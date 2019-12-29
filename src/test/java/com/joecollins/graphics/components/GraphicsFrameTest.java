@@ -1,0 +1,140 @@
+package com.joecollins.graphics.components;
+
+import static com.joecollins.graphics.utils.RenderTestUtils.compareRendering;
+import static org.junit.Assert.assertEquals;
+
+import com.joecollins.bindings.Bindable;
+import com.joecollins.bindings.Binding;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.io.IOException;
+import javax.swing.JPanel;
+import org.junit.Test;
+
+public class GraphicsFrameTest {
+
+  public class TestObject extends Bindable {
+    int numPolls = 0;
+
+    public void setNumPolls(int numPolls) {
+      this.numPolls = numPolls;
+      onPropertyRefreshed("NumPolls");
+    }
+  }
+
+  @Test
+  public void testFixedHeader() {
+    GraphicsFrame graphicsFrame = new GraphicsFrame();
+    graphicsFrame.setHeaderBinding(Binding.fixedBinding("HEADER"));
+    assertEquals("HEADER", graphicsFrame.getHeader());
+  }
+
+  @Test
+  public void testDynamicHeader() {
+    GraphicsFrame graphicsFrame = new GraphicsFrame();
+    graphicsFrame.setHeaderBinding(
+        Binding.propertyBinding(
+            new TestObject(), o -> o.numPolls + " POLLS REPORTING", "NumPolls"));
+    assertEquals("0 POLLS REPORTING", graphicsFrame.getHeader());
+  }
+
+  @Test
+  public void testDynamicHeaderRefreshed() {
+    GraphicsFrame graphicsFrame = new GraphicsFrame();
+    TestObject object = new TestObject();
+    graphicsFrame.setHeaderBinding(
+        Binding.propertyBinding(object, o -> o.numPolls + " POLLS REPORTING", "NumPolls"));
+    assertEquals("0 POLLS REPORTING", graphicsFrame.getHeader());
+    object.setNumPolls(1);
+    assertEquals("1 POLLS REPORTING", graphicsFrame.getHeader());
+  }
+
+  @Test
+  public void testUnbind() {
+    GraphicsFrame graphicsFrame = new GraphicsFrame();
+    TestObject object = new TestObject();
+    graphicsFrame.setHeaderBinding(
+        Binding.propertyBinding(object, o -> o.numPolls + " POLLS REPORTING", "NumPolls"));
+    assertEquals("0 POLLS REPORTING", graphicsFrame.getHeader());
+    graphicsFrame.setHeaderBinding(Binding.fixedBinding("FIXED BINDING"));
+    assertEquals("FIXED BINDING", graphicsFrame.getHeader());
+    object.setNumPolls(1);
+    assertEquals("FIXED BINDING", graphicsFrame.getHeader());
+  }
+
+  @Test
+  public void testFixedNotes() {
+    GraphicsFrame graphicsFrame = new GraphicsFrame();
+    graphicsFrame.setNotesBinding(Binding.fixedBinding("SOURCE: BBC"));
+    assertEquals("SOURCE: BBC", graphicsFrame.getNotes());
+  }
+
+  @Test
+  public void testBorderColor() {
+    GraphicsFrame graphicsFrame = new GraphicsFrame();
+    graphicsFrame.setBorderColorBinding(Binding.fixedBinding(Color.BLUE));
+    assertEquals(Color.BLUE, graphicsFrame.getBorderColor());
+  }
+
+  @Test
+  public void testRenderingHeaderOnly() throws IOException {
+    GraphicsFrame graphicsFrame =
+        new GraphicsFrame() {
+          {
+            JPanel panel = new JPanel();
+            panel.setBackground(Color.YELLOW);
+            add(panel, BorderLayout.CENTER);
+          }
+        };
+    graphicsFrame.setHeaderBinding(Binding.fixedBinding("HEADER"));
+    graphicsFrame.setSize(256, 128);
+    compareRendering("GraphicsFrame", "HeaderOnly", graphicsFrame);
+  }
+
+  @Test
+  public void testRenderingHeaderAndNotes() throws IOException {
+    GraphicsFrame graphicsFrame =
+        new GraphicsFrame() {
+          {
+            JPanel panel = new JPanel();
+            panel.setBackground(Color.YELLOW);
+            add(panel, BorderLayout.CENTER);
+          }
+        };
+    graphicsFrame.setHeaderBinding(Binding.fixedBinding("HEADER"));
+    graphicsFrame.setNotesBinding(Binding.fixedBinding("SOURCE: BBC"));
+    graphicsFrame.setSize(256, 128);
+    compareRendering("GraphicsFrame", "HeaderAndNotes", graphicsFrame);
+  }
+
+  @Test
+  public void testRenderingNoHeader() throws IOException {
+    GraphicsFrame graphicsFrame =
+        new GraphicsFrame() {
+          {
+            JPanel panel = new JPanel();
+            panel.setBackground(Color.YELLOW);
+            add(panel, BorderLayout.CENTER);
+          }
+        };
+    graphicsFrame.setSize(256, 128);
+    compareRendering("GraphicsFrame", "NoHeader", graphicsFrame);
+  }
+
+  @Test
+  public void testRenderingBorderColor() throws IOException {
+    GraphicsFrame graphicsFrame =
+        new GraphicsFrame() {
+          {
+            JPanel panel = new JPanel();
+            panel.setBackground(Color.YELLOW);
+            add(panel, BorderLayout.CENTER);
+          }
+        };
+    graphicsFrame.setHeaderBinding(Binding.fixedBinding("HEADER"));
+    graphicsFrame.setNotesBinding(Binding.fixedBinding("SOURCE: BBC"));
+    graphicsFrame.setBorderColorBinding(Binding.fixedBinding(Color.RED));
+    graphicsFrame.setSize(256, 128);
+    compareRendering("GraphicsFrame", "BorderColor", graphicsFrame);
+  }
+}
