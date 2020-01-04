@@ -19,6 +19,8 @@ import org.junit.Test;
 public class BarFrameTest {
 
   private static final DecimalFormat CHANGE_FORMAT = new DecimalFormat("+0;-0");
+  private static final DecimalFormat THOUSANDS_FORMAT = new DecimalFormat("#,##0");
+  private static final DecimalFormat PERCENT_FORMAT = new DecimalFormat("0.0%");
 
   @Test
   public void testNumBars() {
@@ -551,6 +553,48 @@ public class BarFrameTest {
     compareRendering("BarFrame", "MultiSeriesBothDirections", barFrame);
   }
 
+  @Test
+  public void testRenderTwoLinedBars() throws IOException {
+    BindableList<RidingResult> results = new BindableList<>();
+    results.add(new RidingResult("BARDISH CHAGGER", "LIBERAL", Color.RED, 31085, 0.4879));
+    results.add(new RidingResult("JERRY ZHANG", "CONSERVATIVE", Color.BLUE, 15615, 0.2451));
+    results.add(
+        new RidingResult("LORI CAMPBELL", "NEW DEMOCRATIC PARTY", Color.ORANGE, 9710, 0.1524));
+    results.add(new RidingResult("KIRSTEN WRIGHT", "GREEN", Color.GREEN, 6184, 0.0971));
+    results.add(
+        new RidingResult("ERIKA TRAUB", "PEOPLE'S PARTY", Color.MAGENTA.darker(), 1112, 0.0175));
+
+    BarFrame barFrame = new BarFrame();
+    barFrame.setHeaderBinding(Binding.fixedBinding("WATERLOO"));
+    barFrame.setMaxBinding(
+        Binding.fixedBinding(results.stream().mapToInt(RidingResult::getNumVotes).sum() / 2));
+    barFrame.setSubheadTextBinding(Binding.fixedBinding("LIB HOLD"));
+    barFrame.setSubheadColorBinding(Binding.fixedBinding(Color.RED));
+    barFrame.setNumBarsBinding(Binding.sizeBinding(results));
+    barFrame.setLeftTextBinding(
+        IndexedBinding.propertyBinding(
+            results,
+            r -> r.getCandidateName() + "\n" + r.getPartyName(),
+            "CandidateName",
+            "PartyName"));
+    barFrame.setRightTextBinding(
+        IndexedBinding.propertyBinding(
+            results,
+            r ->
+                THOUSANDS_FORMAT.format(r.getNumVotes())
+                    + "\n"
+                    + PERCENT_FORMAT.format(r.getVotePct()),
+            "NumVotes",
+            "VotePct"));
+    barFrame.addSeriesBinding(
+        "Seats",
+        IndexedBinding.propertyBinding(results, RidingResult::getPartyColor, "PartyColor"),
+        IndexedBinding.propertyBinding(results, RidingResult::getNumVotes, "NumSeats"));
+    barFrame.setSize(512, 256);
+
+    compareRendering("BarFrame", "TwoLinedBars", barFrame);
+  }
+
   public class ElectionResult extends Bindable {
     private String partyName;
     private Color partyColor;
@@ -602,6 +646,68 @@ public class BarFrameTest {
     public void setSeatEstimate(int seatEstimate) {
       this.seatEstimate = seatEstimate;
       onPropertyRefreshed("SeatEstimate");
+    }
+  }
+
+  public class RidingResult extends Bindable {
+    private String candidateName;
+    private String partyName;
+    private Color partyColor;
+    private int numVotes;
+    private double votePct;
+
+    public RidingResult(
+        String candidateName, String partyName, Color partyColor, int numVotes, double votePct) {
+      this.candidateName = candidateName;
+      this.partyName = partyName;
+      this.partyColor = partyColor;
+      this.numVotes = numVotes;
+      this.votePct = votePct;
+    }
+
+    public String getCandidateName() {
+      return candidateName;
+    }
+
+    public void setCandidateName(String candidateName) {
+      this.candidateName = candidateName;
+      onPropertyRefreshed("CandidateName");
+    }
+
+    public String getPartyName() {
+      return partyName;
+    }
+
+    public void setPartyName(String partyName) {
+      this.partyName = partyName;
+      onPropertyRefreshed("PartyName");
+    }
+
+    public Color getPartyColor() {
+      return partyColor;
+    }
+
+    public void setPartyColor(Color partyColor) {
+      this.partyColor = partyColor;
+      onPropertyRefreshed("PartyColor");
+    }
+
+    public int getNumVotes() {
+      return numVotes;
+    }
+
+    public void setNumVotes(int numVotes) {
+      this.numVotes = numVotes;
+      onPropertyRefreshed("NumVotes");
+    }
+
+    public double getVotePct() {
+      return votePct;
+    }
+
+    public void setVotePct(double votePct) {
+      this.votePct = votePct;
+      onPropertyRefreshed("VotePct");
     }
   }
 }

@@ -200,10 +200,14 @@ public class BarFrame extends GraphicsFrame {
         });
   }
 
-  public double getPixelOfValue(Number value) {
+  private double getPixelOfValue(Number value) {
     double range = max.doubleValue() - min.doubleValue();
     double progress = value.doubleValue() - min.doubleValue();
     return (int) ((centralPanel.getWidth() - 2 * BAR_MARGIN) * progress / range) + BAR_MARGIN;
+  }
+
+  private int getMaxLines() {
+    return bars.stream().mapToInt(Bar::getNumLines).max().orElse(1);
   }
 
   private class SubheadLabel extends JLabel {
@@ -236,17 +240,23 @@ public class BarFrame extends GraphicsFrame {
     private List<MutablePair<Color, Number>> series = new ArrayList<>();
 
     public Bar() {
-      setPreferredSize(new Dimension(1024, 30));
+      resetPreferredSize();
       setBackground(Color.WHITE);
+    }
+
+    private void resetPreferredSize() {
+      setPreferredSize(new Dimension(1024, 30 * getNumLines()));
     }
 
     private void setLeftText(String leftText) {
       this.leftText = leftText;
+      resetPreferredSize();
       repaint();
     }
 
     private void setRightText(String rightText) {
       this.rightText = rightText;
+      resetPreferredSize();
       repaint();
     }
 
@@ -274,13 +284,19 @@ public class BarFrame extends GraphicsFrame {
       return series.stream().mapToDouble(e -> e.getRight().doubleValue()).filter(v -> v < 0).sum();
     }
 
+    private int getNumLines() {
+      int leftLines = leftText.split("\n").length;
+      int rightLines = rightText.split("\n").length;
+      return Math.max(leftLines, rightLines);
+    }
+
     @Override
     protected void paintComponent(Graphics g) {
       super.paintComponent(g);
       ((Graphics2D) g)
           .setRenderingHint(
               RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-      Font font = StandardFont.readBoldFont(getHeight() * 2 / 3);
+      Font font = StandardFont.readBoldFont(getBarHeight() * 3 / 4 / getMaxLines());
       g.setFont(font);
       Color mainColor = series.isEmpty() ? Color.BLACK : series.get(0).left;
       g.setColor(mainColor);
@@ -293,11 +309,11 @@ public class BarFrame extends GraphicsFrame {
         g.setColor(seriesItem.left);
         int width = (int) getPixelOfValue(seriesItem.right) - zero;
         if (width > 0) {
-          g.fillRect(posLeft, BAR_MARGIN, width, getHeight() - 2 * BAR_MARGIN);
+          g.fillRect(posLeft, BAR_MARGIN, width, getBarHeight());
           posLeft += width;
         } else {
           negRight += width;
-          g.fillRect(negRight, BAR_MARGIN, -width, getHeight() - 2 * BAR_MARGIN);
+          g.fillRect(negRight, BAR_MARGIN, -width, getBarHeight());
         }
       }
 
@@ -313,22 +329,39 @@ public class BarFrame extends GraphicsFrame {
       g.setClip(oldClip);
     }
 
+    private int getBarHeight() {
+      return getHeight() - 2 * BAR_MARGIN;
+    }
+
     private void drawText(Graphics g, Font font) {
       Map<Boolean, Double> sumsPosNeg =
           series.stream()
               .map(e -> e.getRight().doubleValue())
               .collect(Collectors.partitioningBy(e -> e > 0, Collectors.summingDouble(Math::abs)));
+      boolean isNetPositive = sumsPosNeg.get(true) >= sumsPosNeg.get(false);
 
-      int leftWidth = g.getFontMetrics(font).stringWidth(leftText);
-      int rightWidth = g.getFontMetrics(font).stringWidth(rightText);
-      int textHeight = g.getFontMetrics(font).getHeight();
-      int textBase = (getHeight() + textHeight) / 2 - BAR_MARGIN;
-      if (sumsPosNeg.get(true) >= sumsPosNeg.get(false)) {
-        g.drawString(leftText, (int) getPixelOfValue(0.0), textBase);
-        g.drawString(rightText, getWidth() - rightWidth - BAR_MARGIN, textBase);
-      } else {
-        g.drawString(leftText, (int) getPixelOfValue(0.0) - leftWidth, textBase);
-        g.drawString(rightText, BAR_MARGIN, textBase);
+      String[] leftText = this.leftText.split("\n");
+      for (int i = 0; i < leftText.length; i++) {
+        int leftWidth = g.getFontMetrics(font).stringWidth(leftText[i]);
+        int textHeight = font.getSize();
+        int textBase = (i + 1) * (getBarHeight() + textHeight) / (leftText.length + 1);
+        if (isNetPositive) {
+          g.drawString(leftText[i], (int) getPixelOfValue(0.0), textBase);
+        } else {
+          g.drawString(leftText[i], (int) getPixelOfValue(0.0) - leftWidth, textBase);
+        }
+      }
+
+      String[] rightText = this.rightText.split("\n");
+      for (int i = 0; i < rightText.length; i++) {
+        int rightWidth = g.getFontMetrics(font).stringWidth(rightText[i]);
+        int textHeight = font.getSize();
+        int textBase = (i + 1) * (getBarHeight() + textHeight) / (rightText.length + 1);
+        if (isNetPositive) {
+          g.drawString(rightText[i], getWidth() - rightWidth - BAR_MARGIN, textBase);
+        } else {
+          g.drawString(rightText[i], BAR_MARGIN, textBase);
+        }
       }
     }
   }
