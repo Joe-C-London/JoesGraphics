@@ -2,12 +2,18 @@ package com.joecollins.graphics.components;
 
 import static com.joecollins.graphics.utils.RenderTestUtils.compareRendering;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 import com.joecollins.bindings.Bindable;
 import com.joecollins.bindings.BindableList;
 import com.joecollins.bindings.Binding;
 import com.joecollins.bindings.IndexedBinding;
 import java.awt.Color;
+import java.awt.Polygon;
+import java.awt.Rectangle;
+import java.awt.Shape;
+import java.awt.geom.Area;
+import java.awt.geom.Ellipse2D;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.Arrays;
@@ -149,6 +155,30 @@ public class BarFrameTest {
     assertEquals(3, libSeries.get(0).getRight().intValue());
     assertEquals(lightRed, libSeries.get(1).getLeft());
     assertEquals(155, libSeries.get(1).getRight().intValue());
+  }
+
+  @Test
+  public void testLeftIconBinding() {
+    BindableList<ElectionResult> results = new BindableList<>();
+    results.add(new ElectionResult("LIBERAL", Color.RED, 157));
+    results.add(new ElectionResult("CONSERVATIVE", Color.BLUE, 121));
+    results.add(new ElectionResult("BLOC QUEBECOIS", Color.CYAN, 32));
+    results.add(new ElectionResult("NEW DEMOCRATIC PARTY", Color.ORANGE, 24));
+    results.add(new ElectionResult("GREEN", Color.GREEN, 3));
+    results.add(new ElectionResult("INDEPENDENT", Color.LIGHT_GRAY, 1));
+
+    Shape shape = new Ellipse2D.Double();
+    BarFrame frame = new BarFrame();
+    frame.setNumBarsBinding(Binding.sizeBinding(results));
+    frame.setLeftIconBinding(
+        IndexedBinding.propertyBinding(
+            results, r -> r.getNumSeats() > 150 ? shape : null, "NumSeats"));
+    assertEquals(shape, frame.getLeftIcon(0));
+    assertNull(frame.getLeftIcon(1));
+    assertNull(frame.getLeftIcon(2));
+    assertNull(frame.getLeftIcon(3));
+    assertNull(frame.getLeftIcon(4));
+    assertNull(frame.getLeftIcon(5));
   }
 
   @Test
@@ -595,6 +625,91 @@ public class BarFrameTest {
     compareRendering("BarFrame", "TwoLinedBars", barFrame);
   }
 
+  @Test
+  public void testRenderTwoLinedBarWithIcon() throws IOException {
+    BindableList<RidingResult> results = new BindableList<>();
+    results.add(new RidingResult("BARDISH CHAGGER", "LIBERAL", Color.RED, 31085, 0.4879, true));
+    results.add(new RidingResult("JERRY ZHANG", "CONSERVATIVE", Color.BLUE, 15615, 0.2451));
+    results.add(
+        new RidingResult("LORI CAMPBELL", "NEW DEMOCRATIC PARTY", Color.ORANGE, 9710, 0.1524));
+    results.add(new RidingResult("KIRSTEN WRIGHT", "GREEN", Color.GREEN, 6184, 0.0971));
+    results.add(
+        new RidingResult("ERIKA TRAUB", "PEOPLE'S PARTY", Color.MAGENTA.darker(), 1112, 0.0175));
+
+    Shape shape = createTickShape();
+
+    BarFrame barFrame = new BarFrame();
+    barFrame.setHeaderBinding(Binding.fixedBinding("WATERLOO"));
+    barFrame.setMaxBinding(
+        Binding.fixedBinding(results.stream().mapToInt(RidingResult::getNumVotes).sum() / 2));
+    barFrame.setSubheadTextBinding(Binding.fixedBinding("LIB HOLD"));
+    barFrame.setSubheadColorBinding(Binding.fixedBinding(Color.RED));
+    barFrame.setNumBarsBinding(Binding.sizeBinding(results));
+    barFrame.setLeftTextBinding(
+        IndexedBinding.propertyBinding(
+            results,
+            r -> r.getCandidateName() + "\n" + r.getPartyName(),
+            "CandidateName",
+            "PartyName"));
+    barFrame.setRightTextBinding(
+        IndexedBinding.propertyBinding(
+            results,
+            r ->
+                THOUSANDS_FORMAT.format(r.getNumVotes())
+                    + "\n"
+                    + PERCENT_FORMAT.format(r.getVotePct()),
+            "NumVotes",
+            "VotePct"));
+    barFrame.setLeftIconBinding(
+        IndexedBinding.propertyBinding(results, r -> r.isElected() ? shape : null, "Elected"));
+    barFrame.addSeriesBinding(
+        "Seats",
+        IndexedBinding.propertyBinding(results, RidingResult::getPartyColor, "PartyColor"),
+        IndexedBinding.propertyBinding(results, RidingResult::getNumVotes, "NumSeats"));
+    barFrame.setSize(512, 256);
+
+    compareRendering("BarFrame", "TwoLinedBarWithIcon", barFrame);
+  }
+
+  @Test
+  public void testRenderTwoLinedBarWithNegativeIcon() throws IOException {
+    BindableList<RidingResult> results = new BindableList<>();
+    results.add(new RidingResult("BARDISH CHAGGER", "LIB", Color.RED, 31085, -0.010, true));
+    results.add(new RidingResult("JERRY ZHANG", "CON", Color.BLUE, 15615, -0.077));
+    results.add(new RidingResult("LORI CAMPBELL", "NDP", Color.ORANGE, 9710, +0.003));
+    results.add(new RidingResult("KIRSTEN WRIGHT", "GRN", Color.GREEN, 6184, +0.068));
+    results.add(new RidingResult("ERIKA TRAUB", "PPC", Color.MAGENTA.darker(), 1112, +0.017));
+
+    Shape shape = createTickShape();
+
+    BarFrame barFrame = new BarFrame();
+    barFrame.setHeaderBinding(Binding.fixedBinding("WATERLOO"));
+    barFrame.setNumBarsBinding(Binding.sizeBinding(results));
+    barFrame.setLeftTextBinding(
+        IndexedBinding.propertyBinding(results, RidingResult::getPartyName, "PartyName"));
+    barFrame.setRightTextBinding(
+        IndexedBinding.propertyBinding(
+            results, r -> PERCENT_FORMAT.format(r.getVotePct()), "VotePct"));
+    barFrame.setLeftIconBinding(
+        IndexedBinding.propertyBinding(results, r -> r.isElected() ? shape : null, "Elected"));
+    barFrame.addSeriesBinding(
+        "Seats",
+        IndexedBinding.propertyBinding(results, RidingResult::getPartyColor, "PartyColor"),
+        IndexedBinding.propertyBinding(results, RidingResult::getVotePct, "VotePct"));
+    barFrame.setSize(512, 256);
+
+    compareRendering("BarFrame", "TwoLinedBarWithNegativeIcon", barFrame);
+  }
+
+  private Shape createTickShape() {
+    Area shape = new Area(new Rectangle(0, 0, 100, 100));
+    shape.subtract(
+        new Area(
+            new Polygon(
+                new int[] {10, 40, 90, 80, 40, 20}, new int[] {50, 80, 30, 20, 60, 40}, 6)));
+    return shape;
+  }
+
   public class ElectionResult extends Bindable {
     private String partyName;
     private Color partyColor;
@@ -655,14 +770,26 @@ public class BarFrameTest {
     private Color partyColor;
     private int numVotes;
     private double votePct;
+    private boolean elected;
 
     public RidingResult(
         String candidateName, String partyName, Color partyColor, int numVotes, double votePct) {
+      this(candidateName, partyName, partyColor, numVotes, votePct, false);
+    }
+
+    public RidingResult(
+        String candidateName,
+        String partyName,
+        Color partyColor,
+        int numVotes,
+        double votePct,
+        boolean elected) {
       this.candidateName = candidateName;
       this.partyName = partyName;
       this.partyColor = partyColor;
       this.numVotes = numVotes;
       this.votePct = votePct;
+      this.elected = elected;
     }
 
     public String getCandidateName() {
@@ -708,6 +835,15 @@ public class BarFrameTest {
     public void setVotePct(double votePct) {
       this.votePct = votePct;
       onPropertyRefreshed("VotePct");
+    }
+
+    public boolean isElected() {
+      return elected;
+    }
+
+    public void setElected(boolean elected) {
+      this.elected = elected;
+      onPropertyRefreshed("Elected");
     }
   }
 }

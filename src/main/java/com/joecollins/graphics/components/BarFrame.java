@@ -12,10 +12,12 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.LayoutManager;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -42,6 +44,7 @@ public class BarFrame extends GraphicsFrame {
   private Binding<Integer> numBarsBinding = () -> 0;
   private IndexedBinding<String> leftTextBinding = IndexedBinding.emptyBinding();
   private IndexedBinding<String> rightTextBinding = IndexedBinding.emptyBinding();
+  private IndexedBinding<Shape> leftIconBinding = IndexedBinding.emptyBinding();
   private Map<String, Pair<IndexedBinding<Color>, IndexedBinding<? extends Number>>>
       seriesBindings = new LinkedHashMap<>();
   private Binding<Number> minBinding =
@@ -170,6 +173,16 @@ public class BarFrame extends GraphicsFrame {
         });
   }
 
+  Shape getLeftIcon(int barNum) {
+    return bars.get(barNum).leftIcon;
+  }
+
+  public void setLeftIconBinding(IndexedBinding<Shape> leftIconBinding) {
+    this.leftIconBinding.unbind();
+    this.leftIconBinding = leftIconBinding;
+    this.leftIconBinding.bind((idx, shape) -> bars.get(idx).setLeftIcon(shape));
+  }
+
   Number getMin() {
     return min;
   }
@@ -238,6 +251,7 @@ public class BarFrame extends GraphicsFrame {
     private String leftText = "";
     private String rightText = "";
     private List<MutablePair<Color, Number>> series = new ArrayList<>();
+    private Shape leftIcon = null;
 
     public Bar() {
       resetPreferredSize();
@@ -257,6 +271,11 @@ public class BarFrame extends GraphicsFrame {
     private void setRightText(String rightText) {
       this.rightText = rightText;
       resetPreferredSize();
+      repaint();
+    }
+
+    private void setLeftIcon(Shape leftIcon) {
+      this.leftIcon = leftIcon;
       repaint();
     }
 
@@ -339,16 +358,20 @@ public class BarFrame extends GraphicsFrame {
               .map(e -> e.getRight().doubleValue())
               .collect(Collectors.partitioningBy(e -> e > 0, Collectors.summingDouble(Math::abs)));
       boolean isNetPositive = sumsPosNeg.get(true) >= sumsPosNeg.get(false);
+      double zero = getPixelOfValue(0.0);
 
       String[] leftText = this.leftText.split("\n");
+      double leftMax = zero;
       for (int i = 0; i < leftText.length; i++) {
         int leftWidth = g.getFontMetrics(font).stringWidth(leftText[i]);
         int textHeight = font.getSize();
         int textBase = (i + 1) * (getBarHeight() + textHeight) / (leftText.length + 1);
         if (isNetPositive) {
-          g.drawString(leftText[i], (int) getPixelOfValue(0.0), textBase);
+          g.drawString(leftText[i], (int) zero, textBase);
+          leftMax = Math.max(leftMax, leftWidth + zero);
         } else {
-          g.drawString(leftText[i], (int) getPixelOfValue(0.0) - leftWidth, textBase);
+          g.drawString(leftText[i], (int) zero - leftWidth, textBase);
+          leftMax = Math.min(leftMax, zero - leftWidth);
         }
       }
 
@@ -362,6 +385,22 @@ public class BarFrame extends GraphicsFrame {
         } else {
           g.drawString(rightText[i], BAR_MARGIN, textBase);
         }
+      }
+
+      if (leftIcon != null) {
+        Rectangle leftIconBounds = leftIcon.getBounds();
+        double leftIconScale = (getBarHeight() - 2 * BAR_MARGIN) / leftIconBounds.getHeight();
+        AffineTransform transform = new AffineTransform();
+        int spaceWidth = g.getFontMetrics(font).stringWidth(" ");
+        if (isNetPositive) {
+          transform.translate(leftMax + spaceWidth, 2 * BAR_MARGIN);
+        } else {
+          transform.translate(
+              leftMax - spaceWidth - leftIconScale * leftIconBounds.getWidth(), 2 * BAR_MARGIN);
+        }
+        transform.scale(leftIconScale, leftIconScale);
+        Shape scaledLeftIcon = transform.createTransformedShape(leftIcon);
+        ((Graphics2D) g).fill(scaledLeftIcon);
       }
     }
   }
