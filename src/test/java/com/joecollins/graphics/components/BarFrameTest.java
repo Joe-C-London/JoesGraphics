@@ -710,7 +710,7 @@ public class BarFrameTest {
     return shape;
   }
 
-  public class ElectionResult extends Bindable {
+  private static class ElectionResult extends Bindable {
     private String partyName;
     private Color partyColor;
     private int numSeats;
@@ -764,7 +764,7 @@ public class BarFrameTest {
     }
   }
 
-  public class RidingResult extends Bindable {
+  private static class RidingResult extends Bindable {
     private String candidateName;
     private String partyName;
     private Color partyColor;

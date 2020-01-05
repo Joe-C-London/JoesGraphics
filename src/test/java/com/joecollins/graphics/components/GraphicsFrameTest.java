@@ -13,7 +13,7 @@ import org.junit.Test;
 
 public class GraphicsFrameTest {
 
-  public class TestObject extends Bindable {
+  private static class TestObject extends Bindable {
     int numPolls = 0;
 
     public void setNumPolls(int numPolls) {
