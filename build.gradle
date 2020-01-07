@@ -12,12 +12,20 @@ group 'com.joecollins'
 version '1.0-SNAPSHOT'
 
 repositories {
+    maven {
+        url "http://download.osgeo.org/webdav/geotools/"
+    }
     mavenCentral()
 }
+
+def geotoolsVersion = '20.2'
 
 dependencies {
     compile group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.30'
     compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.9'
+    compile group: 'org.geotools', name: 'gt-shapefile', version: geotoolsVersion
+    compile group: 'org.geotools', name: 'gt-api', version: geotoolsVersion
+    compile group: 'org.geotools', name: 'gt-metadata', version: geotoolsVersion
     testCompile group: 'junit', name: 'junit', version: '4.12'
     testCompile group: 'commons-io', name: 'commons-io', version: '2.6'
 }
