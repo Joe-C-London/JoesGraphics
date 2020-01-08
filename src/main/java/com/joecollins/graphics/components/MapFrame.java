@@ -13,7 +13,6 @@ import java.awt.geom.Area;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import javax.swing.JPanel;
 import org.apache.commons.lang3.tuple.MutablePair;
 
@@ -22,8 +21,10 @@ public class MapFrame extends GraphicsFrame {
   private Binding<Integer> numShapesBinding = () -> 0;
   private IndexedBinding<Shape> shapeBinding = IndexedBinding.emptyBinding();
   private IndexedBinding<Color> colorBinding = IndexedBinding.emptyBinding();
+  private Binding<Rectangle2D> focusBinding = () -> null;
 
   private List<MutablePair<Shape, Color>> shapesToDraw = new ArrayList<>();
+  private Rectangle2D focus = null;
 
   public MapFrame() {
     JPanel panel =
@@ -38,14 +39,13 @@ public class MapFrame extends GraphicsFrame {
             Graphics2D g2d = (Graphics2D) g;
             g2d.setRenderingHint(
                 RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            Optional<Rectangle2D> bounds =
-                shapesToDraw.stream()
-                    .map(e -> e.left.getBounds2D())
-                    .reduce(Rectangle2D::createUnion);
-            if (bounds.isEmpty()) return;
+            if (shapesToDraw.isEmpty()) {
+              return;
+            }
+            Rectangle2D bounds = getFocusBox();
             AffineTransform transform = new AffineTransform();
-            double boundsWidth = bounds.get().getMaxX() - bounds.get().getMinX();
-            double boundsHeight = bounds.get().getMaxY() - bounds.get().getMinY();
+            double boundsWidth = bounds.getMaxX() - bounds.getMinX();
+            double boundsHeight = bounds.getMaxY() - bounds.getMinY();
             double xScale = (getWidth() - 4) / boundsWidth;
             double yScale = (getHeight() - 4) / boundsHeight;
             double scale = Math.min(xScale, yScale);
@@ -53,7 +53,7 @@ public class MapFrame extends GraphicsFrame {
             double y = (getHeight() - scale * boundsHeight) / 2;
             transform.translate(x, y);
             transform.scale(scale, scale);
-            transform.translate(-bounds.get().getMinX(), -bounds.get().getMinY());
+            transform.translate(-bounds.getMinX(), -bounds.getMinY());
             shapesToDraw.forEach(
                 pair -> {
                   g2d.setColor(pair.right);
@@ -107,6 +107,31 @@ public class MapFrame extends GraphicsFrame {
     this.colorBinding.bind(
         (idx, color) -> {
           shapesToDraw.get(idx).right = color;
+          repaint();
+        });
+  }
+
+  Rectangle2D getFocusBox() {
+    if (focus == null) {
+      Rectangle2D bounds = null;
+      for (MutablePair<Shape, Color> entry : shapesToDraw) {
+        if (bounds == null) {
+          bounds = entry.left.getBounds2D();
+        } else {
+          bounds.add(entry.left.getBounds2D());
+        }
+      }
+      return bounds;
+    }
+    return focus;
+  }
+
+  public void setFocusBox(Binding<Rectangle2D> focusBinding) {
+    this.focusBinding.unbind();
+    this.focusBinding = focusBinding;
+    this.focusBinding.bind(
+        focus -> {
+          this.focus = focus;
           repaint();
         });
   }
