@@ -238,6 +238,18 @@ public class BarFrameTest {
   }
 
   @Test
+  public void testLines() {
+    BarFrame frame = new BarFrame();
+    frame.setNumLinesBinding(Binding.fixedBinding(1));
+    frame.setLineLevelsBinding(IndexedBinding.singletonBinding(170));
+    frame.setLineLabelsBinding(IndexedBinding.singletonBinding("170 SEATS FOR MAJORITY"));
+
+    assertEquals(1, frame.getNumLines());
+    assertEquals(170, frame.getLineLevel(0));
+    assertEquals("170 SEATS FOR MAJORITY", frame.getLineLabel(0));
+  }
+
+  @Test
   public void testUnbind() {
     BindableList<ElectionResult> results = new BindableList<>();
     ElectionResult con = new ElectionResult("CONSERVATIVE", Color.BLUE, 1);
@@ -699,6 +711,41 @@ public class BarFrameTest {
     barFrame.setSize(512, 256);
 
     compareRendering("BarFrame", "TwoLinedBarWithNegativeIcon", barFrame);
+  }
+
+  @Test
+  public void renderVerticalLine() throws IOException {
+    BindableList<ElectionResult> results = new BindableList<>();
+    results.add(new ElectionResult("LIBERAL", Color.RED, 177));
+    results.add(new ElectionResult("CONSERVATIVE", Color.BLUE, 95));
+    results.add(new ElectionResult("NEW DEMOCRATIC PARTY", Color.ORANGE, 39));
+    results.add(new ElectionResult("BLOC QUEBECOIS", Color.CYAN, 10));
+    results.add(new ElectionResult("INDEPENDENT", Color.LIGHT_GRAY, 8));
+    results.add(new ElectionResult("GREEN", Color.GREEN, 2));
+    results.add(
+        new ElectionResult("CO-OPERATIVE COMMONWEALTH FEDERATION", Color.ORANGE.darker(), 1));
+    results.add(new ElectionResult("PEOPLE'S PARTY", Color.MAGENTA.darker(), 1));
+
+    BarFrame barFrame = new BarFrame();
+    barFrame.setHeaderBinding(Binding.fixedBinding("SEATS AT DISSOLUTION"));
+    barFrame.setSubheadTextBinding(Binding.fixedBinding("170 FOR MAJORITY"));
+    barFrame.setSubheadColorBinding(Binding.fixedBinding(Color.RED));
+    barFrame.setMaxBinding(Binding.fixedBinding(225));
+    barFrame.setNumBarsBinding(Binding.sizeBinding(results));
+    barFrame.setLeftTextBinding(
+        IndexedBinding.propertyBinding(results, ElectionResult::getPartyName, "PartyName"));
+    barFrame.setRightTextBinding(
+        IndexedBinding.propertyBinding(results, r -> String.valueOf(r.getNumSeats()), "NumSeats"));
+    barFrame.addSeriesBinding(
+        "Seats",
+        IndexedBinding.propertyBinding(results, ElectionResult::getPartyColor, "PartyColor"),
+        IndexedBinding.propertyBinding(results, ElectionResult::getNumSeats, "NumSeats"));
+    barFrame.setNumLinesBinding(Binding.fixedBinding(1));
+    barFrame.setLineLevelsBinding(IndexedBinding.singletonBinding(170));
+    barFrame.setLineLabelsBinding(IndexedBinding.singletonBinding("MAJORITY"));
+    barFrame.setSize(512, 256);
+
+    compareRendering("BarFrame", "VerticalLine", barFrame);
   }
 
   private Shape createTickShape() {

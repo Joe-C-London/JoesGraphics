@@ -36,6 +36,7 @@ public class BarFrame extends GraphicsFrame {
   private final JPanel centralPanel;
   private final SubheadLabel subheadLabel = new SubheadLabel();
   private final List<Bar> bars = new ArrayList<>();
+  private final List<Line> lines = new ArrayList<>();
   private Number min = 0.0, max = 0.0;
   private boolean usingDefaultMin = true, usingDefaultMax = true;
 
@@ -47,6 +48,9 @@ public class BarFrame extends GraphicsFrame {
   private IndexedBinding<Shape> leftIconBinding = IndexedBinding.emptyBinding();
   private Map<String, Pair<IndexedBinding<Color>, IndexedBinding<? extends Number>>>
       seriesBindings = new LinkedHashMap<>();
+  private Binding<Integer> numLinesBinding = () -> 0;
+  private IndexedBinding<Number> lineLevelsBinding = IndexedBinding.emptyBinding();
+  private IndexedBinding<String> lineLabelsBinding = IndexedBinding.emptyBinding();
   private Binding<Number> minBinding =
       () ->
           bars.stream()
@@ -60,12 +64,36 @@ public class BarFrame extends GraphicsFrame {
   private static final int BAR_MARGIN = 2;
 
   public BarFrame() {
-    centralPanel = new JPanel();
-    centralPanel.setBackground(Color.WHITE);
-    centralPanel.setLayout(new BarFrameLayout());
+    centralPanel =
+        new JPanel() {
+          {
+            setBackground(Color.WHITE);
+            setLayout(new BarFrameLayout());
+          }
+
+          @Override
+          protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            ((Graphics2D) g)
+                .setRenderingHint(
+                    RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+            drawLines(
+                g,
+                subheadLabel.isVisible() ? subheadLabel.getHeight() : BAR_MARGIN,
+                getHeight() - BAR_MARGIN);
+          }
+        };
     add(centralPanel, BorderLayout.CENTER);
 
     centralPanel.add(subheadLabel);
+  }
+
+  private void drawLines(Graphics g, int top, int bottom) {
+    g.setColor(Color.BLACK);
+    for (var line : lines) {
+      int level = (int) getPixelOfValue(line.level);
+      g.drawLine(level, top, level, bottom);
+    }
   }
 
   String getSubheadText() {
@@ -223,6 +251,47 @@ public class BarFrame extends GraphicsFrame {
     return bars.stream().mapToInt(Bar::getNumLines).max().orElse(1);
   }
 
+  int getNumLines() {
+    return lines.size();
+  }
+
+  public void setNumLinesBinding(Binding<Integer> numLinesBinding) {
+    this.numLinesBinding.unbind();
+    this.numLinesBinding = numLinesBinding;
+    this.numLinesBinding.bind(
+        size -> {
+          while (size > lines.size()) {
+            Line line = new Line();
+            lines.add(line);
+            centralPanel.add(line.label);
+          }
+          while (size < lines.size()) {
+            Line line = lines.remove(size.intValue());
+            centralPanel.remove(line.label);
+          }
+        });
+  }
+
+  Number getLineLevel(int index) {
+    return lines.get(index).level;
+  }
+
+  public void setLineLevelsBinding(IndexedBinding<Number> lineLevelsBinding) {
+    this.lineLevelsBinding.unbind();
+    this.lineLevelsBinding = lineLevelsBinding;
+    this.lineLevelsBinding.bind((idx, level) -> lines.get(idx).setLevel(level));
+  }
+
+  String getLineLabel(int index) {
+    return lines.get(index).label.getText();
+  }
+
+  public void setLineLabelsBinding(IndexedBinding<String> lineLabelsBinding) {
+    this.lineLabelsBinding.unbind();
+    this.lineLabelsBinding = lineLabelsBinding;
+    this.lineLabelsBinding.bind((idx, label) -> lines.get(idx).setLabel(label));
+  }
+
   private class SubheadLabel extends JLabel {
 
     public SubheadLabel() {
@@ -239,11 +308,6 @@ public class BarFrame extends GraphicsFrame {
               setFont(StandardFont.readBoldFont(getHeight() * 2 / 3));
             }
           });
-    }
-
-    @Override
-    public void paint(Graphics g) {
-      super.paint(g);
     }
   }
 
@@ -315,6 +379,7 @@ public class BarFrame extends GraphicsFrame {
       ((Graphics2D) g)
           .setRenderingHint(
               RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+      drawLines(g, 0, getHeight());
       Font font = StandardFont.readBoldFont(getBarHeight() * 3 / 4 / getMaxLines());
       g.setFont(font);
       Color mainColor = series.isEmpty() ? Color.BLACK : series.get(0).left;
@@ -405,6 +470,36 @@ public class BarFrame extends GraphicsFrame {
     }
   }
 
+  private class Line {
+    private Number level = 0;
+    private JLabel label =
+        new JLabel("") {
+          {
+            setForeground(Color.BLACK);
+            setPreferredSize(new Dimension(1024, 15));
+            setFont(StandardFont.readNormalFont(10));
+            setVisible(true);
+            setHorizontalAlignment(JLabel.LEFT);
+            setVerticalAlignment(JLabel.BOTTOM);
+            addComponentListener(
+                new ComponentAdapter() {
+                  @Override
+                  public void componentResized(ComponentEvent e) {
+                    setFont(StandardFont.readNormalFont(getHeight() * 2 / 3));
+                  }
+                });
+          }
+        };
+
+    public void setLevel(Number level) {
+      this.level = level;
+    }
+
+    public void setLabel(String label) {
+      this.label.setText(label);
+    }
+  }
+
   private class BarFrameLayout implements LayoutManager {
 
     @Override
@@ -437,6 +532,9 @@ public class BarFrame extends GraphicsFrame {
         barHeight = Math.max(barHeight, barSize.height);
       }
       height += bars.size() * barHeight;
+      if (!lines.isEmpty()) {
+        height += lines.get(0).label.getPreferredSize().height;
+      }
       return new Dimension(width, height);
     }
 
@@ -461,6 +559,13 @@ public class BarFrame extends GraphicsFrame {
         bar.setLocation(0, top);
         bar.setSize(width, barHeight);
         top += barHeight;
+      }
+
+      for (Line line : lines) {
+        int left = (int) getPixelOfValue(line.level) + BAR_MARGIN;
+        int labelHeight = Math.min(line.label.getPreferredSize().height, actualHeight - top);
+        line.label.setLocation(left, actualHeight - labelHeight);
+        line.label.setSize(width - left, labelHeight);
       }
     }
   }

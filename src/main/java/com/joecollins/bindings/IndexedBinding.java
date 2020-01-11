@@ -30,6 +30,20 @@ public interface IndexedBinding<T> {
     };
   }
 
+  static <T> IndexedBinding<T> singletonBinding(T item) {
+    return new IndexedBinding<T>() {
+      @Override
+      public int size() {
+        return 1;
+      }
+
+      @Override
+      public T getValue(int index) {
+        return item;
+      }
+    };
+  }
+
   @SuppressWarnings("unchecked")
   static <T extends Bindable, U> IndexedBinding<U> propertyBinding(
       BindableList<T> list, Function<T, U> func, String... properties) {
