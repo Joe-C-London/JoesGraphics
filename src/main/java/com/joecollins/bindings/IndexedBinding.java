@@ -44,10 +44,24 @@ public interface IndexedBinding<T> {
     };
   }
 
+  static <T> IndexedBinding<T> listBinding(T... items) {
+    return new IndexedBinding<T>() {
+      @Override
+      public int size() {
+        return items.length;
+      }
+
+      @Override
+      public T getValue(int index) {
+        return items[index];
+      }
+    };
+  }
+
   @SuppressWarnings("unchecked")
   static <T extends Bindable, U> IndexedBinding<U> propertyBinding(
       BindableList<T> list, Function<T, U> func, String... properties) {
-    if (list == null || properties.length == 0) {
+    if (list == null) {
       return emptyBinding();
     }
     return new IndexedBinding<>() {
