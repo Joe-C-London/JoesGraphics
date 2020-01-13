@@ -26,6 +26,7 @@ dependencies {
     compile group: 'org.geotools', name: 'gt-shapefile', version: geotoolsVersion
     compile group: 'org.geotools', name: 'gt-api', version: geotoolsVersion
     compile group: 'org.geotools', name: 'gt-metadata', version: geotoolsVersion
+    compile group: 'org.twitter4j', name: 'twitter4j-core', version: '4.0.7'
     testCompile group: 'junit', name: 'junit', version: '4.12'
     testCompile group: 'commons-io', name: 'commons-io', version: '2.6'
 }

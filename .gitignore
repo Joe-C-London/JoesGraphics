@@ -28,3 +28,6 @@ hs_err_pid*
 
 # IDE
 /.idea
+
+# OAuth passwords are stored here
+twitter.properties
