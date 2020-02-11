@@ -33,9 +33,15 @@ public class RenderTestUtils {
                 + ".png");
     File actualFile = File.createTempFile("test", ".png");
     ImageIO.write(convertToImage(panel), "png", actualFile);
-    LOGGER.info(
-        "Comparing {} with {}", expectedFile.getAbsolutePath(), actualFile.getAbsolutePath());
-    assertTrue(FileUtils.contentEquals(expectedFile, actualFile));
+    boolean isMatch = FileUtils.contentEquals(expectedFile, actualFile);
+    if (!isMatch) {
+      System.out.println(expectedFile.getAbsolutePath());
+      System.out.println(actualFile.getAbsolutePath());
+      System.out.println(
+          String.format(
+              "copy /Y %s %s", actualFile.getAbsolutePath(), expectedFile.getAbsolutePath()));
+    }
+    assertTrue(isMatch);
     actualFile.deleteOnExit();
   }
 

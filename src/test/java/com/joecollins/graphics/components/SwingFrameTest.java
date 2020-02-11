@@ -116,4 +116,19 @@ public class SwingFrameTest {
 
     compareRendering("SwingFrame", "MaxSwingLeft", frame);
   }
+
+  @Test
+  public void testRenderAccents() throws IOException {
+    SwingFrame frame = new SwingFrame();
+    frame.setHeaderBinding(Binding.fixedBinding("CHANGES APR\u00c8S 2014"));
+    frame.setRangeBinding(Binding.fixedBinding(10));
+    frame.setValueBinding(Binding.fixedBinding(0));
+    frame.setLeftColorBinding(Binding.fixedBinding(Color.BLUE));
+    frame.setRightColorBinding(Binding.fixedBinding(Color.RED));
+    frame.setBottomTextBinding(Binding.fixedBinding("VOIX PAS R\u00c9\u00c7US"));
+    frame.setBottomColorBinding(Binding.fixedBinding(Color.BLACK));
+    frame.setSize(256, 128);
+
+    compareRendering("SwingFrame", "Accents", frame);
+  }
 }

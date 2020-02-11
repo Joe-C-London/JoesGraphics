@@ -714,7 +714,7 @@ public class BarFrameTest {
   }
 
   @Test
-  public void renderVerticalLine() throws IOException {
+  public void testRenderVerticalLine() throws IOException {
     BindableList<ElectionResult> results = new BindableList<>();
     results.add(new ElectionResult("LIBERAL", Color.RED, 177));
     results.add(new ElectionResult("CONSERVATIVE", Color.BLUE, 95));
@@ -746,6 +746,68 @@ public class BarFrameTest {
     barFrame.setSize(512, 256);
 
     compareRendering("BarFrame", "VerticalLine", barFrame);
+  }
+
+  @Test
+  public void testRenderAccents() throws IOException {
+    BindableList<ElectionResult> results = new BindableList<>();
+    results.add(
+        new ElectionResult("COALITION AVENIR QU\u00c9BEC: FRAN\u00c7OIS LEGAULT", Color.BLUE, 74));
+    results.add(new ElectionResult("LIB\u00c9RAL: PHILIPPE COUILLARD", Color.RED, 31));
+    results.add(
+        new ElectionResult("PARTI QU\u00c9BECOIS: JEAN-FRAN\u00c7OIS LIS\u00c9E", Color.CYAN, 10));
+    results.add(new ElectionResult("QU\u00c9BEC SOLIDAIRE: MANON MASS\u00c9", Color.ORANGE, 10));
+
+    BarFrame barFrame = new BarFrame();
+    barFrame.setHeaderBinding(Binding.fixedBinding("\u00c9LECTION 2018"));
+    barFrame.setSubheadTextBinding(Binding.fixedBinding("MAJORIT\u00c9: 63"));
+    barFrame.setMaxBinding(Binding.fixedBinding(83));
+    barFrame.setNumBarsBinding(Binding.sizeBinding(results));
+    barFrame.setLeftTextBinding(
+        IndexedBinding.propertyBinding(results, ElectionResult::getPartyName, "PartyName"));
+    barFrame.setRightTextBinding(
+        IndexedBinding.propertyBinding(results, r -> String.valueOf(r.getNumSeats()), "NumSeats"));
+    barFrame.addSeriesBinding(
+        "Seats",
+        IndexedBinding.propertyBinding(results, ElectionResult::getPartyColor, "PartyColor"),
+        IndexedBinding.propertyBinding(results, ElectionResult::getNumSeats, "NumSeats"));
+    barFrame.setNumLinesBinding(Binding.fixedBinding(1));
+    barFrame.setLineLevelsBinding(IndexedBinding.singletonBinding(63));
+    barFrame.setLineLabelsBinding(IndexedBinding.singletonBinding("MAJORIT\u00c9"));
+    barFrame.setSize(512, 256);
+
+    compareRendering("BarFrame", "Accents", barFrame);
+  }
+
+  @Test
+  public void testRenderMultiLineAccents() throws IOException {
+    BindableList<ElectionResult> results = new BindableList<>();
+    results.add(
+        new ElectionResult("COALITION AVENIR QU\u00c9BEC\nFRAN\u00c7OIS LEGAULT", Color.BLUE, 74));
+    results.add(new ElectionResult("LIB\u00c9RAL\nPHILIPPE COUILLARD", Color.RED, 31));
+    results.add(
+        new ElectionResult("PARTI QU\u00c9BECOIS\nJEAN-FRAN\u00c7OIS LIS\u00c9E", Color.CYAN, 10));
+    results.add(new ElectionResult("QU\u00c9BEC SOLIDAIRE\nMANON MASS\u00c9", Color.ORANGE, 10));
+
+    BarFrame barFrame = new BarFrame();
+    barFrame.setHeaderBinding(Binding.fixedBinding("\u00c9LECTION 2018"));
+    barFrame.setSubheadTextBinding(Binding.fixedBinding("MAJORIT\u00c9: 63"));
+    barFrame.setMaxBinding(Binding.fixedBinding(83));
+    barFrame.setNumBarsBinding(Binding.sizeBinding(results));
+    barFrame.setLeftTextBinding(
+        IndexedBinding.propertyBinding(results, ElectionResult::getPartyName, "PartyName"));
+    barFrame.setRightTextBinding(
+        IndexedBinding.propertyBinding(results, r -> String.valueOf(r.getNumSeats()), "NumSeats"));
+    barFrame.addSeriesBinding(
+        "Seats",
+        IndexedBinding.propertyBinding(results, ElectionResult::getPartyColor, "PartyColor"),
+        IndexedBinding.propertyBinding(results, ElectionResult::getNumSeats, "NumSeats"));
+    barFrame.setNumLinesBinding(Binding.fixedBinding(1));
+    barFrame.setLineLevelsBinding(IndexedBinding.singletonBinding(63));
+    barFrame.setLineLabelsBinding(IndexedBinding.singletonBinding("MAJORIT\u00c9"));
+    barFrame.setSize(512, 256);
+
+    compareRendering("BarFrame", "MultiLineAccents", barFrame);
   }
 
   private Shape createTickShape() {

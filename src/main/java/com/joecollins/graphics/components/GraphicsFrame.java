@@ -9,6 +9,7 @@ import java.awt.Font;
 import java.awt.GridLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
 import javax.swing.border.MatteBorder;
 
 public class GraphicsFrame extends JPanel {
@@ -46,6 +47,7 @@ public class GraphicsFrame extends JPanel {
             setForeground(Color.WHITE);
             setHorizontalAlignment(JLabel.CENTER);
             setFont(headerFont);
+            setBorder(new EmptyBorder(3, 0, -3, 0));
           }
         };
     headerPanel.add(headerLabel);
@@ -56,6 +58,7 @@ public class GraphicsFrame extends JPanel {
             setForeground(Color.BLACK);
             setHorizontalAlignment(JLabel.RIGHT);
             setFont(StandardFont.readNormalFont(12));
+            setBorder(new EmptyBorder(2, 0, -2, 0));
           }
         };
     add(notesLabel, BorderLayout.SOUTH);

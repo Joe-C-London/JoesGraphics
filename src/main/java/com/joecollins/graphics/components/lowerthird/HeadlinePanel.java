@@ -19,7 +19,7 @@ public class HeadlinePanel extends JPanel {
           setVerticalAlignment(JLabel.CENTER);
           setFont(StandardFont.readNormalFont(24));
           setForeground(Color.BLACK);
-          setBorder(new EmptyBorder(10, 5, 0, 5));
+          setBorder(new EmptyBorder(6, 5, -6, 5));
         }
       };
   private JLabel subheadLabel =
@@ -30,7 +30,7 @@ public class HeadlinePanel extends JPanel {
           setVerticalAlignment(JLabel.CENTER);
           setFont(StandardFont.readNormalFont(16));
           setForeground(Color.BLACK);
-          setBorder(new EmptyBorder(0, 5, 0, 5));
+          setBorder(new EmptyBorder(2, 5, -2, 5));
         }
       };
 
@@ -85,8 +85,8 @@ public class HeadlinePanel extends JPanel {
     public void layoutContainer(Container parent) {
       int width = parent.getWidth();
       int height = parent.getHeight();
-      int headlineHeight = height * 3 / 5;
-      int subheadHeight = height * 2 / 5;
+      int headlineHeight = height * 11 / 20;
+      int subheadHeight = height * 9 / 20;
       headlineLabel.setLocation(0, 0);
       headlineLabel.setSize(width, subheadLabel.isVisible() ? headlineHeight : height);
       subheadLabel.setLocation(0, headlineHeight);

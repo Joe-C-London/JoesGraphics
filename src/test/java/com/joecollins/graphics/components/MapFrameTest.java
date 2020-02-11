@@ -60,7 +60,7 @@ public class MapFrameTest {
     mapFrame.setNumShapesBinding(Binding.sizeBinding(shapes));
     mapFrame.setShapeBinding(IndexedBinding.propertyBinding(shapes, MapEntry::getShape, "Shape"));
     mapFrame.setColorBinding(IndexedBinding.propertyBinding(shapes, MapEntry::getColor, "Color"));
-    mapFrame.setFocusBox(Binding.fixedBinding(cityBox));
+    mapFrame.setFocusBoxBinding(Binding.fixedBinding(cityBox));
     assertEquals(cityBox, mapFrame.getFocusBox());
   }
 
@@ -103,7 +103,7 @@ public class MapFrameTest {
     mapFrame.setNumShapesBinding(Binding.sizeBinding(shapes));
     mapFrame.setShapeBinding(IndexedBinding.propertyBinding(shapes, MapEntry::getShape, "Shape"));
     mapFrame.setColorBinding(IndexedBinding.propertyBinding(shapes, MapEntry::getColor, "Color"));
-    mapFrame.setFocusBox(Binding.fixedBinding(zoomBox));
+    mapFrame.setFocusBoxBinding(Binding.fixedBinding(zoomBox));
     mapFrame.setSize(256, 128);
 
     compareRendering("MapFrame", "RenderZoomedIn", mapFrame);

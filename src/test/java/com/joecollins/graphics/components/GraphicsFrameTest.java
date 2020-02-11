@@ -137,4 +137,20 @@ public class GraphicsFrameTest {
     graphicsFrame.setSize(256, 128);
     compareRendering("GraphicsFrame", "BorderColor", graphicsFrame);
   }
+
+  @Test
+  public void testRenderingAccents() throws IOException {
+    GraphicsFrame graphicsFrame =
+        new GraphicsFrame() {
+          {
+            JPanel panel = new JPanel();
+            panel.setBackground(Color.YELLOW);
+            add(panel, BorderLayout.CENTER);
+          }
+        };
+    graphicsFrame.setHeaderBinding(Binding.fixedBinding("\u00c7A C'EST GR\u00c2VE"));
+    graphicsFrame.setNotesBinding(Binding.fixedBinding("JOYEUX NO\u00cbL, GAR\u00c7ON!"));
+    graphicsFrame.setSize(256, 128);
+    compareRendering("GraphicsFrame", "Accents", graphicsFrame);
+  }
 }

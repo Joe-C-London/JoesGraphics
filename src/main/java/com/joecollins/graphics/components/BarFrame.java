@@ -49,14 +49,14 @@ public class BarFrame extends GraphicsFrame {
   private Map<String, Pair<IndexedBinding<Color>, IndexedBinding<? extends Number>>>
       seriesBindings = new LinkedHashMap<>();
   private Binding<Integer> numLinesBinding = () -> 0;
-  private IndexedBinding<Number> lineLevelsBinding = IndexedBinding.emptyBinding();
+  private IndexedBinding<? extends Number> lineLevelsBinding = IndexedBinding.emptyBinding();
   private IndexedBinding<String> lineLabelsBinding = IndexedBinding.emptyBinding();
-  private Binding<Number> minBinding =
+  private Binding<? extends Number> minBinding =
       () ->
           bars.stream()
               .mapToDouble(bar -> bar.getTotalNegative().doubleValue())
               .reduce(0, Math::min);
-  private Binding<Number> maxBinding =
+  private Binding<? extends Number> maxBinding =
       () ->
           bars.stream()
               .mapToDouble(bar -> bar.getTotalPositive().doubleValue())
@@ -140,6 +140,9 @@ public class BarFrame extends GraphicsFrame {
             Bar bar = bars.remove(numBars.intValue());
             centralPanel.remove(bar);
           }
+          centralPanel.invalidate();
+          centralPanel.revalidate();
+          repaint();
         });
   }
 
@@ -215,7 +218,7 @@ public class BarFrame extends GraphicsFrame {
     return min;
   }
 
-  public void setMinBinding(Binding<Number> minBinding) {
+  public void setMinBinding(Binding<? extends Number> minBinding) {
     usingDefaultMin = false;
     this.minBinding.unbind();
     this.minBinding = minBinding;
@@ -230,7 +233,7 @@ public class BarFrame extends GraphicsFrame {
     return max;
   }
 
-  public void setMaxBinding(Binding<Number> maxBinding) {
+  public void setMaxBinding(Binding<? extends Number> maxBinding) {
     usingDefaultMax = false;
     this.maxBinding.unbind();
     this.maxBinding = maxBinding;
@@ -276,7 +279,7 @@ public class BarFrame extends GraphicsFrame {
     return lines.get(index).level;
   }
 
-  public void setLineLevelsBinding(IndexedBinding<Number> lineLevelsBinding) {
+  public void setLineLevelsBinding(IndexedBinding<? extends Number> lineLevelsBinding) {
     this.lineLevelsBinding.unbind();
     this.lineLevelsBinding = lineLevelsBinding;
     this.lineLevelsBinding.bind((idx, level) -> lines.get(idx).setLevel(level));

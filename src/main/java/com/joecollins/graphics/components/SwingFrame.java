@@ -9,11 +9,12 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
 
 public class SwingFrame extends GraphicsFrame {
 
-  private Binding<Number> rangeBinding = () -> 1;
-  private Binding<Number> valueBinding = () -> 0;
+  private Binding<? extends Number> rangeBinding = () -> 1;
+  private Binding<? extends Number> valueBinding = () -> 0;
   private Binding<Color> leftColorBinding = () -> Color.BLACK;
   private Binding<Color> rightColorBinding = () -> Color.BLACK;
   private Binding<String> bottomTextBinding = () -> null;
@@ -25,6 +26,7 @@ public class SwingFrame extends GraphicsFrame {
         {
           setHorizontalAlignment(JLabel.CENTER);
           setFont(StandardFont.readBoldFont(15));
+          setBorder(new EmptyBorder(2, 0, -2, 0));
         }
       };
 
@@ -41,7 +43,7 @@ public class SwingFrame extends GraphicsFrame {
     return swingPanel.range;
   }
 
-  public void setRangeBinding(Binding<Number> rangeBinding) {
+  public void setRangeBinding(Binding<? extends Number> rangeBinding) {
     this.rangeBinding.unbind();
     this.rangeBinding = rangeBinding;
     this.rangeBinding.bind(swingPanel::setRange);
@@ -51,7 +53,7 @@ public class SwingFrame extends GraphicsFrame {
     return swingPanel.value;
   }
 
-  public void setValueBinding(Binding<Number> valueBinding) {
+  public void setValueBinding(Binding<? extends Number> valueBinding) {
     this.valueBinding.unbind();
     this.valueBinding = valueBinding;
     this.valueBinding.bind(swingPanel::setValue);

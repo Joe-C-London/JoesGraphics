@@ -56,4 +56,20 @@ public class LowerThirdHeadlineOnlyTest {
 
     compareRendering("LowerThird", "HeadlineOnly", lowerThird);
   }
+
+  @Test
+  public void testRenderHeadlineSubheadAccents() throws IOException {
+    LowerThirdHeadlineOnly lowerThird = new LowerThirdHeadlineOnly();
+    lowerThird.setSize(1024, 50);
+    lowerThird.setLeftImageBinding(
+        Binding.fixedBinding(
+            LowerThird.createImage("\u00c9LECTION FRAN\u00c7AIS", Color.WHITE, Color.RED)));
+    lowerThird.setClock(Clock.fixed(Instant.parse("2019-10-22T01:30:00Z"), ZoneId.systemDefault()));
+    lowerThird.setPlaceBinding(Binding.fixedBinding("SAINT-\u00c9TIENNE"));
+    lowerThird.setTimeZoneBinding(Binding.fixedBinding(ZoneId.of("Europe/Paris")));
+    lowerThird.setHeadlineBinding(Binding.fixedBinding("\u00c9LECTION FRAN\u00c7AIS EST FINI"));
+    lowerThird.setSubheadBinding(Binding.fixedBinding("\u00c9lection fran\u00e7ais est s\u00fbr"));
+
+    compareRendering("LowerThird", "HeadlineAndSubheadAccents", lowerThird);
+  }
 }

@@ -126,7 +126,7 @@ public class MapFrame extends GraphicsFrame {
     return focus;
   }
 
-  public void setFocusBox(Binding<Rectangle2D> focusBinding) {
+  public void setFocusBoxBinding(Binding<Rectangle2D> focusBinding) {
     this.focusBinding.unbind();
     this.focusBinding = focusBinding;
     this.focusBinding.bind(
