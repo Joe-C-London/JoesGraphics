@@ -21,7 +21,7 @@ public interface Binding<T> {
 
   static <T extends Bindable, U> Binding<U> propertyBinding(
       T object, Function<T, U> func, String... properties) {
-    if (object == null || properties.length == 0) {
+    if (object == null) {
       return () -> null;
     }
     return new Binding<>() {

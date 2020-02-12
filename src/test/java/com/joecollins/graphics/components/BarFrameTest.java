@@ -19,7 +19,11 @@ import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.Triple;
 import org.junit.Test;
 
 public class BarFrameTest {
@@ -393,6 +397,86 @@ public class BarFrameTest {
     assertEquals("LIBERALS", frame.getLeftText(0));
     assertEquals("CONSERVATIVES", frame.getLeftText(1));
     assertEquals("NDP", frame.getLeftText(2));
+  }
+
+  @Test
+  public void testTestNonBindableElements() {
+    BindableList<Triple<String, Color, Integer>> results = new BindableList<>();
+    BarFrame frame = new BarFrame();
+    frame.setNumBarsBinding(Binding.sizeBinding(results));
+    frame.setLeftTextBinding(IndexedBinding.propertyBinding(results, Triple::getLeft));
+    assertEquals(0, frame.getNumBars());
+
+    results.add(new ImmutableTriple<>("NDP", Color.ORANGE, 1));
+    assertEquals(1, frame.getNumBars());
+    assertEquals("NDP", frame.getLeftText(0));
+
+    results.setAll(
+        Arrays.asList(
+            new ImmutableTriple<>("LIBERALS", Color.RED, 3),
+            new ImmutableTriple<>("CONSERVATIVES", Color.BLUE, 2),
+            new ImmutableTriple<>("NDP", Color.ORANGE, 1)));
+    assertEquals(3, frame.getNumBars());
+    assertEquals("LIBERALS", frame.getLeftText(0));
+    assertEquals("CONSERVATIVES", frame.getLeftText(1));
+    assertEquals("NDP", frame.getLeftText(2));
+
+    results.setAll(
+        Arrays.asList(
+            new ImmutableTriple<>("LIBERALS", Color.RED, 3),
+            new ImmutableTriple<>("CONSERVATIVES", Color.BLUE, 3)));
+    assertEquals(2, frame.getNumBars());
+    assertEquals("LIBERALS", frame.getLeftText(0));
+    assertEquals("CONSERVATIVES", frame.getLeftText(1));
+  }
+
+  @Test
+  public void testOtherBindings() {
+    BarFrame frame = new BarFrame();
+    frame.setNumBarsBinding(Binding.fixedBinding(3));
+    frame.setLeftTextBinding(IndexedBinding.listBinding("LIBERAL", "CONSERVATIVE", "NDP"));
+    frame.setRightTextBinding(IndexedBinding.functionBinding(3, 6, String::valueOf));
+
+    assertEquals(3, frame.getNumBars());
+    assertEquals("LIBERAL", frame.getLeftText(0));
+    assertEquals("CONSERVATIVE", frame.getLeftText(1));
+    assertEquals("NDP", frame.getLeftText(2));
+    assertEquals("3", frame.getRightText(0));
+    assertEquals("4", frame.getRightText(1));
+    assertEquals("5", frame.getRightText(2));
+
+    ElectionResult result = new ElectionResult(null, null, 3);
+    frame.setNumLinesBinding(
+        Binding.propertyBinding(result, ElectionResult::getNumSeats, "NumSeats"));
+    frame.setLineLevelsBinding(
+        IndexedBinding.propertyBinding(
+            result,
+            r -> IntStream.rangeClosed(1, r.numSeats).boxed().collect(Collectors.toList()),
+            "NumSeats"));
+    assertEquals(3, frame.getNumLines());
+    assertEquals(1, frame.getLineLevel(0));
+    assertEquals(2, frame.getLineLevel(1));
+    assertEquals(3, frame.getLineLevel(2));
+
+    result.setNumSeats(2);
+    assertEquals(2, frame.getNumLines());
+    assertEquals(1, frame.getLineLevel(0));
+    assertEquals(2, frame.getLineLevel(1));
+
+    frame.setNumLinesBinding(Binding.fixedBinding(4));
+    frame.setLineLevelsBinding(IndexedBinding.listBinding(3, 4, 5, 6));
+    assertEquals(4, frame.getNumLines());
+    assertEquals(3, frame.getLineLevel(0));
+    assertEquals(4, frame.getLineLevel(1));
+    assertEquals(5, frame.getLineLevel(2));
+    assertEquals(6, frame.getLineLevel(3));
+
+    result.setNumSeats(1);
+    assertEquals(4, frame.getNumLines());
+    assertEquals(3, frame.getLineLevel(0));
+    assertEquals(4, frame.getLineLevel(1));
+    assertEquals(5, frame.getLineLevel(2));
+    assertEquals(6, frame.getLineLevel(3));
   }
 
   private static Color lighten(Color color) {
