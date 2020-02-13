@@ -14,12 +14,16 @@ import java.util.function.IntConsumer;
 
 public class BindableList<T> extends AbstractList<T> {
 
+  private enum Empty {
+    NULL
+  }
+
   private ArrayList<T> underlying = new ArrayList<>();
 
   private List<IntConsumer> sizeBindings = new LinkedList<>();
 
   @SuppressWarnings("rawtypes")
-  private Map<String, List<BiConsumer>> itemBindings = new HashMap<>();
+  private Map<Enum<?>, List<BiConsumer>> itemBindings = new HashMap<>();
 
   private Map<BiConsumer, Map<Integer, Consumer>> storedBindings = new WeakHashMap<>();
 
@@ -31,23 +35,23 @@ public class BindableList<T> extends AbstractList<T> {
     sizeBindings.remove(binding);
   }
 
-  public void addItemBinding(BiConsumer<Integer, ?> binding, String... properties) {
-    for (String property : properties)
+  public void addItemBinding(BiConsumer<Integer, ?> binding, Enum<?>... properties) {
+    for (Enum<?> property : properties)
       itemBindings.computeIfAbsent(property, x -> new LinkedList<>()).add(binding);
-    itemBindings.computeIfAbsent("", x -> new LinkedList<>()).add(binding);
+    itemBindings.computeIfAbsent(Empty.NULL, x -> new LinkedList<>()).add(binding);
     for (int index = 0; index < size(); index++) {
       T item = get(index);
       if (item instanceof Bindable) {
         ((Bindable) item).addBinding(getOrCreateBinding(binding, index), properties);
-        for (String property : properties) ((Bindable) item).onPropertyRefreshed(property);
+        for (Enum<?> property : properties) ((Bindable) item).onPropertyRefreshed(property);
       }
     }
   }
 
-  public void removeItemBinding(BiConsumer<Integer, ?> binding, String... properties) {
-    for (String property : properties)
+  public void removeItemBinding(BiConsumer<Integer, ?> binding, Enum<?>... properties) {
+    for (Enum<?> property : properties)
       itemBindings.computeIfAbsent(property, x -> new LinkedList<>()).remove(binding);
-    itemBindings.computeIfAbsent("", x -> new LinkedList<>()).remove(binding);
+    itemBindings.computeIfAbsent(Empty.NULL, x -> new LinkedList<>()).remove(binding);
     for (int index = 0; index < size(); index++) {
       T item = get(index);
       if (item instanceof Bindable) {
@@ -127,8 +131,8 @@ public class BindableList<T> extends AbstractList<T> {
   @SuppressWarnings({"rawtypes", "unchecked"})
   private void addAllBindings(int index) {
     T item = get(index);
-    for (Map.Entry<String, List<BiConsumer>> entry : itemBindings.entrySet()) {
-      String property = entry.getKey();
+    for (Map.Entry<Enum<?>, List<BiConsumer>> entry : itemBindings.entrySet()) {
+      Enum<?> property = entry.getKey();
       List<BiConsumer> consumers = entry.getValue();
       for (BiConsumer consumer : consumers) {
         if (item instanceof Bindable) {
@@ -144,8 +148,8 @@ public class BindableList<T> extends AbstractList<T> {
   @SuppressWarnings("rawtypes")
   private void removeAllBindings(int index) {
     T item = get(index);
-    for (Map.Entry<String, List<BiConsumer>> entry : itemBindings.entrySet()) {
-      String property = entry.getKey();
+    for (Map.Entry<Enum<?>, List<BiConsumer>> entry : itemBindings.entrySet()) {
+      Enum<?> property = entry.getKey();
       List<BiConsumer> consumers = entry.getValue();
       for (BiConsumer consumer : consumers) {
         if (item instanceof Bindable) {

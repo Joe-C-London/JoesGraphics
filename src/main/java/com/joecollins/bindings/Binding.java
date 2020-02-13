@@ -20,7 +20,7 @@ public interface Binding<T> {
   }
 
   static <T extends Bindable, U> Binding<U> propertyBinding(
-      T object, Function<T, U> func, String... properties) {
+      T object, Function<T, U> func, Enum<?>... properties) {
     if (object == null) {
       return () -> null;
     }

@@ -86,7 +86,8 @@ public class BarFrameTest {
     BarFrame frame = new BarFrame();
     frame.setNumBarsBinding(Binding.sizeBinding(results));
     frame.setLeftTextBinding(
-        IndexedBinding.propertyBinding(results, ElectionResult::getPartyName, "PartyName"));
+        IndexedBinding.propertyBinding(
+            results, ElectionResult::getPartyName, ElectionResult.Properties.PARTY_NAME));
     assertEquals("LIBERAL", frame.getLeftText(0));
     assertEquals("CONSERVATIVE", frame.getLeftText(1));
     assertEquals("BLOC QUEBECOIS", frame.getLeftText(2));
@@ -108,7 +109,8 @@ public class BarFrameTest {
     BarFrame frame = new BarFrame();
     frame.setNumBarsBinding(Binding.sizeBinding(results));
     frame.setRightTextBinding(
-        IndexedBinding.propertyBinding(results, r -> String.valueOf(r.getNumSeats()), "NumSeats"));
+        IndexedBinding.propertyBinding(
+            results, r -> String.valueOf(r.getNumSeats()), ElectionResult.Properties.NUM_SEATS));
     assertEquals("157", frame.getRightText(0));
     assertEquals("121", frame.getRightText(1));
     assertEquals("32", frame.getRightText(2));
@@ -131,13 +133,19 @@ public class BarFrameTest {
     frame.setNumBarsBinding(Binding.sizeBinding(results));
     frame.addSeriesBinding(
         "Seats",
-        IndexedBinding.propertyBinding(results, ElectionResult::getPartyColor, "PartyColor"),
-        IndexedBinding.propertyBinding(results, ElectionResult::getNumSeats, "NumSeats"));
+        IndexedBinding.propertyBinding(
+            results, ElectionResult::getPartyColor, ElectionResult.Properties.PARTY_COLOR),
+        IndexedBinding.propertyBinding(
+            results, ElectionResult::getNumSeats, ElectionResult.Properties.NUM_SEATS));
     frame.addSeriesBinding(
         "Estimate",
-        IndexedBinding.propertyBinding(results, r -> lighten(r.getPartyColor()), "PartyColor"),
         IndexedBinding.propertyBinding(
-            results, r -> r.getSeatEstimate() - r.getNumSeats(), "NumSeats", "SeatEstimate"));
+            results, r -> lighten(r.getPartyColor()), ElectionResult.Properties.PARTY_COLOR),
+        IndexedBinding.propertyBinding(
+            results,
+            r -> r.getSeatEstimate() - r.getNumSeats(),
+            ElectionResult.Properties.NUM_SEATS,
+            ElectionResult.Properties.SEAT_ESTIMATE));
 
     Color lightRed = new Color(255, 127, 127);
     List<Pair<Color, Number>> libSeries = frame.getSeries(0);
@@ -176,7 +184,9 @@ public class BarFrameTest {
     frame.setNumBarsBinding(Binding.sizeBinding(results));
     frame.setLeftIconBinding(
         IndexedBinding.propertyBinding(
-            results, r -> r.getNumSeats() > 150 ? shape : null, "NumSeats"));
+            results,
+            r -> r.getNumSeats() > 150 ? shape : null,
+            ElectionResult.Properties.NUM_SEATS));
     assertEquals(shape, frame.getLeftIcon(0));
     assertNull(frame.getLeftIcon(1));
     assertNull(frame.getLeftIcon(2));
@@ -199,8 +209,10 @@ public class BarFrameTest {
     frame.setNumBarsBinding(Binding.sizeBinding(results));
     frame.addSeriesBinding(
         "Seats",
-        IndexedBinding.propertyBinding(results, ElectionResult::getPartyColor, "PartyColor"),
-        IndexedBinding.propertyBinding(results, ElectionResult::getNumSeats, "NumSeats"));
+        IndexedBinding.propertyBinding(
+            results, ElectionResult::getPartyColor, ElectionResult.Properties.PARTY_COLOR),
+        IndexedBinding.propertyBinding(
+            results, ElectionResult::getNumSeats, ElectionResult.Properties.NUM_SEATS));
 
     assertEquals(157, frame.getMax().intValue());
     assertEquals(0, frame.getMin().intValue());
@@ -263,7 +275,8 @@ public class BarFrameTest {
     BarFrame frame = new BarFrame();
     frame.setNumBarsBinding(Binding.sizeBinding(results));
     frame.setLeftTextBinding(
-        IndexedBinding.propertyBinding(results, ElectionResult::getPartyName, "PartyName"));
+        IndexedBinding.propertyBinding(
+            results, ElectionResult::getPartyName, ElectionResult.Properties.PARTY_NAME));
     assertEquals(3, frame.getNumBars());
     assertEquals("CONSERVATIVE", frame.getLeftText(0));
     assertEquals("LIBERAL", frame.getLeftText(1));
@@ -274,7 +287,7 @@ public class BarFrameTest {
     frame.setNumBarsBinding(Binding.sizeBinding(differentResults));
     frame.setLeftTextBinding(
         IndexedBinding.propertyBinding(
-            differentResults, ElectionResult::getPartyName, "PartyName"));
+            differentResults, ElectionResult::getPartyName, ElectionResult.Properties.PARTY_NAME));
     assertEquals(1, frame.getNumBars());
     assertEquals("GREEN", frame.getLeftText(0));
 
@@ -307,7 +320,8 @@ public class BarFrameTest {
     BarFrame frame = new BarFrame();
     frame.setNumBarsBinding(Binding.sizeBinding(results));
     frame.setLeftTextBinding(
-        IndexedBinding.propertyBinding(results, ElectionResult::getPartyName, "PartyName"));
+        IndexedBinding.propertyBinding(
+            results, ElectionResult::getPartyName, ElectionResult.Properties.PARTY_NAME));
     assertEquals(0, frame.getNumBars());
 
     results.add(new ElectionResult("LIBERAL", Color.RED, 1));
@@ -342,7 +356,8 @@ public class BarFrameTest {
     BarFrame frame = new BarFrame();
     frame.setNumBarsBinding(Binding.sizeBinding(results));
     frame.setLeftTextBinding(
-        IndexedBinding.propertyBinding(results, ElectionResult::getPartyName, "PartyName"));
+        IndexedBinding.propertyBinding(
+            results, ElectionResult::getPartyName, ElectionResult.Properties.PARTY_NAME));
     assertEquals(3, frame.getNumBars());
     assertEquals("CONSERVATIVE", frame.getLeftText(0));
     assertEquals("LIBERAL", frame.getLeftText(1));
@@ -378,7 +393,8 @@ public class BarFrameTest {
     BarFrame frame = new BarFrame();
     frame.setNumBarsBinding(Binding.sizeBinding(results));
     frame.setLeftTextBinding(
-        IndexedBinding.propertyBinding(results, ElectionResult::getPartyName, "PartyName"));
+        IndexedBinding.propertyBinding(
+            results, ElectionResult::getPartyName, ElectionResult.Properties.PARTY_NAME));
     assertEquals(3, frame.getNumBars());
     assertEquals("CONSERVATIVE", frame.getLeftText(0));
     assertEquals("LIBERAL", frame.getLeftText(1));
@@ -447,12 +463,13 @@ public class BarFrameTest {
 
     ElectionResult result = new ElectionResult(null, null, 3);
     frame.setNumLinesBinding(
-        Binding.propertyBinding(result, ElectionResult::getNumSeats, "NumSeats"));
+        Binding.propertyBinding(
+            result, ElectionResult::getNumSeats, ElectionResult.Properties.NUM_SEATS));
     frame.setLineLevelsBinding(
         IndexedBinding.propertyBinding(
             result,
             r -> IntStream.rangeClosed(1, r.numSeats).boxed().collect(Collectors.toList()),
-            "NumSeats"));
+            ElectionResult.Properties.NUM_SEATS));
     assertEquals(3, frame.getNumLines());
     assertEquals(1, frame.getLineLevel(0));
     assertEquals(2, frame.getLineLevel(1));
@@ -499,13 +516,17 @@ public class BarFrameTest {
     barFrame.setMaxBinding(Binding.fixedBinding(160));
     barFrame.setNumBarsBinding(Binding.sizeBinding(results));
     barFrame.setLeftTextBinding(
-        IndexedBinding.propertyBinding(results, ElectionResult::getPartyName, "PartyName"));
+        IndexedBinding.propertyBinding(
+            results, ElectionResult::getPartyName, ElectionResult.Properties.PARTY_NAME));
     barFrame.setRightTextBinding(
-        IndexedBinding.propertyBinding(results, r -> String.valueOf(r.getNumSeats()), "NumSeats"));
+        IndexedBinding.propertyBinding(
+            results, r -> String.valueOf(r.getNumSeats()), ElectionResult.Properties.NUM_SEATS));
     barFrame.addSeriesBinding(
         "Seats",
-        IndexedBinding.propertyBinding(results, ElectionResult::getPartyColor, "PartyColor"),
-        IndexedBinding.propertyBinding(results, ElectionResult::getNumSeats, "NumSeats"));
+        IndexedBinding.propertyBinding(
+            results, ElectionResult::getPartyColor, ElectionResult.Properties.PARTY_COLOR),
+        IndexedBinding.propertyBinding(
+            results, ElectionResult::getNumSeats, ElectionResult.Properties.NUM_SEATS));
     barFrame.setSize(512, 256);
 
     compareRendering("BarFrame", "SingleSeriesAllPositive", barFrame);
@@ -528,13 +549,17 @@ public class BarFrameTest {
     barFrame.setSubheadColorBinding(Binding.fixedBinding(Color.RED));
     barFrame.setNumBarsBinding(Binding.sizeBinding(results));
     barFrame.setLeftTextBinding(
-        IndexedBinding.propertyBinding(results, ElectionResult::getPartyName, "PartyName"));
+        IndexedBinding.propertyBinding(
+            results, ElectionResult::getPartyName, ElectionResult.Properties.PARTY_NAME));
     barFrame.setRightTextBinding(
-        IndexedBinding.propertyBinding(results, r -> String.valueOf(r.getNumSeats()), "NumSeats"));
+        IndexedBinding.propertyBinding(
+            results, r -> String.valueOf(r.getNumSeats()), ElectionResult.Properties.NUM_SEATS));
     barFrame.addSeriesBinding(
         "Seats",
-        IndexedBinding.propertyBinding(results, ElectionResult::getPartyColor, "PartyColor"),
-        IndexedBinding.propertyBinding(results, ElectionResult::getNumSeats, "NumSeats"));
+        IndexedBinding.propertyBinding(
+            results, ElectionResult::getPartyColor, ElectionResult.Properties.PARTY_COLOR),
+        IndexedBinding.propertyBinding(
+            results, ElectionResult::getNumSeats, ElectionResult.Properties.NUM_SEATS));
     barFrame.setSize(512, 256);
 
     compareRendering("BarFrame", "SingleSeriesWithSubhead", barFrame);
@@ -559,13 +584,17 @@ public class BarFrameTest {
     barFrame.setSubheadColorBinding(Binding.fixedBinding(Color.RED));
     barFrame.setNumBarsBinding(Binding.sizeBinding(results));
     barFrame.setLeftTextBinding(
-        IndexedBinding.propertyBinding(results, ElectionResult::getPartyName, "PartyName"));
+        IndexedBinding.propertyBinding(
+            results, ElectionResult::getPartyName, ElectionResult.Properties.PARTY_NAME));
     barFrame.setRightTextBinding(
-        IndexedBinding.propertyBinding(results, r -> String.valueOf(r.getNumSeats()), "NumSeats"));
+        IndexedBinding.propertyBinding(
+            results, r -> String.valueOf(r.getNumSeats()), ElectionResult.Properties.NUM_SEATS));
     barFrame.addSeriesBinding(
         "Seats",
-        IndexedBinding.propertyBinding(results, ElectionResult::getPartyColor, "PartyColor"),
-        IndexedBinding.propertyBinding(results, ElectionResult::getNumSeats, "NumSeats"));
+        IndexedBinding.propertyBinding(
+            results, ElectionResult::getPartyColor, ElectionResult.Properties.PARTY_COLOR),
+        IndexedBinding.propertyBinding(
+            results, ElectionResult::getNumSeats, ElectionResult.Properties.NUM_SEATS));
     barFrame.setSize(512, 256);
 
     compareRendering("BarFrame", "SingleSeriesShrinkToFit", barFrame);
@@ -586,19 +615,28 @@ public class BarFrameTest {
     barFrame.setMaxBinding(Binding.fixedBinding(160));
     barFrame.setNumBarsBinding(Binding.sizeBinding(results));
     barFrame.setLeftTextBinding(
-        IndexedBinding.propertyBinding(results, ElectionResult::getPartyName, "PartyName"));
+        IndexedBinding.propertyBinding(
+            results, ElectionResult::getPartyName, ElectionResult.Properties.PARTY_NAME));
     barFrame.setRightTextBinding(
         IndexedBinding.propertyBinding(
-            results, r -> r.getNumSeats() + "/" + r.getSeatEstimate(), "NumSeats"));
+            results,
+            r -> r.getNumSeats() + "/" + r.getSeatEstimate(),
+            ElectionResult.Properties.NUM_SEATS));
     barFrame.addSeriesBinding(
         "Seats",
-        IndexedBinding.propertyBinding(results, ElectionResult::getPartyColor, "PartyColor"),
-        IndexedBinding.propertyBinding(results, ElectionResult::getNumSeats, "NumSeats"));
+        IndexedBinding.propertyBinding(
+            results, ElectionResult::getPartyColor, ElectionResult.Properties.PARTY_COLOR),
+        IndexedBinding.propertyBinding(
+            results, ElectionResult::getNumSeats, ElectionResult.Properties.NUM_SEATS));
     barFrame.addSeriesBinding(
         "Estimate",
-        IndexedBinding.propertyBinding(results, r -> lighten(r.getPartyColor()), "PartyColor"),
         IndexedBinding.propertyBinding(
-            results, r -> r.getSeatEstimate() - r.getNumSeats(), "NumSeats", "SeatEstimate"));
+            results, r -> lighten(r.getPartyColor()), ElectionResult.Properties.PARTY_COLOR),
+        IndexedBinding.propertyBinding(
+            results,
+            r -> r.getSeatEstimate() - r.getNumSeats(),
+            ElectionResult.Properties.NUM_SEATS,
+            ElectionResult.Properties.SEAT_ESTIMATE));
     barFrame.setSize(512, 256);
 
     compareRendering("BarFrame", "MultiSeriesAllPositive", barFrame);
@@ -620,14 +658,19 @@ public class BarFrameTest {
     barFrame.setMinBinding(Binding.fixedBinding(-28));
     barFrame.setNumBarsBinding(Binding.sizeBinding(results));
     barFrame.setLeftTextBinding(
-        IndexedBinding.propertyBinding(results, ElectionResult::getPartyName, "PartyName"));
+        IndexedBinding.propertyBinding(
+            results, ElectionResult::getPartyName, ElectionResult.Properties.PARTY_NAME));
     barFrame.setRightTextBinding(
         IndexedBinding.propertyBinding(
-            results, r -> new DecimalFormat("+0;-0").format(r.getNumSeats()), "NumSeats"));
+            results,
+            r -> new DecimalFormat("+0;-0").format(r.getNumSeats()),
+            ElectionResult.Properties.NUM_SEATS));
     barFrame.addSeriesBinding(
         "Seats",
-        IndexedBinding.propertyBinding(results, ElectionResult::getPartyColor, "PartyColor"),
-        IndexedBinding.propertyBinding(results, ElectionResult::getNumSeats, "NumSeats"));
+        IndexedBinding.propertyBinding(
+            results, ElectionResult::getPartyColor, ElectionResult.Properties.PARTY_COLOR),
+        IndexedBinding.propertyBinding(
+            results, ElectionResult::getNumSeats, ElectionResult.Properties.NUM_SEATS));
     barFrame.setSize(512, 256);
 
     compareRendering("BarFrame", "SingleSeriesBothDirections", barFrame);
@@ -649,7 +692,8 @@ public class BarFrameTest {
     barFrame.setMinBinding(Binding.fixedBinding(-28));
     barFrame.setNumBarsBinding(Binding.sizeBinding(results));
     barFrame.setLeftTextBinding(
-        IndexedBinding.propertyBinding(results, ElectionResult::getPartyName, "PartyName"));
+        IndexedBinding.propertyBinding(
+            results, ElectionResult::getPartyName, ElectionResult.Properties.PARTY_NAME));
     barFrame.setRightTextBinding(
         IndexedBinding.propertyBinding(
             results,
@@ -657,14 +701,17 @@ public class BarFrameTest {
                 CHANGE_FORMAT.format(r.getNumSeats())
                     + "/"
                     + CHANGE_FORMAT.format(r.getSeatEstimate()),
-            "NumSeats"));
+            ElectionResult.Properties.NUM_SEATS));
     barFrame.addSeriesBinding(
         "Seats",
-        IndexedBinding.propertyBinding(results, ElectionResult::getPartyColor, "PartyColor"),
-        IndexedBinding.propertyBinding(results, ElectionResult::getNumSeats, "NumSeats"));
+        IndexedBinding.propertyBinding(
+            results, ElectionResult::getPartyColor, ElectionResult.Properties.PARTY_COLOR),
+        IndexedBinding.propertyBinding(
+            results, ElectionResult::getNumSeats, ElectionResult.Properties.NUM_SEATS));
     barFrame.addSeriesBinding(
         "Estimate",
-        IndexedBinding.propertyBinding(results, r -> lighten(r.getPartyColor()), "PartyColor"),
+        IndexedBinding.propertyBinding(
+            results, r -> lighten(r.getPartyColor()), ElectionResult.Properties.PARTY_COLOR),
         IndexedBinding.propertyBinding(
             results,
             r ->
@@ -672,8 +719,8 @@ public class BarFrameTest {
                     - (Math.signum(r.getSeatEstimate()) == Math.signum(r.getNumSeats())
                         ? r.getNumSeats()
                         : 0),
-            "NumSeats",
-            "SeatEstimate"));
+            ElectionResult.Properties.NUM_SEATS,
+            ElectionResult.Properties.SEAT_ESTIMATE));
     barFrame.setSize(512, 256);
 
     compareRendering("BarFrame", "MultiSeriesBothDirections", barFrame);
@@ -701,8 +748,8 @@ public class BarFrameTest {
         IndexedBinding.propertyBinding(
             results,
             r -> r.getCandidateName() + "\n" + r.getPartyName(),
-            "CandidateName",
-            "PartyName"));
+            RidingResult.Properties.CANDIDATE_NAME,
+            RidingResult.Properties.PARTY_NAME));
     barFrame.setRightTextBinding(
         IndexedBinding.propertyBinding(
             results,
@@ -710,12 +757,14 @@ public class BarFrameTest {
                 THOUSANDS_FORMAT.format(r.getNumVotes())
                     + "\n"
                     + PERCENT_FORMAT.format(r.getVotePct()),
-            "NumVotes",
-            "VotePct"));
+            RidingResult.Properties.NUM_VOTES,
+            RidingResult.Properties.VOTE_PCT));
     barFrame.addSeriesBinding(
         "Seats",
-        IndexedBinding.propertyBinding(results, RidingResult::getPartyColor, "PartyColor"),
-        IndexedBinding.propertyBinding(results, RidingResult::getNumVotes, "NumSeats"));
+        IndexedBinding.propertyBinding(
+            results, RidingResult::getPartyColor, ElectionResult.Properties.PARTY_COLOR),
+        IndexedBinding.propertyBinding(
+            results, RidingResult::getNumVotes, ElectionResult.Properties.NUM_SEATS));
     barFrame.setSize(512, 256);
 
     compareRendering("BarFrame", "TwoLinedBars", barFrame);
@@ -745,8 +794,8 @@ public class BarFrameTest {
         IndexedBinding.propertyBinding(
             results,
             r -> r.getCandidateName() + "\n" + r.getPartyName(),
-            "CandidateName",
-            "PartyName"));
+            RidingResult.Properties.CANDIDATE_NAME,
+            RidingResult.Properties.PARTY_NAME));
     barFrame.setRightTextBinding(
         IndexedBinding.propertyBinding(
             results,
@@ -754,14 +803,17 @@ public class BarFrameTest {
                 THOUSANDS_FORMAT.format(r.getNumVotes())
                     + "\n"
                     + PERCENT_FORMAT.format(r.getVotePct()),
-            "NumVotes",
-            "VotePct"));
+            RidingResult.Properties.NUM_VOTES,
+            RidingResult.Properties.VOTE_PCT));
     barFrame.setLeftIconBinding(
-        IndexedBinding.propertyBinding(results, r -> r.isElected() ? shape : null, "Elected"));
+        IndexedBinding.propertyBinding(
+            results, r -> r.isElected() ? shape : null, RidingResult.Properties.ELECTED));
     barFrame.addSeriesBinding(
         "Seats",
-        IndexedBinding.propertyBinding(results, RidingResult::getPartyColor, "PartyColor"),
-        IndexedBinding.propertyBinding(results, RidingResult::getNumVotes, "NumSeats"));
+        IndexedBinding.propertyBinding(
+            results, RidingResult::getPartyColor, RidingResult.Properties.PARTY_COLOR),
+        IndexedBinding.propertyBinding(
+            results, RidingResult::getNumVotes, RidingResult.Properties.NUM_VOTES));
     barFrame.setSize(512, 256);
 
     compareRendering("BarFrame", "TwoLinedBarWithIcon", barFrame);
@@ -782,16 +834,20 @@ public class BarFrameTest {
     barFrame.setHeaderBinding(Binding.fixedBinding("WATERLOO"));
     barFrame.setNumBarsBinding(Binding.sizeBinding(results));
     barFrame.setLeftTextBinding(
-        IndexedBinding.propertyBinding(results, RidingResult::getPartyName, "PartyName"));
+        IndexedBinding.propertyBinding(
+            results, RidingResult::getPartyName, RidingResult.Properties.PARTY_NAME));
     barFrame.setRightTextBinding(
         IndexedBinding.propertyBinding(
-            results, r -> PERCENT_FORMAT.format(r.getVotePct()), "VotePct"));
+            results, r -> PERCENT_FORMAT.format(r.getVotePct()), RidingResult.Properties.VOTE_PCT));
     barFrame.setLeftIconBinding(
-        IndexedBinding.propertyBinding(results, r -> r.isElected() ? shape : null, "Elected"));
+        IndexedBinding.propertyBinding(
+            results, r -> r.isElected() ? shape : null, RidingResult.Properties.ELECTED));
     barFrame.addSeriesBinding(
         "Seats",
-        IndexedBinding.propertyBinding(results, RidingResult::getPartyColor, "PartyColor"),
-        IndexedBinding.propertyBinding(results, RidingResult::getVotePct, "VotePct"));
+        IndexedBinding.propertyBinding(
+            results, RidingResult::getPartyColor, RidingResult.Properties.PARTY_COLOR),
+        IndexedBinding.propertyBinding(
+            results, RidingResult::getVotePct, RidingResult.Properties.VOTE_PCT));
     barFrame.setSize(512, 256);
 
     compareRendering("BarFrame", "TwoLinedBarWithNegativeIcon", barFrame);
@@ -817,13 +873,17 @@ public class BarFrameTest {
     barFrame.setMaxBinding(Binding.fixedBinding(225));
     barFrame.setNumBarsBinding(Binding.sizeBinding(results));
     barFrame.setLeftTextBinding(
-        IndexedBinding.propertyBinding(results, ElectionResult::getPartyName, "PartyName"));
+        IndexedBinding.propertyBinding(
+            results, ElectionResult::getPartyName, ElectionResult.Properties.PARTY_NAME));
     barFrame.setRightTextBinding(
-        IndexedBinding.propertyBinding(results, r -> String.valueOf(r.getNumSeats()), "NumSeats"));
+        IndexedBinding.propertyBinding(
+            results, r -> String.valueOf(r.getNumSeats()), ElectionResult.Properties.NUM_SEATS));
     barFrame.addSeriesBinding(
         "Seats",
-        IndexedBinding.propertyBinding(results, ElectionResult::getPartyColor, "PartyColor"),
-        IndexedBinding.propertyBinding(results, ElectionResult::getNumSeats, "NumSeats"));
+        IndexedBinding.propertyBinding(
+            results, ElectionResult::getPartyColor, ElectionResult.Properties.PARTY_COLOR),
+        IndexedBinding.propertyBinding(
+            results, ElectionResult::getNumSeats, ElectionResult.Properties.NUM_SEATS));
     barFrame.setNumLinesBinding(Binding.fixedBinding(1));
     barFrame.setLineLevelsBinding(IndexedBinding.singletonBinding(170));
     barFrame.setLineLabelsBinding(IndexedBinding.singletonBinding("MAJORITY"));
@@ -848,13 +908,17 @@ public class BarFrameTest {
     barFrame.setMaxBinding(Binding.fixedBinding(83));
     barFrame.setNumBarsBinding(Binding.sizeBinding(results));
     barFrame.setLeftTextBinding(
-        IndexedBinding.propertyBinding(results, ElectionResult::getPartyName, "PartyName"));
+        IndexedBinding.propertyBinding(
+            results, ElectionResult::getPartyName, ElectionResult.Properties.PARTY_NAME));
     barFrame.setRightTextBinding(
-        IndexedBinding.propertyBinding(results, r -> String.valueOf(r.getNumSeats()), "NumSeats"));
+        IndexedBinding.propertyBinding(
+            results, r -> String.valueOf(r.getNumSeats()), ElectionResult.Properties.NUM_SEATS));
     barFrame.addSeriesBinding(
         "Seats",
-        IndexedBinding.propertyBinding(results, ElectionResult::getPartyColor, "PartyColor"),
-        IndexedBinding.propertyBinding(results, ElectionResult::getNumSeats, "NumSeats"));
+        IndexedBinding.propertyBinding(
+            results, ElectionResult::getPartyColor, ElectionResult.Properties.PARTY_COLOR),
+        IndexedBinding.propertyBinding(
+            results, ElectionResult::getNumSeats, ElectionResult.Properties.NUM_SEATS));
     barFrame.setNumLinesBinding(Binding.fixedBinding(1));
     barFrame.setLineLevelsBinding(IndexedBinding.singletonBinding(63));
     barFrame.setLineLabelsBinding(IndexedBinding.singletonBinding("MAJORIT\u00c9"));
@@ -879,13 +943,17 @@ public class BarFrameTest {
     barFrame.setMaxBinding(Binding.fixedBinding(83));
     barFrame.setNumBarsBinding(Binding.sizeBinding(results));
     barFrame.setLeftTextBinding(
-        IndexedBinding.propertyBinding(results, ElectionResult::getPartyName, "PartyName"));
+        IndexedBinding.propertyBinding(
+            results, ElectionResult::getPartyName, ElectionResult.Properties.PARTY_NAME));
     barFrame.setRightTextBinding(
-        IndexedBinding.propertyBinding(results, r -> String.valueOf(r.getNumSeats()), "NumSeats"));
+        IndexedBinding.propertyBinding(
+            results, r -> String.valueOf(r.getNumSeats()), ElectionResult.Properties.NUM_SEATS));
     barFrame.addSeriesBinding(
         "Seats",
-        IndexedBinding.propertyBinding(results, ElectionResult::getPartyColor, "PartyColor"),
-        IndexedBinding.propertyBinding(results, ElectionResult::getNumSeats, "NumSeats"));
+        IndexedBinding.propertyBinding(
+            results, ElectionResult::getPartyColor, ElectionResult.Properties.PARTY_COLOR),
+        IndexedBinding.propertyBinding(
+            results, ElectionResult::getNumSeats, ElectionResult.Properties.NUM_SEATS));
     barFrame.setNumLinesBinding(Binding.fixedBinding(1));
     barFrame.setLineLevelsBinding(IndexedBinding.singletonBinding(63));
     barFrame.setLineLabelsBinding(IndexedBinding.singletonBinding("MAJORIT\u00c9"));
@@ -904,6 +972,14 @@ public class BarFrameTest {
   }
 
   private static class ElectionResult extends Bindable {
+
+    private enum Properties {
+      PARTY_NAME,
+      PARTY_COLOR,
+      NUM_SEATS,
+      SEAT_ESTIMATE
+    }
+
     private String partyName;
     private Color partyColor;
     private int numSeats;
@@ -926,7 +1002,7 @@ public class BarFrameTest {
 
     public void setPartyName(String partyName) {
       this.partyName = partyName;
-      onPropertyRefreshed("PartyName");
+      onPropertyRefreshed(Properties.PARTY_NAME);
     }
 
     public Color getPartyColor() {
@@ -935,7 +1011,7 @@ public class BarFrameTest {
 
     public void setPartyColor(Color partyColor) {
       this.partyColor = partyColor;
-      onPropertyRefreshed("PartyColor");
+      onPropertyRefreshed(Properties.PARTY_COLOR);
     }
 
     public int getNumSeats() {
@@ -944,7 +1020,7 @@ public class BarFrameTest {
 
     public void setNumSeats(int numSeats) {
       this.numSeats = numSeats;
-      onPropertyRefreshed("NumSeats");
+      onPropertyRefreshed(Properties.NUM_SEATS);
     }
 
     public int getSeatEstimate() {
@@ -953,11 +1029,21 @@ public class BarFrameTest {
 
     public void setSeatEstimate(int seatEstimate) {
       this.seatEstimate = seatEstimate;
-      onPropertyRefreshed("SeatEstimate");
+      onPropertyRefreshed(Properties.SEAT_ESTIMATE);
     }
   }
 
   private static class RidingResult extends Bindable {
+
+    private enum Properties {
+      CANDIDATE_NAME,
+      PARTY_NAME,
+      PARTY_COLOR,
+      NUM_VOTES,
+      VOTE_PCT,
+      ELECTED
+    }
+
     private String candidateName;
     private String partyName;
     private Color partyColor;
@@ -991,7 +1077,7 @@ public class BarFrameTest {
 
     public void setCandidateName(String candidateName) {
       this.candidateName = candidateName;
-      onPropertyRefreshed("CandidateName");
+      onPropertyRefreshed(Properties.CANDIDATE_NAME);
     }
 
     public String getPartyName() {
@@ -1000,7 +1086,7 @@ public class BarFrameTest {
 
     public void setPartyName(String partyName) {
       this.partyName = partyName;
-      onPropertyRefreshed("PartyName");
+      onPropertyRefreshed(Properties.PARTY_NAME);
     }
 
     public Color getPartyColor() {
@@ -1009,7 +1095,7 @@ public class BarFrameTest {
 
     public void setPartyColor(Color partyColor) {
       this.partyColor = partyColor;
-      onPropertyRefreshed("PartyColor");
+      onPropertyRefreshed(Properties.PARTY_COLOR);
     }
 
     public int getNumVotes() {
@@ -1018,7 +1104,7 @@ public class BarFrameTest {
 
     public void setNumVotes(int numVotes) {
       this.numVotes = numVotes;
-      onPropertyRefreshed("NumVotes");
+      onPropertyRefreshed(Properties.NUM_VOTES);
     }
 
     public double getVotePct() {
@@ -1027,7 +1113,7 @@ public class BarFrameTest {
 
     public void setVotePct(double votePct) {
       this.votePct = votePct;
-      onPropertyRefreshed("VotePct");
+      onPropertyRefreshed(Properties.VOTE_PCT);
     }
 
     public boolean isElected() {
@@ -1036,7 +1122,7 @@ public class BarFrameTest {
 
     public void setElected(boolean elected) {
       this.elected = elected;
-      onPropertyRefreshed("Elected");
+      onPropertyRefreshed(Properties.ELECTED);
     }
   }
 }

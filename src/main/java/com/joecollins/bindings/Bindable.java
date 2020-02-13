@@ -10,19 +10,19 @@ import java.util.function.Consumer;
 public abstract class Bindable {
 
   @SuppressWarnings("rawtypes")
-  private Map<String, List<Consumer>> bindings = new HashMap<>();
+  private Map<Enum<?>, List<Consumer>> bindings = new HashMap<>();
 
-  public void addBinding(Consumer<?> binding, String... properties) {
-    for (String property : properties)
+  public void addBinding(Consumer<?> binding, Enum<?>... properties) {
+    for (Enum<?> property : properties)
       bindings.computeIfAbsent(property, x -> new LinkedList<>()).add(binding);
   }
 
-  public void removeBinding(Consumer<?> binding, String... properties) {
-    for (String property : properties)
+  public void removeBinding(Consumer<?> binding, Enum<?>... properties) {
+    for (Enum<?> property : properties)
       bindings.computeIfAbsent(property, x -> new LinkedList<>()).remove(binding);
   }
 
-  protected void onPropertyRefreshed(String property) {
+  protected void onPropertyRefreshed(Enum<?> property) {
     bindings
         .getOrDefault(property, Collections.emptyList())
         .forEach(binding -> binding.accept(this));

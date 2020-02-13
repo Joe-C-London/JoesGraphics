@@ -14,11 +14,16 @@ import org.junit.Test;
 public class GraphicsFrameTest {
 
   private static class TestObject extends Bindable {
+
+    private enum Properties {
+      NUM_POLLS
+    }
+
     int numPolls = 0;
 
     public void setNumPolls(int numPolls) {
       this.numPolls = numPolls;
-      onPropertyRefreshed("NumPolls");
+      onPropertyRefreshed(Properties.NUM_POLLS);
     }
   }
 
@@ -34,7 +39,9 @@ public class GraphicsFrameTest {
     GraphicsFrame graphicsFrame = new GraphicsFrame();
     graphicsFrame.setHeaderBinding(
         Binding.propertyBinding(
-            new TestObject(), o -> o.numPolls + " POLLS REPORTING", "NumPolls"));
+            new TestObject(),
+            o -> o.numPolls + " POLLS REPORTING",
+            TestObject.Properties.NUM_POLLS));
     assertEquals("0 POLLS REPORTING", graphicsFrame.getHeader());
   }
 
@@ -43,7 +50,8 @@ public class GraphicsFrameTest {
     GraphicsFrame graphicsFrame = new GraphicsFrame();
     TestObject object = new TestObject();
     graphicsFrame.setHeaderBinding(
-        Binding.propertyBinding(object, o -> o.numPolls + " POLLS REPORTING", "NumPolls"));
+        Binding.propertyBinding(
+            object, o -> o.numPolls + " POLLS REPORTING", TestObject.Properties.NUM_POLLS));
     assertEquals("0 POLLS REPORTING", graphicsFrame.getHeader());
     object.setNumPolls(1);
     assertEquals("1 POLLS REPORTING", graphicsFrame.getHeader());
@@ -54,7 +62,8 @@ public class GraphicsFrameTest {
     GraphicsFrame graphicsFrame = new GraphicsFrame();
     TestObject object = new TestObject();
     graphicsFrame.setHeaderBinding(
-        Binding.propertyBinding(object, o -> o.numPolls + " POLLS REPORTING", "NumPolls"));
+        Binding.propertyBinding(
+            object, o -> o.numPolls + " POLLS REPORTING", TestObject.Properties.NUM_POLLS));
     assertEquals("0 POLLS REPORTING", graphicsFrame.getHeader());
     graphicsFrame.setHeaderBinding(Binding.fixedBinding("FIXED BINDING"));
     assertEquals("FIXED BINDING", graphicsFrame.getHeader());

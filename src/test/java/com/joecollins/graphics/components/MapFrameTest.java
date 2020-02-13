@@ -26,8 +26,10 @@ public class MapFrameTest {
 
     MapFrame mapFrame = new MapFrame();
     mapFrame.setNumShapesBinding(Binding.sizeBinding(shapes));
-    mapFrame.setShapeBinding(IndexedBinding.propertyBinding(shapes, MapEntry::getShape, "Shape"));
-    mapFrame.setColorBinding(IndexedBinding.propertyBinding(shapes, MapEntry::getColor, "Color"));
+    mapFrame.setShapeBinding(
+        IndexedBinding.propertyBinding(shapes, MapEntry::getShape, MapEntry.Property.SHAPE));
+    mapFrame.setColorBinding(
+        IndexedBinding.propertyBinding(shapes, MapEntry::getColor, MapEntry.Property.COLOR));
 
     assertEquals(27, mapFrame.getNumShapes());
     assertEquals(shapes.get(0).shape, mapFrame.getShape(0));
@@ -40,8 +42,10 @@ public class MapFrameTest {
 
     MapFrame mapFrame = new MapFrame();
     mapFrame.setNumShapesBinding(Binding.sizeBinding(shapes));
-    mapFrame.setShapeBinding(IndexedBinding.propertyBinding(shapes, MapEntry::getShape, "Shape"));
-    mapFrame.setColorBinding(IndexedBinding.propertyBinding(shapes, MapEntry::getColor, "Color"));
+    mapFrame.setShapeBinding(
+        IndexedBinding.propertyBinding(shapes, MapEntry::getShape, MapEntry.Property.SHAPE));
+    mapFrame.setColorBinding(
+        IndexedBinding.propertyBinding(shapes, MapEntry::getColor, MapEntry.Property.COLOR));
 
     Rectangle2D bindingBox =
         shapes.stream()
@@ -58,8 +62,10 @@ public class MapFrameTest {
 
     MapFrame mapFrame = new MapFrame();
     mapFrame.setNumShapesBinding(Binding.sizeBinding(shapes));
-    mapFrame.setShapeBinding(IndexedBinding.propertyBinding(shapes, MapEntry::getShape, "Shape"));
-    mapFrame.setColorBinding(IndexedBinding.propertyBinding(shapes, MapEntry::getColor, "Color"));
+    mapFrame.setShapeBinding(
+        IndexedBinding.propertyBinding(shapes, MapEntry::getShape, MapEntry.Property.SHAPE));
+    mapFrame.setColorBinding(
+        IndexedBinding.propertyBinding(shapes, MapEntry::getColor, MapEntry.Property.COLOR));
     mapFrame.setFocusBoxBinding(Binding.fixedBinding(cityBox));
     assertEquals(cityBox, mapFrame.getFocusBox());
   }
@@ -71,8 +77,10 @@ public class MapFrameTest {
     MapFrame mapFrame = new MapFrame();
     mapFrame.setHeaderBinding(Binding.fixedBinding("PEI"));
     mapFrame.setNumShapesBinding(Binding.sizeBinding(shapes));
-    mapFrame.setShapeBinding(IndexedBinding.propertyBinding(shapes, MapEntry::getShape, "Shape"));
-    mapFrame.setColorBinding(IndexedBinding.propertyBinding(shapes, MapEntry::getColor, "Color"));
+    mapFrame.setShapeBinding(
+        IndexedBinding.propertyBinding(shapes, MapEntry::getShape, MapEntry.Property.SHAPE));
+    mapFrame.setColorBinding(
+        IndexedBinding.propertyBinding(shapes, MapEntry::getColor, MapEntry.Property.COLOR));
     mapFrame.setSize(256, 128);
 
     compareRendering("MapFrame", "RenderFull", mapFrame);
@@ -85,8 +93,10 @@ public class MapFrameTest {
     MapFrame mapFrame = new MapFrame();
     mapFrame.setHeaderBinding(Binding.fixedBinding("PEI"));
     mapFrame.setNumShapesBinding(Binding.sizeBinding(shapes));
-    mapFrame.setShapeBinding(IndexedBinding.propertyBinding(shapes, MapEntry::getShape, "Shape"));
-    mapFrame.setColorBinding(IndexedBinding.propertyBinding(shapes, MapEntry::getColor, "Color"));
+    mapFrame.setShapeBinding(
+        IndexedBinding.propertyBinding(shapes, MapEntry::getShape, MapEntry.Property.SHAPE));
+    mapFrame.setColorBinding(
+        IndexedBinding.propertyBinding(shapes, MapEntry::getColor, MapEntry.Property.COLOR));
     mapFrame.setSize(64, 128);
 
     compareRendering("MapFrame", "RenderFullThin", mapFrame);
@@ -101,8 +111,10 @@ public class MapFrameTest {
     MapFrame mapFrame = new MapFrame();
     mapFrame.setHeaderBinding(Binding.fixedBinding("CHARLOTTETOWN"));
     mapFrame.setNumShapesBinding(Binding.sizeBinding(shapes));
-    mapFrame.setShapeBinding(IndexedBinding.propertyBinding(shapes, MapEntry::getShape, "Shape"));
-    mapFrame.setColorBinding(IndexedBinding.propertyBinding(shapes, MapEntry::getColor, "Color"));
+    mapFrame.setShapeBinding(
+        IndexedBinding.propertyBinding(shapes, MapEntry::getShape, MapEntry.Property.SHAPE));
+    mapFrame.setColorBinding(
+        IndexedBinding.propertyBinding(shapes, MapEntry::getColor, MapEntry.Property.COLOR));
     mapFrame.setFocusBoxBinding(Binding.fixedBinding(zoomBox));
     mapFrame.setSize(256, 128);
 
@@ -180,6 +192,12 @@ public class MapFrameTest {
   }
 
   private static class MapEntry extends Bindable {
+
+    private enum Property {
+      SHAPE,
+      COLOR
+    }
+
     private Shape shape;
     private Color color;
 
@@ -194,7 +212,7 @@ public class MapFrameTest {
 
     public void setShape(Shape shape) {
       this.shape = shape;
-      onPropertyRefreshed("Shape");
+      onPropertyRefreshed(MapEntry.Property.SHAPE);
     }
 
     public Color getColor() {
@@ -203,7 +221,7 @@ public class MapFrameTest {
 
     public void setColor(Color color) {
       this.color = color;
-      onPropertyRefreshed("Color");
+      onPropertyRefreshed(MapEntry.Property.COLOR);
     }
   }
 }

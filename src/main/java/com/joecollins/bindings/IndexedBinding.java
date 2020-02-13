@@ -77,7 +77,7 @@ public interface IndexedBinding<T> {
   }
 
   static <T extends Bindable, U> IndexedBinding<U> propertyBinding(
-      T item, Function<T, List<? extends U>> func, String... properties) {
+      T item, Function<T, List<? extends U>> func, Enum<?>... properties) {
     if (item == null) {
       return emptyBinding();
     }
@@ -126,7 +126,7 @@ public interface IndexedBinding<T> {
 
   @SuppressWarnings("unchecked")
   static <T, U> IndexedBinding<U> propertyBinding(
-      BindableList<T> list, Function<T, U> func, String... properties) {
+      BindableList<T> list, Function<T, U> func, Enum<?>... properties) {
     if (list == null) {
       return emptyBinding();
     }
