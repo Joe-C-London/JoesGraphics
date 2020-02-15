@@ -15,6 +15,8 @@ import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.net.URL;
 import java.time.Clock;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
@@ -23,6 +25,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import javax.imageio.ImageIO;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
@@ -81,6 +84,10 @@ public class LowerThird extends JPanel {
   void setClock(Clock clock) {
     this.clock = clock;
     this.rightPanel.updateTime();
+  }
+
+  public static Image createImage(URL url) throws IOException {
+    return ImageIO.read(url);
   }
 
   public static Image createImage(String text, Color foreground, Color background) {
