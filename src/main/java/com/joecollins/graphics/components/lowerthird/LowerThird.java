@@ -213,15 +213,9 @@ public class LowerThird extends JPanel {
       try {
         String newTime = FORMATTER.format(clock.instant().atZone(timezone));
         if (!newTime.equals(this.timeLabel.getText())) {
-          EventQueue.invokeAndWait(
-              () -> {
-                this.timeLabel.setText(newTime);
-                this.timeLabel.repaint();
-              });
+          this.timeLabel.setText(newTime);
+          EventQueue.invokeLater(() -> this.timeLabel.repaint());
         }
-      } catch (InterruptedException e) {
-        Thread.currentThread().interrupt();
-        e.printStackTrace();
       } catch (Exception e) {
         e.printStackTrace();
       }

@@ -36,13 +36,16 @@ import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
 import twitter4j.conf.ConfigurationBuilder;
 
-public class GenericWindow extends JFrame {
+public class GenericWindow<T extends JPanel> extends JFrame {
 
-  public GenericWindow(JPanel panel) {
+  protected final T panel;
+
+  public GenericWindow(T panel) {
     this(panel, panel.getClass().getSimpleName());
   }
 
-  public GenericWindow(JPanel panel, String title) {
+  public GenericWindow(T panel, String title) {
+    this.panel = panel;
     setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     setExtendedState(MAXIMIZED_BOTH);
     setTitle(title);
