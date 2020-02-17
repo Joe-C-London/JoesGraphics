@@ -3,15 +3,21 @@ package com.joecollins.graphics.components;
 import static org.junit.Assert.assertEquals;
 
 import com.joecollins.bindings.Bindable;
+import com.joecollins.bindings.BindableList;
 import com.joecollins.bindings.Binding;
 import java.awt.Color;
 import java.text.DecimalFormat;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Test;
 
 public class BarFrameBuilderTest {
+
+  private static final DecimalFormat THOUSANDS = new DecimalFormat("#,##0");
+  private static final DecimalFormat DIFF = new DecimalFormat("+0;-0");
 
   private enum BindableWrapperValue {
     VALUE
@@ -34,12 +40,19 @@ public class BarFrameBuilderTest {
     }
   }
 
+  private static class Wrapper<T> {
+    final T value;
+
+    private Wrapper(T value) {
+      this.value = value;
+    }
+  }
+
   @Test
   public void testSimpleBars() {
     BindableWrapper<Map<Pair<String, Color>, Integer>> result = new BindableWrapper<>();
     BarFrame frame =
-        BarFrameBuilder.basic(
-                result.getBinding(), Pair::getLeft, Pair::getRight, new DecimalFormat("#,##0"))
+        BarFrameBuilder.basic(result.getBinding(), Pair::getLeft, Pair::getRight, THOUSANDS::format)
             .build();
     assertEquals(0, frame.getNumBars());
     assertEquals(0, frame.getNumLines());
@@ -65,13 +78,46 @@ public class BarFrameBuilderTest {
   }
 
   @Test
+  public void testSimpleBarsWithValueObject() {
+    BindableWrapper<Map<Pair<String, Color>, Wrapper<Integer>>> result = new BindableWrapper<>();
+    BarFrame frame =
+        BarFrameBuilder.basic(
+                result.getBinding(),
+                Pair::getLeft,
+                Pair::getRight,
+                v -> v.value,
+                v -> THOUSANDS.format(v.value))
+            .build();
+    assertEquals(0, frame.getNumBars());
+    assertEquals(0, frame.getNumLines());
+
+    result.setValue(
+        Map.of(
+            ImmutablePair.of("CLINTON", Color.ORANGE),
+            new Wrapper<>(2842),
+            ImmutablePair.of("SANDERS", Color.GREEN),
+            new Wrapper<>(1865)));
+    assertEquals(2, frame.getNumBars());
+    assertEquals("CLINTON", frame.getLeftText(0));
+    assertEquals("SANDERS", frame.getLeftText(1));
+    assertEquals("2,842", frame.getRightText(0));
+    assertEquals("1,865", frame.getRightText(1));
+    assertEquals(Color.ORANGE, frame.getSeries(0).get(0).getLeft());
+    assertEquals(Color.GREEN, frame.getSeries(1).get(0).getLeft());
+    assertEquals(2842, frame.getSeries(0).get(0).getRight());
+    assertEquals(1865, frame.getSeries(1).get(0).getRight());
+
+    assertEquals(0, frame.getMin().intValue());
+    assertEquals(2842, frame.getMax().intValue());
+  }
+
+  @Test
   public void testSimpleBarsRange() {
     BindableWrapper<Map<Pair<String, Color>, Integer>> result = new BindableWrapper<>();
     BindableWrapper<Integer> max = new BindableWrapper<>();
     max.setValue(2500);
     BarFrame frame =
-        BarFrameBuilder.basic(
-                result.getBinding(), Pair::getLeft, Pair::getRight, new DecimalFormat("#,##0"))
+        BarFrameBuilder.basic(result.getBinding(), Pair::getLeft, Pair::getRight, THOUSANDS::format)
             .withMax(max.getBinding())
             .build();
     assertEquals(0, frame.getMin().intValue());
@@ -117,9 +163,8 @@ public class BarFrameBuilderTest {
     borderColor.setValue(Color.BLACK);
     BindableWrapper<Color> subheadColor = new BindableWrapper<>();
     subheadColor.setValue(Color.GRAY);
-    DecimalFormat formatter = new DecimalFormat("#,##0");
     BarFrame frame =
-        BarFrameBuilder.basic(result.getBinding(), Pair::getLeft, Pair::getRight, formatter)
+        BarFrameBuilder.basic(result.getBinding(), Pair::getLeft, Pair::getRight, THOUSANDS::format)
             .withHeader(header.getBinding())
             .withSubhead(subhead.getBinding())
             .withNotes(notes.getBinding())
@@ -153,13 +198,167 @@ public class BarFrameBuilderTest {
     BindableWrapper<Map<Pair<String, Color>, Integer>> result = new BindableWrapper<>();
     BindableWrapper<Integer> target = new BindableWrapper<>();
     target.setValue(2382);
-    DecimalFormat formatter = new DecimalFormat("#,##0");
     BarFrame frame =
-        BarFrameBuilder.basic(result.getBinding(), Pair::getLeft, Pair::getRight, formatter)
-            .withTarget(target.getBinding(), t -> formatter.format(t) + " TO WIN")
+        BarFrameBuilder.basic(result.getBinding(), Pair::getLeft, Pair::getRight, THOUSANDS::format)
+            .withTarget(target.getBinding(), t -> THOUSANDS.format(t) + " TO WIN")
             .build();
     assertEquals(1, frame.getNumLines());
     assertEquals(2382, frame.getLineLevel(0));
     assertEquals("2,382 TO WIN", frame.getLineLabel(0));
+  }
+
+  @Test
+  public void testMultiLines() {
+    BindableWrapper<Map<Pair<String, Color>, Integer>> result = new BindableWrapper<>();
+    BindableList<Integer> lines = new BindableList<>();
+    BarFrame frame =
+        BarFrameBuilder.basic(result.getBinding(), Pair::getLeft, Pair::getRight, THOUSANDS::format)
+            .withLines(lines, t -> t + " QUOTA" + (t == 1 ? "" : "S"))
+            .build();
+    assertEquals(0, frame.getNumLines());
+
+    lines.addAll(Arrays.asList(1, 2, 3, 4, 5));
+    assertEquals(5, frame.getNumLines());
+
+    assertEquals(1, frame.getLineLevel(0));
+    assertEquals(2, frame.getLineLevel(1));
+    assertEquals(3, frame.getLineLevel(2));
+    assertEquals(4, frame.getLineLevel(3));
+    assertEquals(5, frame.getLineLevel(4));
+
+    assertEquals("1 QUOTA", frame.getLineLabel(0));
+    assertEquals("2 QUOTAS", frame.getLineLabel(1));
+    assertEquals("3 QUOTAS", frame.getLineLabel(2));
+    assertEquals("4 QUOTAS", frame.getLineLabel(3));
+    assertEquals("5 QUOTAS", frame.getLineLabel(4));
+  }
+
+  @Test
+  public void testMultiLinesBinding() {
+    BindableWrapper<Map<Pair<String, Color>, Integer>> result = new BindableWrapper<>();
+    BindableWrapper<List<Integer>> lines = new BindableWrapper<>();
+    lines.setValue(List.of());
+    BarFrame frame =
+        BarFrameBuilder.basic(result.getBinding(), Pair::getLeft, Pair::getRight, THOUSANDS::format)
+            .withLines(lines.getBinding(), t -> t + " QUOTA" + (t == 1 ? "" : "S"))
+            .build();
+    assertEquals(0, frame.getNumLines());
+
+    lines.setValue(Arrays.asList(1, 2, 3, 4, 5));
+    assertEquals(5, frame.getNumLines());
+
+    assertEquals(1, frame.getLineLevel(0));
+    assertEquals(2, frame.getLineLevel(1));
+    assertEquals(3, frame.getLineLevel(2));
+    assertEquals(4, frame.getLineLevel(3));
+    assertEquals(5, frame.getLineLevel(4));
+
+    assertEquals("1 QUOTA", frame.getLineLabel(0));
+    assertEquals("2 QUOTAS", frame.getLineLabel(1));
+    assertEquals("3 QUOTAS", frame.getLineLabel(2));
+    assertEquals("4 QUOTAS", frame.getLineLabel(3));
+    assertEquals("5 QUOTAS", frame.getLineLabel(4));
+  }
+
+  @Test
+  public void testSimpleDiffBars() {
+    BindableWrapper<Map<Pair<String, Color>, Pair<Integer, Integer>>> result =
+        new BindableWrapper<>();
+    BarFrame frame =
+        BarFrameBuilder.basic(
+                result.getBinding(),
+                Pair::getLeft,
+                Pair::getRight,
+                Pair::getRight,
+                p -> DIFF.format(p.getRight()),
+                Pair::getLeft)
+            .build();
+    assertEquals(0, frame.getNumBars());
+    assertEquals(0, frame.getNumLines());
+
+    result.setValue(
+        Map.of(
+            ImmutablePair.of("LIB", Color.RED),
+            ImmutablePair.of(157, -27),
+            ImmutablePair.of("CON", Color.BLUE),
+            ImmutablePair.of(121, +22),
+            ImmutablePair.of("NDP", Color.ORANGE),
+            ImmutablePair.of(24, -20),
+            ImmutablePair.of("BQ", Color.CYAN),
+            ImmutablePair.of(32, +22),
+            ImmutablePair.of("GRN", Color.GREEN),
+            ImmutablePair.of(3, +2),
+            ImmutablePair.of("IND", Color.GRAY),
+            ImmutablePair.of(1, +1)));
+    assertEquals(6, frame.getNumBars());
+
+    assertEquals("LIB", frame.getLeftText(0));
+    assertEquals("CON", frame.getLeftText(1));
+    assertEquals("BQ", frame.getLeftText(2));
+    assertEquals("NDP", frame.getLeftText(3));
+    assertEquals("GRN", frame.getLeftText(4));
+    assertEquals("IND", frame.getLeftText(5));
+
+    assertEquals("-27", frame.getRightText(0));
+    assertEquals("+22", frame.getRightText(1));
+    assertEquals("+22", frame.getRightText(2));
+    assertEquals("-20", frame.getRightText(3));
+    assertEquals("+2", frame.getRightText(4));
+    assertEquals("+1", frame.getRightText(5));
+
+    assertEquals(Color.RED, frame.getSeries(0).get(0).getLeft());
+    assertEquals(Color.BLUE, frame.getSeries(1).get(0).getLeft());
+    assertEquals(Color.CYAN, frame.getSeries(2).get(0).getLeft());
+    assertEquals(Color.ORANGE, frame.getSeries(3).get(0).getLeft());
+    assertEquals(Color.GREEN, frame.getSeries(4).get(0).getLeft());
+    assertEquals(Color.GRAY, frame.getSeries(5).get(0).getLeft());
+
+    assertEquals(-27, frame.getSeries(0).get(0).getRight());
+    assertEquals(+22, frame.getSeries(1).get(0).getRight());
+    assertEquals(+22, frame.getSeries(2).get(0).getRight());
+    assertEquals(-20, frame.getSeries(3).get(0).getRight());
+    assertEquals(+2, frame.getSeries(4).get(0).getRight());
+    assertEquals(+1, frame.getSeries(5).get(0).getRight());
+
+    assertEquals(-27, frame.getMin().intValue());
+    assertEquals(+22, frame.getMax().intValue());
+  }
+
+  @Test
+  public void testSimpleDiffWingspan() {
+    BindableWrapper<Map<Pair<String, Color>, Pair<Integer, Integer>>> result =
+        new BindableWrapper<>();
+    BindableWrapper<Integer> range = new BindableWrapper<>();
+    range.setValue(10);
+    BarFrame frame =
+        BarFrameBuilder.basic(
+                result.getBinding(),
+                Pair::getLeft,
+                Pair::getRight,
+                Pair::getRight,
+                p -> DIFF.format(p.getRight()),
+                Pair::getLeft)
+            .withWingspan(range.getBinding())
+            .build();
+    assertEquals(-10, frame.getMin().intValue());
+    assertEquals(+10, frame.getMax().intValue());
+
+    result.setValue(
+        Map.of(
+            ImmutablePair.of("LIB", Color.RED),
+            ImmutablePair.of(157, -27),
+            ImmutablePair.of("CON", Color.BLUE),
+            ImmutablePair.of(121, +22),
+            ImmutablePair.of("NDP", Color.ORANGE),
+            ImmutablePair.of(24, -20),
+            ImmutablePair.of("BQ", Color.CYAN),
+            ImmutablePair.of(32, +22),
+            ImmutablePair.of("GRN", Color.GREEN),
+            ImmutablePair.of(3, +2),
+            ImmutablePair.of("IND", Color.GRAY),
+            ImmutablePair.of(1, +1)));
+
+    assertEquals(-27, frame.getMin().intValue());
+    assertEquals(+27, frame.getMax().intValue());
   }
 }
