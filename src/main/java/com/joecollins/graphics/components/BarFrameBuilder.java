@@ -5,6 +5,7 @@ import com.joecollins.bindings.BindableList;
 import com.joecollins.bindings.Binding;
 import com.joecollins.bindings.IndexedBinding;
 import java.awt.Color;
+import java.awt.Shape;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -81,6 +82,29 @@ public class BarFrameBuilder {
       Function<? super U, ? extends Number> valueFunc,
       Function<? super U, String> valueLabelFunc,
       Function<? super U, ? extends Number> sortFunc) {
+    return basicWithShapes(
+        binding, labelFunc, colorFunc, valueFunc, valueLabelFunc, x -> null, sortFunc);
+  }
+
+  public static <T, U> BarFrameBuilder basicWithShapes(
+      Binding<? extends Map<? extends T, ? extends U>> binding,
+      Function<? super T, String> labelFunc,
+      Function<? super T, Color> colorFunc,
+      Function<? super U, ? extends Number> valueFunc,
+      Function<? super U, String> valueLabelFunc,
+      Function<? super U, ? extends Shape> shapeFunc) {
+    return basicWithShapes(
+        binding, labelFunc, colorFunc, valueFunc, valueLabelFunc, shapeFunc, valueFunc);
+  }
+
+  public static <T, U> BarFrameBuilder basicWithShapes(
+      Binding<? extends Map<? extends T, ? extends U>> binding,
+      Function<? super T, String> labelFunc,
+      Function<? super T, Color> colorFunc,
+      Function<? super U, ? extends Number> valueFunc,
+      Function<? super U, String> valueLabelFunc,
+      Function<? super U, ? extends Shape> shapeFunc,
+      Function<? super U, ? extends Number> sortFunc) {
     BarFrameBuilder builder = new BarFrameBuilder();
     BarFrame barFrame = builder.barFrame;
     RangeFinder rangeFinder = builder.rangeFinder;
@@ -90,12 +114,14 @@ public class BarFrameBuilder {
       final Color color;
       final Number value;
       final String valueLabel;
+      final Shape shape;
 
-      BarEntry(String label, Color color, Number value, String valueLabel) {
+      BarEntry(String label, Color color, Number value, String valueLabel, Shape shape) {
         this.label = label;
         this.color = color;
         this.value = value;
         this.valueLabel = valueLabel;
+        this.shape = shape;
       }
     }
 
@@ -103,6 +129,7 @@ public class BarFrameBuilder {
     barFrame.setNumBarsBinding(Binding.sizeBinding(entries));
     barFrame.setLeftTextBinding(IndexedBinding.propertyBinding(entries, e -> e.label));
     barFrame.setRightTextBinding(IndexedBinding.propertyBinding(entries, e -> e.valueLabel));
+    barFrame.setLeftIconBinding(IndexedBinding.propertyBinding(entries, e -> e.shape));
     barFrame.setMinBinding(
         Binding.propertyBinding(
             rangeFinder, rf -> rf.minFunction.apply(rf), RangeFinder.Property.MIN));
@@ -132,7 +159,8 @@ public class BarFrameBuilder {
                                 labelFunc.apply(e.getKey()),
                                 colorFunc.apply(e.getKey()),
                                 valueFunc.apply(e.getValue()),
-                                valueLabelFunc.apply(e.getValue())))
+                                valueLabelFunc.apply(e.getValue()),
+                                shapeFunc.apply(e.getValue())))
                     .collect(Collectors.toList()));
             rangeFinder.setHighest(
                 map.values().stream()

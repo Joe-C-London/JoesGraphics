@@ -1,11 +1,13 @@
 package com.joecollins.graphics.components;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 import com.joecollins.bindings.Bindable;
 import com.joecollins.bindings.BindableList;
 import com.joecollins.bindings.Binding;
 import java.awt.Color;
+import java.awt.geom.Rectangle2D.Double;
 import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.List;
@@ -258,6 +260,42 @@ public class BarFrameBuilderTest {
     assertEquals("3 QUOTAS", frame.getLineLabel(2));
     assertEquals("4 QUOTAS", frame.getLineLabel(3));
     assertEquals("5 QUOTAS", frame.getLineLabel(4));
+  }
+
+  @Test
+  public void testLeftShape() {
+    BindableWrapper<Map<Pair<String, Color>, Pair<Integer, Boolean>>> result =
+        new BindableWrapper<>();
+    Double shape = new Double(0, 0, 1, 1);
+    BarFrame frame =
+        BarFrameBuilder.basicWithShapes(
+                result.getBinding(),
+                Pair::getLeft,
+                Pair::getRight,
+                Pair::getLeft,
+                v -> THOUSANDS.format(v.getLeft()),
+                v -> v.getRight() ? shape : null)
+            .build();
+    assertEquals(0, frame.getNumBars());
+    assertEquals(0, frame.getNumLines());
+
+    result.setValue(
+        Map.of(
+            ImmutablePair.of("CLINTON", Color.ORANGE),
+            ImmutablePair.of(2842, true),
+            ImmutablePair.of("SANDERS", Color.GREEN),
+            ImmutablePair.of(1865, false)));
+    assertEquals(2, frame.getNumBars());
+    assertEquals("CLINTON", frame.getLeftText(0));
+    assertEquals("SANDERS", frame.getLeftText(1));
+    assertEquals("2,842", frame.getRightText(0));
+    assertEquals("1,865", frame.getRightText(1));
+    assertEquals(Color.ORANGE, frame.getSeries(0).get(0).getLeft());
+    assertEquals(Color.GREEN, frame.getSeries(1).get(0).getLeft());
+    assertEquals(2842, frame.getSeries(0).get(0).getRight());
+    assertEquals(1865, frame.getSeries(1).get(0).getRight());
+    assertEquals(shape, frame.getLeftIcon(0));
+    assertNull(frame.getLeftIcon(1));
   }
 
   @Test
