@@ -2,8 +2,15 @@ package com.joecollins.graphics.components;
 
 import com.joecollins.bindings.Bindable;
 import com.joecollins.bindings.Binding;
+import com.joecollins.models.general.Party;
 import java.awt.Color;
+import java.text.DecimalFormat;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Collectors;
+import org.apache.commons.collections4.ComparatorUtils;
 
 public class SwingFrameBuilder {
 
@@ -51,6 +58,107 @@ public class SwingFrameBuilder {
   private SwingFrame swingFrame = new SwingFrame();
   private SwingProperties props = new SwingProperties();
   private Color neutralColor = Color.BLACK;
+
+  private enum SingletonProperty {
+    ALL
+  }
+
+  public static SwingFrameBuilder prevCurr(
+      Binding<? extends Map<Party, ? extends Number>> prevBinding,
+      Binding<? extends Map<Party, ? extends Number>> currBinding,
+      Comparator<Party> partyOrder) {
+    var prevCurr =
+        new Bindable() {
+          private Map<Party, Double> prevPct = new HashMap<>();
+          private Map<Party, Double> currPct = new HashMap<>();
+
+          private Party fromParty = null;
+          private Party toParty = null;
+          private double swing = 0;
+
+          void setPrevPct(Map<Party, Double> prevPct) {
+            this.prevPct = prevPct;
+            setProperties();
+          }
+
+          void setCurrPct(Map<Party, Double> currPct) {
+            this.currPct = currPct;
+            setProperties();
+          }
+
+          void setProperties() {
+            fromParty =
+                prevPct.entrySet().stream()
+                    .max(Comparator.comparingDouble(Map.Entry::getValue))
+                    .map(Map.Entry::getKey)
+                    .orElse(null);
+            toParty =
+                currPct.entrySet().stream()
+                    .filter(p -> !p.getKey().equals(fromParty))
+                    .max(Comparator.comparingDouble(Map.Entry::getValue))
+                    .map(Map.Entry::getKey)
+                    .orElse(null);
+            if (fromParty != null && toParty != null) {
+              double fromSwing =
+                  currPct.getOrDefault(fromParty, 0.0) - prevPct.getOrDefault(fromParty, 0.0);
+              double toSwing =
+                  currPct.getOrDefault(toParty, 0.0) - prevPct.getOrDefault(toParty, 0.0);
+              swing = (toSwing - fromSwing) / 2;
+            }
+            if (swing < 0) {
+              swing *= -1;
+              Party temp = fromParty;
+              fromParty = toParty;
+              toParty = temp;
+            }
+            onPropertyRefreshed(SingletonProperty.ALL);
+          }
+        };
+    Function<Map<Party, ? extends Number>, Map<Party, Double>> toPctFunc =
+        map -> {
+          double total = map.values().stream().mapToDouble(Number::doubleValue).sum();
+          return map.entrySet().stream()
+              .collect(
+                  Collectors.toMap(Map.Entry::getKey, e -> e.getValue().doubleValue() / total));
+        };
+    prevBinding.bind(map -> prevCurr.setPrevPct(toPctFunc.apply(map)));
+    currBinding.bind(map -> prevCurr.setCurrPct(toPctFunc.apply(map)));
+    return basic(
+            Binding.propertyBinding(prevCurr, Function.identity(), SingletonProperty.ALL),
+            p -> {
+              if (p.fromParty == null || p.toParty == null) {
+                return Color.LIGHT_GRAY;
+              }
+              return ComparatorUtils.max(p.fromParty, p.toParty, partyOrder).getColor();
+            },
+            p -> {
+              if (p.fromParty == null || p.toParty == null) {
+                return Color.LIGHT_GRAY;
+              }
+              return ComparatorUtils.min(p.fromParty, p.toParty, partyOrder).getColor();
+            },
+            p -> {
+              if (p.fromParty == null || p.toParty == null) {
+                return 0.0;
+              }
+              return p.swing * Math.signum(partyOrder.compare(p.toParty, p.fromParty));
+            },
+            p -> {
+              if (p.fromParty == null || p.toParty == null) {
+                return "NOT AVAILABLE";
+              }
+              if (p.swing == 0) {
+                return "NO SWING";
+              }
+              return new DecimalFormat("0.0%").format(p.swing)
+                  + " SWING FROM "
+                  + p.fromParty.getAbbreviation()
+                  + " TO "
+                  + p.toParty.getAbbreviation();
+            })
+        .withRange(Binding.fixedBinding(0.1))
+        .withNeutralColor(Binding.fixedBinding(Color.LIGHT_GRAY));
+  }
 
   public static <T> SwingFrameBuilder basic(
       Binding<? extends T> binding,

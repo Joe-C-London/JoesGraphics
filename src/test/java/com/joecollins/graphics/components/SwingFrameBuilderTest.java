@@ -4,7 +4,12 @@ import static org.junit.Assert.assertEquals;
 
 import com.joecollins.bindings.Bindable;
 import com.joecollins.bindings.Binding;
+import com.joecollins.models.general.Party;
 import java.awt.Color;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 import org.junit.Test;
 
 public class SwingFrameBuilderTest {
@@ -103,5 +108,114 @@ public class SwingFrameBuilderTest {
 
     neutralColor.setValue(Color.BLACK);
     assertEquals(Color.BLACK, frame.getBottomColor());
+  }
+
+  @Test
+  public void testSwingPrevCurrTwoMainPartiesSwingRight() {
+    Party lib = new Party("LIBERAL", "LIB", Color.RED);
+    Party con = new Party("CONSERVATIVE", "CON", Color.BLUE);
+    Party ndp = new Party("NEW DEMOCRATIC PARTY", "NDP", Color.ORANGE);
+    Binding<Map<Party, Integer>> prevBinding = () -> Map.of(lib, 25, con, 15, ndp, 10);
+    Binding<Map<Party, Integer>> currBinding = () -> Map.of(lib, 16, con, 13, ndp, 11);
+    // LIB: 50.00 -> 40.00 (-10.00)
+    // CON: 30.00 -> 32.25 (+ 2.25)
+    // NDP: 20.00 -> 27.75 (+ 7.75)
+    List<Party> partyOrder = Arrays.asList(ndp, lib, con);
+    SwingFrame swingFrame =
+        SwingFrameBuilder.prevCurr(
+                prevBinding, currBinding, Comparator.comparing(partyOrder::indexOf))
+            .build();
+    assertEquals(Color.BLUE, swingFrame.getLeftColor());
+    assertEquals(Color.RED, swingFrame.getRightColor());
+    assertEquals(Color.BLUE, swingFrame.getBottomColor());
+    assertEquals(0.0625, swingFrame.getValue().doubleValue(), 1e-6);
+    assertEquals(0.1, swingFrame.getRange().doubleValue(), 1e-6);
+    assertEquals("6.2% SWING FROM LIB TO CON", swingFrame.getBottomText());
+  }
+
+  @Test
+  public void testSwingPrevCurrTwoMainPartiesSwingLeft() {
+    Party lib = new Party("LIBERAL", "LIB", Color.RED);
+    Party con = new Party("CONSERVATIVE", "CON", Color.BLUE);
+    Party ndp = new Party("NEW DEMOCRATIC PARTY", "NDP", Color.ORANGE);
+    Binding<Map<Party, Integer>> prevBinding = () -> Map.of(lib, 25, con, 15, ndp, 10);
+    Binding<Map<Party, Integer>> currBinding = () -> Map.of(lib, 26, con, 10, ndp, 4);
+    // LIB: 50.00 -> 65.00 (+15.00)
+    // CON: 30.00 -> 25.00 (- 5.00)
+    // NDP: 20.00 -> 10.00 (-10.00)
+    List<Party> partyOrder = Arrays.asList(ndp, lib, con);
+    SwingFrame swingFrame =
+        SwingFrameBuilder.prevCurr(
+                prevBinding, currBinding, Comparator.comparing(partyOrder::indexOf))
+            .build();
+    assertEquals(Color.BLUE, swingFrame.getLeftColor());
+    assertEquals(Color.RED, swingFrame.getRightColor());
+    assertEquals(Color.RED, swingFrame.getBottomColor());
+    assertEquals(-0.1, swingFrame.getValue().doubleValue(), 1e-6);
+    assertEquals(0.1, swingFrame.getRange().doubleValue(), 1e-6);
+    assertEquals("10.0% SWING FROM CON TO LIB", swingFrame.getBottomText());
+  }
+
+  @Test
+  public void testSwingPrevCurrPartiesSwingLeftFromRight() {
+    Party lib = new Party("LIBERAL", "LIB", Color.RED);
+    Party con = new Party("CONSERVATIVE", "CON", Color.BLUE);
+    Party ndp = new Party("NEW DEMOCRATIC PARTY", "NDP", Color.ORANGE);
+    Binding<Map<Party, Integer>> prevBinding = () -> Map.of(lib, 15, con, 25, ndp, 10);
+    Binding<Map<Party, Integer>> currBinding = () -> Map.of(lib, 6, con, 10, ndp, 24);
+    // LIB: 30.00 -> 15.00 (-15.00)
+    // CON: 50.00 -> 25.00 (-25.00)
+    // NDP: 20.00 -> 60.00 (+40.00)
+    List<Party> partyOrder = Arrays.asList(ndp, lib, con);
+    SwingFrame swingFrame =
+        SwingFrameBuilder.prevCurr(
+                prevBinding, currBinding, Comparator.comparing(partyOrder::indexOf))
+            .build();
+    assertEquals(Color.BLUE, swingFrame.getLeftColor());
+    assertEquals(Color.ORANGE, swingFrame.getRightColor());
+    assertEquals(Color.ORANGE, swingFrame.getBottomColor());
+    assertEquals(-0.325, swingFrame.getValue().doubleValue(), 1e-6);
+    assertEquals(0.1, swingFrame.getRange().doubleValue(), 1e-6);
+    assertEquals("32.5% SWING FROM CON TO NDP", swingFrame.getBottomText());
+  }
+
+  @Test
+  public void testNoSwingBetweenParties() {
+    Party lib = new Party("LIBERAL", "LIB", Color.RED);
+    Party con = new Party("CONSERVATIVE", "CON", Color.BLUE);
+    Party ndp = new Party("NEW DEMOCRATIC PARTY", "NDP", Color.ORANGE);
+    Binding<Map<Party, Integer>> prevBinding = () -> Map.of(lib, 15, con, 25, ndp, 10);
+    Binding<Map<Party, Integer>> currBinding = () -> Map.of(lib, 15, con, 25, ndp, 10);
+    List<Party> partyOrder = Arrays.asList(ndp, lib, con);
+    SwingFrame swingFrame =
+        SwingFrameBuilder.prevCurr(
+                prevBinding, currBinding, Comparator.comparing(partyOrder::indexOf))
+            .build();
+    assertEquals(Color.BLUE, swingFrame.getLeftColor());
+    assertEquals(Color.RED, swingFrame.getRightColor());
+    assertEquals(Color.LIGHT_GRAY, swingFrame.getBottomColor());
+    assertEquals(0.0, swingFrame.getValue().doubleValue(), 1e-6);
+    assertEquals(0.1, swingFrame.getRange().doubleValue(), 1e-6);
+    assertEquals("NO SWING", swingFrame.getBottomText());
+  }
+
+  @Test
+  public void testNoSwingAvailable() {
+    Party lib = new Party("LIBERAL", "LIB", Color.RED);
+    Party con = new Party("CONSERVATIVE", "CON", Color.BLUE);
+    Party ndp = new Party("NEW DEMOCRATIC PARTY", "NDP", Color.ORANGE);
+    Binding<Map<Party, Integer>> prevBinding = () -> Map.of(lib, 15, con, 25, ndp, 10);
+    Binding<Map<Party, Integer>> currBinding = Map::of;
+    List<Party> partyOrder = Arrays.asList(ndp, lib, con);
+    SwingFrame swingFrame =
+        SwingFrameBuilder.prevCurr(
+                prevBinding, currBinding, Comparator.comparing(partyOrder::indexOf))
+            .build();
+    assertEquals(Color.LIGHT_GRAY, swingFrame.getLeftColor());
+    assertEquals(Color.LIGHT_GRAY, swingFrame.getRightColor());
+    assertEquals(Color.LIGHT_GRAY, swingFrame.getBottomColor());
+    assertEquals(0.0, swingFrame.getValue().doubleValue(), 1e-6);
+    assertEquals(0.1, swingFrame.getRange().doubleValue(), 1e-6);
+    assertEquals("NOT AVAILABLE", swingFrame.getBottomText());
   }
 }
