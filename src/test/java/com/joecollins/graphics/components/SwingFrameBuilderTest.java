@@ -218,4 +218,27 @@ public class SwingFrameBuilderTest {
     assertEquals(0.1, swingFrame.getRange().doubleValue(), 1e-6);
     assertEquals("NOT AVAILABLE", swingFrame.getBottomText());
   }
+
+  @Test
+  public void testSwingPrevCurrTwoMainPartiesNormalised() {
+    Party lib = new Party("LIBERAL", "LIB", Color.RED);
+    Party con = new Party("CONSERVATIVE", "CON", Color.BLUE);
+    Party ndp = new Party("NEW DEMOCRATIC PARTY", "NDP", Color.ORANGE);
+    Binding<Map<Party, Double>> prevBinding = () -> Map.of(lib, 0.40, con, 0.30, ndp, 0.20);
+    Binding<Map<Party, Double>> currBinding = () -> Map.of(lib, 0.38, con, 0.35, ndp, 0.18);
+    // LIB: 40.00 -> 38.00 (- 2.00)
+    // CON: 30.00 -> 35.00 (+ 5.00)
+    // NDP: 20.00 -> 18.00 (- 2.00)
+    List<Party> partyOrder = Arrays.asList(ndp, lib, con);
+    SwingFrame swingFrame =
+        SwingFrameBuilder.prevCurrNormalised(
+                prevBinding, currBinding, Comparator.comparing(partyOrder::indexOf))
+            .build();
+    assertEquals(Color.BLUE, swingFrame.getLeftColor());
+    assertEquals(Color.RED, swingFrame.getRightColor());
+    assertEquals(Color.BLUE, swingFrame.getBottomColor());
+    assertEquals(0.035, swingFrame.getValue().doubleValue(), 1e-6);
+    assertEquals(0.1, swingFrame.getRange().doubleValue(), 1e-6);
+    assertEquals("3.5% SWING FROM LIB TO CON", swingFrame.getBottomText());
+  }
 }

@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.util.Objects;
 
 public class Party {
+
   private final String name;
   private final String abbreviation;
   private final Color color;

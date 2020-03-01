@@ -67,56 +67,19 @@ public class SwingFrameBuilder {
       Binding<? extends Map<Party, ? extends Number>> prevBinding,
       Binding<? extends Map<Party, ? extends Number>> currBinding,
       Comparator<Party> partyOrder) {
-    var prevCurr =
-        new Bindable() {
-          private Map<Party, Double> prevPct = new HashMap<>();
-          private Map<Party, Double> currPct = new HashMap<>();
+    return prevCurr(prevBinding, currBinding, partyOrder, false);
+  }
 
-          private Party fromParty = null;
-          private Party toParty = null;
-          private double swing = 0;
-
-          void setPrevPct(Map<Party, Double> prevPct) {
-            this.prevPct = prevPct;
-            setProperties();
-          }
-
-          void setCurrPct(Map<Party, Double> currPct) {
-            this.currPct = currPct;
-            setProperties();
-          }
-
-          void setProperties() {
-            fromParty =
-                prevPct.entrySet().stream()
-                    .max(Comparator.comparingDouble(Map.Entry::getValue))
-                    .map(Map.Entry::getKey)
-                    .orElse(null);
-            toParty =
-                currPct.entrySet().stream()
-                    .filter(p -> !p.getKey().equals(fromParty))
-                    .max(Comparator.comparingDouble(Map.Entry::getValue))
-                    .map(Map.Entry::getKey)
-                    .orElse(null);
-            if (fromParty != null && toParty != null) {
-              double fromSwing =
-                  currPct.getOrDefault(fromParty, 0.0) - prevPct.getOrDefault(fromParty, 0.0);
-              double toSwing =
-                  currPct.getOrDefault(toParty, 0.0) - prevPct.getOrDefault(toParty, 0.0);
-              swing = (toSwing - fromSwing) / 2;
-            }
-            if (swing < 0) {
-              swing *= -1;
-              Party temp = fromParty;
-              fromParty = toParty;
-              toParty = temp;
-            }
-            onPropertyRefreshed(SingletonProperty.ALL);
-          }
-        };
+  public static SwingFrameBuilder prevCurr(
+      Binding<? extends Map<Party, ? extends Number>> prevBinding,
+      Binding<? extends Map<Party, ? extends Number>> currBinding,
+      Comparator<Party> partyOrder,
+      boolean normalised) {
+    var prevCurr = new BindablePrevCurrPct();
     Function<Map<Party, ? extends Number>, Map<Party, Double>> toPctFunc =
         map -> {
-          double total = map.values().stream().mapToDouble(Number::doubleValue).sum();
+          double total =
+              normalised ? 1 : map.values().stream().mapToDouble(Number::doubleValue).sum();
           return map.entrySet().stream()
               .collect(
                   Collectors.toMap(Map.Entry::getKey, e -> e.getValue().doubleValue() / total));
@@ -158,6 +121,13 @@ public class SwingFrameBuilder {
             })
         .withRange(Binding.fixedBinding(0.1))
         .withNeutralColor(Binding.fixedBinding(Color.LIGHT_GRAY));
+  }
+
+  public static SwingFrameBuilder prevCurrNormalised(
+      Binding<? extends Map<Party, Double>> prevBinding,
+      Binding<? extends Map<Party, Double>> currBinding,
+      Comparator<Party> partyOrder) {
+    return prevCurr(prevBinding, currBinding, partyOrder, true);
   }
 
   public static <T> SwingFrameBuilder basic(
@@ -221,5 +191,52 @@ public class SwingFrameBuilder {
 
   public SwingFrame build() {
     return swingFrame;
+  }
+
+  private static class BindablePrevCurrPct extends Bindable {
+
+    private Map<Party, Double> prevPct = new HashMap<>();
+    private Map<Party, Double> currPct = new HashMap<>();
+
+    private Party fromParty = null;
+    private Party toParty = null;
+    private double swing = 0;
+
+    void setPrevPct(Map<Party, Double> prevPct) {
+      this.prevPct = prevPct;
+      setProperties();
+    }
+
+    void setCurrPct(Map<Party, Double> currPct) {
+      this.currPct = currPct;
+      setProperties();
+    }
+
+    void setProperties() {
+      fromParty =
+          prevPct.entrySet().stream()
+              .max(Comparator.comparingDouble(Map.Entry::getValue))
+              .map(Map.Entry::getKey)
+              .orElse(null);
+      toParty =
+          currPct.entrySet().stream()
+              .filter(p -> !p.getKey().equals(fromParty))
+              .max(Comparator.comparingDouble(Map.Entry::getValue))
+              .map(Map.Entry::getKey)
+              .orElse(null);
+      if (fromParty != null && toParty != null) {
+        double fromSwing =
+            currPct.getOrDefault(fromParty, 0.0) - prevPct.getOrDefault(fromParty, 0.0);
+        double toSwing = currPct.getOrDefault(toParty, 0.0) - prevPct.getOrDefault(toParty, 0.0);
+        swing = (toSwing - fromSwing) / 2;
+      }
+      if (swing < 0) {
+        swing *= -1;
+        Party temp = fromParty;
+        fromParty = toParty;
+        toParty = temp;
+      }
+      onPropertyRefreshed(SingletonProperty.ALL);
+    }
   }
 }
