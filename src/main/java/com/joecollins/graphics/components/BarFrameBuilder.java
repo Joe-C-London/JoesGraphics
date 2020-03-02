@@ -10,7 +10,10 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import org.apache.commons.lang3.tuple.Pair;
 
 public class BarFrameBuilder {
 
@@ -152,7 +155,8 @@ public class BarFrameBuilder {
                     .sorted(
                         Comparator.<Map.Entry<? extends T, ? extends U>>comparingDouble(
                                 e -> sortFunc.apply(e.getValue()).doubleValue())
-                            .reversed())
+                            .reversed()
+                            .thenComparing(e -> labelFunc.apply(e.getKey())))
                     .map(
                         e ->
                             new BarEntry(
@@ -175,6 +179,141 @@ public class BarFrameBuilder {
           }
         });
     return builder;
+  }
+
+  public static <T> BarFrameBuilder dual(
+      Binding<? extends Map<? extends T, ? extends Pair<? extends Number, ? extends Number>>>
+          binding,
+      Function<? super T, String> labelFunc,
+      Function<? super T, Color> colorFunc,
+      Function<? super Pair<? extends Number, ? extends Number>, String> valueLabelFunc,
+      Function<Pair<? extends Number, ? extends Number>, Number> sortFunc) {
+    return dual(binding, labelFunc, colorFunc, Function.identity(), valueLabelFunc, sortFunc);
+  }
+
+  public static <T, U> BarFrameBuilder dual(
+      Binding<? extends Map<? extends T, ? extends U>> binding,
+      Function<? super T, String> labelFunc,
+      Function<? super T, Color> colorFunc,
+      Function<? super U, ? extends Pair<? extends Number, ? extends Number>> valueFunc,
+      Function<? super U, String> valueLabelFunc,
+      Function<? super U, ? extends Number> sortFunc) {
+    BarFrameBuilder builder = new BarFrameBuilder();
+    BarFrame barFrame = builder.barFrame;
+    RangeFinder rangeFinder = builder.rangeFinder;
+
+    class BarEntry {
+      final String label;
+      final Color color;
+      final Number value1;
+      final Number value2;
+      final String valueLabel;
+
+      BarEntry(String label, Color color, Number value1, Number value2, String valueLabel) {
+        this.label = label;
+        this.color = color;
+        this.value1 = value1;
+        this.value2 = value2;
+        this.valueLabel = valueLabel;
+      }
+
+      boolean differentDirections() {
+        return Math.signum(value1.doubleValue()) * Math.signum(value2.doubleValue()) == -1;
+      }
+
+      Number first() {
+        if (differentDirections()
+            || Math.abs(value1.doubleValue()) < Math.abs(value2.doubleValue())) {
+          return value1;
+        } else {
+          return value2;
+        }
+      }
+
+      Number second() {
+        if (differentDirections()
+            || Math.abs(value1.doubleValue()) < Math.abs(value2.doubleValue())) {
+          return value2;
+        } else {
+          return value1;
+        }
+      }
+    }
+
+    BindableList<BarEntry> entries = new BindableList<>();
+    barFrame.setNumBarsBinding(Binding.sizeBinding(entries));
+    barFrame.setLeftTextBinding(IndexedBinding.propertyBinding(entries, e -> e.label));
+    barFrame.setRightTextBinding(IndexedBinding.propertyBinding(entries, e -> e.valueLabel));
+    barFrame.setMinBinding(
+        Binding.propertyBinding(
+            rangeFinder, rf -> rf.minFunction.apply(rf), RangeFinder.Property.MIN));
+    barFrame.setMaxBinding(
+        Binding.propertyBinding(
+            rangeFinder, rf -> rf.maxFunction.apply(rf), RangeFinder.Property.MAX));
+    barFrame.addSeriesBinding(
+        "First",
+        IndexedBinding.propertyBinding(
+            entries,
+            e -> {
+              UnaryOperator<Color> cf =
+                  e.differentDirections() ? BarFrameBuilder::lighten : UnaryOperator.identity();
+              return cf.apply(e.color);
+            }),
+        IndexedBinding.propertyBinding(entries, BarEntry::first));
+    barFrame.addSeriesBinding(
+        "Second",
+        IndexedBinding.propertyBinding(entries, e -> lighten(e.color)),
+        IndexedBinding.propertyBinding(
+            entries,
+            e ->
+                e.second().doubleValue()
+                    - (e.differentDirections() ? 0 : e.first().doubleValue())));
+    binding.bind(
+        map -> {
+          if (map == null) {
+            entries.clear();
+            rangeFinder.setLowest(0);
+            rangeFinder.setHighest(0);
+          } else {
+            entries.setAll(
+                map.entrySet().stream()
+                    .sorted(
+                        Comparator.<Map.Entry<? extends T, ? extends U>>comparingDouble(
+                                e -> sortFunc.apply(e.getValue()).doubleValue())
+                            .reversed()
+                            .thenComparing(e -> labelFunc.apply(e.getKey())))
+                    .map(
+                        e -> {
+                          Pair<? extends Number, ? extends Number> values =
+                              valueFunc.apply(e.getValue());
+                          return new BarEntry(
+                              labelFunc.apply(e.getKey()),
+                              colorFunc.apply(e.getKey()),
+                              values.getLeft(),
+                              values.getRight(),
+                              valueLabelFunc.apply(e.getValue()));
+                        })
+                    .collect(Collectors.toList()));
+            rangeFinder.setHighest(
+                map.values().stream()
+                    .map(valueFunc)
+                    .flatMap(e -> Stream.of(e.getLeft(), e.getRight()))
+                    .mapToDouble(Number::doubleValue)
+                    .reduce(0, Math::max));
+            rangeFinder.setLowest(
+                map.values().stream()
+                    .map(valueFunc)
+                    .flatMap(e -> Stream.of(e.getLeft(), e.getRight()))
+                    .mapToDouble(Number::doubleValue)
+                    .reduce(0, Math::min));
+          }
+        });
+    return builder;
+  }
+
+  private static Color lighten(Color color) {
+    return new Color(
+        128 + color.getRed() / 2, 128 + color.getGreen() / 2, 128 + color.getBlue() / 2);
   }
 
   public BarFrameBuilder withHeader(Binding<String> headerBinding) {

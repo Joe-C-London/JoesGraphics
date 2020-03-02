@@ -13,7 +13,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.Triple;
 import org.junit.Test;
 
 public class BarFrameBuilderTest {
@@ -398,5 +400,243 @@ public class BarFrameBuilderTest {
 
     assertEquals(-27, frame.getMin().intValue());
     assertEquals(+27, frame.getMax().intValue());
+  }
+
+  @Test
+  public void testDualValueBars() {
+    BindableWrapper<Map<Pair<String, Color>, Pair<Integer, Integer>>> result =
+        new BindableWrapper<>();
+    BarFrame frame =
+        BarFrameBuilder.dual(
+                result.getBinding(),
+                Pair::getLeft,
+                Pair::getRight,
+                p -> p.getLeft() + "/" + p.getRight(),
+                Pair::getRight)
+            .build();
+    assertEquals(0, frame.getNumBars());
+    assertEquals(0, frame.getNumLines());
+
+    result.setValue(
+        Map.of(
+            ImmutablePair.of("LIBERAL", Color.RED),
+            ImmutablePair.of(26, 157),
+            ImmutablePair.of("CONSERVATIVE", Color.BLUE),
+            ImmutablePair.of(4, 121),
+            ImmutablePair.of("NEW DEMOCRATIC PARTY", Color.ORANGE),
+            ImmutablePair.of(1, 24),
+            ImmutablePair.of("BLOC QU\u00c9B\u00c9COIS", Color.CYAN),
+            ImmutablePair.of(0, 32),
+            ImmutablePair.of("GREEN", Color.GREEN),
+            ImmutablePair.of(1, 3),
+            ImmutablePair.of("INDEPENDENT", Color.GRAY),
+            ImmutablePair.of(0, 1)));
+    assertEquals(6, frame.getNumBars());
+
+    assertEquals("LIBERAL", frame.getLeftText(0));
+    assertEquals("CONSERVATIVE", frame.getLeftText(1));
+    assertEquals("BLOC QU\u00c9B\u00c9COIS", frame.getLeftText(2));
+    assertEquals("NEW DEMOCRATIC PARTY", frame.getLeftText(3));
+    assertEquals("GREEN", frame.getLeftText(4));
+    assertEquals("INDEPENDENT", frame.getLeftText(5));
+
+    assertEquals("26/157", frame.getRightText(0));
+    assertEquals("4/121", frame.getRightText(1));
+    assertEquals("0/32", frame.getRightText(2));
+    assertEquals("1/24", frame.getRightText(3));
+    assertEquals("1/3", frame.getRightText(4));
+    assertEquals("0/1", frame.getRightText(5));
+
+    assertEquals(Color.RED, frame.getSeries(0).get(0).getLeft());
+    assertEquals(Color.BLUE, frame.getSeries(1).get(0).getLeft());
+    assertEquals(Color.CYAN, frame.getSeries(2).get(0).getLeft());
+    assertEquals(Color.ORANGE, frame.getSeries(3).get(0).getLeft());
+    assertEquals(Color.GREEN, frame.getSeries(4).get(0).getLeft());
+    assertEquals(Color.GRAY, frame.getSeries(5).get(0).getLeft());
+
+    assertEquals(26, frame.getSeries(0).get(0).getRight().intValue());
+    assertEquals(4, frame.getSeries(1).get(0).getRight().intValue());
+    assertEquals(0, frame.getSeries(2).get(0).getRight().intValue());
+    assertEquals(1, frame.getSeries(3).get(0).getRight().intValue());
+    assertEquals(1, frame.getSeries(4).get(0).getRight().intValue());
+    assertEquals(0, frame.getSeries(5).get(0).getRight().intValue());
+
+    assertEquals(lighten(Color.RED), frame.getSeries(0).get(1).getLeft());
+    assertEquals(lighten(Color.BLUE), frame.getSeries(1).get(1).getLeft());
+    assertEquals(lighten(Color.CYAN), frame.getSeries(2).get(1).getLeft());
+    assertEquals(lighten(Color.ORANGE), frame.getSeries(3).get(1).getLeft());
+    assertEquals(lighten(Color.GREEN), frame.getSeries(4).get(1).getLeft());
+    assertEquals(lighten(Color.GRAY), frame.getSeries(5).get(1).getLeft());
+
+    assertEquals(157 - 26, frame.getSeries(0).get(1).getRight().intValue());
+    assertEquals(121 - 4, frame.getSeries(1).get(1).getRight().intValue());
+    assertEquals(32 - 0, frame.getSeries(2).get(1).getRight().intValue());
+    assertEquals(24 - 1, frame.getSeries(3).get(1).getRight().intValue());
+    assertEquals(3 - 1, frame.getSeries(4).get(1).getRight().intValue());
+    assertEquals(1 - 0, frame.getSeries(5).get(1).getRight().intValue());
+
+    assertEquals(0, frame.getMin().intValue());
+    assertEquals(157, frame.getMax().intValue());
+  }
+
+  @Test
+  public void testDualChangeBars() {
+    BindableWrapper<Map<Pair<String, Color>, Triple<Integer, Integer, Integer>>> result =
+        new BindableWrapper<>();
+    BarFrame frame =
+        BarFrameBuilder.dual(
+                result.getBinding(),
+                Pair::getLeft,
+                Pair::getRight,
+                t -> ImmutablePair.of(t.getLeft(), t.getMiddle()),
+                t -> DIFF.format(t.getLeft()) + "/" + DIFF.format(t.getMiddle()),
+                Triple::getRight)
+            .build();
+    assertEquals(0, frame.getNumBars());
+    assertEquals(0, frame.getNumLines());
+
+    result.setValue(
+        Map.of(
+            ImmutablePair.of("LIB", Color.RED),
+            ImmutableTriple.of(-6, -27, 157),
+            ImmutablePair.of("CON", Color.BLUE),
+            ImmutableTriple.of(+4, +22, 121),
+            ImmutablePair.of("NDP", Color.ORANGE),
+            ImmutableTriple.of(+1, -20, 24),
+            ImmutablePair.of("BQ", Color.CYAN),
+            ImmutableTriple.of(0, +22, 32),
+            ImmutablePair.of("GRN", Color.GREEN),
+            ImmutableTriple.of(+1, +2, 3),
+            ImmutablePair.of("IND", Color.GRAY),
+            ImmutableTriple.of(0, +1, 1)));
+    assertEquals(6, frame.getNumBars());
+
+    assertEquals("LIB", frame.getLeftText(0));
+    assertEquals("CON", frame.getLeftText(1));
+    assertEquals("BQ", frame.getLeftText(2));
+    assertEquals("NDP", frame.getLeftText(3));
+    assertEquals("GRN", frame.getLeftText(4));
+    assertEquals("IND", frame.getLeftText(5));
+
+    assertEquals("-6/-27", frame.getRightText(0));
+    assertEquals("+4/+22", frame.getRightText(1));
+    assertEquals("+0/+22", frame.getRightText(2));
+    assertEquals("+1/-20", frame.getRightText(3));
+    assertEquals("+1/+2", frame.getRightText(4));
+    assertEquals("+0/+1", frame.getRightText(5));
+
+    assertEquals(Color.RED, frame.getSeries(0).get(0).getLeft());
+    assertEquals(Color.BLUE, frame.getSeries(1).get(0).getLeft());
+    assertEquals(Color.CYAN, frame.getSeries(2).get(0).getLeft());
+    assertEquals(lighten(Color.ORANGE), frame.getSeries(3).get(0).getLeft());
+    assertEquals(Color.GREEN, frame.getSeries(4).get(0).getLeft());
+    assertEquals(Color.GRAY, frame.getSeries(5).get(0).getLeft());
+
+    assertEquals(-6, frame.getSeries(0).get(0).getRight().intValue());
+    assertEquals(+4, frame.getSeries(1).get(0).getRight().intValue());
+    assertEquals(0, frame.getSeries(2).get(0).getRight().intValue());
+    assertEquals(+1, frame.getSeries(3).get(0).getRight().intValue());
+    assertEquals(+1, frame.getSeries(4).get(0).getRight().intValue());
+    assertEquals(0, frame.getSeries(5).get(0).getRight().intValue());
+
+    assertEquals(lighten(Color.RED), frame.getSeries(0).get(1).getLeft());
+    assertEquals(lighten(Color.BLUE), frame.getSeries(1).get(1).getLeft());
+    assertEquals(lighten(Color.CYAN), frame.getSeries(2).get(1).getLeft());
+    assertEquals(lighten(Color.ORANGE), frame.getSeries(3).get(1).getLeft());
+    assertEquals(lighten(Color.GREEN), frame.getSeries(4).get(1).getLeft());
+    assertEquals(lighten(Color.GRAY), frame.getSeries(5).get(1).getLeft());
+
+    assertEquals((-27) - (-6), frame.getSeries(0).get(1).getRight().intValue());
+    assertEquals((+22) - (+4), frame.getSeries(1).get(1).getRight().intValue());
+    assertEquals((+22) - 0, frame.getSeries(2).get(1).getRight().intValue());
+    assertEquals(-20, frame.getSeries(3).get(1).getRight().intValue());
+    assertEquals((+2) - (+1), frame.getSeries(4).get(1).getRight().intValue());
+    assertEquals((+1) - 0, frame.getSeries(5).get(1).getRight().intValue());
+
+    assertEquals(-27, frame.getMin().intValue());
+    assertEquals(+22, frame.getMax().intValue());
+  }
+
+  @Test
+  public void testDualChangeRangeBars() {
+    BindableWrapper<Map<Pair<String, Color>, Triple<Integer, Integer, Integer>>> result =
+        new BindableWrapper<>();
+    BarFrame frame =
+        BarFrameBuilder.dual(
+                result.getBinding(),
+                Pair::getLeft,
+                Pair::getRight,
+                t -> ImmutablePair.of(t.getLeft(), t.getMiddle()),
+                t -> "(" + DIFF.format(t.getLeft()) + ")-(" + DIFF.format(t.getMiddle()) + ")",
+                Triple::getRight)
+            .build();
+    assertEquals(0, frame.getNumBars());
+    assertEquals(0, frame.getNumLines());
+
+    result.setValue(
+        Map.of(
+            ImmutablePair.of("LIB", Color.RED),
+            ImmutableTriple.of(-27, -6, 157),
+            ImmutablePair.of("CON", Color.BLUE),
+            ImmutableTriple.of(+4, +22, 121),
+            ImmutablePair.of("NDP", Color.ORANGE),
+            ImmutableTriple.of(-20, +1, 24),
+            ImmutablePair.of("BQ", Color.CYAN),
+            ImmutableTriple.of(0, +22, 32),
+            ImmutablePair.of("GRN", Color.GREEN),
+            ImmutableTriple.of(+1, +2, 3),
+            ImmutablePair.of("IND", Color.GRAY),
+            ImmutableTriple.of(0, +1, 1)));
+    assertEquals(6, frame.getNumBars());
+
+    assertEquals("LIB", frame.getLeftText(0));
+    assertEquals("CON", frame.getLeftText(1));
+    assertEquals("BQ", frame.getLeftText(2));
+    assertEquals("NDP", frame.getLeftText(3));
+    assertEquals("GRN", frame.getLeftText(4));
+    assertEquals("IND", frame.getLeftText(5));
+
+    assertEquals("(-27)-(-6)", frame.getRightText(0));
+    assertEquals("(+4)-(+22)", frame.getRightText(1));
+    assertEquals("(+0)-(+22)", frame.getRightText(2));
+    assertEquals("(-20)-(+1)", frame.getRightText(3));
+    assertEquals("(+1)-(+2)", frame.getRightText(4));
+    assertEquals("(+0)-(+1)", frame.getRightText(5));
+
+    assertEquals(Color.RED, frame.getSeries(0).get(0).getLeft());
+    assertEquals(Color.BLUE, frame.getSeries(1).get(0).getLeft());
+    assertEquals(Color.CYAN, frame.getSeries(2).get(0).getLeft());
+    assertEquals(lighten(Color.ORANGE), frame.getSeries(3).get(0).getLeft());
+    assertEquals(Color.GREEN, frame.getSeries(4).get(0).getLeft());
+    assertEquals(Color.GRAY, frame.getSeries(5).get(0).getLeft());
+
+    assertEquals(-6, frame.getSeries(0).get(0).getRight().intValue());
+    assertEquals(+4, frame.getSeries(1).get(0).getRight().intValue());
+    assertEquals(0, frame.getSeries(2).get(0).getRight().intValue());
+    assertEquals(-20, frame.getSeries(3).get(0).getRight().intValue());
+    assertEquals(+1, frame.getSeries(4).get(0).getRight().intValue());
+    assertEquals(0, frame.getSeries(5).get(0).getRight().intValue());
+
+    assertEquals(lighten(Color.RED), frame.getSeries(0).get(1).getLeft());
+    assertEquals(lighten(Color.BLUE), frame.getSeries(1).get(1).getLeft());
+    assertEquals(lighten(Color.CYAN), frame.getSeries(2).get(1).getLeft());
+    assertEquals(lighten(Color.ORANGE), frame.getSeries(3).get(1).getLeft());
+    assertEquals(lighten(Color.GREEN), frame.getSeries(4).get(1).getLeft());
+    assertEquals(lighten(Color.GRAY), frame.getSeries(5).get(1).getLeft());
+
+    assertEquals((-27) - (-6), frame.getSeries(0).get(1).getRight().intValue());
+    assertEquals((+22) - (+4), frame.getSeries(1).get(1).getRight().intValue());
+    assertEquals((+22) - 0, frame.getSeries(2).get(1).getRight().intValue());
+    assertEquals(+1, frame.getSeries(3).get(1).getRight().intValue());
+    assertEquals((+2) - (+1), frame.getSeries(4).get(1).getRight().intValue());
+    assertEquals((+1) - 0, frame.getSeries(5).get(1).getRight().intValue());
+
+    assertEquals(-27, frame.getMin().intValue());
+    assertEquals(+22, frame.getMax().intValue());
+  }
+
+  private static Color lighten(Color color) {
+    return new Color(
+        128 + color.getRed() / 2, 128 + color.getGreen() / 2, 128 + color.getBlue() / 2);
   }
 }
