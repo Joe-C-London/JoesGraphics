@@ -8,6 +8,9 @@ import java.awt.Shape;
 import java.awt.geom.Rectangle2D;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
 public class MapFrameBuilder {
@@ -26,6 +29,19 @@ public class MapFrameBuilder {
   public static MapFrameBuilder from(Binding<List<Pair<Shape, Color>>> shapes) {
     BindableList<Pair<Shape, Color>> list = new BindableList<>();
     shapes.bind(list::setAll);
+    return from(list);
+  }
+
+  public static <T> MapFrameBuilder from(
+      Binding<List<T>> shapes, Function<T, Shape> shapeFunc, Function<T, Color> colorFunc) {
+    BindableList<Pair<Shape, Color>> list = new BindableList<>();
+    shapes.bind(
+        l -> {
+          list.setAll(
+              l.stream()
+                  .map(p -> ImmutablePair.of(shapeFunc.apply(p), colorFunc.apply(p)))
+                  .collect(Collectors.toList()));
+        });
     return from(list);
   }
 

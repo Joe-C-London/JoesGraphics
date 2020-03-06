@@ -52,6 +52,34 @@ public class MapFrameBuilderTest {
   }
 
   @Test
+  public void testMapPropertyBinding() {
+    class ConstituencyPair {
+      private final Shape shape;
+      private final Color color;
+
+      ConstituencyPair(Shape shape, Color color) {
+        this.shape = shape;
+        this.color = color;
+      }
+    }
+    List<ConstituencyPair> shapes = new ArrayList<>();
+    shapes.add(new ConstituencyPair(new Ellipse2D.Double(2, 2, 1, 1), Color.RED));
+    shapes.add(new ConstituencyPair(new Rectangle2D.Double(5, 5, 2, 2), Color.BLUE));
+
+    MapFrame frame =
+        MapFrameBuilder.from(() -> shapes, cp -> cp.shape, cp -> cp.color)
+            .withHeader(Binding.fixedBinding("MAP"))
+            .build();
+    assertEquals(2, frame.getNumShapes());
+    assertEquals(Ellipse2D.Double.class, frame.getShape(0).getClass());
+    assertEquals(Color.RED, frame.getColor(0));
+    assertEquals(Rectangle2D.Double.class, frame.getShape(1).getClass());
+    assertEquals(Color.BLUE, frame.getColor(1));
+    assertEquals("MAP", frame.getHeader());
+    assertEquals(new Rectangle2D.Double(2, 2, 5, 5), frame.getFocusBox());
+  }
+
+  @Test
   public void testFocusBox() {
     BindableList<Pair<Shape, Color>> shapes = new BindableList<>();
     shapes.add(ImmutablePair.of(new Ellipse2D.Double(2, 2, 1, 1), Color.RED));
