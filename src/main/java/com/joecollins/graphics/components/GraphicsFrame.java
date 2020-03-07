@@ -1,12 +1,14 @@
 package com.joecollins.graphics.components;
 
 import com.joecollins.bindings.Binding;
+import com.joecollins.bindings.IndexedBinding;
 import com.joecollins.graphics.utils.StandardFont;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
+import java.lang.reflect.Field;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
@@ -109,5 +111,26 @@ public class GraphicsFrame extends JPanel {
           headerPanel.setBackground(borderColor);
           notesLabel.setForeground(borderColor);
         });
+  }
+
+  public void dispose() {
+    try {
+      Class<?> clazz = this.getClass();
+      do {
+        Field[] fields = clazz.getDeclaredFields();
+        for (Field field : fields) {
+          if (Binding.class.isAssignableFrom(field.getType())) {
+            field.setAccessible(true);
+            ((Binding<?>) field.get(this)).unbind();
+          } else if (IndexedBinding.class.isAssignableFrom(field.getType())) {
+            field.setAccessible(true);
+            ((IndexedBinding<?>) field.get(this)).unbind();
+          }
+        }
+        clazz = clazz.getSuperclass();
+      } while (clazz != GraphicsFrame.class.getSuperclass());
+    } catch (IllegalAccessException e) {
+      throw new IllegalStateException(e);
+    }
   }
 }

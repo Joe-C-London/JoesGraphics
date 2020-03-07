@@ -6,10 +6,12 @@ import com.joecollins.bindings.Binding;
 import com.joecollins.bindings.IndexedBinding;
 import java.awt.Color;
 import java.awt.Shape;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
@@ -18,8 +20,17 @@ import org.apache.commons.lang3.tuple.Pair;
 
 public class BarFrameBuilder {
 
-  private final BarFrame barFrame = new BarFrame();
+  private final BarFrame barFrame =
+      new BarFrame() {
+        @Override
+        public void dispose() {
+          super.dispose();
+          bindings.forEach(Binding::unbind);
+        }
+      };
   private final RangeFinder rangeFinder = new RangeFinder();
+
+  private final List<Binding<?>> bindings = new ArrayList<>();
 
   private static class RangeFinder extends Bindable {
 
@@ -151,7 +162,8 @@ public class BarFrameBuilder {
         "Main",
         IndexedBinding.propertyBinding(entries, e -> e.color),
         IndexedBinding.propertyBinding(entries, e -> e.value));
-    binding.bind(
+    builder.bind(
+        binding,
         map -> {
           if (map == null) {
             entries.clear();
@@ -276,7 +288,8 @@ public class BarFrameBuilder {
             e ->
                 e.second().doubleValue()
                     - (e.differentDirections() ? 0 : e.first().doubleValue())));
-    binding.bind(
+    builder.bind(
+        binding,
         map -> {
           if (map == null) {
             entries.clear();
@@ -351,7 +364,8 @@ public class BarFrameBuilder {
 
   public BarFrameBuilder withMax(Binding<? extends Number> maxBinding) {
     rangeFinder.setMinFunction(rf -> 0);
-    maxBinding.bind(
+    bind(
+        maxBinding,
         max ->
             rangeFinder.setMaxFunction(
                 rf -> Math.max(max.doubleValue(), rf.highest.doubleValue())));
@@ -359,7 +373,8 @@ public class BarFrameBuilder {
   }
 
   public BarFrameBuilder withWingspan(Binding<? extends Number> wingspanBinding) {
-    wingspanBinding.bind(
+    bind(
+        wingspanBinding,
         range -> {
           Function<RangeFinder, Double> f =
               rf ->
@@ -375,7 +390,8 @@ public class BarFrameBuilder {
 
   public <T extends Number> BarFrameBuilder withTarget(
       Binding<T> targetBinding, Function<? super T, String> labelFunc) {
-    targetBinding.bind(
+    bind(
+        targetBinding,
         target -> {
           barFrame.setNumLinesBinding(Binding.fixedBinding(1));
           barFrame.setLineLevelsBinding(IndexedBinding.listBinding(target));
@@ -394,7 +410,8 @@ public class BarFrameBuilder {
 
   public <T extends Number> BarFrameBuilder withLines(
       Binding<List<T>> linesBinding, Function<? super T, String> labelFunc) {
-    linesBinding.bind(
+    bind(
+        linesBinding,
         lines -> {
           barFrame.setNumLinesBinding(Binding.fixedBinding(lines.size()));
           barFrame.setLineLevelsBinding(IndexedBinding.listBinding(lines.toArray(new Number[0])));
@@ -402,6 +419,11 @@ public class BarFrameBuilder {
               IndexedBinding.listBinding(lines.stream().map(labelFunc).toArray(String[]::new)));
         });
     return this;
+  }
+
+  private <T> void bind(Binding<T> binding, Consumer<T> onUpdate) {
+    binding.bind(onUpdate);
+    bindings.add(binding);
   }
 
   public BarFrame build() {

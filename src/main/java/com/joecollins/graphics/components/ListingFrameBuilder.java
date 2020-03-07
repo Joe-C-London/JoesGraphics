@@ -4,12 +4,22 @@ import com.joecollins.bindings.BindableList;
 import com.joecollins.bindings.Binding;
 import com.joecollins.bindings.IndexedBinding;
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
 public class ListingFrameBuilder {
 
-  private BarFrame barFrame = new BarFrame();
+  private BarFrame barFrame =
+      new BarFrame() {
+        @Override
+        public void dispose() {
+          super.dispose();
+          bindings.forEach(Binding::unbind);
+        }
+      };
+
+  private final List<Binding<?>> bindings = new ArrayList<>();
 
   public static <T> ListingFrameBuilder of(
       BindableList<T> list,
@@ -35,7 +45,9 @@ public class ListingFrameBuilder {
       Function<T, Color> colorFunc) {
     BindableList<T> bindableList = new BindableList<>();
     list.bind(bindableList::setAll);
-    return of(bindableList, leftTextFunc, rightTextFunc, colorFunc);
+    ListingFrameBuilder ret = of(bindableList, leftTextFunc, rightTextFunc, colorFunc);
+    ret.bindings.add(list);
+    return ret;
   }
 
   public ListingFrameBuilder withHeader(Binding<String> headerBinding) {

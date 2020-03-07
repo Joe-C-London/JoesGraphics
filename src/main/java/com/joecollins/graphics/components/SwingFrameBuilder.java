@@ -5,8 +5,10 @@ import com.joecollins.bindings.Binding;
 import com.joecollins.models.general.Party;
 import java.awt.Color;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -55,9 +57,18 @@ public class SwingFrameBuilder {
     }
   }
 
-  private SwingFrame swingFrame = new SwingFrame();
+  private SwingFrame swingFrame =
+      new SwingFrame() {
+        @Override
+        public void dispose() {
+          super.dispose();
+          bindings.forEach(Binding::unbind);
+        }
+      };
   private SwingProperties props = new SwingProperties();
   private Color neutralColor = Color.BLACK;
+
+  private final List<Binding<?>> bindings = new ArrayList<>();
 
   private enum SingletonProperty {
     ALL
@@ -86,41 +97,45 @@ public class SwingFrameBuilder {
         };
     prevBinding.bind(map -> prevCurr.setPrevPct(toPctFunc.apply(map)));
     currBinding.bind(map -> prevCurr.setCurrPct(toPctFunc.apply(map)));
-    return basic(
-            Binding.propertyBinding(prevCurr, Function.identity(), SingletonProperty.ALL),
-            p -> {
-              if (p.fromParty == null || p.toParty == null) {
-                return Color.LIGHT_GRAY;
-              }
-              return ComparatorUtils.max(p.fromParty, p.toParty, partyOrder).getColor();
-            },
-            p -> {
-              if (p.fromParty == null || p.toParty == null) {
-                return Color.LIGHT_GRAY;
-              }
-              return ComparatorUtils.min(p.fromParty, p.toParty, partyOrder).getColor();
-            },
-            p -> {
-              if (p.fromParty == null || p.toParty == null) {
-                return 0.0;
-              }
-              return p.swing * Math.signum(partyOrder.compare(p.toParty, p.fromParty));
-            },
-            p -> {
-              if (p.fromParty == null || p.toParty == null) {
-                return "NOT AVAILABLE";
-              }
-              if (p.swing == 0) {
-                return "NO SWING";
-              }
-              return new DecimalFormat("0.0%").format(p.swing)
-                  + " SWING FROM "
-                  + p.fromParty.getAbbreviation()
-                  + " TO "
-                  + p.toParty.getAbbreviation();
-            })
-        .withRange(Binding.fixedBinding(0.1))
-        .withNeutralColor(Binding.fixedBinding(Color.LIGHT_GRAY));
+    SwingFrameBuilder ret =
+        basic(
+                Binding.propertyBinding(prevCurr, Function.identity(), SingletonProperty.ALL),
+                p -> {
+                  if (p.fromParty == null || p.toParty == null) {
+                    return Color.LIGHT_GRAY;
+                  }
+                  return ComparatorUtils.max(p.fromParty, p.toParty, partyOrder).getColor();
+                },
+                p -> {
+                  if (p.fromParty == null || p.toParty == null) {
+                    return Color.LIGHT_GRAY;
+                  }
+                  return ComparatorUtils.min(p.fromParty, p.toParty, partyOrder).getColor();
+                },
+                p -> {
+                  if (p.fromParty == null || p.toParty == null) {
+                    return 0.0;
+                  }
+                  return p.swing * Math.signum(partyOrder.compare(p.toParty, p.fromParty));
+                },
+                p -> {
+                  if (p.fromParty == null || p.toParty == null) {
+                    return "NOT AVAILABLE";
+                  }
+                  if (p.swing == 0) {
+                    return "NO SWING";
+                  }
+                  return new DecimalFormat("0.0%").format(p.swing)
+                      + " SWING FROM "
+                      + p.fromParty.getAbbreviation()
+                      + " TO "
+                      + p.toParty.getAbbreviation();
+                })
+            .withRange(Binding.fixedBinding(0.1))
+            .withNeutralColor(Binding.fixedBinding(Color.LIGHT_GRAY));
+    ret.bindings.add(prevBinding);
+    ret.bindings.add(currBinding);
+    return ret;
   }
 
   public static SwingFrameBuilder prevCurrNormalised(
@@ -165,6 +180,7 @@ public class SwingFrameBuilder {
             props.setBottomColor(builder.neutralColor);
           }
         });
+    builder.bindings.add(binding);
     return builder;
   }
 
@@ -181,6 +197,7 @@ public class SwingFrameBuilder {
             props.setBottomColor(color);
           }
         });
+    bindings.add(neutralColorBinding);
     return this;
   }
 

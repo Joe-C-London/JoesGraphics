@@ -71,6 +71,10 @@ public class BarFrameTest {
 
     results.clear();
     assertEquals(0, frame.getNumBars());
+
+    frame.dispose();
+    results.add(new ElectionResult("IN DOUBT", Color.BLACK, 338));
+    assertEquals(0, frame.getNumBars());
   }
 
   @Test
@@ -93,6 +97,10 @@ public class BarFrameTest {
     assertEquals("BLOC QUEBECOIS", frame.getLeftText(2));
     assertEquals("NEW DEMOCRATIC PARTY", frame.getLeftText(3));
     assertEquals("GREEN", frame.getLeftText(4));
+    assertEquals("INDEPENDENT", frame.getLeftText(5));
+
+    frame.dispose();
+    results.set(5, new ElectionResult("OTHERS", Color.LIGHT_GRAY, 1));
     assertEquals("INDEPENDENT", frame.getLeftText(5));
   }
 

@@ -15,7 +15,16 @@ import org.apache.commons.lang3.tuple.Pair;
 
 public class MapFrameBuilder {
 
-  private MapFrame mapFrame = new MapFrame();
+  private MapFrame mapFrame =
+      new MapFrame() {
+        @Override
+        public void dispose() {
+          super.dispose();
+          bindings.forEach(Binding::unbind);
+        }
+      };
+
+  private final List<Binding<?>> bindings = new ArrayList<>();
 
   public static MapFrameBuilder from(BindableList<Pair<Shape, Color>> shapes) {
     MapFrameBuilder mapFrameBuilder = new MapFrameBuilder();
@@ -29,7 +38,9 @@ public class MapFrameBuilder {
   public static MapFrameBuilder from(Binding<List<Pair<Shape, Color>>> shapes) {
     BindableList<Pair<Shape, Color>> list = new BindableList<>();
     shapes.bind(list::setAll);
-    return from(list);
+    MapFrameBuilder ret = from(list);
+    ret.bindings.add(shapes);
+    return ret;
   }
 
   public static <T> MapFrameBuilder from(
@@ -48,12 +59,13 @@ public class MapFrameBuilder {
             Binding<Color> colorBinding = colorFunc.apply(item);
             list.add(ImmutablePair.of(shape, colorBinding.getValue()));
             int idx = i;
-            colorBinding.bind(
-                color -> list.set(idx, ImmutablePair.of(shape, color)));
+            colorBinding.bind(color -> list.set(idx, ImmutablePair.of(shape, color)));
             bindings.add(colorBinding);
           }
         });
-    return from(list);
+    MapFrameBuilder ret = from(list);
+    ret.bindings.add(itemsBinding);
+    return ret;
   }
 
   public MapFrameBuilder withFocus(Binding<List<Shape>> focusBinding) {
@@ -73,6 +85,7 @@ public class MapFrameBuilder {
                   .orElse(null);
           mapFrame.setFocusBoxBinding(Binding.fixedBinding(bounds));
         });
+    bindings.add(focusBinding);
     return this;
   }
 
