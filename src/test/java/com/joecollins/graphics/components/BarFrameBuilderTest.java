@@ -22,6 +22,7 @@ public class BarFrameBuilderTest {
 
   private static final DecimalFormat THOUSANDS = new DecimalFormat("#,##0");
   private static final DecimalFormat DIFF = new DecimalFormat("+0;-0");
+  private static final DecimalFormat PCT = new DecimalFormat("0.0%");
 
   private enum BindableWrapperValue {
     VALUE
@@ -311,7 +312,7 @@ public class BarFrameBuilderTest {
                 Pair::getRight,
                 Pair::getRight,
                 p -> DIFF.format(p.getRight()),
-                Pair::getLeft)
+                (p, v) -> v.getLeft())
             .build();
     assertEquals(0, frame.getNumBars());
     assertEquals(0, frame.getNumLines());
@@ -377,7 +378,7 @@ public class BarFrameBuilderTest {
                 Pair::getRight,
                 Pair::getRight,
                 p -> DIFF.format(p.getRight()),
-                Pair::getLeft)
+                (p, v) -> v.getLeft())
             .withWingspan(range.getBinding())
             .build();
     assertEquals(-10, frame.getMin().intValue());

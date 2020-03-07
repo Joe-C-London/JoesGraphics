@@ -9,6 +9,7 @@ import java.awt.Shape;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
@@ -75,7 +76,8 @@ public class BarFrameBuilder {
       Function<? super T, Color> colorFunc,
       Function<? super U, ? extends Number> valueFunc,
       Function<? super U, String> valueLabelFunc) {
-    return basic(binding, labelFunc, colorFunc, valueFunc, valueLabelFunc, valueFunc);
+    return basic(
+        binding, labelFunc, colorFunc, valueFunc, valueLabelFunc, (t, u) -> valueFunc.apply(u));
   }
 
   public static <T, U> BarFrameBuilder basic(
@@ -84,7 +86,7 @@ public class BarFrameBuilder {
       Function<? super T, Color> colorFunc,
       Function<? super U, ? extends Number> valueFunc,
       Function<? super U, String> valueLabelFunc,
-      Function<? super U, ? extends Number> sortFunc) {
+      BiFunction<? super T, ? super U, ? extends Number> sortFunc) {
     return basicWithShapes(
         binding, labelFunc, colorFunc, valueFunc, valueLabelFunc, x -> null, sortFunc);
   }
@@ -97,7 +99,13 @@ public class BarFrameBuilder {
       Function<? super U, String> valueLabelFunc,
       Function<? super U, ? extends Shape> shapeFunc) {
     return basicWithShapes(
-        binding, labelFunc, colorFunc, valueFunc, valueLabelFunc, shapeFunc, valueFunc);
+        binding,
+        labelFunc,
+        colorFunc,
+        valueFunc,
+        valueLabelFunc,
+        shapeFunc,
+        (t, u) -> valueFunc.apply(u));
   }
 
   public static <T, U> BarFrameBuilder basicWithShapes(
@@ -107,7 +115,7 @@ public class BarFrameBuilder {
       Function<? super U, ? extends Number> valueFunc,
       Function<? super U, String> valueLabelFunc,
       Function<? super U, ? extends Shape> shapeFunc,
-      Function<? super U, ? extends Number> sortFunc) {
+      BiFunction<? super T, ? super U, ? extends Number> sortFunc) {
     BarFrameBuilder builder = new BarFrameBuilder();
     BarFrame barFrame = builder.barFrame;
     RangeFinder rangeFinder = builder.rangeFinder;
@@ -154,7 +162,7 @@ public class BarFrameBuilder {
                 map.entrySet().stream()
                     .sorted(
                         Comparator.<Map.Entry<? extends T, ? extends U>>comparingDouble(
-                                e -> sortFunc.apply(e.getValue()).doubleValue())
+                                e -> sortFunc.apply(e.getKey(), e.getValue()).doubleValue())
                             .reversed()
                             .thenComparing(e -> labelFunc.apply(e.getKey())))
                     .map(
