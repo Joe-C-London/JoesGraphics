@@ -19,8 +19,7 @@ public interface Binding<T> {
     return () -> t;
   }
 
-  static <T extends Bindable, U> Binding<U> propertyBinding(
-      T object, Function<T, U> func, Enum<?>... properties) {
+  static <T, U> Binding<U> propertyBinding(T object, Function<T, U> func, Enum<?>... properties) {
     if (object == null) {
       return () -> null;
     }
@@ -39,19 +38,28 @@ public interface Binding<T> {
           throw new IllegalStateException("Binding is already used");
         }
         consumer = val -> onUpdate.accept(func.apply(val));
-        object.addBinding(consumer, properties);
+        if (object instanceof Bindable) {
+          ((Bindable) object).addBinding(consumer, properties);
+        }
         onUpdate.accept(getValue());
       }
 
       @Override
       public void unbind() {
         if (consumer == null) {
-          throw new IllegalStateException("Binding is not currently used");
+          return;
         }
-        object.removeBinding(consumer, properties);
+        if (object instanceof Bindable) {
+          ((Bindable) object).removeBinding(consumer, properties);
+        }
         consumer = null;
       }
     };
+  }
+
+  static <T, U> Function<T, Binding<U>> propertyBindingFunc(
+      Function<T, U> func, Enum<?>... properties) {
+    return t -> propertyBinding(t, func, properties);
   }
 
   static Binding<Integer> sizeBinding(BindableList<?> list) {
@@ -79,7 +87,7 @@ public interface Binding<T> {
       @Override
       public void unbind() {
         if (consumer == null) {
-          throw new IllegalStateException("Binding is not currently used");
+          return;
         }
         list.removeSizeBinding(consumer);
         consumer = null;

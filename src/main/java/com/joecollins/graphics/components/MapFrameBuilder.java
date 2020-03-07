@@ -6,10 +6,10 @@ import com.joecollins.bindings.IndexedBinding;
 import java.awt.Color;
 import java.awt.Shape;
 import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -33,14 +33,25 @@ public class MapFrameBuilder {
   }
 
   public static <T> MapFrameBuilder from(
-      Binding<List<T>> shapes, Function<T, Shape> shapeFunc, Function<T, Color> colorFunc) {
+      Binding<List<T>> itemsBinding,
+      Function<T, Shape> shapeFunc,
+      Function<T, Binding<Color>> colorFunc) {
     BindableList<Pair<Shape, Color>> list = new BindableList<>();
-    shapes.bind(
-        l -> {
-          list.setAll(
-              l.stream()
-                  .map(p -> ImmutablePair.of(shapeFunc.apply(p), colorFunc.apply(p)))
-                  .collect(Collectors.toList()));
+    List<Binding<Color>> bindings = new ArrayList<>();
+    itemsBinding.bind(
+        items -> {
+          bindings.forEach(Binding::unbind);
+          list.clear();
+          for (int i = 0; i < items.size(); i++) {
+            T item = items.get(i);
+            Shape shape = shapeFunc.apply(item);
+            Binding<Color> colorBinding = colorFunc.apply(item);
+            list.add(ImmutablePair.of(shape, colorBinding.getValue()));
+            int idx = i;
+            colorBinding.bind(
+                color -> list.set(idx, ImmutablePair.of(shape, color)));
+            bindings.add(colorBinding);
+          }
         });
     return from(list);
   }

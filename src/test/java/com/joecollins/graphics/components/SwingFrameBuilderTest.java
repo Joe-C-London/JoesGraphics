@@ -2,8 +2,8 @@ package com.joecollins.graphics.components;
 
 import static org.junit.Assert.assertEquals;
 
-import com.joecollins.bindings.Bindable;
 import com.joecollins.bindings.Binding;
+import com.joecollins.graphics.utils.BindableWrapper;
 import com.joecollins.models.general.Party;
 import java.awt.Color;
 import java.util.Arrays;
@@ -13,27 +13,6 @@ import java.util.Map;
 import org.junit.Test;
 
 public class SwingFrameBuilderTest {
-
-  private enum BindableWrapperValue {
-    VALUE
-  }
-
-  private static class BindableWrapper<T> extends Bindable {
-    private T value;
-
-    T getValue() {
-      return value;
-    }
-
-    void setValue(T value) {
-      this.value = value;
-      onPropertyRefreshed(BindableWrapperValue.VALUE);
-    }
-
-    Binding<T> getBinding() {
-      return Binding.propertyBinding(this, BindableWrapper::getValue, BindableWrapperValue.VALUE);
-    }
-  }
 
   private static class SwingProperties {
     private final Color leftColor;

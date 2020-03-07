@@ -3,9 +3,8 @@ package com.joecollins.graphics.components;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
-import com.joecollins.bindings.Bindable;
 import com.joecollins.bindings.BindableList;
-import com.joecollins.bindings.Binding;
+import com.joecollins.graphics.utils.BindableWrapper;
 import java.awt.Color;
 import java.awt.geom.Rectangle2D.Double;
 import java.text.DecimalFormat;
@@ -23,27 +22,6 @@ public class BarFrameBuilderTest {
   private static final DecimalFormat THOUSANDS = new DecimalFormat("#,##0");
   private static final DecimalFormat DIFF = new DecimalFormat("+0;-0");
   private static final DecimalFormat PCT = new DecimalFormat("0.0%");
-
-  private enum BindableWrapperValue {
-    VALUE
-  }
-
-  private static class BindableWrapper<T> extends Bindable {
-    private T value;
-
-    T getValue() {
-      return value;
-    }
-
-    void setValue(T value) {
-      this.value = value;
-      onPropertyRefreshed(BindableWrapperValue.VALUE);
-    }
-
-    Binding<T> getBinding() {
-      return Binding.propertyBinding(this, BindableWrapper::getValue, BindableWrapperValue.VALUE);
-    }
-  }
 
   private static class Wrapper<T> {
     final T value;
