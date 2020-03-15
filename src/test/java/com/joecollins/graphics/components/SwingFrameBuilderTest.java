@@ -109,7 +109,7 @@ public class SwingFrameBuilderTest {
     assertEquals(Color.BLUE, swingFrame.getBottomColor());
     assertEquals(0.0625, swingFrame.getValue().doubleValue(), 1e-6);
     assertEquals(0.1, swingFrame.getRange().doubleValue(), 1e-6);
-    assertEquals("6.2% SWING FROM LIB TO CON", swingFrame.getBottomText());
+    assertEquals("6.2% SWING LIB TO CON", swingFrame.getBottomText());
   }
 
   @Test
@@ -132,7 +132,7 @@ public class SwingFrameBuilderTest {
     assertEquals(Color.RED, swingFrame.getBottomColor());
     assertEquals(-0.1, swingFrame.getValue().doubleValue(), 1e-6);
     assertEquals(0.1, swingFrame.getRange().doubleValue(), 1e-6);
-    assertEquals("10.0% SWING FROM CON TO LIB", swingFrame.getBottomText());
+    assertEquals("10.0% SWING CON TO LIB", swingFrame.getBottomText());
   }
 
   @Test
@@ -155,7 +155,7 @@ public class SwingFrameBuilderTest {
     assertEquals(Color.ORANGE, swingFrame.getBottomColor());
     assertEquals(-0.325, swingFrame.getValue().doubleValue(), 1e-6);
     assertEquals(0.1, swingFrame.getRange().doubleValue(), 1e-6);
-    assertEquals("32.5% SWING FROM CON TO NDP", swingFrame.getBottomText());
+    assertEquals("32.5% SWING CON TO NDP", swingFrame.getBottomText());
   }
 
   @Test
@@ -218,6 +218,6 @@ public class SwingFrameBuilderTest {
     assertEquals(Color.BLUE, swingFrame.getBottomColor());
     assertEquals(0.035, swingFrame.getValue().doubleValue(), 1e-6);
     assertEquals(0.1, swingFrame.getRange().doubleValue(), 1e-6);
-    assertEquals("3.5% SWING FROM LIB TO CON", swingFrame.getBottomText());
+    assertEquals("3.5% SWING LIB TO CON", swingFrame.getBottomText());
   }
 }

@@ -7,6 +7,30 @@ import java.util.function.IntConsumer;
 @FunctionalInterface
 public interface Binding<T> {
 
+  class BindingReceiver<T> extends Bindable {
+    private enum Property {
+      PROP
+    }
+
+    private T value;
+
+    public BindingReceiver(Binding<T> binding) {
+      binding.bind(
+          v -> {
+            value = v;
+            onPropertyRefreshed(Property.PROP);
+          });
+    }
+
+    public Binding<T> getBinding() {
+      return Binding.propertyBinding(this, t -> t.value, Property.PROP);
+    }
+
+    public T getValue() {
+      return value;
+    }
+  }
+
   T getValue();
 
   default void bind(Consumer<T> onUpdate) {

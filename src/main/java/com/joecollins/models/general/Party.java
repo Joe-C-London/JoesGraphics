@@ -5,6 +5,8 @@ import java.util.Objects;
 
 public class Party {
 
+  public static Party OTHERS = new Party("Others", "OTH", Color.GRAY);
+
   private final String name;
   private final String abbreviation;
   private final Color color;

@@ -175,8 +175,7 @@ public class BarFrameBuilder {
                     .sorted(
                         Comparator.<Map.Entry<? extends T, ? extends U>>comparingDouble(
                                 e -> sortFunc.apply(e.getKey(), e.getValue()).doubleValue())
-                            .reversed()
-                            .thenComparing(e -> labelFunc.apply(e.getKey())))
+                            .reversed())
                     .map(
                         e ->
                             new BarEntry(
@@ -301,8 +300,7 @@ public class BarFrameBuilder {
                     .sorted(
                         Comparator.<Map.Entry<? extends T, ? extends U>>comparingDouble(
                                 e -> sortFunc.apply(e.getValue()).doubleValue())
-                            .reversed()
-                            .thenComparing(e -> labelFunc.apply(e.getKey())))
+                            .reversed())
                     .map(
                         e -> {
                           Pair<? extends Number, ? extends Number> values =

@@ -126,7 +126,7 @@ public class SwingFrameBuilder {
                     return "NO SWING";
                   }
                   return new DecimalFormat("0.0%").format(p.swing)
-                      + " SWING FROM "
+                      + " SWING "
                       + p.fromParty.getAbbreviation()
                       + " TO "
                       + p.toParty.getAbbreviation();
