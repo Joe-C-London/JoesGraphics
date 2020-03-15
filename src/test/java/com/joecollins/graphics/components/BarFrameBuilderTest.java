@@ -426,33 +426,40 @@ public class BarFrameBuilderTest {
     assertEquals("1/3", frame.getRightText(4));
     assertEquals("0/1", frame.getRightText(5));
 
-    assertEquals(Color.RED, frame.getSeries(0).get(0).getLeft());
-    assertEquals(Color.BLUE, frame.getSeries(1).get(0).getLeft());
-    assertEquals(Color.CYAN, frame.getSeries(2).get(0).getLeft());
-    assertEquals(Color.ORANGE, frame.getSeries(3).get(0).getLeft());
-    assertEquals(Color.GREEN, frame.getSeries(4).get(0).getLeft());
-    assertEquals(Color.GRAY, frame.getSeries(5).get(0).getLeft());
-
-    assertEquals(26, frame.getSeries(0).get(0).getRight().intValue());
-    assertEquals(4, frame.getSeries(1).get(0).getRight().intValue());
+    assertEquals(0, frame.getSeries(0).get(0).getRight().intValue());
+    assertEquals(0, frame.getSeries(1).get(0).getRight().intValue());
     assertEquals(0, frame.getSeries(2).get(0).getRight().intValue());
-    assertEquals(1, frame.getSeries(3).get(0).getRight().intValue());
-    assertEquals(1, frame.getSeries(4).get(0).getRight().intValue());
+    assertEquals(0, frame.getSeries(3).get(0).getRight().intValue());
+    assertEquals(0, frame.getSeries(4).get(0).getRight().intValue());
     assertEquals(0, frame.getSeries(5).get(0).getRight().intValue());
 
-    assertEquals(lighten(Color.RED), frame.getSeries(0).get(1).getLeft());
-    assertEquals(lighten(Color.BLUE), frame.getSeries(1).get(1).getLeft());
-    assertEquals(lighten(Color.CYAN), frame.getSeries(2).get(1).getLeft());
-    assertEquals(lighten(Color.ORANGE), frame.getSeries(3).get(1).getLeft());
-    assertEquals(lighten(Color.GREEN), frame.getSeries(4).get(1).getLeft());
-    assertEquals(lighten(Color.GRAY), frame.getSeries(5).get(1).getLeft());
+    assertEquals(Color.RED, frame.getSeries(0).get(1).getLeft());
+    assertEquals(Color.BLUE, frame.getSeries(1).get(1).getLeft());
+    assertEquals(Color.CYAN, frame.getSeries(2).get(1).getLeft());
+    assertEquals(Color.ORANGE, frame.getSeries(3).get(1).getLeft());
+    assertEquals(Color.GREEN, frame.getSeries(4).get(1).getLeft());
+    assertEquals(Color.GRAY, frame.getSeries(5).get(1).getLeft());
 
-    assertEquals(157 - 26, frame.getSeries(0).get(1).getRight().intValue());
-    assertEquals(121 - 4, frame.getSeries(1).get(1).getRight().intValue());
-    assertEquals(32 - 0, frame.getSeries(2).get(1).getRight().intValue());
-    assertEquals(24 - 1, frame.getSeries(3).get(1).getRight().intValue());
-    assertEquals(3 - 1, frame.getSeries(4).get(1).getRight().intValue());
-    assertEquals(1 - 0, frame.getSeries(5).get(1).getRight().intValue());
+    assertEquals(26, frame.getSeries(0).get(1).getRight().intValue());
+    assertEquals(4, frame.getSeries(1).get(1).getRight().intValue());
+    assertEquals(0, frame.getSeries(2).get(1).getRight().intValue());
+    assertEquals(1, frame.getSeries(3).get(1).getRight().intValue());
+    assertEquals(1, frame.getSeries(4).get(1).getRight().intValue());
+    assertEquals(0, frame.getSeries(5).get(1).getRight().intValue());
+
+    assertEquals(lighten(Color.RED), frame.getSeries(0).get(2).getLeft());
+    assertEquals(lighten(Color.BLUE), frame.getSeries(1).get(2).getLeft());
+    assertEquals(lighten(Color.CYAN), frame.getSeries(2).get(2).getLeft());
+    assertEquals(lighten(Color.ORANGE), frame.getSeries(3).get(2).getLeft());
+    assertEquals(lighten(Color.GREEN), frame.getSeries(4).get(2).getLeft());
+    assertEquals(lighten(Color.GRAY), frame.getSeries(5).get(2).getLeft());
+
+    assertEquals(157 - 26, frame.getSeries(0).get(2).getRight().intValue());
+    assertEquals(121 - 4, frame.getSeries(1).get(2).getRight().intValue());
+    assertEquals(32 - 0, frame.getSeries(2).get(2).getRight().intValue());
+    assertEquals(24 - 1, frame.getSeries(3).get(2).getRight().intValue());
+    assertEquals(3 - 1, frame.getSeries(4).get(2).getRight().intValue());
+    assertEquals(1 - 0, frame.getSeries(5).get(2).getRight().intValue());
 
     assertEquals(0, frame.getMin().intValue());
     assertEquals(157, frame.getMax().intValue());
@@ -507,30 +514,44 @@ public class BarFrameBuilderTest {
     assertEquals(Color.RED, frame.getSeries(0).get(0).getLeft());
     assertEquals(Color.BLUE, frame.getSeries(1).get(0).getLeft());
     assertEquals(Color.CYAN, frame.getSeries(2).get(0).getLeft());
-    assertEquals(lighten(Color.ORANGE), frame.getSeries(3).get(0).getLeft());
+    assertEquals(Color.ORANGE, frame.getSeries(3).get(0).getLeft());
     assertEquals(Color.GREEN, frame.getSeries(4).get(0).getLeft());
     assertEquals(Color.GRAY, frame.getSeries(5).get(0).getLeft());
 
-    assertEquals(-6, frame.getSeries(0).get(0).getRight().intValue());
-    assertEquals(+4, frame.getSeries(1).get(0).getRight().intValue());
+    assertEquals(0, frame.getSeries(0).get(0).getRight().intValue());
+    assertEquals(0, frame.getSeries(1).get(0).getRight().intValue());
     assertEquals(0, frame.getSeries(2).get(0).getRight().intValue());
-    assertEquals(+1, frame.getSeries(3).get(0).getRight().intValue());
-    assertEquals(+1, frame.getSeries(4).get(0).getRight().intValue());
+    assertEquals(0, frame.getSeries(3).get(0).getRight().intValue());
+    assertEquals(0, frame.getSeries(4).get(0).getRight().intValue());
     assertEquals(0, frame.getSeries(5).get(0).getRight().intValue());
 
-    assertEquals(lighten(Color.RED), frame.getSeries(0).get(1).getLeft());
-    assertEquals(lighten(Color.BLUE), frame.getSeries(1).get(1).getLeft());
-    assertEquals(lighten(Color.CYAN), frame.getSeries(2).get(1).getLeft());
+    assertEquals(Color.RED, frame.getSeries(0).get(1).getLeft());
+    assertEquals(Color.BLUE, frame.getSeries(1).get(1).getLeft());
+    assertEquals(Color.CYAN, frame.getSeries(2).get(1).getLeft());
     assertEquals(lighten(Color.ORANGE), frame.getSeries(3).get(1).getLeft());
-    assertEquals(lighten(Color.GREEN), frame.getSeries(4).get(1).getLeft());
-    assertEquals(lighten(Color.GRAY), frame.getSeries(5).get(1).getLeft());
+    assertEquals(Color.GREEN, frame.getSeries(4).get(1).getLeft());
+    assertEquals(Color.GRAY, frame.getSeries(5).get(1).getLeft());
 
-    assertEquals((-27) - (-6), frame.getSeries(0).get(1).getRight().intValue());
-    assertEquals((+22) - (+4), frame.getSeries(1).get(1).getRight().intValue());
-    assertEquals((+22) - 0, frame.getSeries(2).get(1).getRight().intValue());
-    assertEquals(-20, frame.getSeries(3).get(1).getRight().intValue());
-    assertEquals((+2) - (+1), frame.getSeries(4).get(1).getRight().intValue());
-    assertEquals((+1) - 0, frame.getSeries(5).get(1).getRight().intValue());
+    assertEquals(-6, frame.getSeries(0).get(1).getRight().intValue());
+    assertEquals(+4, frame.getSeries(1).get(1).getRight().intValue());
+    assertEquals(0, frame.getSeries(2).get(1).getRight().intValue());
+    assertEquals(+1, frame.getSeries(3).get(1).getRight().intValue());
+    assertEquals(+1, frame.getSeries(4).get(1).getRight().intValue());
+    assertEquals(0, frame.getSeries(5).get(1).getRight().intValue());
+
+    assertEquals(lighten(Color.RED), frame.getSeries(0).get(2).getLeft());
+    assertEquals(lighten(Color.BLUE), frame.getSeries(1).get(2).getLeft());
+    assertEquals(lighten(Color.CYAN), frame.getSeries(2).get(2).getLeft());
+    assertEquals(lighten(Color.ORANGE), frame.getSeries(3).get(2).getLeft());
+    assertEquals(lighten(Color.GREEN), frame.getSeries(4).get(2).getLeft());
+    assertEquals(lighten(Color.GRAY), frame.getSeries(5).get(2).getLeft());
+
+    assertEquals((-27) - (-6), frame.getSeries(0).get(2).getRight().intValue());
+    assertEquals((+22) - (+4), frame.getSeries(1).get(2).getRight().intValue());
+    assertEquals((+22) - 0, frame.getSeries(2).get(2).getRight().intValue());
+    assertEquals(-20, frame.getSeries(3).get(2).getRight().intValue());
+    assertEquals((+2) - (+1), frame.getSeries(4).get(2).getRight().intValue());
+    assertEquals((+1) - 0, frame.getSeries(5).get(2).getRight().intValue());
 
     assertEquals(-27, frame.getMin().intValue());
     assertEquals(+22, frame.getMax().intValue());
@@ -582,33 +603,33 @@ public class BarFrameBuilderTest {
     assertEquals("(+1)-(+2)", frame.getRightText(4));
     assertEquals("(+0)-(+1)", frame.getRightText(5));
 
-    assertEquals(Color.RED, frame.getSeries(0).get(0).getLeft());
-    assertEquals(Color.BLUE, frame.getSeries(1).get(0).getLeft());
-    assertEquals(Color.CYAN, frame.getSeries(2).get(0).getLeft());
-    assertEquals(lighten(Color.ORANGE), frame.getSeries(3).get(0).getLeft());
-    assertEquals(Color.GREEN, frame.getSeries(4).get(0).getLeft());
-    assertEquals(Color.GRAY, frame.getSeries(5).get(0).getLeft());
-
-    assertEquals(-6, frame.getSeries(0).get(0).getRight().intValue());
-    assertEquals(+4, frame.getSeries(1).get(0).getRight().intValue());
-    assertEquals(0, frame.getSeries(2).get(0).getRight().intValue());
-    assertEquals(-20, frame.getSeries(3).get(0).getRight().intValue());
-    assertEquals(+1, frame.getSeries(4).get(0).getRight().intValue());
-    assertEquals(0, frame.getSeries(5).get(0).getRight().intValue());
-
-    assertEquals(lighten(Color.RED), frame.getSeries(0).get(1).getLeft());
-    assertEquals(lighten(Color.BLUE), frame.getSeries(1).get(1).getLeft());
-    assertEquals(lighten(Color.CYAN), frame.getSeries(2).get(1).getLeft());
+    assertEquals(Color.RED, frame.getSeries(0).get(1).getLeft());
+    assertEquals(Color.BLUE, frame.getSeries(1).get(1).getLeft());
+    assertEquals(Color.CYAN, frame.getSeries(2).get(1).getLeft());
     assertEquals(lighten(Color.ORANGE), frame.getSeries(3).get(1).getLeft());
-    assertEquals(lighten(Color.GREEN), frame.getSeries(4).get(1).getLeft());
-    assertEquals(lighten(Color.GRAY), frame.getSeries(5).get(1).getLeft());
+    assertEquals(Color.GREEN, frame.getSeries(4).get(1).getLeft());
+    assertEquals(Color.GRAY, frame.getSeries(5).get(1).getLeft());
 
-    assertEquals((-27) - (-6), frame.getSeries(0).get(1).getRight().intValue());
-    assertEquals((+22) - (+4), frame.getSeries(1).get(1).getRight().intValue());
-    assertEquals((+22) - 0, frame.getSeries(2).get(1).getRight().intValue());
-    assertEquals(+1, frame.getSeries(3).get(1).getRight().intValue());
-    assertEquals((+2) - (+1), frame.getSeries(4).get(1).getRight().intValue());
-    assertEquals((+1) - 0, frame.getSeries(5).get(1).getRight().intValue());
+    assertEquals(-6, frame.getSeries(0).get(1).getRight().intValue());
+    assertEquals(+4, frame.getSeries(1).get(1).getRight().intValue());
+    assertEquals(0, frame.getSeries(2).get(1).getRight().intValue());
+    assertEquals(-20, frame.getSeries(3).get(1).getRight().intValue());
+    assertEquals(+1, frame.getSeries(4).get(1).getRight().intValue());
+    assertEquals(0, frame.getSeries(5).get(1).getRight().intValue());
+
+    assertEquals(lighten(Color.RED), frame.getSeries(0).get(2).getLeft());
+    assertEquals(lighten(Color.BLUE), frame.getSeries(1).get(2).getLeft());
+    assertEquals(lighten(Color.CYAN), frame.getSeries(2).get(2).getLeft());
+    assertEquals(lighten(Color.ORANGE), frame.getSeries(3).get(2).getLeft());
+    assertEquals(lighten(Color.GREEN), frame.getSeries(4).get(2).getLeft());
+    assertEquals(lighten(Color.GRAY), frame.getSeries(5).get(2).getLeft());
+
+    assertEquals((-27) - (-6), frame.getSeries(0).get(2).getRight().intValue());
+    assertEquals((+22) - (+4), frame.getSeries(1).get(2).getRight().intValue());
+    assertEquals((+22) - 0, frame.getSeries(2).get(2).getRight().intValue());
+    assertEquals(+1, frame.getSeries(3).get(2).getRight().intValue());
+    assertEquals((+2) - (+1), frame.getSeries(4).get(2).getRight().intValue());
+    assertEquals((+1) - 0, frame.getSeries(5).get(2).getRight().intValue());
 
     assertEquals(-27, frame.getMin().intValue());
     assertEquals(+22, frame.getMax().intValue());

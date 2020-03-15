@@ -217,6 +217,17 @@ public class BarFrameBuilder {
       Function<? super U, ? extends Pair<? extends Number, ? extends Number>> valueFunc,
       Function<? super U, String> valueLabelFunc,
       Function<? super U, ? extends Number> sortFunc) {
+    return dual(
+        binding, labelFunc, colorFunc, valueFunc, valueLabelFunc, (k, v) -> sortFunc.apply(v));
+  }
+
+  public static <T, U> BarFrameBuilder dual(
+      Binding<? extends Map<? extends T, ? extends U>> binding,
+      Function<? super T, String> labelFunc,
+      Function<? super T, Color> colorFunc,
+      Function<? super U, ? extends Pair<? extends Number, ? extends Number>> valueFunc,
+      Function<? super U, String> valueLabelFunc,
+      BiFunction<? super T, ? super U, ? extends Number> sortFunc) {
     BarFrameBuilder builder = new BarFrameBuilder();
     BarFrame barFrame = builder.barFrame;
     RangeFinder rangeFinder = builder.rangeFinder;
@@ -270,6 +281,10 @@ public class BarFrameBuilder {
         Binding.propertyBinding(
             rangeFinder, rf -> rf.maxFunction.apply(rf), RangeFinder.Property.MAX));
     barFrame.addSeriesBinding(
+        "Placeholder",
+        IndexedBinding.propertyBinding(entries, e -> e.color),
+        IndexedBinding.propertyBinding(entries, e -> 0));
+    barFrame.addSeriesBinding(
         "First",
         IndexedBinding.propertyBinding(
             entries,
@@ -299,7 +314,7 @@ public class BarFrameBuilder {
                 map.entrySet().stream()
                     .sorted(
                         Comparator.<Map.Entry<? extends T, ? extends U>>comparingDouble(
-                                e -> sortFunc.apply(e.getValue()).doubleValue())
+                                e -> sortFunc.apply(e.getKey(), e.getValue()).doubleValue())
                             .reversed())
                     .map(
                         e -> {
