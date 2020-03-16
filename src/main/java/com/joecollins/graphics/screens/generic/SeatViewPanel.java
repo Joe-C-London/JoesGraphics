@@ -96,17 +96,18 @@ public class SeatViewPanel extends JPanel {
 
   private enum PartyEntryProp {
     CURR,
-    PREV
+    PREV,
+    DIFF
   }
 
-  private static class PartyEntryMap<C, P, D> extends Bindable {
+  private static class PrevCurrEntryMap<C, P, D> extends Bindable {
     private Map<Party, C> curr = new LinkedHashMap<>();
     private Map<Party, P> prev = new LinkedHashMap<>();
     private final BiFunction<C, P, D> diffFunction;
     private final C currIdentity;
     private final P prevIdentity;
 
-    private PartyEntryMap(BiFunction<C, P, D> diffFunction, C currIdentity, P prevIdentity) {
+    private PrevCurrEntryMap(BiFunction<C, P, D> diffFunction, C currIdentity, P prevIdentity) {
       this.diffFunction = diffFunction;
       this.currIdentity = currIdentity;
       this.prevIdentity = prevIdentity;
@@ -145,6 +146,52 @@ public class SeatViewPanel extends JPanel {
           },
           PartyEntryProp.CURR,
           PartyEntryProp.PREV);
+    }
+  }
+
+  private static class PrevDiffEntryMap<C, D> extends Bindable {
+    private Map<Party, C> curr = new LinkedHashMap<>();
+    private Map<Party, D> diff = new LinkedHashMap<>();
+    private final C currIdentity;
+    private final D diffIdentity;
+
+    private PrevDiffEntryMap(C currIdentity, D diffIdentity) {
+      this.currIdentity = currIdentity;
+      this.diffIdentity = diffIdentity;
+    }
+
+    void setCurr(Map<Party, C> curr) {
+      this.curr = curr;
+      onPropertyRefreshed(PartyEntryProp.CURR);
+    }
+
+    void setDiff(Map<Party, D> diff) {
+      this.diff = diff;
+      onPropertyRefreshed(PartyEntryProp.DIFF);
+    }
+
+    Binding<Map<Party, C>> currBinding() {
+      return Binding.propertyBinding(this, m -> m.curr, PartyEntryProp.CURR);
+    }
+
+    Binding<Map<Party, Pair<D, C>>> diffBinding() {
+      return Binding.propertyBinding(
+          this,
+          m -> {
+            LinkedHashMap<Party, Pair<D, C>> ret = new LinkedHashMap<>();
+            curr.forEach(
+                (k, v) -> {
+                  D d = diff.getOrDefault(k, diffIdentity);
+                  ret.put(k, ImmutablePair.of(d, v));
+                });
+            diff.forEach(
+                (k, v) -> {
+                  ret.putIfAbsent(k, ImmutablePair.of(v, currIdentity));
+                });
+            return ret;
+          },
+          PartyEntryProp.CURR,
+          PartyEntryProp.DIFF);
     }
   }
 
@@ -193,7 +240,7 @@ public class SeatViewPanel extends JPanel {
     private MapFrameBuilder mapFrame;
     private Limits limits;
 
-    public static Builder basic(
+    public static Builder basicCurrPrev(
         Binding<? extends Map<Party, Integer>> currentSeats,
         Binding<? extends Map<Party, Integer>> previousSeats,
         Binding<Integer> totalSeats,
@@ -202,7 +249,7 @@ public class SeatViewPanel extends JPanel {
         Binding<String> seatSubhead,
         Binding<String> changeHeader) {
 
-      class PEM extends PartyEntryMap<Integer, Integer, Integer> {
+      class PEM extends PrevCurrEntryMap<Integer, Integer, Integer> {
         private PEM() {
           super((a, b) -> a - b, 0, 0);
         }
@@ -243,11 +290,60 @@ public class SeatViewPanel extends JPanel {
       return builder;
     }
 
+    public static Builder basicCurrDiff(
+        Binding<? extends Map<Party, Integer>> currentSeats,
+        Binding<? extends Map<Party, Integer>> seatDiff,
+        Binding<Integer> totalSeats,
+        Binding<String> header,
+        Binding<String> seatHeader,
+        Binding<String> seatSubhead,
+        Binding<String> changeHeader) {
+      class PEM extends PrevDiffEntryMap<Integer, Integer> {
+        private PEM() {
+          super(0, 0);
+        }
+      }
+      PEM map = new PEM();
+      currentSeats.bind(map::setCurr);
+      seatDiff.bind(map::setDiff);
+
+      Builder builder = new Builder();
+      builder.limits = new Limits();
+      totalSeats.bind(builder.limits::setMax);
+      builder.headerLabel = createLabel(header);
+      builder.seatFrame =
+          BarFrameBuilder.basic(
+                  map.currBinding(),
+                  party -> party.getName().toUpperCase(),
+                  party -> party.getColor(),
+                  Function.identity(),
+                  seats -> seats.toString(),
+                  (party, seats) -> party == Party.OTHERS ? -1 : seats)
+              .withHeader(seatHeader)
+              .withSubhead(seatSubhead)
+              .withMax(
+                  Binding.propertyBinding(
+                      builder.limits, l -> Math.max(1, l.max * 2 / 3), Limits.LimitsProp.PROP));
+      builder.changeFrame =
+          BarFrameBuilder.basic(
+                  map.diffBinding(),
+                  party -> party.getAbbreviation().toUpperCase(),
+                  party -> party.getColor(),
+                  seats -> seats.getLeft(),
+                  seats -> changeStr(seats.getLeft()),
+                  (party, seats) -> party == Party.OTHERS ? -1 : seats.getRight())
+              .withHeader(changeHeader)
+              .withWingspan(
+                  Binding.propertyBinding(
+                      builder.limits, l -> Math.max(1, l.max / 20), Limits.LimitsProp.PROP));
+      return builder;
+    }
+
     private static String changeStr(Integer seats) {
       return seats == 0 ? "\u00b10" : DIFF_FORMAT.format(seats);
     }
 
-    public static Builder dual(
+    public static Builder dualCurrPrev(
         Binding<LinkedHashMap<Party, Pair<Integer, Integer>>> currentSeats,
         Binding<LinkedHashMap<Party, Pair<Integer, Integer>>> previousSeats,
         Binding<Integer> totalSeats,
@@ -256,7 +352,7 @@ public class SeatViewPanel extends JPanel {
         Binding<String> seatSubhead,
         Binding<String> changeHeader) {
       class PEM
-          extends PartyEntryMap<
+          extends PrevCurrEntryMap<
               Pair<Integer, Integer>, Pair<Integer, Integer>, Pair<Integer, Integer>> {
         private PEM() {
           super(
@@ -268,6 +364,58 @@ public class SeatViewPanel extends JPanel {
       PEM map = new PEM();
       currentSeats.bind(map::setCurr);
       previousSeats.bind(map::setPrev);
+
+      Builder builder = new Builder();
+      builder.limits = new Limits();
+      totalSeats.bind(builder.limits::setMax);
+      builder.headerLabel = createLabel(header);
+      builder.seatFrame =
+          BarFrameBuilder.dual(
+                  map.currBinding(),
+                  party -> party.getName().toUpperCase(),
+                  party -> party.getColor(),
+                  Function.identity(),
+                  seats -> seats.getLeft() + "/" + seats.getRight(),
+                  (party, seats) -> party == Party.OTHERS ? -1 : seats.getRight())
+              .withHeader(seatHeader)
+              .withSubhead(seatSubhead)
+              .withMax(
+                  Binding.propertyBinding(
+                      builder.limits, l -> Math.max(1, l.max * 2 / 3), Limits.LimitsProp.PROP));
+      builder.changeFrame =
+          BarFrameBuilder.dual(
+                  map.diffBinding(),
+                  party -> party.getAbbreviation().toUpperCase(),
+                  party -> party.getColor(),
+                  seats -> seats.getLeft(),
+                  seats ->
+                      changeStr(seats.getLeft().getLeft())
+                          + "/"
+                          + changeStr(seats.getLeft().getRight()),
+                  (party, seats) -> party == Party.OTHERS ? -1 : seats.getRight().getRight())
+              .withHeader(changeHeader)
+              .withWingspan(
+                  Binding.propertyBinding(
+                      builder.limits, l -> Math.max(1, l.max / 20), Limits.LimitsProp.PROP));
+      return builder;
+    }
+
+    public static Builder dualCurrDiff(
+        Binding<LinkedHashMap<Party, Pair<Integer, Integer>>> currentSeats,
+        Binding<LinkedHashMap<Party, Pair<Integer, Integer>>> seatDiff,
+        Binding<Integer> totalSeats,
+        Binding<String> header,
+        Binding<String> seatHeader,
+        Binding<String> seatSubhead,
+        Binding<String> changeHeader) {
+      class PEM extends PrevDiffEntryMap<Pair<Integer, Integer>, Pair<Integer, Integer>> {
+        private PEM() {
+          super(ImmutablePair.of(0, 0), ImmutablePair.of(0, 0));
+        }
+      }
+      PEM map = new PEM();
+      currentSeats.bind(map::setCurr);
+      seatDiff.bind(map::setDiff);
 
       Builder builder = new Builder();
       builder.limits = new Limits();

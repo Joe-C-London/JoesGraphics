@@ -22,7 +22,7 @@ import org.junit.Test;
 public class SeatViewPanelTest {
 
   @Test
-  public void testBasic() throws IOException {
+  public void testBasicCurrPrev() throws IOException {
     BindableWrapper<LinkedHashMap<Party, Integer>> currentSeats =
         new BindableWrapper<>(new LinkedHashMap<>());
     BindableWrapper<LinkedHashMap<Party, Integer>> previousSeats =
@@ -37,7 +37,7 @@ public class SeatViewPanelTest {
     Party lab = new Party("Labour", "LAB", Color.RED);
 
     SeatViewPanel panel =
-        SeatViewPanel.Builder.basic(
+        SeatViewPanel.Builder.basicCurrPrev(
                 currentSeats.getBinding(),
                 previousSeats.getBinding(),
                 totalSeats.getBinding(),
@@ -120,6 +120,103 @@ public class SeatViewPanelTest {
   }
 
   @Test
+  public void testBasicCurrDiff() throws IOException {
+    BindableWrapper<LinkedHashMap<Party, Integer>> currentSeats =
+        new BindableWrapper<>(new LinkedHashMap<>());
+    BindableWrapper<LinkedHashMap<Party, Integer>> seatDiff =
+        new BindableWrapper<>(new LinkedHashMap<>());
+    BindableWrapper<Integer> totalSeats = new BindableWrapper<>(650);
+    BindableWrapper<Boolean> showMajority = new BindableWrapper<>(true);
+    BindableWrapper<String> header = new BindableWrapper<>("UNITED KINGDOM");
+    BindableWrapper<String> seatHeader = new BindableWrapper<>("0 OF 650 CONSTITUENCIES DECLARED");
+    BindableWrapper<String> seatSubhead = new BindableWrapper<>("PROJECTION: TOO EARLY TO CALL");
+    BindableWrapper<String> changeHeader = new BindableWrapper<>("CHANGE SINCE 2017");
+    Party con = new Party("Conservative", "CON", Color.BLUE);
+    Party lab = new Party("Labour", "LAB", Color.RED);
+
+    SeatViewPanel panel =
+        SeatViewPanel.Builder.basicCurrDiff(
+                currentSeats.getBinding(),
+                seatDiff.getBinding(),
+                totalSeats.getBinding(),
+                header.getBinding(),
+                seatHeader.getBinding(),
+                seatSubhead.getBinding(),
+                changeHeader.getBinding())
+            .withMajorityLine(showMajority.getBinding(), n -> n + " SEATS FOR MAJORITY")
+            .build();
+    panel.setSize(1024, 512);
+    compareRendering("SeatViewPanel", "Basic-1", panel);
+
+    LinkedHashMap<Party, Integer> curr = new LinkedHashMap<>();
+    LinkedHashMap<Party, Integer> diff = new LinkedHashMap<>();
+
+    curr.put(con, 1);
+    currentSeats.setValue(curr);
+
+    diff.put(con, +1);
+    diff.put(lab, -1);
+    seatDiff.setValue(diff);
+    seatHeader.setValue("1 OF 650 SEATS DECLARED");
+    compareRendering("SeatViewPanel", "Basic-2", panel);
+
+    curr.put(lab, 2);
+    currentSeats.setValue(curr);
+
+    seatHeader.setValue("3 OF 650 SEATS DECLARED");
+    compareRendering("SeatViewPanel", "Basic-3", panel);
+
+    Party ld = new Party("Liberal Democrat", "LD", Color.ORANGE);
+    Party snp = new Party("Scottish National Party", "SNP", Color.YELLOW);
+    Party pc = new Party("Plaid Cymru", "PC", Color.GREEN.darker());
+    Party grn = new Party("Green", "GRN", Color.GREEN);
+    Party oth = Party.OTHERS;
+
+    curr.put(con, 365);
+    curr.put(lab, 202);
+    curr.put(ld, 11);
+    curr.put(snp, 48);
+    curr.put(grn, 1);
+    curr.put(pc, 4);
+    curr.put(oth, 19);
+
+    diff.put(con, +48);
+    diff.put(lab, -60);
+    diff.put(ld, -1);
+    diff.put(snp, +13);
+    diff.put(grn, 0);
+    diff.put(pc, 0);
+    diff.put(oth, 0);
+
+    currentSeats.setValue(curr);
+    seatDiff.setValue(diff);
+    seatHeader.setValue("650 OF 650 SEATS DECLARED");
+    seatSubhead.setValue("PROJECTION: CON MAJORITY");
+    compareRendering("SeatViewPanel", "Basic-4", panel);
+
+    header.setValue("SCOTLAND");
+    seatHeader.setValue("59 OF 59 SEATS DECLARED");
+    seatSubhead.setValue("");
+    totalSeats.setValue(59);
+    showMajority.setValue(false);
+    curr.clear();
+    diff.clear();
+
+    curr.put(snp, 48);
+    curr.put(con, 6);
+    curr.put(ld, 4);
+    curr.put(lab, 1);
+    currentSeats.setValue(curr);
+
+    diff.put(snp, +13);
+    diff.put(con, -7);
+    diff.put(ld, 0);
+    diff.put(lab, -6);
+    seatDiff.setValue(diff);
+    compareRendering("SeatViewPanel", "Basic-5", panel);
+  }
+
+  @Test
   public void testSwing() throws IOException {
     BindableWrapper<LinkedHashMap<Party, Integer>> currentSeats =
         new BindableWrapper<>(new LinkedHashMap<>());
@@ -147,7 +244,7 @@ public class SeatViewPanelTest {
     List<Party> partyOrder = List.of(snp, lab, pc, grn, ld, oth, con);
 
     SeatViewPanel panel =
-        SeatViewPanel.Builder.basic(
+        SeatViewPanel.Builder.basicCurrPrev(
                 currentSeats.getBinding(),
                 previousSeats.getBinding(),
                 totalSeats.getBinding(),
@@ -224,7 +321,7 @@ public class SeatViewPanelTest {
     List<Party> partyOrder = List.of(ndp, grn, lib, oth, pc);
 
     SeatViewPanel panel =
-        SeatViewPanel.Builder.basic(
+        SeatViewPanel.Builder.basicCurrPrev(
                 currentSeats.getBinding(),
                 previousSeats.getBinding(),
                 totalSeats.getBinding(),
@@ -323,7 +420,7 @@ public class SeatViewPanelTest {
   }
 
   @Test
-  public void testDual() throws IOException {
+  public void testDualCurrPrev() throws IOException {
     BindableWrapper<LinkedHashMap<Party, Pair<Integer, Integer>>> currentSeats =
         new BindableWrapper<>(new LinkedHashMap<>());
     BindableWrapper<LinkedHashMap<Party, Pair<Integer, Integer>>> previousSeats =
@@ -334,7 +431,6 @@ public class SeatViewPanelTest {
     BindableWrapper<String> seatHeader = new BindableWrapper<>("0 OF 338 RIDINGS REPORTING");
     BindableWrapper<String> seatSubhead = new BindableWrapper<>("");
     BindableWrapper<String> changeHeader = new BindableWrapper<>("CHANGE SINCE 2015");
-    BindableWrapper<String> swingHeader = new BindableWrapper<>("SWING SINCE 2015");
 
     Party lib = new Party("Liberal", "LIB", Color.RED);
     Party con = new Party("Conservative", "CON", Color.BLUE);
@@ -344,7 +440,7 @@ public class SeatViewPanelTest {
     Party ind = new Party("Independent", "IND", Color.GRAY);
 
     SeatViewPanel panel =
-        SeatViewPanel.Builder.dual(
+        SeatViewPanel.Builder.dualCurrPrev(
                 currentSeats.getBinding(),
                 previousSeats.getBinding(),
                 totalSeats.getBinding(),
@@ -430,6 +526,125 @@ public class SeatViewPanelTest {
     prevSeats.put(bq, ImmutablePair.of(10, 10));
     prevSeats.put(grn, ImmutablePair.of(1, 1));
     previousSeats.setValue(prevSeats);
+
+    seatHeader.setValue("338 OF 338 RIDINGS REPORTING");
+    compareRendering("SeatViewPanel", "Dual-6", panel);
+  }
+
+  @Test
+  public void testDualCurrDiff() throws IOException {
+    BindableWrapper<LinkedHashMap<Party, Pair<Integer, Integer>>> currentSeats =
+        new BindableWrapper<>(new LinkedHashMap<>());
+    BindableWrapper<LinkedHashMap<Party, Pair<Integer, Integer>>> seatDiff =
+        new BindableWrapper<>(new LinkedHashMap<>());
+    BindableWrapper<Integer> totalSeats = new BindableWrapper<>(338);
+    BindableWrapper<Boolean> showMajority = new BindableWrapper<>(true);
+    BindableWrapper<String> header = new BindableWrapper<>("CANADA");
+    BindableWrapper<String> seatHeader = new BindableWrapper<>("0 OF 338 RIDINGS REPORTING");
+    BindableWrapper<String> seatSubhead = new BindableWrapper<>("");
+    BindableWrapper<String> changeHeader = new BindableWrapper<>("CHANGE SINCE 2015");
+
+    Party lib = new Party("Liberal", "LIB", Color.RED);
+    Party con = new Party("Conservative", "CON", Color.BLUE);
+    Party ndp = new Party("New Democratic Party", "NDP", Color.ORANGE);
+    Party bq = new Party("Bloc Qu\u00e9b\u00e9cois", "BQ", Color.CYAN.darker());
+    Party grn = new Party("Green", "GRN", Color.GREEN.darker());
+    Party ind = new Party("Independent", "IND", Color.GRAY);
+
+    SeatViewPanel panel =
+        SeatViewPanel.Builder.dualCurrDiff(
+                currentSeats.getBinding(),
+                seatDiff.getBinding(),
+                totalSeats.getBinding(),
+                header.getBinding(),
+                seatHeader.getBinding(),
+                seatSubhead.getBinding(),
+                changeHeader.getBinding())
+            .withMajorityLine(showMajority.getBinding(), n -> n + " SEATS FOR MAJORITY")
+            .build();
+    panel.setSize(1024, 512);
+    compareRendering("SeatViewPanel", "Dual-1", panel);
+
+    LinkedHashMap<Party, Pair<Integer, Integer>> currSeats = new LinkedHashMap<>();
+    LinkedHashMap<Party, Pair<Integer, Integer>> diff = new LinkedHashMap<>();
+
+    currSeats.put(lib, ImmutablePair.of(0, 6));
+    currSeats.put(ndp, ImmutablePair.of(0, 1));
+    currentSeats.setValue(currSeats);
+
+    diff.put(lib, ImmutablePair.of(0, -1));
+    diff.put(ndp, ImmutablePair.of(0, +1));
+    seatDiff.setValue(diff);
+
+    seatHeader.setValue("7 OF 338 RIDINGS REPORTING");
+    compareRendering("SeatViewPanel", "Dual-2", panel);
+
+    currSeats.put(lib, ImmutablePair.of(6, 26));
+    currSeats.put(ndp, ImmutablePair.of(1, 1));
+    currSeats.put(con, ImmutablePair.of(0, 4));
+    currSeats.put(grn, ImmutablePair.of(0, 1));
+    currentSeats.setValue(currSeats);
+
+    diff.put(lib, ImmutablePair.of(-1, -6));
+    diff.put(ndp, ImmutablePair.of(+1, +1));
+    diff.put(con, ImmutablePair.of(0, +4));
+    diff.put(grn, ImmutablePair.of(0, +1));
+    seatDiff.setValue(diff);
+
+    seatHeader.setValue("32 OF 338 RIDINGS REPORTING");
+    compareRendering("SeatViewPanel", "Dual-3", panel);
+
+    currSeats.put(lib, ImmutablePair.of(26, 145));
+    currSeats.put(ndp, ImmutablePair.of(1, 13));
+    currSeats.put(con, ImmutablePair.of(4, 104));
+    currSeats.put(bq, ImmutablePair.of(0, 32));
+    currSeats.put(grn, ImmutablePair.of(1, 1));
+    currentSeats.setValue(currSeats);
+
+    diff.put(lib, ImmutablePair.of(-6, -21));
+    diff.put(ndp, ImmutablePair.of(+1, -17));
+    diff.put(con, ImmutablePair.of(+4, +15));
+    diff.put(bq, ImmutablePair.of(0, +22));
+    diff.put(grn, ImmutablePair.of(+1, +1));
+    seatDiff.setValue(diff);
+
+    seatHeader.setValue("295 OF 338 RIDINGS REPORTING");
+    compareRendering("SeatViewPanel", "Dual-4", panel);
+
+    currSeats.put(lib, ImmutablePair.of(145, 157));
+    currSeats.put(ndp, ImmutablePair.of(13, 24));
+    currSeats.put(con, ImmutablePair.of(104, 121));
+    currSeats.put(bq, ImmutablePair.of(32, 32));
+    currSeats.put(grn, ImmutablePair.of(1, 3));
+    currSeats.put(ind, ImmutablePair.of(0, 1));
+    currentSeats.setValue(currSeats);
+
+    diff.put(lib, ImmutablePair.of(-21, -27));
+    diff.put(ndp, ImmutablePair.of(-17, -20));
+    diff.put(con, ImmutablePair.of(+15, +22));
+    diff.put(bq, ImmutablePair.of(+22, +22));
+    diff.put(grn, ImmutablePair.of(+1, +2));
+    diff.put(ind, ImmutablePair.of(0, +1));
+    seatDiff.setValue(diff);
+
+    seatHeader.setValue("338 OF 338 RIDINGS REPORTING");
+    compareRendering("SeatViewPanel", "Dual-5", panel);
+
+    currSeats.put(lib, ImmutablePair.of(157, 157));
+    currSeats.put(ndp, ImmutablePair.of(24, 24));
+    currSeats.put(con, ImmutablePair.of(121, 121));
+    currSeats.put(bq, ImmutablePair.of(32, 32));
+    currSeats.put(grn, ImmutablePair.of(3, 3));
+    currSeats.put(ind, ImmutablePair.of(1, 1));
+    currentSeats.setValue(currSeats);
+
+    diff.put(lib, ImmutablePair.of(-27, -27));
+    diff.put(ndp, ImmutablePair.of(-20, -20));
+    diff.put(con, ImmutablePair.of(+22, +22));
+    diff.put(bq, ImmutablePair.of(+22, +22));
+    diff.put(grn, ImmutablePair.of(+2, +2));
+    diff.put(ind, ImmutablePair.of(+1, +1));
+    seatDiff.setValue(diff);
 
     seatHeader.setValue("338 OF 338 RIDINGS REPORTING");
     compareRendering("SeatViewPanel", "Dual-6", panel);
