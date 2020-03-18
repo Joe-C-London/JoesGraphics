@@ -102,6 +102,16 @@ public class BarFrameBuilder {
         binding, labelFunc, colorFunc, valueFunc, valueLabelFunc, x -> null, sortFunc);
   }
 
+  public static <T, U extends Number> BarFrameBuilder basicWithShapes(
+      Binding<? extends Map<? extends T, ? extends U>> binding,
+      Function<? super T, String> labelFunc,
+      Function<? super T, Color> colorFunc,
+      Function<? super U, String> valueLabelFunc,
+      Function<? super U, ? extends Shape> shapeFunc) {
+    return basicWithShapes(
+        binding, labelFunc, colorFunc, Function.identity(), valueLabelFunc, shapeFunc);
+  }
+
   public static <T, U> BarFrameBuilder basicWithShapes(
       Binding<? extends Map<? extends T, ? extends U>> binding,
       Function<? super T, String> labelFunc,

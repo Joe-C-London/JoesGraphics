@@ -30,6 +30,7 @@ import java.util.function.Function;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+import org.apache.commons.lang3.Range;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -445,6 +446,124 @@ public class SeatViewPanel extends JPanel {
                           + "/"
                           + changeStr(seats.getLeft().getRight()),
                   (party, seats) -> party == Party.OTHERS ? -1 : seats.getRight().getRight())
+              .withHeader(changeHeader)
+              .withWingspan(
+                  Binding.propertyBinding(
+                      builder.limits, l -> Math.max(1, l.max / 20), Limits.LimitsProp.PROP));
+      return builder;
+    }
+
+    public static Builder rangeCurrPrev(
+        Binding<LinkedHashMap<Party, Range<Integer>>> currentSeats,
+        Binding<LinkedHashMap<Party, Integer>> previousSeats,
+        Binding<Integer> totalSeats,
+        Binding<String> header,
+        Binding<String> seatHeader,
+        Binding<String> seatSubhead,
+        Binding<String> changeHeader) {
+      class PEM extends PrevCurrEntryMap<Range<Integer>, Integer, Range<Integer>> {
+        private PEM() {
+          super((a, b) -> Range.between(a.getMinimum() - b, a.getMaximum() - b), Range.is(0), 0);
+        }
+      }
+      PEM map = new PEM();
+      currentSeats.bind(map::setCurr);
+      previousSeats.bind(map::setPrev);
+
+      Builder builder = new Builder();
+      builder.limits = new Limits();
+      totalSeats.bind(builder.limits::setMax);
+      builder.headerLabel = createLabel(header);
+      builder.seatFrame =
+          BarFrameBuilder.dual(
+                  map.currBinding(),
+                  party -> party.getName().toUpperCase(),
+                  party -> party.getColor(),
+                  seats -> ImmutablePair.of(seats.getMinimum(), seats.getMaximum()),
+                  seats -> seats.getMinimum() + "-" + seats.getMaximum(),
+                  (party, seats) ->
+                      party == Party.OTHERS ? -1 : seats.getMinimum() + seats.getMaximum())
+              .withHeader(seatHeader)
+              .withSubhead(seatSubhead)
+              .withMax(
+                  Binding.propertyBinding(
+                      builder.limits, l -> Math.max(1, l.max * 2 / 3), Limits.LimitsProp.PROP));
+      builder.changeFrame =
+          BarFrameBuilder.dual(
+                  map.diffBinding(),
+                  party -> party.getAbbreviation().toUpperCase(),
+                  party -> party.getColor(),
+                  seats ->
+                      ImmutablePair.of(seats.getLeft().getMinimum(), seats.getLeft().getMaximum()),
+                  seats ->
+                      "("
+                          + changeStr(seats.getLeft().getMinimum())
+                          + ")-("
+                          + changeStr(seats.getLeft().getMaximum())
+                          + ")",
+                  (party, seats) ->
+                      party == Party.OTHERS
+                          ? -1
+                          : seats.getRight().getMinimum() + seats.getRight().getMaximum())
+              .withHeader(changeHeader)
+              .withWingspan(
+                  Binding.propertyBinding(
+                      builder.limits, l -> Math.max(1, l.max / 20), Limits.LimitsProp.PROP));
+      return builder;
+    }
+
+    public static Builder rangeCurrDiff(
+        Binding<LinkedHashMap<Party, Range<Integer>>> currentSeats,
+        Binding<LinkedHashMap<Party, Range<Integer>>> seatDiff,
+        Binding<Integer> totalSeats,
+        Binding<String> header,
+        Binding<String> seatHeader,
+        Binding<String> seatSubhead,
+        Binding<String> changeHeader) {
+      class PEM extends PrevDiffEntryMap<Range<Integer>, Range<Integer>> {
+        private PEM() {
+          super(Range.is(0), Range.is(0));
+        }
+      }
+      PEM map = new PEM();
+      currentSeats.bind(map::setCurr);
+      seatDiff.bind(map::setDiff);
+
+      Builder builder = new Builder();
+      builder.limits = new Limits();
+      totalSeats.bind(builder.limits::setMax);
+      builder.headerLabel = createLabel(header);
+      builder.seatFrame =
+          BarFrameBuilder.dual(
+                  map.currBinding(),
+                  party -> party.getName().toUpperCase(),
+                  party -> party.getColor(),
+                  seats -> ImmutablePair.of(seats.getMinimum(), seats.getMaximum()),
+                  seats -> seats.getMinimum() + "-" + seats.getMaximum(),
+                  (party, seats) ->
+                      party == Party.OTHERS ? -1 : seats.getMinimum() + seats.getMaximum())
+              .withHeader(seatHeader)
+              .withSubhead(seatSubhead)
+              .withMax(
+                  Binding.propertyBinding(
+                      builder.limits, l -> Math.max(1, l.max * 2 / 3), Limits.LimitsProp.PROP));
+      builder.changeFrame =
+          BarFrameBuilder.dual(
+                  map.diffBinding(),
+                  party -> party.getAbbreviation().toUpperCase(),
+                  party -> party.getColor(),
+                  seats ->
+                      ImmutablePair.of(seats.getLeft().getMinimum(), seats.getLeft().getMaximum()),
+                  seats ->
+                      "("
+                          + changeStr(seats.getLeft().getMinimum())
+                          + ")-("
+                          + changeStr(seats.getLeft().getMaximum())
+                          + ")",
+                  (party, seats) ->
+                      party == Party.OTHERS
+                          ? -1
+                          : seats.getRight().getMinimum() + seats.getRight().getMaximum())
               .withHeader(changeHeader)
               .withWingspan(
                   Binding.propertyBinding(

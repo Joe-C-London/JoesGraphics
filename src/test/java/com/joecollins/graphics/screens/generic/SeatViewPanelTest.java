@@ -15,6 +15,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.Range;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Test;
@@ -648,6 +649,182 @@ public class SeatViewPanelTest {
 
     seatHeader.setValue("338 OF 338 RIDINGS REPORTING");
     compareRendering("SeatViewPanel", "Dual-6", panel);
+  }
+
+  @Test
+  public void testRangeCurrPrev() throws IOException {
+    BindableWrapper<LinkedHashMap<Party, Range<Integer>>> currentSeats =
+        new BindableWrapper<>(new LinkedHashMap<>());
+    BindableWrapper<LinkedHashMap<Party, Integer>> previousSeats =
+        new BindableWrapper<>(new LinkedHashMap<>());
+    BindableWrapper<Integer> totalSeats = new BindableWrapper<>(76);
+    BindableWrapper<Boolean> showMajority = new BindableWrapper<>(true);
+    BindableWrapper<String> header = new BindableWrapper<>("AUSTRALIA");
+    BindableWrapper<String> seatHeader = new BindableWrapper<>("SENATE SEATS");
+    BindableWrapper<String> seatSubhead = new BindableWrapper<>("");
+    BindableWrapper<String> changeHeader = new BindableWrapper<>("CHANGE SINCE 2013");
+
+    Party lnp = new Party("Liberal/National Coalition", "L/NP", Color.BLUE);
+    Party alp = new Party("Labor Party", "ALP", Color.RED);
+    Party grn = new Party("The Greens", "GRN", Color.GREEN.darker());
+    Party onp = new Party("One Nation Party", "ONP", Color.ORANGE);
+    Party nxt = new Party("Nick Xenophon Team", "NXT", Color.ORANGE);
+    Party oth = Party.OTHERS;
+
+    SeatViewPanel panel =
+        SeatViewPanel.Builder.rangeCurrPrev(
+                currentSeats.getBinding(),
+                previousSeats.getBinding(),
+                totalSeats.getBinding(),
+                header.getBinding(),
+                seatHeader.getBinding(),
+                seatSubhead.getBinding(),
+                changeHeader.getBinding())
+            .withMajorityLine(showMajority.getBinding(), n -> n + " SEATS FOR MAJORITY")
+            .build();
+    panel.setSize(1024, 512);
+    compareRendering("SeatViewPanel", "Range-1", panel);
+
+    LinkedHashMap<Party, Range<Integer>> currSeats = new LinkedHashMap<>();
+    LinkedHashMap<Party, Integer> prevSeats = new LinkedHashMap<>();
+
+    currSeats.put(lnp, Range.between(4, 5));
+    currSeats.put(alp, Range.between(4, 4));
+    currSeats.put(grn, Range.between(0, 1));
+    currSeats.put(onp, Range.between(0, 1));
+    currSeats.put(oth, Range.between(0, 2));
+    currentSeats.setValue(currSeats);
+
+    prevSeats.put(lnp, 6);
+    prevSeats.put(alp, 4);
+    prevSeats.put(grn, 1);
+    prevSeats.put(oth, 1);
+    previousSeats.setValue(prevSeats);
+
+    compareRendering("SeatViewPanel", "Range-2", panel);
+
+    currSeats.put(lnp, Range.between(8, 10));
+    currSeats.put(alp, Range.between(7, 8));
+    currSeats.put(grn, Range.between(0, 2));
+    currSeats.put(onp, Range.between(1, 2));
+    currSeats.put(nxt, Range.between(0, 1));
+    currSeats.put(oth, Range.between(0, 4));
+    currentSeats.setValue(currSeats);
+
+    prevSeats.put(lnp, 12);
+    prevSeats.put(alp, 8);
+    prevSeats.put(grn, 2);
+    prevSeats.put(oth, 2);
+    previousSeats.setValue(prevSeats);
+
+    compareRendering("SeatViewPanel", "Range-3", panel);
+
+    currSeats.put(lnp, Range.between(27, 31));
+    currSeats.put(alp, Range.between(25, 27));
+    currSeats.put(grn, Range.between(5, 9));
+    currSeats.put(onp, Range.between(1, 4));
+    currSeats.put(nxt, Range.between(3, 3));
+    currSeats.put(oth, Range.between(1, 8));
+    currentSeats.setValue(currSeats);
+
+    prevSeats.put(lnp, 33);
+    prevSeats.put(alp, 25);
+    prevSeats.put(grn, 10);
+    prevSeats.put(nxt, 1);
+    prevSeats.put(oth, 7);
+    previousSeats.setValue(prevSeats);
+
+    compareRendering("SeatViewPanel", "Range-4", panel);
+  }
+
+  @Test
+  public void testRangeCurrDiff() throws IOException {
+    BindableWrapper<LinkedHashMap<Party, Range<Integer>>> currentSeats =
+        new BindableWrapper<>(new LinkedHashMap<>());
+    BindableWrapper<LinkedHashMap<Party, Range<Integer>>> seatDiff =
+        new BindableWrapper<>(new LinkedHashMap<>());
+    BindableWrapper<Integer> totalSeats = new BindableWrapper<>(76);
+    BindableWrapper<Boolean> showMajority = new BindableWrapper<>(true);
+    BindableWrapper<String> header = new BindableWrapper<>("AUSTRALIA");
+    BindableWrapper<String> seatHeader = new BindableWrapper<>("SENATE SEATS");
+    BindableWrapper<String> seatSubhead = new BindableWrapper<>("");
+    BindableWrapper<String> changeHeader = new BindableWrapper<>("CHANGE SINCE 2013");
+
+    Party lnp = new Party("Liberal/National Coalition", "L/NP", Color.BLUE);
+    Party alp = new Party("Labor Party", "ALP", Color.RED);
+    Party grn = new Party("The Greens", "GRN", Color.GREEN.darker());
+    Party onp = new Party("One Nation Party", "ONP", Color.ORANGE);
+    Party nxt = new Party("Nick Xenophon Team", "NXT", Color.ORANGE);
+    Party oth = Party.OTHERS;
+
+    SeatViewPanel panel =
+        SeatViewPanel.Builder.rangeCurrDiff(
+                currentSeats.getBinding(),
+                seatDiff.getBinding(),
+                totalSeats.getBinding(),
+                header.getBinding(),
+                seatHeader.getBinding(),
+                seatSubhead.getBinding(),
+                changeHeader.getBinding())
+            .withMajorityLine(showMajority.getBinding(), n -> n + " SEATS FOR MAJORITY")
+            .build();
+    panel.setSize(1024, 512);
+    compareRendering("SeatViewPanel", "Range-1", panel);
+
+    LinkedHashMap<Party, Range<Integer>> currSeats = new LinkedHashMap<>();
+    LinkedHashMap<Party, Range<Integer>> diff = new LinkedHashMap<>();
+
+    currSeats.put(lnp, Range.between(4, 5));
+    currSeats.put(alp, Range.between(4, 4));
+    currSeats.put(grn, Range.between(0, 1));
+    currSeats.put(onp, Range.between(0, 1));
+    currSeats.put(oth, Range.between(0, 2));
+    currentSeats.setValue(currSeats);
+
+    diff.put(lnp, Range.between(-2, -1));
+    diff.put(alp, Range.between(0, 0));
+    diff.put(grn, Range.between(-1, 0));
+    diff.put(onp, Range.between(0, +1));
+    diff.put(oth, Range.between(-1, +1));
+    seatDiff.setValue(diff);
+
+    compareRendering("SeatViewPanel", "Range-2", panel);
+
+    currSeats.put(lnp, Range.between(8, 10));
+    currSeats.put(alp, Range.between(7, 8));
+    currSeats.put(grn, Range.between(0, 2));
+    currSeats.put(onp, Range.between(1, 2));
+    currSeats.put(nxt, Range.between(0, 1));
+    currSeats.put(oth, Range.between(0, 4));
+    currentSeats.setValue(currSeats);
+
+    diff.put(lnp, Range.between(-4, -2));
+    diff.put(alp, Range.between(-1, 0));
+    diff.put(grn, Range.between(-2, 0));
+    diff.put(onp, Range.between(+1, +2));
+    diff.put(nxt, Range.between(0, +1));
+    diff.put(oth, Range.between(-2, +2));
+    seatDiff.setValue(diff);
+
+    compareRendering("SeatViewPanel", "Range-3", panel);
+
+    currSeats.put(lnp, Range.between(27, 31));
+    currSeats.put(alp, Range.between(25, 27));
+    currSeats.put(grn, Range.between(5, 9));
+    currSeats.put(onp, Range.between(1, 4));
+    currSeats.put(nxt, Range.between(3, 3));
+    currSeats.put(oth, Range.between(1, 8));
+    currentSeats.setValue(currSeats);
+
+    diff.put(lnp, Range.between(-6, -2));
+    diff.put(alp, Range.between(0, +2));
+    diff.put(grn, Range.between(-5, -1));
+    diff.put(onp, Range.between(+1, +4));
+    diff.put(nxt, Range.between(+2, +2));
+    diff.put(oth, Range.between(-6, +1));
+    seatDiff.setValue(diff);
+
+    compareRendering("SeatViewPanel", "Range-4", panel);
   }
 
   private Map<Integer, Shape> peiShapesByDistrict() throws IOException {
