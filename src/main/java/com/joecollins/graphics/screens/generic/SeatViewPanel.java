@@ -102,8 +102,8 @@ public class SeatViewPanel extends JPanel {
   }
 
   private static class PrevCurrEntryMap<C, P, D> extends Bindable {
-    private Map<Party, C> curr = new LinkedHashMap<>();
-    private Map<Party, P> prev = new LinkedHashMap<>();
+    private Map<Party, ? extends C> curr = new LinkedHashMap<>();
+    private Map<Party, ? extends P> prev = new LinkedHashMap<>();
     private final BiFunction<C, P, D> diffFunction;
     private final C currIdentity;
     private final P prevIdentity;
@@ -114,28 +114,28 @@ public class SeatViewPanel extends JPanel {
       this.prevIdentity = prevIdentity;
     }
 
-    void setCurr(Map<Party, C> curr) {
+    void setCurr(Map<Party, ? extends C> curr) {
       this.curr = curr;
       onPropertyRefreshed(PartyEntryProp.CURR);
     }
 
-    void setPrev(Map<Party, P> prev) {
+    void setPrev(Map<Party, ? extends P> prev) {
       this.prev = prev;
       onPropertyRefreshed(PartyEntryProp.PREV);
     }
 
-    Binding<Map<Party, C>> currBinding() {
+    Binding<Map<Party, ? extends C>> currBinding() {
       return Binding.propertyBinding(this, m -> m.curr, PartyEntryProp.CURR);
     }
 
-    Binding<Map<Party, Pair<D, C>>> diffBinding() {
+    Binding<Map<Party, ? extends Pair<D, C>>> diffBinding() {
       return Binding.propertyBinding(
           this,
           m -> {
-            LinkedHashMap<Party, Pair<D, C>> ret = new LinkedHashMap<>();
+            LinkedHashMap<Party, ImmutablePair<D, C>> ret = new LinkedHashMap<>();
             curr.forEach(
                 (k, v) -> {
-                  D d = diffFunction.apply(v, prev.getOrDefault(k, prevIdentity));
+                  D d = diffFunction.apply(v, prev.containsKey(k) ? prev.get(k) : prevIdentity);
                   ret.put(k, ImmutablePair.of(d, v));
                 });
             prev.forEach(
@@ -151,8 +151,8 @@ public class SeatViewPanel extends JPanel {
   }
 
   private static class PrevDiffEntryMap<C, D> extends Bindable {
-    private Map<Party, C> curr = new LinkedHashMap<>();
-    private Map<Party, D> diff = new LinkedHashMap<>();
+    private Map<Party, ? extends C> curr = new LinkedHashMap<>();
+    private Map<Party, ? extends D> diff = new LinkedHashMap<>();
     private final C currIdentity;
     private final D diffIdentity;
 
@@ -161,28 +161,28 @@ public class SeatViewPanel extends JPanel {
       this.diffIdentity = diffIdentity;
     }
 
-    void setCurr(Map<Party, C> curr) {
+    void setCurr(Map<Party, ? extends C> curr) {
       this.curr = curr;
       onPropertyRefreshed(PartyEntryProp.CURR);
     }
 
-    void setDiff(Map<Party, D> diff) {
+    void setDiff(Map<Party, ? extends D> diff) {
       this.diff = diff;
       onPropertyRefreshed(PartyEntryProp.DIFF);
     }
 
-    Binding<Map<Party, C>> currBinding() {
+    Binding<Map<Party, ? extends C>> currBinding() {
       return Binding.propertyBinding(this, m -> m.curr, PartyEntryProp.CURR);
     }
 
-    Binding<Map<Party, Pair<D, C>>> diffBinding() {
+    Binding<Map<Party, ? extends Pair<D, C>>> diffBinding() {
       return Binding.propertyBinding(
           this,
           m -> {
             LinkedHashMap<Party, Pair<D, C>> ret = new LinkedHashMap<>();
             curr.forEach(
                 (k, v) -> {
-                  D d = diff.getOrDefault(k, diffIdentity);
+                  D d = diff.containsKey(k) ? diff.get(k) : diffIdentity;
                   ret.put(k, ImmutablePair.of(d, v));
                 });
             diff.forEach(
@@ -345,8 +345,8 @@ public class SeatViewPanel extends JPanel {
     }
 
     public static Builder dualCurrPrev(
-        Binding<LinkedHashMap<Party, Pair<Integer, Integer>>> currentSeats,
-        Binding<LinkedHashMap<Party, Pair<Integer, Integer>>> previousSeats,
+        Binding<? extends Map<Party, ? extends Pair<Integer, Integer>>> currentSeats,
+        Binding<? extends Map<Party, ? extends Pair<Integer, Integer>>> previousSeats,
         Binding<Integer> totalSeats,
         Binding<String> header,
         Binding<String> seatHeader,
@@ -402,8 +402,8 @@ public class SeatViewPanel extends JPanel {
     }
 
     public static Builder dualCurrDiff(
-        Binding<LinkedHashMap<Party, Pair<Integer, Integer>>> currentSeats,
-        Binding<LinkedHashMap<Party, Pair<Integer, Integer>>> seatDiff,
+        Binding<? extends Map<Party, ? extends Pair<Integer, Integer>>> currentSeats,
+        Binding<? extends Map<Party, ? extends Pair<Integer, Integer>>> seatDiff,
         Binding<Integer> totalSeats,
         Binding<String> header,
         Binding<String> seatHeader,
@@ -454,8 +454,8 @@ public class SeatViewPanel extends JPanel {
     }
 
     public static Builder rangeCurrPrev(
-        Binding<LinkedHashMap<Party, Range<Integer>>> currentSeats,
-        Binding<LinkedHashMap<Party, Integer>> previousSeats,
+        Binding<? extends Map<Party, Range<Integer>>> currentSeats,
+        Binding<? extends Map<Party, Integer>> previousSeats,
         Binding<Integer> totalSeats,
         Binding<String> header,
         Binding<String> seatHeader,
@@ -513,8 +513,8 @@ public class SeatViewPanel extends JPanel {
     }
 
     public static Builder rangeCurrDiff(
-        Binding<LinkedHashMap<Party, Range<Integer>>> currentSeats,
-        Binding<LinkedHashMap<Party, Range<Integer>>> seatDiff,
+        Binding<? extends Map<Party, Range<Integer>>> currentSeats,
+        Binding<? extends Map<Party, Range<Integer>>> seatDiff,
         Binding<Integer> totalSeats,
         Binding<String> header,
         Binding<String> seatHeader,
@@ -597,19 +597,26 @@ public class SeatViewPanel extends JPanel {
         Binding<? extends Map<Party, Integer>> currVotes,
         Binding<? extends Map<Party, Integer>> prevVotes,
         List<Party> partyOrder) {
-      swingFrame =
-          SwingFrameBuilder.prevCurr(
-                  prevVotes,
-                  currVotes,
-                  Comparator.comparing(
-                      p -> {
-                        int idx = partyOrder.indexOf(p);
-                        if (idx < 0) {
-                          idx = partyOrder.indexOf(Party.OTHERS);
-                        }
-                        return idx;
-                      }))
-              .withHeader(header);
+      return withSwing(
+          header,
+          currVotes,
+          prevVotes,
+          Comparator.comparing(
+              p -> {
+                int idx = partyOrder.indexOf(p);
+                if (idx < 0) {
+                  idx = partyOrder.indexOf(Party.OTHERS);
+                }
+                return idx;
+              }));
+    }
+
+    public Builder withSwing(
+        Binding<String> header,
+        Binding<? extends Map<Party, Integer>> currVotes,
+        Binding<? extends Map<Party, Integer>> prevVotes,
+        Comparator<Party> comparator) {
+      swingFrame = SwingFrameBuilder.prevCurr(prevVotes, currVotes, comparator).withHeader(header);
       return this;
     }
 
