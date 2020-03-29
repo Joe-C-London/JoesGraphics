@@ -123,6 +123,7 @@ public class LowerThird extends JPanel {
     public void setImage(Image image) {
       this.image = image;
       this.setPreferredSize(new Dimension(50 * image.getWidth(null) / image.getHeight(null), 50));
+      LowerThird.this.revalidate();
       repaint();
     }
 

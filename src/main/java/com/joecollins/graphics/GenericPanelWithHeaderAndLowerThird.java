@@ -1,5 +1,6 @@
 package com.joecollins.graphics;
 
+import com.joecollins.bindings.Binding;
 import com.joecollins.graphics.components.lowerthird.LowerThird;
 import com.joecollins.graphics.utils.StandardFont;
 import java.awt.BorderLayout;
@@ -16,8 +17,14 @@ public class GenericPanelWithHeaderAndLowerThird<T extends JPanel> extends JPane
   private final LowerThird lowerThird;
 
   public GenericPanelWithHeaderAndLowerThird(T panel, String label, LowerThird lowerThird) {
+    this(panel, Binding.fixedBinding(label), lowerThird);
+  }
+
+  public GenericPanelWithHeaderAndLowerThird(
+      T panel, Binding<String> label, LowerThird lowerThird) {
     this.panel = panel;
-    this.label = new JLabel(label);
+    this.label = new JLabel();
+    label.bind(this.label::setText);
     this.label.setHorizontalAlignment(JLabel.CENTER);
     this.label.setBorder(new EmptyBorder(5, 0, -5, 0));
     this.label.setFont(StandardFont.readBoldFont(32));

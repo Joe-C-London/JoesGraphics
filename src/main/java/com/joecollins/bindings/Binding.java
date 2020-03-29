@@ -23,7 +23,11 @@ public interface Binding<T> {
     }
 
     public Binding<T> getBinding() {
-      return Binding.propertyBinding(this, t -> t.value, Property.PROP);
+      return getBinding(Function.identity());
+    }
+
+    public <U> Binding<U> getBinding(Function<T, U> func) {
+      return Binding.propertyBinding(this, t -> func.apply(t.value), Property.PROP);
     }
 
     public T getValue() {

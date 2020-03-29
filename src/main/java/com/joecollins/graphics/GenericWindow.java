@@ -86,6 +86,11 @@ public class GenericWindow<T extends JPanel> extends JFrame {
     requestFocus();
   }
 
+  public GenericWindow<T> withControlPanel(JPanel panel) {
+    add(panel);
+    return this;
+  }
+
   private static void saveImageToFile(JPanel panel) {
     JFileChooser fileChooser = new JFileChooser();
     fileChooser.setCurrentDirectory(
