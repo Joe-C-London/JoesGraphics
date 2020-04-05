@@ -232,12 +232,14 @@ public class SwingFrameBuilder {
     void setProperties() {
       fromParty =
           prevPct.entrySet().stream()
+              .filter(e -> !Double.isNaN(e.getValue()))
               .max(Comparator.comparingDouble(Map.Entry::getValue))
               .map(Map.Entry::getKey)
               .orElse(null);
       toParty =
           currPct.entrySet().stream()
               .filter(p -> !p.getKey().equals(fromParty))
+              .filter(e -> !Double.isNaN(e.getValue()))
               .max(Comparator.comparingDouble(Map.Entry::getValue))
               .map(Map.Entry::getKey)
               .orElse(null);

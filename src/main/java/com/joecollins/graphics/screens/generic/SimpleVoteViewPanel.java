@@ -99,13 +99,11 @@ public class SimpleVoteViewPanel extends JPanel {
       voteFrame.setSize(width * 3 / 5 - 10, height - 10);
       changeFrame.setLocation(width * 3 / 5 + 5, 5);
       changeFrame.setSize(width * 2 / 5 - 10, height * 2 / 3 - 10);
-      if (swingFrame != null) {
-        swingFrame.setLocation(width * 3 / 5 + 5, height * 2 / 3 + 5);
-        swingFrame.setSize(width * (mapFrame == null ? 2 : 1) / 5 - 10, height / 3 - 10);
-      }
+      swingFrame.setLocation(width * 3 / 5 + 5, height * 2 / 3 + 5);
+      swingFrame.setSize(width * (mapFrame == null ? 2 : 1) / 5 - 10, height / 3 - 10);
       if (mapFrame != null) {
-        mapFrame.setLocation(width * (swingFrame == null ? 3 : 4) / 5 + 5, height * 2 / 3 + 5);
-        mapFrame.setSize(width * (swingFrame == null ? 2 : 1) / 5 - 10, height / 3 - 10);
+        mapFrame.setLocation(width * 4 / 5 + 5, height * 2 / 3 + 5);
+        mapFrame.setSize(width / 5 - 10, height / 3 - 10);
       }
     }
   }
@@ -121,14 +119,14 @@ public class SimpleVoteViewPanel extends JPanel {
     private Map<Party, Pair<Integer, Double>> prev = new LinkedHashMap<>();
 
     void setCurr(Map<Candidate, Integer> curr) {
-      int total = curr.values().stream().mapToInt(i -> i).sum();
+      int total = Math.max(1, curr.values().stream().mapToInt(i -> i).sum());
       this.curr = new LinkedHashMap<>();
       curr.forEach((c, v) -> this.curr.put(c, ImmutablePair.of(v, 1.0 * v / total)));
       onPropertyRefreshed(PartyEntryProp.CURR);
     }
 
     void setPrev(Map<Party, Integer> prev) {
-      int total = prev.values().stream().mapToInt(i -> i).sum();
+      int total = Math.max(1, prev.values().stream().mapToInt(i -> i).sum());
       this.prev = new LinkedHashMap<>();
       prev.forEach((c, v) -> this.prev.put(c, ImmutablePair.of(v, 1.0 * v / total)));
       onPropertyRefreshed(PartyEntryProp.PREV);
@@ -165,6 +163,9 @@ public class SimpleVoteViewPanel extends JPanel {
           this,
           m -> {
             Map<Party, Pair<Double, Integer>> ret = new LinkedHashMap<>();
+            if (curr.values().stream().mapToInt(Pair::getLeft).sum() == 0) {
+              return ret;
+            }
             curr.forEach(
                 (k, v) -> {
                   double d =
@@ -205,12 +206,35 @@ public class SimpleVoteViewPanel extends JPanel {
         Binding<String> changeHeaderBinding,
         Binding<String> swingHeaderBinding,
         List<Party> swingPartyOrder) {
+      return basicCurrPrev(
+          currVotes,
+          prevVotes,
+          Binding.fixedBinding(1.0),
+          headerBinding,
+          voteHeaderBinding,
+          voteSubheadBinding,
+          changeHeaderBinding,
+          swingHeaderBinding,
+          swingPartyOrder);
+    }
+
+    public static Builder basicCurrPrev(
+        Binding<? extends Map<Candidate, Integer>> currVotes,
+        Binding<? extends Map<Party, Integer>> prevVotes,
+        Binding<Double> pctReporting,
+        Binding<String> headerBinding,
+        Binding<String> voteHeaderBinding,
+        Binding<String> voteSubheadBinding,
+        Binding<String> changeHeaderBinding,
+        Binding<String> swingHeaderBinding,
+        List<Party> swingPartyOrder) {
       Builder builder = new Builder();
       builder.currVotes = new BindingReceiver<>(currVotes);
       PrevCurrEntryMap map = new PrevCurrEntryMap();
       builder.currVotes.getBinding().bind(map::setCurr);
       prevVotes.bind(map::setPrev);
 
+      BindingReceiver<Double> pctReportingReceiver = new BindingReceiver<>(pctReporting);
       builder.headerLabel = createLabel(headerBinding);
       builder.voteFrame =
           BarFrameBuilder.basic(
@@ -218,10 +242,15 @@ public class SimpleVoteViewPanel extends JPanel {
                   c -> c.getName().toUpperCase() + "\n" + c.getParty().getName().toUpperCase(),
                   c -> c.getParty().getColor(),
                   v -> v.getRight(),
-                  v -> VOTE_FORMAT.format(v.getLeft()) + "\n" + PCT_FORMAT.format(v.getRight()))
+                  v ->
+                      v.getLeft() == 0
+                          ? "WAITING..."
+                          : (VOTE_FORMAT.format(v.getLeft())
+                              + "\n"
+                              + PCT_FORMAT.format(v.getRight())))
               .withHeader(voteHeaderBinding)
               .withSubhead(voteSubheadBinding)
-              .withMax(Binding.fixedBinding(2.0 / 3));
+              .withMax(pctReportingReceiver.getBinding(i -> 2.0 / 3 / Math.max(i, 1e-6)));
       builder.changeFrame =
           BarFrameBuilder.basic(
                   map.diffPctBinding(),
@@ -231,7 +260,7 @@ public class SimpleVoteViewPanel extends JPanel {
                   v -> DIFF_FORMAT.format(v.getLeft()),
                   (p, v) -> v.getRight())
               .withHeader(changeHeaderBinding)
-              .withWingspan(Binding.fixedBinding(0.10));
+              .withWingspan(pctReportingReceiver.getBinding(i -> 0.10 / Math.max(i, 1e-6)));
       builder.swingFrame =
           SwingFrameBuilder.prevCurr(
                   map.prevPartyBinding(),
@@ -324,6 +353,7 @@ public class SimpleVoteViewPanel extends JPanel {
         color =
             currVotes.getValue().entrySet().stream()
                 .max(Map.Entry.comparingByValue())
+                .filter(e -> e.getValue() > 0)
                 .map(e -> e.getKey().getParty().getColor())
                 .orElse(Color.BLACK);
       } else {
