@@ -12,6 +12,7 @@ import java.awt.Shape;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,6 +51,7 @@ public class SimpleVoteViewPanelTest {
     BindableWrapper<String> changeHeader = new BindableWrapper<>("CHANGE SINCE 2015");
     BindableWrapper<String> swingHeader = new BindableWrapper<>("SWING SINCE 2015");
     BindableWrapper<String> mapHeader = new BindableWrapper<>("CARDIGAN");
+    BindableWrapper<Party> leader = new BindableWrapper<>(pc.getParty());
     List<Party> swingPartyOrder =
         Arrays.asList(ndp.getParty(), grn.getParty(), lib.getParty(), pc.getParty());
     Map<Integer, Shape> shapesByDistrict = peiShapesByDistrict();
@@ -75,6 +77,7 @@ public class SimpleVoteViewPanelTest {
                 mapHeader.getBinding(),
                 shapesByDistrict,
                 selectedDistrict.getBinding(),
+                leader.getBinding(),
                 focus.getBinding())
             .build();
     panel.setSize(1024, 512);
@@ -174,6 +177,7 @@ public class SimpleVoteViewPanelTest {
     BindableWrapper<String> changeHeader = new BindableWrapper<>("CHANGE SINCE 2015");
     BindableWrapper<String> swingHeader = new BindableWrapper<>("SWING SINCE 2015");
     BindableWrapper<String> mapHeader = new BindableWrapper<>("CARDIGAN");
+    BindableWrapper<Party> leader = new BindableWrapper<>();
     List<Party> swingPartyOrder =
         Arrays.asList(ndp.getParty(), grn.getParty(), lib.getParty(), pc.getParty());
     Map<Integer, Shape> shapesByDistrict = peiShapesByDistrict();
@@ -200,6 +204,7 @@ public class SimpleVoteViewPanelTest {
                 mapHeader.getBinding(),
                 shapesByDistrict,
                 selectedDistrict.getBinding(),
+                leader.getBinding(),
                 focus.getBinding())
             .build();
     panel.setSize(1024, 512);
@@ -213,6 +218,7 @@ public class SimpleVoteViewPanelTest {
     voteHeader.setValue("1 OF 9 POLLS REPORTING");
     voteSubhead.setValue("PROJECTION: TOO EARLY TO CALL");
     pctReporting.setValue(1.0 / 9);
+    leader.setValue(lib.getParty());
     compareRendering("SimpleVoteViewPanel", "Update-2", panel);
 
     curr.put(ndp, 8);
@@ -223,6 +229,7 @@ public class SimpleVoteViewPanelTest {
     voteHeader.setValue("2 OF 9 POLLS REPORTING");
     voteSubhead.setValue("PROJECTION: TOO EARLY TO CALL");
     pctReporting.setValue(2.0 / 9);
+    leader.setValue(grn.getParty());
     compareRendering("SimpleVoteViewPanel", "Update-3", panel);
 
     curr.put(ndp, 18);
@@ -233,6 +240,7 @@ public class SimpleVoteViewPanelTest {
     voteHeader.setValue("5 OF 9 POLLS REPORTING");
     voteSubhead.setValue("PROJECTION: TOO EARLY TO CALL");
     pctReporting.setValue(5.0 / 9);
+    leader.setValue(pc.getParty());
     compareRendering("SimpleVoteViewPanel", "Update-4", panel);
 
     curr.put(ndp, 124);
@@ -244,6 +252,84 @@ public class SimpleVoteViewPanelTest {
     voteSubhead.setValue("PROJECTION: PC GAIN FROM LIB");
     pctReporting.setValue(9.0 / 9);
     compareRendering("SimpleVoteViewPanel", "Update-5", panel);
+  }
+
+  @Test
+  public void testPartyVoteScreen() throws IOException {
+    Party ndp = new Party("New Democratic Party", "NDP", Color.ORANGE);
+    Party pc = new Party("Progressive Conservative", "PC", Color.BLUE);
+    Party lib = new Party("Liberal", "LIB", Color.RED);
+    Party grn = new Party("Green", "GRN", Color.GREEN.darker());
+
+    LinkedHashMap<Party, Integer> curr = new LinkedHashMap<>();
+
+    LinkedHashMap<Party, Integer> prev = new LinkedHashMap<>();
+
+    BindableWrapper<LinkedHashMap<Party, Integer>> currentVotes = new BindableWrapper<>(curr);
+    BindableWrapper<LinkedHashMap<Party, Integer>> previousVotes = new BindableWrapper<>(prev);
+    BindableWrapper<Double> pctReporting = new BindableWrapper<>(0.0);
+    BindableWrapper<String> header = new BindableWrapper<>("PRINCE EDWARD ISLAND");
+    BindableWrapper<String> voteHeader = new BindableWrapper<>("0 OF 27 DISTRICTS DECLARED");
+    BindableWrapper<String> voteSubhead = new BindableWrapper<>("WAITING FOR RESULTS...");
+    BindableWrapper<String> changeHeader = new BindableWrapper<>("CHANGE SINCE 2015");
+    BindableWrapper<String> swingHeader = new BindableWrapper<>("SWING SINCE 2015");
+    BindableWrapper<String> mapHeader = new BindableWrapper<>("PEI");
+    List<Party> swingPartyOrder = Arrays.asList(ndp, grn, lib, pc);
+    Map<Integer, Shape> shapesByDistrict = peiShapesByDistrict();
+    BindableWrapper<List<Shape>> focus = new BindableWrapper<>();
+    BindableWrapper<Map<Integer, Party>> winnersByDistrict = new BindableWrapper<>(new HashMap<>());
+
+    SimpleVoteViewPanel panel =
+        SimpleVoteViewPanel.Builder.basicPartyCurrPrev(
+                currentVotes.getBinding(),
+                previousVotes.getBinding(),
+                pctReporting.getBinding(),
+                header.getBinding(),
+                voteHeader.getBinding(),
+                voteSubhead.getBinding(),
+                changeHeader.getBinding(),
+                swingHeader.getBinding(),
+                swingPartyOrder)
+            .withMap(
+                mapHeader.getBinding(),
+                shapesByDistrict,
+                winnersByDistrict.getBinding(),
+                focus.getBinding())
+            .build();
+    panel.setSize(1024, 512);
+    compareRendering("SimpleVoteViewPanel", "PopularVote-1", panel);
+
+    LinkedHashMap<Integer, Party> winners = new LinkedHashMap<>();
+
+    curr.put(ndp, 124);
+    curr.put(pc, 1373);
+    curr.put(lib, 785);
+    curr.put(grn, 675);
+    currentVotes.setValue(curr);
+
+    prev.put(ndp, 585);
+    prev.put(pc, 785);
+    prev.put(lib, 1060);
+    prev.put(grn, 106);
+    previousVotes.setValue(prev);
+
+    voteHeader.setValue("1 OF 27 DISTRICTS DECLARED");
+    voteSubhead.setValue("PROJECTION: TOO EARLY TO CALL");
+    pctReporting.setValue(1.0 / 27);
+    winners.put(3, pc);
+    winnersByDistrict.setValue(winners);
+    compareRendering("SimpleVoteViewPanel", "PopularVote-2", panel);
+
+    focus.setValue(
+        shapesByDistrict.entrySet().stream()
+            .filter(e -> e.getKey() <= 7)
+            .map(Map.Entry::getValue)
+            .collect(Collectors.toList()));
+    mapHeader.setValue("CARDIGAN");
+    header.setValue("CARDIGAN");
+    pctReporting.setValue(1.0 / 7);
+    voteHeader.setValue("1 OF 7 DISTRICTS DECLARED");
+    compareRendering("SimpleVoteViewPanel", "PopularVote-3", panel);
   }
 
   private Map<Integer, Shape> peiShapesByDistrict() throws IOException {

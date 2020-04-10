@@ -10,6 +10,7 @@ import com.joecollins.graphics.components.MapFrame;
 import com.joecollins.graphics.components.MapFrameBuilder;
 import com.joecollins.graphics.components.SwingFrame;
 import com.joecollins.graphics.components.SwingFrameBuilder;
+import com.joecollins.graphics.screens.generic.SeatViewPanel.Builder;
 import com.joecollins.graphics.utils.StandardFont;
 import com.joecollins.models.general.Candidate;
 import com.joecollins.models.general.Party;
@@ -26,6 +27,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
@@ -114,11 +116,13 @@ public class SimpleVoteViewPanel extends JPanel {
     DIFF
   }
 
-  private static class PrevCurrEntryMap extends Bindable {
-    private Map<Candidate, Pair<Integer, Double>> curr = new LinkedHashMap<>();
+  private abstract static class PrevCurrEntryMap<CT> extends Bindable {
+    private Map<CT, Pair<Integer, Double>> curr = new LinkedHashMap<>();
     private Map<Party, Pair<Integer, Double>> prev = new LinkedHashMap<>();
 
-    void setCurr(Map<Candidate, Integer> curr) {
+    protected abstract Party toParty(CT val);
+
+    void setCurr(Map<CT, Integer> curr) {
       int total = Math.max(1, curr.values().stream().mapToInt(i -> i).sum());
       this.curr = new LinkedHashMap<>();
       curr.forEach((c, v) -> this.curr.put(c, ImmutablePair.of(v, 1.0 * v / total)));
@@ -137,7 +141,7 @@ public class SimpleVoteViewPanel extends JPanel {
           this,
           m -> {
             LinkedHashMap<Party, Integer> ret = new LinkedHashMap<>();
-            m.curr.forEach((c, v) -> ret.put(c.getParty(), v.getLeft()));
+            m.curr.forEach((c, v) -> ret.put(toParty(c), v.getLeft()));
             return ret;
           },
           PartyEntryProp.CURR);
@@ -154,7 +158,7 @@ public class SimpleVoteViewPanel extends JPanel {
           PartyEntryProp.PREV);
     }
 
-    Binding<Map<Candidate, Pair<Integer, Double>>> currPctBinding() {
+    Binding<Map<CT, Pair<Integer, Double>>> currPctBinding() {
       return Binding.propertyBinding(this, m -> m.curr, PartyEntryProp.CURR);
     }
 
@@ -170,10 +174,8 @@ public class SimpleVoteViewPanel extends JPanel {
                 (k, v) -> {
                   double d =
                       v.getRight()
-                          - (prev.containsKey(k.getParty())
-                              ? prev.get(k.getParty()).getRight()
-                              : 0);
-                  ret.put(k.getParty(), ImmutablePair.of(d, v.getLeft()));
+                          - (prev.containsKey(toParty(k)) ? prev.get(toParty(k)).getRight() : 0);
+                  ret.put(toParty(k), ImmutablePair.of(d, v.getLeft()));
                 });
             prev.forEach(
                 (k, v) -> {
@@ -194,8 +196,6 @@ public class SimpleVoteViewPanel extends JPanel {
     private BarFrameBuilder changeFrame;
     private SwingFrameBuilder swingFrame;
     private MapFrameBuilder mapFrame;
-
-    private BindingReceiver<? extends Map<Candidate, Integer>> currVotes;
 
     public static Builder basicCurrPrev(
         Binding<? extends Map<Candidate, Integer>> currVotes,
@@ -229,9 +229,14 @@ public class SimpleVoteViewPanel extends JPanel {
         Binding<String> swingHeaderBinding,
         List<Party> swingPartyOrder) {
       Builder builder = new Builder();
-      builder.currVotes = new BindingReceiver<>(currVotes);
-      PrevCurrEntryMap map = new PrevCurrEntryMap();
-      builder.currVotes.getBinding().bind(map::setCurr);
+      PrevCurrEntryMap<Candidate> map =
+          new PrevCurrEntryMap<>() {
+            @Override
+            protected Party toParty(Candidate val) {
+              return val.getParty();
+            }
+          };
+      currVotes.bind(map::setCurr);
       prevVotes.bind(map::setPrev);
 
       BindingReceiver<Double> pctReportingReceiver = new BindingReceiver<>(pctReporting);
@@ -277,6 +282,65 @@ public class SimpleVoteViewPanel extends JPanel {
       return builder;
     }
 
+    public static Builder basicPartyCurrPrev(
+        Binding<? extends Map<Party, Integer>> currVotes,
+        Binding<? extends Map<Party, Integer>> prevVotes,
+        Binding<Double> pctReporting,
+        Binding<String> headerBinding,
+        Binding<String> voteHeaderBinding,
+        Binding<String> voteSubheadBinding,
+        Binding<String> changeHeaderBinding,
+        Binding<String> swingHeaderBinding,
+        List<Party> swingPartyOrder) {
+      Builder builder = new Builder();
+      PrevCurrEntryMap<Party> map =
+          new PrevCurrEntryMap<>() {
+            @Override
+            protected Party toParty(Party val) {
+              return val;
+            }
+          };
+      currVotes.bind(map::setCurr);
+      prevVotes.bind(map::setPrev);
+
+      BindingReceiver<Double> pctReportingReceiver = new BindingReceiver<>(pctReporting);
+      builder.headerLabel = createLabel(headerBinding);
+      builder.voteFrame =
+          BarFrameBuilder.basic(
+                  map.currPctBinding(),
+                  c -> c.getName().toUpperCase(),
+                  c -> c.getColor(),
+                  v -> v.getRight(),
+                  v -> PCT_FORMAT.format(v.getRight()))
+              .withHeader(voteHeaderBinding)
+              .withSubhead(voteSubheadBinding)
+              .withMax(pctReportingReceiver.getBinding(i -> 2.0 / 3 / Math.max(i, 1e-6)));
+      builder.changeFrame =
+          BarFrameBuilder.basic(
+                  map.diffPctBinding(),
+                  p -> p.getAbbreviation().toUpperCase(),
+                  p -> p.getColor(),
+                  v -> v.getLeft(),
+                  v -> DIFF_FORMAT.format(v.getLeft()),
+                  (p, v) -> v.getRight())
+              .withHeader(changeHeaderBinding)
+              .withWingspan(pctReportingReceiver.getBinding(i -> 0.10 / Math.max(i, 1e-6)));
+      builder.swingFrame =
+          SwingFrameBuilder.prevCurr(
+                  map.prevPartyBinding(),
+                  map.currPartyBinding(),
+                  Comparator.comparing(
+                      p -> {
+                        int idx = swingPartyOrder.indexOf(p);
+                        if (idx < 0) {
+                          idx = swingPartyOrder.indexOf(Party.OTHERS);
+                        }
+                        return idx;
+                      }))
+              .withHeader(swingHeaderBinding);
+      return builder;
+    }
+
     private static JLabel createLabel(Binding<String> textBinding) {
       JLabel headerLabel = new JLabel();
       headerLabel.setFont(StandardFont.readBoldFont(32));
@@ -290,10 +354,12 @@ public class SimpleVoteViewPanel extends JPanel {
         Binding<String> headerBinding,
         Map<T, Shape> shapes,
         Binding<T> selectedShape,
+        Binding<Party> leadingParty,
         Binding<List<Shape>> focus) {
       BindableList<Pair<Shape, Color>> shapesList = new BindableList<>();
       BindingReceiver<List<Shape>> focusList = new BindingReceiver<>(focus);
       BindingReceiver<T> selected = new BindingReceiver<>(selectedShape);
+      BindingReceiver<Party> party = new BindingReceiver<>(leadingParty);
       Map<T, Integer> index = new HashMap<>();
       for (Map.Entry<T, Shape> shape : shapes.entrySet()) {
         index.put(shape.getKey(), shapesList.size());
@@ -307,7 +373,10 @@ public class SimpleVoteViewPanel extends JPanel {
                     (key, idx) -> {
                       Color color =
                           extractColor(
-                              focusList.getValue(), shapes.get(key), shapes.get(selectedUpdate));
+                              focusList.getValue(),
+                              shapes.get(key),
+                              shapes.get(selectedUpdate),
+                              party.getValue());
                       ImmutablePair<Shape, Color> entry = ImmutablePair.of(shapes.get(key), color);
                       shapesList.set(idx, entry);
                     });
@@ -320,22 +389,26 @@ public class SimpleVoteViewPanel extends JPanel {
                     (key, idx) -> {
                       Color color =
                           extractColor(
-                              focusUpdate, shapes.get(key), shapes.get(selected.getValue()));
+                              focusUpdate,
+                              shapes.get(key),
+                              shapes.get(selected.getValue()),
+                              party.getValue());
                       ImmutablePair<Shape, Color> entry = ImmutablePair.of(shapes.get(key), color);
                       shapesList.set(idx, entry);
                     });
               });
-      currVotes
+      party
           .getBinding()
           .bind(
-              votes -> {
+              p -> {
                 index.forEach(
                     (key, idx) -> {
                       Color color =
                           extractColor(
                               focusList.getValue(),
                               shapes.get(key),
-                              shapes.get(selected.getValue()));
+                              shapes.get(selected.getValue()),
+                              p);
                       ImmutablePair<Shape, Color> entry = ImmutablePair.of(shapes.get(key), color);
                       shapesList.set(idx, entry);
                     });
@@ -347,15 +420,74 @@ public class SimpleVoteViewPanel extends JPanel {
       return this;
     }
 
-    private Color extractColor(List<Shape> focus, Shape shape, Shape selected) {
+    public <T> Builder withMap(
+        Binding<String> headerBinding, Map<T, Shape> shapes, Binding<Map<T, Party>> winner) {
+      return withMap(headerBinding, shapes, winner, () -> null);
+    }
+
+    public <T> Builder withMap(
+        Binding<String> headerBinding,
+        Map<T, Shape> shapes,
+        Binding<Map<T, Party>> winner,
+        Binding<List<Shape>> focus) {
+      BindableList<Pair<Shape, Color>> shapesList = new BindableList<>();
+      BindingReceiver<List<Shape>> focusList = new BindingReceiver<>(focus);
+      BindingReceiver<Map<T, Party>> winnerMap = new BindingReceiver<>(winner);
+      Map<T, Integer> index = new HashMap<>();
+      for (Map.Entry<T, Shape> shape : shapes.entrySet()) {
+        index.put(shape.getKey(), shapesList.size());
+        shapesList.add(ImmutablePair.of(shape.getValue(), Color.LIGHT_GRAY));
+      }
+      winnerMap
+          .getBinding()
+          .bind(
+              winnerUpdate -> {
+                index.forEach(
+                    (key, idx) -> {
+                      Color color =
+                          extractColor(
+                              focusList.getValue(), shapes.get(key), winnerUpdate.get(key));
+                      ImmutablePair<Shape, Color> entry = ImmutablePair.of(shapes.get(key), color);
+                      shapesList.set(idx, entry);
+                    });
+              });
+      focusList
+          .getBinding()
+          .bind(
+              focusUpdate -> {
+                index.forEach(
+                    (key, idx) -> {
+                      Color color =
+                          extractColor(focusUpdate, shapes.get(key), winnerMap.getValue().get(key));
+                      ImmutablePair<Shape, Color> entry = ImmutablePair.of(shapes.get(key), color);
+                      shapesList.set(idx, entry);
+                    });
+              });
+      mapFrame =
+          MapFrameBuilder.from(shapesList)
+              .withFocus(focusList.getBinding())
+              .withHeader(headerBinding);
+      return this;
+    }
+
+    private Color extractColor(List<Shape> focus, Shape shape, Party winner) {
+      Color color;
+      if (winner != null) {
+        color = winner.getColor();
+      } else {
+        if (focus == null || focus.isEmpty() || focus.contains(shape)) {
+          color = Color.LIGHT_GRAY;
+        } else {
+          color = new Color(220, 220, 220);
+        }
+      }
+      return color;
+    }
+
+    private Color extractColor(List<Shape> focus, Shape shape, Shape selected, Party party) {
       Color color;
       if (selected == shape) {
-        color =
-            currVotes.getValue().entrySet().stream()
-                .max(Map.Entry.comparingByValue())
-                .filter(e -> e.getValue() > 0)
-                .map(e -> e.getKey().getParty().getColor())
-                .orElse(Color.BLACK);
+        color = Optional.ofNullable(party).map(Party::getColor).orElse(Color.BLACK);
       } else {
         if (focus == null || focus.isEmpty() || focus.contains(shape)) {
           color = Color.LIGHT_GRAY;
