@@ -11,6 +11,7 @@ import com.joecollins.graphics.components.MapFrameBuilder;
 import com.joecollins.graphics.components.SwingFrame;
 import com.joecollins.graphics.components.SwingFrameBuilder;
 import com.joecollins.graphics.utils.StandardFont;
+import com.joecollins.models.general.Candidate;
 import com.joecollins.models.general.Party;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -101,20 +102,26 @@ public class SeatViewPanel extends JPanel {
     DIFF
   }
 
-  private static class PrevCurrEntryMap<C, P, D> extends Bindable {
-    private Map<Party, ? extends C> curr = new LinkedHashMap<>();
+  private static class PrevCurrEntryMap<K, C, P, D> extends Bindable {
+    private Map<K, ? extends C> curr = new LinkedHashMap<>();
     private Map<Party, ? extends P> prev = new LinkedHashMap<>();
     private final BiFunction<C, P, D> diffFunction;
+    private final Function<K, Party> partyFunction;
     private final C currIdentity;
     private final P prevIdentity;
 
-    private PrevCurrEntryMap(BiFunction<C, P, D> diffFunction, C currIdentity, P prevIdentity) {
+    private PrevCurrEntryMap(
+        BiFunction<C, P, D> diffFunction,
+        Function<K, Party> partyFunction,
+        C currIdentity,
+        P prevIdentity) {
       this.diffFunction = diffFunction;
+      this.partyFunction = partyFunction;
       this.currIdentity = currIdentity;
       this.prevIdentity = prevIdentity;
     }
 
-    void setCurr(Map<Party, ? extends C> curr) {
+    void setCurr(Map<K, ? extends C> curr) {
       this.curr = curr;
       onPropertyRefreshed(PartyEntryProp.CURR);
     }
@@ -124,7 +131,7 @@ public class SeatViewPanel extends JPanel {
       onPropertyRefreshed(PartyEntryProp.PREV);
     }
 
-    Binding<Map<Party, ? extends C>> currBinding() {
+    Binding<Map<K, ? extends C>> currBinding() {
       return Binding.propertyBinding(this, m -> m.curr, PartyEntryProp.CURR);
     }
 
@@ -135,8 +142,9 @@ public class SeatViewPanel extends JPanel {
             LinkedHashMap<Party, ImmutablePair<D, C>> ret = new LinkedHashMap<>();
             curr.forEach(
                 (k, v) -> {
-                  D d = diffFunction.apply(v, prev.containsKey(k) ? prev.get(k) : prevIdentity);
-                  ret.put(k, ImmutablePair.of(d, v));
+                  Party p = partyFunction.apply(k);
+                  D d = diffFunction.apply(v, prev.containsKey(p) ? prev.get(p) : prevIdentity);
+                  ret.put(p, ImmutablePair.of(d, v));
                 });
             prev.forEach(
                 (k, v) -> {
@@ -250,9 +258,36 @@ public class SeatViewPanel extends JPanel {
         Binding<String> seatSubhead,
         Binding<String> changeHeader) {
 
-      class PEM extends PrevCurrEntryMap<Integer, Integer, Integer> {
+      class PEM extends PrevCurrEntryMap<Party, Integer, Integer, Integer> {
         private PEM() {
-          super((a, b) -> a - b, 0, 0);
+          super((a, b) -> a - b, Function.identity(), 0, 0);
+        }
+      }
+      PEM map = new PEM();
+      currentSeats.bind(map::setCurr);
+      previousSeats.bind(map::setPrev);
+
+      Builder builder = new Builder();
+      builder.limits = new Limits();
+      totalSeats.bind(builder.limits::setMax);
+      builder.headerLabel = createLabel(header);
+      builder.seatFrame = createFrame(seatHeader, seatSubhead, builder.limits, map.currBinding());
+      builder.changeFrame = createDiffFrame(changeHeader, builder.limits, map.diffBinding());
+      return builder;
+    }
+
+    public static Builder basicCandidateCurrPrev(
+        Binding<? extends Map<Candidate, Integer>> currentSeats,
+        Binding<? extends Map<Party, Integer>> previousSeats,
+        Binding<Integer> totalSeats,
+        Binding<String> header,
+        Binding<String> seatHeader,
+        Binding<String> seatSubhead,
+        Binding<String> changeHeader) {
+
+      class PEM extends PrevCurrEntryMap<Candidate, Integer, Integer, Integer> {
+        private PEM() {
+          super((a, b) -> a - b, Candidate::getParty, 0, 0);
         }
       }
       PEM map = new PEM();
@@ -264,30 +299,8 @@ public class SeatViewPanel extends JPanel {
       totalSeats.bind(builder.limits::setMax);
       builder.headerLabel = createLabel(header);
       builder.seatFrame =
-          BarFrameBuilder.basic(
-                  map.currBinding(),
-                  party -> party.getName().toUpperCase(),
-                  party -> party.getColor(),
-                  Function.identity(),
-                  seats -> seats.toString(),
-                  (party, seats) -> party == Party.OTHERS ? -1 : seats)
-              .withHeader(seatHeader)
-              .withSubhead(seatSubhead)
-              .withMax(
-                  Binding.propertyBinding(
-                      builder.limits, l -> Math.max(1, l.max * 2 / 3), Limits.LimitsProp.PROP));
-      builder.changeFrame =
-          BarFrameBuilder.basic(
-                  map.diffBinding(),
-                  party -> party.getAbbreviation().toUpperCase(),
-                  party -> party.getColor(),
-                  seats -> seats.getLeft(),
-                  seats -> changeStr(seats.getLeft()),
-                  (party, seats) -> party == Party.OTHERS ? -1 : seats.getRight())
-              .withHeader(changeHeader)
-              .withWingspan(
-                  Binding.propertyBinding(
-                      builder.limits, l -> Math.max(1, l.max / 20), Limits.LimitsProp.PROP));
+          createCandidateFrame(seatHeader, seatSubhead, builder.limits, map.currBinding());
+      builder.changeFrame = createDiffFrame(changeHeader, builder.limits, map.diffBinding());
       return builder;
     }
 
@@ -312,32 +325,67 @@ public class SeatViewPanel extends JPanel {
       builder.limits = new Limits();
       totalSeats.bind(builder.limits::setMax);
       builder.headerLabel = createLabel(header);
-      builder.seatFrame =
-          BarFrameBuilder.basic(
-                  map.currBinding(),
-                  party -> party.getName().toUpperCase(),
-                  party -> party.getColor(),
-                  Function.identity(),
-                  seats -> seats.toString(),
-                  (party, seats) -> party == Party.OTHERS ? -1 : seats)
-              .withHeader(seatHeader)
-              .withSubhead(seatSubhead)
-              .withMax(
-                  Binding.propertyBinding(
-                      builder.limits, l -> Math.max(1, l.max * 2 / 3), Limits.LimitsProp.PROP));
-      builder.changeFrame =
-          BarFrameBuilder.basic(
-                  map.diffBinding(),
-                  party -> party.getAbbreviation().toUpperCase(),
-                  party -> party.getColor(),
-                  seats -> seats.getLeft(),
-                  seats -> changeStr(seats.getLeft()),
-                  (party, seats) -> party == Party.OTHERS ? -1 : seats.getRight())
-              .withHeader(changeHeader)
-              .withWingspan(
-                  Binding.propertyBinding(
-                      builder.limits, l -> Math.max(1, l.max / 20), Limits.LimitsProp.PROP));
+      builder.seatFrame = createFrame(seatHeader, seatSubhead, builder.limits, map.currBinding());
+      builder.changeFrame = createDiffFrame(changeHeader, builder.limits, map.diffBinding());
       return builder;
+    }
+
+    private static BarFrameBuilder createFrame(
+        Binding<String> seatHeader,
+        Binding<String> seatSubhead,
+        Limits limits,
+        Binding<Map<Party, ? extends Integer>> mapBinding) {
+      return BarFrameBuilder.basic(
+              mapBinding,
+              party -> party.getName().toUpperCase(),
+              party -> party.getColor(),
+              Function.identity(),
+              seats -> seats.toString(),
+              (party, seats) -> party == Party.OTHERS ? -1 : seats)
+          .withHeader(seatHeader)
+          .withSubhead(seatSubhead)
+          .withMax(
+              Binding.propertyBinding(
+                  limits, l -> Math.max(1, l.max * 2 / 3), Limits.LimitsProp.PROP));
+    }
+
+    private static BarFrameBuilder createCandidateFrame(
+        Binding<String> seatHeader,
+        Binding<String> seatSubhead,
+        Limits limits,
+        Binding<Map<Candidate, ? extends Integer>> mapBinding) {
+      return BarFrameBuilder.basic(
+              mapBinding,
+              candidate ->
+                  candidate.getName().toUpperCase()
+                      + "\n"
+                      + candidate.getParty().getName().toUpperCase(),
+              candidate -> candidate.getParty().getColor(),
+              Function.identity(),
+              seats -> seats.toString(),
+              (candidate, seats) -> seats)
+          .withHeader(seatHeader)
+          .withSubhead(seatSubhead)
+          .withMax(
+              Binding.propertyBinding(
+                  limits, l -> Math.max(1, l.max * 2 / 3), Limits.LimitsProp.PROP));
+    }
+
+    private static BarFrameBuilder createDiffFrame(
+        Binding<String> changeHeader,
+        Limits limits,
+        Binding<Map<Party, ? extends Pair<Integer, Integer>>> mapBinding) {
+      return BarFrameBuilder.basic(
+              mapBinding,
+              party -> party.getAbbreviation().toUpperCase(),
+              party -> party.getColor(),
+              seats -> seats.getLeft(),
+              seats -> changeStr(seats.getLeft()),
+              (party, seats) -> party == Party.OTHERS ? -1 : seats.getRight())
+          .withHeader(changeHeader)
+          .withWingspan(
+              Binding.propertyBinding(
+                  limits, l -> Math.max(1, l.max / 20), Limits.LimitsProp.PROP));
     }
 
     private static String changeStr(Integer seats) {
@@ -354,10 +402,11 @@ public class SeatViewPanel extends JPanel {
         Binding<String> changeHeader) {
       class PEM
           extends PrevCurrEntryMap<
-              Pair<Integer, Integer>, Pair<Integer, Integer>, Pair<Integer, Integer>> {
+              Party, Pair<Integer, Integer>, Pair<Integer, Integer>, Pair<Integer, Integer>> {
         private PEM() {
           super(
               (a, b) -> ImmutablePair.of(a.getLeft() - b.getLeft(), a.getRight() - b.getRight()),
+              Function.identity(),
               ImmutablePair.of(0, 0),
               ImmutablePair.of(0, 0));
         }
@@ -371,33 +420,41 @@ public class SeatViewPanel extends JPanel {
       totalSeats.bind(builder.limits::setMax);
       builder.headerLabel = createLabel(header);
       builder.seatFrame =
-          BarFrameBuilder.dual(
-                  map.currBinding(),
-                  party -> party.getName().toUpperCase(),
-                  party -> party.getColor(),
-                  Function.identity(),
-                  seats -> seats.getLeft() + "/" + seats.getRight(),
-                  (party, seats) -> party == Party.OTHERS ? -1 : seats.getRight())
-              .withHeader(seatHeader)
-              .withSubhead(seatSubhead)
-              .withMax(
-                  Binding.propertyBinding(
-                      builder.limits, l -> Math.max(1, l.max * 2 / 3), Limits.LimitsProp.PROP));
-      builder.changeFrame =
-          BarFrameBuilder.dual(
-                  map.diffBinding(),
-                  party -> party.getAbbreviation().toUpperCase(),
-                  party -> party.getColor(),
-                  seats -> seats.getLeft(),
-                  seats ->
-                      changeStr(seats.getLeft().getLeft())
-                          + "/"
-                          + changeStr(seats.getLeft().getRight()),
-                  (party, seats) -> party == Party.OTHERS ? -1 : seats.getRight().getRight())
-              .withHeader(changeHeader)
-              .withWingspan(
-                  Binding.propertyBinding(
-                      builder.limits, l -> Math.max(1, l.max / 20), Limits.LimitsProp.PROP));
+          createDualFrame(seatHeader, seatSubhead, builder.limits, map.currBinding());
+      builder.changeFrame = createDualChangeFrame(changeHeader, builder.limits, map.diffBinding());
+      return builder;
+    }
+
+    public static Builder dualCandidateCurrPrev(
+        Binding<? extends Map<Candidate, ? extends Pair<Integer, Integer>>> currentSeats,
+        Binding<? extends Map<Party, ? extends Pair<Integer, Integer>>> previousSeats,
+        Binding<Integer> totalSeats,
+        Binding<String> header,
+        Binding<String> seatHeader,
+        Binding<String> seatSubhead,
+        Binding<String> changeHeader) {
+      class PEM
+          extends PrevCurrEntryMap<
+              Candidate, Pair<Integer, Integer>, Pair<Integer, Integer>, Pair<Integer, Integer>> {
+        private PEM() {
+          super(
+              (a, b) -> ImmutablePair.of(a.getLeft() - b.getLeft(), a.getRight() - b.getRight()),
+              Candidate::getParty,
+              ImmutablePair.of(0, 0),
+              ImmutablePair.of(0, 0));
+        }
+      }
+      PEM map = new PEM();
+      currentSeats.bind(map::setCurr);
+      previousSeats.bind(map::setPrev);
+
+      Builder builder = new Builder();
+      builder.limits = new Limits();
+      totalSeats.bind(builder.limits::setMax);
+      builder.headerLabel = createLabel(header);
+      builder.seatFrame =
+          createDualCandidateFrame(seatHeader, seatSubhead, builder.limits, map.currBinding());
+      builder.changeFrame = createDualChangeFrame(changeHeader, builder.limits, map.diffBinding());
       return builder;
     }
 
@@ -423,34 +480,71 @@ public class SeatViewPanel extends JPanel {
       totalSeats.bind(builder.limits::setMax);
       builder.headerLabel = createLabel(header);
       builder.seatFrame =
-          BarFrameBuilder.dual(
-                  map.currBinding(),
-                  party -> party.getName().toUpperCase(),
-                  party -> party.getColor(),
-                  Function.identity(),
-                  seats -> seats.getLeft() + "/" + seats.getRight(),
-                  (party, seats) -> party == Party.OTHERS ? -1 : seats.getRight())
-              .withHeader(seatHeader)
-              .withSubhead(seatSubhead)
-              .withMax(
-                  Binding.propertyBinding(
-                      builder.limits, l -> Math.max(1, l.max * 2 / 3), Limits.LimitsProp.PROP));
-      builder.changeFrame =
-          BarFrameBuilder.dual(
-                  map.diffBinding(),
-                  party -> party.getAbbreviation().toUpperCase(),
-                  party -> party.getColor(),
-                  seats -> seats.getLeft(),
-                  seats ->
-                      changeStr(seats.getLeft().getLeft())
-                          + "/"
-                          + changeStr(seats.getLeft().getRight()),
-                  (party, seats) -> party == Party.OTHERS ? -1 : seats.getRight().getRight())
-              .withHeader(changeHeader)
-              .withWingspan(
-                  Binding.propertyBinding(
-                      builder.limits, l -> Math.max(1, l.max / 20), Limits.LimitsProp.PROP));
+          createDualFrame(seatHeader, seatSubhead, builder.limits, map.currBinding());
+      builder.changeFrame = createDualChangeFrame(changeHeader, builder.limits, map.diffBinding());
       return builder;
+    }
+
+    private static BarFrameBuilder createDualFrame(
+        Binding<String> seatHeader,
+        Binding<String> seatSubhead,
+        Limits limits,
+        Binding<Map<Party, ? extends Pair<Integer, Integer>>> mapBinding) {
+      return BarFrameBuilder.dual(
+              mapBinding,
+              party -> party.getName().toUpperCase(),
+              party -> party.getColor(),
+              Function.identity(),
+              seats -> seats.getLeft() + "/" + seats.getRight(),
+              (party, seats) -> party == Party.OTHERS ? -1 : seats.getRight())
+          .withHeader(seatHeader)
+          .withSubhead(seatSubhead)
+          .withMax(
+              Binding.propertyBinding(
+                  limits, l -> Math.max(1, l.max * 2 / 3), Limits.LimitsProp.PROP));
+    }
+
+    private static BarFrameBuilder createDualCandidateFrame(
+        Binding<String> seatHeader,
+        Binding<String> seatSubhead,
+        Limits limits,
+        Binding<Map<Candidate, ? extends Pair<Integer, Integer>>> mapBinding) {
+      return BarFrameBuilder.dual(
+              mapBinding,
+              candidate ->
+                  candidate.getName().toUpperCase()
+                      + "\n"
+                      + candidate.getParty().getName().toUpperCase(),
+              candidate -> candidate.getParty().getColor(),
+              Function.identity(),
+              seats -> seats.getLeft() + "/" + seats.getRight(),
+              (candidate, seats) -> seats.getRight())
+          .withHeader(seatHeader)
+          .withSubhead(seatSubhead)
+          .withMax(
+              Binding.propertyBinding(
+                  limits, l -> Math.max(1, l.max * 2 / 3), Limits.LimitsProp.PROP));
+    }
+
+    private static BarFrameBuilder createDualChangeFrame(
+        Binding<String> changeHeader,
+        Limits limits,
+        Binding<Map<Party, ? extends Pair<Pair<Integer, Integer>, Pair<Integer, Integer>>>>
+            mapBinding) {
+      return BarFrameBuilder.dual(
+              mapBinding,
+              party -> party.getAbbreviation().toUpperCase(),
+              party -> party.getColor(),
+              seats -> seats.getLeft(),
+              seats ->
+                  changeStr(seats.getLeft().getLeft())
+                      + "/"
+                      + changeStr(seats.getLeft().getRight()),
+              (party, seats) -> party == Party.OTHERS ? -1 : seats.getRight().getRight())
+          .withHeader(changeHeader)
+          .withWingspan(
+              Binding.propertyBinding(
+                  limits, l -> Math.max(1, l.max / 20), Limits.LimitsProp.PROP));
     }
 
     public static Builder rangeCurrPrev(
@@ -461,9 +555,13 @@ public class SeatViewPanel extends JPanel {
         Binding<String> seatHeader,
         Binding<String> seatSubhead,
         Binding<String> changeHeader) {
-      class PEM extends PrevCurrEntryMap<Range<Integer>, Integer, Range<Integer>> {
+      class PEM extends PrevCurrEntryMap<Party, Range<Integer>, Integer, Range<Integer>> {
         private PEM() {
-          super((a, b) -> Range.between(a.getMinimum() - b, a.getMaximum() - b), Range.is(0), 0);
+          super(
+              (a, b) -> Range.between(a.getMinimum() - b, a.getMaximum() - b),
+              Function.identity(),
+              Range.is(0),
+              0);
         }
       }
       PEM map = new PEM();
@@ -475,40 +573,39 @@ public class SeatViewPanel extends JPanel {
       totalSeats.bind(builder.limits::setMax);
       builder.headerLabel = createLabel(header);
       builder.seatFrame =
-          BarFrameBuilder.dual(
-                  map.currBinding(),
-                  party -> party.getName().toUpperCase(),
-                  party -> party.getColor(),
-                  seats -> ImmutablePair.of(seats.getMinimum(), seats.getMaximum()),
-                  seats -> seats.getMinimum() + "-" + seats.getMaximum(),
-                  (party, seats) ->
-                      party == Party.OTHERS ? -1 : seats.getMinimum() + seats.getMaximum())
-              .withHeader(seatHeader)
-              .withSubhead(seatSubhead)
-              .withMax(
-                  Binding.propertyBinding(
-                      builder.limits, l -> Math.max(1, l.max * 2 / 3), Limits.LimitsProp.PROP));
-      builder.changeFrame =
-          BarFrameBuilder.dual(
-                  map.diffBinding(),
-                  party -> party.getAbbreviation().toUpperCase(),
-                  party -> party.getColor(),
-                  seats ->
-                      ImmutablePair.of(seats.getLeft().getMinimum(), seats.getLeft().getMaximum()),
-                  seats ->
-                      "("
-                          + changeStr(seats.getLeft().getMinimum())
-                          + ")-("
-                          + changeStr(seats.getLeft().getMaximum())
-                          + ")",
-                  (party, seats) ->
-                      party == Party.OTHERS
-                          ? -1
-                          : seats.getRight().getMinimum() + seats.getRight().getMaximum())
-              .withHeader(changeHeader)
-              .withWingspan(
-                  Binding.propertyBinding(
-                      builder.limits, l -> Math.max(1, l.max / 20), Limits.LimitsProp.PROP));
+          createRangeFrame(seatHeader, seatSubhead, builder.limits, map.currBinding());
+      builder.changeFrame = getRangeDiffFrame(changeHeader, builder.limits, map.diffBinding());
+      return builder;
+    }
+
+    public static Builder rangeCandidateCurrPrev(
+        Binding<? extends Map<Candidate, Range<Integer>>> currentSeats,
+        Binding<? extends Map<Party, Integer>> previousSeats,
+        Binding<Integer> totalSeats,
+        Binding<String> header,
+        Binding<String> seatHeader,
+        Binding<String> seatSubhead,
+        Binding<String> changeHeader) {
+      class PEM extends PrevCurrEntryMap<Candidate, Range<Integer>, Integer, Range<Integer>> {
+        private PEM() {
+          super(
+              (a, b) -> Range.between(a.getMinimum() - b, a.getMaximum() - b),
+              Candidate::getParty,
+              Range.is(0),
+              0);
+        }
+      }
+      PEM map = new PEM();
+      currentSeats.bind(map::setCurr);
+      previousSeats.bind(map::setPrev);
+
+      Builder builder = new Builder();
+      builder.limits = new Limits();
+      totalSeats.bind(builder.limits::setMax);
+      builder.headerLabel = createLabel(header);
+      builder.seatFrame =
+          createCandidateRangeFrame(seatHeader, seatSubhead, builder.limits, map.currBinding());
+      builder.changeFrame = getRangeDiffFrame(changeHeader, builder.limits, map.diffBinding());
       return builder;
     }
 
@@ -534,41 +631,76 @@ public class SeatViewPanel extends JPanel {
       totalSeats.bind(builder.limits::setMax);
       builder.headerLabel = createLabel(header);
       builder.seatFrame =
-          BarFrameBuilder.dual(
-                  map.currBinding(),
-                  party -> party.getName().toUpperCase(),
-                  party -> party.getColor(),
-                  seats -> ImmutablePair.of(seats.getMinimum(), seats.getMaximum()),
-                  seats -> seats.getMinimum() + "-" + seats.getMaximum(),
-                  (party, seats) ->
-                      party == Party.OTHERS ? -1 : seats.getMinimum() + seats.getMaximum())
-              .withHeader(seatHeader)
-              .withSubhead(seatSubhead)
-              .withMax(
-                  Binding.propertyBinding(
-                      builder.limits, l -> Math.max(1, l.max * 2 / 3), Limits.LimitsProp.PROP));
-      builder.changeFrame =
-          BarFrameBuilder.dual(
-                  map.diffBinding(),
-                  party -> party.getAbbreviation().toUpperCase(),
-                  party -> party.getColor(),
-                  seats ->
-                      ImmutablePair.of(seats.getLeft().getMinimum(), seats.getLeft().getMaximum()),
-                  seats ->
-                      "("
-                          + changeStr(seats.getLeft().getMinimum())
-                          + ")-("
-                          + changeStr(seats.getLeft().getMaximum())
-                          + ")",
-                  (party, seats) ->
-                      party == Party.OTHERS
-                          ? -1
-                          : seats.getRight().getMinimum() + seats.getRight().getMaximum())
-              .withHeader(changeHeader)
-              .withWingspan(
-                  Binding.propertyBinding(
-                      builder.limits, l -> Math.max(1, l.max / 20), Limits.LimitsProp.PROP));
+          createRangeFrame(seatHeader, seatSubhead, builder.limits, map.currBinding());
+      builder.changeFrame = getRangeDiffFrame(changeHeader, builder.limits, map.diffBinding());
       return builder;
+    }
+
+    private static BarFrameBuilder createRangeFrame(
+        Binding<String> seatHeader,
+        Binding<String> seatSubhead,
+        Limits limits,
+        Binding<Map<Party, ? extends Range<Integer>>> mapBinding) {
+      return BarFrameBuilder.dual(
+              mapBinding,
+              party -> party.getName().toUpperCase(),
+              party -> party.getColor(),
+              seats -> ImmutablePair.of(seats.getMinimum(), seats.getMaximum()),
+              seats -> seats.getMinimum() + "-" + seats.getMaximum(),
+              (party, seats) ->
+                  party == Party.OTHERS ? -1 : seats.getMinimum() + seats.getMaximum())
+          .withHeader(seatHeader)
+          .withSubhead(seatSubhead)
+          .withMax(
+              Binding.propertyBinding(
+                  limits, l -> Math.max(1, l.max * 2 / 3), Limits.LimitsProp.PROP));
+    }
+
+    private static BarFrameBuilder createCandidateRangeFrame(
+        Binding<String> seatHeader,
+        Binding<String> seatSubhead,
+        Limits limits,
+        Binding<Map<Candidate, ? extends Range<Integer>>> mapBinding) {
+      return BarFrameBuilder.dual(
+              mapBinding,
+              candidate ->
+                  candidate.getName().toUpperCase()
+                      + "\n"
+                      + candidate.getParty().getName().toUpperCase(),
+              candidate -> candidate.getParty().getColor(),
+              seats -> ImmutablePair.of(seats.getMinimum(), seats.getMaximum()),
+              seats -> seats.getMinimum() + "-" + seats.getMaximum(),
+              (candidate, seats) -> seats.getMinimum() + seats.getMaximum())
+          .withHeader(seatHeader)
+          .withSubhead(seatSubhead)
+          .withMax(
+              Binding.propertyBinding(
+                  limits, l -> Math.max(1, l.max * 2 / 3), Limits.LimitsProp.PROP));
+    }
+
+    private static BarFrameBuilder getRangeDiffFrame(
+        Binding<String> changeHeader,
+        Limits limits,
+        Binding<Map<Party, ? extends Pair<Range<Integer>, Range<Integer>>>> mapBinding) {
+      return BarFrameBuilder.dual(
+              mapBinding,
+              party -> party.getAbbreviation().toUpperCase(),
+              party -> party.getColor(),
+              seats -> ImmutablePair.of(seats.getLeft().getMinimum(), seats.getLeft().getMaximum()),
+              seats ->
+                  "("
+                      + changeStr(seats.getLeft().getMinimum())
+                      + ")-("
+                      + changeStr(seats.getLeft().getMaximum())
+                      + ")",
+              (party, seats) ->
+                  party == Party.OTHERS
+                      ? -1
+                      : seats.getRight().getMinimum() + seats.getRight().getMaximum())
+          .withHeader(changeHeader)
+          .withWingspan(
+              Binding.propertyBinding(
+                  limits, l -> Math.max(1, l.max / 20), Limits.LimitsProp.PROP));
     }
 
     public Builder withMajorityLine(

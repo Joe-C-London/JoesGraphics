@@ -5,6 +5,7 @@ import static com.joecollins.graphics.utils.RenderTestUtils.compareRendering;
 import com.joecollins.graphics.components.MapFrameTest;
 import com.joecollins.graphics.utils.BindableWrapper;
 import com.joecollins.graphics.utils.ShapefileReader;
+import com.joecollins.models.general.Candidate;
 import com.joecollins.models.general.Party;
 import java.awt.Color;
 import java.awt.Shape;
@@ -825,6 +826,132 @@ public class SeatViewPanelTest {
     seatDiff.setValue(diff);
 
     compareRendering("SeatViewPanel", "Range-4", panel);
+  }
+
+  @Test
+  public void testCandidates() throws IOException {
+    BindableWrapper<LinkedHashMap<Candidate, Integer>> currentSeats =
+        new BindableWrapper<>(new LinkedHashMap<>());
+    BindableWrapper<LinkedHashMap<Party, Integer>> previousSeats =
+        new BindableWrapper<>(new LinkedHashMap<>());
+    BindableWrapper<Integer> totalSeats = new BindableWrapper<>(538);
+    BindableWrapper<Boolean> showMajority = new BindableWrapper<>(true);
+    BindableWrapper<String> header = new BindableWrapper<>("UNITED STATES");
+    BindableWrapper<String> seatHeader = new BindableWrapper<>("PRESIDENT");
+    BindableWrapper<String> seatSubhead = new BindableWrapper<>("");
+    BindableWrapper<String> changeHeader = new BindableWrapper<>("CHANGE SINCE 2012");
+
+    Candidate clinton = new Candidate("Hillary Clinton", new Party("Democrat", "DEM", Color.BLUE));
+    Candidate trump = new Candidate("Donald Trump", new Party("Republican", "GOP", Color.RED));
+
+    LinkedHashMap<Candidate, Integer> curr = new LinkedHashMap<>();
+    LinkedHashMap<Party, Integer> prev = new LinkedHashMap<>();
+
+    curr.put(clinton, 232);
+    curr.put(trump, 306);
+    currentSeats.setValue(curr);
+
+    prev.put(clinton.getParty(), 332);
+    prev.put(trump.getParty(), 206);
+    previousSeats.setValue(prev);
+
+    SeatViewPanel panel =
+        SeatViewPanel.Builder.basicCandidateCurrPrev(
+                currentSeats.getBinding(),
+                previousSeats.getBinding(),
+                totalSeats.getBinding(),
+                header.getBinding(),
+                seatHeader.getBinding(),
+                seatSubhead.getBinding(),
+                changeHeader.getBinding())
+            .withMajorityLine(showMajority.getBinding(), n -> n + " ELECTORAL VOTES TO WIN")
+            .build();
+    panel.setSize(1024, 512);
+    compareRendering("SeatViewPanel", "Candidate-1", panel);
+  }
+
+  @Test
+  public void testCandidatesDual() throws IOException {
+    BindableWrapper<LinkedHashMap<Candidate, Pair<Integer, Integer>>> currentSeats =
+        new BindableWrapper<>(new LinkedHashMap<>());
+    BindableWrapper<LinkedHashMap<Party, Pair<Integer, Integer>>> previousSeats =
+        new BindableWrapper<>(new LinkedHashMap<>());
+    BindableWrapper<Integer> totalSeats = new BindableWrapper<>(538);
+    BindableWrapper<Boolean> showMajority = new BindableWrapper<>(true);
+    BindableWrapper<String> header = new BindableWrapper<>("UNITED STATES");
+    BindableWrapper<String> seatHeader = new BindableWrapper<>("PRESIDENT");
+    BindableWrapper<String> seatSubhead = new BindableWrapper<>("");
+    BindableWrapper<String> changeHeader = new BindableWrapper<>("CHANGE SINCE 2012");
+
+    Candidate clinton = new Candidate("Hillary Clinton", new Party("Democrat", "DEM", Color.BLUE));
+    Candidate trump = new Candidate("Donald Trump", new Party("Republican", "GOP", Color.RED));
+
+    LinkedHashMap<Candidate, Pair<Integer, Integer>> curr = new LinkedHashMap<>();
+    LinkedHashMap<Party, Pair<Integer, Integer>> prev = new LinkedHashMap<>();
+
+    curr.put(clinton, ImmutablePair.of(218, 232));
+    curr.put(trump, ImmutablePair.of(276, 306));
+    currentSeats.setValue(curr);
+
+    prev.put(clinton.getParty(), ImmutablePair.of(302, 332));
+    prev.put(trump.getParty(), ImmutablePair.of(192, 206));
+    previousSeats.setValue(prev);
+
+    SeatViewPanel panel =
+        SeatViewPanel.Builder.dualCandidateCurrPrev(
+                currentSeats.getBinding(),
+                previousSeats.getBinding(),
+                totalSeats.getBinding(),
+                header.getBinding(),
+                seatHeader.getBinding(),
+                seatSubhead.getBinding(),
+                changeHeader.getBinding())
+            .withMajorityLine(showMajority.getBinding(), n -> n + " ELECTORAL VOTES TO WIN")
+            .build();
+    panel.setSize(1024, 512);
+    compareRendering("SeatViewPanel", "Candidate-2", panel);
+  }
+
+  @Test
+  public void testCandidatesRange() throws IOException {
+    BindableWrapper<LinkedHashMap<Candidate, Range<Integer>>> currentSeats =
+        new BindableWrapper<>(new LinkedHashMap<>());
+    BindableWrapper<LinkedHashMap<Party, Integer>> previousSeats =
+        new BindableWrapper<>(new LinkedHashMap<>());
+    BindableWrapper<Integer> totalSeats = new BindableWrapper<>(538);
+    BindableWrapper<Boolean> showMajority = new BindableWrapper<>(true);
+    BindableWrapper<String> header = new BindableWrapper<>("UNITED STATES");
+    BindableWrapper<String> seatHeader = new BindableWrapper<>("PRESIDENT");
+    BindableWrapper<String> seatSubhead = new BindableWrapper<>("");
+    BindableWrapper<String> changeHeader = new BindableWrapper<>("CHANGE SINCE 2012");
+
+    Candidate clinton = new Candidate("Hillary Clinton", new Party("Democrat", "DEM", Color.BLUE));
+    Candidate trump = new Candidate("Donald Trump", new Party("Republican", "GOP", Color.RED));
+
+    LinkedHashMap<Candidate, Range<Integer>> curr = new LinkedHashMap<>();
+    LinkedHashMap<Party, Integer> prev = new LinkedHashMap<>();
+
+    curr.put(clinton, Range.between(303 - 65, 303 + 65));
+    curr.put(trump, Range.between(235 - 65, 235 + 65));
+    currentSeats.setValue(curr);
+
+    prev.put(clinton.getParty(), 332);
+    prev.put(trump.getParty(), 206);
+    previousSeats.setValue(prev);
+
+    SeatViewPanel panel =
+        SeatViewPanel.Builder.rangeCandidateCurrPrev(
+                currentSeats.getBinding(),
+                previousSeats.getBinding(),
+                totalSeats.getBinding(),
+                header.getBinding(),
+                seatHeader.getBinding(),
+                seatSubhead.getBinding(),
+                changeHeader.getBinding())
+            .withMajorityLine(showMajority.getBinding(), n -> n + " ELECTORAL VOTES TO WIN")
+            .build();
+    panel.setSize(1024, 512);
+    compareRendering("SeatViewPanel", "Candidate-3", panel);
   }
 
   private Map<Integer, Shape> peiShapesByDistrict() throws IOException {
