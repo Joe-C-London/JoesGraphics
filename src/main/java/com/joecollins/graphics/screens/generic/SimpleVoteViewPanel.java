@@ -4,6 +4,7 @@ import com.joecollins.bindings.Bindable;
 import com.joecollins.bindings.BindableList;
 import com.joecollins.bindings.Binding;
 import com.joecollins.bindings.Binding.BindingReceiver;
+import com.joecollins.graphics.ImageGenerator;
 import com.joecollins.graphics.components.BarFrame;
 import com.joecollins.graphics.components.BarFrameBuilder;
 import com.joecollins.graphics.components.MapFrame;
@@ -113,26 +114,37 @@ public class SimpleVoteViewPanel extends JPanel {
   private enum PartyEntryProp {
     CURR,
     PREV,
-    DIFF
+    DIFF,
+    WINNER
   }
 
   private abstract static class PrevCurrEntryMap<CT> extends Bindable {
-    private Map<CT, Pair<Integer, Double>> curr = new LinkedHashMap<>();
-    private Map<Party, Pair<Integer, Double>> prev = new LinkedHashMap<>();
+    private Map<CT, Result> curr = new LinkedHashMap<>();
+    private Map<Party, Result> prev = new LinkedHashMap<>();
 
     protected abstract Party toParty(CT val);
 
     void setCurr(Map<CT, Integer> curr) {
       int total = Math.max(1, curr.values().stream().mapToInt(i -> i).sum());
       this.curr = new LinkedHashMap<>();
-      curr.forEach((c, v) -> this.curr.put(c, ImmutablePair.of(v, 1.0 * v / total)));
+      curr.forEach(
+          (c, v) -> this.curr.computeIfAbsent(c, x -> new Result()).setResult(v, 1.0 * v / total));
       onPropertyRefreshed(PartyEntryProp.CURR);
+    }
+
+    public void setWinner(CT winner) {
+      this.curr.forEach((c, v) -> v.setWinner(c.equals(winner)));
+      if (winner != null) {
+        this.curr.computeIfAbsent(winner, x -> new Result()).setWinner(true);
+      }
+      onPropertyRefreshed(PartyEntryProp.WINNER);
     }
 
     void setPrev(Map<Party, Integer> prev) {
       int total = Math.max(1, prev.values().stream().mapToInt(i -> i).sum());
       this.prev = new LinkedHashMap<>();
-      prev.forEach((c, v) -> this.prev.put(c, ImmutablePair.of(v, 1.0 * v / total)));
+      prev.forEach(
+          (c, v) -> this.prev.computeIfAbsent(c, x -> new Result()).setResult(v, 1.0 * v / total));
       onPropertyRefreshed(PartyEntryProp.PREV);
     }
 
@@ -141,7 +153,7 @@ public class SimpleVoteViewPanel extends JPanel {
           this,
           m -> {
             LinkedHashMap<Party, Integer> ret = new LinkedHashMap<>();
-            m.curr.forEach((c, v) -> ret.put(toParty(c), v.getLeft()));
+            m.curr.forEach((c, v) -> ret.put(toParty(c), v.getVotes()));
             return ret;
           },
           PartyEntryProp.CURR);
@@ -152,40 +164,74 @@ public class SimpleVoteViewPanel extends JPanel {
           this,
           m -> {
             LinkedHashMap<Party, Integer> ret = new LinkedHashMap<>();
-            m.prev.forEach((p, v) -> ret.put(p, v.getLeft()));
+            m.prev.forEach((p, v) -> ret.put(p, v.getVotes()));
             return ret;
           },
           PartyEntryProp.PREV);
     }
 
-    Binding<Map<CT, Pair<Integer, Double>>> currPctBinding() {
-      return Binding.propertyBinding(this, m -> m.curr, PartyEntryProp.CURR);
+    Binding<Map<CT, Result>> currPctBinding() {
+      return Binding.propertyBinding(this, m -> m.curr, PartyEntryProp.CURR, PartyEntryProp.WINNER);
     }
 
-    Binding<Map<Party, Pair<Double, Integer>>> diffPctBinding() {
+    Binding<Map<Party, Result>> diffPctBinding() {
       return Binding.propertyBinding(
           this,
           m -> {
-            Map<Party, Pair<Double, Integer>> ret = new LinkedHashMap<>();
-            if (curr.values().stream().mapToInt(Pair::getLeft).sum() == 0) {
+            Map<Party, Result> ret = new LinkedHashMap<>();
+            if (curr.values().stream().mapToInt(Result::getVotes).sum() == 0) {
               return ret;
             }
             curr.forEach(
                 (k, v) -> {
                   double d =
-                      v.getRight()
-                          - (prev.containsKey(toParty(k)) ? prev.get(toParty(k)).getRight() : 0);
-                  ret.put(toParty(k), ImmutablePair.of(d, v.getLeft()));
+                      v.getPct()
+                          - (prev.containsKey(toParty(k)) ? prev.get(toParty(k)).getPct() : 0);
+                  ret.put(toParty(k), new Result(v.getVotes(), d));
                 });
             prev.forEach(
                 (k, v) -> {
-                  double d = -(prev.containsKey(k) ? prev.get(k).getRight() : 0);
-                  ret.putIfAbsent(k, ImmutablePair.of(d, 0));
+                  double d = -(prev.containsKey(k) ? prev.get(k).getPct() : 0);
+                  ret.putIfAbsent(k, new Result(0, d));
                 });
             return ret;
           },
           PartyEntryProp.CURR,
           PartyEntryProp.PREV);
+    }
+
+    private static class Result {
+      private int votes;
+      private double pct;
+      private boolean winner;
+
+      public Result() {}
+
+      public Result(int votes, double pct) {
+        this.votes = votes;
+        this.pct = pct;
+      }
+
+      public int getVotes() {
+        return votes;
+      }
+
+      public double getPct() {
+        return pct;
+      }
+
+      public void setResult(int votes, double pct) {
+        this.votes = votes;
+        this.pct = pct;
+      }
+
+      public boolean isWinner() {
+        return winner;
+      }
+
+      public void setWinner(boolean winner) {
+        this.winner = winner;
+      }
     }
   }
 
@@ -228,6 +274,30 @@ public class SimpleVoteViewPanel extends JPanel {
         Binding<String> changeHeaderBinding,
         Binding<String> swingHeaderBinding,
         List<Party> swingPartyOrder) {
+      return basicCurrPrev(
+          currVotes,
+          () -> null,
+          prevVotes,
+          pctReporting,
+          headerBinding,
+          voteHeaderBinding,
+          voteSubheadBinding,
+          changeHeaderBinding,
+          swingHeaderBinding,
+          swingPartyOrder);
+    }
+
+    public static Builder basicCurrPrev(
+        Binding<? extends Map<Candidate, Integer>> currVotes,
+        Binding<Candidate> winner,
+        Binding<? extends Map<Party, Integer>> prevVotes,
+        Binding<Double> pctReporting,
+        Binding<String> headerBinding,
+        Binding<String> voteHeaderBinding,
+        Binding<String> voteSubheadBinding,
+        Binding<String> changeHeaderBinding,
+        Binding<String> swingHeaderBinding,
+        List<Party> swingPartyOrder) {
       Builder builder = new Builder();
       PrevCurrEntryMap<Candidate> map =
           new PrevCurrEntryMap<>() {
@@ -238,21 +308,24 @@ public class SimpleVoteViewPanel extends JPanel {
           };
       currVotes.bind(map::setCurr);
       prevVotes.bind(map::setPrev);
+      winner.bind(map::setWinner);
 
+      Shape tick = ImageGenerator.createHalfTickShape();
       BindingReceiver<Double> pctReportingReceiver = new BindingReceiver<>(pctReporting);
       builder.headerLabel = createLabel(headerBinding);
       builder.voteFrame =
-          BarFrameBuilder.basic(
+          BarFrameBuilder.basicWithShapes(
                   map.currPctBinding(),
                   c -> c.getName().toUpperCase() + "\n" + c.getParty().getName().toUpperCase(),
                   c -> c.getParty().getColor(),
-                  v -> v.getRight(),
+                  v -> v.getPct(),
                   v ->
-                      v.getLeft() == 0
+                      v.getVotes() == 0
                           ? "WAITING..."
-                          : (VOTE_FORMAT.format(v.getLeft())
+                          : (VOTE_FORMAT.format(v.getVotes())
                               + "\n"
-                              + PCT_FORMAT.format(v.getRight())))
+                              + PCT_FORMAT.format(v.getPct())),
+                  (c, v) -> v.isWinner() ? tick : null)
               .withHeader(voteHeaderBinding)
               .withSubhead(voteSubheadBinding)
               .withMax(pctReportingReceiver.getBinding(i -> 2.0 / 3 / Math.max(i, 1e-6)));
@@ -261,9 +334,9 @@ public class SimpleVoteViewPanel extends JPanel {
                   map.diffPctBinding(),
                   p -> p.getAbbreviation().toUpperCase(),
                   p -> p.getColor(),
-                  v -> v.getLeft(),
-                  v -> DIFF_FORMAT.format(v.getLeft()),
-                  (p, v) -> v.getRight())
+                  v -> v.getPct(),
+                  v -> DIFF_FORMAT.format(v.getPct()),
+                  (p, v) -> v.getVotes())
               .withHeader(changeHeaderBinding)
               .withWingspan(pctReportingReceiver.getBinding(i -> 0.10 / Math.max(i, 1e-6)));
       builder.swingFrame =
@@ -310,8 +383,8 @@ public class SimpleVoteViewPanel extends JPanel {
                   map.currPctBinding(),
                   c -> c.getName().toUpperCase(),
                   c -> c.getColor(),
-                  v -> v.getRight(),
-                  v -> PCT_FORMAT.format(v.getRight()))
+                  v -> v.getPct(),
+                  v -> PCT_FORMAT.format(v.getPct()))
               .withHeader(voteHeaderBinding)
               .withSubhead(voteSubheadBinding)
               .withMax(pctReportingReceiver.getBinding(i -> 2.0 / 3 / Math.max(i, 1e-6)));
@@ -320,9 +393,9 @@ public class SimpleVoteViewPanel extends JPanel {
                   map.diffPctBinding(),
                   p -> p.getAbbreviation().toUpperCase(),
                   p -> p.getColor(),
-                  v -> v.getLeft(),
-                  v -> DIFF_FORMAT.format(v.getLeft()),
-                  (p, v) -> v.getRight())
+                  v -> v.getPct(),
+                  v -> DIFF_FORMAT.format(v.getPct()),
+                  (p, v) -> v.getVotes())
               .withHeader(changeHeaderBinding)
               .withWingspan(pctReportingReceiver.getBinding(i -> 0.10 / Math.max(i, 1e-6)));
       builder.swingFrame =

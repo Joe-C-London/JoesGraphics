@@ -178,6 +178,7 @@ public class SimpleVoteViewPanelTest {
     BindableWrapper<String> swingHeader = new BindableWrapper<>("SWING SINCE 2015");
     BindableWrapper<String> mapHeader = new BindableWrapper<>("CARDIGAN");
     BindableWrapper<Party> leader = new BindableWrapper<>();
+    BindableWrapper<Candidate> winner = new BindableWrapper<>();
     List<Party> swingPartyOrder =
         Arrays.asList(ndp.getParty(), grn.getParty(), lib.getParty(), pc.getParty());
     Map<Integer, Shape> shapesByDistrict = peiShapesByDistrict();
@@ -192,6 +193,7 @@ public class SimpleVoteViewPanelTest {
     SimpleVoteViewPanel panel =
         SimpleVoteViewPanel.Builder.basicCurrPrev(
                 currentVotes.getBinding(),
+                winner.getBinding(),
                 previousVotes.getBinding(),
                 pctReporting.getBinding(),
                 header.getBinding(),
@@ -251,6 +253,7 @@ public class SimpleVoteViewPanelTest {
     voteHeader.setValue("9 OF 9 POLLS REPORTING");
     voteSubhead.setValue("PROJECTION: PC GAIN FROM LIB");
     pctReporting.setValue(9.0 / 9);
+    winner.setValue(pc);
     compareRendering("SimpleVoteViewPanel", "Update-5", panel);
   }
 

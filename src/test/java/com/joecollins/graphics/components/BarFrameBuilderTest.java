@@ -255,7 +255,7 @@ public class BarFrameBuilderTest {
                 Pair::getRight,
                 Pair::getLeft,
                 v -> THOUSANDS.format(v.getLeft()),
-                v -> v.getRight() ? shape : null)
+                (c, v) -> v.getRight() ? shape : null)
             .build();
     assertEquals(0, frame.getNumBars());
     assertEquals(0, frame.getNumLines());

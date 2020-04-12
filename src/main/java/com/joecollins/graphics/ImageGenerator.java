@@ -4,6 +4,7 @@ import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.geom.Area;
+import java.awt.geom.Rectangle2D;
 
 public class ImageGenerator {
 
@@ -15,6 +16,12 @@ public class ImageGenerator {
         new Area(
             new Polygon(
                 new int[] {10, 40, 90, 80, 40, 20}, new int[] {50, 80, 30, 20, 60, 40}, 6)));
+    return shape;
+  }
+
+  public static Shape createHalfTickShape() {
+    Area shape = new Area(createTickShape());
+    shape.add(new Area(new Rectangle2D.Double(200, 200, 1e-6, 1e-6)));
     return shape;
   }
 

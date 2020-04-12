@@ -99,7 +99,7 @@ public class BarFrameBuilder {
       Function<? super U, String> valueLabelFunc,
       BiFunction<? super T, ? super U, ? extends Number> sortFunc) {
     return basicWithShapes(
-        binding, labelFunc, colorFunc, valueFunc, valueLabelFunc, x -> null, sortFunc);
+        binding, labelFunc, colorFunc, valueFunc, valueLabelFunc, (x, y) -> null, sortFunc);
   }
 
   public static <T, U extends Number> BarFrameBuilder basicWithShapes(
@@ -107,7 +107,7 @@ public class BarFrameBuilder {
       Function<? super T, String> labelFunc,
       Function<? super T, Color> colorFunc,
       Function<? super U, String> valueLabelFunc,
-      Function<? super U, ? extends Shape> shapeFunc) {
+      BiFunction<? super T, ? super U, ? extends Shape> shapeFunc) {
     return basicWithShapes(
         binding, labelFunc, colorFunc, Function.identity(), valueLabelFunc, shapeFunc);
   }
@@ -118,7 +118,7 @@ public class BarFrameBuilder {
       Function<? super T, Color> colorFunc,
       Function<? super U, ? extends Number> valueFunc,
       Function<? super U, String> valueLabelFunc,
-      Function<? super U, ? extends Shape> shapeFunc) {
+      BiFunction<? super T, ? super U, ? extends Shape> shapeFunc) {
     return basicWithShapes(
         binding,
         labelFunc,
@@ -135,7 +135,7 @@ public class BarFrameBuilder {
       Function<? super T, Color> colorFunc,
       Function<? super U, ? extends Number> valueFunc,
       Function<? super U, String> valueLabelFunc,
-      Function<? super U, ? extends Shape> shapeFunc,
+      BiFunction<? super T, ? super U, ? extends Shape> shapeFunc,
       BiFunction<? super T, ? super U, ? extends Number> sortFunc) {
     BarFrameBuilder builder = new BarFrameBuilder();
     BarFrame barFrame = builder.barFrame;
@@ -193,7 +193,7 @@ public class BarFrameBuilder {
                                 colorFunc.apply(e.getKey()),
                                 valueFunc.apply(e.getValue()),
                                 valueLabelFunc.apply(e.getValue()),
-                                shapeFunc.apply(e.getValue())))
+                                shapeFunc.apply(e.getKey(), e.getValue())))
                     .collect(Collectors.toList()));
             rangeFinder.setHighest(
                 map.values().stream()
