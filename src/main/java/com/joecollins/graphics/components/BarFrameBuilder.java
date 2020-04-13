@@ -238,6 +238,18 @@ public class BarFrameBuilder {
       Function<? super U, ? extends Pair<? extends Number, ? extends Number>> valueFunc,
       Function<? super U, String> valueLabelFunc,
       BiFunction<? super T, ? super U, ? extends Number> sortFunc) {
+    return dualWithShapes(
+        binding, labelFunc, colorFunc, valueFunc, valueLabelFunc, (k, v) -> null, sortFunc);
+  }
+
+  public static <T, U> BarFrameBuilder dualWithShapes(
+      Binding<? extends Map<? extends T, ? extends U>> binding,
+      Function<? super T, String> labelFunc,
+      Function<? super T, Color> colorFunc,
+      Function<? super U, ? extends Pair<? extends Number, ? extends Number>> valueFunc,
+      Function<? super U, String> valueLabelFunc,
+      BiFunction<? super T, ? super U, ? extends Shape> shapeFunc,
+      BiFunction<? super T, ? super U, ? extends Number> sortFunc) {
     BarFrameBuilder builder = new BarFrameBuilder();
     BarFrame barFrame = builder.barFrame;
     RangeFinder rangeFinder = builder.rangeFinder;
@@ -248,13 +260,16 @@ public class BarFrameBuilder {
       final Number value1;
       final Number value2;
       final String valueLabel;
+      final Shape shape;
 
-      BarEntry(String label, Color color, Number value1, Number value2, String valueLabel) {
+      BarEntry(
+          String label, Color color, Number value1, Number value2, String valueLabel, Shape shape) {
         this.label = label;
         this.color = color;
         this.value1 = value1;
         this.value2 = value2;
         this.valueLabel = valueLabel;
+        this.shape = shape;
       }
 
       boolean differentDirections() {
@@ -312,6 +327,7 @@ public class BarFrameBuilder {
             e ->
                 e.second().doubleValue()
                     - (e.differentDirections() ? 0 : e.first().doubleValue())));
+    barFrame.setLeftIconBinding(IndexedBinding.propertyBinding(entries, e -> e.shape));
     builder.bind(
         binding,
         map -> {
@@ -335,7 +351,8 @@ public class BarFrameBuilder {
                               colorFunc.apply(e.getKey()),
                               values.getLeft(),
                               values.getRight(),
-                              valueLabelFunc.apply(e.getValue()));
+                              valueLabelFunc.apply(e.getValue()),
+                              shapeFunc.apply(e.getKey(), e.getValue()));
                         })
                     .collect(Collectors.toList()));
             rangeFinder.setHighest(

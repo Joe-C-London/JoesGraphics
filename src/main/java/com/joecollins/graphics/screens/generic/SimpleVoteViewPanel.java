@@ -365,6 +365,30 @@ public class SimpleVoteViewPanel extends JPanel {
         Binding<String> changeHeaderBinding,
         Binding<String> swingHeaderBinding,
         List<Party> swingPartyOrder) {
+      return basicPartyCurrPrev(
+          currVotes,
+          () -> null,
+          prevVotes,
+          pctReporting,
+          headerBinding,
+          voteHeaderBinding,
+          voteSubheadBinding,
+          changeHeaderBinding,
+          swingHeaderBinding,
+          swingPartyOrder);
+    }
+
+    public static Builder basicPartyCurrPrev(
+        Binding<? extends Map<Party, Integer>> currVotes,
+        Binding<Party> winner,
+        Binding<? extends Map<Party, Integer>> prevVotes,
+        Binding<Double> pctReporting,
+        Binding<String> headerBinding,
+        Binding<String> voteHeaderBinding,
+        Binding<String> voteSubheadBinding,
+        Binding<String> changeHeaderBinding,
+        Binding<String> swingHeaderBinding,
+        List<Party> swingPartyOrder) {
       Builder builder = new Builder();
       PrevCurrEntryMap<Party> map =
           new PrevCurrEntryMap<>() {
@@ -375,16 +399,19 @@ public class SimpleVoteViewPanel extends JPanel {
           };
       currVotes.bind(map::setCurr);
       prevVotes.bind(map::setPrev);
+      winner.bind(map::setWinner);
 
+      Shape tick = ImageGenerator.createTickShape();
       BindingReceiver<Double> pctReportingReceiver = new BindingReceiver<>(pctReporting);
       builder.headerLabel = createLabel(headerBinding);
       builder.voteFrame =
-          BarFrameBuilder.basic(
+          BarFrameBuilder.basicWithShapes(
                   map.currPctBinding(),
                   c -> c.getName().toUpperCase(),
                   c -> c.getColor(),
                   v -> v.getPct(),
-                  v -> PCT_FORMAT.format(v.getPct()))
+                  v -> PCT_FORMAT.format(v.getPct()),
+                  (c, v) -> v.isWinner() ? tick : null)
               .withHeader(voteHeaderBinding)
               .withSubhead(voteSubheadBinding)
               .withMax(pctReportingReceiver.getBinding(i -> 2.0 / 3 / Math.max(i, 1e-6)));

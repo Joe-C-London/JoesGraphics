@@ -4,6 +4,7 @@ import com.joecollins.bindings.Bindable;
 import com.joecollins.bindings.BindableList;
 import com.joecollins.bindings.Binding;
 import com.joecollins.bindings.Binding.BindingReceiver;
+import com.joecollins.graphics.ImageGenerator;
 import com.joecollins.graphics.components.BarFrame;
 import com.joecollins.graphics.components.BarFrameBuilder;
 import com.joecollins.graphics.components.MapFrame;
@@ -99,12 +100,14 @@ public class SeatViewPanel extends JPanel {
   private enum PartyEntryProp {
     CURR,
     PREV,
-    DIFF
+    DIFF,
+    WINNER
   }
 
   private static class PrevCurrEntryMap<K, C, P, D> extends Bindable {
     private Map<K, ? extends C> curr = new LinkedHashMap<>();
     private Map<Party, ? extends P> prev = new LinkedHashMap<>();
+    private K winner;
     private final BiFunction<C, P, D> diffFunction;
     private final Function<K, Party> partyFunction;
     private final C currIdentity;
@@ -131,8 +134,25 @@ public class SeatViewPanel extends JPanel {
       onPropertyRefreshed(PartyEntryProp.PREV);
     }
 
+    void setWinner(K winner) {
+      this.winner = winner;
+      onPropertyRefreshed(PartyEntryProp.WINNER);
+    }
+
     Binding<Map<K, ? extends C>> currBinding() {
-      return Binding.propertyBinding(this, m -> m.curr, PartyEntryProp.CURR);
+      return Binding.propertyBinding(this, m -> m.curr, PartyEntryProp.CURR, PartyEntryProp.WINNER);
+    }
+
+    Binding<Map<K, Pair<? extends C, Boolean>>> currWinnerBinding() {
+      return Binding.propertyBinding(
+          this,
+          m -> {
+            Map<K, Pair<? extends C, Boolean>> ret = new LinkedHashMap<>();
+            m.curr.forEach((k, v) -> ret.put(k, ImmutablePair.of(v, k.equals(m.winner))));
+            return ret;
+          },
+          PartyEntryProp.CURR,
+          PartyEntryProp.WINNER);
     }
 
     Binding<Map<Party, ? extends Pair<D, C>>> diffBinding() {
@@ -257,6 +277,26 @@ public class SeatViewPanel extends JPanel {
         Binding<String> seatHeader,
         Binding<String> seatSubhead,
         Binding<String> changeHeader) {
+      return basicCurrPrev(
+          currentSeats,
+          () -> null,
+          previousSeats,
+          totalSeats,
+          header,
+          seatHeader,
+          seatSubhead,
+          changeHeader);
+    }
+
+    public static Builder basicCurrPrev(
+        Binding<? extends Map<Party, Integer>> currentSeats,
+        Binding<Party> winner,
+        Binding<? extends Map<Party, Integer>> previousSeats,
+        Binding<Integer> totalSeats,
+        Binding<String> header,
+        Binding<String> seatHeader,
+        Binding<String> seatSubhead,
+        Binding<String> changeHeader) {
 
       class PEM extends PrevCurrEntryMap<Party, Integer, Integer, Integer> {
         private PEM() {
@@ -266,18 +306,40 @@ public class SeatViewPanel extends JPanel {
       PEM map = new PEM();
       currentSeats.bind(map::setCurr);
       previousSeats.bind(map::setPrev);
+      winner.bind(map::setWinner);
 
       Builder builder = new Builder();
       builder.limits = new Limits();
       totalSeats.bind(builder.limits::setMax);
       builder.headerLabel = createLabel(header);
-      builder.seatFrame = createFrame(seatHeader, seatSubhead, builder.limits, map.currBinding());
+      builder.seatFrame =
+          createFrameWithShapes(seatHeader, seatSubhead, builder.limits, map.currWinnerBinding());
       builder.changeFrame = createDiffFrame(changeHeader, builder.limits, map.diffBinding());
       return builder;
     }
 
     public static Builder basicCandidateCurrPrev(
         Binding<? extends Map<Candidate, Integer>> currentSeats,
+        Binding<? extends Map<Party, Integer>> previousSeats,
+        Binding<Integer> totalSeats,
+        Binding<String> header,
+        Binding<String> seatHeader,
+        Binding<String> seatSubhead,
+        Binding<String> changeHeader) {
+      return basicCandidateCurrPrev(
+          currentSeats,
+          () -> null,
+          previousSeats,
+          totalSeats,
+          header,
+          seatHeader,
+          seatSubhead,
+          changeHeader);
+    }
+
+    public static Builder basicCandidateCurrPrev(
+        Binding<? extends Map<Candidate, Integer>> currentSeats,
+        Binding<Candidate> winner,
         Binding<? extends Map<Party, Integer>> previousSeats,
         Binding<Integer> totalSeats,
         Binding<String> header,
@@ -293,13 +355,14 @@ public class SeatViewPanel extends JPanel {
       PEM map = new PEM();
       currentSeats.bind(map::setCurr);
       previousSeats.bind(map::setPrev);
+      winner.bind(map::setWinner);
 
       Builder builder = new Builder();
       builder.limits = new Limits();
       totalSeats.bind(builder.limits::setMax);
       builder.headerLabel = createLabel(header);
       builder.seatFrame =
-          createCandidateFrame(seatHeader, seatSubhead, builder.limits, map.currBinding());
+          createCandidateFrame(seatHeader, seatSubhead, builder.limits, map.currWinnerBinding());
       builder.changeFrame = createDiffFrame(changeHeader, builder.limits, map.diffBinding());
       return builder;
     }
@@ -349,21 +412,44 @@ public class SeatViewPanel extends JPanel {
                   limits, l -> Math.max(1, l.max * 2 / 3), Limits.LimitsProp.PROP));
     }
 
+    private static BarFrameBuilder createFrameWithShapes(
+        Binding<String> seatHeader,
+        Binding<String> seatSubhead,
+        Limits limits,
+        Binding<Map<Party, Pair<? extends Integer, Boolean>>> mapBinding) {
+      Shape tick = ImageGenerator.createTickShape();
+      return BarFrameBuilder.basicWithShapes(
+              mapBinding,
+              party -> party.getName().toUpperCase(),
+              party -> party.getColor(),
+              seats -> seats.getLeft(),
+              seats -> seats.getLeft().toString(),
+              (party, seats) -> seats.getRight() ? tick : null,
+              (party, seats) -> party == Party.OTHERS ? -1 : seats.getLeft())
+          .withHeader(seatHeader)
+          .withSubhead(seatSubhead)
+          .withMax(
+              Binding.propertyBinding(
+                  limits, l -> Math.max(1, l.max * 2 / 3), Limits.LimitsProp.PROP));
+    }
+
     private static BarFrameBuilder createCandidateFrame(
         Binding<String> seatHeader,
         Binding<String> seatSubhead,
         Limits limits,
-        Binding<Map<Candidate, ? extends Integer>> mapBinding) {
-      return BarFrameBuilder.basic(
+        Binding<Map<Candidate, Pair<? extends Integer, Boolean>>> mapBinding) {
+      Shape tick = ImageGenerator.createHalfTickShape();
+      return BarFrameBuilder.basicWithShapes(
               mapBinding,
               candidate ->
                   candidate.getName().toUpperCase()
                       + "\n"
                       + candidate.getParty().getName().toUpperCase(),
               candidate -> candidate.getParty().getColor(),
-              Function.identity(),
-              seats -> seats.toString(),
-              (candidate, seats) -> seats)
+              seats -> seats.getLeft(),
+              seats -> seats.getLeft().toString(),
+              (candidate, seats) -> seats.getRight() ? tick : null,
+              (candidate, seats) -> seats.getLeft())
           .withHeader(seatHeader)
           .withSubhead(seatSubhead)
           .withMax(
@@ -400,6 +486,26 @@ public class SeatViewPanel extends JPanel {
         Binding<String> seatHeader,
         Binding<String> seatSubhead,
         Binding<String> changeHeader) {
+      return dualCurrPrev(
+          currentSeats,
+          () -> null,
+          previousSeats,
+          totalSeats,
+          header,
+          seatHeader,
+          seatSubhead,
+          changeHeader);
+    }
+
+    public static Builder dualCurrPrev(
+        Binding<? extends Map<Party, ? extends Pair<Integer, Integer>>> currentSeats,
+        Binding<Party> winner,
+        Binding<? extends Map<Party, ? extends Pair<Integer, Integer>>> previousSeats,
+        Binding<Integer> totalSeats,
+        Binding<String> header,
+        Binding<String> seatHeader,
+        Binding<String> seatSubhead,
+        Binding<String> changeHeader) {
       class PEM
           extends PrevCurrEntryMap<
               Party, Pair<Integer, Integer>, Pair<Integer, Integer>, Pair<Integer, Integer>> {
@@ -414,19 +520,41 @@ public class SeatViewPanel extends JPanel {
       PEM map = new PEM();
       currentSeats.bind(map::setCurr);
       previousSeats.bind(map::setPrev);
+      winner.bind(map::setWinner);
 
       Builder builder = new Builder();
       builder.limits = new Limits();
       totalSeats.bind(builder.limits::setMax);
       builder.headerLabel = createLabel(header);
       builder.seatFrame =
-          createDualFrame(seatHeader, seatSubhead, builder.limits, map.currBinding());
+          createDualFrameWithShape(
+              seatHeader, seatSubhead, builder.limits, map.currWinnerBinding());
       builder.changeFrame = createDualChangeFrame(changeHeader, builder.limits, map.diffBinding());
       return builder;
     }
 
     public static Builder dualCandidateCurrPrev(
         Binding<? extends Map<Candidate, ? extends Pair<Integer, Integer>>> currentSeats,
+        Binding<? extends Map<Party, ? extends Pair<Integer, Integer>>> previousSeats,
+        Binding<Integer> totalSeats,
+        Binding<String> header,
+        Binding<String> seatHeader,
+        Binding<String> seatSubhead,
+        Binding<String> changeHeader) {
+      return dualCandidateCurrPrev(
+          currentSeats,
+          () -> null,
+          previousSeats,
+          totalSeats,
+          header,
+          seatHeader,
+          seatSubhead,
+          changeHeader);
+    }
+
+    public static Builder dualCandidateCurrPrev(
+        Binding<? extends Map<Candidate, ? extends Pair<Integer, Integer>>> currentSeats,
+        Binding<Candidate> winner,
         Binding<? extends Map<Party, ? extends Pair<Integer, Integer>>> previousSeats,
         Binding<Integer> totalSeats,
         Binding<String> header,
@@ -447,13 +575,15 @@ public class SeatViewPanel extends JPanel {
       PEM map = new PEM();
       currentSeats.bind(map::setCurr);
       previousSeats.bind(map::setPrev);
+      winner.bind(map::setWinner);
 
       Builder builder = new Builder();
       builder.limits = new Limits();
       totalSeats.bind(builder.limits::setMax);
       builder.headerLabel = createLabel(header);
       builder.seatFrame =
-          createDualCandidateFrame(seatHeader, seatSubhead, builder.limits, map.currBinding());
+          createDualCandidateFrame(
+              seatHeader, seatSubhead, builder.limits, map.currWinnerBinding());
       builder.changeFrame = createDualChangeFrame(changeHeader, builder.limits, map.diffBinding());
       return builder;
     }
@@ -504,21 +634,44 @@ public class SeatViewPanel extends JPanel {
                   limits, l -> Math.max(1, l.max * 2 / 3), Limits.LimitsProp.PROP));
     }
 
+    private static BarFrameBuilder createDualFrameWithShape(
+        Binding<String> seatHeader,
+        Binding<String> seatSubhead,
+        Limits limits,
+        Binding<Map<Party, Pair<? extends Pair<Integer, Integer>, Boolean>>> mapBinding) {
+      Shape tick = ImageGenerator.createTickShape();
+      return BarFrameBuilder.dualWithShapes(
+              mapBinding,
+              party -> party.getName().toUpperCase(),
+              party -> party.getColor(),
+              seats -> seats.getLeft(),
+              seats -> seats.getLeft().getLeft() + "/" + seats.getLeft().getRight(),
+              (party, seats) -> seats.getRight() ? tick : null,
+              (party, seats) -> party == Party.OTHERS ? -1 : seats.getLeft().getRight())
+          .withHeader(seatHeader)
+          .withSubhead(seatSubhead)
+          .withMax(
+              Binding.propertyBinding(
+                  limits, l -> Math.max(1, l.max * 2 / 3), Limits.LimitsProp.PROP));
+    }
+
     private static BarFrameBuilder createDualCandidateFrame(
         Binding<String> seatHeader,
         Binding<String> seatSubhead,
         Limits limits,
-        Binding<Map<Candidate, ? extends Pair<Integer, Integer>>> mapBinding) {
-      return BarFrameBuilder.dual(
+        Binding<Map<Candidate, Pair<? extends Pair<Integer, Integer>, Boolean>>> mapBinding) {
+      Shape tick = ImageGenerator.createHalfTickShape();
+      return BarFrameBuilder.dualWithShapes(
               mapBinding,
               candidate ->
                   candidate.getName().toUpperCase()
                       + "\n"
                       + candidate.getParty().getName().toUpperCase(),
               candidate -> candidate.getParty().getColor(),
-              Function.identity(),
-              seats -> seats.getLeft() + "/" + seats.getRight(),
-              (candidate, seats) -> seats.getRight())
+              seats -> seats.getLeft(),
+              seats -> seats.getLeft().getLeft() + "/" + seats.getLeft().getRight(),
+              (candidate, seats) -> seats.getRight() ? tick : null,
+              (candidate, seats) -> seats.getLeft().getRight())
           .withHeader(seatHeader)
           .withSubhead(seatSubhead)
           .withMax(

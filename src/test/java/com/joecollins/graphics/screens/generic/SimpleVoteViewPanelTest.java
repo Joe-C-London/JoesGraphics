@@ -265,7 +265,6 @@ public class SimpleVoteViewPanelTest {
     Party grn = new Party("Green", "GRN", Color.GREEN.darker());
 
     LinkedHashMap<Party, Integer> curr = new LinkedHashMap<>();
-
     LinkedHashMap<Party, Integer> prev = new LinkedHashMap<>();
 
     BindableWrapper<LinkedHashMap<Party, Integer>> currentVotes = new BindableWrapper<>(curr);
@@ -333,6 +332,48 @@ public class SimpleVoteViewPanelTest {
     pctReporting.setValue(1.0 / 7);
     voteHeader.setValue("1 OF 7 DISTRICTS DECLARED");
     compareRendering("SimpleVoteViewPanel", "PopularVote-3", panel);
+  }
+
+  @Test
+  public void testPartyVoteTickScreen() throws IOException {
+    Party dem = new Party("DEMOCRAT", "DEM", Color.BLUE);
+    Party gop = new Party("REPUBLICAN", "GOP", Color.RED);
+
+    LinkedHashMap<Party, Integer> curr = new LinkedHashMap<>();
+    curr.put(dem, 60572245);
+    curr.put(gop, 50861970);
+    curr.put(Party.OTHERS, 1978774);
+    LinkedHashMap<Party, Integer> prev = new LinkedHashMap<>();
+    prev.put(dem, 61776554);
+    prev.put(gop, 63173815);
+    prev.put(Party.OTHERS, 3676641);
+
+    BindableWrapper<LinkedHashMap<Party, Integer>> currentVotes = new BindableWrapper<>(curr);
+    BindableWrapper<LinkedHashMap<Party, Integer>> previousVotes = new BindableWrapper<>(prev);
+    BindableWrapper<Double> pctReporting = new BindableWrapper<>(1.0);
+    BindableWrapper<String> header = new BindableWrapper<>("UNITED STATES");
+    BindableWrapper<String> voteHeader = new BindableWrapper<>("HOUSE OF REPRESENTATIVES");
+    BindableWrapper<String> voteSubhead = new BindableWrapper<>("");
+    BindableWrapper<String> changeHeader = new BindableWrapper<>("CHANGE SINCE 2016");
+    BindableWrapper<String> swingHeader = new BindableWrapper<>("SWING SINCE 2016");
+    BindableWrapper<Party> winner = new BindableWrapper<>(dem);
+    List<Party> swingPartyOrder = List.of(dem, gop);
+
+    SimpleVoteViewPanel panel =
+        SimpleVoteViewPanel.Builder.basicPartyCurrPrev(
+                currentVotes.getBinding(),
+                winner.getBinding(),
+                previousVotes.getBinding(),
+                pctReporting.getBinding(),
+                header.getBinding(),
+                voteHeader.getBinding(),
+                voteSubhead.getBinding(),
+                changeHeader.getBinding(),
+                swingHeader.getBinding(),
+                swingPartyOrder)
+            .build();
+    panel.setSize(1024, 512);
+    compareRendering("SimpleVoteViewPanel", "PartyTick-1", panel);
   }
 
   private Map<Integer, Shape> peiShapesByDistrict() throws IOException {
