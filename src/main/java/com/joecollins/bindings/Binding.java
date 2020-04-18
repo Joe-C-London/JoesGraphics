@@ -1,5 +1,6 @@
 package com.joecollins.bindings;
 
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.IntConsumer;
@@ -14,7 +15,7 @@ public interface Binding<T> {
 
     private T value;
 
-    public BindingReceiver(Binding<T> binding) {
+    public BindingReceiver(Binding<? extends T> binding) {
       binding.bind(
           v -> {
             value = v;
@@ -42,6 +43,44 @@ public interface Binding<T> {
   }
 
   default void unbind() {}
+
+  default <U, R> Binding<R> merge(Binding<U> other, BiFunction<T, U, R> func) {
+    Binding<T> me = this;
+    return new Binding<R>() {
+      private T val1;
+      private U val2;
+      private boolean bound = false;
+
+      @Override
+      public R getValue() {
+        return func.apply(me.getValue(), other.getValue());
+      }
+
+      @Override
+      public void bind(Consumer<R> onUpdate) {
+        me.bind(
+            t -> {
+              val1 = t;
+              if (bound) {
+                onUpdate.accept(func.apply(t, val2));
+              }
+            });
+        other.bind(
+            u -> {
+              val2 = u;
+              onUpdate.accept(func.apply(val1, u));
+            });
+        bound = true;
+      }
+
+      @Override
+      public void unbind() {
+        me.unbind();
+        other.unbind();
+        bound = false;
+      }
+    };
+  }
 
   static <T> Binding<T> fixedBinding(T t) {
     return () -> t;

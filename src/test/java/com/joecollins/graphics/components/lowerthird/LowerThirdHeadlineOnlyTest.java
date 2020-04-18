@@ -28,7 +28,7 @@ public class LowerThirdHeadlineOnlyTest {
   }
 
   @Test
-  public void testRenderHeadlineSubhead() throws IOException {
+  public void testRenderHeadlineSubhead() throws IOException, InterruptedException {
     LowerThirdHeadlineOnly lowerThird = new LowerThirdHeadlineOnly();
     lowerThird.setSize(1024, 50);
     lowerThird.setLeftImageBinding(
@@ -38,6 +38,7 @@ public class LowerThirdHeadlineOnlyTest {
     lowerThird.setTimeZoneBinding(Binding.fixedBinding(ZoneId.of("Canada/Eastern")));
     lowerThird.setHeadlineBinding(Binding.fixedBinding("POLLS CLOSE ACROSS CENTRAL CANADA"));
     lowerThird.setSubheadBinding(Binding.fixedBinding("Polls open for 30 minutes on west coast"));
+    Thread.sleep(100);
 
     compareRendering("LowerThird", "HeadlineAndSubhead", lowerThird);
   }

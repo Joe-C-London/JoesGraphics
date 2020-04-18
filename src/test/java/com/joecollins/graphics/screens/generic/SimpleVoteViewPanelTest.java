@@ -12,6 +12,7 @@ import java.awt.Shape;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -63,23 +64,18 @@ public class SimpleVoteViewPanelTest {
                 .collect(Collectors.toList()));
     BindableWrapper<Integer> selectedDistrict = new BindableWrapper<>(3);
 
-    SimpleVoteViewPanel panel =
-        SimpleVoteViewPanel.Builder.basicCurrPrev(
-                currentVotes.getBinding(),
-                previousVotes.getBinding(),
-                header.getBinding(),
-                voteHeader.getBinding(),
-                voteSubhead.getBinding(),
-                changeHeader.getBinding(),
-                swingHeader.getBinding(),
-                swingPartyOrder)
+    BasicResultPanel panel =
+        BasicResultPanel.candidateVotes(
+                currentVotes.getBinding(), voteHeader.getBinding(), voteSubhead.getBinding())
+            .withPrev(previousVotes.getBinding(), changeHeader.getBinding())
+            .withSwing(Comparator.comparing(swingPartyOrder::indexOf), swingHeader.getBinding())
             .withMap(
-                mapHeader.getBinding(),
-                shapesByDistrict,
+                () -> shapesByDistrict,
                 selectedDistrict.getBinding(),
                 leader.getBinding(),
-                focus.getBinding())
-            .build();
+                focus.getBinding(),
+                mapHeader.getBinding())
+            .build(header.getBinding());
     panel.setSize(1024, 512);
     compareRendering("SimpleVoteViewPanel", "Basic-1", panel);
   }
@@ -131,17 +127,12 @@ public class SimpleVoteViewPanelTest {
         Arrays.asList(
             ndp.getParty(), grn.getParty(), lib.getParty(), bq.getParty(), con.getParty());
 
-    SimpleVoteViewPanel panel =
-        SimpleVoteViewPanel.Builder.basicCurrPrev(
-                currentVotes.getBinding(),
-                previousVotes.getBinding(),
-                header.getBinding(),
-                voteHeader.getBinding(),
-                voteSubhead.getBinding(),
-                changeHeader.getBinding(),
-                swingHeader.getBinding(),
-                swingPartyOrder)
-            .build();
+    BasicResultPanel panel =
+        BasicResultPanel.candidateVotes(
+                currentVotes.getBinding(), voteHeader.getBinding(), voteSubhead.getBinding())
+            .withPrev(previousVotes.getBinding(), changeHeader.getBinding())
+            .withSwing(Comparator.comparing(swingPartyOrder::indexOf), swingHeader.getBinding())
+            .build(header.getBinding());
     panel.setSize(1024, 512);
     compareRendering("SimpleVoteViewPanel", "Basic-2", panel);
   }
@@ -190,25 +181,20 @@ public class SimpleVoteViewPanelTest {
                 .collect(Collectors.toList()));
     BindableWrapper<Integer> selectedDistrict = new BindableWrapper<>(3);
 
-    SimpleVoteViewPanel panel =
-        SimpleVoteViewPanel.Builder.basicCurrPrev(
-                currentVotes.getBinding(),
-                winner.getBinding(),
-                previousVotes.getBinding(),
-                pctReporting.getBinding(),
-                header.getBinding(),
-                voteHeader.getBinding(),
-                voteSubhead.getBinding(),
-                changeHeader.getBinding(),
-                swingHeader.getBinding(),
-                swingPartyOrder)
+    BasicResultPanel panel =
+        BasicResultPanel.candidateVotes(
+                currentVotes.getBinding(), voteHeader.getBinding(), voteSubhead.getBinding())
+            .withPrev(previousVotes.getBinding(), changeHeader.getBinding())
+            .withSwing(Comparator.comparing(swingPartyOrder::indexOf), swingHeader.getBinding())
             .withMap(
-                mapHeader.getBinding(),
-                shapesByDistrict,
+                () -> shapesByDistrict,
                 selectedDistrict.getBinding(),
                 leader.getBinding(),
-                focus.getBinding())
-            .build();
+                focus.getBinding(),
+                mapHeader.getBinding())
+            .withWinner(winner.getBinding())
+            .withPctReporting(pctReporting.getBinding())
+            .build(header.getBinding());
     panel.setSize(1024, 512);
     compareRendering("SimpleVoteViewPanel", "Update-1", panel);
 
@@ -281,23 +267,18 @@ public class SimpleVoteViewPanelTest {
     BindableWrapper<List<Shape>> focus = new BindableWrapper<>();
     BindableWrapper<Map<Integer, Party>> winnersByDistrict = new BindableWrapper<>(new HashMap<>());
 
-    SimpleVoteViewPanel panel =
-        SimpleVoteViewPanel.Builder.basicPartyCurrPrev(
-                currentVotes.getBinding(),
-                previousVotes.getBinding(),
-                pctReporting.getBinding(),
-                header.getBinding(),
-                voteHeader.getBinding(),
-                voteSubhead.getBinding(),
-                changeHeader.getBinding(),
-                swingHeader.getBinding(),
-                swingPartyOrder)
+    BasicResultPanel panel =
+        BasicResultPanel.partyVotes(
+                currentVotes.getBinding(), voteHeader.getBinding(), voteSubhead.getBinding())
+            .withPrev(previousVotes.getBinding(), changeHeader.getBinding())
+            .withSwing(Comparator.comparing(swingPartyOrder::indexOf), swingHeader.getBinding())
+            .withPctReporting(pctReporting.getBinding())
             .withMap(
-                mapHeader.getBinding(),
-                shapesByDistrict,
+                () -> shapesByDistrict,
                 winnersByDistrict.getBinding(),
-                focus.getBinding())
-            .build();
+                focus.getBinding(),
+                mapHeader.getBinding())
+            .build(header.getBinding());
     panel.setSize(1024, 512);
     compareRendering("SimpleVoteViewPanel", "PopularVote-1", panel);
 
@@ -359,19 +340,14 @@ public class SimpleVoteViewPanelTest {
     BindableWrapper<Party> winner = new BindableWrapper<>(dem);
     List<Party> swingPartyOrder = List.of(dem, gop);
 
-    SimpleVoteViewPanel panel =
-        SimpleVoteViewPanel.Builder.basicPartyCurrPrev(
-                currentVotes.getBinding(),
-                winner.getBinding(),
-                previousVotes.getBinding(),
-                pctReporting.getBinding(),
-                header.getBinding(),
-                voteHeader.getBinding(),
-                voteSubhead.getBinding(),
-                changeHeader.getBinding(),
-                swingHeader.getBinding(),
-                swingPartyOrder)
-            .build();
+    BasicResultPanel panel =
+        BasicResultPanel.partyVotes(
+                currentVotes.getBinding(), voteHeader.getBinding(), voteSubhead.getBinding())
+            .withPrev(previousVotes.getBinding(), changeHeader.getBinding())
+            .withWinner(winner.getBinding())
+            .withPctReporting(pctReporting.getBinding())
+            .withSwing(Comparator.comparing(swingPartyOrder::indexOf), swingHeader.getBinding())
+            .build(header.getBinding());
     panel.setSize(1024, 512);
     compareRendering("SimpleVoteViewPanel", "PartyTick-1", panel);
   }

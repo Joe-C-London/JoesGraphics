@@ -11,6 +11,7 @@ import java.awt.Color;
 import java.awt.Shape;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -38,17 +39,13 @@ public class SeatViewPanelTest {
     Party con = new Party("Conservative", "CON", Color.BLUE);
     Party lab = new Party("Labour", "LAB", Color.RED);
 
-    SeatViewPanel panel =
-        SeatViewPanel.Builder.basicCurrPrev(
-                currentSeats.getBinding(),
-                previousSeats.getBinding(),
-                totalSeats.getBinding(),
-                header.getBinding(),
-                seatHeader.getBinding(),
-                seatSubhead.getBinding(),
-                changeHeader.getBinding())
+    BasicResultPanel panel =
+        BasicResultPanel.partySeats(
+                currentSeats.getBinding(), seatHeader.getBinding(), seatSubhead.getBinding())
+            .withTotal(totalSeats.getBinding())
             .withMajorityLine(showMajority.getBinding(), n -> n + " SEATS FOR MAJORITY")
-            .build();
+            .withPrev(previousSeats.getBinding(), changeHeader.getBinding())
+            .build(header.getBinding());
     panel.setSize(1024, 512);
     compareRendering("SeatViewPanel", "Basic-1", panel);
 
@@ -136,17 +133,13 @@ public class SeatViewPanelTest {
     Party con = new Party("Conservative", "CON", Color.BLUE);
     Party lab = new Party("Labour", "LAB", Color.RED);
 
-    SeatViewPanel panel =
-        SeatViewPanel.Builder.basicCurrDiff(
-                currentSeats.getBinding(),
-                seatDiff.getBinding(),
-                totalSeats.getBinding(),
-                header.getBinding(),
-                seatHeader.getBinding(),
-                seatSubhead.getBinding(),
-                changeHeader.getBinding())
+    BasicResultPanel panel =
+        BasicResultPanel.partySeats(
+                currentSeats.getBinding(), seatHeader.getBinding(), seatSubhead.getBinding())
+            .withTotal(totalSeats.getBinding())
             .withMajorityLine(showMajority.getBinding(), n -> n + " SEATS FOR MAJORITY")
-            .build();
+            .withDiff(seatDiff.getBinding(), changeHeader.getBinding())
+            .build(header.getBinding());
     panel.setSize(1024, 512);
     compareRendering("SeatViewPanel", "Basic-1", panel);
 
@@ -245,22 +238,18 @@ public class SeatViewPanelTest {
     Party oth = Party.OTHERS;
     List<Party> partyOrder = List.of(snp, lab, pc, grn, ld, oth, con);
 
-    SeatViewPanel panel =
-        SeatViewPanel.Builder.basicCurrPrev(
-                currentSeats.getBinding(),
-                previousSeats.getBinding(),
-                totalSeats.getBinding(),
-                header.getBinding(),
-                seatHeader.getBinding(),
-                seatSubhead.getBinding(),
-                changeHeader.getBinding())
+    BasicResultPanel panel =
+        BasicResultPanel.partySeats(
+                currentSeats.getBinding(), seatHeader.getBinding(), seatSubhead.getBinding())
+            .withPrev(previousSeats.getBinding(), changeHeader.getBinding())
+            .withTotal(totalSeats.getBinding())
             .withMajorityLine(showMajority.getBinding(), n -> n + " SEATS FOR MAJORITY")
             .withSwing(
-                swingHeader.getBinding(),
                 currentVotes.getBinding(),
                 previousVotes.getBinding(),
-                partyOrder)
-            .build();
+                Comparator.comparingInt(partyOrder::indexOf),
+                swingHeader.getBinding())
+            .build(header.getBinding());
     panel.setSize(1024, 512);
     compareRendering("SeatViewPanel", "Swing-1", panel);
 
@@ -322,27 +311,23 @@ public class SeatViewPanelTest {
     Party oth = Party.OTHERS;
     List<Party> partyOrder = List.of(ndp, grn, lib, oth, pc);
 
-    SeatViewPanel panel =
-        SeatViewPanel.Builder.basicCurrPrev(
-                currentSeats.getBinding(),
-                previousSeats.getBinding(),
-                totalSeats.getBinding(),
-                header.getBinding(),
-                seatHeader.getBinding(),
-                seatSubhead.getBinding(),
-                changeHeader.getBinding())
+    BasicResultPanel panel =
+        BasicResultPanel.partySeats(
+                currentSeats.getBinding(), seatHeader.getBinding(), seatSubhead.getBinding())
+            .withPrev(previousSeats.getBinding(), changeHeader.getBinding())
+            .withTotal(totalSeats.getBinding())
             .withMajorityLine(showMajority.getBinding(), n -> n + " SEATS FOR MAJORITY")
             .withSwing(
-                swingHeader.getBinding(),
                 currentVotes.getBinding(),
                 previousVotes.getBinding(),
-                partyOrder)
+                Comparator.comparing(partyOrder::indexOf),
+                swingHeader.getBinding())
             .withMap(
-                mapHeader.getBinding(),
-                shapesByDistrict,
+                () -> shapesByDistrict,
                 winnersByDistrict.getBinding(),
-                focus.getBinding())
-            .build();
+                focus.getBinding(),
+                mapHeader.getBinding())
+            .build(header.getBinding());
     panel.setSize(1024, 512);
     compareRendering("SeatViewPanel", "Map-1", panel);
 
@@ -441,17 +426,13 @@ public class SeatViewPanelTest {
     Party grn = new Party("Green", "GRN", Color.GREEN.darker());
     Party ind = new Party("Independent", "IND", Color.GRAY);
 
-    SeatViewPanel panel =
-        SeatViewPanel.Builder.dualCurrPrev(
-                currentSeats.getBinding(),
-                previousSeats.getBinding(),
-                totalSeats.getBinding(),
-                header.getBinding(),
-                seatHeader.getBinding(),
-                seatSubhead.getBinding(),
-                changeHeader.getBinding())
+    BasicResultPanel panel =
+        BasicResultPanel.partyDualSeats(
+                currentSeats.getBinding(), seatHeader.getBinding(), seatSubhead.getBinding())
+            .withPrev(previousSeats.getBinding(), changeHeader.getBinding())
+            .withTotal(totalSeats.getBinding())
             .withMajorityLine(showMajority.getBinding(), n -> n + " SEATS FOR MAJORITY")
-            .build();
+            .build(header.getBinding());
     panel.setSize(1024, 512);
     compareRendering("SeatViewPanel", "Dual-1", panel);
 
@@ -553,17 +534,13 @@ public class SeatViewPanelTest {
     Party grn = new Party("Green", "GRN", Color.GREEN.darker());
     Party ind = new Party("Independent", "IND", Color.GRAY);
 
-    SeatViewPanel panel =
-        SeatViewPanel.Builder.dualCurrDiff(
-                currentSeats.getBinding(),
-                seatDiff.getBinding(),
-                totalSeats.getBinding(),
-                header.getBinding(),
-                seatHeader.getBinding(),
-                seatSubhead.getBinding(),
-                changeHeader.getBinding())
+    BasicResultPanel panel =
+        BasicResultPanel.partyDualSeats(
+                currentSeats.getBinding(), seatHeader.getBinding(), seatSubhead.getBinding())
+            .withDiff(seatDiff.getBinding(), changeHeader.getBinding())
+            .withTotal(totalSeats.getBinding())
             .withMajorityLine(showMajority.getBinding(), n -> n + " SEATS FOR MAJORITY")
-            .build();
+            .build(header.getBinding());
     panel.setSize(1024, 512);
     compareRendering("SeatViewPanel", "Dual-1", panel);
 
@@ -672,17 +649,13 @@ public class SeatViewPanelTest {
     Party nxt = new Party("Nick Xenophon Team", "NXT", Color.ORANGE);
     Party oth = Party.OTHERS;
 
-    SeatViewPanel panel =
-        SeatViewPanel.Builder.rangeCurrPrev(
-                currentSeats.getBinding(),
-                previousSeats.getBinding(),
-                totalSeats.getBinding(),
-                header.getBinding(),
-                seatHeader.getBinding(),
-                seatSubhead.getBinding(),
-                changeHeader.getBinding())
+    BasicResultPanel panel =
+        BasicResultPanel.partyRangeSeats(
+                currentSeats.getBinding(), seatHeader.getBinding(), seatSubhead.getBinding())
+            .withPrev(previousSeats.getBinding(), changeHeader.getBinding())
+            .withTotal(totalSeats.getBinding())
             .withMajorityLine(showMajority.getBinding(), n -> n + " SEATS FOR MAJORITY")
-            .build();
+            .build(header.getBinding());
     panel.setSize(1024, 512);
     compareRendering("SeatViewPanel", "Range-1", panel);
 
@@ -758,17 +731,13 @@ public class SeatViewPanelTest {
     Party nxt = new Party("Nick Xenophon Team", "NXT", Color.ORANGE);
     Party oth = Party.OTHERS;
 
-    SeatViewPanel panel =
-        SeatViewPanel.Builder.rangeCurrDiff(
-                currentSeats.getBinding(),
-                seatDiff.getBinding(),
-                totalSeats.getBinding(),
-                header.getBinding(),
-                seatHeader.getBinding(),
-                seatSubhead.getBinding(),
-                changeHeader.getBinding())
+    BasicResultPanel panel =
+        BasicResultPanel.partyRangeSeats(
+                currentSeats.getBinding(), seatHeader.getBinding(), seatSubhead.getBinding())
+            .withDiff(seatDiff.getBinding(), changeHeader.getBinding())
+            .withTotal(totalSeats.getBinding())
             .withMajorityLine(showMajority.getBinding(), n -> n + " SEATS FOR MAJORITY")
-            .build();
+            .build(header.getBinding());
     panel.setSize(1024, 512);
     compareRendering("SeatViewPanel", "Range-1", panel);
 
@@ -845,18 +814,14 @@ public class SeatViewPanelTest {
     Candidate clinton = new Candidate("Hillary Clinton", new Party("Democrat", "DEM", Color.BLUE));
     Candidate trump = new Candidate("Donald Trump", new Party("Republican", "GOP", Color.RED));
 
-    SeatViewPanel panel =
-        SeatViewPanel.Builder.basicCandidateCurrPrev(
-                currentSeats.getBinding(),
-                winner.getBinding(),
-                previousSeats.getBinding(),
-                totalSeats.getBinding(),
-                header.getBinding(),
-                seatHeader.getBinding(),
-                seatSubhead.getBinding(),
-                changeHeader.getBinding())
+    BasicResultPanel panel =
+        BasicResultPanel.candidateSeats(
+                currentSeats.getBinding(), seatHeader.getBinding(), seatSubhead.getBinding())
+            .withWinner(winner.getBinding())
+            .withPrev(previousSeats.getBinding(), changeHeader.getBinding())
+            .withTotal(totalSeats.getBinding())
             .withMajorityLine(showMajority.getBinding(), n -> n + " ELECTORAL VOTES TO WIN")
-            .build();
+            .build(header.getBinding());
     panel.setSize(1024, 512);
 
     LinkedHashMap<Candidate, Integer> curr = new LinkedHashMap<>();
@@ -887,18 +852,14 @@ public class SeatViewPanelTest {
     BindableWrapper<String> changeHeader = new BindableWrapper<>("CHANGE SINCE 2012");
     BindableWrapper<Candidate> winner = new BindableWrapper<>();
 
-    SeatViewPanel panel =
-        SeatViewPanel.Builder.dualCandidateCurrPrev(
-                currentSeats.getBinding(),
-                winner.getBinding(),
-                previousSeats.getBinding(),
-                totalSeats.getBinding(),
-                header.getBinding(),
-                seatHeader.getBinding(),
-                seatSubhead.getBinding(),
-                changeHeader.getBinding())
+    BasicResultPanel panel =
+        BasicResultPanel.candidateDualSeats(
+                currentSeats.getBinding(), seatHeader.getBinding(), seatSubhead.getBinding())
+            .withWinner(winner.getBinding())
+            .withPrev(previousSeats.getBinding(), changeHeader.getBinding())
+            .withTotal(totalSeats.getBinding())
             .withMajorityLine(showMajority.getBinding(), n -> n + " ELECTORAL VOTES TO WIN")
-            .build();
+            .build(header.getBinding());
     panel.setSize(1024, 512);
 
     Candidate clinton = new Candidate("Hillary Clinton", new Party("Democrat", "DEM", Color.BLUE));
@@ -945,17 +906,13 @@ public class SeatViewPanelTest {
     prev.put(trump.getParty(), 206);
     previousSeats.setValue(prev);
 
-    SeatViewPanel panel =
-        SeatViewPanel.Builder.rangeCandidateCurrPrev(
-                currentSeats.getBinding(),
-                previousSeats.getBinding(),
-                totalSeats.getBinding(),
-                header.getBinding(),
-                seatHeader.getBinding(),
-                seatSubhead.getBinding(),
-                changeHeader.getBinding())
+    BasicResultPanel panel =
+        BasicResultPanel.candidateRangeSeats(
+                currentSeats.getBinding(), seatHeader.getBinding(), seatSubhead.getBinding())
+            .withPrev(previousSeats.getBinding(), changeHeader.getBinding())
+            .withTotal(totalSeats.getBinding())
             .withMajorityLine(showMajority.getBinding(), n -> n + " ELECTORAL VOTES TO WIN")
-            .build();
+            .build(header.getBinding());
     panel.setSize(1024, 512);
     compareRendering("SeatViewPanel", "Candidate-3", panel);
   }
@@ -974,18 +931,14 @@ public class SeatViewPanelTest {
     BindableWrapper<String> changeHeader = new BindableWrapper<>("CHANGE SINCE 2016");
     BindableWrapper<Party> winner = new BindableWrapper<>();
 
-    SeatViewPanel panel =
-        SeatViewPanel.Builder.basicCurrPrev(
-                currentSeats.getBinding(),
-                winner.getBinding(),
-                previousSeats.getBinding(),
-                totalSeats.getBinding(),
-                header.getBinding(),
-                seatHeader.getBinding(),
-                seatSubhead.getBinding(),
-                changeHeader.getBinding())
+    BasicResultPanel panel =
+        BasicResultPanel.partySeats(
+                currentSeats.getBinding(), seatHeader.getBinding(), seatSubhead.getBinding())
+            .withPrev(previousSeats.getBinding(), changeHeader.getBinding())
+            .withWinner(winner.getBinding())
+            .withTotal(totalSeats.getBinding())
             .withMajorityLine(showMajority.getBinding(), n -> n + " SEATS FOR MAJORITY")
-            .build();
+            .build(header.getBinding());
     panel.setSize(1024, 512);
 
     Party dem = new Party("Democrat", "DEM", Color.BLUE);
@@ -1019,18 +972,14 @@ public class SeatViewPanelTest {
     BindableWrapper<String> changeHeader = new BindableWrapper<>("CHANGE SINCE 2016");
     BindableWrapper<Party> winner = new BindableWrapper<>();
 
-    SeatViewPanel panel =
-        SeatViewPanel.Builder.dualCurrPrev(
-                currentSeats.getBinding(),
-                winner.getBinding(),
-                previousSeats.getBinding(),
-                totalSeats.getBinding(),
-                header.getBinding(),
-                seatHeader.getBinding(),
-                seatSubhead.getBinding(),
-                changeHeader.getBinding())
+    BasicResultPanel panel =
+        BasicResultPanel.partyDualSeats(
+                currentSeats.getBinding(), seatHeader.getBinding(), seatSubhead.getBinding())
+            .withWinner(winner.getBinding())
+            .withPrev(previousSeats.getBinding(), changeHeader.getBinding())
+            .withTotal(totalSeats.getBinding())
             .withMajorityLine(showMajority.getBinding(), n -> n + " SEATS FOR MAJORITY")
-            .build();
+            .build(header.getBinding());
     panel.setSize(1024, 512);
 
     Party dem = new Party("Democrat", "DEM", Color.BLUE);
