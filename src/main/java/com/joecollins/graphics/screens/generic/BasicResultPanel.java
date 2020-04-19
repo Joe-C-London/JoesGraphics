@@ -114,6 +114,48 @@ public class BasicResultPanel extends JPanel {
     }
   }
 
+  public static class Result {
+    private final Party party;
+    private final boolean elected;
+
+    private Result(Party party, boolean elected) {
+      this.party = party;
+      this.elected = elected;
+    }
+
+    public static Result elected(Party party) {
+      return new Result(party, true);
+    }
+
+    public static Result leading(Party party) {
+      return new Result(party, false);
+    }
+
+    public Color getColor() {
+      if (party == null) {
+        return Color.BLACK;
+      }
+      if (elected) {
+        return party.getColor();
+      }
+      return brighter(party.getColor());
+    }
+
+    private static Color brighter(Color color) {
+      return new Color(
+          (3 * color.getRed() + 255) / 4,
+          (3 * color.getGreen() + 255) / 4,
+          (3 * color.getBlue() + 255) / 4,
+          color.getAlpha());
+    }
+  }
+
+  private static <T> Map<T, Result> partyMapToResultMap(Map<T, Party> m) {
+    Map<T, Result> ret = new LinkedHashMap<>();
+    m.forEach((k, v) -> ret.put(k, Result.elected(v)));
+    return ret;
+  }
+
   private static JLabel createHeaderLabel(Binding<String> textBinding) {
     JLabel headerLabel = new JLabel();
     headerLabel.setFont(StandardFont.readBoldFont(32));
@@ -289,9 +331,7 @@ public class BasicResultPanel extends JPanel {
     protected BindingReceiver<String> swingHeader;
     protected Comparator<Party> swingComparator;
 
-    protected BindingReceiver<List<Pair<Shape, Color>>> winners;
-    protected BindingReceiver<List<Shape>> mapFocus;
-    protected BindingReceiver<String> mapHeader;
+    protected MapBuilder mapBuilder;
 
     private SeatScreenBuilder(
         BindingReceiver<Map<KT, ? extends CT>> current,
@@ -385,32 +425,23 @@ public class BasicResultPanel extends JPanel {
       return this;
     }
 
-    public <T> SeatScreenBuilder<KT, CT, PT> withMap(
+    public <T> SeatScreenBuilder<KT, CT, PT> withPartyMap(
         Binding<Map<T, Shape>> shapes,
         Binding<Map<T, Party>> winners,
         Binding<List<Shape>> focus,
         Binding<String> headerBinding) {
-      Binding<List<ImmutablePair<Shape, Party>>> shapesToParties =
-          shapes.merge(
-              winners,
-              (s, w) ->
-                  s.entrySet().stream()
-                      .map(
-                          e -> {
-                            Party winnerParty = w.get(e.getKey());
-                            return ImmutablePair.of(e.getValue(), winnerParty);
-                          })
-                      .collect(Collectors.toList()));
-      this.mapFocus = new BindingReceiver<>(focus);
-      this.winners =
-          new BindingReceiver<>(
-              shapesToParties.merge(
-                  mapFocus.getBinding(),
-                  (r, f) ->
-                      r.stream()
-                          .map(p -> ImmutablePair.of(p.left, extractColor(f, p.left, p.right)))
-                          .collect(Collectors.toList())));
-      this.mapHeader = new BindingReceiver<>(headerBinding);
+      this.mapBuilder =
+          new MapBuilder(
+              shapes, winners.map(BasicResultPanel::partyMapToResultMap), focus, headerBinding);
+      return this;
+    }
+
+    public <T> SeatScreenBuilder<KT, CT, PT> withResultMap(
+        Binding<Map<T, Shape>> shapes,
+        Binding<Map<T, Result>> winners,
+        Binding<List<Shape>> focus,
+        Binding<String> headerBinding) {
+      this.mapBuilder = new MapBuilder(shapes, winners, focus, headerBinding);
       return this;
     }
 
@@ -438,13 +469,10 @@ public class BasicResultPanel extends JPanel {
     }
 
     private MapFrame createMapFrame() {
-      if (mapHeader == null) {
+      if (mapBuilder == null) {
         return null;
       }
-      return MapFrameBuilder.from(winners.getBinding())
-          .withFocus(mapFocus.getBinding())
-          .withHeader(mapHeader.getBinding())
-          .build();
+      return mapBuilder.createMapFrame();
     }
 
     protected Binding<Map<KT, ResultAndWinner<CT>>> createResultAndWinner() {
@@ -840,9 +868,7 @@ public class BasicResultPanel extends JPanel {
     protected BindingReceiver<String> swingHeader;
     protected Comparator<Party> swingComparator;
 
-    protected BindingReceiver<List<Pair<Shape, Color>>> winners;
-    protected BindingReceiver<List<Shape>> mapFocus;
-    protected BindingReceiver<String> mapHeader;
+    protected MapBuilder mapBuilder;
 
     private VoteScreenBuilder(
         BindingReceiver<Map<KT, ? extends CT>> current,
@@ -881,78 +907,44 @@ public class BasicResultPanel extends JPanel {
       return this;
     }
 
-    public <T> VoteScreenBuilder<KT, CT, CPT, PT> withMap(
+    public <T> VoteScreenBuilder<KT, CT, CPT, PT> withPartyMap(
         Binding<Map<T, Shape>> shapes,
         Binding<Map<T, Party>> winners,
         Binding<List<Shape>> focus,
         Binding<String> headerBinding) {
-      Binding<List<ImmutablePair<Shape, Party>>> shapesToParties =
-          shapes.merge(
-              winners,
-              (s, w) ->
-                  s.entrySet().stream()
-                      .map(
-                          e -> {
-                            Party winnerParty = w.get(e.getKey());
-                            return ImmutablePair.of(e.getValue(), winnerParty);
-                          })
-                      .collect(Collectors.toList()));
-      this.mapFocus = new BindingReceiver<>(focus);
-      this.winners =
-          new BindingReceiver<>(
-              shapesToParties.merge(
-                  mapFocus.getBinding(),
-                  (r, f) ->
-                      r.stream()
-                          .map(p -> ImmutablePair.of(p.left, extractColor(f, p.left, p.right)))
-                          .collect(Collectors.toList())));
-      this.mapHeader = new BindingReceiver<>(headerBinding);
+      this.mapBuilder =
+          new MapBuilder(
+              shapes, winners.map(BasicResultPanel::partyMapToResultMap), focus, headerBinding);
       return this;
     }
 
-    public <T> VoteScreenBuilder<KT, CT, CPT, PT> withMap(
+    public <T> VoteScreenBuilder<KT, CT, CPT, PT> withPartyMap(
         Binding<Map<T, Shape>> shapes,
         Binding<T> selectedShape,
         Binding<Party> leadingParty,
         Binding<List<Shape>> focus,
         Binding<String> header) {
-      Binding<ImmutablePair<T, Party>> leaderWithShape =
-          selectedShape.merge(leadingParty, ImmutablePair::new);
-      mapFocus = new BindingReceiver<>(focus);
-      mapHeader = new BindingReceiver<>(header);
-      Binding<List<Pair<Shape, Color>>> shapeWinners =
-          shapes.merge(
-              leaderWithShape,
-              (shp, ldr) ->
-                  shp.entrySet().stream()
-                      .map(
-                          e -> {
-                            Color color;
-                            if (e.getKey().equals(ldr.left)) {
-                              color =
-                                  Optional.ofNullable(ldr.right)
-                                      .map(Party::getColor)
-                                      .orElse(Color.BLACK);
-                            } else {
-                              color = Color.LIGHT_GRAY;
-                            }
-                            return ImmutablePair.of(e.getValue(), color);
-                          })
-                      .collect(Collectors.toList()));
-      Binding<List<Pair<Shape, Color>>> focusedShapeWinners =
-          shapeWinners.merge(
-              mapFocus.getBinding(),
-              (sw, f) -> {
-                if (f == null) return sw;
-                return sw.stream()
-                    .map(
-                        e -> {
-                          if (f.contains(e.getLeft())) return e;
-                          return ImmutablePair.of(e.getLeft(), new Color(220, 220, 220));
-                        })
-                    .collect(Collectors.toList());
-              });
-      winners = new BindingReceiver<>(focusedShapeWinners);
+      this.mapBuilder =
+          new MapBuilder(shapes, selectedShape, leadingParty.map(Result::elected), focus, header);
+      return this;
+    }
+
+    public <T> VoteScreenBuilder<KT, CT, CPT, PT> withResultMap(
+        Binding<Map<T, Shape>> shapes,
+        Binding<Map<T, Result>> winners,
+        Binding<List<Shape>> focus,
+        Binding<String> headerBinding) {
+      this.mapBuilder = new MapBuilder(shapes, winners, focus, headerBinding);
+      return this;
+    }
+
+    public <T> VoteScreenBuilder<KT, CT, CPT, PT> withResultMap(
+        Binding<Map<T, Shape>> shapes,
+        Binding<T> selectedShape,
+        Binding<Result> leadingParty,
+        Binding<List<Shape>> focus,
+        Binding<String> header) {
+      this.mapBuilder = new MapBuilder(shapes, selectedShape, leadingParty, focus, header);
       return this;
     }
 
@@ -972,13 +964,10 @@ public class BasicResultPanel extends JPanel {
     protected abstract SwingFrame createSwingFrame();
 
     private MapFrame createMapFrame() {
-      if (mapHeader == null) {
+      if (mapBuilder == null) {
         return null;
       }
-      return MapFrameBuilder.from(winners.getBinding())
-          .withFocus(mapFocus.getBinding())
-          .withHeader(mapHeader.getBinding())
-          .build();
+      return mapBuilder.createMapFrame();
     }
   }
 
@@ -1086,7 +1075,7 @@ public class BasicResultPanel extends JPanel {
     }
   }
 
-  private static Color extractColor(List<Shape> focus, Shape shape, Party winner) {
+  private static Color extractColor(List<Shape> focus, Shape shape, Result winner) {
     Color color;
     if (winner != null) {
       color = winner.getColor();
@@ -1118,6 +1107,95 @@ public class BasicResultPanel extends JPanel {
     private CurrDiff(CT curr, CT diff) {
       this.curr = curr;
       this.diff = diff;
+    }
+  }
+
+  private static class MapBuilder {
+    private final BindingReceiver<List<Pair<Shape, Color>>> winners;
+    private final BindingReceiver<List<Shape>> mapFocus;
+    private final BindingReceiver<String> mapHeader;
+
+    public <T> MapBuilder(
+        Binding<Map<T, Shape>> shapes,
+        Binding<Map<T, Result>> winners,
+        Binding<List<Shape>> focus,
+        Binding<String> headerBinding) {
+      Binding<List<ImmutablePair<Shape, Result>>> shapesToParties =
+          shapes.merge(
+              winners,
+              (s, w) ->
+                  s.entrySet().stream()
+                      .map(
+                          e -> {
+                            Result winnerParty = w.get(e.getKey());
+                            return ImmutablePair.of(e.getValue(), winnerParty);
+                          })
+                      .collect(Collectors.toList()));
+      this.mapFocus = new BindingReceiver<>(focus);
+      this.winners =
+          new BindingReceiver<>(
+              shapesToParties.merge(
+                  mapFocus.getBinding(),
+                  (r, f) ->
+                      r.stream()
+                          .map(p -> ImmutablePair.of(p.left, extractColor(f, p.left, p.right)))
+                          .collect(Collectors.toList())));
+      this.mapHeader = new BindingReceiver<>(headerBinding);
+    }
+
+    public <T> MapBuilder(
+        Binding<Map<T, Shape>> shapes,
+        Binding<T> selectedShape,
+        Binding<Result> leadingParty,
+        Binding<List<Shape>> focus,
+        Binding<String> header) {
+      Binding<ImmutablePair<T, Result>> leaderWithShape =
+          selectedShape.merge(leadingParty, ImmutablePair::new);
+      mapFocus = new BindingReceiver<>(focus);
+      mapHeader = new BindingReceiver<>(header);
+      Binding<List<Pair<Shape, Color>>> shapeWinners =
+          shapes.merge(
+              leaderWithShape,
+              (shp, ldr) ->
+                  shp.entrySet().stream()
+                      .map(
+                          e -> {
+                            Color color;
+                            if (e.getKey().equals(ldr.left)) {
+                              color =
+                                  Optional.ofNullable(ldr.right)
+                                      .map(Result::getColor)
+                                      .orElse(Color.BLACK);
+                            } else {
+                              color = Color.LIGHT_GRAY;
+                            }
+                            return ImmutablePair.of(e.getValue(), color);
+                          })
+                      .collect(Collectors.toList()));
+      Binding<List<Pair<Shape, Color>>> focusedShapeWinners =
+          shapeWinners.merge(
+              mapFocus.getBinding(),
+              (sw, f) -> {
+                if (f == null) return sw;
+                return sw.stream()
+                    .map(
+                        e -> {
+                          if (f.contains(e.getLeft())) return e;
+                          return ImmutablePair.of(e.getLeft(), new Color(220, 220, 220));
+                        })
+                    .collect(Collectors.toList());
+              });
+      winners = new BindingReceiver<>(focusedShapeWinners);
+    }
+
+    public MapFrame createMapFrame() {
+      if (mapHeader == null) {
+        return null;
+      }
+      return MapFrameBuilder.from(winners.getBinding())
+          .withFocus(mapFocus.getBinding())
+          .withHeader(mapHeader.getBinding())
+          .build();
     }
   }
 }

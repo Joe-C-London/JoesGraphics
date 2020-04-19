@@ -44,6 +44,26 @@ public interface Binding<T> {
 
   default void unbind() {}
 
+  default <R> Binding<R> map(Function<T, R> func) {
+    Binding<T> me = this;
+    return new Binding<R>() {
+      @Override
+      public R getValue() {
+        return func.apply(me.getValue());
+      }
+
+      @Override
+      public void bind(Consumer<R> onUpdate) {
+        me.bind(t -> onUpdate.accept(func.apply(t)));
+      }
+
+      @Override
+      public void unbind() {
+        me.unbind();
+      }
+    };
+  }
+
   default <U, R> Binding<R> merge(Binding<U> other, BiFunction<T, U, R> func) {
     Binding<T> me = this;
     return new Binding<R>() {

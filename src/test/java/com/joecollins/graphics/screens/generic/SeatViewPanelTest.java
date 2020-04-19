@@ -322,7 +322,7 @@ public class SeatViewPanelTest {
                 previousVotes.getBinding(),
                 Comparator.comparing(partyOrder::indexOf),
                 swingHeader.getBinding())
-            .withMap(
+            .withPartyMap(
                 () -> shapesByDistrict,
                 winnersByDistrict.getBinding(),
                 focus.getBinding(),
