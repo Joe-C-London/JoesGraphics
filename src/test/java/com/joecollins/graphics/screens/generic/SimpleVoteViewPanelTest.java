@@ -352,6 +352,51 @@ public class SimpleVoteViewPanelTest {
     compareRendering("SimpleVoteViewPanel", "PartyTick-1", panel);
   }
 
+  @Test
+  public void testMultipleCandidatesSameParty() throws IOException {
+    Party dem = new Party("DEMOCRAT", "DEM", Color.BLUE);
+    Party gop = new Party("REPUBLICAN", "GOP", Color.RED);
+    Party lbt = new Party("LIBERTARIAN", "LBT", Color.ORANGE);
+    Party ind = new Party("INDEPENDENT", "IND", Color.GRAY);
+
+    LinkedHashMap<Candidate, Integer> curr = new LinkedHashMap<>();
+    curr.put(new Candidate("Raul Barrera", dem), 1747);
+    curr.put(new Candidate("Bech Bruun", gop), 1570);
+    curr.put(new Candidate("Michael Cloud", gop), 19856);
+    curr.put(new Candidate("Judith Cutright", ind), 172);
+    curr.put(new Candidate("Eric Holguin", dem), 11595);
+    curr.put(new Candidate("Marty Perez", gop), 276);
+    curr.put(new Candidate("Christopher Suprun", ind), 51);
+    curr.put(new Candidate("Daniel Tinus", lbt), 144);
+    curr.put(new Candidate("Mike Westergren", dem), 858);
+
+    LinkedHashMap<Party, Integer> prev = new LinkedHashMap<>();
+    prev.put(dem, 88329);
+    prev.put(gop, 142251);
+
+    BindableWrapper<LinkedHashMap<Candidate, Integer>> currentVotes = new BindableWrapper<>(curr);
+    BindableWrapper<LinkedHashMap<Party, Integer>> previousVotes = new BindableWrapper<>(prev);
+    BindableWrapper<String> header = new BindableWrapper<>("TEXAS DISTRICT 27");
+    BindableWrapper<String> voteHeader = new BindableWrapper<>("OFFICIAL RESULT");
+    BindableWrapper<String> voteSubhead = new BindableWrapper<>("GOP HOLD");
+    BindableWrapper<String> changeHeader = new BindableWrapper<>("CHANGE SINCE 2016");
+    BindableWrapper<String> swingHeader = new BindableWrapper<>("SWING SINCE 2016");
+    BindableWrapper<Candidate> winner =
+        new BindableWrapper<>(
+            curr.entrySet().stream().max(Map.Entry.comparingByValue()).get().getKey());
+    List<Party> swingPartyOrder = Arrays.asList(dem, gop);
+
+    BasicResultPanel panel =
+        BasicResultPanel.candidateVotes(
+                currentVotes.getBinding(), voteHeader.getBinding(), voteSubhead.getBinding())
+            .withPrev(previousVotes.getBinding(), changeHeader.getBinding())
+            .withSwing(Comparator.comparing(swingPartyOrder::indexOf), swingHeader.getBinding())
+            .withWinner(winner.getBinding())
+            .build(header.getBinding());
+    panel.setSize(1024, 512);
+    compareRendering("SimpleVoteViewPanel", "SameParty-1", panel);
+  }
+
   private Map<Integer, Shape> peiShapesByDistrict() throws IOException {
     URL peiMap =
         MapFrameTest.class

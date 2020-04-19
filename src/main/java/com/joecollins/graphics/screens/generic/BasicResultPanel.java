@@ -1038,13 +1038,13 @@ public class BasicResultPanel extends JPanel {
                   (c, p) -> {
                     int currTotal = c.values().stream().mapToInt(i -> i).sum();
                     int prevTotal = p.values().stream().mapToInt(i -> i).sum();
+                    Map<Party, Integer> partyTotal = currTotalByParty(c);
                     Map<Party, CurrDiff<Double>> ret = new LinkedHashMap<>();
                     if (currTotal == 0 || prevTotal == 0) {
                       return ret;
                     }
-                    c.forEach(
-                        (k, cv) -> {
-                          Party party = keyTemplate.toParty(k);
+                    partyTotal.forEach(
+                        (party, cv) -> {
                           double cpct = 1.0 * cv / currTotal;
                           double ppct = 1.0 * (p.containsKey(party) ? p.get(party) : 0) / prevTotal;
                           ret.put(party, new CurrDiff<>(cpct, cpct - ppct));
@@ -1073,16 +1073,16 @@ public class BasicResultPanel extends JPanel {
       if (swingHeader == null) {
         return null;
       }
-      Binding<Map<Party, Integer>> curr =
-          current.getBinding(
-              cv -> {
-                Map<Party, Integer> ret = new LinkedHashMap<>();
-                cv.forEach((k, v) -> ret.put(keyTemplate.toParty(k), v));
-                return ret;
-              });
+      Binding<Map<Party, Integer>> curr = current.getBinding(this::currTotalByParty);
       return SwingFrameBuilder.prevCurr(prev.getBinding(), curr, swingComparator)
           .withHeader(swingHeader.getBinding())
           .build();
+    }
+
+    protected Map<Party, Integer> currTotalByParty(Map<KT, ? extends Integer> curr) {
+      Map<Party, Integer> ret = new LinkedHashMap<>();
+      curr.forEach((k, v) -> ret.merge(keyTemplate.toParty(k), v, Integer::sum));
+      return ret;
     }
   }
 
