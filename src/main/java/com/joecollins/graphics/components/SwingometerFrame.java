@@ -6,6 +6,7 @@ import com.joecollins.graphics.utils.StandardFont;
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -42,6 +43,7 @@ public class SwingometerFrame extends GraphicsFrame {
   private Binding<Integer> numDotsBinding = () -> 0;
   private IndexedBinding<? extends Number> dotsPositionBinding = IndexedBinding.emptyBinding();
   private IndexedBinding<Color> dotsColorBinding = IndexedBinding.emptyBinding();
+  private IndexedBinding<String> dotsLabelBinding = IndexedBinding.emptyBinding();
 
   private SwingPanel swingPanel = new SwingPanel();
 
@@ -215,13 +217,23 @@ public class SwingometerFrame extends GraphicsFrame {
   }
 
   Color getDotColor(int index) {
-    return swingPanel.dots.get(index).getRight();
+    return swingPanel.dots.get(index).getMiddle();
   }
 
   public void setDotsColorBinding(IndexedBinding<Color> dotsColorBinding) {
     this.dotsColorBinding.unbind();
     this.dotsColorBinding = dotsColorBinding;
     this.dotsColorBinding.bind(swingPanel::setDotColor);
+  }
+
+  String getDotLabel(int index) {
+    return swingPanel.dots.get(index).getRight();
+  }
+
+  public void setDotsLabelBinding(IndexedBinding<String> dotsLabelBinding) {
+    this.dotsLabelBinding.unbind();
+    this.dotsLabelBinding = dotsLabelBinding;
+    this.dotsLabelBinding.bind(swingPanel::setDotLabel);
   }
 
   private class SwingPanel extends JPanel {
@@ -234,7 +246,7 @@ public class SwingometerFrame extends GraphicsFrame {
     private List<MutablePair<Number, String>> ticks = new ArrayList<>();
     private List<MutableTriple<Number, String, Color>> outerLabels = new ArrayList<>();
     private int numBucketsPerSide = numBucketsPerSideBinding.getValue();
-    private List<MutablePair<Number, Color>> dots = new ArrayList<>();
+    private List<MutableTriple<Number, Color, String>> dots = new ArrayList<>();
 
     public SwingPanel() {
       setBackground(Color.WHITE);
@@ -325,7 +337,7 @@ public class SwingometerFrame extends GraphicsFrame {
         dots.remove(numDots);
       }
       while (numDots > dots.size()) {
-        dots.add(MutablePair.of(0.0, Color.WHITE));
+        dots.add(MutableTriple.of(0.0, Color.WHITE, ""));
       }
       repaint();
     }
@@ -335,7 +347,11 @@ public class SwingometerFrame extends GraphicsFrame {
     }
 
     public void setDotColor(int index, Color color) {
-      dots.get(index).setRight(color);
+      dots.get(index).setMiddle(color);
+    }
+
+    public void setDotLabel(int index, String label) {
+      dots.get(index).setRight(label);
     }
 
     @Override
@@ -394,12 +410,30 @@ public class SwingometerFrame extends GraphicsFrame {
         double val = (entry.getKey() - 0.5 * Math.signum(entry.getKey())) * bucketSize;
         ((Graphics2D) g).setTransform(createRotationTransform(val, originalTransform, arcY));
         for (int i = 0; i < entry.getValue().size(); i++) {
-          g.setColor(entry.getValue().get(i).right);
+          var dot = entry.getValue().get(i);
+          g.setColor(dot.middle);
           g.fillOval(
               (getWidth() - dotSize) / 2 + 2,
               inner / 2 - (i + 1) * dotSize + 2,
               dotSize - 4,
               dotSize - 4);
+          g.setColor(Color.WHITE);
+          int size = dotSize - 8;
+          Font font = null;
+          int strWidth = 0;
+          while (size > 1) {
+            font = StandardFont.readNormalFont(size);
+            strWidth = g.getFontMetrics(font).stringWidth(dot.right);
+            if (strWidth < dotSize - 8) {
+              break;
+            }
+            size--;
+          }
+          g.setFont(font);
+          g.drawString(
+              dot.right,
+              (getWidth() - strWidth) / 2,
+              inner / 2 - i * dotSize - (dotSize - font.getSize() + 6) / 2);
         }
         ((Graphics2D) g).setTransform(originalTransform);
       }
