@@ -304,4 +304,113 @@ public class SwingometerFrameTest {
     frame.setSize(1024, 512);
     compareRendering("SwingometerFrame", "Labels", frame);
   }
+
+  @Test
+  public void testRenderMultiLineLabels() throws IOException {
+    BindableList<Integer> ticks =
+        IntStream.rangeClosed(-9, 9).boxed().collect(Collectors.toCollection(BindableList::new));
+
+    BindableList<ImmutableTriple<Double, Integer, Color>> outerLabels = new BindableList<>();
+    outerLabels.add(ImmutableTriple.of(0.0, 332, Color.BLUE));
+    outerLabels.add(ImmutableTriple.of(-3.91, 350, Color.BLUE));
+    outerLabels.add(ImmutableTriple.of(-5.235, 400, Color.BLUE));
+    outerLabels.add(ImmutableTriple.of(-7.895, 450, Color.BLUE));
+    outerLabels.add(ImmutableTriple.of(2.68, 270, Color.RED));
+    outerLabels.add(ImmutableTriple.of(5.075, 350, Color.RED));
+    outerLabels.add(ImmutableTriple.of(8.665, 400, Color.RED));
+
+    BindableList<ImmutableTriple<ImmutablePair<String, Integer>, Double, Color>> dots =
+        new BindableList<>();
+    dots.add(ImmutableTriple.of(ImmutablePair.of("UT", 6), -24.02, Color.RED));
+    dots.add(ImmutableTriple.of(ImmutablePair.of("NE-03", 1), -21.31, Color.RED));
+    dots.add(ImmutableTriple.of(ImmutablePair.of("WY", 3), -20.41, Color.RED));
+    dots.add(ImmutableTriple.of(ImmutablePair.of("OK", 7), -17.27, Color.RED));
+    dots.add(ImmutableTriple.of(ImmutablePair.of("ID", 4), -15.945, Color.RED));
+    dots.add(ImmutableTriple.of(ImmutablePair.of("WV", 5), -13.42, Color.RED));
+    dots.add(ImmutableTriple.of(ImmutablePair.of("AR", 6), -11.855, Color.RED));
+    dots.add(ImmutableTriple.of(ImmutablePair.of("KY", 8), -11.345, Color.RED));
+    dots.add(ImmutableTriple.of(ImmutablePair.of("AL", 9), -11.095, Color.RED));
+    dots.add(ImmutableTriple.of(ImmutablePair.of("NE-AL", 2), -10.885, Color.RED));
+    dots.add(ImmutableTriple.of(ImmutablePair.of("KS", 6), -10.86, Color.RED));
+    dots.add(ImmutableTriple.of(ImmutablePair.of("TN", 11), -10.20, Color.RED));
+    dots.add(ImmutableTriple.of(ImmutablePair.of("ND", 3), -9.815, Color.RED));
+    dots.add(ImmutableTriple.of(ImmutablePair.of("SD", 3), -9.01, Color.RED));
+    dots.add(ImmutableTriple.of(ImmutablePair.of("LA", 8), -8.60, Color.RED));
+    dots.add(ImmutableTriple.of(ImmutablePair.of("NE-01", 1), -8.30, Color.RED));
+    dots.add(ImmutableTriple.of(ImmutablePair.of("TX", 38), -7.895, Color.RED));
+    dots.add(ImmutableTriple.of(ImmutablePair.of("AK", 3), -6.995, Color.RED));
+    dots.add(ImmutableTriple.of(ImmutablePair.of("MT", 3), -6.825, Color.RED));
+    dots.add(ImmutableTriple.of(ImmutablePair.of("MS", 6), -5.75, Color.RED));
+    dots.add(ImmutableTriple.of(ImmutablePair.of("SC", 9), -5.235, Color.RED));
+    dots.add(ImmutableTriple.of(ImmutablePair.of("IN", 11), -5.10, Color.RED));
+    dots.add(ImmutableTriple.of(ImmutablePair.of("MO", 10), -4.69, Color.RED));
+    dots.add(ImmutableTriple.of(ImmutablePair.of("AZ", 11), -4.53, Color.RED));
+    dots.add(ImmutableTriple.of(ImmutablePair.of("GA", 16), -3.91, Color.RED));
+    dots.add(ImmutableTriple.of(ImmutablePair.of("NE-02", 1), -3.575, Color.RED));
+    dots.add(ImmutableTriple.of(ImmutablePair.of("NC", 15), -1.02, Color.RED));
+    dots.add(ImmutableTriple.of(ImmutablePair.of("FL", 29), +0.44, Color.RED));
+    dots.add(ImmutableTriple.of(ImmutablePair.of("OH", 18), +1.49, Color.RED));
+    dots.add(ImmutableTriple.of(ImmutablePair.of("VA", 13), +1.94, Color.BLUE));
+    dots.add(ImmutableTriple.of(ImmutablePair.of("CO", 9), +2.68, Color.BLUE));
+    dots.add(ImmutableTriple.of(ImmutablePair.of("PA", 20), +2.69, Color.RED));
+    dots.add(ImmutableTriple.of(ImmutablePair.of("NH", 4), +2.79, Color.BLUE));
+    dots.add(ImmutableTriple.of(ImmutablePair.of("IA", 6), +2.905, Color.RED));
+    dots.add(ImmutableTriple.of(ImmutablePair.of("NV", 6), +3.34, Color.BLUE));
+    dots.add(ImmutableTriple.of(ImmutablePair.of("MN", 10), +3.845, Color.BLUE));
+    dots.add(ImmutableTriple.of(ImmutablePair.of("ME-02", 1), +4.28, Color.RED));
+    dots.add(ImmutableTriple.of(ImmutablePair.of("WI", 10), +4.47, Color.RED));
+    dots.add(ImmutableTriple.of(ImmutablePair.of("MI", 16), +4.75, Color.RED));
+    dots.add(ImmutableTriple.of(ImmutablePair.of("NM", 5), +5.075, Color.BLUE));
+    dots.add(ImmutableTriple.of(ImmutablePair.of("OR", 7), +6.045, Color.BLUE));
+    dots.add(ImmutableTriple.of(ImmutablePair.of("WA", 12), +7.435, Color.BLUE));
+    dots.add(ImmutableTriple.of(ImmutablePair.of("ME-AL", 2), +7.645, Color.BLUE));
+    dots.add(ImmutableTriple.of(ImmutablePair.of("IL", 20), +8.435, Color.BLUE));
+    dots.add(ImmutableTriple.of(ImmutablePair.of("CT", 7), +8.665, Color.BLUE));
+    dots.add(ImmutableTriple.of(ImmutablePair.of("NJ", 14), +8.895, Color.BLUE));
+    dots.add(ImmutableTriple.of(ImmutablePair.of("DE", 3), +9.315, Color.BLUE));
+    dots.add(ImmutableTriple.of(ImmutablePair.of("ME-01", 1), +10.695, Color.BLUE));
+    dots.add(ImmutableTriple.of(ImmutablePair.of("CA", 55), +11.56, Color.BLUE));
+    dots.add(ImmutableTriple.of(ImmutablePair.of("MA", 11), +11.57, Color.BLUE));
+    dots.add(ImmutableTriple.of(ImmutablePair.of("MD", 10), +13.035, Color.BLUE));
+    dots.add(ImmutableTriple.of(ImmutablePair.of("RI", 4), +13.92, Color.BLUE));
+    dots.add(ImmutableTriple.of(ImmutablePair.of("NY", 29), +14.09, Color.BLUE));
+    dots.add(ImmutableTriple.of(ImmutablePair.of("VT", 3), +17.80, Color.BLUE));
+    dots.add(ImmutableTriple.of(ImmutablePair.of("HI", 4), +21.355, Color.BLUE));
+    dots.add(ImmutableTriple.of(ImmutablePair.of("DC", 3), +46.815, Color.BLUE));
+
+    SwingometerFrame frame = new SwingometerFrame();
+    frame.setHeaderBinding(Binding.fixedBinding("2016 PRESIDENT SWINGOMETER"));
+    frame.setRangeBinding(Binding.fixedBinding(10));
+    frame.setValueBinding(Binding.fixedBinding(0.885));
+    frame.setNumBucketsPerSideBinding(Binding.fixedBinding(20));
+    frame.setLeftColorBinding(Binding.fixedBinding(Color.BLUE));
+    frame.setRightColorBinding(Binding.fixedBinding(Color.RED));
+    frame.setLeftToWinBinding(Binding.fixedBinding(-2.68));
+    frame.setRightToWinBinding(Binding.fixedBinding(2.68));
+    frame.setNumTicksBinding(Binding.sizeBinding(ticks));
+    frame.setTickPositionBinding(IndexedBinding.propertyBinding(ticks, Function.identity()));
+    frame.setTickTextBinding(IndexedBinding.propertyBinding(ticks, String::valueOf));
+    frame.setNumOuterLabelsBinding(Binding.sizeBinding(outerLabels));
+    frame.setOuterLabelPositionBinding(
+        IndexedBinding.propertyBinding(outerLabels, ImmutableTriple::getLeft));
+    frame.setOuterLabelTextBinding(
+        IndexedBinding.propertyBinding(outerLabels, label -> label.getMiddle().toString()));
+    frame.setOuterLabelColorBinding(
+        IndexedBinding.propertyBinding(outerLabels, ImmutableTriple::getRight));
+    frame.setNumDotsBinding(Binding.sizeBinding(dots));
+    frame.setDotsPositionBinding(IndexedBinding.propertyBinding(dots, Triple::getMiddle));
+    frame.setDotsColorBinding(IndexedBinding.propertyBinding(dots, Triple::getRight));
+    frame.setDotsLabelBinding(
+        IndexedBinding.propertyBinding(
+            dots,
+            e -> {
+              if (e.left.left.contains("-")) {
+                return e.left.left.replaceAll("-", "\n-");
+              }
+              return e.left.left + "\n(" + e.left.right + ")";
+            }));
+
+    frame.setSize(1024, 512);
+    compareRendering("SwingometerFrame", "MultiLineLabels", frame);
+  }
 }

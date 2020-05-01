@@ -12,6 +12,7 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.swing.JPanel;
@@ -409,31 +410,39 @@ public class SwingometerFrame extends GraphicsFrame {
       for (var entry : bucketedDots.entrySet()) {
         double val = (entry.getKey() - 0.5 * Math.signum(entry.getKey())) * bucketSize;
         ((Graphics2D) g).setTransform(createRotationTransform(val, originalTransform, arcY));
-        for (int i = 0; i < entry.getValue().size(); i++) {
-          var dot = entry.getValue().get(i);
+        for (int dotNum = 0; dotNum < entry.getValue().size(); dotNum++) {
+          var dot = entry.getValue().get(dotNum);
           g.setColor(dot.middle);
           g.fillOval(
               (getWidth() - dotSize) / 2 + 2,
-              inner / 2 - (i + 1) * dotSize + 2,
+              inner / 2 - (dotNum + 1) * dotSize + 2,
               dotSize - 4,
               dotSize - 4);
           g.setColor(Color.WHITE);
-          int size = dotSize - 8;
+          String[] text = dot.right.split("\n");
+          int size = (dotSize - 8) / text.length;
           Font font = null;
-          int strWidth = 0;
           while (size > 1) {
             font = StandardFont.readNormalFont(size);
-            strWidth = g.getFontMetrics(font).stringWidth(dot.right);
-            if (strWidth < dotSize - 8) {
+            int maxWidth =
+                Arrays.stream(text).mapToInt(g.getFontMetrics(font)::stringWidth).max().orElse(0);
+            if (maxWidth < dotSize - 8) {
               break;
             }
             size--;
           }
           g.setFont(font);
-          g.drawString(
-              dot.right,
-              (getWidth() - strWidth) / 2,
-              inner / 2 - i * dotSize - (dotSize - font.getSize() + 6) / 2);
+          for (int i = 0; i < text.length; i++) {
+            int strWidth = g.getFontMetrics(font).stringWidth(text[i]);
+            int totalHeight = size * text.length;
+            g.drawString(
+                text[i],
+                (getWidth() - strWidth) / 2,
+                inner / 2
+                    - dotNum * dotSize
+                    - (dotSize - totalHeight * 3 / 4) / 2
+                    + (i - text.length + 1) * size);
+          }
         }
         ((Graphics2D) g).setTransform(originalTransform);
       }
