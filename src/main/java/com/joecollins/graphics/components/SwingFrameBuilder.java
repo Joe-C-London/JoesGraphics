@@ -127,9 +127,9 @@ public class SwingFrameBuilder {
                   }
                   return new DecimalFormat("0.0%").format(p.swing)
                       + " SWING "
-                      + p.fromParty.getAbbreviation()
+                      + p.fromParty.getAbbreviation().toUpperCase()
                       + " TO "
-                      + p.toParty.getAbbreviation();
+                      + p.toParty.getAbbreviation().toUpperCase();
                 })
             .withRange(Binding.fixedBinding(0.1))
             .withNeutralColor(Binding.fixedBinding(Color.LIGHT_GRAY));

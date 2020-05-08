@@ -399,6 +399,45 @@ public class SimpleVoteViewPanelTest {
     compareRendering("SimpleVoteViewPanel", "SameParty-1", panel);
   }
 
+  @Test
+  public void testCandidateMajorityLine() throws IOException {
+    Party lrem = new Party("LA R\u00c9PUBLIQUE EN MARCHE", "LREM", Color.ORANGE);
+    Party fn = new Party("FRONT NATIONAL", "FN", Color.BLUE);
+
+    LinkedHashMap<Candidate, Integer> curr = new LinkedHashMap<>();
+    curr.put(new Candidate("Emmanuel Macron", lrem), 20743128);
+    curr.put(new Candidate("Marine Le Pen", fn), 10638475);
+
+    BindableWrapper<LinkedHashMap<Candidate, Integer>> currentVotes = new BindableWrapper<>(curr);
+    BindableWrapper<String> header = new BindableWrapper<>("FRANCE PRESIDENT: ROUND 2");
+    BindableWrapper<String> voteHeader = new BindableWrapper<>("OFFICIAL RESULT");
+    BindableWrapper<String> voteSubhead = new BindableWrapper<>("MACRON WIN");
+    BindableWrapper<Boolean> showMajority = new BindableWrapper<>(true);
+    BindableWrapper<Double> pctReporting = new BindableWrapper<>(1.0);
+    BindableWrapper<Candidate> winner =
+        new BindableWrapper<>(
+            curr.entrySet().stream().max(Map.Entry.comparingByValue()).get().getKey());
+
+    BasicResultPanel panel =
+        BasicResultPanel.candidateVotes(
+                currentVotes.getBinding(), voteHeader.getBinding(), voteSubhead.getBinding())
+            .withWinner(winner.getBinding())
+            .withMajorityLine(showMajority.getBinding(), () -> "50% TO WIN")
+            .withPctReporting(pctReporting.getBinding())
+            .build(header.getBinding());
+    panel.setSize(1024, 512);
+    compareRendering("SimpleVoteViewPanel", "MajorityLine-1", panel);
+
+    voteHeader.setValue("15.4% REPORTING");
+    voteSubhead.setValue("PROJECTION: MACRON WIN");
+    pctReporting.setValue(0.154);
+    winner.setValue(null);
+    curr.put(new Candidate("Emmanuel Macron", lrem), 3825279);
+    curr.put(new Candidate("Marine Le Pen", fn), 1033686);
+    currentVotes.setValue(curr);
+    compareRendering("SimpleVoteViewPanel", "MajorityLine-2", panel);
+  }
+
   private Map<Integer, Shape> peiShapesByDistrict() throws IOException {
     URL peiMap =
         MapFrameTest.class

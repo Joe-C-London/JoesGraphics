@@ -859,6 +859,8 @@ public class BasicResultPanel extends JPanel {
     protected BindingReceiver<Map<KT, ? extends CT>> current;
     protected BindingReceiver<String> header;
     protected BindingReceiver<String> subhead;
+    protected BindingReceiver<Boolean> showMajority;
+    protected BindingReceiver<String> majorityLabel;
     protected BindingReceiver<KT> winner;
     protected BindingReceiver<Double> pctReporting;
 
@@ -948,6 +950,13 @@ public class BasicResultPanel extends JPanel {
       return this;
     }
 
+    public VoteScreenBuilder<KT, CT, CPT, PT> withMajorityLine(
+        Binding<Boolean> showMajority, Binding<String> majorityLabel) {
+      this.showMajority = new BindingReceiver<>(showMajority);
+      this.majorityLabel = new BindingReceiver<>(majorityLabel);
+      return this;
+    }
+
     public BasicResultPanel build(Binding<String> textHeader) {
       return new BasicResultPanel(
           createHeaderLabel(textHeader),
@@ -995,30 +1004,67 @@ public class BasicResultPanel extends JPanel {
                 return ret;
               });
       Binding<KT> winner = this.winner == null ? (() -> null) : this.winner.getBinding();
-      return BarFrameBuilder.basicWithShapes(
-              votesPct.merge(
-                  winner,
-                  (v, w) -> {
-                    if (w != null) {
-                      v.computeIfAbsent(w, x -> new VotesPct<>(0, 0.0)).winner = true;
+      BarFrameBuilder builder =
+          BarFrameBuilder.basicWithShapes(
+                  votesPct.merge(
+                      winner,
+                      (v, w) -> {
+                        if (w != null) {
+                          v.computeIfAbsent(w, x -> new VotesPct<>(0, 0.0)).winner = true;
+                        }
+                        return v;
+                      }),
+                  keyTemplate::toMainBarHeader,
+                  key -> keyTemplate.toParty(key).getColor(),
+                  votes -> votes.percent,
+                  votes -> voteTemplate.toBarString(votes.votes, votes.percent),
+                  (party, votes) -> votes.winner ? keyTemplate.winnerShape() : null,
+                  (party, votes) -> party == Party.OTHERS ? -1 : votes.percent)
+              .withHeader(header.getBinding())
+              .withSubhead(subhead.getBinding())
+              .withMax(
+                  pctReporting == null
+                      ? (() -> 2.0 / 3)
+                      : pctReporting.getBinding(x -> 2.0 / 3 / x));
+      if (showMajority != null) {
+        BindableList<Double> lines = new BindableList<>();
+        showMajority
+            .getBinding()
+            .bind(
+                show -> {
+                  lines.clear();
+                  if (show) {
+                    lines.add(pctReporting == null ? 0.5 : 0.5 / pctReporting.getValue());
+                  }
+                });
+        if (pctReporting != null) {
+          pctReporting
+              .getBinding()
+              .bind(
+                  pct -> {
+                    if (!lines.isEmpty()) {
+                      lines.set(0, 0.5 / pct);
                     }
-                    return v;
-                  }),
-              keyTemplate::toMainBarHeader,
-              key -> keyTemplate.toParty(key).getColor(),
-              votes -> votes.percent,
-              votes -> voteTemplate.toBarString(votes.votes, votes.percent),
-              (party, votes) -> votes.winner ? keyTemplate.winnerShape() : null,
-              (party, votes) -> party == Party.OTHERS ? -1 : votes.percent)
-          .withHeader(header.getBinding())
-          .withSubhead(subhead.getBinding())
-          .withMax(
-              pctReporting == null ? (() -> 2.0 / 3) : pctReporting.getBinding(x -> 2.0 / 3 / x))
-          .build();
+                  });
+        }
+        showMajority
+            .getBinding()
+            .bind(
+                label -> {
+                  if (!lines.isEmpty()) {
+                    lines.setAll(lines);
+                  }
+                });
+        builder = builder.withLines(lines, n -> majorityLabel.getValue());
+      }
+      return builder.build();
     }
 
     @Override
     protected BarFrame createDiffFrame() {
+      if (prev == null) {
+        return null;
+      }
       Binding<? extends Map<Party, CurrDiff<Double>>> currDiff =
           current
               .getBinding()
