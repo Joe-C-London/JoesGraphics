@@ -80,7 +80,7 @@ public class SwingometerFrame extends GraphicsFrame {
     return swingPanel.value;
   }
 
-  public void setValueBinding(Binding<Number> valueBinding) {
+  public void setValueBinding(Binding<? extends Number> valueBinding) {
     this.valueBinding.unbind();
     this.valueBinding = valueBinding;
     this.valueBinding.bind(swingPanel::setValue);
@@ -90,7 +90,7 @@ public class SwingometerFrame extends GraphicsFrame {
     return swingPanel.range;
   }
 
-  public void setRangeBinding(Binding<Number> rangeBinding) {
+  public void setRangeBinding(Binding<? extends Number> rangeBinding) {
     this.rangeBinding.unbind();
     this.rangeBinding = rangeBinding;
     this.rangeBinding.bind(swingPanel::setRange);
@@ -480,14 +480,17 @@ public class SwingometerFrame extends GraphicsFrame {
 
       g.setFont(StandardFont.readNormalFont(20));
       for (Triple<Number, String, Color> outerLabel : outerLabels) {
-        g.setColor(outerLabel.getRight());
-        ((Graphics2D) g)
-            .setTransform(
-                createRotationTransform(
-                    outerLabel.getLeft().doubleValue(), originalTransform, arcY));
-        int textWidth = g.getFontMetrics().stringWidth(outerLabel.getMiddle());
-        g.drawString(outerLabel.getMiddle(), (getWidth() - textWidth) / 2, arcY + boundary / 2 - 6);
-        ((Graphics2D) g).setTransform(originalTransform);
+        if (Math.abs(outerLabel.getLeft().doubleValue()) <= range.doubleValue()) {
+          g.setColor(outerLabel.getRight());
+          ((Graphics2D) g)
+              .setTransform(
+                  createRotationTransform(
+                      outerLabel.getLeft().doubleValue(), originalTransform, arcY));
+          int textWidth = g.getFontMetrics().stringWidth(outerLabel.getMiddle());
+          g.drawString(
+              outerLabel.getMiddle(), (getWidth() - textWidth) / 2, arcY + boundary / 2 - 6);
+          ((Graphics2D) g).setTransform(originalTransform);
+        }
       }
     }
 

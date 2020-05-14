@@ -1,9 +1,11 @@
 package com.joecollins.graphics;
 
+import com.joecollins.graphics.components.GraphicsFrame;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.ClipboardOwner;
@@ -30,6 +32,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.WindowConstants;
+import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileFilter;
 import twitter4j.StatusUpdate;
 import twitter4j.TwitterException;
@@ -53,7 +56,17 @@ public class GenericWindow<T extends JPanel> extends JFrame {
 
     getContentPane().setLayout(new FlowLayout());
     getContentPane().setBackground(Color.BLACK);
-    getContentPane().add(panel);
+    JPanel p;
+    if (panel instanceof GraphicsFrame) {
+      p = new JPanel();
+      p.setBackground(Color.WHITE);
+      p.setLayout(new GridLayout(1, 1));
+      p.setBorder(new EmptyBorder(5, 5, 5, 5));
+      p.add(panel);
+    } else {
+      p = panel;
+    }
+    getContentPane().add(p);
 
     JMenuBar menuBar = new JMenuBar();
     setJMenuBar(menuBar);
@@ -64,21 +77,21 @@ public class GenericWindow<T extends JPanel> extends JFrame {
     JMenuItem copyItem = new JMenuItem("Copy to Clipboard");
     copyItem.addActionListener(
         evt -> {
-          copyImageToClipboard(panel);
+          copyImageToClipboard(p);
         });
     imageMenu.add(copyItem);
 
     JMenuItem fileItem = new JMenuItem("Save to File...");
     fileItem.addActionListener(
         evt -> {
-          saveImageToFile(panel);
+          saveImageToFile(p);
         });
     imageMenu.add(fileItem);
 
     JMenuItem tweetItem = new JMenuItem("Tweet...");
     tweetItem.addActionListener(
         evt -> {
-          TweetFrame tweetFrame = new TweetFrame(panel);
+          TweetFrame tweetFrame = new TweetFrame(p);
           tweetFrame.setVisible(true);
         });
     imageMenu.add(tweetItem);
