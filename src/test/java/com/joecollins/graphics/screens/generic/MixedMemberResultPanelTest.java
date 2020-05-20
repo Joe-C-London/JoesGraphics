@@ -12,7 +12,6 @@ import java.awt.Color;
 import java.awt.Shape;
 import java.io.IOException;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,7 +37,6 @@ public class MixedMemberResultPanelTest {
     BindableWrapper<String> partyHeader = new BindableWrapper<>("PARTY VOTES");
     BindableWrapper<String> partyChangeHeader = new BindableWrapper<>("PARTY CHANGE SINCE 2015");
     BindableWrapper<String> mapHeader = new BindableWrapper<>("CHARLOTTETOWN");
-    BindableWrapper<Map<Integer, Party>> winnersByDistrict = new BindableWrapper<>(new HashMap<>());
     Map<Integer, Shape> shapesByDistrict = peiShapesByDistrict();
     BindableWrapper<List<Shape>> focus =
         new BindableWrapper<>(
@@ -72,10 +70,10 @@ public class MixedMemberResultPanelTest {
     panel.setSize(1024, 512);
 
     LinkedHashMap<Candidate, Integer> currCandVotes = new LinkedHashMap<>();
-    currCandVotes.put(new Candidate("Robert Mitchell", lib), 1420);
-    currCandVotes.put(new Candidate("Mike Gillis", pc), 865);
-    currCandVotes.put(new Candidate("Amanda Morrison", grn), 1057);
     currCandVotes.put(new Candidate("Jesse Reddin Cousins", ndp), 41);
+    currCandVotes.put(new Candidate("Mike Gillis", pc), 865);
+    currCandVotes.put(new Candidate("Robert Mitchell", lib), 1420);
+    currCandVotes.put(new Candidate("Amanda Morrison", grn), 1057);
     currentCandidateVotes.setValue(currCandVotes);
 
     LinkedHashMap<Party, Integer> prevCandVotes = new LinkedHashMap<>();
@@ -84,13 +82,12 @@ public class MixedMemberResultPanelTest {
     prevCandVotes.put(ndp, 360);
     prevCandVotes.put(grn, 295);
     previousCandidateVotes.setValue(prevCandVotes);
-    currentCandidateVotes.setValue(currCandVotes);
 
     LinkedHashMap<Party, Integer> currPartyVotes = new LinkedHashMap<>();
-    currPartyVotes.put(lib, 1013);
-    currPartyVotes.put(pc, 822);
-    currPartyVotes.put(ndp, 112);
     currPartyVotes.put(grn, 1098);
+    currPartyVotes.put(lib, 1013);
+    currPartyVotes.put(ndp, 112);
+    currPartyVotes.put(pc, 822);
     currentPartyVotes.setValue(currPartyVotes);
 
     LinkedHashMap<Party, Integer> prevPartyVotes = new LinkedHashMap<>();
@@ -100,7 +97,180 @@ public class MixedMemberResultPanelTest {
     prevPartyVotes.put(grn, 426);
     previousPartyVotes.setValue(prevPartyVotes);
 
-    compareRendering("MixedMemberResultPanel", "Map-1", panel);
+    compareRendering("MixedMemberResultPanel", "Basic", panel);
+  }
+
+  @Test
+  public void testMMPWithPctReporting() throws Exception {
+    BindableWrapper<LinkedHashMap<Candidate, Integer>> currentCandidateVotes =
+        new BindableWrapper<>(new LinkedHashMap<>());
+    BindableWrapper<LinkedHashMap<Party, Integer>> previousCandidateVotes =
+        new BindableWrapper<>(new LinkedHashMap<>());
+    BindableWrapper<LinkedHashMap<Party, Integer>> currentPartyVotes =
+        new BindableWrapper<>(new LinkedHashMap<>());
+    BindableWrapper<LinkedHashMap<Party, Integer>> previousPartyVotes =
+        new BindableWrapper<>(new LinkedHashMap<>());
+    BindableWrapper<String> header = new BindableWrapper<>("CHARLOTTETOWN-WINSLOE");
+    BindableWrapper<String> candidateHeader = new BindableWrapper<>("CANDIDATE VOTES");
+    BindableWrapper<String> candidateChangeHeader =
+        new BindableWrapper<>("CANDIDATE CHANGE SINCE 2015");
+    BindableWrapper<String> partyHeader = new BindableWrapper<>("PARTY VOTES");
+    BindableWrapper<String> partyChangeHeader = new BindableWrapper<>("PARTY CHANGE SINCE 2015");
+    BindableWrapper<String> mapHeader = new BindableWrapper<>("CHARLOTTETOWN");
+    Map<Integer, Shape> shapesByDistrict = peiShapesByDistrict();
+    BindableWrapper<List<Shape>> focus =
+        new BindableWrapper<>(
+            shapesByDistrict.entrySet().stream()
+                .filter(e -> e.getKey() >= 10 && e.getKey() <= 14)
+                .map(Map.Entry::getValue)
+                .collect(Collectors.toList()));
+    BindableWrapper<Integer> selectedShape = new BindableWrapper<>(10);
+    BindableWrapper<Result> selectedResult = new BindableWrapper<>();
+    BindableWrapper<Double> candidatePctReporting = new BindableWrapper<>(0.0);
+    BindableWrapper<Double> partyPctReporting = new BindableWrapper<>(0.0);
+
+    Party lib = new Party("Liberal", "LIB", Color.RED);
+    Party grn = new Party("Green", "GRN", Color.GREEN.darker());
+    Party pc = new Party("Progressive Conservative", "PC", Color.BLUE);
+    Party ndp = new Party("New Democratic Party", "NDP", Color.ORANGE);
+
+    MixedMemberResultPanel panel =
+        MixedMemberResultPanel.builder()
+            .withCandidateVotes(currentCandidateVotes.getBinding(), candidateHeader.getBinding())
+            .withPrevCandidateVotes(
+                previousCandidateVotes.getBinding(), candidateChangeHeader.getBinding())
+            .withCandidatePctReporting(candidatePctReporting.getBinding())
+            .withPartyVotes(currentPartyVotes.getBinding(), partyHeader.getBinding())
+            .withPrevPartyVotes(previousPartyVotes.getBinding(), partyChangeHeader.getBinding())
+            .withPartyPctReporting(partyPctReporting.getBinding())
+            .withResultMap(
+                () -> shapesByDistrict,
+                selectedShape.getBinding(),
+                selectedResult.getBinding(),
+                focus.getBinding(),
+                mapHeader.getBinding())
+            .build(header.getBinding());
+    panel.setSize(1024, 512);
+
+    LinkedHashMap<Candidate, Integer> currCandVotes = new LinkedHashMap<>();
+    currCandVotes.put(new Candidate("Jesse Reddin Cousins", ndp), 8);
+    currCandVotes.put(new Candidate("Mike Gillis", pc), 173);
+    currCandVotes.put(new Candidate("Robert Mitchell", lib), 284);
+    currCandVotes.put(new Candidate("Amanda Morrison", grn), 211);
+    currentCandidateVotes.setValue(currCandVotes);
+
+    LinkedHashMap<Party, Integer> prevCandVotes = new LinkedHashMap<>();
+    prevCandVotes.put(lib, 1425);
+    prevCandVotes.put(pc, 1031);
+    prevCandVotes.put(ndp, 360);
+    prevCandVotes.put(grn, 295);
+    previousCandidateVotes.setValue(prevCandVotes);
+
+    LinkedHashMap<Party, Integer> currPartyVotes = new LinkedHashMap<>();
+    currPartyVotes.put(grn, 110);
+    currPartyVotes.put(lib, 101);
+    currPartyVotes.put(ndp, 11);
+    currPartyVotes.put(pc, 82);
+    currentPartyVotes.setValue(currPartyVotes);
+
+    LinkedHashMap<Party, Integer> prevPartyVotes = new LinkedHashMap<>();
+    prevPartyVotes.put(lib, 1397);
+    prevPartyVotes.put(pc, 1062);
+    prevPartyVotes.put(ndp, 544);
+    prevPartyVotes.put(grn, 426);
+    previousPartyVotes.setValue(prevPartyVotes);
+
+    candidatePctReporting.setValue(0.2);
+    partyPctReporting.setValue(0.1);
+    selectedResult.setValue(Result.leading(lib));
+
+    compareRendering("MixedMemberResultPanel", "PctReporting", panel);
+  }
+
+  @Test
+  public void testMMPWaiting() throws Exception {
+    BindableWrapper<LinkedHashMap<Candidate, Integer>> currentCandidateVotes =
+        new BindableWrapper<>(new LinkedHashMap<>());
+    BindableWrapper<LinkedHashMap<Party, Integer>> previousCandidateVotes =
+        new BindableWrapper<>(new LinkedHashMap<>());
+    BindableWrapper<LinkedHashMap<Party, Integer>> currentPartyVotes =
+        new BindableWrapper<>(new LinkedHashMap<>());
+    BindableWrapper<LinkedHashMap<Party, Integer>> previousPartyVotes =
+        new BindableWrapper<>(new LinkedHashMap<>());
+    BindableWrapper<String> header = new BindableWrapper<>("CHARLOTTETOWN-WINSLOE");
+    BindableWrapper<String> candidateHeader = new BindableWrapper<>("CANDIDATE VOTES");
+    BindableWrapper<String> candidateChangeHeader =
+        new BindableWrapper<>("CANDIDATE CHANGE SINCE 2015");
+    BindableWrapper<String> partyHeader = new BindableWrapper<>("PARTY VOTES");
+    BindableWrapper<String> partyChangeHeader = new BindableWrapper<>("PARTY CHANGE SINCE 2015");
+    BindableWrapper<String> mapHeader = new BindableWrapper<>("CHARLOTTETOWN");
+    Map<Integer, Shape> shapesByDistrict = peiShapesByDistrict();
+    BindableWrapper<List<Shape>> focus =
+        new BindableWrapper<>(
+            shapesByDistrict.entrySet().stream()
+                .filter(e -> e.getKey() >= 10 && e.getKey() <= 14)
+                .map(Map.Entry::getValue)
+                .collect(Collectors.toList()));
+    BindableWrapper<Integer> selectedShape = new BindableWrapper<>(10);
+    BindableWrapper<Result> selectedResult = new BindableWrapper<>();
+    BindableWrapper<Double> candidatePctReporting = new BindableWrapper<>(0.0);
+    BindableWrapper<Double> partyPctReporting = new BindableWrapper<>(0.0);
+
+    Party lib = new Party("Liberal", "LIB", Color.RED);
+    Party grn = new Party("Green", "GRN", Color.GREEN.darker());
+    Party pc = new Party("Progressive Conservative", "PC", Color.BLUE);
+    Party ndp = new Party("New Democratic Party", "NDP", Color.ORANGE);
+
+    MixedMemberResultPanel panel =
+        MixedMemberResultPanel.builder()
+            .withCandidateVotes(currentCandidateVotes.getBinding(), candidateHeader.getBinding())
+            .withPrevCandidateVotes(
+                previousCandidateVotes.getBinding(), candidateChangeHeader.getBinding())
+            .withCandidatePctReporting(candidatePctReporting.getBinding())
+            .withPartyVotes(currentPartyVotes.getBinding(), partyHeader.getBinding())
+            .withPrevPartyVotes(previousPartyVotes.getBinding(), partyChangeHeader.getBinding())
+            .withPartyPctReporting(partyPctReporting.getBinding())
+            .withResultMap(
+                () -> shapesByDistrict,
+                selectedShape.getBinding(),
+                selectedResult.getBinding(),
+                focus.getBinding(),
+                mapHeader.getBinding())
+            .build(header.getBinding());
+    panel.setSize(1024, 512);
+
+    LinkedHashMap<Candidate, Integer> currCandVotes = new LinkedHashMap<>();
+    currCandVotes.put(new Candidate("Jesse Reddin Cousins", ndp), 0);
+    currCandVotes.put(new Candidate("Mike Gillis", pc), 0);
+    currCandVotes.put(new Candidate("Robert Mitchell", lib), 0);
+    currCandVotes.put(new Candidate("Amanda Morrison", grn), 0);
+    currentCandidateVotes.setValue(currCandVotes);
+
+    LinkedHashMap<Party, Integer> prevCandVotes = new LinkedHashMap<>();
+    prevCandVotes.put(lib, 1425);
+    prevCandVotes.put(pc, 1031);
+    prevCandVotes.put(ndp, 360);
+    prevCandVotes.put(grn, 295);
+    previousCandidateVotes.setValue(prevCandVotes);
+
+    LinkedHashMap<Party, Integer> currPartyVotes = new LinkedHashMap<>();
+    currPartyVotes.put(grn, 0);
+    currPartyVotes.put(lib, 0);
+    currPartyVotes.put(ndp, 0);
+    currPartyVotes.put(pc, 0);
+    currentPartyVotes.setValue(currPartyVotes);
+
+    LinkedHashMap<Party, Integer> prevPartyVotes = new LinkedHashMap<>();
+    prevPartyVotes.put(lib, 1397);
+    prevPartyVotes.put(pc, 1062);
+    prevPartyVotes.put(ndp, 544);
+    prevPartyVotes.put(grn, 426);
+    previousPartyVotes.setValue(prevPartyVotes);
+
+    candidatePctReporting.setValue(0.0);
+    partyPctReporting.setValue(0.0);
+
+    compareRendering("MixedMemberResultPanel", "Waiting", panel);
   }
 
   private Map<Integer, Shape> peiShapesByDistrict() throws IOException {

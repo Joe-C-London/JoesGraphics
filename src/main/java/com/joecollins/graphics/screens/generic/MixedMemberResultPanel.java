@@ -113,8 +113,10 @@ public class MixedMemberResultPanel extends JPanel {
 
     private BindingReceiver<? extends Map<Candidate, Integer>> candidateVotes;
     private BindingReceiver<? extends Map<Party, Integer>> candidatePrev;
+    private BindingReceiver<Double> candidatePctReporting;
     private BindingReceiver<? extends Map<Party, Integer>> partyVotes;
     private BindingReceiver<? extends Map<Party, Integer>> partyPrev;
+    private BindingReceiver<Double> partyPctReporting;
 
     private BindingReceiver<String> candidateVoteHeader;
     private BindingReceiver<String> candidateChangeHeader;
@@ -151,6 +153,16 @@ public class MixedMemberResultPanel extends JPanel {
       return this;
     }
 
+    public Builder withCandidatePctReporting(Binding<Double> pctReporting) {
+      this.candidatePctReporting = new BindingReceiver<>(pctReporting);
+      return this;
+    }
+
+    public Builder withPartyPctReporting(Binding<Double> pctReporting) {
+      this.partyPctReporting = new BindingReceiver<>(pctReporting);
+      return this;
+    }
+
     public <T> Builder withResultMap(
         Binding<Map<T, Shape>> shapes,
         Binding<T> selectedShape,
@@ -179,7 +191,9 @@ public class MixedMemberResultPanel extends JPanel {
                     LinkedHashMap<Candidate, Pair<Integer, Double>> ret = new LinkedHashMap<>();
                     for (var e : v.entrySet()) {
                       ret.put(
-                          e.getKey(), ImmutablePair.of(e.getValue(), 1.0 * e.getValue() / total));
+                          e.getKey(),
+                          ImmutablePair.of(
+                              e.getValue(), total == 0 ? 0 : (1.0 * e.getValue() / total)));
                     }
                     return ret;
                   }),
@@ -191,12 +205,17 @@ public class MixedMemberResultPanel extends JPanel {
               c -> c.getParty().getColor(),
               v -> v.getRight(),
               v ->
-                  THOUSANDS_FORMAT.format(v.getLeft())
-                      + " ("
-                      + PCT_FORMAT.format(v.getRight())
-                      + ")")
+                  v.getLeft() == 0
+                      ? "WAITING..."
+                      : (THOUSANDS_FORMAT.format(v.getLeft())
+                          + " ("
+                          + PCT_FORMAT.format(v.getRight())
+                          + ")"))
           .withHeader(candidateVoteHeader.getBinding())
-          .withMax(() -> 2.0 / 3)
+          .withMax(
+              candidatePctReporting == null
+                  ? Binding.fixedBinding(2.0 / 3)
+                  : candidatePctReporting.getBinding(x -> 2.0 / 3 / Math.max(x, 1e-6)))
           .build();
     }
 
@@ -210,6 +229,9 @@ public class MixedMemberResultPanel extends JPanel {
                         int currTotal = c.values().stream().mapToInt(i -> i).sum();
                         int prevTotal = p.values().stream().mapToInt(i -> i).sum();
                         LinkedHashMap<Party, Pair<Integer, Double>> ret = new LinkedHashMap<>();
+                        if (currTotal == 0) {
+                          return ret;
+                        }
                         for (var e : c.entrySet()) {
                           ret.put(
                               e.getKey().getParty(),
@@ -232,7 +254,10 @@ public class MixedMemberResultPanel extends JPanel {
               v -> PCT_DIFF_FORMAT.format(v.getRight()),
               (p, v) -> v.getLeft())
           .withHeader(candidateChangeHeader.getBinding())
-          .withWingspan(() -> 0.05)
+          .withWingspan(
+              candidatePctReporting == null
+                  ? Binding.fixedBinding(0.05)
+                  : candidatePctReporting.getBinding(x -> 0.05 / x))
           .build();
     }
 
@@ -244,7 +269,9 @@ public class MixedMemberResultPanel extends JPanel {
                     LinkedHashMap<Party, Pair<Integer, Double>> ret = new LinkedHashMap<>();
                     for (var e : v.entrySet()) {
                       ret.put(
-                          e.getKey(), ImmutablePair.of(e.getValue(), 1.0 * e.getValue() / total));
+                          e.getKey(),
+                          ImmutablePair.of(
+                              e.getValue(), total == 0 ? 0 : (1.0 * e.getValue() / total)));
                     }
                     return ret;
                   }),
@@ -252,12 +279,17 @@ public class MixedMemberResultPanel extends JPanel {
               Party::getColor,
               v -> v.getRight(),
               v ->
-                  THOUSANDS_FORMAT.format(v.getLeft())
-                      + " ("
-                      + PCT_FORMAT.format(v.getRight())
-                      + ")")
+                  v.getLeft() == 0
+                      ? "WAITING..."
+                      : (THOUSANDS_FORMAT.format(v.getLeft())
+                          + " ("
+                          + PCT_FORMAT.format(v.getRight())
+                          + ")"))
           .withHeader(partyVoteHeader.getBinding())
-          .withMax(() -> 2.0 / 3)
+          .withMax(
+              partyPctReporting == null
+                  ? Binding.fixedBinding(2.0 / 3)
+                  : partyPctReporting.getBinding(x -> 2.0 / 3 / x))
           .build();
     }
 
@@ -271,6 +303,9 @@ public class MixedMemberResultPanel extends JPanel {
                         int currTotal = c.values().stream().mapToInt(i -> i).sum();
                         int prevTotal = p.values().stream().mapToInt(i -> i).sum();
                         LinkedHashMap<Party, Pair<Integer, Double>> ret = new LinkedHashMap<>();
+                        if (currTotal == 0) {
+                          return ret;
+                        }
                         for (var e : c.entrySet()) {
                           ret.put(
                               e.getKey(),
@@ -291,7 +326,10 @@ public class MixedMemberResultPanel extends JPanel {
               v -> PCT_DIFF_FORMAT.format(v.getRight()),
               (p, v) -> v.getLeft())
           .withHeader(partyChangeHeader.getBinding())
-          .withWingspan(() -> 0.05)
+          .withWingspan(
+              partyPctReporting == null
+                  ? Binding.fixedBinding(0.05)
+                  : partyPctReporting.getBinding(x -> 0.05 / x))
           .build();
     }
 
