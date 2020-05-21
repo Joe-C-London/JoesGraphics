@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
-class MapBuilder {
+public class MapBuilder {
   private final BindingReceiver<List<Pair<Shape, Color>>> winners;
   private final BindingReceiver<List<Shape>> mapFocus;
   private final BindingReceiver<String> mapHeader;

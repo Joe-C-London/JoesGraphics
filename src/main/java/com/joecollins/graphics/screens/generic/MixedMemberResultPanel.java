@@ -284,7 +284,8 @@ public class MixedMemberResultPanel extends JPanel {
                       : (THOUSANDS_FORMAT.format(v.getLeft())
                           + " ("
                           + PCT_FORMAT.format(v.getRight())
-                          + ")"))
+                          + ")"),
+              (p, v) -> p == Party.OTHERS ? -1 : v.getLeft())
           .withHeader(partyVoteHeader.getBinding())
           .withMax(
               partyPctReporting == null
@@ -324,7 +325,7 @@ public class MixedMemberResultPanel extends JPanel {
               Party::getColor,
               v -> v.getRight(),
               v -> PCT_DIFF_FORMAT.format(v.getRight()),
-              (p, v) -> v.getLeft())
+              (p, v) -> p == Party.OTHERS ? -1 : v.getLeft())
           .withHeader(partyChangeHeader.getBinding())
           .withWingspan(
               partyPctReporting == null
