@@ -302,7 +302,7 @@ public class SeatViewPanelTest {
     BindableWrapper<String> mapHeader = new BindableWrapper<>("PEI");
     BindableWrapper<Map<Integer, Party>> winnersByDistrict = new BindableWrapper<>(new HashMap<>());
     Map<Integer, Shape> shapesByDistrict = peiShapesByDistrict();
-    BindableWrapper<List<Shape>> focus = new BindableWrapper<>();
+    BindableWrapper<List<Integer>> focus = new BindableWrapper<>();
 
     Party lib = new Party("Liberal", "LIB", Color.RED);
     Party grn = new Party("Green", "GRN", Color.GREEN.darker());
@@ -360,10 +360,7 @@ public class SeatViewPanelTest {
     compareRendering("SeatViewPanel", "Map-2", panel);
 
     focus.setValue(
-        shapesByDistrict.entrySet().stream()
-            .filter(e -> e.getKey() <= 7)
-            .map(Map.Entry::getValue)
-            .collect(Collectors.toList()));
+        shapesByDistrict.keySet().stream().filter(id -> id <= 7).collect(Collectors.toList()));
     header.setValue("CARDIGAN");
     seatHeader.setValue("1 OF 7 DISTRICTS DECLARED");
     seatSubhead.setValue("");

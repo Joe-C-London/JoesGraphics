@@ -57,12 +57,9 @@ public class SimpleVoteViewPanelTest {
     List<Party> swingPartyOrder =
         Arrays.asList(ndp.getParty(), grn.getParty(), lib.getParty(), pc.getParty());
     Map<Integer, Shape> shapesByDistrict = peiShapesByDistrict();
-    BindableWrapper<List<Shape>> focus =
+    BindableWrapper<List<Integer>> focus =
         new BindableWrapper<>(
-            shapesByDistrict.entrySet().stream()
-                .filter(e -> e.getKey() <= 7)
-                .map(Map.Entry::getValue)
-                .collect(Collectors.toList()));
+            shapesByDistrict.keySet().stream().filter(id -> id <= 7).collect(Collectors.toList()));
     BindableWrapper<Integer> selectedDistrict = new BindableWrapper<>(3);
 
     BasicResultPanel panel =
@@ -174,12 +171,9 @@ public class SimpleVoteViewPanelTest {
     List<Party> swingPartyOrder =
         Arrays.asList(ndp.getParty(), grn.getParty(), lib.getParty(), pc.getParty());
     Map<Integer, Shape> shapesByDistrict = peiShapesByDistrict();
-    BindableWrapper<List<Shape>> focus =
+    BindableWrapper<List<Integer>> focus =
         new BindableWrapper<>(
-            shapesByDistrict.entrySet().stream()
-                .filter(e -> e.getKey() <= 7)
-                .map(Map.Entry::getValue)
-                .collect(Collectors.toList()));
+            shapesByDistrict.keySet().stream().filter(id -> id <= 7).collect(Collectors.toList()));
     BindableWrapper<Integer> selectedDistrict = new BindableWrapper<>(3);
 
     BasicResultPanel panel =
@@ -266,7 +260,7 @@ public class SimpleVoteViewPanelTest {
     BindableWrapper<String> mapHeader = new BindableWrapper<>("PEI");
     List<Party> swingPartyOrder = Arrays.asList(ndp, grn, lib, pc);
     Map<Integer, Shape> shapesByDistrict = peiShapesByDistrict();
-    BindableWrapper<List<Shape>> focus = new BindableWrapper<>();
+    BindableWrapper<List<Integer>> focus = new BindableWrapper<>();
     BindableWrapper<Map<Integer, Party>> winnersByDistrict = new BindableWrapper<>(new HashMap<>());
 
     BasicResultPanel panel =
@@ -306,10 +300,7 @@ public class SimpleVoteViewPanelTest {
     compareRendering("SimpleVoteViewPanel", "PopularVote-2", panel);
 
     focus.setValue(
-        shapesByDistrict.entrySet().stream()
-            .filter(e -> e.getKey() <= 7)
-            .map(Map.Entry::getValue)
-            .collect(Collectors.toList()));
+        shapesByDistrict.keySet().stream().filter(id -> id <= 7).collect(Collectors.toList()));
     mapHeader.setValue("CARDIGAN");
     header.setValue("CARDIGAN");
     pctReporting.setValue(1.0 / 7);

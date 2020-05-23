@@ -38,11 +38,10 @@ public class MixedMemberResultPanelTest {
     BindableWrapper<String> partyChangeHeader = new BindableWrapper<>("PARTY CHANGE SINCE 2015");
     BindableWrapper<String> mapHeader = new BindableWrapper<>("CHARLOTTETOWN");
     Map<Integer, Shape> shapesByDistrict = peiShapesByDistrict();
-    BindableWrapper<List<Shape>> focus =
+    BindableWrapper<List<Integer>> focus =
         new BindableWrapper<>(
-            shapesByDistrict.entrySet().stream()
-                .filter(e -> e.getKey() >= 10 && e.getKey() <= 14)
-                .map(Map.Entry::getValue)
+            shapesByDistrict.keySet().stream()
+                .filter(id -> id >= 10 && id <= 14)
                 .collect(Collectors.toList()));
     BindableWrapper<Integer> selectedShape = new BindableWrapper<>(10);
     BindableWrapper<Result> selectedResult = new BindableWrapper<>();
@@ -118,11 +117,10 @@ public class MixedMemberResultPanelTest {
     BindableWrapper<String> partyChangeHeader = new BindableWrapper<>("PARTY CHANGE SINCE 2015");
     BindableWrapper<String> mapHeader = new BindableWrapper<>("CHARLOTTETOWN");
     Map<Integer, Shape> shapesByDistrict = peiShapesByDistrict();
-    BindableWrapper<List<Shape>> focus =
+    BindableWrapper<List<Integer>> focus =
         new BindableWrapper<>(
-            shapesByDistrict.entrySet().stream()
-                .filter(e -> e.getKey() >= 10 && e.getKey() <= 14)
-                .map(Map.Entry::getValue)
+            shapesByDistrict.keySet().stream()
+                .filter(id -> id >= 10 && id <= 14)
                 .collect(Collectors.toList()));
     BindableWrapper<Integer> selectedShape = new BindableWrapper<>(10);
     BindableWrapper<Result> selectedResult = new BindableWrapper<>();
@@ -205,11 +203,10 @@ public class MixedMemberResultPanelTest {
     BindableWrapper<String> partyChangeHeader = new BindableWrapper<>("PARTY CHANGE SINCE 2015");
     BindableWrapper<String> mapHeader = new BindableWrapper<>("CHARLOTTETOWN");
     Map<Integer, Shape> shapesByDistrict = peiShapesByDistrict();
-    BindableWrapper<List<Shape>> focus =
+    BindableWrapper<List<Integer>> focus =
         new BindableWrapper<>(
-            shapesByDistrict.entrySet().stream()
-                .filter(e -> e.getKey() >= 10 && e.getKey() <= 14)
-                .map(Map.Entry::getValue)
+            shapesByDistrict.keySet().stream()
+                .filter(id -> id >= 10 && id <= 14)
                 .collect(Collectors.toList()));
     BindableWrapper<Integer> selectedShape = new BindableWrapper<>(10);
     BindableWrapper<Result> selectedResult = new BindableWrapper<>();
@@ -291,11 +288,10 @@ public class MixedMemberResultPanelTest {
     BindableWrapper<String> partyChangeHeader = new BindableWrapper<>("PARTY CHANGE SINCE 2015");
     BindableWrapper<String> mapHeader = new BindableWrapper<>("CHARLOTTETOWN");
     Map<Integer, Shape> shapesByDistrict = peiShapesByDistrict();
-    BindableWrapper<List<Shape>> focus =
+    BindableWrapper<List<Integer>> focus =
         new BindableWrapper<>(
-            shapesByDistrict.entrySet().stream()
-                .filter(e -> e.getKey() >= 10 && e.getKey() <= 14)
-                .map(Map.Entry::getValue)
+            shapesByDistrict.keySet().stream()
+                .filter(id -> id >= 10 && id <= 14)
                 .collect(Collectors.toList()));
     BindableWrapper<Integer> selectedShape = new BindableWrapper<>(10);
     BindableWrapper<Result> selectedResult = new BindableWrapper<>();

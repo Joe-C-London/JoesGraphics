@@ -15,6 +15,7 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
 public class MapBuilder {
+
   private final BindingReceiver<List<Pair<Shape, Color>>> winners;
   private final BindingReceiver<List<Shape>> mapFocus;
   private final BindingReceiver<String> mapHeader;
@@ -22,20 +23,24 @@ public class MapBuilder {
   public <T> MapBuilder(
       Binding<Map<T, Shape>> shapes,
       Binding<Map<T, Result>> winners,
-      Binding<List<Shape>> focus,
+      Binding<List<T>> focus,
       Binding<String> headerBinding) {
+    BindingReceiver<Map<T, Shape>> shapesReceiver = new BindingReceiver<>(shapes);
     Binding<List<ImmutablePair<Shape, Result>>> shapesToParties =
-        shapes.merge(
-            winners,
-            (s, w) ->
-                s.entrySet().stream()
-                    .map(
-                        e -> {
-                          Result winnerParty = w.get(e.getKey());
-                          return ImmutablePair.of(e.getValue(), winnerParty);
-                        })
-                    .collect(Collectors.toList()));
-    this.mapFocus = new BindingReceiver<>(focus);
+        shapesReceiver
+            .getBinding()
+            .merge(
+                winners,
+                (s, w) ->
+                    s.entrySet().stream()
+                        .map(
+                            e -> {
+                              Result winnerParty = w.get(e.getKey());
+                              return ImmutablePair.of(e.getValue(), winnerParty);
+                            })
+                        .collect(Collectors.toList()));
+    this.mapFocus =
+        new BindingReceiver<>(shapesReceiver.getBinding().merge(focus, this::createFocusShapes));
     this.winners =
         new BindingReceiver<>(
             shapesToParties.merge(
@@ -51,45 +56,59 @@ public class MapBuilder {
       Binding<Map<T, Shape>> shapes,
       Binding<T> selectedShape,
       Binding<Result> leadingParty,
-      Binding<List<Shape>> focus,
+      Binding<List<T>> focus,
       Binding<String> header) {
+    BindingReceiver<Map<T, Shape>> shapesReceiver = new BindingReceiver<>(shapes);
     Binding<ImmutablePair<T, Result>> leaderWithShape =
         selectedShape.merge(leadingParty, ImmutablePair::new);
-    mapFocus = new BindingReceiver<>(focus);
+    mapFocus =
+        new BindingReceiver<>(shapesReceiver.getBinding().merge(focus, this::createFocusShapes));
     mapHeader = new BindingReceiver<>(header);
     Binding<List<Pair<Shape, Color>>> shapeWinners =
-        shapes.merge(
-            leaderWithShape,
-            (shp, ldr) ->
-                shp.entrySet().stream()
-                    .map(
-                        e -> {
-                          Color color;
-                          if (e.getKey().equals(ldr.left)) {
-                            color =
-                                Optional.ofNullable(ldr.right)
-                                    .map(Result::getColor)
-                                    .orElse(Color.BLACK);
-                          } else {
-                            color = Color.LIGHT_GRAY;
-                          }
-                          return ImmutablePair.of(e.getValue(), color);
-                        })
-                    .collect(Collectors.toList()));
+        shapesReceiver
+            .getBinding()
+            .merge(
+                leaderWithShape,
+                (shp, ldr) ->
+                    shp.entrySet().stream()
+                        .map(
+                            e -> {
+                              Color color;
+                              if (e.getKey().equals(ldr.left)) {
+                                color =
+                                    Optional.ofNullable(ldr.right)
+                                        .map(Result::getColor)
+                                        .orElse(Color.BLACK);
+                              } else {
+                                color = Color.LIGHT_GRAY;
+                              }
+                              return ImmutablePair.of(e.getValue(), color);
+                            })
+                        .collect(Collectors.toList()));
     Binding<List<Pair<Shape, Color>>> focusedShapeWinners =
         shapeWinners.merge(
             mapFocus.getBinding(),
             (sw, f) -> {
-              if (f == null) return sw;
+              if (f == null) {
+                return sw;
+              }
               return sw.stream()
                   .map(
                       e -> {
-                        if (f.contains(e.getLeft())) return e;
+                        if (f.contains(e.getLeft())) {
+                          return e;
+                        }
                         return ImmutablePair.of(e.getLeft(), new Color(220, 220, 220));
                       })
                   .collect(Collectors.toList());
             });
     winners = new BindingReceiver<>(focusedShapeWinners);
+  }
+
+  private <T> List<Shape> createFocusShapes(Map<T, Shape> shapes, List<T> focus) {
+    return focus == null
+        ? null
+        : focus.stream().filter(shapes::containsKey).map(shapes::get).collect(Collectors.toList());
   }
 
   public MapFrame createMapFrame() {
@@ -117,6 +136,7 @@ public class MapBuilder {
   }
 
   public static class Result {
+
     private final Party party;
     private final boolean elected;
 

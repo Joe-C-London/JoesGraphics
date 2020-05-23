@@ -167,7 +167,7 @@ public class MixedMemberResultPanel extends JPanel {
         Binding<Map<T, Shape>> shapes,
         Binding<T> selectedShape,
         Binding<Result> leadingParty,
-        Binding<List<Shape>> focus,
+        Binding<List<T>> focus,
         Binding<String> header) {
       this.mapBuilder = new MapBuilder(shapes, selectedShape, leadingParty, focus, header);
       return this;

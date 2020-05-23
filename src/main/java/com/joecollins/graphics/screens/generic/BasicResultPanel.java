@@ -390,7 +390,7 @@ public class BasicResultPanel extends JPanel {
     public <T> SeatScreenBuilder<KT, CT, PT> withPartyMap(
         Binding<Map<T, Shape>> shapes,
         Binding<Map<T, Party>> winners,
-        Binding<List<Shape>> focus,
+        Binding<List<T>> focus,
         Binding<String> headerBinding) {
       this.mapBuilder =
           new MapBuilder(
@@ -401,7 +401,7 @@ public class BasicResultPanel extends JPanel {
     public <T> SeatScreenBuilder<KT, CT, PT> withResultMap(
         Binding<Map<T, Shape>> shapes,
         Binding<Map<T, Result>> winners,
-        Binding<List<Shape>> focus,
+        Binding<List<T>> focus,
         Binding<String> headerBinding) {
       this.mapBuilder = new MapBuilder(shapes, winners, focus, headerBinding);
       return this;
@@ -874,7 +874,7 @@ public class BasicResultPanel extends JPanel {
     public <T> VoteScreenBuilder<KT, CT, CPT, PT> withPartyMap(
         Binding<Map<T, Shape>> shapes,
         Binding<Map<T, Party>> winners,
-        Binding<List<Shape>> focus,
+        Binding<List<T>> focus,
         Binding<String> headerBinding) {
       this.mapBuilder =
           new MapBuilder(
@@ -886,7 +886,7 @@ public class BasicResultPanel extends JPanel {
         Binding<Map<T, Shape>> shapes,
         Binding<T> selectedShape,
         Binding<Party> leadingParty,
-        Binding<List<Shape>> focus,
+        Binding<List<T>> focus,
         Binding<String> header) {
       this.mapBuilder =
           new MapBuilder(
@@ -897,7 +897,7 @@ public class BasicResultPanel extends JPanel {
     public <T> VoteScreenBuilder<KT, CT, CPT, PT> withResultMap(
         Binding<Map<T, Shape>> shapes,
         Binding<Map<T, Result>> winners,
-        Binding<List<Shape>> focus,
+        Binding<List<T>> focus,
         Binding<String> headerBinding) {
       this.mapBuilder = new MapBuilder(shapes, winners, focus, headerBinding);
       return this;
@@ -907,7 +907,7 @@ public class BasicResultPanel extends JPanel {
         Binding<Map<T, Shape>> shapes,
         Binding<T> selectedShape,
         Binding<Result> leadingParty,
-        Binding<List<Shape>> focus,
+        Binding<List<T>> focus,
         Binding<String> header) {
       this.mapBuilder = new MapBuilder(shapes, selectedShape, leadingParty, focus, header);
       return this;
