@@ -173,6 +173,18 @@ public class MixedMemberResultPanel extends JPanel {
       return this;
     }
 
+    public <T> Builder withResultMap(
+        Binding<Map<T, Shape>> shapes,
+        Binding<T> selectedShape,
+        Binding<Result> leadingParty,
+        Binding<List<T>> focus,
+        Binding<List<T>> additionalHighlight,
+        Binding<String> header) {
+      this.mapBuilder =
+          new MapBuilder(shapes, selectedShape, leadingParty, focus, additionalHighlight, header);
+      return this;
+    }
+
     public MixedMemberResultPanel build(Binding<String> header) {
       return new MixedMemberResultPanel(
           createHeaderLabel(header),

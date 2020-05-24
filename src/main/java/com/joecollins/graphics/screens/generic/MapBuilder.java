@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -58,11 +59,23 @@ public class MapBuilder {
       Binding<Result> leadingParty,
       Binding<List<T>> focus,
       Binding<String> header) {
+    this(shapes, selectedShape, leadingParty, focus, () -> null, header);
+  }
+
+  public <T> MapBuilder(
+      Binding<Map<T, Shape>> shapes,
+      Binding<T> selectedShape,
+      Binding<Result> leadingParty,
+      Binding<List<T>> focus,
+      Binding<List<T>> additionalHighlight,
+      Binding<String> header) {
     BindingReceiver<Map<T, Shape>> shapesReceiver = new BindingReceiver<>(shapes);
     Binding<ImmutablePair<T, Result>> leaderWithShape =
         selectedShape.merge(leadingParty, ImmutablePair::new);
     mapFocus =
         new BindingReceiver<>(shapesReceiver.getBinding().merge(focus, this::createFocusShapes));
+    Binding<List<Shape>> additionalFocusShapes =
+        shapesReceiver.getBinding().merge(additionalHighlight, this::createFocusShapes);
     mapHeader = new BindingReceiver<>(header);
     Binding<List<Pair<Shape, Color>>> shapeWinners =
         shapesReceiver
@@ -85,9 +98,21 @@ public class MapBuilder {
                               return ImmutablePair.of(e.getValue(), color);
                             })
                         .collect(Collectors.toList()));
+    Binding<List<Shape>> allFocusShapes =
+        mapFocus
+            .getBinding()
+            .merge(
+                additionalFocusShapes,
+                (l1, l2) -> {
+                  if (l1 == null) return l2;
+                  if (l2 == null) return l1;
+                  return Stream.concat(l1.stream(), l2.stream())
+                      .distinct()
+                      .collect(Collectors.toList());
+                });
     Binding<List<Pair<Shape, Color>>> focusedShapeWinners =
         shapeWinners.merge(
-            mapFocus.getBinding(),
+            allFocusShapes,
             (sw, f) -> {
               if (f == null) {
                 return sw;
@@ -122,17 +147,13 @@ public class MapBuilder {
   }
 
   private static Color extractColor(List<Shape> focus, Shape shape, Result winner) {
-    Color color;
     if (winner != null) {
-      color = winner.getColor();
+      return winner.getColor();
+    } else if (focus == null || focus.isEmpty() || focus.contains(shape)) {
+      return Color.LIGHT_GRAY;
     } else {
-      if (focus == null || focus.isEmpty() || focus.contains(shape)) {
-        color = Color.LIGHT_GRAY;
-      } else {
-        color = new Color(220, 220, 220);
-      }
+      return new Color(220, 220, 220);
     }
-    return color;
   }
 
   public static class Result {
