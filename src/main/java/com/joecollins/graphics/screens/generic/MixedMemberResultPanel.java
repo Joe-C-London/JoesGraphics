@@ -64,9 +64,13 @@ public class MixedMemberResultPanel extends JPanel {
     add(panel, BorderLayout.CENTER);
 
     panel.add(candidateFrame);
-    panel.add(candidateChangeFrame);
+    if (candidateChangeFrame != null) {
+      panel.add(candidateChangeFrame);
+    }
     panel.add(partyFrame);
-    panel.add(partyChangeFrame);
+    if (partyChangeFrame != null) {
+      panel.add(partyChangeFrame);
+    }
     panel.add(mapFrame);
   }
 
@@ -93,15 +97,20 @@ public class MixedMemberResultPanel extends JPanel {
       int width = parent.getWidth();
       int height = parent.getHeight();
       candidateFrame.setLocation(5, 5);
-      candidateFrame.setSize(width * 3 / 5 - 10, height / 2 - 10);
-      candidateChangeFrame.setLocation(5, height / 2 + 5);
-      candidateChangeFrame.setSize(width * 3 / 5 - 10, height / 2 - 10);
+      candidateFrame.setSize(
+          width * 3 / 5 - 10, height / (candidateChangeFrame == null ? 1 : 2) - 10);
+      if (candidateChangeFrame != null) {
+        candidateChangeFrame.setLocation(5, height / 2 + 5);
+        candidateChangeFrame.setSize(width * 3 / 5 - 10, height / 2 - 10);
+      }
       partyFrame.setLocation(width * 3 / 5 + 5, 5);
-      partyFrame.setSize(width * 2 / 5 - 10, height / 3 - 10);
-      partyChangeFrame.setLocation(width * 3 / 5 + 5, height / 3 + 5);
-      partyChangeFrame.setSize(width * 2 / 5 - 10, height / 3 - 10);
-      mapFrame.setLocation(width * 3 / 5 + 5, height * 2 / 3 + 5);
-      mapFrame.setSize(width * 2 / 5 - 10, height / 3 - 10);
+      partyFrame.setSize(width * 2 / 5 - 10, height / (partyChangeFrame == null ? 2 : 3) - 10);
+      if (partyChangeFrame != null) {
+        partyChangeFrame.setLocation(width * 3 / 5 + 5, height / 3 + 5);
+        partyChangeFrame.setSize(width * 2 / 5 - 10, height / 3 - 10);
+      }
+      mapFrame.setLocation(width * 3 / 5 + 5, height * 2 / (partyChangeFrame == null ? 4 : 3) + 5);
+      mapFrame.setSize(width * 2 / 5 - 10, height / (partyChangeFrame == null ? 2 : 3) - 10);
     }
   }
 
@@ -196,6 +205,7 @@ public class MixedMemberResultPanel extends JPanel {
     }
 
     private BarFrame createCandidateVotes() {
+      boolean showBothLines = candidatePrev == null;
       return BarFrameBuilder.basic(
               candidateVotes.getBinding(
                   v -> {
@@ -209,20 +219,31 @@ public class MixedMemberResultPanel extends JPanel {
                     }
                     return ret;
                   }),
-              c ->
-                  c.getName().toUpperCase()
-                      + " ("
-                      + c.getParty().getAbbreviation().toUpperCase()
-                      + ")",
+              c -> {
+                if (showBothLines) {
+                  return c.getName().toUpperCase() + "\n" + c.getParty().getName().toUpperCase();
+                }
+                return c.getName().toUpperCase()
+                    + " ("
+                    + c.getParty().getAbbreviation().toUpperCase()
+                    + ")";
+              },
               c -> c.getParty().getColor(),
               v -> v.getRight(),
-              v ->
-                  v.getLeft() == 0
-                      ? "WAITING..."
-                      : (THOUSANDS_FORMAT.format(v.getLeft())
-                          + " ("
-                          + PCT_FORMAT.format(v.getRight())
-                          + ")"))
+              v -> {
+                if (v.getLeft() == 0) {
+                  return "WAITING...";
+                }
+                if (showBothLines) {
+                  return THOUSANDS_FORMAT.format(v.getLeft())
+                      + "\n"
+                      + PCT_FORMAT.format(v.getRight());
+                }
+                return THOUSANDS_FORMAT.format(v.getLeft())
+                    + " ("
+                    + PCT_FORMAT.format(v.getRight())
+                    + ")";
+              })
           .withHeader(candidateVoteHeader.getBinding())
           .withMax(
               candidatePctReporting == null
@@ -232,6 +253,9 @@ public class MixedMemberResultPanel extends JPanel {
     }
 
     private BarFrame createCandidateChange() {
+      if (candidatePrev == null) {
+        return null;
+      }
       return BarFrameBuilder.basic(
               candidateVotes
                   .getBinding()
@@ -307,6 +331,9 @@ public class MixedMemberResultPanel extends JPanel {
     }
 
     private BarFrame createPartyChange() {
+      if (partyPrev == null) {
+        return null;
+      }
       return BarFrameBuilder.basic(
               partyVotes
                   .getBinding()

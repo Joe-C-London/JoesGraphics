@@ -428,6 +428,61 @@ public class MixedMemberResultPanelTest {
     compareRendering("MixedMemberResultPanel", "MapAdditionalHighlight", panel);
   }
 
+  @Test
+  public void testWithoutPrev() throws Exception {
+    BindableWrapper<LinkedHashMap<Candidate, Integer>> currentCandidateVotes =
+        new BindableWrapper<>(new LinkedHashMap<>());
+    BindableWrapper<LinkedHashMap<Party, Integer>> currentPartyVotes =
+        new BindableWrapper<>(new LinkedHashMap<>());
+    BindableWrapper<String> header = new BindableWrapper<>("CHARLOTTETOWN-WINSLOE");
+    BindableWrapper<String> candidateHeader = new BindableWrapper<>("CANDIDATE VOTES");
+    BindableWrapper<String> partyHeader = new BindableWrapper<>("PARTY VOTES");
+    BindableWrapper<String> mapHeader = new BindableWrapper<>("CHARLOTTETOWN");
+    Map<Integer, Shape> shapesByDistrict = peiShapesByDistrict();
+    BindableWrapper<List<Integer>> focus =
+        new BindableWrapper<>(
+            shapesByDistrict.keySet().stream()
+                .filter(id -> id >= 10 && id <= 14)
+                .collect(Collectors.toList()));
+    BindableWrapper<Integer> selectedShape = new BindableWrapper<>(10);
+    BindableWrapper<Result> selectedResult = new BindableWrapper<>();
+
+    Party lib = new Party("Liberal", "LIB", Color.RED);
+    Party grn = new Party("Green", "GRN", Color.GREEN.darker());
+    Party pc = new Party("Progressive Conservative", "PC", Color.BLUE);
+    Party ndp = new Party("New Democratic Party", "NDP", Color.ORANGE);
+    selectedResult.setValue(Result.elected(lib));
+
+    MixedMemberResultPanel panel =
+        MixedMemberResultPanel.builder()
+            .withCandidateVotes(currentCandidateVotes.getBinding(), candidateHeader.getBinding())
+            .withPartyVotes(currentPartyVotes.getBinding(), partyHeader.getBinding())
+            .withResultMap(
+                () -> shapesByDistrict,
+                selectedShape.getBinding(),
+                selectedResult.getBinding(),
+                focus.getBinding(),
+                mapHeader.getBinding())
+            .build(header.getBinding());
+    panel.setSize(1024, 512);
+
+    LinkedHashMap<Candidate, Integer> currCandVotes = new LinkedHashMap<>();
+    currCandVotes.put(new Candidate("Jesse Reddin Cousins", ndp), 41);
+    currCandVotes.put(new Candidate("Mike Gillis", pc), 865);
+    currCandVotes.put(new Candidate("Robert Mitchell", lib), 1420);
+    currCandVotes.put(new Candidate("Amanda Morrison", grn), 1057);
+    currentCandidateVotes.setValue(currCandVotes);
+
+    LinkedHashMap<Party, Integer> currPartyVotes = new LinkedHashMap<>();
+    currPartyVotes.put(grn, 1098);
+    currPartyVotes.put(lib, 1013);
+    currPartyVotes.put(ndp, 112);
+    currPartyVotes.put(pc, 822);
+    currentPartyVotes.setValue(currPartyVotes);
+
+    compareRendering("MixedMemberResultPanel", "NoPrev", panel);
+  }
+
   private Map<Integer, Shape> peiShapesByDistrict() throws IOException {
     URL peiMap =
         MapFrameTest.class
