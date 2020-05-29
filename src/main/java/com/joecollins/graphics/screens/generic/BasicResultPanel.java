@@ -219,6 +219,19 @@ public class BasicResultPanel extends JPanel {
         new VotePctTemplate());
   }
 
+  public static VoteScreenBuilder<Candidate, Integer, Double, Integer> candidateVotes(
+      Binding<? extends Map<Candidate, Integer>> votes,
+      Binding<String> header,
+      Binding<String> subhead,
+      String incumbentMarker) {
+    return new BasicVoteScreenBuilder<>(
+        new BindingReceiver<>(votes),
+        new BindingReceiver<>(header),
+        new BindingReceiver<>(subhead),
+        new CandidateTemplate(incumbentMarker),
+        new VotePctTemplate());
+  }
+
   private interface KeyTemplate<KT> {
     Party toParty(KT key);
 
@@ -247,6 +260,16 @@ public class BasicResultPanel extends JPanel {
 
   private static class CandidateTemplate implements KeyTemplate<Candidate> {
 
+    private final String incumbentMarker;
+
+    private CandidateTemplate() {
+      this.incumbentMarker = "";
+    }
+
+    private CandidateTemplate(String incumbentMarker) {
+      this.incumbentMarker = " " + incumbentMarker;
+    }
+
     @Override
     public Party toParty(Candidate key) {
       return key.getParty();
@@ -254,7 +277,11 @@ public class BasicResultPanel extends JPanel {
 
     @Override
     public String toMainBarHeader(Candidate key) {
-      return (key.getName() + "\n" + key.getParty().getName()).toUpperCase();
+      return (key.getName()
+              + (key.isIncumbent() ? incumbentMarker : "")
+              + "\n"
+              + key.getParty().getName())
+          .toUpperCase();
     }
 
     @Override

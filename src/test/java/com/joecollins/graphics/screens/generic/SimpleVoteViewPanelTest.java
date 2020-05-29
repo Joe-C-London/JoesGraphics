@@ -83,7 +83,7 @@ public class SimpleVoteViewPanelTest {
     Candidate ndp =
         new Candidate("Steven Scott", new Party("New Democratic Party", "NDP", Color.ORANGE));
     Candidate con = new Candidate("Claudio Rocchi", new Party("Conservative", "CON", Color.BLUE));
-    Candidate lib = new Candidate("David Lametti", new Party("Liberal", "LIB", Color.RED));
+    Candidate lib = new Candidate("David Lametti", new Party("Liberal", "LIB", Color.RED), true);
     Candidate grn = new Candidate("Jency Mercier", new Party("Green", "GRN", Color.GREEN.darker()));
     Candidate bq =
         new Candidate(
@@ -127,7 +127,10 @@ public class SimpleVoteViewPanelTest {
 
     BasicResultPanel panel =
         BasicResultPanel.candidateVotes(
-                currentVotes.getBinding(), voteHeader.getBinding(), voteSubhead.getBinding())
+                currentVotes.getBinding(),
+                voteHeader.getBinding(),
+                voteSubhead.getBinding(),
+                "(MP)")
             .withPrev(previousVotes.getBinding(), changeHeader.getBinding())
             .withSwing(Comparator.comparing(swingPartyOrder::indexOf), swingHeader.getBinding())
             .build(header.getBinding());

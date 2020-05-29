@@ -71,7 +71,7 @@ public class MixedMemberResultPanelTest {
     LinkedHashMap<Candidate, Integer> currCandVotes = new LinkedHashMap<>();
     currCandVotes.put(new Candidate("Jesse Reddin Cousins", ndp), 41);
     currCandVotes.put(new Candidate("Mike Gillis", pc), 865);
-    currCandVotes.put(new Candidate("Robert Mitchell", lib), 1420);
+    currCandVotes.put(new Candidate("Robert Mitchell", lib, true), 1420);
     currCandVotes.put(new Candidate("Amanda Morrison", grn), 1057);
     currentCandidateVotes.setValue(currCandVotes);
 
@@ -153,7 +153,7 @@ public class MixedMemberResultPanelTest {
     LinkedHashMap<Candidate, Integer> currCandVotes = new LinkedHashMap<>();
     currCandVotes.put(new Candidate("Jesse Reddin Cousins", ndp), 8);
     currCandVotes.put(new Candidate("Mike Gillis", pc), 173);
-    currCandVotes.put(new Candidate("Robert Mitchell", lib), 284);
+    currCandVotes.put(new Candidate("Robert Mitchell", lib, true), 284);
     currCandVotes.put(new Candidate("Amanda Morrison", grn), 211);
     currentCandidateVotes.setValue(currCandVotes);
 
@@ -239,7 +239,7 @@ public class MixedMemberResultPanelTest {
     LinkedHashMap<Candidate, Integer> currCandVotes = new LinkedHashMap<>();
     currCandVotes.put(new Candidate("Jesse Reddin Cousins", ndp), 0);
     currCandVotes.put(new Candidate("Mike Gillis", pc), 0);
-    currCandVotes.put(new Candidate("Robert Mitchell", lib), 0);
+    currCandVotes.put(new Candidate("Robert Mitchell", lib, true), 0);
     currCandVotes.put(new Candidate("Amanda Morrison", grn), 0);
     currentCandidateVotes.setValue(currCandVotes);
 
@@ -321,7 +321,7 @@ public class MixedMemberResultPanelTest {
     LinkedHashMap<Candidate, Integer> currCandVotes = new LinkedHashMap<>();
     currCandVotes.put(new Candidate("Jesse Reddin Cousins", ndp), 41);
     currCandVotes.put(new Candidate("Mike Gillis", pc), 865);
-    currCandVotes.put(new Candidate("Robert Mitchell", lib), 1420);
+    currCandVotes.put(new Candidate("Robert Mitchell", lib, true), 1420);
     currCandVotes.put(new Candidate("Amanda Morrison", grn), 1057);
     currentCandidateVotes.setValue(currCandVotes);
 
@@ -385,6 +385,7 @@ public class MixedMemberResultPanelTest {
             .withCandidateVotes(currentCandidateVotes.getBinding(), candidateHeader.getBinding())
             .withPrevCandidateVotes(
                 previousCandidateVotes.getBinding(), candidateChangeHeader.getBinding())
+            .withIncumbentMarker("(MLA)")
             .withPartyVotes(currentPartyVotes.getBinding(), partyHeader.getBinding())
             .withPrevPartyVotes(previousPartyVotes.getBinding(), partyChangeHeader.getBinding())
             .withResultMap(
@@ -400,7 +401,7 @@ public class MixedMemberResultPanelTest {
     LinkedHashMap<Candidate, Integer> currCandVotes = new LinkedHashMap<>();
     currCandVotes.put(new Candidate("Jesse Reddin Cousins", ndp), 41);
     currCandVotes.put(new Candidate("Mike Gillis", pc), 865);
-    currCandVotes.put(new Candidate("Robert Mitchell", lib), 1420);
+    currCandVotes.put(new Candidate("Robert Mitchell", lib, true), 1420);
     currCandVotes.put(new Candidate("Amanda Morrison", grn), 1057);
     currentCandidateVotes.setValue(currCandVotes);
 
@@ -457,6 +458,7 @@ public class MixedMemberResultPanelTest {
         MixedMemberResultPanel.builder()
             .withCandidateVotes(currentCandidateVotes.getBinding(), candidateHeader.getBinding())
             .withPartyVotes(currentPartyVotes.getBinding(), partyHeader.getBinding())
+            .withIncumbentMarker("(MLA)")
             .withResultMap(
                 () -> shapesByDistrict,
                 selectedShape.getBinding(),
@@ -469,7 +471,7 @@ public class MixedMemberResultPanelTest {
     LinkedHashMap<Candidate, Integer> currCandVotes = new LinkedHashMap<>();
     currCandVotes.put(new Candidate("Jesse Reddin Cousins", ndp), 41);
     currCandVotes.put(new Candidate("Mike Gillis", pc), 865);
-    currCandVotes.put(new Candidate("Robert Mitchell", lib), 1420);
+    currCandVotes.put(new Candidate("Robert Mitchell", lib, true), 1420);
     currCandVotes.put(new Candidate("Amanda Morrison", grn), 1057);
     currentCandidateVotes.setValue(currCandVotes);
 

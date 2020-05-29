@@ -126,6 +126,7 @@ public class MixedMemberResultPanel extends JPanel {
     private BindingReceiver<? extends Map<Party, Integer>> partyVotes;
     private BindingReceiver<? extends Map<Party, Integer>> partyPrev;
     private BindingReceiver<Double> partyPctReporting;
+    private String incumbentMarker = "";
 
     private BindingReceiver<String> candidateVoteHeader;
     private BindingReceiver<String> candidateChangeHeader;
@@ -221,9 +222,13 @@ public class MixedMemberResultPanel extends JPanel {
                   }),
               c -> {
                 if (showBothLines) {
-                  return c.getName().toUpperCase() + "\n" + c.getParty().getName().toUpperCase();
+                  return c.getName().toUpperCase()
+                      + (c.isIncumbent() ? incumbentMarker : "")
+                      + "\n"
+                      + c.getParty().getName().toUpperCase();
                 }
                 return c.getName().toUpperCase()
+                    + (c.isIncumbent() ? incumbentMarker : "")
                     + " ("
                     + c.getParty().getAbbreviation().toUpperCase()
                     + ")";
@@ -250,6 +255,11 @@ public class MixedMemberResultPanel extends JPanel {
                   ? Binding.fixedBinding(2.0 / 3)
                   : candidatePctReporting.getBinding(x -> 2.0 / 3 / Math.max(x, 1e-6)))
           .build();
+    }
+
+    public Builder withIncumbentMarker(String incumbentMarker) {
+      this.incumbentMarker = " " + incumbentMarker;
+      return this;
     }
 
     private BarFrame createCandidateChange() {
