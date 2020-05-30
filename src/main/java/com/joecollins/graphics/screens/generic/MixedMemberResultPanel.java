@@ -2,6 +2,7 @@ package com.joecollins.graphics.screens.generic;
 
 import com.joecollins.bindings.Binding;
 import com.joecollins.bindings.Binding.BindingReceiver;
+import com.joecollins.graphics.ImageGenerator;
 import com.joecollins.graphics.components.BarFrame;
 import com.joecollins.graphics.components.BarFrameBuilder;
 import com.joecollins.graphics.components.MapFrame;
@@ -24,7 +25,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.Triple;
 
 public class MixedMemberResultPanel extends JPanel {
 
@@ -123,6 +126,7 @@ public class MixedMemberResultPanel extends JPanel {
     private BindingReceiver<? extends Map<Candidate, Integer>> candidateVotes;
     private BindingReceiver<? extends Map<Party, Integer>> candidatePrev;
     private BindingReceiver<Double> candidatePctReporting;
+    private BindingReceiver<Candidate> winner;
     private BindingReceiver<? extends Map<Party, Integer>> partyVotes;
     private BindingReceiver<? extends Map<Party, Integer>> partyPrev;
     private BindingReceiver<Double> partyPctReporting;
@@ -139,6 +143,16 @@ public class MixedMemberResultPanel extends JPanel {
         Binding<? extends Map<Candidate, Integer>> votes, Binding<String> header) {
       this.candidateVotes = new BindingReceiver<>(votes);
       this.candidateVoteHeader = new BindingReceiver<>(header);
+      return this;
+    }
+
+    public Builder withIncumbentMarker(String incumbentMarker) {
+      this.incumbentMarker = " " + incumbentMarker;
+      return this;
+    }
+
+    public Builder withWinner(Binding<Candidate> winner) {
+      this.winner = new BindingReceiver<>(winner);
       return this;
     }
 
@@ -206,20 +220,34 @@ public class MixedMemberResultPanel extends JPanel {
     }
 
     private BarFrame createCandidateVotes() {
+      Binding<Candidate> winnerBinding =
+          winner == null ? Binding.fixedBinding(null) : winner.getBinding();
       boolean showBothLines = candidatePrev == null;
-      return BarFrameBuilder.basic(
-              candidateVotes.getBinding(
-                  v -> {
-                    int total = v.values().stream().mapToInt(i -> i).sum();
-                    LinkedHashMap<Candidate, Pair<Integer, Double>> ret = new LinkedHashMap<>();
-                    for (var e : v.entrySet()) {
-                      ret.put(
-                          e.getKey(),
-                          ImmutablePair.of(
-                              e.getValue(), total == 0 ? 0 : (1.0 * e.getValue() / total)));
-                    }
-                    return ret;
-                  }),
+      Shape shape =
+          winner == null
+              ? null
+              : (showBothLines
+                  ? ImageGenerator.createHalfTickShape()
+                  : ImageGenerator.createTickShape());
+      return BarFrameBuilder.basicWithShapes(
+              candidateVotes
+                  .getBinding()
+                  .merge(
+                      winnerBinding,
+                      (v, w) -> {
+                        int total = v.values().stream().mapToInt(i -> i).sum();
+                        LinkedHashMap<Candidate, Triple<Integer, Double, Boolean>> ret =
+                            new LinkedHashMap<>();
+                        for (var e : v.entrySet()) {
+                          ret.put(
+                              e.getKey(),
+                              ImmutableTriple.of(
+                                  e.getValue(),
+                                  total == 0 ? 0 : (1.0 * e.getValue() / total),
+                                  e.getKey().equals(w)));
+                        }
+                        return ret;
+                      }),
               c -> {
                 if (showBothLines) {
                   return c.getName().toUpperCase()
@@ -234,7 +262,7 @@ public class MixedMemberResultPanel extends JPanel {
                     + ")";
               },
               c -> c.getParty().getColor(),
-              v -> v.getRight(),
+              v -> v.getMiddle(),
               v -> {
                 if (v.getLeft() == 0) {
                   return "WAITING...";
@@ -242,24 +270,20 @@ public class MixedMemberResultPanel extends JPanel {
                 if (showBothLines) {
                   return THOUSANDS_FORMAT.format(v.getLeft())
                       + "\n"
-                      + PCT_FORMAT.format(v.getRight());
+                      + PCT_FORMAT.format(v.getMiddle());
                 }
                 return THOUSANDS_FORMAT.format(v.getLeft())
                     + " ("
-                    + PCT_FORMAT.format(v.getRight())
+                    + PCT_FORMAT.format(v.getMiddle())
                     + ")";
-              })
+              },
+              (c, v) -> v.getRight() ? shape : null)
           .withHeader(candidateVoteHeader.getBinding())
           .withMax(
               candidatePctReporting == null
                   ? Binding.fixedBinding(2.0 / 3)
                   : candidatePctReporting.getBinding(x -> 2.0 / 3 / Math.max(x, 1e-6)))
           .build();
-    }
-
-    public Builder withIncumbentMarker(String incumbentMarker) {
-      this.incumbentMarker = " " + incumbentMarker;
-      return this;
     }
 
     private BarFrame createCandidateChange() {
