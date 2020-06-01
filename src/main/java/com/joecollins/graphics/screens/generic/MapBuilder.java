@@ -1,7 +1,7 @@
 package com.joecollins.graphics.screens.generic;
 
 import com.joecollins.bindings.Binding;
-import com.joecollins.bindings.Binding.BindingReceiver;
+import com.joecollins.bindings.BindingReceiver;
 import com.joecollins.graphics.components.MapFrame;
 import com.joecollins.graphics.components.MapFrameBuilder;
 import com.joecollins.models.general.Party;

@@ -2,7 +2,7 @@ package com.joecollins.graphics.screens.generic;
 
 import com.joecollins.bindings.BindableList;
 import com.joecollins.bindings.Binding;
-import com.joecollins.bindings.Binding.BindingReceiver;
+import com.joecollins.bindings.BindingReceiver;
 import com.joecollins.graphics.ImageGenerator;
 import com.joecollins.graphics.components.BarFrame;
 import com.joecollins.graphics.components.BarFrameBuilder;

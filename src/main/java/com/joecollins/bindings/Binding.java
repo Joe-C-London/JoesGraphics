@@ -1,5 +1,8 @@
 package com.joecollins.bindings;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -7,34 +10,6 @@ import java.util.function.IntConsumer;
 
 @FunctionalInterface
 public interface Binding<T> {
-
-  class BindingReceiver<T> extends Bindable {
-    private enum Property {
-      PROP
-    }
-
-    private T value;
-
-    public BindingReceiver(Binding<? extends T> binding) {
-      binding.bind(
-          v -> {
-            value = v;
-            onPropertyRefreshed(Property.PROP);
-          });
-    }
-
-    public Binding<T> getBinding() {
-      return getBinding(Function.identity());
-    }
-
-    public <U> Binding<U> getBinding(Function<T, U> func) {
-      return Binding.propertyBinding(this, t -> func.apply(t.value), Property.PROP);
-    }
-
-    public T getValue() {
-      return value;
-    }
-  }
 
   T getValue();
 
@@ -178,6 +153,62 @@ public interface Binding<T> {
         }
         list.removeSizeBinding(consumer);
         consumer = null;
+      }
+    };
+  }
+
+  static <T, R> Binding<R> mapReduceBinding(
+      List<Binding<T>> bindings,
+      R identity,
+      BiFunction<R, T, R> onValueAdded,
+      BiFunction<R, T, R> onValueRemoved) {
+    return new Binding<R>() {
+      @Override
+      public R getValue() {
+        return bindings.stream()
+            .map(Binding::getValue)
+            .reduce(
+                identity,
+                onValueAdded,
+                (a, b) -> {
+                  throw new IllegalStateException("Combiner should not be called");
+                });
+      }
+
+      private R aggregate = identity;
+      private List<T> values = new ArrayList<>();
+
+      @Override
+      public void bind(Consumer<R> onUpdate) {
+        for (int i = 0; i < bindings.size(); i++) {
+          values.add(null);
+        }
+        aggregate = identity;
+        for (int i = 0; i < bindings.size(); i++) {
+          int index = i;
+          bindings
+              .get(index)
+              .bind(
+                  newVal -> {
+                    T oldVal = values.get(index);
+                    if (!Objects.equals(oldVal, newVal)) {
+                      if (oldVal != null) {
+                        aggregate = onValueRemoved.apply(aggregate, oldVal);
+                      }
+                      values.set(index, newVal);
+                      if (newVal != null) {
+                        aggregate = onValueAdded.apply(aggregate, newVal);
+                      }
+                      onUpdate.accept(aggregate);
+                    }
+                  });
+        }
+      }
+
+      @Override
+      public void unbind() {
+        bindings.forEach(Binding::unbind);
+        values.clear();
       }
     };
   }

@@ -3,7 +3,7 @@ package com.joecollins.graphics.components;
 import com.joecollins.bindings.Bindable;
 import com.joecollins.bindings.BindableList;
 import com.joecollins.bindings.Binding;
-import com.joecollins.bindings.Binding.BindingReceiver;
+import com.joecollins.bindings.BindingReceiver;
 import com.joecollins.bindings.IndexedBinding;
 import java.awt.Color;
 import java.util.ArrayList;
