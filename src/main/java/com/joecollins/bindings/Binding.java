@@ -3,6 +3,7 @@ package com.joecollins.bindings;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -155,6 +156,24 @@ public interface Binding<T> {
         consumer = null;
       }
     };
+  }
+
+  static <T, R> Binding<R> mapReduceBinding(
+      List<Binding<T>> bindings,
+      R identity,
+      BiConsumer<R, T> onValueAdded,
+      BiConsumer<R, T> onValueRemoved) {
+    return mapReduceBinding(
+        bindings,
+        identity,
+        (a, b) -> {
+          onValueAdded.accept(a, b);
+          return a;
+        },
+        (a, b) -> {
+          onValueRemoved.accept(a, b);
+          return a;
+        });
   }
 
   static <T, R> Binding<R> mapReduceBinding(
