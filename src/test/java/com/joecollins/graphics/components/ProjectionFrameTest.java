@@ -39,6 +39,7 @@ public class ProjectionFrameTest {
     ProjectionFrame frame = new ProjectionFrame();
     frame.setImageBinding(Binding.fixedBinding(peiLeg()));
     frame.setBackColorBinding(Binding.fixedBinding(Color.GRAY));
+    frame.setBorderColorBinding(Binding.fixedBinding(Color.GRAY));
     frame.setFooterTextBinding(Binding.fixedBinding("MINORITY LEGISLATURE"));
     frame.setHeaderBinding(Binding.fixedBinding("PROJECTION"));
 

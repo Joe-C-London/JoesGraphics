@@ -57,11 +57,7 @@ public class ProjectionFrame extends GraphicsFrame {
   public void setBackColorBinding(Binding<Color> colorBinding) {
     this.colorBinding.unbind();
     this.colorBinding = colorBinding;
-    this.colorBinding.bind(
-        bg -> {
-          imagePanel.setBackground(bg);
-          footerPanel.setBackground(bg);
-        });
+    this.colorBinding.bind(footerPanel::setBackground);
   }
 
   String getFooterText() {
