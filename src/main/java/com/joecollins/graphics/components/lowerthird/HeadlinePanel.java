@@ -40,22 +40,22 @@ public class HeadlinePanel extends JPanel {
     add(subheadLabel);
   }
 
-  String getHeadline() {
+  public String getHeadline() {
     return headlineLabel.isVisible() ? headlineLabel.getText() : null;
   }
 
-  void setHeadline(String headline) {
+  public void setHeadline(String headline) {
     headlineLabel.setVisible(headline != null);
     if (headline != null) {
       headlineLabel.setText(headline);
     }
   }
 
-  String getSubhead() {
+  public String getSubhead() {
     return subheadLabel.isVisible() ? subheadLabel.getText() : null;
   }
 
-  void setSubhead(String subhead) {
+  public void setSubhead(String subhead) {
     subheadLabel.setVisible(subhead != null);
     if (subhead != null) {
       subheadLabel.setText(subhead);
