@@ -76,6 +76,20 @@ public interface IndexedBinding<T> {
     };
   }
 
+  static <T> IndexedBinding<T> listBinding(List<T> items) {
+    return new IndexedBinding<T>() {
+      @Override
+      public int size() {
+        return items.size();
+      }
+
+      @Override
+      public T getValue(int index) {
+        return items.get(index);
+      }
+    };
+  }
+
   static <T extends Bindable, U> IndexedBinding<U> propertyBinding(
       T item, Function<T, List<? extends U>> func, Enum<?>... properties) {
     if (item == null) {
