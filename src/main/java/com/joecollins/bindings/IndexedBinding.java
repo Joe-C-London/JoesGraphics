@@ -5,6 +5,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.IntFunction;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public interface IndexedBinding<T> {
@@ -177,6 +178,37 @@ public interface IndexedBinding<T> {
         }
         list.removeItemBinding(consumer, properties);
         consumer = null;
+      }
+    };
+  }
+
+  static <T, U> IndexedBinding<U> listBinding(List<T> list, Function<T, Binding<U>> bindingFunc) {
+    if (list == null) {
+      return emptyBinding();
+    }
+    List<Binding<U>> bindings = list.stream().map(bindingFunc).collect(Collectors.toList());
+    return new IndexedBinding<U>() {
+      @Override
+      public int size() {
+        return bindings.size();
+      }
+
+      @Override
+      public U getValue(int index) {
+        return bindings.get(index).getValue();
+      }
+
+      @Override
+      public void bind(BiConsumer<Integer, U> onUpdate) {
+        for (int i = 0; i < bindings.size(); i++) {
+          int index = i;
+          bindings.get(index).bind(val -> onUpdate.accept(index, val));
+        }
+      }
+
+      @Override
+      public void unbind() {
+        bindings.forEach(Binding::unbind);
       }
     };
   }

@@ -155,13 +155,53 @@ public class IndexedBindingTest {
   }
 
   @Test
-  public void testListBinding() {
+  public void testListArrayBinding() {
     Map<Integer, Integer> valuesByIndex = new HashMap<>();
     IndexedBinding<Integer> binding = IndexedBinding.listBinding(1, 2, 3);
     binding.bind(valuesByIndex::put);
     assertEquals(1, valuesByIndex.get(0).intValue());
     assertEquals(2, valuesByIndex.get(1).intValue());
     assertEquals(3, valuesByIndex.get(2).intValue());
+  }
+
+  @Test
+  public void testListListBinding() {
+    Map<Integer, Integer> valuesByIndex = new HashMap<>();
+    IndexedBinding<Integer> binding = IndexedBinding.listBinding(List.of(1, 2, 3));
+    binding.bind(valuesByIndex::put);
+    assertEquals(1, valuesByIndex.get(0).intValue());
+    assertEquals(2, valuesByIndex.get(1).intValue());
+    assertEquals(3, valuesByIndex.get(2).intValue());
+  }
+
+  @Test
+  public void testListFuncBinding() {
+    Map<Integer, Integer> valuesByIndex = new HashMap<>();
+    List<BindableInt> bindables =
+        List.of(new BindableInt(1), new BindableInt(2), new BindableInt(3));
+    IndexedBinding<Integer> binding =
+        IndexedBinding.listBinding(
+            bindables,
+            b -> Binding.propertyBinding(b, BindableInt::getValue, BindableInt.Property.VALUE));
+    binding.bind(valuesByIndex::put);
+    assertEquals(1, valuesByIndex.get(0).intValue());
+    assertEquals(2, valuesByIndex.get(1).intValue());
+    assertEquals(3, valuesByIndex.get(2).intValue());
+
+    bindables.get(0).setValue(4);
+    bindables.get(1).setValue(5);
+    bindables.get(2).setValue(6);
+    assertEquals(4, valuesByIndex.get(0).intValue());
+    assertEquals(5, valuesByIndex.get(1).intValue());
+    assertEquals(6, valuesByIndex.get(2).intValue());
+
+    binding.unbind();
+    bindables.get(0).setValue(1);
+    bindables.get(1).setValue(2);
+    bindables.get(2).setValue(3);
+    assertEquals(4, valuesByIndex.get(0).intValue());
+    assertEquals(5, valuesByIndex.get(1).intValue());
+    assertEquals(6, valuesByIndex.get(2).intValue());
   }
 
   @Test
