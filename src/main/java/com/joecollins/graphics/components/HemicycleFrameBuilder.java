@@ -26,6 +26,15 @@ public class HemicycleFrameBuilder {
       List<T> entries,
       Function<T, Binding<Color>> colorFunc,
       Tiebreaker tiebreaker) {
+    return of(rows, entries, colorFunc, colorFunc, tiebreaker);
+  }
+
+  public static <T> HemicycleFrameBuilder of(
+      List<Integer> rows,
+      List<T> entries,
+      Function<T, Binding<Color>> colorFunc,
+      Function<T, Binding<Color>> borderFunc,
+      Tiebreaker tiebreaker) {
     HemicycleFrameBuilder builder = new HemicycleFrameBuilder();
     builder.frame.setNumRowsBinding(Binding.fixedBinding(rows.size()));
     builder.frame.setRowCountsBinding(IndexedBinding.listBinding(rows));
@@ -55,6 +64,7 @@ public class HemicycleFrameBuilder {
 
     builder.frame.setNumDotsBinding(Binding.fixedBinding(entries.size()));
     builder.frame.setDotColorBinding(IndexedBinding.listBinding(dots, colorFunc));
+    builder.frame.setDotBorderBinding(IndexedBinding.listBinding(dots, borderFunc));
     return builder;
   }
 

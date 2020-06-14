@@ -50,6 +50,25 @@ public class HemicycleFrameTest {
   }
 
   @Test
+  public void testDotBorders() {
+    List<Color> dotColors =
+        List.of(
+            RED, RED, RED, BLUE, BLUE, //
+            RED, RED, RED, RED, BLUE, BLUE, //
+            RED, RED, RED, RED, RED, BLUE, BLUE, //
+            GREEN, RED, RED, RED, RED, RED, RED, BLUE, BLUE);
+
+    HemicycleFrame frame = new HemicycleFrame();
+    frame.setNumDotsBinding(Binding.fixedBinding(dotColors.size()));
+    frame.setDotBorderBinding(IndexedBinding.listBinding(dotColors));
+
+    assertEquals(27, frame.getNumDots());
+    assertEquals(RED, frame.getDotBorder(0));
+    assertEquals(BLUE, frame.getDotBorder(9));
+    assertEquals(GREEN, frame.getDotBorder(18));
+  }
+
+  @Test
   public void testRenderDotsOnly() throws IOException {
     List<Integer> rowCounts = List.of(7, 9, 11);
     List<Color> dotColors =
@@ -57,12 +76,18 @@ public class HemicycleFrameTest {
             GREEN, GREEN, RED, BLUE, BLUE, BLUE, BLUE, //
             GREEN, GREEN, GREEN, RED, RED, BLUE, BLUE, BLUE, BLUE, //
             GREEN, GREEN, GREEN, RED, RED, RED, BLUE, BLUE, BLUE, BLUE, BLUE);
+    List<Color> dotBorders =
+        List.of(
+            RED, RED, RED, RED, RED, BLUE, BLUE, //
+            RED, RED, RED, RED, RED, RED, BLUE, BLUE, BLUE, //
+            GREEN, RED, RED, RED, RED, RED, RED, RED, BLUE, BLUE, BLUE);
 
     HemicycleFrame frame = new HemicycleFrame();
     frame.setNumRowsBinding(Binding.fixedBinding(rowCounts.size()));
     frame.setRowCountsBinding(IndexedBinding.listBinding(rowCounts));
     frame.setNumDotsBinding(Binding.fixedBinding(dotColors.size()));
     frame.setDotColorBinding(IndexedBinding.listBinding(dotColors));
+    frame.setDotBorderBinding(IndexedBinding.listBinding(dotBorders));
     frame.setHeaderBinding(() -> "PEI HEMICYCLE");
     frame.setSize(1024, 512);
 

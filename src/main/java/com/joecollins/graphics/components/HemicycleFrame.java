@@ -4,6 +4,7 @@ import static java.lang.Math.PI;
 
 import com.joecollins.bindings.Binding;
 import com.joecollins.bindings.IndexedBinding;
+import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -21,6 +22,7 @@ public class HemicycleFrame extends GraphicsFrame {
 
   private Binding<Integer> numDotsBinding = () -> 0;
   private IndexedBinding<Color> dotColorBinding = IndexedBinding.emptyBinding();
+  private IndexedBinding<Color> dotBorderBinding = IndexedBinding.emptyBinding();
 
   private Panel panel = new Panel();
 
@@ -71,7 +73,7 @@ public class HemicycleFrame extends GraphicsFrame {
     this.numDotsBinding.bind(
         numDots -> {
           while (numDots > panel.dots.size()) {
-            panel.dots.add(null);
+            panel.dots.add(new Dot());
           }
           while (numDots < panel.dots.size()) {
             panel.dots.remove(numDots.intValue());
@@ -81,7 +83,7 @@ public class HemicycleFrame extends GraphicsFrame {
   }
 
   Color getDotColor(int dotNum) {
-    return panel.dots.get(dotNum);
+    return panel.dots.get(dotNum).color;
   }
 
   public void setDotColorBinding(IndexedBinding<Color> dotColorBinding) {
@@ -89,14 +91,33 @@ public class HemicycleFrame extends GraphicsFrame {
     this.dotColorBinding = dotColorBinding;
     this.dotColorBinding.bind(
         (idx, color) -> {
-          panel.dots.set(idx, color);
+          panel.dots.get(idx).color = color;
           panel.repaint();
         });
   }
 
+  Color getDotBorder(int dotNum) {
+    return panel.dots.get(dotNum).border;
+  }
+
+  public void setDotBorderBinding(IndexedBinding<Color> dotBorderBinding) {
+    this.dotBorderBinding.unbind();
+    this.dotBorderBinding = dotBorderBinding;
+    this.dotBorderBinding.bind(
+        (idx, border) -> {
+          panel.dots.get(idx).border = border;
+          panel.repaint();
+        });
+  }
+
+  class Dot {
+    private Color color;
+    private Color border;
+  }
+
   class Panel extends JPanel {
     private List<Integer> rows = new ArrayList<>();
-    private List<Color> dots = new ArrayList<>();
+    private List<Dot> dots = new ArrayList<>();
 
     public Panel() {
       setBackground(Color.WHITE);
@@ -141,16 +162,23 @@ public class HemicycleFrame extends GraphicsFrame {
         int rowsFromOuter = rows.size() - rowsFromInner - 1;
         int dotsInRow = rows.get(rowsFromInner);
         int firstDot = rowStartIndexes.get(rowsFromInner);
-        for (int dot = 0; dot < dotsInRow; dot++) {
-          Color color = dots.get(firstDot + dot);
+        for (int dotNum = 0; dotNum < dotsInRow; dotNum++) {
+          Dot dot = dots.get(firstDot + dotNum);
           ((Graphics2D) g)
               .setTransform(
-                  createRotationTransform(1.0 * dot / (dotsInRow - 1), originalTransform, arcY));
+                  createRotationTransform(1.0 * dotNum / (dotsInRow - 1), originalTransform, arcY));
           int x = getWidth() / 2;
           int y = getHeight() - (int) Math.round(r + (0.5 - rowsFromOuter) * d);
-          int rad = (int) Math.round(d / 2) * 19 / 20;
-          g.setColor(color);
-          g.fillOval(x - rad, y - rad, 2 * rad, 2 * rad);
+          int rad = (int) Math.round(d / 2 * 4 / 5);
+          ((Graphics2D) g).setStroke(new BasicStroke(Math.max(1, rad / 5)));
+          if (dot.color != null) {
+            g.setColor(dot.color);
+            g.fillOval(x - rad, y - rad, 2 * rad, 2 * rad);
+          }
+          if (dot.border != null) {
+            g.setColor(dot.border);
+            g.drawOval(x - rad, y - rad, 2 * rad, 2 * rad);
+          }
           ((Graphics2D) g).setTransform(originalTransform);
         }
       }
