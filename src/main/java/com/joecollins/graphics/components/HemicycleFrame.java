@@ -148,7 +148,7 @@ public class HemicycleFrame extends GraphicsFrame {
                   createRotationTransform(1.0 * dot / (dotsInRow - 1), originalTransform, arcY));
           int x = getWidth() / 2;
           int y = getHeight() - (int) Math.round(r + (0.5 - rowsFromOuter) * d);
-          int rad = (int) Math.round(d / 2) - 5;
+          int rad = (int) Math.round(d / 2) * 19 / 20;
           g.setColor(color);
           g.fillOval(x - rad, y - rad, 2 * rad, 2 * rad);
           ((Graphics2D) g).setTransform(originalTransform);

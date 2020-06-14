@@ -25,6 +25,7 @@ public class HemicycleFrameBuilderTest {
 
     HemicycleFrame frame =
         HemicycleFrameBuilder.of(rows, dots, Binding::fixedBinding, Tiebreaker.FRONT_ROW_FROM_RIGHT)
+            .withHeader(() -> "PEI")
             .build();
 
     assertEquals(3, frame.getNumRows());
@@ -41,5 +42,7 @@ public class HemicycleFrameBuilderTest {
     for (int i = 0; i < frame.getNumDots(); i++) {
       assertEquals("Dot " + i, expectedDots.get(i), frame.getDotColor(i));
     }
+
+    assertEquals("PEI", frame.getHeader());
   }
 }

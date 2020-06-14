@@ -58,6 +58,11 @@ public class HemicycleFrameBuilder {
     return builder;
   }
 
+  public HemicycleFrameBuilder withHeader(Binding<String> headerBinding) {
+    frame.setHeaderBinding(headerBinding);
+    return this;
+  }
+
   public HemicycleFrame build() {
     return frame;
   }
