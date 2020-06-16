@@ -4,15 +4,24 @@ import static java.lang.Math.PI;
 
 import com.joecollins.bindings.Binding;
 import com.joecollins.bindings.IndexedBinding;
+import com.joecollins.graphics.utils.StandardFont;
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.LayoutManager;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.Shape;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Area;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 import javax.swing.JPanel;
 
 public class HemicycleFrame extends GraphicsFrame {
@@ -24,14 +33,67 @@ public class HemicycleFrame extends GraphicsFrame {
   private IndexedBinding<Color> dotColorBinding = IndexedBinding.emptyBinding();
   private IndexedBinding<Color> dotBorderBinding = IndexedBinding.emptyBinding();
 
-  private Panel panel = new Panel();
+  private Binding<Integer> leftSeatBarCountBinding = () -> 0;
+  private IndexedBinding<Color> leftSeatBarColorBinding = IndexedBinding.emptyBinding();
+  private IndexedBinding<Integer> leftSeatBarSizeBinding = IndexedBinding.emptyBinding();
+  private Binding<String> leftSeatBarLabelBinding = () -> "";
+
+  private Binding<Integer> rightSeatBarCountBinding = () -> 0;
+  private IndexedBinding<Color> rightSeatBarColorBinding = IndexedBinding.emptyBinding();
+  private IndexedBinding<Integer> rightSeatBarSizeBinding = IndexedBinding.emptyBinding();
+  private Binding<String> rightSeatBarLabelBinding = () -> "";
+
+  private Binding<Integer> middleSeatBarCountBinding = () -> 0;
+  private IndexedBinding<Color> middleSeatBarColorBinding = IndexedBinding.emptyBinding();
+  private IndexedBinding<Integer> middleSeatBarSizeBinding = IndexedBinding.emptyBinding();
+  private Binding<String> middleSeatBarLabelBinding = () -> "";
+
+  private BarPanel barsPanel = new BarPanel();
+  private DotsPanel dotsPanel = new DotsPanel();
 
   public HemicycleFrame() {
+    JPanel panel = new JPanel();
     add(panel, BorderLayout.CENTER);
+
+    panel.setLayout(new Layout());
+    panel.add(barsPanel);
+    panel.add(dotsPanel);
+  }
+
+  private class Layout implements LayoutManager {
+
+    @Override
+    public void addLayoutComponent(String name, Component comp) {}
+
+    @Override
+    public void removeLayoutComponent(Component comp) {}
+
+    @Override
+    public Dimension preferredLayoutSize(Container parent) {
+      return null;
+    }
+
+    @Override
+    public Dimension minimumLayoutSize(Container parent) {
+      return null;
+    }
+
+    @Override
+    public void layoutContainer(Container parent) {
+      int mid = 0;
+      if (barsPanel.hasSeats()) {
+        mid += 25;
+      }
+      mid = Math.min(mid, parent.getHeight() / 10);
+      barsPanel.setLocation(0, 0);
+      barsPanel.setSize(parent.getWidth(), mid);
+      dotsPanel.setLocation(0, mid);
+      dotsPanel.setSize(parent.getWidth(), parent.getHeight() - mid);
+    }
   }
 
   int getNumRows() {
-    return panel.rows.size();
+    return dotsPanel.rows.size();
   }
 
   public void setNumRowsBinding(Binding<Integer> numRowsBinding) {
@@ -39,18 +101,13 @@ public class HemicycleFrame extends GraphicsFrame {
     this.numRowsBinding = numRowsBinding;
     this.numRowsBinding.bind(
         numRows -> {
-          while (numRows > panel.rows.size()) {
-            panel.rows.add(0);
-          }
-          while (numRows < panel.rows.size()) {
-            panel.rows.remove(numRows.intValue());
-          }
-          panel.repaint();
+          setSize(dotsPanel.rows, numRows, () -> 0);
+          dotsPanel.repaint();
         });
   }
 
   int getRowCount(int rowNum) {
-    return panel.rows.get(rowNum);
+    return dotsPanel.rows.get(rowNum);
   }
 
   public void setRowCountsBinding(IndexedBinding<Integer> rowCountBinding) {
@@ -58,13 +115,13 @@ public class HemicycleFrame extends GraphicsFrame {
     this.rowCountBinding = rowCountBinding;
     this.rowCountBinding.bind(
         (idx, count) -> {
-          panel.rows.set(idx, count);
-          panel.repaint();
+          dotsPanel.rows.set(idx, count);
+          dotsPanel.repaint();
         });
   }
 
   int getNumDots() {
-    return panel.dots.size();
+    return dotsPanel.dots.size();
   }
 
   public void setNumDotsBinding(Binding<Integer> numDotsBinding) {
@@ -72,18 +129,13 @@ public class HemicycleFrame extends GraphicsFrame {
     this.numDotsBinding = numDotsBinding;
     this.numDotsBinding.bind(
         numDots -> {
-          while (numDots > panel.dots.size()) {
-            panel.dots.add(new Dot());
-          }
-          while (numDots < panel.dots.size()) {
-            panel.dots.remove(numDots.intValue());
-          }
-          panel.repaint();
+          setSize(dotsPanel.dots, numDots, Dot::new);
+          dotsPanel.repaint();
         });
   }
 
   Color getDotColor(int dotNum) {
-    return panel.dots.get(dotNum).color;
+    return dotsPanel.dots.get(dotNum).color;
   }
 
   public void setDotColorBinding(IndexedBinding<Color> dotColorBinding) {
@@ -91,13 +143,13 @@ public class HemicycleFrame extends GraphicsFrame {
     this.dotColorBinding = dotColorBinding;
     this.dotColorBinding.bind(
         (idx, color) -> {
-          panel.dots.get(idx).color = color;
-          panel.repaint();
+          dotsPanel.dots.get(idx).color = color;
+          dotsPanel.repaint();
         });
   }
 
   Color getDotBorder(int dotNum) {
-    return panel.dots.get(dotNum).border;
+    return dotsPanel.dots.get(dotNum).border;
   }
 
   public void setDotBorderBinding(IndexedBinding<Color> dotBorderBinding) {
@@ -105,21 +157,348 @@ public class HemicycleFrame extends GraphicsFrame {
     this.dotBorderBinding = dotBorderBinding;
     this.dotBorderBinding.bind(
         (idx, border) -> {
-          panel.dots.get(idx).border = border;
-          panel.repaint();
+          dotsPanel.dots.get(idx).border = border;
+          dotsPanel.repaint();
         });
   }
 
-  class Dot {
+  int getLeftSeatBarCount() {
+    return barsPanel.leftBars.size();
+  }
+
+  public void setLeftSeatBarCountBinding(Binding<Integer> leftSeatBarCountBinding) {
+    this.leftSeatBarCountBinding.unbind();
+    this.leftSeatBarCountBinding = leftSeatBarCountBinding;
+    this.leftSeatBarCountBinding.bind(
+        numBars -> {
+          setSize(barsPanel.leftBars, numBars, Bar::new);
+          barsPanel.repaint();
+        });
+  }
+
+  Color getLeftSeatBarColor(int idx) {
+    return barsPanel.leftBars.get(idx).color;
+  }
+
+  public void setLeftSeatBarColorBinding(IndexedBinding<Color> leftSeatBarColorBinding) {
+    this.leftSeatBarColorBinding.unbind();
+    this.leftSeatBarColorBinding = leftSeatBarColorBinding;
+    this.leftSeatBarColorBinding.bind(
+        (idx, color) -> {
+          barsPanel.leftBars.get(idx).color = color;
+          barsPanel.repaint();
+        });
+  }
+
+  int getLeftSeatBarSize(int idx) {
+    return barsPanel.leftBars.get(idx).size;
+  }
+
+  public void setLeftSeatBarSizeBinding(IndexedBinding<Integer> leftSeatBarSizeBinding) {
+    this.leftSeatBarSizeBinding.unbind();
+    this.leftSeatBarSizeBinding = leftSeatBarSizeBinding;
+    this.leftSeatBarSizeBinding.bind(
+        (idx, size) -> {
+          barsPanel.leftBars.get(idx).size = size;
+          barsPanel.repaint();
+        });
+  }
+
+  String getLeftSeatBarLabel() {
+    return barsPanel.leftLabel;
+  }
+
+  public void setLeftSeatBarLabelBinding(Binding<String> leftSeatBarLabelBinding) {
+    this.leftSeatBarLabelBinding.unbind();
+    this.leftSeatBarLabelBinding = leftSeatBarLabelBinding;
+    this.leftSeatBarLabelBinding.bind(
+        label -> {
+          barsPanel.leftLabel = label;
+          barsPanel.repaint();
+        });
+  }
+
+  int getRightSeatBarCount() {
+    return barsPanel.rightBars.size();
+  }
+
+  public void setRightSeatBarCountBinding(Binding<Integer> rightSeatBarCountBinding) {
+    this.rightSeatBarCountBinding.unbind();
+    this.rightSeatBarCountBinding = rightSeatBarCountBinding;
+    this.rightSeatBarCountBinding.bind(
+        numBars -> {
+          setSize(barsPanel.rightBars, numBars, Bar::new);
+          barsPanel.repaint();
+        });
+  }
+
+  Color getRightSeatBarColor(int idx) {
+    return barsPanel.rightBars.get(idx).color;
+  }
+
+  public void setRightSeatBarColorBinding(IndexedBinding<Color> rightSeatBarColorBinding) {
+    this.rightSeatBarColorBinding.unbind();
+    this.rightSeatBarColorBinding = rightSeatBarColorBinding;
+    this.rightSeatBarColorBinding.bind(
+        (idx, color) -> {
+          barsPanel.rightBars.get(idx).color = color;
+          barsPanel.repaint();
+        });
+  }
+
+  int getRightSeatBarSize(int idx) {
+    return barsPanel.rightBars.get(idx).size;
+  }
+
+  public void setRightSeatBarSizeBinding(IndexedBinding<Integer> rightSeatBarSizeBinding) {
+    this.rightSeatBarSizeBinding.unbind();
+    this.rightSeatBarSizeBinding = rightSeatBarSizeBinding;
+    this.rightSeatBarSizeBinding.bind(
+        (idx, size) -> {
+          barsPanel.rightBars.get(idx).size = size;
+          barsPanel.repaint();
+        });
+  }
+
+  String getRightSeatBarLabel() {
+    return barsPanel.rightLabel;
+  }
+
+  public void setRightSeatBarLabelBinding(Binding<String> rightSeatBarLabelBinding) {
+    this.rightSeatBarLabelBinding.unbind();
+    this.rightSeatBarLabelBinding = rightSeatBarLabelBinding;
+    this.rightSeatBarLabelBinding.bind(
+        label -> {
+          barsPanel.rightLabel = label;
+          barsPanel.repaint();
+        });
+  }
+
+  int getMiddleSeatBarCount() {
+    return barsPanel.middleBars.size();
+  }
+
+  public void setMiddleSeatBarCountBinding(Binding<Integer> middleSeatBarCountBinding) {
+    this.middleSeatBarCountBinding.unbind();
+    this.middleSeatBarCountBinding = middleSeatBarCountBinding;
+    this.middleSeatBarCountBinding.bind(
+        numBars -> {
+          setSize(barsPanel.middleBars, numBars, Bar::new);
+          barsPanel.repaint();
+        });
+  }
+
+  Color getMiddleSeatBarColor(int idx) {
+    return barsPanel.middleBars.get(idx).color;
+  }
+
+  public void setMiddleSeatBarColorBinding(IndexedBinding<Color> middleSeatBarColorBinding) {
+    this.middleSeatBarColorBinding.unbind();
+    this.middleSeatBarColorBinding = middleSeatBarColorBinding;
+    this.middleSeatBarColorBinding.bind(
+        (idx, color) -> {
+          barsPanel.middleBars.get(idx).color = color;
+          barsPanel.repaint();
+        });
+  }
+
+  int getMiddleSeatBarSize(int idx) {
+    return barsPanel.middleBars.get(idx).size;
+  }
+
+  public void setMiddleSeatBarSizeBinding(IndexedBinding<Integer> middleSeatBarSizeBinding) {
+    this.middleSeatBarSizeBinding.unbind();
+    this.middleSeatBarSizeBinding = middleSeatBarSizeBinding;
+    this.middleSeatBarSizeBinding.bind(
+        (idx, size) -> {
+          barsPanel.middleBars.get(idx).size = size;
+          barsPanel.repaint();
+        });
+  }
+
+  String getMiddleSeatBarLabel() {
+    return barsPanel.middleLabel;
+  }
+
+  public void setMiddleSeatBarLabelBinding(Binding<String> middleSeatBarLabelBinding) {
+    this.middleSeatBarLabelBinding.unbind();
+    this.middleSeatBarLabelBinding = middleSeatBarLabelBinding;
+    this.middleSeatBarLabelBinding.bind(
+        label -> {
+          barsPanel.middleLabel = label;
+          barsPanel.repaint();
+        });
+  }
+
+  private static <T> void setSize(List<T> list, int size, Supplier<T> defaultItem) {
+    while (size > list.size()) {
+      list.add(defaultItem.get());
+    }
+    while (size < list.size()) {
+      list.remove(size);
+    }
+  }
+
+  private class Bar {
+
+    private Color color;
+    private int size;
+  }
+
+  private class BarPanel extends JPanel {
+
+    private List<Bar> leftBars = new ArrayList<>();
+    private String leftLabel = "";
+    private List<Bar> rightBars = new ArrayList<>();
+    private String rightLabel = "";
+    private List<Bar> middleBars = new ArrayList<>();
+    private String middleLabel = "";
+
+    public BarPanel() {
+      setBackground(Color.WHITE);
+    }
+
+    boolean hasSeats() {
+      return !leftBars.isEmpty()
+          || !middleBars.isEmpty()
+          || !rightBars.isEmpty()
+          || !leftLabel.isEmpty()
+          || !middleLabel.isEmpty()
+          || !rightLabel.isEmpty();
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+      super.paintComponent(g);
+      ((Graphics2D) g)
+          .setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+      ((Graphics2D) g)
+          .setRenderingHint(
+              RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+
+      g.setColor(Color.BLACK);
+      g.drawLine(getWidth() / 2, 0, getWidth() / 2, getHeight());
+
+      g.setFont(StandardFont.readBoldFont(getHeight() * 4 / 5));
+      int seatBaseline = getHeight() * 4 / 5;
+
+      g.setColor(leftBars.isEmpty() ? Color.BLACK : leftBars.get(0).color);
+      g.drawString(leftLabel, 5, seatBaseline);
+
+      g.setColor(rightBars.isEmpty() ? Color.BLACK : rightBars.get(0).color);
+      int rightWidth = g.getFontMetrics().stringWidth(rightLabel);
+      int rightLeft = getWidth() - rightWidth - 5;
+      g.drawString(rightLabel, rightLeft, seatBaseline);
+
+      g.setColor(middleBars.isEmpty() ? Color.BLACK : middleBars.get(0).color);
+      int middleWidth = g.getFontMetrics().stringWidth(middleLabel);
+      int middleLeft = getMiddleStartPosition(0) - middleWidth / 2;
+      g.drawString(middleLabel, middleLeft, seatBaseline);
+
+      int seatBarTop = getHeight() / 10;
+      int seatBarHeight = getHeight() * 4 / 5;
+
+      int leftSoFar = 0;
+      for (Bar bar : leftBars) {
+        int start = getLeftPosition(leftSoFar);
+        int end = getLeftPosition(leftSoFar + bar.size);
+        g.setColor(bar.color);
+        g.fillRect(start, seatBarTop, end - start, seatBarHeight);
+        leftSoFar += bar.size;
+      }
+      Shape leftClip = new Rectangle(0, seatBarTop, getLeftPosition(leftSoFar), seatBarHeight);
+
+      int rightSoFar = 0;
+      for (Bar bar : rightBars) {
+        int start = getRightPosition(rightSoFar + bar.size);
+        int end = getRightPosition(rightSoFar);
+        g.setColor(bar.color);
+        g.fillRect(start, seatBarTop, end - start, seatBarHeight);
+        rightSoFar += bar.size;
+      }
+      Shape rightClip =
+          new Rectangle(
+              getRightPosition(rightSoFar),
+              seatBarTop,
+              getWidth() - getRightPosition(rightSoFar),
+              seatBarHeight);
+
+      int middleSoFar = 0;
+      for (Bar bar : middleBars) {
+        g.setColor(bar.color);
+        int startL = getMiddleStartPosition(middleSoFar + bar.size);
+        int endL = getMiddleStartPosition(middleSoFar);
+        int startR = getMiddleEndPosition(middleSoFar);
+        int endR = getMiddleEndPosition(middleSoFar + bar.size);
+        g.fillRect(startL, seatBarTop, endL - startL, seatBarHeight);
+        g.fillRect(startR, seatBarTop, endR - startR, seatBarHeight);
+        middleSoFar += bar.size;
+      }
+      Shape middleClip =
+          new Rectangle(
+              getMiddleStartPosition(middleSoFar),
+              seatBarTop,
+              getMiddleEndPosition(middleSoFar) - getMiddleStartPosition(middleSoFar),
+              seatBarHeight);
+
+      Shape oldClip = g.getClip();
+      Area newClip = new Area();
+      newClip.add(new Area(leftClip));
+      newClip.add(new Area(rightClip));
+      newClip.add(new Area(middleClip));
+      g.setClip(newClip);
+      g.setColor(Color.WHITE);
+      g.drawString(leftLabel, 5, seatBaseline);
+      g.drawString(rightLabel, rightLeft, seatBaseline);
+      g.drawString(middleLabel, middleLeft, seatBaseline);
+
+      g.setClip(oldClip);
+    }
+
+    private int getLeftPosition(int seats) {
+      return getSize(seats);
+    }
+
+    private int getRightPosition(int seats) {
+      return getWidth() - getSize(seats);
+    }
+
+    private int getMiddleStartPosition(int seats) {
+      int midSize = getSize(middleBars.stream().mapToInt(e -> e.size).sum());
+      int leftSize = getSize(leftBars.stream().mapToInt(e -> e.size).sum());
+      int rightSize = getSize(rightBars.stream().mapToInt(e -> e.size).sum());
+      int midPoint;
+      if (leftSize + midSize / 2 > getWidth() / 2) {
+        midPoint = leftSize + midSize / 2;
+      } else if (rightSize + midSize / 2 > getWidth() / 2) {
+        midPoint = getWidth() - rightSize - midSize / 2;
+      } else {
+        midPoint = getWidth() / 2;
+      }
+      return midPoint - getSize(seats) / 2;
+    }
+
+    private int getMiddleEndPosition(int seats) {
+      return getMiddleStartPosition(seats) + getSize(seats);
+    }
+
+    private int getSize(int seats) {
+      return (int) Math.round(1.0 * getWidth() * seats / getNumDots());
+    }
+  }
+
+  private class Dot {
+
     private Color color;
     private Color border;
   }
 
-  class Panel extends JPanel {
+  private class DotsPanel extends JPanel {
+
     private List<Integer> rows = new ArrayList<>();
     private List<Dot> dots = new ArrayList<>();
 
-    public Panel() {
+    public DotsPanel() {
       setBackground(Color.WHITE);
     }
 
