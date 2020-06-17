@@ -14,6 +14,8 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.LayoutManager;
+import java.awt.Point;
+import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Shape;
@@ -47,6 +49,18 @@ public class HemicycleFrame extends GraphicsFrame {
   private IndexedBinding<Color> middleSeatBarColorBinding = IndexedBinding.emptyBinding();
   private IndexedBinding<Integer> middleSeatBarSizeBinding = IndexedBinding.emptyBinding();
   private Binding<String> middleSeatBarLabelBinding = () -> "";
+
+  private Binding<Integer> leftChangeBarCountBinding = () -> 0;
+  private IndexedBinding<Color> leftChangeBarColorBinding = IndexedBinding.emptyBinding();
+  private IndexedBinding<Integer> leftChangeBarSizeBinding = IndexedBinding.emptyBinding();
+  private Binding<Integer> leftChangeBarStartBinding = () -> 0;
+  private Binding<String> leftChangeBarLabelBinding = () -> "";
+
+  private Binding<Integer> rightChangeBarCountBinding = () -> 0;
+  private IndexedBinding<Color> rightChangeBarColorBinding = IndexedBinding.emptyBinding();
+  private IndexedBinding<Integer> rightChangeBarSizeBinding = IndexedBinding.emptyBinding();
+  private Binding<Integer> rightChangeBarStartBinding = () -> 0;
+  private Binding<String> rightChangeBarLabelBinding = () -> "";
 
   private BarPanel barsPanel = new BarPanel();
   private DotsPanel dotsPanel = new DotsPanel();
@@ -82,9 +96,11 @@ public class HemicycleFrame extends GraphicsFrame {
     public void layoutContainer(Container parent) {
       int mid = 0;
       if (barsPanel.hasSeats()) {
-        mid += 25;
+        mid = Math.min(25, parent.getHeight() / 10);
       }
-      mid = Math.min(mid, parent.getHeight() / 10);
+      if (barsPanel.hasChange()) {
+        mid = Math.min(50, parent.getHeight() / 5);
+      }
       barsPanel.setLocation(0, 0);
       barsPanel.setSize(parent.getWidth(), mid);
       dotsPanel.setLocation(0, mid);
@@ -163,7 +179,7 @@ public class HemicycleFrame extends GraphicsFrame {
   }
 
   int getLeftSeatBarCount() {
-    return barsPanel.leftBars.size();
+    return barsPanel.leftSeatBars.size();
   }
 
   public void setLeftSeatBarCountBinding(Binding<Integer> leftSeatBarCountBinding) {
@@ -171,13 +187,13 @@ public class HemicycleFrame extends GraphicsFrame {
     this.leftSeatBarCountBinding = leftSeatBarCountBinding;
     this.leftSeatBarCountBinding.bind(
         numBars -> {
-          setSize(barsPanel.leftBars, numBars, Bar::new);
+          setSize(barsPanel.leftSeatBars, numBars, Bar::new);
           barsPanel.repaint();
         });
   }
 
   Color getLeftSeatBarColor(int idx) {
-    return barsPanel.leftBars.get(idx).color;
+    return barsPanel.leftSeatBars.get(idx).color;
   }
 
   public void setLeftSeatBarColorBinding(IndexedBinding<Color> leftSeatBarColorBinding) {
@@ -185,13 +201,13 @@ public class HemicycleFrame extends GraphicsFrame {
     this.leftSeatBarColorBinding = leftSeatBarColorBinding;
     this.leftSeatBarColorBinding.bind(
         (idx, color) -> {
-          barsPanel.leftBars.get(idx).color = color;
+          barsPanel.leftSeatBars.get(idx).color = color;
           barsPanel.repaint();
         });
   }
 
   int getLeftSeatBarSize(int idx) {
-    return barsPanel.leftBars.get(idx).size;
+    return barsPanel.leftSeatBars.get(idx).size;
   }
 
   public void setLeftSeatBarSizeBinding(IndexedBinding<Integer> leftSeatBarSizeBinding) {
@@ -199,13 +215,13 @@ public class HemicycleFrame extends GraphicsFrame {
     this.leftSeatBarSizeBinding = leftSeatBarSizeBinding;
     this.leftSeatBarSizeBinding.bind(
         (idx, size) -> {
-          barsPanel.leftBars.get(idx).size = size;
+          barsPanel.leftSeatBars.get(idx).size = size;
           barsPanel.repaint();
         });
   }
 
   String getLeftSeatBarLabel() {
-    return barsPanel.leftLabel;
+    return barsPanel.leftSeatLabel;
   }
 
   public void setLeftSeatBarLabelBinding(Binding<String> leftSeatBarLabelBinding) {
@@ -213,13 +229,13 @@ public class HemicycleFrame extends GraphicsFrame {
     this.leftSeatBarLabelBinding = leftSeatBarLabelBinding;
     this.leftSeatBarLabelBinding.bind(
         label -> {
-          barsPanel.leftLabel = label;
+          barsPanel.leftSeatLabel = label;
           barsPanel.repaint();
         });
   }
 
   int getRightSeatBarCount() {
-    return barsPanel.rightBars.size();
+    return barsPanel.rightSeatBars.size();
   }
 
   public void setRightSeatBarCountBinding(Binding<Integer> rightSeatBarCountBinding) {
@@ -227,13 +243,13 @@ public class HemicycleFrame extends GraphicsFrame {
     this.rightSeatBarCountBinding = rightSeatBarCountBinding;
     this.rightSeatBarCountBinding.bind(
         numBars -> {
-          setSize(barsPanel.rightBars, numBars, Bar::new);
+          setSize(barsPanel.rightSeatBars, numBars, Bar::new);
           barsPanel.repaint();
         });
   }
 
   Color getRightSeatBarColor(int idx) {
-    return barsPanel.rightBars.get(idx).color;
+    return barsPanel.rightSeatBars.get(idx).color;
   }
 
   public void setRightSeatBarColorBinding(IndexedBinding<Color> rightSeatBarColorBinding) {
@@ -241,13 +257,13 @@ public class HemicycleFrame extends GraphicsFrame {
     this.rightSeatBarColorBinding = rightSeatBarColorBinding;
     this.rightSeatBarColorBinding.bind(
         (idx, color) -> {
-          barsPanel.rightBars.get(idx).color = color;
+          barsPanel.rightSeatBars.get(idx).color = color;
           barsPanel.repaint();
         });
   }
 
   int getRightSeatBarSize(int idx) {
-    return barsPanel.rightBars.get(idx).size;
+    return barsPanel.rightSeatBars.get(idx).size;
   }
 
   public void setRightSeatBarSizeBinding(IndexedBinding<Integer> rightSeatBarSizeBinding) {
@@ -255,13 +271,13 @@ public class HemicycleFrame extends GraphicsFrame {
     this.rightSeatBarSizeBinding = rightSeatBarSizeBinding;
     this.rightSeatBarSizeBinding.bind(
         (idx, size) -> {
-          barsPanel.rightBars.get(idx).size = size;
+          barsPanel.rightSeatBars.get(idx).size = size;
           barsPanel.repaint();
         });
   }
 
   String getRightSeatBarLabel() {
-    return barsPanel.rightLabel;
+    return barsPanel.rightSeatLabel;
   }
 
   public void setRightSeatBarLabelBinding(Binding<String> rightSeatBarLabelBinding) {
@@ -269,13 +285,13 @@ public class HemicycleFrame extends GraphicsFrame {
     this.rightSeatBarLabelBinding = rightSeatBarLabelBinding;
     this.rightSeatBarLabelBinding.bind(
         label -> {
-          barsPanel.rightLabel = label;
+          barsPanel.rightSeatLabel = label;
           barsPanel.repaint();
         });
   }
 
   int getMiddleSeatBarCount() {
-    return barsPanel.middleBars.size();
+    return barsPanel.middleSeatBars.size();
   }
 
   public void setMiddleSeatBarCountBinding(Binding<Integer> middleSeatBarCountBinding) {
@@ -283,13 +299,13 @@ public class HemicycleFrame extends GraphicsFrame {
     this.middleSeatBarCountBinding = middleSeatBarCountBinding;
     this.middleSeatBarCountBinding.bind(
         numBars -> {
-          setSize(barsPanel.middleBars, numBars, Bar::new);
+          setSize(barsPanel.middleSeatBars, numBars, Bar::new);
           barsPanel.repaint();
         });
   }
 
   Color getMiddleSeatBarColor(int idx) {
-    return barsPanel.middleBars.get(idx).color;
+    return barsPanel.middleSeatBars.get(idx).color;
   }
 
   public void setMiddleSeatBarColorBinding(IndexedBinding<Color> middleSeatBarColorBinding) {
@@ -297,13 +313,13 @@ public class HemicycleFrame extends GraphicsFrame {
     this.middleSeatBarColorBinding = middleSeatBarColorBinding;
     this.middleSeatBarColorBinding.bind(
         (idx, color) -> {
-          barsPanel.middleBars.get(idx).color = color;
+          barsPanel.middleSeatBars.get(idx).color = color;
           barsPanel.repaint();
         });
   }
 
   int getMiddleSeatBarSize(int idx) {
-    return barsPanel.middleBars.get(idx).size;
+    return barsPanel.middleSeatBars.get(idx).size;
   }
 
   public void setMiddleSeatBarSizeBinding(IndexedBinding<Integer> middleSeatBarSizeBinding) {
@@ -311,13 +327,13 @@ public class HemicycleFrame extends GraphicsFrame {
     this.middleSeatBarSizeBinding = middleSeatBarSizeBinding;
     this.middleSeatBarSizeBinding.bind(
         (idx, size) -> {
-          barsPanel.middleBars.get(idx).size = size;
+          barsPanel.middleSeatBars.get(idx).size = size;
           barsPanel.repaint();
         });
   }
 
   String getMiddleSeatBarLabel() {
-    return barsPanel.middleLabel;
+    return barsPanel.middleSeatLabel;
   }
 
   public void setMiddleSeatBarLabelBinding(Binding<String> middleSeatBarLabelBinding) {
@@ -325,7 +341,147 @@ public class HemicycleFrame extends GraphicsFrame {
     this.middleSeatBarLabelBinding = middleSeatBarLabelBinding;
     this.middleSeatBarLabelBinding.bind(
         label -> {
-          barsPanel.middleLabel = label;
+          barsPanel.middleSeatLabel = label;
+          barsPanel.repaint();
+        });
+  }
+
+  int getLeftChangeBarCount() {
+    return barsPanel.leftChangeBars.size();
+  }
+
+  public void setLeftChangeBarCountBinding(Binding<Integer> leftChangeBarCountBinding) {
+    this.leftChangeBarCountBinding.unbind();
+    this.leftChangeBarCountBinding = leftChangeBarCountBinding;
+    this.leftChangeBarCountBinding.bind(
+        numBars -> {
+          setSize(barsPanel.leftChangeBars, numBars, Bar::new);
+          barsPanel.repaint();
+        });
+  }
+
+  Color getLeftChangeBarColor(int idx) {
+    return barsPanel.leftChangeBars.get(idx).color;
+  }
+
+  public void setLeftChangeBarColorBinding(IndexedBinding<Color> leftChangeBarColorBinding) {
+    this.leftChangeBarColorBinding.unbind();
+    this.leftChangeBarColorBinding = leftChangeBarColorBinding;
+    this.leftChangeBarColorBinding.bind(
+        (idx, color) -> {
+          barsPanel.leftChangeBars.get(idx).color = color;
+          barsPanel.repaint();
+        });
+  }
+
+  int getLeftChangeBarSize(int idx) {
+    return barsPanel.leftChangeBars.get(idx).size;
+  }
+
+  public void setLeftChangeBarSizeBinding(IndexedBinding<Integer> leftChangeBarSizeBinding) {
+    this.leftChangeBarSizeBinding.unbind();
+    this.leftChangeBarSizeBinding = leftChangeBarSizeBinding;
+    this.leftChangeBarSizeBinding.bind(
+        (idx, size) -> {
+          barsPanel.leftChangeBars.get(idx).size = size;
+          barsPanel.repaint();
+        });
+  }
+
+  int getLeftChangeBarStart() {
+    return barsPanel.leftChangeStart;
+  }
+
+  public void setLeftChangeBarStartBinding(Binding<Integer> leftChangeBarStartBinding) {
+    this.leftChangeBarStartBinding.unbind();
+    this.leftChangeBarStartBinding = leftChangeBarStartBinding;
+    this.leftChangeBarStartBinding.bind(
+        start -> {
+          barsPanel.leftChangeStart = start;
+          barsPanel.repaint();
+        });
+  }
+
+  String getLeftChangeBarLabel() {
+    return barsPanel.leftChangeLabel;
+  }
+
+  public void setLeftChangeBarLabelBinding(Binding<String> leftChangeBarLabelBinding) {
+    this.leftChangeBarLabelBinding.unbind();
+    this.leftChangeBarLabelBinding = leftChangeBarLabelBinding;
+    this.leftChangeBarLabelBinding.bind(
+        label -> {
+          barsPanel.leftChangeLabel = label;
+          barsPanel.repaint();
+        });
+  }
+
+  int getRightChangeBarCount() {
+    return barsPanel.rightChangeBars.size();
+  }
+
+  public void setRightChangeBarCountBinding(Binding<Integer> rightChangeBarCountBinding) {
+    this.rightChangeBarCountBinding.unbind();
+    this.rightChangeBarCountBinding = rightChangeBarCountBinding;
+    this.rightChangeBarCountBinding.bind(
+        numBars -> {
+          setSize(barsPanel.rightChangeBars, numBars, Bar::new);
+          barsPanel.repaint();
+        });
+  }
+
+  Color getRightChangeBarColor(int idx) {
+    return barsPanel.rightChangeBars.get(idx).color;
+  }
+
+  public void setRightChangeBarColorBinding(IndexedBinding<Color> rightChangeBarColorBinding) {
+    this.rightChangeBarColorBinding.unbind();
+    this.rightChangeBarColorBinding = rightChangeBarColorBinding;
+    this.rightChangeBarColorBinding.bind(
+        (idx, color) -> {
+          barsPanel.rightChangeBars.get(idx).color = color;
+          barsPanel.repaint();
+        });
+  }
+
+  int getRightChangeBarSize(int idx) {
+    return barsPanel.rightChangeBars.get(idx).size;
+  }
+
+  public void setRightChangeBarSizeBinding(IndexedBinding<Integer> rightChangeBarSizeBinding) {
+    this.rightChangeBarSizeBinding.unbind();
+    this.rightChangeBarSizeBinding = rightChangeBarSizeBinding;
+    this.rightChangeBarSizeBinding.bind(
+        (idx, size) -> {
+          barsPanel.rightChangeBars.get(idx).size = size;
+          barsPanel.repaint();
+        });
+  }
+
+  int getRightChangeBarStart() {
+    return barsPanel.rightChangeStart;
+  }
+
+  public void setRightChangeBarStartBinding(Binding<Integer> rightChangeBarStartBinding) {
+    this.rightChangeBarStartBinding.unbind();
+    this.rightChangeBarStartBinding = rightChangeBarStartBinding;
+    this.rightChangeBarStartBinding.bind(
+        start -> {
+          barsPanel.rightChangeStart = start;
+          barsPanel.repaint();
+        });
+  }
+
+  String getRightChangeBarLabel() {
+    return barsPanel.rightChangeLabel;
+  }
+
+  public void setRightChangeBarLabelBinding(Binding<String> rightChangeBarLabelBinding) {
+    this.rightChangeBarLabelBinding.unbind();
+    this.rightChangeBarLabelBinding = rightChangeBarLabelBinding;
+    this.rightChangeBarLabelBinding.bind(
+        label -> {
+          barsPanel.rightChangeLabel = label;
           barsPanel.repaint();
         });
   }
@@ -347,24 +503,38 @@ public class HemicycleFrame extends GraphicsFrame {
 
   private class BarPanel extends JPanel {
 
-    private List<Bar> leftBars = new ArrayList<>();
-    private String leftLabel = "";
-    private List<Bar> rightBars = new ArrayList<>();
-    private String rightLabel = "";
-    private List<Bar> middleBars = new ArrayList<>();
-    private String middleLabel = "";
+    private List<Bar> leftSeatBars = new ArrayList<>();
+    private String leftSeatLabel = "";
+    private List<Bar> rightSeatBars = new ArrayList<>();
+    private String rightSeatLabel = "";
+    private List<Bar> middleSeatBars = new ArrayList<>();
+    private String middleSeatLabel = "";
+
+    private List<Bar> leftChangeBars = new ArrayList<>();
+    private String leftChangeLabel = "";
+    private int leftChangeStart = 0;
+    private List<Bar> rightChangeBars = new ArrayList<>();
+    private String rightChangeLabel = "";
+    private int rightChangeStart = 0;
 
     public BarPanel() {
       setBackground(Color.WHITE);
     }
 
     boolean hasSeats() {
-      return !leftBars.isEmpty()
-          || !middleBars.isEmpty()
-          || !rightBars.isEmpty()
-          || !leftLabel.isEmpty()
-          || !middleLabel.isEmpty()
-          || !rightLabel.isEmpty();
+      return !leftSeatBars.isEmpty()
+          || !middleSeatBars.isEmpty()
+          || !rightSeatBars.isEmpty()
+          || !leftSeatLabel.isEmpty()
+          || !middleSeatLabel.isEmpty()
+          || !rightSeatLabel.isEmpty();
+    }
+
+    boolean hasChange() {
+      return !leftChangeBars.isEmpty()
+          || !rightChangeBars.isEmpty()
+          || !leftChangeLabel.isEmpty()
+          || !rightChangeLabel.isEmpty();
     }
 
     @Override
@@ -379,27 +549,38 @@ public class HemicycleFrame extends GraphicsFrame {
       g.setColor(Color.BLACK);
       g.drawLine(getWidth() / 2, 0, getWidth() / 2, getHeight());
 
-      g.setFont(StandardFont.readBoldFont(getHeight() * 4 / 5));
-      int seatBaseline = getHeight() * 4 / 5;
+      g.setFont(StandardFont.readBoldFont((getHeight() / (hasChange() ? 2 : 1)) * 4 / 5));
 
-      g.setColor(leftBars.isEmpty() ? Color.BLACK : leftBars.get(0).color);
-      g.drawString(leftLabel, 5, seatBaseline);
+      if (hasSeats()) {
+        paintSeatBars(g);
+      }
+      if (hasChange()) {
+        paintChangeBars(g);
+      }
+    }
 
-      g.setColor(rightBars.isEmpty() ? Color.BLACK : rightBars.get(0).color);
-      int rightWidth = g.getFontMetrics().stringWidth(rightLabel);
+    private void paintSeatBars(Graphics g) {
+      int height = getHeight() / (hasChange() ? 2 : 1);
+      int seatBaseline = height * 4 / 5;
+
+      g.setColor(leftSeatBars.isEmpty() ? Color.BLACK : leftSeatBars.get(0).color);
+      g.drawString(leftSeatLabel, 5, seatBaseline);
+
+      g.setColor(rightSeatBars.isEmpty() ? Color.BLACK : rightSeatBars.get(0).color);
+      int rightWidth = g.getFontMetrics().stringWidth(rightSeatLabel);
       int rightLeft = getWidth() - rightWidth - 5;
-      g.drawString(rightLabel, rightLeft, seatBaseline);
+      g.drawString(rightSeatLabel, rightLeft, seatBaseline);
 
-      g.setColor(middleBars.isEmpty() ? Color.BLACK : middleBars.get(0).color);
-      int middleWidth = g.getFontMetrics().stringWidth(middleLabel);
+      g.setColor(middleSeatBars.isEmpty() ? Color.BLACK : middleSeatBars.get(0).color);
+      int middleWidth = g.getFontMetrics().stringWidth(middleSeatLabel);
       int middleLeft = getMiddleStartPosition(0) - middleWidth / 2;
-      g.drawString(middleLabel, middleLeft, seatBaseline);
+      g.drawString(middleSeatLabel, middleLeft, seatBaseline);
 
-      int seatBarTop = getHeight() / 10;
-      int seatBarHeight = getHeight() * 4 / 5;
+      int seatBarTop = height / 10;
+      int seatBarHeight = height * 4 / 5;
 
       int leftSoFar = 0;
-      for (Bar bar : leftBars) {
+      for (Bar bar : leftSeatBars) {
         int start = getLeftPosition(leftSoFar);
         int end = getLeftPosition(leftSoFar + bar.size);
         g.setColor(bar.color);
@@ -409,7 +590,7 @@ public class HemicycleFrame extends GraphicsFrame {
       Shape leftClip = new Rectangle(0, seatBarTop, getLeftPosition(leftSoFar), seatBarHeight);
 
       int rightSoFar = 0;
-      for (Bar bar : rightBars) {
+      for (Bar bar : rightSeatBars) {
         int start = getRightPosition(rightSoFar + bar.size);
         int end = getRightPosition(rightSoFar);
         g.setColor(bar.color);
@@ -424,7 +605,7 @@ public class HemicycleFrame extends GraphicsFrame {
               seatBarHeight);
 
       int middleSoFar = 0;
-      for (Bar bar : middleBars) {
+      for (Bar bar : middleSeatBars) {
         g.setColor(bar.color);
         int startL = getMiddleStartPosition(middleSoFar + bar.size);
         int endL = getMiddleStartPosition(middleSoFar);
@@ -448,9 +629,101 @@ public class HemicycleFrame extends GraphicsFrame {
       newClip.add(new Area(middleClip));
       g.setClip(newClip);
       g.setColor(Color.WHITE);
-      g.drawString(leftLabel, 5, seatBaseline);
-      g.drawString(rightLabel, rightLeft, seatBaseline);
-      g.drawString(middleLabel, middleLeft, seatBaseline);
+      g.drawString(leftSeatLabel, 5, seatBaseline);
+      g.drawString(rightSeatLabel, rightLeft, seatBaseline);
+      g.drawString(middleSeatLabel, middleLeft, seatBaseline);
+
+      g.setClip(oldClip);
+    }
+
+    private void paintChangeBars(Graphics g) {
+      int height = getHeight() / (hasChange() ? 2 : 1);
+      int seatBaseline = height * 4 / 5 + height;
+
+      g.setColor(leftChangeBars.isEmpty() ? Color.BLACK : leftChangeBars.get(0).color);
+      int leftLeft = getLeftPosition(leftChangeStart) + 5;
+      g.drawString(leftChangeLabel, leftLeft, seatBaseline);
+
+      g.setColor(rightChangeBars.isEmpty() ? Color.BLACK : rightChangeBars.get(0).color);
+      int rightWidth = g.getFontMetrics().stringWidth(rightChangeLabel);
+      int rightLeft = getRightPosition(rightChangeStart) - rightWidth - 5;
+      g.drawString(rightChangeLabel, rightLeft, seatBaseline);
+
+      int changeBarHeight = height * 4 / 5;
+      int changeBarTop = height / 10 + height;
+      int changeBarMid = changeBarTop + changeBarHeight / 2;
+      int changeBarBottom = changeBarTop + changeBarHeight;
+
+      int leftSoFar = leftChangeStart;
+      int leftBase = getLeftPosition(leftChangeStart);
+      for (Bar bar : leftChangeBars) {
+        int start = getLeftPosition(leftSoFar);
+        int end = getLeftPosition(leftSoFar + bar.size);
+        int startSide = Math.max(leftBase, start - changeBarHeight / 2);
+        int endSide = Math.max(leftBase, end - changeBarHeight / 2);
+        g.setColor(bar.color);
+        List<Point> points = new ArrayList<>();
+        points.add(new Point(startSide, changeBarTop));
+        points.add(new Point(start, changeBarMid));
+        points.add(new Point(startSide, changeBarBottom));
+        points.add(new Point(endSide, changeBarBottom));
+        points.add(new Point(end, changeBarMid));
+        points.add(new Point(endSide, changeBarTop));
+        g.fillPolygon(
+            points.stream().mapToInt(p -> (int) p.getX()).toArray(),
+            points.stream().mapToInt(p -> (int) p.getY()).toArray(),
+            points.size());
+        leftSoFar += bar.size;
+      }
+      int leftTip = getLeftPosition(leftSoFar);
+      int leftSize = Math.max(leftBase, leftTip - changeBarHeight / 2);
+      Shape leftClip =
+          new Polygon(
+              new int[] {leftBase, leftBase, leftSize, leftTip, leftSize},
+              new int[] {
+                changeBarTop, changeBarBottom, changeBarBottom, changeBarMid, changeBarTop
+              },
+              5);
+
+      int rightSoFar = rightChangeStart;
+      int rightBase = getRightPosition(rightChangeStart);
+      for (Bar bar : rightChangeBars) {
+        int start = getRightPosition(rightSoFar);
+        int end = getRightPosition(rightSoFar + bar.size);
+        int startSide = Math.min(rightBase, start + changeBarHeight / 2);
+        int endSide = Math.min(rightBase, end + changeBarHeight / 2);
+        g.setColor(bar.color);
+        List<Point> points = new ArrayList<>();
+        points.add(new Point(startSide, changeBarTop));
+        points.add(new Point(start, changeBarMid));
+        points.add(new Point(startSide, changeBarBottom));
+        points.add(new Point(endSide, changeBarBottom));
+        points.add(new Point(end, changeBarMid));
+        points.add(new Point(endSide, changeBarTop));
+        g.fillPolygon(
+            points.stream().mapToInt(p -> (int) p.getX()).toArray(),
+            points.stream().mapToInt(p -> (int) p.getY()).toArray(),
+            points.size());
+        rightSoFar += bar.size;
+      }
+      int rightTip = getRightPosition(rightSoFar);
+      int rightSize = Math.min(rightBase, rightTip + changeBarHeight / 2);
+      Shape rightClip =
+          new Polygon(
+              new int[] {rightBase, rightBase, rightSize, rightTip, rightSize},
+              new int[] {
+                changeBarTop, changeBarBottom, changeBarBottom, changeBarMid, changeBarTop
+              },
+              5);
+
+      Shape oldClip = g.getClip();
+      Area newClip = new Area();
+      newClip.add(new Area(leftClip));
+      newClip.add(new Area(rightClip));
+      g.setClip(newClip);
+      g.setColor(Color.WHITE);
+      g.drawString(leftChangeLabel, leftLeft, seatBaseline);
+      g.drawString(rightChangeLabel, rightLeft, seatBaseline);
 
       g.setClip(oldClip);
     }
@@ -464,9 +737,9 @@ public class HemicycleFrame extends GraphicsFrame {
     }
 
     private int getMiddleStartPosition(int seats) {
-      int midSize = getSize(middleBars.stream().mapToInt(e -> e.size).sum());
-      int leftSize = getSize(leftBars.stream().mapToInt(e -> e.size).sum());
-      int rightSize = getSize(rightBars.stream().mapToInt(e -> e.size).sum());
+      int midSize = getSize(middleSeatBars.stream().mapToInt(e -> e.size).sum());
+      int leftSize = getSize(leftSeatBars.stream().mapToInt(e -> e.size).sum());
+      int rightSize = getSize(rightSeatBars.stream().mapToInt(e -> e.size).sum());
       int midPoint;
       if (leftSize + midSize / 2 > getWidth() / 2) {
         midPoint = leftSize + midSize / 2;
