@@ -2,6 +2,7 @@ package com.joecollins.graphics.components;
 
 import static com.joecollins.graphics.utils.RenderTestUtils.compareRendering;
 import static java.awt.Color.BLUE;
+import static java.awt.Color.GRAY;
 import static java.awt.Color.GREEN;
 import static java.awt.Color.RED;
 import static java.awt.Color.WHITE;
@@ -352,7 +353,7 @@ public class HemicycleFrameTest {
             WHITE, WHITE, WHITE, WHITE, lRed, WHITE, lBlue, lBlue, lBlue, //
             WHITE, WHITE, WHITE, WHITE, WHITE, WHITE, WHITE, WHITE, lBlue, lBlue, lBlue));
     compareRendering("HemicycleFrame", "ChangeBar-2", frame);
-    //
+
     leftSeats.setAll(List.of(1, 7));
     leftLabel.setValue("GREEN: 1/8");
     middleSeats.setAll(List.of(2, 4));
@@ -369,5 +370,75 @@ public class HemicycleFrameTest {
             lGreen, lGreen, lGreen, lRed, RED, lBlue, BLUE, BLUE, BLUE, //
             lGreen, lGreen, lGreen, lRed, lRed, lRed, lBlue, lBlue, BLUE, BLUE, BLUE));
     compareRendering("HemicycleFrame", "ChangeBar-3", frame);
+  }
+
+  @Test
+  public void testRenderNegativeChangeBars() throws IOException {
+    List<Integer> rowCounts = List.of(87);
+    BindableList<Color> dotColors = new BindableList<>();
+    dotColors.addAll(Collections.nCopies(5, Color.RED));
+    dotColors.addAll(Collections.nCopies(4, Color.ORANGE));
+    dotColors.addAll(Collections.nCopies(17, Color.GREEN.darker()));
+    dotColors.addAll(Collections.nCopies(61, Color.BLUE));
+
+    BindableList<Integer> leftSeats = new BindableList<>();
+    BindableList<Integer> middleSeats = new BindableList<>();
+    BindableList<Integer> rightSeats = new BindableList<>();
+    BindableList<Integer> leftChange = new BindableList<>();
+    BindableList<Integer> rightChange = new BindableList<>();
+
+    leftSeats.setAll(List.of(5));
+    middleSeats.setAll(List.of(21));
+    rightSeats.setAll(List.of(61));
+    leftChange.setAll(List.of(-3));
+    rightChange.setAll(List.of(-5));
+
+    BindableWrapper<String> leftLabel = new BindableWrapper<>("LIBERAL: 5");
+    BindableWrapper<String> middleLabel = new BindableWrapper<>("OTHERS: 21");
+    BindableWrapper<String> rightLabel = new BindableWrapper<>("PROGRESSIVE CONSERVATIVE: 61");
+
+    BindableWrapper<String> leftChangeLabel = new BindableWrapper<>("LIB: -3");
+    BindableWrapper<String> rightChangeLabel = new BindableWrapper<>("PC: -5");
+
+    HemicycleFrame frame = new HemicycleFrame();
+    frame.setNumRowsBinding(Binding.fixedBinding(rowCounts.size()));
+    frame.setRowCountsBinding(IndexedBinding.listBinding(rowCounts));
+    frame.setNumDotsBinding(Binding.sizeBinding(dotColors));
+    frame.setDotColorBinding(IndexedBinding.propertyBinding(dotColors, Function.identity()));
+    frame.setHeaderBinding(() -> "ALBERTA HEMICYCLE");
+
+    frame.setLeftSeatBarCountBinding(Binding.sizeBinding(leftSeats));
+    frame.setLeftSeatBarColorBinding(IndexedBinding.listBinding(RED));
+    frame.setLeftSeatBarSizeBinding(IndexedBinding.propertyBinding(leftSeats, Function.identity()));
+    frame.setLeftSeatBarLabelBinding(leftLabel.getBinding());
+
+    frame.setLeftChangeBarCountBinding(Binding.sizeBinding(leftChange));
+    frame.setLeftChangeBarColorBinding(IndexedBinding.listBinding(RED));
+    frame.setLeftChangeBarSizeBinding(
+        IndexedBinding.propertyBinding(leftChange, Function.identity()));
+    frame.setLeftChangeBarLabelBinding(leftChangeLabel.getBinding());
+    frame.setLeftChangeBarStartBinding(Binding.fixedBinding(8));
+
+    frame.setMiddleSeatBarCountBinding(Binding.sizeBinding(middleSeats));
+    frame.setMiddleSeatBarColorBinding(IndexedBinding.listBinding(GRAY));
+    frame.setMiddleSeatBarSizeBinding(
+        IndexedBinding.propertyBinding(middleSeats, Function.identity()));
+    frame.setMiddleSeatBarLabelBinding(middleLabel.getBinding());
+
+    frame.setRightSeatBarCountBinding(Binding.sizeBinding(rightSeats));
+    frame.setRightSeatBarColorBinding(IndexedBinding.listBinding(BLUE));
+    frame.setRightSeatBarSizeBinding(
+        IndexedBinding.propertyBinding(rightSeats, Function.identity()));
+    frame.setRightSeatBarLabelBinding(rightLabel.getBinding());
+
+    frame.setRightChangeBarCountBinding(Binding.sizeBinding(rightChange));
+    frame.setRightChangeBarColorBinding(IndexedBinding.listBinding(BLUE));
+    frame.setRightChangeBarSizeBinding(
+        IndexedBinding.propertyBinding(rightChange, Function.identity()));
+    frame.setRightChangeBarLabelBinding(rightChangeLabel.getBinding());
+    frame.setRightChangeBarStartBinding(Binding.fixedBinding(66));
+
+    frame.setSize(1024, 512);
+    compareRendering("HemicycleFrame", "ChangeBar-Negative", frame);
   }
 }

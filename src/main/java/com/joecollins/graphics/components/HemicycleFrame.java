@@ -23,6 +23,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.IntBinaryOperator;
 import java.util.function.Supplier;
 import javax.swing.JPanel;
 
@@ -654,13 +655,21 @@ public class HemicycleFrame extends GraphicsFrame {
       int changeBarMid = changeBarTop + changeBarHeight / 2;
       int changeBarBottom = changeBarTop + changeBarHeight;
 
+      IntBinaryOperator sideFunc =
+          (zero, point) -> {
+            if (point > zero) {
+              return Math.max(zero, point - changeBarHeight / 2);
+            }
+            return Math.min(zero, point + changeBarHeight / 2);
+          };
+
       int leftSoFar = leftChangeStart;
       int leftBase = getLeftPosition(leftChangeStart);
       for (Bar bar : leftChangeBars) {
         int start = getLeftPosition(leftSoFar);
         int end = getLeftPosition(leftSoFar + bar.size);
-        int startSide = Math.max(leftBase, start - changeBarHeight / 2);
-        int endSide = Math.max(leftBase, end - changeBarHeight / 2);
+        int startSide = sideFunc.applyAsInt(leftBase, start);
+        int endSide = sideFunc.applyAsInt(leftBase, end);
         g.setColor(bar.color);
         List<Point> points = new ArrayList<>();
         points.add(new Point(startSide, changeBarTop));
@@ -676,7 +685,7 @@ public class HemicycleFrame extends GraphicsFrame {
         leftSoFar += bar.size;
       }
       int leftTip = getLeftPosition(leftSoFar);
-      int leftSize = Math.max(leftBase, leftTip - changeBarHeight / 2);
+      int leftSize = sideFunc.applyAsInt(leftBase, leftTip);
       Shape leftClip =
           new Polygon(
               new int[] {leftBase, leftBase, leftSize, leftTip, leftSize},
@@ -690,8 +699,8 @@ public class HemicycleFrame extends GraphicsFrame {
       for (Bar bar : rightChangeBars) {
         int start = getRightPosition(rightSoFar);
         int end = getRightPosition(rightSoFar + bar.size);
-        int startSide = Math.min(rightBase, start + changeBarHeight / 2);
-        int endSide = Math.min(rightBase, end + changeBarHeight / 2);
+        int startSide = sideFunc.applyAsInt(rightBase, start);
+        int endSide = sideFunc.applyAsInt(rightBase, end);
         g.setColor(bar.color);
         List<Point> points = new ArrayList<>();
         points.add(new Point(startSide, changeBarTop));
@@ -707,7 +716,7 @@ public class HemicycleFrame extends GraphicsFrame {
         rightSoFar += bar.size;
       }
       int rightTip = getRightPosition(rightSoFar);
-      int rightSize = Math.min(rightBase, rightTip + changeBarHeight / 2);
+      int rightSize = sideFunc.applyAsInt(rightBase, rightTip);
       Shape rightClip =
           new Polygon(
               new int[] {rightBase, rightBase, rightSize, rightTip, rightSize},
