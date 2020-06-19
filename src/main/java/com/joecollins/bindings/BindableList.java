@@ -18,6 +18,17 @@ public class BindableList<T> extends AbstractList<T> {
     NULL
   }
 
+  public BindableList() {}
+
+  @SafeVarargs
+  public BindableList(T... items) {
+    setAll(List.of(items));
+  }
+
+  public BindableList(List<T> list) {
+    setAll(list);
+  }
+
   private ArrayList<T> underlying = new ArrayList<>();
 
   private List<IntConsumer> sizeBindings = new LinkedList<>();

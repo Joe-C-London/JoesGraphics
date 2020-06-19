@@ -1,5 +1,6 @@
 package com.joecollins.graphics.components;
 
+import com.joecollins.bindings.BindableList;
 import com.joecollins.bindings.Binding;
 import com.joecollins.bindings.IndexedBinding;
 import java.awt.Color;
@@ -70,6 +71,70 @@ public class HemicycleFrameBuilder {
 
   public HemicycleFrameBuilder withHeader(Binding<String> headerBinding) {
     frame.setHeaderBinding(headerBinding);
+    return this;
+  }
+
+  public <T> HemicycleFrameBuilder withLeftSeatBars(
+      BindableList<T> bars,
+      Function<T, Color> colorFunc,
+      Function<T, Integer> seatFunc,
+      Binding<String> labelBinding) {
+    frame.setLeftSeatBarCountBinding(Binding.sizeBinding(bars));
+    frame.setLeftSeatBarColorBinding(IndexedBinding.propertyBinding(bars, colorFunc));
+    frame.setLeftSeatBarSizeBinding(IndexedBinding.propertyBinding(bars, seatFunc));
+    frame.setLeftSeatBarLabelBinding(labelBinding);
+    return this;
+  }
+
+  public <T> HemicycleFrameBuilder withRightSeatBars(
+      BindableList<T> bars,
+      Function<T, Color> colorFunc,
+      Function<T, Integer> seatFunc,
+      Binding<String> labelBinding) {
+    frame.setRightSeatBarCountBinding(Binding.sizeBinding(bars));
+    frame.setRightSeatBarColorBinding(IndexedBinding.propertyBinding(bars, colorFunc));
+    frame.setRightSeatBarSizeBinding(IndexedBinding.propertyBinding(bars, seatFunc));
+    frame.setRightSeatBarLabelBinding(labelBinding);
+    return this;
+  }
+
+  public <T> HemicycleFrameBuilder withMiddleSeatBars(
+      BindableList<T> bars,
+      Function<T, Color> colorFunc,
+      Function<T, Integer> seatFunc,
+      Binding<String> labelBinding) {
+    frame.setMiddleSeatBarCountBinding(Binding.sizeBinding(bars));
+    frame.setMiddleSeatBarColorBinding(IndexedBinding.propertyBinding(bars, colorFunc));
+    frame.setMiddleSeatBarSizeBinding(IndexedBinding.propertyBinding(bars, seatFunc));
+    frame.setMiddleSeatBarLabelBinding(labelBinding);
+    return this;
+  }
+
+  public <T> HemicycleFrameBuilder withLeftChangeBars(
+      BindableList<T> bars,
+      Function<T, Color> colorFunc,
+      Function<T, Integer> seatFunc,
+      Binding<Integer> startBinding,
+      Binding<String> labelBinding) {
+    frame.setLeftChangeBarCountBinding(Binding.sizeBinding(bars));
+    frame.setLeftChangeBarColorBinding(IndexedBinding.propertyBinding(bars, colorFunc));
+    frame.setLeftChangeBarSizeBinding(IndexedBinding.propertyBinding(bars, seatFunc));
+    frame.setLeftChangeBarStartBinding(startBinding);
+    frame.setLeftChangeBarLabelBinding(labelBinding);
+    return this;
+  }
+
+  public <T> HemicycleFrameBuilder withRightChangeBars(
+      BindableList<T> bars,
+      Function<T, Color> colorFunc,
+      Function<T, Integer> seatFunc,
+      Binding<Integer> startBinding,
+      Binding<String> labelBinding) {
+    frame.setRightChangeBarCountBinding(Binding.sizeBinding(bars));
+    frame.setRightChangeBarColorBinding(IndexedBinding.propertyBinding(bars, colorFunc));
+    frame.setRightChangeBarSizeBinding(IndexedBinding.propertyBinding(bars, seatFunc));
+    frame.setRightChangeBarStartBinding(startBinding);
+    frame.setRightChangeBarLabelBinding(labelBinding);
     return this;
   }
 
