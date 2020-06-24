@@ -1,17 +1,16 @@
 package com.joecollins.graphics.components;
 
+import com.google.common.annotations.Beta;
 import com.joecollins.bindings.BindableList;
 import com.joecollins.bindings.Binding;
 import com.joecollins.bindings.IndexedBinding;
 import java.awt.Color;
 import java.awt.Point;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import org.apache.commons.lang3.tuple.MutablePair;
 
 public class HemicycleFrameBuilder {
 
@@ -36,11 +35,29 @@ public class HemicycleFrameBuilder {
       Function<T, Binding<Color>> colorFunc,
       Function<T, Binding<Color>> borderFunc,
       Tiebreaker tiebreaker) {
-    HemicycleFrameBuilder builder = new HemicycleFrameBuilder();
-    builder.frame.setNumRowsBinding(Binding.fixedBinding(rows.size()));
-    builder.frame.setRowCountsBinding(IndexedBinding.listBinding(rows));
+    return ofClustered(rows, entries, e -> 1, colorFunc, borderFunc, tiebreaker);
+  }
 
-    List<Point> points =
+  @Beta
+  public static <T> HemicycleFrameBuilder ofClustered(
+      List<Integer> rows,
+      List<T> entries,
+      Function<T, Integer> seatsFunc,
+      Function<T, Binding<Color>> colorFunc,
+      Tiebreaker tiebreaker) {
+    return ofClustered(rows, entries, seatsFunc, colorFunc, colorFunc, tiebreaker);
+  }
+
+  @Beta
+  public static <T> HemicycleFrameBuilder ofClustered(
+      List<Integer> rows,
+      List<T> entries,
+      Function<T, Integer> seatsFunc,
+      Function<T, Binding<Color>> colorFunc,
+      Function<T, Binding<Color>> borderFunc,
+      Tiebreaker tiebreaker) {
+
+    List<MutablePair<Point, T>> points =
         IntStream.range(0, rows.size())
             .boxed()
             .flatMap(r -> IntStream.range(0, rows.get(r)).mapToObj(c -> new Point(r, c)))
@@ -48,25 +65,70 @@ public class HemicycleFrameBuilder {
                 Comparator.comparingDouble((Point p) -> 180.0 * p.y / (rows.get(p.x) - 1))
                     .thenComparingInt(
                         p -> (tiebreaker == Tiebreaker.FRONT_ROW_FROM_LEFT ? 1 : -1) * p.x))
+            .map(p -> new MutablePair<>(p, (T) null))
             .collect(Collectors.toList());
 
-    Map<Point, T> dotIndexToEntryIndex = new LinkedHashMap<>();
-    for (int dotIndex = 0; dotIndex < points.size(); dotIndex++) {
-      Point point = points.get(dotIndex);
-      T entry = entries.get(dotIndex);
-      dotIndexToEntryIndex.put(point, entry);
+    for (T entry : entries) {
+      List<Point> rejectedPoints = new ArrayList<>();
+      List<Point> selectedPoints = new ArrayList<>();
+      int numDots = seatsFunc.apply(entry);
+      for (int i = 0; i < numDots; i++) {
+        Optional<MutablePair<Point, T>> np =
+            points.stream()
+                .filter(e -> !rejectedPoints.contains(e.left))
+                .filter(e -> e.right == null)
+                .filter(
+                    e ->
+                        selectedPoints.isEmpty()
+                            || selectedPoints.stream()
+                                .anyMatch(p -> pointsAreBesideEachOther(p, e.left, rows)))
+                .findFirst();
+        if (np.isEmpty()) {
+          rejectedPoints.addAll(selectedPoints);
+          selectedPoints.clear();
+          i--;
+          continue;
+        }
+        MutablePair<Point, T> nextPoint = np.orElseThrow();
+        nextPoint.setRight(entry);
+        selectedPoints.add(nextPoint.left);
+      }
     }
+
+    HemicycleFrameBuilder builder = new HemicycleFrameBuilder();
+    builder.frame.setNumRowsBinding(Binding.fixedBinding(rows.size()));
+    builder.frame.setRowCountsBinding(IndexedBinding.listBinding(rows));
 
     List<T> dots =
         points.stream()
-            .sorted(Comparator.comparingInt((Point p) -> p.x).thenComparing(p -> p.y))
-            .map(dotIndexToEntryIndex::get)
+            .sorted(
+                Comparator.comparingInt((MutablePair<Point, T> p) -> p.left.x)
+                    .thenComparing(p -> p.left.y))
+            .map(MutablePair::getRight)
             .collect(Collectors.toList());
 
-    builder.frame.setNumDotsBinding(Binding.fixedBinding(entries.size()));
+    builder.frame.setNumDotsBinding(Binding.fixedBinding(dots.size()));
     builder.frame.setDotColorBinding(IndexedBinding.listBinding(dots, colorFunc));
     builder.frame.setDotBorderBinding(IndexedBinding.listBinding(dots, borderFunc));
     return builder;
+  }
+
+  private static <T> boolean pointsAreBesideEachOther(Point a, Point b, List<Integer> rows) {
+    if (a.x == b.x) {
+      return Math.abs(a.y - b.y) <= 1;
+    }
+    if (Math.abs(a.x - b.x) > 1) {
+      return false;
+    }
+    double aY, bY;
+    if (a.x > b.x) {
+      aY = 1.0 * a.y;
+      bY = 1.0 * b.y / rows.get(b.x) * rows.get(a.x);
+    } else {
+      aY = 1.0 * a.y / rows.get(a.x) * rows.get(b.x);
+      bY = 1.0 * b.y;
+    }
+    return Math.abs(aY - bY) <= 0.5;
   }
 
   public HemicycleFrameBuilder withHeader(Binding<String> headerBinding) {
