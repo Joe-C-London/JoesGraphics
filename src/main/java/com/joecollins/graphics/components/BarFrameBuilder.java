@@ -4,6 +4,7 @@ import com.joecollins.bindings.Bindable;
 import com.joecollins.bindings.BindableList;
 import com.joecollins.bindings.Binding;
 import com.joecollins.bindings.IndexedBinding;
+import com.joecollins.graphics.utils.ColorUtils;
 import java.awt.Color;
 import java.awt.Shape;
 import java.util.ArrayList;
@@ -315,13 +316,13 @@ public class BarFrameBuilder {
             entries,
             e -> {
               UnaryOperator<Color> cf =
-                  e.differentDirections() ? BarFrameBuilder::lighten : UnaryOperator.identity();
+                  e.differentDirections() ? ColorUtils::lighten : UnaryOperator.identity();
               return cf.apply(e.color);
             }),
         IndexedBinding.propertyBinding(entries, BarEntry::first));
     barFrame.addSeriesBinding(
         "Second",
-        IndexedBinding.propertyBinding(entries, e -> lighten(e.color)),
+        IndexedBinding.propertyBinding(entries, e -> ColorUtils.lighten(e.color)),
         IndexedBinding.propertyBinding(
             entries,
             e ->
@@ -370,11 +371,6 @@ public class BarFrameBuilder {
           }
         });
     return builder;
-  }
-
-  private static Color lighten(Color color) {
-    return new Color(
-        128 + color.getRed() / 2, 128 + color.getGreen() / 2, 128 + color.getBlue() / 2);
   }
 
   public BarFrameBuilder withHeader(Binding<String> headerBinding) {

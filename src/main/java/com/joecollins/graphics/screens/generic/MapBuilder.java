@@ -4,6 +4,7 @@ import com.joecollins.bindings.Binding;
 import com.joecollins.bindings.BindingReceiver;
 import com.joecollins.graphics.components.MapFrame;
 import com.joecollins.graphics.components.MapFrameBuilder;
+import com.joecollins.graphics.utils.ColorUtils;
 import com.joecollins.models.general.Party;
 import java.awt.Color;
 import java.awt.Shape;
@@ -181,15 +182,7 @@ public class MapBuilder {
       if (elected) {
         return party.getColor();
       }
-      return brighter(party.getColor());
-    }
-
-    private static Color brighter(Color color) {
-      return new Color(
-          (3 * color.getRed() + 255) / 4,
-          (3 * color.getGreen() + 255) / 4,
-          (3 * color.getBlue() + 255) / 4,
-          color.getAlpha());
+      return ColorUtils.lighten(party.getColor());
     }
   }
 }
