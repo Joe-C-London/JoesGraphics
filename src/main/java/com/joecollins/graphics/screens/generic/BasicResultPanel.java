@@ -219,6 +219,18 @@ public class BasicResultPanel extends JPanel {
         new VotePctTemplate());
   }
 
+  public static VoteScreenBuilder<Candidate, Integer, Double, Integer> candidateVotesPctOnly(
+      Binding<? extends Map<Candidate, Integer>> votes,
+      Binding<String> header,
+      Binding<String> subhead) {
+    return new BasicVoteScreenBuilder<>(
+        new BindingReceiver<>(votes),
+        new BindingReceiver<>(header),
+        new BindingReceiver<>(subhead),
+        new CandidateTemplate(),
+        new VotePctOnlyTemplate());
+  }
+
   public static VoteScreenBuilder<Candidate, Integer, Double, Integer> candidateVotes(
       Binding<? extends Map<Candidate, Integer>> votes,
       Binding<String> header,
@@ -230,6 +242,19 @@ public class BasicResultPanel extends JPanel {
         new BindingReceiver<>(subhead),
         new CandidateTemplate(incumbentMarker),
         new VotePctTemplate());
+  }
+
+  public static VoteScreenBuilder<Candidate, Integer, Double, Integer> candidateVotesPctOnly(
+          Binding<? extends Map<Candidate, Integer>> votes,
+          Binding<String> header,
+          Binding<String> subhead,
+          String incumbentMarker) {
+    return new BasicVoteScreenBuilder<>(
+            new BindingReceiver<>(votes),
+            new BindingReceiver<>(header),
+            new BindingReceiver<>(subhead),
+            new CandidateTemplate(incumbentMarker),
+            new VotePctOnlyTemplate());
   }
 
   private interface KeyTemplate<KT> {
@@ -841,6 +866,14 @@ public class BasicResultPanel extends JPanel {
     }
   }
 
+  private static class VotePctOnlyTemplate implements VoteTemplate<Integer, Double> {
+
+    @Override
+    public String toBarString(Integer votes, Double pct) {
+      return votes == 0 ? "WAITING..." : (PCT_FORMAT.format(pct));
+    }
+  }
+
   public abstract static class VoteScreenBuilder<KT, CT, CPT, PT> {
     protected final KeyTemplate<KT> keyTemplate;
     protected final VoteTemplate<CT, CPT> voteTemplate;
@@ -852,6 +885,7 @@ public class BasicResultPanel extends JPanel {
     protected BindingReceiver<String> majorityLabel;
     protected BindingReceiver<KT> winner;
     protected BindingReceiver<Double> pctReporting;
+    protected BindingReceiver<String> notes;
 
     protected BindingReceiver<Map<Party, ? extends PT>> prev;
     protected BindingReceiver<String> changeHeader;
@@ -947,6 +981,11 @@ public class BasicResultPanel extends JPanel {
       return this;
     }
 
+    public VoteScreenBuilder<KT, CT, CPT, PT> withNotes(Binding<String> notes) {
+      this.notes = new BindingReceiver<>(notes);
+      return this;
+    }
+
     public BasicResultPanel build(Binding<String> textHeader) {
       return new BasicResultPanel(
           createHeaderLabel(textHeader),
@@ -1012,6 +1051,7 @@ public class BasicResultPanel extends JPanel {
                   (party, votes) -> party == Party.OTHERS ? -1 : votes.percent)
               .withHeader(header.getBinding())
               .withSubhead(subhead.getBinding())
+              .withNotes(notes == null ? (() -> null) : notes.getBinding())
               .withMax(
                   pctReporting == null
                       ? (() -> 2.0 / 3)

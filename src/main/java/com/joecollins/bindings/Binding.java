@@ -222,6 +222,9 @@ public interface Binding<T> {
                     }
                   });
         }
+        if (bindings.isEmpty()) {
+          onUpdate.accept(aggregate);
+        }
       }
 
       @Override

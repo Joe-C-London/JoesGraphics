@@ -221,6 +221,16 @@ public class BindingTest {
     assertEquals(15, boundValue.getValue().intValue());
   }
 
+  @Test
+  public void testEmptyMapReduceBinding() {
+    Mutable<Integer> boundValue = new MutableObject<>();
+    List<Binding<Integer>> bindings = List.of();
+    Binding<Integer> binding =
+        Binding.mapReduceBinding(bindings, 1, (a, v) -> a + v, (a, v) -> a - v);
+    binding.bind(boundValue::setValue);
+    assertEquals(1, boundValue.getValue().intValue());
+  }
+
   private static class BindableValue<T> extends Bindable {
     enum Property {
       VALUE
