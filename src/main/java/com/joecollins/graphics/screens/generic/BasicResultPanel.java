@@ -245,16 +245,16 @@ public class BasicResultPanel extends JPanel {
   }
 
   public static VoteScreenBuilder<Candidate, Integer, Double, Integer> candidateVotesPctOnly(
-          Binding<? extends Map<Candidate, Integer>> votes,
-          Binding<String> header,
-          Binding<String> subhead,
-          String incumbentMarker) {
+      Binding<? extends Map<Candidate, Integer>> votes,
+      Binding<String> header,
+      Binding<String> subhead,
+      String incumbentMarker) {
     return new BasicVoteScreenBuilder<>(
-            new BindingReceiver<>(votes),
-            new BindingReceiver<>(header),
-            new BindingReceiver<>(subhead),
-            new CandidateTemplate(incumbentMarker),
-            new VotePctOnlyTemplate());
+        new BindingReceiver<>(votes),
+        new BindingReceiver<>(header),
+        new BindingReceiver<>(subhead),
+        new CandidateTemplate(incumbentMarker),
+        new VotePctOnlyTemplate());
   }
 
   private interface KeyTemplate<KT> {
