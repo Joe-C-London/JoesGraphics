@@ -162,7 +162,7 @@ public class MapBuilder {
     private final Party party;
     private final boolean elected;
 
-    private Result(Party party, boolean elected) {
+    public Result(Party party, boolean elected) {
       this.party = party;
       this.elected = elected;
     }

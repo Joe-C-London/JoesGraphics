@@ -336,6 +336,7 @@ public class BasicResultPanel extends JPanel {
     protected BindingReceiver<Boolean> showMajority;
     protected Function<Integer, String> majorityFunction;
     protected BindingReceiver<KT> winner;
+    protected BindingReceiver<String> notes;
 
     protected BindingReceiver<Map<Party, CurrDiff<CT>>> diff;
     protected BindingReceiver<String> changeHeader;
@@ -459,6 +460,11 @@ public class BasicResultPanel extends JPanel {
       return this;
     }
 
+    public SeatScreenBuilder<KT, CT, PT> withNotes(Binding<String> notes) {
+      this.notes = new BindingReceiver<>(notes);
+      return this;
+    }
+
     public BasicResultPanel build(Binding<String> textHeader) {
       return new BasicResultPanel(
           createHeaderLabel(textHeader),
@@ -554,7 +560,8 @@ public class BasicResultPanel extends JPanel {
                   (party, result) -> result.winner ? tick : null,
                   (party, result) -> party == Party.OTHERS ? -1 : result.result)
               .withHeader(header.getBinding())
-              .withSubhead(subhead.getBinding());
+              .withSubhead(subhead.getBinding())
+              .withNotes(notes == null ? (() -> null) : notes.getBinding());
       if (total != null) {
         builder = builder.withMax(total.getBinding(t -> t * 2 / 3));
       }
@@ -664,7 +671,8 @@ public class BasicResultPanel extends JPanel {
                   (party, result) -> result.winner ? tick : null,
                   (party, result) -> party == Party.OTHERS ? -1 : result.result.getRight())
               .withHeader(header.getBinding())
-              .withSubhead(subhead.getBinding());
+              .withSubhead(subhead.getBinding())
+              .withNotes(notes == null ? (() -> null) : notes.getBinding());
       if (total != null) {
         builder = builder.withMax(total.getBinding(t -> t * 2 / 3));
       }
@@ -779,7 +787,8 @@ public class BasicResultPanel extends JPanel {
                           ? -1
                           : result.result.getMinimum() + result.result.getMaximum())
               .withHeader(header.getBinding())
-              .withSubhead(subhead.getBinding());
+              .withSubhead(subhead.getBinding())
+              .withNotes(notes == null ? (() -> null) : notes.getBinding());
       if (total != null) {
         builder = builder.withMax(total.getBinding(t -> t * 2 / 3));
       }

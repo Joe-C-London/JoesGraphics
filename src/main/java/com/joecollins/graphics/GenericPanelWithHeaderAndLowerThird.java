@@ -16,6 +16,10 @@ public class GenericPanelWithHeaderAndLowerThird<T extends JPanel> extends JPane
   private final JLabel label;
   private final LowerThird lowerThird;
 
+  public GenericPanelWithHeaderAndLowerThird(T panel, LowerThird lowerThird) {
+    this(panel, (Binding<String>) null, lowerThird);
+  }
+
   public GenericPanelWithHeaderAndLowerThird(T panel, String label, LowerThird lowerThird) {
     this(panel, Binding.fixedBinding(label), lowerThird);
   }
@@ -23,17 +27,21 @@ public class GenericPanelWithHeaderAndLowerThird<T extends JPanel> extends JPane
   public GenericPanelWithHeaderAndLowerThird(
       T panel, Binding<String> label, LowerThird lowerThird) {
     this.panel = panel;
-    this.label = new JLabel();
-    label.bind(this.label::setText);
-    this.label.setHorizontalAlignment(JLabel.CENTER);
-    this.label.setBorder(new EmptyBorder(5, 0, -5, 0));
-    this.label.setFont(StandardFont.readBoldFont(32));
     this.lowerThird = lowerThird;
+    this.label = new JLabel();
+    if (label != null) {
+      label.bind(this.label::setText);
+      this.label.setHorizontalAlignment(JLabel.CENTER);
+      this.label.setBorder(new EmptyBorder(5, 0, -5, 0));
+      this.label.setFont(StandardFont.readBoldFont(32));
+    }
 
     setBackground(Color.WHITE);
     setLayout(new BorderLayout());
     setPreferredSize(new Dimension(1024, 512));
-    add(this.label, BorderLayout.NORTH);
+    if (label != null) {
+      add(this.label, BorderLayout.NORTH);
+    }
     add(this.lowerThird, BorderLayout.SOUTH);
     add(this.panel, BorderLayout.CENTER);
   }
