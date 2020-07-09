@@ -22,7 +22,7 @@ public class SwingFrame extends GraphicsFrame {
 
   private SwingPanel swingPanel = new SwingPanel();
   private JLabel bottomLabel =
-      new JLabel() {
+      new FontSizeAdjustingLabel() {
         {
           setHorizontalAlignment(JLabel.CENTER);
           setFont(StandardFont.readBoldFont(15));

@@ -44,7 +44,7 @@ public class GraphicsFrame extends JPanel {
 
     headerFont = StandardFont.readNormalFont(24);
     headerLabel =
-        new JLabel() {
+        new FontSizeAdjustingLabel() {
           {
             setForeground(Color.WHITE);
             setHorizontalAlignment(JLabel.CENTER);

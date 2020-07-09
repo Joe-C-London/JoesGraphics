@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 
 import com.joecollins.bindings.Bindable;
 import com.joecollins.bindings.Binding;
+import com.joecollins.graphics.utils.BindableWrapper;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.io.IOException;
@@ -165,5 +166,27 @@ public class GraphicsFrameTest {
     graphicsFrame.setNotesBinding(Binding.fixedBinding("JOYEUX NO\u00cbL, GAR\u00c7ON!"));
     graphicsFrame.setSize(256, 128);
     compareRendering("GraphicsFrame", "Accents", graphicsFrame);
+  }
+
+  @Test
+  public void testHeaderFontSize() throws IOException {
+    GraphicsFrame graphicsFrame =
+        new GraphicsFrame() {
+          {
+            JPanel panel = new JPanel();
+            panel.setBackground(Color.YELLOW);
+            add(panel, BorderLayout.CENTER);
+          }
+        };
+    BindableWrapper<String> headerWrapper = new BindableWrapper<>("THIS IS A HEADER");
+    graphicsFrame.setHeaderBinding(headerWrapper.getBinding());
+    graphicsFrame.setSize(256, 128);
+    compareRendering("GraphicsFrame", "HeaderFontSize-1", graphicsFrame);
+
+    headerWrapper.setValue("THIS IS A VERY MUCH LONGER HEADER");
+    compareRendering("GraphicsFrame", "HeaderFontSize-2", graphicsFrame);
+
+    graphicsFrame.setSize(512, 128);
+    compareRendering("GraphicsFrame", "HeaderFontSize-3", graphicsFrame);
   }
 }
