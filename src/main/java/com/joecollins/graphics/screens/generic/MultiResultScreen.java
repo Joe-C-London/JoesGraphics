@@ -39,11 +39,11 @@ import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
 
-public class MultiResultPanel extends JPanel {
+public class MultiResultScreen extends JPanel {
 
   private List<ResultPanel> panels = new ArrayList<>();
 
-  private <T> MultiResultPanel(Builder<T> builder, Binding<String> textHeader) {
+  private <T> MultiResultScreen(Builder<T> builder, Binding<String> textHeader) {
     setBackground(Color.WHITE);
     setLayout(new BorderLayout());
     add(createHeaderLabel(textHeader), BorderLayout.NORTH);
@@ -63,7 +63,9 @@ public class MultiResultPanel extends JPanel {
                 panels.add(newPanel);
               }
               while (panels.size() > size) {
-                center.remove(panels.remove(size.intValue()));
+                ResultPanel panel = panels.remove(size.intValue());
+                panel.unbindAll();
+                center.remove(panel);
               }
             });
 
@@ -228,8 +230,8 @@ public class MultiResultPanel extends JPanel {
       return this;
     }
 
-    public MultiResultPanel build(Binding<String> textHeader) {
-      return new MultiResultPanel(this, textHeader);
+    public MultiResultScreen build(Binding<String> textHeader) {
+      return new MultiResultScreen(this, textHeader);
     }
   }
 
@@ -274,13 +276,15 @@ public class MultiResultPanel extends JPanel {
                           + p.getParty().getAbbreviation()
                           + (p.isIncumbent() ? (" " + incumbentMarker) : ""),
                   p -> p.getParty().getColor(),
-                  v -> v.getMiddle(),
+                  v -> Double.isNaN(v.getMiddle()) ? 0 : v.getMiddle(),
                   v ->
-                      new DecimalFormat("#,##0").format(v.getLeft())
-                          + "\n"
-                          + new DecimalFormat("0.0%").format(v.getMiddle()),
+                      Double.isNaN(v.getMiddle())
+                          ? "WAITING..."
+                          : new DecimalFormat("#,##0").format(v.getLeft())
+                              + "\n"
+                              + new DecimalFormat("0.0%").format(v.getMiddle()),
                   (p, v) -> v.getRight() ? ImageGenerator.createHalfTickShape() : null)
-              .withMax(pctReporting.getBinding().map(d -> 0.5 / d))
+              .withMax(pctReporting.getBinding().map(d -> 0.5 / Math.max(1e-6, d)))
               .build();
       add(barFrame);
 
@@ -354,6 +358,19 @@ public class MultiResultPanel extends JPanel {
 
     void setMapHeaderBinding(Binding<String> mapLabelBinding) {
       mapFrame.setHeaderBinding(mapLabelBinding);
+    }
+
+    void unbindAll() {
+      setVotesBinding(Map::of);
+      setHeaderBinding(() -> "");
+      setSubheadBinding(() -> "");
+      setWinnerBinding(() -> null);
+      setPctReportingBinding(() -> 0.0);
+      setPrevBinding(Map::of);
+      setSwingHeaderBinding(() -> "");
+      setMapShapeBinding(List.of());
+      setMapFocusBinding(List.of());
+      setMapHeaderBinding(() -> "");
     }
 
     private class ResultPanelLayout implements LayoutManager {
