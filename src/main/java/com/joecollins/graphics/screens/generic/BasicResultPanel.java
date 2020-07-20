@@ -340,6 +340,7 @@ public class BasicResultPanel extends JPanel {
 
     protected BindingReceiver<Map<Party, CurrDiff<CT>>> diff;
     protected BindingReceiver<String> changeHeader;
+    protected BindingReceiver<String> changeSubhead;
 
     protected BindingReceiver<Map<Party, Integer>> currVotes;
     protected BindingReceiver<Map<Party, Integer>> prevVotes;
@@ -378,6 +379,13 @@ public class BasicResultPanel extends JPanel {
 
     public SeatScreenBuilder<KT, CT, PT> withDiff(
         Binding<? extends Map<Party, ? extends CT>> diff, Binding<String> changeHeader) {
+      return withDiff(diff, changeHeader, Binding.fixedBinding(null));
+    }
+
+    public SeatScreenBuilder<KT, CT, PT> withDiff(
+        Binding<? extends Map<Party, ? extends CT>> diff,
+        Binding<String> changeHeader,
+        Binding<String> changeSubhead) {
       this.diff =
           new BindingReceiver<>(
               current
@@ -395,6 +403,7 @@ public class BasicResultPanel extends JPanel {
                         return ret;
                       }));
       this.changeHeader = new BindingReceiver<>(changeHeader);
+      this.changeSubhead = new BindingReceiver<>(changeSubhead);
       return this;
     }
 
@@ -404,6 +413,13 @@ public class BasicResultPanel extends JPanel {
 
     public SeatScreenBuilder<KT, CT, PT> withPrev(
         Binding<? extends Map<Party, PT>> prev, Binding<String> changeHeader) {
+      return withPrev(prev, changeHeader, Binding.fixedBinding(null));
+    }
+
+    public SeatScreenBuilder<KT, CT, PT> withPrev(
+        Binding<? extends Map<Party, PT>> prev,
+        Binding<String> changeHeader,
+        Binding<String> changeSubhead) {
       this.diff =
           new BindingReceiver<>(
               current
@@ -421,6 +437,7 @@ public class BasicResultPanel extends JPanel {
                         return ret;
                       }));
       this.changeHeader = new BindingReceiver<>(changeHeader);
+      this.changeSubhead = new BindingReceiver<>(changeSubhead);
       return this;
     }
 
@@ -601,7 +618,8 @@ public class BasicResultPanel extends JPanel {
                   seats -> seats.diff,
                   seats -> changeStr(seats.diff),
                   (party, seats) -> party == Party.OTHERS ? -1 : seats.curr)
-              .withHeader(changeHeader.getBinding());
+              .withHeader(changeHeader.getBinding())
+              .withSubhead(changeSubhead.getBinding());
       if (total != null) {
         builder = builder.withWingspan(total.getBinding(t -> Math.max(1, t / 20)));
       }
@@ -712,7 +730,8 @@ public class BasicResultPanel extends JPanel {
                   seats -> seats.diff,
                   seats -> changeStr(seats.diff.getLeft()) + "/" + changeStr(seats.diff.getRight()),
                   (party, seats) -> party == Party.OTHERS ? -1 : seats.curr.getRight())
-              .withHeader(changeHeader.getBinding());
+              .withHeader(changeHeader.getBinding())
+              .withSubhead(changeSubhead.getBinding());
       if (total != null) {
         builder = builder.withWingspan(total.getBinding(t -> Math.max(1, t / 20)));
       }
@@ -836,7 +855,8 @@ public class BasicResultPanel extends JPanel {
                       party == Party.OTHERS
                           ? -1
                           : seats.curr.getMinimum() + seats.curr.getMaximum())
-              .withHeader(changeHeader.getBinding());
+              .withHeader(changeHeader.getBinding())
+              .withSubhead(changeSubhead.getBinding());
       if (total != null) {
         builder = builder.withWingspan(total.getBinding(t -> Math.max(1, t / 20)));
       }

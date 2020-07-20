@@ -36,6 +36,7 @@ public class SeatViewPanelTest {
     BindableWrapper<String> seatHeader = new BindableWrapper<>("0 OF 650 CONSTITUENCIES DECLARED");
     BindableWrapper<String> seatSubhead = new BindableWrapper<>("PROJECTION: TOO EARLY TO CALL");
     BindableWrapper<String> changeHeader = new BindableWrapper<>("CHANGE SINCE 2017");
+    BindableWrapper<String> changeSubhead = new BindableWrapper<>("CON NEED +9 FOR MAJORITY");
     Party con = new Party("Conservative", "CON", Color.BLUE);
     Party lab = new Party("Labour", "LAB", Color.RED);
 
@@ -44,7 +45,8 @@ public class SeatViewPanelTest {
                 currentSeats.getBinding(), seatHeader.getBinding(), seatSubhead.getBinding())
             .withTotal(totalSeats.getBinding())
             .withMajorityLine(showMajority.getBinding(), n -> n + " SEATS FOR MAJORITY")
-            .withPrev(previousSeats.getBinding(), changeHeader.getBinding())
+            .withPrev(
+                previousSeats.getBinding(), changeHeader.getBinding(), changeSubhead.getBinding())
             .build(header.getBinding());
     panel.setSize(1024, 512);
     compareRendering("SeatViewPanel", "Basic-1", panel);
@@ -99,6 +101,7 @@ public class SeatViewPanelTest {
     header.setValue("SCOTLAND");
     seatHeader.setValue("59 OF 59 SEATS DECLARED");
     seatSubhead.setValue("");
+    changeSubhead.setValue(null);
     totalSeats.setValue(59);
     showMajority.setValue(false);
     curr.clear();
@@ -130,6 +133,7 @@ public class SeatViewPanelTest {
     BindableWrapper<String> seatHeader = new BindableWrapper<>("0 OF 650 CONSTITUENCIES DECLARED");
     BindableWrapper<String> seatSubhead = new BindableWrapper<>("PROJECTION: TOO EARLY TO CALL");
     BindableWrapper<String> changeHeader = new BindableWrapper<>("CHANGE SINCE 2017");
+    BindableWrapper<String> changeSubhead = new BindableWrapper<>("CON NEED +9 FOR MAJORITY");
     Party con = new Party("Conservative", "CON", Color.BLUE);
     Party lab = new Party("Labour", "LAB", Color.RED);
 
@@ -138,7 +142,7 @@ public class SeatViewPanelTest {
                 currentSeats.getBinding(), seatHeader.getBinding(), seatSubhead.getBinding())
             .withTotal(totalSeats.getBinding())
             .withMajorityLine(showMajority.getBinding(), n -> n + " SEATS FOR MAJORITY")
-            .withDiff(seatDiff.getBinding(), changeHeader.getBinding())
+            .withDiff(seatDiff.getBinding(), changeHeader.getBinding(), changeSubhead.getBinding())
             .build(header.getBinding());
     panel.setSize(1024, 512);
     compareRendering("SeatViewPanel", "Basic-1", panel);
@@ -192,6 +196,7 @@ public class SeatViewPanelTest {
     header.setValue("SCOTLAND");
     seatHeader.setValue("59 OF 59 SEATS DECLARED");
     seatSubhead.setValue("");
+    changeSubhead.setValue(null);
     totalSeats.setValue(59);
     showMajority.setValue(false);
     curr.clear();
