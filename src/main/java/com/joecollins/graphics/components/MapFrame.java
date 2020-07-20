@@ -10,9 +10,11 @@ import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
+import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 import javax.swing.JPanel;
 import org.apache.commons.lang3.tuple.MutablePair;
 
@@ -54,11 +56,23 @@ public class MapFrame extends GraphicsFrame {
             transform.translate(x, y);
             transform.scale(scale, scale);
             transform.translate(-bounds.getMinX(), -bounds.getMinY());
-            shapesToDraw.forEach(
-                pair -> {
-                  g2d.setColor(pair.right);
-                  g2d.fill(transform.createTransformedShape(pair.left));
-                });
+            final Predicate<Shape> inScope;
+            try {
+              AffineTransform inverted = transform.createInverse();
+              Shape drawArea =
+                  inverted.createTransformedShape(
+                      new Rectangle2D.Double(0, 0, getWidth(), getHeight()));
+              inScope = s -> drawArea.intersects(s.getBounds());
+            } catch (NoninvertibleTransformException e) {
+              throw new RuntimeException(e);
+            }
+            shapesToDraw.stream()
+                .filter(e -> inScope.test(e.left))
+                .forEach(
+                    pair -> {
+                      g2d.setColor(pair.right);
+                      g2d.fill(transform.createTransformedShape(pair.left));
+                    });
           }
         };
     add(panel, BorderLayout.CENTER);

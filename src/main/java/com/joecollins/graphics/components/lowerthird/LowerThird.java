@@ -129,6 +129,8 @@ public class LowerThird extends JPanel {
 
     @Override
     protected void paintComponent(Graphics g) {
+      ((Graphics2D) g)
+          .setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
       g.drawImage(image, 0, 0, null);
     }
   }

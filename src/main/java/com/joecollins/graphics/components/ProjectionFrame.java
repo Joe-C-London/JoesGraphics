@@ -5,8 +5,10 @@ import com.joecollins.graphics.utils.StandardFont;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.GridLayout;
 import java.awt.Image;
+import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -90,6 +92,8 @@ public class ProjectionFrame extends GraphicsFrame {
       double ratio = Math.min(1.0, Math.min(xRatio, yRatio));
       int newWidth = (int) (ratio * image.getWidth(null));
       int newHeight = (int) (ratio * image.getHeight(null));
+      ((Graphics2D) g)
+          .setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
       Image scaledImage = image.getScaledInstance(newWidth, newHeight, Image.SCALE_DEFAULT);
       g.drawImage(scaledImage, (getWidth() - newWidth) / 2, (getHeight() - newHeight), null);
     }

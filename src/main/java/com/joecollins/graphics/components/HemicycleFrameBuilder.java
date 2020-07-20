@@ -350,7 +350,7 @@ public class HemicycleFrameBuilder {
                     .get(e)
                     .getBinding(
                         r -> {
-                          if (r == null) return Color.WHITE;
+                          if (r == null || r.winner == null) return Color.WHITE;
                           return (r.hasWon
                                   ? Function.<Color>identity()
                                   : (Function<Color, Color>) ColorUtils::lighten)
@@ -436,7 +436,7 @@ public class HemicycleFrameBuilder {
             resultWithPrev.stream().map(BindingReceiver::getBinding).collect(Collectors.toList()),
             ImmutablePair.of(0, 0),
             (p, r) -> {
-              if (r.getLeft() == null) {
+              if (r.getLeft() == null || r.getLeft().winner == null) {
                 return p;
               }
               if (partyFilter.test(r.getLeft().winner)) {
