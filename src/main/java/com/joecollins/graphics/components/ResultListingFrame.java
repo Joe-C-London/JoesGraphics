@@ -24,6 +24,7 @@ public class ResultListingFrame extends GraphicsFrame {
   private final List<Item> items = new ArrayList<>();
 
   private Binding<Integer> numRowsBinding = () -> 0;
+  private Binding<Boolean> reversedBinding = () -> false;
   private Binding<Integer> numItemsBinding = () -> 0;
   private IndexedBinding<String> textBinding = IndexedBinding.emptyBinding();
   private IndexedBinding<Color> foregroundBinding = IndexedBinding.emptyBinding();
@@ -44,6 +45,16 @@ public class ResultListingFrame extends GraphicsFrame {
     this.numRowsBinding.unbind();
     this.numRowsBinding = numRowsBinding;
     this.numRowsBinding.bind(layout::setNumRows);
+  }
+
+  boolean isReversed() {
+    return layout.reversed;
+  }
+
+  public void setReversedBinding(Binding<Boolean> reversedBinding) {
+    this.reversedBinding.unbind();
+    this.reversedBinding = reversedBinding;
+    this.reversedBinding.bind(layout::setReversed);
   }
 
   int getNumItems() {
@@ -156,9 +167,15 @@ public class ResultListingFrame extends GraphicsFrame {
 
   class Layout implements LayoutManager {
     int numRows;
+    boolean reversed;
 
     void setNumRows(int numRows) {
       this.numRows = numRows;
+      layoutContainer(ResultListingFrame.this.centralPanel);
+    }
+
+    void setReversed(boolean reversed) {
+      this.reversed = reversed;
       layoutContainer(ResultListingFrame.this.centralPanel);
     }
 
@@ -190,6 +207,9 @@ public class ResultListingFrame extends GraphicsFrame {
         Item item = items.get(i);
         int row = i % numRows;
         int col = i / numRows;
+        if (reversed) {
+          col = numCols - col - 1;
+        }
         item.setSize(itemWidth - 4, itemHeight - 4);
         item.setLocation(col * itemWidth + 2, row * itemHeight + 2);
       }

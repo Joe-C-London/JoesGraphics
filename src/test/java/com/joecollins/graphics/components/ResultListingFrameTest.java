@@ -149,6 +149,45 @@ public class ResultListingFrameTest {
     compareRendering("ResultListingFrame", "Varying-3", frame);
   }
 
+  @Test
+  public void testVaryingItemsInReverse() throws IOException {
+    BindableList<Item> items = new BindableList<>();
+
+    ResultListingFrame frame = new ResultListingFrame();
+    frame.setNumRowsBinding(() -> 10);
+    frame.setReversedBinding(() -> true);
+    frame.setNumItemsBinding(Binding.sizeBinding(items));
+    frame.setTextBinding(
+        IndexedBinding.propertyBinding(items, i -> i.text.toUpperCase(), Item.Property.TEXT));
+    frame.setForegroundBinding(
+        IndexedBinding.propertyBinding(items, i -> i.foreground, Item.Property.FOREGROUND));
+    frame.setBackgroundBinding(
+        IndexedBinding.propertyBinding(items, i -> i.background, Item.Property.BACKGROUND));
+    frame.setBorderBinding(
+        IndexedBinding.propertyBinding(items, i -> i.border, Item.Property.BORDER));
+    frame.setHeaderBinding(() -> "SEATS CHANGING");
+    frame.setSize(512, 256);
+    compareRendering("ResultListingFrame", "Reversed-1", frame);
+
+    items.add(new Item("Montague-Kilmuir", Color.BLUE, Color.WHITE, Color.RED));
+    items.add(new Item("Brackley-Hunter River", Color.BLUE, Color.WHITE, Color.GRAY));
+    items.add(
+        new Item("Charlottetown-Victoria Park", Color.GREEN.darker(), Color.WHITE, Color.RED));
+    items.add(new Item("Summerside-South Drive", Color.GREEN.darker(), Color.WHITE, Color.RED));
+    items.sort(Comparator.comparing(i -> i.text));
+    compareRendering("ResultListingFrame", "Reversed-2", frame);
+
+    items.add(new Item("Mermaid-Stratford", Color.GREEN.darker(), Color.WHITE, Color.RED));
+    items.add(new Item("Charlottetown-Belvedere", Color.GREEN.darker(), Color.WHITE, Color.RED));
+    items.add(new Item("Stanhope-Marshfield", Color.BLUE, Color.WHITE, Color.RED));
+    items.add(new Item("Charlottetown-Brighton", Color.GREEN.darker(), Color.WHITE, Color.RED));
+    items.add(new Item("Alberton-Bloomfield", Color.BLUE, Color.WHITE, Color.RED));
+    items.add(new Item("Summerside-Wilmot", Color.GREEN.darker(), Color.WHITE, Color.RED));
+    items.add(new Item("Tyne Valley-Sherbrooke", Color.GREEN.darker(), Color.WHITE, Color.RED));
+    items.sort(Comparator.comparing(i -> i.text));
+    compareRendering("ResultListingFrame", "Reversed-3", frame);
+  }
+
   private static class Item extends Bindable {
     enum Property {
       TEXT,
