@@ -2,7 +2,9 @@ package com.joecollins.graphics.components;
 
 import static org.junit.Assert.assertEquals;
 
+import com.joecollins.bindings.Bindable;
 import com.joecollins.bindings.BindableList;
+import com.joecollins.bindings.Binding;
 import com.joecollins.graphics.utils.BindableWrapper;
 import java.awt.Color;
 import java.text.DecimalFormat;
@@ -208,5 +210,53 @@ public class SwingometerFrameBuilderTest {
     assertEquals(0.115, frame.getDotPosition(0).doubleValue(), 1e-6);
     assertEquals(Color.RED, frame.getDotColor(1));
     assertEquals("10", frame.getDotLabel(2));
+  }
+
+  enum Property {
+    PROP
+  }
+
+  @Test
+  public void testFixedDots() {
+    class Dot extends Bindable {
+      private final double position;
+      private Color color;
+
+      Dot(double position, Color color) {
+        this.position = position;
+        this.color = color;
+      }
+
+      Binding<Color> getColor() {
+        return Binding.propertyBinding(this, t -> t.color, Property.PROP);
+      }
+
+      void setColor(Color color) {
+        this.color = color;
+        onPropertyRefreshed(Property.PROP);
+      }
+    }
+    BindableList<Dot> dots = new BindableList<>();
+    dots.add(new Dot(0.115, Color.RED));
+    dots.add(new Dot(0.36, Color.RED));
+    dots.add(new Dot(0.385, Color.RED));
+    dots.add(new Dot(0.6, Color.RED));
+    dots.add(new Dot(-0.185, Color.BLUE));
+    dots.add(new Dot(-0.76, Color.BLUE));
+    dots.add(new Dot(-0.76, Color.BLUE));
+    BindableWrapper<Pair<Color, Color>> colors =
+        new BindableWrapper<>(ImmutablePair.of(Color.BLUE, Color.RED));
+    BindableWrapper<Double> value = new BindableWrapper<>(-1.0);
+    SwingometerFrame frame =
+        SwingometerFrameBuilder.basic(colors.getBinding(), value.getBinding())
+            .withFixedDots(dots, d -> d.position, d -> d.getColor())
+            .build();
+    assertEquals(7, frame.getNumDots());
+    assertEquals(0.115, frame.getDotPosition(0).doubleValue(), 1e-6);
+    assertEquals(Color.RED, frame.getDotColor(1));
+    assertEquals("", frame.getDotLabel(2));
+
+    dots.get(1).setColor(Color.BLUE);
+    assertEquals(Color.BLUE, frame.getDotColor(1));
   }
 }

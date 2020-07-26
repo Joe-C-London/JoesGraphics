@@ -162,6 +162,26 @@ public class SwingometerFrameBuilder {
     return this;
   }
 
+  public <T> SwingometerFrameBuilder withFixedDots(
+      List<T> dots,
+      Function<T, ? extends Number> positionFunc,
+      Function<T, Binding<Color>> colorFunc) {
+    return withFixedDots(dots, positionFunc, colorFunc, d -> "");
+  }
+
+  public <T> SwingometerFrameBuilder withFixedDots(
+      List<T> dots,
+      Function<T, ? extends Number> positionFunc,
+      Function<T, Binding<Color>> colorFunc,
+      Function<T, String> labelFunc) {
+    frame.setNumDotsBinding(Binding.fixedBinding(dots.size()));
+    frame.setDotsPositionBinding(
+        IndexedBinding.listBinding(dots, d -> () -> positionFunc.apply(d)));
+    frame.setDotsColorBinding(IndexedBinding.listBinding(dots, d -> colorFunc.apply(d)));
+    frame.setDotsLabelBinding(IndexedBinding.listBinding(dots, d -> () -> labelFunc.apply(d)));
+    return this;
+  }
+
   public SwingometerFrame build() {
     return frame;
   }
