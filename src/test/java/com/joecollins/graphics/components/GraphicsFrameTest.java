@@ -189,4 +189,28 @@ public class GraphicsFrameTest {
     graphicsFrame.setSize(512, 128);
     compareRendering("GraphicsFrame", "HeaderFontSize-3", graphicsFrame);
   }
+
+  @Test
+  public void testRenderHeaderAlignment() throws IOException {
+    BindableWrapper<GraphicsFrame.Alignment> alignment =
+        new BindableWrapper<>(GraphicsFrame.Alignment.CENTER);
+    GraphicsFrame graphicsFrame =
+        new GraphicsFrame() {
+          {
+            JPanel panel = new JPanel();
+            panel.setBackground(Color.YELLOW);
+            add(panel, BorderLayout.CENTER);
+          }
+        };
+    graphicsFrame.setHeaderBinding(Binding.fixedBinding("HEADER"));
+    graphicsFrame.setHeaderAlignmentBinding(alignment.getBinding());
+    graphicsFrame.setSize(256, 128);
+    compareRendering("GraphicsFrame", "HeaderAlignment-1", graphicsFrame);
+
+    alignment.setValue(GraphicsFrame.Alignment.LEFT);
+    compareRendering("GraphicsFrame", "HeaderAlignment-2", graphicsFrame);
+
+    alignment.setValue(GraphicsFrame.Alignment.RIGHT);
+    compareRendering("GraphicsFrame", "HeaderAlignment-3", graphicsFrame);
+  }
 }

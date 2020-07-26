@@ -9,12 +9,25 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.lang.reflect.Field;
+import java.util.Arrays;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.MatteBorder;
 
 public class GraphicsFrame extends JPanel {
+
+  public enum Alignment {
+    LEFT(JLabel.LEFT),
+    CENTER(JLabel.CENTER),
+    RIGHT(JLabel.RIGHT);
+
+    final int jlabelAlignment;
+
+    Alignment(int jlabelAlignment) {
+      this.jlabelAlignment = jlabelAlignment;
+    }
+  }
 
   private final Font headerFont;
   private final JPanel headerPanel;
@@ -24,6 +37,7 @@ public class GraphicsFrame extends JPanel {
   private Binding<String> headerTextBinding = () -> null;
   private Binding<String> notesTextBinding = () -> null;
   private Binding<Color> borderColorBinding = () -> Color.BLACK;
+  private Binding<Alignment> headerAlignmentBinding = () -> Alignment.CENTER;
 
   public GraphicsFrame() {
     setLayout(new BorderLayout());
@@ -80,6 +94,20 @@ public class GraphicsFrame extends JPanel {
             headerLabel.setText(headerText);
           }
         });
+  }
+
+  Alignment getHeaderAlignment() {
+    return Arrays.stream(Alignment.values())
+        .filter(a -> a.jlabelAlignment == headerLabel.getHorizontalAlignment())
+        .findFirst()
+        .orElseThrow();
+  }
+
+  public void setHeaderAlignmentBinding(Binding<Alignment> headerAlignmentBinding) {
+    this.headerAlignmentBinding.unbind();
+    this.headerAlignmentBinding = headerAlignmentBinding;
+    this.headerAlignmentBinding.bind(
+        headerAlignment -> headerLabel.setHorizontalAlignment(headerAlignment.jlabelAlignment));
   }
 
   String getNotes() {
