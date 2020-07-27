@@ -271,48 +271,48 @@ public class MultiSummaryFrameTest {
         IndexedBinding.listBinding(
             List.of(
                 ImmutablePair.of(Color.BLUE, "LIB"),
-                ImmutablePair.of(Color.RED, "LAB"),
+                ImmutablePair.of(Color.RED, "ALP"),
                 ImmutablePair.of(Color.BLUE, "LIB"),
-                ImmutablePair.of(Color.RED, "LAB"),
+                ImmutablePair.of(Color.RED, "ALP"),
                 ImmutablePair.of(Color.GREEN.darker().darker(), "NAT"),
                 ImmutablePair.of(Color.GREEN.darker(), "GRN")),
             List.of(
                 ImmutablePair.of(Color.BLUE, "LIB"),
-                ImmutablePair.of(Color.RED, "LAB"),
+                ImmutablePair.of(Color.RED, "ALP"),
                 ImmutablePair.of(Color.BLUE, "LIB"),
-                ImmutablePair.of(Color.RED, "LAB"),
+                ImmutablePair.of(Color.RED, "ALP"),
                 ImmutablePair.of(Color.GREEN.darker(), "GRN"),
                 ImmutablePair.of(Color.BLUE, "LIB")),
             List.of(
                 ImmutablePair.of(Color.BLUE, "LNP"),
-                ImmutablePair.of(Color.RED, "LAB"),
+                ImmutablePair.of(Color.RED, "ALP"),
                 ImmutablePair.of(Color.BLUE, "LNP"),
                 ImmutablePair.of(Color.ORANGE, "ONP"),
                 ImmutablePair.of(Color.BLUE, "LNP"),
                 ImmutablePair.of(Color.GREEN.darker(), "GRN")),
             List.of(
                 ImmutablePair.of(Color.BLUE, "LIB"),
-                ImmutablePair.of(Color.RED, "LAB"),
+                ImmutablePair.of(Color.RED, "ALP"),
                 ImmutablePair.of(Color.BLUE, "LIB"),
                 ImmutablePair.of(Color.BLUE, "LIB"),
-                ImmutablePair.of(Color.RED, "LAB"),
+                ImmutablePair.of(Color.RED, "ALP"),
                 ImmutablePair.of(Color.GREEN.darker(), "GRN")),
             List.of(
                 ImmutablePair.of(Color.BLUE, "LIB"),
-                ImmutablePair.of(Color.RED, "LAB"),
+                ImmutablePair.of(Color.RED, "ALP"),
                 ImmutablePair.of(Color.BLUE, "LIB"),
-                ImmutablePair.of(Color.RED, "LAB"),
+                ImmutablePair.of(Color.RED, "ALP"),
                 ImmutablePair.of(Color.GREEN.darker(), "GRN"),
                 ImmutablePair.of(Color.BLUE, "LIB")),
             List.of(
                 ImmutablePair.of(Color.BLUE, "LIB"),
-                ImmutablePair.of(Color.RED, "LAB"),
+                ImmutablePair.of(Color.RED, "ALP"),
                 ImmutablePair.of(Color.BLUE, "LIB"),
                 ImmutablePair.of(Color.GREEN.darker(), "GRN"),
-                ImmutablePair.of(Color.RED, "LAB"),
+                ImmutablePair.of(Color.RED, "ALP"),
                 ImmutablePair.of(Color.YELLOW, "LAMB")),
-            List.of(ImmutablePair.of(Color.RED, "LAB"), ImmutablePair.of(Color.BLUE, "LIB")),
-            List.of(ImmutablePair.of(Color.RED, "LAB"), ImmutablePair.of(Color.ORANGE, "CLP"))));
+            List.of(ImmutablePair.of(Color.RED, "ALP"), ImmutablePair.of(Color.BLUE, "LIB")),
+            List.of(ImmutablePair.of(Color.RED, "ALP"), ImmutablePair.of(Color.ORANGE, "CLP"))));
     frame.setSize(512, 256);
 
     compareRendering("MultiSummaryFrame", "DiffColCounts", frame);
