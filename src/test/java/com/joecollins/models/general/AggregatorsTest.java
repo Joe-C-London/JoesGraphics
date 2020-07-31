@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.mutable.Mutable;
+import org.apache.commons.lang3.mutable.MutableDouble;
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -188,5 +189,38 @@ public class AggregatorsTest {
 
     votes.setValue(Map.of("ABC", 750, "GHI", 30));
     assertEquals(Map.of("ABC", 75, "GHI", 3), output.getValue());
+  }
+
+  @Test
+  public void testCombinePctReporting() {
+    List<BindableWrapper<Double>> inputs = new ArrayList<>();
+    inputs.add(new BindableWrapper<>(0.5));
+    inputs.add(new BindableWrapper<>(0.3));
+    MutableDouble output = new MutableDouble();
+    Aggregators.combinePctReporting(inputs, BindableWrapper::getBinding).bind(output::setValue);
+    assertEquals(0.4, output.getValue(), 1e-6);
+
+    inputs.get(0).setValue(0.6);
+    assertEquals(0.45, output.getValue(), 1e-6);
+
+    inputs.get(1).setValue(0.7);
+    assertEquals(0.65, output.getValue(), 1e-6);
+  }
+
+  @Test
+  public void testCombinePctReportingWithWeights() {
+    List<Pair<BindableWrapper<Double>, Double>> inputs = new ArrayList<>();
+    inputs.add(ImmutablePair.of(new BindableWrapper<>(0.5), 2.0));
+    inputs.add(ImmutablePair.of(new BindableWrapper<>(0.3), 3.0));
+    MutableDouble output = new MutableDouble();
+    Aggregators.combinePctReporting(inputs, e -> e.getLeft().getBinding(), e -> e.getRight())
+        .bind(output::setValue);
+    assertEquals(0.38, output.getValue(), 1e-6);
+
+    inputs.get(0).getLeft().setValue(0.6);
+    assertEquals(0.42, output.getValue(), 1e-6);
+
+    inputs.get(1).getLeft().setValue(0.7);
+    assertEquals(0.66, output.getValue(), 1e-6);
   }
 }

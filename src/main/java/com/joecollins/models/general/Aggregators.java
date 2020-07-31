@@ -8,6 +8,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.function.ToDoubleFunction;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -97,6 +98,29 @@ public class Aggregators {
           r.forEach((k, v) -> ret.put(k, (int) (v * p)));
           return ret;
         });
+  }
+
+  public static <T> Binding<Double> combinePctReporting(
+      Collection<T> items, Function<T, Binding<Double>> pctReportingFunc) {
+    return combinePctReporting(items, pctReportingFunc, t -> 1);
+  }
+
+  public static <T> Binding<Double> combinePctReporting(
+      Collection<T> items,
+      Function<T, Binding<Double>> pctReportingFunc,
+      ToDoubleFunction<T> weightFunc) {
+    double totalWeight = items.stream().mapToDouble(weightFunc).sum();
+    return Binding.mapReduceBinding(
+        items.stream()
+            .map(
+                t -> {
+                  double weight = weightFunc.applyAsDouble(t);
+                  return pctReportingFunc.apply(t).map(x -> x * weight);
+                })
+            .collect(Collectors.toList()),
+        0.0,
+        (a, p) -> a + (p / totalWeight),
+        (a, p) -> a - (p / totalWeight));
   }
 
   public static <K1, K2> Binding<Map<K2, Integer>> adjustKey(
