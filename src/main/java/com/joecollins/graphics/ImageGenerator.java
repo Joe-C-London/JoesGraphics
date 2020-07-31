@@ -3,6 +3,7 @@ package com.joecollins.graphics;
 import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.Shape;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.geom.Rectangle2D;
 
@@ -22,6 +23,14 @@ public class ImageGenerator {
   public static Shape createHalfTickShape() {
     Area shape = new Area(createTickShape());
     shape.add(new Area(new Rectangle2D.Double(200, 200, 1e-6, 1e-6)));
+    return shape;
+  }
+
+  public static Shape createMidTickShape() {
+    AffineTransform transform = AffineTransform.getTranslateInstance(0, 50);
+    Area shape = new Area(transform.createTransformedShape(createTickShape()));
+    shape.add(new Area(new Rectangle2D.Double(200, 200, 1e-6, 1e-6)));
+    shape.add(new Area(new Rectangle2D.Double(0, 0, 1e-6, 1e-6)));
     return shape;
   }
 
