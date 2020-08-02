@@ -881,7 +881,7 @@ public class BasicResultPanel extends JPanel {
 
     @Override
     public String toBarString(Integer votes, Double pct) {
-      return votes == 0 ? "WAITING..." : PCT_FORMAT.format(pct);
+      return Double.isNaN(pct) ? "WAITING..." : PCT_FORMAT.format(pct);
     }
   }
 
@@ -889,7 +889,7 @@ public class BasicResultPanel extends JPanel {
 
     @Override
     public String toBarString(Integer votes, Double pct) {
-      return votes == 0
+      return Double.isNaN(pct)
           ? "WAITING..."
           : (THOUSANDS_FORMAT.format(votes) + "\n" + PCT_FORMAT.format(pct));
     }
@@ -1058,7 +1058,8 @@ public class BasicResultPanel extends JPanel {
                 int total = map.values().stream().mapToInt(i -> i).sum();
                 Map<KT, VotesPct<Integer, Double>> ret = new LinkedHashMap<>();
                 map.forEach(
-                    (k, v) -> ret.put(k, new VotesPct<>(v, total == 0 ? 0 : 1.0 * v / total)));
+                    (k, v) ->
+                        ret.put(k, new VotesPct<>(v, total == 0 ? Double.NaN : 1.0 * v / total)));
                 return ret;
               });
       Binding<KT> winner = this.winner == null ? (() -> null) : this.winner.getBinding();
@@ -1068,13 +1069,17 @@ public class BasicResultPanel extends JPanel {
                       winner,
                       (v, w) -> {
                         if (w != null) {
-                          v.computeIfAbsent(w, x -> new VotesPct<>(0, 0.0)).winner = true;
+                          int total = v.values().stream().mapToInt(i -> i.votes).sum();
+                          v.computeIfAbsent(
+                                      w, x -> new VotesPct<>(0, total == 0 ? Double.NaN : 0.0))
+                                  .winner =
+                              true;
                         }
                         return v;
                       }),
                   keyTemplate::toMainBarHeader,
                   key -> keyTemplate.toParty(key).getColor(),
-                  votes -> votes.percent,
+                  votes -> Double.isNaN(votes.percent) ? 0 : votes.percent,
                   votes -> voteTemplate.toBarString(votes.votes, votes.percent),
                   (party, votes) -> votes.winner ? keyTemplate.winnerShape() : null,
                   (party, votes) -> party == Party.OTHERS ? -1 : votes.percent)

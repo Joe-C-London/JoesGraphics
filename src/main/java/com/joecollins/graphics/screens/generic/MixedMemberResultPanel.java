@@ -243,7 +243,7 @@ public class MixedMemberResultPanel extends JPanel {
                               e.getKey(),
                               ImmutableTriple.of(
                                   e.getValue(),
-                                  total == 0 ? 0 : (1.0 * e.getValue() / total),
+                                  total == 0 ? Double.NaN : (1.0 * e.getValue() / total),
                                   e.getKey().equals(w)));
                         }
                         return ret;
@@ -262,9 +262,9 @@ public class MixedMemberResultPanel extends JPanel {
                     + ")";
               },
               c -> c.getParty().getColor(),
-              v -> v.getMiddle(),
+              v -> Double.isNaN(v.getMiddle()) ? 0 : v.getMiddle(),
               v -> {
-                if (v.getLeft() == 0) {
+                if (Double.isNaN(v.getMiddle())) {
                   return "WAITING...";
                 }
                 if (showBothLines) {
@@ -327,7 +327,7 @@ public class MixedMemberResultPanel extends JPanel {
           .withWingspan(
               candidatePctReporting == null
                   ? Binding.fixedBinding(0.05)
-                  : candidatePctReporting.getBinding(x -> 0.05 / x))
+                  : candidatePctReporting.getBinding(x -> 0.05 / Math.max(x, 1e-6)))
           .build();
     }
 
@@ -341,15 +341,16 @@ public class MixedMemberResultPanel extends JPanel {
                       ret.put(
                           e.getKey(),
                           ImmutablePair.of(
-                              e.getValue(), total == 0 ? 0 : (1.0 * e.getValue() / total)));
+                              e.getValue(),
+                              total == 0 ? Double.NaN : (1.0 * e.getValue() / total)));
                     }
                     return ret;
                   }),
               p -> p.getName().toUpperCase(),
               Party::getColor,
-              v -> v.getRight(),
+              v -> Double.isNaN(v.getRight()) ? 0 : v.getRight(),
               v ->
-                  v.getLeft() == 0
+                  Double.isNaN(v.getRight())
                       ? "WAITING..."
                       : (THOUSANDS_FORMAT.format(v.getLeft())
                           + " ("
@@ -360,7 +361,7 @@ public class MixedMemberResultPanel extends JPanel {
           .withMax(
               partyPctReporting == null
                   ? Binding.fixedBinding(2.0 / 3)
-                  : partyPctReporting.getBinding(x -> 2.0 / 3 / x))
+                  : partyPctReporting.getBinding(x -> 2.0 / 3 / Math.max(x, 1e-6)))
           .build();
     }
 
@@ -403,7 +404,7 @@ public class MixedMemberResultPanel extends JPanel {
           .withWingspan(
               partyPctReporting == null
                   ? Binding.fixedBinding(0.05)
-                  : partyPctReporting.getBinding(x -> 0.05 / x))
+                  : partyPctReporting.getBinding(x -> 0.05 / Math.max(x, 1e-6)))
           .build();
     }
 
