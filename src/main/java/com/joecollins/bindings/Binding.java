@@ -182,6 +182,8 @@ public interface Binding<T> {
       BiFunction<R, T, R> onValueAdded,
       BiFunction<R, T, R> onValueRemoved) {
     return new Binding<R>() {
+      private boolean bound = false;
+
       @Override
       public R getValue() {
         return bindings.stream()
@@ -218,13 +220,14 @@ public interface Binding<T> {
                       if (newVal != null) {
                         aggregate = onValueAdded.apply(aggregate, newVal);
                       }
-                      onUpdate.accept(aggregate);
+                      if (bound) {
+                        onUpdate.accept(aggregate);
+                      }
                     }
                   });
         }
-        if (bindings.isEmpty()) {
-          onUpdate.accept(aggregate);
-        }
+        bound = true;
+        onUpdate.accept(aggregate);
       }
 
       @Override
