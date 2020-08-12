@@ -133,6 +133,7 @@ public class MixedMemberResultPanel extends JPanel {
     private String incumbentMarker = "";
 
     private BindingReceiver<String> candidateVoteHeader;
+    private BindingReceiver<String> candidateVoteSubheader;
     private BindingReceiver<String> candidateChangeHeader;
     private BindingReceiver<String> partyVoteHeader;
     private BindingReceiver<String> partyChangeHeader;
@@ -141,8 +142,16 @@ public class MixedMemberResultPanel extends JPanel {
 
     public Builder withCandidateVotes(
         Binding<? extends Map<Candidate, Integer>> votes, Binding<String> header) {
+      return withCandidateVotes(votes, header, () -> null);
+    }
+
+    public Builder withCandidateVotes(
+        Binding<? extends Map<Candidate, Integer>> votes,
+        Binding<String> header,
+        Binding<String> subheader) {
       this.candidateVotes = new BindingReceiver<>(votes);
       this.candidateVoteHeader = new BindingReceiver<>(header);
+      this.candidateVoteSubheader = new BindingReceiver<>(subheader);
       return this;
     }
 
@@ -279,6 +288,7 @@ public class MixedMemberResultPanel extends JPanel {
               },
               (c, v) -> v.getRight() ? shape : null)
           .withHeader(candidateVoteHeader.getBinding())
+          .withSubhead(candidateVoteSubheader.getBinding())
           .withMax(
               candidatePctReporting == null
                   ? Binding.fixedBinding(2.0 / 3)
