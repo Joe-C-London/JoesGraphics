@@ -43,7 +43,7 @@ public class MultiResultScreen extends JPanel {
 
   private List<ResultPanel> panels = new ArrayList<>();
 
-  private <T> MultiResultScreen(Builder<T> builder, Binding<String> textHeader) {
+  private <T> MultiResultScreen(Builder<T> builder, Binding<String> textHeader, boolean hasMap) {
     setBackground(Color.WHITE);
     setLayout(new BorderLayout());
     add(createHeaderLabel(textHeader), BorderLayout.NORTH);
@@ -58,7 +58,7 @@ public class MultiResultScreen extends JPanel {
             size -> {
               while (panels.size() < size) {
                 ResultPanel newPanel =
-                    new ResultPanel(builder.incumbentMarker, builder.swingPartyOrder, true);
+                    new ResultPanel(builder.incumbentMarker, builder.swingPartyOrder, hasMap);
                 center.add(newPanel);
                 panels.add(newPanel);
               }
@@ -231,7 +231,7 @@ public class MultiResultScreen extends JPanel {
     }
 
     public MultiResultScreen build(Binding<String> textHeader) {
-      return new MultiResultScreen(this, textHeader);
+      return new MultiResultScreen(this, textHeader, mapHeaderFunc != null);
     }
   }
 
@@ -336,28 +336,36 @@ public class MultiResultScreen extends JPanel {
     }
 
     void setSwingHeaderBinding(Binding<String> swingLabelBinding) {
-      swingFrame.setHeaderBinding(swingLabelBinding);
+      if (swingFrame != null) {
+        swingFrame.setHeaderBinding(swingLabelBinding);
+      }
     }
 
     void setMapShapeBinding(List<Pair<Shape, Binding<Color>>> shapes) {
-      mapFrame.setNumShapesBinding(Binding.fixedBinding(shapes.size()));
-      mapFrame.setShapeBinding(
-          IndexedBinding.listBinding(
-              shapes.stream().map(Pair::getKey).collect(Collectors.toList())));
-      mapFrame.setColorBinding(IndexedBinding.listBinding(shapes, Pair::getValue));
+      if (mapFrame != null) {
+        mapFrame.setNumShapesBinding(Binding.fixedBinding(shapes.size()));
+        mapFrame.setShapeBinding(
+            IndexedBinding.listBinding(
+                shapes.stream().map(Pair::getKey).collect(Collectors.toList())));
+        mapFrame.setColorBinding(IndexedBinding.listBinding(shapes, Pair::getValue));
+      }
     }
 
     void setMapFocusBinding(List<Shape> shapes) {
-      mapFrame.setFocusBoxBinding(
-          Binding.fixedBinding(
-              shapes.stream()
-                  .map(Shape::getBounds2D)
-                  .reduce(Rectangle2D::createUnion)
-                  .orElse(null)));
+      if (mapFrame != null) {
+        mapFrame.setFocusBoxBinding(
+            Binding.fixedBinding(
+                shapes.stream()
+                    .map(Shape::getBounds2D)
+                    .reduce(Rectangle2D::createUnion)
+                    .orElse(null)));
+      }
     }
 
     void setMapHeaderBinding(Binding<String> mapLabelBinding) {
-      mapFrame.setHeaderBinding(mapLabelBinding);
+      if (mapFrame != null) {
+        mapFrame.setHeaderBinding(mapLabelBinding);
+      }
     }
 
     void unbindAll() {
