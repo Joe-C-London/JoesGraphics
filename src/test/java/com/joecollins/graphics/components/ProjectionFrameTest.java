@@ -47,6 +47,20 @@ public class ProjectionFrameTest {
     compareRendering("ProjectionFrame", "Basic", frame);
   }
 
+  @Test
+  public void testLongRendering() throws IOException {
+    ProjectionFrame frame = new ProjectionFrame();
+    frame.setImageBinding(Binding.fixedBinding(peiLeg()));
+    frame.setBackColorBinding(Binding.fixedBinding(Color.GRAY));
+    frame.setBorderColorBinding(Binding.fixedBinding(Color.GRAY));
+    frame.setFooterTextBinding(
+        Binding.fixedBinding("WE ARE NOW PROJECTING A MINORITY LEGISLATURE"));
+    frame.setHeaderBinding(Binding.fixedBinding("PROJECTION"));
+
+    frame.setSize(1024, 512);
+    compareRendering("ProjectionFrame", "Long", frame);
+  }
+
   private Image peiLeg() throws IOException {
     return LowerThird.createImage(
         ProjectionFrameTest.class

@@ -23,7 +23,7 @@ public class ProjectionFrame extends GraphicsFrame {
 
   private ImagePanel imagePanel = new ImagePanel();
   private JPanel footerPanel = new JPanel();
-  private JLabel footerLabel = new JLabel();
+  private FontSizeAdjustingLabel footerLabel = new FontSizeAdjustingLabel();
 
   public ProjectionFrame() {
     JPanel centre = new JPanel();
