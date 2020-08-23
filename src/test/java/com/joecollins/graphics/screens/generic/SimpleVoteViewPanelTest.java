@@ -296,6 +296,9 @@ public class SimpleVoteViewPanelTest {
     leader.setValue(MapBuilder.Result.elected(pc.getParty()));
     winner.setValue(pc);
     compareRendering("SimpleVoteViewPanel", "Update-5", panel);
+
+    winner.setValue(null);
+    compareRendering("SimpleVoteViewPanel", "Update-6", panel);
   }
 
   @Test

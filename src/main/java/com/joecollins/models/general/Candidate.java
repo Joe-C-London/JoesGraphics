@@ -48,4 +48,9 @@ public class Candidate {
   public int hashCode() {
     return Objects.hash(name, party, incumbent);
   }
+
+  @Override
+  public String toString() {
+    return name + " (" + party + ")";
+  }
 }

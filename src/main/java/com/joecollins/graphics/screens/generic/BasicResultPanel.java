@@ -1068,6 +1068,7 @@ public class BasicResultPanel extends JPanel {
                   votesPct.merge(
                       winner,
                       (v, w) -> {
+                        v.values().forEach(p -> p.winner = false);
                         if (w != null) {
                           int total = v.values().stream().mapToInt(i -> i.votes).sum();
                           v.computeIfAbsent(

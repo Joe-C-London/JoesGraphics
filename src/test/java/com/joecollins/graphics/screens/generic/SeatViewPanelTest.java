@@ -838,6 +838,9 @@ public class SeatViewPanelTest {
 
     winner.setValue(trump);
     compareRendering("SeatViewPanel", "Candidate-1", panel);
+
+    winner.setValue(null);
+    compareRendering("SeatViewPanel", "Candidate-WinnerRemoved", panel);
   }
 
   @Test
