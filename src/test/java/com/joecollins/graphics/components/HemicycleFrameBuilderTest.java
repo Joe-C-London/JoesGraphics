@@ -419,4 +419,82 @@ public class HemicycleFrameBuilderTest {
     assertEquals(-30, frame.getRightChangeBarSize(0));
     assertEquals(0, frame.getRightChangeBarSize(1));
   }
+
+  @Test
+  public void testBarsUpdateProperlyOnIncompleteResults() {
+    Party dem = new Party("Democratic", "DEM", Color.BLUE);
+    Party gop = new Party("Republican", "GOP", Color.RED);
+
+    class Result extends Bindable {
+      Party leader;
+      boolean hasWon;
+      final Party prev;
+      final int numSeats;
+
+      Result(Party leader, boolean hasWon, Party prev, int numSeats) {
+        this.leader = leader;
+        this.hasWon = hasWon;
+        this.prev = prev;
+        this.numSeats = numSeats;
+      }
+
+      Binding<HemicycleFrameBuilder.Result> getBinding() {
+        return Binding.propertyBinding(
+            this, t -> new HemicycleFrameBuilder.Result(leader, hasWon), Property.PROP);
+      }
+
+      void setResult(Party leader, boolean hasWon) {
+        this.leader = leader;
+        this.hasWon = hasWon;
+        onPropertyRefreshed(Property.PROP);
+      }
+    }
+
+    Result result = new Result(null, false, gop, 30);
+    List<Result> results = Arrays.asList(result);
+    HemicycleFrame frame =
+        HemicycleFrameBuilder.ofElectedLeading(
+            List.of(results.stream().mapToInt(r -> r.numSeats).sum()),
+            results,
+            r -> r.numSeats,
+            r -> r.getBinding(),
+            r -> r.prev,
+            dem,
+            gop,
+            (e, l) -> "DEM: " + e + "/" + l,
+            (e, l) -> "GOP: " + e + "/" + l,
+            (e, l) -> "OTH: " + e + "/" + l,
+            (e, l) -> true,
+            (e, l) ->
+                new DecimalFormat("+0;-0").format(e) + "/" + new DecimalFormat("+0;-0").format(l),
+            Tiebreaker.FRONT_ROW_FROM_LEFT,
+            () -> "TEST");
+    assertEquals(30, frame.getNumDots());
+    assertEquals(Color.RED, frame.getDotBorder(0));
+    assertEquals(Color.WHITE, frame.getDotColor(0));
+    assertEquals(0, frame.getLeftSeatBarSize(0));
+    assertEquals(0, frame.getLeftSeatBarSize(1));
+    assertEquals(0, frame.getRightSeatBarSize(0));
+    assertEquals(0, frame.getRightSeatBarSize(1));
+    assertEquals(0, frame.getMiddleSeatBarSize(0));
+    assertEquals(0, frame.getMiddleSeatBarSize(1));
+    assertEquals(0, frame.getLeftChangeBarSize(0));
+    assertEquals(0, frame.getLeftChangeBarSize(1));
+    assertEquals(0, frame.getRightChangeBarSize(0));
+    assertEquals(0, frame.getRightChangeBarSize(1));
+
+    result.setResult(null, false);
+    assertEquals(Color.RED, frame.getDotBorder(0));
+    assertEquals(Color.WHITE, frame.getDotColor(0));
+    assertEquals(0, frame.getLeftSeatBarSize(0));
+    assertEquals(0, frame.getLeftSeatBarSize(1));
+    assertEquals(0, frame.getRightSeatBarSize(0));
+    assertEquals(0, frame.getRightSeatBarSize(1));
+    assertEquals(0, frame.getMiddleSeatBarSize(0));
+    assertEquals(0, frame.getMiddleSeatBarSize(1));
+    assertEquals(0, frame.getLeftChangeBarSize(0));
+    assertEquals(0, frame.getLeftChangeBarSize(1));
+    assertEquals(0, frame.getRightChangeBarSize(0));
+    assertEquals(0, frame.getRightChangeBarSize(1));
+  }
 }

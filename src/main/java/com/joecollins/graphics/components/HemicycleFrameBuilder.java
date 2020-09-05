@@ -452,7 +452,7 @@ public class HemicycleFrameBuilder {
               return p;
             },
             (p, r) -> {
-              if (r.getLeft() == null) {
+              if (r.getLeft() == null || r.getLeft().winner == null) {
                 return p;
               }
               if (partyFilter.test(r.getLeft().winner)) {
