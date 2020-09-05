@@ -25,7 +25,7 @@ public class SwingometerFrameBuilder {
     private Number tickInterval = null;
 
     public void setValue(Number value) {
-      this.value = value;
+      this.value = Double.isNaN(value.doubleValue()) ? 0.0 : value;
       onPropertyRefreshed(Properties.Property.VALUE);
     }
 
@@ -179,6 +179,11 @@ public class SwingometerFrameBuilder {
         IndexedBinding.listBinding(dots, d -> () -> positionFunc.apply(d)));
     frame.setDotsColorBinding(IndexedBinding.listBinding(dots, d -> colorFunc.apply(d)));
     frame.setDotsLabelBinding(IndexedBinding.listBinding(dots, d -> () -> labelFunc.apply(d)));
+    return this;
+  }
+
+  public SwingometerFrameBuilder withHeader(Binding<String> header) {
+    frame.setHeaderBinding(header);
     return this;
   }
 

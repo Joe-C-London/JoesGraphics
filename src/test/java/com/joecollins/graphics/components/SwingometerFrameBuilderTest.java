@@ -23,10 +23,28 @@ public class SwingometerFrameBuilderTest {
         new BindableWrapper<>(ImmutablePair.of(Color.BLUE, Color.RED));
     BindableWrapper<Double> value = new BindableWrapper<>(-1.0);
     SwingometerFrame frame =
-        SwingometerFrameBuilder.basic(colors.getBinding(), value.getBinding()).build();
+        SwingometerFrameBuilder.basic(colors.getBinding(), value.getBinding())
+            .withHeader(() -> "SWINGOMETER")
+            .build();
     assertEquals(Color.BLUE, frame.getLeftColor());
     assertEquals(Color.RED, frame.getRightColor());
     assertEquals(-1.0, frame.getValue().doubleValue(), 0);
+    assertEquals("SWINGOMETER", frame.getHeader());
+  }
+
+  @Test
+  public void testNaNIsZero() {
+    BindableWrapper<Pair<Color, Color>> colors =
+        new BindableWrapper<>(ImmutablePair.of(Color.BLUE, Color.RED));
+    BindableWrapper<Double> value = new BindableWrapper<>(Double.NaN);
+    SwingometerFrame frame =
+        SwingometerFrameBuilder.basic(colors.getBinding(), value.getBinding())
+            .withHeader(() -> "SWINGOMETER")
+            .build();
+    assertEquals(Color.BLUE, frame.getLeftColor());
+    assertEquals(Color.RED, frame.getRightColor());
+    assertEquals(0.0, frame.getValue().doubleValue(), 0);
+    assertEquals("SWINGOMETER", frame.getHeader());
   }
 
   @Test
