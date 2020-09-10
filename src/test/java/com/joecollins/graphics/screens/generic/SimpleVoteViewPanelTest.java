@@ -548,6 +548,14 @@ public class SimpleVoteViewPanelTest {
     curr.put(new Candidate("Marine Le Pen", fn), 1033686);
     currentVotes.setValue(curr);
     compareRendering("SimpleVoteViewPanel", "MajorityLine-2", panel);
+
+    pctReporting.setValue(0.0);
+    curr.put(new Candidate("Emmanuel Macron", lrem), 0);
+    curr.put(new Candidate("Marine Le Pen", fn), 0);
+    currentVotes.setValue(curr);
+    voteHeader.setValue("0.0% REPORTING");
+    voteSubhead.setValue("");
+    compareRendering("SimpleVoteViewPanel", "MajorityLine-3", panel);
   }
 
   private Map<Integer, Shape> peiShapesByDistrict() throws IOException {

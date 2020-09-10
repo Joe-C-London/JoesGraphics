@@ -1090,7 +1090,7 @@ public class BasicResultPanel extends JPanel {
               .withMax(
                   pctReporting == null
                       ? (() -> 2.0 / 3)
-                      : pctReporting.getBinding(x -> 2.0 / 3 / x));
+                      : pctReporting.getBinding(x -> 2.0 / 3 / Math.max(1e-6, x)));
       if (showMajority != null) {
         BindableList<Double> lines = new BindableList<>();
         showMajority
@@ -1099,7 +1099,8 @@ public class BasicResultPanel extends JPanel {
                 show -> {
                   lines.clear();
                   if (show) {
-                    lines.add(pctReporting == null ? 0.5 : 0.5 / pctReporting.getValue());
+                    lines.add(
+                        pctReporting == null ? 0.5 : 0.5 / Math.max(1e-6, pctReporting.getValue()));
                   }
                 });
         if (pctReporting != null) {
@@ -1108,7 +1109,7 @@ public class BasicResultPanel extends JPanel {
               .bind(
                   pct -> {
                     if (!lines.isEmpty()) {
-                      lines.set(0, 0.5 / pct);
+                      lines.set(0, 0.5 / Math.max(1e-6, pct));
                     }
                   });
         }
@@ -1163,7 +1164,10 @@ public class BasicResultPanel extends JPanel {
               value -> value.diff,
               value -> new DecimalFormat("+0.0%;-0.0%").format(value.diff),
               (party, value) -> party == Party.OTHERS ? -1 : value.curr)
-          .withWingspan(pctReporting == null ? (() -> 0.1) : pctReporting.getBinding(x -> 0.1 / x))
+          .withWingspan(
+              pctReporting == null
+                  ? (() -> 0.1)
+                  : pctReporting.getBinding(x -> 0.1 / Math.max(1e-6, x)))
           .withHeader(changeHeader.getBinding())
           .build();
     }
