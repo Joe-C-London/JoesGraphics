@@ -12,6 +12,7 @@ import java.awt.Color;
 import java.awt.Shape;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -556,6 +557,64 @@ public class SimpleVoteViewPanelTest {
     voteHeader.setValue("0.0% REPORTING");
     voteSubhead.setValue("");
     compareRendering("SimpleVoteViewPanel", "MajorityLine-3", panel);
+  }
+
+  @Test
+  public void testAdditionalHighlightMap() throws IOException {
+    Candidate ndp =
+        new Candidate("Billy Cann", new Party("New Democratic Party", "NDP", Color.ORANGE));
+    Candidate pc =
+        new Candidate("Cory Deagle", new Party("Progressive Conservative", "PC", Color.BLUE));
+    Candidate lib = new Candidate("Daphne Griffin", new Party("Liberal", "LIB", Color.RED));
+    Candidate grn =
+        new Candidate("John Allen MacLean", new Party("Green", "GRN", Color.GREEN.darker()));
+
+    LinkedHashMap<Candidate, Integer> curr = new LinkedHashMap<>();
+    curr.put(ndp, 124);
+    curr.put(pc, 1373);
+    curr.put(lib, 785);
+    curr.put(grn, 674);
+
+    LinkedHashMap<Party, Integer> prev = new LinkedHashMap<>();
+    prev.put(ndp.getParty(), 585);
+    prev.put(pc.getParty(), 785);
+    prev.put(lib.getParty(), 1060);
+    prev.put(grn.getParty(), 106);
+
+    BindableWrapper<LinkedHashMap<Candidate, Integer>> currentVotes = new BindableWrapper<>(curr);
+    BindableWrapper<LinkedHashMap<Party, Integer>> previousVotes = new BindableWrapper<>(prev);
+    BindableWrapper<String> header = new BindableWrapper<>("MONTAGUE-KILMUIR");
+    BindableWrapper<String> voteHeader = new BindableWrapper<>("9 OF 9 POLLS REPORTING");
+    BindableWrapper<String> voteSubhead = new BindableWrapper<>("PROJECTION: PC GAIN FROM LIB");
+    BindableWrapper<String> changeHeader = new BindableWrapper<>("CHANGE SINCE 2015");
+    BindableWrapper<String> swingHeader = new BindableWrapper<>("SWING SINCE 2015");
+    BindableWrapper<String> mapHeader = new BindableWrapper<>("CARDIGAN");
+    BindableWrapper<Party> leader = new BindableWrapper<>(pc.getParty());
+    List<Party> swingPartyOrder =
+        Arrays.asList(ndp.getParty(), grn.getParty(), lib.getParty(), pc.getParty());
+    Map<Integer, Shape> shapesByDistrict = peiShapesByDistrict();
+    BindableWrapper<List<Integer>> focus =
+        new BindableWrapper<>(
+            shapesByDistrict.keySet().stream().filter(id -> id <= 7).collect(Collectors.toList()));
+    BindableWrapper<List<Integer>> additionalHighlight =
+        new BindableWrapper<>(new ArrayList<>(shapesByDistrict.keySet()));
+    BindableWrapper<Integer> selectedDistrict = new BindableWrapper<>(3);
+
+    BasicResultPanel panel =
+        BasicResultPanel.candidateVotes(
+                currentVotes.getBinding(), voteHeader.getBinding(), voteSubhead.getBinding())
+            .withPrev(previousVotes.getBinding(), changeHeader.getBinding())
+            .withSwing(Comparator.comparing(swingPartyOrder::indexOf), swingHeader.getBinding())
+            .withResultMap(
+                () -> shapesByDistrict,
+                selectedDistrict.getBinding(),
+                leader.getBinding().map(Result::elected),
+                focus.getBinding(),
+                additionalHighlight.getBinding(),
+                mapHeader.getBinding())
+            .build(header.getBinding());
+    panel.setSize(1024, 512);
+    compareRendering("SimpleVoteViewPanel", "AdditionalHighlightMap-1", panel);
   }
 
   private Map<Integer, Shape> peiShapesByDistrict() throws IOException {

@@ -1003,6 +1003,18 @@ public class BasicResultPanel extends JPanel {
       return this;
     }
 
+    public <T> VoteScreenBuilder<KT, CT, CPT, PT> withResultMap(
+        Binding<Map<T, Shape>> shapes,
+        Binding<T> selectedShape,
+        Binding<Result> leadingParty,
+        Binding<List<T>> focus,
+        Binding<List<T>> additionalHighlight,
+        Binding<String> header) {
+      this.mapBuilder =
+          new MapBuilder(shapes, selectedShape, leadingParty, focus, additionalHighlight, header);
+      return this;
+    }
+
     public VoteScreenBuilder<KT, CT, CPT, PT> withMajorityLine(
         Binding<Boolean> showMajority, Binding<String> majorityLabel) {
       this.showMajority = new BindingReceiver<>(showMajority);
