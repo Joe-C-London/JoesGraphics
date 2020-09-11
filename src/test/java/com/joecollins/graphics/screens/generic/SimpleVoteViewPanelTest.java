@@ -587,6 +587,7 @@ public class SimpleVoteViewPanelTest {
     BindableWrapper<String> voteHeader = new BindableWrapper<>("9 OF 9 POLLS REPORTING");
     BindableWrapper<String> voteSubhead = new BindableWrapper<>("PROJECTION: PC GAIN FROM LIB");
     BindableWrapper<String> changeHeader = new BindableWrapper<>("CHANGE SINCE 2015");
+    BindableWrapper<String> changeSubhead = new BindableWrapper<>("ADJUSTED FOR BOUNDARY CHANGES");
     BindableWrapper<String> swingHeader = new BindableWrapper<>("SWING SINCE 2015");
     BindableWrapper<String> mapHeader = new BindableWrapper<>("CARDIGAN");
     BindableWrapper<Party> leader = new BindableWrapper<>(pc.getParty());
@@ -603,7 +604,8 @@ public class SimpleVoteViewPanelTest {
     BasicResultPanel panel =
         BasicResultPanel.candidateVotes(
                 currentVotes.getBinding(), voteHeader.getBinding(), voteSubhead.getBinding())
-            .withPrev(previousVotes.getBinding(), changeHeader.getBinding())
+            .withPrev(
+                previousVotes.getBinding(), changeHeader.getBinding(), changeSubhead.getBinding())
             .withSwing(Comparator.comparing(swingPartyOrder::indexOf), swingHeader.getBinding())
             .withResultMap(
                 () -> shapesByDistrict,

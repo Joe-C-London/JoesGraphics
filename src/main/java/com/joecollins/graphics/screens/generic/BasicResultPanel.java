@@ -918,6 +918,7 @@ public class BasicResultPanel extends JPanel {
 
     protected BindingReceiver<Map<Party, ? extends PT>> prev;
     protected BindingReceiver<String> changeHeader;
+    protected BindingReceiver<String> changeSubhead;
 
     protected BindingReceiver<String> swingHeader;
     protected Comparator<Party> swingComparator;
@@ -939,8 +940,16 @@ public class BasicResultPanel extends JPanel {
 
     public VoteScreenBuilder<KT, CT, CPT, PT> withPrev(
         Binding<? extends Map<Party, ? extends PT>> prev, Binding<String> header) {
+      return withPrev(prev, header, Binding.fixedBinding(null));
+    }
+
+    public VoteScreenBuilder<KT, CT, CPT, PT> withPrev(
+        Binding<? extends Map<Party, ? extends PT>> prev,
+        Binding<String> header,
+        Binding<String> subhead) {
       this.prev = new BindingReceiver<>(prev);
       this.changeHeader = new BindingReceiver<>(header);
+      this.changeSubhead = new BindingReceiver<>(subhead);
       return this;
     }
 
@@ -1181,6 +1190,7 @@ public class BasicResultPanel extends JPanel {
                   ? (() -> 0.1)
                   : pctReporting.getBinding(x -> 0.1 / Math.max(1e-6, x)))
           .withHeader(changeHeader.getBinding())
+          .withSubhead(changeSubhead.getBinding())
           .build();
     }
 
