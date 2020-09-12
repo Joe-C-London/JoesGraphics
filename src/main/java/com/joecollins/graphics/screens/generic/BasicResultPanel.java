@@ -1097,12 +1097,16 @@ public class BasicResultPanel extends JPanel {
                                   .winner =
                               true;
                         }
+                        v.values().forEach(p -> p.alone = (v.size() == 1));
                         return v;
                       }),
                   keyTemplate::toMainBarHeader,
                   key -> keyTemplate.toParty(key).getColor(),
                   votes -> Double.isNaN(votes.percent) ? 0 : votes.percent,
-                  votes -> voteTemplate.toBarString(votes.votes, votes.percent),
+                  votes ->
+                      votes.alone
+                          ? "UNCONTESTED"
+                          : voteTemplate.toBarString(votes.votes, votes.percent),
                   (party, votes) -> votes.winner ? keyTemplate.winnerShape() : null,
                   (party, votes) -> party == Party.OTHERS ? -1 : votes.percent)
               .withHeader(header.getBinding())
@@ -1216,6 +1220,7 @@ public class BasicResultPanel extends JPanel {
     private final T votes;
     private final PT percent;
     private boolean winner;
+    private boolean alone;
 
     private VotesPct(T votes, PT percent) {
       this.votes = votes;

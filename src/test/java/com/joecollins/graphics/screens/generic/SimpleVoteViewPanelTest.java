@@ -619,6 +619,36 @@ public class SimpleVoteViewPanelTest {
     compareRendering("SimpleVoteViewPanel", "AdditionalHighlightMap-1", panel);
   }
 
+  @Test
+  public void testCandidateUncontested() throws IOException {
+    Candidate dem = new Candidate("Joe Kennedy III", new Party("Democratic", "DEM", Color.BLUE));
+
+    LinkedHashMap<Candidate, Integer> curr = new LinkedHashMap<>();
+    curr.put(dem, 0);
+
+    LinkedHashMap<Party, Integer> prev = new LinkedHashMap<>();
+    prev.put(dem.getParty(), 265823);
+    prev.put(new Party("Republican", "GOP", Color.RED), 113055);
+
+    BindableWrapper<LinkedHashMap<Candidate, Integer>> currentVotes = new BindableWrapper<>(curr);
+    BindableWrapper<LinkedHashMap<Party, Integer>> previousVotes = new BindableWrapper<>(prev);
+    BindableWrapper<String> header = new BindableWrapper<>("MASSACHUSETTS DISTRICT 4");
+    BindableWrapper<String> voteHeader = new BindableWrapper<>("0.0% OF POLLS REPORTING");
+    BindableWrapper<String> voteSubhead = new BindableWrapper<>("");
+    BindableWrapper<String> changeHeader = new BindableWrapper<>("CHANGE SINCE 2016");
+    BindableWrapper<String> swingHeader = new BindableWrapper<>("SWING SINCE 2016");
+    List<Party> swingPartyOrder = new ArrayList<>(prev.keySet());
+
+    BasicResultPanel panel =
+        BasicResultPanel.candidateVotes(
+                currentVotes.getBinding(), voteHeader.getBinding(), voteSubhead.getBinding())
+            .withPrev(previousVotes.getBinding(), changeHeader.getBinding())
+            .withSwing(Comparator.comparing(swingPartyOrder::indexOf), swingHeader.getBinding())
+            .build(header.getBinding());
+    panel.setSize(1024, 512);
+    compareRendering("SimpleVoteViewPanel", "Uncontested-1", panel);
+  }
+
   private Map<Integer, Shape> peiShapesByDistrict() throws IOException {
     URL peiMap =
         MapFrameTest.class
