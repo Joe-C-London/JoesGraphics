@@ -649,6 +649,76 @@ public class SimpleVoteViewPanelTest {
     compareRendering("SimpleVoteViewPanel", "Uncontested-1", panel);
   }
 
+  @Test
+  public void testCandidatesSwitchingBetweenSingleAndDoubleLines() throws IOException {
+    LinkedHashMap<Candidate, Integer> result2017 = new LinkedHashMap<>();
+    result2017.put(
+        new Candidate("Boris Johnson", new Party("Conservative", "CON", Color.BLUE)), 23716);
+    result2017.put(new Candidate("Vincent Lo", new Party("Labour", "LAB", Color.RED)), 18682);
+    result2017.put(
+        new Candidate("Rosina Robson", new Party("Liberal Democrats", "LD", Color.ORANGE)), 1835);
+    result2017.put(
+        new Candidate(
+            "Lizzy Kemp", new Party("UK Independence Party", "UKIP", Color.MAGENTA.darker())),
+        1577);
+    result2017.put(
+        new Candidate("Mark Keir", new Party("Green", "GRN", Color.GREEN.darker())), 884);
+
+    LinkedHashMap<Candidate, Integer> result2019 = new LinkedHashMap<>();
+    result2019.put(new Candidate("Count Binface", new Party("Independent", "IND", Color.GRAY)), 69);
+    result2019.put(
+        new Candidate(
+            "Lord Buckethead", new Party("Monster Raving Loony Party", "MRLP", Color.YELLOW)),
+        125);
+    result2019.put(new Candidate("Norma Burke", new Party("Independent", "IND", Color.GRAY)), 22);
+    result2019.put(
+        new Candidate(
+            "Geoffrey Courtenay",
+            new Party("UK Independence Party", "UKIP", Color.MAGENTA.darker())),
+        283);
+    result2019.put(
+        new Candidate("Joanne Humphreys", new Party("Liberal Democrats", "LD", Color.ORANGE)),
+        3026);
+    result2019.put(
+        new Candidate("Boris Johnson", new Party("Conservative", "CON", Color.BLUE)), 25351);
+    result2019.put(
+        new Candidate("Mark Keir", new Party("Green", "GRN", Color.GREEN.darker())), 1090);
+    result2019.put(new Candidate("Ali Milani", new Party("Labour", "LAB", Color.RED)), 18141);
+    result2019.put(new Candidate("Bobby Smith", new Party("Independent", "IND", Color.GRAY)), 8);
+    result2019.put(new Candidate("William Tobin", new Party("Independent", "IND", Color.GRAY)), 5);
+    result2019.put(new Candidate("Alfie Utting", new Party("Independent", "IND", Color.GRAY)), 44);
+    result2019.put(
+        new Candidate(
+            "Yace \"Interplanetary Time Lord\" Yogenstein",
+            new Party("Independent", "IND", Color.GRAY)),
+        23);
+
+    BindableWrapper<LinkedHashMap<Candidate, Integer>> currentVotes =
+        new BindableWrapper<>(result2017);
+    BindableWrapper<String> header = new BindableWrapper<>("UXBRIDGE AND SOUTH RUISLIP");
+    BindableWrapper<String> voteHeader = new BindableWrapper<>("2017 RESULT");
+    BindableWrapper<String> voteSubhead = new BindableWrapper<>("");
+    BindableWrapper<Candidate> winner =
+        new BindableWrapper<>(
+            new Candidate("Boris Johnson", new Party("Conservative", "CON", Color.BLUE)));
+
+    BasicResultPanel panel =
+        BasicResultPanel.candidateVotes(
+                currentVotes.getBinding(), voteHeader.getBinding(), voteSubhead.getBinding())
+            .withWinner(winner.getBinding())
+            .build(header.getBinding());
+    panel.setSize(1024, 512);
+    compareRendering("SimpleVoteViewPanel", "LotsOfCandidates-1", panel);
+
+    currentVotes.setValue(result2019);
+    voteHeader.setValue("2019 RESULT");
+    compareRendering("SimpleVoteViewPanel", "LotsOfCandidates-2", panel);
+
+    currentVotes.setValue(result2017);
+    voteHeader.setValue("2017 RESULT");
+    compareRendering("SimpleVoteViewPanel", "LotsOfCandidates-1", panel);
+  }
+
   private Map<Integer, Shape> peiShapesByDistrict() throws IOException {
     URL peiMap =
         MapFrameTest.class
