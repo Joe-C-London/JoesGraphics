@@ -26,6 +26,7 @@ public class MultiResultScreenTest {
   private static Party grn = new Party("Green", "GRN", Color.GREEN.darker());
   private static Party pc = new Party("Progressive Conservative", "PCP", Color.BLUE);
   private static Party ndp = new Party("New Democratic Party", "NDP", Color.ORANGE);
+  private static Party pa = new Party("People's Alliance", "PA", Color.MAGENTA.darker());
   private static Party ind = new Party("Independent", "IND", Color.GRAY);
 
   @Test
@@ -290,12 +291,104 @@ public class MultiResultScreenTest {
     compareRendering("MultiResultPanel", "Update-9", panel);
   }
 
+  @Test
+  public void testOthersPanel() throws IOException {
+    BindableList<District> districts = new BindableList<>();
+    districts.add(
+        new District(
+            30,
+            "Saint John East",
+            of(
+                new Candidate("Glen Savoie", pc, true), 3507,
+                new Candidate("Phil Comeau", lib), 1639,
+                new Candidate("Gerald Irish", grn), 394,
+                new Candidate("Patrick Kemp", pa), 434,
+                new Candidate("Josh Floyd", ndp), 248),
+            true,
+            of(lib, 1775, pc, 3017, grn, 373, ndp, 402, pa, 1047)));
+    districts.add(
+        new District(
+            32,
+            "Saint John Harbour",
+            of(
+                new Candidate("Arlene Dunn", pc), 2181,
+                new Candidate("Alice McKim", lib), 1207,
+                new Candidate("Brent Harris", grn), 1224,
+                new Candidate("Tony Gunn", pa), 186,
+                new Candidate("Courtney Pyrke", ndp), 309,
+                new Candidate("Mike Cyr", ind), 47,
+                new Candidate("Arty Watson", ind), 114),
+            false,
+            of(lib, 1865, pc, 1855, grn, 721, ndp, 836, pa, 393)));
+    districts.add(
+        new District(
+            33,
+            "Saint John Lancaster",
+            of(
+                new Candidate("Dorothy Shephard", pc, true), 3560,
+                new Candidate("Sharon Teare", lib), 1471,
+                new Candidate("Joanna Killen", grn), 938,
+                new Candidate("Paul Seelye", pa), 394,
+                new Candidate("Don Durant", ndp), 201),
+            true,
+            of(lib, 1727, pc, 3001, grn, 582, ndp, 414, pa, 922)));
+
+    List<Party> swingometerOrder = List.of(ndp, grn, lib, ind, pc, pa);
+    MultiResultScreen panel =
+        MultiResultScreen.of(
+                districts,
+                d -> Binding.fixedBinding(d.votes),
+                d -> Binding.fixedBinding("DISTRICT " + d.districtNum),
+                d -> Binding.fixedBinding(d.name.toUpperCase()))
+            .withIncumbentMarker("(MLA)")
+            .withWinner(
+                d ->
+                    Binding.fixedBinding(
+                        d.leaderHasWon
+                            ? d.votes.entrySet().stream()
+                                .max(Map.Entry.comparingByValue())
+                                .orElseThrow()
+                                .getKey()
+                            : null))
+            .withPrev(
+                d -> Binding.fixedBinding(d.prevVotes),
+                d -> Binding.fixedBinding("SWING SINCE 2018"),
+                Comparator.comparingInt(swingometerOrder::indexOf))
+            .build(() -> "SAINT JOHN");
+
+    panel.setSize(1024, 512);
+    compareRendering("MultiResultPanel", "Others-1", panel);
+  }
+
   private <K, V> Map<K, V> of(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4) {
     LinkedHashMap<K, V> ret = new LinkedHashMap<>();
     ret.put(k1, v1);
     ret.put(k2, v2);
     ret.put(k3, v3);
     ret.put(k4, v4);
+    return ret;
+  }
+
+  private <K, V> Map<K, V> of(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5) {
+    LinkedHashMap<K, V> ret = new LinkedHashMap<>();
+    ret.put(k1, v1);
+    ret.put(k2, v2);
+    ret.put(k3, v3);
+    ret.put(k4, v4);
+    ret.put(k5, v5);
+    return ret;
+  }
+
+  private <K, V> Map<K, V> of(
+      K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5, K k6, V v6, K k7, V v7) {
+    LinkedHashMap<K, V> ret = new LinkedHashMap<>();
+    ret.put(k1, v1);
+    ret.put(k2, v2);
+    ret.put(k3, v3);
+    ret.put(k4, v4);
+    ret.put(k5, v5);
+    ret.put(k6, v6);
+    ret.put(k7, v7);
     return ret;
   }
 

@@ -29,11 +29,13 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.commons.lang3.tuple.Pair;
@@ -237,6 +239,7 @@ public class MultiResultScreen extends JPanel {
 
   private static class ResultPanel extends JPanel {
 
+    private static final Candidate OTHERS = new Candidate("", Party.OTHERS);
     private BarFrame barFrame;
     private SwingFrame swingFrame = null;
     private MapFrame mapFrame = null;
@@ -264,17 +267,37 @@ public class MultiResultScreen extends JPanel {
                             int total = m.values().stream().mapToInt(i -> i).sum();
                             Map<Candidate, Triple<Integer, Double, Boolean>> ret =
                                 new LinkedHashMap<>();
+                            Set<Candidate> candidatesToInclude =
+                                m.entrySet().stream()
+                                    .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                                    .map(Map.Entry::getKey)
+                                    .limit(m.size() > 5 ? 4 : 5)
+                                    .collect(Collectors.toSet());
+                            candidatesToInclude.add(w);
+                            MutableInt others = new MutableInt(0);
                             m.forEach(
-                                (k, v) ->
-                                    ret.put(
-                                        k, ImmutableTriple.of(v, 1.0 * v / total, k.equals(w))));
+                                (k, v) -> {
+                                  if (candidatesToInclude.contains(k)) {
+                                    ret.put(k, ImmutableTriple.of(v, 1.0 * v / total, k.equals(w)));
+                                  } else {
+                                    others.add(v);
+                                  }
+                                });
+                            if (candidatesToInclude.size() < m.size()) {
+                              ret.put(
+                                  OTHERS,
+                                  ImmutableTriple.of(
+                                      others.intValue(), others.doubleValue() / total, false));
+                            }
                             return ret;
                           }),
-                  p ->
-                      p.getName().toUpperCase()
-                          + "\n"
-                          + p.getParty().getAbbreviation()
-                          + (p.isIncumbent() ? (" " + incumbentMarker) : ""),
+                  p -> {
+                    if (p == OTHERS) return "OTHERS";
+                    return p.getName().toUpperCase()
+                        + "\n"
+                        + p.getParty().getAbbreviation()
+                        + (p.isIncumbent() ? " " + incumbentMarker : "");
+                  },
                   p -> p.getParty().getColor(),
                   v -> Double.isNaN(v.getMiddle()) ? 0 : v.getMiddle(),
                   v ->
@@ -283,7 +306,8 @@ public class MultiResultScreen extends JPanel {
                           : new DecimalFormat("#,##0").format(v.getLeft())
                               + "\n"
                               + new DecimalFormat("0.0%").format(v.getMiddle()),
-                  (p, v) -> v.getRight() ? ImageGenerator.createHalfTickShape() : null)
+                  (p, v) -> v.getRight() ? ImageGenerator.createHalfTickShape() : null,
+                  (p, v) -> Party.OTHERS.equals(p.getParty()) ? -1 : v.getLeft())
               .withMax(pctReporting.getBinding().map(d -> 0.5 / Math.max(1e-6, d)))
               .build();
       add(barFrame);
