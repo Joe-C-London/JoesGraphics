@@ -67,6 +67,75 @@ public class BarFrameBuilder {
     }
   }
 
+  public static <T> BarFrameBuilder basicList(
+      Binding<? extends List<? extends T>> binding,
+      Function<? super T, String> labelFunc,
+      Function<? super T, Color> colorFunc,
+      Function<? super T, ? extends Number> valueFunc,
+      Function<? super T, String> valueLabelFunc) {
+    BarFrameBuilder builder = new BarFrameBuilder();
+    BarFrame barFrame = builder.barFrame;
+    RangeFinder rangeFinder = builder.rangeFinder;
+
+    class BarEntry {
+      final String label;
+      final Color color;
+      final Number value;
+      final String valueLabel;
+      final Shape shape;
+
+      BarEntry(String label, Color color, Number value, String valueLabel, Shape shape) {
+        this.label = label;
+        this.color = color;
+        this.value = value;
+        this.valueLabel = valueLabel;
+        this.shape = shape;
+      }
+    }
+
+    BindableList<BarEntry> entries = new BindableList<>();
+    barFrame.setNumBarsBinding(Binding.sizeBinding(entries));
+    barFrame.setLeftTextBinding(IndexedBinding.propertyBinding(entries, e -> e.label));
+    barFrame.setRightTextBinding(IndexedBinding.propertyBinding(entries, e -> e.valueLabel));
+    barFrame.setLeftIconBinding(IndexedBinding.propertyBinding(entries, e -> e.shape));
+    barFrame.setMinBinding(
+        Binding.propertyBinding(
+            rangeFinder, rf -> rf.minFunction.apply(rf), RangeFinder.Property.MIN));
+    barFrame.setMaxBinding(
+        Binding.propertyBinding(
+            rangeFinder, rf -> rf.maxFunction.apply(rf), RangeFinder.Property.MAX));
+    barFrame.addSeriesBinding(
+        "Main",
+        IndexedBinding.propertyBinding(entries, e -> e.color),
+        IndexedBinding.propertyBinding(entries, e -> e.value));
+    builder.bind(
+        binding,
+        map -> {
+          if (map == null) {
+            entries.clear();
+            rangeFinder.setLowest(0);
+            rangeFinder.setHighest(0);
+          } else {
+            entries.setAll(
+                map.stream()
+                    .map(
+                        e ->
+                            new BarEntry(
+                                labelFunc.apply(e),
+                                colorFunc.apply(e),
+                                valueFunc.apply(e),
+                                valueLabelFunc.apply(e),
+                                null))
+                    .collect(Collectors.toList()));
+            rangeFinder.setHighest(
+                map.stream().map(valueFunc).mapToDouble(Number::doubleValue).reduce(0, Math::max));
+            rangeFinder.setLowest(
+                map.stream().map(valueFunc).mapToDouble(Number::doubleValue).reduce(0, Math::min));
+          }
+        });
+    return builder;
+  }
+
   public static <T> BarFrameBuilder basic(
       Binding<? extends Map<? extends T, ? extends Number>> binding,
       Function<? super T, String> labelFunc,

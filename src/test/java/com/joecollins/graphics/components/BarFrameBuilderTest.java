@@ -635,6 +635,45 @@ public class BarFrameBuilderTest {
     assertEquals(+22, frame.getMax().intValue());
   }
 
+  @Test
+  public void testBasicList() {
+    List<Pair<String, Integer>> regions =
+        List.of(
+            ImmutablePair.of("East Midlands", 5),
+            ImmutablePair.of("East of England", 7),
+            ImmutablePair.of("London", 8),
+            ImmutablePair.of("North East England", 3),
+            ImmutablePair.of("North West England", 8),
+            ImmutablePair.of("South East England", 10),
+            ImmutablePair.of("South West England", 6),
+            ImmutablePair.of("West Midlands", 7),
+            ImmutablePair.of("Yorkshire and the Humber", 6),
+            ImmutablePair.of("Scotland", 6),
+            ImmutablePair.of("Wales", 4),
+            ImmutablePair.of("Northern Ireland", 3));
+    BarFrame frame =
+        BarFrameBuilder.basicList(
+                () -> regions,
+                Pair::getLeft,
+                x -> Color.BLACK,
+                Pair::getRight,
+                x -> x.getRight().toString())
+            .build();
+    assertEquals(12, frame.getNumBars());
+
+    assertEquals("East Midlands", frame.getLeftText(0));
+    assertEquals("South East England", frame.getLeftText(5));
+    assertEquals("Northern Ireland", frame.getLeftText(11));
+
+    assertEquals("5", frame.getRightText(0));
+    assertEquals("10", frame.getRightText(5));
+    assertEquals("3", frame.getRightText(11));
+
+    assertEquals(5, frame.getSeries(0).get(0).getRight());
+    assertEquals(10, frame.getSeries(5).get(0).getRight());
+    assertEquals(3, frame.getSeries(11).get(0).getRight());
+  }
+
   private static Color lighten(Color color) {
     return new Color(
         128 + color.getRed() / 2, 128 + color.getGreen() / 2, 128 + color.getBlue() / 2);
