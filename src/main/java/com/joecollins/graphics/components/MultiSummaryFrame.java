@@ -157,7 +157,7 @@ public class MultiSummaryFrame extends GraphicsFrame {
   }
 
   private class EntryPanel extends JPanel {
-    private JLabel headerLabel;
+    private FontSizeAdjustingLabel headerLabel;
     private List<JPanel> panels = new ArrayList<>();
     private List<JLabel> labels = new ArrayList<>();
 
@@ -165,7 +165,7 @@ public class MultiSummaryFrame extends GraphicsFrame {
       setBackground(Color.WHITE);
       setLayout(new EntryLayout());
       setBorder(new MatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY));
-      headerLabel = new JLabel();
+      headerLabel = new FontSizeAdjustingLabel();
       headerLabel.setFont(StandardFont.readBoldFont(16));
       headerLabel.setBorder(new EmptyBorder(4, 0, -4, 0));
       add(headerLabel);

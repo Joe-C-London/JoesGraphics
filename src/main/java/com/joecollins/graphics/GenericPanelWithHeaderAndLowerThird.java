@@ -16,6 +16,10 @@ public class GenericPanelWithHeaderAndLowerThird<T extends JPanel> extends JPane
   private final JLabel label;
   private final LowerThird lowerThird;
 
+  public GenericPanelWithHeaderAndLowerThird(T panel, String label) {
+    this(panel, Binding.fixedBinding(label), null);
+  }
+
   public GenericPanelWithHeaderAndLowerThird(T panel, LowerThird lowerThird) {
     this(panel, (Binding<String>) null, lowerThird);
   }
@@ -42,7 +46,9 @@ public class GenericPanelWithHeaderAndLowerThird<T extends JPanel> extends JPane
     if (label != null) {
       add(this.label, BorderLayout.NORTH);
     }
-    add(this.lowerThird, BorderLayout.SOUTH);
+    if (lowerThird != null) {
+      add(this.lowerThird, BorderLayout.SOUTH);
+    }
     add(this.panel, BorderLayout.CENTER);
   }
 

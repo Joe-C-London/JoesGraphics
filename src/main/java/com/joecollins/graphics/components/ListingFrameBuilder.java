@@ -60,6 +60,11 @@ public class ListingFrameBuilder {
     return this;
   }
 
+  public ListingFrameBuilder withNotes(Binding<String> notesBinding) {
+    barFrame.setNotesBinding(notesBinding);
+    return this;
+  }
+
   public BarFrame build() {
     return barFrame;
   }
