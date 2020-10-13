@@ -8,14 +8,22 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.Shape;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
+import java.awt.geom.GeneralPath;
 import java.awt.geom.NoninvertibleTransformException;
+import java.awt.geom.PathIterator;
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.WeakHashMap;
 import java.util.function.Predicate;
 import javax.swing.JPanel;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.MutablePair;
 
 public class MapFrame extends GraphicsFrame {
@@ -24,15 +32,26 @@ public class MapFrame extends GraphicsFrame {
   private IndexedBinding<Shape> shapeBinding = IndexedBinding.emptyBinding();
   private IndexedBinding<Color> colorBinding = IndexedBinding.emptyBinding();
   private Binding<Rectangle2D> focusBinding = () -> null;
+  private Binding<Boolean> outlineShapesBinding = () -> false;
 
   private List<MutablePair<Shape, Color>> shapesToDraw = new ArrayList<>();
   private Rectangle2D focus = null;
+  private boolean outlineShapes = false;
+  private Map<Shape, Shape> transformedShapesCache = new WeakHashMap<>();
+  private final double distanceThreshold = 0.5;
 
   public MapFrame() {
     JPanel panel =
         new JPanel() {
           {
             setBackground(Color.WHITE);
+            addComponentListener(
+                new ComponentAdapter() {
+                  @Override
+                  public void componentResized(ComponentEvent e) {
+                    transformedShapesCache.clear();
+                  }
+                });
           }
 
           @Override
@@ -68,14 +87,70 @@ public class MapFrame extends GraphicsFrame {
             }
             shapesToDraw.stream()
                 .filter(e -> inScope.test(e.left))
+                .map(
+                    pair ->
+                        ImmutablePair.of(
+                            transformedShapesCache.computeIfAbsent(
+                                pair.left, shape -> createTransformedShape(transform, shape)),
+                            pair.right))
                 .forEach(
                     pair -> {
                       g2d.setColor(pair.right);
-                      g2d.fill(transform.createTransformedShape(pair.left));
+                      g2d.fill(pair.left);
+                      if (outlineShapes) {
+                        g2d.setColor(Color.WHITE);
+                        g2d.draw(pair.left);
+                      }
                     });
           }
         };
     add(panel, BorderLayout.CENTER);
+  }
+
+  private Shape createTransformedShape(AffineTransform transform, Shape shape) {
+    PathIterator pathIterator = transform.createTransformedShape(shape).getPathIterator(null);
+    GeneralPath currentPath = new GeneralPath();
+    double[] c = new double[6];
+    Point2D.Double lastPoint = null;
+    while (!pathIterator.isDone()) {
+      int type = pathIterator.currentSegment(c);
+      Point2D.Double nextPoint;
+      switch (type) {
+        case PathIterator.SEG_MOVETO:
+          lastPoint = new Point2D.Double(c[0], c[1]);
+          currentPath.moveTo(c[0], c[1]);
+          break;
+        case PathIterator.SEG_LINETO:
+          nextPoint = new Point2D.Double(c[0], c[1]);
+          if (lastPoint == null || lastPoint.distance(nextPoint) > distanceThreshold) {
+            currentPath.lineTo(c[0], c[1]);
+            lastPoint = nextPoint;
+          }
+          break;
+        case PathIterator.SEG_QUADTO:
+          nextPoint = new Point2D.Double(c[2], c[3]);
+          if (lastPoint == null || lastPoint.distance(nextPoint) > distanceThreshold) {
+            currentPath.quadTo(c[0], c[1], c[2], c[3]);
+            lastPoint = nextPoint;
+          }
+          break;
+        case PathIterator.SEG_CUBICTO:
+          nextPoint = new Point2D.Double(c[4], c[5]);
+          if (lastPoint == null || lastPoint.distance(nextPoint) > distanceThreshold) {
+            currentPath.curveTo(c[0], c[1], c[2], c[3], c[4], c[5]);
+            lastPoint = nextPoint;
+          }
+          break;
+        case PathIterator.SEG_CLOSE:
+          lastPoint = null;
+          currentPath.closePath();
+          break;
+        default:
+          throw new IllegalStateException("Unrecognised segment type " + type);
+      }
+      pathIterator.next();
+    }
+    return currentPath;
   }
 
   int getNumShapes() {
@@ -146,6 +221,21 @@ public class MapFrame extends GraphicsFrame {
     this.focusBinding.bind(
         focus -> {
           this.focus = focus;
+          transformedShapesCache.clear();
+          repaint();
+        });
+  }
+
+  boolean isOutlineShapes() {
+    return outlineShapes;
+  }
+
+  public void setOutlineShapesBinding(Binding<Boolean> outlineShapesBinding) {
+    this.outlineShapesBinding.unbind();
+    this.outlineShapesBinding = outlineShapesBinding;
+    this.outlineShapesBinding.bind(
+        outline -> {
+          this.outlineShapes = outline;
           repaint();
         });
   }
