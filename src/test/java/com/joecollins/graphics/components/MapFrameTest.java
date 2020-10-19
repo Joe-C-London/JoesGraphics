@@ -16,6 +16,8 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Map;
 import java.util.function.IntFunction;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import org.junit.Test;
 
 public class MapFrameTest {
@@ -71,6 +73,17 @@ public class MapFrameTest {
   }
 
   @Test
+  public void testOutlines() throws IOException {
+    BindableList<Shape> regions = loadRegions();
+
+    MapFrame mapFrame = new MapFrame();
+    mapFrame.setNumOutlineShapesBinding(Binding.sizeBinding(regions));
+    mapFrame.setOutlineShapesBinding(IndexedBinding.listBinding(regions));
+    assertEquals(4, mapFrame.getNumOutlineShapes());
+    assertEquals(regions.get(0), mapFrame.getOutlineShape(0));
+  }
+
+  @Test
   public void testRenderFull() throws IOException {
     BindableList<MapEntry> shapes = loadShapes(this::getDistrictColor);
 
@@ -121,6 +134,30 @@ public class MapFrameTest {
     compareRendering("MapFrame", "RenderZoomedIn", mapFrame);
   }
 
+  @Test
+  public void testRenderWithBorders() throws IOException {
+    BindableList<MapEntry> shapes = loadShapes(this::getDistrictColor);
+    Rectangle2D zoomBox = loadCityBox();
+    BindableList<Shape> regions = new BindableList<>();
+    regions.addAll(shapes.stream().map(MapEntry::getShape).collect(Collectors.toList()));
+
+    MapFrame mapFrame = new MapFrame();
+    mapFrame.setHeaderBinding(Binding.fixedBinding("PEI"));
+    mapFrame.setNumShapesBinding(Binding.sizeBinding(shapes));
+    mapFrame.setShapeBinding(
+        IndexedBinding.propertyBinding(shapes, MapEntry::getShape, MapEntry.Property.SHAPE));
+    mapFrame.setColorBinding(
+        IndexedBinding.propertyBinding(shapes, MapEntry::getColor, MapEntry.Property.COLOR));
+    mapFrame.setNumOutlineShapesBinding(Binding.sizeBinding(regions));
+    mapFrame.setOutlineShapesBinding(IndexedBinding.listBinding(regions));
+    mapFrame.setSize(256, 128);
+    compareRendering("MapFrame", "RenderBorders-1", mapFrame);
+
+    mapFrame.setFocusBoxBinding(Binding.fixedBinding(zoomBox));
+    mapFrame.setHeaderBinding(Binding.fixedBinding("CHARLOTTETOWN"));
+    compareRendering("MapFrame", "RenderBorders-2", mapFrame);
+  }
+
   private BindableList<MapEntry> loadShapes(IntFunction<Color> colorFunc) throws IOException {
     Map<Integer, Shape> shapesByDistrict = shapesByDistrict();
     BindableList<MapEntry> shapes = new BindableList<>();
@@ -130,6 +167,32 @@ public class MapFrameTest {
           shapes.add(new MapEntry(shape, color));
         });
     return shapes;
+  }
+
+  private BindableList<Shape> loadRegions() throws IOException {
+    Map<Integer, Shape> shapesByDistrict = shapesByDistrict();
+    BindableList<Shape> regions = new BindableList<>();
+    regions.add(
+        IntStream.rangeClosed(1, 7)
+            .mapToObj(shapesByDistrict::get)
+            .map(Area::new)
+            .collect(Area::new, Area::add, Area::add));
+    regions.add(
+        IntStream.rangeClosed(9, 14)
+            .mapToObj(shapesByDistrict::get)
+            .map(Area::new)
+            .collect(Area::new, Area::add, Area::add));
+    regions.add(
+        IntStream.concat(IntStream.of(8), IntStream.rangeClosed(15, 20))
+            .mapToObj(shapesByDistrict::get)
+            .map(Area::new)
+            .collect(Area::new, Area::add, Area::add));
+    regions.add(
+        IntStream.rangeClosed(21, 27)
+            .mapToObj(shapesByDistrict::get)
+            .map(Area::new)
+            .collect(Area::new, Area::add, Area::add));
+    return regions;
   }
 
   private Color getDistrictColor(Integer district) {

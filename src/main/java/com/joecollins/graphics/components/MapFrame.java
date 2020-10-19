@@ -2,6 +2,7 @@ package com.joecollins.graphics.components;
 
 import com.joecollins.bindings.Binding;
 import com.joecollins.bindings.IndexedBinding;
+import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -32,11 +33,12 @@ public class MapFrame extends GraphicsFrame {
   private IndexedBinding<Shape> shapeBinding = IndexedBinding.emptyBinding();
   private IndexedBinding<Color> colorBinding = IndexedBinding.emptyBinding();
   private Binding<Rectangle2D> focusBinding = () -> null;
-  private Binding<Boolean> outlineShapesBinding = () -> false;
+  private Binding<Integer> numOutlineShapesBinding = () -> 0;
+  private IndexedBinding<Shape> outlineShapesBinding = IndexedBinding.emptyBinding();
 
   private List<MutablePair<Shape, Color>> shapesToDraw = new ArrayList<>();
   private Rectangle2D focus = null;
-  private boolean outlineShapes = false;
+  private List<Shape> outlineShapes = new ArrayList<>();
   private Map<Shape, Shape> transformedShapesCache = new WeakHashMap<>();
   private final double distanceThreshold = 0.5;
 
@@ -97,10 +99,18 @@ public class MapFrame extends GraphicsFrame {
                     pair -> {
                       g2d.setColor(pair.right);
                       g2d.fill(pair.left);
-                      if (outlineShapes) {
-                        g2d.setColor(Color.WHITE);
-                        g2d.draw(pair.left);
-                      }
+                    });
+            outlineShapes.stream()
+                .filter(e -> inScope.test(e))
+                .map(
+                    shape ->
+                        transformedShapesCache.computeIfAbsent(
+                            shape, s -> createTransformedShape(transform, s)))
+                .forEach(
+                    shape -> {
+                      g2d.setColor(Color.WHITE);
+                      g2d.setStroke(new BasicStroke((float) Math.sqrt(0.5)));
+                      g2d.draw(shape);
                     });
           }
         };
@@ -226,16 +236,35 @@ public class MapFrame extends GraphicsFrame {
         });
   }
 
-  boolean isOutlineShapes() {
-    return outlineShapes;
+  int getNumOutlineShapes() {
+    return outlineShapes.size();
   }
 
-  public void setOutlineShapesBinding(Binding<Boolean> outlineShapesBinding) {
+  public void setNumOutlineShapesBinding(Binding<Integer> numOutlineShapesBinding) {
+    this.numOutlineShapesBinding.unbind();
+    this.numOutlineShapesBinding = numOutlineShapesBinding;
+    this.numOutlineShapesBinding.bind(
+        size -> {
+          while (size > outlineShapes.size()) {
+            outlineShapes.add(new Area());
+          }
+          while (size < outlineShapes.size()) {
+            outlineShapes.remove(size.intValue());
+          }
+          repaint();
+        });
+  }
+
+  Shape getOutlineShape(int idx) {
+    return outlineShapes.get(idx);
+  }
+
+  public void setOutlineShapesBinding(IndexedBinding<Shape> outlineShapesBinding) {
     this.outlineShapesBinding.unbind();
     this.outlineShapesBinding = outlineShapesBinding;
     this.outlineShapesBinding.bind(
-        outline -> {
-          this.outlineShapes = outline;
+        (idx, outline) -> {
+          this.outlineShapes.set(idx, outline);
           repaint();
         });
   }
