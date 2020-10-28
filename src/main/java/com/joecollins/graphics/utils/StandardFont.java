@@ -11,32 +11,32 @@ public class StandardFont {
 
   private StandardFont() {}
 
+  private static final Font KLAVIKA_BOLD;
+  private static final Font KLAVIKA_REGULAR;
+
+  static {
+    try {
+      KLAVIKA_BOLD =
+          Font.createFont(
+              Font.TRUETYPE_FONT,
+              StandardFont.class.getClassLoader().getResourceAsStream("Klavika Bold.otf"));
+      KLAVIKA_REGULAR =
+          Font.createFont(
+              Font.TRUETYPE_FONT,
+              StandardFont.class.getClassLoader().getResourceAsStream("Klavika Regular.otf"));
+    } catch (FontFormatException | IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
   private static Map<Integer, Font> boldFontCache = new HashMap<>();
   private static Map<Integer, Font> normalFontCache = new HashMap<>();
 
   private static Function<Integer, Font> boldFont =
-      size -> {
-        try {
-          return Font.createFont(
-                  Font.TRUETYPE_FONT,
-                  StandardFont.class.getClassLoader().getResourceAsStream("Klavika Bold.otf"))
-              .deriveFont(Font.PLAIN, size);
-        } catch (FontFormatException | IOException e) {
-          throw new RuntimeException(e);
-        }
-      };
+      size -> KLAVIKA_BOLD.deriveFont(Font.PLAIN, size);
 
   private static Function<Integer, Font> normalFont =
-      size -> {
-        try {
-          return Font.createFont(
-                  Font.TRUETYPE_FONT,
-                  StandardFont.class.getClassLoader().getResourceAsStream("Klavika Regular.otf"))
-              .deriveFont(Font.PLAIN, size);
-        } catch (FontFormatException | IOException e) {
-          throw new RuntimeException(e);
-        }
-      };
+      size -> KLAVIKA_REGULAR.deriveFont(Font.PLAIN, size);
 
   public static synchronized Font readBoldFont(int size) {
     return boldFontCache.computeIfAbsent(size, boldFont);

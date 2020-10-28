@@ -13,6 +13,7 @@ import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.swing.JPanel;
@@ -394,6 +395,7 @@ public class SwingometerFrame extends GraphicsFrame {
       var bucketedDots =
           dots.stream()
               .filter(e -> Math.abs(e.getLeft().doubleValue()) <= range.doubleValue())
+              .sorted(Comparator.comparing(e -> Math.abs(e.getLeft().doubleValue())))
               .collect(
                   Collectors.groupingBy(
                       e ->

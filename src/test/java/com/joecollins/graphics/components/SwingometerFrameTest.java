@@ -153,8 +153,8 @@ public class SwingometerFrameTest {
     dots.add(ImmutableTriple.of("ND", +0.45, Color.RED));
     dots.add(ImmutableTriple.of("MT", +1.85, Color.BLUE));
     dots.add(ImmutableTriple.of("WI", +2.75, Color.BLUE));
-    dots.add(ImmutableTriple.of("NM", +2.85, Color.BLUE));
     dots.add(ImmutableTriple.of("IN", +2.90, Color.RED));
+    dots.add(ImmutableTriple.of("NM", +2.85, Color.BLUE));
     dots.add(ImmutableTriple.of("VA", +2.95, Color.BLUE));
     dots.add(ImmutableTriple.of("OH", +3.00, Color.BLUE));
     dots.add(ImmutableTriple.of("MA", +3.70, Color.BLUE));
