@@ -346,14 +346,17 @@ public class SwingometerFrame extends GraphicsFrame {
 
     public void setDotPosition(int index, Number position) {
       dots.get(index).setLeft(position);
+      repaint();
     }
 
     public void setDotColor(int index, Color color) {
       dots.get(index).setMiddle(color);
+      repaint();
     }
 
     public void setDotLabel(int index, String label) {
       dots.get(index).setRight(label);
+      repaint();
     }
 
     @Override
