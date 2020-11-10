@@ -11,6 +11,7 @@ import com.joecollins.graphics.components.MapFrame;
 import com.joecollins.graphics.components.SwingFrame;
 import com.joecollins.graphics.components.SwingFrameBuilder;
 import com.joecollins.graphics.utils.StandardFont;
+import com.joecollins.models.general.Aggregators;
 import com.joecollins.models.general.Candidate;
 import com.joecollins.models.general.Party;
 import java.awt.BorderLayout;
@@ -29,17 +30,14 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
-import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.commons.lang3.tuple.Triple;
 
 public class MultiResultScreen extends JPanel {
 
@@ -265,31 +263,22 @@ public class MultiResultScreen extends JPanel {
                           winner.getBinding(),
                           (m, w) -> {
                             int total = m.values().stream().mapToInt(i -> i).sum();
-                            Map<Candidate, Triple<Integer, Double, Boolean>> ret =
-                                new LinkedHashMap<>();
-                            Set<Candidate> candidatesToInclude =
-                                m.entrySet().stream()
-                                    .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
-                                    .map(Map.Entry::getKey)
-                                    .limit(m.size() > 5 ? 4 : 5)
-                                    .collect(Collectors.toSet());
-                            candidatesToInclude.add(w);
-                            MutableInt others = new MutableInt(0);
-                            m.forEach(
-                                (k, v) -> {
-                                  if (candidatesToInclude.contains(k)) {
-                                    ret.put(k, ImmutableTriple.of(v, 1.0 * v / total, k.equals(w)));
-                                  } else {
-                                    others.add(v);
-                                  }
-                                });
-                            if (candidatesToInclude.size() < m.size()) {
-                              ret.put(
-                                  OTHERS,
-                                  ImmutableTriple.of(
-                                      others.intValue(), others.doubleValue() / total, false));
-                            }
-                            return ret;
+                            Map<Candidate, Integer> votesWithOthers =
+                                Aggregators.topAndOthers(m, 5, OTHERS, w);
+                            return votesWithOthers.entrySet().stream()
+                                .collect(
+                                    Collectors.toMap(
+                                        Map.Entry::getKey,
+                                        e ->
+                                            ImmutableTriple.of(
+                                                e.getValue(),
+                                                1.0 * e.getValue() / total,
+                                                e.getKey().equals(w)),
+                                        (a, b) -> {
+                                          throw new IllegalStateException(
+                                              "Unexpected duplicate key");
+                                        },
+                                        LinkedHashMap::new));
                           }),
                   p -> {
                     if (p == OTHERS) return "OTHERS";

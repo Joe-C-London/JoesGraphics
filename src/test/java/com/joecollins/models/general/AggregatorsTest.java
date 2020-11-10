@@ -223,4 +223,60 @@ public class AggregatorsTest {
     inputs.get(1).getLeft().setValue(0.7);
     assertEquals(0.66, output.getValue(), 1e-6);
   }
+
+  @Test
+  public void testTopAndOthersBelowLimit() {
+    BindableWrapper<Map<String, Integer>> votes = new BindableWrapper<>(Map.of("ABC", 5, "DEF", 3));
+    Mutable<Map<String, Integer>> output = new MutableObject<>();
+    Aggregators.topAndOthers(votes.getBinding(), 3, "OTHERS").bind(output::setValue);
+    assertEquals(Map.of("ABC", 5, "DEF", 3), output.getValue());
+
+    votes.setValue(Map.of("ABC", 5, "DEF", 7));
+    assertEquals(Map.of("ABC", 5, "DEF", 7), output.getValue());
+  }
+
+  @Test
+  public void testTopAndOthersAtLimit() {
+    BindableWrapper<Map<String, Integer>> votes =
+        new BindableWrapper<>(Map.of("ABC", 5, "DEF", 3, "GHI", 2));
+    Mutable<Map<String, Integer>> output = new MutableObject<>();
+    Aggregators.topAndOthers(votes.getBinding(), 3, "OTHERS").bind(output::setValue);
+    assertEquals(Map.of("ABC", 5, "DEF", 3, "GHI", 2), output.getValue());
+
+    votes.setValue(Map.of("ABC", 5, "DEF", 7, "GHI", 6));
+    assertEquals(Map.of("ABC", 5, "DEF", 7, "GHI", 6), output.getValue());
+  }
+
+  @Test
+  public void testTopAndOthersAboveLimit() {
+    BindableWrapper<Map<String, Integer>> votes =
+        new BindableWrapper<>(Map.of("ABC", 5, "DEF", 3, "GHI", 2, "JKL", 4));
+    Mutable<Map<String, Integer>> output = new MutableObject<>();
+    Aggregators.topAndOthers(votes.getBinding(), 3, "OTHERS").bind(output::setValue);
+    assertEquals(Map.of("ABC", 5, "JKL", 4, "OTHERS", 5), output.getValue());
+
+    votes.setValue(Map.of("ABC", 5, "DEF", 7, "GHI", 6, "JKL", 4));
+    assertEquals(Map.of("DEF", 7, "GHI", 6, "OTHERS", 9), output.getValue());
+  }
+
+  @Test
+  public void testTopAndOthersAboveLimitWithMandatoryInclusion() {
+    BindableWrapper<Map<String, Integer>> votes =
+        new BindableWrapper<>(Map.of("ABC", 5, "DEF", 3, "GHI", 2, "JKL", 4));
+    BindableWrapper<String> winner = new BindableWrapper<>(null);
+    Mutable<Map<String, Integer>> output = new MutableObject<>();
+    Aggregators.topAndOthers(votes.getBinding(), 3, "OTHERS", winner.getBinding())
+        .bind(output::setValue);
+    assertEquals(Map.of("ABC", 5, "JKL", 4, "OTHERS", 5), output.getValue());
+
+    votes.setValue(Map.of("ABC", 5, "DEF", 7, "GHI", 6, "JKL", 4));
+    winner.setValue("ABC");
+    assertEquals(Map.of("DEF", 7, "ABC", 5, "OTHERS", 10), output.getValue());
+
+    winner.setValue(null);
+    assertEquals(Map.of("DEF", 7, "GHI", 6, "OTHERS", 9), output.getValue());
+
+    winner.setValue("DEF");
+    assertEquals(Map.of("DEF", 7, "GHI", 6, "OTHERS", 9), output.getValue());
+  }
 }

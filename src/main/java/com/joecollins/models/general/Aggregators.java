@@ -1,15 +1,18 @@
 package com.joecollins.models.general;
 
 import com.joecollins.bindings.Binding;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.ToDoubleFunction;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -132,5 +135,44 @@ public class Aggregators {
     LinkedHashMap<K2, Integer> ret = new LinkedHashMap<>();
     map.forEach((k, v) -> ret.merge(func.apply(k), v, Integer::sum));
     return ret;
+  }
+
+  @SafeVarargs
+  public static <K> Binding<Map<K, Integer>> topAndOthers(
+      Binding<Map<K, Integer>> result, int limit, K others, Binding<K>... mustInclude) {
+    Binding<Set<K>> mustIncludeSet = Binding.fixedBinding(Set.of());
+    for (Binding<K> mustIncludeEntry : mustInclude) {
+      mustIncludeSet =
+          mustIncludeSet.merge(
+              mustIncludeEntry,
+              (s, e) ->
+                  Stream.concat(s.stream(), e == null ? Stream.empty() : Stream.of(e))
+                      .collect(Collectors.toSet()));
+    }
+    return result.merge(
+        mustIncludeSet, (m, w) -> topAndOthers(m, limit, others, (K[]) w.toArray()));
+  }
+
+  @SafeVarargs
+  public static <K> Map<K, Integer> topAndOthers(
+      Map<K, Integer> map, int limit, K others, K... mustInclude) {
+    if (map.size() <= limit) {
+      return map;
+    }
+    Set<K> mustIncludeSet =
+        Arrays.stream(mustInclude).filter(Objects::nonNull).collect(Collectors.toSet());
+    Set<Map.Entry<K, Integer>> top =
+        map.entrySet().stream()
+            .filter(e -> !mustIncludeSet.contains(e.getKey()))
+            .sorted(Map.Entry.<K, Integer>comparingByValue().reversed())
+            .limit(Math.max(0, limit - 1 - mustIncludeSet.size()))
+            .collect(Collectors.toSet());
+    return map.entrySet().stream()
+        .collect(
+            Collectors.toMap(
+                e -> top.contains(e) || mustIncludeSet.contains(e.getKey()) ? e.getKey() : others,
+                Map.Entry::getValue,
+                Integer::sum,
+                LinkedHashMap::new));
   }
 }

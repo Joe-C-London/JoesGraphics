@@ -4,6 +4,8 @@ import java.util.Objects;
 
 public class Candidate {
 
+  public static final Candidate OTHERS = new Candidate("", Party.OTHERS);
+
   private final String name;
   private final Party party;
   private final boolean incumbent;

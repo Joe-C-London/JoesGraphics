@@ -11,6 +11,7 @@ import com.joecollins.graphics.components.SwingFrame;
 import com.joecollins.graphics.components.SwingFrameBuilder;
 import com.joecollins.graphics.screens.generic.MapBuilder.Result;
 import com.joecollins.graphics.utils.StandardFont;
+import com.joecollins.models.general.Aggregators;
 import com.joecollins.models.general.Candidate;
 import com.joecollins.models.general.Party;
 import java.awt.BorderLayout;
@@ -26,7 +27,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Stream;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
@@ -205,7 +208,8 @@ public class BasicResultPanel extends JPanel {
         new BindingReceiver<>(header),
         new BindingReceiver<>(subhead),
         new PartyTemplate(),
-        new PctOnlyTemplate());
+        new PctOnlyTemplate(),
+        Party.OTHERS);
   }
 
   public static VoteScreenBuilder<Candidate, Integer, Double, Integer> candidateVotes(
@@ -217,7 +221,8 @@ public class BasicResultPanel extends JPanel {
         new BindingReceiver<>(header),
         new BindingReceiver<>(subhead),
         new CandidateTemplate(),
-        new VotePctTemplate());
+        new VotePctTemplate(),
+        Candidate.OTHERS);
   }
 
   public static VoteScreenBuilder<Candidate, Integer, Double, Integer> candidateVotesPctOnly(
@@ -229,7 +234,8 @@ public class BasicResultPanel extends JPanel {
         new BindingReceiver<>(header),
         new BindingReceiver<>(subhead),
         new CandidateTemplate(),
-        new VotePctOnlyTemplate());
+        new VotePctOnlyTemplate(),
+        Candidate.OTHERS);
   }
 
   public static VoteScreenBuilder<Candidate, Integer, Double, Integer> candidateVotes(
@@ -242,7 +248,8 @@ public class BasicResultPanel extends JPanel {
         new BindingReceiver<>(header),
         new BindingReceiver<>(subhead),
         new CandidateTemplate(incumbentMarker),
-        new VotePctTemplate());
+        new VotePctTemplate(),
+        Candidate.OTHERS);
   }
 
   public static VoteScreenBuilder<Candidate, Integer, Double, Integer> candidateVotesPctOnly(
@@ -255,7 +262,8 @@ public class BasicResultPanel extends JPanel {
         new BindingReceiver<>(header),
         new BindingReceiver<>(subhead),
         new CandidateTemplate(incumbentMarker),
-        new VotePctOnlyTemplate());
+        new VotePctOnlyTemplate(),
+        Candidate.OTHERS);
   }
 
   private static class NumCandidatesWrapper<T> {
@@ -326,6 +334,9 @@ public class BasicResultPanel extends JPanel {
 
     @Override
     public String toMainBarHeader(NumCandidatesWrapper<Candidate> key) {
+      if (key.candidate == Candidate.OTHERS) {
+        return key.candidate.getParty().getName().toUpperCase();
+      }
       boolean singleLine = key.numCandidates > 10;
       return (key.candidate.getName()
               + (key.candidate.isIncumbent() ? incumbentMarker : "")
@@ -947,8 +958,9 @@ public class BasicResultPanel extends JPanel {
   public abstract static class VoteScreenBuilder<KT, CT, CPT, PT> {
     protected final KeyTemplate<KT> keyTemplate;
     protected final VoteTemplate<VotesPct<CT, CPT>> voteTemplate;
+    protected final KT others;
 
-    protected BindingReceiver<Map<KT, ? extends CT>> current;
+    protected BindingReceiver<Map<KT, CT>> current;
     protected BindingReceiver<String> header;
     protected BindingReceiver<String> subhead;
     protected BindingReceiver<Boolean> showMajority;
@@ -956,8 +968,10 @@ public class BasicResultPanel extends JPanel {
     protected BindingReceiver<KT> winner;
     protected BindingReceiver<Double> pctReporting;
     protected BindingReceiver<String> notes;
+    protected int limit = Integer.MAX_VALUE;
+    protected Set<Party> mandatoryParties = Set.of();
 
-    protected BindingReceiver<Map<Party, ? extends PT>> prev;
+    protected BindingReceiver<Map<Party, PT>> prev;
     protected BindingReceiver<String> changeHeader;
     protected BindingReceiver<String> changeSubhead;
 
@@ -967,27 +981,27 @@ public class BasicResultPanel extends JPanel {
     protected MapBuilder mapBuilder;
 
     private VoteScreenBuilder(
-        BindingReceiver<Map<KT, ? extends CT>> current,
+        BindingReceiver<Map<KT, CT>> current,
         BindingReceiver<String> header,
         BindingReceiver<String> subhead,
         KeyTemplate<KT> keyTemplate,
-        VoteTemplate<VotesPct<CT, CPT>> voteTemplate) {
+        VoteTemplate<VotesPct<CT, CPT>> voteTemplate,
+        KT others) {
       this.keyTemplate = keyTemplate;
       this.current = current;
       this.header = header;
       this.subhead = subhead;
       this.voteTemplate = voteTemplate;
+      this.others = others;
     }
 
     public VoteScreenBuilder<KT, CT, CPT, PT> withPrev(
-        Binding<? extends Map<Party, ? extends PT>> prev, Binding<String> header) {
+        Binding<? extends Map<Party, PT>> prev, Binding<String> header) {
       return withPrev(prev, header, Binding.fixedBinding(null));
     }
 
     public VoteScreenBuilder<KT, CT, CPT, PT> withPrev(
-        Binding<? extends Map<Party, ? extends PT>> prev,
-        Binding<String> header,
-        Binding<String> subhead) {
+        Binding<? extends Map<Party, PT>> prev, Binding<String> header, Binding<String> subhead) {
       this.prev = new BindingReceiver<>(prev);
       this.changeHeader = new BindingReceiver<>(header);
       this.changeSubhead = new BindingReceiver<>(subhead);
@@ -1077,6 +1091,15 @@ public class BasicResultPanel extends JPanel {
       return this;
     }
 
+    public VoteScreenBuilder<KT, CT, CPT, PT> withLimit(int limit, Party... mandatoryParties) {
+      if (limit <= 0) {
+        throw new IllegalArgumentException("Invalid limit: " + limit);
+      }
+      this.limit = limit;
+      this.mandatoryParties = Set.of(mandatoryParties);
+      return this;
+    }
+
     public BasicResultPanel build(Binding<String> textHeader) {
       return new BasicResultPanel(
           createHeaderLabel(textHeader),
@@ -1104,26 +1127,42 @@ public class BasicResultPanel extends JPanel {
       extends VoteScreenBuilder<KT, Integer, Double, Integer> {
 
     public BasicVoteScreenBuilder(
-        BindingReceiver<Map<KT, ? extends Integer>> current,
+        BindingReceiver<Map<KT, Integer>> current,
         BindingReceiver<String> header,
         BindingReceiver<String> subhead,
         KeyTemplate<KT> keyTemplate,
-        VoteTemplate<VotesPct<Integer, Double>> voteTemplate) {
-      super(current, header, subhead, keyTemplate, voteTemplate);
+        VoteTemplate<VotesPct<Integer, Double>> voteTemplate,
+        KT others) {
+      super(current, header, subhead, keyTemplate, voteTemplate, others);
     }
 
     @Override
     protected BarFrame createFrame() {
       Binding<Map<KT, VotesPct<Integer, Double>>> votesPct =
-          current.getBinding(
-              map -> {
-                int total = map.values().stream().mapToInt(i -> i).sum();
-                Map<KT, VotesPct<Integer, Double>> ret = new LinkedHashMap<>();
-                map.forEach(
-                    (k, v) ->
-                        ret.put(k, new VotesPct<>(v, total == 0 ? Double.NaN : 1.0 * v / total)));
-                return ret;
-              });
+          current
+              .getBinding()
+              .merge(
+                  (winner == null ? Binding.fixedBinding(null) : winner.getBinding()),
+                  (map, winner) -> {
+                    int total = map.values().stream().mapToInt(i -> i).sum();
+                    Map<KT, VotesPct<Integer, Double>> ret = new LinkedHashMap<>();
+                    var mandatory =
+                        (KT[])
+                            Stream.concat(
+                                    map.keySet().stream()
+                                        .filter(
+                                            k -> mandatoryParties.contains(keyTemplate.toParty(k))),
+                                    Stream.of(winner).filter(Objects::nonNull))
+                                .filter(Objects::nonNull)
+                                .toArray();
+                    Aggregators.topAndOthers(map, limit, others, mandatory)
+                        .forEach(
+                            (KT k, Integer v) ->
+                                ret.put(
+                                    k,
+                                    new VotesPct<>(v, total == 0 ? Double.NaN : 1.0 * v / total)));
+                    return ret;
+                  });
       Binding<KT> winner = this.winner == null ? (() -> null) : this.winner.getBinding();
       BarFrameBuilder builder =
           BarFrameBuilder.basicWithShapes(
@@ -1154,7 +1193,7 @@ public class BasicResultPanel extends JPanel {
                   votes -> voteTemplate.toBarString(votes),
                   (party, votes) ->
                       votes.winner ? keyTemplate.winnerShape(party.numCandidates) : null,
-                  (party, votes) -> party.candidate == Party.OTHERS ? -1 : votes.percent)
+                  (party, votes) -> others.equals(party.candidate) ? -1 : votes.percent)
               .withHeader(header.getBinding())
               .withSubhead(subhead.getBinding())
               .withNotes(notes == null ? (() -> null) : notes.getBinding())
@@ -1210,7 +1249,12 @@ public class BasicResultPanel extends JPanel {
                   (c, p) -> {
                     int currTotal = c.values().stream().mapToInt(i -> i).sum();
                     int prevTotal = p.values().stream().mapToInt(i -> i).sum();
-                    Map<Party, Integer> partyTotal = currTotalByParty(c);
+                    Map<Party, Integer> partyTotal =
+                        Aggregators.topAndOthers(
+                            currTotalByParty(c),
+                            limit,
+                            Party.OTHERS,
+                            mandatoryParties.toArray(new Party[0]));
                     Map<Party, CurrDiff<Double>> ret = new LinkedHashMap<>();
                     if (currTotal == 0 || prevTotal == 0) {
                       return ret;
@@ -1223,8 +1267,13 @@ public class BasicResultPanel extends JPanel {
                         });
                     p.forEach(
                         (party, pv) -> {
-                          double ppct = 1.0 * pv / prevTotal;
-                          ret.putIfAbsent(party, new CurrDiff<>(0.0, -ppct));
+                          if (!partyTotal.containsKey(party)) {
+                            double ppct = 1.0 * pv / prevTotal;
+                            ret.merge(
+                                Party.OTHERS,
+                                new CurrDiff<>(0.0, -ppct),
+                                (a, b) -> new CurrDiff<>(a.curr + b.curr, a.diff + b.diff));
+                          }
                         });
                     return ret;
                   });
