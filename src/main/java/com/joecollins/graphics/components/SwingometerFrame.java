@@ -425,7 +425,7 @@ public class SwingometerFrame extends GraphicsFrame {
               dotSize - 4);
           g.setColor(Color.WHITE);
           String[] text = dot.right.split("\n");
-          int size = (dotSize - 8) / text.length;
+          int size = Math.max(2, (dotSize - 8) / text.length);
           Font font = null;
           while (size > 1) {
             font = StandardFont.readNormalFont(size);

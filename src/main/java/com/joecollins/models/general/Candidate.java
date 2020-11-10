@@ -51,6 +51,6 @@ public class Candidate {
 
   @Override
   public String toString() {
-    return name + " (" + party + ")";
+    return name + " (" + party + ")" + (incumbent ? "*" : "");
   }
 }
