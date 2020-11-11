@@ -36,7 +36,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.commons.lang3.tuple.Pair;
 
 public class MultiResultScreen extends JPanel {
@@ -235,6 +234,26 @@ public class MultiResultScreen extends JPanel {
     }
   }
 
+  private static class Result extends Bindable {
+    private enum Property {
+      VOTES,
+      WINNER
+    }
+
+    private Map<Candidate, Integer> votes = new HashMap<>();
+    private Candidate winner;
+
+    private void setVotes(Map<Candidate, Integer> votes) {
+      this.votes = votes;
+      onPropertyRefreshed(Property.VOTES);
+    }
+
+    private void setWinner(Candidate winner) {
+      this.winner = winner;
+      onPropertyRefreshed(Property.WINNER);
+    }
+  }
+
   private static class ResultPanel extends JPanel {
 
     private static final Candidate OTHERS = new Candidate("", Party.OTHERS);
@@ -255,48 +274,52 @@ public class MultiResultScreen extends JPanel {
       this.incumbentMarker = incumbentMarker;
       setBackground(Color.WHITE);
       setLayout(new ResultPanelLayout());
+
+      Result result = new Result();
+      votes.getBinding().bind(result::setVotes);
+      winner.getBinding().bind(result::setWinner);
+      Binding<List<BarFrameBuilder.BasicBar>> bars =
+          Binding.propertyBinding(
+              result,
+              r -> {
+                int total = r.votes.values().stream().mapToInt(i -> i).sum();
+                return Aggregators.topAndOthers(r.votes, 5, Candidate.OTHERS, r.winner).entrySet()
+                    .stream()
+                    .sorted(
+                        Comparator.<Map.Entry<Candidate, Integer>>comparingInt(
+                                e ->
+                                    e.getKey() == Candidate.OTHERS
+                                        ? Integer.MIN_VALUE
+                                        : e.getValue())
+                            .reversed())
+                    .map(
+                        e -> {
+                          Candidate candidate = e.getKey();
+                          int votes = e.getValue();
+                          double pct = 1.0 * votes / total;
+                          return new BarFrameBuilder.BasicBar(
+                              candidate == Candidate.OTHERS
+                                  ? "OTHERS"
+                                  : (candidate.getName().toUpperCase()
+                                      + "\n"
+                                      + candidate.getParty().getAbbreviation()
+                                      + (candidate.isIncumbent() ? " " + incumbentMarker : "")),
+                              candidate.getParty().getColor(),
+                              Double.isNaN(pct) ? 0 : pct,
+                              Double.isNaN(pct)
+                                  ? "WAITING..."
+                                  : new DecimalFormat("#,##0").format(votes)
+                                      + "\n"
+                                      + new DecimalFormat("0.0%").format(pct),
+                              candidate == r.winner ? ImageGenerator.createHalfTickShape() : null);
+                        })
+                    .collect(Collectors.toList());
+              },
+              Result.Property.VOTES,
+              Result.Property.WINNER);
+
       barFrame =
-          BarFrameBuilder.basicWithShapes(
-                  votes
-                      .getBinding()
-                      .merge(
-                          winner.getBinding(),
-                          (m, w) -> {
-                            int total = m.values().stream().mapToInt(i -> i).sum();
-                            Map<Candidate, Integer> votesWithOthers =
-                                Aggregators.topAndOthers(m, 5, OTHERS, w);
-                            return votesWithOthers.entrySet().stream()
-                                .collect(
-                                    Collectors.toMap(
-                                        Map.Entry::getKey,
-                                        e ->
-                                            ImmutableTriple.of(
-                                                e.getValue(),
-                                                1.0 * e.getValue() / total,
-                                                e.getKey().equals(w)),
-                                        (a, b) -> {
-                                          throw new IllegalStateException(
-                                              "Unexpected duplicate key");
-                                        },
-                                        LinkedHashMap::new));
-                          }),
-                  p -> {
-                    if (p == OTHERS) return "OTHERS";
-                    return p.getName().toUpperCase()
-                        + "\n"
-                        + p.getParty().getAbbreviation()
-                        + (p.isIncumbent() ? " " + incumbentMarker : "");
-                  },
-                  p -> p.getParty().getColor(),
-                  v -> Double.isNaN(v.getMiddle()) ? 0 : v.getMiddle(),
-                  v ->
-                      Double.isNaN(v.getMiddle())
-                          ? "WAITING..."
-                          : new DecimalFormat("#,##0").format(v.getLeft())
-                              + "\n"
-                              + new DecimalFormat("0.0%").format(v.getMiddle()),
-                  (p, v) -> v.getRight() ? ImageGenerator.createHalfTickShape() : null,
-                  (p, v) -> Party.OTHERS.equals(p.getParty()) ? -1 : v.getLeft())
+          BarFrameBuilder.basic(bars)
               .withMax(pctReporting.getBinding().map(d -> 0.5 / Math.max(1e-6, d)))
               .build();
       add(barFrame);

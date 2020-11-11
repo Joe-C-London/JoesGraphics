@@ -73,6 +73,46 @@ public class BarFrameBuilder {
       Function<? super T, Color> colorFunc,
       Function<? super T, ? extends Number> valueFunc,
       Function<? super T, String> valueLabelFunc) {
+    return basicList(binding, labelFunc, colorFunc, valueFunc, valueLabelFunc, t -> null);
+  }
+
+  public static class BasicBar {
+    private final String label;
+    private final Color color;
+    private final Number value;
+    private final String valueLabel;
+    private final Shape shape;
+
+    public BasicBar(String label, Color color, Number value) {
+      this(label, color, value, value.toString());
+    }
+
+    public BasicBar(String label, Color color, Number value, String valueLabel) {
+      this(label, color, value, valueLabel, null);
+    }
+
+    public BasicBar(String label, Color color, Number value, String valueLabel, Shape shape) {
+      this.label = label;
+      this.color = color;
+      this.value = value;
+      this.valueLabel = valueLabel;
+      this.shape = shape;
+    }
+  }
+
+  public static BarFrameBuilder basic(Binding<? extends List<BasicBar>> binding) {
+    return basicList(
+        binding, b -> b.label, b -> b.color, b -> b.value, b -> b.valueLabel, b -> b.shape);
+  }
+
+  @Deprecated
+  public static <T> BarFrameBuilder basicList(
+      Binding<? extends List<? extends T>> binding,
+      Function<? super T, String> labelFunc,
+      Function<? super T, Color> colorFunc,
+      Function<? super T, ? extends Number> valueFunc,
+      Function<? super T, String> valueLabelFunc,
+      Function<? super T, Shape> shapeFunc) {
     BarFrameBuilder builder = new BarFrameBuilder();
     BarFrame barFrame = builder.barFrame;
     RangeFinder rangeFinder = builder.rangeFinder;
@@ -125,7 +165,7 @@ public class BarFrameBuilder {
                                 colorFunc.apply(e),
                                 valueFunc.apply(e),
                                 valueLabelFunc.apply(e),
-                                null))
+                                shapeFunc.apply(e)))
                     .collect(Collectors.toList()));
             rangeFinder.setHighest(
                 map.stream().map(valueFunc).mapToDouble(Number::doubleValue).reduce(0, Math::max));
@@ -136,6 +176,7 @@ public class BarFrameBuilder {
     return builder;
   }
 
+  @Deprecated
   public static <T> BarFrameBuilder basic(
       Binding<? extends Map<? extends T, ? extends Number>> binding,
       Function<? super T, String> labelFunc,
@@ -143,6 +184,7 @@ public class BarFrameBuilder {
     return basic(binding, labelFunc, colorFunc, Number::toString);
   }
 
+  @Deprecated
   public static <T> BarFrameBuilder basic(
       Binding<? extends Map<? extends T, ? extends Number>> binding,
       Function<? super T, String> labelFunc,
@@ -151,6 +193,7 @@ public class BarFrameBuilder {
     return basic(binding, labelFunc, colorFunc, Function.identity(), valueLabelFunc);
   }
 
+  @Deprecated
   public static <T, U> BarFrameBuilder basic(
       Binding<? extends Map<? extends T, ? extends U>> binding,
       Function<? super T, String> labelFunc,
@@ -161,6 +204,7 @@ public class BarFrameBuilder {
         binding, labelFunc, colorFunc, valueFunc, valueLabelFunc, (t, u) -> valueFunc.apply(u));
   }
 
+  @Deprecated
   public static <T, U> BarFrameBuilder basic(
       Binding<? extends Map<? extends T, ? extends U>> binding,
       Function<? super T, String> labelFunc,
@@ -172,6 +216,7 @@ public class BarFrameBuilder {
         binding, labelFunc, colorFunc, valueFunc, valueLabelFunc, (x, y) -> null, sortFunc);
   }
 
+  @Deprecated
   public static <T, U extends Number> BarFrameBuilder basicWithShapes(
       Binding<? extends Map<? extends T, ? extends U>> binding,
       Function<? super T, String> labelFunc,
@@ -182,6 +227,7 @@ public class BarFrameBuilder {
         binding, labelFunc, colorFunc, Function.identity(), valueLabelFunc, shapeFunc);
   }
 
+  @Deprecated
   public static <T, U> BarFrameBuilder basicWithShapes(
       Binding<? extends Map<? extends T, ? extends U>> binding,
       Function<? super T, String> labelFunc,
@@ -199,6 +245,7 @@ public class BarFrameBuilder {
         (t, u) -> valueFunc.apply(u));
   }
 
+  @Deprecated
   public static <T, U> BarFrameBuilder basicWithShapes(
       Binding<? extends Map<? extends T, ? extends U>> binding,
       Function<? super T, String> labelFunc,
@@ -280,6 +327,7 @@ public class BarFrameBuilder {
     return builder;
   }
 
+  @Deprecated
   public static <T> BarFrameBuilder dual(
       Binding<? extends Map<? extends T, ? extends Pair<? extends Number, ? extends Number>>>
           binding,
@@ -290,6 +338,7 @@ public class BarFrameBuilder {
     return dual(binding, labelFunc, colorFunc, Function.identity(), valueLabelFunc, sortFunc);
   }
 
+  @Deprecated
   public static <T, U> BarFrameBuilder dual(
       Binding<? extends Map<? extends T, ? extends U>> binding,
       Function<? super T, String> labelFunc,
@@ -301,6 +350,7 @@ public class BarFrameBuilder {
         binding, labelFunc, colorFunc, valueFunc, valueLabelFunc, (k, v) -> sortFunc.apply(v));
   }
 
+  @Deprecated
   public static <T, U> BarFrameBuilder dual(
       Binding<? extends Map<? extends T, ? extends U>> binding,
       Function<? super T, String> labelFunc,
@@ -312,6 +362,7 @@ public class BarFrameBuilder {
         binding, labelFunc, colorFunc, valueFunc, valueLabelFunc, (k, v) -> null, sortFunc);
   }
 
+  @Deprecated
   public static <T, U> BarFrameBuilder dualWithShapes(
       Binding<? extends Map<? extends T, ? extends U>> binding,
       Function<? super T, String> labelFunc,

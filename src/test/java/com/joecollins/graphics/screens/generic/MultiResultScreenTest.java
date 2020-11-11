@@ -18,6 +18,8 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Test;
 
 public class MultiResultScreenTest {
@@ -168,18 +170,7 @@ public class MultiResultScreenTest {
                 d -> d.getStatus())
             .withIncumbentMarker("(MLA)")
             .withPctReporting(d -> d.getPctReporting())
-            .withWinner(
-                d ->
-                    d.getVotes()
-                        .merge(
-                            d.getLeaderHasWon(),
-                            (v, w) ->
-                                w
-                                    ? v.entrySet().stream()
-                                        .max(Map.Entry.comparingByValue())
-                                        .orElseThrow()
-                                        .getKey()
-                                    : null))
+            .withWinner(d -> d.getWinner())
             .withPrev(
                 d -> Binding.fixedBinding(d.prevVotes),
                 d -> Binding.fixedBinding("SWING SINCE 2015"),
@@ -188,18 +179,12 @@ public class MultiResultScreenTest {
                 d -> shapesByDistrict,
                 d -> d.districtNum,
                 d ->
-                    d.getVotes()
-                        .merge(
-                            d.getLeaderHasWon(),
-                            (v, w) ->
+                    d.getLeader()
+                        .map(
+                            e ->
                                 new MapBuilder.Result(
-                                    v.entrySet().stream()
-                                        .filter(e -> e.getValue() > 0)
-                                        .max(Map.Entry.comparingByValue())
-                                        .map(Map.Entry::getKey)
-                                        .map(Candidate::getParty)
-                                        .orElse(null),
-                                    w)),
+                                    e.getLeft() == null ? null : e.getLeft().getParty(),
+                                    e.getRight())),
                 d ->
                     d.districtNum < 10
                         ? List.of(1, 2, 3, 4, 5, 6, 7, 8)
@@ -454,6 +439,33 @@ public class MultiResultScreenTest {
 
     public Binding<Boolean> getLeaderHasWon() {
       return Binding.propertyBinding(this, t -> t.leaderHasWon, Property.PROP);
+    }
+
+    public Binding<Candidate> getWinner() {
+      return Binding.propertyBinding(
+          this,
+          t ->
+              leaderHasWon
+                  ? votes.entrySet().stream()
+                      .max(Map.Entry.comparingByValue())
+                      .orElseThrow()
+                      .getKey()
+                  : null,
+          Property.PROP);
+    }
+
+    public Binding<Pair<Candidate, Boolean>> getLeader() {
+      return Binding.propertyBinding(
+          this,
+          t ->
+              ImmutablePair.of(
+                  votes.entrySet().stream()
+                      .filter(e -> e.getValue() > 0)
+                      .max(Map.Entry.comparingByValue())
+                      .map(Map.Entry::getKey)
+                      .orElse(null),
+                  leaderHasWon),
+          Property.PROP);
     }
 
     public void update(String status, double pctReporting, Map<Candidate, Integer> votes) {
