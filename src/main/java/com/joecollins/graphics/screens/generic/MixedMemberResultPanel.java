@@ -1,12 +1,12 @@
 package com.joecollins.graphics.screens.generic;
 
+import com.joecollins.bindings.Bindable;
 import com.joecollins.bindings.Binding;
 import com.joecollins.bindings.BindingReceiver;
 import com.joecollins.graphics.ImageGenerator;
 import com.joecollins.graphics.components.BarFrame;
 import com.joecollins.graphics.components.BarFrameBuilder;
 import com.joecollins.graphics.components.MapFrame;
-import com.joecollins.graphics.screens.generic.MapBuilder.Result;
 import com.joecollins.graphics.utils.StandardFont;
 import com.joecollins.models.general.Candidate;
 import com.joecollins.models.general.Party;
@@ -18,16 +18,16 @@ import java.awt.Dimension;
 import java.awt.LayoutManager;
 import java.awt.Shape;
 import java.text.DecimalFormat;
-import java.util.LinkedHashMap;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.ImmutableTriple;
-import org.apache.commons.lang3.tuple.Pair;
-import org.apache.commons.lang3.tuple.Triple;
 
 public class MixedMemberResultPanel extends JPanel {
 
@@ -199,7 +199,7 @@ public class MixedMemberResultPanel extends JPanel {
     public <T> Builder withResultMap(
         Binding<Map<T, Shape>> shapes,
         Binding<T> selectedShape,
-        Binding<Result> leadingParty,
+        Binding<MapBuilder.Result> leadingParty,
         Binding<List<T>> focus,
         Binding<String> header) {
       this.mapBuilder = new MapBuilder(shapes, selectedShape, leadingParty, focus, header);
@@ -209,7 +209,7 @@ public class MixedMemberResultPanel extends JPanel {
     public <T> Builder withResultMap(
         Binding<Map<T, Shape>> shapes,
         Binding<T> selectedShape,
-        Binding<Result> leadingParty,
+        Binding<MapBuilder.Result> leadingParty,
         Binding<List<T>> focus,
         Binding<List<T>> additionalHighlight,
         Binding<String> header) {
@@ -228,6 +228,26 @@ public class MixedMemberResultPanel extends JPanel {
           createMapFrame());
     }
 
+    private static class Result extends Bindable {
+      private enum Property {
+        VOTES,
+        WINNER
+      }
+
+      private Map<Candidate, Integer> votes = new HashMap<>();
+      private Candidate winner = null;
+
+      public void setVotes(Map<Candidate, Integer> votes) {
+        this.votes = votes;
+        onPropertyRefreshed(Property.VOTES);
+      }
+
+      public void setWinner(Candidate winner) {
+        this.winner = winner;
+        onPropertyRefreshed(Property.WINNER);
+      }
+    }
+
     private BarFrame createCandidateVotes() {
       Binding<Candidate> winnerBinding =
           winner == null ? Binding.fixedBinding(null) : winner.getBinding();
@@ -238,55 +258,58 @@ public class MixedMemberResultPanel extends JPanel {
               : (showBothLines
                   ? ImageGenerator.createHalfTickShape()
                   : ImageGenerator.createTickShape());
-      return BarFrameBuilder.basicWithShapes(
-              candidateVotes
-                  .getBinding()
-                  .merge(
-                      winnerBinding,
-                      (v, w) -> {
-                        int total = v.values().stream().mapToInt(i -> i).sum();
-                        LinkedHashMap<Candidate, Triple<Integer, Double, Boolean>> ret =
-                            new LinkedHashMap<>();
-                        for (var e : v.entrySet()) {
-                          ret.put(
-                              e.getKey(),
-                              ImmutableTriple.of(
-                                  e.getValue(),
-                                  total == 0 ? Double.NaN : (1.0 * e.getValue() / total),
-                                  e.getKey().equals(w)));
-                        }
-                        return ret;
-                      }),
-              c -> {
-                if (showBothLines) {
-                  return c.getName().toUpperCase()
-                      + (c.isIncumbent() ? incumbentMarker : "")
-                      + "\n"
-                      + c.getParty().getName().toUpperCase();
-                }
-                return c.getName().toUpperCase()
-                    + (c.isIncumbent() ? incumbentMarker : "")
-                    + " ("
-                    + c.getParty().getAbbreviation().toUpperCase()
-                    + ")";
+
+      Result result = new Result();
+      candidateVotes.getBinding().bind(result::setVotes);
+      winnerBinding.bind(result::setWinner);
+      Binding<List<BarFrameBuilder.BasicBar>> bars =
+          Binding.propertyBinding(
+              result,
+              r -> {
+                int total = r.votes.values().stream().mapToInt(i -> i).sum();
+                return r.votes.entrySet().stream()
+                    .sorted(Map.Entry.<Candidate, Integer>comparingByValue().reversed())
+                    .map(
+                        e -> {
+                          var candidate = e.getKey();
+                          int votes = e.getValue();
+                          double pct = 1.0 * e.getValue() / total;
+                          String leftLabel;
+                          String rightLabel;
+                          if (showBothLines) {
+                            leftLabel =
+                                candidate.getName().toUpperCase()
+                                    + (candidate.isIncumbent() ? incumbentMarker : "")
+                                    + "\n"
+                                    + candidate.getParty().getName().toUpperCase();
+                            rightLabel =
+                                THOUSANDS_FORMAT.format(votes) + "\n" + PCT_FORMAT.format(pct);
+                          } else {
+                            leftLabel =
+                                candidate.getName().toUpperCase()
+                                    + (candidate.isIncumbent() ? incumbentMarker : "")
+                                    + " ("
+                                    + candidate.getParty().getAbbreviation().toUpperCase()
+                                    + ")";
+                            rightLabel =
+                                THOUSANDS_FORMAT.format(votes)
+                                    + " ("
+                                    + PCT_FORMAT.format(pct)
+                                    + ")";
+                          }
+                          return new BarFrameBuilder.BasicBar(
+                              leftLabel,
+                              candidate.getParty().getColor(),
+                              Double.isNaN(pct) ? 0 : pct,
+                              Double.isNaN(pct) ? "WAITING..." : rightLabel,
+                              candidate == r.winner ? shape : null);
+                        })
+                    .collect(Collectors.toList());
               },
-              c -> c.getParty().getColor(),
-              v -> Double.isNaN(v.getMiddle()) ? 0 : v.getMiddle(),
-              v -> {
-                if (Double.isNaN(v.getMiddle())) {
-                  return "WAITING...";
-                }
-                if (showBothLines) {
-                  return THOUSANDS_FORMAT.format(v.getLeft())
-                      + "\n"
-                      + PCT_FORMAT.format(v.getMiddle());
-                }
-                return THOUSANDS_FORMAT.format(v.getLeft())
-                    + " ("
-                    + PCT_FORMAT.format(v.getMiddle())
-                    + ")";
-              },
-              (c, v) -> v.getRight() ? shape : null)
+              Result.Property.VOTES,
+              Result.Property.WINNER);
+
+      return BarFrameBuilder.basic(bars)
           .withHeader(candidateVoteHeader.getBinding())
           .withSubhead(candidateVoteSubheader.getBinding())
           .withMax(
@@ -296,43 +319,79 @@ public class MixedMemberResultPanel extends JPanel {
           .build();
     }
 
+    private static class Change<C> extends Bindable {
+      private enum Property {
+        CURR,
+        PREV
+      }
+
+      private Map<C, Integer> curr = new HashMap<>();
+      private Map<Party, Integer> prev = new HashMap<>();
+
+      public void setCurr(Map<C, Integer> curr) {
+        this.curr = curr;
+        onPropertyRefreshed(Property.CURR);
+      }
+
+      public void setPrev(Map<Party, Integer> prev) {
+        this.prev = prev;
+        onPropertyRefreshed(Property.PREV);
+      }
+    }
+
     private BarFrame createCandidateChange() {
       if (candidatePrev == null) {
         return null;
       }
-      return BarFrameBuilder.basic(
-              candidateVotes
-                  .getBinding()
-                  .merge(
-                      candidatePrev.getBinding(),
-                      (c, p) -> {
-                        int currTotal = c.values().stream().mapToInt(i -> i).sum();
-                        int prevTotal = p.values().stream().mapToInt(i -> i).sum();
-                        LinkedHashMap<Party, Pair<Integer, Double>> ret = new LinkedHashMap<>();
-                        if (currTotal == 0) {
-                          return ret;
-                        }
-                        for (var e : c.entrySet()) {
-                          ret.put(
-                              e.getKey().getParty(),
-                              ImmutablePair.of(
-                                  e.getValue(),
+
+      Change<Candidate> change = new Change<>();
+      candidateVotes.getBinding().bind(change::setCurr);
+      candidatePrev.getBinding().bind(change::setPrev);
+      Binding<List<BarFrameBuilder.BasicBar>> bars =
+          Binding.propertyBinding(
+              change,
+              r -> {
+                int currTotal = r.curr.values().stream().mapToInt(i -> i).sum();
+                if (currTotal == 0) {
+                  return List.of();
+                }
+                int prevTotal = r.prev.values().stream().mapToInt(i -> i).sum();
+                Set<Party> currParties =
+                    r.curr.keySet().stream().map(Candidate::getParty).collect(Collectors.toSet());
+                var matchingBars =
+                    r.curr.entrySet().stream()
+                        .sorted(Map.Entry.<Candidate, Integer>comparingByValue().reversed())
+                        .map(
+                            e -> {
+                              double pct =
                                   1.0 * e.getValue() / currTotal
                                       - 1.0
-                                          * p.getOrDefault(e.getKey().getParty(), 0)
-                                          / prevTotal));
-                        }
-                        for (var e : p.entrySet()) {
-                          ret.putIfAbsent(
-                              e.getKey(), ImmutablePair.of(0, -1.0 * e.getValue() / prevTotal));
-                        }
-                        return ret;
-                      }),
-              p -> p.getAbbreviation().toUpperCase(),
-              Party::getColor,
-              v -> v.getRight(),
-              v -> PCT_DIFF_FORMAT.format(v.getRight()),
-              (p, v) -> v.getLeft())
+                                          * r.prev.getOrDefault(e.getKey().getParty(), 0)
+                                          / prevTotal;
+                              return new BarFrameBuilder.BasicBar(
+                                  e.getKey().getParty().getAbbreviation().toUpperCase(),
+                                  e.getKey().getParty().getColor(),
+                                  pct,
+                                  PCT_DIFF_FORMAT.format(pct));
+                            });
+                var nonMatchingBars =
+                    r.prev.entrySet().stream()
+                        .filter(e -> !currParties.contains(e.getKey()))
+                        .map(
+                            e -> {
+                              double pct = -1.0 * e.getValue() / prevTotal;
+                              return new BarFrameBuilder.BasicBar(
+                                  e.getKey().getAbbreviation().toUpperCase(),
+                                  e.getKey().getColor(),
+                                  pct,
+                                  PCT_DIFF_FORMAT.format(pct));
+                            });
+                return Stream.concat(matchingBars, nonMatchingBars).collect(Collectors.toList());
+              },
+              Change.Property.CURR,
+              Change.Property.PREV);
+
+      return BarFrameBuilder.basic(bars)
           .withHeader(candidateChangeHeader.getBinding())
           .withWingspan(
               candidatePctReporting == null
@@ -346,27 +405,30 @@ public class MixedMemberResultPanel extends JPanel {
               partyVotes.getBinding(
                   v -> {
                     int total = v.values().stream().mapToInt(i -> i).sum();
-                    LinkedHashMap<Party, Pair<Integer, Double>> ret = new LinkedHashMap<>();
-                    for (var e : v.entrySet()) {
-                      ret.put(
-                          e.getKey(),
-                          ImmutablePair.of(
-                              e.getValue(),
-                              total == 0 ? Double.NaN : (1.0 * e.getValue() / total)));
-                    }
-                    return ret;
-                  }),
-              p -> p.getName().toUpperCase(),
-              Party::getColor,
-              v -> Double.isNaN(v.getRight()) ? 0 : v.getRight(),
-              v ->
-                  Double.isNaN(v.getRight())
-                      ? "WAITING..."
-                      : (THOUSANDS_FORMAT.format(v.getLeft())
-                          + " ("
-                          + PCT_FORMAT.format(v.getRight())
-                          + ")"),
-              (p, v) -> p == Party.OTHERS ? -1 : v.getLeft())
+                    return v.entrySet().stream()
+                        .sorted(
+                            Comparator.<Map.Entry<Party, Integer>>comparingInt(
+                                    e ->
+                                        e.getKey() == Party.OTHERS
+                                            ? Integer.MIN_VALUE
+                                            : e.getValue())
+                                .reversed())
+                        .map(
+                            e -> {
+                              double pct = 1.0 * e.getValue() / total;
+                              return new BarFrameBuilder.BasicBar(
+                                  e.getKey().getName().toUpperCase(),
+                                  e.getKey().getColor(),
+                                  Double.isNaN(pct) ? 0 : pct,
+                                  Double.isNaN(pct)
+                                      ? "WAITING..."
+                                      : (THOUSANDS_FORMAT.format(e.getValue())
+                                          + " ("
+                                          + PCT_FORMAT.format(pct)
+                                          + ")"));
+                            })
+                        .collect(Collectors.toList());
+                  }))
           .withHeader(partyVoteHeader.getBinding())
           .withMax(
               partyPctReporting == null
@@ -379,37 +441,59 @@ public class MixedMemberResultPanel extends JPanel {
       if (partyPrev == null) {
         return null;
       }
-      return BarFrameBuilder.basic(
-              partyVotes
-                  .getBinding()
-                  .merge(
-                      partyPrev.getBinding(),
-                      (c, p) -> {
-                        int currTotal = c.values().stream().mapToInt(i -> i).sum();
-                        int prevTotal = p.values().stream().mapToInt(i -> i).sum();
-                        LinkedHashMap<Party, Pair<Integer, Double>> ret = new LinkedHashMap<>();
-                        if (currTotal == 0) {
-                          return ret;
-                        }
-                        for (var e : c.entrySet()) {
-                          ret.put(
-                              e.getKey(),
-                              ImmutablePair.of(
-                                  e.getValue(),
+
+      Change<Party> change = new Change<>();
+      partyVotes.getBinding().bind(change::setCurr);
+      partyPrev.getBinding().bind(change::setPrev);
+      Binding<List<BarFrameBuilder.BasicBar>> bars =
+          Binding.propertyBinding(
+              change,
+              r -> {
+                var c = r.curr;
+                var p = r.prev;
+                int currTotal = c.values().stream().mapToInt(i -> i).sum();
+                if (currTotal == 0) {
+                  return List.of();
+                }
+                int prevTotal = p.values().stream().mapToInt(i -> i).sum();
+                var presentBars =
+                    c.entrySet().stream()
+                        .sorted(
+                            Comparator.<Map.Entry<Party, Integer>>comparingInt(
+                                    e ->
+                                        e.getKey() == Party.OTHERS
+                                            ? Integer.MIN_VALUE
+                                            : e.getValue())
+                                .reversed())
+                        .map(
+                            e -> {
+                              double pct =
                                   1.0 * e.getValue() / currTotal
-                                      - 1.0 * p.getOrDefault(e.getKey(), 0) / prevTotal));
-                        }
-                        for (var e : p.entrySet()) {
-                          ret.putIfAbsent(
-                              e.getKey(), ImmutablePair.of(0, -1.0 * e.getValue() / prevTotal));
-                        }
-                        return ret;
-                      }),
-              p -> p.getAbbreviation().toUpperCase(),
-              Party::getColor,
-              v -> v.getRight(),
-              v -> PCT_DIFF_FORMAT.format(v.getRight()),
-              (p, v) -> p == Party.OTHERS ? -1 : v.getLeft())
+                                      - 1.0 * p.getOrDefault(e.getKey(), 0) / prevTotal;
+                              return new BarFrameBuilder.BasicBar(
+                                  e.getKey().getAbbreviation().toUpperCase(),
+                                  e.getKey().getColor(),
+                                  pct,
+                                  PCT_DIFF_FORMAT.format(pct));
+                            });
+                var absentBars =
+                    p.entrySet().stream()
+                        .filter(e -> !c.containsKey(e.getKey()))
+                        .map(
+                            e -> {
+                              double pct = -1.0 * e.getValue() / currTotal;
+                              return new BarFrameBuilder.BasicBar(
+                                  e.getKey().getAbbreviation().toUpperCase(),
+                                  e.getKey().getColor(),
+                                  pct,
+                                  PCT_DIFF_FORMAT.format(pct));
+                            });
+                return Stream.concat(presentBars, absentBars).collect(Collectors.toList());
+              },
+              Change.Property.CURR,
+              Change.Property.PREV);
+
+      return BarFrameBuilder.basic(bars)
           .withHeader(partyChangeHeader.getBinding())
           .withWingspan(
               partyPctReporting == null
