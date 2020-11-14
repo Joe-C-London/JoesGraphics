@@ -40,6 +40,10 @@ public interface Binding<T> {
     };
   }
 
+  default <R> Binding<R> mapNonNull(Function<T, R> func) {
+    return map(t -> t == null ? null : func.apply(t));
+  }
+
   default <U, R> Binding<R> merge(Binding<U> other, BiFunction<T, U, R> func) {
     Binding<T> me = this;
     return new Binding<R>() {

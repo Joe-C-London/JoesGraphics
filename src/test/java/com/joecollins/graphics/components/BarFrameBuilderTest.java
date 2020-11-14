@@ -10,9 +10,11 @@ import java.awt.Color;
 import java.awt.geom.Rectangle2D.Double;
 import java.text.DecimalFormat;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.commons.lang3.tuple.Pair;
@@ -37,7 +39,23 @@ public class BarFrameBuilderTest {
   public void testSimpleBars() {
     BindableWrapper<Map<Pair<String, Color>, Integer>> result = new BindableWrapper<>();
     BarFrame frame =
-        BarFrameBuilder.basic(result.getBinding(), Pair::getLeft, Pair::getRight, THOUSANDS::format)
+        BarFrameBuilder.basic(
+                result
+                    .getBinding()
+                    .mapNonNull(
+                        map ->
+                            map.entrySet().stream()
+                                .sorted(
+                                    Map.Entry.<Pair<String, Color>, Integer>comparingByValue()
+                                        .reversed())
+                                .map(
+                                    e ->
+                                        new BarFrameBuilder.BasicBar(
+                                            e.getKey().getLeft(),
+                                            e.getKey().getValue(),
+                                            e.getValue(),
+                                            THOUSANDS.format(e.getValue())))
+                                .collect(Collectors.toList())))
             .build();
     assertEquals(0, frame.getNumBars());
     assertEquals(0, frame.getNumLines());
@@ -67,11 +85,24 @@ public class BarFrameBuilderTest {
     BindableWrapper<Map<Pair<String, Color>, Wrapper<Integer>>> result = new BindableWrapper<>();
     BarFrame frame =
         BarFrameBuilder.basic(
-                result.getBinding(),
-                Pair::getLeft,
-                Pair::getRight,
-                v -> v.value,
-                v -> THOUSANDS.format(v.value))
+                result
+                    .getBinding()
+                    .mapNonNull(
+                        map ->
+                            map.entrySet().stream()
+                                .sorted(
+                                    Comparator
+                                        .<Map.Entry<Pair<String, Color>, Wrapper<Integer>>>
+                                            comparingInt(e -> e.getValue().value)
+                                        .reversed())
+                                .map(
+                                    e ->
+                                        new BarFrameBuilder.BasicBar(
+                                            e.getKey().getLeft(),
+                                            e.getKey().getRight(),
+                                            e.getValue().value,
+                                            THOUSANDS.format(e.getValue().value)))
+                                .collect(Collectors.toList())))
             .build();
     assertEquals(0, frame.getNumBars());
     assertEquals(0, frame.getNumLines());
@@ -102,7 +133,23 @@ public class BarFrameBuilderTest {
     BindableWrapper<Integer> max = new BindableWrapper<>();
     max.setValue(2500);
     BarFrame frame =
-        BarFrameBuilder.basic(result.getBinding(), Pair::getLeft, Pair::getRight, THOUSANDS::format)
+        BarFrameBuilder.basic(
+                result
+                    .getBinding()
+                    .mapNonNull(
+                        map ->
+                            map.entrySet().stream()
+                                .sorted(
+                                    Map.Entry.<Pair<String, Color>, Integer>comparingByValue()
+                                        .reversed())
+                                .map(
+                                    e ->
+                                        new BarFrameBuilder.BasicBar(
+                                            e.getKey().getLeft(),
+                                            e.getKey().getRight(),
+                                            e.getValue(),
+                                            THOUSANDS.format(e.getValue())))
+                                .collect(Collectors.toList())))
             .withMax(max.getBinding())
             .build();
     assertEquals(0, frame.getMin().intValue());
@@ -149,7 +196,23 @@ public class BarFrameBuilderTest {
     BindableWrapper<Color> subheadColor = new BindableWrapper<>();
     subheadColor.setValue(Color.GRAY);
     BarFrame frame =
-        BarFrameBuilder.basic(result.getBinding(), Pair::getLeft, Pair::getRight, THOUSANDS::format)
+        BarFrameBuilder.basic(
+                result
+                    .getBinding()
+                    .mapNonNull(
+                        map ->
+                            map.entrySet().stream()
+                                .sorted(
+                                    Map.Entry.<Pair<String, Color>, Integer>comparingByValue()
+                                        .reversed())
+                                .map(
+                                    e ->
+                                        new BarFrameBuilder.BasicBar(
+                                            e.getKey().getLeft(),
+                                            e.getKey().getRight(),
+                                            e.getValue(),
+                                            THOUSANDS.format(e.getValue())))
+                                .collect(Collectors.toList())))
             .withHeader(header.getBinding())
             .withSubhead(subhead.getBinding())
             .withNotes(notes.getBinding())
@@ -184,7 +247,23 @@ public class BarFrameBuilderTest {
     BindableWrapper<Integer> target = new BindableWrapper<>();
     target.setValue(2382);
     BarFrame frame =
-        BarFrameBuilder.basic(result.getBinding(), Pair::getLeft, Pair::getRight, THOUSANDS::format)
+        BarFrameBuilder.basic(
+                result
+                    .getBinding()
+                    .mapNonNull(
+                        map ->
+                            map.entrySet().stream()
+                                .sorted(
+                                    Map.Entry.<Pair<String, Color>, Integer>comparingByValue()
+                                        .reversed())
+                                .map(
+                                    e ->
+                                        new BarFrameBuilder.BasicBar(
+                                            e.getKey().getLeft(),
+                                            e.getKey().getRight(),
+                                            e.getValue(),
+                                            THOUSANDS.format(e.getValue())))
+                                .collect(Collectors.toList())))
             .withTarget(target.getBinding(), t -> THOUSANDS.format(t) + " TO WIN")
             .build();
     assertEquals(1, frame.getNumLines());
@@ -197,7 +276,23 @@ public class BarFrameBuilderTest {
     BindableWrapper<Map<Pair<String, Color>, Integer>> result = new BindableWrapper<>();
     BindableList<Integer> lines = new BindableList<>();
     BarFrame frame =
-        BarFrameBuilder.basic(result.getBinding(), Pair::getLeft, Pair::getRight, THOUSANDS::format)
+        BarFrameBuilder.basic(
+                result
+                    .getBinding()
+                    .mapNonNull(
+                        map ->
+                            map.entrySet().stream()
+                                .sorted(
+                                    Map.Entry.<Pair<String, Color>, Integer>comparingByValue()
+                                        .reversed())
+                                .map(
+                                    e ->
+                                        new BarFrameBuilder.BasicBar(
+                                            e.getKey().getLeft(),
+                                            e.getKey().getRight(),
+                                            e.getValue(),
+                                            THOUSANDS.format(e.getValue())))
+                                .collect(Collectors.toList())))
             .withLines(lines, t -> t + " QUOTA" + (t == 1 ? "" : "S"))
             .build();
     assertEquals(0, frame.getNumLines());
@@ -224,7 +319,23 @@ public class BarFrameBuilderTest {
     BindableWrapper<List<Integer>> lines = new BindableWrapper<>();
     lines.setValue(List.of());
     BarFrame frame =
-        BarFrameBuilder.basic(result.getBinding(), Pair::getLeft, Pair::getRight, THOUSANDS::format)
+        BarFrameBuilder.basic(
+                result
+                    .getBinding()
+                    .mapNonNull(
+                        map ->
+                            map.entrySet().stream()
+                                .sorted(
+                                    Map.Entry.<Pair<String, Color>, Integer>comparingByValue()
+                                        .reversed())
+                                .map(
+                                    e ->
+                                        new BarFrameBuilder.BasicBar(
+                                            e.getKey().getLeft(),
+                                            e.getKey().getRight(),
+                                            e.getValue(),
+                                            THOUSANDS.format(e.getValue())))
+                                .collect(Collectors.toList())))
             .withLines(lines.getBinding(), t -> t + " QUOTA" + (t == 1 ? "" : "S"))
             .build();
     assertEquals(0, frame.getNumLines());
@@ -251,13 +362,26 @@ public class BarFrameBuilderTest {
         new BindableWrapper<>();
     Double shape = new Double(0, 0, 1, 1);
     BarFrame frame =
-        BarFrameBuilder.basicWithShapes(
-                result.getBinding(),
-                Pair::getLeft,
-                Pair::getRight,
-                Pair::getLeft,
-                v -> THOUSANDS.format(v.getLeft()),
-                (c, v) -> v.getRight() ? shape : null)
+        BarFrameBuilder.basic(
+                result
+                    .getBinding()
+                    .mapNonNull(
+                        map ->
+                            map.entrySet().stream()
+                                .sorted(
+                                    Comparator
+                                        .<Map.Entry<Pair<String, Color>, Pair<Integer, Boolean>>>
+                                            comparingInt(e -> e.getValue().getLeft())
+                                        .reversed())
+                                .map(
+                                    e ->
+                                        new BarFrameBuilder.BasicBar(
+                                            e.getKey().getLeft(),
+                                            e.getKey().getRight(),
+                                            e.getValue().getLeft(),
+                                            THOUSANDS.format(e.getValue().getLeft()),
+                                            e.getValue().getRight() ? shape : null))
+                                .collect(Collectors.toList())))
             .build();
     assertEquals(0, frame.getNumBars());
     assertEquals(0, frame.getNumLines());
@@ -287,12 +411,24 @@ public class BarFrameBuilderTest {
         new BindableWrapper<>();
     BarFrame frame =
         BarFrameBuilder.basic(
-                result.getBinding(),
-                Pair::getLeft,
-                Pair::getRight,
-                Pair::getRight,
-                p -> DIFF.format(p.getRight()),
-                (p, v) -> v.getLeft())
+                result
+                    .getBinding()
+                    .mapNonNull(
+                        map ->
+                            map.entrySet().stream()
+                                .sorted(
+                                    Comparator
+                                        .<Map.Entry<Pair<String, Color>, Pair<Integer, Integer>>>
+                                            comparingInt(e -> e.getValue().getLeft())
+                                        .reversed())
+                                .map(
+                                    e ->
+                                        new BarFrameBuilder.BasicBar(
+                                            e.getKey().getLeft(),
+                                            e.getKey().getRight(),
+                                            e.getValue().getRight(),
+                                            DIFF.format(e.getValue().getRight())))
+                                .collect(Collectors.toList())))
             .build();
     assertEquals(0, frame.getNumBars());
     assertEquals(0, frame.getNumLines());
@@ -353,12 +489,24 @@ public class BarFrameBuilderTest {
     range.setValue(10);
     BarFrame frame =
         BarFrameBuilder.basic(
-                result.getBinding(),
-                Pair::getLeft,
-                Pair::getRight,
-                Pair::getRight,
-                p -> DIFF.format(p.getRight()),
-                (p, v) -> v.getLeft())
+                result
+                    .getBinding()
+                    .mapNonNull(
+                        map ->
+                            map.entrySet().stream()
+                                .sorted(
+                                    Comparator
+                                        .<Map.Entry<Pair<String, Color>, Pair<Integer, Integer>>>
+                                            comparingInt(e -> e.getValue().getLeft())
+                                        .reversed())
+                                .map(
+                                    e ->
+                                        new BarFrameBuilder.BasicBar(
+                                            e.getKey().getLeft(),
+                                            e.getKey().getRight(),
+                                            e.getValue().getRight(),
+                                            DIFF.format(e.getValue().getRight())))
+                                .collect(Collectors.toList())))
             .withWingspan(range.getBinding())
             .build();
     assertEquals(-10, frame.getMin().intValue());
@@ -389,11 +537,25 @@ public class BarFrameBuilderTest {
         new BindableWrapper<>();
     BarFrame frame =
         BarFrameBuilder.dual(
-                result.getBinding(),
-                Pair::getLeft,
-                Pair::getRight,
-                p -> p.getLeft() + "/" + p.getRight(),
-                Pair::getRight)
+                result
+                    .getBinding()
+                    .mapNonNull(
+                        map ->
+                            map.entrySet().stream()
+                                .sorted(
+                                    Comparator
+                                        .<Map.Entry<Pair<String, Color>, Pair<Integer, Integer>>>
+                                            comparingInt(e -> e.getValue().getRight())
+                                        .reversed())
+                                .map(
+                                    e ->
+                                        new BarFrameBuilder.DualBar(
+                                            e.getKey().getLeft(),
+                                            e.getKey().getRight(),
+                                            e.getValue().getLeft(),
+                                            e.getValue().getRight(),
+                                            e.getValue().getLeft() + "/" + e.getValue().getRight()))
+                                .collect(Collectors.toList())))
             .build();
     assertEquals(0, frame.getNumBars());
     assertEquals(0, frame.getNumLines());
@@ -473,12 +635,29 @@ public class BarFrameBuilderTest {
         new BindableWrapper<>();
     BarFrame frame =
         BarFrameBuilder.dual(
-                result.getBinding(),
-                Pair::getLeft,
-                Pair::getRight,
-                t -> ImmutablePair.of(t.getLeft(), t.getMiddle()),
-                t -> DIFF.format(t.getLeft()) + "/" + DIFF.format(t.getMiddle()),
-                Triple::getRight)
+                result
+                    .getBinding()
+                    .mapNonNull(
+                        map ->
+                            map.entrySet().stream()
+                                .sorted(
+                                    Comparator
+                                        .<Map.Entry<
+                                                Pair<String, Color>,
+                                                Triple<Integer, Integer, Integer>>>
+                                            comparingInt(e -> e.getValue().getRight())
+                                        .reversed())
+                                .map(
+                                    e ->
+                                        new BarFrameBuilder.DualBar(
+                                            e.getKey().getLeft(),
+                                            e.getKey().getRight(),
+                                            e.getValue().getLeft(),
+                                            e.getValue().getMiddle(),
+                                            DIFF.format(e.getValue().getLeft())
+                                                + "/"
+                                                + DIFF.format(e.getValue().getMiddle())))
+                                .collect(Collectors.toList())))
             .build();
     assertEquals(0, frame.getNumBars());
     assertEquals(0, frame.getNumLines());
@@ -565,12 +744,31 @@ public class BarFrameBuilderTest {
         new BindableWrapper<>();
     BarFrame frame =
         BarFrameBuilder.dual(
-                result.getBinding(),
-                Pair::getLeft,
-                Pair::getRight,
-                t -> ImmutablePair.of(t.getLeft(), t.getMiddle()),
-                t -> "(" + DIFF.format(t.getLeft()) + ")-(" + DIFF.format(t.getMiddle()) + ")",
-                Triple::getRight)
+                result
+                    .getBinding()
+                    .mapNonNull(
+                        map ->
+                            map.entrySet().stream()
+                                .sorted(
+                                    Comparator
+                                        .<Map.Entry<
+                                                Pair<String, Color>,
+                                                Triple<Integer, Integer, Integer>>>
+                                            comparingInt(e -> e.getValue().getRight())
+                                        .reversed())
+                                .map(
+                                    e ->
+                                        new BarFrameBuilder.DualBar(
+                                            e.getKey().getLeft(),
+                                            e.getKey().getRight(),
+                                            e.getValue().getLeft(),
+                                            e.getValue().getMiddle(),
+                                            "("
+                                                + DIFF.format(e.getValue().getLeft())
+                                                + ")-("
+                                                + DIFF.format(e.getValue().getMiddle())
+                                                + ")"))
+                                .collect(Collectors.toList())))
             .build();
     assertEquals(0, frame.getNumBars());
     assertEquals(0, frame.getNumLines());
@@ -788,45 +986,6 @@ public class BarFrameBuilderTest {
     doAssert.accept(ImmutablePair.of(Color.BLACK, 0.0), frame.getSeries(0).get(0));
     doAssert.accept(ImmutablePair.of(lighten(Color.BLACK), +1.0), frame.getSeries(0).get(1));
     doAssert.accept(ImmutablePair.of(lighten(Color.BLACK), -1.0), frame.getSeries(0).get(2));
-  }
-
-  @Test
-  public void testBasicList() {
-    List<Pair<String, Integer>> regions =
-        List.of(
-            ImmutablePair.of("East Midlands", 5),
-            ImmutablePair.of("East of England", 7),
-            ImmutablePair.of("London", 8),
-            ImmutablePair.of("North East England", 3),
-            ImmutablePair.of("North West England", 8),
-            ImmutablePair.of("South East England", 10),
-            ImmutablePair.of("South West England", 6),
-            ImmutablePair.of("West Midlands", 7),
-            ImmutablePair.of("Yorkshire and the Humber", 6),
-            ImmutablePair.of("Scotland", 6),
-            ImmutablePair.of("Wales", 4),
-            ImmutablePair.of("Northern Ireland", 3));
-    BarFrame frame =
-        BarFrameBuilder.basicList(
-                () -> regions,
-                Pair::getLeft,
-                x -> Color.BLACK,
-                Pair::getRight,
-                x -> x.getRight().toString())
-            .build();
-    assertEquals(12, frame.getNumBars());
-
-    assertEquals("East Midlands", frame.getLeftText(0));
-    assertEquals("South East England", frame.getLeftText(5));
-    assertEquals("Northern Ireland", frame.getLeftText(11));
-
-    assertEquals("5", frame.getRightText(0));
-    assertEquals("10", frame.getRightText(5));
-    assertEquals("3", frame.getRightText(11));
-
-    assertEquals(5, frame.getSeries(0).get(0).getRight());
-    assertEquals(10, frame.getSeries(5).get(0).getRight());
-    assertEquals(3, frame.getSeries(11).get(0).getRight());
   }
 
   private static Color lighten(Color color) {
