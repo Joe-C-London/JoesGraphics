@@ -17,7 +17,7 @@ public class SwingometerFrameBuilder {
 
     enum Property {
       VALUE
-    };
+    }
 
     private Number value = 0;
     private Number max = 1;

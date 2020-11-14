@@ -5,12 +5,14 @@ import static org.junit.Assert.assertNull;
 
 import com.joecollins.bindings.BindableList;
 import com.joecollins.graphics.utils.BindableWrapper;
+import com.joecollins.graphics.utils.ColorUtils;
 import java.awt.Color;
 import java.awt.geom.Rectangle2D.Double;
 import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiConsumer;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.commons.lang3.tuple.Pair;
@@ -633,6 +635,159 @@ public class BarFrameBuilderTest {
 
     assertEquals(-27, frame.getMin().intValue());
     assertEquals(+22, frame.getMax().intValue());
+  }
+
+  @Test
+  public void testBasicBars() {
+    List<BarFrameBuilder.BasicBar> regions =
+        List.of(
+            new BarFrameBuilder.BasicBar("East Midlands", Color.BLACK, 5),
+            new BarFrameBuilder.BasicBar("East of England", Color.BLACK, 7),
+            new BarFrameBuilder.BasicBar("London", Color.BLACK, 8),
+            new BarFrameBuilder.BasicBar("North East England", Color.BLACK, 3),
+            new BarFrameBuilder.BasicBar("North West England", Color.BLACK, 8),
+            new BarFrameBuilder.BasicBar("South East England", Color.BLACK, 10),
+            new BarFrameBuilder.BasicBar("South West England", Color.BLACK, 6),
+            new BarFrameBuilder.BasicBar("West Midlands", Color.BLACK, 7),
+            new BarFrameBuilder.BasicBar("Yorkshire and the Humber", Color.BLACK, 6),
+            new BarFrameBuilder.BasicBar("Scotland", Color.BLACK, 6),
+            new BarFrameBuilder.BasicBar("Wales", Color.BLACK, 4),
+            new BarFrameBuilder.BasicBar("Northern Ireland", Color.BLACK, 3));
+    BarFrame frame = BarFrameBuilder.basic(() -> regions).build();
+    assertEquals(12, frame.getNumBars());
+
+    assertEquals("East Midlands", frame.getLeftText(0));
+    assertEquals("South East England", frame.getLeftText(5));
+    assertEquals("Northern Ireland", frame.getLeftText(11));
+
+    assertEquals("5", frame.getRightText(0));
+    assertEquals("10", frame.getRightText(5));
+    assertEquals("3", frame.getRightText(11));
+
+    assertEquals(5, frame.getSeries(0).get(0).getRight());
+    assertEquals(10, frame.getSeries(5).get(0).getRight());
+    assertEquals(3, frame.getSeries(11).get(0).getRight());
+  }
+
+  @Test
+  public void testDualBarsAllPositive() {
+    List<BarFrameBuilder.DualBar> regions =
+        List.of(
+            new BarFrameBuilder.DualBar("East Midlands", Color.BLACK, 44, 46, "46 > 44"),
+            new BarFrameBuilder.DualBar("East of England", Color.BLACK, 56, 58, "58 > 56"),
+            new BarFrameBuilder.DualBar("London", Color.BLACK, 68, 73, "73 > 68"),
+            new BarFrameBuilder.DualBar("North East England", Color.BLACK, 26, 29, "29 > 26"),
+            new BarFrameBuilder.DualBar("North West England", Color.BLACK, 68, 75, "75 > 68"),
+            new BarFrameBuilder.DualBar("South East England", Color.BLACK, 83, 84, "84 > 83"),
+            new BarFrameBuilder.DualBar("South West England", Color.BLACK, 53, 55, "55 > 53"),
+            new BarFrameBuilder.DualBar("West Midlands", Color.BLACK, 54, 59, "59 > 54"),
+            new BarFrameBuilder.DualBar("Yorkshire and the Humber", Color.BLACK, 50, 54, "54 > 50"),
+            new BarFrameBuilder.DualBar("Scotland", Color.BLACK, 52, 59, "59 > 52"),
+            new BarFrameBuilder.DualBar("Wales", Color.BLACK, 30, 40, "40 > 30"),
+            new BarFrameBuilder.DualBar("Northern Ireland", Color.BLACK, 16, 18, "18 > 16"));
+    BarFrame frame = BarFrameBuilder.dual(() -> regions).build();
+    assertEquals(12, frame.getNumBars());
+
+    assertEquals("East Midlands", frame.getLeftText(0));
+    assertEquals("South East England", frame.getLeftText(5));
+    assertEquals("Northern Ireland", frame.getLeftText(11));
+
+    assertEquals("46 > 44", frame.getRightText(0));
+    assertEquals("84 > 83", frame.getRightText(5));
+    assertEquals("18 > 16", frame.getRightText(11));
+
+    assertEquals(Color.BLACK, frame.getSeries(0).get(0).getLeft());
+    assertEquals(Color.BLACK, frame.getSeries(5).get(0).getLeft());
+    assertEquals(Color.BLACK, frame.getSeries(11).get(0).getLeft());
+
+    assertEquals(0, frame.getSeries(0).get(0).getRight().doubleValue(), 0);
+    assertEquals(0, frame.getSeries(5).get(0).getRight().doubleValue(), 0);
+    assertEquals(0, frame.getSeries(11).get(0).getRight().doubleValue(), 0);
+
+    assertEquals(Color.BLACK, frame.getSeries(0).get(1).getLeft());
+    assertEquals(Color.BLACK, frame.getSeries(5).get(1).getLeft());
+    assertEquals(Color.BLACK, frame.getSeries(11).get(1).getLeft());
+
+    assertEquals(44, frame.getSeries(0).get(1).getRight().doubleValue(), 0);
+    assertEquals(83, frame.getSeries(5).get(1).getRight().doubleValue(), 0);
+    assertEquals(16, frame.getSeries(11).get(1).getRight().doubleValue(), 0);
+
+    assertEquals(ColorUtils.lighten(Color.BLACK), frame.getSeries(0).get(2).getLeft());
+    assertEquals(ColorUtils.lighten(Color.BLACK), frame.getSeries(5).get(2).getLeft());
+    assertEquals(ColorUtils.lighten(Color.BLACK), frame.getSeries(11).get(2).getLeft());
+
+    assertEquals(2, frame.getSeries(0).get(2).getRight().doubleValue(), 0);
+    assertEquals(1, frame.getSeries(5).get(2).getRight().doubleValue(), 0);
+    assertEquals(2, frame.getSeries(11).get(2).getRight().doubleValue(), 0);
+
+    assertEquals(84, frame.getMax().doubleValue(), 0);
+    assertEquals(0, frame.getMin().doubleValue(), 0);
+  }
+
+  @Test
+  public void testDualVariousCombos() {
+    BiConsumer<Pair<Color, Number>, Pair<Color, Number>> doAssert =
+        (exp, act) -> {
+          assertEquals(exp.getLeft(), act.getLeft());
+          assertEquals(exp.getRight().doubleValue(), act.getRight().doubleValue(), 0.0);
+        };
+
+    BindableWrapper<List<BarFrameBuilder.DualBar>> regions =
+        new BindableWrapper<>(List.of(new BarFrameBuilder.DualBar("", Color.BLACK, 0.0, 0.0, "")));
+    BarFrame frame = BarFrameBuilder.dual(regions.getBinding()).build();
+    doAssert.accept(ImmutablePair.of(Color.BLACK, 0.0), frame.getSeries(0).get(0));
+    doAssert.accept(ImmutablePair.of(Color.BLACK, 0.0), frame.getSeries(0).get(1));
+    doAssert.accept(ImmutablePair.of(lighten(Color.BLACK), 0.0), frame.getSeries(0).get(2));
+
+    regions.setValue(List.of(new BarFrameBuilder.DualBar("", Color.BLACK, 0.0, 2.0, "")));
+    doAssert.accept(ImmutablePair.of(Color.BLACK, 0.0), frame.getSeries(0).get(0));
+    doAssert.accept(ImmutablePair.of(Color.BLACK, 0.0), frame.getSeries(0).get(1));
+    doAssert.accept(ImmutablePair.of(lighten(Color.BLACK), 2.0), frame.getSeries(0).get(2));
+
+    regions.setValue(List.of(new BarFrameBuilder.DualBar("", Color.BLACK, 2.0, 0.0, "")));
+    doAssert.accept(ImmutablePair.of(Color.BLACK, 0.0), frame.getSeries(0).get(0));
+    doAssert.accept(ImmutablePair.of(Color.BLACK, 0.0), frame.getSeries(0).get(1));
+    doAssert.accept(ImmutablePair.of(lighten(Color.BLACK), 2.0), frame.getSeries(0).get(2));
+
+    regions.setValue(List.of(new BarFrameBuilder.DualBar("", Color.BLACK, 0.0, -2.0, "")));
+    doAssert.accept(ImmutablePair.of(Color.BLACK, 0.0), frame.getSeries(0).get(0));
+    doAssert.accept(ImmutablePair.of(Color.BLACK, 0.0), frame.getSeries(0).get(1));
+    doAssert.accept(ImmutablePair.of(lighten(Color.BLACK), -2.0), frame.getSeries(0).get(2));
+
+    regions.setValue(List.of(new BarFrameBuilder.DualBar("", Color.BLACK, -2.0, 0.0, "")));
+    doAssert.accept(ImmutablePair.of(Color.BLACK, 0.0), frame.getSeries(0).get(0));
+    doAssert.accept(ImmutablePair.of(Color.BLACK, 0.0), frame.getSeries(0).get(1));
+    doAssert.accept(ImmutablePair.of(lighten(Color.BLACK), -2.0), frame.getSeries(0).get(2));
+
+    regions.setValue(List.of(new BarFrameBuilder.DualBar("", Color.BLACK, 1.0, 3.0, "")));
+    doAssert.accept(ImmutablePair.of(Color.BLACK, 0.0), frame.getSeries(0).get(0));
+    doAssert.accept(ImmutablePair.of(Color.BLACK, 1.0), frame.getSeries(0).get(1));
+    doAssert.accept(ImmutablePair.of(lighten(Color.BLACK), 2.0), frame.getSeries(0).get(2));
+
+    regions.setValue(List.of(new BarFrameBuilder.DualBar("", Color.BLACK, 3.0, 1.0, "")));
+    doAssert.accept(ImmutablePair.of(Color.BLACK, 0.0), frame.getSeries(0).get(0));
+    doAssert.accept(ImmutablePair.of(Color.BLACK, 1.0), frame.getSeries(0).get(1));
+    doAssert.accept(ImmutablePair.of(lighten(Color.BLACK), 2.0), frame.getSeries(0).get(2));
+
+    regions.setValue(List.of(new BarFrameBuilder.DualBar("", Color.BLACK, -1.0, -3.0, "")));
+    doAssert.accept(ImmutablePair.of(Color.BLACK, 0.0), frame.getSeries(0).get(0));
+    doAssert.accept(ImmutablePair.of(Color.BLACK, -1.0), frame.getSeries(0).get(1));
+    doAssert.accept(ImmutablePair.of(lighten(Color.BLACK), -2.0), frame.getSeries(0).get(2));
+
+    regions.setValue(List.of(new BarFrameBuilder.DualBar("", Color.BLACK, -3.0, -1.0, "")));
+    doAssert.accept(ImmutablePair.of(Color.BLACK, 0.0), frame.getSeries(0).get(0));
+    doAssert.accept(ImmutablePair.of(Color.BLACK, -1.0), frame.getSeries(0).get(1));
+    doAssert.accept(ImmutablePair.of(lighten(Color.BLACK), -2.0), frame.getSeries(0).get(2));
+
+    regions.setValue(List.of(new BarFrameBuilder.DualBar("", Color.BLACK, -1.0, +1.0, "")));
+    doAssert.accept(ImmutablePair.of(Color.BLACK, 0.0), frame.getSeries(0).get(0));
+    doAssert.accept(ImmutablePair.of(lighten(Color.BLACK), -1.0), frame.getSeries(0).get(1));
+    doAssert.accept(ImmutablePair.of(lighten(Color.BLACK), +1.0), frame.getSeries(0).get(2));
+
+    regions.setValue(List.of(new BarFrameBuilder.DualBar("", Color.BLACK, +1.0, -1.0, "")));
+    doAssert.accept(ImmutablePair.of(Color.BLACK, 0.0), frame.getSeries(0).get(0));
+    doAssert.accept(ImmutablePair.of(lighten(Color.BLACK), +1.0), frame.getSeries(0).get(1));
+    doAssert.accept(ImmutablePair.of(lighten(Color.BLACK), -1.0), frame.getSeries(0).get(2));
   }
 
   @Test

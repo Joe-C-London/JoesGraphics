@@ -1,5 +1,6 @@
 package com.joecollins.graphics.screens.generic;
 
+import com.joecollins.bindings.Bindable;
 import com.joecollins.bindings.BindableList;
 import com.joecollins.bindings.Binding;
 import com.joecollins.bindings.BindingReceiver;
@@ -23,12 +24,14 @@ import java.awt.LayoutManager;
 import java.awt.Shape;
 import java.text.DecimalFormat;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -41,6 +44,7 @@ public class BasicResultPanel extends JPanel {
 
   private static final DecimalFormat PCT_FORMAT = new DecimalFormat("0.0%");
   private static final DecimalFormat THOUSANDS_FORMAT = new DecimalFormat("#,##0");
+  private static final int DOUBLE_LINE_BAR_LIMIT = 10;
   private final JLabel label;
   private final BarFrame seatFrame;
   private final BarFrame changeFrame;
@@ -155,7 +159,7 @@ public class BasicResultPanel extends JPanel {
 
   public static SeatScreenBuilder<Party, Pair<Integer, Integer>, Pair<Integer, Integer>>
       partyDualSeats(
-          Binding<? extends Map<Party, ? extends Pair<Integer, Integer>>> seats,
+          Binding<? extends Map<Party, Pair<Integer, Integer>>> seats,
           Binding<String> header,
           Binding<String> subhead) {
     return new DualSeatScreenBuilder<>(
@@ -178,7 +182,7 @@ public class BasicResultPanel extends JPanel {
   }
 
   public static SeatScreenBuilder<Party, Range<Integer>, Integer> partyRangeSeats(
-      Binding<? extends Map<Party, ? extends Range<Integer>>> seats,
+      Binding<? extends Map<Party, Range<Integer>>> seats,
       Binding<String> header,
       Binding<String> subhead) {
     return new RangeSeatScreenBuilder<>(
@@ -266,33 +270,10 @@ public class BasicResultPanel extends JPanel {
         Candidate.OTHERS);
   }
 
-  private static class NumCandidatesWrapper<T> {
-    private final T candidate;
-    private final int numCandidates;
-
-    private NumCandidatesWrapper(T candidate, int numCandidates) {
-      this.candidate = candidate;
-      this.numCandidates = numCandidates;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-      if (this == o) return true;
-      if (o == null || getClass() != o.getClass()) return false;
-      NumCandidatesWrapper<?> that = (NumCandidatesWrapper<?>) o;
-      return numCandidates == that.numCandidates && candidate.equals(that.candidate);
-    }
-
-    @Override
-    public int hashCode() {
-      return Objects.hash(candidate, numCandidates);
-    }
-  }
-
   private interface KeyTemplate<KT> {
     Party toParty(KT key);
 
-    String toMainBarHeader(NumCandidatesWrapper<KT> key);
+    String toMainBarHeader(KT key, int barsCount);
 
     Shape winnerShape(int numCandidates);
   }
@@ -305,8 +286,8 @@ public class BasicResultPanel extends JPanel {
     }
 
     @Override
-    public String toMainBarHeader(NumCandidatesWrapper<Party> key) {
-      return key.candidate.getName().toUpperCase();
+    public String toMainBarHeader(Party key, int barsCount) {
+      return key.getName().toUpperCase();
     }
 
     @Override
@@ -333,34 +314,24 @@ public class BasicResultPanel extends JPanel {
     }
 
     @Override
-    public String toMainBarHeader(NumCandidatesWrapper<Candidate> key) {
-      if (key.candidate == Candidate.OTHERS) {
-        return key.candidate.getParty().getName().toUpperCase();
+    public String toMainBarHeader(Candidate key, int barsCount) {
+      if (key == Candidate.OTHERS) {
+        return key.getParty().getName().toUpperCase();
       }
-      boolean singleLine = key.numCandidates > 10;
-      return (key.candidate.getName()
-              + (key.candidate.isIncumbent() ? incumbentMarker : "")
+      boolean singleLine = barsCount > DOUBLE_LINE_BAR_LIMIT;
+      return (key.getName()
+              + (key.isIncumbent() ? incumbentMarker : "")
               + (singleLine
-                  ? (" (" + key.candidate.getParty().getAbbreviation() + ")")
-                  : ("\n" + key.candidate.getParty().getName())))
+                  ? (" (" + key.getParty().getAbbreviation() + ")")
+                  : ("\n" + key.getParty().getName())))
           .toUpperCase();
     }
 
     @Override
     public Shape winnerShape(int numCandidates) {
-      return numCandidates > 10
+      return numCandidates > DOUBLE_LINE_BAR_LIMIT
           ? ImageGenerator.createTickShape()
           : ImageGenerator.createHalfTickShape();
-    }
-  }
-
-  private static class ResultAndWinner<CT> {
-    private CT result;
-    private boolean winner;
-
-    public ResultAndWinner(CT result) {
-      this.result = result;
-      this.winner = false;
     }
   }
 
@@ -368,7 +339,7 @@ public class BasicResultPanel extends JPanel {
 
     protected final KeyTemplate<KT> keyTemplate;
 
-    protected BindingReceiver<Map<KT, ? extends CT>> current;
+    protected BindingReceiver<Map<KT, CT>> current;
     protected BindingReceiver<String> header;
     protected BindingReceiver<String> subhead;
     protected BindingReceiver<Integer> total;
@@ -389,7 +360,7 @@ public class BasicResultPanel extends JPanel {
     protected MapBuilder mapBuilder;
 
     private SeatScreenBuilder(
-        BindingReceiver<Map<KT, ? extends CT>> current,
+        BindingReceiver<Map<KT, CT>> current,
         BindingReceiver<String> header,
         BindingReceiver<String> subhead,
         KeyTemplate<KT> keyTemplate) {
@@ -550,36 +521,12 @@ public class BasicResultPanel extends JPanel {
       }
       return mapBuilder.createMapFrame();
     }
-
-    protected Binding<Map<NumCandidatesWrapper<KT>, ResultAndWinner<CT>>> createResultAndWinner() {
-      Binding<KT> winnerBinding = winner == null ? (() -> null) : winner.getBinding();
-      return current
-          .getBinding()
-          .merge(
-              winnerBinding,
-              (s, w) -> {
-                Map<NumCandidatesWrapper<KT>, ResultAndWinner<CT>> ret = new LinkedHashMap<>();
-                s.forEach(
-                    (k, v) ->
-                        ret.put(new NumCandidatesWrapper<>(k, s.size()), new ResultAndWinner<>(v)));
-                if (w != null) {
-                  ret.computeIfAbsent(
-                              new NumCandidatesWrapper<>(w, s.size()),
-                              x -> new ResultAndWinner<>(createDefault()))
-                          .winner =
-                      true;
-                }
-                return ret;
-              });
-    }
-
-    protected abstract CT createDefault();
   }
 
   private static class BasicSeatScreenBuilder<KT> extends SeatScreenBuilder<KT, Integer, Integer> {
 
     private BasicSeatScreenBuilder(
-        BindingReceiver<Map<KT, ? extends Integer>> current,
+        BindingReceiver<Map<KT, Integer>> current,
         BindingReceiver<String> header,
         BindingReceiver<String> subhead,
         KeyTemplate<KT> keyTemplate) {
@@ -610,17 +557,59 @@ public class BasicResultPanel extends JPanel {
       return val == null ? 0 : val;
     }
 
+    private static class Result<KT> extends Bindable {
+      private enum Property {
+        SEATS,
+        WINNER
+      }
+
+      private Map<KT, Integer> seats = new HashMap<>();
+      private KT winner;
+
+      public void setSeats(Map<KT, Integer> seats) {
+        this.seats = seats;
+        onPropertyRefreshed(Property.SEATS);
+      }
+
+      public void setWinner(KT winner) {
+        this.winner = winner;
+        onPropertyRefreshed(Property.WINNER);
+      }
+    }
+
     protected BarFrame createFrame() {
+      Result<KT> result = new Result<>();
+      current.getBinding().bind(result::setSeats);
+      if (winner != null) {
+        winner.getBinding().bind(result::setWinner);
+      }
+      Binding<List<BarFrameBuilder.BasicBar>> bars =
+          Binding.propertyBinding(
+              result,
+              r -> {
+                int numBars = r.seats.size();
+                return r.seats.entrySet().stream()
+                    .sorted(
+                        Comparator.<Map.Entry<KT, Integer>>comparingInt(
+                                e -> e.getKey() == Party.OTHERS ? Integer.MIN_VALUE : e.getValue())
+                            .reversed())
+                    .map(
+                        e ->
+                            new BarFrameBuilder.BasicBar(
+                                keyTemplate.toMainBarHeader(e.getKey(), numBars),
+                                keyTemplate.toParty(e.getKey()).getColor(),
+                                e.getValue(),
+                                String.valueOf(e.getValue()),
+                                e.getKey().equals(r.winner)
+                                    ? keyTemplate.winnerShape(numBars)
+                                    : null))
+                    .collect(Collectors.toList());
+              },
+              Result.Property.SEATS,
+              Result.Property.WINNER);
+
       BarFrameBuilder builder =
-          BarFrameBuilder.basicWithShapes(
-                  createResultAndWinner(),
-                  party -> keyTemplate.toMainBarHeader(party),
-                  party -> keyTemplate.toParty(party.candidate).getColor(),
-                  result -> result.result,
-                  result -> String.valueOf(result.result),
-                  (party, result) ->
-                      result.winner ? keyTemplate.winnerShape(party.numCandidates) : null,
-                  (party, result) -> party.candidate == Party.OTHERS ? -1 : result.result)
+          BarFrameBuilder.basic(bars)
               .withHeader(header.getBinding())
               .withSubhead(subhead.getBinding())
               .withNotes(notes == null ? (() -> null) : notes.getBinding());
@@ -655,25 +644,35 @@ public class BasicResultPanel extends JPanel {
       if (changeHeader == null) {
         return null;
       }
+
+      Binding<List<BarFrameBuilder.BasicBar>> bars =
+          diff.getBinding(
+              map ->
+                  map.entrySet().stream()
+                      .sorted(
+                          Comparator.<Map.Entry<Party, CurrDiff<Integer>>>comparingInt(
+                                  e ->
+                                      e.getKey() == Party.OTHERS
+                                          ? Integer.MIN_VALUE
+                                          : e.getValue().curr)
+                              .reversed())
+                      .map(
+                          e ->
+                              new BarFrameBuilder.BasicBar(
+                                  e.getKey().getAbbreviation().toUpperCase(),
+                                  e.getKey().getColor(),
+                                  e.getValue().diff,
+                                  changeStr(e.getValue().diff)))
+                      .collect(Collectors.toList()));
+
       BarFrameBuilder builder =
-          BarFrameBuilder.basic(
-                  diff.getBinding(),
-                  party -> party.getAbbreviation().toUpperCase(),
-                  party -> party.getColor(),
-                  seats -> seats.diff,
-                  seats -> changeStr(seats.diff),
-                  (party, seats) -> party == Party.OTHERS ? -1 : seats.curr)
+          BarFrameBuilder.basic(bars)
               .withHeader(changeHeader.getBinding())
               .withSubhead(changeSubhead.getBinding());
       if (total != null) {
         builder = builder.withWingspan(total.getBinding(t -> Math.max(1, t / 20)));
       }
       return builder.build();
-    }
-
-    @Override
-    protected Integer createDefault() {
-      return 0;
     }
 
     private static String changeStr(Integer seats) {
@@ -685,7 +684,7 @@ public class BasicResultPanel extends JPanel {
       extends SeatScreenBuilder<KT, Pair<Integer, Integer>, Pair<Integer, Integer>> {
 
     private DualSeatScreenBuilder(
-        BindingReceiver<Map<KT, ? extends Pair<Integer, Integer>>> current,
+        BindingReceiver<Map<KT, Pair<Integer, Integer>>> current,
         BindingReceiver<String> header,
         BindingReceiver<String> subhead,
         KeyTemplate<KT> keyTemplate) {
@@ -722,18 +721,63 @@ public class BasicResultPanel extends JPanel {
       return val == null ? ImmutablePair.of(0, 0) : val;
     }
 
+    private static class Result<KT> extends Bindable {
+      private enum Property {
+        SEATS,
+        WINNER
+      }
+
+      private Map<KT, Pair<Integer, Integer>> seats = new HashMap<>();
+      private KT winner;
+
+      public void setSeats(Map<KT, Pair<Integer, Integer>> seats) {
+        this.seats = seats;
+        onPropertyRefreshed(Property.SEATS);
+      }
+
+      public void setWinner(KT winner) {
+        this.winner = winner;
+        onPropertyRefreshed(Property.WINNER);
+      }
+    }
+
     protected BarFrame createFrame() {
+      Result<KT> result = new Result<>();
+      current.getBinding().bind(result::setSeats);
+      if (winner != null) {
+        winner.getBinding().bind(result::setWinner);
+      }
+      Binding<List<BarFrameBuilder.DualBar>> bars =
+          Binding.propertyBinding(
+              result,
+              r -> {
+                int count = r.seats.size();
+                return r.seats.entrySet().stream()
+                    .sorted(
+                        Comparator.<Map.Entry<KT, Pair<Integer, Integer>>>comparingInt(
+                                e ->
+                                    e.getKey() == Party.OTHERS
+                                        ? Integer.MIN_VALUE
+                                        : e.getValue().getRight())
+                            .reversed())
+                    .map(
+                        e ->
+                            new BarFrameBuilder.DualBar(
+                                keyTemplate.toMainBarHeader(e.getKey(), count),
+                                keyTemplate.toParty(e.getKey()).getColor(),
+                                e.getValue().getLeft(),
+                                e.getValue().getRight(),
+                                e.getValue().getLeft() + "/" + e.getValue().getRight(),
+                                e.getKey().equals(r.winner)
+                                    ? keyTemplate.winnerShape(count)
+                                    : null))
+                    .collect(Collectors.toList());
+              },
+              Result.Property.SEATS,
+              Result.Property.WINNER);
+
       BarFrameBuilder builder =
-          BarFrameBuilder.dualWithShapes(
-                  createResultAndWinner(),
-                  party -> keyTemplate.toMainBarHeader(party),
-                  party -> keyTemplate.toParty(party.candidate).getColor(),
-                  result -> result.result,
-                  result -> result.result.getLeft() + "/" + result.result.getRight(),
-                  (party, result) ->
-                      result.winner ? keyTemplate.winnerShape(party.numCandidates) : null,
-                  (party, result) ->
-                      party.candidate == Party.OTHERS ? -1 : result.result.getRight())
+          BarFrameBuilder.dual(bars)
               .withHeader(header.getBinding())
               .withSubhead(subhead.getBinding())
               .withNotes(notes == null ? (() -> null) : notes.getBinding());
@@ -768,25 +812,38 @@ public class BasicResultPanel extends JPanel {
       if (changeHeader == null) {
         return null;
       }
+
+      Binding<List<BarFrameBuilder.DualBar>> bars =
+          diff.getBinding(
+              map ->
+                  map.entrySet().stream()
+                      .sorted(
+                          Comparator
+                              .<Map.Entry<Party, CurrDiff<Pair<Integer, Integer>>>>comparingInt(
+                                  e ->
+                                      e.getKey() == Party.OTHERS
+                                          ? Integer.MIN_VALUE
+                                          : e.getValue().curr.getRight())
+                              .reversed())
+                      .map(
+                          e ->
+                              new BarFrameBuilder.DualBar(
+                                  e.getKey().getAbbreviation().toUpperCase(),
+                                  e.getKey().getColor(),
+                                  e.getValue().diff.getLeft(),
+                                  e.getValue().diff.getRight(),
+                                  changeStr(e.getValue().diff.getLeft())
+                                      + "/"
+                                      + changeStr(e.getValue().diff.getRight())))
+                      .collect(Collectors.toList()));
       BarFrameBuilder builder =
-          BarFrameBuilder.dual(
-                  diff.getBinding(),
-                  party -> party.getAbbreviation().toUpperCase(),
-                  party -> party.getColor(),
-                  seats -> seats.diff,
-                  seats -> changeStr(seats.diff.getLeft()) + "/" + changeStr(seats.diff.getRight()),
-                  (party, seats) -> party == Party.OTHERS ? -1 : seats.curr.getRight())
+          BarFrameBuilder.dual(bars)
               .withHeader(changeHeader.getBinding())
               .withSubhead(changeSubhead.getBinding());
       if (total != null) {
         builder = builder.withWingspan(total.getBinding(t -> Math.max(1, t / 20)));
       }
       return builder.build();
-    }
-
-    @Override
-    protected Pair<Integer, Integer> createDefault() {
-      return ImmutablePair.of(0, 0);
     }
 
     private static String changeStr(Integer seats) {
@@ -798,7 +855,7 @@ public class BasicResultPanel extends JPanel {
       extends SeatScreenBuilder<KT, Range<Integer>, Integer> {
 
     private RangeSeatScreenBuilder(
-        BindingReceiver<Map<KT, ? extends Range<Integer>>> current,
+        BindingReceiver<Map<KT, Range<Integer>>> current,
         BindingReceiver<String> header,
         BindingReceiver<String> subhead,
         KeyTemplate<KT> keyTemplate) {
@@ -836,21 +893,63 @@ public class BasicResultPanel extends JPanel {
       return val == null ? 0 : val;
     }
 
+    private static class Result<KT> extends Bindable {
+      private enum Property {
+        SEATS,
+        WINNER
+      }
+
+      private Map<KT, Range<Integer>> seats = new HashMap<>();
+      private KT winner;
+
+      public void setSeats(Map<KT, Range<Integer>> seats) {
+        this.seats = seats;
+        onPropertyRefreshed(Property.SEATS);
+      }
+
+      public void setWinner(KT winner) {
+        this.winner = winner;
+        onPropertyRefreshed(Property.WINNER);
+      }
+    }
+
     protected BarFrame createFrame() {
+      Result<KT> result = new Result<>();
+      current.getBinding().bind(result::setSeats);
+      if (winner != null) {
+        winner.getBinding().bind(result::setWinner);
+      }
+      Binding<List<BarFrameBuilder.DualBar>> bars =
+          Binding.propertyBinding(
+              result,
+              r -> {
+                int count = r.seats.size();
+                return r.seats.entrySet().stream()
+                    .sorted(
+                        Comparator.<Map.Entry<KT, Range<Integer>>>comparingInt(
+                                e ->
+                                    e.getKey() == Party.OTHERS
+                                        ? Integer.MIN_VALUE
+                                        : (e.getValue().getMinimum() + e.getValue().getMaximum()))
+                            .reversed())
+                    .map(
+                        e ->
+                            new BarFrameBuilder.DualBar(
+                                keyTemplate.toMainBarHeader(e.getKey(), count),
+                                keyTemplate.toParty(e.getKey()).getColor(),
+                                e.getValue().getMinimum(),
+                                e.getValue().getMaximum(),
+                                e.getValue().getMinimum() + "-" + e.getValue().getMaximum(),
+                                e.getKey().equals(r.winner)
+                                    ? keyTemplate.winnerShape(count)
+                                    : null))
+                    .collect(Collectors.toList());
+              },
+              Result.Property.SEATS,
+              Result.Property.WINNER);
+
       BarFrameBuilder builder =
-          BarFrameBuilder.dualWithShapes(
-                  createResultAndWinner(),
-                  party -> keyTemplate.toMainBarHeader(party),
-                  party -> keyTemplate.toParty(party.candidate).getColor(),
-                  result ->
-                      ImmutablePair.of(result.result.getMinimum(), result.result.getMaximum()),
-                  result -> result.result.getMinimum() + "-" + result.result.getMaximum(),
-                  (party, result) ->
-                      result.winner ? keyTemplate.winnerShape(party.numCandidates) : null,
-                  (party, result) ->
-                      party.candidate == Party.OTHERS
-                          ? -1
-                          : result.result.getMinimum() + result.result.getMaximum())
+          BarFrameBuilder.dual(bars)
               .withHeader(header.getBinding())
               .withSubhead(subhead.getBinding())
               .withNotes(notes == null ? (() -> null) : notes.getBinding());
@@ -885,22 +984,35 @@ public class BasicResultPanel extends JPanel {
       if (changeHeader == null) {
         return null;
       }
+
+      Binding<List<BarFrameBuilder.DualBar>> bars =
+          diff.getBinding(
+              map -> {
+                return map.entrySet().stream()
+                    .sorted(
+                        Comparator.<Map.Entry<Party, CurrDiff<Range<Integer>>>>comparingInt(
+                                e ->
+                                    e.getKey() == Party.OTHERS
+                                        ? Integer.MIN_VALUE
+                                        : (e.getValue().curr.getMinimum()
+                                            + e.getValue().curr.getMaximum()))
+                            .reversed())
+                    .map(
+                        e ->
+                            new BarFrameBuilder.DualBar(
+                                e.getKey().getAbbreviation().toUpperCase(),
+                                e.getKey().getColor(),
+                                e.getValue().diff.getMinimum(),
+                                e.getValue().diff.getMaximum(),
+                                "("
+                                    + changeStr(e.getValue().diff.getMinimum())
+                                    + ")-("
+                                    + changeStr(e.getValue().diff.getMaximum())
+                                    + ")"))
+                    .collect(Collectors.toList());
+              });
       BarFrameBuilder builder =
-          BarFrameBuilder.dual(
-                  diff.getBinding(),
-                  party -> party.getAbbreviation().toUpperCase(),
-                  party -> party.getColor(),
-                  seats -> ImmutablePair.of(seats.diff.getMinimum(), seats.diff.getMaximum()),
-                  seats ->
-                      "("
-                          + changeStr(seats.diff.getMinimum())
-                          + ")-("
-                          + changeStr(seats.diff.getMaximum())
-                          + ")",
-                  (party, seats) ->
-                      party == Party.OTHERS
-                          ? -1
-                          : seats.curr.getMinimum() + seats.curr.getMaximum())
+          BarFrameBuilder.dual(bars)
               .withHeader(changeHeader.getBinding())
               .withSubhead(changeSubhead.getBinding());
       if (total != null) {
@@ -909,55 +1021,46 @@ public class BasicResultPanel extends JPanel {
       return builder.build();
     }
 
-    @Override
-    protected Range<Integer> createDefault() {
-      return Range.is(0);
-    }
-
     private static String changeStr(Integer seats) {
       return seats == 0 ? "\u00b10" : new DecimalFormat("+0;-0").format(seats);
     }
   }
 
-  private interface VoteTemplate<VT> {
-    String toBarString(VT votes);
+  private interface VoteTemplate {
+    String toBarString(int votes, double pct, int barCount);
   }
 
-  private static class PctOnlyTemplate implements VoteTemplate<VotesPct<Integer, Double>> {
+  private static class PctOnlyTemplate implements VoteTemplate {
 
     @Override
-    public String toBarString(VotesPct<Integer, Double> votes) {
-      if (votes.totalCandidates == 1) return "UNCONTESTED";
-      return Double.isNaN(votes.percent) ? "WAITING..." : PCT_FORMAT.format(votes.percent);
+    public String toBarString(int votes, double pct, int barCount) {
+      return PCT_FORMAT.format(pct);
     }
   }
 
-  private static class VotePctTemplate implements VoteTemplate<VotesPct<Integer, Double>> {
+  private static class VotePctTemplate implements VoteTemplate {
 
     @Override
-    public String toBarString(VotesPct<Integer, Double> votes) {
-      if (votes.totalCandidates == 1) return "UNCONTESTED";
-      boolean singleLine = votes.totalCandidates > 10;
-      return Double.isNaN(votes.percent)
-          ? "WAITING..."
-          : (THOUSANDS_FORMAT.format(votes.votes)
-              + (singleLine ? " (" : "\n")
-              + PCT_FORMAT.format(votes.percent)
-              + (singleLine ? ")" : ""));
+    public String toBarString(int votes, double pct, int barCount) {
+      boolean singleLine = barCount > DOUBLE_LINE_BAR_LIMIT;
+      return THOUSANDS_FORMAT.format(votes)
+          + (singleLine ? " (" : "\n")
+          + PCT_FORMAT.format(pct)
+          + (singleLine ? ")" : "");
     }
   }
 
-  private static class VotePctOnlyTemplate implements VoteTemplate<VotesPct<Integer, Double>> {
+  private static class VotePctOnlyTemplate implements VoteTemplate {
 
     @Override
-    public String toBarString(VotesPct<Integer, Double> votes) {
-      return votes.votes == 0 ? "WAITING..." : (PCT_FORMAT.format(votes.percent));
+    public String toBarString(int votes, double pct, int barCount) {
+      return PCT_FORMAT.format(pct);
     }
   }
 
   public abstract static class VoteScreenBuilder<KT, CT, CPT, PT> {
     protected final KeyTemplate<KT> keyTemplate;
-    protected final VoteTemplate<VotesPct<CT, CPT>> voteTemplate;
+    protected final VoteTemplate voteTemplate;
     protected final KT others;
 
     protected BindingReceiver<Map<KT, CT>> current;
@@ -985,7 +1088,7 @@ public class BasicResultPanel extends JPanel {
         BindingReceiver<String> header,
         BindingReceiver<String> subhead,
         KeyTemplate<KT> keyTemplate,
-        VoteTemplate<VotesPct<CT, CPT>> voteTemplate,
+        VoteTemplate voteTemplate,
         KT others) {
       this.keyTemplate = keyTemplate;
       this.current = current;
@@ -1131,69 +1234,82 @@ public class BasicResultPanel extends JPanel {
         BindingReceiver<String> header,
         BindingReceiver<String> subhead,
         KeyTemplate<KT> keyTemplate,
-        VoteTemplate<VotesPct<Integer, Double>> voteTemplate,
+        VoteTemplate voteTemplate,
         KT others) {
       super(current, header, subhead, keyTemplate, voteTemplate, others);
     }
 
+    private static class Result<KT> extends Bindable {
+      private enum Property {
+        VOTES,
+        WINNER
+      }
+
+      private Map<KT, Integer> votes = new HashMap<>();
+      private KT winner;
+
+      public void setVotes(Map<KT, Integer> votes) {
+        this.votes = votes;
+        onPropertyRefreshed(Property.VOTES);
+      }
+
+      public void setWinner(KT winner) {
+        this.winner = winner;
+        onPropertyRefreshed(Property.WINNER);
+      }
+    }
+
     @Override
     protected BarFrame createFrame() {
-      Binding<Map<KT, VotesPct<Integer, Double>>> votesPct =
-          current
-              .getBinding()
-              .merge(
-                  (winner == null ? Binding.fixedBinding(null) : winner.getBinding()),
-                  (map, winner) -> {
-                    int total = map.values().stream().mapToInt(i -> i).sum();
-                    Map<KT, VotesPct<Integer, Double>> ret = new LinkedHashMap<>();
-                    var mandatory =
-                        (KT[])
-                            Stream.concat(
-                                    map.keySet().stream()
-                                        .filter(
-                                            k -> mandatoryParties.contains(keyTemplate.toParty(k))),
-                                    Stream.of(winner).filter(Objects::nonNull))
-                                .filter(Objects::nonNull)
-                                .toArray();
-                    Aggregators.topAndOthers(map, limit, others, mandatory)
-                        .forEach(
-                            (KT k, Integer v) ->
-                                ret.put(
-                                    k,
-                                    new VotesPct<>(v, total == 0 ? Double.NaN : 1.0 * v / total)));
-                    return ret;
-                  });
-      Binding<KT> winner = this.winner == null ? (() -> null) : this.winner.getBinding();
+      Result<KT> result = new Result<>();
+      current.getBinding().bind(result::setVotes);
+      if (winner != null) {
+        winner.getBinding().bind(result::setWinner);
+      }
+      Binding<List<BarFrameBuilder.BasicBar>> bars =
+          Binding.propertyBinding(
+              result,
+              r -> {
+                int total = r.votes.values().stream().mapToInt(i -> i).sum();
+                var mandatory =
+                    (KT[])
+                        Stream.concat(
+                                r.votes.keySet().stream()
+                                    .filter(k -> mandatoryParties.contains(keyTemplate.toParty(k))),
+                                Stream.of(r.winner).filter(Objects::nonNull))
+                            .filter(Objects::nonNull)
+                            .toArray();
+                var aggregatedResult = Aggregators.topAndOthers(r.votes, limit, others, mandatory);
+                int count = aggregatedResult.size();
+                return aggregatedResult.entrySet().stream()
+                    .sorted(
+                        Comparator.<Map.Entry<KT, Integer>>comparingInt(
+                                e -> e.getKey() == others ? Integer.MIN_VALUE : e.getValue())
+                            .reversed())
+                    .map(
+                        e -> {
+                          double pct = 1.0 * e.getValue() / total;
+                          String valueLabel;
+                          if (count == 1) {
+                            valueLabel = "UNCONTESTED";
+                          } else if (Double.isNaN(pct)) {
+                            valueLabel = "WAITING...";
+                          } else {
+                            valueLabel = voteTemplate.toBarString(e.getValue(), pct, count);
+                          }
+                          return new BarFrameBuilder.BasicBar(
+                              keyTemplate.toMainBarHeader(e.getKey(), count),
+                              keyTemplate.toParty(e.getKey()).getColor(),
+                              Double.isNaN(pct) ? 0 : pct,
+                              valueLabel,
+                              e.getKey().equals(r.winner) ? keyTemplate.winnerShape(count) : null);
+                        })
+                    .collect(Collectors.toList());
+              },
+              Result.Property.VOTES,
+              Result.Property.WINNER);
       BarFrameBuilder builder =
-          BarFrameBuilder.basicWithShapes(
-                  votesPct.merge(
-                      winner,
-                      (v, w) -> {
-                        Map<NumCandidatesWrapper<KT>, VotesPct<Integer, Double>> ret =
-                            new LinkedHashMap<>();
-                        v.forEach(
-                            (candidate, votes) -> {
-                              votes.winner = false;
-                              votes.totalCandidates = v.size();
-                              ret.put(new NumCandidatesWrapper<>(candidate, v.size()), votes);
-                            });
-                        if (w != null) {
-                          int total = v.values().stream().mapToInt(i -> i.votes).sum();
-                          ret.computeIfAbsent(
-                                      new NumCandidatesWrapper<>(w, v.size()),
-                                      x -> new VotesPct<>(0, total == 0 ? Double.NaN : 0.0))
-                                  .winner =
-                              true;
-                        }
-                        return ret;
-                      }),
-                  keyTemplate::toMainBarHeader,
-                  key -> keyTemplate.toParty(key.candidate).getColor(),
-                  votes -> Double.isNaN(votes.percent) ? 0 : votes.percent,
-                  votes -> voteTemplate.toBarString(votes),
-                  (party, votes) ->
-                      votes.winner ? keyTemplate.winnerShape(party.numCandidates) : null,
-                  (party, votes) -> others.equals(party.candidate) ? -1 : votes.percent)
+          BarFrameBuilder.basic(bars)
               .withHeader(header.getBinding())
               .withSubhead(subhead.getBinding())
               .withNotes(notes == null ? (() -> null) : notes.getBinding())
@@ -1236,54 +1352,74 @@ public class BasicResultPanel extends JPanel {
       return builder.build();
     }
 
+    private static class Change<KT> extends Bindable {
+      private enum Property {
+        CURR,
+        PREV
+      }
+
+      private Map<KT, Integer> currVotes = new HashMap<>();
+      private Map<Party, Integer> prevVotes = new HashMap<>();
+
+      public void setCurrVotes(Map<KT, Integer> currVotes) {
+        this.currVotes = currVotes;
+        onPropertyRefreshed(Property.CURR);
+      }
+
+      public void setPrevVotes(Map<Party, Integer> prevVotes) {
+        this.prevVotes = prevVotes;
+        onPropertyRefreshed(Property.PREV);
+      }
+    }
+
     @Override
     protected BarFrame createDiffFrame() {
       if (prev == null) {
         return null;
       }
-      Binding<? extends Map<Party, CurrDiff<Double>>> currDiff =
-          current
-              .getBinding()
-              .merge(
-                  prev.getBinding(),
-                  (c, p) -> {
-                    int currTotal = c.values().stream().mapToInt(i -> i).sum();
-                    int prevTotal = p.values().stream().mapToInt(i -> i).sum();
-                    Map<Party, Integer> partyTotal =
-                        Aggregators.topAndOthers(
-                            currTotalByParty(c),
-                            limit,
-                            Party.OTHERS,
-                            mandatoryParties.toArray(new Party[0]));
-                    Map<Party, CurrDiff<Double>> ret = new LinkedHashMap<>();
-                    if (currTotal == 0 || prevTotal == 0) {
-                      return ret;
-                    }
-                    partyTotal.forEach(
-                        (party, cv) -> {
-                          double cpct = 1.0 * cv / currTotal;
-                          double ppct = 1.0 * (p.containsKey(party) ? p.get(party) : 0) / prevTotal;
-                          ret.put(party, new CurrDiff<>(cpct, cpct - ppct));
-                        });
-                    p.forEach(
-                        (party, pv) -> {
-                          if (!partyTotal.containsKey(party)) {
-                            double ppct = 1.0 * pv / prevTotal;
-                            ret.merge(
-                                Party.OTHERS,
-                                new CurrDiff<>(0.0, -ppct),
-                                (a, b) -> new CurrDiff<>(a.curr + b.curr, a.diff + b.diff));
-                          }
-                        });
-                    return ret;
-                  });
-      return BarFrameBuilder.basic(
-              currDiff,
-              party -> party.getAbbreviation().toUpperCase(),
-              party -> party.getColor(),
-              value -> value.diff,
-              value -> new DecimalFormat("+0.0%;-0.0%").format(value.diff),
-              (party, value) -> party == Party.OTHERS ? -1 : value.curr)
+
+      Change<KT> change = new Change<>();
+      current.getBinding().bind(change::setCurrVotes);
+      prev.getBinding().bind(change::setPrevVotes);
+      Binding<List<BarFrameBuilder.BasicBar>> bars =
+          Binding.propertyBinding(
+              change,
+              r -> {
+                int currTotal = r.currVotes.values().stream().mapToInt(i -> i).sum();
+                int prevTotal = r.prevVotes.values().stream().mapToInt(i -> i).sum();
+                if (currTotal == 0 || prevTotal == 0) {
+                  return List.of();
+                }
+                Map<Party, Integer> partyTotal =
+                    Aggregators.topAndOthers(
+                        currTotalByParty(r.currVotes),
+                        limit,
+                        Party.OTHERS,
+                        mandatoryParties.toArray(new Party[0]));
+                Map<Party, Integer> prevVotes = new HashMap<>(r.prevVotes);
+                r.prevVotes.entrySet().stream()
+                    .filter(e -> !partyTotal.containsKey(e.getKey()))
+                    .forEach(e -> prevVotes.merge(Party.OTHERS, e.getValue(), Integer::sum));
+                return partyTotal.entrySet().stream()
+                    .sorted(
+                        Comparator.<Map.Entry<Party, Integer>>comparingInt(
+                                e -> e.getKey() == Party.OTHERS ? Integer.MIN_VALUE : e.getValue())
+                            .reversed())
+                    .map(
+                        e -> {
+                          double cpct = 1.0 * e.getValue() / currTotal;
+                          double ppct = 1.0 * (prevVotes.getOrDefault(e.getKey(), 0)) / prevTotal;
+                          return new BarFrameBuilder.BasicBar(
+                              e.getKey().getAbbreviation().toUpperCase(),
+                              e.getKey().getColor(),
+                              cpct - ppct,
+                              new DecimalFormat("+0.0%;-0.0%").format(cpct - ppct));
+                        })
+                    .collect(Collectors.toList());
+              },
+              Change.Property.CURR,
+              Change.Property.PREV);
+      return BarFrameBuilder.basic(bars)
           .withWingspan(
               pctReporting == null
                   ? (() -> 0.1)
@@ -1308,18 +1444,6 @@ public class BasicResultPanel extends JPanel {
       Map<Party, Integer> ret = new LinkedHashMap<>();
       curr.forEach((k, v) -> ret.merge(keyTemplate.toParty(k), v, Integer::sum));
       return ret;
-    }
-  }
-
-  private static class VotesPct<T, PT> {
-    private final T votes;
-    private final PT percent;
-    private boolean winner;
-    private int totalCandidates;
-
-    private VotesPct(T votes, PT percent) {
-      this.votes = votes;
-      this.percent = percent;
     }
   }
 
