@@ -7,6 +7,7 @@ import com.joecollins.bindings.Bindable;
 import com.joecollins.bindings.BindableList;
 import com.joecollins.bindings.Binding;
 import com.joecollins.bindings.IndexedBinding;
+import com.joecollins.bindings.NestedBindableList;
 import com.joecollins.graphics.utils.ShapefileReader;
 import java.awt.Color;
 import java.awt.Shape;
@@ -24,7 +25,7 @@ public class MapFrameTest {
 
   @Test
   public void testBindShapes() throws IOException {
-    BindableList<MapEntry> shapes = loadShapes(this::getDistrictColor);
+    NestedBindableList<MapEntry, MapEntry.Property> shapes = loadShapes(this::getDistrictColor);
 
     MapFrame mapFrame = new MapFrame();
     mapFrame.setNumShapesBinding(Binding.sizeBinding(shapes));
@@ -40,7 +41,7 @@ public class MapFrameTest {
 
   @Test
   public void testDefaultFocusAreaEncompassesAllShapes() throws IOException {
-    BindableList<MapEntry> shapes = loadShapes(this::getDistrictColor);
+    NestedBindableList<MapEntry, MapEntry.Property> shapes = loadShapes(this::getDistrictColor);
 
     MapFrame mapFrame = new MapFrame();
     mapFrame.setNumShapesBinding(Binding.sizeBinding(shapes));
@@ -59,7 +60,7 @@ public class MapFrameTest {
 
   @Test
   public void testFocusBox() throws IOException {
-    BindableList<MapEntry> shapes = loadShapes(this::getDistrictColor);
+    NestedBindableList<MapEntry, MapEntry.Property> shapes = loadShapes(this::getDistrictColor);
     Rectangle2D cityBox = loadCityBox();
 
     MapFrame mapFrame = new MapFrame();
@@ -85,7 +86,7 @@ public class MapFrameTest {
 
   @Test
   public void testRenderFull() throws IOException {
-    BindableList<MapEntry> shapes = loadShapes(this::getDistrictColor);
+    NestedBindableList<MapEntry, MapEntry.Property> shapes = loadShapes(this::getDistrictColor);
 
     MapFrame mapFrame = new MapFrame();
     mapFrame.setHeaderBinding(Binding.fixedBinding("PEI"));
@@ -101,7 +102,7 @@ public class MapFrameTest {
 
   @Test
   public void testRenderFullThin() throws IOException {
-    BindableList<MapEntry> shapes = loadShapes(this::getDistrictColor);
+    NestedBindableList<MapEntry, MapEntry.Property> shapes = loadShapes(this::getDistrictColor);
 
     MapFrame mapFrame = new MapFrame();
     mapFrame.setHeaderBinding(Binding.fixedBinding("PEI"));
@@ -117,7 +118,7 @@ public class MapFrameTest {
 
   @Test
   public void testRenderZoomedIn() throws IOException {
-    BindableList<MapEntry> shapes =
+    NestedBindableList<MapEntry, MapEntry.Property> shapes =
         loadShapes(i -> i >= 9 && i <= 14 ? getDistrictColor(i) : Color.GRAY);
     Rectangle2D zoomBox = loadCityBox();
 
@@ -136,7 +137,7 @@ public class MapFrameTest {
 
   @Test
   public void testRenderWithBorders() throws IOException {
-    BindableList<MapEntry> shapes = loadShapes(this::getDistrictColor);
+    NestedBindableList<MapEntry, MapEntry.Property> shapes = loadShapes(this::getDistrictColor);
     Rectangle2D zoomBox = loadCityBox();
     BindableList<Shape> regions = new BindableList<>();
     regions.addAll(shapes.stream().map(MapEntry::getShape).collect(Collectors.toList()));
@@ -158,9 +159,10 @@ public class MapFrameTest {
     compareRendering("MapFrame", "RenderBorders-2", mapFrame);
   }
 
-  private BindableList<MapEntry> loadShapes(IntFunction<Color> colorFunc) throws IOException {
+  private NestedBindableList<MapEntry, MapEntry.Property> loadShapes(IntFunction<Color> colorFunc)
+      throws IOException {
     Map<Integer, Shape> shapesByDistrict = shapesByDistrict();
-    BindableList<MapEntry> shapes = new BindableList<>();
+    NestedBindableList<MapEntry, MapEntry.Property> shapes = new NestedBindableList<>();
     shapesByDistrict.forEach(
         (district, shape) -> {
           Color color = colorFunc.apply(district);
@@ -254,7 +256,7 @@ public class MapFrameTest {
     return ShapefileReader.readShapes(peiMap, "DIST_NO", Integer.class);
   }
 
-  private static class MapEntry extends Bindable {
+  private static class MapEntry extends Bindable<MapEntry.Property> {
 
     private enum Property {
       SHAPE,

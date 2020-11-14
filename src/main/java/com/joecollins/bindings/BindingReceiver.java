@@ -3,8 +3,8 @@ package com.joecollins.bindings;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public class BindingReceiver<T> extends Bindable {
-  private enum Property {
+public class BindingReceiver<T> extends Bindable<BindingReceiver.Property> {
+  enum Property {
     PROP
   }
 
@@ -27,7 +27,7 @@ public class BindingReceiver<T> extends Bindable {
   }
 
   public <U> Binding<U> getFlatBinding(Function<T, Binding<U>> func) {
-    return new Binding<U>() {
+    return new Binding<>() {
       private Binding<T> topBinding;
       private Binding<U> subBinding;
       private Consumer<U> consumer;

@@ -22,7 +22,7 @@ public interface Binding<T> {
 
   default <R> Binding<R> map(Function<T, R> func) {
     Binding<T> me = this;
-    return new Binding<R>() {
+    return new Binding<>() {
       @Override
       public R getValue() {
         return func.apply(me.getValue());
@@ -46,7 +46,7 @@ public interface Binding<T> {
 
   default <U, R> Binding<R> merge(Binding<U> other, BiFunction<T, U, R> func) {
     Binding<T> me = this;
-    return new Binding<R>() {
+    return new Binding<>() {
       private T val1;
       private U val2;
       private boolean bound = false;
@@ -86,7 +86,8 @@ public interface Binding<T> {
     return () -> t;
   }
 
-  static <T, U> Binding<U> propertyBinding(T object, Function<T, U> func, Enum<?>... properties) {
+  static <T extends Bindable<E>, U, E extends Enum<E>> Binding<U> propertyBinding(
+      T object, Function<T, U> func, E... properties) {
     if (object == null) {
       return () -> null;
     }
@@ -105,9 +106,7 @@ public interface Binding<T> {
           throw new IllegalStateException("Binding is already used");
         }
         consumer = val -> onUpdate.accept(func.apply(val));
-        if (object instanceof Bindable) {
-          ((Bindable) object).addBinding(consumer, properties);
-        }
+        object.addBinding(consumer, properties);
         onUpdate.accept(getValue());
       }
 
@@ -116,16 +115,14 @@ public interface Binding<T> {
         if (consumer == null) {
           return;
         }
-        if (object instanceof Bindable) {
-          ((Bindable) object).removeBinding(consumer, properties);
-        }
+        object.removeBinding(consumer, properties);
         consumer = null;
       }
     };
   }
 
-  static <T, U> Function<T, Binding<U>> propertyBindingFunc(
-      Function<T, U> func, Enum<?>... properties) {
+  static <T extends Bindable<E>, U, E extends Enum<E>> Function<T, Binding<U>> propertyBindingFunc(
+      Function<T, U> func, E... properties) {
     return t -> propertyBinding(t, func, properties);
   }
 
@@ -185,7 +182,7 @@ public interface Binding<T> {
       R identity,
       BiFunction<R, T, R> onValueAdded,
       BiFunction<R, T, R> onValueRemoved) {
-    return new Binding<R>() {
+    return new Binding<>() {
       private boolean bound = false;
 
       @Override

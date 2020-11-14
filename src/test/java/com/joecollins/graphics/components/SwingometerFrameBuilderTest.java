@@ -236,7 +236,7 @@ public class SwingometerFrameBuilderTest {
 
   @Test
   public void testFixedDots() {
-    class Dot extends Bindable {
+    class Dot extends Bindable<Property> {
       private final double position;
       private Color color;
 

@@ -228,7 +228,7 @@ public class MixedMemberResultPanel extends JPanel {
           createMapFrame());
     }
 
-    private static class Result extends Bindable {
+    private static class Result extends Bindable<Result.Property> {
       private enum Property {
         VOTES,
         WINNER
@@ -319,7 +319,7 @@ public class MixedMemberResultPanel extends JPanel {
           .build();
     }
 
-    private static class Change<C> extends Bindable {
+    private static class Change<C> extends Bindable<Change.Property> {
       private enum Property {
         CURR,
         PREV

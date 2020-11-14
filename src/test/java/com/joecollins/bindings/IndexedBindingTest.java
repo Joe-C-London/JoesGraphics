@@ -84,7 +84,7 @@ public class IndexedBindingTest {
   @Test
   public void indexedBindingBindableTest() {
     Map<Integer, Integer> valuesByIndex = new HashMap<>();
-    BindableList<BindableInt> list = new BindableList<>();
+    NestedBindableList<BindableInt, BindableValue.Property> list = new NestedBindableList<>();
     BindableInt bindable1 = new BindableInt(7);
     list.add(bindable1);
     IndexedBinding<Integer> binding =
@@ -216,7 +216,7 @@ public class IndexedBindingTest {
     assertNull(valuesByIndex.get(4));
   }
 
-  private static class BindableValue<T> extends Bindable {
+  private static class BindableValue<T> extends Bindable<BindableValue.Property> {
     enum Property {
       VALUE
     }

@@ -557,7 +557,7 @@ public class BasicResultPanel extends JPanel {
       return val == null ? 0 : val;
     }
 
-    private static class Result<KT> extends Bindable {
+    private static class Result<KT> extends Bindable<Result.Property> {
       private enum Property {
         SEATS,
         WINNER
@@ -721,7 +721,7 @@ public class BasicResultPanel extends JPanel {
       return val == null ? ImmutablePair.of(0, 0) : val;
     }
 
-    private static class Result<KT> extends Bindable {
+    private static class Result<KT> extends Bindable<Result.Property> {
       private enum Property {
         SEATS,
         WINNER
@@ -893,7 +893,7 @@ public class BasicResultPanel extends JPanel {
       return val == null ? 0 : val;
     }
 
-    private static class Result<KT> extends Bindable {
+    private static class Result<KT> extends Bindable<Result.Property> {
       private enum Property {
         SEATS,
         WINNER
@@ -1239,7 +1239,7 @@ public class BasicResultPanel extends JPanel {
       super(current, header, subhead, keyTemplate, voteTemplate, others);
     }
 
-    private static class Result<KT> extends Bindable {
+    private static class Result<KT> extends Bindable<Result.Property> {
       private enum Property {
         VOTES,
         WINNER
@@ -1352,7 +1352,7 @@ public class BasicResultPanel extends JPanel {
       return builder.build();
     }
 
-    private static class Change<KT> extends Bindable {
+    private static class Change<KT> extends Bindable<Change.Property> {
       private enum Property {
         CURR,
         PREV

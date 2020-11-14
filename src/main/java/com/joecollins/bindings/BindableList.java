@@ -3,13 +3,9 @@ package com.joecollins.bindings;
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.WeakHashMap;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 import java.util.function.IntConsumer;
 
 public class BindableList<T> extends AbstractList<T> {
@@ -32,11 +28,7 @@ public class BindableList<T> extends AbstractList<T> {
   private ArrayList<T> underlying = new ArrayList<>();
 
   private List<IntConsumer> sizeBindings = new LinkedList<>();
-
-  @SuppressWarnings("rawtypes")
-  private Map<Enum<?>, List<BiConsumer>> itemBindings = new HashMap<>();
-
-  private Map<BiConsumer, Map<Integer, Consumer>> storedBindings = new WeakHashMap<>();
+  private List<BiConsumer<Integer, T>> itemBindings = new LinkedList<>();
 
   public void addSizeBinding(IntConsumer binding) {
     sizeBindings.add(binding);
@@ -46,36 +38,12 @@ public class BindableList<T> extends AbstractList<T> {
     sizeBindings.remove(binding);
   }
 
-  public void addItemBinding(BiConsumer<Integer, ?> binding, Enum<?>... properties) {
-    for (Enum<?> property : properties)
-      itemBindings.computeIfAbsent(property, x -> new LinkedList<>()).add(binding);
-    itemBindings.computeIfAbsent(Empty.NULL, x -> new LinkedList<>()).add(binding);
-    for (int index = 0; index < size(); index++) {
-      T item = get(index);
-      if (item instanceof Bindable) {
-        ((Bindable) item).addBinding(getOrCreateBinding(binding, index), properties);
-        for (Enum<?> property : properties) ((Bindable) item).onPropertyRefreshed(property);
-      }
-    }
+  public void addItemBinding(BiConsumer<Integer, T> binding) {
+    itemBindings.add(binding);
   }
 
   public void removeItemBinding(BiConsumer<Integer, ?> binding, Enum<?>... properties) {
-    for (Enum<?> property : properties)
-      itemBindings.computeIfAbsent(property, x -> new LinkedList<>()).remove(binding);
-    itemBindings.computeIfAbsent(Empty.NULL, x -> new LinkedList<>()).remove(binding);
-    for (int index = 0; index < size(); index++) {
-      T item = get(index);
-      if (item instanceof Bindable) {
-        ((Bindable) item).removeBinding(getOrCreateBinding(binding, index), properties);
-      }
-    }
-  }
-
-  @SuppressWarnings({"rawtypes", "unchecked"})
-  private Consumer getOrCreateBinding(BiConsumer consumer, int index) {
-    return storedBindings
-        .computeIfAbsent(consumer, x -> new HashMap<>())
-        .computeIfAbsent(index, i -> (val -> consumer.accept(i, val)));
+    itemBindings.remove(binding);
   }
 
   private void onSizeUpdated() {
@@ -139,34 +107,12 @@ public class BindableList<T> extends AbstractList<T> {
     return ret;
   }
 
-  @SuppressWarnings({"rawtypes", "unchecked"})
-  private void addAllBindings(int index) {
+  protected void addAllBindings(int index) {
     T item = get(index);
-    for (Map.Entry<Enum<?>, List<BiConsumer>> entry : itemBindings.entrySet()) {
-      Enum<?> property = entry.getKey();
-      List<BiConsumer> consumers = entry.getValue();
-      for (BiConsumer consumer : consumers) {
-        if (item instanceof Bindable) {
-          ((Bindable) item).addBinding(getOrCreateBinding(consumer, index), property);
-          ((Bindable) item).onPropertyRefreshed(property);
-        } else {
-          getOrCreateBinding(consumer, index).accept(item);
-        }
-      }
+    for (BiConsumer<Integer, T> c : itemBindings) {
+      c.accept(index, item);
     }
   }
 
-  @SuppressWarnings("rawtypes")
-  private void removeAllBindings(int index) {
-    T item = get(index);
-    for (Map.Entry<Enum<?>, List<BiConsumer>> entry : itemBindings.entrySet()) {
-      Enum<?> property = entry.getKey();
-      List<BiConsumer> consumers = entry.getValue();
-      for (BiConsumer consumer : consumers) {
-        if (item instanceof Bindable) {
-          ((Bindable) item).removeBinding(getOrCreateBinding(consumer, index), property);
-        }
-      }
-    }
-  }
+  protected void removeAllBindings(int index) {}
 }

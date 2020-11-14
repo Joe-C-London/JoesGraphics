@@ -130,7 +130,7 @@ public class MultiSummaryFrameBuilderTest {
     assertEquals("YP: 338", frame.getValue(1, 0));
   }
 
-  private static class Riding extends Bindable {
+  private static class Riding extends Bindable<Riding.Property> {
     enum Property {
       RESULT,
       WINNER

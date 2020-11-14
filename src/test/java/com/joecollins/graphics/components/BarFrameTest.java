@@ -8,6 +8,7 @@ import com.joecollins.bindings.Bindable;
 import com.joecollins.bindings.BindableList;
 import com.joecollins.bindings.Binding;
 import com.joecollins.bindings.IndexedBinding;
+import com.joecollins.bindings.NestedBindableList;
 import java.awt.Color;
 import java.awt.Polygon;
 import java.awt.Rectangle;
@@ -79,7 +80,8 @@ public class BarFrameTest {
 
   @Test
   public void testLeftTextBinding() {
-    BindableList<ElectionResult> results = new BindableList<>();
+    NestedBindableList<ElectionResult, ElectionResult.Properties> results =
+        new NestedBindableList<>();
     results.add(new ElectionResult("LIBERAL", Color.RED, 157));
     results.add(new ElectionResult("CONSERVATIVE", Color.BLUE, 121));
     results.add(new ElectionResult("BLOC QUEBECOIS", Color.CYAN, 32));
@@ -106,7 +108,8 @@ public class BarFrameTest {
 
   @Test
   public void testRightTextBinding() {
-    BindableList<ElectionResult> results = new BindableList<>();
+    NestedBindableList<ElectionResult, ElectionResult.Properties> results =
+        new NestedBindableList<>();
     results.add(new ElectionResult("LIBERAL", Color.RED, 157));
     results.add(new ElectionResult("CONSERVATIVE", Color.BLUE, 121));
     results.add(new ElectionResult("BLOC QUEBECOIS", Color.CYAN, 32));
@@ -129,7 +132,8 @@ public class BarFrameTest {
 
   @Test
   public void testSeriesBinding() {
-    BindableList<ElectionResult> results = new BindableList<>();
+    NestedBindableList<ElectionResult, ElectionResult.Properties> results =
+        new NestedBindableList<>();
     results.add(new ElectionResult("LIBERAL", Color.RED, 2, 157));
     results.add(new ElectionResult("CONSERVATIVE", Color.BLUE, 1, 121));
     results.add(new ElectionResult("BLOC QUEBECOIS", Color.CYAN, 0, 32));
@@ -179,7 +183,8 @@ public class BarFrameTest {
 
   @Test
   public void testLeftIconBinding() {
-    BindableList<ElectionResult> results = new BindableList<>();
+    NestedBindableList<ElectionResult, ElectionResult.Properties> results =
+        new NestedBindableList<>();
     results.add(new ElectionResult("LIBERAL", Color.RED, 157));
     results.add(new ElectionResult("CONSERVATIVE", Color.BLUE, 121));
     results.add(new ElectionResult("BLOC QUEBECOIS", Color.CYAN, 32));
@@ -205,7 +210,8 @@ public class BarFrameTest {
 
   @Test
   public void testMinMax() {
-    BindableList<ElectionResult> results = new BindableList<>();
+    NestedBindableList<ElectionResult, ElectionResult.Properties> results =
+        new NestedBindableList<>();
     results.add(new ElectionResult("LIBERAL", Color.RED, 157));
     results.add(new ElectionResult("CONSERVATIVE", Color.BLUE, 121));
     results.add(new ElectionResult("BLOC QUEBECOIS", Color.CYAN, 32));
@@ -275,7 +281,8 @@ public class BarFrameTest {
 
   @Test
   public void testUnbind() {
-    BindableList<ElectionResult> results = new BindableList<>();
+    NestedBindableList<ElectionResult, ElectionResult.Properties> results =
+        new NestedBindableList<>();
     ElectionResult con = new ElectionResult("CONSERVATIVE", Color.BLUE, 1);
     ElectionResult lib = new ElectionResult("LIBERAL", Color.RED, 1);
     ElectionResult ndp = new ElectionResult("NEW DEMOCRATIC PARTY", Color.ORANGE, 1);
@@ -290,7 +297,8 @@ public class BarFrameTest {
     assertEquals("LIBERAL", frame.getLeftText(1));
     assertEquals("NEW DEMOCRATIC PARTY", frame.getLeftText(2));
 
-    BindableList<ElectionResult> differentResults = new BindableList<>();
+    NestedBindableList<ElectionResult, ElectionResult.Properties> differentResults =
+        new NestedBindableList<>();
     differentResults.add(new ElectionResult("GREEN", Color.GREEN, 1));
     frame.setNumBarsBinding(Binding.sizeBinding(differentResults));
     frame.setLeftTextBinding(
@@ -324,7 +332,8 @@ public class BarFrameTest {
 
   @Test
   public void testLeftTextBindingOnAdd() {
-    BindableList<ElectionResult> results = new BindableList<>();
+    NestedBindableList<ElectionResult, ElectionResult.Properties> results =
+        new NestedBindableList<>();
     BarFrame frame = new BarFrame();
     frame.setNumBarsBinding(Binding.sizeBinding(results));
     frame.setLeftTextBinding(
@@ -356,7 +365,8 @@ public class BarFrameTest {
 
   @Test
   public void testLeftTextBindingOnRemove() {
-    BindableList<ElectionResult> results = new BindableList<>();
+    NestedBindableList<ElectionResult, ElectionResult.Properties> results =
+        new NestedBindableList<>();
     ElectionResult con = new ElectionResult("CONSERVATIVE", Color.BLUE, 1);
     ElectionResult lib = new ElectionResult("LIBERAL", Color.RED, 1);
     ElectionResult ndp = new ElectionResult("NEW DEMOCRATIC PARTY", Color.ORANGE, 1);
@@ -393,7 +403,8 @@ public class BarFrameTest {
 
   @Test
   public void testLeftTextBindingOnSet() {
-    BindableList<ElectionResult> results = new BindableList<>();
+    NestedBindableList<ElectionResult, ElectionResult.Properties> results =
+        new NestedBindableList<>();
     ElectionResult con = new ElectionResult("CONSERVATIVE", Color.BLUE, 2);
     ElectionResult lib = new ElectionResult("LIBERAL", Color.RED, 3);
     ElectionResult ndp = new ElectionResult("NEW DEMOCRATIC PARTY", Color.ORANGE, 1);
@@ -511,7 +522,8 @@ public class BarFrameTest {
 
   @Test
   public void testRenderSingleSeriesAllPositive() throws IOException {
-    BindableList<ElectionResult> results = new BindableList<>();
+    NestedBindableList<ElectionResult, ElectionResult.Properties> results =
+        new NestedBindableList<>();
     results.add(new ElectionResult("LIBERAL", Color.RED, 157));
     results.add(new ElectionResult("CONSERVATIVE", Color.BLUE, 121));
     results.add(new ElectionResult("BLOC QUEBECOIS", Color.CYAN, 32));
@@ -542,7 +554,8 @@ public class BarFrameTest {
 
   @Test
   public void testRenderSingleSeriesWithSubhead() throws IOException {
-    BindableList<ElectionResult> results = new BindableList<>();
+    NestedBindableList<ElectionResult, ElectionResult.Properties> results =
+        new NestedBindableList<>();
     results.add(new ElectionResult("LIBERAL", Color.RED, 157));
     results.add(new ElectionResult("CONSERVATIVE", Color.BLUE, 121));
     results.add(new ElectionResult("BLOC QUEBECOIS", Color.CYAN, 32));
@@ -575,7 +588,8 @@ public class BarFrameTest {
 
   @Test
   public void testRenderSingleSeriesShrinkToFit() throws IOException {
-    BindableList<ElectionResult> results = new BindableList<>();
+    NestedBindableList<ElectionResult, ElectionResult.Properties> results =
+        new NestedBindableList<>();
     results.add(new ElectionResult("LIBERAL", Color.RED, 177));
     results.add(new ElectionResult("CONSERVATIVE", Color.BLUE, 95));
     results.add(new ElectionResult("NEW DEMOCRATIC PARTY", Color.ORANGE, 39));
@@ -610,7 +624,8 @@ public class BarFrameTest {
 
   @Test
   public void testRenderMultiSeriesAllPositive() throws IOException {
-    BindableList<ElectionResult> results = new BindableList<>();
+    NestedBindableList<ElectionResult, ElectionResult.Properties> results =
+        new NestedBindableList<>();
     results.add(new ElectionResult("LIBERAL", Color.RED, 34, 157));
     results.add(new ElectionResult("CONSERVATIVE", Color.BLUE, 21, 121));
     results.add(new ElectionResult("BLOC QUEBECOIS", Color.CYAN, 2, 32));
@@ -652,7 +667,8 @@ public class BarFrameTest {
 
   @Test
   public void testRenderSingleSeriesBothDirections() throws IOException {
-    BindableList<ElectionResult> results = new BindableList<>();
+    NestedBindableList<ElectionResult, ElectionResult.Properties> results =
+        new NestedBindableList<>();
     results.add(new ElectionResult("LIB", Color.RED, -27));
     results.add(new ElectionResult("CON", Color.BLUE, +22));
     results.add(new ElectionResult("BQ", Color.CYAN, +22));
@@ -686,7 +702,8 @@ public class BarFrameTest {
 
   @Test
   public void testRenderMultiSeriesBothDirections() throws IOException {
-    BindableList<ElectionResult> results = new BindableList<>();
+    NestedBindableList<ElectionResult, ElectionResult.Properties> results =
+        new NestedBindableList<>();
     results.add(new ElectionResult("LIB", Color.RED, -7, -27));
     results.add(new ElectionResult("CON", Color.BLUE, +4, +22));
     results.add(new ElectionResult("BQ", Color.CYAN, +0, +22));
@@ -736,7 +753,7 @@ public class BarFrameTest {
 
   @Test
   public void testRenderTwoLinedBars() throws IOException {
-    BindableList<RidingResult> results = new BindableList<>();
+    NestedBindableList<RidingResult, RidingResult.Properties> results = new NestedBindableList<>();
     results.add(new RidingResult("BARDISH CHAGGER", "LIBERAL", Color.RED, 31085, 0.4879));
     results.add(new RidingResult("JERRY ZHANG", "CONSERVATIVE", Color.BLUE, 15615, 0.2451));
     results.add(
@@ -770,9 +787,9 @@ public class BarFrameTest {
     barFrame.addSeriesBinding(
         "Seats",
         IndexedBinding.propertyBinding(
-            results, RidingResult::getPartyColor, ElectionResult.Properties.PARTY_COLOR),
+            results, RidingResult::getPartyColor, RidingResult.Properties.PARTY_COLOR),
         IndexedBinding.propertyBinding(
-            results, RidingResult::getNumVotes, ElectionResult.Properties.NUM_SEATS));
+            results, RidingResult::getNumVotes, RidingResult.Properties.NUM_VOTES));
     barFrame.setSize(512, 256);
 
     compareRendering("BarFrame", "TwoLinedBars", barFrame);
@@ -780,7 +797,7 @@ public class BarFrameTest {
 
   @Test
   public void testRenderTwoLinedBarWithIcon() throws IOException {
-    BindableList<RidingResult> results = new BindableList<>();
+    NestedBindableList<RidingResult, RidingResult.Properties> results = new NestedBindableList<>();
     results.add(new RidingResult("BARDISH CHAGGER", "LIBERAL", Color.RED, 31085, 0.4879, true));
     results.add(new RidingResult("JERRY ZHANG", "CONSERVATIVE", Color.BLUE, 15615, 0.2451));
     results.add(
@@ -829,7 +846,7 @@ public class BarFrameTest {
 
   @Test
   public void testRenderTwoLinedBarWithNegativeIcon() throws IOException {
-    BindableList<RidingResult> results = new BindableList<>();
+    NestedBindableList<RidingResult, RidingResult.Properties> results = new NestedBindableList<>();
     results.add(new RidingResult("BARDISH CHAGGER", "LIB", Color.RED, 31085, -0.010, true));
     results.add(new RidingResult("JERRY ZHANG", "CON", Color.BLUE, 15615, -0.077));
     results.add(new RidingResult("LORI CAMPBELL", "NDP", Color.ORANGE, 9710, +0.003));
@@ -863,7 +880,8 @@ public class BarFrameTest {
 
   @Test
   public void testRenderVerticalLine() throws IOException {
-    BindableList<ElectionResult> results = new BindableList<>();
+    NestedBindableList<ElectionResult, ElectionResult.Properties> results =
+        new NestedBindableList<>();
     results.add(new ElectionResult("LIBERAL", Color.RED, 177));
     results.add(new ElectionResult("CONSERVATIVE", Color.BLUE, 95));
     results.add(new ElectionResult("NEW DEMOCRATIC PARTY", Color.ORANGE, 39));
@@ -902,7 +920,8 @@ public class BarFrameTest {
 
   @Test
   public void testRenderAccents() throws IOException {
-    BindableList<ElectionResult> results = new BindableList<>();
+    NestedBindableList<ElectionResult, ElectionResult.Properties> results =
+        new NestedBindableList<>();
     results.add(
         new ElectionResult("COALITION AVENIR QU\u00c9BEC: FRAN\u00c7OIS LEGAULT", Color.BLUE, 74));
     results.add(new ElectionResult("LIB\u00c9RAL: PHILIPPE COUILLARD", Color.RED, 31));
@@ -937,7 +956,8 @@ public class BarFrameTest {
 
   @Test
   public void testRenderMultiLineAccents() throws IOException {
-    BindableList<ElectionResult> results = new BindableList<>();
+    NestedBindableList<ElectionResult, ElectionResult.Properties> results =
+        new NestedBindableList<>();
     results.add(
         new ElectionResult("COALITION AVENIR QU\u00c9BEC\nFRAN\u00c7OIS LEGAULT", Color.BLUE, 74));
     results.add(new ElectionResult("LIB\u00c9RAL\nPHILIPPE COUILLARD", Color.RED, 31));
@@ -979,7 +999,7 @@ public class BarFrameTest {
     return shape;
   }
 
-  private static class ElectionResult extends Bindable {
+  private static class ElectionResult extends Bindable<ElectionResult.Properties> {
 
     private enum Properties {
       PARTY_NAME,
@@ -1041,7 +1061,7 @@ public class BarFrameTest {
     }
   }
 
-  private static class RidingResult extends Bindable {
+  private static class RidingResult extends Bindable<RidingResult.Properties> {
 
     private enum Properties {
       CANDIDATE_NAME,

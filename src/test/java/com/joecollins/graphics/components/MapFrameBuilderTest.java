@@ -68,8 +68,7 @@ public class MapFrameBuilderTest {
     shapes.add(new ConstituencyPair(new Rectangle2D.Double(5, 5, 2, 2), Color.BLUE));
 
     MapFrame frame =
-        MapFrameBuilder.from(
-                () -> shapes, cp -> cp.shape, Binding.propertyBindingFunc(cp -> cp.color))
+        MapFrameBuilder.from(() -> shapes, cp -> cp.shape, cp -> Binding.fixedBinding(cp.color))
             .withHeader(Binding.fixedBinding("MAP"))
             .build();
     assertEquals(2, frame.getNumShapes());

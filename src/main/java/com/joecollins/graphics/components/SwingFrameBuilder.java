@@ -16,7 +16,7 @@ import org.apache.commons.collections4.ComparatorUtils;
 
 public class SwingFrameBuilder {
 
-  private static class SwingProperties extends Bindable {
+  private static class SwingProperties extends Bindable<SwingProperties.SwingProperty> {
     enum SwingProperty {
       LEFT_COLOR,
       RIGHT_COLOR,
@@ -210,7 +210,7 @@ public class SwingFrameBuilder {
     return swingFrame;
   }
 
-  private static class BindablePrevCurrPct extends Bindable {
+  private static class BindablePrevCurrPct extends Bindable<SingletonProperty> {
 
     private Map<Party, Double> prevPct = new HashMap<>();
     private Map<Party, Double> currPct = new HashMap<>();

@@ -231,7 +231,7 @@ public class BindingTest {
     assertEquals(1, boundValue.getValue().intValue());
   }
 
-  private static class BindableValue<T> extends Bindable {
+  private static class BindableValue<T> extends Bindable<BindableValue.Property> {
     enum Property {
       VALUE
     }

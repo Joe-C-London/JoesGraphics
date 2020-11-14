@@ -21,7 +21,7 @@ public interface IndexedBinding<T> {
   default void unbind() {}
 
   static <T> IndexedBinding<T> emptyBinding() {
-    return new IndexedBinding<T>() {
+    return new IndexedBinding<>() {
       @Override
       public int size() {
         return 0;
@@ -35,7 +35,7 @@ public interface IndexedBinding<T> {
   }
 
   static <T> IndexedBinding<T> singletonBinding(T item) {
-    return new IndexedBinding<T>() {
+    return new IndexedBinding<>() {
       @Override
       public int size() {
         return 1;
@@ -50,7 +50,7 @@ public interface IndexedBinding<T> {
 
   static <T> IndexedBinding<T> functionBinding(
       int startInclusive, int endExclusive, IntFunction<T> itemFunc) {
-    return new IndexedBinding<T>() {
+    return new IndexedBinding<>() {
       @Override
       public int size() {
         return endExclusive - startInclusive;
@@ -64,7 +64,7 @@ public interface IndexedBinding<T> {
   }
 
   static <T> IndexedBinding<T> listBinding(T... items) {
-    return new IndexedBinding<T>() {
+    return new IndexedBinding<>() {
       @Override
       public int size() {
         return items.length;
@@ -78,7 +78,7 @@ public interface IndexedBinding<T> {
   }
 
   static <T> IndexedBinding<T> listBinding(List<T> items) {
-    return new IndexedBinding<T>() {
+    return new IndexedBinding<>() {
       @Override
       public int size() {
         return items.size();
@@ -91,8 +91,8 @@ public interface IndexedBinding<T> {
     };
   }
 
-  static <T extends Bindable, U> IndexedBinding<U> propertyBinding(
-      T item, Function<T, List<? extends U>> func, Enum<?>... properties) {
+  static <E extends Enum<E>, T extends Bindable<E>, U> IndexedBinding<U> propertyBinding(
+      T item, Function<T, List<? extends U>> func, E... properties) {
     if (item == null) {
       return emptyBinding();
     }
@@ -139,9 +139,7 @@ public interface IndexedBinding<T> {
     };
   }
 
-  @SuppressWarnings("unchecked")
-  static <T, U> IndexedBinding<U> propertyBinding(
-      BindableList<T> list, Function<T, U> func, Enum<?>... properties) {
+  static <T, U> IndexedBinding<U> propertyBinding(BindableList<T> list, Function<T, U> func) {
     if (list == null) {
       return emptyBinding();
     }
@@ -167,7 +165,7 @@ public interface IndexedBinding<T> {
           throw new IllegalStateException("Binding is already used");
         }
         consumer = (idx, val) -> onUpdate.accept(idx, func.apply(val));
-        list.addItemBinding(consumer, properties);
+        list.addItemBinding(consumer);
         IntStream.range(0, size()).forEach(idx -> onUpdate.accept(idx, getValue(idx)));
       }
 
@@ -176,7 +174,49 @@ public interface IndexedBinding<T> {
         if (consumer == null) {
           throw new IllegalStateException("Binding is not currently used");
         }
-        list.removeItemBinding(consumer, properties);
+        list.removeItemBinding(consumer);
+        consumer = null;
+      }
+    };
+  }
+
+  static <T extends Bindable<E>, U, E extends Enum<E>> IndexedBinding<U> propertyBinding(
+      NestedBindableList<T, E> list, Function<T, U> func, E... properties) {
+    if (list == null) {
+      return emptyBinding();
+    }
+    return new IndexedBinding<>() {
+      private BiConsumer<Integer, T> consumer = null;
+
+      @Override
+      public U getValue(int idx) {
+        if (idx < 0 || idx >= size()) {
+          return null;
+        }
+        return func.apply(list.get(idx));
+      }
+
+      @Override
+      public int size() {
+        return list.size();
+      }
+
+      @Override
+      public void bind(BiConsumer<Integer, U> onUpdate) {
+        if (consumer != null) {
+          throw new IllegalStateException("Binding is already used");
+        }
+        consumer = (idx, val) -> onUpdate.accept(idx, func.apply(val));
+        list.addNestedItemBinding(consumer, properties);
+        IntStream.range(0, size()).forEach(idx -> onUpdate.accept(idx, getValue(idx)));
+      }
+
+      @Override
+      public void unbind() {
+        if (consumer == null) {
+          throw new IllegalStateException("Binding is not currently used");
+        }
+        list.removeNestedItemBinding(consumer, properties);
         consumer = null;
       }
     };
@@ -187,7 +227,7 @@ public interface IndexedBinding<T> {
       return emptyBinding();
     }
     List<Binding<U>> bindings = list.stream().map(bindingFunc).collect(Collectors.toList());
-    return new IndexedBinding<U>() {
+    return new IndexedBinding<>() {
       @Override
       public int size() {
         return bindings.size();

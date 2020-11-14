@@ -4,9 +4,9 @@ import static com.joecollins.graphics.utils.RenderTestUtils.compareRendering;
 import static org.junit.Assert.assertEquals;
 
 import com.joecollins.bindings.Bindable;
-import com.joecollins.bindings.BindableList;
 import com.joecollins.bindings.Binding;
 import com.joecollins.bindings.IndexedBinding;
+import com.joecollins.bindings.NestedBindableList;
 import java.awt.Color;
 import java.io.IOException;
 import java.util.Comparator;
@@ -23,7 +23,7 @@ public class ResultListingFrameTest {
 
   @Test
   public void testItems() {
-    BindableList<Item> items = new BindableList<>();
+    NestedBindableList<Item, Item.Property> items = new NestedBindableList<>();
     ResultListingFrame frame = new ResultListingFrame();
     frame.setNumItemsBinding(Binding.sizeBinding(items));
     frame.setTextBinding(IndexedBinding.propertyBinding(items, i -> i.text, Item.Property.TEXT));
@@ -57,7 +57,7 @@ public class ResultListingFrameTest {
 
   @Test
   public void testSingleFullColumn() throws IOException {
-    BindableList<Item> items = new BindableList<>();
+    NestedBindableList<Item, Item.Property> items = new NestedBindableList<>();
     items.add(new Item("Mermaid-Stratford", Color.WHITE, Color.BLACK, Color.RED)); // 0.0
     items.add(new Item("Charlottetown-Brighton", Color.WHITE, Color.BLACK, Color.RED)); // 0.8
     items.add(new Item("Summerside-Wilmot", Color.WHITE, Color.BLACK, Color.RED)); // 1.0
@@ -113,7 +113,7 @@ public class ResultListingFrameTest {
 
   @Test
   public void testVaryingItems() throws IOException {
-    BindableList<Item> items = new BindableList<>();
+    NestedBindableList<Item, Item.Property> items = new NestedBindableList<>();
 
     ResultListingFrame frame = new ResultListingFrame();
     frame.setNumRowsBinding(() -> 10);
@@ -151,7 +151,7 @@ public class ResultListingFrameTest {
 
   @Test
   public void testVaryingItemsInReverse() throws IOException {
-    BindableList<Item> items = new BindableList<>();
+    NestedBindableList<Item, Item.Property> items = new NestedBindableList<>();
 
     ResultListingFrame frame = new ResultListingFrame();
     frame.setNumRowsBinding(() -> 10);
@@ -188,7 +188,7 @@ public class ResultListingFrameTest {
     compareRendering("ResultListingFrame", "Reversed-3", frame);
   }
 
-  private static class Item extends Bindable {
+  private static class Item extends Bindable<Item.Property> {
     enum Property {
       TEXT,
       FOREGROUND,
