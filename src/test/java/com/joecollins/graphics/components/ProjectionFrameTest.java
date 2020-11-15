@@ -35,6 +35,15 @@ public class ProjectionFrameTest {
   }
 
   @Test
+  public void testAlignment() {
+    ProjectionFrame frame = new ProjectionFrame();
+    assertEquals(ProjectionFrame.Alignment.BOTTOM, frame.getImageAlignment());
+
+    frame.setImageAlignmentBinding(Binding.fixedBinding(ProjectionFrame.Alignment.MIDDLE));
+    assertEquals(ProjectionFrame.Alignment.MIDDLE, frame.getImageAlignment());
+  }
+
+  @Test
   public void testRendering() throws IOException {
     ProjectionFrame frame = new ProjectionFrame();
     frame.setImageBinding(Binding.fixedBinding(peiLeg()));
@@ -59,6 +68,20 @@ public class ProjectionFrameTest {
 
     frame.setSize(1024, 512);
     compareRendering("ProjectionFrame", "Long", frame);
+  }
+
+  @Test
+  public void testCenterRendering() throws IOException {
+    ProjectionFrame frame = new ProjectionFrame();
+    frame.setImageBinding(Binding.fixedBinding(peiLeg()));
+    frame.setBackColorBinding(Binding.fixedBinding(Color.GRAY));
+    frame.setBorderColorBinding(Binding.fixedBinding(Color.GRAY));
+    frame.setImageAlignmentBinding(Binding.fixedBinding(ProjectionFrame.Alignment.MIDDLE));
+    frame.setFooterTextBinding(Binding.fixedBinding("MINORITY LEGISLATURE"));
+    frame.setHeaderBinding(Binding.fixedBinding("PROJECTION"));
+
+    frame.setSize(1024, 512);
+    compareRendering("ProjectionFrame", "Center", frame);
   }
 
   private Image peiLeg() throws IOException {

@@ -16,10 +16,16 @@ import javax.swing.border.EmptyBorder;
 
 public class ProjectionFrame extends GraphicsFrame {
 
+  public enum Alignment {
+    BOTTOM,
+    MIDDLE
+  }
+
   private Binding<Image> imageBinding =
       Binding.fixedBinding(new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB));
   private Binding<Color> colorBinding = Binding.fixedBinding(Color.WHITE);
   private Binding<String> textBinding = Binding.fixedBinding("");
+  private Binding<Alignment> imageAlignmentBinding = Binding.fixedBinding(Alignment.BOTTOM);
 
   private ImagePanel imagePanel = new ImagePanel();
   private JPanel footerPanel = new JPanel();
@@ -72,8 +78,19 @@ public class ProjectionFrame extends GraphicsFrame {
     this.textBinding.bind(footerLabel::setText);
   }
 
+  Alignment getImageAlignment() {
+    return imagePanel.alignment;
+  }
+
+  public void setImageAlignmentBinding(Binding<Alignment> imageAlignmentBinding) {
+    this.imageAlignmentBinding.unbind();
+    this.imageAlignmentBinding = imageAlignmentBinding;
+    this.imageAlignmentBinding.bind(imagePanel::setAlignment);
+  }
+
   private class ImagePanel extends JPanel {
     private Image image = imageBinding.getValue();
+    private Alignment alignment = imageAlignmentBinding.getValue();
 
     public ImagePanel() {
       setBackground(Color.WHITE);
@@ -81,6 +98,11 @@ public class ProjectionFrame extends GraphicsFrame {
 
     private void setImage(Image image) {
       this.image = image;
+      repaint();
+    }
+
+    private void setAlignment(Alignment alignment) {
+      this.alignment = alignment;
       repaint();
     }
 
@@ -95,7 +117,11 @@ public class ProjectionFrame extends GraphicsFrame {
       ((Graphics2D) g)
           .setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
       Image scaledImage = image.getScaledInstance(newWidth, newHeight, Image.SCALE_DEFAULT);
-      g.drawImage(scaledImage, (getWidth() - newWidth) / 2, (getHeight() - newHeight), null);
+      g.drawImage(
+          scaledImage,
+          (getWidth() - newWidth) / 2,
+          (getHeight() - newHeight) / (alignment == Alignment.BOTTOM ? 1 : 2),
+          null);
     }
   }
 }
