@@ -1399,7 +1399,11 @@ public class BasicResultPanel extends JPanel {
                 Map<Party, Integer> prevVotes = new HashMap<>(r.prevVotes);
                 r.prevVotes.entrySet().stream()
                     .filter(e -> !partyTotal.containsKey(e.getKey()))
-                    .forEach(e -> prevVotes.merge(Party.OTHERS, e.getValue(), Integer::sum));
+                    .forEach(
+                        e -> {
+                          partyTotal.putIfAbsent(Party.OTHERS, 0);
+                          prevVotes.merge(Party.OTHERS, e.getValue(), Integer::sum);
+                        });
                 return partyTotal.entrySet().stream()
                     .sorted(
                         Comparator.<Map.Entry<Party, Integer>>comparingInt(
