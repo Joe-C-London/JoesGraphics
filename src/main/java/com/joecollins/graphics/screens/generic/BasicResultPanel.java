@@ -25,6 +25,7 @@ import java.awt.Shape;
 import java.text.DecimalFormat;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -276,6 +277,8 @@ public class BasicResultPanel extends JPanel {
     String toMainBarHeader(KT key, int barsCount);
 
     Shape winnerShape(int numCandidates);
+
+    Shape runoffShape(int numCandidates);
   }
 
   private static class PartyTemplate implements KeyTemplate<Party> {
@@ -293,6 +296,11 @@ public class BasicResultPanel extends JPanel {
     @Override
     public Shape winnerShape(int numCandidates) {
       return ImageGenerator.createTickShape();
+    }
+
+    @Override
+    public Shape runoffShape(int numCandidates) {
+      return ImageGenerator.createRunoffShape();
     }
   }
 
@@ -332,6 +340,13 @@ public class BasicResultPanel extends JPanel {
       return numCandidates > DOUBLE_LINE_BAR_LIMIT
           ? ImageGenerator.createTickShape()
           : ImageGenerator.createHalfTickShape();
+    }
+
+    @Override
+    public Shape runoffShape(int numCandidates) {
+      return numCandidates > DOUBLE_LINE_BAR_LIMIT
+          ? ImageGenerator.createRunoffShape()
+          : ImageGenerator.createHalfRunoffShape();
     }
   }
 
@@ -1069,6 +1084,7 @@ public class BasicResultPanel extends JPanel {
     protected BindingReceiver<Boolean> showMajority;
     protected BindingReceiver<String> majorityLabel;
     protected BindingReceiver<KT> winner;
+    protected BindingReceiver<Set<KT>> runoff;
     protected BindingReceiver<Double> pctReporting;
     protected BindingReceiver<String> notes;
     protected int limit = Integer.MAX_VALUE;
@@ -1113,6 +1129,11 @@ public class BasicResultPanel extends JPanel {
 
     public VoteScreenBuilder<KT, CT, CPT, PT> withWinner(Binding<KT> winner) {
       this.winner = new BindingReceiver<>(winner);
+      return this;
+    }
+
+    public VoteScreenBuilder<KT, CT, CPT, PT> withRunoff(Binding<Set<KT>> runoff) {
+      this.runoff = new BindingReceiver<>(runoff);
       return this;
     }
 
@@ -1242,11 +1263,13 @@ public class BasicResultPanel extends JPanel {
     private static class Result<KT> extends Bindable<Result.Property> {
       private enum Property {
         VOTES,
-        WINNER
+        WINNER,
+        RUNOFF
       }
 
       private Map<KT, Integer> votes = new HashMap<>();
       private KT winner;
+      private Set<KT> runoff = new HashSet<>();
 
       public void setVotes(Map<KT, Integer> votes) {
         this.votes = votes;
@@ -1257,6 +1280,11 @@ public class BasicResultPanel extends JPanel {
         this.winner = winner;
         onPropertyRefreshed(Property.WINNER);
       }
+
+      public void setRunoff(Set<KT> runoff) {
+        this.runoff = (runoff == null ? Set.of() : runoff);
+        onPropertyRefreshed(Property.RUNOFF);
+      }
     }
 
     @Override
@@ -1265,6 +1293,9 @@ public class BasicResultPanel extends JPanel {
       current.getBinding().bind(result::setVotes);
       if (winner != null) {
         winner.getBinding().bind(result::setWinner);
+      }
+      if (runoff != null) {
+        runoff.getBinding().bind(result::setRunoff);
       }
       Binding<List<BarFrameBuilder.BasicBar>> bars =
           Binding.propertyBinding(
@@ -1276,7 +1307,8 @@ public class BasicResultPanel extends JPanel {
                         Stream.concat(
                                 r.votes.keySet().stream()
                                     .filter(k -> mandatoryParties.contains(keyTemplate.toParty(k))),
-                                Stream.of(r.winner).filter(Objects::nonNull))
+                                Stream.concat(r.runoff.stream(), Stream.of(r.winner))
+                                    .filter(Objects::nonNull))
                             .filter(Objects::nonNull)
                             .toArray();
                 var aggregatedResult = Aggregators.topAndOthers(r.votes, limit, others, mandatory);
@@ -1297,17 +1329,23 @@ public class BasicResultPanel extends JPanel {
                           } else {
                             valueLabel = voteTemplate.toBarString(e.getValue(), pct, count);
                           }
+                          Shape shape;
+                          if (e.getKey().equals(r.winner)) shape = keyTemplate.winnerShape(count);
+                          else if (r.runoff.contains(e.getKey()))
+                            shape = keyTemplate.runoffShape(count);
+                          else shape = null;
                           return new BarFrameBuilder.BasicBar(
                               keyTemplate.toMainBarHeader(e.getKey(), count),
                               keyTemplate.toParty(e.getKey()).getColor(),
                               Double.isNaN(pct) ? 0 : pct,
                               valueLabel,
-                              e.getKey().equals(r.winner) ? keyTemplate.winnerShape(count) : null);
+                              shape);
                         })
                     .collect(Collectors.toList());
               },
               Result.Property.VOTES,
-              Result.Property.WINNER);
+              Result.Property.WINNER,
+              Result.Property.RUNOFF);
       BarFrameBuilder builder =
           BarFrameBuilder.basic(bars)
               .withHeader(header.getBinding())

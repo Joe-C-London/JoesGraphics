@@ -21,7 +21,11 @@ public class ImageGenerator {
   }
 
   public static Shape createHalfTickShape() {
-    Area shape = new Area(createTickShape());
+    return createHalfShape(createTickShape());
+  }
+
+  private static Area createHalfShape(Shape s) {
+    Area shape = new Area(s);
     shape.add(new Area(new Rectangle2D.Double(200, 200, 1e-6, 1e-6)));
     return shape;
   }
@@ -43,5 +47,20 @@ public class ImageGenerator {
                 new int[] {25, 15, 40, 15, 25, 50, 75, 85, 60, 85, 75, 50},
                 12)));
     return shape;
+  }
+
+  public static Shape createRunoffShape() {
+    Area shape = new Area(new Rectangle(0, 0, 100, 100));
+    shape.subtract(
+        new Area(
+            new Polygon(
+                new int[] {10, 10, 50, 50, 90, 50, 50},
+                new int[] {30, 70, 70, 90, 50, 10, 30},
+                7)));
+    return shape;
+  }
+
+  public static Shape createHalfRunoffShape() {
+    return createHalfShape(createRunoffShape());
   }
 }

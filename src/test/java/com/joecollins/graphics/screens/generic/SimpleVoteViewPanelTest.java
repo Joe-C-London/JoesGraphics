@@ -6,6 +6,7 @@ import com.joecollins.graphics.components.MapFrameTest;
 import com.joecollins.graphics.screens.generic.MapBuilder.Result;
 import com.joecollins.graphics.utils.BindableWrapper;
 import com.joecollins.graphics.utils.ShapefileReader;
+import com.joecollins.models.general.Aggregators;
 import com.joecollins.models.general.Candidate;
 import com.joecollins.models.general.Party;
 import java.awt.Color;
@@ -19,6 +20,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.Test;
 
@@ -947,6 +949,133 @@ public class SimpleVoteViewPanelTest {
             .build(header.getBinding());
     panel.setSize(1024, 512);
     compareRendering("SimpleVoteViewPanel", "PartiesNotRunningAgainOthers-1", panel);
+  }
+
+  @Test
+  public void testCandidateRunoffSingleLine() throws IOException {
+    Candidate macron =
+        new Candidate("Emmanuel Macron", new Party("En Marche!", "EM", Color.ORANGE));
+    Candidate lePen =
+        new Candidate("Marine Le Pen", new Party("National Front", "FN", Color.BLUE.darker()));
+    Candidate fillon =
+        new Candidate("Fran\u00e7ois Fillon", new Party("The Republicans", "LR", Color.BLUE));
+    Candidate melenchon =
+        new Candidate(
+            "Jean-Luc M\u00e9lenchon",
+            new Party("La France Insoumise", "FI", Color.ORANGE.darker()));
+    Candidate hamon =
+        new Candidate("Beno\u00eet Hamon", new Party("Socialist Party", "PS", Color.RED));
+    Candidate dupontAignan =
+        new Candidate(
+            "Nicolas Dupont-Aignan", new Party("Debout la France", "DLF", Color.CYAN.darker()));
+    Candidate lasalle =
+        new Candidate("Jean Lasalle", new Party("R\u00e9sistons!", "R\u00c9S", Color.CYAN));
+    Candidate poutou =
+        new Candidate(
+            "Philippe Poutou", new Party("New Anticapitalist Party", "NPA", Color.RED.darker()));
+    Candidate asselineau =
+        new Candidate(
+            "Fran\u00e7ois Asselineau",
+            new Party("Popular Republican Union", "UPR", Color.CYAN.darker().darker()));
+    Candidate arthaud =
+        new Candidate("Nathalie Arthaud", new Party("Lutte Ouvri\u00e8re", "LO", Color.RED));
+    Candidate cheminade =
+        new Candidate("Jacques Cheminade", new Party("Solidarity and Progress", "S&P", Color.GRAY));
+
+    LinkedHashMap<Candidate, Integer> curr = new LinkedHashMap<>();
+    curr.put(macron, 8656346);
+    curr.put(lePen, 7678491);
+    curr.put(fillon, 7212995);
+    curr.put(melenchon, 7059951);
+    curr.put(hamon, 2291288);
+    curr.put(dupontAignan, 1695000);
+    curr.put(lasalle, 435301);
+    curr.put(poutou, 394505);
+    curr.put(asselineau, 332547);
+    curr.put(arthaud, 232384);
+    curr.put(cheminade, 65586);
+
+    BindableWrapper<LinkedHashMap<Candidate, Integer>> currentVotes = new BindableWrapper<>(curr);
+    BindableWrapper<String> header = new BindableWrapper<>("ELECTION 2017: FRANCE DECIDES");
+    BindableWrapper<String> voteHeader = new BindableWrapper<>("FIRST ROUND RESULT");
+    BindableWrapper<String> voteSubhead = new BindableWrapper<>("");
+    BindableWrapper<Set<Candidate>> runoff = new BindableWrapper<>();
+
+    BasicResultPanel panel =
+        BasicResultPanel.candidateVotes(
+                currentVotes.getBinding(), voteHeader.getBinding(), voteSubhead.getBinding())
+            .withRunoff(runoff.getBinding())
+            .withMajorityLine(() -> true, () -> "50% TO WIN")
+            .build(header.getBinding());
+    panel.setSize(1024, 512);
+    compareRendering("SimpleVoteViewPanel", "CandidateRunoffSingleLine-1", panel);
+
+    runoff.setValue(Set.of(macron, lePen));
+    compareRendering("SimpleVoteViewPanel", "CandidateRunoffSingleLine-2", panel);
+  }
+
+  @Test
+  public void testCandidateRunoffDualLine() throws IOException {
+    Candidate macron =
+        new Candidate("Emmanuel Macron", new Party("En Marche!", "EM", Color.ORANGE));
+    Candidate lePen =
+        new Candidate("Marine Le Pen", new Party("National Front", "FN", Color.BLUE.darker()));
+    Candidate fillon =
+        new Candidate("Fran\u00e7ois Fillon", new Party("The Republicans", "LR", Color.BLUE));
+    Candidate melenchon =
+        new Candidate(
+            "Jean-Luc M\u00e9lenchon",
+            new Party("La France Insoumise", "FI", Color.ORANGE.darker()));
+    Candidate hamon =
+        new Candidate("Beno\u00eet Hamon", new Party("Socialist Party", "PS", Color.RED));
+    Candidate dupontAignan =
+        new Candidate(
+            "Nicolas Dupont-Aignan", new Party("Debout la France", "DLF", Color.CYAN.darker()));
+    Candidate lasalle =
+        new Candidate("Jean Lasalle", new Party("R\u00e9sistons!", "R\u00c9S", Color.CYAN));
+    Candidate poutou =
+        new Candidate(
+            "Philippe Poutou", new Party("New Anticapitalist Party", "NPA", Color.RED.darker()));
+    Candidate asselineau =
+        new Candidate(
+            "Fran\u00e7ois Asselineau",
+            new Party("Popular Republican Union", "UPR", Color.CYAN.darker().darker()));
+    Candidate arthaud =
+        new Candidate("Nathalie Arthaud", new Party("Lutte Ouvri\u00e8re", "LO", Color.RED));
+    Candidate cheminade =
+        new Candidate("Jacques Cheminade", new Party("Solidarity and Progress", "S&P", Color.GRAY));
+
+    LinkedHashMap<Candidate, Integer> curr = new LinkedHashMap<>();
+    curr.put(macron, 8656346);
+    curr.put(lePen, 7678491);
+    curr.put(fillon, 7212995);
+    curr.put(melenchon, 7059951);
+    curr.put(hamon, 2291288);
+    curr.put(dupontAignan, 1695000);
+    curr.put(lasalle, 435301);
+    curr.put(poutou, 394505);
+    curr.put(asselineau, 332547);
+    curr.put(arthaud, 232384);
+    curr.put(cheminade, 65586);
+
+    BindableWrapper<Map<Candidate, Integer>> currentVotes =
+        new BindableWrapper<>(Aggregators.topAndOthers(curr, 6, Candidate.OTHERS));
+    BindableWrapper<String> header = new BindableWrapper<>("ELECTION 2017: FRANCE DECIDES");
+    BindableWrapper<String> voteHeader = new BindableWrapper<>("FIRST ROUND RESULT");
+    BindableWrapper<String> voteSubhead = new BindableWrapper<>("");
+    BindableWrapper<Set<Candidate>> runoff = new BindableWrapper<>();
+
+    BasicResultPanel panel =
+        BasicResultPanel.candidateVotes(
+                currentVotes.getBinding(), voteHeader.getBinding(), voteSubhead.getBinding())
+            .withRunoff(runoff.getBinding())
+            .withMajorityLine(() -> true, () -> "50% TO WIN")
+            .build(header.getBinding());
+    panel.setSize(1024, 512);
+    compareRendering("SimpleVoteViewPanel", "CandidateRunoffDualLine-1", panel);
+
+    runoff.setValue(Set.of(macron, lePen));
+    compareRendering("SimpleVoteViewPanel", "CandidateRunoffDualLine-2", panel);
   }
 
   private Map<Integer, Shape> peiShapesByDistrict() throws IOException {
