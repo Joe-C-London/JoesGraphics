@@ -19,6 +19,7 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -432,10 +433,52 @@ public class BarFrame extends GraphicsFrame {
       double zero = getPixelOfValue(0.0);
 
       String[] leftText = this.leftText.split("\n");
+      String[] rightText = this.rightText.split("\n");
+      int maxLeftWidth =
+          Arrays.stream(leftText).mapToInt(g.getFontMetrics(font)::stringWidth).max().orElse(0);
+      int maxRightWidth =
+          Arrays.stream(rightText).mapToInt(g.getFontMetrics(font)::stringWidth).max().orElse(0);
+      int leftIconWidth;
+      if (leftIcon != null) {
+        Rectangle leftIconBounds = leftIcon.getBounds();
+        double leftIconScale = (getBarHeight() - 2 * BAR_MARGIN) / leftIconBounds.getHeight();
+        leftIconWidth = (int) (leftIconScale * leftIconBounds.getWidth());
+      } else {
+        leftIconWidth = 0;
+      }
+      int minSpaceBetween = 20;
+      boolean shrinkLeft;
+      boolean shrinkRight;
+
+      if (maxLeftWidth + leftIconWidth + maxRightWidth + minSpaceBetween > getWidth()) {
+        shrinkLeft = maxLeftWidth + leftIconWidth > getWidth() / 2;
+        shrinkRight = maxRightWidth > getWidth() / 2;
+      } else {
+        shrinkLeft = false;
+        shrinkRight = false;
+      }
+
       double leftMax = zero;
       for (int i = 0; i < leftText.length; i++) {
-        int leftWidth = g.getFontMetrics(font).stringWidth(leftText[i]);
-        int textHeight = font.getSize();
+        Font lineFont = font;
+        if (shrinkLeft) {
+          int maxWidth =
+              getWidth()
+                  - (shrinkRight
+                      ? ((getWidth() + minSpaceBetween) / 2)
+                      : (maxRightWidth + minSpaceBetween))
+                  - leftIconWidth;
+          for (int fontSize = font.getSize(); fontSize > 1; fontSize--) {
+            lineFont = font.deriveFont((float) fontSize);
+            int width = g.getFontMetrics(lineFont).stringWidth(leftText[i]);
+            if (width < maxWidth) {
+              break;
+            }
+          }
+        }
+        g.setFont(lineFont);
+        int leftWidth = g.getFontMetrics(lineFont).stringWidth(leftText[i]);
+        int textHeight = lineFont.getSize();
         int textBase = (i + 1) * (getBarHeight() + textHeight) / (leftText.length + 1);
         if (isNetPositive) {
           g.drawString(leftText[i], (int) zero, textBase);
@@ -446,10 +489,25 @@ public class BarFrame extends GraphicsFrame {
         }
       }
 
-      String[] rightText = this.rightText.split("\n");
       for (int i = 0; i < rightText.length; i++) {
-        int rightWidth = g.getFontMetrics(font).stringWidth(rightText[i]);
-        int textHeight = font.getSize();
+        Font lineFont = font;
+        if (shrinkRight) {
+          int maxWidth =
+              getWidth()
+                  - (shrinkLeft
+                      ? ((getWidth() + minSpaceBetween) / 2)
+                      : (maxLeftWidth + leftIconWidth + minSpaceBetween));
+          for (int fontSize = font.getSize(); fontSize > 1; fontSize--) {
+            lineFont = font.deriveFont((float) fontSize);
+            int width = g.getFontMetrics(lineFont).stringWidth(rightText[i]);
+            if (width < maxWidth) {
+              break;
+            }
+          }
+        }
+        g.setFont(lineFont);
+        int rightWidth = g.getFontMetrics(lineFont).stringWidth(rightText[i]);
+        int textHeight = lineFont.getSize();
         int textBase = (i + 1) * (getBarHeight() + textHeight) / (rightText.length + 1);
         if (isNetPositive) {
           g.drawString(rightText[i], getWidth() - rightWidth - BAR_MARGIN, textBase);

@@ -9,6 +9,7 @@ import com.joecollins.bindings.BindableList;
 import com.joecollins.bindings.Binding;
 import com.joecollins.bindings.IndexedBinding;
 import com.joecollins.bindings.NestedBindableList;
+import com.joecollins.graphics.ImageGenerator;
 import java.awt.Color;
 import java.awt.Polygon;
 import java.awt.Rectangle;
@@ -988,6 +989,60 @@ public class BarFrameTest {
     barFrame.setSize(512, 256);
 
     compareRendering("BarFrame", "MultiLineAccents", barFrame);
+  }
+
+  @Test
+  public void testBarFrameOverlaps() throws IOException {
+    BindableList<Triple<String, String, Boolean>> lines = new BindableList<>();
+    lines.add(ImmutableTriple.of("THIS IS A VERY VERY LONG\nLEFT HAND SIDE", "RIGHT\nSIDE", false));
+
+    BarFrame barFrame = new BarFrame();
+    barFrame.setHeaderBinding(Binding.fixedBinding("BAR FRAME"));
+    barFrame.setSubheadTextBinding(Binding.fixedBinding(""));
+    barFrame.setMaxBinding(Binding.fixedBinding(1));
+    barFrame.setNumBarsBinding(Binding.sizeBinding(lines));
+    barFrame.setLeftTextBinding(IndexedBinding.propertyBinding(lines, Triple::getLeft));
+    barFrame.setRightTextBinding(IndexedBinding.propertyBinding(lines, Triple::getMiddle));
+    barFrame.setLeftIconBinding(
+        IndexedBinding.propertyBinding(
+            lines, t -> t.getRight() ? ImageGenerator.createHalfTickShape() : null));
+    barFrame.addSeriesBinding(
+        "Value",
+        IndexedBinding.propertyBinding(lines, x -> Color.RED),
+        IndexedBinding.propertyBinding(lines, x -> 1));
+    barFrame.setNumLinesBinding(() -> 1);
+    barFrame.setLineLevelsBinding(IndexedBinding.listBinding(0.5));
+    barFrame.setSize(256, 128);
+
+    compareRendering("BarFrame", "FrameOverlap-1", barFrame);
+
+    lines.set(
+        0, ImmutableTriple.of("LEFT\nSIDE", "THIS IS A VERY VERY LONG\nRIGHT HAND SIDE", false));
+    compareRendering("BarFrame", "FrameOverlap-2", barFrame);
+
+    lines.set(
+        0,
+        ImmutableTriple.of(
+            "THIS IS A VERY VERY LONG\nLEFT HAND SIDE",
+            "THIS IS A VERY VERY LONG\nRIGHT HAND SIDE",
+            false));
+    compareRendering("BarFrame", "FrameOverlap-3", barFrame);
+
+    lines.set(
+        0, ImmutableTriple.of("THIS IS A VERY VERY LONG\nLEFT HAND SIDE", "RIGHT\nSIDE", true));
+    compareRendering("BarFrame", "FrameOverlap-4", barFrame);
+
+    lines.set(
+        0, ImmutableTriple.of("LEFT\nSIDE", "THIS IS A VERY VERY LONG\nRIGHT HAND SIDE", true));
+    compareRendering("BarFrame", "FrameOverlap-5", barFrame);
+
+    lines.set(
+        0,
+        ImmutableTriple.of(
+            "THIS IS A VERY VERY LONG\nLEFT HAND SIDE",
+            "THIS IS A VERY VERY LONG\nRIGHT HAND SIDE",
+            true));
+    compareRendering("BarFrame", "FrameOverlap-6", barFrame);
   }
 
   private Shape createTickShape() {
