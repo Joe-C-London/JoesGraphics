@@ -299,7 +299,7 @@ public class BarFrame extends GraphicsFrame {
     this.lineLabelsBinding.bind((idx, label) -> lines.get(idx).setLabel(label));
   }
 
-  private class SubheadLabel extends JLabel {
+  private class SubheadLabel extends FontSizeAdjustingLabel {
 
     public SubheadLabel() {
       setForeground(Color.BLACK);

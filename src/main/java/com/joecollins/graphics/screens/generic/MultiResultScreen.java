@@ -66,6 +66,15 @@ public class MultiResultScreen extends JPanel {
                 panel.unbindAll();
                 center.remove(panel);
               }
+              int numRows = (size > 4 ? 2 : 1);
+              center.setLayout(new GridLayout(numRows, 0));
+              panels.forEach(
+                  p -> {
+                    p.displayBothRows = (numRows == 1);
+                    p.setMaxBarsBinding(Binding.fixedBinding(numRows == 2 ? 4 : 5));
+                    p.invalidate();
+                    p.revalidate();
+                  });
             });
 
     IndexedBinding.propertyBinding(builder.list, builder.votesFunc)
@@ -237,11 +246,13 @@ public class MultiResultScreen extends JPanel {
   private static class Result extends Bindable<Result.Property> {
     private enum Property {
       VOTES,
-      WINNER
+      WINNER,
+      MAX_BARS
     }
 
     private Map<Candidate, Integer> votes = new HashMap<>();
     private Candidate winner;
+    private int maxBars;
 
     private void setVotes(Map<Candidate, Integer> votes) {
       this.votes = votes;
@@ -252,14 +263,19 @@ public class MultiResultScreen extends JPanel {
       this.winner = winner;
       onPropertyRefreshed(Property.WINNER);
     }
+
+    private void setMaxBars(int maxBars) {
+      this.maxBars = maxBars;
+      onPropertyRefreshed(Property.MAX_BARS);
+    }
   }
 
   private static class ResultPanel extends JPanel {
 
-    private static final Candidate OTHERS = new Candidate("", Party.OTHERS);
     private BarFrame barFrame;
     private SwingFrame swingFrame = null;
     private MapFrame mapFrame = null;
+    private boolean displayBothRows = true;
 
     private final String incumbentMarker;
 
@@ -269,6 +285,7 @@ public class MultiResultScreen extends JPanel {
     private final WrappedBinding<Candidate> winner = new WrappedBinding<>(() -> null);
     private final WrappedBinding<Map<Party, Integer>> prevVotes =
         new WrappedBinding<>(HashMap::new);
+    private final WrappedBinding<Integer> maxBars = new WrappedBinding<>(() -> 5);
 
     ResultPanel(String incumbentMarker, Comparator<Party> swingPartyOrder, boolean hasMap) {
       this.incumbentMarker = incumbentMarker;
@@ -278,13 +295,14 @@ public class MultiResultScreen extends JPanel {
       Result result = new Result();
       votes.getBinding().bind(result::setVotes);
       winner.getBinding().bind(result::setWinner);
+      maxBars.getBinding().bind(result::setMaxBars);
       Binding<List<BarFrameBuilder.BasicBar>> bars =
           Binding.propertyBinding(
               result,
               r -> {
                 int total = r.votes.values().stream().mapToInt(i -> i).sum();
-                return Aggregators.topAndOthers(r.votes, 5, Candidate.OTHERS, r.winner).entrySet()
-                    .stream()
+                return Aggregators.topAndOthers(r.votes, r.maxBars, Candidate.OTHERS, r.winner)
+                    .entrySet().stream()
                     .sorted(
                         Comparator.<Map.Entry<Candidate, Integer>>comparingInt(
                                 e ->
@@ -316,7 +334,8 @@ public class MultiResultScreen extends JPanel {
                     .collect(Collectors.toList());
               },
               Result.Property.VOTES,
-              Result.Property.WINNER);
+              Result.Property.WINNER,
+              Result.Property.MAX_BARS);
 
       barFrame =
           BarFrameBuilder.basic(bars)
@@ -404,6 +423,10 @@ public class MultiResultScreen extends JPanel {
       }
     }
 
+    void setMaxBarsBinding(Binding<Integer> maxBarsBinding) {
+      this.maxBars.setBinding(maxBarsBinding);
+    }
+
     void unbindAll() {
       setVotesBinding(Map::of);
       setHeaderBinding(() -> "");
@@ -415,6 +438,7 @@ public class MultiResultScreen extends JPanel {
       setMapShapeBinding(List.of());
       setMapFocusBinding(List.of());
       setMapHeaderBinding(() -> "");
+      setMaxBarsBinding(() -> 5);
     }
 
     private class ResultPanelLayout implements LayoutManager {
@@ -440,15 +464,17 @@ public class MultiResultScreen extends JPanel {
         int width = parent.getWidth();
         int height = parent.getHeight();
         barFrame.setLocation(5, 5);
-        boolean barsOnly = swingFrame == null && mapFrame == null;
+        boolean barsOnly = !displayBothRows || (swingFrame == null && mapFrame == null);
         barFrame.setSize(width - 10, height * (barsOnly ? 3 : 2) / 3 - 10);
         if (swingFrame != null) {
           swingFrame.setLocation(5, height * 2 / 3 + 5);
           swingFrame.setSize(width / (mapFrame == null ? 1 : 2) - 10, height / 3 - 10);
+          swingFrame.setVisible(displayBothRows);
         }
         if (mapFrame != null) {
           mapFrame.setLocation((swingFrame == null ? 0 : width / 2) + 5, height * 2 / 3 + 5);
           mapFrame.setSize(width / (swingFrame == null ? 1 : 2) - 10, height / 3 - 10);
+          mapFrame.setVisible(displayBothRows);
         }
       }
     }
