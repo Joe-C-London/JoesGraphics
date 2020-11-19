@@ -18,6 +18,8 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Test;
@@ -30,6 +32,9 @@ public class MultiResultScreenTest {
   private static Party ndp = new Party("New Democratic Party", "NDP", Color.ORANGE);
   private static Party pa = new Party("People's Alliance", "PA", Color.MAGENTA.darker());
   private static Party ind = new Party("Independent", "IND", Color.GRAY);
+
+  private static Party dem = new Party("Democratic", "DEM", Color.BLUE);
+  private static Party gop = new Party("Republican", "GOP", Color.RED);
 
   @Test
   public void testSimplePanel() throws IOException {
@@ -459,6 +464,53 @@ public class MultiResultScreenTest {
     compareRendering("MultiResultPanel", "MultipleRows-3", panel);
   }
 
+  @Test
+  public void testRunoffs() throws IOException {
+    BindableList<District> districts = new BindableList<>();
+    districts.add(
+        new District(
+            2,
+            "Regular Election",
+            Map.of(
+                new Candidate("David Perdue", gop), 2458453,
+                new Candidate("Jon Ossoff", dem), 2371921,
+                new Candidate("Shane Hazel", ind), 114873),
+            false,
+            Map.of()));
+    districts.add(
+        new District(
+            3,
+            "Special Election",
+            Map.of(
+                new Candidate("Raphael Warnock", dem),
+                1615550,
+                new Candidate("Kelly Loeffler", gop),
+                1271320,
+                new Candidate("Doug Collins", gop),
+                979052,
+                new Candidate("Deborah Jackson", dem),
+                323833,
+                Candidate.OTHERS,
+                718808),
+            false,
+            Map.of()));
+
+    MultiResultScreen panel =
+        MultiResultScreen.of(
+                districts,
+                d -> Binding.fixedBinding(d.votes),
+                d -> Binding.fixedBinding(d.name.toUpperCase()),
+                d -> Binding.fixedBinding("CLASS " + d.districtNum))
+            .withRunoff(District::getRunoff)
+            .build(() -> "GEORGIA SENATE");
+
+    panel.setSize(1024, 512);
+    compareRendering("MultiResultPanel", "Runoff-1", panel);
+
+    districts.forEach(District::declareRunoff);
+    compareRendering("MultiResultPanel", "Runoff-2", panel);
+  }
+
   private <K, V> Map<K, V> of(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4) {
     LinkedHashMap<K, V> ret = new LinkedHashMap<>();
     ret.put(k1, v1);
@@ -512,6 +564,7 @@ public class MultiResultScreenTest {
     private Map<Candidate, Integer> votes;
     private Map<Party, Integer> prevVotes;
     private double pctReporting;
+    private boolean topTwoToRunoff;
 
     private District(
         int districtNum,
@@ -537,6 +590,7 @@ public class MultiResultScreenTest {
       this.prevVotes = prevVotes;
       this.status = status;
       this.pctReporting = pctReporting;
+      this.topTwoToRunoff = false;
     }
 
     public Binding<String> getStatus() {
@@ -568,6 +622,20 @@ public class MultiResultScreenTest {
           Property.PROP);
     }
 
+    public Binding<Set<Candidate>> getRunoff() {
+      return Binding.propertyBinding(
+          this,
+          t -> {
+            if (!t.topTwoToRunoff) return null;
+            return t.votes.entrySet().stream()
+                .sorted(Map.Entry.<Candidate, Integer>comparingByValue().reversed())
+                .limit(2)
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toSet());
+          },
+          Property.PROP);
+    }
+
     public Binding<Pair<Candidate, Boolean>> getLeader() {
       return Binding.propertyBinding(
           this,
@@ -595,6 +663,11 @@ public class MultiResultScreenTest {
       this.pctReporting = pctReporting;
       this.votes = votes;
       this.leaderHasWon = leaderHasWon;
+      onPropertyRefreshed(Property.PROP);
+    }
+
+    public void declareRunoff() {
+      this.topTwoToRunoff = true;
       onPropertyRefreshed(Property.PROP);
     }
   }

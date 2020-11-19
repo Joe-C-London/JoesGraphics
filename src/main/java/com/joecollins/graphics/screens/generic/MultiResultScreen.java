@@ -19,6 +19,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.EventQueue;
 import java.awt.GridLayout;
 import java.awt.LayoutManager;
 import java.awt.Shape;
@@ -30,6 +31,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.swing.JLabel;
@@ -75,6 +77,7 @@ public class MultiResultScreen extends JPanel {
                     p.invalidate();
                     p.revalidate();
                   });
+              EventQueue.invokeLater(this::repaint);
             });
 
     IndexedBinding.propertyBinding(builder.list, builder.votesFunc)
@@ -88,6 +91,9 @@ public class MultiResultScreen extends JPanel {
             (idx, winner) -> {
               panels.get(idx).setWinnerBinding(winner);
             });
+
+    IndexedBinding.propertyBinding(builder.list, builder.runoffFunc)
+        .bind((idx, runoff) -> panels.get(idx).setRunoffBinding(runoff));
 
     IndexedBinding.propertyBinding(builder.list, builder.pctReportingFunc)
         .bind(
@@ -154,6 +160,7 @@ public class MultiResultScreen extends JPanel {
 
     private Function<T, Binding<Double>> pctReportingFunc = t -> Binding.fixedBinding(1.0);
     private Function<T, Binding<Candidate>> winnerFunc = t -> Binding.fixedBinding(null);
+    private Function<T, Binding<Set<Candidate>>> runoffFunc = t -> Binding.fixedBinding(Set.of());
     private String incumbentMarker = "";
 
     private Function<T, Binding<Map<Party, Integer>>> prevFunc = null;
@@ -182,6 +189,11 @@ public class MultiResultScreen extends JPanel {
 
     public Builder<T> withWinner(Function<T, Binding<Candidate>> winnerFunc) {
       this.winnerFunc = winnerFunc;
+      return this;
+    }
+
+    public Builder<T> withRunoff(Function<T, Binding<Set<Candidate>>> runoffFunc) {
+      this.runoffFunc = runoffFunc;
       return this;
     }
 
@@ -247,11 +259,13 @@ public class MultiResultScreen extends JPanel {
     private enum Property {
       VOTES,
       WINNER,
+      RUNOFF,
       MAX_BARS
     }
 
     private Map<Candidate, Integer> votes = new HashMap<>();
     private Candidate winner;
+    private Set<Candidate> runoff = Set.of();
     private int maxBars;
 
     private void setVotes(Map<Candidate, Integer> votes) {
@@ -262,6 +276,11 @@ public class MultiResultScreen extends JPanel {
     private void setWinner(Candidate winner) {
       this.winner = winner;
       onPropertyRefreshed(Property.WINNER);
+    }
+
+    private void setRunoff(Set<Candidate> runoff) {
+      this.runoff = (runoff == null ? Set.of() : runoff);
+      onPropertyRefreshed(Property.RUNOFF);
     }
 
     private void setMaxBars(int maxBars) {
@@ -283,6 +302,7 @@ public class MultiResultScreen extends JPanel {
         new WrappedBinding<>(HashMap::new);
     private final WrappedBinding<Double> pctReporting = new WrappedBinding<>(() -> 1.0);
     private final WrappedBinding<Candidate> winner = new WrappedBinding<>(() -> null);
+    private final WrappedBinding<Set<Candidate>> runoff = new WrappedBinding<>(Set::of);
     private final WrappedBinding<Map<Party, Integer>> prevVotes =
         new WrappedBinding<>(HashMap::new);
     private final WrappedBinding<Integer> maxBars = new WrappedBinding<>(() -> 5);
@@ -295,6 +315,7 @@ public class MultiResultScreen extends JPanel {
       Result result = new Result();
       votes.getBinding().bind(result::setVotes);
       winner.getBinding().bind(result::setWinner);
+      runoff.getBinding().bind(result::setRunoff);
       maxBars.getBinding().bind(result::setMaxBars);
       Binding<List<BarFrameBuilder.BasicBar>> bars =
           Binding.propertyBinding(
@@ -315,6 +336,11 @@ public class MultiResultScreen extends JPanel {
                           Candidate candidate = e.getKey();
                           int votes = e.getValue();
                           double pct = 1.0 * votes / total;
+                          Shape shape;
+                          if (candidate == r.winner) shape = ImageGenerator.createHalfTickShape();
+                          else if (r.runoff.contains(candidate))
+                            shape = ImageGenerator.createHalfRunoffShape();
+                          else shape = null;
                           return new BarFrameBuilder.BasicBar(
                               candidate == Candidate.OTHERS
                                   ? "OTHERS"
@@ -329,12 +355,13 @@ public class MultiResultScreen extends JPanel {
                                   : new DecimalFormat("#,##0").format(votes)
                                       + "\n"
                                       + new DecimalFormat("0.0%").format(pct),
-                              candidate == r.winner ? ImageGenerator.createHalfTickShape() : null);
+                              shape);
                         })
                     .collect(Collectors.toList());
               },
               Result.Property.VOTES,
               Result.Property.WINNER,
+              Result.Property.RUNOFF,
               Result.Property.MAX_BARS);
 
       barFrame =
@@ -380,6 +407,10 @@ public class MultiResultScreen extends JPanel {
 
     void setWinnerBinding(Binding<Candidate> winnerBinding) {
       this.winner.setBinding(winnerBinding);
+    }
+
+    void setRunoffBinding(Binding<Set<Candidate>> runoffBinding) {
+      this.runoff.setBinding(runoffBinding);
     }
 
     void setPctReportingBinding(Binding<Double> pctReportingBinding) {
@@ -432,6 +463,7 @@ public class MultiResultScreen extends JPanel {
       setHeaderBinding(() -> "");
       setSubheadBinding(() -> "");
       setWinnerBinding(() -> null);
+      setRunoffBinding(Set::of);
       setPctReportingBinding(() -> 0.0);
       setPrevBinding(Map::of);
       setSwingHeaderBinding(() -> "");
