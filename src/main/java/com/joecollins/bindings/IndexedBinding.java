@@ -20,6 +20,31 @@ public interface IndexedBinding<T> {
 
   default void unbind() {}
 
+  default <R> IndexedBinding<R> map(Function<T, R> func) {
+    IndexedBinding<T> me = this;
+    return new IndexedBinding<R>() {
+      @Override
+      public int size() {
+        return me.size();
+      }
+
+      @Override
+      public R getValue(int index) {
+        return func.apply(me.getValue(index));
+      }
+
+      @Override
+      public void bind(BiConsumer<Integer, R> onUpdate) {
+        me.bind((idx, val) -> onUpdate.accept(idx, func.apply(val)));
+      }
+
+      @Override
+      public void unbind() {
+        me.unbind();
+      }
+    };
+  }
+
   static <T> IndexedBinding<T> emptyBinding() {
     return new IndexedBinding<>() {
       @Override
