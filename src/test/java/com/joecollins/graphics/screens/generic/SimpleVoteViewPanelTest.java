@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.Range;
 import org.junit.Test;
 
 public class SimpleVoteViewPanelTest {
@@ -1076,6 +1077,48 @@ public class SimpleVoteViewPanelTest {
 
     runoff.setValue(Set.of(macron, lePen));
     compareRendering("SimpleVoteViewPanel", "CandidateRunoffDualLine-2", panel);
+  }
+
+  @Test
+  public void testVoteRangeScreen() throws IOException {
+    Party ndp = new Party("New Democratic Party", "NDP", Color.ORANGE);
+    Party pc = new Party("Progressive Conservative", "PC", Color.BLUE);
+    Party lib = new Party("Liberal", "LIB", Color.RED);
+    Party grn = new Party("Green", "GRN", Color.GREEN.darker());
+
+    LinkedHashMap<Party, Range<Double>> curr = new LinkedHashMap<>();
+    curr.put(ndp, Range.between(0.030, 0.046));
+    curr.put(pc, Range.between(0.290, 0.353));
+    curr.put(lib, Range.between(0.257, 0.292));
+    curr.put(grn, Range.between(0.343, 0.400));
+
+    LinkedHashMap<Party, Integer> prev = new LinkedHashMap<>();
+    prev.put(ndp, 8997);
+    prev.put(pc, 30663);
+    prev.put(lib, 33481);
+    prev.put(grn, 8857);
+
+    BindableWrapper<LinkedHashMap<Party, Range<Double>>> currentVotes = new BindableWrapper<>(curr);
+    BindableWrapper<LinkedHashMap<Party, Integer>> previousVotes = new BindableWrapper<>(prev);
+    BindableWrapper<String> header = new BindableWrapper<>("PRINCE EDWARD ISLAND");
+    BindableWrapper<String> voteHeader = new BindableWrapper<>("OPINION POLL RANGE");
+    BindableWrapper<String> voteSubhead = new BindableWrapper<>("SINCE ELECTION CALL");
+    BindableWrapper<String> changeHeader = new BindableWrapper<>("CHANGE SINCE 2015");
+    BindableWrapper<String> swingHeader = new BindableWrapper<>("SWING SINCE 2015");
+    BindableWrapper<String> mapHeader = new BindableWrapper<>("PEI");
+    List<Party> swingPartyOrder = Arrays.asList(ndp, grn, lib, pc);
+    Map<Integer, Shape> shapesByDistrict = peiShapesByDistrict();
+    Map<Integer, Party> winners = new HashMap<>();
+
+    BasicResultPanel panel =
+        BasicResultPanel.partyRangeVotes(
+                currentVotes.getBinding(), voteHeader.getBinding(), voteSubhead.getBinding())
+            .withPrev(previousVotes.getBinding(), changeHeader.getBinding())
+            .withSwing(Comparator.comparing(swingPartyOrder::indexOf), swingHeader.getBinding())
+            .withPartyMap(() -> shapesByDistrict, () -> winners, () -> null, mapHeader.getBinding())
+            .build(header.getBinding());
+    panel.setSize(1024, 512);
+    compareRendering("SimpleVoteViewPanel", "Range-1", panel);
   }
 
   private Map<Integer, Shape> peiShapesByDistrict() throws IOException {

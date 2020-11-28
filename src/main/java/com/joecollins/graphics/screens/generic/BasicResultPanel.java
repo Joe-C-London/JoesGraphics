@@ -271,6 +271,19 @@ public class BasicResultPanel extends JPanel {
         Candidate.OTHERS);
   }
 
+  public static VoteScreenBuilder<Party, Range<Double>, Double, Integer> partyRangeVotes(
+      Binding<? extends Map<Party, Range<Double>>> votes,
+      Binding<String> header,
+      Binding<String> subhead) {
+    return new RangeVoteScreenBuilder<>(
+        new BindingReceiver<>(votes),
+        new BindingReceiver<>(header),
+        new BindingReceiver<>(subhead),
+        new PartyTemplate(),
+        new PctOnlyTemplate(),
+        Party.OTHERS);
+  }
+
   private interface KeyTemplate<KT> {
     Party toParty(KT key);
 
@@ -1485,6 +1498,200 @@ public class BasicResultPanel extends JPanel {
     protected Map<Party, Integer> currTotalByParty(Map<KT, ? extends Integer> curr) {
       Map<Party, Integer> ret = new LinkedHashMap<>();
       curr.forEach((k, v) -> ret.merge(keyTemplate.toParty(k), v, Integer::sum));
+      return ret;
+    }
+  }
+
+  private static class RangeVoteScreenBuilder<KT>
+      extends VoteScreenBuilder<KT, Range<Double>, Double, Integer> {
+
+    private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("0.0");
+    private static final DecimalFormat CHANGE_DECIMAL_FORMAT = new DecimalFormat("+0.0;-0.0");
+
+    private RangeVoteScreenBuilder(
+        BindingReceiver<Map<KT, Range<Double>>> current,
+        BindingReceiver<String> header,
+        BindingReceiver<String> subhead,
+        KeyTemplate<KT> keyTemplate,
+        VoteTemplate voteTemplate,
+        KT others) {
+      super(current, header, subhead, keyTemplate, voteTemplate, others);
+    }
+
+    @Override
+    protected BarFrame createFrame() {
+      Binding<List<BarFrameBuilder.DualBar>> bars =
+          current.getBinding(
+              r -> {
+                return r.entrySet().stream()
+                    .sorted(
+                        Comparator.<Map.Entry<KT, Range<Double>>>comparingDouble(
+                                e ->
+                                    e.getKey() == others
+                                        ? Double.MIN_VALUE
+                                        : (e.getValue().getMinimum() + e.getValue().getMaximum()))
+                            .reversed())
+                    .map(
+                        e -> {
+                          String valueLabel =
+                              DECIMAL_FORMAT.format(100 * e.getValue().getMinimum())
+                                  + "-"
+                                  + new DecimalFormat("0.0").format(100 * e.getValue().getMaximum())
+                                  + "%";
+                          return new BarFrameBuilder.DualBar(
+                              keyTemplate.toMainBarHeader(e.getKey(), 1),
+                              keyTemplate.toParty(e.getKey()).getColor(),
+                              e.getValue().getMinimum(),
+                              e.getValue().getMaximum(),
+                              valueLabel);
+                        })
+                    .collect(Collectors.toList());
+              });
+      BarFrameBuilder builder =
+          BarFrameBuilder.dual(bars)
+              .withHeader(header.getBinding())
+              .withSubhead(subhead.getBinding())
+              .withNotes(notes == null ? (() -> null) : notes.getBinding())
+              .withMax(() -> 2.0 / 3);
+      if (showMajority != null) {
+        BindableList<Double> lines = new BindableList<>();
+        showMajority
+            .getBinding()
+            .bind(
+                show -> {
+                  lines.clear();
+                  if (show) {
+                    lines.add(0.5);
+                  }
+                });
+        showMajority
+            .getBinding()
+            .bind(
+                label -> {
+                  if (!lines.isEmpty()) {
+                    lines.setAll(lines);
+                  }
+                });
+        builder = builder.withLines(lines, n -> majorityLabel.getValue());
+      }
+      return builder.build();
+    }
+
+    private static class Change<KT> extends Bindable<RangeVoteScreenBuilder.Change.Property> {
+      private enum Property {
+        CURR,
+        PREV
+      }
+
+      private Map<KT, Range<Double>> currVotes = new HashMap<>();
+      private Map<Party, Integer> prevVotes = new HashMap<>();
+
+      public void setCurrVotes(Map<KT, Range<Double>> currVotes) {
+        this.currVotes = currVotes;
+        onPropertyRefreshed(RangeVoteScreenBuilder.Change.Property.CURR);
+      }
+
+      public void setPrevVotes(Map<Party, Integer> prevVotes) {
+        this.prevVotes = prevVotes;
+        onPropertyRefreshed(RangeVoteScreenBuilder.Change.Property.PREV);
+      }
+    }
+
+    @Override
+    protected BarFrame createDiffFrame() {
+      if (prev == null) {
+        return null;
+      }
+
+      RangeVoteScreenBuilder.Change<KT> change = new RangeVoteScreenBuilder.Change<>();
+      current.getBinding().bind(change::setCurrVotes);
+      prev.getBinding().bind(change::setPrevVotes);
+      Binding<List<BarFrameBuilder.DualBar>> bars =
+          Binding.propertyBinding(
+              change,
+              r -> {
+                int prevTotal = r.prevVotes.values().stream().mapToInt(i -> i).sum();
+                if (prevTotal == 0) {
+                  return List.of();
+                }
+                Map<Party, Range<Double>> partyTotal = currTotalByParty(r.currVotes);
+                Map<Party, Integer> prevVotes = new HashMap<>(r.prevVotes);
+                r.prevVotes.entrySet().stream()
+                    .filter(e -> !partyTotal.containsKey(e.getKey()))
+                    .forEach(
+                        e -> {
+                          partyTotal.putIfAbsent(Party.OTHERS, Range.is(0.0));
+                          prevVotes.merge(Party.OTHERS, e.getValue(), Integer::sum);
+                        });
+                return partyTotal.entrySet().stream()
+                    .sorted(
+                        Comparator.<Map.Entry<Party, Range<Double>>>comparingDouble(
+                                e ->
+                                    e.getKey() == Party.OTHERS
+                                        ? Double.MIN_VALUE
+                                        : (e.getValue().getMinimum() + e.getValue().getMaximum()))
+                            .reversed())
+                    .map(
+                        e -> {
+                          double cpctMin = e.getValue().getMinimum();
+                          double cpctMax = e.getValue().getMaximum();
+                          double ppct = 1.0 * (prevVotes.getOrDefault(e.getKey(), 0)) / prevTotal;
+                          return new BarFrameBuilder.DualBar(
+                              e.getKey().getAbbreviation().toUpperCase(),
+                              e.getKey().getColor(),
+                              cpctMin - ppct,
+                              cpctMax - ppct,
+                              "("
+                                  + CHANGE_DECIMAL_FORMAT.format(100.0 * (cpctMin - ppct))
+                                  + ")-("
+                                  + CHANGE_DECIMAL_FORMAT.format(100.0 * (cpctMax - ppct))
+                                  + ")%");
+                        })
+                    .collect(Collectors.toList());
+              },
+              RangeVoteScreenBuilder.Change.Property.CURR,
+              RangeVoteScreenBuilder.Change.Property.PREV);
+      return BarFrameBuilder.dual(bars)
+          .withWingspan(() -> 0.1)
+          .withHeader(changeHeader.getBinding())
+          .withSubhead(changeSubhead.getBinding())
+          .build();
+    }
+
+    @Override
+    protected SwingFrame createSwingFrame() {
+      if (swingHeader == null) {
+        return null;
+      }
+      Binding<Map<Party, Integer>> curr =
+          current
+              .getBinding(this::currTotalByParty)
+              .map(
+                  m -> {
+                    Map<Party, Integer> ret = new LinkedHashMap<>();
+                    m.forEach(
+                        (p, r) ->
+                            ret.put(
+                                p,
+                                (int)
+                                    Math.round(1_000_000 * (r.getMinimum() + r.getMaximum()) / 2)));
+                    return ret;
+                  });
+      return SwingFrameBuilder.prevCurr(prev.getBinding(), curr, swingComparator)
+          .withHeader(swingHeader.getBinding())
+          .build();
+    }
+
+    protected Map<Party, Range<Double>> currTotalByParty(Map<KT, ? extends Range<Double>> curr) {
+      Map<Party, Range<Double>> ret = new LinkedHashMap<>();
+      curr.forEach(
+          (k, v) ->
+              ret.merge(
+                  keyTemplate.toParty(k),
+                  v,
+                  (a, b) ->
+                      Range.between(
+                          a.getMinimum() + b.getMinimum(), a.getMaximum() + b.getMaximum())));
       return ret;
     }
   }
