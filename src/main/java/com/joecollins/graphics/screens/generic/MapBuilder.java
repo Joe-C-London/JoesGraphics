@@ -4,8 +4,6 @@ import com.joecollins.bindings.Binding;
 import com.joecollins.bindings.BindingReceiver;
 import com.joecollins.graphics.components.MapFrame;
 import com.joecollins.graphics.components.MapFrameBuilder;
-import com.joecollins.graphics.utils.ColorUtils;
-import com.joecollins.models.general.Party;
 import java.awt.Color;
 import java.awt.Shape;
 import java.util.List;
@@ -24,11 +22,11 @@ public class MapBuilder {
 
   public <T> MapBuilder(
       Binding<Map<T, Shape>> shapes,
-      Binding<Map<T, Result>> winners,
+      Binding<Map<T, PartyResult>> winners,
       Binding<List<T>> focus,
       Binding<String> headerBinding) {
     BindingReceiver<Map<T, Shape>> shapesReceiver = new BindingReceiver<>(shapes);
-    Binding<List<ImmutablePair<Shape, Result>>> shapesToParties =
+    Binding<List<ImmutablePair<Shape, PartyResult>>> shapesToParties =
         shapesReceiver
             .getBinding()
             .merge(
@@ -37,7 +35,7 @@ public class MapBuilder {
                     s.entrySet().stream()
                         .map(
                             e -> {
-                              Result winnerParty = w.get(e.getKey());
+                              PartyResult winnerParty = w.get(e.getKey());
                               return ImmutablePair.of(e.getValue(), winnerParty);
                             })
                         .collect(Collectors.toList()));
@@ -57,7 +55,7 @@ public class MapBuilder {
   public <T> MapBuilder(
       Binding<Map<T, Shape>> shapes,
       Binding<T> selectedShape,
-      Binding<Result> leadingParty,
+      Binding<PartyResult> leadingParty,
       Binding<List<T>> focus,
       Binding<String> header) {
     this(shapes, selectedShape, leadingParty, focus, () -> null, header);
@@ -66,12 +64,12 @@ public class MapBuilder {
   public <T> MapBuilder(
       Binding<Map<T, Shape>> shapes,
       Binding<T> selectedShape,
-      Binding<Result> leadingParty,
+      Binding<PartyResult> leadingParty,
       Binding<List<T>> focus,
       Binding<List<T>> additionalHighlight,
       Binding<String> header) {
     BindingReceiver<Map<T, Shape>> shapesReceiver = new BindingReceiver<>(shapes);
-    Binding<ImmutablePair<T, Result>> leaderWithShape =
+    Binding<ImmutablePair<T, PartyResult>> leaderWithShape =
         selectedShape.merge(leadingParty, ImmutablePair::new);
     mapFocus =
         new BindingReceiver<>(shapesReceiver.getBinding().merge(focus, this::createFocusShapes));
@@ -91,7 +89,7 @@ public class MapBuilder {
                               if (e.getKey().equals(ldr.left)) {
                                 color =
                                     Optional.ofNullable(ldr.right)
-                                        .map(Result::getColor)
+                                        .map(PartyResult::getColor)
                                         .orElse(Color.BLACK);
                               } else {
                                 color = Color.LIGHT_GRAY;
@@ -147,42 +145,13 @@ public class MapBuilder {
         .build();
   }
 
-  private static Color extractColor(List<Shape> focus, Shape shape, Result winner) {
+  private static Color extractColor(List<Shape> focus, Shape shape, PartyResult winner) {
     if (winner != null) {
       return winner.getColor();
     } else if (focus == null || focus.isEmpty() || focus.contains(shape)) {
       return Color.LIGHT_GRAY;
     } else {
       return new Color(220, 220, 220);
-    }
-  }
-
-  public static class Result {
-
-    private final Party party;
-    private final boolean elected;
-
-    public Result(Party party, boolean elected) {
-      this.party = party;
-      this.elected = elected;
-    }
-
-    public static Result elected(Party party) {
-      return new Result(party, true);
-    }
-
-    public static Result leading(Party party) {
-      return new Result(party, false);
-    }
-
-    public Color getColor() {
-      if (party == null) {
-        return Color.BLACK;
-      }
-      if (elected) {
-        return party.getColor();
-      }
-      return ColorUtils.lighten(party.getColor());
     }
   }
 }

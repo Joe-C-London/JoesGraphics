@@ -215,7 +215,7 @@ public class MultiResultScreen extends JPanel {
     public <K> Builder<T> withMap(
         Function<T, Map<K, Shape>> shapesFunc,
         Function<T, K> selectedShapeFunc,
-        Function<T, Binding<MapBuilder.Result>> leadingPartyFunc,
+        Function<T, Binding<PartyResult>> leadingPartyFunc,
         Function<T, List<K>> focusFunc,
         Function<T, Binding<String>> mapHeaderFunc) {
       this.mapHeaderFunc = mapHeaderFunc;
@@ -230,13 +230,12 @@ public class MultiResultScreen extends JPanel {
           t -> {
             K selected = selectedShapeFunc.apply(t);
             List<K> focus = focusFunc.apply(t);
-            Binding<MapBuilder.Result> leader = leadingPartyFunc.apply(t);
+            Binding<PartyResult> leader = leadingPartyFunc.apply(t);
             return shapesFunc.apply(t).entrySet().stream()
                 .map(
                     e -> {
                       if (e.getKey().equals(selected)) {
-                        return ImmutablePair.of(
-                            e.getValue(), leader.map(MapBuilder.Result::getColor));
+                        return ImmutablePair.of(e.getValue(), leader.map(PartyResult::getColor));
                       }
                       if (focus == null || focus.isEmpty() || focus.contains(e.getKey())) {
                         return ImmutablePair.of(

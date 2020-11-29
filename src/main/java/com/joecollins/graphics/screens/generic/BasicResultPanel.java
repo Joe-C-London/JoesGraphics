@@ -10,7 +10,6 @@ import com.joecollins.graphics.components.BarFrameBuilder;
 import com.joecollins.graphics.components.MapFrame;
 import com.joecollins.graphics.components.SwingFrame;
 import com.joecollins.graphics.components.SwingFrameBuilder;
-import com.joecollins.graphics.screens.generic.MapBuilder.Result;
 import com.joecollins.graphics.utils.StandardFont;
 import com.joecollins.models.general.Aggregators;
 import com.joecollins.models.general.Candidate;
@@ -121,9 +120,9 @@ public class BasicResultPanel extends JPanel {
     }
   }
 
-  private static <T> Map<T, Result> partyMapToResultMap(Map<T, Party> m) {
-    Map<T, Result> ret = new LinkedHashMap<>();
-    m.forEach((k, v) -> ret.put(k, MapBuilder.Result.elected(v)));
+  private static <T> Map<T, PartyResult> partyMapToResultMap(Map<T, Party> m) {
+    Map<T, PartyResult> ret = new LinkedHashMap<>();
+    m.forEach((k, v) -> ret.put(k, PartyResult.elected(v)));
     return ret;
   }
 
@@ -508,7 +507,7 @@ public class BasicResultPanel extends JPanel {
 
     public <T> SeatScreenBuilder<KT, CT, PT> withResultMap(
         Binding<Map<T, Shape>> shapes,
-        Binding<Map<T, Result>> winners,
+        Binding<Map<T, PartyResult>> winners,
         Binding<List<T>> focus,
         Binding<String> headerBinding) {
       this.mapBuilder = new MapBuilder(shapes, winners, focus, headerBinding);
@@ -1181,13 +1180,13 @@ public class BasicResultPanel extends JPanel {
         Binding<String> header) {
       this.mapBuilder =
           new MapBuilder(
-              shapes, selectedShape, leadingParty.map(MapBuilder.Result::elected), focus, header);
+              shapes, selectedShape, leadingParty.map(PartyResult::elected), focus, header);
       return this;
     }
 
     public <T> VoteScreenBuilder<KT, CT, CPT, PT> withResultMap(
         Binding<Map<T, Shape>> shapes,
-        Binding<Map<T, Result>> winners,
+        Binding<Map<T, PartyResult>> winners,
         Binding<List<T>> focus,
         Binding<String> headerBinding) {
       this.mapBuilder = new MapBuilder(shapes, winners, focus, headerBinding);
@@ -1197,7 +1196,7 @@ public class BasicResultPanel extends JPanel {
     public <T> VoteScreenBuilder<KT, CT, CPT, PT> withResultMap(
         Binding<Map<T, Shape>> shapes,
         Binding<T> selectedShape,
-        Binding<Result> leadingParty,
+        Binding<PartyResult> leadingParty,
         Binding<List<T>> focus,
         Binding<String> header) {
       this.mapBuilder = new MapBuilder(shapes, selectedShape, leadingParty, focus, header);
@@ -1207,7 +1206,7 @@ public class BasicResultPanel extends JPanel {
     public <T> VoteScreenBuilder<KT, CT, CPT, PT> withResultMap(
         Binding<Map<T, Shape>> shapes,
         Binding<T> selectedShape,
-        Binding<Result> leadingParty,
+        Binding<PartyResult> leadingParty,
         Binding<List<T>> focus,
         Binding<List<T>> additionalHighlight,
         Binding<String> header) {

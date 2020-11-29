@@ -199,7 +199,7 @@ public class MixedMemberResultPanel extends JPanel {
     public <T> Builder withResultMap(
         Binding<Map<T, Shape>> shapes,
         Binding<T> selectedShape,
-        Binding<MapBuilder.Result> leadingParty,
+        Binding<PartyResult> leadingParty,
         Binding<List<T>> focus,
         Binding<String> header) {
       this.mapBuilder = new MapBuilder(shapes, selectedShape, leadingParty, focus, header);
@@ -209,7 +209,7 @@ public class MixedMemberResultPanel extends JPanel {
     public <T> Builder withResultMap(
         Binding<Map<T, Shape>> shapes,
         Binding<T> selectedShape,
-        Binding<MapBuilder.Result> leadingParty,
+        Binding<PartyResult> leadingParty,
         Binding<List<T>> focus,
         Binding<List<T>> additionalHighlight,
         Binding<String> header) {

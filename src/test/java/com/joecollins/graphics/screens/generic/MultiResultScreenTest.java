@@ -100,7 +100,7 @@ public class MultiResultScreenTest {
                 d -> d.districtNum,
                 d ->
                     Binding.fixedBinding(
-                        new MapBuilder.Result(
+                        new PartyResult(
                             d.votes.entrySet().stream()
                                 .max(Map.Entry.comparingByValue())
                                 .map(Map.Entry::getKey)
@@ -187,7 +187,7 @@ public class MultiResultScreenTest {
                     d.getLeader()
                         .map(
                             e ->
-                                new MapBuilder.Result(
+                                new PartyResult(
                                     e.getLeft() == null ? null : e.getLeft().getParty(),
                                     e.getRight())),
                 d ->

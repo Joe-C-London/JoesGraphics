@@ -3,7 +3,6 @@ package com.joecollins.graphics.screens.generic;
 import static com.joecollins.graphics.utils.RenderTestUtils.compareRendering;
 
 import com.joecollins.graphics.components.MapFrameTest;
-import com.joecollins.graphics.screens.generic.MapBuilder.Result;
 import com.joecollins.graphics.utils.BindableWrapper;
 import com.joecollins.graphics.utils.ShapefileReader;
 import com.joecollins.models.general.Aggregators;
@@ -229,7 +228,7 @@ public class SimpleVoteViewPanelTest {
     BindableWrapper<String> changeHeader = new BindableWrapper<>("CHANGE SINCE 2015");
     BindableWrapper<String> swingHeader = new BindableWrapper<>("SWING SINCE 2015");
     BindableWrapper<String> mapHeader = new BindableWrapper<>("CARDIGAN");
-    BindableWrapper<Result> leader = new BindableWrapper<>();
+    BindableWrapper<PartyResult> leader = new BindableWrapper<>();
     BindableWrapper<Candidate> winner = new BindableWrapper<>();
     List<Party> swingPartyOrder =
         Arrays.asList(ndp.getParty(), grn.getParty(), lib.getParty(), pc.getParty());
@@ -264,7 +263,7 @@ public class SimpleVoteViewPanelTest {
     voteHeader.setValue("1 OF 9 POLLS REPORTING");
     voteSubhead.setValue("PROJECTION: TOO EARLY TO CALL");
     pctReporting.setValue(1.0 / 9);
-    leader.setValue(MapBuilder.Result.leading(lib.getParty()));
+    leader.setValue(PartyResult.leading(lib.getParty()));
     compareRendering("SimpleVoteViewPanel", "Update-2", panel);
 
     curr.put(ndp, 8);
@@ -275,7 +274,7 @@ public class SimpleVoteViewPanelTest {
     voteHeader.setValue("2 OF 9 POLLS REPORTING");
     voteSubhead.setValue("PROJECTION: TOO EARLY TO CALL");
     pctReporting.setValue(2.0 / 9);
-    leader.setValue(MapBuilder.Result.leading(grn.getParty()));
+    leader.setValue(PartyResult.leading(grn.getParty()));
     compareRendering("SimpleVoteViewPanel", "Update-3", panel);
 
     curr.put(ndp, 18);
@@ -286,7 +285,7 @@ public class SimpleVoteViewPanelTest {
     voteHeader.setValue("5 OF 9 POLLS REPORTING");
     voteSubhead.setValue("PROJECTION: TOO EARLY TO CALL");
     pctReporting.setValue(5.0 / 9);
-    leader.setValue(MapBuilder.Result.leading(pc.getParty()));
+    leader.setValue(PartyResult.leading(pc.getParty()));
     compareRendering("SimpleVoteViewPanel", "Update-4", panel);
 
     curr.put(ndp, 124);
@@ -297,7 +296,7 @@ public class SimpleVoteViewPanelTest {
     voteHeader.setValue("9 OF 9 POLLS REPORTING");
     voteSubhead.setValue("PROJECTION: PC GAIN FROM LIB");
     pctReporting.setValue(9.0 / 9);
-    leader.setValue(MapBuilder.Result.elected(pc.getParty()));
+    leader.setValue(PartyResult.elected(pc.getParty()));
     winner.setValue(pc);
     compareRendering("SimpleVoteViewPanel", "Update-5", panel);
 
@@ -336,7 +335,8 @@ public class SimpleVoteViewPanelTest {
     BindableWrapper<String> changeHeader = new BindableWrapper<>("CHANGE SINCE 2015");
     BindableWrapper<String> swingHeader = new BindableWrapper<>("SWING SINCE 2015");
     BindableWrapper<String> mapHeader = new BindableWrapper<>("CARDIGAN");
-    BindableWrapper<Result> leader = new BindableWrapper<>(Result.leading(lib.getParty()));
+    BindableWrapper<PartyResult> leader =
+        new BindableWrapper<>(PartyResult.leading(lib.getParty()));
     BindableWrapper<Candidate> winner = new BindableWrapper<>();
     List<Party> swingPartyOrder =
         Arrays.asList(ndp.getParty(), grn.getParty(), lib.getParty(), pc.getParty());
@@ -613,7 +613,7 @@ public class SimpleVoteViewPanelTest {
             .withResultMap(
                 () -> shapesByDistrict,
                 selectedDistrict.getBinding(),
-                leader.getBinding().map(Result::elected),
+                leader.getBinding().map(PartyResult::elected),
                 focus.getBinding(),
                 additionalHighlight.getBinding(),
                 mapHeader.getBinding())
@@ -753,7 +753,7 @@ public class SimpleVoteViewPanelTest {
     BindableWrapper<String> changeHeader = new BindableWrapper<>("CHANGE SINCE 2015");
     BindableWrapper<String> swingHeader = new BindableWrapper<>("SWING SINCE 2015");
     BindableWrapper<String> mapHeader = new BindableWrapper<>("CARDIGAN");
-    BindableWrapper<Result> leader = new BindableWrapper<>();
+    BindableWrapper<PartyResult> leader = new BindableWrapper<>();
     BindableWrapper<Candidate> winner = new BindableWrapper<>();
     List<Party> swingPartyOrder =
         Arrays.asList(ndp.getParty(), grn.getParty(), lib.getParty(), pc.getParty());
@@ -792,7 +792,7 @@ public class SimpleVoteViewPanelTest {
     voteHeader.setValue("9 OF 9 POLLS REPORTING");
     voteSubhead.setValue("PROJECTION: PC GAIN FROM LIB");
     pctReporting.setValue(9.0 / 9);
-    leader.setValue(MapBuilder.Result.elected(pc.getParty()));
+    leader.setValue(PartyResult.elected(pc.getParty()));
     winner.setValue(pc);
     compareRendering("SimpleVoteViewPanel", "CandidateOthers-3", panel);
   }
@@ -828,7 +828,7 @@ public class SimpleVoteViewPanelTest {
     BindableWrapper<String> changeHeader = new BindableWrapper<>("CHANGE SINCE 2015");
     BindableWrapper<String> swingHeader = new BindableWrapper<>("SWING SINCE 2015");
     BindableWrapper<String> mapHeader = new BindableWrapper<>("CARDIGAN");
-    BindableWrapper<Result> leader = new BindableWrapper<>();
+    BindableWrapper<PartyResult> leader = new BindableWrapper<>();
     BindableWrapper<Candidate> winner = new BindableWrapper<>();
     List<Party> swingPartyOrder =
         Arrays.asList(ndp.getParty(), grn.getParty(), lib.getParty(), pc.getParty());
@@ -867,7 +867,7 @@ public class SimpleVoteViewPanelTest {
     voteHeader.setValue("9 OF 9 POLLS REPORTING");
     voteSubhead.setValue("PROJECTION: PC GAIN FROM LIB");
     pctReporting.setValue(9.0 / 9);
-    leader.setValue(MapBuilder.Result.elected(pc.getParty()));
+    leader.setValue(PartyResult.elected(pc.getParty()));
     winner.setValue(pc);
     compareRendering("SimpleVoteViewPanel", "CandidateOthersMandatory-3", panel);
   }
