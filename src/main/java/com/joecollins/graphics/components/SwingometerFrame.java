@@ -46,6 +46,7 @@ public class SwingometerFrame extends GraphicsFrame {
   private IndexedBinding<? extends Number> dotsPositionBinding = IndexedBinding.emptyBinding();
   private IndexedBinding<Color> dotsColorBinding = IndexedBinding.emptyBinding();
   private IndexedBinding<String> dotsLabelBinding = IndexedBinding.emptyBinding();
+  private IndexedBinding<Boolean> dotsSolidBinding = IndexedBinding.singletonBinding(true);
 
   private SwingPanel swingPanel = new SwingPanel();
 
@@ -209,7 +210,7 @@ public class SwingometerFrame extends GraphicsFrame {
   }
 
   Number getDotPosition(int index) {
-    return swingPanel.dots.get(index).getLeft();
+    return swingPanel.dots.get(index).position;
   }
 
   public void setDotsPositionBinding(IndexedBinding<? extends Number> dotsPositionBinding) {
@@ -219,7 +220,7 @@ public class SwingometerFrame extends GraphicsFrame {
   }
 
   Color getDotColor(int index) {
-    return swingPanel.dots.get(index).getMiddle();
+    return swingPanel.dots.get(index).color;
   }
 
   public void setDotsColorBinding(IndexedBinding<Color> dotsColorBinding) {
@@ -229,13 +230,35 @@ public class SwingometerFrame extends GraphicsFrame {
   }
 
   String getDotLabel(int index) {
-    return swingPanel.dots.get(index).getRight();
+    return swingPanel.dots.get(index).label;
   }
 
   public void setDotsLabelBinding(IndexedBinding<String> dotsLabelBinding) {
     this.dotsLabelBinding.unbind();
     this.dotsLabelBinding = dotsLabelBinding;
     this.dotsLabelBinding.bind(swingPanel::setDotLabel);
+  }
+
+  boolean isDotSolid(int index) {
+    return swingPanel.dots.get(index).solid;
+  }
+
+  public void setDotsSolidBinding(IndexedBinding<Boolean> dotsSolidBinding) {
+    this.dotsSolidBinding.unbind();
+    this.dotsSolidBinding = dotsSolidBinding;
+    this.dotsSolidBinding.bind(swingPanel::setDotSolid);
+  }
+
+  private class Dot {
+    private Number position = 0.0;
+    private Color color = Color.WHITE;
+    private String label = "";
+    private boolean solid = true;
+  }
+
+  @FunctionalInterface
+  private interface OvalDrawer {
+    void draw(int x, int y, int width, int height);
   }
 
   private class SwingPanel extends JPanel {
@@ -248,7 +271,7 @@ public class SwingometerFrame extends GraphicsFrame {
     private List<MutablePair<Number, String>> ticks = new ArrayList<>();
     private List<MutableTriple<Number, String, Color>> outerLabels = new ArrayList<>();
     private int numBucketsPerSide = numBucketsPerSideBinding.getValue();
-    private List<MutableTriple<Number, Color, String>> dots = new ArrayList<>();
+    private List<Dot> dots = new ArrayList<>();
 
     public SwingPanel() {
       setBackground(Color.WHITE);
@@ -339,23 +362,28 @@ public class SwingometerFrame extends GraphicsFrame {
         dots.remove(numDots);
       }
       while (numDots > dots.size()) {
-        dots.add(MutableTriple.of(0.0, Color.WHITE, ""));
+        dots.add(new Dot());
       }
       repaint();
     }
 
     public void setDotPosition(int index, Number position) {
-      dots.get(index).setLeft(position);
+      dots.get(index).position = position;
       repaint();
     }
 
     public void setDotColor(int index, Color color) {
-      dots.get(index).setMiddle(color);
+      dots.get(index).color = color;
       repaint();
     }
 
     public void setDotLabel(int index, String label) {
-      dots.get(index).setRight(label);
+      dots.get(index).label = label;
+      repaint();
+    }
+
+    public void setDotSolid(int index, boolean solid) {
+      dots.get(index).solid = solid;
       repaint();
     }
 
@@ -397,13 +425,13 @@ public class SwingometerFrame extends GraphicsFrame {
       double bucketSize = range.doubleValue() / numBucketsPerSide;
       var bucketedDots =
           dots.stream()
-              .filter(e -> Math.abs(e.getLeft().doubleValue()) <= range.doubleValue())
-              .sorted(Comparator.comparing(e -> Math.abs(e.getLeft().doubleValue())))
+              .filter(e -> Math.abs(e.position.doubleValue()) <= range.doubleValue())
+              .sorted(Comparator.comparing(e -> Math.abs(e.position.doubleValue())))
               .collect(
                   Collectors.groupingBy(
                       e ->
-                          (int) Math.signum(e.getLeft().doubleValue())
-                              * (int) Math.ceil(Math.abs(e.getLeft().doubleValue() / bucketSize))));
+                          (int) Math.signum(e.position.doubleValue())
+                              * (int) Math.ceil(Math.abs(e.position.doubleValue() / bucketSize))));
       int maxBucketSize = bucketedDots.values().stream().mapToInt(List::size).max().orElse(0);
       double theta = Math.PI / 2 / numBucketsPerSide;
       int dotSize =
@@ -417,14 +445,15 @@ public class SwingometerFrame extends GraphicsFrame {
         ((Graphics2D) g).setTransform(createRotationTransform(val, originalTransform, arcY));
         for (int dotNum = 0; dotNum < entry.getValue().size(); dotNum++) {
           var dot = entry.getValue().get(dotNum);
-          g.setColor(dot.middle);
-          g.fillOval(
+          g.setColor(dot.color);
+          OvalDrawer drawer = dot.solid ? g::fillOval : g::drawOval;
+          drawer.draw(
               (getWidth() - dotSize) / 2 + 2,
               inner / 2 - (dotNum + 1) * dotSize + 2,
               dotSize - 4,
               dotSize - 4);
-          g.setColor(Color.WHITE);
-          String[] text = dot.right.split("\n");
+          g.setColor(dot.solid ? Color.WHITE : dot.color);
+          String[] text = dot.label.split("\n");
           int size = Math.max(2, (dotSize - 8) / text.length);
           Font font = null;
           while (size > 1) {

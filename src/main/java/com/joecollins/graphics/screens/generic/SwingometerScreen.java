@@ -43,13 +43,13 @@ public class SwingometerScreen extends JPanel {
     add(panel, BorderLayout.CENTER);
   }
 
-  public static <T> Builder of(
+  public static <T> Builder<T> of(
       Binding<Map<T, Map<Party, Integer>>> prevVotes,
       Binding<Map<T, PartyResult>> results,
       Binding<Map<Party, Double>> swing,
       Binding<Pair<Party, Party>> parties,
       Binding<String> header) {
-    return new Builder(prevVotes, results, parties, swing, header);
+    return new Builder<>(prevVotes, results, parties, swing, header);
   }
 
   public static class Builder<T> {
@@ -58,6 +58,7 @@ public class SwingometerScreen extends JPanel {
       enum Property {
         PREV,
         RESULTS,
+        FILTERED_SEATS,
         PARTIES,
         SWINGS,
         RANGE,
@@ -66,6 +67,7 @@ public class SwingometerScreen extends JPanel {
 
       Map<T, Map<Party, Integer>> prevVotes = new HashMap<>();
       Map<T, PartyResult> results = new HashMap<>();
+      Set<T> filteredSeats = null;
       Pair<Party, Party> parties = ImmutablePair.of(null, null);
       Map<Party, Double> partySwings = new HashMap<>();
       Number range = 0.09999;
@@ -79,6 +81,11 @@ public class SwingometerScreen extends JPanel {
       public void setResults(Map<T, PartyResult> results) {
         this.results = results;
         onPropertyRefreshed(Property.RESULTS);
+      }
+
+      public void setSeatFilter(Set<T> filteredSeats) {
+        this.filteredSeats = filteredSeats;
+        onPropertyRefreshed(Property.FILTERED_SEATS);
       }
 
       public void setParties(Pair<Party, Party> parties) {
@@ -123,6 +130,11 @@ public class SwingometerScreen extends JPanel {
       return this;
     }
 
+    public Builder<T> withSeatFilter(Binding<Set<T>> seatsFilterBinding) {
+      seatsFilterBinding.bind(inputs::setSeatFilter);
+      return this;
+    }
+
     public SwingometerScreen build(Binding<String> title) {
       JLabel headerLabel = new JLabel();
       headerLabel.setFont(StandardFont.readBoldFont(32));
@@ -136,7 +148,7 @@ public class SwingometerScreen extends JPanel {
     }
 
     private SwingometerFrame createSwingometer() {
-      BindableList<Pair<Double, Color>> dotsList = createDotsForSwingometer();
+      BindableList<Triple<Double, Color, Boolean>> dotsList = createDotsForSwingometer();
 
       return SwingometerFrameBuilder.basic(
               Binding.propertyBinding(
@@ -154,7 +166,7 @@ public class SwingometerScreen extends JPanel {
                   },
                   Inputs.Property.PARTIES,
                   Inputs.Property.SWINGS))
-          .withDots(dotsList, Pair::getLeft, Pair::getRight)
+          .withDotsSolid(dotsList, Triple::getLeft, Triple::getMiddle, Triple::getRight)
           .withHeader(header.getBinding())
           .withRange(Binding.propertyBinding(inputs, in -> in.range, Inputs.Property.RANGE))
           .withTickInterval(() -> 0.01, n -> String.valueOf(Math.round(n.doubleValue() * 100)))
@@ -359,17 +371,19 @@ public class SwingometerScreen extends JPanel {
           .collect(Collectors.toList());
     }
 
-    private BindableList<Pair<Double, Color>> createDotsForSwingometer() {
+    private BindableList<Triple<Double, Color, Boolean>> createDotsForSwingometer() {
       var emptyResult = new PartyResult(null, false);
-      Binding<List<Pair<Double, Color>>> dotsBinding =
+      Binding<List<Triple<Double, Color, Boolean>>> dotsBinding =
           Binding.propertyBinding(
               inputs,
               in -> {
                 return in.prevVotes.entrySet().stream()
                     .map(
                         e ->
-                            ImmutablePair.of(
-                                e.getValue(), in.results.getOrDefault(e.getKey(), emptyResult)))
+                            ImmutableTriple.of(
+                                e.getValue(),
+                                in.results.getOrDefault(e.getKey(), emptyResult),
+                                in.filteredSeats == null || in.filteredSeats.contains(e.getKey())))
                     .filter(
                         e -> {
                           Party winner =
@@ -385,15 +399,16 @@ public class SwingometerScreen extends JPanel {
                           int total = e.getLeft().values().stream().mapToInt(i -> i).sum();
                           int left = e.getLeft().getOrDefault(in.parties.getLeft(), 0);
                           int right = e.getLeft().getOrDefault(in.parties.getRight(), 0);
-                          return ImmutablePair.of(
-                              0.5 * (left - right) / total, e.getRight().getColor());
+                          return ImmutableTriple.of(
+                              0.5 * (left - right) / total, e.getMiddle().getColor(), e.getRight());
                         })
                     .collect(Collectors.toList());
               },
               Inputs.Property.PREV,
               Inputs.Property.RESULTS,
-              Inputs.Property.PARTIES);
-      BindableList<Pair<Double, Color>> dotsList = new BindableList<>();
+              Inputs.Property.PARTIES,
+              Inputs.Property.FILTERED_SEATS);
+      BindableList<Triple<Double, Color, Boolean>> dotsList = new BindableList<>();
       dotsBinding.bind(dotsList::setAll);
       return dotsList;
     }

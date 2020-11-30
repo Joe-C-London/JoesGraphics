@@ -8,6 +8,7 @@ import com.joecollins.models.general.Party;
 import java.awt.Color;
 import java.io.IOException;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -50,6 +51,48 @@ public class SwingometerScreenTest {
 
     parties.setValue(ImmutablePair.of(pa, pc));
     compareRendering("SwingometerScreen", "Basic-TwoParty-3", panel);
+  }
+
+  @Test
+  public void testFilteredTwoParties() throws IOException {
+    BindableWrapper<Map<String, Map<Party, Integer>>> prevResult =
+        new BindableWrapper<>(nbPrevResult());
+    BindableWrapper<Map<String, PartyResult>> currResult = new BindableWrapper<>(nbCurrResult());
+    BindableWrapper<Pair<Party, Party>> parties = new BindableWrapper<>(ImmutablePair.of(lib, pc));
+    BindableWrapper<Map<Party, Double>> swing =
+        new BindableWrapper<>(
+            Map.of(
+                pc, +0.0745, lib, -0.0345, grn, +0.0336, pa, -0.0339, ndp, -0.0335, ind, -0.0062));
+    BindableWrapper<Set<String>> seatsFiltered =
+        new BindableWrapper<>(
+            Set.of(
+                "Oromocto-Lincoln-Fredericton",
+                "Fredericton-Grand Lake",
+                "New Maryland-Sunbury",
+                "Fredericton South",
+                "Fredericton North",
+                "Fredericton-York",
+                "Fredericton West-Hanwell",
+                "Carleton-York"));
+
+    SwingometerScreen panel =
+        SwingometerScreen.of(
+                prevResult.getBinding(),
+                currResult.getBinding(),
+                swing.getBinding(),
+                parties.getBinding(),
+                Binding.fixedBinding("SWINGOMETER"))
+            .withSeatLabelIncrements(Binding.fixedBinding(3))
+            .withSeatFilter(seatsFiltered.getBinding())
+            .build(Binding.fixedBinding("NEW BRUNSWICK"));
+    panel.setSize(1024, 512);
+    compareRendering("SwingometerScreen", "Filtered-TwoParty-1", panel);
+
+    seatsFiltered.setValue(Set.of());
+    compareRendering("SwingometerScreen", "Filtered-TwoParty-2", panel);
+
+    seatsFiltered.setValue(null);
+    compareRendering("SwingometerScreen", "Filtered-TwoParty-3", panel);
   }
 
   private static Map<String, Map<Party, Integer>> nbPrevResult() {

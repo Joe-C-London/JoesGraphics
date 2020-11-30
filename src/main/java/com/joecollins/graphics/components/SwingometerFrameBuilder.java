@@ -9,6 +9,7 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import org.apache.commons.lang3.tuple.Pair;
 
 public class SwingometerFrameBuilder {
@@ -155,10 +156,28 @@ public class SwingometerFrameBuilder {
       Function<T, ? extends Number> positionFunc,
       Function<T, Color> colorFunc,
       Function<T, String> labelFunc) {
+    return withDots(dots, positionFunc, colorFunc, labelFunc, d -> true);
+  }
+
+  public <T> SwingometerFrameBuilder withDotsSolid(
+      BindableList<T> dots,
+      Function<T, ? extends Number> positionFunc,
+      Function<T, Color> colorFunc,
+      Predicate<T> solidFunc) {
+    return withDots(dots, positionFunc, colorFunc, d -> "", solidFunc);
+  }
+
+  public <T> SwingometerFrameBuilder withDots(
+      BindableList<T> dots,
+      Function<T, ? extends Number> positionFunc,
+      Function<T, Color> colorFunc,
+      Function<T, String> labelFunc,
+      Predicate<T> solidFunc) {
     frame.setNumDotsBinding(Binding.sizeBinding(dots));
     frame.setDotsPositionBinding(IndexedBinding.propertyBinding(dots, positionFunc));
     frame.setDotsColorBinding(IndexedBinding.propertyBinding(dots, colorFunc));
     frame.setDotsLabelBinding(IndexedBinding.propertyBinding(dots, labelFunc));
+    frame.setDotsSolidBinding(IndexedBinding.propertyBinding(dots, solidFunc::test));
     return this;
   }
 
@@ -174,11 +193,29 @@ public class SwingometerFrameBuilder {
       Function<T, ? extends Number> positionFunc,
       Function<T, Binding<Color>> colorFunc,
       Function<T, String> labelFunc) {
+    return withFixedDots(dots, positionFunc, colorFunc, labelFunc, d -> true);
+  }
+
+  public <T> SwingometerFrameBuilder withFixedDotsSolid(
+      List<T> dots,
+      Function<T, ? extends Number> positionFunc,
+      Function<T, Binding<Color>> colorFunc,
+      Predicate<T> solidFunc) {
+    return withFixedDots(dots, positionFunc, colorFunc, d -> "", solidFunc);
+  }
+
+  public <T> SwingometerFrameBuilder withFixedDots(
+      List<T> dots,
+      Function<T, ? extends Number> positionFunc,
+      Function<T, Binding<Color>> colorFunc,
+      Function<T, String> labelFunc,
+      Predicate<T> solidFunc) {
     frame.setNumDotsBinding(Binding.fixedBinding(dots.size()));
     frame.setDotsPositionBinding(
         IndexedBinding.listBinding(dots, d -> () -> positionFunc.apply(d)));
     frame.setDotsColorBinding(IndexedBinding.listBinding(dots, d -> colorFunc.apply(d)));
     frame.setDotsLabelBinding(IndexedBinding.listBinding(dots, d -> () -> labelFunc.apply(d)));
+    frame.setDotsSolidBinding(IndexedBinding.listBinding(dots, d -> () -> solidFunc.test(d)));
     return this;
   }
 

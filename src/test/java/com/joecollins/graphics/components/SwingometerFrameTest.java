@@ -2,6 +2,8 @@ package com.joecollins.graphics.components;
 
 import static com.joecollins.graphics.utils.RenderTestUtils.compareRendering;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import com.joecollins.bindings.BindableList;
 import com.joecollins.bindings.Binding;
@@ -124,6 +126,28 @@ public class SwingometerFrameTest {
     assertEquals(0.3, frame.getDotPosition(0));
     assertEquals(Color.RED, frame.getDotColor(1));
     assertEquals("C", frame.getDotLabel(2));
+    assertTrue(frame.isDotSolid(2));
+  }
+
+  @Test
+  public void testDotEmpty() {
+    BindableList<Triple<Double, Color, Boolean>> dots = new BindableList<>();
+    dots.add(ImmutableTriple.of(0.3, Color.BLUE, true));
+    dots.add(ImmutableTriple.of(-0.7, Color.RED, false));
+    dots.add(ImmutableTriple.of(2.4, Color.BLACK, true));
+    SwingometerFrame frame = new SwingometerFrame();
+    frame.setNumBucketsPerSideBinding(Binding.fixedBinding(20));
+    frame.setNumDotsBinding(Binding.sizeBinding(dots));
+    frame.setDotsPositionBinding(IndexedBinding.propertyBinding(dots, Triple::getLeft));
+    frame.setDotsColorBinding(IndexedBinding.propertyBinding(dots, Triple::getMiddle));
+    frame.setDotsSolidBinding(IndexedBinding.propertyBinding(dots, Triple::getRight));
+    assertEquals(20, frame.getNumBucketsPerSide());
+    assertEquals(3, frame.getNumDots());
+    assertEquals(0.3, frame.getDotPosition(0));
+    assertEquals(Color.RED, frame.getDotColor(1));
+    assertTrue(frame.isDotSolid(0));
+    assertFalse(frame.isDotSolid(1));
+    assertTrue(frame.isDotSolid(2));
   }
 
   @Test
@@ -298,6 +322,53 @@ public class SwingometerFrameTest {
 
     frame.setSize(1024, 512);
     compareRendering("SwingometerFrame", "Labels", frame);
+  }
+
+  @Test
+  public void testRenderEmptyDots() throws IOException {
+    BindableList<Integer> ticks =
+        IntStream.rangeClosed(-9, 9).boxed().collect(Collectors.toCollection(BindableList::new));
+
+    BindableList<ImmutableTriple<Double, Integer, Color>> outerLabels = new BindableList<>();
+    outerLabels.add(ImmutableTriple.of(0.0, 332, Color.BLUE));
+    outerLabels.add(ImmutableTriple.of(-3.91, 350, Color.BLUE));
+    outerLabels.add(ImmutableTriple.of(-5.235, 400, Color.BLUE));
+    outerLabels.add(ImmutableTriple.of(-7.895, 450, Color.BLUE));
+    outerLabels.add(ImmutableTriple.of(2.68, 270, Color.RED));
+    outerLabels.add(ImmutableTriple.of(5.075, 350, Color.RED));
+    outerLabels.add(ImmutableTriple.of(8.665, 400, Color.RED));
+
+    BindableList<ImmutableTriple<ImmutablePair<String, Integer>, Double, Color>> dots =
+        createSwingometerDotsWithLabels();
+
+    SwingometerFrame frame = new SwingometerFrame();
+    frame.setHeaderBinding(Binding.fixedBinding("2016 PRESIDENT SWINGOMETER"));
+    frame.setRangeBinding(Binding.fixedBinding(10));
+    frame.setValueBinding(Binding.fixedBinding(0.885));
+    frame.setNumBucketsPerSideBinding(Binding.fixedBinding(20));
+    frame.setLeftColorBinding(Binding.fixedBinding(Color.BLUE));
+    frame.setRightColorBinding(Binding.fixedBinding(Color.RED));
+    frame.setLeftToWinBinding(Binding.fixedBinding(-2.68));
+    frame.setRightToWinBinding(Binding.fixedBinding(2.68));
+    frame.setNumTicksBinding(Binding.sizeBinding(ticks));
+    frame.setTickPositionBinding(IndexedBinding.propertyBinding(ticks, Function.identity()));
+    frame.setTickTextBinding(IndexedBinding.propertyBinding(ticks, String::valueOf));
+    frame.setNumOuterLabelsBinding(Binding.sizeBinding(outerLabels));
+    frame.setOuterLabelPositionBinding(
+        IndexedBinding.propertyBinding(outerLabels, ImmutableTriple::getLeft));
+    frame.setOuterLabelTextBinding(
+        IndexedBinding.propertyBinding(outerLabels, label -> label.getMiddle().toString()));
+    frame.setOuterLabelColorBinding(
+        IndexedBinding.propertyBinding(outerLabels, ImmutableTriple::getRight));
+    frame.setNumDotsBinding(Binding.sizeBinding(dots));
+    frame.setDotsPositionBinding(IndexedBinding.propertyBinding(dots, Triple::getMiddle));
+    frame.setDotsColorBinding(IndexedBinding.propertyBinding(dots, Triple::getRight));
+    frame.setDotsLabelBinding(IndexedBinding.propertyBinding(dots, e -> e.left.right.toString()));
+    frame.setDotsSolidBinding(
+        IndexedBinding.propertyBinding(dots, e -> e.middle > -5 && e.middle < 0));
+
+    frame.setSize(1024, 512);
+    compareRendering("SwingometerFrame", "EmptyDots", frame);
   }
 
   private BindableList<ImmutableTriple<ImmutablePair<String, Integer>, Double, Color>>

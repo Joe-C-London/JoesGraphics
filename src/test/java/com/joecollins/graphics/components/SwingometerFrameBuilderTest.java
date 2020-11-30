@@ -1,6 +1,8 @@
 package com.joecollins.graphics.components;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import com.joecollins.bindings.Bindable;
 import com.joecollins.bindings.BindableList;
@@ -228,6 +230,41 @@ public class SwingometerFrameBuilderTest {
     assertEquals(0.115, frame.getDotPosition(0).doubleValue(), 1e-6);
     assertEquals(Color.RED, frame.getDotColor(1));
     assertEquals("10", frame.getDotLabel(2));
+  }
+
+  @Test
+  public void testDotsSolidOrEmpty() {
+    class Dot {
+      private final double position;
+      private final Color color;
+      private final boolean solid;
+
+      Dot(double position, Color color, boolean solid) {
+        this.position = position;
+        this.color = color;
+        this.solid = solid;
+      }
+    }
+    BindableList<Dot> dots = new BindableList<>();
+    dots.add(new Dot(0.115, Color.RED, true));
+    dots.add(new Dot(0.36, Color.RED, true));
+    dots.add(new Dot(0.385, Color.RED, true));
+    dots.add(new Dot(0.6, Color.RED, true));
+    dots.add(new Dot(-0.185, Color.BLUE, false));
+    dots.add(new Dot(-0.76, Color.BLUE, true));
+    dots.add(new Dot(-0.76, Color.BLUE, false));
+    BindableWrapper<Pair<Color, Color>> colors =
+        new BindableWrapper<>(ImmutablePair.of(Color.BLUE, Color.RED));
+    BindableWrapper<Double> value = new BindableWrapper<>(-1.0);
+    SwingometerFrame frame =
+        SwingometerFrameBuilder.basic(colors.getBinding(), value.getBinding())
+            .withDotsSolid(dots, d -> d.position, d -> d.color, d -> d.solid)
+            .build();
+    assertEquals(7, frame.getNumDots());
+    assertEquals(0.115, frame.getDotPosition(0).doubleValue(), 1e-6);
+    assertEquals(Color.RED, frame.getDotColor(1));
+    assertTrue(frame.isDotSolid(2));
+    assertFalse(frame.isDotSolid(4));
   }
 
   enum Property {
