@@ -11,10 +11,14 @@ public class Party {
   private final String abbreviation;
   private final Color color;
 
+  private final int hash;
+
   public Party(String name, String abbreviation, Color color) {
     this.name = name;
     this.abbreviation = abbreviation;
     this.color = color;
+
+    this.hash = Objects.hash(this.name, this.abbreviation, this.color);
   }
 
   public String getName() {
@@ -45,7 +49,7 @@ public class Party {
 
   @Override
   public int hashCode() {
-    return Objects.hash(name, abbreviation, color);
+    return hash;
   }
 
   @Override

@@ -10,6 +10,8 @@ public class Candidate {
   private final Party party;
   private final boolean incumbent;
 
+  private final int hash;
+
   public Candidate(String name, Party party) {
     this(name, party, false);
   }
@@ -18,6 +20,8 @@ public class Candidate {
     this.name = name;
     this.party = party;
     this.incumbent = incumbent;
+
+    this.hash = Objects.hash(this.name, this.party, this.incumbent);
   }
 
   public String getName() {
@@ -48,7 +52,7 @@ public class Candidate {
 
   @Override
   public int hashCode() {
-    return Objects.hash(name, party, incumbent);
+    return hash;
   }
 
   @Override
