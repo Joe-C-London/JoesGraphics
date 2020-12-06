@@ -22,6 +22,14 @@ public class PartyResult {
     return new PartyResult(party, false);
   }
 
+  public Party getParty() {
+    return party;
+  }
+
+  public boolean isElected() {
+    return elected;
+  }
+
   public Color getColor() {
     if (party == null) {
       return Color.BLACK;
