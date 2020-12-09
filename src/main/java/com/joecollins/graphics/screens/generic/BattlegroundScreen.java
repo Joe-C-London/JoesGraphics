@@ -10,6 +10,7 @@ import com.joecollins.graphics.components.ResultListingFrame;
 import com.joecollins.graphics.utils.ColorUtils;
 import com.joecollins.graphics.utils.StandardFont;
 import com.joecollins.models.general.Party;
+import com.joecollins.models.general.PartyResult;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;

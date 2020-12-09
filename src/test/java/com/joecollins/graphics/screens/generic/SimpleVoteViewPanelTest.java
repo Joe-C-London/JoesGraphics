@@ -8,6 +8,7 @@ import com.joecollins.graphics.utils.ShapefileReader;
 import com.joecollins.models.general.Aggregators;
 import com.joecollins.models.general.Candidate;
 import com.joecollins.models.general.Party;
+import com.joecollins.models.general.PartyResult;
 import java.awt.Color;
 import java.awt.Shape;
 import java.io.IOException;

@@ -14,6 +14,7 @@ import com.joecollins.graphics.utils.StandardFont;
 import com.joecollins.models.general.Aggregators;
 import com.joecollins.models.general.Candidate;
 import com.joecollins.models.general.Party;
+import com.joecollins.models.general.PartyResult;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;

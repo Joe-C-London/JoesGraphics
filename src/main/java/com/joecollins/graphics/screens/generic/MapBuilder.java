@@ -4,6 +4,7 @@ import com.joecollins.bindings.Binding;
 import com.joecollins.bindings.BindingReceiver;
 import com.joecollins.graphics.components.MapFrame;
 import com.joecollins.graphics.components.MapFrameBuilder;
+import com.joecollins.models.general.PartyResult;
 import java.awt.Color;
 import java.awt.Shape;
 import java.util.List;

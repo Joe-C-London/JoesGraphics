@@ -1,7 +1,6 @@
-package com.joecollins.graphics.screens.generic;
+package com.joecollins.models.general;
 
 import com.joecollins.graphics.utils.ColorUtils;
-import com.joecollins.models.general.Party;
 import java.awt.Color;
 
 public class PartyResult {

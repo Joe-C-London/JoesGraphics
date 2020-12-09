@@ -4,6 +4,7 @@ import static com.joecollins.graphics.utils.RenderTestUtils.compareRendering;
 
 import com.joecollins.graphics.utils.BindableWrapper;
 import com.joecollins.models.general.Party;
+import com.joecollins.models.general.PartyResult;
 import java.awt.Color;
 import java.io.IOException;
 import java.util.Map;

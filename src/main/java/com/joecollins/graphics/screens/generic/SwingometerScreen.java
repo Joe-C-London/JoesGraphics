@@ -8,6 +8,7 @@ import com.joecollins.graphics.components.SwingometerFrame;
 import com.joecollins.graphics.components.SwingometerFrameBuilder;
 import com.joecollins.graphics.utils.StandardFont;
 import com.joecollins.models.general.Party;
+import com.joecollins.models.general.PartyResult;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.GridLayout;
