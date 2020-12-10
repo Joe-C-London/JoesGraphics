@@ -279,4 +279,21 @@ public class AggregatorsTest {
     winner.setValue("DEF");
     assertEquals(Map.of("DEF", 7, "GHI", 6, "OTHERS", 9), output.getValue());
   }
+
+  @Test
+  public void testToMap() {
+    Map<String, BindableWrapper<Integer>> inputs =
+        Map.of("ABC", new BindableWrapper<>(1), "DEF", new BindableWrapper<>(2));
+    Mutable<Map<String, Integer>> output = new MutableObject<>();
+    var outputBinding = Aggregators.toMap(inputs.keySet(), k -> inputs.get(k).getBinding());
+    outputBinding.bind(output::setValue);
+    assertEquals(Map.of("ABC", 1, "DEF", 2), output.getValue());
+
+    inputs.get("ABC").setValue(7);
+    assertEquals(Map.of("ABC", 7, "DEF", 2), output.getValue());
+
+    outputBinding.unbind();
+    inputs.get("DEF").setValue(9);
+    assertEquals(Map.of("ABC", 7, "DEF", 2), output.getValue());
+  }
 }

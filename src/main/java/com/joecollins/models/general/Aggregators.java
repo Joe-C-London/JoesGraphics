@@ -1,14 +1,17 @@
 package com.joecollins.models.general;
 
 import com.joecollins.bindings.Binding;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.ToDoubleFunction;
 import java.util.stream.Collectors;
@@ -174,5 +177,49 @@ public class Aggregators {
                 Map.Entry::getValue,
                 Integer::sum,
                 LinkedHashMap::new));
+  }
+
+  public static <K, V> Binding<Map<K, V>> toMap(Set<K> keys, Function<K, Binding<V>> bindingFunc) {
+    return new Binding<Map<K, V>>() {
+      private List<Binding<V>> bindings = null;
+      private Map<K, V> value = null;
+
+      @Override
+      public Map<K, V> getValue() {
+        return keys.stream()
+            .collect(Collectors.toMap(Function.identity(), k -> bindingFunc.apply(k).getValue()));
+      }
+
+      @Override
+      public void bind(Consumer<Map<K, V>> onUpdate) {
+        if (bindings != null) {
+          throw new IllegalStateException("Binding is already used");
+        }
+        value = new HashMap<>();
+        Map<K, Binding<V>> bindingsMap = new HashMap<>();
+        for (K key : keys) {
+          Binding<V> binding = bindingFunc.apply(key);
+          bindingsMap.put(key, binding);
+          binding.bind(
+              val -> {
+                value.put(key, val);
+                if (bindings != null) {
+                  onUpdate.accept(value);
+                }
+              });
+        }
+        onUpdate.accept(value);
+        bindings = new ArrayList<>(bindingsMap.values());
+      }
+
+      @Override
+      public void unbind() {
+        if (bindings != null) {
+          bindings.forEach(Binding::unbind);
+          bindings = null;
+          value = null;
+        }
+      }
+    };
   }
 }
