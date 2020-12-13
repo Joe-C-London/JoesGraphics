@@ -7,7 +7,9 @@ import com.joecollins.bindings.BindingReceiver;
 import com.joecollins.bindings.IndexedBinding;
 import com.joecollins.graphics.components.MultiSummaryFrame;
 import com.joecollins.graphics.utils.StandardFont;
+import com.joecollins.models.general.Aggregators;
 import com.joecollins.models.general.Candidate;
+import com.joecollins.models.general.Party;
 import com.joecollins.models.general.PartyResult;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -47,6 +49,24 @@ public class TooCloseToCallScreen extends JPanel {
       Function<T, String> labelFunc,
       Binding<String> headerBinding) {
     return new Builder<>(headerBinding, votesBinding, resultBinding, labelFunc);
+  }
+
+  public static <T> Builder<T> ofParty(
+      Binding<Map<T, Map<Party, Integer>>> votesBinding,
+      Binding<Map<T, PartyResult>> resultBinding,
+      Function<T, String> labelFunc,
+      Binding<String> headerBinding) {
+    return new Builder<>(
+        headerBinding,
+        votesBinding.map(
+            all ->
+                all.entrySet().stream()
+                    .collect(
+                        Collectors.toMap(
+                            Map.Entry::getKey,
+                            e -> Aggregators.adjustKey(e.getValue(), p -> new Candidate("", p))))),
+        resultBinding,
+        labelFunc);
   }
 
   private static class Input<T> extends Bindable<Input.Property> {

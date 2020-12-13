@@ -4,6 +4,7 @@ import static com.joecollins.graphics.utils.RenderTestUtils.compareRendering;
 
 import com.joecollins.bindings.Binding;
 import com.joecollins.graphics.utils.BindableWrapper;
+import com.joecollins.models.general.Aggregators;
 import com.joecollins.models.general.Candidate;
 import com.joecollins.models.general.Party;
 import com.joecollins.models.general.PartyResult;
@@ -11,6 +12,7 @@ import java.awt.Color;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.junit.Test;
 
 public class TooCloseToCallScreenTest {
@@ -190,6 +192,56 @@ public class TooCloseToCallScreenTest {
     candidateVotes.setValue(candidateVotesRaw);
     partyResults.setValue(partyResultsRaw);
     compareRendering("TooCloseToCallScreen", "NumCandidates-1", screen);
+  }
+
+  @Test
+  public void testParty() throws IOException {
+    Map<Integer, Map<Candidate, Integer>> candidateVotesRaw = new HashMap<>();
+    Map<Integer, PartyResult> partyResultsRaw = new HashMap<>();
+    BindableWrapper<Map<Integer, Map<Candidate, Integer>>> candidateVotes =
+        new BindableWrapper<>(candidateVotesRaw);
+    BindableWrapper<Map<Integer, PartyResult>> partyResults =
+        new BindableWrapper<>(partyResultsRaw);
+
+    TooCloseToCallScreen screen =
+        TooCloseToCallScreen.ofParty(
+                candidateVotes
+                    .getBinding()
+                    .map(
+                        all ->
+                            all.entrySet().stream()
+                                .collect(
+                                    Collectors.toMap(
+                                        e -> e.getKey(),
+                                        e ->
+                                            Aggregators.adjustKey(
+                                                e.getValue(), Candidate::getParty)))),
+                partyResults.getBinding(),
+                d -> "DISTRICT " + d,
+                Binding.fixedBinding("TOO CLOSE TO CALL"))
+            .build(Binding.fixedBinding("PRINCE EDWARD ISLAND"));
+    screen.setSize(1024, 512);
+    compareRendering("TooCloseToCallScreen", "Basic-1", screen);
+
+    setupFirstAdvancePoll(candidateVotesRaw, partyResultsRaw, new HashMap<>());
+    candidateVotes.setValue(candidateVotesRaw);
+    partyResults.setValue(partyResultsRaw);
+    compareRendering("TooCloseToCallScreen", "Basic-2", screen);
+
+    setupAllAdvancePolls(candidateVotesRaw, partyResultsRaw, new HashMap<>());
+    candidateVotes.setValue(candidateVotesRaw);
+    partyResults.setValue(partyResultsRaw);
+    compareRendering("TooCloseToCallScreen", "Basic-3", screen);
+
+    setupHalfOfPolls(candidateVotesRaw, partyResultsRaw, new HashMap<>());
+    candidateVotes.setValue(candidateVotesRaw);
+    partyResults.setValue(partyResultsRaw);
+    compareRendering("TooCloseToCallScreen", "Basic-4", screen);
+
+    setupFullResults(candidateVotesRaw, partyResultsRaw, new HashMap<>());
+    candidateVotes.setValue(candidateVotesRaw);
+    partyResults.setValue(partyResultsRaw);
+    compareRendering("TooCloseToCallScreen", "Basic-1", screen);
   }
 
   private void setupFirstAdvancePoll(
