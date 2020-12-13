@@ -1,5 +1,5 @@
 plugins {
-    id "com.github.ben-manes.versions" version "0.29.0"
+    id "com.github.ben-manes.versions" version "0.36.0"
     id "com.diffplug.spotless" version "5.8.2"
     id "jacoco"
 }
@@ -19,7 +19,7 @@ repositories {
     mavenCentral()
 }
 
-def geotoolsVersion = '23.2'
+def geotoolsVersion = '24.1'
 
 dependencies {
     compile group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.30'
@@ -28,9 +28,9 @@ dependencies {
     compile group: 'org.geotools', name: 'gt-metadata', version: geotoolsVersion
     compile group: 'org.twitter4j', name: 'twitter4j-core', version: '4.0.7'
     compile group: 'org.apache.commons', name: 'commons-collections4', version: '4.4'
-    compile group: 'com.google.guava', name: 'guava', version: '29.0-jre'
-    testCompile group: 'junit', name: 'junit', version: '4.13'
-    testCompile group: 'commons-io', name: 'commons-io', version: '2.7'
+    compile group: 'com.google.guava', name: 'guava', version: '30.0-jre'
+    testCompile group: 'junit', name: 'junit', version: '4.13.1'
+    testCompile group: 'commons-io', name: 'commons-io', version: '2.8.0'
 }
 
 spotless {
