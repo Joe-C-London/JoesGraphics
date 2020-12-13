@@ -323,7 +323,8 @@ public class MultiResultScreen extends JPanel {
               r -> {
                 int total = r.votes.values().stream().mapToInt(i -> i).sum();
                 return Aggregators.topAndOthers(r.votes, r.maxBars, Candidate.OTHERS, r.winner)
-                    .entrySet().stream()
+                    .entrySet()
+                    .stream()
                     .sorted(
                         Comparator.<Map.Entry<Candidate, Integer>>comparingInt(
                                 e ->
