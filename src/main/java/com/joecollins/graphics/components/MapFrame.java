@@ -52,6 +52,7 @@ public class MapFrame extends GraphicsFrame {
                   @Override
                   public void componentResized(ComponentEvent e) {
                     transformedShapesCache.clear();
+                    repaint();
                   }
                 });
           }
