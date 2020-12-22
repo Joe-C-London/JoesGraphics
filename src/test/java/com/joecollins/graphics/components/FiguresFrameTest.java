@@ -137,4 +137,69 @@ public class FiguresFrameTest {
 
     compareRendering("FiguresFrame", "Overflow", frame);
   }
+
+  @Test
+  public void testRenderLongStrings() throws IOException {
+    FiguresFrame frame = new FiguresFrame();
+    frame.setHeaderBinding(Binding.fixedBinding("PARTY LEADERS"));
+    frame.setNumEntriesBinding(Binding.fixedBinding(9));
+    frame.setNameBinding(
+        IndexedBinding.listBinding(
+            "JUSTIN TRUDEAU",
+            "ANDREW SCHEER",
+            "JAGMEET SINGH",
+            "YVES-FRAN\u00c7OIS BLANCHET",
+            "ELIZABETH MAY",
+            "MAXIME BERNIER",
+            "ROD TAYLOR",
+            "S\u00c9BASTIEN CORHINO",
+            "TIM MOEN"));
+    frame.setDescriptionBinding(
+        IndexedBinding.listBinding(
+            "Liberal Leader, Papineau",
+            "Conservative Leader, Regina-Qu'Apelle",
+            "NDP Leader, Burnaby South",
+            "Bloc Qu\u00e9b\u00e9cois Leader, Beloeil-Chambly",
+            "Green Leader, Saanich-Gulf Islands",
+            "People's Party Leader, Beauce",
+            "CHP Leader, Skeena-Bulkley Valley",
+            "Rhinoceros Party Leader, Qu\u00e9bec",
+            "Libertarian Leader, Fort McMurray-Athabasca"));
+    frame.setColorBinding(
+        IndexedBinding.listBinding(
+            Color.RED,
+            Color.BLUE,
+            Color.ORANGE,
+            Color.CYAN.darker(),
+            Color.GREEN.darker(),
+            Color.MAGENTA.darker(),
+            Color.MAGENTA,
+            Color.GRAY,
+            Color.YELLOW.darker()));
+    frame.setResultBinding(
+        IndexedBinding.listBinding(
+            "ELECTED",
+            "ELECTED",
+            "ELECTED",
+            "ELECTED",
+            "ELECTED",
+            "DEFEATED",
+            "DEFEATED",
+            "DEFEATED",
+            "DEFEATED"));
+    frame.setResultColorBinding(
+        IndexedBinding.listBinding(
+            Color.RED,
+            Color.BLUE,
+            Color.ORANGE,
+            Color.CYAN.darker(),
+            Color.GREEN.darker(),
+            Color.BLUE,
+            Color.ORANGE,
+            Color.RED,
+            Color.BLUE));
+    frame.setSize(128, 256);
+
+    compareRendering("FiguresFrame", "LongStrings", frame);
+  }
 }

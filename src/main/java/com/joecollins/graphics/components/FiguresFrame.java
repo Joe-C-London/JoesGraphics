@@ -112,22 +112,22 @@ public class FiguresFrame extends GraphicsFrame {
 
   private class Entry extends JPanel {
 
-    private final JLabel nameLabel;
-    private final JLabel descriptionLabel;
+    private final FontSizeAdjustingLabel nameLabel;
+    private final FontSizeAdjustingLabel descriptionLabel;
     private final JPanel resultPanel;
-    private final JLabel resultLabel;
+    private final FontSizeAdjustingLabel resultLabel;
 
     public Entry() {
       setForeground(Color.LIGHT_GRAY);
       setBackground(Color.WHITE);
       setLayout(new EntryLayout());
 
-      nameLabel = new JLabel();
+      nameLabel = new FontSizeAdjustingLabel();
       nameLabel.setFont(StandardFont.readBoldFont(15));
       nameLabel.setBorder(new EmptyBorder(2, 0, -2, 0));
       add(nameLabel);
 
-      descriptionLabel = new JLabel();
+      descriptionLabel = new FontSizeAdjustingLabel();
       descriptionLabel.setFont(StandardFont.readNormalFont(10));
       descriptionLabel.setBorder(new EmptyBorder(1, 0, -1, 0));
       add(descriptionLabel);
@@ -137,7 +137,7 @@ public class FiguresFrame extends GraphicsFrame {
       resultPanel.setBackground(Color.LIGHT_GRAY);
       add(resultPanel);
 
-      resultLabel = new JLabel();
+      resultLabel = new FontSizeAdjustingLabel();
       resultLabel.setFont(StandardFont.readBoldFont(20));
       resultLabel.setForeground(Color.WHITE);
       resultLabel.setBorder(new EmptyBorder(3, 0, -3, 0));
