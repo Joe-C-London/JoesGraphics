@@ -5,6 +5,8 @@ import java.awt.Color;
 
 public class PartyResult {
 
+  public static PartyResult NO_RESULT = PartyResult.leading(null);
+
   private final Party party;
   private final boolean elected;
 

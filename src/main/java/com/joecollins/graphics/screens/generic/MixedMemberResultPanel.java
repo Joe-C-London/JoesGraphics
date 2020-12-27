@@ -43,7 +43,7 @@ public class MixedMemberResultPanel extends JPanel {
   private final BarFrame partyChangeFrame;
   private final MapFrame mapFrame;
 
-  public MixedMemberResultPanel(
+  private MixedMemberResultPanel(
       JLabel label,
       BarFrame candidateFrame,
       BarFrame candidateChangeFrame,
