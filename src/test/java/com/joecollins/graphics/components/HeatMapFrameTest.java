@@ -41,19 +41,19 @@ public class HeatMapFrameTest {
             BLUE,
             BLUE,
             BLUE,
-            BLUE, //
+            BLUE,
             DARK_GREEN,
             DARK_GREEN,
             DARK_GREEN,
             BLUE,
-            DARK_GREEN, //
+            DARK_GREEN,
             RED,
             RED,
             BLUE,
             DARK_GREEN,
             RED,
             DARK_GREEN,
-            RED, //
+            RED,
             BLUE,
             BLUE,
             DARK_GREEN,
@@ -300,6 +300,71 @@ public class HeatMapFrameTest {
     borderColor.setValue(RED);
     header.setValue("LIBERAL HEAT MAP");
     compareRendering("HeatMapFrame", "Uneven-2", frame);
+  }
+
+  @Test
+  public void testRenderChangeReversals() throws IOException {
+    Map<Integer, Pair<Color, Color>> results = getPeiResults();
+
+    BindableList<Pair<Color, Color>> squares = new BindableList<>();
+    squares.setAll(
+        Stream.of(
+                20, 6, 19, 18, 7, 1, 2, 4, 5, 13, 21, 15, 22, 14, 25, 3, 12, 16, 23, 10, 26, 9, 11,
+                8, 27, 24, 17)
+            .map(results::get)
+            .collect(Collectors.toList()));
+
+    BindableList<Pair<Color, Integer>> seatBars = new BindableList<>();
+    seatBars.setAll(
+        List.of(ImmutablePair.of(BLUE, 2), ImmutablePair.of(new Color(128, 128, 255), 2)));
+    BindableWrapper<String> seatLabel = new BindableWrapper<>("2/4");
+
+    BindableList<Pair<Color, Integer>> changeBars = new BindableList<>();
+    changeBars.setAll(
+        List.of(ImmutablePair.of(BLUE, 3), ImmutablePair.of(new Color(128, 128, 255), 2)));
+    BindableWrapper<String> changeLabel = new BindableWrapper<>("+3/+5");
+    BindableWrapper<Integer> changeStart = new BindableWrapper<>(8);
+
+    BindableWrapper<Color> borderColor = new BindableWrapper<>(BLUE);
+    BindableWrapper<String> header = new BindableWrapper<>("PROGRESSIVE CONSERVATIVE HEAT MAP");
+
+    HeatMapFrame frame = new HeatMapFrame();
+    frame.setNumRowsBinding(Binding.fixedBinding(5));
+    frame.setNumSquaresBinding(Binding.sizeBinding(squares));
+    frame.setSquareBordersBinding(IndexedBinding.propertyBinding(squares, Pair::getLeft));
+    frame.setSquareFillBinding(IndexedBinding.propertyBinding(squares, Pair::getRight));
+    frame.setNumSeatBarsBinding(Binding.sizeBinding(seatBars));
+    frame.setSeatBarColorBinding(IndexedBinding.propertyBinding(seatBars, Pair::getLeft));
+    frame.setSeatBarSizeBinding(IndexedBinding.propertyBinding(seatBars, Pair::getRight));
+    frame.setSeatBarLabelBinding(seatLabel.getBinding());
+    frame.setNumChangeBarsBinding(Binding.sizeBinding(changeBars));
+    frame.setChangeBarColorBinding(IndexedBinding.propertyBinding(changeBars, Pair::getLeft));
+    frame.setChangeBarSizeBinding(IndexedBinding.propertyBinding(changeBars, Pair::getRight));
+    frame.setChangeBarLabelBinding(changeLabel.getBinding());
+    frame.setChangeBarStartBinding(changeStart.getBinding());
+    frame.setBorderColorBinding(borderColor.getBinding());
+    frame.setHeaderBinding(header.getBinding());
+    frame.setSize(1024, 512);
+
+    changeBars.setAll(
+        List.of(ImmutablePair.of(BLUE, 2), ImmutablePair.of(new Color(128, 128, 255), -1)));
+    changeLabel.setValue("+2/+1");
+    compareRendering("HeatMapFrame", "ChangeReversals-1", frame);
+
+    changeBars.setAll(
+        List.of(ImmutablePair.of(BLUE, -2), ImmutablePair.of(new Color(128, 128, 255), 1)));
+    changeLabel.setValue("-2/-1");
+    compareRendering("HeatMapFrame", "ChangeReversals-2", frame);
+
+    changeBars.setAll(
+        List.of(ImmutablePair.of(BLUE, 1), ImmutablePair.of(new Color(128, 128, 255), -2)));
+    changeLabel.setValue("+1/-1");
+    compareRendering("HeatMapFrame", "ChangeReversals-3", frame);
+
+    changeBars.setAll(
+        List.of(ImmutablePair.of(BLUE, -1), ImmutablePair.of(new Color(128, 128, 255), 2)));
+    changeLabel.setValue("-1/+1");
+    compareRendering("HeatMapFrame", "ChangeReversals-4", frame);
   }
 
   private Map<Integer, Pair<Color, Color>> getPeiResults() {

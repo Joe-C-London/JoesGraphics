@@ -370,6 +370,7 @@ public class HeatMapFrame extends GraphicsFrame {
 
       int leftSoFar = changeBarStart;
       int leftBase = getLeftPosition(changeBarStart);
+      Area newClip = new Area();
       for (Bar bar : changeBars) {
         int start = getLeftPosition(leftSoFar);
         int end = getLeftPosition(leftSoFar + bar.size);
@@ -383,25 +384,17 @@ public class HeatMapFrame extends GraphicsFrame {
         points.add(new Point(endSide, changeBarBottom));
         points.add(new Point(end, changeBarMid));
         points.add(new Point(endSide, changeBarTop));
-        g.fillPolygon(
-            points.stream().mapToInt(p -> (int) p.getX()).toArray(),
-            points.stream().mapToInt(p -> (int) p.getY()).toArray(),
-            points.size());
+        var polygon =
+            new Polygon(
+                points.stream().mapToInt(p -> (int) p.getX()).toArray(),
+                points.stream().mapToInt(p -> (int) p.getY()).toArray(),
+                points.size());
+        g.fillPolygon(polygon);
+        newClip.add(new Area(polygon));
         leftSoFar += bar.size;
       }
-      int leftTip = getLeftPosition(leftSoFar);
-      int leftSize = sideFunc.applyAsInt(leftBase, leftTip);
-      Shape leftClip =
-          new Polygon(
-              new int[] {leftBase, leftBase, leftSize, leftTip, leftSize},
-              new int[] {
-                changeBarTop, changeBarBottom, changeBarBottom, changeBarMid, changeBarTop
-              },
-              5);
 
       Shape oldClip = g.getClip();
-      Area newClip = new Area();
-      newClip.add(new Area(leftClip));
       g.setClip(newClip);
       g.setColor(Color.WHITE);
       g.drawString(changeBarLabel, leftLeft, seatBaseline);
