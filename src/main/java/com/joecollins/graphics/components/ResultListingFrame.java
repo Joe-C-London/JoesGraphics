@@ -74,6 +74,7 @@ public class ResultListingFrame extends GraphicsFrame {
           while (numItems < items.size()) {
             centralPanel.remove(items.remove(numItems.intValue()));
           }
+          repaint();
         });
   }
 
