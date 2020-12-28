@@ -219,6 +219,17 @@ public class MultiResultScreen extends JPanel {
         Function<T, Binding<PartyResult>> leadingPartyFunc,
         Function<T, List<K>> focusFunc,
         Function<T, Binding<String>> mapHeaderFunc) {
+      return withMap(
+          shapesFunc, selectedShapeFunc, leadingPartyFunc, focusFunc, focusFunc, mapHeaderFunc);
+    }
+
+    public <K> Builder<T> withMap(
+        Function<T, Map<K, Shape>> shapesFunc,
+        Function<T, K> selectedShapeFunc,
+        Function<T, Binding<PartyResult>> leadingPartyFunc,
+        Function<T, List<K>> focusFunc,
+        Function<T, List<K>> additionalHighlightsFunc,
+        Function<T, Binding<String>> mapHeaderFunc) {
       this.mapHeaderFunc = mapHeaderFunc;
       this.mapFocusFunc =
           t -> {
@@ -231,6 +242,7 @@ public class MultiResultScreen extends JPanel {
           t -> {
             K selected = selectedShapeFunc.apply(t);
             List<K> focus = focusFunc.apply(t);
+            List<K> additionalHighlight = additionalHighlightsFunc.apply(t);
             Binding<PartyResult> leader = leadingPartyFunc.apply(t);
             return shapesFunc.apply(t).entrySet().stream()
                 .map(
@@ -239,6 +251,10 @@ public class MultiResultScreen extends JPanel {
                         return ImmutablePair.of(e.getValue(), leader.map(PartyResult::getColor));
                       }
                       if (focus == null || focus.isEmpty() || focus.contains(e.getKey())) {
+                        return ImmutablePair.of(
+                            e.getValue(), Binding.fixedBinding(Color.LIGHT_GRAY));
+                      }
+                      if (additionalHighlight != null && additionalHighlight.contains(e.getKey())) {
                         return ImmutablePair.of(
                             e.getValue(), Binding.fixedBinding(Color.LIGHT_GRAY));
                       }

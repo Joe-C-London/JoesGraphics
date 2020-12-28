@@ -512,6 +512,86 @@ public class MultiResultScreenTest {
     compareRendering("MultiResultPanel", "Runoff-2", panel);
   }
 
+  @Test
+  public void testMapAdditionalHighlights() throws IOException {
+    BindableList<District> districts = new BindableList<>();
+    districts.add(
+        new District(
+            13,
+            "Charlottetown-Brighton",
+            of(
+                new Candidate("Jordan Brown", lib, true), 1223,
+                new Candidate("Donna Hurry", pc), 567,
+                new Candidate("Ole Hammarlund", grn), 1301,
+                new Candidate("Simone Webster", ndp), 138),
+            false,
+            of(lib, 1054, pc, 1032, grn, 352, ndp, 265)));
+    districts.add(
+        new District(
+            12,
+            "Charlottetown-Victoria Park",
+            of(
+                new Candidate("Richard Brown", lib, true), 875,
+                new Candidate("Tim Keizer", pc), 656,
+                new Candidate("Karla Bernard", grn), 1272,
+                new Candidate("Joe Byrne", ndp), 338),
+            false,
+            of(lib, 955, pc, 666, grn, 456, ndp, 348)));
+    districts.add(
+        new District(
+            10,
+            "Charlottetown-Winsloe",
+            of(
+                new Candidate("Robert Mitchell", lib, true), 1420,
+                new Candidate("Mike Gillis", pc), 865,
+                new Candidate("Amanda Morrison", grn), 1057,
+                new Candidate("Jesse Reddin Cousins", ndp), 41),
+            false,
+            of(lib, 1425, pc, 1031, grn, 295, ndp, 360)));
+
+    Map<Integer, Shape> shapesByDistrict = peiShapesByDistrict();
+    List<Party> swingometerOrder = List.of(ndp, grn, lib, ind, pc);
+    MultiResultScreen panel =
+        MultiResultScreen.of(
+                districts,
+                d -> Binding.fixedBinding(d.votes),
+                d -> Binding.fixedBinding("DISTRICT " + d.districtNum),
+                d -> Binding.fixedBinding(d.name.toUpperCase()))
+            .withIncumbentMarker("(MLA)")
+            .withWinner(
+                d ->
+                    Binding.fixedBinding(
+                        d.leaderHasWon
+                            ? d.votes.entrySet().stream()
+                                .max(Map.Entry.comparingByValue())
+                                .orElseThrow()
+                                .getKey()
+                            : null))
+            .withPrev(
+                d -> Binding.fixedBinding(d.prevVotes),
+                d -> Binding.fixedBinding("SWING SINCE 2015"),
+                Comparator.comparingInt(swingometerOrder::indexOf))
+            .withMap(
+                d -> shapesByDistrict,
+                d -> d.districtNum,
+                d ->
+                    Binding.fixedBinding(
+                        new PartyResult(
+                            d.votes.entrySet().stream()
+                                .max(Map.Entry.comparingByValue())
+                                .map(Map.Entry::getKey)
+                                .map(Candidate::getParty)
+                                .orElse(null),
+                            d.leaderHasWon)),
+                d -> List.of(10, 11, 12, 13, 14),
+                d -> List.of(9, 10, 11, 12, 13, 14),
+                d -> Binding.fixedBinding("CHARLOTTETOWN"))
+            .build(() -> "CABINET MEMBERS IN CHARLOTTETOWN");
+
+    panel.setSize(1024, 512);
+    compareRendering("MultiResultPanel", "MapAdditionalHighlights-1", panel);
+  }
+
   private <K, V> Map<K, V> of(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4) {
     LinkedHashMap<K, V> ret = new LinkedHashMap<>();
     ret.put(k1, v1);
