@@ -296,4 +296,21 @@ public class AggregatorsTest {
     inputs.get("DEF").setValue(9);
     assertEquals(Map.of("ABC", 7, "DEF", 2), output.getValue());
   }
+
+  @Test
+  public void testToPct() {
+    BindableWrapper<Map<String, Integer>> votes =
+        new BindableWrapper<>(Map.of("ABC", 5, "DEF", 3, "GHI", 2, "JKL", 4));
+    Mutable<Map<String, Double>> output = new MutableObject<>();
+    var outputBinding = Aggregators.toPct(votes.getBinding());
+    outputBinding.bind(output::setValue);
+    assertEquals(
+        Map.of("ABC", 5.0 / 14, "DEF", 3.0 / 14, "GHI", 2.0 / 14, "JKL", 4.0 / 14),
+        output.getValue());
+
+    votes.setValue(Map.of("ABC", 5, "DEF", 7, "GHI", 6, "JKL", 4));
+    assertEquals(
+        Map.of("ABC", 5.0 / 22, "DEF", 7.0 / 22, "GHI", 6.0 / 22, "JKL", 4.0 / 22),
+        output.getValue());
+  }
 }

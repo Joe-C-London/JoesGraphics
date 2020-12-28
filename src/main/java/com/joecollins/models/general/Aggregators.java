@@ -140,6 +140,21 @@ public class Aggregators {
     return ret;
   }
 
+  public static <K> Binding<Map<K, Double>> toPct(Binding<Map<K, Integer>> mapBinding) {
+    return mapBinding.map(Aggregators::toPct);
+  }
+
+  public static <K> Map<K, Double> toPct(Map<K, Integer> map) {
+    int total = map.values().stream().mapToInt(i -> i).sum();
+    return map.entrySet().stream()
+        .collect(
+            Collectors.toMap(
+                Map.Entry::getKey,
+                e -> 1.0 * e.getValue() / total,
+                Double::sum,
+                LinkedHashMap::new));
+  }
+
   @SafeVarargs
   public static <K> Binding<Map<K, Integer>> topAndOthers(
       Binding<Map<K, Integer>> result, int limit, K others, Binding<K>... mustInclude) {
