@@ -60,7 +60,11 @@ public class MultiResultScreen extends JPanel {
             size -> {
               while (panels.size() < size) {
                 ResultPanel newPanel =
-                    new ResultPanel(builder.incumbentMarker, builder.swingPartyOrder, hasMap);
+                    new ResultPanel(
+                        builder.incumbentMarker,
+                        builder.swingPartyOrder,
+                        hasMap,
+                        builder.partiesOnly);
                 center.add(newPanel);
                 panels.add(newPanel);
               }
@@ -74,7 +78,9 @@ public class MultiResultScreen extends JPanel {
               panels.forEach(
                   p -> {
                     p.displayBothRows = (numRows == 1);
-                    p.setMaxBarsBinding(Binding.fixedBinding(numRows == 2 ? 4 : 5));
+                    p.setMaxBarsBinding(
+                        Binding.fixedBinding(
+                            (numRows == 2 ? 4 : 5) * (builder.partiesOnly ? 2 : 1)));
                     p.invalidate();
                     p.revalidate();
                   });
@@ -145,7 +151,17 @@ public class MultiResultScreen extends JPanel {
       Function<T, Binding<Map<Candidate, Integer>>> votesFunc,
       Function<T, Binding<String>> headerFunc,
       Function<T, Binding<String>> subheadFunc) {
-    return new Builder<>(list, votesFunc, headerFunc, subheadFunc);
+    return new Builder<>(list, votesFunc, headerFunc, subheadFunc, false);
+  }
+
+  public static <T> Builder<T> ofParties(
+      BindableList<T> list,
+      Function<T, Binding<Map<Party, Integer>>> votesFunc,
+      Function<T, Binding<String>> headerFunc,
+      Function<T, Binding<String>> subheadFunc) {
+    Function<T, Binding<Map<Candidate, Integer>>> adjustedVoteFunc =
+        votesFunc.andThen(b -> b.map(m -> Aggregators.adjustKey(m, k -> new Candidate("", k))));
+    return new Builder<>(list, adjustedVoteFunc, headerFunc, subheadFunc, true);
   }
 
   @FunctionalInterface
@@ -158,6 +174,7 @@ public class MultiResultScreen extends JPanel {
     private final Function<T, Binding<Map<Candidate, Integer>>> votesFunc;
     private final Function<T, Binding<String>> headerFunc;
     private final Function<T, Binding<String>> subheadFunc;
+    private final boolean partiesOnly;
 
     private Function<T, Binding<Double>> pctReportingFunc = t -> Binding.fixedBinding(1.0);
     private Function<T, Binding<Candidate>> winnerFunc = t -> Binding.fixedBinding(null);
@@ -176,11 +193,13 @@ public class MultiResultScreen extends JPanel {
         BindableList<T> list,
         Function<T, Binding<Map<Candidate, Integer>>> votesFunc,
         Function<T, Binding<String>> headerFunc,
-        Function<T, Binding<String>> subheadFunc) {
+        Function<T, Binding<String>> subheadFunc,
+        boolean partiesOnly) {
       this.list = list;
       this.votesFunc = votesFunc;
       this.headerFunc = headerFunc;
       this.subheadFunc = subheadFunc;
+      this.partiesOnly = partiesOnly;
     }
 
     public Builder<T> withIncumbentMarker(String incumbentMarker) {
@@ -323,7 +342,11 @@ public class MultiResultScreen extends JPanel {
         new WrappedBinding<>(HashMap::new);
     private final WrappedBinding<Integer> maxBars = new WrappedBinding<>(() -> 5);
 
-    ResultPanel(String incumbentMarker, Comparator<Party> swingPartyOrder, boolean hasMap) {
+    ResultPanel(
+        String incumbentMarker,
+        Comparator<Party> swingPartyOrder,
+        boolean hasMap,
+        boolean partiesOnly) {
       this.incumbentMarker = incumbentMarker;
       setBackground(Color.WHITE);
       setLayout(new ResultPanelLayout());
@@ -358,20 +381,34 @@ public class MultiResultScreen extends JPanel {
                           else if (r.runoff.contains(candidate))
                             shape = ImageGenerator.createHalfRunoffShape();
                           else shape = null;
+                          String leftLabel;
+                          if (partiesOnly) {
+                            leftLabel = candidate.getParty().getName().toUpperCase();
+                          } else if (candidate == Candidate.OTHERS) {
+                            leftLabel = "OTHERS";
+                          } else {
+                            leftLabel =
+                                candidate.getName().toUpperCase()
+                                    + "\n"
+                                    + candidate.getParty().getAbbreviation()
+                                    + (candidate.isIncumbent() ? " " + incumbentMarker : "");
+                          }
+                          String rightLabel;
+                          if (Double.isNaN(pct)) {
+                            rightLabel = "WAITING...";
+                          } else if (partiesOnly) {
+                            rightLabel = new DecimalFormat("0.0%").format(pct);
+                          } else {
+                            rightLabel =
+                                new DecimalFormat("#,##0").format(votes)
+                                    + "\n"
+                                    + new DecimalFormat("0.0%").format(pct);
+                          }
                           return new BarFrameBuilder.BasicBar(
-                              candidate == Candidate.OTHERS
-                                  ? "OTHERS"
-                                  : (candidate.getName().toUpperCase()
-                                      + "\n"
-                                      + candidate.getParty().getAbbreviation()
-                                      + (candidate.isIncumbent() ? " " + incumbentMarker : "")),
+                              leftLabel,
                               candidate.getParty().getColor(),
                               Double.isNaN(pct) ? 0 : pct,
-                              Double.isNaN(pct)
-                                  ? "WAITING..."
-                                  : new DecimalFormat("#,##0").format(votes)
-                                      + "\n"
-                                      + new DecimalFormat("0.0%").format(pct),
+                              rightLabel,
                               shape);
                         })
                     .collect(Collectors.toList());

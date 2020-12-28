@@ -592,6 +592,110 @@ public class MultiResultScreenTest {
     compareRendering("MultiResultPanel", "MapAdditionalHighlights-1", panel);
   }
 
+  @Test
+  public void testPartiesOnly() throws IOException {
+    BindableList<District> districts = new BindableList<>();
+    districts.add(
+        new District(
+            30,
+            "Saint John East",
+            of(
+                new Candidate("Glen Savoie", pc, true), 3507,
+                new Candidate("Phil Comeau", lib), 1639,
+                new Candidate("Gerald Irish", grn), 394,
+                new Candidate("Patrick Kemp", pa), 434,
+                new Candidate("Josh Floyd", ndp), 248),
+            true,
+            of(lib, 1775, pc, 3017, grn, 373, ndp, 402, pa, 1047)));
+    districts.add(
+        new District(
+            31,
+            "Portland-Simonds",
+            of(
+                new Candidate("Trevor Holder", pc, true), 3170,
+                new Candidate("Tim Jones", lib), 1654,
+                new Candidate("Stefan Warner", grn), 483,
+                new Candidate("Darella Jackson", pa), 282,
+                new Candidate("Erik Heinze-Milne", ndp), 164),
+            true,
+            of(lib, 1703, pc, 3168, grn, 435, ndp, 449, ind, 191)));
+    districts.add(
+        new District(
+            32,
+            "Saint John Harbour",
+            of(
+                new Candidate("Arlene Dunn", pc), 2181,
+                new Candidate("Alice McKim", lib), 1207,
+                new Candidate("Brent Harris", grn), 1224,
+                new Candidate("Tony Gunn", pa), 186,
+                new Candidate("Courtney Pyrke", ndp), 309,
+                new Candidate("Mike Cyr", ind), 47,
+                new Candidate("Arty Watson", ind), 114),
+            false,
+            of(lib, 1865, pc, 1855, grn, 721, ndp, 836, pa, 393)));
+    districts.add(
+        new District(
+            33,
+            "Saint John Lancaster",
+            of(
+                new Candidate("Dorothy Shephard", pc, true), 3560,
+                new Candidate("Sharon Teare", lib), 1471,
+                new Candidate("Joanna Killen", grn), 938,
+                new Candidate("Paul Seelye", pa), 394,
+                new Candidate("Don Durant", ndp), 201),
+            true,
+            of(lib, 1727, pc, 3001, grn, 582, ndp, 414, pa, 922)));
+
+    List<Party> swingometerOrder = List.of(ndp, grn, lib, ind, pc, pa);
+    MultiResultScreen panel =
+        MultiResultScreen.ofParties(
+                districts,
+                d -> d.getPartyVotes(),
+                d -> Binding.fixedBinding("DISTRICT " + d.districtNum),
+                d -> Binding.fixedBinding(d.name.toUpperCase()))
+            .withPrev(
+                d -> Binding.fixedBinding(d.prevVotes),
+                d -> Binding.fixedBinding("SWING SINCE 2018"),
+                Comparator.comparingInt(swingometerOrder::indexOf))
+            .build(() -> "ELECTION 2020: NEW BRUNSWICK DECIDES");
+
+    panel.setSize(1024, 512);
+    compareRendering("MultiResultPanel", "PartiesOnly-1", panel);
+
+    districts.add(
+        new District(
+            34,
+            "Kings Centre",
+            of(
+                new Candidate("Bill Oliver", pc, true), 4583,
+                new Candidate("Bruce Bryer", grn), 1006,
+                new Candidate("Paul Adams", lib), 911,
+                new Candidate("William Edgett", pa), 693,
+                new Candidate("Margaret Anderson Kilfoil", ndp), 254),
+            true,
+            of(lib, 1785, pc, 3267, grn, 731, ndp, 342, pa, 1454)));
+
+    districts.add(
+        new District(
+            35,
+            "Fundy-The Isles-Saint John West",
+            of(
+                new Candidate("Andrea Anderson-Mason", pc, true), 4740,
+                new Candidate("Tony Mann", lib), 726,
+                new Candidate("Vincent Edgett", pa), 688,
+                new Candidate("Lois Mitchell", grn), 686,
+                new Candidate("Sharon Greenlaw", ndp), 291),
+            true,
+            of(lib, 2422, pc, 3808, grn, 469, ndp, 203, pa, 1104)));
+    compareRendering("MultiResultPanel", "PartiesOnly-2", panel);
+
+    districts.remove(3);
+    districts.remove(2);
+    districts.remove(1);
+    districts.remove(0);
+    compareRendering("MultiResultPanel", "PartiesOnly-3", panel);
+  }
+
   private <K, V> Map<K, V> of(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4) {
     LinkedHashMap<K, V> ret = new LinkedHashMap<>();
     ret.put(k1, v1);
@@ -684,6 +788,17 @@ public class MultiResultScreenTest {
 
     public Binding<Map<Candidate, Integer>> getVotes() {
       return Binding.propertyBinding(this, t -> t.votes, Property.PROP);
+    }
+
+    public Binding<Map<Party, Integer>> getPartyVotes() {
+      return Binding.propertyBinding(
+          this,
+          t ->
+              t.votes.entrySet().stream()
+                  .collect(
+                      Collectors.toMap(
+                          e -> e.getKey().getParty(), Map.Entry::getValue, Integer::sum)),
+          Property.PROP);
     }
 
     public Binding<Boolean> getLeaderHasWon() {
