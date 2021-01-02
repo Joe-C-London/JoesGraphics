@@ -45,9 +45,9 @@ public class BasicResultPanel extends JPanel {
 
   private static final DecimalFormat PCT_FORMAT = new DecimalFormat("0.0%");
   private static final DecimalFormat THOUSANDS_FORMAT = new DecimalFormat("#,##0");
-  private static final int DOUBLE_LINE_BAR_LIMIT = 10;
   private final JLabel label;
   private final BarFrame seatFrame;
+  private final BarFrame preferenceFrame;
   private final BarFrame changeFrame;
   private final SwingFrame swingFrame;
   private final MapFrame mapFrame;
@@ -55,11 +55,13 @@ public class BasicResultPanel extends JPanel {
   private BasicResultPanel(
       JLabel label,
       BarFrame seatFrame,
+      BarFrame preferenceFrame,
       BarFrame changeFrame,
       SwingFrame swingFrame,
       MapFrame mapFrame) {
     this.label = label;
     this.seatFrame = seatFrame;
+    this.preferenceFrame = preferenceFrame;
     this.changeFrame = changeFrame;
     this.swingFrame = swingFrame;
     this.mapFrame = mapFrame;
@@ -75,6 +77,7 @@ public class BasicResultPanel extends JPanel {
     add(panel, BorderLayout.CENTER);
 
     panel.add(seatFrame);
+    if (preferenceFrame != null) panel.add(preferenceFrame);
     if (changeFrame != null) panel.add(changeFrame);
 
     if (swingFrame != null) panel.add(swingFrame);
@@ -105,7 +108,13 @@ public class BasicResultPanel extends JPanel {
       int height = parent.getHeight();
       seatFrame.setLocation(5, 5);
       boolean seatFrameIsAlone = changeFrame == null && swingFrame == null && mapFrame == null;
-      seatFrame.setSize(width * (seatFrameIsAlone ? 5 : 3) / 5 - 10, height - 10);
+      seatFrame.setSize(
+          width * (seatFrameIsAlone ? 5 : 3) / 5 - 10,
+          height * (preferenceFrame == null ? 3 : 2) / 3 - 10);
+      if (preferenceFrame != null) {
+        preferenceFrame.setLocation(5, height * 2 / 3 + 5);
+        preferenceFrame.setSize(width * (seatFrameIsAlone ? 5 : 3) / 5 - 10, height / 3 - 10);
+      }
       if (changeFrame != null) {
         changeFrame.setLocation(width * 3 / 5 + 5, 5);
         changeFrame.setSize(width * 2 / 5 - 10, height * 2 / 3 - 10);
@@ -287,11 +296,11 @@ public class BasicResultPanel extends JPanel {
   private interface KeyTemplate<KT> {
     Party toParty(KT key);
 
-    String toMainBarHeader(KT key, int barsCount);
+    String toMainBarHeader(KT key, boolean forceSingleLine);
 
-    Shape winnerShape(int numCandidates);
+    Shape winnerShape(boolean forceSingleLine);
 
-    Shape runoffShape(int numCandidates);
+    Shape runoffShape(boolean forceSingleLine);
   }
 
   private static class PartyTemplate implements KeyTemplate<Party> {
@@ -302,17 +311,17 @@ public class BasicResultPanel extends JPanel {
     }
 
     @Override
-    public String toMainBarHeader(Party key, int barsCount) {
+    public String toMainBarHeader(Party key, boolean forceSingleLine) {
       return key.getName().toUpperCase();
     }
 
     @Override
-    public Shape winnerShape(int numCandidates) {
+    public Shape winnerShape(boolean forceSingleLine) {
       return ImageGenerator.createTickShape();
     }
 
     @Override
-    public Shape runoffShape(int numCandidates) {
+    public Shape runoffShape(boolean forceSingleLine) {
       return ImageGenerator.createRunoffShape();
     }
   }
@@ -335,29 +344,28 @@ public class BasicResultPanel extends JPanel {
     }
 
     @Override
-    public String toMainBarHeader(Candidate key, int barsCount) {
+    public String toMainBarHeader(Candidate key, boolean forceSingleLine) {
       if (key == Candidate.OTHERS) {
         return key.getParty().getName().toUpperCase();
       }
-      boolean singleLine = barsCount > DOUBLE_LINE_BAR_LIMIT;
       return (key.getName()
               + (key.isIncumbent() ? incumbentMarker : "")
-              + (singleLine
+              + (forceSingleLine
                   ? (" (" + key.getParty().getAbbreviation() + ")")
                   : ("\n" + key.getParty().getName())))
           .toUpperCase();
     }
 
     @Override
-    public Shape winnerShape(int numCandidates) {
-      return numCandidates > DOUBLE_LINE_BAR_LIMIT
+    public Shape winnerShape(boolean forceSingleLine) {
+      return forceSingleLine
           ? ImageGenerator.createTickShape()
           : ImageGenerator.createHalfTickShape();
     }
 
     @Override
-    public Shape runoffShape(int numCandidates) {
-      return numCandidates > DOUBLE_LINE_BAR_LIMIT
+    public Shape runoffShape(boolean forceSingleLine) {
+      return forceSingleLine
           ? ImageGenerator.createRunoffShape()
           : ImageGenerator.createHalfRunoffShape();
     }
@@ -524,6 +532,7 @@ public class BasicResultPanel extends JPanel {
       return new BasicResultPanel(
           createHeaderLabel(textHeader),
           createFrame(),
+          null,
           createDiffFrame(),
           createSwingFrame(),
           createMapFrame());
@@ -605,6 +614,10 @@ public class BasicResultPanel extends JPanel {
       }
     }
 
+    protected int doubleLineBarLimit() {
+      return 10;
+    }
+
     protected BarFrame createFrame() {
       Result<KT> result = new Result<>();
       current.getBinding().bind(result::setSeats);
@@ -624,12 +637,13 @@ public class BasicResultPanel extends JPanel {
                     .map(
                         e ->
                             new BarFrameBuilder.BasicBar(
-                                keyTemplate.toMainBarHeader(e.getKey(), numBars),
+                                keyTemplate.toMainBarHeader(
+                                    e.getKey(), numBars > doubleLineBarLimit()),
                                 keyTemplate.toParty(e.getKey()).getColor(),
                                 e.getValue(),
                                 String.valueOf(e.getValue()),
                                 e.getKey().equals(r.winner)
-                                    ? keyTemplate.winnerShape(numBars)
+                                    ? keyTemplate.winnerShape(numBars > doubleLineBarLimit())
                                     : null))
                     .collect(Collectors.toList());
               },
@@ -769,6 +783,10 @@ public class BasicResultPanel extends JPanel {
       }
     }
 
+    protected int doubleLineBarLimit() {
+      return 10;
+    }
+
     protected BarFrame createFrame() {
       Result<KT> result = new Result<>();
       current.getBinding().bind(result::setSeats);
@@ -791,13 +809,14 @@ public class BasicResultPanel extends JPanel {
                     .map(
                         e ->
                             new BarFrameBuilder.DualBar(
-                                keyTemplate.toMainBarHeader(e.getKey(), count),
+                                keyTemplate.toMainBarHeader(
+                                    e.getKey(), count > doubleLineBarLimit()),
                                 keyTemplate.toParty(e.getKey()).getColor(),
                                 e.getValue().getLeft(),
                                 e.getValue().getRight(),
                                 e.getValue().getLeft() + "/" + e.getValue().getRight(),
                                 e.getKey().equals(r.winner)
-                                    ? keyTemplate.winnerShape(count)
+                                    ? keyTemplate.winnerShape(count > doubleLineBarLimit())
                                     : null))
                     .collect(Collectors.toList());
               },
@@ -941,6 +960,10 @@ public class BasicResultPanel extends JPanel {
       }
     }
 
+    protected int doubleLineBarLimit() {
+      return 10;
+    }
+
     protected BarFrame createFrame() {
       Result<KT> result = new Result<>();
       current.getBinding().bind(result::setSeats);
@@ -963,13 +986,14 @@ public class BasicResultPanel extends JPanel {
                     .map(
                         e ->
                             new BarFrameBuilder.DualBar(
-                                keyTemplate.toMainBarHeader(e.getKey(), count),
+                                keyTemplate.toMainBarHeader(
+                                    e.getKey(), count > doubleLineBarLimit()),
                                 keyTemplate.toParty(e.getKey()).getColor(),
                                 e.getValue().getMinimum(),
                                 e.getValue().getMaximum(),
                                 e.getValue().getMinimum() + "-" + e.getValue().getMaximum(),
                                 e.getKey().equals(r.winner)
-                                    ? keyTemplate.winnerShape(count)
+                                    ? keyTemplate.winnerShape(count > doubleLineBarLimit())
                                     : null))
                     .collect(Collectors.toList());
               },
@@ -1055,13 +1079,13 @@ public class BasicResultPanel extends JPanel {
   }
 
   private interface VoteTemplate {
-    String toBarString(int votes, double pct, int barCount);
+    String toBarString(int votes, double pct, boolean forceSingleLine);
   }
 
   private static class PctOnlyTemplate implements VoteTemplate {
 
     @Override
-    public String toBarString(int votes, double pct, int barCount) {
+    public String toBarString(int votes, double pct, boolean forceSingleLine) {
       return PCT_FORMAT.format(pct);
     }
   }
@@ -1069,19 +1093,18 @@ public class BasicResultPanel extends JPanel {
   private static class VotePctTemplate implements VoteTemplate {
 
     @Override
-    public String toBarString(int votes, double pct, int barCount) {
-      boolean singleLine = barCount > DOUBLE_LINE_BAR_LIMIT;
+    public String toBarString(int votes, double pct, boolean forceSingleLine) {
       return THOUSANDS_FORMAT.format(votes)
-          + (singleLine ? " (" : "\n")
+          + (forceSingleLine ? " (" : "\n")
           + PCT_FORMAT.format(pct)
-          + (singleLine ? ")" : "");
+          + (forceSingleLine ? ")" : "");
     }
   }
 
   private static class VotePctOnlyTemplate implements VoteTemplate {
 
     @Override
-    public String toBarString(int votes, double pct, int barCount) {
+    public String toBarString(int votes, double pct, boolean forceSingleLine) {
       return PCT_FORMAT.format(pct);
     }
   }
@@ -1106,6 +1129,12 @@ public class BasicResultPanel extends JPanel {
     protected BindingReceiver<Map<Party, PT>> prev;
     protected BindingReceiver<String> changeHeader;
     protected BindingReceiver<String> changeSubhead;
+
+    protected BindingReceiver<Map<KT, CT>> currPreferences;
+    protected BindingReceiver<Map<Party, PT>> prevPreferences;
+    protected BindingReceiver<String> preferenceHeader;
+    protected BindingReceiver<String> preferenceSubhead;
+    protected BindingReceiver<Double> preferencePctReporting;
 
     protected BindingReceiver<String> swingHeader;
     protected Comparator<Party> swingComparator;
@@ -1140,6 +1169,22 @@ public class BasicResultPanel extends JPanel {
       return this;
     }
 
+    public VoteScreenBuilder<KT, CT, CPT, PT> withPreferences(
+        Binding<? extends Map<KT, CT>> preferences,
+        Binding<String> preferenceHeader,
+        Binding<String> preferenceSubhead) {
+      this.currPreferences = new BindingReceiver<>(preferences);
+      this.preferenceHeader = new BindingReceiver<>(preferenceHeader);
+      this.preferenceSubhead = new BindingReceiver<>(preferenceSubhead);
+      return this;
+    }
+
+    public VoteScreenBuilder<KT, CT, CPT, PT> withPrevPreferences(
+        Binding<? extends Map<Party, PT>> prevPreferences) {
+      this.prevPreferences = new BindingReceiver<>(prevPreferences);
+      return this;
+    }
+
     public VoteScreenBuilder<KT, CT, CPT, PT> withWinner(Binding<KT> winner) {
       this.winner = new BindingReceiver<>(winner);
       return this;
@@ -1152,6 +1197,12 @@ public class BasicResultPanel extends JPanel {
 
     public VoteScreenBuilder<KT, CT, CPT, PT> withPctReporting(Binding<Double> pctReporting) {
       this.pctReporting = new BindingReceiver<>(pctReporting);
+      return this;
+    }
+
+    public VoteScreenBuilder<KT, CT, CPT, PT> withPreferencePctReporting(
+        Binding<Double> preferencePctReporting) {
+      this.preferencePctReporting = new BindingReceiver<>(preferencePctReporting);
       return this;
     }
 
@@ -1241,12 +1292,15 @@ public class BasicResultPanel extends JPanel {
       return new BasicResultPanel(
           createHeaderLabel(textHeader),
           createFrame(),
+          createPreferenceFrame(),
           createDiffFrame(),
           createSwingFrame(),
           createMapFrame());
     }
 
     protected abstract BarFrame createFrame();
+
+    protected abstract BarFrame createPreferenceFrame();
 
     protected abstract BarFrame createDiffFrame();
 
@@ -1300,6 +1354,10 @@ public class BasicResultPanel extends JPanel {
       }
     }
 
+    protected int doubleLineBarLimit() {
+      return currPreferences == null ? 10 : 6;
+    }
+
     @Override
     protected BarFrame createFrame() {
       Result<KT> result = new Result<>();
@@ -1340,15 +1398,18 @@ public class BasicResultPanel extends JPanel {
                           } else if (Double.isNaN(pct)) {
                             valueLabel = "WAITING...";
                           } else {
-                            valueLabel = voteTemplate.toBarString(e.getValue(), pct, count);
+                            valueLabel =
+                                voteTemplate.toBarString(
+                                    e.getValue(), pct, count > doubleLineBarLimit());
                           }
                           Shape shape;
-                          if (e.getKey().equals(r.winner)) shape = keyTemplate.winnerShape(count);
+                          if (e.getKey().equals(r.winner))
+                            shape = keyTemplate.winnerShape(count > doubleLineBarLimit());
                           else if (r.runoff.contains(e.getKey()))
-                            shape = keyTemplate.runoffShape(count);
+                            shape = keyTemplate.runoffShape(count > doubleLineBarLimit());
                           else shape = null;
                           return new BarFrameBuilder.BasicBar(
-                              keyTemplate.toMainBarHeader(e.getKey(), count),
+                              keyTemplate.toMainBarHeader(e.getKey(), count > doubleLineBarLimit()),
                               keyTemplate.toParty(e.getKey()).getColor(),
                               Double.isNaN(pct) ? 0 : pct,
                               valueLabel,
@@ -1424,6 +1485,68 @@ public class BasicResultPanel extends JPanel {
     }
 
     @Override
+    protected BarFrame createPreferenceFrame() {
+      if (currPreferences == null) {
+        return null;
+      }
+      Result<KT> result = new Result<>();
+      currPreferences.getBinding().bind(result::setVotes);
+      winner.getBinding().bind(result::setWinner);
+      Binding<List<BarFrameBuilder.BasicBar>> bars =
+          Binding.propertyBinding(
+              result,
+              r -> {
+                int total = r.votes.values().stream().mapToInt(i -> i).sum();
+                int count = r.votes.size();
+                return r.votes.entrySet().stream()
+                    .sorted(
+                        Comparator.<Map.Entry<KT, Integer>>comparingInt(
+                                e -> e.getKey() == others ? Integer.MIN_VALUE : e.getValue())
+                            .reversed())
+                    .map(
+                        e -> {
+                          double pct = 1.0 * e.getValue() / total;
+                          String valueLabel;
+                          if (count == 1) {
+                            valueLabel = "ELECTED";
+                          } else if (Double.isNaN(pct)) {
+                            valueLabel = "WAITING...";
+                          } else {
+                            valueLabel = voteTemplate.toBarString(e.getValue(), pct, true);
+                          }
+                          Shape shape;
+                          if (e.getKey().equals(r.winner)) shape = keyTemplate.winnerShape(true);
+                          else if (r.runoff.contains(e.getKey()))
+                            shape = keyTemplate.runoffShape(true);
+                          else shape = null;
+                          return new BarFrameBuilder.BasicBar(
+                              keyTemplate.toMainBarHeader(e.getKey(), true),
+                              keyTemplate.toParty(e.getKey()).getColor(),
+                              Double.isNaN(pct) ? 0 : pct,
+                              valueLabel,
+                              shape);
+                        })
+                    .collect(Collectors.toList());
+              },
+              Result.Property.VOTES,
+              Result.Property.WINNER,
+              Result.Property.RUNOFF);
+      return BarFrameBuilder.basic(bars)
+          .withHeader(preferenceHeader.getBinding())
+          .withSubhead(preferenceSubhead.getBinding())
+          .withLines(
+              preferencePctReporting == null
+                  ? Binding.fixedBinding(List.of(0.5))
+                  : preferencePctReporting.getBinding(p -> List.of(0.5 / Math.max(p, 1e-6))),
+              x -> "50%")
+          .withMax(
+              preferencePctReporting == null
+                  ? Binding.fixedBinding(2.0 / 3)
+                  : preferencePctReporting.getBinding(p -> 2.0 / 3 / Math.max(p, 1e-6)))
+          .build();
+    }
+
+    @Override
     protected BarFrame createDiffFrame() {
       if (prev == null) {
         return null;
@@ -1489,8 +1612,16 @@ public class BasicResultPanel extends JPanel {
       if (swingHeader == null) {
         return null;
       }
-      Binding<Map<Party, Integer>> curr = current.getBinding(this::currTotalByParty);
-      return SwingFrameBuilder.prevCurr(prev.getBinding(), curr, swingComparator)
+      Binding<Map<Party, Integer>> curr;
+      Binding<Map<Party, Integer>> prev;
+      if (currPreferences != null && prevPreferences != null) {
+        curr = currPreferences.getBinding(this::currTotalByParty);
+        prev = prevPreferences.getBinding();
+      } else {
+        curr = current.getBinding(this::currTotalByParty);
+        prev = this.prev.getBinding();
+      }
+      return SwingFrameBuilder.prevCurr(prev, curr, swingComparator)
           .withHeader(swingHeader.getBinding())
           .build();
     }
@@ -1539,7 +1670,7 @@ public class BasicResultPanel extends JPanel {
                                   + new DecimalFormat("0.0").format(100 * e.getValue().getMaximum())
                                   + "%";
                           return new BarFrameBuilder.DualBar(
-                              keyTemplate.toMainBarHeader(e.getKey(), 1),
+                              keyTemplate.toMainBarHeader(e.getKey(), false),
                               keyTemplate.toParty(e.getKey()).getColor(),
                               e.getValue().getMinimum(),
                               e.getValue().getMaximum(),
@@ -1656,6 +1787,50 @@ public class BasicResultPanel extends JPanel {
           .withHeader(changeHeader.getBinding())
           .withSubhead(changeSubhead.getBinding())
           .build();
+    }
+
+    @Override
+    protected BarFrame createPreferenceFrame() {
+      if (currPreferences == null) {
+        return null;
+      }
+
+      Binding<List<BarFrameBuilder.DualBar>> bars =
+          currPreferences.getBinding(
+              r -> {
+                return r.entrySet().stream()
+                    .sorted(
+                        Comparator.<Map.Entry<KT, Range<Double>>>comparingDouble(
+                                e ->
+                                    e.getKey() == others
+                                        ? Double.MIN_VALUE
+                                        : (e.getValue().getMinimum() + e.getValue().getMaximum()))
+                            .reversed())
+                    .map(
+                        e -> {
+                          String valueLabel =
+                              DECIMAL_FORMAT.format(100 * e.getValue().getMinimum())
+                                  + "-"
+                                  + new DecimalFormat("0.0").format(100 * e.getValue().getMaximum())
+                                  + "%";
+                          return new BarFrameBuilder.DualBar(
+                              keyTemplate.toMainBarHeader(e.getKey(), false),
+                              keyTemplate.toParty(e.getKey()).getColor(),
+                              e.getValue().getMinimum(),
+                              e.getValue().getMaximum(),
+                              valueLabel);
+                        })
+                    .collect(Collectors.toList());
+              });
+      BarFrameBuilder builder =
+          BarFrameBuilder.dual(bars)
+              .withHeader(preferenceHeader.getBinding())
+              .withSubhead(preferenceSubhead.getBinding())
+              .withMax(() -> 2.0 / 3);
+      BindableList<Double> lines = new BindableList<>();
+      lines.setAll(List.of(0.5));
+      builder = builder.withLines(lines, n -> "50%");
+      return builder.build();
     }
 
     @Override

@@ -68,7 +68,7 @@ public class BindableList<T> extends AbstractList<T> {
     return ret;
   }
 
-  public void setAll(Collection<T> elements) {
+  public void setAll(Collection<? extends T> elements) {
     List<T> elementsInOrder = new ArrayList<>(elements);
     for (int i = 0; i < elementsInOrder.size(); i++) {
       if (i < size()) {
