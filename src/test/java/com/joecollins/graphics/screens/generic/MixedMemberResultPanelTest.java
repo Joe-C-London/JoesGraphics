@@ -408,16 +408,14 @@ public class MixedMemberResultPanelTest {
     panel.setSize(1024, 512);
 
     LinkedHashMap<Candidate, Integer> currCandVotes = new LinkedHashMap<>();
-    currCandVotes.put(new Candidate("Jesse Reddin Cousins", ndp), 41);
-    currCandVotes.put(new Candidate("Mike Gillis", pc), 865);
+    currCandVotes.put(Candidate.OTHERS, 1106);
     currCandVotes.put(new Candidate("Robert Mitchell", lib, true), 1420);
     currCandVotes.put(new Candidate("Amanda Morrison", grn), 1057);
     currentCandidateVotes.setValue(currCandVotes);
 
     LinkedHashMap<Party, Integer> prevCandVotes = new LinkedHashMap<>();
+    prevCandVotes.put(Party.OTHERS, 1391);
     prevCandVotes.put(lib, 1425);
-    prevCandVotes.put(pc, 1031);
-    prevCandVotes.put(ndp, 360);
     prevCandVotes.put(grn, 295);
     previousCandidateVotes.setValue(prevCandVotes);
 

@@ -269,7 +269,13 @@ public class MixedMemberResultPanel extends JPanel {
               r -> {
                 int total = r.votes.values().stream().mapToInt(i -> i).sum();
                 return r.votes.entrySet().stream()
-                    .sorted(Map.Entry.<Candidate, Integer>comparingByValue().reversed())
+                    .sorted(
+                        Comparator.<Map.Entry<Candidate, Integer>>comparingInt(
+                                e ->
+                                    e.getKey() == Candidate.OTHERS
+                                        ? Integer.MIN_VALUE
+                                        : e.getValue())
+                            .reversed())
                     .map(
                         e -> {
                           var candidate = e.getKey();
@@ -299,7 +305,7 @@ public class MixedMemberResultPanel extends JPanel {
                                     + ")";
                           }
                           return new BarFrameBuilder.BasicBar(
-                              leftLabel,
+                              candidate == Candidate.OTHERS ? "OTHERS" : leftLabel,
                               candidate.getParty().getColor(),
                               Double.isNaN(pct) ? 0 : pct,
                               Double.isNaN(pct) ? "WAITING..." : rightLabel,
@@ -361,7 +367,13 @@ public class MixedMemberResultPanel extends JPanel {
                     r.curr.keySet().stream().map(Candidate::getParty).collect(Collectors.toSet());
                 var matchingBars =
                     r.curr.entrySet().stream()
-                        .sorted(Map.Entry.<Candidate, Integer>comparingByValue().reversed())
+                        .sorted(
+                            Comparator.<Map.Entry<Candidate, Integer>>comparingInt(
+                                    e ->
+                                        e.getKey() == Candidate.OTHERS
+                                            ? Integer.MIN_VALUE
+                                            : e.getValue())
+                                .reversed())
                         .map(
                             e -> {
                               double pct =
