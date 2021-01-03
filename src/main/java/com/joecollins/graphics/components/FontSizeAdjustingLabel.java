@@ -15,7 +15,7 @@ public class FontSizeAdjustingLabel extends JLabel {
       Font newFont = font;
       for (int size = font.getSize(); size > 1; size--) {
         newFont = font.deriveFont((float) size);
-        if (getStringWidth(newFont) <= getWidth() - 4) break;
+        if (getStringWidth(newFont) <= getWidth() - 6) break;
       }
       g.setFont(newFont);
     }

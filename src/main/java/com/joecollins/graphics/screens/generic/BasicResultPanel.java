@@ -1491,7 +1491,9 @@ public class BasicResultPanel extends JPanel {
       }
       Result<KT> result = new Result<>();
       currPreferences.getBinding().bind(result::setVotes);
-      winner.getBinding().bind(result::setWinner);
+      if (winner != null) {
+        winner.getBinding().bind(result::setWinner);
+      }
       Binding<List<BarFrameBuilder.BasicBar>> bars =
           Binding.propertyBinding(
               result,
