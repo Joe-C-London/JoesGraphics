@@ -1372,7 +1372,8 @@ public class BasicResultPanel extends JPanel {
           Binding.propertyBinding(
               result,
               r -> {
-                int total = r.votes.values().stream().mapToInt(i -> i).sum();
+                int total =
+                    r.votes.values().stream().filter(Objects::nonNull).mapToInt(i -> i).sum();
                 var mandatory =
                     (KT[])
                         Stream.concat(
@@ -1384,19 +1385,27 @@ public class BasicResultPanel extends JPanel {
                             .toArray();
                 var aggregatedResult = Aggregators.topAndOthers(r.votes, limit, others, mandatory);
                 int count = aggregatedResult.size();
+                boolean partialDeclaration = r.votes.values().stream().anyMatch(Objects::isNull);
                 return aggregatedResult.entrySet().stream()
                     .sorted(
                         Comparator.<Map.Entry<KT, Integer>>comparingInt(
-                                e -> e.getKey() == others ? Integer.MIN_VALUE : e.getValue())
+                                e -> {
+                                  if (e.getKey() == others) return Integer.MIN_VALUE;
+                                  if (e.getValue() == null) return -1;
+                                  return e.getValue();
+                                })
                             .reversed())
                     .map(
                         e -> {
-                          double pct = 1.0 * e.getValue() / total;
+                          double pct =
+                              e.getValue() == null ? Double.NaN : (1.0 * e.getValue() / total);
                           String valueLabel;
                           if (count == 1) {
                             valueLabel = "UNCONTESTED";
                           } else if (Double.isNaN(pct)) {
                             valueLabel = "WAITING...";
+                          } else if (partialDeclaration) {
+                            valueLabel = THOUSANDS_FORMAT.format(e.getValue());
                           } else {
                             valueLabel =
                                 voteTemplate.toBarString(
@@ -1561,6 +1570,9 @@ public class BasicResultPanel extends JPanel {
           Binding.propertyBinding(
               change,
               r -> {
+                if (r.currVotes.values().stream().anyMatch(Objects::isNull)) {
+                  return List.of();
+                }
                 int currTotal = r.currVotes.values().stream().mapToInt(i -> i).sum();
                 int prevTotal = r.prevVotes.values().stream().mapToInt(i -> i).sum();
                 if (currTotal == 0 || prevTotal == 0) {
@@ -1629,6 +1641,9 @@ public class BasicResultPanel extends JPanel {
     }
 
     protected Map<Party, Integer> currTotalByParty(Map<KT, ? extends Integer> curr) {
+      if (curr.values().stream().anyMatch(Objects::isNull)) {
+        return Map.of();
+      }
       Map<Party, Integer> ret = new LinkedHashMap<>();
       curr.forEach((k, v) -> ret.merge(keyTemplate.toParty(k), v, Integer::sum));
       return ret;
