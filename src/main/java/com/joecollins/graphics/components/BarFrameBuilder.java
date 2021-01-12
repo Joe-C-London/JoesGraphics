@@ -300,6 +300,16 @@ public class BarFrameBuilder {
     return this;
   }
 
+  public <T> BarFrameBuilder withLines(
+      BindableList<T> lines,
+      Function<? super T, String> labelFunc,
+      Function<? super T, ? extends Number> valueFunc) {
+    barFrame.setNumLinesBinding(Binding.sizeBinding(lines));
+    barFrame.setLineLevelsBinding(IndexedBinding.propertyBinding(lines, valueFunc::apply));
+    barFrame.setLineLabelsBinding(IndexedBinding.propertyBinding(lines, labelFunc::apply));
+    return this;
+  }
+
   public <T extends Number> BarFrameBuilder withLines(
       Binding<List<T>> linesBinding, Function<? super T, String> labelFunc) {
     bind(

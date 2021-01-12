@@ -314,6 +314,43 @@ public class BarFrameBuilderTest {
   }
 
   @Test
+  public void testMultiLinesBespokeLabels() {
+    BindableWrapper<Map<Pair<String, Color>, Integer>> result = new BindableWrapper<>();
+    BindableList<Pair<String, Integer>> lines = new BindableList<>();
+    BarFrame frame =
+        BarFrameBuilder.basic(
+                result
+                    .getBinding()
+                    .mapNonNull(
+                        map ->
+                            map.entrySet().stream()
+                                .sorted(
+                                    Map.Entry.<Pair<String, Color>, Integer>comparingByValue()
+                                        .reversed())
+                                .map(
+                                    e ->
+                                        new BarFrameBuilder.BasicBar(
+                                            e.getKey().getLeft(),
+                                            e.getKey().getRight(),
+                                            e.getValue(),
+                                            THOUSANDS.format(e.getValue())))
+                                .collect(Collectors.toList())))
+            .withLines(lines, Pair::getLeft, Pair::getRight)
+            .build();
+    assertEquals(0, frame.getNumLines());
+
+    lines.addAll(
+        Arrays.asList(ImmutablePair.of("The line is here", 1), ImmutablePair.of("and here", 2)));
+    assertEquals(2, frame.getNumLines());
+
+    assertEquals(1, frame.getLineLevel(0));
+    assertEquals(2, frame.getLineLevel(1));
+
+    assertEquals("The line is here", frame.getLineLabel(0));
+    assertEquals("and here", frame.getLineLabel(1));
+  }
+
+  @Test
   public void testMultiLinesBinding() {
     BindableWrapper<Map<Pair<String, Color>, Integer>> result = new BindableWrapper<>();
     BindableWrapper<List<Integer>> lines = new BindableWrapper<>();
