@@ -312,5 +312,8 @@ public class AggregatorsTest {
     assertEquals(
         Map.of("ABC", 5.0 / 22, "DEF", 7.0 / 22, "GHI", 6.0 / 22, "JKL", 4.0 / 22),
         output.getValue());
+
+    votes.setValue(Map.of("ABC", 0, "DEF", 0, "GHI", 0));
+    assertEquals(Map.of("ABC", 0.0, "DEF", 0.0, "GHI", 0.0), output.getValue());
   }
 }

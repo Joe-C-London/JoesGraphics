@@ -164,6 +164,10 @@ public interface IndexedBinding<T> {
     };
   }
 
+  static <T> IndexedBinding<T> propertyBinding(BindableList<T> list) {
+    return propertyBinding(list, Function.identity());
+  }
+
   static <T, U> IndexedBinding<U> propertyBinding(BindableList<T> list, Function<T, U> func) {
     if (list == null) {
       return emptyBinding();

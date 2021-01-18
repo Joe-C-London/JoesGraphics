@@ -19,7 +19,7 @@ public class IndexedBindingTest {
     Map<Integer, Integer> valuesByIndex = new HashMap<>();
     BindableList<Integer> list = new BindableList<>();
     list.add(7);
-    IndexedBinding<Integer> binding = IndexedBinding.propertyBinding(list, i -> i);
+    IndexedBinding<Integer> binding = IndexedBinding.propertyBinding(list);
     binding.bind(valuesByIndex::put);
     assertEquals(7, valuesByIndex.get(0).intValue());
 

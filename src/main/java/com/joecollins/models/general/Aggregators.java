@@ -150,7 +150,7 @@ public class Aggregators {
         .collect(
             Collectors.toMap(
                 Map.Entry::getKey,
-                e -> 1.0 * e.getValue() / total,
+                e -> total == 0 ? 0 : 1.0 * e.getValue() / total,
                 Double::sum,
                 LinkedHashMap::new));
   }
