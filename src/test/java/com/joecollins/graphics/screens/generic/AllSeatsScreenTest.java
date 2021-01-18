@@ -106,6 +106,32 @@ public class AllSeatsScreenTest {
     compareRendering("AllSeatsScreen", "Filtered-4", panel);
   }
 
+  @Test
+  public void testAllSeatsWithNullResults() throws IOException {
+    BindableWrapper<Map<String, Map<Party, Integer>>> prevResult =
+        new BindableWrapper<>(bcPrevResult());
+    Map<String, PartyResult> results = bcCurrResult();
+    results.keySet().forEach(riding -> results.put(riding, null));
+    BindableWrapper<Map<String, PartyResult>> currResult = new BindableWrapper<>(results);
+    BindableWrapper<Integer> numRows = new BindableWrapper<>(15);
+    BindableWrapper<String> title = new BindableWrapper<>("BRITISH COLUMBIA");
+
+    Function<String, String> nameShortener = String::toUpperCase;
+    AllSeatsScreen panel =
+        AllSeatsScreen.of(
+                prevResult.getBinding(),
+                currResult.getBinding(),
+                nameShortener,
+                Binding.fixedBinding("SEATS CHANGING"))
+            .withNumRows(numRows.getBinding())
+            .build(title.getBinding());
+    panel.setSize(1024, 512);
+    compareRendering("AllSeatsScreen", "Basic-1", panel);
+
+    currResult.setValue(bcCurrResult());
+    compareRendering("AllSeatsScreen", "Basic-4", panel);
+  }
+
   private static Map<String, Map<Party, Integer>> bcPrevResult() {
     Map<String, Map<Party, Integer>> ret = new TreeMap<>();
     ret.put("Nechako Lakes", Map.of(lib, 5307, ndp, 2909, grn, 878, oth, 438 + 226));

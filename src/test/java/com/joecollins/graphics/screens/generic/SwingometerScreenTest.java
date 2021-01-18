@@ -55,6 +55,34 @@ public class SwingometerScreenTest {
   }
 
   @Test
+  public void testBasicSwingUpdates() throws IOException {
+    BindableWrapper<Map<String, Map<Party, Integer>>> prevResult =
+        new BindableWrapper<>(nbPrevResult());
+    var result = nbCurrResult();
+    result.keySet().forEach(riding -> result.put(riding, null));
+    BindableWrapper<Map<String, PartyResult>> currResult = new BindableWrapper<>(result);
+    BindableWrapper<Pair<Party, Party>> parties = new BindableWrapper<>(ImmutablePair.of(lib, pc));
+    BindableWrapper<Map<Party, Double>> swing = new BindableWrapper<>(Map.of());
+
+    SwingometerScreen panel =
+        SwingometerScreen.of(
+                prevResult.getBinding(),
+                currResult.getBinding(),
+                swing.getBinding(),
+                parties.getBinding(),
+                Binding.fixedBinding("SWINGOMETER"))
+            .withSeatLabelIncrements(Binding.fixedBinding(3))
+            .build(Binding.fixedBinding("NEW BRUNSWICK"));
+    panel.setSize(1024, 512);
+    compareRendering("SwingometerScreen", "Basic-Updates-1", panel);
+
+    currResult.setValue(nbCurrResult());
+    swing.setValue(
+        Map.of(pc, +0.0745, lib, -0.0345, grn, +0.0336, pa, -0.0339, ndp, -0.0335, ind, -0.0062));
+    compareRendering("SwingometerScreen", "Basic-Updates-2", panel);
+  }
+
+  @Test
   public void testFilteredTwoParties() throws IOException {
     BindableWrapper<Map<String, Map<Party, Integer>>> prevResult =
         new BindableWrapper<>(nbPrevResult());

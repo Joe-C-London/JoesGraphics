@@ -178,13 +178,12 @@ public class AllSeatsScreen extends JPanel {
                               t.currResults.getOrDefault(e.getLeft(), NO_RESULT)))
                   .map(
                       e -> {
+                        var result = e.getRight() == null ? NO_RESULT : e.getRight();
                         return new Entry<>(
                             e.getLeft(),
                             e.getMiddle().getColor(),
-                            e.getRight().getParty() == null
-                                ? Color.BLACK
-                                : e.getRight().getParty().getColor(),
-                            e.getRight().isElected());
+                            result.getParty() == null ? Color.BLACK : result.getParty().getColor(),
+                            result.isElected());
                       })
                   .collect(Collectors.toList()),
           Input.Property.PREV,

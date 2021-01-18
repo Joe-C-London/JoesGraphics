@@ -262,7 +262,8 @@ public class MultiResultScreen extends JPanel {
             K selected = selectedShapeFunc.apply(t);
             List<K> focus = focusFunc.apply(t);
             List<K> additionalHighlight = additionalHighlightsFunc.apply(t);
-            Binding<PartyResult> leader = leadingPartyFunc.apply(t);
+            Binding<PartyResult> leader =
+                leadingPartyFunc.apply(t).map(p -> p == null ? PartyResult.NO_RESULT : p);
             return shapesFunc.apply(t).entrySet().stream()
                 .map(
                     e -> {

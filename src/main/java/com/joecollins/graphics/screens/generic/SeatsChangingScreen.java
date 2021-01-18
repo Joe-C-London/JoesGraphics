@@ -172,6 +172,7 @@ public class SeatsChangingScreen extends JPanel {
                               e.getLeft(),
                               e.getRight(),
                               t.currResults.getOrDefault(e.getLeft(), NO_RESULT)))
+                  .filter(e -> e.getRight() != null)
                   .filter(e -> e.getRight().getParty() != null)
                   .filter(e -> !e.getMiddle().equals(e.getRight().getParty()))
                   .map(

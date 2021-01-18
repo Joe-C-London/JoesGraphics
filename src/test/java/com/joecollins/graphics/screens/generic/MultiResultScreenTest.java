@@ -188,9 +188,11 @@ public class MultiResultScreenTest {
                     d.getLeader()
                         .map(
                             e ->
-                                new PartyResult(
-                                    e.getLeft() == null ? null : e.getLeft().getParty(),
-                                    e.getRight())),
+                                e == null
+                                    ? null
+                                    : new PartyResult(
+                                        e.getLeft() == null ? null : e.getLeft().getParty(),
+                                        e.getRight())),
                 d ->
                     d.districtNum < 10
                         ? List.of(1, 2, 3, 4, 5, 6, 7, 8)
@@ -835,14 +837,18 @@ public class MultiResultScreenTest {
     public Binding<Pair<Candidate, Boolean>> getLeader() {
       return Binding.propertyBinding(
           this,
-          t ->
-              ImmutablePair.of(
-                  votes.entrySet().stream()
-                      .filter(e -> e.getValue() > 0)
-                      .max(Map.Entry.comparingByValue())
-                      .map(Map.Entry::getKey)
-                      .orElse(null),
-                  leaderHasWon),
+          t -> {
+            if (votes.values().stream().allMatch(v -> v == 0)) {
+              return null;
+            }
+            return ImmutablePair.of(
+                votes.entrySet().stream()
+                    .filter(e -> e.getValue() > 0)
+                    .max(Map.Entry.comparingByValue())
+                    .map(Map.Entry::getKey)
+                    .orElse(null),
+                leaderHasWon);
+          },
           Property.PROP);
     }
 

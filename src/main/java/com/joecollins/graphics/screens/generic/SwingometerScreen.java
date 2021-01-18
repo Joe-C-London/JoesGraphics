@@ -401,7 +401,10 @@ public class SwingometerScreen extends JPanel {
                           int left = e.getLeft().getOrDefault(in.parties.getLeft(), 0);
                           int right = e.getLeft().getOrDefault(in.parties.getRight(), 0);
                           return ImmutableTriple.of(
-                              0.5 * (left - right) / total, e.getMiddle().getColor(), e.getRight());
+                              0.5 * (left - right) / total,
+                              (e.getMiddle() == null ? PartyResult.NO_RESULT : e.getMiddle())
+                                  .getColor(),
+                              e.getRight());
                         })
                     .collect(Collectors.toList());
               },
