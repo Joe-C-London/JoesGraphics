@@ -81,7 +81,7 @@ public class SwingFrameBuilder {
     return prevCurr(prevBinding, currBinding, partyOrder, false);
   }
 
-  public static SwingFrameBuilder prevCurr(
+  private static SwingFrameBuilder prevCurr(
       Binding<? extends Map<Party, ? extends Number>> prevBinding,
       Binding<? extends Map<Party, ? extends Number>> currBinding,
       Comparator<Party> partyOrder,

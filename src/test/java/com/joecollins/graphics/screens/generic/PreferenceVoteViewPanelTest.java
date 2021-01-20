@@ -388,6 +388,71 @@ public class PreferenceVoteViewPanelTest {
   }
 
   @Test
+  public void testChangeInPreference() throws IOException {
+    Candidate alp = new Candidate("Sophie Ismail", new Party("Labor", "ALP", Color.RED));
+    Candidate lib = new Candidate("Le Liu", new Party("Liberal", "LIB", Color.BLUE));
+    Candidate grn =
+        new Candidate("Adam Bandt", new Party("Greens", "GRN", Color.GREEN.darker()), true);
+    Candidate ind = new Candidate("Others", new Party("Independent", "IND", Color.GRAY));
+
+    LinkedHashMap<Candidate, Integer> currPrimary = new LinkedHashMap<>();
+    currPrimary.put(alp, 23130);
+    currPrimary.put(lib, 23878);
+    currPrimary.put(grn, 41377);
+    currPrimary.put(ind, 94579 - currPrimary.values().stream().mapToInt(i -> i).sum());
+
+    LinkedHashMap<Party, Integer> prevPrimary = new LinkedHashMap<>();
+    prevPrimary.put(alp.getParty(), 22490);
+    prevPrimary.put(lib.getParty(), 19301);
+    prevPrimary.put(grn.getParty(), 36035);
+    prevPrimary.put(ind.getParty(), 84551 - prevPrimary.values().stream().mapToInt(i -> i).sum());
+
+    LinkedHashMap<Candidate, Integer> curr2CP = new LinkedHashMap<>();
+    curr2CP.put(grn, 64771);
+    curr2CP.put(lib, 29808);
+
+    LinkedHashMap<Party, Integer> prev2PP = new LinkedHashMap<>();
+    prev2PP.put(grn.getParty(), 46732);
+    prev2PP.put(alp.getParty(), 37819);
+
+    BindableWrapper<LinkedHashMap<Candidate, Integer>> currentPrimaryVotes =
+        new BindableWrapper<>(currPrimary);
+    BindableWrapper<LinkedHashMap<Party, Integer>> previousPrimaryVotes =
+        new BindableWrapper<>(prevPrimary);
+    BindableWrapper<LinkedHashMap<Candidate, Integer>> current2CPVotes =
+        new BindableWrapper<>(curr2CP);
+    BindableWrapper<LinkedHashMap<Party, Integer>> previous2PPVotes =
+        new BindableWrapper<>(prev2PP);
+    BindableWrapper<String> header = new BindableWrapper<>("MELBOURNE");
+    BindableWrapper<String> voteHeader = new BindableWrapper<>("PRIMARY VOTE");
+    BindableWrapper<String> voteSubhead = new BindableWrapper<>("2016 RESULTS");
+    BindableWrapper<String> preferenceHeader = new BindableWrapper<>("TWO CANDIDATE PREFERRED");
+    BindableWrapper<String> preferenceSubhead = new BindableWrapper<>("2016 RESULTS");
+    BindableWrapper<String> changeHeader = new BindableWrapper<>("PRIMARY CHANGE SINCE 2013");
+    BindableWrapper<String> swingHeader = new BindableWrapper<>("PREFERENCE SWING SINCE 2013");
+    BindableWrapper<Candidate> leader = new BindableWrapper<>(grn);
+    List<Party> swingPartyOrder = Arrays.asList(alp.getParty(), grn.getParty(), lib.getParty());
+
+    BasicResultPanel panel =
+        BasicResultPanel.candidateVotes(
+                currentPrimaryVotes.getBinding(),
+                voteHeader.getBinding(),
+                voteSubhead.getBinding(),
+                "(MP)")
+            .withPrev(previousPrimaryVotes.getBinding(), changeHeader.getBinding())
+            .withPreferences(
+                current2CPVotes.getBinding(),
+                preferenceHeader.getBinding(),
+                preferenceSubhead.getBinding())
+            .withPrevPreferences(previous2PPVotes.getBinding())
+            .withWinner(leader.getBinding())
+            .withSwing(Comparator.comparing(swingPartyOrder::indexOf), swingHeader.getBinding())
+            .build(header.getBinding());
+    panel.setSize(1024, 512);
+    compareRendering("PreferenceVoteViewPanel", "ChangeInPreference-1", panel);
+  }
+
+  @Test
   public void testRanges() throws IOException {
     Party alp = new Party("Labor", "ALP", Color.RED);
     Party coa = new Party("Coalition", "L/NP", Color.BLUE);

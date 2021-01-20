@@ -954,6 +954,63 @@ public class SimpleVoteViewPanelTest {
   }
 
   @Test
+  public void testWinningPartyNotRunningAgain() throws IOException {
+    Candidate con = new Candidate("Greg Smith", new Party("Conservative", "CON", Color.BLUE));
+    Candidate ld =
+        new Candidate("Stephen Dorrell", new Party("Liberal Democrats", "LD", Color.ORANGE));
+    Candidate lab = new Candidate("David Morgan", new Party("Labour", "LAB", Color.RED));
+    Candidate bxp =
+        new Candidate("Andrew Bell", new Party("Brexit Party", "BXP", Color.CYAN.darker()));
+    Candidate ind =
+        new Candidate("Ned Thompson", new Party("Independent", "IND", Party.OTHERS.getColor()));
+    Candidate ed =
+        new Candidate(
+            "Antonio Vitiello", new Party("English Democrats", "ED", Color.ORANGE.darker()));
+
+    Party spkr = new Party("Speaker", "SPKR", Color.GRAY);
+    Party grn = new Party("Green", "GRN", Color.GREEN.darker());
+    Party ukip = new Party("UK Independence Party", "UKIP", Color.MAGENTA.darker());
+
+    LinkedHashMap<Candidate, Integer> curr = new LinkedHashMap<>();
+    curr.put(con, 37035);
+    curr.put(ld, 16624);
+    curr.put(lab, 7638);
+    curr.put(bxp, 1286);
+    curr.put(ind, 681);
+    curr.put(ed, 194);
+
+    LinkedHashMap<Party, Integer> prev = new LinkedHashMap<>();
+    prev.put(spkr, 34299);
+    prev.put(grn, 8574);
+    prev.put(ind.getParty(), 5638);
+    prev.put(ukip, 4168);
+
+    BindableWrapper<LinkedHashMap<Candidate, Integer>> currentVotes = new BindableWrapper<>(curr);
+    BindableWrapper<LinkedHashMap<Party, Integer>> previousVotes = new BindableWrapper<>(prev);
+    BindableWrapper<String> header = new BindableWrapper<>("BUCKINGHAM");
+    BindableWrapper<String> voteHeader = new BindableWrapper<>("OFFICIAL RESULT");
+    BindableWrapper<String> voteSubhead = new BindableWrapper<>("");
+    BindableWrapper<String> changeHeader = new BindableWrapper<>("CHANGE SINCE 2017");
+    BindableWrapper<String> changeSubhead =
+        new BindableWrapper<>("NOT APPLICABLE: PREVIOUSLY SPEAKER'S SEAT");
+    BindableWrapper<String> swingHeader = new BindableWrapper<>("SWING SINCE 2017");
+    BindableWrapper<Candidate> winner = new BindableWrapper<>(con);
+    List<Party> swingPartyOrder =
+        Arrays.asList(lab.getParty(), ld.getParty(), con.getParty(), bxp.getParty());
+
+    BasicResultPanel panel =
+        BasicResultPanel.candidateVotes(
+                currentVotes.getBinding(), voteHeader.getBinding(), voteSubhead.getBinding())
+            .withPrev(
+                previousVotes.getBinding(), changeHeader.getBinding(), changeSubhead.getBinding())
+            .withWinner(winner.getBinding())
+            .withSwing(Comparator.comparing(swingPartyOrder::indexOf), swingHeader.getBinding())
+            .build(header.getBinding());
+    panel.setSize(1024, 512);
+    compareRendering("SimpleVoteViewPanel", "WinningPartyNotRunningAgain-1", panel);
+  }
+
+  @Test
   public void testCandidateRunoffSingleLine() throws IOException {
     Candidate macron =
         new Candidate("Emmanuel Macron", new Party("En Marche!", "EM", Color.ORANGE));

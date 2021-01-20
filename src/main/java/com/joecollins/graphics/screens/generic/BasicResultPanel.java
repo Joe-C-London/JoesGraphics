@@ -1573,6 +1573,17 @@ public class BasicResultPanel extends JPanel {
                 if (r.currVotes.values().stream().anyMatch(Objects::isNull)) {
                   return List.of();
                 }
+                var prevWinner =
+                    r.prevVotes.entrySet().stream()
+                        .max(Map.Entry.comparingByValue())
+                        .map(Map.Entry::getKey)
+                        .orElse(null);
+                if (prevWinner == null
+                    || r.currVotes.keySet().stream()
+                        .map(keyTemplate::toParty)
+                        .noneMatch(prevWinner::equals)) {
+                  return List.of();
+                }
                 int currTotal = r.currVotes.values().stream().mapToInt(i -> i).sum();
                 int prevTotal = r.prevVotes.values().stream().mapToInt(i -> i).sum();
                 if (currTotal == 0 || prevTotal == 0) {
@@ -1630,10 +1641,38 @@ public class BasicResultPanel extends JPanel {
       Binding<Map<Party, Integer>> prev;
       if (currPreferences != null && prevPreferences != null) {
         curr = currPreferences.getBinding(this::currTotalByParty);
-        prev = prevPreferences.getBinding();
+        prev =
+            prevPreferences
+                .getBinding()
+                .merge(
+                    currPreferences.getBinding(this::currTotalByParty),
+                    (p, c) -> {
+                      if (!c.keySet().equals(p.keySet())) {
+                        return Map.of();
+                      }
+                      return p;
+                    });
       } else {
         curr = current.getBinding(this::currTotalByParty);
-        prev = this.prev.getBinding();
+        prev =
+            this.prev
+                .getBinding()
+                .merge(
+                    current.getBinding(),
+                    (p, c) -> {
+                      var prevWinner =
+                          p.entrySet().stream()
+                              .max(Map.Entry.comparingByValue())
+                              .map(Map.Entry::getKey)
+                              .orElse(null);
+                      if (prevWinner == null
+                          || c.keySet().stream()
+                              .map(keyTemplate::toParty)
+                              .noneMatch(prevWinner::equals)) {
+                        return Map.of();
+                      }
+                      return p;
+                    });
       }
       return SwingFrameBuilder.prevCurr(prev, curr, swingComparator)
           .withHeader(swingHeader.getBinding())
