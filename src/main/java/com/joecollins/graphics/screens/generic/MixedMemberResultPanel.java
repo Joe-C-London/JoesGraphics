@@ -23,6 +23,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -75,7 +76,9 @@ public class MixedMemberResultPanel extends JPanel {
     if (partyChangeFrame != null) {
       panel.add(partyChangeFrame);
     }
-    panel.add(mapFrame);
+    if (mapFrame != null) {
+      panel.add(mapFrame);
+    }
   }
 
   private class ScreenLayout implements LayoutManager {
@@ -113,8 +116,11 @@ public class MixedMemberResultPanel extends JPanel {
         partyChangeFrame.setLocation(width * 3 / 5 + 5, height / 3 + 5);
         partyChangeFrame.setSize(width * 2 / 5 - 10, height / 3 - 10);
       }
-      mapFrame.setLocation(width * 3 / 5 + 5, height * 2 / (partyChangeFrame == null ? 4 : 3) + 5);
-      mapFrame.setSize(width * 2 / 5 - 10, height / (partyChangeFrame == null ? 2 : 3) - 10);
+      if (mapFrame != null) {
+        mapFrame.setLocation(
+            width * 3 / 5 + 5, height * 2 / (partyChangeFrame == null ? 4 : 3) + 5);
+        mapFrame.setSize(width * 2 / 5 - 10, height / (partyChangeFrame == null ? 2 : 3) - 10);
+      }
     }
   }
 
@@ -267,20 +273,23 @@ public class MixedMemberResultPanel extends JPanel {
           Binding.propertyBinding(
               result,
               r -> {
-                int total = r.votes.values().stream().mapToInt(i -> i).sum();
+                int total =
+                    r.votes.values().stream().filter(Objects::nonNull).mapToInt(i -> i).sum();
+                boolean partialDeclaration = r.votes.values().stream().anyMatch(Objects::isNull);
                 return r.votes.entrySet().stream()
                     .sorted(
                         Comparator.<Map.Entry<Candidate, Integer>>comparingInt(
                                 e ->
-                                    e.getKey() == Candidate.OTHERS
+                                    e.getKey() == Candidate.OTHERS || e.getValue() == null
                                         ? Integer.MIN_VALUE
                                         : e.getValue())
                             .reversed())
                     .map(
                         e -> {
                           var candidate = e.getKey();
-                          int votes = e.getValue();
-                          double pct = 1.0 * e.getValue() / total;
+                          int votes = e.getValue() == null ? 0 : e.getValue();
+                          double pct =
+                              e.getValue() == null ? Double.NaN : 1.0 * e.getValue() / total;
                           String leftLabel;
                           String rightLabel;
                           if (showBothLines) {
@@ -303,6 +312,9 @@ public class MixedMemberResultPanel extends JPanel {
                                     + " ("
                                     + PCT_FORMAT.format(pct)
                                     + ")";
+                          }
+                          if (partialDeclaration) {
+                            rightLabel = THOUSANDS_FORMAT.format(votes);
                           }
                           return new BarFrameBuilder.BasicBar(
                               candidate == Candidate.OTHERS ? "OTHERS" : leftLabel,
@@ -358,8 +370,12 @@ public class MixedMemberResultPanel extends JPanel {
           Binding.propertyBinding(
               change,
               r -> {
-                int currTotal = r.curr.values().stream().mapToInt(i -> i).sum();
+                int currTotal =
+                    r.curr.values().stream().filter(Objects::nonNull).mapToInt(i -> i).sum();
                 if (currTotal == 0) {
+                  return List.of();
+                }
+                if (r.curr.values().stream().anyMatch(Objects::isNull)) {
                   return List.of();
                 }
                 int prevTotal = r.prev.values().stream().mapToInt(i -> i).sum();
@@ -367,12 +383,10 @@ public class MixedMemberResultPanel extends JPanel {
                     r.curr.keySet().stream().map(Candidate::getParty).collect(Collectors.toSet());
                 var matchingBars =
                     r.curr.entrySet().stream()
+                        .filter(e -> e.getKey().getParty() != Party.OTHERS)
                         .sorted(
                             Comparator.<Map.Entry<Candidate, Integer>>comparingInt(
-                                    e ->
-                                        e.getKey() == Candidate.OTHERS
-                                            ? Integer.MIN_VALUE
-                                            : e.getValue())
+                                    Map.Entry::getValue)
                                 .reversed())
                         .map(
                             e -> {
@@ -387,18 +401,26 @@ public class MixedMemberResultPanel extends JPanel {
                                   pct,
                                   PCT_DIFF_FORMAT.format(pct));
                             });
+                var othersPct =
+                    r.curr.entrySet().stream()
+                            .filter(e -> e.getKey().getParty() == Party.OTHERS)
+                            .mapToDouble(e -> 1.0 * e.getValue() / currTotal)
+                            .sum()
+                        + r.prev.entrySet().stream()
+                            .filter(
+                                e ->
+                                    e.getKey() == Party.OTHERS || !currParties.contains(e.getKey()))
+                            .mapToDouble(e -> -1.0 * e.getValue() / prevTotal)
+                            .sum();
                 var nonMatchingBars =
-                    r.prev.entrySet().stream()
-                        .filter(e -> !currParties.contains(e.getKey()))
-                        .map(
-                            e -> {
-                              double pct = -1.0 * e.getValue() / prevTotal;
-                              return new BarFrameBuilder.BasicBar(
-                                  e.getKey().getAbbreviation().toUpperCase(),
-                                  e.getKey().getColor(),
-                                  pct,
-                                  PCT_DIFF_FORMAT.format(pct));
-                            });
+                    othersPct == 0
+                        ? Stream.<BarFrameBuilder.BasicBar>of()
+                        : Stream.of(
+                            new BarFrameBuilder.BasicBar(
+                                Party.OTHERS.getAbbreviation().toUpperCase(),
+                                Party.OTHERS.getColor(),
+                                othersPct,
+                                PCT_DIFF_FORMAT.format(othersPct)));
                 return Stream.concat(matchingBars, nonMatchingBars).collect(Collectors.toList());
               },
               Change.Property.CURR,
@@ -417,18 +439,20 @@ public class MixedMemberResultPanel extends JPanel {
       return BarFrameBuilder.basic(
               partyVotes.getBinding(
                   v -> {
-                    int total = v.values().stream().mapToInt(i -> i).sum();
+                    int total = v.values().stream().filter(Objects::nonNull).mapToInt(i -> i).sum();
+                    boolean partialDeclaration = v.values().stream().anyMatch(Objects::isNull);
                     return v.entrySet().stream()
                         .sorted(
                             Comparator.<Map.Entry<Party, Integer>>comparingInt(
                                     e ->
                                         e.getKey() == Party.OTHERS
                                             ? Integer.MIN_VALUE
-                                            : e.getValue())
+                                            : (e.getValue() == null ? -1 : e.getValue()))
                                 .reversed())
                         .map(
                             e -> {
-                              double pct = 1.0 * e.getValue() / total;
+                              double pct =
+                                  e.getValue() == null ? Double.NaN : 1.0 * e.getValue() / total;
                               return new BarFrameBuilder.BasicBar(
                                   e.getKey().getName().toUpperCase(),
                                   e.getKey().getColor(),
@@ -436,9 +460,9 @@ public class MixedMemberResultPanel extends JPanel {
                                   Double.isNaN(pct)
                                       ? "WAITING..."
                                       : (THOUSANDS_FORMAT.format(e.getValue())
-                                          + " ("
-                                          + PCT_FORMAT.format(pct)
-                                          + ")"));
+                                          + (partialDeclaration
+                                              ? ""
+                                              : (" (" + PCT_FORMAT.format(pct) + ")"))));
                             })
                         .collect(Collectors.toList());
                   }))
@@ -464,19 +488,19 @@ public class MixedMemberResultPanel extends JPanel {
               r -> {
                 var c = r.curr;
                 var p = r.prev;
-                int currTotal = c.values().stream().mapToInt(i -> i).sum();
+                int currTotal = c.values().stream().filter(Objects::nonNull).mapToInt(i -> i).sum();
                 if (currTotal == 0) {
+                  return List.of();
+                }
+                if (c.values().stream().anyMatch(Objects::isNull)) {
                   return List.of();
                 }
                 int prevTotal = p.values().stream().mapToInt(i -> i).sum();
                 var presentBars =
                     c.entrySet().stream()
+                        .filter(e -> e.getKey() != Party.OTHERS)
                         .sorted(
-                            Comparator.<Map.Entry<Party, Integer>>comparingInt(
-                                    e ->
-                                        e.getKey() == Party.OTHERS
-                                            ? Integer.MIN_VALUE
-                                            : e.getValue())
+                            Comparator.<Map.Entry<Party, Integer>>comparingInt(Map.Entry::getValue)
                                 .reversed())
                         .map(
                             e -> {
@@ -489,18 +513,24 @@ public class MixedMemberResultPanel extends JPanel {
                                   pct,
                                   PCT_DIFF_FORMAT.format(pct));
                             });
+                double otherTotal =
+                    c.entrySet().stream()
+                            .filter(e -> e.getKey() == Party.OTHERS)
+                            .mapToDouble(e -> 1.0 * e.getValue() / currTotal)
+                            .sum()
+                        + p.entrySet().stream()
+                            .filter(e -> e.getKey() == Party.OTHERS || !c.containsKey(e.getKey()))
+                            .mapToDouble(e -> -1.0 * e.getValue() / prevTotal)
+                            .sum();
                 var absentBars =
-                    p.entrySet().stream()
-                        .filter(e -> !c.containsKey(e.getKey()))
-                        .map(
-                            e -> {
-                              double pct = -1.0 * e.getValue() / currTotal;
-                              return new BarFrameBuilder.BasicBar(
-                                  e.getKey().getAbbreviation().toUpperCase(),
-                                  e.getKey().getColor(),
-                                  pct,
-                                  PCT_DIFF_FORMAT.format(pct));
-                            });
+                    otherTotal == 0
+                        ? Stream.<BarFrameBuilder.BasicBar>of()
+                        : Stream.of(
+                            new BarFrameBuilder.BasicBar(
+                                Party.OTHERS.getAbbreviation().toUpperCase(),
+                                Party.OTHERS.getColor(),
+                                otherTotal,
+                                PCT_DIFF_FORMAT.format(otherTotal)));
                 return Stream.concat(presentBars, absentBars).collect(Collectors.toList());
               },
               Change.Property.CURR,
@@ -516,7 +546,7 @@ public class MixedMemberResultPanel extends JPanel {
     }
 
     private MapFrame createMapFrame() {
-      return mapBuilder.createMapFrame();
+      return mapBuilder == null ? null : mapBuilder.createMapFrame();
     }
   }
 

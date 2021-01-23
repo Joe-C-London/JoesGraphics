@@ -265,7 +265,8 @@ public class AggregatorsTest {
         new BindableWrapper<>(Map.of("ABC", 5, "DEF", 3, "GHI", 2, "JKL", 4));
     BindableWrapper<String> winner = new BindableWrapper<>(null);
     Mutable<Map<String, Integer>> output = new MutableObject<>();
-    Aggregators.topAndOthers(votes.getBinding(), 3, "OTHERS", winner.getBinding())
+    Aggregators.topAndOthers(
+            votes.getBinding(), 3, "OTHERS", winner.getBinding().map(w -> new String[] {w}))
         .bind(output::setValue);
     assertEquals(Map.of("ABC", 5, "JKL", 4, "OTHERS", 5), output.getValue());
 

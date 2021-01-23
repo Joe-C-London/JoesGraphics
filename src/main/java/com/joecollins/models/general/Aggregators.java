@@ -4,6 +4,7 @@ import com.joecollins.bindings.Binding;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -13,9 +14,9 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.ToDoubleFunction;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -155,20 +156,14 @@ public class Aggregators {
                 LinkedHashMap::new));
   }
 
-  @SafeVarargs
   public static <K> Binding<Map<K, Integer>> topAndOthers(
-      Binding<Map<K, Integer>> result, int limit, K others, Binding<K>... mustInclude) {
-    Binding<Set<K>> mustIncludeSet = Binding.fixedBinding(Set.of());
-    for (Binding<K> mustIncludeEntry : mustInclude) {
-      mustIncludeSet =
-          mustIncludeSet.merge(
-              mustIncludeEntry,
-              (s, e) ->
-                  Stream.concat(s.stream(), e == null ? Stream.empty() : Stream.of(e))
-                      .collect(Collectors.toSet()));
-    }
-    return result.merge(
-        mustIncludeSet, (m, w) -> topAndOthers(m, limit, others, (K[]) w.toArray()));
+      Binding<? extends Map<K, Integer>> result, int limit, K others) {
+    return topAndOthers(result, limit, others, Binding.fixedBinding((K[]) new Object[0]));
+  }
+
+  public static <K> Binding<Map<K, Integer>> topAndOthers(
+      Binding<? extends Map<K, Integer>> result, int limit, K others, Binding<K[]> mustInclude) {
+    return result.merge(mustInclude, (m, w) -> topAndOthers(m, limit, others, w));
   }
 
   @SafeVarargs
@@ -182,20 +177,36 @@ public class Aggregators {
     Set<Map.Entry<K, Integer>> top =
         map.entrySet().stream()
             .filter(e -> !mustIncludeSet.contains(e.getKey()))
-            .sorted(Map.Entry.<K, Integer>comparingByValue().reversed())
+            .sorted(
+                Map.Entry.<K, Integer>comparingByValue(
+                        Comparator.comparingInt(i -> i == null ? -1 : i))
+                    .reversed())
             .limit(Math.max(0, limit - 1 - mustIncludeSet.size()))
             .collect(Collectors.toSet());
-    return map.entrySet().stream()
-        .collect(
-            Collectors.toMap(
-                e -> top.contains(e) || mustIncludeSet.contains(e.getKey()) ? e.getKey() : others,
-                Map.Entry::getValue,
-                Integer::sum,
-                LinkedHashMap::new));
+    Predicate<Map.Entry<K, Integer>> topAndRequired =
+        e -> top.contains(e) || mustIncludeSet.contains(e.getKey());
+    LinkedHashMap<K, Integer> result = new LinkedHashMap<>();
+    boolean needOthers = false;
+    for (Map.Entry<K, Integer> e : map.entrySet()) {
+      if (topAndRequired.test(e) || e.getValue() != null) {
+        var key = topAndRequired.test(e) ? e.getKey() : others;
+        if (result.containsKey(key)) {
+          result.merge(key, e.getValue(), Integer::sum);
+        } else {
+          result.put(key, e.getValue());
+        }
+      } else {
+        needOthers = true;
+      }
+    }
+    if (needOthers) {
+      result.put(others, null);
+    }
+    return result;
   }
 
   public static <K, V> Binding<Map<K, V>> toMap(Set<K> keys, Function<K, Binding<V>> bindingFunc) {
-    return new Binding<Map<K, V>>() {
+    return new Binding<>() {
       private List<Binding<V>> bindings = null;
       private Map<K, V> value = null;
 
