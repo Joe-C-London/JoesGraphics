@@ -17,6 +17,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import org.apache.commons.lang3.Range;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -405,6 +406,10 @@ public class SeatViewPanelTest {
     totalSeats.setValue(27);
     showMajority.setValue(true);
     mapHeader.setValue("PEI");
+    compareRendering("SeatViewPanel", "Map-5", panel);
+
+    IntStream.rangeClosed(1, 27).forEach(i -> winners.putIfAbsent(i, null));
+    winnersByDistrict.setValue(winners);
     compareRendering("SeatViewPanel", "Map-5", panel);
   }
 

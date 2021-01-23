@@ -299,6 +299,24 @@ public class AggregatorsTest {
   }
 
   @Test
+  public void testToMapTransformedKey() {
+    Map<String, BindableWrapper<Integer>> inputs =
+        Map.of("abc", new BindableWrapper<>(1), "def", new BindableWrapper<>(2));
+    Mutable<Map<String, Integer>> output = new MutableObject<>();
+    var outputBinding =
+        Aggregators.toMap(inputs.keySet(), String::toUpperCase, k -> inputs.get(k).getBinding());
+    outputBinding.bind(output::setValue);
+    assertEquals(Map.of("ABC", 1, "DEF", 2), output.getValue());
+
+    inputs.get("abc").setValue(7);
+    assertEquals(Map.of("ABC", 7, "DEF", 2), output.getValue());
+
+    outputBinding.unbind();
+    inputs.get("def").setValue(9);
+    assertEquals(Map.of("ABC", 7, "DEF", 2), output.getValue());
+  }
+
+  @Test
   public void testToPct() {
     BindableWrapper<Map<String, Integer>> votes =
         new BindableWrapper<>(Map.of("ABC", 5, "DEF", 3, "GHI", 2, "JKL", 4));

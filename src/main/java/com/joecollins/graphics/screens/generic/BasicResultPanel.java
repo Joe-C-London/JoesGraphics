@@ -132,7 +132,7 @@ public class BasicResultPanel extends JPanel {
 
   private static <T> Map<T, PartyResult> partyMapToResultMap(Map<T, Party> m) {
     Map<T, PartyResult> ret = new LinkedHashMap<>();
-    m.forEach((k, v) -> ret.put(k, PartyResult.elected(v)));
+    m.forEach((k, v) -> ret.put(k, v == null ? null : PartyResult.elected(v)));
     return ret;
   }
 

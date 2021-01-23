@@ -205,15 +205,21 @@ public class Aggregators {
     return result;
   }
 
-  public static <K, V> Binding<Map<K, V>> toMap(Set<K> keys, Function<K, Binding<V>> bindingFunc) {
+  public static <K, V> Binding<Map<K, V>> toMap(
+      Collection<K> keys, Function<K, Binding<V>> bindingFunc) {
+    return toMap(keys, Function.identity(), bindingFunc);
+  }
+
+  public static <T, K, V> Binding<Map<K, V>> toMap(
+      Collection<T> entries, final Function<T, K> keyFunc, Function<T, Binding<V>> bindingFunc) {
     return new Binding<>() {
       private List<Binding<V>> bindings = null;
       private Map<K, V> value = null;
 
       @Override
       public Map<K, V> getValue() {
-        return keys.stream()
-            .collect(Collectors.toMap(Function.identity(), k -> bindingFunc.apply(k).getValue()));
+        return entries.stream()
+            .collect(Collectors.toMap(keyFunc, k -> bindingFunc.apply(k).getValue()));
       }
 
       @Override
@@ -223,8 +229,9 @@ public class Aggregators {
         }
         value = new HashMap<>();
         Map<K, Binding<V>> bindingsMap = new HashMap<>();
-        for (K key : keys) {
-          Binding<V> binding = bindingFunc.apply(key);
+        for (T entry : entries) {
+          K key = keyFunc.apply(entry);
+          Binding<V> binding = bindingFunc.apply(entry);
           bindingsMap.put(key, binding);
           binding.bind(
               val -> {
