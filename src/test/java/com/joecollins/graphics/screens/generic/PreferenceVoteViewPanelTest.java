@@ -495,4 +495,99 @@ public class PreferenceVoteViewPanelTest {
     panel.setSize(1024, 512);
     compareRendering("PreferenceVoteViewPanel", "Ranges-1", panel);
   }
+
+  @Test
+  public void testPreferencesDeclarationInProgress() throws IOException {
+    Candidate lab = new Candidate("Sadiq Khan", new Party("Labour", "LAB", Color.RED));
+    Candidate con = new Candidate("Zac Goldsmith", new Party("Conservative", "CON", Color.BLUE));
+    Candidate ld =
+        new Candidate("Caroline Pidgeon", new Party("Liberal Democrats", "LD", Color.ORANGE));
+    Candidate grn =
+        new Candidate("Si\u00e2n Berry", new Party("Green", "GRN", Color.GREEN.darker()));
+    Candidate ukip =
+        new Candidate(
+            "Peter Whittle", new Party("UK Independence Party", "UKIP", Color.MAGENTA.darker()));
+    Candidate oth = Candidate.OTHERS;
+
+    LinkedHashMap<Candidate, Integer> currPrimary = new LinkedHashMap<>();
+    currPrimary.put(grn, null);
+    currPrimary.put(con, null);
+    currPrimary.put(lab, null);
+    currPrimary.put(ld, null);
+    currPrimary.put(ukip, null);
+    currPrimary.put(oth, null);
+
+    LinkedHashMap<Party, Integer> prevPrimary = new LinkedHashMap<>();
+    prevPrimary.put(lab.getParty(), 889918);
+    prevPrimary.put(con.getParty(), 971931);
+    prevPrimary.put(ld.getParty(), 91774);
+    prevPrimary.put(grn.getParty(), 98913);
+    prevPrimary.put(ukip.getParty(), 43274);
+    prevPrimary.put(oth.getParty(), 83914 + 28751);
+
+    LinkedHashMap<Candidate, Integer> curr2CP = new LinkedHashMap<>();
+    curr2CP.put(con, null);
+    curr2CP.put(lab, null);
+
+    LinkedHashMap<Party, Integer> prev2PP = new LinkedHashMap<>();
+    prev2PP.put(lab.getParty(), 992273);
+    prev2PP.put(con.getParty(), 1054811);
+
+    BindableWrapper<LinkedHashMap<Candidate, Integer>> currentPrimaryVotes =
+        new BindableWrapper<>(currPrimary);
+    BindableWrapper<LinkedHashMap<Party, Integer>> previousPrimaryVotes =
+        new BindableWrapper<>(prevPrimary);
+    BindableWrapper<LinkedHashMap<Candidate, Integer>> current2CPVotes =
+        new BindableWrapper<>(curr2CP);
+    BindableWrapper<LinkedHashMap<Party, Integer>> previous2PPVotes =
+        new BindableWrapper<>(prev2PP);
+    BindableWrapper<String> header = new BindableWrapper<>("MAYOR OF LONDON");
+    BindableWrapper<String> voteHeader = new BindableWrapper<>("FIRST CHOICE VOTES");
+    BindableWrapper<String> voteSubhead = new BindableWrapper<>("2016 RESULTS");
+    BindableWrapper<String> preferenceHeader = new BindableWrapper<>("SECOND CHOICE VOTES");
+    BindableWrapper<String> preferenceSubhead = new BindableWrapper<>("2016 RESULTS");
+    BindableWrapper<String> changeHeader = new BindableWrapper<>("FIRST CHOICE CHANGE SINCE 2012");
+    BindableWrapper<String> swingHeader = new BindableWrapper<>("SECOND CHOICE SWING SINCE 2012");
+    BindableWrapper<Candidate> leader = new BindableWrapper<>(null);
+    List<Party> swingPartyOrder =
+        Arrays.asList(lab.getParty(), grn.getParty(), ld.getParty(), con.getParty());
+
+    BasicResultPanel panel =
+        BasicResultPanel.candidateVotes(
+                currentPrimaryVotes.getBinding(), voteHeader.getBinding(), voteSubhead.getBinding())
+            .withPrev(previousPrimaryVotes.getBinding(), changeHeader.getBinding())
+            .withPreferences(
+                current2CPVotes.getBinding(),
+                preferenceHeader.getBinding(),
+                preferenceSubhead.getBinding())
+            .withPrevPreferences(previous2PPVotes.getBinding())
+            .withWinner(leader.getBinding())
+            .withSwing(Comparator.comparing(swingPartyOrder::indexOf), swingHeader.getBinding())
+            .build(header.getBinding());
+    panel.setSize(1024, 512);
+    compareRendering("PreferenceVoteViewPanel", "Declaration-1", panel);
+
+    currPrimary.put(grn, 150673);
+    currPrimary.put(con, 909755);
+    currentPrimaryVotes.setValue(currPrimary);
+    compareRendering("PreferenceVoteViewPanel", "Declaration-2", panel);
+
+    currPrimary.put(lab, 1148716);
+    currPrimary.put(ld, 120005);
+    currentPrimaryVotes.setValue(currPrimary);
+    compareRendering("PreferenceVoteViewPanel", "Declaration-3", panel);
+
+    currPrimary.put(ukip, 94373);
+    currPrimary.put(oth, 53055 + 37007 + 31372 + 20537 + 13325 + 13202 + 4941);
+    currentPrimaryVotes.setValue(currPrimary);
+    compareRendering("PreferenceVoteViewPanel", "Declaration-4", panel);
+
+    curr2CP.put(con, 994614);
+    current2CPVotes.setValue(curr2CP);
+    compareRendering("PreferenceVoteViewPanel", "Declaration-5", panel);
+
+    curr2CP.put(lab, 1310143);
+    current2CPVotes.setValue(curr2CP);
+    compareRendering("PreferenceVoteViewPanel", "Declaration-6", panel);
+  }
 }

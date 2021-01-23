@@ -1507,21 +1507,29 @@ public class BasicResultPanel extends JPanel {
           Binding.propertyBinding(
               result,
               r -> {
-                int total = r.votes.values().stream().mapToInt(i -> i).sum();
+                int total =
+                    r.votes.values().stream().filter(Objects::nonNull).mapToInt(i -> i).sum();
+                boolean partialDeclaration = r.votes.values().stream().anyMatch(Objects::isNull);
                 int count = r.votes.size();
                 return r.votes.entrySet().stream()
                     .sorted(
                         Comparator.<Map.Entry<KT, Integer>>comparingInt(
-                                e -> e.getKey() == others ? Integer.MIN_VALUE : e.getValue())
+                                e ->
+                                    e.getKey() == others
+                                        ? Integer.MIN_VALUE
+                                        : (e.getValue() == null ? -1 : e.getValue()))
                             .reversed())
                     .map(
                         e -> {
-                          double pct = 1.0 * e.getValue() / total;
+                          double pct =
+                              e.getValue() == null ? Double.NaN : 1.0 * e.getValue() / total;
                           String valueLabel;
                           if (count == 1) {
                             valueLabel = "ELECTED";
                           } else if (Double.isNaN(pct)) {
                             valueLabel = "WAITING...";
+                          } else if (partialDeclaration) {
+                            valueLabel = THOUSANDS_FORMAT.format(e.getValue());
                           } else {
                             valueLabel = voteTemplate.toBarString(e.getValue(), pct, true);
                           }
