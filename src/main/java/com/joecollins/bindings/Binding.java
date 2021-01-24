@@ -159,6 +159,7 @@ public interface Binding<T> {
     };
   }
 
+  @Deprecated
   static <T, R> Binding<R> mapReduceBinding(
       List<Binding<T>> bindings,
       R identity,
@@ -202,6 +203,9 @@ public interface Binding<T> {
 
       @Override
       public void bind(Consumer<R> onUpdate) {
+        if (bound) {
+          throw new IllegalStateException("Binding is already used");
+        }
         for (int i = 0; i < bindings.size(); i++) {
           values.add(null);
         }

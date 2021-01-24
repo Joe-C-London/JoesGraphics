@@ -2,12 +2,17 @@ package com.joecollins.models.general;
 
 import static org.junit.Assert.assertEquals;
 
+import com.joecollins.bindings.Binding;
 import com.joecollins.graphics.utils.BindableWrapper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.commons.lang3.mutable.MutableDouble;
+import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -175,6 +180,72 @@ public class AggregatorsTest {
   }
 
   @Test
+  public void testNestedCombinedStillPropagates() {
+    List<BindableWrapper<Map<String, Integer>>> inputs1 = new ArrayList<>();
+    inputs1.add(new BindableWrapper<>(Map.of("ABC", 8, "DEF", 6)));
+    inputs1.add(new BindableWrapper<>(Map.of("ABC", 7, "GHI", 3)));
+    List<BindableWrapper<Map<String, Integer>>> inputs2 = new ArrayList<>();
+    inputs2.add(new BindableWrapper<>(Map.of("ABC", 8, "DEF", 6)));
+    inputs2.add(new BindableWrapper<>(Map.of("ABC", 7, "GHI", 3)));
+
+    Mutable<Map<String, Integer>> output = new MutableObject<>();
+    List<Binding<Map<String, Integer>>> combined =
+        Stream.of(inputs1, inputs2)
+            .map(inputs -> Aggregators.combine(inputs, BindableWrapper::getBinding))
+            .collect(Collectors.toList());
+    Aggregators.combine(combined, Function.identity()).bind(output::setValue);
+    assertEquals(Map.of("ABC", 30, "DEF", 12, "GHI", 6), output.getValue());
+
+    inputs1.get(0).setValue(Map.of("ABC", 9, "DEF", 5));
+    assertEquals(Map.of("ABC", 31, "DEF", 11, "GHI", 6), output.getValue());
+  }
+
+  @Test
+  public void testNestedCombinedDualStillPropagates() {
+    List<BindableWrapper<Map<String, Pair<Integer, Integer>>>> inputs1 = new ArrayList<>();
+    inputs1.add(
+        new BindableWrapper<>(
+            Map.of("ABC", ImmutablePair.of(4, 8), "DEF", ImmutablePair.of(1, 6))));
+    inputs1.add(
+        new BindableWrapper<>(
+            Map.of("ABC", ImmutablePair.of(2, 7), "GHI", ImmutablePair.of(0, 3))));
+    List<BindableWrapper<Map<String, Pair<Integer, Integer>>>> inputs2 = new ArrayList<>();
+    inputs2.add(
+        new BindableWrapper<>(
+            Map.of("ABC", ImmutablePair.of(4, 8), "DEF", ImmutablePair.of(1, 6))));
+    inputs2.add(
+        new BindableWrapper<>(
+            Map.of("ABC", ImmutablePair.of(2, 7), "GHI", ImmutablePair.of(0, 3))));
+
+    Mutable<Map<String, Pair<Integer, Integer>>> output = new MutableObject<>();
+    List<Binding<Map<String, Pair<Integer, Integer>>>> combined =
+        Stream.of(inputs1, inputs2)
+            .map(inputs -> Aggregators.combineDual(inputs, BindableWrapper::getBinding))
+            .collect(Collectors.toList());
+    Aggregators.combineDual(combined, Function.identity()).bind(output::setValue);
+    assertEquals(
+        Map.of(
+            "ABC",
+            ImmutablePair.of(12, 30),
+            "DEF",
+            ImmutablePair.of(2, 12),
+            "GHI",
+            ImmutablePair.of(0, 6)),
+        output.getValue());
+
+    inputs1.get(0).setValue(Map.of("ABC", ImmutablePair.of(3, 9), "DEF", ImmutablePair.of(2, 5)));
+    assertEquals(
+        Map.of(
+            "ABC",
+            ImmutablePair.of(11, 31),
+            "DEF",
+            ImmutablePair.of(3, 11),
+            "GHI",
+            ImmutablePair.of(0, 6)),
+        output.getValue());
+  }
+
+  @Test
   public void testAdjustForPctReporting() {
     BindableWrapper<Map<String, Integer>> votes =
         new BindableWrapper<>(Map.of("ABC", 500, "DEF", 300));
@@ -334,5 +405,17 @@ public class AggregatorsTest {
 
     votes.setValue(Map.of("ABC", 0, "DEF", 0, "GHI", 0));
     assertEquals(Map.of("ABC", 0.0, "DEF", 0.0, "GHI", 0.0), output.getValue());
+  }
+
+  @Test
+  public void testSum() {
+    List<BindableWrapper<Integer>> inputs =
+        List.of(new BindableWrapper<>(1), new BindableWrapper<>(2), new BindableWrapper<>(3));
+    MutableInt output = new MutableInt();
+    Aggregators.sum(inputs, BindableWrapper::getBinding).bind(output::setValue);
+    assertEquals(6, output.getValue().intValue());
+
+    inputs.get(1).setValue(7);
+    assertEquals(11, output.getValue().intValue());
   }
 }

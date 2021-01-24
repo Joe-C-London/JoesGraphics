@@ -12,11 +12,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.BinaryOperator;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.ToDoubleFunction;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -36,18 +38,34 @@ public class Aggregators {
         items.stream().map(result).collect(Collectors.toList()),
         new LinkedHashMap<>(identity),
         (a, r) -> {
-          if (r != null) r.forEach((k, v) -> a.compute(k, (k1, v1) -> (v1 == null ? 0 : v1) + v));
+          if (r == null) {
+            return new LinkedHashMap<>(a);
+          }
+          return Stream.concat(a.entrySet().stream(), r.entrySet().stream())
+              .collect(
+                  Collectors.toMap(
+                      Map.Entry::getKey, Map.Entry::getValue, Integer::sum, LinkedHashMap::new));
         },
         (a, r) -> {
-          if (r != null)
-            r.forEach(
-                (k, v) ->
-                    a.compute(
-                        k,
-                        (k1, v1) -> {
-                          int ret = (v1 == null ? 0 : v1) - v;
-                          return ret == 0 && !seededKeys.contains(k1) ? null : ret;
-                        }));
+          if (r == null) {
+            return new LinkedHashMap<>(a);
+          }
+          return Stream.concat(
+                  a.entrySet().stream(),
+                  r.entrySet().stream().map(e -> ImmutablePair.of(e.getKey(), -e.getValue())))
+              .collect(
+                  Collectors.toMap(
+                      Map.Entry::getKey, Map.Entry::getValue, Integer::sum, LinkedHashMap::new))
+              .entrySet()
+              .stream()
+              .filter(
+                  e ->
+                      seededKeys.contains(e.getKey())
+                          || e.getValue() != 0
+                          || !r.containsKey(e.getKey()))
+              .collect(
+                  Collectors.toMap(
+                      Map.Entry::getKey, Map.Entry::getValue, Integer::sum, LinkedHashMap::new));
         });
   }
 
@@ -61,39 +79,52 @@ public class Aggregators {
       Function<T, Binding<Map<K, Pair<Integer, Integer>>>> result,
       Map<K, Pair<Integer, Integer>> identity) {
     Set<K> seededKeys = new HashSet<>(identity.keySet());
+    BinaryOperator<Pair<Integer, Integer>> sum =
+        (v1, v2) -> ImmutablePair.of(v1.getLeft() + v2.getLeft(), v1.getRight() + v2.getRight());
     return Binding.mapReduceBinding(
         items.stream().map(result).collect(Collectors.toList()),
         new LinkedHashMap<>(identity),
         (a, r) -> {
-          if (r != null)
-            r.forEach(
-                (k, v) ->
-                    a.compute(
-                        k,
-                        (k1, v1) -> {
-                          Pair<Integer, Integer> v2 = v1 == null ? ImmutablePair.of(0, 0) : v1;
-                          return ImmutablePair.of(
-                              v2.getLeft() + v.getLeft(), v2.getRight() + v.getRight());
-                        }));
+          if (r == null) {
+            return new LinkedHashMap<>(a);
+          }
+          return Stream.concat(a.entrySet().stream(), r.entrySet().stream())
+              .collect(
+                  Collectors.toMap(
+                      Map.Entry::getKey, Map.Entry::getValue, sum, LinkedHashMap::new));
         },
         (a, r) -> {
-          if (r != null)
-            r.forEach(
-                (k, v) ->
-                    a.compute(
-                        k,
-                        (k1, v1) -> {
-                          Pair<Integer, Integer> v2 = v1 == null ? ImmutablePair.of(0, 0) : v1;
-                          ImmutablePair<Integer, Integer> ret =
-                              ImmutablePair.of(
-                                  v2.getLeft() - v.getLeft(), v2.getRight() - v.getRight());
-                          return ret.getLeft() == 0
-                                  && ret.getRight() == 0
-                                  && !seededKeys.contains(k1)
-                              ? null
-                              : ret;
-                        }));
+          if (r == null) {
+            return new LinkedHashMap<>(a);
+          }
+          return Stream.concat(
+                  a.entrySet().stream(),
+                  r.entrySet().stream()
+                      .map(
+                          e ->
+                              new ImmutablePair<>(
+                                  e.getKey(),
+                                  ImmutablePair.of(
+                                      -e.getValue().getLeft(), -e.getValue().getRight()))))
+              .collect(
+                  Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, sum, LinkedHashMap::new))
+              .entrySet()
+              .stream()
+              .filter(
+                  e ->
+                      seededKeys.contains(e.getKey())
+                          || e.getValue().getLeft() != 0
+                          || e.getValue().getRight() != 0
+                          || !r.containsKey(e.getKey()))
+              .collect(
+                  Collectors.toMap(
+                      Map.Entry::getKey, Map.Entry::getValue, sum, LinkedHashMap::new));
         });
+  }
+
+  public static <T> Binding<Integer> sum(Collection<T> items, Function<T, Binding<Integer>> val) {
+    return Binding.mapReduceBinding(
+        items.stream().map(val).collect(Collectors.toList()), 0, (t, v) -> t + v, (t, v) -> t - v);
   }
 
   public static <K> Binding<Map<K, Integer>> adjustForPctReporting(
