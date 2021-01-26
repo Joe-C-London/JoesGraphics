@@ -50,6 +50,23 @@ public class ListingFrameBuilder {
     return ret;
   }
 
+  public static <T> ListingFrameBuilder ofFixedList(
+      List<T> list,
+      Function<T, Binding<String>> leftTextFunc,
+      Function<T, Binding<String>> rightTextFunc,
+      Function<T, Binding<Color>> colorFunc) {
+    ListingFrameBuilder builder = new ListingFrameBuilder();
+    BarFrame barFrame = builder.barFrame;
+    barFrame.setNumBarsBinding(Binding.fixedBinding(list.size()));
+    barFrame.setLeftTextBinding(IndexedBinding.listBinding(list, leftTextFunc));
+    barFrame.setRightTextBinding(IndexedBinding.listBinding(list, rightTextFunc));
+    barFrame.addSeriesBinding(
+        "Item",
+        IndexedBinding.listBinding(list, colorFunc),
+        IndexedBinding.listBinding(list, x -> Binding.fixedBinding(1)));
+    return builder;
+  }
+
   public ListingFrameBuilder withHeader(Binding<String> headerBinding) {
     barFrame.setHeaderBinding(headerBinding);
     return this;
