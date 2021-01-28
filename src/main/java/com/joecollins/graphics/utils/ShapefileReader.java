@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import org.geotools.data.FileDataStore;
 import org.geotools.data.FileDataStoreFinder;
 import org.geotools.data.simple.SimpleFeatureIterator;
@@ -19,6 +21,17 @@ public class ShapefileReader {
 
   public static <T> Map<T, Shape> readShapes(URL file, String keyProperty, Class<T> keyType)
       throws IOException {
+    return readShapes(file, feature -> keyType.cast(feature.getAttribute(keyProperty)));
+  }
+
+  public static <T> Map<T, Shape> readShapes(URL file, Function<SimpleFeature, T> keyFunc)
+      throws IOException {
+    return readShapes(file, keyFunc, feature -> true);
+  }
+
+  public static <T> Map<T, Shape> readShapes(
+      URL file, Function<SimpleFeature, T> keyFunc, Predicate<SimpleFeature> filter)
+      throws IOException {
     Map<T, Shape> shapes = new HashMap<>();
     FileDataStore store = null;
     SimpleFeatureSource featureSource = null;
@@ -29,7 +42,10 @@ public class ShapefileReader {
       features = featureSource.getFeatures().features();
       while (features.hasNext()) {
         SimpleFeature feature = features.next();
-        T key = keyType.cast(feature.getAttribute(keyProperty));
+        if (!filter.test(feature)) {
+          continue;
+        }
+        T key = keyFunc.apply(feature);
         Geometry geom = (Geometry) feature.getAttribute("the_geom");
         shapes.merge(
             key,

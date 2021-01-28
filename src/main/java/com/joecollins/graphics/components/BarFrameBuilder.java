@@ -229,6 +229,77 @@ public class BarFrameBuilder {
     return builder;
   }
 
+  public static BarFrameBuilder dualReversed(Binding<? extends List<DualBar>> bars) {
+    BarFrameBuilder builder = new BarFrameBuilder();
+    BarFrame barFrame = builder.barFrame;
+    RangeFinder rangeFinder = builder.rangeFinder;
+
+    Predicate<DualBar> differentDirections =
+        bar -> Math.signum(bar.value1.doubleValue()) * Math.signum(bar.value2.doubleValue()) == -1;
+    Predicate<DualBar> reverse =
+        bar ->
+            differentDirections.test(bar)
+                || Math.abs(bar.value1.doubleValue()) < Math.abs(bar.value2.doubleValue());
+    Function<DualBar, Number> first = bar -> reverse.test(bar) ? bar.value1 : bar.value2;
+    Function<DualBar, Number> second = bar -> reverse.test(bar) ? bar.value2 : bar.value1;
+
+    BindableList<DualBar> entries = new BindableList<>();
+    barFrame.setNumBarsBinding(Binding.sizeBinding(entries));
+    barFrame.setLeftTextBinding(IndexedBinding.propertyBinding(entries, e -> e.label));
+    barFrame.setRightTextBinding(IndexedBinding.propertyBinding(entries, e -> e.valueLabel));
+    barFrame.setMinBinding(
+        Binding.propertyBinding(
+            rangeFinder, rf -> rf.minFunction.apply(rf), RangeFinder.Property.MIN));
+    barFrame.setMaxBinding(
+        Binding.propertyBinding(
+            rangeFinder, rf -> rf.maxFunction.apply(rf), RangeFinder.Property.MAX));
+    barFrame.addSeriesBinding(
+        "Placeholder",
+        IndexedBinding.propertyBinding(entries, e -> e.color),
+        IndexedBinding.propertyBinding(entries, e -> 0));
+    barFrame.addSeriesBinding(
+        "First",
+        IndexedBinding.propertyBinding(entries, e -> ColorUtils.lighten(e.color)),
+        IndexedBinding.propertyBinding(entries, first));
+    barFrame.addSeriesBinding(
+        "Second",
+        IndexedBinding.propertyBinding(
+            entries,
+            e -> {
+              UnaryOperator<Color> cf =
+                  differentDirections.test(e) ? ColorUtils::lighten : UnaryOperator.identity();
+              return cf.apply(e.color);
+            }),
+        IndexedBinding.propertyBinding(
+            entries,
+            e ->
+                second.apply(e).doubleValue()
+                    - (differentDirections.test(e) ? 0 : first.apply(e).doubleValue())));
+    barFrame.setLeftIconBinding(IndexedBinding.propertyBinding(entries, e -> e.shape));
+    builder.bind(
+        bars,
+        map -> {
+          if (map == null) {
+            entries.clear();
+            rangeFinder.setLowest(0);
+            rangeFinder.setHighest(0);
+          } else {
+            entries.setAll(map);
+            rangeFinder.setHighest(
+                map.stream()
+                    .flatMap(e -> Stream.of(e.value1, e.value2))
+                    .mapToDouble(Number::doubleValue)
+                    .reduce(0, Math::max));
+            rangeFinder.setLowest(
+                map.stream()
+                    .flatMap(e -> Stream.of(e.value1, e.value2))
+                    .mapToDouble(Number::doubleValue)
+                    .reduce(0, Math::min));
+          }
+        });
+    return builder;
+  }
+
   public BarFrameBuilder withHeader(Binding<String> headerBinding) {
     barFrame.setHeaderBinding(headerBinding);
     return this;
