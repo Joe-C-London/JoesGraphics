@@ -13,11 +13,13 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 import org.apache.commons.lang3.Range;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -1007,6 +1009,130 @@ public class SeatViewPanelTest {
 
     winner.setValue(dem);
     compareRendering("SeatViewPanel", "PartyTick-2", panel);
+  }
+
+  @Test
+  public void testPartyClassification() throws IOException {
+    Party dup = new Party("Democratic Unionist Party", "DUP", Color.ORANGE.darker());
+    Party sf = new Party("Sinn F\u00e9in", "SF", Color.GREEN.darker().darker());
+    Party sdlp = new Party("Social Democratic and Labour Party", "SDLP", Color.GREEN.darker());
+    Party uup = new Party("Ulster Unionist Party", "UUP", Color.BLUE);
+    Party apni = new Party("Alliance Party", "APNI", Color.YELLOW);
+    Party grn = new Party("Green Party", "GRN", Color.GREEN);
+    Party tuv = new Party("Traditional Unionist Voice", "TUV", Color.BLUE.darker());
+    Party pbp = new Party("People Before Profit", "PBP", Color.MAGENTA);
+    Party pup = new Party("Progressive Unionist Party", "PUP", Color.BLUE.darker());
+    Party con = new Party("NI Conservatives", "CON", Color.BLUE);
+    Party lab = new Party("Labour Alternative", "LAB", Color.RED);
+    Party ukip = new Party("UK Independence Party", "UKIP", Color.MAGENTA.darker());
+    Party cista = new Party("Cannabis is Safer than Alcohol", "CISTA", Color.GRAY);
+    Party wp = new Party("Workers' Party", "WP", Color.RED);
+    Party ind_u = new Party("Independent", "IND", Color.GRAY);
+    Party ind_n = new Party("Independent", "IND", Color.GRAY);
+    Party ind_o = new Party("Independent", "IND", Color.GRAY);
+
+    Party unionists = new Party("Unionists", "Unionists", new Color(0xff8200));
+    Party nationalists = new Party("Nationalists", "Nationalists", new Color(0x169b62));
+    Party others = Party.OTHERS;
+
+    Map<Party, Party> mapping = new IdentityHashMap<>();
+    Stream.of(dup, uup, tuv, con, pup, ukip, ind_u).forEach(p -> mapping.put(p, unionists));
+    Stream.of(sf, sdlp, wp, ind_n).forEach(p -> mapping.put(p, nationalists));
+    Stream.of(apni, grn, pbp, lab, ind_o).forEach(p -> mapping.put(p, others));
+
+    BindableWrapper<LinkedHashMap<Party, Integer>> currentSeats =
+        new BindableWrapper<>(new LinkedHashMap<>());
+    BindableWrapper<LinkedHashMap<Party, Integer>> previousSeats =
+        new BindableWrapper<>(new LinkedHashMap<>());
+    BindableWrapper<LinkedHashMap<Party, Integer>> currentVotes =
+        new BindableWrapper<>(new LinkedHashMap<>());
+    BindableWrapper<LinkedHashMap<Party, Integer>> previousVotes =
+        new BindableWrapper<>(new LinkedHashMap<>());
+    BindableWrapper<Integer> totalSeats = new BindableWrapper<>(90);
+    BindableWrapper<String> header = new BindableWrapper<>("NORTHERN IRELAND");
+    BindableWrapper<String> seatHeader = new BindableWrapper<>("2017 RESULTS");
+    BindableWrapper<String> seatSubhead = new BindableWrapper<>(null);
+    BindableWrapper<String> changeHeader = new BindableWrapper<>("NOTIONAL CHANGE SINCE 2016");
+
+    BasicResultPanel panel =
+        BasicResultPanel.partySeats(
+                currentSeats.getBinding(), seatHeader.getBinding(), seatSubhead.getBinding())
+            .withPrev(previousSeats.getBinding(), changeHeader.getBinding())
+            .withTotal(totalSeats.getBinding())
+            .withClassification(p -> mapping.getOrDefault(p, others), () -> "BY DESIGNATION")
+            .withSwing(
+                currentVotes.getBinding(),
+                previousVotes.getBinding(),
+                Comparator.comparing(List.of(nationalists, others, unionists)::indexOf),
+                () -> "FIRST PREFERENCE SWING SINCE 2016")
+            .build(header.getBinding());
+    panel.setSize(1024, 512);
+    compareRendering("SeatViewPanel", "PartyClassifications-1", panel);
+
+    LinkedHashMap<Party, Integer> currSeats = new LinkedHashMap<>();
+    currSeats.put(dup, 28);
+    currSeats.put(sf, 27);
+    currSeats.put(sdlp, 12);
+    currSeats.put(uup, 10);
+    currSeats.put(apni, 8);
+    currSeats.put(grn, 2);
+    currSeats.put(tuv, 1);
+    currSeats.put(pbp, 1);
+    currSeats.put(ind_u, 1);
+    currentSeats.setValue(currSeats);
+
+    LinkedHashMap<Party, Integer> prevSeats = new LinkedHashMap<>();
+    prevSeats.put(dup, 33);
+    prevSeats.put(sf, 23);
+    prevSeats.put(sdlp, 11);
+    prevSeats.put(uup, 11);
+    prevSeats.put(apni, 8);
+    prevSeats.put(grn, 2);
+    prevSeats.put(tuv, 1);
+    prevSeats.put(pbp, 1);
+    previousSeats.setValue(prevSeats);
+
+    LinkedHashMap<Party, Integer> currVotes = new LinkedHashMap<>();
+    currVotes.put(dup, 225413);
+    currVotes.put(sf, 224245);
+    currVotes.put(sdlp, 95958);
+    currVotes.put(uup, 103314);
+    currVotes.put(apni, 72717);
+    currVotes.put(grn, 18527);
+    currVotes.put(tuv, 20523);
+    currVotes.put(pbp, 14100);
+    currVotes.put(pup, 5590);
+    currVotes.put(con, 2399);
+    currVotes.put(lab, 2009);
+    currVotes.put(ukip, 1579);
+    currVotes.put(cista, 1273);
+    currVotes.put(wp, 1261);
+    currVotes.put(ind_u, 4918);
+    currVotes.put(ind_n, 1639);
+    currVotes.put(ind_o, 7850);
+    currentVotes.setValue(currVotes);
+
+    LinkedHashMap<Party, Integer> prevVotes = new LinkedHashMap<>();
+    prevVotes.put(dup, 202567);
+    prevVotes.put(sf, 166785);
+    prevVotes.put(uup, 87302);
+    prevVotes.put(sdlp, 83368);
+    prevVotes.put(apni, 48447);
+    prevVotes.put(tuv, 23776);
+    prevVotes.put(grn, 18718);
+    prevVotes.put(pbp, 13761);
+    prevVotes.put(ukip, 10109);
+    prevVotes.put(pup, 5955);
+    prevVotes.put(con, 2554);
+    prevVotes.put(cista, 2510);
+    prevVotes.put(lab, 1939 + 1577);
+    prevVotes.put(wp, 1565);
+    prevVotes.put(ind_u, 351 + 3270);
+    prevVotes.put(ind_n, 0);
+    prevVotes.put(ind_o, 224 + 124 + 32 + 19380);
+    previousVotes.setValue(prevVotes);
+
+    compareRendering("SeatViewPanel", "PartyClassifications-2", panel);
   }
 
   private Map<Integer, Shape> peiShapesByDistrict() throws IOException {

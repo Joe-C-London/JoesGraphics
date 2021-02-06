@@ -110,13 +110,22 @@ public class SwingFrameBuilder {
                   if (p.fromParty == null || p.toParty == null) {
                     return Color.LIGHT_GRAY;
                   }
-                  return ComparatorUtils.min(p.fromParty, p.toParty, partyOrder).getColor();
+                  return (ComparatorUtils.max(p.fromParty, p.toParty, partyOrder)
+                              .equals(p.fromParty)
+                          ? p.toParty
+                          : p.fromParty)
+                      .getColor();
                 },
                 p -> {
                   if (p.fromParty == null || p.toParty == null) {
                     return 0.0;
                   }
-                  return p.swing * Math.signum(partyOrder.compare(p.toParty, p.fromParty));
+                  return p.swing
+                      * Math.signum(
+                          ComparatorUtils.max(p.fromParty, p.toParty, partyOrder)
+                                  .equals(p.fromParty)
+                              ? -1
+                              : 1);
                 },
                 p -> {
                   if (p.fromParty == null || p.toParty == null) {

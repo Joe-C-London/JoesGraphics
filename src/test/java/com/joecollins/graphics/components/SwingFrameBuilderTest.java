@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.junit.Test;
 
 public class SwingFrameBuilderTest {
@@ -131,6 +132,31 @@ public class SwingFrameBuilderTest {
     assertEquals(Color.RED, swingFrame.getRightColor());
     assertEquals(Color.RED, swingFrame.getBottomColor());
     assertEquals(-0.1, swingFrame.getValue().doubleValue(), 1e-6);
+    assertEquals(0.1, swingFrame.getRange().doubleValue(), 1e-6);
+    assertEquals("10.0% SWING CON TO LIB", swingFrame.getBottomText());
+  }
+
+  @Test
+  public void testSwingPrevCurrPartiesNotInComparator() {
+    Party lib = new Party("LIBERAL", "LIB", Color.RED);
+    Party con = new Party("CONSERVATIVE", "CON", Color.BLUE);
+    Party ndp = new Party("NEW DEMOCRATIC PARTY", "NDP", Color.ORANGE);
+    Binding<Map<Party, Integer>> prevBinding = () -> Map.of(lib, 25, con, 15, ndp, 10);
+    Binding<Map<Party, Integer>> currBinding = () -> Map.of(lib, 26, con, 10, ndp, 4);
+    // LIB: 50.00 -> 65.00 (+15.00)
+    // CON: 30.00 -> 25.00 (- 5.00)
+    // NDP: 20.00 -> 10.00 (-10.00)
+    List<Party> partyOrder = Arrays.asList();
+    SwingFrame swingFrame =
+        SwingFrameBuilder.prevCurr(
+                prevBinding, currBinding, Comparator.comparing(partyOrder::indexOf))
+            .build();
+    assertEquals(
+        Set.of(Color.BLUE, Color.RED),
+        Set.of(swingFrame.getLeftColor(), swingFrame.getRightColor()));
+    //    assertEquals(Color.RED, swingFrame.getBottomColor());
+    //    assertEquals(0.1 * (swingFrame.getLeftColor().equals(Color.BLUE) ? -1 : 1),
+    // swingFrame.getValue().doubleValue(), 1e-6);
     assertEquals(0.1, swingFrame.getRange().doubleValue(), 1e-6);
     assertEquals("10.0% SWING CON TO LIB", swingFrame.getBottomText());
   }

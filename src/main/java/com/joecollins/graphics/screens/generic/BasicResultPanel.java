@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.swing.JLabel;
@@ -393,6 +394,9 @@ public class BasicResultPanel extends JPanel {
     protected BindingReceiver<String> swingHeader;
     protected Comparator<Party> swingComparator;
 
+    protected UnaryOperator<Party> classificationFunc;
+    protected BindingReceiver<String> classificationHeader;
+
     protected MapBuilder mapBuilder;
 
     private SeatScreenBuilder(
@@ -528,17 +532,26 @@ public class BasicResultPanel extends JPanel {
       return this;
     }
 
+    public SeatScreenBuilder<KT, CT, PT> withClassification(
+        UnaryOperator<Party> classificationFunc, Binding<String> classificationHeader) {
+      this.classificationFunc = classificationFunc;
+      this.classificationHeader = new BindingReceiver<>(classificationHeader);
+      return this;
+    }
+
     public BasicResultPanel build(Binding<String> textHeader) {
       return new BasicResultPanel(
           createHeaderLabel(textHeader),
           createFrame(),
-          null,
+          createClassificationFrame(),
           createDiffFrame(),
           createSwingFrame(),
           createMapFrame());
     }
 
     protected abstract BarFrame createFrame();
+
+    protected abstract BarFrame createClassificationFrame();
 
     protected abstract BarFrame createDiffFrame();
 
@@ -547,7 +560,13 @@ public class BasicResultPanel extends JPanel {
         return null;
       }
       return SwingFrameBuilder.prevCurr(
-              prevVotes.getBinding(), currVotes.getBinding(), swingComparator)
+              classificationFunc == null
+                  ? prevVotes.getBinding()
+                  : Aggregators.adjustKey(prevVotes.getBinding(), classificationFunc),
+              classificationFunc == null
+                  ? currVotes.getBinding()
+                  : Aggregators.adjustKey(currVotes.getBinding(), classificationFunc),
+              swingComparator)
           .withHeader(swingHeader.getBinding())
           .build();
     }
@@ -658,6 +677,11 @@ public class BasicResultPanel extends JPanel {
       if (total != null) {
         builder = builder.withMax(total.getBinding(t -> t * 2 / 3));
       }
+      builder = applyMajorityLine(builder);
+      return builder.build();
+    }
+
+    private BarFrameBuilder applyMajorityLine(BarFrameBuilder builder) {
       if (showMajority != null) {
         BindableList<Integer> lines = new BindableList<>();
         showMajority
@@ -679,6 +703,34 @@ public class BasicResultPanel extends JPanel {
                 });
         builder = builder.withLines(lines, majorityFunction);
       }
+      return builder;
+    }
+
+    protected BarFrame createClassificationFrame() {
+      if (classificationHeader == null) {
+        return null;
+      }
+      Binding<List<BarFrameBuilder.BasicBar>> bars =
+          Aggregators.adjustKey(
+                  current.getBinding(), e -> classificationFunc.apply(keyTemplate.toParty(e)))
+              .map(
+                  seats -> {
+                    return seats.entrySet().stream()
+                        .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                        .map(
+                            e ->
+                                new BarFrameBuilder.BasicBar(
+                                    e.getKey().getName().toUpperCase(),
+                                    e.getKey().getColor(),
+                                    e.getValue()))
+                        .collect(Collectors.toList());
+                  });
+      BarFrameBuilder builder =
+          BarFrameBuilder.basic(bars).withHeader(classificationHeader.getBinding());
+      if (total != null) {
+        builder = builder.withMax(total.getBinding(t -> t * 2 / 3));
+      }
+      builder = applyMajorityLine(builder);
       return builder.build();
     }
 
@@ -853,6 +905,13 @@ public class BasicResultPanel extends JPanel {
         builder = builder.withLines(lines, majorityFunction);
       }
       return builder.build();
+    }
+
+    protected BarFrame createClassificationFrame() {
+      if (classificationHeader == null) {
+        return null;
+      }
+      throw new UnsupportedOperationException("Classification frame not supported on dual frame");
     }
 
     protected BarFrame createDiffFrame() {
@@ -1032,6 +1091,13 @@ public class BasicResultPanel extends JPanel {
       return builder.build();
     }
 
+    protected BarFrame createClassificationFrame() {
+      if (classificationHeader == null) {
+        return null;
+      }
+      throw new UnsupportedOperationException("Classification frame not supported on range frame");
+    }
+
     protected BarFrame createDiffFrame() {
       if (changeHeader == null) {
         return null;
@@ -1138,6 +1204,9 @@ public class BasicResultPanel extends JPanel {
 
     protected BindingReceiver<String> swingHeader;
     protected Comparator<Party> swingComparator;
+
+    protected UnaryOperator<Party> classificationFunc;
+    protected BindingReceiver<String> classificationHeader;
 
     protected MapBuilder mapBuilder;
 
@@ -1288,11 +1357,18 @@ public class BasicResultPanel extends JPanel {
       return this;
     }
 
+    public VoteScreenBuilder<KT, CT, CPT, PT> withClassification(
+        UnaryOperator<Party> classificationFunc, Binding<String> classificationHeader) {
+      this.classificationFunc = classificationFunc;
+      this.classificationHeader = new BindingReceiver<>(classificationHeader);
+      return this;
+    }
+
     public BasicResultPanel build(Binding<String> textHeader) {
       return new BasicResultPanel(
           createHeaderLabel(textHeader),
           createFrame(),
-          createPreferenceFrame(),
+          classificationHeader == null ? createPreferenceFrame() : createClassificationFrame(),
           createDiffFrame(),
           createSwingFrame(),
           createMapFrame());
@@ -1301,6 +1377,8 @@ public class BasicResultPanel extends JPanel {
     protected abstract BarFrame createFrame();
 
     protected abstract BarFrame createPreferenceFrame();
+
+    protected abstract BarFrame createClassificationFrame();
 
     protected abstract BarFrame createDiffFrame();
 
@@ -1438,6 +1516,11 @@ public class BasicResultPanel extends JPanel {
                   pctReporting == null
                       ? (() -> 2.0 / 3)
                       : pctReporting.getBinding(x -> 2.0 / 3 / Math.max(1e-6, x)));
+      builder = addMajority(builder);
+      return builder.build();
+    }
+
+    private BarFrameBuilder addMajority(BarFrameBuilder builder) {
       if (showMajority != null) {
         BindableList<Double> lines = new BindableList<>();
         showMajority
@@ -1470,7 +1553,7 @@ public class BasicResultPanel extends JPanel {
                 });
         builder = builder.withLines(lines, n -> majorityLabel.getValue());
       }
-      return builder.build();
+      return builder;
     }
 
     private static class Change<KT> extends Bindable<Change.Property> {
@@ -1563,6 +1646,40 @@ public class BasicResultPanel extends JPanel {
                   ? Binding.fixedBinding(2.0 / 3)
                   : preferencePctReporting.getBinding(p -> 2.0 / 3 / Math.max(p, 1e-6)))
           .build();
+    }
+
+    @Override
+    protected BarFrame createClassificationFrame() {
+      if (classificationHeader == null) {
+        return null;
+      }
+      Binding<List<BarFrameBuilder.BasicBar>> bars =
+          Aggregators.adjustKey(
+                  current.getBinding(), k -> classificationFunc.apply(keyTemplate.toParty(k)))
+              .map(
+                  m -> {
+                    int total = m.values().stream().mapToInt(i -> i).sum();
+                    return m.entrySet().stream()
+                        .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                        .map(
+                            e ->
+                                new BarFrameBuilder.BasicBar(
+                                    e.getKey().getName().toUpperCase(),
+                                    e.getKey().getColor(),
+                                    1.0 * e.getValue() / total,
+                                    voteTemplate.toBarString(
+                                        e.getValue(), 1.0 * e.getValue() / total, true)))
+                        .collect(Collectors.toList());
+                  });
+      BarFrameBuilder builder =
+          BarFrameBuilder.basic(bars)
+              .withHeader(classificationHeader.getBinding())
+              .withMax(
+                  pctReporting == null
+                      ? (() -> 2.0 / 3)
+                      : pctReporting.getBinding(x -> 2.0 / 3 / Math.max(1e-6, x)));
+      builder = addMajority(builder);
+      return builder.build();
     }
 
     @Override
@@ -1682,7 +1799,10 @@ public class BasicResultPanel extends JPanel {
                       return p;
                     });
       }
-      return SwingFrameBuilder.prevCurr(prev, curr, swingComparator)
+      return SwingFrameBuilder.prevCurr(
+              classificationFunc == null ? prev : Aggregators.adjustKey(prev, classificationFunc),
+              classificationFunc == null ? curr : Aggregators.adjustKey(curr, classificationFunc),
+              swingComparator)
           .withHeader(swingHeader.getBinding())
           .build();
     }
@@ -1851,6 +1971,14 @@ public class BasicResultPanel extends JPanel {
           .withHeader(changeHeader.getBinding())
           .withSubhead(changeSubhead.getBinding())
           .build();
+    }
+
+    @Override
+    protected BarFrame createClassificationFrame() {
+      if (classificationHeader == null) {
+        return null;
+      }
+      throw new UnsupportedOperationException("Classifications not supported on range frames");
     }
 
     @Override
