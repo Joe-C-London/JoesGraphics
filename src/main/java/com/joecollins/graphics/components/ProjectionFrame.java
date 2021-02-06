@@ -55,7 +55,7 @@ public class ProjectionFrame extends GraphicsFrame {
   public void setImageBinding(Binding<Image> imageBinding) {
     this.imageBinding.unbind();
     this.imageBinding = imageBinding;
-    this.imageBinding.bind(imagePanel::setImage);
+    this.imageBinding.bindLegacy(imagePanel::setImage);
   }
 
   Color getBackColor() {
@@ -65,7 +65,7 @@ public class ProjectionFrame extends GraphicsFrame {
   public void setBackColorBinding(Binding<Color> colorBinding) {
     this.colorBinding.unbind();
     this.colorBinding = colorBinding;
-    this.colorBinding.bind(footerPanel::setBackground);
+    this.colorBinding.bindLegacy(footerPanel::setBackground);
   }
 
   String getFooterText() {
@@ -75,7 +75,7 @@ public class ProjectionFrame extends GraphicsFrame {
   public void setFooterTextBinding(Binding<String> textBinding) {
     this.textBinding.unbind();
     this.textBinding = textBinding;
-    this.textBinding.bind(footerLabel::setText);
+    this.textBinding.bindLegacy(footerLabel::setText);
   }
 
   Alignment getImageAlignment() {
@@ -85,7 +85,7 @@ public class ProjectionFrame extends GraphicsFrame {
   public void setImageAlignmentBinding(Binding<Alignment> imageAlignmentBinding) {
     this.imageAlignmentBinding.unbind();
     this.imageAlignmentBinding = imageAlignmentBinding;
-    this.imageAlignmentBinding.bind(imagePanel::setAlignment);
+    this.imageAlignmentBinding.bindLegacy(imagePanel::setAlignment);
   }
 
   private class ImagePanel extends JPanel {

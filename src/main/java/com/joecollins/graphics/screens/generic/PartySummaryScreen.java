@@ -186,8 +186,10 @@ public class PartySummaryScreen extends JPanel {
       headerLabel.setFont(StandardFont.readBoldFont(32));
       headerLabel.setHorizontalAlignment(JLabel.CENTER);
       headerLabel.setBorder(new EmptyBorder(5, 0, -5, 0));
-      party.getBinding(p -> p.getName().toUpperCase() + " SUMMARY").bind(headerLabel::setText);
-      party.getBinding(Party::getColor).bind(headerLabel::setForeground);
+      party
+          .getBinding(p -> p.getName().toUpperCase() + " SUMMARY")
+          .bindLegacy(headerLabel::setText);
+      party.getBinding(Party::getColor).bindLegacy(headerLabel::setForeground);
 
       RegionSummaryFrame mainFrame = createFrame(mainRegion, party);
       List<RegionSummaryFrame> otherFrames =
@@ -198,11 +200,11 @@ public class PartySummaryScreen extends JPanel {
 
     private RegionSummaryFrame createFrame(T region, BindingReceiver<Party> party) {
       SinglePartyInput input = new SinglePartyInput();
-      seatFunc.apply(region).bind(input::setSeats);
-      seatDiffFunc.apply(region).bind(input::setSeatDiff);
-      votePctFunc.apply(region).bind(input::setVotePct);
-      votePctDiffFunc.apply(region).bind(input::setVotePctDiff);
-      party.getBinding().bind(input::setParty);
+      seatFunc.apply(region).bindLegacy(input::setSeats);
+      seatDiffFunc.apply(region).bindLegacy(input::setSeatDiff);
+      votePctFunc.apply(region).bindLegacy(input::setVotePct);
+      votePctDiffFunc.apply(region).bindLegacy(input::setVotePctDiff);
+      party.getBinding().bindLegacy(input::setParty);
 
       BindableList<List<String>> values = new BindableList<>();
       values.setAll(List.of(List.of("", ""), List.of("", "")));
@@ -218,7 +220,7 @@ public class PartySummaryScreen extends JPanel {
               SinglePartyInput.Property.SEATS,
               SinglePartyInput.Property.SEAT_DIFF,
               SinglePartyInput.Property.PARTY)
-          .bind(p -> values.set(0, p));
+          .bindLegacy(p -> values.set(0, p));
       Binding.propertyBinding(
               input,
               i -> {
@@ -231,7 +233,7 @@ public class PartySummaryScreen extends JPanel {
               SinglePartyInput.Property.VOTE_PCT,
               SinglePartyInput.Property.VOTE_PCT_DIFF,
               SinglePartyInput.Property.PARTY)
-          .bind(p -> values.set(1, p));
+          .bindLegacy(p -> values.set(1, p));
 
       RegionSummaryFrame frame = new RegionSummaryFrame();
       frame.setHeaderBinding(titleFunc.apply(region));

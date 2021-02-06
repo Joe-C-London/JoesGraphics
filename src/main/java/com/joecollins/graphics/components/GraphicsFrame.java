@@ -87,7 +87,7 @@ public class GraphicsFrame extends JPanel {
   public void setHeaderBinding(Binding<String> headerTextBinding) {
     this.headerTextBinding.unbind();
     this.headerTextBinding = headerTextBinding;
-    this.headerTextBinding.bind(
+    this.headerTextBinding.bindLegacy(
         headerText -> {
           headerPanel.setVisible(headerText != null);
           if (headerText != null) {
@@ -106,7 +106,7 @@ public class GraphicsFrame extends JPanel {
   public void setHeaderAlignmentBinding(Binding<Alignment> headerAlignmentBinding) {
     this.headerAlignmentBinding.unbind();
     this.headerAlignmentBinding = headerAlignmentBinding;
-    this.headerAlignmentBinding.bind(
+    this.headerAlignmentBinding.bindLegacy(
         headerAlignment -> headerLabel.setHorizontalAlignment(headerAlignment.jlabelAlignment));
   }
 
@@ -117,7 +117,7 @@ public class GraphicsFrame extends JPanel {
   public void setNotesBinding(Binding<String> notesTextBinding) {
     this.notesTextBinding.unbind();
     this.notesTextBinding = notesTextBinding;
-    this.notesTextBinding.bind(
+    this.notesTextBinding.bindLegacy(
         notesText -> {
           notesLabel.setVisible(notesText != null);
           if (notesText != null) {
@@ -133,7 +133,7 @@ public class GraphicsFrame extends JPanel {
   public void setBorderColorBinding(Binding<Color> borderColorBinding) {
     this.borderColorBinding.unbind();
     this.borderColorBinding = borderColorBinding;
-    this.borderColorBinding.bind(
+    this.borderColorBinding.bindLegacy(
         borderColor -> {
           setBorder(new MatteBorder(1, 1, 1, 1, borderColor));
           headerPanel.setBackground(borderColor);

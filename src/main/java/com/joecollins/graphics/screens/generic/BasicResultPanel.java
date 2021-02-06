@@ -142,7 +142,7 @@ public class BasicResultPanel extends JPanel {
     headerLabel.setFont(StandardFont.readBoldFont(32));
     headerLabel.setHorizontalAlignment(JLabel.CENTER);
     headerLabel.setBorder(new EmptyBorder(5, 0, -5, 0));
-    textBinding.bind(headerLabel::setText);
+    textBinding.bindLegacy(headerLabel::setText);
     return headerLabel;
   }
 
@@ -639,9 +639,9 @@ public class BasicResultPanel extends JPanel {
 
     protected BarFrame createFrame() {
       Result<KT> result = new Result<>();
-      current.getBinding().bind(result::setSeats);
+      current.getBinding().bindLegacy(result::setSeats);
       if (winner != null) {
-        winner.getBinding().bind(result::setWinner);
+        winner.getBinding().bindLegacy(result::setWinner);
       }
       Binding<List<BarFrameBuilder.BasicBar>> bars =
           Binding.propertyBinding(
@@ -686,7 +686,7 @@ public class BasicResultPanel extends JPanel {
         BindableList<Integer> lines = new BindableList<>();
         showMajority
             .getBinding()
-            .bind(
+            .bindLegacy(
                 show -> {
                   lines.clear();
                   if (show) {
@@ -695,7 +695,7 @@ public class BasicResultPanel extends JPanel {
                 });
         total
             .getBinding()
-            .bind(
+            .bindLegacy(
                 t -> {
                   if (!lines.isEmpty()) {
                     lines.set(0, t / 2 + 1);
@@ -841,9 +841,9 @@ public class BasicResultPanel extends JPanel {
 
     protected BarFrame createFrame() {
       Result<KT> result = new Result<>();
-      current.getBinding().bind(result::setSeats);
+      current.getBinding().bindLegacy(result::setSeats);
       if (winner != null) {
-        winner.getBinding().bind(result::setWinner);
+        winner.getBinding().bindLegacy(result::setWinner);
       }
       Binding<List<BarFrameBuilder.DualBar>> bars =
           Binding.propertyBinding(
@@ -887,7 +887,7 @@ public class BasicResultPanel extends JPanel {
         BindableList<Integer> lines = new BindableList<>();
         showMajority
             .getBinding()
-            .bind(
+            .bindLegacy(
                 show -> {
                   lines.clear();
                   if (show) {
@@ -896,7 +896,7 @@ public class BasicResultPanel extends JPanel {
                 });
         total
             .getBinding()
-            .bind(
+            .bindLegacy(
                 t -> {
                   if (!lines.isEmpty()) {
                     lines.set(0, t / 2 + 1);
@@ -1025,9 +1025,9 @@ public class BasicResultPanel extends JPanel {
 
     protected BarFrame createFrame() {
       Result<KT> result = new Result<>();
-      current.getBinding().bind(result::setSeats);
+      current.getBinding().bindLegacy(result::setSeats);
       if (winner != null) {
-        winner.getBinding().bind(result::setWinner);
+        winner.getBinding().bindLegacy(result::setWinner);
       }
       Binding<List<BarFrameBuilder.DualBar>> bars =
           Binding.propertyBinding(
@@ -1071,7 +1071,7 @@ public class BasicResultPanel extends JPanel {
         BindableList<Integer> lines = new BindableList<>();
         showMajority
             .getBinding()
-            .bind(
+            .bindLegacy(
                 show -> {
                   lines.clear();
                   if (show) {
@@ -1080,7 +1080,7 @@ public class BasicResultPanel extends JPanel {
                 });
         total
             .getBinding()
-            .bind(
+            .bindLegacy(
                 t -> {
                   if (!lines.isEmpty()) {
                     lines.set(0, t / 2 + 1);
@@ -1439,12 +1439,12 @@ public class BasicResultPanel extends JPanel {
     @Override
     protected BarFrame createFrame() {
       Result<KT> result = new Result<>();
-      current.getBinding().bind(result::setVotes);
+      current.getBinding().bindLegacy(result::setVotes);
       if (winner != null) {
-        winner.getBinding().bind(result::setWinner);
+        winner.getBinding().bindLegacy(result::setWinner);
       }
       if (runoff != null) {
-        runoff.getBinding().bind(result::setRunoff);
+        runoff.getBinding().bindLegacy(result::setRunoff);
       }
       Binding<List<BarFrameBuilder.BasicBar>> bars =
           Binding.propertyBinding(
@@ -1525,7 +1525,7 @@ public class BasicResultPanel extends JPanel {
         BindableList<Double> lines = new BindableList<>();
         showMajority
             .getBinding()
-            .bind(
+            .bindLegacy(
                 show -> {
                   lines.clear();
                   if (show) {
@@ -1536,7 +1536,7 @@ public class BasicResultPanel extends JPanel {
         if (pctReporting != null) {
           pctReporting
               .getBinding()
-              .bind(
+              .bindLegacy(
                   pct -> {
                     if (!lines.isEmpty()) {
                       lines.set(0, 0.5 / Math.max(1e-6, pct));
@@ -1545,7 +1545,7 @@ public class BasicResultPanel extends JPanel {
         }
         showMajority
             .getBinding()
-            .bind(
+            .bindLegacy(
                 label -> {
                   if (!lines.isEmpty()) {
                     lines.setAll(lines);
@@ -1582,9 +1582,9 @@ public class BasicResultPanel extends JPanel {
         return null;
       }
       Result<KT> result = new Result<>();
-      currPreferences.getBinding().bind(result::setVotes);
+      currPreferences.getBinding().bindLegacy(result::setVotes);
       if (winner != null) {
-        winner.getBinding().bind(result::setWinner);
+        winner.getBinding().bindLegacy(result::setWinner);
       }
       Binding<List<BarFrameBuilder.BasicBar>> bars =
           Binding.propertyBinding(
@@ -1689,8 +1689,8 @@ public class BasicResultPanel extends JPanel {
       }
 
       Change<KT> change = new Change<>();
-      current.getBinding().bind(change::setCurrVotes);
-      prev.getBinding().bind(change::setPrevVotes);
+      current.getBinding().bindLegacy(change::setCurrVotes);
+      prev.getBinding().bindLegacy(change::setPrevVotes);
       Binding<List<BarFrameBuilder.BasicBar>> bars =
           Binding.propertyBinding(
               change,
@@ -1872,7 +1872,7 @@ public class BasicResultPanel extends JPanel {
         BindableList<Double> lines = new BindableList<>();
         showMajority
             .getBinding()
-            .bind(
+            .bindLegacy(
                 show -> {
                   lines.clear();
                   if (show) {
@@ -1881,7 +1881,7 @@ public class BasicResultPanel extends JPanel {
                 });
         showMajority
             .getBinding()
-            .bind(
+            .bindLegacy(
                 label -> {
                   if (!lines.isEmpty()) {
                     lines.setAll(lines);
@@ -1919,8 +1919,8 @@ public class BasicResultPanel extends JPanel {
       }
 
       RangeVoteScreenBuilder.Change<KT> change = new RangeVoteScreenBuilder.Change<>();
-      current.getBinding().bind(change::setCurrVotes);
-      prev.getBinding().bind(change::setPrevVotes);
+      current.getBinding().bindLegacy(change::setCurrVotes);
+      prev.getBinding().bindLegacy(change::setPrevVotes);
       Binding<List<BarFrameBuilder.DualBar>> bars =
           Binding.propertyBinding(
               change,

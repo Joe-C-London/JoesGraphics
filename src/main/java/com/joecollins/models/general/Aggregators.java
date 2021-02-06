@@ -19,8 +19,11 @@ import java.util.function.Predicate;
 import java.util.function.ToDoubleFunction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import kotlin.Unit;
+import kotlin.jvm.functions.Function1;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.jetbrains.annotations.NotNull;
 
 public class Aggregators {
 
@@ -254,7 +257,12 @@ public class Aggregators {
       }
 
       @Override
-      public void bind(Consumer<Map<K, V>> onUpdate) {
+      public void bind(@NotNull Function1<? super Map<K, V>, Unit> onUpdate) {
+        bindLegacy((Consumer<Map<K, V>>) onUpdate::invoke);
+      }
+
+      @Override
+      public void bindLegacy(Consumer<Map<K, V>> onUpdate) {
         if (bindings != null) {
           throw new IllegalStateException("Binding is already used");
         }
@@ -264,7 +272,7 @@ public class Aggregators {
           K key = keyFunc.apply(entry);
           Binding<V> binding = bindingFunc.apply(entry);
           bindingsMap.put(key, binding);
-          binding.bind(
+          binding.bindLegacy(
               val -> {
                 value.put(key, val);
                 if (bindings != null) {

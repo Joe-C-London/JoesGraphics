@@ -58,7 +58,7 @@ public class LowerThird extends JPanel {
   public void setLeftImageBinding(Binding<Image> leftImageBinding) {
     this.leftImageBinding.unbind();
     this.leftImageBinding = leftImageBinding;
-    this.leftImageBinding.bind(leftPanel::setImage);
+    this.leftImageBinding.bindLegacy(leftPanel::setImage);
   }
 
   String getPlace() {
@@ -68,7 +68,7 @@ public class LowerThird extends JPanel {
   public void setPlaceBinding(Binding<String> placeBinding) {
     this.placeBinding.unbind();
     this.placeBinding = placeBinding;
-    this.placeBinding.bind(rightPanel::setPlace);
+    this.placeBinding.bindLegacy(rightPanel::setPlace);
   }
 
   String getTime() {
@@ -78,7 +78,7 @@ public class LowerThird extends JPanel {
   public void setTimeZoneBinding(Binding<ZoneId> timezoneBinding) {
     this.timezoneBinding.unbind();
     this.timezoneBinding = timezoneBinding;
-    this.timezoneBinding.bind(rightPanel::setTimezone);
+    this.timezoneBinding.bindLegacy(rightPanel::setTimezone);
   }
 
   void setClock(Clock clock) {

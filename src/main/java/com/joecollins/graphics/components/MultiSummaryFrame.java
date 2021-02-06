@@ -45,7 +45,7 @@ public class MultiSummaryFrame extends GraphicsFrame {
   public void setNumRowsBinding(Binding<Integer> numRowsBinding) {
     this.numRowsBinding.unbind();
     this.numRowsBinding = numRowsBinding;
-    this.numRowsBinding.bind(
+    this.numRowsBinding.bindLegacy(
         size -> {
           while (entries.size() < size) {
             EntryPanel entryPanel = new EntryPanel();

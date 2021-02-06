@@ -107,7 +107,7 @@ public class BarFrame extends GraphicsFrame {
   public void setSubheadTextBinding(Binding<String> subheadTextBinding) {
     this.subheadTextBinding.unbind();
     this.subheadTextBinding = subheadTextBinding;
-    this.subheadTextBinding.bind(
+    this.subheadTextBinding.bindLegacy(
         subheadText -> {
           subheadLabel.setVisible(subheadText != null);
           if (subheadText != null) {
@@ -123,7 +123,7 @@ public class BarFrame extends GraphicsFrame {
   public void setSubheadColorBinding(Binding<Color> subheadColorBinding) {
     this.subheadColorBinding.unbind();
     this.subheadColorBinding = subheadColorBinding;
-    this.subheadColorBinding.bind(subheadLabel::setForeground);
+    this.subheadColorBinding.bindLegacy(subheadLabel::setForeground);
   }
 
   int getNumBars() {
@@ -133,7 +133,7 @@ public class BarFrame extends GraphicsFrame {
   public void setNumBarsBinding(Binding<Integer> numBarsBinding) {
     this.numBarsBinding.unbind();
     this.numBarsBinding = numBarsBinding;
-    this.numBarsBinding.bind(
+    this.numBarsBinding.bindLegacy(
         numBars -> {
           while (bars.size() < numBars) {
             Bar bar = new Bar();
@@ -226,7 +226,7 @@ public class BarFrame extends GraphicsFrame {
     usingDefaultMin = false;
     this.minBinding.unbind();
     this.minBinding = minBinding;
-    this.minBinding.bind(
+    this.minBinding.bindLegacy(
         min -> {
           this.min = min;
           repaint();
@@ -241,7 +241,7 @@ public class BarFrame extends GraphicsFrame {
     usingDefaultMax = false;
     this.maxBinding.unbind();
     this.maxBinding = maxBinding;
-    this.maxBinding.bind(
+    this.maxBinding.bindLegacy(
         max -> {
           this.max = max;
           repaint();
@@ -265,7 +265,7 @@ public class BarFrame extends GraphicsFrame {
   public void setNumLinesBinding(Binding<Integer> numLinesBinding) {
     this.numLinesBinding.unbind();
     this.numLinesBinding = numLinesBinding;
-    this.numLinesBinding.bind(
+    this.numLinesBinding.bindLegacy(
         size -> {
           while (size > lines.size()) {
             Line line = new Line();

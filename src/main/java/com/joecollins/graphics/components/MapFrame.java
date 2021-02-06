@@ -171,7 +171,7 @@ public class MapFrame extends GraphicsFrame {
   public void setNumShapesBinding(Binding<Integer> numShapesBinding) {
     this.numShapesBinding.unbind();
     this.numShapesBinding = numShapesBinding;
-    this.numShapesBinding.bind(
+    this.numShapesBinding.bindLegacy(
         size -> {
           while (size > shapesToDraw.size()) {
             shapesToDraw.add(new MutablePair<>(new Area(), Color.BLACK));
@@ -229,7 +229,7 @@ public class MapFrame extends GraphicsFrame {
   public void setFocusBoxBinding(Binding<Rectangle2D> focusBinding) {
     this.focusBinding.unbind();
     this.focusBinding = focusBinding;
-    this.focusBinding.bind(
+    this.focusBinding.bindLegacy(
         focus -> {
           this.focus = focus;
           transformedShapesCache.clear();
@@ -244,7 +244,7 @@ public class MapFrame extends GraphicsFrame {
   public void setNumOutlineShapesBinding(Binding<Integer> numOutlineShapesBinding) {
     this.numOutlineShapesBinding.unbind();
     this.numOutlineShapesBinding = numOutlineShapesBinding;
-    this.numOutlineShapesBinding.bind(
+    this.numOutlineShapesBinding.bindLegacy(
         size -> {
           while (size > outlineShapes.size()) {
             outlineShapes.add(new Area());

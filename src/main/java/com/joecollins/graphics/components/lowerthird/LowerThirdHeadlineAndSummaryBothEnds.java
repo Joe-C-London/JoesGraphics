@@ -30,7 +30,7 @@ public class LowerThirdHeadlineAndSummaryBothEnds extends LowerThird {
   public void setHeadlineBinding(Binding<String> headlineBinding) {
     this.headlineBinding.unbind();
     this.headlineBinding = headlineBinding;
-    this.headlineBinding.bind(headlinePanel::setHeadline);
+    this.headlineBinding.bindLegacy(headlinePanel::setHeadline);
   }
 
   String getSubhead() {
@@ -40,7 +40,7 @@ public class LowerThirdHeadlineAndSummaryBothEnds extends LowerThird {
   public void setSubheadBinding(Binding<String> subheadBinding) {
     this.subheadBinding.unbind();
     this.subheadBinding = subheadBinding;
-    this.subheadBinding.bind(headlinePanel::setSubhead);
+    this.subheadBinding.bindLegacy(headlinePanel::setSubhead);
   }
 
   String getSummaryHeader() {

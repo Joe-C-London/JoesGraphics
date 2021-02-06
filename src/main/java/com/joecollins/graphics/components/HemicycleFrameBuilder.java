@@ -415,7 +415,7 @@ public class HemicycleFrameBuilder {
     BindingReceiver<ImmutablePair<Integer, Integer>> seats = new BindingReceiver<>(binding);
     seats
         .getBinding()
-        .bind(
+        .bindLegacy(
             p -> {
               list.setAll(
                   List.of(
@@ -470,7 +470,7 @@ public class HemicycleFrameBuilder {
     BindingReceiver<ImmutablePair<Integer, Integer>> seats = new BindingReceiver<>(binding);
     seats
         .getBinding()
-        .bind(
+        .bindLegacy(
             p -> {
               if (showChangeBars.test(p.left, p.right)) {
                 list.setAll(

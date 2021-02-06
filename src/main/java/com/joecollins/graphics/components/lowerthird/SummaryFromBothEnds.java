@@ -44,7 +44,7 @@ public class SummaryFromBothEnds extends JPanel {
   public void setHeadlineBinding(Binding<String> headlineBinding) {
     this.headlineBinding.unbind();
     this.headlineBinding = headlineBinding;
-    this.headlineBinding.bind(this.headlinePanel.topLabel::setText);
+    this.headlineBinding.bindLegacy(this.headlinePanel.topLabel::setText);
   }
 
   public int getTotal() {
@@ -54,7 +54,7 @@ public class SummaryFromBothEnds extends JPanel {
   public void setTotalBinding(Binding<Integer> totalBinding) {
     this.totalBinding.unbind();
     this.totalBinding = totalBinding;
-    this.totalBinding.bind(entryPanel::setTotal);
+    this.totalBinding.bindLegacy(entryPanel::setTotal);
   }
 
   public Entry getLeft() {
@@ -64,7 +64,7 @@ public class SummaryFromBothEnds extends JPanel {
   public void setLeftBinding(Binding<Entry> leftBinding) {
     this.leftBinding.unbind();
     this.leftBinding = leftBinding;
-    this.leftBinding.bind(entryPanel::setLeft);
+    this.leftBinding.bindLegacy(entryPanel::setLeft);
   }
 
   public Entry getRight() {
@@ -74,7 +74,7 @@ public class SummaryFromBothEnds extends JPanel {
   public void setRightBinding(Binding<Entry> rightBinding) {
     this.rightBinding.unbind();
     this.rightBinding = rightBinding;
-    this.rightBinding.bind(entryPanel::setRight);
+    this.rightBinding.bindLegacy(entryPanel::setRight);
   }
 
   public Entry getMiddle() {
@@ -84,7 +84,7 @@ public class SummaryFromBothEnds extends JPanel {
   public void setMiddleBinding(Binding<Entry> middleBinding) {
     this.middleBinding.unbind();
     this.middleBinding = middleBinding;
-    this.middleBinding.bind(entryPanel::setMiddle);
+    this.middleBinding.bindLegacy(entryPanel::setMiddle);
   }
 
   private class HeadlinePanel extends JPanel {

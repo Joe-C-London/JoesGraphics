@@ -134,7 +134,7 @@ public class TooCloseToCallScreen extends JPanel {
               Property.PCT_REPORTING,
               Property.MAX_ROWS,
               Property.NUM_CANDIDATES)
-          .bind(entries::setAll);
+          .bindLegacy(entries::setAll);
       return entries;
     }
   }
@@ -213,23 +213,23 @@ public class TooCloseToCallScreen extends JPanel {
       headerLabel.setFont(StandardFont.readBoldFont(32));
       headerLabel.setHorizontalAlignment(JLabel.CENTER);
       headerLabel.setBorder(new EmptyBorder(5, 0, -5, 0));
-      titleBinding.bind(headerLabel::setText);
+      titleBinding.bindLegacy(headerLabel::setText);
 
       return new TooCloseToCallScreen(headerLabel, createFrame());
     }
 
     private MultiSummaryFrame createFrame() {
       Input<T> input = new Input<>();
-      votes.getBinding().bind(input::setVotes);
-      results.getBinding().bind(input::setResults);
+      votes.getBinding().bindLegacy(input::setVotes);
+      results.getBinding().bindLegacy(input::setResults);
       if (pctReporting != null) {
-        pctReporting.getBinding().bind(input::setPctReporting);
+        pctReporting.getBinding().bindLegacy(input::setPctReporting);
       }
       if (rowsLimit != null) {
-        rowsLimit.getBinding().bind(input::setMaxRows);
+        rowsLimit.getBinding().bindLegacy(input::setMaxRows);
       }
       if (numCandidates != null) {
-        numCandidates.getBinding().bind(input::setNumCandidates);
+        numCandidates.getBinding().bindLegacy(input::setNumCandidates);
       }
       BindableList<Entry<T>> entries = input.toEntries();
 

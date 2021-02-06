@@ -94,7 +94,7 @@ public class HeatMapFrame extends GraphicsFrame {
   public void setNumRowsBinding(Binding<Integer> numRowsBinding) {
     this.numRowsBinding.unbind();
     this.numRowsBinding = numRowsBinding;
-    this.numRowsBinding.bind(squaresPanel::setNumRows);
+    this.numRowsBinding.bindLegacy(squaresPanel::setNumRows);
   }
 
   int getNumSquares() {
@@ -104,7 +104,7 @@ public class HeatMapFrame extends GraphicsFrame {
   public void setNumSquaresBinding(Binding<Integer> numSquaresBinding) {
     this.numSquaresBinding.unbind();
     this.numSquaresBinding = numSquaresBinding;
-    this.numSquaresBinding.bind(squaresPanel::setNumSquares);
+    this.numSquaresBinding.bindLegacy(squaresPanel::setNumSquares);
   }
 
   Color getSquareBorder(int index) {
@@ -134,7 +134,7 @@ public class HeatMapFrame extends GraphicsFrame {
   public void setNumSeatBarsBinding(Binding<Integer> numSeatBarsBinding) {
     this.numSeatBarsBinding.unbind();
     this.numSeatBarsBinding = numSeatBarsBinding;
-    this.numSeatBarsBinding.bind(barsPanel::setNumSeatBars);
+    this.numSeatBarsBinding.bindLegacy(barsPanel::setNumSeatBars);
   }
 
   Color getSeatBarColor(int index) {
@@ -164,7 +164,7 @@ public class HeatMapFrame extends GraphicsFrame {
   public void setSeatBarLabelBinding(Binding<String> seatBarLabelBinding) {
     this.seatBarLabelBinding.unbind();
     this.seatBarLabelBinding = seatBarLabelBinding;
-    this.seatBarLabelBinding.bind(barsPanel::setSeatBarLabel);
+    this.seatBarLabelBinding.bindLegacy(barsPanel::setSeatBarLabel);
   }
 
   int getChangeBarCount() {
@@ -174,7 +174,7 @@ public class HeatMapFrame extends GraphicsFrame {
   public void setNumChangeBarsBinding(Binding<Integer> numChangeBarsBinding) {
     this.numChangeBarsBinding.unbind();
     this.numChangeBarsBinding = numChangeBarsBinding;
-    this.numChangeBarsBinding.bind(barsPanel::setNumChangeBars);
+    this.numChangeBarsBinding.bindLegacy(barsPanel::setNumChangeBars);
   }
 
   Color getChangeBarColor(int index) {
@@ -204,7 +204,7 @@ public class HeatMapFrame extends GraphicsFrame {
   public void setChangeBarLabelBinding(Binding<String> changeBarLabelBinding) {
     this.changeBarLabelBinding.unbind();
     this.changeBarLabelBinding = changeBarLabelBinding;
-    this.changeBarLabelBinding.bind(barsPanel::setChangeBarLabel);
+    this.changeBarLabelBinding.bindLegacy(barsPanel::setChangeBarLabel);
   }
 
   int getChangeBarStart() {
@@ -214,7 +214,7 @@ public class HeatMapFrame extends GraphicsFrame {
   public void setChangeBarStartBinding(Binding<Integer> changeBarStartBinding) {
     this.changeBarStartBinding.unbind();
     this.changeBarStartBinding = changeBarStartBinding;
-    this.changeBarStartBinding.bind(barsPanel::setChangeBarStart);
+    this.changeBarStartBinding.bindLegacy(barsPanel::setChangeBarStart);
   }
 
   private class SeatBarPanel extends JPanel {

@@ -44,7 +44,7 @@ public class ListingFrameBuilder {
       Function<T, String> rightTextFunc,
       Function<T, Color> colorFunc) {
     BindableList<T> bindableList = new BindableList<>();
-    list.bind(bindableList::setAll);
+    list.bindLegacy(bindableList::setAll);
     ListingFrameBuilder ret = of(bindableList, leftTextFunc, rightTextFunc, colorFunc);
     ret.bindings.add(list);
     return ret;

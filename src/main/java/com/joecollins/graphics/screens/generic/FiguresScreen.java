@@ -55,8 +55,8 @@ public class FiguresScreen extends JPanel {
     public Section withCandidate(
         Candidate candidate, String description, Binding<Party> leader, Binding<String> status) {
       Entry entry = new Entry(candidate, description);
-      leader.bind(entry::setLeader);
-      status.bind(entry::setStatus);
+      leader.bindLegacy(entry::setLeader);
+      status.bindLegacy(entry::setStatus);
       entries.add(entry);
       return this;
     }
@@ -124,7 +124,7 @@ public class FiguresScreen extends JPanel {
       headerLabel.setFont(StandardFont.readBoldFont(32));
       headerLabel.setHorizontalAlignment(JLabel.CENTER);
       headerLabel.setBorder(new EmptyBorder(5, 0, -5, 0));
-      titleBinding.bind(headerLabel::setText);
+      titleBinding.bindLegacy(headerLabel::setText);
 
       var frames = sections.stream().map(Section::createFrame).toArray(FiguresFrame[]::new);
       return new FiguresScreen(headerLabel, frames);

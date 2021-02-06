@@ -7,6 +7,7 @@ import com.joecollins.graphics.utils.BindableWrapper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -24,7 +25,7 @@ public class AggregatorsTest {
   public void testKeyChange() {
     BindableWrapper<Map<String, Integer>> input = new BindableWrapper<>(Map.of("ABC", 5, "DEF", 7));
     Mutable<Map<String, Integer>> output = new MutableObject<>();
-    Aggregators.adjustKey(input.getBinding(), k -> k.substring(0, 1)).bind(output::setValue);
+    Aggregators.adjustKey(input.getBinding(), k -> k.substring(0, 1)).bindLegacy(output::setValue);
     assertEquals(Map.of("A", 5, "D", 7), output.getValue());
 
     input.setValue(Map.of("ABC", 10, "DEF", 9, "GHI", 1));
@@ -35,7 +36,7 @@ public class AggregatorsTest {
   public void testKeyChangeWithMerge() {
     BindableWrapper<Map<String, Integer>> input = new BindableWrapper<>(Map.of("ABC", 5, "AZY", 7));
     Mutable<Map<String, Integer>> output = new MutableObject<>();
-    Aggregators.adjustKey(input.getBinding(), k -> k.substring(0, 1)).bind(output::setValue);
+    Aggregators.adjustKey(input.getBinding(), k -> k.substring(0, 1)).bindLegacy(output::setValue);
     assertEquals(Map.of("A", 12), output.getValue());
 
     input.setValue(Map.of("ABC", 10, "DEF", 6, "DCB", 2));
@@ -48,7 +49,7 @@ public class AggregatorsTest {
     inputs.add(new BindableWrapper<>(Map.of("ABC", 8, "DEF", 6)));
     inputs.add(new BindableWrapper<>(Map.of("ABC", 7, "GHI", 3)));
     Mutable<Map<String, Integer>> output = new MutableObject<>();
-    Aggregators.combine(inputs, BindableWrapper::getBinding).bind(output::setValue);
+    Aggregators.combine(inputs, BindableWrapper::getBinding).bindLegacy(output::setValue);
     assertEquals(Map.of("ABC", 15, "DEF", 6, "GHI", 3), output.getValue());
 
     inputs.get(0).setValue(Map.of("ABC", 12, "DEF", 7));
@@ -71,7 +72,7 @@ public class AggregatorsTest {
     inputs.add(new BindableWrapper<>(Map.of("ABC", 8, "DEF", 6)));
     inputs.add(new BindableWrapper<>(Map.of("ABC", 7, "GHI", 3)));
     Mutable<Map<String, Integer>> output = new MutableObject<>();
-    Aggregators.combine(inputs, BindableWrapper::getBinding, seed).bind(output::setValue);
+    Aggregators.combine(inputs, BindableWrapper::getBinding, seed).bindLegacy(output::setValue);
     assertEquals(Map.of("ABC", 15, "DEF", 6, "GHI", 3), output.getValue());
 
     inputs.get(0).setValue(Map.of("ABC", 12, "DEF", 7));
@@ -97,7 +98,7 @@ public class AggregatorsTest {
         new BindableWrapper<>(
             Map.of("ABC", ImmutablePair.of(2, 7), "GHI", ImmutablePair.of(0, 3))));
     Mutable<Map<String, Pair<Integer, Integer>>> output = new MutableObject<>();
-    Aggregators.combineDual(inputs, BindableWrapper::getBinding).bind(output::setValue);
+    Aggregators.combineDual(inputs, BindableWrapper::getBinding).bindLegacy(output::setValue);
     assertEquals(
         Map.of(
             "ABC",
@@ -144,7 +145,7 @@ public class AggregatorsTest {
         new BindableWrapper<>(
             Map.of("ABC", ImmutablePair.of(2, 7), "GHI", ImmutablePair.of(0, 3))));
     Mutable<Map<String, Pair<Integer, Integer>>> output = new MutableObject<>();
-    Aggregators.combineDual(inputs, BindableWrapper::getBinding, seed).bind(output::setValue);
+    Aggregators.combineDual(inputs, BindableWrapper::getBinding, seed).bindLegacy(output::setValue);
     assertEquals(
         Map.of(
             "ABC",
@@ -193,7 +194,7 @@ public class AggregatorsTest {
         Stream.of(inputs1, inputs2)
             .map(inputs -> Aggregators.combine(inputs, BindableWrapper::getBinding))
             .collect(Collectors.toList());
-    Aggregators.combine(combined, Function.identity()).bind(output::setValue);
+    Aggregators.combine(combined, Function.identity()).bindLegacy(output::setValue);
     assertEquals(Map.of("ABC", 30, "DEF", 12, "GHI", 6), output.getValue());
 
     inputs1.get(0).setValue(Map.of("ABC", 9, "DEF", 5));
@@ -222,7 +223,7 @@ public class AggregatorsTest {
         Stream.of(inputs1, inputs2)
             .map(inputs -> Aggregators.combineDual(inputs, BindableWrapper::getBinding))
             .collect(Collectors.toList());
-    Aggregators.combineDual(combined, Function.identity()).bind(output::setValue);
+    Aggregators.combineDual(combined, Function.identity()).bindLegacy(output::setValue);
     assertEquals(
         Map.of(
             "ABC",
@@ -252,7 +253,7 @@ public class AggregatorsTest {
     BindableWrapper<Double> pctReporting = new BindableWrapper<>(0.01);
     Mutable<Map<String, Integer>> output = new MutableObject<>();
     Aggregators.adjustForPctReporting(votes.getBinding(), pctReporting.getBinding())
-        .bind(output::setValue);
+        .bindLegacy(output::setValue);
     assertEquals(Map.of("ABC", 5, "DEF", 3), output.getValue());
 
     pctReporting.setValue(0.10);
@@ -268,7 +269,8 @@ public class AggregatorsTest {
     inputs.add(new BindableWrapper<>(0.5));
     inputs.add(new BindableWrapper<>(0.3));
     MutableDouble output = new MutableDouble();
-    Aggregators.combinePctReporting(inputs, BindableWrapper::getBinding).bind(output::setValue);
+    Aggregators.combinePctReporting(inputs, BindableWrapper::getBinding)
+        .bindLegacy((Consumer<Double>) output::setValue);
     assertEquals(0.4, output.getValue(), 1e-6);
 
     inputs.get(0).setValue(0.6);
@@ -285,7 +287,7 @@ public class AggregatorsTest {
     inputs.add(ImmutablePair.of(new BindableWrapper<>(0.3), 3.0));
     MutableDouble output = new MutableDouble();
     Aggregators.combinePctReporting(inputs, e -> e.getLeft().getBinding(), e -> e.getRight())
-        .bind(output::setValue);
+        .bindLegacy((Consumer<Double>) output::setValue);
     assertEquals(0.38, output.getValue(), 1e-6);
 
     inputs.get(0).getLeft().setValue(0.6);
@@ -299,7 +301,7 @@ public class AggregatorsTest {
   public void testTopAndOthersBelowLimit() {
     BindableWrapper<Map<String, Integer>> votes = new BindableWrapper<>(Map.of("ABC", 5, "DEF", 3));
     Mutable<Map<String, Integer>> output = new MutableObject<>();
-    Aggregators.topAndOthers(votes.getBinding(), 3, "OTHERS").bind(output::setValue);
+    Aggregators.topAndOthers(votes.getBinding(), 3, "OTHERS").bindLegacy(output::setValue);
     assertEquals(Map.of("ABC", 5, "DEF", 3), output.getValue());
 
     votes.setValue(Map.of("ABC", 5, "DEF", 7));
@@ -311,7 +313,7 @@ public class AggregatorsTest {
     BindableWrapper<Map<String, Integer>> votes =
         new BindableWrapper<>(Map.of("ABC", 5, "DEF", 3, "GHI", 2));
     Mutable<Map<String, Integer>> output = new MutableObject<>();
-    Aggregators.topAndOthers(votes.getBinding(), 3, "OTHERS").bind(output::setValue);
+    Aggregators.topAndOthers(votes.getBinding(), 3, "OTHERS").bindLegacy(output::setValue);
     assertEquals(Map.of("ABC", 5, "DEF", 3, "GHI", 2), output.getValue());
 
     votes.setValue(Map.of("ABC", 5, "DEF", 7, "GHI", 6));
@@ -323,7 +325,7 @@ public class AggregatorsTest {
     BindableWrapper<Map<String, Integer>> votes =
         new BindableWrapper<>(Map.of("ABC", 5, "DEF", 3, "GHI", 2, "JKL", 4));
     Mutable<Map<String, Integer>> output = new MutableObject<>();
-    Aggregators.topAndOthers(votes.getBinding(), 3, "OTHERS").bind(output::setValue);
+    Aggregators.topAndOthers(votes.getBinding(), 3, "OTHERS").bindLegacy(output::setValue);
     assertEquals(Map.of("ABC", 5, "JKL", 4, "OTHERS", 5), output.getValue());
 
     votes.setValue(Map.of("ABC", 5, "DEF", 7, "GHI", 6, "JKL", 4));
@@ -338,7 +340,7 @@ public class AggregatorsTest {
     Mutable<Map<String, Integer>> output = new MutableObject<>();
     Aggregators.topAndOthers(
             votes.getBinding(), 3, "OTHERS", winner.getBinding().map(w -> new String[] {w}))
-        .bind(output::setValue);
+        .bindLegacy(output::setValue);
     assertEquals(Map.of("ABC", 5, "JKL", 4, "OTHERS", 5), output.getValue());
 
     votes.setValue(Map.of("ABC", 5, "DEF", 7, "GHI", 6, "JKL", 4));
@@ -358,7 +360,7 @@ public class AggregatorsTest {
         Map.of("ABC", new BindableWrapper<>(1), "DEF", new BindableWrapper<>(2));
     Mutable<Map<String, Integer>> output = new MutableObject<>();
     var outputBinding = Aggregators.toMap(inputs.keySet(), k -> inputs.get(k).getBinding());
-    outputBinding.bind(output::setValue);
+    outputBinding.bindLegacy(output::setValue);
     assertEquals(Map.of("ABC", 1, "DEF", 2), output.getValue());
 
     inputs.get("ABC").setValue(7);
@@ -376,7 +378,7 @@ public class AggregatorsTest {
     Mutable<Map<String, Integer>> output = new MutableObject<>();
     var outputBinding =
         Aggregators.toMap(inputs.keySet(), String::toUpperCase, k -> inputs.get(k).getBinding());
-    outputBinding.bind(output::setValue);
+    outputBinding.bindLegacy(output::setValue);
     assertEquals(Map.of("ABC", 1, "DEF", 2), output.getValue());
 
     inputs.get("abc").setValue(7);
@@ -393,7 +395,7 @@ public class AggregatorsTest {
         new BindableWrapper<>(Map.of("ABC", 5, "DEF", 3, "GHI", 2, "JKL", 4));
     Mutable<Map<String, Double>> output = new MutableObject<>();
     var outputBinding = Aggregators.toPct(votes.getBinding());
-    outputBinding.bind(output::setValue);
+    outputBinding.bindLegacy(output::setValue);
     assertEquals(
         Map.of("ABC", 5.0 / 14, "DEF", 3.0 / 14, "GHI", 2.0 / 14, "JKL", 4.0 / 14),
         output.getValue());
@@ -412,7 +414,8 @@ public class AggregatorsTest {
     List<BindableWrapper<Integer>> inputs =
         List.of(new BindableWrapper<>(1), new BindableWrapper<>(2), new BindableWrapper<>(3));
     MutableInt output = new MutableInt();
-    Aggregators.sum(inputs, BindableWrapper::getBinding).bind(output::setValue);
+    Aggregators.sum(inputs, BindableWrapper::getBinding)
+        .bindLegacy((Consumer<Integer>) output::setValue);
     assertEquals(6, output.getValue().intValue());
 
     inputs.get(1).setValue(7);

@@ -267,8 +267,8 @@ public class MixedMemberResultPanel extends JPanel {
                   : ImageGenerator.createTickShape());
 
       Result result = new Result();
-      candidateVotes.getBinding().bind(result::setVotes);
-      winnerBinding.bind(result::setWinner);
+      candidateVotes.getBinding().bindLegacy(result::setVotes);
+      winnerBinding.bindLegacy(result::setWinner);
       Binding<List<BarFrameBuilder.BasicBar>> bars =
           Binding.propertyBinding(
               result,
@@ -364,8 +364,8 @@ public class MixedMemberResultPanel extends JPanel {
       }
 
       Change<Candidate> change = new Change<>();
-      candidateVotes.getBinding().bind(change::setCurr);
-      candidatePrev.getBinding().bind(change::setPrev);
+      candidateVotes.getBinding().bindLegacy(change::setCurr);
+      candidatePrev.getBinding().bindLegacy(change::setPrev);
       Binding<List<BarFrameBuilder.BasicBar>> bars =
           Binding.propertyBinding(
               change,
@@ -480,8 +480,8 @@ public class MixedMemberResultPanel extends JPanel {
       }
 
       Change<Party> change = new Change<>();
-      partyVotes.getBinding().bind(change::setCurr);
-      partyPrev.getBinding().bind(change::setPrev);
+      partyVotes.getBinding().bindLegacy(change::setCurr);
+      partyPrev.getBinding().bindLegacy(change::setPrev);
       Binding<List<BarFrameBuilder.BasicBar>> bars =
           Binding.propertyBinding(
               change,
@@ -555,7 +555,7 @@ public class MixedMemberResultPanel extends JPanel {
     headerLabel.setFont(StandardFont.readBoldFont(32));
     headerLabel.setHorizontalAlignment(JLabel.CENTER);
     headerLabel.setBorder(new EmptyBorder(5, 0, -5, 0));
-    textBinding.bind(headerLabel::setText);
+    textBinding.bindLegacy(headerLabel::setText);
     return headerLabel;
   }
 }

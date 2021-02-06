@@ -48,7 +48,7 @@ public class RegionSummaryFrame extends GraphicsFrame {
   public void setNumSectionsBinding(Binding<Integer> numSectionsBinding) {
     this.numSectionsBinding.unbind();
     this.numSectionsBinding = numSectionsBinding;
-    this.numSectionsBinding.bind(
+    this.numSectionsBinding.bindLegacy(
         numSections -> {
           while (sections.size() < numSections) {
             SectionPanel newPanel = new SectionPanel();
@@ -68,7 +68,7 @@ public class RegionSummaryFrame extends GraphicsFrame {
   public void setSummaryColorBinding(Binding<Color> summaryColorBinding) {
     this.summaryColorBinding.unbind();
     this.summaryColorBinding = summaryColorBinding;
-    this.summaryColorBinding.bind(
+    this.summaryColorBinding.bindLegacy(
         color -> {
           summaryColor = color;
           sections.forEach(

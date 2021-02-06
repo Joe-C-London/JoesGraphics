@@ -271,7 +271,7 @@ public interface IndexedBinding<T> {
       public void bind(BiConsumer<Integer, U> onUpdate) {
         for (int i = 0; i < bindings.size(); i++) {
           int index = i;
-          bindings.get(index).bind(val -> onUpdate.accept(index, val));
+          bindings.get(index).bindLegacy(val -> onUpdate.accept(index, val));
         }
       }
 

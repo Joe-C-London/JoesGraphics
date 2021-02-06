@@ -395,7 +395,7 @@ public class BarFrameBuilder {
   }
 
   private <T> void bind(Binding<T> binding, Consumer<T> onUpdate) {
-    binding.bind(onUpdate);
+    binding.bindLegacy(onUpdate);
     bindings.add(binding);
   }
 

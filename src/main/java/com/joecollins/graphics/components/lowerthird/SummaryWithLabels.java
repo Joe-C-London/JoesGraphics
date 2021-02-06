@@ -47,7 +47,7 @@ public class SummaryWithLabels extends JPanel {
   public void setNumEntriesBinding(Binding<Integer> numEntriesBinding) {
     this.numEntriesBinding.unbind();
     this.numEntriesBinding = numEntriesBinding;
-    this.numEntriesBinding.bind(
+    this.numEntriesBinding.bindLegacy(
         size -> {
           while (entryPanels.size() < size) {
             EntryPanel newPanel = new EntryPanel();

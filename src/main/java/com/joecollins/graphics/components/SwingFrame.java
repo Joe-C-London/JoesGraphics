@@ -46,7 +46,7 @@ public class SwingFrame extends GraphicsFrame {
   public void setRangeBinding(Binding<? extends Number> rangeBinding) {
     this.rangeBinding.unbind();
     this.rangeBinding = rangeBinding;
-    this.rangeBinding.bind(swingPanel::setRange);
+    this.rangeBinding.bindLegacy(swingPanel::setRange);
   }
 
   Number getValue() {
@@ -56,7 +56,7 @@ public class SwingFrame extends GraphicsFrame {
   public void setValueBinding(Binding<? extends Number> valueBinding) {
     this.valueBinding.unbind();
     this.valueBinding = valueBinding;
-    this.valueBinding.bind(swingPanel::setValue);
+    this.valueBinding.bindLegacy(swingPanel::setValue);
   }
 
   Color getLeftColor() {
@@ -66,7 +66,7 @@ public class SwingFrame extends GraphicsFrame {
   public void setLeftColorBinding(Binding<Color> leftColorBinding) {
     this.leftColorBinding.unbind();
     this.leftColorBinding = leftColorBinding;
-    this.leftColorBinding.bind(swingPanel::setLeftColor);
+    this.leftColorBinding.bindLegacy(swingPanel::setLeftColor);
   }
 
   Color getRightColor() {
@@ -76,7 +76,7 @@ public class SwingFrame extends GraphicsFrame {
   public void setRightColorBinding(Binding<Color> rightColorBinding) {
     this.rightColorBinding.unbind();
     this.rightColorBinding = rightColorBinding;
-    this.rightColorBinding.bind(swingPanel::setRightColor);
+    this.rightColorBinding.bindLegacy(swingPanel::setRightColor);
   }
 
   String getBottomText() {
@@ -86,7 +86,7 @@ public class SwingFrame extends GraphicsFrame {
   public void setBottomTextBinding(Binding<String> bottomTextBinding) {
     this.bottomTextBinding.unbind();
     this.bottomTextBinding = bottomTextBinding;
-    this.bottomTextBinding.bind(
+    this.bottomTextBinding.bindLegacy(
         bottomText -> {
           bottomLabel.setVisible(bottomText != null);
           if (bottomText != null) {
@@ -102,7 +102,7 @@ public class SwingFrame extends GraphicsFrame {
   public void setBottomColorBinding(Binding<Color> bottomColorBinding) {
     this.bottomColorBinding.unbind();
     this.bottomColorBinding = bottomColorBinding;
-    this.bottomColorBinding.bind(bottomLabel::setForeground);
+    this.bottomColorBinding.bindLegacy(bottomLabel::setForeground);
   }
 
   private class SwingPanel extends JPanel {

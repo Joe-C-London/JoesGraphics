@@ -81,11 +81,12 @@ public class SwingFrameBuilder {
     return prevCurr(prevBinding, currBinding, partyOrder, false);
   }
 
-  private static SwingFrameBuilder prevCurr(
-      Binding<? extends Map<Party, ? extends Number>> prevBinding,
-      Binding<? extends Map<Party, ? extends Number>> currBinding,
-      Comparator<Party> partyOrder,
-      boolean normalised) {
+  private static <C extends Map<Party, ? extends Number>, P extends Map<Party, ? extends Number>>
+      SwingFrameBuilder prevCurr(
+          Binding<P> prevBinding,
+          Binding<C> currBinding,
+          Comparator<Party> partyOrder,
+          boolean normalised) {
     var prevCurr = new BindablePrevCurrPct();
     Function<Map<Party, ? extends Number>, Map<Party, Double>> toPctFunc =
         map -> {
@@ -95,11 +96,11 @@ public class SwingFrameBuilder {
               .collect(
                   Collectors.toMap(Map.Entry::getKey, e -> e.getValue().doubleValue() / total));
         };
-    prevBinding.bind(map -> prevCurr.setPrevPct(toPctFunc.apply(map)));
-    currBinding.bind(map -> prevCurr.setCurrPct(toPctFunc.apply(map)));
+    prevBinding.bindLegacy(map -> prevCurr.setPrevPct(toPctFunc.apply(map)));
+    currBinding.bindLegacy(map -> prevCurr.setCurrPct(toPctFunc.apply(map)));
     SwingFrameBuilder ret =
         basic(
-                Binding.propertyBinding(prevCurr, Function.identity(), SingletonProperty.ALL),
+                Binding.propertyBinding(prevCurr, t -> t, SingletonProperty.ALL),
                 p -> {
                   if (p.fromParty == null || p.toParty == null) {
                     return Color.LIGHT_GRAY;
@@ -175,7 +176,7 @@ public class SwingFrameBuilder {
             props, p -> p.bottomColor, SwingProperties.SwingProperty.BOTTOM_COLOR));
     swingFrame.setBottomTextBinding(
         Binding.propertyBinding(props, p -> p.text, SwingProperties.SwingProperty.TEXT));
-    binding.bind(
+    binding.bindLegacy(
         val -> {
           props.setLeftColor(leftColorFunc.apply(val));
           props.setRightColor(rightColorFunc.apply(val));
@@ -199,7 +200,7 @@ public class SwingFrameBuilder {
   }
 
   public SwingFrameBuilder withNeutralColor(Binding<Color> neutralColorBinding) {
-    neutralColorBinding.bind(
+    neutralColorBinding.bindLegacy(
         color -> {
           this.neutralColor = color;
           if (props.value.doubleValue() == 0) {

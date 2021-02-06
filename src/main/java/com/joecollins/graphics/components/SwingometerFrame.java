@@ -65,7 +65,7 @@ public class SwingometerFrame extends GraphicsFrame {
   public void setLeftColorBinding(Binding<Color> leftColorBinding) {
     this.leftColorBinding.unbind();
     this.leftColorBinding = leftColorBinding;
-    this.leftColorBinding.bind(swingPanel::setLeftColor);
+    this.leftColorBinding.bindLegacy(swingPanel::setLeftColor);
   }
 
   Color getRightColor() {
@@ -75,7 +75,7 @@ public class SwingometerFrame extends GraphicsFrame {
   public void setRightColorBinding(Binding<Color> rightColorBinding) {
     this.rightColorBinding.unbind();
     this.rightColorBinding = rightColorBinding;
-    this.rightColorBinding.bind(swingPanel::setRightColor);
+    this.rightColorBinding.bindLegacy(swingPanel::setRightColor);
   }
 
   Number getValue() {
@@ -85,7 +85,7 @@ public class SwingometerFrame extends GraphicsFrame {
   public void setValueBinding(Binding<? extends Number> valueBinding) {
     this.valueBinding.unbind();
     this.valueBinding = valueBinding;
-    this.valueBinding.bind(swingPanel::setValue);
+    this.valueBinding.bindLegacy(swingPanel::setValue);
   }
 
   public Number getRange() {
@@ -95,7 +95,7 @@ public class SwingometerFrame extends GraphicsFrame {
   public void setRangeBinding(Binding<? extends Number> rangeBinding) {
     this.rangeBinding.unbind();
     this.rangeBinding = rangeBinding;
-    this.rangeBinding.bind(swingPanel::setRange);
+    this.rangeBinding.bindLegacy(swingPanel::setRange);
   }
 
   int getNumTicks() {
@@ -105,7 +105,7 @@ public class SwingometerFrame extends GraphicsFrame {
   public void setNumTicksBinding(Binding<Integer> numTicksBinding) {
     this.numTicksBinding.unbind();
     this.numTicksBinding = numTicksBinding;
-    this.numTicksBinding.bind(swingPanel::setNumTicks);
+    this.numTicksBinding.bindLegacy(swingPanel::setNumTicks);
   }
 
   Number getTickPosition(int index) {
@@ -135,7 +135,7 @@ public class SwingometerFrame extends GraphicsFrame {
   public void setLeftToWinBinding(Binding<? extends Number> leftToWinBinding) {
     this.leftToWinBinding.unbind();
     this.leftToWinBinding = leftToWinBinding;
-    this.leftToWinBinding.bind(swingPanel::setLeftToWin);
+    this.leftToWinBinding.bindLegacy(swingPanel::setLeftToWin);
   }
 
   Number getRightToWin() {
@@ -145,7 +145,7 @@ public class SwingometerFrame extends GraphicsFrame {
   public void setRightToWinBinding(Binding<? extends Number> rightToWinBinding) {
     this.rightToWinBinding.unbind();
     this.rightToWinBinding = rightToWinBinding;
-    this.rightToWinBinding.bind(swingPanel::setRightToWin);
+    this.rightToWinBinding.bindLegacy(swingPanel::setRightToWin);
   }
 
   int getNumOuterLabels() {
@@ -155,7 +155,7 @@ public class SwingometerFrame extends GraphicsFrame {
   public void setNumOuterLabelsBinding(Binding<Integer> numOuterLabelsBinding) {
     this.numOuterLabelsBinding.unbind();
     this.numOuterLabelsBinding = numOuterLabelsBinding;
-    this.numOuterLabelsBinding.bind(swingPanel::setNumOuterLabels);
+    this.numOuterLabelsBinding.bindLegacy(swingPanel::setNumOuterLabels);
   }
 
   Number getOuterLabelPosition(int index) {
@@ -196,7 +196,7 @@ public class SwingometerFrame extends GraphicsFrame {
   public void setNumBucketsPerSideBinding(Binding<Integer> numBucketsPerSideBinding) {
     this.numBucketsPerSideBinding.unbind();
     this.numBucketsPerSideBinding = numBucketsPerSideBinding;
-    this.numBucketsPerSideBinding.bind(swingPanel::setNumBucketsPerSide);
+    this.numBucketsPerSideBinding.bindLegacy(swingPanel::setNumBucketsPerSide);
   }
 
   int getNumDots() {
@@ -206,7 +206,7 @@ public class SwingometerFrame extends GraphicsFrame {
   public void setNumDotsBinding(Binding<Integer> numDotsBinding) {
     this.numDotsBinding.unbind();
     this.numDotsBinding = numDotsBinding;
-    this.numDotsBinding.bind(swingPanel::setNumDots);
+    this.numDotsBinding.bindLegacy(swingPanel::setNumDots);
   }
 
   Number getDotPosition(int index) {

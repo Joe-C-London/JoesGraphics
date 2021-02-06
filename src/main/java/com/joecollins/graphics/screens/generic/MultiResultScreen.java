@@ -56,7 +56,7 @@ public class MultiResultScreen extends JPanel {
     add(center, BorderLayout.CENTER);
 
     Binding.sizeBinding(builder.list)
-        .bind(
+        .bindLegacy(
             size -> {
               while (panels.size() < size) {
                 ResultPanel newPanel =
@@ -142,7 +142,7 @@ public class MultiResultScreen extends JPanel {
     headerLabel.setFont(StandardFont.readBoldFont(32));
     headerLabel.setHorizontalAlignment(JLabel.CENTER);
     headerLabel.setBorder(new EmptyBorder(5, 0, -5, 0));
-    textBinding.bind(headerLabel::setText);
+    textBinding.bindLegacy(headerLabel::setText);
     return headerLabel;
   }
 
@@ -353,10 +353,10 @@ public class MultiResultScreen extends JPanel {
       setLayout(new ResultPanelLayout());
 
       Result result = new Result();
-      votes.getBinding().bind(result::setVotes);
-      winner.getBinding().bind(result::setWinner);
-      runoff.getBinding().bind(result::setRunoff);
-      maxBars.getBinding().bind(result::setMaxBars);
+      votes.getBinding().bindLegacy(result::setVotes);
+      winner.getBinding().bindLegacy(result::setWinner);
+      runoff.getBinding().bindLegacy(result::setRunoff);
+      maxBars.getBinding().bindLegacy(result::setMaxBars);
       Binding<List<BarFrameBuilder.BasicBar>> bars =
           Binding.propertyBinding(
               result,
@@ -587,7 +587,7 @@ public class MultiResultScreen extends JPanel {
     void setBinding(Binding<T> underBinding) {
       this.underBinding.unbind();
       this.underBinding = underBinding;
-      this.underBinding.bind(this::setValue);
+      this.underBinding.bindLegacy(this::setValue);
     }
 
     private void setValue(T value) {

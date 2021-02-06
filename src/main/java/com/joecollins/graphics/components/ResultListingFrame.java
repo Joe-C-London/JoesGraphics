@@ -44,7 +44,7 @@ public class ResultListingFrame extends GraphicsFrame {
   public void setNumRowsBinding(Binding<Integer> numRowsBinding) {
     this.numRowsBinding.unbind();
     this.numRowsBinding = numRowsBinding;
-    this.numRowsBinding.bind(layout::setNumRows);
+    this.numRowsBinding.bindLegacy(layout::setNumRows);
   }
 
   boolean isReversed() {
@@ -54,7 +54,7 @@ public class ResultListingFrame extends GraphicsFrame {
   public void setReversedBinding(Binding<Boolean> reversedBinding) {
     this.reversedBinding.unbind();
     this.reversedBinding = reversedBinding;
-    this.reversedBinding.bind(layout::setReversed);
+    this.reversedBinding.bindLegacy(layout::setReversed);
   }
 
   int getNumItems() {
@@ -64,7 +64,7 @@ public class ResultListingFrame extends GraphicsFrame {
   public void setNumItemsBinding(Binding<Integer> numItemsBinding) {
     this.numItemsBinding.unbind();
     this.numItemsBinding = numItemsBinding;
-    this.numItemsBinding.bind(
+    this.numItemsBinding.bindLegacy(
         numItems -> {
           while (numItems > items.size()) {
             Item item = new Item();

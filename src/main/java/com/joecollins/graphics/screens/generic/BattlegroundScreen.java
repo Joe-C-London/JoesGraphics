@@ -109,15 +109,15 @@ public class BattlegroundScreen extends JPanel {
       headerLabel.setFont(StandardFont.readBoldFont(32));
       headerLabel.setHorizontalAlignment(JLabel.CENTER);
       headerLabel.setBorder(new EmptyBorder(5, 0, -5, 0));
-      title.bind(headerLabel::setText);
-      party.getBinding(Party::getColor).bind(headerLabel::setForeground);
+      title.bindLegacy(headerLabel::setText);
+      party.getBinding(Party::getColor).bindLegacy(headerLabel::setForeground);
 
       BattlegroundInput<T> defenseInput = new BattlegroundInput<>();
-      prevResults.getBinding().bind(defenseInput::setPrev);
-      currResults.getBinding().bind(defenseInput::setCurr);
-      defenseSeatCount.getBinding().bind(defenseInput::setCount);
-      party.getBinding().bind(defenseInput::setParty);
-      seatFilter.getBinding().bind(defenseInput::setFilteredSeats);
+      prevResults.getBinding().bindLegacy(defenseInput::setPrev);
+      currResults.getBinding().bindLegacy(defenseInput::setCurr);
+      defenseSeatCount.getBinding().bindLegacy(defenseInput::setCount);
+      party.getBinding().bindLegacy(defenseInput::setParty);
+      seatFilter.getBinding().bindLegacy(defenseInput::setFilteredSeats);
       defenseInput.setSide(BattlegroundInput.Side.DEFENSE);
       var defenseItems = defenseInput.getItems();
       var defenseFrame = new ResultListingFrame();
@@ -136,11 +136,11 @@ public class BattlegroundScreen extends JPanel {
           IndexedBinding.propertyBinding(defenseItems, e -> !e.fill ? e.resultColor : Color.WHITE));
 
       BattlegroundInput<T> targetInput = new BattlegroundInput<>();
-      prevResults.getBinding().bind(targetInput::setPrev);
-      currResults.getBinding().bind(targetInput::setCurr);
-      targetSeatCount.getBinding().bind(targetInput::setCount);
-      party.getBinding().bind(targetInput::setParty);
-      seatFilter.getBinding().bind(targetInput::setFilteredSeats);
+      prevResults.getBinding().bindLegacy(targetInput::setPrev);
+      currResults.getBinding().bindLegacy(targetInput::setCurr);
+      targetSeatCount.getBinding().bindLegacy(targetInput::setCount);
+      party.getBinding().bindLegacy(targetInput::setParty);
+      seatFilter.getBinding().bindLegacy(targetInput::setFilteredSeats);
       targetInput.setSide(BattlegroundInput.Side.TARGET);
       var targetItems = targetInput.getItems();
       var targetFrame = new ResultListingFrame();
@@ -168,11 +168,11 @@ public class BattlegroundScreen extends JPanel {
             defenseSeatCount
                 .getBinding()
                 .merge(numRows.getBinding(), (c, n) -> n * (int) Math.ceil(1.0 * c / n))
-                .bind(layout::setLeft);
+                .bindLegacy(layout::setLeft);
             targetSeatCount
                 .getBinding()
                 .merge(numRows.getBinding(), (c, n) -> n * (int) Math.ceil(1.0 * c / n))
-                .bind(layout::setRight);
+                .bindLegacy(layout::setRight);
             return layout;
           });
     }
@@ -241,7 +241,7 @@ public class BattlegroundScreen extends JPanel {
               Property.PARTY,
               Property.SIDE,
               Property.FILTERED_SEATS)
-          .bind(ret::setAll);
+          .bindLegacy(ret::setAll);
       return ret;
     }
 

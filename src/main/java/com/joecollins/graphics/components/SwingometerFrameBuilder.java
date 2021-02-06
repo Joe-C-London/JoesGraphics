@@ -53,7 +53,7 @@ public class SwingometerFrameBuilder {
       Binding<? extends Pair<Color, Color>> colors, Binding<? extends Number> value) {
     BindingReceiver<? extends Pair<Color, Color>> colorsRec = new BindingReceiver<>(colors);
     SwingometerFrameBuilder builder = new SwingometerFrameBuilder();
-    value.bind(builder.properties::setValue);
+    value.bindLegacy(builder.properties::setValue);
     builder.frame.setLeftColorBinding(colorsRec.getBinding(Pair::getLeft));
     builder.frame.setRightColorBinding(colorsRec.getBinding(Pair::getRight));
     builder.frame.setValueBinding(
@@ -63,7 +63,7 @@ public class SwingometerFrameBuilder {
   }
 
   public SwingometerFrameBuilder withRange(Binding<? extends Number> range) {
-    range.bind(properties::setMax);
+    range.bindLegacy(properties::setMax);
     frame.setRangeBinding(
         Binding.propertyBinding(properties, this::getMax, Properties.Property.VALUE));
     return this;
@@ -77,7 +77,7 @@ public class SwingometerFrameBuilder {
   }
 
   public SwingometerFrameBuilder withBucketSize(Binding<? extends Number> bucketSize) {
-    bucketSize.bind(properties::setBucketSize);
+    bucketSize.bindLegacy(properties::setBucketSize);
     frame.setNumBucketsPerSideBinding(
         Binding.propertyBinding(
             properties,
@@ -99,10 +99,10 @@ public class SwingometerFrameBuilder {
   public SwingometerFrameBuilder withTickInterval(
       Binding<? extends Number> tickInterval, Function<? super Number, String> tickStringFunc) {
     BindableList<Tick> ticks = new BindableList<>();
-    tickInterval.bind(properties::setTickInterval);
+    tickInterval.bindLegacy(properties::setTickInterval);
     Binding.propertyBinding(
             properties, props -> getTicks(props, tickStringFunc), Properties.Property.VALUE)
-        .bind(ticks::setAll);
+        .bindLegacy(ticks::setAll);
     frame.setNumTicksBinding(Binding.sizeBinding(ticks));
     frame.setTickPositionBinding(IndexedBinding.propertyBinding(ticks, t -> t.level));
     frame.setTickTextBinding(IndexedBinding.propertyBinding(ticks, t -> t.text));

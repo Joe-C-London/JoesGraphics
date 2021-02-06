@@ -43,7 +43,7 @@ public class FiguresFrame extends GraphicsFrame {
   public void setNumEntriesBinding(Binding<Integer> numEntriesBinding) {
     this.numEntriesBinding.unbind();
     this.numEntriesBinding = numEntriesBinding;
-    this.numEntriesBinding.bind(
+    this.numEntriesBinding.bindLegacy(
         size -> {
           while (entries.size() < size) {
             Entry entry = new Entry();

@@ -74,7 +74,7 @@ public class CountdownFrame extends GraphicsFrame {
   public void setTimeBinding(Binding<? extends Temporal> timeBinding) {
     this.timeBinding.unbind();
     this.timeBinding = timeBinding;
-    this.timeBinding.bind(
+    this.timeBinding.bindLegacy(
         time -> {
           this.time = time;
           refresh();
@@ -102,7 +102,7 @@ public class CountdownFrame extends GraphicsFrame {
   public void setAdditionalInfoBinding(Binding<String> additionalInfoBinding) {
     this.additionalInfoBinding.unbind();
     this.additionalInfoBinding = additionalInfoBinding;
-    this.additionalInfoBinding.bind(
+    this.additionalInfoBinding.bindLegacy(
         text -> {
           additionalInfoLabel.setText(text);
           additionalInfoLabel.setVisible(text != null);
@@ -116,7 +116,7 @@ public class CountdownFrame extends GraphicsFrame {
   public void setCountdownColorBinding(Binding<Color> countdownColorBinding) {
     this.countdownColorBinding.unbind();
     this.countdownColorBinding = countdownColorBinding;
-    this.countdownColorBinding.bind(
+    this.countdownColorBinding.bindLegacy(
         color -> {
           timeRemainingLabel.setForeground(color);
           additionalInfoLabel.setForeground(color);

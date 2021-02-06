@@ -37,7 +37,7 @@ public class MapFrameBuilder {
 
   public static MapFrameBuilder from(Binding<List<Pair<Shape, Color>>> shapes) {
     BindableList<Pair<Shape, Color>> list = new BindableList<>();
-    shapes.bind(list::setAll);
+    shapes.bindLegacy(list::setAll);
     MapFrameBuilder ret = from(list);
     ret.bindings.add(shapes);
     return ret;
@@ -49,7 +49,7 @@ public class MapFrameBuilder {
       Function<T, Binding<Color>> colorFunc) {
     BindableList<Pair<Shape, Color>> list = new BindableList<>();
     List<Binding<Color>> bindings = new ArrayList<>();
-    itemsBinding.bind(
+    itemsBinding.bindLegacy(
         items -> {
           bindings.forEach(Binding::unbind);
           list.clear();
@@ -59,7 +59,7 @@ public class MapFrameBuilder {
             Binding<Color> colorBinding = colorFunc.apply(item);
             list.add(ImmutablePair.of(shape, colorBinding.getValue()));
             int idx = i;
-            colorBinding.bind(color -> list.set(idx, ImmutablePair.of(shape, color)));
+            colorBinding.bindLegacy(color -> list.set(idx, ImmutablePair.of(shape, color)));
             bindings.add(colorBinding);
           }
         });
@@ -69,7 +69,7 @@ public class MapFrameBuilder {
   }
 
   public MapFrameBuilder withFocus(Binding<List<Shape>> focusBinding) {
-    focusBinding.bind(
+    focusBinding.bindLegacy(
         list -> {
           if (list == null) {
             list = Collections.emptyList();

@@ -119,20 +119,20 @@ public class SwingometerScreen extends JPanel {
         Binding<Pair<Party, Party>> partiesBinding,
         Binding<Map<Party, Double>> partySwingsBinding,
         Binding<String> headerBinding) {
-      prevVotesBinding.bind(inputs::setPrevVotes);
-      resultsBinding.bind(inputs::setResults);
-      partiesBinding.bind(inputs::setParties);
-      partySwingsBinding.bind(inputs::setPartySwings);
+      prevVotesBinding.bindLegacy(inputs::setPrevVotes);
+      resultsBinding.bindLegacy(inputs::setResults);
+      partiesBinding.bindLegacy(inputs::setParties);
+      partySwingsBinding.bindLegacy(inputs::setPartySwings);
       header = new BindingReceiver<>(headerBinding);
     }
 
     public Builder<T> withSeatLabelIncrements(Binding<Integer> incrementBinding) {
-      incrementBinding.bind(inputs::setSeatLabelIncrement);
+      incrementBinding.bindLegacy(inputs::setSeatLabelIncrement);
       return this;
     }
 
     public Builder<T> withSeatFilter(Binding<Set<T>> seatsFilterBinding) {
-      seatsFilterBinding.bind(inputs::setSeatFilter);
+      seatsFilterBinding.bindLegacy(inputs::setSeatFilter);
       return this;
     }
 
@@ -141,7 +141,7 @@ public class SwingometerScreen extends JPanel {
       headerLabel.setFont(StandardFont.readBoldFont(32));
       headerLabel.setHorizontalAlignment(JLabel.CENTER);
       headerLabel.setBorder(new EmptyBorder(5, 0, -5, 0));
-      title.bind(headerLabel::setText);
+      title.bindLegacy(headerLabel::setText);
 
       var swingometer = createSwingometer();
 
@@ -227,7 +227,7 @@ public class SwingometerScreen extends JPanel {
               Inputs.Property.PREV,
               Inputs.Property.PARTIES,
               Inputs.Property.LABEL_INCREMENT);
-      binding.bind(labels::setAll);
+      binding.bindLegacy(labels::setAll);
       return labels;
     }
 
@@ -413,7 +413,7 @@ public class SwingometerScreen extends JPanel {
               Inputs.Property.PARTIES,
               Inputs.Property.FILTERED_SEATS);
       BindableList<Triple<Double, Color, Boolean>> dotsList = new BindableList<>();
-      dotsBinding.bind(dotsList::setAll);
+      dotsBinding.bindLegacy(dotsList::setAll);
       return dotsList;
     }
   }

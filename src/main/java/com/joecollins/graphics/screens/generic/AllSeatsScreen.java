@@ -86,15 +86,15 @@ public class AllSeatsScreen extends JPanel {
       headerLabel.setFont(StandardFont.readBoldFont(32));
       headerLabel.setHorizontalAlignment(JLabel.CENTER);
       headerLabel.setBorder(new EmptyBorder(5, 0, -5, 0));
-      titleBinding.bind(headerLabel::setText);
+      titleBinding.bindLegacy(headerLabel::setText);
 
       Input<T> inputs = new Input<>(nameFunc);
-      prevResults.getBinding().bind(inputs::setPrevResults);
-      currResults.getBinding().bind(inputs::setCurrResults);
-      seatFilter.getBinding().bind(inputs::setSeatFilter);
+      prevResults.getBinding().bindLegacy(inputs::setPrevResults);
+      currResults.getBinding().bindLegacy(inputs::setCurrResults);
+      seatFilter.getBinding().bindLegacy(inputs::setSeatFilter);
 
       BindableList<Entry<T>> entries = new BindableList<>();
-      inputs.getResultBinding().bind(entries::setAll);
+      inputs.getResultBinding().bindLegacy(entries::setAll);
 
       ResultListingFrame frame = new ResultListingFrame();
       frame.setHeaderBinding(header.getBinding());

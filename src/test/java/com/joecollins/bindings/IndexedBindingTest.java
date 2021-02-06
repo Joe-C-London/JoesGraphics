@@ -39,7 +39,7 @@ public class IndexedBindingTest {
     list.add(7);
     IndexedBinding<Integer> binding = IndexedBinding.propertyBinding(list, i -> i);
     binding.bind(valuesByIndex::put);
-    Binding.sizeBinding(list).bind(size::setValue);
+    Binding.sizeBinding(list).bindLegacy(size::setValue);
     assertEquals(7, valuesByIndex.get(0).intValue());
     assertEquals(1, size.getValue().intValue());
 

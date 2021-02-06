@@ -50,28 +50,28 @@ public class MultiSummaryFrameBuilder {
       Row row = new Row();
       display
           .apply(item)
-          .bind(
+          .bindLegacy(
               d -> {
                 row.display = d;
                 update.run();
               });
       sortFunc
           .apply(item)
-          .bind(
+          .bindLegacy(
               s -> {
                 row.sort = s.doubleValue();
                 update.run();
               });
       rowHeaderFunc
           .apply(item)
-          .bind(
+          .bindLegacy(
               h -> {
                 row.rowHeader = h;
                 update.run();
               });
       rowLabelsFunc
           .apply(item)
-          .bind(
+          .bindLegacy(
               l -> {
                 row.rowLabels = l;
                 update.run();

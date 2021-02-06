@@ -12,10 +12,18 @@ import org.junit.Test;
 public class BindingTest {
 
   @Test
+  public void testLambdaBinding() {
+    Mutable<Integer> boundValue = new MutableObject<>();
+    Binding<Integer> binding = () -> 42;
+    binding.bindLegacy(boundValue::setValue);
+    assertEquals(42, boundValue.getValue().intValue());
+  }
+
+  @Test
   public void testFixedBinding() {
     Mutable<Integer> boundValue = new MutableObject<>();
     Binding<Integer> binding = Binding.fixedBinding(42);
-    binding.bind(boundValue::setValue);
+    binding.bindLegacy(boundValue::setValue);
     assertEquals(42, boundValue.getValue().intValue());
   }
 
@@ -25,7 +33,7 @@ public class BindingTest {
     BindableInt bindable = new BindableInt(7);
     Binding<Integer> binding =
         Binding.propertyBinding(bindable, BindableInt::getValue, BindableInt.Property.VALUE);
-    binding.bind(boundValue::setValue);
+    binding.bindLegacy(boundValue::setValue);
     assertEquals(7, boundValue.getValue().intValue());
 
     bindable.setValue(42);
@@ -42,7 +50,7 @@ public class BindingTest {
     BindableList<Integer> list = new BindableList<>();
     list.add(7);
     Binding<Integer> binding = Binding.sizeBinding(list);
-    binding.bind(boundValue::setValue);
+    binding.bindLegacy(boundValue::setValue);
     assertEquals(1, boundValue.getValue().intValue());
 
     list.add(42);
@@ -72,7 +80,7 @@ public class BindingTest {
     Binding<String> binding =
         Binding.propertyBinding(bindable, BindableInt::getValue, BindableInt.Property.VALUE)
             .map(Object::toString);
-    binding.bind(boundValue::setValue);
+    binding.bindLegacy(boundValue::setValue);
     assertEquals("7", boundValue.getValue());
 
     bindable.setValue(42);
@@ -93,7 +101,7 @@ public class BindingTest {
     Binding<Integer> binding2 =
         Binding.propertyBinding(bindable2, BindableInt::getValue, BindableInt.Property.VALUE);
     Binding<Integer> binding = binding1.merge(binding2, Integer::sum);
-    binding.bind(boundValue::setValue);
+    binding.bindLegacy(boundValue::setValue);
     assertEquals(49, boundValue.getValue().intValue());
 
     bindable1.setValue(42);
@@ -118,9 +126,9 @@ public class BindingTest {
         Binding.propertyBinding(bindable, BindableInt::getValue, BindableInt.Property.VALUE);
     BindingReceiver<Integer> receiver = new BindingReceiver<>(binding);
     Binding<Integer> binding1 = receiver.getBinding();
-    binding1.bind(boundValue1::setValue);
+    binding1.bindLegacy(boundValue1::setValue);
     Binding<Integer> binding2 = receiver.getBinding();
-    binding2.bind(boundValue2::setValue);
+    binding2.bindLegacy(boundValue2::setValue);
     assertEquals(7, boundValue1.getValue().intValue());
     assertEquals(7, boundValue2.getValue().intValue());
 
@@ -143,9 +151,9 @@ public class BindingTest {
         Binding.propertyBinding(bindable, BindableInt::getValue, BindableInt.Property.VALUE);
     BindingReceiver<Integer> receiver = new BindingReceiver<>(binding);
     Binding<Integer> binding1 = receiver.getBinding(i -> i * 2);
-    binding1.bind(boundValue1::setValue);
+    binding1.bindLegacy(boundValue1::setValue);
     Binding<Integer> binding2 = receiver.getBinding(i -> i * i);
-    binding2.bind(boundValue2::setValue);
+    binding2.bindLegacy(boundValue2::setValue);
     assertEquals(14, boundValue1.getValue().intValue());
     assertEquals(49, boundValue2.getValue().intValue());
 
@@ -170,7 +178,7 @@ public class BindingTest {
     Binding<Integer> binding =
         receiver.getFlatBinding(
             v -> Binding.propertyBinding(v, BindableValue::getValue, BindableInt.Property.VALUE));
-    binding.bind(boundValue::setValue);
+    binding.bindLegacy(boundValue::setValue);
     assertEquals(7, boundValue.getValue().intValue());
 
     bindable1.setValue(42);
@@ -205,7 +213,7 @@ public class BindingTest {
             .collect(Collectors.toList());
     Binding<Integer> binding =
         Binding.mapReduceBinding(bindings, 0, (a, v) -> a + v, (a, v) -> a - v);
-    binding.bind(boundValue::setValue);
+    binding.bindLegacy(boundValue::setValue);
     assertEquals(6, boundValue.getValue().intValue());
 
     list.get(0).setValue(4);
@@ -227,7 +235,7 @@ public class BindingTest {
     List<Binding<Integer>> bindings = List.of();
     Binding<Integer> binding =
         Binding.mapReduceBinding(bindings, 1, (a, v) -> a + v, (a, v) -> a - v);
-    binding.bind(boundValue::setValue);
+    binding.bindLegacy(boundValue::setValue);
     assertEquals(1, boundValue.getValue().intValue());
   }
 

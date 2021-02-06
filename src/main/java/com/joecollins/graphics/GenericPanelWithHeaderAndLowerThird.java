@@ -34,7 +34,7 @@ public class GenericPanelWithHeaderAndLowerThird<T extends JPanel> extends JPane
     this.lowerThird = lowerThird;
     this.label = new JLabel();
     if (label != null) {
-      label.bind(this.label::setText);
+      label.bindLegacy(this.label::setText);
       this.label.setHorizontalAlignment(JLabel.CENTER);
       this.label.setBorder(new EmptyBorder(5, 0, -5, 0));
       this.label.setFont(StandardFont.readBoldFont(32));

@@ -116,7 +116,7 @@ public class HemicycleFrame extends GraphicsFrame {
   public void setNumRowsBinding(Binding<Integer> numRowsBinding) {
     this.numRowsBinding.unbind();
     this.numRowsBinding = numRowsBinding;
-    this.numRowsBinding.bind(
+    this.numRowsBinding.bindLegacy(
         numRows -> {
           setSize(dotsPanel.rows, numRows, () -> 0);
           dotsPanel.repaint();
@@ -144,7 +144,7 @@ public class HemicycleFrame extends GraphicsFrame {
   public void setNumDotsBinding(Binding<Integer> numDotsBinding) {
     this.numDotsBinding.unbind();
     this.numDotsBinding = numDotsBinding;
-    this.numDotsBinding.bind(
+    this.numDotsBinding.bindLegacy(
         numDots -> {
           setSize(dotsPanel.dots, numDots, Dot::new);
           dotsPanel.repaint();
@@ -186,7 +186,7 @@ public class HemicycleFrame extends GraphicsFrame {
   public void setLeftSeatBarCountBinding(Binding<Integer> leftSeatBarCountBinding) {
     this.leftSeatBarCountBinding.unbind();
     this.leftSeatBarCountBinding = leftSeatBarCountBinding;
-    this.leftSeatBarCountBinding.bind(
+    this.leftSeatBarCountBinding.bindLegacy(
         numBars -> {
           setSize(barsPanel.leftSeatBars, numBars, Bar::new);
           barsPanel.repaint();
@@ -228,7 +228,7 @@ public class HemicycleFrame extends GraphicsFrame {
   public void setLeftSeatBarLabelBinding(Binding<String> leftSeatBarLabelBinding) {
     this.leftSeatBarLabelBinding.unbind();
     this.leftSeatBarLabelBinding = leftSeatBarLabelBinding;
-    this.leftSeatBarLabelBinding.bind(
+    this.leftSeatBarLabelBinding.bindLegacy(
         label -> {
           barsPanel.leftSeatLabel = label;
           barsPanel.repaint();
@@ -242,7 +242,7 @@ public class HemicycleFrame extends GraphicsFrame {
   public void setRightSeatBarCountBinding(Binding<Integer> rightSeatBarCountBinding) {
     this.rightSeatBarCountBinding.unbind();
     this.rightSeatBarCountBinding = rightSeatBarCountBinding;
-    this.rightSeatBarCountBinding.bind(
+    this.rightSeatBarCountBinding.bindLegacy(
         numBars -> {
           setSize(barsPanel.rightSeatBars, numBars, Bar::new);
           barsPanel.repaint();
@@ -284,7 +284,7 @@ public class HemicycleFrame extends GraphicsFrame {
   public void setRightSeatBarLabelBinding(Binding<String> rightSeatBarLabelBinding) {
     this.rightSeatBarLabelBinding.unbind();
     this.rightSeatBarLabelBinding = rightSeatBarLabelBinding;
-    this.rightSeatBarLabelBinding.bind(
+    this.rightSeatBarLabelBinding.bindLegacy(
         label -> {
           barsPanel.rightSeatLabel = label;
           barsPanel.repaint();
@@ -298,7 +298,7 @@ public class HemicycleFrame extends GraphicsFrame {
   public void setMiddleSeatBarCountBinding(Binding<Integer> middleSeatBarCountBinding) {
     this.middleSeatBarCountBinding.unbind();
     this.middleSeatBarCountBinding = middleSeatBarCountBinding;
-    this.middleSeatBarCountBinding.bind(
+    this.middleSeatBarCountBinding.bindLegacy(
         numBars -> {
           setSize(barsPanel.middleSeatBars, numBars, Bar::new);
           barsPanel.repaint();
@@ -340,7 +340,7 @@ public class HemicycleFrame extends GraphicsFrame {
   public void setMiddleSeatBarLabelBinding(Binding<String> middleSeatBarLabelBinding) {
     this.middleSeatBarLabelBinding.unbind();
     this.middleSeatBarLabelBinding = middleSeatBarLabelBinding;
-    this.middleSeatBarLabelBinding.bind(
+    this.middleSeatBarLabelBinding.bindLegacy(
         label -> {
           barsPanel.middleSeatLabel = label;
           barsPanel.repaint();
@@ -354,7 +354,7 @@ public class HemicycleFrame extends GraphicsFrame {
   public void setLeftChangeBarCountBinding(Binding<Integer> leftChangeBarCountBinding) {
     this.leftChangeBarCountBinding.unbind();
     this.leftChangeBarCountBinding = leftChangeBarCountBinding;
-    this.leftChangeBarCountBinding.bind(
+    this.leftChangeBarCountBinding.bindLegacy(
         numBars -> {
           setSize(barsPanel.leftChangeBars, numBars, Bar::new);
           barsPanel.repaint();
@@ -396,7 +396,7 @@ public class HemicycleFrame extends GraphicsFrame {
   public void setLeftChangeBarStartBinding(Binding<Integer> leftChangeBarStartBinding) {
     this.leftChangeBarStartBinding.unbind();
     this.leftChangeBarStartBinding = leftChangeBarStartBinding;
-    this.leftChangeBarStartBinding.bind(
+    this.leftChangeBarStartBinding.bindLegacy(
         start -> {
           barsPanel.leftChangeStart = start;
           barsPanel.repaint();
@@ -410,7 +410,7 @@ public class HemicycleFrame extends GraphicsFrame {
   public void setLeftChangeBarLabelBinding(Binding<String> leftChangeBarLabelBinding) {
     this.leftChangeBarLabelBinding.unbind();
     this.leftChangeBarLabelBinding = leftChangeBarLabelBinding;
-    this.leftChangeBarLabelBinding.bind(
+    this.leftChangeBarLabelBinding.bindLegacy(
         label -> {
           barsPanel.leftChangeLabel = label;
           barsPanel.repaint();
@@ -424,7 +424,7 @@ public class HemicycleFrame extends GraphicsFrame {
   public void setRightChangeBarCountBinding(Binding<Integer> rightChangeBarCountBinding) {
     this.rightChangeBarCountBinding.unbind();
     this.rightChangeBarCountBinding = rightChangeBarCountBinding;
-    this.rightChangeBarCountBinding.bind(
+    this.rightChangeBarCountBinding.bindLegacy(
         numBars -> {
           setSize(barsPanel.rightChangeBars, numBars, Bar::new);
           barsPanel.repaint();
@@ -466,7 +466,7 @@ public class HemicycleFrame extends GraphicsFrame {
   public void setRightChangeBarStartBinding(Binding<Integer> rightChangeBarStartBinding) {
     this.rightChangeBarStartBinding.unbind();
     this.rightChangeBarStartBinding = rightChangeBarStartBinding;
-    this.rightChangeBarStartBinding.bind(
+    this.rightChangeBarStartBinding.bindLegacy(
         start -> {
           barsPanel.rightChangeStart = start;
           barsPanel.repaint();
@@ -480,7 +480,7 @@ public class HemicycleFrame extends GraphicsFrame {
   public void setRightChangeBarLabelBinding(Binding<String> rightChangeBarLabelBinding) {
     this.rightChangeBarLabelBinding.unbind();
     this.rightChangeBarLabelBinding = rightChangeBarLabelBinding;
-    this.rightChangeBarLabelBinding.bind(
+    this.rightChangeBarLabelBinding.bindLegacy(
         label -> {
           barsPanel.rightChangeLabel = label;
           barsPanel.repaint();

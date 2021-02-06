@@ -197,7 +197,7 @@ public class RegionalBreakdownScreen extends JPanel {
       headerLabel.setFont(StandardFont.readBoldFont(32));
       headerLabel.setHorizontalAlignment(JLabel.CENTER);
       headerLabel.setBorder(new EmptyBorder(5, 0, -5, 0));
-      titleBinding.bind(headerLabel::setText);
+      titleBinding.bindLegacy(headerLabel::setText);
 
       return new RegionalBreakdownScreen(headerLabel, createFrame());
     }
@@ -225,10 +225,10 @@ public class RegionalBreakdownScreen extends JPanel {
       this.partyOrder =
           new BindingReceiver<>(totalSeats.getBinding(RegionalBreakdownScreen::extractPartyOrder));
       SeatEntry topEntry = new SeatEntry();
-      partyOrder.getBinding().bind(topEntry::setPartyOrder);
-      totalHeaderBinding.bind(topEntry::setName);
-      totalSeats.getBinding().bind(topEntry::setSeats);
-      numTotalSeatsBinding.bind(topEntry::setTotalSeats);
+      partyOrder.getBinding().bindLegacy(topEntry::setPartyOrder);
+      totalHeaderBinding.bindLegacy(topEntry::setName);
+      totalSeats.getBinding().bindLegacy(topEntry::setSeats);
+      numTotalSeatsBinding.bindLegacy(topEntry::setTotalSeats);
       entries.add(topEntry);
     }
 
@@ -242,10 +242,10 @@ public class RegionalBreakdownScreen extends JPanel {
         Binding<Map<Party, Integer>> seatsBinding,
         Binding<Integer> numSeatsBinding) {
       SeatEntry newEntry = new SeatEntry();
-      partyOrder.getBinding().bind(newEntry::setPartyOrder);
-      nameBinding.bind(newEntry::setName);
-      seatsBinding.bind(newEntry::setSeats);
-      numSeatsBinding.bind(newEntry::setTotalSeats);
+      partyOrder.getBinding().bindLegacy(newEntry::setPartyOrder);
+      nameBinding.bindLegacy(newEntry::setName);
+      seatsBinding.bindLegacy(newEntry::setSeats);
+      numSeatsBinding.bindLegacy(newEntry::setTotalSeats);
       entries.add(newEntry);
       return this;
     }
@@ -269,11 +269,11 @@ public class RegionalBreakdownScreen extends JPanel {
                   .getBinding()
                   .merge(seatDiff.getBinding(), RegionalBreakdownScreen::extractPartyOrder));
       SeatDiffEntry topEntry = new SeatDiffEntry();
-      partyOrder.getBinding().bind(topEntry::setPartyOrder);
-      totalHeaderBinding.bind(topEntry::setName);
-      totalSeats.getBinding().bind(topEntry::setSeats);
-      seatDiff.getBinding().bind(topEntry::setDiff);
-      numTotalSeatsBinding.bind(topEntry::setTotalSeats);
+      partyOrder.getBinding().bindLegacy(topEntry::setPartyOrder);
+      totalHeaderBinding.bindLegacy(topEntry::setName);
+      totalSeats.getBinding().bindLegacy(topEntry::setSeats);
+      seatDiff.getBinding().bindLegacy(topEntry::setDiff);
+      numTotalSeatsBinding.bindLegacy(topEntry::setTotalSeats);
       entries.add(topEntry);
     }
 
@@ -288,11 +288,11 @@ public class RegionalBreakdownScreen extends JPanel {
         Binding<Map<Party, Integer>> diffBinding,
         Binding<Integer> numSeatsBinding) {
       SeatDiffEntry newEntry = new SeatDiffEntry();
-      partyOrder.getBinding().bind(newEntry::setPartyOrder);
-      nameBinding.bind(newEntry::setName);
-      seatsBinding.bind(newEntry::setSeats);
-      diffBinding.bind(newEntry::setDiff);
-      numSeatsBinding.bind(newEntry::setTotalSeats);
+      partyOrder.getBinding().bindLegacy(newEntry::setPartyOrder);
+      nameBinding.bindLegacy(newEntry::setName);
+      seatsBinding.bindLegacy(newEntry::setSeats);
+      diffBinding.bindLegacy(newEntry::setDiff);
+      numSeatsBinding.bindLegacy(newEntry::setTotalSeats);
       entries.add(newEntry);
       return this;
     }
@@ -316,11 +316,11 @@ public class RegionalBreakdownScreen extends JPanel {
                   .getBinding()
                   .merge(prevSeats.getBinding(), RegionalBreakdownScreen::extractPartyOrder));
       SeatPrevEntry topEntry = new SeatPrevEntry();
-      partyOrder.getBinding().bind(topEntry::setPartyOrder);
-      totalHeaderBinding.bind(topEntry::setName);
-      totalSeats.getBinding().bind(topEntry::setSeats);
-      prevSeats.getBinding().bind(topEntry::setPrev);
-      numTotalSeatsBinding.bind(topEntry::setTotalSeats);
+      partyOrder.getBinding().bindLegacy(topEntry::setPartyOrder);
+      totalHeaderBinding.bindLegacy(topEntry::setName);
+      totalSeats.getBinding().bindLegacy(topEntry::setSeats);
+      prevSeats.getBinding().bindLegacy(topEntry::setPrev);
+      numTotalSeatsBinding.bindLegacy(topEntry::setTotalSeats);
       entries.add(topEntry);
     }
 
@@ -335,11 +335,11 @@ public class RegionalBreakdownScreen extends JPanel {
         Binding<Map<Party, Integer>> prevBinding,
         Binding<Integer> numSeatsBinding) {
       SeatPrevEntry newEntry = new SeatPrevEntry();
-      partyOrder.getBinding().bind(newEntry::setPartyOrder);
-      nameBinding.bind(newEntry::setName);
-      seatsBinding.bind(newEntry::setSeats);
-      prevBinding.bind(newEntry::setPrev);
-      numSeatsBinding.bind(newEntry::setTotalSeats);
+      partyOrder.getBinding().bindLegacy(newEntry::setPartyOrder);
+      nameBinding.bindLegacy(newEntry::setName);
+      seatsBinding.bindLegacy(newEntry::setSeats);
+      prevBinding.bindLegacy(newEntry::setPrev);
+      numSeatsBinding.bindLegacy(newEntry::setTotalSeats);
       entries.add(newEntry);
       return this;
     }

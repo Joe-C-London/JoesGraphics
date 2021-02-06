@@ -48,7 +48,7 @@ public class SummaryWithoutLabels extends JPanel {
   public void setNumEntriesBinding(Binding<Integer> numEntriesBinding) {
     this.numEntriesBinding.unbind();
     this.numEntriesBinding = numEntriesBinding;
-    this.numEntriesBinding.bind(
+    this.numEntriesBinding.bindLegacy(
         size -> {
           while (entryPanels.size() < size) {
             EntryPanel newPanel = new EntryPanel();
@@ -68,7 +68,7 @@ public class SummaryWithoutLabels extends JPanel {
   public void setHeadlineBinding(Binding<String> headlineBinding) {
     this.headlineBinding.unbind();
     this.headlineBinding = headlineBinding;
-    this.headlineBinding.bind(this.headlinePanel.topLabel::setText);
+    this.headlineBinding.bindLegacy(this.headlinePanel.topLabel::setText);
   }
 
   int getNumEntries() {
