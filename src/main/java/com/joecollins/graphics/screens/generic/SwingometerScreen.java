@@ -55,7 +55,7 @@ public class SwingometerScreen extends JPanel {
 
   public static class Builder<T> {
 
-    private static class Inputs<T> extends Bindable<Inputs.Property> {
+    private static class Inputs<T> extends Bindable<Inputs<T>, Inputs.Property> {
       enum Property {
         PREV,
         RESULTS,

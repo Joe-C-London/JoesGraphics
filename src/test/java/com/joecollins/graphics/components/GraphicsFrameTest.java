@@ -14,7 +14,7 @@ import org.junit.Test;
 
 public class GraphicsFrameTest {
 
-  private static class TestObject extends Bindable<TestObject.Properties> {
+  private static class TestObject extends Bindable<TestObject, TestObject.Properties> {
 
     private enum Properties {
       NUM_POLLS

@@ -231,7 +231,7 @@ public class PartySummaryScreenTest {
     compareRendering("PartySummaryScreen", "SingleParty-5", screen);
   }
 
-  private static class Region extends Bindable<Region.Property> {
+  private static class Region extends Bindable<Region, Region.Property> {
     private enum Property {
       SEATS,
       SEAT_DIFF,

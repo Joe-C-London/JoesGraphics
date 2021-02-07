@@ -188,7 +188,7 @@ public class ResultListingFrameTest {
     compareRendering("ResultListingFrame", "Reversed-3", frame);
   }
 
-  private static class Item extends Bindable<Item.Property> {
+  private static class Item extends Bindable<Item, Item.Property> {
     enum Property {
       TEXT,
       FOREGROUND,

@@ -61,7 +61,7 @@ interface Binding<T> {
             override val value: T = t
         }
 
-        @JvmStatic fun <T : Bindable<E>, U, E : Enum<E>> propertyBinding(obj: T, func: (T) -> U, vararg properties: E): Binding<U> {
+        @JvmStatic fun <T : Bindable<T, E>, U, E : Enum<E>> propertyBinding(obj: T, func: (T) -> U, vararg properties: E): Binding<U> {
             return object : Binding<U> {
                 var consumer: java.util.function.Consumer<T>? = null
                 override val value: U get() = func(obj)

@@ -90,7 +90,7 @@ public class RegionalBreakdownScreen extends JPanel {
     }
   }
 
-  private static class SeatEntry extends Bindable<SeatEntry.Property> implements Entry {
+  private static class SeatEntry extends Bindable<SeatEntry, SeatEntry.Property> implements Entry {
     enum Property {
       PARTY_ORDER,
       NAME,

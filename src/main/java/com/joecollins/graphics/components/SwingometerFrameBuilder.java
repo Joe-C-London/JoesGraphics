@@ -14,7 +14,7 @@ import org.apache.commons.lang3.tuple.Pair;
 
 public class SwingometerFrameBuilder {
 
-  private static class Properties extends Bindable<Properties.Property> {
+  private static class Properties extends Bindable<Properties, Properties.Property> {
 
     enum Property {
       VALUE

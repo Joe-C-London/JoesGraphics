@@ -69,7 +69,7 @@ public class TooCloseToCallScreen extends JPanel {
         labelFunc);
   }
 
-  private static class Input<T> extends Bindable<Input.Property> {
+  private static class Input<T> extends Bindable<Input<T>, Input.Property> {
     enum Property {
       VOTES,
       RESULTS,

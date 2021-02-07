@@ -1054,7 +1054,7 @@ public class BarFrameTest {
     return shape;
   }
 
-  private static class ElectionResult extends Bindable<ElectionResult.Properties> {
+  private static class ElectionResult extends Bindable<ElectionResult, ElectionResult.Properties> {
 
     private enum Properties {
       PARTY_NAME,
@@ -1116,7 +1116,7 @@ public class BarFrameTest {
     }
   }
 
-  private static class RidingResult extends Bindable<RidingResult.Properties> {
+  private static class RidingResult extends Bindable<RidingResult, RidingResult.Properties> {
 
     private enum Properties {
       CANDIDATE_NAME,

@@ -13,7 +13,7 @@ class BindingReceiver<T>(binding: Binding<out T>) {
 
     private enum class Property { VALUE }
 
-    private class WrappedValue<T> : Bindable<Property>() {
+    private class WrappedValue<T> : Bindable<WrappedValue<T>, Property>() {
         private val _value: Mutable<T> = MutableObject()
 
         var value: T

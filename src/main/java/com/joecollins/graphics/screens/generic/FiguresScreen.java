@@ -88,7 +88,7 @@ public class FiguresScreen extends JPanel {
     }
   }
 
-  private static class Entry extends Bindable<Entry.Property> {
+  private static class Entry extends Bindable<Entry, Entry.Property> {
     private enum Property {
       LEADER,
       STATUS

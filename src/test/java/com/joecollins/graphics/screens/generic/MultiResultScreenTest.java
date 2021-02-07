@@ -738,7 +738,7 @@ public class MultiResultScreenTest {
     return ShapefileReader.readShapes(peiMap, "DIST_NO", Integer.class);
   }
 
-  private static class District extends Bindable<District.Property> {
+  private static class District extends Bindable<District, District.Property> {
 
     enum Property {
       PROP

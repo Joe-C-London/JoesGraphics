@@ -30,7 +30,7 @@ public class BarFrameBuilder {
 
   private final List<Binding<?>> bindings = new ArrayList<>();
 
-  private static class RangeFinder extends Bindable<RangeFinder.Property> {
+  private static class RangeFinder extends Bindable<RangeFinder, RangeFinder.Property> {
 
     enum Property {
       MIN,

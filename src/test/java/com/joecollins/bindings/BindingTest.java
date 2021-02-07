@@ -32,7 +32,7 @@ public class BindingTest {
     Mutable<Integer> boundValue = new MutableObject<>();
     BindableInt bindable = new BindableInt(7);
     Binding<Integer> binding =
-        Binding.propertyBinding(bindable, BindableInt::getValue, BindableInt.Property.VALUE);
+        Binding.propertyBinding(bindable, BindableValue::getValue, BindableInt.Property.VALUE);
     binding.bindLegacy(boundValue::setValue);
     assertEquals(7, boundValue.getValue().intValue());
 
@@ -78,7 +78,7 @@ public class BindingTest {
     Mutable<String> boundValue = new MutableObject<>();
     BindableInt bindable = new BindableInt(7);
     Binding<String> binding =
-        Binding.propertyBinding(bindable, BindableInt::getValue, BindableInt.Property.VALUE)
+        Binding.propertyBinding(bindable, BindableValue::getValue, BindableInt.Property.VALUE)
             .map(Object::toString);
     binding.bindLegacy(boundValue::setValue);
     assertEquals("7", boundValue.getValue());
@@ -97,9 +97,9 @@ public class BindingTest {
     BindableInt bindable1 = new BindableInt(7);
     BindableInt bindable2 = new BindableInt(42);
     Binding<Integer> binding1 =
-        Binding.propertyBinding(bindable1, BindableInt::getValue, BindableInt.Property.VALUE);
+        Binding.propertyBinding(bindable1, BindableValue::getValue, BindableInt.Property.VALUE);
     Binding<Integer> binding2 =
-        Binding.propertyBinding(bindable2, BindableInt::getValue, BindableInt.Property.VALUE);
+        Binding.propertyBinding(bindable2, BindableValue::getValue, BindableInt.Property.VALUE);
     Binding<Integer> binding = binding1.merge(binding2, Integer::sum);
     binding.bindLegacy(boundValue::setValue);
     assertEquals(49, boundValue.getValue().intValue());
@@ -123,7 +123,7 @@ public class BindingTest {
     Mutable<Integer> boundValue2 = new MutableObject<>();
     BindableInt bindable = new BindableInt(7);
     Binding<Integer> binding =
-        Binding.propertyBinding(bindable, BindableInt::getValue, BindableInt.Property.VALUE);
+        Binding.propertyBinding(bindable, BindableValue::getValue, BindableInt.Property.VALUE);
     BindingReceiver<Integer> receiver = new BindingReceiver<>(binding);
     Binding<Integer> binding1 = receiver.getBinding();
     binding1.bindLegacy(boundValue1::setValue);
@@ -148,7 +148,7 @@ public class BindingTest {
     Mutable<Integer> boundValue2 = new MutableObject<>();
     BindableInt bindable = new BindableInt(7);
     Binding<Integer> binding =
-        Binding.propertyBinding(bindable, BindableInt::getValue, BindableInt.Property.VALUE);
+        Binding.propertyBinding(bindable, BindableValue::getValue, BindableInt.Property.VALUE);
     BindingReceiver<Integer> receiver = new BindingReceiver<>(binding);
     Binding<Integer> binding1 = receiver.getBinding(i -> i * 2);
     binding1.bindLegacy(boundValue1::setValue);
@@ -173,7 +173,7 @@ public class BindingTest {
     BindableInt bindable1 = new BindableInt(7);
     NestedBindable<Integer> nested = new NestedBindable<>(bindable1);
     Binding<BindableValue<Integer>> nestedBinding =
-        Binding.propertyBinding(nested, NestedBindable::getValue, BindableInt.Property.VALUE);
+        Binding.propertyBinding(nested, BindableValue::getValue, BindableInt.Property.VALUE);
     BindingReceiver<BindableValue<Integer>> receiver = new BindingReceiver<>(nestedBinding);
     Binding<Integer> binding =
         receiver.getFlatBinding(
@@ -239,7 +239,7 @@ public class BindingTest {
     assertEquals(1, boundValue.getValue().intValue());
   }
 
-  private static class BindableValue<T> extends Bindable<BindableValue.Property> {
+  private static class BindableValue<T> extends Bindable<BindableValue<T>, BindableValue.Property> {
     enum Property {
       VALUE
     }

@@ -291,7 +291,7 @@ public class MultiResultScreen extends JPanel {
     }
   }
 
-  private static class Result extends Bindable<Result.Property> {
+  private static class Result extends Bindable<Result, Result.Property> {
     private enum Property {
       VOTES,
       WINNER,
@@ -567,7 +567,8 @@ public class MultiResultScreen extends JPanel {
     }
   }
 
-  private static class WrappedBinding<T> extends Bindable<WrappedBinding.Property> {
+  private static class WrappedBinding<T>
+      extends Bindable<WrappedBinding<T>, WrappedBinding.Property> {
     private enum Property {
       PROP
     }

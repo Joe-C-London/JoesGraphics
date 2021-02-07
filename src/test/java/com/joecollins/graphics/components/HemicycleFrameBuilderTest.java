@@ -232,7 +232,7 @@ public class HemicycleFrameBuilderTest {
     Party dem = new Party("Democratic", "DEM", Color.BLUE);
     Party gop = new Party("Republican", "GOP", Color.RED);
 
-    class Result extends Bindable<Property> {
+    class Result extends Bindable<Result, Property> {
       Party leader;
       boolean hasWon;
       final Party prev;
@@ -314,7 +314,7 @@ public class HemicycleFrameBuilderTest {
     Party dem = new Party("Democratic", "DEM", Color.BLUE);
     Party gop = new Party("Republican", "GOP", Color.RED);
 
-    class Result extends Bindable<Property> {
+    class Result extends Bindable<Result, Property> {
       Party leader;
       boolean hasWon;
       final Party prev;
@@ -425,7 +425,7 @@ public class HemicycleFrameBuilderTest {
     Party dem = new Party("Democratic", "DEM", Color.BLUE);
     Party gop = new Party("Republican", "GOP", Color.RED);
 
-    class Result extends Bindable<Property> {
+    class Result extends Bindable<Result, Property> {
       Party leader;
       boolean hasWon;
       final Party prev;

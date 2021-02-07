@@ -256,7 +256,7 @@ public class MapFrameTest {
     return ShapefileReader.readShapes(peiMap, "DIST_NO", Integer.class);
   }
 
-  private static class MapEntry extends Bindable<MapEntry.Property> {
+  private static class MapEntry extends Bindable<MapEntry, MapEntry.Property> {
 
     private enum Property {
       SHAPE,

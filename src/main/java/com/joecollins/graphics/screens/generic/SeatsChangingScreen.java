@@ -112,7 +112,7 @@ public class SeatsChangingScreen extends JPanel {
     }
   }
 
-  private static class Input<T> extends Bindable<Input.Property> {
+  private static class Input<T> extends Bindable<Input<T>, Input.Property> {
     private enum Property {
       PREV,
       CURR,

@@ -613,7 +613,7 @@ public class BasicResultPanel extends JPanel {
       return val == null ? 0 : val;
     }
 
-    private static class Result<KT> extends Bindable<Result.Property> {
+    private static class Result<KT> extends Bindable<Result<KT>, Result.Property> {
       private enum Property {
         SEATS,
         WINNER
@@ -815,7 +815,7 @@ public class BasicResultPanel extends JPanel {
       return val == null ? ImmutablePair.of(0, 0) : val;
     }
 
-    private static class Result<KT> extends Bindable<Result.Property> {
+    private static class Result<KT> extends Bindable<Result<KT>, Result.Property> {
       private enum Property {
         SEATS,
         WINNER
@@ -999,7 +999,7 @@ public class BasicResultPanel extends JPanel {
       return val == null ? 0 : val;
     }
 
-    private static class Result<KT> extends Bindable<Result.Property> {
+    private static class Result<KT> extends Bindable<Result<KT>, Result.Property> {
       private enum Property {
         SEATS,
         WINNER
@@ -1405,7 +1405,7 @@ public class BasicResultPanel extends JPanel {
       super(current, header, subhead, keyTemplate, voteTemplate, others);
     }
 
-    private static class Result<KT> extends Bindable<Result.Property> {
+    private static class Result<KT> extends Bindable<Result<KT>, Result.Property> {
       private enum Property {
         VOTES,
         WINNER,
@@ -1556,7 +1556,7 @@ public class BasicResultPanel extends JPanel {
       return builder;
     }
 
-    private static class Change<KT> extends Bindable<Change.Property> {
+    private static class Change<KT> extends Bindable<Change<KT>, Change.Property> {
       private enum Property {
         CURR,
         PREV
@@ -1892,7 +1892,7 @@ public class BasicResultPanel extends JPanel {
       return builder.build();
     }
 
-    private static class Change<KT> extends Bindable<RangeVoteScreenBuilder.Change.Property> {
+    private static class Change<KT> extends Bindable<Change<KT>, Change.Property> {
       private enum Property {
         CURR,
         PREV
@@ -1903,12 +1903,12 @@ public class BasicResultPanel extends JPanel {
 
       public void setCurrVotes(Map<KT, Range<Double>> currVotes) {
         this.currVotes = currVotes;
-        onPropertyRefreshed(RangeVoteScreenBuilder.Change.Property.CURR);
+        onPropertyRefreshed(Change.Property.CURR);
       }
 
       public void setPrevVotes(Map<Party, Integer> prevVotes) {
         this.prevVotes = prevVotes;
-        onPropertyRefreshed(RangeVoteScreenBuilder.Change.Property.PREV);
+        onPropertyRefreshed(Change.Property.PREV);
       }
     }
 

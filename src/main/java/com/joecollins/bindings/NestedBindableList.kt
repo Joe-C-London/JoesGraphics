@@ -6,7 +6,7 @@ import java.util.function.Consumer
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
-class NestedBindableList<T : Bindable<E>, E : Enum<E>>(items: List<T> = ArrayList()) : BindableList<T>(items) {
+class NestedBindableList<T : Bindable<T, E>, E : Enum<E>>(items: List<T> = ArrayList()) : BindableList<T>(items) {
 
     private val itemBindings: MutableMap<E, MutableList<(Int, T) -> Unit>> = HashMap()
     private val storedBindings: MutableMap<(Int, T) -> Unit, MutableMap<Int, Consumer<T>>> = WeakHashMap()

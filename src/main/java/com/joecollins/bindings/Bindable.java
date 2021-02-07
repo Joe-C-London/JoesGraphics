@@ -8,28 +8,27 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public abstract class Bindable<E extends Enum<E>> {
+public abstract class Bindable<T extends Bindable<T, E>, E extends Enum<E>> {
 
-  @SuppressWarnings("rawtypes")
-  private Map<E, List<Consumer>> bindings = new ConcurrentHashMap<>();
+  private Map<E, List<Consumer<T>>> bindings = new ConcurrentHashMap<>();
 
-  public void addBinding(Consumer<?> binding, E... properties) {
+  public void addBinding(Consumer<T> binding, E... properties) {
     for (E property : properties) bindings.computeIfAbsent(property, createNewList()).add(binding);
   }
 
-  @SuppressWarnings("rawtypes")
-  private Function<E, List<Consumer>> createNewList() {
+  private Function<E, List<Consumer<T>>> createNewList() {
     return x -> new CopyOnWriteArrayList<>();
   }
 
-  public void removeBinding(Consumer<?> binding, E... properties) {
+  public void removeBinding(Consumer<T> binding, E... properties) {
     for (E property : properties)
       bindings.computeIfAbsent(property, createNewList()).remove(binding);
   }
 
+  @SuppressWarnings("unchecked")
   protected void onPropertyRefreshed(E property) {
     bindings
         .getOrDefault(property, Collections.emptyList())
-        .forEach(binding -> binding.accept(this));
+        .forEach(binding -> binding.accept((T) this));
   }
 }

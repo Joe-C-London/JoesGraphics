@@ -68,7 +68,7 @@ interface IndexedBinding<T> {
             }
         }
 
-        @JvmStatic fun <E : Enum<E>, T : Bindable<E>, U> propertyBinding(item: T, func: (T) -> List<U>, vararg properties: E) = object : IndexedBinding<U> {
+        @JvmStatic fun <E : Enum<E>, T : Bindable<T, E>, U> propertyBinding(item: T, func: (T) -> List<U>, vararg properties: E) = object : IndexedBinding<U> {
             var consumer: java.util.function.Consumer<T>? = null
 
             override val size get() = func(item).size
@@ -111,7 +111,7 @@ interface IndexedBinding<T> {
             }
         }
 
-        @JvmStatic fun <E : Enum<E>, T : Bindable<E>, U> propertyBinding(list: NestedBindableList<T, E>, func: (T) -> U, vararg properties: E) = object : IndexedBinding<U> {
+        @JvmStatic fun <E : Enum<E>, T : Bindable<T, E>, U> propertyBinding(list: NestedBindableList<T, E>, func: (T) -> U, vararg properties: E) = object : IndexedBinding<U> {
             var consumer: ((Int, T) -> Unit)? = null
 
             override val size get(): Int = list.size

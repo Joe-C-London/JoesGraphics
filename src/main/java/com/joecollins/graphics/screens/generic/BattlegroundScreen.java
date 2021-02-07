@@ -178,7 +178,8 @@ public class BattlegroundScreen extends JPanel {
     }
   }
 
-  private static class BattlegroundInput<T> extends Bindable<BattlegroundInput.Property> {
+  private static class BattlegroundInput<T>
+      extends Bindable<BattlegroundInput<T>, BattlegroundInput.Property> {
     private enum Property {
       PREV,
       CURR,

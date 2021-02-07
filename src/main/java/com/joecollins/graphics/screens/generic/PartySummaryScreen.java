@@ -246,7 +246,8 @@ public class PartySummaryScreen extends JPanel {
     }
   }
 
-  private static class SinglePartyInput extends Bindable<SinglePartyInput.Property> {
+  private static class SinglePartyInput
+      extends Bindable<SinglePartyInput, SinglePartyInput.Property> {
     private enum Property {
       SEATS,
       SEAT_DIFF,

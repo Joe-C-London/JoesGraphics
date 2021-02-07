@@ -3,7 +3,8 @@ package com.joecollins.graphics.utils;
 import com.joecollins.bindings.Bindable;
 import com.joecollins.bindings.Binding;
 
-public class BindableWrapper<T> extends Bindable<BindableWrapper.BindableWrapperValue> {
+public class BindableWrapper<T>
+    extends Bindable<BindableWrapper<T>, BindableWrapper.BindableWrapperValue> {
   enum BindableWrapperValue {
     VALUE
   }
