@@ -80,17 +80,21 @@ interface Binding<T> {
 
         @JvmStatic fun <T> sizeBinding(list: BindableList<T>): Binding<Int> {
             return object : Binding<Int> {
-                var consumer: java.util.function.IntConsumer? = null
+                var consumer: ((Int) -> Unit)? = null
                 override val value: Int get() = list.size
                 override fun bind(onUpdate: (Int) -> Unit) {
                     check(consumer == null) { "Binding is already used" }
-                    consumer = java.util.function.IntConsumer { t -> onUpdate(t) }
+                    val consumer: (Int) -> Unit = { t -> onUpdate(t) }
                     list.addSizeBinding(consumer)
-                    consumer!!.accept(list.size)
+                    consumer(list.size)
+                    this.consumer = consumer
                 }
                 override fun unbind() {
-                    list.removeSizeBinding(consumer)
-                    consumer = null
+                    val consumer = this.consumer
+                    if (consumer != null) {
+                        list.removeSizeBinding(consumer)
+                        this.consumer = null
+                    }
                 }
             }
         }

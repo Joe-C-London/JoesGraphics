@@ -42,7 +42,7 @@ class BindingReceiver<T>(binding: Binding<out T>) {
             override val value get() = func(me.value).value
             override fun bind(onUpdate: (U) -> Unit) {
                 check(consumer == null) { "Binding is already used" }
-                consumer = java.util.function.Consumer { onUpdate.invoke(it) }
+                consumer = java.util.function.Consumer { onUpdate(it) }
                 topBinding = me.getBinding()
                 topBinding!!.bind {
                     subBinding?.unbind()

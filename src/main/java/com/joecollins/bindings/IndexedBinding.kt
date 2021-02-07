@@ -91,36 +91,44 @@ interface IndexedBinding<T> {
         @JvmStatic fun <T> propertyBinding(list: BindableList<T>) = propertyBinding(list) { it }
 
         @JvmStatic fun <T, U> propertyBinding(list: BindableList<T>, func: (T) -> U) = object : IndexedBinding<U> {
-            var consumer: java.util.function.BiConsumer<Int, T>? = null
+            var consumer: ((Int, T) -> Unit)? = null
 
             override val size get(): Int = list.size
             override fun get(index: Int): U = func(list[index])
             override fun bind(onUpdate: (Int, U) -> Unit) {
                 check(consumer == null) { "Binding is already used" }
-                consumer = java.util.function.BiConsumer { i, t -> onUpdate(i, func(t)) }
+                val consumer: (Int, T) -> Unit = { i, t -> onUpdate(i, func(t)) }
                 list.addItemBinding(consumer)
-                list.indices.forEach { consumer!!.accept(it, list[it]) }
+                list.indices.forEach { consumer(it, list[it]) }
+                this.consumer = consumer
             }
             override fun unbind() {
-                list.removeItemBinding(consumer)
-                consumer = null
+                val consumer = this.consumer
+                if (consumer != null) {
+                    list.removeItemBinding(consumer)
+                    this.consumer = null
+                }
             }
         }
 
         @JvmStatic fun <E : Enum<E>, T : Bindable<E>, U> propertyBinding(list: NestedBindableList<T, E>, func: (T) -> U, vararg properties: E) = object : IndexedBinding<U> {
-            var consumer: java.util.function.BiConsumer<Int, T>? = null
+            var consumer: ((Int, T) -> Unit)? = null
 
             override val size get(): Int = list.size
             override fun get(index: Int): U = func(list[index])
             override fun bind(onUpdate: (Int, U) -> Unit) {
                 check(consumer == null) { throw IllegalStateException("Binding is already used") }
-                consumer = java.util.function.BiConsumer { i, t -> onUpdate(i, func(t)) }
+                val consumer: (Int, T) -> Unit = { i, t -> onUpdate(i, func(t)) }
                 list.addNestedItemBinding(consumer, *properties)
-                list.indices.forEach { consumer!!.accept(it, list[it]) }
+                list.indices.forEach { consumer(it, list[it]) }
+                this.consumer = consumer
             }
             override fun unbind() {
-                list.removeNestedItemBinding(consumer, *properties)
-                consumer = null
+                val consumer = this.consumer
+                if (consumer != null) {
+                    list.removeNestedItemBinding(consumer, *properties)
+                }
+                this.consumer = null
             }
         }
 
