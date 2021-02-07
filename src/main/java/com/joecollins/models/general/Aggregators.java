@@ -13,7 +13,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.BinaryOperator;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.ToDoubleFunction;
@@ -268,12 +267,12 @@ public class Aggregators {
           Binding<V> binding = bindingFunc.apply(entry);
           bindingsMap.put(key, binding);
           binding.bindLegacy(
-                  val -> {
-                    value.put(key, val);
-                    if (bindings != null) {
-                      onUpdate.invoke(value);
-                    }
-                  });
+              val -> {
+                value.put(key, val);
+                if (bindings != null) {
+                  onUpdate.invoke(value);
+                }
+              });
         }
         onUpdate.invoke(value);
         bindings = new ArrayList<>(bindingsMap.values());

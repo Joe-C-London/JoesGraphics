@@ -202,7 +202,7 @@ public class HeatMapFrameBuilder {
             ImmutablePair::getLeft,
             ImmutablePair::getRight,
             Binding.fixedBinding(calcPrevForParty(allPrevs, party)),
-            change.getBinding(changeLabelFunc))
+            change.getBinding(changeLabelFunc::apply))
         .withHeader(header)
         .withBorder(Binding.fixedBinding(party.getColor()))
         .build();

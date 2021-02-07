@@ -378,13 +378,13 @@ public class HemicycleFrameBuilder {
             ImmutablePair::getLeft,
             ImmutablePair::getRight,
             Binding.fixedBinding(calcPrevForParty(allPrevs, leftParty)),
-            leftChange.getBinding(changeLabelFunc))
+            leftChange.getBinding(changeLabelFunc::apply))
         .withRightChangeBars(
             rightChangeList,
             ImmutablePair::getLeft,
             ImmutablePair::getRight,
             Binding.fixedBinding(calcPrevForParty(allPrevs, rightParty)),
-            rightChange.getBinding(changeLabelFunc))
+            rightChange.getBinding(changeLabelFunc::apply))
         .withHeader(header)
         .build();
   }
