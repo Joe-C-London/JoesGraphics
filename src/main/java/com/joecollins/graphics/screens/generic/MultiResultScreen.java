@@ -87,53 +87,53 @@ public class MultiResultScreen extends JPanel {
               EventQueue.invokeLater(this::repaint);
             });
 
-    IndexedBinding.propertyBinding(builder.list, builder.votesFunc)
-        .bind(
+    IndexedBinding.propertyBinding(builder.list, builder.votesFunc::apply)
+        .bindLegacy(
             (idx, votes) -> {
               panels.get(idx).setVotesBinding(votes);
             });
 
-    IndexedBinding.propertyBinding(builder.list, builder.winnerFunc)
-        .bind(
+    IndexedBinding.propertyBinding(builder.list, builder.winnerFunc::apply)
+        .bindLegacy(
             (idx, winner) -> {
               panels.get(idx).setWinnerBinding(winner);
             });
 
-    IndexedBinding.propertyBinding(builder.list, builder.runoffFunc)
-        .bind((idx, runoff) -> panels.get(idx).setRunoffBinding(runoff));
+    IndexedBinding.propertyBinding(builder.list, builder.runoffFunc::apply)
+        .bindLegacy((idx, runoff) -> panels.get(idx).setRunoffBinding(runoff));
 
-    IndexedBinding.propertyBinding(builder.list, builder.pctReportingFunc)
-        .bind(
+    IndexedBinding.propertyBinding(builder.list, builder.pctReportingFunc::apply)
+        .bindLegacy(
             (idx, pctReporting) -> {
               panels.get(idx).setPctReportingBinding(pctReporting);
             });
 
-    IndexedBinding.propertyBinding(builder.list, builder.headerFunc)
-        .bind(
+    IndexedBinding.propertyBinding(builder.list, builder.headerFunc::apply)
+        .bindLegacy(
             (idx, header) -> {
               panels.get(idx).setHeaderBinding(header);
             });
 
-    IndexedBinding.propertyBinding(builder.list, builder.subheadFunc)
-        .bind(
+    IndexedBinding.propertyBinding(builder.list, builder.subheadFunc::apply)
+        .bindLegacy(
             (idx, subhead) -> {
               panels.get(idx).setSubheadBinding(subhead);
             });
 
     if (builder.swingPartyOrder != null) {
-      IndexedBinding.propertyBinding(builder.list, builder.prevFunc)
-          .bind((idx, prev) -> panels.get(idx).setPrevBinding(prev));
-      IndexedBinding.propertyBinding(builder.list, builder.swingHeaderFunc)
-          .bind((idx, header) -> panels.get(idx).setSwingHeaderBinding(header));
+      IndexedBinding.propertyBinding(builder.list, builder.prevFunc::apply)
+          .bindLegacy((idx, prev) -> panels.get(idx).setPrevBinding(prev));
+      IndexedBinding.propertyBinding(builder.list, builder.swingHeaderFunc::apply)
+          .bindLegacy((idx, header) -> panels.get(idx).setSwingHeaderBinding(header));
     }
 
     if (builder.mapHeaderFunc != null) {
-      IndexedBinding.propertyBinding(builder.list, builder.mapShapeFunc)
-          .bind((idx, shapes) -> panels.get(idx).setMapShapeBinding(shapes));
-      IndexedBinding.propertyBinding(builder.list, builder.mapFocusFunc)
-          .bind((idx, shapes) -> panels.get(idx).setMapFocusBinding(shapes));
-      IndexedBinding.propertyBinding(builder.list, builder.mapHeaderFunc)
-          .bind((idx, header) -> panels.get(idx).setMapHeaderBinding(header));
+      IndexedBinding.propertyBinding(builder.list, builder.mapShapeFunc::apply)
+          .bindLegacy((idx, shapes) -> panels.get(idx).setMapShapeBinding(shapes));
+      IndexedBinding.propertyBinding(builder.list, builder.mapFocusFunc::apply)
+          .bindLegacy((idx, shapes) -> panels.get(idx).setMapFocusBinding(shapes));
+      IndexedBinding.propertyBinding(builder.list, builder.mapHeaderFunc::apply)
+          .bindLegacy((idx, header) -> panels.get(idx).setMapHeaderBinding(header));
     }
   }
 

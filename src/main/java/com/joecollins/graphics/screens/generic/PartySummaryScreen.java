@@ -241,7 +241,7 @@ public class PartySummaryScreen extends JPanel {
       frame.setSummaryColorBinding(party.getBinding(Party::getColor));
       frame.setNumSectionsBinding(() -> 2);
       frame.setSectionHeaderBinding(IndexedBinding.listBinding("SEATS", "POPULAR VOTE"));
-      frame.setSectionValueBinding(IndexedBinding.propertyBinding(values, Function.identity()));
+      frame.setSectionValueBinding(IndexedBinding.propertyBinding(values, t -> t));
       return frame;
     }
   }

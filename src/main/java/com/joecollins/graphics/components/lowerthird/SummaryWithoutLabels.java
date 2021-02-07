@@ -78,7 +78,7 @@ public class SummaryWithoutLabels extends JPanel {
   public void setEntriesBinding(IndexedBinding<Entry> entriesBinding) {
     this.entriesBinding.unbind();
     this.entriesBinding = entriesBinding;
-    this.entriesBinding.bind(
+    this.entriesBinding.bindLegacy(
         (idx, entry) -> {
           entryPanels.get(idx).bottomPanel.setBackground(entry.color);
           entryPanels

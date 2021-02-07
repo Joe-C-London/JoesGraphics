@@ -14,6 +14,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
+import kotlin.jvm.functions.Function1;
 
 public class BarFrameBuilder {
 
@@ -169,8 +170,8 @@ public class BarFrameBuilder {
         bar ->
             differentDirections.test(bar)
                 || Math.abs(bar.value1.doubleValue()) < Math.abs(bar.value2.doubleValue());
-    Function<DualBar, Number> first = bar -> reverse.test(bar) ? bar.value1 : bar.value2;
-    Function<DualBar, Number> second = bar -> reverse.test(bar) ? bar.value2 : bar.value1;
+    Function1<DualBar, Number> first = bar -> reverse.test(bar) ? bar.value1 : bar.value2;
+    Function1<DualBar, Number> second = bar -> reverse.test(bar) ? bar.value2 : bar.value1;
 
     BindableList<DualBar> entries = new BindableList<>();
     barFrame.setNumBarsBinding(Binding.sizeBinding(entries));
@@ -202,8 +203,8 @@ public class BarFrameBuilder {
         IndexedBinding.propertyBinding(
             entries,
             e ->
-                second.apply(e).doubleValue()
-                    - (differentDirections.test(e) ? 0 : first.apply(e).doubleValue())));
+                second.invoke(e).doubleValue()
+                    - (differentDirections.test(e) ? 0 : first.invoke(e).doubleValue())));
     barFrame.setLeftIconBinding(IndexedBinding.propertyBinding(entries, e -> e.shape));
     builder.bind(
         bars,
@@ -240,8 +241,8 @@ public class BarFrameBuilder {
         bar ->
             differentDirections.test(bar)
                 || Math.abs(bar.value1.doubleValue()) < Math.abs(bar.value2.doubleValue());
-    Function<DualBar, Number> first = bar -> reverse.test(bar) ? bar.value1 : bar.value2;
-    Function<DualBar, Number> second = bar -> reverse.test(bar) ? bar.value2 : bar.value1;
+    Function1<DualBar, Number> first = bar -> reverse.test(bar) ? bar.value1 : bar.value2;
+    Function1<DualBar, Number> second = bar -> reverse.test(bar) ? bar.value2 : bar.value1;
 
     BindableList<DualBar> entries = new BindableList<>();
     barFrame.setNumBarsBinding(Binding.sizeBinding(entries));
@@ -273,8 +274,8 @@ public class BarFrameBuilder {
         IndexedBinding.propertyBinding(
             entries,
             e ->
-                second.apply(e).doubleValue()
-                    - (differentDirections.test(e) ? 0 : first.apply(e).doubleValue())));
+                second.invoke(e).doubleValue()
+                    - (differentDirections.test(e) ? 0 : first.invoke(e).doubleValue())));
     barFrame.setLeftIconBinding(IndexedBinding.propertyBinding(entries, e -> e.shape));
     builder.bind(
         bars,
@@ -366,7 +367,7 @@ public class BarFrameBuilder {
   public <T extends Number> BarFrameBuilder withLines(
       BindableList<T> lines, Function<? super T, String> labelFunc) {
     barFrame.setNumLinesBinding(Binding.sizeBinding(lines));
-    barFrame.setLineLevelsBinding(IndexedBinding.propertyBinding(lines, Function.identity()));
+    barFrame.setLineLevelsBinding(IndexedBinding.propertyBinding(lines, t -> t));
     barFrame.setLineLabelsBinding(IndexedBinding.propertyBinding(lines, labelFunc::apply));
     return this;
   }

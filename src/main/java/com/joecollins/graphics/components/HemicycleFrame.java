@@ -130,7 +130,7 @@ public class HemicycleFrame extends GraphicsFrame {
   public void setRowCountsBinding(IndexedBinding<Integer> rowCountBinding) {
     this.rowCountBinding.unbind();
     this.rowCountBinding = rowCountBinding;
-    this.rowCountBinding.bind(
+    this.rowCountBinding.bindLegacy(
         (idx, count) -> {
           dotsPanel.rows.set(idx, count);
           dotsPanel.repaint();
@@ -158,7 +158,7 @@ public class HemicycleFrame extends GraphicsFrame {
   public void setDotColorBinding(IndexedBinding<Color> dotColorBinding) {
     this.dotColorBinding.unbind();
     this.dotColorBinding = dotColorBinding;
-    this.dotColorBinding.bind(
+    this.dotColorBinding.bindLegacy(
         (idx, color) -> {
           dotsPanel.dots.get(idx).color = color;
           dotsPanel.repaint();
@@ -172,7 +172,7 @@ public class HemicycleFrame extends GraphicsFrame {
   public void setDotBorderBinding(IndexedBinding<Color> dotBorderBinding) {
     this.dotBorderBinding.unbind();
     this.dotBorderBinding = dotBorderBinding;
-    this.dotBorderBinding.bind(
+    this.dotBorderBinding.bindLegacy(
         (idx, border) -> {
           dotsPanel.dots.get(idx).border = border;
           dotsPanel.repaint();
@@ -200,7 +200,7 @@ public class HemicycleFrame extends GraphicsFrame {
   public void setLeftSeatBarColorBinding(IndexedBinding<Color> leftSeatBarColorBinding) {
     this.leftSeatBarColorBinding.unbind();
     this.leftSeatBarColorBinding = leftSeatBarColorBinding;
-    this.leftSeatBarColorBinding.bind(
+    this.leftSeatBarColorBinding.bindLegacy(
         (idx, color) -> {
           barsPanel.leftSeatBars.get(idx).color = color;
           barsPanel.repaint();
@@ -214,7 +214,7 @@ public class HemicycleFrame extends GraphicsFrame {
   public void setLeftSeatBarSizeBinding(IndexedBinding<Integer> leftSeatBarSizeBinding) {
     this.leftSeatBarSizeBinding.unbind();
     this.leftSeatBarSizeBinding = leftSeatBarSizeBinding;
-    this.leftSeatBarSizeBinding.bind(
+    this.leftSeatBarSizeBinding.bindLegacy(
         (idx, size) -> {
           barsPanel.leftSeatBars.get(idx).size = size;
           barsPanel.repaint();
@@ -256,7 +256,7 @@ public class HemicycleFrame extends GraphicsFrame {
   public void setRightSeatBarColorBinding(IndexedBinding<Color> rightSeatBarColorBinding) {
     this.rightSeatBarColorBinding.unbind();
     this.rightSeatBarColorBinding = rightSeatBarColorBinding;
-    this.rightSeatBarColorBinding.bind(
+    this.rightSeatBarColorBinding.bindLegacy(
         (idx, color) -> {
           barsPanel.rightSeatBars.get(idx).color = color;
           barsPanel.repaint();
@@ -270,7 +270,7 @@ public class HemicycleFrame extends GraphicsFrame {
   public void setRightSeatBarSizeBinding(IndexedBinding<Integer> rightSeatBarSizeBinding) {
     this.rightSeatBarSizeBinding.unbind();
     this.rightSeatBarSizeBinding = rightSeatBarSizeBinding;
-    this.rightSeatBarSizeBinding.bind(
+    this.rightSeatBarSizeBinding.bindLegacy(
         (idx, size) -> {
           barsPanel.rightSeatBars.get(idx).size = size;
           barsPanel.repaint();
@@ -312,7 +312,7 @@ public class HemicycleFrame extends GraphicsFrame {
   public void setMiddleSeatBarColorBinding(IndexedBinding<Color> middleSeatBarColorBinding) {
     this.middleSeatBarColorBinding.unbind();
     this.middleSeatBarColorBinding = middleSeatBarColorBinding;
-    this.middleSeatBarColorBinding.bind(
+    this.middleSeatBarColorBinding.bindLegacy(
         (idx, color) -> {
           barsPanel.middleSeatBars.get(idx).color = color;
           barsPanel.repaint();
@@ -326,7 +326,7 @@ public class HemicycleFrame extends GraphicsFrame {
   public void setMiddleSeatBarSizeBinding(IndexedBinding<Integer> middleSeatBarSizeBinding) {
     this.middleSeatBarSizeBinding.unbind();
     this.middleSeatBarSizeBinding = middleSeatBarSizeBinding;
-    this.middleSeatBarSizeBinding.bind(
+    this.middleSeatBarSizeBinding.bindLegacy(
         (idx, size) -> {
           barsPanel.middleSeatBars.get(idx).size = size;
           barsPanel.repaint();
@@ -368,7 +368,7 @@ public class HemicycleFrame extends GraphicsFrame {
   public void setLeftChangeBarColorBinding(IndexedBinding<Color> leftChangeBarColorBinding) {
     this.leftChangeBarColorBinding.unbind();
     this.leftChangeBarColorBinding = leftChangeBarColorBinding;
-    this.leftChangeBarColorBinding.bind(
+    this.leftChangeBarColorBinding.bindLegacy(
         (idx, color) -> {
           barsPanel.leftChangeBars.get(idx).color = color;
           barsPanel.repaint();
@@ -382,7 +382,7 @@ public class HemicycleFrame extends GraphicsFrame {
   public void setLeftChangeBarSizeBinding(IndexedBinding<Integer> leftChangeBarSizeBinding) {
     this.leftChangeBarSizeBinding.unbind();
     this.leftChangeBarSizeBinding = leftChangeBarSizeBinding;
-    this.leftChangeBarSizeBinding.bind(
+    this.leftChangeBarSizeBinding.bindLegacy(
         (idx, size) -> {
           barsPanel.leftChangeBars.get(idx).size = size;
           barsPanel.repaint();
@@ -438,7 +438,7 @@ public class HemicycleFrame extends GraphicsFrame {
   public void setRightChangeBarColorBinding(IndexedBinding<Color> rightChangeBarColorBinding) {
     this.rightChangeBarColorBinding.unbind();
     this.rightChangeBarColorBinding = rightChangeBarColorBinding;
-    this.rightChangeBarColorBinding.bind(
+    this.rightChangeBarColorBinding.bindLegacy(
         (idx, color) -> {
           barsPanel.rightChangeBars.get(idx).color = color;
           barsPanel.repaint();
@@ -452,7 +452,7 @@ public class HemicycleFrame extends GraphicsFrame {
   public void setRightChangeBarSizeBinding(IndexedBinding<Integer> rightChangeBarSizeBinding) {
     this.rightChangeBarSizeBinding.unbind();
     this.rightChangeBarSizeBinding = rightChangeBarSizeBinding;
-    this.rightChangeBarSizeBinding.bind(
+    this.rightChangeBarSizeBinding.bindLegacy(
         (idx, size) -> {
           barsPanel.rightChangeBars.get(idx).size = size;
           barsPanel.repaint();

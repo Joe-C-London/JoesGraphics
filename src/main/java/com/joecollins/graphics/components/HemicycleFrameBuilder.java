@@ -119,8 +119,8 @@ public class HemicycleFrameBuilder {
             .collect(Collectors.toList());
 
     builder.frame.setNumDotsBinding(Binding.fixedBinding(dots.size()));
-    builder.frame.setDotColorBinding(IndexedBinding.listBinding(dots, colorFunc));
-    builder.frame.setDotBorderBinding(IndexedBinding.listBinding(dots, borderFunc));
+    builder.frame.setDotColorBinding(IndexedBinding.listBinding(dots, colorFunc::apply));
+    builder.frame.setDotBorderBinding(IndexedBinding.listBinding(dots, borderFunc::apply));
     return builder;
   }
 
@@ -153,7 +153,7 @@ public class HemicycleFrameBuilder {
       ToIntFunction<T> seatFunc,
       Binding<String> labelBinding) {
     frame.setLeftSeatBarCountBinding(Binding.sizeBinding(bars));
-    frame.setLeftSeatBarColorBinding(IndexedBinding.propertyBinding(bars, colorFunc));
+    frame.setLeftSeatBarColorBinding(IndexedBinding.propertyBinding(bars, colorFunc::apply));
     frame.setLeftSeatBarSizeBinding(IndexedBinding.propertyBinding(bars, seatFunc::applyAsInt));
     frame.setLeftSeatBarLabelBinding(labelBinding);
     return this;
@@ -165,7 +165,7 @@ public class HemicycleFrameBuilder {
       ToIntFunction<T> seatFunc,
       Binding<String> labelBinding) {
     frame.setRightSeatBarCountBinding(Binding.sizeBinding(bars));
-    frame.setRightSeatBarColorBinding(IndexedBinding.propertyBinding(bars, colorFunc));
+    frame.setRightSeatBarColorBinding(IndexedBinding.propertyBinding(bars, colorFunc::apply));
     frame.setRightSeatBarSizeBinding(IndexedBinding.propertyBinding(bars, seatFunc::applyAsInt));
     frame.setRightSeatBarLabelBinding(labelBinding);
     return this;
@@ -177,7 +177,7 @@ public class HemicycleFrameBuilder {
       ToIntFunction<T> seatFunc,
       Binding<String> labelBinding) {
     frame.setMiddleSeatBarCountBinding(Binding.sizeBinding(bars));
-    frame.setMiddleSeatBarColorBinding(IndexedBinding.propertyBinding(bars, colorFunc));
+    frame.setMiddleSeatBarColorBinding(IndexedBinding.propertyBinding(bars, colorFunc::apply));
     frame.setMiddleSeatBarSizeBinding(IndexedBinding.propertyBinding(bars, seatFunc::applyAsInt));
     frame.setMiddleSeatBarLabelBinding(labelBinding);
     return this;
@@ -190,7 +190,7 @@ public class HemicycleFrameBuilder {
       Binding<Integer> startBinding,
       Binding<String> labelBinding) {
     frame.setLeftChangeBarCountBinding(Binding.sizeBinding(bars));
-    frame.setLeftChangeBarColorBinding(IndexedBinding.propertyBinding(bars, colorFunc));
+    frame.setLeftChangeBarColorBinding(IndexedBinding.propertyBinding(bars, colorFunc::apply));
     frame.setLeftChangeBarSizeBinding(IndexedBinding.propertyBinding(bars, seatFunc::applyAsInt));
     frame.setLeftChangeBarStartBinding(startBinding);
     frame.setLeftChangeBarLabelBinding(labelBinding);
@@ -204,7 +204,7 @@ public class HemicycleFrameBuilder {
       Binding<Integer> startBinding,
       Binding<String> labelBinding) {
     frame.setRightChangeBarCountBinding(Binding.sizeBinding(bars));
-    frame.setRightChangeBarColorBinding(IndexedBinding.propertyBinding(bars, colorFunc));
+    frame.setRightChangeBarColorBinding(IndexedBinding.propertyBinding(bars, colorFunc::apply));
     frame.setRightChangeBarSizeBinding(IndexedBinding.propertyBinding(bars, seatFunc::applyAsInt));
     frame.setRightChangeBarStartBinding(startBinding);
     frame.setRightChangeBarLabelBinding(labelBinding);

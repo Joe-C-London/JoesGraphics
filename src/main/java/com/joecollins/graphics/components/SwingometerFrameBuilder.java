@@ -138,9 +138,9 @@ public class SwingometerFrameBuilder {
       Function<T, String> labelFunc,
       Function<T, Color> colorFunc) {
     frame.setNumOuterLabelsBinding(Binding.sizeBinding(labels));
-    frame.setOuterLabelPositionBinding(IndexedBinding.propertyBinding(labels, positionFunc));
-    frame.setOuterLabelTextBinding(IndexedBinding.propertyBinding(labels, labelFunc));
-    frame.setOuterLabelColorBinding(IndexedBinding.propertyBinding(labels, colorFunc));
+    frame.setOuterLabelPositionBinding(IndexedBinding.propertyBinding(labels, positionFunc::apply));
+    frame.setOuterLabelTextBinding(IndexedBinding.propertyBinding(labels, labelFunc::apply));
+    frame.setOuterLabelColorBinding(IndexedBinding.propertyBinding(labels, colorFunc::apply));
     return this;
   }
 
@@ -174,9 +174,9 @@ public class SwingometerFrameBuilder {
       Function<T, String> labelFunc,
       Predicate<T> solidFunc) {
     frame.setNumDotsBinding(Binding.sizeBinding(dots));
-    frame.setDotsPositionBinding(IndexedBinding.propertyBinding(dots, positionFunc));
-    frame.setDotsColorBinding(IndexedBinding.propertyBinding(dots, colorFunc));
-    frame.setDotsLabelBinding(IndexedBinding.propertyBinding(dots, labelFunc));
+    frame.setDotsPositionBinding(IndexedBinding.propertyBinding(dots, positionFunc::apply));
+    frame.setDotsColorBinding(IndexedBinding.propertyBinding(dots, colorFunc::apply));
+    frame.setDotsLabelBinding(IndexedBinding.propertyBinding(dots, labelFunc::apply));
     frame.setDotsSolidBinding(IndexedBinding.propertyBinding(dots, solidFunc::test));
     return this;
   }

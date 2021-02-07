@@ -20,7 +20,7 @@ public class IndexedBindingTest {
     BindableList<Integer> list = new BindableList<>();
     list.add(7);
     IndexedBinding<Integer> binding = IndexedBinding.propertyBinding(list);
-    binding.bind(valuesByIndex::put);
+    binding.bindLegacy(valuesByIndex::put);
     assertEquals(7, valuesByIndex.get(0).intValue());
 
     list.set(0, 42);
@@ -38,7 +38,7 @@ public class IndexedBindingTest {
     BindableList<Integer> list = new BindableList<>();
     list.add(7);
     IndexedBinding<Integer> binding = IndexedBinding.propertyBinding(list, i -> i);
-    binding.bind(valuesByIndex::put);
+    binding.bindLegacy(valuesByIndex::put);
     Binding.sizeBinding(list).bindLegacy(size::setValue);
     assertEquals(7, valuesByIndex.get(0).intValue());
     assertEquals(1, size.getValue().intValue());
@@ -89,7 +89,7 @@ public class IndexedBindingTest {
     list.add(bindable1);
     IndexedBinding<Integer> binding =
         IndexedBinding.propertyBinding(list, BindableValue::getValue, BindableInt.Property.VALUE);
-    binding.bind(valuesByIndex::put);
+    binding.bindLegacy(valuesByIndex::put);
     assertEquals(7, valuesByIndex.get(0).intValue());
 
     bindable1.setValue(17);
@@ -117,7 +117,7 @@ public class IndexedBindingTest {
   public void testEmptyBinding() {
     Map<Integer, Integer> valuesByIndex = new HashMap<>();
     IndexedBinding<Integer> binding = IndexedBinding.emptyBinding();
-    binding.bind(valuesByIndex::put);
+    binding.bindLegacy(valuesByIndex::put);
     assertTrue(valuesByIndex.isEmpty());
   }
 
@@ -125,7 +125,7 @@ public class IndexedBindingTest {
   public void testSingletonBinding() {
     Map<Integer, Integer> valuesByIndex = new HashMap<>();
     IndexedBinding<Integer> binding = IndexedBinding.singletonBinding(7);
-    binding.bind(valuesByIndex::put);
+    binding.bindLegacy(valuesByIndex::put);
     assertEquals(1, valuesByIndex.size());
     assertEquals(7, valuesByIndex.get(0).intValue());
   }
@@ -137,7 +137,7 @@ public class IndexedBindingTest {
     IndexedBinding<Integer> binding =
         IndexedBinding.propertyBinding(
             bindable, BindableValue::getValue, BindableValue.Property.VALUE);
-    binding.bind(valuesByIndex::put);
+    binding.bindLegacy(valuesByIndex::put);
     assertEquals(1, valuesByIndex.get(0).intValue());
     assertEquals(2, valuesByIndex.get(1).intValue());
     assertEquals(3, valuesByIndex.get(2).intValue());
@@ -158,7 +158,7 @@ public class IndexedBindingTest {
   public void testListArrayBinding() {
     Map<Integer, Integer> valuesByIndex = new HashMap<>();
     IndexedBinding<Integer> binding = IndexedBinding.listBinding(1, 2, 3);
-    binding.bind(valuesByIndex::put);
+    binding.bindLegacy(valuesByIndex::put);
     assertEquals(1, valuesByIndex.get(0).intValue());
     assertEquals(2, valuesByIndex.get(1).intValue());
     assertEquals(3, valuesByIndex.get(2).intValue());
@@ -168,7 +168,7 @@ public class IndexedBindingTest {
   public void testListListBinding() {
     Map<Integer, Integer> valuesByIndex = new HashMap<>();
     IndexedBinding<Integer> binding = IndexedBinding.listBinding(List.of(1, 2, 3));
-    binding.bind(valuesByIndex::put);
+    binding.bindLegacy(valuesByIndex::put);
     assertEquals(1, valuesByIndex.get(0).intValue());
     assertEquals(2, valuesByIndex.get(1).intValue());
     assertEquals(3, valuesByIndex.get(2).intValue());
@@ -183,7 +183,7 @@ public class IndexedBindingTest {
         IndexedBinding.listBinding(
             bindables,
             b -> Binding.propertyBinding(b, BindableInt::getValue, BindableInt.Property.VALUE));
-    binding.bind(valuesByIndex::put);
+    binding.bindLegacy(valuesByIndex::put);
     assertEquals(1, valuesByIndex.get(0).intValue());
     assertEquals(2, valuesByIndex.get(1).intValue());
     assertEquals(3, valuesByIndex.get(2).intValue());
@@ -208,7 +208,7 @@ public class IndexedBindingTest {
   public void testRangeBinding() {
     Map<Integer, Integer> valuesByIndex = new HashMap<>();
     IndexedBinding<Integer> binding = IndexedBinding.functionBinding(1, 5, i -> i * i);
-    binding.bind(valuesByIndex::put);
+    binding.bindLegacy(valuesByIndex::put);
     assertEquals(1, valuesByIndex.get(0).intValue());
     assertEquals(4, valuesByIndex.get(1).intValue());
     assertEquals(9, valuesByIndex.get(2).intValue());

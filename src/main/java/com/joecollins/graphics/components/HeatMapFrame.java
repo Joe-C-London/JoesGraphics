@@ -114,7 +114,7 @@ public class HeatMapFrame extends GraphicsFrame {
   public void setSquareBordersBinding(IndexedBinding<Color> squareBordersBinding) {
     this.squareBordersBinding.unbind();
     this.squareBordersBinding = squareBordersBinding;
-    this.squareBordersBinding.bind(squaresPanel::setSquareBorder);
+    this.squareBordersBinding.bindLegacy(squaresPanel::setSquareBorder);
   }
 
   Color getSquareFill(int index) {
@@ -124,7 +124,7 @@ public class HeatMapFrame extends GraphicsFrame {
   public void setSquareFillBinding(IndexedBinding<Color> squareFillBinding) {
     this.squareFillBinding.unbind();
     this.squareFillBinding = squareFillBinding;
-    this.squareFillBinding.bind(squaresPanel::setSquareFill);
+    this.squareFillBinding.bindLegacy(squaresPanel::setSquareFill);
   }
 
   int getSeatBarCount() {
@@ -144,7 +144,7 @@ public class HeatMapFrame extends GraphicsFrame {
   public void setSeatBarColorBinding(IndexedBinding<Color> seatBarColorBinding) {
     this.seatBarColorBinding.unbind();
     this.seatBarColorBinding = seatBarColorBinding;
-    this.seatBarColorBinding.bind(barsPanel::setSeatBarColor);
+    this.seatBarColorBinding.bindLegacy(barsPanel::setSeatBarColor);
   }
 
   int getSeatBarSize(int index) {
@@ -154,7 +154,7 @@ public class HeatMapFrame extends GraphicsFrame {
   public void setSeatBarSizeBinding(IndexedBinding<Integer> seatBarSizeBinding) {
     this.seatBarSizeBinding.unbind();
     this.seatBarSizeBinding = seatBarSizeBinding;
-    this.seatBarSizeBinding.bind(barsPanel::setSeatBarSize);
+    this.seatBarSizeBinding.bindLegacy(barsPanel::setSeatBarSize);
   }
 
   String getSeatBarLabel() {
@@ -184,7 +184,7 @@ public class HeatMapFrame extends GraphicsFrame {
   public void setChangeBarColorBinding(IndexedBinding<Color> changeBarColorBinding) {
     this.changeBarColorBinding.unbind();
     this.changeBarColorBinding = changeBarColorBinding;
-    this.changeBarColorBinding.bind(barsPanel::setChangeBarColor);
+    this.changeBarColorBinding.bindLegacy(barsPanel::setChangeBarColor);
   }
 
   int getChangeBarSize(int index) {
@@ -194,7 +194,7 @@ public class HeatMapFrame extends GraphicsFrame {
   public void setChangeBarSizeBinding(IndexedBinding<Integer> changeBarSizeBinding) {
     this.changeBarSizeBinding.unbind();
     this.changeBarSizeBinding = changeBarSizeBinding;
-    this.changeBarSizeBinding.bind(barsPanel::setChangeBarSize);
+    this.changeBarSizeBinding.bindLegacy(barsPanel::setChangeBarSize);
   }
 
   String getChangeBarLabel() {

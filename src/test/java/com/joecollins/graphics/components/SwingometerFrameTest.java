@@ -10,7 +10,6 @@ import com.joecollins.bindings.Binding;
 import com.joecollins.bindings.IndexedBinding;
 import java.awt.Color;
 import java.io.IOException;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -50,7 +49,7 @@ public class SwingometerFrameTest {
         IntStream.rangeClosed(-10, 10).boxed().collect(Collectors.toCollection(BindableList::new));
     SwingometerFrame frame = new SwingometerFrame();
     frame.setNumTicksBinding(Binding.sizeBinding(ticks));
-    frame.setTickPositionBinding(IndexedBinding.propertyBinding(ticks, Function.identity()));
+    frame.setTickPositionBinding(IndexedBinding.propertyBinding(ticks, t -> t));
     frame.setTickTextBinding(
         IndexedBinding.propertyBinding(ticks, t -> String.valueOf(Math.abs(t))));
     assertEquals(21, frame.getNumTicks());
@@ -177,7 +176,7 @@ public class SwingometerFrameTest {
     frame.setLeftToWinBinding(Binding.fixedBinding(1.55));
     frame.setRightToWinBinding(Binding.fixedBinding(-0.60));
     frame.setNumTicksBinding(Binding.sizeBinding(ticks));
-    frame.setTickPositionBinding(IndexedBinding.propertyBinding(ticks, Function.identity()));
+    frame.setTickPositionBinding(IndexedBinding.propertyBinding(ticks, t -> t));
     frame.setTickTextBinding(IndexedBinding.propertyBinding(ticks, String::valueOf));
     frame.setNumOuterLabelsBinding(Binding.sizeBinding(outerLabels));
     frame.setOuterLabelPositionBinding(
@@ -221,7 +220,7 @@ public class SwingometerFrameTest {
     frame.setLeftToWinBinding(Binding.fixedBinding(1.55));
     frame.setRightToWinBinding(Binding.fixedBinding(-0.60));
     frame.setNumTicksBinding(Binding.sizeBinding(ticks));
-    frame.setTickPositionBinding(IndexedBinding.propertyBinding(ticks, Function.identity()));
+    frame.setTickPositionBinding(IndexedBinding.propertyBinding(ticks, t -> t));
     frame.setTickTextBinding(IndexedBinding.propertyBinding(ticks, String::valueOf));
     frame.setNumOuterLabelsBinding(Binding.sizeBinding(outerLabels));
     frame.setOuterLabelPositionBinding(
@@ -306,7 +305,7 @@ public class SwingometerFrameTest {
     frame.setLeftToWinBinding(Binding.fixedBinding(-2.68));
     frame.setRightToWinBinding(Binding.fixedBinding(2.68));
     frame.setNumTicksBinding(Binding.sizeBinding(ticks));
-    frame.setTickPositionBinding(IndexedBinding.propertyBinding(ticks, Function.identity()));
+    frame.setTickPositionBinding(IndexedBinding.propertyBinding(ticks, t -> t));
     frame.setTickTextBinding(IndexedBinding.propertyBinding(ticks, String::valueOf));
     frame.setNumOuterLabelsBinding(Binding.sizeBinding(outerLabels));
     frame.setOuterLabelPositionBinding(
@@ -351,7 +350,7 @@ public class SwingometerFrameTest {
     frame.setLeftToWinBinding(Binding.fixedBinding(-2.68));
     frame.setRightToWinBinding(Binding.fixedBinding(2.68));
     frame.setNumTicksBinding(Binding.sizeBinding(ticks));
-    frame.setTickPositionBinding(IndexedBinding.propertyBinding(ticks, Function.identity()));
+    frame.setTickPositionBinding(IndexedBinding.propertyBinding(ticks, t -> t));
     frame.setTickTextBinding(IndexedBinding.propertyBinding(ticks, String::valueOf));
     frame.setNumOuterLabelsBinding(Binding.sizeBinding(outerLabels));
     frame.setOuterLabelPositionBinding(
@@ -461,7 +460,7 @@ public class SwingometerFrameTest {
     frame.setLeftToWinBinding(Binding.fixedBinding(-2.68));
     frame.setRightToWinBinding(Binding.fixedBinding(2.68));
     frame.setNumTicksBinding(Binding.sizeBinding(ticks));
-    frame.setTickPositionBinding(IndexedBinding.propertyBinding(ticks, Function.identity()));
+    frame.setTickPositionBinding(IndexedBinding.propertyBinding(ticks, t -> t));
     frame.setTickTextBinding(IndexedBinding.propertyBinding(ticks, String::valueOf));
     frame.setNumOuterLabelsBinding(Binding.sizeBinding(outerLabels));
     frame.setOuterLabelPositionBinding(

@@ -16,7 +16,6 @@ import java.awt.Color;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
-import java.util.function.Function;
 import java.util.stream.Stream;
 import org.junit.Test;
 
@@ -204,28 +203,26 @@ public class HemicycleFrameTest {
     frame.setNumRowsBinding(Binding.fixedBinding(rowCounts.size()));
     frame.setRowCountsBinding(IndexedBinding.listBinding(rowCounts));
     frame.setNumDotsBinding(Binding.sizeBinding(dotColors));
-    frame.setDotColorBinding(IndexedBinding.propertyBinding(dotColors, Function.identity()));
+    frame.setDotColorBinding(IndexedBinding.propertyBinding(dotColors, t -> t));
     frame.setDotBorderBinding(IndexedBinding.listBinding(dotBorders));
     frame.setHeaderBinding(() -> "PEI HEMICYCLE");
 
     frame.setLeftSeatBarCountBinding(Binding.sizeBinding(leftSeats));
     Color lGreen = new Color(128, 255, 128);
     frame.setLeftSeatBarColorBinding(IndexedBinding.listBinding(GREEN, lGreen));
-    frame.setLeftSeatBarSizeBinding(IndexedBinding.propertyBinding(leftSeats, Function.identity()));
+    frame.setLeftSeatBarSizeBinding(IndexedBinding.propertyBinding(leftSeats, t -> t));
     frame.setLeftSeatBarLabelBinding(leftLabel.getBinding());
 
     frame.setMiddleSeatBarCountBinding(Binding.sizeBinding(middleSeats));
     Color lRed = new Color(255, 128, 128);
     frame.setMiddleSeatBarColorBinding(IndexedBinding.listBinding(RED, lRed));
-    frame.setMiddleSeatBarSizeBinding(
-        IndexedBinding.propertyBinding(middleSeats, Function.identity()));
+    frame.setMiddleSeatBarSizeBinding(IndexedBinding.propertyBinding(middleSeats, t -> t));
     frame.setMiddleSeatBarLabelBinding(middleLabel.getBinding());
 
     frame.setRightSeatBarCountBinding(Binding.sizeBinding(rightSeats));
     Color lBlue = new Color(128, 128, 255);
     frame.setRightSeatBarColorBinding(IndexedBinding.listBinding(BLUE, lBlue));
-    frame.setRightSeatBarSizeBinding(
-        IndexedBinding.propertyBinding(rightSeats, Function.identity()));
+    frame.setRightSeatBarSizeBinding(IndexedBinding.propertyBinding(rightSeats, t -> t));
     frame.setRightSeatBarLabelBinding(rightLabel.getBinding());
 
     frame.setSize(1024, 512);
@@ -296,41 +293,37 @@ public class HemicycleFrameTest {
     frame.setNumRowsBinding(Binding.fixedBinding(rowCounts.size()));
     frame.setRowCountsBinding(IndexedBinding.listBinding(rowCounts));
     frame.setNumDotsBinding(Binding.sizeBinding(dotColors));
-    frame.setDotColorBinding(IndexedBinding.propertyBinding(dotColors, Function.identity()));
+    frame.setDotColorBinding(IndexedBinding.propertyBinding(dotColors, t -> t));
     frame.setDotBorderBinding(IndexedBinding.listBinding(dotBorders));
     frame.setHeaderBinding(() -> "PEI HEMICYCLE");
 
     Color lGreen = new Color(128, 255, 128);
     frame.setLeftSeatBarCountBinding(Binding.sizeBinding(leftSeats));
     frame.setLeftSeatBarColorBinding(IndexedBinding.listBinding(GREEN, lGreen));
-    frame.setLeftSeatBarSizeBinding(IndexedBinding.propertyBinding(leftSeats, Function.identity()));
+    frame.setLeftSeatBarSizeBinding(IndexedBinding.propertyBinding(leftSeats, t -> t));
     frame.setLeftSeatBarLabelBinding(leftLabel.getBinding());
 
     frame.setLeftChangeBarCountBinding(Binding.sizeBinding(leftChange));
     frame.setLeftChangeBarColorBinding(IndexedBinding.listBinding(GREEN, lGreen));
-    frame.setLeftChangeBarSizeBinding(
-        IndexedBinding.propertyBinding(leftChange, Function.identity()));
+    frame.setLeftChangeBarSizeBinding(IndexedBinding.propertyBinding(leftChange, t -> t));
     frame.setLeftChangeBarLabelBinding(leftChangeLabel.getBinding());
     frame.setLeftChangeBarStartBinding(Binding.fixedBinding(1));
 
     Color lRed = new Color(255, 128, 128);
     frame.setMiddleSeatBarCountBinding(Binding.sizeBinding(middleSeats));
     frame.setMiddleSeatBarColorBinding(IndexedBinding.listBinding(RED, lRed));
-    frame.setMiddleSeatBarSizeBinding(
-        IndexedBinding.propertyBinding(middleSeats, Function.identity()));
+    frame.setMiddleSeatBarSizeBinding(IndexedBinding.propertyBinding(middleSeats, t -> t));
     frame.setMiddleSeatBarLabelBinding(middleLabel.getBinding());
 
     Color lBlue = new Color(128, 128, 255);
     frame.setRightSeatBarCountBinding(Binding.sizeBinding(rightSeats));
     frame.setRightSeatBarColorBinding(IndexedBinding.listBinding(BLUE, lBlue));
-    frame.setRightSeatBarSizeBinding(
-        IndexedBinding.propertyBinding(rightSeats, Function.identity()));
+    frame.setRightSeatBarSizeBinding(IndexedBinding.propertyBinding(rightSeats, t -> t));
     frame.setRightSeatBarLabelBinding(rightLabel.getBinding());
 
     frame.setRightChangeBarCountBinding(Binding.sizeBinding(rightChange));
     frame.setRightChangeBarColorBinding(IndexedBinding.listBinding(BLUE, lBlue));
-    frame.setRightChangeBarSizeBinding(
-        IndexedBinding.propertyBinding(rightChange, Function.identity()));
+    frame.setRightChangeBarSizeBinding(IndexedBinding.propertyBinding(rightChange, t -> t));
     frame.setRightChangeBarLabelBinding(rightChangeLabel.getBinding());
     frame.setRightChangeBarStartBinding(Binding.fixedBinding(8));
 
@@ -404,37 +397,33 @@ public class HemicycleFrameTest {
     frame.setNumRowsBinding(Binding.fixedBinding(rowCounts.size()));
     frame.setRowCountsBinding(IndexedBinding.listBinding(rowCounts));
     frame.setNumDotsBinding(Binding.sizeBinding(dotColors));
-    frame.setDotColorBinding(IndexedBinding.propertyBinding(dotColors, Function.identity()));
+    frame.setDotColorBinding(IndexedBinding.propertyBinding(dotColors, t -> t));
     frame.setHeaderBinding(() -> "ALBERTA HEMICYCLE");
 
     frame.setLeftSeatBarCountBinding(Binding.sizeBinding(leftSeats));
     frame.setLeftSeatBarColorBinding(IndexedBinding.listBinding(RED));
-    frame.setLeftSeatBarSizeBinding(IndexedBinding.propertyBinding(leftSeats, Function.identity()));
+    frame.setLeftSeatBarSizeBinding(IndexedBinding.propertyBinding(leftSeats, t -> t));
     frame.setLeftSeatBarLabelBinding(leftLabel.getBinding());
 
     frame.setLeftChangeBarCountBinding(Binding.sizeBinding(leftChange));
     frame.setLeftChangeBarColorBinding(IndexedBinding.listBinding(RED));
-    frame.setLeftChangeBarSizeBinding(
-        IndexedBinding.propertyBinding(leftChange, Function.identity()));
+    frame.setLeftChangeBarSizeBinding(IndexedBinding.propertyBinding(leftChange, t -> t));
     frame.setLeftChangeBarLabelBinding(leftChangeLabel.getBinding());
     frame.setLeftChangeBarStartBinding(Binding.fixedBinding(8));
 
     frame.setMiddleSeatBarCountBinding(Binding.sizeBinding(middleSeats));
     frame.setMiddleSeatBarColorBinding(IndexedBinding.listBinding(GRAY));
-    frame.setMiddleSeatBarSizeBinding(
-        IndexedBinding.propertyBinding(middleSeats, Function.identity()));
+    frame.setMiddleSeatBarSizeBinding(IndexedBinding.propertyBinding(middleSeats, t -> t));
     frame.setMiddleSeatBarLabelBinding(middleLabel.getBinding());
 
     frame.setRightSeatBarCountBinding(Binding.sizeBinding(rightSeats));
     frame.setRightSeatBarColorBinding(IndexedBinding.listBinding(BLUE));
-    frame.setRightSeatBarSizeBinding(
-        IndexedBinding.propertyBinding(rightSeats, Function.identity()));
+    frame.setRightSeatBarSizeBinding(IndexedBinding.propertyBinding(rightSeats, t -> t));
     frame.setRightSeatBarLabelBinding(rightLabel.getBinding());
 
     frame.setRightChangeBarCountBinding(Binding.sizeBinding(rightChange));
     frame.setRightChangeBarColorBinding(IndexedBinding.listBinding(BLUE));
-    frame.setRightChangeBarSizeBinding(
-        IndexedBinding.propertyBinding(rightChange, Function.identity()));
+    frame.setRightChangeBarSizeBinding(IndexedBinding.propertyBinding(rightChange, t -> t));
     frame.setRightChangeBarLabelBinding(rightChangeLabel.getBinding());
     frame.setRightChangeBarStartBinding(Binding.fixedBinding(66));
 

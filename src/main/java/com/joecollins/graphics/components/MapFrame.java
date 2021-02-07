@@ -190,7 +190,7 @@ public class MapFrame extends GraphicsFrame {
   public void setShapeBinding(IndexedBinding<Shape> shapeBinding) {
     this.shapeBinding.unbind();
     this.shapeBinding = shapeBinding;
-    this.shapeBinding.bind(
+    this.shapeBinding.bindLegacy(
         (idx, shape) -> {
           shapesToDraw.get(idx).left = shape;
           repaint();
@@ -204,7 +204,7 @@ public class MapFrame extends GraphicsFrame {
   public void setColorBinding(IndexedBinding<Color> colorBinding) {
     this.colorBinding.unbind();
     this.colorBinding = colorBinding;
-    this.colorBinding.bind(
+    this.colorBinding.bindLegacy(
         (idx, color) -> {
           shapesToDraw.get(idx).right = color;
           repaint();
@@ -263,7 +263,7 @@ public class MapFrame extends GraphicsFrame {
   public void setOutlineShapesBinding(IndexedBinding<Shape> outlineShapesBinding) {
     this.outlineShapesBinding.unbind();
     this.outlineShapesBinding = outlineShapesBinding;
-    this.outlineShapesBinding.bind(
+    this.outlineShapesBinding.bindLegacy(
         (idx, outline) -> {
           this.outlineShapes.set(idx, outline);
           repaint();

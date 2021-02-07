@@ -39,8 +39,8 @@ public class HeatMapFrameBuilder {
     var builder = new HeatMapFrameBuilder();
     builder.frame.setNumRowsBinding(numRows);
     builder.frame.setNumSquaresBinding(Binding.fixedBinding(entries.size()));
-    builder.frame.setSquareFillBinding(IndexedBinding.listBinding(entries, fillFunc));
-    builder.frame.setSquareBordersBinding(IndexedBinding.listBinding(entries, borderFunc));
+    builder.frame.setSquareFillBinding(IndexedBinding.listBinding(entries, fillFunc::apply));
+    builder.frame.setSquareBordersBinding(IndexedBinding.listBinding(entries, borderFunc::apply));
     return builder;
   }
 
@@ -63,7 +63,7 @@ public class HeatMapFrameBuilder {
       ToIntFunction<T> seatFunc,
       Binding<String> labelBinding) {
     frame.setNumSeatBarsBinding(Binding.sizeBinding(bars));
-    frame.setSeatBarColorBinding(IndexedBinding.propertyBinding(bars, colorFunc));
+    frame.setSeatBarColorBinding(IndexedBinding.propertyBinding(bars, colorFunc::apply));
     frame.setSeatBarSizeBinding(IndexedBinding.propertyBinding(bars, seatFunc::applyAsInt));
     frame.setSeatBarLabelBinding(labelBinding);
     return this;
@@ -76,7 +76,7 @@ public class HeatMapFrameBuilder {
       Binding<Integer> startBinding,
       Binding<String> labelBinding) {
     frame.setNumChangeBarsBinding(Binding.sizeBinding(bars));
-    frame.setChangeBarColorBinding(IndexedBinding.propertyBinding(bars, colorFunc));
+    frame.setChangeBarColorBinding(IndexedBinding.propertyBinding(bars, colorFunc::apply));
     frame.setChangeBarSizeBinding(IndexedBinding.propertyBinding(bars, seatFunc::applyAsInt));
     frame.setChangeBarStartBinding(startBinding);
     frame.setChangeBarLabelBinding(labelBinding);

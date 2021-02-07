@@ -63,7 +63,7 @@ public class FiguresFrame extends GraphicsFrame {
   public void setColorBinding(IndexedBinding<Color> colorBinding) {
     this.colorBinding.unbind();
     this.colorBinding = colorBinding;
-    this.colorBinding.bind((idx, color) -> entries.get(idx).setForeground(color));
+    this.colorBinding.bindLegacy((idx, color) -> entries.get(idx).setForeground(color));
   }
 
   Color getColor(int index) {
@@ -73,7 +73,7 @@ public class FiguresFrame extends GraphicsFrame {
   public void setNameBinding(IndexedBinding<String> nameBinding) {
     this.nameBinding.unbind();
     this.nameBinding = nameBinding;
-    this.nameBinding.bind((idx, name) -> entries.get(idx).nameLabel.setText(name));
+    this.nameBinding.bindLegacy((idx, name) -> entries.get(idx).nameLabel.setText(name));
   }
 
   String getName(int index) {
@@ -83,7 +83,8 @@ public class FiguresFrame extends GraphicsFrame {
   public void setDescriptionBinding(IndexedBinding<String> descriptionBinding) {
     this.descriptionBinding.unbind();
     this.descriptionBinding = descriptionBinding;
-    this.descriptionBinding.bind((idx, desc) -> entries.get(idx).descriptionLabel.setText(desc));
+    this.descriptionBinding.bindLegacy(
+        (idx, desc) -> entries.get(idx).descriptionLabel.setText(desc));
   }
 
   String getDescription(int index) {
@@ -93,7 +94,7 @@ public class FiguresFrame extends GraphicsFrame {
   public void setResultBinding(IndexedBinding<String> resultBinding) {
     this.resultBinding.unbind();
     this.resultBinding = resultBinding;
-    this.resultBinding.bind((idx, result) -> entries.get(idx).resultLabel.setText(result));
+    this.resultBinding.bindLegacy((idx, result) -> entries.get(idx).resultLabel.setText(result));
   }
 
   String getResult(int index) {
@@ -103,7 +104,8 @@ public class FiguresFrame extends GraphicsFrame {
   public void setResultColorBinding(IndexedBinding<Color> resultColorBinding) {
     this.resultColorBinding.unbind();
     this.resultColorBinding = resultColorBinding;
-    this.resultColorBinding.bind((idx, color) -> entries.get(idx).resultPanel.setBackground(color));
+    this.resultColorBinding.bindLegacy(
+        (idx, color) -> entries.get(idx).resultPanel.setBackground(color));
   }
 
   Color getResultColor(int index) {

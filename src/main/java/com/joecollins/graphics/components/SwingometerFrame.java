@@ -115,7 +115,7 @@ public class SwingometerFrame extends GraphicsFrame {
   public void setTickPositionBinding(IndexedBinding<? extends Number> tickPositionBinding) {
     this.tickPositionBinding.unbind();
     this.tickPositionBinding = tickPositionBinding;
-    this.tickPositionBinding.bind(swingPanel::setTickPosition);
+    this.tickPositionBinding.bindLegacy(swingPanel::setTickPosition);
   }
 
   String getTickText(int index) {
@@ -125,7 +125,7 @@ public class SwingometerFrame extends GraphicsFrame {
   public void setTickTextBinding(IndexedBinding<String> tickTextBinding) {
     this.tickTextBinding.unbind();
     this.tickTextBinding = tickTextBinding;
-    this.tickTextBinding.bind(swingPanel::setTickText);
+    this.tickTextBinding.bindLegacy(swingPanel::setTickText);
   }
 
   Number getLeftToWin() {
@@ -166,7 +166,7 @@ public class SwingometerFrame extends GraphicsFrame {
       IndexedBinding<? extends Number> outerLabelPositionBinding) {
     this.outerLabelPositionBinding.unbind();
     this.outerLabelPositionBinding = outerLabelPositionBinding;
-    this.outerLabelPositionBinding.bind(swingPanel::setOuterLabelPosition);
+    this.outerLabelPositionBinding.bindLegacy(swingPanel::setOuterLabelPosition);
   }
 
   public String getOuterLabelText(int index) {
@@ -176,7 +176,7 @@ public class SwingometerFrame extends GraphicsFrame {
   public void setOuterLabelTextBinding(IndexedBinding<String> outerLabelTextBinding) {
     this.outerLabelTextBinding.unbind();
     this.outerLabelTextBinding = outerLabelTextBinding;
-    this.outerLabelTextBinding.bind(swingPanel::setOuterLabelText);
+    this.outerLabelTextBinding.bindLegacy(swingPanel::setOuterLabelText);
   }
 
   public Color getOuterLabelColor(int index) {
@@ -186,7 +186,7 @@ public class SwingometerFrame extends GraphicsFrame {
   public void setOuterLabelColorBinding(IndexedBinding<Color> outerLabelColorBinding) {
     this.outerLabelColorBinding.unbind();
     this.outerLabelColorBinding = outerLabelColorBinding;
-    this.outerLabelColorBinding.bind(swingPanel::setOuterLabelColor);
+    this.outerLabelColorBinding.bindLegacy(swingPanel::setOuterLabelColor);
   }
 
   int getNumBucketsPerSide() {
@@ -216,7 +216,7 @@ public class SwingometerFrame extends GraphicsFrame {
   public void setDotsPositionBinding(IndexedBinding<? extends Number> dotsPositionBinding) {
     this.dotsPositionBinding.unbind();
     this.dotsPositionBinding = dotsPositionBinding;
-    this.dotsPositionBinding.bind(swingPanel::setDotPosition);
+    this.dotsPositionBinding.bindLegacy(swingPanel::setDotPosition);
   }
 
   Color getDotColor(int index) {
@@ -226,7 +226,7 @@ public class SwingometerFrame extends GraphicsFrame {
   public void setDotsColorBinding(IndexedBinding<Color> dotsColorBinding) {
     this.dotsColorBinding.unbind();
     this.dotsColorBinding = dotsColorBinding;
-    this.dotsColorBinding.bind(swingPanel::setDotColor);
+    this.dotsColorBinding.bindLegacy(swingPanel::setDotColor);
   }
 
   String getDotLabel(int index) {
@@ -236,7 +236,7 @@ public class SwingometerFrame extends GraphicsFrame {
   public void setDotsLabelBinding(IndexedBinding<String> dotsLabelBinding) {
     this.dotsLabelBinding.unbind();
     this.dotsLabelBinding = dotsLabelBinding;
-    this.dotsLabelBinding.bind(swingPanel::setDotLabel);
+    this.dotsLabelBinding.bindLegacy(swingPanel::setDotLabel);
   }
 
   boolean isDotSolid(int index) {
@@ -246,7 +246,7 @@ public class SwingometerFrame extends GraphicsFrame {
   public void setDotsSolidBinding(IndexedBinding<Boolean> dotsSolidBinding) {
     this.dotsSolidBinding.unbind();
     this.dotsSolidBinding = dotsSolidBinding;
-    this.dotsSolidBinding.bind(swingPanel::setDotSolid);
+    this.dotsSolidBinding.bindLegacy(swingPanel::setDotSolid);
   }
 
   private class Dot {

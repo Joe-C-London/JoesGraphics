@@ -66,7 +66,7 @@ public class MultiSummaryFrame extends GraphicsFrame {
   public void setRowHeaderBinding(IndexedBinding<String> headerBinding) {
     this.headerBinding.unbind();
     this.headerBinding = headerBinding;
-    this.headerBinding.bind(
+    this.headerBinding.bindLegacy(
         (idx, header) -> {
           entries.get(idx).headerLabel.setText(header);
           repaint();
@@ -80,7 +80,7 @@ public class MultiSummaryFrame extends GraphicsFrame {
   public void setValuesBinding(IndexedBinding<List<Pair<Color, String>>> valuesBinding) {
     this.valuesBinding.unbind();
     this.valuesBinding = valuesBinding;
-    this.valuesBinding.bind(
+    this.valuesBinding.bindLegacy(
         (idx, values) -> {
           EntryPanel entry = entries.get(idx);
           while (entry.panels.size() < values.size()) {

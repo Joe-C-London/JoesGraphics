@@ -157,7 +157,7 @@ public class BarFrame extends GraphicsFrame {
   public void setLeftTextBinding(IndexedBinding<String> leftTextBinding) {
     this.leftTextBinding.unbind();
     this.leftTextBinding = leftTextBinding;
-    this.leftTextBinding.bind((idx, leftText) -> bars.get(idx).setLeftText(leftText));
+    this.leftTextBinding.bindLegacy((idx, leftText) -> bars.get(idx).setLeftText(leftText));
   }
 
   String getRightText(int barNum) {
@@ -167,7 +167,7 @@ public class BarFrame extends GraphicsFrame {
   public void setRightTextBinding(IndexedBinding<String> rightTextBinding) {
     this.rightTextBinding.unbind();
     this.rightTextBinding = rightTextBinding;
-    this.rightTextBinding.bind((idx, rightText) -> bars.get(idx).setRightText(rightText));
+    this.rightTextBinding.bindLegacy((idx, rightText) -> bars.get(idx).setRightText(rightText));
   }
 
   List<Pair<Color, Number>> getSeries(int barNum) {
@@ -187,8 +187,8 @@ public class BarFrame extends GraphicsFrame {
     }
     seriesBindings.put(seriesName, new ImmutablePair<>(colorBinding, valueBinding));
     int seriesNum = new ArrayList<>(seriesBindings.keySet()).indexOf(seriesName);
-    colorBinding.bind((idx, color) -> bars.get(idx).setColor(seriesNum, color));
-    valueBinding.bind(
+    colorBinding.bindLegacy((idx, color) -> bars.get(idx).setColor(seriesNum, color));
+    valueBinding.bindLegacy(
         (idx, color) -> {
           bars.get(idx).setValue(seriesNum, color);
           if (usingDefaultMin) {
@@ -215,7 +215,7 @@ public class BarFrame extends GraphicsFrame {
   public void setLeftIconBinding(IndexedBinding<Shape> leftIconBinding) {
     this.leftIconBinding.unbind();
     this.leftIconBinding = leftIconBinding;
-    this.leftIconBinding.bind((idx, shape) -> bars.get(idx).setLeftIcon(shape));
+    this.leftIconBinding.bindLegacy((idx, shape) -> bars.get(idx).setLeftIcon(shape));
   }
 
   Number getMin() {
@@ -286,7 +286,7 @@ public class BarFrame extends GraphicsFrame {
   public void setLineLevelsBinding(IndexedBinding<? extends Number> lineLevelsBinding) {
     this.lineLevelsBinding.unbind();
     this.lineLevelsBinding = lineLevelsBinding;
-    this.lineLevelsBinding.bind((idx, level) -> lines.get(idx).setLevel(level));
+    this.lineLevelsBinding.bindLegacy((idx, level) -> lines.get(idx).setLevel(level));
   }
 
   String getLineLabel(int index) {
@@ -296,7 +296,7 @@ public class BarFrame extends GraphicsFrame {
   public void setLineLabelsBinding(IndexedBinding<String> lineLabelsBinding) {
     this.lineLabelsBinding.unbind();
     this.lineLabelsBinding = lineLabelsBinding;
-    this.lineLabelsBinding.bind((idx, label) -> lines.get(idx).setLabel(label));
+    this.lineLabelsBinding.bindLegacy((idx, label) -> lines.get(idx).setLabel(label));
   }
 
   private class SubheadLabel extends FontSizeAdjustingLabel {

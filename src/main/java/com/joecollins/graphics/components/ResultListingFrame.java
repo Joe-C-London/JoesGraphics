@@ -85,7 +85,7 @@ public class ResultListingFrame extends GraphicsFrame {
   public void setTextBinding(IndexedBinding<String> textBinding) {
     this.textBinding.unbind();
     this.textBinding = textBinding;
-    this.textBinding.bind((idx, text) -> items.get(idx).setText(text));
+    this.textBinding.bindLegacy((idx, text) -> items.get(idx).setText(text));
   }
 
   Color getForeground(int index) {
@@ -95,7 +95,7 @@ public class ResultListingFrame extends GraphicsFrame {
   public void setForegroundBinding(IndexedBinding<Color> foregroundBinding) {
     this.foregroundBinding.unbind();
     this.foregroundBinding = foregroundBinding;
-    this.foregroundBinding.bind((idx, color) -> items.get(idx).setForeground(color));
+    this.foregroundBinding.bindLegacy((idx, color) -> items.get(idx).setForeground(color));
   }
 
   Color getBackground(int index) {
@@ -105,7 +105,7 @@ public class ResultListingFrame extends GraphicsFrame {
   public void setBackgroundBinding(IndexedBinding<Color> backgroundBinding) {
     this.backgroundBinding.unbind();
     this.backgroundBinding = backgroundBinding;
-    this.backgroundBinding.bind((idx, color) -> items.get(idx).setBackground(color));
+    this.backgroundBinding.bindLegacy((idx, color) -> items.get(idx).setBackground(color));
   }
 
   Color getBorder(int index) {
@@ -115,7 +115,7 @@ public class ResultListingFrame extends GraphicsFrame {
   public void setBorderBinding(IndexedBinding<Color> borderBinding) {
     this.borderBinding.unbind();
     this.borderBinding = borderBinding;
-    this.borderBinding.bind((idx, color) -> items.get(idx).setBorder(color));
+    this.borderBinding.bindLegacy((idx, color) -> items.get(idx).setBorder(color));
   }
 
   class Item extends JPanel {

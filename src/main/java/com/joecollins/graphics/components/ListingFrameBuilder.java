@@ -29,11 +29,11 @@ public class ListingFrameBuilder {
     ListingFrameBuilder builder = new ListingFrameBuilder();
     BarFrame barFrame = builder.barFrame;
     barFrame.setNumBarsBinding(Binding.sizeBinding(list));
-    barFrame.setLeftTextBinding(IndexedBinding.propertyBinding(list, leftTextFunc));
-    barFrame.setRightTextBinding(IndexedBinding.propertyBinding(list, rightTextFunc));
+    barFrame.setLeftTextBinding(IndexedBinding.propertyBinding(list, leftTextFunc::apply));
+    barFrame.setRightTextBinding(IndexedBinding.propertyBinding(list, rightTextFunc::apply));
     barFrame.addSeriesBinding(
         "Item",
-        IndexedBinding.propertyBinding(list, colorFunc),
+        IndexedBinding.propertyBinding(list, colorFunc::apply),
         IndexedBinding.propertyBinding(list, x -> 1));
     return builder;
   }
@@ -58,11 +58,11 @@ public class ListingFrameBuilder {
     ListingFrameBuilder builder = new ListingFrameBuilder();
     BarFrame barFrame = builder.barFrame;
     barFrame.setNumBarsBinding(Binding.fixedBinding(list.size()));
-    barFrame.setLeftTextBinding(IndexedBinding.listBinding(list, leftTextFunc));
-    barFrame.setRightTextBinding(IndexedBinding.listBinding(list, rightTextFunc));
+    barFrame.setLeftTextBinding(IndexedBinding.listBinding(list, leftTextFunc::apply));
+    barFrame.setRightTextBinding(IndexedBinding.listBinding(list, rightTextFunc::apply));
     barFrame.addSeriesBinding(
         "Item",
-        IndexedBinding.listBinding(list, colorFunc),
+        IndexedBinding.listBinding(list, colorFunc::apply),
         IndexedBinding.listBinding(list, x -> Binding.fixedBinding(1)));
     return builder;
   }

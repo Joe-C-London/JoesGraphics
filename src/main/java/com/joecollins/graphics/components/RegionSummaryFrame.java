@@ -87,7 +87,7 @@ public class RegionSummaryFrame extends GraphicsFrame {
   public void setSectionHeaderBinding(IndexedBinding<String> sectionHeaderBinding) {
     this.sectionHeaderBinding.unbind();
     this.sectionHeaderBinding = sectionHeaderBinding;
-    this.sectionHeaderBinding.bind((idx, header) -> sections.get(idx).setHeader(header));
+    this.sectionHeaderBinding.bindLegacy((idx, header) -> sections.get(idx).setHeader(header));
   }
 
   Color getValueColor(int sectionIdx, int valueIdx) {
@@ -102,7 +102,7 @@ public class RegionSummaryFrame extends GraphicsFrame {
       IndexedBinding<List<Pair<Color, String>>> sectionValueColorBinding) {
     this.sectionValueColorBinding.unbind();
     this.sectionValueColorBinding = sectionValueColorBinding;
-    this.sectionValueColorBinding.bind((idx, values) -> sections.get(idx).setValues(values));
+    this.sectionValueColorBinding.bindLegacy((idx, values) -> sections.get(idx).setValues(values));
   }
 
   public void setSectionValueBinding(IndexedBinding<List<String>> sectionValueBinding) {
