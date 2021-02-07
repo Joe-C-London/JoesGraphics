@@ -42,24 +42,19 @@ public class BindingReceiver<T> extends Bindable<BindingReceiver.Property> {
 
       @Override
       public void bind(@NotNull Function1<? super U, Unit> onUpdate) {
-        bindLegacy(onUpdate::invoke);
-      }
-
-      @Override
-      public void bindLegacy(Consumer<U> onUpdate) {
         if (consumer != null) {
           throw new IllegalStateException("Binding already in use");
         }
-        consumer = onUpdate;
+        consumer = onUpdate::invoke;
         topBinding = getBinding();
         topBinding.bindLegacy(
-            t -> {
-              if (subBinding != null) {
-                subBinding.unbind();
-              }
-              subBinding = func.apply(t);
-              subBinding.bindLegacy(consumer);
-            });
+                t -> {
+                  if (subBinding != null) {
+                    subBinding.unbind();
+                  }
+                  subBinding = func.apply(t);
+                  subBinding.bindLegacy(consumer);
+                });
       }
 
       @Override

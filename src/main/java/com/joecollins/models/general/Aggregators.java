@@ -258,11 +258,6 @@ public class Aggregators {
 
       @Override
       public void bind(@NotNull Function1<? super Map<K, V>, Unit> onUpdate) {
-        bindLegacy((Consumer<Map<K, V>>) onUpdate::invoke);
-      }
-
-      @Override
-      public void bindLegacy(Consumer<Map<K, V>> onUpdate) {
         if (bindings != null) {
           throw new IllegalStateException("Binding is already used");
         }
@@ -273,14 +268,14 @@ public class Aggregators {
           Binding<V> binding = bindingFunc.apply(entry);
           bindingsMap.put(key, binding);
           binding.bindLegacy(
-              val -> {
-                value.put(key, val);
-                if (bindings != null) {
-                  onUpdate.accept(value);
-                }
-              });
+                  val -> {
+                    value.put(key, val);
+                    if (bindings != null) {
+                      onUpdate.invoke(value);
+                    }
+                  });
         }
-        onUpdate.accept(value);
+        onUpdate.invoke(value);
         bindings = new ArrayList<>(bindingsMap.values());
       }
 
