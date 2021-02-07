@@ -63,17 +63,21 @@ interface Binding<T> {
 
         @JvmStatic fun <T : Bindable<T, E>, U, E : Enum<E>> propertyBinding(obj: T, func: (T) -> U, vararg properties: E): Binding<U> {
             return object : Binding<U> {
-                var consumer: java.util.function.Consumer<T>? = null
+                var consumer: ((T) -> Unit)? = null
                 override val value: U get() = func(obj)
                 override fun bind(onUpdate: (U) -> Unit) {
                     check(consumer == null) { "Binding is already used" }
-                    consumer = java.util.function.Consumer<T> { t -> onUpdate(func(t)) }
+                    val consumer: (T) -> Unit = { t -> onUpdate(func(t)) }
                     obj.addBinding(consumer, *properties)
-                    consumer!!.accept(obj)
+                    consumer(obj)
+                    this.consumer = consumer
                 }
                 override fun unbind() {
-                    obj.removeBinding(consumer, *properties)
-                    consumer = null
+                    val consumer = this.consumer
+                    if (consumer != null) {
+                        obj.removeBinding(consumer, *properties)
+                        this.consumer = null
+                    }
                 }
             }
         }

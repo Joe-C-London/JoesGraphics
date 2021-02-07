@@ -2,16 +2,15 @@ package com.joecollins.bindings
 
 import java.util.LinkedList
 import java.util.WeakHashMap
-import java.util.function.Consumer
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
 class NestedBindableList<T : Bindable<T, E>, E : Enum<E>>(items: List<T> = ArrayList()) : BindableList<T>(items) {
 
     private val itemBindings: MutableMap<E, MutableList<(Int, T) -> Unit>> = HashMap()
-    private val storedBindings: MutableMap<(Int, T) -> Unit, MutableMap<Int, Consumer<T>>> = WeakHashMap()
+    private val storedBindings: MutableMap<(Int, T) -> Unit, MutableMap<Int, (T) -> Unit>> = WeakHashMap()
 
-    fun addNestedItemBinding(binding: (Int, T) -> Unit, vararg properties: E) {
+    internal fun addNestedItemBinding(binding: (Int, T) -> Unit, vararg properties: E) {
         addItemBinding(binding)
         properties.forEach { property ->
             itemBindings.computeIfAbsent(property, { LinkedList() }).add(binding)
@@ -19,11 +18,11 @@ class NestedBindableList<T : Bindable<T, E>, E : Enum<E>>(items: List<T> = Array
         (0 until size).forEach { index ->
             val item = get(index)
             item.addBinding(getOrCreateBinding(binding, index), *properties)
-            for (property in properties) item.onPropertyRefreshed(property)
+            for (property in properties) item.onPropertyRefreshedInternal(property)
         }
     }
 
-    fun removeNestedItemBinding(binding: (Int, T) -> Unit, vararg properties: E) {
+    internal fun removeNestedItemBinding(binding: (Int, T) -> Unit, vararg properties: E) {
         removeItemBinding(binding)
         properties.forEach { property ->
             itemBindings.computeIfAbsent(property, { LinkedList() }).remove(binding)
@@ -54,11 +53,11 @@ class NestedBindableList<T : Bindable<T, E>, E : Enum<E>>(items: List<T> = Array
         }
     }
 
-    private fun getOrCreateBinding(consumer: (Int, T) -> Unit, index: Int): Consumer<T>? {
+    private fun getOrCreateBinding(consumer: (Int, T) -> Unit, index: Int): (T) -> Unit {
         return storedBindings
             .computeIfAbsent(consumer, { HashMap() })
             .computeIfAbsent(index) { idx ->
-                Consumer { value: T ->
+                { value: T ->
                     consumer(idx, value)
                 }
             }

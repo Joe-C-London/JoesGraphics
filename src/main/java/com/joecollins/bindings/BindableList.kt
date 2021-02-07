@@ -13,19 +13,19 @@ open class BindableList<T>(items: List<T> = ArrayList()) : AbstractMutableList<T
         setAll(items)
     }
 
-    fun addSizeBinding(binding: (Int) -> Unit) {
+    internal fun addSizeBinding(binding: (Int) -> Unit) {
         sizeBindings.add(binding)
     }
 
-    fun removeSizeBinding(binding: (Int) -> Unit) {
+    internal fun removeSizeBinding(binding: (Int) -> Unit) {
         sizeBindings.remove(binding)
     }
 
-    fun addItemBinding(binding: (Int, T) -> Unit) {
+    internal fun addItemBinding(binding: (Int, T) -> Unit) {
         itemBindings.add(binding)
     }
 
-    fun removeItemBinding(binding: (Int, T) -> Unit) {
+    internal fun removeItemBinding(binding: (Int, T) -> Unit) {
         itemBindings.remove(binding)
     }
 

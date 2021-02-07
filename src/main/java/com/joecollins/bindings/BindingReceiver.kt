@@ -37,12 +37,9 @@ class BindingReceiver<T>(binding: Binding<out T>) {
         return object : Binding<U> {
             var topBinding: Binding<T>? = null
             var subBinding: Binding<U>? = null
-            var consumer: java.util.function.Consumer<U>? = null
 
             override val value get() = func(me.value).value
             override fun bind(onUpdate: (U) -> Unit) {
-                check(consumer == null) { "Binding is already used" }
-                consumer = java.util.function.Consumer { onUpdate(it) }
                 topBinding = me.getBinding()
                 topBinding!!.bind {
                     subBinding?.unbind()
@@ -53,7 +50,6 @@ class BindingReceiver<T>(binding: Binding<out T>) {
             override fun unbind() {
                 topBinding?.unbind()
                 subBinding?.unbind()
-                consumer = null
             }
         }
     }

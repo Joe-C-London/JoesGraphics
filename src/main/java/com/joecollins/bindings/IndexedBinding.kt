@@ -69,22 +69,26 @@ interface IndexedBinding<T> {
         }
 
         @JvmStatic fun <E : Enum<E>, T : Bindable<T, E>, U> propertyBinding(item: T, func: (T) -> List<U>, vararg properties: E) = object : IndexedBinding<U> {
-            var consumer: java.util.function.Consumer<T>? = null
+            var consumer: ((T) -> Unit)? = null
 
             override val size get() = func(item).size
             override fun get(index: Int) = func(item)[index]
             override fun bind(onUpdate: (Int, U) -> Unit) {
                 check(consumer == null) { "Binding is already used" }
-                consumer = java.util.function.Consumer {
+                val consumer: (T) -> Unit = {
                     val values = func(it)
                     values.indices.forEach { idx -> onUpdate(idx, values[idx]) }
                 }
                 item.addBinding(consumer, *properties)
-                consumer!!.accept(item)
+                consumer(item)
+                this.consumer = consumer
             }
             override fun unbind() {
-                item.removeBinding(consumer, *properties)
-                consumer = null
+                val consumer = this.consumer
+                if (consumer != null) {
+                    item.removeBinding(consumer, *properties)
+                    this.consumer = null
+                }
             }
         }
 
