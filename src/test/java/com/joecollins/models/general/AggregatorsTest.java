@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.mutable.Mutable;
@@ -194,7 +193,7 @@ public class AggregatorsTest {
         Stream.of(inputs1, inputs2)
             .map(inputs -> Aggregators.combine(inputs, BindableWrapper::getBinding))
             .collect(Collectors.toList());
-    Aggregators.combine(combined, Function.identity()).bindLegacy(output::setValue);
+    Aggregators.combine(combined, t -> t).bindLegacy(output::setValue);
     assertEquals(Map.of("ABC", 30, "DEF", 12, "GHI", 6), output.getValue());
 
     inputs1.get(0).setValue(Map.of("ABC", 9, "DEF", 5));
@@ -223,7 +222,7 @@ public class AggregatorsTest {
         Stream.of(inputs1, inputs2)
             .map(inputs -> Aggregators.combineDual(inputs, BindableWrapper::getBinding))
             .collect(Collectors.toList());
-    Aggregators.combineDual(combined, Function.identity()).bindLegacy(output::setValue);
+    Aggregators.combineDual(combined, t -> t).bindLegacy(output::setValue);
     assertEquals(
         Map.of(
             "ABC",

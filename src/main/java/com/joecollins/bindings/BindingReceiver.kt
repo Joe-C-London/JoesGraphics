@@ -35,8 +35,8 @@ class BindingReceiver<T>(binding: Binding<out T>) {
     fun <U> getFlatBinding(func: (T) -> Binding<U>): Binding<U> {
         val me = this
         return object : Binding<U> {
-            var topBinding: Binding<T>? = null
-            var subBinding: Binding<U>? = null
+            private var topBinding: Binding<T>? = null
+            private var subBinding: Binding<U>? = null
 
             override val value get() = func(me.value).value
             override fun bind(onUpdate: (U) -> Unit) {

@@ -28,9 +28,9 @@ interface Binding<T> {
     @JvmDefault fun <U, R> merge(other: Binding<U>, mergeFunc: (T, U) -> R): Binding<R> {
         val me = this
         return object : Binding<R> {
-            val val1: Mutable<T> = MutableObject()
-            val val2: Mutable<U> = MutableObject()
-            var bound = false
+            private val val1: Mutable<T> = MutableObject()
+            private val val2: Mutable<U> = MutableObject()
+            private var bound = false
 
             override val value: R get() = mergeFunc(me.value, other.value)
             override fun bind(onUpdate: (R) -> Unit) {
@@ -63,7 +63,7 @@ interface Binding<T> {
 
         @JvmStatic fun <T : Bindable<T, E>, U, E : Enum<E>> propertyBinding(obj: T, func: (T) -> U, vararg properties: E): Binding<U> {
             return object : Binding<U> {
-                var consumer: ((T) -> Unit)? = null
+                private var consumer: ((T) -> Unit)? = null
                 override val value: U get() = func(obj)
                 override fun bind(onUpdate: (U) -> Unit) {
                     check(consumer == null) { "Binding is already used" }
@@ -84,7 +84,7 @@ interface Binding<T> {
 
         @JvmStatic fun <T> sizeBinding(list: BindableList<T>): Binding<Int> {
             return object : Binding<Int> {
-                var consumer: ((Int) -> Unit)? = null
+                private var consumer: ((Int) -> Unit)? = null
                 override val value: Int get() = list.size
                 override fun bind(onUpdate: (Int) -> Unit) {
                     check(consumer == null) { "Binding is already used" }
@@ -109,9 +109,9 @@ interface Binding<T> {
             onValueAdded: (R, T) -> R,
             onValueRemoved: (R, T) -> R
         ) = object : Binding<R> {
-            var bound = false
-            var aggregate = identity
-            val values: MutableList<Mutable<T>> = ArrayList(bindings.size)
+            private var bound = false
+            private var aggregate = identity
+            private val values: MutableList<Mutable<T>> = ArrayList(bindings.size)
 
             override val value: R get() = bindings.fold(identity) { agg, value -> onValueAdded(agg, value.value) }
             override fun bind(onUpdate: (R) -> Unit) {

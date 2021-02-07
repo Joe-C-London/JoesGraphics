@@ -8,7 +8,9 @@ abstract class Bindable<T : Bindable<T, E>, E : Enum<E>> {
     private val bindings: MutableMap<E, MutableList<(T) -> Unit>> = ConcurrentHashMap()
 
     internal fun addBinding(binding: (T) -> Unit, vararg properties: E) {
-        for (property in properties) bindings.computeIfAbsent(property, createNewList()).add(binding)
+        properties.forEach { property ->
+            bindings.computeIfAbsent(property, createNewList()).add(binding)
+        }
     }
 
     private fun createNewList(): (E) -> MutableList<(T) -> Unit> {
@@ -16,7 +18,9 @@ abstract class Bindable<T : Bindable<T, E>, E : Enum<E>> {
     }
 
     internal fun removeBinding(binding: (T) -> Unit, vararg properties: E) {
-        for (property in properties) bindings.computeIfAbsent(property, createNewList()).remove(binding)
+        properties.forEach { property ->
+            bindings.computeIfAbsent(property, createNewList()).remove(binding)
+        }
     }
 
     @Suppress("UNCHECKED_CAST")

@@ -562,10 +562,10 @@ public class BasicResultPanel extends JPanel {
       return SwingFrameBuilder.prevCurr(
               classificationFunc == null
                   ? prevVotes.getBinding()
-                  : Aggregators.adjustKey(prevVotes.getBinding(), classificationFunc),
+                  : Aggregators.adjustKey(prevVotes.getBinding(), classificationFunc::apply),
               classificationFunc == null
                   ? currVotes.getBinding()
-                  : Aggregators.adjustKey(currVotes.getBinding(), classificationFunc),
+                  : Aggregators.adjustKey(currVotes.getBinding(), classificationFunc::apply),
               swingComparator)
           .withHeader(swingHeader.getBinding())
           .build();
@@ -1800,8 +1800,12 @@ public class BasicResultPanel extends JPanel {
                     });
       }
       return SwingFrameBuilder.prevCurr(
-              classificationFunc == null ? prev : Aggregators.adjustKey(prev, classificationFunc),
-              classificationFunc == null ? curr : Aggregators.adjustKey(curr, classificationFunc),
+              classificationFunc == null
+                  ? prev
+                  : Aggregators.adjustKey(prev, classificationFunc::apply),
+              classificationFunc == null
+                  ? curr
+                  : Aggregators.adjustKey(curr, classificationFunc::apply),
               swingComparator)
           .withHeader(swingHeader.getBinding())
           .build();
