@@ -5,19 +5,19 @@ import org.apache.commons.lang3.mutable.MutableObject
 
 interface Binding<T> {
 
-    fun getValue(): T
+    val value: T
 
     @Deprecated("Replacing with Kotlin version")
     @JvmDefault fun bindLegacy(onUpdate: java.util.function.Consumer<T>) = bind { onUpdate.accept(it) }
 
-    @JvmDefault fun bind(onUpdate: (T) -> Unit) = onUpdate(getValue())
+    @JvmDefault fun bind(onUpdate: (T) -> Unit) = onUpdate(value)
 
     @JvmDefault fun unbind() {}
 
     @JvmDefault fun <R> map(func: (T) -> R): Binding<R> {
         val me = this
         return object : Binding<R> {
-            override fun getValue() = func(me.getValue())
+            override val value get() = func(me.value)
             override fun bind(onUpdate: (R) -> Unit) = me.bind { onUpdate(func(it)) }
             override fun unbind() = me.unbind()
         }
@@ -32,7 +32,7 @@ interface Binding<T> {
             val val2: Mutable<U> = MutableObject()
             var bound = false
 
-            override fun getValue(): R = mergeFunc(me.getValue(), other.getValue())
+            override val value: R get() = mergeFunc(me.value, other.value)
             override fun bind(onUpdate: (R) -> Unit) {
                 me.bind {
                     val1.value = it
@@ -58,13 +58,13 @@ interface Binding<T> {
     companion object {
 
         @JvmStatic fun <T> fixedBinding(t: T) = object : Binding<T> {
-            override fun getValue(): T = t
+            override val value: T = t
         }
 
         @JvmStatic fun <T : Bindable<E>, U, E : Enum<E>> propertyBinding(obj: T, func: (T) -> U, vararg properties: E): Binding<U> {
             return object : Binding<U> {
                 var consumer: java.util.function.Consumer<T>? = null
-                override fun getValue(): U = func(obj)
+                override val value: U get() = func(obj)
                 override fun bind(onUpdate: (U) -> Unit) {
                     check(consumer == null) { "Binding is already used" }
                     consumer = java.util.function.Consumer<T> { t -> onUpdate(func(t)) }
@@ -81,7 +81,7 @@ interface Binding<T> {
         @JvmStatic fun <T> sizeBinding(list: BindableList<T>): Binding<Int> {
             return object : Binding<Int> {
                 var consumer: java.util.function.IntConsumer? = null
-                override fun getValue(): Int = list.size
+                override val value: Int get() = list.size
                 override fun bind(onUpdate: (Int) -> Unit) {
                     check(consumer == null) { "Binding is already used" }
                     consumer = java.util.function.IntConsumer { t -> onUpdate(t) }
@@ -105,7 +105,7 @@ interface Binding<T> {
             var aggregate = identity
             val values: MutableList<Mutable<T>> = ArrayList(bindings.size)
 
-            override fun getValue(): R = bindings.fold(identity) { agg, value -> onValueAdded(agg, value.getValue()) }
+            override val value: R get() = bindings.fold(identity) { agg, value -> onValueAdded(agg, value.value) }
             override fun bind(onUpdate: (R) -> Unit) {
                 check(!bound) { "Binding is already used" }
                 for (i in bindings.indices) {
