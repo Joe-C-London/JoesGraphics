@@ -18,14 +18,7 @@ import kotlin.jvm.functions.Function1;
 
 public class BarFrameBuilder {
 
-  private final BarFrame barFrame =
-      new BarFrame() {
-        @Override
-        public void dispose() {
-          super.dispose();
-          bindings.forEach(Binding::unbind);
-        }
-      };
+  private final BarFrame barFrame = new BarFrame();
   private final RangeFinder rangeFinder = new RangeFinder();
 
   private final List<Binding<?>> bindings = new ArrayList<>();

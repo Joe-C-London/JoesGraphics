@@ -56,10 +56,6 @@ public class GraphicsFrameTest {
     assertEquals("0 POLLS REPORTING", graphicsFrame.getHeader());
     object.setNumPolls(1);
     assertEquals("1 POLLS REPORTING", graphicsFrame.getHeader());
-
-    graphicsFrame.dispose();
-    object.setNumPolls(0);
-    assertEquals("1 POLLS REPORTING", graphicsFrame.getHeader());
   }
 
   @Test

@@ -10,14 +10,7 @@ import java.util.function.Function;
 
 public class ListingFrameBuilder {
 
-  private BarFrame barFrame =
-      new BarFrame() {
-        @Override
-        public void dispose() {
-          super.dispose();
-          bindings.forEach(Binding::unbind);
-        }
-      };
+  private BarFrame barFrame = new BarFrame();
 
   private final List<Binding<?>> bindings = new ArrayList<>();
 

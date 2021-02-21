@@ -15,14 +15,7 @@ import org.apache.commons.lang3.tuple.Pair;
 
 public class MapFrameBuilder {
 
-  private MapFrame mapFrame =
-      new MapFrame() {
-        @Override
-        public void dispose() {
-          super.dispose();
-          bindings.forEach(Binding::unbind);
-        }
-      };
+  private MapFrame mapFrame = new MapFrame();
 
   private final List<Binding<?>> bindings = new ArrayList<>();
 

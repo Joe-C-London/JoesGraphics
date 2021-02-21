@@ -58,14 +58,7 @@ public class SwingFrameBuilder {
     }
   }
 
-  private SwingFrame swingFrame =
-      new SwingFrame() {
-        @Override
-        public void dispose() {
-          super.dispose();
-          bindings.forEach(Binding::unbind);
-        }
-      };
+  private SwingFrame swingFrame = new SwingFrame();
   private SwingProperties props = new SwingProperties();
   private Color neutralColor = Color.BLACK;
 
