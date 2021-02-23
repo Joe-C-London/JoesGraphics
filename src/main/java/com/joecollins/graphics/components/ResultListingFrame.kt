@@ -159,8 +159,8 @@ class ResultListingFrame : GraphicsFrame() {
     }
 
     private inner class Layout : LayoutManager {
-        var _numRows = 0
-        var _reversed = false
+        private var _numRows = 0
+        private var _reversed = false
 
         var numRows: Int
         get() { return _numRows }

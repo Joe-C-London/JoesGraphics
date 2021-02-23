@@ -109,8 +109,8 @@ class RegionSummaryFrame : GraphicsFrame() {
     }
 
     private inner class SectionPanel : JPanel() {
-        var _header: String = ""
-        var _values: List<Pair<Color, String>> = emptyList()
+        private var _header: String = ""
+        private var _values: List<Pair<Color, String>> = emptyList()
 
         var header: String
         get() { return _header }
