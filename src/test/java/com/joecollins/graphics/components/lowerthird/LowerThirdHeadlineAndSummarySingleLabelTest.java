@@ -73,4 +73,29 @@ public class LowerThirdHeadlineAndSummarySingleLabelTest {
 
     compareRendering("LowerThird", "HeadlineAndSummarySingleLabel", lowerThird);
   }
+
+  @Test
+  public void testRenderLongHeadlineAndSummary() throws IOException {
+    LowerThirdHeadlineAndSummarySingleLabel lowerThird =
+        new LowerThirdHeadlineAndSummarySingleLabel();
+    lowerThird.setSize(1024, 50);
+    lowerThird.setLeftImageBinding(
+        Binding.fixedBinding(
+            LowerThird.createImage(
+                LowerThirdHeadlineAndSummarySingleLabelTest.class
+                    .getClassLoader()
+                    .getResource("com/joecollins/graphics/lowerthird-left.png"))));
+    lowerThird.setClock(Clock.fixed(Instant.parse("2019-10-22T01:30:00Z"), ZoneId.systemDefault()));
+    lowerThird.setPlaceBinding(Binding.fixedBinding("OTTAWA"));
+    lowerThird.setTimeZoneBinding(Binding.fixedBinding(ZoneId.of("Canada/Eastern")));
+    lowerThird.setHeadlineBinding(Binding.fixedBinding("POLLS CLOSE ACROSS CENTRAL CANADA"));
+    lowerThird.setSubheadBinding(
+        Binding.fixedBinding("Polls open for another 30 minutes in British Columbia, Yukon"));
+    lowerThird.setNumSummaryEntriesBinding(Binding.fixedBinding(2));
+    lowerThird.setSummaryEntriesBinding(
+        IndexedBinding.listBinding(new Entry(Color.RED, "2"), new Entry(Color.BLUE, "1")));
+    lowerThird.setSummaryHeaderBinding(Binding.fixedBinding("170 SEATS FOR MAJORITY"));
+
+    compareRendering("LowerThird", "LongHeadlineAndSummarySingleLabel", lowerThird);
+  }
 }

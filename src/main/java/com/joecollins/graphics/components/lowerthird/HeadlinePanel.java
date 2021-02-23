@@ -1,5 +1,6 @@
 package com.joecollins.graphics.components.lowerthird;
 
+import com.joecollins.graphics.components.FontSizeAdjustingLabel;
 import com.joecollins.graphics.utils.StandardFont;
 import java.awt.Color;
 import java.awt.Component;
@@ -12,31 +13,30 @@ import javax.swing.border.EmptyBorder;
 
 public class HeadlinePanel extends JPanel {
 
-  private JLabel headlineLabel =
-      new JLabel("") {
-        {
-          setHorizontalAlignment(JLabel.LEFT);
-          setVerticalAlignment(JLabel.CENTER);
-          setFont(StandardFont.readNormalFont(24));
-          setForeground(Color.BLACK);
-          setBorder(new EmptyBorder(6, 5, -6, 5));
-        }
-      };
-  private JLabel subheadLabel =
-      new JLabel("") {
-        {
-          setVisible(false);
-          setHorizontalAlignment(JLabel.LEFT);
-          setVerticalAlignment(JLabel.CENTER);
-          setFont(StandardFont.readNormalFont(16));
-          setForeground(Color.BLACK);
-          setBorder(new EmptyBorder(2, 5, -2, 5));
-        }
-      };
+  private JLabel headlineLabel;
+
+  private JLabel subheadLabel;
 
   public HeadlinePanel() {
     setLayout(new HeadlinePanelLayout());
+
+    headlineLabel = new FontSizeAdjustingLabel();
+    headlineLabel.setText("");
+    headlineLabel.setHorizontalAlignment(JLabel.LEFT);
+    headlineLabel.setVerticalAlignment(JLabel.CENTER);
+    headlineLabel.setFont(StandardFont.readNormalFont(24));
+    headlineLabel.setForeground(Color.BLACK);
+    headlineLabel.setBorder(new EmptyBorder(6, 5, -6, 5));
     add(headlineLabel);
+
+    subheadLabel = new FontSizeAdjustingLabel();
+    subheadLabel.setText("");
+    subheadLabel.setVisible(false);
+    subheadLabel.setHorizontalAlignment(JLabel.LEFT);
+    subheadLabel.setVerticalAlignment(JLabel.CENTER);
+    subheadLabel.setFont(StandardFont.readNormalFont(16));
+    subheadLabel.setForeground(Color.BLACK);
+    subheadLabel.setBorder(new EmptyBorder(2, 5, -2, 5));
     add(subheadLabel);
   }
 
