@@ -25,9 +25,7 @@ abstract class Bindable<T : Bindable<T, E>, E : Enum<E>> {
 
     @Suppress("UNCHECKED_CAST")
     protected fun onPropertyRefreshed(property: E) {
-        bindings
-            .getOrDefault(property, emptyList())
-            .forEach { binding -> binding(this as T) }
+        bindings[property]?.forEach { binding -> binding(this as T) }
     }
 
     internal fun onPropertyRefreshedInternal(property: E) {

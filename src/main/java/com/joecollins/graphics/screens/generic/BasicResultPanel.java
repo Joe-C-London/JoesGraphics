@@ -701,7 +701,7 @@ public class BasicResultPanel extends JPanel {
                     lines.set(0, t / 2 + 1);
                   }
                 });
-        builder = builder.withLines(lines, majorityFunction);
+        builder = builder.withLines(lines, majorityFunction::apply);
       }
       return builder;
     }
@@ -902,7 +902,7 @@ public class BasicResultPanel extends JPanel {
                     lines.set(0, t / 2 + 1);
                   }
                 });
-        builder = builder.withLines(lines, majorityFunction);
+        builder = builder.withLines(lines, majorityFunction::apply);
       }
       return builder.build();
     }
@@ -1086,7 +1086,7 @@ public class BasicResultPanel extends JPanel {
                     lines.set(0, t / 2 + 1);
                   }
                 });
-        builder = builder.withLines(lines, majorityFunction);
+        builder = builder.withLines(lines, majorityFunction::apply);
       }
       return builder.build();
     }

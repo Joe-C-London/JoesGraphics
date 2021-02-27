@@ -177,7 +177,7 @@ class BarFrame : GraphicsFrame() {
         return bars[barNum].leftIcon
     }
 
-    protected fun setLeftIconBinding(leftIconBinding: IndexedBinding<Shape?>) {
+    fun setLeftIconBinding(leftIconBinding: IndexedBinding<Shape?>) {
         this.leftIconBinding.unbind()
         this.leftIconBinding = leftIconBinding
         this.leftIconBinding.bind { idx, shape -> bars[idx].leftIcon = shape }
