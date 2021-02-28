@@ -41,7 +41,7 @@ class BarFrame : GraphicsFrame() {
     private var usingDefaultMin = true
     private var usingDefaultMax = true
 
-    private var subheadTextBinding: Binding<String?> = Binding.fixedBinding(null)
+    private var subheadTextBinding: Binding<out String?> = Binding.fixedBinding(null)
     private var subheadColorBinding: Binding<Color> = Binding.fixedBinding(Color.BLACK)
 
     private var numBarsBinding: Binding<Int> = Binding.fixedBinding(0)
@@ -77,7 +77,7 @@ class BarFrame : GraphicsFrame() {
     protected val subheadText: String?
         get() = if (subheadLabel.isVisible) subheadLabel.text else null
 
-    fun setSubheadTextBinding(subheadTextBinding: Binding<String?>) {
+    fun setSubheadTextBinding(subheadTextBinding: Binding<out String?>) {
         this.subheadTextBinding.unbind()
         this.subheadTextBinding = subheadTextBinding
         this.subheadTextBinding.bind {

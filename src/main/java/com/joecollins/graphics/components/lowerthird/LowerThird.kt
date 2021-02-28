@@ -69,6 +69,7 @@ open class LowerThird : JPanel() {
     fun setClock(clock: Clock) {
         this.clock = clock
         rightPanel.updateTime()
+        Thread.sleep(100)
     }
 
     private inner class ImagePanel : JPanel() {

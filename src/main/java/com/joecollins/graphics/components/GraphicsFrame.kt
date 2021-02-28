@@ -25,8 +25,8 @@ open class GraphicsFrame : JPanel() {
     private val headerLabel = FontSizeAdjustingLabel()
     private val notesLabel = FontSizeAdjustingLabel()
 
-    private var headerTextBinding: Binding<String?> = Binding.fixedBinding(null)
-    private var notesTextBinding: Binding<String?> = Binding.fixedBinding(null)
+    private var headerTextBinding: Binding<out String?> = Binding.fixedBinding(null)
+    private var notesTextBinding: Binding<out String?> = Binding.fixedBinding(null)
     private var borderColorBinding: Binding<Color> = Binding.fixedBinding(Color.BLACK)
     private var headerAlignmentBinding: Binding<Alignment> = Binding.fixedBinding(Alignment.CENTER)
 
@@ -57,7 +57,7 @@ open class GraphicsFrame : JPanel() {
 
     protected val header: String? get() = if (headerPanel.isVisible) headerLabel.text.trim() else null
 
-    fun setHeaderBinding(headerTextBinding: Binding<String?>) {
+    fun setHeaderBinding(headerTextBinding: Binding<out String?>) {
         this.headerTextBinding.unbind()
         this.headerTextBinding = headerTextBinding
         this.headerTextBinding.bind {
@@ -76,7 +76,7 @@ open class GraphicsFrame : JPanel() {
 
     protected val notes: String? get() = if (notesLabel.isVisible) notesLabel.text.trim() else null
 
-    fun setNotesBinding(notesTextBinding: Binding<String?>) {
+    fun setNotesBinding(notesTextBinding: Binding<out String?>) {
         this.notesTextBinding.unbind()
         this.notesTextBinding = notesTextBinding
         this.notesTextBinding.bind {

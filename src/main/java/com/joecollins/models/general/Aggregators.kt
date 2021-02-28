@@ -97,30 +97,31 @@ object Aggregators {
 
     @JvmStatic fun <K> topAndOthers(result: Binding<Map<K, Int>>, limit: Int, others: K, mustInclude: Binding<Array<K>>) = result.merge(mustInclude) { m, w -> topAndOthers(m, limit, others, *w) }
 
-    @JvmStatic fun <K> topAndOthers(result: Map<K, Int?>, limit: Int, others: K, vararg mustInclude: K): Map<K, Int?> {
+    @Suppress("UNCHECKED_CAST")
+    @JvmStatic fun <K, T : Int?> topAndOthers(result: Map<K, T>, limit: Int, others: K, vararg mustInclude: K): Map<K, T> {
         if (result.size <= limit) {
             return result
         }
         val mustIncludeSet = mustInclude.filter { it != null }.toSet()
         val top = result.entries
             .filter { !mustIncludeSet.contains(it.key) }
-            .sortedByDescending { if (it.value == null) -1 else it.value }
+            .sortedByDescending { it.value ?: -1 }
             .take(max(0, limit - 1 - mustIncludeSet.size))
             .toSet()
         val topAndRequired: (Map.Entry<K, Int?>) -> Boolean = { top.contains(it) || mustIncludeSet.contains(it.key) }
         var needOthers = false
-        val ret: LinkedHashMap<K, Int?> = LinkedHashMap()
+        val ret: LinkedHashMap<K, T> = LinkedHashMap()
         result.entries.forEach { e ->
             if (topAndRequired(e) || e.value != null) {
                 val key = if (topAndRequired(e)) e.key else others
-                if (ret.containsKey(key)) ret.merge(key, e.value!!) { a, b -> a + b }
+                if (ret.containsKey(key)) ret.merge(key, e.value!!) { a, b -> (a!!.toInt() + b!!.toInt()) as T }
                 else ret[key] = e.value
             } else {
                 needOthers = true
             }
         }
         if (needOthers) {
-            ret[others] = null
+            ret[others] = null as T
         }
         return ret
     }

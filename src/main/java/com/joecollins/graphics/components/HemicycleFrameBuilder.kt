@@ -163,7 +163,7 @@ class HemicycleFrameBuilder {
                             .firstOrNull {
                                 (selectedPoints.isEmpty() ||
                                         selectedPoints
-                                        .any { point: Point -> pointsAreBesideEachOther<Any>(point, it.left, rows) })
+                                        .any { point: Point -> pointsAreBesideEachOther(point, it.left, rows) })
                             }
                     if (nextPoint == null) {
                         rejectedPoints.addAll(selectedPoints)
@@ -192,7 +192,7 @@ class HemicycleFrameBuilder {
             return builder
         }
 
-        private fun <T> pointsAreBesideEachOther(a: Point, b: Point, rows: List<Int>): Boolean {
+        private fun pointsAreBesideEachOther(a: Point, b: Point, rows: List<Int>): Boolean {
             if (a.x == b.x) {
                 return abs(a.y - b.y) <= 1
             }
@@ -277,23 +277,23 @@ class HemicycleFrameBuilder {
                     }
                     .toList()
             val leftList = BindableList<ImmutablePair<Color, Int>>()
-            val leftSeats = createSeatBarBinding<Any>(resultBindings, leftList, { it == leftParty }, leftParty.color)
+            val leftSeats = createSeatBarBinding(resultBindings, leftList, { it == leftParty }, leftParty.color)
             val rightList = BindableList<ImmutablePair<Color, Int>>()
-            val rightSeats = createSeatBarBinding<Any>(resultBindings, rightList, { it == rightParty }, rightParty.color)
+            val rightSeats = createSeatBarBinding(resultBindings, rightList, { it == rightParty }, rightParty.color)
             val middleList = BindableList<ImmutablePair<Color, Int>>()
-            val middleSeats = createSeatBarBinding<Any>(
+            val middleSeats = createSeatBarBinding(
                     resultBindings,
                     middleList,
                     { party: Party? -> party != null && party != leftParty && party != rightParty },
                     Party.OTHERS.color)
             val leftChangeList = BindableList<ImmutablePair<Color, Int>>()
-            val leftChange = createChangeBarBinding<Any>(
+            val leftChange = createChangeBarBinding(
                     resultWithPrevBindings,
                     leftChangeList, { it == leftParty },
                     leftParty.color,
                     showChange)
             val rightChangeList = BindableList<ImmutablePair<Color, Int>>()
-            val rightChange = createChangeBarBinding<Any>(
+            val rightChange = createChangeBarBinding(
                     resultWithPrevBindings,
                     rightChangeList, { it == rightParty },
                     rightParty.color,
@@ -328,21 +328,21 @@ class HemicycleFrameBuilder {
                             middleSeats.getBinding { otherLabel(it.left, it.right) })
                     .withLeftChangeBars(
                             leftChangeList, { it.getLeft() }, { it.getRight() },
-                            Binding.fixedBinding(calcPrevForParty<Any>(allPrevs, leftParty)),
+                            Binding.fixedBinding(calcPrevForParty(allPrevs, leftParty)),
                             leftChange.getBinding(changeLabelFunc))
                     .withRightChangeBars(
                             rightChangeList, { it.getLeft() }, { it.getRight() },
-                            Binding.fixedBinding(calcPrevForParty<Any>(allPrevs, rightParty)),
+                            Binding.fixedBinding(calcPrevForParty(allPrevs, rightParty)),
                             rightChange.getBinding(changeLabelFunc))
                     .withHeader(header)
                     .build()
         }
 
-        private fun <T> calcPrevForParty(prev: List<Pair<Party, Int>>, party: Party): Int {
+        private fun calcPrevForParty(prev: List<Pair<Party, Int>>, party: Party): Int {
             return prev.filter { party == it.left }.map { it.right }.sum()
         }
 
-        private fun <T> createSeatBarBinding(
+        private fun createSeatBarBinding(
             results: List<BindingReceiver<Pair<Result, Int>>>,
             list: BindableList<ImmutablePair<Color, Int>>,
             partyFilter: (Party?) -> Boolean,
@@ -378,7 +378,7 @@ class HemicycleFrameBuilder {
             return seats
         }
 
-        private fun <T> createChangeBarBinding(
+        private fun createChangeBarBinding(
             resultWithPrev: List<BindingReceiver<Triple<Result, Party, Int>>>,
             list: BindableList<ImmutablePair<Color, Int>>,
             partyFilter: (Party?) -> Boolean,

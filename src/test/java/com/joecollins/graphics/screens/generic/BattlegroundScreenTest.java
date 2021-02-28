@@ -36,7 +36,10 @@ public class BattlegroundScreenTest {
     Function<String, String> nameShortener = String::toUpperCase;
     BattlegroundScreen panel =
         BattlegroundScreen.singleParty(
-                prevResult.getBinding(), currResult.getBinding(), nameShortener, party.getBinding())
+                prevResult.getBinding(),
+                currResult.getBinding(),
+                nameShortener::apply,
+                party.getBinding())
             .withSeatsToShow(defenseSeats.getBinding(), targetSeats.getBinding())
             .withNumRows(numRows.getBinding())
             .build(title.getBinding());
@@ -90,7 +93,10 @@ public class BattlegroundScreenTest {
     Function<String, String> nameShortener = String::toUpperCase;
     BattlegroundScreen panel =
         BattlegroundScreen.singleParty(
-                prevResult.getBinding(), currResult.getBinding(), nameShortener, party.getBinding())
+                prevResult.getBinding(),
+                currResult.getBinding(),
+                nameShortener::apply,
+                party.getBinding())
             .withSeatsToShow(defenseSeats.getBinding(), targetSeats.getBinding())
             .withNumRows(numRows.getBinding())
             .withSeatFilter(filteredSeats.getBinding())

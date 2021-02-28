@@ -36,7 +36,7 @@ public class SeatsChangingScreenTest {
         SeatsChangingScreen.of(
                 prevResult.getBinding(),
                 currResult.getBinding(),
-                nameShortener,
+                nameShortener::apply,
                 Binding.fixedBinding("SEATS CHANGING"))
             .withNumRows(numRows.getBinding())
             .build(title.getBinding());
@@ -80,7 +80,7 @@ public class SeatsChangingScreenTest {
         SeatsChangingScreen.of(
                 prevResult.getBinding(),
                 currResult.getBinding(),
-                nameShortener,
+                nameShortener::apply,
                 Binding.fixedBinding("SEATS CHANGING"))
             .withNumRows(numRows.getBinding())
             .withSeatFilter(filteredSeats.getBinding())
@@ -122,7 +122,7 @@ public class SeatsChangingScreenTest {
         SeatsChangingScreen.of(
                 prevResult.getBinding(),
                 currResult.getBinding(),
-                nameShortener,
+                nameShortener::apply,
                 Binding.fixedBinding("SEATS CHANGING"))
             .withNumRows(numRows.getBinding())
             .build(title.getBinding());

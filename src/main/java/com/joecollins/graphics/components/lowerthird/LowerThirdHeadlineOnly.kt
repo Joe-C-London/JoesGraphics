@@ -6,13 +6,13 @@ import java.awt.BorderLayout
 
 class LowerThirdHeadlineOnly : LowerThird() {
     private val headlinePanel = HeadlinePanel()
-    private var headlineBinding = fixedBinding("")
+    private var headlineBinding = fixedBinding<String?>("")
     private var subheadBinding = fixedBinding<String?>(null)
 
     val headline: String?
         get() = headlinePanel.headline
 
-    fun setHeadlineBinding(headlineBinding: Binding<String>) {
+    fun setHeadlineBinding(headlineBinding: Binding<String?>) {
         this.headlineBinding.unbind()
         this.headlineBinding = headlineBinding
         this.headlineBinding.bind { headlinePanel.headline = it }

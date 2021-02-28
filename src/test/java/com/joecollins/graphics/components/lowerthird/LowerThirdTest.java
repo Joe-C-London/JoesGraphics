@@ -23,11 +23,12 @@ public class LowerThirdTest {
   }
 
   @Test
-  public void testLocationAndTimeZone() {
+  public void testLocationAndTimeZone() throws InterruptedException {
     LowerThird lowerThird = new LowerThird();
-    lowerThird.setClock(Clock.fixed(Instant.parse("2019-10-22T01:30:00Z"), ZoneId.systemDefault()));
     lowerThird.setPlaceBinding(Binding.fixedBinding("OTTAWA"));
     lowerThird.setTimeZoneBinding(Binding.fixedBinding(ZoneId.of("Canada/Eastern")));
+    lowerThird.setClock(Clock.fixed(Instant.parse("2019-10-22T01:30:00Z"), ZoneId.systemDefault()));
+    Thread.sleep(100);
     assertEquals("OTTAWA", lowerThird.getPlace());
     assertEquals("21:30", lowerThird.getTime());
   }
@@ -38,9 +39,9 @@ public class LowerThirdTest {
     lowerThird.setSize(1024, 50);
     lowerThird.setLeftImageBinding(
         Binding.fixedBinding(LowerThird.createImage("BREAKING NEWS", Color.WHITE, Color.RED)));
-    lowerThird.setClock(Clock.fixed(Instant.parse("2019-10-22T01:30:00Z"), ZoneId.systemDefault()));
     lowerThird.setPlaceBinding(Binding.fixedBinding("OTTAWA"));
     lowerThird.setTimeZoneBinding(Binding.fixedBinding(ZoneId.of("Canada/Eastern")));
+    lowerThird.setClock(Clock.fixed(Instant.parse("2019-10-22T01:30:00Z"), ZoneId.systemDefault()));
 
     compareRendering("LowerThird", "BlankMiddle", lowerThird);
   }

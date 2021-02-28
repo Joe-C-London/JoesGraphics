@@ -88,9 +88,9 @@ public class LowerThirdHeadlineAndSummaryBothEndsTest {
     lowerThird.setSize(1024, 50);
     lowerThird.setLeftImageBinding(
         Binding.fixedBinding(LowerThird.createImage("AMERICA VOTES", Color.WHITE, Color.RED)));
-    lowerThird.setClock(Clock.fixed(Instant.parse("2016-11-09T06:00:00Z"), ZoneId.systemDefault()));
     lowerThird.setPlaceBinding(Binding.fixedBinding("WASHINGTON"));
     lowerThird.setTimeZoneBinding(Binding.fixedBinding(ZoneId.of("US/Eastern")));
+    lowerThird.setClock(Clock.fixed(Instant.parse("2016-11-09T06:00:00Z"), ZoneId.systemDefault()));
     lowerThird.setHeadlineBinding(Binding.fixedBinding("TRUMP WINS ELECTION"));
     lowerThird.setSubheadBinding(Binding.fixedBinding(null));
     lowerThird.setSummaryHeaderBinding(Binding.fixedBinding("270 TO WIN"));
@@ -122,9 +122,9 @@ public class LowerThirdHeadlineAndSummaryBothEndsTest {
     lowerThird.setSize(1024, 50);
     lowerThird.setLeftImageBinding(
         Binding.fixedBinding(LowerThird.createImage("AMERICA VOTES", Color.WHITE, Color.RED)));
-    lowerThird.setClock(Clock.fixed(Instant.parse("2008-11-05T06:00:00Z"), ZoneId.systemDefault()));
     lowerThird.setPlaceBinding(Binding.fixedBinding("WASHINGTON"));
     lowerThird.setTimeZoneBinding(Binding.fixedBinding(ZoneId.of("US/Eastern")));
+    lowerThird.setClock(Clock.fixed(Instant.parse("2008-11-05T06:00:00Z"), ZoneId.systemDefault()));
     lowerThird.setHeadlineBinding(Binding.fixedBinding("OBAMA WINS ELECTION"));
     lowerThird.setSubheadBinding(Binding.fixedBinding(null));
     lowerThird.setSummaryHeaderBinding(Binding.fixedBinding("270 TO WIN"));
@@ -156,9 +156,9 @@ public class LowerThirdHeadlineAndSummaryBothEndsTest {
     lowerThird.setSize(1024, 50);
     lowerThird.setLeftImageBinding(
         Binding.fixedBinding(LowerThird.createImage("AMERICA VOTES", Color.WHITE, Color.RED)));
-    lowerThird.setClock(Clock.fixed(Instant.parse("1984-11-07T06:00:00Z"), ZoneId.systemDefault()));
     lowerThird.setPlaceBinding(Binding.fixedBinding("WASHINGTON"));
     lowerThird.setTimeZoneBinding(Binding.fixedBinding(ZoneId.of("US/Eastern")));
+    lowerThird.setClock(Clock.fixed(Instant.parse("1984-11-07T06:00:00Z"), ZoneId.systemDefault()));
     lowerThird.setHeadlineBinding(Binding.fixedBinding("REAGAN WINS RE-ELECTION"));
     lowerThird.setSubheadBinding(Binding.fixedBinding(null));
     lowerThird.setSummaryHeaderBinding(Binding.fixedBinding("270 TO WIN"));
@@ -190,9 +190,9 @@ public class LowerThirdHeadlineAndSummaryBothEndsTest {
     lowerThird.setSize(1024, 50);
     lowerThird.setLeftImageBinding(
         Binding.fixedBinding(LowerThird.createImage("AMERICA VOTES", Color.WHITE, Color.RED)));
-    lowerThird.setClock(Clock.fixed(Instant.parse("1936-11-04T06:00:00Z"), ZoneId.systemDefault()));
     lowerThird.setPlaceBinding(Binding.fixedBinding("WASHINGTON"));
     lowerThird.setTimeZoneBinding(Binding.fixedBinding(ZoneId.of("US/Eastern")));
+    lowerThird.setClock(Clock.fixed(Instant.parse("1936-11-04T06:00:00Z"), ZoneId.systemDefault()));
     lowerThird.setHeadlineBinding(Binding.fixedBinding("ROOSEVELT WINS RE-ELECTION"));
     lowerThird.setSubheadBinding(Binding.fixedBinding(null));
     lowerThird.setSummaryHeaderBinding(Binding.fixedBinding("266 TO WIN"));
@@ -225,9 +225,9 @@ public class LowerThirdHeadlineAndSummaryBothEndsTest {
     lowerThird.setSize(1024, 50);
     lowerThird.setLeftImageBinding(
         Binding.fixedBinding(LowerThird.createImage("AMERICA VOTES", Color.WHITE, Color.RED)));
-    lowerThird.setClock(Clock.fixed(Instant.parse("2006-11-08T06:00:00Z"), ZoneId.systemDefault()));
     lowerThird.setPlaceBinding(Binding.fixedBinding("WASHINGTON"));
     lowerThird.setTimeZoneBinding(Binding.fixedBinding(ZoneId.of("US/Eastern")));
+    lowerThird.setClock(Clock.fixed(Instant.parse("2006-11-08T06:00:00Z"), ZoneId.systemDefault()));
     lowerThird.setHeadlineBinding(Binding.fixedBinding("NO SENATE MAJORITY"));
     lowerThird.setSubheadBinding(Binding.fixedBinding(null));
     lowerThird.setSummaryHeaderBinding(Binding.fixedBinding("51 FOR CONTROL"));
@@ -259,9 +259,9 @@ public class LowerThirdHeadlineAndSummaryBothEndsTest {
     lowerThird.setSize(1024, 50);
     lowerThird.setLeftImageBinding(
         Binding.fixedBinding(LowerThird.createImage("AMERICA VOTES", Color.WHITE, Color.RED)));
-    lowerThird.setClock(Clock.fixed(Instant.parse("2008-11-05T06:00:00Z"), ZoneId.systemDefault()));
     lowerThird.setPlaceBinding(Binding.fixedBinding("WASHINGTON"));
     lowerThird.setTimeZoneBinding(Binding.fixedBinding(ZoneId.of("US/Eastern")));
+    lowerThird.setClock(Clock.fixed(Instant.parse("2008-11-05T06:00:00Z"), ZoneId.systemDefault()));
     lowerThird.setHeadlineBinding(Binding.fixedBinding("DEMOCRATIC SENATE MAJORITY"));
     lowerThird.setSubheadBinding(Binding.fixedBinding(null));
     lowerThird.setSummaryHeaderBinding(Binding.fixedBinding("51 FOR CONTROL"));
@@ -293,9 +293,9 @@ public class LowerThirdHeadlineAndSummaryBothEndsTest {
     lowerThird.setSize(1024, 50);
     lowerThird.setLeftImageBinding(
         Binding.fixedBinding(LowerThird.createImage("AMERICA VOTES", Color.WHITE, Color.RED)));
-    lowerThird.setClock(Clock.fixed(Instant.parse("2004-11-03T06:00:00Z"), ZoneId.systemDefault()));
     lowerThird.setPlaceBinding(Binding.fixedBinding("WASHINGTON"));
     lowerThird.setTimeZoneBinding(Binding.fixedBinding(ZoneId.of("US/Eastern")));
+    lowerThird.setClock(Clock.fixed(Instant.parse("2004-11-03T06:00:00Z"), ZoneId.systemDefault()));
     lowerThird.setHeadlineBinding(Binding.fixedBinding("REPUBLICAN SENATE MAJORITY"));
     lowerThird.setSubheadBinding(Binding.fixedBinding(null));
     lowerThird.setSummaryHeaderBinding(Binding.fixedBinding("51 FOR CONTROL"));

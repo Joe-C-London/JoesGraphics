@@ -58,9 +58,9 @@ public class LowerThirdHeadlineAndSummaryTest {
                 LowerThirdHeadlineAndSummaryTest.class
                     .getClassLoader()
                     .getResource("com/joecollins/graphics/lowerthird-left.png"))));
-    lowerThird.setClock(Clock.fixed(Instant.parse("2019-10-22T01:30:00Z"), ZoneId.systemDefault()));
     lowerThird.setPlaceBinding(Binding.fixedBinding("OTTAWA"));
     lowerThird.setTimeZoneBinding(Binding.fixedBinding(ZoneId.of("Canada/Eastern")));
+    lowerThird.setClock(Clock.fixed(Instant.parse("2019-10-22T01:30:00Z"), ZoneId.systemDefault()));
     lowerThird.setHeadlineBinding(Binding.fixedBinding("CENTRAL CANADA POLLS CLOSE"));
     lowerThird.setSubheadBinding(Binding.fixedBinding("Polls open for 30 minutes on west coast"));
     lowerThird.setNumSummaryEntriesBinding(Binding.fixedBinding(2));
