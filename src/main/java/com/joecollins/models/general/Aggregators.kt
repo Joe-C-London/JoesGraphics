@@ -102,7 +102,7 @@ object Aggregators {
         if (result.size <= limit) {
             return result
         }
-        val mustIncludeSet = mustInclude.filter { it != null }.toSet()
+        val mustIncludeSet = mustInclude.filterNotNull().toSet()
         val top = result.entries
             .filter { !mustIncludeSet.contains(it.key) }
             .sortedByDescending { it.value ?: -1 }

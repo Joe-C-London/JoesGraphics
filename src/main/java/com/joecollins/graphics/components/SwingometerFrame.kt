@@ -233,7 +233,7 @@ class SwingometerFrame : GraphicsFrame() {
 
     private inner class Dot {
         var position: Number = 0.0
-        var color = Color.WHITE
+        var color: Color = Color.WHITE
         var label = ""
         var solid = true
     }

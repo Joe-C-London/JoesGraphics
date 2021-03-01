@@ -23,8 +23,6 @@ interface Binding<T> {
         }
     }
 
-    @JvmDefault fun <R> mapNonNull(func: (T) -> R): Binding<R?> = map { if (it == null) null else func(it) }
-
     @JvmDefault fun <U, R> merge(other: Binding<U>, mergeFunc: (T, U) -> R): Binding<R> {
         val me = this
         return object : Binding<R> {

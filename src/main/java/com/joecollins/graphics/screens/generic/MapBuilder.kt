@@ -19,9 +19,9 @@ class MapBuilder<T> {
         shapes: Binding<Map<T, Shape>>,
         winners: Binding<Map<T, PartyResult?>>,
         focus: Binding<List<T>?>,
-        headerBinding: Binding<String>
+        headerBinding: Binding<String?>
     ) {
-        val shapesReceiver: BindingReceiver<Map<T, Shape>> = BindingReceiver<Map<T, Shape>>(shapes)
+        val shapesReceiver: BindingReceiver<Map<T, Shape>> = BindingReceiver(shapes)
         val shapesToParties = shapesReceiver
                 .getBinding()
                 .merge(winners) { s, w ->
@@ -49,8 +49,7 @@ class MapBuilder<T> {
         leadingParty: Binding<PartyResult?>,
         focus: Binding<List<T>?>,
         header: Binding<String?>
-    ) : this(shapes, selectedShape, leadingParty, focus, Binding.fixedBinding(null), header) {
-    }
+    ) : this(shapes, selectedShape, leadingParty, focus, Binding.fixedBinding(null), header)
 
     constructor(
         shapes: Binding<Map<T, Shape>>,
@@ -87,12 +86,10 @@ class MapBuilder<T> {
                 .merge(
                         additionalFocusShapes
                 ) { l1: List<Shape>?, l2: List<Shape>? ->
-                    if (l1 == null) {
-                        l2
-                    } else if (l2 == null) {
-                        l1
-                    } else {
-                        listOf(l1, l2).flatten().distinct()
+                    when {
+                        l1 == null -> l2
+                        l2 == null -> l1
+                        else -> listOf(l1, l2).flatten().distinct()
                     }
                 }
         val focusedShapeWinners = shapeWinners.merge(

@@ -222,11 +222,11 @@ class BarFrame : GraphicsFrame() {
             while (size > lines.size) {
                 val line = Line()
                 lines.add(line)
-                centralPanel.add(line._label)
+                centralPanel.add(line.jLabel)
             }
             while (size < lines.size) {
                 val line = lines.removeAt(size)
-                centralPanel.remove(line._label)
+                centralPanel.remove(line.jLabel)
             }
         }
     }
@@ -471,7 +471,7 @@ class BarFrame : GraphicsFrame() {
     private inner class Line {
         var level: Number = 0
 
-        val _label: JLabel = object : JLabel("") {
+        val jLabel: JLabel = object : JLabel("") {
             init {
                 foreground = Color.BLACK
                 preferredSize = Dimension(1024, 15)
@@ -489,9 +489,9 @@ class BarFrame : GraphicsFrame() {
         }
 
         var label: String
-        get() { return _label.text }
+        get() { return jLabel.text }
         set(label) {
-            _label.text = label
+            jLabel.text = label
         }
     }
 
@@ -522,7 +522,7 @@ class BarFrame : GraphicsFrame() {
             }
             height += bars.size * barHeight
             if (lines.isNotEmpty()) {
-                height += lines[0]._label.preferredSize.height
+                height += lines[0].jLabel.preferredSize.height
             }
             return Dimension(width, height)
         }
@@ -551,9 +551,9 @@ class BarFrame : GraphicsFrame() {
             }
             for (line in lines) {
                 val left = getPixelOfValue(line.level).toInt() + BAR_MARGIN
-                val labelHeight = min(line._label.preferredSize.height, actualHeight - top)
-                line._label.setLocation(left, actualHeight - labelHeight)
-                line._label.setSize(width - left, labelHeight)
+                val labelHeight = min(line.jLabel.preferredSize.height, actualHeight - top)
+                line.jLabel.setLocation(left, actualHeight - labelHeight)
+                line.jLabel.setSize(width - left, labelHeight)
             }
         }
     }

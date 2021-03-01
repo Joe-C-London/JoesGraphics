@@ -103,11 +103,10 @@ open class LowerThird : JPanel() {
         }
 
         private var _timezone: ZoneId = ZoneOffset.UTC
-        private val _placeLabel: JLabel
+        private val _placeLabel: JLabel = JLabel("UTC")
         private val _timeLabel: JLabel
 
         init {
-            _placeLabel = JLabel("UTC")
             _placeLabel.font = StandardFont.readBoldFont(12)
             _placeLabel.horizontalAlignment = JLabel.CENTER
             _placeLabel.verticalAlignment = JLabel.CENTER

@@ -41,7 +41,7 @@ import twitter4j.TwitterException
 import twitter4j.TwitterFactory
 import twitter4j.conf.ConfigurationBuilder
 
-class GenericWindow<T : JPanel> @JvmOverloads constructor(private val panel: T, title: String? = panel.javaClass.getSimpleName()) : JFrame() {
+class GenericWindow<T : JPanel> @JvmOverloads constructor(private val panel: T, title: String? = panel.javaClass.simpleName) : JFrame() {
 
     fun withControlPanel(panel: JPanel): GenericWindow<T> {
         add(panel)

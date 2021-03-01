@@ -47,8 +47,8 @@ class MultiResultScreen private constructor(builder: Builder<*>, textHeader: Bin
         internal val partiesOnly: Boolean
     ) {
         var pctReportingFunc: (T) -> Binding<Double> = { Binding.fixedBinding(1.0) }
-        var winnerFunc: (T) -> Binding<Candidate?> = { Binding.fixedBinding<Candidate?>(null) }
-        var runoffFunc: (T) -> Binding<Set<Candidate>?> = { Binding.fixedBinding<Set<Candidate>?>(setOf()) }
+        var winnerFunc: (T) -> Binding<Candidate?> = { Binding.fixedBinding(null) }
+        var runoffFunc: (T) -> Binding<Set<Candidate>?> = { Binding.fixedBinding(setOf()) }
         var incumbentMarker = ""
         var prevFunc: ((T) -> Binding<Map<Party, Int>>)? = null
         var swingHeaderFunc: ((T) -> Binding<String>)? = null
@@ -318,7 +318,7 @@ class MultiResultScreen private constructor(builder: Builder<*>, textHeader: Bin
             winner.binding.bind { result.winner = it }
             runoff.binding.bind { result.runoff = it ?: emptySet() }
             maxBars.binding.bind { result.maxBars = it }
-            val bars = Binding.propertyBinding<Result, List<BasicBar>?, Result.Property>(
+            val bars = Binding.propertyBinding(
                     result,
                     { r: Result ->
                         val total = r.votes.values.sum()
@@ -343,10 +343,7 @@ class MultiResultScreen private constructor(builder: Builder<*>, textHeader: Bin
                                             "OTHERS"
                                         }
                                         else -> {
-                                            """
-                                 ${candidate.name.toUpperCase()}
-                                 ${candidate.party.abbreviation}${if (candidate.isIncumbent()) " $incumbentMarker" else ""}
-                                 """.trimIndent()
+                                            "${candidate.name.toUpperCase()}\n${candidate.party.abbreviation}${if (candidate.isIncumbent()) " $incumbentMarker" else ""}"
                                         }
                                     }
                                     val rightLabel: String = when {
@@ -357,10 +354,7 @@ class MultiResultScreen private constructor(builder: Builder<*>, textHeader: Bin
                                             DecimalFormat("0.0%").format(pct)
                                         }
                                         else -> {
-                                            """
-                                 ${DecimalFormat("#,##0").format(votes.toLong())}
-                                 ${DecimalFormat("0.0%").format(pct)}
-                                 """.trimIndent()
+                                            "${DecimalFormat("#,##0").format(votes.toLong())}\n${DecimalFormat("0.0%").format(pct)}"
                                         }
                                     }
                                     BasicBar(

@@ -19,7 +19,7 @@ class BarFrameBuilder {
     private val bindings: MutableList<Binding<*>> = ArrayList()
 
     private class RangeFinder : Bindable<RangeFinder, RangeFinder.Property>() {
-        internal enum class Property {
+        enum class Property {
             MIN, MAX
         }
 
@@ -60,7 +60,7 @@ class BarFrameBuilder {
     }
 
     class BasicBar @JvmOverloads constructor(val label: String, val color: Color, val value: Number, val valueLabel: String = value.toString(), val shape: Shape? = null) {
-        constructor(label: String, color: Color, value: Number, shape: Shape?) : this(label, color, value, value.toString(), shape) {}
+        constructor(label: String, color: Color, value: Number, shape: Shape?) : this(label, color, value, value.toString(), shape)
     }
 
     class DualBar @JvmOverloads constructor(
@@ -72,17 +72,17 @@ class BarFrameBuilder {
         val shape: Shape? = null
     )
 
-    fun withHeader(headerBinding: Binding<String?>): BarFrameBuilder {
+    fun withHeader(headerBinding: Binding<out String?>): BarFrameBuilder {
         barFrame.setHeaderBinding(headerBinding)
         return this
     }
 
-    fun withSubhead(subheadBinding: Binding<String?>): BarFrameBuilder {
+    fun withSubhead(subheadBinding: Binding<out String?>): BarFrameBuilder {
         barFrame.setSubheadTextBinding(subheadBinding)
         return this
     }
 
-    fun withNotes(notesBinding: Binding<String?>): BarFrameBuilder {
+    fun withNotes(notesBinding: Binding<out String?>): BarFrameBuilder {
         barFrame.setNotesBinding(notesBinding)
         return this
     }
@@ -172,7 +172,7 @@ class BarFrameBuilder {
     }
 
     companion object {
-        @JvmStatic fun basic(binding: Binding<out List<BasicBar>?>): BarFrameBuilder {
+        @JvmStatic fun basic(binding: Binding<out List<BasicBar>>): BarFrameBuilder {
             val builder = BarFrameBuilder()
             val barFrame = builder.barFrame
             val rangeFinder = builder.rangeFinder
@@ -192,26 +192,20 @@ class BarFrameBuilder {
                     IndexedBinding.propertyBinding(entries) { it.color },
                     IndexedBinding.propertyBinding(entries) { it.value })
             builder.bind(binding) { map ->
-                if (map == null) {
-                    entries.clear()
-                    rangeFinder.lowest = 0
-                    rangeFinder.highest = 0
-                } else {
-                    entries.setAll(map)
-                    rangeFinder.highest = map
-                            .map { it.value }
-                            .map { it.toDouble() }
-                            .fold(0.0) { a, b -> max(a, b) }
-                    rangeFinder.lowest = map
-                            .map { it.value }
-                            .map { it.toDouble() }
-                            .fold(0.0) { a, b -> min(a, b) }
-                }
+                entries.setAll(map)
+                rangeFinder.highest = map
+                        .map { it.value }
+                        .map { it.toDouble() }
+                        .fold(0.0) { a, b -> max(a, b) }
+                rangeFinder.lowest = map
+                        .map { it.value }
+                        .map { it.toDouble() }
+                        .fold(0.0) { a, b -> min(a, b) }
             }
             return builder
         }
 
-        @JvmStatic fun dual(bars: Binding<out MutableList<DualBar>?>): BarFrameBuilder {
+        @JvmStatic fun dual(bars: Binding<out List<DualBar>>): BarFrameBuilder {
             val builder = BarFrameBuilder()
             val barFrame = builder.barFrame
             val rangeFinder = builder.rangeFinder
@@ -258,26 +252,20 @@ class BarFrameBuilder {
                     })
             barFrame.setLeftIconBinding(IndexedBinding.propertyBinding(entries) { e: DualBar -> e.shape })
             builder.bind(bars) { map ->
-                if (map == null) {
-                    entries.clear()
-                    rangeFinder.lowest = 0
-                    rangeFinder.highest = 0
-                } else {
-                    entries.setAll(map)
-                    rangeFinder.highest = map
-                            .flatMap { sequenceOf(it.value1, it.value2) }
-                            .map { it.toDouble() }
-                            .fold(0.0) { a, b -> max(a, b) }
-                    rangeFinder.lowest = map
-                            .flatMap { sequenceOf(it.value1, it.value2) }
-                            .map { it.toDouble() }
-                            .fold(0.0) { a, b -> min(a, b) }
-                }
+                entries.setAll(map)
+                rangeFinder.highest = map
+                        .flatMap { sequenceOf(it.value1, it.value2) }
+                        .map { it.toDouble() }
+                        .fold(0.0) { a, b -> max(a, b) }
+                rangeFinder.lowest = map
+                        .flatMap { sequenceOf(it.value1, it.value2) }
+                        .map { it.toDouble() }
+                        .fold(0.0) { a, b -> min(a, b) }
             }
             return builder
         }
 
-        @JvmStatic fun dualReversed(bars: Binding<out List<DualBar>?>): BarFrameBuilder {
+        @JvmStatic fun dualReversed(bars: Binding<out List<DualBar>>): BarFrameBuilder {
             val builder = BarFrameBuilder()
             val barFrame = builder.barFrame
             val rangeFinder = builder.rangeFinder
@@ -317,7 +305,7 @@ class BarFrameBuilder {
                             it.color
                         }
                     },
-                    IndexedBinding.propertyBinding<DualBar, Double>(
+                    IndexedBinding.propertyBinding(
                             entries
                     ) {
                         (second.invoke(it).toDouble() -
@@ -325,21 +313,15 @@ class BarFrameBuilder {
                     })
             barFrame.setLeftIconBinding(IndexedBinding.propertyBinding(entries) { e: DualBar -> e.shape })
             builder.bind(bars) { map ->
-                if (map == null) {
-                    entries.clear()
-                    rangeFinder.lowest = 0
-                    rangeFinder.highest = 0
-                } else {
-                    entries.setAll(map)
-                    rangeFinder.highest = map
-                            .flatMap { sequenceOf(it.value1, it.value2) }
-                            .map { it.toDouble() }
-                            .fold(0.0) { a: Double, b: Double -> max(a, b) }
-                    rangeFinder.lowest = map
-                            .flatMap { sequenceOf(it.value1, it.value2) }
-                            .map { it.toDouble() }
-                            .fold(0.0) { a, b -> min(a, b) }
-                }
+                entries.setAll(map)
+                rangeFinder.highest = map
+                        .flatMap { sequenceOf(it.value1, it.value2) }
+                        .map { it.toDouble() }
+                        .fold(0.0) { a: Double, b: Double -> max(a, b) }
+                rangeFinder.lowest = map
+                        .flatMap { sequenceOf(it.value1, it.value2) }
+                        .map { it.toDouble() }
+                        .fold(0.0) { a, b -> min(a, b) }
             }
             return builder
         }

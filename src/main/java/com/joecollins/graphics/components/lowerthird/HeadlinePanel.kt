@@ -1,7 +1,6 @@
 package com.joecollins.graphics.components.lowerthird
 
 import com.joecollins.graphics.components.FontSizeAdjustingLabel
-import com.joecollins.graphics.components.lowerthird.HeadlinePanel.HeadlinePanelLayout
 import com.joecollins.graphics.utils.StandardFont
 import java.awt.Color
 import java.awt.Component

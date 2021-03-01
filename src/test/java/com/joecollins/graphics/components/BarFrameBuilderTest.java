@@ -42,20 +42,22 @@ public class BarFrameBuilderTest {
         BarFrameBuilder.basic(
                 result
                     .getBinding()
-                    .mapNonNull(
-                        map ->
-                            map.entrySet().stream()
-                                .sorted(
-                                    Map.Entry.<Pair<String, Color>, Integer>comparingByValue()
-                                        .reversed())
-                                .map(
-                                    e ->
-                                        new BarFrameBuilder.BasicBar(
-                                            e.getKey().getLeft(),
-                                            e.getKey().getValue(),
-                                            e.getValue(),
-                                            THOUSANDS.format(e.getValue())))
-                                .collect(Collectors.toList())))
+                    .map(
+                        map -> {
+                          if (map == null) return List.of();
+                          return map.entrySet().stream()
+                              .sorted(
+                                  Map.Entry.<Pair<String, Color>, Integer>comparingByValue()
+                                      .reversed())
+                              .map(
+                                  e ->
+                                      new BarFrameBuilder.BasicBar(
+                                          e.getKey().getLeft(),
+                                          e.getKey().getValue(),
+                                          e.getValue(),
+                                          THOUSANDS.format(e.getValue())))
+                              .collect(Collectors.toList());
+                        }))
             .build();
     assertEquals(0, frame.getNumBars());
     assertEquals(0, frame.getNumLines());
@@ -87,22 +89,24 @@ public class BarFrameBuilderTest {
         BarFrameBuilder.basic(
                 result
                     .getBinding()
-                    .mapNonNull(
-                        map ->
-                            map.entrySet().stream()
-                                .sorted(
-                                    Comparator
-                                        .<Map.Entry<Pair<String, Color>, Wrapper<Integer>>>
-                                            comparingInt(e -> e.getValue().value)
-                                        .reversed())
-                                .map(
-                                    e ->
-                                        new BarFrameBuilder.BasicBar(
-                                            e.getKey().getLeft(),
-                                            e.getKey().getRight(),
-                                            e.getValue().value,
-                                            THOUSANDS.format(e.getValue().value)))
-                                .collect(Collectors.toList())))
+                    .map(
+                        map -> {
+                          if (map == null) return List.of();
+                          return map.entrySet().stream()
+                              .sorted(
+                                  Comparator
+                                      .<Map.Entry<Pair<String, Color>, Wrapper<Integer>>>
+                                          comparingInt(e -> e.getValue().value)
+                                      .reversed())
+                              .map(
+                                  e ->
+                                      new BarFrameBuilder.BasicBar(
+                                          e.getKey().getLeft(),
+                                          e.getKey().getRight(),
+                                          e.getValue().value,
+                                          THOUSANDS.format(e.getValue().value)))
+                              .collect(Collectors.toList());
+                        }))
             .build();
     assertEquals(0, frame.getNumBars());
     assertEquals(0, frame.getNumLines());
@@ -136,20 +140,22 @@ public class BarFrameBuilderTest {
         BarFrameBuilder.basic(
                 result
                     .getBinding()
-                    .mapNonNull(
-                        map ->
-                            map.entrySet().stream()
-                                .sorted(
-                                    Map.Entry.<Pair<String, Color>, Integer>comparingByValue()
-                                        .reversed())
-                                .map(
-                                    e ->
-                                        new BarFrameBuilder.BasicBar(
-                                            e.getKey().getLeft(),
-                                            e.getKey().getRight(),
-                                            e.getValue(),
-                                            THOUSANDS.format(e.getValue())))
-                                .collect(Collectors.toList())))
+                    .map(
+                        map -> {
+                          if (map == null) return List.of();
+                          return map.entrySet().stream()
+                              .sorted(
+                                  Map.Entry.<Pair<String, Color>, Integer>comparingByValue()
+                                      .reversed())
+                              .map(
+                                  e ->
+                                      new BarFrameBuilder.BasicBar(
+                                          e.getKey().getLeft(),
+                                          e.getKey().getRight(),
+                                          e.getValue(),
+                                          THOUSANDS.format(e.getValue())))
+                              .collect(Collectors.toList());
+                        }))
             .withMax(max.getBinding())
             .build();
     assertEquals(0, frame.getMin().intValue());
@@ -199,20 +205,22 @@ public class BarFrameBuilderTest {
         BarFrameBuilder.basic(
                 result
                     .getBinding()
-                    .mapNonNull(
-                        map ->
-                            map.entrySet().stream()
-                                .sorted(
-                                    Map.Entry.<Pair<String, Color>, Integer>comparingByValue()
-                                        .reversed())
-                                .map(
-                                    e ->
-                                        new BarFrameBuilder.BasicBar(
-                                            e.getKey().getLeft(),
-                                            e.getKey().getRight(),
-                                            e.getValue(),
-                                            THOUSANDS.format(e.getValue())))
-                                .collect(Collectors.toList())))
+                    .map(
+                        map -> {
+                          if (map == null) return List.of();
+                          return map.entrySet().stream()
+                              .sorted(
+                                  Map.Entry.<Pair<String, Color>, Integer>comparingByValue()
+                                      .reversed())
+                              .map(
+                                  e ->
+                                      new BarFrameBuilder.BasicBar(
+                                          e.getKey().getLeft(),
+                                          e.getKey().getRight(),
+                                          e.getValue(),
+                                          THOUSANDS.format(e.getValue())))
+                              .collect(Collectors.toList());
+                        }))
             .withHeader(header.getBinding())
             .withSubhead(subhead.getBinding())
             .withNotes(notes.getBinding())
@@ -250,20 +258,22 @@ public class BarFrameBuilderTest {
         BarFrameBuilder.basic(
                 result
                     .getBinding()
-                    .mapNonNull(
-                        map ->
-                            map.entrySet().stream()
-                                .sorted(
-                                    Map.Entry.<Pair<String, Color>, Integer>comparingByValue()
-                                        .reversed())
-                                .map(
-                                    e ->
-                                        new BarFrameBuilder.BasicBar(
-                                            e.getKey().getLeft(),
-                                            e.getKey().getRight(),
-                                            e.getValue(),
-                                            THOUSANDS.format(e.getValue())))
-                                .collect(Collectors.toList())))
+                    .map(
+                        map -> {
+                          if (map == null) return List.of();
+                          return map.entrySet().stream()
+                              .sorted(
+                                  Map.Entry.<Pair<String, Color>, Integer>comparingByValue()
+                                      .reversed())
+                              .map(
+                                  e ->
+                                      new BarFrameBuilder.BasicBar(
+                                          e.getKey().getLeft(),
+                                          e.getKey().getRight(),
+                                          e.getValue(),
+                                          THOUSANDS.format(e.getValue())))
+                              .collect(Collectors.toList());
+                        }))
             .withTarget(target.getBinding(), t -> THOUSANDS.format(t) + " TO WIN")
             .build();
     assertEquals(1, frame.getNumLines());
@@ -279,20 +289,22 @@ public class BarFrameBuilderTest {
         BarFrameBuilder.basic(
                 result
                     .getBinding()
-                    .mapNonNull(
-                        map ->
-                            map.entrySet().stream()
-                                .sorted(
-                                    Map.Entry.<Pair<String, Color>, Integer>comparingByValue()
-                                        .reversed())
-                                .map(
-                                    e ->
-                                        new BarFrameBuilder.BasicBar(
-                                            e.getKey().getLeft(),
-                                            e.getKey().getRight(),
-                                            e.getValue(),
-                                            THOUSANDS.format(e.getValue())))
-                                .collect(Collectors.toList())))
+                    .map(
+                        map -> {
+                          if (map == null) return List.of();
+                          return map.entrySet().stream()
+                              .sorted(
+                                  Map.Entry.<Pair<String, Color>, Integer>comparingByValue()
+                                      .reversed())
+                              .map(
+                                  e ->
+                                      new BarFrameBuilder.BasicBar(
+                                          e.getKey().getLeft(),
+                                          e.getKey().getRight(),
+                                          e.getValue(),
+                                          THOUSANDS.format(e.getValue())))
+                              .collect(Collectors.toList());
+                        }))
             .withLines(lines, t -> t + " QUOTA" + (t == 1 ? "" : "S"))
             .build();
     assertEquals(0, frame.getNumLines());
@@ -321,20 +333,22 @@ public class BarFrameBuilderTest {
         BarFrameBuilder.basic(
                 result
                     .getBinding()
-                    .mapNonNull(
-                        map ->
-                            map.entrySet().stream()
-                                .sorted(
-                                    Map.Entry.<Pair<String, Color>, Integer>comparingByValue()
-                                        .reversed())
-                                .map(
-                                    e ->
-                                        new BarFrameBuilder.BasicBar(
-                                            e.getKey().getLeft(),
-                                            e.getKey().getRight(),
-                                            e.getValue(),
-                                            THOUSANDS.format(e.getValue())))
-                                .collect(Collectors.toList())))
+                    .map(
+                        map -> {
+                          if (map == null) return List.of();
+                          return map.entrySet().stream()
+                              .sorted(
+                                  Map.Entry.<Pair<String, Color>, Integer>comparingByValue()
+                                      .reversed())
+                              .map(
+                                  e ->
+                                      new BarFrameBuilder.BasicBar(
+                                          e.getKey().getLeft(),
+                                          e.getKey().getRight(),
+                                          e.getValue(),
+                                          THOUSANDS.format(e.getValue())))
+                              .collect(Collectors.toList());
+                        }))
             .withLines(lines, Pair::getLeft, Pair::getRight)
             .build();
     assertEquals(0, frame.getNumLines());
@@ -359,20 +373,22 @@ public class BarFrameBuilderTest {
         BarFrameBuilder.basic(
                 result
                     .getBinding()
-                    .mapNonNull(
-                        map ->
-                            map.entrySet().stream()
-                                .sorted(
-                                    Map.Entry.<Pair<String, Color>, Integer>comparingByValue()
-                                        .reversed())
-                                .map(
-                                    e ->
-                                        new BarFrameBuilder.BasicBar(
-                                            e.getKey().getLeft(),
-                                            e.getKey().getRight(),
-                                            e.getValue(),
-                                            THOUSANDS.format(e.getValue())))
-                                .collect(Collectors.toList())))
+                    .map(
+                        map -> {
+                          if (map == null) return List.of();
+                          return map.entrySet().stream()
+                              .sorted(
+                                  Map.Entry.<Pair<String, Color>, Integer>comparingByValue()
+                                      .reversed())
+                              .map(
+                                  e ->
+                                      new BarFrameBuilder.BasicBar(
+                                          e.getKey().getLeft(),
+                                          e.getKey().getRight(),
+                                          e.getValue(),
+                                          THOUSANDS.format(e.getValue())))
+                              .collect(Collectors.toList());
+                        }))
             .withLines(lines.getBinding(), t -> t + " QUOTA" + (t == 1 ? "" : "S"))
             .build();
     assertEquals(0, frame.getNumLines());
@@ -402,23 +418,25 @@ public class BarFrameBuilderTest {
         BarFrameBuilder.basic(
                 result
                     .getBinding()
-                    .mapNonNull(
-                        map ->
-                            map.entrySet().stream()
-                                .sorted(
-                                    Comparator
-                                        .<Map.Entry<Pair<String, Color>, Pair<Integer, Boolean>>>
-                                            comparingInt(e -> e.getValue().getLeft())
-                                        .reversed())
-                                .map(
-                                    e ->
-                                        new BarFrameBuilder.BasicBar(
-                                            e.getKey().getLeft(),
-                                            e.getKey().getRight(),
-                                            e.getValue().getLeft(),
-                                            THOUSANDS.format(e.getValue().getLeft()),
-                                            e.getValue().getRight() ? shape : null))
-                                .collect(Collectors.toList())))
+                    .map(
+                        map -> {
+                          if (map == null) return List.of();
+                          return map.entrySet().stream()
+                              .sorted(
+                                  Comparator
+                                      .<Map.Entry<Pair<String, Color>, Pair<Integer, Boolean>>>
+                                          comparingInt(e -> e.getValue().getLeft())
+                                      .reversed())
+                              .map(
+                                  e ->
+                                      new BarFrameBuilder.BasicBar(
+                                          e.getKey().getLeft(),
+                                          e.getKey().getRight(),
+                                          e.getValue().getLeft(),
+                                          THOUSANDS.format(e.getValue().getLeft()),
+                                          e.getValue().getRight() ? shape : null))
+                              .collect(Collectors.toList());
+                        }))
             .build();
     assertEquals(0, frame.getNumBars());
     assertEquals(0, frame.getNumLines());
@@ -450,22 +468,24 @@ public class BarFrameBuilderTest {
         BarFrameBuilder.basic(
                 result
                     .getBinding()
-                    .mapNonNull(
-                        map ->
-                            map.entrySet().stream()
-                                .sorted(
-                                    Comparator
-                                        .<Map.Entry<Pair<String, Color>, Pair<Integer, Integer>>>
-                                            comparingInt(e -> e.getValue().getLeft())
-                                        .reversed())
-                                .map(
-                                    e ->
-                                        new BarFrameBuilder.BasicBar(
-                                            e.getKey().getLeft(),
-                                            e.getKey().getRight(),
-                                            e.getValue().getRight(),
-                                            DIFF.format(e.getValue().getRight())))
-                                .collect(Collectors.toList())))
+                    .map(
+                        map -> {
+                          if (map == null) return List.of();
+                          return map.entrySet().stream()
+                              .sorted(
+                                  Comparator
+                                      .<Map.Entry<Pair<String, Color>, Pair<Integer, Integer>>>
+                                          comparingInt(e -> e.getValue().getLeft())
+                                      .reversed())
+                              .map(
+                                  e ->
+                                      new BarFrameBuilder.BasicBar(
+                                          e.getKey().getLeft(),
+                                          e.getKey().getRight(),
+                                          e.getValue().getRight(),
+                                          DIFF.format(e.getValue().getRight())))
+                              .collect(Collectors.toList());
+                        }))
             .build();
     assertEquals(0, frame.getNumBars());
     assertEquals(0, frame.getNumLines());
@@ -528,22 +548,24 @@ public class BarFrameBuilderTest {
         BarFrameBuilder.basic(
                 result
                     .getBinding()
-                    .mapNonNull(
-                        map ->
-                            map.entrySet().stream()
-                                .sorted(
-                                    Comparator
-                                        .<Map.Entry<Pair<String, Color>, Pair<Integer, Integer>>>
-                                            comparingInt(e -> e.getValue().getLeft())
-                                        .reversed())
-                                .map(
-                                    e ->
-                                        new BarFrameBuilder.BasicBar(
-                                            e.getKey().getLeft(),
-                                            e.getKey().getRight(),
-                                            e.getValue().getRight(),
-                                            DIFF.format(e.getValue().getRight())))
-                                .collect(Collectors.toList())))
+                    .map(
+                        map -> {
+                          if (map == null) return List.of();
+                          return map.entrySet().stream()
+                              .sorted(
+                                  Comparator
+                                      .<Map.Entry<Pair<String, Color>, Pair<Integer, Integer>>>
+                                          comparingInt(e -> e.getValue().getLeft())
+                                      .reversed())
+                              .map(
+                                  e ->
+                                      new BarFrameBuilder.BasicBar(
+                                          e.getKey().getLeft(),
+                                          e.getKey().getRight(),
+                                          e.getValue().getRight(),
+                                          DIFF.format(e.getValue().getRight())))
+                              .collect(Collectors.toList());
+                        }))
             .withWingspan(range.getBinding())
             .build();
     assertEquals(-10, frame.getMin().intValue());
@@ -576,23 +598,25 @@ public class BarFrameBuilderTest {
         BarFrameBuilder.dual(
                 result
                     .getBinding()
-                    .mapNonNull(
-                        map ->
-                            map.entrySet().stream()
-                                .sorted(
-                                    Comparator
-                                        .<Map.Entry<Pair<String, Color>, Pair<Integer, Integer>>>
-                                            comparingInt(e -> e.getValue().getRight())
-                                        .reversed())
-                                .map(
-                                    e ->
-                                        new BarFrameBuilder.DualBar(
-                                            e.getKey().getLeft(),
-                                            e.getKey().getRight(),
-                                            e.getValue().getLeft(),
-                                            e.getValue().getRight(),
-                                            e.getValue().getLeft() + "/" + e.getValue().getRight()))
-                                .collect(Collectors.toList())))
+                    .map(
+                        map -> {
+                          if (map == null) return List.of();
+                          return map.entrySet().stream()
+                              .sorted(
+                                  Comparator
+                                      .<Map.Entry<Pair<String, Color>, Pair<Integer, Integer>>>
+                                          comparingInt(e -> e.getValue().getRight())
+                                      .reversed())
+                              .map(
+                                  e ->
+                                      new BarFrameBuilder.DualBar(
+                                          e.getKey().getLeft(),
+                                          e.getKey().getRight(),
+                                          e.getValue().getLeft(),
+                                          e.getValue().getRight(),
+                                          e.getValue().getLeft() + "/" + e.getValue().getRight()))
+                              .collect(Collectors.toList());
+                        }))
             .build();
     assertEquals(0, frame.getNumBars());
     assertEquals(0, frame.getNumLines());
@@ -674,23 +698,25 @@ public class BarFrameBuilderTest {
         BarFrameBuilder.dualReversed(
                 result
                     .getBinding()
-                    .mapNonNull(
-                        map ->
-                            map.entrySet().stream()
-                                .sorted(
-                                    Comparator
-                                        .<Map.Entry<Pair<String, Color>, Pair<Integer, Integer>>>
-                                            comparingInt(e -> e.getValue().getRight())
-                                        .reversed())
-                                .map(
-                                    e ->
-                                        new BarFrameBuilder.DualBar(
-                                            e.getKey().getLeft(),
-                                            e.getKey().getRight(),
-                                            e.getValue().getLeft(),
-                                            e.getValue().getRight(),
-                                            e.getValue().getLeft() + "/" + e.getValue().getRight()))
-                                .collect(Collectors.toList())))
+                    .map(
+                        map -> {
+                          if (map == null) return List.of();
+                          return map.entrySet().stream()
+                              .sorted(
+                                  Comparator
+                                      .<Map.Entry<Pair<String, Color>, Pair<Integer, Integer>>>
+                                          comparingInt(e -> e.getValue().getRight())
+                                      .reversed())
+                              .map(
+                                  e ->
+                                      new BarFrameBuilder.DualBar(
+                                          e.getKey().getLeft(),
+                                          e.getKey().getRight(),
+                                          e.getValue().getLeft(),
+                                          e.getValue().getRight(),
+                                          e.getValue().getLeft() + "/" + e.getValue().getRight()))
+                              .collect(Collectors.toList());
+                        }))
             .build();
     assertEquals(0, frame.getNumBars());
     assertEquals(0, frame.getNumLines());
@@ -772,27 +798,29 @@ public class BarFrameBuilderTest {
         BarFrameBuilder.dual(
                 result
                     .getBinding()
-                    .mapNonNull(
-                        map ->
-                            map.entrySet().stream()
-                                .sorted(
-                                    Comparator
-                                        .<Map.Entry<
-                                                Pair<String, Color>,
-                                                Triple<Integer, Integer, Integer>>>
-                                            comparingInt(e -> e.getValue().getRight())
-                                        .reversed())
-                                .map(
-                                    e ->
-                                        new BarFrameBuilder.DualBar(
-                                            e.getKey().getLeft(),
-                                            e.getKey().getRight(),
-                                            e.getValue().getLeft(),
-                                            e.getValue().getMiddle(),
-                                            DIFF.format(e.getValue().getLeft())
-                                                + "/"
-                                                + DIFF.format(e.getValue().getMiddle())))
-                                .collect(Collectors.toList())))
+                    .map(
+                        map -> {
+                          if (map == null) return List.of();
+                          return map.entrySet().stream()
+                              .sorted(
+                                  Comparator
+                                      .<Map.Entry<
+                                              Pair<String, Color>,
+                                              Triple<Integer, Integer, Integer>>>
+                                          comparingInt(e -> e.getValue().getRight())
+                                      .reversed())
+                              .map(
+                                  e ->
+                                      new BarFrameBuilder.DualBar(
+                                          e.getKey().getLeft(),
+                                          e.getKey().getRight(),
+                                          e.getValue().getLeft(),
+                                          e.getValue().getMiddle(),
+                                          DIFF.format(e.getValue().getLeft())
+                                              + "/"
+                                              + DIFF.format(e.getValue().getMiddle())))
+                              .collect(Collectors.toList());
+                        }))
             .build();
     assertEquals(0, frame.getNumBars());
     assertEquals(0, frame.getNumLines());
@@ -881,29 +909,31 @@ public class BarFrameBuilderTest {
         BarFrameBuilder.dual(
                 result
                     .getBinding()
-                    .mapNonNull(
-                        map ->
-                            map.entrySet().stream()
-                                .sorted(
-                                    Comparator
-                                        .<Map.Entry<
-                                                Pair<String, Color>,
-                                                Triple<Integer, Integer, Integer>>>
-                                            comparingInt(e -> e.getValue().getRight())
-                                        .reversed())
-                                .map(
-                                    e ->
-                                        new BarFrameBuilder.DualBar(
-                                            e.getKey().getLeft(),
-                                            e.getKey().getRight(),
-                                            e.getValue().getLeft(),
-                                            e.getValue().getMiddle(),
-                                            "("
-                                                + DIFF.format(e.getValue().getLeft())
-                                                + ")-("
-                                                + DIFF.format(e.getValue().getMiddle())
-                                                + ")"))
-                                .collect(Collectors.toList())))
+                    .map(
+                        map -> {
+                          if (map == null) return List.of();
+                          return map.entrySet().stream()
+                              .sorted(
+                                  Comparator
+                                      .<Map.Entry<
+                                              Pair<String, Color>,
+                                              Triple<Integer, Integer, Integer>>>
+                                          comparingInt(e -> e.getValue().getRight())
+                                      .reversed())
+                              .map(
+                                  e ->
+                                      new BarFrameBuilder.DualBar(
+                                          e.getKey().getLeft(),
+                                          e.getKey().getRight(),
+                                          e.getValue().getLeft(),
+                                          e.getValue().getMiddle(),
+                                          "("
+                                              + DIFF.format(e.getValue().getLeft())
+                                              + ")-("
+                                              + DIFF.format(e.getValue().getMiddle())
+                                              + ")"))
+                              .collect(Collectors.toList());
+                        }))
             .build();
     assertEquals(0, frame.getNumBars());
     assertEquals(0, frame.getNumLines());

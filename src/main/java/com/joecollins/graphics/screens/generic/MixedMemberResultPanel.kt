@@ -201,7 +201,7 @@ class MixedMemberResultPanel private constructor(
             val result = Result()
             candidateVotes.getBinding().bind { result.votes = it }
             winnerBinding.bind { result.winner = it }
-            val bars = Binding.propertyBinding<Result, List<BasicBar>?, Result.Property>(
+            val bars = Binding.propertyBinding(
                     result,
                     { r: Result ->
                         val total = r.votes.values.filterNotNull().sum()
@@ -217,24 +217,11 @@ class MixedMemberResultPanel private constructor(
                                     val leftLabel: String
                                     var rightLabel: String
                                     if (showBothLines) {
-                                        leftLabel = ("""
-                                                    """ + candidate.name.toUpperCase() + (if (candidate.isIncumbent()) incumbentMarker else "") + """
-                                                    """ + candidate.party.name.toUpperCase() + """
-                                                    """).trimIndent()
-                                        rightLabel = """
-                    ${THOUSANDS_FORMAT.format(votes.toLong())}
-                    ${PCT_FORMAT.format(pct)}
-                    """.trimIndent()
+                                        leftLabel = ("${candidate.name.toUpperCase()}${if (candidate.isIncumbent()) incumbentMarker else ""}\n${candidate.party.name.toUpperCase()}")
+                                        rightLabel = "${THOUSANDS_FORMAT.format(votes.toLong())}\n${PCT_FORMAT.format(pct)}"
                                     } else {
-                                        leftLabel = (candidate.name.toUpperCase() +
-                                                (if (candidate.isIncumbent()) incumbentMarker else "") +
-                                                " (" +
-                                                candidate.party.abbreviation.toUpperCase() +
-                                                ")")
-                                        rightLabel = (THOUSANDS_FORMAT.format(votes.toLong()) +
-                                                " (" +
-                                                PCT_FORMAT.format(pct) +
-                                                ")")
+                                        leftLabel = ("${candidate.name.toUpperCase()}${if (candidate.isIncumbent()) incumbentMarker else ""} (${candidate.party.abbreviation.toUpperCase()})")
+                                        rightLabel = ("${THOUSANDS_FORMAT.format(votes.toLong())} (${PCT_FORMAT.format(pct)})")
                                     }
                                     if (partialDeclaration) {
                                         rightLabel = THOUSANDS_FORMAT.format(votes.toLong())
@@ -287,7 +274,7 @@ class MixedMemberResultPanel private constructor(
             val change = Change<Candidate>()
             candidateVotes.getBinding().bind { change.curr = it }
             candidatePrev!!.getBinding().bind { change.prev = it }
-            val bars = Binding.propertyBinding<Change<Candidate>, List<BasicBar>?, Change.Property>(
+            val bars = Binding.propertyBinding(
                     change,
                     { r: Change<Candidate> ->
                         val currTotal = r.curr.values.filterNotNull().sum()
@@ -370,7 +357,7 @@ class MixedMemberResultPanel private constructor(
             val change = Change<Party>()
             partyVotes.getBinding().bind { change.curr = it }
             partyPrev!!.getBinding().bind { change.prev = it }
-            val bars = Binding.propertyBinding<Change<Party>, List<BasicBar>?, Change.Property>(
+            val bars = Binding.propertyBinding(
                     change,
                     { r: Change<Party> ->
                         val currTotal = r.curr.values.filterNotNull().sum()

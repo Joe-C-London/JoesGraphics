@@ -11,16 +11,16 @@ import javax.swing.JPanel
 import javax.swing.border.EmptyBorder
 
 class GenericPanelWithHeaderAndLowerThird<T : JPanel>(
-    private val panel: T,
-    private val label: Binding<String>?,
-    private val lowerThird: LowerThird?
+    panel: T,
+    label: Binding<String>?,
+    lowerThird: LowerThird?
 ) : JPanel() {
 
     private val _label: JLabel = JLabel()
 
-    constructor(panel: T, label: String) : this(panel, Binding.fixedBinding<String>(label), null) {}
-    constructor(panel: T, lowerThird: LowerThird?) : this(panel, null as Binding<String>?, lowerThird) {}
-    constructor(panel: T, label: String, lowerThird: LowerThird?) : this(panel, Binding.fixedBinding<String>(label), lowerThird) {}
+    constructor(panel: T, label: String) : this(panel, Binding.fixedBinding<String>(label), null)
+    constructor(panel: T, lowerThird: LowerThird?) : this(panel, null as Binding<String>?, lowerThird)
+    constructor(panel: T, label: String, lowerThird: LowerThird?) : this(panel, Binding.fixedBinding<String>(label), lowerThird)
 
     init {
         if (label != null) {

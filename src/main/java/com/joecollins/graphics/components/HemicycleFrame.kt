@@ -2,8 +2,6 @@ package com.joecollins.graphics.components
 
 import com.joecollins.bindings.Binding
 import com.joecollins.bindings.IndexedBinding
-import com.joecollins.graphics.components.HemicycleFrame.BarPanel
-import com.joecollins.graphics.components.HemicycleFrame.DotsPanel
 import com.joecollins.graphics.utils.StandardFont
 import java.awt.BasicStroke
 import java.awt.BorderLayout
@@ -21,7 +19,6 @@ import java.awt.RenderingHints
 import java.awt.Shape
 import java.awt.geom.AffineTransform
 import java.awt.geom.Area
-import java.lang.Math
 import java.util.ArrayList
 import javax.swing.JPanel
 import kotlin.math.max
