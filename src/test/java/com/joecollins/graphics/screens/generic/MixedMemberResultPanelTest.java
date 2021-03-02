@@ -45,7 +45,7 @@ public class MixedMemberResultPanelTest {
                 .filter(id -> id >= 10 && id <= 14)
                 .collect(Collectors.toList()));
     BindableWrapper<Integer> selectedShape = new BindableWrapper<>(10);
-    BindableWrapper<PartyResult> selectedResult = new BindableWrapper<>();
+    BindableWrapper<PartyResult> selectedResult = new BindableWrapper<>(null);
 
     Party lib = new Party("Liberal", "LIB", Color.RED);
     Party grn = new Party("Green", "GRN", Color.GREEN.darker());
@@ -124,10 +124,10 @@ public class MixedMemberResultPanelTest {
                 .filter(id -> id >= 10 && id <= 14)
                 .collect(Collectors.toList()));
     BindableWrapper<Integer> selectedShape = new BindableWrapper<>(10);
-    BindableWrapper<PartyResult> selectedResult = new BindableWrapper<>();
+    BindableWrapper<PartyResult> selectedResult = new BindableWrapper<>(null);
     BindableWrapper<Double> candidatePctReporting = new BindableWrapper<>(0.0);
     BindableWrapper<Double> partyPctReporting = new BindableWrapper<>(0.0);
-    BindableWrapper<Candidate> winner = new BindableWrapper<>();
+    BindableWrapper<Candidate> winner = new BindableWrapper<>(null);
 
     Party lib = new Party("Liberal", "LIB", Color.RED);
     Party grn = new Party("Green", "GRN", Color.GREEN.darker());
@@ -214,7 +214,7 @@ public class MixedMemberResultPanelTest {
                 .filter(id -> id >= 10 && id <= 14)
                 .collect(Collectors.toList()));
     BindableWrapper<Integer> selectedShape = new BindableWrapper<>(10);
-    BindableWrapper<PartyResult> selectedResult = new BindableWrapper<>();
+    BindableWrapper<PartyResult> selectedResult = new BindableWrapper<>(null);
     BindableWrapper<Double> candidatePctReporting = new BindableWrapper<>(0.0);
     BindableWrapper<Double> partyPctReporting = new BindableWrapper<>(0.0);
 
@@ -384,7 +384,7 @@ public class MixedMemberResultPanelTest {
                 .filter(id -> id >= 10 && id <= 14)
                 .collect(Collectors.toList()));
     BindableWrapper<Integer> selectedShape = new BindableWrapper<>(10);
-    BindableWrapper<PartyResult> selectedResult = new BindableWrapper<>();
+    BindableWrapper<PartyResult> selectedResult = new BindableWrapper<>(null);
 
     Party lib = new Party("Liberal", "LIB", Color.RED);
     Party grn = new Party("Green", "GRN", Color.GREEN.darker());
@@ -460,7 +460,7 @@ public class MixedMemberResultPanelTest {
                 .collect(Collectors.toList()));
     BindableWrapper<List<Integer>> additionalHighlight = new BindableWrapper<>(List.of(9));
     BindableWrapper<Integer> selectedShape = new BindableWrapper<>(10);
-    BindableWrapper<PartyResult> selectedResult = new BindableWrapper<>();
+    BindableWrapper<PartyResult> selectedResult = new BindableWrapper<>(null);
 
     Party lib = new Party("Liberal", "LIB", Color.RED);
     Party grn = new Party("Green", "GRN", Color.GREEN.darker());
@@ -534,7 +534,7 @@ public class MixedMemberResultPanelTest {
                 .filter(id -> id >= 10 && id <= 14)
                 .collect(Collectors.toList()));
     BindableWrapper<Integer> selectedShape = new BindableWrapper<>(10);
-    BindableWrapper<PartyResult> selectedResult = new BindableWrapper<>();
+    BindableWrapper<PartyResult> selectedResult = new BindableWrapper<>(null);
 
     Party lib = new Party("Liberal", "LIB", Color.RED);
     Party grn = new Party("Green", "GRN", Color.GREEN.darker());
@@ -591,7 +591,7 @@ public class MixedMemberResultPanelTest {
                 .filter(id -> id >= 10 && id <= 14)
                 .collect(Collectors.toList()));
     BindableWrapper<Integer> selectedShape = new BindableWrapper<>(10);
-    BindableWrapper<PartyResult> selectedResult = new BindableWrapper<>();
+    BindableWrapper<PartyResult> selectedResult = new BindableWrapper<>(null);
 
     Party lib = new Party("Liberal", "LIB", Color.RED);
     Party grn = new Party("Green", "GRN", Color.GREEN.darker());
@@ -650,8 +650,8 @@ public class MixedMemberResultPanelTest {
                 .filter(id -> id >= 10 && id <= 14)
                 .collect(Collectors.toList()));
     BindableWrapper<Integer> selectedShape = new BindableWrapper<>(10);
-    BindableWrapper<PartyResult> selectedResult = new BindableWrapper<>();
-    BindableWrapper<Candidate> winner = new BindableWrapper<>();
+    BindableWrapper<PartyResult> selectedResult = new BindableWrapper<>(null);
+    BindableWrapper<Candidate> winner = new BindableWrapper<>(null);
 
     Party lib = new Party("Liberal", "LIB", Color.RED);
     Party grn = new Party("Green", "GRN", Color.GREEN.darker());

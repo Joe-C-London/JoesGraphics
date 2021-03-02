@@ -37,7 +37,7 @@ public class BarFrameBuilderTest {
 
   @Test
   public void testSimpleBars() {
-    BindableWrapper<Map<Pair<String, Color>, Integer>> result = new BindableWrapper<>();
+    BindableWrapper<Map<Pair<String, Color>, Integer>> result = new BindableWrapper<>(Map.of());
     BarFrame frame =
         BarFrameBuilder.basic(
                 result
@@ -84,7 +84,8 @@ public class BarFrameBuilderTest {
 
   @Test
   public void testSimpleBarsWithValueObject() {
-    BindableWrapper<Map<Pair<String, Color>, Wrapper<Integer>>> result = new BindableWrapper<>();
+    BindableWrapper<Map<Pair<String, Color>, Wrapper<Integer>>> result =
+        new BindableWrapper<>(Map.of());
     BarFrame frame =
         BarFrameBuilder.basic(
                 result
@@ -133,9 +134,8 @@ public class BarFrameBuilderTest {
 
   @Test
   public void testSimpleBarsRange() {
-    BindableWrapper<Map<Pair<String, Color>, Integer>> result = new BindableWrapper<>();
-    BindableWrapper<Integer> max = new BindableWrapper<>();
-    max.setValue(2500);
+    BindableWrapper<Map<Pair<String, Color>, Integer>> result = new BindableWrapper<>(Map.of());
+    BindableWrapper<Integer> max = new BindableWrapper<>(2500);
     BarFrame frame =
         BarFrameBuilder.basic(
                 result
@@ -190,17 +190,12 @@ public class BarFrameBuilderTest {
 
   @Test
   public void testHeaderSubheadAndNotes() {
-    BindableWrapper<Map<Pair<String, Color>, Integer>> result = new BindableWrapper<>();
-    BindableWrapper<String> header = new BindableWrapper<>();
-    header.setValue("HEADER");
-    BindableWrapper<String> subhead = new BindableWrapper<>();
-    subhead.setValue("SUBHEAD");
-    BindableWrapper<String> notes = new BindableWrapper<>();
-    notes.setValue("NOTES");
-    BindableWrapper<Color> borderColor = new BindableWrapper<>();
-    borderColor.setValue(Color.BLACK);
-    BindableWrapper<Color> subheadColor = new BindableWrapper<>();
-    subheadColor.setValue(Color.GRAY);
+    BindableWrapper<Map<Pair<String, Color>, Integer>> result = new BindableWrapper<>(Map.of());
+    BindableWrapper<String> header = new BindableWrapper<>("HEADER");
+    BindableWrapper<String> subhead = new BindableWrapper<>("SUBHEAD");
+    BindableWrapper<String> notes = new BindableWrapper<>("NOTES");
+    BindableWrapper<Color> borderColor = new BindableWrapper<>(Color.BLACK);
+    BindableWrapper<Color> subheadColor = new BindableWrapper<>(Color.GRAY);
     BarFrame frame =
         BarFrameBuilder.basic(
                 result
@@ -251,9 +246,8 @@ public class BarFrameBuilderTest {
 
   @Test
   public void testTarget() {
-    BindableWrapper<Map<Pair<String, Color>, Integer>> result = new BindableWrapper<>();
-    BindableWrapper<Integer> target = new BindableWrapper<>();
-    target.setValue(2382);
+    BindableWrapper<Map<Pair<String, Color>, Integer>> result = new BindableWrapper<>(Map.of());
+    BindableWrapper<Integer> target = new BindableWrapper<>(2382);
     BarFrame frame =
         BarFrameBuilder.basic(
                 result
@@ -283,7 +277,7 @@ public class BarFrameBuilderTest {
 
   @Test
   public void testMultiLines() {
-    BindableWrapper<Map<Pair<String, Color>, Integer>> result = new BindableWrapper<>();
+    BindableWrapper<Map<Pair<String, Color>, Integer>> result = new BindableWrapper<>(Map.of());
     BindableList<Integer> lines = new BindableList<>();
     BarFrame frame =
         BarFrameBuilder.basic(
@@ -327,7 +321,7 @@ public class BarFrameBuilderTest {
 
   @Test
   public void testMultiLinesBespokeLabels() {
-    BindableWrapper<Map<Pair<String, Color>, Integer>> result = new BindableWrapper<>();
+    BindableWrapper<Map<Pair<String, Color>, Integer>> result = new BindableWrapper<>(Map.of());
     BindableList<Pair<String, Integer>> lines = new BindableList<>();
     BarFrame frame =
         BarFrameBuilder.basic(
@@ -366,9 +360,8 @@ public class BarFrameBuilderTest {
 
   @Test
   public void testMultiLinesBinding() {
-    BindableWrapper<Map<Pair<String, Color>, Integer>> result = new BindableWrapper<>();
-    BindableWrapper<List<Integer>> lines = new BindableWrapper<>();
-    lines.setValue(List.of());
+    BindableWrapper<Map<Pair<String, Color>, Integer>> result = new BindableWrapper<>(Map.of());
+    BindableWrapper<List<Integer>> lines = new BindableWrapper<>(List.of());
     BarFrame frame =
         BarFrameBuilder.basic(
                 result
@@ -412,7 +405,7 @@ public class BarFrameBuilderTest {
   @Test
   public void testLeftShape() {
     BindableWrapper<Map<Pair<String, Color>, Pair<Integer, Boolean>>> result =
-        new BindableWrapper<>();
+        new BindableWrapper<>(Map.of());
     Double shape = new Double(0, 0, 1, 1);
     BarFrame frame =
         BarFrameBuilder.basic(
@@ -463,7 +456,7 @@ public class BarFrameBuilderTest {
   @Test
   public void testSimpleDiffBars() {
     BindableWrapper<Map<Pair<String, Color>, Pair<Integer, Integer>>> result =
-        new BindableWrapper<>();
+        new BindableWrapper<>(Map.of());
     BarFrame frame =
         BarFrameBuilder.basic(
                 result
@@ -541,9 +534,8 @@ public class BarFrameBuilderTest {
   @Test
   public void testSimpleDiffWingspan() {
     BindableWrapper<Map<Pair<String, Color>, Pair<Integer, Integer>>> result =
-        new BindableWrapper<>();
-    BindableWrapper<Integer> range = new BindableWrapper<>();
-    range.setValue(10);
+        new BindableWrapper<>(Map.of());
+    BindableWrapper<Integer> range = new BindableWrapper<>(10);
     BarFrame frame =
         BarFrameBuilder.basic(
                 result
@@ -593,7 +585,7 @@ public class BarFrameBuilderTest {
   @Test
   public void testDualValueBars() {
     BindableWrapper<Map<Pair<String, Color>, Pair<Integer, Integer>>> result =
-        new BindableWrapper<>();
+        new BindableWrapper<>(Map.of());
     BarFrame frame =
         BarFrameBuilder.dual(
                 result
@@ -693,7 +685,7 @@ public class BarFrameBuilderTest {
   @Test
   public void testDualReversedValueBars() {
     BindableWrapper<Map<Pair<String, Color>, Pair<Integer, Integer>>> result =
-        new BindableWrapper<>();
+        new BindableWrapper<>(Map.of());
     BarFrame frame =
         BarFrameBuilder.dualReversed(
                 result
@@ -793,7 +785,7 @@ public class BarFrameBuilderTest {
   @Test
   public void testDualChangeBars() {
     BindableWrapper<Map<Pair<String, Color>, Triple<Integer, Integer, Integer>>> result =
-        new BindableWrapper<>();
+        new BindableWrapper<>(Map.of());
     BarFrame frame =
         BarFrameBuilder.dual(
                 result
@@ -904,7 +896,7 @@ public class BarFrameBuilderTest {
   @Test
   public void testDualChangeRangeBars() {
     BindableWrapper<Map<Pair<String, Color>, Triple<Integer, Integer, Integer>>> result =
-        new BindableWrapper<>();
+        new BindableWrapper<>(Map.of());
     BarFrame frame =
         BarFrameBuilder.dual(
                 result

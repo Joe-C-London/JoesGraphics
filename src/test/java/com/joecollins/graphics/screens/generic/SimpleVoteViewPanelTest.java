@@ -231,8 +231,8 @@ public class SimpleVoteViewPanelTest {
     BindableWrapper<String> changeHeader = new BindableWrapper<>("CHANGE SINCE 2015");
     BindableWrapper<String> swingHeader = new BindableWrapper<>("SWING SINCE 2015");
     BindableWrapper<String> mapHeader = new BindableWrapper<>("CARDIGAN");
-    BindableWrapper<PartyResult> leader = new BindableWrapper<>();
-    BindableWrapper<Candidate> winner = new BindableWrapper<>();
+    BindableWrapper<PartyResult> leader = new BindableWrapper<>(null);
+    BindableWrapper<Candidate> winner = new BindableWrapper<>(null);
     List<Party> swingPartyOrder =
         Arrays.asList(ndp.getParty(), grn.getParty(), lib.getParty(), pc.getParty());
     Map<Integer, Shape> shapesByDistrict = peiShapesByDistrict();
@@ -340,7 +340,7 @@ public class SimpleVoteViewPanelTest {
     BindableWrapper<String> mapHeader = new BindableWrapper<>("CARDIGAN");
     BindableWrapper<PartyResult> leader =
         new BindableWrapper<>(PartyResult.leading(lib.getParty()));
-    BindableWrapper<Candidate> winner = new BindableWrapper<>();
+    BindableWrapper<Candidate> winner = new BindableWrapper<>(null);
     List<Party> swingPartyOrder =
         Arrays.asList(ndp.getParty(), grn.getParty(), lib.getParty(), pc.getParty());
     Map<Integer, Shape> shapesByDistrict = peiShapesByDistrict();
@@ -388,7 +388,7 @@ public class SimpleVoteViewPanelTest {
     BindableWrapper<String> mapHeader = new BindableWrapper<>("PEI");
     List<Party> swingPartyOrder = Arrays.asList(ndp, grn, lib, pc);
     Map<Integer, Shape> shapesByDistrict = peiShapesByDistrict();
-    BindableWrapper<List<Integer>> focus = new BindableWrapper<>();
+    BindableWrapper<List<Integer>> focus = new BindableWrapper<>(null);
     BindableWrapper<Map<Integer, Party>> winnersByDistrict = new BindableWrapper<>(new HashMap<>());
 
     BasicResultPanel panel =
@@ -756,8 +756,8 @@ public class SimpleVoteViewPanelTest {
     BindableWrapper<String> changeHeader = new BindableWrapper<>("CHANGE SINCE 2015");
     BindableWrapper<String> swingHeader = new BindableWrapper<>("SWING SINCE 2015");
     BindableWrapper<String> mapHeader = new BindableWrapper<>("CARDIGAN");
-    BindableWrapper<PartyResult> leader = new BindableWrapper<>();
-    BindableWrapper<Candidate> winner = new BindableWrapper<>();
+    BindableWrapper<PartyResult> leader = new BindableWrapper<>(null);
+    BindableWrapper<Candidate> winner = new BindableWrapper<>(null);
     List<Party> swingPartyOrder =
         Arrays.asList(ndp.getParty(), grn.getParty(), lib.getParty(), pc.getParty());
     Map<Integer, Shape> shapesByDistrict = peiShapesByDistrict();
@@ -831,8 +831,8 @@ public class SimpleVoteViewPanelTest {
     BindableWrapper<String> changeHeader = new BindableWrapper<>("CHANGE SINCE 2015");
     BindableWrapper<String> swingHeader = new BindableWrapper<>("SWING SINCE 2015");
     BindableWrapper<String> mapHeader = new BindableWrapper<>("CARDIGAN");
-    BindableWrapper<PartyResult> leader = new BindableWrapper<>();
-    BindableWrapper<Candidate> winner = new BindableWrapper<>();
+    BindableWrapper<PartyResult> leader = new BindableWrapper<>(null);
+    BindableWrapper<Candidate> winner = new BindableWrapper<>(null);
     List<Party> swingPartyOrder =
         Arrays.asList(ndp.getParty(), grn.getParty(), lib.getParty(), pc.getParty());
     Map<Integer, Shape> shapesByDistrict = peiShapesByDistrict();
@@ -1060,7 +1060,7 @@ public class SimpleVoteViewPanelTest {
     BindableWrapper<String> header = new BindableWrapper<>("ELECTION 2017: FRANCE DECIDES");
     BindableWrapper<String> voteHeader = new BindableWrapper<>("FIRST ROUND RESULT");
     BindableWrapper<String> voteSubhead = new BindableWrapper<>("");
-    BindableWrapper<Set<Candidate>> runoff = new BindableWrapper<>();
+    BindableWrapper<Set<Candidate>> runoff = new BindableWrapper<>(null);
 
     BasicResultPanel panel =
         BasicResultPanel.candidateVotes(
@@ -1124,7 +1124,7 @@ public class SimpleVoteViewPanelTest {
     BindableWrapper<String> header = new BindableWrapper<>("ELECTION 2017: FRANCE DECIDES");
     BindableWrapper<String> voteHeader = new BindableWrapper<>("FIRST ROUND RESULT");
     BindableWrapper<String> voteSubhead = new BindableWrapper<>("");
-    BindableWrapper<Set<Candidate>> runoff = new BindableWrapper<>();
+    BindableWrapper<Set<Candidate>> runoff = new BindableWrapper<>(null);
 
     BasicResultPanel panel =
         BasicResultPanel.candidateVotes(

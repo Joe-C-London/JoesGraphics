@@ -310,7 +310,7 @@ public class SeatViewPanelTest {
     BindableWrapper<String> mapHeader = new BindableWrapper<>("PEI");
     BindableWrapper<Map<Integer, Party>> winnersByDistrict = new BindableWrapper<>(new HashMap<>());
     Map<Integer, Shape> shapesByDistrict = peiShapesByDistrict();
-    BindableWrapper<List<Integer>> focus = new BindableWrapper<>();
+    BindableWrapper<List<Integer>> focus = new BindableWrapper<>(null);
 
     Party lib = new Party("Liberal", "LIB", Color.RED);
     Party grn = new Party("Green", "GRN", Color.GREEN.darker());
@@ -818,7 +818,7 @@ public class SeatViewPanelTest {
     BindableWrapper<String> seatHeader = new BindableWrapper<>("PRESIDENT");
     BindableWrapper<String> seatSubhead = new BindableWrapper<>("");
     BindableWrapper<String> changeHeader = new BindableWrapper<>("CHANGE SINCE 2012");
-    BindableWrapper<Candidate> winner = new BindableWrapper<>();
+    BindableWrapper<Candidate> winner = new BindableWrapper<>(null);
 
     Candidate clinton = new Candidate("Hillary Clinton", new Party("Democrat", "DEM", Color.BLUE));
     Candidate trump = new Candidate("Donald Trump", new Party("Republican", "GOP", Color.RED));
@@ -862,7 +862,7 @@ public class SeatViewPanelTest {
     BindableWrapper<String> seatHeader = new BindableWrapper<>("PRESIDENT");
     BindableWrapper<String> seatSubhead = new BindableWrapper<>("");
     BindableWrapper<String> changeHeader = new BindableWrapper<>("CHANGE SINCE 2012");
-    BindableWrapper<Candidate> winner = new BindableWrapper<>();
+    BindableWrapper<Candidate> winner = new BindableWrapper<>(null);
 
     BasicResultPanel panel =
         BasicResultPanel.candidateDualSeats(
@@ -941,7 +941,7 @@ public class SeatViewPanelTest {
     BindableWrapper<String> seatHeader = new BindableWrapper<>("HOUSE OF REPRESENTATIVES");
     BindableWrapper<String> seatSubhead = new BindableWrapper<>("");
     BindableWrapper<String> changeHeader = new BindableWrapper<>("CHANGE SINCE 2016");
-    BindableWrapper<Party> winner = new BindableWrapper<>();
+    BindableWrapper<Party> winner = new BindableWrapper<>(null);
 
     BasicResultPanel panel =
         BasicResultPanel.partySeats(
@@ -982,7 +982,7 @@ public class SeatViewPanelTest {
     BindableWrapper<String> seatHeader = new BindableWrapper<>("HOUSE OF REPRESENTATIVES");
     BindableWrapper<String> seatSubhead = new BindableWrapper<>("");
     BindableWrapper<String> changeHeader = new BindableWrapper<>("CHANGE SINCE 2016");
-    BindableWrapper<Party> winner = new BindableWrapper<>();
+    BindableWrapper<Party> winner = new BindableWrapper<>(null);
 
     BasicResultPanel panel =
         BasicResultPanel.partyDualSeats(

@@ -31,8 +31,8 @@ public class SwingFrameBuilderTest {
 
   @Test
   public void basicTest() {
-    BindableWrapper<SwingProperties> swingProps = new BindableWrapper<>();
-    swingProps.setValue(new SwingProperties(Color.RED, Color.BLUE, 0.02, "2% SWING"));
+    BindableWrapper<SwingProperties> swingProps =
+        new BindableWrapper<>(new SwingProperties(Color.RED, Color.BLUE, 0.02, "2% SWING"));
     SwingFrame frame =
         SwingFrameBuilder.basic(
                 swingProps.getBinding(),
@@ -61,10 +61,9 @@ public class SwingFrameBuilderTest {
 
   @Test
   public void testNeutralBottomColor() {
-    BindableWrapper<SwingProperties> swingProps = new BindableWrapper<>();
-    swingProps.setValue(new SwingProperties(Color.RED, Color.BLUE, 0.02, "2% SWING"));
-    BindableWrapper<Color> neutralColor = new BindableWrapper<>();
-    neutralColor.setValue(Color.GRAY);
+    BindableWrapper<SwingProperties> swingProps =
+        new BindableWrapper<>(new SwingProperties(Color.RED, Color.BLUE, 0.02, "2% SWING"));
+    BindableWrapper<Color> neutralColor = new BindableWrapper<>(Color.GRAY);
     SwingFrame frame =
         SwingFrameBuilder.basic(
                 swingProps.getBinding(),
