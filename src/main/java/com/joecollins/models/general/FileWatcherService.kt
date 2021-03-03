@@ -14,11 +14,12 @@ import java.util.concurrent.Future
 
 class FileWatcherService(private val executor: ExecutorService, private val task: Future<*>) : AutoCloseable {
 
-    interface PathConsumer {
+    fun interface PathConsumer {
         @Throws(IOException::class) operator fun invoke(path: Path)
     }
 
     companion object {
+
         @Throws(IOException::class)
         @JvmStatic fun createService(path: Path, onUpdate: PathConsumer): FileWatcherService {
             val executor = Executors.newSingleThreadExecutor {
