@@ -75,8 +75,8 @@ class LowerThirdHeadlineAndSummaryBothEndsTest {
     @Test
     @Throws(IOException::class)
     fun testRenderRightWin() {
-        val left = BindableWrapper<SummaryFromBothEnds.Entry?>(SummaryFromBothEnds.Entry(Color.BLUE, "CLINTON", 0))
-        val right = BindableWrapper<SummaryFromBothEnds.Entry?>(SummaryFromBothEnds.Entry(Color.RED, "TRUMP", 0))
+        val left = BindableWrapper(SummaryFromBothEnds.Entry(Color.BLUE, "CLINTON", 0))
+        val right = BindableWrapper(SummaryFromBothEnds.Entry(Color.RED, "TRUMP", 0))
         val lowerThird = LowerThirdHeadlineAndSummaryBothEnds()
         lowerThird.setSize(1024, 50)
         lowerThird.setLeftImageBinding(
@@ -105,8 +105,8 @@ class LowerThirdHeadlineAndSummaryBothEndsTest {
     @Test
     @Throws(IOException::class)
     fun testRenderLeftWin() {
-        val left = BindableWrapper<SummaryFromBothEnds.Entry?>(SummaryFromBothEnds.Entry(Color.BLUE, "OBAMA", 0))
-        val right = BindableWrapper<SummaryFromBothEnds.Entry?>(SummaryFromBothEnds.Entry(Color.RED, "MCCAIN", 0))
+        val left = BindableWrapper(SummaryFromBothEnds.Entry(Color.BLUE, "OBAMA", 0))
+        val right = BindableWrapper(SummaryFromBothEnds.Entry(Color.RED, "MCCAIN", 0))
         val lowerThird = LowerThirdHeadlineAndSummaryBothEnds()
         lowerThird.setSize(1024, 50)
         lowerThird.setLeftImageBinding(
@@ -135,8 +135,8 @@ class LowerThirdHeadlineAndSummaryBothEndsTest {
     @Test
     @Throws(IOException::class)
     fun testRenderRightLandslide() {
-        val left = BindableWrapper<SummaryFromBothEnds.Entry?>(SummaryFromBothEnds.Entry(Color.BLUE, "MONDALE", 0))
-        val right = BindableWrapper<SummaryFromBothEnds.Entry?>(SummaryFromBothEnds.Entry(Color.RED, "REAGAN", 0))
+        val left = BindableWrapper(SummaryFromBothEnds.Entry(Color.BLUE, "MONDALE", 0))
+        val right = BindableWrapper(SummaryFromBothEnds.Entry(Color.RED, "REAGAN", 0))
         val lowerThird = LowerThirdHeadlineAndSummaryBothEnds()
         lowerThird.setSize(1024, 50)
         lowerThird.setLeftImageBinding(
@@ -165,8 +165,8 @@ class LowerThirdHeadlineAndSummaryBothEndsTest {
     @Test
     @Throws(IOException::class)
     fun testRenderLeftLandslide() {
-        val left = BindableWrapper<SummaryFromBothEnds.Entry?>(SummaryFromBothEnds.Entry(Color.BLUE, "ROOSEVELT", 0))
-        val right = BindableWrapper<SummaryFromBothEnds.Entry?>(SummaryFromBothEnds.Entry(Color.RED, "LANDON", 0))
+        val left = BindableWrapper(SummaryFromBothEnds.Entry(Color.BLUE, "ROOSEVELT", 0))
+        val right = BindableWrapper(SummaryFromBothEnds.Entry(Color.RED, "LANDON", 0))
         val lowerThird = LowerThirdHeadlineAndSummaryBothEnds()
         lowerThird.setSize(1024, 50)
         lowerThird.setLeftImageBinding(
@@ -195,8 +195,8 @@ class LowerThirdHeadlineAndSummaryBothEndsTest {
     @Test
     @Throws(IOException::class)
     fun testRenderWithMiddleNoMajority() {
-        val left = BindableWrapper<SummaryFromBothEnds.Entry?>(SummaryFromBothEnds.Entry(Color.BLUE, "DEMOCRATS", 27))
-        val right = BindableWrapper<SummaryFromBothEnds.Entry?>(SummaryFromBothEnds.Entry(Color.RED, "REPUBLICANS", 40))
+        val left = BindableWrapper(SummaryFromBothEnds.Entry(Color.BLUE, "DEMOCRATS", 27))
+        val right = BindableWrapper(SummaryFromBothEnds.Entry(Color.RED, "REPUBLICANS", 40))
         val middle = BindableWrapper<SummaryFromBothEnds.Entry?>(null)
         val lowerThird = LowerThirdHeadlineAndSummaryBothEnds()
         lowerThird.setSize(1024, 50)
@@ -226,9 +226,9 @@ class LowerThirdHeadlineAndSummaryBothEndsTest {
     @Test
     @Throws(IOException::class)
     fun testRenderWithMiddleLeftMajority() {
-        val left = BindableWrapper<SummaryFromBothEnds.Entry?>(SummaryFromBothEnds.Entry(Color.BLUE, "DEMOCRATS", 37))
-        val right = BindableWrapper<SummaryFromBothEnds.Entry?>(SummaryFromBothEnds.Entry(Color.RED, "REPUBLICANS", 26))
-        val middle = BindableWrapper<SummaryFromBothEnds.Entry?>(SummaryFromBothEnds.Entry(Color.GRAY, "OTHERS", 2))
+        val left = BindableWrapper(SummaryFromBothEnds.Entry(Color.BLUE, "DEMOCRATS", 37))
+        val right = BindableWrapper(SummaryFromBothEnds.Entry(Color.RED, "REPUBLICANS", 26))
+        val middle = BindableWrapper(SummaryFromBothEnds.Entry(Color.GRAY, "OTHERS", 2))
         val lowerThird = LowerThirdHeadlineAndSummaryBothEnds()
         lowerThird.setSize(1024, 50)
         lowerThird.setLeftImageBinding(
@@ -257,9 +257,9 @@ class LowerThirdHeadlineAndSummaryBothEndsTest {
     @Test
     @Throws(IOException::class)
     fun testRenderWithMiddleRightMajority() {
-        val left = BindableWrapper<SummaryFromBothEnds.Entry?>(SummaryFromBothEnds.Entry(Color.BLUE, "DEMOCRATS", 29))
-        val right = BindableWrapper<SummaryFromBothEnds.Entry?>(SummaryFromBothEnds.Entry(Color.RED, "REPUBLICANS", 36))
-        val middle = BindableWrapper<SummaryFromBothEnds.Entry?>(SummaryFromBothEnds.Entry(Color.GRAY, "OTHERS", 1))
+        val left = BindableWrapper(SummaryFromBothEnds.Entry(Color.BLUE, "DEMOCRATS", 29))
+        val right = BindableWrapper(SummaryFromBothEnds.Entry(Color.RED, "REPUBLICANS", 36))
+        val middle = BindableWrapper(SummaryFromBothEnds.Entry(Color.GRAY, "OTHERS", 1))
         val lowerThird = LowerThirdHeadlineAndSummaryBothEnds()
         lowerThird.setSize(1024, 50)
         lowerThird.setLeftImageBinding(

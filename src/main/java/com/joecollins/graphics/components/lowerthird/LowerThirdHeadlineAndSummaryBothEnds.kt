@@ -46,21 +46,21 @@ class LowerThirdHeadlineAndSummaryBothEnds : LowerThird() {
     internal val left: SummaryFromBothEnds.Entry?
         get() = partySummary.left
 
-    fun setLeftBinding(leftBinding: Binding<SummaryFromBothEnds.Entry?>) {
+    fun setLeftBinding(leftBinding: Binding<out SummaryFromBothEnds.Entry?>) {
         partySummary.setLeftBinding(leftBinding)
     }
 
     internal val right: SummaryFromBothEnds.Entry?
         get() = partySummary.right
 
-    fun setRightBinding(rightBinding: Binding<SummaryFromBothEnds.Entry?>) {
+    fun setRightBinding(rightBinding: Binding<out SummaryFromBothEnds.Entry?>) {
         partySummary.setRightBinding(rightBinding)
     }
 
     internal val middle: SummaryFromBothEnds.Entry?
         get() = partySummary.middle
 
-    fun setMiddleBinding(middleBinding: Binding<SummaryFromBothEnds.Entry?>) {
+    fun setMiddleBinding(middleBinding: Binding<out SummaryFromBothEnds.Entry?>) {
         partySummary.setMiddleBinding(middleBinding)
     }
 
