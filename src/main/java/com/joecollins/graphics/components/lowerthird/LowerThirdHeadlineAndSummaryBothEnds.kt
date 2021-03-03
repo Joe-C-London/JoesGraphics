@@ -11,7 +11,7 @@ class LowerThirdHeadlineAndSummaryBothEnds : LowerThird() {
     private var headlineBinding = Binding.fixedBinding<String?>("")
     private var subheadBinding = Binding.fixedBinding<String?>(null)
 
-    protected val headline: String?
+    internal val headline: String?
         get() = headlinePanel.headline
 
     fun setHeadlineBinding(headlineBinding: Binding<String?>) {
@@ -20,7 +20,7 @@ class LowerThirdHeadlineAndSummaryBothEnds : LowerThird() {
         this.headlineBinding.bind { headlinePanel.headline = it }
     }
 
-    protected val subhead: String?
+    internal val subhead: String?
         get() = headlinePanel.subhead
 
     fun setSubheadBinding(subheadBinding: Binding<String?>) {
@@ -29,35 +29,35 @@ class LowerThirdHeadlineAndSummaryBothEnds : LowerThird() {
         this.subheadBinding.bind { headlinePanel.subhead = it }
     }
 
-    protected val summaryHeader: String
+    internal val summaryHeader: String
         get() = partySummary.headline
 
     fun setSummaryHeaderBinding(summaryHeaderBinding: Binding<String>) {
         partySummary.setHeadlineBinding(summaryHeaderBinding)
     }
 
-    protected val total: Int
+    internal val total: Int
         get() = partySummary.total
 
     fun setTotalBinding(totalBinding: Binding<Int>) {
         partySummary.setTotalBinding(totalBinding)
     }
 
-    protected val left: SummaryFromBothEnds.Entry?
+    internal val left: SummaryFromBothEnds.Entry?
         get() = partySummary.left
 
     fun setLeftBinding(leftBinding: Binding<SummaryFromBothEnds.Entry?>) {
         partySummary.setLeftBinding(leftBinding)
     }
 
-    protected val right: SummaryFromBothEnds.Entry?
+    internal val right: SummaryFromBothEnds.Entry?
         get() = partySummary.right
 
     fun setRightBinding(rightBinding: Binding<SummaryFromBothEnds.Entry?>) {
         partySummary.setRightBinding(rightBinding)
     }
 
-    protected val middle: SummaryFromBothEnds.Entry?
+    internal val middle: SummaryFromBothEnds.Entry?
         get() = partySummary.middle
 
     fun setMiddleBinding(middleBinding: Binding<SummaryFromBothEnds.Entry?>) {

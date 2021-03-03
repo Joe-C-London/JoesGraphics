@@ -39,7 +39,7 @@ open class LowerThird : JPanel() {
     private var placeBinding = Binding.fixedBinding("UTC")
     private var timezoneBinding = Binding.fixedBinding<ZoneId>(ZoneOffset.UTC)
 
-    protected val leftImage: Image
+    internal val leftImage: Image
     get() { return leftPanel.leftImage }
 
     fun setLeftImageBinding(leftImageBinding: Binding<Image>) {
@@ -48,7 +48,7 @@ open class LowerThird : JPanel() {
         this.leftImageBinding.bind { leftPanel.setImage(it) }
     }
 
-    protected val place: String
+    internal val place: String
         get() = rightPanel.place
 
     fun setPlaceBinding(placeBinding: Binding<String>) {
@@ -57,7 +57,7 @@ open class LowerThird : JPanel() {
         this.placeBinding.bind { rightPanel.place = it }
     }
 
-    protected val time: String
+    internal val time: String
         get() = rightPanel.time
 
     fun setTimeZoneBinding(timezoneBinding: Binding<ZoneId>) {
@@ -66,7 +66,7 @@ open class LowerThird : JPanel() {
         this.timezoneBinding.bind { rightPanel.timezone = it }
     }
 
-    fun setClock(clock: Clock) {
+    internal fun setClock(clock: Clock) {
         this.clock = clock
         rightPanel.updateTime()
         Thread.sleep(100)

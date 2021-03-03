@@ -13,7 +13,7 @@ class LowerThirdHeadlineAndSummary : LowerThird() {
     private var headlineBinding = Binding.fixedBinding<String?>("")
     private var subheadBinding = Binding.fixedBinding<String?>(null)
 
-    protected val headline: String?
+    internal val headline: String?
         get() = headlinePanel.headline
 
     fun setHeadlineBinding(headlineBinding: Binding<String?>) {
@@ -22,7 +22,7 @@ class LowerThirdHeadlineAndSummary : LowerThird() {
         this.headlineBinding.bind { headlinePanel.headline = it }
     }
 
-    protected val subhead: String?
+    internal val subhead: String?
         get() = headlinePanel.subhead
 
     fun setSubheadBinding(subheadBinding: Binding<String?>) {
@@ -35,22 +35,22 @@ class LowerThirdHeadlineAndSummary : LowerThird() {
         partySummary.setNumEntriesBinding(numEntriesBinding)
     }
 
-    protected val numSummaryEntries: Int
+    internal val numSummaryEntries: Int
         get() = partySummary.numEntries
 
     fun setSummaryEntriesBinding(entriesBinding: IndexedBinding<SummaryWithLabels.Entry>) {
         partySummary.setEntriesBinding(entriesBinding)
     }
 
-    protected fun getEntryColor(index: Int): Color {
+    internal fun getEntryColor(index: Int): Color {
         return partySummary.getEntryColor(index)
     }
 
-    protected fun getEntryLabel(index: Int): String {
+    internal fun getEntryLabel(index: Int): String {
         return partySummary.getEntryLabel(index)
     }
 
-    protected fun getEntryValue(index: Int): String {
+    internal fun getEntryValue(index: Int): String {
         return partySummary.getEntryValue(index)
     }
 
