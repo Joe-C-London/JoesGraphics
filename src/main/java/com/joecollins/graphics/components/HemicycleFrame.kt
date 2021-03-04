@@ -592,8 +592,8 @@ class HemicycleFrame : GraphicsFrame() {
                 points.add(Point(end, changeBarMid))
                 points.add(Point(endSide, changeBarTop))
                 g.fillPolygon(
-                    points.stream().mapToInt { p: Point -> p.getX().toInt() }.toArray(),
-                    points.stream().mapToInt { p: Point -> p.getY().toInt() }.toArray(),
+                    points.map { p: Point -> p.getX().toInt() }.toIntArray(),
+                    points.map { p: Point -> p.getY().toInt() }.toIntArray(),
                     points.size
                 )
                 leftSoFar += bar.size
@@ -622,8 +622,8 @@ class HemicycleFrame : GraphicsFrame() {
                 points.add(Point(end, changeBarMid))
                 points.add(Point(endSide, changeBarTop))
                 g.fillPolygon(
-                    points.stream().mapToInt { p: Point -> p.getX().toInt() }.toArray(),
-                    points.stream().mapToInt { p: Point -> p.getY().toInt() }.toArray(),
+                    points.map { p: Point -> p.getX().toInt() }.toIntArray(),
+                    points.map { p: Point -> p.getY().toInt() }.toIntArray(),
                     points.size
                 )
                 rightSoFar += bar.size
@@ -656,12 +656,9 @@ class HemicycleFrame : GraphicsFrame() {
         }
 
         private fun getMiddleStartPosition(seats: Int): Int {
-            val midSize = getSize(middleSeatBars.stream().mapToInt { e: Bar -> e.size }
-                .sum())
-            val leftSize = getSize(leftSeatBars.stream().mapToInt { e: Bar -> e.size }
-                .sum())
-            val rightSize = getSize(rightSeatBars.stream().mapToInt { e: Bar -> e.size }
-                .sum())
+            val midSize = getSize(middleSeatBars.map { e: Bar -> e.size }.sum())
+            val leftSize = getSize(leftSeatBars.map { e: Bar -> e.size }.sum())
+            val rightSize = getSize(rightSeatBars.map { e: Bar -> e.size }.sum())
             val midPoint: Int = when {
                 leftSize + midSize / 2 > width / 2 -> {
                     leftSize + midSize / 2

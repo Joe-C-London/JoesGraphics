@@ -74,7 +74,7 @@ class BarFrame : GraphicsFrame() {
         }
     }
 
-    protected val subheadText: String?
+    internal val subheadText: String?
         get() = if (subheadLabel.isVisible) subheadLabel.text else null
 
     fun setSubheadTextBinding(subheadTextBinding: Binding<out String?>) {
@@ -86,7 +86,7 @@ class BarFrame : GraphicsFrame() {
         }
     }
 
-    protected val subheadColor: Color
+    internal val subheadColor: Color
         get() = subheadLabel.foreground
 
     fun setSubheadColorBinding(subheadColorBinding: Binding<Color>) {
@@ -95,7 +95,7 @@ class BarFrame : GraphicsFrame() {
         this.subheadColorBinding.bind { subheadLabel.foreground = it }
     }
 
-    protected val numBars: Int
+    internal val numBars: Int
         get() = bars.size
 
     fun setNumBarsBinding(numBarsBinding: Binding<Int>) {
@@ -117,7 +117,7 @@ class BarFrame : GraphicsFrame() {
         }
     }
 
-    protected fun getLeftText(barNum: Int): String {
+    internal fun getLeftText(barNum: Int): String {
         return bars[barNum].leftText
     }
 
@@ -127,7 +127,7 @@ class BarFrame : GraphicsFrame() {
         this.leftTextBinding.bind { idx, leftText -> bars[idx].leftText = leftText }
     }
 
-    protected fun getRightText(barNum: Int): String {
+    internal fun getRightText(barNum: Int): String {
         return bars[barNum].rightText
     }
 
@@ -137,7 +137,7 @@ class BarFrame : GraphicsFrame() {
         this.rightTextBinding.bind { idx, rightText -> bars[idx].rightText = rightText }
     }
 
-    protected fun getSeries(barNum: Int): List<Pair<Color, Number>> {
+    internal fun getSeries(barNum: Int): List<Pair<Color, Number>> {
         return bars[barNum].series
     }
 
@@ -173,7 +173,7 @@ class BarFrame : GraphicsFrame() {
         }
     }
 
-    protected fun getLeftIcon(barNum: Int): Shape? {
+    internal fun getLeftIcon(barNum: Int): Shape? {
         return bars[barNum].leftIcon
     }
 
@@ -212,7 +212,7 @@ class BarFrame : GraphicsFrame() {
     private val maxLines: Int
         get() = bars.map { obj: Bar -> obj.numLines }.maxOrNull() ?: 1
 
-    protected val numLines: Int
+    internal val numLines: Int
         get() = lines.size
 
     fun setNumLinesBinding(numLinesBinding: Binding<Int>) {
@@ -231,7 +231,7 @@ class BarFrame : GraphicsFrame() {
         }
     }
 
-    protected fun getLineLevel(index: Int): Number {
+    internal fun getLineLevel(index: Int): Number {
         return lines[index].level
     }
 
@@ -241,7 +241,7 @@ class BarFrame : GraphicsFrame() {
         this.lineLevelsBinding.bind { idx, level -> lines[idx].level = level }
     }
 
-    protected fun getLineLabel(index: Int): String {
+    internal fun getLineLabel(index: Int): String {
         return lines[index].label
     }
 

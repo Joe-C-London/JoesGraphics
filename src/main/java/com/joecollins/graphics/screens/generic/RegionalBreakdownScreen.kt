@@ -92,7 +92,7 @@ class RegionalBreakdownScreen private constructor(titleLabel: JLabel, multiSumma
     }
 
     private class SeatDiffEntry : SeatEntry() {
-        private var _diff: Map<Party, Int> = java.util.Map.of()
+        private var _diff: Map<Party, Int> = emptyMap()
 
         var diff: Map<Party, Int>
         get() = _diff
@@ -115,7 +115,7 @@ class RegionalBreakdownScreen private constructor(titleLabel: JLabel, multiSumma
     }
 
     private class SeatPrevEntry : SeatEntry() {
-        private var _prev: Map<Party, Int> = java.util.Map.of()
+        private var _prev: Map<Party, Int> = emptyMap()
 
         var prev: Map<Party, Int>
         get() = _prev
