@@ -35,7 +35,7 @@ class SwingFrame : GraphicsFrame() {
         add(centerPanel, BorderLayout.CENTER)
     }
 
-    protected fun getRange(): Number {
+    internal fun getRange(): Number {
         return swingPanel.range
     }
 
@@ -45,7 +45,7 @@ class SwingFrame : GraphicsFrame() {
         this.rangeBinding.bind { swingPanel.range = it }
     }
 
-    protected fun getValue(): Number {
+    internal fun getValue(): Number {
         return swingPanel.value
     }
 
@@ -55,7 +55,7 @@ class SwingFrame : GraphicsFrame() {
         this.valueBinding.bind { swingPanel.value = it }
     }
 
-    protected fun getLeftColor(): Color {
+    internal fun getLeftColor(): Color {
         return swingPanel.leftColor
     }
 
@@ -65,7 +65,7 @@ class SwingFrame : GraphicsFrame() {
         this.leftColorBinding.bind { swingPanel.leftColor = it }
     }
 
-    protected fun getRightColor(): Color {
+    internal fun getRightColor(): Color {
         return swingPanel.rightColor
     }
 
@@ -75,7 +75,7 @@ class SwingFrame : GraphicsFrame() {
         this.rightColorBinding.bind { swingPanel.rightColor = it }
     }
 
-    protected fun getBottomText(): String? {
+    internal fun getBottomText(): String? {
         return if (bottomLabel.isVisible) bottomLabel.text else null
     }
 
@@ -88,7 +88,7 @@ class SwingFrame : GraphicsFrame() {
         }
     }
 
-    protected fun getBottomColor(): Color {
+    internal fun getBottomColor(): Color {
         return bottomLabel.foreground
     }
 

@@ -32,7 +32,7 @@ class RegionSummaryFrame : GraphicsFrame() {
         add(centralPanel, BorderLayout.CENTER)
     }
 
-    protected fun getNumSections(): Int {
+    internal fun getNumSections(): Int {
         return sections.size
     }
 
@@ -51,7 +51,7 @@ class RegionSummaryFrame : GraphicsFrame() {
         }
     }
 
-    protected fun getSummaryColor(): Color {
+    internal fun getSummaryColor(): Color {
         return summaryColor
     }
 
@@ -73,7 +73,7 @@ class RegionSummaryFrame : GraphicsFrame() {
             .toList()
     }
 
-    protected fun getSectionHeader(idx: Int): String {
+    internal fun getSectionHeader(idx: Int): String {
         return sections[idx].header
     }
 
@@ -83,11 +83,11 @@ class RegionSummaryFrame : GraphicsFrame() {
         this.sectionHeaderBinding.bind { idx, header -> sections[idx].header = header }
     }
 
-    protected fun getValueColor(sectionIdx: Int, valueIdx: Int): Color {
+    internal fun getValueColor(sectionIdx: Int, valueIdx: Int): Color {
         return sections[sectionIdx].values[valueIdx].left
     }
 
-    protected fun getValue(sectionIdx: Int, valueIdx: Int): String {
+    internal fun getValue(sectionIdx: Int, valueIdx: Int): String {
         return sections[sectionIdx].values[valueIdx].right
     }
 

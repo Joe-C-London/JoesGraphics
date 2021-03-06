@@ -7,6 +7,7 @@ import java.io.IOException
 import java.net.URL
 import java.util.HashMap
 import kotlin.Throws
+import kotlin.reflect.cast
 import org.geotools.data.FileDataStore
 import org.geotools.data.FileDataStoreFinder
 import org.geotools.data.simple.SimpleFeatureIterator
@@ -16,9 +17,16 @@ import org.locationtech.jts.geom.Geometry
 import org.opengis.feature.simple.SimpleFeature
 
 object ShapefileReader {
+
     @Throws(IOException::class)
     @JvmStatic fun <T> readShapes(file: URL, keyProperty: String, keyType: Class<T>): Map<T, Shape> {
-        return readShapes(file) { feature: SimpleFeature -> keyType.cast(feature.getAttribute(keyProperty)) }
+        if (keyType == Int::class.java) {
+            return readShapes(file) { feature ->
+                @Suppress("UNCHECKED_CAST")
+                Integer::class.cast(feature.getAttribute(keyProperty)).toInt() as T
+            }
+        }
+        return readShapes(file) { feature -> keyType.cast(feature.getAttribute(keyProperty)) }
     }
 
     @Throws(IOException::class)

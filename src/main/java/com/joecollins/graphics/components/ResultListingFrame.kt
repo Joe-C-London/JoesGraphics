@@ -35,7 +35,7 @@ class ResultListingFrame : GraphicsFrame() {
         add(centralPanel, BorderLayout.CENTER)
     }
 
-    protected fun getNumRows(): Int {
+    internal fun getNumRows(): Int {
         return layout.numRows
     }
 
@@ -45,7 +45,7 @@ class ResultListingFrame : GraphicsFrame() {
         this.numRowsBinding.bind { layout.numRows = it }
     }
 
-    protected fun isReversed(): Boolean {
+    internal fun isReversed(): Boolean {
         return layout.reversed
     }
 
@@ -55,7 +55,7 @@ class ResultListingFrame : GraphicsFrame() {
         this.reversedBinding.bind { layout.reversed = it }
     }
 
-    protected fun getNumItems(): Int {
+    internal fun getNumItems(): Int {
         return items.size
     }
 
@@ -75,7 +75,7 @@ class ResultListingFrame : GraphicsFrame() {
         }
     }
 
-    protected fun getText(index: Int): String {
+    internal fun getText(index: Int): String {
         return items[index].text
     }
 
@@ -85,7 +85,7 @@ class ResultListingFrame : GraphicsFrame() {
         this.textBinding.bind { idx, text -> items[idx].text = text }
     }
 
-    protected fun getForeground(index: Int): Color {
+    internal fun getForeground(index: Int): Color {
         return items[index].foreground
     }
 
@@ -95,7 +95,7 @@ class ResultListingFrame : GraphicsFrame() {
         this.foregroundBinding.bind { idx, color -> items[idx].foreground = color }
     }
 
-    protected fun getBackground(index: Int): Color {
+    internal fun getBackground(index: Int): Color {
         return items[index].background
     }
 
@@ -105,7 +105,7 @@ class ResultListingFrame : GraphicsFrame() {
         this.backgroundBinding.bind { idx, color -> items[idx].background = color }
     }
 
-    protected fun getBorder(index: Int): Color {
+    internal fun getBorder(index: Int): Color {
         return items[index].borderColor
     }
 

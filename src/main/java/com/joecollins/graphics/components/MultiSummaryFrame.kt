@@ -43,7 +43,7 @@ class MultiSummaryFrame : GraphicsFrame() {
         }
     }
 
-    protected val numRows: Int
+    internal val numRows: Int
         get() = entries.size
 
     fun setRowHeaderBinding(headerBinding: IndexedBinding<String>) {
@@ -55,7 +55,7 @@ class MultiSummaryFrame : GraphicsFrame() {
         }
     }
 
-    protected fun getRowHeader(index: Int): String {
+    internal fun getRowHeader(index: Int): String {
         return entries[index].headerLabel.text
     }
 

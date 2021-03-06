@@ -18,7 +18,7 @@ import javax.swing.border.EmptyBorder
 
 class CountdownFrame : GraphicsFrame() {
 
-    protected var clock: Clock = Clock.systemDefaultZone()
+    internal var clock: Clock = Clock.systemDefaultZone()
 
     private var timeBinding: Binding<out Temporal> = Binding.fixedBinding(Instant.now())
     private var labelFunc: (Duration) -> String = { it.toString() }
@@ -58,7 +58,7 @@ class CountdownFrame : GraphicsFrame() {
         )
     }
 
-    protected fun getTimeRemaining(): Duration {
+    internal fun getTimeRemaining(): Duration {
         return Duration.between(clock.instant().truncatedTo(ChronoUnit.SECONDS), time)
     }
 
@@ -81,11 +81,11 @@ class CountdownFrame : GraphicsFrame() {
         refresh()
     }
 
-    protected fun getTimeRemainingString(): String {
+    internal fun getTimeRemainingString(): String {
         return timeRemainingLabel.text
     }
 
-    protected fun getAdditionalInfo(): String? {
+    internal fun getAdditionalInfo(): String? {
         return if (additionalInfoLabel.isVisible) additionalInfoLabel.text else null
     }
 
@@ -98,7 +98,7 @@ class CountdownFrame : GraphicsFrame() {
         }
     }
 
-    protected fun getCountdownColor(): Color {
+    internal fun getCountdownColor(): Color {
         return timeRemainingLabel.foreground
     }
 

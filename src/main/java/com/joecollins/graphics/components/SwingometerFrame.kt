@@ -49,7 +49,8 @@ class SwingometerFrame : GraphicsFrame() {
     private var dotsSolidBinding = IndexedBinding.singletonBinding(true)
 
     private val swingPanel: SwingPanel = SwingPanel()
-    val leftColor: Color
+
+    internal val leftColor: Color
         get() = swingPanel.leftColor
 
     fun setLeftColorBinding(leftColorBinding: Binding<Color>) {
@@ -58,7 +59,7 @@ class SwingometerFrame : GraphicsFrame() {
         this.leftColorBinding.bind { leftColor -> swingPanel.leftColor = leftColor }
     }
 
-    val rightColor: Color
+    internal val rightColor: Color
         get() = swingPanel.rightColor
 
     fun setRightColorBinding(rightColorBinding: Binding<Color>) {
@@ -67,7 +68,7 @@ class SwingometerFrame : GraphicsFrame() {
         this.rightColorBinding.bind { rightColor -> swingPanel.rightColor = rightColor }
     }
 
-    val value: Number
+    internal val value: Number
         get() = swingPanel.value
 
     fun setValueBinding(valueBinding: Binding<out Number>) {
@@ -76,7 +77,7 @@ class SwingometerFrame : GraphicsFrame() {
         this.valueBinding.bind { value -> swingPanel.value = value }
     }
 
-    val range: Number
+    internal val range: Number
         get() = swingPanel.range
 
     fun setRangeBinding(rangeBinding: Binding<out Number>) {
@@ -85,7 +86,7 @@ class SwingometerFrame : GraphicsFrame() {
         this.rangeBinding.bind { range -> swingPanel.range = range }
     }
 
-    val numTicks: Int
+    internal val numTicks: Int
         get() = swingPanel.ticks.size
 
     fun setNumTicksBinding(numTicksBinding: Binding<Int>) {
@@ -94,7 +95,7 @@ class SwingometerFrame : GraphicsFrame() {
         this.numTicksBinding.bind { numTicks -> swingPanel.setNumTicks(numTicks) }
     }
 
-    fun getTickPosition(index: Int): Number {
+    internal fun getTickPosition(index: Int): Number {
         return swingPanel.ticks[index].left
     }
 
@@ -104,7 +105,7 @@ class SwingometerFrame : GraphicsFrame() {
         this.tickPositionBinding.bind { index, position -> swingPanel.setTickPosition(index, position) }
     }
 
-    fun getTickText(index: Int): String {
+    internal fun getTickText(index: Int): String {
         return swingPanel.ticks[index].right
     }
 
@@ -114,7 +115,7 @@ class SwingometerFrame : GraphicsFrame() {
         this.tickTextBinding.bind { index, text -> swingPanel.setTickText(index, text) }
     }
 
-    val leftToWin: Number
+    internal val leftToWin: Number
         get() = leftToWinBinding.value
 
     fun setLeftToWinBinding(leftToWinBinding: Binding<out Number>) {
@@ -123,7 +124,7 @@ class SwingometerFrame : GraphicsFrame() {
         this.leftToWinBinding.bind { leftToWin -> swingPanel.leftToWin = leftToWin }
     }
 
-    val rightToWin: Number
+    internal val rightToWin: Number
         get() = rightToWinBinding.value
 
     fun setRightToWinBinding(rightToWinBinding: Binding<out Number>) {
@@ -132,7 +133,7 @@ class SwingometerFrame : GraphicsFrame() {
         this.rightToWinBinding.bind { rightToWin -> swingPanel.rightToWin = rightToWin }
     }
 
-    val numOuterLabels: Int
+    internal val numOuterLabels: Int
         get() = swingPanel.outerLabels.size
 
     fun setNumOuterLabelsBinding(numOuterLabelsBinding: Binding<Int>) {
@@ -141,7 +142,7 @@ class SwingometerFrame : GraphicsFrame() {
         this.numOuterLabelsBinding.bind { numOuterLabels -> swingPanel.setNumOuterLabels(numOuterLabels) }
     }
 
-    fun getOuterLabelPosition(index: Int): Number {
+    internal fun getOuterLabelPosition(index: Int): Number {
         return swingPanel.outerLabels[index].left
     }
 
@@ -153,7 +154,7 @@ class SwingometerFrame : GraphicsFrame() {
         this.outerLabelPositionBinding.bind { index, position -> swingPanel.setOuterLabelPosition(index, position) }
     }
 
-    fun getOuterLabelText(index: Int): String {
+    internal fun getOuterLabelText(index: Int): String {
         return swingPanel.outerLabels[index].middle
     }
 
@@ -163,7 +164,7 @@ class SwingometerFrame : GraphicsFrame() {
         this.outerLabelTextBinding.bind { index, text -> swingPanel.setOuterLabelText(index, text) }
     }
 
-    fun getOuterLabelColor(index: Int): Color {
+    internal fun getOuterLabelColor(index: Int): Color {
         return swingPanel.outerLabels[index].right
     }
 
@@ -173,7 +174,7 @@ class SwingometerFrame : GraphicsFrame() {
         this.outerLabelColorBinding.bind { index, color -> swingPanel.setOuterLabelColor(index, color) }
     }
 
-    val numBucketsPerSide: Int
+    internal val numBucketsPerSide: Int
         get() = swingPanel.numBucketsPerSide
 
     fun setNumBucketsPerSideBinding(numBucketsPerSideBinding: Binding<Int>) {
@@ -182,7 +183,7 @@ class SwingometerFrame : GraphicsFrame() {
         this.numBucketsPerSideBinding.bind { numBucketsPerSide -> swingPanel.numBucketsPerSide = numBucketsPerSide }
     }
 
-    val numDots: Int
+    internal val numDots: Int
         get() = swingPanel.dots.size
 
     fun setNumDotsBinding(numDotsBinding: Binding<Int>) {
@@ -191,7 +192,7 @@ class SwingometerFrame : GraphicsFrame() {
         this.numDotsBinding.bind { numDots -> swingPanel.setNumDots(numDots) }
     }
 
-    fun getDotPosition(index: Int): Number {
+    internal fun getDotPosition(index: Int): Number {
         return swingPanel.dots[index].position
     }
 
@@ -201,7 +202,7 @@ class SwingometerFrame : GraphicsFrame() {
         this.dotsPositionBinding.bind { index, position -> swingPanel.setDotPosition(index, position) }
     }
 
-    fun getDotColor(index: Int): Color {
+    internal fun getDotColor(index: Int): Color {
         return swingPanel.dots[index].color
     }
 
@@ -211,7 +212,7 @@ class SwingometerFrame : GraphicsFrame() {
         this.dotsColorBinding.bind { index, color -> swingPanel.setDotColor(index, color) }
     }
 
-    fun getDotLabel(index: Int): String {
+    internal fun getDotLabel(index: Int): String {
         return swingPanel.dots[index].label
     }
 
@@ -221,7 +222,7 @@ class SwingometerFrame : GraphicsFrame() {
         this.dotsLabelBinding.bind { index, label -> swingPanel.setDotLabel(index, label) }
     }
 
-    fun isDotSolid(index: Int): Boolean {
+    internal fun isDotSolid(index: Int): Boolean {
         return swingPanel.dots[index].solid
     }
 

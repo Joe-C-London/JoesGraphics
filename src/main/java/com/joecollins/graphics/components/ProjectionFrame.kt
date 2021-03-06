@@ -43,7 +43,7 @@ class ProjectionFrame : GraphicsFrame() {
         footerLabel.border = EmptyBorder(15, 0, -15, 0)
     }
 
-    protected fun getImage(): Image? {
+    internal fun getImage(): Image? {
         return imagePanel.image
     }
 
@@ -53,7 +53,7 @@ class ProjectionFrame : GraphicsFrame() {
         this.imageBinding.bind { imagePanel.image = it }
     }
 
-    protected fun getBackColor(): Color {
+    internal fun getBackColor(): Color {
         return footerPanel.background
     }
 
@@ -63,7 +63,7 @@ class ProjectionFrame : GraphicsFrame() {
         this.colorBinding.bind { footerPanel.background = it }
     }
 
-    protected fun getFooterText(): String? {
+    internal fun getFooterText(): String? {
         return if (footerLabel.isVisible) footerLabel.text else null
     }
 
@@ -76,7 +76,7 @@ class ProjectionFrame : GraphicsFrame() {
         }
     }
 
-    protected fun getImageAlignment(): Alignment {
+    internal fun getImageAlignment(): Alignment {
         return imagePanel.alignment
     }
 

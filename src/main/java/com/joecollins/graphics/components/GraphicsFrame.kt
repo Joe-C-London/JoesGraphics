@@ -55,8 +55,7 @@ open class GraphicsFrame : JPanel() {
         add(notesLabel, BorderLayout.SOUTH)
     }
 
-    @Deprecated("Make this internal")
-    val header: String? get() = if (headerPanel.isVisible) headerLabel.text.trim() else null
+    internal val header: String? get() = if (headerPanel.isVisible) headerLabel.text.trim() else null
 
     fun setHeaderBinding(headerTextBinding: Binding<out String?>) {
         this.headerTextBinding.unbind()
@@ -75,8 +74,7 @@ open class GraphicsFrame : JPanel() {
         this.headerAlignmentBinding.bind { headerLabel.horizontalAlignment = it.jlabelAlignment }
     }
 
-    @Deprecated("Make this internal")
-    val notes: String? get() = if (notesLabel.isVisible) notesLabel.text.trim() else null
+    internal val notes: String? get() = if (notesLabel.isVisible) notesLabel.text.trim() else null
 
     fun setNotesBinding(notesTextBinding: Binding<out String?>) {
         this.notesTextBinding.unbind()
@@ -87,8 +85,7 @@ open class GraphicsFrame : JPanel() {
         }
     }
 
-    @Deprecated("Make this internal")
-    val borderColor: Color get() = headerPanel.background
+    internal val borderColor: Color get() = headerPanel.background
 
     fun setBorderColorBinding(borderColorBinding: Binding<Color>) {
         this.borderColorBinding.unbind()

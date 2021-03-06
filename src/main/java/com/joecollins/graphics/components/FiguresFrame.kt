@@ -41,7 +41,7 @@ class FiguresFrame : GraphicsFrame() {
         }
     }
 
-    protected val numEntries: Int
+    internal val numEntries: Int
         get() = entries.size
 
     fun setColorBinding(colorBinding: IndexedBinding<Color>) {
@@ -50,7 +50,7 @@ class FiguresFrame : GraphicsFrame() {
         this.colorBinding.bind { idx, color -> entries[idx].foreground = color }
     }
 
-    protected fun getColor(index: Int): Color {
+    internal fun getColor(index: Int): Color {
         return entries[index].foreground
     }
 
@@ -60,7 +60,7 @@ class FiguresFrame : GraphicsFrame() {
         this.nameBinding.bind { idx, name -> entries[idx].nameLabel.text = name }
     }
 
-    protected fun getName(index: Int): String {
+    internal fun getName(index: Int): String {
         return entries[index].nameLabel.text
     }
 
@@ -70,7 +70,7 @@ class FiguresFrame : GraphicsFrame() {
         this.descriptionBinding.bind { idx, desc -> entries[idx].descriptionLabel.text = desc }
     }
 
-    protected fun getDescription(index: Int): String {
+    internal fun getDescription(index: Int): String {
         return entries[index].descriptionLabel.text
     }
 
@@ -80,7 +80,7 @@ class FiguresFrame : GraphicsFrame() {
         this.resultBinding.bind { idx, result -> entries[idx].resultLabel.text = result }
     }
 
-    protected fun getResult(index: Int): String {
+    internal fun getResult(index: Int): String {
         return entries[index].resultLabel.text
     }
 
@@ -90,7 +90,7 @@ class FiguresFrame : GraphicsFrame() {
         this.resultColorBinding.bind { idx, color -> entries[idx].resultPanel.background = color }
     }
 
-    protected fun getResultColor(index: Int): Color {
+    internal fun getResultColor(index: Int): Color {
         return entries[index].resultPanel.background
     }
 

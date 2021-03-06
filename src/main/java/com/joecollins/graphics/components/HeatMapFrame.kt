@@ -68,7 +68,7 @@ class HeatMapFrame : GraphicsFrame() {
         }
     }
 
-    val numRows: Int
+    internal val numRows: Int
         get() = squaresPanel.numRows
 
     fun setNumRowsBinding(numRowsBinding: Binding<Int>) {
@@ -77,7 +77,7 @@ class HeatMapFrame : GraphicsFrame() {
         this.numRowsBinding.bind { numRows -> squaresPanel.numRows = numRows }
     }
 
-    val numSquares: Int
+    internal val numSquares: Int
         get() = squaresPanel.squares.size
 
     fun setNumSquaresBinding(numSquaresBinding: Binding<Int>) {
@@ -86,7 +86,7 @@ class HeatMapFrame : GraphicsFrame() {
         this.numSquaresBinding.bind { numSquares -> squaresPanel.setNumSquares(numSquares) }
     }
 
-    fun getSquareBorder(index: Int): Color? {
+    internal fun getSquareBorder(index: Int): Color? {
         return squaresPanel.squares[index].borderColor
     }
 
@@ -96,7 +96,7 @@ class HeatMapFrame : GraphicsFrame() {
         this.squareBordersBinding.bind { index, color -> squaresPanel.setSquareBorder(index, color) }
     }
 
-    fun getSquareFill(index: Int): Color {
+    internal fun getSquareFill(index: Int): Color {
         return squaresPanel.squares[index].fillColor
     }
 
@@ -106,7 +106,7 @@ class HeatMapFrame : GraphicsFrame() {
         this.squareFillBinding.bind { index, color -> squaresPanel.setSquareFill(index, color) }
     }
 
-    val seatBarCount: Int
+    internal val seatBarCount: Int
         get() = barsPanel.seatBars.size
 
     fun setNumSeatBarsBinding(numSeatBarsBinding: Binding<Int>) {
@@ -115,7 +115,7 @@ class HeatMapFrame : GraphicsFrame() {
         this.numSeatBarsBinding.bind { numSeatBars -> barsPanel.setNumSeatBars(numSeatBars) }
     }
 
-    fun getSeatBarColor(index: Int): Color {
+    internal fun getSeatBarColor(index: Int): Color {
         return barsPanel.seatBars[index].color
     }
 
@@ -125,7 +125,7 @@ class HeatMapFrame : GraphicsFrame() {
         this.seatBarColorBinding.bind { index, color -> barsPanel.setSeatBarColor(index, color) }
     }
 
-    fun getSeatBarSize(index: Int): Int {
+    internal fun getSeatBarSize(index: Int): Int {
         return barsPanel.seatBars[index].size
     }
 
@@ -135,7 +135,7 @@ class HeatMapFrame : GraphicsFrame() {
         this.seatBarSizeBinding.bind { index, size -> barsPanel.setSeatBarSize(index, size) }
     }
 
-    val seatBarLabel: String
+    internal val seatBarLabel: String
         get() = barsPanel.seatBarLabel
 
     fun setSeatBarLabelBinding(seatBarLabelBinding: Binding<String>) {
@@ -144,7 +144,7 @@ class HeatMapFrame : GraphicsFrame() {
         this.seatBarLabelBinding.bind { label -> barsPanel.seatBarLabel = label }
     }
 
-    val changeBarCount: Int
+    internal val changeBarCount: Int
         get() = barsPanel.changeBars.size
 
     fun setNumChangeBarsBinding(numChangeBarsBinding: Binding<Int>) {
@@ -153,7 +153,7 @@ class HeatMapFrame : GraphicsFrame() {
         this.numChangeBarsBinding.bind { numChangeBars -> barsPanel.setNumChangeBars(numChangeBars) }
     }
 
-    fun getChangeBarColor(index: Int): Color {
+    internal fun getChangeBarColor(index: Int): Color {
         return barsPanel.changeBars[index].color
     }
 
@@ -163,7 +163,7 @@ class HeatMapFrame : GraphicsFrame() {
         this.changeBarColorBinding.bind { index, color -> barsPanel.setChangeBarColor(index, color) }
     }
 
-    fun getChangeBarSize(index: Int): Int {
+    internal fun getChangeBarSize(index: Int): Int {
         return barsPanel.changeBars[index].size
     }
 
@@ -173,7 +173,7 @@ class HeatMapFrame : GraphicsFrame() {
         this.changeBarSizeBinding.bind { index, size -> barsPanel.setChangeBarSize(index, size) }
     }
 
-    val changeBarLabel: String
+    internal val changeBarLabel: String
         get() = barsPanel.changeBarLabel
 
     fun setChangeBarLabelBinding(changeBarLabelBinding: Binding<String>) {
@@ -182,7 +182,7 @@ class HeatMapFrame : GraphicsFrame() {
         this.changeBarLabelBinding.bind { label -> barsPanel.changeBarLabel = label }
     }
 
-    val changeBarStart: Int
+    internal val changeBarStart: Int
         get() = barsPanel.changeBarStart
 
     fun setChangeBarStartBinding(changeBarStartBinding: Binding<Int>) {

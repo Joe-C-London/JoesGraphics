@@ -89,7 +89,7 @@ class HemicycleFrame : GraphicsFrame() {
         }
     }
 
-    protected val numRows: Int
+    internal val numRows: Int
         get() = dotsPanel.rows.size
 
     fun setNumRowsBinding(numRowsBinding: Binding<Int>) {
@@ -101,7 +101,7 @@ class HemicycleFrame : GraphicsFrame() {
         }
     }
 
-    protected fun getRowCount(rowNum: Int): Int {
+    internal fun getRowCount(rowNum: Int): Int {
         return dotsPanel.rows[rowNum]
     }
 
@@ -114,7 +114,7 @@ class HemicycleFrame : GraphicsFrame() {
         }
     }
 
-    protected val numDots: Int
+    internal val numDots: Int
         get() = dotsPanel.dots.size
 
     fun setNumDotsBinding(numDotsBinding: Binding<Int>) {
@@ -126,7 +126,7 @@ class HemicycleFrame : GraphicsFrame() {
         }
     }
 
-    protected fun getDotColor(dotNum: Int): Color {
+    internal fun getDotColor(dotNum: Int): Color {
         return dotsPanel.dots[dotNum].color
     }
 
@@ -139,7 +139,7 @@ class HemicycleFrame : GraphicsFrame() {
         }
     }
 
-    protected fun getDotBorder(dotNum: Int): Color? {
+    internal fun getDotBorder(dotNum: Int): Color? {
         return dotsPanel.dots[dotNum].border
     }
 
@@ -152,7 +152,7 @@ class HemicycleFrame : GraphicsFrame() {
         }
     }
 
-    protected val leftSeatBarCount: Int
+    internal val leftSeatBarCount: Int
         get() = barsPanel.leftSeatBars.size
 
     fun setLeftSeatBarCountBinding(leftSeatBarCountBinding: Binding<Int>) {
@@ -164,7 +164,7 @@ class HemicycleFrame : GraphicsFrame() {
         }
     }
 
-    protected fun getLeftSeatBarColor(idx: Int): Color {
+    internal fun getLeftSeatBarColor(idx: Int): Color {
         return barsPanel.leftSeatBars[idx].color
     }
 
@@ -177,7 +177,7 @@ class HemicycleFrame : GraphicsFrame() {
         }
     }
 
-    protected fun getLeftSeatBarSize(idx: Int): Int {
+    internal fun getLeftSeatBarSize(idx: Int): Int {
         return barsPanel.leftSeatBars[idx].size
     }
 
@@ -190,7 +190,7 @@ class HemicycleFrame : GraphicsFrame() {
         }
     }
 
-    protected fun getLeftSeatBarLabel(): String {
+    internal fun getLeftSeatBarLabel(): String {
         return barsPanel.leftSeatBarLabel
     }
 
@@ -203,7 +203,7 @@ class HemicycleFrame : GraphicsFrame() {
         }
     }
 
-    protected val rightSeatBarCount: Int
+    internal val rightSeatBarCount: Int
         get() = barsPanel.rightSeatBars.size
 
     fun setRightSeatBarCountBinding(rightSeatBarCountBinding: Binding<Int>) {
@@ -215,7 +215,7 @@ class HemicycleFrame : GraphicsFrame() {
         }
     }
 
-    protected fun getRightSeatBarColor(idx: Int): Color {
+    internal fun getRightSeatBarColor(idx: Int): Color {
         return barsPanel.rightSeatBars[idx].color
     }
 
@@ -228,7 +228,7 @@ class HemicycleFrame : GraphicsFrame() {
         }
     }
 
-    protected fun getRightSeatBarSize(idx: Int): Int {
+    internal fun getRightSeatBarSize(idx: Int): Int {
         return barsPanel.rightSeatBars[idx].size
     }
 
@@ -241,7 +241,7 @@ class HemicycleFrame : GraphicsFrame() {
         }
     }
 
-    protected fun getRightSeatBarLabel(): String {
+    internal fun getRightSeatBarLabel(): String {
         return barsPanel.rightSeatBarLabel
     }
 
@@ -254,7 +254,7 @@ class HemicycleFrame : GraphicsFrame() {
         }
     }
 
-    protected val middleSeatBarCount: Int
+    internal val middleSeatBarCount: Int
         get() = barsPanel.middleSeatBars.size
 
     fun setMiddleSeatBarCountBinding(middleSeatBarCountBinding: Binding<Int>) {
@@ -266,7 +266,7 @@ class HemicycleFrame : GraphicsFrame() {
         }
     }
 
-    protected fun getMiddleSeatBarColor(idx: Int): Color {
+    internal fun getMiddleSeatBarColor(idx: Int): Color {
         return barsPanel.middleSeatBars[idx].color
     }
 
@@ -279,7 +279,7 @@ class HemicycleFrame : GraphicsFrame() {
         }
     }
 
-    protected fun getMiddleSeatBarSize(idx: Int): Int {
+    internal fun getMiddleSeatBarSize(idx: Int): Int {
         return barsPanel.middleSeatBars[idx].size
     }
 
@@ -292,7 +292,7 @@ class HemicycleFrame : GraphicsFrame() {
         }
     }
 
-    protected fun getMiddleSeatBarLabel(): String {
+    internal fun getMiddleSeatBarLabel(): String {
         return barsPanel.middleSeatBarLabel
     }
 
@@ -305,7 +305,7 @@ class HemicycleFrame : GraphicsFrame() {
         }
     }
 
-    protected val leftChangeBarCount: Int
+    internal val leftChangeBarCount: Int
         get() = barsPanel.leftChangeBars.size
 
     fun setLeftChangeBarCountBinding(leftChangeBarCountBinding: Binding<Int>) {
@@ -317,7 +317,7 @@ class HemicycleFrame : GraphicsFrame() {
         }
     }
 
-    protected fun getLeftChangeBarColor(idx: Int): Color {
+    internal fun getLeftChangeBarColor(idx: Int): Color {
         return barsPanel.leftChangeBars[idx].color
     }
 
@@ -330,7 +330,7 @@ class HemicycleFrame : GraphicsFrame() {
         }
     }
 
-    protected fun getLeftChangeBarSize(idx: Int): Int {
+    internal fun getLeftChangeBarSize(idx: Int): Int {
         return barsPanel.leftChangeBars[idx].size
     }
 
@@ -343,7 +343,7 @@ class HemicycleFrame : GraphicsFrame() {
         }
     }
 
-    protected fun getLeftChangeBarStart(): Int {
+    internal fun getLeftChangeBarStart(): Int {
         return barsPanel.leftChangeBarStart
     }
 
@@ -356,7 +356,7 @@ class HemicycleFrame : GraphicsFrame() {
         }
     }
 
-    protected fun getLeftChangeBarLabel(): String {
+    internal fun getLeftChangeBarLabel(): String {
         return barsPanel.leftChangeBarLabel
     }
 
@@ -369,7 +369,7 @@ class HemicycleFrame : GraphicsFrame() {
         }
     }
 
-    protected val rightChangeBarCount: Int
+    internal val rightChangeBarCount: Int
         get() = barsPanel.rightChangeBars.size
 
     fun setRightChangeBarCountBinding(rightChangeBarCountBinding: Binding<Int>) {
@@ -381,7 +381,7 @@ class HemicycleFrame : GraphicsFrame() {
         }
     }
 
-    protected fun getRightChangeBarColor(idx: Int): Color {
+    internal fun getRightChangeBarColor(idx: Int): Color {
         return barsPanel.rightChangeBars[idx].color
     }
 
@@ -394,7 +394,7 @@ class HemicycleFrame : GraphicsFrame() {
         }
     }
 
-    protected fun getRightChangeBarSize(idx: Int): Int {
+    internal fun getRightChangeBarSize(idx: Int): Int {
         return barsPanel.rightChangeBars[idx].size
     }
 
@@ -407,7 +407,7 @@ class HemicycleFrame : GraphicsFrame() {
         }
     }
 
-    protected fun getRightChangeBarStart(): Int {
+    internal fun getRightChangeBarStart(): Int {
         return barsPanel.rightChangeBarStart
     }
 
@@ -420,7 +420,7 @@ class HemicycleFrame : GraphicsFrame() {
         }
     }
 
-    protected fun getRightChangeBarLabel(): String {
+    internal fun getRightChangeBarLabel(): String {
         return barsPanel.rightChangeBarLabel
     }
 

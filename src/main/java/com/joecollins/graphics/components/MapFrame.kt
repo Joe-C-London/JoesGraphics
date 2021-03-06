@@ -88,7 +88,7 @@ class MapFrame : GraphicsFrame() {
         return currentPath
     }
 
-    protected val numShapes: Int
+    internal val numShapes: Int
         get() = shapesToDraw.size
 
     fun setNumShapesBinding(numShapesBinding: Binding<Int>) {
@@ -105,7 +105,7 @@ class MapFrame : GraphicsFrame() {
         }
     }
 
-    protected fun getShape(idx: Int): Shape {
+    internal fun getShape(idx: Int): Shape {
         return shapesToDraw[idx].left
     }
 
@@ -118,7 +118,7 @@ class MapFrame : GraphicsFrame() {
         }
     }
 
-    protected fun getColor(idx: Int): Color {
+    internal fun getColor(idx: Int): Color {
         return shapesToDraw[idx].right
     }
 
@@ -131,7 +131,7 @@ class MapFrame : GraphicsFrame() {
         }
     }
 
-    protected val focusBox: Rectangle2D?
+    internal val focusBox: Rectangle2D?
         get() {
             if (focus == null) {
                 var bounds: Rectangle2D? = null
@@ -157,7 +157,7 @@ class MapFrame : GraphicsFrame() {
         }
     }
 
-    protected val numOutlineShapes: Int
+    internal val numOutlineShapes: Int
         get() = outlineShapes.size
 
     fun setNumOutlineShapesBinding(numOutlineShapesBinding: Binding<Int>) {
@@ -174,7 +174,7 @@ class MapFrame : GraphicsFrame() {
         }
     }
 
-    protected fun getOutlineShape(idx: Int): Shape {
+    internal fun getOutlineShape(idx: Int): Shape {
         return outlineShapes[idx]
     }
 
