@@ -38,8 +38,6 @@ class BarFrame : GraphicsFrame() {
         private set
     var max: Number = 0.0
         private set
-    private var usingDefaultMin = true
-    private var usingDefaultMax = true
 
     private var subheadTextBinding: Binding<String?> = Binding.fixedBinding(null)
     private var subheadColorBinding: Binding<Color> = Binding.fixedBinding(Color.BLACK)
@@ -53,17 +51,12 @@ class BarFrame : GraphicsFrame() {
     private var numLinesBinding: Binding<Int> = Binding.fixedBinding(0)
     private var lineLevelsBinding: IndexedBinding<Number> = IndexedBinding.emptyBinding()
     private var lineLabelsBinding = IndexedBinding.emptyBinding<String>()
-    private var minBinding: Binding<Number> = object : Binding<Number> {
-        override val value: Number
-            get() = bars
-                .map { bar: Bar -> bar.totalNegative.toDouble() }
-                .fold(0.0) { a: Double, b: Double -> min(a, b) }
-    }
-    private var maxBinding: Binding<Number> = object : Binding<Number> {
-        override val value: Number
-        get() = bars
-            .map { bar: Bar -> bar.totalPositive.toDouble() }
-            .fold(0.0) { a: Double, b: Double -> max(a, b) }
+    private var minBinding: Binding<Number> = DefaultMinBinding()
+    private var maxBinding: Binding<Number> = DefaultMaxBinding()
+
+    init {
+        setMinBinding(minBinding)
+        setMaxBinding(maxBinding)
     }
 
     private fun drawLines(g: Graphics, top: Int, bottom: Int) {
@@ -156,19 +149,13 @@ class BarFrame : GraphicsFrame() {
         colorBinding.bind { idx, color -> bars[idx].setColor(seriesNum, color) }
         valueBinding.bind { idx, color ->
             bars[idx].setValue(seriesNum, color)
-            if (usingDefaultMin) {
-                val newMin = minBinding.value
-                if (newMin.toDouble() != min.toDouble()) {
-                    min = newMin
-                    repaint()
-                }
+            val minBinding = this.minBinding
+            if (minBinding is DefaultMinBinding) {
+                minBinding.pushUpdate()
             }
-            if (usingDefaultMax) {
-                val newMax = maxBinding.value
-                if (newMax.toDouble() != max.toDouble()) {
-                    max = newMax
-                    repaint()
-                }
+            val maxBinding = this.maxBinding
+            if (maxBinding is DefaultMaxBinding) {
+                maxBinding.pushUpdate()
             }
         }
     }
@@ -184,7 +171,6 @@ class BarFrame : GraphicsFrame() {
     }
 
     fun setMinBinding(minBinding: Binding<Number>) {
-        usingDefaultMin = false
         this.minBinding.unbind()
         this.minBinding = minBinding
         this.minBinding.bind { min ->
@@ -194,13 +180,45 @@ class BarFrame : GraphicsFrame() {
     }
 
     fun setMaxBinding(maxBinding: Binding<Number>) {
-        usingDefaultMax = false
         this.maxBinding.unbind()
         this.maxBinding = maxBinding
         this.maxBinding.bind { max ->
             this.max = max
             repaint()
         }
+    }
+
+    private abstract inner class DefaultMinMaxBinding : Binding<Number> {
+        private var consumer: ((Number) -> Unit)? = null
+
+        override fun bind(onUpdate: (Number) -> Unit) {
+            check(consumer == null) { "Binding is already used" }
+            onUpdate(value)
+            this.consumer = onUpdate
+        }
+
+        override fun unbind() {
+            val consumer = this.consumer
+            if (consumer != null) {
+                this.consumer = null
+            }
+        }
+
+        fun pushUpdate() {
+            consumer?.invoke(value)
+        }
+    }
+
+    private inner class DefaultMinBinding : DefaultMinMaxBinding() {
+        override val value: Number
+            get() = bars.map { it.totalNegative.toDouble() }.fold(0.0) { a, b -> min(a, b) }
+
+    }
+
+    private inner class DefaultMaxBinding : DefaultMinMaxBinding() {
+        override val value: Number
+            get() = bars.map { it.totalPositive.toDouble() }.fold(0.0) { a, b -> max(a, b) }
+
     }
 
     private fun getPixelOfValue(value: Number): Double {

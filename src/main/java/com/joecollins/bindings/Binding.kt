@@ -10,9 +10,9 @@ interface Binding<out T> {
     @Deprecated("Replacing with Kotlin version")
     @JvmDefault fun bindLegacy(onUpdate: java.util.function.Consumer<in T>) = bind { onUpdate.accept(it) }
 
-    @JvmDefault fun bind(onUpdate: (T) -> Unit) = onUpdate(value)
+    fun bind(onUpdate: (T) -> Unit)
 
-    @JvmDefault fun unbind() {}
+    fun unbind()
 
     @JvmDefault fun <R> map(func: (T) -> R): Binding<R> {
         val me = this
@@ -57,6 +57,8 @@ interface Binding<out T> {
 
         @JvmStatic fun <T> fixedBinding(t: T) = object : Binding<T> {
             override val value: T = t
+            override fun bind(onUpdate: (T) -> Unit) = onUpdate(value)
+            override fun unbind() {}
         }
 
         @JvmStatic fun <T : Bindable<T, E>, U, E : Enum<E>> propertyBinding(obj: T, func: (T) -> U, vararg properties: E): Binding<U> {
