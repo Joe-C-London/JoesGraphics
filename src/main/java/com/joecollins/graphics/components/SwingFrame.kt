@@ -13,8 +13,8 @@ import javax.swing.border.EmptyBorder
 import kotlin.math.min
 
 class SwingFrame : GraphicsFrame() {
-    private var rangeBinding: Binding<out Number> = Binding.fixedBinding(1)
-    private var valueBinding: Binding<out Number> = Binding.fixedBinding(0)
+    private var rangeBinding: Binding<Number> = Binding.fixedBinding(1)
+    private var valueBinding: Binding<Number> = Binding.fixedBinding(0)
     private var leftColorBinding: Binding<Color> = Binding.fixedBinding(Color.BLACK)
     private var rightColorBinding: Binding<Color> = Binding.fixedBinding(Color.BLACK)
     private var bottomTextBinding: Binding<String?> = Binding.fixedBinding(null)
@@ -39,7 +39,7 @@ class SwingFrame : GraphicsFrame() {
         return swingPanel.range
     }
 
-    fun setRangeBinding(rangeBinding: Binding<out Number>) {
+    fun setRangeBinding(rangeBinding: Binding<Number>) {
         this.rangeBinding.unbind()
         this.rangeBinding = rangeBinding
         this.rangeBinding.bind { swingPanel.range = it }
@@ -49,7 +49,7 @@ class SwingFrame : GraphicsFrame() {
         return swingPanel.value
     }
 
-    fun setValueBinding(valueBinding: Binding<out Number>) {
+    fun setValueBinding(valueBinding: Binding<Number>) {
         this.valueBinding.unbind()
         this.valueBinding = valueBinding
         this.valueBinding.bind { swingPanel.value = it }

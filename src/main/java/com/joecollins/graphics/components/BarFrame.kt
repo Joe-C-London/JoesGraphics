@@ -41,25 +41,25 @@ class BarFrame : GraphicsFrame() {
     private var usingDefaultMin = true
     private var usingDefaultMax = true
 
-    private var subheadTextBinding: Binding<out String?> = Binding.fixedBinding(null)
+    private var subheadTextBinding: Binding<String?> = Binding.fixedBinding(null)
     private var subheadColorBinding: Binding<Color> = Binding.fixedBinding(Color.BLACK)
 
     private var numBarsBinding: Binding<Int> = Binding.fixedBinding(0)
     private var leftTextBinding = IndexedBinding.emptyBinding<String>()
     private var rightTextBinding = IndexedBinding.emptyBinding<String>()
     private var leftIconBinding = IndexedBinding.emptyBinding<Shape?>()
-    private val seriesBindings: MutableMap<String, Pair<IndexedBinding<Color>, IndexedBinding<out Number>>> =
+    private val seriesBindings: MutableMap<String, Pair<IndexedBinding<Color>, IndexedBinding<Number>>> =
         LinkedHashMap()
     private var numLinesBinding: Binding<Int> = Binding.fixedBinding(0)
-    private var lineLevelsBinding: IndexedBinding<out Number> = IndexedBinding.emptyBinding()
+    private var lineLevelsBinding: IndexedBinding<Number> = IndexedBinding.emptyBinding()
     private var lineLabelsBinding = IndexedBinding.emptyBinding<String>()
-    private var minBinding: Binding<out Number> = object : Binding<Number> {
+    private var minBinding: Binding<Number> = object : Binding<Number> {
         override val value: Number
             get() = bars
                 .map { bar: Bar -> bar.totalNegative.toDouble() }
                 .fold(0.0) { a: Double, b: Double -> min(a, b) }
     }
-    private var maxBinding: Binding<out Number> = object : Binding<Number> {
+    private var maxBinding: Binding<Number> = object : Binding<Number> {
         override val value: Number
         get() = bars
             .map { bar: Bar -> bar.totalPositive.toDouble() }
@@ -77,7 +77,7 @@ class BarFrame : GraphicsFrame() {
     internal val subheadText: String?
         get() = if (subheadLabel.isVisible) subheadLabel.text else null
 
-    fun setSubheadTextBinding(subheadTextBinding: Binding<out String?>) {
+    fun setSubheadTextBinding(subheadTextBinding: Binding<String?>) {
         this.subheadTextBinding.unbind()
         this.subheadTextBinding = subheadTextBinding
         this.subheadTextBinding.bind {
@@ -144,7 +144,7 @@ class BarFrame : GraphicsFrame() {
     fun addSeriesBinding(
         seriesName: String,
         colorBinding: IndexedBinding<Color>,
-        valueBinding: IndexedBinding<out Number>
+        valueBinding: IndexedBinding<Number>
     ) {
         val oldSeries = seriesBindings[seriesName]
         if (oldSeries != null) {
@@ -183,7 +183,7 @@ class BarFrame : GraphicsFrame() {
         this.leftIconBinding.bind { idx, shape -> bars[idx].leftIcon = shape }
     }
 
-    fun setMinBinding(minBinding: Binding<out Number>) {
+    fun setMinBinding(minBinding: Binding<Number>) {
         usingDefaultMin = false
         this.minBinding.unbind()
         this.minBinding = minBinding
@@ -193,7 +193,7 @@ class BarFrame : GraphicsFrame() {
         }
     }
 
-    fun setMaxBinding(maxBinding: Binding<out Number>) {
+    fun setMaxBinding(maxBinding: Binding<Number>) {
         usingDefaultMax = false
         this.maxBinding.unbind()
         this.maxBinding = maxBinding
@@ -235,7 +235,7 @@ class BarFrame : GraphicsFrame() {
         return lines[index].level
     }
 
-    fun setLineLevelsBinding(lineLevelsBinding: IndexedBinding<out Number>) {
+    fun setLineLevelsBinding(lineLevelsBinding: IndexedBinding<Number>) {
         this.lineLevelsBinding.unbind()
         this.lineLevelsBinding = lineLevelsBinding
         this.lineLevelsBinding.bind { idx, level -> lines[idx].level = level }

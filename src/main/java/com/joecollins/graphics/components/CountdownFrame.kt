@@ -20,7 +20,7 @@ class CountdownFrame : GraphicsFrame() {
 
     internal var clock: Clock = Clock.systemDefaultZone()
 
-    private var timeBinding: Binding<out Temporal> = Binding.fixedBinding(Instant.now())
+    private var timeBinding: Binding<Temporal> = Binding.fixedBinding(Instant.now())
     private var labelFunc: (Duration) -> String = { it.toString() }
     private var additionalInfoBinding: Binding<String?> = Binding.fixedBinding(null)
     private var countdownColorBinding: Binding<Color> = Binding.fixedBinding(Color.BLACK)
@@ -62,7 +62,7 @@ class CountdownFrame : GraphicsFrame() {
         return Duration.between(clock.instant().truncatedTo(ChronoUnit.SECONDS), time)
     }
 
-    fun setTimeBinding(timeBinding: Binding<out Temporal>) {
+    fun setTimeBinding(timeBinding: Binding<Temporal>) {
         this.timeBinding.unbind()
         this.timeBinding = timeBinding
         this.timeBinding.bind {

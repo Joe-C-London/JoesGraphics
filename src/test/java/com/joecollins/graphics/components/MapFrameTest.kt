@@ -14,7 +14,6 @@ import java.awt.Shape
 import java.awt.geom.Area
 import java.awt.geom.Rectangle2D
 import java.io.IOException
-import java.util.function.IntFunction
 import kotlin.Throws
 import org.junit.Assert
 import org.junit.Test
@@ -139,11 +138,11 @@ class MapFrameTest {
     }
 
     @Throws(IOException::class)
-    private fun loadShapes(colorFunc: IntFunction<Color>): NestedBindableList<MapEntry, MapEntry.Property> {
+    private fun loadShapes(colorFunc: (Int) -> Color): NestedBindableList<MapEntry, MapEntry.Property> {
         val shapesByDistrict = shapesByDistrict()
         val shapes: NestedBindableList<MapEntry, MapEntry.Property> = NestedBindableList()
         shapesByDistrict.forEach { (district: Int, shape: Shape) ->
-            val color = colorFunc.apply(district)
+            val color = colorFunc(district)
             shapes.add(MapEntry(shape, color))
         }
         return shapes

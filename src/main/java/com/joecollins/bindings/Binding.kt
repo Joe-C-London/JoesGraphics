@@ -3,12 +3,12 @@ package com.joecollins.bindings
 import org.apache.commons.lang3.mutable.Mutable
 import org.apache.commons.lang3.mutable.MutableObject
 
-interface Binding<T> {
+interface Binding<out T> {
 
     val value: T
 
     @Deprecated("Replacing with Kotlin version")
-    @JvmDefault fun bindLegacy(onUpdate: java.util.function.Consumer<T>) = bind { onUpdate.accept(it) }
+    @JvmDefault fun bindLegacy(onUpdate: java.util.function.Consumer<in T>) = bind { onUpdate.accept(it) }
 
     @JvmDefault fun bind(onUpdate: (T) -> Unit) = onUpdate(value)
 

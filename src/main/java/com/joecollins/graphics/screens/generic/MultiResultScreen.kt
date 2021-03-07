@@ -221,7 +221,7 @@ class MultiResultScreen private constructor(builder: Builder<*>, textHeader: Bin
             barFrame.setHeaderBinding(headerBinding)
         }
 
-        fun setSubheadBinding(subheadBinding: Binding<out String?>) {
+        fun setSubheadBinding(subheadBinding: Binding<String?>) {
             barFrame.setSubheadTextBinding(subheadBinding)
         }
 
@@ -241,7 +241,7 @@ class MultiResultScreen private constructor(builder: Builder<*>, textHeader: Bin
             prevVotes.binding = prevBinding
         }
 
-        fun setSwingHeaderBinding(swingLabelBinding: Binding<out String?>) {
+        fun setSwingHeaderBinding(swingLabelBinding: Binding<String?>) {
             swingFrame?.setHeaderBinding(swingLabelBinding)
         }
 

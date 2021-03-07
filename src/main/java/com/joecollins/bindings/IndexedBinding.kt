@@ -3,14 +3,14 @@ package com.joecollins.bindings
 import java.lang.IllegalStateException
 import java.lang.IndexOutOfBoundsException
 
-interface IndexedBinding<T> {
+interface IndexedBinding<out T> {
 
     val size: Int
 
     operator fun get(index: Int): T
 
     @Deprecated("Convert to Kotlin version")
-    @JvmDefault fun bindLegacy(onUpdate: java.util.function.BiConsumer<Int, T>) = bind { i, v -> onUpdate.accept(i, v) }
+    @JvmDefault fun bindLegacy(onUpdate: java.util.function.BiConsumer<Int, in T>) = bind { i, v -> onUpdate.accept(i, v) }
 
     @JvmDefault fun bind(onUpdate: (Int, T) -> Unit) {
         (0 until size).forEach { onUpdate(it, this[it]) }

@@ -20,6 +20,7 @@ import org.apache.commons.lang3.tuple.Pair
 import org.junit.Assert
 import org.junit.Test
 
+@Suppress("UNUSED_ANONYMOUS_PARAMETER")
 class HemicycleFrameBuilderTest {
     @Test
     fun testHemicycleBasic() {

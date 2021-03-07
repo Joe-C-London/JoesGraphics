@@ -26,7 +26,7 @@ class MultiSummaryFrameBuilder {
         @JvmStatic fun <T> tooClose(
             items: List<T>,
             display: (T) -> Binding<Boolean>,
-            sortFunc: (T) -> Binding<out Number>,
+            sortFunc: (T) -> Binding<Number>,
             rowHeaderFunc: (T) -> Binding<String>,
             rowLabelsFunc: (T) -> Binding<List<Pair<Color, String>>>,
             limit: Int

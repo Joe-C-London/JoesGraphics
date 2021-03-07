@@ -41,14 +41,14 @@ class MultiSummaryFrameBuilderTest {
         Assert.assertEquals(0, frame.numRows.toLong())
 
         // add first (36)
-        ridings[5].setResults(java.util.Map.of(yp, 140, ndp, 104, lib, 76, grn, 11))
+        ridings[5].setResults(mapOf(yp to 140, ndp to 104, lib to 76, grn to 11))
         Assert.assertEquals(1, frame.numRows.toLong())
         Assert.assertEquals("PELLY-NISUTLIN", frame.getRowHeader(0))
         Assert.assertEquals(Color.BLUE, frame.getColor(0, 0))
         Assert.assertEquals("YP: 140", frame.getValue(0, 0))
 
         // add to top (3/36)
-        ridings[6].setResults(java.util.Map.of(yp, 35, ndp, 2, lib, 38))
+        ridings[6].setResults(mapOf(yp to 35, ndp to 2, lib to 38))
         Assert.assertEquals(2, frame.numRows.toLong())
         Assert.assertEquals("VUNTUT GWITCHIN", frame.getRowHeader(0))
         Assert.assertEquals(Color.RED, frame.getColor(0, 0))
@@ -58,7 +58,7 @@ class MultiSummaryFrameBuilderTest {
         Assert.assertEquals("YP: 140", frame.getValue(1, 0))
 
         // add beyond limit (3/36/40)
-        ridings[7].setResults(java.util.Map.of(yp, 150, ndp, 110, lib, 106, ind, 19))
+        ridings[7].setResults(mapOf(yp to 150, ndp to 110, lib to 106, ind to 19))
         Assert.assertEquals(2, frame.numRows.toLong())
         Assert.assertEquals("VUNTUT GWITCHIN", frame.getRowHeader(0))
         Assert.assertEquals(Color.RED, frame.getColor(0, 0))
@@ -68,7 +68,7 @@ class MultiSummaryFrameBuilderTest {
         Assert.assertEquals("YP: 140", frame.getValue(1, 0))
 
         // existing updated, sorted to bottom (3/40/72)
-        ridings[5].setResults(java.util.Map.of(yp, 280, ndp, 207, lib, 152, grn, 22))
+        ridings[5].setResults(mapOf(yp to 280, ndp to 207, lib to 152, grn to 22))
         Assert.assertEquals("VUNTUT GWITCHIN", frame.getRowHeader(0))
         Assert.assertEquals(Color.RED, frame.getColor(0, 0))
         Assert.assertEquals("LIB: 38", frame.getValue(0, 0))
@@ -86,7 +86,7 @@ class MultiSummaryFrameBuilderTest {
         Assert.assertEquals("YP: 150", frame.getValue(1, 0))
 
         // update in view (7/40)
-        ridings[6].setResults(java.util.Map.of(yp, 70, ndp, 3, lib, 77))
+        ridings[6].setResults(mapOf(yp to 70, ndp to 3, lib to 77))
         Assert.assertEquals("VUNTUT GWITCHIN", frame.getRowHeader(0))
         Assert.assertEquals(Color.RED, frame.getColor(0, 0))
         Assert.assertEquals("LIB: 77", frame.getValue(0, 0))
@@ -102,7 +102,7 @@ class MultiSummaryFrameBuilderTest {
         Assert.assertEquals("YP: 150", frame.getValue(0, 0))
 
         // add to top (25/40)
-        ridings[1].setResults(java.util.Map.of(yp, 169, ndp, 76, lib, 144))
+        ridings[1].setResults(mapOf(yp to 169, ndp to 76, lib to 144))
         Assert.assertEquals(2, frame.numRows.toLong())
         Assert.assertEquals("KLUANE", frame.getRowHeader(0))
         Assert.assertEquals(Color.BLUE, frame.getColor(0, 0))
@@ -112,7 +112,7 @@ class MultiSummaryFrameBuilderTest {
         Assert.assertEquals("YP: 150", frame.getValue(1, 0))
 
         // update in view, sorted (40/49)
-        ridings[1].setResults(java.util.Map.of(yp, 338, ndp, 153, lib, 289))
+        ridings[1].setResults(mapOf(yp to 338, ndp to 153, lib to 289))
         Assert.assertEquals(2, frame.numRows.toLong())
         Assert.assertEquals("WATSON LAKE", frame.getRowHeader(0))
         Assert.assertEquals(Color.BLUE, frame.getColor(0, 0))

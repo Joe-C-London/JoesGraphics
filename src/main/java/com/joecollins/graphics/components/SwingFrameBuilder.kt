@@ -69,7 +69,7 @@ class SwingFrameBuilder {
         ALL
     }
 
-    fun withRange(rangeBinding: Binding<out Number>): SwingFrameBuilder {
+    fun withRange(rangeBinding: Binding<Number>): SwingFrameBuilder {
         swingFrame.setRangeBinding(rangeBinding)
         return this
     }
@@ -138,8 +138,8 @@ class SwingFrameBuilder {
 
     companion object {
         @JvmStatic fun prevCurr(
-            prevBinding: Binding<out Map<Party, Number>>,
-            currBinding: Binding<out Map<Party, Number>>,
+            prevBinding: Binding<Map<Party, Number>>,
+            currBinding: Binding<Map<Party, Number>>,
             partyOrder: Comparator<Party>
         ): SwingFrameBuilder {
             return prevCurr(prevBinding, currBinding, partyOrder, false)
@@ -214,15 +214,15 @@ class SwingFrameBuilder {
         }
 
         @JvmStatic fun prevCurrNormalised(
-            prevBinding: Binding<out Map<Party, Double>>,
-            currBinding: Binding<out Map<Party, Double>>,
+            prevBinding: Binding<Map<Party, Double>>,
+            currBinding: Binding<Map<Party, Double>>,
             partyOrder: Comparator<Party>
         ): SwingFrameBuilder {
             return prevCurr(prevBinding, currBinding, partyOrder, true)
         }
 
         @JvmStatic fun <T> basic(
-            binding: Binding<out T>,
+            binding: Binding<T>,
             leftColorFunc: (T) -> Color,
             rightColorFunc: (T) -> Color,
             valueFunc: (T) -> Number,

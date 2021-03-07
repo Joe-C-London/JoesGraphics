@@ -72,17 +72,17 @@ class BarFrameBuilder {
         val shape: Shape? = null
     )
 
-    fun withHeader(headerBinding: Binding<out String?>): BarFrameBuilder {
+    fun withHeader(headerBinding: Binding<String?>): BarFrameBuilder {
         barFrame.setHeaderBinding(headerBinding)
         return this
     }
 
-    fun withSubhead(subheadBinding: Binding<out String?>): BarFrameBuilder {
+    fun withSubhead(subheadBinding: Binding<String?>): BarFrameBuilder {
         barFrame.setSubheadTextBinding(subheadBinding)
         return this
     }
 
-    fun withNotes(notesBinding: Binding<out String?>): BarFrameBuilder {
+    fun withNotes(notesBinding: Binding<String?>): BarFrameBuilder {
         barFrame.setNotesBinding(notesBinding)
         return this
     }
@@ -97,13 +97,13 @@ class BarFrameBuilder {
         return this
     }
 
-    fun withMax(maxBinding: Binding<out Number>): BarFrameBuilder {
+    fun withMax(maxBinding: Binding<Number>): BarFrameBuilder {
         rangeFinder.minFunction = { 0 }
         bind(maxBinding) { max -> rangeFinder.maxFunction = { max(max.toDouble(), it.highest.toDouble()) } }
         return this
     }
 
-    fun withWingspan(wingspanBinding: Binding<out Number>): BarFrameBuilder {
+    fun withWingspan(wingspanBinding: Binding<Number>): BarFrameBuilder {
         bind(wingspanBinding) { wingspan ->
             val f = { it: RangeFinder ->
                 max(
@@ -172,7 +172,7 @@ class BarFrameBuilder {
     }
 
     companion object {
-        @JvmStatic fun basic(binding: Binding<out List<BasicBar>>): BarFrameBuilder {
+        @JvmStatic fun basic(binding: Binding<List<BasicBar>>): BarFrameBuilder {
             val builder = BarFrameBuilder()
             val barFrame = builder.barFrame
             val rangeFinder = builder.rangeFinder
@@ -205,7 +205,7 @@ class BarFrameBuilder {
             return builder
         }
 
-        @JvmStatic fun dual(bars: Binding<out List<DualBar>>): BarFrameBuilder {
+        @JvmStatic fun dual(bars: Binding<List<DualBar>>): BarFrameBuilder {
             val builder = BarFrameBuilder()
             val barFrame = builder.barFrame
             val rangeFinder = builder.rangeFinder
@@ -265,7 +265,7 @@ class BarFrameBuilder {
             return builder
         }
 
-        @JvmStatic fun dualReversed(bars: Binding<out List<DualBar>>): BarFrameBuilder {
+        @JvmStatic fun dualReversed(bars: Binding<List<DualBar>>): BarFrameBuilder {
             val builder = BarFrameBuilder()
             val barFrame = builder.barFrame
             val rangeFinder = builder.rangeFinder

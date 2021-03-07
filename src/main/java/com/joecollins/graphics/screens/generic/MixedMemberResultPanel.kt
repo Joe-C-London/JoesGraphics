@@ -64,12 +64,12 @@ class MixedMemberResultPanel private constructor(
     }
 
     class Builder {
-        private var candidateVotes: BindingReceiver<out Map<Candidate, Int?>> = BindingReceiver(Binding.fixedBinding(emptyMap()))
-        private var candidatePrev: BindingReceiver<out Map<Party, Int>>? = null
+        private var candidateVotes: BindingReceiver<Map<Candidate, Int?>> = BindingReceiver(Binding.fixedBinding(emptyMap()))
+        private var candidatePrev: BindingReceiver<Map<Party, Int>>? = null
         private var candidatePctReporting: BindingReceiver<Double>? = null
         private var winner: BindingReceiver<Candidate?> = BindingReceiver(Binding.fixedBinding(null))
-        private var partyVotes: BindingReceiver<out Map<Party, Int?>> = BindingReceiver(Binding.fixedBinding(emptyMap()))
-        private var partyPrev: BindingReceiver<out Map<Party, Int>>? = null
+        private var partyVotes: BindingReceiver<Map<Party, Int?>> = BindingReceiver(Binding.fixedBinding(emptyMap()))
+        private var partyPrev: BindingReceiver<Map<Party, Int>>? = null
         private var partyPctReporting: BindingReceiver<Double>? = null
         private var incumbentMarker = ""
         private var candidateVoteHeader: BindingReceiver<String?> = BindingReceiver(Binding.fixedBinding(null))
@@ -81,7 +81,7 @@ class MixedMemberResultPanel private constructor(
 
         @JvmOverloads
         fun withCandidateVotes(
-            votes: Binding<out Map<Candidate, Int>>,
+            votes: Binding<Map<Candidate, Int?>>,
             header: Binding<String>,
             subheader: Binding<String?> = Binding.fixedBinding(null)
         ): Builder {
@@ -102,8 +102,8 @@ class MixedMemberResultPanel private constructor(
         }
 
         fun withPrevCandidateVotes(
-            votes: Binding<out Map<Party, Int>>,
-            header: Binding<String?>
+            votes: Binding<Map<Party, Int>>,
+            header: Binding<String>
         ): Builder {
             candidatePrev = BindingReceiver(votes)
             candidateChangeHeader = BindingReceiver(header)
@@ -111,8 +111,8 @@ class MixedMemberResultPanel private constructor(
         }
 
         fun withPartyVotes(
-            votes: Binding<out Map<Party, Int>>,
-            header: Binding<String?>
+            votes: Binding<Map<Party, Int?>>,
+            header: Binding<String>
         ): Builder {
             partyVotes = BindingReceiver(votes)
             partyVoteHeader = BindingReceiver(header)
@@ -120,8 +120,8 @@ class MixedMemberResultPanel private constructor(
         }
 
         fun withPrevPartyVotes(
-            votes: Binding<out Map<Party, Int>>,
-            header: Binding<String?>
+            votes: Binding<Map<Party, Int>>,
+            header: Binding<String>
         ): Builder {
             partyPrev = BindingReceiver(votes)
             partyChangeHeader = BindingReceiver(header)
@@ -143,7 +143,7 @@ class MixedMemberResultPanel private constructor(
             selectedShape: Binding<T?>,
             leadingParty: Binding<PartyResult?>,
             focus: Binding<List<T>?>,
-            header: Binding<String?>
+            header: Binding<String>
         ): Builder {
             mapBuilder = MapBuilder(shapes, selectedShape, leadingParty, focus, header)
             return this
@@ -155,7 +155,7 @@ class MixedMemberResultPanel private constructor(
             leadingParty: Binding<PartyResult?>,
             focus: Binding<List<T>?>,
             additionalHighlight: Binding<List<T>?>,
-            header: Binding<String?>
+            header: Binding<String>
         ): Builder {
             mapBuilder = MapBuilder(shapes, selectedShape, leadingParty, focus, additionalHighlight, header)
             return this

@@ -55,7 +55,7 @@ class SwingometerFrameBuilder {
 
     private val frame = SwingometerFrame()
     private val properties = Properties()
-    fun withRange(range: Binding<out Number>): SwingometerFrameBuilder {
+    fun withRange(range: Binding<Number>): SwingometerFrameBuilder {
         range.bind { max -> properties.max = max }
         frame.setRangeBinding(
                 Binding.propertyBinding(properties, { getMax(it) }, Properties.Property.VALUE))
@@ -68,7 +68,7 @@ class SwingometerFrameBuilder {
                 ceil(abs(props.value.toDouble() / props.bucketSize.toDouble())))
     }
 
-    fun withBucketSize(bucketSize: Binding<out Number>): SwingometerFrameBuilder {
+    fun withBucketSize(bucketSize: Binding<Number>): SwingometerFrameBuilder {
         bucketSize.bind { properties.bucketSize = it }
         frame.setNumBucketsPerSideBinding(
                 Binding.propertyBinding(
@@ -81,7 +81,7 @@ class SwingometerFrameBuilder {
     private inner class Tick(val level: Double, val text: String)
 
     fun withTickInterval(
-        tickInterval: Binding<out Number>,
+        tickInterval: Binding<Number>,
         tickStringFunc: (Number) -> String
     ): SwingometerFrameBuilder {
         val ticks = BindableList<Tick>()
@@ -107,12 +107,12 @@ class SwingometerFrameBuilder {
         return ticks
     }
 
-    fun withLeftNeedingToWin(leftToWin: Binding<out Number>): SwingometerFrameBuilder {
+    fun withLeftNeedingToWin(leftToWin: Binding<Number>): SwingometerFrameBuilder {
         frame.setLeftToWinBinding(leftToWin)
         return this
     }
 
-    fun withRightNeedingToWin(rightToWin: Binding<out Number>): SwingometerFrameBuilder {
+    fun withRightNeedingToWin(rightToWin: Binding<Number>): SwingometerFrameBuilder {
         frame.setRightToWinBinding(rightToWin)
         return this
     }
@@ -224,10 +224,10 @@ class SwingometerFrameBuilder {
 
     companion object {
         @JvmStatic fun basic(
-            colors: Binding<out Pair<Color, Color>>,
-            value: Binding<out Number>
+            colors: Binding<Pair<Color, Color>>,
+            value: Binding<Number>
         ): SwingometerFrameBuilder {
-            val colorsRec: BindingReceiver<out Pair<Color, Color>> = BindingReceiver(colors)
+            val colorsRec: BindingReceiver<Pair<Color, Color>> = BindingReceiver(colors)
             val builder = SwingometerFrameBuilder()
             value.bind { builder.properties.value = it }
             builder.frame.setLeftColorBinding(colorsRec.getBinding { it.left })

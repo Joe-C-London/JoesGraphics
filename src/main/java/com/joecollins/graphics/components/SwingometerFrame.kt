@@ -24,26 +24,26 @@ import org.apache.commons.lang3.tuple.MutablePair
 import org.apache.commons.lang3.tuple.MutableTriple
 
 class SwingometerFrame : GraphicsFrame() {
-    private var rangeBinding: Binding<out Number> = Binding.fixedBinding(1)
-    private var valueBinding: Binding<out Number> = Binding.fixedBinding(0)
+    private var rangeBinding: Binding<Number> = Binding.fixedBinding(1)
+    private var valueBinding: Binding<Number> = Binding.fixedBinding(0)
     private var leftColorBinding: Binding<Color> = Binding.fixedBinding(Color.BLACK)
     private var rightColorBinding: Binding<Color> = Binding.fixedBinding(Color.BLACK)
-    private var leftToWinBinding: Binding<out Number> = Binding.fixedBinding(Double.POSITIVE_INFINITY)
-    private var rightToWinBinding: Binding<out Number> = Binding.fixedBinding(Double.POSITIVE_INFINITY)
+    private var leftToWinBinding: Binding<Number> = Binding.fixedBinding(Double.POSITIVE_INFINITY)
+    private var rightToWinBinding: Binding<Number> = Binding.fixedBinding(Double.POSITIVE_INFINITY)
 
     private var numTicksBinding: Binding<Int> = Binding.fixedBinding(0)
-    private var tickPositionBinding: IndexedBinding<out Number> = IndexedBinding.emptyBinding()
+    private var tickPositionBinding: IndexedBinding<Number> = IndexedBinding.emptyBinding()
     private var tickTextBinding = IndexedBinding.emptyBinding<String>()
 
     private var numOuterLabelsBinding: Binding<Int> = Binding.fixedBinding(0)
-    private var outerLabelPositionBinding: IndexedBinding<out Number> = IndexedBinding.emptyBinding()
+    private var outerLabelPositionBinding: IndexedBinding<Number> = IndexedBinding.emptyBinding()
     private var outerLabelTextBinding = IndexedBinding.emptyBinding<String>()
     private var outerLabelColorBinding = IndexedBinding.emptyBinding<Color>()
 
     private var numBucketsPerSideBinding: Binding<Int> = Binding.fixedBinding(1)
 
     private var numDotsBinding: Binding<Int> = Binding.fixedBinding(0)
-    private var dotsPositionBinding: IndexedBinding<out Number> = IndexedBinding.emptyBinding()
+    private var dotsPositionBinding: IndexedBinding<Number> = IndexedBinding.emptyBinding()
     private var dotsColorBinding = IndexedBinding.emptyBinding<Color>()
     private var dotsLabelBinding = IndexedBinding.emptyBinding<String>()
     private var dotsSolidBinding = IndexedBinding.singletonBinding(true)
@@ -71,7 +71,7 @@ class SwingometerFrame : GraphicsFrame() {
     internal val value: Number
         get() = swingPanel.value
 
-    fun setValueBinding(valueBinding: Binding<out Number>) {
+    fun setValueBinding(valueBinding: Binding<Number>) {
         this.valueBinding.unbind()
         this.valueBinding = valueBinding
         this.valueBinding.bind { value -> swingPanel.value = value }
@@ -80,7 +80,7 @@ class SwingometerFrame : GraphicsFrame() {
     internal val range: Number
         get() = swingPanel.range
 
-    fun setRangeBinding(rangeBinding: Binding<out Number>) {
+    fun setRangeBinding(rangeBinding: Binding<Number>) {
         this.rangeBinding.unbind()
         this.rangeBinding = rangeBinding
         this.rangeBinding.bind { range -> swingPanel.range = range }
@@ -99,7 +99,7 @@ class SwingometerFrame : GraphicsFrame() {
         return swingPanel.ticks[index].left
     }
 
-    fun setTickPositionBinding(tickPositionBinding: IndexedBinding<out Number>) {
+    fun setTickPositionBinding(tickPositionBinding: IndexedBinding<Number>) {
         this.tickPositionBinding.unbind()
         this.tickPositionBinding = tickPositionBinding
         this.tickPositionBinding.bind { index, position -> swingPanel.setTickPosition(index, position) }
@@ -118,7 +118,7 @@ class SwingometerFrame : GraphicsFrame() {
     internal val leftToWin: Number
         get() = leftToWinBinding.value
 
-    fun setLeftToWinBinding(leftToWinBinding: Binding<out Number>) {
+    fun setLeftToWinBinding(leftToWinBinding: Binding<Number>) {
         this.leftToWinBinding.unbind()
         this.leftToWinBinding = leftToWinBinding
         this.leftToWinBinding.bind { leftToWin -> swingPanel.leftToWin = leftToWin }
@@ -127,7 +127,7 @@ class SwingometerFrame : GraphicsFrame() {
     internal val rightToWin: Number
         get() = rightToWinBinding.value
 
-    fun setRightToWinBinding(rightToWinBinding: Binding<out Number>) {
+    fun setRightToWinBinding(rightToWinBinding: Binding<Number>) {
         this.rightToWinBinding.unbind()
         this.rightToWinBinding = rightToWinBinding
         this.rightToWinBinding.bind { rightToWin -> swingPanel.rightToWin = rightToWin }
@@ -147,7 +147,7 @@ class SwingometerFrame : GraphicsFrame() {
     }
 
     fun setOuterLabelPositionBinding(
-        outerLabelPositionBinding: IndexedBinding<out Number>
+        outerLabelPositionBinding: IndexedBinding<Number>
     ) {
         this.outerLabelPositionBinding.unbind()
         this.outerLabelPositionBinding = outerLabelPositionBinding
@@ -196,7 +196,7 @@ class SwingometerFrame : GraphicsFrame() {
         return swingPanel.dots[index].position
     }
 
-    fun setDotsPositionBinding(dotsPositionBinding: IndexedBinding<out Number>) {
+    fun setDotsPositionBinding(dotsPositionBinding: IndexedBinding<Number>) {
         this.dotsPositionBinding.unbind()
         this.dotsPositionBinding = dotsPositionBinding
         this.dotsPositionBinding.bind { index, position -> swingPanel.setDotPosition(index, position) }

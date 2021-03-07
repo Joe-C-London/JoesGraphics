@@ -20,9 +20,9 @@ import kotlin.math.roundToInt
 
 class SummaryFromBothEnds : JPanel() {
     private var headlineBinding: Binding<String> = Binding.fixedBinding("RESULT")
-    private var leftBinding: Binding<out Entry?> = Binding.fixedBinding(null)
-    private var rightBinding: Binding<out Entry?> = Binding.fixedBinding(null)
-    private var middleBinding: Binding<out Entry?> = Binding.fixedBinding(null)
+    private var leftBinding: Binding<Entry?> = Binding.fixedBinding(null)
+    private var rightBinding: Binding<Entry?> = Binding.fixedBinding(null)
+    private var middleBinding: Binding<Entry?> = Binding.fixedBinding(null)
     private var totalBinding: Binding<Int> = Binding.fixedBinding(1)
 
     private val headlinePanel: HeadlinePanel = HeadlinePanel()
@@ -49,7 +49,7 @@ class SummaryFromBothEnds : JPanel() {
     internal val left: Entry?
         get() = entryPanel.left
 
-    fun setLeftBinding(leftBinding: Binding<out Entry?>) {
+    fun setLeftBinding(leftBinding: Binding<Entry?>) {
         this.leftBinding.unbind()
         this.leftBinding = leftBinding
         this.leftBinding.bind { entryPanel.left = it }
@@ -58,7 +58,7 @@ class SummaryFromBothEnds : JPanel() {
     internal val right: Entry?
         get() = entryPanel.right
 
-    fun setRightBinding(rightBinding: Binding<out Entry?>) {
+    fun setRightBinding(rightBinding: Binding<Entry?>) {
         this.rightBinding.unbind()
         this.rightBinding = rightBinding
         this.rightBinding.bind { entryPanel.right = it }
@@ -67,7 +67,7 @@ class SummaryFromBothEnds : JPanel() {
     internal val middle: Entry?
         get() = entryPanel.middle
 
-    fun setMiddleBinding(middleBinding: Binding<out Entry?>) {
+    fun setMiddleBinding(middleBinding: Binding<Entry?>) {
         this.middleBinding.unbind()
         this.middleBinding = middleBinding
         this.middleBinding.bind { entryPanel.middle = it }

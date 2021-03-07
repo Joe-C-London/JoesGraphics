@@ -3,7 +3,7 @@ package com.joecollins.bindings
 import org.apache.commons.lang3.mutable.Mutable
 import org.apache.commons.lang3.mutable.MutableObject
 
-class BindingReceiver<T>(binding: Binding<out T>) {
+class BindingReceiver<T>(binding: Binding<T>) {
 
     private val _value = WrappedValue<T>()
 

@@ -144,7 +144,7 @@ class BasicResultPanel private constructor(
         protected var total: BindingReceiver<Int>? = null
         protected var showMajority: BindingReceiver<Boolean>? = null
         protected var majorityFunction: ((Int) -> String)? = null
-        protected var winner: BindingReceiver<KT>? = null
+        protected var winner: BindingReceiver<KT?>? = null
         protected var notes: BindingReceiver<String>? = null
         protected var diff: BindingReceiver<Map<Party, CurrDiff<CT>>>? = null
         protected var changeHeader: BindingReceiver<String?>? = null
@@ -170,14 +170,14 @@ class BasicResultPanel private constructor(
             return this
         }
 
-        fun withWinner(winner: Binding<KT>): SeatScreenBuilder<KT, CT, PT> {
+        fun withWinner(winner: Binding<KT?>): SeatScreenBuilder<KT, CT, PT> {
             this.winner = BindingReceiver(winner)
             return this
         }
 
         @JvmOverloads
         fun withDiff(
-            diff: Binding<out MutableMap<Party, out CT>>,
+            diff: Binding<MutableMap<Party, out CT>>,
             changeHeader: Binding<String?>,
             changeSubhead: Binding<String?> = Binding.fixedBinding(null)
         ): SeatScreenBuilder<KT, CT, PT> {
@@ -200,7 +200,7 @@ class BasicResultPanel private constructor(
 
         @JvmOverloads
         fun withPrev(
-            prev: Binding<out MutableMap<Party, PT>>,
+            prev: Binding<MutableMap<Party, PT>>,
             changeHeader: Binding<String?>,
             changeSubhead: Binding<String?> = Binding.fixedBinding(null)
         ): SeatScreenBuilder<KT, CT, PT> {
@@ -222,8 +222,8 @@ class BasicResultPanel private constructor(
         protected abstract fun createFromPrev(prev: PT): CurrDiff<CT>
 
         fun withSwing(
-            currVotes: Binding<out Map<Party, Int>>,
-            prevVotes: Binding<out Map<Party, Int>>,
+            currVotes: Binding<Map<Party, Int>>,
+            prevVotes: Binding<Map<Party, Int>>,
             comparator: Comparator<Party>,
             header: Binding<String?>
         ): SeatScreenBuilder<KT, CT, PT> {
@@ -813,7 +813,7 @@ class BasicResultPanel private constructor(
     ) {
         protected var showMajority: BindingReceiver<Boolean>? = null
         protected var majorityLabel: BindingReceiver<String>? = null
-        protected var winner: BindingReceiver<KT>? = null
+        protected var winner: BindingReceiver<KT?>? = null
         protected var runoff: BindingReceiver<Set<KT>?>? = null
         protected var pctReporting: BindingReceiver<Double>? = null
         protected var notes: BindingReceiver<String>? = null
@@ -835,7 +835,7 @@ class BasicResultPanel private constructor(
 
         @JvmOverloads
         fun withPrev(
-            prev: Binding<out Map<Party, PT>>,
+            prev: Binding<Map<Party, PT>>,
             header: Binding<String?>,
             subhead: Binding<String?> = Binding.fixedBinding(null)
         ): VoteScreenBuilder<KT, CT, CPT, PT> {
@@ -846,7 +846,7 @@ class BasicResultPanel private constructor(
         }
 
         fun withPreferences(
-            preferences: Binding<out Map<KT, CT>>,
+            preferences: Binding<Map<KT, CT>>,
             preferenceHeader: Binding<String?>,
             preferenceSubhead: Binding<String?>
         ): VoteScreenBuilder<KT, CT, CPT, PT> {
@@ -857,18 +857,18 @@ class BasicResultPanel private constructor(
         }
 
         fun withPrevPreferences(
-            prevPreferences: Binding<out Map<Party, PT>>
+            prevPreferences: Binding<Map<Party, PT>>
         ): VoteScreenBuilder<KT, CT, CPT, PT> {
             this.prevPreferences = BindingReceiver(prevPreferences)
             return this
         }
 
-        fun withWinner(winner: Binding<KT>): VoteScreenBuilder<KT, CT, CPT, PT> {
+        fun withWinner(winner: Binding<KT?>): VoteScreenBuilder<KT, CT, CPT, PT> {
             this.winner = BindingReceiver(winner)
             return this
         }
 
-        fun withRunoff(runoff: Binding<Set<KT>>): VoteScreenBuilder<KT, CT, CPT, PT> {
+        fun withRunoff(runoff: Binding<Set<KT>?>): VoteScreenBuilder<KT, CT, CPT, PT> {
             this.runoff = BindingReceiver(runoff)
             return this
         }
@@ -1324,9 +1324,10 @@ class BasicResultPanel private constructor(
                                     currPreferences.getBinding { currTotalByParty(it) }
                             ) { p: Map<Party, Int>, c: Map<Party, Int> ->
                                 if (c.keys != p.keys) {
-                                    return@merge java.util.Map.of()
+                                    emptyMap()
+                                } else {
+                                    p
                                 }
-                                p
                             }
                 } else {
                     curr = current.getBinding { currTotalByParty(it) }
@@ -1340,9 +1341,10 @@ class BasicResultPanel private constructor(
                                         c.keys.asSequence()
                                                 .map { key: KT -> keyTemplate.toParty(key) }
                                                 .none { it == prevWinner }) {
-                                    return@merge java.util.Map.of()
+                                    emptyMap()
+                                } else {
+                                    p
                                 }
-                                p
                             }
                 }
                 val classificationFunc = classificationFunc
@@ -1578,7 +1580,7 @@ class BasicResultPanel private constructor(
         }
 
         @JvmStatic fun partySeats(
-            seats: Binding<out Map<Party, Int>>,
+            seats: Binding<Map<Party, Int>>,
             header: Binding<String?>,
             subhead: Binding<String?>
         ): SeatScreenBuilder<Party, Int, Int> {
@@ -1590,7 +1592,7 @@ class BasicResultPanel private constructor(
         }
 
         @JvmStatic fun candidateSeats(
-            seats: Binding<out Map<Candidate, Int>>,
+            seats: Binding<Map<Candidate, Int>>,
             header: Binding<String?>,
             subhead: Binding<String?>
         ): SeatScreenBuilder<Candidate, Int, Int> {
@@ -1602,7 +1604,7 @@ class BasicResultPanel private constructor(
         }
 
         @JvmStatic fun partyDualSeats(
-            seats: Binding<out Map<Party, Pair<Int, Int>>>,
+            seats: Binding<Map<Party, Pair<Int, Int>>>,
             header: Binding<String?>,
             subhead: Binding<String?>
         ): SeatScreenBuilder<Party, Pair<Int, Int>, Pair<Int, Int>> {
@@ -1614,7 +1616,7 @@ class BasicResultPanel private constructor(
         }
 
         @JvmStatic fun candidateDualSeats(
-            seats: Binding<out Map<Candidate, Pair<Int, Int>>>,
+            seats: Binding<Map<Candidate, Pair<Int, Int>>>,
             header: Binding<String?>,
             subhead: Binding<String?>
         ): SeatScreenBuilder<Candidate, Pair<Int, Int>, Pair<Int, Int>> {
@@ -1626,7 +1628,7 @@ class BasicResultPanel private constructor(
         }
 
         @JvmStatic fun partyRangeSeats(
-            seats: Binding<out Map<Party, Range<Int>>>,
+            seats: Binding<Map<Party, Range<Int>>>,
             header: Binding<String?>,
             subhead: Binding<String?>
         ): SeatScreenBuilder<Party, Range<Int>, Int> {
@@ -1638,7 +1640,7 @@ class BasicResultPanel private constructor(
         }
 
         @JvmStatic fun candidateRangeSeats(
-            seats: Binding<out Map<Candidate, Range<Int>>>,
+            seats: Binding<Map<Candidate, Range<Int>>>,
             header: Binding<String?>,
             subhead: Binding<String?>
         ): SeatScreenBuilder<Candidate, Range<Int>, Int> {
@@ -1650,7 +1652,7 @@ class BasicResultPanel private constructor(
         }
 
         @JvmStatic fun partyVotes(
-            votes: Binding<out Map<Party, Int?>>,
+            votes: Binding<Map<Party, Int?>>,
             header: Binding<String?>,
             subhead: Binding<String?>
         ): VoteScreenBuilder<Party, Int?, Double?, Int> {
@@ -1664,7 +1666,7 @@ class BasicResultPanel private constructor(
         }
 
         @JvmStatic fun candidateVotes(
-            votes: Binding<out Map<Candidate, Int?>>,
+            votes: Binding<Map<Candidate, Int?>>,
             header: Binding<String?>,
             subhead: Binding<String?>
         ): VoteScreenBuilder<Candidate, Int?, Double?, Int> {
@@ -1678,7 +1680,7 @@ class BasicResultPanel private constructor(
         }
 
         @JvmStatic fun candidateVotesPctOnly(
-            votes: Binding<out Map<Candidate, Int?>>,
+            votes: Binding<Map<Candidate, Int?>>,
             header: Binding<String?>,
             subhead: Binding<String?>
         ): VoteScreenBuilder<Candidate, Int?, Double?, Int> {
@@ -1692,7 +1694,7 @@ class BasicResultPanel private constructor(
         }
 
         @JvmStatic fun candidateVotes(
-            votes: Binding<out Map<Candidate, Int?>>,
+            votes: Binding<Map<Candidate, Int?>>,
             header: Binding<String?>,
             subhead: Binding<String?>,
             incumbentMarker: String
@@ -1707,7 +1709,7 @@ class BasicResultPanel private constructor(
         }
 
         @JvmStatic fun candidateVotesPctOnly(
-            votes: Binding<out Map<Candidate, Int?>>,
+            votes: Binding<Map<Candidate, Int?>>,
             header: Binding<String?>,
             subhead: Binding<String?>,
             incumbentMarker: String
@@ -1722,7 +1724,7 @@ class BasicResultPanel private constructor(
         }
 
         @JvmStatic fun partyRangeVotes(
-            votes: Binding<out Map<Party, Range<Double>>>,
+            votes: Binding<Map<Party, Range<Double>>>,
             header: Binding<String?>,
             subhead: Binding<String?>
         ): VoteScreenBuilder<Party, Range<Double>, Double, Int> {
