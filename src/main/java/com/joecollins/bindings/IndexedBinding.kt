@@ -4,9 +4,6 @@ import java.lang.IllegalStateException
 
 interface IndexedBinding<out T> {
 
-    @Deprecated("Convert to Kotlin version")
-    @JvmDefault fun bindLegacy(onUpdate: java.util.function.BiConsumer<Int, in T>) = bind { i, v -> onUpdate.accept(i, v) }
-
     fun bind(onUpdate: (Int, T) -> Unit)
 
     fun unbind()
