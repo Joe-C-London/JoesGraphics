@@ -25,7 +25,7 @@ class CountdownFrame : GraphicsFrame() {
     private var additionalInfoBinding: Binding<String?> = Binding.fixedBinding(null)
     private var countdownColorBinding: Binding<Color> = Binding.fixedBinding(Color.BLACK)
 
-    private var time = timeBinding.value
+    private var time: Temporal = Instant.now()
 
     private val timeRemainingLabel: JLabel = JLabel()
     private val additionalInfoLabel: JLabel = JLabel()

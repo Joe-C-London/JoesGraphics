@@ -70,7 +70,7 @@ class MapFrameBuilder {
                     val item = items[i]
                     val shape = shapeFunc(item)
                     val colorBinding = colorFunc(item)
-                    list.add(ImmutablePair.of(shape, colorBinding.value))
+                    list.add(ImmutablePair.of(shape, Color.BLACK))
                     colorBinding.bind { color -> list[i] = ImmutablePair.of(shape, color) }
                     bindings.add(colorBinding)
                 }

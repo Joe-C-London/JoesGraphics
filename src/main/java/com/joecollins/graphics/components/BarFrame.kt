@@ -191,6 +191,8 @@ class BarFrame : GraphicsFrame() {
     private abstract inner class DefaultMinMaxBinding : Binding<Number> {
         private var consumer: ((Number) -> Unit)? = null
 
+        abstract val value: Number
+
         override fun bind(onUpdate: (Number) -> Unit) {
             check(consumer == null) { "Binding is already used" }
             onUpdate(value)
@@ -212,13 +214,11 @@ class BarFrame : GraphicsFrame() {
     private inner class DefaultMinBinding : DefaultMinMaxBinding() {
         override val value: Number
             get() = bars.map { it.totalNegative.toDouble() }.fold(0.0) { a, b -> min(a, b) }
-
     }
 
     private inner class DefaultMaxBinding : DefaultMinMaxBinding() {
         override val value: Number
             get() = bars.map { it.totalPositive.toDouble() }.fold(0.0) { a, b -> max(a, b) }
-
     }
 
     private fun getPixelOfValue(value: Number): Double {

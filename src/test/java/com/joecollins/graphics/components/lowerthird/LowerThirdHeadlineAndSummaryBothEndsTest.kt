@@ -1,6 +1,5 @@
 package com.joecollins.graphics.components.lowerthird
 
-import com.joecollins.bindings.Binding
 import com.joecollins.bindings.Binding.Companion.fixedBinding
 import com.joecollins.graphics.components.lowerthird.LowerThird.Companion.createImage
 import com.joecollins.graphics.utils.BindableWrapper

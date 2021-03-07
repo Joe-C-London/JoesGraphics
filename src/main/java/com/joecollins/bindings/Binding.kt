@@ -5,8 +5,6 @@ import org.apache.commons.lang3.mutable.MutableObject
 
 interface Binding<out T> {
 
-    val value: T
-
     @Deprecated("Replacing with Kotlin version")
     @JvmDefault fun bindLegacy(onUpdate: java.util.function.Consumer<in T>) = bind { onUpdate.accept(it) }
 
@@ -17,7 +15,6 @@ interface Binding<out T> {
     @JvmDefault fun <R> map(func: (T) -> R): Binding<R> {
         val me = this
         return object : Binding<R> {
-            override val value get() = func(me.value)
             override fun bind(onUpdate: (R) -> Unit) = me.bind { onUpdate(func(it)) }
             override fun unbind() = me.unbind()
         }
@@ -30,7 +27,6 @@ interface Binding<out T> {
             private val val2: Mutable<U> = MutableObject()
             private var bound = false
 
-            override val value: R get() = mergeFunc(me.value, other.value)
             override fun bind(onUpdate: (R) -> Unit) {
                 me.bind {
                     val1.value = it
@@ -56,15 +52,13 @@ interface Binding<out T> {
     companion object {
 
         @JvmStatic fun <T> fixedBinding(t: T) = object : Binding<T> {
-            override val value: T = t
-            override fun bind(onUpdate: (T) -> Unit) = onUpdate(value)
+            override fun bind(onUpdate: (T) -> Unit) = onUpdate(t)
             override fun unbind() {}
         }
 
         @JvmStatic fun <T : Bindable<T, E>, U, E : Enum<E>> propertyBinding(obj: T, func: (T) -> U, vararg properties: E): Binding<U> {
             return object : Binding<U> {
                 private var consumer: ((T) -> Unit)? = null
-                override val value: U get() = func(obj)
                 override fun bind(onUpdate: (U) -> Unit) {
                     check(consumer == null) { "Binding is already used" }
                     val consumer: (T) -> Unit = { t -> onUpdate(func(t)) }
@@ -85,7 +79,6 @@ interface Binding<out T> {
         @JvmStatic fun <T> sizeBinding(list: BindableList<T>): Binding<Int> {
             return object : Binding<Int> {
                 private var consumer: ((Int) -> Unit)? = null
-                override val value: Int get() = list.size
                 override fun bind(onUpdate: (Int) -> Unit) {
                     check(consumer == null) { "Binding is already used" }
                     val consumer: (Int) -> Unit = { t -> onUpdate(t) }
@@ -113,7 +106,6 @@ interface Binding<out T> {
             private var aggregate = identity
             private val values: MutableList<Mutable<T>> = ArrayList(bindings.size)
 
-            override val value: R get() = bindings.fold(identity) { agg, value -> onValueAdded(agg, value.value) }
             override fun bind(onUpdate: (R) -> Unit) {
                 check(!bound) { "Binding is already used" }
                 for (i in bindings.indices) {

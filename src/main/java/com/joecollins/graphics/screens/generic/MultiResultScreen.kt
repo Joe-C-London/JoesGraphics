@@ -206,12 +206,12 @@ class MultiResultScreen private constructor(builder: Builder<*>, textHeader: Bin
         private var swingFrame: SwingFrame? = null
         private var mapFrame: MapFrame? = null
         var displayBothRows = true
-        private val votes = WrappedBinding<Map<Candidate, Int>>(Binding.fixedBinding(emptyMap()))
-        private val pctReporting = WrappedBinding(Binding.fixedBinding(1.0))
-        private val winner = WrappedBinding<Candidate?>(Binding.fixedBinding(null))
-        private val runoff = WrappedBinding<Set<Candidate>?>(Binding.fixedBinding(emptySet()))
-        private val prevVotes = WrappedBinding<Map<Party, Int>>(Binding.fixedBinding(emptyMap()))
-        private val maxBars = WrappedBinding(Binding.fixedBinding(5))
+        private val votes = WrappedBinding<Map<Candidate, Int>>(emptyMap())
+        private val pctReporting = WrappedBinding(1.0)
+        private val winner = WrappedBinding<Candidate?>(null)
+        private val runoff = WrappedBinding<Set<Candidate>?>(emptySet())
+        private val prevVotes = WrappedBinding<Map<Party, Int>>(emptyMap())
+        private val maxBars = WrappedBinding(5)
 
         fun setVotesBinding(votes: Binding<Map<Candidate, Int>>) {
             this.votes.binding = votes
@@ -394,13 +394,12 @@ class MultiResultScreen private constructor(builder: Builder<*>, textHeader: Bin
         }
     }
 
-    private class WrappedBinding<T> constructor(binding: Binding<T>) : Bindable<WrappedBinding<T>, WrappedBinding.Property>() {
+    private class WrappedBinding<T> constructor(private var value: T) : Bindable<WrappedBinding<T>, WrappedBinding.Property>() {
         private enum class Property {
             PROP
         }
 
-        private var underBinding: Binding<T> = binding
-        private var value: T = binding.value
+        private var underBinding: Binding<T> = Binding.fixedBinding(value)
 
         var binding: Binding<T>
             get() = Binding.propertyBinding(this, { t -> t.value }, Property.PROP)

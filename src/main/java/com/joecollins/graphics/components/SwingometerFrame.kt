@@ -116,7 +116,7 @@ class SwingometerFrame : GraphicsFrame() {
     }
 
     internal val leftToWin: Number
-        get() = leftToWinBinding.value
+        get() = swingPanel.leftToWin
 
     fun setLeftToWinBinding(leftToWinBinding: Binding<Number>) {
         this.leftToWinBinding.unbind()
@@ -125,7 +125,7 @@ class SwingometerFrame : GraphicsFrame() {
     }
 
     internal val rightToWin: Number
-        get() = rightToWinBinding.value
+        get() = swingPanel.rightToWin
 
     fun setRightToWinBinding(rightToWinBinding: Binding<Number>) {
         this.rightToWinBinding.unbind()
@@ -240,15 +240,15 @@ class SwingometerFrame : GraphicsFrame() {
     }
 
     private inner class SwingPanel : JPanel() {
-        private var _leftColor = leftColorBinding.value
-        private var _rightColor = rightColorBinding.value
-        private var _value = valueBinding.value
-        private var _range = rangeBinding.value
-        private var _leftToWin = leftToWinBinding.value
-        private var _rightToWin = rightToWinBinding.value
+        private var _leftColor = Color.BLACK
+        private var _rightColor = Color.BLACK
+        private var _value: Number = 0
+        private var _range: Number = 1
+        private var _leftToWin: Number = Double.POSITIVE_INFINITY
+        private var _rightToWin: Number = Double.POSITIVE_INFINITY
         private val _ticks: MutableList<MutablePair<Number, String>> = ArrayList()
         private val _outerLabels: MutableList<MutableTriple<Number, String, Color>> = ArrayList()
-        private var _numBucketsPerSide = numBucketsPerSideBinding.value
+        private var _numBucketsPerSide = 1
         private val _dots: MutableList<Dot> = ArrayList()
 
         var leftColor: Color

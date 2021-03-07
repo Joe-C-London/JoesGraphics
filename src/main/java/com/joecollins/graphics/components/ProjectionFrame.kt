@@ -87,8 +87,8 @@ class ProjectionFrame : GraphicsFrame() {
     }
 
     private inner class ImagePanel : JPanel() {
-        private var _image: Image? = imageBinding.value
-        private var _alignment: Alignment = imageAlignmentBinding.value
+        private var _image: Image? = null
+        private var _alignment: Alignment = Alignment.BOTTOM
 
         var image: Image?
             get() { return _image }

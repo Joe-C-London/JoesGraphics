@@ -1,28 +1,19 @@
 package com.joecollins.bindings
 
 import java.lang.IllegalStateException
-import java.lang.IndexOutOfBoundsException
 
 interface IndexedBinding<out T> {
-
-    val size: Int
-
-    operator fun get(index: Int): T
 
     @Deprecated("Convert to Kotlin version")
     @JvmDefault fun bindLegacy(onUpdate: java.util.function.BiConsumer<Int, in T>) = bind { i, v -> onUpdate.accept(i, v) }
 
-    @JvmDefault fun bind(onUpdate: (Int, T) -> Unit) {
-        (0 until size).forEach { onUpdate(it, this[it]) }
-    }
+    fun bind(onUpdate: (Int, T) -> Unit)
 
-    @JvmDefault fun unbind() {}
+    fun unbind()
 
     @JvmDefault fun <U> map(func: (T) -> U): IndexedBinding<U> {
         val me = this
         return object : IndexedBinding<U> {
-            override val size get() = me.size
-            override fun get(index: Int) = func(me[index])
             override fun bind(onUpdate: (Int, U) -> Unit) = me.bind { idx, value -> onUpdate(idx, func(value)) }
             override fun unbind() = me.unbind()
         }
@@ -30,35 +21,32 @@ interface IndexedBinding<out T> {
 
     companion object {
         @JvmStatic fun <T> emptyBinding(): IndexedBinding<T> = object : IndexedBinding<T> {
-            override val size = 0
-            override fun get(index: Int): T {
-                throw IndexOutOfBoundsException(index)
-            }
+            override fun bind(onUpdate: (Int, T) -> Unit) {}
+            override fun unbind() {}
         }
 
         @JvmStatic fun <T> singletonBinding(item: T): IndexedBinding<T> = object : IndexedBinding<T> {
-            override val size = 1
-            override fun get(index: Int): T {
-                check(index == 0) { throw ArrayIndexOutOfBoundsException(index) }
-                return item
-            }
+            override fun bind(onUpdate: (Int, T) -> Unit) { onUpdate(0, item) }
+            override fun unbind() {}
         }
 
         @JvmStatic fun <T> listBinding(vararg list: T): IndexedBinding<T> = object : IndexedBinding<T> {
-            override val size get() = list.size
-            override fun get(index: Int): T = list[index]
+            override fun bind(onUpdate: (Int, T) -> Unit) {
+                list.indices.forEach { onUpdate(it, list[it]) }
+            }
+            override fun unbind() {}
         }
 
         @JvmStatic fun <T> listBinding(list: List<T>): IndexedBinding<T> = object : IndexedBinding<T> {
-            override val size get() = list.size
-            override fun get(index: Int): T = list[index]
+            override fun bind(onUpdate: (Int, T) -> Unit) {
+                list.indices.forEach { onUpdate(it, list[it]) }
+            }
+            override fun unbind() {}
         }
 
         @JvmStatic fun <T, U> listBinding(list: List<T>, func: (T) -> Binding<U>): IndexedBinding<U> {
             val bindings = list.map(func)
             return object : IndexedBinding<U> {
-                override val size get() = list.size
-                override fun get(index: Int): U = func(list[index]).value
                 override fun bind(onUpdate: (Int, U) -> Unit) {
                     list.indices.forEach { idx -> bindings[idx].bind { onUpdate(idx, it) } }
                 }
@@ -71,8 +59,6 @@ interface IndexedBinding<out T> {
         @JvmStatic fun <E : Enum<E>, T : Bindable<T, E>, U> propertyBinding(item: T, func: (T) -> List<U>, vararg properties: E) = object : IndexedBinding<U> {
             private var consumer: ((T) -> Unit)? = null
 
-            override val size get() = func(item).size
-            override fun get(index: Int) = func(item)[index]
             override fun bind(onUpdate: (Int, U) -> Unit) {
                 check(consumer == null) { "Binding is already used" }
                 val consumer: (T) -> Unit = {
@@ -97,8 +83,6 @@ interface IndexedBinding<out T> {
         @JvmStatic fun <T, U> propertyBinding(list: BindableList<T>, func: (T) -> U) = object : IndexedBinding<U> {
             private var consumer: ((Int, T) -> Unit)? = null
 
-            override val size get(): Int = list.size
-            override fun get(index: Int): U = func(list[index])
             override fun bind(onUpdate: (Int, U) -> Unit) {
                 check(consumer == null) { "Binding is already used" }
                 val consumer: (Int, T) -> Unit = { i, t -> onUpdate(i, func(t)) }
@@ -118,8 +102,6 @@ interface IndexedBinding<out T> {
         @JvmStatic fun <E : Enum<E>, T : Bindable<T, E>, U> propertyBinding(list: NestedBindableList<T, E>, func: (T) -> U, vararg properties: E) = object : IndexedBinding<U> {
             private var consumer: ((Int, T) -> Unit)? = null
 
-            override val size get(): Int = list.size
-            override fun get(index: Int): U = func(list[index])
             override fun bind(onUpdate: (Int, U) -> Unit) {
                 check(consumer == null) { throw IllegalStateException("Binding is already used") }
                 val consumer: (Int, T) -> Unit = { i, t -> onUpdate(i, func(t)) }
@@ -137,8 +119,10 @@ interface IndexedBinding<out T> {
         }
 
         @JvmStatic fun <T> functionBinding(startInclusive: Int, endExclusive: Int, func: (Int) -> T): IndexedBinding<T> = object : IndexedBinding<T> {
-            override val size = endExclusive - startInclusive
-            override fun get(index: Int) = func(index + startInclusive)
+            override fun bind(onUpdate: (Int, T) -> Unit) {
+                (startInclusive until endExclusive).forEach { onUpdate(it - startInclusive, func(it)) }
+            }
+            override fun unbind() {}
         }
     }
 }

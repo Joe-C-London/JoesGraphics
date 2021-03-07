@@ -133,7 +133,6 @@ object Aggregators {
             private var bindings: List<Binding<V>>? = null
             private var map: Map<K, V>? = null
 
-            override val value get() = entries.map { keyFunc(it) to bindingFunc(it).value }.toMap()
             override fun bind(onUpdate: (Map<K, V>) -> Unit) {
                 check(bindings == null) { "Binding is already used" }
                 map = HashMap()

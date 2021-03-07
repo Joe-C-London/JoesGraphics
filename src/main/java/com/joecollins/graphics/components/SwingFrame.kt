@@ -99,10 +99,10 @@ class SwingFrame : GraphicsFrame() {
     }
 
     private inner class SwingPanel : JPanel() {
-        private var _range: Number = rangeBinding.value
-        private var _value: Number = valueBinding.value
-        private var _leftColor: Color = leftColorBinding.value
-        private var _rightColor: Color = rightColorBinding.value
+        private var _range: Number = 1
+        private var _value: Number = 0
+        private var _leftColor: Color = Color.BLACK
+        private var _rightColor: Color = Color.BLACK
 
         var range: Number
         get() { return _range }

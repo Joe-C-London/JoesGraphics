@@ -38,7 +38,6 @@ class BindingReceiver<T>(binding: Binding<T>) {
             private var topBinding: Binding<T>? = null
             private var subBinding: Binding<U>? = null
 
-            override val value get() = func(me.value).value
             override fun bind(onUpdate: (U) -> Unit) {
                 topBinding = me.getBinding()
                 topBinding!!.bind {
