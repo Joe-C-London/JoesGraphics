@@ -11,8 +11,6 @@ import com.joecollins.bindings.IndexedBinding.Companion.propertyBinding
 import com.joecollins.bindings.IndexedBinding.Companion.singletonBinding
 import com.joecollins.bindings.NestedBindableList
 import com.joecollins.graphics.ImageGenerator.createHalfTickShape
-import com.joecollins.graphics.components.BarFrameTest.ElectionResult
-import com.joecollins.graphics.components.BarFrameTest.RidingResult
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import java.awt.Color
 import java.awt.Polygon

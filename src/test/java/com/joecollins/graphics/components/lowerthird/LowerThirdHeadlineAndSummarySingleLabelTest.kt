@@ -32,7 +32,7 @@ class LowerThirdHeadlineAndSummarySingleLabelTest {
     fun testSummaryPanel() {
         val lowerThird = LowerThirdHeadlineAndSummarySingleLabel()
         lowerThird.setNumSummaryEntriesBinding(fixedBinding(2))
-        lowerThird.setSummaryHeaderBinding(Binding.fixedBinding("170 SEATS FOR MAJORITY"))
+        lowerThird.setSummaryHeaderBinding(fixedBinding("170 SEATS FOR MAJORITY"))
         lowerThird.setSummaryEntriesBinding(
                 listBinding(SummaryWithoutLabels.Entry(Color.RED, "2"), SummaryWithoutLabels.Entry(Color.BLUE, "1")))
         Assert.assertEquals(2, lowerThird.numSummaryEntries.toLong())

@@ -98,7 +98,7 @@ class SwingFrameBuilderTest {
         // CON: 30.00 -> 25.00 (- 5.00)
         // NDP: 20.00 -> 10.00 (-10.00)
         val partyOrder = listOf(ndp, lib, con)
-        val swingFrame = prevCurr(prevBinding, currBinding, compareBy { it: Party -> partyOrder.indexOf(it) }).build()
+        val swingFrame = prevCurr(prevBinding, currBinding, compareBy { partyOrder.indexOf(it) }).build()
         Assert.assertEquals(Color.BLUE, swingFrame.getLeftColor())
         Assert.assertEquals(Color.RED, swingFrame.getRightColor())
         Assert.assertEquals(Color.RED, swingFrame.getBottomColor())
@@ -119,7 +119,7 @@ class SwingFrameBuilderTest {
         // NDP: 20.00 -> 10.00 (-10.00)
         val partyOrder: List<Party> = listOf()
         val swingFrame = prevCurr(
-                prevBinding, currBinding, compareBy { it: Party -> partyOrder.indexOf(it) })
+                prevBinding, currBinding, compareBy { partyOrder.indexOf(it) })
                 .build()
         Assert.assertEquals(
                 setOf(Color.BLUE, Color.RED),
@@ -142,7 +142,7 @@ class SwingFrameBuilderTest {
         // CON: 50.00 -> 25.00 (-25.00)
         // NDP: 20.00 -> 60.00 (+40.00)
         val partyOrder = listOf(ndp, lib, con)
-        val swingFrame = prevCurr(prevBinding, currBinding, compareBy { it: Party -> partyOrder.indexOf(it) }).build()
+        val swingFrame = prevCurr(prevBinding, currBinding, compareBy { partyOrder.indexOf(it) }).build()
         Assert.assertEquals(Color.BLUE, swingFrame.getLeftColor())
         Assert.assertEquals(Color.ORANGE, swingFrame.getRightColor())
         Assert.assertEquals(Color.ORANGE, swingFrame.getBottomColor())

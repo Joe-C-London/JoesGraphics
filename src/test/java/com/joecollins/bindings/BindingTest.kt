@@ -4,7 +4,6 @@ import com.joecollins.bindings.Binding.Companion.fixedBinding
 import com.joecollins.bindings.Binding.Companion.mapReduceBinding
 import com.joecollins.bindings.Binding.Companion.propertyBinding
 import com.joecollins.bindings.Binding.Companion.sizeBinding
-import com.joecollins.bindings.BindingTest.NestedBindable
 import org.apache.commons.lang3.mutable.Mutable
 import org.apache.commons.lang3.mutable.MutableObject
 import org.junit.Assert
@@ -144,7 +143,7 @@ class BindingTest {
         val nested = NestedBindable(bindable1)
         val nestedBinding = propertyBinding(nested, { it.value }, BindableValue.Property.VALUE)
         val receiver = BindingReceiver(nestedBinding)
-        val binding = receiver.getFlatBinding { propertyBinding(it, { it.value }, BindableValue.Property.VALUE) }
+        val binding = receiver.getFlatBinding { propertyBinding(it, { e -> e.value }, BindableValue.Property.VALUE) }
         binding.bind { boundValue.setValue(it) }
         Assert.assertEquals(7, boundValue.value.toInt().toLong())
         bindable1.setValue(42)

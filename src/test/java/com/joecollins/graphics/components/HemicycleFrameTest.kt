@@ -2,7 +2,6 @@ package com.joecollins.graphics.components
 
 import com.joecollins.bindings.BindableList
 import com.joecollins.bindings.Binding.Companion.fixedBinding
-import com.joecollins.bindings.Binding.Companion.propertyBinding
 import com.joecollins.bindings.Binding.Companion.sizeBinding
 import com.joecollins.bindings.IndexedBinding.Companion.listBinding
 import com.joecollins.bindings.IndexedBinding.Companion.propertyBinding

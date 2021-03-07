@@ -32,7 +32,7 @@ class LowerThirdHeadlineAndSummaryBothEndsTest {
     fun testSummaryPanel() {
         val lowerThird = LowerThirdHeadlineAndSummaryBothEnds()
         lowerThird.setSummaryHeaderBinding(fixedBinding("270 TO WIN"))
-        lowerThird.setTotalBinding(Binding.fixedBinding(538))
+        lowerThird.setTotalBinding(fixedBinding(538))
         Assert.assertEquals("270 TO WIN", lowerThird.summaryHeader)
         Assert.assertEquals(538, lowerThird.total.toLong())
     }

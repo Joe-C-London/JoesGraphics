@@ -4,8 +4,6 @@ import com.joecollins.bindings.Bindable
 import com.joecollins.bindings.BindableList
 import com.joecollins.bindings.Binding
 import com.joecollins.bindings.Binding.Companion.fixedBinding
-import com.joecollins.bindings.Binding.Companion.propertyBinding
-import com.joecollins.bindings.IndexedBinding.Companion.propertyBinding
 import com.joecollins.graphics.components.HemicycleFrameBuilder.Companion.of
 import com.joecollins.graphics.components.HemicycleFrameBuilder.Companion.ofElectedLeading
 import com.joecollins.graphics.components.HemicycleFrameBuilder.Tiebreaker

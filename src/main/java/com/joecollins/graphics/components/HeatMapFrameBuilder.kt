@@ -146,9 +146,9 @@ class HeatMapFrameBuilder {
                     }
                     .toList()
             val seatList = BindableList<ImmutablePair<Color, Int>>()
-            val seats = createSeatBarBinding<T>(resultBindings, seatList, { party == it }, party.color)
+            val seats = createSeatBarBinding(resultBindings, seatList, { party == it }, party.color)
             val changeList = BindableList<ImmutablePair<Color, Int>>()
-            val change = createChangeBarBinding<T>(
+            val change = createChangeBarBinding(
                     resultWithPrevBindings, changeList, { party == it }, party.color, showChange)
             val changeLabelFunc = { p: ImmutablePair<Int, Int> -> if (showChange(p.left, p.right)) changeLabel(p.left, p.right) else "" }
             val allPrevs = entries
@@ -173,18 +173,18 @@ class HeatMapFrameBuilder {
                             seats.getBinding { seatLabel(it.left, it.right) })
                     .withChangeBars(
                             changeList, { it.getLeft() }, { it.getRight() },
-                            Binding.fixedBinding(calcPrevForParty<T>(allPrevs, party)),
+                            Binding.fixedBinding(calcPrevForParty(allPrevs, party)),
                             change.getBinding(changeLabelFunc))
                     .withHeader(header)
                     .withBorder(Binding.fixedBinding(party.color))
                     .build()
         }
 
-        private fun <T> calcPrevForParty(prev: List<Pair<Party, Int>>, party: Party): Int {
+        private fun calcPrevForParty(prev: List<Pair<Party, Int>>, party: Party): Int {
             return prev.filter { party == it.left }.map { it.right }.sum()
         }
 
-        private fun <T> createSeatBarBinding(
+        private fun createSeatBarBinding(
             results: List<BindingReceiver<Pair<PartyResult?, Int>>>,
             list: BindableList<ImmutablePair<Color, Int>>,
             partyFilter: (Party?) -> Boolean,
@@ -218,7 +218,7 @@ class HeatMapFrameBuilder {
             return seats
         }
 
-        private fun <T> createChangeBarBinding(
+        private fun createChangeBarBinding(
             resultWithPrev: List<BindingReceiver<Triple<PartyResult?, Party, Int>>>,
             list: BindableList<ImmutablePair<Color, Int>>,
             partyFilter: (Party?) -> Boolean,

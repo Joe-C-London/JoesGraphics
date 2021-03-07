@@ -348,7 +348,7 @@ class BasicResultPanel private constructor(
             }
         }
 
-        protected fun doubleLineBarLimit(): Int {
+        private fun doubleLineBarLimit(): Int {
             return 10
         }
 
@@ -519,7 +519,7 @@ class BasicResultPanel private constructor(
             }
         }
 
-        protected fun doubleLineBarLimit(): Int {
+        private fun doubleLineBarLimit(): Int {
             return 10
         }
 
@@ -668,7 +668,7 @@ class BasicResultPanel private constructor(
             }
         }
 
-        protected fun doubleLineBarLimit(): Int {
+        private fun doubleLineBarLimit(): Int {
             return 10
         }
 
@@ -1038,7 +1038,7 @@ class BasicResultPanel private constructor(
             }
         }
 
-        protected fun doubleLineBarLimit(): Int {
+        private fun doubleLineBarLimit(): Int {
             return if (currPreferences == null) 10 else 6
         }
 
@@ -1100,7 +1100,7 @@ class BasicResultPanel private constructor(
                     Result.Property.RUNOFF)
             val notes = this.notes
             val pctReporting = this.pctReporting
-            var builder = BarFrameBuilder.basic(bars)
+            val builder = BarFrameBuilder.basic(bars)
                     .withHeader(header.getBinding())
                     .withSubhead(subhead.getBinding())
                     .withNotes(notes?.getBinding() ?: Binding.fixedBinding(null))
@@ -1357,7 +1357,7 @@ class BasicResultPanel private constructor(
             }
         }
 
-        protected fun currTotalByParty(curr: Map<KT, Int?>): Map<Party, Int> {
+        private fun currTotalByParty(curr: Map<KT, Int?>): Map<Party, Int> {
             if (curr.values.any { it == null }) {
                 return emptyMap()
             }
@@ -1543,7 +1543,7 @@ class BasicResultPanel private constructor(
             }
         }
 
-        protected fun currTotalByParty(curr: Map<KT, Range<Double>>): MutableMap<Party, Range<Double>> {
+        private fun currTotalByParty(curr: Map<KT, Range<Double>>): MutableMap<Party, Range<Double>> {
             val ret: MutableMap<Party, Range<Double>> = LinkedHashMap()
             curr.forEach { (k: KT, v: Range<Double>) ->
                 ret.merge(keyTemplate.toParty(k), v) { a, b ->

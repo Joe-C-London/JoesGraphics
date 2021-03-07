@@ -87,7 +87,7 @@ class MultiResultScreenTest {
                 { fixedBinding(it.name.toUpperCase()) }
         )
                 .withIncumbentMarker("(MLA)")
-                .withWinner { fixedBinding(if (it.leaderHasWon) it.votes.entries.maxByOrNull { it.value }!!.key else null) }
+                .withWinner { fixedBinding(if (it.leaderHasWon) it.votes.entries.maxByOrNull { e -> e.value }!!.key else null) }
                 .withPrev(
                         { fixedBinding(it.prevVotes) },
                         { fixedBinding("SWING SINCE 2015") },
@@ -95,7 +95,7 @@ class MultiResultScreenTest {
                 .withMap(
                         { shapesByDistrict },
                         { it.districtNum },
-                        { fixedBinding(PartyResult(it.votes.entries.maxByOrNull { it.value }?.key?.party, it.leaderHasWon)) },
+                        { fixedBinding(PartyResult(it.votes.entries.maxByOrNull { e -> e.value }?.key?.party, it.leaderHasWon)) },
                         { if (it.districtNum < 10) listOf(1, 2, 3, 4, 5, 6, 7, 8) else listOf(15, 16, 17, 18, 19, 20) },
                         { fixedBinding(if (it.districtNum < 10) "CARDIGAN" else "MALPEQUE") }
                 )
@@ -801,7 +801,7 @@ class MultiResultScreenTest {
         private var status: String = "100% REPORTING",
         private var pctReporting: Double = 1.0
     ) : Bindable<District, District.Property>() {
-        internal enum class Property {
+        enum class Property {
             PROP
         }
 

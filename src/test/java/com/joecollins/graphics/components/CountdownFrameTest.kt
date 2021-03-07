@@ -46,7 +46,7 @@ class CountdownFrameTest {
         frame.clock = Clock.fixed(Instant.parse("2020-07-04T12:34:56Z"), ZoneId.of("UTC"))
         frame.setTimeBinding(
                 fixedBinding(ZonedDateTime.of(2020, 7, 5, 19, 0, 0, 0, ZoneId.of("US/Eastern"))))
-        frame.setLabelFunction { it: Duration -> CountdownFrame.formatDDHHMMSS(it) }
+        frame.setLabelFunction { CountdownFrame.formatDDHHMMSS(it) }
         Assert.assertEquals("1:10:25:04", frame.getTimeRemainingString())
         frame.clock = Clock.fixed(Instant.parse("2020-07-04T12:34:57Z"), ZoneId.of("UTC"))
         Thread.sleep(200)

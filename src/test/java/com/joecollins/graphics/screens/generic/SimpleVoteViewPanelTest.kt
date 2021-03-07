@@ -866,7 +866,7 @@ class SimpleVoteViewPanelTest {
         curr[asselineau] = 332547
         curr[arthaud] = 232384
         curr[cheminade] = 65586
-        val currentVotes = BindableWrapper<Map<Candidate, Int>>(topAndOthers(curr, 6, Candidate.OTHERS))
+        val currentVotes = BindableWrapper(topAndOthers(curr, 6, Candidate.OTHERS))
         val header = BindableWrapper("ELECTION 2017: FRANCE DECIDES")
         val voteHeader = BindableWrapper("FIRST ROUND RESULT")
         val voteSubhead = BindableWrapper("")

@@ -7,7 +7,6 @@ import com.joecollins.bindings.IndexedBinding.Companion.functionBinding
 import com.joecollins.bindings.IndexedBinding.Companion.listBinding
 import com.joecollins.bindings.IndexedBinding.Companion.propertyBinding
 import com.joecollins.bindings.IndexedBinding.Companion.singletonBinding
-import com.joecollins.bindings.IndexedBindingTest.BindableToList
 import java.util.HashMap
 import org.apache.commons.lang3.mutable.MutableInt
 import org.junit.Assert
