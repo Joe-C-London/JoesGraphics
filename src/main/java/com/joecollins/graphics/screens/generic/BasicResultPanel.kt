@@ -145,7 +145,7 @@ class BasicResultPanel private constructor(
         protected var showMajority: BindingReceiver<Boolean>? = null
         protected var majorityFunction: ((Int) -> String)? = null
         protected var winner: BindingReceiver<KT?>? = null
-        protected var notes: BindingReceiver<String>? = null
+        protected var notes: BindingReceiver<String?>? = null
         protected var diff: BindingReceiver<Map<Party, CurrDiff<CT>>>? = null
         protected var changeHeader: BindingReceiver<String?>? = null
         protected var changeSubhead: BindingReceiver<String?>? = null
@@ -177,7 +177,7 @@ class BasicResultPanel private constructor(
 
         @JvmOverloads
         fun withDiff(
-            diff: Binding<MutableMap<Party, out CT>>,
+            diff: Binding<Map<Party, out CT>>,
             changeHeader: Binding<String?>,
             changeSubhead: Binding<String?> = Binding.fixedBinding(null)
         ): SeatScreenBuilder<KT, CT, PT> {
@@ -200,7 +200,7 @@ class BasicResultPanel private constructor(
 
         @JvmOverloads
         fun withPrev(
-            prev: Binding<MutableMap<Party, PT>>,
+            prev: Binding<Map<Party, PT>>,
             changeHeader: Binding<String?>,
             changeSubhead: Binding<String?> = Binding.fixedBinding(null)
         ): SeatScreenBuilder<KT, CT, PT> {
@@ -255,7 +255,7 @@ class BasicResultPanel private constructor(
             return this
         }
 
-        fun withNotes(notes: Binding<String>): SeatScreenBuilder<KT, CT, PT> {
+        fun withNotes(notes: Binding<String?>): SeatScreenBuilder<KT, CT, PT> {
             this.notes = BindingReceiver(notes)
             return this
         }
@@ -816,7 +816,7 @@ class BasicResultPanel private constructor(
         protected var winner: BindingReceiver<KT?>? = null
         protected var runoff: BindingReceiver<Set<KT>?>? = null
         protected var pctReporting: BindingReceiver<Double>? = null
-        protected var notes: BindingReceiver<String>? = null
+        protected var notes: BindingReceiver<String?>? = null
         protected var limit = Int.MAX_VALUE
         protected var mandatoryParties: Set<Party> = emptySet()
         protected var prev: BindingReceiver<Map<Party, PT>>? = null
@@ -957,7 +957,7 @@ class BasicResultPanel private constructor(
             return this
         }
 
-        fun withNotes(notes: Binding<String>): VoteScreenBuilder<KT, CT, CPT, PT> {
+        fun withNotes(notes: Binding<String?>): VoteScreenBuilder<KT, CT, CPT, PT> {
             this.notes = BindingReceiver(notes)
             return this
         }
