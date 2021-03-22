@@ -25,9 +25,6 @@ import javax.swing.JPanel
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
-import org.apache.commons.lang3.tuple.ImmutablePair
-import org.apache.commons.lang3.tuple.MutablePair
-import org.apache.commons.lang3.tuple.Pair
 
 class BarFrame : GraphicsFrame() {
     private val centralPanel: JPanel
@@ -141,10 +138,10 @@ class BarFrame : GraphicsFrame() {
     ) {
         val oldSeries = seriesBindings[seriesName]
         if (oldSeries != null) {
-            oldSeries.left.unbind()
-            oldSeries.right.unbind()
+            oldSeries.first.unbind()
+            oldSeries.second.unbind()
         }
-        seriesBindings[seriesName] = ImmutablePair(colorBinding, valueBinding)
+        seriesBindings[seriesName] = Pair(colorBinding, valueBinding)
         val seriesNum = ArrayList(seriesBindings.keys).indexOf(seriesName)
         colorBinding.bind { idx, color -> bars[idx].setColor(seriesNum, color) }
         valueBinding.bind { idx, color ->
@@ -272,7 +269,7 @@ class BarFrame : GraphicsFrame() {
     private inner class Bar : JPanel() {
         private var _leftText = ""
         private var _rightText = ""
-        private val _series: MutableList<MutablePair<Color, Number>> = ArrayList()
+        private val _series: MutableList<Pair<Color, Number>> = ArrayList()
         private var _leftIcon: Shape? = null
 
         private fun resetPreferredSize() {
@@ -307,28 +304,28 @@ class BarFrame : GraphicsFrame() {
 
         fun setColor(idx: Int, color: Color) {
             while (_series.size <= idx) {
-                _series.add(MutablePair(Color.BLACK, 0))
+                _series.add(Pair(Color.BLACK, 0))
             }
-            _series[idx].setLeft(color)
+            _series[idx] = _series[idx].copy(first = color)
             repaint()
         }
 
         fun setValue(idx: Int, value: Number) {
             while (_series.size <= idx) {
-                _series.add(MutablePair(Color.BLACK, 0))
+                _series.add(Pair(Color.BLACK, 0))
             }
-            _series[idx].setRight(value)
+            _series[idx] = _series[idx].copy(second = value)
             repaint()
         }
 
         val totalPositive: Number
             get() = _series
-                .map { it.getRight().toDouble() }
+                .map { it.second.toDouble() }
                 .filter { it > 0 }
                 .sum()
         val totalNegative: Number
             get() = _series
-                .map { it.getRight().toDouble() }
+                .map { it.second.toDouble() }
                 .filter { it < 0 }
                 .sum()
         val numLines: Int
@@ -347,15 +344,15 @@ class BarFrame : GraphicsFrame() {
             drawLines(g, 0, height)
             val font = StandardFont.readBoldFont(barHeight * 3 / 4 / maxLines)
             g.setFont(font)
-            val mainColor = if (_series.isEmpty()) Color.BLACK else _series[0].left
+            val mainColor = if (_series.isEmpty()) Color.BLACK else _series[0].first
             g.setColor(mainColor)
             drawText(g, font)
             val zero = getPixelOfValue(0.0).toInt()
             var posLeft = zero
             var negRight = zero
             for (seriesItem in _series) {
-                g.setColor(seriesItem.left)
-                val width = getPixelOfValue(seriesItem.right).toInt() - zero
+                g.setColor(seriesItem.first)
+                val width = getPixelOfValue(seriesItem.second).toInt() - zero
                 if (width > 0) {
                     g.fillRect(posLeft, BAR_MARGIN, width, barHeight)
                     posLeft += width
@@ -380,7 +377,7 @@ class BarFrame : GraphicsFrame() {
 
         private fun drawText(g: Graphics, font: Font) {
             val sumsPosNeg = _series
-                .map { it.getRight().toDouble() }
+                .map { it.second.toDouble() }
                 .groupBy { it > 0 }
                 .mapValues { e -> e.value.map { abs(it) }.sum() }
             val isNetPositive = (sumsPosNeg[true] ?: 0).toDouble() >= (sumsPosNeg[false] ?: 0).toDouble()

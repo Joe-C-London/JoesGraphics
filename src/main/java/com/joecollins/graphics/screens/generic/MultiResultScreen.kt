@@ -33,8 +33,6 @@ import java.util.LinkedHashMap
 import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.border.EmptyBorder
-import org.apache.commons.lang3.tuple.ImmutablePair
-import org.apache.commons.lang3.tuple.Pair
 
 class MultiResultScreen private constructor(builder: Builder<*>, textHeader: Binding<String?>, hasMap: Boolean) : JPanel() {
     private val panels: MutableList<ResultPanel> = ArrayList()
@@ -121,17 +119,17 @@ class MultiResultScreen private constructor(builder: Builder<*>, textHeader: Bin
                         .map { e: Map.Entry<K, Shape> ->
                             when {
                                 e.key == selected -> {
-                                    ImmutablePair.of(e.value, leader.map(PartyResult::color))
+                                    Pair(e.value, leader.map(PartyResult::color))
                                 }
                                 focus == null || focus.isEmpty() || focus.contains(e.key) -> {
-                                    ImmutablePair.of(
+                                    Pair(
                                             e.value, Binding.fixedBinding(Color.LIGHT_GRAY))
                                 }
                                 additionalHighlight != null && additionalHighlight.contains(e.key) -> {
-                                    ImmutablePair.of(
+                                    Pair(
                                             e.value, Binding.fixedBinding(Color.LIGHT_GRAY))
                                 }
-                                else -> ImmutablePair.of(
+                                else -> Pair(
                                         e.value, Binding.fixedBinding(Color(220, 220, 220)))
                             }
                         }
@@ -249,8 +247,8 @@ class MultiResultScreen private constructor(builder: Builder<*>, textHeader: Bin
             mapFrame?.setNumShapesBinding(Binding.fixedBinding(shapes.size))
             mapFrame?.setShapeBinding(
                     IndexedBinding.listBinding(
-                            shapes.map { it.key }))
-            mapFrame?.setColorBinding(IndexedBinding.listBinding(shapes) { it.value })
+                            shapes.map { it.first }))
+            mapFrame?.setColorBinding(IndexedBinding.listBinding(shapes) { it.second })
         }
 
         fun setMapFocusBinding(shapes: List<Shape>) {

@@ -23,7 +23,6 @@ import java.util.HashMap
 import java.util.IdentityHashMap
 import java.util.LinkedHashMap
 import kotlin.Throws
-import org.apache.commons.lang3.Range
 import org.junit.Test
 
 class SimpleVoteViewPanelTest {
@@ -888,11 +887,11 @@ class SimpleVoteViewPanelTest {
         val pc = Party("Progressive Conservative", "PC", Color.BLUE)
         val lib = Party("Liberal", "LIB", Color.RED)
         val grn = Party("Green", "GRN", Color.GREEN.darker())
-        val curr = LinkedHashMap<Party, Range<Double>>()
-        curr[ndp] = Range.between(0.030, 0.046)
-        curr[pc] = Range.between(0.290, 0.353)
-        curr[lib] = Range.between(0.257, 0.292)
-        curr[grn] = Range.between(0.343, 0.400)
+        val curr = LinkedHashMap<Party, ClosedRange<Double>>()
+        curr[ndp] = (0.030).rangeTo(0.046)
+        curr[pc] = (0.290).rangeTo(0.353)
+        curr[lib] = (0.257).rangeTo(0.292)
+        curr[grn] = (0.343).rangeTo(0.400)
         val prev = LinkedHashMap<Party, Int>()
         prev[ndp] = 8997
         prev[pc] = 30663

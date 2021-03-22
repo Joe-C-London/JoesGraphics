@@ -11,7 +11,6 @@ import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.max
 import kotlin.math.roundToInt
-import org.apache.commons.lang3.tuple.Pair
 
 class SwingometerFrameBuilder {
     private class Properties : Bindable<Properties, Properties.Property>() {
@@ -230,8 +229,8 @@ class SwingometerFrameBuilder {
             val colorsRec: BindingReceiver<Pair<Color, Color>> = BindingReceiver(colors)
             val builder = SwingometerFrameBuilder()
             value.bind { builder.properties.value = it }
-            builder.frame.setLeftColorBinding(colorsRec.getBinding { it.left })
-            builder.frame.setRightColorBinding(colorsRec.getBinding { it.right })
+            builder.frame.setLeftColorBinding(colorsRec.getBinding { it.first })
+            builder.frame.setRightColorBinding(colorsRec.getBinding { it.second })
             builder.frame.setValueBinding(
                     Binding.propertyBinding(
                             builder.properties, { props: Properties -> props.value }, Properties.Property.VALUE))

@@ -7,8 +7,6 @@ import com.joecollins.graphics.components.ListingFrameBuilder.Companion.ofFixedL
 import com.joecollins.graphics.utils.BindableWrapper
 import java.awt.Color
 import java.util.ArrayList
-import org.apache.commons.lang3.tuple.ImmutableTriple
-import org.apache.commons.lang3.tuple.Triple
 import org.junit.Assert
 import org.junit.Test
 
@@ -16,9 +14,9 @@ class ListingFrameBuilderTest {
     @Test
     fun testBasicListingFrame() {
         val list = BindableList<Triple<String, Color, String>>()
-        list.add(ImmutableTriple.of("JUSTIN TRUDEAU", Color.RED, "LIBERAL"))
-        list.add(ImmutableTriple.of("ANDREW SCHEER", Color.BLUE, "CONSERVATIVE"))
-        val frame = of(list, { it.left }, { it.right }) { it.middle }
+        list.add(Triple("JUSTIN TRUDEAU", Color.RED, "LIBERAL"))
+        list.add(Triple("ANDREW SCHEER", Color.BLUE, "CONSERVATIVE"))
+        val frame = of(list, { it.first }, { it.third }) { it.second }
                 .withHeader(fixedBinding("HEADER"))
                 .withSubhead(fixedBinding("SUBHEAD"))
                 .build()
@@ -31,21 +29,21 @@ class ListingFrameBuilderTest {
         Assert.assertEquals("JUSTIN TRUDEAU", frame.getLeftText(0))
         Assert.assertEquals("LIBERAL", frame.getRightText(0))
         Assert.assertEquals(1, frame.getSeries(0).size.toLong())
-        Assert.assertEquals(Color.RED, frame.getSeries(0)[0].left)
-        Assert.assertEquals(1.0, frame.getSeries(0)[0].right.toDouble(), 1e-6)
+        Assert.assertEquals(Color.RED, frame.getSeries(0)[0].first)
+        Assert.assertEquals(1.0, frame.getSeries(0)[0].second.toDouble(), 1e-6)
         Assert.assertEquals("ANDREW SCHEER", frame.getLeftText(1))
         Assert.assertEquals("CONSERVATIVE", frame.getRightText(1))
         Assert.assertEquals(1, frame.getSeries(1).size.toLong())
-        Assert.assertEquals(Color.BLUE, frame.getSeries(1)[0].left)
-        Assert.assertEquals(1.0, frame.getSeries(1)[0].right.toDouble(), 1e-6)
+        Assert.assertEquals(Color.BLUE, frame.getSeries(1)[0].first)
+        Assert.assertEquals(1.0, frame.getSeries(1)[0].second.toDouble(), 1e-6)
     }
 
     @Test
     fun testBasicListingFrameWithListBinding() {
         val list: MutableList<Triple<String, Color, String>> = ArrayList()
-        list.add(ImmutableTriple.of("JUSTIN TRUDEAU", Color.RED, "LIBERAL"))
-        list.add(ImmutableTriple.of("ANDREW SCHEER", Color.BLUE, "CONSERVATIVE"))
-        val frame: BarFrame = of(fixedBinding(list), { it.left }, { it.right }) { it.middle }
+        list.add(Triple("JUSTIN TRUDEAU", Color.RED, "LIBERAL"))
+        list.add(Triple("ANDREW SCHEER", Color.BLUE, "CONSERVATIVE"))
+        val frame: BarFrame = of(fixedBinding(list), { it.first }, { it.third }) { it.second }
                 .withHeader(fixedBinding("HEADER"))
                 .withSubhead(fixedBinding("SUBHEAD"))
                 .build()
@@ -58,27 +56,27 @@ class ListingFrameBuilderTest {
         Assert.assertEquals("JUSTIN TRUDEAU", frame.getLeftText(0))
         Assert.assertEquals("LIBERAL", frame.getRightText(0))
         Assert.assertEquals(1, frame.getSeries(0).size.toLong())
-        Assert.assertEquals(Color.RED, frame.getSeries(0)[0].left)
-        Assert.assertEquals(1.0, frame.getSeries(0)[0].right.toDouble(), 1e-6)
+        Assert.assertEquals(Color.RED, frame.getSeries(0)[0].first)
+        Assert.assertEquals(1.0, frame.getSeries(0)[0].second.toDouble(), 1e-6)
         Assert.assertEquals("ANDREW SCHEER", frame.getLeftText(1))
         Assert.assertEquals("CONSERVATIVE", frame.getRightText(1))
         Assert.assertEquals(1, frame.getSeries(1).size.toLong())
-        Assert.assertEquals(Color.BLUE, frame.getSeries(1)[0].left)
-        Assert.assertEquals(1.0, frame.getSeries(1)[0].right.toDouble(), 1e-6)
+        Assert.assertEquals(Color.BLUE, frame.getSeries(1)[0].first)
+        Assert.assertEquals(1.0, frame.getSeries(1)[0].second.toDouble(), 1e-6)
     }
 
     @Test
     fun testBasicFixedListFrame() {
         val list: MutableList<Triple<BindableWrapper<String>, BindableWrapper<Color>, BindableWrapper<String>>> = ArrayList()
-        list.add(ImmutableTriple.of(
+        list.add(Triple(
                         BindableWrapper("JUSTIN TRUDEAU"),
                         BindableWrapper(Color.RED),
                         BindableWrapper("LIBERAL")))
-        list.add(ImmutableTriple.of(
+        list.add(Triple(
                         BindableWrapper("ANDREW SCHEER"),
                         BindableWrapper(Color.BLUE),
                         BindableWrapper("CONSERVATIVE")))
-        val frame = ofFixedList(list, { it.left.binding }, { it.right.binding }) { it.middle.binding }
+        val frame = ofFixedList(list, { it.first.binding }, { it.third.binding }) { it.second.binding }
                 .withHeader(fixedBinding("HEADER"))
                 .withSubhead(fixedBinding("SUBHEAD"))
                 .build()
@@ -91,12 +89,12 @@ class ListingFrameBuilderTest {
         Assert.assertEquals("JUSTIN TRUDEAU", frame.getLeftText(0))
         Assert.assertEquals("LIBERAL", frame.getRightText(0))
         Assert.assertEquals(1, frame.getSeries(0).size.toLong())
-        Assert.assertEquals(Color.RED, frame.getSeries(0)[0].left)
-        Assert.assertEquals(1.0, frame.getSeries(0)[0].right.toDouble(), 1e-6)
+        Assert.assertEquals(Color.RED, frame.getSeries(0)[0].first)
+        Assert.assertEquals(1.0, frame.getSeries(0)[0].second.toDouble(), 1e-6)
         Assert.assertEquals("ANDREW SCHEER", frame.getLeftText(1))
         Assert.assertEquals("CONSERVATIVE", frame.getRightText(1))
         Assert.assertEquals(1, frame.getSeries(1).size.toLong())
-        Assert.assertEquals(Color.BLUE, frame.getSeries(1)[0].left)
-        Assert.assertEquals(1.0, frame.getSeries(1)[0].right.toDouble(), 1e-6)
+        Assert.assertEquals(Color.BLUE, frame.getSeries(1)[0].first)
+        Assert.assertEquals(1.0, frame.getSeries(1)[0].second.toDouble(), 1e-6)
     }
 }

@@ -6,7 +6,6 @@ import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import java.awt.Color
 import java.io.IOException
 import kotlin.Throws
-import org.apache.commons.lang3.tuple.ImmutablePair
 import org.junit.Assert
 import org.junit.Test
 
@@ -20,13 +19,13 @@ class RegionSummaryFrameTest {
                 listBinding(
                         listOf(
                                 listOf(
-                                        ImmutablePair.of(Color.BLUE, "306"),
-                                        ImmutablePair.of(Color.BLUE, "<< 74"),
-                                        ImmutablePair.of(Color.RED, "232")),
+                                        Pair(Color.BLUE, "306"),
+                                        Pair(Color.BLUE, "<< 74"),
+                                        Pair(Color.RED, "232")),
                                 listOf(
-                                        ImmutablePair.of(Color.BLUE, "51.1%"),
-                                        ImmutablePair.of(Color.BLUE, "<< 1.0%"),
-                                        ImmutablePair.of(Color.RED, "47.2%")))))
+                                        Pair(Color.BLUE, "51.1%"),
+                                        Pair(Color.BLUE, "<< 1.0%"),
+                                        Pair(Color.RED, "47.2%")))))
         Assert.assertEquals(2, frame.getNumSections().toLong())
         Assert.assertEquals(Color.BLACK, frame.getSummaryColor())
         Assert.assertEquals("ELECTORAL VOTES", frame.getSectionHeader(0))
@@ -59,13 +58,13 @@ class RegionSummaryFrameTest {
                 listBinding(
                         listOf(
                                 listOf(
-                                        ImmutablePair.of(Color.BLUE, "306"),
-                                        ImmutablePair.of(Color.BLUE, "<< 74"),
-                                        ImmutablePair.of(Color.RED, "232")),
+                                        Pair(Color.BLUE, "306"),
+                                        Pair(Color.BLUE, "<< 74"),
+                                        Pair(Color.RED, "232")),
                                 listOf(
-                                        ImmutablePair.of(Color.BLUE, "51.1%"),
-                                        ImmutablePair.of(Color.BLUE, "<< 1.0%"),
-                                        ImmutablePair.of(Color.RED, "47.2%")))))
+                                        Pair(Color.BLUE, "51.1%"),
+                                        Pair(Color.BLUE, "<< 1.0%"),
+                                        Pair(Color.RED, "47.2%")))))
         frame.setSize(500, 500)
         compareRendering("RegionSummaryFrame", "DifferentColors", frame)
     }

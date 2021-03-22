@@ -9,8 +9,6 @@ import com.joecollins.models.general.Party
 import java.awt.Color
 import java.util.ArrayList
 import java.util.HashMap
-import org.apache.commons.lang3.tuple.ImmutablePair
-import org.apache.commons.lang3.tuple.Pair
 import org.junit.Assert
 import org.junit.Test
 
@@ -159,14 +157,14 @@ class MultiSummaryFrameBuilderTest {
                     },
                     Property.RESULT)
 
-        val boxes: Binding<List<Pair<Color, String>>>
+        val boxes: Binding<List<kotlin.Pair<Color, String>>>
             get() = propertyBinding(
                     this,
                     { me ->
                         me.results.entries.asSequence()
                                 .sortedByDescending { it.value }
                                 .map {
-                                    ImmutablePair.of(
+                                    Pair(
                                             it.key.color,
                                             it.key.abbreviation + ": " + it.value)
                                 }

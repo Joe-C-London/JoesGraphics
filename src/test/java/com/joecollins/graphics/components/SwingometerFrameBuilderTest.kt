@@ -8,14 +8,13 @@ import com.joecollins.graphics.components.SwingometerFrameBuilder.Companion.basi
 import com.joecollins.graphics.utils.BindableWrapper
 import java.awt.Color
 import java.text.DecimalFormat
-import org.apache.commons.lang3.tuple.ImmutablePair
 import org.junit.Assert
 import org.junit.Test
 
 class SwingometerFrameBuilderTest {
     @Test
     fun testBasic() {
-        val colors = BindableWrapper(ImmutablePair.of(Color.BLUE, Color.RED))
+        val colors = BindableWrapper(Pair(Color.BLUE, Color.RED))
         val value = BindableWrapper(-1.0)
         val frame = basic(colors.binding, value.binding)
                 .withHeader(fixedBinding("SWINGOMETER"))
@@ -28,7 +27,7 @@ class SwingometerFrameBuilderTest {
 
     @Test
     fun testNaNIsZero() {
-        val colors = BindableWrapper(ImmutablePair.of(Color.BLUE, Color.RED))
+        val colors = BindableWrapper(Pair(Color.BLUE, Color.RED))
         val value = BindableWrapper(Double.NaN)
         val frame = basic(colors.binding, value.binding)
                 .withHeader(fixedBinding("SWINGOMETER"))
@@ -41,7 +40,7 @@ class SwingometerFrameBuilderTest {
 
     @Test
     fun testMax() {
-        val colors = BindableWrapper(ImmutablePair.of(Color.BLUE, Color.RED))
+        val colors = BindableWrapper(Pair(Color.BLUE, Color.RED))
         val value = BindableWrapper(-1.0)
         val range = BindableWrapper(10.0)
         val bucketSize = BindableWrapper(0.5)
@@ -72,7 +71,7 @@ class SwingometerFrameBuilderTest {
 
     @Test
     fun testTicks() {
-        val colors = BindableWrapper(ImmutablePair.of(Color.BLUE, Color.RED))
+        val colors = BindableWrapper(Pair(Color.BLUE, Color.RED))
         val value = BindableWrapper(-1.0)
         val range = BindableWrapper(10.0)
         val tickInterval = BindableWrapper(1.0)
@@ -91,7 +90,7 @@ class SwingometerFrameBuilderTest {
 
     @Test
     fun testNeededToWin() {
-        val colors = BindableWrapper(ImmutablePair.of(Color.BLUE, Color.RED))
+        val colors = BindableWrapper(Pair(Color.BLUE, Color.RED))
         val value = BindableWrapper(-1.0)
         val leftToWin = BindableWrapper(-2.0)
         val rightToWin = BindableWrapper(4.0)
@@ -118,7 +117,7 @@ class SwingometerFrameBuilderTest {
         labels.add(OuterLabel(Color.BLUE, "400", -4.495))
         labels.add(OuterLabel(Color.BLUE, "450", -9.455))
         labels.add(OuterLabel(Color.BLUE, "500", -13.86))
-        val colors = BindableWrapper(ImmutablePair.of(Color.BLUE, Color.RED))
+        val colors = BindableWrapper(Pair(Color.BLUE, Color.RED))
         val value = BindableWrapper(-1.0)
         val frame = basic(colors.binding, value.binding)
                 .withOuterLabels(labels, { it.position }, { it.label }, { it.color })
@@ -142,7 +141,7 @@ class SwingometerFrameBuilderTest {
         dots.add(Dot(-0.185, Color.BLUE))
         dots.add(Dot(-0.76, Color.BLUE))
         dots.add(Dot(-0.76, Color.BLUE))
-        val colors = BindableWrapper(ImmutablePair.of(Color.BLUE, Color.RED))
+        val colors = BindableWrapper(Pair(Color.BLUE, Color.RED))
         val value = BindableWrapper(-1.0)
         val frame = basic(colors.binding, value.binding)
                 .withDots(dots, { it.position }, { it.color })
@@ -165,7 +164,7 @@ class SwingometerFrameBuilderTest {
         dots.add(Dot(-0.185, Color.BLUE, "4"))
         dots.add(Dot(-0.76, Color.BLUE, "10"))
         dots.add(Dot(-0.76, Color.BLUE, "6"))
-        val colors = BindableWrapper(ImmutablePair.of(Color.BLUE, Color.RED))
+        val colors = BindableWrapper(Pair(Color.BLUE, Color.RED))
         val value = BindableWrapper(-1.0)
         val frame = basic(colors.binding, value.binding)
                 .withDots(dots, { it.position }, { it.color }, { it.label })
@@ -188,7 +187,7 @@ class SwingometerFrameBuilderTest {
         dots.add(Dot(-0.185, Color.BLUE, false))
         dots.add(Dot(-0.76, Color.BLUE, true))
         dots.add(Dot(-0.76, Color.BLUE, false))
-        val colors = BindableWrapper(ImmutablePair.of(Color.BLUE, Color.RED))
+        val colors = BindableWrapper(Pair(Color.BLUE, Color.RED))
         val value = BindableWrapper(-1.0)
         val frame = basic(colors.binding, value.binding)
                 .withDotsSolid(dots, { it.position }, { it.color }, { it.solid })
@@ -225,7 +224,7 @@ class SwingometerFrameBuilderTest {
         dots.add(Dot(-0.185, Color.BLUE))
         dots.add(Dot(-0.76, Color.BLUE))
         dots.add(Dot(-0.76, Color.BLUE))
-        val colors = BindableWrapper(ImmutablePair.of(Color.BLUE, Color.RED))
+        val colors = BindableWrapper(Pair(Color.BLUE, Color.RED))
         val value = BindableWrapper(-1.0)
         val frame = basic(colors.binding, value.binding)
                 .withFixedDots(dots, { it.position }, { it.getColor() })

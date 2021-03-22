@@ -16,9 +16,6 @@ import java.awt.GridLayout
 import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.border.EmptyBorder
-import org.apache.commons.lang3.tuple.ImmutablePair
-import org.apache.commons.lang3.tuple.ImmutableTriple
-import org.apache.commons.lang3.tuple.Pair
 
 class AllSeatsScreen private constructor(title: JLabel, frame: ResultListingFrame) : JPanel() {
     class Builder<T>(
@@ -88,17 +85,17 @@ class AllSeatsScreen private constructor(title: JLabel, frame: ResultListingFram
                                 .sortedDescending()
                                 .take(2)
                                 .toList()
-                        ImmutablePair.of(e, 1.0 * (topTwo[0] - topTwo[1]) / total)
+                        Pair(e, 1.0 * (topTwo[0] - topTwo[1]) / total)
                     }
-                    .sortedBy { e -> nameFunc(e.getLeft().key).toUpperCase() }
-                    .map { it.key }
+                    .sortedBy { e -> nameFunc(e.first.key).toUpperCase() }
+                    .map { it.first }
                     .map { e ->
-                        ImmutablePair.of(
+                        Pair(
                                 e.key,
                                 e.value.entries
                                         .maxByOrNull { it.value }
                                         !!.key
-                        ) as Pair<T, Party>
+                        )
                     }
                     .toList()
             onPropertyRefreshed(Property.PREV)
@@ -120,18 +117,18 @@ class AllSeatsScreen private constructor(title: JLabel, frame: ResultListingFram
                     { t: Input<T> ->
                         t.prevResults
                                 .asSequence()
-                                .filter { e: Pair<T, Party> -> t.seatFilter?.contains(e.key) ?: true }
+                                .filter { e: Pair<T, Party> -> t.seatFilter?.contains(e.first) ?: true }
                                 .map { e: Pair<T, Party> ->
-                                    ImmutableTriple.of(
-                                            e.left,
-                                            e.right,
-                                            t.currResults[e.left] ?: PartyResult.NO_RESULT)
+                                    Triple(
+                                            e.first,
+                                            e.second,
+                                            t.currResults[e.first] ?: PartyResult.NO_RESULT)
                                 }
-                                .map { e: ImmutableTriple<T, Party, PartyResult?> ->
-                                    val result = e.getRight() ?: PartyResult.NO_RESULT
+                                .map { e: Triple<T, Party, PartyResult?> ->
+                                    val result = e.third ?: PartyResult.NO_RESULT
                                     Entry(
-                                            e.getLeft(),
-                                            e.getMiddle().color,
+                                            e.first,
+                                            e.second.color,
                                             result.party?.color ?: Color.BLACK,
                                             result.isElected)
                                 }

@@ -96,7 +96,7 @@ class SwingometerFrame : GraphicsFrame() {
     }
 
     internal fun getTickPosition(index: Int): Number {
-        return swingPanel.ticks[index].left
+        return swingPanel.ticks[index].first
     }
 
     fun setTickPositionBinding(tickPositionBinding: IndexedBinding<Number>) {
@@ -106,7 +106,7 @@ class SwingometerFrame : GraphicsFrame() {
     }
 
     internal fun getTickText(index: Int): String {
-        return swingPanel.ticks[index].right
+        return swingPanel.ticks[index].second
     }
 
     fun setTickTextBinding(tickTextBinding: IndexedBinding<String>) {
@@ -143,7 +143,7 @@ class SwingometerFrame : GraphicsFrame() {
     }
 
     internal fun getOuterLabelPosition(index: Int): Number {
-        return swingPanel.outerLabels[index].left
+        return swingPanel.outerLabels[index].first
     }
 
     fun setOuterLabelPositionBinding(
@@ -155,7 +155,7 @@ class SwingometerFrame : GraphicsFrame() {
     }
 
     internal fun getOuterLabelText(index: Int): String {
-        return swingPanel.outerLabels[index].middle
+        return swingPanel.outerLabels[index].second
     }
 
     fun setOuterLabelTextBinding(outerLabelTextBinding: IndexedBinding<String>) {
@@ -165,7 +165,7 @@ class SwingometerFrame : GraphicsFrame() {
     }
 
     internal fun getOuterLabelColor(index: Int): Color {
-        return swingPanel.outerLabels[index].right
+        return swingPanel.outerLabels[index].third
     }
 
     fun setOuterLabelColorBinding(outerLabelColorBinding: IndexedBinding<Color>) {
@@ -246,8 +246,8 @@ class SwingometerFrame : GraphicsFrame() {
         private var _range: Number = 1
         private var _leftToWin: Number = Double.POSITIVE_INFINITY
         private var _rightToWin: Number = Double.POSITIVE_INFINITY
-        private val _ticks: MutableList<MutablePair<Number, String>> = ArrayList()
-        private val _outerLabels: MutableList<MutableTriple<Number, String, Color>> = ArrayList()
+        private val _ticks: MutableList<Pair<Number, String>> = ArrayList()
+        private val _outerLabels: MutableList<Triple<Number, String, Color>> = ArrayList()
         private var _numBucketsPerSide = 1
         private val _dots: MutableList<Dot> = ArrayList()
 
@@ -293,7 +293,7 @@ class SwingometerFrame : GraphicsFrame() {
             repaint()
         }
 
-        val ticks: List<org.apache.commons.lang3.tuple.Pair<Number, String>>
+        val ticks: List<Pair<Number, String>>
         get() { return _ticks }
 
         fun setNumTicks(numTicks: Int) {
@@ -301,22 +301,22 @@ class SwingometerFrame : GraphicsFrame() {
                 _ticks.removeAt(numTicks)
             }
             while (numTicks > _ticks.size) {
-                _ticks.add(MutablePair.of(0.0, ""))
+                _ticks.add(Pair(0.0, ""))
             }
             repaint()
         }
 
         fun setTickPosition(index: Int, position: Number) {
-            _ticks[index].left = position
+            _ticks[index] = _ticks[index].copy(first = position)
             repaint()
         }
 
         fun setTickText(index: Int, text: String) {
-            _ticks[index].right = text
+            _ticks[index] = _ticks[index].copy(second = text)
             repaint()
         }
 
-        val outerLabels: List<org.apache.commons.lang3.tuple.Triple<Number, String, Color>>
+        val outerLabels: List<Triple<Number, String, Color>>
         get() { return _outerLabels }
 
         fun setNumOuterLabels(numOuterLabels: Int) {
@@ -324,23 +324,23 @@ class SwingometerFrame : GraphicsFrame() {
                 _outerLabels.removeAt(numOuterLabels)
             }
             while (numOuterLabels > _outerLabels.size) {
-                _outerLabels.add(MutableTriple.of(0.0, "", Color.BLACK))
+                _outerLabels.add(Triple(0.0, "", Color.BLACK))
             }
             repaint()
         }
 
         fun setOuterLabelPosition(index: Int, position: Number) {
-            _outerLabels[index].left = position
+            _outerLabels[index] = _outerLabels[index].copy(first = position)
             repaint()
         }
 
         fun setOuterLabelText(index: Int, text: String) {
-            _outerLabels[index].middle = text
+            _outerLabels[index] = _outerLabels[index].copy(second = text)
             repaint()
         }
 
         fun setOuterLabelColor(index: Int, color: Color) {
-            _outerLabels[index].right = color
+            _outerLabels[index] = _outerLabels[index].copy(third = color)
             repaint()
         }
 
@@ -409,9 +409,9 @@ class SwingometerFrame : GraphicsFrame() {
             g.setFont(StandardFont.readBoldFont(12))
             val originalTransform = g.transform
             for (tick in ticks) {
-                g.transform = createRotationTransform(tick.left, originalTransform, arcY)
-                val textWidth = g.getFontMetrics().stringWidth(tick.right)
-                g.drawString(tick.right, (width - textWidth) / 2, arcY + outer / 2 - 3)
+                g.transform = createRotationTransform(tick.first, originalTransform, arcY)
+                val textWidth = g.getFontMetrics().stringWidth(tick.second)
+                g.drawString(tick.second, (width - textWidth) / 2, arcY + outer / 2 - 3)
                 g.transform = originalTransform
             }
             val bucketSize = range.toDouble() / numBucketsPerSide
@@ -504,14 +504,14 @@ class SwingometerFrame : GraphicsFrame() {
             g.fillRect(0, 0, width, arcY)
             g.setFont(StandardFont.readNormalFont(20))
             for (outerLabel in outerLabels) {
-                if (abs(outerLabel.left.toDouble()) <= range.toDouble()) {
-                    g.setColor(outerLabel.right)
+                if (abs(outerLabel.first.toDouble()) <= range.toDouble()) {
+                    g.setColor(outerLabel.third)
                     g.transform = createRotationTransform(
-                        outerLabel.left.toDouble(), originalTransform, arcY
+                        outerLabel.first.toDouble(), originalTransform, arcY
                     )
-                    val textWidth = g.getFontMetrics().stringWidth(outerLabel.middle)
+                    val textWidth = g.getFontMetrics().stringWidth(outerLabel.second)
                     g.drawString(
-                        outerLabel.middle, (width - textWidth) / 2, arcY + boundary / 2 - 6
+                        outerLabel.second, (width - textWidth) / 2, arcY + boundary / 2 - 6
                     )
                     g.transform = originalTransform
                 }

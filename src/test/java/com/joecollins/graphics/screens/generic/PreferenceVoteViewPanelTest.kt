@@ -11,7 +11,6 @@ import java.awt.Color
 import java.io.IOException
 import java.util.LinkedHashMap
 import kotlin.Throws
-import org.apache.commons.lang3.Range
 import org.junit.Test
 
 class PreferenceVoteViewPanelTest {
@@ -373,11 +372,11 @@ class PreferenceVoteViewPanelTest {
         val panel = partyRangeVotes(
                 fixedBinding(
                         mapOf(
-                                alp to Range.between(0.34, 0.36),
-                                coa to Range.between(0.42, 0.43),
-                                grn to Range.between(0.11, 0.12),
-                                onp to Range.between(0.02, 0.04),
-                                oth to Range.between(0.08, 0.08))),
+                                alp to (0.34).rangeTo(0.36),
+                                coa to (0.42).rangeTo(0.43),
+                                grn to (0.11).rangeTo(0.12),
+                                onp to (0.02).rangeTo(0.04),
+                                oth to (0.08).rangeTo(0.08))),
                 fixedBinding("POLLING RANGE"),
                 fixedBinding("NOVEMBER 2020"))
                 .withPrev(
@@ -392,8 +391,8 @@ class PreferenceVoteViewPanelTest {
                 .withPreferences(
                         fixedBinding(
                                 mapOf(
-                                        alp to Range.between(0.49, 0.495),
-                                        coa to Range.between(0.505, 0.51))),
+                                        alp to (0.49).rangeTo(0.495),
+                                        coa to (0.505).rangeTo(0.51))),
                         fixedBinding("TWO PARTY PREFERRED"),
                         fixedBinding(""))
                 .withPrevPreferences(fixedBinding(mapOf(alp to 6908580, coa to 7344813)))

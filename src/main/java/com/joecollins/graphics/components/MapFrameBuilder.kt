@@ -7,8 +7,6 @@ import java.awt.Color
 import java.awt.Shape
 import java.awt.geom.Rectangle2D
 import java.util.ArrayList
-import org.apache.commons.lang3.tuple.ImmutablePair
-import org.apache.commons.lang3.tuple.Pair
 
 class MapFrameBuilder {
     private val mapFrame = MapFrame()
@@ -43,8 +41,8 @@ class MapFrameBuilder {
             val mapFrameBuilder = MapFrameBuilder()
             val mapFrame = mapFrameBuilder.mapFrame
             mapFrame.setNumShapesBinding(Binding.sizeBinding(shapes))
-            mapFrame.setShapeBinding(IndexedBinding.propertyBinding(shapes) { it.left })
-            mapFrame.setColorBinding(IndexedBinding.propertyBinding(shapes) { it.right })
+            mapFrame.setShapeBinding(IndexedBinding.propertyBinding(shapes) { it.first })
+            mapFrame.setColorBinding(IndexedBinding.propertyBinding(shapes) { it.second })
             return mapFrameBuilder
         }
 
@@ -70,8 +68,8 @@ class MapFrameBuilder {
                     val item = items[i]
                     val shape = shapeFunc(item)
                     val colorBinding = colorFunc(item)
-                    list.add(ImmutablePair.of(shape, Color.BLACK))
-                    colorBinding.bind { color -> list[i] = ImmutablePair.of(shape, color) }
+                    list.add(Pair(shape, Color.BLACK))
+                    colorBinding.bind { color -> list[i] = Pair(shape, color) }
                     bindings.add(colorBinding)
                 }
             }

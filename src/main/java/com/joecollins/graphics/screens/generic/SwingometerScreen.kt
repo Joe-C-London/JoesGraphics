@@ -20,11 +20,6 @@ import javax.swing.JPanel
 import javax.swing.border.EmptyBorder
 import kotlin.math.ceil
 import kotlin.math.roundToInt
-import org.apache.commons.lang3.Range
-import org.apache.commons.lang3.tuple.ImmutablePair
-import org.apache.commons.lang3.tuple.ImmutableTriple
-import org.apache.commons.lang3.tuple.Pair
-import org.apache.commons.lang3.tuple.Triple
 
 class SwingometerScreen private constructor(title: JLabel, frame: SwingometerFrame) : JPanel() {
     class Builder<T>(
@@ -126,20 +121,19 @@ class SwingometerScreen private constructor(title: JLabel, frame: SwingometerFra
                     Binding.propertyBinding(
                             inputs,
                             { inputs: Inputs<T> ->
-                                ImmutablePair.of(
-                                        inputs.parties.left.color, inputs.parties.right.color)
+                                Pair(inputs.parties.first.color, inputs.parties.second.color)
                             },
                             Inputs.Property.PARTIES),
                     Binding.propertyBinding(
                             inputs,
                             { inputs: Inputs<T> ->
-                                val left = inputs.partySwings[inputs.parties.left] ?: 0.0
-                                val right = inputs.partySwings[inputs.parties.right] ?: 0.0
+                                val left = inputs.partySwings[inputs.parties.first] ?: 0.0
+                                val right = inputs.partySwings[inputs.parties.second] ?: 0.0
                                 (right - left) / 2
                             },
                             Inputs.Property.PARTIES,
                             Inputs.Property.SWINGS))
-                    .withDotsSolid(dotsList, { obj -> obj.left }, { obj -> obj.middle }) { obj -> obj.right }
+                    .withDotsSolid(dotsList, { obj -> obj.first }, { obj -> obj.second }) { obj -> obj.third }
                     .withHeader(header.getBinding())
                     .withRange(Binding.propertyBinding(inputs, { inputs: Inputs<T> -> inputs.range }, Inputs.Property.RANGE))
                     .withTickInterval(Binding.fixedBinding(0.01)) { n: Number -> (n.toDouble() * 100).roundToInt().toString() }
@@ -148,7 +142,7 @@ class SwingometerScreen private constructor(title: JLabel, frame: SwingometerFra
                                     inputs,
                                     { inputs: Inputs<T> ->
                                         getSwingNeededForMajority(
-                                                inputs.prevVotes, inputs.parties.left, inputs.parties.right)
+                                                inputs.prevVotes, inputs.parties.first, inputs.parties.second)
                                     },
                                     Inputs.Property.PREV,
                                     Inputs.Property.PARTIES))
@@ -157,12 +151,12 @@ class SwingometerScreen private constructor(title: JLabel, frame: SwingometerFra
                                     inputs,
                                     { inputs: Inputs<T> ->
                                         getSwingNeededForMajority(
-                                                inputs.prevVotes, inputs.parties.right, inputs.parties.left)
+                                                inputs.prevVotes, inputs.parties.second, inputs.parties.first)
                                     },
                                     Inputs.Property.PREV,
                                     Inputs.Property.PARTIES))
                     .withBucketSize(Binding.fixedBinding(0.005))
-                    .withOuterLabels(outerLabels, { obj -> obj.left }, { obj -> obj.right }) { obj -> obj.middle }
+                    .withOuterLabels(outerLabels, { obj -> obj.first }, { obj -> obj.third }) { obj -> obj.second }
                     .build()
         }
 
@@ -173,9 +167,9 @@ class SwingometerScreen private constructor(title: JLabel, frame: SwingometerFra
                         inputs,
                         { inputs: Inputs<T> ->
                             val leftSwingList = createSwingList(
-                                    inputs.prevVotes.values, inputs.parties.left, inputs.parties.right)
+                                    inputs.prevVotes.values, inputs.parties.first, inputs.parties.second)
                             val rightSwingList = createSwingList(
-                                    inputs.prevVotes.values, inputs.parties.right, inputs.parties.left)
+                                    inputs.prevVotes.values, inputs.parties.second, inputs.parties.first)
                             val ret: MutableList<Triple<Double, Color, String>> = LinkedList()
                             val leftSeats = getNumSeats(leftSwingList)
                             val rightSeats = getNumSeats(rightSwingList)
@@ -221,27 +215,25 @@ class SwingometerScreen private constructor(title: JLabel, frame: SwingometerFra
                 }
                 if (i <= leftSwingList.size) {
                     list.add(
-                            ImmutableTriple.of(
-                                    -leftSwingList[i - 1], parties.left.color, i.toString()))
+                            Triple(-leftSwingList[i - 1], parties.first.color, i.toString()))
                 }
                 if (i <= rightSwingList.size) {
                     list.add(
-                            ImmutableTriple.of(
-                                    rightSwingList[i - 1], parties.right.color, i.toString()))
+                            Triple(rightSwingList[i - 1], parties.second.color, i.toString()))
                 }
                 i += seatLabelIncrement
             }
         }
 
         private fun filterNearbyLabels(ret: MutableList<Triple<Double, Color, String>>) {
-            val ranges: MutableSet<Range<Double>> = HashSet()
+            val ranges: MutableSet<ClosedRange<Double>> = HashSet()
             val it = ret.iterator()
             while (it.hasNext()) {
                 val item = it.next()
-                if (ranges.any { range -> range.contains(item.left) }) {
+                if (ranges.any { range -> range.contains(item.first) }) {
                     it.remove()
                 } else {
-                    ranges.add(Range.between(item.left - 0.005, item.left + 0.005))
+                    ranges.add((item.first - 0.005).rangeTo(item.first + 0.005))
                 }
             }
         }
@@ -263,16 +255,16 @@ class SwingometerScreen private constructor(title: JLabel, frame: SwingometerFra
                             .drop(newLeadSeats - 1)
                             .firstOrNull()
                             ?: Double.POSITIVE_INFINITY
-                    color = if ((leftSeats + rightSeats) % 2 == 0) Color.BLACK else parties.right.color
+                    color = if ((leftSeats + rightSeats) % 2 == 0) Color.BLACK else parties.second.color
                 } else {
                     swing = -1 *
                             (leftSwingList
                             .drop(newLeadSeats - 1)
                             .firstOrNull()
                             ?: Double.POSITIVE_INFINITY)
-                    color = if ((leftSeats + rightSeats) % 2 == 0) Color.BLACK else parties.left.color
+                    color = if ((leftSeats + rightSeats) % 2 == 0) Color.BLACK else parties.first.color
                 }
-                list.add(ImmutableTriple.of(swing, color, newLeadSeats.toString()))
+                list.add(Triple(swing, color, newLeadSeats.toString()))
             }
         }
 
@@ -291,13 +283,11 @@ class SwingometerScreen private constructor(title: JLabel, frame: SwingometerFra
             val rightMajority = rightSwingList.drop((majority - 1)).firstOrNull() ?: Double.POSITIVE_INFINITY
             if (leftMajority != rightMajority || leftMajority < 0) {
                 list.add(
-                        ImmutableTriple.of(
-                                leftMajority, parties.left.color, majority.toString()))
+                        Triple(leftMajority, parties.first.color, majority.toString()))
             }
             if (leftMajority != rightMajority || rightMajority > 0) {
                 list.add(
-                        ImmutableTriple.of(
-                                rightMajority, parties.right.color, majority.toString()))
+                        Triple(rightMajority, parties.second.color, majority.toString()))
             }
         }
 
@@ -308,9 +298,9 @@ class SwingometerScreen private constructor(title: JLabel, frame: SwingometerFra
             rightSeats: Int
         ) {
             list.add(when {
-                leftSeats > rightSeats -> ImmutableTriple.of(0.0, parties.left.color, leftSeats.toString())
-                rightSeats > leftSeats -> ImmutableTriple.of(0.0, parties.right.color, rightSeats.toString())
-                else -> ImmutableTriple.of(0.0, Color.BLACK, rightSeats.toString())
+                leftSeats > rightSeats -> Triple(0.0, parties.first.color, leftSeats.toString())
+                rightSeats > leftSeats -> Triple(0.0, parties.second.color, rightSeats.toString())
+                else -> Triple(0.0, Color.BLACK, rightSeats.toString())
             })
         }
 
@@ -357,25 +347,25 @@ class SwingometerScreen private constructor(title: JLabel, frame: SwingometerFra
                     { inputs: Inputs<T> ->
                         inputs.prevVotes.entries.asSequence()
                                 .map { e ->
-                                    ImmutableTriple.of(
+                                    Triple(
                                             e.value,
                                             inputs.results[e.key] ?: emptyResult,
                                             inputs.seatFilter?.contains(e.key) ?: true)
                                 }
                                 .filter { e ->
-                                    val winner = e.getLeft().entries
+                                    val winner = e.first.entries
                                             .maxByOrNull { it.value }!!
                                             .key
-                                    winner == inputs.parties.left || winner == inputs.parties.right
+                                    winner == inputs.parties.first || winner == inputs.parties.second
                                 }
                                 .map { e ->
-                                    val total = e.getLeft().values.sum()
-                                    val left = e.getLeft()[inputs.parties.left] ?: 0
-                                    val right = e.getLeft()[inputs.parties.right] ?: 0
-                                    ImmutableTriple.of(
+                                    val total = e.first.values.sum()
+                                    val left = e.first[inputs.parties.first] ?: 0
+                                    val right = e.first[inputs.parties.second] ?: 0
+                                    Triple(
                                             0.5 * (left - right) / total,
-                                            (e.getMiddle() ?: PartyResult.NO_RESULT).color,
-                                            e.getRight())
+                                            (e.second ?: PartyResult.NO_RESULT).color,
+                                            e.third)
                                 }
                                 .toList()
                     },

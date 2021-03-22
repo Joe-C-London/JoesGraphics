@@ -8,10 +8,6 @@ import com.joecollins.graphics.utils.ColorUtils
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
 import java.awt.Color
-import org.apache.commons.lang3.tuple.ImmutablePair
-import org.apache.commons.lang3.tuple.ImmutableTriple
-import org.apache.commons.lang3.tuple.Pair
-import org.apache.commons.lang3.tuple.Triple
 
 class HeatMapFrameBuilder {
     private val frame = HeatMapFrame()
@@ -135,24 +131,22 @@ class HeatMapFrameBuilder {
             val prev = entries.distinct().associateWith(prevResultFunc)
             val resultBindings = entries
                     .map { e: T ->
-                        BindingReceiver<Pair<PartyResult?, Int>>(
-                                results[e]!!.getBinding { ImmutablePair.of(it, seatsFunc(e)) })
+                        BindingReceiver(results[e]!!.getBinding { Pair(it, seatsFunc(e)) })
                     }
                     .toList()
             val resultWithPrevBindings: List<BindingReceiver<Triple<PartyResult?, Party, Int>>> = entries
                     .map { e: T ->
-                        BindingReceiver<Triple<PartyResult?, Party, Int>>(
-                                results[e]!!.getBinding { ImmutableTriple.of(it, prev[e], seatsFunc(e)) })
+                        BindingReceiver(results[e]!!.getBinding { Triple(it, prev[e]!!, seatsFunc(e)) })
                     }
                     .toList()
-            val seatList = BindableList<ImmutablePair<Color, Int>>()
+            val seatList = BindableList<Pair<Color, Int>>()
             val seats = createSeatBarBinding(resultBindings, seatList, { party == it }, party.color)
-            val changeList = BindableList<ImmutablePair<Color, Int>>()
+            val changeList = BindableList<Pair<Color, Int>>()
             val change = createChangeBarBinding(
                     resultWithPrevBindings, changeList, { party == it }, party.color, showChange)
-            val changeLabelFunc = { p: ImmutablePair<Int, Int> -> if (showChange(p.left, p.right)) changeLabel(p.left, p.right) else "" }
+            val changeLabelFunc = { p: Pair<Int, Int> -> if (showChange(p.first, p.second)) changeLabel(p.first, p.second) else "" }
             val allPrevs = entries
-                    .map { ImmutablePair.of(prev[it]!!, seatsFunc(it)) as Pair<Party, Int> }
+                    .map { Pair(prev[it]!!, seatsFunc(it)) }
                     .toList()
             return ofClustered(
                     rows,
@@ -169,10 +163,10 @@ class HeatMapFrameBuilder {
                     },
                     { Binding.fixedBinding(prevResultFunc(it).color) })
                     .withSeatBars(
-                            seatList, { it.getLeft() }, { it.getRight() },
-                            seats.getBinding { seatLabel(it.left, it.right) })
+                            seatList, { it.first }, { it.second },
+                            seats.getBinding { seatLabel(it.first, it.second) })
                     .withChangeBars(
-                            changeList, { it.getLeft() }, { it.getRight() },
+                            changeList, { it.first }, { it.second },
                             Binding.fixedBinding(calcPrevForParty(allPrevs, party)),
                             change.getBinding(changeLabelFunc))
                     .withHeader(header)
@@ -181,30 +175,28 @@ class HeatMapFrameBuilder {
         }
 
         private fun calcPrevForParty(prev: List<Pair<Party, Int>>, party: Party): Int {
-            return prev.filter { party == it.left }.map { it.right }.sum()
+            return prev.filter { party == it.first }.map { it.second }.sum()
         }
 
         private fun createSeatBarBinding(
-            results: List<BindingReceiver<Pair<PartyResult?, Int>>>,
-            list: BindableList<ImmutablePair<Color, Int>>,
-            partyFilter: (Party?) -> Boolean,
-            color: Color
-        ): BindingReceiver<ImmutablePair<Int, Int>> {
+                results: List<BindingReceiver<Pair<PartyResult?, Int>>>,
+                list: BindableList<Pair<Color, Int>>,
+                partyFilter: (Party?) -> Boolean,
+                color: Color
+        ): BindingReceiver<Pair<Int, Int>> {
             val binding = Binding.mapReduceBinding(
                     results.map { it.getBinding() }.toList(),
-                    ImmutablePair.of(0, 0),
-                    { p: ImmutablePair<Int, Int>, r: Pair<PartyResult?, Int> ->
-                        val left = r.left
+                    Pair(0, 0),
+                    { p: Pair<Int, Int>, r: Pair<PartyResult?, Int> ->
+                        val left = r.first
                         if (left == null || !partyFilter(left.party)) { p } else {
-                            ImmutablePair.of(
-                                    p.left + if (left.isElected) r.right else 0, p.right + r.right)
+                            Pair(p.first + if (left.isElected) r.second else 0, p.second + r.second)
                         }
                     },
-                    { p: ImmutablePair<Int, Int>, r: Pair<PartyResult?, Int> ->
-                        val left = r.left
+                    { p: Pair<Int, Int>, r: Pair<PartyResult?, Int> ->
+                        val left = r.first
                         if (left == null || !partyFilter(left.party)) { p } else {
-                            ImmutablePair.of(
-                                    p.left - if (left.isElected) r.right else 0, p.right - r.right)
+                            Pair(p.first - if (left.isElected) r.second else 0, p.second - r.second)
                         }
                     })
             val seats = BindingReceiver(binding)
@@ -212,56 +204,56 @@ class HeatMapFrameBuilder {
                     .bind {
                         list.setAll(
                                 listOf(
-                                        ImmutablePair.of(color, it.left),
-                                        ImmutablePair.of(ColorUtils.lighten(color), it.right - it.left)))
+                                        Pair(color, it.first),
+                                        Pair(ColorUtils.lighten(color), it.second - it.first)))
                     }
             return seats
         }
 
         private fun createChangeBarBinding(
-            resultWithPrev: List<BindingReceiver<Triple<PartyResult?, Party, Int>>>,
-            list: BindableList<ImmutablePair<Color, Int>>,
-            partyFilter: (Party?) -> Boolean,
-            color: Color,
-            showChangeBars: (Int, Int) -> Boolean
-        ): BindingReceiver<ImmutablePair<Int, Int>> {
+                resultWithPrev: List<BindingReceiver<Triple<PartyResult?, Party, Int>>>,
+                list: BindableList<Pair<Color, Int>>,
+                partyFilter: (Party?) -> Boolean,
+                color: Color,
+                showChangeBars: (Int, Int) -> Boolean
+        ): BindingReceiver<Pair<Int, Int>> {
             val binding = Binding.mapReduceBinding(
                     resultWithPrev.map { it.getBinding() }.toList(),
-                    ImmutablePair.of(0, 0),
-                    { p: ImmutablePair<Int, Int>, r: Triple<PartyResult?, Party, Int> ->
-                        val left = r.left
+                    Pair(0, 0),
+                    { p: Pair<Int, Int>, r: Triple<PartyResult?, Party, Int> ->
+                        val left = r.first
                         if (left?.party == null) {
                             p
                         } else {
                             var ret = p
                             if (partyFilter(left.party)) {
-                                ret = ImmutablePair.of(
-                                        ret.left + if (left.isElected) r.right else 0,
-                                        ret.right + r.right)
+                                ret = Pair(
+                                        ret.first + if (left.isElected) r.third else 0,
+                                        ret.second + r.third)
                             }
-                            if (partyFilter(r.middle)) {
-                                ret = ImmutablePair.of(
-                                        ret.left - if (left.isElected) r.right else 0,
-                                        ret.right - r.right)
+                            if (partyFilter(r.second)) {
+                                ret = Pair(
+                                        ret.first - if (left.isElected) r.third else 0,
+                                        ret.second - r.third)
                             }
                             ret
                         }
                     },
-                    { p: ImmutablePair<Int, Int>, r: Triple<PartyResult?, Party, Int> ->
-                        val left = r.left
+                    { p: Pair<Int, Int>, r: Triple<PartyResult?, Party, Int> ->
+                        val left = r.first
                         if (left?.party == null) {
                             p
                         } else {
                             var ret = p
                             if (partyFilter(left.party)) {
-                                ret = ImmutablePair.of(
-                                        ret.left - if (left.isElected) r.right else 0,
-                                        ret.right - r.right)
+                                ret = Pair(
+                                        ret.first - if (left.isElected) r.third else 0,
+                                        ret.second - r.third)
                             }
-                            if (partyFilter(r.middle)) {
-                                ret = ImmutablePair.of(
-                                        ret.left + if (left.isElected) r.right else 0,
-                                        ret.right + r.right)
+                            if (partyFilter(r.second)) {
+                                ret = Pair(
+                                        ret.first + if (left.isElected) r.third else 0,
+                                        ret.second + r.third)
                             }
                             ret
                         }
@@ -269,11 +261,11 @@ class HeatMapFrameBuilder {
             val seats = BindingReceiver(binding)
             seats.getBinding()
                     .bind {
-                        if (showChangeBars(it.left, it.right)) {
+                        if (showChangeBars(it.first, it.second)) {
                             list.setAll(
                                     listOf(
-                                            ImmutablePair.of(color, it.left),
-                                            ImmutablePair.of(ColorUtils.lighten(color), it.right - it.left)))
+                                            Pair(color, it.first),
+                                            Pair(ColorUtils.lighten(color), it.second - it.first)))
                         } else {
                             list.clear()
                         }

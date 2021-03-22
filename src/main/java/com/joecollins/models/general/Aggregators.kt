@@ -2,8 +2,6 @@ package com.joecollins.models.general
 
 import com.joecollins.bindings.Binding
 import java.lang.Integer.max
-import org.apache.commons.lang3.tuple.ImmutablePair
-import org.apache.commons.lang3.tuple.Pair
 
 object Aggregators {
 
@@ -32,7 +30,7 @@ object Aggregators {
     @JvmStatic fun <T, K> combineDual(items: Collection<T>, result: (T) -> Binding<Map<K, Pair<Int, Int>>>, identity: Map<K, Pair<Int, Int>> = HashMap()): Binding<Map<K, Pair<Int, Int>>> {
         val seededKeys = identity.keys
         val sum: (Pair<Int, Int>, Pair<Int, Int>) -> Pair<Int, Int> =
-            { a, b -> ImmutablePair.of(a.left + b.left, a.right + b.right) }
+            { a, b -> Pair(a.first + b.first, a.second + b.second) }
         return Binding.mapReduceBinding(
             items.map(result),
             identity,
@@ -43,8 +41,8 @@ object Aggregators {
             },
             { a, r ->
                 val ret = LinkedHashMap(a)
-                r.forEach { (k, v) -> ret.merge(k, ImmutablePair.of(-v.left, -v.right), sum) }
-                ret.filter { e -> seededKeys.contains(e.key) || e.value.left != 0 || e.value.right != 0 || !r.containsKey(e.key) }
+                r.forEach { (k, v) -> ret.merge(k, Pair(-v.first, -v.second), sum) }
+                ret.filter { e -> seededKeys.contains(e.key) || e.value.first != 0 || e.value.second != 0 || !r.containsKey(e.key) }
             }
         )
     }

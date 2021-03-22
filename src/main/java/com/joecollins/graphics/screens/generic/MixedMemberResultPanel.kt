@@ -140,7 +140,7 @@ class MixedMemberResultPanel private constructor(
 
         fun <T> withResultMap(
             shapes: Binding<Map<T, Shape>>,
-            selectedShape: Binding<T?>,
+            selectedShape: Binding<T>,
             leadingParty: Binding<PartyResult?>,
             focus: Binding<List<T>?>,
             header: Binding<String>
@@ -151,7 +151,7 @@ class MixedMemberResultPanel private constructor(
 
         fun <T> withResultMap(
             shapes: Binding<Map<T, Shape>>,
-            selectedShape: Binding<T?>,
+            selectedShape: Binding<T>,
             leadingParty: Binding<PartyResult?>,
             focus: Binding<List<T>?>,
             additionalHighlight: Binding<List<T>?>,

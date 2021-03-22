@@ -14,8 +14,6 @@ import java.awt.Color
 import java.text.DecimalFormat
 import java.util.ArrayList
 import java.util.Collections
-import org.apache.commons.lang3.tuple.ImmutablePair
-import org.apache.commons.lang3.tuple.Pair
 import org.junit.Assert
 import org.junit.Test
 
@@ -23,21 +21,21 @@ class HeatMapFrameBuilderTest {
     @Test
     fun testHeatMapBasic() {
         val dots: MutableList<Pair<Color, Color>> = ArrayList()
-        dots.addAll(Collections.nCopies(1, ImmutablePair.of(Color.GREEN, Color.GREEN)))
-        dots.addAll(Collections.nCopies(7, ImmutablePair.of(Color.GREEN, Color.RED)))
-        dots.addAll(Collections.nCopies(6, ImmutablePair.of(Color.RED, Color.RED)))
-        dots.addAll(Collections.nCopies(5, ImmutablePair.of(Color.BLUE, Color.RED)))
-        dots.addAll(Collections.nCopies(8, ImmutablePair.of(Color.BLUE, Color.BLUE)))
-        val seatBars = BindableList<Pair<Color, Int>>(listOf(ImmutablePair.of(Color.GREEN, 8)))
-        val changeBars = BindableList<Pair<Color, Int>>(listOf(ImmutablePair.of(Color.GREEN, +7)))
+        dots.addAll(Collections.nCopies(1, Pair(Color.GREEN, Color.GREEN)))
+        dots.addAll(Collections.nCopies(7, Pair(Color.GREEN, Color.RED)))
+        dots.addAll(Collections.nCopies(6, Pair(Color.RED, Color.RED)))
+        dots.addAll(Collections.nCopies(5, Pair(Color.BLUE, Color.RED)))
+        dots.addAll(Collections.nCopies(8, Pair(Color.BLUE, Color.BLUE)))
+        val seatBars = BindableList<Pair<Color, Int>>(listOf(Pair(Color.GREEN, 8)))
+        val changeBars = BindableList<Pair<Color, Int>>(listOf(Pair(Color.GREEN, +7)))
         val frame = of(
                 fixedBinding(3),
                 dots,
-                { fixedBinding(it.left) },
-                { fixedBinding(it.right) })
-                .withSeatBars(seatBars, { it.left }, { it.right }, fixedBinding("GREEN: 8"))
+                { fixedBinding(it.first) },
+                { fixedBinding(it.second) })
+                .withSeatBars(seatBars, { it.first }, { it.second }, fixedBinding("GREEN: 8"))
                 .withChangeBars(
-                        changeBars, { it.left }, { it.right },
+                        changeBars, { it.first }, { it.second },
                         fixedBinding(1),
                         fixedBinding("GRN: +7"))
                 .withHeader(fixedBinding("PEI"))

@@ -12,8 +12,6 @@ import java.awt.GridLayout
 import java.awt.RenderingHints
 import java.util.ArrayList
 import javax.swing.JPanel
-import org.apache.commons.lang3.tuple.ImmutablePair
-import org.apache.commons.lang3.tuple.Pair
 
 class RegionSummaryFrame : GraphicsFrame() {
     private val centralPanel: JPanel = JPanel()
@@ -69,7 +67,7 @@ class RegionSummaryFrame : GraphicsFrame() {
         color: Color
     ) {
         panel.values = panel.values
-            .map { ImmutablePair.of(color, it.right) }
+            .map { Pair(color, it.second) }
             .toList()
     }
 
@@ -84,11 +82,11 @@ class RegionSummaryFrame : GraphicsFrame() {
     }
 
     internal fun getValueColor(sectionIdx: Int, valueIdx: Int): Color {
-        return sections[sectionIdx].values[valueIdx].left
+        return sections[sectionIdx].values[valueIdx].first
     }
 
     internal fun getValue(sectionIdx: Int, valueIdx: Int): String {
-        return sections[sectionIdx].values[valueIdx].right
+        return sections[sectionIdx].values[valueIdx].second
     }
 
     fun setSectionValueColorBinding(
@@ -103,7 +101,7 @@ class RegionSummaryFrame : GraphicsFrame() {
         setSectionValueColorBinding(
             sectionValueBinding.map { values: List<String> ->
                 values
-                    .map { ImmutablePair.of(summaryColor, it) }
+                    .map { Pair(summaryColor, it) }
                     .toList()
             })
     }
@@ -140,8 +138,8 @@ class RegionSummaryFrame : GraphicsFrame() {
             var valueFont: Font
             val startFontSize = 61.coerceAtMost(height * 2 / 3 - 9)
             for (i in values.indices) {
-                g.setColor(values[i].left)
-                val value = values[i].right
+                g.setColor(values[i].first)
+                val value = values[i].second
                 var valueWidth: Int
                 var fontSize = startFontSize
                 do {

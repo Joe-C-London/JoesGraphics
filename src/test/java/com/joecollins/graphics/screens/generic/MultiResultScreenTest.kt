@@ -18,8 +18,6 @@ import java.awt.Color
 import java.awt.Shape
 import java.io.IOException
 import kotlin.Throws
-import org.apache.commons.lang3.tuple.ImmutablePair
-import org.apache.commons.lang3.tuple.Pair
 import org.junit.Test
 
 class MultiResultScreenTest {
@@ -188,7 +186,7 @@ class MultiResultScreenTest {
                                         if (e == null)
                                             null
                                         else
-                                            PartyResult(e.left.party, e.right)
+                                            PartyResult(e.first.party, e.second)
                                     }
                         },
                         { if (it.districtNum < 10) listOf(1, 2, 3, 4, 5, 6, 7, 8) else listOf(15, 16, 17, 18, 19, 20) },
@@ -859,11 +857,11 @@ class MultiResultScreenTest {
                         if (votes.values.all { it == 0 })
                             null
                         else
-                            ImmutablePair.of(
+                            Pair(
                                 votes.entries.asSequence()
                                         .filter { it.value > 0 }
                                         .maxByOrNull { it.value }
-                                        ?.key,
+                                        !!.key,
                                 leaderHasWon)
                     },
                     Property.PROP)

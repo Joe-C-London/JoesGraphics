@@ -10,8 +10,6 @@ import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import java.awt.Color
 import java.io.IOException
 import kotlin.Throws
-import org.apache.commons.lang3.tuple.ImmutablePair
-import org.apache.commons.lang3.tuple.Pair
 import org.junit.Assert
 import org.junit.Test
 
@@ -108,11 +106,11 @@ class HeatMapFrameTest {
                         .toList())
         val seatBars = BindableList<Pair<Color, Int>>()
         seatBars.setAll(
-                listOf(ImmutablePair.of(Color.BLUE, 8), ImmutablePair.of(Color(128, 128, 255), 5)))
+                listOf(Pair(Color.BLUE, 8), Pair(Color(128, 128, 255), 5)))
         val seatLabel = BindableWrapper("8/13")
         val changeBars = BindableList<Pair<Color, Int>>()
         changeBars.setAll(
-                listOf(ImmutablePair.of(Color.BLUE, 3), ImmutablePair.of(Color(128, 128, 255), 2)))
+                listOf(Pair(Color.BLUE, 3), Pair(Color(128, 128, 255), 2)))
         val changeLabel = BindableWrapper("+3/+5")
         val changeStart = BindableWrapper(8)
         val borderColor = BindableWrapper(Color.BLUE)
@@ -120,15 +118,15 @@ class HeatMapFrameTest {
         val frame = HeatMapFrame()
         frame.setNumRowsBinding(fixedBinding(3))
         frame.setNumSquaresBinding(sizeBinding(squares))
-        frame.setSquareBordersBinding(propertyBinding(squares) { it.left })
-        frame.setSquareFillBinding(propertyBinding(squares) { it.right })
+        frame.setSquareBordersBinding(propertyBinding(squares) { it.first })
+        frame.setSquareFillBinding(propertyBinding(squares) { it.second })
         frame.setNumSeatBarsBinding(sizeBinding(seatBars))
-        frame.setSeatBarColorBinding(propertyBinding(seatBars) { it.left })
-        frame.setSeatBarSizeBinding(propertyBinding(seatBars) { it.right })
+        frame.setSeatBarColorBinding(propertyBinding(seatBars) { it.first })
+        frame.setSeatBarSizeBinding(propertyBinding(seatBars) { it.second })
         frame.setSeatBarLabelBinding(seatLabel.binding)
         frame.setNumChangeBarsBinding(sizeBinding(changeBars))
-        frame.setChangeBarColorBinding(propertyBinding(changeBars) { it.left })
-        frame.setChangeBarSizeBinding(propertyBinding(changeBars) { it.right })
+        frame.setChangeBarColorBinding(propertyBinding(changeBars) { it.first })
+        frame.setChangeBarSizeBinding(propertyBinding(changeBars) { it.second })
         frame.setChangeBarLabelBinding(changeLabel.binding)
         frame.setChangeBarStartBinding(changeStart.binding)
         frame.setBorderColorBinding(borderColor.binding)
@@ -142,10 +140,10 @@ class HeatMapFrameTest {
                         .map { results[it]!! }
                         .toList())
         seatBars.setAll(
-                listOf(ImmutablePair.of(Color.RED, 2), ImmutablePair.of(Color(255, 128, 128), 4)))
+                listOf(Pair(Color.RED, 2), Pair(Color(255, 128, 128), 4)))
         seatLabel.value = "2/6"
         changeBars.setAll(
-                listOf(ImmutablePair.of(Color.RED, -4), ImmutablePair.of(Color(255, 128, 128), -8)))
+                listOf(Pair(Color.RED, -4), Pair(Color(255, 128, 128), -8)))
         changeLabel.value = "-4/-12"
         changeStart.value = 18
         borderColor.value = Color.RED
@@ -166,11 +164,11 @@ class HeatMapFrameTest {
                         .toList())
         val seatBars = BindableList<Pair<Color, Int>>()
         seatBars.setAll(
-                listOf(ImmutablePair.of(Color.BLUE, 8), ImmutablePair.of(Color(128, 128, 255), 5)))
+                listOf(Pair(Color.BLUE, 8), Pair(Color(128, 128, 255), 5)))
         val seatLabel = BindableWrapper("8/13")
         val changeBars = BindableList<Pair<Color, Int>>()
         changeBars.setAll(
-                listOf(ImmutablePair.of(Color.BLUE, 3), ImmutablePair.of(Color(128, 128, 255), 2)))
+                listOf(Pair(Color.BLUE, 3), Pair(Color(128, 128, 255), 2)))
         val changeLabel = BindableWrapper("+3/+5")
         val changeStart = BindableWrapper(8)
         val borderColor = BindableWrapper(Color.BLUE)
@@ -178,15 +176,15 @@ class HeatMapFrameTest {
         val frame = HeatMapFrame()
         frame.setNumRowsBinding(fixedBinding(9))
         frame.setNumSquaresBinding(sizeBinding(squares))
-        frame.setSquareBordersBinding(propertyBinding(squares) { it.left })
-        frame.setSquareFillBinding(propertyBinding(squares) { it.right })
+        frame.setSquareBordersBinding(propertyBinding(squares) { it.first })
+        frame.setSquareFillBinding(propertyBinding(squares) { it.second })
         frame.setNumSeatBarsBinding(sizeBinding(seatBars))
-        frame.setSeatBarColorBinding(propertyBinding(seatBars) { it.left })
-        frame.setSeatBarSizeBinding(propertyBinding(seatBars) { it.right })
+        frame.setSeatBarColorBinding(propertyBinding(seatBars) { it.first })
+        frame.setSeatBarSizeBinding(propertyBinding(seatBars) { it.second })
         frame.setSeatBarLabelBinding(seatLabel.binding)
         frame.setNumChangeBarsBinding(sizeBinding(changeBars))
-        frame.setChangeBarColorBinding(propertyBinding(changeBars) { it.left })
-        frame.setChangeBarSizeBinding(propertyBinding(changeBars) { it.right })
+        frame.setChangeBarColorBinding(propertyBinding(changeBars) { it.first })
+        frame.setChangeBarSizeBinding(propertyBinding(changeBars) { it.second })
         frame.setChangeBarLabelBinding(changeLabel.binding)
         frame.setChangeBarStartBinding(changeStart.binding)
         frame.setBorderColorBinding(borderColor.binding)
@@ -200,10 +198,10 @@ class HeatMapFrameTest {
                         .map { results[it]!! }
                         .toList())
         seatBars.setAll(
-                listOf(ImmutablePair.of(Color.RED, 2), ImmutablePair.of(Color(255, 128, 128), 4)))
+                listOf(Pair(Color.RED, 2), Pair(Color(255, 128, 128), 4)))
         seatLabel.value = "2/6"
         changeBars.setAll(
-                listOf(ImmutablePair.of(Color.RED, -4), ImmutablePair.of(Color(255, 128, 128), -8)))
+                listOf(Pair(Color.RED, -4), Pair(Color(255, 128, 128), -8)))
         changeLabel.value = "-4/-12"
         changeStart.value = 18
         borderColor.value = Color.RED
@@ -224,11 +222,11 @@ class HeatMapFrameTest {
                         .toList())
         val seatBars = BindableList<Pair<Color, Int>>()
         seatBars.setAll(
-                listOf(ImmutablePair.of(Color.BLUE, 8), ImmutablePair.of(Color(128, 128, 255), 5)))
+                listOf(Pair(Color.BLUE, 8), Pair(Color(128, 128, 255), 5)))
         val seatLabel = BindableWrapper("8/13")
         val changeBars = BindableList<Pair<Color, Int>>()
         changeBars.setAll(
-                listOf(ImmutablePair.of(Color.BLUE, 3), ImmutablePair.of(Color(128, 128, 255), 2)))
+                listOf(Pair(Color.BLUE, 3), Pair(Color(128, 128, 255), 2)))
         val changeLabel = BindableWrapper("+3/+5")
         val changeStart = BindableWrapper(8)
         val borderColor = BindableWrapper(Color.BLUE)
@@ -236,15 +234,15 @@ class HeatMapFrameTest {
         val frame = HeatMapFrame()
         frame.setNumRowsBinding(fixedBinding(5))
         frame.setNumSquaresBinding(sizeBinding(squares))
-        frame.setSquareBordersBinding(propertyBinding(squares) { it.left })
-        frame.setSquareFillBinding(propertyBinding(squares) { it.right })
+        frame.setSquareBordersBinding(propertyBinding(squares) { it.first })
+        frame.setSquareFillBinding(propertyBinding(squares) { it.second })
         frame.setNumSeatBarsBinding(sizeBinding(seatBars))
-        frame.setSeatBarColorBinding(propertyBinding(seatBars) { it.left })
-        frame.setSeatBarSizeBinding(propertyBinding(seatBars) { it.right })
+        frame.setSeatBarColorBinding(propertyBinding(seatBars) { it.first })
+        frame.setSeatBarSizeBinding(propertyBinding(seatBars) { it.second })
         frame.setSeatBarLabelBinding(seatLabel.binding)
         frame.setNumChangeBarsBinding(sizeBinding(changeBars))
-        frame.setChangeBarColorBinding(propertyBinding(changeBars) { it.left })
-        frame.setChangeBarSizeBinding(propertyBinding(changeBars) { it.right })
+        frame.setChangeBarColorBinding(propertyBinding(changeBars) { it.first })
+        frame.setChangeBarSizeBinding(propertyBinding(changeBars) { it.second })
         frame.setChangeBarLabelBinding(changeLabel.binding)
         frame.setChangeBarStartBinding(changeStart.binding)
         frame.setBorderColorBinding(borderColor.binding)
@@ -258,10 +256,10 @@ class HeatMapFrameTest {
                         .map { results[it]!! }
                         .toList())
         seatBars.setAll(
-                listOf(ImmutablePair.of(Color.RED, 2), ImmutablePair.of(Color(255, 128, 128), 4)))
+                listOf(Pair(Color.RED, 2), Pair(Color(255, 128, 128), 4)))
         seatLabel.value = "2/6"
         changeBars.setAll(
-                listOf(ImmutablePair.of(Color.RED, -4), ImmutablePair.of(Color(255, 128, 128), -8)))
+                listOf(Pair(Color.RED, -4), Pair(Color(255, 128, 128), -8)))
         changeLabel.value = "-4/-12"
         changeStart.value = 18
         borderColor.value = Color.RED
@@ -282,11 +280,11 @@ class HeatMapFrameTest {
                         .toList())
         val seatBars = BindableList<Pair<Color, Int>>()
         seatBars.setAll(
-                listOf(ImmutablePair.of(Color.BLUE, 2), ImmutablePair.of(Color(128, 128, 255), 2)))
+                listOf(Pair(Color.BLUE, 2), Pair(Color(128, 128, 255), 2)))
         val seatLabel = BindableWrapper("2/4")
         val changeBars = BindableList<Pair<Color, Int>>()
         changeBars.setAll(
-                listOf(ImmutablePair.of(Color.BLUE, 3), ImmutablePair.of(Color(128, 128, 255), 2)))
+                listOf(Pair(Color.BLUE, 3), Pair(Color(128, 128, 255), 2)))
         val changeLabel = BindableWrapper("+3/+5")
         val changeStart = BindableWrapper(8)
         val borderColor = BindableWrapper(Color.BLUE)
@@ -294,67 +292,67 @@ class HeatMapFrameTest {
         val frame = HeatMapFrame()
         frame.setNumRowsBinding(fixedBinding(5))
         frame.setNumSquaresBinding(sizeBinding(squares))
-        frame.setSquareBordersBinding(propertyBinding(squares) { it.left })
-        frame.setSquareFillBinding(propertyBinding(squares) { it.right })
+        frame.setSquareBordersBinding(propertyBinding(squares) { it.first })
+        frame.setSquareFillBinding(propertyBinding(squares) { it.second })
         frame.setNumSeatBarsBinding(sizeBinding(seatBars))
-        frame.setSeatBarColorBinding(propertyBinding(seatBars) { it.left })
-        frame.setSeatBarSizeBinding(propertyBinding(seatBars) { it.right })
+        frame.setSeatBarColorBinding(propertyBinding(seatBars) { it.first })
+        frame.setSeatBarSizeBinding(propertyBinding(seatBars) { it.second })
         frame.setSeatBarLabelBinding(seatLabel.binding)
         frame.setNumChangeBarsBinding(sizeBinding(changeBars))
-        frame.setChangeBarColorBinding(propertyBinding(changeBars) { it.left })
-        frame.setChangeBarSizeBinding(propertyBinding(changeBars) { it.right })
+        frame.setChangeBarColorBinding(propertyBinding(changeBars) { it.first })
+        frame.setChangeBarSizeBinding(propertyBinding(changeBars) { it.second })
         frame.setChangeBarLabelBinding(changeLabel.binding)
         frame.setChangeBarStartBinding(changeStart.binding)
         frame.setBorderColorBinding(borderColor.binding)
         frame.setHeaderBinding(header.binding)
         frame.setSize(1024, 512)
         changeBars.setAll(
-                listOf(ImmutablePair.of(Color.BLUE, 2), ImmutablePair.of(Color(128, 128, 255), -1)))
+                listOf(Pair(Color.BLUE, 2), Pair(Color(128, 128, 255), -1)))
         changeLabel.value = "+2/+1"
         compareRendering("HeatMapFrame", "ChangeReversals-1", frame)
         changeBars.setAll(
-                listOf(ImmutablePair.of(Color.BLUE, -2), ImmutablePair.of(Color(128, 128, 255), 1)))
+                listOf(Pair(Color.BLUE, -2), Pair(Color(128, 128, 255), 1)))
         changeLabel.value = "-2/-1"
         compareRendering("HeatMapFrame", "ChangeReversals-2", frame)
         changeBars.setAll(
-                listOf(ImmutablePair.of(Color.BLUE, 1), ImmutablePair.of(Color(128, 128, 255), -2)))
+                listOf(Pair(Color.BLUE, 1), Pair(Color(128, 128, 255), -2)))
         changeLabel.value = "+1/-1"
         compareRendering("HeatMapFrame", "ChangeReversals-3", frame)
         changeBars.setAll(
-                listOf(ImmutablePair.of(Color.BLUE, -1), ImmutablePair.of(Color(128, 128, 255), 2)))
+                listOf(Pair(Color.BLUE, -1), Pair(Color(128, 128, 255), 2)))
         changeLabel.value = "-1/+1"
         compareRendering("HeatMapFrame", "ChangeReversals-4", frame)
     }
 
     private val peiResults: Map<Int, Pair<Color, Color>>
         get() = mapOf(
-                1 to ImmutablePair.of(Color.BLUE, Color.BLUE),
-                2 to ImmutablePair.of(Color.BLUE, Color.BLUE),
-                3 to ImmutablePair.of(Color.RED, Color.BLUE),
-                4 to ImmutablePair.of(Color.BLUE, Color.BLUE),
-                5 to ImmutablePair.of(Color.RED, DARK_GREEN),
-                6 to ImmutablePair.of(Color.BLUE, Color.BLUE),
-                7 to ImmutablePair.of(Color.BLUE, Color.BLUE),
-                8 to ImmutablePair.of(Color.RED, Color.BLUE),
-                9 to ImmutablePair.of(Color.RED, Color.BLUE),
-                10 to ImmutablePair.of(Color.RED, Color.RED),
-                11 to ImmutablePair.of(Color.RED, DARK_GREEN),
-                12 to ImmutablePair.of(Color.RED, DARK_GREEN),
-                13 to ImmutablePair.of(Color.RED, DARK_GREEN),
-                14 to ImmutablePair.of(Color.RED, Color.RED),
-                15 to ImmutablePair.of(Color.RED, Color.BLUE),
-                16 to ImmutablePair.of(Color.RED, Color.RED),
-                17 to ImmutablePair.of(DARK_GREEN, DARK_GREEN),
-                18 to ImmutablePair.of(Color.BLUE, Color.BLUE),
-                19 to ImmutablePair.of(Color.BLUE, Color.BLUE),
-                20 to ImmutablePair.of(Color.BLUE, Color.BLUE),
-                21 to ImmutablePair.of(Color.RED, DARK_GREEN),
-                22 to ImmutablePair.of(Color.RED, DARK_GREEN),
-                23 to ImmutablePair.of(Color.RED, DARK_GREEN),
-                24 to ImmutablePair.of(Color.RED, Color.RED),
-                25 to ImmutablePair.of(Color.RED, Color.RED),
-                26 to ImmutablePair.of(Color.RED, Color.BLUE),
-                27 to ImmutablePair.of(Color.RED, Color.RED))
+                1 to Pair(Color.BLUE, Color.BLUE),
+                2 to Pair(Color.BLUE, Color.BLUE),
+                3 to Pair(Color.RED, Color.BLUE),
+                4 to Pair(Color.BLUE, Color.BLUE),
+                5 to Pair(Color.RED, DARK_GREEN),
+                6 to Pair(Color.BLUE, Color.BLUE),
+                7 to Pair(Color.BLUE, Color.BLUE),
+                8 to Pair(Color.RED, Color.BLUE),
+                9 to Pair(Color.RED, Color.BLUE),
+                10 to Pair(Color.RED, Color.RED),
+                11 to Pair(Color.RED, DARK_GREEN),
+                12 to Pair(Color.RED, DARK_GREEN),
+                13 to Pair(Color.RED, DARK_GREEN),
+                14 to Pair(Color.RED, Color.RED),
+                15 to Pair(Color.RED, Color.BLUE),
+                16 to Pair(Color.RED, Color.RED),
+                17 to Pair(DARK_GREEN, DARK_GREEN),
+                18 to Pair(Color.BLUE, Color.BLUE),
+                19 to Pair(Color.BLUE, Color.BLUE),
+                20 to Pair(Color.BLUE, Color.BLUE),
+                21 to Pair(Color.RED, DARK_GREEN),
+                22 to Pair(Color.RED, DARK_GREEN),
+                23 to Pair(Color.RED, DARK_GREEN),
+                24 to Pair(Color.RED, Color.RED),
+                25 to Pair(Color.RED, Color.RED),
+                26 to Pair(Color.RED, Color.BLUE),
+                27 to Pair(Color.RED, Color.RED))
 
     companion object {
         private val DARK_GREEN = Color.GREEN.darker()

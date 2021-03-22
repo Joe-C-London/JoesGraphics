@@ -20,9 +20,6 @@ import java.util.HashMap
 import java.util.IdentityHashMap
 import java.util.LinkedHashMap
 import kotlin.Throws
-import org.apache.commons.lang3.Range
-import org.apache.commons.lang3.tuple.ImmutablePair
-import org.apache.commons.lang3.tuple.Pair
 import org.junit.Test
 
 class SeatViewPanelTest {
@@ -375,66 +372,66 @@ class SeatViewPanelTest {
 
         val currSeats = LinkedHashMap<Party, Pair<Int, Int>>()
         val prevSeats = LinkedHashMap<Party, Pair<Int, Int>>()
-        currSeats[lib] = ImmutablePair.of(0, 6)
-        currSeats[ndp] = ImmutablePair.of(0, 1)
+        currSeats[lib] = Pair(0, 6)
+        currSeats[ndp] = Pair(0, 1)
         currentSeats.value = currSeats
-        prevSeats[lib] = ImmutablePair.of(0, 7)
+        prevSeats[lib] = Pair(0, 7)
         previousSeats.value = prevSeats
         seatHeader.value = "7 OF 338 RIDINGS REPORTING"
         compareRendering("SeatViewPanel", "Dual-2", panel)
 
-        currSeats[lib] = ImmutablePair.of(6, 26)
-        currSeats[ndp] = ImmutablePair.of(1, 1)
-        currSeats[con] = ImmutablePair.of(0, 4)
-        currSeats[grn] = ImmutablePair.of(0, 1)
+        currSeats[lib] = Pair(6, 26)
+        currSeats[ndp] = Pair(1, 1)
+        currSeats[con] = Pair(0, 4)
+        currSeats[grn] = Pair(0, 1)
         currentSeats.value = currSeats
-        prevSeats[lib] = ImmutablePair.of(7, 32)
+        prevSeats[lib] = Pair(7, 32)
         previousSeats.value = prevSeats
         seatHeader.value = "32 OF 338 RIDINGS REPORTING"
         compareRendering("SeatViewPanel", "Dual-3", panel)
 
-        currSeats[lib] = ImmutablePair.of(26, 145)
-        currSeats[ndp] = ImmutablePair.of(1, 13)
-        currSeats[con] = ImmutablePair.of(4, 104)
-        currSeats[bq] = ImmutablePair.of(0, 32)
-        currSeats[grn] = ImmutablePair.of(1, 1)
+        currSeats[lib] = Pair(26, 145)
+        currSeats[ndp] = Pair(1, 13)
+        currSeats[con] = Pair(4, 104)
+        currSeats[bq] = Pair(0, 32)
+        currSeats[grn] = Pair(1, 1)
         currentSeats.value = currSeats
-        prevSeats[lib] = ImmutablePair.of(32, 166)
-        prevSeats[ndp] = ImmutablePair.of(0, 30)
-        prevSeats[con] = ImmutablePair.of(0, 89)
-        prevSeats[bq] = ImmutablePair.of(0, 10)
+        prevSeats[lib] = Pair(32, 166)
+        prevSeats[ndp] = Pair(0, 30)
+        prevSeats[con] = Pair(0, 89)
+        prevSeats[bq] = Pair(0, 10)
         previousSeats.value = prevSeats
         seatHeader.value = "295 OF 338 RIDINGS REPORTING"
         compareRendering("SeatViewPanel", "Dual-4", panel)
 
-        currSeats[lib] = ImmutablePair.of(145, 157)
-        currSeats[ndp] = ImmutablePair.of(13, 24)
-        currSeats[con] = ImmutablePair.of(104, 121)
-        currSeats[bq] = ImmutablePair.of(32, 32)
-        currSeats[grn] = ImmutablePair.of(1, 3)
-        currSeats[ind] = ImmutablePair.of(0, 1)
+        currSeats[lib] = Pair(145, 157)
+        currSeats[ndp] = Pair(13, 24)
+        currSeats[con] = Pair(104, 121)
+        currSeats[bq] = Pair(32, 32)
+        currSeats[grn] = Pair(1, 3)
+        currSeats[ind] = Pair(0, 1)
         currentSeats.value = currSeats
-        prevSeats[lib] = ImmutablePair.of(166, 184)
-        prevSeats[ndp] = ImmutablePair.of(30, 44)
-        prevSeats[con] = ImmutablePair.of(89, 99)
-        prevSeats[bq] = ImmutablePair.of(10, 10)
-        prevSeats[grn] = ImmutablePair.of(0, 1)
+        prevSeats[lib] = Pair(166, 184)
+        prevSeats[ndp] = Pair(30, 44)
+        prevSeats[con] = Pair(89, 99)
+        prevSeats[bq] = Pair(10, 10)
+        prevSeats[grn] = Pair(0, 1)
         previousSeats.value = prevSeats
         seatHeader.value = "338 OF 338 RIDINGS REPORTING"
         compareRendering("SeatViewPanel", "Dual-5", panel)
 
-        currSeats[lib] = ImmutablePair.of(157, 157)
-        currSeats[ndp] = ImmutablePair.of(24, 24)
-        currSeats[con] = ImmutablePair.of(121, 121)
-        currSeats[bq] = ImmutablePair.of(32, 32)
-        currSeats[grn] = ImmutablePair.of(3, 3)
-        currSeats[ind] = ImmutablePair.of(1, 1)
+        currSeats[lib] = Pair(157, 157)
+        currSeats[ndp] = Pair(24, 24)
+        currSeats[con] = Pair(121, 121)
+        currSeats[bq] = Pair(32, 32)
+        currSeats[grn] = Pair(3, 3)
+        currSeats[ind] = Pair(1, 1)
         currentSeats.value = currSeats
-        prevSeats[lib] = ImmutablePair.of(184, 184)
-        prevSeats[ndp] = ImmutablePair.of(44, 44)
-        prevSeats[con] = ImmutablePair.of(99, 99)
-        prevSeats[bq] = ImmutablePair.of(10, 10)
-        prevSeats[grn] = ImmutablePair.of(1, 1)
+        prevSeats[lib] = Pair(184, 184)
+        prevSeats[ndp] = Pair(44, 44)
+        prevSeats[con] = Pair(99, 99)
+        prevSeats[bq] = Pair(10, 10)
+        prevSeats[grn] = Pair(1, 1)
         previousSeats.value = prevSeats
         seatHeader.value = "338 OF 338 RIDINGS REPORTING"
         compareRendering("SeatViewPanel", "Dual-6", panel)
@@ -468,73 +465,73 @@ class SeatViewPanelTest {
 
         val currSeats = LinkedHashMap<Party, Pair<Int, Int>>()
         val diff = LinkedHashMap<Party, Pair<Int, Int>>()
-        currSeats[lib] = ImmutablePair.of(0, 6)
-        currSeats[ndp] = ImmutablePair.of(0, 1)
+        currSeats[lib] = Pair(0, 6)
+        currSeats[ndp] = Pair(0, 1)
         currentSeats.value = currSeats
-        diff[lib] = ImmutablePair.of(0, -1)
-        diff[ndp] = ImmutablePair.of(0, +1)
+        diff[lib] = Pair(0, -1)
+        diff[ndp] = Pair(0, +1)
         seatDiff.value = diff
         seatHeader.value = "7 OF 338 RIDINGS REPORTING"
         compareRendering("SeatViewPanel", "Dual-2", panel)
 
-        currSeats[lib] = ImmutablePair.of(6, 26)
-        currSeats[ndp] = ImmutablePair.of(1, 1)
-        currSeats[con] = ImmutablePair.of(0, 4)
-        currSeats[grn] = ImmutablePair.of(0, 1)
+        currSeats[lib] = Pair(6, 26)
+        currSeats[ndp] = Pair(1, 1)
+        currSeats[con] = Pair(0, 4)
+        currSeats[grn] = Pair(0, 1)
         currentSeats.value = currSeats
-        diff[lib] = ImmutablePair.of(-1, -6)
-        diff[ndp] = ImmutablePair.of(+1, +1)
-        diff[con] = ImmutablePair.of(0, +4)
-        diff[grn] = ImmutablePair.of(0, +1)
+        diff[lib] = Pair(-1, -6)
+        diff[ndp] = Pair(+1, +1)
+        diff[con] = Pair(0, +4)
+        diff[grn] = Pair(0, +1)
         seatDiff.value = diff
         seatHeader.value = "32 OF 338 RIDINGS REPORTING"
         compareRendering("SeatViewPanel", "Dual-3", panel)
 
-        currSeats[lib] = ImmutablePair.of(26, 145)
-        currSeats[ndp] = ImmutablePair.of(1, 13)
-        currSeats[con] = ImmutablePair.of(4, 104)
-        currSeats[bq] = ImmutablePair.of(0, 32)
-        currSeats[grn] = ImmutablePair.of(1, 1)
+        currSeats[lib] = Pair(26, 145)
+        currSeats[ndp] = Pair(1, 13)
+        currSeats[con] = Pair(4, 104)
+        currSeats[bq] = Pair(0, 32)
+        currSeats[grn] = Pair(1, 1)
         currentSeats.value = currSeats
-        diff[lib] = ImmutablePair.of(-6, -21)
-        diff[ndp] = ImmutablePair.of(+1, -17)
-        diff[con] = ImmutablePair.of(+4, +15)
-        diff[bq] = ImmutablePair.of(0, +22)
-        diff[grn] = ImmutablePair.of(+1, +1)
+        diff[lib] = Pair(-6, -21)
+        diff[ndp] = Pair(+1, -17)
+        diff[con] = Pair(+4, +15)
+        diff[bq] = Pair(0, +22)
+        diff[grn] = Pair(+1, +1)
         seatDiff.value = diff
         seatHeader.value = "295 OF 338 RIDINGS REPORTING"
         compareRendering("SeatViewPanel", "Dual-4", panel)
 
-        currSeats[lib] = ImmutablePair.of(145, 157)
-        currSeats[ndp] = ImmutablePair.of(13, 24)
-        currSeats[con] = ImmutablePair.of(104, 121)
-        currSeats[bq] = ImmutablePair.of(32, 32)
-        currSeats[grn] = ImmutablePair.of(1, 3)
-        currSeats[ind] = ImmutablePair.of(0, 1)
+        currSeats[lib] = Pair(145, 157)
+        currSeats[ndp] = Pair(13, 24)
+        currSeats[con] = Pair(104, 121)
+        currSeats[bq] = Pair(32, 32)
+        currSeats[grn] = Pair(1, 3)
+        currSeats[ind] = Pair(0, 1)
         currentSeats.value = currSeats
-        diff[lib] = ImmutablePair.of(-21, -27)
-        diff[ndp] = ImmutablePair.of(-17, -20)
-        diff[con] = ImmutablePair.of(+15, +22)
-        diff[bq] = ImmutablePair.of(+22, +22)
-        diff[grn] = ImmutablePair.of(+1, +2)
-        diff[ind] = ImmutablePair.of(0, +1)
+        diff[lib] = Pair(-21, -27)
+        diff[ndp] = Pair(-17, -20)
+        diff[con] = Pair(+15, +22)
+        diff[bq] = Pair(+22, +22)
+        diff[grn] = Pair(+1, +2)
+        diff[ind] = Pair(0, +1)
         seatDiff.value = diff
         seatHeader.value = "338 OF 338 RIDINGS REPORTING"
         compareRendering("SeatViewPanel", "Dual-5", panel)
 
-        currSeats[lib] = ImmutablePair.of(157, 157)
-        currSeats[ndp] = ImmutablePair.of(24, 24)
-        currSeats[con] = ImmutablePair.of(121, 121)
-        currSeats[bq] = ImmutablePair.of(32, 32)
-        currSeats[grn] = ImmutablePair.of(3, 3)
-        currSeats[ind] = ImmutablePair.of(1, 1)
+        currSeats[lib] = Pair(157, 157)
+        currSeats[ndp] = Pair(24, 24)
+        currSeats[con] = Pair(121, 121)
+        currSeats[bq] = Pair(32, 32)
+        currSeats[grn] = Pair(3, 3)
+        currSeats[ind] = Pair(1, 1)
         currentSeats.value = currSeats
-        diff[lib] = ImmutablePair.of(-27, -27)
-        diff[ndp] = ImmutablePair.of(-20, -20)
-        diff[con] = ImmutablePair.of(+22, +22)
-        diff[bq] = ImmutablePair.of(+22, +22)
-        diff[grn] = ImmutablePair.of(+2, +2)
-        diff[ind] = ImmutablePair.of(+1, +1)
+        diff[lib] = Pair(-27, -27)
+        diff[ndp] = Pair(-20, -20)
+        diff[con] = Pair(+22, +22)
+        diff[bq] = Pair(+22, +22)
+        diff[grn] = Pair(+2, +2)
+        diff[ind] = Pair(+1, +1)
         seatDiff.value = diff
         seatHeader.value = "338 OF 338 RIDINGS REPORTING"
         compareRendering("SeatViewPanel", "Dual-6", panel)
@@ -543,7 +540,7 @@ class SeatViewPanelTest {
     @Test
     @Throws(IOException::class)
     fun testRangeCurrPrev() {
-        val currentSeats = BindableWrapper(LinkedHashMap<Party, Range<Int>>())
+        val currentSeats = BindableWrapper(LinkedHashMap<Party, IntRange>())
         val previousSeats = BindableWrapper(LinkedHashMap<Party, Int>())
         val totalSeats = BindableWrapper(76)
         val showMajority = BindableWrapper(true)
@@ -566,13 +563,13 @@ class SeatViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("SeatViewPanel", "Range-1", panel)
 
-        val currSeats = LinkedHashMap<Party, Range<Int>>()
+        val currSeats = LinkedHashMap<Party, IntRange>()
         val prevSeats = LinkedHashMap<Party, Int>()
-        currSeats[lnp] = Range.between(4, 5)
-        currSeats[alp] = Range.between(4, 4)
-        currSeats[grn] = Range.between(0, 1)
-        currSeats[onp] = Range.between(0, 1)
-        currSeats[oth] = Range.between(0, 2)
+        currSeats[lnp] = IntRange(4, 5)
+        currSeats[alp] = IntRange(4, 4)
+        currSeats[grn] = IntRange(0, 1)
+        currSeats[onp] = IntRange(0, 1)
+        currSeats[oth] = IntRange(0, 2)
         currentSeats.value = currSeats
         prevSeats[lnp] = 6
         prevSeats[alp] = 4
@@ -581,12 +578,12 @@ class SeatViewPanelTest {
         previousSeats.value = prevSeats
         compareRendering("SeatViewPanel", "Range-2", panel)
 
-        currSeats[lnp] = Range.between(8, 10)
-        currSeats[alp] = Range.between(7, 8)
-        currSeats[grn] = Range.between(0, 2)
-        currSeats[onp] = Range.between(1, 2)
-        currSeats[nxt] = Range.between(0, 1)
-        currSeats[oth] = Range.between(0, 4)
+        currSeats[lnp] = IntRange(8, 10)
+        currSeats[alp] = IntRange(7, 8)
+        currSeats[grn] = IntRange(0, 2)
+        currSeats[onp] = IntRange(1, 2)
+        currSeats[nxt] = IntRange(0, 1)
+        currSeats[oth] = IntRange(0, 4)
         currentSeats.value = currSeats
         prevSeats[lnp] = 12
         prevSeats[alp] = 8
@@ -595,12 +592,12 @@ class SeatViewPanelTest {
         previousSeats.value = prevSeats
         compareRendering("SeatViewPanel", "Range-3", panel)
 
-        currSeats[lnp] = Range.between(27, 31)
-        currSeats[alp] = Range.between(25, 27)
-        currSeats[grn] = Range.between(5, 9)
-        currSeats[onp] = Range.between(1, 4)
-        currSeats[nxt] = Range.between(3, 3)
-        currSeats[oth] = Range.between(1, 8)
+        currSeats[lnp] = IntRange(27, 31)
+        currSeats[alp] = IntRange(25, 27)
+        currSeats[grn] = IntRange(5, 9)
+        currSeats[onp] = IntRange(1, 4)
+        currSeats[nxt] = IntRange(3, 3)
+        currSeats[oth] = IntRange(1, 8)
         currentSeats.value = currSeats
         prevSeats[lnp] = 33
         prevSeats[alp] = 25
@@ -614,8 +611,8 @@ class SeatViewPanelTest {
     @Test
     @Throws(IOException::class)
     fun testRangeCurrDiff() {
-        val currentSeats = BindableWrapper(LinkedHashMap<Party, Range<Int>>())
-        val seatDiff = BindableWrapper(LinkedHashMap<Party, Range<Int>>())
+        val currentSeats = BindableWrapper(LinkedHashMap<Party, IntRange>())
+        val seatDiff = BindableWrapper(LinkedHashMap<Party, IntRange>())
         val totalSeats = BindableWrapper(76)
         val showMajority = BindableWrapper(true)
         val header = BindableWrapper("AUSTRALIA")
@@ -637,51 +634,51 @@ class SeatViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("SeatViewPanel", "Range-1", panel)
 
-        val currSeats = LinkedHashMap<Party, Range<Int>>()
-        val diff = LinkedHashMap<Party, Range<Int>>()
-        currSeats[lnp] = Range.between(4, 5)
-        currSeats[alp] = Range.between(4, 4)
-        currSeats[grn] = Range.between(0, 1)
-        currSeats[onp] = Range.between(0, 1)
-        currSeats[oth] = Range.between(0, 2)
+        val currSeats = LinkedHashMap<Party, IntRange>()
+        val diff = LinkedHashMap<Party, IntRange>()
+        currSeats[lnp] = IntRange(4, 5)
+        currSeats[alp] = IntRange(4, 4)
+        currSeats[grn] = IntRange(0, 1)
+        currSeats[onp] = IntRange(0, 1)
+        currSeats[oth] = IntRange(0, 2)
         currentSeats.value = currSeats
-        diff[lnp] = Range.between(-2, -1)
-        diff[alp] = Range.between(0, 0)
-        diff[grn] = Range.between(-1, 0)
-        diff[onp] = Range.between(0, +1)
-        diff[oth] = Range.between(-1, +1)
+        diff[lnp] = IntRange(-2, -1)
+        diff[alp] = IntRange(0, 0)
+        diff[grn] = IntRange(-1, 0)
+        diff[onp] = IntRange(0, +1)
+        diff[oth] = IntRange(-1, +1)
         seatDiff.value = diff
         compareRendering("SeatViewPanel", "Range-2", panel)
 
-        currSeats[lnp] = Range.between(8, 10)
-        currSeats[alp] = Range.between(7, 8)
-        currSeats[grn] = Range.between(0, 2)
-        currSeats[onp] = Range.between(1, 2)
-        currSeats[nxt] = Range.between(0, 1)
-        currSeats[oth] = Range.between(0, 4)
+        currSeats[lnp] = IntRange(8, 10)
+        currSeats[alp] = IntRange(7, 8)
+        currSeats[grn] = IntRange(0, 2)
+        currSeats[onp] = IntRange(1, 2)
+        currSeats[nxt] = IntRange(0, 1)
+        currSeats[oth] = IntRange(0, 4)
         currentSeats.value = currSeats
-        diff[lnp] = Range.between(-4, -2)
-        diff[alp] = Range.between(-1, 0)
-        diff[grn] = Range.between(-2, 0)
-        diff[onp] = Range.between(+1, +2)
-        diff[nxt] = Range.between(0, +1)
-        diff[oth] = Range.between(-2, +2)
+        diff[lnp] = IntRange(-4, -2)
+        diff[alp] = IntRange(-1, 0)
+        diff[grn] = IntRange(-2, 0)
+        diff[onp] = IntRange(+1, +2)
+        diff[nxt] = IntRange(0, +1)
+        diff[oth] = IntRange(-2, +2)
         seatDiff.value = diff
         compareRendering("SeatViewPanel", "Range-3", panel)
 
-        currSeats[lnp] = Range.between(27, 31)
-        currSeats[alp] = Range.between(25, 27)
-        currSeats[grn] = Range.between(5, 9)
-        currSeats[onp] = Range.between(1, 4)
-        currSeats[nxt] = Range.between(3, 3)
-        currSeats[oth] = Range.between(1, 8)
+        currSeats[lnp] = IntRange(27, 31)
+        currSeats[alp] = IntRange(25, 27)
+        currSeats[grn] = IntRange(5, 9)
+        currSeats[onp] = IntRange(1, 4)
+        currSeats[nxt] = IntRange(3, 3)
+        currSeats[oth] = IntRange(1, 8)
         currentSeats.value = currSeats
-        diff[lnp] = Range.between(-6, -2)
-        diff[alp] = Range.between(0, +2)
-        diff[grn] = Range.between(-5, -1)
-        diff[onp] = Range.between(+1, +4)
-        diff[nxt] = Range.between(+2, +2)
-        diff[oth] = Range.between(-6, +1)
+        diff[lnp] = IntRange(-6, -2)
+        diff[alp] = IntRange(0, +2)
+        diff[grn] = IntRange(-5, -1)
+        diff[onp] = IntRange(+1, +4)
+        diff[nxt] = IntRange(+2, +2)
+        diff[oth] = IntRange(-6, +1)
         seatDiff.value = diff
         compareRendering("SeatViewPanel", "Range-4", panel)
     }
@@ -745,12 +742,12 @@ class SeatViewPanelTest {
         val clinton = Candidate("Hillary Clinton", Party("Democrat", "DEM", Color.BLUE))
         val trump = Candidate("Donald Trump", Party("Republican", "GOP", Color.RED))
         val curr = LinkedHashMap<Candidate, Pair<Int, Int>>()
-        curr[clinton] = ImmutablePair.of(218, 232)
-        curr[trump] = ImmutablePair.of(276, 306)
+        curr[clinton] = Pair(218, 232)
+        curr[trump] = Pair(276, 306)
         currentSeats.value = curr
         val prev = LinkedHashMap<Party, Pair<Int, Int>>()
-        prev[clinton.party] = ImmutablePair.of(302, 332)
-        prev[trump.party] = ImmutablePair.of(192, 206)
+        prev[clinton.party] = Pair(302, 332)
+        prev[trump.party] = Pair(192, 206)
         previousSeats.value = prev
         winner.value = trump
         compareRendering("SeatViewPanel", "Candidate-2", panel)
@@ -759,7 +756,7 @@ class SeatViewPanelTest {
     @Test
     @Throws(IOException::class)
     fun testCandidatesRange() {
-        val currentSeats = BindableWrapper(LinkedHashMap<Candidate, Range<Int>>())
+        val currentSeats = BindableWrapper(LinkedHashMap<Candidate, IntRange>())
         val previousSeats = BindableWrapper(LinkedHashMap<Party, Int>())
         val totalSeats = BindableWrapper(538)
         val showMajority = BindableWrapper(true)
@@ -769,10 +766,10 @@ class SeatViewPanelTest {
         val changeHeader = BindableWrapper("CHANGE SINCE 2012")
         val clinton = Candidate("Hillary Clinton", Party("Democrat", "DEM", Color.BLUE))
         val trump = Candidate("Donald Trump", Party("Republican", "GOP", Color.RED))
-        val curr = LinkedHashMap<Candidate, Range<Int>>()
+        val curr = LinkedHashMap<Candidate, IntRange>()
         val prev = LinkedHashMap<Party, Int>()
-        curr[clinton] = Range.between(303 - 65, 303 + 65)
-        curr[trump] = Range.between(235 - 65, 235 + 65)
+        curr[clinton] = IntRange(303 - 65, 303 + 65)
+        curr[trump] = IntRange(235 - 65, 235 + 65)
         currentSeats.value = curr
         prev[clinton.party] = 332
         prev[trump.party] = 206
@@ -844,12 +841,12 @@ class SeatViewPanelTest {
         val dem = Party("Democrat", "DEM", Color.BLUE)
         val gop = Party("Republican", "GOP", Color.RED)
         val curr = LinkedHashMap<Party, Pair<Int, Int>>()
-        curr[dem] = ImmutablePair.of(224, 235)
-        curr[gop] = ImmutablePair.of(192, 200)
+        curr[dem] = Pair(224, 235)
+        curr[gop] = Pair(192, 200)
         currentSeats.value = curr
         val prev = LinkedHashMap<Party, Pair<Int, Int>>()
-        prev[dem] = ImmutablePair.of(193, 194)
-        prev[gop] = ImmutablePair.of(223, 241)
+        prev[dem] = Pair(193, 194)
+        prev[gop] = Pair(223, 241)
         previousSeats.value = prev
         winner.value = dem
         compareRendering("SeatViewPanel", "PartyTick-2", panel)

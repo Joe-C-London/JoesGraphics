@@ -12,10 +12,6 @@ import com.joecollins.graphics.utils.ColorUtils
 import java.awt.Color
 import java.awt.geom.Rectangle2D
 import java.text.DecimalFormat
-import org.apache.commons.lang3.tuple.ImmutablePair
-import org.apache.commons.lang3.tuple.ImmutableTriple
-import org.apache.commons.lang3.tuple.Pair
-import org.apache.commons.lang3.tuple.Triple
 import org.junit.Assert
 import org.junit.Test
 
@@ -30,24 +26,24 @@ class BarFrameBuilderTest {
                         .map { map ->
                             map.entries.asSequence()
                                     .sortedByDescending { it.value }
-                                    .map { BasicBar(it.key.left, it.key.value, it.value, THOUSANDS.format(it.value)) }
+                                    .map { BasicBar(it.key.first, it.key.second, it.value, THOUSANDS.format(it.value)) }
                                     .toList()
                         })
                 .build()
         Assert.assertEquals(0, frame.numBars.toLong())
         Assert.assertEquals(0, frame.numLines.toLong())
         result.value = mapOf(
-                ImmutablePair.of("CLINTON", Color.ORANGE) to 2842,
-                ImmutablePair.of("SANDERS", Color.GREEN) to 1865)
+                Pair("CLINTON", Color.ORANGE) to 2842,
+                Pair("SANDERS", Color.GREEN) to 1865)
         Assert.assertEquals(2, frame.numBars.toLong())
         Assert.assertEquals("CLINTON", frame.getLeftText(0))
         Assert.assertEquals("SANDERS", frame.getLeftText(1))
         Assert.assertEquals("2,842", frame.getRightText(0))
         Assert.assertEquals("1,865", frame.getRightText(1))
-        Assert.assertEquals(Color.ORANGE, frame.getSeries(0)[0].left)
-        Assert.assertEquals(Color.GREEN, frame.getSeries(1)[0].left)
-        Assert.assertEquals(2842, frame.getSeries(0)[0].right)
-        Assert.assertEquals(1865, frame.getSeries(1)[0].right)
+        Assert.assertEquals(Color.ORANGE, frame.getSeries(0)[0].first)
+        Assert.assertEquals(Color.GREEN, frame.getSeries(1)[0].first)
+        Assert.assertEquals(2842, frame.getSeries(0)[0].second)
+        Assert.assertEquals(1865, frame.getSeries(1)[0].second)
         Assert.assertEquals(0, frame.min.toInt().toLong())
         Assert.assertEquals(2842, frame.max.toInt().toLong())
     }
@@ -60,24 +56,24 @@ class BarFrameBuilderTest {
                         .map { map ->
                             map.entries.asSequence()
                                     .sortedByDescending { it.value.value }
-                                    .map { BasicBar(it.key.left, it.key.right, it.value.value, THOUSANDS.format(it.value.value)) }
+                                    .map { BasicBar(it.key.first, it.key.second, it.value.value, THOUSANDS.format(it.value.value)) }
                                     .toList()
                         })
                 .build()
         Assert.assertEquals(0, frame.numBars.toLong())
         Assert.assertEquals(0, frame.numLines.toLong())
         result.value = mapOf(
-                ImmutablePair.of("CLINTON", Color.ORANGE) to Wrapper(2842),
-                ImmutablePair.of("SANDERS", Color.GREEN) to Wrapper(1865))
+                Pair("CLINTON", Color.ORANGE) to Wrapper(2842),
+                Pair("SANDERS", Color.GREEN) to Wrapper(1865))
         Assert.assertEquals(2, frame.numBars.toLong())
         Assert.assertEquals("CLINTON", frame.getLeftText(0))
         Assert.assertEquals("SANDERS", frame.getLeftText(1))
         Assert.assertEquals("2,842", frame.getRightText(0))
         Assert.assertEquals("1,865", frame.getRightText(1))
-        Assert.assertEquals(Color.ORANGE, frame.getSeries(0)[0].left)
-        Assert.assertEquals(Color.GREEN, frame.getSeries(1)[0].left)
-        Assert.assertEquals(2842, frame.getSeries(0)[0].right)
-        Assert.assertEquals(1865, frame.getSeries(1)[0].right)
+        Assert.assertEquals(Color.ORANGE, frame.getSeries(0)[0].first)
+        Assert.assertEquals(Color.GREEN, frame.getSeries(1)[0].first)
+        Assert.assertEquals(2842, frame.getSeries(0)[0].second)
+        Assert.assertEquals(1865, frame.getSeries(1)[0].second)
         Assert.assertEquals(0, frame.min.toInt().toLong())
         Assert.assertEquals(2842, frame.max.toInt().toLong())
     }
@@ -91,7 +87,7 @@ class BarFrameBuilderTest {
                         .map { map ->
                             map.entries.asSequence()
                                     .sortedByDescending { it.value }
-                                    .map { BasicBar(it.key.left, it.key.right, it.value, THOUSANDS.format(it.value)) }
+                                    .map { BasicBar(it.key.first, it.key.second, it.value, THOUSANDS.format(it.value)) }
                                     .toList()
                         })
                 .withMax(max.binding)
@@ -99,13 +95,13 @@ class BarFrameBuilderTest {
         Assert.assertEquals(0, frame.min.toInt().toLong())
         Assert.assertEquals(2500, frame.max.toInt().toLong())
         result.value = mapOf(
-                ImmutablePair.of("CLINTON", Color.ORANGE) to 2205,
-                ImmutablePair.of("SANDERS", Color.GREEN) to 1846)
+                Pair("CLINTON", Color.ORANGE) to 2205,
+                Pair("SANDERS", Color.GREEN) to 1846)
         Assert.assertEquals(0, frame.min.toInt().toLong())
         Assert.assertEquals(2500, frame.max.toInt().toLong())
         result.value = mapOf(
-                ImmutablePair.of("CLINTON", Color.ORANGE) to 2842,
-                ImmutablePair.of("SANDERS", Color.GREEN) to 1865)
+                Pair("CLINTON", Color.ORANGE) to 2842,
+                Pair("SANDERS", Color.GREEN) to 1865)
         Assert.assertEquals(0, frame.min.toInt().toLong())
         Assert.assertEquals(2842, frame.max.toInt().toLong())
         max.value = 3000
@@ -129,7 +125,7 @@ class BarFrameBuilderTest {
                         .map { map ->
                             map.entries.asSequence()
                                     .sortedByDescending { it.value }
-                                    .map { BasicBar(it.key.left, it.key.right, it.value, THOUSANDS.format(it.value)) }
+                                    .map { BasicBar(it.key.first, it.key.second, it.value, THOUSANDS.format(it.value)) }
                                     .toList()
                         })
                 .withHeader(header.binding)
@@ -164,7 +160,7 @@ class BarFrameBuilderTest {
                         .map { map ->
                             map.entries.asSequence()
                                     .sortedByDescending { it.value }
-                                    .map { BasicBar(it.key.left, it.key.right, it.value, THOUSANDS.format(it.value)) }
+                                    .map { BasicBar(it.key.first, it.key.second, it.value, THOUSANDS.format(it.value)) }
                                     .toList()
                         })
                 .withTarget(target.binding) { THOUSANDS.format(it) + " TO WIN" }
@@ -183,7 +179,7 @@ class BarFrameBuilderTest {
                         .map { map ->
                             map.entries.asSequence()
                                     .sortedByDescending { it.value }
-                                    .map { BasicBar(it.key.left, it.key.right, it.value, THOUSANDS.format(it.value)) }
+                                    .map { BasicBar(it.key.first, it.key.second, it.value, THOUSANDS.format(it.value)) }
                                     .toList()
                         })
                 .withLines(lines) { it.toString() + " QUOTA" + (if (it == 1) "" else "S") }
@@ -212,15 +208,15 @@ class BarFrameBuilderTest {
                         .map { map ->
                             map.entries.asSequence()
                                     .sortedByDescending { it.value }
-                                    .map { BasicBar(it.key.left, it.key.right, it.value, THOUSANDS.format(it.value)) }
+                                    .map { BasicBar(it.key.first, it.key.second, it.value, THOUSANDS.format(it.value)) }
                                     .toList()
                         })
-                .withLines(lines, { it.left }) { it.right }
+                .withLines(lines, { it.first }) { it.second }
                 .build()
         Assert.assertEquals(0, frame.numLines.toLong())
         lines.addAll(listOf(
-                ImmutablePair.of("The line is here", 1),
-                ImmutablePair.of("and here", 2)))
+                Pair("The line is here", 1),
+                Pair("and here", 2)))
         Assert.assertEquals(2, frame.numLines.toLong())
         Assert.assertEquals(1, frame.getLineLevel(0))
         Assert.assertEquals(2, frame.getLineLevel(1))
@@ -237,7 +233,7 @@ class BarFrameBuilderTest {
                         .map { map ->
                             map.entries.asSequence()
                                     .sortedByDescending { it.value }
-                                    .map { BasicBar(it.key.left, it.key.right, it.value, THOUSANDS.format(it.value)) }
+                                    .map { BasicBar(it.key.first, it.key.second, it.value, THOUSANDS.format(it.value)) }
                                     .toList()
                         })
                 .withLines(lines.binding) { it.toString() + " QUOTA" + (if (it == 1) "" else "S") }
@@ -265,25 +261,25 @@ class BarFrameBuilderTest {
                 result.binding
                         .map { map ->
                             map.entries.asSequence()
-                                    .sortedByDescending { it.value.left }
-                                    .map { BasicBar(it.key.left, it.key.right, it.value.left, THOUSANDS.format(it.value.left), if (it.value.right) shape else null) }
+                                    .sortedByDescending { it.value.first }
+                                    .map { BasicBar(it.key.first, it.key.second, it.value.first, THOUSANDS.format(it.value.first), if (it.value.second) shape else null) }
                                     .toList()
                         })
                 .build()
         Assert.assertEquals(0, frame.numBars.toLong())
         Assert.assertEquals(0, frame.numLines.toLong())
         result.value = mapOf(
-                ImmutablePair.of("CLINTON", Color.ORANGE) to ImmutablePair.of(2842, true),
-                ImmutablePair.of("SANDERS", Color.GREEN) to ImmutablePair.of(1865, false))
+                Pair("CLINTON", Color.ORANGE) to Pair(2842, true),
+                Pair("SANDERS", Color.GREEN) to Pair(1865, false))
         Assert.assertEquals(2, frame.numBars.toLong())
         Assert.assertEquals("CLINTON", frame.getLeftText(0))
         Assert.assertEquals("SANDERS", frame.getLeftText(1))
         Assert.assertEquals("2,842", frame.getRightText(0))
         Assert.assertEquals("1,865", frame.getRightText(1))
-        Assert.assertEquals(Color.ORANGE, frame.getSeries(0)[0].left)
-        Assert.assertEquals(Color.GREEN, frame.getSeries(1)[0].left)
-        Assert.assertEquals(2842, frame.getSeries(0)[0].right)
-        Assert.assertEquals(1865, frame.getSeries(1)[0].right)
+        Assert.assertEquals(Color.ORANGE, frame.getSeries(0)[0].first)
+        Assert.assertEquals(Color.GREEN, frame.getSeries(1)[0].first)
+        Assert.assertEquals(2842, frame.getSeries(0)[0].second)
+        Assert.assertEquals(1865, frame.getSeries(1)[0].second)
         Assert.assertEquals(shape, frame.getLeftIcon(0))
         Assert.assertNull(frame.getLeftIcon(1))
     }
@@ -295,20 +291,20 @@ class BarFrameBuilderTest {
                 result.binding
                         .map { map ->
                             map.entries.asSequence()
-                                    .sortedByDescending { it.value.left }
-                                    .map { BasicBar(it.key.left, it.key.right, it.value.right, DIFF.format(it.value.right)) }
+                                    .sortedByDescending { it.value.first }
+                                    .map { BasicBar(it.key.first, it.key.second, it.value.second, DIFF.format(it.value.second)) }
                                     .toList()
                         })
                 .build()
         Assert.assertEquals(0, frame.numBars.toLong())
         Assert.assertEquals(0, frame.numLines.toLong())
         result.value = mapOf(
-                ImmutablePair.of("LIB", Color.RED) to ImmutablePair.of(157, -27),
-                ImmutablePair.of("CON", Color.BLUE) to ImmutablePair.of(121, +22),
-                ImmutablePair.of("NDP", Color.ORANGE) to ImmutablePair.of(24, -20),
-                ImmutablePair.of("BQ", Color.CYAN) to ImmutablePair.of(32, +22),
-                ImmutablePair.of("GRN", Color.GREEN) to ImmutablePair.of(3, +2),
-                ImmutablePair.of("IND", Color.GRAY) to ImmutablePair.of(1, +1))
+                Pair("LIB", Color.RED) to Pair(157, -27),
+                Pair("CON", Color.BLUE) to Pair(121, +22),
+                Pair("NDP", Color.ORANGE) to Pair(24, -20),
+                Pair("BQ", Color.CYAN) to Pair(32, +22),
+                Pair("GRN", Color.GREEN) to Pair(3, +2),
+                Pair("IND", Color.GRAY) to Pair(1, +1))
         Assert.assertEquals(6, frame.numBars.toLong())
         Assert.assertEquals("LIB", frame.getLeftText(0))
         Assert.assertEquals("CON", frame.getLeftText(1))
@@ -322,18 +318,18 @@ class BarFrameBuilderTest {
         Assert.assertEquals("-20", frame.getRightText(3))
         Assert.assertEquals("+2", frame.getRightText(4))
         Assert.assertEquals("+1", frame.getRightText(5))
-        Assert.assertEquals(Color.RED, frame.getSeries(0)[0].left)
-        Assert.assertEquals(Color.BLUE, frame.getSeries(1)[0].left)
-        Assert.assertEquals(Color.CYAN, frame.getSeries(2)[0].left)
-        Assert.assertEquals(Color.ORANGE, frame.getSeries(3)[0].left)
-        Assert.assertEquals(Color.GREEN, frame.getSeries(4)[0].left)
-        Assert.assertEquals(Color.GRAY, frame.getSeries(5)[0].left)
-        Assert.assertEquals(-27, frame.getSeries(0)[0].right)
-        Assert.assertEquals(+22, frame.getSeries(1)[0].right)
-        Assert.assertEquals(+22, frame.getSeries(2)[0].right)
-        Assert.assertEquals(-20, frame.getSeries(3)[0].right)
-        Assert.assertEquals(+2, frame.getSeries(4)[0].right)
-        Assert.assertEquals(+1, frame.getSeries(5)[0].right)
+        Assert.assertEquals(Color.RED, frame.getSeries(0)[0].first)
+        Assert.assertEquals(Color.BLUE, frame.getSeries(1)[0].first)
+        Assert.assertEquals(Color.CYAN, frame.getSeries(2)[0].first)
+        Assert.assertEquals(Color.ORANGE, frame.getSeries(3)[0].first)
+        Assert.assertEquals(Color.GREEN, frame.getSeries(4)[0].first)
+        Assert.assertEquals(Color.GRAY, frame.getSeries(5)[0].first)
+        Assert.assertEquals(-27, frame.getSeries(0)[0].second)
+        Assert.assertEquals(+22, frame.getSeries(1)[0].second)
+        Assert.assertEquals(+22, frame.getSeries(2)[0].second)
+        Assert.assertEquals(-20, frame.getSeries(3)[0].second)
+        Assert.assertEquals(+2, frame.getSeries(4)[0].second)
+        Assert.assertEquals(+1, frame.getSeries(5)[0].second)
         Assert.assertEquals(-27, frame.min.toInt().toLong())
         Assert.assertEquals(+22, frame.max.toInt().toLong())
     }
@@ -346,8 +342,8 @@ class BarFrameBuilderTest {
                 result.binding
                         .map { map ->
                             map.entries.asSequence()
-                                    .sortedByDescending { it.value.left }
-                                    .map { BasicBar(it.key.left, it.key.right, it.value.right, DIFF.format(it.value.right)) }
+                                    .sortedByDescending { it.value.first }
+                                    .map { BasicBar(it.key.first, it.key.second, it.value.second, DIFF.format(it.value.second)) }
                                     .toList()
                         })
                 .withWingspan(range.binding)
@@ -355,12 +351,12 @@ class BarFrameBuilderTest {
         Assert.assertEquals(-10, frame.min.toInt().toLong())
         Assert.assertEquals(+10, frame.max.toInt().toLong())
         result.value = mapOf(
-                ImmutablePair.of("LIB", Color.RED) to ImmutablePair.of(157, -27),
-                ImmutablePair.of("CON", Color.BLUE) to ImmutablePair.of(121, +22),
-                ImmutablePair.of("NDP", Color.ORANGE) to ImmutablePair.of(24, -20),
-                ImmutablePair.of("BQ", Color.CYAN) to ImmutablePair.of(32, +22),
-                ImmutablePair.of("GRN", Color.GREEN) to ImmutablePair.of(3, +2),
-                ImmutablePair.of("IND", Color.GRAY) to ImmutablePair.of(1, +1))
+                Pair("LIB", Color.RED) to Pair(157, -27),
+                Pair("CON", Color.BLUE) to Pair(121, +22),
+                Pair("NDP", Color.ORANGE) to Pair(24, -20),
+                Pair("BQ", Color.CYAN) to Pair(32, +22),
+                Pair("GRN", Color.GREEN) to Pair(3, +2),
+                Pair("IND", Color.GRAY) to Pair(1, +1))
         Assert.assertEquals(-27, frame.min.toInt().toLong())
         Assert.assertEquals(+27, frame.max.toInt().toLong())
     }
@@ -373,20 +369,20 @@ class BarFrameBuilderTest {
                         .binding
                         .map { map ->
                             map.entries.asSequence()
-                                    .sortedByDescending { it.value.right }
-                                    .map { DualBar(it.key.left, it.key.right, it.value.left, it.value.right, it.value.left.toString() + "/" + it.value.right) }
+                                    .sortedByDescending { it.value.second }
+                                    .map { DualBar(it.key.first, it.key.second, it.value.first, it.value.second, it.value.first.toString() + "/" + it.value.second) }
                                     .toList()
                         })
                 .build()
         Assert.assertEquals(0, frame.numBars.toLong())
         Assert.assertEquals(0, frame.numLines.toLong())
         result.value = mapOf(
-                ImmutablePair.of("LIBERAL", Color.RED) to ImmutablePair.of(26, 157),
-                ImmutablePair.of("CONSERVATIVE", Color.BLUE) to ImmutablePair.of(4, 121),
-                ImmutablePair.of("NEW DEMOCRATIC PARTY", Color.ORANGE) to ImmutablePair.of(1, 24),
-                ImmutablePair.of("BLOC QU\u00c9B\u00c9COIS", Color.CYAN) to ImmutablePair.of(0, 32),
-                ImmutablePair.of("GREEN", Color.GREEN) to ImmutablePair.of(1, 3),
-                ImmutablePair.of("INDEPENDENT", Color.GRAY) to ImmutablePair.of(0, 1))
+                Pair("LIBERAL", Color.RED) to Pair(26, 157),
+                Pair("CONSERVATIVE", Color.BLUE) to Pair(4, 121),
+                Pair("NEW DEMOCRATIC PARTY", Color.ORANGE) to Pair(1, 24),
+                Pair("BLOC QU\u00c9B\u00c9COIS", Color.CYAN) to Pair(0, 32),
+                Pair("GREEN", Color.GREEN) to Pair(1, 3),
+                Pair("INDEPENDENT", Color.GRAY) to Pair(0, 1))
         Assert.assertEquals(6, frame.numBars.toLong())
         Assert.assertEquals("LIBERAL", frame.getLeftText(0))
         Assert.assertEquals("CONSERVATIVE", frame.getLeftText(1))
@@ -400,36 +396,36 @@ class BarFrameBuilderTest {
         Assert.assertEquals("1/24", frame.getRightText(3))
         Assert.assertEquals("1/3", frame.getRightText(4))
         Assert.assertEquals("0/1", frame.getRightText(5))
-        Assert.assertEquals(0, frame.getSeries(0)[0].right.toInt().toLong())
-        Assert.assertEquals(0, frame.getSeries(1)[0].right.toInt().toLong())
-        Assert.assertEquals(0, frame.getSeries(2)[0].right.toInt().toLong())
-        Assert.assertEquals(0, frame.getSeries(3)[0].right.toInt().toLong())
-        Assert.assertEquals(0, frame.getSeries(4)[0].right.toInt().toLong())
-        Assert.assertEquals(0, frame.getSeries(5)[0].right.toInt().toLong())
-        Assert.assertEquals(Color.RED, frame.getSeries(0)[1].left)
-        Assert.assertEquals(Color.BLUE, frame.getSeries(1)[1].left)
-        Assert.assertEquals(Color.CYAN, frame.getSeries(2)[1].left)
-        Assert.assertEquals(Color.ORANGE, frame.getSeries(3)[1].left)
-        Assert.assertEquals(Color.GREEN, frame.getSeries(4)[1].left)
-        Assert.assertEquals(Color.GRAY, frame.getSeries(5)[1].left)
-        Assert.assertEquals(26, frame.getSeries(0)[1].right.toInt().toLong())
-        Assert.assertEquals(4, frame.getSeries(1)[1].right.toInt().toLong())
-        Assert.assertEquals(0, frame.getSeries(2)[1].right.toInt().toLong())
-        Assert.assertEquals(1, frame.getSeries(3)[1].right.toInt().toLong())
-        Assert.assertEquals(1, frame.getSeries(4)[1].right.toInt().toLong())
-        Assert.assertEquals(0, frame.getSeries(5)[1].right.toInt().toLong())
-        Assert.assertEquals(lighten(Color.RED), frame.getSeries(0)[2].left)
-        Assert.assertEquals(lighten(Color.BLUE), frame.getSeries(1)[2].left)
-        Assert.assertEquals(lighten(Color.CYAN), frame.getSeries(2)[2].left)
-        Assert.assertEquals(lighten(Color.ORANGE), frame.getSeries(3)[2].left)
-        Assert.assertEquals(lighten(Color.GREEN), frame.getSeries(4)[2].left)
-        Assert.assertEquals(lighten(Color.GRAY), frame.getSeries(5)[2].left)
-        Assert.assertEquals((157 - 26).toLong(), frame.getSeries(0)[2].right.toInt().toLong())
-        Assert.assertEquals((121 - 4).toLong(), frame.getSeries(1)[2].right.toInt().toLong())
-        Assert.assertEquals((32 - 0).toLong(), frame.getSeries(2)[2].right.toInt().toLong())
-        Assert.assertEquals((24 - 1).toLong(), frame.getSeries(3)[2].right.toInt().toLong())
-        Assert.assertEquals((3 - 1).toLong(), frame.getSeries(4)[2].right.toInt().toLong())
-        Assert.assertEquals((1 - 0).toLong(), frame.getSeries(5)[2].right.toInt().toLong())
+        Assert.assertEquals(0, frame.getSeries(0)[0].second.toInt().toLong())
+        Assert.assertEquals(0, frame.getSeries(1)[0].second.toInt().toLong())
+        Assert.assertEquals(0, frame.getSeries(2)[0].second.toInt().toLong())
+        Assert.assertEquals(0, frame.getSeries(3)[0].second.toInt().toLong())
+        Assert.assertEquals(0, frame.getSeries(4)[0].second.toInt().toLong())
+        Assert.assertEquals(0, frame.getSeries(5)[0].second.toInt().toLong())
+        Assert.assertEquals(Color.RED, frame.getSeries(0)[1].first)
+        Assert.assertEquals(Color.BLUE, frame.getSeries(1)[1].first)
+        Assert.assertEquals(Color.CYAN, frame.getSeries(2)[1].first)
+        Assert.assertEquals(Color.ORANGE, frame.getSeries(3)[1].first)
+        Assert.assertEquals(Color.GREEN, frame.getSeries(4)[1].first)
+        Assert.assertEquals(Color.GRAY, frame.getSeries(5)[1].first)
+        Assert.assertEquals(26, frame.getSeries(0)[1].second.toInt().toLong())
+        Assert.assertEquals(4, frame.getSeries(1)[1].second.toInt().toLong())
+        Assert.assertEquals(0, frame.getSeries(2)[1].second.toInt().toLong())
+        Assert.assertEquals(1, frame.getSeries(3)[1].second.toInt().toLong())
+        Assert.assertEquals(1, frame.getSeries(4)[1].second.toInt().toLong())
+        Assert.assertEquals(0, frame.getSeries(5)[1].second.toInt().toLong())
+        Assert.assertEquals(lighten(Color.RED), frame.getSeries(0)[2].first)
+        Assert.assertEquals(lighten(Color.BLUE), frame.getSeries(1)[2].first)
+        Assert.assertEquals(lighten(Color.CYAN), frame.getSeries(2)[2].first)
+        Assert.assertEquals(lighten(Color.ORANGE), frame.getSeries(3)[2].first)
+        Assert.assertEquals(lighten(Color.GREEN), frame.getSeries(4)[2].first)
+        Assert.assertEquals(lighten(Color.GRAY), frame.getSeries(5)[2].first)
+        Assert.assertEquals((157 - 26).toLong(), frame.getSeries(0)[2].second.toInt().toLong())
+        Assert.assertEquals((121 - 4).toLong(), frame.getSeries(1)[2].second.toInt().toLong())
+        Assert.assertEquals((32 - 0).toLong(), frame.getSeries(2)[2].second.toInt().toLong())
+        Assert.assertEquals((24 - 1).toLong(), frame.getSeries(3)[2].second.toInt().toLong())
+        Assert.assertEquals((3 - 1).toLong(), frame.getSeries(4)[2].second.toInt().toLong())
+        Assert.assertEquals((1 - 0).toLong(), frame.getSeries(5)[2].second.toInt().toLong())
         Assert.assertEquals(0, frame.min.toInt().toLong())
         Assert.assertEquals(157, frame.max.toInt().toLong())
     }
@@ -441,20 +437,20 @@ class BarFrameBuilderTest {
                 result.binding
                         .map { map ->
                             map.entries.asSequence()
-                                    .sortedByDescending { it.value.right }
-                                    .map { DualBar(it.key.left, it.key.right, it.value.left, it.value.right, it.value.left.toString() + "/" + it.value.right) }
+                                    .sortedByDescending { it.value.second }
+                                    .map { DualBar(it.key.first, it.key.second, it.value.first, it.value.second, it.value.first.toString() + "/" + it.value.second) }
                                     .toList()
                         })
                 .build()
         Assert.assertEquals(0, frame.numBars.toLong())
         Assert.assertEquals(0, frame.numLines.toLong())
         result.value = mapOf(
-                ImmutablePair.of("LIBERAL", Color.RED) to ImmutablePair.of(26, 157),
-                ImmutablePair.of("CONSERVATIVE", Color.BLUE) to ImmutablePair.of(4, 121),
-                ImmutablePair.of("NEW DEMOCRATIC PARTY", Color.ORANGE) to ImmutablePair.of(1, 24),
-                ImmutablePair.of("BLOC QU\u00c9B\u00c9COIS", Color.CYAN) to ImmutablePair.of(0, 32),
-                ImmutablePair.of("GREEN", Color.GREEN) to ImmutablePair.of(1, 3),
-                ImmutablePair.of("INDEPENDENT", Color.GRAY) to ImmutablePair.of(0, 1))
+                Pair("LIBERAL", Color.RED) to Pair(26, 157),
+                Pair("CONSERVATIVE", Color.BLUE) to Pair(4, 121),
+                Pair("NEW DEMOCRATIC PARTY", Color.ORANGE) to Pair(1, 24),
+                Pair("BLOC QU\u00c9B\u00c9COIS", Color.CYAN) to Pair(0, 32),
+                Pair("GREEN", Color.GREEN) to Pair(1, 3),
+                Pair("INDEPENDENT", Color.GRAY) to Pair(0, 1))
         Assert.assertEquals(6, frame.numBars.toLong())
         Assert.assertEquals("LIBERAL", frame.getLeftText(0))
         Assert.assertEquals("CONSERVATIVE", frame.getLeftText(1))
@@ -468,36 +464,36 @@ class BarFrameBuilderTest {
         Assert.assertEquals("1/24", frame.getRightText(3))
         Assert.assertEquals("1/3", frame.getRightText(4))
         Assert.assertEquals("0/1", frame.getRightText(5))
-        Assert.assertEquals(0, frame.getSeries(0)[0].right.toInt().toLong())
-        Assert.assertEquals(0, frame.getSeries(1)[0].right.toInt().toLong())
-        Assert.assertEquals(0, frame.getSeries(2)[0].right.toInt().toLong())
-        Assert.assertEquals(0, frame.getSeries(3)[0].right.toInt().toLong())
-        Assert.assertEquals(0, frame.getSeries(4)[0].right.toInt().toLong())
-        Assert.assertEquals(0, frame.getSeries(5)[0].right.toInt().toLong())
-        Assert.assertEquals(lighten(Color.RED), frame.getSeries(0)[1].left)
-        Assert.assertEquals(lighten(Color.BLUE), frame.getSeries(1)[1].left)
-        Assert.assertEquals(lighten(Color.CYAN), frame.getSeries(2)[1].left)
-        Assert.assertEquals(lighten(Color.ORANGE), frame.getSeries(3)[1].left)
-        Assert.assertEquals(lighten(Color.GREEN), frame.getSeries(4)[1].left)
-        Assert.assertEquals(lighten(Color.GRAY), frame.getSeries(5)[1].left)
-        Assert.assertEquals(26, frame.getSeries(0)[1].right.toInt().toLong())
-        Assert.assertEquals(4, frame.getSeries(1)[1].right.toInt().toLong())
-        Assert.assertEquals(0, frame.getSeries(2)[1].right.toInt().toLong())
-        Assert.assertEquals(1, frame.getSeries(3)[1].right.toInt().toLong())
-        Assert.assertEquals(1, frame.getSeries(4)[1].right.toInt().toLong())
-        Assert.assertEquals(0, frame.getSeries(5)[1].right.toInt().toLong())
-        Assert.assertEquals(Color.RED, frame.getSeries(0)[2].left)
-        Assert.assertEquals(Color.BLUE, frame.getSeries(1)[2].left)
-        Assert.assertEquals(Color.CYAN, frame.getSeries(2)[2].left)
-        Assert.assertEquals(Color.ORANGE, frame.getSeries(3)[2].left)
-        Assert.assertEquals(Color.GREEN, frame.getSeries(4)[2].left)
-        Assert.assertEquals(Color.GRAY, frame.getSeries(5)[2].left)
-        Assert.assertEquals((157 - 26).toLong(), frame.getSeries(0)[2].right.toInt().toLong())
-        Assert.assertEquals((121 - 4).toLong(), frame.getSeries(1)[2].right.toInt().toLong())
-        Assert.assertEquals((32 - 0).toLong(), frame.getSeries(2)[2].right.toInt().toLong())
-        Assert.assertEquals((24 - 1).toLong(), frame.getSeries(3)[2].right.toInt().toLong())
-        Assert.assertEquals((3 - 1).toLong(), frame.getSeries(4)[2].right.toInt().toLong())
-        Assert.assertEquals((1 - 0).toLong(), frame.getSeries(5)[2].right.toInt().toLong())
+        Assert.assertEquals(0, frame.getSeries(0)[0].second.toInt().toLong())
+        Assert.assertEquals(0, frame.getSeries(1)[0].second.toInt().toLong())
+        Assert.assertEquals(0, frame.getSeries(2)[0].second.toInt().toLong())
+        Assert.assertEquals(0, frame.getSeries(3)[0].second.toInt().toLong())
+        Assert.assertEquals(0, frame.getSeries(4)[0].second.toInt().toLong())
+        Assert.assertEquals(0, frame.getSeries(5)[0].second.toInt().toLong())
+        Assert.assertEquals(lighten(Color.RED), frame.getSeries(0)[1].first)
+        Assert.assertEquals(lighten(Color.BLUE), frame.getSeries(1)[1].first)
+        Assert.assertEquals(lighten(Color.CYAN), frame.getSeries(2)[1].first)
+        Assert.assertEquals(lighten(Color.ORANGE), frame.getSeries(3)[1].first)
+        Assert.assertEquals(lighten(Color.GREEN), frame.getSeries(4)[1].first)
+        Assert.assertEquals(lighten(Color.GRAY), frame.getSeries(5)[1].first)
+        Assert.assertEquals(26, frame.getSeries(0)[1].second.toInt().toLong())
+        Assert.assertEquals(4, frame.getSeries(1)[1].second.toInt().toLong())
+        Assert.assertEquals(0, frame.getSeries(2)[1].second.toInt().toLong())
+        Assert.assertEquals(1, frame.getSeries(3)[1].second.toInt().toLong())
+        Assert.assertEquals(1, frame.getSeries(4)[1].second.toInt().toLong())
+        Assert.assertEquals(0, frame.getSeries(5)[1].second.toInt().toLong())
+        Assert.assertEquals(Color.RED, frame.getSeries(0)[2].first)
+        Assert.assertEquals(Color.BLUE, frame.getSeries(1)[2].first)
+        Assert.assertEquals(Color.CYAN, frame.getSeries(2)[2].first)
+        Assert.assertEquals(Color.ORANGE, frame.getSeries(3)[2].first)
+        Assert.assertEquals(Color.GREEN, frame.getSeries(4)[2].first)
+        Assert.assertEquals(Color.GRAY, frame.getSeries(5)[2].first)
+        Assert.assertEquals((157 - 26).toLong(), frame.getSeries(0)[2].second.toInt().toLong())
+        Assert.assertEquals((121 - 4).toLong(), frame.getSeries(1)[2].second.toInt().toLong())
+        Assert.assertEquals((32 - 0).toLong(), frame.getSeries(2)[2].second.toInt().toLong())
+        Assert.assertEquals((24 - 1).toLong(), frame.getSeries(3)[2].second.toInt().toLong())
+        Assert.assertEquals((3 - 1).toLong(), frame.getSeries(4)[2].second.toInt().toLong())
+        Assert.assertEquals((1 - 0).toLong(), frame.getSeries(5)[2].second.toInt().toLong())
         Assert.assertEquals(0, frame.min.toInt().toLong())
         Assert.assertEquals(157, frame.max.toInt().toLong())
     }
@@ -509,20 +505,20 @@ class BarFrameBuilderTest {
                 result.binding
                         .map { map ->
                             map.entries.asSequence()
-                                    .sortedByDescending { it.value.right }
-                                    .map { DualBar(it.key.left, it.key.right, it.value.left, it.value.middle, """${DIFF.format(it.value.left)}/${DIFF.format(it.value.middle)}""") }
+                                    .sortedByDescending { it.value.third }
+                                    .map { DualBar(it.key.first, it.key.second, it.value.first, it.value.second, """${DIFF.format(it.value.first)}/${DIFF.format(it.value.second)}""") }
                                     .toList()
                         })
                 .build()
         Assert.assertEquals(0, frame.numBars.toLong())
         Assert.assertEquals(0, frame.numLines.toLong())
         result.value = mapOf(
-                ImmutablePair.of("LIB", Color.RED) to ImmutableTriple.of(-6, -27, 157),
-                ImmutablePair.of("CON", Color.BLUE) to ImmutableTriple.of(+4, +22, 121),
-                ImmutablePair.of("NDP", Color.ORANGE) to ImmutableTriple.of(+1, -20, 24),
-                ImmutablePair.of("BQ", Color.CYAN) to ImmutableTriple.of(0, +22, 32),
-                ImmutablePair.of("GRN", Color.GREEN) to ImmutableTriple.of(+1, +2, 3),
-                ImmutablePair.of("IND", Color.GRAY) to ImmutableTriple.of(0, +1, 1))
+                Pair("LIB", Color.RED) to Triple(-6, -27, 157),
+                Pair("CON", Color.BLUE) to Triple(+4, +22, 121),
+                Pair("NDP", Color.ORANGE) to Triple(+1, -20, 24),
+                Pair("BQ", Color.CYAN) to Triple(0, +22, 32),
+                Pair("GRN", Color.GREEN) to Triple(+1, +2, 3),
+                Pair("IND", Color.GRAY) to Triple(0, +1, 1))
         Assert.assertEquals(6, frame.numBars.toLong())
         Assert.assertEquals("LIB", frame.getLeftText(0))
         Assert.assertEquals("CON", frame.getLeftText(1))
@@ -536,42 +532,42 @@ class BarFrameBuilderTest {
         Assert.assertEquals("+1/-20", frame.getRightText(3))
         Assert.assertEquals("+1/+2", frame.getRightText(4))
         Assert.assertEquals("+0/+1", frame.getRightText(5))
-        Assert.assertEquals(Color.RED, frame.getSeries(0)[0].left)
-        Assert.assertEquals(Color.BLUE, frame.getSeries(1)[0].left)
-        Assert.assertEquals(Color.CYAN, frame.getSeries(2)[0].left)
-        Assert.assertEquals(Color.ORANGE, frame.getSeries(3)[0].left)
-        Assert.assertEquals(Color.GREEN, frame.getSeries(4)[0].left)
-        Assert.assertEquals(Color.GRAY, frame.getSeries(5)[0].left)
-        Assert.assertEquals(0, frame.getSeries(0)[0].right.toInt().toLong())
-        Assert.assertEquals(0, frame.getSeries(1)[0].right.toInt().toLong())
-        Assert.assertEquals(0, frame.getSeries(2)[0].right.toInt().toLong())
-        Assert.assertEquals(0, frame.getSeries(3)[0].right.toInt().toLong())
-        Assert.assertEquals(0, frame.getSeries(4)[0].right.toInt().toLong())
-        Assert.assertEquals(0, frame.getSeries(5)[0].right.toInt().toLong())
-        Assert.assertEquals(Color.RED, frame.getSeries(0)[1].left)
-        Assert.assertEquals(Color.BLUE, frame.getSeries(1)[1].left)
-        Assert.assertEquals(Color.CYAN, frame.getSeries(2)[1].left)
-        Assert.assertEquals(lighten(Color.ORANGE), frame.getSeries(3)[1].left)
-        Assert.assertEquals(Color.GREEN, frame.getSeries(4)[1].left)
-        Assert.assertEquals(Color.GRAY, frame.getSeries(5)[1].left)
-        Assert.assertEquals(-6, frame.getSeries(0)[1].right.toInt().toLong())
-        Assert.assertEquals(+4, frame.getSeries(1)[1].right.toInt().toLong())
-        Assert.assertEquals(0, frame.getSeries(2)[1].right.toInt().toLong())
-        Assert.assertEquals(+1, frame.getSeries(3)[1].right.toInt().toLong())
-        Assert.assertEquals(+1, frame.getSeries(4)[1].right.toInt().toLong())
-        Assert.assertEquals(0, frame.getSeries(5)[1].right.toInt().toLong())
-        Assert.assertEquals(lighten(Color.RED), frame.getSeries(0)[2].left)
-        Assert.assertEquals(lighten(Color.BLUE), frame.getSeries(1)[2].left)
-        Assert.assertEquals(lighten(Color.CYAN), frame.getSeries(2)[2].left)
-        Assert.assertEquals(lighten(Color.ORANGE), frame.getSeries(3)[2].left)
-        Assert.assertEquals(lighten(Color.GREEN), frame.getSeries(4)[2].left)
-        Assert.assertEquals(lighten(Color.GRAY), frame.getSeries(5)[2].left)
-        Assert.assertEquals((-27 - -6).toLong(), frame.getSeries(0)[2].right.toInt().toLong())
-        Assert.assertEquals((+22 - +4).toLong(), frame.getSeries(1)[2].right.toInt().toLong())
-        Assert.assertEquals((+22 - 0).toLong(), frame.getSeries(2)[2].right.toInt().toLong())
-        Assert.assertEquals(-20, frame.getSeries(3)[2].right.toInt().toLong())
-        Assert.assertEquals((+2 - +1).toLong(), frame.getSeries(4)[2].right.toInt().toLong())
-        Assert.assertEquals((+1 - 0).toLong(), frame.getSeries(5)[2].right.toInt().toLong())
+        Assert.assertEquals(Color.RED, frame.getSeries(0)[0].first)
+        Assert.assertEquals(Color.BLUE, frame.getSeries(1)[0].first)
+        Assert.assertEquals(Color.CYAN, frame.getSeries(2)[0].first)
+        Assert.assertEquals(Color.ORANGE, frame.getSeries(3)[0].first)
+        Assert.assertEquals(Color.GREEN, frame.getSeries(4)[0].first)
+        Assert.assertEquals(Color.GRAY, frame.getSeries(5)[0].first)
+        Assert.assertEquals(0, frame.getSeries(0)[0].second.toInt().toLong())
+        Assert.assertEquals(0, frame.getSeries(1)[0].second.toInt().toLong())
+        Assert.assertEquals(0, frame.getSeries(2)[0].second.toInt().toLong())
+        Assert.assertEquals(0, frame.getSeries(3)[0].second.toInt().toLong())
+        Assert.assertEquals(0, frame.getSeries(4)[0].second.toInt().toLong())
+        Assert.assertEquals(0, frame.getSeries(5)[0].second.toInt().toLong())
+        Assert.assertEquals(Color.RED, frame.getSeries(0)[1].first)
+        Assert.assertEquals(Color.BLUE, frame.getSeries(1)[1].first)
+        Assert.assertEquals(Color.CYAN, frame.getSeries(2)[1].first)
+        Assert.assertEquals(lighten(Color.ORANGE), frame.getSeries(3)[1].first)
+        Assert.assertEquals(Color.GREEN, frame.getSeries(4)[1].first)
+        Assert.assertEquals(Color.GRAY, frame.getSeries(5)[1].first)
+        Assert.assertEquals(-6, frame.getSeries(0)[1].second.toInt().toLong())
+        Assert.assertEquals(+4, frame.getSeries(1)[1].second.toInt().toLong())
+        Assert.assertEquals(0, frame.getSeries(2)[1].second.toInt().toLong())
+        Assert.assertEquals(+1, frame.getSeries(3)[1].second.toInt().toLong())
+        Assert.assertEquals(+1, frame.getSeries(4)[1].second.toInt().toLong())
+        Assert.assertEquals(0, frame.getSeries(5)[1].second.toInt().toLong())
+        Assert.assertEquals(lighten(Color.RED), frame.getSeries(0)[2].first)
+        Assert.assertEquals(lighten(Color.BLUE), frame.getSeries(1)[2].first)
+        Assert.assertEquals(lighten(Color.CYAN), frame.getSeries(2)[2].first)
+        Assert.assertEquals(lighten(Color.ORANGE), frame.getSeries(3)[2].first)
+        Assert.assertEquals(lighten(Color.GREEN), frame.getSeries(4)[2].first)
+        Assert.assertEquals(lighten(Color.GRAY), frame.getSeries(5)[2].first)
+        Assert.assertEquals((-27 - -6).toLong(), frame.getSeries(0)[2].second.toInt().toLong())
+        Assert.assertEquals((+22 - +4).toLong(), frame.getSeries(1)[2].second.toInt().toLong())
+        Assert.assertEquals((+22 - 0).toLong(), frame.getSeries(2)[2].second.toInt().toLong())
+        Assert.assertEquals(-20, frame.getSeries(3)[2].second.toInt().toLong())
+        Assert.assertEquals((+2 - +1).toLong(), frame.getSeries(4)[2].second.toInt().toLong())
+        Assert.assertEquals((+1 - 0).toLong(), frame.getSeries(5)[2].second.toInt().toLong())
         Assert.assertEquals(-27, frame.min.toInt().toLong())
         Assert.assertEquals(+22, frame.max.toInt().toLong())
     }
@@ -583,20 +579,20 @@ class BarFrameBuilderTest {
                 result.binding
                         .map { map ->
                             map.entries.asSequence()
-                                    .sortedByDescending { it.value.right }
-                                    .map { DualBar(it.key.left, it.key.right, it.value.left, it.value.middle, "(${DIFF.format(it.value.left)})-(${DIFF.format(it.value.middle)})") }
+                                    .sortedByDescending { it.value.third }
+                                    .map { DualBar(it.key.first, it.key.second, it.value.first, it.value.second, "(${DIFF.format(it.value.first)})-(${DIFF.format(it.value.second)})") }
                                     .toList()
                         })
                 .build()
         Assert.assertEquals(0, frame.numBars.toLong())
         Assert.assertEquals(0, frame.numLines.toLong())
         result.value = mapOf(
-                ImmutablePair.of("LIB", Color.RED) to ImmutableTriple.of(-27, -6, 157),
-                ImmutablePair.of("CON", Color.BLUE) to ImmutableTriple.of(+4, +22, 121),
-                ImmutablePair.of("NDP", Color.ORANGE) to ImmutableTriple.of(-20, +1, 24),
-                ImmutablePair.of("BQ", Color.CYAN) to ImmutableTriple.of(0, +22, 32),
-                ImmutablePair.of("GRN", Color.GREEN) to ImmutableTriple.of(+1, +2, 3),
-                ImmutablePair.of("IND", Color.GRAY) to ImmutableTriple.of(0, +1, 1))
+                Pair("LIB", Color.RED) to Triple(-27, -6, 157),
+                Pair("CON", Color.BLUE) to Triple(+4, +22, 121),
+                Pair("NDP", Color.ORANGE) to Triple(-20, +1, 24),
+                Pair("BQ", Color.CYAN) to Triple(0, +22, 32),
+                Pair("GRN", Color.GREEN) to Triple(+1, +2, 3),
+                Pair("IND", Color.GRAY) to Triple(0, +1, 1))
         Assert.assertEquals(6, frame.numBars.toLong())
         Assert.assertEquals("LIB", frame.getLeftText(0))
         Assert.assertEquals("CON", frame.getLeftText(1))
@@ -610,30 +606,30 @@ class BarFrameBuilderTest {
         Assert.assertEquals("(-20)-(+1)", frame.getRightText(3))
         Assert.assertEquals("(+1)-(+2)", frame.getRightText(4))
         Assert.assertEquals("(+0)-(+1)", frame.getRightText(5))
-        Assert.assertEquals(Color.RED, frame.getSeries(0)[1].left)
-        Assert.assertEquals(Color.BLUE, frame.getSeries(1)[1].left)
-        Assert.assertEquals(Color.CYAN, frame.getSeries(2)[1].left)
-        Assert.assertEquals(lighten(Color.ORANGE), frame.getSeries(3)[1].left)
-        Assert.assertEquals(Color.GREEN, frame.getSeries(4)[1].left)
-        Assert.assertEquals(Color.GRAY, frame.getSeries(5)[1].left)
-        Assert.assertEquals(-6, frame.getSeries(0)[1].right.toInt().toLong())
-        Assert.assertEquals(+4, frame.getSeries(1)[1].right.toInt().toLong())
-        Assert.assertEquals(0, frame.getSeries(2)[1].right.toInt().toLong())
-        Assert.assertEquals(-20, frame.getSeries(3)[1].right.toInt().toLong())
-        Assert.assertEquals(+1, frame.getSeries(4)[1].right.toInt().toLong())
-        Assert.assertEquals(0, frame.getSeries(5)[1].right.toInt().toLong())
-        Assert.assertEquals(lighten(Color.RED), frame.getSeries(0)[2].left)
-        Assert.assertEquals(lighten(Color.BLUE), frame.getSeries(1)[2].left)
-        Assert.assertEquals(lighten(Color.CYAN), frame.getSeries(2)[2].left)
-        Assert.assertEquals(lighten(Color.ORANGE), frame.getSeries(3)[2].left)
-        Assert.assertEquals(lighten(Color.GREEN), frame.getSeries(4)[2].left)
-        Assert.assertEquals(lighten(Color.GRAY), frame.getSeries(5)[2].left)
-        Assert.assertEquals((-27 - -6).toLong(), frame.getSeries(0)[2].right.toInt().toLong())
-        Assert.assertEquals((+22 - +4).toLong(), frame.getSeries(1)[2].right.toInt().toLong())
-        Assert.assertEquals((+22 - 0).toLong(), frame.getSeries(2)[2].right.toInt().toLong())
-        Assert.assertEquals(+1, frame.getSeries(3)[2].right.toInt().toLong())
-        Assert.assertEquals((+2 - +1).toLong(), frame.getSeries(4)[2].right.toInt().toLong())
-        Assert.assertEquals((+1 - 0).toLong(), frame.getSeries(5)[2].right.toInt().toLong())
+        Assert.assertEquals(Color.RED, frame.getSeries(0)[1].first)
+        Assert.assertEquals(Color.BLUE, frame.getSeries(1)[1].first)
+        Assert.assertEquals(Color.CYAN, frame.getSeries(2)[1].first)
+        Assert.assertEquals(lighten(Color.ORANGE), frame.getSeries(3)[1].first)
+        Assert.assertEquals(Color.GREEN, frame.getSeries(4)[1].first)
+        Assert.assertEquals(Color.GRAY, frame.getSeries(5)[1].first)
+        Assert.assertEquals(-6, frame.getSeries(0)[1].second.toInt().toLong())
+        Assert.assertEquals(+4, frame.getSeries(1)[1].second.toInt().toLong())
+        Assert.assertEquals(0, frame.getSeries(2)[1].second.toInt().toLong())
+        Assert.assertEquals(-20, frame.getSeries(3)[1].second.toInt().toLong())
+        Assert.assertEquals(+1, frame.getSeries(4)[1].second.toInt().toLong())
+        Assert.assertEquals(0, frame.getSeries(5)[1].second.toInt().toLong())
+        Assert.assertEquals(lighten(Color.RED), frame.getSeries(0)[2].first)
+        Assert.assertEquals(lighten(Color.BLUE), frame.getSeries(1)[2].first)
+        Assert.assertEquals(lighten(Color.CYAN), frame.getSeries(2)[2].first)
+        Assert.assertEquals(lighten(Color.ORANGE), frame.getSeries(3)[2].first)
+        Assert.assertEquals(lighten(Color.GREEN), frame.getSeries(4)[2].first)
+        Assert.assertEquals(lighten(Color.GRAY), frame.getSeries(5)[2].first)
+        Assert.assertEquals((-27 - -6).toLong(), frame.getSeries(0)[2].second.toInt().toLong())
+        Assert.assertEquals((+22 - +4).toLong(), frame.getSeries(1)[2].second.toInt().toLong())
+        Assert.assertEquals((+22 - 0).toLong(), frame.getSeries(2)[2].second.toInt().toLong())
+        Assert.assertEquals(+1, frame.getSeries(3)[2].second.toInt().toLong())
+        Assert.assertEquals((+2 - +1).toLong(), frame.getSeries(4)[2].second.toInt().toLong())
+        Assert.assertEquals((+1 - 0).toLong(), frame.getSeries(5)[2].second.toInt().toLong())
         Assert.assertEquals(-27, frame.min.toInt().toLong())
         Assert.assertEquals(+22, frame.max.toInt().toLong())
     }
@@ -661,9 +657,9 @@ class BarFrameBuilderTest {
         Assert.assertEquals("5", frame.getRightText(0))
         Assert.assertEquals("10", frame.getRightText(5))
         Assert.assertEquals("3", frame.getRightText(11))
-        Assert.assertEquals(5, frame.getSeries(0)[0].right)
-        Assert.assertEquals(10, frame.getSeries(5)[0].right)
-        Assert.assertEquals(3, frame.getSeries(11)[0].right)
+        Assert.assertEquals(5, frame.getSeries(0)[0].second)
+        Assert.assertEquals(10, frame.getSeries(5)[0].second)
+        Assert.assertEquals(3, frame.getSeries(11)[0].second)
     }
 
     @Test
@@ -689,79 +685,79 @@ class BarFrameBuilderTest {
         Assert.assertEquals("46 > 44", frame.getRightText(0))
         Assert.assertEquals("84 > 83", frame.getRightText(5))
         Assert.assertEquals("18 > 16", frame.getRightText(11))
-        Assert.assertEquals(Color.BLACK, frame.getSeries(0)[0].left)
-        Assert.assertEquals(Color.BLACK, frame.getSeries(5)[0].left)
-        Assert.assertEquals(Color.BLACK, frame.getSeries(11)[0].left)
-        Assert.assertEquals(0.0, frame.getSeries(0)[0].right.toDouble(), 0.0)
-        Assert.assertEquals(0.0, frame.getSeries(5)[0].right.toDouble(), 0.0)
-        Assert.assertEquals(0.0, frame.getSeries(11)[0].right.toDouble(), 0.0)
-        Assert.assertEquals(Color.BLACK, frame.getSeries(0)[1].left)
-        Assert.assertEquals(Color.BLACK, frame.getSeries(5)[1].left)
-        Assert.assertEquals(Color.BLACK, frame.getSeries(11)[1].left)
-        Assert.assertEquals(44.0, frame.getSeries(0)[1].right.toDouble(), 0.0)
-        Assert.assertEquals(83.0, frame.getSeries(5)[1].right.toDouble(), 0.0)
-        Assert.assertEquals(16.0, frame.getSeries(11)[1].right.toDouble(), 0.0)
-        Assert.assertEquals(ColorUtils.lighten(Color.BLACK), frame.getSeries(0)[2].left)
-        Assert.assertEquals(ColorUtils.lighten(Color.BLACK), frame.getSeries(5)[2].left)
-        Assert.assertEquals(ColorUtils.lighten(Color.BLACK), frame.getSeries(11)[2].left)
-        Assert.assertEquals(2.0, frame.getSeries(0)[2].right.toDouble(), 0.0)
-        Assert.assertEquals(1.0, frame.getSeries(5)[2].right.toDouble(), 0.0)
-        Assert.assertEquals(2.0, frame.getSeries(11)[2].right.toDouble(), 0.0)
+        Assert.assertEquals(Color.BLACK, frame.getSeries(0)[0].first)
+        Assert.assertEquals(Color.BLACK, frame.getSeries(5)[0].first)
+        Assert.assertEquals(Color.BLACK, frame.getSeries(11)[0].first)
+        Assert.assertEquals(0.0, frame.getSeries(0)[0].second.toDouble(), 0.0)
+        Assert.assertEquals(0.0, frame.getSeries(5)[0].second.toDouble(), 0.0)
+        Assert.assertEquals(0.0, frame.getSeries(11)[0].second.toDouble(), 0.0)
+        Assert.assertEquals(Color.BLACK, frame.getSeries(0)[1].first)
+        Assert.assertEquals(Color.BLACK, frame.getSeries(5)[1].first)
+        Assert.assertEquals(Color.BLACK, frame.getSeries(11)[1].first)
+        Assert.assertEquals(44.0, frame.getSeries(0)[1].second.toDouble(), 0.0)
+        Assert.assertEquals(83.0, frame.getSeries(5)[1].second.toDouble(), 0.0)
+        Assert.assertEquals(16.0, frame.getSeries(11)[1].second.toDouble(), 0.0)
+        Assert.assertEquals(ColorUtils.lighten(Color.BLACK), frame.getSeries(0)[2].first)
+        Assert.assertEquals(ColorUtils.lighten(Color.BLACK), frame.getSeries(5)[2].first)
+        Assert.assertEquals(ColorUtils.lighten(Color.BLACK), frame.getSeries(11)[2].first)
+        Assert.assertEquals(2.0, frame.getSeries(0)[2].second.toDouble(), 0.0)
+        Assert.assertEquals(1.0, frame.getSeries(5)[2].second.toDouble(), 0.0)
+        Assert.assertEquals(2.0, frame.getSeries(11)[2].second.toDouble(), 0.0)
         Assert.assertEquals(84.0, frame.max.toDouble(), 0.0)
         Assert.assertEquals(0.0, frame.min.toDouble(), 0.0)
     }
 
     @Test
     fun testDualVariousCombos() {
-        val doAssert = { exp: Pair<Color, Number>, act: Pair<Color, Number> ->
-            Assert.assertEquals(exp.left, act.left)
-            Assert.assertEquals(exp.right.toDouble(), act.right.toDouble(), 0.0)
+        val doAssert = { exp: kotlin.Pair<Color, Number>, act: kotlin.Pair<Color, Number> ->
+            Assert.assertEquals(exp.first, act.first)
+            Assert.assertEquals(exp.second.toDouble(), act.second.toDouble(), 0.0)
         }
         val regions = BindableWrapper(listOf(DualBar("", Color.BLACK, 0.0, 0.0, "")))
         val frame = dual(regions.binding).build()
-        doAssert(ImmutablePair.of(Color.BLACK, 0.0), frame.getSeries(0)[0])
-        doAssert(ImmutablePair.of(Color.BLACK, 0.0), frame.getSeries(0)[1])
-        doAssert(ImmutablePair.of(lighten(Color.BLACK), 0.0), frame.getSeries(0)[2])
+        doAssert(Pair(Color.BLACK, 0.0), frame.getSeries(0)[0])
+        doAssert(Pair(Color.BLACK, 0.0), frame.getSeries(0)[1])
+        doAssert(Pair(lighten(Color.BLACK), 0.0), frame.getSeries(0)[2])
         regions.value = listOf(DualBar("", Color.BLACK, 0.0, 2.0, ""))
-        doAssert(ImmutablePair.of(Color.BLACK, 0.0), frame.getSeries(0)[0])
-        doAssert(ImmutablePair.of(Color.BLACK, 0.0), frame.getSeries(0)[1])
-        doAssert(ImmutablePair.of(lighten(Color.BLACK), 2.0), frame.getSeries(0)[2])
+        doAssert(Pair(Color.BLACK, 0.0), frame.getSeries(0)[0])
+        doAssert(Pair(Color.BLACK, 0.0), frame.getSeries(0)[1])
+        doAssert(Pair(lighten(Color.BLACK), 2.0), frame.getSeries(0)[2])
         regions.value = listOf(DualBar("", Color.BLACK, 2.0, 0.0, ""))
-        doAssert(ImmutablePair.of(Color.BLACK, 0.0), frame.getSeries(0)[0])
-        doAssert(ImmutablePair.of(Color.BLACK, 0.0), frame.getSeries(0)[1])
-        doAssert(ImmutablePair.of(lighten(Color.BLACK), 2.0), frame.getSeries(0)[2])
+        doAssert(Pair(Color.BLACK, 0.0), frame.getSeries(0)[0])
+        doAssert(Pair(Color.BLACK, 0.0), frame.getSeries(0)[1])
+        doAssert(Pair(lighten(Color.BLACK), 2.0), frame.getSeries(0)[2])
         regions.value = listOf(DualBar("", Color.BLACK, 0.0, -2.0, ""))
-        doAssert(ImmutablePair.of(Color.BLACK, 0.0), frame.getSeries(0)[0])
-        doAssert(ImmutablePair.of(Color.BLACK, 0.0), frame.getSeries(0)[1])
-        doAssert(ImmutablePair.of(lighten(Color.BLACK), -2.0), frame.getSeries(0)[2])
+        doAssert(Pair(Color.BLACK, 0.0), frame.getSeries(0)[0])
+        doAssert(Pair(Color.BLACK, 0.0), frame.getSeries(0)[1])
+        doAssert(Pair(lighten(Color.BLACK), -2.0), frame.getSeries(0)[2])
         regions.value = listOf(DualBar("", Color.BLACK, -2.0, 0.0, ""))
-        doAssert(ImmutablePair.of(Color.BLACK, 0.0), frame.getSeries(0)[0])
-        doAssert(ImmutablePair.of(Color.BLACK, 0.0), frame.getSeries(0)[1])
-        doAssert(ImmutablePair.of(lighten(Color.BLACK), -2.0), frame.getSeries(0)[2])
+        doAssert(Pair(Color.BLACK, 0.0), frame.getSeries(0)[0])
+        doAssert(Pair(Color.BLACK, 0.0), frame.getSeries(0)[1])
+        doAssert(Pair(lighten(Color.BLACK), -2.0), frame.getSeries(0)[2])
         regions.value = listOf(DualBar("", Color.BLACK, 1.0, 3.0, ""))
-        doAssert(ImmutablePair.of(Color.BLACK, 0.0), frame.getSeries(0)[0])
-        doAssert(ImmutablePair.of(Color.BLACK, 1.0), frame.getSeries(0)[1])
-        doAssert(ImmutablePair.of(lighten(Color.BLACK), 2.0), frame.getSeries(0)[2])
+        doAssert(Pair(Color.BLACK, 0.0), frame.getSeries(0)[0])
+        doAssert(Pair(Color.BLACK, 1.0), frame.getSeries(0)[1])
+        doAssert(Pair(lighten(Color.BLACK), 2.0), frame.getSeries(0)[2])
         regions.value = listOf(DualBar("", Color.BLACK, 3.0, 1.0, ""))
-        doAssert(ImmutablePair.of(Color.BLACK, 0.0), frame.getSeries(0)[0])
-        doAssert(ImmutablePair.of(Color.BLACK, 1.0), frame.getSeries(0)[1])
-        doAssert(ImmutablePair.of(lighten(Color.BLACK), 2.0), frame.getSeries(0)[2])
+        doAssert(Pair(Color.BLACK, 0.0), frame.getSeries(0)[0])
+        doAssert(Pair(Color.BLACK, 1.0), frame.getSeries(0)[1])
+        doAssert(Pair(lighten(Color.BLACK), 2.0), frame.getSeries(0)[2])
         regions.value = listOf(DualBar("", Color.BLACK, -1.0, -3.0, ""))
-        doAssert(ImmutablePair.of(Color.BLACK, 0.0), frame.getSeries(0)[0])
-        doAssert(ImmutablePair.of(Color.BLACK, -1.0), frame.getSeries(0)[1])
-        doAssert(ImmutablePair.of(lighten(Color.BLACK), -2.0), frame.getSeries(0)[2])
+        doAssert(Pair(Color.BLACK, 0.0), frame.getSeries(0)[0])
+        doAssert(Pair(Color.BLACK, -1.0), frame.getSeries(0)[1])
+        doAssert(Pair(lighten(Color.BLACK), -2.0), frame.getSeries(0)[2])
         regions.value = listOf(DualBar("", Color.BLACK, -3.0, -1.0, ""))
-        doAssert(ImmutablePair.of(Color.BLACK, 0.0), frame.getSeries(0)[0])
-        doAssert(ImmutablePair.of(Color.BLACK, -1.0), frame.getSeries(0)[1])
-        doAssert(ImmutablePair.of(lighten(Color.BLACK), -2.0), frame.getSeries(0)[2])
+        doAssert(Pair(Color.BLACK, 0.0), frame.getSeries(0)[0])
+        doAssert(Pair(Color.BLACK, -1.0), frame.getSeries(0)[1])
+        doAssert(Pair(lighten(Color.BLACK), -2.0), frame.getSeries(0)[2])
         regions.value = listOf(DualBar("", Color.BLACK, -1.0, +1.0, ""))
-        doAssert(ImmutablePair.of(Color.BLACK, 0.0), frame.getSeries(0)[0])
-        doAssert(ImmutablePair.of(lighten(Color.BLACK), -1.0), frame.getSeries(0)[1])
-        doAssert(ImmutablePair.of(lighten(Color.BLACK), +1.0), frame.getSeries(0)[2])
+        doAssert(Pair(Color.BLACK, 0.0), frame.getSeries(0)[0])
+        doAssert(Pair(lighten(Color.BLACK), -1.0), frame.getSeries(0)[1])
+        doAssert(Pair(lighten(Color.BLACK), +1.0), frame.getSeries(0)[2])
         regions.value = listOf(DualBar("", Color.BLACK, +1.0, -1.0, ""))
-        doAssert(ImmutablePair.of(Color.BLACK, 0.0), frame.getSeries(0)[0])
-        doAssert(ImmutablePair.of(lighten(Color.BLACK), +1.0), frame.getSeries(0)[1])
-        doAssert(ImmutablePair.of(lighten(Color.BLACK), -1.0), frame.getSeries(0)[2])
+        doAssert(Pair(Color.BLACK, 0.0), frame.getSeries(0)[0])
+        doAssert(Pair(lighten(Color.BLACK), +1.0), frame.getSeries(0)[1])
+        doAssert(Pair(lighten(Color.BLACK), -1.0), frame.getSeries(0)[2])
     }
 
     companion object {

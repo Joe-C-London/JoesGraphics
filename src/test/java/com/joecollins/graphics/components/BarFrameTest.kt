@@ -23,8 +23,6 @@ import java.text.DecimalFormat
 import kotlin.Throws
 import kotlin.jvm.JvmOverloads
 import kotlin.math.sign
-import org.apache.commons.lang3.tuple.ImmutableTriple
-import org.apache.commons.lang3.tuple.Triple
 import org.junit.Assert
 import org.junit.Test
 
@@ -124,22 +122,22 @@ class BarFrameTest {
                 propertyBinding(results, { it.getSeatEstimate() - it.getNumSeats() }, ElectionResult.Properties.NUM_SEATS, ElectionResult.Properties.SEAT_ESTIMATE))
         val lightRed = Color(255, 127, 127)
         var libSeries = frame.getSeries(0)
-        Assert.assertEquals(Color.RED, libSeries[0].left)
-        Assert.assertEquals(2, libSeries[0].right.toInt().toLong())
-        Assert.assertEquals(lightRed, libSeries[1].left)
-        Assert.assertEquals(155, libSeries[1].right.toInt().toLong())
+        Assert.assertEquals(Color.RED, libSeries[0].first)
+        Assert.assertEquals(2, libSeries[0].second.toInt().toLong())
+        Assert.assertEquals(lightRed, libSeries[1].first)
+        Assert.assertEquals(155, libSeries[1].second.toInt().toLong())
         results[0].setSeatEstimate(158)
         libSeries = frame.getSeries(0)
-        Assert.assertEquals(Color.RED, libSeries[0].left)
-        Assert.assertEquals(2, libSeries[0].right.toInt().toLong())
-        Assert.assertEquals(lightRed, libSeries[1].left)
-        Assert.assertEquals(156, libSeries[1].right.toInt().toLong())
+        Assert.assertEquals(Color.RED, libSeries[0].first)
+        Assert.assertEquals(2, libSeries[0].second.toInt().toLong())
+        Assert.assertEquals(lightRed, libSeries[1].first)
+        Assert.assertEquals(156, libSeries[1].second.toInt().toLong())
         results[0].setNumSeats(3)
         libSeries = frame.getSeries(0)
-        Assert.assertEquals(Color.RED, libSeries[0].left)
-        Assert.assertEquals(3, libSeries[0].right.toInt().toLong())
-        Assert.assertEquals(lightRed, libSeries[1].left)
-        Assert.assertEquals(155, libSeries[1].right.toInt().toLong())
+        Assert.assertEquals(Color.RED, libSeries[0].first)
+        Assert.assertEquals(3, libSeries[0].second.toInt().toLong())
+        Assert.assertEquals(lightRed, libSeries[1].first)
+        Assert.assertEquals(155, libSeries[1].second.toInt().toLong())
     }
 
     @Test
@@ -354,22 +352,22 @@ class BarFrameTest {
         val results = BindableList<Triple<String, Color, Int>>()
         val frame = BarFrame()
         frame.setNumBarsBinding(sizeBinding(results))
-        frame.setLeftTextBinding(propertyBinding(results) { it.left })
+        frame.setLeftTextBinding(propertyBinding(results) { it.first })
         Assert.assertEquals(0, frame.numBars.toLong())
-        results.add(ImmutableTriple("NDP", Color.ORANGE, 1))
+        results.add(Triple("NDP", Color.ORANGE, 1))
         Assert.assertEquals(1, frame.numBars.toLong())
         Assert.assertEquals("NDP", frame.getLeftText(0))
         results.setAll(listOf(
-                ImmutableTriple("LIBERALS", Color.RED, 3),
-                ImmutableTriple("CONSERVATIVES", Color.BLUE, 2),
-                ImmutableTriple("NDP", Color.ORANGE, 1)))
+                Triple("LIBERALS", Color.RED, 3),
+                Triple("CONSERVATIVES", Color.BLUE, 2),
+                Triple("NDP", Color.ORANGE, 1)))
         Assert.assertEquals(3, frame.numBars.toLong())
         Assert.assertEquals("LIBERALS", frame.getLeftText(0))
         Assert.assertEquals("CONSERVATIVES", frame.getLeftText(1))
         Assert.assertEquals("NDP", frame.getLeftText(2))
         results.setAll(listOf(
-                ImmutableTriple("LIBERALS", Color.RED, 3),
-                ImmutableTriple("CONSERVATIVES", Color.BLUE, 3)))
+                Triple("LIBERALS", Color.RED, 3),
+                Triple("CONSERVATIVES", Color.BLUE, 3)))
         Assert.assertEquals(2, frame.numBars.toLong())
         Assert.assertEquals("LIBERALS", frame.getLeftText(0))
         Assert.assertEquals("CONSERVATIVES", frame.getLeftText(1))
@@ -736,15 +734,15 @@ class BarFrameTest {
     @Throws(IOException::class)
     fun testBarFrameOverlaps() {
         val lines = BindableList<Triple<String, String, Boolean>>()
-        lines.add(ImmutableTriple.of("THIS IS A VERY VERY LONG\nLEFT HAND SIDE", "RIGHT\nSIDE", false))
+        lines.add(Triple("THIS IS A VERY VERY LONG\nLEFT HAND SIDE", "RIGHT\nSIDE", false))
         val barFrame = BarFrame()
         barFrame.setHeaderBinding(fixedBinding<String?>("BAR FRAME"))
         barFrame.setSubheadTextBinding(fixedBinding<String?>(""))
         barFrame.setMaxBinding(fixedBinding(1))
         barFrame.setNumBarsBinding(sizeBinding(lines))
-        barFrame.setLeftTextBinding(propertyBinding(lines) { it.left })
-        barFrame.setRightTextBinding(propertyBinding(lines) { it.middle })
-        barFrame.setLeftIconBinding(propertyBinding(lines) { if (it.right) createHalfTickShape() else null })
+        barFrame.setLeftTextBinding(propertyBinding(lines) { it.first })
+        barFrame.setRightTextBinding(propertyBinding(lines) { it.second })
+        barFrame.setLeftIconBinding(propertyBinding(lines) { if (it.third) createHalfTickShape() else null })
         barFrame.addSeriesBinding(
                 "Value",
                 propertyBinding(lines) { Color.RED },
@@ -753,15 +751,15 @@ class BarFrameTest {
         barFrame.setLineLevelsBinding(listBinding(0.5))
         barFrame.setSize(256, 128)
         compareRendering("BarFrame", "FrameOverlap-1", barFrame)
-        lines[0] = ImmutableTriple.of("LEFT\nSIDE", "THIS IS A VERY VERY LONG\nRIGHT HAND SIDE", false)
+        lines[0] = Triple("LEFT\nSIDE", "THIS IS A VERY VERY LONG\nRIGHT HAND SIDE", false)
         compareRendering("BarFrame", "FrameOverlap-2", barFrame)
-        lines[0] = ImmutableTriple.of("THIS IS A VERY VERY LONG\nLEFT HAND SIDE", "THIS IS A VERY VERY LONG\nRIGHT HAND SIDE", false)
+        lines[0] = Triple("THIS IS A VERY VERY LONG\nLEFT HAND SIDE", "THIS IS A VERY VERY LONG\nRIGHT HAND SIDE", false)
         compareRendering("BarFrame", "FrameOverlap-3", barFrame)
-        lines[0] = ImmutableTriple.of("THIS IS A VERY VERY LONG\nLEFT HAND SIDE", "RIGHT\nSIDE", true)
+        lines[0] = Triple("THIS IS A VERY VERY LONG\nLEFT HAND SIDE", "RIGHT\nSIDE", true)
         compareRendering("BarFrame", "FrameOverlap-4", barFrame)
-        lines[0] = ImmutableTriple.of("LEFT\nSIDE", "THIS IS A VERY VERY LONG\nRIGHT HAND SIDE", true)
+        lines[0] = Triple("LEFT\nSIDE", "THIS IS A VERY VERY LONG\nRIGHT HAND SIDE", true)
         compareRendering("BarFrame", "FrameOverlap-5", barFrame)
-        lines[0] = ImmutableTriple.of("THIS IS A VERY VERY LONG\nLEFT HAND SIDE", "THIS IS A VERY VERY LONG\nRIGHT HAND SIDE", true)
+        lines[0] = Triple("THIS IS A VERY VERY LONG\nLEFT HAND SIDE", "THIS IS A VERY VERY LONG\nRIGHT HAND SIDE", true)
         compareRendering("BarFrame", "FrameOverlap-6", barFrame)
     }
 

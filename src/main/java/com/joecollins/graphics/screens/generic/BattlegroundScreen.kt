@@ -23,7 +23,6 @@ import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.border.EmptyBorder
 import kotlin.math.ceil
-import org.apache.commons.lang3.tuple.ImmutableTriple
 
 class BattlegroundScreen private constructor(
     title: JLabel,
@@ -211,13 +210,13 @@ class BattlegroundScreen private constructor(
                                 if (topTwo[0].key != t.party) Double.NaN else 1.0 * ((votes[t.party]
                                         ?: 0) - topTwo[1].value) / total
                             }
-                            ImmutableTriple.of(e.key, margin, topTwo[0].key.color)
+                            Triple(e.key, margin, topTwo[0].key.color)
                         }
-                        .filter { !java.lang.Double.isNaN(it.getMiddle()) }
-                        .sortedBy { it.middle }
+                        .filter { !java.lang.Double.isNaN(it.second) }
+                        .sortedBy { it.second }
                         .take(t.count)
                         .map {
-                            val partyResult = t.curr[it.getLeft()]
+                            val partyResult = t.curr[it.first]
                             val resultColor: Color
                             val fill: Boolean
                             if (partyResult == null) {
@@ -227,9 +226,9 @@ class BattlegroundScreen private constructor(
                                 resultColor = partyResult.party?.color ?: Color.BLACK
                                 fill = partyResult.isElected
                             }
-                            val colorFunc = if (t.filteredSeats?.contains(it.getLeft()) != false) { c -> c } else { c: Color -> lighten(lighten(c)) }
+                            val colorFunc = if (t.filteredSeats?.contains(it.first) != false) { c -> c } else { c: Color -> lighten(lighten(c)) }
                             Entry(
-                                    it.getLeft(), colorFunc(it.getRight()), colorFunc(resultColor), fill)
+                                    it.first, colorFunc(it.third), colorFunc(resultColor), fill)
                         }
                         .toList()
             }

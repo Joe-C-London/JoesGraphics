@@ -7,7 +7,6 @@ import java.awt.Color
 import java.lang.Runnable
 import java.util.ArrayList
 import org.apache.commons.lang3.mutable.MutableBoolean
-import org.apache.commons.lang3.tuple.Pair
 
 class MultiSummaryFrameBuilder {
 

@@ -7,8 +7,6 @@ import com.joecollins.graphics.components.MapFrameBuilder
 import com.joecollins.models.general.PartyResult
 import java.awt.Color
 import java.awt.Shape
-import org.apache.commons.lang3.tuple.ImmutablePair
-import org.apache.commons.lang3.tuple.Pair
 
 class MapBuilder<T> {
     private val winners: BindingReceiver<List<Pair<Shape, Color>>>
@@ -28,7 +26,7 @@ class MapBuilder<T> {
                     s.entries
                             .map {
                                 val winnerParty = w[it.key]
-                                ImmutablePair.of(it.value, winnerParty)
+                                Pair(it.value, winnerParty)
                             }
                             .toList()
                 }
@@ -36,8 +34,8 @@ class MapBuilder<T> {
         this.winners = BindingReceiver(
                 shapesToParties.merge(
                         mapFocus.getBinding()
-                ) { r: List<ImmutablePair<Shape, PartyResult?>>, f: List<Shape>? ->
-                    r.map { ImmutablePair.of(it.left, extractColor(f, it.left, it.right)) }
+                ) { r: List<Pair<Shape, PartyResult?>>, f: List<Shape>? ->
+                    r.map { Pair(it.first, extractColor(f, it.first, it.second)) }
                             .toList()
                 })
         mapHeader = BindingReceiver(headerBinding)
@@ -45,7 +43,7 @@ class MapBuilder<T> {
 
     constructor(
         shapes: Binding<Map<T, Shape>>,
-        selectedShape: Binding<T?>,
+        selectedShape: Binding<T>,
         leadingParty: Binding<PartyResult?>,
         focus: Binding<List<T>?>,
         header: Binding<String?>
@@ -53,31 +51,29 @@ class MapBuilder<T> {
 
     constructor(
         shapes: Binding<Map<T, Shape>>,
-        selectedShape: Binding<T?>,
+        selectedShape: Binding<T>,
         leadingParty: Binding<PartyResult?>,
         focus: Binding<List<T>?>,
         additionalHighlight: Binding<List<T>?>,
         header: Binding<String?>
     ) {
         val shapesReceiver: BindingReceiver<Map<T, Shape>> = BindingReceiver(shapes)
-        val leaderWithShape: Binding<ImmutablePair<T, PartyResult>> = selectedShape.merge(leadingParty) { left, right -> ImmutablePair(left, right) }
+        val leaderWithShape: Binding<Pair<T, PartyResult?>> = selectedShape.merge(leadingParty) { left, right -> Pair(left, right) }
         mapFocus = BindingReceiver(shapesReceiver.getBinding().merge(focus) { shp, foc -> createFocusShapes(shp, foc) })
         val additionalFocusShapes = shapesReceiver.getBinding().merge(additionalHighlight) { shp, foc -> createFocusShapes(shp, foc) }
         mapHeader = BindingReceiver(header)
         val shapeWinners: Binding<List<Pair<Shape, Color>>> = shapesReceiver
                 .getBinding()
-                .merge(
-                        leaderWithShape
-                ) { shp, ldr ->
+                .merge(leaderWithShape) { shp, ldr ->
                     shp.entries
                             .map {
                                 val color =
-                                    if (it.key == ldr.left) {
-                                        ldr.right?.color ?: Color.BLACK
+                                    if (it.key == ldr.first) {
+                                        ldr.second?.color ?: Color.BLACK
                                     } else {
                                         Color.LIGHT_GRAY
                                     }
-                                ImmutablePair.of(it.value, color)
+                                Pair(it.value, color)
                             }
                             .toList()
                 }
@@ -92,17 +88,16 @@ class MapBuilder<T> {
                         else -> listOf(l1, l2).flatten().distinct()
                     }
                 }
-        val focusedShapeWinners = shapeWinners.merge(
-                allFocusShapes
-        ) { sw: List<Pair<Shape, Color>>, f: List<Shape>? ->
+        val focusedShapeWinners = shapeWinners.merge(allFocusShapes)
+        { sw: List<Pair<Shape, Color>>, f: List<Shape>? ->
             if (f == null) {
                 sw
             } else {
                 sw.map {
-                            if (f.contains(it.left)) {
+                            if (f.contains(it.first)) {
                                 it
                             } else {
-                                ImmutablePair.of(it.left, Color(220, 220, 220))
+                                Pair(it.first, Color(220, 220, 220))
                             }
                         }
                         .toList()

@@ -15,8 +15,6 @@ import java.util.ArrayList
 import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.border.EmptyBorder
-import org.apache.commons.lang3.tuple.ImmutablePair
-import org.apache.commons.lang3.tuple.Pair
 
 class RegionalBreakdownScreen private constructor(titleLabel: JLabel, multiSummaryFrame: MultiSummaryFrame) : JPanel() {
     interface Entry {
@@ -77,7 +75,7 @@ class RegionalBreakdownScreen private constructor(titleLabel: JLabel, multiSumma
                     { t: SeatEntry ->
                         val ret: MutableList<Pair<Color, String>> = t.partyOrder.map { t.getPartyLabel(it) }.toMutableList()
                         ret.add(
-                                ImmutablePair.of(
+                                Pair(
                                         Color.WHITE,
                                         seats.values.sum().toString() + "/" + totalSeats))
                         ret
@@ -87,7 +85,7 @@ class RegionalBreakdownScreen private constructor(titleLabel: JLabel, multiSumma
                     Property.TOTAL_SEATS)
 
         protected open fun getPartyLabel(party: Party): Pair<Color, String> {
-            return ImmutablePair.of(party.color, (seats[party] ?: 0).toString())
+            return Pair(party.color, (seats[party] ?: 0).toString())
         }
     }
 
@@ -101,10 +99,10 @@ class RegionalBreakdownScreen private constructor(titleLabel: JLabel, multiSumma
             onPropertyRefreshed(Property.SEATS)
         }
 
-        override fun getPartyLabel(party: Party): ImmutablePair<Color, String> {
+        override fun getPartyLabel(party: Party): Pair<Color, String> {
             val seats = seats[party] ?: 0
             val diff = diff[party] ?: 0
-            return ImmutablePair.of(
+            return Pair(
                     party.color,
                     seats.toString() + " (" + (if (diff == 0) "\u00b10" else DIFF_FORMAT.format(diff.toLong())) + ")")
         }
@@ -124,10 +122,10 @@ class RegionalBreakdownScreen private constructor(titleLabel: JLabel, multiSumma
             onPropertyRefreshed(Property.SEATS)
         }
 
-        override fun getPartyLabel(party: Party): ImmutablePair<Color, String> {
+        override fun getPartyLabel(party: Party): Pair<Color, String> {
             val seats = seats[party] ?: 0
             val diff = seats - (prev[party] ?: 0)
-            return ImmutablePair.of(
+            return Pair(
                     party.color,
                     seats.toString() + " (" + (if (diff == 0) "\u00b10" else DIFF_FORMAT.format(diff.toLong())) + ")")
         }

@@ -16,9 +16,6 @@ import java.awt.GridLayout
 import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.border.EmptyBorder
-import org.apache.commons.lang3.tuple.ImmutablePair
-import org.apache.commons.lang3.tuple.ImmutableTriple
-import org.apache.commons.lang3.tuple.Pair
 
 class SeatsChangingScreen private constructor(title: JLabel, frame: ResultListingFrame) : JPanel() {
     class Builder<T>(
@@ -89,12 +86,12 @@ class SeatsChangingScreen private constructor(title: JLabel, frame: ResultListin
                                 .sortedDescending()
                                 .take(2)
                                 .toList()
-                        ImmutablePair.of(e, 1.0 * (topTwo[0] - topTwo[1]) / total)
+                        Pair(e, 1.0 * (topTwo[0] - topTwo[1]) / total)
                     }
-                    .sortedBy { it.value }
-                    .map { it.key }
+                    .sortedBy { it.second }
+                    .map { it.first }
                     .map { it: Map.Entry<T, Map<Party, Int>> ->
-                        ImmutablePair.of(
+                        Pair(
                                 it.key,
                                 it.value.entries
                                         .maxByOrNull { it.value }
@@ -121,22 +118,22 @@ class SeatsChangingScreen private constructor(title: JLabel, frame: ResultListin
                         t.prevResults
                                 .asSequence()
                                 .map {
-                                    ImmutableTriple.of(
-                                            it.left,
-                                            it.right,
-                                            t.currResults[it.left] ?: PartyResult.NO_RESULT)
+                                    Triple(
+                                            it.first,
+                                            it.second,
+                                            t.currResults[it.first] ?: PartyResult.NO_RESULT)
                                 }
-                                .filter { it.getRight() != null }
-                                .filter { it.getRight().party != null }
-                                .filter { it.getMiddle() != it.getRight().party }
+                                .filter { it.third != null }
+                                .filter { it.third.party != null }
+                                .filter { it.second != it.third.party }
                                 .map {
                                     val seatFilter = t.seatFilter
-                                    val colorFunc = if (seatFilter == null || seatFilter.contains(it.getLeft())) { c: Color -> c } else { c: Color -> lighten(lighten(c)) }
+                                    val colorFunc = if (seatFilter == null || seatFilter.contains(it.first)) { c: Color -> c } else { c: Color -> lighten(lighten(c)) }
                                     Entry(
-                                            it.getLeft(),
-                                            colorFunc(it.getMiddle().color),
-                                            colorFunc(it.getRight().party!!.color),
-                                            it.getRight().isElected)
+                                            it.first,
+                                            colorFunc(it.second.color),
+                                            colorFunc(it.third.party!!.color),
+                                            it.third.isElected)
                                 }
                                 .toList()
                     },

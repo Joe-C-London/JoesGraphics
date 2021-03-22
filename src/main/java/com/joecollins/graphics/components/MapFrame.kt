@@ -25,7 +25,6 @@ import java.util.WeakHashMap
 import javax.swing.JPanel
 import kotlin.math.min
 import kotlin.math.sqrt
-import org.apache.commons.lang3.tuple.ImmutablePair
 import org.apache.commons.lang3.tuple.MutablePair
 
 class MapFrame : GraphicsFrame() {
@@ -223,7 +222,7 @@ class MapFrame : GraphicsFrame() {
                 shapesToDraw
                     .filter { inScope(it.left) }
                     .map {
-                        ImmutablePair.of(
+                        Pair(
                             transformedShapesCache.computeIfAbsent(
                                 it.left
                             ) { shape: Shape -> createTransformedShape(transform, shape) },
@@ -231,8 +230,8 @@ class MapFrame : GraphicsFrame() {
                         )
                     }
                     .forEach {
-                        g2d.color = it.right
-                        g2d.fill(it.left)
+                        g2d.color = it.second
+                        g2d.fill(it.first)
                     }
                 outlineShapes
                     .filter { inScope(it) }

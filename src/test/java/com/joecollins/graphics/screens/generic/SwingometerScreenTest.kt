@@ -11,8 +11,6 @@ import java.awt.Color
 import java.io.IOException
 import java.util.TreeMap
 import kotlin.Throws
-import org.apache.commons.lang3.tuple.ImmutablePair
-import org.apache.commons.lang3.tuple.Pair
 import org.junit.Test
 
 class SwingometerScreenTest {
@@ -22,7 +20,7 @@ class SwingometerScreenTest {
     fun testBasicTwoParties() {
         val prevResult = BindableWrapper(nbPrevResult())
         val currResult = BindableWrapper<Map<String, PartyResult?>>(nbCurrResult())
-        val parties = BindableWrapper<Pair<Party, Party>>(ImmutablePair.of(lib, pc))
+        val parties = BindableWrapper(Pair(lib, pc))
         val swing = BindableWrapper(mapOf(pc to +0.0745, lib to -0.0345, grn to +0.0336, pa to -0.0339, ndp to -0.0335, ind to -0.0062))
         val panel = of(
                 prevResult.binding,
@@ -34,9 +32,9 @@ class SwingometerScreenTest {
                 .build(fixedBinding("NEW BRUNSWICK"))
         panel.setSize(1024, 512)
         compareRendering("SwingometerScreen", "Basic-TwoParty-1", panel)
-        parties.value = ImmutablePair.of(grn, pc)
+        parties.value = Pair(grn, pc)
         compareRendering("SwingometerScreen", "Basic-TwoParty-2", panel)
-        parties.value = ImmutablePair.of(pa, pc)
+        parties.value = Pair(pa, pc)
         compareRendering("SwingometerScreen", "Basic-TwoParty-3", panel)
     }
 
@@ -47,7 +45,7 @@ class SwingometerScreenTest {
         val result = nbCurrResult()
         result.keys.forEach { result[it] = null }
         val currResult = BindableWrapper<Map<String, PartyResult?>>(result)
-        val parties = BindableWrapper<Pair<Party, Party>>(ImmutablePair.of(lib, pc))
+        val parties = BindableWrapper(Pair(lib, pc))
         val swing = BindableWrapper<Map<Party, Double>>(emptyMap())
         val panel = of(
                 prevResult.binding,
@@ -69,7 +67,7 @@ class SwingometerScreenTest {
     fun testFilteredTwoParties() {
         val prevResult = BindableWrapper(nbPrevResult())
         val currResult = BindableWrapper<Map<String, PartyResult?>>(nbCurrResult())
-        val parties = BindableWrapper<Pair<Party, Party>>(ImmutablePair.of(lib, pc))
+        val parties = BindableWrapper(Pair(lib, pc))
         val swing = BindableWrapper(mapOf(pc to +0.0745, lib to -0.0345, grn to +0.0336, pa to -0.0339, ndp to -0.0335, ind to -0.0062))
         val seatsFiltered = BindableWrapper<Set<String>?>(
                 setOf(

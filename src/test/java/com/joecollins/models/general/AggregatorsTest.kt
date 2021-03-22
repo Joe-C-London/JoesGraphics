@@ -15,8 +15,6 @@ import org.apache.commons.lang3.mutable.Mutable
 import org.apache.commons.lang3.mutable.MutableDouble
 import org.apache.commons.lang3.mutable.MutableInt
 import org.apache.commons.lang3.mutable.MutableObject
-import org.apache.commons.lang3.tuple.ImmutablePair
-import org.apache.commons.lang3.tuple.Pair
 import org.junit.Assert
 import org.junit.Test
 
@@ -83,82 +81,82 @@ class AggregatorsTest {
         val inputs: MutableList<BindableWrapper<Map<String, Pair<Int, Int>>>> = ArrayList()
         inputs.add(
                 BindableWrapper(
-                        mapOf("ABC" to ImmutablePair.of(4, 8), "DEF" to ImmutablePair.of(1, 6))))
+                        mapOf("ABC" to Pair(4, 8), "DEF" to Pair(1, 6))))
         inputs.add(
                 BindableWrapper(
-                        mapOf("ABC" to ImmutablePair.of(2, 7), "GHI" to ImmutablePair.of(0, 3))))
+                        mapOf("ABC" to Pair(2, 7), "GHI" to Pair(0, 3))))
         val output: Mutable<Map<String, Pair<Int, Int>>> = MutableObject()
         combineDual(inputs) { it.binding }.bind { output.setValue(it) }
         Assert.assertEquals(
                 mapOf(
                         "ABC" to
-                        ImmutablePair.of(6, 15),
+                        Pair(6, 15),
                         "DEF" to
-                        ImmutablePair.of(1, 6),
+                        Pair(1, 6),
                         "GHI" to
-                        ImmutablePair.of(0, 3)),
+                        Pair(0, 3)),
                 output.value)
-        inputs[0].value = mapOf("ABC" to ImmutablePair.of(5, 12), "DEF" to ImmutablePair.of(4, 7))
+        inputs[0].value = mapOf("ABC" to Pair(5, 12), "DEF" to Pair(4, 7))
         Assert.assertEquals(
                 mapOf(
                         "ABC" to
-                        ImmutablePair.of(7, 19),
+                        Pair(7, 19),
                         "DEF" to
-                        ImmutablePair.of(4, 7),
+                        Pair(4, 7),
                         "GHI" to
-                        ImmutablePair.of(0, 3)),
+                        Pair(0, 3)),
                 output.value)
-        inputs[1].value = mapOf("ABC" to ImmutablePair.of(2, 3))
+        inputs[1].value = mapOf("ABC" to Pair(2, 3))
         Assert.assertEquals(
-                mapOf("ABC" to ImmutablePair.of(7, 15), "DEF" to ImmutablePair.of(4, 7)), output.value)
-        inputs[0].value = mapOf("ABC" to ImmutablePair.of(0, 6), "DEF" to ImmutablePair.of(0, 0))
+                mapOf("ABC" to Pair(7, 15), "DEF" to Pair(4, 7)), output.value)
+        inputs[0].value = mapOf("ABC" to Pair(0, 6), "DEF" to Pair(0, 0))
         Assert.assertEquals(
-                mapOf("ABC" to ImmutablePair.of(2, 9), "DEF" to ImmutablePair.of(0, 0)), output.value)
-        inputs[1].value = mapOf("ABC" to ImmutablePair.of(4, 4))
+                mapOf("ABC" to Pair(2, 9), "DEF" to Pair(0, 0)), output.value)
+        inputs[1].value = mapOf("ABC" to Pair(4, 4))
         Assert.assertEquals(
-                mapOf("ABC" to ImmutablePair.of(4, 10), "DEF" to ImmutablePair.of(0, 0)), output.value)
+                mapOf("ABC" to Pair(4, 10), "DEF" to Pair(0, 0)), output.value)
     }
 
     @Test
     fun testCombineDualWithSeeding() {
-        val seed: Map<String, Pair<Int, Int>> = mapOf("ABC" to ImmutablePair.of(0, 0), "DEF" to ImmutablePair.of(0, 0))
+        val seed: Map<String, Pair<Int, Int>> = mapOf("ABC" to Pair(0, 0), "DEF" to Pair(0, 0))
         val inputs: MutableList<BindableWrapper<Map<String, Pair<Int, Int>>>> = ArrayList()
         inputs.add(
                 BindableWrapper(
-                        mapOf("ABC" to ImmutablePair.of(4, 8), "DEF" to ImmutablePair.of(1, 6))))
+                        mapOf("ABC" to Pair(4, 8), "DEF" to Pair(1, 6))))
         inputs.add(
                 BindableWrapper(
-                        mapOf("ABC" to ImmutablePair.of(2, 7), "GHI" to ImmutablePair.of(0, 3))))
+                        mapOf("ABC" to Pair(2, 7), "GHI" to Pair(0, 3))))
         val output: Mutable<Map<String, Pair<Int, Int>>> = MutableObject()
         combineDual(inputs, { it.binding }, seed).bind { output.setValue(it) }
         Assert.assertEquals(
                 mapOf(
                         "ABC" to
-                        ImmutablePair.of(6, 15),
+                        Pair(6, 15),
                         "DEF" to
-                        ImmutablePair.of(1, 6),
+                        Pair(1, 6),
                         "GHI" to
-                        ImmutablePair.of(0, 3)),
+                        Pair(0, 3)),
                 output.value)
-        inputs[0].value = mapOf("ABC" to ImmutablePair.of(5, 12), "DEF" to ImmutablePair.of(4, 7))
+        inputs[0].value = mapOf("ABC" to Pair(5, 12), "DEF" to Pair(4, 7))
         Assert.assertEquals(
                 mapOf(
                         "ABC" to
-                        ImmutablePair.of(7, 19),
+                        Pair(7, 19),
                         "DEF" to
-                        ImmutablePair.of(4, 7),
+                        Pair(4, 7),
                         "GHI" to
-                        ImmutablePair.of(0, 3)),
+                        Pair(0, 3)),
                 output.value)
-        inputs[1].value = mapOf("ABC" to ImmutablePair.of(2, 3))
+        inputs[1].value = mapOf("ABC" to Pair(2, 3))
         Assert.assertEquals(
-                mapOf("ABC" to ImmutablePair.of(7, 15), "DEF" to ImmutablePair.of(4, 7)), output.value)
-        inputs[0].value = mapOf("ABC" to ImmutablePair.of(0, 6))
+                mapOf("ABC" to Pair(7, 15), "DEF" to Pair(4, 7)), output.value)
+        inputs[0].value = mapOf("ABC" to Pair(0, 6))
         Assert.assertEquals(
-                mapOf("ABC" to ImmutablePair.of(2, 9), "DEF" to ImmutablePair.of(0, 0)), output.value)
-        inputs[1].value = mapOf("ABC" to ImmutablePair.of(4, 4))
+                mapOf("ABC" to Pair(2, 9), "DEF" to Pair(0, 0)), output.value)
+        inputs[1].value = mapOf("ABC" to Pair(4, 4))
         Assert.assertEquals(
-                mapOf("ABC" to ImmutablePair.of(4, 10), "DEF" to ImmutablePair.of(0, 0)), output.value)
+                mapOf("ABC" to Pair(4, 10), "DEF" to Pair(0, 0)), output.value)
     }
 
     @Test
@@ -184,17 +182,17 @@ class AggregatorsTest {
         val inputs1: MutableList<BindableWrapper<Map<String, Pair<Int, Int>>>> = ArrayList()
         inputs1.add(
                 BindableWrapper(
-                        mapOf("ABC" to ImmutablePair.of(4, 8), "DEF" to ImmutablePair.of(1, 6))))
+                        mapOf("ABC" to Pair(4, 8), "DEF" to Pair(1, 6))))
         inputs1.add(
                 BindableWrapper(
-                        mapOf("ABC" to ImmutablePair.of(2, 7), "GHI" to ImmutablePair.of(0, 3))))
+                        mapOf("ABC" to Pair(2, 7), "GHI" to Pair(0, 3))))
         val inputs2: MutableList<BindableWrapper<Map<String, Pair<Int, Int>>>> = ArrayList()
         inputs2.add(
                 BindableWrapper(
-                        mapOf("ABC" to ImmutablePair.of(4, 8), "DEF" to ImmutablePair.of(1, 6))))
+                        mapOf("ABC" to Pair(4, 8), "DEF" to Pair(1, 6))))
         inputs2.add(
                 BindableWrapper(
-                        mapOf("ABC" to ImmutablePair.of(2, 7), "GHI" to ImmutablePair.of(0, 3))))
+                        mapOf("ABC" to Pair(2, 7), "GHI" to Pair(0, 3))))
         val output: Mutable<Map<String, Pair<Int, Int>>> = MutableObject()
         val combined = sequenceOf(inputs1, inputs2)
                 .map { inputs -> combineDual(inputs) { it.binding } }
@@ -203,21 +201,21 @@ class AggregatorsTest {
         Assert.assertEquals(
                 mapOf(
                         "ABC" to
-                        ImmutablePair.of(12, 30),
+                        Pair(12, 30),
                         "DEF" to
-                        ImmutablePair.of(2, 12),
+                        Pair(2, 12),
                         "GHI" to
-                        ImmutablePair.of(0, 6)),
+                        Pair(0, 6)),
                 output.value)
-        inputs1[0].value = mapOf("ABC" to ImmutablePair.of(3, 9), "DEF" to ImmutablePair.of(2, 5))
+        inputs1[0].value = mapOf("ABC" to Pair(3, 9), "DEF" to Pair(2, 5))
         Assert.assertEquals(
                 mapOf(
                         "ABC" to
-                        ImmutablePair.of(11, 31),
+                        Pair(11, 31),
                         "DEF" to
-                        ImmutablePair.of(3, 11),
+                        Pair(3, 11),
                         "GHI" to
-                        ImmutablePair.of(0, 6)),
+                        Pair(0, 6)),
                 output.value)
     }
 
@@ -253,15 +251,15 @@ class AggregatorsTest {
     @Test
     fun testCombinePctReportingWithWeights() {
         val inputs: MutableList<Pair<BindableWrapper<Double>, Double>> = ArrayList()
-        inputs.add(ImmutablePair.of(BindableWrapper(0.5), 2.0))
-        inputs.add(ImmutablePair.of(BindableWrapper(0.3), 3.0))
+        inputs.add(Pair(BindableWrapper(0.5), 2.0))
+        inputs.add(Pair(BindableWrapper(0.3), 3.0))
         val output = MutableDouble()
-        combinePctReporting(inputs, { it.left.binding }) { it.right }
+        combinePctReporting(inputs, { it.first.binding }, { it.second })
                 .bind { output.setValue(it) }
         Assert.assertEquals(0.38, output.value, 1e-6)
-        inputs[0].left.value = 0.6
+        inputs[0].first.value = 0.6
         Assert.assertEquals(0.42, output.value, 1e-6)
-        inputs[1].left.value = 0.7
+        inputs[1].first.value = 0.7
         Assert.assertEquals(0.66, output.value, 1e-6)
     }
 

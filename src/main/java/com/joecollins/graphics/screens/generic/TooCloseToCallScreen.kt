@@ -19,8 +19,6 @@ import java.util.HashMap
 import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.border.EmptyBorder
-import org.apache.commons.lang3.tuple.ImmutablePair
-import org.apache.commons.lang3.tuple.Pair
 
 class TooCloseToCallScreen private constructor(titleLabel: JLabel, multiSummaryFrame: MultiSummaryFrame) : JPanel() {
     private class Input<T> : Bindable<Input<T>, Input.Property>() {
@@ -163,19 +161,19 @@ class TooCloseToCallScreen private constructor(titleLabel: JLabel, multiSummaryF
                         val ret: MutableList<Pair<Color, String>> = sequenceOf(
                                 it.topCandidates.asSequence()
                                         .map { v: Map.Entry<Candidate, Int> ->
-                                            ImmutablePair.of(
+                                            Pair(
                                                     v.key.party.color,
                                                     v.key.party.abbreviation.toUpperCase() +
                                                             ": " +
                                                             thousandsFormatter.format(v.value))
                                         },
-                                generateSequence { ImmutablePair.of(Color.WHITE, "") })
+                                generateSequence { Pair(Color.WHITE, "") })
                                 .flatten()
                                 .take(it.numCandidates)
                                 .toMutableList()
-                        ret.add(ImmutablePair.of(Color.WHITE, "LEAD: " + thousandsFormatter.format(it.lead.toLong())))
+                        ret.add(Pair(Color.WHITE, "LEAD: " + thousandsFormatter.format(it.lead.toLong())))
                         if (pctReporting != null) {
-                            ret.add(ImmutablePair.of(Color.WHITE, pctFormatter.format(it.pctReporting) + " IN"))
+                            ret.add(Pair(Color.WHITE, pctFormatter.format(it.pctReporting) + " IN"))
                         }
                         ret
                     })
