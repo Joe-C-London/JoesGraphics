@@ -33,7 +33,6 @@ def geotoolsVersion = '24.1'
 
 dependencies {
     compile group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.30'
-    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
     compile group: 'org.geotools', name: 'gt-shapefile', version: geotoolsVersion
     compile group: 'org.geotools', name: 'gt-metadata', version: geotoolsVersion
     compile group: 'org.twitter4j', name: 'twitter4j-core', version: '4.0.7'

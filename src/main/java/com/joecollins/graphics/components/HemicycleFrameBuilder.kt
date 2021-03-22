@@ -12,7 +12,6 @@ import java.awt.Point
 import java.util.ArrayList
 import java.util.Comparator
 import kotlin.math.abs
-import org.apache.commons.lang3.tuple.MutablePair
 
 class HemicycleFrameBuilder {
     enum class Tiebreaker {
@@ -145,21 +144,21 @@ class HemicycleFrameBuilder {
                     .sortedWith(
                             Comparator.comparingDouble { p: Point -> 180.0 * p.y / (rows[p.x] - 1) }
                                     .thenComparingInt { p: Point -> (if (tiebreaker == Tiebreaker.FRONT_ROW_FROM_LEFT) 1 else -1) * p.x })
-                    .map { point: Point -> MutablePair(point, null as T?) }
-                    .toList()
+                    .map { point: Point -> Pair(point, null as T?) }
+                    .toMutableList()
             for (entry in entries) {
                 val rejectedPoints: MutableList<Point> = ArrayList()
                 val selectedPoints: MutableList<Point> = ArrayList()
                 val numDots = seatsFunc(entry)
                 var i = 0
                 while (i < numDots) {
-                    val nextPoint = points
-                            .filter { !rejectedPoints.contains(it.left) }
-                            .filter { it.right == null }
+                    val nextPoint = points.withIndex()
+                            .filter { !rejectedPoints.contains(it.value.first) }
+                            .filter { it.value.second == null }
                             .firstOrNull {
                                 (selectedPoints.isEmpty() ||
                                         selectedPoints
-                                        .any { point: Point -> pointsAreBesideEachOther(point, it.left, rows) })
+                                        .any { point: Point -> pointsAreBesideEachOther(point, it.value.first, rows) })
                             }
                     if (nextPoint == null) {
                         rejectedPoints.addAll(selectedPoints)
@@ -168,8 +167,8 @@ class HemicycleFrameBuilder {
                         i++
                         continue
                     }
-                    nextPoint.setRight(entry)
-                    selectedPoints.add(nextPoint.left)
+                    points[nextPoint.index] = nextPoint.value.copy(second = entry)
+                    selectedPoints.add(nextPoint.value.first)
                     i++
                 }
             }
@@ -178,9 +177,9 @@ class HemicycleFrameBuilder {
             builder.frame.setRowCountsBinding(IndexedBinding.listBinding(rows))
             val dots: List<T> = points
                     .sortedWith(
-                            Comparator.comparingInt { it: MutablePair<Point, T?> -> it.left.x }
-                                    .thenComparing { it -> it.left.y })
-                    .map { it.getRight()!! }
+                            Comparator.comparingInt { it: Pair<Point, T?> -> it.first.x }
+                                    .thenComparing { it -> it.first.y })
+                    .map { it.second!! }
                     .toList()
             builder.frame.setNumDotsBinding(Binding.fixedBinding(dots.size))
             builder.frame.setDotColorBinding(IndexedBinding.listBinding(dots, colorFunc))

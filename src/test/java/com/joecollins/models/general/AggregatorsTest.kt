@@ -1,6 +1,7 @@
 package com.joecollins.models.general
 
 import com.joecollins.graphics.utils.BindableWrapper
+import com.joecollins.graphics.utils.BoundResult
 import com.joecollins.models.general.Aggregators.adjustForPctReporting
 import com.joecollins.models.general.Aggregators.adjustKey
 import com.joecollins.models.general.Aggregators.combine
@@ -11,10 +12,6 @@ import com.joecollins.models.general.Aggregators.toMap
 import com.joecollins.models.general.Aggregators.toPct
 import com.joecollins.models.general.Aggregators.topAndOthers
 import java.util.ArrayList
-import org.apache.commons.lang3.mutable.Mutable
-import org.apache.commons.lang3.mutable.MutableDouble
-import org.apache.commons.lang3.mutable.MutableInt
-import org.apache.commons.lang3.mutable.MutableObject
 import org.junit.Assert
 import org.junit.Test
 
@@ -22,8 +19,8 @@ class AggregatorsTest {
     @Test
     fun testKeyChange() {
         val input = BindableWrapper(mapOf("ABC" to 5, "DEF" to 7))
-        val output: Mutable<Map<String, Int>> = MutableObject()
-        adjustKey(input.binding) { it.substring(0, 1) }.bind { output.setValue(it) }
+        val output: BoundResult<Map<String, Int>> = BoundResult()
+        adjustKey(input.binding) { it.substring(0, 1) }.bind { output.value = it }
         Assert.assertEquals(mapOf("A" to 5, "D" to 7), output.value)
         input.value = mapOf("ABC" to 10, "DEF" to 9, "GHI" to 1)
         Assert.assertEquals(mapOf("A" to 10, "D" to 9, "G" to 1), output.value)
@@ -32,8 +29,8 @@ class AggregatorsTest {
     @Test
     fun testKeyChangeWithMerge() {
         val input = BindableWrapper(mapOf("ABC" to 5, "AZY" to 7))
-        val output: Mutable<Map<String, Int>> = MutableObject()
-        adjustKey(input.binding) { it.substring(0, 1) }.bind { output.setValue(it) }
+        val output: BoundResult<Map<String, Int>> = BoundResult()
+        adjustKey(input.binding) { it.substring(0, 1) }.bind { output.value = it }
         Assert.assertEquals(mapOf("A" to 12), output.value)
         input.value = mapOf("ABC" to 10, "DEF" to 6, "DCB" to 2)
         Assert.assertEquals(mapOf("A" to 10, "D" to 8), output.value)
@@ -44,8 +41,8 @@ class AggregatorsTest {
         val inputs: MutableList<BindableWrapper<Map<String, Int>>> = ArrayList()
         inputs.add(BindableWrapper(mapOf("ABC" to 8, "DEF" to 6)))
         inputs.add(BindableWrapper(mapOf("ABC" to 7, "GHI" to 3)))
-        val output: Mutable<Map<String, Int>> = MutableObject()
-        combine(inputs) { it.binding }.bind { output.setValue(it) }
+        val output: BoundResult<Map<String, Int>> = BoundResult()
+        combine(inputs) { it.binding }.bind { output.value = it }
         Assert.assertEquals(mapOf("ABC" to 15, "DEF" to 6, "GHI" to 3), output.value)
         inputs[0].value = mapOf("ABC" to 12, "DEF" to 7)
         Assert.assertEquals(mapOf("ABC" to 19, "DEF" to 7, "GHI" to 3), output.value)
@@ -63,8 +60,8 @@ class AggregatorsTest {
         val inputs: MutableList<BindableWrapper<Map<String, Int>>> = ArrayList()
         inputs.add(BindableWrapper(mapOf("ABC" to 8, "DEF" to 6)))
         inputs.add(BindableWrapper(mapOf("ABC" to 7, "GHI" to 3)))
-        val output: Mutable<Map<String, Int>> = MutableObject()
-        combine(inputs, { it.binding }, seed).bind { output.setValue(it) }
+        val output: BoundResult<Map<String, Int>> = BoundResult()
+        combine(inputs, { it.binding }, seed).bind { output.value = it }
         Assert.assertEquals(mapOf("ABC" to 15, "DEF" to 6, "GHI" to 3), output.value)
         inputs[0].value = mapOf("ABC" to 12, "DEF" to 7)
         Assert.assertEquals(mapOf("ABC" to 19, "DEF" to 7, "GHI" to 3), output.value)
@@ -85,8 +82,8 @@ class AggregatorsTest {
         inputs.add(
                 BindableWrapper(
                         mapOf("ABC" to Pair(2, 7), "GHI" to Pair(0, 3))))
-        val output: Mutable<Map<String, Pair<Int, Int>>> = MutableObject()
-        combineDual(inputs) { it.binding }.bind { output.setValue(it) }
+        val output: BoundResult<Map<String, Pair<Int, Int>>> = BoundResult()
+        combineDual(inputs) { it.binding }.bind { output.value = it }
         Assert.assertEquals(
                 mapOf(
                         "ABC" to
@@ -127,8 +124,8 @@ class AggregatorsTest {
         inputs.add(
                 BindableWrapper(
                         mapOf("ABC" to Pair(2, 7), "GHI" to Pair(0, 3))))
-        val output: Mutable<Map<String, Pair<Int, Int>>> = MutableObject()
-        combineDual(inputs, { it.binding }, seed).bind { output.setValue(it) }
+        val output: BoundResult<Map<String, Pair<Int, Int>>> = BoundResult()
+        combineDual(inputs, { it.binding }, seed).bind { output.value = it }
         Assert.assertEquals(
                 mapOf(
                         "ABC" to
@@ -167,11 +164,11 @@ class AggregatorsTest {
         val inputs2: MutableList<BindableWrapper<Map<String, Int>>> = ArrayList()
         inputs2.add(BindableWrapper(mapOf("ABC" to 8, "DEF" to 6)))
         inputs2.add(BindableWrapper(mapOf("ABC" to 7, "GHI" to 3)))
-        val output: Mutable<Map<String, Int>> = MutableObject()
+        val output: BoundResult<Map<String, Int>> = BoundResult()
         val combined = sequenceOf(inputs1, inputs2)
                 .map { inputs -> combine(inputs) { it.binding } }
                 .toList()
-        combine(combined) { it }.bind { output.setValue(it) }
+        combine(combined) { it }.bind { output.value = it }
         Assert.assertEquals(mapOf("ABC" to 30, "DEF" to 12, "GHI" to 6), output.value)
         inputs1[0].value = mapOf("ABC" to 9, "DEF" to 5)
         Assert.assertEquals(mapOf("ABC" to 31, "DEF" to 11, "GHI" to 6), output.value)
@@ -193,11 +190,11 @@ class AggregatorsTest {
         inputs2.add(
                 BindableWrapper(
                         mapOf("ABC" to Pair(2, 7), "GHI" to Pair(0, 3))))
-        val output: Mutable<Map<String, Pair<Int, Int>>> = MutableObject()
+        val output: BoundResult<Map<String, Pair<Int, Int>>> = BoundResult()
         val combined = sequenceOf(inputs1, inputs2)
                 .map { inputs -> combineDual(inputs) { it.binding } }
                 .toList()
-        combineDual(combined) { it }.bind { output.setValue(it) }
+        combineDual(combined) { it }.bind { output.value = it }
         Assert.assertEquals(
                 mapOf(
                         "ABC" to
@@ -223,9 +220,9 @@ class AggregatorsTest {
     fun testAdjustForPctReporting() {
         val votes = BindableWrapper(mapOf("ABC" to 500, "DEF" to 300))
         val pctReporting = BindableWrapper(0.01)
-        val output: Mutable<Map<String, Int>> = MutableObject()
+        val output: BoundResult<Map<String, Int>> = BoundResult()
         adjustForPctReporting(votes.binding, pctReporting.binding)
-                .bind { output.setValue(it) }
+                .bind { output.value = it }
         Assert.assertEquals(mapOf("ABC" to 5, "DEF" to 3), output.value)
         pctReporting.value = 0.10
         Assert.assertEquals(mapOf("ABC" to 50, "DEF" to 30), output.value)
@@ -238,9 +235,9 @@ class AggregatorsTest {
         val inputs: MutableList<BindableWrapper<Double>> = ArrayList()
         inputs.add(BindableWrapper(0.5))
         inputs.add(BindableWrapper(0.3))
-        val output = MutableDouble()
+        val output = BoundResult<Double>()
         combinePctReporting(inputs) { it.binding }
-                .bind { output.setValue(it) }
+                .bind { output.value = it }
         Assert.assertEquals(0.4, output.value, 1e-6)
         inputs[0].value = 0.6
         Assert.assertEquals(0.45, output.value, 1e-6)
@@ -253,9 +250,9 @@ class AggregatorsTest {
         val inputs: MutableList<Pair<BindableWrapper<Double>, Double>> = ArrayList()
         inputs.add(Pair(BindableWrapper(0.5), 2.0))
         inputs.add(Pair(BindableWrapper(0.3), 3.0))
-        val output = MutableDouble()
+        val output = BoundResult<Double>()
         combinePctReporting(inputs, { it.first.binding }, { it.second })
-                .bind { output.setValue(it) }
+                .bind { output.value = it }
         Assert.assertEquals(0.38, output.value, 1e-6)
         inputs[0].first.value = 0.6
         Assert.assertEquals(0.42, output.value, 1e-6)
@@ -266,8 +263,8 @@ class AggregatorsTest {
     @Test
     fun testTopAndOthersBelowLimit() {
         val votes = BindableWrapper(mapOf("ABC" to 5, "DEF" to 3))
-        val output: Mutable<Map<String, Int>> = MutableObject()
-        topAndOthers(votes.binding, 3, "OTHERS").bind { output.setValue(it) }
+        val output: BoundResult<Map<String, Int>> = BoundResult()
+        topAndOthers(votes.binding, 3, "OTHERS").bind { output.value = it }
         Assert.assertEquals(mapOf("ABC" to 5, "DEF" to 3), output.value)
         votes.value = mapOf("ABC" to 5, "DEF" to 7)
         Assert.assertEquals(mapOf("ABC" to 5, "DEF" to 7), output.value)
@@ -276,8 +273,8 @@ class AggregatorsTest {
     @Test
     fun testTopAndOthersAtLimit() {
         val votes = BindableWrapper(mapOf("ABC" to 5, "DEF" to 3, "GHI" to 2))
-        val output: Mutable<Map<String, Int>> = MutableObject()
-        topAndOthers(votes.binding, 3, "OTHERS").bind { output.setValue(it) }
+        val output: BoundResult<Map<String, Int>> = BoundResult()
+        topAndOthers(votes.binding, 3, "OTHERS").bind { output.value = it }
         Assert.assertEquals(mapOf("ABC" to 5, "DEF" to 3, "GHI" to 2), output.value)
         votes.value = mapOf("ABC" to 5, "DEF" to 7, "GHI" to 6)
         Assert.assertEquals(mapOf("ABC" to 5, "DEF" to 7, "GHI" to 6), output.value)
@@ -286,8 +283,8 @@ class AggregatorsTest {
     @Test
     fun testTopAndOthersAboveLimit() {
         val votes = BindableWrapper(mapOf("ABC" to 5, "DEF" to 3, "GHI" to 2, "JKL" to 4))
-        val output: Mutable<Map<String, Int>> = MutableObject()
-        topAndOthers(votes.binding, 3, "OTHERS").bind { output.setValue(it) }
+        val output: BoundResult<Map<String, Int>> = BoundResult()
+        topAndOthers(votes.binding, 3, "OTHERS").bind { output.value = it }
         Assert.assertEquals(mapOf("ABC" to 5, "JKL" to 4, "OTHERS" to 5), output.value)
         votes.value = mapOf("ABC" to 5, "DEF" to 7, "GHI" to 6, "JKL" to 4)
         Assert.assertEquals(mapOf("DEF" to 7, "GHI" to 6, "OTHERS" to 9), output.value)
@@ -297,10 +294,10 @@ class AggregatorsTest {
     fun testTopAndOthersAboveLimitWithMandatoryInclusion() {
         val votes = BindableWrapper(mapOf("ABC" to 5, "DEF" to 3, "GHI" to 2, "JKL" to 4))
         val winner = BindableWrapper<String?>(null)
-        val output: Mutable<Map<String, Int>> = MutableObject()
+        val output: BoundResult<Map<String, Int>> = BoundResult()
         topAndOthers(
                 votes.binding, 3, "OTHERS", winner.binding.map { if (it == null) emptyArray() else arrayOf(it) })
-                .bind { output.setValue(it) }
+                .bind { output.value = it }
         Assert.assertEquals(mapOf("ABC" to 5, "JKL" to 4, "OTHERS" to 5), output.value)
         votes.value = mapOf("ABC" to 5, "DEF" to 7, "GHI" to 6, "JKL" to 4)
         winner.value = "ABC"
@@ -314,9 +311,9 @@ class AggregatorsTest {
     @Test
     fun testToMap() {
         val inputs = mapOf("ABC" to BindableWrapper(1), "DEF" to BindableWrapper(2))
-        val output: Mutable<Map<String, Int>> = MutableObject()
+        val output: BoundResult<Map<String, Int>> = BoundResult()
         val outputBinding = toMap(inputs.keys) { inputs[it]!!.binding }
-        outputBinding.bind { output.setValue(it) }
+        outputBinding.bind { output.value = it }
         Assert.assertEquals(mapOf("ABC" to 1, "DEF" to 2), output.value)
         inputs["ABC"]!!.value = 7
         Assert.assertEquals(mapOf("ABC" to 7, "DEF" to 2), output.value)
@@ -328,9 +325,9 @@ class AggregatorsTest {
     @Test
     fun testToMapTransformedKey() {
         val inputs = mapOf("abc" to BindableWrapper(1), "def" to BindableWrapper(2))
-        val output: Mutable<Map<String, Int>> = MutableObject()
+        val output: BoundResult<Map<String, Int>> = BoundResult()
         val outputBinding = toMap(inputs.keys, { it.toUpperCase() }) { inputs[it]!!.binding }
-        outputBinding.bind { output.setValue(it) }
+        outputBinding.bind { output.value = it }
         Assert.assertEquals(mapOf("ABC" to 1, "DEF" to 2), output.value)
         inputs["abc"]!!.value = 7
         Assert.assertEquals(mapOf("ABC" to 7, "DEF" to 2), output.value)
@@ -342,9 +339,9 @@ class AggregatorsTest {
     @Test
     fun testToPct() {
         val votes = BindableWrapper(mapOf("ABC" to 5, "DEF" to 3, "GHI" to 2, "JKL" to 4))
-        val output: Mutable<Map<String, Double>> = MutableObject()
+        val output: BoundResult<Map<String, Double>> = BoundResult()
         val outputBinding = toPct(votes.binding)
-        outputBinding.bind { output.setValue(it) }
+        outputBinding.bind { output.value = it }
         Assert.assertEquals(
                 mapOf("ABC" to 5.0 / 14, "DEF" to 3.0 / 14, "GHI" to 2.0 / 14, "JKL" to 4.0 / 14),
                 output.value)
@@ -359,10 +356,10 @@ class AggregatorsTest {
     @Test
     fun testSum() {
         val inputs = listOf(BindableWrapper(1), BindableWrapper(2), BindableWrapper(3))
-        val output = MutableInt()
-        sum(inputs) { it.binding }.bind { output.setValue(it) }
-        Assert.assertEquals(6, output.value.toInt().toLong())
+        val output = BoundResult<Int>()
+        sum(inputs) { it.binding }.bind { output.value = it }
+        Assert.assertEquals(6, output.value.toLong())
         inputs[1].value = 7
-        Assert.assertEquals(11, output.value.toInt().toLong())
+        Assert.assertEquals(11, output.value.toLong())
     }
 }

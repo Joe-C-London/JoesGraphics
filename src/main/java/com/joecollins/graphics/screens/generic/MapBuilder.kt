@@ -88,8 +88,7 @@ class MapBuilder<T> {
                         else -> listOf(l1, l2).flatten().distinct()
                     }
                 }
-        val focusedShapeWinners = shapeWinners.merge(allFocusShapes)
-        { sw: List<Pair<Shape, Color>>, f: List<Shape>? ->
+        val focusedShapeWinners = shapeWinners.merge(allFocusShapes) { sw: List<Pair<Shape, Color>>, f: List<Shape>? ->
             if (f == null) {
                 sw
             } else {

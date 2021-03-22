@@ -7,8 +7,8 @@ import com.joecollins.bindings.IndexedBinding.Companion.functionBinding
 import com.joecollins.bindings.IndexedBinding.Companion.listBinding
 import com.joecollins.bindings.IndexedBinding.Companion.propertyBinding
 import com.joecollins.bindings.IndexedBinding.Companion.singletonBinding
+import com.joecollins.graphics.utils.BoundResult
 import java.util.HashMap
-import org.apache.commons.lang3.mutable.MutableInt
 import org.junit.Assert
 import org.junit.Test
 
@@ -31,12 +31,12 @@ class IndexedBindingTest {
     @Test
     fun indexedBindingListTest() {
         val valuesByIndex: MutableMap<Int, Int> = HashMap()
-        val size = MutableInt()
+        val size = BoundResult<Int>()
         val list = BindableList<Int>()
         list.add(7)
         val binding = propertyBinding(list)
         binding.bind { key: Int, value: Int -> valuesByIndex[key] = value }
-        sizeBinding(list).bind { value: Int? -> size.setValue(value) }
+        sizeBinding(list).bind { value: Int -> size.value = value }
         Assert.assertEquals(7, valuesByIndex[0]!!.toInt().toLong())
         Assert.assertEquals(1, size.value.toInt().toLong())
         list.add(0, 42)

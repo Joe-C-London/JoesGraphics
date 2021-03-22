@@ -1,8 +1,6 @@
 package com.joecollins.bindings
 
 import com.joecollins.bindings.Utils.convertConsumer
-import org.apache.commons.lang3.mutable.Mutable
-import org.apache.commons.lang3.mutable.MutableObject
 
 interface Binding<out T> {
 
@@ -24,20 +22,21 @@ interface Binding<out T> {
     @JvmDefault fun <U, R> merge(other: Binding<U>, mergeFunc: (T, U) -> R): Binding<R> {
         val me = this
         return object : Binding<R> {
-            private val val1: Mutable<T> = MutableObject()
-            private val val2: Mutable<U> = MutableObject()
+            private var val1: T? = null
+            private var val2: U? = null
             private var bound = false
 
+            @Suppress("UNCHECKED_CAST")
             override fun bind(onUpdate: (R) -> Unit) {
                 me.bind {
-                    val1.value = it
+                    val1 = it
                     if (bound) {
-                        onUpdate(mergeFunc(val1.value, val2.value))
+                        onUpdate(mergeFunc(val1 as T, val2 as U))
                     }
                 }
                 other.bind {
-                    val2.value = it
-                    onUpdate(mergeFunc(val1.value, val2.value))
+                    val2 = it
+                    onUpdate(mergeFunc(val1 as T, val2 as U))
                 }
                 bound = true
             }
@@ -105,22 +104,22 @@ interface Binding<out T> {
         ) = object : Binding<R> {
             private var bound = false
             private var aggregate = identity
-            private val values: MutableList<Mutable<T>> = ArrayList(bindings.size)
+            private val values: MutableList<T?> = ArrayList(bindings.size)
 
             override fun bind(onUpdate: (R) -> Unit) {
                 check(!bound) { "Binding is already used" }
                 for (i in bindings.indices) {
-                    values.add(MutableObject())
+                    values.add(null)
                 }
                 aggregate = identity
                 for (i in bindings.indices) {
                     bindings[i].bind { newVal ->
                         val oldVal = values[i]
                         if (oldVal != newVal) {
-                            if (oldVal.value != null) {
-                                aggregate = onValueRemoved(aggregate, oldVal.value)
+                            if (oldVal != null) {
+                                aggregate = onValueRemoved(aggregate, oldVal)
                             }
-                            values[i].value = newVal
+                            values[i] = newVal
                             if (newVal != null) {
                                 aggregate = onValueAdded(aggregate, newVal)
                             }

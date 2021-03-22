@@ -25,7 +25,6 @@ import java.util.WeakHashMap
 import javax.swing.JPanel
 import kotlin.math.min
 import kotlin.math.sqrt
-import org.apache.commons.lang3.tuple.MutablePair
 
 class MapFrame : GraphicsFrame() {
     private var numShapesBinding: Binding<Int> = Binding.fixedBinding(0)
@@ -36,7 +35,7 @@ class MapFrame : GraphicsFrame() {
     private var numOutlineShapesBinding: Binding<Int> = Binding.fixedBinding(0)
     private var outlineShapesBinding = IndexedBinding.emptyBinding<Shape>()
 
-    private val shapesToDraw: MutableList<MutablePair<Shape, Color>> = ArrayList()
+    private val shapesToDraw: MutableList<Pair<Shape, Color>> = ArrayList()
     private var focus: Rectangle2D? = null
     private val outlineShapes: MutableList<Shape> = ArrayList()
     private val transformedShapesCache: MutableMap<Shape, Shape> = WeakHashMap()
@@ -95,7 +94,7 @@ class MapFrame : GraphicsFrame() {
         this.numShapesBinding = numShapesBinding
         this.numShapesBinding.bind { size ->
             while (size > shapesToDraw.size) {
-                shapesToDraw.add(MutablePair(Area(), Color.BLACK))
+                shapesToDraw.add(Pair(Area(), Color.BLACK))
             }
             while (size < shapesToDraw.size) {
                 shapesToDraw.removeAt(size)
@@ -105,27 +104,27 @@ class MapFrame : GraphicsFrame() {
     }
 
     internal fun getShape(idx: Int): Shape {
-        return shapesToDraw[idx].left
+        return shapesToDraw[idx].first
     }
 
     fun setShapeBinding(shapeBinding: IndexedBinding<Shape>) {
         this.shapeBinding.unbind()
         this.shapeBinding = shapeBinding
         this.shapeBinding.bind { idx, shape ->
-            shapesToDraw[idx].left = shape
+            shapesToDraw[idx] = shapesToDraw[idx].copy(first = shape)
             repaint()
         }
     }
 
     internal fun getColor(idx: Int): Color {
-        return shapesToDraw[idx].right
+        return shapesToDraw[idx].second
     }
 
     fun setColorBinding(colorBinding: IndexedBinding<Color>) {
         this.colorBinding.unbind()
         this.colorBinding = colorBinding
         this.colorBinding.bind { idx, color ->
-            shapesToDraw[idx].right = color
+            shapesToDraw[idx] = shapesToDraw[idx].copy(second = color)
             repaint()
         }
     }
@@ -136,9 +135,9 @@ class MapFrame : GraphicsFrame() {
                 var bounds: Rectangle2D? = null
                 for (entry in shapesToDraw) {
                     if (bounds == null) {
-                        bounds = entry.left.bounds2D
+                        bounds = entry.first.bounds2D
                     } else {
-                        bounds.add(entry.left.bounds2D)
+                        bounds.add(entry.first.bounds2D)
                     }
                 }
                 return bounds
@@ -220,13 +219,13 @@ class MapFrame : GraphicsFrame() {
                     throw RuntimeException(e)
                 }
                 shapesToDraw
-                    .filter { inScope(it.left) }
+                    .filter { inScope(it.first) }
                     .map {
                         Pair(
                             transformedShapesCache.computeIfAbsent(
-                                it.left
+                                it.first
                             ) { shape: Shape -> createTransformedShape(transform, shape) },
-                            it.right
+                            it.second
                         )
                     }
                     .forEach {

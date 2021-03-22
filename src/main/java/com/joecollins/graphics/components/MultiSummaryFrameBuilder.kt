@@ -6,7 +6,6 @@ import com.joecollins.bindings.IndexedBinding
 import java.awt.Color
 import java.lang.Runnable
 import java.util.ArrayList
-import org.apache.commons.lang3.mutable.MutableBoolean
 
 class MultiSummaryFrameBuilder {
 
@@ -40,9 +39,9 @@ class MultiSummaryFrameBuilder {
 
             val allRows: MutableList<Row> = ArrayList()
             val displayedRows = BindableList<Row>()
-            val isReady = MutableBoolean(false)
+            var isReady = false
             val update = Runnable {
-                if (isReady.booleanValue()) displayedRows.setAll(
+                if (isReady) displayedRows.setAll(
                         allRows
                                 .filter { it.display }
                                 .sortedBy { it.sort }
@@ -73,7 +72,7 @@ class MultiSummaryFrameBuilder {
                         }
                 allRows.add(row)
             }
-            isReady.setTrue()
+            isReady = true
             update.run()
             val builder = MultiSummaryFrameBuilder()
             builder.frame.setNumRowsBinding(Binding.sizeBinding(displayedRows))

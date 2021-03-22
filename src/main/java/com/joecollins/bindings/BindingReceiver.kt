@@ -1,8 +1,5 @@
 package com.joecollins.bindings
 
-import org.apache.commons.lang3.mutable.Mutable
-import org.apache.commons.lang3.mutable.MutableObject
-
 class BindingReceiver<T>(binding: Binding<T>) {
 
     private val _value = WrappedValue<T>()
@@ -14,14 +11,15 @@ class BindingReceiver<T>(binding: Binding<T>) {
     private enum class Property { VALUE }
 
     private class WrappedValue<T> : Bindable<WrappedValue<T>, Property>() {
-        private val _value: Mutable<T> = MutableObject()
+        private var _value: T? = null
 
         var value: T
         get() {
-            return _value.value
+            @Suppress("UNCHECKED_CAST")
+            return _value as T
         }
         set(v) {
-            _value.value = v
+            _value = v
             onPropertyRefreshed(Property.VALUE)
         }
     }

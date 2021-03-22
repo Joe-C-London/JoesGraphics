@@ -179,10 +179,10 @@ class HeatMapFrameBuilder {
         }
 
         private fun createSeatBarBinding(
-                results: List<BindingReceiver<Pair<PartyResult?, Int>>>,
-                list: BindableList<Pair<Color, Int>>,
-                partyFilter: (Party?) -> Boolean,
-                color: Color
+            results: List<BindingReceiver<Pair<PartyResult?, Int>>>,
+            list: BindableList<Pair<Color, Int>>,
+            partyFilter: (Party?) -> Boolean,
+            color: Color
         ): BindingReceiver<Pair<Int, Int>> {
             val binding = Binding.mapReduceBinding(
                     results.map { it.getBinding() }.toList(),
@@ -211,11 +211,11 @@ class HeatMapFrameBuilder {
         }
 
         private fun createChangeBarBinding(
-                resultWithPrev: List<BindingReceiver<Triple<PartyResult?, Party, Int>>>,
-                list: BindableList<Pair<Color, Int>>,
-                partyFilter: (Party?) -> Boolean,
-                color: Color,
-                showChangeBars: (Int, Int) -> Boolean
+            resultWithPrev: List<BindingReceiver<Triple<PartyResult?, Party, Int>>>,
+            list: BindableList<Pair<Color, Int>>,
+            partyFilter: (Party?) -> Boolean,
+            color: Color,
+            showChangeBars: (Int, Int) -> Boolean
         ): BindingReceiver<Pair<Int, Int>> {
             val binding = Binding.mapReduceBinding(
                     resultWithPrev.map { it.getBinding() }.toList(),

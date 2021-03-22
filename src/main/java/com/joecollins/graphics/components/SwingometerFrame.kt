@@ -20,8 +20,6 @@ import kotlin.math.min
 import kotlin.math.roundToLong
 import kotlin.math.sign
 import kotlin.math.sin
-import org.apache.commons.lang3.tuple.MutablePair
-import org.apache.commons.lang3.tuple.MutableTriple
 
 class SwingometerFrame : GraphicsFrame() {
     private var rangeBinding: Binding<Number> = Binding.fixedBinding(1)
