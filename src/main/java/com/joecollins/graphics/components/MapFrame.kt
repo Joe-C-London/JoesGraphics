@@ -219,14 +219,23 @@ class MapFrame : GraphicsFrame() {
                     throw RuntimeException(e)
                 }
                 shapesToDraw
+                    .asSequence()
                     .filter { inScope(it.first) }
                     .map {
                         Pair(
-                            transformedShapesCache.computeIfAbsent(
-                                it.first
-                            ) { shape: Shape -> createTransformedShape(transform, shape) },
+                            transformedShapesCache.computeIfAbsent(it.first) { shape: Shape -> createTransformedShape(transform, shape) },
                             it.second
                         )
+                    }
+                    .groupBy { it.second }
+                    .asSequence()
+                    .map {
+                        val a = Area()
+                        it.value.asSequence()
+                                .map { e -> e.first }
+                                .sortedBy { s -> s.bounds.width * s.bounds.height }
+                                .forEach { s -> a.add(Area(s)) }
+                        Pair(a, it.key)
                     }
                     .forEach {
                         g2d.color = it.second
