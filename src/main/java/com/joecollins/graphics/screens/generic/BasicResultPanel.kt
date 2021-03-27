@@ -248,6 +248,17 @@ class BasicResultPanel private constructor(
             return this
         }
 
+        fun <T> withResultMap(
+            shapes: Binding<Map<T, Shape>>,
+            winners: Binding<Map<T, PartyResult?>>,
+            focus: Binding<List<T>?>,
+            additionalHighlight: Binding<List<T>?>,
+            headerBinding: Binding<String?>
+        ): SeatScreenBuilder<KT, CT, PT> {
+            mapBuilder = MapBuilder(shapes, winners, Pair(focus, additionalHighlight), headerBinding)
+            return this
+        }
+
         fun withNotes(notes: Binding<String?>): SeatScreenBuilder<KT, CT, PT> {
             this.notes = BindingReceiver(notes)
             return this
@@ -381,8 +392,8 @@ class BasicResultPanel private constructor(
 
         private fun applyMajorityLine(builder: BarFrameBuilder) {
             val showMajority = this.showMajority
-            val total = this.total ?: throw IllegalArgumentException("Cannot show majority line without total")
             if (showMajority != null) {
+                val total = this.total ?: throw IllegalArgumentException("Cannot show majority line without total")
                 val lines = BindableList<Int>()
                 showMajority
                         .getBinding()
@@ -911,6 +922,16 @@ class BasicResultPanel private constructor(
             shapes: Binding<Map<T, Shape>>,
             winners: Binding<Map<T, PartyResult?>>,
             focus: Binding<List<T>?>,
+            headerBinding: Binding<String?>
+        ): VoteScreenBuilder<KT, CT, CPT, PT> {
+            mapBuilder = MapBuilder(shapes, winners, focus, headerBinding)
+            return this
+        }
+
+        fun <T> withResultMap(
+            shapes: Binding<Map<T, Shape>>,
+            winners: Binding<Map<T, PartyResult?>>,
+            focus: Pair<Binding<List<T>?>, Binding<List<T>?>>,
             headerBinding: Binding<String?>
         ): VoteScreenBuilder<KT, CT, CPT, PT> {
             mapBuilder = MapBuilder(shapes, winners, focus, headerBinding)

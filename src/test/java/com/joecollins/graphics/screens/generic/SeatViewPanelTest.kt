@@ -13,9 +13,11 @@ import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.graphics.utils.ShapefileReader.readShapes
 import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.Party
+import com.joecollins.models.general.PartyResult
 import java.awt.Color
 import java.awt.Shape
 import java.io.IOException
+import java.util.ArrayList
 import java.util.HashMap
 import java.util.IdentityHashMap
 import java.util.LinkedHashMap
@@ -850,6 +852,40 @@ class SeatViewPanelTest {
         previousSeats.value = prev
         winner.value = dem
         compareRendering("SeatViewPanel", "PartyTick-2", panel)
+    }
+
+    @Test
+    @Throws(IOException::class)
+    fun testAdditionalHighlightMapWithNoResults() {
+        val ndp = Party("New Democratic Party", "NDP", Color.ORANGE)
+        val pc = Party("Progressive Conservative", "PC", Color.BLUE)
+        val lib = Party("Liberal", "LIB", Color.RED)
+        val grn = Party("Green", "GRN", Color.GREEN.darker())
+        val currentSeats = BindableWrapper(mapOf<Party, Int>())
+        val previousSeats = BindableWrapper(mapOf<Party, Int>())
+        val currentVotes = BindableWrapper(mapOf<Party, Int>())
+        val previousVotes = BindableWrapper(mapOf<Party, Int>())
+        val header = BindableWrapper("CARDIGAN")
+        val voteHeader = BindableWrapper("0 OF 7 RIDINGS REPORTING")
+        val voteSubhead = BindableWrapper("")
+        val changeHeader = BindableWrapper("CHANGE SINCE 2015")
+        val changeSubhead = BindableWrapper(null)
+        val swingHeader = BindableWrapper("SWING SINCE 2015")
+        val mapHeader = BindableWrapper("CARDIGAN")
+        val swingPartyOrder = listOf(ndp, grn, lib, pc)
+        val shapesByDistrict = peiShapesByDistrict()
+        val focus = BindableWrapper(shapesByDistrict.keys.filter { it <= 7 })
+        val additionalHighlight = BindableWrapper<List<Int>>(ArrayList(shapesByDistrict.keys))
+        val winnerByDistrict = BindableWrapper(mapOf<Int, PartyResult>())
+        val panel = BasicResultPanel.partySeats(
+                currentSeats.binding, voteHeader.binding, voteSubhead.binding)
+                .withPrev(previousSeats.binding, changeHeader.binding, changeSubhead.binding)
+                .withSwing(currentVotes.binding, previousVotes.binding, compareBy { swingPartyOrder.indexOf(it) }, swingHeader.binding)
+                .withResultMap(fixedBinding(shapesByDistrict), winnerByDistrict.binding, focus.binding, additionalHighlight.binding, mapHeader.binding)
+                .withTotal(fixedBinding(7))
+                .build(header.binding)
+        panel.setSize(1024, 512)
+        compareRendering("SeatViewPanel", "AdditionalHighlightMap-1", panel)
     }
 
     @Test

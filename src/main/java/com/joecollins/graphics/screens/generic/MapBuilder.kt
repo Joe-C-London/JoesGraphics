@@ -1,6 +1,7 @@
 package com.joecollins.graphics.screens.generic
 
 import com.joecollins.bindings.Binding
+import com.joecollins.bindings.Binding.Companion.fixedBinding
 import com.joecollins.bindings.BindingReceiver
 import com.joecollins.graphics.components.MapFrame
 import com.joecollins.graphics.components.MapFrameBuilder
@@ -18,6 +19,13 @@ class MapBuilder<T> {
         winners: Binding<Map<T, PartyResult?>>,
         focus: Binding<List<T>?>,
         headerBinding: Binding<String?>
+    ) : this(shapes, winners, Pair(focus, fixedBinding(null)), headerBinding)
+
+    constructor(
+        shapes: Binding<Map<T, Shape>>,
+        winners: Binding<Map<T, PartyResult?>>,
+        focus: Pair<Binding<List<T>?>, Binding<List<T>?>>,
+        headerBinding: Binding<String?>
     ) {
         val shapesReceiver: BindingReceiver<Map<T, Shape>> = BindingReceiver(shapes)
         val shapesToParties = shapesReceiver
@@ -30,11 +38,17 @@ class MapBuilder<T> {
                             }
                             .toList()
                 }
-        mapFocus = BindingReceiver(shapesReceiver.getBinding().merge(focus) { shp, foc -> createFocusShapes(shp, foc) })
+        mapFocus = BindingReceiver(shapesReceiver.getBinding().merge(focus.first) { shp, foc -> createFocusShapes(shp, foc) })
+        val additionalFocus = BindingReceiver(shapesReceiver.getBinding().merge(focus.second) { shp, foc -> createFocusShapes(shp, foc) })
+        val allFocusShapes = mapFocus.getBinding().merge(additionalFocus.getBinding()) { a, b ->
+            when {
+                a == null -> b
+                b == null -> a
+                else -> listOf(a, b).flatten()
+            }
+        }
         this.winners = BindingReceiver(
-                shapesToParties.merge(
-                        mapFocus.getBinding()
-                ) { r: List<Pair<Shape, PartyResult?>>, f: List<Shape>? ->
+                shapesToParties.merge(allFocusShapes) { r: List<Pair<Shape, PartyResult?>>, f: List<Shape>? ->
                     r.map { Pair(it.first, extractColor(f, it.first, it.second)) }
                             .toList()
                 })

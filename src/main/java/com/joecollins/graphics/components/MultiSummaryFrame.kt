@@ -91,15 +91,15 @@ class MultiSummaryFrame : GraphicsFrame() {
         }
     }
 
-    fun getNumValues(index: Int): Int {
+    internal fun getNumValues(index: Int): Int {
         return entries[index].panels.size
     }
 
-    fun getColor(row: Int, col: Int): Color {
+    internal fun getColor(row: Int, col: Int): Color {
         return entries[row].panels[col].background
     }
 
-    fun getValue(row: Int, col: Int): String {
+    internal fun getValue(row: Int, col: Int): String {
         return entries[row].labels[col].text
     }
 
