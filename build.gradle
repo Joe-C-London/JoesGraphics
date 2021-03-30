@@ -8,8 +8,8 @@ buildscript {
     }
 }
 plugins {
-    id "com.github.ben-manes.versions" version "0.36.0"
-    id "com.diffplug.spotless" version "5.8.2"
+    id "com.github.ben-manes.versions" version "0.38.0"
+    id "com.diffplug.spotless" version "5.11.1"
     id "jacoco"
 }
 
@@ -29,7 +29,7 @@ repositories {
     mavenCentral()
 }
 
-def geotoolsVersion = '24.1'
+def geotoolsVersion = '25.0'
 
 dependencies {
     compile group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.30'
@@ -37,7 +37,7 @@ dependencies {
     compile group: 'org.geotools', name: 'gt-metadata', version: geotoolsVersion
     compile group: 'org.twitter4j', name: 'twitter4j-core', version: '4.0.7'
     compile group: 'org.apache.commons', name: 'commons-collections4', version: '4.4'
-    compile group: 'com.google.guava', name: 'guava', version: '30.1-jre'
+    compile group: 'com.google.guava', name: 'guava', version: '30.1.1-jre'
     testCompile group: 'junit', name: 'junit', version: '4.13.2'
     testCompile group: 'commons-io', name: 'commons-io', version: '2.8.0'
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
