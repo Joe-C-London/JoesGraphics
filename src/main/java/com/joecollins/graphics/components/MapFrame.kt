@@ -230,11 +230,10 @@ class MapFrame : GraphicsFrame() {
                     .groupBy { it.second }
                     .asSequence()
                     .map {
-                        val a = Area()
-                        it.value.asSequence()
+                        val a = it.value.parallelStream()
                                 .map { e -> e.first }
-                                .sortedBy { s -> s.bounds.width * s.bounds.height }
-                                .forEach { s -> a.add(Area(s)) }
+                                .sorted(compareBy { s -> s.bounds.width * s.bounds.height })
+                                .collect({ Area() }, { a, s -> a.add(Area(s)) }, { a, s -> a.add(s) })
                         Pair(a, it.key)
                     }
                     .forEach {
