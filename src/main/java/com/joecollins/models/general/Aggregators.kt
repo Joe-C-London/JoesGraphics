@@ -91,7 +91,7 @@ object Aggregators {
     }
 
     @Suppress("UNCHECKED_CAST")
-    @JvmStatic fun <K> topAndOthers(result: Binding<Map<K, Int>>, limit: Int, others: K) = topAndOthers(result, limit, others, Binding.fixedBinding(Array<Any?>(0) { null } as Array<K>))
+    @JvmStatic fun <K, T : Int?> topAndOthers(result: Binding<Map<K, T>>, limit: Int, others: K) = topAndOthers(result, limit, others, Binding.fixedBinding(Array<Any?>(0) { null } as Array<K>))
 
     @JvmStatic fun <K, T : Int?> topAndOthers(result: Binding<Map<K, T>>, limit: Int, others: K, mustInclude: Binding<Array<K>>) = result.merge(mustInclude) { m, w -> topAndOthers(m, limit, others, *w) }
 

@@ -1,11 +1,6 @@
 package com.joecollins.bindings
 
-import com.joecollins.bindings.Utils.convertConsumer
-
 interface Binding<out T> {
-
-    @Deprecated("Replacing with Kotlin version")
-    @JvmDefault fun bindLegacy(onUpdate: java.util.function.Consumer<in T>) = bind(convertConsumer(onUpdate))
 
     fun bind(onUpdate: (T) -> Unit)
 
