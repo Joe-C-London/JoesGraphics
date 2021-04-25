@@ -1,7 +1,6 @@
 package com.joecollins.graphics.components.lowerthird
 
 import com.joecollins.bindings.Binding
-import com.joecollins.bindings.IndexedBinding
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.GridLayout
@@ -38,14 +37,10 @@ class LowerThirdHeadlineAndSummarySingleLabel : LowerThird() {
         partySummary.setHeadlineBinding(summaryHeaderBinding)
     }
 
-    fun setNumSummaryEntriesBinding(numEntriesBinding: Binding<Int>) {
-        partySummary.setNumEntriesBinding(numEntriesBinding)
-    }
-
     internal val numSummaryEntries: Int
         get() = partySummary.numEntries
 
-    fun setSummaryEntriesBinding(entriesBinding: IndexedBinding<SummaryWithoutLabels.Entry>) {
+    fun setSummaryEntriesBinding(entriesBinding: Binding<List<SummaryWithoutLabels.Entry>>) {
         partySummary.setEntriesBinding(entriesBinding)
     }
 

@@ -1,7 +1,6 @@
 package com.joecollins.graphics.components.lowerthird
 
 import com.joecollins.bindings.Binding
-import com.joecollins.bindings.IndexedBinding
 import com.joecollins.graphics.utils.StandardFont
 import java.awt.Color
 import java.awt.Component
@@ -16,39 +15,33 @@ import javax.swing.border.EmptyBorder
 import javax.swing.border.MatteBorder
 
 class SummaryWithLabels : JPanel() {
-    private var numEntriesBinding: Binding<Int> = Binding.fixedBinding(1)
-    private var entriesBinding = IndexedBinding.singletonBinding(Entry(Color.WHITE, "NO RESULT YET", "WAITING..."))
+    private var entriesBinding = Binding.fixedBinding(listOf(Entry(Color.WHITE, "NO RESULT YET", "WAITING...")))
     private val entryPanels: MutableList<EntryPanel> = ArrayList()
 
     class Entry(val color: Color, val label: String, val value: String)
 
-    fun setNumEntriesBinding(numEntriesBinding: Binding<Int>) {
-        this.numEntriesBinding.unbind()
-        this.numEntriesBinding = numEntriesBinding
-        this.numEntriesBinding.bind { size ->
-            while (entryPanels.size < size) {
+    internal val numEntries: Int
+        get() = entryPanels.size
+
+    fun setEntriesBinding(entriesBinding: Binding<List<Entry>>) {
+        this.entriesBinding.unbind()
+        this.entriesBinding = entriesBinding
+        this.entriesBinding.bind { entries: List<Entry> ->
+            while (entryPanels.size < entries.size) {
                 val newPanel = EntryPanel()
                 add(newPanel)
                 entryPanels.add(newPanel)
             }
-            while (entryPanels.size > size) {
-                remove(entryPanels.removeAt(size))
+            while (entryPanels.size > entries.size) {
+                remove(entryPanels.removeAt(entries.size))
             }
-        }
-    }
-
-    internal val numEntries: Int
-        get() = entryPanels.size
-
-    fun setEntriesBinding(entriesBinding: IndexedBinding<Entry>) {
-        this.entriesBinding.unbind()
-        this.entriesBinding = entriesBinding
-        this.entriesBinding.bind { idx, entry ->
-            entryPanels[idx].topLabel.foreground = if (entry.color == Color.BLACK) Color.WHITE else entry.color
-            entryPanels[idx].bottomPanel.background = entry.color
-            entryPanels[idx].bottomLabel.foreground = if (entry.color == Color.WHITE) Color.BLACK else Color.WHITE
-            entryPanels[idx].topLabel.text = entry.label
-            entryPanels[idx].bottomLabel.text = entry.value
+            entries.onEachIndexed { idx, entry ->
+                entryPanels[idx].topLabel.foreground = if (entry.color == Color.BLACK) Color.WHITE else entry.color
+                entryPanels[idx].bottomPanel.background = entry.color
+                entryPanels[idx].bottomLabel.foreground = if (entry.color == Color.WHITE) Color.BLACK else Color.WHITE
+                entryPanels[idx].topLabel.text = entry.label
+                entryPanels[idx].bottomLabel.text = entry.value
+            }
         }
     }
 
@@ -152,7 +145,6 @@ class SummaryWithLabels : JPanel() {
         background = Color.WHITE
         layout = SummaryLayout()
         border = MatteBorder(1, 1, 1, 1, Color.BLACK)
-        setNumEntriesBinding(numEntriesBinding)
         setEntriesBinding(entriesBinding)
     }
 }

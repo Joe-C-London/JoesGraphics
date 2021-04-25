@@ -1,7 +1,6 @@
 package com.joecollins.graphics.components.lowerthird
 
 import com.joecollins.bindings.Binding.Companion.fixedBinding
-import com.joecollins.bindings.IndexedBinding.Companion.listBinding
 import com.joecollins.graphics.components.lowerthird.LowerThird.Companion.createImage
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import java.awt.Color
@@ -30,10 +29,14 @@ class LowerThirdHeadlineAndSummaryTest {
     @Test
     fun testSummaryPanel() {
         val lowerThird = LowerThirdHeadlineAndSummary()
-        lowerThird.setNumSummaryEntriesBinding(fixedBinding(2))
         lowerThird.setSummaryEntriesBinding(
-                listBinding(
-                        SummaryWithLabels.Entry(Color.RED, "LIB", "2"), SummaryWithLabels.Entry(Color.BLUE, "CON", "1")))
+            fixedBinding(
+                listOf(
+                    SummaryWithLabels.Entry(Color.RED, "LIB", "2"),
+                    SummaryWithLabels.Entry(Color.BLUE, "CON", "1")
+                )
+            )
+        )
         Assert.assertEquals(2, lowerThird.numSummaryEntries.toLong())
         Assert.assertEquals(Color.RED, lowerThird.getEntryColor(0))
         Assert.assertEquals(Color.BLUE, lowerThird.getEntryColor(1))
@@ -59,10 +62,14 @@ class LowerThirdHeadlineAndSummaryTest {
         lowerThird.setClock(Clock.fixed(Instant.parse("2019-10-22T01:30:00Z"), ZoneId.systemDefault()))
         lowerThird.setHeadlineBinding(fixedBinding("CENTRAL CANADA POLLS CLOSE"))
         lowerThird.setSubheadBinding(fixedBinding("Polls open for 30 minutes on west coast"))
-        lowerThird.setNumSummaryEntriesBinding(fixedBinding(2))
         lowerThird.setSummaryEntriesBinding(
-                listBinding(
-                        SummaryWithLabels.Entry(Color.RED, "LIB", "2"), SummaryWithLabels.Entry(Color.BLUE, "CON", "1")))
+            fixedBinding(
+                listOf(
+                    SummaryWithLabels.Entry(Color.RED, "LIB", "2"),
+                    SummaryWithLabels.Entry(Color.BLUE, "CON", "1")
+                )
+            )
+        )
         compareRendering("LowerThird", "HeadlineAndSummary", lowerThird)
     }
 }

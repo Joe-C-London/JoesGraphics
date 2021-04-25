@@ -1,7 +1,6 @@
 package com.joecollins.graphics.components.lowerthird
 
 import com.joecollins.bindings.Binding.Companion.fixedBinding
-import com.joecollins.bindings.IndexedBinding.Companion.listBinding
 import com.joecollins.graphics.components.lowerthird.LowerThird.Companion.createImage
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import java.awt.Color
@@ -30,10 +29,15 @@ class LowerThirdHeadlineAndSummarySingleLabelTest {
     @Test
     fun testSummaryPanel() {
         val lowerThird = LowerThirdHeadlineAndSummarySingleLabel()
-        lowerThird.setNumSummaryEntriesBinding(fixedBinding(2))
         lowerThird.setSummaryHeaderBinding(fixedBinding("170 SEATS FOR MAJORITY"))
         lowerThird.setSummaryEntriesBinding(
-                listBinding(SummaryWithoutLabels.Entry(Color.RED, "2"), SummaryWithoutLabels.Entry(Color.BLUE, "1")))
+            fixedBinding(
+                listOf(
+                    SummaryWithoutLabels.Entry(Color.RED, "2"),
+                    SummaryWithoutLabels.Entry(Color.BLUE, "1")
+                )
+            )
+        )
         Assert.assertEquals(2, lowerThird.numSummaryEntries.toLong())
         Assert.assertEquals(Color.RED, lowerThird.getEntryColor(0))
         Assert.assertEquals(Color.BLUE, lowerThird.getEntryColor(1))
@@ -58,9 +62,14 @@ class LowerThirdHeadlineAndSummarySingleLabelTest {
         lowerThird.setClock(Clock.fixed(Instant.parse("2019-10-22T01:30:00Z"), ZoneId.systemDefault()))
         lowerThird.setHeadlineBinding(fixedBinding("CENTRAL CANADA POLLS CLOSE"))
         lowerThird.setSubheadBinding(fixedBinding("Polls open for 30 minutes on west coast"))
-        lowerThird.setNumSummaryEntriesBinding(fixedBinding(2))
         lowerThird.setSummaryEntriesBinding(
-                listBinding(SummaryWithoutLabels.Entry(Color.RED, "2"), SummaryWithoutLabels.Entry(Color.BLUE, "1")))
+            fixedBinding(
+                listOf(
+                    SummaryWithoutLabels.Entry(Color.RED, "2"),
+                    SummaryWithoutLabels.Entry(Color.BLUE, "1")
+                )
+            )
+        )
         lowerThird.setSummaryHeaderBinding(fixedBinding("170 SEATS FOR MAJORITY"))
         compareRendering("LowerThird", "HeadlineAndSummarySingleLabel", lowerThird)
     }
@@ -82,9 +91,14 @@ class LowerThirdHeadlineAndSummarySingleLabelTest {
         lowerThird.setHeadlineBinding(fixedBinding("POLLS CLOSE ACROSS CENTRAL CANADA"))
         lowerThird.setSubheadBinding(
                 fixedBinding("Polls open for another 30 minutes in British Columbia, Yukon"))
-        lowerThird.setNumSummaryEntriesBinding(fixedBinding(2))
         lowerThird.setSummaryEntriesBinding(
-                listBinding(SummaryWithoutLabels.Entry(Color.RED, "2"), SummaryWithoutLabels.Entry(Color.BLUE, "1")))
+            fixedBinding(
+                listOf(
+                    SummaryWithoutLabels.Entry(Color.RED, "2"),
+                    SummaryWithoutLabels.Entry(Color.BLUE, "1")
+                )
+            )
+        )
         lowerThird.setSummaryHeaderBinding(fixedBinding("170 SEATS FOR MAJORITY"))
         compareRendering("LowerThird", "LongHeadlineAndSummarySingleLabel", lowerThird)
     }
