@@ -164,3 +164,5 @@ interface Binding<out T> {
         }
     }
 }
+
+inline fun <T, R> Binding<List<T>>.mapElements(crossinline func: (T) -> R): Binding<List<R>> = this.map { list -> list.map(func) }

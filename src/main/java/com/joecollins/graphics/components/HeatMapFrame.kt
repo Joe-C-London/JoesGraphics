@@ -1,7 +1,6 @@
 package com.joecollins.graphics.components
 
 import com.joecollins.bindings.Binding
-import com.joecollins.bindings.IndexedBinding
 import com.joecollins.graphics.utils.StandardFont
 import java.awt.BasicStroke
 import java.awt.BorderLayout
@@ -27,18 +26,16 @@ import kotlin.math.roundToInt
 
 class HeatMapFrame : GraphicsFrame() {
     private var numRowsBinding = Binding.fixedBinding(1)
-    private var numSquaresBinding = Binding.fixedBinding(0)
-    private var squareBordersBinding = IndexedBinding.emptyBinding<Color>()
-    private var squareFillBinding = IndexedBinding.emptyBinding<Color>()
-    private var numSeatBarsBinding = Binding.fixedBinding(0)
-    private var seatBarColorBinding = IndexedBinding.emptyBinding<Color>()
-    private var seatBarSizeBinding = IndexedBinding.emptyBinding<Int>()
+
+    private var squaresBinding: Binding<List<Square>> = Binding.fixedBinding(emptyList())
+
+    private var seatBarsBinding: Binding<List<Bar>> = Binding.fixedBinding(emptyList())
     private var seatBarLabelBinding = Binding.fixedBinding("")
-    private var numChangeBarsBinding = Binding.fixedBinding(0)
-    private var changeBarColorBinding = IndexedBinding.emptyBinding<Color>()
-    private var changeBarSizeBinding = IndexedBinding.emptyBinding<Int>()
+
+    private var changeBarsBinding: Binding<List<Bar>> = Binding.fixedBinding(emptyList())
     private var changeBarLabelBinding = Binding.fixedBinding("")
     private var changeBarStartBinding = Binding.fixedBinding(0)
+
     private val barsPanel = SeatBarPanel()
     private val squaresPanel = SquaresPanel()
 
@@ -80,59 +77,35 @@ class HeatMapFrame : GraphicsFrame() {
     internal val numSquares: Int
         get() = squaresPanel.squares.size
 
-    fun setNumSquaresBinding(numSquaresBinding: Binding<Int>) {
-        this.numSquaresBinding.unbind()
-        this.numSquaresBinding = numSquaresBinding
-        this.numSquaresBinding.bind { numSquares -> squaresPanel.setNumSquares(numSquares) }
-    }
-
     internal fun getSquareBorder(index: Int): Color? {
         return squaresPanel.squares[index].borderColor
-    }
-
-    fun setSquareBordersBinding(squareBordersBinding: IndexedBinding<Color>) {
-        this.squareBordersBinding.unbind()
-        this.squareBordersBinding = squareBordersBinding
-        this.squareBordersBinding.bind { index, color -> squaresPanel.setSquareBorder(index, color) }
     }
 
     internal fun getSquareFill(index: Int): Color {
         return squaresPanel.squares[index].fillColor
     }
 
-    fun setSquareFillBinding(squareFillBinding: IndexedBinding<Color>) {
-        this.squareFillBinding.unbind()
-        this.squareFillBinding = squareFillBinding
-        this.squareFillBinding.bind { index, color -> squaresPanel.setSquareFill(index, color) }
+    fun setSquaresBinding(squaresBinding: Binding<List<Square>>) {
+        this.squaresBinding.unbind()
+        this.squaresBinding = squaresBinding
+        this.squaresBinding.bind { squares -> squaresPanel.squares = squares }
     }
 
     internal val seatBarCount: Int
         get() = barsPanel.seatBars.size
 
-    fun setNumSeatBarsBinding(numSeatBarsBinding: Binding<Int>) {
-        this.numSeatBarsBinding.unbind()
-        this.numSeatBarsBinding = numSeatBarsBinding
-        this.numSeatBarsBinding.bind { numSeatBars -> barsPanel.setNumSeatBars(numSeatBars) }
-    }
-
     internal fun getSeatBarColor(index: Int): Color {
         return barsPanel.seatBars[index].color
-    }
-
-    fun setSeatBarColorBinding(seatBarColorBinding: IndexedBinding<Color>) {
-        this.seatBarColorBinding.unbind()
-        this.seatBarColorBinding = seatBarColorBinding
-        this.seatBarColorBinding.bind { index, color -> barsPanel.setSeatBarColor(index, color) }
     }
 
     internal fun getSeatBarSize(index: Int): Int {
         return barsPanel.seatBars[index].size
     }
 
-    fun setSeatBarSizeBinding(seatBarSizeBinding: IndexedBinding<Int>) {
-        this.seatBarSizeBinding.unbind()
-        this.seatBarSizeBinding = seatBarSizeBinding
-        this.seatBarSizeBinding.bind { index, size -> barsPanel.setSeatBarSize(index, size) }
+    fun setSeatBarsBinding(seatBarsBinding: Binding<List<Bar>>) {
+        this.seatBarsBinding.unbind()
+        this.seatBarsBinding = seatBarsBinding
+        this.seatBarsBinding.bind { bars -> barsPanel.seatBars = bars }
     }
 
     internal val seatBarLabel: String
@@ -147,30 +120,18 @@ class HeatMapFrame : GraphicsFrame() {
     internal val changeBarCount: Int
         get() = barsPanel.changeBars.size
 
-    fun setNumChangeBarsBinding(numChangeBarsBinding: Binding<Int>) {
-        this.numChangeBarsBinding.unbind()
-        this.numChangeBarsBinding = numChangeBarsBinding
-        this.numChangeBarsBinding.bind { numChangeBars -> barsPanel.setNumChangeBars(numChangeBars) }
-    }
-
     internal fun getChangeBarColor(index: Int): Color {
         return barsPanel.changeBars[index].color
-    }
-
-    fun setChangeBarColorBinding(changeBarColorBinding: IndexedBinding<Color>) {
-        this.changeBarColorBinding.unbind()
-        this.changeBarColorBinding = changeBarColorBinding
-        this.changeBarColorBinding.bind { index, color -> barsPanel.setChangeBarColor(index, color) }
     }
 
     internal fun getChangeBarSize(index: Int): Int {
         return barsPanel.changeBars[index].size
     }
 
-    fun setChangeBarSizeBinding(changeBarSizeBinding: IndexedBinding<Int>) {
-        this.changeBarSizeBinding.unbind()
-        this.changeBarSizeBinding = changeBarSizeBinding
-        this.changeBarSizeBinding.bind { index, size -> barsPanel.setChangeBarSize(index, size) }
+    fun setChangeBarsBinding(changeBarsBinding: Binding<List<Bar>>) {
+        this.changeBarsBinding.unbind()
+        this.changeBarsBinding = changeBarsBinding
+        this.changeBarsBinding.bind { bars -> barsPanel.changeBars = bars }
     }
 
     internal val changeBarLabel: String
@@ -192,32 +153,16 @@ class HeatMapFrame : GraphicsFrame() {
     }
 
     private inner class SeatBarPanel : JPanel() {
-        private val _seatBars: MutableList<Bar> = ArrayList()
+        private var _seatBars: List<Bar> = ArrayList()
         private var _seatBarLabel = ""
-        private val _changeBars: MutableList<Bar> = ArrayList()
+        private var _changeBars: List<Bar> = ArrayList()
         private var _changeBarLabel = ""
         private var _changeBarStart = 0
 
-        val seatBars: List<Bar>
+        var seatBars: List<Bar>
         get() { return _seatBars }
-
-        fun setNumSeatBars(numSeatBars: Int) {
-            while (_seatBars.size < numSeatBars) {
-                _seatBars.add(Bar())
-            }
-            while (_seatBars.size > numSeatBars) {
-                _seatBars.removeAt(numSeatBars)
-            }
-            repaint()
-        }
-
-        fun setSeatBarColor(index: Int, color: Color) {
-            seatBars[index].color = color
-            repaint()
-        }
-
-        fun setSeatBarSize(index: Int, size: Int) {
-            seatBars[index].size = size
+        set(seatBars) {
+            _seatBars = seatBars
             repaint()
         }
 
@@ -228,26 +173,10 @@ class HeatMapFrame : GraphicsFrame() {
             repaint()
         }
 
-        val changeBars: List<Bar>
+        var changeBars: List<Bar>
         get() { return _changeBars }
-
-        fun setNumChangeBars(numChangeBars: Int) {
-            while (_changeBars.size < numChangeBars) {
-                _changeBars.add(Bar())
-            }
-            while (_changeBars.size > numChangeBars) {
-                _changeBars.removeAt(numChangeBars)
-            }
-            repaint()
-        }
-
-        fun setChangeBarColor(index: Int, color: Color) {
-            changeBars[index].color = color
-            repaint()
-        }
-
-        fun setChangeBarSize(index: Int, size: Int) {
-            changeBars[index].size = size
+        set(changeBars) {
+            _changeBars = changeBars
             repaint()
         }
 
@@ -381,14 +310,11 @@ class HeatMapFrame : GraphicsFrame() {
         }
     }
 
-    private inner class Bar {
-        var color: Color = Color.WHITE
-        var size = 0
-    }
+    class Bar(val color: Color = Color.WHITE, val size: Int = 0)
 
     private inner class SquaresPanel : JPanel() {
         private var _numRows = 1
-        private val _squares: MutableList<Square> = ArrayList()
+        private var _squares: List<Square> = ArrayList()
 
         var numRows: Int
         get() { return _numRows }
@@ -397,26 +323,10 @@ class HeatMapFrame : GraphicsFrame() {
             repaint()
         }
 
-        val squares: List<Square>
+        var squares: List<Square>
         get() { return _squares }
-
-        fun setNumSquares(numSquares: Int) {
-            while (_squares.size < numSquares) {
-                _squares.add(Square())
-            }
-            while (_squares.size > numSquares) {
-                _squares.removeAt(numSquares)
-            }
-            repaint()
-        }
-
-        fun setSquareBorder(index: Int, color: Color) {
-            _squares[index].borderColor = color
-            repaint()
-        }
-
-        fun setSquareFill(index: Int, color: Color) {
-            _squares[index].fillColor = color
+        set(squares) {
+            _squares = squares
             repaint()
         }
 
@@ -473,10 +383,7 @@ class HeatMapFrame : GraphicsFrame() {
         }
     }
 
-    private inner class Square {
-        var borderColor: Color? = null
-        var fillColor: Color = Color.WHITE
-    }
+    class Square(val borderColor: Color? = null, val fillColor: Color = Color.WHITE)
 
     init {
         val panel = JPanel()

@@ -1,12 +1,12 @@
 package com.joecollins.graphics.components
 
 import com.joecollins.bindings.Bindable
-import com.joecollins.bindings.BindableList
 import com.joecollins.bindings.Binding
 import com.joecollins.bindings.Binding.Companion.fixedBinding
 import com.joecollins.bindings.Binding.Companion.propertyBinding
 import com.joecollins.graphics.components.HeatMapFrameBuilder.Companion.of
 import com.joecollins.graphics.components.HeatMapFrameBuilder.Companion.ofElectedLeading
+import com.joecollins.graphics.utils.BindableWrapper
 import com.joecollins.graphics.utils.ColorUtils.lighten
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
@@ -26,16 +26,16 @@ class HeatMapFrameBuilderTest {
         dots.addAll(Collections.nCopies(6, Pair(Color.RED, Color.RED)))
         dots.addAll(Collections.nCopies(5, Pair(Color.BLUE, Color.RED)))
         dots.addAll(Collections.nCopies(8, Pair(Color.BLUE, Color.BLUE)))
-        val seatBars = BindableList<Pair<Color, Int>>(listOf(Pair(Color.GREEN, 8)))
-        val changeBars = BindableList<Pair<Color, Int>>(listOf(Pair(Color.GREEN, +7)))
+        val seatBars = BindableWrapper(listOf(Pair(Color.GREEN, 8)))
+        val changeBars = BindableWrapper(listOf(Pair(Color.GREEN, +7)))
         val frame = of(
                 fixedBinding(3),
                 dots,
                 { fixedBinding(it.first) },
                 { fixedBinding(it.second) })
-                .withSeatBars(seatBars, { it.first }, { it.second }, fixedBinding("GREEN: 8"))
+                .withSeatBars(seatBars.binding, { it.first }, { it.second }, fixedBinding("GREEN: 8"))
                 .withChangeBars(
-                        changeBars, { it.first }, { it.second },
+                        changeBars.binding, { it.first }, { it.second },
                         fixedBinding(1),
                         fixedBinding("GRN: +7"))
                 .withHeader(fixedBinding("PEI"))

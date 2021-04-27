@@ -2,7 +2,6 @@ package com.joecollins.graphics.screens.generic
 
 import com.joecollins.bindings.Bindable
 import com.joecollins.bindings.Binding
-import com.joecollins.bindings.IndexedBinding
 import com.joecollins.graphics.components.FiguresFrame
 import com.joecollins.graphics.utils.StandardFont.readBoldFont
 import com.joecollins.models.general.Candidate
@@ -37,27 +36,26 @@ class FiguresScreen private constructor(headerLabel: JLabel, frames: Array<Figur
         fun createFrame(): FiguresFrame {
             val frame = FiguresFrame()
             frame.setHeaderBinding(Binding.fixedBinding(name))
-            frame.setNumEntriesBinding(Binding.fixedBinding(entries.size))
-            frame.setNameBinding(
-                    IndexedBinding.listBinding(
-                            entries) { e: Entry -> Binding.fixedBinding(e.candidate.name.toUpperCase()) })
-            frame.setColorBinding(
-                    IndexedBinding.listBinding(
-                            entries) { e: Entry -> Binding.fixedBinding(e.candidate.party.color) })
-            frame.setDescriptionBinding(
-                    IndexedBinding.listBinding(entries) { e: Entry -> Binding.fixedBinding(e.description) })
-            frame.setResultColorBinding(
-                    IndexedBinding.listBinding(
-                            entries
-                    ) { e: Entry ->
-                        Binding.propertyBinding(
-                                e,
-                                { x: Entry -> (x.leader ?: Party.OTHERS).color },
-                                Entry.Property.LEADER)
-                    })
-            frame.setResultBinding(
-                    IndexedBinding.listBinding(
-                            entries) { e: Entry -> Binding.propertyBinding(e, { x: Entry -> x.status }, Entry.Property.STATUS) })
+            frame.setEntriesBinding(
+                Binding.listBinding(
+                    entries.map { e ->
+                        val colorBinding = Binding.propertyBinding(
+                            e,
+                            { x: Entry -> (x.leader ?: Party.OTHERS).color },
+                            Entry.Property.LEADER)
+                        val statusBinding = Binding.propertyBinding(e, { x: Entry -> x.status }, Entry.Property.STATUS)
+                        colorBinding.merge(statusBinding) { color, status ->
+                            FiguresFrame.Entry(
+                                name = e.candidate.name.toUpperCase(),
+                                color = e.candidate.party.color,
+                                description = e.description,
+                                resultColor = color,
+                                result = status
+                            )
+                        }
+                    }
+                )
+            )
             return frame
         }
     }

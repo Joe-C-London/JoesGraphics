@@ -1,7 +1,6 @@
 package com.joecollins.graphics.components
 
 import com.joecollins.bindings.Binding.Companion.fixedBinding
-import com.joecollins.bindings.IndexedBinding.Companion.listBinding
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import java.awt.Color
 import java.io.IOException
@@ -13,12 +12,15 @@ class FiguresFrameTest {
     @Test
     fun testNamesAndDescriptions() {
         val frame = FiguresFrame()
-        frame.setNumEntriesBinding(fixedBinding(3))
-        frame.setNameBinding(
-                listBinding("Justin Trudeau", "Andrew Scheer", "Jagmeet Singh"))
-        frame.setDescriptionBinding(
-                listBinding("Liberal Leader", "Conservative Leader", "NDP Leader"))
-        frame.setColorBinding(listBinding(Color.RED, Color.BLUE, Color.ORANGE))
+        frame.setEntriesBinding(
+            fixedBinding(
+                listOf(
+                    FiguresFrame.Entry(Color.RED, "Justin Trudeau", "Liberal Leader", "", Color.BLACK),
+                    FiguresFrame.Entry(Color.BLUE, "Andrew Scheer", "Conservative Leader", "", Color.BLACK),
+                    FiguresFrame.Entry(Color.ORANGE, "Jagmeet Singh", "NDP Leader", "", Color.BLACK)
+                )
+            )
+        )
         Assert.assertEquals(3, frame.numEntries.toLong())
         Assert.assertEquals("Justin Trudeau", frame.getName(0))
         Assert.assertEquals("Andrew Scheer", frame.getName(1))
@@ -34,10 +36,15 @@ class FiguresFrameTest {
     @Test
     fun testResults() {
         val frame = FiguresFrame()
-        frame.setNumEntriesBinding(fixedBinding(3))
-        frame.setResultBinding(listBinding("LEADING", "ELECTED", "WAITING..."))
-        frame.setResultColorBinding(
-                listBinding(Color.RED, Color.BLUE, Color.LIGHT_GRAY))
+        frame.setEntriesBinding(
+            fixedBinding(
+                listOf(
+                    FiguresFrame.Entry(Color.RED, "Justin Trudeau", "Liberal Leader", "LEADING", Color.RED),
+                    FiguresFrame.Entry(Color.BLUE, "Andrew Scheer", "Conservative Leader", "ELECTED", Color.BLUE),
+                    FiguresFrame.Entry(Color.ORANGE, "Jagmeet Singh", "NDP Leader", "WAITING...", Color.LIGHT_GRAY)
+                )
+            )
+        )
         Assert.assertEquals(3, frame.numEntries.toLong())
         Assert.assertEquals("LEADING", frame.getResult(0))
         Assert.assertEquals("ELECTED", frame.getResult(1))
@@ -52,15 +59,15 @@ class FiguresFrameTest {
     fun testRenderEntries() {
         val frame = FiguresFrame()
         frame.setHeaderBinding(fixedBinding<String?>("PARTY LEADERS"))
-        frame.setNumEntriesBinding(fixedBinding(3))
-        frame.setNameBinding(
-                listBinding("JUSTIN TRUDEAU", "ANDREW SCHEER", "JAGMEET SINGH"))
-        frame.setDescriptionBinding(
-                listBinding("Liberal Leader", "Conservative Leader", "NDP Leader"))
-        frame.setColorBinding(listBinding(Color.RED, Color.BLUE, Color.ORANGE))
-        frame.setResultBinding(listBinding("LEADING", "ELECTED", "WAITING..."))
-        frame.setResultColorBinding(
-                listBinding(Color.RED, Color.BLUE, Color.LIGHT_GRAY))
+        frame.setEntriesBinding(
+            fixedBinding(
+                listOf(
+                    FiguresFrame.Entry(Color.RED, "JUSTIN TRUDEAU", "Liberal Leader", "LEADING", Color.RED),
+                    FiguresFrame.Entry(Color.BLUE, "ANDREW SCHEER", "Conservative Leader", "ELECTED", Color.BLUE),
+                    FiguresFrame.Entry(Color.ORANGE, "JAGMEET SINGH", "NDP Leader", "WAITING...", Color.LIGHT_GRAY)
+                )
+            )
+        )
         frame.setSize(512, 256)
         compareRendering("FiguresFrame", "Entries", frame)
     }
@@ -70,62 +77,21 @@ class FiguresFrameTest {
     fun testRenderOverflow() {
         val frame = FiguresFrame()
         frame.setHeaderBinding(fixedBinding<String?>("PARTY LEADERS"))
-        frame.setNumEntriesBinding(fixedBinding(9))
-        frame.setNameBinding(
-                listBinding(
-                        "JUSTIN TRUDEAU",
-                        "ANDREW SCHEER",
-                        "JAGMEET SINGH",
-                        "YVES-FRAN\u00c7OIS BLANCHET",
-                        "ELIZABETH MAY",
-                        "MAXIME BERNIER",
-                        "ROD TAYLOR",
-                        "S\u00c9BASTIEN CORHINO",
-                        "TIM MOEN"))
-        frame.setDescriptionBinding(
-                listBinding(
-                        "Liberal Leader, Papineau",
-                        "Conservative Leader, Regina-Qu'Apelle",
-                        "NDP Leader, Burnaby South",
-                        "Bloc Qu\u00e9b\u00e9cois Leader, Beloeil-Chambly",
-                        "Green Leader, Saanich-Gulf Islands",
-                        "People's Party Leader, Beauce",
-                        "CHP Leader, Skeena-Bulkley Valley",
-                        "Rhinoceros Party Leader, Qu\u00e9bec",
-                        "Libertarian Leader, Fort McMurray-Athabasca"))
-        frame.setColorBinding(
-                listBinding(
-                        Color.RED,
-                        Color.BLUE,
-                        Color.ORANGE,
-                        Color.CYAN.darker(),
-                        Color.GREEN.darker(),
-                        Color.MAGENTA.darker(),
-                        Color.MAGENTA,
-                        Color.GRAY,
-                        Color.YELLOW.darker()))
-        frame.setResultBinding(
-                listBinding(
-                        "ELECTED",
-                        "ELECTED",
-                        "ELECTED",
-                        "ELECTED",
-                        "ELECTED",
-                        "DEFEATED",
-                        "DEFEATED",
-                        "DEFEATED",
-                        "DEFEATED"))
-        frame.setResultColorBinding(
-                listBinding(
-                        Color.RED,
-                        Color.BLUE,
-                        Color.ORANGE,
-                        Color.CYAN.darker(),
-                        Color.GREEN.darker(),
-                        Color.BLUE,
-                        Color.ORANGE,
-                        Color.RED,
-                        Color.BLUE))
+        frame.setEntriesBinding(
+            fixedBinding(
+                listOf(
+                    FiguresFrame.Entry(Color.RED, "JUSTIN TRUDEAU", "Liberal Leader, Papineau", "ELECTED", Color.RED),
+                    FiguresFrame.Entry(Color.BLUE, "ANDREW SCHEER", "Conservative Leader, Regina-Qu'Apelle", "ELECTED", Color.BLUE),
+                    FiguresFrame.Entry(Color.ORANGE, "JAGMEET SINGH", "NDP Leader, Burnaby South", "ELECTED", Color.ORANGE),
+                    FiguresFrame.Entry(Color.CYAN.darker(), "YVES-FRAN\u00c7OIS BLANCHET", "Bloc Qu\u00e9b\u00e9cois Leader, Beloeil-Chambly", "ELECTED", Color.CYAN.darker()),
+                    FiguresFrame.Entry(Color.GREEN.darker(), "ELIZABETH MAY", "Green Leader, Saanich-Gulf Islands", "ELECTED", Color.GREEN.darker()),
+                    FiguresFrame.Entry(Color.MAGENTA.darker(), "MAXIME BERNIER", "People's Party Leader, Beauce", "DEFEATED", Color.BLUE),
+                    FiguresFrame.Entry(Color.MAGENTA, "ROD TAYLOR", "CHP Leader, Skeena-Bulkley Valley", "DEFEATED", Color.ORANGE),
+                    FiguresFrame.Entry(Color.GRAY, "S\u00c9BASTIEN CORHINO", "Rhinoceros Party Leader, Qu\u00e9bec", "DEFEATED", Color.RED),
+                    FiguresFrame.Entry(Color.YELLOW.darker(), "TIM MOEN", "Libertarian Leader, Fort McMurray-Athabasca", "DEFEATED", Color.BLUE)
+                )
+            )
+        )
         frame.setSize(512, 256)
         compareRendering("FiguresFrame", "Overflow", frame)
     }
@@ -135,62 +101,21 @@ class FiguresFrameTest {
     fun testRenderLongStrings() {
         val frame = FiguresFrame()
         frame.setHeaderBinding(fixedBinding<String?>("PARTY LEADERS"))
-        frame.setNumEntriesBinding(fixedBinding(9))
-        frame.setNameBinding(
-                listBinding(
-                        "JUSTIN TRUDEAU",
-                        "ANDREW SCHEER",
-                        "JAGMEET SINGH",
-                        "YVES-FRAN\u00c7OIS BLANCHET",
-                        "ELIZABETH MAY",
-                        "MAXIME BERNIER",
-                        "ROD TAYLOR",
-                        "S\u00c9BASTIEN CORHINO",
-                        "TIM MOEN"))
-        frame.setDescriptionBinding(
-                listBinding(
-                        "Liberal Leader, Papineau",
-                        "Conservative Leader, Regina-Qu'Apelle",
-                        "NDP Leader, Burnaby South",
-                        "Bloc Qu\u00e9b\u00e9cois Leader, Beloeil-Chambly",
-                        "Green Leader, Saanich-Gulf Islands",
-                        "People's Party Leader, Beauce",
-                        "CHP Leader, Skeena-Bulkley Valley",
-                        "Rhinoceros Party Leader, Qu\u00e9bec",
-                        "Libertarian Leader, Fort McMurray-Athabasca"))
-        frame.setColorBinding(
-                listBinding(
-                        Color.RED,
-                        Color.BLUE,
-                        Color.ORANGE,
-                        Color.CYAN.darker(),
-                        Color.GREEN.darker(),
-                        Color.MAGENTA.darker(),
-                        Color.MAGENTA,
-                        Color.GRAY,
-                        Color.YELLOW.darker()))
-        frame.setResultBinding(
-                listBinding(
-                        "ELECTED",
-                        "ELECTED",
-                        "ELECTED",
-                        "ELECTED",
-                        "ELECTED",
-                        "DEFEATED",
-                        "DEFEATED",
-                        "DEFEATED",
-                        "DEFEATED"))
-        frame.setResultColorBinding(
-                listBinding(
-                        Color.RED,
-                        Color.BLUE,
-                        Color.ORANGE,
-                        Color.CYAN.darker(),
-                        Color.GREEN.darker(),
-                        Color.BLUE,
-                        Color.ORANGE,
-                        Color.RED,
-                        Color.BLUE))
+        frame.setEntriesBinding(
+            fixedBinding(
+                listOf(
+                    FiguresFrame.Entry(Color.RED, "JUSTIN TRUDEAU", "Liberal Leader, Papineau", "ELECTED", Color.RED),
+                    FiguresFrame.Entry(Color.BLUE, "ANDREW SCHEER", "Conservative Leader, Regina-Qu'Apelle", "ELECTED", Color.BLUE),
+                    FiguresFrame.Entry(Color.ORANGE, "JAGMEET SINGH", "NDP Leader, Burnaby South", "ELECTED", Color.ORANGE),
+                    FiguresFrame.Entry(Color.CYAN.darker(), "YVES-FRAN\u00c7OIS BLANCHET", "Bloc Qu\u00e9b\u00e9cois Leader, Beloeil-Chambly", "ELECTED", Color.CYAN.darker()),
+                    FiguresFrame.Entry(Color.GREEN.darker(), "ELIZABETH MAY", "Green Leader, Saanich-Gulf Islands", "ELECTED", Color.GREEN.darker()),
+                    FiguresFrame.Entry(Color.MAGENTA.darker(), "MAXIME BERNIER", "People's Party Leader, Beauce", "DEFEATED", Color.BLUE),
+                    FiguresFrame.Entry(Color.MAGENTA, "ROD TAYLOR", "CHP Leader, Skeena-Bulkley Valley", "DEFEATED", Color.ORANGE),
+                    FiguresFrame.Entry(Color.GRAY, "S\u00c9BASTIEN CORHINO", "Rhinoceros Party Leader, Qu\u00e9bec", "DEFEATED", Color.RED),
+                    FiguresFrame.Entry(Color.YELLOW.darker(), "TIM MOEN", "Libertarian Leader, Fort McMurray-Athabasca", "DEFEATED", Color.BLUE)
+                )
+            )
+        )
         frame.setSize(128, 256)
         compareRendering("FiguresFrame", "LongStrings", frame)
     }

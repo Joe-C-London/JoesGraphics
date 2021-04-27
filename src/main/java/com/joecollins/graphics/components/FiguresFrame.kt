@@ -1,7 +1,6 @@
 package com.joecollins.graphics.components
 
 import com.joecollins.bindings.Binding
-import com.joecollins.bindings.IndexedBinding
 import com.joecollins.graphics.utils.StandardFont
 import java.awt.BorderLayout
 import java.awt.Color
@@ -17,26 +16,37 @@ import javax.swing.border.EmptyBorder
 import javax.swing.border.MatteBorder
 
 class FiguresFrame : GraphicsFrame() {
-    private var numEntriesBinding: Binding<Int> = Binding.fixedBinding(0)
-    private var colorBinding = IndexedBinding.emptyBinding<Color>()
-    private var nameBinding = IndexedBinding.emptyBinding<String>()
-    private var descriptionBinding = IndexedBinding.emptyBinding<String>()
-    private var resultBinding = IndexedBinding.emptyBinding<String>()
-    private var resultColorBinding = IndexedBinding.emptyBinding<Color>()
-    private val centralPanel: JPanel = JPanel()
-    private val entries: MutableList<Entry> = ArrayList()
 
-    fun setNumEntriesBinding(numEntriesBinding: Binding<Int>) {
-        this.numEntriesBinding.unbind()
-        this.numEntriesBinding = numEntriesBinding
-        this.numEntriesBinding.bind { size: Int ->
-            while (entries.size < size) {
-                val entry = Entry()
+    class Entry(
+        val color: Color,
+        val name: String,
+        val description: String,
+        val result: String,
+        val resultColor: Color
+    )
+
+    private var entriesBinding: Binding<List<Entry>> = Binding.fixedBinding(emptyList())
+    private val centralPanel: JPanel = JPanel()
+    private val entries: MutableList<EntryPanel> = ArrayList()
+
+    fun setEntriesBinding(entriesBinding: Binding<List<Entry>>) {
+        this.entriesBinding.unbind()
+        this.entriesBinding = entriesBinding
+        this.entriesBinding.bind { e ->
+            while (entries.size < e.size) {
+                val entry = EntryPanel()
                 centralPanel.add(entry)
                 entries.add(entry)
             }
-            while (entries.size > size) {
-                centralPanel.remove(entries.removeAt(size))
+            while (entries.size > e.size) {
+                centralPanel.remove(entries.removeAt(e.size))
+            }
+            e.forEachIndexed { idx, entry ->
+                entries[idx].foreground = entry.color
+                entries[idx].nameLabel.text = entry.name
+                entries[idx].descriptionLabel.text = entry.description
+                entries[idx].resultLabel.text = entry.result
+                entries[idx].resultPanel.background = entry.resultColor
             }
         }
     }
@@ -44,57 +54,27 @@ class FiguresFrame : GraphicsFrame() {
     internal val numEntries: Int
         get() = entries.size
 
-    fun setColorBinding(colorBinding: IndexedBinding<Color>) {
-        this.colorBinding.unbind()
-        this.colorBinding = colorBinding
-        this.colorBinding.bind { idx, color -> entries[idx].foreground = color }
-    }
-
     internal fun getColor(index: Int): Color {
         return entries[index].foreground
-    }
-
-    fun setNameBinding(nameBinding: IndexedBinding<String>) {
-        this.nameBinding.unbind()
-        this.nameBinding = nameBinding
-        this.nameBinding.bind { idx, name -> entries[idx].nameLabel.text = name }
     }
 
     internal fun getName(index: Int): String {
         return entries[index].nameLabel.text
     }
 
-    fun setDescriptionBinding(descriptionBinding: IndexedBinding<String>) {
-        this.descriptionBinding.unbind()
-        this.descriptionBinding = descriptionBinding
-        this.descriptionBinding.bind { idx, desc -> entries[idx].descriptionLabel.text = desc }
-    }
-
     internal fun getDescription(index: Int): String {
         return entries[index].descriptionLabel.text
-    }
-
-    fun setResultBinding(resultBinding: IndexedBinding<String>) {
-        this.resultBinding.unbind()
-        this.resultBinding = resultBinding
-        this.resultBinding.bind { idx, result -> entries[idx].resultLabel.text = result }
     }
 
     internal fun getResult(index: Int): String {
         return entries[index].resultLabel.text
     }
 
-    fun setResultColorBinding(resultColorBinding: IndexedBinding<Color>) {
-        this.resultColorBinding.unbind()
-        this.resultColorBinding = resultColorBinding
-        this.resultColorBinding.bind { idx, color -> entries[idx].resultPanel.background = color }
-    }
-
     internal fun getResultColor(index: Int): Color {
         return entries[index].resultPanel.background
     }
 
-    private inner class Entry : JPanel() {
+    private inner class EntryPanel : JPanel() {
         val nameLabel: FontSizeAdjustingLabel
         val descriptionLabel: FontSizeAdjustingLabel
         val resultPanel: JPanel
