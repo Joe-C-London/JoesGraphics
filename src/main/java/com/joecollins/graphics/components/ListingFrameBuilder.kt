@@ -1,8 +1,6 @@
 package com.joecollins.graphics.components
 
-import com.joecollins.bindings.BindableList
 import com.joecollins.bindings.Binding
-import com.joecollins.bindings.IndexedBinding
 import java.awt.Color
 import java.util.ArrayList
 
@@ -30,35 +28,22 @@ class ListingFrameBuilder {
     }
 
     companion object {
-        @JvmStatic fun <T> of(
-            list: BindableList<T>,
+        @JvmStatic
+        fun <T> of(
+            list: Binding<List<T>>,
             leftTextFunc: (T) -> String,
             rightTextFunc: (T) -> String,
             colorFunc: (T) -> Color
         ): ListingFrameBuilder {
             val builder = ListingFrameBuilder()
             val barFrame = builder.barFrame
-            barFrame.setNumBarsBinding(Binding.sizeBinding(list))
-            barFrame.setLeftTextBinding(IndexedBinding.propertyBinding(list, leftTextFunc))
-            barFrame.setRightTextBinding(IndexedBinding.propertyBinding(list, rightTextFunc))
-            barFrame.addSeriesBinding(
-                    "Item",
-                    IndexedBinding.propertyBinding(list, colorFunc),
-                    IndexedBinding.propertyBinding(list) { 1 })
+            barFrame.setBarsBinding(list.map { l ->
+                l.map {
+                    BarFrame.Bar(leftTextFunc(it), rightTextFunc(it), null, listOf(Pair(colorFunc(it), 1)))
+                }
+            })
+            builder.bindings.add(list)
             return builder
-        }
-
-        @JvmStatic fun <T> of(
-            list: Binding<List<T>>,
-            leftTextFunc: (T) -> String,
-            rightTextFunc: (T) -> String,
-            colorFunc: (T) -> Color
-        ): ListingFrameBuilder {
-            val bindableList = BindableList<T>()
-            list.bind { bindableList.setAll(it) }
-            val ret = of(bindableList, leftTextFunc, rightTextFunc, colorFunc)
-            ret.bindings.add(list)
-            return ret
         }
 
         @JvmStatic fun <T> ofFixedList(
@@ -69,13 +54,14 @@ class ListingFrameBuilder {
         ): ListingFrameBuilder {
             val builder = ListingFrameBuilder()
             val barFrame = builder.barFrame
-            barFrame.setNumBarsBinding(Binding.fixedBinding(list.size))
-            barFrame.setLeftTextBinding(IndexedBinding.listBinding(list, leftTextFunc))
-            barFrame.setRightTextBinding(IndexedBinding.listBinding(list, rightTextFunc))
-            barFrame.addSeriesBinding(
-                    "Item",
-                    IndexedBinding.listBinding(list, colorFunc),
-                    IndexedBinding.listBinding(list) { Binding.fixedBinding(1) })
+            barFrame.setBarsBinding(Binding.listBinding(
+                list.map {
+                    leftTextFunc(it).merge(rightTextFunc(it)) { left, right -> Pair(left, right) }
+                        .merge(colorFunc(it)) {
+                            text, color -> BarFrame.Bar(text.first, text.second, listOf(Pair(color, 1)))
+                        }
+                }
+            ))
             return builder
         }
     }

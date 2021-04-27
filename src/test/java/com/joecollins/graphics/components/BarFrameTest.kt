@@ -1,16 +1,9 @@
 package com.joecollins.graphics.components
 
 import com.joecollins.bindings.Bindable
-import com.joecollins.bindings.BindableList
-import com.joecollins.bindings.Binding
 import com.joecollins.bindings.Binding.Companion.fixedBinding
-import com.joecollins.bindings.Binding.Companion.sizeBinding
-import com.joecollins.bindings.IndexedBinding.Companion.functionBinding
-import com.joecollins.bindings.IndexedBinding.Companion.listBinding
-import com.joecollins.bindings.IndexedBinding.Companion.propertyBinding
-import com.joecollins.bindings.IndexedBinding.Companion.singletonBinding
-import com.joecollins.bindings.NestedBindableList
 import com.joecollins.graphics.ImageGenerator.createHalfTickShape
+import com.joecollins.graphics.utils.BindableWrapper
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import java.awt.Color
 import java.awt.Polygon
@@ -29,50 +22,57 @@ import org.junit.Test
 class BarFrameTest {
     @Test
     fun testNumBars() {
-        val results = BindableList<ElectionResult>()
-        results.add(ElectionResult("LIBERAL", Color.RED, 157))
-        results.add(ElectionResult("CONSERVATIVE", Color.BLUE, 121))
-        results.add(ElectionResult("BLOC QUEBECOIS", Color.CYAN, 32))
-        results.add(ElectionResult("NEW DEMOCRATIC PARTY", Color.ORANGE, 24))
-        results.add(ElectionResult("GREEN", Color.GREEN, 3))
-        results.add(ElectionResult("INDEPENDENT", Color.LIGHT_GRAY, 1))
+        val results = BindableWrapper<List<ElectionResult>>(listOf(
+        ElectionResult("LIBERAL", Color.RED, 157),
+        ElectionResult("CONSERVATIVE", Color.BLUE, 121),
+        ElectionResult("BLOC QUEBECOIS", Color.CYAN, 32),
+        ElectionResult("NEW DEMOCRATIC PARTY", Color.ORANGE, 24),
+        ElectionResult("GREEN", Color.GREEN, 3),
+        ElectionResult("INDEPENDENT", Color.LIGHT_GRAY, 1)
+        ))
         val frame = BarFrame()
-        frame.setNumBarsBinding(sizeBinding(results))
+        frame.setBarsBinding(results.binding.map { b -> b.map { BarFrame.Bar("", "", null, listOf()) } })
         Assert.assertEquals(6, frame.numBars.toLong())
     }
 
     @Test
     fun testAddRemoveBars() {
-        val results = BindableList<ElectionResult>()
+        val list = mutableListOf<ElectionResult>()
+        val results = BindableWrapper(list)
         val frame = BarFrame()
-        frame.setNumBarsBinding(sizeBinding(results))
+        frame.setBarsBinding(results.binding.map { b -> b.map { BarFrame.Bar("", "", null, listOf()) } })
         Assert.assertEquals(0, frame.numBars.toLong())
-        results.add(ElectionResult("LIBERAL", Color.RED, 1))
+        list.add(ElectionResult("LIBERAL", Color.RED, 1))
+        results.value = list
         Assert.assertEquals(1, frame.numBars.toLong())
-        results.addAll(listOf(
+        list.addAll(listOf(
                         ElectionResult("CONSERVATIVE", Color.BLUE, 1),
                         ElectionResult("NEW DEMOCRATIC PARTY", Color.ORANGE, 1)))
+        results.value = list
         Assert.assertEquals(3, frame.numBars.toLong())
-        results.removeAt(2)
+        list.removeAt(2)
+        results.value = list
         Assert.assertEquals(2, frame.numBars.toLong())
-        results.removeIf { it.getPartyName() != "LIBERAL" }
+        list.removeIf { it.getPartyName() != "LIBERAL" }
+        results.value = list
         Assert.assertEquals(1, frame.numBars.toLong())
-        results.clear()
+        list.clear()
+        results.value = list
         Assert.assertEquals(0, frame.numBars.toLong())
     }
 
     @Test
     fun testLeftTextBinding() {
-        val results: NestedBindableList<ElectionResult, ElectionResult.Properties> = NestedBindableList()
-        results.add(ElectionResult("LIBERAL", Color.RED, 157))
-        results.add(ElectionResult("CONSERVATIVE", Color.BLUE, 121))
-        results.add(ElectionResult("BLOC QUEBECOIS", Color.CYAN, 32))
-        results.add(ElectionResult("NEW DEMOCRATIC PARTY", Color.ORANGE, 24))
-        results.add(ElectionResult("GREEN", Color.GREEN, 3))
-        results.add(ElectionResult("INDEPENDENT", Color.LIGHT_GRAY, 1))
+        val results = BindableWrapper(listOf(
+        ElectionResult("LIBERAL", Color.RED, 157),
+        ElectionResult("CONSERVATIVE", Color.BLUE, 121),
+        ElectionResult("BLOC QUEBECOIS", Color.CYAN, 32),
+        ElectionResult("NEW DEMOCRATIC PARTY", Color.ORANGE, 24),
+        ElectionResult("GREEN", Color.GREEN, 3),
+        ElectionResult("INDEPENDENT", Color.LIGHT_GRAY, 1)
+        ))
         val frame = BarFrame()
-        frame.setNumBarsBinding(sizeBinding(results))
-        frame.setLeftTextBinding(propertyBinding(results, { it.getPartyName() }, ElectionResult.Properties.PARTY_NAME))
+        frame.setBarsBinding(results.binding.map { b -> b.map { BarFrame.Bar(it.getPartyName(), "", null, listOf()) } })
         Assert.assertEquals("LIBERAL", frame.getLeftText(0))
         Assert.assertEquals("CONSERVATIVE", frame.getLeftText(1))
         Assert.assertEquals("BLOC QUEBECOIS", frame.getLeftText(2))
@@ -83,16 +83,16 @@ class BarFrameTest {
 
     @Test
     fun testRightTextBinding() {
-        val results: NestedBindableList<ElectionResult, ElectionResult.Properties> = NestedBindableList()
-        results.add(ElectionResult("LIBERAL", Color.RED, 157))
-        results.add(ElectionResult("CONSERVATIVE", Color.BLUE, 121))
-        results.add(ElectionResult("BLOC QUEBECOIS", Color.CYAN, 32))
-        results.add(ElectionResult("NEW DEMOCRATIC PARTY", Color.ORANGE, 24))
-        results.add(ElectionResult("GREEN", Color.GREEN, 3))
-        results.add(ElectionResult("INDEPENDENT", Color.LIGHT_GRAY, 1))
+        val results = BindableWrapper(listOf(
+            ElectionResult("LIBERAL", Color.RED, 157),
+            ElectionResult("CONSERVATIVE", Color.BLUE, 121),
+            ElectionResult("BLOC QUEBECOIS", Color.CYAN, 32),
+            ElectionResult("NEW DEMOCRATIC PARTY", Color.ORANGE, 24),
+            ElectionResult("GREEN", Color.GREEN, 3),
+            ElectionResult("INDEPENDENT", Color.LIGHT_GRAY, 1)
+        ))
         val frame = BarFrame()
-        frame.setNumBarsBinding(sizeBinding(results))
-        frame.setRightTextBinding(propertyBinding(results, { it.getNumSeats().toString() }, ElectionResult.Properties.NUM_SEATS))
+        frame.setBarsBinding(results.binding.map { b -> b.map { BarFrame.Bar(it.getPartyName(), "${it.getNumSeats()}", null, listOf()) } })
         Assert.assertEquals("157", frame.getRightText(0))
         Assert.assertEquals("121", frame.getRightText(1))
         Assert.assertEquals("32", frame.getRightText(2))
@@ -103,36 +103,35 @@ class BarFrameTest {
 
     @Test
     fun testSeriesBinding() {
-        val results: NestedBindableList<ElectionResult, ElectionResult.Properties> = NestedBindableList()
-        results.add(ElectionResult("LIBERAL", Color.RED, 2, 157))
-        results.add(ElectionResult("CONSERVATIVE", Color.BLUE, 1, 121))
-        results.add(ElectionResult("BLOC QUEBECOIS", Color.CYAN, 0, 32))
-        results.add(ElectionResult("NEW DEMOCRATIC PARTY", Color.ORANGE, 1, 24))
-        results.add(ElectionResult("GREEN", Color.GREEN, 0, 3))
-        results.add(ElectionResult("INDEPENDENT", Color.LIGHT_GRAY, 0, 1))
+        val list = mutableListOf(
+            ElectionResult("LIBERAL", Color.RED, 2, 157),
+            ElectionResult("CONSERVATIVE", Color.BLUE, 1, 121),
+            ElectionResult("BLOC QUEBECOIS", Color.CYAN, 0, 32),
+            ElectionResult("NEW DEMOCRATIC PARTY", Color.ORANGE, 1, 24),
+            ElectionResult("GREEN", Color.GREEN, 0, 3),
+            ElectionResult("INDEPENDENT", Color.LIGHT_GRAY, 0, 1)
+        )
+        val results = BindableWrapper(list)
         val frame = BarFrame()
-        frame.setNumBarsBinding(sizeBinding(results))
-        frame.addSeriesBinding(
-                "Seats",
-                propertyBinding(results, { it.getPartyColor() }, ElectionResult.Properties.PARTY_COLOR),
-                propertyBinding(results, { it.getNumSeats() }, ElectionResult.Properties.NUM_SEATS))
-        frame.addSeriesBinding(
-                "Estimate",
-                propertyBinding(results, { lighten(it.getPartyColor()) }, ElectionResult.Properties.PARTY_COLOR),
-                propertyBinding(results, { it.getSeatEstimate() - it.getNumSeats() }, ElectionResult.Properties.NUM_SEATS, ElectionResult.Properties.SEAT_ESTIMATE))
+        frame.setBarsBinding(results.binding.map { b -> b.map { BarFrame.Bar(it.getPartyName(), "${it.getNumSeats()}", null, listOf(
+            Pair(it.getPartyColor(), it.getNumSeats()),
+            Pair(lighten(it.getPartyColor()), it.getSeatEstimate() - it.getNumSeats())
+        )) } })
         val lightRed = Color(255, 127, 127)
         var libSeries = frame.getSeries(0)
         Assert.assertEquals(Color.RED, libSeries[0].first)
         Assert.assertEquals(2, libSeries[0].second.toInt().toLong())
         Assert.assertEquals(lightRed, libSeries[1].first)
         Assert.assertEquals(155, libSeries[1].second.toInt().toLong())
-        results[0].setSeatEstimate(158)
+        list[0].setSeatEstimate(158)
+        results.value = list
         libSeries = frame.getSeries(0)
         Assert.assertEquals(Color.RED, libSeries[0].first)
         Assert.assertEquals(2, libSeries[0].second.toInt().toLong())
         Assert.assertEquals(lightRed, libSeries[1].first)
         Assert.assertEquals(156, libSeries[1].second.toInt().toLong())
-        results[0].setNumSeats(3)
+        list[0].setNumSeats(3)
+        results.value = list
         libSeries = frame.getSeries(0)
         Assert.assertEquals(Color.RED, libSeries[0].first)
         Assert.assertEquals(3, libSeries[0].second.toInt().toLong())
@@ -142,17 +141,18 @@ class BarFrameTest {
 
     @Test
     fun testLeftIconBinding() {
-        val results: NestedBindableList<ElectionResult, ElectionResult.Properties> = NestedBindableList()
-        results.add(ElectionResult("LIBERAL", Color.RED, 157))
-        results.add(ElectionResult("CONSERVATIVE", Color.BLUE, 121))
-        results.add(ElectionResult("BLOC QUEBECOIS", Color.CYAN, 32))
-        results.add(ElectionResult("NEW DEMOCRATIC PARTY", Color.ORANGE, 24))
-        results.add(ElectionResult("GREEN", Color.GREEN, 3))
-        results.add(ElectionResult("INDEPENDENT", Color.LIGHT_GRAY, 1))
+        val list = mutableListOf(
+            ElectionResult("LIBERAL", Color.RED, 157),
+            ElectionResult("CONSERVATIVE", Color.BLUE, 121),
+            ElectionResult("BLOC QUEBECOIS", Color.CYAN, 32),
+            ElectionResult("NEW DEMOCRATIC PARTY", Color.ORANGE, 24),
+            ElectionResult("GREEN", Color.GREEN, 3),
+            ElectionResult("INDEPENDENT", Color.LIGHT_GRAY, 1)
+        )
+        val results = BindableWrapper(list)
         val shape: Shape = Ellipse2D.Double()
         val frame = BarFrame()
-        frame.setNumBarsBinding(sizeBinding(results))
-        frame.setLeftIconBinding(propertyBinding(results, { if (it.getNumSeats() > 150) shape else null }, ElectionResult.Properties.NUM_SEATS))
+        frame.setBarsBinding(results.binding.map { b -> b.map { BarFrame.Bar("", "", if (it.getNumSeats() > 150) shape else null, listOf()) } })
         Assert.assertEquals(shape, frame.getLeftIcon(0))
         Assert.assertNull(frame.getLeftIcon(1))
         Assert.assertNull(frame.getLeftIcon(2))
@@ -163,27 +163,28 @@ class BarFrameTest {
 
     @Test
     fun testMinMax() {
-        val results: NestedBindableList<ElectionResult, ElectionResult.Properties> = NestedBindableList()
-        results.add(ElectionResult("LIBERAL", Color.RED, 157))
-        results.add(ElectionResult("CONSERVATIVE", Color.BLUE, 121))
-        results.add(ElectionResult("BLOC QUEBECOIS", Color.CYAN, 32))
-        results.add(ElectionResult("NEW DEMOCRATIC PARTY", Color.ORANGE, 24))
-        results.add(ElectionResult("GREEN", Color.GREEN, 3))
-        results.add(ElectionResult("INDEPENDENT", Color.LIGHT_GRAY, 1))
+        val list = mutableListOf(
+            ElectionResult("LIBERAL", Color.RED, 157),
+            ElectionResult("CONSERVATIVE", Color.BLUE, 121),
+            ElectionResult("BLOC QUEBECOIS", Color.CYAN, 32),
+            ElectionResult("NEW DEMOCRATIC PARTY", Color.ORANGE, 24),
+            ElectionResult("GREEN", Color.GREEN, 3),
+            ElectionResult("INDEPENDENT", Color.LIGHT_GRAY, 1)
+        )
+        val results = BindableWrapper(list)
         val frame = BarFrame()
-        frame.setNumBarsBinding(sizeBinding(results))
-        frame.addSeriesBinding(
-                "Seats",
-                propertyBinding(results, { it.getPartyColor() }, ElectionResult.Properties.PARTY_COLOR),
-                propertyBinding(results, { it.getNumSeats() }, ElectionResult.Properties.NUM_SEATS))
+        frame.setBarsBinding(results.binding.map { b -> b.map { BarFrame.Bar("", "", null, listOf(
+            Pair(it.getPartyColor(), it.getNumSeats())
+        )) } })
         Assert.assertEquals(157, frame.max.toInt().toLong())
         Assert.assertEquals(0, frame.min.toInt().toLong())
-        results[0].setNumSeats(-27)
-        results[1].setNumSeats(22)
-        results[2].setNumSeats(22)
-        results[3].setNumSeats(-20)
-        results[4].setNumSeats(2)
-        results[5].setNumSeats(1)
+        list[0].setNumSeats(-27)
+        list[1].setNumSeats(22)
+        list[2].setNumSeats(22)
+        list[3].setNumSeats(-20)
+        list[4].setNumSeats(2)
+        list[5].setNumSeats(1)
+        results.value = list
         Assert.assertEquals(22, frame.max.toInt().toLong())
         Assert.assertEquals(-27, frame.min.toInt().toLong())
         frame.setMinBinding(fixedBinding(-30))
@@ -215,9 +216,7 @@ class BarFrameTest {
     @Test
     fun testLines() {
         val frame = BarFrame()
-        frame.setNumLinesBinding(fixedBinding(1))
-        frame.setLineLevelsBinding(singletonBinding(170))
-        frame.setLineLabelsBinding(singletonBinding("170 SEATS FOR MAJORITY"))
+        frame.setLinesBinding(fixedBinding(listOf(BarFrame.Line(170, "170 SEATS FOR MAJORITY"))))
         Assert.assertEquals(1, frame.numLines.toLong())
         Assert.assertEquals(170, frame.getLineLevel(0))
         Assert.assertEquals("170 SEATS FOR MAJORITY", frame.getLineLabel(0))
@@ -225,139 +224,37 @@ class BarFrameTest {
 
     @Test
     fun testUnbind() {
-        val results: NestedBindableList<ElectionResult, ElectionResult.Properties> = NestedBindableList()
+        val results: BindableWrapper<List<ElectionResult>> = BindableWrapper(listOf())
         val con = ElectionResult("CONSERVATIVE", Color.BLUE, 1)
         val lib = ElectionResult("LIBERAL", Color.RED, 1)
         val ndp = ElectionResult("NEW DEMOCRATIC PARTY", Color.ORANGE, 1)
-        results.addAll(listOf(con, lib, ndp))
+        results.value = listOf(con, lib, ndp)
         val frame = BarFrame()
-        frame.setNumBarsBinding(sizeBinding(results))
-        frame.setLeftTextBinding(propertyBinding(results, { it.getPartyName() }, ElectionResult.Properties.PARTY_NAME))
+        frame.setBarsBinding(results.binding.map { b -> b.map { BarFrame.Bar(it.getPartyName(), "", null, listOf()) } })
         Assert.assertEquals(3, frame.numBars.toLong())
         Assert.assertEquals("CONSERVATIVE", frame.getLeftText(0))
         Assert.assertEquals("LIBERAL", frame.getLeftText(1))
         Assert.assertEquals("NEW DEMOCRATIC PARTY", frame.getLeftText(2))
-        val differentResults: NestedBindableList<ElectionResult, ElectionResult.Properties> = NestedBindableList()
-        differentResults.add(ElectionResult("GREEN", Color.GREEN, 1))
-        frame.setNumBarsBinding(sizeBinding(differentResults))
-        frame.setLeftTextBinding(propertyBinding(differentResults, { it.getPartyName() }, ElectionResult.Properties.PARTY_NAME))
+        val differentResults: BindableWrapper<List<ElectionResult>> = BindableWrapper(listOf())
+        differentResults.value = listOf(ElectionResult("GREEN", Color.GREEN, 1))
+        frame.setBarsBinding(differentResults.binding.map { b -> b.map { BarFrame.Bar(it.getPartyName(), "", null, listOf()) } })
         Assert.assertEquals(1, frame.numBars.toLong())
         Assert.assertEquals("GREEN", frame.getLeftText(0))
-        results.removeAt(0)
+        results.value = emptyList()
         Assert.assertEquals(1, frame.numBars.toLong())
         Assert.assertEquals("GREEN", frame.getLeftText(0))
-        results[0].setPartyName("HAHA")
-        Assert.assertEquals(1, frame.numBars.toLong())
-        Assert.assertEquals("GREEN", frame.getLeftText(0))
-        differentResults[0].setPartyName("GREENS")
+        differentResults.value = listOf(ElectionResult("GREENS", Color.GREEN, 1))
         Assert.assertEquals(1, frame.numBars.toLong())
         Assert.assertEquals("GREENS", frame.getLeftText(0))
-        differentResults.add(0, ElectionResult("LIBERAL", Color.RED, 1))
-        Assert.assertEquals(2, frame.numBars.toLong())
-        Assert.assertEquals("LIBERAL", frame.getLeftText(0))
-        Assert.assertEquals("GREENS", frame.getLeftText(1))
-        differentResults[1].setPartyName("GREEN")
-        Assert.assertEquals(2, frame.numBars.toLong())
-        Assert.assertEquals("LIBERAL", frame.getLeftText(0))
-        Assert.assertEquals("GREEN", frame.getLeftText(1))
-    }
-
-    @Test
-    fun testLeftTextBindingOnAdd() {
-        val results: NestedBindableList<ElectionResult, ElectionResult.Properties> = NestedBindableList()
-        val frame = BarFrame()
-        frame.setNumBarsBinding(sizeBinding(results))
-        frame.setLeftTextBinding(propertyBinding(results, { it.getPartyName() }, ElectionResult.Properties.PARTY_NAME))
-        Assert.assertEquals(0, frame.numBars.toLong())
-        results.add(ElectionResult("LIBERAL", Color.RED, 1))
-        Assert.assertEquals(1, frame.numBars.toLong())
-        Assert.assertEquals("LIBERAL", frame.getLeftText(0))
-        results.add(ElectionResult("NEW DEMOCRATIC PARTY", Color.ORANGE, 1))
-        Assert.assertEquals(2, frame.numBars.toLong())
-        Assert.assertEquals("LIBERAL", frame.getLeftText(0))
-        Assert.assertEquals("NEW DEMOCRATIC PARTY", frame.getLeftText(1))
-        results.add(0, ElectionResult("CONSERVATIVE", Color.BLUE, 1))
-        Assert.assertEquals(3, frame.numBars.toLong())
-        Assert.assertEquals("CONSERVATIVE", frame.getLeftText(0))
-        Assert.assertEquals("LIBERAL", frame.getLeftText(1))
-        Assert.assertEquals("NEW DEMOCRATIC PARTY", frame.getLeftText(2))
-        results[0].setPartyName("CONSERVATIVES")
-        Assert.assertEquals(3, frame.numBars.toLong())
-        Assert.assertEquals("CONSERVATIVES", frame.getLeftText(0))
-        Assert.assertEquals("LIBERAL", frame.getLeftText(1))
-        Assert.assertEquals("NEW DEMOCRATIC PARTY", frame.getLeftText(2))
-    }
-
-    @Test
-    fun testLeftTextBindingOnRemove() {
-        val results: NestedBindableList<ElectionResult, ElectionResult.Properties> = NestedBindableList()
-        val con = ElectionResult("CONSERVATIVE", Color.BLUE, 1)
-        val lib = ElectionResult("LIBERAL", Color.RED, 1)
-        val ndp = ElectionResult("NEW DEMOCRATIC PARTY", Color.ORANGE, 1)
-        results.addAll(listOf(con, lib, ndp))
-        val frame = BarFrame()
-        frame.setNumBarsBinding(sizeBinding(results))
-        frame.setLeftTextBinding(propertyBinding(results, { it.getPartyName() }, ElectionResult.Properties.PARTY_NAME))
-        Assert.assertEquals(3, frame.numBars.toLong())
-        Assert.assertEquals("CONSERVATIVE", frame.getLeftText(0))
-        Assert.assertEquals("LIBERAL", frame.getLeftText(1))
-        Assert.assertEquals("NEW DEMOCRATIC PARTY", frame.getLeftText(2))
-        results.remove(lib)
-        Assert.assertEquals(2, frame.numBars.toLong())
-        Assert.assertEquals("CONSERVATIVE", frame.getLeftText(0))
-        Assert.assertEquals("NEW DEMOCRATIC PARTY", frame.getLeftText(1))
-        lib.setPartyName("LIBERALS")
-        Assert.assertEquals(2, frame.numBars.toLong())
-        Assert.assertEquals("CONSERVATIVE", frame.getLeftText(0))
-        Assert.assertEquals("NEW DEMOCRATIC PARTY", frame.getLeftText(1))
-        ndp.setPartyName("NDP")
-        Assert.assertEquals(2, frame.numBars.toLong())
-        Assert.assertEquals("CONSERVATIVE", frame.getLeftText(0))
-        Assert.assertEquals("NDP", frame.getLeftText(1))
-        results.removeAt(1)
-        Assert.assertEquals(1, frame.numBars.toLong())
-        Assert.assertEquals("CONSERVATIVE", frame.getLeftText(0))
-    }
-
-    @Test
-    fun testLeftTextBindingOnSet() {
-        val results: NestedBindableList<ElectionResult, ElectionResult.Properties> = NestedBindableList()
-        val con = ElectionResult("CONSERVATIVE", Color.BLUE, 2)
-        val lib = ElectionResult("LIBERAL", Color.RED, 3)
-        val ndp = ElectionResult("NEW DEMOCRATIC PARTY", Color.ORANGE, 1)
-        results.addAll(listOf(con, lib, ndp))
-        val frame = BarFrame()
-        frame.setNumBarsBinding(sizeBinding(results))
-        frame.setLeftTextBinding(propertyBinding(results, { it.getPartyName() }, ElectionResult.Properties.PARTY_NAME))
-        Assert.assertEquals(3, frame.numBars.toLong())
-        Assert.assertEquals("CONSERVATIVE", frame.getLeftText(0))
-        Assert.assertEquals("LIBERAL", frame.getLeftText(1))
-        Assert.assertEquals("NEW DEMOCRATIC PARTY", frame.getLeftText(2))
-        results.sortByDescending { it.getNumSeats() }
-        Assert.assertEquals(3, frame.numBars.toLong())
-        Assert.assertEquals("LIBERAL", frame.getLeftText(0))
-        Assert.assertEquals("CONSERVATIVE", frame.getLeftText(1))
-        Assert.assertEquals("NEW DEMOCRATIC PARTY", frame.getLeftText(2))
-        con.setPartyName("CONSERVATIVES")
-        lib.setPartyName("LIBERALS")
-        ndp.setPartyName("NDP")
-        Assert.assertEquals(3, frame.numBars.toLong())
-        Assert.assertEquals("LIBERALS", frame.getLeftText(0))
-        Assert.assertEquals("CONSERVATIVES", frame.getLeftText(1))
-        Assert.assertEquals("NDP", frame.getLeftText(2))
     }
 
     @Test
     fun testTestNonBindableElements() {
-        val results = BindableList<Triple<String, Color, Int>>()
+        val results = BindableWrapper<List<Triple<String, Color, Int>>>(listOf())
         val frame = BarFrame()
-        frame.setNumBarsBinding(sizeBinding(results))
-        frame.setLeftTextBinding(propertyBinding(results) { it.first })
+        frame.setBarsBinding(results.binding.map { r -> r.map { BarFrame.Bar(it.first, "", null, listOf()) } })
         Assert.assertEquals(0, frame.numBars.toLong())
-        results.add(Triple("NDP", Color.ORANGE, 1))
-        Assert.assertEquals(1, frame.numBars.toLong())
-        Assert.assertEquals("NDP", frame.getLeftText(0))
-        results.setAll(listOf(
+        results.value = (listOf(
                 Triple("LIBERALS", Color.RED, 3),
                 Triple("CONSERVATIVES", Color.BLUE, 2),
                 Triple("NDP", Color.ORANGE, 1)))
@@ -365,7 +262,7 @@ class BarFrameTest {
         Assert.assertEquals("LIBERALS", frame.getLeftText(0))
         Assert.assertEquals("CONSERVATIVES", frame.getLeftText(1))
         Assert.assertEquals("NDP", frame.getLeftText(2))
-        results.setAll(listOf(
+        results.value = (listOf(
                 Triple("LIBERALS", Color.RED, 3),
                 Triple("CONSERVATIVES", Color.BLUE, 3)))
         Assert.assertEquals(2, frame.numBars.toLong())
@@ -374,64 +271,22 @@ class BarFrameTest {
     }
 
     @Test
-    fun testOtherBindings() {
-        val frame = BarFrame()
-        frame.setNumBarsBinding(fixedBinding(3))
-        frame.setLeftTextBinding(listBinding("LIBERAL", "CONSERVATIVE", "NDP"))
-        frame.setRightTextBinding(functionBinding(3, 6) { it.toString() })
-        Assert.assertEquals(3, frame.numBars.toLong())
-        Assert.assertEquals("LIBERAL", frame.getLeftText(0))
-        Assert.assertEquals("CONSERVATIVE", frame.getLeftText(1))
-        Assert.assertEquals("NDP", frame.getLeftText(2))
-        Assert.assertEquals("3", frame.getRightText(0))
-        Assert.assertEquals("4", frame.getRightText(1))
-        Assert.assertEquals("5", frame.getRightText(2))
-        val result = ElectionResult("", Color.WHITE, 3)
-        frame.setNumLinesBinding(Binding.propertyBinding(result, { it.getNumSeats() }, ElectionResult.Properties.NUM_SEATS))
-        frame.setLineLevelsBinding(propertyBinding(result, { (1..it.getNumSeats()).toList() }, ElectionResult.Properties.NUM_SEATS))
-        Assert.assertEquals(3, frame.numLines.toLong())
-        Assert.assertEquals(1, frame.getLineLevel(0))
-        Assert.assertEquals(2, frame.getLineLevel(1))
-        Assert.assertEquals(3, frame.getLineLevel(2))
-        result.setNumSeats(2)
-        Assert.assertEquals(2, frame.numLines.toLong())
-        Assert.assertEquals(1, frame.getLineLevel(0))
-        Assert.assertEquals(2, frame.getLineLevel(1))
-        frame.setNumLinesBinding(fixedBinding(4))
-        frame.setLineLevelsBinding(listBinding(3, 4, 5, 6))
-        Assert.assertEquals(4, frame.numLines.toLong())
-        Assert.assertEquals(3, frame.getLineLevel(0))
-        Assert.assertEquals(4, frame.getLineLevel(1))
-        Assert.assertEquals(5, frame.getLineLevel(2))
-        Assert.assertEquals(6, frame.getLineLevel(3))
-        result.setNumSeats(1)
-        Assert.assertEquals(4, frame.numLines.toLong())
-        Assert.assertEquals(3, frame.getLineLevel(0))
-        Assert.assertEquals(4, frame.getLineLevel(1))
-        Assert.assertEquals(5, frame.getLineLevel(2))
-        Assert.assertEquals(6, frame.getLineLevel(3))
-    }
-
-    @Test
     @Throws(IOException::class)
     fun testRenderSingleSeriesAllPositive() {
-        val results: NestedBindableList<ElectionResult, ElectionResult.Properties> = NestedBindableList()
-        results.add(ElectionResult("LIBERAL", Color.RED, 157))
-        results.add(ElectionResult("CONSERVATIVE", Color.BLUE, 121))
-        results.add(ElectionResult("BLOC QUEBECOIS", Color.CYAN, 32))
-        results.add(ElectionResult("NEW DEMOCRATIC PARTY", Color.ORANGE, 24))
-        results.add(ElectionResult("GREEN", Color.GREEN, 3))
-        results.add(ElectionResult("INDEPENDENT", Color.LIGHT_GRAY, 1))
+        val results: BindableWrapper<List<ElectionResult>> = BindableWrapper(listOf(
+        ElectionResult("LIBERAL", Color.RED, 157),
+        ElectionResult("CONSERVATIVE", Color.BLUE, 121),
+        ElectionResult("BLOC QUEBECOIS", Color.CYAN, 32),
+        ElectionResult("NEW DEMOCRATIC PARTY", Color.ORANGE, 24),
+        ElectionResult("GREEN", Color.GREEN, 3),
+        ElectionResult("INDEPENDENT", Color.LIGHT_GRAY, 1)
+        ))
         val barFrame = BarFrame()
         barFrame.setHeaderBinding(fixedBinding<String?>("2019 CANADIAN ELECTION RESULT"))
         barFrame.setMaxBinding(fixedBinding(160))
-        barFrame.setNumBarsBinding(sizeBinding(results))
-        barFrame.setLeftTextBinding(propertyBinding(results, { it.getPartyName() }, ElectionResult.Properties.PARTY_NAME))
-        barFrame.setRightTextBinding(propertyBinding(results, { it.getNumSeats().toString() }, ElectionResult.Properties.NUM_SEATS))
-        barFrame.addSeriesBinding(
-                "Seats",
-                propertyBinding(results, { it.getPartyColor() }, ElectionResult.Properties.PARTY_COLOR),
-                propertyBinding(results, { it.getNumSeats() }, ElectionResult.Properties.NUM_SEATS))
+        barFrame.setBarsBinding(results.binding.map { b -> b.map { BarFrame.Bar(it.getPartyName(), "${it.getNumSeats()}", null, listOf(
+            Pair(it.getPartyColor(), it.getNumSeats())
+        )) } })
         barFrame.setSize(512, 256)
         compareRendering("BarFrame", "SingleSeriesAllPositive", barFrame)
     }
@@ -439,25 +294,22 @@ class BarFrameTest {
     @Test
     @Throws(IOException::class)
     fun testRenderSingleSeriesWithSubhead() {
-        val results: NestedBindableList<ElectionResult, ElectionResult.Properties> = NestedBindableList()
-        results.add(ElectionResult("LIBERAL", Color.RED, 157))
-        results.add(ElectionResult("CONSERVATIVE", Color.BLUE, 121))
-        results.add(ElectionResult("BLOC QUEBECOIS", Color.CYAN, 32))
-        results.add(ElectionResult("NEW DEMOCRATIC PARTY", Color.ORANGE, 24))
-        results.add(ElectionResult("GREEN", Color.GREEN, 3))
-        results.add(ElectionResult("INDEPENDENT", Color.LIGHT_GRAY, 1))
+        val results: BindableWrapper<List<ElectionResult>> = BindableWrapper(listOf(
+            ElectionResult("LIBERAL", Color.RED, 157),
+            ElectionResult("CONSERVATIVE", Color.BLUE, 121),
+            ElectionResult("BLOC QUEBECOIS", Color.CYAN, 32),
+            ElectionResult("NEW DEMOCRATIC PARTY", Color.ORANGE, 24),
+            ElectionResult("GREEN", Color.GREEN, 3),
+            ElectionResult("INDEPENDENT", Color.LIGHT_GRAY, 1)
+        ))
         val barFrame = BarFrame()
         barFrame.setHeaderBinding(fixedBinding<String?>("2019 CANADIAN ELECTION RESULT"))
         barFrame.setMaxBinding(fixedBinding(160))
-        barFrame.setSubheadTextBinding(fixedBinding<String?>("PROJECTION: LIB MINORITY"))
+        barFrame.setSubheadTextBinding(fixedBinding("PROJECTION: LIB MINORITY"))
         barFrame.setSubheadColorBinding(fixedBinding(Color.RED))
-        barFrame.setNumBarsBinding(sizeBinding(results))
-        barFrame.setLeftTextBinding(propertyBinding(results, { it.getPartyName() }, ElectionResult.Properties.PARTY_NAME))
-        barFrame.setRightTextBinding(propertyBinding(results, { it.getNumSeats().toString() }, ElectionResult.Properties.NUM_SEATS))
-        barFrame.addSeriesBinding(
-                "Seats",
-                propertyBinding(results, { it.getPartyColor() }, ElectionResult.Properties.PARTY_COLOR),
-                propertyBinding(results, { it.getNumSeats() }, ElectionResult.Properties.NUM_SEATS))
+        barFrame.setBarsBinding(results.binding.map { b -> b.map { BarFrame.Bar(it.getPartyName(), "${it.getNumSeats()}", null, listOf(
+            Pair(it.getPartyColor(), it.getNumSeats())
+        )) } })
         barFrame.setSize(512, 256)
         compareRendering("BarFrame", "SingleSeriesWithSubhead", barFrame)
     }
@@ -465,26 +317,23 @@ class BarFrameTest {
     @Test
     @Throws(IOException::class)
     fun testRenderSingleSeriesShrinkToFit() {
-        val results: NestedBindableList<ElectionResult, ElectionResult.Properties> = NestedBindableList()
-        results.add(ElectionResult("LIBERAL", Color.RED, 177))
-        results.add(ElectionResult("CONSERVATIVE", Color.BLUE, 95))
-        results.add(ElectionResult("NEW DEMOCRATIC PARTY", Color.ORANGE, 39))
-        results.add(ElectionResult("BLOC QUEBECOIS", Color.CYAN, 10))
-        results.add(ElectionResult("INDEPENDENT", Color.LIGHT_GRAY, 8))
-        results.add(ElectionResult("GREEN", Color.GREEN, 2))
-        results.add(ElectionResult("CO-OPERATIVE COMMONWEALTH FEDERATION", Color.ORANGE.darker(), 1))
-        results.add(ElectionResult("PEOPLE'S PARTY", Color.MAGENTA.darker(), 1))
+        val results: BindableWrapper<List<ElectionResult>> = BindableWrapper(listOf(
+        ElectionResult("LIBERAL", Color.RED, 177),
+        ElectionResult("CONSERVATIVE", Color.BLUE, 95),
+        ElectionResult("NEW DEMOCRATIC PARTY", Color.ORANGE, 39),
+        ElectionResult("BLOC QUEBECOIS", Color.CYAN, 10),
+        ElectionResult("INDEPENDENT", Color.LIGHT_GRAY, 8),
+        ElectionResult("GREEN", Color.GREEN, 2),
+        ElectionResult("CO-OPERATIVE COMMONWEALTH FEDERATION", Color.ORANGE.darker(), 1),
+        ElectionResult("PEOPLE'S PARTY", Color.MAGENTA.darker(), 1)
+        ))
         val barFrame = BarFrame()
         barFrame.setHeaderBinding(fixedBinding<String?>("SEATS AT DISSOLUTION"))
         barFrame.setSubheadTextBinding(fixedBinding<String?>("170 FOR MAJORITY"))
         barFrame.setSubheadColorBinding(fixedBinding(Color.RED))
-        barFrame.setNumBarsBinding(sizeBinding(results))
-        barFrame.setLeftTextBinding(propertyBinding(results, { it.getPartyName() }, ElectionResult.Properties.PARTY_NAME))
-        barFrame.setRightTextBinding(propertyBinding(results, { it.getNumSeats().toString() }, ElectionResult.Properties.NUM_SEATS))
-        barFrame.addSeriesBinding(
-                "Seats",
-                propertyBinding(results, { it.getPartyColor() }, ElectionResult.Properties.PARTY_COLOR),
-                propertyBinding(results, { it.getNumSeats() }, ElectionResult.Properties.NUM_SEATS))
+        barFrame.setBarsBinding(results.binding.map { b -> b.map { BarFrame.Bar(it.getPartyName(), "${it.getNumSeats()}", null, listOf(
+            Pair(it.getPartyColor(), it.getNumSeats())
+        )) } })
         barFrame.setSize(512, 256)
         compareRendering("BarFrame", "SingleSeriesShrinkToFit", barFrame)
     }
@@ -492,27 +341,21 @@ class BarFrameTest {
     @Test
     @Throws(IOException::class)
     fun testRenderMultiSeriesAllPositive() {
-        val results: NestedBindableList<ElectionResult, ElectionResult.Properties> = NestedBindableList()
-        results.add(ElectionResult("LIBERAL", Color.RED, 34, 157))
-        results.add(ElectionResult("CONSERVATIVE", Color.BLUE, 21, 121))
-        results.add(ElectionResult("BLOC QUEBECOIS", Color.CYAN, 2, 32))
-        results.add(ElectionResult("NEW DEMOCRATIC PARTY", Color.ORANGE, 4, 24))
-        results.add(ElectionResult("GREEN", Color.GREEN, 1, 3))
-        results.add(ElectionResult("INDEPENDENT", Color.LIGHT_GRAY, 0, 1))
+        val results: BindableWrapper<List<ElectionResult>> = BindableWrapper(listOf(
+        ElectionResult("LIBERAL", Color.RED, 34, 157),
+        ElectionResult("CONSERVATIVE", Color.BLUE, 21, 121),
+        ElectionResult("BLOC QUEBECOIS", Color.CYAN, 2, 32),
+        ElectionResult("NEW DEMOCRATIC PARTY", Color.ORANGE, 4, 24),
+        ElectionResult("GREEN", Color.GREEN, 1, 3),
+        ElectionResult("INDEPENDENT", Color.LIGHT_GRAY, 0, 1)
+        ))
         val barFrame = BarFrame()
         barFrame.setHeaderBinding(fixedBinding<String?>("2019 CANADIAN ELECTION RESULT"))
         barFrame.setMaxBinding(fixedBinding(160))
-        barFrame.setNumBarsBinding(sizeBinding(results))
-        barFrame.setLeftTextBinding(propertyBinding(results, { it.getPartyName() }, ElectionResult.Properties.PARTY_NAME))
-        barFrame.setRightTextBinding(propertyBinding(results, { it.getNumSeats().toString() + "/" + it.getSeatEstimate() }, ElectionResult.Properties.NUM_SEATS))
-        barFrame.addSeriesBinding(
-                "Seats",
-                propertyBinding(results, { it.getPartyColor() }, ElectionResult.Properties.PARTY_COLOR),
-                propertyBinding(results, { it.getNumSeats() }, ElectionResult.Properties.NUM_SEATS))
-        barFrame.addSeriesBinding(
-                "Estimate",
-                propertyBinding(results, { lighten(it.getPartyColor()) }, ElectionResult.Properties.PARTY_COLOR),
-                propertyBinding(results, { it.getSeatEstimate() - it.getNumSeats() }, ElectionResult.Properties.NUM_SEATS, ElectionResult.Properties.SEAT_ESTIMATE))
+        barFrame.setBarsBinding(results.binding.map { b -> b.map { BarFrame.Bar(it.getPartyName(), it.getNumSeats().toString() + "/" + it.getSeatEstimate(), null, listOf(
+            Pair(it.getPartyColor(), it.getNumSeats()),
+            Pair(lighten(it.getPartyColor()), it.getSeatEstimate() - it.getNumSeats())
+        )) } })
         barFrame.setSize(512, 256)
         compareRendering("BarFrame", "MultiSeriesAllPositive", barFrame)
     }
@@ -520,24 +363,21 @@ class BarFrameTest {
     @Test
     @Throws(IOException::class)
     fun testRenderSingleSeriesBothDirections() {
-        val results: NestedBindableList<ElectionResult, ElectionResult.Properties> = NestedBindableList()
-        results.add(ElectionResult("LIB", Color.RED, -27))
-        results.add(ElectionResult("CON", Color.BLUE, +22))
-        results.add(ElectionResult("BQ", Color.CYAN, +22))
-        results.add(ElectionResult("NDP", Color.ORANGE, -20))
-        results.add(ElectionResult("GRN", Color.GREEN, +2))
-        results.add(ElectionResult("IND", Color.LIGHT_GRAY, +1))
+        val results: BindableWrapper<List<ElectionResult>> = BindableWrapper(listOf(
+        ElectionResult("LIB", Color.RED, -27),
+        ElectionResult("CON", Color.BLUE, +22),
+        ElectionResult("BQ", Color.CYAN, +22),
+        ElectionResult("NDP", Color.ORANGE, -20),
+        ElectionResult("GRN", Color.GREEN, +2),
+        ElectionResult("IND", Color.LIGHT_GRAY, +1)
+        ))
         val barFrame = BarFrame()
         barFrame.setHeaderBinding(fixedBinding<String?>("RESULT CHANGE SINCE 2015"))
         barFrame.setMaxBinding(fixedBinding(28))
         barFrame.setMinBinding(fixedBinding(-28))
-        barFrame.setNumBarsBinding(sizeBinding(results))
-        barFrame.setLeftTextBinding(propertyBinding(results, { it.getPartyName() }, ElectionResult.Properties.PARTY_NAME))
-        barFrame.setRightTextBinding(propertyBinding(results, { DecimalFormat("+0;-0").format(it.getNumSeats().toLong()) }, ElectionResult.Properties.NUM_SEATS))
-        barFrame.addSeriesBinding(
-                "Seats",
-                propertyBinding(results, { it.getPartyColor() }, ElectionResult.Properties.PARTY_COLOR),
-                propertyBinding(results, { it.getNumSeats() }, ElectionResult.Properties.NUM_SEATS))
+        barFrame.setBarsBinding(results.binding.map { b -> b.map { BarFrame.Bar(it.getPartyName(), DecimalFormat("+0;-0").format(it.getNumSeats().toLong()), null, listOf(
+            Pair(it.getPartyColor(), it.getNumSeats())
+        )) } })
         barFrame.setSize(512, 256)
         compareRendering("BarFrame", "SingleSeriesBothDirections", barFrame)
     }
@@ -545,28 +385,22 @@ class BarFrameTest {
     @Test
     @Throws(IOException::class)
     fun testRenderMultiSeriesBothDirections() {
-        val results: NestedBindableList<ElectionResult, ElectionResult.Properties> = NestedBindableList()
-        results.add(ElectionResult("LIB", Color.RED, -7, -27))
-        results.add(ElectionResult("CON", Color.BLUE, +4, +22))
-        results.add(ElectionResult("BQ", Color.CYAN, +0, +22))
-        results.add(ElectionResult("NDP", Color.ORANGE, +2, -20))
-        results.add(ElectionResult("GRN", Color.GREEN, +1, +2))
-        results.add(ElectionResult("IND", Color.LIGHT_GRAY, +0, +1))
+        val results: BindableWrapper<List<ElectionResult>> = BindableWrapper(listOf(
+        ElectionResult("LIB", Color.RED, -7, -27),
+        ElectionResult("CON", Color.BLUE, +4, +22),
+        ElectionResult("BQ", Color.CYAN, +0, +22),
+        ElectionResult("NDP", Color.ORANGE, +2, -20),
+        ElectionResult("GRN", Color.GREEN, +1, +2),
+        ElectionResult("IND", Color.LIGHT_GRAY, +0, +1)
+        ))
         val barFrame = BarFrame()
         barFrame.setHeaderBinding(fixedBinding<String?>("RESULT CHANGE SINCE 2015"))
         barFrame.setMaxBinding(fixedBinding(28))
         barFrame.setMinBinding(fixedBinding(-28))
-        barFrame.setNumBarsBinding(sizeBinding(results))
-        barFrame.setLeftTextBinding(propertyBinding(results, { it.getPartyName() }, ElectionResult.Properties.PARTY_NAME))
-        barFrame.setRightTextBinding(propertyBinding(results, { ("${CHANGE_FORMAT.format(it.getNumSeats().toLong())}/${CHANGE_FORMAT.format(it.getSeatEstimate().toLong())}") }, ElectionResult.Properties.NUM_SEATS))
-        barFrame.addSeriesBinding(
-                "Seats",
-                propertyBinding(results, { it.getPartyColor() }, ElectionResult.Properties.PARTY_COLOR),
-                propertyBinding(results, { it.getNumSeats() }, ElectionResult.Properties.NUM_SEATS))
-        barFrame.addSeriesBinding(
-                "Estimate",
-                propertyBinding(results, { lighten(it.getPartyColor()) }, ElectionResult.Properties.PARTY_COLOR),
-                propertyBinding(results, { (it.getSeatEstimate() - if (sign(it.getSeatEstimate().toFloat()) == sign(it.getNumSeats().toFloat())) it.getNumSeats() else 0) }, ElectionResult.Properties.NUM_SEATS, ElectionResult.Properties.SEAT_ESTIMATE))
+        barFrame.setBarsBinding(results.binding.map { b -> b.map { BarFrame.Bar(it.getPartyName(), "${CHANGE_FORMAT.format(it.getNumSeats().toLong())}/${CHANGE_FORMAT.format(it.getSeatEstimate().toLong())}", null, listOf(
+            Pair(it.getPartyColor(), it.getNumSeats()),
+            Pair(lighten(it.getPartyColor()), it.getSeatEstimate() - if (sign(it.getSeatEstimate().toFloat()) == sign(it.getNumSeats().toFloat())) it.getNumSeats() else 0)
+        )) } })
         barFrame.setSize(512, 256)
         compareRendering("BarFrame", "MultiSeriesBothDirections", barFrame)
     }
@@ -574,24 +408,25 @@ class BarFrameTest {
     @Test
     @Throws(IOException::class)
     fun testRenderTwoLinedBars() {
-        val results: NestedBindableList<RidingResult, RidingResult.Properties> = NestedBindableList()
-        results.add(RidingResult("BARDISH CHAGGER", "LIBERAL", Color.RED, 31085, 0.4879))
-        results.add(RidingResult("JERRY ZHANG", "CONSERVATIVE", Color.BLUE, 15615, 0.2451))
-        results.add(RidingResult("LORI CAMPBELL", "NEW DEMOCRATIC PARTY", Color.ORANGE, 9710, 0.1524))
-        results.add(RidingResult("KIRSTEN WRIGHT", "GREEN", Color.GREEN, 6184, 0.0971))
-        results.add(RidingResult("ERIKA TRAUB", "PEOPLE'S PARTY", Color.MAGENTA.darker(), 1112, 0.0175))
+        val results: BindableWrapper<List<RidingResult>> = BindableWrapper(listOf(
+        RidingResult("BARDISH CHAGGER", "LIBERAL", Color.RED, 31085, 0.4879),
+        RidingResult("JERRY ZHANG", "CONSERVATIVE", Color.BLUE, 15615, 0.2451),
+        RidingResult("LORI CAMPBELL", "NEW DEMOCRATIC PARTY", Color.ORANGE, 9710, 0.1524),
+        RidingResult("KIRSTEN WRIGHT", "GREEN", Color.GREEN, 6184, 0.0971),
+        RidingResult("ERIKA TRAUB", "PEOPLE'S PARTY", Color.MAGENTA.darker(), 1112, 0.0175)
+        ))
         val barFrame = BarFrame()
         barFrame.setHeaderBinding(fixedBinding<String?>("WATERLOO"))
-        barFrame.setMaxBinding(fixedBinding(results.map { it.getNumVotes() }.sum() / 2))
+        barFrame.setMaxBinding((results.binding.map { r -> r.sumOf { it.getNumVotes() } / 2 }))
         barFrame.setSubheadTextBinding(fixedBinding<String?>("LIB HOLD"))
         barFrame.setSubheadColorBinding(fixedBinding(Color.RED))
-        barFrame.setNumBarsBinding(sizeBinding(results))
-        barFrame.setLeftTextBinding(propertyBinding(results, { "${it.getCandidateName()}\n${it.getPartyName()}" }, RidingResult.Properties.CANDIDATE_NAME, RidingResult.Properties.PARTY_NAME))
-        barFrame.setRightTextBinding(propertyBinding(results, { "${THOUSANDS_FORMAT.format(it.getNumVotes().toLong())}\n${PERCENT_FORMAT.format(it.getVotePct())}" }, RidingResult.Properties.NUM_VOTES, RidingResult.Properties.VOTE_PCT))
-        barFrame.addSeriesBinding(
-                "Seats",
-                propertyBinding(results, { it.getPartyColor() }, RidingResult.Properties.PARTY_COLOR),
-                propertyBinding(results, { it.getNumVotes() }, RidingResult.Properties.NUM_VOTES))
+        barFrame.setBarsBinding(results.binding.map { r -> r.map {
+            BarFrame.Bar(
+                "${it.getCandidateName()}\n${it.getPartyName()}",
+                "${THOUSANDS_FORMAT.format(it.getNumVotes().toLong())}\n${PERCENT_FORMAT.format(it.getVotePct())}",
+                listOf(Pair(it.getPartyColor(), it.getNumVotes()))
+            )
+        } })
         barFrame.setSize(512, 256)
         compareRendering("BarFrame", "TwoLinedBars", barFrame)
     }
@@ -599,26 +434,27 @@ class BarFrameTest {
     @Test
     @Throws(IOException::class)
     fun testRenderTwoLinedBarWithIcon() {
-        val results: NestedBindableList<RidingResult, RidingResult.Properties> = NestedBindableList()
-        results.add(RidingResult("BARDISH CHAGGER", "LIBERAL", Color.RED, 31085, 0.4879, true))
-        results.add(RidingResult("JERRY ZHANG", "CONSERVATIVE", Color.BLUE, 15615, 0.2451))
-        results.add(RidingResult("LORI CAMPBELL", "NEW DEMOCRATIC PARTY", Color.ORANGE, 9710, 0.1524))
-        results.add(RidingResult("KIRSTEN WRIGHT", "GREEN", Color.GREEN, 6184, 0.0971))
-        results.add(RidingResult("ERIKA TRAUB", "PEOPLE'S PARTY", Color.MAGENTA.darker(), 1112, 0.0175))
+        val results: BindableWrapper<List<RidingResult>> = BindableWrapper(listOf(
+        RidingResult("BARDISH CHAGGER", "LIBERAL", Color.RED, 31085, 0.4879, true),
+        RidingResult("JERRY ZHANG", "CONSERVATIVE", Color.BLUE, 15615, 0.2451),
+        RidingResult("LORI CAMPBELL", "NEW DEMOCRATIC PARTY", Color.ORANGE, 9710, 0.1524),
+        RidingResult("KIRSTEN WRIGHT", "GREEN", Color.GREEN, 6184, 0.0971),
+        RidingResult("ERIKA TRAUB", "PEOPLE'S PARTY", Color.MAGENTA.darker(), 1112, 0.0175)
+        ))
         val shape = createTickShape()
         val barFrame = BarFrame()
         barFrame.setHeaderBinding(fixedBinding<String?>("WATERLOO"))
-        barFrame.setMaxBinding(fixedBinding(results.map { it.getNumVotes() }.sum() / 2))
+        barFrame.setMaxBinding((results.binding.map { r -> r.sumOf { it.getNumVotes() } / 2 }))
         barFrame.setSubheadTextBinding(fixedBinding<String?>("LIB HOLD"))
         barFrame.setSubheadColorBinding(fixedBinding(Color.RED))
-        barFrame.setNumBarsBinding(sizeBinding(results))
-        barFrame.setLeftTextBinding(propertyBinding(results, { "${it.getCandidateName()}\n${it.getPartyName()}" }, RidingResult.Properties.CANDIDATE_NAME, RidingResult.Properties.PARTY_NAME))
-        barFrame.setRightTextBinding(propertyBinding(results, { "${THOUSANDS_FORMAT.format(it.getNumVotes().toLong())}\n${PERCENT_FORMAT.format(it.getVotePct())}" }, RidingResult.Properties.NUM_VOTES, RidingResult.Properties.VOTE_PCT))
-        barFrame.setLeftIconBinding(propertyBinding(results, { if (it.isElected()) shape else null }, RidingResult.Properties.ELECTED))
-        barFrame.addSeriesBinding(
-                "Seats",
-                propertyBinding(results, { it.getPartyColor() }, RidingResult.Properties.PARTY_COLOR),
-                propertyBinding(results, { it.getNumVotes() }, RidingResult.Properties.NUM_VOTES))
+        barFrame.setBarsBinding(results.binding.map { r -> r.map {
+            BarFrame.Bar(
+                "${it.getCandidateName()}\n${it.getPartyName()}",
+                "${THOUSANDS_FORMAT.format(it.getNumVotes().toLong())}\n${PERCENT_FORMAT.format(it.getVotePct())}",
+                if (it.isElected()) shape else null,
+                listOf(Pair(it.getPartyColor(), it.getNumVotes()))
+            )
+        } })
         barFrame.setSize(512, 256)
         compareRendering("BarFrame", "TwoLinedBarWithIcon", barFrame)
     }
@@ -626,23 +462,24 @@ class BarFrameTest {
     @Test
     @Throws(IOException::class)
     fun testRenderTwoLinedBarWithNegativeIcon() {
-        val results: NestedBindableList<RidingResult, RidingResult.Properties> = NestedBindableList()
-        results.add(RidingResult("BARDISH CHAGGER", "LIB", Color.RED, 31085, -0.010, true))
-        results.add(RidingResult("JERRY ZHANG", "CON", Color.BLUE, 15615, -0.077))
-        results.add(RidingResult("LORI CAMPBELL", "NDP", Color.ORANGE, 9710, +0.003))
-        results.add(RidingResult("KIRSTEN WRIGHT", "GRN", Color.GREEN, 6184, +0.068))
-        results.add(RidingResult("ERIKA TRAUB", "PPC", Color.MAGENTA.darker(), 1112, +0.017))
+        val results: BindableWrapper<List<RidingResult>> = BindableWrapper(listOf(
+        RidingResult("BARDISH CHAGGER", "LIB", Color.RED, 31085, -0.010, true),
+        RidingResult("JERRY ZHANG", "CON", Color.BLUE, 15615, -0.077),
+        RidingResult("LORI CAMPBELL", "NDP", Color.ORANGE, 9710, +0.003),
+        RidingResult("KIRSTEN WRIGHT", "GRN", Color.GREEN, 6184, +0.068),
+        RidingResult("ERIKA TRAUB", "PPC", Color.MAGENTA.darker(), 1112, +0.017)
+        ))
         val shape = createTickShape()
         val barFrame = BarFrame()
         barFrame.setHeaderBinding(fixedBinding<String?>("WATERLOO"))
-        barFrame.setNumBarsBinding(sizeBinding(results))
-        barFrame.setLeftTextBinding(propertyBinding(results, { it.getPartyName() }, RidingResult.Properties.PARTY_NAME))
-        barFrame.setRightTextBinding(propertyBinding(results, { PERCENT_FORMAT.format(it.getVotePct()) }, RidingResult.Properties.VOTE_PCT))
-        barFrame.setLeftIconBinding(propertyBinding(results, { if (it.isElected()) shape else null }, RidingResult.Properties.ELECTED))
-        barFrame.addSeriesBinding(
-                "Seats",
-                propertyBinding(results, { it.getPartyColor() }, RidingResult.Properties.PARTY_COLOR),
-                propertyBinding(results, { it.getVotePct() }, RidingResult.Properties.VOTE_PCT))
+        barFrame.setBarsBinding(results.binding.map { r -> r.map {
+            BarFrame.Bar(
+                it.getPartyName(),
+                PERCENT_FORMAT.format(it.getVotePct()),
+                if (it.isElected()) shape else null,
+                listOf(Pair(it.getPartyColor(), it.getVotePct()))
+            )
+        } })
         barFrame.setSize(512, 256)
         compareRendering("BarFrame", "TwoLinedBarWithNegativeIcon", barFrame)
     }
@@ -650,30 +487,31 @@ class BarFrameTest {
     @Test
     @Throws(IOException::class)
     fun testRenderVerticalLine() {
-        val results: NestedBindableList<ElectionResult, ElectionResult.Properties> = NestedBindableList()
-        results.add(ElectionResult("LIBERAL", Color.RED, 177))
-        results.add(ElectionResult("CONSERVATIVE", Color.BLUE, 95))
-        results.add(ElectionResult("NEW DEMOCRATIC PARTY", Color.ORANGE, 39))
-        results.add(ElectionResult("BLOC QUEBECOIS", Color.CYAN, 10))
-        results.add(ElectionResult("INDEPENDENT", Color.LIGHT_GRAY, 8))
-        results.add(ElectionResult("GREEN", Color.GREEN, 2))
-        results.add(ElectionResult("CO-OPERATIVE COMMONWEALTH FEDERATION", Color.ORANGE.darker(), 1))
-        results.add(ElectionResult("PEOPLE'S PARTY", Color.MAGENTA.darker(), 1))
+        val results: BindableWrapper<List<ElectionResult>> = BindableWrapper(listOf(
+        ElectionResult("LIBERAL", Color.RED, 177),
+        ElectionResult("CONSERVATIVE", Color.BLUE, 95),
+        ElectionResult("NEW DEMOCRATIC PARTY", Color.ORANGE, 39),
+        ElectionResult("BLOC QUEBECOIS", Color.CYAN, 10),
+        ElectionResult("INDEPENDENT", Color.LIGHT_GRAY, 8),
+        ElectionResult("GREEN", Color.GREEN, 2),
+        ElectionResult("CO-OPERATIVE COMMONWEALTH FEDERATION", Color.ORANGE.darker(), 1),
+        ElectionResult("PEOPLE'S PARTY", Color.MAGENTA.darker(), 1)
+        ))
         val barFrame = BarFrame()
         barFrame.setHeaderBinding(fixedBinding<String?>("SEATS AT DISSOLUTION"))
         barFrame.setSubheadTextBinding(fixedBinding<String?>("170 FOR MAJORITY"))
         barFrame.setSubheadColorBinding(fixedBinding(Color.RED))
         barFrame.setMaxBinding(fixedBinding(225))
-        barFrame.setNumBarsBinding(sizeBinding(results))
-        barFrame.setLeftTextBinding(propertyBinding(results, { it.getPartyName() }, ElectionResult.Properties.PARTY_NAME))
-        barFrame.setRightTextBinding(propertyBinding(results, { it.getNumSeats().toString() }, ElectionResult.Properties.NUM_SEATS))
-        barFrame.addSeriesBinding(
-                "Seats",
-                propertyBinding(results, { it.getPartyColor() }, ElectionResult.Properties.PARTY_COLOR),
-                propertyBinding(results, { it.getNumSeats() }, ElectionResult.Properties.NUM_SEATS))
-        barFrame.setNumLinesBinding(fixedBinding(1))
-        barFrame.setLineLevelsBinding(singletonBinding(170))
-        barFrame.setLineLabelsBinding(singletonBinding("MAJORITY"))
+        barFrame.setBarsBinding(results.binding.map { r -> r.map {
+            BarFrame.Bar(
+                it.getPartyName(),
+                "${it.getNumSeats()}",
+                listOf(
+                    Pair(it.getPartyColor(), it.getNumSeats())
+                )
+            )
+        } })
+        barFrame.setLinesBinding(fixedBinding(listOf(BarFrame.Line(170, "MAJORITY"))))
         barFrame.setSize(512, 256)
         compareRendering("BarFrame", "VerticalLine", barFrame)
     }
@@ -681,25 +519,26 @@ class BarFrameTest {
     @Test
     @Throws(IOException::class)
     fun testRenderAccents() {
-        val results: NestedBindableList<ElectionResult, ElectionResult.Properties> = NestedBindableList()
-        results.add(ElectionResult("COALITION AVENIR QU\u00c9BEC: FRAN\u00c7OIS LEGAULT", Color.BLUE, 74))
-        results.add(ElectionResult("LIB\u00c9RAL: PHILIPPE COUILLARD", Color.RED, 31))
-        results.add(ElectionResult("PARTI QU\u00c9BECOIS: JEAN-FRAN\u00c7OIS LIS\u00c9E", Color.CYAN, 10))
-        results.add(ElectionResult("QU\u00c9BEC SOLIDAIRE: MANON MASS\u00c9", Color.ORANGE, 10))
+        val results: BindableWrapper<List<ElectionResult>> = BindableWrapper(listOf(
+        ElectionResult("COALITION AVENIR QU\u00c9BEC: FRAN\u00c7OIS LEGAULT", Color.BLUE, 74),
+        ElectionResult("LIB\u00c9RAL: PHILIPPE COUILLARD", Color.RED, 31),
+        ElectionResult("PARTI QU\u00c9BECOIS: JEAN-FRAN\u00c7OIS LIS\u00c9E", Color.CYAN, 10),
+        ElectionResult("QU\u00c9BEC SOLIDAIRE: MANON MASS\u00c9", Color.ORANGE, 10)
+        ))
         val barFrame = BarFrame()
         barFrame.setHeaderBinding(fixedBinding<String?>("\u00c9LECTION 2018"))
         barFrame.setSubheadTextBinding(fixedBinding<String?>("MAJORIT\u00c9: 63"))
         barFrame.setMaxBinding(fixedBinding(83))
-        barFrame.setNumBarsBinding(sizeBinding(results))
-        barFrame.setLeftTextBinding(propertyBinding(results, { it.getPartyName() }, ElectionResult.Properties.PARTY_NAME))
-        barFrame.setRightTextBinding(propertyBinding(results, { it.getNumSeats().toString() }, ElectionResult.Properties.NUM_SEATS))
-        barFrame.addSeriesBinding(
-                "Seats",
-                propertyBinding(results, { it.getPartyColor() }, ElectionResult.Properties.PARTY_COLOR),
-                propertyBinding(results, { it.getNumSeats() }, ElectionResult.Properties.NUM_SEATS))
-        barFrame.setNumLinesBinding(fixedBinding(1))
-        barFrame.setLineLevelsBinding(singletonBinding(63))
-        barFrame.setLineLabelsBinding(singletonBinding("MAJORIT\u00c9"))
+        barFrame.setBarsBinding(results.binding.map { r -> r.map {
+            BarFrame.Bar(
+                it.getPartyName(),
+                "${it.getNumSeats()}",
+                listOf(
+                    Pair(it.getPartyColor(), it.getNumSeats())
+                )
+            )
+        } })
+        barFrame.setLinesBinding(fixedBinding(listOf(BarFrame.Line(63, "MAJORIT\u00c9"))))
         barFrame.setSize(512, 256)
         compareRendering("BarFrame", "Accents", barFrame)
     }
@@ -707,25 +546,26 @@ class BarFrameTest {
     @Test
     @Throws(IOException::class)
     fun testRenderMultiLineAccents() {
-        val results: NestedBindableList<ElectionResult, ElectionResult.Properties> = NestedBindableList()
-        results.add(ElectionResult("COALITION AVENIR QU\u00c9BEC\nFRAN\u00c7OIS LEGAULT", Color.BLUE, 74))
-        results.add(ElectionResult("LIB\u00c9RAL\nPHILIPPE COUILLARD", Color.RED, 31))
-        results.add(ElectionResult("PARTI QU\u00c9BECOIS\nJEAN-FRAN\u00c7OIS LIS\u00c9E", Color.CYAN, 10))
-        results.add(ElectionResult("QU\u00c9BEC SOLIDAIRE\nMANON MASS\u00c9", Color.ORANGE, 10))
+        val results: BindableWrapper<List<ElectionResult>> = BindableWrapper(listOf(
+        ElectionResult("COALITION AVENIR QU\u00c9BEC\nFRAN\u00c7OIS LEGAULT", Color.BLUE, 74),
+        ElectionResult("LIB\u00c9RAL\nPHILIPPE COUILLARD", Color.RED, 31),
+        ElectionResult("PARTI QU\u00c9BECOIS\nJEAN-FRAN\u00c7OIS LIS\u00c9E", Color.CYAN, 10),
+        ElectionResult("QU\u00c9BEC SOLIDAIRE\nMANON MASS\u00c9", Color.ORANGE, 10)
+        ))
         val barFrame = BarFrame()
         barFrame.setHeaderBinding(fixedBinding<String?>("\u00c9LECTION 2018"))
         barFrame.setSubheadTextBinding(fixedBinding<String?>("MAJORIT\u00c9: 63"))
         barFrame.setMaxBinding(fixedBinding(83))
-        barFrame.setNumBarsBinding(sizeBinding(results))
-        barFrame.setLeftTextBinding(propertyBinding(results, { it.getPartyName() }, ElectionResult.Properties.PARTY_NAME))
-        barFrame.setRightTextBinding(propertyBinding(results, { it.getNumSeats().toString() }, ElectionResult.Properties.NUM_SEATS))
-        barFrame.addSeriesBinding(
-                "Seats",
-                propertyBinding(results, { it.getPartyColor() }, ElectionResult.Properties.PARTY_COLOR),
-                propertyBinding(results, { it.getNumSeats() }, ElectionResult.Properties.NUM_SEATS))
-        barFrame.setNumLinesBinding(fixedBinding(1))
-        barFrame.setLineLevelsBinding(singletonBinding(63))
-        barFrame.setLineLabelsBinding(singletonBinding("MAJORIT\u00c9"))
+        barFrame.setBarsBinding(results.binding.map { r -> r.map {
+            BarFrame.Bar(
+                it.getPartyName(),
+                "${it.getNumSeats()}",
+                listOf(
+                    Pair(it.getPartyColor(), it.getNumSeats())
+                )
+            )
+        } })
+        barFrame.setLinesBinding(fixedBinding(listOf(BarFrame.Line(63, "MAJORIT\u00c9"))))
         barFrame.setSize(512, 256)
         compareRendering("BarFrame", "MultiLineAccents", barFrame)
     }
@@ -733,33 +573,31 @@ class BarFrameTest {
     @Test
     @Throws(IOException::class)
     fun testBarFrameOverlaps() {
-        val lines = BindableList<Triple<String, String, Boolean>>()
-        lines.add(Triple("THIS IS A VERY VERY LONG\nLEFT HAND SIDE", "RIGHT\nSIDE", false))
+        val lines = BindableWrapper<List<Triple<String, String, Boolean>>>(listOf(Triple("THIS IS A VERY VERY LONG\nLEFT HAND SIDE", "RIGHT\nSIDE", false)))
         val barFrame = BarFrame()
         barFrame.setHeaderBinding(fixedBinding<String?>("BAR FRAME"))
         barFrame.setSubheadTextBinding(fixedBinding<String?>(""))
         barFrame.setMaxBinding(fixedBinding(1))
-        barFrame.setNumBarsBinding(sizeBinding(lines))
-        barFrame.setLeftTextBinding(propertyBinding(lines) { it.first })
-        barFrame.setRightTextBinding(propertyBinding(lines) { it.second })
-        barFrame.setLeftIconBinding(propertyBinding(lines) { if (it.third) createHalfTickShape() else null })
-        barFrame.addSeriesBinding(
-                "Value",
-                propertyBinding(lines) { Color.RED },
-                propertyBinding(lines) { 1 })
-        barFrame.setNumLinesBinding(fixedBinding(1))
-        barFrame.setLineLevelsBinding(listBinding(0.5))
+        barFrame.setBarsBinding(lines.binding.map { l -> l.map {
+            BarFrame.Bar(
+                it.first,
+                it.second,
+                if (it.third) createHalfTickShape() else null,
+                listOf(Pair(Color.RED, 1))
+            )
+        } })
+        barFrame.setLinesBinding(fixedBinding(listOf(BarFrame.Line(0.5, ""))))
         barFrame.setSize(256, 128)
         compareRendering("BarFrame", "FrameOverlap-1", barFrame)
-        lines[0] = Triple("LEFT\nSIDE", "THIS IS A VERY VERY LONG\nRIGHT HAND SIDE", false)
+        lines.value = listOf(Triple("LEFT\nSIDE", "THIS IS A VERY VERY LONG\nRIGHT HAND SIDE", false))
         compareRendering("BarFrame", "FrameOverlap-2", barFrame)
-        lines[0] = Triple("THIS IS A VERY VERY LONG\nLEFT HAND SIDE", "THIS IS A VERY VERY LONG\nRIGHT HAND SIDE", false)
+        lines.value = listOf(Triple("THIS IS A VERY VERY LONG\nLEFT HAND SIDE", "THIS IS A VERY VERY LONG\nRIGHT HAND SIDE", false))
         compareRendering("BarFrame", "FrameOverlap-3", barFrame)
-        lines[0] = Triple("THIS IS A VERY VERY LONG\nLEFT HAND SIDE", "RIGHT\nSIDE", true)
+        lines.value = listOf(Triple("THIS IS A VERY VERY LONG\nLEFT HAND SIDE", "RIGHT\nSIDE", true))
         compareRendering("BarFrame", "FrameOverlap-4", barFrame)
-        lines[0] = Triple("LEFT\nSIDE", "THIS IS A VERY VERY LONG\nRIGHT HAND SIDE", true)
+        lines.value = listOf(Triple("LEFT\nSIDE", "THIS IS A VERY VERY LONG\nRIGHT HAND SIDE", true))
         compareRendering("BarFrame", "FrameOverlap-5", barFrame)
-        lines[0] = Triple("THIS IS A VERY VERY LONG\nLEFT HAND SIDE", "THIS IS A VERY VERY LONG\nRIGHT HAND SIDE", true)
+        lines.value = listOf(Triple("THIS IS A VERY VERY LONG\nLEFT HAND SIDE", "THIS IS A VERY VERY LONG\nRIGHT HAND SIDE", true))
         compareRendering("BarFrame", "FrameOverlap-6", barFrame)
     }
 

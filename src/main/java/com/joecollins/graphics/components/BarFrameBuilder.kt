@@ -1,9 +1,8 @@
 package com.joecollins.graphics.components
 
 import com.joecollins.bindings.Bindable
-import com.joecollins.bindings.BindableList
 import com.joecollins.bindings.Binding
-import com.joecollins.bindings.IndexedBinding
+import com.joecollins.bindings.BindingReceiver
 import com.joecollins.graphics.utils.ColorUtils
 import java.awt.Color
 import java.awt.Shape
@@ -120,32 +119,25 @@ class BarFrameBuilder {
         targetBinding: Binding<T>,
         labelFunc: (T) -> String
     ): BarFrameBuilder {
-        bind(targetBinding) {
-            barFrame.setNumLinesBinding(Binding.fixedBinding(1))
-            barFrame.setLineLevelsBinding(IndexedBinding.listBinding(it))
-            barFrame.setLineLabelsBinding(IndexedBinding.listBinding(labelFunc(it)))
-        }
-        return this
-    }
-
-    fun <T : Number> withLines(
-        lines: BindableList<T>,
-        labelFunc: (T) -> String
-    ): BarFrameBuilder {
-        barFrame.setNumLinesBinding(Binding.sizeBinding(lines))
-        barFrame.setLineLevelsBinding(IndexedBinding.propertyBinding(lines))
-        barFrame.setLineLabelsBinding(IndexedBinding.propertyBinding(lines, labelFunc))
+        barFrame.setLinesBinding(targetBinding.map {
+            val str = labelFunc(it)
+            listOf(BarFrame.Line(it, str))
+        })
         return this
     }
 
     fun <T> withLines(
-        lines: BindableList<T>,
+        lines: Binding<List<T>>,
         labelFunc: (T) -> String,
         valueFunc: (T) -> Number
     ): BarFrameBuilder {
-        barFrame.setNumLinesBinding(Binding.sizeBinding(lines))
-        barFrame.setLineLevelsBinding(IndexedBinding.propertyBinding(lines, valueFunc))
-        barFrame.setLineLabelsBinding(IndexedBinding.propertyBinding(lines, labelFunc))
+        barFrame.setLinesBinding(lines.map { l ->
+            l.map {
+                val label = labelFunc(it)
+                val value = valueFunc(it)
+                BarFrame.Line(value, label)
+            }
+        })
         return this
     }
 
@@ -153,13 +145,7 @@ class BarFrameBuilder {
         linesBinding: Binding<List<T>>,
         labelFunc: (T) -> String
     ): BarFrameBuilder {
-        bind(linesBinding) {
-            barFrame.setNumLinesBinding(Binding.fixedBinding(it.size))
-            barFrame.setLineLevelsBinding(IndexedBinding.listBinding(*it.toTypedArray<Number>()))
-            barFrame.setLineLabelsBinding(
-                    IndexedBinding.listBinding(*it.map(labelFunc).toTypedArray()))
-        }
-        return this
+        return withLines(linesBinding, labelFunc) { it }
     }
 
     private fun <T> bind(binding: Binding<T>, onUpdate: (T) -> Unit) {
@@ -176,23 +162,19 @@ class BarFrameBuilder {
             val builder = BarFrameBuilder()
             val barFrame = builder.barFrame
             val rangeFinder = builder.rangeFinder
-            val entries = BindableList<BasicBar>()
-            barFrame.setNumBarsBinding(Binding.sizeBinding(entries))
-            barFrame.setLeftTextBinding(IndexedBinding.propertyBinding(entries) { it.label })
-            barFrame.setRightTextBinding(IndexedBinding.propertyBinding(entries) { it.valueLabel })
-            barFrame.setLeftIconBinding(IndexedBinding.propertyBinding(entries) { it.shape })
+            val bindingReceiver = BindingReceiver(binding)
+            barFrame.setBarsBinding(bindingReceiver.getBinding { bars ->
+                bars.map {
+                    BarFrame.Bar(it.label, it.valueLabel, it.shape, listOf(Pair(it.color, it.value)))
+                }
+            })
             barFrame.setMinBinding(
                     Binding.propertyBinding(
                             rangeFinder, { rf: RangeFinder -> rf.minFunction(rf) }, RangeFinder.Property.MIN))
             barFrame.setMaxBinding(
                     Binding.propertyBinding(
                             rangeFinder, { rf: RangeFinder -> rf.maxFunction(rf) }, RangeFinder.Property.MAX))
-            barFrame.addSeriesBinding(
-                    "Main",
-                    IndexedBinding.propertyBinding(entries) { it.color },
-                    IndexedBinding.propertyBinding(entries) { it.value })
-            builder.bind(binding) { map ->
-                entries.setAll(map)
+            builder.bind(bindingReceiver.getBinding()) { map ->
                 rangeFinder.highest = map
                         .map { it.value }
                         .map { it.toDouble() }
@@ -216,43 +198,29 @@ class BarFrameBuilder {
             }
             val first = { bar: DualBar -> if (reverse(bar)) bar.value1 else bar.value2 }
             val second = { bar: DualBar -> if (reverse(bar)) bar.value2 else bar.value1 }
-            val entries = BindableList<DualBar>()
-            barFrame.setNumBarsBinding(Binding.sizeBinding(entries))
-            barFrame.setLeftTextBinding(IndexedBinding.propertyBinding(entries) { e: DualBar -> e.label })
-            barFrame.setRightTextBinding(IndexedBinding.propertyBinding(entries) { e: DualBar -> e.valueLabel })
+            val barsReceiver = BindingReceiver(bars)
+            barFrame.setBarsBinding(barsReceiver.getBinding { b ->
+                b.map {
+                    BarFrame.Bar(
+                        it.label, it.valueLabel, it.shape,
+                        listOf(
+                            Pair(it.color, 0),
+                            Pair(if (differentDirections(it)) ColorUtils.lighten(it.color) else it.color, first(it)),
+                            Pair(
+                                ColorUtils.lighten(it.color),
+                                second(it).toDouble() - if (differentDirections(it)) 0.0 else first(it).toDouble()
+                            )
+                        )
+                    )
+                }
+            })
             barFrame.setMinBinding(
                     Binding.propertyBinding(
                             rangeFinder, { it.minFunction(it) }, RangeFinder.Property.MIN))
             barFrame.setMaxBinding(
                     Binding.propertyBinding(
                             rangeFinder, { it.maxFunction(it) }, RangeFinder.Property.MAX))
-            barFrame.addSeriesBinding(
-                    "Placeholder",
-                    IndexedBinding.propertyBinding(entries) { it.color },
-                    IndexedBinding.propertyBinding(entries) { 0 })
-            barFrame.addSeriesBinding(
-                    "First",
-                    IndexedBinding.propertyBinding(
-                            entries
-                    ) {
-                        if (differentDirections(it)) {
-                            ColorUtils.lighten(it.color)
-                        } else {
-                            it.color
-                        }
-                    },
-                    IndexedBinding.propertyBinding(entries, first))
-            barFrame.addSeriesBinding(
-                    "Second",
-                    IndexedBinding.propertyBinding(entries) { ColorUtils.lighten(it.color) },
-                    IndexedBinding.propertyBinding(
-                            entries
-                    ) {
-                        (second.invoke(it).toDouble() - if (differentDirections(it)) 0.0 else first.invoke(it).toDouble())
-                    })
-            barFrame.setLeftIconBinding(IndexedBinding.propertyBinding(entries) { e: DualBar -> e.shape })
-            builder.bind(bars) { map ->
-                entries.setAll(map)
+            builder.bind(barsReceiver.getBinding()) { map ->
                 rangeFinder.highest = map
                         .flatMap { sequenceOf(it.value1, it.value2) }
                         .map { it.toDouble() }
@@ -276,44 +244,29 @@ class BarFrameBuilder {
             }
             val first = { bar: DualBar -> if (reverse(bar)) bar.value1 else bar.value2 }
             val second = { bar: DualBar -> if (reverse(bar)) bar.value2 else bar.value1 }
-            val entries = BindableList<DualBar>()
-            barFrame.setNumBarsBinding(Binding.sizeBinding(entries))
-            barFrame.setLeftTextBinding(IndexedBinding.propertyBinding(entries) { e: DualBar -> e.label })
-            barFrame.setRightTextBinding(IndexedBinding.propertyBinding(entries) { e: DualBar -> e.valueLabel })
+            val barsReceiver = BindingReceiver(bars)
+            barFrame.setBarsBinding(barsReceiver.getBinding { b ->
+                b.map {
+                    BarFrame.Bar(
+                        it.label, it.valueLabel, it.shape,
+                        listOf(
+                            Pair(it.color, 0),
+                            Pair(ColorUtils.lighten(it.color), first(it)),
+                            Pair(
+                                if (differentDirections(it)) ColorUtils.lighten(it.color) else it.color,
+                                second(it).toDouble() - if (differentDirections(it)) 0.0 else first(it).toDouble()
+                            )
+                        )
+                    )
+                }
+            })
             barFrame.setMinBinding(
                     Binding.propertyBinding(
                             rangeFinder, { it.minFunction(it) }, RangeFinder.Property.MIN))
             barFrame.setMaxBinding(
                     Binding.propertyBinding(
                             rangeFinder, { it.maxFunction(it) }, RangeFinder.Property.MAX))
-            barFrame.addSeriesBinding(
-                    "Placeholder",
-                    IndexedBinding.propertyBinding(entries) { it.color },
-                    IndexedBinding.propertyBinding(entries) { 0 })
-            barFrame.addSeriesBinding(
-                    "First",
-                    IndexedBinding.propertyBinding(entries) { ColorUtils.lighten(it.color) },
-                    IndexedBinding.propertyBinding(entries, first))
-            barFrame.addSeriesBinding(
-                    "Second",
-                    IndexedBinding.propertyBinding(
-                            entries
-                    ) {
-                        if (differentDirections(it)) {
-                            ColorUtils.lighten(it.color)
-                        } else {
-                            it.color
-                        }
-                    },
-                    IndexedBinding.propertyBinding(
-                            entries
-                    ) {
-                        (second.invoke(it).toDouble() -
-                                if (differentDirections(it)) 0.0 else first.invoke(it).toDouble())
-                    })
-            barFrame.setLeftIconBinding(IndexedBinding.propertyBinding(entries) { e: DualBar -> e.shape })
-            builder.bind(bars) { map ->
-                entries.setAll(map)
+            builder.bind(barsReceiver.getBinding()) { map ->
                 rangeFinder.highest = map
                         .flatMap { sequenceOf(it.value1, it.value2) }
                         .map { it.toDouble() }

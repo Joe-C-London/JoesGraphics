@@ -1,6 +1,7 @@
 package com.joecollins.bindings
 
 import com.joecollins.bindings.Binding.Companion.fixedBinding
+import com.joecollins.bindings.Binding.Companion.listBinding
 import com.joecollins.bindings.Binding.Companion.mapReduceBinding
 import com.joecollins.bindings.Binding.Companion.propertyBinding
 import com.joecollins.bindings.Binding.Companion.sizeBinding
@@ -180,6 +181,29 @@ class BindingTest {
         list[1].setValue(2)
         list[2].setValue(3)
         Assert.assertEquals(15, boundValue.value.toLong())
+    }
+
+    @Test
+    fun testListBinding() {
+        val boundValue: BoundResult<List<Int>> = BoundResult()
+        val list = listOf(BindableInt(1), BindableInt(2), BindableInt(3))
+        val bindings = list
+            .map { b: BindableInt ->
+                propertyBinding(b, { it.value }, BindableValue.Property.VALUE)
+            }
+            .toList()
+        val binding = listBinding(bindings)
+        binding.bind { boundValue.value = it }
+        Assert.assertEquals(listOf(1, 2, 3), boundValue.value)
+        list[0].setValue(4)
+        list[1].setValue(5)
+        list[2].setValue(6)
+        Assert.assertEquals(listOf(4, 5, 6), boundValue.value)
+        binding.unbind()
+        list[0].setValue(1)
+        list[1].setValue(2)
+        list[2].setValue(3)
+        Assert.assertEquals(listOf(4, 5, 6), boundValue.value)
     }
 
     @Test

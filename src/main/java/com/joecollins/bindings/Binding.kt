@@ -132,5 +132,35 @@ interface Binding<out T> {
                 values.clear()
             }
         }
+
+        @JvmStatic fun <T> listBinding(bindings: List<Binding<T>>): Binding<List<T>> = object : Binding<List<T>> {
+            private var bound = false
+            private val values: MutableList<T?> = ArrayList(bindings.size)
+
+            @Suppress("UNCHECKED_CAST")
+            override fun bind(onUpdate: (List<T>) -> Unit) {
+                check(!bound) { "Binding is already used" }
+                for (i in bindings.indices) {
+                    values.add(null)
+                }
+                for (i in bindings.indices) {
+                    bindings[i].bind { newVal ->
+                        val oldVal = values[i]
+                        if (oldVal != newVal) {
+                            values[i] = newVal
+                            if (bound) {
+                                onUpdate(values.map { it as T })
+                            }
+                        }
+                    }
+                }
+                bound = true
+                onUpdate(values.map { it as T })
+            }
+            override fun unbind() {
+                bindings.forEach { it.unbind() }
+                values.clear()
+            }
+        }
     }
 }

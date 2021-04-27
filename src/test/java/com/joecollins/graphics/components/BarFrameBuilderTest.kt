@@ -1,6 +1,5 @@
 package com.joecollins.graphics.components
 
-import com.joecollins.bindings.BindableList
 import com.joecollins.bindings.Binding
 import com.joecollins.graphics.components.BarFrameBuilder.BasicBar
 import com.joecollins.graphics.components.BarFrameBuilder.Companion.basic
@@ -173,7 +172,7 @@ class BarFrameBuilderTest {
     @Test
     fun testMultiLines() {
         val result = BindableWrapper<Map<Pair<String, Color>, Int>>(emptyMap())
-        val lines = BindableList<Int>()
+        val lines = BindableWrapper<List<Int>>(emptyList())
         val frame = basic(
                 result.binding
                         .map { map ->
@@ -182,10 +181,10 @@ class BarFrameBuilderTest {
                                     .map { BasicBar(it.key.first, it.key.second, it.value, THOUSANDS.format(it.value)) }
                                     .toList()
                         })
-                .withLines(lines) { it.toString() + " QUOTA" + (if (it == 1) "" else "S") }
+                .withLines(lines.binding) { it.toString() + " QUOTA" + (if (it == 1) "" else "S") }
                 .build()
         Assert.assertEquals(0, frame.numLines.toLong())
-        lines.addAll(listOf(1, 2, 3, 4, 5))
+        lines.value = listOf(1, 2, 3, 4, 5)
         Assert.assertEquals(5, frame.numLines.toLong())
         Assert.assertEquals(1, frame.getLineLevel(0))
         Assert.assertEquals(2, frame.getLineLevel(1))
@@ -202,7 +201,7 @@ class BarFrameBuilderTest {
     @Test
     fun testMultiLinesBespokeLabels() {
         val result = BindableWrapper<Map<Pair<String, Color>, Int>>(emptyMap())
-        val lines = BindableList<Pair<String, Int>>()
+        val lines = BindableWrapper<List<Pair<String, Int>>>(emptyList())
         val frame = basic(
                 result.binding
                         .map { map ->
@@ -211,12 +210,12 @@ class BarFrameBuilderTest {
                                     .map { BasicBar(it.key.first, it.key.second, it.value, THOUSANDS.format(it.value)) }
                                     .toList()
                         })
-                .withLines(lines, { it.first }) { it.second }
+                .withLines(lines.binding, { it.first }) { it.second }
                 .build()
         Assert.assertEquals(0, frame.numLines.toLong())
-        lines.addAll(listOf(
+        lines.value = listOf(
                 Pair("The line is here", 1),
-                Pair("and here", 2)))
+                Pair("and here", 2))
         Assert.assertEquals(2, frame.numLines.toLong())
         Assert.assertEquals(1, frame.getLineLevel(0))
         Assert.assertEquals(2, frame.getLineLevel(1))

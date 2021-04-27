@@ -1,7 +1,6 @@
 package com.joecollins.graphics.screens.generic
 
 import com.joecollins.bindings.Bindable
-import com.joecollins.bindings.BindableList
 import com.joecollins.bindings.Binding
 import com.joecollins.bindings.BindingReceiver
 import com.joecollins.graphics.ImageGenerator
@@ -394,22 +393,11 @@ class BasicResultPanel private constructor(
             val showMajority = this.showMajority
             if (showMajority != null) {
                 val total = this.total ?: throw IllegalArgumentException("Cannot show majority line without total")
-                val lines = BindableList<Int>()
-                showMajority
-                        .getBinding()
-                        .bind { show ->
-                            lines.clear()
-                            if (show) {
-                                lines.add(total.value / 2 + 1)
-                            }
-                        }
-                total
-                        .getBinding()
-                        .bind { tot ->
-                            if (!lines.isEmpty()) {
-                                lines[0] = tot / 2 + 1
-                            }
-                        }
+                val lines = showMajority.getBinding().merge(total.getBinding()) {
+                    show, tot ->
+                        if (show) listOf(tot / 2 + 1)
+                        else emptyList()
+                }
                 builder.withLines(lines) { t -> majorityFunction!!(t) }
             }
         }
@@ -563,22 +551,11 @@ class BasicResultPanel private constructor(
                 if (total == null) {
                     throw IllegalStateException("Cannot show majority line without total")
                 }
-                val lines = BindableList<Int>()
-                showMajority
-                        .getBinding()
-                        .bind { show ->
-                            lines.clear()
-                            if (show) {
-                                lines.add(total.value / 2 + 1)
-                            }
-                        }
-                total
-                        .getBinding()
-                        .bind { tot ->
-                            if (!lines.isEmpty()) {
-                                lines[0] = tot / 2 + 1
-                            }
-                        }
+                val lines = showMajority.getBinding().merge(total.getBinding()) {
+                    show, tot ->
+                        if (show) listOf(tot / 2 + 1)
+                        else emptyList()
+                }
                 builder = builder.withLines(lines) { t -> majorityFunction!!(t) }
             }
             return builder.build()
@@ -713,22 +690,11 @@ class BasicResultPanel private constructor(
                 if (total == null) {
                     throw IllegalStateException("Cannot show majority without total")
                 }
-                val lines = BindableList<Int>()
-                showMajority
-                        .getBinding()
-                        .bind { show ->
-                            lines.clear()
-                            if (show) {
-                                lines.add(total.value / 2 + 1)
-                            }
-                        }
-                total
-                        .getBinding()
-                        .bind { tot ->
-                            if (!lines.isEmpty()) {
-                                lines[0] = tot / 2 + 1
-                            }
-                        }
+                val lines = showMajority.getBinding().merge(total.getBinding()) {
+                    show, tot ->
+                        if (show) listOf(tot / 2 + 1)
+                        else emptyList()
+                }
                 builder = builder.withLines(lines) { t -> majorityFunction!!(t) }
             }
             return builder.build()
@@ -1127,28 +1093,13 @@ class BasicResultPanel private constructor(
             val showMajority = this.showMajority
             val pctReporting = this.pctReporting
             if (showMajority != null) {
-                val lines = BindableList<Double>()
-                showMajority
-                        .getBinding()
-                        .bind { show ->
-                            lines.clear()
-                            if (show) {
-                                lines.add(
-                                        if (pctReporting == null) 0.5 else 0.5 / pctReporting.value.coerceAtLeast(1e-6))
-                            }
-                        }
-                pctReporting?.getBinding()?.bind { pct ->
-                    if (!lines.isEmpty()) {
-                        lines[0] = 0.5 / pct.coerceAtLeast(1e-6)
-                    }
+                val lines = showMajority.getBinding().merge(
+                    pctReporting?.getBinding() ?: Binding.fixedBinding(1.0)
+                ) {
+                    show, pct ->
+                        if (show) listOf(0.5 / pct.coerceAtLeast(1e-6))
+                        else emptyList()
                 }
-                showMajority
-                        .getBinding()
-                        .bind {
-                            if (!lines.isEmpty()) {
-                                lines.setAll(lines)
-                            }
-                        }
                 builder.withLines(lines) { majorityLabel!!.value }
             }
         }
@@ -1414,22 +1365,9 @@ class BasicResultPanel private constructor(
                     .withMax(Binding.fixedBinding(2.0 / 3))
             val showMajority = showMajority
             if (showMajority != null) {
-                val lines = BindableList<Double>()
-                showMajority
-                        .getBinding()
-                        .bind { show ->
-                            lines.clear()
-                            if (show) {
-                                lines.add(0.5)
-                            }
-                        }
-                showMajority
-                        .getBinding()
-                        .bind {
-                            if (!lines.isEmpty()) {
-                                lines.setAll(lines)
-                            }
-                        }
+                val lines = showMajority.getBinding().map {
+                    if (it) listOf(0.5) else emptyList()
+                }
                 builder = builder.withLines(lines) { majorityLabel!!.value }
             }
             return builder.build()
@@ -1534,8 +1472,7 @@ class BasicResultPanel private constructor(
                         .withHeader(preferenceHeader!!.getBinding())
                         .withSubhead(preferenceSubhead?.getBinding() ?: Binding.fixedBinding(null))
                         .withMax(Binding.fixedBinding(2.0 / 3))
-                val lines = BindableList<Double>()
-                lines.setAll(listOf(0.5))
+                val lines = Binding.fixedBinding(listOf(0.5))
                 builder = builder.withLines(lines) { "50%" }
                 return builder.build()
             }
