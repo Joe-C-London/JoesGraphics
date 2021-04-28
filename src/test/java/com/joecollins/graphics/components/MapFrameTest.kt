@@ -3,10 +3,6 @@ package com.joecollins.graphics.components
 import com.joecollins.bindings.Bindable
 import com.joecollins.bindings.BindableList
 import com.joecollins.bindings.Binding.Companion.fixedBinding
-import com.joecollins.bindings.Binding.Companion.sizeBinding
-import com.joecollins.bindings.IndexedBinding.Companion.listBinding
-import com.joecollins.bindings.IndexedBinding.Companion.propertyBinding
-import com.joecollins.bindings.NestedBindableList
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.graphics.utils.ShapefileReader.readShapes
 import java.awt.Color
@@ -24,9 +20,7 @@ class MapFrameTest {
     fun testBindShapes() {
         val shapes = loadShapes { getDistrictColor(it) }
         val mapFrame = MapFrame()
-        mapFrame.setNumShapesBinding(sizeBinding(shapes))
-        mapFrame.setShapeBinding(propertyBinding(shapes, { it.shape }, MapEntry.Property.SHAPE))
-        mapFrame.setColorBinding(propertyBinding(shapes, { it.color }, MapEntry.Property.COLOR))
+        mapFrame.setShapesBinding(fixedBinding(shapes.map { Pair(it.shape, it.color) }))
         Assert.assertEquals(27, mapFrame.numShapes.toLong())
         Assert.assertEquals(shapes[0].shape, mapFrame.getShape(0))
         Assert.assertEquals(shapes[0].color, mapFrame.getColor(0))
@@ -37,9 +31,7 @@ class MapFrameTest {
     fun testDefaultFocusAreaEncompassesAllShapes() {
         val shapes = loadShapes { getDistrictColor(it) }
         val mapFrame = MapFrame()
-        mapFrame.setNumShapesBinding(sizeBinding(shapes))
-        mapFrame.setShapeBinding(propertyBinding(shapes, { it.shape }, MapEntry.Property.SHAPE))
-        mapFrame.setColorBinding(propertyBinding(shapes, { it.color }, MapEntry.Property.COLOR))
+        mapFrame.setShapesBinding(fixedBinding(shapes.map { Pair(it.shape, it.color) }))
         val bindingBox = shapes.asSequence()
                 .map { Area(it.shape) }
                 .reduce { acc, area ->
@@ -57,9 +49,7 @@ class MapFrameTest {
         val shapes = loadShapes { getDistrictColor(it) }
         val cityBox = loadCityBox()
         val mapFrame = MapFrame()
-        mapFrame.setNumShapesBinding(sizeBinding(shapes))
-        mapFrame.setShapeBinding(propertyBinding(shapes, { it.shape }, MapEntry.Property.SHAPE))
-        mapFrame.setColorBinding(propertyBinding(shapes, { it.color }, MapEntry.Property.COLOR))
+        mapFrame.setShapesBinding(fixedBinding(shapes.map { Pair(it.shape, it.color) }))
         mapFrame.setFocusBoxBinding(fixedBinding(cityBox))
         Assert.assertEquals(cityBox, mapFrame.focusBox)
     }
@@ -69,8 +59,7 @@ class MapFrameTest {
     fun testOutlines() {
         val regions = loadRegions()
         val mapFrame = MapFrame()
-        mapFrame.setNumOutlineShapesBinding(sizeBinding(regions))
-        mapFrame.setOutlineShapesBinding(listBinding(regions))
+        mapFrame.setOutlineShapesBinding(fixedBinding(regions))
         Assert.assertEquals(4, mapFrame.numOutlineShapes.toLong())
         Assert.assertEquals(regions[0], mapFrame.getOutlineShape(0))
     }
@@ -81,9 +70,7 @@ class MapFrameTest {
         val shapes = loadShapes { getDistrictColor(it) }
         val mapFrame = MapFrame()
         mapFrame.setHeaderBinding(fixedBinding<String?>("PEI"))
-        mapFrame.setNumShapesBinding(sizeBinding(shapes))
-        mapFrame.setShapeBinding(propertyBinding(shapes, { it.shape }, MapEntry.Property.SHAPE))
-        mapFrame.setColorBinding(propertyBinding(shapes, { it.color }, MapEntry.Property.COLOR))
+        mapFrame.setShapesBinding(fixedBinding(shapes.map { Pair(it.shape, it.color) }))
         mapFrame.setSize(256, 128)
         compareRendering("MapFrame", "RenderFull", mapFrame)
     }
@@ -94,9 +81,7 @@ class MapFrameTest {
         val shapes = loadShapes { district: Int -> getDistrictColor(district) }
         val mapFrame = MapFrame()
         mapFrame.setHeaderBinding(fixedBinding<String?>("PEI"))
-        mapFrame.setNumShapesBinding(sizeBinding(shapes))
-        mapFrame.setShapeBinding(propertyBinding(shapes, { obj: MapEntry -> obj.shape }, MapEntry.Property.SHAPE))
-        mapFrame.setColorBinding(propertyBinding(shapes, { obj: MapEntry -> obj.color }, MapEntry.Property.COLOR))
+        mapFrame.setShapesBinding(fixedBinding(shapes.map { Pair(it.shape, it.color) }))
         mapFrame.setSize(64, 128)
         compareRendering("MapFrame", "RenderFullThin", mapFrame)
     }
@@ -108,9 +93,7 @@ class MapFrameTest {
         val zoomBox = loadCityBox()
         val mapFrame = MapFrame()
         mapFrame.setHeaderBinding(fixedBinding("CHARLOTTETOWN"))
-        mapFrame.setNumShapesBinding(sizeBinding(shapes))
-        mapFrame.setShapeBinding(propertyBinding(shapes, { it.shape }, MapEntry.Property.SHAPE))
-        mapFrame.setColorBinding(propertyBinding(shapes, { it.color }, MapEntry.Property.COLOR))
+        mapFrame.setShapesBinding(fixedBinding(shapes.map { Pair(it.shape, it.color) }))
         mapFrame.setFocusBoxBinding(fixedBinding(zoomBox))
         mapFrame.setSize(256, 128)
         compareRendering("MapFrame", "RenderZoomedIn", mapFrame)
@@ -125,11 +108,8 @@ class MapFrameTest {
         regions.addAll(shapes.map { it.shape })
         val mapFrame = MapFrame()
         mapFrame.setHeaderBinding(fixedBinding<String?>("PEI"))
-        mapFrame.setNumShapesBinding(sizeBinding(shapes))
-        mapFrame.setShapeBinding(propertyBinding(shapes, { it.shape }, MapEntry.Property.SHAPE))
-        mapFrame.setColorBinding(propertyBinding(shapes, { it.color }, MapEntry.Property.COLOR))
-        mapFrame.setNumOutlineShapesBinding(sizeBinding(regions))
-        mapFrame.setOutlineShapesBinding(listBinding(regions))
+        mapFrame.setShapesBinding(fixedBinding(shapes.map { Pair(it.shape, it.color) }))
+        mapFrame.setOutlineShapesBinding(fixedBinding(regions))
         mapFrame.setSize(256, 128)
         compareRendering("MapFrame", "RenderBorders-1", mapFrame)
         mapFrame.setFocusBoxBinding(fixedBinding(zoomBox))
@@ -138,14 +118,12 @@ class MapFrameTest {
     }
 
     @Throws(IOException::class)
-    private fun loadShapes(colorFunc: (Int) -> Color): NestedBindableList<MapEntry, MapEntry.Property> {
+    private fun loadShapes(colorFunc: (Int) -> Color): List<MapEntry> {
         val shapesByDistrict = shapesByDistrict()
-        val shapes: NestedBindableList<MapEntry, MapEntry.Property> = NestedBindableList()
-        shapesByDistrict.forEach { (district: Int, shape: Shape) ->
+        return shapesByDistrict.map { (district: Int, shape: Shape) ->
             val color = colorFunc(district)
-            shapes.add(MapEntry(shape, color))
+            MapEntry(shape, color)
         }
-        return shapes
     }
 
     @Throws(IOException::class)

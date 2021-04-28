@@ -1,12 +1,12 @@
 package com.joecollins.graphics.components
 
 import com.joecollins.bindings.Bindable
-import com.joecollins.bindings.BindableList
 import com.joecollins.bindings.Binding
 import com.joecollins.bindings.Binding.Companion.fixedBinding
 import com.joecollins.graphics.components.HemicycleFrameBuilder.Companion.of
 import com.joecollins.graphics.components.HemicycleFrameBuilder.Companion.ofElectedLeading
 import com.joecollins.graphics.components.HemicycleFrameBuilder.Tiebreaker
+import com.joecollins.graphics.utils.BindableWrapper
 import com.joecollins.graphics.utils.ColorUtils.lighten
 import com.joecollins.models.general.Party
 import java.awt.Color
@@ -27,22 +27,22 @@ class HemicycleFrameBuilderTest {
         dots.addAll(Collections.nCopies(6, Pair(Color.RED, Color.RED)))
         dots.addAll(Collections.nCopies(5, Pair(Color.BLUE, Color.RED)))
         dots.addAll(Collections.nCopies(8, Pair(Color.BLUE, Color.BLUE)))
-        val leftSeatBars = BindableList<Pair<Color, Int>>(listOf(Pair(Color.GREEN, 8)))
-        val rightSeatBars = BindableList<Pair<Color, Int>>(listOf(Pair(Color.BLUE, 13)))
-        val middleSeatBars = BindableList<Pair<Color, Int>>(listOf(Pair(Color.RED, 6)))
-        val leftChangeBars = BindableList<Pair<Color, Int>>(listOf(Pair(Color.GREEN, +7)))
-        val rightChangeBars = BindableList<Pair<Color, Int>>(listOf(Pair(Color.BLUE, +5)))
+        val leftSeatBars = BindableWrapper(listOf(Pair(Color.GREEN, 8)))
+        val rightSeatBars = BindableWrapper(listOf(Pair(Color.BLUE, 13)))
+        val middleSeatBars = BindableWrapper(listOf(Pair(Color.RED, 6)))
+        val leftChangeBars = BindableWrapper(listOf(Pair(Color.GREEN, +7)))
+        val rightChangeBars = BindableWrapper(listOf(Pair(Color.BLUE, +5)))
         val frame = of(
                 rows,
                 dots,
                 { fixedBinding(it.first) },
                 { fixedBinding(it.second) },
                 Tiebreaker.FRONT_ROW_FROM_RIGHT)
-                .withLeftSeatBars(leftSeatBars, { it.first }, { it.second }, fixedBinding("GREEN: 8"))
-                .withRightSeatBars(rightSeatBars, { it.first }, { it.second }, fixedBinding("PROGRESSIVE CONSERVATIVE: 13"))
-                .withMiddleSeatBars(middleSeatBars, { it.first }, { it.second }, fixedBinding("LIBERAL: 6"))
-                .withLeftChangeBars(leftChangeBars, { it.first }, { it.second }, fixedBinding(1), fixedBinding("GRN: +7"))
-                .withRightChangeBars(rightChangeBars, { it.first }, { it.second }, fixedBinding(8), fixedBinding("PC: +5"))
+                .withLeftSeatBars(leftSeatBars.binding, { it.first }, { it.second }, fixedBinding("GREEN: 8"))
+                .withRightSeatBars(rightSeatBars.binding, { it.first }, { it.second }, fixedBinding("PROGRESSIVE CONSERVATIVE: 13"))
+                .withMiddleSeatBars(middleSeatBars.binding, { it.first }, { it.second }, fixedBinding("LIBERAL: 6"))
+                .withLeftChangeBars(leftChangeBars.binding, { it.first }, { it.second }, fixedBinding(1), fixedBinding("GRN: +7"))
+                .withRightChangeBars(rightChangeBars.binding, { it.first }, { it.second }, fixedBinding(8), fixedBinding("PC: +5"))
                 .withHeader(fixedBinding("PEI"))
                 .build()
         Assert.assertEquals(3, frame.numRows.toLong())

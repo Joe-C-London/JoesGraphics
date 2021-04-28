@@ -1,7 +1,6 @@
 package com.joecollins.graphics.components
 
 import com.joecollins.bindings.Binding
-import com.joecollins.bindings.IndexedBinding
 import com.joecollins.graphics.utils.StandardFont
 import java.awt.BasicStroke
 import java.awt.BorderLayout
@@ -26,37 +25,23 @@ import kotlin.math.min
 import kotlin.math.roundToInt
 
 class HemicycleFrame : GraphicsFrame() {
-    private var numRowsBinding: Binding<Int> = Binding.fixedBinding(0)
-    private var rowCountBinding = IndexedBinding.emptyBinding<Int>()
+    private var rowsBinding: Binding<List<Int>> = Binding.fixedBinding(emptyList())
+    private var dotsBinding: Binding<List<Dot>> = Binding.fixedBinding(emptyList())
 
-    private var numDotsBinding: Binding<Int> = Binding.fixedBinding(0)
-    private var dotColorBinding = IndexedBinding.emptyBinding<Color>()
-    private var dotBorderBinding = IndexedBinding.emptyBinding<Color>()
-
-    private var leftSeatBarCountBinding: Binding<Int> = Binding.fixedBinding(0)
-    private var leftSeatBarColorBinding = IndexedBinding.emptyBinding<Color>()
-    private var leftSeatBarSizeBinding = IndexedBinding.emptyBinding<Int>()
+    private var leftSeatBarBinding: Binding<List<Bar>> = Binding.fixedBinding(emptyList())
     private var leftSeatBarLabelBinding: Binding<String> = Binding.fixedBinding("")
 
-    private var rightSeatBarCountBinding: Binding<Int> = Binding.fixedBinding(0)
-    private var rightSeatBarColorBinding = IndexedBinding.emptyBinding<Color>()
-    private var rightSeatBarSizeBinding = IndexedBinding.emptyBinding<Int>()
+    private var rightSeatBarBinding: Binding<List<Bar>> = Binding.fixedBinding(emptyList())
     private var rightSeatBarLabelBinding: Binding<String> = Binding.fixedBinding("")
 
-    private var middleSeatBarCountBinding: Binding<Int> = Binding.fixedBinding(0)
-    private var middleSeatBarColorBinding = IndexedBinding.emptyBinding<Color>()
-    private var middleSeatBarSizeBinding = IndexedBinding.emptyBinding<Int>()
+    private var middleSeatBarBinding: Binding<List<Bar>> = Binding.fixedBinding(emptyList())
     private var middleSeatBarLabelBinding: Binding<String> = Binding.fixedBinding("")
 
-    private var leftChangeBarCountBinding: Binding<Int> = Binding.fixedBinding(0)
-    private var leftChangeBarColorBinding = IndexedBinding.emptyBinding<Color>()
-    private var leftChangeBarSizeBinding = IndexedBinding.emptyBinding<Int>()
+    private var leftChangeBarBinding: Binding<List<Bar>> = Binding.fixedBinding(emptyList())
     private var leftChangeBarStartBinding: Binding<Int> = Binding.fixedBinding(0)
     private var leftChangeBarLabelBinding: Binding<String> = Binding.fixedBinding("")
 
-    private var rightChangeBarCountBinding: Binding<Int> = Binding.fixedBinding(0)
-    private var rightChangeBarColorBinding = IndexedBinding.emptyBinding<Color>()
-    private var rightChangeBarSizeBinding = IndexedBinding.emptyBinding<Int>()
+    private var rightChangeBarBinding: Binding<List<Bar>> = Binding.fixedBinding(emptyList())
     private var rightChangeBarStartBinding: Binding<Int> = Binding.fixedBinding(0)
     private var rightChangeBarLabelBinding: Binding<String> = Binding.fixedBinding("")
 
@@ -92,24 +77,15 @@ class HemicycleFrame : GraphicsFrame() {
     internal val numRows: Int
         get() = dotsPanel.rows.size
 
-    fun setNumRowsBinding(numRowsBinding: Binding<Int>) {
-        this.numRowsBinding.unbind()
-        this.numRowsBinding = numRowsBinding
-        this.numRowsBinding.bind { numRows ->
-            setSize(dotsPanel.rows, numRows) { 0 }
-            dotsPanel.repaint()
-        }
-    }
-
     internal fun getRowCount(rowNum: Int): Int {
         return dotsPanel.rows[rowNum]
     }
 
-    fun setRowCountsBinding(rowCountBinding: IndexedBinding<Int>) {
-        this.rowCountBinding.unbind()
-        this.rowCountBinding = rowCountBinding
-        this.rowCountBinding.bind { idx, count ->
-            dotsPanel.rows[idx] = count
+    fun setRowsBinding(rowsBinding: Binding<List<Int>>) {
+        this.rowsBinding.unbind()
+        this.rowsBinding = rowsBinding
+        this.rowsBinding.bind { r ->
+            dotsPanel.rows = r
             dotsPanel.repaint()
         }
     }
@@ -117,37 +93,19 @@ class HemicycleFrame : GraphicsFrame() {
     internal val numDots: Int
         get() = dotsPanel.dots.size
 
-    fun setNumDotsBinding(numDotsBinding: Binding<Int>) {
-        this.numDotsBinding.unbind()
-        this.numDotsBinding = numDotsBinding
-        this.numDotsBinding.bind { numDots ->
-            setSize(dotsPanel.dots, numDots) { Dot() }
-            dotsPanel.repaint()
-        }
-    }
-
     internal fun getDotColor(dotNum: Int): Color {
         return dotsPanel.dots[dotNum].color
-    }
-
-    fun setDotColorBinding(dotColorBinding: IndexedBinding<Color>) {
-        this.dotColorBinding.unbind()
-        this.dotColorBinding = dotColorBinding
-        this.dotColorBinding.bind { idx, color ->
-            dotsPanel.dots[idx].color = color
-            dotsPanel.repaint()
-        }
     }
 
     internal fun getDotBorder(dotNum: Int): Color? {
         return dotsPanel.dots[dotNum].border
     }
 
-    fun setDotBorderBinding(dotBorderBinding: IndexedBinding<Color>) {
-        this.dotBorderBinding.unbind()
-        this.dotBorderBinding = dotBorderBinding
-        this.dotBorderBinding.bind { idx, border ->
-            dotsPanel.dots[idx].border = border
+    fun setDotsBinding(dotsBinding: Binding<List<Dot>>) {
+        this.dotsBinding.unbind()
+        this.dotsBinding = dotsBinding
+        this.dotsBinding.bind { d ->
+            dotsPanel.dots = d
             dotsPanel.repaint()
         }
     }
@@ -155,37 +113,19 @@ class HemicycleFrame : GraphicsFrame() {
     internal val leftSeatBarCount: Int
         get() = barsPanel.leftSeatBars.size
 
-    fun setLeftSeatBarCountBinding(leftSeatBarCountBinding: Binding<Int>) {
-        this.leftSeatBarCountBinding.unbind()
-        this.leftSeatBarCountBinding = leftSeatBarCountBinding
-        this.leftSeatBarCountBinding.bind { numBars ->
-            setSize(barsPanel.leftSeatBars, numBars) { Bar() }
-            barsPanel.repaint()
-        }
-    }
-
     internal fun getLeftSeatBarColor(idx: Int): Color {
         return barsPanel.leftSeatBars[idx].color
-    }
-
-    fun setLeftSeatBarColorBinding(leftSeatBarColorBinding: IndexedBinding<Color>) {
-        this.leftSeatBarColorBinding.unbind()
-        this.leftSeatBarColorBinding = leftSeatBarColorBinding
-        this.leftSeatBarColorBinding.bind { idx, color ->
-            barsPanel.leftSeatBars[idx].color = color
-            barsPanel.repaint()
-        }
     }
 
     internal fun getLeftSeatBarSize(idx: Int): Int {
         return barsPanel.leftSeatBars[idx].size
     }
 
-    fun setLeftSeatBarSizeBinding(leftSeatBarSizeBinding: IndexedBinding<Int>) {
-        this.leftSeatBarSizeBinding.unbind()
-        this.leftSeatBarSizeBinding = leftSeatBarSizeBinding
-        this.leftSeatBarSizeBinding.bind { idx, size ->
-            barsPanel.leftSeatBars[idx].size = size
+    fun setLeftSeatBarBinding(leftSeatBarBinding: Binding<List<Bar>>) {
+        this.leftSeatBarBinding.unbind()
+        this.leftSeatBarBinding = leftSeatBarBinding
+        this.leftSeatBarBinding.bind { b ->
+            barsPanel.leftSeatBars = b
             barsPanel.repaint()
         }
     }
@@ -206,37 +146,19 @@ class HemicycleFrame : GraphicsFrame() {
     internal val rightSeatBarCount: Int
         get() = barsPanel.rightSeatBars.size
 
-    fun setRightSeatBarCountBinding(rightSeatBarCountBinding: Binding<Int>) {
-        this.rightSeatBarCountBinding.unbind()
-        this.rightSeatBarCountBinding = rightSeatBarCountBinding
-        this.rightSeatBarCountBinding.bind { numBars ->
-            setSize(barsPanel.rightSeatBars, numBars) { Bar() }
-            barsPanel.repaint()
-        }
-    }
-
     internal fun getRightSeatBarColor(idx: Int): Color {
         return barsPanel.rightSeatBars[idx].color
-    }
-
-    fun setRightSeatBarColorBinding(rightSeatBarColorBinding: IndexedBinding<Color>) {
-        this.rightSeatBarColorBinding.unbind()
-        this.rightSeatBarColorBinding = rightSeatBarColorBinding
-        this.rightSeatBarColorBinding.bind { idx, color ->
-            barsPanel.rightSeatBars[idx].color = color
-            barsPanel.repaint()
-        }
     }
 
     internal fun getRightSeatBarSize(idx: Int): Int {
         return barsPanel.rightSeatBars[idx].size
     }
 
-    fun setRightSeatBarSizeBinding(rightSeatBarSizeBinding: IndexedBinding<Int>) {
-        this.rightSeatBarSizeBinding.unbind()
-        this.rightSeatBarSizeBinding = rightSeatBarSizeBinding
-        this.rightSeatBarSizeBinding.bind { idx, size ->
-            barsPanel.rightSeatBars[idx].size = size
+    fun setRightSeatBarBinding(rightSeatBarBinding: Binding<List<Bar>>) {
+        this.rightSeatBarBinding.unbind()
+        this.rightSeatBarBinding = rightSeatBarBinding
+        this.rightSeatBarBinding.bind { b ->
+            barsPanel.rightSeatBars = b
             barsPanel.repaint()
         }
     }
@@ -257,37 +179,19 @@ class HemicycleFrame : GraphicsFrame() {
     internal val middleSeatBarCount: Int
         get() = barsPanel.middleSeatBars.size
 
-    fun setMiddleSeatBarCountBinding(middleSeatBarCountBinding: Binding<Int>) {
-        this.middleSeatBarCountBinding.unbind()
-        this.middleSeatBarCountBinding = middleSeatBarCountBinding
-        this.middleSeatBarCountBinding.bind { numBars ->
-            setSize(barsPanel.middleSeatBars, numBars) { Bar() }
-            barsPanel.repaint()
-        }
-    }
-
     internal fun getMiddleSeatBarColor(idx: Int): Color {
         return barsPanel.middleSeatBars[idx].color
-    }
-
-    fun setMiddleSeatBarColorBinding(middleSeatBarColorBinding: IndexedBinding<Color>) {
-        this.middleSeatBarColorBinding.unbind()
-        this.middleSeatBarColorBinding = middleSeatBarColorBinding
-        this.middleSeatBarColorBinding.bind { idx, color ->
-            barsPanel.middleSeatBars[idx].color = color
-            barsPanel.repaint()
-        }
     }
 
     internal fun getMiddleSeatBarSize(idx: Int): Int {
         return barsPanel.middleSeatBars[idx].size
     }
 
-    fun setMiddleSeatBarSizeBinding(middleSeatBarSizeBinding: IndexedBinding<Int>) {
-        this.middleSeatBarSizeBinding.unbind()
-        this.middleSeatBarSizeBinding = middleSeatBarSizeBinding
-        this.middleSeatBarSizeBinding.bind { idx, size ->
-            barsPanel.middleSeatBars[idx].size = size
+    fun setMiddleSeatBarBinding(middleSeatBarBinding: Binding<List<Bar>>) {
+        this.middleSeatBarBinding.unbind()
+        this.middleSeatBarBinding = middleSeatBarBinding
+        this.middleSeatBarBinding.bind { b ->
+            barsPanel.middleSeatBars = b
             barsPanel.repaint()
         }
     }
@@ -308,37 +212,19 @@ class HemicycleFrame : GraphicsFrame() {
     internal val leftChangeBarCount: Int
         get() = barsPanel.leftChangeBars.size
 
-    fun setLeftChangeBarCountBinding(leftChangeBarCountBinding: Binding<Int>) {
-        this.leftChangeBarCountBinding.unbind()
-        this.leftChangeBarCountBinding = leftChangeBarCountBinding
-        this.leftChangeBarCountBinding.bind { numBars ->
-            setSize(barsPanel.leftChangeBars, numBars) { Bar() }
-            barsPanel.repaint()
-        }
-    }
-
     internal fun getLeftChangeBarColor(idx: Int): Color {
         return barsPanel.leftChangeBars[idx].color
-    }
-
-    fun setLeftChangeBarColorBinding(leftChangeBarColorBinding: IndexedBinding<Color>) {
-        this.leftChangeBarColorBinding.unbind()
-        this.leftChangeBarColorBinding = leftChangeBarColorBinding
-        this.leftChangeBarColorBinding.bind { idx, color ->
-            barsPanel.leftChangeBars[idx].color = color
-            barsPanel.repaint()
-        }
     }
 
     internal fun getLeftChangeBarSize(idx: Int): Int {
         return barsPanel.leftChangeBars[idx].size
     }
 
-    fun setLeftChangeBarSizeBinding(leftChangeBarSizeBinding: IndexedBinding<Int>) {
-        this.leftChangeBarSizeBinding.unbind()
-        this.leftChangeBarSizeBinding = leftChangeBarSizeBinding
-        this.leftChangeBarSizeBinding.bind { idx, size ->
-            barsPanel.leftChangeBars[idx].size = size
+    fun setLeftChangeBarBinding(leftChangeBarBinding: Binding<List<Bar>>) {
+        this.leftChangeBarBinding.unbind()
+        this.leftChangeBarBinding = leftChangeBarBinding
+        this.leftChangeBarBinding.bind { b ->
+            barsPanel.leftChangeBars = b
             barsPanel.repaint()
         }
     }
@@ -372,37 +258,19 @@ class HemicycleFrame : GraphicsFrame() {
     internal val rightChangeBarCount: Int
         get() = barsPanel.rightChangeBars.size
 
-    fun setRightChangeBarCountBinding(rightChangeBarCountBinding: Binding<Int>) {
-        this.rightChangeBarCountBinding.unbind()
-        this.rightChangeBarCountBinding = rightChangeBarCountBinding
-        this.rightChangeBarCountBinding.bind { numBars ->
-            setSize(barsPanel.rightChangeBars, numBars) { Bar() }
-            barsPanel.repaint()
-        }
-    }
-
     internal fun getRightChangeBarColor(idx: Int): Color {
         return barsPanel.rightChangeBars[idx].color
-    }
-
-    fun setRightChangeBarColorBinding(rightChangeBarColorBinding: IndexedBinding<Color>) {
-        this.rightChangeBarColorBinding.unbind()
-        this.rightChangeBarColorBinding = rightChangeBarColorBinding
-        this.rightChangeBarColorBinding.bind { idx, color ->
-            barsPanel.rightChangeBars[idx].color = color
-            barsPanel.repaint()
-        }
     }
 
     internal fun getRightChangeBarSize(idx: Int): Int {
         return barsPanel.rightChangeBars[idx].size
     }
 
-    fun setRightChangeBarSizeBinding(rightChangeBarSizeBinding: IndexedBinding<Int>) {
-        this.rightChangeBarSizeBinding.unbind()
-        this.rightChangeBarSizeBinding = rightChangeBarSizeBinding
-        this.rightChangeBarSizeBinding.bind { idx, size ->
-            barsPanel.rightChangeBars[idx].size = size
+    fun setRightChangeBarBinding(rightChangeBarBinding: Binding<List<Bar>>) {
+        this.rightChangeBarBinding.unbind()
+        this.rightChangeBarBinding = rightChangeBarBinding
+        this.rightChangeBarBinding.bind { b ->
+            barsPanel.rightChangeBars = b
             barsPanel.repaint()
         }
     }
@@ -433,22 +301,19 @@ class HemicycleFrame : GraphicsFrame() {
         }
     }
 
-    private inner class Bar {
-        var color: Color = Color.WHITE
-        var size = 0
-    }
+    class Bar(val color: Color, val size: Int)
 
     private inner class BarPanel : JPanel() {
-        val leftSeatBars: MutableList<Bar> = ArrayList()
+        var leftSeatBars: List<Bar> = ArrayList()
         var leftSeatBarLabel = ""
-        val rightSeatBars: MutableList<Bar> = ArrayList()
+        var rightSeatBars: List<Bar> = ArrayList()
         var rightSeatBarLabel = ""
-        val middleSeatBars: MutableList<Bar> = ArrayList()
+        var middleSeatBars: List<Bar> = ArrayList()
         var middleSeatBarLabel = ""
-        val leftChangeBars: MutableList<Bar> = ArrayList()
+        var leftChangeBars: List<Bar> = ArrayList()
         var leftChangeBarLabel = ""
         var leftChangeBarStart = 0
-        val rightChangeBars: MutableList<Bar> = ArrayList()
+        var rightChangeBars: List<Bar> = ArrayList()
         var rightChangeBarLabel = ""
         var rightChangeBarStart = 0
 
@@ -686,14 +551,11 @@ class HemicycleFrame : GraphicsFrame() {
         }
     }
 
-    private inner class Dot {
-        var color: Color = Color.WHITE
-        var border: Color? = null
-    }
+    class Dot(val color: Color, val border: Color?)
 
     private inner class DotsPanel : JPanel() {
-        val rows: MutableList<Int> = ArrayList()
-        val dots: MutableList<Dot> = ArrayList()
+        var rows: List<Int> = ArrayList()
+        var dots: List<Dot> = ArrayList()
         override fun paintComponent(g: Graphics) {
             super.paintComponent(g)
             (g as Graphics2D)

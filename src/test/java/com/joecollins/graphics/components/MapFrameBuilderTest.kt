@@ -1,7 +1,7 @@
 package com.joecollins.graphics.components
 
-import com.joecollins.bindings.BindableList
 import com.joecollins.bindings.Binding.Companion.fixedBinding
+import com.joecollins.bindings.mapElements
 import com.joecollins.graphics.components.MapFrameBuilder.Companion.from
 import com.joecollins.graphics.utils.BindableWrapper
 import java.awt.Color
@@ -15,10 +15,11 @@ import org.junit.Test
 class MapFrameBuilderTest {
     @Test
     fun testBasicMapFrame() {
-        val shapes = BindableList<Pair<Shape, Color>>()
-        shapes.add(Pair(Ellipse2D.Double(2.0, 2.0, 1.0, 1.0), Color.RED))
-        shapes.add(Pair(Rectangle2D.Double(5.0, 5.0, 2.0, 2.0), Color.BLUE))
-        val frame = from(shapes).withHeader(fixedBinding("MAP")).build()
+        val shapes = BindableWrapper(listOf(
+        Pair(Ellipse2D.Double(2.0, 2.0, 1.0, 1.0), Color.RED),
+        Pair(Rectangle2D.Double(5.0, 5.0, 2.0, 2.0), Color.BLUE)
+        ))
+        val frame = from(shapes.binding).withHeader(fixedBinding("MAP")).build()
         Assert.assertEquals(2, frame.numShapes.toLong())
         Assert.assertEquals(Ellipse2D.Double::class.java, frame.getShape(0).javaClass)
         Assert.assertEquals(Color.RED, frame.getColor(0))
@@ -87,26 +88,28 @@ class MapFrameBuilderTest {
 
     @Test
     fun testFocusBox() {
-        val shapes = BindableList<Pair<Shape, Color>>()
-        shapes.add(Pair(Ellipse2D.Double(2.0, 2.0, 1.0, 1.0), Color.RED))
-        shapes.add(Pair(Rectangle2D.Double(5.0, 5.0, 2.0, 2.0), Color.BLUE))
-        val binding = listOf(shapes[0].first)
-        val frame = from(shapes)
+        val shapes = BindableWrapper(listOf(
+        Pair(Ellipse2D.Double(2.0, 2.0, 1.0, 1.0), Color.RED),
+        Pair(Rectangle2D.Double(5.0, 5.0, 2.0, 2.0), Color.BLUE)
+        ))
+        val binding = shapes.binding.map { s -> listOf(s[0].first) }
+        val frame = from(shapes.binding)
                 .withHeader(fixedBinding("MAP"))
-                .withFocus(fixedBinding(binding))
+                .withFocus(binding)
                 .build()
         Assert.assertEquals(Rectangle2D.Double(2.0, 2.0, 1.0, 1.0), frame.focusBox)
     }
 
     @Test
     fun testMultiFocusBox() {
-        val shapes = BindableList<Pair<Shape, Color>>()
-        shapes.add(Pair(Ellipse2D.Double(2.0, 2.0, 1.0, 1.0), Color.RED))
-        shapes.add(Pair(Rectangle2D.Double(5.0, 5.0, 2.0, 2.0), Color.BLUE))
-        val binding = shapes.map { it.first }
-        val frame = from(shapes)
+        val shapes = BindableWrapper(listOf(
+        Pair(Ellipse2D.Double(2.0, 2.0, 1.0, 1.0), Color.RED),
+        Pair(Rectangle2D.Double(5.0, 5.0, 2.0, 2.0), Color.BLUE)
+        ))
+        val binding = shapes.binding.mapElements { it.first }
+        val frame = from(shapes.binding)
                 .withHeader(fixedBinding("MAP"))
-                .withFocus(fixedBinding(binding))
+                .withFocus(binding)
                 .build()
         Assert.assertEquals(Rectangle2D.Double(2.0, 2.0, 5.0, 5.0), frame.focusBox)
     }

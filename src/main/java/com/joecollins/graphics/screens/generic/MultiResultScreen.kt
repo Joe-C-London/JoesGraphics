@@ -244,11 +244,11 @@ class MultiResultScreen private constructor(builder: Builder<*>, textHeader: Bin
         }
 
         fun setMapShapeBinding(shapes: List<Pair<Shape, Binding<Color>>>) {
-            mapFrame?.setNumShapesBinding(Binding.fixedBinding(shapes.size))
-            mapFrame?.setShapeBinding(
-                    IndexedBinding.listBinding(
-                            shapes.map { it.first }))
-            mapFrame?.setColorBinding(IndexedBinding.listBinding(shapes) { it.second })
+            mapFrame?.setShapesBinding(
+                Binding.listBinding(
+                    shapes.map { it.second.map { c -> Pair(it.first, c) } }
+                )
+            )
         }
 
         fun setMapFocusBinding(shapes: List<Shape>) {

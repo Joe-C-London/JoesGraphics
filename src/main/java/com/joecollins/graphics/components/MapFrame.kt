@@ -1,7 +1,6 @@
 package com.joecollins.graphics.components
 
 import com.joecollins.bindings.Binding
-import com.joecollins.bindings.IndexedBinding
 import java.awt.BasicStroke
 import java.awt.BorderLayout
 import java.awt.Color
@@ -27,17 +26,15 @@ import kotlin.math.min
 import kotlin.math.sqrt
 
 class MapFrame : GraphicsFrame() {
-    private var numShapesBinding: Binding<Int> = Binding.fixedBinding(0)
-    private var shapeBinding = IndexedBinding.emptyBinding<Shape>()
-    private var colorBinding = IndexedBinding.emptyBinding<Color>()
+    private var shapesBinding: Binding<List<Pair<Shape, Color>>> = Binding.fixedBinding(emptyList())
 
     private var focusBinding: Binding<Rectangle2D?> = Binding.fixedBinding(null)
-    private var numOutlineShapesBinding: Binding<Int> = Binding.fixedBinding(0)
-    private var outlineShapesBinding = IndexedBinding.emptyBinding<Shape>()
 
-    private val shapesToDraw: MutableList<Pair<Shape, Color>> = ArrayList()
+    private var outlineShapesBinding: Binding<List<Shape>> = Binding.fixedBinding(emptyList())
+
+    private var shapesToDraw: List<Pair<Shape, Color>> = ArrayList()
     private var focus: Rectangle2D? = null
-    private val outlineShapes: MutableList<Shape> = ArrayList()
+    private var outlineShapes: List<Shape> = ArrayList()
     private val transformedShapesCache: MutableMap<Shape, Shape> = WeakHashMap()
     private val distanceThreshold = 0.5
 
@@ -89,42 +86,19 @@ class MapFrame : GraphicsFrame() {
     internal val numShapes: Int
         get() = shapesToDraw.size
 
-    fun setNumShapesBinding(numShapesBinding: Binding<Int>) {
-        this.numShapesBinding.unbind()
-        this.numShapesBinding = numShapesBinding
-        this.numShapesBinding.bind { size ->
-            while (size > shapesToDraw.size) {
-                shapesToDraw.add(Pair(Area(), Color.BLACK))
-            }
-            while (size < shapesToDraw.size) {
-                shapesToDraw.removeAt(size)
-            }
-            repaint()
-        }
-    }
-
     internal fun getShape(idx: Int): Shape {
         return shapesToDraw[idx].first
-    }
-
-    fun setShapeBinding(shapeBinding: IndexedBinding<Shape>) {
-        this.shapeBinding.unbind()
-        this.shapeBinding = shapeBinding
-        this.shapeBinding.bind { idx, shape ->
-            shapesToDraw[idx] = shapesToDraw[idx].copy(first = shape)
-            repaint()
-        }
     }
 
     internal fun getColor(idx: Int): Color {
         return shapesToDraw[idx].second
     }
 
-    fun setColorBinding(colorBinding: IndexedBinding<Color>) {
-        this.colorBinding.unbind()
-        this.colorBinding = colorBinding
-        this.colorBinding.bind { idx, color ->
-            shapesToDraw[idx] = shapesToDraw[idx].copy(second = color)
+    fun setShapesBinding(shapesBinding: Binding<List<Pair<Shape, Color>>>) {
+        this.shapesBinding.unbind()
+        this.shapesBinding = shapesBinding
+        this.shapesBinding.bind { s ->
+            shapesToDraw = s
             repaint()
         }
     }
@@ -158,29 +132,15 @@ class MapFrame : GraphicsFrame() {
     internal val numOutlineShapes: Int
         get() = outlineShapes.size
 
-    fun setNumOutlineShapesBinding(numOutlineShapesBinding: Binding<Int>) {
-        this.numOutlineShapesBinding.unbind()
-        this.numOutlineShapesBinding = numOutlineShapesBinding
-        this.numOutlineShapesBinding.bind { size ->
-            while (size > outlineShapes.size) {
-                outlineShapes.add(Area())
-            }
-            while (size < outlineShapes.size) {
-                outlineShapes.removeAt(size)
-            }
-            repaint()
-        }
-    }
-
     internal fun getOutlineShape(idx: Int): Shape {
         return outlineShapes[idx]
     }
 
-    fun setOutlineShapesBinding(outlineShapesBinding: IndexedBinding<Shape>) {
+    fun setOutlineShapesBinding(outlineShapesBinding: Binding<List<Shape>>) {
         this.outlineShapesBinding.unbind()
         this.outlineShapesBinding = outlineShapesBinding
-        this.outlineShapesBinding.bind { idx, outline ->
-            outlineShapes[idx] = outline
+        this.outlineShapesBinding.bind { s ->
+            outlineShapes = s
             repaint()
         }
     }

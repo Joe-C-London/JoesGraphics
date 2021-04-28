@@ -1,10 +1,9 @@
 package com.joecollins.graphics.components
 
 import com.google.common.annotations.Beta
-import com.joecollins.bindings.BindableList
 import com.joecollins.bindings.Binding
 import com.joecollins.bindings.BindingReceiver
-import com.joecollins.bindings.IndexedBinding
+import com.joecollins.bindings.mapElements
 import com.joecollins.graphics.utils.ColorUtils
 import com.joecollins.models.general.Party
 import java.awt.Color
@@ -26,69 +25,59 @@ class HemicycleFrameBuilder {
     }
 
     fun <T> withLeftSeatBars(
-        bars: BindableList<T>,
+        bars: Binding<List<T>>,
         colorFunc: (T) -> Color,
         seatFunc: (T) -> Int,
         labelBinding: Binding<String>
     ): HemicycleFrameBuilder {
-        frame.setLeftSeatBarCountBinding(Binding.sizeBinding(bars))
-        frame.setLeftSeatBarColorBinding(IndexedBinding.propertyBinding(bars, colorFunc))
-        frame.setLeftSeatBarSizeBinding(IndexedBinding.propertyBinding(bars, seatFunc))
+        frame.setLeftSeatBarBinding(bars.mapElements { HemicycleFrame.Bar(color = colorFunc(it), size = seatFunc(it)) })
         frame.setLeftSeatBarLabelBinding(labelBinding)
         return this
     }
 
     fun <T> withRightSeatBars(
-        bars: BindableList<T>,
+        bars: Binding<List<T>>,
         colorFunc: (T) -> Color,
         seatFunc: (T) -> Int,
         labelBinding: Binding<String>
     ): HemicycleFrameBuilder {
-        frame.setRightSeatBarCountBinding(Binding.sizeBinding(bars))
-        frame.setRightSeatBarColorBinding(IndexedBinding.propertyBinding(bars, colorFunc))
-        frame.setRightSeatBarSizeBinding(IndexedBinding.propertyBinding(bars, seatFunc))
+        frame.setRightSeatBarBinding(bars.mapElements { HemicycleFrame.Bar(color = colorFunc(it), size = seatFunc(it)) })
         frame.setRightSeatBarLabelBinding(labelBinding)
         return this
     }
 
     fun <T> withMiddleSeatBars(
-        bars: BindableList<T>,
+        bars: Binding<List<T>>,
         colorFunc: (T) -> Color,
         seatFunc: (T) -> Int,
         labelBinding: Binding<String>
     ): HemicycleFrameBuilder {
-        frame.setMiddleSeatBarCountBinding(Binding.sizeBinding(bars))
-        frame.setMiddleSeatBarColorBinding(IndexedBinding.propertyBinding(bars, colorFunc))
-        frame.setMiddleSeatBarSizeBinding(IndexedBinding.propertyBinding(bars, seatFunc))
+        frame.setMiddleSeatBarBinding(bars.mapElements { HemicycleFrame.Bar(color = colorFunc(it), size = seatFunc(it)) })
         frame.setMiddleSeatBarLabelBinding(labelBinding)
         return this
     }
 
     fun <T> withLeftChangeBars(
-        bars: BindableList<T>,
+        bars: Binding<List<T>>,
         colorFunc: (T) -> Color,
         seatFunc: (T) -> Int,
         startBinding: Binding<Int>,
         labelBinding: Binding<String>
     ): HemicycleFrameBuilder {
-        frame.setLeftChangeBarCountBinding(Binding.sizeBinding(bars))
-        frame.setLeftChangeBarColorBinding(IndexedBinding.propertyBinding(bars, colorFunc))
-        frame.setLeftChangeBarSizeBinding(IndexedBinding.propertyBinding(bars, seatFunc))
+        frame.setLeftChangeBarBinding(bars.mapElements { HemicycleFrame.Bar(color = colorFunc(it), size = seatFunc(it)) })
         frame.setLeftChangeBarStartBinding(startBinding)
         frame.setLeftChangeBarLabelBinding(labelBinding)
         return this
     }
 
     fun <T> withRightChangeBars(
-        bars: BindableList<T>,
+        bars: Binding<List<T>>,
         colorFunc: (T) -> Color,
         seatFunc: (T) -> Int,
         startBinding: Binding<Int>,
         labelBinding: Binding<String>
     ): HemicycleFrameBuilder {
-        frame.setRightChangeBarCountBinding(Binding.sizeBinding(bars))
-        frame.setRightChangeBarColorBinding(IndexedBinding.propertyBinding(bars, colorFunc))
-        frame.setRightChangeBarSizeBinding(IndexedBinding.propertyBinding(bars, seatFunc))
+        frame.setRightChangeBarBinding(bars.mapElements { HemicycleFrame.Bar(color = colorFunc(it), size = seatFunc(it)) })
         frame.setRightChangeBarStartBinding(startBinding)
         frame.setRightChangeBarLabelBinding(labelBinding)
         return this
@@ -173,17 +162,20 @@ class HemicycleFrameBuilder {
                 }
             }
             val builder = HemicycleFrameBuilder()
-            builder.frame.setNumRowsBinding(Binding.fixedBinding(rows.size))
-            builder.frame.setRowCountsBinding(IndexedBinding.listBinding(rows))
+            builder.frame.setRowsBinding(Binding.fixedBinding(rows))
             val dots: List<T> = points
                     .sortedWith(
                             Comparator.comparingInt { it: Pair<Point, T?> -> it.first.x }
                                     .thenComparing { it -> it.first.y })
                     .map { it.second!! }
                     .toList()
-            builder.frame.setNumDotsBinding(Binding.fixedBinding(dots.size))
-            builder.frame.setDotColorBinding(IndexedBinding.listBinding(dots, colorFunc))
-            builder.frame.setDotBorderBinding(IndexedBinding.listBinding(dots, borderFunc))
+            builder.frame.setDotsBinding(Binding.listBinding(
+                dots.map {
+                    colorFunc(it).merge(borderFunc(it)) {
+                        color, border -> HemicycleFrame.Dot(color = color, border = border)
+                    }
+                }
+            ))
             return builder
         }
 
@@ -271,28 +263,44 @@ class HemicycleFrameBuilder {
                                 results[it]!!.getBinding { result: Result? -> Triple(result, prev[it]!!, seatsFunc(it)) })
                     }
                     .toList()
-            val leftList = BindableList<Pair<Color, Int>>()
-            val leftSeats = createSeatBarBinding(resultBindings, leftList, { it == leftParty }, leftParty.color)
-            val rightList = BindableList<Pair<Color, Int>>()
-            val rightSeats = createSeatBarBinding(resultBindings, rightList, { it == rightParty }, rightParty.color)
-            val middleList = BindableList<Pair<Color, Int>>()
+            val leftSeats = createSeatBarBinding(resultBindings) { it == leftParty }
+            val leftList = leftSeats.getBinding { listOf(
+                Pair(leftParty.color, it.first),
+                Pair(ColorUtils.lighten(leftParty.color), it.second - it.first)) }
+            val rightSeats = createSeatBarBinding(resultBindings) { it == rightParty }
+            val rightList = rightSeats.getBinding { listOf(
+                Pair(rightParty.color, it.first),
+                Pair(ColorUtils.lighten(rightParty.color), it.second - it.first)) }
             val middleSeats = createSeatBarBinding(
-                    resultBindings,
-                    middleList,
-                    { party: Party? -> party != null && party != leftParty && party != rightParty },
-                    Party.OTHERS.color)
-            val leftChangeList = BindableList<Pair<Color, Int>>()
+                    resultBindings
+            ) { party: Party? -> party != null && party != leftParty && party != rightParty }
+            val middleList = middleSeats.getBinding { listOf(
+                Pair(Party.OTHERS.color, it.first),
+                Pair(ColorUtils.lighten(Party.OTHERS.color), it.second - it.first)) }
             val leftChange = createChangeBarBinding(
-                    resultWithPrevBindings,
-                    leftChangeList, { it == leftParty },
-                    leftParty.color,
-                    showChange)
-            val rightChangeList = BindableList<Pair<Color, Int>>()
+                    resultWithPrevBindings
+            ) { it == leftParty }
+            val leftChangeList = leftChange.getBinding {
+                if (showChange(it.first, it.second)) {
+                        listOf(
+                            Pair(leftParty.color, it.first),
+                            Pair(ColorUtils.lighten(leftParty.color), it.second - it.first))
+                } else {
+                    emptyList()
+                }
+            }
             val rightChange = createChangeBarBinding(
-                    resultWithPrevBindings,
-                    rightChangeList, { it == rightParty },
-                    rightParty.color,
-                    showChange)
+                    resultWithPrevBindings
+            ) { it == rightParty }
+            val rightChangeList = rightChange.getBinding {
+                if (showChange(it.first, it.second)) {
+                    listOf(
+                        Pair(rightParty.color, it.first),
+                        Pair(ColorUtils.lighten(rightParty.color), it.second - it.first))
+                } else {
+                    emptyList()
+                }
+            }
             val changeLabelFunc = { p: Pair<Int, Int> -> if (showChange(p.first, p.second)) changeLabel(p.first, p.second) else "" }
             val allPrevs: List<Pair<Party, Int>> = entries
                     .map { Pair(prev[it]!!, seatsFunc(it)) }
@@ -339,93 +347,68 @@ class HemicycleFrameBuilder {
 
         private fun createSeatBarBinding(
             results: List<BindingReceiver<Pair<Result?, Int>>>,
-            list: BindableList<Pair<Color, Int>>,
-            partyFilter: (Party?) -> Boolean,
-            color: Color
+            partyFilter: (Party?) -> Boolean
         ): BindingReceiver<Pair<Int, Int>> {
             val binding = Binding.mapReduceBinding(
-                    results.map { it.getBinding() }.toList(),
-                    Pair(0, 0),
-                    { p: Pair<Int, Int>, r: Pair<Result?, Int> ->
-                        val result = r.first
-                        if (result == null || !partyFilter(result.winner)) {
-                            p
-                        } else {
-                            Pair(p.first + if (result.hasWon) r.second else 0, p.second + r.second)
-                        }
-                    },
-                    { p: Pair<Int, Int>, r: Pair<Result?, Int> ->
-                        val result = r.first
-                        if (result == null || !partyFilter(result.winner)) {
-                            p
-                        } else {
-                            Pair(p.first - if (result.hasWon) r.second else 0, p.second - r.second)
-                        }
-                    })
-            val seats = BindingReceiver(binding)
-            seats.getBinding()
-                    .bind {
-                        list.setAll(
-                                listOf(
-                                        Pair(color, it.first),
-                                        Pair(ColorUtils.lighten(color), it.second - it.first)))
+                results.map { it.getBinding() }.toList(),
+                Pair(0, 0),
+                { p: Pair<Int, Int>, r: Pair<Result?, Int> ->
+                    val result = r.first
+                    if (result == null || !partyFilter(result.winner)) {
+                        p
+                    } else {
+                        Pair(p.first + if (result.hasWon) r.second else 0, p.second + r.second)
                     }
-            return seats
+                },
+                { p: Pair<Int, Int>, r: Pair<Result?, Int> ->
+                    val result = r.first
+                    if (result == null || !partyFilter(result.winner)) {
+                        p
+                    } else {
+                        Pair(p.first - if (result.hasWon) r.second else 0, p.second - r.second)
+                    }
+                })
+            return BindingReceiver(binding)
         }
 
         private fun createChangeBarBinding(
             resultWithPrev: List<BindingReceiver<Triple<Result?, Party, Int>>>,
-            list: BindableList<Pair<Color, Int>>,
-            partyFilter: (Party?) -> Boolean,
-            color: Color,
-            showChangeBars: (Int, Int) -> Boolean
+            partyFilter: (Party?) -> Boolean
         ): BindingReceiver<Pair<Int, Int>> {
             val binding = Binding.mapReduceBinding(
-                    resultWithPrev.map { it.getBinding() }.toList(),
-                    Pair(0, 0),
-                    { p: Pair<Int, Int>, r: Triple<Result?, Party, Int> ->
-                        var ret = p
-                        val result = r.first
-                        if (result?.winner == null) {
-                            ret
-                        } else {
-                            if (partyFilter(result.winner)) {
-                                ret = Pair(ret.first + if (result.hasWon) r.third else 0, ret.second + r.third)
-                            }
-                            if (partyFilter(r.second)) {
-                                ret = Pair(ret.first - if (result.hasWon) r.third else 0, ret.second - r.third)
-                            }
-                            ret
+                resultWithPrev.map { it.getBinding() }.toList(),
+                Pair(0, 0),
+                { p: Pair<Int, Int>, r: Triple<Result?, Party, Int> ->
+                    var ret = p
+                    val result = r.first
+                    if (result?.winner == null) {
+                        ret
+                    } else {
+                        if (partyFilter(result.winner)) {
+                            ret = Pair(ret.first + if (result.hasWon) r.third else 0, ret.second + r.third)
                         }
-                    },
-                    { p: Pair<Int, Int>, r: Triple<Result?, Party, Int> ->
-                        var ret = p
-                        val result = r.first
-                        if (result?.winner == null) {
-                            ret
-                        } else {
-                            if (partyFilter(result.winner)) {
-                                ret = Pair(ret.first - if (result.hasWon) r.third else 0, ret.second - r.third)
-                            }
-                            if (partyFilter(r.second)) {
-                                ret = Pair(ret.first + if (result.hasWon) r.third else 0, ret.second + r.third)
-                            }
-                            ret
+                        if (partyFilter(r.second)) {
+                            ret = Pair(ret.first - if (result.hasWon) r.third else 0, ret.second - r.third)
                         }
-                    })
-            val seats = BindingReceiver(binding)
-            seats.getBinding()
-                    .bind {
-                        if (showChangeBars(it.first, it.second)) {
-                            list.setAll(
-                                    listOf(
-                                            Pair(color, it.first),
-                                            Pair(ColorUtils.lighten(color), it.second - it.first)))
-                        } else {
-                            list.clear()
-                        }
+                        ret
                     }
-            return seats
+                },
+                { p: Pair<Int, Int>, r: Triple<Result?, Party, Int> ->
+                    var ret = p
+                    val result = r.first
+                    if (result?.winner == null) {
+                        ret
+                    } else {
+                        if (partyFilter(result.winner)) {
+                            ret = Pair(ret.first - if (result.hasWon) r.third else 0, ret.second - r.third)
+                        }
+                        if (partyFilter(r.second)) {
+                            ret = Pair(ret.first + if (result.hasWon) r.third else 0, ret.second + r.third)
+                        }
+                        ret
+                    }
+                })
+            return BindingReceiver(binding)
         }
     }
 }

@@ -1,8 +1,7 @@
 package com.joecollins.graphics.components
 
-import com.joecollins.bindings.BindableList
 import com.joecollins.bindings.Binding
-import com.joecollins.bindings.IndexedBinding
+import com.joecollins.bindings.BindingReceiver
 import java.awt.Color
 import java.awt.Shape
 import java.awt.geom.Rectangle2D
@@ -37,21 +36,11 @@ class MapFrameBuilder {
     }
 
     companion object {
-        @JvmStatic fun from(shapes: BindableList<Pair<Shape, Color>>): MapFrameBuilder {
+        @JvmStatic fun from(shapes: Binding<List<Pair<Shape, Color>>>): MapFrameBuilder {
             val mapFrameBuilder = MapFrameBuilder()
             val mapFrame = mapFrameBuilder.mapFrame
-            mapFrame.setNumShapesBinding(Binding.sizeBinding(shapes))
-            mapFrame.setShapeBinding(IndexedBinding.propertyBinding(shapes) { it.first })
-            mapFrame.setColorBinding(IndexedBinding.propertyBinding(shapes) { it.second })
+            mapFrame.setShapesBinding(shapes)
             return mapFrameBuilder
-        }
-
-        @JvmStatic fun from(shapes: Binding<List<Pair<Shape, Color>>>): MapFrameBuilder {
-            val list = BindableList<Pair<Shape, Color>>()
-            shapes.bind { list.setAll(it) }
-            val ret = from(list)
-            ret.bindings.add(shapes)
-            return ret
         }
 
         @JvmStatic fun <T> from(
@@ -59,19 +48,11 @@ class MapFrameBuilder {
             shapeFunc: (T) -> Shape,
             colorFunc: (T) -> Binding<Color>
         ): MapFrameBuilder {
-            val list = BindableList<Pair<Shape, Color>>()
-            val bindings: MutableList<Binding<Color>> = ArrayList()
-            itemsBinding.bind { items ->
-                bindings.forEach { it.unbind() }
-                list.clear()
-                for (i in items.indices) {
-                    val item = items[i]
-                    val shape = shapeFunc(item)
-                    val colorBinding = colorFunc(item)
-                    list.add(Pair(shape, Color.BLACK))
-                    colorBinding.bind { color -> list[i] = Pair(shape, color) }
-                    bindings.add(colorBinding)
-                }
+            val itemsReceiver = BindingReceiver(itemsBinding)
+            val list = itemsReceiver.getFlatBinding { items ->
+                Binding.listBinding(
+                    items.map { colorFunc(it).map { c -> Pair(shapeFunc(it), c) } }
+                )
             }
             val ret = from(list)
             ret.bindings.add(itemsBinding)
