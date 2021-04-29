@@ -1,11 +1,9 @@
 package com.joecollins.graphics.screens.generic
 
 import com.joecollins.bindings.Bindable
-import com.joecollins.bindings.BindableList
 import com.joecollins.bindings.Binding
-import com.joecollins.bindings.Binding.Companion.sizeBinding
 import com.joecollins.bindings.BindingReceiver
-import com.joecollins.bindings.IndexedBinding
+import com.joecollins.bindings.mapElements
 import com.joecollins.graphics.components.ResultListingFrame
 import com.joecollins.graphics.utils.StandardFont.readBoldFont
 import com.joecollins.models.general.Party
@@ -50,18 +48,19 @@ class AllSeatsScreen private constructor(title: JLabel, frame: ResultListingFram
             prevResults.getBinding().bind { inputs.setPrevResults(it) }
             currResults.getBinding().bind { inputs.setCurrResults(it) }
             seatFilter.getBinding().bind { inputs.setSeatFilter(it) }
-            val entries = BindableList<Entry<T>>()
-            inputs.resultBinding.bind { entries.setAll(it) }
             val frame = ResultListingFrame()
             frame.setHeaderBinding(header.getBinding())
             frame.setNumRowsBinding(numRows.getBinding())
-            frame.setNumItemsBinding(sizeBinding(entries))
-            frame.setTextBinding(IndexedBinding.propertyBinding(entries) { nameFunc(it.key) })
-            frame.setBorderBinding(IndexedBinding.propertyBinding(entries) { it.prevColor })
-            frame.setBackgroundBinding(
-                    IndexedBinding.propertyBinding(entries) { e: Entry<T> -> if (e.fill) e.resultColor else Color.WHITE })
-            frame.setForegroundBinding(
-                    IndexedBinding.propertyBinding(entries) { e: Entry<T> -> if (!e.fill) e.resultColor else Color.WHITE })
+            frame.setItemsBinding(
+                inputs.resultBinding.mapElements {
+                    ResultListingFrame.Item(
+                        text = nameFunc(it.key),
+                        border = it.prevColor,
+                        background = if (it.fill) it.resultColor else Color.WHITE,
+                        foreground = if (!it.fill) it.resultColor else Color.WHITE
+                    )
+                }
+            )
             return AllSeatsScreen(headerLabel, frame)
         }
     }

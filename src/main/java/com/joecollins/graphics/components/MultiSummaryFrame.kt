@@ -1,7 +1,6 @@
 package com.joecollins.graphics.components
 
 import com.joecollins.bindings.Binding
-import com.joecollins.bindings.IndexedBinding
 import com.joecollins.graphics.utils.StandardFont
 import java.awt.BorderLayout
 import java.awt.Color
@@ -20,75 +19,18 @@ import javax.swing.border.MatteBorder
 import kotlin.math.max
 
 class MultiSummaryFrame : GraphicsFrame() {
+    private var rowsBinding: Binding<List<Row>> = Binding.fixedBinding(emptyList())
+
     private val centralPanel: JPanel
-    private var numRowsBinding: Binding<Int> = Binding.fixedBinding(0)
-    private var headerBinding = IndexedBinding.emptyBinding<String>()
-    private var valuesBinding = IndexedBinding.emptyBinding<List<Pair<Color, String>>>()
     private val entries: MutableList<EntryPanel> = ArrayList()
 
-    fun setNumRowsBinding(numRowsBinding: Binding<Int>) {
-        this.numRowsBinding.unbind()
-        this.numRowsBinding = numRowsBinding
-        this.numRowsBinding.bind { size ->
-            while (entries.size < size) {
-                val entryPanel = EntryPanel()
-                centralPanel.add(entryPanel)
-                entries.add(entryPanel)
-            }
-            while (entries.size > size) {
-                centralPanel.remove(entries.removeAt(size))
-            }
-            repaint()
-        }
-    }
+    class Row(val header: String, val values: List<Pair<Color, String>>)
 
     internal val numRows: Int
         get() = entries.size
 
-    fun setRowHeaderBinding(headerBinding: IndexedBinding<String>) {
-        this.headerBinding.unbind()
-        this.headerBinding = headerBinding
-        this.headerBinding.bind { idx, header ->
-            entries[idx].headerLabel.text = header
-            repaint()
-        }
-    }
-
     internal fun getRowHeader(index: Int): String {
         return entries[index].headerLabel.text
-    }
-
-    fun setValuesBinding(valuesBinding: IndexedBinding<List<Pair<Color, String>>>) {
-        this.valuesBinding.unbind()
-        this.valuesBinding = valuesBinding
-        this.valuesBinding.bind { idx, values ->
-            val entry = entries[idx]
-            while (entry.panels.size < values.size) {
-                val panel = JPanel()
-                val label = JLabel()
-                label.font = entry.headerLabel.font
-                label.border = entry.headerLabel.border
-                label.horizontalAlignment = JLabel.CENTER
-                panel.layout = GridLayout(1, 1)
-                panel.add(label)
-                entry.panels.add(panel)
-                entry.labels.add(label)
-                entry.add(panel)
-            }
-            while (entry.panels.size > values.size) {
-                entry.remove(entry.panels.removeAt(values.size))
-                entry.labels.removeAt(values.size)
-            }
-            for (i in values.indices) {
-                entry.panels[i].background = values[i].first
-                entry.labels[i].foreground = if (values[i].first == Color.WHITE) Color.BLACK else Color.WHITE
-                entry.labels[i].text = values[i].second
-            }
-            entries.forEach { e: EntryPanel ->
-                e.invalidate()
-                e.revalidate()
-            }
-        }
     }
 
     internal fun getNumValues(index: Int): Int {
@@ -101,6 +43,52 @@ class MultiSummaryFrame : GraphicsFrame() {
 
     internal fun getValue(row: Int, col: Int): String {
         return entries[row].labels[col].text
+    }
+
+    fun setRowsBinding(rowsBinding: Binding<List<Row>>) {
+        this.rowsBinding.unbind()
+        this.rowsBinding = rowsBinding
+        this.rowsBinding.bind { r ->
+            while (entries.size < r.size) {
+                val entryPanel = EntryPanel()
+                centralPanel.add(entryPanel)
+                entries.add(entryPanel)
+            }
+            while (entries.size > r.size) {
+                centralPanel.remove(entries.removeAt(r.size))
+            }
+            r.forEachIndexed { idx, row ->
+                entries[idx].headerLabel.text = row.header
+                val entry = entries[idx]
+                val values = row.values
+                while (entry.panels.size < values.size) {
+                    val panel = JPanel()
+                    val label = JLabel()
+                    label.font = entry.headerLabel.font
+                    label.border = entry.headerLabel.border
+                    label.horizontalAlignment = JLabel.CENTER
+                    panel.layout = GridLayout(1, 1)
+                    panel.add(label)
+                    entry.panels.add(panel)
+                    entry.labels.add(label)
+                    entry.add(panel)
+                }
+                while (entry.panels.size > values.size) {
+                    entry.remove(entry.panels.removeAt(values.size))
+                    entry.labels.removeAt(values.size)
+                }
+                for (i in values.indices) {
+                    entry.panels[i].background = values[i].first
+                    entry.labels[i].foreground = if (values[i].first == Color.WHITE) Color.BLACK else Color.WHITE
+                    entry.labels[i].text = values[i].second
+                }
+                entries.forEach { e: EntryPanel ->
+                    e.invalidate()
+                    e.revalidate()
+                }
+            }
+            repaint()
+        }
     }
 
     private inner class FrameLayout : LayoutManager {

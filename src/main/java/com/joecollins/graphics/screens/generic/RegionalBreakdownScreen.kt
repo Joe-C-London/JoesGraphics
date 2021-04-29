@@ -3,7 +3,6 @@ package com.joecollins.graphics.screens.generic
 import com.joecollins.bindings.Bindable
 import com.joecollins.bindings.Binding
 import com.joecollins.bindings.BindingReceiver
-import com.joecollins.bindings.IndexedBinding
 import com.joecollins.graphics.components.MultiSummaryFrame
 import com.joecollins.graphics.utils.StandardFont
 import com.joecollins.models.general.Party
@@ -154,9 +153,13 @@ class RegionalBreakdownScreen private constructor(titleLabel: JLabel, multiSumma
         private fun createFrame(): MultiSummaryFrame {
             val frame = MultiSummaryFrame()
             frame.setHeaderBinding(title.getBinding())
-            frame.setNumRowsBinding(Binding.fixedBinding(entries.size))
-            frame.setRowHeaderBinding(IndexedBinding.listBinding(entries) { obj: Entry -> obj.headerBinding })
-            frame.setValuesBinding(IndexedBinding.listBinding(entries) { obj: Entry -> obj.valueBinding })
+            frame.setRowsBinding(
+                Binding.listBinding(
+                    entries.map {
+                        it.headerBinding.merge(it.valueBinding) { h, v -> MultiSummaryFrame.Row(h, v) }
+                    }
+                )
+            )
             return frame
         }
     }

@@ -1,10 +1,9 @@
 package com.joecollins.graphics.screens.generic
 
 import com.joecollins.bindings.Bindable
-import com.joecollins.bindings.BindableList
 import com.joecollins.bindings.Binding
 import com.joecollins.bindings.BindingReceiver
-import com.joecollins.bindings.IndexedBinding
+import com.joecollins.bindings.mapElements
 import com.joecollins.graphics.components.MultiSummaryFrame
 import com.joecollins.graphics.utils.StandardFont.readBoldFont
 import com.joecollins.models.general.Aggregators.adjustKey
@@ -57,9 +56,8 @@ class TooCloseToCallScreen private constructor(titleLabel: JLabel, multiSummaryF
             onPropertyRefreshed(Property.NUM_CANDIDATES)
         }
 
-        fun toEntries(): BindableList<Entry<T>> {
-            val entries = BindableList<Entry<T>>()
-            Binding.propertyBinding(
+        fun toEntries(): Binding<List<Entry<T>>> {
+            return Binding.propertyBinding(
                     this,
                     { t: Input<T> ->
                         t.votes.entries.asSequence()
@@ -82,8 +80,6 @@ class TooCloseToCallScreen private constructor(titleLabel: JLabel, multiSummaryF
                     Property.PCT_REPORTING,
                     Property.MAX_ROWS,
                     Property.NUM_CANDIDATES)
-                    .bind { entries.setAll(it) }
-            return entries
         }
     }
 
@@ -153,30 +149,32 @@ class TooCloseToCallScreen private constructor(titleLabel: JLabel, multiSummaryF
             val pctFormatter = DecimalFormat("0.0%")
             val frame = MultiSummaryFrame()
             frame.setHeaderBinding(header.getBinding())
-            frame.setNumRowsBinding(Binding.sizeBinding(entries))
-            frame.setRowHeaderBinding(
-                    IndexedBinding.propertyBinding(entries) { rowHeaderFunc(it.key) })
-            frame.setValuesBinding(
-                    IndexedBinding.propertyBinding(entries) {
+            frame.setRowsBinding(
+                entries.mapElements {
+                    val header = rowHeaderFunc(it.key)
+                    val values = run {
                         val ret: MutableList<Pair<Color, String>> = sequenceOf(
-                                it.topCandidates.asSequence()
-                                        .map { v: Map.Entry<Candidate, Int> ->
-                                            Pair(
-                                                    v.key.party.color,
-                                                    v.key.party.abbreviation.toUpperCase() +
-                                                            ": " +
-                                                            thousandsFormatter.format(v.value))
-                                        },
-                                generateSequence { Pair(Color.WHITE, "") })
-                                .flatten()
-                                .take(it.numCandidates)
-                                .toMutableList()
+                            it.topCandidates.asSequence()
+                                .map { v: Map.Entry<Candidate, Int> ->
+                                    Pair(
+                                        v.key.party.color,
+                                        v.key.party.abbreviation.toUpperCase() +
+                                                ": " +
+                                                thousandsFormatter.format(v.value))
+                                },
+                            generateSequence { Pair(Color.WHITE, "") })
+                            .flatten()
+                            .take(it.numCandidates)
+                            .toMutableList()
                         ret.add(Pair(Color.WHITE, "LEAD: " + thousandsFormatter.format(it.lead.toLong())))
                         if (pctReporting != null) {
                             ret.add(Pair(Color.WHITE, pctFormatter.format(it.pctReporting) + " IN"))
                         }
                         ret
-                    })
+                    }
+                    MultiSummaryFrame.Row(header, values)
+                }
+            )
             return frame
         }
     }

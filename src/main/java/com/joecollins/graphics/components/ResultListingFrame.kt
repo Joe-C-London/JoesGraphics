@@ -1,7 +1,6 @@
 package com.joecollins.graphics.components
 
 import com.joecollins.bindings.Binding
-import com.joecollins.bindings.IndexedBinding
 import com.joecollins.graphics.utils.StandardFont
 import java.awt.BorderLayout
 import java.awt.Color
@@ -19,15 +18,13 @@ import kotlin.math.ceil
 class ResultListingFrame : GraphicsFrame() {
     private val centralPanel = JPanel()
     private val layout = Layout()
-    private val items: MutableList<Item> = ArrayList()
+    private val items: MutableList<ItemPanel> = ArrayList()
+
+    class Item(val text: String, val foreground: Color, val background: Color, val border: Color)
 
     private var numRowsBinding: Binding<Int> = Binding.fixedBinding(0)
     private var reversedBinding: Binding<Boolean> = Binding.fixedBinding(false)
-    private var numItemsBinding: Binding<Int> = Binding.fixedBinding(0)
-    private var textBinding = IndexedBinding.emptyBinding<String>()
-    private var foregroundBinding = IndexedBinding.emptyBinding<Color>()
-    private var backgroundBinding = IndexedBinding.emptyBinding<Color>()
-    private var borderBinding = IndexedBinding.emptyBinding<Color>()
+    private var itemsBinding: Binding<List<Item>> = Binding.fixedBinding(emptyList())
 
     init {
         centralPanel.background = Color.WHITE
@@ -59,63 +56,45 @@ class ResultListingFrame : GraphicsFrame() {
         return items.size
     }
 
-    fun setNumItemsBinding(numItemsBinding: Binding<Int>) {
-        this.numItemsBinding.unbind()
-        this.numItemsBinding = numItemsBinding
-        this.numItemsBinding.bind { numItems ->
-            while (numItems > items.size) {
-                val item = Item()
-                items.add(item)
-                centralPanel.add(item)
-            }
-            while (numItems < items.size) {
-                centralPanel.remove(items.removeAt(numItems))
-            }
-            repaint()
-        }
-    }
-
     internal fun getText(index: Int): String {
         return items[index].text
-    }
-
-    fun setTextBinding(textBinding: IndexedBinding<String>) {
-        this.textBinding.unbind()
-        this.textBinding = textBinding
-        this.textBinding.bind { idx, text -> items[idx].text = text }
     }
 
     internal fun getForeground(index: Int): Color {
         return items[index].foreground
     }
 
-    fun setForegroundBinding(foregroundBinding: IndexedBinding<Color>) {
-        this.foregroundBinding.unbind()
-        this.foregroundBinding = foregroundBinding
-        this.foregroundBinding.bind { idx, color -> items[idx].foreground = color }
-    }
-
     internal fun getBackground(index: Int): Color {
         return items[index].background
-    }
-
-    fun setBackgroundBinding(backgroundBinding: IndexedBinding<Color>) {
-        this.backgroundBinding.unbind()
-        this.backgroundBinding = backgroundBinding
-        this.backgroundBinding.bind { idx, color -> items[idx].background = color }
     }
 
     internal fun getBorder(index: Int): Color {
         return items[index].borderColor
     }
 
-    fun setBorderBinding(borderBinding: IndexedBinding<Color>) {
-        this.borderBinding.unbind()
-        this.borderBinding = borderBinding
-        this.borderBinding.bind { idx, color -> items[idx].borderColor = color }
+    fun setItemsBinding(itemsBinding: Binding<List<Item>>) {
+        this.itemsBinding.unbind()
+        this.itemsBinding = itemsBinding
+        this.itemsBinding.bind { i ->
+            while (i.size > items.size) {
+                val item = ItemPanel()
+                items.add(item)
+                centralPanel.add(item)
+            }
+            while (i.size < items.size) {
+                centralPanel.remove(items.removeAt(i.size))
+            }
+            i.forEachIndexed { idx, item ->
+                items[idx].text = item.text
+                items[idx].foreground = item.foreground
+                items[idx].background = item.background
+                items[idx].borderColor = item.border
+            }
+            repaint()
+        }
     }
 
-    private inner class Item : JPanel() {
+    private inner class ItemPanel : JPanel() {
         private var _text = ""
         private var _borderColor = Color.WHITE
 
@@ -194,7 +173,7 @@ class ResultListingFrame : GraphicsFrame() {
             val itemHeight = totalHeight / numRows
             val itemWidth = totalWidth / numCols
             for (i in items.indices) {
-                val item: Item = items[i]
+                val item: ItemPanel = items[i]
                 val row: Int = i % numRows
                 var col: Int = i / numRows
                 if (reversed) {

@@ -1,11 +1,7 @@
 package com.joecollins.graphics.components
 
-import com.joecollins.bindings.BindableList
 import com.joecollins.bindings.Binding
-import com.joecollins.bindings.IndexedBinding
 import java.awt.Color
-import java.lang.Runnable
-import java.util.ArrayList
 
 class MultiSummaryFrameBuilder {
 
@@ -30,55 +26,23 @@ class MultiSummaryFrameBuilder {
             limit: Int
         ): MultiSummaryFrameBuilder {
 
-            class Row {
-                var display = false
-                var sort = 0.0
-                var rowHeader: String = ""
-                var rowLabels: List<Pair<Color, String>> = ArrayList()
-            }
+            class Row(val display: Boolean, val sort: Number, val row: MultiSummaryFrame.Row)
 
-            val allRows: MutableList<Row> = ArrayList()
-            val displayedRows = BindableList<Row>()
-            var isReady = false
-            val update = Runnable {
-                if (isReady) displayedRows.setAll(
-                        allRows
-                                .filter { it.display }
-                                .sortedBy { it.sort }
-                                .take(limit)
-                                .toList())
-            }
-            for (item in items) {
-                val row = Row()
-                display(item)
-                        .bind {
-                            row.display = it
-                            update.run()
-                        }
-                sortFunc(item)
-                        .bind {
-                            row.sort = it.toDouble()
-                            update.run()
-                        }
-                rowHeaderFunc(item)
-                        .bind {
-                            row.rowHeader = it
-                            update.run()
-                        }
-                rowLabelsFunc(item)
-                        .bind {
-                            row.rowLabels = it
-                            update.run()
-                        }
-                allRows.add(row)
-            }
-            isReady = true
-            update.run()
+            val displayedRows: Binding<List<MultiSummaryFrame.Row>> =
+                Binding.listBinding(
+                    items.map {
+                        val meta = display(it).merge(sortFunc(it)) { d, s -> Pair(d, s) }
+                        val row = rowHeaderFunc(it).merge(rowLabelsFunc(it)) { h, v -> MultiSummaryFrame.Row(h, v) }
+                        meta.merge(row) { m, r -> Row(m.first, m.second, r) }
+                    }
+                ).map { rows ->
+                    rows.filter { it.display }
+                        .sortedBy { it.sort.toDouble() }
+                        .map { it.row }
+                        .take(limit)
+                }
             val builder = MultiSummaryFrameBuilder()
-            builder.frame.setNumRowsBinding(Binding.sizeBinding(displayedRows))
-            builder.frame.setRowHeaderBinding(
-                    IndexedBinding.propertyBinding(displayedRows) { it.rowHeader })
-            builder.frame.setValuesBinding(IndexedBinding.propertyBinding(displayedRows) { it.rowLabels })
+            builder.frame.setRowsBinding(displayedRows)
             return builder
         }
     }

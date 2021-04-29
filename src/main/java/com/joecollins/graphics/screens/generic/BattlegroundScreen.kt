@@ -1,10 +1,9 @@
 package com.joecollins.graphics.screens.generic
 
 import com.joecollins.bindings.Bindable
-import com.joecollins.bindings.BindableList
 import com.joecollins.bindings.Binding
 import com.joecollins.bindings.BindingReceiver
-import com.joecollins.bindings.IndexedBinding
+import com.joecollins.bindings.mapElements
 import com.joecollins.graphics.components.GraphicsFrame
 import com.joecollins.graphics.components.ResultListingFrame
 import com.joecollins.graphics.screens.generic.BattlegroundScreen.BattlegroundInput.Side
@@ -86,11 +85,14 @@ class BattlegroundScreen private constructor(
             defenseFrame.setHeaderAlignmentBinding(Binding.fixedBinding(GraphicsFrame.Alignment.RIGHT))
             defenseFrame.setReversedBinding(Binding.fixedBinding(true))
             defenseFrame.setNumRowsBinding(numRows.getBinding())
-            defenseFrame.setNumItemsBinding(Binding.sizeBinding(defenseItems))
-            defenseFrame.setTextBinding(IndexedBinding.propertyBinding(defenseItems) { e: Entry<T> -> nameFunc(e.key) })
-            defenseFrame.setBorderBinding(IndexedBinding.propertyBinding(defenseItems) { e: Entry<T> -> e.prevColor })
-            defenseFrame.setBackgroundBinding(IndexedBinding.propertyBinding(defenseItems) { e: Entry<T> -> (if (e.fill) e.resultColor else Color.WHITE) })
-            defenseFrame.setForegroundBinding(IndexedBinding.propertyBinding(defenseItems) { e: Entry<T> -> (if (!e.fill) e.resultColor else Color.WHITE) })
+            defenseFrame.setItemsBinding(defenseItems.mapElements {
+                ResultListingFrame.Item(
+                    text = nameFunc(it.key),
+                    border = it.prevColor,
+                    background = (if (it.fill) it.resultColor else Color.WHITE),
+                    foreground = (if (!it.fill) it.resultColor else Color.WHITE)
+                )
+            })
 
             val targetInput = BattlegroundInput<T>()
             prevResults.getBinding().bind { targetInput.setPrev(it) }
@@ -107,11 +109,14 @@ class BattlegroundScreen private constructor(
             targetFrame.setReversedBinding(Binding.fixedBinding(false))
             targetFrame.setNumRowsBinding(numRows.getBinding())
             targetFrame.setNumRowsBinding(numRows.getBinding())
-            targetFrame.setNumItemsBinding(Binding.sizeBinding(targetItems))
-            targetFrame.setTextBinding(IndexedBinding.propertyBinding(targetItems) { e: Entry<T> -> nameFunc(e.key) })
-            targetFrame.setBorderBinding(IndexedBinding.propertyBinding(targetItems) { e: Entry<T> -> e.prevColor })
-            targetFrame.setBackgroundBinding(IndexedBinding.propertyBinding(targetItems) { e: Entry<T> -> (if (e.fill) e.resultColor else Color.WHITE) })
-            targetFrame.setForegroundBinding(IndexedBinding.propertyBinding(targetItems) { e: Entry<T> -> (if (!e.fill) e.resultColor else Color.WHITE) })
+            targetFrame.setItemsBinding(targetItems.mapElements {
+                ResultListingFrame.Item(
+                    text = nameFunc(it.key),
+                    border = it.prevColor,
+                    background = (if (it.fill) it.resultColor else Color.WHITE),
+                    foreground = (if (!it.fill) it.resultColor else Color.WHITE)
+                )
+            })
 
             return BattlegroundScreen(
                     headerLabel,
@@ -178,10 +183,9 @@ class BattlegroundScreen private constructor(
             onPropertyRefreshed(Property.FILTERED_SEATS)
         }
 
-        val items: BindableList<Entry<T>>
+        val items: Binding<List<Entry<T>>>
             get() {
-                val ret = BindableList<Entry<T>>()
-                Binding.propertyBinding(
+                return Binding.propertyBinding(
                         this, { input -> getItemsList(input) },
                         Property.PREV,
                         Property.COUNT,
@@ -189,8 +193,6 @@ class BattlegroundScreen private constructor(
                         Property.PARTY,
                         Property.SIDE,
                         Property.FILTERED_SEATS)
-                        .bind { ret.setAll(it) }
-                return ret
             }
 
         companion object {
