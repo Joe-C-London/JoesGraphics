@@ -1,7 +1,7 @@
 package com.joecollins.graphics.components
 
+import com.joecollins.bindings.Binding
 import com.joecollins.bindings.Binding.Companion.fixedBinding
-import com.joecollins.bindings.IndexedBinding.Companion.listBinding
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import java.awt.Color
 import java.io.IOException
@@ -13,19 +13,20 @@ class RegionSummaryFrameTest {
     @Test
     fun testEntriesDifferentColors() {
         val frame = RegionSummaryFrame()
-        frame.setNumSectionsBinding(fixedBinding(2))
-        frame.setSectionHeaderBinding(listBinding(listOf("ELECTORAL VOTES", "POPULAR VOTE")))
-        frame.setSectionValueColorBinding(
-                listBinding(
-                        listOf(
-                                listOf(
-                                        Pair(Color.BLUE, "306"),
-                                        Pair(Color.BLUE, "<< 74"),
-                                        Pair(Color.RED, "232")),
-                                listOf(
-                                        Pair(Color.BLUE, "51.1%"),
-                                        Pair(Color.BLUE, "<< 1.0%"),
-                                        Pair(Color.RED, "47.2%")))))
+        frame.setSectionsBinding(
+            Binding.fixedBinding(
+                listOf(
+                    RegionSummaryFrame.Section("ELECTORAL VOTES", listOf(
+                        Pair(Color.BLUE, "306"),
+                        Pair(Color.BLUE, "<< 74"),
+                        Pair(Color.RED, "232"))),
+                    RegionSummaryFrame.Section("POPULAR VOTE", listOf(
+                        Pair(Color.BLUE, "51.1%"),
+                        Pair(Color.BLUE, "<< 1.0%"),
+                        Pair(Color.RED, "47.2%")))
+                )
+            )
+        )
         Assert.assertEquals(2, frame.getNumSections().toLong())
         Assert.assertEquals(Color.BLACK, frame.getSummaryColor())
         Assert.assertEquals("ELECTORAL VOTES", frame.getSectionHeader(0))
@@ -36,10 +37,15 @@ class RegionSummaryFrameTest {
     @Test
     fun testEntriesSameColor() {
         val frame = RegionSummaryFrame()
-        frame.setNumSectionsBinding(fixedBinding(2))
         frame.setSummaryColorBinding(fixedBinding(Color.BLUE))
-        frame.setSectionHeaderBinding(listBinding(listOf("ELECTORAL VOTES", "POPULAR VOTE")))
-        frame.setSectionValueBinding(listBinding(listOf(listOf("306", "+74"), listOf("51.1%", "+1.0%"))))
+        frame.setSectionsBindingWithoutColors(
+            Binding.fixedBinding(
+                listOf(
+                    RegionSummaryFrame.SectionWithoutColor("ELECTORAL VOTES", listOf("306", "+74")),
+                    RegionSummaryFrame.SectionWithoutColor("POPULAR VOTE", listOf("51.1%", "+1.0%"))
+                )
+            )
+        )
         Assert.assertEquals(2, frame.getNumSections().toLong())
         Assert.assertEquals(Color.BLUE, frame.getSummaryColor())
         Assert.assertEquals("ELECTORAL VOTES", frame.getSectionHeader(0))
@@ -52,19 +58,20 @@ class RegionSummaryFrameTest {
     fun testRenderDifferentColors() {
         val frame = RegionSummaryFrame()
         frame.setHeaderBinding(fixedBinding("UNITED STATES"))
-        frame.setNumSectionsBinding(fixedBinding(2))
-        frame.setSectionHeaderBinding(listBinding(listOf("ELECTORAL VOTES", "POPULAR VOTE")))
-        frame.setSectionValueColorBinding(
-                listBinding(
-                        listOf(
-                                listOf(
-                                        Pair(Color.BLUE, "306"),
-                                        Pair(Color.BLUE, "<< 74"),
-                                        Pair(Color.RED, "232")),
-                                listOf(
-                                        Pair(Color.BLUE, "51.1%"),
-                                        Pair(Color.BLUE, "<< 1.0%"),
-                                        Pair(Color.RED, "47.2%")))))
+        frame.setSectionsBinding(
+            Binding.fixedBinding(
+                listOf(
+                    RegionSummaryFrame.Section("ELECTORAL VOTES", listOf(
+                        Pair(Color.BLUE, "306"),
+                        Pair(Color.BLUE, "<< 74"),
+                        Pair(Color.RED, "232"))),
+                    RegionSummaryFrame.Section("POPULAR VOTE", listOf(
+                        Pair(Color.BLUE, "51.1%"),
+                        Pair(Color.BLUE, "<< 1.0%"),
+                        Pair(Color.RED, "47.2%")))
+                )
+            )
+        )
         frame.setSize(500, 500)
         compareRendering("RegionSummaryFrame", "DifferentColors", frame)
     }
@@ -74,11 +81,16 @@ class RegionSummaryFrameTest {
     fun testRenderSameColor() {
         val frame = RegionSummaryFrame()
         frame.setHeaderBinding(fixedBinding("USA"))
-        frame.setNumSectionsBinding(fixedBinding(2))
         frame.setBorderColorBinding(fixedBinding(Color.BLUE))
         frame.setSummaryColorBinding(fixedBinding(Color.BLUE))
-        frame.setSectionHeaderBinding(listBinding(listOf("ELECTORAL VOTES", "POPULAR VOTE")))
-        frame.setSectionValueBinding(listBinding(listOf(listOf("306", "+74"), listOf("51.1%", "+1.0%"))))
+        frame.setSectionsBindingWithoutColors(
+            Binding.fixedBinding(
+                listOf(
+                    RegionSummaryFrame.SectionWithoutColor("ELECTORAL VOTES", listOf("306", "+74")),
+                    RegionSummaryFrame.SectionWithoutColor("POPULAR VOTE", listOf("51.1%", "+1.0%"))
+                )
+            )
+        )
         frame.setSize(125, 125)
         compareRendering("RegionSummaryFrame", "SameColor", frame)
     }

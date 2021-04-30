@@ -1,7 +1,7 @@
 package com.joecollins.graphics.components
 
 import com.joecollins.bindings.Binding
-import com.joecollins.bindings.IndexedBinding
+import com.joecollins.bindings.mapElements
 import com.joecollins.graphics.utils.StandardFont
 import java.awt.BorderLayout
 import java.awt.Color
@@ -16,10 +16,11 @@ import javax.swing.JPanel
 class RegionSummaryFrame : GraphicsFrame() {
     private val centralPanel: JPanel = JPanel()
 
+    class Section(val header: String, val valueColor: List<Pair<Color, String>>)
+    class SectionWithoutColor(val header: String, val value: List<String>)
+
     private var summaryColorBinding = Binding.fixedBinding(Color.BLACK)
-    private var numSectionsBinding = Binding.fixedBinding(0)
-    private var sectionHeaderBinding = IndexedBinding.emptyBinding<String>()
-    private var sectionValueColorBinding = IndexedBinding.emptyBinding<List<Pair<Color, String>>>()
+    private var sectionsBinding: Binding<List<Section>> = Binding.fixedBinding(emptyList())
 
     private var summaryColor = Color.BLACK
     private val sections: MutableList<SectionPanel> = ArrayList()
@@ -32,21 +33,6 @@ class RegionSummaryFrame : GraphicsFrame() {
 
     internal fun getNumSections(): Int {
         return sections.size
-    }
-
-    fun setNumSectionsBinding(numSectionsBinding: Binding<Int>) {
-        this.numSectionsBinding.unbind()
-        this.numSectionsBinding = numSectionsBinding
-        this.numSectionsBinding.bind { numSections ->
-            while (sections.size < numSections) {
-                val newPanel = SectionPanel()
-                centralPanel.add(newPanel)
-                sections.add(newPanel)
-            }
-            while (sections.size > numSections) {
-                centralPanel.remove(sections.removeAt(numSections))
-            }
-        }
     }
 
     internal fun getSummaryColor(): Color {
@@ -75,12 +61,6 @@ class RegionSummaryFrame : GraphicsFrame() {
         return sections[idx].header
     }
 
-    fun setSectionHeaderBinding(sectionHeaderBinding: IndexedBinding<String>) {
-        this.sectionHeaderBinding.unbind()
-        this.sectionHeaderBinding = sectionHeaderBinding
-        this.sectionHeaderBinding.bind { idx, header -> sections[idx].header = header }
-    }
-
     internal fun getValueColor(sectionIdx: Int, valueIdx: Int): Color {
         return sections[sectionIdx].values[valueIdx].first
     }
@@ -89,21 +69,27 @@ class RegionSummaryFrame : GraphicsFrame() {
         return sections[sectionIdx].values[valueIdx].second
     }
 
-    fun setSectionValueColorBinding(
-        sectionValueColorBinding: IndexedBinding<List<Pair<Color, String>>>
-    ) {
-        this.sectionValueColorBinding.unbind()
-        this.sectionValueColorBinding = sectionValueColorBinding
-        this.sectionValueColorBinding.bind { idx, values -> sections[idx].values = values }
+    fun setSectionsBinding(sectionsBinding: Binding<List<Section>>) {
+        this.sectionsBinding.unbind()
+        this.sectionsBinding = sectionsBinding
+        this.sectionsBinding.bind { s ->
+            while (sections.size < s.size) {
+                val newPanel = SectionPanel()
+                centralPanel.add(newPanel)
+                sections.add(newPanel)
+            }
+            while (sections.size > s.size) {
+                centralPanel.remove(sections.removeAt(s.size))
+            }
+            s.forEachIndexed { idx, section ->
+                sections[idx].header = section.header
+                sections[idx].values = section.valueColor
+            }
+        }
     }
 
-    fun setSectionValueBinding(sectionValueBinding: IndexedBinding<List<String>>) {
-        setSectionValueColorBinding(
-            sectionValueBinding.map { values: List<String> ->
-                values
-                    .map { Pair(summaryColor, it) }
-                    .toList()
-            })
+    fun setSectionsBindingWithoutColors(sectionsBinding: Binding<List<SectionWithoutColor>>) {
+        setSectionsBinding(sectionsBinding.mapElements { s -> Section(s.header, s.value.map { Pair(summaryColor, it) }) })
     }
 
     private inner class SectionPanel : JPanel() {

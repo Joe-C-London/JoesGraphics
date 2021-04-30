@@ -1,10 +1,8 @@
 package com.joecollins.graphics.screens.generic
 
 import com.joecollins.bindings.Bindable
-import com.joecollins.bindings.BindableList
 import com.joecollins.bindings.Binding
 import com.joecollins.bindings.BindingReceiver
-import com.joecollins.bindings.IndexedBinding
 import com.joecollins.graphics.components.RegionSummaryFrame
 import com.joecollins.graphics.utils.StandardFont.readBoldFont
 import com.joecollins.models.general.Party
@@ -102,40 +100,42 @@ class PartySummaryScreen private constructor(
             votePctFunc(region).bind { input.votePct = it }
             votePctDiffFunc(region).bind { input.votePctDiff = it }
             party.getBinding().bind { input.party = it }
-            val values = BindableList<List<String>>()
-            values.setAll(listOf(listOf("", ""), listOf("", "")))
-            Binding.propertyBinding<SinglePartyInput, List<String>, SinglePartyInput.Property>(
-                    input,
-                    { i: SinglePartyInput ->
-                        val seats = i.seats[i.party] ?: 0
-                        val diff = i.seatDiff[i.party] ?: 0
-                        listOf(seats.toString(),
-                                if (diff == 0) "\u00b10" else DecimalFormat("+0;-0").format(diff))
-                    },
-                    SinglePartyInput.Property.SEATS,
-                    SinglePartyInput.Property.SEAT_DIFF,
-                    SinglePartyInput.Property.PARTY)
-                    .bind { values[0] = it }
-            Binding.propertyBinding<SinglePartyInput, List<String>, SinglePartyInput.Property>(
-                    input,
-                    { i: SinglePartyInput ->
-                        val vote = i.votePct[i.party] ?: 0.0
-                        val diff = i.votePctDiff[i.party] ?: 0.0
-                        listOf(
-                                DecimalFormat("0.0%").format(vote),
-                                if (diff == 0.0) "\u00b10.0%" else DecimalFormat("+0.0%;-0.0%").format(diff))
-                    },
-                    SinglePartyInput.Property.VOTE_PCT,
-                    SinglePartyInput.Property.VOTE_PCT_DIFF,
-                    SinglePartyInput.Property.PARTY)
-                    .bind { values[1] = it }
+            val seatBinding = Binding.propertyBinding<SinglePartyInput, List<String>, SinglePartyInput.Property>(
+                input,
+                { i: SinglePartyInput ->
+                    val seats = i.seats[i.party] ?: 0
+                    val diff = i.seatDiff[i.party] ?: 0
+                    listOf(
+                        seats.toString(),
+                        if (diff == 0) "\u00b10" else DecimalFormat("+0;-0").format(diff)
+                    )
+                },
+                SinglePartyInput.Property.SEATS,
+                SinglePartyInput.Property.SEAT_DIFF,
+                SinglePartyInput.Property.PARTY
+            )
+            val voteBinding = Binding.propertyBinding<SinglePartyInput, List<String>, SinglePartyInput.Property>(
+                input,
+                { i: SinglePartyInput ->
+                    val vote = i.votePct[i.party] ?: 0.0
+                    val diff = i.votePctDiff[i.party] ?: 0.0
+                    listOf(
+                        DecimalFormat("0.0%").format(vote),
+                        if (diff == 0.0) "\u00b10.0%" else DecimalFormat("+0.0%;-0.0%").format(diff)
+                    )
+                },
+                SinglePartyInput.Property.VOTE_PCT,
+                SinglePartyInput.Property.VOTE_PCT_DIFF,
+                SinglePartyInput.Property.PARTY
+            )
+            val values = seatBinding.merge(voteBinding) { s, v -> listOf(s, v) }
             val frame = RegionSummaryFrame()
             frame.setHeaderBinding(titleFunc(region))
             frame.setBorderColorBinding(party.getBinding(Party::color))
             frame.setSummaryColorBinding(party.getBinding(Party::color))
-            frame.setNumSectionsBinding(Binding.fixedBinding(2))
-            frame.setSectionHeaderBinding(IndexedBinding.listBinding("SEATS", "POPULAR VOTE"))
-            frame.setSectionValueBinding(IndexedBinding.propertyBinding(values) { it })
+            frame.setSectionsBindingWithoutColors(values.map { value ->
+                value.zip(listOf("SEATS", "POPULAR VOTE")) { v, h -> RegionSummaryFrame.SectionWithoutColor(h, v) }
+            })
             return frame
         }
     }
