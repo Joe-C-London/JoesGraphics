@@ -1,10 +1,9 @@
 package com.joecollins.graphics.components
 
 import com.joecollins.bindings.Bindable
-import com.joecollins.bindings.BindableList
 import com.joecollins.bindings.Binding
 import com.joecollins.bindings.BindingReceiver
-import com.joecollins.bindings.IndexedBinding
+import com.joecollins.bindings.mapElements
 import java.awt.Color
 import java.util.ArrayList
 import kotlin.math.abs
@@ -83,13 +82,13 @@ class SwingometerFrameBuilder {
         tickInterval: Binding<Number>,
         tickStringFunc: (Number) -> String
     ): SwingometerFrameBuilder {
-        val ticks = BindableList<Tick>()
         tickInterval.bind { properties.tickInterval = it }
-        Binding.propertyBinding(properties, { getTicks(it, tickStringFunc) }, Properties.Property.VALUE)
-                .bind { ticks.setAll(it) }
-        frame.setNumTicksBinding(Binding.sizeBinding(ticks))
-        frame.setTickPositionBinding(IndexedBinding.propertyBinding(ticks) { it.level })
-        frame.setTickTextBinding(IndexedBinding.propertyBinding(ticks) { it.text })
+        val ticks = Binding.propertyBinding(properties, { getTicks(it, tickStringFunc) }, Properties.Property.VALUE)
+        frame.setTicksBinding(
+            ticks.mapElements {
+                SwingometerFrame.Tick(it.level, it.text)
+            }
+        )
         return this
     }
 
@@ -117,20 +116,21 @@ class SwingometerFrameBuilder {
     }
 
     fun <T> withOuterLabels(
-        labels: BindableList<T>,
+        labels: Binding<List<T>>,
         positionFunc: (T) -> Number,
         labelFunc: (T) -> String,
         colorFunc: (T) -> Color
     ): SwingometerFrameBuilder {
-        frame.setNumOuterLabelsBinding(Binding.sizeBinding(labels))
-        frame.setOuterLabelPositionBinding(IndexedBinding.propertyBinding(labels, positionFunc))
-        frame.setOuterLabelTextBinding(IndexedBinding.propertyBinding(labels, labelFunc))
-        frame.setOuterLabelColorBinding(IndexedBinding.propertyBinding(labels, colorFunc))
+        frame.setOuterLabelsBinding(
+            labels.mapElements {
+                SwingometerFrame.OuterLabel(positionFunc(it), labelFunc(it), colorFunc(it))
+            }
+        )
         return this
     }
 
     fun <T> withDots(
-        dots: BindableList<T>,
+        dots: Binding<List<T>>,
         positionFunc: (T) -> Number,
         colorFunc: (T) -> Color
     ): SwingometerFrameBuilder {
@@ -138,7 +138,7 @@ class SwingometerFrameBuilder {
     }
 
     fun <T> withDots(
-        dots: BindableList<T>,
+        dots: Binding<List<T>>,
         positionFunc: (T) -> Number,
         colorFunc: (T) -> Color,
         labelFunc: (T) -> String
@@ -147,7 +147,7 @@ class SwingometerFrameBuilder {
     }
 
     fun <T> withDotsSolid(
-        dots: BindableList<T>,
+        dots: Binding<List<T>>,
         positionFunc: (T) -> Number,
         colorFunc: (T) -> Color,
         solidFunc: (T) -> Boolean
@@ -156,17 +156,15 @@ class SwingometerFrameBuilder {
     }
 
     fun <T> withDots(
-        dots: BindableList<T>,
+        dots: Binding<List<T>>,
         positionFunc: (T) -> Number,
         colorFunc: (T) -> Color,
         labelFunc: (T) -> String,
         solidFunc: (T) -> Boolean
     ): SwingometerFrameBuilder {
-        frame.setNumDotsBinding(Binding.sizeBinding(dots))
-        frame.setDotsPositionBinding(IndexedBinding.propertyBinding(dots, positionFunc))
-        frame.setDotsColorBinding(IndexedBinding.propertyBinding(dots, colorFunc))
-        frame.setDotsLabelBinding(IndexedBinding.propertyBinding(dots, labelFunc))
-        frame.setDotsSolidBinding(IndexedBinding.propertyBinding(dots, solidFunc))
+        frame.setDotsBinding(
+            dots.mapElements { SwingometerFrame.Dot(positionFunc(it), colorFunc(it), labelFunc(it), solidFunc(it)) }
+        )
         return this
     }
 
@@ -203,12 +201,13 @@ class SwingometerFrameBuilder {
         labelFunc: (T) -> String,
         solidFunc: (T) -> Boolean
     ): SwingometerFrameBuilder {
-        frame.setNumDotsBinding(Binding.fixedBinding(dots.size))
-        frame.setDotsPositionBinding(
-                IndexedBinding.listBinding(dots) { Binding.fixedBinding(positionFunc(it)) })
-        frame.setDotsColorBinding(IndexedBinding.listBinding(dots, colorFunc))
-        frame.setDotsLabelBinding(IndexedBinding.listBinding(dots) { Binding.fixedBinding(labelFunc(it)) })
-        frame.setDotsSolidBinding(IndexedBinding.listBinding(dots) { Binding.fixedBinding(solidFunc(it)) })
+        frame.setDotsBinding(
+            Binding.listBinding(
+                dots.map {
+                    colorFunc(it).map { c -> SwingometerFrame.Dot(positionFunc(it), c, labelFunc(it), solidFunc(it)) }
+                }
+            )
+        )
         return this
     }
 

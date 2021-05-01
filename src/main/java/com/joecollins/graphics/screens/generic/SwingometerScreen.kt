@@ -1,7 +1,6 @@
 package com.joecollins.graphics.screens.generic
 
 import com.joecollins.bindings.Bindable
-import com.joecollins.bindings.BindableList
 import com.joecollins.bindings.Binding
 import com.joecollins.bindings.BindingReceiver
 import com.joecollins.graphics.components.SwingometerFrame
@@ -160,9 +159,8 @@ class SwingometerScreen private constructor(title: JLabel, frame: SwingometerFra
                     .build()
         }
 
-        private val outerLabels: BindableList<Triple<Double, Color, String>>
+        private val outerLabels: Binding<List<Triple<Double, Color, String>>>
             get() {
-                val labels = BindableList<Triple<Double, Color, String>>()
                 val binding: Binding<List<Triple<Double, Color, String>>> = Binding.propertyBinding(
                         inputs,
                         { inputs: Inputs<T> ->
@@ -193,8 +191,7 @@ class SwingometerScreen private constructor(title: JLabel, frame: SwingometerFra
                         Inputs.Property.PREV,
                         Inputs.Property.PARTIES,
                         Inputs.Property.LABEL_INCREMENT)
-                binding.bind { labels.setAll(it) }
-                return labels
+                return binding
             }
 
         private fun addIncrementLabels(
@@ -340,7 +337,7 @@ class SwingometerScreen private constructor(title: JLabel, frame: SwingometerFra
                     .toList()
         }
 
-        private fun createDotsForSwingometer(): BindableList<Triple<Double, Color, Boolean>> {
+        private fun createDotsForSwingometer(): Binding<List<Triple<Double, Color, Boolean>>> {
             val emptyResult = PartyResult(null, false)
             val dotsBinding: Binding<List<Triple<Double, Color, Boolean>>> = Binding.propertyBinding(
                     inputs,
@@ -364,7 +361,7 @@ class SwingometerScreen private constructor(title: JLabel, frame: SwingometerFra
                                     val right = e.first[inputs.parties.second] ?: 0
                                     Triple(
                                             0.5 * (left - right) / total,
-                                            (e.second ?: PartyResult.NO_RESULT).color,
+                                            e.second.color,
                                             e.third)
                                 }
                                 .toList()
@@ -373,9 +370,7 @@ class SwingometerScreen private constructor(title: JLabel, frame: SwingometerFra
                     Inputs.Property.RESULTS,
                     Inputs.Property.PARTIES,
                     Inputs.Property.FILTERED_SEATS)
-            val dotsList = BindableList<Triple<Double, Color, Boolean>>()
-            dotsBinding.bind { dotsList.setAll(it) }
-            return dotsList
+            return dotsBinding
         }
 
         init {

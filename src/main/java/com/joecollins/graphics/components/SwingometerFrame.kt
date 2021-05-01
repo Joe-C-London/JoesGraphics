@@ -1,7 +1,6 @@
 package com.joecollins.graphics.components
 
 import com.joecollins.bindings.Binding
-import com.joecollins.bindings.IndexedBinding
 import com.joecollins.graphics.utils.StandardFont
 import java.awt.BasicStroke
 import java.awt.BorderLayout
@@ -29,22 +28,15 @@ class SwingometerFrame : GraphicsFrame() {
     private var leftToWinBinding: Binding<Number> = Binding.fixedBinding(Double.POSITIVE_INFINITY)
     private var rightToWinBinding: Binding<Number> = Binding.fixedBinding(Double.POSITIVE_INFINITY)
 
-    private var numTicksBinding: Binding<Int> = Binding.fixedBinding(0)
-    private var tickPositionBinding: IndexedBinding<Number> = IndexedBinding.emptyBinding()
-    private var tickTextBinding = IndexedBinding.emptyBinding<String>()
+    class Tick(val position: Number, val text: String)
+    private var ticksBinding: Binding<List<Tick>> = Binding.fixedBinding(emptyList())
 
-    private var numOuterLabelsBinding: Binding<Int> = Binding.fixedBinding(0)
-    private var outerLabelPositionBinding: IndexedBinding<Number> = IndexedBinding.emptyBinding()
-    private var outerLabelTextBinding = IndexedBinding.emptyBinding<String>()
-    private var outerLabelColorBinding = IndexedBinding.emptyBinding<Color>()
+    class OuterLabel(val position: Number, val text: String, val color: Color)
+    private var outerLabelsBinding: Binding<List<OuterLabel>> = Binding.fixedBinding(emptyList())
 
     private var numBucketsPerSideBinding: Binding<Int> = Binding.fixedBinding(1)
 
-    private var numDotsBinding: Binding<Int> = Binding.fixedBinding(0)
-    private var dotsPositionBinding: IndexedBinding<Number> = IndexedBinding.emptyBinding()
-    private var dotsColorBinding = IndexedBinding.emptyBinding<Color>()
-    private var dotsLabelBinding = IndexedBinding.emptyBinding<String>()
-    private var dotsSolidBinding = IndexedBinding.singletonBinding(true)
+    private var dotsBinding: Binding<List<Dot>> = Binding.fixedBinding(emptyList())
 
     private val swingPanel: SwingPanel = SwingPanel()
 
@@ -87,30 +79,20 @@ class SwingometerFrame : GraphicsFrame() {
     internal val numTicks: Int
         get() = swingPanel.ticks.size
 
-    fun setNumTicksBinding(numTicksBinding: Binding<Int>) {
-        this.numTicksBinding.unbind()
-        this.numTicksBinding = numTicksBinding
-        this.numTicksBinding.bind { numTicks -> swingPanel.setNumTicks(numTicks) }
-    }
-
     internal fun getTickPosition(index: Int): Number {
-        return swingPanel.ticks[index].first
-    }
-
-    fun setTickPositionBinding(tickPositionBinding: IndexedBinding<Number>) {
-        this.tickPositionBinding.unbind()
-        this.tickPositionBinding = tickPositionBinding
-        this.tickPositionBinding.bind { index, position -> swingPanel.setTickPosition(index, position) }
+        return swingPanel.ticks[index].position
     }
 
     internal fun getTickText(index: Int): String {
-        return swingPanel.ticks[index].second
+        return swingPanel.ticks[index].text
     }
 
-    fun setTickTextBinding(tickTextBinding: IndexedBinding<String>) {
-        this.tickTextBinding.unbind()
-        this.tickTextBinding = tickTextBinding
-        this.tickTextBinding.bind { index, text -> swingPanel.setTickText(index, text) }
+    fun setTicksBinding(ticksBinding: Binding<List<Tick>>) {
+        this.ticksBinding.unbind()
+        this.ticksBinding = ticksBinding
+        this.ticksBinding.bind { t ->
+            swingPanel.ticks = t
+        }
     }
 
     internal val leftToWin: Number
@@ -134,42 +116,22 @@ class SwingometerFrame : GraphicsFrame() {
     internal val numOuterLabels: Int
         get() = swingPanel.outerLabels.size
 
-    fun setNumOuterLabelsBinding(numOuterLabelsBinding: Binding<Int>) {
-        this.numOuterLabelsBinding.unbind()
-        this.numOuterLabelsBinding = numOuterLabelsBinding
-        this.numOuterLabelsBinding.bind { numOuterLabels -> swingPanel.setNumOuterLabels(numOuterLabels) }
-    }
-
     internal fun getOuterLabelPosition(index: Int): Number {
-        return swingPanel.outerLabels[index].first
-    }
-
-    fun setOuterLabelPositionBinding(
-        outerLabelPositionBinding: IndexedBinding<Number>
-    ) {
-        this.outerLabelPositionBinding.unbind()
-        this.outerLabelPositionBinding = outerLabelPositionBinding
-        this.outerLabelPositionBinding.bind { index, position -> swingPanel.setOuterLabelPosition(index, position) }
+        return swingPanel.outerLabels[index].position
     }
 
     internal fun getOuterLabelText(index: Int): String {
-        return swingPanel.outerLabels[index].second
-    }
-
-    fun setOuterLabelTextBinding(outerLabelTextBinding: IndexedBinding<String>) {
-        this.outerLabelTextBinding.unbind()
-        this.outerLabelTextBinding = outerLabelTextBinding
-        this.outerLabelTextBinding.bind { index, text -> swingPanel.setOuterLabelText(index, text) }
+        return swingPanel.outerLabels[index].text
     }
 
     internal fun getOuterLabelColor(index: Int): Color {
-        return swingPanel.outerLabels[index].third
+        return swingPanel.outerLabels[index].color
     }
 
-    fun setOuterLabelColorBinding(outerLabelColorBinding: IndexedBinding<Color>) {
-        this.outerLabelColorBinding.unbind()
-        this.outerLabelColorBinding = outerLabelColorBinding
-        this.outerLabelColorBinding.bind { index, color -> swingPanel.setOuterLabelColor(index, color) }
+    fun setOuterLabelsBinding(outerLabelsBinding: Binding<List<OuterLabel>>) {
+        this.outerLabelsBinding.unbind()
+        this.outerLabelsBinding = outerLabelsBinding
+        this.outerLabelsBinding.bind { l -> swingPanel.outerLabels = l }
     }
 
     internal val numBucketsPerSide: Int
@@ -184,58 +146,29 @@ class SwingometerFrame : GraphicsFrame() {
     internal val numDots: Int
         get() = swingPanel.dots.size
 
-    fun setNumDotsBinding(numDotsBinding: Binding<Int>) {
-        this.numDotsBinding.unbind()
-        this.numDotsBinding = numDotsBinding
-        this.numDotsBinding.bind { numDots -> swingPanel.setNumDots(numDots) }
-    }
-
     internal fun getDotPosition(index: Int): Number {
         return swingPanel.dots[index].position
-    }
-
-    fun setDotsPositionBinding(dotsPositionBinding: IndexedBinding<Number>) {
-        this.dotsPositionBinding.unbind()
-        this.dotsPositionBinding = dotsPositionBinding
-        this.dotsPositionBinding.bind { index, position -> swingPanel.setDotPosition(index, position) }
     }
 
     internal fun getDotColor(index: Int): Color {
         return swingPanel.dots[index].color
     }
 
-    fun setDotsColorBinding(dotsColorBinding: IndexedBinding<Color>) {
-        this.dotsColorBinding.unbind()
-        this.dotsColorBinding = dotsColorBinding
-        this.dotsColorBinding.bind { index, color -> swingPanel.setDotColor(index, color) }
-    }
-
     internal fun getDotLabel(index: Int): String {
         return swingPanel.dots[index].label
-    }
-
-    fun setDotsLabelBinding(dotsLabelBinding: IndexedBinding<String>) {
-        this.dotsLabelBinding.unbind()
-        this.dotsLabelBinding = dotsLabelBinding
-        this.dotsLabelBinding.bind { index, label -> swingPanel.setDotLabel(index, label) }
     }
 
     internal fun isDotSolid(index: Int): Boolean {
         return swingPanel.dots[index].solid
     }
 
-    fun setDotsSolidBinding(dotsSolidBinding: IndexedBinding<Boolean>) {
-        this.dotsSolidBinding.unbind()
-        this.dotsSolidBinding = dotsSolidBinding
-        this.dotsSolidBinding.bind { index, solid -> swingPanel.setDotSolid(index, solid) }
+    fun setDotsBinding(dotsBinding: Binding<List<Dot>>) {
+        this.dotsBinding.unbind()
+        this.dotsBinding = dotsBinding
+        this.dotsBinding.bind { swingPanel.dots = it }
     }
 
-    private inner class Dot {
-        var position: Number = 0.0
-        var color: Color = Color.WHITE
-        var label = ""
-        var solid = true
-    }
+    class Dot(val position: Number, val color: Color, val label: String = "", val solid: Boolean = true)
 
     private inner class SwingPanel : JPanel() {
         private var _leftColor = Color.BLACK
@@ -244,10 +177,10 @@ class SwingometerFrame : GraphicsFrame() {
         private var _range: Number = 1
         private var _leftToWin: Number = Double.POSITIVE_INFINITY
         private var _rightToWin: Number = Double.POSITIVE_INFINITY
-        private val _ticks: MutableList<Pair<Number, String>> = ArrayList()
-        private val _outerLabels: MutableList<Triple<Number, String, Color>> = ArrayList()
+        private var _ticks: List<Tick> = ArrayList()
+        private var _outerLabels: List<OuterLabel> = ArrayList()
         private var _numBucketsPerSide = 1
-        private val _dots: MutableList<Dot> = ArrayList()
+        private var _dots: List<Dot> = ArrayList()
 
         var leftColor: Color
         get() { return _leftColor }
@@ -291,54 +224,17 @@ class SwingometerFrame : GraphicsFrame() {
             repaint()
         }
 
-        val ticks: List<Pair<Number, String>>
+        var ticks: List<Tick>
         get() { return _ticks }
-
-        fun setNumTicks(numTicks: Int) {
-            while (numTicks < _ticks.size) {
-                _ticks.removeAt(numTicks)
-            }
-            while (numTicks > _ticks.size) {
-                _ticks.add(Pair(0.0, ""))
-            }
+        set(ticks) {
+            _ticks = ticks
             repaint()
         }
 
-        fun setTickPosition(index: Int, position: Number) {
-            _ticks[index] = _ticks[index].copy(first = position)
-            repaint()
-        }
-
-        fun setTickText(index: Int, text: String) {
-            _ticks[index] = _ticks[index].copy(second = text)
-            repaint()
-        }
-
-        val outerLabels: List<Triple<Number, String, Color>>
+        var outerLabels: List<OuterLabel>
         get() { return _outerLabels }
-
-        fun setNumOuterLabels(numOuterLabels: Int) {
-            while (numOuterLabels < _outerLabels.size) {
-                _outerLabels.removeAt(numOuterLabels)
-            }
-            while (numOuterLabels > _outerLabels.size) {
-                _outerLabels.add(Triple(0.0, "", Color.BLACK))
-            }
-            repaint()
-        }
-
-        fun setOuterLabelPosition(index: Int, position: Number) {
-            _outerLabels[index] = _outerLabels[index].copy(first = position)
-            repaint()
-        }
-
-        fun setOuterLabelText(index: Int, text: String) {
-            _outerLabels[index] = _outerLabels[index].copy(second = text)
-            repaint()
-        }
-
-        fun setOuterLabelColor(index: Int, color: Color) {
-            _outerLabels[index] = _outerLabels[index].copy(third = color)
+        set(outerLabels) {
+            _outerLabels = outerLabels
             repaint()
         }
 
@@ -349,36 +245,10 @@ class SwingometerFrame : GraphicsFrame() {
             repaint()
         }
 
-        val dots: List<Dot>
+        var dots: List<Dot>
         get() { return _dots }
-
-        fun setNumDots(numDots: Int) {
-            while (numDots < _dots.size) {
-                _dots.removeAt(numDots)
-            }
-            while (numDots > _dots.size) {
-                _dots.add(Dot())
-            }
-            repaint()
-        }
-
-        fun setDotPosition(index: Int, position: Number) {
-            dots[index].position = position
-            repaint()
-        }
-
-        fun setDotColor(index: Int, color: Color) {
-            dots[index].color = color
-            repaint()
-        }
-
-        fun setDotLabel(index: Int, label: String) {
-            dots[index].label = label
-            repaint()
-        }
-
-        fun setDotSolid(index: Int, solid: Boolean) {
-            dots[index].solid = solid
+        set(dots) {
+            _dots = dots
             repaint()
         }
 
@@ -407,9 +277,9 @@ class SwingometerFrame : GraphicsFrame() {
             g.setFont(StandardFont.readBoldFont(12))
             val originalTransform = g.transform
             for (tick in ticks) {
-                g.transform = createRotationTransform(tick.first, originalTransform, arcY)
-                val textWidth = g.getFontMetrics().stringWidth(tick.second)
-                g.drawString(tick.second, (width - textWidth) / 2, arcY + outer / 2 - 3)
+                g.transform = createRotationTransform(tick.position, originalTransform, arcY)
+                val textWidth = g.getFontMetrics().stringWidth(tick.text)
+                g.drawString(tick.text, (width - textWidth) / 2, arcY + outer / 2 - 3)
                 g.transform = originalTransform
             }
             val bucketSize = range.toDouble() / numBucketsPerSide
@@ -502,14 +372,14 @@ class SwingometerFrame : GraphicsFrame() {
             g.fillRect(0, 0, width, arcY)
             g.setFont(StandardFont.readNormalFont(20))
             for (outerLabel in outerLabels) {
-                if (abs(outerLabel.first.toDouble()) <= range.toDouble()) {
-                    g.setColor(outerLabel.third)
+                if (abs(outerLabel.position.toDouble()) <= range.toDouble()) {
+                    g.setColor(outerLabel.color)
                     g.transform = createRotationTransform(
-                        outerLabel.first.toDouble(), originalTransform, arcY
+                        outerLabel.position.toDouble(), originalTransform, arcY
                     )
-                    val textWidth = g.getFontMetrics().stringWidth(outerLabel.second)
+                    val textWidth = g.getFontMetrics().stringWidth(outerLabel.text)
                     g.drawString(
-                        outerLabel.second, (width - textWidth) / 2, arcY + boundary / 2 - 6
+                        outerLabel.text, (width - textWidth) / 2, arcY + boundary / 2 - 6
                     )
                     g.transform = originalTransform
                 }
