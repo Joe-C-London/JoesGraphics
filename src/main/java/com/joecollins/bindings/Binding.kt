@@ -71,26 +71,6 @@ interface Binding<out T> {
             }
         }
 
-        @JvmStatic fun <T> sizeBinding(list: BindableList<T>): Binding<Int> {
-            return object : Binding<Int> {
-                private var consumer: ((Int) -> Unit)? = null
-                override fun bind(onUpdate: (Int) -> Unit) {
-                    check(consumer == null) { "Binding is already used" }
-                    val consumer: (Int) -> Unit = { t -> onUpdate(t) }
-                    list.addSizeBinding(consumer)
-                    consumer(list.size)
-                    this.consumer = consumer
-                }
-                override fun unbind() {
-                    val consumer = this.consumer
-                    if (consumer != null) {
-                        list.removeSizeBinding(consumer)
-                        this.consumer = null
-                    }
-                }
-            }
-        }
-
         @JvmStatic fun <T, R> mapReduceBinding(
             bindings: List<Binding<T>>,
             identity: R,

@@ -1,7 +1,6 @@
 package com.joecollins.graphics.components
 
 import com.joecollins.bindings.Bindable
-import com.joecollins.bindings.BindableList
 import com.joecollins.bindings.Binding.Companion.fixedBinding
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.graphics.utils.ShapefileReader.readShapes
@@ -104,8 +103,7 @@ class MapFrameTest {
     fun testRenderWithBorders() {
         val shapes = loadShapes { getDistrictColor(it) }
         val zoomBox = loadCityBox()
-        val regions = BindableList<Shape>()
-        regions.addAll(shapes.map { it.shape })
+        val regions = shapes.map { it.shape }
         val mapFrame = MapFrame()
         mapFrame.setHeaderBinding(fixedBinding<String?>("PEI"))
         mapFrame.setShapesBinding(fixedBinding(shapes.map { Pair(it.shape, it.color) }))
@@ -127,9 +125,9 @@ class MapFrameTest {
     }
 
     @Throws(IOException::class)
-    private fun loadRegions(): BindableList<Shape> {
+    private fun loadRegions(): List<Shape> {
         val shapesByDistrict = shapesByDistrict()
-        val regions = BindableList<Shape>()
+        val regions = ArrayList<Shape>()
         val areaReduce = { lhs: Area, rhs: Area ->
             val ret = Area(lhs)
             ret.add(rhs)

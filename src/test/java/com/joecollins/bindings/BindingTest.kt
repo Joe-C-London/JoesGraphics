@@ -4,7 +4,6 @@ import com.joecollins.bindings.Binding.Companion.fixedBinding
 import com.joecollins.bindings.Binding.Companion.listBinding
 import com.joecollins.bindings.Binding.Companion.mapReduceBinding
 import com.joecollins.bindings.Binding.Companion.propertyBinding
-import com.joecollins.bindings.Binding.Companion.sizeBinding
 import com.joecollins.graphics.utils.BoundResult
 import org.junit.Assert
 import org.junit.Test
@@ -31,29 +30,6 @@ class BindingTest {
         binding.unbind()
         bindable.setValue(7)
         Assert.assertEquals(42, boundValue.value.toLong())
-    }
-
-    @Test
-    fun testSizeBinding() {
-        val boundValue: BoundResult<Int> = BoundResult()
-        val list = BindableList<Int>()
-        list.add(7)
-        val binding = sizeBinding(list)
-        binding.bind { boundValue.value = it }
-        Assert.assertEquals(1, boundValue.value.toLong())
-        list.add(42)
-        Assert.assertEquals(2, boundValue.value.toLong())
-        list.removeAt(1)
-        Assert.assertEquals(1, boundValue.value.toLong())
-        list.add(0, 7)
-        Assert.assertEquals(2, boundValue.value.toLong())
-        list.clear()
-        Assert.assertEquals(0, boundValue.value.toLong())
-        list.add(7)
-        Assert.assertEquals(1, boundValue.value.toLong())
-        binding.unbind()
-        list.add(42)
-        Assert.assertEquals(1, boundValue.value.toLong())
     }
 
     @Test

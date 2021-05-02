@@ -1,7 +1,6 @@
 package com.joecollins.graphics.components
 
 import com.joecollins.bindings.Bindable
-import com.joecollins.bindings.BindableList
 import com.joecollins.bindings.Binding
 import com.joecollins.bindings.Binding.Companion.fixedBinding
 import com.joecollins.graphics.components.SwingometerFrameBuilder.Companion.basic
@@ -220,7 +219,7 @@ class SwingometerFrameBuilderTest {
             }
         }
 
-        val dots = BindableList<Dot>()
+        val dots = ArrayList<Dot>()
         dots.add(Dot(0.115, Color.RED))
         dots.add(Dot(0.36, Color.RED))
         dots.add(Dot(0.385, Color.RED))
