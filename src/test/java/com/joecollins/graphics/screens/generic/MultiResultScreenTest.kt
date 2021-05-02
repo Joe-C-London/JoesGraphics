@@ -1,7 +1,6 @@
 package com.joecollins.graphics.screens.generic
 
 import com.joecollins.bindings.Bindable
-import com.joecollins.bindings.BindableList
 import com.joecollins.bindings.Binding
 import com.joecollins.bindings.Binding.Companion.fixedBinding
 import com.joecollins.bindings.Binding.Companion.propertyBinding
@@ -24,7 +23,7 @@ class MultiResultScreenTest {
     @Test
     @Throws(IOException::class)
     fun testSimplePanel() {
-        val districts = BindableList<District>()
+        val districts = ArrayList<District>()
         districts.add(
                 District(
                         8,
@@ -79,7 +78,7 @@ class MultiResultScreenTest {
         val shapesByDistrict = peiShapesByDistrict()
         val swingometerOrder = listOf(ndp, grn, lib, ind, pc)
         val panel = of(
-                districts,
+                fixedBinding(districts),
                 { fixedBinding(it.votes) },
                 { fixedBinding("DISTRICT " + it.districtNum) },
                 { fixedBinding(it.name.toUpperCase()) }
@@ -159,14 +158,12 @@ class MultiResultScreenTest {
                 ),
                 "0 OF 10 POLLS REPORTING",
                 0.0)
-        val districts = BindableList<District>()
-        districts.add(district15)
-        districts.add(district17)
+        val districts = BindableWrapper(listOf(district15, district17))
         val shapesByDistrict = peiShapesByDistrict()
         val swingometerOrder = listOf(ndp, grn, lib, ind, pc)
         val title = BindableWrapper("MAJOR PARTY LEADERS")
         val panel = of(
-                districts,
+                districts.binding,
                 { it.getVotes() },
                 { fixedBinding(it.name.toUpperCase()) },
                 { it.getStatus() }
@@ -205,7 +202,7 @@ class MultiResultScreenTest {
                         Candidate("Don Wills", ind) to 7
                 ))
         compareRendering("MultiResultPanel", "Update-2", panel)
-        districts.add(0, district8)
+        districts.value = listOf(district8, district15, district17)
         title.value = "PARTY LEADERS"
         compareRendering("MultiResultPanel", "Update-3", panel)
         district15.update(
@@ -239,7 +236,7 @@ class MultiResultScreenTest {
                 ),
                 true)
         compareRendering("MultiResultPanel", "Update-6", panel)
-        districts.remove(district15)
+        districts.value = listOf(district8, district17)
         title.value = "PARTY LEADERS IN DOUBT"
         compareRendering("MultiResultPanel", "Update-7", panel)
         district15.update(
@@ -278,7 +275,7 @@ class MultiResultScreenTest {
     @Test
     @Throws(IOException::class)
     fun testOthersPanel() {
-        val districts = BindableList<District>()
+        val districts = ArrayList<District>()
         districts.add(
                 District(
                         30,
@@ -340,7 +337,7 @@ class MultiResultScreenTest {
                         )))
         val swingometerOrder = listOf(ndp, grn, lib, ind, pc, pa)
         val panel = of(
-                districts,
+                fixedBinding(districts),
                 { fixedBinding(it.votes) },
                 { fixedBinding("DISTRICT " + it.districtNum) },
                 { fixedBinding(it.name.toUpperCase()) }
@@ -365,7 +362,7 @@ class MultiResultScreenTest {
     @Test
     @Throws(IOException::class)
     fun testMultipleRowsPanel() {
-        val districts = BindableList<District>()
+        val districts = ArrayList<District>()
         districts.add(
                 District(
                         30,
@@ -445,8 +442,9 @@ class MultiResultScreenTest {
                                 pa to 922
                         )))
         val swingometerOrder = listOf(ndp, grn, lib, ind, pc, pa)
+        val districtsBinding = BindableWrapper(districts)
         val panel = of(
-                districts,
+                districtsBinding.binding,
                 { fixedBinding(it.votes) },
                 { fixedBinding("DISTRICT " + it.districtNum) },
                 { fixedBinding(it.name.toUpperCase()) }
@@ -504,18 +502,20 @@ class MultiResultScreenTest {
                                 ndp to 203,
                                 pa to 1104
                         )))
+        districtsBinding.value = districts
         compareRendering("MultiResultPanel", "MultipleRows-2", panel)
         districts.removeAt(3)
         districts.removeAt(2)
         districts.removeAt(1)
         districts.removeAt(0)
+        districtsBinding.value = districts
         compareRendering("MultiResultPanel", "MultipleRows-3", panel)
     }
 
     @Test
     @Throws(IOException::class)
     fun testRunoffs() {
-        val districts = BindableList<District>()
+        val districts = ArrayList<District>()
         districts.add(
                 District(
                         2,
@@ -539,7 +539,7 @@ class MultiResultScreenTest {
                         false,
                         emptyMap()))
         val panel = of(
-                districts,
+                fixedBinding(districts),
                 { fixedBinding(it.votes) },
                 { fixedBinding(it.name.toUpperCase()) },
                 { fixedBinding("CLASS " + it.districtNum) }
@@ -555,7 +555,7 @@ class MultiResultScreenTest {
     @Test
     @Throws(IOException::class)
     fun testMapAdditionalHighlights() {
-        val districts = BindableList<District>()
+        val districts = ArrayList<District>()
         districts.add(
                 District(
                         13,
@@ -610,7 +610,7 @@ class MultiResultScreenTest {
         val shapesByDistrict = peiShapesByDistrict()
         val swingometerOrder = listOf(ndp, grn, lib, ind, pc)
         val panel = of(
-                districts,
+                fixedBinding(districts),
                 { fixedBinding(it.votes) },
                 { fixedBinding("DISTRICT " + it.districtNum) },
                 { fixedBinding(it.name.toUpperCase()) }
@@ -643,7 +643,7 @@ class MultiResultScreenTest {
     @Test
     @Throws(IOException::class)
     fun testPartiesOnly() {
-        val districts = BindableList<District>()
+        val districts = ArrayList<District>()
         districts.add(
                 District(
                         30,
@@ -723,8 +723,9 @@ class MultiResultScreenTest {
                                 pa to 922
                         )))
         val swingometerOrder = listOf(ndp, grn, lib, ind, pc, pa)
+            val districtBinding = BindableWrapper(districts)
         val panel = ofParties(
-                districts,
+                districtBinding.binding,
                 { it.partyVotes },
                 { fixedBinding("DISTRICT " + it.districtNum) },
                 { fixedBinding(it.name.toUpperCase()) }
@@ -774,11 +775,13 @@ class MultiResultScreenTest {
                                 ndp to 203,
                                 pa to 1104
                         )))
+            districtBinding.value = districts
         compareRendering("MultiResultPanel", "PartiesOnly-2", panel)
         districts.removeAt(3)
         districts.removeAt(2)
         districts.removeAt(1)
         districts.removeAt(0)
+            districtBinding.value = districts
         compareRendering("MultiResultPanel", "PartiesOnly-3", panel)
     }
 

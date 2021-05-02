@@ -1,9 +1,7 @@
 package com.joecollins.graphics.screens.generic
 
 import com.joecollins.bindings.Bindable
-import com.joecollins.bindings.BindableList
 import com.joecollins.bindings.Binding
-import com.joecollins.bindings.IndexedBinding
 import com.joecollins.graphics.ImageGenerator
 import com.joecollins.graphics.components.BarFrame
 import com.joecollins.graphics.components.BarFrameBuilder
@@ -34,11 +32,11 @@ import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.border.EmptyBorder
 
-class MultiResultScreen private constructor(builder: Builder<*>, textHeader: Binding<String?>, hasMap: Boolean) : JPanel() {
+class MultiResultScreen private constructor() : JPanel() {
     private val panels: MutableList<ResultPanel> = ArrayList()
 
     class Builder<T>(
-        internal val list: BindableList<T>,
+        internal val listBinding: Binding<List<T>>,
         private val votesFunc: (T) -> Binding<Map<Candidate, Int>>,
         private val headerFunc: (T) -> Binding<String>,
         private val subheadFunc: (T) -> Binding<String>,
@@ -53,7 +51,7 @@ class MultiResultScreen private constructor(builder: Builder<*>, textHeader: Bin
         var swingPartyOrder: Comparator<Party>? = null
         var mapShapeFunc: ((T) -> List<Pair<Shape, Binding<Color>>>)? = null
         var mapFocusFunc: ((T) -> List<Shape>?)? = null
-        var mapHeaderFunc: ((T) -> Binding<String?>)? = null
+        var mapHeaderFunc: ((T) -> Binding<String>)? = null
 
         fun withIncumbentMarker(incumbentMarker: String): Builder<T> {
             this.incumbentMarker = incumbentMarker
@@ -91,7 +89,7 @@ class MultiResultScreen private constructor(builder: Builder<*>, textHeader: Bin
             selectedShapeFunc: (T) -> K,
             leadingPartyFunc: (T) -> Binding<PartyResult?>,
             focusFunc: (T) -> List<K>?,
-            mapHeaderFunc: (T) -> Binding<String?>
+            mapHeaderFunc: (T) -> Binding<String>
         ): Builder<T> {
             return withMap(shapesFunc, selectedShapeFunc, leadingPartyFunc, focusFunc, focusFunc, mapHeaderFunc)
         }
@@ -102,7 +100,7 @@ class MultiResultScreen private constructor(builder: Builder<*>, textHeader: Bin
             leadingPartyFunc: (T) -> Binding<PartyResult?>,
             focusFunc: (T) -> List<K>?,
             additionalHighlightsFunc: (T) -> List<K>?,
-            mapHeaderFunc: (T) -> Binding<String?>
+            mapHeaderFunc: (T) -> Binding<String>
         ): Builder<T> {
             this.mapHeaderFunc = mapHeaderFunc
             mapFocusFunc = label@{ t: T ->
@@ -139,20 +137,65 @@ class MultiResultScreen private constructor(builder: Builder<*>, textHeader: Bin
         }
 
         fun build(textHeader: Binding<String?>): MultiResultScreen {
-            return MultiResultScreen(this, textHeader, mapHeaderFunc != null)
-        }
+            val screen = MultiResultScreen()
+            screen.background = Color.WHITE
+            screen.layout = BorderLayout()
+            screen.add(createHeaderLabel(textHeader), BorderLayout.NORTH)
+            val center = JPanel()
+            center.layout = GridLayout(1, 0)
+            center.background = Color.WHITE
+            screen.add(center, BorderLayout.CENTER)
+            this.listBinding.bind { list ->
+                val size = list.size
+                while (screen.panels.size < size) {
+                    val newPanel = ResultPanel(
+                        this.incumbentMarker,
+                        this.swingPartyOrder,
+                        mapHeaderFunc != null,
+                        this.partiesOnly
+                    )
+                    center.add(newPanel)
+                    screen.panels.add(newPanel)
+                }
+                while (screen.panels.size > size) {
+                    val panel = screen.panels.removeAt(size)
+                    panel.unbindAll()
+                    center.remove(panel)
+                }
+                val numRows = if (size > 4) 2 else 1
+                center.layout = GridLayout(numRows, 0)
+                screen.panels.forEach { p: ResultPanel ->
+                    p.displayBothRows = numRows == 1
+                    p.setMaxBarsBinding(
+                        Binding.fixedBinding(
+                            (if (numRows == 2) 4 else 5) * if (this.partiesOnly) 2 else 1
+                        )
+                    )
+                    p.invalidate()
+                    p.revalidate()
+                }
+                list.forEachIndexed { idx, item ->
+                    screen.panels[idx].setVotesBinding(votesFunc(item))
+                    screen.panels[idx].setWinnerBinding(winnerFunc(item))
+                    screen.panels[idx].setRunoffBinding(runoffFunc(item))
+                    screen.panels[idx].setPctReportingBinding(pctReportingFunc(item))
+                    screen.panels[idx].setHeaderBinding(headerFunc(item))
+                    screen.panels[idx].setSubheadBinding(subheadFunc(item))
+                    if (swingPartyOrder != null) {
+                        prevFunc?.let { f -> screen.panels[idx].setPrevBinding(f(item)) }
+                        swingHeaderFunc?.let { f -> screen.panels[idx].setSwingHeaderBinding(f(item)) }
+                    }
+                    if (mapHeaderFunc != null) {
+                        mapShapeFunc?.let { f -> screen.panels[idx].setMapShapeBinding(f(item)) }
+                        mapFocusFunc?.let { f -> screen.panels[idx].setMapFocusBinding(f(item) ?: emptyList()) }
+                        mapHeaderFunc?.let { f -> screen.panels[idx].setMapHeaderBinding(f(item)) }
+                    }
+                }
+                EventQueue.invokeLater { screen.repaint() }
+            }
 
-        internal fun votesBinding() = IndexedBinding.propertyBinding(list, votesFunc)
-        internal fun winnerBinding() = IndexedBinding.propertyBinding(list, winnerFunc)
-        internal fun runOffBinding() = IndexedBinding.propertyBinding(list, runoffFunc)
-        internal fun pctReportingBinding() = IndexedBinding.propertyBinding(list, pctReportingFunc)
-        internal fun headerBinding() = IndexedBinding.propertyBinding(list, headerFunc)
-        internal fun subheadBinding() = IndexedBinding.propertyBinding(list, subheadFunc)
-        internal fun prevBinding() = prevFunc?.let { IndexedBinding.propertyBinding(list, it) }
-        internal fun swingHeaderBinding() = swingHeaderFunc?.let { IndexedBinding.propertyBinding(list, it) }
-        internal fun mapShapeBinding() = mapShapeFunc?.let { IndexedBinding.propertyBinding(list, it) }
-        internal fun mapFocusBinding() = mapFocusFunc?.let { IndexedBinding.propertyBinding(list, it) }
-        internal fun mapHeaderBinding() = mapHeaderFunc?.let { IndexedBinding.propertyBinding(list, it) }
+            return screen
+        }
     }
 
     private class Result : Bindable<Result, Result.Property>() {
@@ -259,7 +302,7 @@ class MultiResultScreen private constructor(builder: Builder<*>, textHeader: Bin
                                     .reduceOrNull { agg, r -> agg.createUnion(r) }))
         }
 
-        fun setMapHeaderBinding(mapLabelBinding: Binding<String?>) {
+        fun setMapHeaderBinding(mapLabelBinding: Binding<String>) {
             mapFrame?.setHeaderBinding(mapLabelBinding)
         }
 
@@ -424,7 +467,7 @@ class MultiResultScreen private constructor(builder: Builder<*>, textHeader: Bin
         }
 
         @JvmStatic fun <T> of(
-            list: BindableList<T>,
+            list: Binding<List<T>>,
             votesFunc: (T) -> Binding<Map<Candidate, Int>>,
             headerFunc: (T) -> Binding<String>,
             subheadFunc: (T) -> Binding<String>
@@ -433,77 +476,13 @@ class MultiResultScreen private constructor(builder: Builder<*>, textHeader: Bin
         }
 
         @JvmStatic fun <T> ofParties(
-            list: BindableList<T>,
+            list: Binding<List<T>>,
             votesFunc: (T) -> Binding<Map<Party, Int>>,
             headerFunc: (T) -> Binding<String>,
             subheadFunc: (T) -> Binding<String>
         ): Builder<T> {
             val adjustedVoteFunc = { t: T -> votesFunc(t).map { m: Map<Party, Int> -> Aggregators.adjustKey(m) { k: Party -> Candidate("", k) } } }
             return Builder(list, adjustedVoteFunc, headerFunc, subheadFunc, true)
-        }
-    }
-
-    init {
-        background = Color.WHITE
-        layout = BorderLayout()
-        add(createHeaderLabel(textHeader), BorderLayout.NORTH)
-        val center = JPanel()
-        center.layout = GridLayout(1, 0)
-        center.background = Color.WHITE
-        add(center, BorderLayout.CENTER)
-        Binding.sizeBinding(builder.list)
-                .bind { size: Int ->
-                    while (panels.size < size) {
-                        val newPanel = ResultPanel(
-                                builder.incumbentMarker,
-                                builder.swingPartyOrder,
-                                hasMap,
-                                builder.partiesOnly)
-                        center.add(newPanel)
-                        panels.add(newPanel)
-                    }
-                    while (panels.size > size) {
-                        val panel = panels.removeAt(size)
-                        panel.unbindAll()
-                        center.remove(panel)
-                    }
-                    val numRows = if (size > 4) 2 else 1
-                    center.layout = GridLayout(numRows, 0)
-                    panels.forEach { p: ResultPanel ->
-                        p.displayBothRows = numRows == 1
-                        p.setMaxBarsBinding(
-                                Binding.fixedBinding(
-                                        (if (numRows == 2) 4 else 5) * if (builder.partiesOnly) 2 else 1))
-                        p.invalidate()
-                        p.revalidate()
-                    }
-                    EventQueue.invokeLater { this.repaint() }
-                }
-        builder.votesBinding()
-                .bind { idx, votes -> panels[idx].setVotesBinding(votes) }
-        builder.winnerBinding()
-                .bind { idx, winner -> panels[idx].setWinnerBinding(winner) }
-        builder.runOffBinding()
-                .bind { idx, runoff -> panels[idx].setRunoffBinding(runoff) }
-        builder.pctReportingBinding()
-                .bind { idx, pctReporting -> panels[idx].setPctReportingBinding(pctReporting) }
-        builder.headerBinding()
-                .bind { idx, header -> panels[idx].setHeaderBinding(header) }
-        builder.subheadBinding()
-                .bind { idx, subhead -> panels[idx].setSubheadBinding(subhead) }
-        if (builder.swingPartyOrder != null) {
-            builder.prevBinding()
-                    ?.bind { idx, prev -> panels[idx].setPrevBinding(prev) }
-            builder.swingHeaderBinding()
-                    ?.bind { idx, header -> panels[idx].setSwingHeaderBinding(header) }
-        }
-        if (builder.mapHeaderFunc != null) {
-            builder.mapShapeBinding()
-                    ?.bind { idx, shapes -> panels[idx].setMapShapeBinding(shapes) }
-            builder.mapFocusBinding()
-                    ?.bind { idx, shapes -> panels[idx].setMapFocusBinding(shapes ?: emptyList()) }
-            builder.mapHeaderBinding()
-                    ?.bind { idx, header -> panels[idx].setMapHeaderBinding(header) }
         }
     }
 }
