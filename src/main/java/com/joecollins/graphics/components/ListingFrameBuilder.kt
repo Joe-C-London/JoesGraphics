@@ -2,28 +2,35 @@ package com.joecollins.graphics.components
 
 import com.joecollins.bindings.Binding
 import java.awt.Color
-import java.util.ArrayList
 
 class ListingFrameBuilder {
-    private val barFrame = BarFrame()
-    private val bindings: MutableList<Binding<*>> = ArrayList()
+
+    private var headerBinding: Binding<String?>? = null
+    private var subheadTextBinding: Binding<String?>? = null
+    private var notesBinding: Binding<String?>? = null
+    private var barsBinding: Binding<List<BarFrame.Bar>>? = null
 
     fun withHeader(headerBinding: Binding<String?>): ListingFrameBuilder {
-        barFrame.setHeaderBinding(headerBinding)
+        this.headerBinding = headerBinding
         return this
     }
 
     fun withSubhead(subheadBinding: Binding<String?>): ListingFrameBuilder {
-        barFrame.setSubheadTextBinding(subheadBinding)
+        this.subheadTextBinding = subheadBinding
         return this
     }
 
     fun withNotes(notesBinding: Binding<String?>): ListingFrameBuilder {
-        barFrame.setNotesBinding(notesBinding)
+        this.notesBinding = notesBinding
         return this
     }
 
     fun build(): BarFrame {
+        val barFrame = BarFrame()
+        headerBinding?.let { barFrame.setHeaderBinding(it) }
+        subheadTextBinding?.let { barFrame.setSubheadTextBinding(it) }
+        notesBinding?.let { barFrame.setNotesBinding(it) }
+        barsBinding?.let { barFrame.setBarsBinding(it) }
         return barFrame
     }
 
@@ -36,13 +43,11 @@ class ListingFrameBuilder {
             colorFunc: (T) -> Color
         ): ListingFrameBuilder {
             val builder = ListingFrameBuilder()
-            val barFrame = builder.barFrame
-            barFrame.setBarsBinding(list.map { l ->
+            builder.barsBinding = list.map { l ->
                 l.map {
                     BarFrame.Bar(leftTextFunc(it), rightTextFunc(it), null, listOf(Pair(colorFunc(it), 1)))
                 }
-            })
-            builder.bindings.add(list)
+            }
             return builder
         }
 
@@ -53,15 +58,14 @@ class ListingFrameBuilder {
             colorFunc: (T) -> Binding<Color>
         ): ListingFrameBuilder {
             val builder = ListingFrameBuilder()
-            val barFrame = builder.barFrame
-            barFrame.setBarsBinding(Binding.listBinding(
+            builder.barsBinding = Binding.listBinding(
                 list.map {
                     leftTextFunc(it).merge(rightTextFunc(it)) { left, right -> Pair(left, right) }
                         .merge(colorFunc(it)) {
                                 (left, right), color -> BarFrame.Bar(left, right, listOf(Pair(color, 1)))
                         }
                 }
-            ))
+            )
             return builder
         }
     }

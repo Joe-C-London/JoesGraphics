@@ -3,17 +3,21 @@ package com.joecollins.graphics.components
 import com.joecollins.bindings.Binding
 import java.awt.Color
 
-class MultiSummaryFrameBuilder {
+class MultiSummaryFrameBuilder private constructor() {
 
-    private val frame = MultiSummaryFrame()
+    private var headerBinding: Binding<String?>? = null
+    private var rowsBinding: Binding<List<MultiSummaryFrame.Row>>? = null
 
     fun withHeader(header: Binding<String?>): MultiSummaryFrameBuilder {
-        frame.setHeaderBinding(header)
+        this.headerBinding = header
         return this
     }
 
     fun build(): MultiSummaryFrame {
-        return frame
+        val multiSummaryFrame = MultiSummaryFrame()
+        headerBinding?.let { multiSummaryFrame.setHeaderBinding(it) }
+        rowsBinding?.let { multiSummaryFrame.setRowsBinding(it) }
+        return multiSummaryFrame
     }
 
     companion object {
@@ -42,7 +46,7 @@ class MultiSummaryFrameBuilder {
                         .take(limit)
                 }
             val builder = MultiSummaryFrameBuilder()
-            builder.frame.setRowsBinding(displayedRows)
+            builder.rowsBinding = displayedRows
             return builder
         }
     }

@@ -5,41 +5,43 @@ import com.joecollins.bindings.BindingReceiver
 import java.awt.Color
 import java.awt.Shape
 import java.awt.geom.Rectangle2D
-import java.util.ArrayList
 
 class MapFrameBuilder {
-    private val mapFrame = MapFrame()
-    private val bindings: MutableList<Binding<*>> = ArrayList()
+
+    private var focusBoxBinding: Binding<Rectangle2D?>? = null
+    private var headerBinding: Binding<String?>? = null
+    private var shapesBinding: Binding<List<Pair<Shape, Color>>>? = null
 
     fun withFocus(focusBinding: Binding<List<Shape>?>): MapFrameBuilder {
-        focusBinding.bind { shapes ->
-            val bounds = shapes
-                    ?.map { it.bounds2D }
-                    ?.reduceOrNull { a, b ->
-                        val ret = Rectangle2D.Double(a.x, a.y, a.width, a.height)
-                        ret.add(b)
-                        ret
-                    }
-            mapFrame.setFocusBoxBinding(Binding.fixedBinding(bounds))
+        this.focusBoxBinding = focusBinding.map { shapes ->
+            shapes
+                ?.map { it.bounds2D }
+                ?.reduceOrNull { a, b ->
+                    val ret = Rectangle2D.Double(a.x, a.y, a.width, a.height)
+                    ret.add(b)
+                    ret
+                }
         }
-        bindings.add(focusBinding)
         return this
     }
 
     fun withHeader(headerBinding: Binding<String?>): MapFrameBuilder {
-        mapFrame.setHeaderBinding(headerBinding)
+        this.headerBinding = headerBinding
         return this
     }
 
     fun build(): MapFrame {
+        val mapFrame = MapFrame()
+        focusBoxBinding?.let { mapFrame.setFocusBoxBinding(it) }
+        headerBinding?.let { mapFrame.setHeaderBinding(it) }
+        shapesBinding?.let { mapFrame.setShapesBinding(it) }
         return mapFrame
     }
 
     companion object {
         @JvmStatic fun from(shapes: Binding<List<Pair<Shape, Color>>>): MapFrameBuilder {
             val mapFrameBuilder = MapFrameBuilder()
-            val mapFrame = mapFrameBuilder.mapFrame
-            mapFrame.setShapesBinding(shapes)
+            mapFrameBuilder.shapesBinding = shapes
             return mapFrameBuilder
         }
 
@@ -55,7 +57,6 @@ class MapFrameBuilder {
                 )
             }
             val ret = from(list)
-            ret.bindings.add(itemsBinding)
             return ret
         }
     }

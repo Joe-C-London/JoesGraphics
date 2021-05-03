@@ -6,7 +6,6 @@ import com.joecollins.graphics.components.SwingFrameBuilder.SwingProperties.Swin
 import com.joecollins.models.general.Party
 import java.awt.Color
 import java.text.DecimalFormat
-import java.util.ArrayList
 import java.util.Comparator
 import java.util.HashMap
 import kotlin.math.sign
@@ -60,17 +59,23 @@ class SwingFrameBuilder {
         }
     }
 
-    private val swingFrame = SwingFrame()
+    private var rangeBinding: Binding<Number>? = null
+    private var headerBinding: Binding<String?>? = null
+    private var leftColorBinding: Binding<Color>? = null
+    private var rightColorBinding: Binding<Color>? = null
+    private var valueBinding: Binding<Number>? = null
+    private var bottomColorBinding: Binding<Color>? = null
+    private var bottomTextBinding: Binding<String>? = null
+
     private val props = SwingProperties()
     private var neutralColor = Color.BLACK
-    private val bindings: MutableList<Binding<*>> = ArrayList()
 
     private enum class SingletonProperty {
         ALL
     }
 
     fun withRange(rangeBinding: Binding<Number>): SwingFrameBuilder {
-        swingFrame.setRangeBinding(rangeBinding)
+        this.rangeBinding = rangeBinding
         return this
     }
 
@@ -81,16 +86,23 @@ class SwingFrameBuilder {
                 props.bottomColor = it
             }
         }
-        bindings.add(neutralColorBinding)
         return this
     }
 
     fun withHeader(headerBinding: Binding<String?>): SwingFrameBuilder {
-        swingFrame.setHeaderBinding(headerBinding)
+        this.headerBinding = headerBinding
         return this
     }
 
     fun build(): SwingFrame {
+        val swingFrame = SwingFrame()
+        rangeBinding?.let { swingFrame.setRangeBinding(it) }
+        headerBinding?.let { swingFrame.setHeaderBinding(it) }
+        leftColorBinding?.let { swingFrame.setLeftColorBinding(it) }
+        rightColorBinding?.let { swingFrame.setRightColorBinding(it) }
+        valueBinding?.let { swingFrame.setValueBinding(it) }
+        bottomColorBinding?.let { swingFrame.setBottomColorBinding(it) }
+        bottomTextBinding?.let { swingFrame.setBottomTextBinding(it) }
         return swingFrame
     }
 
@@ -208,8 +220,6 @@ class SwingFrameBuilder {
                     })
                     .withRange(Binding.fixedBinding(0.1))
                     .withNeutralColor(Binding.fixedBinding(Color.LIGHT_GRAY))
-            ret.bindings.add(prevBinding)
-            ret.bindings.add(currBinding)
             return ret
         }
 
@@ -229,20 +239,15 @@ class SwingFrameBuilder {
             textFunc: (T) -> String
         ): SwingFrameBuilder {
             val builder = SwingFrameBuilder()
-            val swingFrame = builder.swingFrame
             val props = builder.props
-            swingFrame.setLeftColorBinding(
-                    Binding.propertyBinding(props, { p: SwingProperties -> p.leftColor }, SwingProperty.LEFT_COLOR))
-            swingFrame.setRightColorBinding(
-                    Binding.propertyBinding(
-                            props, { p: SwingProperties -> p.rightColor }, SwingProperty.RIGHT_COLOR))
-            swingFrame.setValueBinding(
-                    Binding.propertyBinding(props, { p: SwingProperties -> p.value }, SwingProperty.VALUE))
-            swingFrame.setBottomColorBinding(
-                    Binding.propertyBinding(
-                            props, { p: SwingProperties -> p.bottomColor }, SwingProperty.BOTTOM_COLOR))
-            swingFrame.setBottomTextBinding(
-                    Binding.propertyBinding(props, { p: SwingProperties -> p.text }, SwingProperty.TEXT))
+            builder.leftColorBinding =
+                Binding.propertyBinding(props, { p: SwingProperties -> p.leftColor }, SwingProperty.LEFT_COLOR)
+            builder.rightColorBinding = Binding.propertyBinding(
+                    props, { p: SwingProperties -> p.rightColor }, SwingProperty.RIGHT_COLOR)
+            builder.valueBinding = Binding.propertyBinding(props, { p: SwingProperties -> p.value }, SwingProperty.VALUE)
+            builder.bottomColorBinding = Binding.propertyBinding(
+                    props, { p: SwingProperties -> p.bottomColor }, SwingProperty.BOTTOM_COLOR)
+            builder.bottomTextBinding = Binding.propertyBinding(props, { p: SwingProperties -> p.text }, SwingProperty.TEXT)
             binding.bind {
                 props.leftColor = leftColorFunc(it)
                 props.rightColor = rightColorFunc(it)
@@ -260,7 +265,6 @@ class SwingFrameBuilder {
                     }
                 }
             }
-            builder.bindings.add(binding)
             return builder
         }
     }

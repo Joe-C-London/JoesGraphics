@@ -6,16 +6,23 @@ import com.joecollins.bindings.BindingReceiver
 import com.joecollins.graphics.utils.ColorUtils
 import java.awt.Color
 import java.awt.Shape
-import java.util.ArrayList
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.sign
 
 class BarFrameBuilder {
-    private val barFrame = BarFrame()
+    private var headerBinding: Binding<String?>? = null
+    private var subheadBinding: Binding<String?>? = null
+    private var notesBinding: Binding<String?>? = null
+    private var borderColorBinding: Binding<Color>? = null
+    private var subheadColorBinding: Binding<Color>? = null
+    private var linesBinding: Binding<List<BarFrame.Line>>? = null
+    private var barsBinding: Binding<List<BarFrame.Bar>>? = null
+    private var minBinding: Binding<Number>? = null
+    private var maxBinding: Binding<Number>? = null
+
     private val rangeFinder = RangeFinder()
-    private val bindings: MutableList<Binding<*>> = ArrayList()
 
     private class RangeFinder : Bindable<RangeFinder, RangeFinder.Property>() {
         enum class Property {
@@ -72,42 +79,43 @@ class BarFrameBuilder {
     )
 
     fun withHeader(headerBinding: Binding<String?>): BarFrameBuilder {
-        barFrame.setHeaderBinding(headerBinding)
+        this.headerBinding = headerBinding
         return this
     }
 
     fun withSubhead(subheadBinding: Binding<String?>): BarFrameBuilder {
-        barFrame.setSubheadTextBinding(subheadBinding)
+        this.subheadBinding = subheadBinding
         return this
     }
 
     fun withNotes(notesBinding: Binding<String?>): BarFrameBuilder {
-        barFrame.setNotesBinding(notesBinding)
+        this.notesBinding = notesBinding
         return this
     }
 
     fun withBorder(borderColorBinding: Binding<Color>): BarFrameBuilder {
-        barFrame.setBorderColorBinding(borderColorBinding)
+        this.borderColorBinding = borderColorBinding
         return this
     }
 
     fun withSubheadColor(subheadColorBinding: Binding<Color>): BarFrameBuilder {
-        barFrame.setSubheadColorBinding(subheadColorBinding)
+        this.subheadColorBinding = subheadColorBinding
         return this
     }
 
     fun withMax(maxBinding: Binding<Number>): BarFrameBuilder {
         rangeFinder.minFunction = { 0 }
-        bind(maxBinding) { max -> rangeFinder.maxFunction = { max(max.toDouble(), it.highest.toDouble()) } }
+        maxBinding.bind { max: Number -> rangeFinder.maxFunction = { max(max.toDouble(), it.highest.toDouble()) } }
         return this
     }
 
     fun withWingspan(wingspanBinding: Binding<Number>): BarFrameBuilder {
-        bind(wingspanBinding) { wingspan ->
+        wingspanBinding.bind { wingspan: Number ->
             val f = { it: RangeFinder ->
                 max(
-                        wingspan.toDouble(),
-                        max(abs(it.lowest.toDouble()), abs(it.highest.toDouble())))
+                    wingspan.toDouble(),
+                    max(abs(it.lowest.toDouble()), abs(it.highest.toDouble()))
+                )
             }
             rangeFinder.minFunction = { -f(it) }
             rangeFinder.maxFunction = { +f(it) }
@@ -119,10 +127,10 @@ class BarFrameBuilder {
         targetBinding: Binding<T>,
         labelFunc: (T) -> String
     ): BarFrameBuilder {
-        barFrame.setLinesBinding(targetBinding.map {
+        this.linesBinding = targetBinding.map {
             val str = labelFunc(it)
             listOf(BarFrame.Line(it, str))
-        })
+        }
         return this
     }
 
@@ -131,13 +139,13 @@ class BarFrameBuilder {
         labelFunc: (T) -> String,
         valueFunc: (T) -> Number
     ): BarFrameBuilder {
-        barFrame.setLinesBinding(lines.map { l ->
+        this.linesBinding = lines.map { l ->
             l.map {
                 val label = labelFunc(it)
                 val value = valueFunc(it)
                 BarFrame.Line(value, label)
             }
-        })
+        }
         return this
     }
 
@@ -148,48 +156,50 @@ class BarFrameBuilder {
         return withLines(linesBinding, labelFunc) { it }
     }
 
-    private fun <T> bind(binding: Binding<T>, onUpdate: (T) -> Unit) {
-        binding.bind(onUpdate)
-        bindings.add(binding)
-    }
-
     fun build(): BarFrame {
+        val barFrame = BarFrame()
+        headerBinding?.let { barFrame.setHeaderBinding(it) }
+        subheadBinding?.let { barFrame.setSubheadTextBinding(it) }
+        notesBinding?.let { barFrame.setNotesBinding(it) }
+        borderColorBinding?.let { barFrame.setBorderColorBinding(it) }
+        subheadColorBinding?.let { barFrame.setSubheadColorBinding(it) }
+        linesBinding?.let { barFrame.setLinesBinding(it) }
+        barsBinding?.let { barFrame.setBarsBinding(it) }
+        minBinding?.let { barFrame.setMinBinding(it) }
+        maxBinding?.let { barFrame.setMaxBinding(it) }
         return barFrame
     }
 
     companion object {
         @JvmStatic fun basic(binding: Binding<List<BasicBar>>): BarFrameBuilder {
             val builder = BarFrameBuilder()
-            val barFrame = builder.barFrame
             val rangeFinder = builder.rangeFinder
             val bindingReceiver = BindingReceiver(binding)
-            barFrame.setBarsBinding(bindingReceiver.getBinding { bars ->
+            builder.barsBinding = bindingReceiver.getBinding { bars ->
                 bars.map {
                     BarFrame.Bar(it.label, it.valueLabel, it.shape, listOf(Pair(it.color, it.value)))
                 }
-            })
-            barFrame.setMinBinding(
-                    Binding.propertyBinding(
-                            rangeFinder, { rf: RangeFinder -> rf.minFunction(rf) }, RangeFinder.Property.MIN))
-            barFrame.setMaxBinding(
+            }
+            builder.minBinding = Binding.propertyBinding(
+                    rangeFinder, { rf: RangeFinder -> rf.minFunction(rf) }, RangeFinder.Property.MIN)
+            builder.maxBinding = (
                     Binding.propertyBinding(
                             rangeFinder, { rf: RangeFinder -> rf.maxFunction(rf) }, RangeFinder.Property.MAX))
-            builder.bind(bindingReceiver.getBinding()) { map ->
+            bindingReceiver.getBinding().bind { map: List<BasicBar> ->
                 rangeFinder.highest = map
-                        .map { it.value }
-                        .map { it.toDouble() }
-                        .fold(0.0) { a, b -> max(a, b) }
+                    .map { it.value }
+                    .map { it.toDouble() }
+                    .fold(0.0) { a, b -> max(a, b) }
                 rangeFinder.lowest = map
-                        .map { it.value }
-                        .map { it.toDouble() }
-                        .fold(0.0) { a, b -> min(a, b) }
+                    .map { it.value }
+                    .map { it.toDouble() }
+                    .fold(0.0) { a, b -> min(a, b) }
             }
             return builder
         }
 
         @JvmStatic fun dual(bars: Binding<List<DualBar>>): BarFrameBuilder {
             val builder = BarFrameBuilder()
-            val barFrame = builder.barFrame
             val rangeFinder = builder.rangeFinder
             val differentDirections = { bar: DualBar -> sign(bar.value1.toDouble()) * sign(bar.value2.toDouble()) == -1.0 }
             val reverse = { bar: DualBar ->
@@ -199,7 +209,7 @@ class BarFrameBuilder {
             val first = { bar: DualBar -> if (reverse(bar)) bar.value1 else bar.value2 }
             val second = { bar: DualBar -> if (reverse(bar)) bar.value2 else bar.value1 }
             val barsReceiver = BindingReceiver(bars)
-            barFrame.setBarsBinding(barsReceiver.getBinding { b ->
+            builder.barsBinding = barsReceiver.getBinding { b ->
                 b.map {
                     BarFrame.Bar(
                         it.label, it.valueLabel, it.shape,
@@ -213,29 +223,26 @@ class BarFrameBuilder {
                         )
                     )
                 }
-            })
-            barFrame.setMinBinding(
-                    Binding.propertyBinding(
-                            rangeFinder, { it.minFunction(it) }, RangeFinder.Property.MIN))
-            barFrame.setMaxBinding(
-                    Binding.propertyBinding(
-                            rangeFinder, { it.maxFunction(it) }, RangeFinder.Property.MAX))
-            builder.bind(barsReceiver.getBinding()) { map ->
+            }
+            builder.minBinding = Binding.propertyBinding(
+                    rangeFinder, { it.minFunction(it) }, RangeFinder.Property.MIN)
+            builder.maxBinding = Binding.propertyBinding(
+                    rangeFinder, { it.maxFunction(it) }, RangeFinder.Property.MAX)
+            barsReceiver.getBinding().bind { map: List<DualBar> ->
                 rangeFinder.highest = map
-                        .flatMap { sequenceOf(it.value1, it.value2) }
-                        .map { it.toDouble() }
-                        .fold(0.0) { a, b -> max(a, b) }
+                    .flatMap { sequenceOf(it.value1, it.value2) }
+                    .map { it.toDouble() }
+                    .fold(0.0) { a, b -> max(a, b) }
                 rangeFinder.lowest = map
-                        .flatMap { sequenceOf(it.value1, it.value2) }
-                        .map { it.toDouble() }
-                        .fold(0.0) { a, b -> min(a, b) }
+                    .flatMap { sequenceOf(it.value1, it.value2) }
+                    .map { it.toDouble() }
+                    .fold(0.0) { a, b -> min(a, b) }
             }
             return builder
         }
 
         @JvmStatic fun dualReversed(bars: Binding<List<DualBar>>): BarFrameBuilder {
             val builder = BarFrameBuilder()
-            val barFrame = builder.barFrame
             val rangeFinder = builder.rangeFinder
             val differentDirections = { bar: DualBar -> sign(bar.value1.toDouble()) * sign(bar.value2.toDouble()) == -1.0 }
             val reverse = { bar: DualBar ->
@@ -245,7 +252,7 @@ class BarFrameBuilder {
             val first = { bar: DualBar -> if (reverse(bar)) bar.value1 else bar.value2 }
             val second = { bar: DualBar -> if (reverse(bar)) bar.value2 else bar.value1 }
             val barsReceiver = BindingReceiver(bars)
-            barFrame.setBarsBinding(barsReceiver.getBinding { b ->
+            builder.barsBinding = barsReceiver.getBinding { b ->
                 b.map {
                     BarFrame.Bar(
                         it.label, it.valueLabel, it.shape,
@@ -259,22 +266,20 @@ class BarFrameBuilder {
                         )
                     )
                 }
-            })
-            barFrame.setMinBinding(
-                    Binding.propertyBinding(
-                            rangeFinder, { it.minFunction(it) }, RangeFinder.Property.MIN))
-            barFrame.setMaxBinding(
-                    Binding.propertyBinding(
-                            rangeFinder, { it.maxFunction(it) }, RangeFinder.Property.MAX))
-            builder.bind(barsReceiver.getBinding()) { map ->
+            }
+            builder.minBinding = Binding.propertyBinding(
+                    rangeFinder, { it.minFunction(it) }, RangeFinder.Property.MIN)
+            builder.maxBinding = Binding.propertyBinding(
+                    rangeFinder, { it.maxFunction(it) }, RangeFinder.Property.MAX)
+            barsReceiver.getBinding().bind { map: List<DualBar> ->
                 rangeFinder.highest = map
-                        .flatMap { sequenceOf(it.value1, it.value2) }
-                        .map { it.toDouble() }
-                        .fold(0.0) { a: Double, b: Double -> max(a, b) }
+                    .flatMap { sequenceOf(it.value1, it.value2) }
+                    .map { it.toDouble() }
+                    .fold(0.0) { a: Double, b: Double -> max(a, b) }
                 rangeFinder.lowest = map
-                        .flatMap { sequenceOf(it.value1, it.value2) }
-                        .map { it.toDouble() }
-                        .fold(0.0) { a, b -> min(a, b) }
+                    .flatMap { sequenceOf(it.value1, it.value2) }
+                    .map { it.toDouble() }
+                    .fold(0.0) { a, b -> min(a, b) }
             }
             return builder
         }

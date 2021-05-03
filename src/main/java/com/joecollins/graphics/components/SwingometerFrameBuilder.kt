@@ -51,12 +51,23 @@ class SwingometerFrameBuilder {
         }
     }
 
-    private val frame = SwingometerFrame()
+    private var rangeBinding: Binding<Double>? = null
+    private var numBucketsPerSideBinding: Binding<Int>? = null
+    private var ticksBinding: Binding<List<SwingometerFrame.Tick>>? = null
+    private var leftToWinBinding: Binding<Number>? = null
+    private var rightToWinBinding: Binding<Number>? = null
+    private var outerLabelsBinding: Binding<List<SwingometerFrame.OuterLabel>>? = null
+    private var dotsBinding: Binding<List<SwingometerFrame.Dot>>? = null
+    private var headerBinding: Binding<String?>? = null
+    private var leftColorBinding: Binding<Color>? = null
+    private var rightColorBinding: Binding<Color>? = null
+    private var valueBinding: Binding<Number>? = null
+
     private val properties = Properties()
+
     fun withRange(range: Binding<Number>): SwingometerFrameBuilder {
         range.bind { max -> properties.max = max }
-        frame.setRangeBinding(
-                Binding.propertyBinding(properties, { getMax(it) }, Properties.Property.VALUE))
+        this.rangeBinding = Binding.propertyBinding(properties, { getMax(it) }, Properties.Property.VALUE)
         return this
     }
 
@@ -68,11 +79,10 @@ class SwingometerFrameBuilder {
 
     fun withBucketSize(bucketSize: Binding<Number>): SwingometerFrameBuilder {
         bucketSize.bind { properties.bucketSize = it }
-        frame.setNumBucketsPerSideBinding(
-                Binding.propertyBinding(
-                        properties,
-                        { (getMax(it) / it.bucketSize.toDouble()).roundToInt() },
-                        Properties.Property.VALUE))
+        this.numBucketsPerSideBinding = Binding.propertyBinding(
+                properties,
+                { (getMax(it) / it.bucketSize.toDouble()).roundToInt() },
+                Properties.Property.VALUE)
         return this
     }
 
@@ -84,11 +94,9 @@ class SwingometerFrameBuilder {
     ): SwingometerFrameBuilder {
         tickInterval.bind { properties.tickInterval = it }
         val ticks = Binding.propertyBinding(properties, { getTicks(it, tickStringFunc) }, Properties.Property.VALUE)
-        frame.setTicksBinding(
-            ticks.mapElements {
-                SwingometerFrame.Tick(it.level, it.text)
-            }
-        )
+        this.ticksBinding = ticks.mapElements {
+            SwingometerFrame.Tick(it.level, it.text)
+        }
         return this
     }
 
@@ -106,12 +114,12 @@ class SwingometerFrameBuilder {
     }
 
     fun withLeftNeedingToWin(leftToWin: Binding<Number>): SwingometerFrameBuilder {
-        frame.setLeftToWinBinding(leftToWin)
+        this.leftToWinBinding = leftToWin
         return this
     }
 
     fun withRightNeedingToWin(rightToWin: Binding<Number>): SwingometerFrameBuilder {
-        frame.setRightToWinBinding(rightToWin)
+        this.rightToWinBinding = rightToWin
         return this
     }
 
@@ -121,11 +129,9 @@ class SwingometerFrameBuilder {
         labelFunc: (T) -> String,
         colorFunc: (T) -> Color
     ): SwingometerFrameBuilder {
-        frame.setOuterLabelsBinding(
-            labels.mapElements {
-                SwingometerFrame.OuterLabel(positionFunc(it), labelFunc(it), colorFunc(it))
-            }
-        )
+        this.outerLabelsBinding = labels.mapElements {
+            SwingometerFrame.OuterLabel(positionFunc(it), labelFunc(it), colorFunc(it))
+        }
         return this
     }
 
@@ -162,9 +168,8 @@ class SwingometerFrameBuilder {
         labelFunc: (T) -> String,
         solidFunc: (T) -> Boolean
     ): SwingometerFrameBuilder {
-        frame.setDotsBinding(
+        this.dotsBinding =
             dots.mapElements { SwingometerFrame.Dot(positionFunc(it), colorFunc(it), labelFunc(it), solidFunc(it)) }
-        )
         return this
     }
 
@@ -201,23 +206,33 @@ class SwingometerFrameBuilder {
         labelFunc: (T) -> String,
         solidFunc: (T) -> Boolean
     ): SwingometerFrameBuilder {
-        frame.setDotsBinding(
-            Binding.listBinding(
-                dots.map {
-                    colorFunc(it).map { c -> SwingometerFrame.Dot(positionFunc(it), c, labelFunc(it), solidFunc(it)) }
-                }
-            )
+        this.dotsBinding = Binding.listBinding(
+            dots.map {
+                colorFunc(it).map { c -> SwingometerFrame.Dot(positionFunc(it), c, labelFunc(it), solidFunc(it)) }
+            }
         )
         return this
     }
 
     fun withHeader(header: Binding<String?>): SwingometerFrameBuilder {
-        frame.setHeaderBinding(header)
+        this.headerBinding = header
         return this
     }
 
     fun build(): SwingometerFrame {
-        return frame
+        val swingometerFrame = SwingometerFrame()
+        rangeBinding?.let { swingometerFrame.setRangeBinding(it) }
+        numBucketsPerSideBinding?.let { swingometerFrame.setNumBucketsPerSideBinding(it) }
+        ticksBinding?.let { swingometerFrame.setTicksBinding(it) }
+        leftToWinBinding?.let { swingometerFrame.setLeftToWinBinding(it) }
+        rightToWinBinding?.let { swingometerFrame.setRightToWinBinding(it) }
+        outerLabelsBinding?.let { swingometerFrame.setOuterLabelsBinding(it) }
+        dotsBinding?.let { swingometerFrame.setDotsBinding(it) }
+        headerBinding?.let { swingometerFrame.setHeaderBinding(it) }
+        leftColorBinding?.let { swingometerFrame.setLeftColorBinding(it) }
+        rightColorBinding?.let { swingometerFrame.setRightColorBinding(it) }
+        valueBinding?.let { swingometerFrame.setValueBinding(it) }
+        return swingometerFrame
     }
 
     companion object {
@@ -228,11 +243,10 @@ class SwingometerFrameBuilder {
             val colorsRec: BindingReceiver<Pair<Color, Color>> = BindingReceiver(colors)
             val builder = SwingometerFrameBuilder()
             value.bind { builder.properties.value = it }
-            builder.frame.setLeftColorBinding(colorsRec.getBinding { it.first })
-            builder.frame.setRightColorBinding(colorsRec.getBinding { it.second })
-            builder.frame.setValueBinding(
-                    Binding.propertyBinding(
-                            builder.properties, { props: Properties -> props.value }, Properties.Property.VALUE))
+            builder.leftColorBinding = colorsRec.getBinding { it.first }
+            builder.rightColorBinding = colorsRec.getBinding { it.second }
+            builder.valueBinding = Binding.propertyBinding(
+                    builder.properties, { props: Properties -> props.value }, Properties.Property.VALUE)
             return builder
         }
     }

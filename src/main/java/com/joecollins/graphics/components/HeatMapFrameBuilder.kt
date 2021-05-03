@@ -9,15 +9,24 @@ import com.joecollins.models.general.PartyResult
 import java.awt.Color
 
 class HeatMapFrameBuilder {
-    private val frame = HeatMapFrame()
+    private var seatBarsBinding: Binding<List<HeatMapFrame.Bar>>? = null
+    private var seatBarLabelBinding: Binding<String>? = null
+    private var changeBarsBinding: Binding<List<HeatMapFrame.Bar>>? = null
+    private var changeBarStartBinding: Binding<Int>? = null
+    private var changeBarLabelBinding: Binding<String>? = null
+    private var headerBinding: Binding<String?>? = null
+    private var borderColorBinding: Binding<Color>? = null
+    private var numRowsBinding: Binding<Int>? = null
+    private var squaresBinding: Binding<List<HeatMapFrame.Square>>? = null
+
     fun <T> withSeatBars(
         bars: Binding<List<T>>,
         colorFunc: (T) -> Color,
         seatFunc: (T) -> Int,
         labelBinding: Binding<String>
     ): HeatMapFrameBuilder {
-        frame.setSeatBarsBinding(bars.mapElements { HeatMapFrame.Bar(colorFunc(it), seatFunc(it)) })
-        frame.setSeatBarLabelBinding(labelBinding)
+        this.seatBarsBinding = bars.mapElements { HeatMapFrame.Bar(colorFunc(it), seatFunc(it)) }
+        this.seatBarLabelBinding = labelBinding
         return this
     }
 
@@ -28,24 +37,34 @@ class HeatMapFrameBuilder {
         startBinding: Binding<Int>,
         labelBinding: Binding<String>
     ): HeatMapFrameBuilder {
-        frame.setChangeBarsBinding(bars.mapElements { HeatMapFrame.Bar(colorFunc(it), seatFunc(it)) })
-        frame.setChangeBarStartBinding(startBinding)
-        frame.setChangeBarLabelBinding(labelBinding)
+        this.changeBarsBinding = bars.mapElements { HeatMapFrame.Bar(colorFunc(it), seatFunc(it)) }
+        this.changeBarStartBinding = startBinding
+        this.changeBarLabelBinding = labelBinding
         return this
     }
 
     fun withHeader(headerBinding: Binding<String?>): HeatMapFrameBuilder {
-        frame.setHeaderBinding(headerBinding)
+        this.headerBinding = headerBinding
         return this
     }
 
     fun withBorder(colorBinding: Binding<Color>): HeatMapFrameBuilder {
-        frame.setBorderColorBinding(colorBinding)
+        this.borderColorBinding = colorBinding
         return this
     }
 
     fun build(): HeatMapFrame {
-        return frame
+        val heatMapFrame = HeatMapFrame()
+        seatBarsBinding?.let { heatMapFrame.setSeatBarsBinding(it) }
+        seatBarLabelBinding?.let { heatMapFrame.setSeatBarLabelBinding(it) }
+        changeBarsBinding?.let { heatMapFrame.setChangeBarsBinding(it) }
+        changeBarStartBinding?.let { heatMapFrame.setChangeBarStartBinding(it) }
+        changeBarLabelBinding?.let { heatMapFrame.setChangeBarLabelBinding(it) }
+        headerBinding?.let { heatMapFrame.setHeaderBinding(it) }
+        borderColorBinding?.let { heatMapFrame.setBorderColorBinding(it) }
+        numRowsBinding?.let { heatMapFrame.setNumRowsBinding(it) }
+        squaresBinding?.let { heatMapFrame.setSquaresBinding(it) }
+        return heatMapFrame
     }
 
     companion object {
@@ -64,15 +83,13 @@ class HeatMapFrameBuilder {
             borderFunc: (T) -> Binding<Color>
         ): HeatMapFrameBuilder {
             val builder = HeatMapFrameBuilder()
-            builder.frame.setNumRowsBinding(numRows)
-            builder.frame.setSquaresBinding(
-                Binding.listBinding(
-                    entries.map {
-                        fillFunc(it).merge(borderFunc(it)) {
-                            fill, border -> HeatMapFrame.Square(fillColor = fill, borderColor = border)
-                        }
+            builder.numRowsBinding = numRows
+            builder.squaresBinding = Binding.listBinding(
+                entries.map {
+                    fillFunc(it).merge(borderFunc(it)) {
+                        fill, border -> HeatMapFrame.Square(fillColor = fill, borderColor = border)
                     }
-                )
+                }
             )
             return builder
         }

@@ -13,14 +13,28 @@ import java.util.Comparator
 import kotlin.math.abs
 
 class HemicycleFrameBuilder {
+    private var headerBinding: Binding<String?>? = null
+    private var leftSeatBarBinding: Binding<List<HemicycleFrame.Bar>>? = null
+    private var leftSeatBarLabelBinding: Binding<String>? = null
+    private var rightSeatBarBinding: Binding<List<HemicycleFrame.Bar>>? = null
+    private var rightSeatBarLabelBinding: Binding<String>? = null
+    private var middleSeatBarBinding: Binding<List<HemicycleFrame.Bar>>? = null
+    private var middleSeatBarLabelBinding: Binding<String>? = null
+    private var leftChangeBarBinding: Binding<List<HemicycleFrame.Bar>>? = null
+    private var leftChangeBarStartBinding: Binding<Int>? = null
+    private var leftChangeBarLabelBinding: Binding<String>? = null
+    private var rightChangeBarBinding: Binding<List<HemicycleFrame.Bar>>? = null
+    private var rightChangeBarStartBinding: Binding<Int>? = null
+    private var rightChangeBarLabelBinding: Binding<String>? = null
+    private var rowsBinding: Binding<List<Int>>? = null
+    private var dotsBinding: Binding<List<HemicycleFrame.Dot>>? = null
+
     enum class Tiebreaker {
         FRONT_ROW_FROM_LEFT, FRONT_ROW_FROM_RIGHT
     }
 
-    var frame = HemicycleFrame()
-
     fun withHeader(headerBinding: Binding<String?>): HemicycleFrameBuilder {
-        frame.setHeaderBinding(headerBinding)
+        this.headerBinding = headerBinding
         return this
     }
 
@@ -30,8 +44,8 @@ class HemicycleFrameBuilder {
         seatFunc: (T) -> Int,
         labelBinding: Binding<String>
     ): HemicycleFrameBuilder {
-        frame.setLeftSeatBarBinding(bars.mapElements { HemicycleFrame.Bar(color = colorFunc(it), size = seatFunc(it)) })
-        frame.setLeftSeatBarLabelBinding(labelBinding)
+        this.leftSeatBarBinding = bars.mapElements { HemicycleFrame.Bar(color = colorFunc(it), size = seatFunc(it)) }
+        this.leftSeatBarLabelBinding = labelBinding
         return this
     }
 
@@ -41,8 +55,8 @@ class HemicycleFrameBuilder {
         seatFunc: (T) -> Int,
         labelBinding: Binding<String>
     ): HemicycleFrameBuilder {
-        frame.setRightSeatBarBinding(bars.mapElements { HemicycleFrame.Bar(color = colorFunc(it), size = seatFunc(it)) })
-        frame.setRightSeatBarLabelBinding(labelBinding)
+        this.rightSeatBarBinding = bars.mapElements { HemicycleFrame.Bar(color = colorFunc(it), size = seatFunc(it)) }
+        this.rightSeatBarLabelBinding = labelBinding
         return this
     }
 
@@ -52,8 +66,8 @@ class HemicycleFrameBuilder {
         seatFunc: (T) -> Int,
         labelBinding: Binding<String>
     ): HemicycleFrameBuilder {
-        frame.setMiddleSeatBarBinding(bars.mapElements { HemicycleFrame.Bar(color = colorFunc(it), size = seatFunc(it)) })
-        frame.setMiddleSeatBarLabelBinding(labelBinding)
+        this.middleSeatBarBinding = bars.mapElements { HemicycleFrame.Bar(color = colorFunc(it), size = seatFunc(it)) }
+        this.middleSeatBarLabelBinding = labelBinding
         return this
     }
 
@@ -64,9 +78,9 @@ class HemicycleFrameBuilder {
         startBinding: Binding<Int>,
         labelBinding: Binding<String>
     ): HemicycleFrameBuilder {
-        frame.setLeftChangeBarBinding(bars.mapElements { HemicycleFrame.Bar(color = colorFunc(it), size = seatFunc(it)) })
-        frame.setLeftChangeBarStartBinding(startBinding)
-        frame.setLeftChangeBarLabelBinding(labelBinding)
+        this.leftChangeBarBinding = bars.mapElements { HemicycleFrame.Bar(color = colorFunc(it), size = seatFunc(it)) }
+        this.leftChangeBarStartBinding = startBinding
+        this.leftChangeBarLabelBinding = labelBinding
         return this
     }
 
@@ -77,14 +91,30 @@ class HemicycleFrameBuilder {
         startBinding: Binding<Int>,
         labelBinding: Binding<String>
     ): HemicycleFrameBuilder {
-        frame.setRightChangeBarBinding(bars.mapElements { HemicycleFrame.Bar(color = colorFunc(it), size = seatFunc(it)) })
-        frame.setRightChangeBarStartBinding(startBinding)
-        frame.setRightChangeBarLabelBinding(labelBinding)
+        this.rightChangeBarBinding = bars.mapElements { HemicycleFrame.Bar(color = colorFunc(it), size = seatFunc(it)) }
+        this.rightChangeBarStartBinding = startBinding
+        this.rightChangeBarLabelBinding = labelBinding
         return this
     }
 
     fun build(): HemicycleFrame {
-        return frame
+        val hemicycleFrame = HemicycleFrame()
+        headerBinding?.let { hemicycleFrame.setHeaderBinding(it) }
+        leftSeatBarBinding?.let { hemicycleFrame.setLeftSeatBarBinding(it) }
+        leftSeatBarLabelBinding?.let { hemicycleFrame.setLeftSeatBarLabelBinding(it) }
+        rightSeatBarBinding?.let { hemicycleFrame.setRightSeatBarBinding(it) }
+        rightSeatBarLabelBinding?.let { hemicycleFrame.setRightSeatBarLabelBinding(it) }
+        middleSeatBarBinding?.let { hemicycleFrame.setMiddleSeatBarBinding(it) }
+        middleSeatBarLabelBinding?.let { hemicycleFrame.setMiddleSeatBarLabelBinding(it) }
+        leftChangeBarBinding?.let { hemicycleFrame.setLeftChangeBarBinding(it) }
+        leftChangeBarStartBinding?.let { hemicycleFrame.setLeftChangeBarStartBinding(it) }
+        leftChangeBarLabelBinding?.let { hemicycleFrame.setLeftChangeBarLabelBinding(it) }
+        rightChangeBarBinding?.let { hemicycleFrame.setRightChangeBarBinding(it) }
+        rightChangeBarStartBinding?.let { hemicycleFrame.setRightChangeBarStartBinding(it) }
+        rightChangeBarLabelBinding?.let { hemicycleFrame.setRightChangeBarLabelBinding(it) }
+        rowsBinding?.let { hemicycleFrame.setRowsBinding(it) }
+        dotsBinding?.let { hemicycleFrame.setDotsBinding(it) }
+        return hemicycleFrame
     }
 
     class Result(val winner: Party?, val hasWon: Boolean)
@@ -162,20 +192,20 @@ class HemicycleFrameBuilder {
                 }
             }
             val builder = HemicycleFrameBuilder()
-            builder.frame.setRowsBinding(Binding.fixedBinding(rows))
+            builder.rowsBinding = Binding.fixedBinding(rows)
             val dots: List<T> = points
                     .sortedWith(
                             Comparator.comparingInt { it: Pair<Point, T?> -> it.first.x }
                                     .thenComparing { it -> it.first.y })
                     .map { it.second!! }
                     .toList()
-            builder.frame.setDotsBinding(Binding.listBinding(
+            builder.dotsBinding = Binding.listBinding(
                 dots.map {
                     colorFunc(it).merge(borderFunc(it)) {
                         color, border -> HemicycleFrame.Dot(color = color, border = border)
                     }
                 }
-            ))
+            )
             return builder
         }
 
