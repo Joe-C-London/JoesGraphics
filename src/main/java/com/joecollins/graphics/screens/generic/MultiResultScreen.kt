@@ -2,6 +2,7 @@ package com.joecollins.graphics.screens.generic
 
 import com.joecollins.bindings.Bindable
 import com.joecollins.bindings.Binding
+import com.joecollins.bindings.BindingReceiver
 import com.joecollins.graphics.ImageGenerator
 import com.joecollins.graphics.components.BarFrame
 import com.joecollins.graphics.components.BarFrameBuilder
@@ -36,12 +37,15 @@ class MultiResultScreen private constructor() : JPanel() {
     private val panels: MutableList<ResultPanel> = ArrayList()
 
     class Builder<T>(
-        internal val listBinding: Binding<List<T>>,
+        listBinding: Binding<List<T>>,
         private val votesFunc: (T) -> Binding<Map<Candidate, Int>>,
         private val headerFunc: (T) -> Binding<String>,
         private val subheadFunc: (T) -> Binding<String>,
         private val partiesOnly: Boolean
     ) {
+        private val listReceiver = BindingReceiver(listBinding)
+        private val itemReceivers: MutableList<BindingReceiver<T?>> = ArrayList()
+
         var pctReportingFunc: (T) -> Binding<Double> = { Binding.fixedBinding(1.0) }
         var winnerFunc: (T) -> Binding<Candidate?> = { Binding.fixedBinding(null) }
         var runoffFunc: (T) -> Binding<Set<Candidate>?> = { Binding.fixedBinding(setOf()) }
@@ -145,15 +149,41 @@ class MultiResultScreen private constructor() : JPanel() {
             center.layout = GridLayout(1, 0)
             center.background = Color.WHITE
             screen.add(center, BorderLayout.CENTER)
-            this.listBinding.bind { list ->
+            this.listReceiver.getBinding().bind { list ->
                 val size = list.size
                 while (screen.panels.size < size) {
+                    val idx = screen.panels.size
+                    val itemReceiver = BindingReceiver(
+                        this.listReceiver.getBinding {
+                            if (idx < it.size) {
+                                it[idx]
+                            } else {
+                                null
+                            }
+                        }
+                    )
+                    itemReceivers.add(itemReceiver)
                     val newPanel = ResultPanel(
                         this.incumbentMarker,
                         this.swingPartyOrder,
                         mapHeaderFunc != null,
                         this.partiesOnly
                     )
+                    newPanel.setVotesBinding(itemReceiver.getFlatBinding { it?.let(votesFunc) ?: Binding.fixedBinding(emptyMap()) })
+                    newPanel.setWinnerBinding(itemReceiver.getFlatBinding { it?.let(winnerFunc) ?: Binding.fixedBinding(null) })
+                    newPanel.setRunoffBinding(itemReceiver.getFlatBinding { it?.let(runoffFunc) ?: Binding.fixedBinding(null) })
+                    newPanel.setPctReportingBinding(itemReceiver.getFlatBinding { it?.let(pctReportingFunc) ?: Binding.fixedBinding(0.0) })
+                    newPanel.setHeaderBinding(itemReceiver.getFlatBinding { it?.let(headerFunc) ?: Binding.fixedBinding("") })
+                    newPanel.setSubheadBinding(itemReceiver.getFlatBinding { it?.let(subheadFunc) ?: Binding.fixedBinding("") })
+                    if (swingPartyOrder != null) {
+                        prevFunc?.let { f -> newPanel.setPrevBinding(itemReceiver.getFlatBinding { it?.let(f) ?: Binding.fixedBinding(emptyMap()) }) }
+                        swingHeaderFunc?.let { f -> newPanel.setSwingHeaderBinding(itemReceiver.getFlatBinding { it?.let(f) ?: Binding.fixedBinding("") }) }
+                    }
+                    if (mapHeaderFunc != null) {
+                        mapShapeFunc?.let { f -> newPanel.setMapShapeBinding(itemReceiver.getFlatBinding { Binding.listBinding((it?.let(f) ?: emptyList()).map { e -> e.second.map { c -> Pair(e.first, c) } }) }) }
+                        mapFocusFunc?.let { f -> newPanel.setMapFocusBinding(itemReceiver.getBinding { it?.let(f) ?: emptyList() }) }
+                        mapHeaderFunc?.let { f -> newPanel.setMapHeaderBinding(itemReceiver.getFlatBinding { it?.let(f) ?: Binding.fixedBinding("") }) }
+                    }
                     center.add(newPanel)
                     screen.panels.add(newPanel)
                 }
@@ -161,6 +191,7 @@ class MultiResultScreen private constructor() : JPanel() {
                     val panel = screen.panels.removeAt(size)
                     panel.unbindAll()
                     center.remove(panel)
+                    itemReceivers.removeAt(size)
                 }
                 val numRows = if (size > 4) 2 else 1
                 center.layout = GridLayout(numRows, 0)
@@ -173,23 +204,6 @@ class MultiResultScreen private constructor() : JPanel() {
                     )
                     p.invalidate()
                     p.revalidate()
-                }
-                list.forEachIndexed { idx, item ->
-                    screen.panels[idx].setVotesBinding(votesFunc(item))
-                    screen.panels[idx].setWinnerBinding(winnerFunc(item))
-                    screen.panels[idx].setRunoffBinding(runoffFunc(item))
-                    screen.panels[idx].setPctReportingBinding(pctReportingFunc(item))
-                    screen.panels[idx].setHeaderBinding(headerFunc(item))
-                    screen.panels[idx].setSubheadBinding(subheadFunc(item))
-                    if (swingPartyOrder != null) {
-                        prevFunc?.let { f -> screen.panels[idx].setPrevBinding(f(item)) }
-                        swingHeaderFunc?.let { f -> screen.panels[idx].setSwingHeaderBinding(f(item)) }
-                    }
-                    if (mapHeaderFunc != null) {
-                        mapShapeFunc?.let { f -> screen.panels[idx].setMapShapeBinding(Binding.listBinding(f(item).map { it.second.map { c -> Pair(it.first, c) } })) }
-                        mapFocusFunc?.let { f -> screen.panels[idx].setMapFocusBinding(Binding.fixedBinding(f(item) ?: emptyList())) }
-                        mapHeaderFunc?.let { f -> screen.panels[idx].setMapHeaderBinding(f(item)) }
-                    }
                 }
                 EventQueue.invokeLater { screen.repaint() }
             }
