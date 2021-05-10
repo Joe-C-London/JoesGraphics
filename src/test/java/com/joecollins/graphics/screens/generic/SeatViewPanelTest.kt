@@ -314,6 +314,10 @@ class SeatViewPanelTest {
         mapHeader.value = "CARDIGAN"
         compareRendering("SeatViewPanel", "Map-3", panel)
 
+        winners[8] = pc
+        winnersByDistrict.value = winners
+        compareRendering("SeatViewPanel", "Map-3", panel)
+
         currSeats[pc] = 2
         currentSeats.value = currSeats
         prevSeats[lib] = 1
@@ -332,10 +336,15 @@ class SeatViewPanelTest {
         winnersByDistrict.value = winners
         seatHeader.value = "2 OF 7 DISTRICTS DECLARED"
         compareRendering("SeatViewPanel", "Map-4", panel)
+
         focus.value = null
         header.value = "PRINCE EDWARD ISLAND"
-        seatHeader.value = "2 OF 27 DISTRICTS DECLARED"
+        seatHeader.value = "3 OF 27 DISTRICTS DECLARED"
         seatSubhead.value = "PROJECTION: TOO EARLY TO CALL"
+        currSeats[pc] = 3
+        currentSeats.value = currSeats
+        prevSeats[lib] = 2
+        previousSeats.value = prevSeats
         totalSeats.value = 27
         showMajority.value = true
         mapHeader.value = "PEI"

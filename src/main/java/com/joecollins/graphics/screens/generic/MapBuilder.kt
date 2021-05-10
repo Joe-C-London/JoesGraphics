@@ -135,8 +135,9 @@ class MapBuilder<T> {
 
     companion object {
         private fun extractColor(focus: List<Shape>?, shape: Shape, winner: PartyResult?): Color {
-            return winner?.color
-                    ?: (if (focus == null || focus.isEmpty() || focus.contains(shape)) {
+            val isInFocus = focus == null || focus.isEmpty() || focus.contains(shape)
+            return winner?.color?.takeIf { isInFocus }
+                    ?: (if (isInFocus) {
                         Color.LIGHT_GRAY
                     } else {
                         Color(220, 220, 220)
