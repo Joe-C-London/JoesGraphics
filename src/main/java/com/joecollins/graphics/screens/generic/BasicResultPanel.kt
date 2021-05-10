@@ -1018,7 +1018,7 @@ class BasicResultPanel private constructor(
         }
 
         private fun doubleLineBarLimit(): Int {
-            return if (currPreferences == null) 10 else 6
+            return if (currPreferences == null) 10 else 0
         }
 
         override fun createFrame(): BarFrame {
