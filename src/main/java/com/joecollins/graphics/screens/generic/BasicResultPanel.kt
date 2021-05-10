@@ -1241,13 +1241,16 @@ class BasicResultPanel private constructor(
                                     currTotalByParty(r.currVotes),
                                     limit,
                                     Party.OTHERS,
-                                    *mandatoryParties.toTypedArray()).toMutableMap()
+                                    *mandatoryParties.toTypedArray())
+                                .toMutableMap()
                             val prevVotes: MutableMap<Party, Int> = HashMap(r.prevVotes)
                             r.prevVotes.entries.asSequence()
                                     .filter { e: Map.Entry<Party, Int> -> !partyTotal.containsKey(e.key) }
                                     .forEach { e: Map.Entry<Party, Int> ->
                                         partyTotal.putIfAbsent(Party.OTHERS, 0)
-                                        prevVotes.merge(Party.OTHERS, e.value) { a: Int, b: Int -> Integer.sum(a, b) }
+                                        if (e.key != Party.OTHERS) {
+                                            prevVotes.merge(Party.OTHERS, e.value) { a: Int, b: Int -> Integer.sum(a, b) }
+                                        }
                                     }
                             partyTotal.entries.asSequence()
                                     .sortedByDescending { e: Map.Entry<Party, Int> -> if (e.key === Party.OTHERS) Int.MIN_VALUE else e.value }

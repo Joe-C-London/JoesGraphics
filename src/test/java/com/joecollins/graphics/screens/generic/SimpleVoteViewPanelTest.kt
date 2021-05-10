@@ -723,6 +723,41 @@ class SimpleVoteViewPanelTest {
 
     @Test
     @Throws(IOException::class)
+    fun testPartiesNotRunningAgainPrevOthers() {
+        val ndp = Party("New Democratic Party", "NDP", Color.ORANGE)
+        val pc = Candidate("Jean-G\u00e9rard Chiasson", Party("Progressive Conservative", "PC", Color.BLUE))
+        val lib = Candidate("Eric Mallet", Party("Liberal", "LIB", Color.RED))
+        val grn = Candidate("Marie Leclerc", Party("Green", "GRN", Color.GREEN.darker()))
+        val curr = LinkedHashMap<Candidate, Int>()
+        curr[pc] = 714
+        curr[lib] = 6834
+        curr[grn] = 609
+        val prev = LinkedHashMap<Party, Int>()
+        prev[Party.OTHERS] = 289
+        prev[ndp] = 289
+        prev[pc.party] = 4048
+        prev[lib.party] = 3949
+        val currentVotes = BindableWrapper(curr)
+        val previousVotes = BindableWrapper(prev)
+        val header = BindableWrapper("SHIPPAGAN-LAM\u00c8QUE-MISCOU")
+        val voteHeader = BindableWrapper("OFFICIAL RESULT")
+        val voteSubhead = BindableWrapper("")
+        val changeHeader = BindableWrapper("CHANGE SINCE 2018")
+        val swingHeader = BindableWrapper("SWING SINCE 2018")
+        val winner = BindableWrapper(lib)
+        val swingPartyOrder = listOf(grn.party, lib.party, pc.party)
+        val panel = candidateVotes(
+            currentVotes.binding, voteHeader.binding, voteSubhead.binding)
+            .withPrev(previousVotes.binding, changeHeader.binding)
+            .withWinner(winner.binding)
+            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader.binding)
+            .build(header.binding)
+        panel.setSize(1024, 512)
+        compareRendering("SimpleVoteViewPanel", "PartiesNotRunningAgain-1", panel)
+    }
+
+    @Test
+    @Throws(IOException::class)
     fun testPartiesNotRunningAgainOthers() {
         val ndp = Party("New Democratic Party", "NDP", Color.ORANGE)
         val pc = Candidate("Jean-G\u00e9rard Chiasson", Party("Progressive Conservative", "PC", Color.BLUE))
@@ -751,6 +786,41 @@ class SimpleVoteViewPanelTest {
                 .withWinner(winner.binding)
                 .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader.binding)
                 .build(header.binding)
+        panel.setSize(1024, 512)
+        compareRendering("SimpleVoteViewPanel", "PartiesNotRunningAgainOthers-1", panel)
+    }
+
+    @Test
+    @Throws(IOException::class)
+    fun testPartiesNotRunningAgainOthersPrevOthers() {
+        val ndp = Party("New Democratic Party", "NDP", Color.ORANGE)
+        val pc = Candidate("Jean-G\u00e9rard Chiasson", Party("Progressive Conservative", "PC", Color.BLUE))
+        val lib = Candidate("Eric Mallet", Party("Liberal", "LIB", Color.RED))
+        val oth = Candidate.OTHERS
+        val curr = LinkedHashMap<Candidate, Int>()
+        curr[pc] = 714
+        curr[lib] = 6834
+        curr[oth] = 609
+        val prev = LinkedHashMap<Party, Int>()
+        prev[Party.OTHERS] = 289
+        prev[ndp] = 289
+        prev[pc.party] = 4048
+        prev[lib.party] = 3949
+        val currentVotes = BindableWrapper(curr)
+        val previousVotes = BindableWrapper(prev)
+        val header = BindableWrapper("SHIPPAGAN-LAM\u00c8QUE-MISCOU")
+        val voteHeader = BindableWrapper("OFFICIAL RESULT")
+        val voteSubhead = BindableWrapper("")
+        val changeHeader = BindableWrapper("CHANGE SINCE 2018")
+        val swingHeader = BindableWrapper("SWING SINCE 2018")
+        val winner = BindableWrapper(lib)
+        val swingPartyOrder = listOf(ndp, oth.party, lib.party, pc.party)
+        val panel = candidateVotes(
+            currentVotes.binding, voteHeader.binding, voteSubhead.binding)
+            .withPrev(previousVotes.binding, changeHeader.binding)
+            .withWinner(winner.binding)
+            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader.binding)
+            .build(header.binding)
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "PartiesNotRunningAgainOthers-1", panel)
     }
