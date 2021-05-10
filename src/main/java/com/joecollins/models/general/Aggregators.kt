@@ -101,8 +101,9 @@ object Aggregators {
             return result
         }
         val mustIncludeSet = mustInclude.filterNotNull().toSet()
-        val top = result.entries
+        val top = result.entries.asSequence()
             .filter { !mustIncludeSet.contains(it.key) }
+            .filter { it.key != others }
             .sortedByDescending { it.value ?: -1 }
             .take(max(0, limit - 1 - mustIncludeSet.size))
             .toSet()

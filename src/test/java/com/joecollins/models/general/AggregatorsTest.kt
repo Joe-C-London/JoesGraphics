@@ -291,6 +291,16 @@ class AggregatorsTest {
     }
 
     @Test
+    fun testTopAndOthersAboveLimitWithOthers() {
+        val votes = BindableWrapper(mapOf("ABC" to 5, "DEF" to 3, "GHI" to 2, "JKL" to 4, "OTHERS" to 6))
+        val output: BoundResult<Map<String, Int>> = BoundResult()
+        topAndOthers(votes.binding, 3, "OTHERS").bind { output.value = it }
+        Assert.assertEquals(mapOf("ABC" to 5, "JKL" to 4, "OTHERS" to 11), output.value)
+        votes.value = mapOf("ABC" to 5, "DEF" to 7, "GHI" to 6, "JKL" to 4, "OTHERS" to 7)
+        Assert.assertEquals(mapOf("DEF" to 7, "GHI" to 6, "OTHERS" to 16), output.value)
+    }
+
+    @Test
     fun testTopAndOthersAboveLimitWithMandatoryInclusion() {
         val votes = BindableWrapper(mapOf("ABC" to 5, "DEF" to 3, "GHI" to 2, "JKL" to 4))
         val winner = BindableWrapper<String?>(null)
