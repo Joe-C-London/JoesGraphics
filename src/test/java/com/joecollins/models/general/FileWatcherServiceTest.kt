@@ -1,7 +1,6 @@
 package com.joecollins.models.general
 
 import com.joecollins.models.general.FileWatcherService.Companion.createService
-import com.joecollins.models.general.FileWatcherService.PathConsumer
 import java.io.File
 import java.io.IOException
 import java.lang.InterruptedException
@@ -39,8 +38,7 @@ class FileWatcherServiceTest {
         Files.writeString(tempPath!!.resolve("file1.txt"), file1Contents, UTF8)
         Files.writeString(tempPath!!.resolve("file2.txt"), file2Contents, UTF8)
         val contents: MutableMap<Path, String> = HashMap()
-        createService(
-                tempPath!!, PathConsumer { p: Path -> contents[p] = Files.readString(p, UTF8) }).use { }
+        createService(tempPath!!) { p: Path -> contents[p] = Files.readString(p, UTF8) }.use { }
         Assert.assertEquals(file1Contents, contents[tempPath!!.resolve("file1.txt")])
         Assert.assertEquals(file2Contents, contents[tempPath!!.resolve("file2.txt")])
     }
@@ -55,8 +53,7 @@ class FileWatcherServiceTest {
         Files.writeString(tempPath!!.resolve("file1.txt"), file1Contents, UTF8)
         Files.writeString(tempPath!!.resolve("file2.txt"), file2Contents, UTF8)
         val contents: MutableMap<Path, String> = HashMap()
-        createService(
-                tempPath!!, PathConsumer { p: Path -> contents[p] = Files.readString(p, UTF8) }).use {
+        createService(tempPath!!) { p: Path -> contents[p] = Files.readString(p, UTF8) }.use {
             run {
                 val tmpFile = Files.createTempFile("file", ".txt")
                 Files.writeString(tmpFile, file1NewContents, UTF8)
@@ -79,9 +76,7 @@ class FileWatcherServiceTest {
     fun testIOExceptionThrownOnFirstAttempt() {
         val file1Contents = "File 1 Contents"
         Files.writeString(tempPath!!.resolve("file1.txt"), file1Contents, UTF8)
-        createService(
-                tempPath!!,
-                PathConsumer { throw IOException("KABOOM!") }).use { }
+        createService(tempPath!!) { throw IOException("KABOOM!") }.use { }
     }
 
     @Test
@@ -94,14 +89,44 @@ class FileWatcherServiceTest {
         Files.writeString(tempPath!!.resolve("file1.txt"), file1Contents, UTF8)
         Files.writeString(tempPath!!.resolve("file2.txt"), file2Contents, UTF8)
         val contents: MutableMap<Path, String> = HashMap()
-        createService(
-                tempPath!!,
-                PathConsumer { p: Path ->
-                    if (p.toString().contains("file3.txt")) {
-                        throw IOException("KABOOM!")
-                    }
-                    contents[p] = Files.readString(p, UTF8)
-                }).use {
+        createService(tempPath!!) { p: Path ->
+            if (p.toString().contains("file3.txt")) {
+                throw IOException("KABOOM!")
+            }
+            contents[p] = Files.readString(p, UTF8)
+        }.use {
+            run {
+                val tmpFile = Files.createTempFile("file", ".txt")
+                Files.writeString(tmpFile, file3Contents, UTF8)
+                Files.move(tmpFile, tempPath!!.resolve("file3.txt"), StandardCopyOption.REPLACE_EXISTING)
+            }
+            run {
+                val tmpFile = Files.createTempFile("file", ".txt")
+                Files.writeString(tmpFile, file1NewContents, UTF8)
+                Files.move(tmpFile, tempPath!!.resolve("file1.txt"), StandardCopyOption.REPLACE_EXISTING)
+            }
+            Thread.sleep(200)
+        }
+        Assert.assertEquals(file1NewContents, contents[tempPath!!.resolve("file1.txt")])
+        Assert.assertEquals(file2Contents, contents[tempPath!!.resolve("file2.txt")])
+    }
+
+    @Test
+    @Throws(InterruptedException::class)
+    fun testRuntimeExceptionOnUpdateIgnored() {
+        val file1Contents = "File 1 Contents"
+        val file1NewContents = "File 1 New Contents"
+        val file2Contents = "File 2 Contents"
+        val file3Contents = "File 3 Contents"
+        Files.writeString(tempPath!!.resolve("file1.txt"), file1Contents, UTF8)
+        Files.writeString(tempPath!!.resolve("file2.txt"), file2Contents, UTF8)
+        val contents: MutableMap<Path, String> = HashMap()
+        createService(tempPath!!) { p: Path ->
+            if (p.toString().contains("file3.txt")) {
+                throw IllegalArgumentException("KABOOM!")
+            }
+            contents[p] = Files.readString(p, UTF8)
+        }.use {
             run {
                 val tmpFile = Files.createTempFile("file", ".txt")
                 Files.writeString(tmpFile, file3Contents, UTF8)

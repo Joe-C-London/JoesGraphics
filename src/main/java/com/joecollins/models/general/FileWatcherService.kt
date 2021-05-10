@@ -1,6 +1,5 @@
 package com.joecollins.models.general
 
-import java.io.IOException
 import java.nio.file.FileSystems
 import java.nio.file.Files
 import java.nio.file.Path
@@ -14,14 +13,9 @@ import java.util.concurrent.Future
 
 class FileWatcherService(private val executor: ExecutorService, private val task: Future<*>) : AutoCloseable {
 
-    fun interface PathConsumer {
-        @Throws(IOException::class) operator fun invoke(path: Path)
-    }
-
     companion object {
 
-        @Throws(IOException::class)
-        @JvmStatic fun createService(path: Path, onUpdate: PathConsumer): FileWatcherService {
+        @JvmStatic fun createService(path: Path, onUpdate: (Path) -> Unit): FileWatcherService {
             val executor = Executors.newSingleThreadExecutor {
                 val t = Executors.defaultThreadFactory().newThread(it)
                 t.isDaemon = true
@@ -44,7 +38,7 @@ class FileWatcherService(private val executor: ExecutorService, private val task
                                 val filename = ev.context()
                                 onUpdate(path.resolve(filename))
                             }
-                        } catch (e: IOException) {
+                        } catch (e: Exception) {
                             e.printStackTrace()
                         }
                     }
