@@ -16,7 +16,6 @@ import java.awt.RenderingHints
 import java.awt.geom.AffineTransform
 import java.awt.geom.Ellipse2D
 import java.awt.image.BufferedImage
-import java.lang.IllegalStateException
 import java.net.URL
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -226,7 +225,7 @@ class TweetFrame(tweet: Binding<Status>, private val timezone: ZoneId = ZoneId.s
                 image = imageURL?.let { ImageIO.read(URL(it)) }
                 title = head.selectFirst(Evaluator.AttributeWithValue("name", "twitter:title"))?.attr("content")
                     ?: (head.selectFirst(Evaluator.Tag("title"))?.text())
-                    ?: "No title found"
+                    ?: ""
                 domain = head.selectFirst(Evaluator.AttributeWithValue("name", "twitter:domain"))?.attr("content")
                     ?: urlEntity.expandedURL.let { it.substring(it.indexOf("//") + 2) }.let { it.substring(0, it.indexOf("/")) }
             } catch (e: Exception) {

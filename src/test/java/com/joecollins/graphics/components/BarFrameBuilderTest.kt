@@ -708,7 +708,7 @@ class BarFrameBuilderTest {
 
     @Test
     fun testDualVariousCombos() {
-        val doAssert = { exp: kotlin.Pair<Color, Number>, act: kotlin.Pair<Color, Number> ->
+        val doAssert = { exp: Pair<Color, Number>, act: Pair<Color, Number> ->
             Assert.assertEquals(exp.first, act.first)
             Assert.assertEquals(exp.second.toDouble(), act.second.toDouble(), 0.0)
         }
@@ -757,6 +757,29 @@ class BarFrameBuilderTest {
         doAssert(Pair(Color.BLACK, 0.0), frame.getSeries(0)[0])
         doAssert(Pair(lighten(Color.BLACK), +1.0), frame.getSeries(0)[1])
         doAssert(Pair(lighten(Color.BLACK), -1.0), frame.getSeries(0)[2])
+    }
+
+    @Test
+    fun expandBarSpace() {
+        val bars = BindableWrapper<List<BasicBar>>(listOf())
+        val minBars = BindableWrapper(0)
+        val barFrame = basic(bars.binding).withMinBarCount(minBars.binding).build()
+        Assert.assertEquals(0, barFrame.numBars)
+
+        bars.value = listOf(
+            BasicBar("JOE BIDEN", Color.BLUE, 306),
+            BasicBar("DONALD TRUMP", Color.RED, 232)
+        )
+        Assert.assertEquals(2, barFrame.numBars)
+
+        minBars.value = 3
+        Assert.assertEquals(3, barFrame.numBars)
+
+        minBars.value = 1
+        Assert.assertEquals(2, barFrame.numBars)
+
+        bars.value = emptyList()
+        Assert.assertEquals(1, barFrame.numBars)
     }
 
     companion object {

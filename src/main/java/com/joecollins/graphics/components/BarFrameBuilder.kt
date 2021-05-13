@@ -18,9 +18,10 @@ class BarFrameBuilder {
     private var borderColorBinding: Binding<Color>? = null
     private var subheadColorBinding: Binding<Color>? = null
     private var linesBinding: Binding<List<BarFrame.Line>>? = null
-    private var barsBinding: Binding<List<BarFrame.Bar>>? = null
+    private lateinit var barsBinding: Binding<List<BarFrame.Bar>>
     private var minBinding: Binding<Number>? = null
     private var maxBinding: Binding<Number>? = null
+    private var minBarCountBinding: Binding<Int>? = null
 
     private val rangeFinder = RangeFinder()
 
@@ -156,6 +157,11 @@ class BarFrameBuilder {
         return withLines(linesBinding, labelFunc) { it }
     }
 
+    fun withMinBarCount(minBarCountBinding: Binding<Int>): BarFrameBuilder {
+        this.minBarCountBinding = minBarCountBinding
+        return this
+    }
+
     fun build(): BarFrame {
         val barFrame = BarFrame()
         headerBinding?.let { barFrame.setHeaderBinding(it) }
@@ -164,7 +170,15 @@ class BarFrameBuilder {
         borderColorBinding?.let { barFrame.setBorderColorBinding(it) }
         subheadColorBinding?.let { barFrame.setSubheadColorBinding(it) }
         linesBinding?.let { barFrame.setLinesBinding(it) }
-        barsBinding?.let { barFrame.setBarsBinding(it) }
+        barFrame.setBarsBinding(
+            minBarCountBinding?.let { minBinding -> barsBinding.merge(minBinding) { bars, min ->
+                if (bars.size >= min) bars
+                else sequenceOf(bars, MutableList(min - bars.size) { BarFrame.Bar("", "", emptyList()) })
+                    .flatten()
+                    .toList()
+            } }
+                ?: barsBinding
+        )
         minBinding?.let { barFrame.setMinBinding(it) }
         maxBinding?.let { barFrame.setMaxBinding(it) }
         return barFrame
