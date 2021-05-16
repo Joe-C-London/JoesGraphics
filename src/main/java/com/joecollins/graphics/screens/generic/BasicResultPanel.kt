@@ -24,14 +24,13 @@ import java.awt.Dimension
 import java.awt.LayoutManager
 import java.awt.Shape
 import java.text.DecimalFormat
-import java.util.Comparator
-import java.util.HashMap
-import java.util.LinkedHashMap
 import java.util.Objects
 import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.border.EmptyBorder
+import kotlin.math.abs
 import kotlin.math.roundToInt
+import kotlin.math.sign
 
 class BasicResultPanel private constructor(
     label: JLabel,
@@ -463,8 +462,12 @@ class BasicResultPanel private constructor(
         current: BindingReceiver<Map<KT, Pair<Int, Int>>>,
         header: BindingReceiver<String?>,
         subhead: BindingReceiver<String?>,
-        keyTemplate: KeyTemplate<KT>
+        keyTemplate: KeyTemplate<KT>,
+        val focusLocation: FocusLocation
     ) : SeatScreenBuilder<KT, Pair<Int, Int>, Pair<Int, Int>>(current, header, subhead, keyTemplate) {
+
+        enum class FocusLocation { FIRST, LAST }
+
         override fun createFromDiff(
             curr: Pair<Int, Int>,
             diff: Pair<Int, Int>?
@@ -529,7 +532,7 @@ class BasicResultPanel private constructor(
                                             keyTemplate.toMainBarHeader(
                                                     e.key, count > doubleLineBarLimit()),
                                             keyTemplate.toParty(e.key).color,
-                                            e.value.first,
+                                            if (focusLocation == FocusLocation.FIRST) e.value.first else (e.value.second - e.value.first),
                                             e.value.second,
                                             e.value.first.toString() + "/" + e.value.second,
                                             if (e.key == r.winner) keyTemplate.winnerShape(count > doubleLineBarLimit()) else null)
@@ -538,10 +541,15 @@ class BasicResultPanel private constructor(
                     },
                     Result.Property.SEATS,
                     Result.Property.WINNER)
-            var builder = BarFrameBuilder.dual(bars)
-                    .withHeader(header.getBinding())
-                    .withSubhead(subhead.getBinding())
-                    .withNotes(this.notes?.getBinding() ?: Binding.fixedBinding(null))
+            var builder = if (focusLocation == FocusLocation.FIRST) {
+                BarFrameBuilder.dual(bars)
+            } else {
+                BarFrameBuilder.dualReversed(bars)
+            }
+            builder = builder
+                .withHeader(header.getBinding())
+                .withSubhead(subhead.getBinding())
+                .withNotes(this.notes?.getBinding() ?: Binding.fixedBinding(null))
             val total = this.total
             if (total != null) {
                 builder = builder.withMax(total.getBinding { it * 2 / 3 })
@@ -577,7 +585,10 @@ class BasicResultPanel private constructor(
                                 DualBar(
                                         e.key.abbreviation.toUpperCase(),
                                         e.key.color,
-                                        e.value.diff.first,
+                                        if (focusLocation == FocusLocation.FIRST ||
+                                            (e.value.diff.first != 0 && sign(e.value.diff.first.toDouble()) != sign(e.value.diff.second.toDouble())) ||
+                                            abs(e.value.diff.first.toDouble()) > abs(e.value.diff.second.toDouble())
+                                        ) e.value.diff.first else (e.value.diff.second - e.value.diff.first),
                                         e.value.diff.second,
                                         changeStr(e.value.diff.first) +
                                                 "/" +
@@ -585,7 +596,11 @@ class BasicResultPanel private constructor(
                             }
                             .toList()
                 }
-                var builder = BarFrameBuilder.dual(bars)
+                var builder = if (focusLocation == FocusLocation.FIRST)
+                    BarFrameBuilder.dual(bars)
+                else
+                    BarFrameBuilder.dualReversed(bars)
+                builder = builder
                         .withHeader(changeHeader.getBinding())
                         .withSubhead(changeSubhead?.getBinding() ?: Binding.fixedBinding(null))
                 val total = this.total
@@ -1564,7 +1579,21 @@ class BasicResultPanel private constructor(
                     BindingReceiver(seats),
                     BindingReceiver(header),
                     BindingReceiver(subhead),
-                    PartyTemplate())
+                    PartyTemplate(),
+                    DualSeatScreenBuilder.FocusLocation.FIRST)
+        }
+
+        @JvmStatic fun partyDualSeatsReversed(
+            seats: Binding<Map<Party, Pair<Int, Int>>>,
+            header: Binding<String?>,
+            subhead: Binding<String?>
+        ): SeatScreenBuilder<Party, Pair<Int, Int>, Pair<Int, Int>> {
+            return DualSeatScreenBuilder(
+                BindingReceiver(seats),
+                BindingReceiver(header),
+                BindingReceiver(subhead),
+                PartyTemplate(),
+                DualSeatScreenBuilder.FocusLocation.LAST)
         }
 
         @JvmStatic fun candidateDualSeats(
@@ -1576,7 +1605,8 @@ class BasicResultPanel private constructor(
                     BindingReceiver(seats),
                     BindingReceiver(header),
                     BindingReceiver(subhead),
-                    CandidateTemplate())
+                    CandidateTemplate(),
+                    DualSeatScreenBuilder.FocusLocation.FIRST)
         }
 
         @JvmStatic fun partyRangeSeats(

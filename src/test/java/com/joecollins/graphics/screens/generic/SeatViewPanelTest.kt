@@ -6,6 +6,7 @@ import com.joecollins.graphics.screens.generic.BasicResultPanel.Companion.candid
 import com.joecollins.graphics.screens.generic.BasicResultPanel.Companion.candidateRangeSeats
 import com.joecollins.graphics.screens.generic.BasicResultPanel.Companion.candidateSeats
 import com.joecollins.graphics.screens.generic.BasicResultPanel.Companion.partyDualSeats
+import com.joecollins.graphics.screens.generic.BasicResultPanel.Companion.partyDualSeatsReversed
 import com.joecollins.graphics.screens.generic.BasicResultPanel.Companion.partyRangeSeats
 import com.joecollins.graphics.screens.generic.BasicResultPanel.Companion.partySeats
 import com.joecollins.graphics.utils.BindableWrapper
@@ -446,6 +447,99 @@ class SeatViewPanelTest {
         previousSeats.value = prevSeats
         seatHeader.value = "338 OF 338 RIDINGS REPORTING"
         compareRendering("SeatViewPanel", "Dual-6", panel)
+    }
+
+    @Test
+    @Throws(IOException::class)
+    fun testDualReversedCurrPrev() {
+        val currentSeats = BindableWrapper(LinkedHashMap<Party, Pair<Int, Int>>())
+        val previousSeats = BindableWrapper(LinkedHashMap<Party, Pair<Int, Int>>())
+        val totalSeats = BindableWrapper(338)
+        val showMajority = BindableWrapper(true)
+        val header = BindableWrapper("CANADA")
+        val seatHeader = BindableWrapper("0 OF 338 RIDINGS REPORTING")
+        val seatSubhead = BindableWrapper("")
+        val changeHeader = BindableWrapper("CHANGE SINCE 2015")
+        val lib = Party("Liberal", "LIB", Color.RED)
+        val con = Party("Conservative", "CON", Color.BLUE)
+        val ndp = Party("New Democratic Party", "NDP", Color.ORANGE)
+        val bq = Party("Bloc Qu\u00e9b\u00e9cois", "BQ", Color.CYAN.darker())
+        val grn = Party("Green", "GRN", Color.GREEN.darker())
+        val ind = Party("Independent", "IND", Color.GRAY)
+        val panel = partyDualSeatsReversed(
+            currentSeats.binding, seatHeader.binding, seatSubhead.binding)
+            .withPrev(previousSeats.binding, changeHeader.binding)
+            .withTotal(totalSeats.binding)
+            .withMajorityLine(showMajority.binding) { "$it SEATS FOR MAJORITY" }
+            .build(header.binding)
+        panel.setSize(1024, 512)
+        compareRendering("SeatViewPanel", "DualReversed-1", panel)
+
+        val currSeats = LinkedHashMap<Party, Pair<Int, Int>>()
+        val prevSeats = LinkedHashMap<Party, Pair<Int, Int>>()
+        currSeats[lib] = Pair(0, 6)
+        currSeats[ndp] = Pair(0, 1)
+        currentSeats.value = currSeats
+        prevSeats[lib] = Pair(0, 7)
+        previousSeats.value = prevSeats
+        seatHeader.value = "7 OF 338 RIDINGS REPORTING"
+        compareRendering("SeatViewPanel", "DualReversed-2", panel)
+
+        currSeats[lib] = Pair(6, 26)
+        currSeats[ndp] = Pair(1, 1)
+        currSeats[con] = Pair(0, 4)
+        currSeats[grn] = Pair(0, 1)
+        currentSeats.value = currSeats
+        prevSeats[lib] = Pair(7, 32)
+        previousSeats.value = prevSeats
+        seatHeader.value = "32 OF 338 RIDINGS REPORTING"
+        compareRendering("SeatViewPanel", "DualReversed-3", panel)
+
+        currSeats[lib] = Pair(26, 145)
+        currSeats[ndp] = Pair(1, 13)
+        currSeats[con] = Pair(4, 104)
+        currSeats[bq] = Pair(0, 32)
+        currSeats[grn] = Pair(1, 1)
+        currentSeats.value = currSeats
+        prevSeats[lib] = Pair(32, 166)
+        prevSeats[ndp] = Pair(0, 30)
+        prevSeats[con] = Pair(0, 89)
+        prevSeats[bq] = Pair(0, 10)
+        previousSeats.value = prevSeats
+        seatHeader.value = "295 OF 338 RIDINGS REPORTING"
+        compareRendering("SeatViewPanel", "DualReversed-4", panel)
+
+        currSeats[lib] = Pair(145, 157)
+        currSeats[ndp] = Pair(13, 24)
+        currSeats[con] = Pair(104, 121)
+        currSeats[bq] = Pair(32, 32)
+        currSeats[grn] = Pair(1, 3)
+        currSeats[ind] = Pair(0, 1)
+        currentSeats.value = currSeats
+        prevSeats[lib] = Pair(166, 184)
+        prevSeats[ndp] = Pair(30, 44)
+        prevSeats[con] = Pair(89, 99)
+        prevSeats[bq] = Pair(10, 10)
+        prevSeats[grn] = Pair(0, 1)
+        previousSeats.value = prevSeats
+        seatHeader.value = "338 OF 338 RIDINGS REPORTING"
+        compareRendering("SeatViewPanel", "DualReversed-5", panel)
+
+        currSeats[lib] = Pair(157, 157)
+        currSeats[ndp] = Pair(24, 24)
+        currSeats[con] = Pair(121, 121)
+        currSeats[bq] = Pair(32, 32)
+        currSeats[grn] = Pair(3, 3)
+        currSeats[ind] = Pair(1, 1)
+        currentSeats.value = currSeats
+        prevSeats[lib] = Pair(184, 184)
+        prevSeats[ndp] = Pair(44, 44)
+        prevSeats[con] = Pair(99, 99)
+        prevSeats[bq] = Pair(10, 10)
+        prevSeats[grn] = Pair(1, 1)
+        previousSeats.value = prevSeats
+        seatHeader.value = "338 OF 338 RIDINGS REPORTING"
+        compareRendering("SeatViewPanel", "DualReversed-6", panel)
     }
 
     @Test
