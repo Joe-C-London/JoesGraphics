@@ -4,6 +4,13 @@ import com.joecollins.bindings.Binding
 import com.joecollins.bindings.BindingReceiver
 import com.joecollins.graphics.ImageGenerator
 import com.joecollins.graphics.utils.StandardFont
+import io.webfolder.cdp.Launcher
+import twitter4j.MediaEntity
+import twitter4j.Status
+import twitter4j.TwitterFactory
+import twitter4j.URLEntity
+import twitter4j.User
+import twitter4j.conf.ConfigurationBuilder
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Component
@@ -31,14 +38,6 @@ import kotlin.math.ceil
 import kotlin.math.min
 import kotlin.math.roundToInt
 import kotlin.math.sqrt
-import org.jsoup.Jsoup
-import org.jsoup.select.Evaluator
-import twitter4j.MediaEntity
-import twitter4j.Status
-import twitter4j.TwitterFactory
-import twitter4j.URLEntity
-import twitter4j.User
-import twitter4j.conf.ConfigurationBuilder
 
 class TweetFrame(tweet: Binding<Status>, private val timezone: ZoneId = ZoneId.systemDefault()) : JPanel() {
     private val twitterColor = Color(0x00acee)
@@ -219,15 +218,18 @@ class TweetFrame(tweet: Binding<Status>, private val timezone: ZoneId = ZoneId.s
             background = Color.WHITE
 
             try {
-                val doc = Jsoup.parse(URL(urlEntity.expandedURL).openStream(), null, urlEntity.expandedURL)
-                val head = doc.head()
-                val imageURL = head.selectFirst(Evaluator.AttributeWithValue("name", "twitter:image:src"))?.attr("content")
-                image = imageURL?.let { ImageIO.read(URL(it)) }
-                title = head.selectFirst(Evaluator.AttributeWithValue("name", "twitter:title"))?.attr("content")
-                    ?: (head.selectFirst(Evaluator.Tag("title"))?.text())
-                    ?: ""
-                domain = head.selectFirst(Evaluator.AttributeWithValue("name", "twitter:domain"))?.attr("content")
-                    ?: urlEntity.expandedURL.let { it.substring(it.indexOf("//") + 2) }.let { it.substring(0, it.indexOf("/")) }
+                val launcher = Launcher()
+                launcher.launch().use { sessionFactory ->
+                    sessionFactory.create().use { session ->
+                        session.navigate(urlEntity.expandedURL).waitDocumentReady().wait(5000)
+                        val imageURL = session.getAttribute("//meta[@name='twitter:image:src']", "content")
+                        image = imageURL?.let { ImageIO.read(URL(it)) }
+                        title = session.getAttribute("//meta[@name='twitter:title']", "content")
+                            ?: session.getText("//title")
+                        domain = session.getAttribute("//meta[@name='twitter:domain']", "content")
+                            ?: urlEntity.expandedURL.let { it.substring(it.indexOf("//") + 2) }.let { it.substring(0, it.indexOf("/")) }
+                    }
+                }
             } catch (e: Exception) {
                 e.printStackTrace()
                 image = null
