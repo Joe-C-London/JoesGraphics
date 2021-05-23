@@ -16,8 +16,8 @@ plugins {
 apply plugin: 'java'
 apply plugin: 'kotlin'
 
-sourceCompatibility = 14
-targetCompatibility = 14
+sourceCompatibility = 16
+targetCompatibility = 16
 
 group 'com.joecollins'
 version '1.0-SNAPSHOT'
@@ -56,7 +56,7 @@ spotless {
 }
 
 jacoco {
-    toolVersion = "0.8.5"
+    toolVersion = "0.8.7"
     reportsDir = file("$buildDir/jacocoReports")
 }
 
@@ -69,12 +69,12 @@ jacocoTestReport {
 }
 compileKotlin {
     kotlinOptions {
-        jvmTarget = "14"
+        jvmTarget = "16"
         freeCompilerArgs = ['-Xjvm-default=enable']
     }
 }
 compileTestKotlin {
     kotlinOptions {
-        jvmTarget = "14"
+        jvmTarget = "16"
     }
 }
