@@ -31,65 +31,61 @@ class GraphicsFrameTest {
 
     @Test
     fun testFixedHeader() {
-        val graphicsFrame = GraphicsFrame()
-        graphicsFrame.setHeaderBinding(fixedBinding("HEADER"))
+        val graphicsFrame = GraphicsFrame(
+            headerBinding = fixedBinding("HEADER")
+        )
         Assert.assertEquals("HEADER", graphicsFrame.header)
     }
 
     @Test
     fun testDynamicHeader() {
-        val graphicsFrame = GraphicsFrame()
-        graphicsFrame.setHeaderBinding(propertyBinding(TestObject(), { it.numPolls.toString() + " POLLS REPORTING" }, TestObject.Properties.NUM_POLLS))
+        val graphicsFrame = GraphicsFrame(
+            headerBinding = propertyBinding(TestObject(), { it.numPolls.toString() + " POLLS REPORTING" }, TestObject.Properties.NUM_POLLS)
+        )
         Assert.assertEquals("0 POLLS REPORTING", graphicsFrame.header)
     }
 
     @Test
     fun testDynamicHeaderRefreshed() {
-        val graphicsFrame = GraphicsFrame()
         val obj = TestObject()
-        graphicsFrame.setHeaderBinding(propertyBinding(obj, { it.numPolls.toString() + " POLLS REPORTING" }, TestObject.Properties.NUM_POLLS))
+        val graphicsFrame = GraphicsFrame(
+            headerBinding = propertyBinding(obj, { it.numPolls.toString() + " POLLS REPORTING" }, TestObject.Properties.NUM_POLLS)
+        )
         Assert.assertEquals("0 POLLS REPORTING", graphicsFrame.header)
         obj.numPolls = 1
         Assert.assertEquals("1 POLLS REPORTING", graphicsFrame.header)
     }
 
     @Test
-    fun testUnbind() {
-        val graphicsFrame = GraphicsFrame()
-        val obj = TestObject()
-        graphicsFrame.setHeaderBinding(propertyBinding(obj, { it.numPolls.toString() + " POLLS REPORTING" }, TestObject.Properties.NUM_POLLS))
-        Assert.assertEquals("0 POLLS REPORTING", graphicsFrame.header)
-        graphicsFrame.setHeaderBinding(fixedBinding("FIXED BINDING"))
-        Assert.assertEquals("FIXED BINDING", graphicsFrame.header)
-        obj.numPolls = 1
-        Assert.assertEquals("FIXED BINDING", graphicsFrame.header)
-    }
-
-    @Test
     fun testFixedNotes() {
-        val graphicsFrame = GraphicsFrame()
-        graphicsFrame.setNotesBinding(fixedBinding("SOURCE: BBC"))
+        val graphicsFrame = GraphicsFrame(
+            headerBinding = fixedBinding(null),
+            notesBinding = fixedBinding("SOURCE: BBC")
+        )
         Assert.assertEquals("SOURCE: BBC", graphicsFrame.notes)
     }
 
     @Test
     fun testBorderColor() {
-        val graphicsFrame = GraphicsFrame()
-        graphicsFrame.setBorderColorBinding(fixedBinding(Color.BLUE))
+        val graphicsFrame = GraphicsFrame(
+            headerBinding = fixedBinding(null),
+            borderColorBinding = fixedBinding(Color.BLUE)
+        )
         Assert.assertEquals(Color.BLUE, graphicsFrame.borderColor)
     }
 
     @Test
     @Throws(IOException::class)
     fun testRenderingHeaderOnly() {
-        val graphicsFrame: GraphicsFrame = object : GraphicsFrame() {
+        val graphicsFrame: GraphicsFrame = object : GraphicsFrame(
+            headerBinding = fixedBinding("HEADER")
+        ) {
             init {
                 val panel = JPanel()
                 panel.background = Color.YELLOW
                 add(panel, BorderLayout.CENTER)
             }
         }
-        graphicsFrame.setHeaderBinding(fixedBinding("HEADER"))
         graphicsFrame.setSize(256, 128)
         compareRendering("GraphicsFrame", "HeaderOnly", graphicsFrame)
     }
@@ -97,15 +93,16 @@ class GraphicsFrameTest {
     @Test
     @Throws(IOException::class)
     fun testRenderingHeaderAndNotes() {
-        val graphicsFrame: GraphicsFrame = object : GraphicsFrame() {
+        val graphicsFrame: GraphicsFrame = object : GraphicsFrame(
+            headerBinding = fixedBinding("HEADER"),
+            notesBinding = fixedBinding("SOURCE: BBC")
+        ) {
             init {
                 val panel = JPanel()
                 panel.background = Color.YELLOW
                 add(panel, BorderLayout.CENTER)
             }
         }
-        graphicsFrame.setHeaderBinding(fixedBinding("HEADER"))
-        graphicsFrame.setNotesBinding(fixedBinding("SOURCE: BBC"))
         graphicsFrame.setSize(256, 128)
         compareRendering("GraphicsFrame", "HeaderAndNotes", graphicsFrame)
     }
@@ -113,7 +110,9 @@ class GraphicsFrameTest {
     @Test
     @Throws(IOException::class)
     fun testRenderingNoHeader() {
-        val graphicsFrame: GraphicsFrame = object : GraphicsFrame() {
+        val graphicsFrame: GraphicsFrame = object : GraphicsFrame(
+            headerBinding = fixedBinding(null)
+        ) {
             init {
                 val panel = JPanel()
                 panel.background = Color.YELLOW
@@ -127,16 +126,17 @@ class GraphicsFrameTest {
     @Test
     @Throws(IOException::class)
     fun testRenderingBorderColor() {
-        val graphicsFrame: GraphicsFrame = object : GraphicsFrame() {
+        val graphicsFrame: GraphicsFrame = object : GraphicsFrame(
+            headerBinding = fixedBinding("HEADER"),
+            notesBinding = fixedBinding("SOURCE: BBC"),
+            borderColorBinding = fixedBinding(Color.RED)
+        ) {
             init {
                 val panel = JPanel()
                 panel.background = Color.YELLOW
                 add(panel, BorderLayout.CENTER)
             }
         }
-        graphicsFrame.setHeaderBinding(fixedBinding("HEADER"))
-        graphicsFrame.setNotesBinding(fixedBinding("SOURCE: BBC"))
-        graphicsFrame.setBorderColorBinding(fixedBinding(Color.RED))
         graphicsFrame.setSize(256, 128)
         compareRendering("GraphicsFrame", "BorderColor", graphicsFrame)
     }
@@ -144,15 +144,16 @@ class GraphicsFrameTest {
     @Test
     @Throws(IOException::class)
     fun testRenderingAccents() {
-        val graphicsFrame: GraphicsFrame = object : GraphicsFrame() {
+        val graphicsFrame: GraphicsFrame = object : GraphicsFrame(
+            headerBinding = fixedBinding("\u00c7A C'EST GR\u00c2VE"),
+            notesBinding = fixedBinding("JOYEUX NO\u00cbL, GAR\u00c7ON!")
+        ) {
             init {
                 val panel = JPanel()
                 panel.background = Color.YELLOW
                 add(panel, BorderLayout.CENTER)
             }
         }
-        graphicsFrame.setHeaderBinding(fixedBinding("\u00c7A C'EST GR\u00c2VE"))
-        graphicsFrame.setNotesBinding(fixedBinding("JOYEUX NO\u00cbL, GAR\u00c7ON!"))
         graphicsFrame.setSize(256, 128)
         compareRendering("GraphicsFrame", "Accents", graphicsFrame)
     }
@@ -160,15 +161,16 @@ class GraphicsFrameTest {
     @Test
     @Throws(IOException::class)
     fun testHeaderFontSize() {
-        val graphicsFrame: GraphicsFrame = object : GraphicsFrame() {
+        val headerWrapper = BindableWrapper("THIS IS A HEADER")
+        val graphicsFrame: GraphicsFrame = object : GraphicsFrame(
+            headerBinding = headerWrapper.binding
+        ) {
             init {
                 val panel = JPanel()
                 panel.background = Color.YELLOW
                 add(panel, BorderLayout.CENTER)
             }
         }
-        val headerWrapper = BindableWrapper("THIS IS A HEADER")
-        graphicsFrame.setHeaderBinding(headerWrapper.binding)
         graphicsFrame.setSize(256, 128)
         compareRendering("GraphicsFrame", "HeaderFontSize-1", graphicsFrame)
         headerWrapper.value = "THIS IS A VERY MUCH LONGER HEADER"
@@ -181,15 +183,16 @@ class GraphicsFrameTest {
     @Throws(IOException::class)
     fun testRenderHeaderAlignment() {
         val alignment = BindableWrapper(GraphicsFrame.Alignment.CENTER)
-        val graphicsFrame: GraphicsFrame = object : GraphicsFrame() {
+        val graphicsFrame: GraphicsFrame = object : GraphicsFrame(
+            headerBinding = fixedBinding("HEADER"),
+            headerAlignmentBinding = alignment.binding
+        ) {
             init {
                 val panel = JPanel()
                 panel.background = Color.YELLOW
                 add(panel, BorderLayout.CENTER)
             }
         }
-        graphicsFrame.setHeaderBinding(fixedBinding("HEADER"))
-        graphicsFrame.setHeaderAlignmentBinding(alignment.binding)
         graphicsFrame.setSize(256, 128)
         compareRendering("GraphicsFrame", "HeaderAlignment-1", graphicsFrame)
         alignment.value = GraphicsFrame.Alignment.LEFT

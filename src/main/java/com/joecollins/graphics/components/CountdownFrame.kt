@@ -16,7 +16,13 @@ import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.border.EmptyBorder
 
-class CountdownFrame : GraphicsFrame() {
+class CountdownFrame(
+    headerBinding: Binding<String>,
+    borderColorBinding: Binding<Color>? = null
+) : GraphicsFrame(
+    headerBinding = headerBinding,
+    borderColorBinding = borderColorBinding
+) {
 
     internal var clock: Clock = Clock.systemDefaultZone()
 

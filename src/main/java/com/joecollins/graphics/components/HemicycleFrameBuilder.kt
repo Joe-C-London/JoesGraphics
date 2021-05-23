@@ -98,8 +98,9 @@ class HemicycleFrameBuilder {
     }
 
     fun build(): HemicycleFrame {
-        val hemicycleFrame = HemicycleFrame()
-        headerBinding?.let { hemicycleFrame.setHeaderBinding(it) }
+        val hemicycleFrame = HemicycleFrame(
+            headerBinding = headerBinding ?: Binding.fixedBinding(null)
+        )
         leftSeatBarBinding?.let { hemicycleFrame.setLeftSeatBarBinding(it) }
         leftSeatBarLabelBinding?.let { hemicycleFrame.setLeftSeatBarLabelBinding(it) }
         rightSeatBarBinding?.let { hemicycleFrame.setRightSeatBarBinding(it) }

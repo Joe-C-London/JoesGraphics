@@ -12,7 +12,9 @@ import org.junit.Test
 class RegionSummaryFrameTest {
     @Test
     fun testEntriesDifferentColors() {
-        val frame = RegionSummaryFrame()
+        val frame = RegionSummaryFrame(
+            headerBinding = fixedBinding("")
+        )
         frame.setSectionsBinding(
             Binding.fixedBinding(
                 listOf(
@@ -36,7 +38,9 @@ class RegionSummaryFrameTest {
 
     @Test
     fun testEntriesSameColor() {
-        val frame = RegionSummaryFrame()
+        val frame = RegionSummaryFrame(
+            headerBinding = fixedBinding("")
+        )
         frame.setSummaryColorBinding(fixedBinding(Color.BLUE))
         frame.setSectionsBindingWithoutColors(
             Binding.fixedBinding(
@@ -56,8 +60,9 @@ class RegionSummaryFrameTest {
     @Test
     @Throws(IOException::class)
     fun testRenderDifferentColors() {
-        val frame = RegionSummaryFrame()
-        frame.setHeaderBinding(fixedBinding("UNITED STATES"))
+        val frame = RegionSummaryFrame(
+            headerBinding = fixedBinding("UNITED STATES")
+        )
         frame.setSectionsBinding(
             Binding.fixedBinding(
                 listOf(
@@ -79,9 +84,10 @@ class RegionSummaryFrameTest {
     @Test
     @Throws(IOException::class)
     fun testRenderSameColor() {
-        val frame = RegionSummaryFrame()
-        frame.setHeaderBinding(fixedBinding("USA"))
-        frame.setBorderColorBinding(fixedBinding(Color.BLUE))
+        val frame = RegionSummaryFrame(
+            headerBinding = fixedBinding("USA"),
+            borderColorBinding = fixedBinding(Color.BLUE)
+        )
         frame.setSummaryColorBinding(fixedBinding(Color.BLUE))
         frame.setSectionsBindingWithoutColors(
             Binding.fixedBinding(

@@ -17,15 +17,20 @@ import java.awt.geom.NoninvertibleTransformException
 import java.awt.geom.PathIterator
 import java.awt.geom.Point2D
 import java.awt.geom.Rectangle2D
-import java.lang.IllegalStateException
-import java.lang.RuntimeException
-import java.util.ArrayList
 import java.util.WeakHashMap
 import javax.swing.JPanel
 import kotlin.math.min
 import kotlin.math.sqrt
 
-class MapFrame : GraphicsFrame() {
+class MapFrame(
+    headerBinding: Binding<String?>,
+    notesBinding: Binding<String?>? = null,
+    borderColorBinding: Binding<Color>? = null
+) : GraphicsFrame(
+    headerBinding = headerBinding,
+    notesBinding = notesBinding,
+    borderColorBinding = borderColorBinding
+) {
     private var shapesBinding: Binding<List<Pair<Shape, Color>>> = Binding.fixedBinding(emptyList())
 
     private var focusBinding: Binding<Rectangle2D?> = Binding.fixedBinding(null)

@@ -13,7 +13,13 @@ import java.awt.RenderingHints
 import java.util.ArrayList
 import javax.swing.JPanel
 
-class RegionSummaryFrame : GraphicsFrame() {
+class RegionSummaryFrame(
+    headerBinding: Binding<String>,
+    borderColorBinding: Binding<Color>? = null
+) : GraphicsFrame(
+    headerBinding = headerBinding,
+    borderColorBinding = borderColorBinding
+) {
     private val centralPanel: JPanel = JPanel()
 
     class Section(val header: String, val valueColor: List<Pair<Color, String>>)

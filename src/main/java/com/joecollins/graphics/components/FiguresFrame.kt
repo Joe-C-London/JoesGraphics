@@ -15,7 +15,11 @@ import javax.swing.JPanel
 import javax.swing.border.EmptyBorder
 import javax.swing.border.MatteBorder
 
-class FiguresFrame : GraphicsFrame() {
+class FiguresFrame(
+    headerBinding: Binding<String?>
+) : GraphicsFrame(
+    headerBinding = headerBinding
+) {
 
     class Entry(
         val color: Color,

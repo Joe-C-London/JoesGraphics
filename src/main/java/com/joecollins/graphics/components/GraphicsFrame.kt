@@ -12,7 +12,12 @@ import javax.swing.border.EmptyBorder
 import javax.swing.border.MatteBorder
 
 @Suppress("LeakingThis")
-open class GraphicsFrame : JPanel() {
+open class GraphicsFrame(
+    headerBinding: Binding<String?>,
+    notesBinding: Binding<String?>? = null,
+    borderColorBinding: Binding<Color>? = null,
+    headerAlignmentBinding: Binding<Alignment>? = null
+) : JPanel() {
 
     enum class Alignment(val jlabelAlignment: Int) {
         LEFT(JLabel.LEFT),
@@ -24,11 +29,6 @@ open class GraphicsFrame : JPanel() {
     private val headerPanel = JPanel()
     private val headerLabel = FontSizeAdjustingLabel()
     private val notesLabel = FontSizeAdjustingLabel()
-
-    private var headerTextBinding: Binding<String?> = Binding.fixedBinding(null)
-    private var notesTextBinding: Binding<String?> = Binding.fixedBinding(null)
-    private var borderColorBinding: Binding<Color> = Binding.fixedBinding(Color.BLACK)
-    private var headerAlignmentBinding: Binding<Alignment> = Binding.fixedBinding(Alignment.CENTER)
 
     init {
         layout = BorderLayout()
@@ -53,47 +53,28 @@ open class GraphicsFrame : JPanel() {
         notesLabel.font = StandardFont.readNormalFont(12)
         notesLabel.border = EmptyBorder(2, 0, -2, 0)
         add(notesLabel, BorderLayout.SOUTH)
-    }
 
-    internal val header: String? get() = if (headerPanel.isVisible) headerLabel.text.trim() else null
-
-    fun setHeaderBinding(headerTextBinding: Binding<String?>) {
-        this.headerTextBinding.unbind()
-        this.headerTextBinding = headerTextBinding
-        this.headerTextBinding.bind {
+        headerBinding.bind {
             headerPanel.isVisible = (it != null)
             headerLabel.text = it ?: ""
         }
-    }
-
-    protected val alignment: Alignment get() = Alignment.values().find { it.jlabelAlignment == headerLabel.horizontalAlignment }!!
-
-    fun setHeaderAlignmentBinding(headerAlignmentBinding: Binding<Alignment>) {
-        this.headerAlignmentBinding.unbind()
-        this.headerAlignmentBinding = headerAlignmentBinding
-        this.headerAlignmentBinding.bind { headerLabel.horizontalAlignment = it.jlabelAlignment }
-    }
-
-    internal val notes: String? get() = if (notesLabel.isVisible) notesLabel.text.trim() else null
-
-    fun setNotesBinding(notesTextBinding: Binding<String?>) {
-        this.notesTextBinding.unbind()
-        this.notesTextBinding = notesTextBinding
-        this.notesTextBinding.bind {
+        (headerAlignmentBinding ?: Binding.fixedBinding(Alignment.CENTER)).bind { headerLabel.horizontalAlignment = it.jlabelAlignment }
+        (notesBinding ?: Binding.fixedBinding(null)).bind {
             notesLabel.isVisible = (it != null)
             notesLabel.text = (it ?: "") + " "
         }
-    }
-
-    internal val borderColor: Color get() = headerPanel.background
-
-    fun setBorderColorBinding(borderColorBinding: Binding<Color>) {
-        this.borderColorBinding.unbind()
-        this.borderColorBinding = borderColorBinding
-        this.borderColorBinding.bind {
+        (borderColorBinding ?: Binding.fixedBinding(Color.BLACK)).bind {
             border = MatteBorder(1, 1, 1, 1, it)
             headerPanel.background = it
             notesLabel.foreground = it
         }
     }
+
+    internal val header: String? get() = if (headerPanel.isVisible) headerLabel.text.trim() else null
+
+    protected val alignment: Alignment get() = Alignment.values().find { it.jlabelAlignment == headerLabel.horizontalAlignment }!!
+
+    internal val notes: String? get() = if (notesLabel.isVisible) notesLabel.text.trim() else null
+
+    internal val borderColor: Color get() = headerPanel.background
 }

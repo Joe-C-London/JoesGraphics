@@ -147,8 +147,9 @@ class TooCloseToCallScreen private constructor(titleLabel: JLabel, multiSummaryF
             val entries = input.toEntries()
             val thousandsFormatter = DecimalFormat("#,##0")
             val pctFormatter = DecimalFormat("0.0%")
-            val frame = MultiSummaryFrame()
-            frame.setHeaderBinding(header.getBinding())
+            val frame = MultiSummaryFrame(
+                headerBinding = header.getBinding()
+            )
             frame.setRowsBinding(
                 entries.mapElements {
                     val header = rowHeaderFunc(it.key)

@@ -17,7 +17,9 @@ import org.junit.Test
 class CountdownFrameTest {
     @Test
     fun testTimeRemaining() {
-        val frame = CountdownFrame()
+        val frame = CountdownFrame(
+            headerBinding = fixedBinding("")
+        )
         frame.clock = Clock.fixed(Instant.parse("2020-07-04T12:34:56Z"), ZoneId.of("UTC"))
         frame.setTimeBinding(
                 fixedBinding(ZonedDateTime.of(2020, 7, 5, 19, 0, 0, 0, ZoneId.of("US/Eastern"))))
@@ -27,7 +29,9 @@ class CountdownFrameTest {
 
     @Test
     fun testTimeDisplay() {
-        val frame = CountdownFrame()
+        val frame = CountdownFrame(
+            headerBinding = fixedBinding("")
+        )
         frame.clock = Clock.fixed(Instant.parse("2020-07-04T12:34:56Z"), ZoneId.of("UTC"))
         frame.setTimeBinding(
                 fixedBinding(ZonedDateTime.of(2020, 7, 5, 19, 0, 0, 0, ZoneId.of("US/Eastern"))))
@@ -42,7 +46,9 @@ class CountdownFrameTest {
     @Test
     @Throws(InterruptedException::class)
     fun testCountdown() {
-        val frame = CountdownFrame()
+        val frame = CountdownFrame(
+            headerBinding = fixedBinding("")
+        )
         frame.clock = Clock.fixed(Instant.parse("2020-07-04T12:34:56Z"), ZoneId.of("UTC"))
         frame.setTimeBinding(
                 fixedBinding(ZonedDateTime.of(2020, 7, 5, 19, 0, 0, 0, ZoneId.of("US/Eastern"))))
@@ -55,14 +61,18 @@ class CountdownFrameTest {
 
     @Test
     fun testAdditionalInfo() {
-        val frame = CountdownFrame()
+        val frame = CountdownFrame(
+            headerBinding = fixedBinding("")
+        )
         frame.setAdditionalInfoBinding(fixedBinding("ADDITIONAL INFO"))
         Assert.assertEquals("ADDITIONAL INFO", frame.getAdditionalInfo())
     }
 
     @Test
     fun testCountdownColor() {
-        val frame = CountdownFrame()
+        val frame = CountdownFrame(
+            headerBinding = fixedBinding("")
+        )
         frame.setCountdownColorBinding(fixedBinding(Color.RED))
         Assert.assertEquals(Color.RED, frame.getCountdownColor())
     }
@@ -70,14 +80,15 @@ class CountdownFrameTest {
     @Test
     @Throws(IOException::class)
     fun testRenderWithoutAdditionalInfo() {
-        val frame = CountdownFrame()
+        val frame = CountdownFrame(
+            headerBinding = fixedBinding("TRUMP TERM END"),
+            borderColorBinding = fixedBinding(Color.RED)
+        )
         frame.clock = Clock.fixed(Instant.parse("2020-07-04T19:41:10Z"), ZoneId.of("UTC"))
         frame.setTimeBinding(
                 fixedBinding(ZonedDateTime.of(2021, 1, 20, 12, 0, 0, 0, ZoneId.of("US/Eastern"))))
         frame.setLabelFunction { CountdownFrame.formatDDHHMMSS(it) }
-        frame.setHeaderBinding(fixedBinding("TRUMP TERM END"))
         frame.setCountdownColorBinding(fixedBinding(Color.RED))
-        frame.setBorderColorBinding(fixedBinding(Color.RED))
         frame.setSize(200, 100)
         compareRendering("CountdownFrame", "NoAdditionalInfo", frame)
     }
@@ -85,12 +96,13 @@ class CountdownFrameTest {
     @Test
     @Throws(IOException::class)
     fun testRenderWithAdditionalInfo() {
-        val frame = CountdownFrame()
+        val frame = CountdownFrame(
+            headerBinding = fixedBinding("1ST POLLS CLOSE")
+        )
         frame.clock = Clock.fixed(Instant.parse("2020-07-04T19:41:10Z"), ZoneId.of("UTC"))
         frame.setTimeBinding(
                 fixedBinding(ZonedDateTime.of(2020, 11, 3, 23, 0, 0, 0, ZoneId.of("UTC"))))
         frame.setLabelFunction { CountdownFrame.formatDDHHMMSS(it) }
-        frame.setHeaderBinding(fixedBinding("1ST POLLS CLOSE"))
         frame.setAdditionalInfoBinding(fixedBinding("IN/KY"))
         frame.setSize(200, 100)
         compareRendering("CountdownFrame", "AdditionalInfo", frame)

@@ -13,7 +13,13 @@ import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.border.EmptyBorder
 
-class ProjectionFrame : GraphicsFrame() {
+class ProjectionFrame(
+    headerBinding: Binding<String?>,
+    borderColorBinding: Binding<Color>? = null
+) : GraphicsFrame(
+    headerBinding = headerBinding,
+    borderColorBinding = borderColorBinding
+) {
 
     enum class Alignment { BOTTOM, MIDDLE }
 

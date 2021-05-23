@@ -11,14 +11,19 @@ import java.awt.GridLayout
 import java.awt.LayoutManager
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
-import java.util.ArrayList
 import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.border.EmptyBorder
 import javax.swing.border.MatteBorder
 import kotlin.math.max
 
-class MultiSummaryFrame : GraphicsFrame() {
+class MultiSummaryFrame(
+    headerBinding: Binding<String?>,
+    notesBinding: Binding<String?>? = null
+) : GraphicsFrame(
+    headerBinding = headerBinding,
+    notesBinding = notesBinding
+) {
     private var rowsBinding: Binding<List<Row>> = Binding.fixedBinding(emptyList())
 
     private val centralPanel: JPanel

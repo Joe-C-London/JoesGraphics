@@ -12,7 +12,11 @@ import javax.swing.JPanel
 import javax.swing.border.EmptyBorder
 import kotlin.math.min
 
-class SwingFrame : GraphicsFrame() {
+class SwingFrame(
+    headerBinding: Binding<String?>
+) : GraphicsFrame(
+    headerBinding = headerBinding
+) {
     private var rangeBinding: Binding<Number> = Binding.fixedBinding(1)
     private var valueBinding: Binding<Number> = Binding.fixedBinding(0)
     private var leftColorBinding: Binding<Color> = Binding.fixedBinding(Color.BLACK)

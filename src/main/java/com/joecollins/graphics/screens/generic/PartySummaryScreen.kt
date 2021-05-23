@@ -66,7 +66,7 @@ class PartySummaryScreen private constructor(
 
     class Builder<T>(
         private val mainRegion: T,
-        private val titleFunc: (T) -> Binding<String?>,
+        private val titleFunc: (T) -> Binding<String>,
         private val seatFunc: (T) -> Binding<Map<Party, Int>>,
         private val seatDiffFunc: (T) -> Binding<Map<Party, Int>>,
         private val votePctFunc: (T) -> Binding<Map<Party, Double>>,
@@ -129,9 +129,10 @@ class PartySummaryScreen private constructor(
                 SinglePartyInput.Property.PARTY
             )
             val values = seatBinding.merge(voteBinding) { s, v -> listOf(s, v) }
-            val frame = RegionSummaryFrame()
-            frame.setHeaderBinding(titleFunc(region))
-            frame.setBorderColorBinding(party.getBinding(Party::color))
+            val frame = RegionSummaryFrame(
+                headerBinding = titleFunc(region),
+                borderColorBinding = party.getBinding(Party::color)
+            )
             frame.setSummaryColorBinding(party.getBinding(Party::color))
             frame.setSectionsBindingWithoutColors(values.map { value ->
                 value.zip(listOf("SEATS", "POPULAR VOTE")) { v, h -> RegionSummaryFrame.SectionWithoutColor(h, v) }
@@ -190,7 +191,7 @@ class PartySummaryScreen private constructor(
     companion object {
         @JvmStatic fun <T> ofDiff(
             mainRegion: T,
-            titleFunc: (T) -> Binding<String?>,
+            titleFunc: (T) -> Binding<String>,
             seatFunc: (T) -> Binding<Map<Party, Int>>,
             seatDiffFunc: (T) -> Binding<Map<Party, Int>>,
             votePctFunc: (T) -> Binding<Map<Party, Double>>,
@@ -202,7 +203,7 @@ class PartySummaryScreen private constructor(
 
         @JvmStatic fun <T> ofPrev(
             mainRegion: T,
-            titleFunc: (T) -> Binding<String?>,
+            titleFunc: (T) -> Binding<String>,
             seatFunc: (T) -> Binding<Map<Party, Int>>,
             seatPrevFunc: (T) -> Binding<Map<Party, Int>>,
             votePctFunc: (T) -> Binding<Map<Party, Double>>,

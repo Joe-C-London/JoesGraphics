@@ -20,7 +20,11 @@ import kotlin.math.roundToLong
 import kotlin.math.sign
 import kotlin.math.sin
 
-class SwingometerFrame : GraphicsFrame() {
+class SwingometerFrame(
+    headerBinding: Binding<String?>
+) : GraphicsFrame(
+    headerBinding = headerBinding
+) {
     private var rangeBinding: Binding<Number> = Binding.fixedBinding(1)
     private var valueBinding: Binding<Number> = Binding.fixedBinding(0)
     private var leftColorBinding: Binding<Color> = Binding.fixedBinding(Color.BLACK)

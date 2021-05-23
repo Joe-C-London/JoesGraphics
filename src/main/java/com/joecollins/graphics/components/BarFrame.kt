@@ -24,7 +24,15 @@ import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 
-class BarFrame : GraphicsFrame() {
+class BarFrame(
+    headerBinding: Binding<String?>,
+    notesBinding: Binding<String?>? = null,
+    borderColorBinding: Binding<Color>? = null
+) : GraphicsFrame(
+    headerBinding = headerBinding,
+    notesBinding = notesBinding,
+    borderColorBinding = borderColorBinding
+) {
     private val centralPanel: JPanel
     private val subheadLabel: FontSizeAdjustingLabel = FontSizeAdjustingLabel()
     private val bars: MutableList<BarPanel> = ArrayList()

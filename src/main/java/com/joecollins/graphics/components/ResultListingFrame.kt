@@ -15,7 +15,15 @@ import java.util.ArrayList
 import javax.swing.JPanel
 import kotlin.math.ceil
 
-class ResultListingFrame : GraphicsFrame() {
+class ResultListingFrame(
+    headerBinding: Binding<String?>,
+    borderColorBinding: Binding<Color>? = null,
+    headerAlignmentBinding: Binding<Alignment>? = null
+) : GraphicsFrame(
+    headerBinding = headerBinding,
+    borderColorBinding = borderColorBinding,
+    headerAlignmentBinding = headerAlignmentBinding
+) {
     private val centralPanel = JPanel()
     private val layout = Layout()
     private val items: MutableList<ItemPanel> = ArrayList()

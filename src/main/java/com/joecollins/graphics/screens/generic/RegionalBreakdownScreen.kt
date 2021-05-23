@@ -151,8 +151,9 @@ class RegionalBreakdownScreen private constructor(titleLabel: JLabel, multiSumma
         }
 
         private fun createFrame(): MultiSummaryFrame {
-            val frame = MultiSummaryFrame()
-            frame.setHeaderBinding(title.getBinding())
+            val frame = MultiSummaryFrame(
+                headerBinding = title.getBinding()
+            )
             frame.setRowsBinding(
                 Binding.listBinding(
                     entries.map {

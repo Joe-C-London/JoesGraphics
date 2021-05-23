@@ -54,14 +54,15 @@ class HeatMapFrameBuilder {
     }
 
     fun build(): HeatMapFrame {
-        val heatMapFrame = HeatMapFrame()
+        val heatMapFrame = HeatMapFrame(
+            headerBinding = headerBinding ?: Binding.fixedBinding(null),
+            borderColorBinding = borderColorBinding
+        )
         seatBarsBinding?.let { heatMapFrame.setSeatBarsBinding(it) }
         seatBarLabelBinding?.let { heatMapFrame.setSeatBarLabelBinding(it) }
         changeBarsBinding?.let { heatMapFrame.setChangeBarsBinding(it) }
         changeBarStartBinding?.let { heatMapFrame.setChangeBarStartBinding(it) }
         changeBarLabelBinding?.let { heatMapFrame.setChangeBarLabelBinding(it) }
-        headerBinding?.let { heatMapFrame.setHeaderBinding(it) }
-        borderColorBinding?.let { heatMapFrame.setBorderColorBinding(it) }
         numRowsBinding?.let { heatMapFrame.setNumRowsBinding(it) }
         squaresBinding?.let { heatMapFrame.setSquaresBinding(it) }
         return heatMapFrame

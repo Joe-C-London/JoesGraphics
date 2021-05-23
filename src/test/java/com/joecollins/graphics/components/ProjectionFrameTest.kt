@@ -14,7 +14,9 @@ class ProjectionFrameTest {
     @Test
     @Throws(IOException::class)
     fun testImage() {
-        val frame = ProjectionFrame()
+        val frame = ProjectionFrame(
+            headerBinding = fixedBinding(null)
+        )
         val image = peiLeg()
         frame.setImageBinding(fixedBinding(image))
         Assert.assertEquals(image, frame.getImage())
@@ -22,21 +24,27 @@ class ProjectionFrameTest {
 
     @Test
     fun testBackColor() {
-        val frame = ProjectionFrame()
+        val frame = ProjectionFrame(
+            headerBinding = fixedBinding(null)
+        )
         frame.setBackColorBinding(fixedBinding(Color.GRAY))
         Assert.assertEquals(Color.GRAY, frame.getBackColor())
     }
 
     @Test
     fun testFooterText() {
-        val frame = ProjectionFrame()
+        val frame = ProjectionFrame(
+            headerBinding = fixedBinding(null)
+        )
         frame.setFooterTextBinding(fixedBinding("MINORITY LEGISLATURE"))
         Assert.assertEquals("MINORITY LEGISLATURE", frame.getFooterText())
     }
 
     @Test
     fun testAlignment() {
-        val frame = ProjectionFrame()
+        val frame = ProjectionFrame(
+            headerBinding = fixedBinding(null)
+        )
         Assert.assertEquals(ProjectionFrame.Alignment.BOTTOM, frame.getImageAlignment())
         frame.setImageAlignmentBinding(fixedBinding(ProjectionFrame.Alignment.MIDDLE))
         Assert.assertEquals(ProjectionFrame.Alignment.MIDDLE, frame.getImageAlignment())
@@ -45,12 +53,13 @@ class ProjectionFrameTest {
     @Test
     @Throws(IOException::class)
     fun testRendering() {
-        val frame = ProjectionFrame()
+        val frame = ProjectionFrame(
+            headerBinding = fixedBinding<String?>("PROJECTION"),
+            borderColorBinding = fixedBinding(Color.GRAY)
+        )
         frame.setImageBinding(fixedBinding(peiLeg()))
         frame.setBackColorBinding(fixedBinding(Color.GRAY))
-        frame.setBorderColorBinding(fixedBinding(Color.GRAY))
         frame.setFooterTextBinding(fixedBinding("MINORITY LEGISLATURE"))
-        frame.setHeaderBinding(fixedBinding<String?>("PROJECTION"))
         frame.setSize(1024, 512)
         compareRendering("ProjectionFrame", "Basic", frame)
     }
@@ -58,12 +67,13 @@ class ProjectionFrameTest {
     @Test
     @Throws(IOException::class)
     fun testLongRendering() {
-        val frame = ProjectionFrame()
+        val frame = ProjectionFrame(
+            headerBinding = fixedBinding<String?>("PROJECTION"),
+            borderColorBinding = fixedBinding(Color.GRAY)
+        )
         frame.setImageBinding(fixedBinding(peiLeg()))
         frame.setBackColorBinding(fixedBinding(Color.GRAY))
-        frame.setBorderColorBinding(fixedBinding(Color.GRAY))
         frame.setFooterTextBinding(fixedBinding("WE ARE NOW PROJECTING A MINORITY LEGISLATURE"))
-        frame.setHeaderBinding(fixedBinding<String?>("PROJECTION"))
         frame.setSize(1024, 512)
         compareRendering("ProjectionFrame", "Long", frame)
     }
@@ -71,13 +81,14 @@ class ProjectionFrameTest {
     @Test
     @Throws(IOException::class)
     fun testCenterRendering() {
-        val frame = ProjectionFrame()
+        val frame = ProjectionFrame(
+            headerBinding = fixedBinding<String?>("PROJECTION"),
+            borderColorBinding = fixedBinding(Color.GRAY)
+        )
         frame.setImageBinding(fixedBinding(peiLeg()))
         frame.setBackColorBinding(fixedBinding(Color.GRAY))
-        frame.setBorderColorBinding(fixedBinding(Color.GRAY))
         frame.setImageAlignmentBinding(fixedBinding(ProjectionFrame.Alignment.MIDDLE))
         frame.setFooterTextBinding(fixedBinding("MINORITY LEGISLATURE"))
-        frame.setHeaderBinding(fixedBinding<String?>("PROJECTION"))
         frame.setSize(1024, 512)
         compareRendering("ProjectionFrame", "Center", frame)
     }

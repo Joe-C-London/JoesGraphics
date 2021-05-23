@@ -34,8 +34,9 @@ class FiguresScreen private constructor(headerLabel: JLabel, frames: Array<Figur
         }
 
         fun createFrame(): FiguresFrame {
-            val frame = FiguresFrame()
-            frame.setHeaderBinding(Binding.fixedBinding(name))
+            val frame = FiguresFrame(
+                headerBinding = Binding.fixedBinding(name)
+            )
             frame.setEntriesBinding(
                 Binding.listBinding(
                     entries.map { e ->

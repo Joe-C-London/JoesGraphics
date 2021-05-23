@@ -14,8 +14,9 @@ class MultiSummaryFrameBuilder private constructor() {
     }
 
     fun build(): MultiSummaryFrame {
-        val multiSummaryFrame = MultiSummaryFrame()
-        headerBinding?.let { multiSummaryFrame.setHeaderBinding(it) }
+        val multiSummaryFrame = MultiSummaryFrame(
+            headerBinding = headerBinding ?: Binding.fixedBinding(null)
+        )
         rowsBinding?.let { multiSummaryFrame.setRowsBinding(it) }
         return multiSummaryFrame
     }

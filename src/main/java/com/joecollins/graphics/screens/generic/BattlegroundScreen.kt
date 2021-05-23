@@ -79,10 +79,11 @@ class BattlegroundScreen private constructor(
             seatFilter.getBinding().bind { defenseInput.setFilteredSeats(it) }
             defenseInput.setSide(Side.DEFENSE)
             val defenseItems = defenseInput.items
-            val defenseFrame = ResultListingFrame()
-            defenseFrame.setBorderColorBinding(party.getBinding(Party::color))
-            defenseFrame.setHeaderBinding(party.getBinding<String?> { p: Party -> "$p DEFENSE SEATS" })
-            defenseFrame.setHeaderAlignmentBinding(Binding.fixedBinding(GraphicsFrame.Alignment.RIGHT))
+            val defenseFrame = ResultListingFrame(
+                headerBinding = party.getBinding { p: Party -> "$p DEFENSE SEATS" },
+                borderColorBinding = party.getBinding(Party::color),
+                headerAlignmentBinding = Binding.fixedBinding(GraphicsFrame.Alignment.RIGHT)
+            )
             defenseFrame.setReversedBinding(Binding.fixedBinding(true))
             defenseFrame.setNumRowsBinding(numRows.getBinding())
             defenseFrame.setItemsBinding(defenseItems.mapElements {
@@ -102,10 +103,11 @@ class BattlegroundScreen private constructor(
             seatFilter.getBinding().bind { targetInput.setFilteredSeats(it) }
             targetInput.setSide(Side.TARGET)
             val targetItems = targetInput.items
-            val targetFrame = ResultListingFrame()
-            targetFrame.setBorderColorBinding(party.getBinding(Party::color))
-            targetFrame.setHeaderBinding(party.getBinding<String?> { p: Party -> "$p TARGET SEATS" })
-            targetFrame.setHeaderAlignmentBinding(Binding.fixedBinding(GraphicsFrame.Alignment.LEFT))
+            val targetFrame = ResultListingFrame(
+                headerBinding = party.getBinding<String?> { p: Party -> "$p TARGET SEATS" },
+                borderColorBinding = party.getBinding(Party::color),
+                headerAlignmentBinding = Binding.fixedBinding(GraphicsFrame.Alignment.LEFT)
+            )
             targetFrame.setReversedBinding(Binding.fixedBinding(false))
             targetFrame.setNumRowsBinding(numRows.getBinding())
             targetFrame.setNumRowsBinding(numRows.getBinding())

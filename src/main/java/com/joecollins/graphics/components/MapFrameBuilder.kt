@@ -10,6 +10,8 @@ class MapFrameBuilder {
 
     private var focusBoxBinding: Binding<Rectangle2D?>? = null
     private var headerBinding: Binding<String?>? = null
+    private var notesBinding: Binding<String?>? = null
+    private var borderColorBinding: Binding<Color>? = null
     private var shapesBinding: Binding<List<Pair<Shape, Color>>>? = null
 
     fun withFocus(focusBinding: Binding<List<Shape>?>): MapFrameBuilder {
@@ -30,10 +32,23 @@ class MapFrameBuilder {
         return this
     }
 
+    fun withNotes(notesBinding: Binding<String?>): MapFrameBuilder {
+        this.notesBinding = notesBinding
+        return this
+    }
+
+    fun withBorderColor(borderColorBinding: Binding<Color>): MapFrameBuilder {
+        this.borderColorBinding = borderColorBinding
+        return this
+    }
+
     fun build(): MapFrame {
-        val mapFrame = MapFrame()
+        val mapFrame = MapFrame(
+            headerBinding = headerBinding ?: Binding.fixedBinding(null),
+            notesBinding = notesBinding,
+            borderColorBinding = borderColorBinding
+        )
         focusBoxBinding?.let { mapFrame.setFocusBoxBinding(it) }
-        headerBinding?.let { mapFrame.setHeaderBinding(it) }
         shapesBinding?.let { mapFrame.setShapesBinding(it) }
         return mapFrame
     }

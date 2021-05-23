@@ -113,4 +113,30 @@ class MapFrameBuilderTest {
                 .build()
         Assert.assertEquals(Rectangle2D.Double(2.0, 2.0, 5.0, 5.0), frame.focusBox)
     }
+
+    @Test
+    fun testNotes() {
+        val shapes = BindableWrapper(listOf(
+            Pair(Ellipse2D.Double(2.0, 2.0, 1.0, 1.0), Color.RED),
+            Pair(Rectangle2D.Double(5.0, 5.0, 2.0, 2.0), Color.BLUE)
+        ))
+        val frame = from(shapes.binding)
+            .withHeader(fixedBinding("MAP"))
+            .withNotes(fixedBinding("A note"))
+            .build()
+        Assert.assertEquals("A note", frame.notes)
+    }
+
+    @Test
+    fun testBorderColor() {
+        val shapes = BindableWrapper(listOf(
+            Pair(Ellipse2D.Double(2.0, 2.0, 1.0, 1.0), Color.RED),
+            Pair(Rectangle2D.Double(5.0, 5.0, 2.0, 2.0), Color.BLUE)
+        ))
+        val frame = from(shapes.binding)
+            .withHeader(fixedBinding("MAP"))
+            .withBorderColor(fixedBinding(Color.GRAY))
+            .build()
+        Assert.assertEquals(Color.GRAY, frame.borderColor)
+    }
 }

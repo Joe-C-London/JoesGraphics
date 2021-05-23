@@ -220,7 +220,9 @@ class SwingometerFrameBuilder {
     }
 
     fun build(): SwingometerFrame {
-        val swingometerFrame = SwingometerFrame()
+        val swingometerFrame = SwingometerFrame(
+            headerBinding = headerBinding ?: Binding.fixedBinding(null)
+        )
         rangeBinding?.let { swingometerFrame.setRangeBinding(it) }
         numBucketsPerSideBinding?.let { swingometerFrame.setNumBucketsPerSideBinding(it) }
         ticksBinding?.let { swingometerFrame.setTicksBinding(it) }
@@ -228,7 +230,6 @@ class SwingometerFrameBuilder {
         rightToWinBinding?.let { swingometerFrame.setRightToWinBinding(it) }
         outerLabelsBinding?.let { swingometerFrame.setOuterLabelsBinding(it) }
         dotsBinding?.let { swingometerFrame.setDotsBinding(it) }
-        headerBinding?.let { swingometerFrame.setHeaderBinding(it) }
         leftColorBinding?.let { swingometerFrame.setLeftColorBinding(it) }
         rightColorBinding?.let { swingometerFrame.setRightColorBinding(it) }
         valueBinding?.let { swingometerFrame.setValueBinding(it) }

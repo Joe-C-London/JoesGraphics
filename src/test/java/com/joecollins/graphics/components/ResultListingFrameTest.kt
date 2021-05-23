@@ -14,7 +14,9 @@ import org.junit.Test
 class ResultListingFrameTest {
     @Test
     fun testNumRows() {
-        val frame = ResultListingFrame()
+        val frame = ResultListingFrame(
+            headerBinding = fixedBinding(null)
+        )
         frame.setNumRowsBinding(fixedBinding(20))
         Assert.assertEquals(20, frame.getNumRows().toLong())
     }
@@ -31,7 +33,9 @@ class ResultListingFrameTest {
         rawItems.add(Item("STRATFORD-KINLOCK", Color.WHITE, Color.BLACK, Color.BLUE))
         rawItems.add(Item("KENSINGTON-MALPEQUE", Color.WHITE, Color.BLACK, Color.BLUE))
         val items: BindableWrapper<List<Item>> = BindableWrapper(rawItems)
-        val frame = ResultListingFrame()
+        val frame = ResultListingFrame(
+            headerBinding = fixedBinding(null)
+        )
         frame.setItemsBinding(
             items.binding.mapElements {
                 ResultListingFrame.Item(
@@ -71,7 +75,10 @@ class ResultListingFrameTest {
         rawItems.add(Item("Charlottetown-Victoria Park", Color.WHITE, Color.BLACK, Color.RED)) // 11.9
         rawItems.add(Item("Cornwall-Meadowbank", Color.WHITE, Color.BLACK, Color.RED)) // 12.5
         val items: BindableWrapper<List<Item>> = BindableWrapper(rawItems)
-        val frame = ResultListingFrame()
+        val frame = ResultListingFrame(
+            headerBinding = fixedBinding("PC TARGETS"),
+            borderColorBinding = fixedBinding(Color.BLUE)
+        )
         frame.setNumRowsBinding(fixedBinding(10))
         frame.setItemsBinding(
             items.binding.mapElements {
@@ -83,8 +90,6 @@ class ResultListingFrameTest {
                 )
             }
         )
-        frame.setHeaderBinding(fixedBinding("PC TARGETS"))
-        frame.setBorderColorBinding(fixedBinding(Color.BLUE))
         frame.setSize(512, 512)
         compareRendering("ResultListingFrame", "FullColumn-1", frame)
 
@@ -106,7 +111,9 @@ class ResultListingFrameTest {
     fun testVaryingItems() {
         val rawItems: MutableList<Item> = ArrayList()
         val items: BindableWrapper<List<Item>> = BindableWrapper(rawItems)
-        val frame = ResultListingFrame()
+        val frame = ResultListingFrame(
+            headerBinding = fixedBinding("SEATS CHANGING")
+        )
         frame.setNumRowsBinding(fixedBinding(10))
         frame.setItemsBinding(
             items.binding.mapElements {
@@ -118,7 +125,6 @@ class ResultListingFrameTest {
                 )
             }
         )
-        frame.setHeaderBinding(fixedBinding("SEATS CHANGING"))
         frame.setSize(512, 256)
         compareRendering("ResultListingFrame", "Varying-1", frame)
 
@@ -147,7 +153,9 @@ class ResultListingFrameTest {
     fun testVaryingItemsInReverse() {
         val rawItems: MutableList<Item> = ArrayList()
         val items: BindableWrapper<List<Item>> = BindableWrapper(rawItems)
-        val frame = ResultListingFrame()
+        val frame = ResultListingFrame(
+            headerBinding = fixedBinding("SEATS CHANGING")
+        )
         frame.setNumRowsBinding(fixedBinding(10))
         frame.setReversedBinding(fixedBinding(true))
         frame.setItemsBinding(
@@ -160,7 +168,6 @@ class ResultListingFrameTest {
                 )
             }
         )
-        frame.setHeaderBinding(fixedBinding("SEATS CHANGING"))
         frame.setSize(512, 256)
         compareRendering("ResultListingFrame", "Reversed-1", frame)
 

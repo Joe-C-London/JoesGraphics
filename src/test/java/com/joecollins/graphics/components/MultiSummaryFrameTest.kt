@@ -11,7 +11,9 @@ import org.junit.Test
 class MultiSummaryFrameTest {
     @Test
     fun testEntries() {
-        val frame = MultiSummaryFrame()
+        val frame = MultiSummaryFrame(
+            headerBinding = fixedBinding(null)
+        )
         frame.setRowsBinding(fixedBinding(listOf(
             MultiSummaryFrame.Row("ATLANTIC", listOf(
                 Pair(Color.RED, "26"),
@@ -75,8 +77,9 @@ class MultiSummaryFrameTest {
     @Test
     @Throws(IOException::class)
     fun testRenderBasicSummary() {
-        val frame = MultiSummaryFrame()
-        frame.setHeaderBinding(fixedBinding("SEATS BY REGION"))
+        val frame = MultiSummaryFrame(
+            headerBinding = fixedBinding("SEATS BY REGION")
+        )
         frame.setRowsBinding(fixedBinding(listOf(
             MultiSummaryFrame.Row("ATLANTIC", listOf(
                 Pair(Color.RED, "26"),
@@ -121,8 +124,9 @@ class MultiSummaryFrameTest {
     @Test
     @Throws(IOException::class)
     fun testRenderOverflowSummary() {
-        val frame = MultiSummaryFrame()
-        frame.setHeaderBinding(fixedBinding("SEATS BY PROVINCE"))
+        val frame = MultiSummaryFrame(
+            headerBinding = fixedBinding("SEATS BY PROVINCE")
+        )
         frame.setRowsBinding(fixedBinding(listOf(
             MultiSummaryFrame.Row("NEWFOUNDLAND & LABRADOR", listOf(
                 Pair(Color.RED, "6"),
@@ -223,8 +227,9 @@ class MultiSummaryFrameTest {
     @Test
     @Throws(IOException::class)
     fun testRenderDifferentColCounts() {
-        val frame = MultiSummaryFrame()
-        frame.setHeaderBinding(fixedBinding("SENATE SEATS"))
+        val frame = MultiSummaryFrame(
+            headerBinding = fixedBinding("SENATE SEATS")
+        )
         frame.setRowsBinding(fixedBinding(listOf(
             MultiSummaryFrame.Row("NEW SOUTH WALES", listOf(
                 Pair(Color.BLUE, "LIB"),

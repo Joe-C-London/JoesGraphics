@@ -163,11 +163,12 @@ class BarFrameBuilder {
     }
 
     fun build(): BarFrame {
-        val barFrame = BarFrame()
-        headerBinding?.let { barFrame.setHeaderBinding(it) }
+        val barFrame = BarFrame(
+            headerBinding = headerBinding ?: Binding.fixedBinding(null),
+            notesBinding = notesBinding,
+            borderColorBinding = borderColorBinding
+        )
         subheadBinding?.let { barFrame.setSubheadTextBinding(it) }
-        notesBinding?.let { barFrame.setNotesBinding(it) }
-        borderColorBinding?.let { barFrame.setBorderColorBinding(it) }
         subheadColorBinding?.let { barFrame.setSubheadColorBinding(it) }
         linesBinding?.let { barFrame.setLinesBinding(it) }
         barFrame.setBarsBinding(

@@ -24,7 +24,13 @@ import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
 
-class HeatMapFrame : GraphicsFrame() {
+class HeatMapFrame(
+    headerBinding: Binding<String?>,
+    borderColorBinding: Binding<Color>? = null
+) : GraphicsFrame(
+    headerBinding = headerBinding,
+    borderColorBinding = borderColorBinding
+) {
     private var numRowsBinding = Binding.fixedBinding(1)
 
     private var squaresBinding: Binding<List<Square>> = Binding.fixedBinding(emptyList())

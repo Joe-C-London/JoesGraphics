@@ -444,12 +444,13 @@ class MultiResultScreen private constructor() : JPanel() {
                 add(swingFrame)
             }
             if (hasMap) {
-                mapFrame = MapFrame()
+                mapFrame = MapFrame(
+                    headerBinding = mapHeader.binding
+                )
                 mapFrame!!.setShapesBinding(mapShape.binding)
                 mapFrame!!.setFocusBoxBinding(mapFocus.binding.map { it.asSequence()
                     .map { obj: Shape -> obj.bounds2D }
                     .reduceOrNull { agg, r -> agg.createUnion(r) } })
-                mapFrame!!.setHeaderBinding(mapHeader.binding)
                 add(mapFrame)
             }
         }

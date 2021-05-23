@@ -24,7 +24,11 @@ import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
 
-class HemicycleFrame : GraphicsFrame() {
+class HemicycleFrame(
+    headerBinding: Binding<String?>
+) : GraphicsFrame(
+    headerBinding = headerBinding
+) {
     private var rowsBinding: Binding<List<Int>> = Binding.fixedBinding(emptyList())
     private var dotsBinding: Binding<List<Dot>> = Binding.fixedBinding(emptyList())
 

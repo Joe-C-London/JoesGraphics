@@ -95,9 +95,10 @@ class SwingFrameBuilder {
     }
 
     fun build(): SwingFrame {
-        val swingFrame = SwingFrame()
+        val swingFrame = SwingFrame(
+            headerBinding = headerBinding ?: Binding.fixedBinding(null)
+        )
         rangeBinding?.let { swingFrame.setRangeBinding(it) }
-        headerBinding?.let { swingFrame.setHeaderBinding(it) }
         leftColorBinding?.let { swingFrame.setLeftColorBinding(it) }
         rightColorBinding?.let { swingFrame.setRightColorBinding(it) }
         valueBinding?.let { swingFrame.setValueBinding(it) }

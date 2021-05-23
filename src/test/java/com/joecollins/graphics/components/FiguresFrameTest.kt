@@ -11,7 +11,9 @@ import org.junit.Test
 class FiguresFrameTest {
     @Test
     fun testNamesAndDescriptions() {
-        val frame = FiguresFrame()
+        val frame = FiguresFrame(
+            headerBinding = fixedBinding(null)
+        )
         frame.setEntriesBinding(
             fixedBinding(
                 listOf(
@@ -35,7 +37,9 @@ class FiguresFrameTest {
 
     @Test
     fun testResults() {
-        val frame = FiguresFrame()
+        val frame = FiguresFrame(
+            headerBinding = fixedBinding(null)
+        )
         frame.setEntriesBinding(
             fixedBinding(
                 listOf(
@@ -57,8 +61,9 @@ class FiguresFrameTest {
     @Test
     @Throws(IOException::class)
     fun testRenderEntries() {
-        val frame = FiguresFrame()
-        frame.setHeaderBinding(fixedBinding<String?>("PARTY LEADERS"))
+        val frame = FiguresFrame(
+            headerBinding = fixedBinding<String?>("PARTY LEADERS")
+        )
         frame.setEntriesBinding(
             fixedBinding(
                 listOf(
@@ -75,8 +80,9 @@ class FiguresFrameTest {
     @Test
     @Throws(IOException::class)
     fun testRenderOverflow() {
-        val frame = FiguresFrame()
-        frame.setHeaderBinding(fixedBinding<String?>("PARTY LEADERS"))
+        val frame = FiguresFrame(
+            headerBinding = fixedBinding<String?>("PARTY LEADERS")
+        )
         frame.setEntriesBinding(
             fixedBinding(
                 listOf(
@@ -99,8 +105,9 @@ class FiguresFrameTest {
     @Test
     @Throws(IOException::class)
     fun testRenderLongStrings() {
-        val frame = FiguresFrame()
-        frame.setHeaderBinding(fixedBinding<String?>("PARTY LEADERS"))
+        val frame = FiguresFrame(
+            headerBinding = fixedBinding<String?>("PARTY LEADERS")
+        )
         frame.setEntriesBinding(
             fixedBinding(
                 listOf(
