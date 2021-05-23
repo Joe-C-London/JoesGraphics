@@ -262,22 +262,28 @@ class MultiResultScreen private constructor() : JPanel() {
         private var mapFrame: MapFrame? = null
         var displayBothRows = true
         private val votes = WrappedBinding<Map<Candidate, Int>>(emptyMap())
+        private val header = WrappedBinding("")
+        private val subhead = WrappedBinding<String?>(null)
         private val pctReporting = WrappedBinding(1.0)
         private val winner = WrappedBinding<Candidate?>(null)
         private val runoff = WrappedBinding<Set<Candidate>?>(emptySet())
         private val prevVotes = WrappedBinding<Map<Party, Int>>(emptyMap())
         private val maxBars = WrappedBinding(5)
+        private val swingHeader = WrappedBinding<String?>(null)
+        private val mapShape = WrappedBinding<List<Pair<Shape, Color>>>(emptyList())
+        private val mapFocus = WrappedBinding<List<Shape>>(emptyList())
+        private val mapHeader = WrappedBinding("")
 
         fun setVotesBinding(votes: Binding<Map<Candidate, Int>>) {
             this.votes.binding = votes
         }
 
         fun setHeaderBinding(headerBinding: Binding<String>) {
-            barFrame.setHeaderBinding(headerBinding)
+            this.header.binding = headerBinding
         }
 
         fun setSubheadBinding(subheadBinding: Binding<String?>) {
-            barFrame.setSubheadTextBinding(subheadBinding)
+            this.subhead.binding = subheadBinding
         }
 
         fun setWinnerBinding(winnerBinding: Binding<Candidate?>) {
@@ -297,22 +303,19 @@ class MultiResultScreen private constructor() : JPanel() {
         }
 
         fun setSwingHeaderBinding(swingLabelBinding: Binding<String?>) {
-            swingFrame?.setHeaderBinding(swingLabelBinding)
+            swingHeader.binding = swingLabelBinding
         }
 
         fun setMapShapeBinding(shapes: Binding<List<Pair<Shape, Color>>>) {
-            mapFrame?.setShapesBinding(shapes)
+            mapShape.binding = shapes
         }
 
         fun setMapFocusBinding(shapes: Binding<List<Shape>>) {
-            mapFrame?.setFocusBoxBinding(
-                            shapes.map { it.asSequence()
-                                    .map { obj: Shape -> obj.bounds2D }
-                                    .reduceOrNull { agg, r -> agg.createUnion(r) } })
+            mapFocus.binding = shapes
         }
 
         fun setMapHeaderBinding(mapLabelBinding: Binding<String>) {
-            mapFrame?.setHeaderBinding(mapLabelBinding)
+            mapHeader.binding = mapLabelBinding
         }
 
         fun setMaxBarsBinding(maxBarsBinding: Binding<Int>) {
@@ -422,6 +425,8 @@ class MultiResultScreen private constructor() : JPanel() {
                     Result.Property.MAX_BARS)
             barFrame = BarFrameBuilder.basic(bars)
                     .withMax(pctReporting.binding.map { d: Double -> 0.5 / d.coerceAtLeast(1e-6) })
+                    .withHeader(header.binding)
+                    .withSubhead(subhead.binding)
                     .build()
             add(barFrame)
             if (swingPartyOrder != null) {
@@ -434,11 +439,17 @@ class MultiResultScreen private constructor() : JPanel() {
                                     ret
                                 },
                         swingPartyOrder)
+                        .withHeader(swingHeader.binding)
                         .build()
                 add(swingFrame)
             }
             if (hasMap) {
                 mapFrame = MapFrame()
+                mapFrame!!.setShapesBinding(mapShape.binding)
+                mapFrame!!.setFocusBoxBinding(mapFocus.binding.map { it.asSequence()
+                    .map { obj: Shape -> obj.bounds2D }
+                    .reduceOrNull { agg, r -> agg.createUnion(r) } })
+                mapFrame!!.setHeaderBinding(mapHeader.binding)
                 add(mapFrame)
             }
         }
