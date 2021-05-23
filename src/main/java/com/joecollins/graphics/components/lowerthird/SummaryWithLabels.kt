@@ -14,36 +14,15 @@ import javax.swing.JPanel
 import javax.swing.border.EmptyBorder
 import javax.swing.border.MatteBorder
 
-class SummaryWithLabels : JPanel() {
-    private var entriesBinding = Binding.fixedBinding(listOf(Entry(Color.WHITE, "NO RESULT YET", "WAITING...")))
+class SummaryWithLabels(
+    private val entriesBinding: Binding<List<Entry>>
+) : JPanel() {
     private val entryPanels: MutableList<EntryPanel> = ArrayList()
 
     class Entry(val color: Color, val label: String, val value: String)
 
     internal val numEntries: Int
         get() = entryPanels.size
-
-    fun setEntriesBinding(entriesBinding: Binding<List<Entry>>) {
-        this.entriesBinding.unbind()
-        this.entriesBinding = entriesBinding
-        this.entriesBinding.bind { entries: List<Entry> ->
-            while (entryPanels.size < entries.size) {
-                val newPanel = EntryPanel()
-                add(newPanel)
-                entryPanels.add(newPanel)
-            }
-            while (entryPanels.size > entries.size) {
-                remove(entryPanels.removeAt(entries.size))
-            }
-            entries.onEachIndexed { idx, entry ->
-                entryPanels[idx].topLabel.foreground = if (entry.color == Color.BLACK) Color.WHITE else entry.color
-                entryPanels[idx].bottomPanel.background = entry.color
-                entryPanels[idx].bottomLabel.foreground = if (entry.color == Color.WHITE) Color.BLACK else Color.WHITE
-                entryPanels[idx].topLabel.text = entry.label
-                entryPanels[idx].bottomLabel.text = entry.value
-            }
-        }
-    }
 
     internal fun getEntryColor(index: Int): Color {
         return entryPanels[index].bottomPanel.background
@@ -145,6 +124,23 @@ class SummaryWithLabels : JPanel() {
         background = Color.WHITE
         layout = SummaryLayout()
         border = MatteBorder(1, 1, 1, 1, Color.BLACK)
-        setEntriesBinding(entriesBinding)
+
+        this.entriesBinding.bind { entries: List<Entry> ->
+            while (entryPanels.size < entries.size) {
+                val newPanel = EntryPanel()
+                add(newPanel)
+                entryPanels.add(newPanel)
+            }
+            while (entryPanels.size > entries.size) {
+                remove(entryPanels.removeAt(entries.size))
+            }
+            entries.onEachIndexed { idx, entry ->
+                entryPanels[idx].topLabel.foreground = if (entry.color == Color.BLACK) Color.WHITE else entry.color
+                entryPanels[idx].bottomPanel.background = entry.color
+                entryPanels[idx].bottomLabel.foreground = if (entry.color == Color.WHITE) Color.BLACK else Color.WHITE
+                entryPanels[idx].topLabel.text = entry.label
+                entryPanels[idx].bottomLabel.text = entry.value
+            }
+        }
     }
 }

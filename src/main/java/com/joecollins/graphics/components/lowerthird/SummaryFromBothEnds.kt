@@ -18,12 +18,13 @@ import javax.swing.border.EmptyBorder
 import javax.swing.border.MatteBorder
 import kotlin.math.roundToInt
 
-class SummaryFromBothEnds : JPanel() {
-    private var headlineBinding: Binding<String> = Binding.fixedBinding("RESULT")
-    private var leftBinding: Binding<Entry?> = Binding.fixedBinding(null)
-    private var rightBinding: Binding<Entry?> = Binding.fixedBinding(null)
-    private var middleBinding: Binding<Entry?> = Binding.fixedBinding(null)
-    private var totalBinding: Binding<Int> = Binding.fixedBinding(1)
+class SummaryFromBothEnds(
+    private val headlineBinding: Binding<String>,
+    private val totalBinding: Binding<Int>,
+    private val leftBinding: Binding<Entry?>,
+    private val rightBinding: Binding<Entry?>,
+    private val middleBinding: Binding<Entry?> = Binding.fixedBinding(null)
+) : JPanel() {
 
     private val headlinePanel: HeadlinePanel = HeadlinePanel()
     private val entryPanel: EntryPanel = EntryPanel()
@@ -31,47 +32,17 @@ class SummaryFromBothEnds : JPanel() {
     internal val headline: String
         get() = headlinePanel.top
 
-    fun setHeadlineBinding(headlineBinding: Binding<String>) {
-        this.headlineBinding.unbind()
-        this.headlineBinding = headlineBinding
-        this.headlineBinding.bind { headlinePanel.top = it }
-    }
-
     internal val total: Int
         get() = entryPanel.total
-
-    fun setTotalBinding(totalBinding: Binding<Int>) {
-        this.totalBinding.unbind()
-        this.totalBinding = totalBinding
-        this.totalBinding.bind { entryPanel.total = it }
-    }
 
     internal val left: Entry?
         get() = entryPanel.left
 
-    fun setLeftBinding(leftBinding: Binding<Entry?>) {
-        this.leftBinding.unbind()
-        this.leftBinding = leftBinding
-        this.leftBinding.bind { entryPanel.left = it }
-    }
-
     internal val right: Entry?
         get() = entryPanel.right
 
-    fun setRightBinding(rightBinding: Binding<Entry?>) {
-        this.rightBinding.unbind()
-        this.rightBinding = rightBinding
-        this.rightBinding.bind { entryPanel.right = it }
-    }
-
     internal val middle: Entry?
         get() = entryPanel.middle
-
-    fun setMiddleBinding(middleBinding: Binding<Entry?>) {
-        this.middleBinding.unbind()
-        this.middleBinding = middleBinding
-        this.middleBinding.bind { entryPanel.middle = it }
-    }
 
     private inner class HeadlinePanel : JPanel() {
         private val topPanel: JPanel = object : JPanel() {
@@ -254,5 +225,11 @@ class SummaryFromBothEnds : JPanel() {
         border = MatteBorder(1, 1, 1, 1, Color.BLACK)
         add(headlinePanel)
         add(entryPanel)
+
+        this.headlineBinding.bind { headlinePanel.top = it }
+        this.totalBinding.bind { entryPanel.total = it }
+        this.leftBinding.bind { entryPanel.left = it }
+        this.rightBinding.bind { entryPanel.right = it }
+        this.middleBinding.bind { entryPanel.middle = it }
     }
 }

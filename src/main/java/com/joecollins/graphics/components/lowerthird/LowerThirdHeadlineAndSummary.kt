@@ -4,38 +4,49 @@ import com.joecollins.bindings.Binding
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.GridLayout
+import java.awt.Image
+import java.time.Clock
+import java.time.ZoneId
 import javax.swing.JPanel
 
-class LowerThirdHeadlineAndSummary : LowerThird() {
+class LowerThirdHeadlineAndSummary internal constructor(
+    leftImageBinding: Binding<Image>,
+    placeBinding: Binding<String>,
+    timezoneBinding: Binding<ZoneId>,
+    private val headlineBinding: Binding<String?>,
+    private val subheadBinding: Binding<String?>,
+    summaryEntriesBinding: Binding<List<SummaryWithLabels.Entry>>,
+    clock: Clock
+) : LowerThird(leftImageBinding, placeBinding, timezoneBinding, clock) {
+
+    constructor(
+        leftImageBinding: Binding<Image>,
+        placeBinding: Binding<String>,
+        timezoneBinding: Binding<ZoneId>,
+        headlineBinding: Binding<String?>,
+        subheadBinding: Binding<String?>,
+        summaryEntriesBinding: Binding<List<SummaryWithLabels.Entry>>
+    ) : this(
+        leftImageBinding,
+        placeBinding,
+        timezoneBinding,
+        headlineBinding,
+        subheadBinding,
+        summaryEntriesBinding,
+        Clock.systemDefaultZone()
+    )
+
     private val headlinePanel = HeadlinePanel()
-    private val partySummary = SummaryWithLabels()
-    private var headlineBinding = Binding.fixedBinding<String?>("")
-    private var subheadBinding = Binding.fixedBinding<String?>(null)
+    private val partySummary = SummaryWithLabels(summaryEntriesBinding)
 
     internal val headline: String?
         get() = headlinePanel.headline
 
-    fun setHeadlineBinding(headlineBinding: Binding<String?>) {
-        this.headlineBinding.unbind()
-        this.headlineBinding = headlineBinding
-        this.headlineBinding.bind { headlinePanel.headline = it }
-    }
-
     internal val subhead: String?
         get() = headlinePanel.subhead
 
-    fun setSubheadBinding(subheadBinding: Binding<String?>) {
-        this.subheadBinding.unbind()
-        this.subheadBinding = subheadBinding
-        this.subheadBinding.bind { headlinePanel.subhead = it }
-    }
-
     internal val numSummaryEntries: Int
         get() = partySummary.numEntries
-
-    fun setSummaryEntriesBinding(entriesBinding: Binding<List<SummaryWithLabels.Entry>>) {
-        partySummary.setEntriesBinding(entriesBinding)
-    }
 
     internal fun getEntryColor(index: Int): Color {
         return partySummary.getEntryColor(index)
@@ -55,5 +66,7 @@ class LowerThirdHeadlineAndSummary : LowerThird() {
         add(center, BorderLayout.CENTER)
         center.add(headlinePanel)
         center.add(partySummary)
+        this.headlineBinding.bind { headlinePanel.headline = it }
+        this.subheadBinding.bind { headlinePanel.subhead = it }
     }
 }

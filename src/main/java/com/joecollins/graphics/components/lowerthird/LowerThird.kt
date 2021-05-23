@@ -31,46 +31,30 @@ import javax.swing.border.EmptyBorder
 import kotlin.Throws
 import kotlin.math.max
 
-open class LowerThird : JPanel() {
-    private var clock = Clock.systemDefaultZone()
+open class LowerThird internal constructor(
+    private val leftImageBinding: Binding<Image>,
+    private val placeBinding: Binding<String>,
+    private val timezoneBinding: Binding<ZoneId>,
+    private val clock: Clock
+) : JPanel() {
+
+    constructor(
+        leftImageBinding: Binding<Image>,
+        placeBinding: Binding<String>,
+        timezoneBinding: Binding<ZoneId>
+    ) : this(leftImageBinding, placeBinding, timezoneBinding, Clock.systemDefaultZone())
+
     private val leftPanel: ImagePanel = ImagePanel()
     private val rightPanel = PlaceAndTimePanel()
-    private var leftImageBinding = Binding.fixedBinding<Image>(DEFAULT_IMAGE)
-    private var placeBinding = Binding.fixedBinding("UTC")
-    private var timezoneBinding = Binding.fixedBinding<ZoneId>(ZoneOffset.UTC)
 
     internal val leftImage: Image
     get() { return leftPanel.leftImage }
 
-    fun setLeftImageBinding(leftImageBinding: Binding<Image>) {
-        this.leftImageBinding.unbind()
-        this.leftImageBinding = leftImageBinding
-        this.leftImageBinding.bind { leftPanel.setImage(it) }
-    }
-
     internal val place: String
         get() = rightPanel.place
 
-    fun setPlaceBinding(placeBinding: Binding<String>) {
-        this.placeBinding.unbind()
-        this.placeBinding = placeBinding
-        this.placeBinding.bind { rightPanel.place = it }
-    }
-
     internal val time: String
         get() = rightPanel.time
-
-    fun setTimeZoneBinding(timezoneBinding: Binding<ZoneId>) {
-        this.timezoneBinding.unbind()
-        this.timezoneBinding = timezoneBinding
-        this.timezoneBinding.bind { rightPanel.timezone = it }
-    }
-
-    internal fun setClock(clock: Clock) {
-        this.clock = clock
-        rightPanel.updateTime()
-        Thread.sleep(100)
-    }
 
     private inner class ImagePanel : JPanel() {
         var leftImage: Image = BufferedImage(1, 1, BufferedImage.TYPE_4BYTE_ABGR)
@@ -221,5 +205,8 @@ open class LowerThird : JPanel() {
         add(leftPanel, BorderLayout.WEST)
         add(rightPanel, BorderLayout.EAST)
         preferredSize = Dimension(1024, 50)
+        this.leftImageBinding.bind { leftPanel.setImage(it) }
+        this.placeBinding.bind { rightPanel.place = it }
+        this.timezoneBinding.bind { rightPanel.timezone = it }
     }
 }

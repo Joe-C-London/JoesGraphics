@@ -14,9 +14,10 @@ import javax.swing.JPanel
 import javax.swing.border.EmptyBorder
 import javax.swing.border.MatteBorder
 
-class SummaryWithoutLabels : JPanel() {
-    private var headlineBinding: Binding<String> = Binding.fixedBinding("RESULT")
-    private var entriesBinding = Binding.fixedBinding(listOf(Entry(Color.WHITE, "WAITING...")))
+class SummaryWithoutLabels(
+    private val headlineBinding: Binding<String>,
+    private val entriesBinding: Binding<List<Entry>>
+) : JPanel() {
     private val headlinePanel: HeadlinePanel = HeadlinePanel()
     private val entryPanels: MutableList<EntryPanel> = ArrayList()
 
@@ -25,34 +26,8 @@ class SummaryWithoutLabels : JPanel() {
     internal val headline: String
         get() = headlinePanel.top
 
-    fun setHeadlineBinding(headlineBinding: Binding<String>) {
-        this.headlineBinding.unbind()
-        this.headlineBinding = headlineBinding
-        this.headlineBinding.bind { text -> headlinePanel.top = text }
-    }
-
     internal val numEntries: Int
         get() = entryPanels.size
-
-    fun setEntriesBinding(entriesBinding: Binding<List<Entry>>) {
-        this.entriesBinding.unbind()
-        this.entriesBinding = entriesBinding
-        this.entriesBinding.bind { entries ->
-            while (entryPanels.size < entries.size) {
-                val newPanel = EntryPanel()
-                add(newPanel)
-                entryPanels.add(newPanel)
-            }
-            while (entryPanels.size > entries.size) {
-                remove(entryPanels.removeAt(entries.size))
-            }
-            entries.forEachIndexed { idx, entry ->
-                entryPanels[idx].bottomPanel.background = entry.color
-                entryPanels[idx].bottomLabel.foreground = if (entry.color == Color.WHITE) Color.BLACK else Color.WHITE
-                entryPanels[idx].bottomLabel.text = entry.value
-            }
-        }
-    }
 
     internal fun getEntryColor(index: Int): Color {
         return entryPanels[index].bottomPanel.background
@@ -142,7 +117,23 @@ class SummaryWithoutLabels : JPanel() {
         background = Color.WHITE
         layout = SummaryLayout()
         border = MatteBorder(1, 1, 1, 1, Color.BLACK)
-        setEntriesBinding(entriesBinding)
         add(headlinePanel)
+
+        this.headlineBinding.bind { text -> headlinePanel.top = text }
+        this.entriesBinding.bind { entries ->
+            while (entryPanels.size < entries.size) {
+                val newPanel = EntryPanel()
+                add(newPanel)
+                entryPanels.add(newPanel)
+            }
+            while (entryPanels.size > entries.size) {
+                remove(entryPanels.removeAt(entries.size))
+            }
+            entries.forEachIndexed { idx, entry ->
+                entryPanels[idx].bottomPanel.background = entry.color
+                entryPanels[idx].bottomLabel.foreground = if (entry.color == Color.WHITE) Color.BLACK else Color.WHITE
+                entryPanels[idx].bottomLabel.text = entry.value
+            }
+        }
     }
 }

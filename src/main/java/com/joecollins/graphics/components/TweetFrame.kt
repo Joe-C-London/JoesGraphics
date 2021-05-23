@@ -5,12 +5,6 @@ import com.joecollins.bindings.BindingReceiver
 import com.joecollins.graphics.ImageGenerator
 import com.joecollins.graphics.utils.StandardFont
 import io.webfolder.cdp.Launcher
-import twitter4j.MediaEntity
-import twitter4j.Status
-import twitter4j.TwitterFactory
-import twitter4j.URLEntity
-import twitter4j.User
-import twitter4j.conf.ConfigurationBuilder
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Component
@@ -38,6 +32,12 @@ import kotlin.math.ceil
 import kotlin.math.min
 import kotlin.math.roundToInt
 import kotlin.math.sqrt
+import twitter4j.MediaEntity
+import twitter4j.Status
+import twitter4j.TwitterFactory
+import twitter4j.URLEntity
+import twitter4j.User
+import twitter4j.conf.ConfigurationBuilder
 
 class TweetFrame(tweet: Binding<Status>, private val timezone: ZoneId = ZoneId.systemDefault()) : JPanel() {
     private val twitterColor = Color(0x00acee)

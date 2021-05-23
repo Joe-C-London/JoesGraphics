@@ -14,24 +14,52 @@ import org.junit.Test
 class LowerThirdHeadlineAndSummarySingleLabelTest {
     @Test
     fun testHeadline() {
-        val lowerThird = LowerThirdHeadlineAndSummarySingleLabel()
-        lowerThird.setHeadlineBinding(fixedBinding("POLLS CLOSE ACROSS CENTRAL CANADA"))
+        val lowerThird = LowerThirdHeadlineAndSummarySingleLabel(
+            leftImageBinding = fixedBinding(createImage("", Color.RED, Color.WHITE)),
+            placeBinding = fixedBinding(""),
+            timezoneBinding = fixedBinding(ZoneId.systemDefault()),
+            headlineBinding = fixedBinding("POLLS CLOSE ACROSS CENTRAL CANADA"),
+            subheadBinding = fixedBinding("Polls open for 30 minutes on west coast"),
+            summaryHeaderBinding = fixedBinding("170 SEATS FOR MAJORITY"),
+            summaryEntriesBinding = fixedBinding(
+                listOf(
+                    SummaryWithoutLabels.Entry(Color.RED, "2"),
+                    SummaryWithoutLabels.Entry(Color.BLUE, "1")
+                )
+            )
+        )
         Assert.assertEquals("POLLS CLOSE ACROSS CENTRAL CANADA", lowerThird.headline)
     }
 
     @Test
     fun testSubhead() {
-        val lowerThird = LowerThirdHeadlineAndSummarySingleLabel()
-        lowerThird.setSubheadBinding(fixedBinding("Polls open for 30 minutes on west coast"))
+        val lowerThird = LowerThirdHeadlineAndSummarySingleLabel(
+            leftImageBinding = fixedBinding(createImage("", Color.RED, Color.WHITE)),
+            placeBinding = fixedBinding(""),
+            timezoneBinding = fixedBinding(ZoneId.systemDefault()),
+            headlineBinding = fixedBinding("POLLS CLOSE ACROSS CENTRAL CANADA"),
+            subheadBinding = fixedBinding("Polls open for 30 minutes on west coast"),
+            summaryHeaderBinding = fixedBinding("170 SEATS FOR MAJORITY"),
+            summaryEntriesBinding = fixedBinding(
+                listOf(
+                    SummaryWithoutLabels.Entry(Color.RED, "2"),
+                    SummaryWithoutLabels.Entry(Color.BLUE, "1")
+                )
+            )
+        )
         Assert.assertEquals("Polls open for 30 minutes on west coast", lowerThird.subhead)
     }
 
     @Test
     fun testSummaryPanel() {
-        val lowerThird = LowerThirdHeadlineAndSummarySingleLabel()
-        lowerThird.setSummaryHeaderBinding(fixedBinding("170 SEATS FOR MAJORITY"))
-        lowerThird.setSummaryEntriesBinding(
-            fixedBinding(
+        val lowerThird = LowerThirdHeadlineAndSummarySingleLabel(
+            leftImageBinding = fixedBinding(createImage("", Color.RED, Color.WHITE)),
+            placeBinding = fixedBinding(""),
+            timezoneBinding = fixedBinding(ZoneId.systemDefault()),
+            headlineBinding = fixedBinding("POLLS CLOSE ACROSS CENTRAL CANADA"),
+            subheadBinding = fixedBinding("Polls open for 30 minutes on west coast"),
+            summaryHeaderBinding = fixedBinding("170 SEATS FOR MAJORITY"),
+            summaryEntriesBinding = fixedBinding(
                 listOf(
                     SummaryWithoutLabels.Entry(Color.RED, "2"),
                     SummaryWithoutLabels.Entry(Color.BLUE, "1")
@@ -49,57 +77,52 @@ class LowerThirdHeadlineAndSummarySingleLabelTest {
     @Test
     @Throws(IOException::class)
     fun testRenderHeadlineAndSummary() {
-        val lowerThird = LowerThirdHeadlineAndSummarySingleLabel()
-        lowerThird.setSize(1024, 50)
-        lowerThird.setLeftImageBinding(
-                fixedBinding(
-                        createImage(
-                                LowerThirdHeadlineAndSummarySingleLabelTest::class.java
-                                        .classLoader
-                                        .getResource("com/joecollins/graphics/lowerthird-left.png"))))
-        lowerThird.setPlaceBinding(fixedBinding("OTTAWA"))
-        lowerThird.setTimeZoneBinding(fixedBinding(ZoneId.of("Canada/Eastern")))
-        lowerThird.setClock(Clock.fixed(Instant.parse("2019-10-22T01:30:00Z"), ZoneId.systemDefault()))
-        lowerThird.setHeadlineBinding(fixedBinding("CENTRAL CANADA POLLS CLOSE"))
-        lowerThird.setSubheadBinding(fixedBinding("Polls open for 30 minutes on west coast"))
-        lowerThird.setSummaryEntriesBinding(
-            fixedBinding(
+        val lowerThird = LowerThirdHeadlineAndSummarySingleLabel(
+            leftImageBinding = fixedBinding(
+                createImage(
+                    LowerThirdHeadlineAndSummarySingleLabelTest::class.java
+                        .classLoader
+                        .getResource("com/joecollins/graphics/lowerthird-left.png"))),
+            placeBinding = fixedBinding("OTTAWA"),
+            timezoneBinding = fixedBinding(ZoneId.of("Canada/Eastern")),
+            headlineBinding = fixedBinding("CENTRAL CANADA POLLS CLOSE"),
+            subheadBinding = fixedBinding("Polls open for 30 minutes on west coast"),
+            summaryHeaderBinding = fixedBinding("170 SEATS FOR MAJORITY"),
+            summaryEntriesBinding = fixedBinding(
                 listOf(
                     SummaryWithoutLabels.Entry(Color.RED, "2"),
                     SummaryWithoutLabels.Entry(Color.BLUE, "1")
                 )
-            )
+            ),
+            clock = Clock.fixed(Instant.parse("2019-10-22T01:30:00Z"), ZoneId.systemDefault())
         )
-        lowerThird.setSummaryHeaderBinding(fixedBinding("170 SEATS FOR MAJORITY"))
+        lowerThird.setSize(1024, 50)
         compareRendering("LowerThird", "HeadlineAndSummarySingleLabel", lowerThird)
     }
 
     @Test
     @Throws(IOException::class)
     fun testRenderLongHeadlineAndSummary() {
-        val lowerThird = LowerThirdHeadlineAndSummarySingleLabel()
-        lowerThird.setSize(1024, 50)
-        lowerThird.setLeftImageBinding(
-                fixedBinding(
-                        createImage(
-                                LowerThirdHeadlineAndSummarySingleLabelTest::class.java
-                                        .classLoader
-                                        .getResource("com/joecollins/graphics/lowerthird-left.png"))))
-        lowerThird.setPlaceBinding(fixedBinding("OTTAWA"))
-        lowerThird.setTimeZoneBinding(fixedBinding(ZoneId.of("Canada/Eastern")))
-        lowerThird.setClock(Clock.fixed(Instant.parse("2019-10-22T01:30:00Z"), ZoneId.systemDefault()))
-        lowerThird.setHeadlineBinding(fixedBinding("POLLS CLOSE ACROSS CENTRAL CANADA"))
-        lowerThird.setSubheadBinding(
-                fixedBinding("Polls open for another 30 minutes in British Columbia, Yukon"))
-        lowerThird.setSummaryEntriesBinding(
-            fixedBinding(
+        val lowerThird = LowerThirdHeadlineAndSummarySingleLabel(
+            leftImageBinding = fixedBinding(
+                createImage(
+                    LowerThirdHeadlineAndSummarySingleLabelTest::class.java
+                        .classLoader
+                        .getResource("com/joecollins/graphics/lowerthird-left.png"))),
+            placeBinding = fixedBinding("OTTAWA"),
+            timezoneBinding = fixedBinding(ZoneId.of("Canada/Eastern")),
+            headlineBinding = fixedBinding("POLLS CLOSE ACROSS CENTRAL CANADA"),
+            subheadBinding = fixedBinding("Polls open for another 30 minutes in British Columbia, Yukon"),
+            summaryHeaderBinding = fixedBinding("170 SEATS FOR MAJORITY"),
+            summaryEntriesBinding = fixedBinding(
                 listOf(
                     SummaryWithoutLabels.Entry(Color.RED, "2"),
                     SummaryWithoutLabels.Entry(Color.BLUE, "1")
                 )
-            )
+            ),
+            clock = Clock.fixed(Instant.parse("2019-10-22T01:30:00Z"), ZoneId.systemDefault())
         )
-        lowerThird.setSummaryHeaderBinding(fixedBinding("170 SEATS FOR MAJORITY"))
+        lowerThird.setSize(1024, 50)
         compareRendering("LowerThird", "LongHeadlineAndSummarySingleLabel", lowerThird)
     }
 }

@@ -15,34 +15,66 @@ import org.junit.Test
 class LowerThirdHeadlineAndSummaryBothEndsTest {
     @Test
     fun testHeadline() {
-        val lowerThird = LowerThirdHeadlineAndSummaryBothEnds()
-        lowerThird.setHeadlineBinding(fixedBinding("POLLS CLOSE ACROSS CENTRAL CANADA"))
+        val lowerThird = LowerThirdHeadlineAndSummaryBothEnds(
+            leftImageBinding = fixedBinding(createImage("", Color.RED, Color.WHITE)),
+            placeBinding = fixedBinding(""),
+            timezoneBinding = fixedBinding(ZoneId.systemDefault()),
+            headlineBinding = fixedBinding("POLLS CLOSE ACROSS CENTRAL CANADA"),
+            subheadBinding = fixedBinding("Polls open for 30 minutes on west coast"),
+            summaryHeaderBinding = fixedBinding("270 TO WIN"),
+            summaryTotalBinding = fixedBinding(538),
+            summaryLeftBinding = fixedBinding(SummaryFromBothEnds.Entry(Color.BLUE, "CLINTON", 232)),
+            summaryRightBinding = fixedBinding(SummaryFromBothEnds.Entry(Color.RED, "TRUMP", 306))
+        )
         Assert.assertEquals("POLLS CLOSE ACROSS CENTRAL CANADA", lowerThird.headline)
     }
 
     @Test
     fun testSubhead() {
-        val lowerThird = LowerThirdHeadlineAndSummaryBothEnds()
-        lowerThird.setSubheadBinding(fixedBinding("Polls open for 30 minutes on west coast"))
+        val lowerThird = LowerThirdHeadlineAndSummaryBothEnds(
+            leftImageBinding = fixedBinding(createImage("", Color.RED, Color.WHITE)),
+            placeBinding = fixedBinding(""),
+            timezoneBinding = fixedBinding(ZoneId.systemDefault()),
+            headlineBinding = fixedBinding("POLLS CLOSE ACROSS CENTRAL CANADA"),
+            subheadBinding = fixedBinding("Polls open for 30 minutes on west coast"),
+            summaryHeaderBinding = fixedBinding("270 TO WIN"),
+            summaryTotalBinding = fixedBinding(538),
+            summaryLeftBinding = fixedBinding(SummaryFromBothEnds.Entry(Color.BLUE, "CLINTON", 232)),
+            summaryRightBinding = fixedBinding(SummaryFromBothEnds.Entry(Color.RED, "TRUMP", 306))
+        )
         Assert.assertEquals("Polls open for 30 minutes on west coast", lowerThird.subhead)
     }
 
     @Test
     fun testSummaryPanel() {
-        val lowerThird = LowerThirdHeadlineAndSummaryBothEnds()
-        lowerThird.setSummaryHeaderBinding(fixedBinding("270 TO WIN"))
-        lowerThird.setTotalBinding(fixedBinding(538))
+        val lowerThird = LowerThirdHeadlineAndSummaryBothEnds(
+            leftImageBinding = fixedBinding(createImage("", Color.RED, Color.WHITE)),
+            placeBinding = fixedBinding(""),
+            timezoneBinding = fixedBinding(ZoneId.systemDefault()),
+            headlineBinding = fixedBinding("POLLS CLOSE ACROSS CENTRAL CANADA"),
+            subheadBinding = fixedBinding("Polls open for 30 minutes on west coast"),
+            summaryHeaderBinding = fixedBinding("270 TO WIN"),
+            summaryTotalBinding = fixedBinding(538),
+            summaryLeftBinding = fixedBinding(SummaryFromBothEnds.Entry(Color.BLUE, "CLINTON", 232)),
+            summaryRightBinding = fixedBinding(SummaryFromBothEnds.Entry(Color.RED, "TRUMP", 306))
+        )
         Assert.assertEquals("270 TO WIN", lowerThird.summaryHeader)
         Assert.assertEquals(538, lowerThird.total.toLong())
     }
 
     @Test
     fun testTwoPartySummary() {
-        val lowerThird = LowerThirdHeadlineAndSummaryBothEnds()
-        lowerThird.setLeftBinding(
-                fixedBinding(SummaryFromBothEnds.Entry(Color.BLUE, "CLINTON", 232)))
-        lowerThird.setRightBinding(
-                fixedBinding(SummaryFromBothEnds.Entry(Color.RED, "TRUMP", 306)))
+        val lowerThird = LowerThirdHeadlineAndSummaryBothEnds(
+            leftImageBinding = fixedBinding(createImage("", Color.RED, Color.WHITE)),
+            placeBinding = fixedBinding(""),
+            timezoneBinding = fixedBinding(ZoneId.systemDefault()),
+            headlineBinding = fixedBinding("POLLS CLOSE ACROSS CENTRAL CANADA"),
+            subheadBinding = fixedBinding("Polls open for 30 minutes on west coast"),
+            summaryHeaderBinding = fixedBinding("270 TO WIN"),
+            summaryTotalBinding = fixedBinding(538),
+            summaryLeftBinding = fixedBinding(SummaryFromBothEnds.Entry(Color.BLUE, "CLINTON", 232)),
+            summaryRightBinding = fixedBinding(SummaryFromBothEnds.Entry(Color.RED, "TRUMP", 306))
+        )
         Assert.assertEquals(Color.BLUE, lowerThird.left!!.color)
         Assert.assertEquals("CLINTON", lowerThird.left!!.label)
         Assert.assertEquals(232, lowerThird.left!!.value.toLong())
@@ -53,13 +85,18 @@ class LowerThirdHeadlineAndSummaryBothEndsTest {
 
     @Test
     fun testThreePartySummary() {
-        val lowerThird = LowerThirdHeadlineAndSummaryBothEnds()
-        lowerThird.setLeftBinding(
-                fixedBinding(SummaryFromBothEnds.Entry(Color.BLUE, "HUMPHREY", 191)))
-        lowerThird.setRightBinding(
-                fixedBinding(SummaryFromBothEnds.Entry(Color.RED, "NIXON", 301)))
-        lowerThird.setMiddleBinding(
-                fixedBinding(SummaryFromBothEnds.Entry(Color.GRAY, "WALLACE", 46)))
+        val lowerThird = LowerThirdHeadlineAndSummaryBothEnds(
+            leftImageBinding = fixedBinding(createImage("", Color.RED, Color.WHITE)),
+            placeBinding = fixedBinding(""),
+            timezoneBinding = fixedBinding(ZoneId.systemDefault()),
+            headlineBinding = fixedBinding("POLLS CLOSE ACROSS CENTRAL CANADA"),
+            subheadBinding = fixedBinding("Polls open for 30 minutes on west coast"),
+            summaryHeaderBinding = fixedBinding("270 TO WIN"),
+            summaryTotalBinding = fixedBinding(538),
+            summaryLeftBinding = fixedBinding(SummaryFromBothEnds.Entry(Color.BLUE, "HUMPHREY", 191)),
+            summaryRightBinding = fixedBinding(SummaryFromBothEnds.Entry(Color.RED, "NIXON", 301)),
+            summaryMiddleBinding = fixedBinding(SummaryFromBothEnds.Entry(Color.GRAY, "WALLACE", 46))
+        )
         Assert.assertEquals(Color.BLUE, lowerThird.left!!.color)
         Assert.assertEquals("HUMPHREY", lowerThird.left!!.label)
         Assert.assertEquals(191, lowerThird.left!!.value.toLong())
@@ -76,19 +113,19 @@ class LowerThirdHeadlineAndSummaryBothEndsTest {
     fun testRenderRightWin() {
         val left = BindableWrapper(SummaryFromBothEnds.Entry(Color.BLUE, "CLINTON", 0))
         val right = BindableWrapper(SummaryFromBothEnds.Entry(Color.RED, "TRUMP", 0))
-        val lowerThird = LowerThirdHeadlineAndSummaryBothEnds()
+        val lowerThird = LowerThirdHeadlineAndSummaryBothEnds(
+            leftImageBinding = fixedBinding(createImage("AMERICA VOTES", Color.WHITE, Color.RED)),
+            placeBinding = fixedBinding("WASHINGTON"),
+            timezoneBinding = fixedBinding(ZoneId.of("US/Eastern")),
+            headlineBinding = fixedBinding("TRUMP WINS ELECTION"),
+            subheadBinding = fixedBinding(null),
+            summaryHeaderBinding = fixedBinding("270 TO WIN"),
+            summaryTotalBinding = fixedBinding(538),
+            summaryLeftBinding = left.binding,
+            summaryRightBinding = right.binding,
+            clock = Clock.fixed(Instant.parse("2016-11-09T06:00:00Z"), ZoneId.systemDefault())
+        )
         lowerThird.setSize(1024, 50)
-        lowerThird.setLeftImageBinding(
-                fixedBinding(createImage("AMERICA VOTES", Color.WHITE, Color.RED)))
-        lowerThird.setPlaceBinding(fixedBinding("WASHINGTON"))
-        lowerThird.setTimeZoneBinding(fixedBinding(ZoneId.of("US/Eastern")))
-        lowerThird.setClock(Clock.fixed(Instant.parse("2016-11-09T06:00:00Z"), ZoneId.systemDefault()))
-        lowerThird.setHeadlineBinding(fixedBinding("TRUMP WINS ELECTION"))
-        lowerThird.setSubheadBinding(fixedBinding(null))
-        lowerThird.setSummaryHeaderBinding(fixedBinding("270 TO WIN"))
-        lowerThird.setLeftBinding(left.binding)
-        lowerThird.setRightBinding(right.binding)
-        lowerThird.setTotalBinding(fixedBinding(538))
         compareRendering("LowerThird", "HeadlineAndSummaryBothEnds-RightWin-1", lowerThird)
         left.value = SummaryFromBothEnds.Entry(Color.BLUE, "CLINTON", 6)
         right.value = SummaryFromBothEnds.Entry(Color.RED, "TRUMP", 16)
@@ -106,19 +143,19 @@ class LowerThirdHeadlineAndSummaryBothEndsTest {
     fun testRenderLeftWin() {
         val left = BindableWrapper(SummaryFromBothEnds.Entry(Color.BLUE, "OBAMA", 0))
         val right = BindableWrapper(SummaryFromBothEnds.Entry(Color.RED, "MCCAIN", 0))
-        val lowerThird = LowerThirdHeadlineAndSummaryBothEnds()
+        val lowerThird = LowerThirdHeadlineAndSummaryBothEnds(
+            leftImageBinding = fixedBinding(createImage("AMERICA VOTES", Color.WHITE, Color.RED)),
+            placeBinding = fixedBinding("WASHINGTON"),
+            timezoneBinding = fixedBinding(ZoneId.of("US/Eastern")),
+            headlineBinding = fixedBinding("OBAMA WINS ELECTION"),
+            subheadBinding = fixedBinding(null),
+            summaryHeaderBinding = fixedBinding("270 TO WIN"),
+            summaryTotalBinding = fixedBinding(538),
+            summaryLeftBinding = left.binding,
+            summaryRightBinding = right.binding,
+            clock = Clock.fixed(Instant.parse("2008-11-05T06:00:00Z"), ZoneId.systemDefault())
+        )
         lowerThird.setSize(1024, 50)
-        lowerThird.setLeftImageBinding(
-                fixedBinding(createImage("AMERICA VOTES", Color.WHITE, Color.RED)))
-        lowerThird.setPlaceBinding(fixedBinding("WASHINGTON"))
-        lowerThird.setTimeZoneBinding(fixedBinding(ZoneId.of("US/Eastern")))
-        lowerThird.setClock(Clock.fixed(Instant.parse("2008-11-05T06:00:00Z"), ZoneId.systemDefault()))
-        lowerThird.setHeadlineBinding(fixedBinding("OBAMA WINS ELECTION"))
-        lowerThird.setSubheadBinding(fixedBinding(null))
-        lowerThird.setSummaryHeaderBinding(fixedBinding("270 TO WIN"))
-        lowerThird.setLeftBinding(left.binding)
-        lowerThird.setRightBinding(right.binding)
-        lowerThird.setTotalBinding(fixedBinding(538))
         compareRendering("LowerThird", "HeadlineAndSummaryBothEnds-LeftWin-1", lowerThird)
         left.value = SummaryFromBothEnds.Entry(Color.BLUE, "OBAMA", 10)
         right.value = SummaryFromBothEnds.Entry(Color.RED, "MCCAIN", 7)
@@ -136,19 +173,19 @@ class LowerThirdHeadlineAndSummaryBothEndsTest {
     fun testRenderRightLandslide() {
         val left = BindableWrapper(SummaryFromBothEnds.Entry(Color.BLUE, "MONDALE", 0))
         val right = BindableWrapper(SummaryFromBothEnds.Entry(Color.RED, "REAGAN", 0))
-        val lowerThird = LowerThirdHeadlineAndSummaryBothEnds()
+        val lowerThird = LowerThirdHeadlineAndSummaryBothEnds(
+            leftImageBinding = fixedBinding(createImage("AMERICA VOTES", Color.WHITE, Color.RED)),
+            placeBinding = fixedBinding("WASHINGTON"),
+            timezoneBinding = fixedBinding(ZoneId.of("US/Eastern")),
+            headlineBinding = fixedBinding("REAGAN WINS RE-ELECTION"),
+            subheadBinding = fixedBinding(null),
+            summaryHeaderBinding = fixedBinding("270 TO WIN"),
+            summaryTotalBinding = fixedBinding(538),
+            summaryLeftBinding = left.binding,
+            summaryRightBinding = right.binding,
+            clock = Clock.fixed(Instant.parse("1984-11-07T06:00:00Z"), ZoneId.systemDefault())
+        )
         lowerThird.setSize(1024, 50)
-        lowerThird.setLeftImageBinding(
-                fixedBinding(createImage("AMERICA VOTES", Color.WHITE, Color.RED)))
-        lowerThird.setPlaceBinding(fixedBinding("WASHINGTON"))
-        lowerThird.setTimeZoneBinding(fixedBinding(ZoneId.of("US/Eastern")))
-        lowerThird.setClock(Clock.fixed(Instant.parse("1984-11-07T06:00:00Z"), ZoneId.systemDefault()))
-        lowerThird.setHeadlineBinding(fixedBinding("REAGAN WINS RE-ELECTION"))
-        lowerThird.setSubheadBinding(fixedBinding(null))
-        lowerThird.setSummaryHeaderBinding(fixedBinding("270 TO WIN"))
-        lowerThird.setLeftBinding(left.binding)
-        lowerThird.setRightBinding(right.binding)
-        lowerThird.setTotalBinding(fixedBinding(538))
         compareRendering("LowerThird", "HeadlineAndSummaryBothEnds-RightLandslide-1", lowerThird)
         left.value = SummaryFromBothEnds.Entry(Color.BLUE, "MONDALE", 3)
         right.value = SummaryFromBothEnds.Entry(Color.RED, "REAGAN", 71)
@@ -166,19 +203,19 @@ class LowerThirdHeadlineAndSummaryBothEndsTest {
     fun testRenderLeftLandslide() {
         val left = BindableWrapper(SummaryFromBothEnds.Entry(Color.BLUE, "ROOSEVELT", 0))
         val right = BindableWrapper(SummaryFromBothEnds.Entry(Color.RED, "LANDON", 0))
-        val lowerThird = LowerThirdHeadlineAndSummaryBothEnds()
+        val lowerThird = LowerThirdHeadlineAndSummaryBothEnds(
+            leftImageBinding = fixedBinding(createImage("AMERICA VOTES", Color.WHITE, Color.RED)),
+            placeBinding = fixedBinding("WASHINGTON"),
+            timezoneBinding = fixedBinding(ZoneId.of("US/Eastern")),
+            headlineBinding = fixedBinding("ROOSEVELT WINS RE-ELECTION"),
+            subheadBinding = fixedBinding(null),
+            summaryHeaderBinding = fixedBinding("266 TO WIN"),
+            summaryTotalBinding = fixedBinding(531),
+            summaryLeftBinding = left.binding,
+            summaryRightBinding = right.binding,
+            clock = Clock.fixed(Instant.parse("1936-11-04T06:00:00Z"), ZoneId.systemDefault())
+        )
         lowerThird.setSize(1024, 50)
-        lowerThird.setLeftImageBinding(
-                fixedBinding(createImage("AMERICA VOTES", Color.WHITE, Color.RED)))
-        lowerThird.setPlaceBinding(fixedBinding("WASHINGTON"))
-        lowerThird.setTimeZoneBinding(fixedBinding(ZoneId.of("US/Eastern")))
-        lowerThird.setClock(Clock.fixed(Instant.parse("1936-11-04T06:00:00Z"), ZoneId.systemDefault()))
-        lowerThird.setHeadlineBinding(fixedBinding("ROOSEVELT WINS RE-ELECTION"))
-        lowerThird.setSubheadBinding(fixedBinding(null))
-        lowerThird.setSummaryHeaderBinding(fixedBinding("266 TO WIN"))
-        lowerThird.setLeftBinding(left.binding)
-        lowerThird.setRightBinding(right.binding)
-        lowerThird.setTotalBinding(fixedBinding(531))
         compareRendering("LowerThird", "HeadlineAndSummaryBothEnds-LeftLandslide-1", lowerThird)
         left.value = SummaryFromBothEnds.Entry(Color.BLUE, "ROOSEVELT", 169)
         right.value = SummaryFromBothEnds.Entry(Color.RED, "LANDON", 0)
@@ -197,20 +234,20 @@ class LowerThirdHeadlineAndSummaryBothEndsTest {
         val left = BindableWrapper(SummaryFromBothEnds.Entry(Color.BLUE, "DEMOCRATS", 27))
         val right = BindableWrapper(SummaryFromBothEnds.Entry(Color.RED, "REPUBLICANS", 40))
         val middle = BindableWrapper<SummaryFromBothEnds.Entry?>(null)
-        val lowerThird = LowerThirdHeadlineAndSummaryBothEnds()
+        val lowerThird = LowerThirdHeadlineAndSummaryBothEnds(
+            leftImageBinding = fixedBinding(createImage("AMERICA VOTES", Color.WHITE, Color.RED)),
+            placeBinding = fixedBinding("WASHINGTON"),
+            timezoneBinding = fixedBinding(ZoneId.of("US/Eastern")),
+            headlineBinding = fixedBinding("NO SENATE MAJORITY"),
+            subheadBinding = fixedBinding(null),
+            summaryHeaderBinding = fixedBinding("51 FOR CONTROL"),
+            summaryTotalBinding = fixedBinding(100),
+            summaryLeftBinding = left.binding,
+            summaryRightBinding = right.binding,
+            summaryMiddleBinding = middle.binding,
+            clock = Clock.fixed(Instant.parse("2006-11-08T06:00:00Z"), ZoneId.systemDefault())
+        )
         lowerThird.setSize(1024, 50)
-        lowerThird.setLeftImageBinding(
-                fixedBinding(createImage("AMERICA VOTES", Color.WHITE, Color.RED)))
-        lowerThird.setPlaceBinding(fixedBinding("WASHINGTON"))
-        lowerThird.setTimeZoneBinding(fixedBinding(ZoneId.of("US/Eastern")))
-        lowerThird.setClock(Clock.fixed(Instant.parse("2006-11-08T06:00:00Z"), ZoneId.systemDefault()))
-        lowerThird.setHeadlineBinding(fixedBinding("NO SENATE MAJORITY"))
-        lowerThird.setSubheadBinding(fixedBinding(null))
-        lowerThird.setSummaryHeaderBinding(fixedBinding("51 FOR CONTROL"))
-        lowerThird.setLeftBinding(left.binding)
-        lowerThird.setRightBinding(right.binding)
-        lowerThird.setMiddleBinding(middle.binding)
-        lowerThird.setTotalBinding(fixedBinding(100))
         compareRendering("LowerThird", "HeadlineAndSummaryBothEnds-MiddleNoMajority-1", lowerThird)
         left.value = SummaryFromBothEnds.Entry(Color.BLUE, "DEMOCRATS", 44)
         right.value = SummaryFromBothEnds.Entry(Color.RED, "REPUBLICANS", 47)
@@ -228,20 +265,20 @@ class LowerThirdHeadlineAndSummaryBothEndsTest {
         val left = BindableWrapper(SummaryFromBothEnds.Entry(Color.BLUE, "DEMOCRATS", 37))
         val right = BindableWrapper(SummaryFromBothEnds.Entry(Color.RED, "REPUBLICANS", 26))
         val middle = BindableWrapper(SummaryFromBothEnds.Entry(Color.GRAY, "OTHERS", 2))
-        val lowerThird = LowerThirdHeadlineAndSummaryBothEnds()
+        val lowerThird = LowerThirdHeadlineAndSummaryBothEnds(
+            leftImageBinding = fixedBinding(createImage("AMERICA VOTES", Color.WHITE, Color.RED)),
+            placeBinding = fixedBinding("WASHINGTON"),
+            timezoneBinding = fixedBinding(ZoneId.of("US/Eastern")),
+            headlineBinding = fixedBinding("DEMOCRATIC SENATE MAJORITY"),
+            subheadBinding = fixedBinding(null),
+            summaryHeaderBinding = fixedBinding("51 FOR CONTROL"),
+            summaryTotalBinding = fixedBinding(100),
+            summaryLeftBinding = left.binding,
+            summaryRightBinding = right.binding,
+            summaryMiddleBinding = middle.binding,
+            clock = Clock.fixed(Instant.parse("2008-11-05T06:00:00Z"), ZoneId.systemDefault())
+        )
         lowerThird.setSize(1024, 50)
-        lowerThird.setLeftImageBinding(
-                fixedBinding(createImage("AMERICA VOTES", Color.WHITE, Color.RED)))
-        lowerThird.setPlaceBinding(fixedBinding("WASHINGTON"))
-        lowerThird.setTimeZoneBinding(fixedBinding(ZoneId.of("US/Eastern")))
-        lowerThird.setClock(Clock.fixed(Instant.parse("2008-11-05T06:00:00Z"), ZoneId.systemDefault()))
-        lowerThird.setHeadlineBinding(fixedBinding("DEMOCRATIC SENATE MAJORITY"))
-        lowerThird.setSubheadBinding(fixedBinding(null))
-        lowerThird.setSummaryHeaderBinding(fixedBinding("51 FOR CONTROL"))
-        lowerThird.setLeftBinding(left.binding)
-        lowerThird.setRightBinding(right.binding)
-        lowerThird.setMiddleBinding(middle.binding)
-        lowerThird.setTotalBinding(fixedBinding(100))
         compareRendering("LowerThird", "HeadlineAndSummaryBothEnds-MiddleLeftMajority-1", lowerThird)
         left.value = SummaryFromBothEnds.Entry(Color.BLUE, "DEMOCRATS", 51)
         right.value = SummaryFromBothEnds.Entry(Color.RED, "REPUBLICANS", 39)
@@ -259,20 +296,20 @@ class LowerThirdHeadlineAndSummaryBothEndsTest {
         val left = BindableWrapper(SummaryFromBothEnds.Entry(Color.BLUE, "DEMOCRATS", 29))
         val right = BindableWrapper(SummaryFromBothEnds.Entry(Color.RED, "REPUBLICANS", 36))
         val middle = BindableWrapper(SummaryFromBothEnds.Entry(Color.GRAY, "OTHERS", 1))
-        val lowerThird = LowerThirdHeadlineAndSummaryBothEnds()
+        val lowerThird = LowerThirdHeadlineAndSummaryBothEnds(
+            leftImageBinding = fixedBinding(createImage("AMERICA VOTES", Color.WHITE, Color.RED)),
+            placeBinding = fixedBinding("WASHINGTON"),
+            timezoneBinding = fixedBinding(ZoneId.of("US/Eastern")),
+            headlineBinding = fixedBinding("REPUBLICAN SENATE MAJORITY"),
+            subheadBinding = fixedBinding(null),
+            summaryHeaderBinding = fixedBinding("51 FOR CONTROL"),
+            summaryTotalBinding = fixedBinding(100),
+            summaryLeftBinding = left.binding,
+            summaryRightBinding = right.binding,
+            summaryMiddleBinding = middle.binding,
+            clock = Clock.fixed(Instant.parse("2004-11-03T06:00:00Z"), ZoneId.systemDefault())
+        )
         lowerThird.setSize(1024, 50)
-        lowerThird.setLeftImageBinding(
-                fixedBinding(createImage("AMERICA VOTES", Color.WHITE, Color.RED)))
-        lowerThird.setPlaceBinding(fixedBinding("WASHINGTON"))
-        lowerThird.setTimeZoneBinding(fixedBinding(ZoneId.of("US/Eastern")))
-        lowerThird.setClock(Clock.fixed(Instant.parse("2004-11-03T06:00:00Z"), ZoneId.systemDefault()))
-        lowerThird.setHeadlineBinding(fixedBinding("REPUBLICAN SENATE MAJORITY"))
-        lowerThird.setSubheadBinding(fixedBinding(null))
-        lowerThird.setSummaryHeaderBinding(fixedBinding("51 FOR CONTROL"))
-        lowerThird.setLeftBinding(left.binding)
-        lowerThird.setRightBinding(right.binding)
-        lowerThird.setMiddleBinding(middle.binding)
-        lowerThird.setTotalBinding(fixedBinding(100))
         compareRendering("LowerThird", "HeadlineAndSummaryBothEnds-MiddleRightMajority-1", lowerThird)
         left.value = SummaryFromBothEnds.Entry(Color.BLUE, "DEMOCRATS", 43)
         right.value = SummaryFromBothEnds.Entry(Color.RED, "REPUBLICANS", 49)
