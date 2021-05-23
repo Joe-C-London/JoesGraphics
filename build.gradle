@@ -1,5 +1,5 @@
 buildscript {
-    ext.kotlin_version = '1.4.31'
+    ext.kotlin_version = '1.5.0'
     repositories {
         mavenCentral()
     }
@@ -9,7 +9,7 @@ buildscript {
 }
 plugins {
     id "com.github.ben-manes.versions" version "0.38.0"
-    id "com.diffplug.spotless" version "5.11.1"
+    id "com.diffplug.spotless" version "5.12.5"
     id "jacoco"
 }
 
@@ -29,7 +29,7 @@ repositories {
     mavenCentral()
 }
 
-def geotoolsVersion = '25.0'
+def geotoolsVersion = '25.1'
 
 dependencies {
     api group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.30'
