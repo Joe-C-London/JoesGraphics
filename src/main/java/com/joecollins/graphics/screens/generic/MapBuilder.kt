@@ -13,6 +13,7 @@ class MapBuilder<T> {
     private val winners: BindingReceiver<List<Pair<Shape, Color>>>
     private val mapFocus: BindingReceiver<List<Shape>?>
     private val mapHeader: BindingReceiver<String?>
+    private var outlines: Binding<List<Shape>>? = null
     private var notes: Binding<String?>? = null
 
     constructor(
@@ -132,11 +133,17 @@ class MapBuilder<T> {
         return this
     }
 
+    fun withOutlines(outlines: Binding<List<Shape>>): MapBuilder<T> {
+        this.outlines = outlines
+        return this
+    }
+
     fun createMapFrame(): MapFrame {
         return MapFrameBuilder.from(winners.getBinding())
                 .withFocus(mapFocus.getBinding())
                 .withHeader(mapHeader.getBinding())
                 .let { map -> notes?.let { n -> map.withNotes(n) } ?: map }
+                .let { map -> outlines?.let { n -> map.withOutline(n) } ?: map }
                 .build()
     }
 

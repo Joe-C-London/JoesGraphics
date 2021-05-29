@@ -26,22 +26,18 @@ import kotlin.math.roundToInt
 
 class HeatMapFrame(
     headerBinding: Binding<String?>,
+    numRowsBinding: Binding<Int>,
+    squaresBinding: Binding<List<Square>>,
+    seatBarsBinding: Binding<List<Bar>>? = null,
+    seatBarLabelBinding: Binding<String>? = null,
+    changeBarsBinding: Binding<List<Bar>>? = null,
+    changeBarLabelBinding: Binding<String>? = null,
+    changeBarStartBinding: Binding<Int>? = null,
     borderColorBinding: Binding<Color>? = null
 ) : GraphicsFrame(
     headerBinding = headerBinding,
     borderColorBinding = borderColorBinding
 ) {
-    private var numRowsBinding = Binding.fixedBinding(1)
-
-    private var squaresBinding: Binding<List<Square>> = Binding.fixedBinding(emptyList())
-
-    private var seatBarsBinding: Binding<List<Bar>> = Binding.fixedBinding(emptyList())
-    private var seatBarLabelBinding = Binding.fixedBinding("")
-
-    private var changeBarsBinding: Binding<List<Bar>> = Binding.fixedBinding(emptyList())
-    private var changeBarLabelBinding = Binding.fixedBinding("")
-    private var changeBarStartBinding = Binding.fixedBinding(0)
-
     private val barsPanel = SeatBarPanel()
     private val squaresPanel = SquaresPanel()
 
@@ -74,12 +70,6 @@ class HeatMapFrame(
     internal val numRows: Int
         get() = squaresPanel.numRows
 
-    fun setNumRowsBinding(numRowsBinding: Binding<Int>) {
-        this.numRowsBinding.unbind()
-        this.numRowsBinding = numRowsBinding
-        this.numRowsBinding.bind { numRows -> squaresPanel.numRows = numRows }
-    }
-
     internal val numSquares: Int
         get() = squaresPanel.squares.size
 
@@ -89,12 +79,6 @@ class HeatMapFrame(
 
     internal fun getSquareFill(index: Int): Color {
         return squaresPanel.squares[index].fillColor
-    }
-
-    fun setSquaresBinding(squaresBinding: Binding<List<Square>>) {
-        this.squaresBinding.unbind()
-        this.squaresBinding = squaresBinding
-        this.squaresBinding.bind { squares -> squaresPanel.squares = squares }
     }
 
     internal val seatBarCount: Int
@@ -108,20 +92,8 @@ class HeatMapFrame(
         return barsPanel.seatBars[index].size
     }
 
-    fun setSeatBarsBinding(seatBarsBinding: Binding<List<Bar>>) {
-        this.seatBarsBinding.unbind()
-        this.seatBarsBinding = seatBarsBinding
-        this.seatBarsBinding.bind { bars -> barsPanel.seatBars = bars }
-    }
-
     internal val seatBarLabel: String
         get() = barsPanel.seatBarLabel
-
-    fun setSeatBarLabelBinding(seatBarLabelBinding: Binding<String>) {
-        this.seatBarLabelBinding.unbind()
-        this.seatBarLabelBinding = seatBarLabelBinding
-        this.seatBarLabelBinding.bind { label -> barsPanel.seatBarLabel = label }
-    }
 
     internal val changeBarCount: Int
         get() = barsPanel.changeBars.size
@@ -134,29 +106,11 @@ class HeatMapFrame(
         return barsPanel.changeBars[index].size
     }
 
-    fun setChangeBarsBinding(changeBarsBinding: Binding<List<Bar>>) {
-        this.changeBarsBinding.unbind()
-        this.changeBarsBinding = changeBarsBinding
-        this.changeBarsBinding.bind { bars -> barsPanel.changeBars = bars }
-    }
-
     internal val changeBarLabel: String
         get() = barsPanel.changeBarLabel
 
-    fun setChangeBarLabelBinding(changeBarLabelBinding: Binding<String>) {
-        this.changeBarLabelBinding.unbind()
-        this.changeBarLabelBinding = changeBarLabelBinding
-        this.changeBarLabelBinding.bind { label -> barsPanel.changeBarLabel = label }
-    }
-
     internal val changeBarStart: Int
         get() = barsPanel.changeBarStart
-
-    fun setChangeBarStartBinding(changeBarStartBinding: Binding<Int>) {
-        this.changeBarStartBinding.unbind()
-        this.changeBarStartBinding = changeBarStartBinding
-        this.changeBarStartBinding.bind { start -> barsPanel.changeBarStart = start }
-    }
 
     private inner class SeatBarPanel : JPanel() {
         private var _seatBars: List<Bar> = ArrayList()
@@ -397,5 +351,13 @@ class HeatMapFrame(
         panel.layout = Layout()
         panel.add(barsPanel)
         panel.add(squaresPanel)
+
+        numRowsBinding.bind { numRows -> squaresPanel.numRows = numRows }
+        squaresBinding.bind { squares -> squaresPanel.squares = squares }
+        (seatBarsBinding ?: Binding.fixedBinding(emptyList())).bind { bars -> barsPanel.seatBars = bars }
+        (seatBarLabelBinding ?: Binding.fixedBinding("")).bind { label -> barsPanel.seatBarLabel = label }
+        (changeBarsBinding ?: Binding.fixedBinding(emptyList())).bind { bars -> barsPanel.changeBars = bars }
+        (changeBarLabelBinding ?: Binding.fixedBinding("")).bind { label -> barsPanel.changeBarLabel = label }
+        (changeBarStartBinding ?: Binding.fixedBinding(0)).bind { start -> barsPanel.changeBarStart = start }
     }
 }

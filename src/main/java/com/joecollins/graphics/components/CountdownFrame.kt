@@ -18,18 +18,21 @@ import javax.swing.border.EmptyBorder
 
 class CountdownFrame(
     headerBinding: Binding<String>,
-    borderColorBinding: Binding<Color>? = null
+    timeBinding: Binding<Temporal>,
+    private val labelFunc: (Duration) -> String,
+    borderColorBinding: Binding<Color>? = null,
+    additionalInfoBinding: Binding<String?>? = null,
+    countdownColorBinding: Binding<Color>? = null
 ) : GraphicsFrame(
     headerBinding = headerBinding,
     borderColorBinding = borderColorBinding
 ) {
 
     internal var clock: Clock = Clock.systemDefaultZone()
-
-    private var timeBinding: Binding<Temporal> = Binding.fixedBinding(Instant.now())
-    private var labelFunc: (Duration) -> String = { it.toString() }
-    private var additionalInfoBinding: Binding<String?> = Binding.fixedBinding(null)
-    private var countdownColorBinding: Binding<Color> = Binding.fixedBinding(Color.BLACK)
+        set(value) {
+            field = value
+            refresh()
+        }
 
     private var time: Temporal = Instant.now()
 
@@ -54,6 +57,19 @@ class CountdownFrame(
         panel.add(additionalInfoLabel, BorderLayout.SOUTH)
         add(panel, BorderLayout.CENTER)
 
+        timeBinding.bind {
+            time = it
+            refresh()
+        }
+        (additionalInfoBinding ?: Binding.fixedBinding(null)).bind {
+            additionalInfoLabel.text = it ?: ""
+            additionalInfoLabel.isVisible = it != null
+        }
+        (countdownColorBinding ?: Binding.fixedBinding(Color.BLACK)).bind {
+            timeRemainingLabel.foreground = it
+            additionalInfoLabel.foreground = it
+        }
+
         val executor = Executors.newScheduledThreadPool(1) { r: Runnable ->
             val t = Executors.defaultThreadFactory().newThread(r)
             t.isDaemon = true
@@ -68,23 +84,9 @@ class CountdownFrame(
         return Duration.between(clock.instant().truncatedTo(ChronoUnit.SECONDS), time)
     }
 
-    fun setTimeBinding(timeBinding: Binding<Temporal>) {
-        this.timeBinding.unbind()
-        this.timeBinding = timeBinding
-        this.timeBinding.bind {
-            time = it
-            refresh()
-        }
-    }
-
     private fun refresh() {
         timeRemainingLabel.text = labelFunc(getTimeRemaining())
         this.repaint()
-    }
-
-    fun setLabelFunction(labelFunc: (Duration) -> String) {
-        this.labelFunc = labelFunc
-        refresh()
     }
 
     internal fun getTimeRemainingString(): String {
@@ -95,26 +97,8 @@ class CountdownFrame(
         return if (additionalInfoLabel.isVisible) additionalInfoLabel.text else null
     }
 
-    fun setAdditionalInfoBinding(additionalInfoBinding: Binding<String?>) {
-        this.additionalInfoBinding.unbind()
-        this.additionalInfoBinding = additionalInfoBinding
-        this.additionalInfoBinding.bind {
-            additionalInfoLabel.text = it ?: ""
-            additionalInfoLabel.isVisible = it != null
-        }
-    }
-
     internal fun getCountdownColor(): Color {
         return timeRemainingLabel.foreground
-    }
-
-    fun setCountdownColorBinding(countdownColorBinding: Binding<Color>) {
-        this.countdownColorBinding.unbind()
-        this.countdownColorBinding = countdownColorBinding
-        this.countdownColorBinding.bind {
-            timeRemainingLabel.foreground = it
-            additionalInfoLabel.foreground = it
-        }
     }
 
     companion object {

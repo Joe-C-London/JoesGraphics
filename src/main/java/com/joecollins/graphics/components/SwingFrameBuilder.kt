@@ -95,16 +95,15 @@ class SwingFrameBuilder {
     }
 
     fun build(): SwingFrame {
-        val swingFrame = SwingFrame(
-            headerBinding = headerBinding ?: Binding.fixedBinding(null)
+        return SwingFrame(
+            headerBinding = headerBinding ?: Binding.fixedBinding(null),
+            rangeBinding = rangeBinding ?: Binding.fixedBinding(1),
+            valueBinding = valueBinding ?: Binding.fixedBinding(0),
+            leftColorBinding = leftColorBinding ?: Binding.fixedBinding(Color.BLACK),
+            rightColorBinding = rightColorBinding ?: Binding.fixedBinding(Color.BLACK),
+            bottomColorBinding = bottomColorBinding ?: Binding.fixedBinding(Color.BLACK),
+            bottomTextBinding = bottomTextBinding ?: Binding.fixedBinding(null)
         )
-        rangeBinding?.let { swingFrame.setRangeBinding(it) }
-        leftColorBinding?.let { swingFrame.setLeftColorBinding(it) }
-        rightColorBinding?.let { swingFrame.setRightColorBinding(it) }
-        valueBinding?.let { swingFrame.setValueBinding(it) }
-        bottomColorBinding?.let { swingFrame.setBottomColorBinding(it) }
-        bottomTextBinding?.let { swingFrame.setBottomTextBinding(it) }
-        return swingFrame
     }
 
     private class BindablePrevCurrPct : Bindable<BindablePrevCurrPct, SingletonProperty>() {

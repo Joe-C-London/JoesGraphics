@@ -1,6 +1,7 @@
 package com.joecollins.graphics.components
 
 import com.joecollins.bindings.Binding
+import com.joecollins.bindings.BindingReceiver
 import com.joecollins.graphics.utils.StandardFont
 import java.awt.BorderLayout
 import java.awt.Color
@@ -26,6 +27,12 @@ import kotlin.math.min
 
 class BarFrame(
     headerBinding: Binding<String?>,
+    subheadTextBinding: Binding<String?>? = null,
+    subheadColorBinding: Binding<Color>? = null,
+    barsBinding: Binding<List<Bar>>,
+    linesBinding: Binding<List<Line>>? = null,
+    private val minBinding: Binding<Number>? = null,
+    private val maxBinding: Binding<Number>? = null,
     notesBinding: Binding<String?>? = null,
     borderColorBinding: Binding<Color>? = null
 ) : GraphicsFrame(
@@ -42,9 +49,6 @@ class BarFrame(
     var max: Number = 0.0
         private set
 
-    private var subheadTextBinding: Binding<String?> = Binding.fixedBinding(null)
-    private var subheadColorBinding: Binding<Color> = Binding.fixedBinding(Color.BLACK)
-
     class Bar constructor(
         val leftText: String,
         val rightText: String,
@@ -54,19 +58,7 @@ class BarFrame(
         constructor(leftText: String, rightText: String, series: List<Pair<Color, Number>>) : this(leftText, rightText, null, series)
     }
 
-    private var barsBinding: Binding<List<Bar>> = Binding.fixedBinding(emptyList())
-
     class Line(val level: Number, val label: String)
-
-    private var linesBinding: Binding<List<Line>> = Binding.fixedBinding(emptyList())
-
-    private var minBinding: Binding<Number> = DefaultMinBinding()
-    private var maxBinding: Binding<Number> = DefaultMaxBinding()
-
-    init {
-        setMinBinding(minBinding)
-        setMaxBinding(maxBinding)
-    }
 
     private fun drawLines(g: Graphics, top: Int, bottom: Int) {
         g.color = Color.BLACK
@@ -79,23 +71,8 @@ class BarFrame(
     internal val subheadText: String?
         get() = if (subheadLabel.isVisible) subheadLabel.text else null
 
-    fun setSubheadTextBinding(subheadTextBinding: Binding<String?>) {
-        this.subheadTextBinding.unbind()
-        this.subheadTextBinding = subheadTextBinding
-        this.subheadTextBinding.bind {
-            subheadLabel.isVisible = it != null
-            subheadLabel.text = it ?: ""
-        }
-    }
-
     internal val subheadColor: Color
         get() = subheadLabel.foreground
-
-    fun setSubheadColorBinding(subheadColorBinding: Binding<Color>) {
-        this.subheadColorBinding.unbind()
-        this.subheadColorBinding = subheadColorBinding
-        this.subheadColorBinding.bind { subheadLabel.foreground = it }
-    }
 
     internal val numBars: Int
         get() = bars.size
@@ -116,91 +93,6 @@ class BarFrame(
         return bars[barNum].leftIcon
     }
 
-    fun setBarsBinding(barsBinding: Binding<List<Bar>>) {
-        this.barsBinding.unbind()
-        this.barsBinding = barsBinding
-        this.barsBinding.bind { b ->
-            val numBars = b.size
-            while (bars.size < numBars) {
-                val bar = BarPanel()
-                bars.add(bar)
-                centralPanel.add(bar)
-            }
-            while (bars.size > numBars) {
-                val bar = bars.removeAt(numBars)
-                centralPanel.remove(bar)
-            }
-            b.forEachIndexed { idx, bar ->
-                bars[idx].leftText = bar.leftText
-                bars[idx].rightText = bar.rightText
-                bars[idx].leftIcon = bar.leftIcon
-                bars[idx].series = bar.series
-                val minBinding = this.minBinding
-                if (minBinding is DefaultMinBinding) {
-                    minBinding.pushUpdate()
-                }
-                val maxBinding = this.maxBinding
-                if (maxBinding is DefaultMaxBinding) {
-                    maxBinding.pushUpdate()
-                }
-            }
-            centralPanel.invalidate()
-            centralPanel.revalidate()
-            repaint()
-        }
-    }
-
-    fun setMinBinding(minBinding: Binding<Number>) {
-        this.minBinding.unbind()
-        this.minBinding = minBinding
-        this.minBinding.bind { min ->
-            this.min = min
-            repaint()
-        }
-    }
-
-    fun setMaxBinding(maxBinding: Binding<Number>) {
-        this.maxBinding.unbind()
-        this.maxBinding = maxBinding
-        this.maxBinding.bind { max ->
-            this.max = max
-            repaint()
-        }
-    }
-
-    private abstract inner class DefaultMinMaxBinding : Binding<Number> {
-        private var consumer: ((Number) -> Unit)? = null
-
-        abstract val value: Number
-
-        override fun bind(onUpdate: (Number) -> Unit) {
-            check(consumer == null) { "Binding is already used" }
-            onUpdate(value)
-            this.consumer = onUpdate
-        }
-
-        override fun unbind() {
-            val consumer = this.consumer
-            if (consumer != null) {
-                this.consumer = null
-            }
-        }
-
-        fun pushUpdate() {
-            consumer?.invoke(value)
-        }
-    }
-
-    private inner class DefaultMinBinding : DefaultMinMaxBinding() {
-        override val value: Number
-            get() = bars.map { it.totalNegative.toDouble() }.fold(0.0) { a, b -> min(a, b) }
-    }
-
-    private inner class DefaultMaxBinding : DefaultMinMaxBinding() {
-        override val value: Number
-            get() = bars.map { it.totalPositive.toDouble() }.fold(0.0) { a, b -> max(a, b) }
-    }
-
     private fun getPixelOfValue(value: Number): Double {
         val range = max.toDouble() - min.toDouble()
         val progress = value.toDouble() - min.toDouble()
@@ -219,26 +111,6 @@ class BarFrame(
 
     internal fun getLineLabel(index: Int): String {
         return lines[index].label
-    }
-
-    fun setLinesBinding(linesBinding: Binding<List<Line>>) {
-        this.linesBinding.unbind()
-        this.linesBinding = linesBinding
-        this.linesBinding.bind { l ->
-            while (l.size > lines.size) {
-                val line = LinePanel()
-                lines.add(line)
-                centralPanel.add(line.jLabel)
-            }
-            while (l.size < lines.size) {
-                val line = lines.removeAt(l.size)
-                centralPanel.remove(line.jLabel)
-            }
-            l.forEachIndexed { idx, line ->
-                lines[idx].level = line.level
-                lines[idx].label = line.label
-            }
-        }
     }
 
     private inner class BarPanel : JPanel() {
@@ -578,5 +450,56 @@ class BarFrame(
         }
         add(centralPanel, BorderLayout.CENTER)
         centralPanel.add(subheadLabel)
+
+        (subheadTextBinding ?: Binding.fixedBinding(null)).bind {
+            subheadLabel.isVisible = it != null
+            subheadLabel.text = it ?: ""
+        }
+        (subheadColorBinding ?: Binding.fixedBinding(Color.BLACK)).bind { subheadLabel.foreground = it }
+        val barsReceiver = BindingReceiver(barsBinding)
+        barsReceiver.getBinding().bind { b ->
+            val numBars = b.size
+            while (bars.size < numBars) {
+                val bar = BarPanel()
+                bars.add(bar)
+                centralPanel.add(bar)
+            }
+            while (bars.size > numBars) {
+                val bar = bars.removeAt(numBars)
+                centralPanel.remove(bar)
+            }
+            b.forEachIndexed { idx, bar ->
+                bars[idx].leftText = bar.leftText
+                bars[idx].rightText = bar.rightText
+                bars[idx].leftIcon = bar.leftIcon
+                bars[idx].series = bar.series
+            }
+            centralPanel.invalidate()
+            centralPanel.revalidate()
+            repaint()
+        }
+        (linesBinding ?: Binding.fixedBinding(emptyList())).bind { l ->
+            while (l.size > lines.size) {
+                val line = LinePanel()
+                lines.add(line)
+                centralPanel.add(line.jLabel)
+            }
+            while (l.size < lines.size) {
+                val line = lines.removeAt(l.size)
+                centralPanel.remove(line.jLabel)
+            }
+            l.forEachIndexed { idx, line ->
+                lines[idx].level = line.level
+                lines[idx].label = line.label
+            }
+        }
+        (minBinding ?: barsReceiver.getBinding { bl: List<Bar> -> bl.minOfOrNull { b -> b.series.sumOf { min(it.second.toDouble(), 0.0) } } ?: 0.0 }).bind { min ->
+            this.min = min
+            repaint()
+        }
+        (maxBinding ?: barsReceiver.getBinding { bl: List<Bar> -> bl.maxOfOrNull { b -> b.series.sumOf { max(it.second.toDouble(), 0.0) } } ?: 0.0 }).bind { max ->
+            this.max = max
+            repaint()
+        }
     }
 }

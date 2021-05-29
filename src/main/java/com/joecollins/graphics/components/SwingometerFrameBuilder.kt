@@ -220,20 +220,19 @@ class SwingometerFrameBuilder {
     }
 
     fun build(): SwingometerFrame {
-        val swingometerFrame = SwingometerFrame(
-            headerBinding = headerBinding ?: Binding.fixedBinding(null)
+        return SwingometerFrame(
+            headerBinding = headerBinding ?: Binding.fixedBinding(null),
+            rangeBinding = rangeBinding ?: Binding.fixedBinding(1),
+            valueBinding = valueBinding ?: Binding.fixedBinding(0),
+            leftColorBinding = leftColorBinding ?: Binding.fixedBinding(Color.BLACK),
+            rightColorBinding = rightColorBinding ?: Binding.fixedBinding(Color.BLACK),
+            numBucketsPerSideBinding = numBucketsPerSideBinding ?: Binding.fixedBinding(1),
+            dotsBinding = dotsBinding ?: Binding.fixedBinding(emptyList()),
+            leftToWinBinding = leftToWinBinding,
+            rightToWinBinding = rightToWinBinding,
+            ticksBinding = ticksBinding,
+            outerLabelsBinding = outerLabelsBinding
         )
-        rangeBinding?.let { swingometerFrame.setRangeBinding(it) }
-        numBucketsPerSideBinding?.let { swingometerFrame.setNumBucketsPerSideBinding(it) }
-        ticksBinding?.let { swingometerFrame.setTicksBinding(it) }
-        leftToWinBinding?.let { swingometerFrame.setLeftToWinBinding(it) }
-        rightToWinBinding?.let { swingometerFrame.setRightToWinBinding(it) }
-        outerLabelsBinding?.let { swingometerFrame.setOuterLabelsBinding(it) }
-        dotsBinding?.let { swingometerFrame.setDotsBinding(it) }
-        leftColorBinding?.let { swingometerFrame.setLeftColorBinding(it) }
-        rightColorBinding?.let { swingometerFrame.setRightColorBinding(it) }
-        valueBinding?.let { swingometerFrame.setValueBinding(it) }
-        return swingometerFrame
     }
 
     companion object {

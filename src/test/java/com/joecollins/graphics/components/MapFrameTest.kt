@@ -20,9 +20,9 @@ class MapFrameTest {
     fun testBindShapes() {
         val shapes = loadShapes { getDistrictColor(it) }
         val mapFrame = MapFrame(
-            headerBinding = fixedBinding(null)
+            headerBinding = fixedBinding(null),
+            shapesBinding = fixedBinding(shapes.map { Pair(it.shape, it.color) })
         )
-        mapFrame.setShapesBinding(fixedBinding(shapes.map { Pair(it.shape, it.color) }))
         Assert.assertEquals(27, mapFrame.numShapes.toLong())
         Assert.assertEquals(shapes[0].shape, mapFrame.getShape(0))
         Assert.assertEquals(shapes[0].color, mapFrame.getColor(0))
@@ -33,9 +33,9 @@ class MapFrameTest {
     fun testDefaultFocusAreaEncompassesAllShapes() {
         val shapes = loadShapes { getDistrictColor(it) }
         val mapFrame = MapFrame(
-            headerBinding = fixedBinding(null)
+            headerBinding = fixedBinding(null),
+            shapesBinding = fixedBinding(shapes.map { Pair(it.shape, it.color) })
         )
-        mapFrame.setShapesBinding(fixedBinding(shapes.map { Pair(it.shape, it.color) }))
         val bindingBox = shapes.asSequence()
                 .map { Area(it.shape) }
                 .reduce { acc, area ->
@@ -53,10 +53,10 @@ class MapFrameTest {
         val shapes = loadShapes { getDistrictColor(it) }
         val cityBox = loadCityBox()
         val mapFrame = MapFrame(
-            headerBinding = fixedBinding(null)
+            headerBinding = fixedBinding(null),
+            shapesBinding = fixedBinding(shapes.map { Pair(it.shape, it.color) }),
+            focusBoxBinding = fixedBinding(cityBox)
         )
-        mapFrame.setShapesBinding(fixedBinding(shapes.map { Pair(it.shape, it.color) }))
-        mapFrame.setFocusBoxBinding(fixedBinding(cityBox))
         Assert.assertEquals(cityBox, mapFrame.focusBox)
     }
 
@@ -65,9 +65,10 @@ class MapFrameTest {
     fun testOutlines() {
         val regions = loadRegions()
         val mapFrame = MapFrame(
-            headerBinding = fixedBinding(null)
+            headerBinding = fixedBinding(null),
+            shapesBinding = fixedBinding(regions.map { Pair(it, Color.BLACK) }),
+            outlineShapesBinding = fixedBinding(regions)
         )
-        mapFrame.setOutlineShapesBinding(fixedBinding(regions))
         Assert.assertEquals(4, mapFrame.numOutlineShapes.toLong())
         Assert.assertEquals(regions[0], mapFrame.getOutlineShape(0))
     }
@@ -77,9 +78,9 @@ class MapFrameTest {
     fun testRenderFull() {
         val shapes = loadShapes { getDistrictColor(it) }
         val mapFrame = MapFrame(
-            headerBinding = fixedBinding<String?>("PEI")
+            headerBinding = fixedBinding<String?>("PEI"),
+            shapesBinding = fixedBinding(shapes.map { Pair(it.shape, it.color) })
         )
-        mapFrame.setShapesBinding(fixedBinding(shapes.map { Pair(it.shape, it.color) }))
         mapFrame.setSize(256, 128)
         compareRendering("MapFrame", "RenderFull", mapFrame)
     }
@@ -89,9 +90,9 @@ class MapFrameTest {
     fun testRenderFullThin() {
         val shapes = loadShapes { district: Int -> getDistrictColor(district) }
         val mapFrame = MapFrame(
-            headerBinding = fixedBinding<String?>("PEI")
+            headerBinding = fixedBinding<String?>("PEI"),
+            shapesBinding = fixedBinding(shapes.map { Pair(it.shape, it.color) })
         )
-        mapFrame.setShapesBinding(fixedBinding(shapes.map { Pair(it.shape, it.color) }))
         mapFrame.setSize(64, 128)
         compareRendering("MapFrame", "RenderFullThin", mapFrame)
     }
@@ -102,10 +103,10 @@ class MapFrameTest {
         val shapes = loadShapes { if (it in 9..14) getDistrictColor(it) else Color.GRAY }
         val zoomBox = loadCityBox()
         val mapFrame = MapFrame(
-            headerBinding = fixedBinding("CHARLOTTETOWN")
+            headerBinding = fixedBinding("CHARLOTTETOWN"),
+            shapesBinding = fixedBinding(shapes.map { Pair(it.shape, it.color) }),
+            focusBoxBinding = fixedBinding(zoomBox)
         )
-        mapFrame.setShapesBinding(fixedBinding(shapes.map { Pair(it.shape, it.color) }))
-        mapFrame.setFocusBoxBinding(fixedBinding(zoomBox))
         mapFrame.setSize(256, 128)
         compareRendering("MapFrame", "RenderZoomedIn", mapFrame)
     }
@@ -117,14 +118,16 @@ class MapFrameTest {
         val zoomBox = loadCityBox()
         val regions = shapes.map { it.shape }
         val header = BindableWrapper("PEI")
+        val focusBox = BindableWrapper<Rectangle2D?>(null)
         val mapFrame = MapFrame(
-            headerBinding = header.binding
+            headerBinding = header.binding,
+            shapesBinding = fixedBinding(shapes.map { Pair(it.shape, it.color) }),
+            focusBoxBinding = focusBox.binding,
+            outlineShapesBinding = fixedBinding(regions)
         )
-        mapFrame.setShapesBinding(fixedBinding(shapes.map { Pair(it.shape, it.color) }))
-        mapFrame.setOutlineShapesBinding(fixedBinding(regions))
         mapFrame.setSize(256, 128)
         compareRendering("MapFrame", "RenderBorders-1", mapFrame)
-        mapFrame.setFocusBoxBinding(fixedBinding(zoomBox))
+        focusBox.value = zoomBox
         header.value = "CHARLOTTETOWN"
         compareRendering("MapFrame", "RenderBorders-2", mapFrame)
     }

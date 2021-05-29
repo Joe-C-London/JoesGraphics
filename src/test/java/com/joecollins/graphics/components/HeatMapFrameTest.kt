@@ -48,11 +48,9 @@ class HeatMapFrameTest {
                 Color.RED,
                 DARK_GREEN)
         val frame = HeatMapFrame(
-            headerBinding = fixedBinding(null)
-        )
-        frame.setNumRowsBinding(fixedBinding(3))
-        frame.setSquaresBinding(
-            fixedBinding(borderColors.zip(fillColors) { border, fill -> HeatMapFrame.Square(borderColor = border, fillColor = fill) })
+            headerBinding = fixedBinding(null),
+            numRowsBinding = fixedBinding(3),
+            squaresBinding = fixedBinding(borderColors.zip(fillColors) { border, fill -> HeatMapFrame.Square(borderColor = border, fillColor = fill) })
         )
         Assert.assertEquals(3, frame.numRows.toLong())
         Assert.assertEquals(27, frame.numSquares.toLong())
@@ -67,15 +65,17 @@ class HeatMapFrameTest {
     @Test
     fun testSeatBar() {
         val frame = HeatMapFrame(
-            headerBinding = fixedBinding(null)
+            headerBinding = fixedBinding(null),
+            numRowsBinding = fixedBinding(1),
+            squaresBinding = fixedBinding(emptyList()),
+            seatBarsBinding = fixedBinding(
+                listOf(
+                    HeatMapFrame.Bar(Color.BLUE, 8),
+                    HeatMapFrame.Bar(Color(128, 128, 255), 5)
+                )
+            ),
+            seatBarLabelBinding = fixedBinding("8/13")
         )
-        frame.setSeatBarsBinding(fixedBinding(
-            listOf(
-                HeatMapFrame.Bar(Color.BLUE, 8),
-                HeatMapFrame.Bar(Color(128, 128, 255), 5)
-            )
-        ))
-        frame.setSeatBarLabelBinding(fixedBinding("8/13"))
         Assert.assertEquals(2, frame.seatBarCount.toLong())
         Assert.assertEquals(Color.BLUE, frame.getSeatBarColor(0))
         Assert.assertEquals(5, frame.getSeatBarSize(1).toLong())
@@ -85,16 +85,18 @@ class HeatMapFrameTest {
     @Test
     fun testChangeBar() {
         val frame = HeatMapFrame(
-            headerBinding = fixedBinding(null)
+            headerBinding = fixedBinding(null),
+            numRowsBinding = fixedBinding(1),
+            squaresBinding = fixedBinding(emptyList()),
+            changeBarsBinding = fixedBinding(
+                listOf(
+                    HeatMapFrame.Bar(Color.BLUE, 3),
+                    HeatMapFrame.Bar(Color(128, 128, 255), 2)
+                )
+            ),
+            changeBarLabelBinding = fixedBinding("+3/+5"),
+            changeBarStartBinding = fixedBinding(5)
         )
-        frame.setChangeBarsBinding(fixedBinding(
-            listOf(
-                HeatMapFrame.Bar(Color.BLUE, 3),
-                HeatMapFrame.Bar(Color(128, 128, 255), 2)
-            )
-        ))
-        frame.setChangeBarLabelBinding(fixedBinding("+3/+5"))
-        frame.setChangeBarStartBinding(fixedBinding(5))
         Assert.assertEquals(2, frame.changeBarCount.toLong())
         Assert.assertEquals(Color.BLUE, frame.getChangeBarColor(0))
         Assert.assertEquals(2, frame.getChangeBarSize(1).toLong())
@@ -123,15 +125,15 @@ class HeatMapFrameTest {
         val header = BindableWrapper<String?>("PROGRESSIVE CONSERVATIVE HEAT MAP")
         val frame = HeatMapFrame(
             headerBinding = header.binding,
+            numRowsBinding = fixedBinding(3),
+            squaresBinding = squares.binding,
+            seatBarsBinding = seatBars.binding.mapElements { HeatMapFrame.Bar(it.first, it.second) },
+            seatBarLabelBinding = seatLabel.binding,
+            changeBarsBinding = changeBars.binding.mapElements { HeatMapFrame.Bar(it.first, it.second) },
+            changeBarLabelBinding = changeLabel.binding,
+            changeBarStartBinding = changeStart.binding,
             borderColorBinding = borderColor.binding
         )
-        frame.setNumRowsBinding(fixedBinding(3))
-        frame.setSquaresBinding(squares.binding)
-        frame.setSeatBarsBinding(seatBars.binding.mapElements { HeatMapFrame.Bar(it.first, it.second) })
-        frame.setSeatBarLabelBinding(seatLabel.binding)
-        frame.setChangeBarsBinding(changeBars.binding.mapElements { HeatMapFrame.Bar(it.first, it.second) })
-        frame.setChangeBarLabelBinding(changeLabel.binding)
-        frame.setChangeBarStartBinding(changeStart.binding)
         frame.setSize(1024, 512)
         compareRendering("HeatMapFrame", "EvenWide-1", frame)
         squares.value = sequenceOf(
@@ -170,15 +172,15 @@ class HeatMapFrameTest {
         val header = BindableWrapper<String?>("PROGRESSIVE CONSERVATIVE HEAT MAP")
         val frame = HeatMapFrame(
             headerBinding = header.binding,
+            numRowsBinding = fixedBinding(9),
+            squaresBinding = squares.binding,
+            seatBarsBinding = seatBars.binding.mapElements { HeatMapFrame.Bar(it.first, it.second) },
+            seatBarLabelBinding = seatLabel.binding,
+            changeBarsBinding = changeBars.binding.mapElements { HeatMapFrame.Bar(it.first, it.second) },
+            changeBarLabelBinding = changeLabel.binding,
+            changeBarStartBinding = changeStart.binding,
             borderColorBinding = borderColor.binding
         )
-        frame.setNumRowsBinding(fixedBinding(9))
-        frame.setSquaresBinding(squares.binding)
-        frame.setSeatBarsBinding(seatBars.binding.mapElements { HeatMapFrame.Bar(it.first, it.second) })
-        frame.setSeatBarLabelBinding(seatLabel.binding)
-        frame.setChangeBarsBinding(changeBars.binding.mapElements { HeatMapFrame.Bar(it.first, it.second) })
-        frame.setChangeBarLabelBinding(changeLabel.binding)
-        frame.setChangeBarStartBinding(changeStart.binding)
         frame.setSize(1024, 512)
         compareRendering("HeatMapFrame", "EvenHigh-1", frame)
         squares.value = sequenceOf(
@@ -217,15 +219,15 @@ class HeatMapFrameTest {
         val header = BindableWrapper<String?>("PROGRESSIVE CONSERVATIVE HEAT MAP")
         val frame = HeatMapFrame(
             headerBinding = header.binding,
+            numRowsBinding = fixedBinding(5),
+            squaresBinding = squares.binding,
+            seatBarsBinding = seatBars.binding.mapElements { HeatMapFrame.Bar(it.first, it.second) },
+            seatBarLabelBinding = seatLabel.binding,
+            changeBarsBinding = changeBars.binding.mapElements { HeatMapFrame.Bar(it.first, it.second) },
+            changeBarLabelBinding = changeLabel.binding,
+            changeBarStartBinding = changeStart.binding,
             borderColorBinding = borderColor.binding
         )
-        frame.setNumRowsBinding(fixedBinding(5))
-        frame.setSquaresBinding(squares.binding)
-        frame.setSeatBarsBinding(seatBars.binding.mapElements { HeatMapFrame.Bar(it.first, it.second) })
-        frame.setSeatBarLabelBinding(seatLabel.binding)
-        frame.setChangeBarsBinding(changeBars.binding.mapElements { HeatMapFrame.Bar(it.first, it.second) })
-        frame.setChangeBarLabelBinding(changeLabel.binding)
-        frame.setChangeBarStartBinding(changeStart.binding)
         frame.setSize(1024, 512)
         compareRendering("HeatMapFrame", "Uneven-1", frame)
         squares.value = sequenceOf(
@@ -264,15 +266,15 @@ class HeatMapFrameTest {
         val header = BindableWrapper<String?>("PROGRESSIVE CONSERVATIVE HEAT MAP")
         val frame = HeatMapFrame(
             headerBinding = header.binding,
+            numRowsBinding = fixedBinding(5),
+            squaresBinding = squares.binding,
+            seatBarsBinding = seatBars.binding.mapElements { HeatMapFrame.Bar(it.first, it.second) },
+            seatBarLabelBinding = seatLabel.binding,
+            changeBarsBinding = changeBars.binding.mapElements { HeatMapFrame.Bar(it.first, it.second) },
+            changeBarLabelBinding = changeLabel.binding,
+            changeBarStartBinding = changeStart.binding,
             borderColorBinding = borderColor.binding
         )
-        frame.setNumRowsBinding(fixedBinding(5))
-        frame.setSquaresBinding(squares.binding)
-        frame.setSeatBarsBinding(seatBars.binding.mapElements { HeatMapFrame.Bar(it.first, it.second) })
-        frame.setSeatBarLabelBinding(seatLabel.binding)
-        frame.setChangeBarsBinding(changeBars.binding.mapElements { HeatMapFrame.Bar(it.first, it.second) })
-        frame.setChangeBarLabelBinding(changeLabel.binding)
-        frame.setChangeBarStartBinding(changeStart.binding)
         frame.setSize(1024, 512)
         changeBars.value = listOf(Pair(Color.BLUE, 2), Pair(Color(128, 128, 255), -1))
         changeLabel.value = "+2/+1"

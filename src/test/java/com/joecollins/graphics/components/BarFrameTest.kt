@@ -32,9 +32,9 @@ class BarFrameTest {
         ElectionResult("INDEPENDENT", Color.LIGHT_GRAY, 1)
         ))
         val frame = BarFrame(
-            headerBinding = fixedBinding(null)
+            headerBinding = fixedBinding(null),
+            barsBinding = results.binding.mapElements { BarFrame.Bar("", "", null, listOf()) }
         )
-        frame.setBarsBinding(results.binding.mapElements { BarFrame.Bar("", "", null, listOf()) })
         Assert.assertEquals(6, frame.numBars.toLong())
     }
 
@@ -43,9 +43,9 @@ class BarFrameTest {
         val list = mutableListOf<ElectionResult>()
         val results = BindableWrapper(list)
         val frame = BarFrame(
-            headerBinding = fixedBinding(null)
+            headerBinding = fixedBinding(null),
+            barsBinding = results.binding.mapElements { BarFrame.Bar("", "", null, listOf()) }
         )
-        frame.setBarsBinding(results.binding.mapElements { BarFrame.Bar("", "", null, listOf()) })
         Assert.assertEquals(0, frame.numBars.toLong())
         list.add(ElectionResult("LIBERAL", Color.RED, 1))
         results.value = list
@@ -77,9 +77,9 @@ class BarFrameTest {
         ElectionResult("INDEPENDENT", Color.LIGHT_GRAY, 1)
         ))
         val frame = BarFrame(
-            headerBinding = fixedBinding(null)
+            headerBinding = fixedBinding(null),
+            barsBinding = results.binding.mapElements { BarFrame.Bar(it.getPartyName(), "", null, listOf()) }
         )
-        frame.setBarsBinding(results.binding.mapElements { BarFrame.Bar(it.getPartyName(), "", null, listOf()) })
         Assert.assertEquals("LIBERAL", frame.getLeftText(0))
         Assert.assertEquals("CONSERVATIVE", frame.getLeftText(1))
         Assert.assertEquals("BLOC QUEBECOIS", frame.getLeftText(2))
@@ -99,9 +99,9 @@ class BarFrameTest {
             ElectionResult("INDEPENDENT", Color.LIGHT_GRAY, 1)
         ))
         val frame = BarFrame(
-            headerBinding = fixedBinding(null)
+            headerBinding = fixedBinding(null),
+            barsBinding = results.binding.mapElements { BarFrame.Bar(it.getPartyName(), "${it.getNumSeats()}", null, listOf()) }
         )
-        frame.setBarsBinding(results.binding.mapElements { BarFrame.Bar(it.getPartyName(), "${it.getNumSeats()}", null, listOf()) })
         Assert.assertEquals("157", frame.getRightText(0))
         Assert.assertEquals("121", frame.getRightText(1))
         Assert.assertEquals("32", frame.getRightText(2))
@@ -122,12 +122,12 @@ class BarFrameTest {
         )
         val results = BindableWrapper(list)
         val frame = BarFrame(
-            headerBinding = fixedBinding(null)
+            headerBinding = fixedBinding(null),
+            barsBinding = results.binding.mapElements { BarFrame.Bar(it.getPartyName(), "${it.getNumSeats()}", null, listOf(
+                Pair(it.getPartyColor(), it.getNumSeats()),
+                Pair(lighten(it.getPartyColor()), it.getSeatEstimate() - it.getNumSeats())
+            )) }
         )
-        frame.setBarsBinding(results.binding.mapElements { BarFrame.Bar(it.getPartyName(), "${it.getNumSeats()}", null, listOf(
-            Pair(it.getPartyColor(), it.getNumSeats()),
-            Pair(lighten(it.getPartyColor()), it.getSeatEstimate() - it.getNumSeats())
-        )) })
         val lightRed = Color(255, 127, 127)
         var libSeries = frame.getSeries(0)
         Assert.assertEquals(Color.RED, libSeries[0].first)
@@ -163,9 +163,9 @@ class BarFrameTest {
         val results = BindableWrapper(list)
         val shape: Shape = Ellipse2D.Double()
         val frame = BarFrame(
-            headerBinding = fixedBinding(null)
+            headerBinding = fixedBinding(null),
+            barsBinding = results.binding.mapElements { BarFrame.Bar("", "", if (it.getNumSeats() > 150) shape else null, listOf()) }
         )
-        frame.setBarsBinding(results.binding.mapElements { BarFrame.Bar("", "", if (it.getNumSeats() > 150) shape else null, listOf()) })
         Assert.assertEquals(shape, frame.getLeftIcon(0))
         Assert.assertNull(frame.getLeftIcon(1))
         Assert.assertNull(frame.getLeftIcon(2))
@@ -175,7 +175,7 @@ class BarFrameTest {
     }
 
     @Test
-    fun testMinMax() {
+    fun testDefaultMinMax() {
         val list = mutableListOf(
             ElectionResult("LIBERAL", Color.RED, 157),
             ElectionResult("CONSERVATIVE", Color.BLUE, 121),
@@ -186,11 +186,11 @@ class BarFrameTest {
         )
         val results = BindableWrapper(list)
         val frame = BarFrame(
-            headerBinding = fixedBinding(null)
+            headerBinding = fixedBinding(null),
+            barsBinding = results.binding.mapElements { BarFrame.Bar("", "", null, listOf(
+                Pair(it.getPartyColor(), it.getNumSeats())
+            )) }
         )
-        frame.setBarsBinding(results.binding.mapElements { BarFrame.Bar("", "", null, listOf(
-            Pair(it.getPartyColor(), it.getNumSeats())
-        )) })
         Assert.assertEquals(157, frame.max.toInt().toLong())
         Assert.assertEquals(0, frame.min.toInt().toLong())
         list[0].setNumSeats(-27)
@@ -202,8 +202,36 @@ class BarFrameTest {
         results.value = list
         Assert.assertEquals(22, frame.max.toInt().toLong())
         Assert.assertEquals(-27, frame.min.toInt().toLong())
-        frame.setMinBinding(fixedBinding(-30))
-        frame.setMaxBinding(fixedBinding(30))
+    }
+
+    @Test
+    fun testFixedMinMax() {
+        val list = mutableListOf(
+            ElectionResult("LIBERAL", Color.RED, 157),
+            ElectionResult("CONSERVATIVE", Color.BLUE, 121),
+            ElectionResult("BLOC QUEBECOIS", Color.CYAN, 32),
+            ElectionResult("NEW DEMOCRATIC PARTY", Color.ORANGE, 24),
+            ElectionResult("GREEN", Color.GREEN, 3),
+            ElectionResult("INDEPENDENT", Color.LIGHT_GRAY, 1)
+        )
+        val results = BindableWrapper(list)
+        val frame = BarFrame(
+            headerBinding = fixedBinding(null),
+            barsBinding = results.binding.mapElements { BarFrame.Bar("", "", null, listOf(
+                Pair(it.getPartyColor(), it.getNumSeats())
+            )) },
+            minBinding = fixedBinding(-30),
+            maxBinding = fixedBinding(30)
+        )
+        Assert.assertEquals(30, frame.max.toInt().toLong())
+        Assert.assertEquals(-30, frame.min.toInt().toLong())
+        list[0].setNumSeats(-27)
+        list[1].setNumSeats(22)
+        list[2].setNumSeats(22)
+        list[3].setNumSeats(-20)
+        list[4].setNumSeats(2)
+        list[5].setNumSeats(1)
+        results.value = list
         Assert.assertEquals(30, frame.max.toInt().toLong())
         Assert.assertEquals(-30, frame.min.toInt().toLong())
     }
@@ -211,16 +239,18 @@ class BarFrameTest {
     @Test
     fun testSubheadText() {
         val frame = BarFrame(
-            headerBinding = fixedBinding(null)
+            headerBinding = fixedBinding(null),
+            subheadTextBinding = fixedBinding<String?>("PROJECTION: LIB MINORITY"),
+            barsBinding = fixedBinding(emptyList())
         )
-        frame.setSubheadTextBinding(fixedBinding<String?>("PROJECTION: LIB MINORITY"))
         Assert.assertEquals("PROJECTION: LIB MINORITY", frame.subheadText)
     }
 
     @Test
     fun testDefaultSubheadColor() {
         val frame = BarFrame(
-            headerBinding = fixedBinding(null)
+            headerBinding = fixedBinding(null),
+            barsBinding = fixedBinding(emptyList())
         )
         Assert.assertEquals(Color.BLACK, frame.subheadColor)
     }
@@ -228,58 +258,33 @@ class BarFrameTest {
     @Test
     fun testSubheadColor() {
         val frame = BarFrame(
-            headerBinding = fixedBinding(null)
+            headerBinding = fixedBinding(null),
+            subheadTextBinding = fixedBinding<String?>("PROJECTION: LIB MINORITY"),
+            subheadColorBinding = fixedBinding(Color.RED),
+            barsBinding = fixedBinding(emptyList())
         )
-        frame.setSubheadColorBinding(fixedBinding(Color.RED))
         Assert.assertEquals(Color.RED, frame.subheadColor)
     }
 
     @Test
     fun testLines() {
         val frame = BarFrame(
-            headerBinding = fixedBinding(null)
+            headerBinding = fixedBinding(null),
+            barsBinding = fixedBinding(emptyList()),
+            linesBinding = fixedBinding(listOf(BarFrame.Line(170, "170 SEATS FOR MAJORITY")))
         )
-        frame.setLinesBinding(fixedBinding(listOf(BarFrame.Line(170, "170 SEATS FOR MAJORITY"))))
         Assert.assertEquals(1, frame.numLines.toLong())
         Assert.assertEquals(170, frame.getLineLevel(0))
         Assert.assertEquals("170 SEATS FOR MAJORITY", frame.getLineLabel(0))
     }
 
     @Test
-    fun testUnbind() {
-        val results: BindableWrapper<List<ElectionResult>> = BindableWrapper(listOf())
-        val con = ElectionResult("CONSERVATIVE", Color.BLUE, 1)
-        val lib = ElectionResult("LIBERAL", Color.RED, 1)
-        val ndp = ElectionResult("NEW DEMOCRATIC PARTY", Color.ORANGE, 1)
-        results.value = listOf(con, lib, ndp)
-        val frame = BarFrame(
-            headerBinding = fixedBinding(null)
-        )
-        frame.setBarsBinding(results.binding.mapElements { BarFrame.Bar(it.getPartyName(), "", null, listOf()) })
-        Assert.assertEquals(3, frame.numBars.toLong())
-        Assert.assertEquals("CONSERVATIVE", frame.getLeftText(0))
-        Assert.assertEquals("LIBERAL", frame.getLeftText(1))
-        Assert.assertEquals("NEW DEMOCRATIC PARTY", frame.getLeftText(2))
-        val differentResults: BindableWrapper<List<ElectionResult>> = BindableWrapper(listOf())
-        differentResults.value = listOf(ElectionResult("GREEN", Color.GREEN, 1))
-        frame.setBarsBinding(differentResults.binding.mapElements { BarFrame.Bar(it.getPartyName(), "", null, listOf()) })
-        Assert.assertEquals(1, frame.numBars.toLong())
-        Assert.assertEquals("GREEN", frame.getLeftText(0))
-        results.value = emptyList()
-        Assert.assertEquals(1, frame.numBars.toLong())
-        Assert.assertEquals("GREEN", frame.getLeftText(0))
-        differentResults.value = listOf(ElectionResult("GREENS", Color.GREEN, 1))
-        Assert.assertEquals(1, frame.numBars.toLong())
-        Assert.assertEquals("GREENS", frame.getLeftText(0))
-    }
-
-    @Test
     fun testTestNonBindableElements() {
         val results = BindableWrapper<List<Triple<String, Color, Int>>>(listOf())
         val frame = BarFrame(
-            headerBinding = fixedBinding(null)
+            headerBinding = fixedBinding(null),
+            barsBinding = results.binding.mapElements { BarFrame.Bar(it.first, "", null, listOf()) }
         )
-        frame.setBarsBinding(results.binding.mapElements { BarFrame.Bar(it.first, "", null, listOf()) })
         Assert.assertEquals(0, frame.numBars.toLong())
         results.value = (listOf(
                 Triple("LIBERALS", Color.RED, 3),
@@ -309,12 +314,12 @@ class BarFrameTest {
         ElectionResult("INDEPENDENT", Color.LIGHT_GRAY, 1)
         ))
         val barFrame = BarFrame(
-            headerBinding = fixedBinding<String?>("2019 CANADIAN ELECTION RESULT")
+            headerBinding = fixedBinding<String?>("2019 CANADIAN ELECTION RESULT"),
+            barsBinding = results.binding.mapElements { BarFrame.Bar(it.getPartyName(), "${it.getNumSeats()}", null, listOf(
+                Pair(it.getPartyColor(), it.getNumSeats())
+            )) },
+            maxBinding = fixedBinding(160)
         )
-        barFrame.setMaxBinding(fixedBinding(160))
-        barFrame.setBarsBinding(results.binding.mapElements { BarFrame.Bar(it.getPartyName(), "${it.getNumSeats()}", null, listOf(
-            Pair(it.getPartyColor(), it.getNumSeats())
-        )) })
         barFrame.setSize(512, 256)
         compareRendering("BarFrame", "SingleSeriesAllPositive", barFrame)
     }
@@ -331,14 +336,14 @@ class BarFrameTest {
             ElectionResult("INDEPENDENT", Color.LIGHT_GRAY, 1)
         ))
         val barFrame = BarFrame(
-            headerBinding = fixedBinding<String?>("2019 CANADIAN ELECTION RESULT")
+            headerBinding = fixedBinding<String?>("2019 CANADIAN ELECTION RESULT"),
+            subheadTextBinding = fixedBinding("PROJECTION: LIB MINORITY"),
+            subheadColorBinding = fixedBinding(Color.RED),
+            barsBinding = results.binding.mapElements { BarFrame.Bar(it.getPartyName(), "${it.getNumSeats()}", null, listOf(
+                Pair(it.getPartyColor(), it.getNumSeats())
+            )) },
+            maxBinding = fixedBinding(160)
         )
-        barFrame.setMaxBinding(fixedBinding(160))
-        barFrame.setSubheadTextBinding(fixedBinding("PROJECTION: LIB MINORITY"))
-        barFrame.setSubheadColorBinding(fixedBinding(Color.RED))
-        barFrame.setBarsBinding(results.binding.mapElements { BarFrame.Bar(it.getPartyName(), "${it.getNumSeats()}", null, listOf(
-            Pair(it.getPartyColor(), it.getNumSeats())
-        )) })
         barFrame.setSize(512, 256)
         compareRendering("BarFrame", "SingleSeriesWithSubhead", barFrame)
     }
@@ -357,13 +362,13 @@ class BarFrameTest {
         ElectionResult("PEOPLE'S PARTY", Color.MAGENTA.darker(), 1)
         ))
         val barFrame = BarFrame(
-            headerBinding = fixedBinding<String?>("SEATS AT DISSOLUTION")
+            headerBinding = fixedBinding<String?>("SEATS AT DISSOLUTION"),
+            subheadTextBinding = fixedBinding<String?>("170 FOR MAJORITY"),
+            subheadColorBinding = fixedBinding(Color.RED),
+            barsBinding = results.binding.mapElements { BarFrame.Bar(it.getPartyName(), "${it.getNumSeats()}", null, listOf(
+                Pair(it.getPartyColor(), it.getNumSeats())
+            )) }
         )
-        barFrame.setSubheadTextBinding(fixedBinding<String?>("170 FOR MAJORITY"))
-        barFrame.setSubheadColorBinding(fixedBinding(Color.RED))
-        barFrame.setBarsBinding(results.binding.mapElements { BarFrame.Bar(it.getPartyName(), "${it.getNumSeats()}", null, listOf(
-            Pair(it.getPartyColor(), it.getNumSeats())
-        )) })
         barFrame.setSize(512, 256)
         compareRendering("BarFrame", "SingleSeriesShrinkToFit", barFrame)
     }
@@ -380,13 +385,13 @@ class BarFrameTest {
         ElectionResult("INDEPENDENT", Color.LIGHT_GRAY, 0, 1)
         ))
         val barFrame = BarFrame(
-            headerBinding = fixedBinding<String?>("2019 CANADIAN ELECTION RESULT")
+            headerBinding = fixedBinding<String?>("2019 CANADIAN ELECTION RESULT"),
+            barsBinding = results.binding.mapElements { BarFrame.Bar(it.getPartyName(), it.getNumSeats().toString() + "/" + it.getSeatEstimate(), null, listOf(
+                Pair(it.getPartyColor(), it.getNumSeats()),
+                Pair(lighten(it.getPartyColor()), it.getSeatEstimate() - it.getNumSeats())
+            )) },
+            maxBinding = fixedBinding(160)
         )
-        barFrame.setMaxBinding(fixedBinding(160))
-        barFrame.setBarsBinding(results.binding.mapElements { BarFrame.Bar(it.getPartyName(), it.getNumSeats().toString() + "/" + it.getSeatEstimate(), null, listOf(
-            Pair(it.getPartyColor(), it.getNumSeats()),
-            Pair(lighten(it.getPartyColor()), it.getSeatEstimate() - it.getNumSeats())
-        )) })
         barFrame.setSize(512, 256)
         compareRendering("BarFrame", "MultiSeriesAllPositive", barFrame)
     }
@@ -403,13 +408,13 @@ class BarFrameTest {
         ElectionResult("IND", Color.LIGHT_GRAY, +1)
         ))
         val barFrame = BarFrame(
-            headerBinding = fixedBinding<String?>("RESULT CHANGE SINCE 2015")
+            headerBinding = fixedBinding<String?>("RESULT CHANGE SINCE 2015"),
+            barsBinding = results.binding.mapElements { BarFrame.Bar(it.getPartyName(), DecimalFormat("+0;-0").format(it.getNumSeats().toLong()), null, listOf(
+                Pair(it.getPartyColor(), it.getNumSeats())
+            )) },
+            maxBinding = fixedBinding(28),
+            minBinding = fixedBinding(-28)
         )
-        barFrame.setMaxBinding(fixedBinding(28))
-        barFrame.setMinBinding(fixedBinding(-28))
-        barFrame.setBarsBinding(results.binding.mapElements { BarFrame.Bar(it.getPartyName(), DecimalFormat("+0;-0").format(it.getNumSeats().toLong()), null, listOf(
-            Pair(it.getPartyColor(), it.getNumSeats())
-        )) })
         barFrame.setSize(512, 256)
         compareRendering("BarFrame", "SingleSeriesBothDirections", barFrame)
     }
@@ -426,14 +431,14 @@ class BarFrameTest {
         ElectionResult("IND", Color.LIGHT_GRAY, +0, +1)
         ))
         val barFrame = BarFrame(
-            headerBinding = fixedBinding<String?>("RESULT CHANGE SINCE 2015")
+            headerBinding = fixedBinding<String?>("RESULT CHANGE SINCE 2015"),
+            barsBinding = results.binding.mapElements { BarFrame.Bar(it.getPartyName(), "${CHANGE_FORMAT.format(it.getNumSeats().toLong())}/${CHANGE_FORMAT.format(it.getSeatEstimate().toLong())}", null, listOf(
+                Pair(it.getPartyColor(), it.getNumSeats()),
+                Pair(lighten(it.getPartyColor()), it.getSeatEstimate() - if (sign(it.getSeatEstimate().toFloat()) == sign(it.getNumSeats().toFloat())) it.getNumSeats() else 0)
+            )) },
+            maxBinding = fixedBinding(28),
+            minBinding = fixedBinding(-28)
         )
-        barFrame.setMaxBinding(fixedBinding(28))
-        barFrame.setMinBinding(fixedBinding(-28))
-        barFrame.setBarsBinding(results.binding.mapElements { BarFrame.Bar(it.getPartyName(), "${CHANGE_FORMAT.format(it.getNumSeats().toLong())}/${CHANGE_FORMAT.format(it.getSeatEstimate().toLong())}", null, listOf(
-            Pair(it.getPartyColor(), it.getNumSeats()),
-            Pair(lighten(it.getPartyColor()), it.getSeatEstimate() - if (sign(it.getSeatEstimate().toFloat()) == sign(it.getNumSeats().toFloat())) it.getNumSeats() else 0)
-        )) })
         barFrame.setSize(512, 256)
         compareRendering("BarFrame", "MultiSeriesBothDirections", barFrame)
     }
@@ -449,18 +454,18 @@ class BarFrameTest {
         RidingResult("ERIKA TRAUB", "PEOPLE'S PARTY", Color.MAGENTA.darker(), 1112, 0.0175)
         ))
         val barFrame = BarFrame(
-            headerBinding = fixedBinding<String?>("WATERLOO")
+            headerBinding = fixedBinding<String?>("WATERLOO"),
+            subheadTextBinding = fixedBinding<String?>("LIB HOLD"),
+            subheadColorBinding = fixedBinding(Color.RED),
+            barsBinding = results.binding.mapElements {
+                BarFrame.Bar(
+                    "${it.getCandidateName()}\n${it.getPartyName()}",
+                    "${THOUSANDS_FORMAT.format(it.getNumVotes().toLong())}\n${PERCENT_FORMAT.format(it.getVotePct())}",
+                    listOf(Pair(it.getPartyColor(), it.getNumVotes()))
+                )
+            },
+            maxBinding = results.binding.map { r -> r.sumOf { it.getNumVotes() } / 2 }
         )
-        barFrame.setMaxBinding((results.binding.map { r -> r.sumOf { it.getNumVotes() } / 2 }))
-        barFrame.setSubheadTextBinding(fixedBinding<String?>("LIB HOLD"))
-        barFrame.setSubheadColorBinding(fixedBinding(Color.RED))
-        barFrame.setBarsBinding(results.binding.mapElements {
-            BarFrame.Bar(
-                "${it.getCandidateName()}\n${it.getPartyName()}",
-                "${THOUSANDS_FORMAT.format(it.getNumVotes().toLong())}\n${PERCENT_FORMAT.format(it.getVotePct())}",
-                listOf(Pair(it.getPartyColor(), it.getNumVotes()))
-            )
-        })
         barFrame.setSize(512, 256)
         compareRendering("BarFrame", "TwoLinedBars", barFrame)
     }
@@ -477,19 +482,19 @@ class BarFrameTest {
         ))
         val shape = createTickShape()
         val barFrame = BarFrame(
-            headerBinding = fixedBinding<String?>("WATERLOO")
+            headerBinding = fixedBinding<String?>("WATERLOO"),
+            subheadTextBinding = fixedBinding<String?>("LIB HOLD"),
+            subheadColorBinding = fixedBinding(Color.RED),
+            barsBinding = results.binding.mapElements {
+                BarFrame.Bar(
+                    "${it.getCandidateName()}\n${it.getPartyName()}",
+                    "${THOUSANDS_FORMAT.format(it.getNumVotes().toLong())}\n${PERCENT_FORMAT.format(it.getVotePct())}",
+                    if (it.isElected()) shape else null,
+                    listOf(Pair(it.getPartyColor(), it.getNumVotes()))
+                )
+            },
+            maxBinding = results.binding.map { r -> r.sumOf { it.getNumVotes() } / 2 }
         )
-        barFrame.setMaxBinding((results.binding.map { r -> r.sumOf { it.getNumVotes() } / 2 }))
-        barFrame.setSubheadTextBinding(fixedBinding<String?>("LIB HOLD"))
-        barFrame.setSubheadColorBinding(fixedBinding(Color.RED))
-        barFrame.setBarsBinding(results.binding.mapElements {
-            BarFrame.Bar(
-                "${it.getCandidateName()}\n${it.getPartyName()}",
-                "${THOUSANDS_FORMAT.format(it.getNumVotes().toLong())}\n${PERCENT_FORMAT.format(it.getVotePct())}",
-                if (it.isElected()) shape else null,
-                listOf(Pair(it.getPartyColor(), it.getNumVotes()))
-            )
-        })
         barFrame.setSize(512, 256)
         compareRendering("BarFrame", "TwoLinedBarWithIcon", barFrame)
     }
@@ -506,16 +511,16 @@ class BarFrameTest {
         ))
         val shape = createTickShape()
         val barFrame = BarFrame(
-            headerBinding = fixedBinding<String?>("WATERLOO")
+            headerBinding = fixedBinding<String?>("WATERLOO"),
+            barsBinding = results.binding.mapElements {
+                BarFrame.Bar(
+                    it.getPartyName(),
+                    PERCENT_FORMAT.format(it.getVotePct()),
+                    if (it.isElected()) shape else null,
+                    listOf(Pair(it.getPartyColor(), it.getVotePct()))
+                )
+            }
         )
-        barFrame.setBarsBinding(results.binding.mapElements {
-            BarFrame.Bar(
-                it.getPartyName(),
-                PERCENT_FORMAT.format(it.getVotePct()),
-                if (it.isElected()) shape else null,
-                listOf(Pair(it.getPartyColor(), it.getVotePct()))
-            )
-        })
         barFrame.setSize(512, 256)
         compareRendering("BarFrame", "TwoLinedBarWithNegativeIcon", barFrame)
     }
@@ -534,21 +539,21 @@ class BarFrameTest {
         ElectionResult("PEOPLE'S PARTY", Color.MAGENTA.darker(), 1)
         ))
         val barFrame = BarFrame(
-            headerBinding = fixedBinding<String?>("SEATS AT DISSOLUTION")
-        )
-        barFrame.setSubheadTextBinding(fixedBinding<String?>("170 FOR MAJORITY"))
-        barFrame.setSubheadColorBinding(fixedBinding(Color.RED))
-        barFrame.setMaxBinding(fixedBinding(225))
-        barFrame.setBarsBinding(results.binding.mapElements {
-            BarFrame.Bar(
-                it.getPartyName(),
-                "${it.getNumSeats()}",
-                listOf(
-                    Pair(it.getPartyColor(), it.getNumSeats())
+            headerBinding = fixedBinding<String?>("SEATS AT DISSOLUTION"),
+            subheadTextBinding = fixedBinding<String?>("170 FOR MAJORITY"),
+            subheadColorBinding = fixedBinding(Color.RED),
+            barsBinding = results.binding.mapElements {
+                BarFrame.Bar(
+                    it.getPartyName(),
+                    "${it.getNumSeats()}",
+                    listOf(
+                        Pair(it.getPartyColor(), it.getNumSeats())
+                    )
                 )
-            )
-        })
-        barFrame.setLinesBinding(fixedBinding(listOf(BarFrame.Line(170, "MAJORITY"))))
+            },
+            linesBinding = fixedBinding(listOf(BarFrame.Line(170, "MAJORITY"))),
+            maxBinding = fixedBinding(225)
+        )
         barFrame.setSize(512, 256)
         compareRendering("BarFrame", "VerticalLine", barFrame)
     }
@@ -563,20 +568,20 @@ class BarFrameTest {
         ElectionResult("QU\u00c9BEC SOLIDAIRE: MANON MASS\u00c9", Color.ORANGE, 10)
         ))
         val barFrame = BarFrame(
-            headerBinding = fixedBinding<String?>("\u00c9LECTION 2018")
-        )
-        barFrame.setSubheadTextBinding(fixedBinding<String?>("MAJORIT\u00c9: 63"))
-        barFrame.setMaxBinding(fixedBinding(83))
-        barFrame.setBarsBinding(results.binding.mapElements {
-            BarFrame.Bar(
-                it.getPartyName(),
-                "${it.getNumSeats()}",
-                listOf(
-                    Pair(it.getPartyColor(), it.getNumSeats())
+            headerBinding = fixedBinding<String?>("\u00c9LECTION 2018"),
+            subheadTextBinding = fixedBinding<String?>("MAJORIT\u00c9: 63"),
+            barsBinding = results.binding.mapElements {
+                BarFrame.Bar(
+                    it.getPartyName(),
+                    "${it.getNumSeats()}",
+                    listOf(
+                        Pair(it.getPartyColor(), it.getNumSeats())
+                    )
                 )
-            )
-        })
-        barFrame.setLinesBinding(fixedBinding(listOf(BarFrame.Line(63, "MAJORIT\u00c9"))))
+            },
+            linesBinding = fixedBinding(listOf(BarFrame.Line(63, "MAJORIT\u00c9"))),
+            maxBinding = fixedBinding(83)
+        )
         barFrame.setSize(512, 256)
         compareRendering("BarFrame", "Accents", barFrame)
     }
@@ -591,20 +596,20 @@ class BarFrameTest {
         ElectionResult("QU\u00c9BEC SOLIDAIRE\nMANON MASS\u00c9", Color.ORANGE, 10)
         ))
         val barFrame = BarFrame(
-            headerBinding = fixedBinding<String?>("\u00c9LECTION 2018")
-        )
-        barFrame.setSubheadTextBinding(fixedBinding<String?>("MAJORIT\u00c9: 63"))
-        barFrame.setMaxBinding(fixedBinding(83))
-        barFrame.setBarsBinding(results.binding.mapElements {
-            BarFrame.Bar(
-                it.getPartyName(),
-                "${it.getNumSeats()}",
-                listOf(
-                    Pair(it.getPartyColor(), it.getNumSeats())
+            headerBinding = fixedBinding<String?>("\u00c9LECTION 2018"),
+            subheadTextBinding = fixedBinding<String?>("MAJORIT\u00c9: 63"),
+            barsBinding = results.binding.mapElements {
+                BarFrame.Bar(
+                    it.getPartyName(),
+                    "${it.getNumSeats()}",
+                    listOf(
+                        Pair(it.getPartyColor(), it.getNumSeats())
+                    )
                 )
-            )
-        })
-        barFrame.setLinesBinding(fixedBinding(listOf(BarFrame.Line(63, "MAJORIT\u00c9"))))
+            },
+            linesBinding = fixedBinding(listOf(BarFrame.Line(63, "MAJORIT\u00c9"))),
+            maxBinding = fixedBinding(83)
+        )
         barFrame.setSize(512, 256)
         compareRendering("BarFrame", "MultiLineAccents", barFrame)
     }
@@ -614,19 +619,19 @@ class BarFrameTest {
     fun testBarFrameOverlaps() {
         val lines = BindableWrapper(listOf(Triple("THIS IS A VERY VERY LONG\nLEFT HAND SIDE", "RIGHT\nSIDE", false)))
         val barFrame = BarFrame(
-            headerBinding = fixedBinding<String?>("BAR FRAME")
+            headerBinding = fixedBinding<String?>("BAR FRAME"),
+            subheadTextBinding = fixedBinding<String?>(""),
+            barsBinding = lines.binding.mapElements {
+                BarFrame.Bar(
+                    it.first,
+                    it.second,
+                    if (it.third) createHalfTickShape() else null,
+                    listOf(Pair(Color.RED, 1))
+                )
+            },
+            linesBinding = fixedBinding(listOf(BarFrame.Line(0.5, ""))),
+            maxBinding = fixedBinding(1)
         )
-        barFrame.setSubheadTextBinding(fixedBinding<String?>(""))
-        barFrame.setMaxBinding(fixedBinding(1))
-        barFrame.setBarsBinding(lines.binding.mapElements {
-            BarFrame.Bar(
-                it.first,
-                it.second,
-                if (it.third) createHalfTickShape() else null,
-                listOf(Pair(Color.RED, 1))
-            )
-        })
-        barFrame.setLinesBinding(fixedBinding(listOf(BarFrame.Line(0.5, ""))))
         barFrame.setSize(256, 128)
         compareRendering("BarFrame", "FrameOverlap-1", barFrame)
         lines.value = listOf(Triple("LEFT\nSIDE", "THIS IS A VERY VERY LONG\nRIGHT HAND SIDE", false))

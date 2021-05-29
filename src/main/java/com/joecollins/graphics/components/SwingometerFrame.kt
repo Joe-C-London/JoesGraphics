@@ -10,6 +10,8 @@ import java.awt.Graphics
 import java.awt.Graphics2D
 import java.awt.RenderingHints
 import java.awt.geom.AffineTransform
+import java.lang.Double.NEGATIVE_INFINITY
+import java.lang.Double.POSITIVE_INFINITY
 import javax.swing.JPanel
 import kotlin.math.abs
 import kotlin.math.ceil
@@ -21,64 +23,37 @@ import kotlin.math.sign
 import kotlin.math.sin
 
 class SwingometerFrame(
-    headerBinding: Binding<String?>
+    headerBinding: Binding<String?>,
+    valueBinding: Binding<Number>,
+    rangeBinding: Binding<Number>,
+    leftColorBinding: Binding<Color>,
+    rightColorBinding: Binding<Color>,
+    numBucketsPerSideBinding: Binding<Int>,
+    dotsBinding: Binding<List<Dot>>,
+    leftToWinBinding: Binding<Number>? = null,
+    rightToWinBinding: Binding<Number>? = null,
+    ticksBinding: Binding<List<Tick>>? = null,
+    outerLabelsBinding: Binding<List<OuterLabel>>? = null
 ) : GraphicsFrame(
     headerBinding = headerBinding
 ) {
-    private var rangeBinding: Binding<Number> = Binding.fixedBinding(1)
-    private var valueBinding: Binding<Number> = Binding.fixedBinding(0)
-    private var leftColorBinding: Binding<Color> = Binding.fixedBinding(Color.BLACK)
-    private var rightColorBinding: Binding<Color> = Binding.fixedBinding(Color.BLACK)
-    private var leftToWinBinding: Binding<Number> = Binding.fixedBinding(Double.POSITIVE_INFINITY)
-    private var rightToWinBinding: Binding<Number> = Binding.fixedBinding(Double.POSITIVE_INFINITY)
-
     class Tick(val position: Number, val text: String)
-    private var ticksBinding: Binding<List<Tick>> = Binding.fixedBinding(emptyList())
 
     class OuterLabel(val position: Number, val text: String, val color: Color)
-    private var outerLabelsBinding: Binding<List<OuterLabel>> = Binding.fixedBinding(emptyList())
-
-    private var numBucketsPerSideBinding: Binding<Int> = Binding.fixedBinding(1)
-
-    private var dotsBinding: Binding<List<Dot>> = Binding.fixedBinding(emptyList())
 
     private val swingPanel: SwingPanel = SwingPanel()
 
     internal val leftColor: Color
         get() = swingPanel.leftColor
 
-    fun setLeftColorBinding(leftColorBinding: Binding<Color>) {
-        this.leftColorBinding.unbind()
-        this.leftColorBinding = leftColorBinding
-        this.leftColorBinding.bind { leftColor -> swingPanel.leftColor = leftColor }
-    }
-
     internal val rightColor: Color
         get() = swingPanel.rightColor
-
-    fun setRightColorBinding(rightColorBinding: Binding<Color>) {
-        this.rightColorBinding.unbind()
-        this.rightColorBinding = rightColorBinding
-        this.rightColorBinding.bind { rightColor -> swingPanel.rightColor = rightColor }
-    }
 
     internal val value: Number
         get() = swingPanel.value
 
-    fun setValueBinding(valueBinding: Binding<Number>) {
-        this.valueBinding.unbind()
-        this.valueBinding = valueBinding
-        this.valueBinding.bind { value -> swingPanel.value = value }
-    }
-
     internal val range: Number
         get() = swingPanel.range
-
-    fun setRangeBinding(rangeBinding: Binding<Number>) {
-        this.rangeBinding.unbind()
-        this.rangeBinding = rangeBinding
-        this.rangeBinding.bind { range -> swingPanel.range = range }
-    }
 
     internal val numTicks: Int
         get() = swingPanel.ticks.size
@@ -91,31 +66,11 @@ class SwingometerFrame(
         return swingPanel.ticks[index].text
     }
 
-    fun setTicksBinding(ticksBinding: Binding<List<Tick>>) {
-        this.ticksBinding.unbind()
-        this.ticksBinding = ticksBinding
-        this.ticksBinding.bind { t ->
-            swingPanel.ticks = t
-        }
-    }
-
     internal val leftToWin: Number
         get() = swingPanel.leftToWin
 
-    fun setLeftToWinBinding(leftToWinBinding: Binding<Number>) {
-        this.leftToWinBinding.unbind()
-        this.leftToWinBinding = leftToWinBinding
-        this.leftToWinBinding.bind { leftToWin -> swingPanel.leftToWin = leftToWin }
-    }
-
     internal val rightToWin: Number
         get() = swingPanel.rightToWin
-
-    fun setRightToWinBinding(rightToWinBinding: Binding<Number>) {
-        this.rightToWinBinding.unbind()
-        this.rightToWinBinding = rightToWinBinding
-        this.rightToWinBinding.bind { rightToWin -> swingPanel.rightToWin = rightToWin }
-    }
 
     internal val numOuterLabels: Int
         get() = swingPanel.outerLabels.size
@@ -132,20 +87,8 @@ class SwingometerFrame(
         return swingPanel.outerLabels[index].color
     }
 
-    fun setOuterLabelsBinding(outerLabelsBinding: Binding<List<OuterLabel>>) {
-        this.outerLabelsBinding.unbind()
-        this.outerLabelsBinding = outerLabelsBinding
-        this.outerLabelsBinding.bind { l -> swingPanel.outerLabels = l }
-    }
-
     internal val numBucketsPerSide: Int
         get() = swingPanel.numBucketsPerSide
-
-    fun setNumBucketsPerSideBinding(numBucketsPerSideBinding: Binding<Int>) {
-        this.numBucketsPerSideBinding.unbind()
-        this.numBucketsPerSideBinding = numBucketsPerSideBinding
-        this.numBucketsPerSideBinding.bind { numBucketsPerSide -> swingPanel.numBucketsPerSide = numBucketsPerSide }
-    }
 
     internal val numDots: Int
         get() = swingPanel.dots.size
@@ -164,12 +107,6 @@ class SwingometerFrame(
 
     internal fun isDotSolid(index: Int): Boolean {
         return swingPanel.dots[index].solid
-    }
-
-    fun setDotsBinding(dotsBinding: Binding<List<Dot>>) {
-        this.dotsBinding.unbind()
-        this.dotsBinding = dotsBinding
-        this.dotsBinding.bind { swingPanel.dots = it }
     }
 
     class Dot(val position: Number, val color: Color, val label: String = "", val solid: Boolean = true)
@@ -412,5 +349,16 @@ class SwingometerFrame(
         centerPanel.layout = BorderLayout()
         centerPanel.add(swingPanel, BorderLayout.CENTER)
         add(centerPanel, BorderLayout.CENTER)
+
+        valueBinding.bind { value -> swingPanel.value = value }
+        rangeBinding.bind { range -> swingPanel.range = range }
+        leftColorBinding.bind { leftColor -> swingPanel.leftColor = leftColor }
+        rightColorBinding.bind { rightColor -> swingPanel.rightColor = rightColor }
+        numBucketsPerSideBinding.bind { numBucketsPerSide -> swingPanel.numBucketsPerSide = numBucketsPerSide }
+        dotsBinding.bind { swingPanel.dots = it }
+        (leftToWinBinding ?: Binding.fixedBinding(POSITIVE_INFINITY)).bind { leftToWin -> swingPanel.leftToWin = leftToWin }
+        (rightToWinBinding ?: Binding.fixedBinding(NEGATIVE_INFINITY)).bind { rightToWin -> swingPanel.rightToWin = rightToWin }
+        (ticksBinding ?: Binding.fixedBinding(emptyList())).bind { t -> swingPanel.ticks = t }
+        (outerLabelsBinding ?: Binding.fixedBinding(emptyList())).bind { l -> swingPanel.outerLabels = l }
     }
 }

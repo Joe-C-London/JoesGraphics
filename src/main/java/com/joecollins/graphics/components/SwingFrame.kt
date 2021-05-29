@@ -13,17 +13,16 @@ import javax.swing.border.EmptyBorder
 import kotlin.math.min
 
 class SwingFrame(
-    headerBinding: Binding<String?>
+    headerBinding: Binding<String?>,
+    valueBinding: Binding<Number>,
+    rangeBinding: Binding<Number>,
+    leftColorBinding: Binding<Color>,
+    rightColorBinding: Binding<Color>,
+    bottomTextBinding: Binding<String?>,
+    bottomColorBinding: Binding<Color>
 ) : GraphicsFrame(
     headerBinding = headerBinding
 ) {
-    private var rangeBinding: Binding<Number> = Binding.fixedBinding(1)
-    private var valueBinding: Binding<Number> = Binding.fixedBinding(0)
-    private var leftColorBinding: Binding<Color> = Binding.fixedBinding(Color.BLACK)
-    private var rightColorBinding: Binding<Color> = Binding.fixedBinding(Color.BLACK)
-    private var bottomTextBinding: Binding<String?> = Binding.fixedBinding(null)
-    private var bottomColorBinding: Binding<Color> = Binding.fixedBinding(Color.BLACK)
-
     private val swingPanel = SwingPanel()
     private val bottomLabel: JLabel = FontSizeAdjustingLabel()
 
@@ -37,69 +36,40 @@ class SwingFrame(
         centerPanel.add(swingPanel, BorderLayout.CENTER)
         centerPanel.add(bottomLabel, BorderLayout.SOUTH)
         add(centerPanel, BorderLayout.CENTER)
+
+        valueBinding.bind { swingPanel.value = it }
+        rangeBinding.bind { swingPanel.range = it }
+        leftColorBinding.bind { swingPanel.leftColor = it }
+        rightColorBinding.bind { swingPanel.rightColor = it }
+        bottomTextBinding.bind {
+            bottomLabel.isVisible = it != null
+            bottomLabel.text = it ?: ""
+        }
+        bottomColorBinding.bind { bottomLabel.foreground = it }
     }
 
     internal fun getRange(): Number {
         return swingPanel.range
     }
 
-    fun setRangeBinding(rangeBinding: Binding<Number>) {
-        this.rangeBinding.unbind()
-        this.rangeBinding = rangeBinding
-        this.rangeBinding.bind { swingPanel.range = it }
-    }
-
     internal fun getValue(): Number {
         return swingPanel.value
-    }
-
-    fun setValueBinding(valueBinding: Binding<Number>) {
-        this.valueBinding.unbind()
-        this.valueBinding = valueBinding
-        this.valueBinding.bind { swingPanel.value = it }
     }
 
     internal fun getLeftColor(): Color {
         return swingPanel.leftColor
     }
 
-    fun setLeftColorBinding(leftColorBinding: Binding<Color>) {
-        this.leftColorBinding.unbind()
-        this.leftColorBinding = leftColorBinding
-        this.leftColorBinding.bind { swingPanel.leftColor = it }
-    }
-
     internal fun getRightColor(): Color {
         return swingPanel.rightColor
-    }
-
-    fun setRightColorBinding(rightColorBinding: Binding<Color>) {
-        this.rightColorBinding.unbind()
-        this.rightColorBinding = rightColorBinding
-        this.rightColorBinding.bind { swingPanel.rightColor = it }
     }
 
     internal fun getBottomText(): String? {
         return if (bottomLabel.isVisible) bottomLabel.text else null
     }
 
-    fun setBottomTextBinding(bottomTextBinding: Binding<String?>) {
-        this.bottomTextBinding.unbind()
-        this.bottomTextBinding = bottomTextBinding
-        this.bottomTextBinding.bind {
-            bottomLabel.isVisible = it != null
-            bottomLabel.text = it ?: ""
-        }
-    }
-
     internal fun getBottomColor(): Color {
         return bottomLabel.foreground
-    }
-
-    fun setBottomColorBinding(bottomColorBinding: Binding<Color>) {
-        this.bottomColorBinding.unbind()
-        this.bottomColorBinding = bottomColorBinding
-        this.bottomColorBinding.bind { bottomLabel.foreground = it }
     }
 
     private inner class SwingPanel : JPanel() {

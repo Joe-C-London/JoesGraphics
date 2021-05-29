@@ -24,6 +24,9 @@ import kotlin.math.sqrt
 
 class MapFrame(
     headerBinding: Binding<String?>,
+    shapesBinding: Binding<List<Pair<Shape, Color>>>,
+    focusBoxBinding: Binding<Rectangle2D?>? = null,
+    outlineShapesBinding: Binding<List<Shape>>? = null,
     notesBinding: Binding<String?>? = null,
     borderColorBinding: Binding<Color>? = null
 ) : GraphicsFrame(
@@ -31,12 +34,6 @@ class MapFrame(
     notesBinding = notesBinding,
     borderColorBinding = borderColorBinding
 ) {
-    private var shapesBinding: Binding<List<Pair<Shape, Color>>> = Binding.fixedBinding(emptyList())
-
-    private var focusBinding: Binding<Rectangle2D?> = Binding.fixedBinding(null)
-
-    private var outlineShapesBinding: Binding<List<Shape>> = Binding.fixedBinding(emptyList())
-
     private var shapesToDraw: List<Pair<Shape, Color>> = ArrayList()
     private var focus: Rectangle2D? = null
     private var outlineShapes: List<Shape> = ArrayList()
@@ -99,15 +96,6 @@ class MapFrame(
         return shapesToDraw[idx].second
     }
 
-    fun setShapesBinding(shapesBinding: Binding<List<Pair<Shape, Color>>>) {
-        this.shapesBinding.unbind()
-        this.shapesBinding = shapesBinding
-        this.shapesBinding.bind { s ->
-            shapesToDraw = s
-            repaint()
-        }
-    }
-
     internal val focusBox: Rectangle2D?
         get() {
             if (focus == null) {
@@ -124,30 +112,11 @@ class MapFrame(
             return focus
         }
 
-    fun setFocusBoxBinding(focusBinding: Binding<Rectangle2D?>) {
-        this.focusBinding.unbind()
-        this.focusBinding = focusBinding
-        this.focusBinding.bind { focus ->
-            this.focus = focus
-            transformedShapesCache.clear()
-            repaint()
-        }
-    }
-
     internal val numOutlineShapes: Int
         get() = outlineShapes.size
 
     internal fun getOutlineShape(idx: Int): Shape {
         return outlineShapes[idx]
-    }
-
-    fun setOutlineShapesBinding(outlineShapesBinding: Binding<List<Shape>>) {
-        this.outlineShapesBinding.unbind()
-        this.outlineShapesBinding = outlineShapesBinding
-        this.outlineShapesBinding.bind { s ->
-            outlineShapes = s
-            repaint()
-        }
     }
 
     init {
@@ -231,5 +200,19 @@ class MapFrame(
             }
         }
         add(panel, BorderLayout.CENTER)
+
+        shapesBinding.bind { s ->
+            shapesToDraw = s
+            repaint()
+        }
+        (focusBoxBinding ?: Binding.fixedBinding(null)).bind { focus ->
+            this.focus = focus
+            transformedShapesCache.clear()
+            repaint()
+        }
+        (outlineShapesBinding ?: Binding.fixedBinding(emptyList())).bind { s ->
+            outlineShapes = s
+            repaint()
+        }
     }
 }

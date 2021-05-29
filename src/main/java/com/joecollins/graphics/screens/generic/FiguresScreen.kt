@@ -35,10 +35,8 @@ class FiguresScreen private constructor(headerLabel: JLabel, frames: Array<Figur
 
         fun createFrame(): FiguresFrame {
             val frame = FiguresFrame(
-                headerBinding = Binding.fixedBinding(name)
-            )
-            frame.setEntriesBinding(
-                Binding.listBinding(
+                headerBinding = Binding.fixedBinding(name),
+                entriesBinding = Binding.listBinding(
                     entries.map { e ->
                         val colorBinding = Binding.propertyBinding(
                             e,

@@ -14,11 +14,10 @@ class MultiSummaryFrameBuilder private constructor() {
     }
 
     fun build(): MultiSummaryFrame {
-        val multiSummaryFrame = MultiSummaryFrame(
-            headerBinding = headerBinding ?: Binding.fixedBinding(null)
+        return MultiSummaryFrame(
+            headerBinding = headerBinding ?: Binding.fixedBinding(null),
+            rowsBinding = rowsBinding ?: Binding.fixedBinding(emptyList())
         )
-        rowsBinding?.let { multiSummaryFrame.setRowsBinding(it) }
-        return multiSummaryFrame
     }
 
     companion object {

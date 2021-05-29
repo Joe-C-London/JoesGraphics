@@ -43,12 +43,12 @@ class ProjectionScreen private constructor(
         val colorReceiver = BindingReceiver(color)
         val frame = ProjectionFrame(
             headerBinding = Binding.fixedBinding("PROJECTION"),
-            borderColorBinding = colorReceiver.getBinding()
+            borderColorBinding = colorReceiver.getBinding(),
+            imageBinding = image,
+            backColorBinding = colorReceiver.getBinding(),
+            footerTextBinding = text,
+            imageAlignmentBinding = imageAlignment
         )
-        frame.setImageBinding(image)
-        frame.setBackColorBinding(colorReceiver.getBinding())
-        frame.setFooterTextBinding(text)
-        frame.setImageAlignmentBinding(imageAlignment)
         add(frame)
     }
 }

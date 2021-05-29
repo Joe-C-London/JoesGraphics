@@ -26,13 +26,12 @@ class ListingFrameBuilder {
     }
 
     fun build(): BarFrame {
-        val barFrame = BarFrame(
+        return BarFrame(
             headerBinding = headerBinding ?: Binding.fixedBinding(null),
-            notesBinding = notesBinding
+            subheadTextBinding = subheadTextBinding,
+            notesBinding = notesBinding,
+            barsBinding = barsBinding ?: Binding.fixedBinding(emptyList())
         )
-        subheadTextBinding?.let { barFrame.setSubheadTextBinding(it) }
-        barsBinding?.let { barFrame.setBarsBinding(it) }
-        return barFrame
     }
 
     companion object {

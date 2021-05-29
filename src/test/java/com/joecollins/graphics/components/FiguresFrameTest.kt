@@ -12,10 +12,8 @@ class FiguresFrameTest {
     @Test
     fun testNamesAndDescriptions() {
         val frame = FiguresFrame(
-            headerBinding = fixedBinding(null)
-        )
-        frame.setEntriesBinding(
-            fixedBinding(
+            headerBinding = fixedBinding(null),
+            entriesBinding = fixedBinding(
                 listOf(
                     FiguresFrame.Entry(Color.RED, "Justin Trudeau", "Liberal Leader", "", Color.BLACK),
                     FiguresFrame.Entry(Color.BLUE, "Andrew Scheer", "Conservative Leader", "", Color.BLACK),
@@ -38,10 +36,8 @@ class FiguresFrameTest {
     @Test
     fun testResults() {
         val frame = FiguresFrame(
-            headerBinding = fixedBinding(null)
-        )
-        frame.setEntriesBinding(
-            fixedBinding(
+            headerBinding = fixedBinding(null),
+            entriesBinding = fixedBinding(
                 listOf(
                     FiguresFrame.Entry(Color.RED, "Justin Trudeau", "Liberal Leader", "LEADING", Color.RED),
                     FiguresFrame.Entry(Color.BLUE, "Andrew Scheer", "Conservative Leader", "ELECTED", Color.BLUE),
@@ -62,10 +58,8 @@ class FiguresFrameTest {
     @Throws(IOException::class)
     fun testRenderEntries() {
         val frame = FiguresFrame(
-            headerBinding = fixedBinding<String?>("PARTY LEADERS")
-        )
-        frame.setEntriesBinding(
-            fixedBinding(
+            headerBinding = fixedBinding<String?>("PARTY LEADERS"),
+            entriesBinding = fixedBinding(
                 listOf(
                     FiguresFrame.Entry(Color.RED, "JUSTIN TRUDEAU", "Liberal Leader", "LEADING", Color.RED),
                     FiguresFrame.Entry(Color.BLUE, "ANDREW SCHEER", "Conservative Leader", "ELECTED", Color.BLUE),
@@ -81,10 +75,8 @@ class FiguresFrameTest {
     @Throws(IOException::class)
     fun testRenderOverflow() {
         val frame = FiguresFrame(
-            headerBinding = fixedBinding<String?>("PARTY LEADERS")
-        )
-        frame.setEntriesBinding(
-            fixedBinding(
+            headerBinding = fixedBinding<String?>("PARTY LEADERS"),
+            entriesBinding = fixedBinding(
                 listOf(
                     FiguresFrame.Entry(Color.RED, "JUSTIN TRUDEAU", "Liberal Leader, Papineau", "ELECTED", Color.RED),
                     FiguresFrame.Entry(Color.BLUE, "ANDREW SCHEER", "Conservative Leader, Regina-Qu'Apelle", "ELECTED", Color.BLUE),
@@ -106,10 +98,8 @@ class FiguresFrameTest {
     @Throws(IOException::class)
     fun testRenderLongStrings() {
         val frame = FiguresFrame(
-            headerBinding = fixedBinding<String?>("PARTY LEADERS")
-        )
-        frame.setEntriesBinding(
-            fixedBinding(
+            headerBinding = fixedBinding<String?>("PARTY LEADERS"),
+            entriesBinding = fixedBinding(
                 listOf(
                     FiguresFrame.Entry(Color.RED, "JUSTIN TRUDEAU", "Liberal Leader, Papineau", "ELECTED", Color.RED),
                     FiguresFrame.Entry(Color.BLUE, "ANDREW SCHEER", "Conservative Leader, Regina-Qu'Apelle", "ELECTED", Color.BLUE),

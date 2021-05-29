@@ -1,6 +1,7 @@
 package com.joecollins.graphics.components
 
 import com.joecollins.bindings.Binding
+import com.joecollins.bindings.BindingReceiver
 import com.joecollins.graphics.utils.StandardFont
 import java.awt.BasicStroke
 import java.awt.BorderLayout
@@ -25,30 +26,24 @@ import kotlin.math.min
 import kotlin.math.roundToInt
 
 class HemicycleFrame(
-    headerBinding: Binding<String?>
+    headerBinding: Binding<String?>,
+    rowsBinding: Binding<List<Int>>? = null,
+    dotsBinding: Binding<List<Dot>>,
+    leftSeatBarBinding: Binding<List<Bar>>? = null,
+    leftSeatBarLabelBinding: Binding<String>? = null,
+    rightSeatBarBinding: Binding<List<Bar>>? = null,
+    rightSeatBarLabelBinding: Binding<String>? = null,
+    middleSeatBarBinding: Binding<List<Bar>>? = null,
+    middleSeatBarLabelBinding: Binding<String>? = null,
+    leftChangeBarBinding: Binding<List<Bar>>? = null,
+    leftChangeBarStartBinding: Binding<Int>? = null,
+    leftChangeBarLabelBinding: Binding<String>? = null,
+    rightChangeBarBinding: Binding<List<Bar>>? = null,
+    rightChangeBarStartBinding: Binding<Int>? = null,
+    rightChangeBarLabelBinding: Binding<String>? = null
 ) : GraphicsFrame(
     headerBinding = headerBinding
 ) {
-    private var rowsBinding: Binding<List<Int>> = Binding.fixedBinding(emptyList())
-    private var dotsBinding: Binding<List<Dot>> = Binding.fixedBinding(emptyList())
-
-    private var leftSeatBarBinding: Binding<List<Bar>> = Binding.fixedBinding(emptyList())
-    private var leftSeatBarLabelBinding: Binding<String> = Binding.fixedBinding("")
-
-    private var rightSeatBarBinding: Binding<List<Bar>> = Binding.fixedBinding(emptyList())
-    private var rightSeatBarLabelBinding: Binding<String> = Binding.fixedBinding("")
-
-    private var middleSeatBarBinding: Binding<List<Bar>> = Binding.fixedBinding(emptyList())
-    private var middleSeatBarLabelBinding: Binding<String> = Binding.fixedBinding("")
-
-    private var leftChangeBarBinding: Binding<List<Bar>> = Binding.fixedBinding(emptyList())
-    private var leftChangeBarStartBinding: Binding<Int> = Binding.fixedBinding(0)
-    private var leftChangeBarLabelBinding: Binding<String> = Binding.fixedBinding("")
-
-    private var rightChangeBarBinding: Binding<List<Bar>> = Binding.fixedBinding(emptyList())
-    private var rightChangeBarStartBinding: Binding<Int> = Binding.fixedBinding(0)
-    private var rightChangeBarLabelBinding: Binding<String> = Binding.fixedBinding("")
-
     private val barsPanel = BarPanel()
     private val dotsPanel = DotsPanel()
 
@@ -85,15 +80,6 @@ class HemicycleFrame(
         return dotsPanel.rows[rowNum]
     }
 
-    fun setRowsBinding(rowsBinding: Binding<List<Int>>) {
-        this.rowsBinding.unbind()
-        this.rowsBinding = rowsBinding
-        this.rowsBinding.bind { r ->
-            dotsPanel.rows = r
-            dotsPanel.repaint()
-        }
-    }
-
     internal val numDots: Int
         get() = dotsPanel.dots.size
 
@@ -103,15 +89,6 @@ class HemicycleFrame(
 
     internal fun getDotBorder(dotNum: Int): Color? {
         return dotsPanel.dots[dotNum].border
-    }
-
-    fun setDotsBinding(dotsBinding: Binding<List<Dot>>) {
-        this.dotsBinding.unbind()
-        this.dotsBinding = dotsBinding
-        this.dotsBinding.bind { d ->
-            dotsPanel.dots = d
-            dotsPanel.repaint()
-        }
     }
 
     internal val leftSeatBarCount: Int
@@ -125,26 +102,8 @@ class HemicycleFrame(
         return barsPanel.leftSeatBars[idx].size
     }
 
-    fun setLeftSeatBarBinding(leftSeatBarBinding: Binding<List<Bar>>) {
-        this.leftSeatBarBinding.unbind()
-        this.leftSeatBarBinding = leftSeatBarBinding
-        this.leftSeatBarBinding.bind { b ->
-            barsPanel.leftSeatBars = b
-            barsPanel.repaint()
-        }
-    }
-
     internal fun getLeftSeatBarLabel(): String {
         return barsPanel.leftSeatBarLabel
-    }
-
-    fun setLeftSeatBarLabelBinding(leftSeatBarLabelBinding: Binding<String>) {
-        this.leftSeatBarLabelBinding.unbind()
-        this.leftSeatBarLabelBinding = leftSeatBarLabelBinding
-        this.leftSeatBarLabelBinding.bind { label ->
-            barsPanel.leftSeatBarLabel = label
-            barsPanel.repaint()
-        }
     }
 
     internal val rightSeatBarCount: Int
@@ -158,26 +117,8 @@ class HemicycleFrame(
         return barsPanel.rightSeatBars[idx].size
     }
 
-    fun setRightSeatBarBinding(rightSeatBarBinding: Binding<List<Bar>>) {
-        this.rightSeatBarBinding.unbind()
-        this.rightSeatBarBinding = rightSeatBarBinding
-        this.rightSeatBarBinding.bind { b ->
-            barsPanel.rightSeatBars = b
-            barsPanel.repaint()
-        }
-    }
-
     internal fun getRightSeatBarLabel(): String {
         return barsPanel.rightSeatBarLabel
-    }
-
-    fun setRightSeatBarLabelBinding(rightSeatBarLabelBinding: Binding<String>) {
-        this.rightSeatBarLabelBinding.unbind()
-        this.rightSeatBarLabelBinding = rightSeatBarLabelBinding
-        this.rightSeatBarLabelBinding.bind { label ->
-            barsPanel.rightSeatBarLabel = label
-            barsPanel.repaint()
-        }
     }
 
     internal val middleSeatBarCount: Int
@@ -191,26 +132,8 @@ class HemicycleFrame(
         return barsPanel.middleSeatBars[idx].size
     }
 
-    fun setMiddleSeatBarBinding(middleSeatBarBinding: Binding<List<Bar>>) {
-        this.middleSeatBarBinding.unbind()
-        this.middleSeatBarBinding = middleSeatBarBinding
-        this.middleSeatBarBinding.bind { b ->
-            barsPanel.middleSeatBars = b
-            barsPanel.repaint()
-        }
-    }
-
     internal fun getMiddleSeatBarLabel(): String {
         return barsPanel.middleSeatBarLabel
-    }
-
-    fun setMiddleSeatBarLabelBinding(middleSeatBarLabelBinding: Binding<String>) {
-        this.middleSeatBarLabelBinding.unbind()
-        this.middleSeatBarLabelBinding = middleSeatBarLabelBinding
-        this.middleSeatBarLabelBinding.bind { label ->
-            barsPanel.middleSeatBarLabel = label
-            barsPanel.repaint()
-        }
     }
 
     internal val leftChangeBarCount: Int
@@ -224,39 +147,12 @@ class HemicycleFrame(
         return barsPanel.leftChangeBars[idx].size
     }
 
-    fun setLeftChangeBarBinding(leftChangeBarBinding: Binding<List<Bar>>) {
-        this.leftChangeBarBinding.unbind()
-        this.leftChangeBarBinding = leftChangeBarBinding
-        this.leftChangeBarBinding.bind { b ->
-            barsPanel.leftChangeBars = b
-            barsPanel.repaint()
-        }
-    }
-
     internal fun getLeftChangeBarStart(): Int {
         return barsPanel.leftChangeBarStart
     }
 
-    fun setLeftChangeBarStartBinding(leftChangeBarStartBinding: Binding<Int>) {
-        this.leftChangeBarStartBinding.unbind()
-        this.leftChangeBarStartBinding = leftChangeBarStartBinding
-        this.leftChangeBarStartBinding.bind { start ->
-            barsPanel.leftChangeBarStart = start
-            barsPanel.repaint()
-        }
-    }
-
     internal fun getLeftChangeBarLabel(): String {
         return barsPanel.leftChangeBarLabel
-    }
-
-    fun setLeftChangeBarLabelBinding(leftChangeBarLabelBinding: Binding<String>) {
-        this.leftChangeBarLabelBinding.unbind()
-        this.leftChangeBarLabelBinding = leftChangeBarLabelBinding
-        this.leftChangeBarLabelBinding.bind { label ->
-            barsPanel.leftChangeBarLabel = label
-            barsPanel.repaint()
-        }
     }
 
     internal val rightChangeBarCount: Int
@@ -270,39 +166,12 @@ class HemicycleFrame(
         return barsPanel.rightChangeBars[idx].size
     }
 
-    fun setRightChangeBarBinding(rightChangeBarBinding: Binding<List<Bar>>) {
-        this.rightChangeBarBinding.unbind()
-        this.rightChangeBarBinding = rightChangeBarBinding
-        this.rightChangeBarBinding.bind { b ->
-            barsPanel.rightChangeBars = b
-            barsPanel.repaint()
-        }
-    }
-
     internal fun getRightChangeBarStart(): Int {
         return barsPanel.rightChangeBarStart
     }
 
-    fun setRightChangeBarStartBinding(rightChangeBarStartBinding: Binding<Int>) {
-        this.rightChangeBarStartBinding.unbind()
-        this.rightChangeBarStartBinding = rightChangeBarStartBinding
-        this.rightChangeBarStartBinding.bind { start ->
-            barsPanel.rightChangeBarStart = start
-            barsPanel.repaint()
-        }
-    }
-
     internal fun getRightChangeBarLabel(): String {
         return barsPanel.rightChangeBarLabel
-    }
-
-    fun setRightChangeBarLabelBinding(rightChangeBarLabelBinding: Binding<String>) {
-        this.rightChangeBarLabelBinding.unbind()
-        this.rightChangeBarLabelBinding = rightChangeBarLabelBinding
-        this.rightChangeBarLabelBinding.bind { label ->
-            barsPanel.rightChangeBarLabel = label
-            barsPanel.repaint()
-        }
     }
 
     class Bar(val color: Color, val size: Int)
@@ -645,5 +514,63 @@ class HemicycleFrame(
         panel.layout = Layout()
         panel.add(barsPanel)
         panel.add(dotsPanel)
+
+        val dotsReceiver = BindingReceiver(dotsBinding)
+        (rowsBinding ?: dotsReceiver.getBinding { d -> listOf(d.size) }).bind { r ->
+            dotsPanel.rows = r
+            dotsPanel.repaint()
+        }
+        dotsReceiver.getBinding().bind { d ->
+            dotsPanel.dots = d
+            dotsPanel.repaint()
+        }
+        (leftSeatBarBinding ?: Binding.fixedBinding(emptyList())).bind { b ->
+            barsPanel.leftSeatBars = b
+            barsPanel.repaint()
+        }
+        (leftSeatBarLabelBinding ?: Binding.fixedBinding("")).bind { label ->
+            barsPanel.leftSeatBarLabel = label
+            barsPanel.repaint()
+        }
+        (rightSeatBarBinding ?: Binding.fixedBinding(emptyList())).bind { b ->
+            barsPanel.rightSeatBars = b
+            barsPanel.repaint()
+        }
+        (rightSeatBarLabelBinding ?: Binding.fixedBinding("")).bind { label ->
+            barsPanel.rightSeatBarLabel = label
+            barsPanel.repaint()
+        }
+        (middleSeatBarBinding ?: Binding.fixedBinding(emptyList())).bind { b ->
+            barsPanel.middleSeatBars = b
+            barsPanel.repaint()
+        }
+        (middleSeatBarLabelBinding ?: Binding.fixedBinding("")).bind { label ->
+            barsPanel.middleSeatBarLabel = label
+            barsPanel.repaint()
+        }
+        (leftChangeBarBinding ?: Binding.fixedBinding(emptyList())).bind { b ->
+            barsPanel.leftChangeBars = b
+            barsPanel.repaint()
+        }
+        (leftChangeBarStartBinding ?: Binding.fixedBinding(0)).bind { start ->
+            barsPanel.leftChangeBarStart = start
+            barsPanel.repaint()
+        }
+        (leftChangeBarLabelBinding ?: Binding.fixedBinding("")).bind { label ->
+            barsPanel.leftChangeBarLabel = label
+            barsPanel.repaint()
+        }
+        (rightChangeBarBinding ?: Binding.fixedBinding(emptyList())).bind { b ->
+            barsPanel.rightChangeBars = b
+            barsPanel.repaint()
+        }
+        (rightChangeBarStartBinding ?: Binding.fixedBinding(0)).bind { start ->
+            barsPanel.rightChangeBarStart = start
+            barsPanel.repaint()
+        }
+        (rightChangeBarLabelBinding ?: Binding.fixedBinding("")).bind { label ->
+            barsPanel.rightChangeBarLabel = label
+            barsPanel.repaint()
+        }
     }
 }

@@ -129,15 +129,13 @@ class PartySummaryScreen private constructor(
                 SinglePartyInput.Property.PARTY
             )
             val values = seatBinding.merge(voteBinding) { s, v -> listOf(s, v) }
-            val frame = RegionSummaryFrame(
+            return RegionSummaryFrame(
                 headerBinding = titleFunc(region),
-                borderColorBinding = party.getBinding(Party::color)
+                summaryColorBinding = party.getBinding { it.color },
+                sectionsBinding = values.map { value ->
+                    value.zip(listOf("SEATS", "POPULAR VOTE")) { v, h -> RegionSummaryFrame.SectionWithoutColor(h, v) }
+                }
             )
-            frame.setSummaryColorBinding(party.getBinding(Party::color))
-            frame.setSectionsBindingWithoutColors(values.map { value ->
-                value.zip(listOf("SEATS", "POPULAR VOTE")) { v, h -> RegionSummaryFrame.SectionWithoutColor(h, v) }
-            })
-            return frame
         }
     }
 

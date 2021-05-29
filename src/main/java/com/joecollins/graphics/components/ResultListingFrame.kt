@@ -17,6 +17,9 @@ import kotlin.math.ceil
 
 class ResultListingFrame(
     headerBinding: Binding<String?>,
+    numRowsBinding: Binding<Int>,
+    itemsBinding: Binding<List<Item>>,
+    reversedBinding: Binding<Boolean>? = null,
     borderColorBinding: Binding<Color>? = null,
     headerAlignmentBinding: Binding<Alignment>? = null
 ) : GraphicsFrame(
@@ -30,34 +33,38 @@ class ResultListingFrame(
 
     class Item(val text: String, val foreground: Color, val background: Color, val border: Color)
 
-    private var numRowsBinding: Binding<Int> = Binding.fixedBinding(0)
-    private var reversedBinding: Binding<Boolean> = Binding.fixedBinding(false)
-    private var itemsBinding: Binding<List<Item>> = Binding.fixedBinding(emptyList())
-
     init {
         centralPanel.background = Color.WHITE
         centralPanel.layout = layout
         add(centralPanel, BorderLayout.CENTER)
+
+        numRowsBinding.bind { layout.numRows = it }
+        (reversedBinding ?: Binding.fixedBinding(false)).bind { layout.reversed = it }
+        itemsBinding.bind { i ->
+            while (i.size > items.size) {
+                val item = ItemPanel()
+                items.add(item)
+                centralPanel.add(item)
+            }
+            while (i.size < items.size) {
+                centralPanel.remove(items.removeAt(i.size))
+            }
+            i.forEachIndexed { idx, item ->
+                items[idx].text = item.text
+                items[idx].foreground = item.foreground
+                items[idx].background = item.background
+                items[idx].borderColor = item.border
+            }
+            repaint()
+        }
     }
 
     internal fun getNumRows(): Int {
         return layout.numRows
     }
 
-    fun setNumRowsBinding(numRowsBinding: Binding<Int>) {
-        this.numRowsBinding.unbind()
-        this.numRowsBinding = numRowsBinding
-        this.numRowsBinding.bind { layout.numRows = it }
-    }
-
     internal fun isReversed(): Boolean {
         return layout.reversed
-    }
-
-    fun setReversedBinding(reversedBinding: Binding<Boolean>) {
-        this.reversedBinding.unbind()
-        this.reversedBinding = reversedBinding
-        this.reversedBinding.bind { layout.reversed = it }
     }
 
     internal fun getNumItems(): Int {
@@ -78,28 +85,6 @@ class ResultListingFrame(
 
     internal fun getBorder(index: Int): Color {
         return items[index].borderColor
-    }
-
-    fun setItemsBinding(itemsBinding: Binding<List<Item>>) {
-        this.itemsBinding.unbind()
-        this.itemsBinding = itemsBinding
-        this.itemsBinding.bind { i ->
-            while (i.size > items.size) {
-                val item = ItemPanel()
-                items.add(item)
-                centralPanel.add(item)
-            }
-            while (i.size < items.size) {
-                centralPanel.remove(items.removeAt(i.size))
-            }
-            i.forEachIndexed { idx, item ->
-                items[idx].text = item.text
-                items[idx].foreground = item.foreground
-                items[idx].background = item.background
-                items[idx].borderColor = item.border
-            }
-            repaint()
-        }
     }
 
     private inner class ItemPanel : JPanel() {

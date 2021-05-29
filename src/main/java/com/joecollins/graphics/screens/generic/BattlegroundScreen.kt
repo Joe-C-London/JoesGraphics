@@ -82,18 +82,18 @@ class BattlegroundScreen private constructor(
             val defenseFrame = ResultListingFrame(
                 headerBinding = party.getBinding { p: Party -> "$p DEFENSE SEATS" },
                 borderColorBinding = party.getBinding(Party::color),
-                headerAlignmentBinding = Binding.fixedBinding(GraphicsFrame.Alignment.RIGHT)
+                headerAlignmentBinding = Binding.fixedBinding(GraphicsFrame.Alignment.RIGHT),
+                numRowsBinding = numRows.getBinding(),
+                itemsBinding = defenseItems.mapElements {
+                    ResultListingFrame.Item(
+                        text = nameFunc(it.key),
+                        border = it.prevColor,
+                        background = (if (it.fill) it.resultColor else Color.WHITE),
+                        foreground = (if (!it.fill) it.resultColor else Color.WHITE)
+                    )
+                },
+                reversedBinding = Binding.fixedBinding(true)
             )
-            defenseFrame.setReversedBinding(Binding.fixedBinding(true))
-            defenseFrame.setNumRowsBinding(numRows.getBinding())
-            defenseFrame.setItemsBinding(defenseItems.mapElements {
-                ResultListingFrame.Item(
-                    text = nameFunc(it.key),
-                    border = it.prevColor,
-                    background = (if (it.fill) it.resultColor else Color.WHITE),
-                    foreground = (if (!it.fill) it.resultColor else Color.WHITE)
-                )
-            })
 
             val targetInput = BattlegroundInput<T>()
             prevResults.getBinding().bind { targetInput.setPrev(it) }
@@ -106,19 +106,18 @@ class BattlegroundScreen private constructor(
             val targetFrame = ResultListingFrame(
                 headerBinding = party.getBinding<String?> { p: Party -> "$p TARGET SEATS" },
                 borderColorBinding = party.getBinding(Party::color),
-                headerAlignmentBinding = Binding.fixedBinding(GraphicsFrame.Alignment.LEFT)
+                headerAlignmentBinding = Binding.fixedBinding(GraphicsFrame.Alignment.LEFT),
+                numRowsBinding = numRows.getBinding(),
+                itemsBinding = targetItems.mapElements {
+                    ResultListingFrame.Item(
+                        text = nameFunc(it.key),
+                        border = it.prevColor,
+                        background = (if (it.fill) it.resultColor else Color.WHITE),
+                        foreground = (if (!it.fill) it.resultColor else Color.WHITE)
+                    )
+                },
+                reversedBinding = Binding.fixedBinding(false)
             )
-            targetFrame.setReversedBinding(Binding.fixedBinding(false))
-            targetFrame.setNumRowsBinding(numRows.getBinding())
-            targetFrame.setNumRowsBinding(numRows.getBinding())
-            targetFrame.setItemsBinding(targetItems.mapElements {
-                ResultListingFrame.Item(
-                    text = nameFunc(it.key),
-                    border = it.prevColor,
-                    background = (if (it.fill) it.resultColor else Color.WHITE),
-                    foreground = (if (!it.fill) it.resultColor else Color.WHITE)
-                )
-            })
 
             return BattlegroundScreen(
                     headerLabel,

@@ -445,12 +445,12 @@ class MultiResultScreen private constructor() : JPanel() {
             }
             if (hasMap) {
                 mapFrame = MapFrame(
-                    headerBinding = mapHeader.binding
+                    headerBinding = mapHeader.binding,
+                    shapesBinding = mapShape.binding,
+                    focusBoxBinding = mapFocus.binding.map { it.asSequence()
+                        .map { obj: Shape -> obj.bounds2D }
+                        .reduceOrNull { agg, r -> agg.createUnion(r) } }
                 )
-                mapFrame!!.setShapesBinding(mapShape.binding)
-                mapFrame!!.setFocusBoxBinding(mapFocus.binding.map { it.asSequence()
-                    .map { obj: Shape -> obj.bounds2D }
-                    .reduceOrNull { agg, r -> agg.createUnion(r) } })
                 add(mapFrame)
             }
         }

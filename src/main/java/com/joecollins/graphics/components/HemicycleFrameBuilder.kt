@@ -98,24 +98,23 @@ class HemicycleFrameBuilder {
     }
 
     fun build(): HemicycleFrame {
-        val hemicycleFrame = HemicycleFrame(
-            headerBinding = headerBinding ?: Binding.fixedBinding(null)
+        return HemicycleFrame(
+            headerBinding = headerBinding ?: Binding.fixedBinding(null),
+            rowsBinding = rowsBinding,
+            dotsBinding = dotsBinding ?: Binding.fixedBinding(emptyList()),
+            leftSeatBarBinding = leftSeatBarBinding,
+            leftSeatBarLabelBinding = leftSeatBarLabelBinding,
+            rightSeatBarBinding = rightSeatBarBinding,
+            rightSeatBarLabelBinding = rightSeatBarLabelBinding,
+            middleSeatBarBinding = middleSeatBarBinding,
+            middleSeatBarLabelBinding = middleSeatBarLabelBinding,
+            leftChangeBarBinding = leftChangeBarBinding,
+            leftChangeBarStartBinding = leftChangeBarStartBinding,
+            leftChangeBarLabelBinding = leftChangeBarLabelBinding,
+            rightChangeBarBinding = rightChangeBarBinding,
+            rightChangeBarStartBinding = rightChangeBarStartBinding,
+            rightChangeBarLabelBinding = rightChangeBarLabelBinding
         )
-        leftSeatBarBinding?.let { hemicycleFrame.setLeftSeatBarBinding(it) }
-        leftSeatBarLabelBinding?.let { hemicycleFrame.setLeftSeatBarLabelBinding(it) }
-        rightSeatBarBinding?.let { hemicycleFrame.setRightSeatBarBinding(it) }
-        rightSeatBarLabelBinding?.let { hemicycleFrame.setRightSeatBarLabelBinding(it) }
-        middleSeatBarBinding?.let { hemicycleFrame.setMiddleSeatBarBinding(it) }
-        middleSeatBarLabelBinding?.let { hemicycleFrame.setMiddleSeatBarLabelBinding(it) }
-        leftChangeBarBinding?.let { hemicycleFrame.setLeftChangeBarBinding(it) }
-        leftChangeBarStartBinding?.let { hemicycleFrame.setLeftChangeBarStartBinding(it) }
-        leftChangeBarLabelBinding?.let { hemicycleFrame.setLeftChangeBarLabelBinding(it) }
-        rightChangeBarBinding?.let { hemicycleFrame.setRightChangeBarBinding(it) }
-        rightChangeBarStartBinding?.let { hemicycleFrame.setRightChangeBarStartBinding(it) }
-        rightChangeBarLabelBinding?.let { hemicycleFrame.setRightChangeBarLabelBinding(it) }
-        rowsBinding?.let { hemicycleFrame.setRowsBinding(it) }
-        dotsBinding?.let { hemicycleFrame.setDotsBinding(it) }
-        return hemicycleFrame
     }
 
     class Result(val winner: Party?, val hasWon: Boolean)

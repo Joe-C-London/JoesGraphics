@@ -15,18 +15,17 @@ import javax.swing.border.EmptyBorder
 
 class ProjectionFrame(
     headerBinding: Binding<String?>,
-    borderColorBinding: Binding<Color>? = null
+    imageBinding: Binding<Image?>,
+    backColorBinding: Binding<Color>,
+    borderColorBinding: Binding<Color>,
+    footerTextBinding: Binding<String?>,
+    imageAlignmentBinding: Binding<Alignment>? = null
 ) : GraphicsFrame(
     headerBinding = headerBinding,
     borderColorBinding = borderColorBinding
 ) {
 
     enum class Alignment { BOTTOM, MIDDLE }
-
-    private var imageBinding: Binding<Image?> = Binding.fixedBinding(null)
-    private var colorBinding: Binding<Color> = Binding.fixedBinding(Color.WHITE)
-    private var textBinding: Binding<String?> = Binding.fixedBinding(null)
-    private var imageAlignmentBinding: Binding<Alignment> = Binding.fixedBinding(Alignment.BOTTOM)
 
     private val imagePanel: ImagePanel = ImagePanel()
     private val footerPanel = JPanel()
@@ -47,49 +46,30 @@ class ProjectionFrame(
         footerLabel.foreground = Color.WHITE
         footerLabel.horizontalAlignment = JLabel.CENTER
         footerLabel.border = EmptyBorder(15, 0, -15, 0)
+
+        imageBinding.bind { imagePanel.image = it }
+        backColorBinding.bind { footerPanel.background = it }
+        footerTextBinding.bind {
+            footerLabel.text = it
+            footerLabel.isVisible = it != null
+        }
+        (imageAlignmentBinding ?: Binding.fixedBinding(Alignment.BOTTOM)).bind { imagePanel.alignment = it }
     }
 
     internal fun getImage(): Image? {
         return imagePanel.image
     }
 
-    fun setImageBinding(imageBinding: Binding<Image?>) {
-        this.imageBinding.unbind()
-        this.imageBinding = imageBinding
-        this.imageBinding.bind { imagePanel.image = it }
-    }
-
     internal fun getBackColor(): Color {
         return footerPanel.background
-    }
-
-    fun setBackColorBinding(colorBinding: Binding<Color>) {
-        this.colorBinding.unbind()
-        this.colorBinding = colorBinding
-        this.colorBinding.bind { footerPanel.background = it }
     }
 
     internal fun getFooterText(): String? {
         return if (footerLabel.isVisible) footerLabel.text else null
     }
 
-    fun setFooterTextBinding(textBinding: Binding<String?>) {
-        this.textBinding.unbind()
-        this.textBinding = textBinding
-        this.textBinding.bind {
-            footerLabel.text = it
-            footerLabel.isVisible = it != null
-        }
-    }
-
     internal fun getImageAlignment(): Alignment {
         return imagePanel.alignment
-    }
-
-    fun setImageAlignmentBinding(imageAlignmentBinding: Binding<Alignment>) {
-        this.imageAlignmentBinding.unbind()
-        this.imageAlignmentBinding = imageAlignmentBinding
-        this.imageAlignmentBinding.bind { imagePanel.alignment = it }
     }
 
     private inner class ImagePanel : JPanel() {

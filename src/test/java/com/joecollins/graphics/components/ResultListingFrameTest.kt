@@ -15,9 +15,10 @@ class ResultListingFrameTest {
     @Test
     fun testNumRows() {
         val frame = ResultListingFrame(
-            headerBinding = fixedBinding(null)
+            headerBinding = fixedBinding(null),
+            numRowsBinding = fixedBinding(20),
+            itemsBinding = fixedBinding(emptyList())
         )
-        frame.setNumRowsBinding(fixedBinding(20))
         Assert.assertEquals(20, frame.getNumRows().toLong())
     }
 
@@ -34,10 +35,9 @@ class ResultListingFrameTest {
         rawItems.add(Item("KENSINGTON-MALPEQUE", Color.WHITE, Color.BLACK, Color.BLUE))
         val items: BindableWrapper<List<Item>> = BindableWrapper(rawItems)
         val frame = ResultListingFrame(
-            headerBinding = fixedBinding(null)
-        )
-        frame.setItemsBinding(
-            items.binding.mapElements {
+            headerBinding = fixedBinding(null),
+            numRowsBinding = fixedBinding(20),
+            itemsBinding = items.binding.mapElements {
                 ResultListingFrame.Item(
                     text = it.text,
                     border = it.border,
@@ -77,11 +77,9 @@ class ResultListingFrameTest {
         val items: BindableWrapper<List<Item>> = BindableWrapper(rawItems)
         val frame = ResultListingFrame(
             headerBinding = fixedBinding("PC TARGETS"),
-            borderColorBinding = fixedBinding(Color.BLUE)
-        )
-        frame.setNumRowsBinding(fixedBinding(10))
-        frame.setItemsBinding(
-            items.binding.mapElements {
+            borderColorBinding = fixedBinding(Color.BLUE),
+            numRowsBinding = fixedBinding(10),
+            itemsBinding = items.binding.mapElements {
                 ResultListingFrame.Item(
                     text = it.text.toUpperCase(),
                     border = it.border,
@@ -112,11 +110,9 @@ class ResultListingFrameTest {
         val rawItems: MutableList<Item> = ArrayList()
         val items: BindableWrapper<List<Item>> = BindableWrapper(rawItems)
         val frame = ResultListingFrame(
-            headerBinding = fixedBinding("SEATS CHANGING")
-        )
-        frame.setNumRowsBinding(fixedBinding(10))
-        frame.setItemsBinding(
-            items.binding.mapElements {
+            headerBinding = fixedBinding("SEATS CHANGING"),
+            numRowsBinding = fixedBinding(10),
+            itemsBinding = items.binding.mapElements {
                 ResultListingFrame.Item(
                     text = it.text.toUpperCase(),
                     border = it.border,
@@ -154,14 +150,12 @@ class ResultListingFrameTest {
         val rawItems: MutableList<Item> = ArrayList()
         val items: BindableWrapper<List<Item>> = BindableWrapper(rawItems)
         val frame = ResultListingFrame(
-            headerBinding = fixedBinding("SEATS CHANGING")
-        )
-        frame.setNumRowsBinding(fixedBinding(10))
-        frame.setReversedBinding(fixedBinding(true))
-        frame.setItemsBinding(
-            items.binding.mapElements {
+            headerBinding = fixedBinding("SEATS CHANGING"),
+            numRowsBinding = fixedBinding(10),
+            reversedBinding = fixedBinding(true),
+            itemsBinding = items.binding.mapElements {
                 ResultListingFrame.Item(
-                    text = it.text.toUpperCase(),
+                    text = it.text.uppercase(),
                     border = it.border,
                     background = it.background,
                     foreground = it.foreground

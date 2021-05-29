@@ -1,6 +1,5 @@
 package com.joecollins.graphics.components
 
-import com.joecollins.bindings.Binding
 import com.joecollins.bindings.Binding.Companion.fixedBinding
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import java.awt.Color
@@ -13,10 +12,8 @@ class RegionSummaryFrameTest {
     @Test
     fun testEntriesDifferentColors() {
         val frame = RegionSummaryFrame(
-            headerBinding = fixedBinding("")
-        )
-        frame.setSectionsBinding(
-            Binding.fixedBinding(
+            headerBinding = fixedBinding(""),
+            sectionsBinding = fixedBinding(
                 listOf(
                     RegionSummaryFrame.Section("ELECTORAL VOTES", listOf(
                         Pair(Color.BLUE, "306"),
@@ -39,11 +36,9 @@ class RegionSummaryFrameTest {
     @Test
     fun testEntriesSameColor() {
         val frame = RegionSummaryFrame(
-            headerBinding = fixedBinding("")
-        )
-        frame.setSummaryColorBinding(fixedBinding(Color.BLUE))
-        frame.setSectionsBindingWithoutColors(
-            Binding.fixedBinding(
+            headerBinding = fixedBinding(""),
+            summaryColorBinding = fixedBinding(Color.BLUE),
+            sectionsBinding = fixedBinding(
                 listOf(
                     RegionSummaryFrame.SectionWithoutColor("ELECTORAL VOTES", listOf("306", "+74")),
                     RegionSummaryFrame.SectionWithoutColor("POPULAR VOTE", listOf("51.1%", "+1.0%"))
@@ -61,10 +56,8 @@ class RegionSummaryFrameTest {
     @Throws(IOException::class)
     fun testRenderDifferentColors() {
         val frame = RegionSummaryFrame(
-            headerBinding = fixedBinding("UNITED STATES")
-        )
-        frame.setSectionsBinding(
-            Binding.fixedBinding(
+            headerBinding = fixedBinding("UNITED STATES"),
+            sectionsBinding = fixedBinding(
                 listOf(
                     RegionSummaryFrame.Section("ELECTORAL VOTES", listOf(
                         Pair(Color.BLUE, "306"),
@@ -86,11 +79,8 @@ class RegionSummaryFrameTest {
     fun testRenderSameColor() {
         val frame = RegionSummaryFrame(
             headerBinding = fixedBinding("USA"),
-            borderColorBinding = fixedBinding(Color.BLUE)
-        )
-        frame.setSummaryColorBinding(fixedBinding(Color.BLUE))
-        frame.setSectionsBindingWithoutColors(
-            Binding.fixedBinding(
+            summaryColorBinding = fixedBinding(Color.BLUE),
+            sectionsBinding = fixedBinding(
                 listOf(
                     RegionSummaryFrame.SectionWithoutColor("ELECTORAL VOTES", listOf("306", "+74")),
                     RegionSummaryFrame.SectionWithoutColor("POPULAR VOTE", listOf("51.1%", "+1.0%"))

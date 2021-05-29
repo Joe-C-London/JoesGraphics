@@ -18,11 +18,11 @@ class CountdownFrameTest {
     @Test
     fun testTimeRemaining() {
         val frame = CountdownFrame(
-            headerBinding = fixedBinding("")
+            headerBinding = fixedBinding(""),
+            timeBinding = fixedBinding(ZonedDateTime.of(2020, 7, 5, 19, 0, 0, 0, ZoneId.of("US/Eastern"))),
+            labelFunc = { CountdownFrame.formatDDHHMMSS(it) }
         )
         frame.clock = Clock.fixed(Instant.parse("2020-07-04T12:34:56Z"), ZoneId.of("UTC"))
-        frame.setTimeBinding(
-                fixedBinding(ZonedDateTime.of(2020, 7, 5, 19, 0, 0, 0, ZoneId.of("US/Eastern"))))
         Assert.assertEquals(
                 Duration.ofDays(1).plusHours(10).plusMinutes(25).plusSeconds(4), frame.getTimeRemaining())
     }
@@ -30,16 +30,11 @@ class CountdownFrameTest {
     @Test
     fun testTimeDisplay() {
         val frame = CountdownFrame(
-            headerBinding = fixedBinding("")
+            headerBinding = fixedBinding(""),
+            timeBinding = fixedBinding(ZonedDateTime.of(2020, 7, 5, 19, 0, 0, 0, ZoneId.of("US/Eastern"))),
+            labelFunc = { CountdownFrame.formatMMSS(it) }
         )
         frame.clock = Clock.fixed(Instant.parse("2020-07-04T12:34:56Z"), ZoneId.of("UTC"))
-        frame.setTimeBinding(
-                fixedBinding(ZonedDateTime.of(2020, 7, 5, 19, 0, 0, 0, ZoneId.of("US/Eastern"))))
-        frame.setLabelFunction { CountdownFrame.formatDDHHMMSS(it) }
-        Assert.assertEquals("1:10:25:04", frame.getTimeRemainingString())
-        frame.setLabelFunction { CountdownFrame.formatHHMMSS(it) }
-        Assert.assertEquals("34:25:04", frame.getTimeRemainingString())
-        frame.setLabelFunction { CountdownFrame.formatMMSS(it) }
         Assert.assertEquals("2065:04", frame.getTimeRemainingString())
     }
 
@@ -47,12 +42,11 @@ class CountdownFrameTest {
     @Throws(InterruptedException::class)
     fun testCountdown() {
         val frame = CountdownFrame(
-            headerBinding = fixedBinding("")
+            headerBinding = fixedBinding(""),
+            timeBinding = fixedBinding(ZonedDateTime.of(2020, 7, 5, 19, 0, 0, 0, ZoneId.of("US/Eastern"))),
+            labelFunc = { CountdownFrame.formatDDHHMMSS(it) }
         )
         frame.clock = Clock.fixed(Instant.parse("2020-07-04T12:34:56Z"), ZoneId.of("UTC"))
-        frame.setTimeBinding(
-                fixedBinding(ZonedDateTime.of(2020, 7, 5, 19, 0, 0, 0, ZoneId.of("US/Eastern"))))
-        frame.setLabelFunction { CountdownFrame.formatDDHHMMSS(it) }
         Assert.assertEquals("1:10:25:04", frame.getTimeRemainingString())
         frame.clock = Clock.fixed(Instant.parse("2020-07-04T12:34:57Z"), ZoneId.of("UTC"))
         Thread.sleep(200)
@@ -62,18 +56,22 @@ class CountdownFrameTest {
     @Test
     fun testAdditionalInfo() {
         val frame = CountdownFrame(
-            headerBinding = fixedBinding("")
+            headerBinding = fixedBinding(""),
+            timeBinding = fixedBinding(ZonedDateTime.of(2020, 7, 5, 19, 0, 0, 0, ZoneId.of("US/Eastern"))),
+            labelFunc = { CountdownFrame.formatDDHHMMSS(it) },
+            additionalInfoBinding = fixedBinding("ADDITIONAL INFO")
         )
-        frame.setAdditionalInfoBinding(fixedBinding("ADDITIONAL INFO"))
         Assert.assertEquals("ADDITIONAL INFO", frame.getAdditionalInfo())
     }
 
     @Test
     fun testCountdownColor() {
         val frame = CountdownFrame(
-            headerBinding = fixedBinding("")
+            headerBinding = fixedBinding(""),
+            timeBinding = fixedBinding(ZonedDateTime.of(2020, 7, 5, 19, 0, 0, 0, ZoneId.of("US/Eastern"))),
+            labelFunc = { CountdownFrame.formatDDHHMMSS(it) },
+            countdownColorBinding = fixedBinding(Color.RED)
         )
-        frame.setCountdownColorBinding(fixedBinding(Color.RED))
         Assert.assertEquals(Color.RED, frame.getCountdownColor())
     }
 
@@ -82,13 +80,12 @@ class CountdownFrameTest {
     fun testRenderWithoutAdditionalInfo() {
         val frame = CountdownFrame(
             headerBinding = fixedBinding("TRUMP TERM END"),
-            borderColorBinding = fixedBinding(Color.RED)
+            timeBinding = fixedBinding(ZonedDateTime.of(2021, 1, 20, 12, 0, 0, 0, ZoneId.of("US/Eastern"))),
+            labelFunc = { CountdownFrame.formatDDHHMMSS(it) },
+            borderColorBinding = fixedBinding(Color.RED),
+            countdownColorBinding = fixedBinding(Color.RED)
         )
         frame.clock = Clock.fixed(Instant.parse("2020-07-04T19:41:10Z"), ZoneId.of("UTC"))
-        frame.setTimeBinding(
-                fixedBinding(ZonedDateTime.of(2021, 1, 20, 12, 0, 0, 0, ZoneId.of("US/Eastern"))))
-        frame.setLabelFunction { CountdownFrame.formatDDHHMMSS(it) }
-        frame.setCountdownColorBinding(fixedBinding(Color.RED))
         frame.setSize(200, 100)
         compareRendering("CountdownFrame", "NoAdditionalInfo", frame)
     }
@@ -97,13 +94,12 @@ class CountdownFrameTest {
     @Throws(IOException::class)
     fun testRenderWithAdditionalInfo() {
         val frame = CountdownFrame(
-            headerBinding = fixedBinding("1ST POLLS CLOSE")
+            headerBinding = fixedBinding("1ST POLLS CLOSE"),
+            timeBinding = fixedBinding(ZonedDateTime.of(2020, 11, 3, 23, 0, 0, 0, ZoneId.of("UTC"))),
+            labelFunc = { CountdownFrame.formatDDHHMMSS(it) },
+            additionalInfoBinding = fixedBinding("IN/KY")
         )
         frame.clock = Clock.fixed(Instant.parse("2020-07-04T19:41:10Z"), ZoneId.of("UTC"))
-        frame.setTimeBinding(
-                fixedBinding(ZonedDateTime.of(2020, 11, 3, 23, 0, 0, 0, ZoneId.of("UTC"))))
-        frame.setLabelFunction { CountdownFrame.formatDDHHMMSS(it) }
-        frame.setAdditionalInfoBinding(fixedBinding("IN/KY"))
         frame.setSize(200, 100)
         compareRendering("CountdownFrame", "AdditionalInfo", frame)
     }

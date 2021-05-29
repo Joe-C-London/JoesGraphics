@@ -163,26 +163,26 @@ class BarFrameBuilder {
     }
 
     fun build(): BarFrame {
-        val barFrame = BarFrame(
-            headerBinding = headerBinding ?: Binding.fixedBinding(null),
-            notesBinding = notesBinding,
-            borderColorBinding = borderColorBinding
-        )
-        subheadBinding?.let { barFrame.setSubheadTextBinding(it) }
-        subheadColorBinding?.let { barFrame.setSubheadColorBinding(it) }
-        linesBinding?.let { barFrame.setLinesBinding(it) }
-        barFrame.setBarsBinding(
-            minBarCountBinding?.let { minBinding -> barsBinding.merge(minBinding) { bars, min ->
+        val barsBinding = (minBarCountBinding?.let { minBinding ->
+            this.barsBinding.merge(minBinding) { bars, min ->
                 if (bars.size >= min) bars
                 else sequenceOf(bars, MutableList(min - bars.size) { BarFrame.Bar("", "", emptyList()) })
                     .flatten()
                     .toList()
-            } }
-                ?: barsBinding
+            }
+        }
+            ?: this.barsBinding)
+        return BarFrame(
+            headerBinding = headerBinding ?: Binding.fixedBinding(null),
+            subheadTextBinding = subheadBinding,
+            subheadColorBinding = subheadColorBinding,
+            notesBinding = notesBinding,
+            borderColorBinding = borderColorBinding,
+            barsBinding = barsBinding,
+            linesBinding = linesBinding,
+            minBinding = minBinding,
+            maxBinding = maxBinding
         )
-        minBinding?.let { barFrame.setMinBinding(it) }
-        maxBinding?.let { barFrame.setMaxBinding(it) }
-        return barFrame
     }
 
     companion object {

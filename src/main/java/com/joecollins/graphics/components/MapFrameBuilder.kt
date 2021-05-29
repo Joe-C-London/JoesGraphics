@@ -12,6 +12,7 @@ class MapFrameBuilder {
     private var headerBinding: Binding<String?>? = null
     private var notesBinding: Binding<String?>? = null
     private var borderColorBinding: Binding<Color>? = null
+    private var outlineBinding: Binding<List<Shape>>? = null
     private var shapesBinding: Binding<List<Pair<Shape, Color>>>? = null
 
     fun withFocus(focusBinding: Binding<List<Shape>?>): MapFrameBuilder {
@@ -42,15 +43,20 @@ class MapFrameBuilder {
         return this
     }
 
+    fun withOutline(outlineBinding: Binding<List<Shape>>): MapFrameBuilder {
+        this.outlineBinding = outlineBinding
+        return this
+    }
+
     fun build(): MapFrame {
-        val mapFrame = MapFrame(
+        return MapFrame(
             headerBinding = headerBinding ?: Binding.fixedBinding(null),
+            shapesBinding = shapesBinding ?: Binding.fixedBinding(emptyList()),
+            focusBoxBinding = focusBoxBinding,
             notesBinding = notesBinding,
-            borderColorBinding = borderColorBinding
+            borderColorBinding = borderColorBinding,
+            outlineShapesBinding = outlineBinding
         )
-        focusBoxBinding?.let { mapFrame.setFocusBoxBinding(it) }
-        shapesBinding?.let { mapFrame.setShapesBinding(it) }
-        return mapFrame
     }
 
     companion object {

@@ -16,7 +16,8 @@ import javax.swing.border.EmptyBorder
 import javax.swing.border.MatteBorder
 
 class FiguresFrame(
-    headerBinding: Binding<String?>
+    headerBinding: Binding<String?>,
+    entriesBinding: Binding<List<Entry>>
 ) : GraphicsFrame(
     headerBinding = headerBinding
 ) {
@@ -29,31 +30,8 @@ class FiguresFrame(
         val resultColor: Color
     )
 
-    private var entriesBinding: Binding<List<Entry>> = Binding.fixedBinding(emptyList())
     private val centralPanel: JPanel = JPanel()
     private val entries: MutableList<EntryPanel> = ArrayList()
-
-    fun setEntriesBinding(entriesBinding: Binding<List<Entry>>) {
-        this.entriesBinding.unbind()
-        this.entriesBinding = entriesBinding
-        this.entriesBinding.bind { e ->
-            while (entries.size < e.size) {
-                val entry = EntryPanel()
-                centralPanel.add(entry)
-                entries.add(entry)
-            }
-            while (entries.size > e.size) {
-                centralPanel.remove(entries.removeAt(e.size))
-            }
-            e.forEachIndexed { idx, entry ->
-                entries[idx].foreground = entry.color
-                entries[idx].nameLabel.text = entry.name
-                entries[idx].descriptionLabel.text = entry.description
-                entries[idx].resultLabel.text = entry.result
-                entries[idx].resultPanel.background = entry.resultColor
-            }
-        }
-    }
 
     internal val numEntries: Int
         get() = entries.size
@@ -167,5 +145,23 @@ class FiguresFrame(
         centralPanel.background = Color.WHITE
         centralPanel.layout = FrameLayout()
         add(centralPanel, BorderLayout.CENTER)
+
+        entriesBinding.bind { e ->
+            while (entries.size < e.size) {
+                val entry = EntryPanel()
+                centralPanel.add(entry)
+                entries.add(entry)
+            }
+            while (entries.size > e.size) {
+                centralPanel.remove(entries.removeAt(e.size))
+            }
+            e.forEachIndexed { idx, entry ->
+                entries[idx].foreground = entry.color
+                entries[idx].nameLabel.text = entry.name
+                entries[idx].descriptionLabel.text = entry.description
+                entries[idx].resultLabel.text = entry.result
+                entries[idx].resultPanel.background = entry.resultColor
+            }
+        }
     }
 }

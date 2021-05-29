@@ -51,17 +51,17 @@ class SeatsChangingScreen private constructor(title: JLabel, frame: ResultListin
             currResults.getBinding().bind { inputs.setCurrResults(it) }
             seatFilter.getBinding().bind { inputs.setSeatFilter(it) }
             val frame = ResultListingFrame(
-                headerBinding = header.getBinding()
+                headerBinding = header.getBinding(),
+                numRowsBinding = numRows.getBinding(),
+                itemsBinding = inputs.resultBinding.mapElements {
+                    ResultListingFrame.Item(
+                        text = nameFunc(it.key),
+                        border = it.prevColor,
+                        background = (if (it.fill) it.resultColor else Color.WHITE),
+                        foreground = (if (!it.fill) it.resultColor else Color.WHITE)
+                    )
+                }
             )
-            frame.setNumRowsBinding(numRows.getBinding())
-            frame.setItemsBinding(inputs.resultBinding.mapElements {
-                ResultListingFrame.Item(
-                    text = nameFunc(it.key),
-                    border = it.prevColor,
-                    background = (if (it.fill) it.resultColor else Color.WHITE),
-                    foreground = (if (!it.fill) it.resultColor else Color.WHITE)
-                )
-            })
             return SeatsChangingScreen(headerLabel, frame)
         }
     }

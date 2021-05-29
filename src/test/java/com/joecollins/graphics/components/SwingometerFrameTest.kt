@@ -15,10 +15,14 @@ class SwingometerFrameTest {
     @Test
     fun testColors() {
         val frame = SwingometerFrame(
-            headerBinding = fixedBinding(null)
+            headerBinding = fixedBinding(null),
+            valueBinding = fixedBinding(3),
+            rangeBinding = fixedBinding(10),
+            leftColorBinding = fixedBinding(Color.BLUE),
+            rightColorBinding = fixedBinding(Color.RED),
+            numBucketsPerSideBinding = fixedBinding(20),
+            dotsBinding = fixedBinding(emptyList())
         )
-        frame.setLeftColorBinding(fixedBinding(Color.BLUE))
-        frame.setRightColorBinding(fixedBinding(Color.RED))
         Assert.assertEquals(Color.BLUE, frame.leftColor)
         Assert.assertEquals(Color.RED, frame.rightColor)
     }
@@ -26,18 +30,28 @@ class SwingometerFrameTest {
     @Test
     fun testValue() {
         val frame = SwingometerFrame(
-            headerBinding = fixedBinding(null)
+            headerBinding = fixedBinding(null),
+            valueBinding = fixedBinding(3),
+            rangeBinding = fixedBinding(10),
+            leftColorBinding = fixedBinding(Color.BLUE),
+            rightColorBinding = fixedBinding(Color.RED),
+            numBucketsPerSideBinding = fixedBinding(20),
+            dotsBinding = fixedBinding(emptyList())
         )
-        frame.setValueBinding(fixedBinding(3))
         Assert.assertEquals(3, frame.value)
     }
 
     @Test
     fun testRange() {
         val frame = SwingometerFrame(
-            headerBinding = fixedBinding(null)
+            headerBinding = fixedBinding(null),
+            valueBinding = fixedBinding(3),
+            rangeBinding = fixedBinding(10),
+            leftColorBinding = fixedBinding(Color.BLUE),
+            rightColorBinding = fixedBinding(Color.RED),
+            numBucketsPerSideBinding = fixedBinding(20),
+            dotsBinding = fixedBinding(emptyList())
         )
-        frame.setRangeBinding(fixedBinding(10))
         Assert.assertEquals(10, frame.range)
     }
 
@@ -45,10 +59,14 @@ class SwingometerFrameTest {
     fun testTicks() {
         val ticks = (-10..10).toList()
         val frame = SwingometerFrame(
-            headerBinding = fixedBinding(null)
-        )
-        frame.setTicksBinding(
-            fixedBinding(
+            headerBinding = fixedBinding(null),
+            valueBinding = fixedBinding(3),
+            rangeBinding = fixedBinding(10),
+            leftColorBinding = fixedBinding(Color.BLUE),
+            rightColorBinding = fixedBinding(Color.RED),
+            numBucketsPerSideBinding = fixedBinding(20),
+            dotsBinding = fixedBinding(emptyList()),
+            ticksBinding = fixedBinding(
                 ticks.map { SwingometerFrame.Tick(it, abs(it).toString()) }
             )
         )
@@ -68,10 +86,16 @@ class SwingometerFrameTest {
     @Test
     fun testWinningPoint() {
         val frame = SwingometerFrame(
-            headerBinding = fixedBinding(null)
+            headerBinding = fixedBinding(null),
+            valueBinding = fixedBinding(3),
+            rangeBinding = fixedBinding(10),
+            leftColorBinding = fixedBinding(Color.BLUE),
+            rightColorBinding = fixedBinding(Color.RED),
+            leftToWinBinding = fixedBinding(3.0),
+            rightToWinBinding = fixedBinding(-2.0),
+            numBucketsPerSideBinding = fixedBinding(20),
+            dotsBinding = fixedBinding(emptyList())
         )
-        frame.setLeftToWinBinding(fixedBinding(3.0))
-        frame.setRightToWinBinding(fixedBinding(-2.0))
         Assert.assertEquals(3.0, frame.leftToWin)
         Assert.assertEquals(-2.0, frame.rightToWin)
     }
@@ -84,10 +108,14 @@ class SwingometerFrameTest {
             Triple(-5.0, "60", Color.BLUE)
         ))
         val frame = SwingometerFrame(
-            headerBinding = fixedBinding(null)
-        )
-        frame.setOuterLabelsBinding(
-            labels.mapElements { SwingometerFrame.OuterLabel(it.first, it.second, it.third) }
+            headerBinding = fixedBinding(null),
+            valueBinding = fixedBinding(3),
+            rangeBinding = fixedBinding(10),
+            leftColorBinding = fixedBinding(Color.BLUE),
+            rightColorBinding = fixedBinding(Color.RED),
+            numBucketsPerSideBinding = fixedBinding(20),
+            dotsBinding = fixedBinding(emptyList()),
+            outerLabelsBinding = labels.mapElements { SwingometerFrame.OuterLabel(it.first, it.second, it.third) }
         )
         Assert.assertEquals(3, frame.numOuterLabels.toLong())
         Assert.assertEquals(0.0, frame.getOuterLabelPosition(0))
@@ -103,10 +131,14 @@ class SwingometerFrameTest {
             Pair(2.4, Color.BLACK)
         ))
         val frame = SwingometerFrame(
-            headerBinding = fixedBinding(null)
+            headerBinding = fixedBinding(null),
+            valueBinding = fixedBinding(3),
+            rangeBinding = fixedBinding(10),
+            leftColorBinding = fixedBinding(Color.BLUE),
+            rightColorBinding = fixedBinding(Color.RED),
+            numBucketsPerSideBinding = fixedBinding(20),
+            dotsBinding = dots.mapElements { SwingometerFrame.Dot(it.first, it.second) }
         )
-        frame.setNumBucketsPerSideBinding(fixedBinding(20))
-        frame.setDotsBinding(dots.mapElements { SwingometerFrame.Dot(it.first, it.second) })
         Assert.assertEquals(20, frame.numBucketsPerSide.toLong())
         Assert.assertEquals(3, frame.numDots.toLong())
         Assert.assertEquals(0.3, frame.getDotPosition(0))
@@ -121,10 +153,14 @@ class SwingometerFrameTest {
             Triple(2.4, Color.BLACK, "C")
         ))
         val frame = SwingometerFrame(
-            headerBinding = fixedBinding(null)
+            headerBinding = fixedBinding(null),
+            valueBinding = fixedBinding(3),
+            rangeBinding = fixedBinding(10),
+            leftColorBinding = fixedBinding(Color.BLUE),
+            rightColorBinding = fixedBinding(Color.RED),
+            numBucketsPerSideBinding = fixedBinding(20),
+            dotsBinding = dots.mapElements { SwingometerFrame.Dot(it.first, it.second, it.third) }
         )
-        frame.setNumBucketsPerSideBinding(fixedBinding(20))
-        frame.setDotsBinding(dots.mapElements { SwingometerFrame.Dot(it.first, it.second, it.third) })
         Assert.assertEquals(20, frame.numBucketsPerSide.toLong())
         Assert.assertEquals(3, frame.numDots.toLong())
         Assert.assertEquals(0.3, frame.getDotPosition(0))
@@ -141,10 +177,14 @@ class SwingometerFrameTest {
             Triple(2.4, Color.BLACK, true)
         ))
         val frame = SwingometerFrame(
-            headerBinding = fixedBinding(null)
+            headerBinding = fixedBinding(null),
+            valueBinding = fixedBinding(3),
+            rangeBinding = fixedBinding(10),
+            leftColorBinding = fixedBinding(Color.BLUE),
+            rightColorBinding = fixedBinding(Color.RED),
+            numBucketsPerSideBinding = fixedBinding(20),
+            dotsBinding = dots.mapElements { SwingometerFrame.Dot(it.first, it.second, solid = it.third) }
         )
-        frame.setNumBucketsPerSideBinding(fixedBinding(20))
-        frame.setDotsBinding(dots.mapElements { SwingometerFrame.Dot(it.first, it.second, solid = it.third) })
         Assert.assertEquals(20, frame.numBucketsPerSide.toLong())
         Assert.assertEquals(3, frame.numDots.toLong())
         Assert.assertEquals(0.3, frame.getDotPosition(0))
@@ -169,24 +209,20 @@ class SwingometerFrameTest {
         ))
         val dots = createSwingometerDotsWithoutLabels()
         val frame = SwingometerFrame(
-            headerBinding = fixedBinding("2018 SENATE SWINGOMETER")
-        )
-        frame.setRangeBinding(fixedBinding(10))
-        frame.setValueBinding(fixedBinding(-4.0))
-        frame.setNumBucketsPerSideBinding(fixedBinding(20))
-        frame.setLeftColorBinding(fixedBinding(Color.BLUE))
-        frame.setRightColorBinding(fixedBinding(Color.RED))
-        frame.setLeftToWinBinding(fixedBinding(1.55))
-        frame.setRightToWinBinding(fixedBinding(-0.60))
-        frame.setTicksBinding(
-            fixedBinding(
+            headerBinding = fixedBinding("2018 SENATE SWINGOMETER"),
+            rangeBinding = fixedBinding(10),
+            valueBinding = fixedBinding(-4.0),
+            leftColorBinding = fixedBinding(Color.BLUE),
+            rightColorBinding = fixedBinding(Color.RED),
+            leftToWinBinding = fixedBinding(1.55),
+            rightToWinBinding = fixedBinding(-0.60),
+            numBucketsPerSideBinding = fixedBinding(20),
+            dotsBinding = dots.mapElements { SwingometerFrame.Dot(it.second, it.third) },
+            ticksBinding = fixedBinding(
                 ticks.map { SwingometerFrame.Tick(it, it.toString()) }
-            )
+            ),
+            outerLabelsBinding = outerLabels.mapElements { SwingometerFrame.OuterLabel(it.first, it.second.toString(), it.third) }
         )
-        frame.setOuterLabelsBinding(
-            outerLabels.mapElements { SwingometerFrame.OuterLabel(it.first, it.second.toString(), it.third) }
-        )
-        frame.setDotsBinding(dots.mapElements { SwingometerFrame.Dot(it.second, it.third) })
         frame.setSize(1024, 512)
         compareRendering("SwingometerFrame", "Unlabelled", frame)
     }
@@ -206,24 +242,20 @@ class SwingometerFrameTest {
         ))
         val dots = createSwingometerDotsWithoutLabels()
         val frame = SwingometerFrame(
-            headerBinding = fixedBinding("2018 SENATE SWINGOMETER")
-        )
-        frame.setRangeBinding(fixedBinding(10))
-        frame.setValueBinding(fixedBinding(-4.0))
-        frame.setNumBucketsPerSideBinding(fixedBinding(80))
-        frame.setLeftColorBinding(fixedBinding(Color.BLUE))
-        frame.setRightColorBinding(fixedBinding(Color.RED))
-        frame.setLeftToWinBinding(fixedBinding(1.55))
-        frame.setRightToWinBinding(fixedBinding(-0.60))
-        frame.setTicksBinding(
-            fixedBinding(
+            headerBinding = fixedBinding("2018 SENATE SWINGOMETER"),
+            rangeBinding = fixedBinding(10),
+            valueBinding = fixedBinding(-4.0),
+            leftColorBinding = fixedBinding(Color.BLUE),
+            rightColorBinding = fixedBinding(Color.RED),
+            leftToWinBinding = fixedBinding(1.55),
+            rightToWinBinding = fixedBinding(-0.60),
+            numBucketsPerSideBinding = fixedBinding(80),
+            dotsBinding = dots.mapElements { SwingometerFrame.Dot(it.second, it.third) },
+            ticksBinding = fixedBinding(
                 ticks.map { SwingometerFrame.Tick(it, it.toString()) }
-            )
+            ),
+            outerLabelsBinding = outerLabels.mapElements { SwingometerFrame.OuterLabel(it.first, it.second.toString(), it.third) }
         )
-        frame.setOuterLabelsBinding(
-            outerLabels.mapElements { SwingometerFrame.OuterLabel(it.first, it.second.toString(), it.third) }
-        )
-        frame.setDotsBinding(dots.mapElements { SwingometerFrame.Dot(it.second, it.third) })
         frame.setSize(1024, 512)
         compareRendering("SwingometerFrame", "Unlabelled-TinyDots", frame)
     }
@@ -283,30 +315,26 @@ class SwingometerFrameTest {
         ))
         val dots = createSwingometerDotsWithLabels()
         val frame = SwingometerFrame(
-            headerBinding = fixedBinding("2016 PRESIDENT SWINGOMETER")
-        )
-        frame.setRangeBinding(fixedBinding(10))
-        frame.setValueBinding(fixedBinding(0.885))
-        frame.setNumBucketsPerSideBinding(fixedBinding(20))
-        frame.setLeftColorBinding(fixedBinding(Color.BLUE))
-        frame.setRightColorBinding(fixedBinding(Color.RED))
-        frame.setLeftToWinBinding(fixedBinding(-2.68))
-        frame.setRightToWinBinding(fixedBinding(2.68))
-        frame.setTicksBinding(
-            fixedBinding(
+            headerBinding = fixedBinding("2016 PRESIDENT SWINGOMETER"),
+            rangeBinding = fixedBinding(10),
+            valueBinding = fixedBinding(0.885),
+            leftColorBinding = fixedBinding(Color.BLUE),
+            rightColorBinding = fixedBinding(Color.RED),
+            leftToWinBinding = fixedBinding(-2.68),
+            rightToWinBinding = fixedBinding(2.68),
+            numBucketsPerSideBinding = fixedBinding(20),
+            dotsBinding = dots.mapElements {
+                SwingometerFrame.Dot(
+                    it.second,
+                    it.third,
+                    label = it.first.second.toString()
+                )
+            },
+            ticksBinding = fixedBinding(
                 ticks.map { SwingometerFrame.Tick(it, it.toString()) }
-            )
+            ),
+            outerLabelsBinding = outerLabels.mapElements { SwingometerFrame.OuterLabel(it.first, it.second.toString(), it.third) }
         )
-        frame.setOuterLabelsBinding(
-            outerLabels.mapElements { SwingometerFrame.OuterLabel(it.first, it.second.toString(), it.third) }
-        )
-        frame.setDotsBinding(dots.mapElements {
-            SwingometerFrame.Dot(
-                it.second,
-                it.third,
-                label = it.first.second.toString()
-            )
-        })
         frame.setSize(1024, 512)
         compareRendering("SwingometerFrame", "Labels", frame)
     }
@@ -326,31 +354,27 @@ class SwingometerFrameTest {
         ))
         val dots = createSwingometerDotsWithLabels()
         val frame = SwingometerFrame(
-            headerBinding = fixedBinding("2016 PRESIDENT SWINGOMETER")
-        )
-        frame.setRangeBinding(fixedBinding(10))
-        frame.setValueBinding(fixedBinding(0.885))
-        frame.setNumBucketsPerSideBinding(fixedBinding(20))
-        frame.setLeftColorBinding(fixedBinding(Color.BLUE))
-        frame.setRightColorBinding(fixedBinding(Color.RED))
-        frame.setLeftToWinBinding(fixedBinding(-2.68))
-        frame.setRightToWinBinding(fixedBinding(2.68))
-        frame.setTicksBinding(
-            fixedBinding(
+            headerBinding = fixedBinding("2016 PRESIDENT SWINGOMETER"),
+            rangeBinding = fixedBinding(10),
+            valueBinding = fixedBinding(0.885),
+            leftColorBinding = fixedBinding(Color.BLUE),
+            rightColorBinding = fixedBinding(Color.RED),
+            leftToWinBinding = fixedBinding(-2.68),
+            rightToWinBinding = fixedBinding(2.68),
+            numBucketsPerSideBinding = fixedBinding(20),
+            dotsBinding = dots.mapElements {
+                SwingometerFrame.Dot(
+                    it.second,
+                    it.third,
+                    label = it.first.second.toString(),
+                    solid = it.second > -5 && it.second < 0
+                )
+            },
+            ticksBinding = fixedBinding(
                 ticks.map { SwingometerFrame.Tick(it, it.toString()) }
-            )
+            ),
+            outerLabelsBinding = outerLabels.mapElements { SwingometerFrame.OuterLabel(it.first, it.second.toString(), it.third) }
         )
-        frame.setOuterLabelsBinding(
-            outerLabels.mapElements { SwingometerFrame.OuterLabel(it.first, it.second.toString(), it.third) }
-        )
-        frame.setDotsBinding(dots.mapElements {
-            SwingometerFrame.Dot(
-                it.second,
-                it.third,
-                label = it.first.second.toString(),
-                solid = it.second > -5 && it.second < 0
-            )
-        })
         frame.setSize(1024, 512)
         compareRendering("SwingometerFrame", "EmptyDots", frame)
     }
@@ -431,34 +455,30 @@ class SwingometerFrameTest {
         ))
         val dots = createSwingometerDotsWithLabels()
         val frame = SwingometerFrame(
-            headerBinding = fixedBinding("2016 PRESIDENT SWINGOMETER")
-        )
-        frame.setRangeBinding(fixedBinding(10))
-        frame.setValueBinding(fixedBinding(0.885))
-        frame.setNumBucketsPerSideBinding(fixedBinding(20))
-        frame.setLeftColorBinding(fixedBinding(Color.BLUE))
-        frame.setRightColorBinding(fixedBinding(Color.RED))
-        frame.setLeftToWinBinding(fixedBinding(-2.68))
-        frame.setRightToWinBinding(fixedBinding(2.68))
-        frame.setTicksBinding(
-            fixedBinding(
+            headerBinding = fixedBinding("2016 PRESIDENT SWINGOMETER"),
+            rangeBinding = fixedBinding(10),
+            valueBinding = fixedBinding(0.885),
+            leftColorBinding = fixedBinding(Color.BLUE),
+            rightColorBinding = fixedBinding(Color.RED),
+            leftToWinBinding = fixedBinding(-2.68),
+            rightToWinBinding = fixedBinding(2.68),
+            numBucketsPerSideBinding = fixedBinding(20),
+            dotsBinding = dots.mapElements {
+                SwingometerFrame.Dot(
+                    it.second,
+                    it.third,
+                    label = if (it.first.first.contains("-")) {
+                        it.first.first.replace("-".toRegex(), "\n-")
+                    } else {
+                        "${it.first.first}\n(${it.first.second})"
+                    }
+                )
+            },
+            ticksBinding = fixedBinding(
                 ticks.map { SwingometerFrame.Tick(it, it.toString()) }
-            )
+            ),
+            outerLabelsBinding = outerLabels.mapElements { SwingometerFrame.OuterLabel(it.first, it.second.toString(), it.third) }
         )
-        frame.setOuterLabelsBinding(
-            outerLabels.mapElements { SwingometerFrame.OuterLabel(it.first, it.second.toString(), it.third) }
-        )
-        frame.setDotsBinding(dots.mapElements {
-            SwingometerFrame.Dot(
-                it.second,
-                it.third,
-                label = if (it.first.first.contains("-")) {
-                    it.first.first.replace("-".toRegex(), "\n-")
-                } else {
-                    "${it.first.first}\n(${it.first.second})"
-                }
-            )
-        })
         frame.setSize(1024, 512)
         compareRendering("SwingometerFrame", "MultiLineLabels", frame)
     }

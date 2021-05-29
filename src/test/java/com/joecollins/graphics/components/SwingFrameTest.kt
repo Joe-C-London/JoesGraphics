@@ -12,28 +12,42 @@ class SwingFrameTest {
     @Test
     fun testSwingRange() {
         val frame = SwingFrame(
-            headerBinding = fixedBinding(null)
+            headerBinding = fixedBinding(null),
+            rangeBinding = fixedBinding(10),
+            valueBinding = fixedBinding(3),
+            leftColorBinding = fixedBinding(Color.BLUE),
+            rightColorBinding = fixedBinding(Color.RED),
+            bottomTextBinding = fixedBinding("4.7% SWING LIB TO CON"),
+            bottomColorBinding = fixedBinding(Color.BLUE)
         )
-        frame.setRangeBinding(fixedBinding(10))
         Assert.assertEquals(10, frame.getRange())
     }
 
     @Test
     fun testSwingValue() {
         val frame = SwingFrame(
-            headerBinding = fixedBinding(null)
+            headerBinding = fixedBinding(null),
+            rangeBinding = fixedBinding(10),
+            valueBinding = fixedBinding(3),
+            leftColorBinding = fixedBinding(Color.BLUE),
+            rightColorBinding = fixedBinding(Color.RED),
+            bottomTextBinding = fixedBinding("4.7% SWING LIB TO CON"),
+            bottomColorBinding = fixedBinding(Color.BLUE)
         )
-        frame.setValueBinding(fixedBinding(3))
         Assert.assertEquals(3, frame.getValue())
     }
 
     @Test
     fun testLeftRightColors() {
         val frame = SwingFrame(
-            headerBinding = fixedBinding(null)
+            headerBinding = fixedBinding(null),
+            rangeBinding = fixedBinding(10),
+            valueBinding = fixedBinding(3),
+            leftColorBinding = fixedBinding(Color.BLUE),
+            rightColorBinding = fixedBinding(Color.RED),
+            bottomTextBinding = fixedBinding("4.7% SWING LIB TO CON"),
+            bottomColorBinding = fixedBinding(Color.BLUE)
         )
-        frame.setLeftColorBinding(fixedBinding(Color.BLUE))
-        frame.setRightColorBinding(fixedBinding(Color.RED))
         Assert.assertEquals(Color.BLUE, frame.getLeftColor())
         Assert.assertEquals(Color.RED, frame.getRightColor())
     }
@@ -41,10 +55,14 @@ class SwingFrameTest {
     @Test
     fun testBottomText() {
         val frame = SwingFrame(
-            headerBinding = fixedBinding(null)
+            headerBinding = fixedBinding(null),
+            rangeBinding = fixedBinding(10),
+            valueBinding = fixedBinding(3),
+            leftColorBinding = fixedBinding(Color.BLUE),
+            rightColorBinding = fixedBinding(Color.RED),
+            bottomTextBinding = fixedBinding("4.7% SWING LIB TO CON"),
+            bottomColorBinding = fixedBinding(Color.BLUE)
         )
-        frame.setBottomTextBinding(fixedBinding("4.7% SWING LIB TO CON"))
-        frame.setBottomColorBinding(fixedBinding(Color.BLUE))
         Assert.assertEquals("4.7% SWING LIB TO CON", frame.getBottomText())
         Assert.assertEquals(Color.BLUE, frame.getBottomColor())
     }
@@ -53,14 +71,14 @@ class SwingFrameTest {
     @Throws(IOException::class)
     fun testRenderNoSwing() {
         val frame = SwingFrame(
-            headerBinding = fixedBinding<String?>("SWING SINCE 2015")
+            headerBinding = fixedBinding<String?>("SWING SINCE 2015"),
+            rangeBinding = fixedBinding(10),
+            valueBinding = fixedBinding(0),
+            leftColorBinding = fixedBinding(Color.BLUE),
+            rightColorBinding = fixedBinding(Color.RED),
+            bottomTextBinding = fixedBinding("WAITING FOR RESULTS..."),
+            bottomColorBinding = fixedBinding(Color.BLACK)
         )
-        frame.setRangeBinding(fixedBinding(10))
-        frame.setValueBinding(fixedBinding(0))
-        frame.setLeftColorBinding(fixedBinding(Color.BLUE))
-        frame.setRightColorBinding(fixedBinding(Color.RED))
-        frame.setBottomTextBinding(fixedBinding("WAITING FOR RESULTS..."))
-        frame.setBottomColorBinding(fixedBinding(Color.BLACK))
         frame.setSize(256, 128)
         compareRendering("SwingFrame", "NoSwing", frame)
     }
@@ -69,14 +87,14 @@ class SwingFrameTest {
     @Throws(IOException::class)
     fun testRenderSwingRight() {
         val frame = SwingFrame(
-            headerBinding = fixedBinding<String?>("SWING SINCE 2015")
+            headerBinding = fixedBinding<String?>("SWING SINCE 2015"),
+            rangeBinding = fixedBinding(10),
+            valueBinding = fixedBinding(4.7),
+            leftColorBinding = fixedBinding(Color.BLUE),
+            rightColorBinding = fixedBinding(Color.RED),
+            bottomTextBinding = fixedBinding("4.7% SWING LIB TO CON"),
+            bottomColorBinding = fixedBinding(Color.BLUE)
         )
-        frame.setRangeBinding(fixedBinding(10))
-        frame.setValueBinding(fixedBinding(4.7))
-        frame.setLeftColorBinding(fixedBinding(Color.BLUE))
-        frame.setRightColorBinding(fixedBinding(Color.RED))
-        frame.setBottomTextBinding(fixedBinding("4.7% SWING LIB TO CON"))
-        frame.setBottomColorBinding(fixedBinding(Color.BLUE))
         frame.setSize(256, 128)
         compareRendering("SwingFrame", "SwingRight", frame)
     }
@@ -85,14 +103,14 @@ class SwingFrameTest {
     @Throws(IOException::class)
     fun testRenderSwingLeft() {
         val frame = SwingFrame(
-            headerBinding = fixedBinding<String?>("SWING SINCE 2015")
+            headerBinding = fixedBinding<String?>("SWING SINCE 2015"),
+            rangeBinding = fixedBinding(10),
+            valueBinding = fixedBinding(-1.3),
+            leftColorBinding = fixedBinding(Color.RED),
+            rightColorBinding = fixedBinding(Color.ORANGE),
+            bottomTextBinding = fixedBinding("1.3% SWING LIB TO NDP"),
+            bottomColorBinding = fixedBinding(Color.ORANGE)
         )
-        frame.setRangeBinding(fixedBinding(10))
-        frame.setValueBinding(fixedBinding(-1.3))
-        frame.setLeftColorBinding(fixedBinding(Color.RED))
-        frame.setRightColorBinding(fixedBinding(Color.ORANGE))
-        frame.setBottomTextBinding(fixedBinding("1.3% SWING LIB TO NDP"))
-        frame.setBottomColorBinding(fixedBinding(Color.ORANGE))
         frame.setSize(256, 128)
         compareRendering("SwingFrame", "SwingLeft", frame)
     }
@@ -101,14 +119,14 @@ class SwingFrameTest {
     @Throws(IOException::class)
     fun testRenderMaxSwingRight() {
         val frame = SwingFrame(
-            headerBinding = fixedBinding<String?>("SWING SINCE 2015")
+            headerBinding = fixedBinding<String?>("SWING SINCE 2015"),
+            rangeBinding = fixedBinding(10),
+            valueBinding = fixedBinding(19.9),
+            leftColorBinding = fixedBinding(Color.BLUE),
+            rightColorBinding = fixedBinding(Color.RED),
+            bottomTextBinding = fixedBinding("19.9% SWING LIB TO CON"),
+            bottomColorBinding = fixedBinding(Color.BLUE)
         )
-        frame.setRangeBinding(fixedBinding(10))
-        frame.setValueBinding(fixedBinding(19.9))
-        frame.setLeftColorBinding(fixedBinding(Color.BLUE))
-        frame.setRightColorBinding(fixedBinding(Color.RED))
-        frame.setBottomTextBinding(fixedBinding("19.9% SWING LIB TO CON"))
-        frame.setBottomColorBinding(fixedBinding(Color.BLUE))
         frame.setSize(256, 128)
         compareRendering("SwingFrame", "MaxSwingRight", frame)
     }
@@ -117,14 +135,14 @@ class SwingFrameTest {
     @Throws(IOException::class)
     fun testRenderMaxSwingLeft() {
         val frame = SwingFrame(
-            headerBinding = fixedBinding<String?>("SWING SINCE 2015")
+            headerBinding = fixedBinding<String?>("SWING SINCE 2015"),
+            rangeBinding = fixedBinding(10),
+            valueBinding = fixedBinding(-21.6),
+            leftColorBinding = fixedBinding(Color.RED),
+            rightColorBinding = fixedBinding(Color.GREEN),
+            bottomTextBinding = fixedBinding("21.6% SWING LIB TO GRN"),
+            bottomColorBinding = fixedBinding(Color.GREEN)
         )
-        frame.setRangeBinding(fixedBinding(10))
-        frame.setValueBinding(fixedBinding(-21.6))
-        frame.setLeftColorBinding(fixedBinding(Color.RED))
-        frame.setRightColorBinding(fixedBinding(Color.GREEN))
-        frame.setBottomTextBinding(fixedBinding("21.6% SWING LIB TO GRN"))
-        frame.setBottomColorBinding(fixedBinding(Color.GREEN))
         frame.setSize(256, 128)
         compareRendering("SwingFrame", "MaxSwingLeft", frame)
     }
@@ -133,14 +151,14 @@ class SwingFrameTest {
     @Throws(IOException::class)
     fun testRenderAccents() {
         val frame = SwingFrame(
-            headerBinding = fixedBinding<String?>("CHANGES APR\u00c8S 2014")
+            headerBinding = fixedBinding<String?>("CHANGES APR\u00c8S 2014"),
+            rangeBinding = fixedBinding(10),
+            valueBinding = fixedBinding(0),
+            leftColorBinding = fixedBinding(Color.BLUE),
+            rightColorBinding = fixedBinding(Color.RED),
+            bottomTextBinding = fixedBinding("VOIX PAS R\u00c9\u00c7US"),
+            bottomColorBinding = fixedBinding(Color.BLACK)
         )
-        frame.setRangeBinding(fixedBinding(10))
-        frame.setValueBinding(fixedBinding(0))
-        frame.setLeftColorBinding(fixedBinding(Color.BLUE))
-        frame.setRightColorBinding(fixedBinding(Color.RED))
-        frame.setBottomTextBinding(fixedBinding("VOIX PAS R\u00c9\u00c7US"))
-        frame.setBottomColorBinding(fixedBinding(Color.BLACK))
         frame.setSize(256, 128)
         compareRendering("SwingFrame", "Accents", frame)
     }
