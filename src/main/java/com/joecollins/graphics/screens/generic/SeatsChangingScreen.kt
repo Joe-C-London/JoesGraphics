@@ -122,7 +122,6 @@ class SeatsChangingScreen private constructor(title: JLabel, frame: ResultListin
                                             it.second,
                                             t.currResults[it.first] ?: PartyResult.NO_RESULT)
                                 }
-                                .filter { it.third != null }
                                 .filter { it.third.party != null }
                                 .filter { it.second != it.third.party }
                                 .map {

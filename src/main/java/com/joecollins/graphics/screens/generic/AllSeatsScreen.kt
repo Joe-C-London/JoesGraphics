@@ -85,7 +85,7 @@ class AllSeatsScreen private constructor(title: JLabel, frame: ResultListingFram
                                 .toList()
                         Pair(e, 1.0 * (topTwo[0] - topTwo[1]) / total)
                     }
-                    .sortedBy { e -> nameFunc(e.first.key).toUpperCase() }
+                    .sortedBy { e -> nameFunc(e.first.key).uppercase() }
                     .map { it.first }
                     .map { e ->
                         Pair(

@@ -81,7 +81,7 @@ class ResultListingFrameTest {
             numRowsBinding = fixedBinding(10),
             itemsBinding = items.binding.mapElements {
                 ResultListingFrame.Item(
-                    text = it.text.toUpperCase(),
+                    text = it.text.uppercase(),
                     border = it.border,
                     background = it.background,
                     foreground = it.foreground
@@ -114,7 +114,7 @@ class ResultListingFrameTest {
             numRowsBinding = fixedBinding(10),
             itemsBinding = items.binding.mapElements {
                 ResultListingFrame.Item(
-                    text = it.text.toUpperCase(),
+                    text = it.text.uppercase(),
                     border = it.border,
                     background = it.background,
                     foreground = it.foreground

@@ -336,7 +336,7 @@ class AggregatorsTest {
     fun testToMapTransformedKey() {
         val inputs = mapOf("abc" to BindableWrapper(1), "def" to BindableWrapper(2))
         val output: BoundResult<Map<String, Int>> = BoundResult()
-        val outputBinding = toMap(inputs.keys, { it.toUpperCase() }) { inputs[it]!!.binding }
+        val outputBinding = toMap(inputs.keys, { it.uppercase() }) { inputs[it]!!.binding }
         outputBinding.bind { output.value = it }
         Assert.assertEquals(mapOf("ABC" to 1, "DEF" to 2), output.value)
         inputs["abc"]!!.value = 7

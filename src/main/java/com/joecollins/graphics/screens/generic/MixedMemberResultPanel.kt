@@ -217,10 +217,10 @@ class MixedMemberResultPanel private constructor(
                                     val leftLabel: String
                                     var rightLabel: String
                                     if (showBothLines) {
-                                        leftLabel = ("${candidate.name.toUpperCase()}${if (candidate.isIncumbent()) incumbentMarker else ""}\n${candidate.party.name.toUpperCase()}")
+                                        leftLabel = ("${candidate.name.uppercase()}${if (candidate.isIncumbent()) incumbentMarker else ""}\n${candidate.party.name.uppercase()}")
                                         rightLabel = "${THOUSANDS_FORMAT.format(votes.toLong())}\n${PCT_FORMAT.format(pct)}"
                                     } else {
-                                        leftLabel = ("${candidate.name.toUpperCase()}${if (candidate.isIncumbent()) incumbentMarker else ""} (${candidate.party.abbreviation.toUpperCase()})")
+                                        leftLabel = ("${candidate.name.uppercase()}${if (candidate.isIncumbent()) incumbentMarker else ""} (${candidate.party.abbreviation.uppercase()})")
                                         rightLabel = ("${THOUSANDS_FORMAT.format(votes.toLong())} (${PCT_FORMAT.format(pct)})")
                                     }
                                     if (partialDeclaration) {
@@ -297,7 +297,7 @@ class MixedMemberResultPanel private constructor(
                                             (r.prev[e.key.party] ?: 0) /
                                             prevTotal)
                                     BasicBar(
-                                            e.key.party.abbreviation.toUpperCase(),
+                                            e.key.party.abbreviation.uppercase(),
                                             e.key.party.color,
                                             pct,
                                             PCT_DIFF_FORMAT.format(pct))
@@ -312,7 +312,7 @@ class MixedMemberResultPanel private constructor(
                                 .sum())
                         val nonMatchingBars = if (othersPct == 0.0) emptySequence() else sequenceOf(
                                 BasicBar(
-                                        Party.OTHERS.abbreviation.toUpperCase(),
+                                        Party.OTHERS.abbreviation.uppercase(),
                                         Party.OTHERS.color,
                                         othersPct,
                                         PCT_DIFF_FORMAT.format(othersPct)))
@@ -337,7 +337,7 @@ class MixedMemberResultPanel private constructor(
                                     val value = e.value
                                     val pct = if (value == null) Double.NaN else 1.0 * value / total
                                     BasicBar(
-                                            e.key.name.toUpperCase(),
+                                            e.key.name.uppercase(),
                                             e.key.color,
                                             if (java.lang.Double.isNaN(pct)) 0 else pct,
                                             if (java.lang.Double.isNaN(pct)) "WAITING..." else THOUSANDS_FORMAT.format(e.value) +
@@ -377,7 +377,7 @@ class MixedMemberResultPanel private constructor(
                                     val pct = (1.0 * e.value / currTotal -
                                             1.0 * (r.prev[e.key] ?: 0) / prevTotal)
                                     BasicBar(
-                                            e.key.abbreviation.toUpperCase(),
+                                            e.key.abbreviation.uppercase(),
                                             e.key.color,
                                             pct,
                                             PCT_DIFF_FORMAT.format(pct))
@@ -392,7 +392,7 @@ class MixedMemberResultPanel private constructor(
                                 .sum())
                         val absentBars = if (otherTotal == 0.0) emptySequence() else sequenceOf(
                                 BasicBar(
-                                        Party.OTHERS.abbreviation.toUpperCase(),
+                                        Party.OTHERS.abbreviation.uppercase(),
                                         Party.OTHERS.color,
                                         otherTotal,
                                         PCT_DIFF_FORMAT.format(otherTotal)))

@@ -6,7 +6,7 @@ interface Binding<out T> {
 
     fun unbind()
 
-    @JvmDefault fun <R> map(func: (T) -> R): Binding<R> {
+    fun <R> map(func: (T) -> R): Binding<R> {
         val me = this
         return object : Binding<R> {
             override fun bind(onUpdate: (R) -> Unit) = me.bind { onUpdate(func(it)) }
@@ -14,7 +14,7 @@ interface Binding<out T> {
         }
     }
 
-    @JvmDefault fun <U, R> merge(other: Binding<U>, mergeFunc: (T, U) -> R): Binding<R> {
+    fun <U, R> merge(other: Binding<U>, mergeFunc: (T, U) -> R): Binding<R> {
         val me = this
         return object : Binding<R> {
             private var val1: T? = null

@@ -390,13 +390,13 @@ class MultiResultScreen private constructor() : JPanel() {
                                             }
                                     val leftLabel: String = when {
                                         partiesOnly -> {
-                                            candidate.party.name.toUpperCase()
+                                            candidate.party.name.uppercase()
                                         }
                                         candidate === Candidate.OTHERS -> {
                                             "OTHERS"
                                         }
                                         else -> {
-                                            "${candidate.name.toUpperCase()}\n${candidate.party.abbreviation}${if (candidate.isIncumbent()) " $incumbentMarker" else ""}"
+                                            "${candidate.name.uppercase()}\n${candidate.party.abbreviation}${if (candidate.isIncumbent()) " $incumbentMarker" else ""}"
                                         }
                                     }
                                     val rightLabel: String = when {

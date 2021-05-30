@@ -33,7 +33,7 @@ class PartySummaryScreenTest {
         val partySelected = BindableWrapper(lib)
         val screen = ofDiff(
                 canada,
-                { r -> fixedBinding(r.name.toUpperCase()) },
+                { r -> fixedBinding(r.name.uppercase()) },
                 { r -> propertyBinding(r, { it.seats }, Region.Property.SEATS) },
                 { r -> propertyBinding(r, { it.seatDiff }, Region.Property.SEAT_DIFF) },
                 { r -> propertyBinding(r, { it.votePct }, Region.Property.VOTE_PCT) },
@@ -112,7 +112,7 @@ class PartySummaryScreenTest {
         val partySelected = BindableWrapper(lib)
         val screen = ofPrev(
                 canada,
-                { r -> fixedBinding(r.name.toUpperCase()) },
+                { r -> fixedBinding(r.name.uppercase()) },
                 { r -> propertyBinding(r, { it.seats }, Region.Property.SEATS) },
                 { r -> propertyBinding(r, { it.prevSeats }, Region.Property.SEAT_DIFF) },
                 { r -> propertyBinding(r, { it.votePct }, Region.Property.VOTE_PCT) },

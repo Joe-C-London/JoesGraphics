@@ -45,7 +45,7 @@ class FiguresScreen private constructor(headerLabel: JLabel, frames: Array<Figur
                         val statusBinding = Binding.propertyBinding(e, { x: Entry -> x.status }, Entry.Property.STATUS)
                         colorBinding.merge(statusBinding) { color, status ->
                             FiguresFrame.Entry(
-                                name = e.candidate.name.toUpperCase(),
+                                name = e.candidate.name.uppercase(),
                                 color = e.candidate.party.color,
                                 description = e.description,
                                 resultColor = color,

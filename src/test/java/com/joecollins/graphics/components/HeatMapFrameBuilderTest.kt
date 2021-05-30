@@ -107,7 +107,7 @@ class HeatMapFrameBuilderTest {
                 { it.prev },
                 lib,
                 { e: Int, l: Int -> "LIB: $e/$l" },
-                { e: Int, l: Int -> l > 0 },
+                { _: Int, l: Int -> l > 0 },
                 { e: Int, l: Int -> DecimalFormat("+0;-0").format(e) + "/" + DecimalFormat("+0;-0").format(l) },
                 fixedBinding("YUKON"))
         Assert.assertEquals(19, frame.numSquares.toLong())
@@ -165,7 +165,7 @@ class HeatMapFrameBuilderTest {
                 { it.prev },
                 dem,
                 { e: Int, l: Int -> "DEM: $e/$l" },
-                { e: Int, l: Int -> l > 0 },
+                { _: Int, l: Int -> l > 0 },
                 { e: Int, l: Int -> DecimalFormat("+0;-0").format(e) + "/" + DecimalFormat("+0;-0").format(l) },
                 fixedBinding("TEST"))
         Assert.assertEquals(30, frame.numSquares.toLong())
@@ -217,7 +217,7 @@ class HeatMapFrameBuilderTest {
                 { it.prev },
                 dem,
                 { e: Int, l: Int -> "DEM: $e/$l" },
-                { e: Int, l: Int -> true },
+                { _: Int, _: Int -> true },
                 { e: Int, l: Int -> DecimalFormat("+0;-0").format(e) + "/" + DecimalFormat("+0;-0").format(l) },
                 fixedBinding("TEST"))
         Assert.assertEquals(30, frame.numSquares.toLong())
@@ -276,7 +276,7 @@ class HeatMapFrameBuilderTest {
                 { it.prev },
                 dem,
                 { e: Int, l: Int -> "DEM: $e/$l" },
-                { e: Int, l: Int -> true },
+                { _: Int, _: Int -> true },
                 { e: Int, l: Int -> DecimalFormat("+0;-0").format(e) + "/" + DecimalFormat("+0;-0").format(l) },
                 fixedBinding("TEST"))
         Assert.assertEquals(30, frame.numSquares.toLong())

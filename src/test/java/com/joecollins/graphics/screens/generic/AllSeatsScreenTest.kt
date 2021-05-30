@@ -21,7 +21,7 @@ class AllSeatsScreenTest {
         val currResult = BindableWrapper<Map<String, PartyResult?>>(emptyMap())
         val numRows = BindableWrapper(15)
         val title = BindableWrapper("BRITISH COLUMBIA")
-        val nameShortener = { obj: String -> obj.toUpperCase() }
+        val nameShortener = { obj: String -> obj.uppercase() }
         val panel = AllSeatsScreen.of(
                 prevResult.binding,
                 currResult.binding,
@@ -60,7 +60,7 @@ class AllSeatsScreenTest {
                 prevResult.value.keys
                         .filter { k: String -> k.startsWith("Vancouver") }
                         .toSet())
-        val nameShortener = { obj: String -> obj.toUpperCase() }
+        val nameShortener = { obj: String -> obj.uppercase() }
         val panel = AllSeatsScreen.of(
                 prevResult.binding,
                 currResult.binding,
@@ -98,7 +98,7 @@ class AllSeatsScreenTest {
         val currResult = BindableWrapper<Map<String, PartyResult?>>(results)
         val numRows = BindableWrapper(15)
         val title = BindableWrapper("BRITISH COLUMBIA")
-        val nameShortener = { obj: String -> obj.toUpperCase() }
+        val nameShortener = { obj: String -> obj.uppercase() }
         val panel = AllSeatsScreen.of(
                 prevResult.binding,
                 currResult.binding,

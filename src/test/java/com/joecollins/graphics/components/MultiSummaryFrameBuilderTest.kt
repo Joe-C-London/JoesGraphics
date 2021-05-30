@@ -31,7 +31,7 @@ class MultiSummaryFrameBuilderTest {
         ridings.add(Riding("Watson Lake")) // 7
         val frame = tooClose(
                 ridings, { it.isTooClose }, { it.margin },
-                { fixedBinding(it.name.toUpperCase()) }, { it.boxes },
+                { fixedBinding(it.name.uppercase()) }, { it.boxes },
                 2)
                 .withHeader(fixedBinding("TOO CLOSE TO CALL"))
                 .build()

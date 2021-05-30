@@ -24,7 +24,7 @@ class BattlegroundScreenTest {
         val defenseSeats = BindableWrapper(15)
         val numRows = BindableWrapper(15)
         val title = BindableWrapper("NDP BATTLEGROUND")
-        val nameShortener = { obj: String -> obj.toUpperCase() }
+        val nameShortener = { obj: String -> obj.uppercase() }
         val panel = singleParty(
                 prevResult.binding,
                 currResult.binding,
@@ -73,7 +73,7 @@ class BattlegroundScreenTest {
                         .filter { k: String -> k.startsWith("Vancouver") }
                         .toSet())
         val title = BindableWrapper("NDP BATTLEGROUND")
-        val nameShortener = { obj: String -> obj.toUpperCase() }
+        val nameShortener = { obj: String -> obj.uppercase() }
         val panel = singleParty(
                 prevResult.binding,
                 currResult.binding,

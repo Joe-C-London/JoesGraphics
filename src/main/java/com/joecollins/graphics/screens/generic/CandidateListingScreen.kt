@@ -68,8 +68,8 @@ class CandidateListingScreen private constructor(
         init {
             candidatesPanel = ListingFrameBuilder.of(
                 candidates,
-                { it.name.toUpperCase() + (if (!it.incumbent || incumbentMarker == null) "" else (" $incumbentMarker")) },
-                { it.party.name.toUpperCase() },
+                { it.name.uppercase() + (if (!it.incumbent || incumbentMarker == null) "" else (" $incumbentMarker")) },
+                { it.party.name.uppercase() },
                 { it.party.color }
             )
                 .withHeader(header)
@@ -101,7 +101,7 @@ class CandidateListingScreen private constructor(
                 .sortedByDescending { it.value }
                 .map {
                     BarFrameBuilder.BasicBar(
-                        it.key.abbreviation.toUpperCase(),
+                        it.key.abbreviation.uppercase(),
                         it.key.color,
                         it.value.toDouble() / total,
                         DecimalFormat("0.0%").format(it.value.toDouble() / total)

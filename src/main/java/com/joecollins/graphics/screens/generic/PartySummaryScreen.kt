@@ -86,7 +86,7 @@ class PartySummaryScreen private constructor(
             headerLabel.font = readBoldFont(32)
             headerLabel.horizontalAlignment = JLabel.CENTER
             headerLabel.border = EmptyBorder(5, 0, -5, 0)
-            party.getBinding { it.name.toUpperCase() + " SUMMARY" }.bind { headerLabel.text = it }
+            party.getBinding { it.name.uppercase() + " SUMMARY" }.bind { headerLabel.text = it }
             party.getBinding(Party::color).bind { headerLabel.foreground = it }
             val mainFrame = createFrame(mainRegion, party)
             val otherFrames = regions.map { createFrame(it, party) }

@@ -386,7 +386,7 @@ class TweetFrame(tweet: Binding<Status>, private val timezone: ZoneId = ZoneId.s
     companion object {
         fun createTweetFrame(tweetId: Binding<Long>): TweetFrame {
             val cb = ConfigurationBuilder()
-            val twitterPropertiesFile = this.javaClass.classLoader.getResourceAsStream("twitter.properties")
+            val twitterPropertiesFile = this::class.java.classLoader.getResourceAsStream("twitter.properties")
                 ?: throw IllegalStateException("Unable to find twitter.properties")
             val properties = Properties()
             properties.load(twitterPropertiesFile)

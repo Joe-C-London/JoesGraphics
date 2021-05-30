@@ -81,7 +81,7 @@ class MultiResultScreenTest {
                 fixedBinding(districts),
                 { fixedBinding(it.votes) },
                 { fixedBinding("DISTRICT " + it.districtNum) },
-                { fixedBinding(it.name.toUpperCase()) }
+                { fixedBinding(it.name.uppercase()) }
         )
                 .withIncumbentMarker("(MLA)")
                 .withWinner { fixedBinding(if (it.leaderHasWon) it.votes.entries.maxByOrNull { e -> e.value }!!.key else null) }
@@ -165,7 +165,7 @@ class MultiResultScreenTest {
         val panel = of(
                 districts.binding,
                 { it.getVotes() },
-                { fixedBinding(it.name.toUpperCase()) },
+                { fixedBinding(it.name.uppercase()) },
                 { it.getStatus() }
         )
                 .withIncumbentMarker("(MLA)")
@@ -340,7 +340,7 @@ class MultiResultScreenTest {
                 fixedBinding(districts),
                 { fixedBinding(it.votes) },
                 { fixedBinding("DISTRICT " + it.districtNum) },
-                { fixedBinding(it.name.toUpperCase()) }
+                { fixedBinding(it.name.uppercase()) }
         )
                 .withIncumbentMarker("(MLA)")
                 .withWinner { d ->
@@ -447,7 +447,7 @@ class MultiResultScreenTest {
                 districtsBinding.binding,
                 { fixedBinding(it.votes) },
                 { fixedBinding("DISTRICT " + it.districtNum) },
-                { fixedBinding(it.name.toUpperCase()) }
+                { fixedBinding(it.name.uppercase()) }
         )
                 .withIncumbentMarker("(MLA)")
                 .withWinner { d ->
@@ -541,7 +541,7 @@ class MultiResultScreenTest {
         val panel = of(
                 fixedBinding(districts),
                 { fixedBinding(it.votes) },
-                { fixedBinding(it.name.toUpperCase()) },
+                { fixedBinding(it.name.uppercase()) },
                 { fixedBinding("CLASS " + it.districtNum) }
         )
                 .withRunoff { it.runoff }
@@ -613,7 +613,7 @@ class MultiResultScreenTest {
                 fixedBinding(districts),
                 { fixedBinding(it.votes) },
                 { fixedBinding("DISTRICT " + it.districtNum) },
-                { fixedBinding(it.name.toUpperCase()) }
+                { fixedBinding(it.name.uppercase()) }
         )
                 .withIncumbentMarker("(MLA)")
                 .withWinner { d ->
@@ -728,7 +728,7 @@ class MultiResultScreenTest {
                 districtBinding.binding,
                 { it.partyVotes },
                 { fixedBinding("DISTRICT " + it.districtNum) },
-                { fixedBinding(it.name.toUpperCase()) }
+                { fixedBinding(it.name.uppercase()) }
         )
                 .withPrev(
                         { fixedBinding(it.prevVotes) },

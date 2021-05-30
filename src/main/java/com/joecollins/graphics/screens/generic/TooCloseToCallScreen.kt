@@ -157,7 +157,7 @@ class TooCloseToCallScreen private constructor(titleLabel: JLabel, multiSummaryF
                                 .map { v: Map.Entry<Candidate, Int> ->
                                     Pair(
                                         v.key.party.color,
-                                        v.key.party.abbreviation.toUpperCase() +
+                                        v.key.party.abbreviation.uppercase() +
                                                 ": " +
                                                 thousandsFormatter.format(v.value))
                                 },

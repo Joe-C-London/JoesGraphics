@@ -70,7 +70,7 @@ jacocoTestReport {
 compileKotlin {
     kotlinOptions {
         jvmTarget = "16"
-        freeCompilerArgs = ['-Xjvm-default=enable']
+        freeCompilerArgs = ['-Xjvm-default=all']
     }
 }
 compileTestKotlin {

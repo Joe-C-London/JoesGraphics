@@ -213,9 +213,9 @@ class SwingFrameBuilder {
                         } else {
                             (DecimalFormat("0.0%").format(swing) +
                                     " SWING " +
-                                    fromParty.abbreviation.toUpperCase() +
+                                    fromParty.abbreviation.uppercase() +
                                     " TO " +
-                                    toParty.abbreviation.toUpperCase())
+                                    toParty.abbreviation.uppercase())
                         }
                     })
                     .withRange(Binding.fixedBinding(0.1))

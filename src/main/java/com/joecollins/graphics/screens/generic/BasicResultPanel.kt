@@ -83,7 +83,7 @@ class BasicResultPanel private constructor(
         }
 
         override fun toMainBarHeader(key: Party, forceSingleLine: Boolean): String {
-            return key.name.toUpperCase()
+            return key.name.uppercase()
         }
 
         override fun winnerShape(forceSingleLine: Boolean): Shape {
@@ -112,9 +112,9 @@ class BasicResultPanel private constructor(
 
         override fun toMainBarHeader(key: Candidate, forceSingleLine: Boolean): String {
             return if (key === Candidate.OTHERS) {
-                key.party.name.toUpperCase()
+                key.party.name.uppercase()
             } else ("${key.name}${if (key.isIncumbent()) incumbentMarker else ""}${if (forceSingleLine) (" (" + key.party.abbreviation + ")") else ("\n" + key.party.name)}")
-                    .toUpperCase()
+                    .uppercase()
         }
 
         override fun winnerShape(forceSingleLine: Boolean): Shape {
@@ -410,7 +410,7 @@ class BasicResultPanel private constructor(
                                     .sortedByDescending { it.value }
                                     .map { e: Map.Entry<Party, Int> ->
                                         BasicBar(
-                                                e.key.name.toUpperCase(),
+                                                e.key.name.uppercase(),
                                                 e.key.color,
                                                 e.value)
                                     }
@@ -433,7 +433,7 @@ class BasicResultPanel private constructor(
                             .sortedByDescending { e: Map.Entry<Party, CurrDiff<Int>> -> if (e.key === Party.OTHERS) Int.MIN_VALUE else e.value.curr }
                             .map { e: Map.Entry<Party, CurrDiff<Int>> ->
                                 BasicBar(
-                                        e.key.abbreviation.toUpperCase(),
+                                        e.key.abbreviation.uppercase(),
                                         e.key.color,
                                         e.value.diff,
                                         changeStr(e.value.diff))
@@ -583,7 +583,7 @@ class BasicResultPanel private constructor(
                             .sortedByDescending { e: Map.Entry<Party, CurrDiff<Pair<Int, Int>>> -> if (e.key === Party.OTHERS) Int.MIN_VALUE else e.value.curr.second }
                             .map { e: Map.Entry<Party, CurrDiff<Pair<Int, Int>>> ->
                                 DualBar(
-                                        e.key.abbreviation.toUpperCase(),
+                                        e.key.abbreviation.uppercase(),
                                         e.key.color,
                                         if (focusLocation == FocusLocation.FIRST ||
                                             (e.value.diff.first != 0 && sign(e.value.diff.first.toDouble()) != sign(e.value.diff.second.toDouble())) ||
@@ -732,7 +732,7 @@ class BasicResultPanel private constructor(
                             }
                             .map { e: Map.Entry<Party, CurrDiff<IntRange>> ->
                                 DualBar(
-                                        e.key.abbreviation.toUpperCase(),
+                                        e.key.abbreviation.uppercase(),
                                         e.key.color,
                                         e.value.diff.first,
                                         e.value.diff.last,
@@ -1209,7 +1209,7 @@ class BasicResultPanel private constructor(
                                     .sortedByDescending { it.value }
                                     .map { e: Map.Entry<Party, Int> ->
                                         BasicBar(
-                                                e.key.name.toUpperCase(),
+                                                e.key.name.uppercase(),
                                                 e.key.color,
                                                 1.0 * e.value / total,
                                                 voteTemplate.toBarString(
@@ -1273,7 +1273,7 @@ class BasicResultPanel private constructor(
                                         val cpct = 1.0 * e.value / currTotal
                                         val ppct = 1.0 * prevVotes.getOrDefault(e.key, 0) / prevTotal
                                         BasicBar(
-                                                e.key.abbreviation.toUpperCase(),
+                                                e.key.abbreviation.uppercase(),
                                                 e.key.color,
                                                 cpct - ppct,
                                                 DecimalFormat("+0.0%;-0.0%").format(cpct - ppct))
@@ -1441,7 +1441,7 @@ class BasicResultPanel private constructor(
                                         val cpctMax = e.value.endInclusive
                                         val ppct = 1.0 * prevVotes.getOrDefault(e.key, 0) / prevTotal
                                         DualBar(
-                                                e.key.abbreviation.toUpperCase(),
+                                                e.key.abbreviation.uppercase(),
                                                 e.key.color,
                                                 cpctMin - ppct,
                                                 cpctMax - ppct,
