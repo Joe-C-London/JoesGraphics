@@ -1527,6 +1527,129 @@ class BasicResultPanel private constructor(
         }
     }
 
+    class PartyQuotaScreenBuilder(
+        private val quotas: BindingReceiver<Map<Party, Double>>,
+        private val totalSeats: BindingReceiver<Int>,
+        private val header: BindingReceiver<String?>,
+        private val subhead: BindingReceiver<String?>
+    ) {
+        private var prevQuotas: BindingReceiver<Map<Party, Double>>? = null
+        private var changeHeader: BindingReceiver<String>? = null
+
+        private var swingCurrVotes: BindingReceiver<Map<Party, Int>>? = null
+        private var swingPrevVotes: BindingReceiver<Map<Party, Int>>? = null
+        private var swingComparator: Comparator<Party>? = null
+        private var swingHeader: BindingReceiver<String?>? = null
+
+        private var mapBuilder: MapBuilder<*>? = null
+
+        fun withPrev(
+            prevQuotas: Binding<Map<Party, Double>>,
+            changeHeader: Binding<String>
+        ): PartyQuotaScreenBuilder {
+            this.prevQuotas = BindingReceiver(prevQuotas)
+            this.changeHeader = BindingReceiver(changeHeader)
+            return this
+        }
+
+        fun withSwing(
+            currVotes: Binding<Map<Party, Int>>,
+            prevVotes: Binding<Map<Party, Int>>,
+            comparator: Comparator<Party>,
+            header: Binding<String?>
+        ): PartyQuotaScreenBuilder {
+            this.swingCurrVotes = BindingReceiver(currVotes)
+            this.swingPrevVotes = BindingReceiver(prevVotes)
+            this.swingComparator = comparator
+            this.swingHeader = BindingReceiver(header)
+            return this
+        }
+
+        fun <T> withPartyMap(
+            shapes: Binding<Map<T, Shape>>,
+            selectedShape: Binding<T>,
+            leadingParty: Binding<Party?>,
+            focus: Binding<List<T>?>,
+            header: Binding<String?>
+        ): PartyQuotaScreenBuilder {
+            mapBuilder = MapBuilder(shapes, selectedShape, leadingParty.map { party: Party? -> PartyResult.elected(party) }, focus, header)
+            return this
+        }
+
+        fun build(textHeader: Binding<String>): BasicResultPanel {
+            return BasicResultPanel(
+                createHeaderLabel(textHeader),
+                createFrame(),
+                null,
+                createDiffFrame(),
+                createSwingFrame(),
+                mapBuilder?.createMapFrame()
+            )
+        }
+
+        private fun createFrame(): BarFrame {
+            return BarFrame(
+                barsBinding = quotas.getBinding { q ->
+                    q.entries.asSequence()
+                        .sortedByDescending { it.value }
+                        .map { BarFrame.Bar(
+                            leftText = it.key.name.uppercase(),
+                            rightText = DecimalFormat("0.00").format(it.value) + " QUOTAS",
+                            series = listOf(it.key.color to it.value)
+                        ) }
+                        .toList()
+                },
+                headerBinding = header.getBinding(),
+                subheadTextBinding = subhead.getBinding(),
+                maxBinding = totalSeats.getBinding(),
+                linesBinding = totalSeats.getBinding { lines -> (1 until lines).map { BarFrame.Line(it, "$it QUOTA${if (it == 1) "" else "S"}") } }
+            )
+        }
+
+        private fun createDiffFrame(): BarFrame? {
+            if (prevQuotas == null) return null
+            return BarFrame(
+                barsBinding = quotas.getBinding().merge(prevQuotas!!.getBinding()) { curr, prevRaw ->
+                    if (curr.isEmpty()) {
+                        emptyList()
+                    } else {
+                        val prev = prevRaw
+                        sequenceOf(
+                            curr.asSequence().sortedByDescending { it.value }.map { it.key },
+                            prev.keys.asSequence().filter { !curr.containsKey(it) }
+                        )
+                            .flatten()
+                            .distinct()
+                            .map { party ->
+                                val diff = (curr[party] ?: 0.0) - (prev[party] ?: 0.0)
+                                BarFrame.Bar(
+                                    leftText = party.abbreviation.uppercase(),
+                                    rightText = DecimalFormat("+0.00;-0.00").format(diff),
+                                    series = listOf(party.color to diff)
+                            ) }
+                            .toList()
+                    }
+                },
+                headerBinding = changeHeader?.getBinding() ?: Binding.fixedBinding(null),
+                maxBinding = Binding.fixedBinding(1),
+                minBinding = Binding.fixedBinding(-1)
+            )
+        }
+
+        private fun createSwingFrame(): SwingFrame? {
+            return swingHeader?.let { header ->
+                val prev = swingPrevVotes!!
+                val curr = swingCurrVotes!!
+                SwingFrameBuilder.prevCurr(
+                    prev.getBinding(),
+                    curr.getBinding(),
+                    swingComparator!!)
+                    .withHeader(header.getBinding())
+                    .build()
+            }
+        }
+    }
+
     class CurrDiff<CT>(val curr: CT, val diff: CT)
     companion object {
         private val PCT_FORMAT = DecimalFormat("0.0%")
@@ -1717,6 +1840,19 @@ class BasicResultPanel private constructor(
                     PartyTemplate(),
                     PctOnlyTemplate(),
                     Party.OTHERS)
+        }
+
+        @JvmStatic fun partyQuotas(
+            quotas: Binding<Map<Party, Double>>,
+            totalSeats: Binding<Int>,
+            header: Binding<String?>,
+            subhead: Binding<String?>
+        ): PartyQuotaScreenBuilder {
+            return PartyQuotaScreenBuilder(
+                BindingReceiver(quotas),
+                BindingReceiver(totalSeats),
+                BindingReceiver(header),
+                BindingReceiver(subhead))
         }
     }
 
