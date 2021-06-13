@@ -159,9 +159,10 @@ class SingleTransferrableResultScreen private constructor(
         }
 
         private fun createCandidatesPanel(): JPanel {
+            val votesQuota = candidateVotes.getBinding().merge(quota.getBinding()) { v, q -> v to q }
             val inOut = elected.getBinding().merge(excluded.getBinding()) { el, ex -> el to ex }
             return BarFrame(
-                barsBinding = candidateVotes.getBinding().merge(inOut) { votes, (elected, excluded) ->
+                barsBinding = votesQuota.merge(inOut) { (votes, quota), (elected, excluded) ->
                     val electedCandidates = elected.map { it.first }
                     val alreadyElectedSequence = elected.asSequence()
                         .filter { !votes.containsKey(it.first) }
@@ -178,7 +179,7 @@ class SingleTransferrableResultScreen private constructor(
                         .map {
                             BarFrame.Bar(
                                 leftText = it.key.name.uppercase() + (if (it.key.incumbent) " $incumbentMarker" else "") + " (${it.key.party.abbreviation.uppercase()})",
-                                rightText = if (it.value == null) "WAITING..." else formatString(it.value!!),
+                                rightText = if (it.value == null) "WAITING..." else (formatString(it.value!!) + (if (quota == null) "" else (" (" + formatString(it.value!!.toDouble() / quota!!.toDouble()) + ")"))),
                                 series = listOf(it.key.party.color to (it.value ?: 0)),
                                 leftIcon = when {
                                     electedCandidates.contains(it.key) -> ImageGenerator.createTickShape()
