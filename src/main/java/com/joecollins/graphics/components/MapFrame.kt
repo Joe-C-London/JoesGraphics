@@ -38,13 +38,18 @@ class MapFrame(
     private var focus: Rectangle2D? = null
     private var outlineShapes: List<Shape> = ArrayList()
     private val transformedShapesCache: MutableMap<Shape, Shape> = WeakHashMap()
-    private val distanceThreshold = 0.5
 
     private fun createTransformedShape(transform: AffineTransform, shape: Shape): Shape {
         val pathIterator = transform.createTransformedShape(shape).getPathIterator(null)
         val currentPath = GeneralPath()
         val c = DoubleArray(6)
         var lastPoint: Point2D.Double? = null
+        val isOffScreen = { p: Point2D? ->
+            p != null && (p.x < 0 || p.y < 0 || p.x > width || p.y > height)
+        }
+        val distanceThreshold = { p1: Point2D, p2: Point2D ->
+            if (isOffScreen(p1) && isOffScreen(p2)) 10.0 else 0.5
+        }
         while (!pathIterator.isDone) {
             val type = pathIterator.currentSegment(c)
             var nextPoint: Point2D.Double
@@ -55,21 +60,21 @@ class MapFrame(
                 }
                 PathIterator.SEG_LINETO -> {
                     nextPoint = Point2D.Double(c[0], c[1])
-                    if (lastPoint == null || lastPoint.distance(nextPoint) > distanceThreshold) {
+                    if (lastPoint == null || lastPoint.distance(nextPoint) > distanceThreshold(lastPoint, nextPoint)) {
                         currentPath.lineTo(c[0], c[1])
                         lastPoint = nextPoint
                     }
                 }
                 PathIterator.SEG_QUADTO -> {
                     nextPoint = Point2D.Double(c[2], c[3])
-                    if (lastPoint == null || lastPoint.distance(nextPoint) > distanceThreshold) {
+                    if (lastPoint == null || lastPoint.distance(nextPoint) > distanceThreshold(lastPoint, nextPoint)) {
                         currentPath.quadTo(c[0], c[1], c[2], c[3])
                         lastPoint = nextPoint
                     }
                 }
                 PathIterator.SEG_CUBICTO -> {
                     nextPoint = Point2D.Double(c[4], c[5])
-                    if (lastPoint == null || lastPoint.distance(nextPoint) > distanceThreshold) {
+                    if (lastPoint == null || lastPoint.distance(nextPoint) > distanceThreshold(lastPoint, nextPoint)) {
                         currentPath.curveTo(c[0], c[1], c[2], c[3], c[4], c[5])
                         lastPoint = nextPoint
                     }
