@@ -3,7 +3,7 @@ package com.joecollins.graphics.screens.generic
 import com.joecollins.bindings.Binding
 import com.joecollins.bindings.BindingReceiver
 import com.joecollins.graphics.ImageGenerator
-import com.joecollins.graphics.components.BarFrame
+import com.joecollins.graphics.components.BarFrameBuilder
 import com.joecollins.graphics.utils.StandardFont
 import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.Party
@@ -161,27 +161,29 @@ class SingleTransferrableResultScreen private constructor(
         private fun createCandidatesPanel(): JPanel {
             val votesQuota = candidateVotes.getBinding().merge(quota.getBinding()) { v, q -> v to q }
             val inOut = elected.getBinding().merge(excluded.getBinding()) { el, ex -> el to ex }
-            return BarFrame(
-                barsBinding = votesQuota.merge(inOut) { (votes, quota), (elected, excluded) ->
+            return BarFrameBuilder.basic(
+                votesQuota.merge(inOut) { (votes, quota), (elected, excluded) ->
                     val electedCandidates = elected.map { it.first }
                     val alreadyElectedSequence = elected.asSequence()
                         .filter { !votes.containsKey(it.first) }
                         .map {
-                            BarFrame.Bar(
-                                leftText = it.first.name.uppercase() + (if (it.first.incumbent) " $incumbentMarker" else "") + " (${it.first.party.abbreviation.uppercase()})",
-                                rightText = "ELECTED IN ${it.second}",
-                                leftIcon = ImageGenerator.createTickShape(),
-                                series = listOf(it.first.party.color to 0)
+                            BarFrameBuilder.BasicBar(
+                                label = it.first.name.uppercase() + (if (it.first.incumbent) " $incumbentMarker" else "") + " (${it.first.party.abbreviation.uppercase()})",
+                                valueLabel = "ELECTED IN ${it.second}",
+                                shape = ImageGenerator.createTickShape(),
+                                value = 0,
+                                color = it.first.party.color
                             )
                         }
                     val thisRoundSequence = votes.entries.asSequence()
                         .sortedByDescending { it.value?.toDouble() ?: -1.0 }
                         .map {
-                            BarFrame.Bar(
-                                leftText = it.key.name.uppercase() + (if (it.key.incumbent) " $incumbentMarker" else "") + " (${it.key.party.abbreviation.uppercase()})",
-                                rightText = if (it.value == null) "WAITING..." else (formatString(it.value!!) + (if (quota == null) "" else (" (" + formatString(it.value!!.toDouble() / quota!!.toDouble()) + ")"))),
-                                series = listOf(it.key.party.color to (it.value ?: 0)),
-                                leftIcon = when {
+                            BarFrameBuilder.BasicBar(
+                                label = it.key.name.uppercase() + (if (it.key.incumbent) " $incumbentMarker" else "") + " (${it.key.party.abbreviation.uppercase()})",
+                                valueLabel = if (it.value == null) "WAITING..." else (formatString(it.value!!) + (if (quota == null) "" else (" (" + formatString(it.value!!.toDouble() / quota!!.toDouble()) + ")"))),
+                                color = it.key.party.color,
+                                value = (it.value ?: 0),
+                                shape = when {
                                     electedCandidates.contains(it.key) -> ImageGenerator.createTickShape()
                                     excluded.contains(it.key) -> ImageGenerator.createCrossShape()
                                     else -> null
@@ -191,12 +193,13 @@ class SingleTransferrableResultScreen private constructor(
                     sequenceOf(alreadyElectedSequence, thisRoundSequence)
                         .flatten()
                         .toList()
-                },
-                headerBinding = candidateHeader.getBinding(),
-                subheadTextBinding = candidateSubhead.getBinding(),
-                maxBinding = quota.getBinding { (it?.toDouble() ?: 1.0) * 2 },
-                linesBinding = quota.getBinding { if (it == null) emptyList() else listOf(BarFrame.Line(it, "QUOTA: " + formatString(it))) }
+                }
             )
+                .withHeader(candidateHeader.getBinding())
+                .withSubhead(candidateSubhead.getBinding())
+                .withMax(quota.getBinding { (it?.toDouble() ?: 1.0) * 2 })
+                .withLines(quota.getBinding { if (it == null) emptyList() else listOf(it) }) { "QUOTA: " + formatString(it) }
+                .build()
         }
 
         private fun createPartiesPanel(): JPanel? {
@@ -204,11 +207,8 @@ class SingleTransferrableResultScreen private constructor(
                 return null
             }
             val quotaAndElected = quota.getBinding().merge(elected.getBinding { e -> e.map { it.first } }) { q, e -> q to e }
-            return BarFrame(
-                headerBinding = partyHeader!!.getBinding(),
-                maxBinding = totalSeats!!.getBinding(),
-                linesBinding = totalSeats!!.getBinding { (1 until it).map { i -> BarFrame.Line(i, "$i QUOTA${if (i == 1) "" else "S"}") } },
-                barsBinding = candidateVotes.getBinding().merge(quotaAndElected) { votes, (quota, elected) ->
+            return BarFrameBuilder.basic(
+                candidateVotes.getBinding().merge(quotaAndElected) { votes, (quota, elected) ->
                     val electedEarlier = elected.filter { !votes.containsKey(it) }
                         .groupingBy { it.party }
                         .eachCount()
@@ -222,32 +222,36 @@ class SingleTransferrableResultScreen private constructor(
                         .associateWith { (electedEarlier[it] ?: 0) + (quotasThisRound[it] ?: 0.0) }
                         .entries
                         .sortedByDescending { it.value }
-                        .map { BarFrame.Bar(
-                            leftText = it.key.name.uppercase(),
-                            rightText = formatString(it.value),
-                            series = listOf(it.key.color to it.value)
+                        .map { BarFrameBuilder.BasicBar(
+                            label = it.key.name.uppercase(),
+                            color = it.key.color,
+                            value = it.value,
+                            valueLabel = formatString(it.value)
                         ) }
                 }
             )
+                .withHeader(partyHeader!!.getBinding())
+                .withMax(totalSeats!!.getBinding())
+                .withLines(totalSeats!!.getBinding { (1 until it).toList() }) { i -> "$i QUOTA${if (i == 1) "" else "S"}" }
+                .build()
         }
 
         private fun createPrevPanel(): JPanel? {
             if (prevHeader == null) {
                 return null
             }
-            return BarFrame(
-                barsBinding = prevSeats!!.getBinding { prev ->
-                    prev.entries
-                        .sortedByDescending { it.value }
-                        .map { BarFrame.Bar(
-                            leftText = it.key.abbreviation.uppercase(),
-                            rightText = "${it.value}",
-                            series = listOf(it.key.color to it.value)
-                        ) }
-                },
-                headerBinding = prevHeader!!.getBinding(),
-                maxBinding = prevSeats!!.getBinding { prev -> prev.values.sum() / 2 }
-            )
+            return BarFrameBuilder.basic(prevSeats!!.getBinding { prev ->
+                prev.entries
+                    .sortedByDescending { it.value }
+                    .map { BarFrameBuilder.BasicBar(
+                        label = it.key.abbreviation.uppercase(),
+                        color = it.key.color,
+                        value = it.value
+                    ) }
+            })
+                .withMax(prevSeats!!.getBinding { prev -> prev.values.sum() / 2 })
+                .withHeader(prevHeader!!.getBinding())
+                .build()
         }
 
         private fun formatString(value: Number): String {
