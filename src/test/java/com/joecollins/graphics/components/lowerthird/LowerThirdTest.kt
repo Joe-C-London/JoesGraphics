@@ -51,4 +51,18 @@ class LowerThirdTest {
         lowerThird.setSize(1024, 50)
         compareRendering("LowerThird", "BlankMiddle", lowerThird)
     }
+
+    @Test
+    @Throws(IOException::class)
+    fun testRenderBlankMiddleShowingTimeZone() {
+        val lowerThird = LowerThird(
+            leftImageBinding = fixedBinding(createImage("BREAKING NEWS", Color.WHITE, Color.RED)),
+            placeBinding = fixedBinding("OTTAWA"),
+            timezoneBinding = fixedBinding(ZoneId.of("Canada/Eastern")),
+            showTimeZone = true,
+            clock = Clock.fixed(Instant.parse("2019-10-22T01:30:00Z"), ZoneId.systemDefault())
+        )
+        lowerThird.setSize(1024, 50)
+        compareRendering("LowerThird", "BlankMiddleShowingTimeZone", lowerThird)
+    }
 }

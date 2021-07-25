@@ -12,22 +12,25 @@ class LowerThirdHeadlineOnly internal constructor(
     timezoneBinding: Binding<ZoneId>,
     private val headlineBinding: Binding<String?>,
     private val subheadBinding: Binding<String?>,
-    clock: Clock
-) : LowerThird(leftImageBinding, placeBinding, timezoneBinding, clock) {
+    clock: Clock,
+    showTimeZone: Boolean = false
+) : LowerThird(leftImageBinding, placeBinding, timezoneBinding, clock, showTimeZone) {
 
     constructor(
         leftImageBinding: Binding<Image>,
         placeBinding: Binding<String>,
         timezoneBinding: Binding<ZoneId>,
         headlineBinding: Binding<String?>,
-        subheadBinding: Binding<String?>
+        subheadBinding: Binding<String?>,
+        showTimeZone: Boolean = false
     ) : this(
         leftImageBinding,
         placeBinding,
         timezoneBinding,
         headlineBinding,
         subheadBinding,
-        Clock.systemDefaultZone()
+        Clock.systemDefaultZone(),
+        showTimeZone
     )
 
     private val headlinePanel = HeadlinePanel()

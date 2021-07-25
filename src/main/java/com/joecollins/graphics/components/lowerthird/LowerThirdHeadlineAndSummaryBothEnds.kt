@@ -19,8 +19,9 @@ class LowerThirdHeadlineAndSummaryBothEnds internal constructor(
     summaryLeftBinding: Binding<SummaryFromBothEnds.Entry?>,
     summaryRightBinding: Binding<SummaryFromBothEnds.Entry?>,
     summaryMiddleBinding: Binding<SummaryFromBothEnds.Entry?> = Binding.fixedBinding(null),
-    clock: Clock
-) : LowerThird(leftImageBinding, placeBinding, timezoneBinding, clock) {
+    clock: Clock,
+    showTimeZone: Boolean = false
+) : LowerThird(leftImageBinding, placeBinding, timezoneBinding, clock, showTimeZone) {
 
     constructor(
         leftImageBinding: Binding<Image>,
@@ -32,7 +33,8 @@ class LowerThirdHeadlineAndSummaryBothEnds internal constructor(
         summaryTotalBinding: Binding<Int>,
         summaryLeftBinding: Binding<SummaryFromBothEnds.Entry?>,
         summaryRightBinding: Binding<SummaryFromBothEnds.Entry?>,
-        summaryMiddleBinding: Binding<SummaryFromBothEnds.Entry?> = Binding.fixedBinding(null)
+        summaryMiddleBinding: Binding<SummaryFromBothEnds.Entry?> = Binding.fixedBinding(null),
+        showTimeZone: Boolean = false
     ) : this(
         leftImageBinding,
         placeBinding,
@@ -44,7 +46,8 @@ class LowerThirdHeadlineAndSummaryBothEnds internal constructor(
         summaryLeftBinding,
         summaryRightBinding,
         summaryMiddleBinding,
-        Clock.systemDefaultZone()
+        Clock.systemDefaultZone(),
+        showTimeZone
     )
 
     private val headlinePanel = HeadlinePanel()

@@ -22,6 +22,7 @@ import java.time.Clock
 import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
+import java.util.Locale
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import javax.imageio.ImageIO
@@ -35,14 +36,16 @@ open class LowerThird internal constructor(
     private val leftImageBinding: Binding<Image>,
     private val placeBinding: Binding<String>,
     private val timezoneBinding: Binding<ZoneId>,
-    private val clock: Clock
+    private val clock: Clock,
+    private val showTimeZone: Boolean = false
 ) : JPanel() {
 
     constructor(
         leftImageBinding: Binding<Image>,
         placeBinding: Binding<String>,
-        timezoneBinding: Binding<ZoneId>
-    ) : this(leftImageBinding, placeBinding, timezoneBinding, Clock.systemDefaultZone())
+        timezoneBinding: Binding<ZoneId>,
+        showTimeZone: Boolean = false
+    ) : this(leftImageBinding, placeBinding, timezoneBinding, Clock.systemDefaultZone(), showTimeZone)
 
     private val leftPanel: ImagePanel = ImagePanel()
     private val rightPanel = PlaceAndTimePanel()
@@ -79,6 +82,7 @@ open class LowerThird internal constructor(
 
     private inner class PlaceAndTimePanel : JPanel() {
         private val formatter = DateTimeFormatter.ofPattern("HH:mm")
+        private val tzFormatter = DateTimeFormatter.ofPattern("zzz", Locale.ENGLISH)
         private val executor = Executors.newSingleThreadScheduledExecutor { r: Runnable? ->
             val t = Thread(r)
             t.name = "LowerThird-Timer-" + this.hashCode()
@@ -89,6 +93,7 @@ open class LowerThird internal constructor(
         private var _timezone: ZoneId = ZoneOffset.UTC
         private val _placeLabel: JLabel = JLabel("UTC")
         private val _timeLabel: JLabel
+        private val _timezoneLabel: JLabel
 
         init {
             _placeLabel.font = StandardFont.readBoldFont(12)
@@ -102,7 +107,14 @@ open class LowerThird internal constructor(
             _timeLabel.horizontalAlignment = JLabel.CENTER
             _timeLabel.verticalAlignment = JLabel.CENTER
             _timeLabel.foreground = Color.BLACK
-            _timeLabel.border = EmptyBorder(0, 0, 0, 0)
+            _timeLabel.border = EmptyBorder(if (showTimeZone) 5 else 0, 0, if (showTimeZone) -5 else 0, 0)
+
+            _timezoneLabel = JLabel("UTC")
+            _timezoneLabel.font = StandardFont.readNormalFont(10)
+            _timezoneLabel.horizontalAlignment = JLabel.CENTER
+            _timezoneLabel.verticalAlignment = JLabel.CENTER
+            _timezoneLabel.foreground = Color.BLACK
+            _timezoneLabel.border = EmptyBorder(5, 0, 1, 0)
         }
 
         var place: String
@@ -124,9 +136,11 @@ open class LowerThird internal constructor(
 
         fun updateTime() {
             try {
-                val newTime = formatter.format(clock.instant().atZone(_timezone))
+                val now = clock.instant().atZone(_timezone)
+                val newTime = formatter.format(now)
                 if (newTime != _timeLabel.text) {
                     _timeLabel.text = newTime
+                    _timezoneLabel.text = tzFormatter.format(now)
                     EventQueue.invokeLater { _timeLabel.repaint() }
                 }
             } catch (e: Exception) {
@@ -164,6 +178,22 @@ open class LowerThird internal constructor(
                         weighty = 1.0
                     }
                 })
+            if (showTimeZone) {
+                add(
+                    _timezoneLabel,
+                    object : GridBagConstraints() {
+                        init {
+                            fill = BOTH
+                            gridx = 0
+                            gridy = 5
+                            gridwidth = 1
+                            gridheight = 1
+                            weightx = 1.0
+                            weighty = 1.0
+                        }
+                    }
+                )
+            }
             executor.scheduleAtFixedRate({ updateTime() }, 0, 100, TimeUnit.MILLISECONDS)
         }
     }
