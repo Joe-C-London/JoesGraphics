@@ -79,7 +79,7 @@ class SummaryWithHeaderAndLabels(
         }
         val bottomHeaderLabel: JLabel = object : JLabel() {
             init {
-                font = StandardFont.readNormalFont(12)
+                font = StandardFont.readNormalFont(10)
                 horizontalAlignment = CENTER
                 foreground = Color.BLACK
                 border = EmptyBorder(3, 0, -3, 0)
