@@ -4,6 +4,7 @@ import com.joecollins.bindings.Bindable
 import com.joecollins.bindings.Binding
 import com.joecollins.bindings.BindingReceiver
 import com.joecollins.bindings.mapElements
+import com.joecollins.graphics.components.FontSizeAdjustingLabel
 import com.joecollins.graphics.components.MultiSummaryFrame
 import com.joecollins.graphics.utils.StandardFont.readBoldFont
 import com.joecollins.models.general.Aggregators.adjustKey
@@ -129,7 +130,7 @@ class TooCloseToCallScreen private constructor(titleLabel: JLabel, multiSummaryF
         }
 
         fun build(titleBinding: Binding<String?>): TooCloseToCallScreen {
-            val headerLabel = JLabel()
+            val headerLabel = FontSizeAdjustingLabel()
             headerLabel.font = readBoldFont(32)
             headerLabel.horizontalAlignment = JLabel.CENTER
             headerLabel.border = EmptyBorder(5, 0, -5, 0)

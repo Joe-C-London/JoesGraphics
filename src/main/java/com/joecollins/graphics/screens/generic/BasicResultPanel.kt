@@ -8,6 +8,7 @@ import com.joecollins.graphics.components.BarFrame
 import com.joecollins.graphics.components.BarFrameBuilder
 import com.joecollins.graphics.components.BarFrameBuilder.BasicBar
 import com.joecollins.graphics.components.BarFrameBuilder.DualBar
+import com.joecollins.graphics.components.FontSizeAdjustingLabel
 import com.joecollins.graphics.components.MapFrame
 import com.joecollins.graphics.components.SwingFrame
 import com.joecollins.graphics.components.SwingFrameBuilder
@@ -1661,7 +1662,7 @@ class BasicResultPanel private constructor(
         }
 
         private fun createHeaderLabel(textBinding: Binding<String>): JLabel {
-            val headerLabel = JLabel()
+            val headerLabel = FontSizeAdjustingLabel()
             headerLabel.font = StandardFont.readBoldFont(32)
             headerLabel.horizontalAlignment = JLabel.CENTER
             headerLabel.border = EmptyBorder(5, 0, -5, 0)

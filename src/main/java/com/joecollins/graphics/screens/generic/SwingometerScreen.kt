@@ -3,6 +3,7 @@ package com.joecollins.graphics.screens.generic
 import com.joecollins.bindings.Bindable
 import com.joecollins.bindings.Binding
 import com.joecollins.bindings.BindingReceiver
+import com.joecollins.graphics.components.FontSizeAdjustingLabel
 import com.joecollins.graphics.components.SwingometerFrame
 import com.joecollins.graphics.components.SwingometerFrameBuilder
 import com.joecollins.graphics.utils.StandardFont
@@ -105,7 +106,7 @@ class SwingometerScreen private constructor(title: JLabel, frame: SwingometerFra
         }
 
         fun build(title: Binding<String?>): SwingometerScreen {
-            val headerLabel = JLabel()
+            val headerLabel = FontSizeAdjustingLabel()
             headerLabel.font = StandardFont.readBoldFont(32)
             headerLabel.horizontalAlignment = JLabel.CENTER
             headerLabel.border = EmptyBorder(5, 0, -5, 0)

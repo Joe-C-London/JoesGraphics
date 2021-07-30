@@ -3,6 +3,7 @@ package com.joecollins.graphics.screens.generic
 import com.joecollins.bindings.Bindable
 import com.joecollins.bindings.Binding
 import com.joecollins.graphics.components.FiguresFrame
+import com.joecollins.graphics.components.FontSizeAdjustingLabel
 import com.joecollins.graphics.utils.StandardFont.readBoldFont
 import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.Party
@@ -86,7 +87,7 @@ class FiguresScreen private constructor(headerLabel: JLabel, frames: Array<Figur
         private val sections: MutableList<Section> = LinkedList()
 
         fun build(titleBinding: Binding<String?>): FiguresScreen {
-            val headerLabel = JLabel()
+            val headerLabel = FontSizeAdjustingLabel()
             headerLabel.font = readBoldFont(32)
             headerLabel.horizontalAlignment = JLabel.CENTER
             headerLabel.border = EmptyBorder(5, 0, -5, 0)

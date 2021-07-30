@@ -4,6 +4,7 @@ import com.joecollins.bindings.Bindable
 import com.joecollins.bindings.Binding
 import com.joecollins.bindings.BindingReceiver
 import com.joecollins.bindings.mapElements
+import com.joecollins.graphics.components.FontSizeAdjustingLabel
 import com.joecollins.graphics.components.ResultListingFrame
 import com.joecollins.graphics.utils.StandardFont.readBoldFont
 import com.joecollins.models.general.Party
@@ -39,7 +40,7 @@ class AllSeatsScreen private constructor(title: JLabel, frame: ResultListingFram
         }
 
         fun build(titleBinding: Binding<String?>): AllSeatsScreen {
-            val headerLabel = JLabel()
+            val headerLabel = FontSizeAdjustingLabel()
             headerLabel.font = readBoldFont(32)
             headerLabel.horizontalAlignment = JLabel.CENTER
             headerLabel.border = EmptyBorder(5, 0, -5, 0)

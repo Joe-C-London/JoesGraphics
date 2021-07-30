@@ -3,6 +3,7 @@ package com.joecollins.graphics.screens.generic
 import com.joecollins.bindings.Bindable
 import com.joecollins.bindings.Binding
 import com.joecollins.bindings.BindingReceiver
+import com.joecollins.graphics.components.FontSizeAdjustingLabel
 import com.joecollins.graphics.components.RegionSummaryFrame
 import com.joecollins.graphics.utils.StandardFont.readBoldFont
 import com.joecollins.models.general.Party
@@ -82,7 +83,7 @@ class PartySummaryScreen private constructor(
 
         fun build(partyBinding: Binding<Party>): PartySummaryScreen {
             val party = BindingReceiver(partyBinding)
-            val headerLabel = JLabel()
+            val headerLabel = FontSizeAdjustingLabel()
             headerLabel.font = readBoldFont(32)
             headerLabel.horizontalAlignment = JLabel.CENTER
             headerLabel.border = EmptyBorder(5, 0, -5, 0)
