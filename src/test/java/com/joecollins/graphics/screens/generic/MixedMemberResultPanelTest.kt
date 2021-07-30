@@ -12,13 +12,10 @@ import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
 import com.joecollins.models.general.PartyResult.Companion.elected
 import com.joecollins.models.general.PartyResult.Companion.leading
+import org.junit.Test
 import java.awt.Color
 import java.awt.Shape
 import java.io.IOException
-import java.lang.Exception
-import java.util.LinkedHashMap
-import kotlin.Throws
-import org.junit.Test
 
 class MixedMemberResultPanelTest {
     @Test
@@ -550,6 +547,54 @@ class MixedMemberResultPanelTest {
         currPartyVotes[pc] = 822
         currentPartyVotes.value = currPartyVotes
         compareRendering("MixedMemberResultPanel", "NoPrevTick", panel)
+    }
+
+    @Test
+    @Throws(Exception::class)
+    fun testPartyOnlyForCandidateVote() {
+        val currentCandidateVotes = BindableWrapper(LinkedHashMap<Candidate, Int>())
+        val currentPartyVotes = BindableWrapper(LinkedHashMap<Party, Int>())
+        val header = BindableWrapper("CHARLOTTETOWN-WINSLOE")
+        val candidateHeader = BindableWrapper("CANDIDATE VOTES")
+        val partyHeader = BindableWrapper("PARTY VOTES")
+        val mapHeader = BindableWrapper("CHARLOTTETOWN")
+        val shapesByDistrict = peiShapesByDistrict()
+        val focus = BindableWrapper(shapesByDistrict.keys.filter { it in 10..14 })
+        val selectedShape = BindableWrapper(10)
+        val selectedResult = BindableWrapper<PartyResult?>(null)
+        val winner = BindableWrapper<Candidate?>(null)
+        val lib = Party("Liberal", "LIB", Color.RED)
+        val grn = Party("Green", "GRN", Color.GREEN.darker())
+        val pc = Party("Progressive Conservative", "PC", Color.BLUE)
+        val ndp = Party("New Democratic Party", "NDP", Color.ORANGE)
+        selectedResult.value = elected(lib)
+        val panel = builder()
+            .withCandidateVotes(currentCandidateVotes.binding, candidateHeader.binding)
+            .withPartyVotes(currentPartyVotes.binding, partyHeader.binding)
+            .withIncumbentMarker("(MLA)")
+            .withWinner(winner.binding)
+            .withResultMap(
+                fixedBinding(shapesByDistrict),
+                selectedShape.binding,
+                selectedResult.binding,
+                focus.binding,
+                mapHeader.binding)
+            .build(header.binding)
+        panel.setSize(1024, 512)
+        val currCandVotes = LinkedHashMap<Candidate, Int>()
+        currCandVotes[Candidate("", ndp)] = 41
+        currCandVotes[Candidate("", pc)] = 865
+        currCandVotes[Candidate("", lib, true)] = 1420
+        currCandVotes[Candidate("", grn)] = 1057
+        currentCandidateVotes.value = currCandVotes
+        winner.value = currCandVotes.keys.first { it.party === lib }
+        val currPartyVotes = LinkedHashMap<Party, Int>()
+        currPartyVotes[grn] = 1098
+        currPartyVotes[lib] = 1013
+        currPartyVotes[ndp] = 112
+        currPartyVotes[pc] = 822
+        currentPartyVotes.value = currPartyVotes
+        compareRendering("MixedMemberResultPanel", "PartyOnlyForCandidateVotes", panel)
     }
 
     @Test

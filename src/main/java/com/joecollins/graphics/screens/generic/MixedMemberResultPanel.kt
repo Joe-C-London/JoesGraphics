@@ -21,11 +21,9 @@ import java.awt.Dimension
 import java.awt.LayoutManager
 import java.awt.Shape
 import java.text.DecimalFormat
-import java.util.HashMap
 import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.border.EmptyBorder
-import kotlin.jvm.JvmOverloads
 
 class MixedMemberResultPanel private constructor(
     label: JLabel,
@@ -217,7 +215,10 @@ class MixedMemberResultPanel private constructor(
                                     val pct = e.value?.toDouble()?.div(total) ?: Double.NaN
                                     val leftLabel: String
                                     var rightLabel: String
-                                    if (showBothLines) {
+                                    if (candidate.name.isBlank()) {
+                                        leftLabel = candidate.party.name.uppercase()
+                                        rightLabel = ("${THOUSANDS_FORMAT.format(votes.toLong())} (${PCT_FORMAT.format(pct)})")
+                                    } else if (showBothLines) {
                                         leftLabel = ("${candidate.name.uppercase()}${if (candidate.isIncumbent()) incumbentMarker else ""}\n${candidate.party.name.uppercase()}")
                                         rightLabel = "${THOUSANDS_FORMAT.format(votes.toLong())}\n${PCT_FORMAT.format(pct)}"
                                     } else {
@@ -232,7 +233,7 @@ class MixedMemberResultPanel private constructor(
                                             candidate.party.color,
                                             if (java.lang.Double.isNaN(pct)) 0 else pct,
                                             (if (java.lang.Double.isNaN(pct)) "WAITING..." else rightLabel),
-                                            if (candidate === r.winner) shape else null)
+                                            if (candidate === r.winner) (if (candidate.name.isBlank()) ImageGenerator.createTickShape() else shape) else null)
                                 }
                                 .toList()
                     },
