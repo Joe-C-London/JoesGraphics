@@ -12,10 +12,10 @@ import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
 import com.joecollins.models.general.PartyResult.Companion.elected
 import com.joecollins.models.general.PartyResult.Companion.leading
-import org.junit.Test
 import java.awt.Color
 import java.awt.Shape
 import java.io.IOException
+import org.junit.Test
 
 class MixedMemberResultPanelTest {
     @Test

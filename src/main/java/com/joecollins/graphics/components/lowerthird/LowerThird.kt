@@ -15,8 +15,6 @@ import java.awt.RenderingHints
 import java.awt.geom.Rectangle2D
 import java.awt.image.BufferedImage
 import java.io.IOException
-import java.lang.Exception
-import java.lang.Runnable
 import java.net.URL
 import java.time.Clock
 import java.time.ZoneId
@@ -29,7 +27,6 @@ import javax.imageio.ImageIO
 import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.border.EmptyBorder
-import kotlin.Throws
 import kotlin.math.max
 
 open class LowerThird internal constructor(
@@ -138,10 +135,14 @@ open class LowerThird internal constructor(
             try {
                 val now = clock.instant().atZone(_timezone)
                 val newTime = formatter.format(now)
+                val newTz = tzFormatter.format(now)
                 if (newTime != _timeLabel.text) {
                     _timeLabel.text = newTime
-                    _timezoneLabel.text = tzFormatter.format(now)
                     EventQueue.invokeLater { _timeLabel.repaint() }
+                }
+                if (newTz != _timezoneLabel.text) {
+                    _timezoneLabel.text = newTz
+                    EventQueue.invokeLater { _timezoneLabel.repaint() }
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
