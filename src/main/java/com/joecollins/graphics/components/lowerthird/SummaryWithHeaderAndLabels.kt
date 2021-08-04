@@ -172,6 +172,9 @@ class SummaryWithHeaderAndLabels(
                 entryPanels[idx].bottomValueLabel.foreground = foreground
                 entryPanels[idx].bottomValueLabel.text = entry.value
             }
+            invalidate()
+            revalidate()
+            repaint()
         }
     }
 }

@@ -141,6 +141,9 @@ class SummaryWithLabels(
                 entryPanels[idx].topLabel.text = entry.label
                 entryPanels[idx].bottomLabel.text = entry.value
             }
+            invalidate()
+            revalidate()
+            repaint()
         }
     }
 }

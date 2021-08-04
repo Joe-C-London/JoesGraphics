@@ -134,6 +134,9 @@ class SummaryWithoutLabels(
                 entryPanels[idx].bottomLabel.foreground = if (entry.color == Color.WHITE) Color.BLACK else Color.WHITE
                 entryPanels[idx].bottomLabel.text = entry.value
             }
+            invalidate()
+            revalidate()
+            repaint()
         }
     }
 }
