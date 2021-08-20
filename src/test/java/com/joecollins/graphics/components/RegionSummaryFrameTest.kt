@@ -90,4 +90,20 @@ class RegionSummaryFrameTest {
         frame.setSize(125, 125)
         compareRendering("RegionSummaryFrame", "SameColor", frame)
     }
+
+    @Test
+    @Throws(IOException::class)
+    fun testRenderSingleLevel() {
+        val frame = RegionSummaryFrame(
+            headerBinding = fixedBinding("CANADA"),
+            summaryColorBinding = fixedBinding(Color.RED),
+            sectionsBinding = fixedBinding(
+                listOf(
+                    RegionSummaryFrame.SectionWithoutColor("SEATS", listOf("157", "-20"))
+                )
+            )
+        )
+        frame.setSize(125, 125)
+        compareRendering("RegionSummaryFrame", "SingleEntry", frame)
+    }
 }
