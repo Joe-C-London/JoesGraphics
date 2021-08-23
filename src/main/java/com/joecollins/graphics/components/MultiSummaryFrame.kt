@@ -147,7 +147,7 @@ class MultiSummaryFrame(
                 val values = row.values
                 while (entry.panels.size < values.size) {
                     val panel = JPanel()
-                    val label = JLabel()
+                    val label = FontSizeAdjustingLabel()
                     label.font = entry.headerLabel.font
                     label.border = entry.headerLabel.border
                     label.horizontalAlignment = JLabel.CENTER

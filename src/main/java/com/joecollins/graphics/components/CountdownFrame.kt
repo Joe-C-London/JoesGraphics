@@ -36,7 +36,7 @@ class CountdownFrame(
 
     private var time: Temporal = Instant.now()
 
-    private val timeRemainingLabel: JLabel = JLabel()
+    private val timeRemainingLabel: JLabel = FontSizeAdjustingLabel()
     private val additionalInfoLabel: JLabel = JLabel()
 
     init {
