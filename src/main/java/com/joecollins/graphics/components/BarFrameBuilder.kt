@@ -11,7 +11,7 @@ import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.sign
 
-class BarFrameBuilder {
+class BarFrameBuilder private constructor() {
     private var headerBinding: Binding<String?>? = null
     private var subheadBinding: Binding<String?>? = null
     private var notesBinding: Binding<String?>? = null
