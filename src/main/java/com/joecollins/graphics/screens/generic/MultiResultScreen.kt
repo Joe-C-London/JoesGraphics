@@ -26,10 +26,6 @@ import java.awt.GridLayout
 import java.awt.LayoutManager
 import java.awt.Shape
 import java.text.DecimalFormat
-import java.util.ArrayList
-import java.util.Comparator
-import java.util.HashMap
-import java.util.LinkedHashMap
 import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.border.EmptyBorder
@@ -503,7 +499,7 @@ class MultiResultScreen private constructor() : JPanel() {
             headerFunc: (T) -> Binding<String>,
             subheadFunc: (T) -> Binding<String>
         ): Builder<T> {
-            val adjustedVoteFunc = { t: T -> votesFunc(t).map { m: Map<Party, Int> -> Aggregators.adjustKey(m) { k: Party -> Candidate("", k) } } }
+            val adjustedVoteFunc = { t: T -> votesFunc(t).map { m: Map<Party, Int> -> Aggregators.adjustKey(m) { k: Party -> if (k == Party.OTHERS) Candidate.OTHERS else Candidate("", k) } } }
             return Builder(list, adjustedVoteFunc, headerFunc, subheadFunc, true)
         }
     }

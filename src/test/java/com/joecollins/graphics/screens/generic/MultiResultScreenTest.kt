@@ -13,11 +13,10 @@ import com.joecollins.graphics.utils.ShapefileReader.readShapes
 import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
+import org.junit.Test
 import java.awt.Color
 import java.awt.Shape
 import java.io.IOException
-import kotlin.Throws
-import org.junit.Test
 
 class MultiResultScreenTest {
     @Test
@@ -358,6 +357,140 @@ class MultiResultScreenTest {
         panel.setSize(1024, 512)
         compareRendering("MultiResultPanel", "Others-1", panel)
     }
+
+        @Test
+        @Throws(IOException::class)
+        fun testOthersPartyPanel() {
+                val districts = ArrayList<District>()
+                districts.add(
+                        District(
+                                30,
+                                "Saint John East",
+                                mapOf(
+                                        Candidate("Glen Savoie", pc, true) to 3507,
+                                        Candidate("Phil Comeau", lib) to 1639,
+                                        Candidate("Gerald Irish", grn) to 394,
+                                        Candidate("Patrick Kemp", pa) to 434,
+                                        Candidate("Josh Floyd", ndp) to 248
+                                ),
+                                true,
+                                mapOf(
+                                        lib to 1775,
+                                        pc to 3017,
+                                        grn to 373,
+                                        ndp to 402,
+                                        pa to 1047
+                                )))
+                districts.add(
+                        District(
+                                32,
+                                "Saint John Harbour",
+                                mapOf(
+                                        Candidate("Arlene Dunn", pc) to 2181,
+                                        Candidate("Alice McKim", lib) to 1207,
+                                        Candidate("Brent Harris", grn) to 1224,
+                                        Candidate("Courtney Pyrke", ndp) to 309,
+                                        Candidate("Others", Party.OTHERS) to 47 + 114 + 186
+                                ),
+                                false,
+                                mapOf(
+                                        lib to 1865,
+                                        pc to 1855,
+                                        grn to 721,
+                                        ndp to 836,
+                                        pa to 393
+                                )))
+                districts.add(
+                        District(
+                                33,
+                                "Saint John Lancaster",
+                                mapOf(
+                                        Candidate("Dorothy Shephard", pc, true) to 3560,
+                                        Candidate("Sharon Teare", lib) to 1471,
+                                        Candidate("Joanna Killen", grn) to 938,
+                                        Candidate("Paul Seelye", pa) to 394,
+                                        Candidate("Don Durant", ndp) to 201
+                                ),
+                                true,
+                                mapOf(
+                                        lib to 1727,
+                                        pc to 3001,
+                                        grn to 582,
+                                        ndp to 414,
+                                        pa to 922
+                                )))
+                districts.add(
+                        District(
+                                38,
+                                "Fredericton-Grand Lake",
+                                mapOf(
+                                        Candidate("Mary E. Wilson", pc, true) to 3374,
+                                        Candidate("Steven Burns", lib) to 2072,
+                                        Candidate("Gail Costello", grn) to 1306,
+                                        Candidate("Craig Rector", pa) to 745,
+                                        Candidate("Natasha M Akhtar", ndp) to 127
+                                ),
+                                true,
+                                mapOf(
+                                        lib to 955,
+                                        pc to 2433,
+                                        grn to 472,
+                                        ndp to 114,
+                                        pa to 4799
+                                )))
+                districts.add(
+                        District(
+                                40,
+                                "Fredericton South",
+                                mapOf(
+                                        Candidate("Brian MacKinnon", pc) to 2342,
+                                        Candidate("Nicole Picot", lib) to 895,
+                                        Candidate("David Coon", grn, true) to 4213,
+                                        Candidate("Wendell Betts", pa) to 234,
+                                        Candidate("Geoffrey Noseworthy", ndp) to 117
+                                ),
+                                true,
+                                mapOf(
+                                        lib to 1525,
+                                        pc to 1042,
+                                        grn to 4273,
+                                        ndp to 132,
+                                        pa to 616
+                                )))
+                districts.add(
+                        District(
+                                41,
+                                "Fredericton North",
+                                mapOf(
+                                        Candidate("Jill Green", pc) to 3227,
+                                        Candidate("Stephen Horsman", lib, true) to 1464,
+                                        Candidate("Luke Randall", grn) to 2464,
+                                        Candidate("Allen Price", pa) to 591,
+                                        Candidate("Mackenzie Thomason", ndp) to 100
+                                ),
+                                true,
+                                mapOf(
+                                        lib to 2443,
+                                        pc to 2182,
+                                        grn to 1313,
+                                        ndp to 139,
+                                        pa to 1651
+                                )))
+                val swingometerOrder = listOf(ndp, grn, lib, ind, pc, pa)
+                val panel = ofParties(
+                        fixedBinding(districts),
+                        { fixedBinding(it.votes.mapKeys { it.key.party }) },
+                        { fixedBinding("DISTRICT " + it.districtNum) },
+                        { fixedBinding(it.name.uppercase()) }
+                )
+                        .withPrev(
+                                { fixedBinding(it.prevVotes) },
+                                { fixedBinding("SWING SINCE 2018") },
+                                compareBy { swingometerOrder.indexOf(it) })
+                        .build(fixedBinding("SAINT JOHN"))
+                panel.setSize(1024, 512)
+                compareRendering("MultiResultPanel", "OthersParty-1", panel)
+        }
 
     @Test
     @Throws(IOException::class)
