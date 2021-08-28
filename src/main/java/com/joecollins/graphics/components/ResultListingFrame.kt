@@ -21,11 +21,13 @@ class ResultListingFrame(
     itemsBinding: Binding<List<Item>>,
     reversedBinding: Binding<Boolean>? = null,
     borderColorBinding: Binding<Color>? = null,
-    headerAlignmentBinding: Binding<Alignment>? = null
+    headerAlignmentBinding: Binding<Alignment>? = null,
+    notesBinding: Binding<String?>? = null
 ) : GraphicsFrame(
     headerBinding = headerBinding,
     borderColorBinding = borderColorBinding,
-    headerAlignmentBinding = headerAlignmentBinding
+    headerAlignmentBinding = headerAlignmentBinding,
+    notesBinding = notesBinding
 ) {
     private val centralPanel = JPanel()
     private val layout = Layout()
