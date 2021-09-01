@@ -13,10 +13,10 @@ import com.joecollins.graphics.utils.ShapefileReader.readShapes
 import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
-import org.junit.Test
 import java.awt.Color
 import java.awt.Shape
 import java.io.IOException
+import org.junit.Test
 
 class MultiResultScreenTest {
     @Test

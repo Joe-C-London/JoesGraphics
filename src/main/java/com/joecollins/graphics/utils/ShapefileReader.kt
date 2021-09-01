@@ -5,8 +5,6 @@ import java.awt.geom.AffineTransform
 import java.awt.geom.Area
 import java.io.IOException
 import java.net.URL
-import java.util.HashMap
-import kotlin.Throws
 import kotlin.reflect.cast
 import org.geotools.data.FileDataStore
 import org.geotools.data.FileDataStoreFinder
@@ -24,6 +22,12 @@ object ShapefileReader {
             return readShapes(file) { feature ->
                 @Suppress("UNCHECKED_CAST")
                 Integer::class.cast(feature.getAttribute(keyProperty)).toInt() as T
+            }
+        }
+        if (keyType == Long::class.java) {
+            return readShapes(file) { feature ->
+                @Suppress("UNCHECKED_CAST")
+                Long::class.cast(feature.getAttribute(keyProperty)).toLong() as T
             }
         }
         return readShapes(file) { feature -> keyType.cast(feature.getAttribute(keyProperty)) }

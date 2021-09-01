@@ -108,6 +108,48 @@ class CandidateListingScreenTest {
     }
 
     @Test
+    fun testCandidatesWithPrevOthersAndMap() {
+        val lib = Party("Liberal", "LIB", Color.RED)
+        val grn = Party("Green", "GRN", Color.GREEN.darker())
+        val pc = Party("Progressive Conservative", "PC", Color.BLUE)
+        val ndp = Party("New Democratic Party", "NDP", Color.ORANGE)
+        val ind = Party("Independent", "IND", Party.OTHERS.color)
+        val candidates = listOf(
+            Candidate("Angus Birt", pc),
+            Candidate("Bush Dumville", ind),
+            Candidate("Gavin Hall", grn),
+            Candidate("Gord McNeilly", lib),
+            Candidate("Janis Newman", ndp)
+        )
+        val prev = mapOf(
+            lib to 1040,
+            ndp to 931,
+            Party.OTHERS to 821 + 244
+        )
+        val shapes = peiShapesByDistrict()
+        val screen = CandidateListingScreen.of(
+            Binding.fixedBinding(candidates),
+            Binding.fixedBinding("CANDIDATES"),
+            Binding.fixedBinding(""),
+            "[MLA]"
+        )
+            .withMap(
+                Binding.fixedBinding(shapes),
+                Binding.fixedBinding(14),
+                Binding.fixedBinding(listOf(9, 10, 11, 12, 13, 14)),
+                Binding.fixedBinding("CHARLOTTETOWN")
+            )
+            .withPrev(
+                Binding.fixedBinding(prev),
+                Binding.fixedBinding("2015 RESULT"),
+                Binding.fixedBinding(null)
+            )
+            .build(Binding.fixedBinding("CHARLOTTETOWN-WEST ROYALTY"))
+        screen.size = Dimension(1024, 512)
+        RenderTestUtils.compareRendering("CandidateListingScreen", "CandidatesWithPrevOtherAndMap", screen)
+    }
+
+    @Test
     fun testCandidatesWithSecondaryPrevAndMap() {
         val lib = Party("Liberal", "LIB", Color.RED)
         val grn = Party("Green", "GRN", Color.GREEN.darker())
