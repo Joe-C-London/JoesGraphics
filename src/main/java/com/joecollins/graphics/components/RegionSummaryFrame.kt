@@ -153,9 +153,15 @@ class RegionSummaryFrame private constructor(
                 valueFonts.add(fontSize)
             }
             g.setColor(summaryColor)
-            val headerFont = StandardFont.readBoldFont(30.coerceAtMost(height / 3 - 5).coerceAtMost((valueFonts.maxOrNull() ?: Int.MAX_VALUE) / 2))
-            g.setFont(headerFont)
-            val headerWidth = g.getFontMetrics(headerFont).stringWidth(header)
+            var headerFontSize = 30.coerceAtMost(height / 3 - 5).coerceAtMost((valueFonts.maxOrNull() ?: Int.MAX_VALUE) / 2)
+            var headerFont: Font
+            var headerWidth: Int
+            do {
+                headerFont = StandardFont.readBoldFont(headerFontSize)
+                g.setFont(headerFont)
+                headerWidth = g.getFontMetrics(headerFont).stringWidth(header)
+                headerFontSize--
+            } while (headerWidth > width - 20)
             g.drawString(header, (width - headerWidth) / 2, height / 3 - 5)
         }
 

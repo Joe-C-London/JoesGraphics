@@ -146,3 +146,5 @@ interface Binding<out T> {
 }
 
 fun <T, R> Binding<List<T>>.mapElements(func: (T) -> R): Binding<List<R>> = this.map { list -> list.map(func) }
+
+fun <T> T.toFixedBinding(): Binding<T> = Binding.fixedBinding(this)

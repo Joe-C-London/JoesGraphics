@@ -68,13 +68,72 @@ class PartySummaryScreen private constructor(
     class Builder<T>(
         private val mainRegion: T,
         private val titleFunc: (T) -> Binding<String>,
-        private val seatFunc: (T) -> Binding<Map<Party, Int>>,
-        private val seatDiffFunc: (T) -> Binding<Map<Party, Int>>,
-        private val votePctFunc: (T) -> Binding<Map<Party, Double>>,
-        private val votePctDiffFunc: (T) -> Binding<Map<Party, Double>>,
         private val numRows: Int
     ) {
+        private var seatFunc: ((T) -> Binding<Map<Party, Int>>)? = null
+        private var seatDiffFunc: ((T) -> Binding<Map<Party, Int>>)? = null
+        private var seatsHeader = "SEATS"
+        private var votePctFunc: ((T) -> Binding<Map<Party, Double>>)? = null
+        private var votePctDiffFunc: ((T) -> Binding<Map<Party, Double>>)? = null
+        private var voteHeader = "POPULAR VOTE"
+
         private val regions: MutableList<T> = ArrayList()
+
+        fun withSeatAndDiff(
+            seatFunc: ((T) -> Binding<Map<Party, Int>>),
+            seatDiffFunc: ((T) -> Binding<Map<Party, Int>>),
+            seatsHeader: String = "SEATS"
+        ): Builder<T> {
+            this.seatFunc = seatFunc
+            this.seatDiffFunc = seatDiffFunc
+            this.seatsHeader = seatsHeader
+            return this
+        }
+
+        fun withSeatAndPrev(
+            seatFunc: ((T) -> Binding<Map<Party, Int>>),
+            seatPrevFunc: ((T) -> Binding<Map<Party, Int>>),
+            seatsHeader: String = "SEATS"
+        ): Builder<T> {
+            val seatDiffFunc = { t: T ->
+                val curr = seatFunc(t)
+                val prev = seatPrevFunc(t)
+                curr.merge(prev) { c, p ->
+                    sequenceOf(c.keys.asSequence(), p.keys.asSequence()).flatten()
+                        .distinct()
+                        .associateWith { party: Party -> (c[party] ?: 0) - (p[party] ?: 0) }
+                }
+            }
+            return withSeatAndDiff(seatFunc, seatDiffFunc, seatsHeader)
+        }
+
+        fun withVotePctAndDiff(
+            votePctFunc: ((T) -> Binding<Map<Party, Double>>),
+            votePctDiffFunc: ((T) -> Binding<Map<Party, Double>>),
+            voteHeader: String = "POPULAR VOTE"
+        ): Builder<T> {
+            this.votePctFunc = votePctFunc
+            this.votePctDiffFunc = votePctDiffFunc
+            this.voteHeader = voteHeader
+            return this
+        }
+
+        fun withVotePctAndPrev(
+            votePctFunc: ((T) -> Binding<Map<Party, Double>>),
+            votePctPrevFunc: ((T) -> Binding<Map<Party, Double>>),
+            voteHeader: String = "POPULAR VOTE"
+        ): Builder<T> {
+            val votePctDiffFunc = { t: T ->
+                val curr = votePctFunc(t)
+                val prev = votePctPrevFunc(t)
+                curr.merge(prev) { c, p ->
+                    sequenceOf(c.keys.asSequence(), p.keys.asSequence()).flatten()
+                        .distinct()
+                        .associateWith { party: Party -> (c[party] ?: 0.0) - (p[party] ?: 0.0) }
+                }
+            }
+            return withVotePctAndDiff(votePctFunc, votePctDiffFunc, voteHeader)
+        }
 
         fun withRegion(region: T): Builder<T> {
             regions.add(region)
@@ -96,10 +155,10 @@ class PartySummaryScreen private constructor(
 
         private fun createFrame(region: T, party: BindingReceiver<Party>): RegionSummaryFrame {
             val input = SinglePartyInput()
-            seatFunc(region).bind { input.seats = it }
-            seatDiffFunc(region).bind { input.seatDiff = it }
-            votePctFunc(region).bind { input.votePct = it }
-            votePctDiffFunc(region).bind { input.votePctDiff = it }
+            seatFunc?.invoke(region)?.bind { input.seats = it }
+            seatDiffFunc?.invoke(region)?.bind { input.seatDiff = it }
+            votePctFunc?.invoke(region)?.bind { input.votePct = it }
+            votePctDiffFunc?.invoke(region)?.bind { input.votePctDiff = it }
             party.getBinding().bind { input.party = it }
             val seatBinding = Binding.propertyBinding<SinglePartyInput, List<String>, SinglePartyInput.Property>(
                 input,
@@ -129,12 +188,16 @@ class PartySummaryScreen private constructor(
                 SinglePartyInput.Property.VOTE_PCT_DIFF,
                 SinglePartyInput.Property.PARTY
             )
-            val values = seatBinding.merge(voteBinding) { s, v -> listOf(s, v) }
+            val (headers, values) = when {
+                seatFunc == null -> listOf(voteHeader) to voteBinding.map { listOf(it) }
+                votePctFunc == null -> listOf(seatsHeader) to seatBinding.map { listOf(it) }
+                else -> listOf(seatsHeader, voteHeader) to seatBinding.merge(voteBinding) { s, v -> listOf(s, v) }
+            }
             return RegionSummaryFrame(
                 headerBinding = titleFunc(region),
                 summaryColorBinding = party.getBinding { it.color },
                 sectionsBinding = values.map { value ->
-                    value.zip(listOf("SEATS", "POPULAR VOTE")) { v, h -> RegionSummaryFrame.SectionWithoutColor(h, v) }
+                    value.zip(headers) { v, h -> RegionSummaryFrame.SectionWithoutColor(h, v) }
                 }
             )
         }
@@ -188,6 +251,14 @@ class PartySummaryScreen private constructor(
     }
 
     companion object {
+        @JvmStatic fun <T> of(
+            mainRegion: T,
+            titleFunc: (T) -> Binding<String>,
+            numRows: Int
+        ): Builder<T> {
+            return Builder(mainRegion, titleFunc, numRows)
+        }
+
         @JvmStatic fun <T> ofDiff(
             mainRegion: T,
             titleFunc: (T) -> Binding<String>,
@@ -197,7 +268,9 @@ class PartySummaryScreen private constructor(
             votePctDiffFunc: (T) -> Binding<Map<Party, Double>>,
             numRows: Int
         ): Builder<T> {
-            return Builder(mainRegion, titleFunc, seatFunc, seatDiffFunc, votePctFunc, votePctDiffFunc, numRows)
+            return Builder(mainRegion, titleFunc, numRows)
+                .withSeatAndDiff(seatFunc, seatDiffFunc)
+                .withVotePctAndDiff(votePctFunc, votePctDiffFunc)
         }
 
         @JvmStatic fun <T> ofPrev(
@@ -209,26 +282,9 @@ class PartySummaryScreen private constructor(
             votePctPrevFunc: (T) -> Binding<Map<Party, Double>>,
             numRows: Int
         ): Builder<T> {
-            val seatDiffFunc = { t: T ->
-                val curr = seatFunc(t)
-                val prev = seatPrevFunc(t)
-                curr.merge(prev) { c, p ->
-                    sequenceOf(c.keys.asSequence(), p.keys.asSequence()).flatten()
-                            .distinct()
-                            .associateWith { party: Party -> (c[party] ?: 0) - (p[party] ?: 0) }
-                }
-            }
-            val votePctDiffFunc = { t: T ->
-                val curr = votePctFunc(t)
-                val prev = votePctPrevFunc(t)
-                curr.merge(prev) { c, p ->
-                    sequenceOf(c.keys.asSequence(), p.keys.asSequence()).flatten()
-                            .distinct()
-                            .associateWith { party: Party -> (c[party] ?: 0.0) - (p[party] ?: 0.0) }
-                }
-            }
-            return Builder(
-                    mainRegion, titleFunc, seatFunc, seatDiffFunc, votePctFunc, votePctDiffFunc, numRows)
+            return Builder(mainRegion, titleFunc, numRows)
+                .withSeatAndPrev(seatFunc, seatPrevFunc)
+                .withVotePctAndPrev(votePctFunc, votePctPrevFunc)
         }
     }
 
