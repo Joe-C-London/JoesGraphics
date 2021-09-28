@@ -53,6 +53,10 @@ object Aggregators {
         )
     }
 
+    @JvmStatic fun <T> count(items: Collection<T>, value: (T) -> Binding<Boolean>): Binding<Int> {
+        return sum(items) { t -> value(t).map { if (it) 1 else 0 } }
+    }
+
     @JvmStatic fun <K> adjustForPctReporting(result: Binding<Map<K, Int>>, pctReporting: Binding<Double>): Binding<Map<K, Int>> {
         return result.merge(pctReporting) { r, p ->
             val ret: LinkedHashMap<K, Int> = LinkedHashMap()

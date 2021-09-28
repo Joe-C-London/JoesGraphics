@@ -1,6 +1,7 @@
 package com.joecollins.graphics.screens.generic
 
 import com.joecollins.bindings.Binding.Companion.fixedBinding
+import com.joecollins.bindings.toFixedBinding
 import com.joecollins.graphics.components.MapFrameTest
 import com.joecollins.graphics.screens.generic.BasicResultPanel.Companion.candidateVotes
 import com.joecollins.graphics.screens.generic.BasicResultPanel.Companion.candidateVotesPctOnly
@@ -1130,6 +1131,52 @@ class SimpleVoteViewPanelTest {
         prevVotes[ind_o] = 224 + 124 + 32 + 19380
         previousVotes.value = prevVotes
         compareRendering("SimpleVoteViewPanel", "PartyClassifications-2", panel)
+    }
+
+    @Test
+    fun testPartiesConsolidatedInDiffIfTooMany() {
+        val CPA = Party("Christian Peoples Alliance", "CPA", Color(148, 0, 170))
+        val GREEN_SOC = Party("Alliance for Green Socialism", "AGS", Color(0, 137, 91))
+        val INDEPENDENT = Party("Independent", "IND", Party.OTHERS.color)
+        val WORKERS = Party("Workers Party", "WP", Color(215, 13, 13))
+        val LIBDEM = Party("Liberal Democrats", "LD", Color(0xfaa01a))
+        val ENGLISH_DEM = Party("English Democrats", "ED", Color(140, 15, 15))
+        val MRLP = Party("Monster Raving Loony Party", "MRLP", Color(255, 240, 0))
+        val HERITAGE = Party("Heritage Party", "HERITAGE", Color(13, 0, 173))
+        val LABOUR = Party("Labour", "LAB", Color(0xe4003b))
+        val SDP = Party("Social Democratic Party", "SDP", Color(0, 65, 118))
+        val YORKSHIRE = Party("Yorkshire Party", "YP", Color(0, 124, 178))
+        val REJOIN = Party("Rejoin EU", "REJOIN", Color(0, 51, 153))
+        val CONSERVATIVE = Party("Conservative", "CON", Color(0x00aeef))
+        val UKIP = Party("UK Independence Party", "UKIP", Color(0x6d3177))
+        val FREE_ALL = Party("Freedom Alliance", "FREE-ALL", Color(200, 24, 125))
+        val FOR_BRITAIN = Party("For Britain", "FOR", Color(0, 0, 128))
+        val REFORM = Party("Reform UK", "REF", Color(0x00c0d5))
+        val GREEN = Party("Green", "GRN", Color(0x6ab023))
+        val curr = mapOf(
+            Candidate("Paul Bickerdike", CPA) to 102,
+            Candidate("Mike Davies", GREEN_SOC) to 104,
+            Candidate("Jayda Fransen", INDEPENDENT) to 50,
+            Candidate("George Galloway", WORKERS) to 8264,
+            Candidate("Tom Gordon", LIBDEM) to 1254,
+            Candidate("Th\u00e9r\u00e8se Hirst", ENGLISH_DEM) to 207,
+            Candidate("Howling Laud Hope", MRLP) to 107,
+            Candidate("Susan Laird", HERITAGE) to 33,
+            Candidate("Kim Leadbeater", LABOUR) to 13296,
+            Candidate("Ollie Purser", SDP) to 66,
+            Candidate("Corey Robinson", YORKSHIRE) to 816,
+            Candidate("Andrew Smith", REJOIN) to 75,
+            Candidate("Ryan Stephenson", CONSERVATIVE) to 12973,
+            Candidate("Jack Thomson", UKIP) to 151,
+            Candidate("Jonathon Tilt", FREE_ALL) to 100,
+            Candidate("Anne Marie Waters", FOR_BRITAIN) to 97
+        )
+        val prev = mapOf(LABOUR to 22594, CONSERVATIVE to 19069, INDEPENDENT to 6432, LIBDEM to 2462, REFORM to 1678, GREEN to 692)
+        val panel = candidateVotes(curr.toFixedBinding(), "DECLARED RESULT".toFixedBinding(), "".toFixedBinding())
+            .withPrev(prev.toFixedBinding(), "CHANGE SINCE 2019".toFixedBinding())
+            .build("BATLEY AND SPEN".toFixedBinding())
+        panel.setSize(1024, 512)
+        compareRendering("SimpleVoteViewPanel", "ConsolidateInDiffIfTooMany-1", panel)
     }
 
     @Throws(IOException::class)

@@ -7,6 +7,7 @@ import com.joecollins.models.general.Aggregators.adjustKey
 import com.joecollins.models.general.Aggregators.combine
 import com.joecollins.models.general.Aggregators.combineDual
 import com.joecollins.models.general.Aggregators.combinePctReporting
+import com.joecollins.models.general.Aggregators.count
 import com.joecollins.models.general.Aggregators.sum
 import com.joecollins.models.general.Aggregators.toMap
 import com.joecollins.models.general.Aggregators.toPct
@@ -371,5 +372,21 @@ class AggregatorsTest {
         Assert.assertEquals(6, output.value.toLong())
         inputs[1].value = 7
         Assert.assertEquals(11, output.value.toLong())
+    }
+
+    @Test
+    fun testCount() {
+        val inputs = listOf(BindableWrapper(true), BindableWrapper(false), BindableWrapper(false))
+        val output = BoundResult<Int>()
+        count(inputs) { it.binding }.bind { output.value = it }
+        Assert.assertEquals(1, output.value.toLong())
+        inputs[1].value = true
+        Assert.assertEquals(2, output.value.toLong())
+        inputs[0].value = false
+        Assert.assertEquals(1, output.value.toLong())
+        inputs[2].value = false
+        Assert.assertEquals(1, output.value.toLong())
+        inputs[1].value = true
+        Assert.assertEquals(1, output.value.toLong())
     }
 }

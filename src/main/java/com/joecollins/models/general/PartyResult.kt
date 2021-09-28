@@ -18,6 +18,8 @@ data class PartyResult(val party: Party?, val elected: Boolean) {
     companion object {
         @JvmField val NO_RESULT = PartyResult(null, false)
 
+        @JvmField val TIE = PartyResult(Party("TIE", "TIE", Color.DARK_GRAY), false)
+
         @JvmStatic fun elected(party: Party?) = PartyResult(party, true)
 
         @JvmStatic fun leading(party: Party?) = PartyResult(party, false)

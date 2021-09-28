@@ -1242,6 +1242,10 @@ class BasicResultPanel private constructor(
                             val prevWinner: Party? = r.prevVotes.entries
                                     .maxByOrNull { it.value }
                                     ?.key
+                            val partiesToShow = sequenceOf(
+                                sequenceOf(prevWinner),
+                                r.currVotes.entries.asSequence().sortedByDescending { it.value!! }.map { keyTemplate.toParty(it.key) }
+                            ).flatten().filterNotNull().distinct().take(10).toSet()
                             if (prevWinner == null ||
                                     r.currVotes.keys
                                             .map { key: KT -> keyTemplate.toParty(key) }
@@ -1254,7 +1258,7 @@ class BasicResultPanel private constructor(
                                 return@propertyBinding emptyList()
                             }
                             val partyTotal = Aggregators.topAndOthers(
-                                    currTotalByParty(r.currVotes),
+                                    consolidate(currTotalByParty(r.currVotes), partiesToShow),
                                     limit,
                                     Party.OTHERS,
                                     *mandatoryParties.toTypedArray())
@@ -1347,6 +1351,10 @@ class BasicResultPanel private constructor(
             val ret: MutableMap<Party, Int> = LinkedHashMap()
             curr.forEach { (k, v) -> ret.merge(keyTemplate.toParty(k), v ?: 0) { a: Int, b: Int -> Integer.sum(a, b) } }
             return ret
+        }
+
+        private fun consolidate(votes: Map<Party, Int>, parties: Set<Party>): Map<Party, Int> {
+            return votes.entries.groupingBy { if (parties.contains(it.key)) it.key else Party.OTHERS }.fold(0) { a, e -> a + e.value }
         }
     }
 
