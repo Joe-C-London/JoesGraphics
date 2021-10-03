@@ -82,7 +82,7 @@ class SummaryWithHeaderAndLabels(
                 font = StandardFont.readNormalFont(10)
                 horizontalAlignment = CENTER
                 foreground = Color.BLACK
-                border = EmptyBorder(3, 0, -3, 0)
+                border = EmptyBorder(2, 0, 0, 0)
             }
         }
         val bottomValueLabel: JLabel = object : JLabel() {
@@ -90,7 +90,7 @@ class SummaryWithHeaderAndLabels(
                 font = StandardFont.readBoldFont(20)
                 horizontalAlignment = CENTER
                 foreground = Color.BLACK
-                border = EmptyBorder(4, 0, -4, 0)
+                border = EmptyBorder(0, 0, -4, 0)
             }
         }
 
@@ -102,7 +102,7 @@ class SummaryWithHeaderAndLabels(
                     gridx = 0
                     gridy = 0
                     gridwidth = 1
-                    gridheight = 3
+                    gridheight = 5
                     weightx = 1.0
                     weighty = 1.0
                 }
@@ -111,9 +111,9 @@ class SummaryWithHeaderAndLabels(
                 init {
                     fill = BOTH
                     gridx = 0
-                    gridy = 3
+                    gridy = 5
                     gridwidth = 1
-                    gridheight = 5
+                    gridheight = 9
                     weightx = 1.0
                     weighty = 1.0
                 }
