@@ -16,8 +16,10 @@ import java.awt.Polygon
 import java.awt.Rectangle
 import java.awt.RenderingHints
 import java.awt.Shape
+import java.awt.event.MouseAdapter
+import java.awt.event.MouseEvent
+import java.awt.event.MouseMotionAdapter
 import java.awt.geom.Area
-import java.util.ArrayList
 import javax.swing.JPanel
 import kotlin.math.ceil
 import kotlin.math.max
@@ -290,6 +292,46 @@ class HeatMapFrame(
             repaint()
         }
 
+        var label: String? = null
+            set(label) {
+                field = label
+                repaint()
+            }
+
+        private val numCols: Int
+            get() {
+                val numCols = ceil(1.0 * _squares.size / numRows).toInt()
+                return numCols
+            }
+
+        private val squareSize: Int
+            get() {
+                val squareSize = min((this.width - 10) / this.numCols, (this.height - 10) / numRows)
+                return squareSize
+            }
+
+        private val farLeft: Int
+            get() {
+                val farLeft = (this.width - this.squareSize * this.numCols) / 2
+                return farLeft
+            }
+
+        private val farTop: Int
+            get() {
+                val farTop = (this.height - this.squareSize * numRows) / 2
+                return farTop
+            }
+
+        private val padding: Int
+            get() {
+                val padding: Int = if (_squares.size % numRows != 0) {
+                    ceil(0.5 * (numRows - _squares.size % numRows)).toInt()
+                } else {
+                    0
+                }
+                return padding
+            }
+
         override fun paintComponent(g: Graphics) {
             super.paintComponent(g)
             (g as Graphics2D)
@@ -301,17 +343,6 @@ class HeatMapFrame(
             g.setColor(Color.BLACK)
             g.drawLine(width / 2, 0, width / 2, height)
             if (_squares.isEmpty()) return
-            val width = width
-            val height = height
-            val numCols = ceil(1.0 * _squares.size / numRows).toInt()
-            val squareSize = min((width - 10) / numCols, (height - 10) / numRows)
-            val farLeft = (width - squareSize * numCols) / 2
-            val farTop = (height - squareSize * numRows) / 2
-            val padding: Int = if (_squares.size % numRows != 0) {
-                ceil(0.5 * (numRows - _squares.size % numRows)).toInt()
-            } else {
-                0
-            }
             for (i in _squares.indices) {
                 val square = _squares[i]
                 val index = i + padding
@@ -336,14 +367,47 @@ class HeatMapFrame(
                 g.setColor(Color.BLACK)
                 g.drawRect(left, top, squareSize, squareSize)
             }
+            if (label != null) {
+                g.color = Color.BLACK
+                g.font = StandardFont.readNormalFont(10)
+                g.drawString(label ?: "", 0, height - 2)
+            }
         }
 
         init {
             background = Color.WHITE
+
+            addMouseListener(object : MouseAdapter() {
+                override fun mouseExited(e: MouseEvent) {
+                    label = null
+                }
+            })
+            addMouseMotionListener(object : MouseMotionAdapter() {
+                override fun mouseMoved(e: MouseEvent) {
+                    val point = e.point
+                    val row = (point.y - farTop) / squareSize
+                    val col = (point.x - farLeft) / squareSize
+                    val index = col * numRows + row - padding
+                    label = if (index >= 0 && index < squares.size) {
+                        "${index + 1}: ${squares[index].label}"
+                    } else {
+                        null
+                    }
+                }
+            })
         }
     }
 
-    class Square(val borderColor: Color? = null, val fillColor: Color = Color.WHITE)
+    internal fun moveMouse(x: Int, y: Int) {
+        val event = MouseEvent(this, 1, System.currentTimeMillis(), 0, x, y, 0, false, 0)
+        if (x < 0 || y < 0) {
+            squaresPanel.mouseListeners.forEach { it.mouseExited(event) }
+        } else {
+            squaresPanel.mouseMotionListeners.forEach { it.mouseMoved(event) }
+        }
+    }
+
+    class Square(val borderColor: Color? = null, val fillColor: Color = Color.WHITE, val label: String? = null)
 
     init {
         val panel = JPanel()

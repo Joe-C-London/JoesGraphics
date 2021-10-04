@@ -71,23 +71,27 @@ class HeatMapFrameBuilder {
         @JvmStatic fun <T> of(
             numRows: Binding<Int>,
             entries: List<T>,
-            colorFunc: (T) -> Binding<Color>
+            colorFunc: (T) -> Binding<Color>,
+            labelFunc: (T) -> Binding<String?> = { Binding.fixedBinding(null) }
         ): HeatMapFrameBuilder {
-            return of(numRows, entries, colorFunc, colorFunc)
+            return of(numRows, entries, colorFunc, colorFunc, labelFunc)
         }
 
         @JvmStatic fun <T> of(
             numRows: Binding<Int>,
             entries: List<T>,
             fillFunc: (T) -> Binding<Color>,
-            borderFunc: (T) -> Binding<Color>
+            borderFunc: (T) -> Binding<Color>,
+            labelFunc: (T) -> Binding<String?> = { Binding.fixedBinding(null) }
         ): HeatMapFrameBuilder {
             val builder = HeatMapFrameBuilder()
             builder.numRowsBinding = numRows
             builder.squaresBinding = Binding.listBinding(
                 entries.map {
                     fillFunc(it).merge(borderFunc(it)) {
-                        fill, border -> HeatMapFrame.Square(fillColor = fill, borderColor = border)
+                        fill, border -> fill to border
+                    }.merge(labelFunc(it)) {
+                        (fill, border), label -> HeatMapFrame.Square(fillColor = fill, borderColor = border, label = label)
                     }
                 }
             )
@@ -99,12 +103,13 @@ class HeatMapFrameBuilder {
             entries: List<T>,
             seatFunc: (T) -> Int,
             fillFunc: (T) -> Binding<Color>,
-            borderFunc: (T) -> Binding<Color>
+            borderFunc: (T) -> Binding<Color>,
+            labelFunc: (T) -> Binding<String?> = { Binding.fixedBinding(null) }
         ): HeatMapFrameBuilder {
             val allEntries = entries
                     .flatMap { generateSequence { it }.take(seatFunc(it)) }
                     .toList()
-            return of(numRows, allEntries, fillFunc, borderFunc)
+            return of(numRows, allEntries, fillFunc, borderFunc, labelFunc)
         }
 
         @JvmStatic fun <T> ofElectedLeading(
@@ -116,7 +121,8 @@ class HeatMapFrameBuilder {
             seatLabel: (Int, Int) -> String,
             showChange: (Int, Int) -> Boolean,
             changeLabel: (Int, Int) -> String,
-            header: Binding<String?>
+            header: Binding<String?>,
+            labelFunc: (T) -> Binding<String?> = { Binding.fixedBinding(null) }
         ): HeatMapFrame {
             return ofElectedLeading(
                     rows,
@@ -128,7 +134,8 @@ class HeatMapFrameBuilder {
                     seatLabel,
                     showChange,
                     changeLabel,
-                    header)
+                    header,
+            labelFunc)
         }
 
         @JvmStatic fun <T> ofElectedLeading(
@@ -141,7 +148,8 @@ class HeatMapFrameBuilder {
             seatLabel: (Int, Int) -> String,
             showChange: (Int, Int) -> Boolean,
             changeLabel: (Int, Int) -> String,
-            header: Binding<String?>
+            header: Binding<String?>,
+            labelFunc: (T) -> Binding<String?> = { Binding.fixedBinding(null) }
         ): HeatMapFrame {
             val results: Map<T, BindingReceiver<PartyResult?>> = entries
                     .distinct()
@@ -192,7 +200,8 @@ class HeatMapFrameBuilder {
                                     }
                                 }
                     },
-                    { Binding.fixedBinding(prevResultFunc(it).color) })
+                    { Binding.fixedBinding(prevResultFunc(it).color) },
+            labelFunc)
                     .withSeatBars(
                             seatList, { it.first }, { it.second },
                             seats.getBinding { seatLabel(it.first, it.second) })

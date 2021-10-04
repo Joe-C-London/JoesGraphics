@@ -243,6 +243,15 @@ class HeatMapFrameTest {
         borderColor.value = Color.RED
         header.value = "LIBERAL HEAT MAP"
         compareRendering("HeatMapFrame", "Uneven-2", frame)
+
+        frame.moveMouse(500, 250)
+        compareRendering("HeatMapFrame", "Uneven-3", frame)
+
+        frame.moveMouse(600, 250)
+        compareRendering("HeatMapFrame", "Uneven-4", frame)
+
+        frame.moveMouse(-1, -1)
+        compareRendering("HeatMapFrame", "Uneven-2", frame)
     }
 
     @Test
@@ -292,33 +301,33 @@ class HeatMapFrameTest {
 
     private val peiResults: Map<Int, HeatMapFrame.Square>
         get() = mapOf(
-                1 to HeatMapFrame.Square(borderColor = Color.BLUE, fillColor = Color.BLUE),
-                2 to HeatMapFrame.Square(borderColor = Color.BLUE, fillColor = Color.BLUE),
-                3 to HeatMapFrame.Square(borderColor = Color.RED, fillColor = Color.BLUE),
-                4 to HeatMapFrame.Square(borderColor = Color.BLUE, fillColor = Color.BLUE),
-                5 to HeatMapFrame.Square(borderColor = Color.RED, fillColor = DARK_GREEN),
-                6 to HeatMapFrame.Square(borderColor = Color.BLUE, fillColor = Color.BLUE),
-                7 to HeatMapFrame.Square(borderColor = Color.BLUE, fillColor = Color.BLUE),
-                8 to HeatMapFrame.Square(borderColor = Color.RED, fillColor = Color.BLUE),
-                9 to HeatMapFrame.Square(borderColor = Color.RED, fillColor = Color.BLUE),
-                10 to HeatMapFrame.Square(borderColor = Color.RED, fillColor = Color.RED),
-                11 to HeatMapFrame.Square(borderColor = Color.RED, fillColor = DARK_GREEN),
-                12 to HeatMapFrame.Square(borderColor = Color.RED, fillColor = DARK_GREEN),
-                13 to HeatMapFrame.Square(borderColor = Color.RED, fillColor = DARK_GREEN),
-                14 to HeatMapFrame.Square(borderColor = Color.RED, fillColor = Color.RED),
-                15 to HeatMapFrame.Square(borderColor = Color.RED, fillColor = Color.BLUE),
-                16 to HeatMapFrame.Square(borderColor = Color.RED, fillColor = Color.RED),
-                17 to HeatMapFrame.Square(borderColor = DARK_GREEN, fillColor = DARK_GREEN),
-                18 to HeatMapFrame.Square(borderColor = Color.BLUE, fillColor = Color.BLUE),
-                19 to HeatMapFrame.Square(borderColor = Color.BLUE, fillColor = Color.BLUE),
-                20 to HeatMapFrame.Square(borderColor = Color.BLUE, fillColor = Color.BLUE),
-                21 to HeatMapFrame.Square(borderColor = Color.RED, fillColor = DARK_GREEN),
-                22 to HeatMapFrame.Square(borderColor = Color.RED, fillColor = DARK_GREEN),
-                23 to HeatMapFrame.Square(borderColor = Color.RED, fillColor = DARK_GREEN),
-                24 to HeatMapFrame.Square(borderColor = Color.RED, fillColor = Color.RED),
-                25 to HeatMapFrame.Square(borderColor = Color.RED, fillColor = Color.RED),
-                26 to HeatMapFrame.Square(borderColor = Color.RED, fillColor = Color.BLUE),
-                27 to HeatMapFrame.Square(borderColor = Color.RED, fillColor = Color.RED))
+                1 to HeatMapFrame.Square(borderColor = Color.BLUE, fillColor = Color.BLUE, label = "Souris-Elmira (1)"),
+                2 to HeatMapFrame.Square(borderColor = Color.BLUE, fillColor = Color.BLUE, label = "Georgetown-Pownall (2)"),
+                3 to HeatMapFrame.Square(borderColor = Color.RED, fillColor = Color.BLUE, label = "Montague-Kilmuir (3)"),
+                4 to HeatMapFrame.Square(borderColor = Color.BLUE, fillColor = Color.BLUE, label = "Belfast-Murray River (4)"),
+                5 to HeatMapFrame.Square(borderColor = Color.RED, fillColor = DARK_GREEN, label = "Mermaid-Stratford (5)"),
+                6 to HeatMapFrame.Square(borderColor = Color.BLUE, fillColor = Color.BLUE, label = "Stratford-Keppoch (6)"),
+                7 to HeatMapFrame.Square(borderColor = Color.BLUE, fillColor = Color.BLUE, label = "Morell-Donagh (7)"),
+                8 to HeatMapFrame.Square(borderColor = Color.RED, fillColor = Color.BLUE, label = "Stanhope-Marshfield (8)"),
+                9 to HeatMapFrame.Square(borderColor = Color.RED, fillColor = Color.BLUE, label = "Charlottetown-Hillsborough Park (9)"),
+                10 to HeatMapFrame.Square(borderColor = Color.RED, fillColor = Color.RED, label = "Charlottetown-Winsloe (10)"),
+                11 to HeatMapFrame.Square(borderColor = Color.RED, fillColor = DARK_GREEN, label = "Charlottetown-Belvedere (11)"),
+                12 to HeatMapFrame.Square(borderColor = Color.RED, fillColor = DARK_GREEN, label = "Charlottetown-Victoria Park (12)"),
+                13 to HeatMapFrame.Square(borderColor = Color.RED, fillColor = DARK_GREEN, label = "Charlottetown-Brighton (13)"),
+                14 to HeatMapFrame.Square(borderColor = Color.RED, fillColor = Color.RED, label = "Charlottetown-West Royalty (14)"),
+                15 to HeatMapFrame.Square(borderColor = Color.RED, fillColor = Color.BLUE, label = "Brackley-Hunter River (15)"),
+                16 to HeatMapFrame.Square(borderColor = Color.RED, fillColor = Color.RED, label = "Cornwall-Meadowbank (16)"),
+                17 to HeatMapFrame.Square(borderColor = DARK_GREEN, fillColor = DARK_GREEN, label = "New Haven-Rocky Point (17)"),
+                18 to HeatMapFrame.Square(borderColor = Color.BLUE, fillColor = Color.BLUE, label = "Rustico-Emerald (18)"),
+                19 to HeatMapFrame.Square(borderColor = Color.BLUE, fillColor = Color.BLUE, label = "Borden-Kinkora (19)"),
+                20 to HeatMapFrame.Square(borderColor = Color.BLUE, fillColor = Color.BLUE, label = "Kensington-Malpeque (20)"),
+                21 to HeatMapFrame.Square(borderColor = Color.RED, fillColor = DARK_GREEN, label = "Summerside-Wilmot (21)"),
+                22 to HeatMapFrame.Square(borderColor = Color.RED, fillColor = DARK_GREEN, label = "Summerside-South Drive (22)"),
+                23 to HeatMapFrame.Square(borderColor = Color.RED, fillColor = DARK_GREEN, label = "Tyne Valley-Sherbrooke (23)"),
+                24 to HeatMapFrame.Square(borderColor = Color.RED, fillColor = Color.RED, label = "Evangeline-Miscouche (24)"),
+                25 to HeatMapFrame.Square(borderColor = Color.RED, fillColor = Color.RED, label = "O'Leary-Inverness (25)"),
+                26 to HeatMapFrame.Square(borderColor = Color.RED, fillColor = Color.BLUE, label = "Alberton-Bloomfield (26)"),
+                27 to HeatMapFrame.Square(borderColor = Color.RED, fillColor = Color.RED, label = "Tignish-Palmer Road (27)"))
 
     companion object {
         private val DARK_GREEN = Color.GREEN.darker()

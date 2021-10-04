@@ -32,7 +32,8 @@ class HeatMapFrameBuilderTest {
                 fixedBinding(3),
                 dots,
                 { fixedBinding(it.first) },
-                { fixedBinding(it.second) })
+                { fixedBinding(it.second) },
+                { fixedBinding(null) })
                 .withSeatBars(seatBars.binding, { it.first }, { it.second }, fixedBinding("GREEN: 8"))
                 .withChangeBars(
                         changeBars.binding, { it.first }, { it.second },
