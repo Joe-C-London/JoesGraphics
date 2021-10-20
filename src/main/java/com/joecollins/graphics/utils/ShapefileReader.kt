@@ -30,6 +30,12 @@ object ShapefileReader {
                 Long::class.cast(feature.getAttribute(keyProperty)).toLong() as T
             }
         }
+        if (keyType == Double::class.java) {
+            return readShapes(file) { feature ->
+                @Suppress("UNCHECKED_CAST")
+                Double::class.cast(feature.getAttribute(keyProperty)).toDouble() as T
+            }
+        }
         return readShapes(file) { feature -> keyType.cast(feature.getAttribute(keyProperty)) }
     }
 

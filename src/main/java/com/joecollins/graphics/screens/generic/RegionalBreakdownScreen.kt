@@ -178,10 +178,11 @@ class RegionalBreakdownScreen private constructor(titleLabel: JLabel, multiSumma
         fun withRegion(
             nameBinding: Binding<String>,
             seatsBinding: Binding<Map<Party, Int>>,
-            numSeatsBinding: Binding<Int>
+            numSeatsBinding: Binding<Int>,
+            partyMapBinding: Binding<Map<Party, Party>> = Binding.fixedBinding(emptyMap())
         ): SeatBuilder {
             val newEntry = SeatEntry()
-            partyOrder!!.getBinding().bind { newEntry.partyOrder = it }
+            transformPartyOrder(partyOrder!!.getBinding(), partyMapBinding).bind { newEntry.partyOrder = it }
             nameBinding.bind { newEntry.name = it }
             seatsBinding.bind { newEntry.seats = it }
             numSeatsBinding.bind { newEntry.totalSeats = it }
@@ -217,10 +218,11 @@ class RegionalBreakdownScreen private constructor(titleLabel: JLabel, multiSumma
             nameBinding: Binding<String>,
             seatsBinding: Binding<Map<Party, Int>>,
             diffBinding: Binding<Map<Party, Int>>,
-            numSeatsBinding: Binding<Int>
+            numSeatsBinding: Binding<Int>,
+            partyMapBinding: Binding<Map<Party, Party>> = Binding.fixedBinding(emptyMap())
         ): SeatDiffBuilder {
             val newEntry = SeatDiffEntry()
-            partyOrder!!.getBinding().bind { newEntry.partyOrder = it }
+            transformPartyOrder(partyOrder!!.getBinding(), partyMapBinding).bind { newEntry.partyOrder = it }
             nameBinding.bind { newEntry.name = it }
             seatsBinding.bind { newEntry.seats = it }
             diffBinding.bind { newEntry.diff = it }
@@ -263,10 +265,11 @@ class RegionalBreakdownScreen private constructor(titleLabel: JLabel, multiSumma
             nameBinding: Binding<String>,
             seatsBinding: Binding<Map<Party, Int>>,
             prevBinding: Binding<Map<Party, Int>>,
-            numSeatsBinding: Binding<Int>
+            numSeatsBinding: Binding<Int>,
+            partyMapBinding: Binding<Map<Party, Party>> = Binding.fixedBinding(emptyMap())
         ): SeatPrevBuilder {
             val newEntry = SeatPrevEntry()
-            partyOrder!!.getBinding().bind { newEntry.partyOrder = it }
+            transformPartyOrder(partyOrder!!.getBinding(), partyMapBinding).bind { newEntry.partyOrder = it }
             nameBinding.bind { newEntry.name = it }
             seatsBinding.bind { newEntry.seats = it }
             prevBinding.bind { newEntry.prev = it }
@@ -347,6 +350,12 @@ class RegionalBreakdownScreen private constructor(titleLabel: JLabel, multiSumma
                     .sortedByDescending { party -> result[party] ?: 0 }
                     .toList()
         }
+
+        private fun transformPartyOrder(
+            partyOrder: Binding<List<Party>>,
+            partyMapping: Binding<Map<Party, Party>>
+        ): Binding<List<Party>> =
+            partyOrder.merge(partyMapping) { po, pm -> po.map { pm[it] ?: it } }
     }
 
     init {

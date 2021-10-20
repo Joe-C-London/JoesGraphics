@@ -1,6 +1,7 @@
 package com.joecollins.graphics.screens.generic
 
 import com.joecollins.bindings.Binding.Companion.fixedBinding
+import com.joecollins.bindings.toFixedBinding
 import com.joecollins.graphics.screens.generic.RegionalBreakdownScreen.Companion.seats
 import com.joecollins.graphics.screens.generic.RegionalBreakdownScreen.Companion.seatsWithDiff
 import com.joecollins.graphics.screens.generic.RegionalBreakdownScreen.Companion.seatsWithPrev
@@ -133,6 +134,92 @@ class RegionalBreakdownScreenTest {
         egmontSeats.value = mapOf(grn to 3, lib to 3, pc to 1)
         egmontPrev.value = mapOf(lib to 7)
         compareRendering("RegionalBreakdownScreen", "SeatsWithDiff-3", screen)
+    }
+
+    @Test
+    fun testSeatsCoalition() {
+        val coa = Party("Coalition", "L/NP", Color.BLUE.darker())
+        val lib = Party("Liberal", "LIB", Color.BLUE.darker())
+        val lnp = Party("Liberal National", "LNP", Color.BLUE)
+        val clp = Party("Country Liberal", "CLP", Color.ORANGE)
+        val alp = Party("Labor", "ALP", Color.RED)
+        val oth = Party.OTHERS
+
+        val screen = seats(
+            fixedBinding("AUSTRALIA"),
+            mapOf(alp to 68, coa to 77, oth to 6).toFixedBinding(),
+            fixedBinding(151),
+            fixedBinding("SEATS BY STATE"))
+            .withBlankRow()
+            .withRegion(fixedBinding("NEW SOUTH WALES"), mapOf(coa to 22, alp to 24, oth to 1).toFixedBinding(), fixedBinding(47))
+            .withRegion(fixedBinding("VICTORIA"), mapOf(coa to 15, alp to 21, oth to 2).toFixedBinding(), fixedBinding(38))
+            .withRegion(fixedBinding("QUEENSLAND"), mapOf(lnp to 23, alp to 6, oth to 1).toFixedBinding(), fixedBinding(30), mapOf(coa to lnp).toFixedBinding())
+            .withRegion(fixedBinding("WESTERN AUSTRALIA"), mapOf(coa to 11, alp to 5).toFixedBinding(), fixedBinding(16))
+            .withRegion(fixedBinding("SOUTH AUSTRALIA"), mapOf(coa to 4, alp to 5, oth to 1).toFixedBinding(), fixedBinding(10))
+            .withRegion(fixedBinding("TASMANIA"), mapOf(coa to 2, alp to 2, oth to 1).toFixedBinding(), fixedBinding(5))
+            .withRegion(fixedBinding("AUSTRALIAN CAPITAL TERRITORY"), mapOf(alp to 3).toFixedBinding(), fixedBinding(3), mapOf(coa to lib).toFixedBinding())
+            .withRegion(fixedBinding("NORTHERN TERRITORY"), mapOf(alp to 2).toFixedBinding(), fixedBinding(2), mapOf(coa to clp).toFixedBinding())
+            .build(fixedBinding("AUSTRALIA"))
+        screen.setSize(1024, 512)
+        compareRendering("RegionalBreakdownScreen", "Seats-C", screen)
+    }
+
+    @Test
+    fun testSeatsWithPrevCoalition() {
+        val coa = Party("Coalition", "L/NP", Color.BLUE.darker())
+        val lib = Party("Liberal", "LIB", Color.BLUE.darker())
+        val lnp = Party("Liberal National", "LNP", Color.BLUE)
+        val clp = Party("Country Liberal", "CLP", Color.ORANGE)
+        val alp = Party("Labor", "ALP", Color.RED)
+        val oth = Party.OTHERS
+
+        val screen = seatsWithPrev(
+            fixedBinding("AUSTRALIA"),
+            mapOf(alp to 68, coa to 77, oth to 6).toFixedBinding(),
+            mapOf(alp to 69, coa to 76, oth to 5).toFixedBinding(),
+            fixedBinding(151),
+            fixedBinding("SEATS BY STATE"))
+            .withBlankRow()
+            .withRegion(fixedBinding("NEW SOUTH WALES"), mapOf(coa to 22, alp to 24, oth to 1).toFixedBinding(), mapOf(coa to 23, alp to 24).toFixedBinding(), fixedBinding(47))
+            .withRegion(fixedBinding("VICTORIA"), mapOf(coa to 15, alp to 21, oth to 2).toFixedBinding(), mapOf(coa to 17, alp to 18, oth to 2).toFixedBinding(), fixedBinding(38))
+            .withRegion(fixedBinding("QUEENSLAND"), mapOf(lnp to 23, alp to 6, oth to 1).toFixedBinding(), mapOf(lnp to 21, alp to 8, oth to 1).toFixedBinding(), fixedBinding(30), mapOf(coa to lnp).toFixedBinding())
+            .withRegion(fixedBinding("WESTERN AUSTRALIA"), mapOf(coa to 11, alp to 5).toFixedBinding(), mapOf(coa to 11, alp to 5).toFixedBinding(), fixedBinding(16))
+            .withRegion(fixedBinding("SOUTH AUSTRALIA"), mapOf(coa to 4, alp to 5, oth to 1).toFixedBinding(), mapOf(coa to 4, alp to 6, oth to 1).toFixedBinding(), fixedBinding(10))
+            .withRegion(fixedBinding("TASMANIA"), mapOf(coa to 2, alp to 2, oth to 1).toFixedBinding(), mapOf(alp to 4, oth to 1).toFixedBinding(), fixedBinding(5))
+            .withRegion(fixedBinding("AUSTRALIAN CAPITAL TERRITORY"), mapOf(alp to 3).toFixedBinding(), mapOf(alp to 2).toFixedBinding(), fixedBinding(3), mapOf(coa to lib).toFixedBinding())
+            .withRegion(fixedBinding("NORTHERN TERRITORY"), mapOf(alp to 2).toFixedBinding(), mapOf(alp to 2).toFixedBinding(), fixedBinding(2), mapOf(coa to clp).toFixedBinding())
+            .build(fixedBinding("AUSTRALIA"))
+        screen.setSize(1024, 512)
+        compareRendering("RegionalBreakdownScreen", "SeatsWithPrev-C", screen)
+    }
+
+    @Test
+    fun testSeatsWithDiffCoalition() {
+        val coa = Party("Coalition", "L/NP", Color.BLUE.darker())
+        val lib = Party("Liberal", "LIB", Color.BLUE.darker())
+        val lnp = Party("Liberal National", "LNP", Color.BLUE)
+        val clp = Party("Country Liberal", "CLP", Color.ORANGE)
+        val alp = Party("Labor", "ALP", Color.RED)
+        val oth = Party.OTHERS
+
+        val screen = seatsWithDiff(
+            fixedBinding("AUSTRALIA"),
+            mapOf(alp to 68, coa to 77, oth to 6).toFixedBinding(),
+            mapOf(alp to -1, coa to +1, oth to +1).toFixedBinding(),
+            fixedBinding(151),
+            fixedBinding("SEATS BY STATE"))
+            .withBlankRow()
+            .withRegion(fixedBinding("NEW SOUTH WALES"), mapOf(coa to 22, alp to 24, oth to 1).toFixedBinding(), mapOf(coa to -1, oth to +1).toFixedBinding(), fixedBinding(47))
+            .withRegion(fixedBinding("VICTORIA"), mapOf(coa to 15, alp to 21, oth to 2).toFixedBinding(), mapOf(coa to -2, alp to +3).toFixedBinding(), fixedBinding(38))
+            .withRegion(fixedBinding("QUEENSLAND"), mapOf(lnp to 23, alp to 6, oth to 1).toFixedBinding(), mapOf(lnp to +2, alp to -2).toFixedBinding(), fixedBinding(30), mapOf(coa to lnp).toFixedBinding())
+            .withRegion(fixedBinding("WESTERN AUSTRALIA"), mapOf(coa to 11, alp to 5).toFixedBinding(), mapOf<Party, Int>().toFixedBinding(), fixedBinding(16))
+            .withRegion(fixedBinding("SOUTH AUSTRALIA"), mapOf(coa to 4, alp to 5, oth to 1).toFixedBinding(), mapOf(alp to -1).toFixedBinding(), fixedBinding(10))
+            .withRegion(fixedBinding("TASMANIA"), mapOf(coa to 2, alp to 2, oth to 1).toFixedBinding(), mapOf(coa to +2, alp to -2).toFixedBinding(), fixedBinding(5))
+            .withRegion(fixedBinding("AUSTRALIAN CAPITAL TERRITORY"), mapOf(alp to 3).toFixedBinding(), mapOf(alp to +1).toFixedBinding(), fixedBinding(3), mapOf(coa to lib).toFixedBinding())
+            .withRegion(fixedBinding("NORTHERN TERRITORY"), mapOf(alp to 2).toFixedBinding(), mapOf(alp to 0).toFixedBinding(), fixedBinding(2), mapOf(coa to clp).toFixedBinding())
+            .build(fixedBinding("AUSTRALIA"))
+        screen.setSize(1024, 512)
+        compareRendering("RegionalBreakdownScreen", "SeatsWithPrev-C", screen)
     }
 
     companion object {
