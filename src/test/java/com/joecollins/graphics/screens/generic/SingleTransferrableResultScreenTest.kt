@@ -1,6 +1,7 @@
 package com.joecollins.graphics.screens.generic
 
 import com.joecollins.bindings.Binding
+import com.joecollins.bindings.toFixedBinding
 import com.joecollins.graphics.components.MapFrameTest
 import com.joecollins.graphics.utils.BindableWrapper
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
@@ -473,6 +474,45 @@ class SingleTransferrableResultScreenTest {
         excluded.value = listOf(mckeag, defaoite, bodel, robinson, girvin, odonnell, milne, kyle, douglas)
         candidateHeader.value = "COUNT 11"
         compareRendering("SingleTransferrableResultScreen", "Candidates-11", panel)
+    }
+
+    @Test
+    fun testPartyOthers() {
+        val lib = Party("Liberal", "LIB", Color.BLUE)
+        val alp = Party("Labor", "ALP", Color.RED)
+        val grn = Party("Greens", "GRN", Color.GREEN)
+        val oth = Party.OTHERS
+
+        val prevVotes = mapOf(
+            lib to 346423,
+            alp to 289942,
+            grn to 62345,
+            oth to 362455
+        )
+        val currVotes = mapOf(
+            lib to 413957,
+            alp to 332399,
+            grn to 119470,
+            oth to 228997
+        )
+        val currQuota = 156404.0
+        val prevQuota = 151596.0
+        val currRound = BindableWrapper(currVotes.mapValues { it.value / currQuota })
+        val prevRound = BindableWrapper(prevVotes.mapValues { it.value / prevQuota })
+
+        val panel = BasicResultPanel.partyQuotas(
+            currRound.binding,
+            Binding.fixedBinding(6),
+            Binding.fixedBinding("PARTY SUMMARY"),
+            Binding.fixedBinding("FIRST PREFERENCES")
+        ).withPrev(
+            prevRound.binding,
+            "CHANGE SINCE 2016".toFixedBinding()
+        ).build(
+            Binding.fixedBinding("SOUTH AUSTRALIA")
+        )
+        panel.setSize(1024, 512)
+        compareRendering("SingleTransferrableResultScreen", "Quotas-Oth", panel)
     }
 
     @Throws(IOException::class)

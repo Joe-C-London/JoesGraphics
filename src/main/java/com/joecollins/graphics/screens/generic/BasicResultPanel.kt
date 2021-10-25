@@ -1600,7 +1600,7 @@ class BasicResultPanel private constructor(
             return BarFrame(
                 barsBinding = quotas.getBinding { q ->
                     q.entries.asSequence()
-                        .sortedByDescending { it.value }
+                        .sortedByDescending { if (it.key == Party.OTHERS) -1.0 else it.value }
                         .map { BarFrame.Bar(
                             leftText = it.key.name.uppercase(),
                             rightText = DecimalFormat("0.00").format(it.value) + " QUOTAS",
@@ -1624,8 +1624,8 @@ class BasicResultPanel private constructor(
                     } else {
                         val prev = prevRaw
                         sequenceOf(
-                            curr.asSequence().sortedByDescending { it.value }.map { it.key },
-                            prev.keys.asSequence().filter { !curr.containsKey(it) }
+                            curr.asSequence().sortedByDescending { if (it.key == Party.OTHERS) -1.0 else it.value }.map { it.key },
+                            prev.keys.asSequence().filter { !curr.containsKey(it) }.sortedByDescending { if (it == Party.OTHERS) -1 else 0 }
                         )
                             .flatten()
                             .distinct()
