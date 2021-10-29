@@ -738,6 +738,7 @@ class SimpleVoteViewPanelTest {
         prev[ndp] = 289
         prev[pc.party] = 4048
         prev[lib.party] = 3949
+        prev[grn.party] = 0
         val currentVotes = BindableWrapper(curr)
         val previousVotes = BindableWrapper(prev)
         val header = BindableWrapper("SHIPPAGAN-LAM\u00c8QUE-MISCOU")
@@ -1177,6 +1178,52 @@ class SimpleVoteViewPanelTest {
             .build("BATLEY AND SPEN".toFixedBinding())
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "ConsolidateInDiffIfTooMany-1", panel)
+    }
+
+    @Test
+    fun testNewPartiesCandidatesMergedWithPrevOthers() {
+        val alp = Party("Labor", "ALP", Color.RED)
+        val lib = Party("Liberal", "LIB", Color.BLUE)
+        val grn = Party("Greens", "GRN", Color.GREEN.darker())
+        val cdp = Party("Christian Democrats", "CDP", Color.MAGENTA.darker())
+        val uap = Party("United Australia Party", "UAP", Color.YELLOW)
+        val sci = Party("Science", "SCI", Color.CYAN)
+        val sus = Party("Sustainable Australia", "SUS", Color.GREEN.darker().darker())
+        val ind = Party("Independent", "IND", Party.OTHERS.color)
+        val curr = mapOf(
+            Candidate("Julian Leeser", lib, true) to 53741,
+            Candidate("Katie Gompertz", alp) to 19821,
+            Candidate("Monica Tan", grn) to 11157,
+            Candidate("Simon Taylor", cdp) to 2163,
+            Candidate("Mick Gallagher", ind) to 2104,
+            Candidate("Craig McLaughlin", uap) to 1576,
+            Candidate("Brendan Clarke", sci) to 1465,
+            Candidate("Justin Thomas", sus) to 1425,
+            Candidate("Roger Woodward", ind) to 495
+        )
+        val curr2CP = mapOf(
+            Candidate("Julian Leeser", lib, true) to 61675,
+            Candidate("Katie Gompertz", alp) to 32272
+        )
+        val prev = mapOf(
+            lib to 53678,
+            alp to 18693,
+            grn to 10815,
+            Party.OTHERS to 5213 + 2859 + 1933 + 826
+        )
+        val prev2CP = mapOf(
+            lib to 62470,
+            alp to 31547
+        )
+        val panel = candidateVotes(curr.toFixedBinding(), "PRIMARY VOTE".toFixedBinding(), "100% REPORTING".toFixedBinding())
+            .withPrev(prev.toFixedBinding(), "CHANGE SINCE 2016".toFixedBinding())
+            .withPreferences(curr2CP.toFixedBinding(), "TWO CANDIDATE PREFERRED".toFixedBinding(), "100% REPORTING".toFixedBinding())
+            .withPrevPreferences(prev2CP.toFixedBinding())
+            .withSwing(Comparator.comparing { when (it) { lib -> 1; alp -> -1; else -> 0 } }, "SWING SINCE 2016".toFixedBinding())
+            .withWinner(Candidate("Julian Leeser", lib, true).toFixedBinding())
+            .build("BEROWRA".toFixedBinding())
+        panel.setSize(1024, 512)
+        compareRendering("SimpleVoteViewPanel", "NewPartiesCandidatesMergedWithPrevOthers", panel)
     }
 
     @Throws(IOException::class)

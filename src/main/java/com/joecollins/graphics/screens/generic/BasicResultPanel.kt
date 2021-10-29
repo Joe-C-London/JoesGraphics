@@ -1242,9 +1242,14 @@ class BasicResultPanel private constructor(
                             val prevWinner: Party? = r.prevVotes.entries
                                     .maxByOrNull { it.value }
                                     ?.key
+                            val prevHasOther = r.prevVotes.containsKey(Party.OTHERS)
                             val partiesToShow = sequenceOf(
                                 sequenceOf(prevWinner),
-                                r.currVotes.entries.asSequence().sortedByDescending { it.value!! }.map { keyTemplate.toParty(it.key) }
+                                r.currVotes.entries
+                                    .asSequence()
+                                    .filter { !prevHasOther || r.prevVotes.containsKey(keyTemplate.toParty(it.key)) }
+                                    .sortedByDescending { it.value!! }
+                                    .map { keyTemplate.toParty(it.key) }
                             ).flatten().filterNotNull().distinct().take(10).toSet()
                             if (prevWinner == null ||
                                     r.currVotes.keys
