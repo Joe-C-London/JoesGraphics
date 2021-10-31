@@ -15,7 +15,6 @@ import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.GridLayout
 import java.text.DecimalFormat
-import java.util.HashMap
 import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.border.EmptyBorder
@@ -27,7 +26,7 @@ class TooCloseToCallScreen private constructor(titleLabel: JLabel, multiSummaryF
         }
 
         private var votes: Map<T, Map<Candidate, Int>> = HashMap()
-        private var results: Map<T, PartyResult> = HashMap()
+        private var results: Map<T, PartyResult?> = HashMap()
         private var pctReporting: Map<T, Double> = HashMap()
         private var maxRows = Int.MAX_VALUE
         private var numCandidates = 2
@@ -37,7 +36,7 @@ class TooCloseToCallScreen private constructor(titleLabel: JLabel, multiSummaryF
             onPropertyRefreshed(Property.VOTES)
         }
 
-        fun setResults(results: Map<T, PartyResult>) {
+        fun setResults(results: Map<T, PartyResult?>) {
             this.results = results
             onPropertyRefreshed(Property.RESULTS)
         }
@@ -104,12 +103,12 @@ class TooCloseToCallScreen private constructor(titleLabel: JLabel, multiSummaryF
     class Builder<T>(
         header: Binding<String?>,
         votes: Binding<Map<T, Map<Candidate, Int>>>,
-        results: Binding<Map<T, PartyResult>>,
+        results: Binding<Map<T, PartyResult?>>,
         private val rowHeaderFunc: (T) -> String
     ) {
         private val header: BindingReceiver<String?> = BindingReceiver(header)
         private val votes: BindingReceiver<Map<T, Map<Candidate, Int>>> = BindingReceiver(votes)
-        private val results: BindingReceiver<Map<T, PartyResult>> = BindingReceiver(results)
+        private val results: BindingReceiver<Map<T, PartyResult?>> = BindingReceiver(results)
         private var pctReporting: BindingReceiver<Map<T, Double>>? = null
         private var rowsLimit: BindingReceiver<Int>? = null
         private var numCandidates: BindingReceiver<Int>? = null
@@ -182,7 +181,7 @@ class TooCloseToCallScreen private constructor(titleLabel: JLabel, multiSummaryF
     companion object {
         @JvmStatic fun <T> of(
             votesBinding: Binding<Map<T, Map<Candidate, Int>>>,
-            resultBinding: Binding<Map<T, PartyResult>>,
+            resultBinding: Binding<Map<T, PartyResult?>>,
             labelFunc: (T) -> String,
             headerBinding: Binding<String?>
         ): Builder<T> {
@@ -191,7 +190,7 @@ class TooCloseToCallScreen private constructor(titleLabel: JLabel, multiSummaryF
 
         @JvmStatic fun <T> ofParty(
             votesBinding: Binding<Map<T, Map<Party, Int>>>,
-            resultBinding: Binding<Map<T, PartyResult>>,
+            resultBinding: Binding<Map<T, PartyResult?>>,
             labelFunc: (T) -> String,
             headerBinding: Binding<String?>
         ): Builder<T> {
