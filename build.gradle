@@ -1,5 +1,5 @@
 buildscript {
-    ext.kotlin_version = '1.5.20'
+    ext.kotlin_version = '1.6.0'
     repositories {
         mavenCentral()
     }
@@ -9,15 +9,15 @@ buildscript {
 }
 plugins {
     id "com.github.ben-manes.versions" version "0.39.0"
-    id "com.diffplug.spotless" version "5.14.2"
+    id "com.diffplug.spotless" version "6.0.4"
     id "jacoco"
 }
 
 apply plugin: 'java'
 apply plugin: 'kotlin'
 
-sourceCompatibility = 16
-targetCompatibility = 16
+sourceCompatibility = 17
+targetCompatibility = 17
 
 group 'com.joecollins'
 version '1.0-SNAPSHOT'
@@ -29,7 +29,7 @@ repositories {
     mavenCentral()
 }
 
-def geotoolsVersion = '25.2'
+def geotoolsVersion = '26.1'
 
 dependencies {
     api group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.30'
@@ -37,9 +37,10 @@ dependencies {
     api group: 'org.geotools', name: 'gt-metadata', version: geotoolsVersion
     api group: 'org.twitter4j', name: 'twitter4j-core', version: '4.0.7'
     api group: 'org.apache.commons', name: 'commons-collections4', version: '4.4'
-    api group: 'com.google.guava', name: 'guava', version: '30.1.1-jre'
-    api group: 'org.jsoup', name: 'jsoup', version: '1.14.1'
+    api group: 'com.google.guava', name: 'guava', version: '31.0.1-jre'
+    api group: 'org.jsoup', name: 'jsoup', version: '1.14.3'
     implementation group: 'io.webfolder', name: 'cdp4j', version: '3.0.15'
+    implementation 'com.fasterxml:jackson-xml-databind:0.6.2'
     testImplementation group: 'junit', name: 'junit', version: '4.13.2'
     testImplementation group: 'commons-io', name: 'commons-io', version: '2.11.0'
     testImplementation group: 'org.mockito', name: 'mockito-all', version: '1.10.19'
@@ -69,12 +70,12 @@ jacocoTestReport {
 }
 compileKotlin {
     kotlinOptions {
-        jvmTarget = "16"
+        jvmTarget = "17"
         freeCompilerArgs = ['-Xjvm-default=all']
     }
 }
 compileTestKotlin {
     kotlinOptions {
-        jvmTarget = "16"
+        jvmTarget = "17"
     }
 }
