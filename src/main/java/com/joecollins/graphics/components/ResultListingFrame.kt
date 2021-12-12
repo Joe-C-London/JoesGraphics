@@ -99,18 +99,18 @@ class ResultListingFrame(
         }
 
         var text: String
-        get() { return _text }
-        set(text) {
-            _text = text
-            repaint()
-        }
+            get() { return _text }
+            set(text) {
+                _text = text
+                repaint()
+            }
 
         var borderColor: Color
-        get() { return _borderColor }
-        set(borderColor) {
-            _borderColor = borderColor
-            repaint()
-        }
+            get() { return _borderColor }
+            set(borderColor) {
+                _borderColor = borderColor
+                repaint()
+            }
 
         override fun paintComponent(g: Graphics) {
             super.paintComponent(g)
@@ -137,18 +137,18 @@ class ResultListingFrame(
         private var _reversed = false
 
         var numRows: Int
-        get() { return _numRows }
-        set(numRows) {
-            _numRows = numRows
-            layoutContainer(centralPanel)
-        }
+            get() { return _numRows }
+            set(numRows) {
+                _numRows = numRows
+                layoutContainer(centralPanel)
+            }
 
         var reversed: Boolean
-        get() { return _reversed }
-        set(reversed) {
-            _reversed = reversed
-            layoutContainer(centralPanel)
-        }
+            get() { return _reversed }
+            set(reversed) {
+                _reversed = reversed
+                layoutContainer(centralPanel)
+            }
 
         override fun addLayoutComponent(name: String, comp: Component) {}
         override fun removeLayoutComponent(comp: Component) {}

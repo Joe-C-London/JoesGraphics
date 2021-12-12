@@ -7,11 +7,11 @@ import com.joecollins.graphics.utils.BindableWrapper
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.Party
+import org.junit.Test
 import java.awt.Color
 import java.io.IOException
 import java.util.LinkedHashMap
 import kotlin.Throws
-import org.junit.Test
 
 class PreferenceVoteViewPanelTest {
     @Test
@@ -51,13 +51,14 @@ class PreferenceVoteViewPanelTest {
         val leader = BindableWrapper(alp)
         val swingPartyOrder = listOf(alp.party, ta.party, clp.party)
         val panel = candidateVotes(
-                currentPrimaryVotes.binding, voteHeader.binding, voteSubhead.binding)
-                .withPrev(previousPrimaryVotes.binding, changeHeader.binding)
-                .withPreferences(current2CPVotes.binding, preferenceHeader.binding, preferenceSubhead.binding)
-                .withPrevPreferences(previous2PPVotes.binding)
-                .withWinner(leader.binding)
-                .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader.binding)
-                .build(header.binding)
+            currentPrimaryVotes.binding, voteHeader.binding, voteSubhead.binding
+        )
+            .withPrev(previousPrimaryVotes.binding, changeHeader.binding)
+            .withPreferences(current2CPVotes.binding, preferenceHeader.binding, preferenceSubhead.binding)
+            .withPrevPreferences(previous2PPVotes.binding)
+            .withWinner(leader.binding)
+            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader.binding)
+            .build(header.binding)
         panel.setSize(1024, 512)
         compareRendering("PreferenceVoteViewPanel", "Basic-1", panel)
     }
@@ -99,15 +100,16 @@ class PreferenceVoteViewPanelTest {
         val leader = BindableWrapper<Candidate?>(null)
         val swingPartyOrder = listOf(alp.party, ta.party, clp.party)
         val panel = candidateVotes(
-                currentPrimaryVotes.binding, voteHeader.binding, voteSubhead.binding)
-                .withPrev(previousPrimaryVotes.binding, changeHeader.binding)
-                .withPctReporting(pctReporting.binding)
-                .withPreferences(current2CPVotes.binding, preferenceHeader.binding, preferenceSubhead.binding)
-                .withPrevPreferences(previous2PPVotes.binding)
-                .withPreferencePctReporting(preferencePctReporting.binding)
-                .withWinner(leader.binding)
-                .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader.binding)
-                .build(header.binding)
+            currentPrimaryVotes.binding, voteHeader.binding, voteSubhead.binding
+        )
+            .withPrev(previousPrimaryVotes.binding, changeHeader.binding)
+            .withPctReporting(pctReporting.binding)
+            .withPreferences(current2CPVotes.binding, preferenceHeader.binding, preferenceSubhead.binding)
+            .withPrevPreferences(previous2PPVotes.binding)
+            .withPreferencePctReporting(preferencePctReporting.binding)
+            .withWinner(leader.binding)
+            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader.binding)
+            .build(header.binding)
         panel.setSize(1024, 512)
         compareRendering("PreferenceVoteViewPanel", "Update-1", panel)
         currPrimary[alp] = 13
@@ -165,16 +167,20 @@ class PreferenceVoteViewPanelTest {
         val grn = Party("Greens", "GRN", Color.GREEN.darker())
         val ind = Party("Independent", "IND", Color.GRAY)
         val currentPrimaryVotes = BindableWrapper(
-                mapOf(
-                        Candidate("Amye Un", ind) to 434,
-                        Candidate("Mark Monaghan", alp) to 1756,
-                        Candidate("Jeff Collins", ta, true) to 497,
-                        Candidate("Kylie Bonanni", clp) to 1488))
+            mapOf(
+                Candidate("Amye Un", ind) to 434,
+                Candidate("Mark Monaghan", alp) to 1756,
+                Candidate("Jeff Collins", ta, true) to 497,
+                Candidate("Kylie Bonanni", clp) to 1488
+            )
+        )
         val previousPrimaryVotes = BindableWrapper(mapOf(alp to 1802, clp to 1439, ta to 356, ind to 384))
         val current2CPVotes = BindableWrapper(
-                mapOf(
-                        Candidate("Mark Monaghan", alp) to 2197,
-                        Candidate("Kylie Bonanni", clp) to 1978))
+            mapOf(
+                Candidate("Mark Monaghan", alp) to 2197,
+                Candidate("Kylie Bonanni", clp) to 1978
+            )
+        )
         val previous2PPVotes = BindableWrapper(mapOf(alp to 2171, clp to 1588))
         val header = BindableWrapper("FONG LIM")
         val voteHeader = BindableWrapper("PRIMARY VOTE")
@@ -186,34 +192,37 @@ class PreferenceVoteViewPanelTest {
         val leader = BindableWrapper<Candidate?>(null)
         val swingPartyOrder = listOf(alp, ta, clp)
         val panel = candidateVotes(
-                currentPrimaryVotes.binding,
-                voteHeader.binding,
-                voteSubhead.binding,
-                "(MP)")
-                .withPrev(previousPrimaryVotes.binding, changeHeader.binding)
-                .withPreferences(current2CPVotes.binding, preferenceHeader.binding, preferenceSubhead.binding)
-                .withPrevPreferences(previous2PPVotes.binding)
-                .withWinner(leader.binding)
-                .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader.binding)
-                .build(header.binding)
+            currentPrimaryVotes.binding,
+            voteHeader.binding,
+            voteSubhead.binding,
+            "(MP)"
+        )
+            .withPrev(previousPrimaryVotes.binding, changeHeader.binding)
+            .withPreferences(current2CPVotes.binding, preferenceHeader.binding, preferenceSubhead.binding)
+            .withPrevPreferences(previous2PPVotes.binding)
+            .withWinner(leader.binding)
+            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader.binding)
+            .build(header.binding)
         panel.setSize(1024, 512)
         compareRendering("PreferenceVoteViewPanel", "LotsOfCandidates-1", panel)
         header.value = "GOYDER"
         voteSubhead.value = "12 OF 12 POLLS REPORTING"
         preferenceSubhead.value = "12 OF 12 POLLS REPORTING"
         currentPrimaryVotes.value = mapOf(
-                Candidate("Rachel Wright", ta) to 614,
-                Candidate("Ted Warren", ind) to 249,
-                Candidate("Phil Battye", clp) to 1289,
-                Candidate("Trevor Jenkins", ind) to 64,
-                Candidate("Kezia Purick", ind, true) to 1459,
-                Candidate("Mick Taylor", alp) to 590,
-                Candidate("Karen Fletcher", grn) to 147,
-                Candidate("Pauline Cass", ind) to 283)
+            Candidate("Rachel Wright", ta) to 614,
+            Candidate("Ted Warren", ind) to 249,
+            Candidate("Phil Battye", clp) to 1289,
+            Candidate("Trevor Jenkins", ind) to 64,
+            Candidate("Kezia Purick", ind, true) to 1459,
+            Candidate("Mick Taylor", alp) to 590,
+            Candidate("Karen Fletcher", grn) to 147,
+            Candidate("Pauline Cass", ind) to 283
+        )
         previousPrimaryVotes.value = mapOf(ind to 2496 + 76, clp to 919, grn to 188, alp to 860)
         current2CPVotes.value = mapOf(
-                Candidate("Phil Battye", clp) to 2030,
-                Candidate("Kezia Purick", ind, true) to 2665)
+            Candidate("Phil Battye", clp) to 2030,
+            Candidate("Kezia Purick", ind, true) to 2665
+        )
         previous2PPVotes.value = mapOf(ind to 3109, clp to 1020)
         compareRendering("PreferenceVoteViewPanel", "LotsOfCandidates-2", panel)
     }
@@ -253,13 +262,14 @@ class PreferenceVoteViewPanelTest {
         val leader = BindableWrapper(alp)
         val swingPartyOrder = listOf(alp.party, ta.party, clp.party)
         val panel = candidateVotes(
-                currentPrimaryVotes.binding, voteHeader.binding, voteSubhead.binding)
-                .withPrev(previousPrimaryVotes.binding, changeHeader.binding)
-                .withPreferences(current2CPVotes.binding, preferenceHeader.binding, preferenceSubhead.binding)
-                .withPrevPreferences(previous2PPVotes.binding)
-                .withWinner(leader.binding)
-                .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader.binding)
-                .build(header.binding)
+            currentPrimaryVotes.binding, voteHeader.binding, voteSubhead.binding
+        )
+            .withPrev(previousPrimaryVotes.binding, changeHeader.binding)
+            .withPreferences(current2CPVotes.binding, preferenceHeader.binding, preferenceSubhead.binding)
+            .withPrevPreferences(previous2PPVotes.binding)
+            .withWinner(leader.binding)
+            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader.binding)
+            .build(header.binding)
         panel.setSize(1024, 512)
         compareRendering("PreferenceVoteViewPanel", "SinglePreference-1", panel)
     }
@@ -299,13 +309,14 @@ class PreferenceVoteViewPanelTest {
         val leader = BindableWrapper(alp)
         val swingPartyOrder = listOf(alp.party, clp.party)
         val panel = candidateVotes(
-                currentPrimaryVotes.binding, voteHeader.binding, voteSubhead.binding)
-                .withPrev(previousPrimaryVotes.binding, changeHeader.binding)
-                .withPreferences(current2CPVotes.binding, preferenceHeader.binding, preferenceSubhead.binding)
-                .withPrevPreferences(previous2PPVotes.binding)
-                .withWinner(leader.binding)
-                .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader.binding)
-                .build(header.binding)
+            currentPrimaryVotes.binding, voteHeader.binding, voteSubhead.binding
+        )
+            .withPrev(previousPrimaryVotes.binding, changeHeader.binding)
+            .withPreferences(current2CPVotes.binding, preferenceHeader.binding, preferenceSubhead.binding)
+            .withPrevPreferences(previous2PPVotes.binding)
+            .withWinner(leader.binding)
+            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader.binding)
+            .build(header.binding)
         panel.setSize(1024, 512)
         compareRendering("PreferenceVoteViewPanel", "NoPrevPreference-1", panel)
     }
@@ -347,16 +358,17 @@ class PreferenceVoteViewPanelTest {
         val leader = BindableWrapper(grn)
         val swingPartyOrder = listOf(alp.party, grn.party, lib.party)
         val panel = candidateVotes(
-                currentPrimaryVotes.binding,
-                voteHeader.binding,
-                voteSubhead.binding,
-                "(MP)")
-                .withPrev(previousPrimaryVotes.binding, changeHeader.binding)
-                .withPreferences(current2CPVotes.binding, preferenceHeader.binding, preferenceSubhead.binding)
-                .withPrevPreferences(previous2PPVotes.binding)
-                .withWinner(leader.binding)
-                .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader.binding)
-                .build(header.binding)
+            currentPrimaryVotes.binding,
+            voteHeader.binding,
+            voteSubhead.binding,
+            "(MP)"
+        )
+            .withPrev(previousPrimaryVotes.binding, changeHeader.binding)
+            .withPreferences(current2CPVotes.binding, preferenceHeader.binding, preferenceSubhead.binding)
+            .withPrevPreferences(previous2PPVotes.binding)
+            .withWinner(leader.binding)
+            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader.binding)
+            .build(header.binding)
         panel.setSize(1024, 512)
         compareRendering("PreferenceVoteViewPanel", "ChangeInPreference-1", panel)
     }
@@ -370,36 +382,46 @@ class PreferenceVoteViewPanelTest {
         val onp = Party("One Nation", "ONP", Color.ORANGE)
         val oth = Party.OTHERS
         val panel = partyRangeVotes(
+            fixedBinding(
+                mapOf(
+                    alp to (0.34).rangeTo(0.36),
+                    coa to (0.42).rangeTo(0.43),
+                    grn to (0.11).rangeTo(0.12),
+                    onp to (0.02).rangeTo(0.04),
+                    oth to (0.08).rangeTo(0.08)
+                )
+            ),
+            fixedBinding("POLLING RANGE"),
+            fixedBinding("NOVEMBER 2020")
+        )
+            .withPrev(
                 fixedBinding(
-                        mapOf(
-                                alp to (0.34).rangeTo(0.36),
-                                coa to (0.42).rangeTo(0.43),
-                                grn to (0.11).rangeTo(0.12),
-                                onp to (0.02).rangeTo(0.04),
-                                oth to (0.08).rangeTo(0.08))),
-                fixedBinding("POLLING RANGE"),
-                fixedBinding("NOVEMBER 2020"))
-                .withPrev(
-                        fixedBinding(
-                                mapOf(
-                                        alp to 4752160,
-                                        coa to 5906875,
-                                        grn to 1482923,
-                                        onp to 438587,
-                                        oth to 488817 + 69736 + 46931 + 479836 + 587528)),
-                        fixedBinding("CHANGE SINCE 2019"))
-                .withPreferences(
-                        fixedBinding(
-                                mapOf(
-                                        alp to (0.49).rangeTo(0.495),
-                                        coa to (0.505).rangeTo(0.51))),
-                        fixedBinding("TWO PARTY PREFERRED"),
-                        fixedBinding(""))
-                .withPrevPreferences(fixedBinding(mapOf(alp to 6908580, coa to 7344813)))
-                .withSwing(
-                        compareBy { listOf(alp, coa).indexOf(it) },
-                        fixedBinding("SWING SINCE 2019"))
-                .build(fixedBinding("AUSTRALIA"))
+                    mapOf(
+                        alp to 4752160,
+                        coa to 5906875,
+                        grn to 1482923,
+                        onp to 438587,
+                        oth to 488817 + 69736 + 46931 + 479836 + 587528
+                    )
+                ),
+                fixedBinding("CHANGE SINCE 2019")
+            )
+            .withPreferences(
+                fixedBinding(
+                    mapOf(
+                        alp to (0.49).rangeTo(0.495),
+                        coa to (0.505).rangeTo(0.51)
+                    )
+                ),
+                fixedBinding("TWO PARTY PREFERRED"),
+                fixedBinding("")
+            )
+            .withPrevPreferences(fixedBinding(mapOf(alp to 6908580, coa to 7344813)))
+            .withSwing(
+                compareBy { listOf(alp, coa).indexOf(it) },
+                fixedBinding("SWING SINCE 2019")
+            )
+            .build(fixedBinding("AUSTRALIA"))
         panel.setSize(1024, 512)
         compareRendering("PreferenceVoteViewPanel", "Ranges-1", panel)
     }
@@ -447,13 +469,14 @@ class PreferenceVoteViewPanelTest {
         val leader = BindableWrapper<Candidate?>(null)
         val swingPartyOrder = listOf(lab.party, grn.party, ld.party, con.party)
         val panel = candidateVotes(
-                currentPrimaryVotes.binding, voteHeader.binding, voteSubhead.binding)
-                .withPrev(previousPrimaryVotes.binding, changeHeader.binding)
-                .withPreferences(current2CPVotes.binding, preferenceHeader.binding, preferenceSubhead.binding)
-                .withPrevPreferences(previous2PPVotes.binding)
-                .withWinner(leader.binding)
-                .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader.binding)
-                .build(header.binding)
+            currentPrimaryVotes.binding, voteHeader.binding, voteSubhead.binding
+        )
+            .withPrev(previousPrimaryVotes.binding, changeHeader.binding)
+            .withPreferences(current2CPVotes.binding, preferenceHeader.binding, preferenceSubhead.binding)
+            .withPrevPreferences(previous2PPVotes.binding)
+            .withWinner(leader.binding)
+            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader.binding)
+            .build(header.binding)
         panel.setSize(1024, 512)
         compareRendering("PreferenceVoteViewPanel", "Declaration-1", panel)
         currPrimary[grn] = 150673

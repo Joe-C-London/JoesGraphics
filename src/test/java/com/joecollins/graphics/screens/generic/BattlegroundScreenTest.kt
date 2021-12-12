@@ -7,11 +7,11 @@ import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
 import com.joecollins.models.general.PartyResult.Companion.elected
 import com.joecollins.models.general.PartyResult.Companion.leading
+import org.junit.Test
 import java.awt.Color
 import java.io.IOException
 import java.util.TreeMap
 import kotlin.Throws
-import org.junit.Test
 
 class BattlegroundScreenTest {
     @Test
@@ -26,13 +26,14 @@ class BattlegroundScreenTest {
         val title = BindableWrapper("NDP BATTLEGROUND")
         val nameShortener = { obj: String -> obj.uppercase() }
         val panel = singleParty(
-                prevResult.binding,
-                currResult.binding,
-                { nameShortener(it) },
-                party.binding)
-                .withSeatsToShow(defenseSeats.binding, targetSeats.binding)
-                .withNumRows(numRows.binding)
-                .build(title.binding)
+            prevResult.binding,
+            currResult.binding,
+            { nameShortener(it) },
+            party.binding
+        )
+            .withSeatsToShow(defenseSeats.binding, targetSeats.binding)
+            .withNumRows(numRows.binding)
+            .build(title.binding)
         panel.setSize(1024, 512)
         compareRendering("BattlegroundScreen", "Basic-SingleParty-1", panel)
         party.value = lib
@@ -69,20 +70,22 @@ class BattlegroundScreenTest {
         val defenseSeats = BindableWrapper(15)
         val numRows = BindableWrapper(15)
         val filteredSeats = BindableWrapper<Set<String>?>(
-                prevResult.value.keys
-                        .filter { k: String -> k.startsWith("Vancouver") }
-                        .toSet())
+            prevResult.value.keys
+                .filter { k: String -> k.startsWith("Vancouver") }
+                .toSet()
+        )
         val title = BindableWrapper("NDP BATTLEGROUND")
         val nameShortener = { obj: String -> obj.uppercase() }
         val panel = singleParty(
-                prevResult.binding,
-                currResult.binding,
-                { nameShortener(it) },
-                party.binding)
-                .withSeatsToShow(defenseSeats.binding, targetSeats.binding)
-                .withNumRows(numRows.binding)
-                .withSeatFilter(filteredSeats.binding)
-                .build(title.binding)
+            prevResult.binding,
+            currResult.binding,
+            { nameShortener(it) },
+            party.binding
+        )
+            .withSeatsToShow(defenseSeats.binding, targetSeats.binding)
+            .withNumRows(numRows.binding)
+            .withSeatFilter(filteredSeats.binding)
+            .build(title.binding)
         panel.setSize(1024, 512)
         compareRendering("BattlegroundScreen", "Filtered-SingleParty-1", panel)
         currResult.value = bcCurrResult()

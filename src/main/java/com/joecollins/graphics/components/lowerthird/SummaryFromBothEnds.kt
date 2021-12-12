@@ -61,10 +61,10 @@ class SummaryFromBothEnds(
         }
 
         var top: String
-        get() { return topLabel.text }
-        set(top) {
-            topLabel.text = top
-        }
+            get() { return topLabel.text }
+            set(top) {
+                topLabel.text = top
+            }
 
         init {
             add(topPanel)
@@ -81,32 +81,32 @@ class SummaryFromBothEnds(
         private var _middle: Entry? = null
 
         var total: Int
-        get() { return _total }
-        set(total) {
-            _total = total
-            repaint()
-        }
+            get() { return _total }
+            set(total) {
+                _total = total
+                repaint()
+            }
 
         var left: Entry?
-        get() { return _left }
-        set(left) {
-            _left = left
-            repaint()
-        }
+            get() { return _left }
+            set(left) {
+                _left = left
+                repaint()
+            }
 
         var right: Entry?
-        get() { return _right }
-        set(right) {
-            _right = right
-            repaint()
-        }
+            get() { return _right }
+            set(right) {
+                _right = right
+                repaint()
+            }
 
         var middle: Entry?
-        get() { return _middle }
-        set(middle) {
-            _middle = middle
-            repaint()
-        }
+            get() { return _middle }
+            set(middle) {
+                _middle = middle
+                repaint()
+            }
 
         override fun paintComponent(g: Graphics) {
             super.paintComponent(g)

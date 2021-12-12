@@ -2,11 +2,11 @@ package com.joecollins.graphics.components
 
 import com.joecollins.bindings.Binding.Companion.fixedBinding
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
+import org.junit.Assert
+import org.junit.Test
 import java.awt.Color
 import java.io.IOException
 import kotlin.Throws
-import org.junit.Assert
-import org.junit.Test
 
 class FiguresFrameTest {
     @Test

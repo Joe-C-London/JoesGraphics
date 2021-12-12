@@ -42,7 +42,8 @@ class FiguresScreen private constructor(headerLabel: JLabel, frames: Array<Figur
                         val colorBinding = Binding.propertyBinding(
                             e,
                             { x: Entry -> (x.leader ?: Party.OTHERS).color },
-                            Entry.Property.LEADER)
+                            Entry.Property.LEADER
+                        )
                         val statusBinding = Binding.propertyBinding(e, { x: Entry -> x.status }, Entry.Property.STATUS)
                         colorBinding.merge(statusBinding) { color, status ->
                             FiguresFrame.Entry(
@@ -69,18 +70,18 @@ class FiguresScreen private constructor(headerLabel: JLabel, frames: Array<Figur
         private var _status: String = ""
 
         var leader: Party?
-        get() = _leader
-        set(leader) {
-            this._leader = leader
-            onPropertyRefreshed(Property.LEADER)
-        }
+            get() = _leader
+            set(leader) {
+                this._leader = leader
+                onPropertyRefreshed(Property.LEADER)
+            }
 
         var status: String
-        get() = _status
-        set(status) {
-            this._status = status
-            onPropertyRefreshed(Property.STATUS)
-        }
+            get() = _status
+            set(status) {
+                this._status = status
+                onPropertyRefreshed(Property.STATUS)
+            }
     }
 
     class Builder {

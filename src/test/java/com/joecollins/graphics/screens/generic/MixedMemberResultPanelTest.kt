@@ -12,10 +12,10 @@ import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
 import com.joecollins.models.general.PartyResult.Companion.elected
 import com.joecollins.models.general.PartyResult.Companion.leading
+import org.junit.Test
 import java.awt.Color
 import java.awt.Shape
 import java.io.IOException
-import org.junit.Test
 
 class MixedMemberResultPanelTest {
     @Test
@@ -41,17 +41,18 @@ class MixedMemberResultPanelTest {
         val ndp = Party("New Democratic Party", "NDP", Color.ORANGE)
         selectedResult.value = elected(lib)
         val panel = builder()
-                .withCandidateVotes(currentCandidateVotes.binding, candidateHeader.binding)
-                .withPrevCandidateVotes(previousCandidateVotes.binding, candidateChangeHeader.binding)
-                .withPartyVotes(currentPartyVotes.binding, partyHeader.binding)
-                .withPrevPartyVotes(previousPartyVotes.binding, partyChangeHeader.binding)
-                .withResultMap(
-                        fixedBinding(shapesByDistrict),
-                        selectedShape.binding,
-                        selectedResult.binding,
-                        focus.binding,
-                        mapHeader.binding)
-                .build(header.binding)
+            .withCandidateVotes(currentCandidateVotes.binding, candidateHeader.binding)
+            .withPrevCandidateVotes(previousCandidateVotes.binding, candidateChangeHeader.binding)
+            .withPartyVotes(currentPartyVotes.binding, partyHeader.binding)
+            .withPrevPartyVotes(previousPartyVotes.binding, partyChangeHeader.binding)
+            .withResultMap(
+                fixedBinding(shapesByDistrict),
+                selectedShape.binding,
+                selectedResult.binding,
+                focus.binding,
+                mapHeader.binding
+            )
+            .build(header.binding)
         panel.setSize(1024, 512)
         val currCandVotes = LinkedHashMap<Candidate, Int>()
         currCandVotes[Candidate("Jesse Reddin Cousins", ndp)] = 41
@@ -105,20 +106,21 @@ class MixedMemberResultPanelTest {
         val pc = Party("Progressive Conservative", "PC", Color.BLUE)
         val ndp = Party("New Democratic Party", "NDP", Color.ORANGE)
         val panel = builder()
-                .withCandidateVotes(currentCandidateVotes.binding, candidateHeader.binding)
-                .withPrevCandidateVotes(previousCandidateVotes.binding, candidateChangeHeader.binding)
-                .withCandidatePctReporting(candidatePctReporting.binding)
-                .withWinner(winner.binding)
-                .withPartyVotes(currentPartyVotes.binding, partyHeader.binding)
-                .withPrevPartyVotes(previousPartyVotes.binding, partyChangeHeader.binding)
-                .withPartyPctReporting(partyPctReporting.binding)
-                .withResultMap(
-                        fixedBinding(shapesByDistrict),
-                        selectedShape.binding,
-                        selectedResult.binding,
-                        focus.binding,
-                        mapHeader.binding)
-                .build(header.binding)
+            .withCandidateVotes(currentCandidateVotes.binding, candidateHeader.binding)
+            .withPrevCandidateVotes(previousCandidateVotes.binding, candidateChangeHeader.binding)
+            .withCandidatePctReporting(candidatePctReporting.binding)
+            .withWinner(winner.binding)
+            .withPartyVotes(currentPartyVotes.binding, partyHeader.binding)
+            .withPrevPartyVotes(previousPartyVotes.binding, partyChangeHeader.binding)
+            .withPartyPctReporting(partyPctReporting.binding)
+            .withResultMap(
+                fixedBinding(shapesByDistrict),
+                selectedShape.binding,
+                selectedResult.binding,
+                focus.binding,
+                mapHeader.binding
+            )
+            .build(header.binding)
         panel.setSize(1024, 512)
         val currCandVotes = LinkedHashMap<Candidate, Int>()
         currCandVotes[Candidate("Jesse Reddin Cousins", ndp)] = 8
@@ -175,19 +177,20 @@ class MixedMemberResultPanelTest {
         val pc = Party("Progressive Conservative", "PC", Color.BLUE)
         val ndp = Party("New Democratic Party", "NDP", Color.ORANGE)
         val panel = builder()
-                .withCandidateVotes(currentCandidateVotes.binding, candidateHeader.binding)
-                .withPrevCandidateVotes(previousCandidateVotes.binding, candidateChangeHeader.binding)
-                .withCandidatePctReporting(candidatePctReporting.binding)
-                .withPartyVotes(currentPartyVotes.binding, partyHeader.binding)
-                .withPrevPartyVotes(previousPartyVotes.binding, partyChangeHeader.binding)
-                .withPartyPctReporting(partyPctReporting.binding)
-                .withResultMap(
-                        fixedBinding(shapesByDistrict),
-                        selectedShape.binding,
-                        selectedResult.binding,
-                        focus.binding,
-                        mapHeader.binding)
-                .build(header.binding)
+            .withCandidateVotes(currentCandidateVotes.binding, candidateHeader.binding)
+            .withPrevCandidateVotes(previousCandidateVotes.binding, candidateChangeHeader.binding)
+            .withCandidatePctReporting(candidatePctReporting.binding)
+            .withPartyVotes(currentPartyVotes.binding, partyHeader.binding)
+            .withPrevPartyVotes(previousPartyVotes.binding, partyChangeHeader.binding)
+            .withPartyPctReporting(partyPctReporting.binding)
+            .withResultMap(
+                fixedBinding(shapesByDistrict),
+                selectedShape.binding,
+                selectedResult.binding,
+                focus.binding,
+                mapHeader.binding
+            )
+            .build(header.binding)
         panel.setSize(1024, 512)
         val currCandVotes = LinkedHashMap<Candidate, Int>()
         currCandVotes[Candidate("Jesse Reddin Cousins", ndp)] = 0
@@ -242,19 +245,20 @@ class MixedMemberResultPanelTest {
         val candidatePctReporting = BindableWrapper(0.0)
         val partyPctReporting = BindableWrapper(0.0)
         val panel = builder()
-                .withCandidateVotes(currentCandidateVotes.binding, candidateHeader.binding)
-                .withPrevCandidateVotes(previousCandidateVotes.binding, candidateChangeHeader.binding)
-                .withCandidatePctReporting(candidatePctReporting.binding)
-                .withPartyVotes(currentPartyVotes.binding, partyHeader.binding)
-                .withPrevPartyVotes(previousPartyVotes.binding, partyChangeHeader.binding)
-                .withPartyPctReporting(partyPctReporting.binding)
-                .withResultMap(
-                        fixedBinding(shapesByDistrict),
-                        selectedShape.binding,
-                        selectedResult.binding,
-                        focus.binding,
-                        mapHeader.binding)
-                .build(header.binding)
+            .withCandidateVotes(currentCandidateVotes.binding, candidateHeader.binding)
+            .withPrevCandidateVotes(previousCandidateVotes.binding, candidateChangeHeader.binding)
+            .withCandidatePctReporting(candidatePctReporting.binding)
+            .withPartyVotes(currentPartyVotes.binding, partyHeader.binding)
+            .withPrevPartyVotes(previousPartyVotes.binding, partyChangeHeader.binding)
+            .withPartyPctReporting(partyPctReporting.binding)
+            .withResultMap(
+                fixedBinding(shapesByDistrict),
+                selectedShape.binding,
+                selectedResult.binding,
+                focus.binding,
+                mapHeader.binding
+            )
+            .build(header.binding)
         panel.setSize(1024, 512)
         val currCandVotes = LinkedHashMap<Candidate, Int>()
         currCandVotes[Candidate("Jesse Reddin Cousins", ndp)] = 0
@@ -307,17 +311,18 @@ class MixedMemberResultPanelTest {
         val pc = Party("Progressive Conservative", "PC", Color.BLUE)
         selectedResult.value = elected(lib)
         val panel = builder()
-                .withCandidateVotes(currentCandidateVotes.binding, candidateHeader.binding)
-                .withPrevCandidateVotes(previousCandidateVotes.binding, candidateChangeHeader.binding)
-                .withPartyVotes(currentPartyVotes.binding, partyHeader.binding)
-                .withPrevPartyVotes(previousPartyVotes.binding, partyChangeHeader.binding)
-                .withResultMap(
-                        fixedBinding(shapesByDistrict),
-                        selectedShape.binding,
-                        selectedResult.binding,
-                        focus.binding,
-                        mapHeader.binding)
-                .build(header.binding)
+            .withCandidateVotes(currentCandidateVotes.binding, candidateHeader.binding)
+            .withPrevCandidateVotes(previousCandidateVotes.binding, candidateChangeHeader.binding)
+            .withPartyVotes(currentPartyVotes.binding, partyHeader.binding)
+            .withPrevPartyVotes(previousPartyVotes.binding, partyChangeHeader.binding)
+            .withResultMap(
+                fixedBinding(shapesByDistrict),
+                selectedShape.binding,
+                selectedResult.binding,
+                focus.binding,
+                mapHeader.binding
+            )
+            .build(header.binding)
         panel.setSize(1024, 512)
         val currCandVotes = LinkedHashMap<Candidate, Int>()
         currCandVotes[Candidate.OTHERS] = 1106
@@ -366,19 +371,20 @@ class MixedMemberResultPanelTest {
         val ndp = Party("New Democratic Party", "NDP", Color.ORANGE)
         selectedResult.value = elected(lib)
         val panel = builder()
-                .withCandidateVotes(currentCandidateVotes.binding, candidateHeader.binding)
-                .withPrevCandidateVotes(previousCandidateVotes.binding, candidateChangeHeader.binding)
-                .withIncumbentMarker("(MLA)")
-                .withPartyVotes(currentPartyVotes.binding, partyHeader.binding)
-                .withPrevPartyVotes(previousPartyVotes.binding, partyChangeHeader.binding)
-                .withResultMap(
-                        fixedBinding(shapesByDistrict),
-                        selectedShape.binding,
-                        selectedResult.binding,
-                        focus.binding,
-                        additionalHighlight.binding,
-                        mapHeader.binding)
-                .build(header.binding)
+            .withCandidateVotes(currentCandidateVotes.binding, candidateHeader.binding)
+            .withPrevCandidateVotes(previousCandidateVotes.binding, candidateChangeHeader.binding)
+            .withIncumbentMarker("(MLA)")
+            .withPartyVotes(currentPartyVotes.binding, partyHeader.binding)
+            .withPrevPartyVotes(previousPartyVotes.binding, partyChangeHeader.binding)
+            .withResultMap(
+                fixedBinding(shapesByDistrict),
+                selectedShape.binding,
+                selectedResult.binding,
+                focus.binding,
+                additionalHighlight.binding,
+                mapHeader.binding
+            )
+            .build(header.binding)
         panel.setSize(1024, 512)
         val currCandVotes = LinkedHashMap<Candidate, Int>()
         currCandVotes[Candidate("Jesse Reddin Cousins", ndp)] = 41
@@ -426,16 +432,17 @@ class MixedMemberResultPanelTest {
         val ndp = Party("New Democratic Party", "NDP", Color.ORANGE)
         selectedResult.value = elected(lib)
         val panel = builder()
-                .withCandidateVotes(currentCandidateVotes.binding, candidateHeader.binding)
-                .withPartyVotes(currentPartyVotes.binding, partyHeader.binding)
-                .withIncumbentMarker("(MLA)")
-                .withResultMap(
-                        fixedBinding(shapesByDistrict),
-                        selectedShape.binding,
-                        selectedResult.binding,
-                        focus.binding,
-                        mapHeader.binding)
-                .build(header.binding)
+            .withCandidateVotes(currentCandidateVotes.binding, candidateHeader.binding)
+            .withPartyVotes(currentPartyVotes.binding, partyHeader.binding)
+            .withIncumbentMarker("(MLA)")
+            .withResultMap(
+                fixedBinding(shapesByDistrict),
+                selectedShape.binding,
+                selectedResult.binding,
+                focus.binding,
+                mapHeader.binding
+            )
+            .build(header.binding)
         panel.setSize(1024, 512)
         val currCandVotes = LinkedHashMap<Candidate, Int>()
         currCandVotes[Candidate("Jesse Reddin Cousins", ndp)] = 41
@@ -472,19 +479,21 @@ class MixedMemberResultPanelTest {
         val ndp = Party("New Democratic Party", "NDP", Color.ORANGE)
         selectedResult.value = elected(lib)
         val panel = builder()
-                .withCandidateVotes(
-                        currentCandidateVotes.binding,
-                        candidateHeader.binding,
-                        candidateSubhead.binding)
-                .withPartyVotes(currentPartyVotes.binding, partyHeader.binding)
-                .withIncumbentMarker("(MLA)")
-                .withResultMap(
-                        fixedBinding(shapesByDistrict),
-                        selectedShape.binding,
-                        selectedResult.binding,
-                        focus.binding,
-                        mapHeader.binding)
-                .build(header.binding)
+            .withCandidateVotes(
+                currentCandidateVotes.binding,
+                candidateHeader.binding,
+                candidateSubhead.binding
+            )
+            .withPartyVotes(currentPartyVotes.binding, partyHeader.binding)
+            .withIncumbentMarker("(MLA)")
+            .withResultMap(
+                fixedBinding(shapesByDistrict),
+                selectedShape.binding,
+                selectedResult.binding,
+                focus.binding,
+                mapHeader.binding
+            )
+            .build(header.binding)
         panel.setSize(1024, 512)
         val currCandVotes = LinkedHashMap<Candidate, Int>()
         currCandVotes[Candidate("Jesse Reddin Cousins", ndp)] = 41
@@ -521,17 +530,18 @@ class MixedMemberResultPanelTest {
         val ndp = Party("New Democratic Party", "NDP", Color.ORANGE)
         selectedResult.value = elected(lib)
         val panel = builder()
-                .withCandidateVotes(currentCandidateVotes.binding, candidateHeader.binding)
-                .withPartyVotes(currentPartyVotes.binding, partyHeader.binding)
-                .withIncumbentMarker("(MLA)")
-                .withWinner(winner.binding)
-                .withResultMap(
-                        fixedBinding(shapesByDistrict),
-                        selectedShape.binding,
-                        selectedResult.binding,
-                        focus.binding,
-                        mapHeader.binding)
-                .build(header.binding)
+            .withCandidateVotes(currentCandidateVotes.binding, candidateHeader.binding)
+            .withPartyVotes(currentPartyVotes.binding, partyHeader.binding)
+            .withIncumbentMarker("(MLA)")
+            .withWinner(winner.binding)
+            .withResultMap(
+                fixedBinding(shapesByDistrict),
+                selectedShape.binding,
+                selectedResult.binding,
+                focus.binding,
+                mapHeader.binding
+            )
+            .build(header.binding)
         panel.setSize(1024, 512)
         val currCandVotes = LinkedHashMap<Candidate, Int>()
         currCandVotes[Candidate("Jesse Reddin Cousins", ndp)] = 41
@@ -578,7 +588,8 @@ class MixedMemberResultPanelTest {
                 selectedShape.binding,
                 selectedResult.binding,
                 focus.binding,
-                mapHeader.binding)
+                mapHeader.binding
+            )
             .build(header.binding)
         panel.setSize(1024, 512)
         val currCandVotes = LinkedHashMap<Candidate, Int>()
@@ -631,13 +642,14 @@ class MixedMemberResultPanelTest {
         val partyChangeHeader = BindableWrapper("AT-LARGE CHANGE SINCE 2012")
         val topPartiesWaiting = BindableWrapper(arrayOf(con, lab, ld, grn))
         val panel = builder()
-                .withCandidateVotes(currentCandidateVotes.binding, candidateHeader.binding)
-                .withPrevCandidateVotes(previousCandidateVotes.binding, candidateChangeHeader.binding)
-                .withPartyVotes(
-                        topAndOthers(currentPartyVotes.binding, 5, Party.OTHERS, topPartiesWaiting.binding),
-                        partyHeader.binding)
-                .withPrevPartyVotes(previousPartyVotes.binding, partyChangeHeader.binding)
-                .build(header.binding)
+            .withCandidateVotes(currentCandidateVotes.binding, candidateHeader.binding)
+            .withPrevCandidateVotes(previousCandidateVotes.binding, candidateChangeHeader.binding)
+            .withPartyVotes(
+                topAndOthers(currentPartyVotes.binding, 5, Party.OTHERS, topPartiesWaiting.binding),
+                partyHeader.binding
+            )
+            .withPrevPartyVotes(previousPartyVotes.binding, partyChangeHeader.binding)
+            .build(header.binding)
         panel.setSize(1024, 512)
         val currCandVotes = LinkedHashMap<Candidate, Int?>()
         currCandVotes[Candidate("Elaine Sheila Bagshaw", ld)] = null
@@ -733,8 +745,8 @@ class MixedMemberResultPanelTest {
     @Throws(IOException::class)
     private fun peiShapesByDistrict(): Map<Int, Shape> {
         val peiMap = MapFrameTest::class.java
-                .classLoader
-                .getResource("com/joecollins/graphics/shapefiles/pei-districts.shp")
+            .classLoader
+            .getResource("com/joecollins/graphics/shapefiles/pei-districts.shp")
         return readShapes(peiMap, "DIST_NO", Int::class.java)
     }
 }

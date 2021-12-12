@@ -5,14 +5,14 @@ import com.joecollins.bindings.Binding.Companion.fixedBinding
 import com.joecollins.graphics.utils.BindableWrapper
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.graphics.utils.ShapefileReader.readShapes
+import org.junit.Assert
+import org.junit.Test
 import java.awt.Color
 import java.awt.Shape
 import java.awt.geom.Area
 import java.awt.geom.Rectangle2D
 import java.io.IOException
 import kotlin.Throws
-import org.junit.Assert
-import org.junit.Test
 
 class MapFrameTest {
     @Test
@@ -37,13 +37,13 @@ class MapFrameTest {
             shapesBinding = fixedBinding(shapes.map { Pair(it.shape, it.color) })
         )
         val bindingBox = shapes.asSequence()
-                .map { Area(it.shape) }
-                .reduce { acc, area ->
-                    val ret = Area(acc)
-                    ret.add(area)
-                    ret
-                }
-                .bounds2D
+            .map { Area(it.shape) }
+            .reduce { acc, area ->
+                val ret = Area(acc)
+                ret.add(area)
+                ret
+            }
+            .bounds2D
         Assert.assertEquals(bindingBox, mapFrame.focusBox)
     }
 
@@ -151,22 +151,26 @@ class MapFrameTest {
             ret
         }
         regions.add(
-                (1..7).map { shapesByDistrict[it] }
-                        .map { Area(it) }
-                        .reduce(areaReduce))
+            (1..7).map { shapesByDistrict[it] }
+                .map { Area(it) }
+                .reduce(areaReduce)
+        )
         regions.add(
-                (9..14).map { shapesByDistrict[it] }
-                        .map { Area(it) }
-                        .reduce(areaReduce))
+            (9..14).map { shapesByDistrict[it] }
+                .map { Area(it) }
+                .reduce(areaReduce)
+        )
         regions.add(
-                sequenceOf(8..8, 15..20).flatten()
-                        .map { shapesByDistrict[it] }
-                        .map { Area(it) }
-                        .reduce(areaReduce))
+            sequenceOf(8..8, 15..20).flatten()
+                .map { shapesByDistrict[it] }
+                .map { Area(it) }
+                .reduce(areaReduce)
+        )
         regions.add(
-                (21..27).map { shapesByDistrict[it] }
-                        .map { Area(it) }
-                        .reduce(areaReduce))
+            (21..27).map { shapesByDistrict[it] }
+                .map { Area(it) }
+                .reduce(areaReduce)
+        )
         return regions
     }
 
@@ -182,21 +186,21 @@ class MapFrameTest {
     @Throws(IOException::class)
     private fun loadCityBox(): Rectangle2D {
         return shapesByDistrict().entries.asSequence()
-                .filter { it.key in 10..14 }
-                .map { Area(it.value) }
-                .reduce { acc, area ->
-                    val ret = Area(acc)
-                    ret.add(area)
-                    ret
-                }
-                .bounds2D
+            .filter { it.key in 10..14 }
+            .map { Area(it.value) }
+            .reduce { acc, area ->
+                val ret = Area(acc)
+                ret.add(area)
+                ret
+            }
+            .bounds2D
     }
 
     @Throws(IOException::class)
     private fun shapesByDistrict(): Map<Int, Shape> {
         val peiMap = MapFrameTest::class.java
-                .classLoader
-                .getResource("com/joecollins/graphics/shapefiles/pei-districts.shp")
+            .classLoader
+            .getResource("com/joecollins/graphics/shapefiles/pei-districts.shp")
         return readShapes(peiMap, "DIST_NO", Int::class.java)
     }
 
@@ -206,17 +210,17 @@ class MapFrameTest {
         }
 
         var shape: Shape
-        get() = _shape
-        set(shape) {
-            this._shape = shape
-            onPropertyRefreshed(Property.SHAPE)
-        }
+            get() = _shape
+            set(shape) {
+                this._shape = shape
+                onPropertyRefreshed(Property.SHAPE)
+            }
 
         var color: Color
-        get() = _color
-        set(color) {
-            this._color = color
-            onPropertyRefreshed(Property.COLOR)
-        }
+            get() = _color
+            set(color) {
+                this._color = color
+                onPropertyRefreshed(Property.COLOR)
+            }
     }
 }

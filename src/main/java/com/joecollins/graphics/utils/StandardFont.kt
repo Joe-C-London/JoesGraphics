@@ -14,11 +14,13 @@ object StandardFont {
     init {
         try {
             KLAVIKA_BOLD = Font.createFont(
-                    Font.TRUETYPE_FONT,
-                    StandardFont::class.java.classLoader.getResourceAsStream("Klavika Bold.otf"))
+                Font.TRUETYPE_FONT,
+                StandardFont::class.java.classLoader.getResourceAsStream("Klavika Bold.otf")
+            )
             KLAVIKA_REGULAR = Font.createFont(
-                    Font.TRUETYPE_FONT,
-                    StandardFont::class.java.classLoader.getResourceAsStream("Klavika Regular.otf"))
+                Font.TRUETYPE_FONT,
+                StandardFont::class.java.classLoader.getResourceAsStream("Klavika Regular.otf")
+            )
         } catch (e: FontFormatException) {
             throw RuntimeException(e)
         } catch (e: IOException) {
@@ -46,9 +48,10 @@ object StandardFont {
         boldFont = { size ->
             try {
                 Font.createFont(
-                        Font.TRUETYPE_FONT,
-                        StandardFont::class.java.classLoader.getResourceAsStream(name))
-                        .deriveFont(Font.BOLD or style, size.toFloat())
+                    Font.TRUETYPE_FONT,
+                    StandardFont::class.java.classLoader.getResourceAsStream(name)
+                )
+                    .deriveFont(Font.BOLD or style, size.toFloat())
             } catch (e: FontFormatException) {
                 throw RuntimeException(e)
             } catch (e: IOException) {
@@ -58,9 +61,10 @@ object StandardFont {
         normalFont = { size ->
             try {
                 Font.createFont(
-                        Font.TRUETYPE_FONT,
-                        StandardFont::class.java.classLoader.getResourceAsStream(name))
-                        .deriveFont(style, size.toFloat())
+                    Font.TRUETYPE_FONT,
+                    StandardFont::class.java.classLoader.getResourceAsStream(name)
+                )
+                    .deriveFont(style, size.toFloat())
             } catch (e: FontFormatException) {
                 throw RuntimeException(e)
             } catch (e: IOException) {

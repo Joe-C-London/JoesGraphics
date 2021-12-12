@@ -7,9 +7,9 @@ import com.joecollins.graphics.components.SwingFrameBuilder.Companion.prevCurr
 import com.joecollins.graphics.components.SwingFrameBuilder.Companion.prevCurrNormalised
 import com.joecollins.graphics.utils.BindableWrapper
 import com.joecollins.models.general.Party
-import java.awt.Color
 import org.junit.Assert
 import org.junit.Test
+import java.awt.Color
 
 class SwingFrameBuilderTest {
     private class SwingProperties(val leftColor: Color, val rightColor: Color, val value: Number, val text: String)
@@ -18,14 +18,15 @@ class SwingFrameBuilderTest {
     fun basicTest() {
         val swingProps = BindableWrapper(SwingProperties(Color.RED, Color.BLUE, 0.02, "2% SWING"))
         val frame = basic(
-                swingProps.binding,
-                { p: SwingProperties -> p.leftColor },
-                { p: SwingProperties -> p.rightColor },
-                { p: SwingProperties -> p.value },
-                { p: SwingProperties -> p.text })
-                .withRange(fixedBinding(0.10))
-                .withHeader(fixedBinding("SWING"))
-                .build()
+            swingProps.binding,
+            { p: SwingProperties -> p.leftColor },
+            { p: SwingProperties -> p.rightColor },
+            { p: SwingProperties -> p.value },
+            { p: SwingProperties -> p.text }
+        )
+            .withRange(fixedBinding(0.10))
+            .withHeader(fixedBinding("SWING"))
+            .build()
         Assert.assertEquals(Color.RED, frame.getLeftColor())
         Assert.assertEquals(Color.BLUE, frame.getRightColor())
         Assert.assertEquals(Color.RED, frame.getBottomColor())
@@ -46,14 +47,15 @@ class SwingFrameBuilderTest {
         val swingProps = BindableWrapper(SwingProperties(Color.RED, Color.BLUE, 0.02, "2% SWING"))
         val neutralColor = BindableWrapper(Color.GRAY)
         val frame = basic(
-                swingProps.binding,
-                { p: SwingProperties -> p.leftColor },
-                { p: SwingProperties -> p.rightColor },
-                { p: SwingProperties -> p.value },
-                { p: SwingProperties -> p.text })
-                .withRange(fixedBinding(0.10))
-                .withNeutralColor(neutralColor.binding)
-                .build()
+            swingProps.binding,
+            { p: SwingProperties -> p.leftColor },
+            { p: SwingProperties -> p.rightColor },
+            { p: SwingProperties -> p.value },
+            { p: SwingProperties -> p.text }
+        )
+            .withRange(fixedBinding(0.10))
+            .withNeutralColor(neutralColor.binding)
+            .build()
         Assert.assertEquals(Color.RED, frame.getBottomColor())
         swingProps.value = SwingProperties(Color.GREEN, Color.ORANGE, -0.05, "5% SWING")
         Assert.assertEquals(Color.ORANGE, frame.getBottomColor())
@@ -77,8 +79,9 @@ class SwingFrameBuilderTest {
         // NDP: 20.00 -> 27.75 (+ 7.75)
         val partyOrder = listOf(ndp, lib, con)
         val swingFrame = prevCurr(
-                prevBinding, currBinding, compareBy { partyOrder.indexOf(it) })
-                .build()
+            prevBinding, currBinding, compareBy { partyOrder.indexOf(it) }
+        )
+            .build()
         Assert.assertEquals(Color.BLUE, swingFrame.getLeftColor())
         Assert.assertEquals(Color.RED, swingFrame.getRightColor())
         Assert.assertEquals(Color.BLUE, swingFrame.getBottomColor())
@@ -119,11 +122,13 @@ class SwingFrameBuilderTest {
         // NDP: 20.00 -> 10.00 (-10.00)
         val partyOrder: List<Party> = listOf()
         val swingFrame = prevCurr(
-                prevBinding, currBinding, compareBy { partyOrder.indexOf(it) })
-                .build()
+            prevBinding, currBinding, compareBy { partyOrder.indexOf(it) }
+        )
+            .build()
         Assert.assertEquals(
-                setOf(Color.BLUE, Color.RED),
-                setOf(swingFrame.getLeftColor(), swingFrame.getRightColor()))
+            setOf(Color.BLUE, Color.RED),
+            setOf(swingFrame.getLeftColor(), swingFrame.getRightColor())
+        )
         //    assertEquals(Color.RED, swingFrame.getBottomColor());
         //    assertEquals(0.1 * (swingFrame.getLeftColor().equals(Color.BLUE) ? -1 : 1),
         // swingFrame.getValue().doubleValue(), 1e-6);

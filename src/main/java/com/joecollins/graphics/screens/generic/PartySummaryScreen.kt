@@ -215,39 +215,39 @@ class PartySummaryScreen private constructor(
         private var _party: Party? = null
 
         var seats: Map<Party, Int>
-        get() = _seats
-        set(seats) {
-            this._seats = seats
-            onPropertyRefreshed(Property.SEATS)
-        }
+            get() = _seats
+            set(seats) {
+                this._seats = seats
+                onPropertyRefreshed(Property.SEATS)
+            }
 
         var seatDiff: Map<Party, Int>
-        get() = _seatDiff
-        set(seatDiff) {
-            this._seatDiff = seatDiff
-            onPropertyRefreshed(Property.SEAT_DIFF)
-        }
+            get() = _seatDiff
+            set(seatDiff) {
+                this._seatDiff = seatDiff
+                onPropertyRefreshed(Property.SEAT_DIFF)
+            }
 
         var votePct: Map<Party, Double>
-        get() = _votePct
-        set(votePct) {
-            this._votePct = votePct
-            onPropertyRefreshed(Property.VOTE_PCT)
-        }
+            get() = _votePct
+            set(votePct) {
+                this._votePct = votePct
+                onPropertyRefreshed(Property.VOTE_PCT)
+            }
 
         var votePctDiff: Map<Party, Double>
-        get() = _votePctDiff
-        set(votePctDiff) {
-            this._votePctDiff = votePctDiff
-            onPropertyRefreshed(Property.VOTE_PCT_DIFF)
-        }
+            get() = _votePctDiff
+            set(votePctDiff) {
+                this._votePctDiff = votePctDiff
+                onPropertyRefreshed(Property.VOTE_PCT_DIFF)
+            }
 
         var party: Party?
-        get() = _party
-        set(party) {
-            this._party = party
-            onPropertyRefreshed(Property.PARTY)
-        }
+            get() = _party
+            set(party) {
+                this._party = party
+                onPropertyRefreshed(Property.PARTY)
+            }
     }
 
     companion object {

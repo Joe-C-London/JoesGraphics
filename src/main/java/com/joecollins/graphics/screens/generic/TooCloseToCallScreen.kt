@@ -58,28 +58,30 @@ class TooCloseToCallScreen private constructor(titleLabel: JLabel, multiSummaryF
 
         fun toEntries(): Binding<List<Entry<T>>> {
             return Binding.propertyBinding(
-                    this,
-                    { t: Input<T> ->
-                        t.votes.entries.asSequence()
-                                .map {
-                                    Entry(
-                                            it.key,
-                                            it.value,
-                                            t.results[it.key],
-                                            t.pctReporting[it.key] ?: 0.0,
-                                            t.numCandidates)
-                                }
-                                .filter { it.votes.values.sum() > 0 }
-                                .filter { it.result == null || !it.result.isElected }
-                                .sortedBy { it.lead }
-                                .take(t.maxRows)
-                                .toList()
-                    },
-                    Property.VOTES,
-                    Property.RESULTS,
-                    Property.PCT_REPORTING,
-                    Property.MAX_ROWS,
-                    Property.NUM_CANDIDATES)
+                this,
+                { t: Input<T> ->
+                    t.votes.entries.asSequence()
+                        .map {
+                            Entry(
+                                it.key,
+                                it.value,
+                                t.results[it.key],
+                                t.pctReporting[it.key] ?: 0.0,
+                                t.numCandidates
+                            )
+                        }
+                        .filter { it.votes.values.sum() > 0 }
+                        .filter { it.result == null || !it.result.isElected }
+                        .sortedBy { it.lead }
+                        .take(t.maxRows)
+                        .toList()
+                },
+                Property.VOTES,
+                Property.RESULTS,
+                Property.PCT_REPORTING,
+                Property.MAX_ROWS,
+                Property.NUM_CANDIDATES
+            )
         }
     }
 
@@ -91,8 +93,8 @@ class TooCloseToCallScreen private constructor(titleLabel: JLabel, multiSummaryF
         val numCandidates: Int
     ) {
         val topCandidates: List<Map.Entry<Candidate, Int>> = votes.entries
-                .sortedByDescending { it.value }
-                .toList()
+            .sortedByDescending { it.value }
+            .toList()
         var lead = when (topCandidates.size) {
             0 -> 0
             1 -> topCandidates[0].value
@@ -158,10 +160,12 @@ class TooCloseToCallScreen private constructor(titleLabel: JLabel, multiSummaryF
                                     Pair(
                                         v.key.party.color,
                                         v.key.party.abbreviation.uppercase() +
-                                                ": " +
-                                                thousandsFormatter.format(v.value))
+                                            ": " +
+                                            thousandsFormatter.format(v.value)
+                                    )
                                 },
-                            generateSequence { Pair(Color.WHITE, "") })
+                            generateSequence { Pair(Color.WHITE, "") }
+                        )
                             .flatten()
                             .take(it.numCandidates)
                             .toMutableList()
@@ -195,11 +199,13 @@ class TooCloseToCallScreen private constructor(titleLabel: JLabel, multiSummaryF
             headerBinding: Binding<String?>
         ): Builder<T> {
             return Builder(
-                    headerBinding,
-                    votesBinding.map { votes ->
-                        votes.mapValues { adjustKey(it.value) { p: Party -> Candidate("", p) } } },
-                    resultBinding,
-                    labelFunc)
+                headerBinding,
+                votesBinding.map { votes ->
+                    votes.mapValues { adjustKey(it.value) { p: Party -> Candidate("", p) } }
+                },
+                resultBinding,
+                labelFunc
+            )
         }
     }
 

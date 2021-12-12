@@ -8,10 +8,10 @@ import com.joecollins.graphics.screens.generic.RegionalBreakdownScreen.Companion
 import com.joecollins.graphics.utils.BindableWrapper
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.models.general.Party
+import org.junit.Test
 import java.awt.Color
 import java.io.IOException
 import kotlin.Throws
-import org.junit.Test
 
 class RegionalBreakdownScreenTest {
     @Test
@@ -23,16 +23,17 @@ class RegionalBreakdownScreenTest {
         val charlottetownSeats = BindableWrapper<Map<Party, Int>>(emptyMap())
         val egmontSeats = BindableWrapper<Map<Party, Int>>(emptyMap())
         val screen = seats(
-                fixedBinding("PRINCE EDWARD ISLAND"),
-                peiSeats.binding,
-                fixedBinding(27),
-                fixedBinding("SEATS BY REGION"))
-                .withBlankRow()
-                .withRegion(fixedBinding("CARDIGAN"), cardiganSeats.binding, fixedBinding(7))
-                .withRegion(fixedBinding("MALPEQUE"), malpequeSeats.binding, fixedBinding(7))
-                .withRegion(fixedBinding("CHARLOTTETOWN"), charlottetownSeats.binding, fixedBinding(6))
-                .withRegion(fixedBinding("EGMONT"), egmontSeats.binding, fixedBinding(7))
-                .build(fixedBinding("PRINCE EDWARD ISLAND"))
+            fixedBinding("PRINCE EDWARD ISLAND"),
+            peiSeats.binding,
+            fixedBinding(27),
+            fixedBinding("SEATS BY REGION")
+        )
+            .withBlankRow()
+            .withRegion(fixedBinding("CARDIGAN"), cardiganSeats.binding, fixedBinding(7))
+            .withRegion(fixedBinding("MALPEQUE"), malpequeSeats.binding, fixedBinding(7))
+            .withRegion(fixedBinding("CHARLOTTETOWN"), charlottetownSeats.binding, fixedBinding(6))
+            .withRegion(fixedBinding("EGMONT"), egmontSeats.binding, fixedBinding(7))
+            .build(fixedBinding("PRINCE EDWARD ISLAND"))
         screen.setSize(1024, 512)
         compareRendering("RegionalBreakdownScreen", "Seats-1", screen)
         peiSeats.value = mapOf(grn to 1)
@@ -60,17 +61,18 @@ class RegionalBreakdownScreenTest {
         val charlottetownDiff = BindableWrapper<Map<Party, Int>>(emptyMap())
         val egmontDiff = BindableWrapper<Map<Party, Int>>(emptyMap())
         val screen = seatsWithDiff(
-                fixedBinding("PRINCE EDWARD ISLAND"),
-                peiSeats.binding,
-                peiDiff.binding,
-                fixedBinding(27),
-                fixedBinding("SEATS BY REGION"))
-                .withBlankRow()
-                .withRegion(fixedBinding("CARDIGAN"), cardiganSeats.binding, cardiganDiff.binding, fixedBinding(7))
-                .withRegion(fixedBinding("MALPEQUE"), malpequeSeats.binding, malpequeDiff.binding, fixedBinding(7))
-                .withRegion(fixedBinding("CHARLOTTETOWN"), charlottetownSeats.binding, charlottetownDiff.binding, fixedBinding(6))
-                .withRegion(fixedBinding("EGMONT"), egmontSeats.binding, egmontDiff.binding, fixedBinding(7))
-                .build(fixedBinding("PRINCE EDWARD ISLAND"))
+            fixedBinding("PRINCE EDWARD ISLAND"),
+            peiSeats.binding,
+            peiDiff.binding,
+            fixedBinding(27),
+            fixedBinding("SEATS BY REGION")
+        )
+            .withBlankRow()
+            .withRegion(fixedBinding("CARDIGAN"), cardiganSeats.binding, cardiganDiff.binding, fixedBinding(7))
+            .withRegion(fixedBinding("MALPEQUE"), malpequeSeats.binding, malpequeDiff.binding, fixedBinding(7))
+            .withRegion(fixedBinding("CHARLOTTETOWN"), charlottetownSeats.binding, charlottetownDiff.binding, fixedBinding(6))
+            .withRegion(fixedBinding("EGMONT"), egmontSeats.binding, egmontDiff.binding, fixedBinding(7))
+            .build(fixedBinding("PRINCE EDWARD ISLAND"))
         screen.setSize(1024, 512)
         compareRendering("RegionalBreakdownScreen", "SeatsWithDiff-1", screen)
         peiSeats.value = mapOf(grn to 1)
@@ -105,17 +107,18 @@ class RegionalBreakdownScreenTest {
         val charlottetownPrev = BindableWrapper<Map<Party, Int>>(emptyMap())
         val egmontPrev = BindableWrapper<Map<Party, Int>>(emptyMap())
         val screen = seatsWithPrev(
-                fixedBinding("PRINCE EDWARD ISLAND"),
-                peiSeats.binding,
-                peiPrev.binding,
-                fixedBinding(27),
-                fixedBinding("SEATS BY REGION"))
-                .withBlankRow()
-                .withRegion(fixedBinding("CARDIGAN"), cardiganSeats.binding, cardiganPrev.binding, fixedBinding(7))
-                .withRegion(fixedBinding("MALPEQUE"), malpequeSeats.binding, malpequePrev.binding, fixedBinding(7))
-                .withRegion(fixedBinding("CHARLOTTETOWN"), charlottetownSeats.binding, charlottetownPrev.binding, fixedBinding(6))
-                .withRegion(fixedBinding("EGMONT"), egmontSeats.binding, egmontPrev.binding, fixedBinding(7))
-                .build(fixedBinding("PRINCE EDWARD ISLAND"))
+            fixedBinding("PRINCE EDWARD ISLAND"),
+            peiSeats.binding,
+            peiPrev.binding,
+            fixedBinding(27),
+            fixedBinding("SEATS BY REGION")
+        )
+            .withBlankRow()
+            .withRegion(fixedBinding("CARDIGAN"), cardiganSeats.binding, cardiganPrev.binding, fixedBinding(7))
+            .withRegion(fixedBinding("MALPEQUE"), malpequeSeats.binding, malpequePrev.binding, fixedBinding(7))
+            .withRegion(fixedBinding("CHARLOTTETOWN"), charlottetownSeats.binding, charlottetownPrev.binding, fixedBinding(6))
+            .withRegion(fixedBinding("EGMONT"), egmontSeats.binding, egmontPrev.binding, fixedBinding(7))
+            .build(fixedBinding("PRINCE EDWARD ISLAND"))
         screen.setSize(1024, 512)
         compareRendering("RegionalBreakdownScreen", "SeatsWithDiff-1", screen)
         peiSeats.value = mapOf(grn to 1)
@@ -149,7 +152,8 @@ class RegionalBreakdownScreenTest {
             fixedBinding("AUSTRALIA"),
             mapOf(alp to 68, coa to 77, oth to 6).toFixedBinding(),
             fixedBinding(151),
-            fixedBinding("SEATS BY STATE"))
+            fixedBinding("SEATS BY STATE")
+        )
             .withBlankRow()
             .withRegion(fixedBinding("NEW SOUTH WALES"), mapOf(coa to 22, alp to 24, oth to 1).toFixedBinding(), fixedBinding(47))
             .withRegion(fixedBinding("VICTORIA"), mapOf(coa to 15, alp to 21, oth to 2).toFixedBinding(), fixedBinding(38))
@@ -178,7 +182,8 @@ class RegionalBreakdownScreenTest {
             mapOf(alp to 68, coa to 77, oth to 6).toFixedBinding(),
             mapOf(alp to 69, coa to 76, oth to 5).toFixedBinding(),
             fixedBinding(151),
-            fixedBinding("SEATS BY STATE"))
+            fixedBinding("SEATS BY STATE")
+        )
             .withBlankRow()
             .withRegion(fixedBinding("NEW SOUTH WALES"), mapOf(coa to 22, alp to 24, oth to 1).toFixedBinding(), mapOf(coa to 23, alp to 24).toFixedBinding(), fixedBinding(47))
             .withRegion(fixedBinding("VICTORIA"), mapOf(coa to 15, alp to 21, oth to 2).toFixedBinding(), mapOf(coa to 17, alp to 18, oth to 2).toFixedBinding(), fixedBinding(38))
@@ -207,7 +212,8 @@ class RegionalBreakdownScreenTest {
             mapOf(alp to 68, coa to 77, oth to 6).toFixedBinding(),
             mapOf(alp to -1, coa to +1, oth to +1).toFixedBinding(),
             fixedBinding(151),
-            fixedBinding("SEATS BY STATE"))
+            fixedBinding("SEATS BY STATE")
+        )
             .withBlankRow()
             .withRegion(fixedBinding("NEW SOUTH WALES"), mapOf(coa to 22, alp to 24, oth to 1).toFixedBinding(), mapOf(coa to -1, oth to +1).toFixedBinding(), fixedBinding(47))
             .withRegion(fixedBinding("VICTORIA"), mapOf(coa to 15, alp to 21, oth to 2).toFixedBinding(), mapOf(coa to -2, alp to +3).toFixedBinding(), fixedBinding(38))

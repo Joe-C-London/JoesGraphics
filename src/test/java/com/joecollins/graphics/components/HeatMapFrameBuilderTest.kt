@@ -10,12 +10,12 @@ import com.joecollins.graphics.utils.BindableWrapper
 import com.joecollins.graphics.utils.ColorUtils.lighten
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
+import org.junit.Assert
+import org.junit.Test
 import java.awt.Color
 import java.text.DecimalFormat
 import java.util.ArrayList
 import java.util.Collections
-import org.junit.Assert
-import org.junit.Test
 
 class HeatMapFrameBuilderTest {
     @Test
@@ -29,33 +29,37 @@ class HeatMapFrameBuilderTest {
         val seatBars = BindableWrapper(listOf(Pair(Color.GREEN, 8)))
         val changeBars = BindableWrapper(listOf(Pair(Color.GREEN, +7)))
         val frame = of(
-                fixedBinding(3),
-                dots,
-                { fixedBinding(it.first) },
-                { fixedBinding(it.second) },
-                { fixedBinding(null) })
-                .withSeatBars(seatBars.binding, { it.first }, { it.second }, fixedBinding("GREEN: 8"))
-                .withChangeBars(
-                        changeBars.binding, { it.first }, { it.second },
-                        fixedBinding(1),
-                        fixedBinding("GRN: +7"))
-                .withHeader(fixedBinding("PEI"))
-                .withBorder(fixedBinding(Color.GREEN))
-                .build()
+            fixedBinding(3),
+            dots,
+            { fixedBinding(it.first) },
+            { fixedBinding(it.second) },
+            { fixedBinding(null) }
+        )
+            .withSeatBars(seatBars.binding, { it.first }, { it.second }, fixedBinding("GREEN: 8"))
+            .withChangeBars(
+                changeBars.binding, { it.first }, { it.second },
+                fixedBinding(1),
+                fixedBinding("GRN: +7")
+            )
+            .withHeader(fixedBinding("PEI"))
+            .withBorder(fixedBinding(Color.GREEN))
+            .build()
         Assert.assertEquals(3, frame.numRows.toLong())
         Assert.assertEquals(27, frame.numSquares.toLong())
         val expectedFills = sequenceOf(
-                Collections.nCopies(8, Color.GREEN),
-                Collections.nCopies(6, Color.RED),
-                Collections.nCopies(13, Color.BLUE))
-                .flatten()
-                .toList()
+            Collections.nCopies(8, Color.GREEN),
+            Collections.nCopies(6, Color.RED),
+            Collections.nCopies(13, Color.BLUE)
+        )
+            .flatten()
+            .toList()
         val expectedBorders = sequenceOf(
-                Collections.nCopies(1, Color.GREEN),
-                Collections.nCopies(18, Color.RED),
-                Collections.nCopies(8, Color.BLUE))
-                .flatten()
-                .toList()
+            Collections.nCopies(1, Color.GREEN),
+            Collections.nCopies(18, Color.RED),
+            Collections.nCopies(8, Color.BLUE)
+        )
+            .flatten()
+            .toList()
         for (i in 0 until frame.numSquares) {
             Assert.assertEquals("Square fill $i", expectedFills[i], frame.getSquareFill(i))
             Assert.assertEquals("Square border $i", expectedBorders[i], frame.getSquareBorder(i))
@@ -102,15 +106,16 @@ class HeatMapFrameBuilderTest {
         ridings.add(Riding("Lake Laberge", yp, true, yp))
         ridings.add(Riding("Whitehorse West", lib, false, yp))
         val frame = ofElectedLeading(
-                fixedBinding(3),
-                ridings,
-                { fixedBinding(PartyResult(it.leader, it.hasWon)) },
-                { it.prev },
-                lib,
-                { e: Int, l: Int -> "LIB: $e/$l" },
-                { _: Int, l: Int -> l > 0 },
-                { e: Int, l: Int -> DecimalFormat("+0;-0").format(e) + "/" + DecimalFormat("+0;-0").format(l) },
-                fixedBinding("YUKON"))
+            fixedBinding(3),
+            ridings,
+            { fixedBinding(PartyResult(it.leader, it.hasWon)) },
+            { it.prev },
+            lib,
+            { e: Int, l: Int -> "LIB: $e/$l" },
+            { _: Int, l: Int -> l > 0 },
+            { e: Int, l: Int -> DecimalFormat("+0;-0").format(e) + "/" + DecimalFormat("+0;-0").format(l) },
+            fixedBinding("YUKON")
+        )
         Assert.assertEquals(19, frame.numSquares.toLong())
         Assert.assertEquals(Color.RED, frame.getSquareBorder(0))
         Assert.assertEquals(lighten(Color.RED), frame.getSquareFill(0))
@@ -143,12 +148,13 @@ class HeatMapFrameBuilderTest {
         class Result(var leader: Party?, var hasWon: Boolean, val prev: Party) : Bindable<Result, Property>() {
             val binding: Binding<PartyResult?>
                 get() = propertyBinding(
-                        this,
-                        {
-                            if (leader == null) null
-                            else PartyResult(leader, hasWon)
-                        },
-                        Property.PROP)
+                    this,
+                    {
+                        if (leader == null) null
+                        else PartyResult(leader, hasWon)
+                    },
+                    Property.PROP
+                )
 
             fun setResult(leader: Party?, hasWon: Boolean) {
                 this.leader = leader
@@ -160,15 +166,16 @@ class HeatMapFrameBuilderTest {
         val result = Result(null, false, gop)
         val results = Collections.nCopies(30, result)
         val frame = ofElectedLeading(
-                fixedBinding(results.size),
-                results,
-                { it.binding },
-                { it.prev },
-                dem,
-                { e: Int, l: Int -> "DEM: $e/$l" },
-                { _: Int, l: Int -> l > 0 },
-                { e: Int, l: Int -> DecimalFormat("+0;-0").format(e) + "/" + DecimalFormat("+0;-0").format(l) },
-                fixedBinding("TEST"))
+            fixedBinding(results.size),
+            results,
+            { it.binding },
+            { it.prev },
+            dem,
+            { e: Int, l: Int -> "DEM: $e/$l" },
+            { _: Int, l: Int -> l > 0 },
+            { e: Int, l: Int -> DecimalFormat("+0;-0").format(e) + "/" + DecimalFormat("+0;-0").format(l) },
+            fixedBinding("TEST")
+        )
         Assert.assertEquals(30, frame.numSquares.toLong())
         Assert.assertEquals(Color.RED, frame.getSquareBorder(0))
         Assert.assertEquals(Color.WHITE, frame.getSquareFill(0))
@@ -194,12 +201,13 @@ class HeatMapFrameBuilderTest {
         class Result(var leader: Party?, var hasWon: Boolean, val prev: Party, val numSeats: Int) : Bindable<Result, Property>() {
             val binding: Binding<PartyResult?>
                 get() = propertyBinding(
-                        this,
-                        {
-                            if (leader == null) null
-                            else PartyResult(leader, hasWon)
-                        },
-                        Property.PROP)
+                    this,
+                    {
+                        if (leader == null) null
+                        else PartyResult(leader, hasWon)
+                    },
+                    Property.PROP
+                )
 
             fun setResult(leader: Party?, hasWon: Boolean) {
                 this.leader = leader
@@ -211,16 +219,17 @@ class HeatMapFrameBuilderTest {
         val result = Result(null, false, gop, 30)
         val results = listOf(result)
         val frame = ofElectedLeading(
-                fixedBinding(results.map { it.numSeats }.sum()),
-                results,
-                { it.numSeats },
-                { it.binding },
-                { it.prev },
-                dem,
-                { e: Int, l: Int -> "DEM: $e/$l" },
-                { _: Int, _: Int -> true },
-                { e: Int, l: Int -> DecimalFormat("+0;-0").format(e) + "/" + DecimalFormat("+0;-0").format(l) },
-                fixedBinding("TEST"))
+            fixedBinding(results.map { it.numSeats }.sum()),
+            results,
+            { it.numSeats },
+            { it.binding },
+            { it.prev },
+            dem,
+            { e: Int, l: Int -> "DEM: $e/$l" },
+            { _: Int, _: Int -> true },
+            { e: Int, l: Int -> DecimalFormat("+0;-0").format(e) + "/" + DecimalFormat("+0;-0").format(l) },
+            fixedBinding("TEST")
+        )
         Assert.assertEquals(30, frame.numSquares.toLong())
         Assert.assertEquals(Color.RED, frame.getSquareBorder(0))
         Assert.assertEquals(Color.WHITE, frame.getSquareFill(0))
@@ -270,16 +279,17 @@ class HeatMapFrameBuilderTest {
         val result = Result(null, false, gop, 30)
         val results = listOf(result)
         val frame = ofElectedLeading(
-                fixedBinding(results.map { it.numSeats }.sum()),
-                results,
-                { it.numSeats },
-                { it.binding },
-                { it.prev },
-                dem,
-                { e: Int, l: Int -> "DEM: $e/$l" },
-                { _: Int, _: Int -> true },
-                { e: Int, l: Int -> DecimalFormat("+0;-0").format(e) + "/" + DecimalFormat("+0;-0").format(l) },
-                fixedBinding("TEST"))
+            fixedBinding(results.map { it.numSeats }.sum()),
+            results,
+            { it.numSeats },
+            { it.binding },
+            { it.prev },
+            dem,
+            { e: Int, l: Int -> "DEM: $e/$l" },
+            { _: Int, _: Int -> true },
+            { e: Int, l: Int -> DecimalFormat("+0;-0").format(e) + "/" + DecimalFormat("+0;-0").format(l) },
+            fixedBinding("TEST")
+        )
         Assert.assertEquals(30, frame.numSquares.toLong())
         Assert.assertEquals(Color.RED, frame.getSquareBorder(0))
         Assert.assertEquals(Color.WHITE, frame.getSquareFill(0))

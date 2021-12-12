@@ -8,10 +8,10 @@ import com.joecollins.graphics.screens.generic.PartySummaryScreen.Companion.ofPr
 import com.joecollins.graphics.utils.BindableWrapper
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.models.general.Party
+import org.junit.Test
 import java.awt.Color
 import java.io.IOException
 import kotlin.Throws
-import org.junit.Test
 
 class PartySummaryScreenTest {
     var lib = Party("Liberal", "LIB", Color.RED)
@@ -32,20 +32,21 @@ class PartySummaryScreenTest {
         val north = Region("North")
         val partySelected = BindableWrapper(lib)
         val screen = ofDiff(
-                canada,
-                { r -> fixedBinding(r.name.uppercase()) },
-                { r -> propertyBinding(r, { it.seats }, Region.Property.SEATS) },
-                { r -> propertyBinding(r, { it.seatDiff }, Region.Property.SEAT_DIFF) },
-                { r -> propertyBinding(r, { it.votePct }, Region.Property.VOTE_PCT) },
-                { r -> propertyBinding(r, { it.votePctDiff }, Region.Property.VOTE_PCT_DIFF) },
-                3)
-                .withRegion(bc)
-                .withRegion(prairies)
-                .withRegion(ontario)
-                .withRegion(quebec)
-                .withRegion(atlantic)
-                .withRegion(north)
-                .build(partySelected.binding)
+            canada,
+            { r -> fixedBinding(r.name.uppercase()) },
+            { r -> propertyBinding(r, { it.seats }, Region.Property.SEATS) },
+            { r -> propertyBinding(r, { it.seatDiff }, Region.Property.SEAT_DIFF) },
+            { r -> propertyBinding(r, { it.votePct }, Region.Property.VOTE_PCT) },
+            { r -> propertyBinding(r, { it.votePctDiff }, Region.Property.VOTE_PCT_DIFF) },
+            3
+        )
+            .withRegion(bc)
+            .withRegion(prairies)
+            .withRegion(ontario)
+            .withRegion(quebec)
+            .withRegion(atlantic)
+            .withRegion(north)
+            .build(partySelected.binding)
         screen.setSize(1024, 512)
         compareRendering("PartySummaryScreen", "SingleParty-1", screen)
 
@@ -111,20 +112,21 @@ class PartySummaryScreenTest {
         val north = Region("North")
         val partySelected = BindableWrapper(lib)
         val screen = ofPrev(
-                canada,
-                { r -> fixedBinding(r.name.uppercase()) },
-                { r -> propertyBinding(r, { it.seats }, Region.Property.SEATS) },
-                { r -> propertyBinding(r, { it.prevSeats }, Region.Property.SEAT_DIFF) },
-                { r -> propertyBinding(r, { it.votePct }, Region.Property.VOTE_PCT) },
-                { r -> propertyBinding(r, { it.prevVotePct }, Region.Property.VOTE_PCT_DIFF) },
-                3)
-                .withRegion(bc)
-                .withRegion(prairies)
-                .withRegion(ontario)
-                .withRegion(quebec)
-                .withRegion(atlantic)
-                .withRegion(north)
-                .build(partySelected.binding)
+            canada,
+            { r -> fixedBinding(r.name.uppercase()) },
+            { r -> propertyBinding(r, { it.seats }, Region.Property.SEATS) },
+            { r -> propertyBinding(r, { it.prevSeats }, Region.Property.SEAT_DIFF) },
+            { r -> propertyBinding(r, { it.votePct }, Region.Property.VOTE_PCT) },
+            { r -> propertyBinding(r, { it.prevVotePct }, Region.Property.VOTE_PCT_DIFF) },
+            3
+        )
+            .withRegion(bc)
+            .withRegion(prairies)
+            .withRegion(ontario)
+            .withRegion(quebec)
+            .withRegion(atlantic)
+            .withRegion(north)
+            .build(partySelected.binding)
         screen.setSize(1024, 512)
         compareRendering("PartySummaryScreen", "SingleParty-1", screen)
 
@@ -192,7 +194,8 @@ class PartySummaryScreenTest {
         val screen = PartySummaryScreen.of(
             canada,
             { r -> fixedBinding(r.name.uppercase()) },
-            3)
+            3
+        )
             .withSeatAndDiff(
                 { r -> propertyBinding(r, { it.seats }, Region.Property.SEATS) },
                 { r -> propertyBinding(r, { it.seatDiff }, Region.Property.SEAT_DIFF) },
@@ -272,7 +275,8 @@ class PartySummaryScreenTest {
         val screen = PartySummaryScreen.of(
             canada,
             { r -> fixedBinding(r.name.uppercase()) },
-            3)
+            3
+        )
             .withVotePctAndDiff(
                 { r -> propertyBinding(r, { it.votePct }, Region.Property.VOTE_PCT) },
                 { r -> propertyBinding(r, { it.votePctDiff }, Region.Property.VOTE_PCT_DIFF) },
@@ -349,42 +353,42 @@ class PartySummaryScreenTest {
         private var _votePctDiff: Map<Party, Double> = emptyMap()
 
         var seats: Map<Party, Int>
-        get() = _seats
-        set(seats) {
-            this._seats = seats
-            onPropertyRefreshed(Property.SEATS)
-        }
+            get() = _seats
+            set(seats) {
+                this._seats = seats
+                onPropertyRefreshed(Property.SEATS)
+            }
 
         var seatDiff: Map<Party, Int>
-        get() = _seatDiff
-        set(seatDiff) {
-            this._seatDiff = seatDiff
-            onPropertyRefreshed(Property.SEAT_DIFF)
-        }
+            get() = _seatDiff
+            set(seatDiff) {
+                this._seatDiff = seatDiff
+                onPropertyRefreshed(Property.SEAT_DIFF)
+            }
 
         var votePct: Map<Party, Double>
-        get() = _votePct
-        set(votePct) {
-            this._votePct = votePct
-            onPropertyRefreshed(Property.VOTE_PCT)
-        }
+            get() = _votePct
+            set(votePct) {
+                this._votePct = votePct
+                onPropertyRefreshed(Property.VOTE_PCT)
+            }
 
         var votePctDiff: Map<Party, Double>
-        get() = _votePctDiff
-        set(votePctDiff) {
-            this._votePctDiff = votePctDiff
-            onPropertyRefreshed(Property.VOTE_PCT_DIFF)
-        }
+            get() = _votePctDiff
+            set(votePctDiff) {
+                this._votePctDiff = votePctDiff
+                onPropertyRefreshed(Property.VOTE_PCT_DIFF)
+            }
 
         val prevSeats: Map<Party, Int>
             get() = sequenceOf(seats.keys, seatDiff.keys)
-                    .flatten()
-                    .distinct()
-                    .associateWith { (seats[it] ?: 0) - (seatDiff[it] ?: 0) }
+                .flatten()
+                .distinct()
+                .associateWith { (seats[it] ?: 0) - (seatDiff[it] ?: 0) }
         val prevVotePct: Map<Party, Double>
             get() = sequenceOf(votePct.keys, votePctDiff.keys)
-                    .flatten()
-                    .distinct()
-                    .associateWith { (votePct[it] ?: 0.0) - (votePctDiff[it] ?: 0.0) }
+                .flatten()
+                .distinct()
+                .associateWith { (votePct[it] ?: 0.0) - (votePctDiff[it] ?: 0.0) }
     }
 }

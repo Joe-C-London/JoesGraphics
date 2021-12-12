@@ -121,19 +121,19 @@ class BattlegroundScreen private constructor(
             )
 
             return BattlegroundScreen(
-                    headerLabel,
-                    defenseFrame,
-                    targetFrame
+                headerLabel,
+                defenseFrame,
+                targetFrame
             ) { screen: BattlegroundScreen ->
                 val layout = screen.Layout()
                 defenseSeatCount
-                        .getBinding()
-                        .merge(numRows.getBinding()) { c: Int, n: Int -> n * ceil(1.0 * c / n).toInt() }
-                        .bind { layout.setLeft(it) }
+                    .getBinding()
+                    .merge(numRows.getBinding()) { c: Int, n: Int -> n * ceil(1.0 * c / n).toInt() }
+                    .bind { layout.setLeft(it) }
                 targetSeatCount
-                        .getBinding()
-                        .merge(numRows.getBinding()) { c: Int, n: Int -> n * ceil(1.0 * c / n).toInt() }
-                        .bind { layout.setRight(it) }
+                    .getBinding()
+                    .merge(numRows.getBinding()) { c: Int, n: Int -> n * ceil(1.0 * c / n).toInt() }
+                    .bind { layout.setRight(it) }
                 layout
             }
         }
@@ -188,53 +188,63 @@ class BattlegroundScreen private constructor(
         val items: Binding<List<Entry<T>>>
             get() {
                 return Binding.propertyBinding(
-                        this, { input -> getItemsList(input) },
-                        Property.PREV,
-                        Property.COUNT,
-                        Property.CURR,
-                        Property.PARTY,
-                        Property.SIDE,
-                        Property.FILTERED_SEATS)
+                    this, { input -> getItemsList(input) },
+                    Property.PREV,
+                    Property.COUNT,
+                    Property.CURR,
+                    Property.PARTY,
+                    Property.SIDE,
+                    Property.FILTERED_SEATS
+                )
             }
 
         companion object {
             @JvmStatic private fun <T> getItemsList(t: BattlegroundInput<T>): List<Entry<T>> {
                 return t.prev.entries.asSequence()
-                        .map { e: Map.Entry<T, Map<Party, Int>> ->
-                            val votes = e.value
-                            val total = votes.values.sum()
-                            val topTwo = votes.entries
-                                    .sortedByDescending { it.value }
-                                    .take(2)
-                                    .toList()
-                            val margin: Double = if (t.side == Side.TARGET) {
-                                if (topTwo[0].key == t.party) Double.NaN else 1.0 * (topTwo[0].value - (votes[t.party]
-                                        ?: 0)) / total
-                            } else {
-                                if (topTwo[0].key != t.party) Double.NaN else 1.0 * ((votes[t.party]
-                                        ?: 0) - topTwo[1].value) / total
-                            }
-                            Triple(e.key, margin, topTwo[0].key.color)
+                    .map { e: Map.Entry<T, Map<Party, Int>> ->
+                        val votes = e.value
+                        val total = votes.values.sum()
+                        val topTwo = votes.entries
+                            .sortedByDescending { it.value }
+                            .take(2)
+                            .toList()
+                        val margin: Double = if (t.side == Side.TARGET) {
+                            if (topTwo[0].key == t.party) Double.NaN else 1.0 * (
+                                topTwo[0].value - (
+                                    votes[t.party]
+                                        ?: 0
+                                    )
+                                ) / total
+                        } else {
+                            if (topTwo[0].key != t.party) Double.NaN else 1.0 * (
+                                (
+                                    votes[t.party]
+                                        ?: 0
+                                    ) - topTwo[1].value
+                                ) / total
                         }
-                        .filter { !java.lang.Double.isNaN(it.second) }
-                        .sortedBy { it.second }
-                        .take(t.count)
-                        .map {
-                            val partyResult = t.curr[it.first]
-                            val resultColor: Color
-                            val fill: Boolean
-                            if (partyResult == null) {
-                                resultColor = Color.BLACK
-                                fill = false
-                            } else {
-                                resultColor = partyResult.party?.color ?: Color.BLACK
-                                fill = partyResult.isElected
-                            }
-                            val colorFunc = if (t.filteredSeats?.contains(it.first) != false) { c -> c } else { c: Color -> lighten(lighten(c)) }
-                            Entry(
-                                    it.first, colorFunc(it.third), colorFunc(resultColor), fill)
+                        Triple(e.key, margin, topTwo[0].key.color)
+                    }
+                    .filter { !java.lang.Double.isNaN(it.second) }
+                    .sortedBy { it.second }
+                    .take(t.count)
+                    .map {
+                        val partyResult = t.curr[it.first]
+                        val resultColor: Color
+                        val fill: Boolean
+                        if (partyResult == null) {
+                            resultColor = Color.BLACK
+                            fill = false
+                        } else {
+                            resultColor = partyResult.party?.color ?: Color.BLACK
+                            fill = partyResult.isElected
                         }
-                        .toList()
+                        val colorFunc = if (t.filteredSeats?.contains(it.first) != false) { c -> c } else { c: Color -> lighten(lighten(c)) }
+                        Entry(
+                            it.first, colorFunc(it.third), colorFunc(resultColor), fill
+                        )
+                    }
+                    .toList()
             }
         }
     }

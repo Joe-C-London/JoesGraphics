@@ -112,18 +112,18 @@ class RegionSummaryFrame private constructor(
         private var _values: List<Pair<Color, String>> = emptyList()
 
         var header: String
-        get() { return _header }
-        set(header) {
-            _header = header
-            repaint()
-        }
+            get() { return _header }
+            set(header) {
+                _header = header
+                repaint()
+            }
 
         var values: List<Pair<Color, String>>
-        get() { return _values }
-        set(values) {
-            _values = values
-            repaint()
-        }
+            get() { return _values }
+            set(values) {
+                _values = values
+                repaint()
+            }
 
         override fun paintComponent(g: Graphics) {
             super.paintComponent(g)

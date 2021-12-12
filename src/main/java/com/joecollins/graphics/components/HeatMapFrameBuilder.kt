@@ -89,9 +89,11 @@ class HeatMapFrameBuilder {
             builder.squaresBinding = Binding.listBinding(
                 entries.map {
                     fillFunc(it).merge(borderFunc(it)) {
-                        fill, border -> fill to border
+                        fill, border ->
+                        fill to border
                     }.merge(labelFunc(it)) {
-                        (fill, border), label -> HeatMapFrame.Square(fillColor = fill, borderColor = border, label = label)
+                        (fill, border), label ->
+                        HeatMapFrame.Square(fillColor = fill, borderColor = border, label = label)
                     }
                 }
             )
@@ -107,8 +109,8 @@ class HeatMapFrameBuilder {
             labelFunc: (T) -> Binding<String?> = { Binding.fixedBinding(null) }
         ): HeatMapFrameBuilder {
             val allEntries = entries
-                    .flatMap { generateSequence { it }.take(seatFunc(it)) }
-                    .toList()
+                .flatMap { generateSequence { it }.take(seatFunc(it)) }
+                .toList()
             return of(numRows, allEntries, fillFunc, borderFunc, labelFunc)
         }
 
@@ -125,17 +127,18 @@ class HeatMapFrameBuilder {
             labelFunc: (T) -> Binding<String?> = { Binding.fixedBinding(null) }
         ): HeatMapFrame {
             return ofElectedLeading(
-                    rows,
-                    entries,
-                    { 1 },
-                    resultFunc,
-                    prevResultFunc,
-                    party,
-                    seatLabel,
-                    showChange,
-                    changeLabel,
-                    header,
-            labelFunc)
+                rows,
+                entries,
+                { 1 },
+                resultFunc,
+                prevResultFunc,
+                party,
+                seatLabel,
+                showChange,
+                changeLabel,
+                header,
+                labelFunc
+            )
         }
 
         @JvmStatic fun <T> ofElectedLeading(
@@ -152,66 +155,71 @@ class HeatMapFrameBuilder {
             labelFunc: (T) -> Binding<String?> = { Binding.fixedBinding(null) }
         ): HeatMapFrame {
             val results: Map<T, BindingReceiver<PartyResult?>> = entries
-                    .distinct()
-                    .associateWith { BindingReceiver(resultFunc(it)) }
+                .distinct()
+                .associateWith { BindingReceiver(resultFunc(it)) }
             val prev = entries.distinct().associateWith(prevResultFunc)
             val resultBindings = entries
-                    .map { e: T ->
-                        BindingReceiver(results[e]!!.getBinding { Pair(it, seatsFunc(e)) })
-                    }
-                    .toList()
+                .map { e: T ->
+                    BindingReceiver(results[e]!!.getBinding { Pair(it, seatsFunc(e)) })
+                }
+                .toList()
             val resultWithPrevBindings: List<BindingReceiver<Triple<PartyResult?, Party, Int>>> = entries
-                    .map { e: T ->
-                        BindingReceiver(results[e]!!.getBinding { Triple(it, prev[e]!!, seatsFunc(e)) })
-                    }
-                    .toList()
+                .map { e: T ->
+                    BindingReceiver(results[e]!!.getBinding { Triple(it, prev[e]!!, seatsFunc(e)) })
+                }
+                .toList()
             val seats = createSeatBarBinding(resultBindings) { party == it }
             val seatList = seats.getBinding {
-                        listOf(
-                            Pair(party.color, it.first),
-                            Pair(ColorUtils.lighten(party.color), it.second - it.first))
-                }
+                listOf(
+                    Pair(party.color, it.first),
+                    Pair(ColorUtils.lighten(party.color), it.second - it.first)
+                )
+            }
 
             val change = createChangeBarBinding(resultWithPrevBindings) { party == it }
             val changeLabelFunc = { p: Pair<Int, Int> -> if (showChange(p.first, p.second)) changeLabel(p.first, p.second) else "" }
             val changeList = change.getBinding()
                 .map {
                     if (showChange(it.first, it.second)) {
-                            listOf(
-                                Pair(party.color, it.first),
-                                Pair(ColorUtils.lighten(party.color), it.second - it.first))
+                        listOf(
+                            Pair(party.color, it.first),
+                            Pair(ColorUtils.lighten(party.color), it.second - it.first)
+                        )
                     } else {
                         emptyList()
                     }
                 }
             val allPrevs = entries
-                    .map { Pair(prev[it]!!, seatsFunc(it)) }
-                    .toList()
+                .map { Pair(prev[it]!!, seatsFunc(it)) }
+                .toList()
             return ofClustered(
-                    rows,
-                    entries,
-                    seatsFunc,
-                    { e: T ->
-                        results[e]!!.getBinding {
-                                    when {
-                                        it?.party == null -> Color.WHITE
-                                        it.isElected -> it.party.color
-                                        else -> ColorUtils.lighten(it.party.color)
-                                    }
-                                }
-                    },
-                    { Binding.fixedBinding(prevResultFunc(it).color) },
-            labelFunc)
-                    .withSeatBars(
-                            seatList, { it.first }, { it.second },
-                            seats.getBinding { seatLabel(it.first, it.second) })
-                    .withChangeBars(
-                            changeList, { it.first }, { it.second },
-                            Binding.fixedBinding(calcPrevForParty(allPrevs, party)),
-                            change.getBinding(changeLabelFunc))
-                    .withHeader(header)
-                    .withBorder(Binding.fixedBinding(party.color))
-                    .build()
+                rows,
+                entries,
+                seatsFunc,
+                { e: T ->
+                    results[e]!!.getBinding {
+                        when {
+                            it?.party == null -> Color.WHITE
+                            it.isElected -> it.party.color
+                            else -> ColorUtils.lighten(it.party.color)
+                        }
+                    }
+                },
+                { Binding.fixedBinding(prevResultFunc(it).color) },
+                labelFunc
+            )
+                .withSeatBars(
+                    seatList, { it.first }, { it.second },
+                    seats.getBinding { seatLabel(it.first, it.second) }
+                )
+                .withChangeBars(
+                    changeList, { it.first }, { it.second },
+                    Binding.fixedBinding(calcPrevForParty(allPrevs, party)),
+                    change.getBinding(changeLabelFunc)
+                )
+                .withHeader(header)
+                .withBorder(Binding.fixedBinding(party.color))
+                .build()
         }
 
         private fun calcPrevForParty(prev: List<Pair<Party, Int>>, party: Party): Int {
@@ -240,7 +248,8 @@ class HeatMapFrameBuilder {
                     } else {
                         Pair(p.first - if (left.isElected) r.second else 0, p.second - r.second)
                     }
-                })
+                }
+            )
             return BindingReceiver(binding)
         }
 
@@ -292,7 +301,8 @@ class HeatMapFrameBuilder {
                         }
                         ret
                     }
-                })
+                }
+            )
             return BindingReceiver(binding)
         }
     }

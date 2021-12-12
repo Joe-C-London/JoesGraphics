@@ -115,24 +115,27 @@ class MultiResultScreen private constructor() : JPanel() {
                 val additionalHighlight = additionalHighlightsFunc(t)
                 val leader = leadingPartyFunc(t).map { p: PartyResult? -> p ?: PartyResult.NO_RESULT }
                 shapesFunc(t).entries.asSequence()
-                        .map { e: Map.Entry<K, Shape> ->
-                            when {
-                                e.key == selected -> {
-                                    Pair(e.value, leader.map(PartyResult::color))
-                                }
-                                focus == null || focus.isEmpty() || focus.contains(e.key) -> {
-                                    Pair(
-                                            e.value, Binding.fixedBinding(Color.LIGHT_GRAY))
-                                }
-                                additionalHighlight != null && additionalHighlight.contains(e.key) -> {
-                                    Pair(
-                                            e.value, Binding.fixedBinding(Color.LIGHT_GRAY))
-                                }
-                                else -> Pair(
-                                        e.value, Binding.fixedBinding(Color(220, 220, 220)))
+                    .map { e: Map.Entry<K, Shape> ->
+                        when {
+                            e.key == selected -> {
+                                Pair(e.value, leader.map(PartyResult::color))
                             }
+                            focus == null || focus.isEmpty() || focus.contains(e.key) -> {
+                                Pair(
+                                    e.value, Binding.fixedBinding(Color.LIGHT_GRAY)
+                                )
+                            }
+                            additionalHighlight != null && additionalHighlight.contains(e.key) -> {
+                                Pair(
+                                    e.value, Binding.fixedBinding(Color.LIGHT_GRAY)
+                                )
+                            }
+                            else -> Pair(
+                                e.value, Binding.fixedBinding(Color(220, 220, 220))
+                            )
                         }
-                        .toList()
+                    }
+                    .toList()
             }
             return this
         }
@@ -220,32 +223,32 @@ class MultiResultScreen private constructor() : JPanel() {
         private var _maxBars = 0
 
         var votes: Map<Candidate, Int>
-        get() = _votes
-        set(votes) {
-            _votes = votes
-            onPropertyRefreshed(Property.VOTES)
-        }
+            get() = _votes
+            set(votes) {
+                _votes = votes
+                onPropertyRefreshed(Property.VOTES)
+            }
 
         var winner: Candidate?
-        get() = _winner
-        set(winner) {
-            _winner = winner
-            onPropertyRefreshed(Property.WINNER)
-        }
+            get() = _winner
+            set(winner) {
+                _winner = winner
+                onPropertyRefreshed(Property.WINNER)
+            }
 
         var runoff: Set<Candidate>
-        get() = _runoff
-        set(runoff) {
-            _runoff = runoff
-            onPropertyRefreshed(Property.RUNOFF)
-        }
+            get() = _runoff
+            set(runoff) {
+                _runoff = runoff
+                onPropertyRefreshed(Property.RUNOFF)
+            }
 
         var maxBars: Int
-        get() = _maxBars
-        set(maxBars) {
-            _maxBars = maxBars
-            onPropertyRefreshed(Property.MAX_BARS)
-        }
+            get() = _maxBars
+            set(maxBars) {
+                _maxBars = maxBars
+                onPropertyRefreshed(Property.MAX_BARS)
+            }
     }
 
     private class ResultPanel constructor(
@@ -369,84 +372,89 @@ class MultiResultScreen private constructor() : JPanel() {
             runoff.binding.bind { result.runoff = it ?: emptySet() }
             maxBars.binding.bind { result.maxBars = it }
             val bars = Binding.propertyBinding(
-                    result,
-                    { r: Result ->
-                        val total = r.votes.values.sum()
-                        Aggregators.topAndOthers(r.votes, r.maxBars, Candidate.OTHERS, *listOfNotNull(r.winner).toTypedArray())
-                                .entries
-                                .asSequence()
-                                .sortedByDescending { e -> if (e.key === Candidate.OTHERS) Int.MIN_VALUE else e.value }
-                                .map { e ->
-                                    val candidate = e.key
-                                    val votes = e.value
-                                    val pct = 1.0 * votes / total
-                                    val shape: Shape? = when {
-                                                candidate == r.winner -> ImageGenerator.createHalfTickShape()
-                                                r.runoff.contains(candidate) -> ImageGenerator.createHalfRunoffShape()
-                                                else -> null
-                                            }
-                                    val leftLabel: String = when {
-                                        partiesOnly -> {
-                                            candidate.party.name.uppercase()
-                                        }
-                                        candidate === Candidate.OTHERS -> {
-                                            "OTHERS"
-                                        }
-                                        else -> {
-                                            "${candidate.name.uppercase()}\n${candidate.party.abbreviation}${if (candidate.isIncumbent()) " $incumbentMarker" else ""}"
-                                        }
-                                    }
-                                    val rightLabel: String = when {
-                                        java.lang.Double.isNaN(pct) -> {
-                                            "WAITING..."
-                                        }
-                                        partiesOnly -> {
-                                            DecimalFormat("0.0%").format(pct)
-                                        }
-                                        else -> {
-                                            "${DecimalFormat("#,##0").format(votes.toLong())}\n${DecimalFormat("0.0%").format(pct)}"
-                                        }
-                                    }
-                                    BasicBar(
-                                            leftLabel,
-                                            candidate.party.color,
-                                            if (java.lang.Double.isNaN(pct)) 0 else pct,
-                                            rightLabel,
-                                            shape)
+                result,
+                { r: Result ->
+                    val total = r.votes.values.sum()
+                    Aggregators.topAndOthers(r.votes, r.maxBars, Candidate.OTHERS, *listOfNotNull(r.winner).toTypedArray())
+                        .entries
+                        .asSequence()
+                        .sortedByDescending { e -> if (e.key === Candidate.OTHERS) Int.MIN_VALUE else e.value }
+                        .map { e ->
+                            val candidate = e.key
+                            val votes = e.value
+                            val pct = 1.0 * votes / total
+                            val shape: Shape? = when {
+                                candidate == r.winner -> ImageGenerator.createHalfTickShape()
+                                r.runoff.contains(candidate) -> ImageGenerator.createHalfRunoffShape()
+                                else -> null
+                            }
+                            val leftLabel: String = when {
+                                partiesOnly -> {
+                                    candidate.party.name.uppercase()
                                 }
-                                .toList()
-                    },
-                    Result.Property.VOTES,
-                    Result.Property.WINNER,
-                    Result.Property.RUNOFF,
-                    Result.Property.MAX_BARS)
+                                candidate === Candidate.OTHERS -> {
+                                    "OTHERS"
+                                }
+                                else -> {
+                                    "${candidate.name.uppercase()}\n${candidate.party.abbreviation}${if (candidate.isIncumbent()) " $incumbentMarker" else ""}"
+                                }
+                            }
+                            val rightLabel: String = when {
+                                java.lang.Double.isNaN(pct) -> {
+                                    "WAITING..."
+                                }
+                                partiesOnly -> {
+                                    DecimalFormat("0.0%").format(pct)
+                                }
+                                else -> {
+                                    "${DecimalFormat("#,##0").format(votes.toLong())}\n${DecimalFormat("0.0%").format(pct)}"
+                                }
+                            }
+                            BasicBar(
+                                leftLabel,
+                                candidate.party.color,
+                                if (java.lang.Double.isNaN(pct)) 0 else pct,
+                                rightLabel,
+                                shape
+                            )
+                        }
+                        .toList()
+                },
+                Result.Property.VOTES,
+                Result.Property.WINNER,
+                Result.Property.RUNOFF,
+                Result.Property.MAX_BARS
+            )
             barFrame = BarFrameBuilder.basic(bars)
-                    .withMax(pctReporting.binding.map { d: Double -> 0.5 / d.coerceAtLeast(1e-6) })
-                    .withHeader(header.binding)
-                    .withSubhead(subhead.binding)
-                    .build()
+                .withMax(pctReporting.binding.map { d: Double -> 0.5 / d.coerceAtLeast(1e-6) })
+                .withHeader(header.binding)
+                .withSubhead(subhead.binding)
+                .build()
             add(barFrame)
             if (swingPartyOrder != null) {
                 swingFrame = SwingFrameBuilder.prevCurr(
-                        prevVotes.binding,
-                        votes.binding
-                                .map { m: Map<Candidate, Int> ->
-                                    val ret: MutableMap<Party, Int> = LinkedHashMap()
-                                    m.forEach { (k: Candidate, v: Int) -> ret.merge(k.party, v) { a, b -> Integer.sum(a, b) } }
-                                    ret
-                                },
-                        swingPartyOrder)
-                        .withHeader(swingHeader.binding)
-                        .build()
+                    prevVotes.binding,
+                    votes.binding
+                        .map { m: Map<Candidate, Int> ->
+                            val ret: MutableMap<Party, Int> = LinkedHashMap()
+                            m.forEach { (k: Candidate, v: Int) -> ret.merge(k.party, v) { a, b -> Integer.sum(a, b) } }
+                            ret
+                        },
+                    swingPartyOrder
+                )
+                    .withHeader(swingHeader.binding)
+                    .build()
                 add(swingFrame)
             }
             if (hasMap) {
                 mapFrame = MapFrame(
                     headerBinding = mapHeader.binding,
                     shapesBinding = mapShape.binding,
-                    focusBoxBinding = mapFocus.binding.map { it.asSequence()
-                        .map { obj: Shape -> obj.bounds2D }
-                        .reduceOrNull { agg, r -> agg.createUnion(r) } }
+                    focusBoxBinding = mapFocus.binding.map {
+                        it.asSequence()
+                            .map { obj: Shape -> obj.bounds2D }
+                            .reduceOrNull { agg, r -> agg.createUnion(r) }
+                    }
                 )
                 add(mapFrame)
             }

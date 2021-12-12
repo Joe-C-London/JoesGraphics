@@ -3,6 +3,8 @@ package com.joecollins.graphics.components.lowerthird
 import com.joecollins.bindings.Binding.Companion.fixedBinding
 import com.joecollins.graphics.components.lowerthird.LowerThird.Companion.createImage
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
+import org.junit.Assert
+import org.junit.Test
 import java.awt.Color
 import java.io.IOException
 import java.lang.InterruptedException
@@ -10,8 +12,6 @@ import java.time.Clock
 import java.time.Instant
 import java.time.ZoneId
 import kotlin.Throws
-import org.junit.Assert
-import org.junit.Test
 
 class LowerThirdHeadlineOnlyTest {
     @Test
@@ -74,7 +74,8 @@ class LowerThirdHeadlineOnlyTest {
     fun testRenderHeadlineSubheadAccents() {
         val lowerThird = LowerThirdHeadlineOnly(
             leftImageBinding = fixedBinding(
-                createImage("\u00c9LECTION FRAN\u00c7AIS", Color.WHITE, Color.RED)),
+                createImage("\u00c9LECTION FRAN\u00c7AIS", Color.WHITE, Color.RED)
+            ),
             placeBinding = fixedBinding("SAINT-\u00c9TIENNE"),
             timezoneBinding = fixedBinding(ZoneId.of("Europe/Paris")),
             headlineBinding = fixedBinding("\u00c9LECTION FRAN\u00c7AIS EST FINI"),

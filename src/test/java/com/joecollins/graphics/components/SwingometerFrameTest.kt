@@ -4,12 +4,12 @@ import com.joecollins.bindings.Binding
 import com.joecollins.bindings.Binding.Companion.fixedBinding
 import com.joecollins.bindings.mapElements
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
+import org.junit.Assert
+import org.junit.Test
 import java.awt.Color
 import java.io.IOException
 import kotlin.Throws
 import kotlin.math.abs
-import org.junit.Assert
-import org.junit.Test
 
 class SwingometerFrameTest {
     @Test
@@ -102,11 +102,13 @@ class SwingometerFrameTest {
 
     @Test
     fun testOuterLabels() {
-        val labels = fixedBinding(listOf(
-            Triple(0.0, "50", Color.BLACK),
-            Triple(5.0, "75", Color.RED),
-            Triple(-5.0, "60", Color.BLUE)
-        ))
+        val labels = fixedBinding(
+            listOf(
+                Triple(0.0, "50", Color.BLACK),
+                Triple(5.0, "75", Color.RED),
+                Triple(-5.0, "60", Color.BLUE)
+            )
+        )
         val frame = SwingometerFrame(
             headerBinding = fixedBinding(null),
             valueBinding = fixedBinding(3),
@@ -125,11 +127,13 @@ class SwingometerFrameTest {
 
     @Test
     fun testBuckets() {
-        val dots = fixedBinding(listOf(
-            Pair(0.3, Color.BLUE),
-            Pair(-0.7, Color.RED),
-            Pair(2.4, Color.BLACK)
-        ))
+        val dots = fixedBinding(
+            listOf(
+                Pair(0.3, Color.BLUE),
+                Pair(-0.7, Color.RED),
+                Pair(2.4, Color.BLACK)
+            )
+        )
         val frame = SwingometerFrame(
             headerBinding = fixedBinding(null),
             valueBinding = fixedBinding(3),
@@ -147,11 +151,13 @@ class SwingometerFrameTest {
 
     @Test
     fun testDotLabels() {
-        val dots = fixedBinding(listOf(
-            Triple(0.3, Color.BLUE, "A"),
-            Triple(-0.7, Color.RED, "B"),
-            Triple(2.4, Color.BLACK, "C")
-        ))
+        val dots = fixedBinding(
+            listOf(
+                Triple(0.3, Color.BLUE, "A"),
+                Triple(-0.7, Color.RED, "B"),
+                Triple(2.4, Color.BLACK, "C")
+            )
+        )
         val frame = SwingometerFrame(
             headerBinding = fixedBinding(null),
             valueBinding = fixedBinding(3),
@@ -171,11 +177,13 @@ class SwingometerFrameTest {
 
     @Test
     fun testDotEmpty() {
-        val dots = fixedBinding(listOf(
-            Triple(0.3, Color.BLUE, true),
-            Triple(-0.7, Color.RED, false),
-            Triple(2.4, Color.BLACK, true)
-        ))
+        val dots = fixedBinding(
+            listOf(
+                Triple(0.3, Color.BLUE, true),
+                Triple(-0.7, Color.RED, false),
+                Triple(2.4, Color.BLACK, true)
+            )
+        )
         val frame = SwingometerFrame(
             headerBinding = fixedBinding(null),
             valueBinding = fixedBinding(3),
@@ -198,15 +206,17 @@ class SwingometerFrameTest {
     @Throws(IOException::class)
     fun testRenderBasic() {
         val ticks = (-9..9).toList()
-        val outerLabels = fixedBinding(listOf(
-            Triple(0.0, 51, Color.RED),
-            Triple(-1.55, 51, Color.BLUE),
-            Triple(-7.8, 52, Color.BLUE),
-            Triple(-8.3, 54, Color.BLUE),
-            Triple(2.85, 55, Color.RED),
-            Triple(4.55, 60, Color.RED),
-            Triple(9.75, 65, Color.RED)
-        ))
+        val outerLabels = fixedBinding(
+            listOf(
+                Triple(0.0, 51, Color.RED),
+                Triple(-1.55, 51, Color.BLUE),
+                Triple(-7.8, 52, Color.BLUE),
+                Triple(-8.3, 54, Color.BLUE),
+                Triple(2.85, 55, Color.RED),
+                Triple(4.55, 60, Color.RED),
+                Triple(9.75, 65, Color.RED)
+            )
+        )
         val dots = createSwingometerDotsWithoutLabels()
         val frame = SwingometerFrame(
             headerBinding = fixedBinding("2018 SENATE SWINGOMETER"),
@@ -231,15 +241,17 @@ class SwingometerFrameTest {
     @Throws(IOException::class)
     fun testRenderBasicTinyDots() {
         val ticks = (-9..9).toList()
-        val outerLabels = fixedBinding(listOf(
-            Triple(0.0, 51, Color.RED),
-            Triple(-1.55, 51, Color.BLUE),
-            Triple(-7.8, 52, Color.BLUE),
-            Triple(-8.3, 54, Color.BLUE),
-            Triple(2.85, 55, Color.RED),
-            Triple(4.55, 60, Color.RED),
-            Triple(9.75, 65, Color.RED)
-        ))
+        val outerLabels = fixedBinding(
+            listOf(
+                Triple(0.0, 51, Color.RED),
+                Triple(-1.55, 51, Color.BLUE),
+                Triple(-7.8, 52, Color.BLUE),
+                Triple(-8.3, 54, Color.BLUE),
+                Triple(2.85, 55, Color.RED),
+                Triple(4.55, 60, Color.RED),
+                Triple(9.75, 65, Color.RED)
+            )
+        )
         val dots = createSwingometerDotsWithoutLabels()
         val frame = SwingometerFrame(
             headerBinding = fixedBinding("2018 SENATE SWINGOMETER"),
@@ -304,15 +316,17 @@ class SwingometerFrameTest {
     @Throws(IOException::class)
     fun testRenderLabels() {
         val ticks = (-9..9).toList()
-        val outerLabels = fixedBinding(listOf(
-            Triple(0.0, 332, Color.BLUE),
-            Triple(-3.91, 350, Color.BLUE),
-            Triple(-5.235, 400, Color.BLUE),
-            Triple(-7.895, 450, Color.BLUE),
-            Triple(2.68, 270, Color.RED),
-            Triple(5.075, 350, Color.RED),
-            Triple(8.665, 400, Color.RED)
-        ))
+        val outerLabels = fixedBinding(
+            listOf(
+                Triple(0.0, 332, Color.BLUE),
+                Triple(-3.91, 350, Color.BLUE),
+                Triple(-5.235, 400, Color.BLUE),
+                Triple(-7.895, 450, Color.BLUE),
+                Triple(2.68, 270, Color.RED),
+                Triple(5.075, 350, Color.RED),
+                Triple(8.665, 400, Color.RED)
+            )
+        )
         val dots = createSwingometerDotsWithLabels()
         val frame = SwingometerFrame(
             headerBinding = fixedBinding("2016 PRESIDENT SWINGOMETER"),
@@ -343,15 +357,17 @@ class SwingometerFrameTest {
     @Throws(IOException::class)
     fun testRenderEmptyDots() {
         val ticks = (-9..9).toList()
-        val outerLabels = fixedBinding(listOf(
-            Triple(0.0, 332, Color.BLUE),
-            Triple(-3.91, 350, Color.BLUE),
-            Triple(-5.235, 400, Color.BLUE),
-            Triple(-7.895, 450, Color.BLUE),
-            Triple(2.68, 270, Color.RED),
-            Triple(5.075, 350, Color.RED),
-            Triple(8.665, 400, Color.RED)
-        ))
+        val outerLabels = fixedBinding(
+            listOf(
+                Triple(0.0, 332, Color.BLUE),
+                Triple(-3.91, 350, Color.BLUE),
+                Triple(-5.235, 400, Color.BLUE),
+                Triple(-7.895, 450, Color.BLUE),
+                Triple(2.68, 270, Color.RED),
+                Triple(5.075, 350, Color.RED),
+                Triple(8.665, 400, Color.RED)
+            )
+        )
         val dots = createSwingometerDotsWithLabels()
         val frame = SwingometerFrame(
             headerBinding = fixedBinding("2016 PRESIDENT SWINGOMETER"),
@@ -444,15 +460,17 @@ class SwingometerFrameTest {
     @Throws(IOException::class)
     fun testRenderMultiLineLabels() {
         val ticks = (-9..9).toList()
-        val outerLabels = fixedBinding(listOf(
-            Triple(0.0, 332, Color.BLUE),
-            Triple(-3.91, 350, Color.BLUE),
-            Triple(-5.235, 400, Color.BLUE),
-            Triple(-7.895, 450, Color.BLUE),
-            Triple(2.68, 270, Color.RED),
-            Triple(5.075, 350, Color.RED),
-            Triple(8.665, 400, Color.RED)
-        ))
+        val outerLabels = fixedBinding(
+            listOf(
+                Triple(0.0, 332, Color.BLUE),
+                Triple(-3.91, 350, Color.BLUE),
+                Triple(-5.235, 400, Color.BLUE),
+                Triple(-7.895, 450, Color.BLUE),
+                Triple(2.68, 270, Color.RED),
+                Triple(5.075, 350, Color.RED),
+                Triple(8.665, 400, Color.RED)
+            )
+        )
         val dots = createSwingometerDotsWithLabels()
         val frame = SwingometerFrame(
             headerBinding = fixedBinding("2016 PRESIDENT SWINGOMETER"),

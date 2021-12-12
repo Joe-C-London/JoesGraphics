@@ -5,10 +5,10 @@ import com.joecollins.bindings.Binding
 import com.joecollins.bindings.Binding.Companion.fixedBinding
 import com.joecollins.graphics.components.SwingometerFrameBuilder.Companion.basic
 import com.joecollins.graphics.utils.BindableWrapper
-import java.awt.Color
-import java.text.DecimalFormat
 import org.junit.Assert
 import org.junit.Test
+import java.awt.Color
+import java.text.DecimalFormat
 
 class SwingometerFrameBuilderTest {
     @Test
@@ -16,8 +16,8 @@ class SwingometerFrameBuilderTest {
         val colors = BindableWrapper(Pair(Color.BLUE, Color.RED))
         val value = BindableWrapper(-1.0)
         val frame = basic(colors.binding, value.binding)
-                .withHeader(fixedBinding("SWINGOMETER"))
-                .build()
+            .withHeader(fixedBinding("SWINGOMETER"))
+            .build()
         Assert.assertEquals(Color.BLUE, frame.leftColor)
         Assert.assertEquals(Color.RED, frame.rightColor)
         Assert.assertEquals(-1.0, frame.value.toDouble(), 0.0)
@@ -29,8 +29,8 @@ class SwingometerFrameBuilderTest {
         val colors = BindableWrapper(Pair(Color.BLUE, Color.RED))
         val value = BindableWrapper(Double.NaN)
         val frame = basic(colors.binding, value.binding)
-                .withHeader(fixedBinding("SWINGOMETER"))
-                .build()
+            .withHeader(fixedBinding("SWINGOMETER"))
+            .build()
         Assert.assertEquals(Color.BLUE, frame.leftColor)
         Assert.assertEquals(Color.RED, frame.rightColor)
         Assert.assertEquals(0.0, frame.value.toDouble(), 0.0)
@@ -44,9 +44,9 @@ class SwingometerFrameBuilderTest {
         val range = BindableWrapper(10.0)
         val bucketSize = BindableWrapper(0.5)
         val frame = basic(colors.binding, value.binding)
-                .withRange(range.binding)
-                .withBucketSize(bucketSize.binding)
-                .build()
+            .withRange(range.binding)
+            .withBucketSize(bucketSize.binding)
+            .build()
         Assert.assertEquals(-1.0, frame.value.toDouble(), 0.0)
         Assert.assertEquals(10.0, frame.range.toDouble(), 0.0)
         Assert.assertEquals(20, frame.numBucketsPerSide.toLong())
@@ -75,9 +75,9 @@ class SwingometerFrameBuilderTest {
         val range = BindableWrapper(10.0)
         val tickInterval = BindableWrapper(1.0)
         val frame = basic(colors.binding, value.binding)
-                .withRange(range.binding)
-                .withTickInterval(tickInterval.binding) { DecimalFormat("0").format(it) }
-                .build()
+            .withRange(range.binding)
+            .withTickInterval(tickInterval.binding) { DecimalFormat("0").format(it) }
+            .build()
         Assert.assertEquals(19, frame.numTicks.toLong())
         val ticks = (0 until frame.numTicks).associate { frame.getTickPosition(it) to frame.getTickText(it) }
         Assert.assertEquals("9", ticks[-9.0])
@@ -94,9 +94,9 @@ class SwingometerFrameBuilderTest {
         val leftToWin = BindableWrapper(-2.0)
         val rightToWin = BindableWrapper(4.0)
         val frame = basic(colors.binding, value.binding)
-                .withLeftNeedingToWin(leftToWin.binding)
-                .withRightNeedingToWin(rightToWin.binding)
-                .build()
+            .withLeftNeedingToWin(leftToWin.binding)
+            .withRightNeedingToWin(rightToWin.binding)
+            .build()
         Assert.assertEquals(-2.0, frame.leftToWin.toDouble(), 0.0)
         Assert.assertEquals(4.0, frame.rightToWin.toDouble(), 0.0)
     }
@@ -105,23 +105,25 @@ class SwingometerFrameBuilderTest {
     fun testOuterLabels() {
         class OuterLabel(val color: Color, val label: String, val position: Double)
 
-        val labels = fixedBinding(listOf(
-        OuterLabel(Color.RED, "306", 0.0),
-        OuterLabel(Color.RED, "350", 2.66),
-        OuterLabel(Color.RED, "400", 7.855),
-        OuterLabel(Color.RED, "450", 11.245),
-        OuterLabel(Color.RED, "500", 15.055),
-        OuterLabel(Color.BLUE, "270", -0.385),
-        OuterLabel(Color.BLUE, "350", -2.565),
-        OuterLabel(Color.BLUE, "400", -4.495),
-        OuterLabel(Color.BLUE, "450", -9.455),
-        OuterLabel(Color.BLUE, "500", -13.86)
-        ))
+        val labels = fixedBinding(
+            listOf(
+                OuterLabel(Color.RED, "306", 0.0),
+                OuterLabel(Color.RED, "350", 2.66),
+                OuterLabel(Color.RED, "400", 7.855),
+                OuterLabel(Color.RED, "450", 11.245),
+                OuterLabel(Color.RED, "500", 15.055),
+                OuterLabel(Color.BLUE, "270", -0.385),
+                OuterLabel(Color.BLUE, "350", -2.565),
+                OuterLabel(Color.BLUE, "400", -4.495),
+                OuterLabel(Color.BLUE, "450", -9.455),
+                OuterLabel(Color.BLUE, "500", -13.86)
+            )
+        )
         val colors = BindableWrapper(Pair(Color.BLUE, Color.RED))
         val value = BindableWrapper(-1.0)
         val frame = basic(colors.binding, value.binding)
-                .withOuterLabels(labels, { it.position }, { it.label }, { it.color })
-                .build()
+            .withOuterLabels(labels, { it.position }, { it.label }, { it.color })
+            .build()
         Assert.assertEquals(10, frame.numOuterLabels.toLong())
         Assert.assertEquals(Color.RED, frame.getOuterLabelColor(0))
         Assert.assertEquals("350", frame.getOuterLabelText(1))
@@ -133,20 +135,22 @@ class SwingometerFrameBuilderTest {
     fun testDotsWithoutLabels() {
         class Dot(val position: Double, val color: Color)
 
-        val dots = fixedBinding(listOf(
-            Dot(0.115, Color.RED),
-            Dot(0.36, Color.RED),
-            Dot(0.385, Color.RED),
-            Dot(0.6, Color.RED),
-            Dot(-0.185, Color.BLUE),
-            Dot(-0.76, Color.BLUE),
-            Dot(-0.76, Color.BLUE)
-        ))
+        val dots = fixedBinding(
+            listOf(
+                Dot(0.115, Color.RED),
+                Dot(0.36, Color.RED),
+                Dot(0.385, Color.RED),
+                Dot(0.6, Color.RED),
+                Dot(-0.185, Color.BLUE),
+                Dot(-0.76, Color.BLUE),
+                Dot(-0.76, Color.BLUE)
+            )
+        )
         val colors = BindableWrapper(Pair(Color.BLUE, Color.RED))
         val value = BindableWrapper(-1.0)
         val frame = basic(colors.binding, value.binding)
-                .withDots(dots, { it.position }, { it.color })
-                .build()
+            .withDots(dots, { it.position }, { it.color })
+            .build()
         Assert.assertEquals(7, frame.numDots.toLong())
         Assert.assertEquals(0.115, frame.getDotPosition(0).toDouble(), 1e-6)
         Assert.assertEquals(Color.RED, frame.getDotColor(1))
@@ -157,20 +161,22 @@ class SwingometerFrameBuilderTest {
     fun testDotsWithLabels() {
         class Dot(val position: Double, val color: Color, val label: String)
 
-        val dots = fixedBinding(listOf(
-            Dot(0.115, Color.RED, "16"),
-            Dot(0.36, Color.RED, "20"),
-            Dot(0.385, Color.RED, "10"),
-            Dot(0.6, Color.RED, "29"),
-            Dot(-0.185, Color.BLUE, "4"),
-            Dot(-0.76, Color.BLUE, "10"),
-            Dot(-0.76, Color.BLUE, "6")
-        ))
+        val dots = fixedBinding(
+            listOf(
+                Dot(0.115, Color.RED, "16"),
+                Dot(0.36, Color.RED, "20"),
+                Dot(0.385, Color.RED, "10"),
+                Dot(0.6, Color.RED, "29"),
+                Dot(-0.185, Color.BLUE, "4"),
+                Dot(-0.76, Color.BLUE, "10"),
+                Dot(-0.76, Color.BLUE, "6")
+            )
+        )
         val colors = BindableWrapper(Pair(Color.BLUE, Color.RED))
         val value = BindableWrapper(-1.0)
         val frame = basic(colors.binding, value.binding)
-                .withDots(dots, { it.position }, { it.color }, { it.label })
-                .build()
+            .withDots(dots, { it.position }, { it.color }, { it.label })
+            .build()
         Assert.assertEquals(7, frame.numDots.toLong())
         Assert.assertEquals(0.115, frame.getDotPosition(0).toDouble(), 1e-6)
         Assert.assertEquals(Color.RED, frame.getDotColor(1))
@@ -181,20 +187,22 @@ class SwingometerFrameBuilderTest {
     fun testDotsSolidOrEmpty() {
         class Dot(val position: Double, val color: Color, val solid: Boolean)
 
-        val dots = fixedBinding(listOf(
-            Dot(0.115, Color.RED, true),
-            Dot(0.36, Color.RED, true),
-            Dot(0.385, Color.RED, true),
-            Dot(0.6, Color.RED, true),
-            Dot(-0.185, Color.BLUE, false),
-            Dot(-0.76, Color.BLUE, true),
-            Dot(-0.76, Color.BLUE, false)
-        ))
+        val dots = fixedBinding(
+            listOf(
+                Dot(0.115, Color.RED, true),
+                Dot(0.36, Color.RED, true),
+                Dot(0.385, Color.RED, true),
+                Dot(0.6, Color.RED, true),
+                Dot(-0.185, Color.BLUE, false),
+                Dot(-0.76, Color.BLUE, true),
+                Dot(-0.76, Color.BLUE, false)
+            )
+        )
         val colors = BindableWrapper(Pair(Color.BLUE, Color.RED))
         val value = BindableWrapper(-1.0)
         val frame = basic(colors.binding, value.binding)
-                .withDotsSolid(dots, { it.position }, { it.color }, { it.solid })
-                .build()
+            .withDotsSolid(dots, { it.position }, { it.color }, { it.solid })
+            .build()
         Assert.assertEquals(7, frame.numDots.toLong())
         Assert.assertEquals(0.115, frame.getDotPosition(0).toDouble(), 1e-6)
         Assert.assertEquals(Color.RED, frame.getDotColor(1))
@@ -230,8 +238,8 @@ class SwingometerFrameBuilderTest {
         val colors = BindableWrapper(Pair(Color.BLUE, Color.RED))
         val value = BindableWrapper(-1.0)
         val frame = basic(colors.binding, value.binding)
-                .withFixedDots(dots, { it.position }, { it.getColor() })
-                .build()
+            .withFixedDots(dots, { it.position }, { it.getColor() })
+            .build()
         Assert.assertEquals(7, frame.numDots.toLong())
         Assert.assertEquals(0.115, frame.getDotPosition(0).toDouble(), 1e-6)
         Assert.assertEquals(Color.RED, frame.getDotColor(1))

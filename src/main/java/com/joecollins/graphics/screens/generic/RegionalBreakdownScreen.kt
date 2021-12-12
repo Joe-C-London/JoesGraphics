@@ -40,49 +40,52 @@ class RegionalBreakdownScreen private constructor(titleLabel: JLabel, multiSumma
         private var _totalSeats = 0
 
         var partyOrder: List<Party>
-        get() = _partyOrder
-        set(partyOrder) {
-            _partyOrder = partyOrder
-            onPropertyRefreshed(Property.PARTY_ORDER)
-        }
+            get() = _partyOrder
+            set(partyOrder) {
+                _partyOrder = partyOrder
+                onPropertyRefreshed(Property.PARTY_ORDER)
+            }
 
         var name: String
-        get() = _name
-        set(name) {
-            _name = name
-            onPropertyRefreshed(Property.NAME)
-        }
+            get() = _name
+            set(name) {
+                _name = name
+                onPropertyRefreshed(Property.NAME)
+            }
 
         var seats: Map<Party, Int>
-        get() = _seats
-        set(seats) {
-            _seats = seats
-            onPropertyRefreshed(Property.SEATS)
-        }
+            get() = _seats
+            set(seats) {
+                _seats = seats
+                onPropertyRefreshed(Property.SEATS)
+            }
 
         var totalSeats: Int
-        get() = _totalSeats
-        set(totalSeats) {
-            _totalSeats = totalSeats
-            onPropertyRefreshed(Property.TOTAL_SEATS)
-        }
+            get() = _totalSeats
+            set(totalSeats) {
+                _totalSeats = totalSeats
+                onPropertyRefreshed(Property.TOTAL_SEATS)
+            }
 
         override val headerBinding: Binding<String>
             get() = Binding.propertyBinding(this, { t: SeatEntry -> t.name }, Property.NAME)
         override val valueBinding: Binding<List<Pair<Color, String>>>
             get() = Binding.propertyBinding(
-                    this,
-                    { t: SeatEntry ->
-                        val ret: MutableList<Pair<Color, String>> = t.partyOrder.map { t.getPartyLabel(it) }.toMutableList()
-                        ret.add(
-                                Pair(
-                                        Color.WHITE,
-                                        seats.values.sum().toString() + "/" + totalSeats))
-                        ret
-                    },
-                    Property.PARTY_ORDER,
-                    Property.SEATS,
-                    Property.TOTAL_SEATS)
+                this,
+                { t: SeatEntry ->
+                    val ret: MutableList<Pair<Color, String>> = t.partyOrder.map { t.getPartyLabel(it) }.toMutableList()
+                    ret.add(
+                        Pair(
+                            Color.WHITE,
+                            seats.values.sum().toString() + "/" + totalSeats
+                        )
+                    )
+                    ret
+                },
+                Property.PARTY_ORDER,
+                Property.SEATS,
+                Property.TOTAL_SEATS
+            )
 
         protected open fun getPartyLabel(party: Party): Pair<Color, String> {
             return Pair(party.color, (seats[party] ?: 0).toString())
@@ -93,18 +96,19 @@ class RegionalBreakdownScreen private constructor(titleLabel: JLabel, multiSumma
         private var _diff: Map<Party, Int> = emptyMap()
 
         var diff: Map<Party, Int>
-        get() = _diff
-        set(diff) {
-            _diff = diff
-            onPropertyRefreshed(Property.SEATS)
-        }
+            get() = _diff
+            set(diff) {
+                _diff = diff
+                onPropertyRefreshed(Property.SEATS)
+            }
 
         override fun getPartyLabel(party: Party): Pair<Color, String> {
             val seats = seats[party] ?: 0
             val diff = diff[party] ?: 0
             return Pair(
-                    party.color,
-                    seats.toString() + " (" + (if (diff == 0) "\u00b10" else DIFF_FORMAT.format(diff.toLong())) + ")")
+                party.color,
+                seats.toString() + " (" + (if (diff == 0) "\u00b10" else DIFF_FORMAT.format(diff.toLong())) + ")"
+            )
         }
 
         companion object {
@@ -116,18 +120,19 @@ class RegionalBreakdownScreen private constructor(titleLabel: JLabel, multiSumma
         private var _prev: Map<Party, Int> = emptyMap()
 
         var prev: Map<Party, Int>
-        get() = _prev
-        set(prev) {
-            _prev = prev
-            onPropertyRefreshed(Property.SEATS)
-        }
+            get() = _prev
+            set(prev) {
+                _prev = prev
+                onPropertyRefreshed(Property.SEATS)
+            }
 
         override fun getPartyLabel(party: Party): Pair<Color, String> {
             val seats = seats[party] ?: 0
             val diff = seats - (prev[party] ?: 0)
             return Pair(
-                    party.color,
-                    seats.toString() + " (" + (if (diff == 0) "\u00b10" else DIFF_FORMAT.format(diff.toLong())) + ")")
+                party.color,
+                seats.toString() + " (" + (if (diff == 0) "\u00b10" else DIFF_FORMAT.format(diff.toLong())) + ")"
+            )
         }
 
         companion object {
@@ -235,9 +240,10 @@ class RegionalBreakdownScreen private constructor(titleLabel: JLabel, multiSumma
             val totalSeats = BindingReceiver(totalSeatsBinding)
             val seatDiff = BindingReceiver(seatDiffBinding)
             partyOrder = BindingReceiver(
-                    totalSeats
-                            .getBinding()
-                            .merge(seatDiff.getBinding()) { result, diff -> extractPartyOrder(result, diff) })
+                totalSeats
+                    .getBinding()
+                    .merge(seatDiff.getBinding()) { result, diff -> extractPartyOrder(result, diff) }
+            )
             val topEntry = SeatDiffEntry()
             partyOrder!!.getBinding().bind { topEntry.partyOrder = it }
             totalHeaderBinding.bind { topEntry.name = it }
@@ -282,9 +288,10 @@ class RegionalBreakdownScreen private constructor(titleLabel: JLabel, multiSumma
             val totalSeats = BindingReceiver(totalSeatsBinding)
             val prevSeats = BindingReceiver(prevSeatBinding)
             partyOrder = BindingReceiver(
-                    totalSeats
-                            .getBinding()
-                            .merge(prevSeats.getBinding()) { result: Map<Party, Int>, diff: Map<Party, Int> -> extractPartyOrder(result, diff) })
+                totalSeats
+                    .getBinding()
+                    .merge(prevSeats.getBinding()) { result: Map<Party, Int>, diff: Map<Party, Int> -> extractPartyOrder(result, diff) }
+            )
             val topEntry = SeatPrevEntry()
             partyOrder!!.getBinding().bind { topEntry.partyOrder = it }
             totalHeaderBinding.bind { topEntry.name = it }
@@ -303,7 +310,8 @@ class RegionalBreakdownScreen private constructor(titleLabel: JLabel, multiSumma
             titleBinding: Binding<String>
         ): SeatBuilder {
             return SeatBuilder(
-                    totalHeaderBinding, totalSeatsBinding, numTotalSeatsBinding, titleBinding)
+                totalHeaderBinding, totalSeatsBinding, numTotalSeatsBinding, titleBinding
+            )
         }
 
         @JvmStatic fun seatsWithDiff(
@@ -314,7 +322,8 @@ class RegionalBreakdownScreen private constructor(titleLabel: JLabel, multiSumma
             titleBinding: Binding<String>
         ): SeatDiffBuilder {
             return SeatDiffBuilder(
-                    totalHeaderBinding, totalSeatsBinding, seatDiffBinding, numTotalSeatsBinding, titleBinding)
+                totalHeaderBinding, totalSeatsBinding, seatDiffBinding, numTotalSeatsBinding, titleBinding
+            )
         }
 
         @JvmStatic fun seatsWithPrev(
@@ -325,19 +334,20 @@ class RegionalBreakdownScreen private constructor(titleLabel: JLabel, multiSumma
             titleBinding: Binding<String>
         ): SeatPrevBuilder {
             return SeatPrevBuilder(
-                    totalHeaderBinding,
-                    totalSeatsBinding,
-                    prevSeatsBinding,
-                    numTotalSeatsBinding,
-                    titleBinding)
+                totalHeaderBinding,
+                totalSeatsBinding,
+                prevSeatsBinding,
+                numTotalSeatsBinding,
+                titleBinding
+            )
         }
 
         private fun extractPartyOrder(result: Map<Party, Int>): List<Party> {
             return result.entries.asSequence()
-                    .filter { it.value > 0 }
-                    .sortedByDescending { it.value }
-                    .map { it.key }
-                    .toList()
+                .filter { it.value > 0 }
+                .sortedByDescending { it.value }
+                .map { it.key }
+                .toList()
         }
 
         private fun extractPartyOrder(
@@ -345,10 +355,10 @@ class RegionalBreakdownScreen private constructor(titleLabel: JLabel, multiSumma
             diff: Map<Party, Int>
         ): List<Party> {
             return sequenceOf(result.keys.asSequence(), diff.keys.asSequence()).flatten()
-                    .distinct()
-                    .filter { party -> result[party] ?: 0 > 0 || diff[party] ?: 0 != 0 }
-                    .sortedByDescending { party -> result[party] ?: 0 }
-                    .toList()
+                .distinct()
+                .filter { party -> result[party] ?: 0 > 0 || diff[party] ?: 0 != 0 }
+                .sortedByDescending { party -> result[party] ?: 0 }
+                .toList()
         }
 
         private fun transformPartyOrder(

@@ -76,27 +76,27 @@ class AllSeatsScreen private constructor(title: JLabel, frame: ResultListingFram
 
         fun setPrevResults(prevResults: Map<T, Map<Party, Int>>) {
             this.prevResults = prevResults.entries
-                    .asSequence()
-                    .map { e ->
-                        val votes = e.value
-                        val total = votes.values.sum()
-                        val topTwo = votes.values
-                                .sortedDescending()
-                                .take(2)
-                                .toList()
-                        Pair(e, 1.0 * (topTwo[0] - topTwo[1]) / total)
-                    }
-                    .sortedBy { e -> nameFunc(e.first.key).uppercase() }
-                    .map { it.first }
-                    .map { e ->
-                        Pair(
-                                e.key,
-                                e.value.entries
-                                        .maxByOrNull { it.value }
-                                        !!.key
-                        )
-                    }
-                    .toList()
+                .asSequence()
+                .map { e ->
+                    val votes = e.value
+                    val total = votes.values.sum()
+                    val topTwo = votes.values
+                        .sortedDescending()
+                        .take(2)
+                        .toList()
+                    Pair(e, 1.0 * (topTwo[0] - topTwo[1]) / total)
+                }
+                .sortedBy { e -> nameFunc(e.first.key).uppercase() }
+                .map { it.first }
+                .map { e ->
+                    Pair(
+                        e.key,
+                        e.value.entries
+                            .maxByOrNull { it.value }
+                        !!.key
+                    )
+                }
+                .toList()
             onPropertyRefreshed(Property.PREV)
         }
 
@@ -112,30 +112,33 @@ class AllSeatsScreen private constructor(title: JLabel, frame: ResultListingFram
 
         val resultBinding: Binding<List<Entry<T>>>
             get() = Binding.propertyBinding(
-                    this,
-                    { t: Input<T> ->
-                        t.prevResults
-                                .asSequence()
-                                .filter { e: Pair<T, Party> -> t.seatFilter?.contains(e.first) ?: true }
-                                .map { e: Pair<T, Party> ->
-                                    Triple(
-                                            e.first,
-                                            e.second,
-                                            t.currResults[e.first] ?: PartyResult.NO_RESULT)
-                                }
-                                .map { e: Triple<T, Party, PartyResult?> ->
-                                    val result = e.third ?: PartyResult.NO_RESULT
-                                    Entry(
-                                            e.first,
-                                            e.second.color,
-                                            result.party?.color ?: Color.BLACK,
-                                            result.isElected)
-                                }
-                                .toList()
-                    },
-                    Property.PREV,
-                    Property.CURR,
-                    Property.FILTER)
+                this,
+                { t: Input<T> ->
+                    t.prevResults
+                        .asSequence()
+                        .filter { e: Pair<T, Party> -> t.seatFilter?.contains(e.first) ?: true }
+                        .map { e: Pair<T, Party> ->
+                            Triple(
+                                e.first,
+                                e.second,
+                                t.currResults[e.first] ?: PartyResult.NO_RESULT
+                            )
+                        }
+                        .map { e: Triple<T, Party, PartyResult?> ->
+                            val result = e.third ?: PartyResult.NO_RESULT
+                            Entry(
+                                e.first,
+                                e.second.color,
+                                result.party?.color ?: Color.BLACK,
+                                result.isElected
+                            )
+                        }
+                        .toList()
+                },
+                Property.PREV,
+                Property.CURR,
+                Property.FILTER
+            )
     }
 
     private class Entry<T>(val key: T, val prevColor: Color, val resultColor: Color, val fill: Boolean)

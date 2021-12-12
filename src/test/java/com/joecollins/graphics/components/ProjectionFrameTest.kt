@@ -3,12 +3,12 @@ package com.joecollins.graphics.components
 import com.joecollins.bindings.Binding.Companion.fixedBinding
 import com.joecollins.graphics.components.lowerthird.LowerThird.Companion.createImage
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
+import org.junit.Assert
+import org.junit.Test
 import java.awt.Color
 import java.awt.Image
 import java.io.IOException
 import kotlin.Throws
-import org.junit.Assert
-import org.junit.Test
 
 class ProjectionFrameTest {
     @Test
@@ -120,8 +120,9 @@ class ProjectionFrameTest {
     @Throws(IOException::class)
     private fun peiLeg(): Image {
         return createImage(
-                ProjectionFrameTest::class.java
-                        .classLoader
-                        .getResource("com/joecollins/graphics/pei-leg.png"))
+            ProjectionFrameTest::class.java
+                .classLoader
+                .getResource("com/joecollins/graphics/pei-leg.png")
+        )
     }
 }

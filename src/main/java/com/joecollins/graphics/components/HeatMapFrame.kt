@@ -122,39 +122,39 @@ class HeatMapFrame(
         private var _changeBarStart = 0
 
         var seatBars: List<Bar>
-        get() { return _seatBars }
-        set(seatBars) {
-            _seatBars = seatBars
-            repaint()
-        }
+            get() { return _seatBars }
+            set(seatBars) {
+                _seatBars = seatBars
+                repaint()
+            }
 
         var seatBarLabel: String
-        get() { return _seatBarLabel }
-        set(seatBarLabel) {
-            _seatBarLabel = seatBarLabel
-            repaint()
-        }
+            get() { return _seatBarLabel }
+            set(seatBarLabel) {
+                _seatBarLabel = seatBarLabel
+                repaint()
+            }
 
         var changeBars: List<Bar>
-        get() { return _changeBars }
-        set(changeBars) {
-            _changeBars = changeBars
-            repaint()
-        }
+            get() { return _changeBars }
+            set(changeBars) {
+                _changeBars = changeBars
+                repaint()
+            }
 
         var changeBarLabel: String
-        get() { return _changeBarLabel }
-        set(changeBarLabel) {
-            _changeBarLabel = changeBarLabel
-            repaint()
-        }
+            get() { return _changeBarLabel }
+            set(changeBarLabel) {
+                _changeBarLabel = changeBarLabel
+                repaint()
+            }
 
         var changeBarStart: Int
-        get() { return _changeBarStart }
-        set(changeBarStart) {
-            _changeBarStart = changeBarStart
-            repaint()
-        }
+            get() { return _changeBarStart }
+            set(changeBarStart) {
+                _changeBarStart = changeBarStart
+                repaint()
+            }
 
         fun hasSeats(): Boolean {
             return seatBars.isNotEmpty()
@@ -169,8 +169,8 @@ class HeatMapFrame(
             (g as Graphics2D)
                 .setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
             g.setRenderingHint(
-                    RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON
-                )
+                RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON
+            )
             g.setColor(Color.BLACK)
             g.drawLine(width / 2, 0, width / 2, height)
             g.setFont(StandardFont.readBoldFont(height / (if (hasChange()) 2 else 1) * 4 / 5))
@@ -279,18 +279,18 @@ class HeatMapFrame(
         private var _squares: List<Square> = ArrayList()
 
         var numRows: Int
-        get() { return _numRows }
-        set(numRows) {
-            _numRows = numRows
-            repaint()
-        }
+            get() { return _numRows }
+            set(numRows) {
+                _numRows = numRows
+                repaint()
+            }
 
         var squares: List<Square>
-        get() { return _squares }
-        set(squares) {
-            _squares = squares
-            repaint()
-        }
+            get() { return _squares }
+            set(squares) {
+                _squares = squares
+                repaint()
+            }
 
         var label: String? = null
             set(label) {

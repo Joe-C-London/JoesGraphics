@@ -54,8 +54,8 @@ class SummaryWithoutLabels(
         }
 
         var top: String
-        get() { return topLabel.text }
-        set(top) { topLabel.text = top }
+            get() { return topLabel.text }
+            set(top) { topLabel.text = top }
 
         init {
             add(topPanel)

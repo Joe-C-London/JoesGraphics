@@ -23,7 +23,8 @@ class ProjectionScreen private constructor(
             image: Binding<Image?>
         ): ProjectionScreen {
             return ProjectionScreen(
-                    text, color, image, Binding.fixedBinding(ProjectionFrame.Alignment.BOTTOM))
+                text, color, image, Binding.fixedBinding(ProjectionFrame.Alignment.BOTTOM)
+            )
         }
 
         @JvmStatic fun createScreen(

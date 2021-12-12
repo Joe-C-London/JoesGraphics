@@ -8,11 +8,11 @@ import com.joecollins.graphics.components.BarFrameBuilder.Companion.dualReversed
 import com.joecollins.graphics.components.BarFrameBuilder.DualBar
 import com.joecollins.graphics.utils.BindableWrapper
 import com.joecollins.graphics.utils.ColorUtils
+import org.junit.Assert
+import org.junit.Test
 import java.awt.Color
 import java.awt.geom.Rectangle2D
 import java.text.DecimalFormat
-import org.junit.Assert
-import org.junit.Test
 
 class BarFrameBuilderTest {
     private class Wrapper<T>(val value: T)
@@ -21,19 +21,21 @@ class BarFrameBuilderTest {
     fun testSimpleBars() {
         val result = BindableWrapper<Map<Pair<String, Color>, Int>>(emptyMap())
         val frame = basic(
-                result.binding
-                        .map { map ->
-                            map.entries.asSequence()
-                                    .sortedByDescending { it.value }
-                                    .map { BasicBar(it.key.first, it.key.second, it.value, THOUSANDS.format(it.value)) }
-                                    .toList()
-                        })
-                .build()
+            result.binding
+                .map { map ->
+                    map.entries.asSequence()
+                        .sortedByDescending { it.value }
+                        .map { BasicBar(it.key.first, it.key.second, it.value, THOUSANDS.format(it.value)) }
+                        .toList()
+                }
+        )
+            .build()
         Assert.assertEquals(0, frame.numBars.toLong())
         Assert.assertEquals(0, frame.numLines.toLong())
         result.value = mapOf(
-                Pair("CLINTON", Color.ORANGE) to 2842,
-                Pair("SANDERS", Color.GREEN) to 1865)
+            Pair("CLINTON", Color.ORANGE) to 2842,
+            Pair("SANDERS", Color.GREEN) to 1865
+        )
         Assert.assertEquals(2, frame.numBars.toLong())
         Assert.assertEquals("CLINTON", frame.getLeftText(0))
         Assert.assertEquals("SANDERS", frame.getLeftText(1))
@@ -51,19 +53,21 @@ class BarFrameBuilderTest {
     fun testSimpleBarsWithValueObject() {
         val result = BindableWrapper<Map<Pair<String, Color>, Wrapper<Int>>>(emptyMap())
         val frame = basic(
-                result.binding
-                        .map { map ->
-                            map.entries.asSequence()
-                                    .sortedByDescending { it.value.value }
-                                    .map { BasicBar(it.key.first, it.key.second, it.value.value, THOUSANDS.format(it.value.value)) }
-                                    .toList()
-                        })
-                .build()
+            result.binding
+                .map { map ->
+                    map.entries.asSequence()
+                        .sortedByDescending { it.value.value }
+                        .map { BasicBar(it.key.first, it.key.second, it.value.value, THOUSANDS.format(it.value.value)) }
+                        .toList()
+                }
+        )
+            .build()
         Assert.assertEquals(0, frame.numBars.toLong())
         Assert.assertEquals(0, frame.numLines.toLong())
         result.value = mapOf(
-                Pair("CLINTON", Color.ORANGE) to Wrapper(2842),
-                Pair("SANDERS", Color.GREEN) to Wrapper(1865))
+            Pair("CLINTON", Color.ORANGE) to Wrapper(2842),
+            Pair("SANDERS", Color.GREEN) to Wrapper(1865)
+        )
         Assert.assertEquals(2, frame.numBars.toLong())
         Assert.assertEquals("CLINTON", frame.getLeftText(0))
         Assert.assertEquals("SANDERS", frame.getLeftText(1))
@@ -82,25 +86,28 @@ class BarFrameBuilderTest {
         val result = BindableWrapper<Map<Pair<String, Color>, Int>>(emptyMap())
         val max = BindableWrapper(2500)
         val frame = basic(
-                result.binding
-                        .map { map ->
-                            map.entries.asSequence()
-                                    .sortedByDescending { it.value }
-                                    .map { BasicBar(it.key.first, it.key.second, it.value, THOUSANDS.format(it.value)) }
-                                    .toList()
-                        })
-                .withMax(max.binding)
-                .build()
+            result.binding
+                .map { map ->
+                    map.entries.asSequence()
+                        .sortedByDescending { it.value }
+                        .map { BasicBar(it.key.first, it.key.second, it.value, THOUSANDS.format(it.value)) }
+                        .toList()
+                }
+        )
+            .withMax(max.binding)
+            .build()
         Assert.assertEquals(0, frame.min.toInt().toLong())
         Assert.assertEquals(2500, frame.max.toInt().toLong())
         result.value = mapOf(
-                Pair("CLINTON", Color.ORANGE) to 2205,
-                Pair("SANDERS", Color.GREEN) to 1846)
+            Pair("CLINTON", Color.ORANGE) to 2205,
+            Pair("SANDERS", Color.GREEN) to 1846
+        )
         Assert.assertEquals(0, frame.min.toInt().toLong())
         Assert.assertEquals(2500, frame.max.toInt().toLong())
         result.value = mapOf(
-                Pair("CLINTON", Color.ORANGE) to 2842,
-                Pair("SANDERS", Color.GREEN) to 1865)
+            Pair("CLINTON", Color.ORANGE) to 2842,
+            Pair("SANDERS", Color.GREEN) to 1865
+        )
         Assert.assertEquals(0, frame.min.toInt().toLong())
         Assert.assertEquals(2842, frame.max.toInt().toLong())
         max.value = 3000
@@ -120,19 +127,20 @@ class BarFrameBuilderTest {
         val borderColor = BindableWrapper(Color.BLACK)
         val subheadColor = BindableWrapper(Color.GRAY)
         val frame = basic(
-                result.binding
-                        .map { map ->
-                            map.entries.asSequence()
-                                    .sortedByDescending { it.value }
-                                    .map { BasicBar(it.key.first, it.key.second, it.value, THOUSANDS.format(it.value)) }
-                                    .toList()
-                        })
-                .withHeader(header.binding)
-                .withSubhead(subhead.binding)
-                .withNotes(notes.binding)
-                .withBorder(borderColor.binding)
-                .withSubheadColor(subheadColor.binding)
-                .build()
+            result.binding
+                .map { map ->
+                    map.entries.asSequence()
+                        .sortedByDescending { it.value }
+                        .map { BasicBar(it.key.first, it.key.second, it.value, THOUSANDS.format(it.value)) }
+                        .toList()
+                }
+        )
+            .withHeader(header.binding)
+            .withSubhead(subhead.binding)
+            .withNotes(notes.binding)
+            .withBorder(borderColor.binding)
+            .withSubheadColor(subheadColor.binding)
+            .build()
         Assert.assertEquals("HEADER", frame.header)
         Assert.assertEquals("SUBHEAD", frame.subheadText)
         Assert.assertEquals("NOTES", frame.notes)
@@ -155,15 +163,16 @@ class BarFrameBuilderTest {
         val result = BindableWrapper<Map<Pair<String, Color>, Int>>(emptyMap())
         val target = BindableWrapper(2382)
         val frame = basic(
-                result.binding
-                        .map { map ->
-                            map.entries.asSequence()
-                                    .sortedByDescending { it.value }
-                                    .map { BasicBar(it.key.first, it.key.second, it.value, THOUSANDS.format(it.value)) }
-                                    .toList()
-                        })
-                .withTarget(target.binding) { THOUSANDS.format(it) + " TO WIN" }
-                .build()
+            result.binding
+                .map { map ->
+                    map.entries.asSequence()
+                        .sortedByDescending { it.value }
+                        .map { BasicBar(it.key.first, it.key.second, it.value, THOUSANDS.format(it.value)) }
+                        .toList()
+                }
+        )
+            .withTarget(target.binding) { THOUSANDS.format(it) + " TO WIN" }
+            .build()
         Assert.assertEquals(1, frame.numLines.toLong())
         Assert.assertEquals(2382, frame.getLineLevel(0))
         Assert.assertEquals("2,382 TO WIN", frame.getLineLabel(0))
@@ -174,15 +183,16 @@ class BarFrameBuilderTest {
         val result = BindableWrapper<Map<Pair<String, Color>, Int>>(emptyMap())
         val lines = BindableWrapper<List<Int>>(emptyList())
         val frame = basic(
-                result.binding
-                        .map { map ->
-                            map.entries.asSequence()
-                                    .sortedByDescending { it.value }
-                                    .map { BasicBar(it.key.first, it.key.second, it.value, THOUSANDS.format(it.value)) }
-                                    .toList()
-                        })
-                .withLines(lines.binding) { it.toString() + " QUOTA" + (if (it == 1) "" else "S") }
-                .build()
+            result.binding
+                .map { map ->
+                    map.entries.asSequence()
+                        .sortedByDescending { it.value }
+                        .map { BasicBar(it.key.first, it.key.second, it.value, THOUSANDS.format(it.value)) }
+                        .toList()
+                }
+        )
+            .withLines(lines.binding) { it.toString() + " QUOTA" + (if (it == 1) "" else "S") }
+            .build()
         Assert.assertEquals(0, frame.numLines.toLong())
         lines.value = listOf(1, 2, 3, 4, 5)
         Assert.assertEquals(5, frame.numLines.toLong())
@@ -203,19 +213,21 @@ class BarFrameBuilderTest {
         val result = BindableWrapper<Map<Pair<String, Color>, Int>>(emptyMap())
         val lines = BindableWrapper<List<Pair<String, Int>>>(emptyList())
         val frame = basic(
-                result.binding
-                        .map { map ->
-                            map.entries.asSequence()
-                                    .sortedByDescending { it.value }
-                                    .map { BasicBar(it.key.first, it.key.second, it.value, THOUSANDS.format(it.value)) }
-                                    .toList()
-                        })
-                .withLines(lines.binding, { it.first }) { it.second }
-                .build()
+            result.binding
+                .map { map ->
+                    map.entries.asSequence()
+                        .sortedByDescending { it.value }
+                        .map { BasicBar(it.key.first, it.key.second, it.value, THOUSANDS.format(it.value)) }
+                        .toList()
+                }
+        )
+            .withLines(lines.binding, { it.first }) { it.second }
+            .build()
         Assert.assertEquals(0, frame.numLines.toLong())
         lines.value = listOf(
-                Pair("The line is here", 1),
-                Pair("and here", 2))
+            Pair("The line is here", 1),
+            Pair("and here", 2)
+        )
         Assert.assertEquals(2, frame.numLines.toLong())
         Assert.assertEquals(1, frame.getLineLevel(0))
         Assert.assertEquals(2, frame.getLineLevel(1))
@@ -228,15 +240,16 @@ class BarFrameBuilderTest {
         val result = BindableWrapper<Map<Pair<String, Color>, Int>>(emptyMap())
         val lines = BindableWrapper(listOf<Int>())
         val frame = basic(
-                result.binding
-                        .map { map ->
-                            map.entries.asSequence()
-                                    .sortedByDescending { it.value }
-                                    .map { BasicBar(it.key.first, it.key.second, it.value, THOUSANDS.format(it.value)) }
-                                    .toList()
-                        })
-                .withLines(lines.binding) { it.toString() + " QUOTA" + (if (it == 1) "" else "S") }
-                .build()
+            result.binding
+                .map { map ->
+                    map.entries.asSequence()
+                        .sortedByDescending { it.value }
+                        .map { BasicBar(it.key.first, it.key.second, it.value, THOUSANDS.format(it.value)) }
+                        .toList()
+                }
+        )
+            .withLines(lines.binding) { it.toString() + " QUOTA" + (if (it == 1) "" else "S") }
+            .build()
         Assert.assertEquals(0, frame.numLines.toLong())
         lines.value = listOf(1, 2, 3, 4, 5)
         Assert.assertEquals(5, frame.numLines.toLong())
@@ -257,19 +270,21 @@ class BarFrameBuilderTest {
         val result = BindableWrapper<Map<Pair<String, Color>, Pair<Int, Boolean>>>(emptyMap())
         val shape = Rectangle2D.Double(0.0, 0.0, 1.0, 1.0)
         val frame = basic(
-                result.binding
-                        .map { map ->
-                            map.entries.asSequence()
-                                    .sortedByDescending { it.value.first }
-                                    .map { BasicBar(it.key.first, it.key.second, it.value.first, THOUSANDS.format(it.value.first), if (it.value.second) shape else null) }
-                                    .toList()
-                        })
-                .build()
+            result.binding
+                .map { map ->
+                    map.entries.asSequence()
+                        .sortedByDescending { it.value.first }
+                        .map { BasicBar(it.key.first, it.key.second, it.value.first, THOUSANDS.format(it.value.first), if (it.value.second) shape else null) }
+                        .toList()
+                }
+        )
+            .build()
         Assert.assertEquals(0, frame.numBars.toLong())
         Assert.assertEquals(0, frame.numLines.toLong())
         result.value = mapOf(
-                Pair("CLINTON", Color.ORANGE) to Pair(2842, true),
-                Pair("SANDERS", Color.GREEN) to Pair(1865, false))
+            Pair("CLINTON", Color.ORANGE) to Pair(2842, true),
+            Pair("SANDERS", Color.GREEN) to Pair(1865, false)
+        )
         Assert.assertEquals(2, frame.numBars.toLong())
         Assert.assertEquals("CLINTON", frame.getLeftText(0))
         Assert.assertEquals("SANDERS", frame.getLeftText(1))
@@ -287,23 +302,25 @@ class BarFrameBuilderTest {
     fun testSimpleDiffBars() {
         val result = BindableWrapper<Map<Pair<String, Color>, Pair<Int, Int>>>(emptyMap())
         val frame = basic(
-                result.binding
-                        .map { map ->
-                            map.entries.asSequence()
-                                    .sortedByDescending { it.value.first }
-                                    .map { BasicBar(it.key.first, it.key.second, it.value.second, DIFF.format(it.value.second)) }
-                                    .toList()
-                        })
-                .build()
+            result.binding
+                .map { map ->
+                    map.entries.asSequence()
+                        .sortedByDescending { it.value.first }
+                        .map { BasicBar(it.key.first, it.key.second, it.value.second, DIFF.format(it.value.second)) }
+                        .toList()
+                }
+        )
+            .build()
         Assert.assertEquals(0, frame.numBars.toLong())
         Assert.assertEquals(0, frame.numLines.toLong())
         result.value = mapOf(
-                Pair("LIB", Color.RED) to Pair(157, -27),
-                Pair("CON", Color.BLUE) to Pair(121, +22),
-                Pair("NDP", Color.ORANGE) to Pair(24, -20),
-                Pair("BQ", Color.CYAN) to Pair(32, +22),
-                Pair("GRN", Color.GREEN) to Pair(3, +2),
-                Pair("IND", Color.GRAY) to Pair(1, +1))
+            Pair("LIB", Color.RED) to Pair(157, -27),
+            Pair("CON", Color.BLUE) to Pair(121, +22),
+            Pair("NDP", Color.ORANGE) to Pair(24, -20),
+            Pair("BQ", Color.CYAN) to Pair(32, +22),
+            Pair("GRN", Color.GREEN) to Pair(3, +2),
+            Pair("IND", Color.GRAY) to Pair(1, +1)
+        )
         Assert.assertEquals(6, frame.numBars.toLong())
         Assert.assertEquals("LIB", frame.getLeftText(0))
         Assert.assertEquals("CON", frame.getLeftText(1))
@@ -338,24 +355,26 @@ class BarFrameBuilderTest {
         val result = BindableWrapper<Map<Pair<String, Color>, Pair<Int, Int>>>(emptyMap())
         val range = BindableWrapper(10)
         val frame = basic(
-                result.binding
-                        .map { map ->
-                            map.entries.asSequence()
-                                    .sortedByDescending { it.value.first }
-                                    .map { BasicBar(it.key.first, it.key.second, it.value.second, DIFF.format(it.value.second)) }
-                                    .toList()
-                        })
-                .withWingspan(range.binding)
-                .build()
+            result.binding
+                .map { map ->
+                    map.entries.asSequence()
+                        .sortedByDescending { it.value.first }
+                        .map { BasicBar(it.key.first, it.key.second, it.value.second, DIFF.format(it.value.second)) }
+                        .toList()
+                }
+        )
+            .withWingspan(range.binding)
+            .build()
         Assert.assertEquals(-10, frame.min.toInt().toLong())
         Assert.assertEquals(+10, frame.max.toInt().toLong())
         result.value = mapOf(
-                Pair("LIB", Color.RED) to Pair(157, -27),
-                Pair("CON", Color.BLUE) to Pair(121, +22),
-                Pair("NDP", Color.ORANGE) to Pair(24, -20),
-                Pair("BQ", Color.CYAN) to Pair(32, +22),
-                Pair("GRN", Color.GREEN) to Pair(3, +2),
-                Pair("IND", Color.GRAY) to Pair(1, +1))
+            Pair("LIB", Color.RED) to Pair(157, -27),
+            Pair("CON", Color.BLUE) to Pair(121, +22),
+            Pair("NDP", Color.ORANGE) to Pair(24, -20),
+            Pair("BQ", Color.CYAN) to Pair(32, +22),
+            Pair("GRN", Color.GREEN) to Pair(3, +2),
+            Pair("IND", Color.GRAY) to Pair(1, +1)
+        )
         Assert.assertEquals(-27, frame.min.toInt().toLong())
         Assert.assertEquals(+27, frame.max.toInt().toLong())
     }
@@ -364,24 +383,26 @@ class BarFrameBuilderTest {
     fun testDualValueBars() {
         val result = BindableWrapper<Map<Pair<String, Color>, Pair<Int, Int>>>(emptyMap())
         val frame = dual(
-                result
-                        .binding
-                        .map { map ->
-                            map.entries.asSequence()
-                                    .sortedByDescending { it.value.second }
-                                    .map { DualBar(it.key.first, it.key.second, it.value.first, it.value.second, it.value.first.toString() + "/" + it.value.second) }
-                                    .toList()
-                        })
-                .build()
+            result
+                .binding
+                .map { map ->
+                    map.entries.asSequence()
+                        .sortedByDescending { it.value.second }
+                        .map { DualBar(it.key.first, it.key.second, it.value.first, it.value.second, it.value.first.toString() + "/" + it.value.second) }
+                        .toList()
+                }
+        )
+            .build()
         Assert.assertEquals(0, frame.numBars.toLong())
         Assert.assertEquals(0, frame.numLines.toLong())
         result.value = mapOf(
-                Pair("LIBERAL", Color.RED) to Pair(26, 157),
-                Pair("CONSERVATIVE", Color.BLUE) to Pair(4, 121),
-                Pair("NEW DEMOCRATIC PARTY", Color.ORANGE) to Pair(1, 24),
-                Pair("BLOC QU\u00c9B\u00c9COIS", Color.CYAN) to Pair(0, 32),
-                Pair("GREEN", Color.GREEN) to Pair(1, 3),
-                Pair("INDEPENDENT", Color.GRAY) to Pair(0, 1))
+            Pair("LIBERAL", Color.RED) to Pair(26, 157),
+            Pair("CONSERVATIVE", Color.BLUE) to Pair(4, 121),
+            Pair("NEW DEMOCRATIC PARTY", Color.ORANGE) to Pair(1, 24),
+            Pair("BLOC QU\u00c9B\u00c9COIS", Color.CYAN) to Pair(0, 32),
+            Pair("GREEN", Color.GREEN) to Pair(1, 3),
+            Pair("INDEPENDENT", Color.GRAY) to Pair(0, 1)
+        )
         Assert.assertEquals(6, frame.numBars.toLong())
         Assert.assertEquals("LIBERAL", frame.getLeftText(0))
         Assert.assertEquals("CONSERVATIVE", frame.getLeftText(1))
@@ -433,23 +454,25 @@ class BarFrameBuilderTest {
     fun testDualReversedValueBars() {
         val result = BindableWrapper<Map<Pair<String, Color>, Pair<Int, Int>>>(emptyMap())
         val frame = dualReversed(
-                result.binding
-                        .map { map ->
-                            map.entries.asSequence()
-                                    .sortedByDescending { it.value.second }
-                                    .map { DualBar(it.key.first, it.key.second, it.value.first, it.value.second, it.value.first.toString() + "/" + it.value.second) }
-                                    .toList()
-                        })
-                .build()
+            result.binding
+                .map { map ->
+                    map.entries.asSequence()
+                        .sortedByDescending { it.value.second }
+                        .map { DualBar(it.key.first, it.key.second, it.value.first, it.value.second, it.value.first.toString() + "/" + it.value.second) }
+                        .toList()
+                }
+        )
+            .build()
         Assert.assertEquals(0, frame.numBars.toLong())
         Assert.assertEquals(0, frame.numLines.toLong())
         result.value = mapOf(
-                Pair("LIBERAL", Color.RED) to Pair(26, 157),
-                Pair("CONSERVATIVE", Color.BLUE) to Pair(4, 121),
-                Pair("NEW DEMOCRATIC PARTY", Color.ORANGE) to Pair(1, 24),
-                Pair("BLOC QU\u00c9B\u00c9COIS", Color.CYAN) to Pair(0, 32),
-                Pair("GREEN", Color.GREEN) to Pair(1, 3),
-                Pair("INDEPENDENT", Color.GRAY) to Pair(0, 1))
+            Pair("LIBERAL", Color.RED) to Pair(26, 157),
+            Pair("CONSERVATIVE", Color.BLUE) to Pair(4, 121),
+            Pair("NEW DEMOCRATIC PARTY", Color.ORANGE) to Pair(1, 24),
+            Pair("BLOC QU\u00c9B\u00c9COIS", Color.CYAN) to Pair(0, 32),
+            Pair("GREEN", Color.GREEN) to Pair(1, 3),
+            Pair("INDEPENDENT", Color.GRAY) to Pair(0, 1)
+        )
         Assert.assertEquals(6, frame.numBars.toLong())
         Assert.assertEquals("LIBERAL", frame.getLeftText(0))
         Assert.assertEquals("CONSERVATIVE", frame.getLeftText(1))
@@ -501,23 +524,25 @@ class BarFrameBuilderTest {
     fun testDualChangeBars() {
         val result = BindableWrapper<Map<Pair<String, Color>, Triple<Int, Int, Int>>>(emptyMap())
         val frame = dual(
-                result.binding
-                        .map { map ->
-                            map.entries.asSequence()
-                                    .sortedByDescending { it.value.third }
-                                    .map { DualBar(it.key.first, it.key.second, it.value.first, it.value.second, """${DIFF.format(it.value.first)}/${DIFF.format(it.value.second)}""") }
-                                    .toList()
-                        })
-                .build()
+            result.binding
+                .map { map ->
+                    map.entries.asSequence()
+                        .sortedByDescending { it.value.third }
+                        .map { DualBar(it.key.first, it.key.second, it.value.first, it.value.second, """${DIFF.format(it.value.first)}/${DIFF.format(it.value.second)}""") }
+                        .toList()
+                }
+        )
+            .build()
         Assert.assertEquals(0, frame.numBars.toLong())
         Assert.assertEquals(0, frame.numLines.toLong())
         result.value = mapOf(
-                Pair("LIB", Color.RED) to Triple(-6, -27, 157),
-                Pair("CON", Color.BLUE) to Triple(+4, +22, 121),
-                Pair("NDP", Color.ORANGE) to Triple(+1, -20, 24),
-                Pair("BQ", Color.CYAN) to Triple(0, +22, 32),
-                Pair("GRN", Color.GREEN) to Triple(+1, +2, 3),
-                Pair("IND", Color.GRAY) to Triple(0, +1, 1))
+            Pair("LIB", Color.RED) to Triple(-6, -27, 157),
+            Pair("CON", Color.BLUE) to Triple(+4, +22, 121),
+            Pair("NDP", Color.ORANGE) to Triple(+1, -20, 24),
+            Pair("BQ", Color.CYAN) to Triple(0, +22, 32),
+            Pair("GRN", Color.GREEN) to Triple(+1, +2, 3),
+            Pair("IND", Color.GRAY) to Triple(0, +1, 1)
+        )
         Assert.assertEquals(6, frame.numBars.toLong())
         Assert.assertEquals("LIB", frame.getLeftText(0))
         Assert.assertEquals("CON", frame.getLeftText(1))
@@ -575,23 +600,25 @@ class BarFrameBuilderTest {
     fun testDualChangeRangeBars() {
         val result = BindableWrapper<Map<Pair<String, Color>, Triple<Int, Int, Int>>>(emptyMap())
         val frame = dual(
-                result.binding
-                        .map { map ->
-                            map.entries.asSequence()
-                                    .sortedByDescending { it.value.third }
-                                    .map { DualBar(it.key.first, it.key.second, it.value.first, it.value.second, "(${DIFF.format(it.value.first)})-(${DIFF.format(it.value.second)})") }
-                                    .toList()
-                        })
-                .build()
+            result.binding
+                .map { map ->
+                    map.entries.asSequence()
+                        .sortedByDescending { it.value.third }
+                        .map { DualBar(it.key.first, it.key.second, it.value.first, it.value.second, "(${DIFF.format(it.value.first)})-(${DIFF.format(it.value.second)})") }
+                        .toList()
+                }
+        )
+            .build()
         Assert.assertEquals(0, frame.numBars.toLong())
         Assert.assertEquals(0, frame.numLines.toLong())
         result.value = mapOf(
-                Pair("LIB", Color.RED) to Triple(-27, -6, 157),
-                Pair("CON", Color.BLUE) to Triple(+4, +22, 121),
-                Pair("NDP", Color.ORANGE) to Triple(-20, +1, 24),
-                Pair("BQ", Color.CYAN) to Triple(0, +22, 32),
-                Pair("GRN", Color.GREEN) to Triple(+1, +2, 3),
-                Pair("IND", Color.GRAY) to Triple(0, +1, 1))
+            Pair("LIB", Color.RED) to Triple(-27, -6, 157),
+            Pair("CON", Color.BLUE) to Triple(+4, +22, 121),
+            Pair("NDP", Color.ORANGE) to Triple(-20, +1, 24),
+            Pair("BQ", Color.CYAN) to Triple(0, +22, 32),
+            Pair("GRN", Color.GREEN) to Triple(+1, +2, 3),
+            Pair("IND", Color.GRAY) to Triple(0, +1, 1)
+        )
         Assert.assertEquals(6, frame.numBars.toLong())
         Assert.assertEquals("LIB", frame.getLeftText(0))
         Assert.assertEquals("CON", frame.getLeftText(1))
@@ -636,18 +663,19 @@ class BarFrameBuilderTest {
     @Test
     fun testBasicBars() {
         val regions = listOf(
-                BasicBar("East Midlands", Color.BLACK, 5),
-                BasicBar("East of England", Color.BLACK, 7),
-                BasicBar("London", Color.BLACK, 8),
-                BasicBar("North East England", Color.BLACK, 3),
-                BasicBar("North West England", Color.BLACK, 8),
-                BasicBar("South East England", Color.BLACK, 10),
-                BasicBar("South West England", Color.BLACK, 6),
-                BasicBar("West Midlands", Color.BLACK, 7),
-                BasicBar("Yorkshire and the Humber", Color.BLACK, 6),
-                BasicBar("Scotland", Color.BLACK, 6),
-                BasicBar("Wales", Color.BLACK, 4),
-                BasicBar("Northern Ireland", Color.BLACK, 3))
+            BasicBar("East Midlands", Color.BLACK, 5),
+            BasicBar("East of England", Color.BLACK, 7),
+            BasicBar("London", Color.BLACK, 8),
+            BasicBar("North East England", Color.BLACK, 3),
+            BasicBar("North West England", Color.BLACK, 8),
+            BasicBar("South East England", Color.BLACK, 10),
+            BasicBar("South West England", Color.BLACK, 6),
+            BasicBar("West Midlands", Color.BLACK, 7),
+            BasicBar("Yorkshire and the Humber", Color.BLACK, 6),
+            BasicBar("Scotland", Color.BLACK, 6),
+            BasicBar("Wales", Color.BLACK, 4),
+            BasicBar("Northern Ireland", Color.BLACK, 3)
+        )
         val frame = basic(Binding.fixedBinding(regions)).build()
         Assert.assertEquals(12, frame.numBars.toLong())
         Assert.assertEquals("East Midlands", frame.getLeftText(0))
@@ -664,18 +692,19 @@ class BarFrameBuilderTest {
     @Test
     fun testDualBarsAllPositive() {
         val regions = listOf(
-                DualBar("East Midlands", Color.BLACK, 44, 46, "46 > 44"),
-                DualBar("East of England", Color.BLACK, 56, 58, "58 > 56"),
-                DualBar("London", Color.BLACK, 68, 73, "73 > 68"),
-                DualBar("North East England", Color.BLACK, 26, 29, "29 > 26"),
-                DualBar("North West England", Color.BLACK, 68, 75, "75 > 68"),
-                DualBar("South East England", Color.BLACK, 83, 84, "84 > 83"),
-                DualBar("South West England", Color.BLACK, 53, 55, "55 > 53"),
-                DualBar("West Midlands", Color.BLACK, 54, 59, "59 > 54"),
-                DualBar("Yorkshire and the Humber", Color.BLACK, 50, 54, "54 > 50"),
-                DualBar("Scotland", Color.BLACK, 52, 59, "59 > 52"),
-                DualBar("Wales", Color.BLACK, 30, 40, "40 > 30"),
-                DualBar("Northern Ireland", Color.BLACK, 16, 18, "18 > 16"))
+            DualBar("East Midlands", Color.BLACK, 44, 46, "46 > 44"),
+            DualBar("East of England", Color.BLACK, 56, 58, "58 > 56"),
+            DualBar("London", Color.BLACK, 68, 73, "73 > 68"),
+            DualBar("North East England", Color.BLACK, 26, 29, "29 > 26"),
+            DualBar("North West England", Color.BLACK, 68, 75, "75 > 68"),
+            DualBar("South East England", Color.BLACK, 83, 84, "84 > 83"),
+            DualBar("South West England", Color.BLACK, 53, 55, "55 > 53"),
+            DualBar("West Midlands", Color.BLACK, 54, 59, "59 > 54"),
+            DualBar("Yorkshire and the Humber", Color.BLACK, 50, 54, "54 > 50"),
+            DualBar("Scotland", Color.BLACK, 52, 59, "59 > 52"),
+            DualBar("Wales", Color.BLACK, 30, 40, "40 > 30"),
+            DualBar("Northern Ireland", Color.BLACK, 16, 18, "18 > 16")
+        )
         val frame = dual(Binding.fixedBinding(regions)).build()
         Assert.assertEquals(12, frame.numBars.toLong())
         Assert.assertEquals("East Midlands", frame.getLeftText(0))
@@ -788,7 +817,8 @@ class BarFrameBuilderTest {
         private val PCT = DecimalFormat("0.0%")
         private fun lighten(color: Color): Color {
             return Color(
-                    128 + color.red / 2, 128 + color.green / 2, 128 + color.blue / 2)
+                128 + color.red / 2, 128 + color.green / 2, 128 + color.blue / 2
+            )
         }
     }
 }

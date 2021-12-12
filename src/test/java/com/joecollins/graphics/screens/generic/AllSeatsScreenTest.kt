@@ -7,11 +7,11 @@ import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
 import com.joecollins.models.general.PartyResult.Companion.elected
 import com.joecollins.models.general.PartyResult.Companion.leading
+import org.junit.Test
 import java.awt.Color
 import java.io.IOException
 import java.util.TreeMap
 import kotlin.Throws
-import org.junit.Test
 
 class AllSeatsScreenTest {
     @Test
@@ -23,26 +23,29 @@ class AllSeatsScreenTest {
         val title = BindableWrapper("BRITISH COLUMBIA")
         val nameShortener = { obj: String -> obj.uppercase() }
         val panel = AllSeatsScreen.of(
-                prevResult.binding,
-                currResult.binding,
-                { nameShortener(it) },
-                fixedBinding("SEATS CHANGING"))
-                .withNumRows(numRows.binding)
-                .build(title.binding)
+            prevResult.binding,
+            currResult.binding,
+            { nameShortener(it) },
+            fixedBinding("SEATS CHANGING")
+        )
+            .withNumRows(numRows.binding)
+            .build(title.binding)
         panel.setSize(1024, 512)
         compareRendering("AllSeatsScreen", "Basic-1", panel)
 
         currResult.value = mapOf(
-                "Coquitlam-Burke Mountain" to leading(ndp),
-                "Fraser-Nicola" to leading(ndp),
-                "Vancouver-False Creek" to leading(ndp))
+            "Coquitlam-Burke Mountain" to leading(ndp),
+            "Fraser-Nicola" to leading(ndp),
+            "Vancouver-False Creek" to leading(ndp)
+        )
         compareRendering("AllSeatsScreen", "Basic-2", panel)
 
         currResult.value = mapOf(
-                "Coquitlam-Burke Mountain" to elected(ndp),
-                "Fraser-Nicola" to leading(lib),
-                "Richmond-Queensborough" to leading(ndp),
-                "Vancouver-False Creek" to leading(ndp))
+            "Coquitlam-Burke Mountain" to elected(ndp),
+            "Fraser-Nicola" to leading(lib),
+            "Richmond-Queensborough" to leading(ndp),
+            "Vancouver-False Creek" to leading(ndp)
+        )
         compareRendering("AllSeatsScreen", "Basic-3", panel)
 
         currResult.value = bcCurrResult()
@@ -57,32 +60,36 @@ class AllSeatsScreenTest {
         val numRows = BindableWrapper(15)
         val title = BindableWrapper("VANCOUVER")
         val filteredSeats = BindableWrapper(
-                prevResult.value.keys
-                        .filter { k: String -> k.startsWith("Vancouver") }
-                        .toSet())
+            prevResult.value.keys
+                .filter { k: String -> k.startsWith("Vancouver") }
+                .toSet()
+        )
         val nameShortener = { obj: String -> obj.uppercase() }
         val panel = AllSeatsScreen.of(
-                prevResult.binding,
-                currResult.binding,
-                { nameShortener(it) },
-                fixedBinding("SEATS CHANGING"))
-                .withNumRows(numRows.binding)
-                .withSeatFilter(filteredSeats.binding)
-                .build(title.binding)
+            prevResult.binding,
+            currResult.binding,
+            { nameShortener(it) },
+            fixedBinding("SEATS CHANGING")
+        )
+            .withNumRows(numRows.binding)
+            .withSeatFilter(filteredSeats.binding)
+            .build(title.binding)
         panel.setSize(1024, 512)
         compareRendering("AllSeatsScreen", "Filtered-1", panel)
 
         currResult.value = mapOf(
-                "Coquitlam-Burke Mountain" to leading(ndp),
-                "Fraser-Nicola" to leading(ndp),
-                "Vancouver-False Creek" to leading(ndp))
+            "Coquitlam-Burke Mountain" to leading(ndp),
+            "Fraser-Nicola" to leading(ndp),
+            "Vancouver-False Creek" to leading(ndp)
+        )
         compareRendering("AllSeatsScreen", "Filtered-2", panel)
 
         currResult.value = mapOf(
-                "Coquitlam-Burke Mountain" to elected(ndp),
-                "Fraser-Nicola" to leading(lib),
-                "Richmond-Queensborough" to leading(ndp),
-                "Vancouver-False Creek" to leading(ndp))
+            "Coquitlam-Burke Mountain" to elected(ndp),
+            "Fraser-Nicola" to leading(lib),
+            "Richmond-Queensborough" to leading(ndp),
+            "Vancouver-False Creek" to leading(ndp)
+        )
         compareRendering("AllSeatsScreen", "Filtered-3", panel)
 
         currResult.value = bcCurrResult()
@@ -100,12 +107,13 @@ class AllSeatsScreenTest {
         val title = BindableWrapper("BRITISH COLUMBIA")
         val nameShortener = { obj: String -> obj.uppercase() }
         val panel = AllSeatsScreen.of(
-                prevResult.binding,
-                currResult.binding,
-                { nameShortener(it) },
-                fixedBinding("SEATS CHANGING"))
-                .withNumRows(numRows.binding)
-                .build(title.binding)
+            prevResult.binding,
+            currResult.binding,
+            { nameShortener(it) },
+            fixedBinding("SEATS CHANGING")
+        )
+            .withNumRows(numRows.binding)
+            .build(title.binding)
         panel.setSize(1024, 512)
         compareRendering("AllSeatsScreen", "Basic-1", panel)
 

@@ -31,15 +31,15 @@ class MapBuilder<T> {
     ) {
         val shapesReceiver: BindingReceiver<Map<T, Shape>> = BindingReceiver(shapes)
         val shapesToParties = shapesReceiver
-                .getBinding()
-                .merge(winners) { s, w ->
-                    s.entries
-                            .map {
-                                val winnerParty = w[it.key]
-                                Pair(it.value, winnerParty)
-                            }
-                            .toList()
-                }
+            .getBinding()
+            .merge(winners) { s, w ->
+                s.entries
+                    .map {
+                        val winnerParty = w[it.key]
+                        Pair(it.value, winnerParty)
+                    }
+                    .toList()
+            }
         mapFocus = BindingReceiver(shapesReceiver.getBinding().merge(focus.first) { shp, foc -> createFocusShapes(shp, foc) })
         val additionalFocus = BindingReceiver(shapesReceiver.getBinding().merge(focus.second) { shp, foc -> createFocusShapes(shp, foc) })
         val allFocusShapes = mapFocus.getBinding().merge(additionalFocus.getBinding()) { a, b ->
@@ -50,10 +50,11 @@ class MapBuilder<T> {
             }
         }
         this.winners = BindingReceiver(
-                shapesToParties.merge(allFocusShapes) { r: List<Pair<Shape, PartyResult?>>, f: List<Shape>? ->
-                    r.map { Pair(it.first, extractColor(f, it.first, it.second)) }
-                            .toList()
-                })
+            shapesToParties.merge(allFocusShapes) { r: List<Pair<Shape, PartyResult?>>, f: List<Shape>? ->
+                r.map { Pair(it.first, extractColor(f, it.first, it.second)) }
+                    .toList()
+            }
+        )
         mapHeader = BindingReceiver(headerBinding)
     }
 
@@ -79,43 +80,43 @@ class MapBuilder<T> {
         val additionalFocusShapes = shapesReceiver.getBinding().merge(additionalHighlight) { shp, foc -> createFocusShapes(shp, foc) }
         mapHeader = BindingReceiver(header)
         val shapeWinners: Binding<List<Pair<Shape, Color>>> = shapesReceiver
-                .getBinding()
-                .merge(leaderWithShape) { shp, ldr ->
-                    shp.entries
-                            .map {
-                                val color =
-                                    if (it.key == ldr.first) {
-                                        ldr.second?.color ?: Color.BLACK
-                                    } else {
-                                        Color.LIGHT_GRAY
-                                    }
-                                Pair(it.value, color)
+            .getBinding()
+            .merge(leaderWithShape) { shp, ldr ->
+                shp.entries
+                    .map {
+                        val color =
+                            if (it.key == ldr.first) {
+                                ldr.second?.color ?: Color.BLACK
+                            } else {
+                                Color.LIGHT_GRAY
                             }
-                            .toList()
-                }
-        val allFocusShapes = mapFocus
-                .getBinding()
-                .merge(
-                        additionalFocusShapes
-                ) { l1: List<Shape>?, l2: List<Shape>? ->
-                    when {
-                        l1 == null -> l2
-                        l2 == null -> l1
-                        else -> listOf(l1, l2).flatten().distinct()
+                        Pair(it.value, color)
                     }
+                    .toList()
+            }
+        val allFocusShapes = mapFocus
+            .getBinding()
+            .merge(
+                additionalFocusShapes
+            ) { l1: List<Shape>?, l2: List<Shape>? ->
+                when {
+                    l1 == null -> l2
+                    l2 == null -> l1
+                    else -> listOf(l1, l2).flatten().distinct()
                 }
+            }
         val focusedShapeWinners = shapeWinners.merge(allFocusShapes) { sw: List<Pair<Shape, Color>>, f: List<Shape>? ->
             if (f == null) {
                 sw
             } else {
                 sw.map {
-                            if (f.contains(it.first)) {
-                                it
-                            } else {
-                                Pair(it.first, Color(220, 220, 220))
-                            }
-                        }
-                        .toList()
+                    if (f.contains(it.first)) {
+                        it
+                    } else {
+                        Pair(it.first, Color(220, 220, 220))
+                    }
+                }
+                    .toList()
             }
         }
         winners = BindingReceiver(focusedShapeWinners)
@@ -123,9 +124,9 @@ class MapBuilder<T> {
 
     private fun <T> createFocusShapes(shapes: Map<T, Shape>, focus: List<T>?): List<Shape>? {
         return focus
-                ?.filter { key: T -> shapes.containsKey(key) }
-                ?.map { key: T -> shapes[key]!! }
-                ?.toList()
+            ?.filter { key: T -> shapes.containsKey(key) }
+            ?.map { key: T -> shapes[key]!! }
+            ?.toList()
     }
 
     fun withNotes(notes: Binding<String?>): MapBuilder<T> {
@@ -140,22 +141,24 @@ class MapBuilder<T> {
 
     fun createMapFrame(): MapFrame {
         return MapFrameBuilder.from(winners.getBinding())
-                .withFocus(mapFocus.getBinding())
-                .withHeader(mapHeader.getBinding())
-                .let { map -> notes?.let { n -> map.withNotes(n) } ?: map }
-                .let { map -> outlines?.let { n -> map.withOutline(n) } ?: map }
-                .build()
+            .withFocus(mapFocus.getBinding())
+            .withHeader(mapHeader.getBinding())
+            .let { map -> notes?.let { n -> map.withNotes(n) } ?: map }
+            .let { map -> outlines?.let { n -> map.withOutline(n) } ?: map }
+            .build()
     }
 
     companion object {
         private fun extractColor(focus: List<Shape>?, shape: Shape, winner: PartyResult?): Color {
             val isInFocus = focus == null || focus.isEmpty() || focus.contains(shape)
             return winner?.color?.takeIf { isInFocus }
-                    ?: (if (isInFocus) {
+                ?: (
+                    if (isInFocus) {
                         Color.LIGHT_GRAY
                     } else {
                         Color(220, 220, 220)
-                    })
+                    }
+                    )
         }
     }
 }

@@ -191,19 +191,23 @@ class HemicycleFrame(
         var rightChangeBarStart = 0
 
         fun hasSeats(): Boolean {
-            return (leftSeatBars.isNotEmpty() ||
+            return (
+                leftSeatBars.isNotEmpty() ||
                     middleSeatBars.isNotEmpty() ||
                     rightSeatBars.isNotEmpty() ||
                     leftSeatBarLabel.isNotEmpty() ||
                     middleSeatBarLabel.isNotEmpty() ||
-                    rightSeatBarLabel.isNotEmpty())
+                    rightSeatBarLabel.isNotEmpty()
+                )
         }
 
         fun hasChange(): Boolean {
-            return (leftChangeBars.isNotEmpty() ||
+            return (
+                leftChangeBars.isNotEmpty() ||
                     rightChangeBars.isNotEmpty() ||
                     leftChangeBarLabel.isNotEmpty() ||
-                    rightChangeBarLabel.isNotEmpty())
+                    rightChangeBarLabel.isNotEmpty()
+                )
         }
 
         override fun paintComponent(g: Graphics) {
@@ -339,7 +343,8 @@ class HemicycleFrame(
             val leftTip = getLeftPosition(leftSoFar)
             val leftSize = sideFunc(leftBase, leftTip)
             val leftClip: Shape = Polygon(
-                intArrayOf(leftBase, leftBase, leftSize, leftTip, leftSize), intArrayOf(
+                intArrayOf(leftBase, leftBase, leftSize, leftTip, leftSize),
+                intArrayOf(
                     changeBarTop, changeBarBottom, changeBarBottom, changeBarMid, changeBarTop
                 ),
                 5
@@ -369,7 +374,8 @@ class HemicycleFrame(
             val rightTip = getRightPosition(rightSoFar)
             val rightSize = sideFunc(rightBase, rightTip)
             val rightClip: Shape = Polygon(
-                intArrayOf(rightBase, rightBase, rightSize, rightTip, rightSize), intArrayOf(
+                intArrayOf(rightBase, rightBase, rightSize, rightTip, rightSize),
+                intArrayOf(
                     changeBarTop, changeBarBottom, changeBarBottom, changeBarMid, changeBarTop
                 ),
                 5

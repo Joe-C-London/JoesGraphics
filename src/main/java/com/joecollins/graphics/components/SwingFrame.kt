@@ -79,32 +79,32 @@ class SwingFrame(
         private var _rightColor: Color = Color.BLACK
 
         var range: Number
-        get() { return _range }
-        set(range) {
-            _range = range
-            repaint()
-        }
+            get() { return _range }
+            set(range) {
+                _range = range
+                repaint()
+            }
 
         var value: Number
-        get() { return _value }
-        set(value) {
-            _value = value
-            repaint()
-        }
+            get() { return _value }
+            set(value) {
+                _value = value
+                repaint()
+            }
 
         var leftColor: Color
-        get() { return _leftColor }
-        set(leftColor) {
-            _leftColor = leftColor
-            repaint()
-        }
+            get() { return _leftColor }
+            set(leftColor) {
+                _leftColor = leftColor
+                repaint()
+            }
 
         var rightColor: Color
-        get() { return _rightColor }
-        set(rightColor) {
-            _rightColor = rightColor
-            repaint()
-        }
+            get() { return _rightColor }
+            set(rightColor) {
+                _rightColor = rightColor
+                repaint()
+            }
 
         override fun paintComponent(g: Graphics) {
             super.paintComponent(g)

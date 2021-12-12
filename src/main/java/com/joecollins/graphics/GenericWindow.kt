@@ -1,6 +1,10 @@
 package com.joecollins.graphics
 
 import com.joecollins.graphics.components.GraphicsFrame
+import twitter4j.StatusUpdate
+import twitter4j.TwitterException
+import twitter4j.TwitterFactory
+import twitter4j.conf.ConfigurationBuilder
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Dimension
@@ -36,10 +40,6 @@ import javax.swing.border.EmptyBorder
 import javax.swing.filechooser.FileFilter
 import kotlin.Throws
 import kotlin.jvm.JvmOverloads
-import twitter4j.StatusUpdate
-import twitter4j.TwitterException
-import twitter4j.TwitterFactory
-import twitter4j.conf.ConfigurationBuilder
 
 class GenericWindow<T : JPanel> @JvmOverloads constructor(private val panel: T, title: String? = panel.javaClass.simpleName) : JFrame() {
 
@@ -55,14 +55,14 @@ class GenericWindow<T : JPanel> @JvmOverloads constructor(private val panel: T, 
             status.media(image)
             val cb = ConfigurationBuilder()
             val twitterPropertiesFile = this.javaClass.classLoader.getResourceAsStream("twitter.properties")
-                    ?: throw IllegalStateException("Unable to find twitter.properties")
+                ?: throw IllegalStateException("Unable to find twitter.properties")
             val properties = Properties()
             properties.load(twitterPropertiesFile)
             cb.setDebugEnabled(true)
-                    .setOAuthConsumerKey(properties["oauthConsumerKey"].toString())
-                    .setOAuthConsumerSecret(properties["oauthConsumerSecret"].toString())
-                    .setOAuthAccessToken(properties["oauthAccessToken"].toString())
-                    .setOAuthAccessTokenSecret(properties["oauthAccessTokenSecret"].toString())
+                .setOAuthConsumerKey(properties["oauthConsumerKey"].toString())
+                .setOAuthConsumerSecret(properties["oauthConsumerSecret"].toString())
+                .setOAuthAccessToken(properties["oauthAccessToken"].toString())
+                .setOAuthAccessTokenSecret(properties["oauthAccessTokenSecret"].toString())
             TwitterFactory(cb.build()).instance.updateStatus(status)
         }
 
@@ -84,11 +84,11 @@ class GenericWindow<T : JPanel> @JvmOverloads constructor(private val panel: T, 
             charLabel.foreground = Color.WHITE
             bottomPanel.add(charLabel, BorderLayout.WEST)
             textArea.addKeyListener(
-                    object : KeyAdapter() {
-                        override fun keyReleased(e: KeyEvent) {
-                            charLabel.text = textArea.text.length.toString()
-                        }
-                    })
+                object : KeyAdapter() {
+                    override fun keyReleased(e: KeyEvent) {
+                        charLabel.text = textArea.text.length.toString()
+                    }
+                })
             val tweetButton = JButton("Tweet")
             tweetButton.background = twitterColor
             tweetButton.foreground = Color.WHITE
@@ -149,7 +149,8 @@ class GenericWindow<T : JPanel> @JvmOverloads constructor(private val panel: T, 
                 } catch (e: IOException) {
                     e.printStackTrace()
                     JOptionPane.showMessageDialog(
-                            panel, e.message, "Cannot save image", JOptionPane.ERROR_MESSAGE)
+                        panel, e.message, "Cannot save image", JOptionPane.ERROR_MESSAGE
+                    )
                 }
             }
         }

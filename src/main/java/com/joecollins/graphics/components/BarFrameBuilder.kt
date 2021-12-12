@@ -36,34 +36,34 @@ class BarFrameBuilder private constructor() {
         private var _maxFunction = { rf: RangeFinder -> rf.highest }
 
         var highest: Number
-        get() { return _highest }
-        set(highest) {
-            _highest = highest
-            onPropertyRefreshed(Property.MIN)
-            onPropertyRefreshed(Property.MAX)
-        }
+            get() { return _highest }
+            set(highest) {
+                _highest = highest
+                onPropertyRefreshed(Property.MIN)
+                onPropertyRefreshed(Property.MAX)
+            }
 
         var lowest: Number
-        get() { return _lowest }
-        set(lowest) {
-            _lowest = lowest
-            onPropertyRefreshed(Property.MIN)
-            onPropertyRefreshed(Property.MAX)
-        }
+            get() { return _lowest }
+            set(lowest) {
+                _lowest = lowest
+                onPropertyRefreshed(Property.MIN)
+                onPropertyRefreshed(Property.MAX)
+            }
 
         var minFunction: (RangeFinder) -> Number
-        get() { return _minFunction }
-        set(minFunction) {
-            _minFunction = minFunction
-            onPropertyRefreshed(Property.MIN)
-        }
+            get() { return _minFunction }
+            set(minFunction) {
+                _minFunction = minFunction
+                onPropertyRefreshed(Property.MIN)
+            }
 
         var maxFunction: (RangeFinder) -> Number
-        get() { return _maxFunction }
-        set(maxFunction) {
-            _maxFunction = maxFunction
-            onPropertyRefreshed(Property.MAX)
-        }
+            get() { return _maxFunction }
+            set(maxFunction) {
+                _maxFunction = maxFunction
+                onPropertyRefreshed(Property.MAX)
+            }
     }
 
     class BasicBar @JvmOverloads constructor(val label: String, val color: Color, val value: Number, val valueLabel: String = value.toString(), val shape: Shape? = null) {
@@ -163,15 +163,17 @@ class BarFrameBuilder private constructor() {
     }
 
     fun build(): BarFrame {
-        val barsBinding = (minBarCountBinding?.let { minBinding ->
-            this.barsBinding.merge(minBinding) { bars, min ->
-                if (bars.size >= min) bars
-                else sequenceOf(bars, MutableList(min - bars.size) { BarFrame.Bar("", "", emptyList()) })
-                    .flatten()
-                    .toList()
+        val barsBinding = (
+            minBarCountBinding?.let { minBinding ->
+                this.barsBinding.merge(minBinding) { bars, min ->
+                    if (bars.size >= min) bars
+                    else sequenceOf(bars, MutableList(min - bars.size) { BarFrame.Bar("", "", emptyList()) })
+                        .flatten()
+                        .toList()
+                }
             }
-        }
-            ?: this.barsBinding)
+                ?: this.barsBinding
+            )
         return BarFrame(
             headerBinding = headerBinding ?: Binding.fixedBinding(null),
             subheadTextBinding = subheadBinding,
@@ -196,10 +198,13 @@ class BarFrameBuilder private constructor() {
                 }
             }
             builder.minBinding = Binding.propertyBinding(
-                    rangeFinder, { rf: RangeFinder -> rf.minFunction(rf) }, RangeFinder.Property.MIN)
+                rangeFinder, { rf: RangeFinder -> rf.minFunction(rf) }, RangeFinder.Property.MIN
+            )
             builder.maxBinding = (
-                    Binding.propertyBinding(
-                            rangeFinder, { rf: RangeFinder -> rf.maxFunction(rf) }, RangeFinder.Property.MAX))
+                Binding.propertyBinding(
+                    rangeFinder, { rf: RangeFinder -> rf.maxFunction(rf) }, RangeFinder.Property.MAX
+                )
+                )
             bindingReceiver.getBinding().bind { map: List<BasicBar> ->
                 rangeFinder.highest = map
                     .map { it.value }
@@ -218,8 +223,10 @@ class BarFrameBuilder private constructor() {
             val rangeFinder = builder.rangeFinder
             val differentDirections = { bar: DualBar -> sign(bar.value1.toDouble()) * sign(bar.value2.toDouble()) == -1.0 }
             val reverse = { bar: DualBar ->
-                (differentDirections(bar) ||
-                        abs(bar.value1.toDouble()) < abs(bar.value2.toDouble()))
+                (
+                    differentDirections(bar) ||
+                        abs(bar.value1.toDouble()) < abs(bar.value2.toDouble())
+                    )
             }
             val first = { bar: DualBar -> if (reverse(bar)) bar.value1 else bar.value2 }
             val second = { bar: DualBar -> if (reverse(bar)) bar.value2 else bar.value1 }
@@ -240,9 +247,11 @@ class BarFrameBuilder private constructor() {
                 }
             }
             builder.minBinding = Binding.propertyBinding(
-                    rangeFinder, { it.minFunction(it) }, RangeFinder.Property.MIN)
+                rangeFinder, { it.minFunction(it) }, RangeFinder.Property.MIN
+            )
             builder.maxBinding = Binding.propertyBinding(
-                    rangeFinder, { it.maxFunction(it) }, RangeFinder.Property.MAX)
+                rangeFinder, { it.maxFunction(it) }, RangeFinder.Property.MAX
+            )
             barsReceiver.getBinding().bind { map: List<DualBar> ->
                 rangeFinder.highest = map
                     .flatMap { sequenceOf(it.value1, it.value2) }
@@ -261,8 +270,10 @@ class BarFrameBuilder private constructor() {
             val rangeFinder = builder.rangeFinder
             val differentDirections = { bar: DualBar -> sign(bar.value1.toDouble()) * sign(bar.value2.toDouble()) == -1.0 }
             val reverse = { bar: DualBar ->
-                (differentDirections(bar) ||
-                        abs(bar.value1.toDouble()) < abs(bar.value2.toDouble()))
+                (
+                    differentDirections(bar) ||
+                        abs(bar.value1.toDouble()) < abs(bar.value2.toDouble())
+                    )
             }
             val first = { bar: DualBar -> if (reverse(bar)) bar.value1 else bar.value2 }
             val second = { bar: DualBar -> if (reverse(bar)) bar.value2 else bar.value1 }
@@ -283,9 +294,11 @@ class BarFrameBuilder private constructor() {
                 }
             }
             builder.minBinding = Binding.propertyBinding(
-                    rangeFinder, { it.minFunction(it) }, RangeFinder.Property.MIN)
+                rangeFinder, { it.minFunction(it) }, RangeFinder.Property.MIN
+            )
             builder.maxBinding = Binding.propertyBinding(
-                    rangeFinder, { it.maxFunction(it) }, RangeFinder.Property.MAX)
+                rangeFinder, { it.maxFunction(it) }, RangeFinder.Property.MAX
+            )
             barsReceiver.getBinding().bind { map: List<DualBar> ->
                 rangeFinder.highest = map
                     .flatMap { sequenceOf(it.value1, it.value2) }

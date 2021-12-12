@@ -6,11 +6,11 @@ import com.joecollins.bindings.Binding.Companion.fixedBinding
 import com.joecollins.bindings.Binding.Companion.propertyBinding
 import com.joecollins.graphics.components.MultiSummaryFrameBuilder.Companion.tooClose
 import com.joecollins.models.general.Party
+import org.junit.Assert
+import org.junit.Test
 import java.awt.Color
 import java.util.ArrayList
 import java.util.HashMap
-import org.junit.Assert
-import org.junit.Test
 
 class MultiSummaryFrameBuilderTest {
     @Test
@@ -30,11 +30,12 @@ class MultiSummaryFrameBuilderTest {
         ridings.add(Riding("Vuntut Gwitchin")) // 6
         ridings.add(Riding("Watson Lake")) // 7
         val frame = tooClose(
-                ridings, { it.isTooClose }, { it.margin },
-                { fixedBinding(it.name.uppercase()) }, { it.boxes },
-                2)
-                .withHeader(fixedBinding("TOO CLOSE TO CALL"))
-                .build()
+            ridings, { it.isTooClose }, { it.margin },
+            { fixedBinding(it.name.uppercase()) }, { it.boxes },
+            2
+        )
+            .withHeader(fixedBinding("TOO CLOSE TO CALL"))
+            .build()
         Assert.assertEquals("TOO CLOSE TO CALL", frame.header)
         Assert.assertEquals(0, frame.numRows.toLong())
 
@@ -140,36 +141,40 @@ class MultiSummaryFrameBuilderTest {
 
         val isTooClose: Binding<Boolean>
             get() = propertyBinding(
-                    this,
-                    { it.winner == null && it.results.values.sum() > 0 },
-                    Property.RESULT,
-                    Property.WINNER)
+                this,
+                { it.winner == null && it.results.values.sum() > 0 },
+                Property.RESULT,
+                Property.WINNER
+            )
 
         val margin: Binding<Int>
             get() = propertyBinding(
-                    this,
-                    {
-                        val topTwoVotes = results.values.sortedDescending()
-                        if (topTwoVotes.isEmpty())
-                            0
-                        else
-                            topTwoVotes[0] - topTwoVotes[1]
-                    },
-                    Property.RESULT)
+                this,
+                {
+                    val topTwoVotes = results.values.sortedDescending()
+                    if (topTwoVotes.isEmpty())
+                        0
+                    else
+                        topTwoVotes[0] - topTwoVotes[1]
+                },
+                Property.RESULT
+            )
 
         val boxes: Binding<List<kotlin.Pair<Color, String>>>
             get() = propertyBinding(
-                    this,
-                    { me ->
-                        me.results.entries.asSequence()
-                                .sortedByDescending { it.value }
-                                .map {
-                                    Pair(
-                                            it.key.color,
-                                            it.key.abbreviation + ": " + it.value)
-                                }
-                                .toList()
-                    },
-                    Property.RESULT)
+                this,
+                { me ->
+                    me.results.entries.asSequence()
+                        .sortedByDescending { it.value }
+                        .map {
+                            Pair(
+                                it.key.color,
+                                it.key.abbreviation + ": " + it.value
+                            )
+                        }
+                        .toList()
+                },
+                Property.RESULT
+            )
     }
 }

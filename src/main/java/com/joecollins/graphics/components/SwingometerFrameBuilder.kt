@@ -23,32 +23,32 @@ class SwingometerFrameBuilder {
         private var _tickInterval: Number = 1
 
         var value: Number
-        get() { return _value }
-        set(value) {
-            _value = if (java.lang.Double.isNaN(value.toDouble())) 0.0 else value
-            onPropertyRefreshed(Property.VALUE)
-        }
+            get() { return _value }
+            set(value) {
+                _value = if (java.lang.Double.isNaN(value.toDouble())) 0.0 else value
+                onPropertyRefreshed(Property.VALUE)
+            }
 
         var max: Number
-        get() { return _max }
-        set(max) {
-            this._max = max
-            onPropertyRefreshed(Property.VALUE)
-        }
+            get() { return _max }
+            set(max) {
+                this._max = max
+                onPropertyRefreshed(Property.VALUE)
+            }
 
         var bucketSize: Number
-        get() { return _bucketSize }
-        set(bucketSize) {
-            this._bucketSize = bucketSize
-            onPropertyRefreshed(Property.VALUE)
-        }
+            get() { return _bucketSize }
+            set(bucketSize) {
+                this._bucketSize = bucketSize
+                onPropertyRefreshed(Property.VALUE)
+            }
 
         var tickInterval: Number
-        get() { return _tickInterval }
-        set(tickInterval) {
-            this._tickInterval = tickInterval
-            onPropertyRefreshed(Property.VALUE)
-        }
+            get() { return _tickInterval }
+            set(tickInterval) {
+                this._tickInterval = tickInterval
+                onPropertyRefreshed(Property.VALUE)
+            }
     }
 
     private var rangeBinding: Binding<Double>? = null
@@ -73,16 +73,19 @@ class SwingometerFrameBuilder {
 
     private fun getMax(props: Properties): Double {
         return max(
-                props.max.toDouble(), props.bucketSize.toDouble() *
-                ceil(abs(props.value.toDouble() / props.bucketSize.toDouble())))
+            props.max.toDouble(),
+            props.bucketSize.toDouble() *
+                ceil(abs(props.value.toDouble() / props.bucketSize.toDouble()))
+        )
     }
 
     fun withBucketSize(bucketSize: Binding<Number>): SwingometerFrameBuilder {
         bucketSize.bind { properties.bucketSize = it }
         this.numBucketsPerSideBinding = Binding.propertyBinding(
-                properties,
-                { (getMax(it) / it.bucketSize.toDouble()).roundToInt() },
-                Properties.Property.VALUE)
+            properties,
+            { (getMax(it) / it.bucketSize.toDouble()).roundToInt() },
+            Properties.Property.VALUE
+        )
         return this
     }
 
@@ -246,7 +249,8 @@ class SwingometerFrameBuilder {
             builder.leftColorBinding = colorsRec.getBinding { it.first }
             builder.rightColorBinding = colorsRec.getBinding { it.second }
             builder.valueBinding = Binding.propertyBinding(
-                    builder.properties, { props: Properties -> props.value }, Properties.Property.VALUE)
+                builder.properties, { props: Properties -> props.value }, Properties.Property.VALUE
+            )
             return builder
         }
     }

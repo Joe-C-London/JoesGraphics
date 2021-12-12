@@ -7,11 +7,11 @@ import com.joecollins.graphics.utils.RenderTestUtils
 import com.joecollins.graphics.utils.ShapefileReader
 import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.Party
+import org.junit.Test
 import java.awt.Color
 import java.awt.Dimension
 import java.awt.Shape
 import java.io.IOException
-import org.junit.Test
 
 class CandidateListingScreenTest {
 
@@ -96,7 +96,7 @@ class CandidateListingScreenTest {
                 Binding.fixedBinding(1),
                 Binding.fixedBinding(listOf(1, 2, 3, 4, 5, 6, 7)),
                 Binding.fixedBinding("CARDIGAN")
-        )
+            )
             .withPrev(
                 Binding.fixedBinding(prev),
                 Binding.fixedBinding("2015 RESULT"),
@@ -248,24 +248,30 @@ class CandidateListingScreenTest {
         val grn = Party("Green", "GRN", Color.GREEN.darker())
         val pc = Party("Progressive Conservative", "PC", Color.BLUE)
         val ndp = Party("New Democratic Party", "NDP", Color.ORANGE)
-        val candidates = BindableWrapper(listOf(
-            Candidate("Kevin Doyle", lib),
-            Candidate("Susan Hartley", grn),
-            Candidate("Edith Perry", ndp),
-            Candidate("Steven Myers", pc, true)
-        ))
-        val prev = BindableWrapper(mapOf(
-            lib to 1170,
-            pc to 1448,
-            grn to 145,
-            ndp to 256
-        ))
-        val secondaryPrev = BindableWrapper(mapOf(
-            lib to 8016,
-            pc to 9444,
-            grn to 1144,
-            ndp to 2404
-        ))
+        val candidates = BindableWrapper(
+            listOf(
+                Candidate("Kevin Doyle", lib),
+                Candidate("Susan Hartley", grn),
+                Candidate("Edith Perry", ndp),
+                Candidate("Steven Myers", pc, true)
+            )
+        )
+        val prev = BindableWrapper(
+            mapOf(
+                lib to 1170,
+                pc to 1448,
+                grn to 145,
+                ndp to 256
+            )
+        )
+        val secondaryPrev = BindableWrapper(
+            mapOf(
+                lib to 8016,
+                pc to 9444,
+                grn to 1144,
+                ndp to 2404
+            )
+        )
         val region = BindableWrapper("CARDIGAN")
         val districtName = BindableWrapper("GEORGETOWN-POWNAL")
         val districtNum = BindableWrapper(2)

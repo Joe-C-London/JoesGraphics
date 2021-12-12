@@ -5,6 +5,12 @@ import com.joecollins.bindings.BindingReceiver
 import com.joecollins.graphics.ImageGenerator
 import com.joecollins.graphics.utils.StandardFont
 import io.webfolder.cdp.Launcher
+import twitter4j.MediaEntity
+import twitter4j.Status
+import twitter4j.TwitterFactory
+import twitter4j.URLEntity
+import twitter4j.User
+import twitter4j.conf.ConfigurationBuilder
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Component
@@ -32,12 +38,6 @@ import kotlin.math.ceil
 import kotlin.math.min
 import kotlin.math.roundToInt
 import kotlin.math.sqrt
-import twitter4j.MediaEntity
-import twitter4j.Status
-import twitter4j.TwitterFactory
-import twitter4j.URLEntity
-import twitter4j.User
-import twitter4j.conf.ConfigurationBuilder
 
 class TweetFrame(tweet: Binding<Status>, private val timezone: ZoneId = ZoneId.systemDefault()) : JPanel() {
     private val twitterColor = Color(0x00acee)
@@ -125,8 +125,8 @@ class TweetFrame(tweet: Binding<Status>, private val timezone: ZoneId = ZoneId.s
         val quotedURL = status.quotedStatus?.let { "https://twitter.com/${it.user.screenName}/status/${it.id}" }
         if (status.user.isProtected) {
             return "<html><span style='color:#$twitterColorHex'>" +
-                    "This user's tweets are protected, and this tweet has therefore been blocked from this frame." +
-                    "</span></html>"
+                "This user's tweets are protected, and this tweet has therefore been blocked from this frame." +
+                "</span></html>"
         }
         var htmlText = status.text.replace("\n", "<br/>")
         status.hashtagEntities.forEach {

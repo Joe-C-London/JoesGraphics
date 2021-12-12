@@ -11,11 +11,11 @@ class BindableWrapper<T>(private var _value: T) : Bindable<BindableWrapper<T>, B
     }
 
     var value: T
-    get() = _value
-    set(value) {
-        this._value = value
-        onPropertyRefreshed(BindableWrapperValue.VALUE)
-    }
+        get() = _value
+        set(value) {
+            this._value = value
+            onPropertyRefreshed(BindableWrapperValue.VALUE)
+        }
 
     val binding: Binding<T>
         get() = Binding.propertyBinding(this, { it.value }, BindableWrapperValue.VALUE)

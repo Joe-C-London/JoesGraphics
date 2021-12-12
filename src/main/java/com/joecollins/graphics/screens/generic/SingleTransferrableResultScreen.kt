@@ -61,7 +61,8 @@ class SingleTransferrableResultScreen private constructor(
             val seatFrameIsAlone = partyFrame == null // && swingFrame == null && mapFrame == null
             candidateFrame.setSize(
                 width * (if (seatFrameIsAlone) 5 else 3) / 5 - 10,
-                height - 10)
+                height - 10
+            )
             partyFrame?.setLocation(width * 3 / 5 + 5, 5)
             partyFrame?.setSize(width * 2 / 5 - 10, height * 2 / 3 - 10)
             prevFrame?.setLocation(width * 3 / 5 + 5, height * 2 / 3 + 5)
@@ -89,7 +90,8 @@ class SingleTransferrableResultScreen private constructor(
                 BindingReceiver(excluded),
                 BindingReceiver(header),
                 BindingReceiver(subhead),
-                incumbentMarker)
+                incumbentMarker
+            )
         }
     }
 
@@ -223,12 +225,14 @@ class SingleTransferrableResultScreen private constructor(
                         .associateWith { (electedEarlier[it] ?: 0) + (quotasThisRound[it] ?: 0.0) }
                         .entries
                         .sortedByDescending { it.value }
-                        .map { BarFrameBuilder.BasicBar(
-                            label = it.key.name.uppercase(),
-                            color = it.key.color,
-                            value = it.value,
-                            valueLabel = formatString(it.value)
-                        ) }
+                        .map {
+                            BarFrameBuilder.BasicBar(
+                                label = it.key.name.uppercase(),
+                                color = it.key.color,
+                                value = it.value,
+                                valueLabel = formatString(it.value)
+                            )
+                        }
                 }
             )
                 .withHeader(partyHeader!!.getBinding())
@@ -241,15 +245,19 @@ class SingleTransferrableResultScreen private constructor(
             if (prevHeader == null) {
                 return null
             }
-            return BarFrameBuilder.basic(prevSeats!!.getBinding { prev ->
-                prev.entries
-                    .sortedByDescending { it.value }
-                    .map { BarFrameBuilder.BasicBar(
-                        label = it.key.abbreviation.uppercase(),
-                        color = it.key.color,
-                        value = it.value
-                    ) }
-            })
+            return BarFrameBuilder.basic(
+                prevSeats!!.getBinding { prev ->
+                    prev.entries
+                        .sortedByDescending { it.value }
+                        .map {
+                            BarFrameBuilder.BasicBar(
+                                label = it.key.abbreviation.uppercase(),
+                                color = it.key.color,
+                                value = it.value
+                            )
+                        }
+                }
+            )
                 .withMax(prevSeats!!.getBinding { prev -> prev.values.sum() / 2 })
                 .withHeader(prevHeader!!.getBinding())
                 .build()

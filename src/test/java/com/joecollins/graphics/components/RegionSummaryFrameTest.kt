@@ -2,11 +2,11 @@ package com.joecollins.graphics.components
 
 import com.joecollins.bindings.Binding.Companion.fixedBinding
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
+import org.junit.Assert
+import org.junit.Test
 import java.awt.Color
 import java.io.IOException
 import kotlin.Throws
-import org.junit.Assert
-import org.junit.Test
 
 class RegionSummaryFrameTest {
     @Test
@@ -15,14 +15,22 @@ class RegionSummaryFrameTest {
             headerBinding = fixedBinding(""),
             sectionsBinding = fixedBinding(
                 listOf(
-                    RegionSummaryFrame.Section("ELECTORAL VOTES", listOf(
-                        Pair(Color.BLUE, "306"),
-                        Pair(Color.BLUE, "<< 74"),
-                        Pair(Color.RED, "232"))),
-                    RegionSummaryFrame.Section("POPULAR VOTE", listOf(
-                        Pair(Color.BLUE, "51.1%"),
-                        Pair(Color.BLUE, "<< 1.0%"),
-                        Pair(Color.RED, "47.2%")))
+                    RegionSummaryFrame.Section(
+                        "ELECTORAL VOTES",
+                        listOf(
+                            Pair(Color.BLUE, "306"),
+                            Pair(Color.BLUE, "<< 74"),
+                            Pair(Color.RED, "232")
+                        )
+                    ),
+                    RegionSummaryFrame.Section(
+                        "POPULAR VOTE",
+                        listOf(
+                            Pair(Color.BLUE, "51.1%"),
+                            Pair(Color.BLUE, "<< 1.0%"),
+                            Pair(Color.RED, "47.2%")
+                        )
+                    )
                 )
             )
         )
@@ -59,14 +67,22 @@ class RegionSummaryFrameTest {
             headerBinding = fixedBinding("UNITED STATES"),
             sectionsBinding = fixedBinding(
                 listOf(
-                    RegionSummaryFrame.Section("ELECTORAL VOTES", listOf(
-                        Pair(Color.BLUE, "306"),
-                        Pair(Color.BLUE, "<< 74"),
-                        Pair(Color.RED, "232"))),
-                    RegionSummaryFrame.Section("POPULAR VOTE", listOf(
-                        Pair(Color.BLUE, "51.1%"),
-                        Pair(Color.BLUE, "<< 1.0%"),
-                        Pair(Color.RED, "47.2%")))
+                    RegionSummaryFrame.Section(
+                        "ELECTORAL VOTES",
+                        listOf(
+                            Pair(Color.BLUE, "306"),
+                            Pair(Color.BLUE, "<< 74"),
+                            Pair(Color.RED, "232")
+                        )
+                    ),
+                    RegionSummaryFrame.Section(
+                        "POPULAR VOTE",
+                        listOf(
+                            Pair(Color.BLUE, "51.1%"),
+                            Pair(Color.BLUE, "<< 1.0%"),
+                            Pair(Color.RED, "47.2%")
+                        )
+                    )
                 )
             )
         )

@@ -2,13 +2,6 @@ package com.joecollins.graphics.components
 
 import com.joecollins.bindings.Binding
 import com.joecollins.graphics.utils.RenderTestUtils
-import java.awt.Dimension
-import java.io.File
-import java.nio.file.Files
-import java.nio.file.StandardCopyOption
-import java.time.Instant
-import java.util.Date
-import java.util.Scanner
 import org.junit.Test
 import org.mockito.Mockito
 import twitter4j.HashtagEntity
@@ -17,6 +10,13 @@ import twitter4j.Status
 import twitter4j.URLEntity
 import twitter4j.User
 import twitter4j.UserMentionEntity
+import java.awt.Dimension
+import java.io.File
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
+import java.time.Instant
+import java.util.Date
+import java.util.Scanner
 
 class TweetFrameTest {
 

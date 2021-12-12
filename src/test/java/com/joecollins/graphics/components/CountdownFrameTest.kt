@@ -2,6 +2,8 @@ package com.joecollins.graphics.components
 
 import com.joecollins.bindings.Binding.Companion.fixedBinding
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
+import org.junit.Assert
+import org.junit.Test
 import java.awt.Color
 import java.io.IOException
 import java.lang.InterruptedException
@@ -11,8 +13,6 @@ import java.time.Instant
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import kotlin.Throws
-import org.junit.Assert
-import org.junit.Test
 
 class CountdownFrameTest {
     @Test
@@ -24,7 +24,8 @@ class CountdownFrameTest {
         )
         frame.clock = Clock.fixed(Instant.parse("2020-07-04T12:34:56Z"), ZoneId.of("UTC"))
         Assert.assertEquals(
-                Duration.ofDays(1).plusHours(10).plusMinutes(25).plusSeconds(4), frame.getTimeRemaining())
+            Duration.ofDays(1).plusHours(10).plusMinutes(25).plusSeconds(4), frame.getTimeRemaining()
+        )
     }
 
     @Test

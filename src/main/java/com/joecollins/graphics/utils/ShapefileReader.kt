@@ -1,11 +1,5 @@
 package com.joecollins.graphics.utils
 
-import java.awt.Shape
-import java.awt.geom.AffineTransform
-import java.awt.geom.Area
-import java.io.IOException
-import java.net.URL
-import kotlin.reflect.cast
 import org.geotools.data.FileDataStore
 import org.geotools.data.FileDataStoreFinder
 import org.geotools.data.simple.SimpleFeatureIterator
@@ -13,6 +7,12 @@ import org.geotools.data.simple.SimpleFeatureSource
 import org.locationtech.jts.awt.ShapeWriter
 import org.locationtech.jts.geom.Geometry
 import org.opengis.feature.simple.SimpleFeature
+import java.awt.Shape
+import java.awt.geom.AffineTransform
+import java.awt.geom.Area
+import java.io.IOException
+import java.net.URL
+import kotlin.reflect.cast
 
 object ShapefileReader {
 
@@ -66,13 +66,14 @@ object ShapefileReader {
                 val key = keyFunc(feature)
                 val geom = feature.getAttribute("the_geom") as Geometry
                 shapes.merge(
-                        key,
-                        toShape(geom),
-                        { s1, s2 ->
-                            val s = Area(s1)
-                            s.add(Area(s2))
-                            s
-                        })
+                    key,
+                    toShape(geom),
+                    { s1, s2 ->
+                        val s = Area(s1)
+                        s.add(Area(s2))
+                        s
+                    }
+                )
             }
             shapes
         } finally {

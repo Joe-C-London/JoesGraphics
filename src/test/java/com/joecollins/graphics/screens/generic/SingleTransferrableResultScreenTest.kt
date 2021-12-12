@@ -8,11 +8,11 @@ import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.graphics.utils.ShapefileReader
 import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.Party
+import org.junit.Test
 import java.awt.Color
 import java.awt.Dimension
 import java.awt.Shape
 import java.io.IOException
-import org.junit.Test
 
 class SingleTransferrableResultScreenTest {
 
@@ -260,22 +260,24 @@ class SingleTransferrableResultScreenTest {
         val odonnell = Candidate("Mair\u00e9ad O'Donnell", sf)
         val robinson = Candidate("Courtney Robinson", labalt)
 
-        val candidateVotes = BindableWrapper<Map<Candidate, Number?>>(mapOf(
-            allen to null,
-            bodel to null,
-            bunting to null,
-            defaoite to null,
-            douglas to null,
-            girvin to null,
-            kyle to null,
-            long to null,
-            lyttle to null,
-            mckeag to null,
-            milne to null,
-            newton to null,
-            odonnell to null,
-            robinson to null
-        ))
+        val candidateVotes = BindableWrapper<Map<Candidate, Number?>>(
+            mapOf(
+                allen to null,
+                bodel to null,
+                bunting to null,
+                defaoite to null,
+                douglas to null,
+                girvin to null,
+                kyle to null,
+                long to null,
+                lyttle to null,
+                mckeag to null,
+                milne to null,
+                newton to null,
+                odonnell to null,
+                robinson to null
+            )
+        )
         val quota = BindableWrapper<Int?>(null)
         val elected = BindableWrapper<List<Pair<Candidate, Int>>>(emptyList())
         val excluded = BindableWrapper<List<Candidate>>(emptyList())

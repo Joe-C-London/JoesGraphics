@@ -4,13 +4,13 @@ import com.joecollins.bindings.Binding.Companion.fixedBinding
 import com.joecollins.graphics.components.lowerthird.LowerThird.Companion.createImage
 import com.joecollins.graphics.utils.BindableWrapper
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
+import org.junit.Assert
+import org.junit.Test
 import java.awt.Color
 import java.io.IOException
 import java.time.Clock
 import java.time.Instant
 import java.time.ZoneId
-import org.junit.Assert
-import org.junit.Test
 
 class LowerThirdHeadlineAndSummaryBothEndsTest {
     @Test

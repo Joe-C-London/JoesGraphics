@@ -48,7 +48,7 @@ open class LowerThird internal constructor(
     private val rightPanel = PlaceAndTimePanel()
 
     internal val leftImage: Image
-    get() { return leftPanel.leftImage }
+        get() { return leftPanel.leftImage }
 
     internal val place: String
         get() = rightPanel.place
@@ -115,21 +115,21 @@ open class LowerThird internal constructor(
         }
 
         var place: String
-        get() { return _placeLabel.text }
-        set(place) {
-            _placeLabel.text = place
-            repaint()
-        }
+            get() { return _placeLabel.text }
+            set(place) {
+                _placeLabel.text = place
+                repaint()
+            }
 
         var timezone: ZoneId
-        get() { return _timezone }
-        set(timezone) {
-            _timezone = timezone
-            updateTime()
-        }
+            get() { return _timezone }
+            set(timezone) {
+                _timezone = timezone
+                updateTime()
+            }
 
         val time: String
-        get() { return _timeLabel.text }
+            get() { return _timeLabel.text }
 
         fun updateTime() {
             try {
@@ -165,7 +165,8 @@ open class LowerThird internal constructor(
                         weightx = 1.0
                         weighty = 1.0
                     }
-                })
+                }
+            )
             add(
                 _timeLabel,
                 object : GridBagConstraints() {
@@ -178,7 +179,8 @@ open class LowerThird internal constructor(
                         weightx = 1.0
                         weighty = 1.0
                     }
-                })
+                }
+            )
             if (showTimeZone) {
                 add(
                     _timezoneLabel,

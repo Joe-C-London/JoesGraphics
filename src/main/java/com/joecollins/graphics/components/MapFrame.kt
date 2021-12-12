@@ -170,9 +170,9 @@ class MapFrame(
                     .asSequence()
                     .map {
                         val a = it.value.parallelStream()
-                                .map { e -> e.first }
-                                .sorted(compareBy { s -> s.bounds.width * s.bounds.height })
-                                .collect({ Area() }, { a, s -> a.add(Area(s)) }, { a, s -> a.add(s) })
+                            .map { e -> e.first }
+                            .sorted(compareBy { s -> s.bounds.width * s.bounds.height })
+                            .collect({ Area() }, { a, s -> a.add(Area(s)) }, { a, s -> a.add(s) })
                         Pair(a, it.key)
                     }
                     .forEach {

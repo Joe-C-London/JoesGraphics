@@ -4,49 +4,51 @@ import com.joecollins.bindings.Binding.Companion.fixedBinding
 import com.joecollins.bindings.mapElements
 import com.joecollins.graphics.utils.BindableWrapper
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
+import org.junit.Assert
+import org.junit.Test
 import java.awt.Color
 import java.io.IOException
 import kotlin.Throws
-import org.junit.Assert
-import org.junit.Test
 
 class HeatMapFrameTest {
     @Test
     fun testDots() {
         val borderColors = sequenceOf(
-                generateSequence { Color.BLUE }.take(8),
-                generateSequence { Color.RED }.take(18),
-                sequenceOf(DARK_GREEN))
-                .flatten()
-                .toList()
+            generateSequence { Color.BLUE }.take(8),
+            generateSequence { Color.RED }.take(18),
+            sequenceOf(DARK_GREEN)
+        )
+            .flatten()
+            .toList()
         val fillColors = listOf(
-                Color.BLUE,
-                Color.BLUE,
-                Color.BLUE,
-                Color.BLUE,
-                Color.BLUE,
-                Color.BLUE,
-                Color.BLUE,
-                Color.BLUE,
-                DARK_GREEN,
-                DARK_GREEN,
-                DARK_GREEN,
-                Color.BLUE,
-                DARK_GREEN,
-                Color.RED,
-                Color.RED,
-                Color.BLUE,
-                DARK_GREEN,
-                Color.RED,
-                DARK_GREEN,
-                Color.RED,
-                Color.BLUE,
-                Color.BLUE,
-                DARK_GREEN,
-                Color.BLUE,
-                Color.RED,
-                Color.RED,
-                DARK_GREEN)
+            Color.BLUE,
+            Color.BLUE,
+            Color.BLUE,
+            Color.BLUE,
+            Color.BLUE,
+            Color.BLUE,
+            Color.BLUE,
+            Color.BLUE,
+            DARK_GREEN,
+            DARK_GREEN,
+            DARK_GREEN,
+            Color.BLUE,
+            DARK_GREEN,
+            Color.RED,
+            Color.RED,
+            Color.BLUE,
+            DARK_GREEN,
+            Color.RED,
+            DARK_GREEN,
+            Color.RED,
+            Color.BLUE,
+            Color.BLUE,
+            DARK_GREEN,
+            Color.BLUE,
+            Color.RED,
+            Color.RED,
+            DARK_GREEN
+        )
         val frame = HeatMapFrame(
             headerBinding = fixedBinding(null),
             numRowsBinding = fixedBinding(3),
@@ -109,16 +111,20 @@ class HeatMapFrameTest {
     fun testRenderEvenWide() {
         val results = peiResults
         val squares = BindableWrapper(
-                sequenceOf(
-                        20, 6, 19, 18, 7, 1, 2, 4, 5, 13, 21, 15, 22, 14, 25, 3, 12, 16, 23, 10, 26, 9, 11,
-                        8, 27, 24, 17)
-                        .map { results[it]!! }
-                        .toList())
+            sequenceOf(
+                20, 6, 19, 18, 7, 1, 2, 4, 5, 13, 21, 15, 22, 14, 25, 3, 12, 16, 23, 10, 26, 9, 11,
+                8, 27, 24, 17
+            )
+                .map { results[it]!! }
+                .toList()
+        )
         val seatBars = BindableWrapper(
-                listOf(Pair(Color.BLUE, 8), Pair(Color(128, 128, 255), 5)))
+            listOf(Pair(Color.BLUE, 8), Pair(Color(128, 128, 255), 5))
+        )
         val seatLabel = BindableWrapper("8/13")
         val changeBars = BindableWrapper(
-                listOf(Pair(Color.BLUE, 3), Pair(Color(128, 128, 255), 2)))
+            listOf(Pair(Color.BLUE, 3), Pair(Color(128, 128, 255), 2))
+        )
         val changeLabel = BindableWrapper("+3/+5")
         val changeStart = BindableWrapper(8)
         val borderColor = BindableWrapper(Color.BLUE)
@@ -137,10 +143,11 @@ class HeatMapFrameTest {
         frame.setSize(1024, 512)
         compareRendering("HeatMapFrame", "EvenWide-1", frame)
         squares.value = sequenceOf(
-                24, 27, 8, 11, 9, 26, 10, 23, 16, 12, 3, 25, 14, 22, 15, 21, 13, 5, 4, 2, 1, 7, 18,
-                19, 6, 20, 17)
-                .map { results[it]!! }
-                .toList()
+            24, 27, 8, 11, 9, 26, 10, 23, 16, 12, 3, 25, 14, 22, 15, 21, 13, 5, 4, 2, 1, 7, 18,
+            19, 6, 20, 17
+        )
+            .map { results[it]!! }
+            .toList()
         seatBars.value = listOf(Pair(Color.RED, 2), Pair(Color(255, 128, 128), 4))
         seatLabel.value = "2/6"
         changeBars.value = listOf(Pair(Color.RED, -4), Pair(Color(255, 128, 128), -8))
@@ -156,16 +163,20 @@ class HeatMapFrameTest {
     fun testRenderEvenHigh() {
         val results = peiResults
         val squares = BindableWrapper(
-                sequenceOf(
-                        20, 6, 19, 18, 7, 1, 2, 4, 5, 13, 21, 15, 22, 14, 25, 3, 12, 16, 23, 10, 26, 9, 11,
-                        8, 27, 24, 17)
-                        .map { results[it]!! }
-                        .toList())
+            sequenceOf(
+                20, 6, 19, 18, 7, 1, 2, 4, 5, 13, 21, 15, 22, 14, 25, 3, 12, 16, 23, 10, 26, 9, 11,
+                8, 27, 24, 17
+            )
+                .map { results[it]!! }
+                .toList()
+        )
         val seatBars = BindableWrapper(
-                listOf(Pair(Color.BLUE, 8), Pair(Color(128, 128, 255), 5)))
+            listOf(Pair(Color.BLUE, 8), Pair(Color(128, 128, 255), 5))
+        )
         val seatLabel = BindableWrapper("8/13")
         val changeBars = BindableWrapper(
-                listOf(Pair(Color.BLUE, 3), Pair(Color(128, 128, 255), 2)))
+            listOf(Pair(Color.BLUE, 3), Pair(Color(128, 128, 255), 2))
+        )
         val changeLabel = BindableWrapper("+3/+5")
         val changeStart = BindableWrapper(8)
         val borderColor = BindableWrapper(Color.BLUE)
@@ -184,10 +195,11 @@ class HeatMapFrameTest {
         frame.setSize(1024, 512)
         compareRendering("HeatMapFrame", "EvenHigh-1", frame)
         squares.value = sequenceOf(
-                24, 27, 8, 11, 9, 26, 10, 23, 16, 12, 3, 25, 14, 22, 15, 21, 13, 5, 4, 2, 1, 7, 18,
-                19, 6, 20, 17)
-                .map { results[it]!! }
-                .toList()
+            24, 27, 8, 11, 9, 26, 10, 23, 16, 12, 3, 25, 14, 22, 15, 21, 13, 5, 4, 2, 1, 7, 18,
+            19, 6, 20, 17
+        )
+            .map { results[it]!! }
+            .toList()
         seatBars.value = listOf(Pair(Color.RED, 2), Pair(Color(255, 128, 128), 4))
         seatLabel.value = "2/6"
         changeBars.value = listOf(Pair(Color.RED, -4), Pair(Color(255, 128, 128), -8))
@@ -203,16 +215,20 @@ class HeatMapFrameTest {
     fun testRenderUneven() {
         val results = peiResults
         val squares = BindableWrapper(
-                sequenceOf(
-                        20, 6, 19, 18, 7, 1, 2, 4, 5, 13, 21, 15, 22, 14, 25, 3, 12, 16, 23, 10, 26, 9, 11,
-                        8, 27, 24, 17)
-                        .map { results[it]!! }
-                        .toList())
+            sequenceOf(
+                20, 6, 19, 18, 7, 1, 2, 4, 5, 13, 21, 15, 22, 14, 25, 3, 12, 16, 23, 10, 26, 9, 11,
+                8, 27, 24, 17
+            )
+                .map { results[it]!! }
+                .toList()
+        )
         val seatBars = BindableWrapper(
-                listOf(Pair(Color.BLUE, 8), Pair(Color(128, 128, 255), 5)))
+            listOf(Pair(Color.BLUE, 8), Pair(Color(128, 128, 255), 5))
+        )
         val seatLabel = BindableWrapper("8/13")
         val changeBars = BindableWrapper(
-                listOf(Pair(Color.BLUE, 3), Pair(Color(128, 128, 255), 2)))
+            listOf(Pair(Color.BLUE, 3), Pair(Color(128, 128, 255), 2))
+        )
         val changeLabel = BindableWrapper("+3/+5")
         val changeStart = BindableWrapper(8)
         val borderColor = BindableWrapper(Color.BLUE)
@@ -231,10 +247,11 @@ class HeatMapFrameTest {
         frame.setSize(1024, 512)
         compareRendering("HeatMapFrame", "Uneven-1", frame)
         squares.value = sequenceOf(
-                24, 27, 8, 11, 9, 26, 10, 23, 16, 12, 3, 25, 14, 22, 15, 21, 13, 5, 4, 2, 1, 7, 18,
-                19, 6, 20, 17)
-                .map { results[it]!! }
-                .toList()
+            24, 27, 8, 11, 9, 26, 10, 23, 16, 12, 3, 25, 14, 22, 15, 21, 13, 5, 4, 2, 1, 7, 18,
+            19, 6, 20, 17
+        )
+            .map { results[it]!! }
+            .toList()
         seatBars.value = listOf(Pair(Color.RED, 2), Pair(Color(255, 128, 128), 4))
         seatLabel.value = "2/6"
         changeBars.value = listOf(Pair(Color.RED, -4), Pair(Color(255, 128, 128), -8))
@@ -259,16 +276,20 @@ class HeatMapFrameTest {
     fun testRenderChangeReversals() {
         val results = peiResults
         val squares = BindableWrapper(
-                sequenceOf(
-                        20, 6, 19, 18, 7, 1, 2, 4, 5, 13, 21, 15, 22, 14, 25, 3, 12, 16, 23, 10, 26, 9, 11,
-                        8, 27, 24, 17)
-                        .map { results[it]!! }
-                        .toList())
+            sequenceOf(
+                20, 6, 19, 18, 7, 1, 2, 4, 5, 13, 21, 15, 22, 14, 25, 3, 12, 16, 23, 10, 26, 9, 11,
+                8, 27, 24, 17
+            )
+                .map { results[it]!! }
+                .toList()
+        )
         val seatBars = BindableWrapper(
-                listOf(Pair(Color.BLUE, 2), Pair(Color(128, 128, 255), 2)))
+            listOf(Pair(Color.BLUE, 2), Pair(Color(128, 128, 255), 2))
+        )
         val seatLabel = BindableWrapper("2/4")
         val changeBars = BindableWrapper(
-                listOf(Pair(Color.BLUE, 3), Pair(Color(128, 128, 255), 2)))
+            listOf(Pair(Color.BLUE, 3), Pair(Color(128, 128, 255), 2))
+        )
         val changeLabel = BindableWrapper("+3/+5")
         val changeStart = BindableWrapper(8)
         val borderColor = BindableWrapper(Color.BLUE)
@@ -301,33 +322,34 @@ class HeatMapFrameTest {
 
     private val peiResults: Map<Int, HeatMapFrame.Square>
         get() = mapOf(
-                1 to HeatMapFrame.Square(borderColor = Color.BLUE, fillColor = Color.BLUE, label = "Souris-Elmira (1)"),
-                2 to HeatMapFrame.Square(borderColor = Color.BLUE, fillColor = Color.BLUE, label = "Georgetown-Pownall (2)"),
-                3 to HeatMapFrame.Square(borderColor = Color.RED, fillColor = Color.BLUE, label = "Montague-Kilmuir (3)"),
-                4 to HeatMapFrame.Square(borderColor = Color.BLUE, fillColor = Color.BLUE, label = "Belfast-Murray River (4)"),
-                5 to HeatMapFrame.Square(borderColor = Color.RED, fillColor = DARK_GREEN, label = "Mermaid-Stratford (5)"),
-                6 to HeatMapFrame.Square(borderColor = Color.BLUE, fillColor = Color.BLUE, label = "Stratford-Keppoch (6)"),
-                7 to HeatMapFrame.Square(borderColor = Color.BLUE, fillColor = Color.BLUE, label = "Morell-Donagh (7)"),
-                8 to HeatMapFrame.Square(borderColor = Color.RED, fillColor = Color.BLUE, label = "Stanhope-Marshfield (8)"),
-                9 to HeatMapFrame.Square(borderColor = Color.RED, fillColor = Color.BLUE, label = "Charlottetown-Hillsborough Park (9)"),
-                10 to HeatMapFrame.Square(borderColor = Color.RED, fillColor = Color.RED, label = "Charlottetown-Winsloe (10)"),
-                11 to HeatMapFrame.Square(borderColor = Color.RED, fillColor = DARK_GREEN, label = "Charlottetown-Belvedere (11)"),
-                12 to HeatMapFrame.Square(borderColor = Color.RED, fillColor = DARK_GREEN, label = "Charlottetown-Victoria Park (12)"),
-                13 to HeatMapFrame.Square(borderColor = Color.RED, fillColor = DARK_GREEN, label = "Charlottetown-Brighton (13)"),
-                14 to HeatMapFrame.Square(borderColor = Color.RED, fillColor = Color.RED, label = "Charlottetown-West Royalty (14)"),
-                15 to HeatMapFrame.Square(borderColor = Color.RED, fillColor = Color.BLUE, label = "Brackley-Hunter River (15)"),
-                16 to HeatMapFrame.Square(borderColor = Color.RED, fillColor = Color.RED, label = "Cornwall-Meadowbank (16)"),
-                17 to HeatMapFrame.Square(borderColor = DARK_GREEN, fillColor = DARK_GREEN, label = "New Haven-Rocky Point (17)"),
-                18 to HeatMapFrame.Square(borderColor = Color.BLUE, fillColor = Color.BLUE, label = "Rustico-Emerald (18)"),
-                19 to HeatMapFrame.Square(borderColor = Color.BLUE, fillColor = Color.BLUE, label = "Borden-Kinkora (19)"),
-                20 to HeatMapFrame.Square(borderColor = Color.BLUE, fillColor = Color.BLUE, label = "Kensington-Malpeque (20)"),
-                21 to HeatMapFrame.Square(borderColor = Color.RED, fillColor = DARK_GREEN, label = "Summerside-Wilmot (21)"),
-                22 to HeatMapFrame.Square(borderColor = Color.RED, fillColor = DARK_GREEN, label = "Summerside-South Drive (22)"),
-                23 to HeatMapFrame.Square(borderColor = Color.RED, fillColor = DARK_GREEN, label = "Tyne Valley-Sherbrooke (23)"),
-                24 to HeatMapFrame.Square(borderColor = Color.RED, fillColor = Color.RED, label = "Evangeline-Miscouche (24)"),
-                25 to HeatMapFrame.Square(borderColor = Color.RED, fillColor = Color.RED, label = "O'Leary-Inverness (25)"),
-                26 to HeatMapFrame.Square(borderColor = Color.RED, fillColor = Color.BLUE, label = "Alberton-Bloomfield (26)"),
-                27 to HeatMapFrame.Square(borderColor = Color.RED, fillColor = Color.RED, label = "Tignish-Palmer Road (27)"))
+            1 to HeatMapFrame.Square(borderColor = Color.BLUE, fillColor = Color.BLUE, label = "Souris-Elmira (1)"),
+            2 to HeatMapFrame.Square(borderColor = Color.BLUE, fillColor = Color.BLUE, label = "Georgetown-Pownall (2)"),
+            3 to HeatMapFrame.Square(borderColor = Color.RED, fillColor = Color.BLUE, label = "Montague-Kilmuir (3)"),
+            4 to HeatMapFrame.Square(borderColor = Color.BLUE, fillColor = Color.BLUE, label = "Belfast-Murray River (4)"),
+            5 to HeatMapFrame.Square(borderColor = Color.RED, fillColor = DARK_GREEN, label = "Mermaid-Stratford (5)"),
+            6 to HeatMapFrame.Square(borderColor = Color.BLUE, fillColor = Color.BLUE, label = "Stratford-Keppoch (6)"),
+            7 to HeatMapFrame.Square(borderColor = Color.BLUE, fillColor = Color.BLUE, label = "Morell-Donagh (7)"),
+            8 to HeatMapFrame.Square(borderColor = Color.RED, fillColor = Color.BLUE, label = "Stanhope-Marshfield (8)"),
+            9 to HeatMapFrame.Square(borderColor = Color.RED, fillColor = Color.BLUE, label = "Charlottetown-Hillsborough Park (9)"),
+            10 to HeatMapFrame.Square(borderColor = Color.RED, fillColor = Color.RED, label = "Charlottetown-Winsloe (10)"),
+            11 to HeatMapFrame.Square(borderColor = Color.RED, fillColor = DARK_GREEN, label = "Charlottetown-Belvedere (11)"),
+            12 to HeatMapFrame.Square(borderColor = Color.RED, fillColor = DARK_GREEN, label = "Charlottetown-Victoria Park (12)"),
+            13 to HeatMapFrame.Square(borderColor = Color.RED, fillColor = DARK_GREEN, label = "Charlottetown-Brighton (13)"),
+            14 to HeatMapFrame.Square(borderColor = Color.RED, fillColor = Color.RED, label = "Charlottetown-West Royalty (14)"),
+            15 to HeatMapFrame.Square(borderColor = Color.RED, fillColor = Color.BLUE, label = "Brackley-Hunter River (15)"),
+            16 to HeatMapFrame.Square(borderColor = Color.RED, fillColor = Color.RED, label = "Cornwall-Meadowbank (16)"),
+            17 to HeatMapFrame.Square(borderColor = DARK_GREEN, fillColor = DARK_GREEN, label = "New Haven-Rocky Point (17)"),
+            18 to HeatMapFrame.Square(borderColor = Color.BLUE, fillColor = Color.BLUE, label = "Rustico-Emerald (18)"),
+            19 to HeatMapFrame.Square(borderColor = Color.BLUE, fillColor = Color.BLUE, label = "Borden-Kinkora (19)"),
+            20 to HeatMapFrame.Square(borderColor = Color.BLUE, fillColor = Color.BLUE, label = "Kensington-Malpeque (20)"),
+            21 to HeatMapFrame.Square(borderColor = Color.RED, fillColor = DARK_GREEN, label = "Summerside-Wilmot (21)"),
+            22 to HeatMapFrame.Square(borderColor = Color.RED, fillColor = DARK_GREEN, label = "Summerside-South Drive (22)"),
+            23 to HeatMapFrame.Square(borderColor = Color.RED, fillColor = DARK_GREEN, label = "Tyne Valley-Sherbrooke (23)"),
+            24 to HeatMapFrame.Square(borderColor = Color.RED, fillColor = Color.RED, label = "Evangeline-Miscouche (24)"),
+            25 to HeatMapFrame.Square(borderColor = Color.RED, fillColor = Color.RED, label = "O'Leary-Inverness (25)"),
+            26 to HeatMapFrame.Square(borderColor = Color.RED, fillColor = Color.BLUE, label = "Alberton-Bloomfield (26)"),
+            27 to HeatMapFrame.Square(borderColor = Color.RED, fillColor = Color.RED, label = "Tignish-Palmer Road (27)")
+        )
 
     companion object {
         private val DARK_GREEN = Color.GREEN.darker()

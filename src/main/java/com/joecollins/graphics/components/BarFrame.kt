@@ -124,34 +124,34 @@ class BarFrame(
         }
 
         var leftText: String
-        get() { return _leftText }
-        set(leftText) {
-            _leftText = leftText
-            resetPreferredSize()
-            repaint()
-        }
+            get() { return _leftText }
+            set(leftText) {
+                _leftText = leftText
+                resetPreferredSize()
+                repaint()
+            }
 
         var rightText: String
-        get() { return _rightText }
-        set(rightText) {
-            _rightText = rightText
-            resetPreferredSize()
-            repaint()
-        }
+            get() { return _rightText }
+            set(rightText) {
+                _rightText = rightText
+                resetPreferredSize()
+                repaint()
+            }
 
         var leftIcon: Shape?
-        get() { return _leftIcon }
-        set(leftIcon) {
-            _leftIcon = leftIcon
-            repaint()
-        }
+            get() { return _leftIcon }
+            set(leftIcon) {
+                _leftIcon = leftIcon
+                repaint()
+            }
 
         var series: List<Pair<Color, Number>>
-        get() { return _series }
-        set(series) {
-            _series = series
-            repaint()
-        }
+            get() { return _series }
+            set(series) {
+                _series = series
+                repaint()
+            }
 
         val totalPositive: Number
             get() = _series
@@ -248,9 +248,11 @@ class BarFrame(
             for (i in leftText.indices) {
                 var lineFont = font
                 if (shrinkLeft) {
-                    val maxWidth = (width -
+                    val maxWidth = (
+                        width -
                             (if (shrinkRight) (width + minSpaceBetween) / 2 else maxRightWidth + minSpaceBetween) -
-                            leftIconWidth)
+                            leftIconWidth
+                        )
                     for (fontSize in font.size downTo 2) {
                         lineFont = font.deriveFont(fontSize.toFloat())
                         val width = g.getFontMetrics(lineFont).stringWidth(leftText[i])
@@ -274,8 +276,10 @@ class BarFrame(
             for (i in rightText.indices) {
                 var lineFont = font
                 if (shrinkRight) {
-                    val maxWidth = (width -
-                            if (shrinkLeft) (width + minSpaceBetween) / 2 else maxLeftWidth + leftIconWidth + minSpaceBetween)
+                    val maxWidth = (
+                        width -
+                            if (shrinkLeft) (width + minSpaceBetween) / 2 else maxLeftWidth + leftIconWidth + minSpaceBetween
+                        )
                     for (fontSize in font.size downTo 2) {
                         lineFont = font.deriveFont(fontSize.toFloat())
                         val width = g.getFontMetrics(lineFont).stringWidth(rightText[i])
@@ -339,10 +343,10 @@ class BarFrame(
         }
 
         var label: String
-        get() { return jLabel.text }
-        set(label) {
-            jLabel.text = label
-        }
+            get() { return jLabel.text }
+            set(label) {
+                jLabel.text = label
+            }
     }
 
     private inner class BarFrameLayout : LayoutManager {
@@ -390,10 +394,13 @@ class BarFrame(
                 top += height
             }
             val barHeight = (
-                    (bars
-                .map { i -> i.preferredSize.height }
-                .maxOrNull() ?: 0) *
-                            factor).toInt()
+                (
+                    bars
+                        .map { i -> i.preferredSize.height }
+                        .maxOrNull() ?: 0
+                    ) *
+                    factor
+                ).toInt()
             for (bar in bars) {
                 bar.setLocation(0, top)
                 bar.setSize(width, barHeight)

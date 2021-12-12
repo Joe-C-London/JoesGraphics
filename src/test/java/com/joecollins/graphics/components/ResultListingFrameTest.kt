@@ -5,11 +5,11 @@ import com.joecollins.bindings.Binding.Companion.fixedBinding
 import com.joecollins.bindings.mapElements
 import com.joecollins.graphics.utils.BindableWrapper
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
+import org.junit.Assert
+import org.junit.Test
 import java.awt.Color
 import java.io.IOException
 import kotlin.Throws
-import org.junit.Assert
-import org.junit.Test
 
 class ResultListingFrameTest {
     @Test
@@ -191,31 +191,31 @@ class ResultListingFrameTest {
         }
 
         var text: String
-        get() = _text
-        set(text) {
-            this._text = text
-            onPropertyRefreshed(Property.TEXT)
-        }
+            get() = _text
+            set(text) {
+                this._text = text
+                onPropertyRefreshed(Property.TEXT)
+            }
 
         var foreground: Color
-        get() = _foreground
-        set(foreground) {
-            this._foreground = foreground
-            onPropertyRefreshed(Property.FOREGROUND)
-        }
+            get() = _foreground
+            set(foreground) {
+                this._foreground = foreground
+                onPropertyRefreshed(Property.FOREGROUND)
+            }
 
         var background: Color
-        get() = _background
-        set(background) {
-            this._background = background
-            onPropertyRefreshed(Property.BACKGROUND)
-        }
+            get() = _background
+            set(background) {
+                this._background = background
+                onPropertyRefreshed(Property.BACKGROUND)
+            }
 
         var border: Color
-        get() = _border
-        set(border) {
-            this._border = border
-            onPropertyRefreshed(Property.BORDER)
-        }
+            get() = _border
+            set(border) {
+                this._border = border
+                onPropertyRefreshed(Property.BORDER)
+            }
     }
 }

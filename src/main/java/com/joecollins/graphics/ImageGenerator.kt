@@ -12,8 +12,10 @@ object ImageGenerator {
     @JvmStatic fun createTickShape(): Shape {
         val shape = Area(Rectangle(0, 0, 100, 100))
         shape.subtract(
-                Area(
-                        Polygon(intArrayOf(10, 40, 90, 80, 40, 20), intArrayOf(50, 80, 30, 20, 60, 40), 6)))
+            Area(
+                Polygon(intArrayOf(10, 40, 90, 80, 40, 20), intArrayOf(50, 80, 30, 20, 60, 40), 6)
+            )
+        )
         return shape
     }
 
@@ -38,18 +40,26 @@ object ImageGenerator {
     @JvmStatic fun createCrossShape(): Shape {
         val shape = Area(Rectangle(0, 0, 100, 100))
         shape.subtract(
-                Area(
-                        Polygon(intArrayOf(15, 25, 50, 75, 85, 60, 85, 75, 50, 25, 15, 40), intArrayOf(25, 15, 40, 15, 25, 50, 75, 85, 60, 85, 75, 50),
-                                12)))
+            Area(
+                Polygon(
+                    intArrayOf(15, 25, 50, 75, 85, 60, 85, 75, 50, 25, 15, 40), intArrayOf(25, 15, 40, 15, 25, 50, 75, 85, 60, 85, 75, 50),
+                    12
+                )
+            )
+        )
         return shape
     }
 
     @JvmStatic fun createRunoffShape(): Shape {
         val shape = Area(Rectangle(0, 0, 100, 100))
         shape.subtract(
-                Area(
-                        Polygon(intArrayOf(10, 10, 50, 50, 90, 50, 50), intArrayOf(30, 70, 70, 90, 50, 10, 30),
-                                7)))
+            Area(
+                Polygon(
+                    intArrayOf(10, 10, 50, 50, 90, 50, 50), intArrayOf(30, 70, 70, 90, 50, 10, 30),
+                    7
+                )
+            )
+        )
         return shape
     }
 

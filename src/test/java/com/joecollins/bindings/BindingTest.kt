@@ -37,7 +37,7 @@ class BindingTest {
         val boundValue: BoundResult<String> = BoundResult()
         val bindable = BindableInt(7)
         val binding = propertyBinding(bindable, { it.value }, BindableValue.Property.VALUE)
-                .map { it.toString() }
+            .map { it.toString() }
         binding.bind { boundValue.value = it }
         Assert.assertEquals("7", boundValue.value)
         bindable.setValue(42)
@@ -141,10 +141,10 @@ class BindingTest {
         val boundValue: BoundResult<Int> = BoundResult()
         val list = listOf(BindableInt(1), BindableInt(2), BindableInt(3))
         val bindings = list
-                .map { b: BindableInt ->
-                    propertyBinding(b, { it.value }, BindableValue.Property.VALUE)
-                }
-                .toList()
+            .map { b: BindableInt ->
+                propertyBinding(b, { it.value }, BindableValue.Property.VALUE)
+            }
+            .toList()
         val binding = mapReduceBinding(bindings, 0, { a: Int, v: Int -> a + v }, { a: Int, v: Int -> a - v })
         binding.bind { boundValue.value = it }
         Assert.assertEquals(6, boundValue.value.toLong())

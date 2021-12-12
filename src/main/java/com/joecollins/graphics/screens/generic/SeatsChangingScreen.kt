@@ -78,26 +78,27 @@ class SeatsChangingScreen private constructor(title: JLabel, frame: ResultListin
 
         fun setPrevResults(prevResults: Map<T, Map<Party, Int>>) {
             this.prevResults = prevResults.entries
-                    .asSequence()
-                    .map { e: Map.Entry<T, Map<Party, Int>> ->
-                        val votes = e.value
-                        val total = votes.values.sum()
-                        val topTwo = votes.values
-                                .sortedDescending()
-                                .take(2)
-                                .toList()
-                        Pair(e, 1.0 * (topTwo[0] - topTwo[1]) / total)
-                    }
-                    .sortedBy { it.second }
-                    .map { it.first }
-                    .map { it: Map.Entry<T, Map<Party, Int>> ->
-                        Pair(
-                                it.key,
-                                it.value.entries
-                                        .maxByOrNull { it.value }
-                                        !!.key)
-                    }
-                    .toList()
+                .asSequence()
+                .map { e: Map.Entry<T, Map<Party, Int>> ->
+                    val votes = e.value
+                    val total = votes.values.sum()
+                    val topTwo = votes.values
+                        .sortedDescending()
+                        .take(2)
+                        .toList()
+                    Pair(e, 1.0 * (topTwo[0] - topTwo[1]) / total)
+                }
+                .sortedBy { it.second }
+                .map { it.first }
+                .map { it: Map.Entry<T, Map<Party, Int>> ->
+                    Pair(
+                        it.key,
+                        it.value.entries
+                            .maxByOrNull { it.value }
+                        !!.key
+                    )
+                }
+                .toList()
             onPropertyRefreshed(Property.PREV)
         }
 
@@ -113,32 +114,35 @@ class SeatsChangingScreen private constructor(title: JLabel, frame: ResultListin
 
         val resultBinding: Binding<List<Entry<T>>>
             get() = Binding.propertyBinding(
-                    this,
-                    { t: Input<T> ->
-                        t.prevResults
-                                .asSequence()
-                                .map {
-                                    Triple(
-                                            it.first,
-                                            it.second,
-                                            t.currResults[it.first] ?: PartyResult.NO_RESULT)
-                                }
-                                .filter { it.third.party != null }
-                                .filter { it.second != it.third.party }
-                                .map {
-                                    val seatFilter = t.seatFilter
-                                    val colorFunc = if (seatFilter == null || seatFilter.contains(it.first)) { c: Color -> c } else { c: Color -> lighten(lighten(c)) }
-                                    Entry(
-                                            it.first,
-                                            colorFunc(it.second.color),
-                                            colorFunc(it.third.party!!.color),
-                                            it.third.isElected)
-                                }
-                                .toList()
-                    },
-                    Property.PREV,
-                    Property.CURR,
-                    Property.FILTER)
+                this,
+                { t: Input<T> ->
+                    t.prevResults
+                        .asSequence()
+                        .map {
+                            Triple(
+                                it.first,
+                                it.second,
+                                t.currResults[it.first] ?: PartyResult.NO_RESULT
+                            )
+                        }
+                        .filter { it.third.party != null }
+                        .filter { it.second != it.third.party }
+                        .map {
+                            val seatFilter = t.seatFilter
+                            val colorFunc = if (seatFilter == null || seatFilter.contains(it.first)) { c: Color -> c } else { c: Color -> lighten(lighten(c)) }
+                            Entry(
+                                it.first,
+                                colorFunc(it.second.color),
+                                colorFunc(it.third.party!!.color),
+                                it.third.isElected
+                            )
+                        }
+                        .toList()
+                },
+                Property.PREV,
+                Property.CURR,
+                Property.FILTER
+            )
     }
 
     private class Entry<T>(val key: T, val prevColor: Color, val resultColor: Color, val fill: Boolean)

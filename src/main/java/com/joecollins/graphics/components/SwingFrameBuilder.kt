@@ -4,12 +4,12 @@ import com.joecollins.bindings.Bindable
 import com.joecollins.bindings.Binding
 import com.joecollins.graphics.components.SwingFrameBuilder.SwingProperties.SwingProperty
 import com.joecollins.models.general.Party
+import org.apache.commons.collections4.ComparatorUtils
 import java.awt.Color
 import java.text.DecimalFormat
 import java.util.Comparator
 import java.util.HashMap
 import kotlin.math.sign
-import org.apache.commons.collections4.ComparatorUtils
 
 class SwingFrameBuilder {
     private class SwingProperties : Bindable<SwingProperties, SwingProperty>() {
@@ -24,39 +24,39 @@ class SwingFrameBuilder {
         private var _bottomColor = Color.BLACK
 
         var leftColor: Color
-        get() { return _leftColor }
-        set(leftColor) {
-            _leftColor = leftColor
-            onPropertyRefreshed(SwingProperty.LEFT_COLOR)
-        }
+            get() { return _leftColor }
+            set(leftColor) {
+                _leftColor = leftColor
+                onPropertyRefreshed(SwingProperty.LEFT_COLOR)
+            }
 
         var rightColor: Color
-        get() { return _rightColor }
-        set(rightColor) {
-            this._rightColor = rightColor
-            onPropertyRefreshed(SwingProperty.RIGHT_COLOR)
-        }
+            get() { return _rightColor }
+            set(rightColor) {
+                this._rightColor = rightColor
+                onPropertyRefreshed(SwingProperty.RIGHT_COLOR)
+            }
 
         var value: Number
-        get() { return _value }
-        set(value) {
-            this._value = value
-            onPropertyRefreshed(SwingProperty.VALUE)
-        }
+            get() { return _value }
+            set(value) {
+                this._value = value
+                onPropertyRefreshed(SwingProperty.VALUE)
+            }
 
         var text: String
-        get() { return _text }
-        set(text) {
-            this._text = text
-            onPropertyRefreshed(SwingProperty.TEXT)
-        }
+            get() { return _text }
+            set(text) {
+                this._text = text
+                onPropertyRefreshed(SwingProperty.TEXT)
+            }
 
         var bottomColor: Color
-        get() { return _bottomColor }
-        set(bottomColor) {
-            this._bottomColor = bottomColor
-            onPropertyRefreshed(SwingProperty.BOTTOM_COLOR)
-        }
+            get() { return _bottomColor }
+            set(bottomColor) {
+                this._bottomColor = bottomColor
+                onPropertyRefreshed(SwingProperty.BOTTOM_COLOR)
+            }
     }
 
     private var rangeBinding: Binding<Number>? = null
@@ -125,14 +125,14 @@ class SwingFrameBuilder {
 
         fun setProperties() {
             fromParty = prevPct.entries
-                    .filter { e -> !java.lang.Double.isNaN(e.value) }
-                    .maxByOrNull { it.value }
-                    ?.key
+                .filter { e -> !java.lang.Double.isNaN(e.value) }
+                .maxByOrNull { it.value }
+                ?.key
             toParty = currPct.entries
-                    .filter { e -> e.key != fromParty }
-                    .filter { e -> !java.lang.Double.isNaN(e.value) }
-                    .maxByOrNull { it.value }
-                    ?.key
+                .filter { e -> e.key != fromParty }
+                .filter { e -> !java.lang.Double.isNaN(e.value) }
+                .maxByOrNull { it.value }
+                ?.key
             if (fromParty != null && toParty != null) {
                 val fromSwing = (currPct[fromParty] ?: 0.0) - (prevPct[fromParty] ?: 0.0)
                 val toSwing = (currPct[toParty] ?: 0.0) - (prevPct[toParty] ?: 0.0)
@@ -171,55 +171,62 @@ class SwingFrameBuilder {
             prevBinding.bind { prevCurr.setPrevPct(toPctFunc(it)) }
             currBinding.bind { prevCurr.setCurrPct(toPctFunc(it)) }
             val ret = basic(
-                    Binding.propertyBinding(prevCurr, { it }, SingletonProperty.ALL),
-                    {
-                        val fromParty = it.fromParty
-                        val toParty = it.toParty
-                        if (fromParty == null || toParty == null) {
-                            Color.LIGHT_GRAY
-                        } else {
-                            ComparatorUtils.max(fromParty, toParty, partyOrder).color
-                        }
-                    },
-                    {
-                        val fromParty = it.fromParty
-                        val toParty = it.toParty
-                        if (fromParty == null || toParty == null) {
-                            Color.LIGHT_GRAY
-                        } else {
-                            (if (ComparatorUtils.max(fromParty, toParty, partyOrder) == fromParty) toParty else fromParty).color
-                        }
-                    },
-                    {
-                        val fromParty = it.fromParty
-                        val toParty = it.toParty
-                        if (fromParty == null || toParty == null) {
-                            0
-                        } else {
-                            (it.swing
-                                    * sign(
+                Binding.propertyBinding(prevCurr, { it }, SingletonProperty.ALL),
+                {
+                    val fromParty = it.fromParty
+                    val toParty = it.toParty
+                    if (fromParty == null || toParty == null) {
+                        Color.LIGHT_GRAY
+                    } else {
+                        ComparatorUtils.max(fromParty, toParty, partyOrder).color
+                    }
+                },
+                {
+                    val fromParty = it.fromParty
+                    val toParty = it.toParty
+                    if (fromParty == null || toParty == null) {
+                        Color.LIGHT_GRAY
+                    } else {
+                        (if (ComparatorUtils.max(fromParty, toParty, partyOrder) == fromParty) toParty else fromParty).color
+                    }
+                },
+                {
+                    val fromParty = it.fromParty
+                    val toParty = it.toParty
+                    if (fromParty == null || toParty == null) {
+                        0
+                    } else {
+                        (
+                            it.swing
+                                * sign(
                                     if (ComparatorUtils.max(fromParty, toParty, partyOrder)
-                                            == fromParty) -1.0 else 1.0))
-                        }
-                    },
-                    {
-                        val fromParty = it.fromParty
-                        val toParty = it.toParty
-                        val swing = it.swing
-                        if (fromParty == null || toParty == null) {
-                            "NOT AVAILABLE"
-                        } else if (swing == 0.0) {
-                            "NO SWING"
-                        } else {
-                            (DecimalFormat("0.0%").format(swing) +
-                                    " SWING " +
-                                    fromParty.abbreviation.uppercase() +
-                                    " TO " +
-                                    toParty.abbreviation.uppercase())
-                        }
-                    })
-                    .withRange(Binding.fixedBinding(0.1))
-                    .withNeutralColor(Binding.fixedBinding(Color.LIGHT_GRAY))
+                                        == fromParty
+                                    ) -1.0 else 1.0
+                                )
+                            )
+                    }
+                },
+                {
+                    val fromParty = it.fromParty
+                    val toParty = it.toParty
+                    val swing = it.swing
+                    if (fromParty == null || toParty == null) {
+                        "NOT AVAILABLE"
+                    } else if (swing == 0.0) {
+                        "NO SWING"
+                    } else {
+                        (
+                            DecimalFormat("0.0%").format(swing) +
+                                " SWING " +
+                                fromParty.abbreviation.uppercase() +
+                                " TO " +
+                                toParty.abbreviation.uppercase()
+                            )
+                    }
+                }
+            )
+                .withRange(Binding.fixedBinding(0.1))
+                .withNeutralColor(Binding.fixedBinding(Color.LIGHT_GRAY))
             return ret
         }
 
@@ -243,10 +250,12 @@ class SwingFrameBuilder {
             builder.leftColorBinding =
                 Binding.propertyBinding(props, { p: SwingProperties -> p.leftColor }, SwingProperty.LEFT_COLOR)
             builder.rightColorBinding = Binding.propertyBinding(
-                    props, { p: SwingProperties -> p.rightColor }, SwingProperty.RIGHT_COLOR)
+                props, { p: SwingProperties -> p.rightColor }, SwingProperty.RIGHT_COLOR
+            )
             builder.valueBinding = Binding.propertyBinding(props, { p: SwingProperties -> p.value }, SwingProperty.VALUE)
             builder.bottomColorBinding = Binding.propertyBinding(
-                    props, { p: SwingProperties -> p.bottomColor }, SwingProperty.BOTTOM_COLOR)
+                props, { p: SwingProperties -> p.bottomColor }, SwingProperty.BOTTOM_COLOR
+            )
             builder.bottomTextBinding = Binding.propertyBinding(props, { p: SwingProperties -> p.text }, SwingProperty.TEXT)
             binding.bind {
                 props.leftColor = leftColorFunc(it)

@@ -9,12 +9,12 @@ import com.joecollins.graphics.components.HemicycleFrameBuilder.Tiebreaker
 import com.joecollins.graphics.utils.BindableWrapper
 import com.joecollins.graphics.utils.ColorUtils.lighten
 import com.joecollins.models.general.Party
+import org.junit.Assert
+import org.junit.Test
 import java.awt.Color
 import java.text.DecimalFormat
 import java.util.ArrayList
 import java.util.Collections
-import org.junit.Assert
-import org.junit.Test
 
 @Suppress("UNUSED_ANONYMOUS_PARAMETER")
 class HemicycleFrameBuilderTest {
@@ -33,31 +33,34 @@ class HemicycleFrameBuilderTest {
         val leftChangeBars = BindableWrapper(listOf(Pair(Color.GREEN, +7)))
         val rightChangeBars = BindableWrapper(listOf(Pair(Color.BLUE, +5)))
         val frame = of(
-                rows,
-                dots,
-                { fixedBinding(it.first) },
-                { fixedBinding(it.second) },
-                Tiebreaker.FRONT_ROW_FROM_RIGHT)
-                .withLeftSeatBars(leftSeatBars.binding, { it.first }, { it.second }, fixedBinding("GREEN: 8"))
-                .withRightSeatBars(rightSeatBars.binding, { it.first }, { it.second }, fixedBinding("PROGRESSIVE CONSERVATIVE: 13"))
-                .withMiddleSeatBars(middleSeatBars.binding, { it.first }, { it.second }, fixedBinding("LIBERAL: 6"))
-                .withLeftChangeBars(leftChangeBars.binding, { it.first }, { it.second }, fixedBinding(1), fixedBinding("GRN: +7"))
-                .withRightChangeBars(rightChangeBars.binding, { it.first }, { it.second }, fixedBinding(8), fixedBinding("PC: +5"))
-                .withHeader(fixedBinding("PEI"))
-                .build()
+            rows,
+            dots,
+            { fixedBinding(it.first) },
+            { fixedBinding(it.second) },
+            Tiebreaker.FRONT_ROW_FROM_RIGHT
+        )
+            .withLeftSeatBars(leftSeatBars.binding, { it.first }, { it.second }, fixedBinding("GREEN: 8"))
+            .withRightSeatBars(rightSeatBars.binding, { it.first }, { it.second }, fixedBinding("PROGRESSIVE CONSERVATIVE: 13"))
+            .withMiddleSeatBars(middleSeatBars.binding, { it.first }, { it.second }, fixedBinding("LIBERAL: 6"))
+            .withLeftChangeBars(leftChangeBars.binding, { it.first }, { it.second }, fixedBinding(1), fixedBinding("GRN: +7"))
+            .withRightChangeBars(rightChangeBars.binding, { it.first }, { it.second }, fixedBinding(8), fixedBinding("PC: +5"))
+            .withHeader(fixedBinding("PEI"))
+            .build()
         Assert.assertEquals(3, frame.numRows.toLong())
         Assert.assertEquals(7, frame.getRowCount(0).toLong())
         Assert.assertEquals(9, frame.getRowCount(1).toLong())
         Assert.assertEquals(11, frame.getRowCount(2).toLong())
         Assert.assertEquals(27, frame.numDots.toLong())
         val expectedDots = listOf(
-                Color.GREEN, Color.GREEN, Color.RED, Color.BLUE, Color.BLUE, Color.BLUE, Color.BLUE, //
-                Color.GREEN, Color.GREEN, Color.GREEN, Color.RED, Color.RED, Color.BLUE, Color.BLUE, Color.BLUE, Color.BLUE, //
-                Color.GREEN, Color.GREEN, Color.GREEN, Color.RED, Color.RED, Color.RED, Color.BLUE, Color.BLUE, Color.BLUE, Color.BLUE, Color.BLUE)
+            Color.GREEN, Color.GREEN, Color.RED, Color.BLUE, Color.BLUE, Color.BLUE, Color.BLUE, //
+            Color.GREEN, Color.GREEN, Color.GREEN, Color.RED, Color.RED, Color.BLUE, Color.BLUE, Color.BLUE, Color.BLUE, //
+            Color.GREEN, Color.GREEN, Color.GREEN, Color.RED, Color.RED, Color.RED, Color.BLUE, Color.BLUE, Color.BLUE, Color.BLUE, Color.BLUE
+        )
         val expectedBorders = listOf(
-                Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.BLUE, Color.BLUE, //
-                Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.BLUE, Color.BLUE, Color.BLUE, //
-                Color.GREEN, Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.BLUE, Color.BLUE, Color.BLUE)
+            Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.BLUE, Color.BLUE, //
+            Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.BLUE, Color.BLUE, Color.BLUE, //
+            Color.GREEN, Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.BLUE, Color.BLUE, Color.BLUE
+        )
         for (i in 0 until frame.numDots) {
             Assert.assertEquals("Dot color $i", expectedDots[i], frame.getDotColor(i))
             Assert.assertEquals("Dot border $i", expectedBorders[i], frame.getDotBorder(i))
@@ -116,19 +119,20 @@ class HemicycleFrameBuilderTest {
         ridings.add(Riding("Lake Laberge", yp, true, yp))
         ridings.add(Riding("Whitehorse West", lib, false, yp))
         val frame = ofElectedLeading(
-                listOf(ridings.size),
-                ridings,
-                { fixedBinding(HemicycleFrameBuilder.Result(it.leader, it.hasWon)) },
-                { it.prev },
-                lib,
-                yp,
-                { e: Int, l: Int -> "LIB: $e/$l" },
-                { e: Int, l: Int -> "YP: $e/$l" },
-                { e: Int, l: Int -> "OTH: $e/$l" },
-                { e: Int, l: Int -> l > 0 },
-                { e: Int, l: Int -> DecimalFormat("+0;-0").format(e) + "/" + DecimalFormat("+0;-0").format(l) },
-                Tiebreaker.FRONT_ROW_FROM_LEFT,
-                fixedBinding("YUKON"))
+            listOf(ridings.size),
+            ridings,
+            { fixedBinding(HemicycleFrameBuilder.Result(it.leader, it.hasWon)) },
+            { it.prev },
+            lib,
+            yp,
+            { e: Int, l: Int -> "LIB: $e/$l" },
+            { e: Int, l: Int -> "YP: $e/$l" },
+            { e: Int, l: Int -> "OTH: $e/$l" },
+            { e: Int, l: Int -> l > 0 },
+            { e: Int, l: Int -> DecimalFormat("+0;-0").format(e) + "/" + DecimalFormat("+0;-0").format(l) },
+            Tiebreaker.FRONT_ROW_FROM_LEFT,
+            fixedBinding("YUKON")
+        )
         Assert.assertEquals(19, frame.numDots.toLong())
         Assert.assertEquals(Color.RED, frame.getDotBorder(0))
         Assert.assertEquals(lighten(Color.RED), frame.getDotColor(0))
@@ -175,12 +179,13 @@ class HemicycleFrameBuilderTest {
         class Result(var leader: Party?, var hasWon: Boolean, val prev: Party) : Bindable<Result, Property>() {
             val binding: Binding<HemicycleFrameBuilder.Result?>
                 get() = Binding.propertyBinding(
-                        this,
-                        {
-                            if (leader == null) null
-                            else HemicycleFrameBuilder.Result(leader, hasWon)
-                        },
-                        Property.PROP)
+                    this,
+                    {
+                        if (leader == null) null
+                        else HemicycleFrameBuilder.Result(leader, hasWon)
+                    },
+                    Property.PROP
+                )
 
             fun setResult(leader: Party?, hasWon: Boolean) {
                 this.leader = leader
@@ -192,19 +197,20 @@ class HemicycleFrameBuilderTest {
         val result = Result(null, false, gop)
         val results = Collections.nCopies(30, result)
         val frame = ofElectedLeading(
-                listOf(results.size),
-                results,
-                { it.binding },
-                { it.prev },
-                dem,
-                gop,
-                { e: Int, l: Int -> "DEM: $e/$l" },
-                { e: Int, l: Int -> "GOP: $e/$l" },
-                { e: Int, l: Int -> "OTH: $e/$l" },
-                { e: Int, l: Int -> l > 0 },
-                { e: Int, l: Int -> DecimalFormat("+0;-0").format(e) + "/" + DecimalFormat("+0;-0").format(l) },
-                Tiebreaker.FRONT_ROW_FROM_LEFT,
-                fixedBinding("TEST"))
+            listOf(results.size),
+            results,
+            { it.binding },
+            { it.prev },
+            dem,
+            gop,
+            { e: Int, l: Int -> "DEM: $e/$l" },
+            { e: Int, l: Int -> "GOP: $e/$l" },
+            { e: Int, l: Int -> "OTH: $e/$l" },
+            { e: Int, l: Int -> l > 0 },
+            { e: Int, l: Int -> DecimalFormat("+0;-0").format(e) + "/" + DecimalFormat("+0;-0").format(l) },
+            Tiebreaker.FRONT_ROW_FROM_LEFT,
+            fixedBinding("TEST")
+        )
         Assert.assertEquals(30, frame.numDots.toLong())
         Assert.assertEquals(Color.RED, frame.getDotBorder(0))
         Assert.assertEquals(Color.WHITE, frame.getDotColor(0))
@@ -242,12 +248,13 @@ class HemicycleFrameBuilderTest {
         class Result(var leader: Party?, var hasWon: Boolean, val prev: Party, val numSeats: Int) : Bindable<Result, Property>() {
             val binding: Binding<HemicycleFrameBuilder.Result?>
                 get() = Binding.propertyBinding(
-                        this,
-                        {
-                            if (leader == null) return@propertyBinding null
-                            HemicycleFrameBuilder.Result(leader, hasWon)
-                        },
-                        Property.PROP)
+                    this,
+                    {
+                        if (leader == null) return@propertyBinding null
+                        HemicycleFrameBuilder.Result(leader, hasWon)
+                    },
+                    Property.PROP
+                )
 
             fun setResult(leader: Party?, hasWon: Boolean) {
                 this.leader = leader
@@ -259,20 +266,21 @@ class HemicycleFrameBuilderTest {
         val result = Result(null, false, gop, 30)
         val results = listOf(result)
         val frame = ofElectedLeading(
-                listOf(results.map { it.numSeats }.sum()),
-                results,
-                { it.numSeats },
-                { it.binding },
-                { it.prev },
-                dem,
-                gop,
-                { e: Int, l: Int -> "DEM: $e/$l" },
-                { e: Int, l: Int -> "GOP: $e/$l" },
-                { e: Int, l: Int -> "OTH: $e/$l" },
-                { e: Int, l: Int -> true },
-                { e: Int, l: Int -> DecimalFormat("+0;-0").format(e) + "/" + DecimalFormat("+0;-0").format(l) },
-                Tiebreaker.FRONT_ROW_FROM_LEFT,
-                fixedBinding("TEST"))
+            listOf(results.map { it.numSeats }.sum()),
+            results,
+            { it.numSeats },
+            { it.binding },
+            { it.prev },
+            dem,
+            gop,
+            { e: Int, l: Int -> "DEM: $e/$l" },
+            { e: Int, l: Int -> "GOP: $e/$l" },
+            { e: Int, l: Int -> "OTH: $e/$l" },
+            { e: Int, l: Int -> true },
+            { e: Int, l: Int -> DecimalFormat("+0;-0").format(e) + "/" + DecimalFormat("+0;-0").format(l) },
+            Tiebreaker.FRONT_ROW_FROM_LEFT,
+            fixedBinding("TEST")
+        )
         Assert.assertEquals(30, frame.numDots.toLong())
         Assert.assertEquals(Color.RED, frame.getDotBorder(0))
         Assert.assertEquals(Color.WHITE, frame.getDotColor(0))
@@ -335,7 +343,8 @@ class HemicycleFrameBuilderTest {
         class Result(var leader: Party?, var hasWon: Boolean, val prev: Party, val numSeats: Int) : Bindable<Result, Property>() {
             val binding: Binding<HemicycleFrameBuilder.Result?>
                 get() = Binding.propertyBinding(
-                        this, { HemicycleFrameBuilder.Result(leader, hasWon) }, Property.PROP)
+                    this, { HemicycleFrameBuilder.Result(leader, hasWon) }, Property.PROP
+                )
 
             fun setResult(leader: Party?, hasWon: Boolean) {
                 this.leader = leader
@@ -347,20 +356,21 @@ class HemicycleFrameBuilderTest {
         val result = Result(null, false, gop, 30)
         val results = listOf(result)
         val frame = ofElectedLeading(
-                listOf(results.map { it.numSeats }.sum()),
-                results,
-                { it.numSeats },
-                { it.binding },
-                { it.prev },
-                dem,
-                gop,
-                { e: Int, l: Int -> "DEM: $e/$l" },
-                { e: Int, l: Int -> "GOP: $e/$l" },
-                { e: Int, l: Int -> "OTH: $e/$l" },
-                { e: Int, l: Int -> true },
-                { e: Int, l: Int -> DecimalFormat("+0;-0").format(e) + "/" + DecimalFormat("+0;-0").format(l) },
-                Tiebreaker.FRONT_ROW_FROM_LEFT,
-                fixedBinding("TEST"))
+            listOf(results.map { it.numSeats }.sum()),
+            results,
+            { it.numSeats },
+            { it.binding },
+            { it.prev },
+            dem,
+            gop,
+            { e: Int, l: Int -> "DEM: $e/$l" },
+            { e: Int, l: Int -> "GOP: $e/$l" },
+            { e: Int, l: Int -> "OTH: $e/$l" },
+            { e: Int, l: Int -> true },
+            { e: Int, l: Int -> DecimalFormat("+0;-0").format(e) + "/" + DecimalFormat("+0;-0").format(l) },
+            Tiebreaker.FRONT_ROW_FROM_LEFT,
+            fixedBinding("TEST")
+        )
         Assert.assertEquals(30, frame.numDots.toLong())
         Assert.assertEquals(Color.RED, frame.getDotBorder(0))
         Assert.assertEquals(Color.WHITE, frame.getDotColor(0))

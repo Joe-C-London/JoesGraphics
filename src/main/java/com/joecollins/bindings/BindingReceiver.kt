@@ -14,14 +14,14 @@ class BindingReceiver<T>(binding: Binding<T>) {
         private var _value: T? = null
 
         var value: T
-        get() {
-            @Suppress("UNCHECKED_CAST")
-            return _value as T
-        }
-        set(v) {
-            _value = v
-            onPropertyRefreshed(Property.VALUE)
-        }
+            get() {
+                @Suppress("UNCHECKED_CAST")
+                return _value as T
+            }
+            set(v) {
+                _value = v
+                onPropertyRefreshed(Property.VALUE)
+            }
     }
 
     val value: T get() = _value.value

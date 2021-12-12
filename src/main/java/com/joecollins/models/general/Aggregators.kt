@@ -72,7 +72,8 @@ object Aggregators {
         return Binding.mapReduceBinding(
             items.map { e ->
                 val weight = weightFunc(e)
-                pctReportingFunc(e).map { it * weight } },
+                pctReportingFunc(e).map { it * weight }
+            },
             0.0,
             { a, p -> a + (p / totalWeight) },
             { a, p -> a - (p / totalWeight) }

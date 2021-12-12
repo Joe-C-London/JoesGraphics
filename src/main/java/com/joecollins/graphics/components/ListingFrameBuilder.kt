@@ -62,7 +62,8 @@ class ListingFrameBuilder {
                 list.map {
                     leftTextFunc(it).merge(rightTextFunc(it)) { left, right -> Pair(left, right) }
                         .merge(colorFunc(it)) {
-                                (left, right), color -> BarFrame.Bar(left, right, listOf(Pair(color, 1)))
+                            (left, right), color ->
+                            BarFrame.Bar(left, right, listOf(Pair(color, 1)))
                         }
                 }
             )

@@ -124,74 +124,74 @@ class SwingometerFrame(
         private var _dots: List<Dot> = ArrayList()
 
         var leftColor: Color
-        get() { return _leftColor }
-        set(leftColor) {
-            _leftColor = leftColor
-            repaint()
-        }
+            get() { return _leftColor }
+            set(leftColor) {
+                _leftColor = leftColor
+                repaint()
+            }
 
         var rightColor: Color
-        get() { return _rightColor }
-        set(rightColor) {
-            _rightColor = rightColor
-            repaint()
-        }
+            get() { return _rightColor }
+            set(rightColor) {
+                _rightColor = rightColor
+                repaint()
+            }
 
         var value: Number
-        get() { return _value }
-        set(value) {
-            _value = value
-            repaint()
-        }
+            get() { return _value }
+            set(value) {
+                _value = value
+                repaint()
+            }
 
         var range: Number
-        get() { return _range }
-        set(range) {
-            _range = range
-            repaint()
-        }
+            get() { return _range }
+            set(range) {
+                _range = range
+                repaint()
+            }
 
         var leftToWin: Number
-        get() { return _leftToWin }
-        set(leftToWin) {
-            _leftToWin = leftToWin
-            repaint()
-        }
+            get() { return _leftToWin }
+            set(leftToWin) {
+                _leftToWin = leftToWin
+                repaint()
+            }
 
         var rightToWin: Number
-        get() { return _rightToWin }
-        set(rightToWin) {
-            _rightToWin = rightToWin
-            repaint()
-        }
+            get() { return _rightToWin }
+            set(rightToWin) {
+                _rightToWin = rightToWin
+                repaint()
+            }
 
         var ticks: List<Tick>
-        get() { return _ticks }
-        set(ticks) {
-            _ticks = ticks
-            repaint()
-        }
+            get() { return _ticks }
+            set(ticks) {
+                _ticks = ticks
+                repaint()
+            }
 
         var outerLabels: List<OuterLabel>
-        get() { return _outerLabels }
-        set(outerLabels) {
-            _outerLabels = outerLabels
-            repaint()
-        }
+            get() { return _outerLabels }
+            set(outerLabels) {
+                _outerLabels = outerLabels
+                repaint()
+            }
 
         var numBucketsPerSide: Int
-        get() { return _numBucketsPerSide }
-        set(numBucketsPerSide) {
-            _numBucketsPerSide = numBucketsPerSide
-            repaint()
-        }
+            get() { return _numBucketsPerSide }
+            set(numBucketsPerSide) {
+                _numBucketsPerSide = numBucketsPerSide
+                repaint()
+            }
 
         var dots: List<Dot>
-        get() { return _dots }
-        set(dots) {
-            _dots = dots
-            repaint()
-        }
+            get() { return _dots }
+            set(dots) {
+                _dots = dots
+                repaint()
+            }
 
         override fun paintComponent(g: Graphics) {
             super.paintComponent(g)
@@ -228,17 +228,23 @@ class SwingometerFrame(
                 .filter { e: Dot -> abs(e.position.toDouble()) <= range.toDouble() }
                 .sortedBy { e: Dot -> abs(e.position.toDouble()) }
                 .groupBy { e: Dot ->
-                        (sign(e.position.toDouble())
+                    (
+                        sign(e.position.toDouble())
                             .toInt() *
-                                ceil(abs(e.position.toDouble() / bucketSize)).toInt())
-                    }
+                            ceil(abs(e.position.toDouble() / bucketSize)).toInt()
+                        )
+                }
             val maxBucketSize = bucketedDots.values
                 .map { obj: List<Dot> -> obj.size }
                 .maxOrNull() ?: 0
             val theta = Math.PI / 2 / numBucketsPerSide
-            val dotSize = ((1.0 *
-                    inner) / 2 /
-                    (0.5 / sin(theta / 2) + 1.0 * maxBucketSize / cos(theta / 2))).toInt()
+            val dotSize = (
+                (
+                    1.0 *
+                        inner
+                    ) / 2 /
+                    (0.5 / sin(theta / 2) + 1.0 * maxBucketSize / cos(theta / 2))
+                ).toInt()
             for ((key, value) in bucketedDots) {
                 val bucketMid = (key - 0.5 * sign(key.toDouble())) * bucketSize
                 g.transform = createRotationTransform(bucketMid, originalTransform, arcY)
@@ -273,8 +279,9 @@ class SwingometerFrame(
                         val totalHeight = size * text.size
                         g.drawString(
                             text[i],
-                            (width - strWidth) / 2, inner / 2 - dotNum * dotSize - (dotSize - totalHeight * 3 / 4) / 2 +
-                                    (i - text.size + 1) * size
+                            (width - strWidth) / 2,
+                            inner / 2 - dotNum * dotSize - (dotSize - totalHeight * 3 / 4) / 2 +
+                                (i - text.size + 1) * size
                         )
                     }
                 }

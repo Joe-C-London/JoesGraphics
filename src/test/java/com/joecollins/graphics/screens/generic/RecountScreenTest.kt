@@ -5,9 +5,9 @@ import com.joecollins.graphics.utils.BindableWrapper
 import com.joecollins.graphics.utils.RenderTestUtils
 import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.Party
+import org.junit.Test
 import java.awt.Color
 import java.util.TreeMap
-import org.junit.Test
 
 class RecountScreenTest {
 

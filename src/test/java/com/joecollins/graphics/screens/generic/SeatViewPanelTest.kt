@@ -15,6 +15,7 @@ import com.joecollins.graphics.utils.ShapefileReader.readShapes
 import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
+import org.junit.Test
 import java.awt.Color
 import java.awt.Shape
 import java.io.IOException
@@ -23,7 +24,6 @@ import java.util.HashMap
 import java.util.IdentityHashMap
 import java.util.LinkedHashMap
 import kotlin.Throws
-import org.junit.Test
 
 class SeatViewPanelTest {
     @Test
@@ -41,11 +41,12 @@ class SeatViewPanelTest {
         val con = Party("Conservative", "CON", Color.BLUE)
         val lab = Party("Labour", "LAB", Color.RED)
         val panel = partySeats(
-                currentSeats.binding, seatHeader.binding, seatSubhead.binding)
-                .withTotal(totalSeats.binding)
-                .withMajorityLine(showMajority.binding) { "$it SEATS FOR MAJORITY" }
-                .withPrev(previousSeats.binding, changeHeader.binding, changeSubhead.binding)
-                .build(header.binding)
+            currentSeats.binding, seatHeader.binding, seatSubhead.binding
+        )
+            .withTotal(totalSeats.binding)
+            .withMajorityLine(showMajority.binding) { "$it SEATS FOR MAJORITY" }
+            .withPrev(previousSeats.binding, changeHeader.binding, changeSubhead.binding)
+            .build(header.binding)
         panel.setSize(1024, 512)
         compareRendering("SeatViewPanel", "Basic-1", panel)
 
@@ -125,11 +126,12 @@ class SeatViewPanelTest {
         val con = Party("Conservative", "CON", Color.BLUE)
         val lab = Party("Labour", "LAB", Color.RED)
         val panel = partySeats(
-                currentSeats.binding, seatHeader.binding, seatSubhead.binding)
-                .withTotal(totalSeats.binding)
-                .withMajorityLine(showMajority.binding) { "$it SEATS FOR MAJORITY" }
-                .withDiff(seatDiff.binding, changeHeader.binding, changeSubhead.binding)
-                .build(header.binding)
+            currentSeats.binding, seatHeader.binding, seatSubhead.binding
+        )
+            .withTotal(totalSeats.binding)
+            .withMajorityLine(showMajority.binding) { "$it SEATS FOR MAJORITY" }
+            .withDiff(seatDiff.binding, changeHeader.binding, changeSubhead.binding)
+            .build(header.binding)
         panel.setSize(1024, 512)
         compareRendering("SeatViewPanel", "Basic-1", panel)
 
@@ -216,12 +218,13 @@ class SeatViewPanelTest {
         val oth = Party.OTHERS
         val partyOrder = listOf(snp, lab, pc, grn, ld, oth, con)
         val panel = partySeats(
-                currentSeats.binding, seatHeader.binding, seatSubhead.binding)
-                .withPrev(previousSeats.binding, changeHeader.binding)
-                .withTotal(totalSeats.binding)
-                .withMajorityLine(showMajority.binding) { "$it SEATS FOR MAJORITY" }
-                .withSwing(currentVotes.binding, previousVotes.binding, compareBy { partyOrder.indexOf(it) }, swingHeader.binding)
-                .build(header.binding)
+            currentSeats.binding, seatHeader.binding, seatSubhead.binding
+        )
+            .withPrev(previousSeats.binding, changeHeader.binding)
+            .withTotal(totalSeats.binding)
+            .withMajorityLine(showMajority.binding) { "$it SEATS FOR MAJORITY" }
+            .withSwing(currentVotes.binding, previousVotes.binding, compareBy { partyOrder.indexOf(it) }, swingHeader.binding)
+            .build(header.binding)
         panel.setSize(1024, 512)
         compareRendering("SeatViewPanel", "Swing-1", panel)
 
@@ -274,13 +277,14 @@ class SeatViewPanelTest {
         val oth = Party.OTHERS
         val partyOrder = listOf(ndp, grn, lib, oth, pc)
         val panel = partySeats(
-                currentSeats.binding, seatHeader.binding, seatSubhead.binding)
-                .withPrev(previousSeats.binding, changeHeader.binding)
-                .withTotal(totalSeats.binding)
-                .withMajorityLine(showMajority.binding) { "$it SEATS FOR MAJORITY" }
-                .withSwing(currentVotes.binding, previousVotes.binding, compareBy { partyOrder.indexOf(it) }, swingHeader.binding)
-                .withPartyMap(fixedBinding(shapesByDistrict), winnersByDistrict.binding, focus.binding, mapHeader.binding)
-                .build(header.binding)
+            currentSeats.binding, seatHeader.binding, seatSubhead.binding
+        )
+            .withPrev(previousSeats.binding, changeHeader.binding)
+            .withTotal(totalSeats.binding)
+            .withMajorityLine(showMajority.binding) { "$it SEATS FOR MAJORITY" }
+            .withSwing(currentVotes.binding, previousVotes.binding, compareBy { partyOrder.indexOf(it) }, swingHeader.binding)
+            .withPartyMap(fixedBinding(shapesByDistrict), winnersByDistrict.binding, focus.binding, mapHeader.binding)
+            .build(header.binding)
         panel.setSize(1024, 512)
         compareRendering("SeatViewPanel", "Map-1", panel)
 
@@ -374,11 +378,12 @@ class SeatViewPanelTest {
         val grn = Party("Green", "GRN", Color.GREEN.darker())
         val ind = Party("Independent", "IND", Color.GRAY)
         val panel = partyDualSeats(
-                currentSeats.binding, seatHeader.binding, seatSubhead.binding)
-                .withPrev(previousSeats.binding, changeHeader.binding)
-                .withTotal(totalSeats.binding)
-                .withMajorityLine(showMajority.binding) { "$it SEATS FOR MAJORITY" }
-                .build(header.binding)
+            currentSeats.binding, seatHeader.binding, seatSubhead.binding
+        )
+            .withPrev(previousSeats.binding, changeHeader.binding)
+            .withTotal(totalSeats.binding)
+            .withMajorityLine(showMajority.binding) { "$it SEATS FOR MAJORITY" }
+            .build(header.binding)
         panel.setSize(1024, 512)
         compareRendering("SeatViewPanel", "Dual-1", panel)
 
@@ -467,7 +472,8 @@ class SeatViewPanelTest {
         val grn = Party("Green", "GRN", Color.GREEN.darker())
         val ind = Party("Independent", "IND", Color.GRAY)
         val panel = partyDualSeatsReversed(
-            currentSeats.binding, seatHeader.binding, seatSubhead.binding)
+            currentSeats.binding, seatHeader.binding, seatSubhead.binding
+        )
             .withPrev(previousSeats.binding, changeHeader.binding)
             .withTotal(totalSeats.binding)
             .withMajorityLine(showMajority.binding) { "$it SEATS FOR MAJORITY" }
@@ -560,11 +566,12 @@ class SeatViewPanelTest {
         val grn = Party("Green", "GRN", Color.GREEN.darker())
         val ind = Party("Independent", "IND", Color.GRAY)
         val panel = partyDualSeats(
-                currentSeats.binding, seatHeader.binding, seatSubhead.binding)
-                .withDiff(seatDiff.binding, changeHeader.binding)
-                .withTotal(totalSeats.binding)
-                .withMajorityLine(showMajority.binding) { "$it SEATS FOR MAJORITY" }
-                .build(header.binding)
+            currentSeats.binding, seatHeader.binding, seatSubhead.binding
+        )
+            .withDiff(seatDiff.binding, changeHeader.binding)
+            .withTotal(totalSeats.binding)
+            .withMajorityLine(showMajority.binding) { "$it SEATS FOR MAJORITY" }
+            .build(header.binding)
         panel.setSize(1024, 512)
         compareRendering("SeatViewPanel", "Dual-1", panel)
 
@@ -660,11 +667,12 @@ class SeatViewPanelTest {
         val nxt = Party("Nick Xenophon Team", "NXT", Color.ORANGE)
         val oth = Party.OTHERS
         val panel = partyRangeSeats(
-                currentSeats.binding, seatHeader.binding, seatSubhead.binding)
-                .withPrev(previousSeats.binding, changeHeader.binding)
-                .withTotal(totalSeats.binding)
-                .withMajorityLine(showMajority.binding) { "$it SEATS FOR MAJORITY" }
-                .build(header.binding)
+            currentSeats.binding, seatHeader.binding, seatSubhead.binding
+        )
+            .withPrev(previousSeats.binding, changeHeader.binding)
+            .withTotal(totalSeats.binding)
+            .withMajorityLine(showMajority.binding) { "$it SEATS FOR MAJORITY" }
+            .build(header.binding)
         panel.setSize(1024, 512)
         compareRendering("SeatViewPanel", "Range-1", panel)
 
@@ -731,11 +739,12 @@ class SeatViewPanelTest {
         val nxt = Party("Nick Xenophon Team", "NXT", Color.ORANGE)
         val oth = Party.OTHERS
         val panel = partyRangeSeats(
-                currentSeats.binding, seatHeader.binding, seatSubhead.binding)
-                .withDiff(seatDiff.binding, changeHeader.binding)
-                .withTotal(totalSeats.binding)
-                .withMajorityLine(showMajority.binding) { "$it SEATS FOR MAJORITY" }
-                .build(header.binding)
+            currentSeats.binding, seatHeader.binding, seatSubhead.binding
+        )
+            .withDiff(seatDiff.binding, changeHeader.binding)
+            .withTotal(totalSeats.binding)
+            .withMajorityLine(showMajority.binding) { "$it SEATS FOR MAJORITY" }
+            .build(header.binding)
         panel.setSize(1024, 512)
         compareRendering("SeatViewPanel", "Range-1", panel)
 
@@ -803,12 +812,13 @@ class SeatViewPanelTest {
         val clinton = Candidate("Hillary Clinton", Party("Democrat", "DEM", Color.BLUE))
         val trump = Candidate("Donald Trump", Party("Republican", "GOP", Color.RED))
         val panel = candidateSeats(
-                currentSeats.binding, seatHeader.binding, seatSubhead.binding)
-                .withWinner(winner.binding)
-                .withPrev(previousSeats.binding, changeHeader.binding)
-                .withTotal(totalSeats.binding)
-                .withMajorityLine(showMajority.binding) { "$it ELECTORAL VOTES TO WIN" }
-                .build(header.binding)
+            currentSeats.binding, seatHeader.binding, seatSubhead.binding
+        )
+            .withWinner(winner.binding)
+            .withPrev(previousSeats.binding, changeHeader.binding)
+            .withTotal(totalSeats.binding)
+            .withMajorityLine(showMajority.binding) { "$it ELECTORAL VOTES TO WIN" }
+            .build(header.binding)
         panel.setSize(1024, 512)
         val curr = LinkedHashMap<Candidate, Int>()
         curr[clinton] = 232
@@ -837,12 +847,13 @@ class SeatViewPanelTest {
         val changeHeader = BindableWrapper("CHANGE SINCE 2012")
         val winner = BindableWrapper<Candidate?>(null)
         val panel = candidateDualSeats(
-                currentSeats.binding, seatHeader.binding, seatSubhead.binding)
-                .withWinner(winner.binding)
-                .withPrev(previousSeats.binding, changeHeader.binding)
-                .withTotal(totalSeats.binding)
-                .withMajorityLine(showMajority.binding) { "$it ELECTORAL VOTES TO WIN" }
-                .build(header.binding)
+            currentSeats.binding, seatHeader.binding, seatSubhead.binding
+        )
+            .withWinner(winner.binding)
+            .withPrev(previousSeats.binding, changeHeader.binding)
+            .withTotal(totalSeats.binding)
+            .withMajorityLine(showMajority.binding) { "$it ELECTORAL VOTES TO WIN" }
+            .build(header.binding)
         panel.setSize(1024, 512)
         val clinton = Candidate("Hillary Clinton", Party("Democrat", "DEM", Color.BLUE))
         val trump = Candidate("Donald Trump", Party("Republican", "GOP", Color.RED))
@@ -880,11 +891,12 @@ class SeatViewPanelTest {
         prev[trump.party] = 206
         previousSeats.value = prev
         val panel = candidateRangeSeats(
-                currentSeats.binding, seatHeader.binding, seatSubhead.binding)
-                .withPrev(previousSeats.binding, changeHeader.binding)
-                .withTotal(totalSeats.binding)
-                .withMajorityLine(showMajority.binding) { "$it ELECTORAL VOTES TO WIN" }
-                .build(header.binding)
+            currentSeats.binding, seatHeader.binding, seatSubhead.binding
+        )
+            .withPrev(previousSeats.binding, changeHeader.binding)
+            .withTotal(totalSeats.binding)
+            .withMajorityLine(showMajority.binding) { "$it ELECTORAL VOTES TO WIN" }
+            .build(header.binding)
         panel.setSize(1024, 512)
         compareRendering("SeatViewPanel", "Candidate-3", panel)
     }
@@ -902,12 +914,13 @@ class SeatViewPanelTest {
         val changeHeader = BindableWrapper("CHANGE SINCE 2016")
         val winner = BindableWrapper<Party?>(null)
         val panel = partySeats(
-                currentSeats.binding, seatHeader.binding, seatSubhead.binding)
-                .withPrev(previousSeats.binding, changeHeader.binding)
-                .withWinner(winner.binding)
-                .withTotal(totalSeats.binding)
-                .withMajorityLine(showMajority.binding) { "$it SEATS FOR MAJORITY" }
-                .build(header.binding)
+            currentSeats.binding, seatHeader.binding, seatSubhead.binding
+        )
+            .withPrev(previousSeats.binding, changeHeader.binding)
+            .withWinner(winner.binding)
+            .withTotal(totalSeats.binding)
+            .withMajorityLine(showMajority.binding) { "$it SEATS FOR MAJORITY" }
+            .build(header.binding)
         panel.setSize(1024, 512)
         val dem = Party("Democrat", "DEM", Color.BLUE)
         val gop = Party("Republican", "GOP", Color.RED)
@@ -936,12 +949,13 @@ class SeatViewPanelTest {
         val changeHeader = BindableWrapper("CHANGE SINCE 2016")
         val winner = BindableWrapper<Party?>(null)
         val panel = partyDualSeats(
-                currentSeats.binding, seatHeader.binding, seatSubhead.binding)
-                .withWinner(winner.binding)
-                .withPrev(previousSeats.binding, changeHeader.binding)
-                .withTotal(totalSeats.binding)
-                .withMajorityLine(showMajority.binding) { "$it SEATS FOR MAJORITY" }
-                .build(header.binding)
+            currentSeats.binding, seatHeader.binding, seatSubhead.binding
+        )
+            .withWinner(winner.binding)
+            .withPrev(previousSeats.binding, changeHeader.binding)
+            .withTotal(totalSeats.binding)
+            .withMajorityLine(showMajority.binding) { "$it SEATS FOR MAJORITY" }
+            .build(header.binding)
         panel.setSize(1024, 512)
         val dem = Party("Democrat", "DEM", Color.BLUE)
         val gop = Party("Republican", "GOP", Color.RED)
@@ -981,12 +995,13 @@ class SeatViewPanelTest {
         val additionalHighlight = BindableWrapper<List<Int>>(ArrayList(shapesByDistrict.keys))
         val winnerByDistrict = BindableWrapper(mapOf<Int, PartyResult>())
         val panel = BasicResultPanel.partySeats(
-                currentSeats.binding, voteHeader.binding, voteSubhead.binding)
-                .withPrev(previousSeats.binding, changeHeader.binding, changeSubhead.binding)
-                .withSwing(currentVotes.binding, previousVotes.binding, compareBy { swingPartyOrder.indexOf(it) }, swingHeader.binding)
-                .withResultMap(fixedBinding(shapesByDistrict), winnerByDistrict.binding, focus.binding, additionalHighlight.binding, mapHeader.binding)
-                .withTotal(fixedBinding(7))
-                .build(header.binding)
+            currentSeats.binding, voteHeader.binding, voteSubhead.binding
+        )
+            .withPrev(previousSeats.binding, changeHeader.binding, changeSubhead.binding)
+            .withSwing(currentVotes.binding, previousVotes.binding, compareBy { swingPartyOrder.indexOf(it) }, swingHeader.binding)
+            .withResultMap(fixedBinding(shapesByDistrict), winnerByDistrict.binding, focus.binding, additionalHighlight.binding, mapHeader.binding)
+            .withTotal(fixedBinding(7))
+            .build(header.binding)
         panel.setSize(1024, 512)
         compareRendering("SeatViewPanel", "AdditionalHighlightMap-1", panel)
     }
@@ -1028,12 +1043,13 @@ class SeatViewPanelTest {
         val seatSubhead = BindableWrapper<String?>(null)
         val changeHeader = BindableWrapper("NOTIONAL CHANGE SINCE 2016")
         val panel = partySeats(
-                currentSeats.binding, seatHeader.binding, seatSubhead.binding)
-                .withPrev(previousSeats.binding, changeHeader.binding)
-                .withTotal(totalSeats.binding)
-                .withClassification({ mapping.getOrDefault(it, others) }, fixedBinding("BY DESIGNATION"))
-                .withSwing(currentVotes.binding, previousVotes.binding, compareBy { listOf(nationalists, others, unionists).indexOf(it) }, fixedBinding("FIRST PREFERENCE SWING SINCE 2016"))
-                .build(header.binding)
+            currentSeats.binding, seatHeader.binding, seatSubhead.binding
+        )
+            .withPrev(previousSeats.binding, changeHeader.binding)
+            .withTotal(totalSeats.binding)
+            .withClassification({ mapping.getOrDefault(it, others) }, fixedBinding("BY DESIGNATION"))
+            .withSwing(currentVotes.binding, previousVotes.binding, compareBy { listOf(nationalists, others, unionists).indexOf(it) }, fixedBinding("FIRST PREFERENCE SWING SINCE 2016"))
+            .build(header.binding)
         panel.setSize(1024, 512)
         compareRendering("SeatViewPanel", "PartyClassifications-1", panel)
 
@@ -1102,8 +1118,8 @@ class SeatViewPanelTest {
     @Throws(IOException::class)
     private fun peiShapesByDistrict(): Map<Int, Shape> {
         val peiMap = MapFrameTest::class.java
-                .classLoader
-                .getResource("com/joecollins/graphics/shapefiles/pei-districts.shp")
+            .classLoader
+            .getResource("com/joecollins/graphics/shapefiles/pei-districts.shp")
         return readShapes(peiMap, "DIST_NO", Int::class.java)
     }
 }

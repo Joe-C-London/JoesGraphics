@@ -7,11 +7,11 @@ import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
 import com.joecollins.models.general.PartyResult.Companion.elected
+import org.junit.Test
 import java.awt.Color
 import java.io.IOException
 import java.util.TreeMap
 import kotlin.Throws
-import org.junit.Test
 
 class SwingometerScreenTest {
 
@@ -23,13 +23,14 @@ class SwingometerScreenTest {
         val parties = BindableWrapper(Pair(lib, pc))
         val swing = BindableWrapper(mapOf(pc to +0.0745, lib to -0.0345, grn to +0.0336, pa to -0.0339, ndp to -0.0335, ind to -0.0062))
         val panel = of(
-                prevResult.binding,
-                currResult.binding,
-                swing.binding,
-                parties.binding,
-                fixedBinding("SWINGOMETER"))
-                .withSeatLabelIncrements(fixedBinding(3))
-                .build(fixedBinding("NEW BRUNSWICK"))
+            prevResult.binding,
+            currResult.binding,
+            swing.binding,
+            parties.binding,
+            fixedBinding("SWINGOMETER")
+        )
+            .withSeatLabelIncrements(fixedBinding(3))
+            .build(fixedBinding("NEW BRUNSWICK"))
         panel.setSize(1024, 512)
         compareRendering("SwingometerScreen", "Basic-TwoParty-1", panel)
         parties.value = Pair(grn, pc)
@@ -48,13 +49,14 @@ class SwingometerScreenTest {
         val parties = BindableWrapper(Pair(lib, pc))
         val swing = BindableWrapper<Map<Party, Double>>(emptyMap())
         val panel = of(
-                prevResult.binding,
-                currResult.binding,
-                swing.binding,
-                parties.binding,
-                fixedBinding("SWINGOMETER"))
-                .withSeatLabelIncrements(fixedBinding(3))
-                .build(fixedBinding("NEW BRUNSWICK"))
+            prevResult.binding,
+            currResult.binding,
+            swing.binding,
+            parties.binding,
+            fixedBinding("SWINGOMETER")
+        )
+            .withSeatLabelIncrements(fixedBinding(3))
+            .build(fixedBinding("NEW BRUNSWICK"))
         panel.setSize(1024, 512)
         compareRendering("SwingometerScreen", "Basic-Updates-1", panel)
         currResult.value = nbCurrResult()
@@ -70,24 +72,27 @@ class SwingometerScreenTest {
         val parties = BindableWrapper(Pair(lib, pc))
         val swing = BindableWrapper(mapOf(pc to +0.0745, lib to -0.0345, grn to +0.0336, pa to -0.0339, ndp to -0.0335, ind to -0.0062))
         val seatsFiltered = BindableWrapper<Set<String>?>(
-                setOf(
-                        "Oromocto-Lincoln-Fredericton",
-                        "Fredericton-Grand Lake",
-                        "New Maryland-Sunbury",
-                        "Fredericton South",
-                        "Fredericton North",
-                        "Fredericton-York",
-                        "Fredericton West-Hanwell",
-                        "Carleton-York"))
+            setOf(
+                "Oromocto-Lincoln-Fredericton",
+                "Fredericton-Grand Lake",
+                "New Maryland-Sunbury",
+                "Fredericton South",
+                "Fredericton North",
+                "Fredericton-York",
+                "Fredericton West-Hanwell",
+                "Carleton-York"
+            )
+        )
         val panel = of(
-                prevResult.binding,
-                currResult.binding,
-                swing.binding,
-                parties.binding,
-                fixedBinding("SWINGOMETER"))
-                .withSeatLabelIncrements(fixedBinding(3))
-                .withSeatFilter(seatsFiltered.binding)
-                .build(fixedBinding("NEW BRUNSWICK"))
+            prevResult.binding,
+            currResult.binding,
+            swing.binding,
+            parties.binding,
+            fixedBinding("SWINGOMETER")
+        )
+            .withSeatLabelIncrements(fixedBinding(3))
+            .withSeatFilter(seatsFiltered.binding)
+            .build(fixedBinding("NEW BRUNSWICK"))
         panel.setSize(1024, 512)
         compareRendering("SwingometerScreen", "Filtered-TwoParty-1", panel)
         seatsFiltered.value = emptySet()

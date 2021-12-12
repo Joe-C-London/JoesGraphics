@@ -5,13 +5,13 @@ import com.joecollins.bindings.Binding.Companion.fixedBinding
 import com.joecollins.bindings.Binding.Companion.propertyBinding
 import com.joecollins.graphics.utils.BindableWrapper
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
+import org.junit.Assert
+import org.junit.Test
 import java.awt.BorderLayout
 import java.awt.Color
 import java.io.IOException
 import javax.swing.JPanel
 import kotlin.Throws
-import org.junit.Assert
-import org.junit.Test
 
 class GraphicsFrameTest {
     private class TestObject : Bindable<TestObject, TestObject.Properties>() {
@@ -22,11 +22,11 @@ class GraphicsFrameTest {
         private var _numPolls = 0
 
         var numPolls: Int
-        get() = _numPolls
-        set(numPolls) {
-            this._numPolls = numPolls
-            onPropertyRefreshed(Properties.NUM_POLLS)
-        }
+            get() = _numPolls
+            set(numPolls) {
+                this._numPolls = numPolls
+                onPropertyRefreshed(Properties.NUM_POLLS)
+            }
     }
 
     @Test

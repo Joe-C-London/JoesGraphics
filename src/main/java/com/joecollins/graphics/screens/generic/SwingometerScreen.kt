@@ -43,53 +43,53 @@ class SwingometerScreen private constructor(title: JLabel, frame: SwingometerFra
             private var _seatLabelIncrement = Int.MAX_VALUE
 
             var prevVotes: Map<T, Map<Party, Int>>
-            get() = _prevVotes
-            set(prevVotes) {
-                this._prevVotes = prevVotes
-                onPropertyRefreshed(Property.PREV)
-            }
+                get() = _prevVotes
+                set(prevVotes) {
+                    this._prevVotes = prevVotes
+                    onPropertyRefreshed(Property.PREV)
+                }
 
             var results: Map<T, PartyResult?>
-            get() = _results
-            set(results) {
-                this._results = results
-                onPropertyRefreshed(Property.RESULTS)
-            }
+                get() = _results
+                set(results) {
+                    this._results = results
+                    onPropertyRefreshed(Property.RESULTS)
+                }
 
             var seatFilter: Set<T>?
-            get() = _filteredSeats
-            set(filteredSeats) {
-                this._filteredSeats = filteredSeats
-                onPropertyRefreshed(Property.FILTERED_SEATS)
-            }
+                get() = _filteredSeats
+                set(filteredSeats) {
+                    this._filteredSeats = filteredSeats
+                    onPropertyRefreshed(Property.FILTERED_SEATS)
+                }
 
             var parties: Pair<Party, Party>
-            get() = _parties!!
-            set(parties) {
-                this._parties = parties
-                onPropertyRefreshed(Property.PARTIES)
-            }
+                get() = _parties!!
+                set(parties) {
+                    this._parties = parties
+                    onPropertyRefreshed(Property.PARTIES)
+                }
 
             var partySwings: Map<Party, Double>
-            get() = _partySwings
-            set(partySwings) {
-                this._partySwings = partySwings
-                onPropertyRefreshed(Property.SWINGS)
-            }
+                get() = _partySwings
+                set(partySwings) {
+                    this._partySwings = partySwings
+                    onPropertyRefreshed(Property.SWINGS)
+                }
 
             var range: Number
-            get() = _range
-            set(range) {
-                this._range = range
-                onPropertyRefreshed(Property.RANGE)
-            }
+                get() = _range
+                set(range) {
+                    this._range = range
+                    onPropertyRefreshed(Property.RANGE)
+                }
 
             var seatLabelIncrement: Int
-            get() = _seatLabelIncrement
-            set(seatLabelIncrement) {
-                this._seatLabelIncrement = seatLabelIncrement
-                onPropertyRefreshed(Property.LABEL_INCREMENT)
-            }
+                get() = _seatLabelIncrement
+                set(seatLabelIncrement) {
+                    this._seatLabelIncrement = seatLabelIncrement
+                    onPropertyRefreshed(Property.LABEL_INCREMENT)
+                }
         }
 
         private val inputs = Inputs<T>()
@@ -118,80 +118,94 @@ class SwingometerScreen private constructor(title: JLabel, frame: SwingometerFra
         private fun createSwingometer(): SwingometerFrame {
             val dotsList = createDotsForSwingometer()
             return SwingometerFrameBuilder.basic(
+                Binding.propertyBinding(
+                    inputs,
+                    { inputs: Inputs<T> ->
+                        Pair(inputs.parties.first.color, inputs.parties.second.color)
+                    },
+                    Inputs.Property.PARTIES
+                ),
+                Binding.propertyBinding(
+                    inputs,
+                    { inputs: Inputs<T> ->
+                        val left = inputs.partySwings[inputs.parties.first] ?: 0.0
+                        val right = inputs.partySwings[inputs.parties.second] ?: 0.0
+                        (right - left) / 2
+                    },
+                    Inputs.Property.PARTIES,
+                    Inputs.Property.SWINGS
+                )
+            )
+                .withDotsSolid(dotsList, { obj -> obj.first }, { obj -> obj.second }) { obj -> obj.third }
+                .withHeader(header.getBinding())
+                .withRange(Binding.propertyBinding(inputs, { inputs: Inputs<T> -> inputs.range }, Inputs.Property.RANGE))
+                .withTickInterval(Binding.fixedBinding(0.01)) { n: Number -> (n.toDouble() * 100).roundToInt().toString() }
+                .withLeftNeedingToWin(
                     Binding.propertyBinding(
-                            inputs,
-                            { inputs: Inputs<T> ->
-                                Pair(inputs.parties.first.color, inputs.parties.second.color)
-                            },
-                            Inputs.Property.PARTIES),
+                        inputs,
+                        { inputs: Inputs<T> ->
+                            getSwingNeededForMajority(
+                                inputs.prevVotes, inputs.parties.first, inputs.parties.second
+                            )
+                        },
+                        Inputs.Property.PREV,
+                        Inputs.Property.PARTIES
+                    )
+                )
+                .withRightNeedingToWin(
                     Binding.propertyBinding(
-                            inputs,
-                            { inputs: Inputs<T> ->
-                                val left = inputs.partySwings[inputs.parties.first] ?: 0.0
-                                val right = inputs.partySwings[inputs.parties.second] ?: 0.0
-                                (right - left) / 2
-                            },
-                            Inputs.Property.PARTIES,
-                            Inputs.Property.SWINGS))
-                    .withDotsSolid(dotsList, { obj -> obj.first }, { obj -> obj.second }) { obj -> obj.third }
-                    .withHeader(header.getBinding())
-                    .withRange(Binding.propertyBinding(inputs, { inputs: Inputs<T> -> inputs.range }, Inputs.Property.RANGE))
-                    .withTickInterval(Binding.fixedBinding(0.01)) { n: Number -> (n.toDouble() * 100).roundToInt().toString() }
-                    .withLeftNeedingToWin(
-                            Binding.propertyBinding(
-                                    inputs,
-                                    { inputs: Inputs<T> ->
-                                        getSwingNeededForMajority(
-                                                inputs.prevVotes, inputs.parties.first, inputs.parties.second)
-                                    },
-                                    Inputs.Property.PREV,
-                                    Inputs.Property.PARTIES))
-                    .withRightNeedingToWin(
-                            Binding.propertyBinding(
-                                    inputs,
-                                    { inputs: Inputs<T> ->
-                                        getSwingNeededForMajority(
-                                                inputs.prevVotes, inputs.parties.second, inputs.parties.first)
-                                    },
-                                    Inputs.Property.PREV,
-                                    Inputs.Property.PARTIES))
-                    .withBucketSize(Binding.fixedBinding(0.005))
-                    .withOuterLabels(outerLabels, { obj -> obj.first }, { obj -> obj.third }) { obj -> obj.second }
-                    .build()
+                        inputs,
+                        { inputs: Inputs<T> ->
+                            getSwingNeededForMajority(
+                                inputs.prevVotes, inputs.parties.second, inputs.parties.first
+                            )
+                        },
+                        Inputs.Property.PREV,
+                        Inputs.Property.PARTIES
+                    )
+                )
+                .withBucketSize(Binding.fixedBinding(0.005))
+                .withOuterLabels(outerLabels, { obj -> obj.first }, { obj -> obj.third }) { obj -> obj.second }
+                .build()
         }
 
         private val outerLabels: Binding<List<Triple<Double, Color, String>>>
             get() {
                 val binding: Binding<List<Triple<Double, Color, String>>> = Binding.propertyBinding(
-                        inputs,
-                        { inputs: Inputs<T> ->
-                            val leftSwingList = createSwingList(
-                                    inputs.prevVotes.values, inputs.parties.first, inputs.parties.second)
-                            val rightSwingList = createSwingList(
-                                    inputs.prevVotes.values, inputs.parties.second, inputs.parties.first)
-                            val ret: MutableList<Triple<Double, Color, String>> = LinkedList()
-                            val leftSeats = getNumSeats(leftSwingList)
-                            val rightSeats = getNumSeats(rightSwingList)
-                            val majority = inputs.prevVotes.size / 2 + 1
-                            addZeroLabel(ret, inputs.parties, leftSeats, rightSeats)
-                            addMajorityLabels(ret, inputs.parties, leftSwingList, rightSwingList, majority)
-                            addLeadChangeLabel(
-                                    ret, inputs.parties, leftSwingList, rightSwingList, leftSeats, rightSeats)
-                            addIncrementLabels(
-                                    ret,
-                                    leftSwingList,
-                                    rightSwingList,
-                                    leftSeats,
-                                    rightSeats,
-                                    inputs.prevVotes,
-                                    inputs.seatLabelIncrement,
-                                    inputs.parties)
-                            filterNearbyLabels(ret)
-                            ret
-                        },
-                        Inputs.Property.PREV,
-                        Inputs.Property.PARTIES,
-                        Inputs.Property.LABEL_INCREMENT)
+                    inputs,
+                    { inputs: Inputs<T> ->
+                        val leftSwingList = createSwingList(
+                            inputs.prevVotes.values, inputs.parties.first, inputs.parties.second
+                        )
+                        val rightSwingList = createSwingList(
+                            inputs.prevVotes.values, inputs.parties.second, inputs.parties.first
+                        )
+                        val ret: MutableList<Triple<Double, Color, String>> = LinkedList()
+                        val leftSeats = getNumSeats(leftSwingList)
+                        val rightSeats = getNumSeats(rightSwingList)
+                        val majority = inputs.prevVotes.size / 2 + 1
+                        addZeroLabel(ret, inputs.parties, leftSeats, rightSeats)
+                        addMajorityLabels(ret, inputs.parties, leftSwingList, rightSwingList, majority)
+                        addLeadChangeLabel(
+                            ret, inputs.parties, leftSwingList, rightSwingList, leftSeats, rightSeats
+                        )
+                        addIncrementLabels(
+                            ret,
+                            leftSwingList,
+                            rightSwingList,
+                            leftSeats,
+                            rightSeats,
+                            inputs.prevVotes,
+                            inputs.seatLabelIncrement,
+                            inputs.parties
+                        )
+                        filterNearbyLabels(ret)
+                        ret
+                    },
+                    Inputs.Property.PREV,
+                    Inputs.Property.PARTIES,
+                    Inputs.Property.LABEL_INCREMENT
+                )
                 return binding
             }
 
@@ -213,11 +227,13 @@ class SwingometerScreen private constructor(title: JLabel, frame: SwingometerFra
                 }
                 if (i <= leftSwingList.size) {
                     list.add(
-                            Triple(-leftSwingList[i - 1], parties.first.color, i.toString()))
+                        Triple(-leftSwingList[i - 1], parties.first.color, i.toString())
+                    )
                 }
                 if (i <= rightSwingList.size) {
                     list.add(
-                            Triple(rightSwingList[i - 1], parties.second.color, i.toString()))
+                        Triple(rightSwingList[i - 1], parties.second.color, i.toString())
+                    )
                 }
                 i += seatLabelIncrement
             }
@@ -250,16 +266,18 @@ class SwingometerScreen private constructor(title: JLabel, frame: SwingometerFra
                 val color: Color
                 if (leftSeats > rightSeats) {
                     swing = rightSwingList
-                            .drop(newLeadSeats - 1)
-                            .firstOrNull()
-                            ?: Double.POSITIVE_INFINITY
+                        .drop(newLeadSeats - 1)
+                        .firstOrNull()
+                        ?: Double.POSITIVE_INFINITY
                     color = if ((leftSeats + rightSeats) % 2 == 0) Color.BLACK else parties.second.color
                 } else {
                     swing = -1 *
-                            (leftSwingList
-                            .drop(newLeadSeats - 1)
-                            .firstOrNull()
-                            ?: Double.POSITIVE_INFINITY)
+                        (
+                            leftSwingList
+                                .drop(newLeadSeats - 1)
+                                .firstOrNull()
+                                ?: Double.POSITIVE_INFINITY
+                            )
                     color = if ((leftSeats + rightSeats) % 2 == 0) Color.BLACK else parties.first.color
                 }
                 list.add(Triple(swing, color, newLeadSeats.toString()))
@@ -274,18 +292,22 @@ class SwingometerScreen private constructor(title: JLabel, frame: SwingometerFra
             majority: Int
         ) {
             val leftMajority = -1 *
-                    (leftSwingList
-                    .drop((majority - 1))
-                    .firstOrNull()
-                            ?: Double.POSITIVE_INFINITY)
+                (
+                    leftSwingList
+                        .drop((majority - 1))
+                        .firstOrNull()
+                        ?: Double.POSITIVE_INFINITY
+                    )
             val rightMajority = rightSwingList.drop((majority - 1)).firstOrNull() ?: Double.POSITIVE_INFINITY
             if (leftMajority != rightMajority || leftMajority < 0) {
                 list.add(
-                        Triple(leftMajority, parties.first.color, majority.toString()))
+                    Triple(leftMajority, parties.first.color, majority.toString())
+                )
             }
             if (leftMajority != rightMajority || rightMajority > 0) {
                 list.add(
-                        Triple(rightMajority, parties.second.color, majority.toString()))
+                    Triple(rightMajority, parties.second.color, majority.toString())
+                )
             }
         }
 
@@ -295,11 +317,13 @@ class SwingometerScreen private constructor(title: JLabel, frame: SwingometerFra
             leftSeats: Int,
             rightSeats: Int
         ) {
-            list.add(when {
-                leftSeats > rightSeats -> Triple(0.0, parties.first.color, leftSeats.toString())
-                rightSeats > leftSeats -> Triple(0.0, parties.second.color, rightSeats.toString())
-                else -> Triple(0.0, Color.BLACK, rightSeats.toString())
-            })
+            list.add(
+                when {
+                    leftSeats > rightSeats -> Triple(0.0, parties.first.color, leftSeats.toString())
+                    rightSeats > leftSeats -> Triple(0.0, parties.second.color, rightSeats.toString())
+                    else -> Triple(0.0, Color.BLACK, rightSeats.toString())
+                }
+            )
         }
 
         private fun getNumSeats(swings: List<Double>): Int {
@@ -313,9 +337,9 @@ class SwingometerScreen private constructor(title: JLabel, frame: SwingometerFra
         ): Double {
             val majority = votes.size / 2 + 1
             return createSwingList(votes.values, focusParty, compParty)
-                    .drop(majority - 1)
-                    .firstOrNull()
-                    ?: Double.POSITIVE_INFINITY
+                .drop(majority - 1)
+                .firstOrNull()
+                ?: Double.POSITIVE_INFINITY
         }
 
         private fun createSwingList(
@@ -324,53 +348,56 @@ class SwingometerScreen private constructor(title: JLabel, frame: SwingometerFra
             compParty: Party?
         ): List<Double> {
             return results.asSequence()
-                    .filter { m ->
-                        val winner = m.entries.maxByOrNull { it.value }!!.key
-                        winner == focusParty || winner == compParty
-                    }
-                    .map { m ->
-                        val total = m.values.sum()
-                        val focus = m[focusParty] ?: 0
-                        val comp = m[compParty] ?: 0
-                        0.5 * (comp - focus) / total
-                    }
-                    .sorted()
-                    .toList()
+                .filter { m ->
+                    val winner = m.entries.maxByOrNull { it.value }!!.key
+                    winner == focusParty || winner == compParty
+                }
+                .map { m ->
+                    val total = m.values.sum()
+                    val focus = m[focusParty] ?: 0
+                    val comp = m[compParty] ?: 0
+                    0.5 * (comp - focus) / total
+                }
+                .sorted()
+                .toList()
         }
 
         private fun createDotsForSwingometer(): Binding<List<Triple<Double, Color, Boolean>>> {
             val emptyResult = PartyResult(null, false)
             val dotsBinding: Binding<List<Triple<Double, Color, Boolean>>> = Binding.propertyBinding(
-                    inputs,
-                    { inputs: Inputs<T> ->
-                        inputs.prevVotes.entries.asSequence()
-                                .map { e ->
-                                    Triple(
-                                            e.value,
-                                            inputs.results[e.key] ?: emptyResult,
-                                            inputs.seatFilter?.contains(e.key) ?: true)
-                                }
-                                .filter { e ->
-                                    val winner = e.first.entries
-                                            .maxByOrNull { it.value }!!
-                                            .key
-                                    winner == inputs.parties.first || winner == inputs.parties.second
-                                }
-                                .map { e ->
-                                    val total = e.first.values.sum()
-                                    val left = e.first[inputs.parties.first] ?: 0
-                                    val right = e.first[inputs.parties.second] ?: 0
-                                    Triple(
-                                            0.5 * (left - right) / total,
-                                            e.second.color,
-                                            e.third)
-                                }
-                                .toList()
-                    },
-                    Inputs.Property.PREV,
-                    Inputs.Property.RESULTS,
-                    Inputs.Property.PARTIES,
-                    Inputs.Property.FILTERED_SEATS)
+                inputs,
+                { inputs: Inputs<T> ->
+                    inputs.prevVotes.entries.asSequence()
+                        .map { e ->
+                            Triple(
+                                e.value,
+                                inputs.results[e.key] ?: emptyResult,
+                                inputs.seatFilter?.contains(e.key) ?: true
+                            )
+                        }
+                        .filter { e ->
+                            val winner = e.first.entries
+                                .maxByOrNull { it.value }!!
+                                .key
+                            winner == inputs.parties.first || winner == inputs.parties.second
+                        }
+                        .map { e ->
+                            val total = e.first.values.sum()
+                            val left = e.first[inputs.parties.first] ?: 0
+                            val right = e.first[inputs.parties.second] ?: 0
+                            Triple(
+                                0.5 * (left - right) / total,
+                                e.second.color,
+                                e.third
+                            )
+                        }
+                        .toList()
+                },
+                Inputs.Property.PREV,
+                Inputs.Property.RESULTS,
+                Inputs.Property.PARTIES,
+                Inputs.Property.FILTERED_SEATS
+            )
             return dotsBinding
         }
 

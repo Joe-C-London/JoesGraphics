@@ -60,7 +60,7 @@ class CandidateListingScreen private constructor(
         }
     }
 
-    class Builder internal constructor (candidates: Binding<List<Candidate>>, header: Binding<String?>, subhead: Binding<String?> = Binding.fixedBinding(""), incumbentMarker: String?) {
+    class Builder internal constructor(candidates: Binding<List<Candidate>>, header: Binding<String?>, subhead: Binding<String?> = Binding.fixedBinding(""), incumbentMarker: String?) {
         internal val candidatesPanel: JPanel
         internal var prevPanel: JPanel? = null
         internal var secondaryPrevPanel: JPanel? = null

@@ -60,8 +60,8 @@ class SummaryWithHeaderAndLabels(
         }
 
         var top: String
-        get() { return topLabel.text }
-        set(top) { topLabel.text = top }
+            get() { return topLabel.text }
+            set(top) { topLabel.text = top }
 
         init {
             add(topPanel)
@@ -96,28 +96,34 @@ class SummaryWithHeaderAndLabels(
 
         init {
             add(bottomPanel)
-            bottomPanel.add(bottomHeaderLabel, object : GridBagConstraints() {
-                init {
-                    fill = BOTH
-                    gridx = 0
-                    gridy = 0
-                    gridwidth = 1
-                    gridheight = 5
-                    weightx = 1.0
-                    weighty = 1.0
+            bottomPanel.add(
+                bottomHeaderLabel,
+                object : GridBagConstraints() {
+                    init {
+                        fill = BOTH
+                        gridx = 0
+                        gridy = 0
+                        gridwidth = 1
+                        gridheight = 5
+                        weightx = 1.0
+                        weighty = 1.0
+                    }
                 }
-            })
-            bottomPanel.add(bottomValueLabel, object : GridBagConstraints() {
-                init {
-                    fill = BOTH
-                    gridx = 0
-                    gridy = 5
-                    gridwidth = 1
-                    gridheight = 9
-                    weightx = 1.0
-                    weighty = 1.0
+            )
+            bottomPanel.add(
+                bottomValueLabel,
+                object : GridBagConstraints() {
+                    init {
+                        fill = BOTH
+                        gridx = 0
+                        gridy = 5
+                        gridwidth = 1
+                        gridheight = 9
+                        weightx = 1.0
+                        weighty = 1.0
+                    }
                 }
-            })
+            )
             layout = GridLayout(1, 1)
         }
     }

@@ -58,8 +58,9 @@ class BasicResultPanel private constructor(
             seatFrame.setLocation(5, 5)
             val seatFrameIsAlone = changeFrame == null && swingFrame == null && mapFrame == null
             seatFrame.setSize(
-                    width * (if (seatFrameIsAlone) 5 else 3) / 5 - 10,
-                    height * (if (preferenceFrame == null) 3 else 2) / 3 - 10)
+                width * (if (seatFrameIsAlone) 5 else 3) / 5 - 10,
+                height * (if (preferenceFrame == null) 3 else 2) / 3 - 10
+            )
             preferenceFrame?.setLocation(5, height * 2 / 3 + 5)
             preferenceFrame?.setSize(width * (if (seatFrameIsAlone) 5 else 3) / 5 - 10, height / 3 - 10)
             changeFrame?.setLocation(width * 3 / 5 + 5, 5)
@@ -115,7 +116,7 @@ class BasicResultPanel private constructor(
             return if (key === Candidate.OTHERS) {
                 key.party.name.uppercase()
             } else ("${key.name}${if (key.isIncumbent()) incumbentMarker else ""}${if (forceSingleLine) (" (" + key.party.abbreviation + ")") else ("\n" + key.party.name)}")
-                    .uppercase()
+                .uppercase()
         }
 
         override fun winnerShape(forceSingleLine: Boolean): Shape {
@@ -174,14 +175,15 @@ class BasicResultPanel private constructor(
             changeSubhead: Binding<String?> = Binding.fixedBinding(null)
         ): SeatScreenBuilder<KT, CT, PT> {
             this.diff = BindingReceiver(
-                    current
-                            .getBinding()
-                            .merge(diff) { c, d ->
-                                val ret = LinkedHashMap<Party, CurrDiff<CT>>()
-                                c.forEach { (k, v) -> ret[keyTemplate.toParty(k)] = createFromDiff(v, d[keyTemplate.toParty(k)]) }
-                                d.forEach { (k, v) -> ret.putIfAbsent(k, createFromDiff(v)) }
-                                ret
-                            })
+                current
+                    .getBinding()
+                    .merge(diff) { c, d ->
+                        val ret = LinkedHashMap<Party, CurrDiff<CT>>()
+                        c.forEach { (k, v) -> ret[keyTemplate.toParty(k)] = createFromDiff(v, d[keyTemplate.toParty(k)]) }
+                        d.forEach { (k, v) -> ret.putIfAbsent(k, createFromDiff(v)) }
+                        ret
+                    }
+            )
             this.changeHeader = BindingReceiver(changeHeader)
             this.changeSubhead = BindingReceiver(changeSubhead)
             return this
@@ -197,14 +199,15 @@ class BasicResultPanel private constructor(
             changeSubhead: Binding<String?> = Binding.fixedBinding(null)
         ): SeatScreenBuilder<KT, CT, PT> {
             diff = BindingReceiver(
-                    current
-                            .getBinding()
-                            .merge(prev) { c, p ->
-                                val ret = LinkedHashMap<Party, CurrDiff<CT>>()
-                                c.forEach { (k, v) -> ret[keyTemplate.toParty(k)] = createFromPrev(v, p[keyTemplate.toParty(k)]) }
-                                p.forEach { (k, v) -> ret.putIfAbsent(k, createFromPrev(v)) }
-                                ret
-                            })
+                current
+                    .getBinding()
+                    .merge(prev) { c, p ->
+                        val ret = LinkedHashMap<Party, CurrDiff<CT>>()
+                        c.forEach { (k, v) -> ret[keyTemplate.toParty(k)] = createFromPrev(v, p[keyTemplate.toParty(k)]) }
+                        p.forEach { (k, v) -> ret.putIfAbsent(k, createFromPrev(v)) }
+                        ret
+                    }
+            )
             this.changeHeader = BindingReceiver(changeHeader)
             this.changeSubhead = BindingReceiver(changeSubhead)
             return this
@@ -233,7 +236,8 @@ class BasicResultPanel private constructor(
             headerBinding: Binding<String?>
         ): SeatScreenBuilder<KT, CT, PT> {
             mapBuilder = MapBuilder(
-                    shapes, winners.map { m: Map<T, Party?> -> partyMapToResultMap(m) }, focus, headerBinding)
+                shapes, winners.map { m: Map<T, Party?> -> partyMapToResultMap(m) }, focus, headerBinding
+            )
             return this
         }
 
@@ -274,12 +278,13 @@ class BasicResultPanel private constructor(
 
         fun build(textHeader: Binding<String>): BasicResultPanel {
             return BasicResultPanel(
-                    createHeaderLabel(textHeader),
-                    createFrame(),
-                    createClassificationFrame(),
-                    createDiffFrame(),
-                    createSwingFrame(),
-                    createMapFrame())
+                createHeaderLabel(textHeader),
+                createFrame(),
+                createClassificationFrame(),
+                createDiffFrame(),
+                createSwingFrame(),
+                createMapFrame()
+            )
         }
 
         protected abstract fun createFrame(): BarFrame
@@ -292,11 +297,12 @@ class BasicResultPanel private constructor(
                 val curr = currVotes!!
                 val func = classificationFunc
                 SwingFrameBuilder.prevCurr(
-                        if (func == null) prev.getBinding() else Aggregators.adjustKey(prev.getBinding(), func),
-                        if (func == null) curr.getBinding() else Aggregators.adjustKey(curr.getBinding(), func),
-                        swingComparator!!)
-                        .withHeader(header.getBinding())
-                        .build()
+                    if (func == null) prev.getBinding() else Aggregators.adjustKey(prev.getBinding(), func),
+                    if (func == null) curr.getBinding() else Aggregators.adjustKey(curr.getBinding(), func),
+                    swingComparator!!
+                )
+                    .withHeader(header.getBinding())
+                    .build()
             }
         }
 
@@ -337,18 +343,18 @@ class BasicResultPanel private constructor(
             private var _winner: KT? = null
 
             var seats: Map<KT, Int>
-            get() = _seats
-            set(seats) {
-                _seats = seats
-                onPropertyRefreshed(Property.SEATS)
-            }
+                get() = _seats
+                set(seats) {
+                    _seats = seats
+                    onPropertyRefreshed(Property.SEATS)
+                }
 
             var winner: KT?
-            get() = _winner
-            set(winner) {
-                _winner = winner
-                onPropertyRefreshed(Property.WINNER)
-            }
+                get() = _winner
+                set(winner) {
+                    _winner = winner
+                    onPropertyRefreshed(Property.WINNER)
+                }
         }
 
         private fun doubleLineBarLimit(): Int {
@@ -360,27 +366,30 @@ class BasicResultPanel private constructor(
             current.getBinding().bind { result.seats = it }
             winner?.getBinding()?.bind { result.winner = it }
             val bars = Binding.propertyBinding(
-                    result,
-                    { r: Result<KT> ->
-                        val numBars = r.seats.size
-                        r.seats.entries.asSequence()
-                                .sortedByDescending { e: Map.Entry<KT, Int> -> if (e.key === Party.OTHERS) Int.MIN_VALUE else e.value }
-                                .map { e: Map.Entry<KT, Int> ->
-                                    BasicBar(
-                                            keyTemplate.toMainBarHeader(
-                                                    e.key, numBars > doubleLineBarLimit()),
-                                            keyTemplate.toParty(e.key).color,
-                                            e.value, e.value.toString(),
-                                            if (e.key == r.winner) keyTemplate.winnerShape(numBars > doubleLineBarLimit()) else null)
-                                }
-                                .toList()
-                    },
-                    Result.Property.SEATS,
-                    Result.Property.WINNER)
+                result,
+                { r: Result<KT> ->
+                    val numBars = r.seats.size
+                    r.seats.entries.asSequence()
+                        .sortedByDescending { e: Map.Entry<KT, Int> -> if (e.key === Party.OTHERS) Int.MIN_VALUE else e.value }
+                        .map { e: Map.Entry<KT, Int> ->
+                            BasicBar(
+                                keyTemplate.toMainBarHeader(
+                                    e.key, numBars > doubleLineBarLimit()
+                                ),
+                                keyTemplate.toParty(e.key).color,
+                                e.value, e.value.toString(),
+                                if (e.key == r.winner) keyTemplate.winnerShape(numBars > doubleLineBarLimit()) else null
+                            )
+                        }
+                        .toList()
+                },
+                Result.Property.SEATS,
+                Result.Property.WINNER
+            )
             var builder = BarFrameBuilder.basic(bars)
-                    .withHeader(header.getBinding())
-                    .withSubhead(subhead.getBinding())
-                    .withNotes(this.notes?.getBinding() ?: Binding.fixedBinding(null))
+                .withHeader(header.getBinding())
+                .withSubhead(subhead.getBinding())
+                .withNotes(this.notes?.getBinding() ?: Binding.fixedBinding(null))
             val total = this.total
             if (total != null) {
                 builder = builder.withMax(total.getBinding { it * 2 / 3 })
@@ -395,8 +404,8 @@ class BasicResultPanel private constructor(
                 val total = this.total ?: throw IllegalArgumentException("Cannot show majority line without total")
                 val lines = showMajority.getBinding().merge(total.getBinding()) {
                     show, tot ->
-                        if (show) listOf(tot / 2 + 1)
-                        else emptyList()
+                    if (show) listOf(tot / 2 + 1)
+                    else emptyList()
                 }
                 builder.withLines(lines) { t -> majorityFunction!!(t) }
             }
@@ -405,18 +414,20 @@ class BasicResultPanel private constructor(
         override fun createClassificationFrame(): BarFrame? {
             return classificationHeader?.let { classificationHeader ->
                 val bars: Binding<List<BasicBar>> = Aggregators.adjustKey(
-                        current.getBinding()) { classificationFunc!!(keyTemplate.toParty(it)) }
-                        .map { seats: Map<Party, Int> ->
-                            seats.entries.asSequence()
-                                    .sortedByDescending { it.value }
-                                    .map { e: Map.Entry<Party, Int> ->
-                                        BasicBar(
-                                                e.key.name.uppercase(),
-                                                e.key.color,
-                                                e.value)
-                                    }
-                                    .toList()
-                        }
+                    current.getBinding()
+                ) { classificationFunc!!(keyTemplate.toParty(it)) }
+                    .map { seats: Map<Party, Int> ->
+                        seats.entries.asSequence()
+                            .sortedByDescending { it.value }
+                            .map { e: Map.Entry<Party, Int> ->
+                                BasicBar(
+                                    e.key.name.uppercase(),
+                                    e.key.color,
+                                    e.value
+                                )
+                            }
+                            .toList()
+                    }
                 var builder = BarFrameBuilder.basic(bars).withHeader(classificationHeader.getBinding())
                 val total = this.total
                 if (total != null) {
@@ -431,19 +442,20 @@ class BasicResultPanel private constructor(
             return changeHeader?.let { changeHeader ->
                 val bars = diff!!.getBinding { map: Map<Party, CurrDiff<Int>> ->
                     map.entries.asSequence()
-                            .sortedByDescending { e: Map.Entry<Party, CurrDiff<Int>> -> if (e.key === Party.OTHERS) Int.MIN_VALUE else e.value.curr }
-                            .map { e: Map.Entry<Party, CurrDiff<Int>> ->
-                                BasicBar(
-                                        e.key.abbreviation.uppercase(),
-                                        e.key.color,
-                                        e.value.diff,
-                                        changeStr(e.value.diff))
-                            }
-                            .toList()
+                        .sortedByDescending { e: Map.Entry<Party, CurrDiff<Int>> -> if (e.key === Party.OTHERS) Int.MIN_VALUE else e.value.curr }
+                        .map { e: Map.Entry<Party, CurrDiff<Int>> ->
+                            BasicBar(
+                                e.key.abbreviation.uppercase(),
+                                e.key.color,
+                                e.value.diff,
+                                changeStr(e.value.diff)
+                            )
+                        }
+                        .toList()
                 }
                 var builder = BarFrameBuilder.basic(bars)
-                        .withHeader(changeHeader.getBinding())
-                        .withSubhead(changeSubhead?.getBinding() ?: Binding.fixedBinding(null))
+                    .withHeader(changeHeader.getBinding())
+                    .withSubhead(changeSubhead?.getBinding() ?: Binding.fixedBinding(null))
                 val total = this.total
                 if (total != null) {
                     builder = builder.withWingspan(total.getBinding { (it / 20).coerceAtLeast(1) })
@@ -500,18 +512,18 @@ class BasicResultPanel private constructor(
             private var _winner: KT? = null
 
             var seats: Map<KT, Pair<Int, Int>>
-            get() = _seats
-            set(seats) {
-                _seats = seats
-                onPropertyRefreshed(Property.SEATS)
-            }
+                get() = _seats
+                set(seats) {
+                    _seats = seats
+                    onPropertyRefreshed(Property.SEATS)
+                }
 
             var winner: KT?
-            get() = _winner
-            set(winner) {
-                _winner = winner
-                onPropertyRefreshed(Property.WINNER)
-            }
+                get() = _winner
+                set(winner) {
+                    _winner = winner
+                    onPropertyRefreshed(Property.WINNER)
+                }
         }
 
         private fun doubleLineBarLimit(): Int {
@@ -523,25 +535,28 @@ class BasicResultPanel private constructor(
             current.getBinding().bind { result.seats = it }
             winner?.getBinding()?.bind { result.winner = it }
             val bars = Binding.propertyBinding(
-                    result,
-                    { r: Result<KT> ->
-                        val count = r.seats.size
-                        r.seats.entries.asSequence()
-                                .sortedByDescending { e: Map.Entry<KT, Pair<Int, Int>> -> if (e.key === Party.OTHERS) Int.MIN_VALUE else e.value.second }
-                                .map { e: Map.Entry<KT, Pair<Int, Int>> ->
-                                    DualBar(
-                                            keyTemplate.toMainBarHeader(
-                                                    e.key, count > doubleLineBarLimit()),
-                                            keyTemplate.toParty(e.key).color,
-                                            if (focusLocation == FocusLocation.FIRST) e.value.first else (e.value.second - e.value.first),
-                                            e.value.second,
-                                            e.value.first.toString() + "/" + e.value.second,
-                                            if (e.key == r.winner) keyTemplate.winnerShape(count > doubleLineBarLimit()) else null)
-                                }
-                                .toList()
-                    },
-                    Result.Property.SEATS,
-                    Result.Property.WINNER)
+                result,
+                { r: Result<KT> ->
+                    val count = r.seats.size
+                    r.seats.entries.asSequence()
+                        .sortedByDescending { e: Map.Entry<KT, Pair<Int, Int>> -> if (e.key === Party.OTHERS) Int.MIN_VALUE else e.value.second }
+                        .map { e: Map.Entry<KT, Pair<Int, Int>> ->
+                            DualBar(
+                                keyTemplate.toMainBarHeader(
+                                    e.key, count > doubleLineBarLimit()
+                                ),
+                                keyTemplate.toParty(e.key).color,
+                                if (focusLocation == FocusLocation.FIRST) e.value.first else (e.value.second - e.value.first),
+                                e.value.second,
+                                e.value.first.toString() + "/" + e.value.second,
+                                if (e.key == r.winner) keyTemplate.winnerShape(count > doubleLineBarLimit()) else null
+                            )
+                        }
+                        .toList()
+                },
+                Result.Property.SEATS,
+                Result.Property.WINNER
+            )
             var builder = if (focusLocation == FocusLocation.FIRST) {
                 BarFrameBuilder.dual(bars)
             } else {
@@ -562,8 +577,8 @@ class BasicResultPanel private constructor(
                 }
                 val lines = showMajority.getBinding().merge(total.getBinding()) {
                     show, tot ->
-                        if (show) listOf(tot / 2 + 1)
-                        else emptyList()
+                    if (show) listOf(tot / 2 + 1)
+                    else emptyList()
                 }
                 builder = builder.withLines(lines) { t -> majorityFunction!!(t) }
             }
@@ -581,29 +596,30 @@ class BasicResultPanel private constructor(
             return changeHeader?.let { changeHeader ->
                 val bars = diff!!.getBinding { map: Map<Party, CurrDiff<Pair<Int, Int>>> ->
                     map.entries.asSequence()
-                            .sortedByDescending { e: Map.Entry<Party, CurrDiff<Pair<Int, Int>>> -> if (e.key === Party.OTHERS) Int.MIN_VALUE else e.value.curr.second }
-                            .map { e: Map.Entry<Party, CurrDiff<Pair<Int, Int>>> ->
-                                DualBar(
-                                        e.key.abbreviation.uppercase(),
-                                        e.key.color,
-                                        if (focusLocation == FocusLocation.FIRST ||
-                                            (e.value.diff.first != 0 && sign(e.value.diff.first.toDouble()) != sign(e.value.diff.second.toDouble())) ||
-                                            abs(e.value.diff.first.toDouble()) > abs(e.value.diff.second.toDouble())
-                                        ) e.value.diff.first else (e.value.diff.second - e.value.diff.first),
-                                        e.value.diff.second,
-                                        changeStr(e.value.diff.first) +
-                                                "/" +
-                                                changeStr(e.value.diff.second))
-                            }
-                            .toList()
+                        .sortedByDescending { e: Map.Entry<Party, CurrDiff<Pair<Int, Int>>> -> if (e.key === Party.OTHERS) Int.MIN_VALUE else e.value.curr.second }
+                        .map { e: Map.Entry<Party, CurrDiff<Pair<Int, Int>>> ->
+                            DualBar(
+                                e.key.abbreviation.uppercase(),
+                                e.key.color,
+                                if (focusLocation == FocusLocation.FIRST ||
+                                    (e.value.diff.first != 0 && sign(e.value.diff.first.toDouble()) != sign(e.value.diff.second.toDouble())) ||
+                                    abs(e.value.diff.first.toDouble()) > abs(e.value.diff.second.toDouble())
+                                ) e.value.diff.first else (e.value.diff.second - e.value.diff.first),
+                                e.value.diff.second,
+                                changeStr(e.value.diff.first) +
+                                    "/" +
+                                    changeStr(e.value.diff.second)
+                            )
+                        }
+                        .toList()
                 }
                 var builder = if (focusLocation == FocusLocation.FIRST)
                     BarFrameBuilder.dual(bars)
                 else
                     BarFrameBuilder.dualReversed(bars)
                 builder = builder
-                        .withHeader(changeHeader.getBinding())
-                        .withSubhead(changeSubhead?.getBinding() ?: Binding.fixedBinding(null))
+                    .withHeader(changeHeader.getBinding())
+                    .withSubhead(changeSubhead?.getBinding() ?: Binding.fixedBinding(null))
                 val total = this.total
                 if (total != null) {
                     builder = builder.withWingspan(total.getBinding { (it / 20).coerceAtLeast(1) })
@@ -650,18 +666,18 @@ class BasicResultPanel private constructor(
             private var _winner: KT? = null
 
             var seats: Map<KT, IntRange>
-            get() = _seats
-            set(seats) {
-                _seats = seats
-                onPropertyRefreshed(Property.SEATS)
-            }
+                get() = _seats
+                set(seats) {
+                    _seats = seats
+                    onPropertyRefreshed(Property.SEATS)
+                }
 
             var winner: KT?
-            get() = _winner
-            set(winner) {
-                _winner = winner
-                onPropertyRefreshed(Property.WINNER)
-            }
+                get() = _winner
+                set(winner) {
+                    _winner = winner
+                    onPropertyRefreshed(Property.WINNER)
+                }
         }
 
         private fun doubleLineBarLimit(): Int {
@@ -673,30 +689,33 @@ class BasicResultPanel private constructor(
             current.getBinding().bind { result.seats = it }
             winner?.getBinding()?.bind { result.winner = it }
             val bars = Binding.propertyBinding(
-                    result,
-                    { r: Result<KT> ->
-                        val count = r.seats.size
-                        r.seats.entries.asSequence()
-                                .sortedByDescending { e: Map.Entry<KT, IntRange> -> if (e.key === Party.OTHERS) Int.MIN_VALUE else (e.value.first + e.value.last) }
-                                .map { e: Map.Entry<KT, IntRange> ->
-                                    DualBar(
-                                            keyTemplate.toMainBarHeader(
-                                                    e.key, count > doubleLineBarLimit()),
-                                            keyTemplate.toParty(e.key).color,
-                                            e.value.first,
-                                            e.value.last,
-                                            e.value.first.toString() + "-" + e.value.last,
-                                            if (e.key == r.winner) keyTemplate.winnerShape(count > doubleLineBarLimit()) else null)
-                                }
-                                .toList()
-                    },
-                    Result.Property.SEATS,
-                    Result.Property.WINNER)
+                result,
+                { r: Result<KT> ->
+                    val count = r.seats.size
+                    r.seats.entries.asSequence()
+                        .sortedByDescending { e: Map.Entry<KT, IntRange> -> if (e.key === Party.OTHERS) Int.MIN_VALUE else (e.value.first + e.value.last) }
+                        .map { e: Map.Entry<KT, IntRange> ->
+                            DualBar(
+                                keyTemplate.toMainBarHeader(
+                                    e.key, count > doubleLineBarLimit()
+                                ),
+                                keyTemplate.toParty(e.key).color,
+                                e.value.first,
+                                e.value.last,
+                                e.value.first.toString() + "-" + e.value.last,
+                                if (e.key == r.winner) keyTemplate.winnerShape(count > doubleLineBarLimit()) else null
+                            )
+                        }
+                        .toList()
+                },
+                Result.Property.SEATS,
+                Result.Property.WINNER
+            )
             val notes = this.notes
             var builder = BarFrameBuilder.dual(bars)
-                    .withHeader(header.getBinding())
-                    .withSubhead(subhead.getBinding())
-                    .withNotes(notes?.getBinding() ?: Binding.fixedBinding(null))
+                .withHeader(header.getBinding())
+                .withSubhead(subhead.getBinding())
+                .withNotes(notes?.getBinding() ?: Binding.fixedBinding(null))
             val total = this.total
             if (total != null) {
                 builder = builder.withMax(total.getBinding { it * 2 / 3 })
@@ -708,8 +727,8 @@ class BasicResultPanel private constructor(
                 }
                 val lines = showMajority.getBinding().merge(total.getBinding()) {
                     show, tot ->
-                        if (show) listOf(tot / 2 + 1)
-                        else emptyList()
+                    if (show) listOf(tot / 2 + 1)
+                    else emptyList()
                 }
                 builder = builder.withLines(lines) { t -> majorityFunction!!(t) }
             }
@@ -727,27 +746,28 @@ class BasicResultPanel private constructor(
             return changeHeader?.let { changeHeader ->
                 val bars = diff!!.getBinding { map: Map<Party, CurrDiff<IntRange>> ->
                     map.entries.asSequence()
-                            .sortedByDescending { e: Map.Entry<Party, CurrDiff<IntRange>> ->
-                                if (e.key === Party.OTHERS) Int.MIN_VALUE
-                                else (e.value.curr.first + e.value.curr.last)
-                            }
-                            .map { e: Map.Entry<Party, CurrDiff<IntRange>> ->
-                                DualBar(
-                                        e.key.abbreviation.uppercase(),
-                                        e.key.color,
-                                        e.value.diff.first,
-                                        e.value.diff.last,
-                                        "(" +
-                                                changeStr(e.value.diff.first) +
-                                                ")-(" +
-                                                changeStr(e.value.diff.last) +
-                                                ")")
-                            }
-                            .toList()
+                        .sortedByDescending { e: Map.Entry<Party, CurrDiff<IntRange>> ->
+                            if (e.key === Party.OTHERS) Int.MIN_VALUE
+                            else (e.value.curr.first + e.value.curr.last)
+                        }
+                        .map { e: Map.Entry<Party, CurrDiff<IntRange>> ->
+                            DualBar(
+                                e.key.abbreviation.uppercase(),
+                                e.key.color,
+                                e.value.diff.first,
+                                e.value.diff.last,
+                                "(" +
+                                    changeStr(e.value.diff.first) +
+                                    ")-(" +
+                                    changeStr(e.value.diff.last) +
+                                    ")"
+                            )
+                        }
+                        .toList()
                 }
                 var builder = BarFrameBuilder.dual(bars)
-                        .withHeader(changeHeader.getBinding())
-                        .withSubhead(changeSubhead?.getBinding() ?: Binding.fixedBinding(null))
+                    .withHeader(changeHeader.getBinding())
+                    .withSubhead(changeSubhead?.getBinding() ?: Binding.fixedBinding(null))
                 val total = this.total
                 if (total != null) {
                     builder = builder.withWingspan(total.getBinding { (it / 20).coerceAtLeast(1) })
@@ -775,10 +795,12 @@ class BasicResultPanel private constructor(
 
     private class VotePctTemplate : VoteTemplate {
         override fun toBarString(votes: Int, pct: Double, forceSingleLine: Boolean): String {
-            return (THOUSANDS_FORMAT.format(votes.toLong()) +
+            return (
+                THOUSANDS_FORMAT.format(votes.toLong()) +
                     (if (forceSingleLine) " (" else "\n") +
                     PCT_FORMAT.format(pct) +
-                    (if (forceSingleLine) ")" else ""))
+                    (if (forceSingleLine) ")" else "")
+                )
         }
     }
 
@@ -975,12 +997,13 @@ class BasicResultPanel private constructor(
 
         fun build(textHeader: Binding<String>): BasicResultPanel {
             return BasicResultPanel(
-                    createHeaderLabel(textHeader),
-                    createFrame(),
-                    if (classificationHeader == null) createPreferenceFrame() else createClassificationFrame(),
-                    createDiffFrame(),
-                    createSwingFrame(),
-                    createMapFrame())
+                createHeaderLabel(textHeader),
+                createFrame(),
+                if (classificationHeader == null) createPreferenceFrame() else createClassificationFrame(),
+                createDiffFrame(),
+                createSwingFrame(),
+                createMapFrame()
+            )
         }
 
         protected abstract fun createFrame(): BarFrame
@@ -1012,25 +1035,25 @@ class BasicResultPanel private constructor(
             private var _runoff: Set<KT>? = null
 
             var votes: Map<KT, Int?>
-            get() = _votes
-            set(votes) {
-                _votes = votes
-                onPropertyRefreshed(Property.VOTES)
-            }
+                get() = _votes
+                set(votes) {
+                    _votes = votes
+                    onPropertyRefreshed(Property.VOTES)
+                }
 
             var winner: KT?
-            get() = _winner
-            set(winner) {
-                _winner = winner
-                onPropertyRefreshed(Property.WINNER)
-            }
+                get() = _winner
+                set(winner) {
+                    _winner = winner
+                    onPropertyRefreshed(Property.WINNER)
+                }
 
             var runoff: Set<KT>?
-            get() = _runoff
-            set(runoff) {
-                _runoff = runoff
-                onPropertyRefreshed(Property.RUNOFF)
-            }
+                get() = _runoff
+                set(runoff) {
+                    _runoff = runoff
+                    onPropertyRefreshed(Property.RUNOFF)
+                }
         }
 
         private fun doubleLineBarLimit(): Int {
@@ -1043,64 +1066,70 @@ class BasicResultPanel private constructor(
             winner?.getBinding()?.bind { result.winner = it }
             runoff?.getBinding()?.bind { result.runoff = it }
             val bars = Binding.propertyBinding(
-                    result,
-                    { r: Result<KT> ->
-                        val total = r.votes.values.filterNotNull().sum()
-                        @Suppress("UNCHECKED_CAST") val mandatory = sequenceOf(
-                                r.votes.keys.asSequence()
-                                        .filter { k: KT -> mandatoryParties.contains(keyTemplate.toParty(k)) },
-                                (r.runoff?.asSequence() ?: emptySequence()), sequenceOf(r.winner)
-                                        .filter { obj -> Objects.nonNull(obj) })
-                                .flatten()
-                                .filter { it != null }
-                                .map { it as Any }
-                                .toList().toTypedArray() as Array<KT>
-                        val aggregatedResult = Aggregators.topAndOthers(r.votes, limit, others, *mandatory)
-                        val count = aggregatedResult.size
-                        val partialDeclaration = r.votes.values.any { it == null }
-                        aggregatedResult.entries.asSequence()
-                                .sortedByDescending { e: Map.Entry<KT, Int?> ->
-                                    if (e.key === others) Int.MIN_VALUE
-                                    else (e.value ?: -1)
+                result,
+                { r: Result<KT> ->
+                    val total = r.votes.values.filterNotNull().sum()
+                    @Suppress("UNCHECKED_CAST") val mandatory = sequenceOf(
+                        r.votes.keys.asSequence()
+                            .filter { k: KT -> mandatoryParties.contains(keyTemplate.toParty(k)) },
+                        (r.runoff?.asSequence() ?: emptySequence()),
+                        sequenceOf(r.winner)
+                            .filter { obj -> Objects.nonNull(obj) }
+                    )
+                        .flatten()
+                        .filter { it != null }
+                        .map { it as Any }
+                        .toList().toTypedArray() as Array<KT>
+                    val aggregatedResult = Aggregators.topAndOthers(r.votes, limit, others, *mandatory)
+                    val count = aggregatedResult.size
+                    val partialDeclaration = r.votes.values.any { it == null }
+                    aggregatedResult.entries.asSequence()
+                        .sortedByDescending { e: Map.Entry<KT, Int?> ->
+                            if (e.key === others) Int.MIN_VALUE
+                            else (e.value ?: -1)
+                        }
+                        .map { e ->
+                            val pct = e.value?.toDouble()?.div(total) ?: Double.NaN
+                            val valueLabel: String = when {
+                                count == 1 -> {
+                                    "UNCONTESTED"
                                 }
-                                .map { e ->
-                                    val pct = e.value?.toDouble()?.div(total) ?: Double.NaN
-                                    val valueLabel: String = when {
-                                        count == 1 -> {
-                                            "UNCONTESTED"
-                                        }
-                                        java.lang.Double.isNaN(pct) -> {
-                                            "WAITING..."
-                                        }
-                                        partialDeclaration -> {
-                                            THOUSANDS_FORMAT.format(e.value)
-                                        }
-                                        else -> {
-                                            voteTemplate.toBarString(
-                                                    e.value!!, pct, count > doubleLineBarLimit())
-                                        }
-                                    }
-                                    val shape: Shape? = if (e.key == r.winner) keyTemplate.winnerShape(count > doubleLineBarLimit()) else if ((r.runoff ?: emptySet()).contains(e.key)) keyTemplate.runoffShape(count > doubleLineBarLimit()) else null
-                                    BasicBar(
-                                            keyTemplate.toMainBarHeader(e.key, count > doubleLineBarLimit()),
-                                            keyTemplate.toParty(e.key).color,
-                                            if (java.lang.Double.isNaN(pct)) 0 else pct,
-                                            valueLabel,
-                                            shape)
+                                java.lang.Double.isNaN(pct) -> {
+                                    "WAITING..."
                                 }
-                                .toList()
-                    },
-                    Result.Property.VOTES,
-                    Result.Property.WINNER,
-                    Result.Property.RUNOFF)
+                                partialDeclaration -> {
+                                    THOUSANDS_FORMAT.format(e.value)
+                                }
+                                else -> {
+                                    voteTemplate.toBarString(
+                                        e.value!!, pct, count > doubleLineBarLimit()
+                                    )
+                                }
+                            }
+                            val shape: Shape? = if (e.key == r.winner) keyTemplate.winnerShape(count > doubleLineBarLimit()) else if ((r.runoff ?: emptySet()).contains(e.key)) keyTemplate.runoffShape(count > doubleLineBarLimit()) else null
+                            BasicBar(
+                                keyTemplate.toMainBarHeader(e.key, count > doubleLineBarLimit()),
+                                keyTemplate.toParty(e.key).color,
+                                if (java.lang.Double.isNaN(pct)) 0 else pct,
+                                valueLabel,
+                                shape
+                            )
+                        }
+                        .toList()
+                },
+                Result.Property.VOTES,
+                Result.Property.WINNER,
+                Result.Property.RUNOFF
+            )
             val notes = this.notes
             val pctReporting = this.pctReporting
             val builder = BarFrameBuilder.basic(bars)
-                    .withHeader(header.getBinding())
-                    .withSubhead(subhead.getBinding())
-                    .withNotes(notes?.getBinding() ?: Binding.fixedBinding(null))
-                    .withMax(
-                            pctReporting?.getBinding { 2.0 / 3 / it.coerceAtLeast(1e-6) } ?: Binding.fixedBinding(2.0 / 3))
+                .withHeader(header.getBinding())
+                .withSubhead(subhead.getBinding())
+                .withNotes(notes?.getBinding() ?: Binding.fixedBinding(null))
+                .withMax(
+                    pctReporting?.getBinding { 2.0 / 3 / it.coerceAtLeast(1e-6) } ?: Binding.fixedBinding(2.0 / 3)
+                )
             applyMajorityLine(builder)
             return builder.build()
         }
@@ -1113,8 +1142,8 @@ class BasicResultPanel private constructor(
                     pctReporting?.getBinding() ?: Binding.fixedBinding(1.0)
                 ) {
                     show, pct ->
-                        if (show) listOf(0.5 / pct.coerceAtLeast(1e-6))
-                        else emptyList()
+                    if (show) listOf(0.5 / pct.coerceAtLeast(1e-6))
+                    else emptyList()
                 }
                 builder.withLines(lines) { majorityLabel!!.value }
             }
@@ -1129,18 +1158,18 @@ class BasicResultPanel private constructor(
             private var _prevVotes: Map<Party, Int> = HashMap()
 
             var currVotes: Map<KT, Int?>
-            get() = _currVotes
-            set(currVotes) {
-                _currVotes = currVotes
-                onPropertyRefreshed(Property.CURR)
-            }
+                get() = _currVotes
+                set(currVotes) {
+                    _currVotes = currVotes
+                    onPropertyRefreshed(Property.CURR)
+                }
 
             var prevVotes: Map<Party, Int>
-            get() = _prevVotes
-            set(prevVotes) {
-                _prevVotes = prevVotes
-                onPropertyRefreshed(Property.PREV)
-            }
+                get() = _prevVotes
+                set(prevVotes) {
+                    _prevVotes = prevVotes
+                    onPropertyRefreshed(Property.PREV)
+                }
         }
 
         override fun createPreferenceFrame(): BarFrame? {
@@ -1149,80 +1178,87 @@ class BasicResultPanel private constructor(
                 currPreferences.getBinding().bind { result.votes = it }
                 winner?.getBinding()?.bind { result.winner = it }
                 val bars = Binding.propertyBinding(
-                        result,
-                        { r: Result<KT> ->
-                            val total = r.votes.values.filterNotNull().sum()
-                            val partialDeclaration = r.votes.values.any { it == null }
-                            val count = r.votes.size
-                            r.votes.entries.asSequence()
-                                    .sortedByDescending { e: Map.Entry<KT, Int?> -> if (e.key === others) Int.MIN_VALUE else (e.value ?: -1) }
-                                    .map { e ->
-                                        val pct = e.value?.toDouble()?.div(total) ?: Double.NaN
-                                        val valueLabel: String = when {
-                                            count == 1 -> {
-                                                "ELECTED"
-                                            }
-                                            java.lang.Double.isNaN(pct) -> {
-                                                "WAITING..."
-                                            }
-                                            partialDeclaration -> {
-                                                THOUSANDS_FORMAT.format(e.value)
-                                            }
-                                            else -> {
-                                                voteTemplate.toBarString(e.value!!, pct, true)
-                                            }
-                                        }
-                                        val shape: Shape? = if (e.key == r.winner) keyTemplate.winnerShape(true) else if ((r.runoff ?: emptySet()).contains(e.key)) keyTemplate.runoffShape(true) else null
-                                        BasicBar(
-                                                keyTemplate.toMainBarHeader(e.key, true),
-                                                keyTemplate.toParty(e.key).color,
-                                                if (java.lang.Double.isNaN(pct)) 0 else pct,
-                                                valueLabel,
-                                                shape)
+                    result,
+                    { r: Result<KT> ->
+                        val total = r.votes.values.filterNotNull().sum()
+                        val partialDeclaration = r.votes.values.any { it == null }
+                        val count = r.votes.size
+                        r.votes.entries.asSequence()
+                            .sortedByDescending { e: Map.Entry<KT, Int?> -> if (e.key === others) Int.MIN_VALUE else (e.value ?: -1) }
+                            .map { e ->
+                                val pct = e.value?.toDouble()?.div(total) ?: Double.NaN
+                                val valueLabel: String = when {
+                                    count == 1 -> {
+                                        "ELECTED"
                                     }
-                                    .toList()
-                        },
-                        Result.Property.VOTES,
-                        Result.Property.WINNER,
-                        Result.Property.RUNOFF)
+                                    java.lang.Double.isNaN(pct) -> {
+                                        "WAITING..."
+                                    }
+                                    partialDeclaration -> {
+                                        THOUSANDS_FORMAT.format(e.value)
+                                    }
+                                    else -> {
+                                        voteTemplate.toBarString(e.value!!, pct, true)
+                                    }
+                                }
+                                val shape: Shape? = if (e.key == r.winner) keyTemplate.winnerShape(true) else if ((r.runoff ?: emptySet()).contains(e.key)) keyTemplate.runoffShape(true) else null
+                                BasicBar(
+                                    keyTemplate.toMainBarHeader(e.key, true),
+                                    keyTemplate.toParty(e.key).color,
+                                    if (java.lang.Double.isNaN(pct)) 0 else pct,
+                                    valueLabel,
+                                    shape
+                                )
+                            }
+                            .toList()
+                    },
+                    Result.Property.VOTES,
+                    Result.Property.WINNER,
+                    Result.Property.RUNOFF
+                )
                 val preferencePctReporting = this.preferencePctReporting
                 return BarFrameBuilder.basic(bars)
-                        .withHeader(preferenceHeader!!.getBinding())
-                        .withSubhead(preferenceSubhead?.getBinding() ?: Binding.fixedBinding(null))
-                        .withLines(
-                                preferencePctReporting?.getBinding { listOf(0.5 / it.coerceAtLeast(1e-6)) }
-                                        ?: Binding.fixedBinding(listOf(0.5))
-                        ) { "50%" }
-                        .withMax(
-                                preferencePctReporting?.getBinding { 2.0 / 3 / it.coerceAtLeast(1e-6) }
-                                        ?: Binding.fixedBinding(2.0 / 3))
-                        .build()
+                    .withHeader(preferenceHeader!!.getBinding())
+                    .withSubhead(preferenceSubhead?.getBinding() ?: Binding.fixedBinding(null))
+                    .withLines(
+                        preferencePctReporting?.getBinding { listOf(0.5 / it.coerceAtLeast(1e-6)) }
+                            ?: Binding.fixedBinding(listOf(0.5))
+                    ) { "50%" }
+                    .withMax(
+                        preferencePctReporting?.getBinding { 2.0 / 3 / it.coerceAtLeast(1e-6) }
+                            ?: Binding.fixedBinding(2.0 / 3)
+                    )
+                    .build()
             }
         }
 
         override fun createClassificationFrame(): BarFrame? {
             return classificationHeader?.let { classificationHeader ->
                 val bars: Binding<List<BasicBar>> = Aggregators.adjustKey(
-                        current.getBinding().map { it.mapValues { e -> e.value ?: throw UnsupportedOperationException("Classifications not supported for partial declarations") } }) { classificationFunc!!(keyTemplate.toParty(it)) }
-                        .map { m: Map<Party, Int> ->
-                            val total = m.values.sum()
-                            m.entries.asSequence()
-                                    .sortedByDescending { it.value }
-                                    .map { e: Map.Entry<Party, Int> ->
-                                        BasicBar(
-                                                e.key.name.uppercase(),
-                                                e.key.color,
-                                                1.0 * e.value / total,
-                                                voteTemplate.toBarString(
-                                                        e.value, 1.0 * e.value / total, true))
-                                    }
-                                    .toList()
-                        }
+                    current.getBinding().map { it.mapValues { e -> e.value ?: throw UnsupportedOperationException("Classifications not supported for partial declarations") } }
+                ) { classificationFunc!!(keyTemplate.toParty(it)) }
+                    .map { m: Map<Party, Int> ->
+                        val total = m.values.sum()
+                        m.entries.asSequence()
+                            .sortedByDescending { it.value }
+                            .map { e: Map.Entry<Party, Int> ->
+                                BasicBar(
+                                    e.key.name.uppercase(),
+                                    e.key.color,
+                                    1.0 * e.value / total,
+                                    voteTemplate.toBarString(
+                                        e.value, 1.0 * e.value / total, true
+                                    )
+                                )
+                            }
+                            .toList()
+                    }
                 val pctReporting = this.pctReporting
                 val builder = BarFrameBuilder.basic(bars)
-                        .withHeader(classificationHeader.getBinding())
-                        .withMax(
-                                pctReporting?.getBinding { 2.0 / 3 / it.coerceAtLeast(1e-6) } ?: Binding.fixedBinding(2.0 / 3))
+                    .withHeader(classificationHeader.getBinding())
+                    .withMax(
+                        pctReporting?.getBinding { 2.0 / 3 / it.coerceAtLeast(1e-6) } ?: Binding.fixedBinding(2.0 / 3)
+                    )
                 applyMajorityLine(builder)
                 return builder.build()
             }
@@ -1234,71 +1270,76 @@ class BasicResultPanel private constructor(
                 current.getBinding().bind { change.currVotes = it }
                 prev.getBinding().bind { change.prevVotes = it }
                 val bars = Binding.propertyBinding(
-                        change,
-                        { r: Change<KT> ->
-                            if (r.currVotes.values.any { it == null }) {
-                                return@propertyBinding emptyList()
+                    change,
+                    { r: Change<KT> ->
+                        if (r.currVotes.values.any { it == null }) {
+                            return@propertyBinding emptyList()
+                        }
+                        val prevWinner: Party? = r.prevVotes.entries
+                            .maxByOrNull { it.value }
+                            ?.key
+                        val prevHasOther = r.prevVotes.containsKey(Party.OTHERS)
+                        val partiesToShow = sequenceOf(
+                            sequenceOf(prevWinner),
+                            r.currVotes.entries
+                                .asSequence()
+                                .filter { !prevHasOther || r.prevVotes.containsKey(keyTemplate.toParty(it.key)) }
+                                .sortedByDescending { it.value!! }
+                                .map { keyTemplate.toParty(it.key) }
+                        ).flatten().filterNotNull().distinct().take(10).toSet()
+                        if (prevWinner == null ||
+                            r.currVotes.keys
+                                .map { key: KT -> keyTemplate.toParty(key) }
+                                .none { it == prevWinner }
+                        ) {
+                            return@propertyBinding emptyList()
+                        }
+                        val currTotal = r.currVotes.values.filterNotNull().sum()
+                        val prevTotal = r.prevVotes.values.sum()
+                        if (currTotal == 0 || prevTotal == 0) {
+                            return@propertyBinding emptyList()
+                        }
+                        val partyTotal = Aggregators.topAndOthers(
+                            consolidate(currTotalByParty(r.currVotes), partiesToShow),
+                            limit,
+                            Party.OTHERS,
+                            *mandatoryParties.toTypedArray()
+                        )
+                            .toMutableMap()
+                        val prevVotes: MutableMap<Party, Int> = HashMap(r.prevVotes)
+                        r.prevVotes.entries.asSequence()
+                            .filter { e: Map.Entry<Party, Int> -> !partyTotal.containsKey(e.key) }
+                            .forEach { e: Map.Entry<Party, Int> ->
+                                partyTotal.putIfAbsent(Party.OTHERS, 0)
+                                if (e.key != Party.OTHERS) {
+                                    prevVotes.merge(Party.OTHERS, e.value) { a: Int, b: Int -> Integer.sum(a, b) }
+                                }
                             }
-                            val prevWinner: Party? = r.prevVotes.entries
-                                    .maxByOrNull { it.value }
-                                    ?.key
-                            val prevHasOther = r.prevVotes.containsKey(Party.OTHERS)
-                            val partiesToShow = sequenceOf(
-                                sequenceOf(prevWinner),
-                                r.currVotes.entries
-                                    .asSequence()
-                                    .filter { !prevHasOther || r.prevVotes.containsKey(keyTemplate.toParty(it.key)) }
-                                    .sortedByDescending { it.value!! }
-                                    .map { keyTemplate.toParty(it.key) }
-                            ).flatten().filterNotNull().distinct().take(10).toSet()
-                            if (prevWinner == null ||
-                                    r.currVotes.keys
-                                            .map { key: KT -> keyTemplate.toParty(key) }
-                                            .none { it == prevWinner }) {
-                                return@propertyBinding emptyList()
+                        partyTotal.entries.asSequence()
+                            .sortedByDescending { e: Map.Entry<Party, Int> -> if (e.key === Party.OTHERS) Int.MIN_VALUE else e.value }
+                            .map { e: Map.Entry<Party, Int> ->
+                                val cpct = 1.0 * e.value / currTotal
+                                val ppct = 1.0 * prevVotes.getOrDefault(e.key, 0) / prevTotal
+                                BasicBar(
+                                    e.key.abbreviation.uppercase(),
+                                    e.key.color,
+                                    cpct - ppct,
+                                    DecimalFormat("+0.0%;-0.0%").format(cpct - ppct)
+                                )
                             }
-                            val currTotal = r.currVotes.values.filterNotNull().sum()
-                            val prevTotal = r.prevVotes.values.sum()
-                            if (currTotal == 0 || prevTotal == 0) {
-                                return@propertyBinding emptyList()
-                            }
-                            val partyTotal = Aggregators.topAndOthers(
-                                    consolidate(currTotalByParty(r.currVotes), partiesToShow),
-                                    limit,
-                                    Party.OTHERS,
-                                    *mandatoryParties.toTypedArray())
-                                .toMutableMap()
-                            val prevVotes: MutableMap<Party, Int> = HashMap(r.prevVotes)
-                            r.prevVotes.entries.asSequence()
-                                    .filter { e: Map.Entry<Party, Int> -> !partyTotal.containsKey(e.key) }
-                                    .forEach { e: Map.Entry<Party, Int> ->
-                                        partyTotal.putIfAbsent(Party.OTHERS, 0)
-                                        if (e.key != Party.OTHERS) {
-                                            prevVotes.merge(Party.OTHERS, e.value) { a: Int, b: Int -> Integer.sum(a, b) }
-                                        }
-                                    }
-                            partyTotal.entries.asSequence()
-                                    .sortedByDescending { e: Map.Entry<Party, Int> -> if (e.key === Party.OTHERS) Int.MIN_VALUE else e.value }
-                                    .map { e: Map.Entry<Party, Int> ->
-                                        val cpct = 1.0 * e.value / currTotal
-                                        val ppct = 1.0 * prevVotes.getOrDefault(e.key, 0) / prevTotal
-                                        BasicBar(
-                                                e.key.abbreviation.uppercase(),
-                                                e.key.color,
-                                                cpct - ppct,
-                                                DecimalFormat("+0.0%;-0.0%").format(cpct - ppct))
-                                    }
-                                    .toList()
-                        },
-                        Change.Property.CURR,
-                        Change.Property.PREV)
+                            .toList()
+                    },
+                    Change.Property.CURR,
+                    Change.Property.PREV
+                )
                 val pctReporting = this.pctReporting
                 return BarFrameBuilder.basic(bars)
-                        .withWingspan(
-                                pctReporting?.getBinding { 0.1 / it.coerceAtLeast(1e-6) } ?: Binding.fixedBinding(0.1))
-                        .withHeader(changeHeader!!.getBinding())
-                        .withSubhead(changeSubhead?.getBinding() ?: Binding.fixedBinding(null))
-                        .build()
+                    .withWingspan(
+                        pctReporting?.getBinding { 0.1 / it.coerceAtLeast(1e-6) } ?: Binding.fixedBinding(0.1)
+                    )
+                    .withHeader(changeHeader!!.getBinding())
+                    .withSubhead(changeSubhead?.getBinding() ?: Binding.fixedBinding(null))
+                    .build()
             }
         }
 
@@ -1311,41 +1352,43 @@ class BasicResultPanel private constructor(
                 if (currPreferences != null && prevPreferences != null) {
                     curr = currPreferences.getBinding { currTotalByParty(it) }
                     prev = prevPreferences
-                            .getBinding()
-                            .merge(
-                                    currPreferences.getBinding { currTotalByParty(it) }
-                            ) { p: Map<Party, Int>, c: Map<Party, Int> ->
-                                if (c.keys != p.keys) {
-                                    emptyMap()
-                                } else {
-                                    p
-                                }
+                        .getBinding()
+                        .merge(
+                            currPreferences.getBinding { currTotalByParty(it) }
+                        ) { p: Map<Party, Int>, c: Map<Party, Int> ->
+                            if (c.keys != p.keys) {
+                                emptyMap()
+                            } else {
+                                p
                             }
+                        }
                 } else {
                     curr = current.getBinding { currTotalByParty(it) }
                     prev = this.prev!!
-                            .getBinding()
-                            .merge(current.getBinding()) { p: Map<Party, Int>, c: Map<KT, Int?> ->
-                                val prevWinner: Party? = p.entries
-                                        .maxByOrNull { it.value }
-                                        ?.key
-                                if (prevWinner == null ||
-                                        c.keys.asSequence()
-                                                .map { key: KT -> keyTemplate.toParty(key) }
-                                                .none { it == prevWinner }) {
-                                    emptyMap()
-                                } else {
-                                    p
-                                }
+                        .getBinding()
+                        .merge(current.getBinding()) { p: Map<Party, Int>, c: Map<KT, Int?> ->
+                            val prevWinner: Party? = p.entries
+                                .maxByOrNull { it.value }
+                                ?.key
+                            if (prevWinner == null ||
+                                c.keys.asSequence()
+                                    .map { key: KT -> keyTemplate.toParty(key) }
+                                    .none { it == prevWinner }
+                            ) {
+                                emptyMap()
+                            } else {
+                                p
                             }
+                        }
                 }
                 val classificationFunc = classificationFunc
                 return SwingFrameBuilder.prevCurr(
-                        if (classificationFunc == null) prev else Aggregators.adjustKey(prev, classificationFunc),
-                        if (classificationFunc == null) curr else Aggregators.adjustKey(curr, classificationFunc),
-                        swingComparator!!)
-                        .withHeader(swingHeader.getBinding())
-                        .build()
+                    if (classificationFunc == null) prev else Aggregators.adjustKey(prev, classificationFunc),
+                    if (classificationFunc == null) curr else Aggregators.adjustKey(curr, classificationFunc),
+                    swingComparator!!
+                )
+                    .withHeader(swingHeader.getBinding())
+                    .build()
             }
         }
 
@@ -1374,27 +1417,30 @@ class BasicResultPanel private constructor(
         override fun createFrame(): BarFrame {
             val bars = current.getBinding { r: Map<KT, ClosedRange<Double>> ->
                 r.entries.asSequence()
-                        .sortedByDescending { e: Map.Entry<KT, ClosedRange<Double>> -> if (e.key === others) Double.MIN_VALUE else (e.value.start + e.value.endInclusive) }
-                        .map { e: Map.Entry<KT, ClosedRange<Double>> ->
-                            val valueLabel = (DECIMAL_FORMAT.format(100 * e.value.start) +
-                                    "-" +
-                                    DecimalFormat("0.0").format(100 * e.value.endInclusive) +
-                                    "%")
-                            DualBar(
-                                    keyTemplate.toMainBarHeader(e.key, false),
-                                    keyTemplate.toParty(e.key).color,
-                                    e.value.start,
-                                    e.value.endInclusive,
-                                    valueLabel)
-                        }
-                        .toList()
+                    .sortedByDescending { e: Map.Entry<KT, ClosedRange<Double>> -> if (e.key === others) Double.MIN_VALUE else (e.value.start + e.value.endInclusive) }
+                    .map { e: Map.Entry<KT, ClosedRange<Double>> ->
+                        val valueLabel = (
+                            DECIMAL_FORMAT.format(100 * e.value.start) +
+                                "-" +
+                                DecimalFormat("0.0").format(100 * e.value.endInclusive) +
+                                "%"
+                            )
+                        DualBar(
+                            keyTemplate.toMainBarHeader(e.key, false),
+                            keyTemplate.toParty(e.key).color,
+                            e.value.start,
+                            e.value.endInclusive,
+                            valueLabel
+                        )
+                    }
+                    .toList()
             }
             val notes = notes
             var builder = BarFrameBuilder.dual(bars)
-                    .withHeader(header.getBinding())
-                    .withSubhead(subhead.getBinding())
-                    .withNotes(notes?.getBinding() ?: Binding.fixedBinding(null))
-                    .withMax(Binding.fixedBinding(2.0 / 3))
+                .withHeader(header.getBinding())
+                .withSubhead(subhead.getBinding())
+                .withNotes(notes?.getBinding() ?: Binding.fixedBinding(null))
+                .withMax(Binding.fixedBinding(2.0 / 3))
             val showMajority = showMajority
             if (showMajority != null) {
                 val lines = showMajority.getBinding().map {
@@ -1414,18 +1460,18 @@ class BasicResultPanel private constructor(
             private var _prevVotes: Map<Party, Int> = HashMap()
 
             var currVotes: Map<KT, ClosedRange<Double>>
-            get() = _currVotes
-            set(currVotes) {
-                _currVotes = currVotes
-                onPropertyRefreshed(Property.CURR)
-            }
+                get() = _currVotes
+                set(currVotes) {
+                    _currVotes = currVotes
+                    onPropertyRefreshed(Property.CURR)
+                }
 
             var prevVotes: Map<Party, Int>
-            get() = _prevVotes
-            set(prevVotes) {
-                _prevVotes = prevVotes
-                onPropertyRefreshed(Property.PREV)
-            }
+                get() = _prevVotes
+                set(prevVotes) {
+                    _prevVotes = prevVotes
+                    onPropertyRefreshed(Property.PREV)
+                }
         }
 
         override fun createDiffFrame(): BarFrame? {
@@ -1434,46 +1480,48 @@ class BasicResultPanel private constructor(
                 current.getBinding().bind { change.currVotes = it }
                 prev.getBinding().bind { change.prevVotes = it }
                 val bars = Binding.propertyBinding(
-                        change,
-                        { r: Change<KT> ->
-                            val prevTotal = r.prevVotes.values.sum()
-                            if (prevTotal == 0) {
-                                return@propertyBinding emptyList()
+                    change,
+                    { r: Change<KT> ->
+                        val prevTotal = r.prevVotes.values.sum()
+                        if (prevTotal == 0) {
+                            return@propertyBinding emptyList()
+                        }
+                        val partyTotal = currTotalByParty(r.currVotes)
+                        val prevVotes: MutableMap<Party, Int> = HashMap(r.prevVotes)
+                        r.prevVotes.entries.asSequence()
+                            .filter { e: Map.Entry<Party, Int> -> !partyTotal.containsKey(e.key) }
+                            .forEach { e: Map.Entry<Party, Int> ->
+                                partyTotal.putIfAbsent(Party.OTHERS, (0.0).rangeTo(0.0))
+                                prevVotes.merge(Party.OTHERS, e.value) { a: Int, b: Int -> Integer.sum(a, b) }
                             }
-                            val partyTotal = currTotalByParty(r.currVotes)
-                            val prevVotes: MutableMap<Party, Int> = HashMap(r.prevVotes)
-                            r.prevVotes.entries.asSequence()
-                                    .filter { e: Map.Entry<Party, Int> -> !partyTotal.containsKey(e.key) }
-                                    .forEach { e: Map.Entry<Party, Int> ->
-                                        partyTotal.putIfAbsent(Party.OTHERS, (0.0).rangeTo(0.0))
-                                        prevVotes.merge(Party.OTHERS, e.value) { a: Int, b: Int -> Integer.sum(a, b) }
-                                    }
-                            partyTotal.entries.asSequence()
-                                    .sortedByDescending { e: Map.Entry<Party, ClosedRange<Double>> -> if (e.key === Party.OTHERS) Double.MIN_VALUE else (e.value.start + e.value.endInclusive) }
-                                    .map { e: Map.Entry<Party, ClosedRange<Double>> ->
-                                        val cpctMin = e.value.start
-                                        val cpctMax = e.value.endInclusive
-                                        val ppct = 1.0 * prevVotes.getOrDefault(e.key, 0) / prevTotal
-                                        DualBar(
-                                                e.key.abbreviation.uppercase(),
-                                                e.key.color,
-                                                cpctMin - ppct,
-                                                cpctMax - ppct,
-                                                "(" +
-                                                        CHANGE_DECIMAL_FORMAT.format(100.0 * (cpctMin - ppct)) +
-                                                        ")-(" +
-                                                        CHANGE_DECIMAL_FORMAT.format(100.0 * (cpctMax - ppct)) +
-                                                        ")%")
-                                    }
-                                    .toList()
-                        },
-                        Change.Property.CURR,
-                        Change.Property.PREV)
+                        partyTotal.entries.asSequence()
+                            .sortedByDescending { e: Map.Entry<Party, ClosedRange<Double>> -> if (e.key === Party.OTHERS) Double.MIN_VALUE else (e.value.start + e.value.endInclusive) }
+                            .map { e: Map.Entry<Party, ClosedRange<Double>> ->
+                                val cpctMin = e.value.start
+                                val cpctMax = e.value.endInclusive
+                                val ppct = 1.0 * prevVotes.getOrDefault(e.key, 0) / prevTotal
+                                DualBar(
+                                    e.key.abbreviation.uppercase(),
+                                    e.key.color,
+                                    cpctMin - ppct,
+                                    cpctMax - ppct,
+                                    "(" +
+                                        CHANGE_DECIMAL_FORMAT.format(100.0 * (cpctMin - ppct)) +
+                                        ")-(" +
+                                        CHANGE_DECIMAL_FORMAT.format(100.0 * (cpctMax - ppct)) +
+                                        ")%"
+                                )
+                            }
+                            .toList()
+                    },
+                    Change.Property.CURR,
+                    Change.Property.PREV
+                )
                 return BarFrameBuilder.dual(bars)
-                        .withWingspan(Binding.fixedBinding(0.1))
-                        .withHeader(changeHeader!!.getBinding())
-                        .withSubhead(changeSubhead?.getBinding() ?: Binding.fixedBinding(null))
-                        .build()
+                    .withWingspan(Binding.fixedBinding(0.1))
+                    .withHeader(changeHeader!!.getBinding())
+                    .withSubhead(changeSubhead?.getBinding() ?: Binding.fixedBinding(null))
+                    .build()
             }
         }
 
@@ -1485,25 +1533,28 @@ class BasicResultPanel private constructor(
             return currPreferences?.let { currPreferences ->
                 val bars = currPreferences.getBinding { r: Map<KT, ClosedRange<Double>> ->
                     r.entries.asSequence()
-                            .sortedByDescending { e: Map.Entry<KT, ClosedRange<Double>> -> if (e.key === others) Double.MIN_VALUE else (e.value.start + e.value.endInclusive) }
-                            .map { e: Map.Entry<KT, ClosedRange<Double>> ->
-                                val valueLabel = (DECIMAL_FORMAT.format(100 * e.value.start) +
-                                        "-" +
-                                        DecimalFormat("0.0").format(100 * e.value.endInclusive) +
-                                        "%")
-                                DualBar(
-                                        keyTemplate.toMainBarHeader(e.key, false),
-                                        keyTemplate.toParty(e.key).color,
-                                        e.value.start,
-                                        e.value.endInclusive,
-                                        valueLabel)
-                            }
-                            .toList()
+                        .sortedByDescending { e: Map.Entry<KT, ClosedRange<Double>> -> if (e.key === others) Double.MIN_VALUE else (e.value.start + e.value.endInclusive) }
+                        .map { e: Map.Entry<KT, ClosedRange<Double>> ->
+                            val valueLabel = (
+                                DECIMAL_FORMAT.format(100 * e.value.start) +
+                                    "-" +
+                                    DecimalFormat("0.0").format(100 * e.value.endInclusive) +
+                                    "%"
+                                )
+                            DualBar(
+                                keyTemplate.toMainBarHeader(e.key, false),
+                                keyTemplate.toParty(e.key).color,
+                                e.value.start,
+                                e.value.endInclusive,
+                                valueLabel
+                            )
+                        }
+                        .toList()
                 }
                 var builder = BarFrameBuilder.dual(bars)
-                        .withHeader(preferenceHeader!!.getBinding())
-                        .withSubhead(preferenceSubhead?.getBinding() ?: Binding.fixedBinding(null))
-                        .withMax(Binding.fixedBinding(2.0 / 3))
+                    .withHeader(preferenceHeader!!.getBinding())
+                    .withSubhead(preferenceSubhead?.getBinding() ?: Binding.fixedBinding(null))
+                    .withMax(Binding.fixedBinding(2.0 / 3))
                 val lines = Binding.fixedBinding(listOf(0.5))
                 builder = builder.withLines(lines) { "50%" }
                 return builder.build()
@@ -1513,15 +1564,15 @@ class BasicResultPanel private constructor(
         override fun createSwingFrame(): SwingFrame? {
             return swingHeader?.let { swingHeader ->
                 val curr = current
-                        .getBinding<Map<Party, ClosedRange<Double>>> { currTotalByParty(it) }
-                        .map { m: Map<Party, ClosedRange<Double>> ->
-                            val ret: MutableMap<Party, Int> = LinkedHashMap()
-                            m.forEach { (p: Party, r: ClosedRange<Double>) -> ret[p] = (1000000 * (r.start + r.endInclusive) / 2).roundToInt() }
-                            ret
-                        }
+                    .getBinding<Map<Party, ClosedRange<Double>>> { currTotalByParty(it) }
+                    .map { m: Map<Party, ClosedRange<Double>> ->
+                        val ret: MutableMap<Party, Int> = LinkedHashMap()
+                        m.forEach { (p: Party, r: ClosedRange<Double>) -> ret[p] = (1000000 * (r.start + r.endInclusive) / 2).roundToInt() }
+                        ret
+                    }
                 return SwingFrameBuilder.prevCurr(prev!!.getBinding(), curr, swingComparator!!)
-                        .withHeader(swingHeader.getBinding())
-                        .build()
+                    .withHeader(swingHeader.getBinding())
+                    .build()
             }
         }
 
@@ -1606,11 +1657,13 @@ class BasicResultPanel private constructor(
                 barsBinding = quotas.getBinding { q ->
                     q.entries.asSequence()
                         .sortedByDescending { if (it.key == Party.OTHERS) -1.0 else it.value }
-                        .map { BarFrame.Bar(
-                            leftText = it.key.name.uppercase(),
-                            rightText = DecimalFormat("0.00").format(it.value) + " QUOTAS",
-                            series = listOf(it.key.color to it.value)
-                        ) }
+                        .map {
+                            BarFrame.Bar(
+                                leftText = it.key.name.uppercase(),
+                                rightText = DecimalFormat("0.00").format(it.value) + " QUOTAS",
+                                series = listOf(it.key.color to it.value)
+                            )
+                        }
                         .toList()
                 },
                 headerBinding = header.getBinding(),
@@ -1640,7 +1693,8 @@ class BasicResultPanel private constructor(
                                     leftText = party.abbreviation.uppercase(),
                                     rightText = DecimalFormat("+0.00;-0.00").format(diff),
                                     series = listOf(party.color to diff)
-                            ) }
+                                )
+                            }
                             .toList()
                     }
                 },
@@ -1657,7 +1711,8 @@ class BasicResultPanel private constructor(
                 SwingFrameBuilder.prevCurr(
                     prev.getBinding(),
                     curr.getBinding(),
-                    swingComparator!!)
+                    swingComparator!!
+                )
                     .withHeader(header.getBinding())
                     .build()
             }
@@ -1689,10 +1744,11 @@ class BasicResultPanel private constructor(
             subhead: Binding<String?>
         ): SeatScreenBuilder<Party, Int, Int> {
             return BasicSeatScreenBuilder(
-                    BindingReceiver(seats),
-                    BindingReceiver(header),
-                    BindingReceiver(subhead),
-                    PartyTemplate())
+                BindingReceiver(seats),
+                BindingReceiver(header),
+                BindingReceiver(subhead),
+                PartyTemplate()
+            )
         }
 
         @JvmStatic fun candidateSeats(
@@ -1701,10 +1757,11 @@ class BasicResultPanel private constructor(
             subhead: Binding<String?>
         ): SeatScreenBuilder<Candidate, Int, Int> {
             return BasicSeatScreenBuilder(
-                    BindingReceiver(seats),
-                    BindingReceiver(header),
-                    BindingReceiver(subhead),
-                    CandidateTemplate())
+                BindingReceiver(seats),
+                BindingReceiver(header),
+                BindingReceiver(subhead),
+                CandidateTemplate()
+            )
         }
 
         @JvmStatic fun partyDualSeats(
@@ -1713,11 +1770,12 @@ class BasicResultPanel private constructor(
             subhead: Binding<String?>
         ): SeatScreenBuilder<Party, Pair<Int, Int>, Pair<Int, Int>> {
             return DualSeatScreenBuilder(
-                    BindingReceiver(seats),
-                    BindingReceiver(header),
-                    BindingReceiver(subhead),
-                    PartyTemplate(),
-                    DualSeatScreenBuilder.FocusLocation.FIRST)
+                BindingReceiver(seats),
+                BindingReceiver(header),
+                BindingReceiver(subhead),
+                PartyTemplate(),
+                DualSeatScreenBuilder.FocusLocation.FIRST
+            )
         }
 
         @JvmStatic fun partyDualSeatsReversed(
@@ -1730,7 +1788,8 @@ class BasicResultPanel private constructor(
                 BindingReceiver(header),
                 BindingReceiver(subhead),
                 PartyTemplate(),
-                DualSeatScreenBuilder.FocusLocation.LAST)
+                DualSeatScreenBuilder.FocusLocation.LAST
+            )
         }
 
         @JvmStatic fun candidateDualSeats(
@@ -1739,11 +1798,12 @@ class BasicResultPanel private constructor(
             subhead: Binding<String?>
         ): SeatScreenBuilder<Candidate, Pair<Int, Int>, Pair<Int, Int>> {
             return DualSeatScreenBuilder(
-                    BindingReceiver(seats),
-                    BindingReceiver(header),
-                    BindingReceiver(subhead),
-                    CandidateTemplate(),
-                    DualSeatScreenBuilder.FocusLocation.FIRST)
+                BindingReceiver(seats),
+                BindingReceiver(header),
+                BindingReceiver(subhead),
+                CandidateTemplate(),
+                DualSeatScreenBuilder.FocusLocation.FIRST
+            )
         }
 
         @JvmStatic fun partyRangeSeats(
@@ -1752,10 +1812,11 @@ class BasicResultPanel private constructor(
             subhead: Binding<String?>
         ): SeatScreenBuilder<Party, IntRange, Int> {
             return RangeSeatScreenBuilder(
-                    BindingReceiver(seats),
-                    BindingReceiver(header),
-                    BindingReceiver(subhead),
-                    PartyTemplate())
+                BindingReceiver(seats),
+                BindingReceiver(header),
+                BindingReceiver(subhead),
+                PartyTemplate()
+            )
         }
 
         @JvmStatic fun candidateRangeSeats(
@@ -1764,10 +1825,11 @@ class BasicResultPanel private constructor(
             subhead: Binding<String?>
         ): SeatScreenBuilder<Candidate, IntRange, Int> {
             return RangeSeatScreenBuilder(
-                    BindingReceiver(seats),
-                    BindingReceiver(header),
-                    BindingReceiver(subhead),
-                    CandidateTemplate())
+                BindingReceiver(seats),
+                BindingReceiver(header),
+                BindingReceiver(subhead),
+                CandidateTemplate()
+            )
         }
 
         @JvmStatic fun partyVotes(
@@ -1776,12 +1838,13 @@ class BasicResultPanel private constructor(
             subhead: Binding<String?>
         ): VoteScreenBuilder<Party, Int?, Double?, Int> {
             return BasicVoteScreenBuilder(
-                    BindingReceiver(votes),
-                    BindingReceiver(header),
-                    BindingReceiver(subhead),
-                    PartyTemplate(),
-                    PctOnlyTemplate(),
-                    Party.OTHERS)
+                BindingReceiver(votes),
+                BindingReceiver(header),
+                BindingReceiver(subhead),
+                PartyTemplate(),
+                PctOnlyTemplate(),
+                Party.OTHERS
+            )
         }
 
         @JvmStatic fun candidateVotes(
@@ -1790,12 +1853,13 @@ class BasicResultPanel private constructor(
             subhead: Binding<String?>
         ): VoteScreenBuilder<Candidate, Int?, Double?, Int> {
             return BasicVoteScreenBuilder(
-                    BindingReceiver(votes),
-                    BindingReceiver(header),
-                    BindingReceiver(subhead),
-                    CandidateTemplate(),
-                    VotePctTemplate(),
-                    Candidate.OTHERS)
+                BindingReceiver(votes),
+                BindingReceiver(header),
+                BindingReceiver(subhead),
+                CandidateTemplate(),
+                VotePctTemplate(),
+                Candidate.OTHERS
+            )
         }
 
         @JvmStatic fun candidateVotesPctOnly(
@@ -1804,12 +1868,13 @@ class BasicResultPanel private constructor(
             subhead: Binding<String?>
         ): VoteScreenBuilder<Candidate, Int?, Double?, Int> {
             return BasicVoteScreenBuilder(
-                    BindingReceiver(votes),
-                    BindingReceiver(header),
-                    BindingReceiver(subhead),
-                    CandidateTemplate(),
-                    VotePctOnlyTemplate(),
-                    Candidate.OTHERS)
+                BindingReceiver(votes),
+                BindingReceiver(header),
+                BindingReceiver(subhead),
+                CandidateTemplate(),
+                VotePctOnlyTemplate(),
+                Candidate.OTHERS
+            )
         }
 
         @JvmStatic fun candidateVotes(
@@ -1819,12 +1884,13 @@ class BasicResultPanel private constructor(
             incumbentMarker: String
         ): VoteScreenBuilder<Candidate, Int?, Double?, Int> {
             return BasicVoteScreenBuilder(
-                    BindingReceiver(votes),
-                    BindingReceiver(header),
-                    BindingReceiver(subhead),
-                    CandidateTemplate(incumbentMarker),
-                    VotePctTemplate(),
-                    Candidate.OTHERS)
+                BindingReceiver(votes),
+                BindingReceiver(header),
+                BindingReceiver(subhead),
+                CandidateTemplate(incumbentMarker),
+                VotePctTemplate(),
+                Candidate.OTHERS
+            )
         }
 
         @JvmStatic fun candidateVotesPctOnly(
@@ -1834,12 +1900,13 @@ class BasicResultPanel private constructor(
             incumbentMarker: String
         ): VoteScreenBuilder<Candidate, Int?, Double?, Int> {
             return BasicVoteScreenBuilder(
-                    BindingReceiver(votes),
-                    BindingReceiver(header),
-                    BindingReceiver(subhead),
-                    CandidateTemplate(incumbentMarker),
-                    VotePctOnlyTemplate(),
-                    Candidate.OTHERS)
+                BindingReceiver(votes),
+                BindingReceiver(header),
+                BindingReceiver(subhead),
+                CandidateTemplate(incumbentMarker),
+                VotePctOnlyTemplate(),
+                Candidate.OTHERS
+            )
         }
 
         @JvmStatic fun partyRangeVotes(
@@ -1848,12 +1915,13 @@ class BasicResultPanel private constructor(
             subhead: Binding<String?>
         ): VoteScreenBuilder<Party, ClosedRange<Double>, Double, Int> {
             return RangeVoteScreenBuilder(
-                    BindingReceiver(votes),
-                    BindingReceiver(header),
-                    BindingReceiver(subhead),
-                    PartyTemplate(),
-                    PctOnlyTemplate(),
-                    Party.OTHERS)
+                BindingReceiver(votes),
+                BindingReceiver(header),
+                BindingReceiver(subhead),
+                PartyTemplate(),
+                PctOnlyTemplate(),
+                Party.OTHERS
+            )
         }
 
         @JvmStatic fun partyQuotas(
@@ -1866,7 +1934,8 @@ class BasicResultPanel private constructor(
                 BindingReceiver(quotas),
                 BindingReceiver(totalSeats),
                 BindingReceiver(header),
-                BindingReceiver(subhead))
+                BindingReceiver(subhead)
+            )
         }
     }
 

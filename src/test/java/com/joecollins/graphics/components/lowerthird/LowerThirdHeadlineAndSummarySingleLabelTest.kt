@@ -3,13 +3,13 @@ package com.joecollins.graphics.components.lowerthird
 import com.joecollins.bindings.Binding.Companion.fixedBinding
 import com.joecollins.graphics.components.lowerthird.LowerThird.Companion.createImage
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
+import org.junit.Assert
+import org.junit.Test
 import java.awt.Color
 import java.io.IOException
 import java.time.Clock
 import java.time.Instant
 import java.time.ZoneId
-import org.junit.Assert
-import org.junit.Test
 
 class LowerThirdHeadlineAndSummarySingleLabelTest {
     @Test
@@ -82,7 +82,9 @@ class LowerThirdHeadlineAndSummarySingleLabelTest {
                 createImage(
                     LowerThirdHeadlineAndSummarySingleLabelTest::class.java
                         .classLoader
-                        .getResource("com/joecollins/graphics/lowerthird-left.png"))),
+                        .getResource("com/joecollins/graphics/lowerthird-left.png")
+                )
+            ),
             placeBinding = fixedBinding("OTTAWA"),
             timezoneBinding = fixedBinding(ZoneId.of("Canada/Eastern")),
             headlineBinding = fixedBinding("CENTRAL CANADA POLLS CLOSE"),
@@ -108,7 +110,9 @@ class LowerThirdHeadlineAndSummarySingleLabelTest {
                 createImage(
                     LowerThirdHeadlineAndSummarySingleLabelTest::class.java
                         .classLoader
-                        .getResource("com/joecollins/graphics/lowerthird-left.png"))),
+                        .getResource("com/joecollins/graphics/lowerthird-left.png")
+                )
+            ),
             placeBinding = fixedBinding("OTTAWA"),
             timezoneBinding = fixedBinding(ZoneId.of("Canada/Eastern")),
             headlineBinding = fixedBinding("POLLS CLOSE ACROSS CENTRAL CANADA"),

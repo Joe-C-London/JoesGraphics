@@ -85,7 +85,8 @@ class RecountScreen private constructor(headerLabel: JLabel, frame: MultiSummary
                         .toList()
                 },
                 Property.VOTES,
-                Property.PCT_REPORTING)
+                Property.PCT_REPORTING
+            )
         }
     }
 
