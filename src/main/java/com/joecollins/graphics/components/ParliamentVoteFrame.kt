@@ -179,6 +179,9 @@ class ParliamentVoteFrame(
                     }
                     add(panel)
                 }
+                invalidate()
+                revalidate()
+                repaint()
             }
 
         init {
