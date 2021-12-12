@@ -1,6 +1,7 @@
 package com.joecollins.graphics.components.lowerthird
 
 import com.joecollins.bindings.Binding
+import com.joecollins.graphics.utils.ColorUtils
 import com.joecollins.graphics.utils.StandardFont
 import java.awt.Color
 import java.awt.Component
@@ -137,7 +138,7 @@ class SummaryWithLabels(
             entries.onEachIndexed { idx, entry ->
                 entryPanels[idx].topLabel.foreground = if (entry.color == Color.BLACK) Color.WHITE else entry.color
                 entryPanels[idx].bottomPanel.background = entry.color
-                entryPanels[idx].bottomLabel.foreground = if (entry.color == Color.WHITE) Color.BLACK else Color.WHITE
+                entryPanels[idx].bottomLabel.foreground = ColorUtils.foregroundToContrast(entry.color)
                 entryPanels[idx].topLabel.text = entry.label
                 entryPanels[idx].bottomLabel.text = entry.value
             }

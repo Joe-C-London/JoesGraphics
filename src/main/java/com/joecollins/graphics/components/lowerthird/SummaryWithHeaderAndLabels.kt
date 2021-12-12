@@ -1,6 +1,7 @@
 package com.joecollins.graphics.components.lowerthird
 
 import com.joecollins.bindings.Binding
+import com.joecollins.graphics.utils.ColorUtils
 import com.joecollins.graphics.utils.StandardFont
 import java.awt.Color
 import java.awt.Component
@@ -172,7 +173,7 @@ class SummaryWithHeaderAndLabels(
             }
             entries.forEachIndexed { idx, entry ->
                 entryPanels[idx].bottomPanel.background = entry.color
-                val foreground = if (entry.color == Color.WHITE) Color.BLACK else Color.WHITE
+                val foreground = ColorUtils.foregroundToContrast(entry.color)
                 entryPanels[idx].bottomHeaderLabel.foreground = foreground
                 entryPanels[idx].bottomHeaderLabel.text = entry.label
                 entryPanels[idx].bottomValueLabel.foreground = foreground
