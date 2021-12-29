@@ -24,8 +24,8 @@ class CountdownFrame(
     additionalInfoBinding: Binding<String?>? = null,
     countdownColorBinding: Binding<Color>? = null
 ) : GraphicsFrame(
-    headerBinding = headerBinding,
-    borderColorBinding = borderColorBinding
+    headerPublisher = headerBinding.toPublisher(),
+    borderColorPublisher = borderColorBinding?.toPublisher()
 ) {
 
     internal var clock: Clock = Clock.systemDefaultZone()

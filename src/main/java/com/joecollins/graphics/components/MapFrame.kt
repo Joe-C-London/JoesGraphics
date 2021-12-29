@@ -30,9 +30,9 @@ class MapFrame(
     notesBinding: Binding<String?>? = null,
     borderColorBinding: Binding<Color>? = null
 ) : GraphicsFrame(
-    headerBinding = headerBinding,
-    notesBinding = notesBinding,
-    borderColorBinding = borderColorBinding
+    headerPublisher = headerBinding.toPublisher(),
+    notesPublisher = notesBinding?.toPublisher(),
+    borderColorPublisher = borderColorBinding?.toPublisher()
 ) {
     private var shapesToDraw: List<Pair<Shape, Color>> = ArrayList()
     private var focus: Rectangle2D? = null

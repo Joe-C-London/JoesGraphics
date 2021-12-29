@@ -22,8 +22,8 @@ class MultiSummaryFrame(
     rowsBinding: Binding<List<Row>>,
     notesBinding: Binding<String?>? = null
 ) : GraphicsFrame(
-    headerBinding = headerBinding,
-    notesBinding = notesBinding
+    headerPublisher = headerBinding.toPublisher(),
+    notesPublisher = notesBinding?.toPublisher()
 ) {
     private val centralPanel: JPanel
     private val entries: MutableList<EntryPanel> = ArrayList()

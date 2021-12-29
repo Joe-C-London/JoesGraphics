@@ -1,11 +1,13 @@
 package com.joecollins.graphics.components
 
-import com.joecollins.bindings.Binding
 import com.joecollins.graphics.utils.StandardFont
+import com.joecollins.pubsub.Subscriber
+import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Dimension
 import java.awt.GridLayout
+import java.util.concurrent.Flow
 import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.border.EmptyBorder
@@ -13,10 +15,10 @@ import javax.swing.border.MatteBorder
 
 @Suppress("LeakingThis")
 open class GraphicsFrame(
-    headerBinding: Binding<String?>,
-    notesBinding: Binding<String?>? = null,
-    borderColorBinding: Binding<Color>? = null,
-    headerAlignmentBinding: Binding<Alignment>? = null
+    headerPublisher: Flow.Publisher<out String?>,
+    notesPublisher: Flow.Publisher<out String?>? = null,
+    borderColorPublisher: Flow.Publisher<out Color>? = null,
+    headerAlignmentPublisher: Flow.Publisher<out Alignment>? = null
 ) : JPanel() {
 
     enum class Alignment(val jlabelAlignment: Int) {
@@ -54,20 +56,38 @@ open class GraphicsFrame(
         notesLabel.border = EmptyBorder(2, 0, -2, 0)
         add(notesLabel, BorderLayout.SOUTH)
 
-        headerBinding.bind {
+        val onHeaderUpdate: (String?) -> Unit = {
             headerPanel.isVisible = (it != null)
             headerLabel.text = it ?: ""
         }
-        (headerAlignmentBinding ?: Binding.fixedBinding(Alignment.CENTER)).bind { headerLabel.horizontalAlignment = it.jlabelAlignment }
-        (notesBinding ?: Binding.fixedBinding(null)).bind {
+        headerPublisher.subscribe(Subscriber(eventQueueWrapper(onHeaderUpdate)))
+
+        val onAlignmentUpdate: (Alignment) -> Unit = {
+            headerLabel.horizontalAlignment = it.jlabelAlignment
+        }
+        if (headerAlignmentPublisher != null)
+            headerAlignmentPublisher.subscribe(Subscriber(eventQueueWrapper(onAlignmentUpdate)))
+        else
+            onAlignmentUpdate(Alignment.CENTER)
+
+        val onNotesUpdate: (String?) -> Unit = {
             notesLabel.isVisible = (it != null)
             notesLabel.text = (it ?: "") + " "
         }
-        (borderColorBinding ?: Binding.fixedBinding(Color.BLACK)).bind {
+        if (notesPublisher != null)
+            notesPublisher.subscribe(Subscriber(eventQueueWrapper(onNotesUpdate)))
+        else
+            onNotesUpdate(null)
+
+        val onBorderColorUpdate: (Color) -> Unit = {
             border = MatteBorder(1, 1, 1, 1, it)
             headerPanel.background = it
             notesLabel.foreground = it
         }
+        if (borderColorPublisher != null)
+            borderColorPublisher.subscribe(Subscriber(eventQueueWrapper(onBorderColorUpdate)))
+        else
+            onBorderColorUpdate(Color.BLACK)
     }
 
     internal val header: String? get() = if (headerPanel.isVisible) headerLabel.text.trim() else null

@@ -4,6 +4,8 @@ import com.joecollins.bindings.Binding.Companion.fixedBinding
 import com.joecollins.bindings.mapElements
 import com.joecollins.graphics.components.MapFrameBuilder.Companion.from
 import com.joecollins.graphics.utils.BindableWrapper
+import org.awaitility.Awaitility
+import org.hamcrest.core.IsEqual
 import org.junit.Assert
 import org.junit.Test
 import java.awt.Color
@@ -11,6 +13,7 @@ import java.awt.Shape
 import java.awt.geom.Ellipse2D
 import java.awt.geom.Rectangle2D
 import java.util.ArrayList
+import java.util.concurrent.TimeUnit
 
 class MapFrameBuilderTest {
     @Test
@@ -27,7 +30,8 @@ class MapFrameBuilderTest {
         Assert.assertEquals(Color.RED, frame.getColor(0))
         Assert.assertEquals(Rectangle2D.Double::class.java, frame.getShape(1).javaClass)
         Assert.assertEquals(Color.BLUE, frame.getColor(1))
-        Assert.assertEquals("MAP", frame.header)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.header }, IsEqual("MAP"))
         Assert.assertEquals(Rectangle2D.Double(2.0, 2.0, 5.0, 5.0), frame.focusBox)
     }
 
@@ -42,7 +46,8 @@ class MapFrameBuilderTest {
         Assert.assertEquals(Color.RED, frame.getColor(0))
         Assert.assertEquals(Rectangle2D.Double::class.java, frame.getShape(1).javaClass)
         Assert.assertEquals(Color.BLUE, frame.getColor(1))
-        Assert.assertEquals("MAP", frame.header)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.header }, IsEqual("MAP"))
         Assert.assertEquals(Rectangle2D.Double(2.0, 2.0, 5.0, 5.0), frame.focusBox)
     }
 
@@ -61,7 +66,8 @@ class MapFrameBuilderTest {
         Assert.assertEquals(Color.RED, frame.getColor(0))
         Assert.assertEquals(Rectangle2D.Double::class.java, frame.getShape(1).javaClass)
         Assert.assertEquals(Color.BLUE, frame.getColor(1))
-        Assert.assertEquals("MAP", frame.header)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.header }, IsEqual("MAP"))
         Assert.assertEquals(Rectangle2D.Double(2.0, 2.0, 5.0, 5.0), frame.focusBox)
     }
 
@@ -134,7 +140,8 @@ class MapFrameBuilderTest {
             .withHeader(fixedBinding("MAP"))
             .withNotes(fixedBinding("A note"))
             .build()
-        Assert.assertEquals("A note", frame.notes)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.notes }, IsEqual("A note"))
     }
 
     @Test
@@ -149,6 +156,7 @@ class MapFrameBuilderTest {
             .withHeader(fixedBinding("MAP"))
             .withBorderColor(fixedBinding(Color.GRAY))
             .build()
-        Assert.assertEquals(Color.GRAY, frame.borderColor)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.borderColor }, IsEqual(Color.GRAY))
     }
 }

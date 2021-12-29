@@ -8,11 +8,14 @@ import com.joecollins.graphics.components.BarFrameBuilder.Companion.dualReversed
 import com.joecollins.graphics.components.BarFrameBuilder.DualBar
 import com.joecollins.graphics.utils.BindableWrapper
 import com.joecollins.graphics.utils.ColorUtils
+import org.awaitility.Awaitility
+import org.hamcrest.core.IsEqual
 import org.junit.Assert
 import org.junit.Test
 import java.awt.Color
 import java.awt.geom.Rectangle2D
 import java.text.DecimalFormat
+import java.util.concurrent.TimeUnit
 
 class BarFrameBuilderTest {
     private class Wrapper<T>(val value: T)
@@ -147,13 +150,16 @@ class BarFrameBuilderTest {
         Assert.assertEquals(Color.BLACK, frame.borderColor)
         Assert.assertEquals(Color.GRAY, frame.subheadColor)
         header.value = "DEMOCRATIC PRIMARY"
-        Assert.assertEquals("DEMOCRATIC PRIMARY", frame.header)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.header }, IsEqual("DEMOCRATIC PRIMARY"))
         subhead.value = "PLEDGED DELEGATES"
         Assert.assertEquals("PLEDGED DELEGATES", frame.subheadText)
         notes.value = "SOURCE: DNC"
-        Assert.assertEquals("SOURCE: DNC", frame.notes)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.notes }, IsEqual("SOURCE: DNC"))
         borderColor.value = Color.BLUE
-        Assert.assertEquals(Color.BLUE, frame.borderColor)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.borderColor }, IsEqual(Color.BLUE))
         subheadColor.value = Color.BLUE
         Assert.assertEquals(Color.BLUE, frame.subheadColor)
     }

@@ -42,7 +42,7 @@ class HemicycleFrame(
     rightChangeBarStartBinding: Binding<Int>? = null,
     rightChangeBarLabelBinding: Binding<String>? = null
 ) : GraphicsFrame(
-    headerBinding = headerBinding
+    headerPublisher = headerBinding.toPublisher()
 ) {
     private val barsPanel = BarPanel()
     private val dotsPanel = DotsPanel()

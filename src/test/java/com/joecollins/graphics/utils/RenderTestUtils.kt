@@ -1,6 +1,7 @@
 package com.joecollins.graphics.utils
 
 import org.apache.commons.io.FileUtils
+import org.awaitility.Awaitility
 import org.junit.Assert
 import java.awt.Component
 import java.awt.Container
@@ -13,6 +14,7 @@ import java.lang.InterruptedException
 import java.lang.reflect.InvocationTargetException
 import java.util.LinkedList
 import java.util.Queue
+import java.util.concurrent.TimeUnit
 import javax.imageio.ImageIO
 import javax.swing.JPanel
 import kotlin.Throws
@@ -25,8 +27,11 @@ object RenderTestUtils {
             "src\\test\\resources\\com\\joecollins\\graphics\\$testClass\\$testMethod.png"
         )
         val actualFile = File.createTempFile("test", ".png")
-        ImageIO.write(convertToImage(panel), "png", actualFile)
-        val isMatch = FileUtils.contentEquals(expectedFile, actualFile)
+        val isMatch = Awaitility.await("$testClass/$testMethod").atMost(1, TimeUnit.SECONDS)
+            .until({
+                ImageIO.write(convertToImage(panel), "png", actualFile)
+                FileUtils.contentEquals(expectedFile, actualFile)
+            }, { it })
         if (!isMatch) {
             println(expectedFile.absolutePath)
             println(actualFile.absolutePath)

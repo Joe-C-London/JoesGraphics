@@ -21,7 +21,7 @@ class SwingFrame(
     bottomTextBinding: Binding<String?>,
     bottomColorBinding: Binding<Color>
 ) : GraphicsFrame(
-    headerBinding = headerBinding
+    headerPublisher = headerBinding.toPublisher()
 ) {
     private val swingPanel = SwingPanel()
     private val bottomLabel: JLabel = FontSizeAdjustingLabel()

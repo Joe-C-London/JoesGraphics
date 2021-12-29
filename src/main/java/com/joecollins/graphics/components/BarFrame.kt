@@ -36,9 +36,9 @@ class BarFrame(
     notesBinding: Binding<String?>? = null,
     borderColorBinding: Binding<Color>? = null
 ) : GraphicsFrame(
-    headerBinding = headerBinding,
-    notesBinding = notesBinding,
-    borderColorBinding = borderColorBinding
+    headerPublisher = headerBinding.toPublisher(),
+    notesPublisher = notesBinding?.toPublisher(),
+    borderColorPublisher = borderColorBinding?.toPublisher()
 ) {
     private val centralPanel: JPanel
     private val subheadLabel: FontSizeAdjustingLabel = FontSizeAdjustingLabel()

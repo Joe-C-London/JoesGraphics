@@ -19,8 +19,8 @@ class RegionSummaryFrame private constructor(
     summaryColorBinding: Binding<Color>,
     borderColorBinding: Binding<Color>? = null
 ) : GraphicsFrame(
-    headerBinding = headerBinding,
-    borderColorBinding = borderColorBinding
+    headerPublisher = headerBinding.toPublisher(),
+    borderColorPublisher = borderColorBinding?.toPublisher()
 ) {
     constructor(
         headerBinding: Binding<String>,

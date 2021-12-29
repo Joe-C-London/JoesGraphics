@@ -37,8 +37,8 @@ class HeatMapFrame(
     changeBarStartBinding: Binding<Int>? = null,
     borderColorBinding: Binding<Color>? = null
 ) : GraphicsFrame(
-    headerBinding = headerBinding,
-    borderColorBinding = borderColorBinding
+    headerPublisher = headerBinding.toPublisher(),
+    borderColorPublisher = borderColorBinding?.toPublisher()
 ) {
     private val barsPanel = SeatBarPanel()
     private val squaresPanel = SquaresPanel()

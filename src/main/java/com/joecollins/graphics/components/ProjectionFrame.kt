@@ -21,8 +21,8 @@ class ProjectionFrame(
     footerTextBinding: Binding<String?>,
     imageAlignmentBinding: Binding<Alignment>? = null
 ) : GraphicsFrame(
-    headerBinding = headerBinding,
-    borderColorBinding = borderColorBinding
+    headerPublisher = headerBinding.toPublisher(),
+    borderColorPublisher = borderColorBinding.toPublisher()
 ) {
 
     enum class Alignment { BOTTOM, MIDDLE }

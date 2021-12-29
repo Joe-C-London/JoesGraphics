@@ -19,7 +19,7 @@ class FiguresFrame(
     headerBinding: Binding<String?>,
     entriesBinding: Binding<List<Entry>>
 ) : GraphicsFrame(
-    headerBinding = headerBinding
+    headerPublisher = headerBinding.toPublisher()
 ) {
 
     class Entry(

@@ -24,10 +24,10 @@ class ResultListingFrame(
     headerAlignmentBinding: Binding<Alignment>? = null,
     notesBinding: Binding<String?>? = null
 ) : GraphicsFrame(
-    headerBinding = headerBinding,
-    borderColorBinding = borderColorBinding,
-    headerAlignmentBinding = headerAlignmentBinding,
-    notesBinding = notesBinding
+    headerPublisher = headerBinding.toPublisher(),
+    borderColorPublisher = borderColorBinding?.toPublisher(),
+    headerAlignmentPublisher = headerAlignmentBinding?.toPublisher(),
+    notesPublisher = notesBinding?.toPublisher()
 ) {
     private val centralPanel = JPanel()
     private val layout = Layout()

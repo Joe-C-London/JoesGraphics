@@ -35,7 +35,7 @@ class SwingometerFrame(
     ticksBinding: Binding<List<Tick>>? = null,
     outerLabelsBinding: Binding<List<OuterLabel>>? = null
 ) : GraphicsFrame(
-    headerBinding = headerBinding
+    headerPublisher = headerBinding.toPublisher()
 ) {
     class Tick(val position: Number, val text: String)
 

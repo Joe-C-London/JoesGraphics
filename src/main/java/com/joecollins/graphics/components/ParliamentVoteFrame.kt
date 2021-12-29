@@ -1,10 +1,10 @@
 package com.joecollins.graphics.components
 
 import com.joecollins.bindings.Binding
-import com.joecollins.bindings.toFixedBinding
 import com.joecollins.graphics.utils.ColorUtils.foregroundToContrast
 import com.joecollins.graphics.utils.StandardFont
 import com.joecollins.models.general.Party
+import com.joecollins.pubsub.asOneTimePublisher
 import java.awt.BorderLayout
 import java.awt.CardLayout
 import java.awt.Color
@@ -28,9 +28,9 @@ class ParliamentVoteFrame(
     partyVotes: Binding<Array<List<Pair<Party, Int>>>>,
     resultText: Binding<String?> = Binding.fixedBinding(null)
 ) : GraphicsFrame(
-    headerBinding = titleBinding,
-    notesBinding = "SOURCE: $bodyName".toFixedBinding(),
-    borderColorBinding = bodyColor.toFixedBinding()
+    headerPublisher = titleBinding.toPublisher(),
+    notesPublisher = "SOURCE: $bodyName".asOneTimePublisher(),
+    borderColorPublisher = bodyColor.asOneTimePublisher()
 ) {
 
     init {

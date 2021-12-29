@@ -1,10 +1,19 @@
 package com.joecollins.bindings
 
+import com.joecollins.pubsub.Publisher
+import java.util.concurrent.Flow
+
 interface Binding<out T> {
 
     fun bind(onUpdate: (T) -> Unit)
 
     fun unbind()
+
+    fun toPublisher(): Flow.Publisher<@UnsafeVariance T> {
+        val publisher = Publisher<T>()
+        bind { publisher.submit(it) }
+        return publisher
+    }
 
     fun <R> map(func: (T) -> R): Binding<R> {
         val me = this
