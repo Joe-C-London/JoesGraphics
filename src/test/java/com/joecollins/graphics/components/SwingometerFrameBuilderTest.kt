@@ -5,10 +5,13 @@ import com.joecollins.bindings.Binding
 import com.joecollins.bindings.Binding.Companion.fixedBinding
 import com.joecollins.graphics.components.SwingometerFrameBuilder.Companion.basic
 import com.joecollins.graphics.utils.BindableWrapper
+import org.awaitility.Awaitility
+import org.hamcrest.core.IsEqual
 import org.junit.Assert
 import org.junit.Test
 import java.awt.Color
 import java.text.DecimalFormat
+import java.util.concurrent.TimeUnit
 
 class SwingometerFrameBuilderTest {
     @Test
@@ -34,7 +37,8 @@ class SwingometerFrameBuilderTest {
         Assert.assertEquals(Color.BLUE, frame.leftColor)
         Assert.assertEquals(Color.RED, frame.rightColor)
         Assert.assertEquals(0.0, frame.value.toDouble(), 0.0)
-        Assert.assertEquals("SWINGOMETER", frame.header)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.header }, IsEqual("SWINGOMETER"))
     }
 
     @Test

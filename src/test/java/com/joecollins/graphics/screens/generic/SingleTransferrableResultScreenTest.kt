@@ -29,8 +29,6 @@ class SingleTransferrableResultScreenTest {
         val con = Party("NI Conservatives", "CON", Color.CYAN.darker())
         val sdlp = Party("Social Democratic and Labour Party", "SDLP", Color.GREEN.darker())
         val ind = Party("Independent", "IND", Party.OTHERS.color)
-        val lab = Party("NI Labour", "LAB", Color.RED)
-        val ukip = Party("UK Independence Party", "UKIP", Color.MAGENTA.darker())
 
         val prevVotes = mapOf(
             dup to 5538 + 4230 + 3875,

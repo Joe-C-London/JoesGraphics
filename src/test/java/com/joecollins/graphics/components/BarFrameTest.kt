@@ -1,11 +1,13 @@
 package com.joecollins.graphics.components
 
 import com.joecollins.bindings.Bindable
-import com.joecollins.bindings.Binding.Companion.fixedBinding
 import com.joecollins.bindings.mapElements
 import com.joecollins.graphics.ImageGenerator.createHalfTickShape
 import com.joecollins.graphics.utils.BindableWrapper
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
+import com.joecollins.pubsub.asOneTimePublisher
+import org.awaitility.Awaitility
+import org.hamcrest.core.IsEqual
 import org.junit.Assert
 import org.junit.Test
 import java.awt.Color
@@ -16,6 +18,7 @@ import java.awt.geom.Area
 import java.awt.geom.Ellipse2D
 import java.io.IOException
 import java.text.DecimalFormat
+import java.util.concurrent.TimeUnit
 import kotlin.Throws
 import kotlin.jvm.JvmOverloads
 import kotlin.math.sign
@@ -34,10 +37,11 @@ class BarFrameTest {
             )
         )
         val frame = BarFrame(
-            headerBinding = fixedBinding(null),
-            barsBinding = results.binding.mapElements { BarFrame.Bar("", "", null, listOf()) }
+            headerPublisher = (null as String?).asOneTimePublisher(),
+            barsPublisher = results.binding.mapElements { BarFrame.Bar("", "", null, listOf()) }.toPublisher()
         )
-        Assert.assertEquals(6, frame.numBars.toLong())
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.numBars }, IsEqual(6))
     }
 
     @Test
@@ -45,13 +49,14 @@ class BarFrameTest {
         val list = mutableListOf<ElectionResult>()
         val results = BindableWrapper(list)
         val frame = BarFrame(
-            headerBinding = fixedBinding(null),
-            barsBinding = results.binding.mapElements { BarFrame.Bar("", "", null, listOf()) }
+            headerPublisher = (null as String?).asOneTimePublisher(),
+            barsPublisher = results.binding.mapElements { BarFrame.Bar("", "", null, listOf()) }.toPublisher()
         )
         Assert.assertEquals(0, frame.numBars.toLong())
         list.add(ElectionResult("LIBERAL", Color.RED, 1))
         results.value = list
-        Assert.assertEquals(1, frame.numBars.toLong())
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.numBars }, IsEqual(1))
         list.addAll(
             listOf(
                 ElectionResult("CONSERVATIVE", Color.BLUE, 1),
@@ -59,16 +64,20 @@ class BarFrameTest {
             )
         )
         results.value = list
-        Assert.assertEquals(3, frame.numBars.toLong())
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.numBars }, IsEqual(3))
         list.removeAt(2)
         results.value = list
-        Assert.assertEquals(2, frame.numBars.toLong())
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.numBars }, IsEqual(2))
         list.removeIf { it.getPartyName() != "LIBERAL" }
         results.value = list
-        Assert.assertEquals(1, frame.numBars.toLong())
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.numBars }, IsEqual(1))
         list.clear()
         results.value = list
-        Assert.assertEquals(0, frame.numBars.toLong())
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.numBars }, IsEqual(0))
     }
 
     @Test
@@ -84,9 +93,11 @@ class BarFrameTest {
             )
         )
         val frame = BarFrame(
-            headerBinding = fixedBinding(null),
-            barsBinding = results.binding.mapElements { BarFrame.Bar(it.getPartyName(), "", null, listOf()) }
+            headerPublisher = (null as String?).asOneTimePublisher(),
+            barsPublisher = results.binding.mapElements { BarFrame.Bar(it.getPartyName(), "", null, listOf()) }.toPublisher()
         )
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.numBars }, IsEqual(6))
         Assert.assertEquals("LIBERAL", frame.getLeftText(0))
         Assert.assertEquals("CONSERVATIVE", frame.getLeftText(1))
         Assert.assertEquals("BLOC QUEBECOIS", frame.getLeftText(2))
@@ -108,9 +119,11 @@ class BarFrameTest {
             )
         )
         val frame = BarFrame(
-            headerBinding = fixedBinding(null),
-            barsBinding = results.binding.mapElements { BarFrame.Bar(it.getPartyName(), "${it.getNumSeats()}", null, listOf()) }
+            headerPublisher = (null as String?).asOneTimePublisher(),
+            barsPublisher = results.binding.mapElements { BarFrame.Bar(it.getPartyName(), "${it.getNumSeats()}", null, listOf()) }.toPublisher()
         )
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.numBars }, IsEqual(6))
         Assert.assertEquals("157", frame.getRightText(0))
         Assert.assertEquals("121", frame.getRightText(1))
         Assert.assertEquals("32", frame.getRightText(2))
@@ -131,8 +144,8 @@ class BarFrameTest {
         )
         val results = BindableWrapper(list)
         val frame = BarFrame(
-            headerBinding = fixedBinding(null),
-            barsBinding = results.binding.mapElements {
+            headerPublisher = (null as String?).asOneTimePublisher(),
+            barsPublisher = results.binding.mapElements {
                 BarFrame.Bar(
                     it.getPartyName(), "${it.getNumSeats()}", null,
                     listOf(
@@ -140,9 +153,11 @@ class BarFrameTest {
                         Pair(lighten(it.getPartyColor()), it.getSeatEstimate() - it.getNumSeats())
                     )
                 )
-            }
+            }.toPublisher()
         )
         val lightRed = Color(255, 127, 127)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.numBars }, IsEqual(6))
         var libSeries = frame.getSeries(0)
         Assert.assertEquals(Color.RED, libSeries[0].first)
         Assert.assertEquals(2, libSeries[0].second.toInt().toLong())
@@ -154,12 +169,14 @@ class BarFrameTest {
         Assert.assertEquals(Color.RED, libSeries[0].first)
         Assert.assertEquals(2, libSeries[0].second.toInt().toLong())
         Assert.assertEquals(lightRed, libSeries[1].first)
-        Assert.assertEquals(156, libSeries[1].second.toInt().toLong())
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ libSeries[1].second.toInt() }, IsEqual(156))
         list[0].setNumSeats(3)
         results.value = list
         libSeries = frame.getSeries(0)
         Assert.assertEquals(Color.RED, libSeries[0].first)
-        Assert.assertEquals(3, libSeries[0].second.toInt().toLong())
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ libSeries[0].second.toInt() }, IsEqual(3))
         Assert.assertEquals(lightRed, libSeries[1].first)
         Assert.assertEquals(155, libSeries[1].second.toInt().toLong())
     }
@@ -177,9 +194,11 @@ class BarFrameTest {
         val results = BindableWrapper(list)
         val shape: Shape = Ellipse2D.Double()
         val frame = BarFrame(
-            headerBinding = fixedBinding(null),
-            barsBinding = results.binding.mapElements { BarFrame.Bar("", "", if (it.getNumSeats() > 150) shape else null, listOf()) }
+            headerPublisher = (null as String?).asOneTimePublisher(),
+            barsPublisher = results.binding.mapElements { BarFrame.Bar("", "", if (it.getNumSeats() > 150) shape else null, listOf()) }.toPublisher()
         )
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.numBars }, IsEqual(6))
         Assert.assertEquals(shape, frame.getLeftIcon(0))
         Assert.assertNull(frame.getLeftIcon(1))
         Assert.assertNull(frame.getLeftIcon(2))
@@ -200,18 +219,20 @@ class BarFrameTest {
         )
         val results = BindableWrapper(list)
         val frame = BarFrame(
-            headerBinding = fixedBinding(null),
-            barsBinding = results.binding.mapElements {
+            headerPublisher = (null as String?).asOneTimePublisher(),
+            barsPublisher = results.binding.mapElements {
                 BarFrame.Bar(
                     "", "", null,
                     listOf(
                         Pair(it.getPartyColor(), it.getNumSeats())
                     )
                 )
-            }
+            }.toPublisher()
         )
-        Assert.assertEquals(157, frame.max.toInt().toLong())
-        Assert.assertEquals(0, frame.min.toInt().toLong())
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.min.toInt() }, IsEqual(0))
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.max.toInt() }, IsEqual(157))
         list[0].setNumSeats(-27)
         list[1].setNumSeats(22)
         list[2].setNumSeats(22)
@@ -219,8 +240,10 @@ class BarFrameTest {
         list[4].setNumSeats(2)
         list[5].setNumSeats(1)
         results.value = list
-        Assert.assertEquals(22, frame.max.toInt().toLong())
-        Assert.assertEquals(-27, frame.min.toInt().toLong())
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.min.toInt() }, IsEqual(-27))
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.max.toInt() }, IsEqual(22))
     }
 
     @Test
@@ -235,20 +258,23 @@ class BarFrameTest {
         )
         val results = BindableWrapper(list)
         val frame = BarFrame(
-            headerBinding = fixedBinding(null),
-            barsBinding = results.binding.mapElements {
+            headerPublisher = (null as String?).asOneTimePublisher(),
+            barsPublisher = results.binding.mapElements {
                 BarFrame.Bar(
                     "", "", null,
                     listOf(
                         Pair(it.getPartyColor(), it.getNumSeats())
                     )
                 )
-            },
-            minBinding = fixedBinding(-30),
-            maxBinding = fixedBinding(30)
+            }.toPublisher(),
+            minPublisher = (-30).asOneTimePublisher(),
+            maxPublisher = 30.asOneTimePublisher()
         )
-        Assert.assertEquals(30, frame.max.toInt().toLong())
-        Assert.assertEquals(-30, frame.min.toInt().toLong())
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.min.toInt() }, IsEqual(-30))
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.max.toInt() }, IsEqual(30))
+
         list[0].setNumSeats(-27)
         list[1].setNumSeats(22)
         list[2].setNumSeats(22)
@@ -256,25 +282,28 @@ class BarFrameTest {
         list[4].setNumSeats(2)
         list[5].setNumSeats(1)
         results.value = list
-        Assert.assertEquals(30, frame.max.toInt().toLong())
-        Assert.assertEquals(-30, frame.min.toInt().toLong())
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.min.toInt() }, IsEqual(-30))
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.max.toInt() }, IsEqual(30))
     }
 
     @Test
     fun testSubheadText() {
         val frame = BarFrame(
-            headerBinding = fixedBinding(null),
-            subheadTextBinding = fixedBinding<String?>("PROJECTION: LIB MINORITY"),
-            barsBinding = fixedBinding(emptyList())
+            headerPublisher = (null as String?).asOneTimePublisher(),
+            subheadTextPublisher = "PROJECTION: LIB MINORITY".asOneTimePublisher(),
+            barsPublisher = emptyList<BarFrame.Bar>().asOneTimePublisher()
         )
-        Assert.assertEquals("PROJECTION: LIB MINORITY", frame.subheadText)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.subheadText }, IsEqual("PROJECTION: LIB MINORITY"))
     }
 
     @Test
     fun testDefaultSubheadColor() {
         val frame = BarFrame(
-            headerBinding = fixedBinding(null),
-            barsBinding = fixedBinding(emptyList())
+            headerPublisher = (null as String?).asOneTimePublisher(),
+            barsPublisher = emptyList<BarFrame.Bar>().asOneTimePublisher()
         )
         Assert.assertEquals(Color.BLACK, frame.subheadColor)
     }
@@ -282,22 +311,24 @@ class BarFrameTest {
     @Test
     fun testSubheadColor() {
         val frame = BarFrame(
-            headerBinding = fixedBinding(null),
-            subheadTextBinding = fixedBinding<String?>("PROJECTION: LIB MINORITY"),
-            subheadColorBinding = fixedBinding(Color.RED),
-            barsBinding = fixedBinding(emptyList())
+            headerPublisher = (null as String?).asOneTimePublisher(),
+            subheadTextPublisher = "PROJECTION: LIB MINORITY".asOneTimePublisher(),
+            subheadColorPublisher = Color.RED.asOneTimePublisher(),
+            barsPublisher = emptyList<BarFrame.Bar>().asOneTimePublisher()
         )
-        Assert.assertEquals(Color.RED, frame.subheadColor)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.subheadColor }, IsEqual(Color.RED))
     }
 
     @Test
     fun testLines() {
         val frame = BarFrame(
-            headerBinding = fixedBinding(null),
-            barsBinding = fixedBinding(emptyList()),
-            linesBinding = fixedBinding(listOf(BarFrame.Line(170, "170 SEATS FOR MAJORITY")))
+            headerPublisher = (null as String?).asOneTimePublisher(),
+            barsPublisher = emptyList<BarFrame.Bar>().asOneTimePublisher(),
+            linesPublisher = listOf(BarFrame.Line(170, "170 SEATS FOR MAJORITY")).asOneTimePublisher()
         )
-        Assert.assertEquals(1, frame.numLines.toLong())
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.numLines }, IsEqual(1))
         Assert.assertEquals(170, frame.getLineLevel(0))
         Assert.assertEquals("170 SEATS FOR MAJORITY", frame.getLineLabel(0))
     }
@@ -306,8 +337,8 @@ class BarFrameTest {
     fun testTestNonBindableElements() {
         val results = BindableWrapper<List<Triple<String, Color, Int>>>(listOf())
         val frame = BarFrame(
-            headerBinding = fixedBinding(null),
-            barsBinding = results.binding.mapElements { BarFrame.Bar(it.first, "", null, listOf()) }
+            headerPublisher = (null as String?).asOneTimePublisher(),
+            barsPublisher = results.binding.mapElements { BarFrame.Bar(it.first, "", null, listOf()) }.toPublisher()
         )
         Assert.assertEquals(0, frame.numBars.toLong())
         results.value = (
@@ -317,7 +348,8 @@ class BarFrameTest {
                 Triple("NDP", Color.ORANGE, 1)
             )
             )
-        Assert.assertEquals(3, frame.numBars.toLong())
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.numBars }, IsEqual(3))
         Assert.assertEquals("LIBERALS", frame.getLeftText(0))
         Assert.assertEquals("CONSERVATIVES", frame.getLeftText(1))
         Assert.assertEquals("NDP", frame.getLeftText(2))
@@ -327,6 +359,8 @@ class BarFrameTest {
                 Triple("CONSERVATIVES", Color.BLUE, 3)
             )
             )
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.numBars }, IsEqual(2))
         Assert.assertEquals(2, frame.numBars.toLong())
         Assert.assertEquals("LIBERALS", frame.getLeftText(0))
         Assert.assertEquals("CONSERVATIVES", frame.getLeftText(1))
@@ -346,16 +380,16 @@ class BarFrameTest {
             )
         )
         val barFrame = BarFrame(
-            headerBinding = fixedBinding<String?>("2019 CANADIAN ELECTION RESULT"),
-            barsBinding = results.binding.mapElements {
+            headerPublisher = "2019 CANADIAN ELECTION RESULT".asOneTimePublisher(),
+            barsPublisher = results.binding.mapElements {
                 BarFrame.Bar(
                     it.getPartyName(), "${it.getNumSeats()}", null,
                     listOf(
                         Pair(it.getPartyColor(), it.getNumSeats())
                     )
                 )
-            },
-            maxBinding = fixedBinding(160)
+            }.toPublisher(),
+            maxPublisher = 160.asOneTimePublisher()
         )
         barFrame.setSize(512, 256)
         compareRendering("BarFrame", "SingleSeriesAllPositive", barFrame)
@@ -375,18 +409,18 @@ class BarFrameTest {
             )
         )
         val barFrame = BarFrame(
-            headerBinding = fixedBinding<String?>("2019 CANADIAN ELECTION RESULT"),
-            subheadTextBinding = fixedBinding("PROJECTION: LIB MINORITY"),
-            subheadColorBinding = fixedBinding(Color.RED),
-            barsBinding = results.binding.mapElements {
+            headerPublisher = "2019 CANADIAN ELECTION RESULT".asOneTimePublisher(),
+            subheadTextPublisher = "PROJECTION: LIB MINORITY".asOneTimePublisher(),
+            subheadColorPublisher = Color.RED.asOneTimePublisher(),
+            barsPublisher = results.binding.mapElements {
                 BarFrame.Bar(
                     it.getPartyName(), "${it.getNumSeats()}", null,
                     listOf(
                         Pair(it.getPartyColor(), it.getNumSeats())
                     )
                 )
-            },
-            maxBinding = fixedBinding(160)
+            }.toPublisher(),
+            maxPublisher = 160.asOneTimePublisher()
         )
         barFrame.setSize(512, 256)
         compareRendering("BarFrame", "SingleSeriesWithSubhead", barFrame)
@@ -408,17 +442,17 @@ class BarFrameTest {
             )
         )
         val barFrame = BarFrame(
-            headerBinding = fixedBinding<String?>("SEATS AT DISSOLUTION"),
-            subheadTextBinding = fixedBinding<String?>("170 FOR MAJORITY"),
-            subheadColorBinding = fixedBinding(Color.RED),
-            barsBinding = results.binding.mapElements {
+            headerPublisher = "SEATS AT DISSOLUTION".asOneTimePublisher(),
+            subheadTextPublisher = "170 FOR MAJORITY".asOneTimePublisher(),
+            subheadColorPublisher = Color.RED.asOneTimePublisher(),
+            barsPublisher = results.binding.mapElements {
                 BarFrame.Bar(
                     it.getPartyName(), "${it.getNumSeats()}", null,
                     listOf(
                         Pair(it.getPartyColor(), it.getNumSeats())
                     )
                 )
-            }
+            }.toPublisher()
         )
         barFrame.setSize(512, 256)
         compareRendering("BarFrame", "SingleSeriesShrinkToFit", barFrame)
@@ -438,8 +472,8 @@ class BarFrameTest {
             )
         )
         val barFrame = BarFrame(
-            headerBinding = fixedBinding<String?>("2019 CANADIAN ELECTION RESULT"),
-            barsBinding = results.binding.mapElements {
+            headerPublisher = "2019 CANADIAN ELECTION RESULT".asOneTimePublisher(),
+            barsPublisher = results.binding.mapElements {
                 BarFrame.Bar(
                     it.getPartyName(), it.getNumSeats().toString() + "/" + it.getSeatEstimate(), null,
                     listOf(
@@ -447,8 +481,8 @@ class BarFrameTest {
                         Pair(lighten(it.getPartyColor()), it.getSeatEstimate() - it.getNumSeats())
                     )
                 )
-            },
-            maxBinding = fixedBinding(160)
+            }.toPublisher(),
+            maxPublisher = 160.asOneTimePublisher()
         )
         barFrame.setSize(512, 256)
         compareRendering("BarFrame", "MultiSeriesAllPositive", barFrame)
@@ -468,17 +502,17 @@ class BarFrameTest {
             )
         )
         val barFrame = BarFrame(
-            headerBinding = fixedBinding<String?>("RESULT CHANGE SINCE 2015"),
-            barsBinding = results.binding.mapElements {
+            headerPublisher = "RESULT CHANGE SINCE 2015".asOneTimePublisher(),
+            barsPublisher = results.binding.mapElements {
                 BarFrame.Bar(
                     it.getPartyName(), DecimalFormat("+0;-0").format(it.getNumSeats().toLong()), null,
                     listOf(
                         Pair(it.getPartyColor(), it.getNumSeats())
                     )
                 )
-            },
-            maxBinding = fixedBinding(28),
-            minBinding = fixedBinding(-28)
+            }.toPublisher(),
+            maxPublisher = 28.asOneTimePublisher(),
+            minPublisher = (-28).asOneTimePublisher()
         )
         barFrame.setSize(512, 256)
         compareRendering("BarFrame", "SingleSeriesBothDirections", barFrame)
@@ -498,8 +532,8 @@ class BarFrameTest {
             )
         )
         val barFrame = BarFrame(
-            headerBinding = fixedBinding<String?>("RESULT CHANGE SINCE 2015"),
-            barsBinding = results.binding.mapElements {
+            headerPublisher = "RESULT CHANGE SINCE 2015".asOneTimePublisher(),
+            barsPublisher = results.binding.mapElements {
                 BarFrame.Bar(
                     it.getPartyName(), "${CHANGE_FORMAT.format(it.getNumSeats().toLong())}/${CHANGE_FORMAT.format(it.getSeatEstimate().toLong())}", null,
                     listOf(
@@ -507,9 +541,9 @@ class BarFrameTest {
                         Pair(lighten(it.getPartyColor()), it.getSeatEstimate() - if (sign(it.getSeatEstimate().toFloat()) == sign(it.getNumSeats().toFloat())) it.getNumSeats() else 0)
                     )
                 )
-            },
-            maxBinding = fixedBinding(28),
-            minBinding = fixedBinding(-28)
+            }.toPublisher(),
+            maxPublisher = 28.asOneTimePublisher(),
+            minPublisher = (-28).asOneTimePublisher()
         )
         barFrame.setSize(512, 256)
         compareRendering("BarFrame", "MultiSeriesBothDirections", barFrame)
@@ -528,17 +562,17 @@ class BarFrameTest {
             )
         )
         val barFrame = BarFrame(
-            headerBinding = fixedBinding<String?>("WATERLOO"),
-            subheadTextBinding = fixedBinding<String?>("LIB HOLD"),
-            subheadColorBinding = fixedBinding(Color.RED),
-            barsBinding = results.binding.mapElements {
+            headerPublisher = "WATERLOO".asOneTimePublisher(),
+            subheadTextPublisher = "LIB HOLD".asOneTimePublisher(),
+            subheadColorPublisher = Color.RED.asOneTimePublisher(),
+            barsPublisher = results.binding.mapElements {
                 BarFrame.Bar(
                     "${it.getCandidateName()}\n${it.getPartyName()}",
                     "${THOUSANDS_FORMAT.format(it.getNumVotes().toLong())}\n${PERCENT_FORMAT.format(it.getVotePct())}",
                     listOf(Pair(it.getPartyColor(), it.getNumVotes()))
                 )
-            },
-            maxBinding = results.binding.map { r -> r.sumOf { it.getNumVotes() } / 2 }
+            }.toPublisher(),
+            maxPublisher = results.binding.map { r -> r.sumOf { it.getNumVotes() } / 2 }.toPublisher()
         )
         barFrame.setSize(512, 256)
         compareRendering("BarFrame", "TwoLinedBars", barFrame)
@@ -558,18 +592,18 @@ class BarFrameTest {
         )
         val shape = createTickShape()
         val barFrame = BarFrame(
-            headerBinding = fixedBinding<String?>("WATERLOO"),
-            subheadTextBinding = fixedBinding<String?>("LIB HOLD"),
-            subheadColorBinding = fixedBinding(Color.RED),
-            barsBinding = results.binding.mapElements {
+            headerPublisher = "WATERLOO".asOneTimePublisher(),
+            subheadTextPublisher = "LIB HOLD".asOneTimePublisher(),
+            subheadColorPublisher = Color.RED.asOneTimePublisher(),
+            barsPublisher = results.binding.mapElements {
                 BarFrame.Bar(
                     "${it.getCandidateName()}\n${it.getPartyName()}",
                     "${THOUSANDS_FORMAT.format(it.getNumVotes().toLong())}\n${PERCENT_FORMAT.format(it.getVotePct())}",
                     if (it.isElected()) shape else null,
                     listOf(Pair(it.getPartyColor(), it.getNumVotes()))
                 )
-            },
-            maxBinding = results.binding.map { r -> r.sumOf { it.getNumVotes() } / 2 }
+            }.toPublisher(),
+            maxPublisher = results.binding.map { r -> r.sumOf { it.getNumVotes() } / 2 }.toPublisher()
         )
         barFrame.setSize(512, 256)
         compareRendering("BarFrame", "TwoLinedBarWithIcon", barFrame)
@@ -589,15 +623,15 @@ class BarFrameTest {
         )
         val shape = createTickShape()
         val barFrame = BarFrame(
-            headerBinding = fixedBinding<String?>("WATERLOO"),
-            barsBinding = results.binding.mapElements {
+            headerPublisher = "WATERLOO".asOneTimePublisher(),
+            barsPublisher = results.binding.mapElements {
                 BarFrame.Bar(
                     it.getPartyName(),
                     PERCENT_FORMAT.format(it.getVotePct()),
                     if (it.isElected()) shape else null,
                     listOf(Pair(it.getPartyColor(), it.getVotePct()))
                 )
-            }
+            }.toPublisher()
         )
         barFrame.setSize(512, 256)
         compareRendering("BarFrame", "TwoLinedBarWithNegativeIcon", barFrame)
@@ -619,10 +653,10 @@ class BarFrameTest {
             )
         )
         val barFrame = BarFrame(
-            headerBinding = fixedBinding<String?>("SEATS AT DISSOLUTION"),
-            subheadTextBinding = fixedBinding<String?>("170 FOR MAJORITY"),
-            subheadColorBinding = fixedBinding(Color.RED),
-            barsBinding = results.binding.mapElements {
+            headerPublisher = "SEATS AT DISSOLUTION".asOneTimePublisher(),
+            subheadTextPublisher = "170 FOR MAJORITY".asOneTimePublisher(),
+            subheadColorPublisher = Color.RED.asOneTimePublisher(),
+            barsPublisher = results.binding.mapElements {
                 BarFrame.Bar(
                     it.getPartyName(),
                     "${it.getNumSeats()}",
@@ -630,9 +664,9 @@ class BarFrameTest {
                         Pair(it.getPartyColor(), it.getNumSeats())
                     )
                 )
-            },
-            linesBinding = fixedBinding(listOf(BarFrame.Line(170, "MAJORITY"))),
-            maxBinding = fixedBinding(225)
+            }.toPublisher(),
+            linesPublisher = listOf(BarFrame.Line(170, "MAJORITY")).asOneTimePublisher(),
+            maxPublisher = 225.asOneTimePublisher()
         )
         barFrame.setSize(512, 256)
         compareRendering("BarFrame", "VerticalLine", barFrame)
@@ -650,9 +684,9 @@ class BarFrameTest {
             )
         )
         val barFrame = BarFrame(
-            headerBinding = fixedBinding<String?>("\u00c9LECTION 2018"),
-            subheadTextBinding = fixedBinding<String?>("MAJORIT\u00c9: 63"),
-            barsBinding = results.binding.mapElements {
+            headerPublisher = "\u00c9LECTION 2018".asOneTimePublisher(),
+            subheadTextPublisher = "MAJORIT\u00c9: 63".asOneTimePublisher(),
+            barsPublisher = results.binding.mapElements {
                 BarFrame.Bar(
                     it.getPartyName(),
                     "${it.getNumSeats()}",
@@ -660,9 +694,9 @@ class BarFrameTest {
                         Pair(it.getPartyColor(), it.getNumSeats())
                     )
                 )
-            },
-            linesBinding = fixedBinding(listOf(BarFrame.Line(63, "MAJORIT\u00c9"))),
-            maxBinding = fixedBinding(83)
+            }.toPublisher(),
+            linesPublisher = listOf(BarFrame.Line(63, "MAJORIT\u00c9")).asOneTimePublisher(),
+            maxPublisher = 83.asOneTimePublisher()
         )
         barFrame.setSize(512, 256)
         compareRendering("BarFrame", "Accents", barFrame)
@@ -680,9 +714,9 @@ class BarFrameTest {
             )
         )
         val barFrame = BarFrame(
-            headerBinding = fixedBinding<String?>("\u00c9LECTION 2018"),
-            subheadTextBinding = fixedBinding<String?>("MAJORIT\u00c9: 63"),
-            barsBinding = results.binding.mapElements {
+            headerPublisher = "\u00c9LECTION 2018".asOneTimePublisher(),
+            subheadTextPublisher = "MAJORIT\u00c9: 63".asOneTimePublisher(),
+            barsPublisher = results.binding.mapElements {
                 BarFrame.Bar(
                     it.getPartyName(),
                     "${it.getNumSeats()}",
@@ -690,9 +724,9 @@ class BarFrameTest {
                         Pair(it.getPartyColor(), it.getNumSeats())
                     )
                 )
-            },
-            linesBinding = fixedBinding(listOf(BarFrame.Line(63, "MAJORIT\u00c9"))),
-            maxBinding = fixedBinding(83)
+            }.toPublisher(),
+            linesPublisher = listOf(BarFrame.Line(63, "MAJORIT\u00c9")).asOneTimePublisher(),
+            maxPublisher = 83.asOneTimePublisher()
         )
         barFrame.setSize(512, 256)
         compareRendering("BarFrame", "MultiLineAccents", barFrame)
@@ -703,18 +737,18 @@ class BarFrameTest {
     fun testBarFrameOverlaps() {
         val lines = BindableWrapper(listOf(Triple("THIS IS A VERY VERY LONG\nLEFT HAND SIDE", "RIGHT\nSIDE", false)))
         val barFrame = BarFrame(
-            headerBinding = fixedBinding<String?>("BAR FRAME"),
-            subheadTextBinding = fixedBinding<String?>(""),
-            barsBinding = lines.binding.mapElements {
+            headerPublisher = "BAR FRAME".asOneTimePublisher(),
+            subheadTextPublisher = "".asOneTimePublisher(),
+            barsPublisher = lines.binding.mapElements {
                 BarFrame.Bar(
                     it.first,
                     it.second,
                     if (it.third) createHalfTickShape() else null,
                     listOf(Pair(Color.RED, 1))
                 )
-            },
-            linesBinding = fixedBinding(listOf(BarFrame.Line(0.5, ""))),
-            maxBinding = fixedBinding(1)
+            }.toPublisher(),
+            linesPublisher = listOf(BarFrame.Line(0.5, "")).asOneTimePublisher(),
+            maxPublisher = 1.asOneTimePublisher()
         )
         barFrame.setSize(256, 128)
         compareRendering("BarFrame", "FrameOverlap-1", barFrame)

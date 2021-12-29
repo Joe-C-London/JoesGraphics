@@ -1,8 +1,9 @@
 package com.joecollins.graphics.components
 
-import com.joecollins.bindings.Binding
-import com.joecollins.bindings.BindingReceiver
 import com.joecollins.graphics.utils.StandardFont
+import com.joecollins.pubsub.Subscriber
+import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
+import com.joecollins.pubsub.map
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Component
@@ -18,6 +19,7 @@ import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
 import java.awt.geom.AffineTransform
 import java.util.ArrayList
+import java.util.concurrent.Flow
 import javax.swing.JComponent
 import javax.swing.JLabel
 import javax.swing.JPanel
@@ -26,19 +28,19 @@ import kotlin.math.max
 import kotlin.math.min
 
 class BarFrame(
-    headerBinding: Binding<String?>,
-    subheadTextBinding: Binding<String?>? = null,
-    subheadColorBinding: Binding<Color>? = null,
-    barsBinding: Binding<List<Bar>>,
-    linesBinding: Binding<List<Line>>? = null,
-    private val minBinding: Binding<Number>? = null,
-    private val maxBinding: Binding<Number>? = null,
-    notesBinding: Binding<String?>? = null,
-    borderColorBinding: Binding<Color>? = null
+    headerPublisher: Flow.Publisher<out String?>,
+    subheadTextPublisher: Flow.Publisher<out String?>? = null,
+    subheadColorPublisher: Flow.Publisher<out Color>? = null,
+    barsPublisher: Flow.Publisher<out List<Bar>>,
+    linesPublisher: Flow.Publisher<out List<Line>>? = null,
+    minPublisher: Flow.Publisher<out Number>? = null,
+    maxPublisher: Flow.Publisher<out Number>? = null,
+    notesPublisher: Flow.Publisher<out String?>? = null,
+    borderColorPublisher: Flow.Publisher<out Color>? = null
 ) : GraphicsFrame(
-    headerPublisher = headerBinding.toPublisher(),
-    notesPublisher = notesBinding?.toPublisher(),
-    borderColorPublisher = borderColorBinding?.toPublisher()
+    headerPublisher = headerPublisher,
+    notesPublisher = notesPublisher,
+    borderColorPublisher = borderColorPublisher
 ) {
     private val centralPanel: JPanel
     private val subheadLabel: FontSizeAdjustingLabel = FontSizeAdjustingLabel()
@@ -458,13 +460,22 @@ class BarFrame(
         add(centralPanel, BorderLayout.CENTER)
         centralPanel.add(subheadLabel)
 
-        (subheadTextBinding ?: Binding.fixedBinding(null)).bind {
+        val onSubheadTextUpdate: (String?) -> Unit = {
             subheadLabel.isVisible = it != null
             subheadLabel.text = it ?: ""
         }
-        (subheadColorBinding ?: Binding.fixedBinding(Color.BLACK)).bind { subheadLabel.foreground = it }
-        val barsReceiver = BindingReceiver(barsBinding)
-        barsReceiver.getBinding().bind { b ->
+        if (subheadTextPublisher != null)
+            subheadTextPublisher.subscribe(Subscriber(eventQueueWrapper(onSubheadTextUpdate)))
+        else
+            onSubheadTextUpdate(null)
+
+        val onSubheadColorUpdate: (Color) -> Unit = { subheadLabel.foreground = it }
+        if (subheadColorPublisher != null)
+            subheadColorPublisher.subscribe(Subscriber(eventQueueWrapper(onSubheadColorUpdate)))
+        else
+            onSubheadColorUpdate(Color.BLACK)
+
+        val onBarsUpdate: (List<Bar>) -> Unit = { b ->
             val numBars = b.size
             while (bars.size < numBars) {
                 val bar = BarPanel()
@@ -485,7 +496,9 @@ class BarFrame(
             centralPanel.revalidate()
             repaint()
         }
-        (linesBinding ?: Binding.fixedBinding(emptyList())).bind { l ->
+        barsPublisher.subscribe(Subscriber(eventQueueWrapper(onBarsUpdate)))
+
+        val onLinesUpdate: (List<Line>) -> Unit = { l ->
             while (l.size > lines.size) {
                 val line = LinePanel()
                 lines.add(line)
@@ -500,13 +513,25 @@ class BarFrame(
                 lines[idx].label = line.label
             }
         }
-        (minBinding ?: barsReceiver.getBinding { bl: List<Bar> -> bl.minOfOrNull { b -> b.series.sumOf { min(it.second.toDouble(), 0.0) } } ?: 0.0 }).bind { min ->
+        if (linesPublisher != null)
+            linesPublisher.subscribe(Subscriber(eventQueueWrapper(onLinesUpdate)))
+        else
+            onLinesUpdate(emptyList())
+
+        val onMinUpdate: (Number) -> Unit = { min ->
             this.min = min
             repaint()
         }
-        (maxBinding ?: barsReceiver.getBinding { bl: List<Bar> -> bl.maxOfOrNull { b -> b.series.sumOf { max(it.second.toDouble(), 0.0) } } ?: 0.0 }).bind { max ->
+        val minFromBars = { bl: List<Bar> -> bl.minOfOrNull { b -> b.series.sumOf { min(it.second.toDouble(), 0.0) } } ?: 0.0 }
+        (minPublisher ?: barsPublisher.map(minFromBars))
+            .subscribe(Subscriber(eventQueueWrapper(onMinUpdate)))
+
+        val onMaxUpdate: (Number) -> Unit = { max ->
             this.max = max
             repaint()
         }
+        val maxFromBars = { bl: List<Bar> -> bl.maxOfOrNull { b -> b.series.sumOf { max(it.second.toDouble(), 0.0) } } ?: 0.0 }
+        (maxPublisher ?: barsPublisher.map(maxFromBars))
+            .subscribe(Subscriber(eventQueueWrapper(onMaxUpdate)))
     }
 }

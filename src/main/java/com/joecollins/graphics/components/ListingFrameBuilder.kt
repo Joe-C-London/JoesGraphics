@@ -1,6 +1,7 @@
 package com.joecollins.graphics.components
 
 import com.joecollins.bindings.Binding
+import com.joecollins.pubsub.asOneTimePublisher
 import java.awt.Color
 
 class ListingFrameBuilder {
@@ -27,10 +28,10 @@ class ListingFrameBuilder {
 
     fun build(): BarFrame {
         return BarFrame(
-            headerBinding = headerBinding ?: Binding.fixedBinding(null),
-            subheadTextBinding = subheadTextBinding,
-            notesBinding = notesBinding,
-            barsBinding = barsBinding ?: Binding.fixedBinding(emptyList())
+            headerPublisher = headerBinding?.toPublisher() ?: (null as String?).asOneTimePublisher(),
+            subheadTextPublisher = subheadTextBinding?.toPublisher(),
+            notesPublisher = notesBinding?.toPublisher(),
+            barsPublisher = barsBinding?.toPublisher() ?: emptyList<BarFrame.Bar>().asOneTimePublisher()
         )
     }
 

@@ -17,6 +17,7 @@ import java.io.IOException
 import java.util.HashMap
 import kotlin.Throws
 
+@Suppress("UNCHECKED_CAST")
 class TooCloseToCallScreenTest {
     @Test
     @Throws(IOException::class)

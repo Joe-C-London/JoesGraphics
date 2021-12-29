@@ -2,6 +2,7 @@ package com.joecollins.graphics.utils
 
 import org.apache.commons.io.FileUtils
 import org.awaitility.Awaitility
+import org.awaitility.core.ConditionTimeoutException
 import org.junit.Assert
 import java.awt.Component
 import java.awt.Container
@@ -27,11 +28,15 @@ object RenderTestUtils {
             "src\\test\\resources\\com\\joecollins\\graphics\\$testClass\\$testMethod.png"
         )
         val actualFile = File.createTempFile("test", ".png")
-        val isMatch = Awaitility.await("$testClass/$testMethod").atMost(1, TimeUnit.SECONDS)
-            .until({
-                ImageIO.write(convertToImage(panel), "png", actualFile)
-                FileUtils.contentEquals(expectedFile, actualFile)
-            }, { it })
+        val isMatch = try {
+            Awaitility.await("$testClass/$testMethod").atMost(1, TimeUnit.SECONDS)
+                .until({
+                    ImageIO.write(convertToImage(panel), "png", actualFile)
+                    FileUtils.contentEquals(expectedFile, actualFile)
+                }, { it })
+        } catch (e: ConditionTimeoutException) {
+            false
+        }
         if (!isMatch) {
             println(expectedFile.absolutePath)
             println(actualFile.absolutePath)

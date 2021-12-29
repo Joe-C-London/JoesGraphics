@@ -39,7 +39,8 @@ class BarFrameBuilderTest {
             Pair("CLINTON", Color.ORANGE) to 2842,
             Pair("SANDERS", Color.GREEN) to 1865
         )
-        Assert.assertEquals(2, frame.numBars.toLong())
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.numBars }, IsEqual(2))
         Assert.assertEquals("CLINTON", frame.getLeftText(0))
         Assert.assertEquals("SANDERS", frame.getLeftText(1))
         Assert.assertEquals("2,842", frame.getRightText(0))
@@ -71,7 +72,8 @@ class BarFrameBuilderTest {
             Pair("CLINTON", Color.ORANGE) to Wrapper(2842),
             Pair("SANDERS", Color.GREEN) to Wrapper(1865)
         )
-        Assert.assertEquals(2, frame.numBars.toLong())
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.numBars }, IsEqual(2))
         Assert.assertEquals("CLINTON", frame.getLeftText(0))
         Assert.assertEquals("SANDERS", frame.getLeftText(1))
         Assert.assertEquals("2,842", frame.getRightText(0))
@@ -99,26 +101,36 @@ class BarFrameBuilderTest {
         )
             .withMax(max.binding)
             .build()
-        Assert.assertEquals(0, frame.min.toInt().toLong())
-        Assert.assertEquals(2500, frame.max.toInt().toLong())
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.min.toInt() }, IsEqual(0))
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.max.toInt() }, IsEqual(2500))
         result.value = mapOf(
             Pair("CLINTON", Color.ORANGE) to 2205,
             Pair("SANDERS", Color.GREEN) to 1846
         )
-        Assert.assertEquals(0, frame.min.toInt().toLong())
-        Assert.assertEquals(2500, frame.max.toInt().toLong())
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.min.toInt() }, IsEqual(0))
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.max.toInt() }, IsEqual(2500))
         result.value = mapOf(
             Pair("CLINTON", Color.ORANGE) to 2842,
             Pair("SANDERS", Color.GREEN) to 1865
         )
-        Assert.assertEquals(0, frame.min.toInt().toLong())
-        Assert.assertEquals(2842, frame.max.toInt().toLong())
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.min.toInt() }, IsEqual(0))
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.max.toInt() }, IsEqual(2842))
         max.value = 3000
-        Assert.assertEquals(0, frame.min.toInt().toLong())
-        Assert.assertEquals(3000, frame.max.toInt().toLong())
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.min.toInt() }, IsEqual(0))
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.max.toInt() }, IsEqual(3000))
         max.value = 2500
-        Assert.assertEquals(0, frame.min.toInt().toLong())
-        Assert.assertEquals(2842, frame.max.toInt().toLong())
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.min.toInt() }, IsEqual(0))
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.max.toInt() }, IsEqual(2842))
     }
 
     @Test
@@ -153,7 +165,8 @@ class BarFrameBuilderTest {
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.header }, IsEqual("DEMOCRATIC PRIMARY"))
         subhead.value = "PLEDGED DELEGATES"
-        Assert.assertEquals("PLEDGED DELEGATES", frame.subheadText)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.subheadText }, IsEqual("PLEDGED DELEGATES"))
         notes.value = "SOURCE: DNC"
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.notes }, IsEqual("SOURCE: DNC"))
@@ -161,7 +174,8 @@ class BarFrameBuilderTest {
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.borderColor }, IsEqual(Color.BLUE))
         subheadColor.value = Color.BLUE
-        Assert.assertEquals(Color.BLUE, frame.subheadColor)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.subheadColor }, IsEqual(Color.BLUE))
     }
 
     @Test
@@ -179,7 +193,8 @@ class BarFrameBuilderTest {
         )
             .withTarget(target.binding) { THOUSANDS.format(it) + " TO WIN" }
             .build()
-        Assert.assertEquals(1, frame.numLines.toLong())
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.numLines }, IsEqual(1))
         Assert.assertEquals(2382, frame.getLineLevel(0))
         Assert.assertEquals("2,382 TO WIN", frame.getLineLabel(0))
     }
@@ -201,7 +216,8 @@ class BarFrameBuilderTest {
             .build()
         Assert.assertEquals(0, frame.numLines.toLong())
         lines.value = listOf(1, 2, 3, 4, 5)
-        Assert.assertEquals(5, frame.numLines.toLong())
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.numLines }, IsEqual(5))
         Assert.assertEquals(1, frame.getLineLevel(0))
         Assert.assertEquals(2, frame.getLineLevel(1))
         Assert.assertEquals(3, frame.getLineLevel(2))
@@ -234,7 +250,8 @@ class BarFrameBuilderTest {
             Pair("The line is here", 1),
             Pair("and here", 2)
         )
-        Assert.assertEquals(2, frame.numLines.toLong())
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.numLines }, IsEqual(2))
         Assert.assertEquals(1, frame.getLineLevel(0))
         Assert.assertEquals(2, frame.getLineLevel(1))
         Assert.assertEquals("The line is here", frame.getLineLabel(0))
@@ -258,7 +275,8 @@ class BarFrameBuilderTest {
             .build()
         Assert.assertEquals(0, frame.numLines.toLong())
         lines.value = listOf(1, 2, 3, 4, 5)
-        Assert.assertEquals(5, frame.numLines.toLong())
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.numLines }, IsEqual(5))
         Assert.assertEquals(1, frame.getLineLevel(0))
         Assert.assertEquals(2, frame.getLineLevel(1))
         Assert.assertEquals(3, frame.getLineLevel(2))
@@ -291,7 +309,8 @@ class BarFrameBuilderTest {
             Pair("CLINTON", Color.ORANGE) to Pair(2842, true),
             Pair("SANDERS", Color.GREEN) to Pair(1865, false)
         )
-        Assert.assertEquals(2, frame.numBars.toLong())
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.numBars }, IsEqual(2))
         Assert.assertEquals("CLINTON", frame.getLeftText(0))
         Assert.assertEquals("SANDERS", frame.getLeftText(1))
         Assert.assertEquals("2,842", frame.getRightText(0))
@@ -327,7 +346,8 @@ class BarFrameBuilderTest {
             Pair("GRN", Color.GREEN) to Pair(3, +2),
             Pair("IND", Color.GRAY) to Pair(1, +1)
         )
-        Assert.assertEquals(6, frame.numBars.toLong())
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.numBars }, IsEqual(6))
         Assert.assertEquals("LIB", frame.getLeftText(0))
         Assert.assertEquals("CON", frame.getLeftText(1))
         Assert.assertEquals("BQ", frame.getLeftText(2))
@@ -352,8 +372,10 @@ class BarFrameBuilderTest {
         Assert.assertEquals(-20, frame.getSeries(3)[0].second)
         Assert.assertEquals(+2, frame.getSeries(4)[0].second)
         Assert.assertEquals(+1, frame.getSeries(5)[0].second)
-        Assert.assertEquals(-27, frame.min.toInt().toLong())
-        Assert.assertEquals(+22, frame.max.toInt().toLong())
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.min.toInt() }, IsEqual(-27))
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.max.toInt() }, IsEqual(22))
     }
 
     @Test
@@ -371,8 +393,10 @@ class BarFrameBuilderTest {
         )
             .withWingspan(range.binding)
             .build()
-        Assert.assertEquals(-10, frame.min.toInt().toLong())
-        Assert.assertEquals(+10, frame.max.toInt().toLong())
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.max.toDouble() }, IsEqual(10.0))
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.min.toDouble() }, IsEqual(-10.0))
         result.value = mapOf(
             Pair("LIB", Color.RED) to Pair(157, -27),
             Pair("CON", Color.BLUE) to Pair(121, +22),
@@ -381,8 +405,10 @@ class BarFrameBuilderTest {
             Pair("GRN", Color.GREEN) to Pair(3, +2),
             Pair("IND", Color.GRAY) to Pair(1, +1)
         )
-        Assert.assertEquals(-27, frame.min.toInt().toLong())
-        Assert.assertEquals(+27, frame.max.toInt().toLong())
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.max.toDouble() }, IsEqual(27.0))
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.min.toDouble() }, IsEqual(-27.0))
     }
 
     @Test
@@ -409,7 +435,8 @@ class BarFrameBuilderTest {
             Pair("GREEN", Color.GREEN) to Pair(1, 3),
             Pair("INDEPENDENT", Color.GRAY) to Pair(0, 1)
         )
-        Assert.assertEquals(6, frame.numBars.toLong())
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.numBars }, IsEqual(6))
         Assert.assertEquals("LIBERAL", frame.getLeftText(0))
         Assert.assertEquals("CONSERVATIVE", frame.getLeftText(1))
         Assert.assertEquals("BLOC QU\u00c9B\u00c9COIS", frame.getLeftText(2))
@@ -479,7 +506,8 @@ class BarFrameBuilderTest {
             Pair("GREEN", Color.GREEN) to Pair(1, 3),
             Pair("INDEPENDENT", Color.GRAY) to Pair(0, 1)
         )
-        Assert.assertEquals(6, frame.numBars.toLong())
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.numBars }, IsEqual(6))
         Assert.assertEquals("LIBERAL", frame.getLeftText(0))
         Assert.assertEquals("CONSERVATIVE", frame.getLeftText(1))
         Assert.assertEquals("BLOC QU\u00c9B\u00c9COIS", frame.getLeftText(2))
@@ -549,7 +577,8 @@ class BarFrameBuilderTest {
             Pair("GRN", Color.GREEN) to Triple(+1, +2, 3),
             Pair("IND", Color.GRAY) to Triple(0, +1, 1)
         )
-        Assert.assertEquals(6, frame.numBars.toLong())
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.numBars }, IsEqual(6))
         Assert.assertEquals("LIB", frame.getLeftText(0))
         Assert.assertEquals("CON", frame.getLeftText(1))
         Assert.assertEquals("BQ", frame.getLeftText(2))
@@ -625,7 +654,8 @@ class BarFrameBuilderTest {
             Pair("GRN", Color.GREEN) to Triple(+1, +2, 3),
             Pair("IND", Color.GRAY) to Triple(0, +1, 1)
         )
-        Assert.assertEquals(6, frame.numBars.toLong())
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.numBars }, IsEqual(6))
         Assert.assertEquals("LIB", frame.getLeftText(0))
         Assert.assertEquals("CON", frame.getLeftText(1))
         Assert.assertEquals("BQ", frame.getLeftText(2))
@@ -683,7 +713,8 @@ class BarFrameBuilderTest {
             BasicBar("Northern Ireland", Color.BLACK, 3)
         )
         val frame = basic(Binding.fixedBinding(regions)).build()
-        Assert.assertEquals(12, frame.numBars.toLong())
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.numBars }, IsEqual(12))
         Assert.assertEquals("East Midlands", frame.getLeftText(0))
         Assert.assertEquals("South East England", frame.getLeftText(5))
         Assert.assertEquals("Northern Ireland", frame.getLeftText(11))
@@ -712,7 +743,8 @@ class BarFrameBuilderTest {
             DualBar("Northern Ireland", Color.BLACK, 16, 18, "18 > 16")
         )
         val frame = dual(Binding.fixedBinding(regions)).build()
-        Assert.assertEquals(12, frame.numBars.toLong())
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.numBars }, IsEqual(12))
         Assert.assertEquals("East Midlands", frame.getLeftText(0))
         Assert.assertEquals("South East England", frame.getLeftText(5))
         Assert.assertEquals("Northern Ireland", frame.getLeftText(11))
@@ -737,18 +769,24 @@ class BarFrameBuilderTest {
         Assert.assertEquals(2.0, frame.getSeries(0)[2].second.toDouble(), 0.0)
         Assert.assertEquals(1.0, frame.getSeries(5)[2].second.toDouble(), 0.0)
         Assert.assertEquals(2.0, frame.getSeries(11)[2].second.toDouble(), 0.0)
-        Assert.assertEquals(84.0, frame.max.toDouble(), 0.0)
-        Assert.assertEquals(0.0, frame.min.toDouble(), 0.0)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.max.toDouble() }, IsEqual(84.0))
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.min.toDouble() }, IsEqual(0.0))
     }
 
     @Test
     fun testDualVariousCombos() {
         val doAssert = { exp: Pair<Color, Number>, act: Pair<Color, Number> ->
-            Assert.assertEquals(exp.first, act.first)
-            Assert.assertEquals(exp.second.toDouble(), act.second.toDouble(), 0.0)
+            Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+                .until({ act.first }, IsEqual(exp.first))
+            Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+                .until({ act.second.toDouble() }, IsEqual(exp.second.toDouble()))
         }
         val regions = BindableWrapper(listOf(DualBar("", Color.BLACK, 0.0, 0.0, "")))
         val frame = dual(regions.binding).build()
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.numBars }, IsEqual(1))
         doAssert(Pair(Color.BLACK, 0.0), frame.getSeries(0)[0])
         doAssert(Pair(Color.BLACK, 0.0), frame.getSeries(0)[1])
         doAssert(Pair(lighten(Color.BLACK), 0.0), frame.getSeries(0)[2])
@@ -805,16 +843,20 @@ class BarFrameBuilderTest {
             BasicBar("JOE BIDEN", Color.BLUE, 306),
             BasicBar("DONALD TRUMP", Color.RED, 232)
         )
-        Assert.assertEquals(2, barFrame.numBars)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ barFrame.numBars }, IsEqual(2))
 
         minBars.value = 3
-        Assert.assertEquals(3, barFrame.numBars)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ barFrame.numBars }, IsEqual(3))
 
         minBars.value = 1
-        Assert.assertEquals(2, barFrame.numBars)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ barFrame.numBars }, IsEqual(2))
 
         bars.value = emptyList()
-        Assert.assertEquals(1, barFrame.numBars)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ barFrame.numBars }, IsEqual(1))
     }
 
     companion object {

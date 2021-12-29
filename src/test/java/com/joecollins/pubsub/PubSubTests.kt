@@ -157,4 +157,20 @@ class PubSubTests {
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS).pollDelay(1, TimeUnit.MILLISECONDS)
             .until({ output }, IsEqual("TEST"))
     }
+
+    @Test
+    fun testPublisherMap() {
+        var output: Int? = null
+        val publisher = SubmissionPublisher<String>()
+        val subscriber = Subscriber<Int> { output = it }
+        publisher.map { it.length }.subscribe(subscriber)
+
+        publisher.submit("TEST")
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS).pollDelay(1, TimeUnit.MILLISECONDS)
+            .until({ output }, IsEqual(4))
+
+        publisher.submit("TEST 2")
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS).pollDelay(1, TimeUnit.MILLISECONDS)
+            .until({ output }, IsEqual(6))
+    }
 }

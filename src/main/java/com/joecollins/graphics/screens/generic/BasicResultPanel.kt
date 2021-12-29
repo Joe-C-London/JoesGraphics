@@ -17,6 +17,7 @@ import com.joecollins.models.general.Aggregators
 import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
+import com.joecollins.pubsub.asOneTimePublisher
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Component
@@ -1654,7 +1655,7 @@ class BasicResultPanel private constructor(
 
         private fun createFrame(): BarFrame {
             return BarFrame(
-                barsBinding = quotas.getBinding { q ->
+                barsPublisher = quotas.getBinding { q ->
                     q.entries.asSequence()
                         .sortedByDescending { if (it.key == Party.OTHERS) -1.0 else it.value }
                         .map {
@@ -1665,18 +1666,18 @@ class BasicResultPanel private constructor(
                             )
                         }
                         .toList()
-                },
-                headerBinding = header.getBinding(),
-                subheadTextBinding = subhead.getBinding(),
-                maxBinding = totalSeats.getBinding(),
-                linesBinding = totalSeats.getBinding { lines -> (1 until lines).map { BarFrame.Line(it, "$it QUOTA${if (it == 1) "" else "S"}") } }
+                }.toPublisher(),
+                headerPublisher = header.getBinding().toPublisher(),
+                subheadTextPublisher = subhead.getBinding().toPublisher(),
+                maxPublisher = totalSeats.getBinding().toPublisher(),
+                linesPublisher = totalSeats.getBinding { lines -> (1 until lines).map { BarFrame.Line(it, "$it QUOTA${if (it == 1) "" else "S"}") } }.toPublisher()
             )
         }
 
         private fun createDiffFrame(): BarFrame? {
             if (prevQuotas == null) return null
             return BarFrame(
-                barsBinding = quotas.getBinding().merge(prevQuotas!!.getBinding()) { curr, prevRaw ->
+                barsPublisher = quotas.getBinding().merge(prevQuotas!!.getBinding()) { curr, prevRaw ->
                     if (curr.isEmpty()) {
                         emptyList()
                     } else {
@@ -1697,10 +1698,10 @@ class BasicResultPanel private constructor(
                             }
                             .toList()
                     }
-                },
-                headerBinding = changeHeader?.getBinding() ?: Binding.fixedBinding(null),
-                maxBinding = Binding.fixedBinding(1),
-                minBinding = Binding.fixedBinding(-1)
+                }.toPublisher(),
+                headerPublisher = changeHeader?.getBinding()?.toPublisher() ?: (null as String?).asOneTimePublisher(),
+                maxPublisher = 1.asOneTimePublisher(),
+                minPublisher = (-1).asOneTimePublisher()
             )
         }
 

@@ -183,7 +183,7 @@ class SingleTransferrableResultScreen private constructor(
                         .map {
                             BarFrameBuilder.BasicBar(
                                 label = it.key.name.uppercase() + (if (it.key.incumbent) " $incumbentMarker" else "") + " (${it.key.party.abbreviation.uppercase()})",
-                                valueLabel = if (it.value == null) "WAITING..." else (formatString(it.value!!) + (if (quota == null) "" else (" (" + formatString(it.value!!.toDouble() / quota!!.toDouble()) + ")"))),
+                                valueLabel = if (it.value == null) "WAITING..." else (formatString(it.value!!) + (if (quota == null) "" else (" (" + formatString(it.value!!.toDouble() / quota.toDouble()) + ")"))),
                                 color = it.key.party.color,
                                 value = (it.value ?: 0),
                                 shape = when {

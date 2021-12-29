@@ -78,3 +78,32 @@ fun <T> T.asOneTimePublisher(): Flow.Publisher<T> {
     publisher.submit(this)
     return publisher
 }
+
+fun <T, R> Flow.Publisher<T>.map(func: (T) -> R): Flow.Publisher<R> {
+    val me = this
+    return object : Flow.Publisher<R> {
+        override fun subscribe(subscriber: Flow.Subscriber<in R>) {
+            me.subscribe(object : Flow.Subscriber<T> {
+                override fun onSubscribe(subscription: Flow.Subscription) {
+                    subscriber.onSubscribe(subscription)
+                }
+
+                override fun onNext(item: T) {
+                    try {
+                        subscriber.onNext(func(item))
+                    } catch (e: Exception) {
+                        subscriber.onError(e)
+                    }
+                }
+
+                override fun onError(throwable: Throwable?) {
+                    subscriber.onError(throwable)
+                }
+
+                override fun onComplete() {
+                    subscriber.onComplete()
+                }
+            })
+        }
+    }
+}

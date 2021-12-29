@@ -4,6 +4,7 @@ import com.joecollins.bindings.Bindable
 import com.joecollins.bindings.Binding
 import com.joecollins.bindings.BindingReceiver
 import com.joecollins.graphics.utils.ColorUtils
+import com.joecollins.pubsub.asOneTimePublisher
 import java.awt.Color
 import java.awt.Shape
 import kotlin.math.abs
@@ -175,15 +176,15 @@ class BarFrameBuilder private constructor() {
                 ?: this.barsBinding
             )
         return BarFrame(
-            headerBinding = headerBinding ?: Binding.fixedBinding(null),
-            subheadTextBinding = subheadBinding,
-            subheadColorBinding = subheadColorBinding,
-            notesBinding = notesBinding,
-            borderColorBinding = borderColorBinding,
-            barsBinding = barsBinding,
-            linesBinding = linesBinding,
-            minBinding = minBinding,
-            maxBinding = maxBinding
+            headerPublisher = headerBinding?.toPublisher() ?: (null as String?).asOneTimePublisher(),
+            subheadTextPublisher = subheadBinding?.toPublisher(),
+            subheadColorPublisher = subheadColorBinding?.toPublisher(),
+            notesPublisher = notesBinding?.toPublisher(),
+            borderColorPublisher = borderColorBinding?.toPublisher(),
+            barsPublisher = barsBinding.toPublisher(),
+            linesPublisher = linesBinding?.toPublisher(),
+            minPublisher = minBinding?.toPublisher(),
+            maxPublisher = maxBinding?.toPublisher()
         )
     }
 

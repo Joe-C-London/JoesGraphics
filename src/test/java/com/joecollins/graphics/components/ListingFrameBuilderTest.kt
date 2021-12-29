@@ -4,10 +4,13 @@ import com.joecollins.bindings.Binding.Companion.fixedBinding
 import com.joecollins.graphics.components.ListingFrameBuilder.Companion.of
 import com.joecollins.graphics.components.ListingFrameBuilder.Companion.ofFixedList
 import com.joecollins.graphics.utils.BindableWrapper
+import org.awaitility.Awaitility
+import org.hamcrest.core.IsEqual
 import org.junit.Assert
 import org.junit.Test
 import java.awt.Color
 import java.util.ArrayList
+import java.util.concurrent.TimeUnit
 
 class ListingFrameBuilderTest {
     @Test
@@ -20,9 +23,12 @@ class ListingFrameBuilderTest {
             .withSubhead(fixedBinding("SUBHEAD"))
             .build()
         Assert.assertEquals(0, frame.numLines.toLong())
-        Assert.assertEquals(2, frame.numBars.toLong())
-        Assert.assertEquals(0.0, frame.min.toDouble(), 1e-6)
-        Assert.assertEquals(1.0, frame.max.toDouble(), 1e-6)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.numBars }, IsEqual(2))
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.max.toDouble() }, IsEqual(1.0))
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.min.toDouble() }, IsEqual(0.0))
         Assert.assertEquals("HEADER", frame.header)
         Assert.assertEquals("SUBHEAD", frame.subheadText)
         Assert.assertEquals("JUSTIN TRUDEAU", frame.getLeftText(0))
@@ -59,7 +65,8 @@ class ListingFrameBuilderTest {
             .withSubhead(fixedBinding("SUBHEAD"))
             .build()
         Assert.assertEquals(0, frame.numLines.toLong())
-        Assert.assertEquals(2, frame.numBars.toLong())
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.numBars }, IsEqual(2))
         Assert.assertEquals(0.0, frame.min.toDouble(), 1e-6)
         Assert.assertEquals(1.0, frame.max.toDouble(), 1e-6)
         Assert.assertEquals("HEADER", frame.header)
