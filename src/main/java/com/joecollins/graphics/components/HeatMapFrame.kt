@@ -1,7 +1,8 @@
 package com.joecollins.graphics.components
 
-import com.joecollins.bindings.Binding
 import com.joecollins.graphics.utils.StandardFont
+import com.joecollins.pubsub.Subscriber
+import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
 import java.awt.BasicStroke
 import java.awt.BorderLayout
 import java.awt.Color
@@ -20,6 +21,7 @@ import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.awt.event.MouseMotionAdapter
 import java.awt.geom.Area
+import java.util.concurrent.Flow
 import javax.swing.JPanel
 import kotlin.math.ceil
 import kotlin.math.max
@@ -27,18 +29,18 @@ import kotlin.math.min
 import kotlin.math.roundToInt
 
 class HeatMapFrame(
-    headerBinding: Binding<String?>,
-    numRowsBinding: Binding<Int>,
-    squaresBinding: Binding<List<Square>>,
-    seatBarsBinding: Binding<List<Bar>>? = null,
-    seatBarLabelBinding: Binding<String>? = null,
-    changeBarsBinding: Binding<List<Bar>>? = null,
-    changeBarLabelBinding: Binding<String>? = null,
-    changeBarStartBinding: Binding<Int>? = null,
-    borderColorBinding: Binding<Color>? = null
+    headerPublisher: Flow.Publisher<out String?>,
+    numRowsPublisher: Flow.Publisher<out Int>,
+    squaresPublisher: Flow.Publisher<out List<Square>>,
+    seatBarsPublisher: Flow.Publisher<out List<Bar>>? = null,
+    seatBarLabelPublisher: Flow.Publisher<out String>? = null,
+    changeBarsPublisher: Flow.Publisher<out List<Bar>>? = null,
+    changeBarLabelPublisher: Flow.Publisher<out String>? = null,
+    changeBarStartPublisher: Flow.Publisher<out Int>? = null,
+    borderColorPublisher: Flow.Publisher<out Color>? = null
 ) : GraphicsFrame(
-    headerPublisher = headerBinding.toPublisher(),
-    borderColorPublisher = borderColorBinding?.toPublisher()
+    headerPublisher = headerPublisher,
+    borderColorPublisher = borderColorPublisher
 ) {
     private val barsPanel = SeatBarPanel()
     private val squaresPanel = SquaresPanel()
@@ -416,12 +418,40 @@ class HeatMapFrame(
         panel.add(barsPanel)
         panel.add(squaresPanel)
 
-        numRowsBinding.bind { numRows -> squaresPanel.numRows = numRows }
-        squaresBinding.bind { squares -> squaresPanel.squares = squares }
-        (seatBarsBinding ?: Binding.fixedBinding(emptyList())).bind { bars -> barsPanel.seatBars = bars }
-        (seatBarLabelBinding ?: Binding.fixedBinding("")).bind { label -> barsPanel.seatBarLabel = label }
-        (changeBarsBinding ?: Binding.fixedBinding(emptyList())).bind { bars -> barsPanel.changeBars = bars }
-        (changeBarLabelBinding ?: Binding.fixedBinding("")).bind { label -> barsPanel.changeBarLabel = label }
-        (changeBarStartBinding ?: Binding.fixedBinding(0)).bind { start -> barsPanel.changeBarStart = start }
+        val onNumRowsUpdate: (Int) -> Unit = { numRows -> squaresPanel.numRows = numRows }
+        numRowsPublisher.subscribe(Subscriber(eventQueueWrapper(onNumRowsUpdate)))
+
+        val onSquaresUpdate: (List<Square>) -> Unit = { squares -> squaresPanel.squares = squares }
+        squaresPublisher.subscribe(Subscriber(eventQueueWrapper(onSquaresUpdate)))
+
+        val onSeatBarsUpdate: (List<Bar>) -> Unit = { bars -> barsPanel.seatBars = bars }
+        if (seatBarsPublisher != null)
+            seatBarsPublisher.subscribe(Subscriber(eventQueueWrapper(onSeatBarsUpdate)))
+        else
+            onSeatBarsUpdate(emptyList())
+
+        val onSeatBarLabelUpdate: (String) -> Unit = { label -> barsPanel.seatBarLabel = label }
+        if (seatBarLabelPublisher != null)
+            seatBarLabelPublisher.subscribe(Subscriber(eventQueueWrapper(onSeatBarLabelUpdate)))
+        else
+            onSeatBarLabelUpdate("")
+
+        val onChangeBarsUpdate: (List<Bar>) -> Unit = { bars -> barsPanel.changeBars = bars }
+        if (changeBarsPublisher != null)
+            changeBarsPublisher.subscribe(Subscriber(eventQueueWrapper(onChangeBarsUpdate)))
+        else
+            onChangeBarsUpdate(emptyList())
+
+        val onChangeBarLabelUpdate: (String) -> Unit = { label -> barsPanel.changeBarLabel = label }
+        if (changeBarLabelPublisher != null)
+            changeBarLabelPublisher.subscribe(Subscriber(eventQueueWrapper(onChangeBarLabelUpdate)))
+        else
+            onChangeBarLabelUpdate("")
+
+        val onChangeBarStartUpdate: (Int) -> Unit = { start -> barsPanel.changeBarStart = start }
+        if (changeBarStartPublisher != null)
+            changeBarStartPublisher.subscribe(Subscriber(eventQueueWrapper(onChangeBarStartUpdate)))
+        else
+            onChangeBarStartUpdate(0)
     }
 }

@@ -24,7 +24,8 @@ class SwingometerFrameBuilderTest {
         Assert.assertEquals(Color.BLUE, frame.leftColor)
         Assert.assertEquals(Color.RED, frame.rightColor)
         Assert.assertEquals(-1.0, frame.value.toDouble(), 0.0)
-        Assert.assertEquals("SWINGOMETER", frame.header)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.header }, IsEqual("SWINGOMETER"))
     }
 
     @Test

@@ -10,12 +10,15 @@ import com.joecollins.graphics.utils.BindableWrapper
 import com.joecollins.graphics.utils.ColorUtils.lighten
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
+import org.awaitility.Awaitility
+import org.hamcrest.core.IsEqual
 import org.junit.Assert
 import org.junit.Test
 import java.awt.Color
 import java.text.DecimalFormat
 import java.util.ArrayList
 import java.util.Collections
+import java.util.concurrent.TimeUnit
 
 class HeatMapFrameBuilderTest {
     @Test
@@ -44,7 +47,8 @@ class HeatMapFrameBuilderTest {
             .withHeader(fixedBinding("PEI"))
             .withBorder(fixedBinding(Color.GREEN))
             .build()
-        Assert.assertEquals(3, frame.numRows.toLong())
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.numRows }, IsEqual(3))
         Assert.assertEquals(27, frame.numSquares.toLong())
         val expectedFills = sequenceOf(
             Collections.nCopies(8, Color.GREEN),
@@ -116,7 +120,8 @@ class HeatMapFrameBuilderTest {
             { e: Int, l: Int -> DecimalFormat("+0;-0").format(e) + "/" + DecimalFormat("+0;-0").format(l) },
             fixedBinding("YUKON")
         )
-        Assert.assertEquals(19, frame.numSquares.toLong())
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.numSquares }, IsEqual(19))
         Assert.assertEquals(Color.RED, frame.getSquareBorder(0))
         Assert.assertEquals(lighten(Color.RED), frame.getSquareFill(0))
         Assert.assertEquals("YUKON", frame.header)
@@ -176,7 +181,8 @@ class HeatMapFrameBuilderTest {
             { e: Int, l: Int -> DecimalFormat("+0;-0").format(e) + "/" + DecimalFormat("+0;-0").format(l) },
             fixedBinding("TEST")
         )
-        Assert.assertEquals(30, frame.numSquares.toLong())
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.numSquares }, IsEqual(30))
         Assert.assertEquals(Color.RED, frame.getSquareBorder(0))
         Assert.assertEquals(Color.WHITE, frame.getSquareFill(0))
         Assert.assertEquals(0, frame.getSeatBarSize(0).toLong())
@@ -290,7 +296,8 @@ class HeatMapFrameBuilderTest {
             { e: Int, l: Int -> DecimalFormat("+0;-0").format(e) + "/" + DecimalFormat("+0;-0").format(l) },
             fixedBinding("TEST")
         )
-        Assert.assertEquals(30, frame.numSquares.toLong())
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.numSquares }, IsEqual(30))
         Assert.assertEquals(Color.RED, frame.getSquareBorder(0))
         Assert.assertEquals(Color.WHITE, frame.getSquareFill(0))
         Assert.assertEquals(0, frame.getSeatBarSize(0).toLong())

@@ -1,8 +1,9 @@
 package com.joecollins.graphics.components
 
-import com.joecollins.bindings.Binding
-import com.joecollins.bindings.BindingReceiver
 import com.joecollins.graphics.utils.StandardFont
+import com.joecollins.pubsub.Subscriber
+import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
+import com.joecollins.pubsub.map
 import java.awt.BasicStroke
 import java.awt.BorderLayout
 import java.awt.Color
@@ -20,29 +21,30 @@ import java.awt.Shape
 import java.awt.geom.AffineTransform
 import java.awt.geom.Area
 import java.util.ArrayList
+import java.util.concurrent.Flow
 import javax.swing.JPanel
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
 
 class HemicycleFrame(
-    headerBinding: Binding<String?>,
-    rowsBinding: Binding<List<Int>>? = null,
-    dotsBinding: Binding<List<Dot>>,
-    leftSeatBarBinding: Binding<List<Bar>>? = null,
-    leftSeatBarLabelBinding: Binding<String>? = null,
-    rightSeatBarBinding: Binding<List<Bar>>? = null,
-    rightSeatBarLabelBinding: Binding<String>? = null,
-    middleSeatBarBinding: Binding<List<Bar>>? = null,
-    middleSeatBarLabelBinding: Binding<String>? = null,
-    leftChangeBarBinding: Binding<List<Bar>>? = null,
-    leftChangeBarStartBinding: Binding<Int>? = null,
-    leftChangeBarLabelBinding: Binding<String>? = null,
-    rightChangeBarBinding: Binding<List<Bar>>? = null,
-    rightChangeBarStartBinding: Binding<Int>? = null,
-    rightChangeBarLabelBinding: Binding<String>? = null
+    headerPublisher: Flow.Publisher<out String?>,
+    rowsPublisher: Flow.Publisher<out List<Int>>? = null,
+    dotsPublisher: Flow.Publisher<out List<Dot>>,
+    leftSeatBarPublisher: Flow.Publisher<out List<Bar>>? = null,
+    leftSeatBarLabelPublisher: Flow.Publisher<out String>? = null,
+    rightSeatBarPublisher: Flow.Publisher<out List<Bar>>? = null,
+    rightSeatBarLabelPublisher: Flow.Publisher<out String>? = null,
+    middleSeatBarPublisher: Flow.Publisher<out List<Bar>>? = null,
+    middleSeatBarLabelPublisher: Flow.Publisher<out String>? = null,
+    leftChangeBarPublisher: Flow.Publisher<out List<Bar>>? = null,
+    leftChangeBarStartPublisher: Flow.Publisher<out Int>? = null,
+    leftChangeBarLabelPublisher: Flow.Publisher<out String>? = null,
+    rightChangeBarPublisher: Flow.Publisher<out List<Bar>>? = null,
+    rightChangeBarStartPublisher: Flow.Publisher<out Int>? = null,
+    rightChangeBarLabelPublisher: Flow.Publisher<out String>? = null
 ) : GraphicsFrame(
-    headerPublisher = headerBinding.toPublisher()
+    headerPublisher = headerPublisher
 ) {
     private val barsPanel = BarPanel()
     private val dotsPanel = DotsPanel()
@@ -521,62 +523,124 @@ class HemicycleFrame(
         panel.add(barsPanel)
         panel.add(dotsPanel)
 
-        val dotsReceiver = BindingReceiver(dotsBinding)
-        (rowsBinding ?: dotsReceiver.getBinding { d -> listOf(d.size) }).bind { r ->
+        val onRowsUpdate: (List<Int>) -> Unit = { r ->
             dotsPanel.rows = r
             dotsPanel.repaint()
         }
-        dotsReceiver.getBinding().bind { d ->
+        (rowsPublisher ?: dotsPublisher.map { d -> listOf(d.size) }).subscribe(Subscriber(eventQueueWrapper(onRowsUpdate)))
+
+        val onDotsUpdate: (List<Dot>) -> Unit = { d ->
             dotsPanel.dots = d
             dotsPanel.repaint()
         }
-        (leftSeatBarBinding ?: Binding.fixedBinding(emptyList())).bind { b ->
+        dotsPublisher.subscribe(Subscriber(eventQueueWrapper(onDotsUpdate)))
+
+        val onLeftSeatBarUpdate: (List<Bar>) -> Unit = { b ->
             barsPanel.leftSeatBars = b
             barsPanel.repaint()
         }
-        (leftSeatBarLabelBinding ?: Binding.fixedBinding("")).bind { label ->
+        if (leftSeatBarPublisher != null)
+            leftSeatBarPublisher.subscribe(Subscriber(eventQueueWrapper(onLeftSeatBarUpdate)))
+        else
+            onLeftSeatBarUpdate(emptyList())
+
+        val onLeftSeatBarLabelUpdate: (String) -> Unit = { label ->
             barsPanel.leftSeatBarLabel = label
             barsPanel.repaint()
         }
-        (rightSeatBarBinding ?: Binding.fixedBinding(emptyList())).bind { b ->
+        if (leftSeatBarLabelPublisher != null)
+            leftSeatBarLabelPublisher.subscribe(Subscriber(eventQueueWrapper(onLeftSeatBarLabelUpdate)))
+        else
+            onLeftSeatBarLabelUpdate("")
+
+        val onRightSeatBarUpdate: (List<Bar>) -> Unit = { b ->
             barsPanel.rightSeatBars = b
             barsPanel.repaint()
         }
-        (rightSeatBarLabelBinding ?: Binding.fixedBinding("")).bind { label ->
+        if (rightSeatBarPublisher != null)
+            rightSeatBarPublisher.subscribe(Subscriber(eventQueueWrapper(onRightSeatBarUpdate)))
+        else
+            onRightSeatBarUpdate(emptyList())
+
+        val onRightSeatBarLabelUpdate: (String) -> Unit = { label ->
             barsPanel.rightSeatBarLabel = label
             barsPanel.repaint()
         }
-        (middleSeatBarBinding ?: Binding.fixedBinding(emptyList())).bind { b ->
+        if (rightSeatBarLabelPublisher != null)
+            rightSeatBarLabelPublisher.subscribe(Subscriber(eventQueueWrapper(onRightSeatBarLabelUpdate)))
+        else
+            onRightSeatBarLabelUpdate("")
+
+        val onMiddleSeatBarUpdate: (List<Bar>) -> Unit = { b ->
             barsPanel.middleSeatBars = b
             barsPanel.repaint()
         }
-        (middleSeatBarLabelBinding ?: Binding.fixedBinding("")).bind { label ->
+        if (middleSeatBarPublisher != null)
+            middleSeatBarPublisher.subscribe(Subscriber(eventQueueWrapper(onMiddleSeatBarUpdate)))
+        else
+            onMiddleSeatBarUpdate(emptyList())
+
+        val onMiddleSeatBarLabelUpdate: (String) -> Unit = { label ->
             barsPanel.middleSeatBarLabel = label
             barsPanel.repaint()
         }
-        (leftChangeBarBinding ?: Binding.fixedBinding(emptyList())).bind { b ->
+        if (middleSeatBarLabelPublisher != null)
+            middleSeatBarLabelPublisher.subscribe(Subscriber(eventQueueWrapper(onMiddleSeatBarLabelUpdate)))
+        else
+            onMiddleSeatBarLabelUpdate("")
+
+        val onLeftChangeBarUpdate: (List<Bar>) -> Unit = { b ->
             barsPanel.leftChangeBars = b
             barsPanel.repaint()
         }
-        (leftChangeBarStartBinding ?: Binding.fixedBinding(0)).bind { start ->
+        if (leftChangeBarPublisher != null)
+            leftChangeBarPublisher.subscribe(Subscriber(eventQueueWrapper(onLeftChangeBarUpdate)))
+        else
+            onLeftChangeBarUpdate(emptyList())
+
+        val onLeftChangeBarStartUpdate: (Int) -> Unit = { start ->
             barsPanel.leftChangeBarStart = start
             barsPanel.repaint()
         }
-        (leftChangeBarLabelBinding ?: Binding.fixedBinding("")).bind { label ->
+        if (leftChangeBarStartPublisher != null)
+            leftChangeBarStartPublisher.subscribe(Subscriber(eventQueueWrapper(onLeftChangeBarStartUpdate)))
+        else
+            onLeftChangeBarStartUpdate(0)
+
+        val onLeftChangeBarLabelUpdate: (String) -> Unit = { label ->
             barsPanel.leftChangeBarLabel = label
             barsPanel.repaint()
         }
-        (rightChangeBarBinding ?: Binding.fixedBinding(emptyList())).bind { b ->
+        if (leftChangeBarLabelPublisher != null)
+            leftChangeBarLabelPublisher.subscribe(Subscriber(eventQueueWrapper(onLeftChangeBarLabelUpdate)))
+        else
+            onLeftChangeBarLabelUpdate("")
+
+        val onRightChangeBarUpdate: (List<Bar>) -> Unit = { b ->
             barsPanel.rightChangeBars = b
             barsPanel.repaint()
         }
-        (rightChangeBarStartBinding ?: Binding.fixedBinding(0)).bind { start ->
+        if (rightChangeBarPublisher != null)
+            rightChangeBarPublisher.subscribe(Subscriber(eventQueueWrapper(onRightChangeBarUpdate)))
+        else
+            onRightChangeBarUpdate(emptyList())
+
+        val onRightChangeBarStartUpdate: (Int) -> Unit = { start ->
             barsPanel.rightChangeBarStart = start
             barsPanel.repaint()
         }
-        (rightChangeBarLabelBinding ?: Binding.fixedBinding("")).bind { label ->
+        if (rightChangeBarStartPublisher != null)
+            rightChangeBarStartPublisher.subscribe(Subscriber(eventQueueWrapper(onRightChangeBarStartUpdate)))
+        else
+            onRightChangeBarStartUpdate(0)
+
+        val onRightChangeBarLabelUpdate: (String) -> Unit = { label ->
             barsPanel.rightChangeBarLabel = label
             barsPanel.repaint()
         }
+        if (rightChangeBarLabelPublisher != null)
+            rightChangeBarLabelPublisher.subscribe(Subscriber(eventQueueWrapper(onRightChangeBarLabelUpdate)))
+        else
+            onRightChangeBarLabelUpdate("")
     }
 }

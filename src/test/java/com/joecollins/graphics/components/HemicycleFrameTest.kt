@@ -1,14 +1,17 @@
 package com.joecollins.graphics.components
 
-import com.joecollins.bindings.Binding.Companion.fixedBinding
 import com.joecollins.bindings.mapElements
 import com.joecollins.graphics.utils.BindableWrapper
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
+import com.joecollins.pubsub.asOneTimePublisher
+import org.awaitility.Awaitility
+import org.hamcrest.core.IsEqual
 import org.junit.Assert
 import org.junit.Test
 import java.awt.Color
 import java.io.IOException
 import java.util.Collections
+import java.util.concurrent.TimeUnit
 import kotlin.Throws
 
 class HemicycleFrameTest {
@@ -16,10 +19,12 @@ class HemicycleFrameTest {
     fun testRowCounts() {
         val rowCounts = listOf(5, 6, 7, 9)
         val frame = HemicycleFrame(
-            headerBinding = fixedBinding(null),
-            rowsBinding = fixedBinding(rowCounts),
-            dotsBinding = fixedBinding(emptyList())
+            headerPublisher = (null as String?).asOneTimePublisher(),
+            rowsPublisher = rowCounts.asOneTimePublisher(),
+            dotsPublisher = emptyList<HemicycleFrame.Dot>().asOneTimePublisher()
         )
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.numRows }, IsEqual(4))
         Assert.assertEquals(4, frame.numRows.toLong())
         Assert.assertEquals(5, frame.getRowCount(0).toLong())
         Assert.assertEquals(6, frame.getRowCount(1).toLong())
@@ -36,8 +41,8 @@ class HemicycleFrameTest {
             Color.GREEN, Color.GREEN, Color.RED, Color.RED, Color.RED, Color.BLUE, Color.BLUE, Color.BLUE, Color.BLUE
         )
         val frame = HemicycleFrame(
-            headerBinding = fixedBinding(null),
-            dotsBinding = fixedBinding(dotColors.map { HemicycleFrame.Dot(color = it, border = null) })
+            headerPublisher = (null as String?).asOneTimePublisher(),
+            dotsPublisher = dotColors.map { HemicycleFrame.Dot(color = it, border = null) }.asOneTimePublisher()
         )
         Assert.assertEquals(27, frame.numDots.toLong())
         Assert.assertEquals(Color.GREEN, frame.getDotColor(0))
@@ -54,10 +59,11 @@ class HemicycleFrameTest {
             Color.GREEN, Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.BLUE, Color.BLUE
         )
         val frame = HemicycleFrame(
-            headerBinding = fixedBinding(null),
-            dotsBinding = fixedBinding(dotColors.map { HemicycleFrame.Dot(color = Color.WHITE, border = it) })
+            headerPublisher = (null as String?).asOneTimePublisher(),
+            dotsPublisher = dotColors.map { HemicycleFrame.Dot(color = Color.WHITE, border = it) }.asOneTimePublisher()
         )
-        Assert.assertEquals(27, frame.numDots.toLong())
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.numDots }, IsEqual(27))
         Assert.assertEquals(Color.RED, frame.getDotBorder(0))
         Assert.assertEquals(Color.BLUE, frame.getDotBorder(9))
         Assert.assertEquals(Color.GREEN, frame.getDotBorder(18))
@@ -66,17 +72,18 @@ class HemicycleFrameTest {
     @Test
     fun testLeftSeatBar() {
         val frame = HemicycleFrame(
-            headerBinding = fixedBinding(null),
-            dotsBinding = fixedBinding(emptyList()),
-            leftSeatBarBinding = fixedBinding(
-                listOf(
-                    HemicycleFrame.Bar(Color.GREEN, 1),
-                    HemicycleFrame.Bar(Color(128, 255, 128), 7)
-                )
-            ),
-            leftSeatBarLabelBinding = fixedBinding("GREEN: 1/8")
+            headerPublisher = (null as String?).asOneTimePublisher(),
+            dotsPublisher = emptyList<HemicycleFrame.Dot>().asOneTimePublisher(),
+            leftSeatBarPublisher =
+            listOf(
+                HemicycleFrame.Bar(Color.GREEN, 1),
+                HemicycleFrame.Bar(Color(128, 255, 128), 7)
+            )
+                .asOneTimePublisher(),
+            leftSeatBarLabelPublisher = "GREEN: 1/8".asOneTimePublisher()
         )
-        Assert.assertEquals(2, frame.leftSeatBarCount.toLong())
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.leftSeatBarCount }, IsEqual(2))
         Assert.assertEquals(Color.GREEN, frame.getLeftSeatBarColor(0))
         Assert.assertEquals(7, frame.getLeftSeatBarSize(1).toLong())
         Assert.assertEquals("GREEN: 1/8", frame.getLeftSeatBarLabel())
@@ -85,15 +92,15 @@ class HemicycleFrameTest {
     @Test
     fun testRightSeatBar() {
         val frame = HemicycleFrame(
-            headerBinding = fixedBinding(null),
-            dotsBinding = fixedBinding(emptyList()),
-            rightSeatBarBinding = fixedBinding(
-                listOf(
-                    HemicycleFrame.Bar(Color.BLUE, 8),
-                    HemicycleFrame.Bar(Color(128, 128, 255), 5)
-                )
-            ),
-            rightSeatBarLabelBinding = fixedBinding("PROGRESSIVE CONSERVATIVE: 8/13")
+            headerPublisher = (null as String?).asOneTimePublisher(),
+            dotsPublisher = emptyList<HemicycleFrame.Dot>().asOneTimePublisher(),
+            rightSeatBarPublisher =
+            listOf(
+                HemicycleFrame.Bar(Color.BLUE, 8),
+                HemicycleFrame.Bar(Color(128, 128, 255), 5)
+            )
+                .asOneTimePublisher(),
+            rightSeatBarLabelPublisher = "PROGRESSIVE CONSERVATIVE: 8/13".asOneTimePublisher()
         )
         Assert.assertEquals(2, frame.rightSeatBarCount.toLong())
         Assert.assertEquals(Color.BLUE, frame.getRightSeatBarColor(0))
@@ -104,15 +111,15 @@ class HemicycleFrameTest {
     @Test
     fun testMiddleSeatBar() {
         val frame = HemicycleFrame(
-            headerBinding = fixedBinding(null),
-            dotsBinding = fixedBinding(emptyList()),
-            middleSeatBarBinding = fixedBinding(
-                listOf(
-                    HemicycleFrame.Bar(Color.RED, 2),
-                    HemicycleFrame.Bar(Color(255, 128, 128), 4)
-                )
-            ),
-            middleSeatBarLabelBinding = fixedBinding("LIBERAL: 2/6")
+            headerPublisher = (null as String?).asOneTimePublisher(),
+            dotsPublisher = emptyList<HemicycleFrame.Dot>().asOneTimePublisher(),
+            middleSeatBarPublisher =
+            listOf(
+                HemicycleFrame.Bar(Color.RED, 2),
+                HemicycleFrame.Bar(Color(255, 128, 128), 4)
+            )
+                .asOneTimePublisher(),
+            middleSeatBarLabelPublisher = "LIBERAL: 2/6".asOneTimePublisher()
         )
         Assert.assertEquals(2, frame.middleSeatBarCount.toLong())
         Assert.assertEquals(Color.RED, frame.getMiddleSeatBarColor(0))
@@ -123,18 +130,19 @@ class HemicycleFrameTest {
     @Test
     fun testLeftChangeBar() {
         val frame = HemicycleFrame(
-            headerBinding = fixedBinding(null),
-            dotsBinding = fixedBinding(emptyList()),
-            leftChangeBarBinding = fixedBinding(
-                listOf(
-                    HemicycleFrame.Bar(Color.GREEN, 1),
-                    HemicycleFrame.Bar(Color(128, 255, 128), 6)
-                )
-            ),
-            leftChangeBarStartBinding = fixedBinding(1),
-            leftChangeBarLabelBinding = fixedBinding("GRN: +1/+7")
+            headerPublisher = (null as String?).asOneTimePublisher(),
+            dotsPublisher = emptyList<HemicycleFrame.Dot>().asOneTimePublisher(),
+            leftChangeBarPublisher =
+            listOf(
+                HemicycleFrame.Bar(Color.GREEN, 1),
+                HemicycleFrame.Bar(Color(128, 255, 128), 6)
+            )
+                .asOneTimePublisher(),
+            leftChangeBarStartPublisher = 1.asOneTimePublisher(),
+            leftChangeBarLabelPublisher = "GRN: +1/+7".asOneTimePublisher()
         )
-        Assert.assertEquals(2, frame.leftChangeBarCount.toLong())
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.leftChangeBarCount }, IsEqual(2))
         Assert.assertEquals(Color.GREEN, frame.getLeftChangeBarColor(0))
         Assert.assertEquals(6, frame.getLeftChangeBarSize(1).toLong())
         Assert.assertEquals(1, frame.getLeftChangeBarStart().toLong())
@@ -144,18 +152,19 @@ class HemicycleFrameTest {
     @Test
     fun testRightChangeBar() {
         val frame = HemicycleFrame(
-            headerBinding = fixedBinding(null),
-            dotsBinding = fixedBinding(emptyList()),
-            rightChangeBarBinding = fixedBinding(
-                listOf(
-                    HemicycleFrame.Bar(Color.BLUE, 3),
-                    HemicycleFrame.Bar(Color(128, 128, 255), 2)
-                )
-            ),
-            rightChangeBarStartBinding = fixedBinding(8),
-            rightChangeBarLabelBinding = fixedBinding("PC: +3/+5")
+            headerPublisher = (null as String?).asOneTimePublisher(),
+            dotsPublisher = emptyList<HemicycleFrame.Dot>().asOneTimePublisher(),
+            rightChangeBarPublisher =
+            listOf(
+                HemicycleFrame.Bar(Color.BLUE, 3),
+                HemicycleFrame.Bar(Color(128, 128, 255), 2)
+            )
+                .asOneTimePublisher(),
+            rightChangeBarStartPublisher = 8.asOneTimePublisher(),
+            rightChangeBarLabelPublisher = "PC: +3/+5".asOneTimePublisher()
         )
-        Assert.assertEquals(2, frame.rightChangeBarCount.toLong())
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.rightChangeBarCount }, IsEqual(2))
         Assert.assertEquals(Color.BLUE, frame.getRightChangeBarColor(0))
         Assert.assertEquals(2, frame.getRightChangeBarSize(1).toLong())
         Assert.assertEquals(8, frame.getRightChangeBarStart().toLong())
@@ -177,9 +186,9 @@ class HemicycleFrameTest {
             Color.GREEN, Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.BLUE, Color.BLUE, Color.BLUE
         )
         val frame = HemicycleFrame(
-            headerBinding = fixedBinding("PEI HEMICYCLE"),
-            rowsBinding = fixedBinding(rowCounts),
-            dotsBinding = fixedBinding(dotColors.zip(dotBorders) { c, b -> HemicycleFrame.Dot(color = c, border = b) })
+            headerPublisher = "PEI HEMICYCLE".asOneTimePublisher(),
+            rowsPublisher = rowCounts.asOneTimePublisher(),
+            dotsPublisher = dotColors.zip(dotBorders) { c, b -> HemicycleFrame.Dot(color = c, border = b) }.asOneTimePublisher()
         )
         frame.setSize(1024, 512)
         compareRendering("HemicycleFrame", "DotsOnly", frame)
@@ -205,15 +214,15 @@ class HemicycleFrameTest {
         val lRed = Color(255, 128, 128)
         val lBlue = Color(128, 128, 255)
         val frame = HemicycleFrame(
-            headerBinding = fixedBinding("PEI HEMICYCLE"),
-            rowsBinding = fixedBinding(rowCounts),
-            dotsBinding = dotColors.binding.map { it.zip(dotBorders) { c, b -> HemicycleFrame.Dot(color = c, border = b) } },
-            leftSeatBarBinding = leftSeats.binding.map { seats -> listOf(Color.GREEN, lGreen).zip(seats) { c, s -> HemicycleFrame.Bar(c, s) } },
-            leftSeatBarLabelBinding = leftLabel.binding,
-            middleSeatBarBinding = middleSeats.binding.map { seats -> listOf(Color.RED, lRed).zip(seats) { c, s -> HemicycleFrame.Bar(c, s) } },
-            middleSeatBarLabelBinding = middleLabel.binding,
-            rightSeatBarBinding = rightSeats.binding.map { seats -> listOf(Color.BLUE, lBlue).zip(seats) { c, s -> HemicycleFrame.Bar(c, s) } },
-            rightSeatBarLabelBinding = rightLabel.binding
+            headerPublisher = "PEI HEMICYCLE".asOneTimePublisher(),
+            rowsPublisher = rowCounts.asOneTimePublisher(),
+            dotsPublisher = dotColors.binding.map { it.zip(dotBorders) { c, b -> HemicycleFrame.Dot(color = c, border = b) } }.toPublisher(),
+            leftSeatBarPublisher = leftSeats.binding.map { seats -> listOf(Color.GREEN, lGreen).zip(seats) { c, s -> HemicycleFrame.Bar(c, s) } }.toPublisher(),
+            leftSeatBarLabelPublisher = leftLabel.binding.toPublisher(),
+            middleSeatBarPublisher = middleSeats.binding.map { seats -> listOf(Color.RED, lRed).zip(seats) { c, s -> HemicycleFrame.Bar(c, s) } }.toPublisher(),
+            middleSeatBarLabelPublisher = middleLabel.binding.toPublisher(),
+            rightSeatBarPublisher = rightSeats.binding.map { seats -> listOf(Color.BLUE, lBlue).zip(seats) { c, s -> HemicycleFrame.Bar(c, s) } }.toPublisher(),
+            rightSeatBarLabelPublisher = rightLabel.binding.toPublisher()
         )
         frame.setSize(1024, 512)
         compareRendering("HemicycleFrame", "SeatsBar-1", frame)
@@ -274,21 +283,21 @@ class HemicycleFrameTest {
         val lRed = Color(255, 128, 128)
         val lBlue = Color(128, 128, 255)
         val frame = HemicycleFrame(
-            headerBinding = fixedBinding("PEI HEMICYCLE"),
-            rowsBinding = fixedBinding(rowCounts),
-            dotsBinding = dotColors.binding.map { it.zip(dotBorders) { c, b -> HemicycleFrame.Dot(color = c, border = b) } },
-            leftSeatBarBinding = leftSeats.binding.map { seats -> listOf(Color.GREEN, lGreen).zip(seats) { c, s -> HemicycleFrame.Bar(c, s) } },
-            leftSeatBarLabelBinding = leftLabel.binding,
-            middleSeatBarBinding = middleSeats.binding.map { seats -> listOf(Color.RED, lRed).zip(seats) { c, s -> HemicycleFrame.Bar(c, s) } },
-            middleSeatBarLabelBinding = middleLabel.binding,
-            rightSeatBarBinding = rightSeats.binding.map { seats -> listOf(Color.BLUE, lBlue).zip(seats) { c, s -> HemicycleFrame.Bar(c, s) } },
-            rightSeatBarLabelBinding = rightLabel.binding,
-            leftChangeBarBinding = leftChange.binding.map { change -> listOf(Color.GREEN, lGreen).zip(change) { c, s -> HemicycleFrame.Bar(c, s) } },
-            leftChangeBarLabelBinding = leftChangeLabel.binding,
-            leftChangeBarStartBinding = fixedBinding(1),
-            rightChangeBarBinding = rightChange.binding.map { change -> listOf(Color.BLUE, lBlue).zip(change) { c, s -> HemicycleFrame.Bar(c, s) } },
-            rightChangeBarLabelBinding = rightChangeLabel.binding,
-            rightChangeBarStartBinding = fixedBinding(8)
+            headerPublisher = "PEI HEMICYCLE".asOneTimePublisher(),
+            rowsPublisher = rowCounts.asOneTimePublisher(),
+            dotsPublisher = dotColors.binding.map { it.zip(dotBorders) { c, b -> HemicycleFrame.Dot(color = c, border = b) } }.toPublisher(),
+            leftSeatBarPublisher = leftSeats.binding.map { seats -> listOf(Color.GREEN, lGreen).zip(seats) { c, s -> HemicycleFrame.Bar(c, s) } }.toPublisher(),
+            leftSeatBarLabelPublisher = leftLabel.binding.toPublisher(),
+            middleSeatBarPublisher = middleSeats.binding.map { seats -> listOf(Color.RED, lRed).zip(seats) { c, s -> HemicycleFrame.Bar(c, s) } }.toPublisher(),
+            middleSeatBarLabelPublisher = middleLabel.binding.toPublisher(),
+            rightSeatBarPublisher = rightSeats.binding.map { seats -> listOf(Color.BLUE, lBlue).zip(seats) { c, s -> HemicycleFrame.Bar(c, s) } }.toPublisher(),
+            rightSeatBarLabelPublisher = rightLabel.binding.toPublisher(),
+            leftChangeBarPublisher = leftChange.binding.map { change -> listOf(Color.GREEN, lGreen).zip(change) { c, s -> HemicycleFrame.Bar(c, s) } }.toPublisher(),
+            leftChangeBarLabelPublisher = leftChangeLabel.binding.toPublisher(),
+            leftChangeBarStartPublisher = 1.asOneTimePublisher(),
+            rightChangeBarPublisher = rightChange.binding.map { change -> listOf(Color.BLUE, lBlue).zip(change) { c, s -> HemicycleFrame.Bar(c, s) } }.toPublisher(),
+            rightChangeBarLabelPublisher = rightChangeLabel.binding.toPublisher(),
+            rightChangeBarStartPublisher = 8.asOneTimePublisher()
         )
         frame.setSize(1024, 512)
         compareRendering("HemicycleFrame", "ChangeBar-1", frame)
@@ -349,21 +358,21 @@ class HemicycleFrameTest {
         val leftChangeLabel = BindableWrapper("LIB: -3")
         val rightChangeLabel = BindableWrapper("PC: -5")
         val frame = HemicycleFrame(
-            headerBinding = fixedBinding("ALBERTA HEMICYCLE"),
-            rowsBinding = fixedBinding(rowCounts),
-            dotsBinding = dotColors.binding.mapElements { HemicycleFrame.Dot(color = it, border = null) },
-            leftSeatBarBinding = leftSeats.binding.mapElements { HemicycleFrame.Bar(Color.RED, it) },
-            leftSeatBarLabelBinding = leftLabel.binding,
-            middleSeatBarBinding = middleSeats.binding.mapElements { HemicycleFrame.Bar(Color.GRAY, it) },
-            middleSeatBarLabelBinding = middleLabel.binding,
-            rightSeatBarBinding = rightSeats.binding.mapElements { HemicycleFrame.Bar(Color.BLUE, it) },
-            rightSeatBarLabelBinding = rightLabel.binding,
-            leftChangeBarBinding = leftChange.binding.mapElements { HemicycleFrame.Bar(Color.RED, it) },
-            leftChangeBarLabelBinding = leftChangeLabel.binding,
-            leftChangeBarStartBinding = fixedBinding(8),
-            rightChangeBarBinding = rightChange.binding.mapElements { HemicycleFrame.Bar(Color.BLUE, it) },
-            rightChangeBarLabelBinding = rightChangeLabel.binding,
-            rightChangeBarStartBinding = fixedBinding(66)
+            headerPublisher = "ALBERTA HEMICYCLE".asOneTimePublisher(),
+            rowsPublisher = rowCounts.asOneTimePublisher(),
+            dotsPublisher = dotColors.binding.mapElements { HemicycleFrame.Dot(color = it, border = null) }.toPublisher(),
+            leftSeatBarPublisher = leftSeats.binding.mapElements { HemicycleFrame.Bar(Color.RED, it) }.toPublisher(),
+            leftSeatBarLabelPublisher = leftLabel.binding.toPublisher(),
+            middleSeatBarPublisher = middleSeats.binding.mapElements { HemicycleFrame.Bar(Color.GRAY, it) }.toPublisher(),
+            middleSeatBarLabelPublisher = middleLabel.binding.toPublisher(),
+            rightSeatBarPublisher = rightSeats.binding.mapElements { HemicycleFrame.Bar(Color.BLUE, it) }.toPublisher(),
+            rightSeatBarLabelPublisher = rightLabel.binding.toPublisher(),
+            leftChangeBarPublisher = leftChange.binding.mapElements { HemicycleFrame.Bar(Color.RED, it) }.toPublisher(),
+            leftChangeBarLabelPublisher = leftChangeLabel.binding.toPublisher(),
+            leftChangeBarStartPublisher = 8.asOneTimePublisher(),
+            rightChangeBarPublisher = rightChange.binding.mapElements { HemicycleFrame.Bar(Color.BLUE, it) }.toPublisher(),
+            rightChangeBarLabelPublisher = rightChangeLabel.binding.toPublisher(),
+            rightChangeBarStartPublisher = 66.asOneTimePublisher()
         )
         frame.setSize(1024, 512)
         compareRendering("HemicycleFrame", "ChangeBar-Negative", frame)

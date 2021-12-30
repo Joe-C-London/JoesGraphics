@@ -6,6 +6,7 @@ import com.joecollins.bindings.BindingReceiver
 import com.joecollins.bindings.mapElements
 import com.joecollins.graphics.utils.ColorUtils
 import com.joecollins.models.general.Party
+import com.joecollins.pubsub.asOneTimePublisher
 import java.awt.Color
 import java.awt.Point
 import java.util.ArrayList
@@ -99,21 +100,21 @@ class HemicycleFrameBuilder {
 
     fun build(): HemicycleFrame {
         return HemicycleFrame(
-            headerBinding = headerBinding ?: Binding.fixedBinding(null),
-            rowsBinding = rowsBinding,
-            dotsBinding = dotsBinding ?: Binding.fixedBinding(emptyList()),
-            leftSeatBarBinding = leftSeatBarBinding,
-            leftSeatBarLabelBinding = leftSeatBarLabelBinding,
-            rightSeatBarBinding = rightSeatBarBinding,
-            rightSeatBarLabelBinding = rightSeatBarLabelBinding,
-            middleSeatBarBinding = middleSeatBarBinding,
-            middleSeatBarLabelBinding = middleSeatBarLabelBinding,
-            leftChangeBarBinding = leftChangeBarBinding,
-            leftChangeBarStartBinding = leftChangeBarStartBinding,
-            leftChangeBarLabelBinding = leftChangeBarLabelBinding,
-            rightChangeBarBinding = rightChangeBarBinding,
-            rightChangeBarStartBinding = rightChangeBarStartBinding,
-            rightChangeBarLabelBinding = rightChangeBarLabelBinding
+            headerPublisher = headerBinding?.toPublisher() ?: (null as String?).asOneTimePublisher(),
+            rowsPublisher = rowsBinding?.toPublisher(),
+            dotsPublisher = dotsBinding?.toPublisher() ?: emptyList<HemicycleFrame.Dot>().asOneTimePublisher(),
+            leftSeatBarPublisher = leftSeatBarBinding?.toPublisher(),
+            leftSeatBarLabelPublisher = leftSeatBarLabelBinding?.toPublisher(),
+            rightSeatBarPublisher = rightSeatBarBinding?.toPublisher(),
+            rightSeatBarLabelPublisher = rightSeatBarLabelBinding?.toPublisher(),
+            middleSeatBarPublisher = middleSeatBarBinding?.toPublisher(),
+            middleSeatBarLabelPublisher = middleSeatBarLabelBinding?.toPublisher(),
+            leftChangeBarPublisher = leftChangeBarBinding?.toPublisher(),
+            leftChangeBarStartPublisher = leftChangeBarStartBinding?.toPublisher(),
+            leftChangeBarLabelPublisher = leftChangeBarLabelBinding?.toPublisher(),
+            rightChangeBarPublisher = rightChangeBarBinding?.toPublisher(),
+            rightChangeBarStartPublisher = rightChangeBarStartBinding?.toPublisher(),
+            rightChangeBarLabelPublisher = rightChangeBarLabelBinding?.toPublisher()
         )
     }
 

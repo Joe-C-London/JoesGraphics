@@ -6,6 +6,7 @@ import com.joecollins.bindings.mapElements
 import com.joecollins.graphics.utils.ColorUtils
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
+import com.joecollins.pubsub.asOneTimePublisher
 import java.awt.Color
 
 class HeatMapFrameBuilder {
@@ -55,15 +56,15 @@ class HeatMapFrameBuilder {
 
     fun build(): HeatMapFrame {
         return HeatMapFrame(
-            headerBinding = headerBinding ?: Binding.fixedBinding(null),
-            borderColorBinding = borderColorBinding,
-            numRowsBinding = numRowsBinding ?: Binding.fixedBinding(1),
-            squaresBinding = squaresBinding ?: Binding.fixedBinding(emptyList()),
-            seatBarsBinding = seatBarsBinding,
-            seatBarLabelBinding = seatBarLabelBinding,
-            changeBarsBinding = changeBarsBinding,
-            changeBarStartBinding = changeBarStartBinding,
-            changeBarLabelBinding = changeBarLabelBinding
+            headerPublisher = headerBinding?.toPublisher() ?: (null as String?).asOneTimePublisher(),
+            borderColorPublisher = borderColorBinding?.toPublisher(),
+            numRowsPublisher = numRowsBinding?.toPublisher() ?: 1.asOneTimePublisher(),
+            squaresPublisher = squaresBinding?.toPublisher() ?: emptyList<HeatMapFrame.Square>().asOneTimePublisher(),
+            seatBarsPublisher = seatBarsBinding?.toPublisher(),
+            seatBarLabelPublisher = seatBarLabelBinding?.toPublisher(),
+            changeBarsPublisher = changeBarsBinding?.toPublisher(),
+            changeBarStartPublisher = changeBarStartBinding?.toPublisher(),
+            changeBarLabelPublisher = changeBarLabelBinding?.toPublisher()
         )
     }
 
