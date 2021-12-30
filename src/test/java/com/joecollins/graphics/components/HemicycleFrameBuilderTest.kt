@@ -9,12 +9,15 @@ import com.joecollins.graphics.components.HemicycleFrameBuilder.Tiebreaker
 import com.joecollins.graphics.utils.BindableWrapper
 import com.joecollins.graphics.utils.ColorUtils.lighten
 import com.joecollins.models.general.Party
+import org.awaitility.Awaitility
+import org.hamcrest.core.IsEqual
 import org.junit.Assert
 import org.junit.Test
 import java.awt.Color
 import java.text.DecimalFormat
 import java.util.ArrayList
 import java.util.Collections
+import java.util.concurrent.TimeUnit
 
 @Suppress("UNUSED_ANONYMOUS_PARAMETER")
 class HemicycleFrameBuilderTest {
@@ -211,13 +214,21 @@ class HemicycleFrameBuilderTest {
             Tiebreaker.FRONT_ROW_FROM_LEFT,
             fixedBinding("TEST")
         )
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.numDots }, IsEqual(30))
         Assert.assertEquals(30, frame.numDots.toLong())
         Assert.assertEquals(Color.RED, frame.getDotBorder(0))
         Assert.assertEquals(Color.WHITE, frame.getDotColor(0))
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.leftSeatBarCount }, IsEqual(2))
         Assert.assertEquals(0, frame.getLeftSeatBarSize(0).toLong())
         Assert.assertEquals(0, frame.getLeftSeatBarSize(1).toLong())
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.rightSeatBarCount }, IsEqual(2))
         Assert.assertEquals(0, frame.getRightSeatBarSize(0).toLong())
         Assert.assertEquals(0, frame.getRightSeatBarSize(1).toLong())
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.middleSeatBarCount }, IsEqual(2))
         Assert.assertEquals(0, frame.getMiddleSeatBarSize(0).toLong())
         Assert.assertEquals(0, frame.getMiddleSeatBarSize(1).toLong())
         result.setResult(gop, false)
@@ -281,17 +292,28 @@ class HemicycleFrameBuilderTest {
             Tiebreaker.FRONT_ROW_FROM_LEFT,
             fixedBinding("TEST")
         )
-        Assert.assertEquals(30, frame.numDots.toLong())
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.numDots }, IsEqual(30))
         Assert.assertEquals(Color.RED, frame.getDotBorder(0))
         Assert.assertEquals(Color.WHITE, frame.getDotColor(0))
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.leftSeatBarCount }, IsEqual(2))
         Assert.assertEquals(0, frame.getLeftSeatBarSize(0).toLong())
         Assert.assertEquals(0, frame.getLeftSeatBarSize(1).toLong())
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.rightSeatBarCount }, IsEqual(2))
         Assert.assertEquals(0, frame.getRightSeatBarSize(0).toLong())
         Assert.assertEquals(0, frame.getRightSeatBarSize(1).toLong())
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.middleSeatBarCount }, IsEqual(2))
         Assert.assertEquals(0, frame.getMiddleSeatBarSize(0).toLong())
         Assert.assertEquals(0, frame.getMiddleSeatBarSize(1).toLong())
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.leftChangeBarCount }, IsEqual(2))
         Assert.assertEquals(0, frame.getLeftChangeBarSize(0).toLong())
         Assert.assertEquals(0, frame.getLeftChangeBarSize(1).toLong())
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.rightChangeBarCount }, IsEqual(2))
         Assert.assertEquals(0, frame.getRightChangeBarSize(0).toLong())
         Assert.assertEquals(0, frame.getRightChangeBarSize(1).toLong())
         result.setResult(gop, false)
@@ -308,6 +330,8 @@ class HemicycleFrameBuilderTest {
         Assert.assertEquals(0, frame.getRightChangeBarSize(0).toLong())
         Assert.assertEquals(0, frame.getRightChangeBarSize(1).toLong())
         result.setResult(dem, false)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.getDotColor(0) }, IsEqual(lighten(Color.BLUE)))
         Assert.assertEquals(Color.RED, frame.getDotBorder(0))
         Assert.assertEquals(lighten(Color.BLUE), frame.getDotColor(0))
         Assert.assertEquals(0, frame.getLeftSeatBarSize(0).toLong())
@@ -321,6 +345,8 @@ class HemicycleFrameBuilderTest {
         Assert.assertEquals(0, frame.getRightChangeBarSize(0).toLong())
         Assert.assertEquals(-30, frame.getRightChangeBarSize(1).toLong())
         result.setResult(dem, true)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.getDotColor(0) }, IsEqual(Color.BLUE))
         Assert.assertEquals(Color.RED, frame.getDotBorder(0))
         Assert.assertEquals(Color.BLUE, frame.getDotColor(0))
         Assert.assertEquals(30, frame.getLeftSeatBarSize(0).toLong())

@@ -2,6 +2,7 @@ package com.joecollins.graphics.components
 
 import com.joecollins.bindings.Binding
 import com.joecollins.bindings.BindingReceiver
+import com.joecollins.pubsub.asOneTimePublisher
 import java.awt.Color
 import java.awt.Shape
 import java.awt.geom.Rectangle2D
@@ -50,12 +51,12 @@ class MapFrameBuilder {
 
     fun build(): MapFrame {
         return MapFrame(
-            headerBinding = headerBinding ?: Binding.fixedBinding(null),
-            shapesBinding = shapesBinding ?: Binding.fixedBinding(emptyList()),
-            focusBoxBinding = focusBoxBinding,
-            notesBinding = notesBinding,
-            borderColorBinding = borderColorBinding,
-            outlineShapesBinding = outlineBinding
+            headerPublisher = headerBinding?.toPublisher() ?: (null as String?).asOneTimePublisher(),
+            shapesPublisher = shapesBinding?.toPublisher() ?: emptyList<Pair<Shape, Color>>().asOneTimePublisher(),
+            focusBoxPublisher = focusBoxBinding?.toPublisher(),
+            notesPublisher = notesBinding?.toPublisher(),
+            borderColorPublisher = borderColorBinding?.toPublisher(),
+            outlineShapesPublisher = outlineBinding?.toPublisher()
         )
     }
 

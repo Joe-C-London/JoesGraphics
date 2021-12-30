@@ -1,7 +1,8 @@
 package com.joecollins.graphics.components
 
-import com.joecollins.bindings.Binding
 import com.joecollins.graphics.utils.StandardFont
+import com.joecollins.pubsub.Subscriber
+import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Component
@@ -11,6 +12,7 @@ import java.awt.GridLayout
 import java.awt.LayoutManager
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
+import java.util.concurrent.Flow
 import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.border.EmptyBorder
@@ -18,12 +20,12 @@ import javax.swing.border.MatteBorder
 import kotlin.math.max
 
 class MultiSummaryFrame(
-    headerBinding: Binding<String?>,
-    rowsBinding: Binding<List<Row>>,
-    notesBinding: Binding<String?>? = null
+    headerPublisher: Flow.Publisher<out String?>,
+    rowsPublisher: Flow.Publisher<out List<Row>>,
+    notesPublisher: Flow.Publisher<out String?>? = null
 ) : GraphicsFrame(
-    headerPublisher = headerBinding.toPublisher(),
-    notesPublisher = notesBinding?.toPublisher()
+    headerPublisher = headerPublisher,
+    notesPublisher = notesPublisher
 ) {
     private val centralPanel: JPanel
     private val entries: MutableList<EntryPanel> = ArrayList()
@@ -132,7 +134,7 @@ class MultiSummaryFrame(
         }
         add(centralPanel, BorderLayout.CENTER)
 
-        rowsBinding.bind { r ->
+        val onRowsUpdate: (List<Row>) -> Unit = { r ->
             while (entries.size < r.size) {
                 val entryPanel = EntryPanel()
                 centralPanel.add(entryPanel)
@@ -173,5 +175,6 @@ class MultiSummaryFrame(
             }
             repaint()
         }
+        rowsPublisher.subscribe(Subscriber(eventQueueWrapper(onRowsUpdate)))
     }
 }

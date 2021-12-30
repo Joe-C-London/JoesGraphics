@@ -1,10 +1,12 @@
 package com.joecollins.graphics.components
 
 import com.joecollins.bindings.Bindable
-import com.joecollins.bindings.Binding.Companion.fixedBinding
 import com.joecollins.graphics.utils.BindableWrapper
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.graphics.utils.ShapefileReader.readShapes
+import com.joecollins.pubsub.asOneTimePublisher
+import org.awaitility.Awaitility
+import org.hamcrest.core.IsEqual
 import org.junit.Assert
 import org.junit.Test
 import java.awt.Color
@@ -12,6 +14,7 @@ import java.awt.Shape
 import java.awt.geom.Area
 import java.awt.geom.Rectangle2D
 import java.io.IOException
+import java.util.concurrent.TimeUnit
 import kotlin.Throws
 
 class MapFrameTest {
@@ -20,10 +23,11 @@ class MapFrameTest {
     fun testBindShapes() {
         val shapes = loadShapes { getDistrictColor(it) }
         val mapFrame = MapFrame(
-            headerBinding = fixedBinding(null),
-            shapesBinding = fixedBinding(shapes.map { Pair(it.shape, it.color) })
+            headerPublisher = (null as String?).asOneTimePublisher(),
+            shapesPublisher = shapes.map { Pair(it.shape, it.color) }.asOneTimePublisher()
         )
-        Assert.assertEquals(27, mapFrame.numShapes.toLong())
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ mapFrame.numShapes }, IsEqual(27))
         Assert.assertEquals(shapes[0].shape, mapFrame.getShape(0))
         Assert.assertEquals(shapes[0].color, mapFrame.getColor(0))
     }
@@ -33,8 +37,8 @@ class MapFrameTest {
     fun testDefaultFocusAreaEncompassesAllShapes() {
         val shapes = loadShapes { getDistrictColor(it) }
         val mapFrame = MapFrame(
-            headerBinding = fixedBinding(null),
-            shapesBinding = fixedBinding(shapes.map { Pair(it.shape, it.color) })
+            headerPublisher = (null as String?).asOneTimePublisher(),
+            shapesPublisher = shapes.map { Pair(it.shape, it.color) }.asOneTimePublisher()
         )
         val bindingBox = shapes.asSequence()
             .map { Area(it.shape) }
@@ -53,11 +57,12 @@ class MapFrameTest {
         val shapes = loadShapes { getDistrictColor(it) }
         val cityBox = loadCityBox()
         val mapFrame = MapFrame(
-            headerBinding = fixedBinding(null),
-            shapesBinding = fixedBinding(shapes.map { Pair(it.shape, it.color) }),
-            focusBoxBinding = fixedBinding(cityBox)
+            headerPublisher = (null as String?).asOneTimePublisher(),
+            shapesPublisher = shapes.map { Pair(it.shape, it.color) }.asOneTimePublisher(),
+            focusBoxPublisher = cityBox.asOneTimePublisher()
         )
-        Assert.assertEquals(cityBox, mapFrame.focusBox)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ mapFrame.focusBox }, IsEqual(cityBox))
     }
 
     @Test
@@ -65,11 +70,12 @@ class MapFrameTest {
     fun testOutlines() {
         val regions = loadRegions()
         val mapFrame = MapFrame(
-            headerBinding = fixedBinding(null),
-            shapesBinding = fixedBinding(regions.map { Pair(it, Color.BLACK) }),
-            outlineShapesBinding = fixedBinding(regions)
+            headerPublisher = (null as String?).asOneTimePublisher(),
+            shapesPublisher = regions.map { Pair(it, Color.BLACK) }.asOneTimePublisher(),
+            outlineShapesPublisher = regions.asOneTimePublisher()
         )
-        Assert.assertEquals(4, mapFrame.numOutlineShapes.toLong())
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ mapFrame.numOutlineShapes }, IsEqual(4))
         Assert.assertEquals(regions[0], mapFrame.getOutlineShape(0))
     }
 
@@ -78,8 +84,8 @@ class MapFrameTest {
     fun testRenderFull() {
         val shapes = loadShapes { getDistrictColor(it) }
         val mapFrame = MapFrame(
-            headerBinding = fixedBinding<String?>("PEI"),
-            shapesBinding = fixedBinding(shapes.map { Pair(it.shape, it.color) })
+            headerPublisher = "PEI".asOneTimePublisher(),
+            shapesPublisher = shapes.map { Pair(it.shape, it.color) }.asOneTimePublisher()
         )
         mapFrame.setSize(256, 128)
         compareRendering("MapFrame", "RenderFull", mapFrame)
@@ -90,8 +96,8 @@ class MapFrameTest {
     fun testRenderFullThin() {
         val shapes = loadShapes { district: Int -> getDistrictColor(district) }
         val mapFrame = MapFrame(
-            headerBinding = fixedBinding<String?>("PEI"),
-            shapesBinding = fixedBinding(shapes.map { Pair(it.shape, it.color) })
+            headerPublisher = "PEI".asOneTimePublisher(),
+            shapesPublisher = shapes.map { Pair(it.shape, it.color) }.asOneTimePublisher()
         )
         mapFrame.setSize(64, 128)
         compareRendering("MapFrame", "RenderFullThin", mapFrame)
@@ -103,9 +109,9 @@ class MapFrameTest {
         val shapes = loadShapes { if (it in 9..14) getDistrictColor(it) else Color.GRAY }
         val zoomBox = loadCityBox()
         val mapFrame = MapFrame(
-            headerBinding = fixedBinding("CHARLOTTETOWN"),
-            shapesBinding = fixedBinding(shapes.map { Pair(it.shape, it.color) }),
-            focusBoxBinding = fixedBinding(zoomBox)
+            headerPublisher = "CHARLOTTETOWN".asOneTimePublisher(),
+            shapesPublisher = shapes.map { Pair(it.shape, it.color) }.asOneTimePublisher(),
+            focusBoxPublisher = zoomBox.asOneTimePublisher()
         )
         mapFrame.setSize(256, 128)
         compareRendering("MapFrame", "RenderZoomedIn", mapFrame)
@@ -120,10 +126,10 @@ class MapFrameTest {
         val header = BindableWrapper("PEI")
         val focusBox = BindableWrapper<Rectangle2D?>(null)
         val mapFrame = MapFrame(
-            headerBinding = header.binding,
-            shapesBinding = fixedBinding(shapes.map { Pair(it.shape, it.color) }),
-            focusBoxBinding = focusBox.binding,
-            outlineShapesBinding = fixedBinding(regions)
+            headerPublisher = header.binding.toPublisher(),
+            shapesPublisher = shapes.map { Pair(it.shape, it.color) }.asOneTimePublisher(),
+            focusBoxPublisher = focusBox.binding.toPublisher(),
+            outlineShapesPublisher = regions.asOneTimePublisher()
         )
         mapFrame.setSize(256, 128)
         compareRendering("MapFrame", "RenderBorders-1", mapFrame)

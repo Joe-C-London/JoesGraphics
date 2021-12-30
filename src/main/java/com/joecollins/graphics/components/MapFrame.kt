@@ -1,6 +1,7 @@
 package com.joecollins.graphics.components
 
-import com.joecollins.bindings.Binding
+import com.joecollins.pubsub.Subscriber
+import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
 import java.awt.BasicStroke
 import java.awt.BorderLayout
 import java.awt.Color
@@ -18,21 +19,22 @@ import java.awt.geom.PathIterator
 import java.awt.geom.Point2D
 import java.awt.geom.Rectangle2D
 import java.util.WeakHashMap
+import java.util.concurrent.Flow
 import javax.swing.JPanel
 import kotlin.math.min
 import kotlin.math.sqrt
 
 class MapFrame(
-    headerBinding: Binding<String?>,
-    shapesBinding: Binding<List<Pair<Shape, Color>>>,
-    focusBoxBinding: Binding<Rectangle2D?>? = null,
-    outlineShapesBinding: Binding<List<Shape>>? = null,
-    notesBinding: Binding<String?>? = null,
-    borderColorBinding: Binding<Color>? = null
+    headerPublisher: Flow.Publisher<out String?>,
+    shapesPublisher: Flow.Publisher<out List<Pair<Shape, Color>>>,
+    focusBoxPublisher: Flow.Publisher<out Rectangle2D?>? = null,
+    outlineShapesPublisher: Flow.Publisher<out List<Shape>>? = null,
+    notesPublisher: Flow.Publisher<out String?>? = null,
+    borderColorPublisher: Flow.Publisher<out Color>? = null
 ) : GraphicsFrame(
-    headerPublisher = headerBinding.toPublisher(),
-    notesPublisher = notesBinding?.toPublisher(),
-    borderColorPublisher = borderColorBinding?.toPublisher()
+    headerPublisher = headerPublisher,
+    notesPublisher = notesPublisher,
+    borderColorPublisher = borderColorPublisher
 ) {
     private var shapesToDraw: List<Pair<Shape, Color>> = ArrayList()
     private var focus: Rectangle2D? = null
@@ -206,18 +208,28 @@ class MapFrame(
         }
         add(panel, BorderLayout.CENTER)
 
-        shapesBinding.bind { s ->
+        val onShapesUpdate: (List<Pair<Shape, Color>>) -> Unit = { s ->
             shapesToDraw = s
             repaint()
         }
-        (focusBoxBinding ?: Binding.fixedBinding(null)).bind { focus ->
+        shapesPublisher.subscribe(Subscriber(eventQueueWrapper(onShapesUpdate)))
+
+        val onFocusBoxUpdate: (Rectangle2D?) -> Unit = { focus ->
             this.focus = focus
             transformedShapesCache.clear()
             repaint()
         }
-        (outlineShapesBinding ?: Binding.fixedBinding(emptyList())).bind { s ->
+        if (focusBoxPublisher != null)
+            focusBoxPublisher.subscribe(Subscriber(eventQueueWrapper(onFocusBoxUpdate)))
+        else onFocusBoxUpdate(null)
+
+        val onOutlineShapesUpdate: (List<Shape>) -> Unit = { s ->
             outlineShapes = s
             repaint()
         }
+        if (outlineShapesPublisher != null)
+            outlineShapesPublisher.subscribe(Subscriber(eventQueueWrapper(onOutlineShapesUpdate)))
+        else
+            onOutlineShapesUpdate(emptyList())
     }
 }

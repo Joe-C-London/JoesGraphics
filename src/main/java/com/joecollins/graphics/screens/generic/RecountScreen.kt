@@ -3,11 +3,11 @@ package com.joecollins.graphics.screens.generic
 import com.joecollins.bindings.Bindable
 import com.joecollins.bindings.Binding
 import com.joecollins.bindings.mapElements
-import com.joecollins.bindings.toFixedBinding
 import com.joecollins.graphics.components.FontSizeAdjustingLabel
 import com.joecollins.graphics.components.MultiSummaryFrame
 import com.joecollins.graphics.utils.StandardFont
 import com.joecollins.models.general.Candidate
+import com.joecollins.pubsub.asOneTimePublisher
 import java.awt.BorderLayout
 import java.awt.Color
 import java.text.DecimalFormat
@@ -143,18 +143,18 @@ class RecountScreen private constructor(headerLabel: JLabel, frame: MultiSummary
             candidateVotes.bind { input.setVotes(it) }
             pctReporting?.bind { input.setPctReporting(it) }
             return MultiSummaryFrame(
-                headerBinding = header,
-                rowsBinding = input.toEntries().mapElements { e ->
+                headerPublisher = header.toPublisher(),
+                rowsPublisher = input.toEntries().mapElements { e ->
                     val partyCells = e.topCandidates.take(2)
                         .map { it.key.party.color to "${it.key.party.abbreviation.uppercase()}: ${voteFormatter.format(it.value)}" }
                     val marginCell = Color.WHITE to "MARGIN: ${e.margin}" + (if (e.pctThreshold == null) "" else " (${pctFormatter.format(e.pctMargin)})")
                     MultiSummaryFrame.Row(rowHeaderFunc(e.key), listOf(partyCells, listOf(marginCell)).flatten())
-                },
-                notesBinding = when {
+                }.toPublisher(),
+                notesPublisher = when {
                     voteThreshold != null -> "Automatic recount triggered if the margin is $voteThreshold votes or fewer"
                     pctThreshold != null -> "Automatic recount triggered if the margin is ${pctFormatter.format(pctThreshold)} or less"
                     else -> null
-                }.toFixedBinding()
+                }.asOneTimePublisher()
             )
         }
     }

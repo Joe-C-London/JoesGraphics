@@ -150,8 +150,8 @@ class TooCloseToCallScreen private constructor(titleLabel: JLabel, multiSummaryF
             val thousandsFormatter = DecimalFormat("#,##0")
             val pctFormatter = DecimalFormat("0.0%")
             val frame = MultiSummaryFrame(
-                headerBinding = header.getBinding(),
-                rowsBinding = entries.mapElements {
+                headerPublisher = header.getBinding().toPublisher(),
+                rowsPublisher = entries.mapElements {
                     val header = rowHeaderFunc(it.key)
                     val values = run {
                         val ret: MutableList<Pair<Color, String>> = sequenceOf(
@@ -176,7 +176,7 @@ class TooCloseToCallScreen private constructor(titleLabel: JLabel, multiSummaryF
                         ret
                     }
                     MultiSummaryFrame.Row(header, values)
-                }
+                }.toPublisher()
             )
             return frame
         }

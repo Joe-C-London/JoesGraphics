@@ -1,6 +1,7 @@
 package com.joecollins.graphics.components
 
 import com.joecollins.bindings.Binding
+import com.joecollins.pubsub.asOneTimePublisher
 import java.awt.Color
 
 class MultiSummaryFrameBuilder private constructor() {
@@ -15,8 +16,8 @@ class MultiSummaryFrameBuilder private constructor() {
 
     fun build(): MultiSummaryFrame {
         return MultiSummaryFrame(
-            headerBinding = headerBinding ?: Binding.fixedBinding(null),
-            rowsBinding = rowsBinding ?: Binding.fixedBinding(emptyList())
+            headerPublisher = headerBinding?.toPublisher() ?: (null as String?).asOneTimePublisher(),
+            rowsPublisher = rowsBinding?.toPublisher() ?: emptyList<MultiSummaryFrame.Row>().asOneTimePublisher()
         )
     }
 
