@@ -1,7 +1,8 @@
 package com.joecollins.graphics.components
 
-import com.joecollins.bindings.Binding
 import com.joecollins.graphics.utils.StandardFont
+import com.joecollins.pubsub.Subscriber
+import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.EventQueue
@@ -11,21 +12,22 @@ import java.time.Instant
 import java.time.temporal.ChronoUnit
 import java.time.temporal.Temporal
 import java.util.concurrent.Executors
+import java.util.concurrent.Flow
 import java.util.concurrent.TimeUnit
 import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.border.EmptyBorder
 
 class CountdownFrame(
-    headerBinding: Binding<String>,
-    timeBinding: Binding<Temporal>,
+    headerPublisher: Flow.Publisher<out String>,
+    timePublisher: Flow.Publisher<out Temporal>,
     private val labelFunc: (Duration) -> String,
-    borderColorBinding: Binding<Color>? = null,
-    additionalInfoBinding: Binding<String?>? = null,
-    countdownColorBinding: Binding<Color>? = null
+    borderColorPublisher: Flow.Publisher<out Color>? = null,
+    additionalInfoPublisher: Flow.Publisher<out String?>? = null,
+    countdownColorPublisher: Flow.Publisher<out Color>? = null
 ) : GraphicsFrame(
-    headerPublisher = headerBinding.toPublisher(),
-    borderColorPublisher = borderColorBinding?.toPublisher()
+    headerPublisher = headerPublisher,
+    borderColorPublisher = borderColorPublisher
 ) {
 
     internal var clock: Clock = Clock.systemDefaultZone()
@@ -57,18 +59,29 @@ class CountdownFrame(
         panel.add(additionalInfoLabel, BorderLayout.SOUTH)
         add(panel, BorderLayout.CENTER)
 
-        timeBinding.bind {
+        val onTimeUpdate: (Temporal) -> Unit = {
             time = it
             refresh()
         }
-        (additionalInfoBinding ?: Binding.fixedBinding(null)).bind {
+        timePublisher.subscribe(Subscriber(onTimeUpdate))
+
+        val onAdditionalInfoUpdate: (String?) -> Unit = {
             additionalInfoLabel.text = it ?: ""
             additionalInfoLabel.isVisible = it != null
         }
-        (countdownColorBinding ?: Binding.fixedBinding(Color.BLACK)).bind {
+        if (additionalInfoPublisher != null)
+            additionalInfoPublisher.subscribe(Subscriber(eventQueueWrapper(onAdditionalInfoUpdate)))
+        else
+            onAdditionalInfoUpdate(null)
+
+        val onCountdownColorBinding: (Color) -> Unit = {
             timeRemainingLabel.foreground = it
             additionalInfoLabel.foreground = it
         }
+        if (countdownColorPublisher != null)
+            countdownColorPublisher.subscribe(Subscriber(eventQueueWrapper(onCountdownColorBinding)))
+        else
+            onCountdownColorBinding(Color.BLACK)
 
         val executor = Executors.newScheduledThreadPool(1) { r: Runnable ->
             val t = Executors.defaultThreadFactory().newThread(r)
@@ -76,7 +89,7 @@ class CountdownFrame(
             t
         }
         executor.scheduleAtFixedRate(
-            { EventQueue.invokeLater { this.refresh() } }, 0, 100, TimeUnit.MILLISECONDS
+            { this.refresh() }, 0, 100, TimeUnit.MILLISECONDS
         )
     }
 
@@ -85,8 +98,10 @@ class CountdownFrame(
     }
 
     private fun refresh() {
-        timeRemainingLabel.text = labelFunc(getTimeRemaining())
-        this.repaint()
+        EventQueue.invokeLater {
+            timeRemainingLabel.text = labelFunc(getTimeRemaining())
+            this.repaint()
+        }
     }
 
     internal fun getTimeRemainingString(): String {

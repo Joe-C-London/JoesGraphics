@@ -1,7 +1,8 @@
 package com.joecollins.graphics.components
 
-import com.joecollins.bindings.Binding
 import com.joecollins.graphics.utils.StandardFont
+import com.joecollins.pubsub.Subscriber
+import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Component
@@ -10,16 +11,17 @@ import java.awt.Dimension
 import java.awt.GridLayout
 import java.awt.LayoutManager
 import java.util.ArrayList
+import java.util.concurrent.Flow
 import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.border.EmptyBorder
 import javax.swing.border.MatteBorder
 
 class FiguresFrame(
-    headerBinding: Binding<String?>,
-    entriesBinding: Binding<List<Entry>>
+    headerPublisher: Flow.Publisher<out String?>,
+    entriesPublisher: Flow.Publisher<out List<Entry>>
 ) : GraphicsFrame(
-    headerPublisher = headerBinding.toPublisher()
+    headerPublisher = headerPublisher
 ) {
 
     class Entry(
@@ -146,7 +148,7 @@ class FiguresFrame(
         centralPanel.layout = FrameLayout()
         add(centralPanel, BorderLayout.CENTER)
 
-        entriesBinding.bind { e ->
+        val onEntriesUpdate: (List<Entry>) -> Unit = { e ->
             while (entries.size < e.size) {
                 val entry = EntryPanel()
                 centralPanel.add(entry)
@@ -163,5 +165,6 @@ class FiguresFrame(
                 entries[idx].resultPanel.background = entry.resultColor
             }
         }
+        entriesPublisher.subscribe(Subscriber(eventQueueWrapper(onEntriesUpdate)))
     }
 }

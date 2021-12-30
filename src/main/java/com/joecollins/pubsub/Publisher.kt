@@ -60,7 +60,11 @@ class Publisher<T> : Flow.Publisher<T>, AutoCloseable {
 
         private fun process() {
             while (waitingFor > 0 && !queue.isEmpty()) {
-                subscriber.onNext(queue.take().item)
+                try {
+                    subscriber.onNext(queue.take().item)
+                } catch (e: Exception) {
+                    subscriber.onError(e)
+                }
                 waitingFor--
             }
         }

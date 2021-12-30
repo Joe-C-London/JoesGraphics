@@ -7,6 +7,7 @@ import com.joecollins.graphics.components.FontSizeAdjustingLabel
 import com.joecollins.graphics.utils.StandardFont.readBoldFont
 import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.Party
+import com.joecollins.pubsub.asOneTimePublisher
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.GridLayout
@@ -36,8 +37,8 @@ class FiguresScreen private constructor(headerLabel: JLabel, frames: Array<Figur
 
         fun createFrame(): FiguresFrame {
             val frame = FiguresFrame(
-                headerBinding = Binding.fixedBinding(name),
-                entriesBinding = Binding.listBinding(
+                headerPublisher = name.asOneTimePublisher(),
+                entriesPublisher = Binding.listBinding(
                     entries.map { e ->
                         val colorBinding = Binding.propertyBinding(
                             e,
@@ -55,7 +56,7 @@ class FiguresScreen private constructor(headerLabel: JLabel, frames: Array<Figur
                             )
                         }
                     }
-                )
+                ).toPublisher()
             )
             return frame
         }
