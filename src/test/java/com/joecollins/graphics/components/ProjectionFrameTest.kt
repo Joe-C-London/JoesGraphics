@@ -1,13 +1,16 @@
 package com.joecollins.graphics.components
 
-import com.joecollins.bindings.Binding.Companion.fixedBinding
 import com.joecollins.graphics.components.lowerthird.LowerThird.Companion.createImage
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
+import com.joecollins.pubsub.asOneTimePublisher
+import org.awaitility.Awaitility
+import org.hamcrest.core.IsEqual
 import org.junit.Assert
 import org.junit.Test
 import java.awt.Color
 import java.awt.Image
 import java.io.IOException
+import java.util.concurrent.TimeUnit
 import kotlin.Throws
 
 class ProjectionFrameTest {
@@ -16,60 +19,64 @@ class ProjectionFrameTest {
     fun testImage() {
         val image = peiLeg()
         val frame = ProjectionFrame(
-            headerBinding = fixedBinding(null),
-            borderColorBinding = fixedBinding(Color.GRAY),
-            imageBinding = fixedBinding(image),
-            backColorBinding = fixedBinding(Color.GRAY),
-            footerTextBinding = fixedBinding("MINORITY LEGISLATURE")
+            headerPublisher = (null as String?).asOneTimePublisher(),
+            borderColorPublisher = Color.GRAY.asOneTimePublisher(),
+            imagePublisher = image.asOneTimePublisher(),
+            backColorPublisher = Color.GRAY.asOneTimePublisher(),
+            footerTextPublisher = "MINORITY LEGISLATURE".asOneTimePublisher()
         )
-        Assert.assertEquals(image, frame.getImage())
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.getImage() }, IsEqual(image))
     }
 
     @Test
     fun testBackColor() {
         val frame = ProjectionFrame(
-            headerBinding = fixedBinding(null),
-            borderColorBinding = fixedBinding(Color.GRAY),
-            imageBinding = fixedBinding(peiLeg()),
-            backColorBinding = fixedBinding(Color.GRAY),
-            footerTextBinding = fixedBinding("MINORITY LEGISLATURE")
+            headerPublisher = (null as String?).asOneTimePublisher(),
+            borderColorPublisher = Color.GRAY.asOneTimePublisher(),
+            imagePublisher = peiLeg().asOneTimePublisher(),
+            backColorPublisher = Color.GRAY.asOneTimePublisher(),
+            footerTextPublisher = "MINORITY LEGISLATURE".asOneTimePublisher()
         )
-        Assert.assertEquals(Color.GRAY, frame.getBackColor())
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.getBackColor() }, IsEqual(Color.GRAY))
     }
 
     @Test
     fun testFooterText() {
         val frame = ProjectionFrame(
-            headerBinding = fixedBinding(null),
-            borderColorBinding = fixedBinding(Color.GRAY),
-            imageBinding = fixedBinding(peiLeg()),
-            backColorBinding = fixedBinding(Color.GRAY),
-            footerTextBinding = fixedBinding("MINORITY LEGISLATURE")
+            headerPublisher = (null as String?).asOneTimePublisher(),
+            borderColorPublisher = Color.GRAY.asOneTimePublisher(),
+            imagePublisher = peiLeg().asOneTimePublisher(),
+            backColorPublisher = Color.GRAY.asOneTimePublisher(),
+            footerTextPublisher = "MINORITY LEGISLATURE".asOneTimePublisher()
         )
-        Assert.assertEquals("MINORITY LEGISLATURE", frame.getFooterText())
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.getFooterText() }, IsEqual("MINORITY LEGISLATURE"))
     }
 
     @Test
     fun testAlignment() {
         val frame = ProjectionFrame(
-            headerBinding = fixedBinding(null),
-            borderColorBinding = fixedBinding(Color.GRAY),
-            imageBinding = fixedBinding(peiLeg()),
-            backColorBinding = fixedBinding(Color.GRAY),
-            footerTextBinding = fixedBinding("MINORITY LEGISLATURE"),
-            imageAlignmentBinding = fixedBinding(ProjectionFrame.Alignment.MIDDLE)
+            headerPublisher = (null as String?).asOneTimePublisher(),
+            borderColorPublisher = Color.GRAY.asOneTimePublisher(),
+            imagePublisher = peiLeg().asOneTimePublisher(),
+            backColorPublisher = Color.GRAY.asOneTimePublisher(),
+            footerTextPublisher = "MINORITY LEGISLATURE".asOneTimePublisher(),
+            imageAlignmentPublisher = ProjectionFrame.Alignment.MIDDLE.asOneTimePublisher()
         )
-        Assert.assertEquals(ProjectionFrame.Alignment.MIDDLE, frame.getImageAlignment())
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.getImageAlignment() }, IsEqual(ProjectionFrame.Alignment.MIDDLE))
     }
 
     @Test
     fun testDefaultAlignment() {
         val frame = ProjectionFrame(
-            headerBinding = fixedBinding(null),
-            borderColorBinding = fixedBinding(Color.GRAY),
-            imageBinding = fixedBinding(peiLeg()),
-            backColorBinding = fixedBinding(Color.GRAY),
-            footerTextBinding = fixedBinding("MINORITY LEGISLATURE")
+            headerPublisher = (null as String?).asOneTimePublisher(),
+            borderColorPublisher = Color.GRAY.asOneTimePublisher(),
+            imagePublisher = peiLeg().asOneTimePublisher(),
+            backColorPublisher = Color.GRAY.asOneTimePublisher(),
+            footerTextPublisher = "MINORITY LEGISLATURE".asOneTimePublisher()
         )
         Assert.assertEquals(ProjectionFrame.Alignment.BOTTOM, frame.getImageAlignment())
     }
@@ -78,11 +85,11 @@ class ProjectionFrameTest {
     @Throws(IOException::class)
     fun testRendering() {
         val frame = ProjectionFrame(
-            headerBinding = fixedBinding<String?>("PROJECTION"),
-            borderColorBinding = fixedBinding(Color.GRAY),
-            imageBinding = fixedBinding(peiLeg()),
-            backColorBinding = fixedBinding(Color.GRAY),
-            footerTextBinding = fixedBinding("MINORITY LEGISLATURE")
+            headerPublisher = "PROJECTION".asOneTimePublisher(),
+            borderColorPublisher = Color.GRAY.asOneTimePublisher(),
+            imagePublisher = peiLeg().asOneTimePublisher(),
+            backColorPublisher = Color.GRAY.asOneTimePublisher(),
+            footerTextPublisher = "MINORITY LEGISLATURE".asOneTimePublisher()
         )
         frame.setSize(1024, 512)
         compareRendering("ProjectionFrame", "Basic", frame)
@@ -92,11 +99,11 @@ class ProjectionFrameTest {
     @Throws(IOException::class)
     fun testLongRendering() {
         val frame = ProjectionFrame(
-            headerBinding = fixedBinding<String?>("PROJECTION"),
-            borderColorBinding = fixedBinding(Color.GRAY),
-            imageBinding = fixedBinding(peiLeg()),
-            backColorBinding = fixedBinding(Color.GRAY),
-            footerTextBinding = fixedBinding("WE ARE NOW PROJECTING A MINORITY LEGISLATURE")
+            headerPublisher = "PROJECTION".asOneTimePublisher(),
+            borderColorPublisher = Color.GRAY.asOneTimePublisher(),
+            imagePublisher = peiLeg().asOneTimePublisher(),
+            backColorPublisher = Color.GRAY.asOneTimePublisher(),
+            footerTextPublisher = "WE ARE NOW PROJECTING A MINORITY LEGISLATURE".asOneTimePublisher()
         )
         frame.setSize(1024, 512)
         compareRendering("ProjectionFrame", "Long", frame)
@@ -106,12 +113,12 @@ class ProjectionFrameTest {
     @Throws(IOException::class)
     fun testCenterRendering() {
         val frame = ProjectionFrame(
-            headerBinding = fixedBinding<String?>("PROJECTION"),
-            borderColorBinding = fixedBinding(Color.GRAY),
-            imageBinding = fixedBinding(peiLeg()),
-            backColorBinding = fixedBinding(Color.GRAY),
-            imageAlignmentBinding = fixedBinding(ProjectionFrame.Alignment.MIDDLE),
-            footerTextBinding = fixedBinding("MINORITY LEGISLATURE")
+            headerPublisher = "PROJECTION".asOneTimePublisher(),
+            borderColorPublisher = Color.GRAY.asOneTimePublisher(),
+            imagePublisher = peiLeg().asOneTimePublisher(),
+            backColorPublisher = Color.GRAY.asOneTimePublisher(),
+            imageAlignmentPublisher = ProjectionFrame.Alignment.MIDDLE.asOneTimePublisher(),
+            footerTextPublisher = "MINORITY LEGISLATURE".asOneTimePublisher()
         )
         frame.setSize(1024, 512)
         compareRendering("ProjectionFrame", "Center", frame)

@@ -1,9 +1,9 @@
 package com.joecollins.graphics.components
 
-import com.joecollins.bindings.toFixedBinding
 import com.joecollins.graphics.utils.BindableWrapper
 import com.joecollins.graphics.utils.RenderTestUtils
 import com.joecollins.models.general.Party
+import com.joecollins.pubsub.asOneTimePublisher
 import org.junit.Test
 import java.awt.Color
 
@@ -15,14 +15,14 @@ class ParliamentVoteFrameTest {
         val partyVotes = BindableWrapper(emptyArray<List<Pair<Party, Int>>>())
 
         val frame = ParliamentVoteFrame(
-            "NATIONALITY AND BORDERS BILL".toFixedBinding(),
-            "THIRD READING".toFixedBinding(),
+            "NATIONALITY AND BORDERS BILL".asOneTimePublisher(),
+            "THIRD READING".asOneTimePublisher(),
             "House of Commons",
             Color(0x006030),
             arrayOf("AYES", "NOES"),
-            divisionResult.binding,
+            divisionResult.binding.toPublisher(),
             3,
-            partyVotes.binding
+            partyVotes.binding.toPublisher()
         )
         frame.setSize(500, 250)
         RenderTestUtils.compareRendering("ParliamentVoteFrame", "ukHouse-1", frame)
@@ -78,15 +78,15 @@ class ParliamentVoteFrameTest {
         val resultText: BindableWrapper<String?> = BindableWrapper(null)
 
         val frame = ParliamentVoteFrame(
-            "EXITING THE EUROPEAN UNION (FINANCIAL SERVICES)".toFixedBinding(),
-            "TO APPROVE DRAFT INSOLVENCY 2 (GROUP SUPERVISION) (AMENDMENT) REGULATIONS 2021".toFixedBinding(),
+            "EXITING THE EUROPEAN UNION (FINANCIAL SERVICES)".asOneTimePublisher(),
+            "TO APPROVE DRAFT INSOLVENCY 2 (GROUP SUPERVISION) (AMENDMENT) REGULATIONS 2021".asOneTimePublisher(),
             "House of Commons",
             Color(0x006030),
             arrayOf("AYES", "NOES"),
-            intArrayOf().toFixedBinding(),
+            intArrayOf().asOneTimePublisher(),
             3,
-            emptyArray<List<Pair<Party, Int>>>().toFixedBinding(),
-            resultText.binding
+            emptyArray<List<Pair<Party, Int>>>().asOneTimePublisher(),
+            resultText.binding.toPublisher()
         )
         frame.setSize(500, 250)
         RenderTestUtils.compareRendering("ParliamentVoteFrame", "ukHouseNoDivision-1", frame)
@@ -101,14 +101,14 @@ class ParliamentVoteFrameTest {
         val partyVotes = BindableWrapper(emptyArray<List<Pair<Party, Int>>>())
 
         val frame = ParliamentVoteFrame(
-            "IMPEACHMENT ARTICLE I".toFixedBinding(),
-            "INCITEMENT OF INSURRECTION".toFixedBinding(),
+            "IMPEACHMENT ARTICLE I".asOneTimePublisher(),
+            "INCITEMENT OF INSURRECTION".asOneTimePublisher(),
             "US Senate",
             Color(0x900000),
             arrayOf("GUILTY", "NOT GUILTY"),
-            divisionResult.binding,
+            divisionResult.binding.toPublisher(),
             1,
-            partyVotes.binding
+            partyVotes.binding.toPublisher()
         )
         frame.setSize(500, 250)
         RenderTestUtils.compareRendering("ParliamentVoteFrame", "usSenate-1", frame)

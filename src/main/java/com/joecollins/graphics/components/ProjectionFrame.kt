@@ -1,7 +1,8 @@
 package com.joecollins.graphics.components
 
-import com.joecollins.bindings.Binding
 import com.joecollins.graphics.utils.StandardFont
+import com.joecollins.pubsub.Subscriber
+import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Graphics
@@ -9,20 +10,21 @@ import java.awt.Graphics2D
 import java.awt.GridLayout
 import java.awt.Image
 import java.awt.RenderingHints
+import java.util.concurrent.Flow
 import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.border.EmptyBorder
 
 class ProjectionFrame(
-    headerBinding: Binding<String?>,
-    imageBinding: Binding<Image?>,
-    backColorBinding: Binding<Color>,
-    borderColorBinding: Binding<Color>,
-    footerTextBinding: Binding<String?>,
-    imageAlignmentBinding: Binding<Alignment>? = null
+    headerPublisher: Flow.Publisher<out String?>,
+    imagePublisher: Flow.Publisher<out Image?>,
+    backColorPublisher: Flow.Publisher<out Color>,
+    borderColorPublisher: Flow.Publisher<out Color>,
+    footerTextPublisher: Flow.Publisher<out String?>,
+    imageAlignmentPublisher: Flow.Publisher<out Alignment>? = null
 ) : GraphicsFrame(
-    headerPublisher = headerBinding.toPublisher(),
-    borderColorPublisher = borderColorBinding.toPublisher()
+    headerPublisher = headerPublisher,
+    borderColorPublisher = borderColorPublisher
 ) {
 
     enum class Alignment { BOTTOM, MIDDLE }
@@ -47,13 +49,20 @@ class ProjectionFrame(
         footerLabel.horizontalAlignment = JLabel.CENTER
         footerLabel.border = EmptyBorder(15, 0, -15, 0)
 
-        imageBinding.bind { imagePanel.image = it }
-        backColorBinding.bind { footerPanel.background = it }
-        footerTextBinding.bind {
-            footerLabel.text = it
-            footerLabel.isVisible = it != null
-        }
-        (imageAlignmentBinding ?: Binding.fixedBinding(Alignment.BOTTOM)).bind { imagePanel.alignment = it }
+        imagePublisher.subscribe(Subscriber(eventQueueWrapper { imagePanel.image = it }))
+        backColorPublisher.subscribe(Subscriber(eventQueueWrapper { footerPanel.background = it }))
+        footerTextPublisher.subscribe(
+            Subscriber(
+                eventQueueWrapper {
+                    footerLabel.text = it
+                    footerLabel.isVisible = it != null
+                }
+            )
+        )
+        if (imageAlignmentPublisher != null)
+            imageAlignmentPublisher.subscribe(Subscriber(eventQueueWrapper { imagePanel.alignment = it }))
+        else
+            imagePanel.alignment = Alignment.BOTTOM
     }
 
     internal fun getImage(): Image? {

@@ -134,6 +134,8 @@ class MapFrameBuilderTest {
             .withHeader(fixedBinding("MAP"))
             .withFocus(binding)
             .build()
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.focusBox }, IsNot(IsNull()))
         Assert.assertEquals(Rectangle2D.Double(2.0, 2.0, 5.0, 5.0), frame.focusBox)
     }
 

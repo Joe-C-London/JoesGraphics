@@ -3,6 +3,7 @@ package com.joecollins.graphics.screens.generic
 import com.joecollins.bindings.Binding
 import com.joecollins.bindings.BindingReceiver
 import com.joecollins.graphics.components.ProjectionFrame
+import com.joecollins.pubsub.asOneTimePublisher
 import java.awt.Color
 import java.awt.GridLayout
 import java.awt.Image
@@ -43,12 +44,12 @@ class ProjectionScreen private constructor(
         border = EmptyBorder(5, 5, 5, 5)
         val colorReceiver = BindingReceiver(color)
         val frame = ProjectionFrame(
-            headerBinding = Binding.fixedBinding("PROJECTION"),
-            borderColorBinding = colorReceiver.getBinding(),
-            imageBinding = image,
-            backColorBinding = colorReceiver.getBinding(),
-            footerTextBinding = text,
-            imageAlignmentBinding = imageAlignment
+            headerPublisher = "PROJECTION".asOneTimePublisher(),
+            borderColorPublisher = colorReceiver.getBinding().toPublisher(),
+            imagePublisher = image.toPublisher(),
+            backColorPublisher = colorReceiver.getBinding().toPublisher(),
+            footerTextPublisher = text.toPublisher(),
+            imageAlignmentPublisher = imageAlignment.toPublisher()
         )
         add(frame)
     }

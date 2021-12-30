@@ -1,9 +1,10 @@
 package com.joecollins.graphics.components
 
-import com.joecollins.bindings.Binding
 import com.joecollins.graphics.utils.ColorUtils.foregroundToContrast
 import com.joecollins.graphics.utils.StandardFont
 import com.joecollins.models.general.Party
+import com.joecollins.pubsub.Subscriber
+import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
 import com.joecollins.pubsub.asOneTimePublisher
 import java.awt.BorderLayout
 import java.awt.CardLayout
@@ -13,22 +14,23 @@ import java.awt.Graphics2D
 import java.awt.GridLayout
 import java.awt.RenderingHints
 import java.util.LinkedList
+import java.util.concurrent.Flow
 import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.border.EmptyBorder
 
 class ParliamentVoteFrame(
-    titleBinding: Binding<String>,
-    subtitleBinding: Binding<String>,
+    titlePublisher: Flow.Publisher<out String>,
+    subtitlePublisher: Flow.Publisher<out String>,
     bodyName: String,
     private val bodyColor: Color,
     sides: Array<String>,
-    votes: Binding<IntArray>,
+    votes: Flow.Publisher<out IntArray>,
     private val partyRows: Int,
-    partyVotes: Binding<Array<List<Pair<Party, Int>>>>,
-    resultText: Binding<String?> = Binding.fixedBinding(null)
+    partyVotes: Flow.Publisher<out Array<List<Pair<Party, Int>>>>,
+    resultText: Flow.Publisher<out String?> = (null as String?).asOneTimePublisher()
 ) : GraphicsFrame(
-    headerPublisher = titleBinding.toPublisher(),
+    headerPublisher = titlePublisher,
     notesPublisher = "SOURCE: $bodyName".asOneTimePublisher(),
     borderColorPublisher = bodyColor.asOneTimePublisher()
 ) {
@@ -44,7 +46,7 @@ class ParliamentVoteFrame(
         subtitleLabel.horizontalAlignment = JLabel.CENTER
         subtitleLabel.border = EmptyBorder(4, 0, -4, 0)
         subtitleLabel.foreground = bodyColor
-        subtitleBinding.bind { subtitleLabel.text = it }
+        subtitlePublisher.subscribe(Subscriber(eventQueueWrapper { subtitleLabel.text = it }))
         outerPanel.add(subtitleLabel, BorderLayout.NORTH)
 
         val innerPanel = JPanel()
@@ -66,17 +68,19 @@ class ParliamentVoteFrame(
             resultLinePanels.add(newPanel)
         }
 
-        votes.bind { v ->
+        val onVotesUpdate: (IntArray) -> Unit = { v ->
             resultLinePanels.forEachIndexed { index, panel ->
                 panel.votes = if (index < v.size) v[index] else null
             }
         }
+        votes.subscribe(Subscriber(eventQueueWrapper(onVotesUpdate)))
 
-        partyVotes.bind { v ->
+        val onPartyVotesUpdate: (Array<List<Pair<Party, Int>>>) -> Unit = { v ->
             resultLinePanels.forEachIndexed { index, panel ->
                 panel.partyVotes = if (index < v.size) v[index] else emptyList()
             }
         }
+        partyVotes.subscribe(Subscriber(eventQueueWrapper(onPartyVotesUpdate)))
 
         val noDivisionLabel = FontSizeAdjustingLabel()
         noDivisionLabel.font = StandardFont.readBoldFont(30)
@@ -84,10 +88,11 @@ class ParliamentVoteFrame(
         noDivisionLabel.horizontalAlignment = JLabel.CENTER
         innerPanel.add(noDivisionLabel, "NODIV")
 
-        resultText.bind {
+        val onResultTextUpdate: (String?) -> Unit = {
             innerPanelLayout.show(innerPanel, if (it == null) "DIV" else "NODIV")
             noDivisionLabel.text = it ?: ""
         }
+        resultText.subscribe(Subscriber(eventQueueWrapper(onResultTextUpdate)))
     }
 
     private inner class ResultLinePanel : JPanel() {
