@@ -173,4 +173,26 @@ class PubSubTests {
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS).pollDelay(1, TimeUnit.MILLISECONDS)
             .until({ output }, IsEqual(6))
     }
+
+    @Test
+    fun testPublisherMerge() {
+        var output: String? = null
+        val publisher1 = SubmissionPublisher<String>()
+        val publisher2 = SubmissionPublisher<String>()
+        val subscriber = Subscriber<String> { output = it }
+        publisher1.merge(publisher2) { a, b -> a + b }.subscribe(subscriber)
+
+        publisher1.submit("A")
+        publisher2.submit("B")
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS).pollDelay(1, TimeUnit.MILLISECONDS)
+            .until({ output }, IsEqual("AB"))
+
+        publisher1.submit("1")
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS).pollDelay(1, TimeUnit.MILLISECONDS)
+            .until({ output }, IsEqual("1B"))
+
+        publisher2.submit("2")
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS).pollDelay(1, TimeUnit.MILLISECONDS)
+            .until({ output }, IsEqual("12"))
+    }
 }

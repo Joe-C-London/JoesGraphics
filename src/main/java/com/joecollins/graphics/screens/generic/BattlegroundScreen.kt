@@ -12,6 +12,7 @@ import com.joecollins.graphics.utils.ColorUtils.lighten
 import com.joecollins.graphics.utils.StandardFont.readBoldFont
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
+import com.joecollins.pubsub.asOneTimePublisher
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Component
@@ -81,19 +82,19 @@ class BattlegroundScreen private constructor(
             defenseInput.setSide(Side.DEFENSE)
             val defenseItems = defenseInput.items
             val defenseFrame = ResultListingFrame(
-                headerBinding = party.getBinding { p: Party -> "$p DEFENSE SEATS" },
-                borderColorBinding = party.getBinding(Party::color),
-                headerAlignmentBinding = Binding.fixedBinding(GraphicsFrame.Alignment.RIGHT),
-                numRowsBinding = numRows.getBinding(),
-                itemsBinding = defenseItems.mapElements {
+                headerPublisher = party.getBinding { p: Party -> "$p DEFENSE SEATS" }.toPublisher(),
+                borderColorPublisher = party.getBinding(Party::color).toPublisher(),
+                headerAlignmentPublisher = Binding.fixedBinding(GraphicsFrame.Alignment.RIGHT).toPublisher(),
+                numRowsPublisher = numRows.getBinding().toPublisher(),
+                itemsPublisher = defenseItems.mapElements {
                     ResultListingFrame.Item(
                         text = nameFunc(it.key),
                         border = it.prevColor,
                         background = (if (it.fill) it.resultColor else Color.WHITE),
                         foreground = (if (!it.fill) it.resultColor else Color.WHITE)
                     )
-                },
-                reversedBinding = Binding.fixedBinding(true)
+                }.toPublisher(),
+                reversedPublisher = true.asOneTimePublisher()
             )
 
             val targetInput = BattlegroundInput<T>()
@@ -105,19 +106,19 @@ class BattlegroundScreen private constructor(
             targetInput.setSide(Side.TARGET)
             val targetItems = targetInput.items
             val targetFrame = ResultListingFrame(
-                headerBinding = party.getBinding<String?> { p: Party -> "$p TARGET SEATS" },
-                borderColorBinding = party.getBinding(Party::color),
-                headerAlignmentBinding = Binding.fixedBinding(GraphicsFrame.Alignment.LEFT),
-                numRowsBinding = numRows.getBinding(),
-                itemsBinding = targetItems.mapElements {
+                headerPublisher = party.getBinding<String?> { p: Party -> "$p TARGET SEATS" }.toPublisher(),
+                borderColorPublisher = party.getBinding(Party::color).toPublisher(),
+                headerAlignmentPublisher = Binding.fixedBinding(GraphicsFrame.Alignment.LEFT).toPublisher(),
+                numRowsPublisher = numRows.getBinding().toPublisher(),
+                itemsPublisher = targetItems.mapElements {
                     ResultListingFrame.Item(
                         text = nameFunc(it.key),
                         border = it.prevColor,
                         background = (if (it.fill) it.resultColor else Color.WHITE),
                         foreground = (if (!it.fill) it.resultColor else Color.WHITE)
                     )
-                },
-                reversedBinding = Binding.fixedBinding(false)
+                }.toPublisher(),
+                reversedPublisher = false.asOneTimePublisher()
             )
 
             return BattlegroundScreen(

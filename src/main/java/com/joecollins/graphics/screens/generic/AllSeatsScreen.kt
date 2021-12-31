@@ -50,16 +50,16 @@ class AllSeatsScreen private constructor(title: JLabel, frame: ResultListingFram
             currResults.getBinding().bind { inputs.setCurrResults(it) }
             seatFilter.getBinding().bind { inputs.setSeatFilter(it) }
             val frame = ResultListingFrame(
-                headerBinding = header.getBinding(),
-                numRowsBinding = numRows.getBinding(),
-                itemsBinding = inputs.resultBinding.mapElements {
+                headerPublisher = header.getBinding().toPublisher(),
+                numRowsPublisher = numRows.getBinding().toPublisher(),
+                itemsPublisher = inputs.resultBinding.mapElements {
                     ResultListingFrame.Item(
                         text = nameFunc(it.key),
                         border = it.prevColor,
                         background = if (it.fill) it.resultColor else Color.WHITE,
                         foreground = if (!it.fill) it.resultColor else Color.WHITE
                     )
-                }
+                }.toPublisher()
             )
             return AllSeatsScreen(headerLabel, frame)
         }

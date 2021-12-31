@@ -1,8 +1,10 @@
 package com.joecollins.graphics.components
 
-import com.joecollins.bindings.Binding
-import com.joecollins.bindings.BindingReceiver
 import com.joecollins.graphics.utils.StandardFont
+import com.joecollins.pubsub.Subscriber
+import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
+import com.joecollins.pubsub.asOneTimePublisher
+import com.joecollins.pubsub.merge
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Font
@@ -11,48 +13,39 @@ import java.awt.Graphics2D
 import java.awt.GridLayout
 import java.awt.RenderingHints
 import java.util.ArrayList
+import java.util.concurrent.Flow
 import javax.swing.JPanel
 
 class RegionSummaryFrame private constructor(
-    headerBinding: Binding<String>,
-    sectionsBinding: Binding<List<Section>>,
-    summaryColorBinding: Binding<Color>,
-    borderColorBinding: Binding<Color>? = null
+    headerPublisher: Flow.Publisher<out String>,
+    sectionsPublisher: Flow.Publisher<out List<Section>>,
+    summaryColorPublisher: Flow.Publisher<out Color>,
+    borderColorPublisher: Flow.Publisher<out Color>? = null
 ) : GraphicsFrame(
-    headerPublisher = headerBinding.toPublisher(),
-    borderColorPublisher = borderColorBinding?.toPublisher()
+    headerPublisher = headerPublisher,
+    borderColorPublisher = borderColorPublisher
 ) {
     constructor(
-        headerBinding: Binding<String>,
-        sectionsBinding: Binding<List<SectionWithoutColor>>,
-        summaryColorBinding: Binding<Color>
+        headerPublisher: Flow.Publisher<out String>,
+        sectionsPublisher: Flow.Publisher<out List<SectionWithoutColor>>,
+        summaryColorPublisher: Flow.Publisher<out Color>
     ) : this(
-        headerBinding,
-        sectionsBinding,
-        BindingReceiver(summaryColorBinding)
-    )
-
-    private constructor(
-        headerBinding: Binding<String>,
-        sectionsBinding: Binding<List<SectionWithoutColor>>,
-        summaryColorBinding: BindingReceiver<Color>
-    ) : this(
-        headerBinding,
-        sectionsBinding.merge(summaryColorBinding.getBinding()) { sections, color ->
+        headerPublisher,
+        sectionsPublisher.merge(summaryColorPublisher) { sections, color ->
             sections.map { s -> Section(s.header, s.value.map { Pair(color, it) }) }
         },
-        summaryColorBinding.getBinding(),
-        summaryColorBinding.getBinding()
+        summaryColorPublisher,
+        summaryColorPublisher
     )
 
     constructor(
-        headerBinding: Binding<String>,
-        sectionsBinding: Binding<List<Section>>
+        headerPublisher: Flow.Publisher<out String>,
+        sectionsPublisher: Flow.Publisher<out List<Section>>
     ) : this(
-        headerBinding,
-        sectionsBinding,
-        Binding.fixedBinding(Color.BLACK),
-        Binding.fixedBinding(Color.BLACK)
+        headerPublisher,
+        sectionsPublisher,
+        Color.BLACK.asOneTimePublisher(),
+        Color.BLACK.asOneTimePublisher()
     )
 
     private val centralPanel: JPanel = JPanel()
@@ -68,10 +61,12 @@ class RegionSummaryFrame private constructor(
         centralPanel.layout = GridLayout(0, 1)
         add(centralPanel, BorderLayout.CENTER)
 
-        summaryColorBinding.bind { color ->
+        val onSummaryColorUpdate: (Color) -> Unit = { color ->
             summaryColor = color
         }
-        sectionsBinding.bind { s ->
+        summaryColorPublisher.subscribe(Subscriber(eventQueueWrapper(onSummaryColorUpdate)))
+
+        val onSectionsUpdate: (List<Section>) -> Unit = { s ->
             while (sections.size < s.size) {
                 val newPanel = SectionPanel()
                 centralPanel.add(newPanel)
@@ -85,6 +80,7 @@ class RegionSummaryFrame private constructor(
                 sections[idx].values = section.valueColor
             }
         }
+        sectionsPublisher.subscribe(Subscriber(eventQueueWrapper(onSectionsUpdate)))
     }
 
     internal fun getNumSections(): Int {

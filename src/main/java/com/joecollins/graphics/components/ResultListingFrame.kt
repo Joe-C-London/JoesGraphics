@@ -1,7 +1,8 @@
 package com.joecollins.graphics.components
 
-import com.joecollins.bindings.Binding
 import com.joecollins.graphics.utils.StandardFont
+import com.joecollins.pubsub.Subscriber
+import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Component
@@ -12,22 +13,23 @@ import java.awt.Graphics2D
 import java.awt.LayoutManager
 import java.awt.RenderingHints
 import java.util.ArrayList
+import java.util.concurrent.Flow
 import javax.swing.JPanel
 import kotlin.math.ceil
 
 class ResultListingFrame(
-    headerBinding: Binding<String?>,
-    numRowsBinding: Binding<Int>,
-    itemsBinding: Binding<List<Item>>,
-    reversedBinding: Binding<Boolean>? = null,
-    borderColorBinding: Binding<Color>? = null,
-    headerAlignmentBinding: Binding<Alignment>? = null,
-    notesBinding: Binding<String?>? = null
+    headerPublisher: Flow.Publisher<out String?>,
+    numRowsPublisher: Flow.Publisher<out Int>,
+    itemsPublisher: Flow.Publisher<out List<Item>>,
+    reversedPublisher: Flow.Publisher<out Boolean>? = null,
+    borderColorPublisher: Flow.Publisher<out Color>? = null,
+    headerAlignmentPublisher: Flow.Publisher<out Alignment>? = null,
+    notesPublisher: Flow.Publisher<out String?>? = null
 ) : GraphicsFrame(
-    headerPublisher = headerBinding.toPublisher(),
-    borderColorPublisher = borderColorBinding?.toPublisher(),
-    headerAlignmentPublisher = headerAlignmentBinding?.toPublisher(),
-    notesPublisher = notesBinding?.toPublisher()
+    headerPublisher = headerPublisher,
+    borderColorPublisher = borderColorPublisher,
+    headerAlignmentPublisher = headerAlignmentPublisher,
+    notesPublisher = notesPublisher
 ) {
     private val centralPanel = JPanel()
     private val layout = Layout()
@@ -40,9 +42,16 @@ class ResultListingFrame(
         centralPanel.layout = layout
         add(centralPanel, BorderLayout.CENTER)
 
-        numRowsBinding.bind { layout.numRows = it }
-        (reversedBinding ?: Binding.fixedBinding(false)).bind { layout.reversed = it }
-        itemsBinding.bind { i ->
+        val onNumRowsUpdate: (Int) -> Unit = { layout.numRows = it }
+        numRowsPublisher.subscribe(Subscriber(eventQueueWrapper(onNumRowsUpdate)))
+
+        val onReversedUpdate: (Boolean) -> Unit = { layout.reversed = it }
+        if (reversedPublisher != null)
+            reversedPublisher.subscribe(Subscriber(eventQueueWrapper(onReversedUpdate)))
+        else
+            onReversedUpdate(false)
+
+        val onItemsUpdate: (List<Item>) -> Unit = { i ->
             while (i.size > items.size) {
                 val item = ItemPanel()
                 items.add(item)
@@ -59,6 +68,7 @@ class ResultListingFrame(
             }
             repaint()
         }
+        itemsPublisher.subscribe(Subscriber(eventQueueWrapper(onItemsUpdate)))
     }
 
     internal fun getNumRows(): Int {

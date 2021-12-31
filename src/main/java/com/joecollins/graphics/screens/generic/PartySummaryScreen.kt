@@ -194,11 +194,11 @@ class PartySummaryScreen private constructor(
                 else -> listOf(seatsHeader, voteHeader) to seatBinding.merge(voteBinding) { s, v -> listOf(s, v) }
             }
             return RegionSummaryFrame(
-                headerBinding = titleFunc(region),
-                summaryColorBinding = party.getBinding { it.color },
-                sectionsBinding = values.map { value ->
+                headerPublisher = titleFunc(region).toPublisher(),
+                summaryColorPublisher = party.getBinding { it.color }.toPublisher(),
+                sectionsPublisher = values.map { value ->
                     value.zip(headers) { v, h -> RegionSummaryFrame.SectionWithoutColor(h, v) }
-                }
+                }.toPublisher()
             )
         }
     }

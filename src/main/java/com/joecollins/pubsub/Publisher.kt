@@ -1,5 +1,6 @@
 package com.joecollins.pubsub
 
+import org.apache.commons.lang3.tuple.MutablePair
 import java.util.concurrent.Flow
 import java.util.concurrent.LinkedBlockingQueue
 
@@ -84,30 +85,36 @@ fun <T> T.asOneTimePublisher(): Flow.Publisher<T> {
 }
 
 fun <T, R> Flow.Publisher<T>.map(func: (T) -> R): Flow.Publisher<R> {
-    val me = this
-    return object : Flow.Publisher<R> {
-        override fun subscribe(subscriber: Flow.Subscriber<in R>) {
-            me.subscribe(object : Flow.Subscriber<T> {
-                override fun onSubscribe(subscription: Flow.Subscription) {
-                    subscriber.onSubscribe(subscription)
-                }
+    val publisher = Publisher<R>()
+    subscribe(Subscriber { publisher.submit(func(it)) })
+    return publisher
+}
 
-                override fun onNext(item: T) {
-                    try {
-                        subscriber.onNext(func(item))
-                    } catch (e: Exception) {
-                        subscriber.onError(e)
-                    }
-                }
-
-                override fun onError(throwable: Throwable?) {
-                    subscriber.onError(throwable)
-                }
-
-                override fun onComplete() {
-                    subscriber.onComplete()
-                }
-            })
-        }
+fun <T, U, R> Flow.Publisher<T>.merge(other: Flow.Publisher<U>, func: (T, U) -> R): Flow.Publisher<R> {
+    data class Wrapper<T>(val item: T)
+    val publisher = Publisher<R>()
+    val pair = MutablePair<Wrapper<T>?, Wrapper<U>?>(null, null)
+    val onUpdate = {
+        val left = pair.left
+        val right = pair.right
+        if (left != null && right != null)
+            publisher.submit(func(left.item, right.item))
     }
+    this.subscribe(
+        Subscriber {
+            synchronized(pair) {
+                pair.left = Wrapper(it)
+                onUpdate()
+            }
+        }
+    )
+    other.subscribe(
+        Subscriber {
+            synchronized(pair) {
+                pair.right = Wrapper(it)
+                onUpdate()
+            }
+        }
+    )
+    return publisher
 }
