@@ -6,6 +6,8 @@ import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.pubsub.asOneTimePublisher
 import org.awaitility.Awaitility
 import org.hamcrest.core.IsEqual
+import org.hamcrest.core.IsNot
+import org.hamcrest.core.IsNull
 import org.junit.Assert
 import org.junit.Test
 import java.awt.Color
@@ -29,7 +31,8 @@ class LowerThirdHeadlineAndSummaryBothEndsTest {
             summaryLeftPublisher = SummaryFromBothEnds.Entry(Color.BLUE, "CLINTON", 232).asOneTimePublisher(),
             summaryRightPublisher = SummaryFromBothEnds.Entry(Color.RED, "TRUMP", 306).asOneTimePublisher()
         )
-        Assert.assertEquals("POLLS CLOSE ACROSS CENTRAL CANADA", lowerThird.headline)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ lowerThird.headline }, IsEqual("POLLS CLOSE ACROSS CENTRAL CANADA"))
     }
 
     @Test
@@ -79,6 +82,8 @@ class LowerThirdHeadlineAndSummaryBothEndsTest {
             summaryLeftPublisher = SummaryFromBothEnds.Entry(Color.BLUE, "CLINTON", 232).asOneTimePublisher(),
             summaryRightPublisher = SummaryFromBothEnds.Entry(Color.RED, "TRUMP", 306).asOneTimePublisher()
         )
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ lowerThird.left }, IsNot(IsNull()))
         Assert.assertEquals(Color.BLUE, lowerThird.left!!.color)
         Assert.assertEquals("CLINTON", lowerThird.left!!.label)
         Assert.assertEquals(232, lowerThird.left!!.value.toLong())
@@ -101,6 +106,8 @@ class LowerThirdHeadlineAndSummaryBothEndsTest {
             summaryRightPublisher = SummaryFromBothEnds.Entry(Color.RED, "NIXON", 301).asOneTimePublisher(),
             summaryMiddlePublisher = SummaryFromBothEnds.Entry(Color.GRAY, "WALLACE", 46).asOneTimePublisher()
         )
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ lowerThird.left }, IsNot(IsNull()))
         Assert.assertEquals(Color.BLUE, lowerThird.left!!.color)
         Assert.assertEquals("HUMPHREY", lowerThird.left!!.label)
         Assert.assertEquals(191, lowerThird.left!!.value.toLong())

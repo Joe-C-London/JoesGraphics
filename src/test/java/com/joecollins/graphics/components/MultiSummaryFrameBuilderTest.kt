@@ -81,8 +81,9 @@ class MultiSummaryFrameBuilderTest {
         ridings[5].setResults(mapOf(yp to 280, ndp to 207, lib to 152, grn to 22))
         Assert.assertEquals("VUNTUT GWITCHIN", frame.getRowHeader(0))
         Assert.assertEquals(Color.RED, frame.getColor(0, 0))
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.getRowHeader(1) }, IsEqual("WATSON LAKE"))
         Assert.assertEquals("LIB: 38", frame.getValue(0, 0))
-        Assert.assertEquals("WATSON LAKE", frame.getRowHeader(1))
         Assert.assertEquals(Color.BLUE, frame.getColor(1, 0))
         Assert.assertEquals("YP: 150", frame.getValue(1, 0))
 

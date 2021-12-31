@@ -175,8 +175,9 @@ class SwingometerFrameTest {
             numBucketsPerSidePublisher = 20.asOneTimePublisher(),
             dotsPublisher = dots.mapElements { SwingometerFrame.Dot(it.first, it.second, it.third) }.toPublisher()
         )
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.numDots }, IsEqual(3))
         Assert.assertEquals(20, frame.numBucketsPerSide.toLong())
-        Assert.assertEquals(3, frame.numDots.toLong())
         Assert.assertEquals(0.3, frame.getDotPosition(0))
         Assert.assertEquals(Color.RED, frame.getDotColor(1))
         Assert.assertEquals("C", frame.getDotLabel(2))

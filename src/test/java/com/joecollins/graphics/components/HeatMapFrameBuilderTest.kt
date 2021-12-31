@@ -240,7 +240,8 @@ class HeatMapFrameBuilderTest {
             { e: Int, l: Int -> DecimalFormat("+0;-0").format(e) + "/" + DecimalFormat("+0;-0").format(l) },
             fixedBinding("TEST")
         )
-        Assert.assertEquals(30, frame.numSquares.toLong())
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.numSquares }, IsEqual(30))
         Assert.assertEquals(Color.RED, frame.getSquareBorder(0))
         Assert.assertEquals(Color.WHITE, frame.getSquareFill(0))
         Assert.assertEquals(0, frame.getSeatBarSize(0).toLong())
