@@ -23,13 +23,13 @@ import kotlin.Throws
 object RenderTestUtils {
 
     @Throws(IOException::class)
-    @JvmStatic fun compareRendering(testClass: String, testMethod: String, panel: JPanel) {
+    @JvmStatic fun compareRendering(testClass: String, testMethod: String, panel: JPanel, timeoutSeconds: Long = 1) {
         val expectedFile = File(
             "src\\test\\resources\\com\\joecollins\\graphics\\$testClass\\$testMethod.png"
         )
         val actualFile = File.createTempFile("test", ".png")
         val isMatch = try {
-            Awaitility.await("$testClass/$testMethod").atMost(1, TimeUnit.SECONDS)
+            Awaitility.await("$testClass/$testMethod").atMost(timeoutSeconds, TimeUnit.SECONDS)
                 .until({
                     ImageIO.write(convertToImage(panel), "png", actualFile)
                     FileUtils.contentEquals(expectedFile, actualFile)

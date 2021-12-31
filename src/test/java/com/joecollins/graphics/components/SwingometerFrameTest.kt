@@ -4,10 +4,14 @@ import com.joecollins.bindings.Binding
 import com.joecollins.bindings.Binding.Companion.fixedBinding
 import com.joecollins.bindings.mapElements
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
+import com.joecollins.pubsub.asOneTimePublisher
+import org.awaitility.Awaitility
+import org.hamcrest.core.IsEqual
 import org.junit.Assert
 import org.junit.Test
 import java.awt.Color
 import java.io.IOException
+import java.util.concurrent.TimeUnit
 import kotlin.Throws
 import kotlin.math.abs
 
@@ -15,13 +19,13 @@ class SwingometerFrameTest {
     @Test
     fun testColors() {
         val frame = SwingometerFrame(
-            headerBinding = fixedBinding(null),
-            valueBinding = fixedBinding(3),
-            rangeBinding = fixedBinding(10),
-            leftColorBinding = fixedBinding(Color.BLUE),
-            rightColorBinding = fixedBinding(Color.RED),
-            numBucketsPerSideBinding = fixedBinding(20),
-            dotsBinding = fixedBinding(emptyList())
+            headerPublisher = (null as String?).asOneTimePublisher(),
+            valuePublisher = 3.asOneTimePublisher(),
+            rangePublisher = 10.asOneTimePublisher(),
+            leftColorPublisher = Color.BLUE.asOneTimePublisher(),
+            rightColorPublisher = Color.RED.asOneTimePublisher(),
+            numBucketsPerSidePublisher = 20.asOneTimePublisher(),
+            dotsPublisher = emptyList<SwingometerFrame.Dot>().asOneTimePublisher()
         )
         Assert.assertEquals(Color.BLUE, frame.leftColor)
         Assert.assertEquals(Color.RED, frame.rightColor)
@@ -30,47 +34,48 @@ class SwingometerFrameTest {
     @Test
     fun testValue() {
         val frame = SwingometerFrame(
-            headerBinding = fixedBinding(null),
-            valueBinding = fixedBinding(3),
-            rangeBinding = fixedBinding(10),
-            leftColorBinding = fixedBinding(Color.BLUE),
-            rightColorBinding = fixedBinding(Color.RED),
-            numBucketsPerSideBinding = fixedBinding(20),
-            dotsBinding = fixedBinding(emptyList())
+            headerPublisher = (null as String?).asOneTimePublisher(),
+            valuePublisher = 3.asOneTimePublisher(),
+            rangePublisher = 10.asOneTimePublisher(),
+            leftColorPublisher = Color.BLUE.asOneTimePublisher(),
+            rightColorPublisher = Color.RED.asOneTimePublisher(),
+            numBucketsPerSidePublisher = 20.asOneTimePublisher(),
+            dotsPublisher = emptyList<SwingometerFrame.Dot>().asOneTimePublisher()
         )
-        Assert.assertEquals(3, frame.value)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.value }, IsEqual(3))
     }
 
     @Test
     fun testRange() {
         val frame = SwingometerFrame(
-            headerBinding = fixedBinding(null),
-            valueBinding = fixedBinding(3),
-            rangeBinding = fixedBinding(10),
-            leftColorBinding = fixedBinding(Color.BLUE),
-            rightColorBinding = fixedBinding(Color.RED),
-            numBucketsPerSideBinding = fixedBinding(20),
-            dotsBinding = fixedBinding(emptyList())
+            headerPublisher = (null as String?).asOneTimePublisher(),
+            valuePublisher = 3.asOneTimePublisher(),
+            rangePublisher = 10.asOneTimePublisher(),
+            leftColorPublisher = Color.BLUE.asOneTimePublisher(),
+            rightColorPublisher = Color.RED.asOneTimePublisher(),
+            numBucketsPerSidePublisher = 20.asOneTimePublisher(),
+            dotsPublisher = emptyList<SwingometerFrame.Dot>().asOneTimePublisher()
         )
-        Assert.assertEquals(10, frame.range)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.range }, IsEqual(10))
     }
 
     @Test
     fun testTicks() {
         val ticks = (-10..10).toList()
         val frame = SwingometerFrame(
-            headerBinding = fixedBinding(null),
-            valueBinding = fixedBinding(3),
-            rangeBinding = fixedBinding(10),
-            leftColorBinding = fixedBinding(Color.BLUE),
-            rightColorBinding = fixedBinding(Color.RED),
-            numBucketsPerSideBinding = fixedBinding(20),
-            dotsBinding = fixedBinding(emptyList()),
-            ticksBinding = fixedBinding(
-                ticks.map { SwingometerFrame.Tick(it, abs(it).toString()) }
-            )
+            headerPublisher = (null as String?).asOneTimePublisher(),
+            valuePublisher = 3.asOneTimePublisher(),
+            rangePublisher = 10.asOneTimePublisher(),
+            leftColorPublisher = Color.BLUE.asOneTimePublisher(),
+            rightColorPublisher = Color.RED.asOneTimePublisher(),
+            numBucketsPerSidePublisher = 20.asOneTimePublisher(),
+            dotsPublisher = emptyList<SwingometerFrame.Dot>().asOneTimePublisher(),
+            ticksPublisher = ticks.map { SwingometerFrame.Tick(it, abs(it).toString()) }.asOneTimePublisher()
         )
-        Assert.assertEquals(21, frame.numTicks.toLong())
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.numTicks }, IsEqual(21))
         for (i in 0..20) {
             Assert.assertEquals("Position at index $i", i - 10, frame.getTickPosition(i))
         }
@@ -86,17 +91,18 @@ class SwingometerFrameTest {
     @Test
     fun testWinningPoint() {
         val frame = SwingometerFrame(
-            headerBinding = fixedBinding(null),
-            valueBinding = fixedBinding(3),
-            rangeBinding = fixedBinding(10),
-            leftColorBinding = fixedBinding(Color.BLUE),
-            rightColorBinding = fixedBinding(Color.RED),
-            leftToWinBinding = fixedBinding(3.0),
-            rightToWinBinding = fixedBinding(-2.0),
-            numBucketsPerSideBinding = fixedBinding(20),
-            dotsBinding = fixedBinding(emptyList())
+            headerPublisher = (null as String?).asOneTimePublisher(),
+            valuePublisher = 3.asOneTimePublisher(),
+            rangePublisher = 10.asOneTimePublisher(),
+            leftColorPublisher = Color.BLUE.asOneTimePublisher(),
+            rightColorPublisher = Color.RED.asOneTimePublisher(),
+            leftToWinPublisher = 3.0.asOneTimePublisher(),
+            rightToWinPublisher = (-2.0).asOneTimePublisher(),
+            numBucketsPerSidePublisher = 20.asOneTimePublisher(),
+            dotsPublisher = emptyList<SwingometerFrame.Dot>().asOneTimePublisher()
         )
-        Assert.assertEquals(3.0, frame.leftToWin)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.leftToWin }, IsEqual(3.0))
         Assert.assertEquals(-2.0, frame.rightToWin)
     }
 
@@ -110,16 +116,17 @@ class SwingometerFrameTest {
             )
         )
         val frame = SwingometerFrame(
-            headerBinding = fixedBinding(null),
-            valueBinding = fixedBinding(3),
-            rangeBinding = fixedBinding(10),
-            leftColorBinding = fixedBinding(Color.BLUE),
-            rightColorBinding = fixedBinding(Color.RED),
-            numBucketsPerSideBinding = fixedBinding(20),
-            dotsBinding = fixedBinding(emptyList()),
-            outerLabelsBinding = labels.mapElements { SwingometerFrame.OuterLabel(it.first, it.second, it.third) }
+            headerPublisher = (null as String?).asOneTimePublisher(),
+            valuePublisher = 3.asOneTimePublisher(),
+            rangePublisher = 10.asOneTimePublisher(),
+            leftColorPublisher = Color.BLUE.asOneTimePublisher(),
+            rightColorPublisher = Color.RED.asOneTimePublisher(),
+            numBucketsPerSidePublisher = 20.asOneTimePublisher(),
+            dotsPublisher = emptyList<SwingometerFrame.Dot>().asOneTimePublisher(),
+            outerLabelsPublisher = labels.mapElements { SwingometerFrame.OuterLabel(it.first, it.second, it.third) }.toPublisher()
         )
-        Assert.assertEquals(3, frame.numOuterLabels.toLong())
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.numOuterLabels }, IsEqual(3))
         Assert.assertEquals(0.0, frame.getOuterLabelPosition(0))
         Assert.assertEquals("75", frame.getOuterLabelText(1))
         Assert.assertEquals(Color.BLUE, frame.getOuterLabelColor(2))
@@ -135,15 +142,16 @@ class SwingometerFrameTest {
             )
         )
         val frame = SwingometerFrame(
-            headerBinding = fixedBinding(null),
-            valueBinding = fixedBinding(3),
-            rangeBinding = fixedBinding(10),
-            leftColorBinding = fixedBinding(Color.BLUE),
-            rightColorBinding = fixedBinding(Color.RED),
-            numBucketsPerSideBinding = fixedBinding(20),
-            dotsBinding = dots.mapElements { SwingometerFrame.Dot(it.first, it.second) }
+            headerPublisher = (null as String?).asOneTimePublisher(),
+            valuePublisher = 3.asOneTimePublisher(),
+            rangePublisher = 10.asOneTimePublisher(),
+            leftColorPublisher = Color.BLUE.asOneTimePublisher(),
+            rightColorPublisher = Color.RED.asOneTimePublisher(),
+            numBucketsPerSidePublisher = 20.asOneTimePublisher(),
+            dotsPublisher = dots.mapElements { SwingometerFrame.Dot(it.first, it.second) }.toPublisher()
         )
-        Assert.assertEquals(20, frame.numBucketsPerSide.toLong())
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.numBucketsPerSide }, IsEqual(20))
         Assert.assertEquals(3, frame.numDots.toLong())
         Assert.assertEquals(0.3, frame.getDotPosition(0))
         Assert.assertEquals(Color.RED, frame.getDotColor(1))
@@ -159,13 +167,13 @@ class SwingometerFrameTest {
             )
         )
         val frame = SwingometerFrame(
-            headerBinding = fixedBinding(null),
-            valueBinding = fixedBinding(3),
-            rangeBinding = fixedBinding(10),
-            leftColorBinding = fixedBinding(Color.BLUE),
-            rightColorBinding = fixedBinding(Color.RED),
-            numBucketsPerSideBinding = fixedBinding(20),
-            dotsBinding = dots.mapElements { SwingometerFrame.Dot(it.first, it.second, it.third) }
+            headerPublisher = (null as String?).asOneTimePublisher(),
+            valuePublisher = 3.asOneTimePublisher(),
+            rangePublisher = 10.asOneTimePublisher(),
+            leftColorPublisher = Color.BLUE.asOneTimePublisher(),
+            rightColorPublisher = Color.RED.asOneTimePublisher(),
+            numBucketsPerSidePublisher = 20.asOneTimePublisher(),
+            dotsPublisher = dots.mapElements { SwingometerFrame.Dot(it.first, it.second, it.third) }.toPublisher()
         )
         Assert.assertEquals(20, frame.numBucketsPerSide.toLong())
         Assert.assertEquals(3, frame.numDots.toLong())
@@ -185,16 +193,17 @@ class SwingometerFrameTest {
             )
         )
         val frame = SwingometerFrame(
-            headerBinding = fixedBinding(null),
-            valueBinding = fixedBinding(3),
-            rangeBinding = fixedBinding(10),
-            leftColorBinding = fixedBinding(Color.BLUE),
-            rightColorBinding = fixedBinding(Color.RED),
-            numBucketsPerSideBinding = fixedBinding(20),
-            dotsBinding = dots.mapElements { SwingometerFrame.Dot(it.first, it.second, solid = it.third) }
+            headerPublisher = (null as String?).asOneTimePublisher(),
+            valuePublisher = 3.asOneTimePublisher(),
+            rangePublisher = 10.asOneTimePublisher(),
+            leftColorPublisher = Color.BLUE.asOneTimePublisher(),
+            rightColorPublisher = Color.RED.asOneTimePublisher(),
+            numBucketsPerSidePublisher = 20.asOneTimePublisher(),
+            dotsPublisher = dots.mapElements { SwingometerFrame.Dot(it.first, it.second, solid = it.third) }.toPublisher()
         )
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.numDots }, IsEqual(3))
         Assert.assertEquals(20, frame.numBucketsPerSide.toLong())
-        Assert.assertEquals(3, frame.numDots.toLong())
         Assert.assertEquals(0.3, frame.getDotPosition(0))
         Assert.assertEquals(Color.RED, frame.getDotColor(1))
         Assert.assertTrue(frame.isDotSolid(0))
@@ -219,19 +228,17 @@ class SwingometerFrameTest {
         )
         val dots = createSwingometerDotsWithoutLabels()
         val frame = SwingometerFrame(
-            headerBinding = fixedBinding("2018 SENATE SWINGOMETER"),
-            rangeBinding = fixedBinding(10),
-            valueBinding = fixedBinding(-4.0),
-            leftColorBinding = fixedBinding(Color.BLUE),
-            rightColorBinding = fixedBinding(Color.RED),
-            leftToWinBinding = fixedBinding(1.55),
-            rightToWinBinding = fixedBinding(-0.60),
-            numBucketsPerSideBinding = fixedBinding(20),
-            dotsBinding = dots.mapElements { SwingometerFrame.Dot(it.second, it.third) },
-            ticksBinding = fixedBinding(
-                ticks.map { SwingometerFrame.Tick(it, it.toString()) }
-            ),
-            outerLabelsBinding = outerLabels.mapElements { SwingometerFrame.OuterLabel(it.first, it.second.toString(), it.third) }
+            headerPublisher = "2018 SENATE SWINGOMETER".asOneTimePublisher(),
+            rangePublisher = 10.asOneTimePublisher(),
+            valuePublisher = (-4.0).asOneTimePublisher(),
+            leftColorPublisher = Color.BLUE.asOneTimePublisher(),
+            rightColorPublisher = Color.RED.asOneTimePublisher(),
+            leftToWinPublisher = 1.55.asOneTimePublisher(),
+            rightToWinPublisher = (-0.60).asOneTimePublisher(),
+            numBucketsPerSidePublisher = 20.asOneTimePublisher(),
+            dotsPublisher = dots.mapElements { SwingometerFrame.Dot(it.second, it.third) }.toPublisher(),
+            ticksPublisher = ticks.map { SwingometerFrame.Tick(it, it.toString()) }.asOneTimePublisher(),
+            outerLabelsPublisher = outerLabels.mapElements { SwingometerFrame.OuterLabel(it.first, it.second.toString(), it.third) }.toPublisher()
         )
         frame.setSize(1024, 512)
         compareRendering("SwingometerFrame", "Unlabelled", frame)
@@ -254,19 +261,17 @@ class SwingometerFrameTest {
         )
         val dots = createSwingometerDotsWithoutLabels()
         val frame = SwingometerFrame(
-            headerBinding = fixedBinding("2018 SENATE SWINGOMETER"),
-            rangeBinding = fixedBinding(10),
-            valueBinding = fixedBinding(-4.0),
-            leftColorBinding = fixedBinding(Color.BLUE),
-            rightColorBinding = fixedBinding(Color.RED),
-            leftToWinBinding = fixedBinding(1.55),
-            rightToWinBinding = fixedBinding(-0.60),
-            numBucketsPerSideBinding = fixedBinding(80),
-            dotsBinding = dots.mapElements { SwingometerFrame.Dot(it.second, it.third) },
-            ticksBinding = fixedBinding(
-                ticks.map { SwingometerFrame.Tick(it, it.toString()) }
-            ),
-            outerLabelsBinding = outerLabels.mapElements { SwingometerFrame.OuterLabel(it.first, it.second.toString(), it.third) }
+            headerPublisher = "2018 SENATE SWINGOMETER".asOneTimePublisher(),
+            rangePublisher = 10.asOneTimePublisher(),
+            valuePublisher = (-4.0).asOneTimePublisher(),
+            leftColorPublisher = Color.BLUE.asOneTimePublisher(),
+            rightColorPublisher = Color.RED.asOneTimePublisher(),
+            leftToWinPublisher = 1.55.asOneTimePublisher(),
+            rightToWinPublisher = (-0.60).asOneTimePublisher(),
+            numBucketsPerSidePublisher = 80.asOneTimePublisher(),
+            dotsPublisher = dots.mapElements { SwingometerFrame.Dot(it.second, it.third) }.toPublisher(),
+            ticksPublisher = ticks.map { SwingometerFrame.Tick(it, it.toString()) }.asOneTimePublisher(),
+            outerLabelsPublisher = outerLabels.mapElements { SwingometerFrame.OuterLabel(it.first, it.second.toString(), it.third) }.toPublisher()
         )
         frame.setSize(1024, 512)
         compareRendering("SwingometerFrame", "Unlabelled-TinyDots", frame)
@@ -329,25 +334,23 @@ class SwingometerFrameTest {
         )
         val dots = createSwingometerDotsWithLabels()
         val frame = SwingometerFrame(
-            headerBinding = fixedBinding("2016 PRESIDENT SWINGOMETER"),
-            rangeBinding = fixedBinding(10),
-            valueBinding = fixedBinding(0.885),
-            leftColorBinding = fixedBinding(Color.BLUE),
-            rightColorBinding = fixedBinding(Color.RED),
-            leftToWinBinding = fixedBinding(-2.68),
-            rightToWinBinding = fixedBinding(2.68),
-            numBucketsPerSideBinding = fixedBinding(20),
-            dotsBinding = dots.mapElements {
+            headerPublisher = "2016 PRESIDENT SWINGOMETER".asOneTimePublisher(),
+            rangePublisher = 10.asOneTimePublisher(),
+            valuePublisher = 0.885.asOneTimePublisher(),
+            leftColorPublisher = Color.BLUE.asOneTimePublisher(),
+            rightColorPublisher = Color.RED.asOneTimePublisher(),
+            leftToWinPublisher = (-2.68).asOneTimePublisher(),
+            rightToWinPublisher = 2.68.asOneTimePublisher(),
+            numBucketsPerSidePublisher = 20.asOneTimePublisher(),
+            dotsPublisher = dots.mapElements {
                 SwingometerFrame.Dot(
                     it.second,
                     it.third,
                     label = it.first.second.toString()
                 )
-            },
-            ticksBinding = fixedBinding(
-                ticks.map { SwingometerFrame.Tick(it, it.toString()) }
-            ),
-            outerLabelsBinding = outerLabels.mapElements { SwingometerFrame.OuterLabel(it.first, it.second.toString(), it.third) }
+            }.toPublisher(),
+            ticksPublisher = ticks.map { SwingometerFrame.Tick(it, it.toString()) }.asOneTimePublisher(),
+            outerLabelsPublisher = outerLabels.mapElements { SwingometerFrame.OuterLabel(it.first, it.second.toString(), it.third) }.toPublisher()
         )
         frame.setSize(1024, 512)
         compareRendering("SwingometerFrame", "Labels", frame)
@@ -370,26 +373,24 @@ class SwingometerFrameTest {
         )
         val dots = createSwingometerDotsWithLabels()
         val frame = SwingometerFrame(
-            headerBinding = fixedBinding("2016 PRESIDENT SWINGOMETER"),
-            rangeBinding = fixedBinding(10),
-            valueBinding = fixedBinding(0.885),
-            leftColorBinding = fixedBinding(Color.BLUE),
-            rightColorBinding = fixedBinding(Color.RED),
-            leftToWinBinding = fixedBinding(-2.68),
-            rightToWinBinding = fixedBinding(2.68),
-            numBucketsPerSideBinding = fixedBinding(20),
-            dotsBinding = dots.mapElements {
+            headerPublisher = "2016 PRESIDENT SWINGOMETER".asOneTimePublisher(),
+            rangePublisher = 10.asOneTimePublisher(),
+            valuePublisher = 0.885.asOneTimePublisher(),
+            leftColorPublisher = Color.BLUE.asOneTimePublisher(),
+            rightColorPublisher = Color.RED.asOneTimePublisher(),
+            leftToWinPublisher = (-2.68).asOneTimePublisher(),
+            rightToWinPublisher = 2.68.asOneTimePublisher(),
+            numBucketsPerSidePublisher = 20.asOneTimePublisher(),
+            dotsPublisher = dots.mapElements {
                 SwingometerFrame.Dot(
                     it.second,
                     it.third,
                     label = it.first.second.toString(),
                     solid = it.second > -5 && it.second < 0
                 )
-            },
-            ticksBinding = fixedBinding(
-                ticks.map { SwingometerFrame.Tick(it, it.toString()) }
-            ),
-            outerLabelsBinding = outerLabels.mapElements { SwingometerFrame.OuterLabel(it.first, it.second.toString(), it.third) }
+            }.toPublisher(),
+            ticksPublisher = ticks.map { SwingometerFrame.Tick(it, it.toString()) }.asOneTimePublisher(),
+            outerLabelsPublisher = outerLabels.mapElements { SwingometerFrame.OuterLabel(it.first, it.second.toString(), it.third) }.toPublisher()
         )
         frame.setSize(1024, 512)
         compareRendering("SwingometerFrame", "EmptyDots", frame)
@@ -473,15 +474,15 @@ class SwingometerFrameTest {
         )
         val dots = createSwingometerDotsWithLabels()
         val frame = SwingometerFrame(
-            headerBinding = fixedBinding("2016 PRESIDENT SWINGOMETER"),
-            rangeBinding = fixedBinding(10),
-            valueBinding = fixedBinding(0.885),
-            leftColorBinding = fixedBinding(Color.BLUE),
-            rightColorBinding = fixedBinding(Color.RED),
-            leftToWinBinding = fixedBinding(-2.68),
-            rightToWinBinding = fixedBinding(2.68),
-            numBucketsPerSideBinding = fixedBinding(20),
-            dotsBinding = dots.mapElements {
+            headerPublisher = "2016 PRESIDENT SWINGOMETER".asOneTimePublisher(),
+            rangePublisher = 10.asOneTimePublisher(),
+            valuePublisher = 0.885.asOneTimePublisher(),
+            leftColorPublisher = Color.BLUE.asOneTimePublisher(),
+            rightColorPublisher = Color.RED.asOneTimePublisher(),
+            leftToWinPublisher = (-2.68).asOneTimePublisher(),
+            rightToWinPublisher = 2.68.asOneTimePublisher(),
+            numBucketsPerSidePublisher = 20.asOneTimePublisher(),
+            dotsPublisher = dots.mapElements {
                 SwingometerFrame.Dot(
                     it.second,
                     it.third,
@@ -491,11 +492,9 @@ class SwingometerFrameTest {
                         "${it.first.first}\n(${it.first.second})"
                     }
                 )
-            },
-            ticksBinding = fixedBinding(
-                ticks.map { SwingometerFrame.Tick(it, it.toString()) }
-            ),
-            outerLabelsBinding = outerLabels.mapElements { SwingometerFrame.OuterLabel(it.first, it.second.toString(), it.third) }
+            }.toPublisher(),
+            ticksPublisher = ticks.map { SwingometerFrame.Tick(it, it.toString()) }.asOneTimePublisher(),
+            outerLabelsPublisher = outerLabels.mapElements { SwingometerFrame.OuterLabel(it.first, it.second.toString(), it.third) }.toPublisher()
         )
         frame.setSize(1024, 512)
         compareRendering("SwingometerFrame", "MultiLineLabels", frame)

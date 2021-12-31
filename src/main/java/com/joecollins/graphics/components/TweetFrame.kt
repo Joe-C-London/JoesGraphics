@@ -1,9 +1,10 @@
 package com.joecollins.graphics.components
 
-import com.joecollins.bindings.Binding
-import com.joecollins.bindings.BindingReceiver
 import com.joecollins.graphics.ImageGenerator
 import com.joecollins.graphics.utils.StandardFont
+import com.joecollins.pubsub.Subscriber
+import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
+import com.joecollins.pubsub.map
 import io.webfolder.cdp.Launcher
 import twitter4j.MediaEntity
 import twitter4j.Status
@@ -27,6 +28,7 @@ import java.net.URL
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Properties
+import java.util.concurrent.Flow
 import javax.imageio.ImageIO
 import javax.swing.Box
 import javax.swing.BoxLayout
@@ -39,16 +41,15 @@ import kotlin.math.min
 import kotlin.math.roundToInt
 import kotlin.math.sqrt
 
-class TweetFrame(tweet: Binding<Status>, private val timezone: ZoneId = ZoneId.systemDefault()) : JPanel() {
+class TweetFrame(tweet: Flow.Publisher<out Status>, private val timezone: ZoneId = ZoneId.systemDefault()) : JPanel() {
     private val twitterColor = Color(0x00acee)
-    private val tweetReceiver = BindingReceiver(tweet)
 
     init {
         border = MatteBorder(1, 1, 1, 1, twitterColor)
         background = Color.WHITE
         layout = BorderLayout()
 
-        add(TweetHeaderFrame(tweetReceiver.getBinding { it.user }), BorderLayout.NORTH)
+        add(TweetHeaderFrame(tweet.map { it.user }), BorderLayout.NORTH)
 
         val blank = JPanel()
         blank.background = Color.WHITE
@@ -66,7 +67,7 @@ class TweetFrame(tweet: Binding<Status>, private val timezone: ZoneId = ZoneId.s
         tweetLabel.horizontalAlignment = JLabel.LEFT
         tweetLabel.maximumSize = Dimension(Int.MAX_VALUE, Int.MAX_VALUE)
         tweetLabel.alignmentX = Component.LEFT_ALIGNMENT
-        tweetReceiver.getBinding().bind { tweetLabel.text = formatTweetText(it, false) }
+        tweet.subscribe(Subscriber(eventQueueWrapper { tweetLabel.text = formatTweetText(it, false) }))
         tweetPanel.add(tweetLabel)
 
         val urlPanel = JPanel()
@@ -74,31 +75,39 @@ class TweetFrame(tweet: Binding<Status>, private val timezone: ZoneId = ZoneId.s
         urlPanel.layout = BoxLayout(urlPanel, BoxLayout.X_AXIS)
         urlPanel.alignmentX = Component.LEFT_ALIGNMENT
         tweetPanel.add(urlPanel)
-        tweetReceiver.getBinding().bind { status ->
-            val urls = status.urlEntities
-            val quotedURL = status.quotedStatus?.let { "https://twitter.com/${it.user.screenName}/status/${it.id}" }
-            urlPanel.isVisible = urls.isNotEmpty()
-            urlPanel.removeAll()
-            urlPanel.add(Box.createHorizontalGlue())
-            urls.filter { it.expandedURL != quotedURL }.forEach {
-                urlPanel.add(UrlPanel(it))
-            }
-            urlPanel.add(Box.createHorizontalGlue())
-        }
+        tweet.subscribe(
+            Subscriber(
+                eventQueueWrapper { status ->
+                    val urls = status.urlEntities
+                    val quotedURL = status.quotedStatus?.let { "https://twitter.com/${it.user.screenName}/status/${it.id}" }
+                    urlPanel.isVisible = urls.isNotEmpty()
+                    urlPanel.removeAll()
+                    urlPanel.add(Box.createHorizontalGlue())
+                    urls.filter { it.expandedURL != quotedURL }.forEach {
+                        urlPanel.add(UrlPanel(it))
+                    }
+                    urlPanel.add(Box.createHorizontalGlue())
+                }
+            )
+        )
 
         val mediaPanel = JPanel()
         mediaPanel.background = Color.WHITE
         mediaPanel.layout = GridLayout(0, 1)
         mediaPanel.alignmentX = Component.LEFT_ALIGNMENT
         tweetPanel.add(mediaPanel)
-        tweetReceiver.getBinding { it.mediaEntities }.bind { media ->
-            mediaPanel.isVisible = media.isNotEmpty()
-            mediaPanel.removeAll()
-            mediaPanel.layout = GridLayout(0, ceil(sqrt(media.size.toDouble())).toInt().coerceAtLeast(1))
-            media.forEach {
-                mediaPanel.add(MediaPanel(it))
-            }
-        }
+        tweet.map { it.mediaEntities }.subscribe(
+            Subscriber(
+                eventQueueWrapper { media ->
+                    mediaPanel.isVisible = media.isNotEmpty()
+                    mediaPanel.removeAll()
+                    mediaPanel.layout = GridLayout(0, ceil(sqrt(media.size.toDouble())).toInt().coerceAtLeast(1))
+                    media.forEach {
+                        mediaPanel.add(MediaPanel(it))
+                    }
+                }
+            )
+        )
 
         val quotedPanel = JPanel()
         quotedPanel.background = Color.WHITE
@@ -106,17 +115,26 @@ class TweetFrame(tweet: Binding<Status>, private val timezone: ZoneId = ZoneId.s
         quotedPanel.alignmentX = Component.LEFT_ALIGNMENT
         quotedPanel.border = EmptyBorder(0, 0, 5, 5)
         tweetPanel.add(quotedPanel)
-        tweetReceiver.getBinding { it.quotedStatus }.bind { status ->
-            quotedPanel.isVisible = (status != null)
-            quotedPanel.removeAll()
-            status?.let { quotedPanel.add(QuotedPanel(it)) }
-        }
+        tweet.map { it.quotedStatus }.subscribe(
+            Subscriber(
+                eventQueueWrapper { status ->
+                    quotedPanel.isVisible = (status != null)
+                    quotedPanel.removeAll()
+                    status?.let { quotedPanel.add(QuotedPanel(it)) }
+                    quotedPanel.invalidate()
+                    quotedPanel.revalidate()
+                    tweetPanel.invalidate()
+                    tweetPanel.revalidate()
+                    repaint()
+                }
+            )
+        )
 
         val timeLabel = JLabel()
         timeLabel.font = StandardFont.readNormalFont(12)
         timeLabel.border = EmptyBorder(2, 0, -2, 0)
         timeLabel.horizontalAlignment = JLabel.RIGHT
-        tweetReceiver.getBinding { if (it.user.isProtected) null else it.createdAt }.bind { timeLabel.text = if (it == null) "" else DateTimeFormatter.ofPattern("d MMMM yyyy HH:mm:ss z ").format(it.toInstant().atZone(timezone)) }
+        tweet.map { if (it.user.isProtected) null else it.createdAt }.subscribe(Subscriber(eventQueueWrapper { timeLabel.text = if (it == null) "" else DateTimeFormatter.ofPattern("d MMMM yyyy HH:mm:ss z ").format(it.toInstant().atZone(timezone)) }))
         add(timeLabel, BorderLayout.SOUTH)
     }
 
@@ -144,7 +162,7 @@ class TweetFrame(tweet: Binding<Status>, private val timezone: ZoneId = ZoneId.s
         return "<html>$htmlText</html>"
     }
 
-    private inner class TweetHeaderFrame(user: Binding<User>) : JPanel() {
+    private inner class TweetHeaderFrame(user: Flow.Publisher<out User>) : JPanel() {
         private var image: Image? = null
         private var fullName: String = ""
         private var screenName: String = ""
@@ -154,24 +172,28 @@ class TweetFrame(tweet: Binding<Status>, private val timezone: ZoneId = ZoneId.s
             background = twitterColor
             preferredSize = Dimension(1024, 50)
 
-            user.bind {
-                val originalImage = ImageIO.read(URL(it.profileImageURL))
-                val size = 48
-                val resizedImage = BufferedImage(size, size, BufferedImage.TYPE_4BYTE_ABGR)
-                val g = resizedImage.createGraphics()
-                (g as Graphics2D)
-                    .setRenderingHint(
-                        RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON
-                    )
-                g.clip = Ellipse2D.Double(0.0, 0.0, size.toDouble(), size.toDouble())
-                g.drawImage(originalImage, 0, 0, size, size, null)
-                g.dispose()
-                image = resizedImage
-                fullName = it.name
-                screenName = it.screenName
-                verified = it.isVerified
-                repaint()
-            }
+            user.subscribe(
+                Subscriber(
+                    eventQueueWrapper {
+                        val originalImage = ImageIO.read(URL(it.profileImageURL))
+                        val size = 48
+                        val resizedImage = BufferedImage(size, size, BufferedImage.TYPE_4BYTE_ABGR)
+                        val g = resizedImage.createGraphics()
+                        (g as Graphics2D)
+                            .setRenderingHint(
+                                RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON
+                            )
+                        g.clip = Ellipse2D.Double(0.0, 0.0, size.toDouble(), size.toDouble())
+                        g.drawImage(originalImage, 0, 0, size, size, null)
+                        g.dispose()
+                        image = resizedImage
+                        fullName = it.name
+                        screenName = it.screenName
+                        verified = it.isVerified
+                        repaint()
+                    }
+                )
+            )
         }
 
         private val fullNameFont = StandardFont.readNormalFont(24)
@@ -384,7 +406,7 @@ class TweetFrame(tweet: Binding<Status>, private val timezone: ZoneId = ZoneId.s
     }
 
     companion object {
-        fun createTweetFrame(tweetId: Binding<Long>): TweetFrame {
+        fun createTweetFrame(tweetId: Flow.Publisher<out Long>): TweetFrame {
             val cb = ConfigurationBuilder()
             val twitterPropertiesFile = this::class.java.classLoader.getResourceAsStream("twitter.properties")
                 ?: throw IllegalStateException("Unable to find twitter.properties")

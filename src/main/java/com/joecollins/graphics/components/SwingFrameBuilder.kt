@@ -4,6 +4,7 @@ import com.joecollins.bindings.Bindable
 import com.joecollins.bindings.Binding
 import com.joecollins.graphics.components.SwingFrameBuilder.SwingProperties.SwingProperty
 import com.joecollins.models.general.Party
+import com.joecollins.pubsub.asOneTimePublisher
 import org.apache.commons.collections4.ComparatorUtils
 import java.awt.Color
 import java.text.DecimalFormat
@@ -96,13 +97,13 @@ class SwingFrameBuilder {
 
     fun build(): SwingFrame {
         return SwingFrame(
-            headerBinding = headerBinding ?: Binding.fixedBinding(null),
-            rangeBinding = rangeBinding ?: Binding.fixedBinding(1),
-            valueBinding = valueBinding ?: Binding.fixedBinding(0),
-            leftColorBinding = leftColorBinding ?: Binding.fixedBinding(Color.BLACK),
-            rightColorBinding = rightColorBinding ?: Binding.fixedBinding(Color.BLACK),
-            bottomColorBinding = bottomColorBinding ?: Binding.fixedBinding(Color.BLACK),
-            bottomTextBinding = bottomTextBinding ?: Binding.fixedBinding(null)
+            headerPublisher = headerBinding?.toPublisher() ?: (null as String?).asOneTimePublisher(),
+            rangePublisher = rangeBinding?.toPublisher() ?: 1.asOneTimePublisher(),
+            valuePublisher = valueBinding?.toPublisher() ?: 0.asOneTimePublisher(),
+            leftColorPublisher = leftColorBinding?.toPublisher() ?: Color.BLACK.asOneTimePublisher(),
+            rightColorPublisher = rightColorBinding?.toPublisher() ?: Color.BLACK.asOneTimePublisher(),
+            bottomColorPublisher = bottomColorBinding?.toPublisher() ?: Color.BLACK.asOneTimePublisher(),
+            bottomTextPublisher = bottomTextBinding?.toPublisher() ?: null.asOneTimePublisher()
         )
     }
 

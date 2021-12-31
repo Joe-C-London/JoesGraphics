@@ -1,27 +1,29 @@
 package com.joecollins.graphics.components
 
-import com.joecollins.bindings.Binding
 import com.joecollins.graphics.utils.StandardFont
+import com.joecollins.pubsub.Subscriber
+import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Graphics
 import java.awt.Graphics2D
 import java.awt.RenderingHints
+import java.util.concurrent.Flow
 import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.border.EmptyBorder
 import kotlin.math.min
 
 class SwingFrame(
-    headerBinding: Binding<String?>,
-    valueBinding: Binding<Number>,
-    rangeBinding: Binding<Number>,
-    leftColorBinding: Binding<Color>,
-    rightColorBinding: Binding<Color>,
-    bottomTextBinding: Binding<String?>,
-    bottomColorBinding: Binding<Color>
+    headerPublisher: Flow.Publisher<out String?>,
+    valuePublisher: Flow.Publisher<out Number>,
+    rangePublisher: Flow.Publisher<out Number>,
+    leftColorPublisher: Flow.Publisher<out Color>,
+    rightColorPublisher: Flow.Publisher<out Color>,
+    bottomTextPublisher: Flow.Publisher<out String?>,
+    bottomColorPublisher: Flow.Publisher<out Color>
 ) : GraphicsFrame(
-    headerPublisher = headerBinding.toPublisher()
+    headerPublisher = headerPublisher
 ) {
     private val swingPanel = SwingPanel()
     private val bottomLabel: JLabel = FontSizeAdjustingLabel()
@@ -37,15 +39,19 @@ class SwingFrame(
         centerPanel.add(bottomLabel, BorderLayout.SOUTH)
         add(centerPanel, BorderLayout.CENTER)
 
-        valueBinding.bind { swingPanel.value = it }
-        rangeBinding.bind { swingPanel.range = it }
-        leftColorBinding.bind { swingPanel.leftColor = it }
-        rightColorBinding.bind { swingPanel.rightColor = it }
-        bottomTextBinding.bind {
-            bottomLabel.isVisible = it != null
-            bottomLabel.text = it ?: ""
-        }
-        bottomColorBinding.bind { bottomLabel.foreground = it }
+        valuePublisher.subscribe(Subscriber(eventQueueWrapper { swingPanel.value = it }))
+        rangePublisher.subscribe(Subscriber(eventQueueWrapper { swingPanel.range = it }))
+        leftColorPublisher.subscribe(Subscriber(eventQueueWrapper { swingPanel.leftColor = it }))
+        rightColorPublisher.subscribe(Subscriber(eventQueueWrapper { swingPanel.rightColor = it }))
+        bottomTextPublisher.subscribe(
+            Subscriber(
+                eventQueueWrapper {
+                    bottomLabel.isVisible = it != null
+                    bottomLabel.text = it ?: ""
+                }
+            )
+        )
+        bottomColorPublisher.subscribe(Subscriber(eventQueueWrapper { bottomLabel.foreground = it }))
     }
 
     internal fun getRange(): Number {

@@ -1,7 +1,8 @@
 package com.joecollins.graphics.components
 
-import com.joecollins.bindings.Binding
 import com.joecollins.graphics.utils.StandardFont
+import com.joecollins.pubsub.Subscriber
+import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
 import java.awt.BasicStroke
 import java.awt.BorderLayout
 import java.awt.Color
@@ -12,6 +13,7 @@ import java.awt.RenderingHints
 import java.awt.geom.AffineTransform
 import java.lang.Double.NEGATIVE_INFINITY
 import java.lang.Double.POSITIVE_INFINITY
+import java.util.concurrent.Flow
 import javax.swing.JPanel
 import kotlin.math.abs
 import kotlin.math.ceil
@@ -23,19 +25,19 @@ import kotlin.math.sign
 import kotlin.math.sin
 
 class SwingometerFrame(
-    headerBinding: Binding<String?>,
-    valueBinding: Binding<Number>,
-    rangeBinding: Binding<Number>,
-    leftColorBinding: Binding<Color>,
-    rightColorBinding: Binding<Color>,
-    numBucketsPerSideBinding: Binding<Int>,
-    dotsBinding: Binding<List<Dot>>,
-    leftToWinBinding: Binding<Number>? = null,
-    rightToWinBinding: Binding<Number>? = null,
-    ticksBinding: Binding<List<Tick>>? = null,
-    outerLabelsBinding: Binding<List<OuterLabel>>? = null
+    headerPublisher: Flow.Publisher<out String?>,
+    valuePublisher: Flow.Publisher<out Number>,
+    rangePublisher: Flow.Publisher<out Number>,
+    leftColorPublisher: Flow.Publisher<out Color>,
+    rightColorPublisher: Flow.Publisher<out Color>,
+    numBucketsPerSidePublisher: Flow.Publisher<out Int>,
+    dotsPublisher: Flow.Publisher<out List<Dot>>,
+    leftToWinPublisher: Flow.Publisher<out Number>? = null,
+    rightToWinPublisher: Flow.Publisher<out Number>? = null,
+    ticksPublisher: Flow.Publisher<out List<Tick>>? = null,
+    outerLabelsPublisher: Flow.Publisher<out List<OuterLabel>>? = null
 ) : GraphicsFrame(
-    headerPublisher = headerBinding.toPublisher()
+    headerPublisher = headerPublisher
 ) {
     class Tick(val position: Number, val text: String)
 
@@ -117,7 +119,7 @@ class SwingometerFrame(
         private var _value: Number = 0
         private var _range: Number = 1
         private var _leftToWin: Number = Double.POSITIVE_INFINITY
-        private var _rightToWin: Number = Double.POSITIVE_INFINITY
+        private var _rightToWin: Number = Double.NEGATIVE_INFINITY
         private var _ticks: List<Tick> = ArrayList()
         private var _outerLabels: List<OuterLabel> = ArrayList()
         private var _numBucketsPerSide = 1
@@ -357,15 +359,46 @@ class SwingometerFrame(
         centerPanel.add(swingPanel, BorderLayout.CENTER)
         add(centerPanel, BorderLayout.CENTER)
 
-        valueBinding.bind { value -> swingPanel.value = value }
-        rangeBinding.bind { range -> swingPanel.range = range }
-        leftColorBinding.bind { leftColor -> swingPanel.leftColor = leftColor }
-        rightColorBinding.bind { rightColor -> swingPanel.rightColor = rightColor }
-        numBucketsPerSideBinding.bind { numBucketsPerSide -> swingPanel.numBucketsPerSide = numBucketsPerSide }
-        dotsBinding.bind { swingPanel.dots = it }
-        (leftToWinBinding ?: Binding.fixedBinding(POSITIVE_INFINITY)).bind { leftToWin -> swingPanel.leftToWin = leftToWin }
-        (rightToWinBinding ?: Binding.fixedBinding(NEGATIVE_INFINITY)).bind { rightToWin -> swingPanel.rightToWin = rightToWin }
-        (ticksBinding ?: Binding.fixedBinding(emptyList())).bind { t -> swingPanel.ticks = t }
-        (outerLabelsBinding ?: Binding.fixedBinding(emptyList())).bind { l -> swingPanel.outerLabels = l }
+        val onValueUpdate: (Number) -> Unit = { value -> swingPanel.value = value }
+        valuePublisher.subscribe(Subscriber(eventQueueWrapper(onValueUpdate)))
+
+        val onRangeUpdate: (Number) -> Unit = { range -> swingPanel.range = range }
+        rangePublisher.subscribe(Subscriber(eventQueueWrapper(onRangeUpdate)))
+
+        val onLeftColorUpdate: (Color) -> Unit = { leftColor -> swingPanel.leftColor = leftColor }
+        leftColorPublisher.subscribe(Subscriber(eventQueueWrapper(onLeftColorUpdate)))
+
+        val onRightColorUpdate: (Color) -> Unit = { rightColor -> swingPanel.rightColor = rightColor }
+        rightColorPublisher.subscribe(Subscriber(eventQueueWrapper(onRightColorUpdate)))
+
+        val onNumBucketsPerSideUpdate: (Int) -> Unit = { numBucketsPerSide -> swingPanel.numBucketsPerSide = numBucketsPerSide }
+        numBucketsPerSidePublisher.subscribe(Subscriber(eventQueueWrapper(onNumBucketsPerSideUpdate)))
+
+        val onDotsUpdate: (List<Dot>) -> Unit = { swingPanel.dots = it }
+        dotsPublisher.subscribe(Subscriber(eventQueueWrapper(onDotsUpdate)))
+
+        val onLeftToWinUpdate: (Number) -> Unit = { leftToWin -> swingPanel.leftToWin = leftToWin }
+        if (leftToWinPublisher != null)
+            leftToWinPublisher.subscribe(Subscriber(eventQueueWrapper(onLeftToWinUpdate)))
+        else
+            onLeftToWinUpdate(POSITIVE_INFINITY)
+
+        val onRightToWinUpdate: (Number) -> Unit = { rightToWin -> swingPanel.rightToWin = rightToWin }
+        if (rightToWinPublisher != null)
+            rightToWinPublisher.subscribe(Subscriber(eventQueueWrapper(onRightToWinUpdate)))
+        else
+            onRightToWinUpdate(NEGATIVE_INFINITY)
+
+        val onTicksUpdate: (List<Tick>) -> Unit = { t -> swingPanel.ticks = t }
+        if (ticksPublisher != null)
+            ticksPublisher.subscribe(Subscriber(eventQueueWrapper(onTicksUpdate)))
+        else
+            onTicksUpdate(emptyList())
+
+        val onOuterLabelsUpdate: (List<OuterLabel>) -> Unit = { l -> swingPanel.outerLabels = l }
+        if (outerLabelsPublisher != null)
+            outerLabelsPublisher.subscribe(Subscriber(eventQueueWrapper(onOuterLabelsUpdate)))
+        else
+            onOuterLabelsUpdate(emptyList())
     }
 }

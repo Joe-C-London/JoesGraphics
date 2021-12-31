@@ -4,6 +4,7 @@ import com.joecollins.bindings.Bindable
 import com.joecollins.bindings.Binding
 import com.joecollins.bindings.BindingReceiver
 import com.joecollins.bindings.mapElements
+import com.joecollins.pubsub.asOneTimePublisher
 import java.awt.Color
 import java.util.ArrayList
 import kotlin.math.abs
@@ -224,17 +225,17 @@ class SwingometerFrameBuilder {
 
     fun build(): SwingometerFrame {
         return SwingometerFrame(
-            headerBinding = headerBinding ?: Binding.fixedBinding(null),
-            rangeBinding = rangeBinding ?: Binding.fixedBinding(1),
-            valueBinding = valueBinding ?: Binding.fixedBinding(0),
-            leftColorBinding = leftColorBinding ?: Binding.fixedBinding(Color.BLACK),
-            rightColorBinding = rightColorBinding ?: Binding.fixedBinding(Color.BLACK),
-            numBucketsPerSideBinding = numBucketsPerSideBinding ?: Binding.fixedBinding(1),
-            dotsBinding = dotsBinding ?: Binding.fixedBinding(emptyList()),
-            leftToWinBinding = leftToWinBinding,
-            rightToWinBinding = rightToWinBinding,
-            ticksBinding = ticksBinding,
-            outerLabelsBinding = outerLabelsBinding
+            headerPublisher = headerBinding?.toPublisher() ?: (null as String?).asOneTimePublisher(),
+            rangePublisher = rangeBinding?.toPublisher() ?: 1.asOneTimePublisher(),
+            valuePublisher = valueBinding?.toPublisher() ?: 0.asOneTimePublisher(),
+            leftColorPublisher = leftColorBinding?.toPublisher() ?: Color.BLACK.asOneTimePublisher(),
+            rightColorPublisher = rightColorBinding?.toPublisher() ?: Color.BLACK.asOneTimePublisher(),
+            numBucketsPerSidePublisher = numBucketsPerSideBinding?.toPublisher() ?: 1.asOneTimePublisher(),
+            dotsPublisher = dotsBinding?.toPublisher() ?: emptyList<SwingometerFrame.Dot>().asOneTimePublisher(),
+            leftToWinPublisher = leftToWinBinding?.toPublisher(),
+            rightToWinPublisher = rightToWinBinding?.toPublisher(),
+            ticksPublisher = ticksBinding?.toPublisher(),
+            outerLabelsPublisher = outerLabelsBinding?.toPublisher()
         )
     }
 
