@@ -1,8 +1,9 @@
 package com.joecollins.graphics.components.lowerthird
 
-import com.joecollins.bindings.Binding
 import com.joecollins.graphics.utils.ColorUtils
 import com.joecollins.graphics.utils.StandardFont
+import com.joecollins.pubsub.Subscriber
+import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
 import java.awt.Color
 import java.awt.Component
 import java.awt.Container
@@ -10,13 +11,14 @@ import java.awt.Dimension
 import java.awt.GridLayout
 import java.awt.LayoutManager
 import java.util.ArrayList
+import java.util.concurrent.Flow
 import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.border.EmptyBorder
 import javax.swing.border.MatteBorder
 
 class SummaryWithLabels(
-    private val entriesBinding: Binding<List<Entry>>
+    private val entriesBinding: Flow.Publisher<out List<Entry>>
 ) : JPanel() {
     private val entryPanels: MutableList<EntryPanel> = ArrayList()
 
@@ -126,25 +128,29 @@ class SummaryWithLabels(
         layout = SummaryLayout()
         border = MatteBorder(1, 1, 1, 1, Color.BLACK)
 
-        this.entriesBinding.bind { entries: List<Entry> ->
-            while (entryPanels.size < entries.size) {
-                val newPanel = EntryPanel()
-                add(newPanel)
-                entryPanels.add(newPanel)
-            }
-            while (entryPanels.size > entries.size) {
-                remove(entryPanels.removeAt(entries.size))
-            }
-            entries.onEachIndexed { idx, entry ->
-                entryPanels[idx].topLabel.foreground = if (entry.color == Color.BLACK) Color.WHITE else entry.color
-                entryPanels[idx].bottomPanel.background = entry.color
-                entryPanels[idx].bottomLabel.foreground = ColorUtils.foregroundToContrast(entry.color)
-                entryPanels[idx].topLabel.text = entry.label
-                entryPanels[idx].bottomLabel.text = entry.value
-            }
-            invalidate()
-            revalidate()
-            repaint()
-        }
+        this.entriesBinding.subscribe(
+            Subscriber(
+                eventQueueWrapper { entries: List<Entry> ->
+                    while (entryPanels.size < entries.size) {
+                        val newPanel = EntryPanel()
+                        add(newPanel)
+                        entryPanels.add(newPanel)
+                    }
+                    while (entryPanels.size > entries.size) {
+                        remove(entryPanels.removeAt(entries.size))
+                    }
+                    entries.onEachIndexed { idx, entry ->
+                        entryPanels[idx].topLabel.foreground = if (entry.color == Color.BLACK) Color.WHITE else entry.color
+                        entryPanels[idx].bottomPanel.background = entry.color
+                        entryPanels[idx].bottomLabel.foreground = ColorUtils.foregroundToContrast(entry.color)
+                        entryPanels[idx].topLabel.text = entry.label
+                        entryPanels[idx].bottomLabel.text = entry.value
+                    }
+                    invalidate()
+                    revalidate()
+                    repaint()
+                }
+            )
+        )
     }
 }

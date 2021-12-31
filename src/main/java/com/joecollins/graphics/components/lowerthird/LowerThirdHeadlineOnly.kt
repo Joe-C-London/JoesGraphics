@@ -1,34 +1,36 @@
 package com.joecollins.graphics.components.lowerthird
 
-import com.joecollins.bindings.Binding
+import com.joecollins.pubsub.Subscriber
+import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
 import java.awt.BorderLayout
 import java.awt.Image
 import java.time.Clock
 import java.time.ZoneId
+import java.util.concurrent.Flow
 
 class LowerThirdHeadlineOnly internal constructor(
-    leftImageBinding: Binding<Image>,
-    placeBinding: Binding<String>,
-    timezoneBinding: Binding<ZoneId>,
-    private val headlineBinding: Binding<String?>,
-    private val subheadBinding: Binding<String?>,
+    leftImagePublisher: Flow.Publisher<out Image>,
+    placePublisher: Flow.Publisher<out String>,
+    timezonePublisher: Flow.Publisher<out ZoneId>,
+    private val headlinePublisher: Flow.Publisher<out String?>,
+    private val subheadPublisher: Flow.Publisher<out String?>,
     clock: Clock,
     showTimeZone: Boolean = false
-) : LowerThird(leftImageBinding, placeBinding, timezoneBinding, clock, showTimeZone) {
+) : LowerThird(leftImagePublisher, placePublisher, timezonePublisher, clock, showTimeZone) {
 
     constructor(
-        leftImageBinding: Binding<Image>,
-        placeBinding: Binding<String>,
-        timezoneBinding: Binding<ZoneId>,
-        headlineBinding: Binding<String?>,
-        subheadBinding: Binding<String?>,
+        leftImagePublisher: Flow.Publisher<out Image>,
+        placePublisher: Flow.Publisher<out String>,
+        timezonePublisher: Flow.Publisher<out ZoneId>,
+        headlinePublisher: Flow.Publisher<out String?>,
+        subheadPublisher: Flow.Publisher<out String?>,
         showTimeZone: Boolean = false
     ) : this(
-        leftImageBinding,
-        placeBinding,
-        timezoneBinding,
-        headlineBinding,
-        subheadBinding,
+        leftImagePublisher,
+        placePublisher,
+        timezonePublisher,
+        headlinePublisher,
+        subheadPublisher,
         Clock.systemDefaultZone(),
         showTimeZone
     )
@@ -43,7 +45,7 @@ class LowerThirdHeadlineOnly internal constructor(
 
     init {
         add(headlinePanel, BorderLayout.CENTER)
-        this.headlineBinding.bind { headlinePanel.headline = it }
-        this.subheadBinding.bind { headlinePanel.subhead = it }
+        this.headlinePublisher.subscribe(Subscriber(eventQueueWrapper { headlinePanel.headline = it }))
+        this.subheadPublisher.subscribe(Subscriber(eventQueueWrapper { headlinePanel.subhead = it }))
     }
 }

@@ -1,8 +1,10 @@
 package com.joecollins.graphics.components.lowerthird
 
-import com.joecollins.bindings.Binding.Companion.fixedBinding
 import com.joecollins.graphics.components.lowerthird.LowerThird.Companion.createImage
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
+import com.joecollins.pubsub.asOneTimePublisher
+import org.awaitility.Awaitility
+import org.hamcrest.core.IsEqual
 import org.junit.Assert
 import org.junit.Test
 import java.awt.Color
@@ -11,6 +13,7 @@ import java.lang.InterruptedException
 import java.time.Clock
 import java.time.Instant
 import java.time.ZoneId
+import java.util.concurrent.TimeUnit
 import kotlin.Throws
 
 class LowerThirdTest {
@@ -18,20 +21,21 @@ class LowerThirdTest {
     fun testLeftImage() {
         val image = createImage("BREAKING NEWS", Color.WHITE, Color.RED)
         val lowerThird = LowerThird(
-            leftImageBinding = fixedBinding(image),
-            placeBinding = fixedBinding("OTTAWA"),
-            timezoneBinding = fixedBinding(ZoneId.of("Canada/Eastern"))
+            leftImagePublisher = image.asOneTimePublisher(),
+            placePublisher = "OTTAWA".asOneTimePublisher(),
+            timezonePublisher = ZoneId.of("Canada/Eastern").asOneTimePublisher()
         )
-        Assert.assertEquals(image, lowerThird.leftImage)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ lowerThird.leftImage }, IsEqual(image))
     }
 
     @Test
     @Throws(InterruptedException::class)
     fun testLocationAndTimeZone() {
         val lowerThird = LowerThird(
-            leftImageBinding = fixedBinding(createImage("BREAKING NEWS", Color.WHITE, Color.RED)),
-            placeBinding = fixedBinding("OTTAWA"),
-            timezoneBinding = fixedBinding(ZoneId.of("Canada/Eastern")),
+            leftImagePublisher = createImage("BREAKING NEWS", Color.WHITE, Color.RED).asOneTimePublisher(),
+            placePublisher = "OTTAWA".asOneTimePublisher(),
+            timezonePublisher = ZoneId.of("Canada/Eastern").asOneTimePublisher(),
             clock = Clock.fixed(Instant.parse("2019-10-22T01:30:00Z"), ZoneId.systemDefault())
         )
         Thread.sleep(100)
@@ -43,9 +47,9 @@ class LowerThirdTest {
     @Throws(IOException::class)
     fun testRenderBlankMiddle() {
         val lowerThird = LowerThird(
-            leftImageBinding = fixedBinding(createImage("BREAKING NEWS", Color.WHITE, Color.RED)),
-            placeBinding = fixedBinding("OTTAWA"),
-            timezoneBinding = fixedBinding(ZoneId.of("Canada/Eastern")),
+            leftImagePublisher = createImage("BREAKING NEWS", Color.WHITE, Color.RED).asOneTimePublisher(),
+            placePublisher = "OTTAWA".asOneTimePublisher(),
+            timezonePublisher = ZoneId.of("Canada/Eastern").asOneTimePublisher(),
             clock = Clock.fixed(Instant.parse("2019-10-22T01:30:00Z"), ZoneId.systemDefault())
         )
         lowerThird.setSize(1024, 50)
@@ -56,9 +60,9 @@ class LowerThirdTest {
     @Throws(IOException::class)
     fun testRenderBlankMiddleShowingTimeZone() {
         val lowerThird = LowerThird(
-            leftImageBinding = fixedBinding(createImage("BREAKING NEWS", Color.WHITE, Color.RED)),
-            placeBinding = fixedBinding("OTTAWA"),
-            timezoneBinding = fixedBinding(ZoneId.of("Canada/Eastern")),
+            leftImagePublisher = createImage("BREAKING NEWS", Color.WHITE, Color.RED).asOneTimePublisher(),
+            placePublisher = "OTTAWA".asOneTimePublisher(),
+            timezonePublisher = ZoneId.of("Canada/Eastern").asOneTimePublisher(),
             showTimeZone = true,
             clock = Clock.fixed(Instant.parse("2019-10-22T01:30:00Z"), ZoneId.systemDefault())
         )

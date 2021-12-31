@@ -1,8 +1,10 @@
 package com.joecollins.graphics.components.lowerthird
 
-import com.joecollins.bindings.Binding.Companion.fixedBinding
 import com.joecollins.graphics.components.lowerthird.LowerThird.Companion.createImage
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
+import com.joecollins.pubsub.asOneTimePublisher
+import org.awaitility.Awaitility
+import org.hamcrest.core.IsEqual
 import org.junit.Assert
 import org.junit.Test
 import java.awt.Color
@@ -10,60 +12,64 @@ import java.io.IOException
 import java.time.Clock
 import java.time.Instant
 import java.time.ZoneId
+import java.util.concurrent.TimeUnit
 
 class LowerThirdHeadlineAndSummaryTest {
     @Test
     fun testHeadline() {
         val lowerThird = LowerThirdHeadlineAndSummary(
-            leftImageBinding = fixedBinding(createImage("", Color.RED, Color.WHITE)),
-            placeBinding = fixedBinding(""),
-            timezoneBinding = fixedBinding(ZoneId.systemDefault()),
-            headlineBinding = fixedBinding("POLLS CLOSE ACROSS CENTRAL CANADA"),
-            subheadBinding = fixedBinding("Polls open for 30 minutes on west coast"),
-            summaryEntriesBinding = fixedBinding(
-                listOf(
-                    SummaryWithLabels.Entry(Color.RED, "LIB", "2"),
-                    SummaryWithLabels.Entry(Color.BLUE, "CON", "1")
-                )
+            leftImagePublisher = createImage("", Color.RED, Color.WHITE).asOneTimePublisher(),
+            placePublisher = "".asOneTimePublisher(),
+            timezonePublisher = ZoneId.systemDefault().asOneTimePublisher(),
+            headlinePublisher = "POLLS CLOSE ACROSS CENTRAL CANADA".asOneTimePublisher(),
+            subheadPublisher = "Polls open for 30 minutes on west coast".asOneTimePublisher(),
+            summaryEntriesPublisher =
+            listOf(
+                SummaryWithLabels.Entry(Color.RED, "LIB", "2"),
+                SummaryWithLabels.Entry(Color.BLUE, "CON", "1")
             )
+                .asOneTimePublisher()
         )
-        Assert.assertEquals("POLLS CLOSE ACROSS CENTRAL CANADA", lowerThird.headline)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ lowerThird.headline }, IsEqual("POLLS CLOSE ACROSS CENTRAL CANADA"))
     }
 
     @Test
     fun testSubhead() {
         val lowerThird = LowerThirdHeadlineAndSummary(
-            leftImageBinding = fixedBinding(createImage("", Color.RED, Color.WHITE)),
-            placeBinding = fixedBinding(""),
-            timezoneBinding = fixedBinding(ZoneId.systemDefault()),
-            headlineBinding = fixedBinding("POLLS CLOSE ACROSS CENTRAL CANADA"),
-            subheadBinding = fixedBinding("Polls open for 30 minutes on west coast"),
-            summaryEntriesBinding = fixedBinding(
-                listOf(
-                    SummaryWithLabels.Entry(Color.RED, "LIB", "2"),
-                    SummaryWithLabels.Entry(Color.BLUE, "CON", "1")
-                )
+            leftImagePublisher = createImage("", Color.RED, Color.WHITE).asOneTimePublisher(),
+            placePublisher = "".asOneTimePublisher(),
+            timezonePublisher = ZoneId.systemDefault().asOneTimePublisher(),
+            headlinePublisher = "POLLS CLOSE ACROSS CENTRAL CANADA".asOneTimePublisher(),
+            subheadPublisher = "Polls open for 30 minutes on west coast".asOneTimePublisher(),
+            summaryEntriesPublisher =
+            listOf(
+                SummaryWithLabels.Entry(Color.RED, "LIB", "2"),
+                SummaryWithLabels.Entry(Color.BLUE, "CON", "1")
             )
+                .asOneTimePublisher()
         )
-        Assert.assertEquals("Polls open for 30 minutes on west coast", lowerThird.subhead)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ lowerThird.subhead }, IsEqual("Polls open for 30 minutes on west coast"))
     }
 
     @Test
     fun testSummaryPanel() {
         val lowerThird = LowerThirdHeadlineAndSummary(
-            leftImageBinding = fixedBinding(createImage("", Color.RED, Color.WHITE)),
-            placeBinding = fixedBinding(""),
-            timezoneBinding = fixedBinding(ZoneId.systemDefault()),
-            headlineBinding = fixedBinding("POLLS CLOSE ACROSS CENTRAL CANADA"),
-            subheadBinding = fixedBinding("Polls open for 30 minutes on west coast"),
-            summaryEntriesBinding = fixedBinding(
-                listOf(
-                    SummaryWithLabels.Entry(Color.RED, "LIB", "2"),
-                    SummaryWithLabels.Entry(Color.BLUE, "CON", "1")
-                )
+            leftImagePublisher = createImage("", Color.RED, Color.WHITE).asOneTimePublisher(),
+            placePublisher = "".asOneTimePublisher(),
+            timezonePublisher = ZoneId.systemDefault().asOneTimePublisher(),
+            headlinePublisher = "POLLS CLOSE ACROSS CENTRAL CANADA".asOneTimePublisher(),
+            subheadPublisher = "Polls open for 30 minutes on west coast".asOneTimePublisher(),
+            summaryEntriesPublisher =
+            listOf(
+                SummaryWithLabels.Entry(Color.RED, "LIB", "2"),
+                SummaryWithLabels.Entry(Color.BLUE, "CON", "1")
             )
+                .asOneTimePublisher()
         )
-        Assert.assertEquals(2, lowerThird.numSummaryEntries.toLong())
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ lowerThird.numSummaryEntries }, IsEqual(2))
         Assert.assertEquals(Color.RED, lowerThird.getEntryColor(0))
         Assert.assertEquals(Color.BLUE, lowerThird.getEntryColor(1))
         Assert.assertEquals("LIB", lowerThird.getEntryLabel(0))
@@ -76,23 +82,23 @@ class LowerThirdHeadlineAndSummaryTest {
     @Throws(IOException::class)
     fun testRenderHeadlineAndSummary() {
         val lowerThird = LowerThirdHeadlineAndSummary(
-            leftImageBinding = fixedBinding(
-                createImage(
-                    LowerThirdHeadlineAndSummaryTest::class.java
-                        .classLoader
-                        .getResource("com/joecollins/graphics/lowerthird-left.png")
-                )
-            ),
-            placeBinding = fixedBinding("OTTAWA"),
-            timezoneBinding = fixedBinding(ZoneId.of("Canada/Eastern")),
-            headlineBinding = fixedBinding("CENTRAL CANADA POLLS CLOSE"),
-            subheadBinding = fixedBinding("Polls open for 30 minutes on west coast"),
-            summaryEntriesBinding = fixedBinding(
-                listOf(
-                    SummaryWithLabels.Entry(Color.RED, "LIB", "2"),
-                    SummaryWithLabels.Entry(Color.BLUE, "CON", "1")
-                )
-            ),
+            leftImagePublisher =
+            createImage(
+                LowerThirdHeadlineAndSummaryTest::class.java
+                    .classLoader
+                    .getResource("com/joecollins/graphics/lowerthird-left.png")
+            )
+                .asOneTimePublisher(),
+            placePublisher = "OTTAWA".asOneTimePublisher(),
+            timezonePublisher = ZoneId.of("Canada/Eastern").asOneTimePublisher(),
+            headlineBinding = "CENTRAL CANADA POLLS CLOSE".asOneTimePublisher(),
+            subheadBinding = "Polls open for 30 minutes on west coast".asOneTimePublisher(),
+            summaryEntriesBinding =
+            listOf(
+                SummaryWithLabels.Entry(Color.RED, "LIB", "2"),
+                SummaryWithLabels.Entry(Color.BLUE, "CON", "1")
+            )
+                .asOneTimePublisher(),
             clock = Clock.fixed(Instant.parse("2019-10-22T01:30:00Z"), ZoneId.systemDefault())
         )
         lowerThird.setSize(1024, 50)

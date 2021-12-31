@@ -1,7 +1,8 @@
 package com.joecollins.graphics.components.lowerthird
 
-import com.joecollins.bindings.Binding
 import com.joecollins.graphics.utils.StandardFont
+import com.joecollins.pubsub.Subscriber
+import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Dimension
@@ -22,6 +23,7 @@ import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 import java.util.concurrent.Executors
+import java.util.concurrent.Flow
 import java.util.concurrent.TimeUnit
 import javax.imageio.ImageIO
 import javax.swing.JLabel
@@ -30,19 +32,19 @@ import javax.swing.border.EmptyBorder
 import kotlin.math.max
 
 open class LowerThird internal constructor(
-    private val leftImageBinding: Binding<Image>,
-    private val placeBinding: Binding<String>,
-    private val timezoneBinding: Binding<ZoneId>,
+    private val leftImagePublisher: Flow.Publisher<out Image>,
+    private val placePublisher: Flow.Publisher<out String>,
+    private val timezonePublisher: Flow.Publisher<out ZoneId>,
     private val clock: Clock,
     private val showTimeZone: Boolean = false
 ) : JPanel() {
 
     constructor(
-        leftImageBinding: Binding<Image>,
-        placeBinding: Binding<String>,
-        timezoneBinding: Binding<ZoneId>,
+        leftImagePublisher: Flow.Publisher<out Image>,
+        placePublisher: Flow.Publisher<out String>,
+        timezonePublisher: Flow.Publisher<out ZoneId>,
         showTimeZone: Boolean = false
-    ) : this(leftImageBinding, placeBinding, timezoneBinding, Clock.systemDefaultZone(), showTimeZone)
+    ) : this(leftImagePublisher, placePublisher, timezonePublisher, Clock.systemDefaultZone(), showTimeZone)
 
     private val leftPanel: ImagePanel = ImagePanel()
     private val rightPanel = PlaceAndTimePanel()
@@ -238,8 +240,8 @@ open class LowerThird internal constructor(
         add(leftPanel, BorderLayout.WEST)
         add(rightPanel, BorderLayout.EAST)
         preferredSize = Dimension(1024, 50)
-        this.leftImageBinding.bind { leftPanel.setImage(it) }
-        this.placeBinding.bind { rightPanel.place = it }
-        this.timezoneBinding.bind { rightPanel.timezone = it }
+        this.leftImagePublisher.subscribe(Subscriber(eventQueueWrapper { leftPanel.setImage(it) }))
+        this.placePublisher.subscribe(Subscriber(eventQueueWrapper { rightPanel.place = it }))
+        this.timezonePublisher.subscribe(Subscriber(eventQueueWrapper { rightPanel.timezone = it }))
     }
 }

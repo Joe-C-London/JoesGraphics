@@ -1,7 +1,9 @@
 package com.joecollins.graphics.components.lowerthird
 
-import com.joecollins.bindings.Binding
 import com.joecollins.graphics.utils.StandardFont
+import com.joecollins.pubsub.Subscriber
+import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
+import com.joecollins.pubsub.asOneTimePublisher
 import java.awt.Color
 import java.awt.Component
 import java.awt.Container
@@ -12,6 +14,7 @@ import java.awt.Graphics2D
 import java.awt.GridLayout
 import java.awt.LayoutManager
 import java.awt.RenderingHints
+import java.util.concurrent.Flow
 import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.border.EmptyBorder
@@ -19,11 +22,11 @@ import javax.swing.border.MatteBorder
 import kotlin.math.roundToInt
 
 class SummaryFromBothEnds(
-    private val headlineBinding: Binding<String>,
-    private val totalBinding: Binding<Int>,
-    private val leftBinding: Binding<Entry?>,
-    private val rightBinding: Binding<Entry?>,
-    private val middleBinding: Binding<Entry?> = Binding.fixedBinding(null)
+    private val headlinePublisher: Flow.Publisher<out String>,
+    private val totalPublisher: Flow.Publisher<out Int>,
+    private val leftPublisher: Flow.Publisher<out Entry?>,
+    private val rightPublisher: Flow.Publisher<out Entry?>,
+    private val middlePublisher: Flow.Publisher<out Entry?> = (null as Entry?).asOneTimePublisher()
 ) : JPanel() {
 
     private val headlinePanel: HeadlinePanel = HeadlinePanel()
@@ -226,10 +229,10 @@ class SummaryFromBothEnds(
         add(headlinePanel)
         add(entryPanel)
 
-        this.headlineBinding.bind { headlinePanel.top = it }
-        this.totalBinding.bind { entryPanel.total = it }
-        this.leftBinding.bind { entryPanel.left = it }
-        this.rightBinding.bind { entryPanel.right = it }
-        this.middleBinding.bind { entryPanel.middle = it }
+        this.headlinePublisher.subscribe(Subscriber(eventQueueWrapper { headlinePanel.top = it }))
+        this.totalPublisher.subscribe(Subscriber(eventQueueWrapper { entryPanel.total = it }))
+        this.leftPublisher.subscribe(Subscriber(eventQueueWrapper { entryPanel.left = it }))
+        this.rightPublisher.subscribe(Subscriber(eventQueueWrapper { entryPanel.right = it }))
+        this.middlePublisher.subscribe(Subscriber(eventQueueWrapper { entryPanel.middle = it }))
     }
 }

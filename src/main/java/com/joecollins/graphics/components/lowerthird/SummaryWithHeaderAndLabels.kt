@@ -1,8 +1,9 @@
 package com.joecollins.graphics.components.lowerthird
 
-import com.joecollins.bindings.Binding
 import com.joecollins.graphics.utils.ColorUtils
 import com.joecollins.graphics.utils.StandardFont
+import com.joecollins.pubsub.Subscriber
+import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
 import java.awt.Color
 import java.awt.Component
 import java.awt.Container
@@ -12,14 +13,15 @@ import java.awt.GridBagLayout
 import java.awt.GridLayout
 import java.awt.LayoutManager
 import java.util.ArrayList
+import java.util.concurrent.Flow
 import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.border.EmptyBorder
 import javax.swing.border.MatteBorder
 
 class SummaryWithHeaderAndLabels(
-    private val headlineBinding: Binding<String>,
-    private val entriesBinding: Binding<List<Entry>>
+    private val headlinePublisher: Flow.Publisher<out String>,
+    private val entriesPublisher: Flow.Publisher<out List<Entry>>
 ) : JPanel() {
     private val headlinePanel: HeadlinePanel = HeadlinePanel()
     private val entryPanels: MutableList<EntryPanel> = ArrayList()
@@ -161,27 +163,31 @@ class SummaryWithHeaderAndLabels(
         border = MatteBorder(1, 1, 1, 1, Color.BLACK)
         add(headlinePanel)
 
-        this.headlineBinding.bind { text -> headlinePanel.top = text }
-        this.entriesBinding.bind { entries ->
-            while (entryPanels.size < entries.size) {
-                val newPanel = EntryPanel()
-                add(newPanel)
-                entryPanels.add(newPanel)
-            }
-            while (entryPanels.size > entries.size) {
-                remove(entryPanels.removeAt(entries.size))
-            }
-            entries.forEachIndexed { idx, entry ->
-                entryPanels[idx].bottomPanel.background = entry.color
-                val foreground = ColorUtils.foregroundToContrast(entry.color)
-                entryPanels[idx].bottomHeaderLabel.foreground = foreground
-                entryPanels[idx].bottomHeaderLabel.text = entry.label
-                entryPanels[idx].bottomValueLabel.foreground = foreground
-                entryPanels[idx].bottomValueLabel.text = entry.value
-            }
-            invalidate()
-            revalidate()
-            repaint()
-        }
+        this.headlinePublisher.subscribe(Subscriber(eventQueueWrapper { text -> headlinePanel.top = text }))
+        this.entriesPublisher.subscribe(
+            Subscriber(
+                eventQueueWrapper { entries ->
+                    while (entryPanels.size < entries.size) {
+                        val newPanel = EntryPanel()
+                        add(newPanel)
+                        entryPanels.add(newPanel)
+                    }
+                    while (entryPanels.size > entries.size) {
+                        remove(entryPanels.removeAt(entries.size))
+                    }
+                    entries.forEachIndexed { idx, entry ->
+                        entryPanels[idx].bottomPanel.background = entry.color
+                        val foreground = ColorUtils.foregroundToContrast(entry.color)
+                        entryPanels[idx].bottomHeaderLabel.foreground = foreground
+                        entryPanels[idx].bottomHeaderLabel.text = entry.label
+                        entryPanels[idx].bottomValueLabel.foreground = foreground
+                        entryPanels[idx].bottomValueLabel.text = entry.value
+                    }
+                    invalidate()
+                    revalidate()
+                    repaint()
+                }
+            )
+        )
     }
 }
