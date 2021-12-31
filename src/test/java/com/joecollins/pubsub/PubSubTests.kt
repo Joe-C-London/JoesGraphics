@@ -5,6 +5,7 @@ import org.hamcrest.core.IsEqual
 import org.hamcrest.core.IsNull
 import org.junit.Assert
 import org.junit.Test
+import java.util.LinkedList
 import java.util.concurrent.Flow
 import java.util.concurrent.SubmissionPublisher
 import java.util.concurrent.TimeUnit
@@ -194,5 +195,49 @@ class PubSubTests {
         publisher2.submit("2")
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS).pollDelay(1, TimeUnit.MILLISECONDS)
             .until({ output }, IsEqual("12"))
+    }
+
+    @Test
+    fun testPublishInSequence() {
+        val output = LinkedList<Int>()
+        val publisher = Publisher<Int>()
+        val subscriber = Subscriber<Int> { output.add(it) }
+        publisher.subscribe(subscriber)
+
+        val limit = 1000
+        (0..limit).forEach { publisher.submit(it) }
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ output.size }, IsEqual(limit + 1))
+        Assert.assertEquals((0..limit).toList(), output)
+    }
+
+    @Test
+    fun testPublishInSequenceAllAtOnce() {
+        val output = LinkedList<Int>()
+        val publisher = Publisher<Int>()
+        val limit = 1000
+        val subscriber = object : Flow.Subscriber<Int> {
+            override fun onSubscribe(subscription: Flow.Subscription) {
+                subscription.request(limit + 1L)
+            }
+
+            override fun onNext(item: Int) {
+                output.add(item)
+            }
+
+            override fun onError(throwable: Throwable) {
+                throw throwable
+            }
+
+            override fun onComplete() {
+                Assert.fail("Shouldn't be completing")
+            }
+        }
+        publisher.subscribe(subscriber)
+
+        (0..limit).forEach { publisher.submit(it) }
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ output.size }, IsEqual(limit + 1))
+        Assert.assertEquals((0..limit).toList(), output)
     }
 }

@@ -1,6 +1,7 @@
 package com.joecollins.pubsub
 
 import org.apache.commons.lang3.tuple.MutablePair
+import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Flow
 import java.util.concurrent.LinkedBlockingQueue
 
@@ -42,6 +43,7 @@ class Publisher<T> : Flow.Publisher<T>, AutoCloseable {
         private var waitingFor = 0L
         private var cancelled = false
         private val queue = LinkedBlockingQueue<Wrapper<T>>()
+        private var future = CompletableFuture.completedFuture<Void>(null)
 
         fun send(item: T) {
             synchronized(this) {
@@ -53,6 +55,9 @@ class Publisher<T> : Flow.Publisher<T>, AutoCloseable {
         }
 
         override fun request(n: Long) {
+            if (n <= 0) {
+                subscriber.onError(IllegalArgumentException("Cannot request $n items, as this must be greater than zero"))
+            }
             synchronized(this) {
                 waitingFor += n
                 process()
@@ -61,10 +66,13 @@ class Publisher<T> : Flow.Publisher<T>, AutoCloseable {
 
         private fun process() {
             while (waitingFor > 0 && !queue.isEmpty()) {
-                try {
-                    subscriber.onNext(queue.take().item)
-                } catch (e: Exception) {
-                    subscriber.onError(e)
+                val next = queue.take().item
+                future = future.thenRunAsync {
+                    try {
+                        subscriber.onNext(next)
+                    } catch (e: Exception) {
+                        subscriber.onError(e)
+                    }
                 }
                 waitingFor--
             }
@@ -73,6 +81,8 @@ class Publisher<T> : Flow.Publisher<T>, AutoCloseable {
         override fun cancel() {
             synchronized(this) {
                 cancelled = true
+                queue.clear()
+                waitingFor = 0L
             }
         }
     }

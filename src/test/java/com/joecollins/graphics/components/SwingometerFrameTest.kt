@@ -27,6 +27,8 @@ class SwingometerFrameTest {
             numBucketsPerSidePublisher = 20.asOneTimePublisher(),
             dotsPublisher = emptyList<SwingometerFrame.Dot>().asOneTimePublisher()
         )
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.leftColor }, IsEqual(Color.BLUE))
         Assert.assertEquals(Color.BLUE, frame.leftColor)
         Assert.assertEquals(Color.RED, frame.rightColor)
     }
