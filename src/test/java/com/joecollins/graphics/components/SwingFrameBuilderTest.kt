@@ -137,6 +137,8 @@ class SwingFrameBuilderTest {
             prevBinding, currBinding, compareBy { partyOrder.indexOf(it) }
         )
             .build()
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ swingFrame.getBottomText() }, IsEqual("10.0% SWING CON TO LIB"))
         Assert.assertEquals(
             setOf(Color.BLUE, Color.RED),
             setOf(swingFrame.getLeftColor(), swingFrame.getRightColor())

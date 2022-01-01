@@ -65,7 +65,8 @@ class LowerThirdHeadlineAndSummaryBothEndsTest {
             summaryLeftPublisher = SummaryFromBothEnds.Entry(Color.BLUE, "CLINTON", 232).asOneTimePublisher(),
             summaryRightPublisher = SummaryFromBothEnds.Entry(Color.RED, "TRUMP", 306).asOneTimePublisher()
         )
-        Assert.assertEquals("270 TO WIN", lowerThird.summaryHeader)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ lowerThird.summaryHeader }, IsEqual("270 TO WIN"))
         Assert.assertEquals(538, lowerThird.total.toLong())
     }
 

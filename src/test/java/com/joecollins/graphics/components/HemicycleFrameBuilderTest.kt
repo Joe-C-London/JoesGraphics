@@ -324,6 +324,8 @@ class HemicycleFrameBuilderTest {
         Assert.assertEquals(0, frame.getRightChangeBarSize(0).toLong())
         Assert.assertEquals(0, frame.getRightChangeBarSize(1).toLong())
         result.setResult(gop, false)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.getDotColor(0) }, IsEqual(lighten(Color.RED)))
         Assert.assertEquals(Color.RED, frame.getDotBorder(0))
         Assert.assertEquals(lighten(Color.RED), frame.getDotColor(0))
         Assert.assertEquals(0, frame.getLeftSeatBarSize(0).toLong())

@@ -26,6 +26,8 @@ class CountdownFrameTest {
             labelFunc = { CountdownFrame.formatDDHHMMSS(it) }
         )
         frame.clock = Clock.fixed(Instant.parse("2020-07-04T12:34:56Z"), ZoneId.of("UTC"))
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.getTimeRemaining().toDays() }, IsEqual(1L))
         Assert.assertEquals(
             Duration.ofDays(1).plusHours(10).plusMinutes(25).plusSeconds(4), frame.getTimeRemaining()
         )
