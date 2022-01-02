@@ -1,9 +1,9 @@
 package com.joecollins.graphics.components
 
 import com.joecollins.bindings.Bindable
-import com.joecollins.graphics.utils.BindableWrapper
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.graphics.utils.ShapefileReader.readShapes
+import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
 import org.awaitility.Awaitility
 import org.hamcrest.core.IsEqual
@@ -123,18 +123,18 @@ class MapFrameTest {
         val shapes = loadShapes { getDistrictColor(it) }
         val zoomBox = loadCityBox()
         val regions = shapes.map { it.shape }
-        val header = BindableWrapper("PEI")
-        val focusBox = BindableWrapper<Rectangle2D?>(null)
+        val header = Publisher("PEI")
+        val focusBox = Publisher<Rectangle2D?>(null)
         val mapFrame = MapFrame(
-            headerPublisher = header.binding.toPublisher(),
+            headerPublisher = header,
             shapesPublisher = shapes.map { Pair(it.shape, it.color) }.asOneTimePublisher(),
-            focusBoxPublisher = focusBox.binding.toPublisher(),
+            focusBoxPublisher = focusBox,
             outlineShapesPublisher = regions.asOneTimePublisher()
         )
         mapFrame.setSize(256, 128)
         compareRendering("MapFrame", "RenderBorders-1", mapFrame)
-        focusBox.value = zoomBox
-        header.value = "CHARLOTTETOWN"
+        focusBox.submit(zoomBox)
+        header.submit("CHARLOTTETOWN")
         compareRendering("MapFrame", "RenderBorders-2", mapFrame)
     }
 

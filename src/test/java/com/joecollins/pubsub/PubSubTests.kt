@@ -240,4 +240,26 @@ class PubSubTests {
             .until({ output.size }, IsEqual(limit + 1))
         Assert.assertEquals((0..limit).toList(), output)
     }
+
+    @Test
+    fun testItemInCtor() {
+        var output: String? = null
+        val publisher = Publisher("TEST")
+        val subscriber = Subscriber<String> { output = it }
+        publisher.subscribe(subscriber)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS).pollDelay(1, TimeUnit.MILLISECONDS)
+            .until({ output }, IsEqual("TEST"))
+    }
+
+    @Test
+    fun testMapElements() {
+        var output: List<Int>? = null
+        val publisher = Publisher<List<String>>()
+        val subscriber = Subscriber<List<Int>> { output = it }
+        publisher.mapElements { it.length }.subscribe(subscriber)
+
+        publisher.submit(listOf("TEST", "TEST 2"))
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ output }, IsEqual(listOf(4, 6)))
+    }
 }

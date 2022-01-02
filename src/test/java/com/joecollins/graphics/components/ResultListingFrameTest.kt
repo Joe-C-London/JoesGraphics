@@ -2,9 +2,10 @@ package com.joecollins.graphics.components
 
 import com.joecollins.bindings.Bindable
 import com.joecollins.bindings.mapElements
-import com.joecollins.graphics.utils.BindableWrapper
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
+import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
+import com.joecollins.pubsub.mapElements
 import org.awaitility.Awaitility
 import org.hamcrest.core.IsEqual
 import org.junit.Assert
@@ -37,18 +38,18 @@ class ResultListingFrameTest {
         rawItems.add(Item("BORDEN-KINKORA", Color.WHITE, Color.BLACK, Color.BLUE))
         rawItems.add(Item("STRATFORD-KINLOCK", Color.WHITE, Color.BLACK, Color.BLUE))
         rawItems.add(Item("KENSINGTON-MALPEQUE", Color.WHITE, Color.BLACK, Color.BLUE))
-        val items: BindableWrapper<List<Item>> = BindableWrapper(rawItems)
+        val items: Publisher<List<Item>> = Publisher(rawItems)
         val frame = ResultListingFrame(
             headerPublisher = (null as String?).asOneTimePublisher(),
             numRowsPublisher = 20.asOneTimePublisher(),
-            itemsPublisher = items.binding.mapElements {
+            itemsPublisher = items.mapElements {
                 ResultListingFrame.Item(
                     text = it.text,
                     border = it.border,
                     background = it.background,
                     foreground = it.foreground
                 )
-            }.toPublisher()
+            }
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.getNumItems() }, IsEqual(8))
@@ -59,7 +60,7 @@ class ResultListingFrameTest {
 
         rawItems[4].foreground = Color.WHITE
         rawItems[4].background = Color.BLUE
-        items.value = rawItems
+        items.submit(rawItems)
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.getBackground(4) }, IsEqual(Color.BLUE))
         Assert.assertEquals(Color.BLUE, frame.getBackground(4))
@@ -81,19 +82,19 @@ class ResultListingFrameTest {
         rawItems.add(Item("Montague-Kilmuir", Color.WHITE, Color.BLACK, Color.RED)) // 10.8
         rawItems.add(Item("Charlottetown-Victoria Park", Color.WHITE, Color.BLACK, Color.RED)) // 11.9
         rawItems.add(Item("Cornwall-Meadowbank", Color.WHITE, Color.BLACK, Color.RED)) // 12.5
-        val items: BindableWrapper<List<Item>> = BindableWrapper(rawItems)
+        val items: Publisher<List<Item>> = Publisher(rawItems)
         val frame = ResultListingFrame(
             headerPublisher = "PC TARGETS".asOneTimePublisher(),
             borderColorPublisher = Color.BLUE.asOneTimePublisher(),
             numRowsPublisher = 10.asOneTimePublisher(),
-            itemsPublisher = items.binding.mapElements {
+            itemsPublisher = items.mapElements {
                 ResultListingFrame.Item(
                     text = it.text.uppercase(),
                     border = it.border,
                     background = it.background,
                     foreground = it.foreground
                 )
-            }.toPublisher()
+            }
         )
         frame.setSize(512, 512)
         compareRendering("ResultListingFrame", "FullColumn-1", frame)
@@ -107,7 +108,7 @@ class ResultListingFrameTest {
             }
             rawItems[i].foreground = Color.WHITE
         }
-        items.value = rawItems
+        items.submit(rawItems)
         compareRendering("ResultListingFrame", "FullColumn-2", frame)
     }
 
@@ -115,18 +116,18 @@ class ResultListingFrameTest {
     @Throws(IOException::class)
     fun testVaryingItems() {
         val rawItems: MutableList<Item> = ArrayList()
-        val items: BindableWrapper<List<Item>> = BindableWrapper(rawItems)
+        val items: Publisher<List<Item>> = Publisher(rawItems)
         val frame = ResultListingFrame(
             headerPublisher = "SEATS CHANGING".asOneTimePublisher(),
             numRowsPublisher = 10.asOneTimePublisher(),
-            itemsPublisher = items.binding.mapElements {
+            itemsPublisher = items.mapElements {
                 ResultListingFrame.Item(
                     text = it.text.uppercase(),
                     border = it.border,
                     background = it.background,
                     foreground = it.foreground
                 )
-            }.toPublisher()
+            }
         )
         frame.setSize(512, 256)
         compareRendering("ResultListingFrame", "Varying-1", frame)
@@ -136,7 +137,7 @@ class ResultListingFrameTest {
         rawItems.add(Item("Charlottetown-Victoria Park", Color.GREEN.darker(), Color.WHITE, Color.RED))
         rawItems.add(Item("Summerside-South Drive", Color.GREEN.darker(), Color.WHITE, Color.RED))
         rawItems.sortBy { it.text }
-        items.value = rawItems
+        items.submit(rawItems)
         compareRendering("ResultListingFrame", "Varying-2", frame)
 
         rawItems.add(Item("Mermaid-Stratford", Color.GREEN.darker(), Color.WHITE, Color.RED))
@@ -147,7 +148,7 @@ class ResultListingFrameTest {
         rawItems.add(Item("Summerside-Wilmot", Color.GREEN.darker(), Color.WHITE, Color.RED))
         rawItems.add(Item("Tyne Valley-Sherbrooke", Color.GREEN.darker(), Color.WHITE, Color.RED))
         rawItems.sortBy { it.text }
-        items.value = rawItems
+        items.submit(rawItems)
         compareRendering("ResultListingFrame", "Varying-3", frame)
     }
 
@@ -155,19 +156,19 @@ class ResultListingFrameTest {
     @Throws(IOException::class)
     fun testVaryingItemsInReverse() {
         val rawItems: MutableList<Item> = ArrayList()
-        val items: BindableWrapper<List<Item>> = BindableWrapper(rawItems)
+        val items: Publisher<List<Item>> = Publisher(rawItems)
         val frame = ResultListingFrame(
             headerPublisher = "SEATS CHANGING".asOneTimePublisher(),
             numRowsPublisher = 10.asOneTimePublisher(),
             reversedPublisher = true.asOneTimePublisher(),
-            itemsPublisher = items.binding.mapElements {
+            itemsPublisher = items.mapElements {
                 ResultListingFrame.Item(
                     text = it.text.uppercase(),
                     border = it.border,
                     background = it.background,
                     foreground = it.foreground
                 )
-            }.toPublisher()
+            }
         )
         frame.setSize(512, 256)
         compareRendering("ResultListingFrame", "Reversed-1", frame)
@@ -177,7 +178,7 @@ class ResultListingFrameTest {
         rawItems.add(Item("Charlottetown-Victoria Park", Color.GREEN.darker(), Color.WHITE, Color.RED))
         rawItems.add(Item("Summerside-South Drive", Color.GREEN.darker(), Color.WHITE, Color.RED))
         rawItems.sortBy { it.text }
-        items.value = rawItems
+        items.submit(rawItems)
         compareRendering("ResultListingFrame", "Reversed-2", frame)
 
         rawItems.add(Item("Mermaid-Stratford", Color.GREEN.darker(), Color.WHITE, Color.RED))
@@ -188,7 +189,7 @@ class ResultListingFrameTest {
         rawItems.add(Item("Summerside-Wilmot", Color.GREEN.darker(), Color.WHITE, Color.RED))
         rawItems.add(Item("Tyne Valley-Sherbrooke", Color.GREEN.darker(), Color.WHITE, Color.RED))
         rawItems.sortBy { it.text }
-        items.value = rawItems
+        items.submit(rawItems)
         compareRendering("ResultListingFrame", "Reversed-3", frame)
     }
 

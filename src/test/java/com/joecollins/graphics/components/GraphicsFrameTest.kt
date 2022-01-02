@@ -1,10 +1,9 @@
 package com.joecollins.graphics.components
 
-import com.joecollins.bindings.Bindable
-import com.joecollins.bindings.Binding.Companion.fixedBinding
-import com.joecollins.bindings.Binding.Companion.propertyBinding
-import com.joecollins.graphics.utils.BindableWrapper
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
+import com.joecollins.pubsub.Publisher
+import com.joecollins.pubsub.asOneTimePublisher
+import com.joecollins.pubsub.map
 import org.awaitility.Awaitility
 import org.hamcrest.core.IsEqual
 import org.junit.Test
@@ -16,25 +15,23 @@ import javax.swing.JPanel
 import kotlin.Throws
 
 class GraphicsFrameTest {
-    private class TestObject : Bindable<TestObject, TestObject.Properties>() {
-        enum class Properties {
-            NUM_POLLS
-        }
+    private class TestObject {
 
         private var _numPolls = 0
+        val numPollsPublisher = Publisher(numPolls)
 
         var numPolls: Int
             get() = _numPolls
             set(numPolls) {
                 this._numPolls = numPolls
-                onPropertyRefreshed(Properties.NUM_POLLS)
+                numPollsPublisher.submit(numPolls)
             }
     }
 
     @Test
     fun testFixedHeader() {
         val graphicsFrame = GraphicsFrame(
-            headerPublisher = fixedBinding("HEADER").toPublisher()
+            headerPublisher = "HEADER".asOneTimePublisher()
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ graphicsFrame.header }, IsEqual("HEADER"))
@@ -43,7 +40,7 @@ class GraphicsFrameTest {
     @Test
     fun testDynamicHeader() {
         val graphicsFrame = GraphicsFrame(
-            headerPublisher = propertyBinding(TestObject(), { it.numPolls.toString() + " POLLS REPORTING" }, TestObject.Properties.NUM_POLLS).toPublisher()
+            headerPublisher = TestObject().numPollsPublisher.map { "$it POLLS REPORTING" }
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ graphicsFrame.header }, IsEqual("0 POLLS REPORTING"))
@@ -53,7 +50,7 @@ class GraphicsFrameTest {
     fun testDynamicHeaderRefreshed() {
         val obj = TestObject()
         val graphicsFrame = GraphicsFrame(
-            headerPublisher = propertyBinding(obj, { it.numPolls.toString() + " POLLS REPORTING" }, TestObject.Properties.NUM_POLLS).toPublisher()
+            headerPublisher = obj.numPollsPublisher.map { "$it POLLS REPORTING" }
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ graphicsFrame.header }, IsEqual("0 POLLS REPORTING"))
@@ -65,8 +62,8 @@ class GraphicsFrameTest {
     @Test
     fun testFixedNotes() {
         val graphicsFrame = GraphicsFrame(
-            headerPublisher = fixedBinding(null).toPublisher(),
-            notesPublisher = fixedBinding("SOURCE: BBC").toPublisher()
+            headerPublisher = (null as String?).asOneTimePublisher(),
+            notesPublisher = "SOURCE: BBC".asOneTimePublisher()
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ graphicsFrame.notes }, IsEqual("SOURCE: BBC"))
@@ -75,8 +72,8 @@ class GraphicsFrameTest {
     @Test
     fun testBorderColor() {
         val graphicsFrame = GraphicsFrame(
-            headerPublisher = fixedBinding(null).toPublisher(),
-            borderColorPublisher = fixedBinding(Color.BLUE).toPublisher()
+            headerPublisher = (null as String?).asOneTimePublisher(),
+            borderColorPublisher = Color.BLUE.asOneTimePublisher()
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ graphicsFrame.borderColor }, IsEqual(Color.BLUE))
@@ -86,7 +83,7 @@ class GraphicsFrameTest {
     @Throws(IOException::class)
     fun testRenderingHeaderOnly() {
         val graphicsFrame: GraphicsFrame = object : GraphicsFrame(
-            headerPublisher = fixedBinding("HEADER").toPublisher()
+            headerPublisher = "HEADER".asOneTimePublisher()
         ) {
             init {
                 val panel = JPanel()
@@ -102,8 +99,8 @@ class GraphicsFrameTest {
     @Throws(IOException::class)
     fun testRenderingHeaderAndNotes() {
         val graphicsFrame: GraphicsFrame = object : GraphicsFrame(
-            headerPublisher = fixedBinding("HEADER").toPublisher(),
-            notesPublisher = fixedBinding("SOURCE: BBC").toPublisher()
+            headerPublisher = "HEADER".asOneTimePublisher(),
+            notesPublisher = "SOURCE: BBC".asOneTimePublisher()
         ) {
             init {
                 val panel = JPanel()
@@ -119,7 +116,7 @@ class GraphicsFrameTest {
     @Throws(IOException::class)
     fun testRenderingNoHeader() {
         val graphicsFrame: GraphicsFrame = object : GraphicsFrame(
-            headerPublisher = fixedBinding(null).toPublisher()
+            headerPublisher = (null as String?).asOneTimePublisher()
         ) {
             init {
                 val panel = JPanel()
@@ -135,9 +132,9 @@ class GraphicsFrameTest {
     @Throws(IOException::class)
     fun testRenderingBorderColor() {
         val graphicsFrame: GraphicsFrame = object : GraphicsFrame(
-            headerPublisher = fixedBinding("HEADER").toPublisher(),
-            notesPublisher = fixedBinding("SOURCE: BBC").toPublisher(),
-            borderColorPublisher = fixedBinding(Color.RED).toPublisher()
+            headerPublisher = "HEADER".asOneTimePublisher(),
+            notesPublisher = "SOURCE: BBC".asOneTimePublisher(),
+            borderColorPublisher = Color.RED.asOneTimePublisher()
         ) {
             init {
                 val panel = JPanel()
@@ -153,8 +150,8 @@ class GraphicsFrameTest {
     @Throws(IOException::class)
     fun testRenderingAccents() {
         val graphicsFrame: GraphicsFrame = object : GraphicsFrame(
-            headerPublisher = fixedBinding("\u00c7A C'EST GR\u00c2VE").toPublisher(),
-            notesPublisher = fixedBinding("JOYEUX NO\u00cbL, GAR\u00c7ON!").toPublisher()
+            headerPublisher = "\u00c7A C'EST GR\u00c2VE".asOneTimePublisher(),
+            notesPublisher = "JOYEUX NO\u00cbL, GAR\u00c7ON!".asOneTimePublisher()
         ) {
             init {
                 val panel = JPanel()
@@ -169,9 +166,9 @@ class GraphicsFrameTest {
     @Test
     @Throws(IOException::class)
     fun testHeaderFontSize() {
-        val headerWrapper = BindableWrapper("THIS IS A HEADER")
+        val headerWrapper = Publisher("THIS IS A HEADER")
         val graphicsFrame: GraphicsFrame = object : GraphicsFrame(
-            headerPublisher = headerWrapper.binding.toPublisher()
+            headerPublisher = headerWrapper
         ) {
             init {
                 val panel = JPanel()
@@ -181,7 +178,7 @@ class GraphicsFrameTest {
         }
         graphicsFrame.setSize(256, 128)
         compareRendering("GraphicsFrame", "HeaderFontSize-1", graphicsFrame)
-        headerWrapper.value = "THIS IS A VERY MUCH LONGER HEADER"
+        headerWrapper.submit("THIS IS A VERY MUCH LONGER HEADER")
         compareRendering("GraphicsFrame", "HeaderFontSize-2", graphicsFrame)
         graphicsFrame.setSize(512, 128)
         compareRendering("GraphicsFrame", "HeaderFontSize-3", graphicsFrame)
@@ -190,10 +187,10 @@ class GraphicsFrameTest {
     @Test
     @Throws(IOException::class)
     fun testRenderHeaderAlignment() {
-        val alignment = BindableWrapper(GraphicsFrame.Alignment.CENTER)
+        val alignment = Publisher(GraphicsFrame.Alignment.CENTER)
         val graphicsFrame: GraphicsFrame = object : GraphicsFrame(
-            headerPublisher = fixedBinding("HEADER").toPublisher(),
-            headerAlignmentPublisher = alignment.binding.toPublisher()
+            headerPublisher = "HEADER".asOneTimePublisher(),
+            headerAlignmentPublisher = alignment
         ) {
             init {
                 val panel = JPanel()
@@ -203,9 +200,9 @@ class GraphicsFrameTest {
         }
         graphicsFrame.setSize(256, 128)
         compareRendering("GraphicsFrame", "HeaderAlignment-1", graphicsFrame)
-        alignment.value = GraphicsFrame.Alignment.LEFT
+        alignment.submit(GraphicsFrame.Alignment.LEFT)
         compareRendering("GraphicsFrame", "HeaderAlignment-2", graphicsFrame)
-        alignment.value = GraphicsFrame.Alignment.RIGHT
+        alignment.submit(GraphicsFrame.Alignment.RIGHT)
         compareRendering("GraphicsFrame", "HeaderAlignment-3", graphicsFrame)
     }
 }

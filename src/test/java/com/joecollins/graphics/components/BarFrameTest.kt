@@ -1,11 +1,12 @@
 package com.joecollins.graphics.components
 
 import com.joecollins.bindings.Bindable
-import com.joecollins.bindings.mapElements
 import com.joecollins.graphics.ImageGenerator.createHalfTickShape
-import com.joecollins.graphics.utils.BindableWrapper
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
+import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
+import com.joecollins.pubsub.map
+import com.joecollins.pubsub.mapElements
 import org.awaitility.Awaitility
 import org.hamcrest.core.IsEqual
 import org.junit.Assert
@@ -26,7 +27,7 @@ import kotlin.math.sign
 class BarFrameTest {
     @Test
     fun testNumBars() {
-        val results = BindableWrapper(
+        val results = Publisher(
             listOf(
                 ElectionResult("LIBERAL", Color.RED, 157),
                 ElectionResult("CONSERVATIVE", Color.BLUE, 121),
@@ -38,7 +39,7 @@ class BarFrameTest {
         )
         val frame = BarFrame(
             headerPublisher = (null as String?).asOneTimePublisher(),
-            barsPublisher = results.binding.mapElements { BarFrame.Bar("", "", null, listOf()) }.toPublisher()
+            barsPublisher = results.mapElements { BarFrame.Bar("", "", null, listOf()) }
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numBars }, IsEqual(6))
@@ -47,14 +48,14 @@ class BarFrameTest {
     @Test
     fun testAddRemoveBars() {
         val list = mutableListOf<ElectionResult>()
-        val results = BindableWrapper(list)
+        val results = Publisher(list)
         val frame = BarFrame(
             headerPublisher = (null as String?).asOneTimePublisher(),
-            barsPublisher = results.binding.mapElements { BarFrame.Bar("", "", null, listOf()) }.toPublisher()
+            barsPublisher = results.mapElements { BarFrame.Bar("", "", null, listOf()) }
         )
         Assert.assertEquals(0, frame.numBars.toLong())
         list.add(ElectionResult("LIBERAL", Color.RED, 1))
-        results.value = list
+        results.submit(list)
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numBars }, IsEqual(1))
         list.addAll(
@@ -63,26 +64,26 @@ class BarFrameTest {
                 ElectionResult("NEW DEMOCRATIC PARTY", Color.ORANGE, 1)
             )
         )
-        results.value = list
+        results.submit(list)
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numBars }, IsEqual(3))
         list.removeAt(2)
-        results.value = list
+        results.submit(list)
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numBars }, IsEqual(2))
         list.removeIf { it.getPartyName() != "LIBERAL" }
-        results.value = list
+        results.submit(list)
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numBars }, IsEqual(1))
         list.clear()
-        results.value = list
+        results.submit(list)
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numBars }, IsEqual(0))
     }
 
     @Test
     fun testLeftTextBinding() {
-        val results = BindableWrapper(
+        val results = Publisher(
             listOf(
                 ElectionResult("LIBERAL", Color.RED, 157),
                 ElectionResult("CONSERVATIVE", Color.BLUE, 121),
@@ -94,7 +95,7 @@ class BarFrameTest {
         )
         val frame = BarFrame(
             headerPublisher = (null as String?).asOneTimePublisher(),
-            barsPublisher = results.binding.mapElements { BarFrame.Bar(it.getPartyName(), "", null, listOf()) }.toPublisher()
+            barsPublisher = results.mapElements { BarFrame.Bar(it.getPartyName(), "", null, listOf()) }
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numBars }, IsEqual(6))
@@ -108,7 +109,7 @@ class BarFrameTest {
 
     @Test
     fun testRightTextBinding() {
-        val results = BindableWrapper(
+        val results = Publisher(
             listOf(
                 ElectionResult("LIBERAL", Color.RED, 157),
                 ElectionResult("CONSERVATIVE", Color.BLUE, 121),
@@ -120,7 +121,7 @@ class BarFrameTest {
         )
         val frame = BarFrame(
             headerPublisher = (null as String?).asOneTimePublisher(),
-            barsPublisher = results.binding.mapElements { BarFrame.Bar(it.getPartyName(), "${it.getNumSeats()}", null, listOf()) }.toPublisher()
+            barsPublisher = results.mapElements { BarFrame.Bar(it.getPartyName(), "${it.getNumSeats()}", null, listOf()) }
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numBars }, IsEqual(6))
@@ -142,10 +143,10 @@ class BarFrameTest {
             ElectionResult("GREEN", Color.GREEN, 0, 3),
             ElectionResult("INDEPENDENT", Color.LIGHT_GRAY, 0, 1)
         )
-        val results = BindableWrapper(list)
+        val results = Publisher(list)
         val frame = BarFrame(
             headerPublisher = (null as String?).asOneTimePublisher(),
-            barsPublisher = results.binding.mapElements {
+            barsPublisher = results.mapElements {
                 BarFrame.Bar(
                     it.getPartyName(), "${it.getNumSeats()}", null,
                     listOf(
@@ -153,7 +154,7 @@ class BarFrameTest {
                         Pair(lighten(it.getPartyColor()), it.getSeatEstimate() - it.getNumSeats())
                     )
                 )
-            }.toPublisher()
+            }
         )
         val lightRed = Color(255, 127, 127)
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
@@ -164,7 +165,7 @@ class BarFrameTest {
         Assert.assertEquals(lightRed, libSeries[1].first)
         Assert.assertEquals(155, libSeries[1].second.toInt().toLong())
         list[0].setSeatEstimate(158)
-        results.value = list
+        results.submit(list)
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.getSeries(0)[1].second.toInt() }, IsEqual(156))
         libSeries = frame.getSeries(0)
@@ -173,7 +174,7 @@ class BarFrameTest {
         Assert.assertEquals(lightRed, libSeries[1].first)
         Assert.assertEquals(156, libSeries[1].second.toInt().toLong())
         list[0].setNumSeats(3)
-        results.value = list
+        results.submit(list)
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.getSeries(0)[0].second.toInt() }, IsEqual(3))
         libSeries = frame.getSeries(0)
@@ -193,11 +194,11 @@ class BarFrameTest {
             ElectionResult("GREEN", Color.GREEN, 3),
             ElectionResult("INDEPENDENT", Color.LIGHT_GRAY, 1)
         )
-        val results = BindableWrapper(list)
+        val results = Publisher(list)
         val shape: Shape = Ellipse2D.Double()
         val frame = BarFrame(
             headerPublisher = (null as String?).asOneTimePublisher(),
-            barsPublisher = results.binding.mapElements { BarFrame.Bar("", "", if (it.getNumSeats() > 150) shape else null, listOf()) }.toPublisher()
+            barsPublisher = results.mapElements { BarFrame.Bar("", "", if (it.getNumSeats() > 150) shape else null, listOf()) }
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numBars }, IsEqual(6))
@@ -219,17 +220,17 @@ class BarFrameTest {
             ElectionResult("GREEN", Color.GREEN, 3),
             ElectionResult("INDEPENDENT", Color.LIGHT_GRAY, 1)
         )
-        val results = BindableWrapper(list)
+        val results = Publisher(list)
         val frame = BarFrame(
             headerPublisher = (null as String?).asOneTimePublisher(),
-            barsPublisher = results.binding.mapElements {
+            barsPublisher = results.mapElements {
                 BarFrame.Bar(
                     "", "", null,
                     listOf(
                         Pair(it.getPartyColor(), it.getNumSeats())
                     )
                 )
-            }.toPublisher()
+            }
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.min.toInt() }, IsEqual(0))
@@ -241,7 +242,7 @@ class BarFrameTest {
         list[3].setNumSeats(-20)
         list[4].setNumSeats(2)
         list[5].setNumSeats(1)
-        results.value = list
+        results.submit(list)
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.min.toInt() }, IsEqual(-27))
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
@@ -258,17 +259,17 @@ class BarFrameTest {
             ElectionResult("GREEN", Color.GREEN, 3),
             ElectionResult("INDEPENDENT", Color.LIGHT_GRAY, 1)
         )
-        val results = BindableWrapper(list)
+        val results = Publisher(list)
         val frame = BarFrame(
             headerPublisher = (null as String?).asOneTimePublisher(),
-            barsPublisher = results.binding.mapElements {
+            barsPublisher = results.mapElements {
                 BarFrame.Bar(
                     "", "", null,
                     listOf(
                         Pair(it.getPartyColor(), it.getNumSeats())
                     )
                 )
-            }.toPublisher(),
+            },
             minPublisher = (-30).asOneTimePublisher(),
             maxPublisher = 30.asOneTimePublisher()
         )
@@ -283,7 +284,7 @@ class BarFrameTest {
         list[3].setNumSeats(-20)
         list[4].setNumSeats(2)
         list[5].setNumSeats(1)
-        results.value = list
+        results.submit(list)
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.min.toInt() }, IsEqual(-30))
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
@@ -337,30 +338,30 @@ class BarFrameTest {
 
     @Test
     fun testTestNonBindableElements() {
-        val results = BindableWrapper<List<Triple<String, Color, Int>>>(listOf())
+        val results = Publisher<List<Triple<String, Color, Int>>>(listOf())
         val frame = BarFrame(
             headerPublisher = (null as String?).asOneTimePublisher(),
-            barsPublisher = results.binding.mapElements { BarFrame.Bar(it.first, "", null, listOf()) }.toPublisher()
+            barsPublisher = results.mapElements { BarFrame.Bar(it.first, "", null, listOf()) }
         )
         Assert.assertEquals(0, frame.numBars.toLong())
-        results.value = (
+        results.submit(
             listOf(
                 Triple("LIBERALS", Color.RED, 3),
                 Triple("CONSERVATIVES", Color.BLUE, 2),
                 Triple("NDP", Color.ORANGE, 1)
             )
-            )
+        )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numBars }, IsEqual(3))
         Assert.assertEquals("LIBERALS", frame.getLeftText(0))
         Assert.assertEquals("CONSERVATIVES", frame.getLeftText(1))
         Assert.assertEquals("NDP", frame.getLeftText(2))
-        results.value = (
+        results.submit(
             listOf(
                 Triple("LIBERALS", Color.RED, 3),
                 Triple("CONSERVATIVES", Color.BLUE, 3)
             )
-            )
+        )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numBars }, IsEqual(2))
         Assert.assertEquals(2, frame.numBars.toLong())
@@ -371,7 +372,7 @@ class BarFrameTest {
     @Test
     @Throws(IOException::class)
     fun testRenderSingleSeriesAllPositive() {
-        val results: BindableWrapper<List<ElectionResult>> = BindableWrapper(
+        val results: Publisher<List<ElectionResult>> = Publisher(
             listOf(
                 ElectionResult("LIBERAL", Color.RED, 157),
                 ElectionResult("CONSERVATIVE", Color.BLUE, 121),
@@ -383,14 +384,14 @@ class BarFrameTest {
         )
         val barFrame = BarFrame(
             headerPublisher = "2019 CANADIAN ELECTION RESULT".asOneTimePublisher(),
-            barsPublisher = results.binding.mapElements {
+            barsPublisher = results.mapElements {
                 BarFrame.Bar(
                     it.getPartyName(), "${it.getNumSeats()}", null,
                     listOf(
                         Pair(it.getPartyColor(), it.getNumSeats())
                     )
                 )
-            }.toPublisher(),
+            },
             maxPublisher = 160.asOneTimePublisher()
         )
         barFrame.setSize(512, 256)
@@ -400,7 +401,7 @@ class BarFrameTest {
     @Test
     @Throws(IOException::class)
     fun testRenderSingleSeriesWithSubhead() {
-        val results: BindableWrapper<List<ElectionResult>> = BindableWrapper(
+        val results: Publisher<List<ElectionResult>> = Publisher(
             listOf(
                 ElectionResult("LIBERAL", Color.RED, 157),
                 ElectionResult("CONSERVATIVE", Color.BLUE, 121),
@@ -414,14 +415,14 @@ class BarFrameTest {
             headerPublisher = "2019 CANADIAN ELECTION RESULT".asOneTimePublisher(),
             subheadTextPublisher = "PROJECTION: LIB MINORITY".asOneTimePublisher(),
             subheadColorPublisher = Color.RED.asOneTimePublisher(),
-            barsPublisher = results.binding.mapElements {
+            barsPublisher = results.mapElements {
                 BarFrame.Bar(
                     it.getPartyName(), "${it.getNumSeats()}", null,
                     listOf(
                         Pair(it.getPartyColor(), it.getNumSeats())
                     )
                 )
-            }.toPublisher(),
+            },
             maxPublisher = 160.asOneTimePublisher()
         )
         barFrame.setSize(512, 256)
@@ -431,7 +432,7 @@ class BarFrameTest {
     @Test
     @Throws(IOException::class)
     fun testRenderSingleSeriesShrinkToFit() {
-        val results: BindableWrapper<List<ElectionResult>> = BindableWrapper(
+        val results: Publisher<List<ElectionResult>> = Publisher(
             listOf(
                 ElectionResult("LIBERAL", Color.RED, 177),
                 ElectionResult("CONSERVATIVE", Color.BLUE, 95),
@@ -447,14 +448,14 @@ class BarFrameTest {
             headerPublisher = "SEATS AT DISSOLUTION".asOneTimePublisher(),
             subheadTextPublisher = "170 FOR MAJORITY".asOneTimePublisher(),
             subheadColorPublisher = Color.RED.asOneTimePublisher(),
-            barsPublisher = results.binding.mapElements {
+            barsPublisher = results.mapElements {
                 BarFrame.Bar(
                     it.getPartyName(), "${it.getNumSeats()}", null,
                     listOf(
                         Pair(it.getPartyColor(), it.getNumSeats())
                     )
                 )
-            }.toPublisher()
+            }
         )
         barFrame.setSize(512, 256)
         compareRendering("BarFrame", "SingleSeriesShrinkToFit", barFrame)
@@ -463,7 +464,7 @@ class BarFrameTest {
     @Test
     @Throws(IOException::class)
     fun testRenderMultiSeriesAllPositive() {
-        val results: BindableWrapper<List<ElectionResult>> = BindableWrapper(
+        val results: Publisher<List<ElectionResult>> = Publisher(
             listOf(
                 ElectionResult("LIBERAL", Color.RED, 34, 157),
                 ElectionResult("CONSERVATIVE", Color.BLUE, 21, 121),
@@ -475,7 +476,7 @@ class BarFrameTest {
         )
         val barFrame = BarFrame(
             headerPublisher = "2019 CANADIAN ELECTION RESULT".asOneTimePublisher(),
-            barsPublisher = results.binding.mapElements {
+            barsPublisher = results.mapElements {
                 BarFrame.Bar(
                     it.getPartyName(), it.getNumSeats().toString() + "/" + it.getSeatEstimate(), null,
                     listOf(
@@ -483,7 +484,7 @@ class BarFrameTest {
                         Pair(lighten(it.getPartyColor()), it.getSeatEstimate() - it.getNumSeats())
                     )
                 )
-            }.toPublisher(),
+            },
             maxPublisher = 160.asOneTimePublisher()
         )
         barFrame.setSize(512, 256)
@@ -493,7 +494,7 @@ class BarFrameTest {
     @Test
     @Throws(IOException::class)
     fun testRenderSingleSeriesBothDirections() {
-        val results: BindableWrapper<List<ElectionResult>> = BindableWrapper(
+        val results: Publisher<List<ElectionResult>> = Publisher(
             listOf(
                 ElectionResult("LIB", Color.RED, -27),
                 ElectionResult("CON", Color.BLUE, +22),
@@ -505,14 +506,14 @@ class BarFrameTest {
         )
         val barFrame = BarFrame(
             headerPublisher = "RESULT CHANGE SINCE 2015".asOneTimePublisher(),
-            barsPublisher = results.binding.mapElements {
+            barsPublisher = results.mapElements {
                 BarFrame.Bar(
                     it.getPartyName(), DecimalFormat("+0;-0").format(it.getNumSeats().toLong()), null,
                     listOf(
                         Pair(it.getPartyColor(), it.getNumSeats())
                     )
                 )
-            }.toPublisher(),
+            },
             maxPublisher = 28.asOneTimePublisher(),
             minPublisher = (-28).asOneTimePublisher()
         )
@@ -523,7 +524,7 @@ class BarFrameTest {
     @Test
     @Throws(IOException::class)
     fun testRenderMultiSeriesBothDirections() {
-        val results: BindableWrapper<List<ElectionResult>> = BindableWrapper(
+        val results: Publisher<List<ElectionResult>> = Publisher(
             listOf(
                 ElectionResult("LIB", Color.RED, -7, -27),
                 ElectionResult("CON", Color.BLUE, +4, +22),
@@ -535,7 +536,7 @@ class BarFrameTest {
         )
         val barFrame = BarFrame(
             headerPublisher = "RESULT CHANGE SINCE 2015".asOneTimePublisher(),
-            barsPublisher = results.binding.mapElements {
+            barsPublisher = results.mapElements {
                 BarFrame.Bar(
                     it.getPartyName(), "${CHANGE_FORMAT.format(it.getNumSeats().toLong())}/${CHANGE_FORMAT.format(it.getSeatEstimate().toLong())}", null,
                     listOf(
@@ -543,7 +544,7 @@ class BarFrameTest {
                         Pair(lighten(it.getPartyColor()), it.getSeatEstimate() - if (sign(it.getSeatEstimate().toFloat()) == sign(it.getNumSeats().toFloat())) it.getNumSeats() else 0)
                     )
                 )
-            }.toPublisher(),
+            },
             maxPublisher = 28.asOneTimePublisher(),
             minPublisher = (-28).asOneTimePublisher()
         )
@@ -554,7 +555,7 @@ class BarFrameTest {
     @Test
     @Throws(IOException::class)
     fun testRenderTwoLinedBars() {
-        val results: BindableWrapper<List<RidingResult>> = BindableWrapper(
+        val results: Publisher<List<RidingResult>> = Publisher(
             listOf(
                 RidingResult("BARDISH CHAGGER", "LIBERAL", Color.RED, 31085, 0.4879),
                 RidingResult("JERRY ZHANG", "CONSERVATIVE", Color.BLUE, 15615, 0.2451),
@@ -567,14 +568,14 @@ class BarFrameTest {
             headerPublisher = "WATERLOO".asOneTimePublisher(),
             subheadTextPublisher = "LIB HOLD".asOneTimePublisher(),
             subheadColorPublisher = Color.RED.asOneTimePublisher(),
-            barsPublisher = results.binding.mapElements {
+            barsPublisher = results.mapElements {
                 BarFrame.Bar(
                     "${it.getCandidateName()}\n${it.getPartyName()}",
                     "${THOUSANDS_FORMAT.format(it.getNumVotes().toLong())}\n${PERCENT_FORMAT.format(it.getVotePct())}",
                     listOf(Pair(it.getPartyColor(), it.getNumVotes()))
                 )
-            }.toPublisher(),
-            maxPublisher = results.binding.map { r -> r.sumOf { it.getNumVotes() } / 2 }.toPublisher()
+            },
+            maxPublisher = results.map { r -> r.sumOf { it.getNumVotes() } / 2 }
         )
         barFrame.setSize(512, 256)
         compareRendering("BarFrame", "TwoLinedBars", barFrame)
@@ -583,7 +584,7 @@ class BarFrameTest {
     @Test
     @Throws(IOException::class)
     fun testRenderTwoLinedBarWithIcon() {
-        val results: BindableWrapper<List<RidingResult>> = BindableWrapper(
+        val results: Publisher<List<RidingResult>> = Publisher(
             listOf(
                 RidingResult("BARDISH CHAGGER", "LIBERAL", Color.RED, 31085, 0.4879, true),
                 RidingResult("JERRY ZHANG", "CONSERVATIVE", Color.BLUE, 15615, 0.2451),
@@ -597,15 +598,15 @@ class BarFrameTest {
             headerPublisher = "WATERLOO".asOneTimePublisher(),
             subheadTextPublisher = "LIB HOLD".asOneTimePublisher(),
             subheadColorPublisher = Color.RED.asOneTimePublisher(),
-            barsPublisher = results.binding.mapElements {
+            barsPublisher = results.mapElements {
                 BarFrame.Bar(
                     "${it.getCandidateName()}\n${it.getPartyName()}",
                     "${THOUSANDS_FORMAT.format(it.getNumVotes().toLong())}\n${PERCENT_FORMAT.format(it.getVotePct())}",
                     if (it.isElected()) shape else null,
                     listOf(Pair(it.getPartyColor(), it.getNumVotes()))
                 )
-            }.toPublisher(),
-            maxPublisher = results.binding.map { r -> r.sumOf { it.getNumVotes() } / 2 }.toPublisher()
+            },
+            maxPublisher = results.map { r -> r.sumOf { it.getNumVotes() } / 2 }
         )
         barFrame.setSize(512, 256)
         compareRendering("BarFrame", "TwoLinedBarWithIcon", barFrame)
@@ -614,7 +615,7 @@ class BarFrameTest {
     @Test
     @Throws(IOException::class)
     fun testRenderTwoLinedBarWithNegativeIcon() {
-        val results: BindableWrapper<List<RidingResult>> = BindableWrapper(
+        val results: Publisher<List<RidingResult>> = Publisher(
             listOf(
                 RidingResult("BARDISH CHAGGER", "LIB", Color.RED, 31085, -0.010, true),
                 RidingResult("JERRY ZHANG", "CON", Color.BLUE, 15615, -0.077),
@@ -626,14 +627,14 @@ class BarFrameTest {
         val shape = createTickShape()
         val barFrame = BarFrame(
             headerPublisher = "WATERLOO".asOneTimePublisher(),
-            barsPublisher = results.binding.mapElements {
+            barsPublisher = results.mapElements {
                 BarFrame.Bar(
                     it.getPartyName(),
                     PERCENT_FORMAT.format(it.getVotePct()),
                     if (it.isElected()) shape else null,
                     listOf(Pair(it.getPartyColor(), it.getVotePct()))
                 )
-            }.toPublisher()
+            }
         )
         barFrame.setSize(512, 256)
         compareRendering("BarFrame", "TwoLinedBarWithNegativeIcon", barFrame)
@@ -642,7 +643,7 @@ class BarFrameTest {
     @Test
     @Throws(IOException::class)
     fun testRenderVerticalLine() {
-        val results: BindableWrapper<List<ElectionResult>> = BindableWrapper(
+        val results: Publisher<List<ElectionResult>> = Publisher(
             listOf(
                 ElectionResult("LIBERAL", Color.RED, 177),
                 ElectionResult("CONSERVATIVE", Color.BLUE, 95),
@@ -658,7 +659,7 @@ class BarFrameTest {
             headerPublisher = "SEATS AT DISSOLUTION".asOneTimePublisher(),
             subheadTextPublisher = "170 FOR MAJORITY".asOneTimePublisher(),
             subheadColorPublisher = Color.RED.asOneTimePublisher(),
-            barsPublisher = results.binding.mapElements {
+            barsPublisher = results.mapElements {
                 BarFrame.Bar(
                     it.getPartyName(),
                     "${it.getNumSeats()}",
@@ -666,7 +667,7 @@ class BarFrameTest {
                         Pair(it.getPartyColor(), it.getNumSeats())
                     )
                 )
-            }.toPublisher(),
+            },
             linesPublisher = listOf(BarFrame.Line(170, "MAJORITY")).asOneTimePublisher(),
             maxPublisher = 225.asOneTimePublisher()
         )
@@ -677,7 +678,7 @@ class BarFrameTest {
     @Test
     @Throws(IOException::class)
     fun testRenderAccents() {
-        val results: BindableWrapper<List<ElectionResult>> = BindableWrapper(
+        val results: Publisher<List<ElectionResult>> = Publisher(
             listOf(
                 ElectionResult("COALITION AVENIR QU\u00c9BEC: FRAN\u00c7OIS LEGAULT", Color.BLUE, 74),
                 ElectionResult("LIB\u00c9RAL: PHILIPPE COUILLARD", Color.RED, 31),
@@ -688,7 +689,7 @@ class BarFrameTest {
         val barFrame = BarFrame(
             headerPublisher = "\u00c9LECTION 2018".asOneTimePublisher(),
             subheadTextPublisher = "MAJORIT\u00c9: 63".asOneTimePublisher(),
-            barsPublisher = results.binding.mapElements {
+            barsPublisher = results.mapElements {
                 BarFrame.Bar(
                     it.getPartyName(),
                     "${it.getNumSeats()}",
@@ -696,7 +697,7 @@ class BarFrameTest {
                         Pair(it.getPartyColor(), it.getNumSeats())
                     )
                 )
-            }.toPublisher(),
+            },
             linesPublisher = listOf(BarFrame.Line(63, "MAJORIT\u00c9")).asOneTimePublisher(),
             maxPublisher = 83.asOneTimePublisher()
         )
@@ -707,7 +708,7 @@ class BarFrameTest {
     @Test
     @Throws(IOException::class)
     fun testRenderMultiLineAccents() {
-        val results: BindableWrapper<List<ElectionResult>> = BindableWrapper(
+        val results: Publisher<List<ElectionResult>> = Publisher(
             listOf(
                 ElectionResult("COALITION AVENIR QU\u00c9BEC\nFRAN\u00c7OIS LEGAULT", Color.BLUE, 74),
                 ElectionResult("LIB\u00c9RAL\nPHILIPPE COUILLARD", Color.RED, 31),
@@ -718,7 +719,7 @@ class BarFrameTest {
         val barFrame = BarFrame(
             headerPublisher = "\u00c9LECTION 2018".asOneTimePublisher(),
             subheadTextPublisher = "MAJORIT\u00c9: 63".asOneTimePublisher(),
-            barsPublisher = results.binding.mapElements {
+            barsPublisher = results.mapElements {
                 BarFrame.Bar(
                     it.getPartyName(),
                     "${it.getNumSeats()}",
@@ -726,7 +727,7 @@ class BarFrameTest {
                         Pair(it.getPartyColor(), it.getNumSeats())
                     )
                 )
-            }.toPublisher(),
+            },
             linesPublisher = listOf(BarFrame.Line(63, "MAJORIT\u00c9")).asOneTimePublisher(),
             maxPublisher = 83.asOneTimePublisher()
         )
@@ -737,32 +738,32 @@ class BarFrameTest {
     @Test
     @Throws(IOException::class)
     fun testBarFrameOverlaps() {
-        val lines = BindableWrapper(listOf(Triple("THIS IS A VERY VERY LONG\nLEFT HAND SIDE", "RIGHT\nSIDE", false)))
+        val lines = Publisher(listOf(Triple("THIS IS A VERY VERY LONG\nLEFT HAND SIDE", "RIGHT\nSIDE", false)))
         val barFrame = BarFrame(
             headerPublisher = "BAR FRAME".asOneTimePublisher(),
             subheadTextPublisher = "".asOneTimePublisher(),
-            barsPublisher = lines.binding.mapElements {
+            barsPublisher = lines.mapElements {
                 BarFrame.Bar(
                     it.first,
                     it.second,
                     if (it.third) createHalfTickShape() else null,
                     listOf(Pair(Color.RED, 1))
                 )
-            }.toPublisher(),
+            },
             linesPublisher = listOf(BarFrame.Line(0.5, "")).asOneTimePublisher(),
             maxPublisher = 1.asOneTimePublisher()
         )
         barFrame.setSize(256, 128)
         compareRendering("BarFrame", "FrameOverlap-1", barFrame)
-        lines.value = listOf(Triple("LEFT\nSIDE", "THIS IS A VERY VERY LONG\nRIGHT HAND SIDE", false))
+        lines.submit(listOf(Triple("LEFT\nSIDE", "THIS IS A VERY VERY LONG\nRIGHT HAND SIDE", false)))
         compareRendering("BarFrame", "FrameOverlap-2", barFrame)
-        lines.value = listOf(Triple("THIS IS A VERY VERY LONG\nLEFT HAND SIDE", "THIS IS A VERY VERY LONG\nRIGHT HAND SIDE", false))
+        lines.submit(listOf(Triple("THIS IS A VERY VERY LONG\nLEFT HAND SIDE", "THIS IS A VERY VERY LONG\nRIGHT HAND SIDE", false)))
         compareRendering("BarFrame", "FrameOverlap-3", barFrame)
-        lines.value = listOf(Triple("THIS IS A VERY VERY LONG\nLEFT HAND SIDE", "RIGHT\nSIDE", true))
+        lines.submit(listOf(Triple("THIS IS A VERY VERY LONG\nLEFT HAND SIDE", "RIGHT\nSIDE", true)))
         compareRendering("BarFrame", "FrameOverlap-4", barFrame)
-        lines.value = listOf(Triple("LEFT\nSIDE", "THIS IS A VERY VERY LONG\nRIGHT HAND SIDE", true))
+        lines.submit(listOf(Triple("LEFT\nSIDE", "THIS IS A VERY VERY LONG\nRIGHT HAND SIDE", true)))
         compareRendering("BarFrame", "FrameOverlap-5", barFrame)
-        lines.value = listOf(Triple("THIS IS A VERY VERY LONG\nLEFT HAND SIDE", "THIS IS A VERY VERY LONG\nRIGHT HAND SIDE", true))
+        lines.submit(listOf(Triple("THIS IS A VERY VERY LONG\nLEFT HAND SIDE", "THIS IS A VERY VERY LONG\nRIGHT HAND SIDE", true)))
         compareRendering("BarFrame", "FrameOverlap-6", barFrame)
     }
 
@@ -772,10 +773,7 @@ class BarFrameTest {
         return shape
     }
 
-    private class ElectionResult @JvmOverloads constructor(private var partyName: String, private var partyColor: Color, private var numSeats: Int, private var seatEstimate: Int = numSeats) : Bindable<ElectionResult, ElectionResult.Properties>() {
-        enum class Properties {
-            PARTY_NAME, PARTY_COLOR, NUM_SEATS, SEAT_ESTIMATE
-        }
+    private class ElectionResult @JvmOverloads constructor(private var partyName: String, private var partyColor: Color, private var numSeats: Int, private var seatEstimate: Int = numSeats) {
 
         fun getPartyName(): String {
             return partyName
@@ -783,7 +781,6 @@ class BarFrameTest {
 
         fun setPartyName(partyName: String) {
             this.partyName = partyName
-            onPropertyRefreshed(Properties.PARTY_NAME)
         }
 
         fun getPartyColor(): Color {
@@ -792,7 +789,6 @@ class BarFrameTest {
 
         fun setPartyColor(partyColor: Color) {
             this.partyColor = partyColor
-            onPropertyRefreshed(Properties.PARTY_COLOR)
         }
 
         fun getNumSeats(): Int {
@@ -801,7 +797,6 @@ class BarFrameTest {
 
         fun setNumSeats(numSeats: Int) {
             this.numSeats = numSeats
-            onPropertyRefreshed(Properties.NUM_SEATS)
         }
 
         fun getSeatEstimate(): Int {
@@ -810,7 +805,6 @@ class BarFrameTest {
 
         fun setSeatEstimate(seatEstimate: Int) {
             this.seatEstimate = seatEstimate
-            onPropertyRefreshed(Properties.SEAT_ESTIMATE)
         }
     }
 

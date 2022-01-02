@@ -1,9 +1,11 @@
 package com.joecollins.graphics.components
 
 import com.joecollins.bindings.mapElements
-import com.joecollins.graphics.utils.BindableWrapper
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
+import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
+import com.joecollins.pubsub.map
+import com.joecollins.pubsub.mapElements
 import org.awaitility.Awaitility
 import org.hamcrest.core.IsEqual
 import org.junit.Assert
@@ -201,64 +203,68 @@ class HemicycleFrameTest {
     @Throws(IOException::class)
     fun testRenderSeatsBars() {
         val rowCounts = listOf(7, 9, 11)
-        val dotColors = BindableWrapper(Collections.nCopies(27, Color.WHITE))
+        val dotColors = Publisher(Collections.nCopies(27, Color.WHITE))
         val dotBorders = listOf(
             Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.BLUE, Color.BLUE, //
             Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.BLUE, Color.BLUE, Color.BLUE, //
             Color.GREEN, Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.BLUE, Color.BLUE, Color.BLUE
         )
-        val leftSeats = BindableWrapper(listOf(0, 0))
-        val middleSeats = BindableWrapper(listOf(0, 0))
-        val rightSeats = BindableWrapper(listOf(0, 0))
-        val leftLabel = BindableWrapper("GREEN: 0/0")
-        val middleLabel = BindableWrapper("LIBERAL: 0/0")
-        val rightLabel = BindableWrapper("PROGRESSIVE CONSERVATIVE: 0/0")
+        val leftSeats = Publisher(listOf(0, 0))
+        val middleSeats = Publisher(listOf(0, 0))
+        val rightSeats = Publisher(listOf(0, 0))
+        val leftLabel = Publisher("GREEN: 0/0")
+        val middleLabel = Publisher("LIBERAL: 0/0")
+        val rightLabel = Publisher("PROGRESSIVE CONSERVATIVE: 0/0")
         val lGreen = Color(128, 255, 128)
         val lRed = Color(255, 128, 128)
         val lBlue = Color(128, 128, 255)
         val frame = HemicycleFrame(
             headerPublisher = "PEI HEMICYCLE".asOneTimePublisher(),
             rowsPublisher = rowCounts.asOneTimePublisher(),
-            dotsPublisher = dotColors.binding.map { it.zip(dotBorders) { c, b -> HemicycleFrame.Dot(color = c, border = b) } }.toPublisher(),
-            leftSeatBarPublisher = leftSeats.binding.map { seats -> listOf(Color.GREEN, lGreen).zip(seats) { c, s -> HemicycleFrame.Bar(c, s) } }.toPublisher(),
-            leftSeatBarLabelPublisher = leftLabel.binding.toPublisher(),
-            middleSeatBarPublisher = middleSeats.binding.map { seats -> listOf(Color.RED, lRed).zip(seats) { c, s -> HemicycleFrame.Bar(c, s) } }.toPublisher(),
-            middleSeatBarLabelPublisher = middleLabel.binding.toPublisher(),
-            rightSeatBarPublisher = rightSeats.binding.map { seats -> listOf(Color.BLUE, lBlue).zip(seats) { c, s -> HemicycleFrame.Bar(c, s) } }.toPublisher(),
-            rightSeatBarLabelPublisher = rightLabel.binding.toPublisher()
+            dotsPublisher = dotColors.map { it.zip(dotBorders) { c, b -> HemicycleFrame.Dot(color = c, border = b) } },
+            leftSeatBarPublisher = leftSeats.map { seats -> listOf(Color.GREEN, lGreen).zip(seats) { c, s -> HemicycleFrame.Bar(c, s) } },
+            leftSeatBarLabelPublisher = leftLabel,
+            middleSeatBarPublisher = middleSeats.map { seats -> listOf(Color.RED, lRed).zip(seats) { c, s -> HemicycleFrame.Bar(c, s) } },
+            middleSeatBarLabelPublisher = middleLabel,
+            rightSeatBarPublisher = rightSeats.map { seats -> listOf(Color.BLUE, lBlue).zip(seats) { c, s -> HemicycleFrame.Bar(c, s) } },
+            rightSeatBarLabelPublisher = rightLabel
         )
         frame.setSize(1024, 512)
         compareRendering("HemicycleFrame", "SeatsBar-1", frame)
-        leftSeats.value = listOf(0, 1)
-        leftLabel.value = "GREEN: 0/1"
-        middleSeats.value = listOf(0, 2)
-        middleLabel.value = "LIBERAL: 0/2"
-        rightSeats.value = listOf(0, 8)
-        rightLabel.value = "PROGRESSIVE CONSERVATIVE: 0/8"
-        dotColors.value = listOf(
-            lGreen, Color.WHITE, Color.WHITE, lRed, Color.WHITE, lBlue, lBlue, //
-            Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE, lRed, Color.WHITE, lBlue, lBlue, lBlue, //
-            Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE, lBlue, lBlue, lBlue
+        leftSeats.submit(listOf(0, 1))
+        leftLabel.submit("GREEN: 0/1")
+        middleSeats.submit(listOf(0, 2))
+        middleLabel.submit("LIBERAL: 0/2")
+        rightSeats.submit(listOf(0, 8))
+        rightLabel.submit("PROGRESSIVE CONSERVATIVE: 0/8")
+        dotColors.submit(
+            listOf(
+                lGreen, Color.WHITE, Color.WHITE, lRed, Color.WHITE, lBlue, lBlue, //
+                Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE, lRed, Color.WHITE, lBlue, lBlue, lBlue, //
+                Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE, lBlue, lBlue, lBlue
+            )
         )
         compareRendering("HemicycleFrame", "SeatsBar-2", frame)
-        leftSeats.value = listOf(1, 7)
-        leftLabel.value = "GREEN: 1/8"
-        middleSeats.value = listOf(2, 4)
-        middleLabel.value = "LIBERAL: 2/6"
-        rightSeats.value = listOf(8, 5)
-        rightLabel.value = "PROGRESSIVE CONSERVATIVE: 8/13"
-        dotColors.value = listOf(
-            Color.GREEN, lGreen, Color.RED, lBlue, lBlue, Color.BLUE, Color.BLUE, //
-            lGreen, lGreen, lGreen, lRed, Color.RED, lBlue, Color.BLUE, Color.BLUE, Color.BLUE, //
-            lGreen, lGreen, lGreen, lRed, lRed, lRed, lBlue, lBlue, Color.BLUE, Color.BLUE, Color.BLUE
+        leftSeats.submit(listOf(1, 7))
+        leftLabel.submit("GREEN: 1/8")
+        middleSeats.submit(listOf(2, 4))
+        middleLabel.submit("LIBERAL: 2/6")
+        rightSeats.submit(listOf(8, 5))
+        rightLabel.submit("PROGRESSIVE CONSERVATIVE: 8/13")
+        dotColors.submit(
+            listOf(
+                Color.GREEN, lGreen, Color.RED, lBlue, lBlue, Color.BLUE, Color.BLUE, //
+                lGreen, lGreen, lGreen, lRed, Color.RED, lBlue, Color.BLUE, Color.BLUE, Color.BLUE, //
+                lGreen, lGreen, lGreen, lRed, lRed, lRed, lBlue, lBlue, Color.BLUE, Color.BLUE, Color.BLUE
+            )
         )
         compareRendering("HemicycleFrame", "SeatsBar-3", frame)
-        leftSeats.value = listOf(8, 5)
-        leftLabel.value = "GREEN: 8/13"
-        middleSeats.value = listOf(2, 4)
-        middleLabel.value = "LIBERAL: 2/6"
-        rightSeats.value = listOf(1, 7)
-        rightLabel.value = "PROGRESSIVE CONSERVATIVE: 1/8"
+        leftSeats.submit(listOf(8, 5))
+        leftLabel.submit("GREEN: 8/13")
+        middleSeats.submit(listOf(2, 4))
+        middleLabel.submit("LIBERAL: 2/6")
+        rightSeats.submit(listOf(1, 7))
+        rightLabel.submit("PROGRESSIVE CONSERVATIVE: 1/8")
         compareRendering("HemicycleFrame", "SeatsBar-4", frame)
     }
 
@@ -266,74 +272,78 @@ class HemicycleFrameTest {
     @Throws(IOException::class)
     fun testRenderPositiveChangeBars() {
         val rowCounts = listOf(7, 9, 11)
-        val dotColors = BindableWrapper(Collections.nCopies(27, Color.WHITE))
+        val dotColors = Publisher(Collections.nCopies(27, Color.WHITE))
         val dotBorders = listOf(
             Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.BLUE, Color.BLUE, //
             Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.BLUE, Color.BLUE, Color.BLUE, //
             Color.GREEN, Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.BLUE, Color.BLUE, Color.BLUE
         )
-        val leftSeats = BindableWrapper(listOf(0, 0))
-        val middleSeats = BindableWrapper(listOf(0, 0))
-        val rightSeats = BindableWrapper(listOf(0, 0))
-        val leftChange = BindableWrapper(listOf(0, 0))
-        val rightChange = BindableWrapper(listOf(0, 0))
-        val leftLabel = BindableWrapper("GREEN: 0/0")
-        val middleLabel = BindableWrapper("LIBERAL: 0/0")
-        val rightLabel = BindableWrapper("PROGRESSIVE CONSERVATIVE: 0/0")
-        val leftChangeLabel = BindableWrapper("GRN: +0/+0")
-        val rightChangeLabel = BindableWrapper("PC: +0/+0")
+        val leftSeats = Publisher(listOf(0, 0))
+        val middleSeats = Publisher(listOf(0, 0))
+        val rightSeats = Publisher(listOf(0, 0))
+        val leftChange = Publisher(listOf(0, 0))
+        val rightChange = Publisher(listOf(0, 0))
+        val leftLabel = Publisher("GREEN: 0/0")
+        val middleLabel = Publisher("LIBERAL: 0/0")
+        val rightLabel = Publisher("PROGRESSIVE CONSERVATIVE: 0/0")
+        val leftChangeLabel = Publisher("GRN: +0/+0")
+        val rightChangeLabel = Publisher("PC: +0/+0")
         val lGreen = Color(128, 255, 128)
         val lRed = Color(255, 128, 128)
         val lBlue = Color(128, 128, 255)
         val frame = HemicycleFrame(
             headerPublisher = "PEI HEMICYCLE".asOneTimePublisher(),
             rowsPublisher = rowCounts.asOneTimePublisher(),
-            dotsPublisher = dotColors.binding.map { it.zip(dotBorders) { c, b -> HemicycleFrame.Dot(color = c, border = b) } }.toPublisher(),
-            leftSeatBarPublisher = leftSeats.binding.map { seats -> listOf(Color.GREEN, lGreen).zip(seats) { c, s -> HemicycleFrame.Bar(c, s) } }.toPublisher(),
-            leftSeatBarLabelPublisher = leftLabel.binding.toPublisher(),
-            middleSeatBarPublisher = middleSeats.binding.map { seats -> listOf(Color.RED, lRed).zip(seats) { c, s -> HemicycleFrame.Bar(c, s) } }.toPublisher(),
-            middleSeatBarLabelPublisher = middleLabel.binding.toPublisher(),
-            rightSeatBarPublisher = rightSeats.binding.map { seats -> listOf(Color.BLUE, lBlue).zip(seats) { c, s -> HemicycleFrame.Bar(c, s) } }.toPublisher(),
-            rightSeatBarLabelPublisher = rightLabel.binding.toPublisher(),
-            leftChangeBarPublisher = leftChange.binding.map { change -> listOf(Color.GREEN, lGreen).zip(change) { c, s -> HemicycleFrame.Bar(c, s) } }.toPublisher(),
-            leftChangeBarLabelPublisher = leftChangeLabel.binding.toPublisher(),
+            dotsPublisher = dotColors.map { it.zip(dotBorders) { c, b -> HemicycleFrame.Dot(color = c, border = b) } },
+            leftSeatBarPublisher = leftSeats.map { seats -> listOf(Color.GREEN, lGreen).zip(seats) { c, s -> HemicycleFrame.Bar(c, s) } },
+            leftSeatBarLabelPublisher = leftLabel,
+            middleSeatBarPublisher = middleSeats.map { seats -> listOf(Color.RED, lRed).zip(seats) { c, s -> HemicycleFrame.Bar(c, s) } },
+            middleSeatBarLabelPublisher = middleLabel,
+            rightSeatBarPublisher = rightSeats.map { seats -> listOf(Color.BLUE, lBlue).zip(seats) { c, s -> HemicycleFrame.Bar(c, s) } },
+            rightSeatBarLabelPublisher = rightLabel,
+            leftChangeBarPublisher = leftChange.map { change -> listOf(Color.GREEN, lGreen).zip(change) { c, s -> HemicycleFrame.Bar(c, s) } },
+            leftChangeBarLabelPublisher = leftChangeLabel,
             leftChangeBarStartPublisher = 1.asOneTimePublisher(),
-            rightChangeBarPublisher = rightChange.binding.map { change -> listOf(Color.BLUE, lBlue).zip(change) { c, s -> HemicycleFrame.Bar(c, s) } }.toPublisher(),
-            rightChangeBarLabelPublisher = rightChangeLabel.binding.toPublisher(),
+            rightChangeBarPublisher = rightChange.map { change -> listOf(Color.BLUE, lBlue).zip(change) { c, s -> HemicycleFrame.Bar(c, s) } },
+            rightChangeBarLabelPublisher = rightChangeLabel,
             rightChangeBarStartPublisher = 8.asOneTimePublisher()
         )
         frame.setSize(1024, 512)
         compareRendering("HemicycleFrame", "ChangeBar-1", frame)
-        leftSeats.value = listOf(0, 1)
-        leftLabel.value = "GREEN: 0/1"
-        middleSeats.value = listOf(0, 2)
-        middleLabel.value = "LIBERAL: 0/2"
-        rightSeats.value = listOf(0, 8)
-        rightLabel.value = "PROGRESSIVE CONSERVATIVE: 0/8"
-        leftChange.value = listOf(0, 1)
-        leftChangeLabel.value = "GRN: +0/+1"
-        rightChange.value = listOf(0, 3)
-        rightChangeLabel.value = "PC: +0/+3"
-        dotColors.value = listOf(
-            lGreen, Color.WHITE, Color.WHITE, lRed, Color.WHITE, lBlue, lBlue, //
-            Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE, lRed, Color.WHITE, lBlue, lBlue, lBlue, //
-            Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE, lBlue, lBlue, lBlue
+        leftSeats.submit(listOf(0, 1))
+        leftLabel.submit("GREEN: 0/1")
+        middleSeats.submit(listOf(0, 2))
+        middleLabel.submit("LIBERAL: 0/2")
+        rightSeats.submit(listOf(0, 8))
+        rightLabel.submit("PROGRESSIVE CONSERVATIVE: 0/8")
+        leftChange.submit(listOf(0, 1))
+        leftChangeLabel.submit("GRN: +0/+1")
+        rightChange.submit(listOf(0, 3))
+        rightChangeLabel.submit("PC: +0/+3")
+        dotColors.submit(
+            listOf(
+                lGreen, Color.WHITE, Color.WHITE, lRed, Color.WHITE, lBlue, lBlue, //
+                Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE, lRed, Color.WHITE, lBlue, lBlue, lBlue, //
+                Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE, lBlue, lBlue, lBlue
+            )
         )
         compareRendering("HemicycleFrame", "ChangeBar-2", frame)
-        leftSeats.value = listOf(1, 7)
-        leftLabel.value = "GREEN: 1/8"
-        middleSeats.value = listOf(2, 4)
-        middleLabel.value = "LIBERAL: 2/6"
-        rightSeats.value = listOf(8, 5)
-        rightLabel.value = "PROGRESSIVE CONSERVATIVE: 8/13"
-        leftChange.value = listOf(1, 6)
-        leftChangeLabel.value = "GRN: +1/+7"
-        rightChange.value = listOf(3, 2)
-        rightChangeLabel.value = "PC: +3/+5"
-        dotColors.value = listOf(
-            Color.GREEN, lGreen, Color.RED, lBlue, lBlue, Color.BLUE, Color.BLUE, //
-            lGreen, lGreen, lGreen, lRed, Color.RED, lBlue, Color.BLUE, Color.BLUE, Color.BLUE, //
-            lGreen, lGreen, lGreen, lRed, lRed, lRed, lBlue, lBlue, Color.BLUE, Color.BLUE, Color.BLUE
+        leftSeats.submit(listOf(1, 7))
+        leftLabel.submit("GREEN: 1/8")
+        middleSeats.submit(listOf(2, 4))
+        middleLabel.submit("LIBERAL: 2/6")
+        rightSeats.submit(listOf(8, 5))
+        rightLabel.submit("PROGRESSIVE CONSERVATIVE: 8/13")
+        leftChange.submit(listOf(1, 6))
+        leftChangeLabel.submit("GRN: +1/+7")
+        rightChange.submit(listOf(3, 2))
+        rightChangeLabel.submit("PC: +3/+5")
+        dotColors.submit(
+            listOf(
+                Color.GREEN, lGreen, Color.RED, lBlue, lBlue, Color.BLUE, Color.BLUE, //
+                lGreen, lGreen, lGreen, lRed, Color.RED, lBlue, Color.BLUE, Color.BLUE, Color.BLUE, //
+                lGreen, lGreen, lGreen, lRed, lRed, lRed, lBlue, lBlue, Color.BLUE, Color.BLUE, Color.BLUE
+            )
         )
         compareRendering("HemicycleFrame", "ChangeBar-3", frame)
     }
@@ -342,7 +352,7 @@ class HemicycleFrameTest {
     @Throws(IOException::class)
     fun testRenderNegativeChangeBars() {
         val rowCounts = listOf(87)
-        val dotColors = BindableWrapper<List<Color>>(
+        val dotColors = Publisher<List<Color>>(
             listOf(
                 Collections.nCopies(5, Color.RED),
                 Collections.nCopies(4, Color.ORANGE),
@@ -350,31 +360,31 @@ class HemicycleFrameTest {
                 Collections.nCopies(61, Color.BLUE)
             ).flatten()
         )
-        val leftSeats = BindableWrapper(listOf(5))
-        val middleSeats = BindableWrapper(listOf(21))
-        val rightSeats = BindableWrapper(listOf(61))
-        val leftChange = BindableWrapper(listOf(-3))
-        val rightChange = BindableWrapper(listOf(-5))
-        val leftLabel = BindableWrapper("LIBERAL: 5")
-        val middleLabel = BindableWrapper("OTHERS: 21")
-        val rightLabel = BindableWrapper("PROGRESSIVE CONSERVATIVE: 61")
-        val leftChangeLabel = BindableWrapper("LIB: -3")
-        val rightChangeLabel = BindableWrapper("PC: -5")
+        val leftSeats = Publisher(listOf(5))
+        val middleSeats = Publisher(listOf(21))
+        val rightSeats = Publisher(listOf(61))
+        val leftChange = Publisher(listOf(-3))
+        val rightChange = Publisher(listOf(-5))
+        val leftLabel = Publisher("LIBERAL: 5")
+        val middleLabel = Publisher("OTHERS: 21")
+        val rightLabel = Publisher("PROGRESSIVE CONSERVATIVE: 61")
+        val leftChangeLabel = Publisher("LIB: -3")
+        val rightChangeLabel = Publisher("PC: -5")
         val frame = HemicycleFrame(
             headerPublisher = "ALBERTA HEMICYCLE".asOneTimePublisher(),
             rowsPublisher = rowCounts.asOneTimePublisher(),
-            dotsPublisher = dotColors.binding.mapElements { HemicycleFrame.Dot(color = it, border = null) }.toPublisher(),
-            leftSeatBarPublisher = leftSeats.binding.mapElements { HemicycleFrame.Bar(Color.RED, it) }.toPublisher(),
-            leftSeatBarLabelPublisher = leftLabel.binding.toPublisher(),
-            middleSeatBarPublisher = middleSeats.binding.mapElements { HemicycleFrame.Bar(Color.GRAY, it) }.toPublisher(),
-            middleSeatBarLabelPublisher = middleLabel.binding.toPublisher(),
-            rightSeatBarPublisher = rightSeats.binding.mapElements { HemicycleFrame.Bar(Color.BLUE, it) }.toPublisher(),
-            rightSeatBarLabelPublisher = rightLabel.binding.toPublisher(),
-            leftChangeBarPublisher = leftChange.binding.mapElements { HemicycleFrame.Bar(Color.RED, it) }.toPublisher(),
-            leftChangeBarLabelPublisher = leftChangeLabel.binding.toPublisher(),
+            dotsPublisher = dotColors.mapElements { HemicycleFrame.Dot(color = it, border = null) },
+            leftSeatBarPublisher = leftSeats.mapElements { HemicycleFrame.Bar(Color.RED, it) },
+            leftSeatBarLabelPublisher = leftLabel,
+            middleSeatBarPublisher = middleSeats.mapElements { HemicycleFrame.Bar(Color.GRAY, it) },
+            middleSeatBarLabelPublisher = middleLabel,
+            rightSeatBarPublisher = rightSeats.mapElements { HemicycleFrame.Bar(Color.BLUE, it) },
+            rightSeatBarLabelPublisher = rightLabel,
+            leftChangeBarPublisher = leftChange.mapElements { HemicycleFrame.Bar(Color.RED, it) },
+            leftChangeBarLabelPublisher = leftChangeLabel,
             leftChangeBarStartPublisher = 8.asOneTimePublisher(),
-            rightChangeBarPublisher = rightChange.binding.mapElements { HemicycleFrame.Bar(Color.BLUE, it) }.toPublisher(),
-            rightChangeBarLabelPublisher = rightChangeLabel.binding.toPublisher(),
+            rightChangeBarPublisher = rightChange.mapElements { HemicycleFrame.Bar(Color.BLUE, it) },
+            rightChangeBarLabelPublisher = rightChangeLabel,
             rightChangeBarStartPublisher = 66.asOneTimePublisher()
         )
         frame.setSize(1024, 512)

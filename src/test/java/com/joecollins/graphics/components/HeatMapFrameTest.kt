@@ -1,9 +1,10 @@
 package com.joecollins.graphics.components
 
 import com.joecollins.bindings.mapElements
-import com.joecollins.graphics.utils.BindableWrapper
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
+import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
+import com.joecollins.pubsub.mapElements
 import org.awaitility.Awaitility
 import org.hamcrest.core.IsEqual
 import org.junit.Assert
@@ -117,7 +118,7 @@ class HeatMapFrameTest {
     @Throws(IOException::class)
     fun testRenderEvenWide() {
         val results = peiResults
-        val squares = BindableWrapper(
+        val squares = Publisher(
             sequenceOf(
                 20, 6, 19, 18, 7, 1, 2, 4, 5, 13, 21, 15, 22, 14, 25, 3, 12, 16, 23, 10, 26, 9, 11,
                 8, 27, 24, 17
@@ -125,43 +126,45 @@ class HeatMapFrameTest {
                 .map { results[it]!! }
                 .toList()
         )
-        val seatBars = BindableWrapper(
+        val seatBars = Publisher(
             listOf(Pair(Color.BLUE, 8), Pair(Color(128, 128, 255), 5))
         )
-        val seatLabel = BindableWrapper("8/13")
-        val changeBars = BindableWrapper(
+        val seatLabel = Publisher("8/13")
+        val changeBars = Publisher(
             listOf(Pair(Color.BLUE, 3), Pair(Color(128, 128, 255), 2))
         )
-        val changeLabel = BindableWrapper("+3/+5")
-        val changeStart = BindableWrapper(8)
-        val borderColor = BindableWrapper(Color.BLUE)
-        val header = BindableWrapper<String?>("PROGRESSIVE CONSERVATIVE HEAT MAP")
+        val changeLabel = Publisher("+3/+5")
+        val changeStart = Publisher(8)
+        val borderColor = Publisher(Color.BLUE)
+        val header = Publisher<String?>("PROGRESSIVE CONSERVATIVE HEAT MAP")
         val frame = HeatMapFrame(
-            headerPublisher = header.binding.toPublisher(),
+            headerPublisher = header,
             numRowsPublisher = 3.asOneTimePublisher(),
-            squaresPublisher = squares.binding.toPublisher(),
-            seatBarsPublisher = seatBars.binding.mapElements { HeatMapFrame.Bar(it.first, it.second) }.toPublisher(),
-            seatBarLabelPublisher = seatLabel.binding.toPublisher(),
-            changeBarsPublisher = changeBars.binding.mapElements { HeatMapFrame.Bar(it.first, it.second) }.toPublisher(),
-            changeBarLabelPublisher = changeLabel.binding.toPublisher(),
-            changeBarStartPublisher = changeStart.binding.toPublisher(),
-            borderColorPublisher = borderColor.binding.toPublisher()
+            squaresPublisher = squares,
+            seatBarsPublisher = seatBars.mapElements { HeatMapFrame.Bar(it.first, it.second) },
+            seatBarLabelPublisher = seatLabel,
+            changeBarsPublisher = changeBars.mapElements { HeatMapFrame.Bar(it.first, it.second) },
+            changeBarLabelPublisher = changeLabel,
+            changeBarStartPublisher = changeStart,
+            borderColorPublisher = borderColor
         )
         frame.setSize(1024, 512)
         compareRendering("HeatMapFrame", "EvenWide-1", frame)
-        squares.value = sequenceOf(
-            24, 27, 8, 11, 9, 26, 10, 23, 16, 12, 3, 25, 14, 22, 15, 21, 13, 5, 4, 2, 1, 7, 18,
-            19, 6, 20, 17
+        squares.submit(
+            sequenceOf(
+                24, 27, 8, 11, 9, 26, 10, 23, 16, 12, 3, 25, 14, 22, 15, 21, 13, 5, 4, 2, 1, 7, 18,
+                19, 6, 20, 17
+            )
+                .map { results[it]!! }
+                .toList()
         )
-            .map { results[it]!! }
-            .toList()
-        seatBars.value = listOf(Pair(Color.RED, 2), Pair(Color(255, 128, 128), 4))
-        seatLabel.value = "2/6"
-        changeBars.value = listOf(Pair(Color.RED, -4), Pair(Color(255, 128, 128), -8))
-        changeLabel.value = "-4/-12"
-        changeStart.value = 18
-        borderColor.value = Color.RED
-        header.value = "LIBERAL HEAT MAP"
+        seatBars.submit(listOf(Pair(Color.RED, 2), Pair(Color(255, 128, 128), 4)))
+        seatLabel.submit("2/6")
+        changeBars.submit(listOf(Pair(Color.RED, -4), Pair(Color(255, 128, 128), -8)))
+        changeLabel.submit("-4/-12")
+        changeStart.submit(18)
+        borderColor.submit(Color.RED)
+        header.submit("LIBERAL HEAT MAP")
         compareRendering("HeatMapFrame", "EvenWide-2", frame)
     }
 
@@ -169,7 +172,7 @@ class HeatMapFrameTest {
     @Throws(IOException::class)
     fun testRenderEvenHigh() {
         val results = peiResults
-        val squares = BindableWrapper(
+        val squares = Publisher(
             sequenceOf(
                 20, 6, 19, 18, 7, 1, 2, 4, 5, 13, 21, 15, 22, 14, 25, 3, 12, 16, 23, 10, 26, 9, 11,
                 8, 27, 24, 17
@@ -177,43 +180,45 @@ class HeatMapFrameTest {
                 .map { results[it]!! }
                 .toList()
         )
-        val seatBars = BindableWrapper(
+        val seatBars = Publisher(
             listOf(Pair(Color.BLUE, 8), Pair(Color(128, 128, 255), 5))
         )
-        val seatLabel = BindableWrapper("8/13")
-        val changeBars = BindableWrapper(
+        val seatLabel = Publisher("8/13")
+        val changeBars = Publisher(
             listOf(Pair(Color.BLUE, 3), Pair(Color(128, 128, 255), 2))
         )
-        val changeLabel = BindableWrapper("+3/+5")
-        val changeStart = BindableWrapper(8)
-        val borderColor = BindableWrapper(Color.BLUE)
-        val header = BindableWrapper<String?>("PROGRESSIVE CONSERVATIVE HEAT MAP")
+        val changeLabel = Publisher("+3/+5")
+        val changeStart = Publisher(8)
+        val borderColor = Publisher(Color.BLUE)
+        val header = Publisher<String?>("PROGRESSIVE CONSERVATIVE HEAT MAP")
         val frame = HeatMapFrame(
-            headerPublisher = header.binding.toPublisher(),
+            headerPublisher = header,
             numRowsPublisher = 9.asOneTimePublisher(),
-            squaresPublisher = squares.binding.toPublisher(),
-            seatBarsPublisher = seatBars.binding.mapElements { HeatMapFrame.Bar(it.first, it.second) }.toPublisher(),
-            seatBarLabelPublisher = seatLabel.binding.toPublisher(),
-            changeBarsPublisher = changeBars.binding.mapElements { HeatMapFrame.Bar(it.first, it.second) }.toPublisher(),
-            changeBarLabelPublisher = changeLabel.binding.toPublisher(),
-            changeBarStartPublisher = changeStart.binding.toPublisher(),
-            borderColorPublisher = borderColor.binding.toPublisher()
+            squaresPublisher = squares,
+            seatBarsPublisher = seatBars.mapElements { HeatMapFrame.Bar(it.first, it.second) },
+            seatBarLabelPublisher = seatLabel,
+            changeBarsPublisher = changeBars.mapElements { HeatMapFrame.Bar(it.first, it.second) },
+            changeBarLabelPublisher = changeLabel,
+            changeBarStartPublisher = changeStart,
+            borderColorPublisher = borderColor
         )
         frame.setSize(1024, 512)
         compareRendering("HeatMapFrame", "EvenHigh-1", frame)
-        squares.value = sequenceOf(
-            24, 27, 8, 11, 9, 26, 10, 23, 16, 12, 3, 25, 14, 22, 15, 21, 13, 5, 4, 2, 1, 7, 18,
-            19, 6, 20, 17
+        squares.submit(
+            sequenceOf(
+                24, 27, 8, 11, 9, 26, 10, 23, 16, 12, 3, 25, 14, 22, 15, 21, 13, 5, 4, 2, 1, 7, 18,
+                19, 6, 20, 17
+            )
+                .map { results[it]!! }
+                .toList()
         )
-            .map { results[it]!! }
-            .toList()
-        seatBars.value = listOf(Pair(Color.RED, 2), Pair(Color(255, 128, 128), 4))
-        seatLabel.value = "2/6"
-        changeBars.value = listOf(Pair(Color.RED, -4), Pair(Color(255, 128, 128), -8))
-        changeLabel.value = "-4/-12"
-        changeStart.value = 18
-        borderColor.value = Color.RED
-        header.value = "LIBERAL HEAT MAP"
+        seatBars.submit(listOf(Pair(Color.RED, 2), Pair(Color(255, 128, 128), 4)))
+        seatLabel.submit("2/6")
+        changeBars.submit(listOf(Pair(Color.RED, -4), Pair(Color(255, 128, 128), -8)))
+        changeLabel.submit("-4/-12")
+        changeStart.submit(18)
+        borderColor.submit(Color.RED)
+        header.submit("LIBERAL HEAT MAP")
         compareRendering("HeatMapFrame", "EvenHigh-2", frame)
     }
 
@@ -221,7 +226,7 @@ class HeatMapFrameTest {
     @Throws(IOException::class)
     fun testRenderUneven() {
         val results = peiResults
-        val squares = BindableWrapper(
+        val squares = Publisher(
             sequenceOf(
                 20, 6, 19, 18, 7, 1, 2, 4, 5, 13, 21, 15, 22, 14, 25, 3, 12, 16, 23, 10, 26, 9, 11,
                 8, 27, 24, 17
@@ -229,43 +234,45 @@ class HeatMapFrameTest {
                 .map { results[it]!! }
                 .toList()
         )
-        val seatBars = BindableWrapper(
+        val seatBars = Publisher(
             listOf(Pair(Color.BLUE, 8), Pair(Color(128, 128, 255), 5))
         )
-        val seatLabel = BindableWrapper("8/13")
-        val changeBars = BindableWrapper(
+        val seatLabel = Publisher("8/13")
+        val changeBars = Publisher(
             listOf(Pair(Color.BLUE, 3), Pair(Color(128, 128, 255), 2))
         )
-        val changeLabel = BindableWrapper("+3/+5")
-        val changeStart = BindableWrapper(8)
-        val borderColor = BindableWrapper(Color.BLUE)
-        val header = BindableWrapper<String?>("PROGRESSIVE CONSERVATIVE HEAT MAP")
+        val changeLabel = Publisher("+3/+5")
+        val changeStart = Publisher(8)
+        val borderColor = Publisher(Color.BLUE)
+        val header = Publisher<String?>("PROGRESSIVE CONSERVATIVE HEAT MAP")
         val frame = HeatMapFrame(
-            headerPublisher = header.binding.toPublisher(),
+            headerPublisher = header,
             numRowsPublisher = 5.asOneTimePublisher(),
-            squaresPublisher = squares.binding.toPublisher(),
-            seatBarsPublisher = seatBars.binding.mapElements { HeatMapFrame.Bar(it.first, it.second) }.toPublisher(),
-            seatBarLabelPublisher = seatLabel.binding.toPublisher(),
-            changeBarsPublisher = changeBars.binding.mapElements { HeatMapFrame.Bar(it.first, it.second) }.toPublisher(),
-            changeBarLabelPublisher = changeLabel.binding.toPublisher(),
-            changeBarStartPublisher = changeStart.binding.toPublisher(),
-            borderColorPublisher = borderColor.binding.toPublisher()
+            squaresPublisher = squares,
+            seatBarsPublisher = seatBars.mapElements { HeatMapFrame.Bar(it.first, it.second) },
+            seatBarLabelPublisher = seatLabel,
+            changeBarsPublisher = changeBars.mapElements { HeatMapFrame.Bar(it.first, it.second) },
+            changeBarLabelPublisher = changeLabel,
+            changeBarStartPublisher = changeStart,
+            borderColorPublisher = borderColor
         )
         frame.setSize(1024, 512)
         compareRendering("HeatMapFrame", "Uneven-1", frame)
-        squares.value = sequenceOf(
-            24, 27, 8, 11, 9, 26, 10, 23, 16, 12, 3, 25, 14, 22, 15, 21, 13, 5, 4, 2, 1, 7, 18,
-            19, 6, 20, 17
+        squares.submit(
+            sequenceOf(
+                24, 27, 8, 11, 9, 26, 10, 23, 16, 12, 3, 25, 14, 22, 15, 21, 13, 5, 4, 2, 1, 7, 18,
+                19, 6, 20, 17
+            )
+                .map { results[it]!! }
+                .toList()
         )
-            .map { results[it]!! }
-            .toList()
-        seatBars.value = listOf(Pair(Color.RED, 2), Pair(Color(255, 128, 128), 4))
-        seatLabel.value = "2/6"
-        changeBars.value = listOf(Pair(Color.RED, -4), Pair(Color(255, 128, 128), -8))
-        changeLabel.value = "-4/-12"
-        changeStart.value = 18
-        borderColor.value = Color.RED
-        header.value = "LIBERAL HEAT MAP"
+        seatBars.submit(listOf(Pair(Color.RED, 2), Pair(Color(255, 128, 128), 4)))
+        seatLabel.submit("2/6")
+        changeBars.submit(listOf(Pair(Color.RED, -4), Pair(Color(255, 128, 128), -8)))
+        changeLabel.submit("-4/-12")
+        changeStart.submit(18)
+        borderColor.submit(Color.RED)
+        header.submit("LIBERAL HEAT MAP")
         compareRendering("HeatMapFrame", "Uneven-2", frame)
 
         frame.moveMouse(500, 250)
@@ -282,7 +289,7 @@ class HeatMapFrameTest {
     @Throws(IOException::class)
     fun testRenderChangeReversals() {
         val results = peiResults
-        val squares = BindableWrapper(
+        val squares = Publisher(
             sequenceOf(
                 20, 6, 19, 18, 7, 1, 2, 4, 5, 13, 21, 15, 22, 14, 25, 3, 12, 16, 23, 10, 26, 9, 11,
                 8, 27, 24, 17
@@ -290,40 +297,40 @@ class HeatMapFrameTest {
                 .map { results[it]!! }
                 .toList()
         )
-        val seatBars = BindableWrapper(
+        val seatBars = Publisher(
             listOf(Pair(Color.BLUE, 2), Pair(Color(128, 128, 255), 2))
         )
-        val seatLabel = BindableWrapper("2/4")
-        val changeBars = BindableWrapper(
+        val seatLabel = Publisher("2/4")
+        val changeBars = Publisher(
             listOf(Pair(Color.BLUE, 3), Pair(Color(128, 128, 255), 2))
         )
-        val changeLabel = BindableWrapper("+3/+5")
-        val changeStart = BindableWrapper(8)
-        val borderColor = BindableWrapper(Color.BLUE)
-        val header = BindableWrapper<String?>("PROGRESSIVE CONSERVATIVE HEAT MAP")
+        val changeLabel = Publisher("+3/+5")
+        val changeStart = Publisher(8)
+        val borderColor = Publisher(Color.BLUE)
+        val header = Publisher<String?>("PROGRESSIVE CONSERVATIVE HEAT MAP")
         val frame = HeatMapFrame(
-            headerPublisher = header.binding.toPublisher(),
+            headerPublisher = header,
             numRowsPublisher = 5.asOneTimePublisher(),
-            squaresPublisher = squares.binding.toPublisher(),
-            seatBarsPublisher = seatBars.binding.mapElements { HeatMapFrame.Bar(it.first, it.second) }.toPublisher(),
-            seatBarLabelPublisher = seatLabel.binding.toPublisher(),
-            changeBarsPublisher = changeBars.binding.mapElements { HeatMapFrame.Bar(it.first, it.second) }.toPublisher(),
-            changeBarLabelPublisher = changeLabel.binding.toPublisher(),
-            changeBarStartPublisher = changeStart.binding.toPublisher(),
-            borderColorPublisher = borderColor.binding.toPublisher()
+            squaresPublisher = squares,
+            seatBarsPublisher = seatBars.mapElements { HeatMapFrame.Bar(it.first, it.second) },
+            seatBarLabelPublisher = seatLabel,
+            changeBarsPublisher = changeBars.mapElements { HeatMapFrame.Bar(it.first, it.second) },
+            changeBarLabelPublisher = changeLabel,
+            changeBarStartPublisher = changeStart,
+            borderColorPublisher = borderColor
         )
         frame.setSize(1024, 512)
-        changeBars.value = listOf(Pair(Color.BLUE, 2), Pair(Color(128, 128, 255), -1))
-        changeLabel.value = "+2/+1"
+        changeBars.submit(listOf(Pair(Color.BLUE, 2), Pair(Color(128, 128, 255), -1)))
+        changeLabel.submit("+2/+1")
         compareRendering("HeatMapFrame", "ChangeReversals-1", frame)
-        changeBars.value = listOf(Pair(Color.BLUE, -2), Pair(Color(128, 128, 255), 1))
-        changeLabel.value = "-2/-1"
+        changeBars.submit(listOf(Pair(Color.BLUE, -2), Pair(Color(128, 128, 255), 1)))
+        changeLabel.submit("-2/-1")
         compareRendering("HeatMapFrame", "ChangeReversals-2", frame)
-        changeBars.value = listOf(Pair(Color.BLUE, 1), Pair(Color(128, 128, 255), -2))
-        changeLabel.value = "+1/-1"
+        changeBars.submit(listOf(Pair(Color.BLUE, 1), Pair(Color(128, 128, 255), -2)))
+        changeLabel.submit("+1/-1")
         compareRendering("HeatMapFrame", "ChangeReversals-3", frame)
-        changeBars.value = listOf(Pair(Color.BLUE, -1), Pair(Color(128, 128, 255), 2))
-        changeLabel.value = "-1/+1"
+        changeBars.submit(listOf(Pair(Color.BLUE, -1), Pair(Color(128, 128, 255), 2)))
+        changeLabel.submit("-1/+1")
         compareRendering("HeatMapFrame", "ChangeReversals-4", frame)
     }
 

@@ -5,10 +5,14 @@ import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Flow
 import java.util.concurrent.LinkedBlockingQueue
 
-class Publisher<T> : Flow.Publisher<T>, AutoCloseable {
+class Publisher<T>() : Flow.Publisher<T>, AutoCloseable {
 
     private val subscriptions = HashSet<Subscription>()
     private var value: Wrapper<T>? = null
+
+    constructor(firstPublication: T) : this() {
+        submit(firstPublication)
+    }
 
     override fun subscribe(subscriber: Flow.Subscriber<in T>) {
         synchronized(this) {
@@ -99,6 +103,8 @@ fun <T, R> Flow.Publisher<T>.map(func: (T) -> R): Flow.Publisher<R> {
     subscribe(Subscriber { publisher.submit(func(it)) })
     return publisher
 }
+
+fun <T, R> Flow.Publisher<out List<T>>.mapElements(func: (T) -> R): Flow.Publisher<List<R>> = map { it.map(func) }
 
 fun <T, U, R> Flow.Publisher<T>.merge(other: Flow.Publisher<U>, func: (T, U) -> R): Flow.Publisher<R> {
     data class Wrapper<T>(val item: T)
