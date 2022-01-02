@@ -1,9 +1,5 @@
 package com.joecollins.graphics.screens.generic
 
-import com.joecollins.bindings.Bindable
-import com.joecollins.bindings.Binding
-import com.joecollins.bindings.BindingReceiver
-import com.joecollins.bindings.mapElements
 import com.joecollins.graphics.components.FontSizeAdjustingLabel
 import com.joecollins.graphics.components.GraphicsFrame
 import com.joecollins.graphics.components.ResultListingFrame
@@ -12,7 +8,13 @@ import com.joecollins.graphics.utils.ColorUtils.lighten
 import com.joecollins.graphics.utils.StandardFont.readBoldFont
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
+import com.joecollins.pubsub.Publisher
+import com.joecollins.pubsub.Subscriber
+import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
 import com.joecollins.pubsub.asOneTimePublisher
+import com.joecollins.pubsub.map
+import com.joecollins.pubsub.mapElements
+import com.joecollins.pubsub.merge
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Component
@@ -20,6 +22,7 @@ import java.awt.Container
 import java.awt.Dimension
 import java.awt.LayoutManager
 import java.util.HashMap
+import java.util.concurrent.Flow
 import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.border.EmptyBorder
@@ -33,59 +36,59 @@ class BattlegroundScreen private constructor(
 ) : JPanel() {
 
     class SinglePartyBuilder<T>(
-        prevResults: Binding<Map<T, Map<Party, Int>>>,
-        currResults: Binding<Map<T, PartyResult?>>,
+        prevResults: Flow.Publisher<out Map<T, Map<Party, Int>>>,
+        currResults: Flow.Publisher<out Map<T, PartyResult?>>,
         private val nameFunc: (T) -> String,
-        party: Binding<Party>
+        party: Flow.Publisher<out Party>
     ) {
-        private val prevResults: BindingReceiver<Map<T, Map<Party, Int>>> = BindingReceiver(prevResults)
-        private val currResults: BindingReceiver<Map<T, PartyResult?>> = BindingReceiver(currResults)
-        private val party: BindingReceiver<Party> = BindingReceiver(party)
-        private var defenseSeatCount = BindingReceiver(Binding.fixedBinding(100))
-        private var targetSeatCount = BindingReceiver(Binding.fixedBinding(100))
-        private var numRows = BindingReceiver(Binding.fixedBinding(20))
-        private var seatFilter = BindingReceiver<Set<T>?>(Binding.fixedBinding(null))
+        private val prevResults: Flow.Publisher<out Map<T, Map<Party, Int>>> = prevResults
+        private val currResults: Flow.Publisher<out Map<T, PartyResult?>> = currResults
+        private val party: Flow.Publisher<out Party> = party
+        private var defenseSeatCount: Flow.Publisher<out Int> = 100.asOneTimePublisher()
+        private var targetSeatCount: Flow.Publisher<out Int> = 100.asOneTimePublisher()
+        private var numRows: Flow.Publisher<out Int> = 20.asOneTimePublisher()
+        private var seatFilter: Flow.Publisher<out Set<T>?> = (null as Set<T>?).asOneTimePublisher()
 
         fun withSeatsToShow(
-            defenseSeatCountBinding: Binding<Int>,
-            targetSeatCountBinding: Binding<Int>
+            defenseSeatCountPublisher: Flow.Publisher<out Int>,
+            targetSeatCountPublisher: Flow.Publisher<out Int>
         ): SinglePartyBuilder<T> {
-            defenseSeatCount = BindingReceiver(defenseSeatCountBinding)
-            targetSeatCount = BindingReceiver(targetSeatCountBinding)
+            defenseSeatCount = defenseSeatCountPublisher
+            targetSeatCount = targetSeatCountPublisher
             return this
         }
 
-        fun withNumRows(numRowsBinding: Binding<Int>): SinglePartyBuilder<T> {
-            numRows = BindingReceiver(numRowsBinding)
+        fun withNumRows(numRowsPublisher: Flow.Publisher<out Int>): SinglePartyBuilder<T> {
+            numRows = numRowsPublisher
             return this
         }
 
-        fun withSeatFilter(seatFilterBinding: Binding<Set<T>?>): SinglePartyBuilder<T> {
-            seatFilter = BindingReceiver(seatFilterBinding)
+        fun withSeatFilter(seatFilterPublisher: Flow.Publisher<out Set<T>?>): SinglePartyBuilder<T> {
+            seatFilter = seatFilterPublisher
             return this
         }
 
-        fun build(title: Binding<String?>): BattlegroundScreen {
+        fun build(title: Flow.Publisher<out String?>): BattlegroundScreen {
             val headerLabel = FontSizeAdjustingLabel()
             headerLabel.font = readBoldFont(32)
             headerLabel.horizontalAlignment = JLabel.CENTER
             headerLabel.border = EmptyBorder(5, 0, -5, 0)
-            title.bind { headerLabel.text = it }
-            party.getBinding(Party::color).bind { headerLabel.foreground = it }
+            title.subscribe(Subscriber(eventQueueWrapper { headerLabel.text = it }))
+            party.map(Party::color).subscribe(Subscriber(eventQueueWrapper { headerLabel.foreground = it }))
 
             val defenseInput = BattlegroundInput<T>()
-            prevResults.getBinding().bind { defenseInput.setPrev(it) }
-            currResults.getBinding().bind { defenseInput.setCurr(it) }
-            defenseSeatCount.getBinding().bind { defenseInput.setCount(it) }
-            party.getBinding().bind { defenseInput.setParty(it) }
-            seatFilter.getBinding().bind { defenseInput.setFilteredSeats(it) }
+            prevResults.subscribe(Subscriber { defenseInput.setPrev(it) })
+            currResults.subscribe(Subscriber { defenseInput.setCurr(it) })
+            defenseSeatCount.subscribe(Subscriber { defenseInput.setCount(it) })
+            party.subscribe(Subscriber { defenseInput.setParty(it) })
+            seatFilter.subscribe(Subscriber { defenseInput.setFilteredSeats(it) })
             defenseInput.setSide(Side.DEFENSE)
             val defenseItems = defenseInput.items
             val defenseFrame = ResultListingFrame(
-                headerPublisher = party.getBinding { p: Party -> "$p DEFENSE SEATS" }.toPublisher(),
-                borderColorPublisher = party.getBinding(Party::color).toPublisher(),
-                headerAlignmentPublisher = Binding.fixedBinding(GraphicsFrame.Alignment.RIGHT).toPublisher(),
-                numRowsPublisher = numRows.getBinding().toPublisher(),
+                headerPublisher = party.map { p: Party -> "$p DEFENSE SEATS" },
+                borderColorPublisher = party.map(Party::color),
+                headerAlignmentPublisher = GraphicsFrame.Alignment.RIGHT.asOneTimePublisher(),
+                numRowsPublisher = numRows,
                 itemsPublisher = defenseItems.mapElements {
                     ResultListingFrame.Item(
                         text = nameFunc(it.key),
@@ -93,23 +96,23 @@ class BattlegroundScreen private constructor(
                         background = (if (it.fill) it.resultColor else Color.WHITE),
                         foreground = (if (!it.fill) it.resultColor else Color.WHITE)
                     )
-                }.toPublisher(),
+                },
                 reversedPublisher = true.asOneTimePublisher()
             )
 
             val targetInput = BattlegroundInput<T>()
-            prevResults.getBinding().bind { targetInput.setPrev(it) }
-            currResults.getBinding().bind { targetInput.setCurr(it) }
-            targetSeatCount.getBinding().bind { targetInput.setCount(it) }
-            party.getBinding().bind { targetInput.setParty(it) }
-            seatFilter.getBinding().bind { targetInput.setFilteredSeats(it) }
+            prevResults.subscribe(Subscriber { targetInput.setPrev(it) })
+            currResults.subscribe(Subscriber { targetInput.setCurr(it) })
+            targetSeatCount.subscribe(Subscriber { targetInput.setCount(it) })
+            party.subscribe(Subscriber { targetInput.setParty(it) })
+            seatFilter.subscribe(Subscriber { targetInput.setFilteredSeats(it) })
             targetInput.setSide(Side.TARGET)
             val targetItems = targetInput.items
             val targetFrame = ResultListingFrame(
-                headerPublisher = party.getBinding<String?> { p: Party -> "$p TARGET SEATS" }.toPublisher(),
-                borderColorPublisher = party.getBinding(Party::color).toPublisher(),
-                headerAlignmentPublisher = Binding.fixedBinding(GraphicsFrame.Alignment.LEFT).toPublisher(),
-                numRowsPublisher = numRows.getBinding().toPublisher(),
+                headerPublisher = party.map { p: Party -> "$p TARGET SEATS" },
+                borderColorPublisher = party.map(Party::color),
+                headerAlignmentPublisher = GraphicsFrame.Alignment.LEFT.asOneTimePublisher(),
+                numRowsPublisher = numRows,
                 itemsPublisher = targetItems.mapElements {
                     ResultListingFrame.Item(
                         text = nameFunc(it.key),
@@ -117,7 +120,7 @@ class BattlegroundScreen private constructor(
                         background = (if (it.fill) it.resultColor else Color.WHITE),
                         foreground = (if (!it.fill) it.resultColor else Color.WHITE)
                     )
-                }.toPublisher(),
+                },
                 reversedPublisher = false.asOneTimePublisher()
             )
 
@@ -128,19 +131,17 @@ class BattlegroundScreen private constructor(
             ) { screen: BattlegroundScreen ->
                 val layout = screen.Layout()
                 defenseSeatCount
-                    .getBinding()
-                    .merge(numRows.getBinding()) { c: Int, n: Int -> n * ceil(1.0 * c / n).toInt() }
-                    .bind { layout.setLeft(it) }
+                    .merge(numRows) { c: Int, n: Int -> n * ceil(1.0 * c / n).toInt() }
+                    .subscribe(Subscriber(eventQueueWrapper { layout.setLeft(it) }))
                 targetSeatCount
-                    .getBinding()
-                    .merge(numRows.getBinding()) { c: Int, n: Int -> n * ceil(1.0 * c / n).toInt() }
-                    .bind { layout.setRight(it) }
+                    .merge(numRows) { c: Int, n: Int -> n * ceil(1.0 * c / n).toInt() }
+                    .subscribe(Subscriber(eventQueueWrapper { layout.setRight(it) }))
                 layout
             }
         }
     }
 
-    private class BattlegroundInput<T> : Bindable<BattlegroundInput<T>, BattlegroundInput.Property>() {
+    private class BattlegroundInput<T> {
         private enum class Property {
             PREV, CURR, PARTY, COUNT, SIDE, FILTERED_SEATS
         }
@@ -158,46 +159,42 @@ class BattlegroundScreen private constructor(
 
         fun setPrev(prev: Map<T, Map<Party, Int>>) {
             this.prev = prev
-            onPropertyRefreshed(Property.PREV)
+            submit()
         }
 
         fun setCurr(curr: Map<T, PartyResult?>) {
             this.curr = curr
-            onPropertyRefreshed(Property.CURR)
+            submit()
         }
 
         fun setCount(count: Int) {
             this.count = count
-            onPropertyRefreshed(Property.COUNT)
+            submit()
         }
 
         fun setParty(party: Party?) {
             this.party = party
-            onPropertyRefreshed(Property.PARTY)
+            submit()
         }
 
         fun setSide(side: Side) {
             this.side = side
-            onPropertyRefreshed(Property.SIDE)
+            submit()
         }
 
         fun setFilteredSeats(filteredSeats: Set<T>?) {
             this.filteredSeats = filteredSeats
-            onPropertyRefreshed(Property.FILTERED_SEATS)
+            submit()
         }
 
-        val items: Binding<List<Entry<T>>>
-            get() {
-                return Binding.propertyBinding(
-                    this, { input -> getItemsList(input) },
-                    Property.PREV,
-                    Property.COUNT,
-                    Property.CURR,
-                    Property.PARTY,
-                    Property.SIDE,
-                    Property.FILTERED_SEATS
-                )
+        private fun submit() {
+            synchronized(this) {
+                _items.submit(getItemsList(this))
             }
+        }
+
+        val _items = Publisher(getItemsList(this))
+        val items: Flow.Publisher<List<Entry<T>>> = _items
 
         companion object {
             @JvmStatic private fun <T> getItemsList(t: BattlegroundInput<T>): List<Entry<T>> {
@@ -301,12 +298,12 @@ class BattlegroundScreen private constructor(
 
     companion object {
         @JvmStatic fun <T> singleParty(
-            prevResultsBinding: Binding<Map<T, Map<Party, Int>>>,
-            currResultsBinding: Binding<Map<T, PartyResult?>>,
+            prevResultsPublisher: Flow.Publisher<out Map<T, Map<Party, Int>>>,
+            currResultsPublisher: Flow.Publisher<out Map<T, PartyResult?>>,
             nameFunc: (T) -> String,
-            partyBinding: Binding<Party>
+            partyPublisher: Flow.Publisher<out Party>
         ): SinglePartyBuilder<T> {
-            return SinglePartyBuilder(prevResultsBinding, currResultsBinding, nameFunc, partyBinding)
+            return SinglePartyBuilder(prevResultsPublisher, currResultsPublisher, nameFunc, partyPublisher)
         }
     }
 

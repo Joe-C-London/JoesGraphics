@@ -66,6 +66,8 @@ class ResultListingFrame(
                 items[idx].background = item.background
                 items[idx].borderColor = item.border
             }
+            invalidate()
+            revalidate()
             repaint()
         }
         itemsPublisher.subscribe(Subscriber(eventQueueWrapper(onItemsUpdate)))

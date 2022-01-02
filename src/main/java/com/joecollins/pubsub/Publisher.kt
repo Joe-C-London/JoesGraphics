@@ -1,6 +1,7 @@
 package com.joecollins.pubsub
 
 import org.apache.commons.lang3.tuple.MutablePair
+import java.sql.Wrapper
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Flow
 import java.util.concurrent.LinkedBlockingQueue
@@ -132,5 +133,27 @@ fun <T, U, R> Flow.Publisher<T>.merge(other: Flow.Publisher<U>, func: (T, U) -> 
             }
         }
     )
+    return publisher
+}
+
+fun <T> List<Flow.Publisher<T>>.combine(): Flow.Publisher<List<T>> {
+    data class Wrapper(val item: T)
+    val publisher = Publisher<List<T>>()
+    val list: MutableList<Wrapper?> = this.map { null }.toMutableList()
+    val onUpdate = {
+        synchronized(list) {
+            if (list.none { it == null }) {
+                publisher.submit(list.map { it!!.item })
+            }
+        }
+    }
+    this.forEachIndexed { index, pub ->
+        pub.subscribe(
+            Subscriber {
+                list[index] = Wrapper(it)
+                onUpdate()
+            }
+        )
+    }
     return publisher
 }

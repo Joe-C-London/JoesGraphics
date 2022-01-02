@@ -42,30 +42,38 @@ class BarFrameBuilder private constructor() {
             get() { return _highest }
             set(highest) {
                 _highest = highest
-                minPublisher.submit(minFunction(this))
-                maxPublisher.submit(maxFunction(this))
+                synchronized(this) {
+                    minPublisher.submit(minFunction(this))
+                    maxPublisher.submit(maxFunction(this))
+                }
             }
 
         var lowest: Number
             get() { return _lowest }
             set(lowest) {
                 _lowest = lowest
-                minPublisher.submit(minFunction(this))
-                maxPublisher.submit(maxFunction(this))
+                synchronized(this) {
+                    minPublisher.submit(minFunction(this))
+                    maxPublisher.submit(maxFunction(this))
+                }
             }
 
         var minFunction: (RangeFinder) -> Number
             get() { return _minFunction }
             set(minFunction) {
                 _minFunction = minFunction
-                minPublisher.submit(minFunction(this))
+                synchronized(this) {
+                    minPublisher.submit(minFunction(this))
+                }
             }
 
         var maxFunction: (RangeFinder) -> Number
             get() { return _maxFunction }
             set(maxFunction) {
                 _maxFunction = maxFunction
-                maxPublisher.submit(maxFunction(this))
+                synchronized(this) {
+                    maxPublisher.submit(maxFunction(this))
+                }
             }
 
         val minPublisher = Publisher(minFunction(this))
@@ -85,39 +93,39 @@ class BarFrameBuilder private constructor() {
         val shape: Shape? = null
     )
 
-    fun withHeader(headerBinding: Flow.Publisher<out String?>): BarFrameBuilder {
-        this.headerPublisher = headerBinding
+    fun withHeader(headerPublisher: Flow.Publisher<out String?>): BarFrameBuilder {
+        this.headerPublisher = headerPublisher
         return this
     }
 
-    fun withSubhead(subheadBinding: Flow.Publisher<out String?>): BarFrameBuilder {
-        this.subheadPublisher = subheadBinding
+    fun withSubhead(subheadPublisher: Flow.Publisher<out String?>): BarFrameBuilder {
+        this.subheadPublisher = subheadPublisher
         return this
     }
 
-    fun withNotes(notesBinding: Flow.Publisher<out String?>): BarFrameBuilder {
-        this.notesPublisher = notesBinding
+    fun withNotes(notesPublisher: Flow.Publisher<out String?>): BarFrameBuilder {
+        this.notesPublisher = notesPublisher
         return this
     }
 
-    fun withBorder(borderColorBinding: Flow.Publisher<out Color>): BarFrameBuilder {
-        this.borderColorPublisher = borderColorBinding
+    fun withBorder(borderColorPublisher: Flow.Publisher<out Color>): BarFrameBuilder {
+        this.borderColorPublisher = borderColorPublisher
         return this
     }
 
-    fun withSubheadColor(subheadColorBinding: Flow.Publisher<out Color>): BarFrameBuilder {
-        this.subheadColorPublisher = subheadColorBinding
+    fun withSubheadColor(subheadColorPublisher: Flow.Publisher<out Color>): BarFrameBuilder {
+        this.subheadColorPublisher = subheadColorPublisher
         return this
     }
 
-    fun withMax(maxBinding: Flow.Publisher<out Number>): BarFrameBuilder {
+    fun withMax(maxPublisher: Flow.Publisher<out Number>): BarFrameBuilder {
         rangeFinder.minFunction = { 0 }
-        maxBinding.subscribe(Subscriber { max: Number -> rangeFinder.maxFunction = { max(max.toDouble(), it.highest.toDouble()) } })
+        maxPublisher.subscribe(Subscriber { max: Number -> rangeFinder.maxFunction = { max(max.toDouble(), it.highest.toDouble()) } })
         return this
     }
 
-    fun withWingspan(wingspanBinding: Flow.Publisher<out Number>): BarFrameBuilder {
-        wingspanBinding.subscribe(
+    fun withWingspan(wingspanPublisher: Flow.Publisher<out Number>): BarFrameBuilder {
+        wingspanPublisher.subscribe(
             Subscriber { wingspan: Number ->
                 val f = { it: RangeFinder ->
                     max(
@@ -133,10 +141,10 @@ class BarFrameBuilder private constructor() {
     }
 
     fun <T : Number> withTarget(
-        targetBinding: Flow.Publisher<out T>,
+        targetPublisher: Flow.Publisher<out T>,
         labelFunc: (T) -> String
     ): BarFrameBuilder {
-        this.linesPublisher = targetBinding.map {
+        this.linesPublisher = targetPublisher.map {
             val str = labelFunc(it)
             listOf(BarFrame.Line(it, str))
         }
@@ -159,14 +167,14 @@ class BarFrameBuilder private constructor() {
     }
 
     fun <T : Number> withLines(
-        linesBinding: Flow.Publisher<out List<T>>,
+        linesPublisher: Flow.Publisher<out List<T>>,
         labelFunc: (T) -> String
     ): BarFrameBuilder {
-        return withLines(linesBinding, labelFunc) { it }
+        return withLines(linesPublisher, labelFunc) { it }
     }
 
-    fun withMinBarCount(minBarCountBinding: Flow.Publisher<out Int>): BarFrameBuilder {
-        this.minBarCountPublisher = minBarCountBinding
+    fun withMinBarCount(minBarCountPublisher: Flow.Publisher<out Int>): BarFrameBuilder {
+        this.minBarCountPublisher = minBarCountPublisher
         return this
     }
 

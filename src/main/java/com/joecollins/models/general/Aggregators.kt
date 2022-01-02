@@ -1,7 +1,9 @@
 package com.joecollins.models.general
 
 import com.joecollins.bindings.Binding
+import com.joecollins.pubsub.map
 import java.lang.Integer.max
+import java.util.concurrent.Flow
 
 object Aggregators {
 
@@ -81,6 +83,8 @@ object Aggregators {
     }
 
     @JvmStatic fun <K1, K2> adjustKey(result: Binding<Map<K1, Int>>, func: (K1) -> K2) = result.map { adjustKey(it, func) }
+
+    @JvmStatic fun <K1, K2> adjustKey(result: Flow.Publisher<out Map<K1, Int>>, func: (K1) -> K2) = result.map { adjustKey(it, func) }
 
     @JvmStatic fun <K1, K2> adjustKey(result: Map<K1, Int>, func: (K1) -> K2): Map<K2, Int> {
         val ret: LinkedHashMap<K2, Int> = LinkedHashMap()

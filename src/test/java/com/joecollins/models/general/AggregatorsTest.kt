@@ -12,9 +12,14 @@ import com.joecollins.models.general.Aggregators.sum
 import com.joecollins.models.general.Aggregators.toMap
 import com.joecollins.models.general.Aggregators.toPct
 import com.joecollins.models.general.Aggregators.topAndOthers
+import com.joecollins.pubsub.Publisher
+import com.joecollins.pubsub.Subscriber
+import org.awaitility.Awaitility
+import org.hamcrest.core.IsEqual
 import org.junit.Assert
 import org.junit.Test
 import java.util.ArrayList
+import java.util.concurrent.TimeUnit
 
 class AggregatorsTest {
     @Test
@@ -29,12 +34,16 @@ class AggregatorsTest {
 
     @Test
     fun testKeyChangeWithMerge() {
-        val input = BindableWrapper(mapOf("ABC" to 5, "AZY" to 7))
+        val input = Publisher(mapOf("ABC" to 5, "AZY" to 7))
         val output: BoundResult<Map<String, Int>> = BoundResult()
-        adjustKey(input.binding) { it.substring(0, 1) }.bind { output.value = it }
-        Assert.assertEquals(mapOf("A" to 12), output.value)
-        input.value = mapOf("ABC" to 10, "DEF" to 6, "DCB" to 2)
-        Assert.assertEquals(mapOf("A" to 10, "D" to 8), output.value)
+        adjustKey(input) { it.substring(0, 1) }.subscribe(Subscriber { output.value = it })
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .ignoreException(NullPointerException::class.java)
+            .until({ output.value }, IsEqual(mapOf("A" to 12)))
+        input.submit(mapOf("ABC" to 10, "DEF" to 6, "DCB" to 2))
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .ignoreException(NullPointerException::class.java)
+            .until({ output.value }, IsEqual(mapOf("A" to 10, "D" to 8)))
     }
 
     @Test

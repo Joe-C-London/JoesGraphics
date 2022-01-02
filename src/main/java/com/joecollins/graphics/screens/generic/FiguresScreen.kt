@@ -1,17 +1,21 @@
 package com.joecollins.graphics.screens.generic
 
-import com.joecollins.bindings.Bindable
-import com.joecollins.bindings.Binding
 import com.joecollins.graphics.components.FiguresFrame
 import com.joecollins.graphics.components.FontSizeAdjustingLabel
 import com.joecollins.graphics.utils.StandardFont.readBoldFont
 import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.Party
+import com.joecollins.pubsub.Publisher
+import com.joecollins.pubsub.Subscriber
+import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
 import com.joecollins.pubsub.asOneTimePublisher
+import com.joecollins.pubsub.combine
+import com.joecollins.pubsub.merge
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.GridLayout
 import java.util.LinkedList
+import java.util.concurrent.Flow
 import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.border.EmptyBorder
@@ -25,12 +29,12 @@ class FiguresScreen private constructor(headerLabel: JLabel, frames: Array<Figur
         fun withCandidate(
             candidate: Candidate,
             description: String,
-            leader: Binding<Party?>,
-            status: Binding<String>
+            leader: Flow.Publisher<out Party?>,
+            status: Flow.Publisher<out String>
         ): Section {
             val entry = Entry(candidate, description)
-            leader.bind { entry.leader = it }
-            status.bind { entry.status = it }
+            leader.subscribe(Subscriber { entry.leader = it })
+            status.subscribe(Subscriber { entry.status = it })
             entries.add(entry)
             return this
         }
@@ -38,31 +42,25 @@ class FiguresScreen private constructor(headerLabel: JLabel, frames: Array<Figur
         fun createFrame(): FiguresFrame {
             val frame = FiguresFrame(
                 headerPublisher = name.asOneTimePublisher(),
-                entriesPublisher = Binding.listBinding(
-                    entries.map { e ->
-                        val colorBinding = Binding.propertyBinding(
-                            e,
-                            { x: Entry -> (x.leader ?: Party.OTHERS).color },
-                            Entry.Property.LEADER
+                entriesPublisher =
+                entries.map { e ->
+                    e.colorPublisher.merge(e.statusPublisher) { color, status ->
+                        FiguresFrame.Entry(
+                            name = e.candidate.name.uppercase(),
+                            color = e.candidate.party.color,
+                            description = e.description,
+                            resultColor = color,
+                            result = status
                         )
-                        val statusBinding = Binding.propertyBinding(e, { x: Entry -> x.status }, Entry.Property.STATUS)
-                        colorBinding.merge(statusBinding) { color, status ->
-                            FiguresFrame.Entry(
-                                name = e.candidate.name.uppercase(),
-                                color = e.candidate.party.color,
-                                description = e.description,
-                                resultColor = color,
-                                result = status
-                            )
-                        }
                     }
-                ).toPublisher()
+                }
+                    .combine()
             )
             return frame
         }
     }
 
-    private class Entry(val candidate: Candidate, val description: String) : Bindable<Entry, Entry.Property>() {
+    private class Entry(val candidate: Candidate, val description: String) {
         enum class Property {
             LEADER, STATUS
         }
@@ -74,26 +72,29 @@ class FiguresScreen private constructor(headerLabel: JLabel, frames: Array<Figur
             get() = _leader
             set(leader) {
                 this._leader = leader
-                onPropertyRefreshed(Property.LEADER)
+                colorPublisher.submit((leader ?: Party.OTHERS).color)
             }
 
         var status: String
             get() = _status
             set(status) {
                 this._status = status
-                onPropertyRefreshed(Property.STATUS)
+                statusPublisher.submit(status)
             }
+
+        val colorPublisher = Publisher((leader ?: Party.OTHERS).color)
+        val statusPublisher = Publisher(status)
     }
 
     class Builder {
         private val sections: MutableList<Section> = LinkedList()
 
-        fun build(titleBinding: Binding<String?>): FiguresScreen {
+        fun build(titlePublisher: Flow.Publisher<out String?>): FiguresScreen {
             val headerLabel = FontSizeAdjustingLabel()
             headerLabel.font = readBoldFont(32)
             headerLabel.horizontalAlignment = JLabel.CENTER
             headerLabel.border = EmptyBorder(5, 0, -5, 0)
-            titleBinding.bind { headerLabel.text = it }
+            titlePublisher.subscribe(Subscriber(eventQueueWrapper { headerLabel.text = it }))
             val frames: Array<FiguresFrame> = sections.map { it.createFrame() }.toTypedArray()
             return FiguresScreen(headerLabel, frames)
         }

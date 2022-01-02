@@ -1,11 +1,11 @@
 package com.joecollins.graphics.screens.generic
 
-import com.joecollins.bindings.Binding.Companion.fixedBinding
 import com.joecollins.graphics.screens.generic.FiguresScreen.Companion.of
 import com.joecollins.graphics.screens.generic.FiguresScreen.Companion.section
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.Party
+import com.joecollins.pubsub.asOneTimePublisher
 import org.junit.Test
 import java.awt.Color
 import java.io.IOException
@@ -21,62 +21,62 @@ class FiguresScreenTest {
                     .withCandidate(
                         Candidate("Wade MacLauchlan", lib),
                         "Premier, Stanhope-Marshfield",
-                        fixedBinding(pc),
-                        fixedBinding("DEFEATED")
+                        pc.asOneTimePublisher(),
+                        "DEFEATED".asOneTimePublisher()
                     )
                     .withCandidate(
                         Candidate("Heath MacDonald", lib),
                         "Finance Minister, Cornwall-Meadowbank",
-                        fixedBinding(lib),
-                        fixedBinding("ELECTED")
+                        lib.asOneTimePublisher(),
+                        "ELECTED".asOneTimePublisher()
                     )
                     .withCandidate(
                         Candidate("Robert Mitchell", lib),
                         "Health and Wellness Minister, Charlottetown-Winsloe",
-                        fixedBinding(lib),
-                        fixedBinding("ELECTED")
+                        lib.asOneTimePublisher(),
+                        "ELECTED".asOneTimePublisher()
                     )
                     .withCandidate(
                         Candidate("Paula Biggar", lib),
                         "Transport and Energy Minister, Tyne Valley-Sherbrooke",
-                        fixedBinding(grn),
-                        fixedBinding("DEFEATED")
+                        grn.asOneTimePublisher(),
+                        "DEFEATED".asOneTimePublisher()
                     )
                     .withCandidate(
                         Candidate("Robert Henderson", lib),
                         "Fisheries and Communities Minister, O'Leary-Inverness",
-                        fixedBinding(lib),
-                        fixedBinding("ELECTED")
+                        lib.asOneTimePublisher(),
+                        "ELECTED".asOneTimePublisher()
                     )
                     .withCandidate(
                         Candidate("Chris Palmer", lib),
                         "Tourism and Culture Minister, Summerside-Wilmot",
-                        fixedBinding(grn),
-                        fixedBinding("DEFEATED")
+                        grn.asOneTimePublisher(),
+                        "DEFEATED".asOneTimePublisher()
                     )
                     .withCandidate(
                         Candidate("Sonny Gallant", lib),
                         "Education Minister, Evangeline-Miscouche",
-                        fixedBinding(lib),
-                        fixedBinding("ELECTED")
+                        lib.asOneTimePublisher(),
+                        "ELECTED".asOneTimePublisher()
                     )
                     .withCandidate(
                         Candidate("Tina Mundy", lib),
                         "Social Develop't Minister, Summerside-South Drive",
-                        fixedBinding(grn),
-                        fixedBinding("DEFEATED")
+                        grn.asOneTimePublisher(),
+                        "DEFEATED".asOneTimePublisher()
                     )
                     .withCandidate(
                         Candidate("Jordan Brown", lib),
                         "Attorney General, Charlottetown-Brighton",
-                        fixedBinding(grn),
-                        fixedBinding("DEFEATED")
+                        grn.asOneTimePublisher(),
+                        "DEFEATED".asOneTimePublisher()
                     )
                     .withCandidate(
                         Candidate("Richard Brown", lib),
                         "Environment Minister, Charlottetown-Victoria Park",
-                        fixedBinding(grn),
-                        fixedBinding("DEFEATED")
+                        grn.asOneTimePublisher(),
+                        "DEFEATED".asOneTimePublisher()
                     )
             )
             .withSection(
@@ -84,62 +84,62 @@ class FiguresScreenTest {
                     .withCandidate(
                         Candidate("Dennis King", pc),
                         "Leader of the Opposition, Brackley-Hunter River",
-                        fixedBinding(pc),
-                        fixedBinding("ELECTED")
+                        pc.asOneTimePublisher(),
+                        "ELECTED".asOneTimePublisher()
                     )
                     .withCandidate(
                         Candidate("Darlene Compton", pc),
                         "Finance Critic, Belfast-Murray River",
-                        fixedBinding(pc),
-                        fixedBinding("ELECTED")
+                        pc.asOneTimePublisher(),
+                        "ELECTED".asOneTimePublisher()
                     )
                     .withCandidate(
                         Candidate("James Aylward", pc),
                         "Health and Wellness Critic, Stratford-Kinlock",
-                        fixedBinding(pc),
-                        fixedBinding("ELECTED")
+                        pc.asOneTimePublisher(),
+                        "ELECTED".asOneTimePublisher()
                     )
                     .withCandidate(
                         Candidate("Steven Myers", pc),
                         "Transportation and Energy Critic, Georgetown-Pownal",
-                        fixedBinding(pc),
-                        fixedBinding("ELECTED")
+                        pc.asOneTimePublisher(),
+                        "ELECTED".asOneTimePublisher()
                     )
                     .withCandidate(
                         Candidate("Jamie Fox", pc),
                         "Fisheries and Communities Critic, Borden-Kinkora",
-                        fixedBinding(pc),
-                        fixedBinding("ELECTED")
+                        pc.asOneTimePublisher(),
+                        "ELECTED".asOneTimePublisher()
                     )
                     .withCandidate(
                         Candidate("Matthew MacKay", pc),
                         "Tourism and Culture Critic, Kensington-Malpeque",
-                        fixedBinding(pc),
-                        fixedBinding("ELECTED")
+                        pc.asOneTimePublisher(),
+                        "ELECTED".asOneTimePublisher()
                     )
                     .withCandidate(
                         Candidate("Brad Trivers", pc),
                         "Education Critic, Rustico-Emerald",
-                        fixedBinding(pc),
-                        fixedBinding("ELECTED")
+                        pc.asOneTimePublisher(),
+                        "ELECTED".asOneTimePublisher()
                     )
                     .withCandidate(
                         Candidate("Ernie Hudson", pc),
                         "Social Development Critic, Alberton-Bloomfield",
-                        fixedBinding(pc),
-                        fixedBinding("ELECTED")
+                        pc.asOneTimePublisher(),
+                        "ELECTED".asOneTimePublisher()
                     )
                     .withCandidate(
                         Candidate("Bloyce Thompson", pc),
                         "Justice Critic, Stanhope-Marshfield",
-                        fixedBinding(pc),
-                        fixedBinding("ELECTED")
+                        pc.asOneTimePublisher(),
+                        "ELECTED".asOneTimePublisher()
                     )
                     .withCandidate(
                         Candidate("Natalie Jameson", pc),
                         "Environment Critic, Charlottetown-Hillsborough Park",
-                        fixedBinding(pc),
-                        fixedBinding("ELECTED")
+                        pc.asOneTimePublisher(),
+                        "ELECTED".asOneTimePublisher()
                     )
             )
             .withSection(
@@ -147,17 +147,17 @@ class FiguresScreenTest {
                     .withCandidate(
                         Candidate("Peter Bevan-Baker", grn),
                         "Green Party Leader, New Haven-Rocky Point",
-                        fixedBinding(grn),
-                        fixedBinding("ELECTED")
+                        grn.asOneTimePublisher(),
+                        "ELECTED".asOneTimePublisher()
                     )
                     .withCandidate(
                         Candidate("Joe Byrne", ndp),
                         "NDP Leader, Charlottetown-Victoria Park",
-                        fixedBinding(grn),
-                        fixedBinding("DEFEATED")
+                        grn.asOneTimePublisher(),
+                        "DEFEATED".asOneTimePublisher()
                     )
             )
-            .build(fixedBinding("PROMINENT FIGURES"))
+            .build("PROMINENT FIGURES".asOneTimePublisher())
         screen.setSize(1024, 512)
         compareRendering("FiguresScreen", "Figures-1", screen)
     }

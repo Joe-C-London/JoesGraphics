@@ -262,4 +262,15 @@ class PubSubTests {
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ output }, IsEqual(listOf(4, 6)))
     }
+
+    @Test
+    fun testListCombiner() {
+        var output: List<Int>? = null
+        val publishers = (0..10).map { Publisher(it) }
+        val subscriber = Subscriber<List<Int>> { output = it }
+        publishers.combine().subscribe(subscriber)
+
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ output }, IsEqual((0..10).toList()))
+    }
 }

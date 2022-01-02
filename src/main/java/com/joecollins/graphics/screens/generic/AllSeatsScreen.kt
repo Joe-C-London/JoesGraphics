@@ -1,15 +1,13 @@
 package com.joecollins.graphics.screens.generic
 
-import com.joecollins.bindings.Bindable
-import com.joecollins.bindings.Binding
-import com.joecollins.bindings.BindingReceiver
-import com.joecollins.bindings.mapElements
 import com.joecollins.graphics.components.FontSizeAdjustingLabel
 import com.joecollins.graphics.components.ResultListingFrame
 import com.joecollins.graphics.utils.StandardFont.readBoldFont
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
 import com.joecollins.pubsub.Publisher
+import com.joecollins.pubsub.Subscriber
+import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
 import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.mapElements
 import java.awt.BorderLayout
@@ -22,37 +20,37 @@ import javax.swing.border.EmptyBorder
 
 class AllSeatsScreen private constructor(title: JLabel, frame: ResultListingFrame) : JPanel() {
     class Builder<T>(
-        prevResultBinding: Binding<out Map<T, Map<Party, Int>>>,
-        currResultBinding: Binding<out Map<T, PartyResult?>>,
+        prevResultPublisher: Flow.Publisher<out Map<T, Map<Party, Int>>>,
+        currResultPublisher: Flow.Publisher<out Map<T, PartyResult?>>,
         private val nameFunc: (T) -> String,
         headerPublisher: Flow.Publisher<out String?>
     ) {
-        private val prevResults: BindingReceiver<Map<T, Map<Party, Int>>> = BindingReceiver(prevResultBinding)
-        private val currResults: BindingReceiver<Map<T, PartyResult?>> = BindingReceiver(currResultBinding)
+        private val prevResults: Flow.Publisher<out Map<T, Map<Party, Int>>> = prevResultPublisher
+        private val currResults: Flow.Publisher<out Map<T, PartyResult?>> = currResultPublisher
         private val header: Flow.Publisher<out String?> = headerPublisher
         private var numRows: Flow.Publisher<out Int> = 20.asOneTimePublisher()
-        private var seatFilter = BindingReceiver<Set<T>?>(Binding.fixedBinding(null))
+        private var seatFilter: Flow.Publisher<out Set<T>?> = (null as Set<T>?).asOneTimePublisher()
 
         fun withNumRows(numRowsPublisher: Flow.Publisher<out Int>): Builder<T> {
             numRows = numRowsPublisher
             return this
         }
 
-        fun withSeatFilter(seatFilterBinding: Binding<out Set<T>?>): Builder<T> {
-            seatFilter = BindingReceiver(seatFilterBinding)
+        fun withSeatFilter(seatFilterPublisher: Flow.Publisher<out Set<T>?>): Builder<T> {
+            seatFilter = seatFilterPublisher
             return this
         }
 
-        fun build(titleBinding: Binding<out String?>): AllSeatsScreen {
+        fun build(titlePublisher: Flow.Publisher<out String?>): AllSeatsScreen {
             val headerLabel = FontSizeAdjustingLabel()
             headerLabel.font = readBoldFont(32)
             headerLabel.horizontalAlignment = JLabel.CENTER
             headerLabel.border = EmptyBorder(5, 0, -5, 0)
-            titleBinding.bind { headerLabel.text = it }
+            titlePublisher.subscribe(Subscriber(eventQueueWrapper { headerLabel.text = it }))
             val inputs = Input(nameFunc)
-            prevResults.getBinding().bind { inputs.setPrevResults(it) }
-            currResults.getBinding().bind { inputs.setCurrResults(it) }
-            seatFilter.getBinding().bind { inputs.setSeatFilter(it) }
+            prevResults.subscribe(Subscriber { inputs.setPrevResults(it) })
+            currResults.subscribe(Subscriber { inputs.setCurrResults(it) })
+            seatFilter.subscribe(Subscriber { inputs.setSeatFilter(it) })
             val frame = ResultListingFrame(
                 headerPublisher = header,
                 numRowsPublisher = numRows,
@@ -69,7 +67,7 @@ class AllSeatsScreen private constructor(title: JLabel, frame: ResultListingFram
         }
     }
 
-    private class Input<T>(private val nameFunc: (T) -> String) : Bindable<Input<T>, Input.Property>() {
+    private class Input<T>(private val nameFunc: (T) -> String) {
         private enum class Property {
             PREV, CURR, FILTER
         }
@@ -142,12 +140,12 @@ class AllSeatsScreen private constructor(title: JLabel, frame: ResultListingFram
     private class Entry<T>(val key: T, val prevColor: Color, val resultColor: Color, val fill: Boolean)
     companion object {
         @JvmStatic fun <T> of(
-            prevResultBinding: Binding<out Map<T, Map<Party, Int>>>,
-            currResultBinding: Binding<out Map<T, PartyResult?>>,
+            prevResultPublisher: Flow.Publisher<out Map<T, Map<Party, Int>>>,
+            currResultPublisher: Flow.Publisher<out Map<T, PartyResult?>>,
             nameFunc: (T) -> String,
             headerPublisher: Flow.Publisher<out String?>
         ): Builder<T> {
-            return Builder(prevResultBinding, currResultBinding, nameFunc, headerPublisher)
+            return Builder(prevResultPublisher, currResultPublisher, nameFunc, headerPublisher)
         }
     }
 

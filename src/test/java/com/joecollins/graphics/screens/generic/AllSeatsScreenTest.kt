@@ -1,6 +1,5 @@
 package com.joecollins.graphics.screens.generic
 
-import com.joecollins.graphics.utils.BindableWrapper
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
@@ -18,107 +17,115 @@ class AllSeatsScreenTest {
     @Test
     @Throws(IOException::class)
     fun testAllSeats() {
-        val prevResult = BindableWrapper(bcPrevResult())
-        val currResult = BindableWrapper<Map<String, PartyResult?>>(emptyMap())
+        val prevResult = Publisher(bcPrevResult())
+        val currResult = Publisher<Map<String, PartyResult?>>(emptyMap())
         val numRows = Publisher(15)
-        val title = BindableWrapper("BRITISH COLUMBIA")
+        val title = Publisher("BRITISH COLUMBIA")
         val nameShortener = { obj: String -> obj.uppercase() }
         val panel = AllSeatsScreen.of(
-            prevResult.binding,
-            currResult.binding,
+            prevResult,
+            currResult,
             { nameShortener(it) },
             "SEATS CHANGING".asOneTimePublisher()
         )
             .withNumRows(numRows)
-            .build(title.binding)
+            .build(title)
         panel.setSize(1024, 512)
         compareRendering("AllSeatsScreen", "Basic-1", panel)
 
-        currResult.value = mapOf(
-            "Coquitlam-Burke Mountain" to leading(ndp),
-            "Fraser-Nicola" to leading(ndp),
-            "Vancouver-False Creek" to leading(ndp)
+        currResult.submit(
+            mapOf(
+                "Coquitlam-Burke Mountain" to leading(ndp),
+                "Fraser-Nicola" to leading(ndp),
+                "Vancouver-False Creek" to leading(ndp)
+            )
         )
         compareRendering("AllSeatsScreen", "Basic-2", panel)
 
-        currResult.value = mapOf(
-            "Coquitlam-Burke Mountain" to elected(ndp),
-            "Fraser-Nicola" to leading(lib),
-            "Richmond-Queensborough" to leading(ndp),
-            "Vancouver-False Creek" to leading(ndp)
+        currResult.submit(
+            mapOf(
+                "Coquitlam-Burke Mountain" to elected(ndp),
+                "Fraser-Nicola" to leading(lib),
+                "Richmond-Queensborough" to leading(ndp),
+                "Vancouver-False Creek" to leading(ndp)
+            )
         )
         compareRendering("AllSeatsScreen", "Basic-3", panel)
 
-        currResult.value = bcCurrResult()
+        currResult.submit(bcCurrResult())
         compareRendering("AllSeatsScreen", "Basic-4", panel)
     }
 
     @Test
     @Throws(IOException::class)
     fun testFilteredSeats() {
-        val prevResult = BindableWrapper(bcPrevResult())
-        val currResult = BindableWrapper<Map<String, PartyResult?>>(emptyMap())
+        val prevResult = Publisher(bcPrevResult())
+        val currResult = Publisher<Map<String, PartyResult?>>(emptyMap())
         val numRows = Publisher(15)
-        val title = BindableWrapper("VANCOUVER")
-        val filteredSeats = BindableWrapper(
-            prevResult.value.keys
+        val title = Publisher("VANCOUVER")
+        val filteredSeats = Publisher(
+            bcPrevResult().keys
                 .filter { k: String -> k.startsWith("Vancouver") }
                 .toSet()
         )
         val nameShortener = { obj: String -> obj.uppercase() }
         val panel = AllSeatsScreen.of(
-            prevResult.binding,
-            currResult.binding,
+            prevResult,
+            currResult,
             { nameShortener(it) },
             "SEATS CHANGING".asOneTimePublisher()
         )
             .withNumRows(numRows)
-            .withSeatFilter(filteredSeats.binding)
-            .build(title.binding)
+            .withSeatFilter(filteredSeats)
+            .build(title)
         panel.setSize(1024, 512)
         compareRendering("AllSeatsScreen", "Filtered-1", panel)
 
-        currResult.value = mapOf(
-            "Coquitlam-Burke Mountain" to leading(ndp),
-            "Fraser-Nicola" to leading(ndp),
-            "Vancouver-False Creek" to leading(ndp)
+        currResult.submit(
+            mapOf(
+                "Coquitlam-Burke Mountain" to leading(ndp),
+                "Fraser-Nicola" to leading(ndp),
+                "Vancouver-False Creek" to leading(ndp)
+            )
         )
         compareRendering("AllSeatsScreen", "Filtered-2", panel)
 
-        currResult.value = mapOf(
-            "Coquitlam-Burke Mountain" to elected(ndp),
-            "Fraser-Nicola" to leading(lib),
-            "Richmond-Queensborough" to leading(ndp),
-            "Vancouver-False Creek" to leading(ndp)
+        currResult.submit(
+            mapOf(
+                "Coquitlam-Burke Mountain" to elected(ndp),
+                "Fraser-Nicola" to leading(lib),
+                "Richmond-Queensborough" to leading(ndp),
+                "Vancouver-False Creek" to leading(ndp)
+            )
         )
         compareRendering("AllSeatsScreen", "Filtered-3", panel)
 
-        currResult.value = bcCurrResult()
+        currResult.submit(bcCurrResult())
         compareRendering("AllSeatsScreen", "Filtered-4", panel)
     }
 
     @Test
     @Throws(IOException::class)
     fun testAllSeatsWithNullResults() {
-        val prevResult = BindableWrapper(bcPrevResult())
+        val prevResult = Publisher(bcPrevResult())
         val results: MutableMap<String, PartyResult?> = HashMap(bcCurrResult())
         results.keys.forEach { riding: String -> results[riding] = null }
-        val currResult = BindableWrapper<Map<String, PartyResult?>>(results)
+        val currResult = Publisher<Map<String, PartyResult?>>(results)
         val numRows = Publisher(15)
-        val title = BindableWrapper("BRITISH COLUMBIA")
+        val title = Publisher("BRITISH COLUMBIA")
         val nameShortener = { obj: String -> obj.uppercase() }
         val panel = AllSeatsScreen.of(
-            prevResult.binding,
-            currResult.binding,
+            prevResult,
+            currResult,
             { nameShortener(it) },
             "SEATS CHANGING".asOneTimePublisher()
         )
             .withNumRows(numRows)
-            .build(title.binding)
+            .build(title)
         panel.setSize(1024, 512)
         compareRendering("AllSeatsScreen", "Basic-1", panel)
 
-        currResult.value = bcCurrResult()
+        currResult.submit(bcCurrResult())
         compareRendering("AllSeatsScreen", "Basic-4", panel)
     }
 

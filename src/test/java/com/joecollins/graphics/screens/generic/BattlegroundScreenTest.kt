@@ -1,12 +1,12 @@
 package com.joecollins.graphics.screens.generic
 
 import com.joecollins.graphics.screens.generic.BattlegroundScreen.Companion.singleParty
-import com.joecollins.graphics.utils.BindableWrapper
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
 import com.joecollins.models.general.PartyResult.Companion.elected
 import com.joecollins.models.general.PartyResult.Companion.leading
+import com.joecollins.pubsub.Publisher
 import org.junit.Test
 import java.awt.Color
 import java.io.IOException
@@ -17,82 +17,82 @@ class BattlegroundScreenTest {
     @Test
     @Throws(IOException::class)
     fun testSinglePartyBattleground() {
-        val prevResult = BindableWrapper(bcPrevResult())
-        val currResult = BindableWrapper<Map<String, PartyResult>>(emptyMap())
-        val party = BindableWrapper(ndp)
-        val targetSeats = BindableWrapper(30)
-        val defenseSeats = BindableWrapper(15)
-        val numRows = BindableWrapper(15)
-        val title = BindableWrapper("NDP BATTLEGROUND")
+        val prevResult = Publisher(bcPrevResult())
+        val currResult = Publisher<Map<String, PartyResult>>(emptyMap())
+        val party = Publisher(ndp)
+        val targetSeats = Publisher(30)
+        val defenseSeats = Publisher(15)
+        val numRows = Publisher(15)
+        val title = Publisher("NDP BATTLEGROUND")
         val nameShortener = { obj: String -> obj.uppercase() }
         val panel = singleParty(
-            prevResult.binding,
-            currResult.binding,
+            prevResult,
+            currResult,
             { nameShortener(it) },
-            party.binding
+            party
         )
-            .withSeatsToShow(defenseSeats.binding, targetSeats.binding)
-            .withNumRows(numRows.binding)
-            .build(title.binding)
+            .withSeatsToShow(defenseSeats, targetSeats)
+            .withNumRows(numRows)
+            .build(title)
         panel.setSize(1024, 512)
         compareRendering("BattlegroundScreen", "Basic-SingleParty-1", panel)
-        party.value = lib
-        targetSeats.value = 15
-        defenseSeats.value = 30
-        title.value = "LIBERAL BATTLEGROUND"
+        party.submit(lib)
+        targetSeats.submit(15)
+        defenseSeats.submit(30)
+        title.submit("LIBERAL BATTLEGROUND")
         compareRendering("BattlegroundScreen", "Basic-SingleParty-2", panel)
-        currResult.value = bcCurrResult()
+        currResult.submit(bcCurrResult())
         compareRendering("BattlegroundScreen", "Basic-SingleParty-3", panel)
-        party.value = grn
-        targetSeats.value = 30
-        defenseSeats.value = 5
-        title.value = "GREEN BATTLEGROUND"
+        party.submit(grn)
+        targetSeats.submit(30)
+        defenseSeats.submit(5)
+        title.submit("GREEN BATTLEGROUND")
         compareRendering("BattlegroundScreen", "Basic-SingleParty-4", panel)
-        party.value = ndp
-        targetSeats.value = 30
-        defenseSeats.value = 0
-        title.value = "NDP TARGETS"
+        party.submit(ndp)
+        targetSeats.submit(30)
+        defenseSeats.submit(0)
+        title.submit("NDP TARGETS")
         compareRendering("BattlegroundScreen", "Basic-SingleParty-5", panel)
-        party.value = lib
-        targetSeats.value = 0
-        defenseSeats.value = 30
-        title.value = "LIBERAL DEFENSE"
+        party.submit(lib)
+        targetSeats.submit(0)
+        defenseSeats.submit(30)
+        title.submit("LIBERAL DEFENSE")
         compareRendering("BattlegroundScreen", "Basic-SingleParty-6", panel)
     }
 
     @Test
     @Throws(IOException::class)
     fun testSinglePartyFilteredBattleground() {
-        val prevResult = BindableWrapper(bcPrevResult())
-        val currResult = BindableWrapper<Map<String, PartyResult?>>(emptyMap())
-        val party = BindableWrapper(ndp)
-        val targetSeats = BindableWrapper(30)
-        val defenseSeats = BindableWrapper(15)
-        val numRows = BindableWrapper(15)
-        val filteredSeats = BindableWrapper<Set<String>?>(
-            prevResult.value.keys
+        val prevResult = Publisher(bcPrevResult())
+        val currResult = Publisher<Map<String, PartyResult?>>(emptyMap())
+        val party = Publisher(ndp)
+        val targetSeats = Publisher(30)
+        val defenseSeats = Publisher(15)
+        val numRows = Publisher(15)
+        val filteredSeats = Publisher<Set<String>?>(
+            bcPrevResult().keys
                 .filter { k: String -> k.startsWith("Vancouver") }
                 .toSet()
         )
-        val title = BindableWrapper("NDP BATTLEGROUND")
+        val title = Publisher("NDP BATTLEGROUND")
         val nameShortener = { obj: String -> obj.uppercase() }
         val panel = singleParty(
-            prevResult.binding,
-            currResult.binding,
+            prevResult,
+            currResult,
             { nameShortener(it) },
-            party.binding
+            party
         )
-            .withSeatsToShow(defenseSeats.binding, targetSeats.binding)
-            .withNumRows(numRows.binding)
-            .withSeatFilter(filteredSeats.binding)
-            .build(title.binding)
+            .withSeatsToShow(defenseSeats, targetSeats)
+            .withNumRows(numRows)
+            .withSeatFilter(filteredSeats)
+            .build(title)
         panel.setSize(1024, 512)
         compareRendering("BattlegroundScreen", "Filtered-SingleParty-1", panel)
-        currResult.value = bcCurrResult()
+        currResult.submit(bcCurrResult())
         compareRendering("BattlegroundScreen", "Filtered-SingleParty-2", panel)
-        filteredSeats.value = emptySet()
+        filteredSeats.submit(emptySet())
         compareRendering("BattlegroundScreen", "Filtered-SingleParty-3", panel)
-        filteredSeats.value = null
+        filteredSeats.submit(null)
         compareRendering("BattlegroundScreen", "Filtered-SingleParty-4", panel)
     }
 
