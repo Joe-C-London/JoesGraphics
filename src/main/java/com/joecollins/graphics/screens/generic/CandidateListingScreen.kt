@@ -7,6 +7,7 @@ import com.joecollins.graphics.components.ListingFrameBuilder
 import com.joecollins.graphics.utils.StandardFont
 import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.Party
+import com.joecollins.pubsub.asOneTimePublisher
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Component
@@ -79,19 +80,19 @@ class CandidateListingScreen private constructor(
         }
 
         fun withPrev(prevVotes: Binding<Map<Party, Int>>, header: Binding<String?>, subhead: Binding<String?> = Binding.fixedBinding(null)): Builder {
-            prevPanel = BarFrameBuilder.basic(prevVotes.map { v -> createBars(v) })
-                .withMax(Binding.fixedBinding(2.0 / 3))
-                .withHeader(header)
-                .withSubhead(subhead)
+            prevPanel = BarFrameBuilder.basic(prevVotes.map { v -> createBars(v) }.toPublisher())
+                .withMax((2.0 / 3).asOneTimePublisher())
+                .withHeader(header.toPublisher())
+                .withSubhead(subhead.toPublisher())
                 .build()
             return this
         }
 
         fun withSecondaryPrev(prevVotes: Binding<Map<Party, Int>>, header: Binding<String?>, subhead: Binding<String?> = Binding.fixedBinding(null)): Builder {
-            secondaryPrevPanel = BarFrameBuilder.basic(prevVotes.map { v -> createBars(v) })
-                .withMax(Binding.fixedBinding(2.0 / 3))
-                .withHeader(header)
-                .withSubhead(subhead)
+            secondaryPrevPanel = BarFrameBuilder.basic(prevVotes.map { v -> createBars(v) }.toPublisher())
+                .withMax((2.0 / 3).asOneTimePublisher())
+                .withHeader(header.toPublisher())
+                .withSubhead(subhead.toPublisher())
                 .build()
             return this
         }

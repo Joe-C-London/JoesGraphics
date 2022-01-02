@@ -9,37 +9,41 @@ import com.joecollins.graphics.components.ResultListingFrame
 import com.joecollins.graphics.utils.StandardFont.readBoldFont
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
+import com.joecollins.pubsub.Publisher
+import com.joecollins.pubsub.asOneTimePublisher
+import com.joecollins.pubsub.mapElements
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.GridLayout
+import java.util.concurrent.Flow
 import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.border.EmptyBorder
 
 class AllSeatsScreen private constructor(title: JLabel, frame: ResultListingFrame) : JPanel() {
     class Builder<T>(
-        prevResultBinding: Binding<Map<T, Map<Party, Int>>>,
-        currResultBinding: Binding<Map<T, PartyResult?>>,
+        prevResultBinding: Binding<out Map<T, Map<Party, Int>>>,
+        currResultBinding: Binding<out Map<T, PartyResult?>>,
         private val nameFunc: (T) -> String,
-        headerBinding: Binding<String?>
+        headerPublisher: Flow.Publisher<out String?>
     ) {
         private val prevResults: BindingReceiver<Map<T, Map<Party, Int>>> = BindingReceiver(prevResultBinding)
         private val currResults: BindingReceiver<Map<T, PartyResult?>> = BindingReceiver(currResultBinding)
-        private val header: BindingReceiver<String?> = BindingReceiver(headerBinding)
-        private var numRows = BindingReceiver(Binding.fixedBinding(20))
+        private val header: Flow.Publisher<out String?> = headerPublisher
+        private var numRows: Flow.Publisher<out Int> = 20.asOneTimePublisher()
         private var seatFilter = BindingReceiver<Set<T>?>(Binding.fixedBinding(null))
 
-        fun withNumRows(numRowsBinding: Binding<Int>): Builder<T> {
-            numRows = BindingReceiver(numRowsBinding)
+        fun withNumRows(numRowsPublisher: Flow.Publisher<out Int>): Builder<T> {
+            numRows = numRowsPublisher
             return this
         }
 
-        fun withSeatFilter(seatFilterBinding: Binding<Set<T>?>): Builder<T> {
+        fun withSeatFilter(seatFilterBinding: Binding<out Set<T>?>): Builder<T> {
             seatFilter = BindingReceiver(seatFilterBinding)
             return this
         }
 
-        fun build(titleBinding: Binding<String?>): AllSeatsScreen {
+        fun build(titleBinding: Binding<out String?>): AllSeatsScreen {
             val headerLabel = FontSizeAdjustingLabel()
             headerLabel.font = readBoldFont(32)
             headerLabel.horizontalAlignment = JLabel.CENTER
@@ -50,16 +54,16 @@ class AllSeatsScreen private constructor(title: JLabel, frame: ResultListingFram
             currResults.getBinding().bind { inputs.setCurrResults(it) }
             seatFilter.getBinding().bind { inputs.setSeatFilter(it) }
             val frame = ResultListingFrame(
-                headerPublisher = header.getBinding().toPublisher(),
-                numRowsPublisher = numRows.getBinding().toPublisher(),
-                itemsPublisher = inputs.resultBinding.mapElements {
+                headerPublisher = header,
+                numRowsPublisher = numRows,
+                itemsPublisher = inputs.resultPublisher.mapElements {
                     ResultListingFrame.Item(
                         text = nameFunc(it.key),
                         border = it.prevColor,
                         background = if (it.fill) it.resultColor else Color.WHITE,
                         foreground = if (!it.fill) it.resultColor else Color.WHITE
                     )
-                }.toPublisher()
+                }
             )
             return AllSeatsScreen(headerLabel, frame)
         }
@@ -97,59 +101,53 @@ class AllSeatsScreen private constructor(title: JLabel, frame: ResultListingFram
                     )
                 }
                 .toList()
-            onPropertyRefreshed(Property.PREV)
+            _resultPublisher.submit(toEntries())
         }
 
         fun setCurrResults(currResults: Map<T, PartyResult?>) {
             this.currResults = currResults
-            onPropertyRefreshed(Property.CURR)
+            _resultPublisher.submit(toEntries())
         }
 
         fun setSeatFilter(seatFilter: Set<T>?) {
             this.seatFilter = seatFilter
-            onPropertyRefreshed(Property.FILTER)
+            _resultPublisher.submit(toEntries())
         }
 
-        val resultBinding: Binding<List<Entry<T>>>
-            get() = Binding.propertyBinding(
-                this,
-                { t: Input<T> ->
-                    t.prevResults
-                        .asSequence()
-                        .filter { e: Pair<T, Party> -> t.seatFilter?.contains(e.first) ?: true }
-                        .map { e: Pair<T, Party> ->
-                            Triple(
-                                e.first,
-                                e.second,
-                                t.currResults[e.first] ?: PartyResult.NO_RESULT
-                            )
-                        }
-                        .map { e: Triple<T, Party, PartyResult?> ->
-                            val result = e.third ?: PartyResult.NO_RESULT
-                            Entry(
-                                e.first,
-                                e.second.color,
-                                result.party?.color ?: Color.BLACK,
-                                result.isElected
-                            )
-                        }
-                        .toList()
-                },
-                Property.PREV,
-                Property.CURR,
-                Property.FILTER
-            )
+        val _resultPublisher = Publisher(toEntries())
+        val resultPublisher: Flow.Publisher<out List<Entry<T>>> = _resultPublisher
+
+        private fun toEntries() = this.prevResults
+            .asSequence()
+            .filter { e: Pair<T, Party> -> this.seatFilter?.contains(e.first) ?: true }
+            .map { e: Pair<T, Party> ->
+                Triple(
+                    e.first,
+                    e.second,
+                    this.currResults[e.first] ?: PartyResult.NO_RESULT
+                )
+            }
+            .map { e: Triple<T, Party, PartyResult?> ->
+                val result = e.third ?: PartyResult.NO_RESULT
+                Entry(
+                    e.first,
+                    e.second.color,
+                    result.party?.color ?: Color.BLACK,
+                    result.isElected
+                )
+            }
+            .toList()
     }
 
     private class Entry<T>(val key: T, val prevColor: Color, val resultColor: Color, val fill: Boolean)
     companion object {
         @JvmStatic fun <T> of(
-            prevResultBinding: Binding<Map<T, Map<Party, Int>>>,
-            currResultBinding: Binding<Map<T, PartyResult?>>,
+            prevResultBinding: Binding<out Map<T, Map<Party, Int>>>,
+            currResultBinding: Binding<out Map<T, PartyResult?>>,
             nameFunc: (T) -> String,
-            headerBinding: Binding<String?>
+            headerPublisher: Flow.Publisher<out String?>
         ): Builder<T> {
-            return Builder(prevResultBinding, currResultBinding, nameFunc, headerBinding)
+            return Builder(prevResultBinding, currResultBinding, nameFunc, headerPublisher)
         }
     }
 

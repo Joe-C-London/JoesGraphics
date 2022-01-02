@@ -425,10 +425,10 @@ class MultiResultScreen private constructor() : JPanel() {
                 Result.Property.RUNOFF,
                 Result.Property.MAX_BARS
             )
-            barFrame = BarFrameBuilder.basic(bars)
-                .withMax(pctReporting.binding.map { d: Double -> 0.5 / d.coerceAtLeast(1e-6) })
-                .withHeader(header.binding)
-                .withSubhead(subhead.binding)
+            barFrame = BarFrameBuilder.basic(bars.toPublisher())
+                .withMax(pctReporting.binding.map { d: Double -> 0.5 / d.coerceAtLeast(1e-6) }.toPublisher())
+                .withHeader(header.binding.toPublisher())
+                .withSubhead(subhead.binding.toPublisher())
                 .build()
             add(barFrame)
             if (swingPartyOrder != null) {

@@ -1,13 +1,14 @@
 package com.joecollins.graphics.components
 
-import com.joecollins.bindings.Binding
 import com.joecollins.graphics.components.BarFrameBuilder.BasicBar
 import com.joecollins.graphics.components.BarFrameBuilder.Companion.basic
 import com.joecollins.graphics.components.BarFrameBuilder.Companion.dual
 import com.joecollins.graphics.components.BarFrameBuilder.Companion.dualReversed
 import com.joecollins.graphics.components.BarFrameBuilder.DualBar
-import com.joecollins.graphics.utils.BindableWrapper
 import com.joecollins.graphics.utils.ColorUtils
+import com.joecollins.pubsub.Publisher
+import com.joecollins.pubsub.asOneTimePublisher
+import com.joecollins.pubsub.map
 import org.awaitility.Awaitility
 import org.hamcrest.core.IsEqual
 import org.junit.Assert
@@ -22,9 +23,9 @@ class BarFrameBuilderTest {
 
     @Test
     fun testSimpleBars() {
-        val result = BindableWrapper<Map<Pair<String, Color>, Int>>(emptyMap())
+        val result = Publisher<Map<Pair<String, Color>, Int>>(emptyMap())
         val frame = basic(
-            result.binding
+            result
                 .map { map ->
                     map.entries.asSequence()
                         .sortedByDescending { it.value }
@@ -35,9 +36,11 @@ class BarFrameBuilderTest {
             .build()
         Assert.assertEquals(0, frame.numBars.toLong())
         Assert.assertEquals(0, frame.numLines.toLong())
-        result.value = mapOf(
-            Pair("CLINTON", Color.ORANGE) to 2842,
-            Pair("SANDERS", Color.GREEN) to 1865
+        result.submit(
+            mapOf(
+                Pair("CLINTON", Color.ORANGE) to 2842,
+                Pair("SANDERS", Color.GREEN) to 1865
+            )
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numBars }, IsEqual(2))
@@ -55,9 +58,9 @@ class BarFrameBuilderTest {
 
     @Test
     fun testSimpleBarsWithValueObject() {
-        val result = BindableWrapper<Map<Pair<String, Color>, Wrapper<Int>>>(emptyMap())
+        val result = Publisher<Map<Pair<String, Color>, Wrapper<Int>>>(emptyMap())
         val frame = basic(
-            result.binding
+            result
                 .map { map ->
                     map.entries.asSequence()
                         .sortedByDescending { it.value.value }
@@ -68,9 +71,11 @@ class BarFrameBuilderTest {
             .build()
         Assert.assertEquals(0, frame.numBars.toLong())
         Assert.assertEquals(0, frame.numLines.toLong())
-        result.value = mapOf(
-            Pair("CLINTON", Color.ORANGE) to Wrapper(2842),
-            Pair("SANDERS", Color.GREEN) to Wrapper(1865)
+        result.submit(
+            mapOf(
+                Pair("CLINTON", Color.ORANGE) to Wrapper(2842),
+                Pair("SANDERS", Color.GREEN) to Wrapper(1865)
+            )
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numBars }, IsEqual(2))
@@ -88,10 +93,10 @@ class BarFrameBuilderTest {
 
     @Test
     fun testSimpleBarsRange() {
-        val result = BindableWrapper<Map<Pair<String, Color>, Int>>(emptyMap())
-        val max = BindableWrapper(2500)
+        val result = Publisher<Map<Pair<String, Color>, Int>>(emptyMap())
+        val max = Publisher(2500)
         val frame = basic(
-            result.binding
+            result
                 .map { map ->
                     map.entries.asSequence()
                         .sortedByDescending { it.value }
@@ -99,34 +104,38 @@ class BarFrameBuilderTest {
                         .toList()
                 }
         )
-            .withMax(max.binding)
+            .withMax(max)
             .build()
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.min.toInt() }, IsEqual(0))
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.max.toInt() }, IsEqual(2500))
-        result.value = mapOf(
-            Pair("CLINTON", Color.ORANGE) to 2205,
-            Pair("SANDERS", Color.GREEN) to 1846
+        result.submit(
+            mapOf(
+                Pair("CLINTON", Color.ORANGE) to 2205,
+                Pair("SANDERS", Color.GREEN) to 1846
+            )
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.min.toInt() }, IsEqual(0))
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.max.toInt() }, IsEqual(2500))
-        result.value = mapOf(
-            Pair("CLINTON", Color.ORANGE) to 2842,
-            Pair("SANDERS", Color.GREEN) to 1865
+        result.submit(
+            mapOf(
+                Pair("CLINTON", Color.ORANGE) to 2842,
+                Pair("SANDERS", Color.GREEN) to 1865
+            )
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.min.toInt() }, IsEqual(0))
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.max.toInt() }, IsEqual(2842))
-        max.value = 3000
+        max.submit(3000)
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.min.toInt() }, IsEqual(0))
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.max.toInt() }, IsEqual(3000))
-        max.value = 2500
+        max.submit(2500)
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.min.toInt() }, IsEqual(0))
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
@@ -135,14 +144,14 @@ class BarFrameBuilderTest {
 
     @Test
     fun testHeaderSubheadAndNotes() {
-        val result = BindableWrapper<Map<Pair<String, Color>, Int>>(emptyMap())
-        val header = BindableWrapper<String?>("HEADER")
-        val subhead = BindableWrapper<String?>("SUBHEAD")
-        val notes = BindableWrapper<String?>("NOTES")
-        val borderColor = BindableWrapper(Color.BLACK)
-        val subheadColor = BindableWrapper(Color.GRAY)
+        val result = Publisher<Map<Pair<String, Color>, Int>>(emptyMap())
+        val header = Publisher<String?>("HEADER")
+        val subhead = Publisher<String?>("SUBHEAD")
+        val notes = Publisher<String?>("NOTES")
+        val borderColor = Publisher(Color.BLACK)
+        val subheadColor = Publisher(Color.GRAY)
         val frame = basic(
-            result.binding
+            result
                 .map { map ->
                     map.entries.asSequence()
                         .sortedByDescending { it.value }
@@ -150,11 +159,11 @@ class BarFrameBuilderTest {
                         .toList()
                 }
         )
-            .withHeader(header.binding)
-            .withSubhead(subhead.binding)
-            .withNotes(notes.binding)
-            .withBorder(borderColor.binding)
-            .withSubheadColor(subheadColor.binding)
+            .withHeader(header)
+            .withSubhead(subhead)
+            .withNotes(notes)
+            .withBorder(borderColor)
+            .withSubheadColor(subheadColor)
             .build()
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.header }, IsEqual("HEADER"))
@@ -162,29 +171,29 @@ class BarFrameBuilderTest {
         Assert.assertEquals("NOTES", frame.notes)
         Assert.assertEquals(Color.BLACK, frame.borderColor)
         Assert.assertEquals(Color.GRAY, frame.subheadColor)
-        header.value = "DEMOCRATIC PRIMARY"
+        header.submit("DEMOCRATIC PRIMARY")
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.header }, IsEqual("DEMOCRATIC PRIMARY"))
-        subhead.value = "PLEDGED DELEGATES"
+        subhead.submit("PLEDGED DELEGATES")
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.subheadText }, IsEqual("PLEDGED DELEGATES"))
-        notes.value = "SOURCE: DNC"
+        notes.submit("SOURCE: DNC")
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.notes }, IsEqual("SOURCE: DNC"))
-        borderColor.value = Color.BLUE
+        borderColor.submit(Color.BLUE)
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.borderColor }, IsEqual(Color.BLUE))
-        subheadColor.value = Color.BLUE
+        subheadColor.submit(Color.BLUE)
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.subheadColor }, IsEqual(Color.BLUE))
     }
 
     @Test
     fun testTarget() {
-        val result = BindableWrapper<Map<Pair<String, Color>, Int>>(emptyMap())
-        val target = BindableWrapper(2382)
+        val result = Publisher<Map<Pair<String, Color>, Int>>(emptyMap())
+        val target = Publisher(2382)
         val frame = basic(
-            result.binding
+            result
                 .map { map ->
                     map.entries.asSequence()
                         .sortedByDescending { it.value }
@@ -192,7 +201,7 @@ class BarFrameBuilderTest {
                         .toList()
                 }
         )
-            .withTarget(target.binding) { THOUSANDS.format(it) + " TO WIN" }
+            .withTarget(target) { THOUSANDS.format(it) + " TO WIN" }
             .build()
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numLines }, IsEqual(1))
@@ -202,10 +211,10 @@ class BarFrameBuilderTest {
 
     @Test
     fun testMultiLines() {
-        val result = BindableWrapper<Map<Pair<String, Color>, Int>>(emptyMap())
-        val lines = BindableWrapper<List<Int>>(emptyList())
+        val result = Publisher<Map<Pair<String, Color>, Int>>(emptyMap())
+        val lines = Publisher<List<Int>>(emptyList())
         val frame = basic(
-            result.binding
+            result
                 .map { map ->
                     map.entries.asSequence()
                         .sortedByDescending { it.value }
@@ -213,10 +222,10 @@ class BarFrameBuilderTest {
                         .toList()
                 }
         )
-            .withLines(lines.binding) { it.toString() + " QUOTA" + (if (it == 1) "" else "S") }
+            .withLines(lines) { it.toString() + " QUOTA" + (if (it == 1) "" else "S") }
             .build()
         Assert.assertEquals(0, frame.numLines.toLong())
-        lines.value = listOf(1, 2, 3, 4, 5)
+        lines.submit(listOf(1, 2, 3, 4, 5))
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numLines }, IsEqual(5))
         Assert.assertEquals(1, frame.getLineLevel(0))
@@ -233,10 +242,10 @@ class BarFrameBuilderTest {
 
     @Test
     fun testMultiLinesBespokeLabels() {
-        val result = BindableWrapper<Map<Pair<String, Color>, Int>>(emptyMap())
-        val lines = BindableWrapper<List<Pair<String, Int>>>(emptyList())
+        val result = Publisher<Map<Pair<String, Color>, Int>>(emptyMap())
+        val lines = Publisher<List<Pair<String, Int>>>(emptyList())
         val frame = basic(
-            result.binding
+            result
                 .map { map ->
                     map.entries.asSequence()
                         .sortedByDescending { it.value }
@@ -244,12 +253,14 @@ class BarFrameBuilderTest {
                         .toList()
                 }
         )
-            .withLines(lines.binding, { it.first }) { it.second }
+            .withLines(lines, { it.first }) { it.second }
             .build()
         Assert.assertEquals(0, frame.numLines.toLong())
-        lines.value = listOf(
-            Pair("The line is here", 1),
-            Pair("and here", 2)
+        lines.submit(
+            listOf(
+                Pair("The line is here", 1),
+                Pair("and here", 2)
+            )
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numLines }, IsEqual(2))
@@ -261,10 +272,10 @@ class BarFrameBuilderTest {
 
     @Test
     fun testMultiLinesBinding() {
-        val result = BindableWrapper<Map<Pair<String, Color>, Int>>(emptyMap())
-        val lines = BindableWrapper(listOf<Int>())
+        val result = Publisher<Map<Pair<String, Color>, Int>>(emptyMap())
+        val lines = Publisher(listOf<Int>())
         val frame = basic(
-            result.binding
+            result
                 .map { map ->
                     map.entries.asSequence()
                         .sortedByDescending { it.value }
@@ -272,10 +283,10 @@ class BarFrameBuilderTest {
                         .toList()
                 }
         )
-            .withLines(lines.binding) { it.toString() + " QUOTA" + (if (it == 1) "" else "S") }
+            .withLines(lines) { it.toString() + " QUOTA" + (if (it == 1) "" else "S") }
             .build()
         Assert.assertEquals(0, frame.numLines.toLong())
-        lines.value = listOf(1, 2, 3, 4, 5)
+        lines.submit(listOf(1, 2, 3, 4, 5))
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numLines }, IsEqual(5))
         Assert.assertEquals(1, frame.getLineLevel(0))
@@ -292,10 +303,10 @@ class BarFrameBuilderTest {
 
     @Test
     fun testLeftShape() {
-        val result = BindableWrapper<Map<Pair<String, Color>, Pair<Int, Boolean>>>(emptyMap())
+        val result = Publisher<Map<Pair<String, Color>, Pair<Int, Boolean>>>(emptyMap())
         val shape = Rectangle2D.Double(0.0, 0.0, 1.0, 1.0)
         val frame = basic(
-            result.binding
+            result
                 .map { map ->
                     map.entries.asSequence()
                         .sortedByDescending { it.value.first }
@@ -306,9 +317,11 @@ class BarFrameBuilderTest {
             .build()
         Assert.assertEquals(0, frame.numBars.toLong())
         Assert.assertEquals(0, frame.numLines.toLong())
-        result.value = mapOf(
-            Pair("CLINTON", Color.ORANGE) to Pair(2842, true),
-            Pair("SANDERS", Color.GREEN) to Pair(1865, false)
+        result.submit(
+            mapOf(
+                Pair("CLINTON", Color.ORANGE) to Pair(2842, true),
+                Pair("SANDERS", Color.GREEN) to Pair(1865, false)
+            )
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numBars }, IsEqual(2))
@@ -326,9 +339,9 @@ class BarFrameBuilderTest {
 
     @Test
     fun testSimpleDiffBars() {
-        val result = BindableWrapper<Map<Pair<String, Color>, Pair<Int, Int>>>(emptyMap())
+        val result = Publisher<Map<Pair<String, Color>, Pair<Int, Int>>>(emptyMap())
         val frame = basic(
-            result.binding
+            result
                 .map { map ->
                     map.entries.asSequence()
                         .sortedByDescending { it.value.first }
@@ -339,13 +352,15 @@ class BarFrameBuilderTest {
             .build()
         Assert.assertEquals(0, frame.numBars.toLong())
         Assert.assertEquals(0, frame.numLines.toLong())
-        result.value = mapOf(
-            Pair("LIB", Color.RED) to Pair(157, -27),
-            Pair("CON", Color.BLUE) to Pair(121, +22),
-            Pair("NDP", Color.ORANGE) to Pair(24, -20),
-            Pair("BQ", Color.CYAN) to Pair(32, +22),
-            Pair("GRN", Color.GREEN) to Pair(3, +2),
-            Pair("IND", Color.GRAY) to Pair(1, +1)
+        result.submit(
+            mapOf(
+                Pair("LIB", Color.RED) to Pair(157, -27),
+                Pair("CON", Color.BLUE) to Pair(121, +22),
+                Pair("NDP", Color.ORANGE) to Pair(24, -20),
+                Pair("BQ", Color.CYAN) to Pair(32, +22),
+                Pair("GRN", Color.GREEN) to Pair(3, +2),
+                Pair("IND", Color.GRAY) to Pair(1, +1)
+            )
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numBars }, IsEqual(6))
@@ -381,10 +396,10 @@ class BarFrameBuilderTest {
 
     @Test
     fun testSimpleDiffWingspan() {
-        val result = BindableWrapper<Map<Pair<String, Color>, Pair<Int, Int>>>(emptyMap())
-        val range = BindableWrapper(10)
+        val result = Publisher<Map<Pair<String, Color>, Pair<Int, Int>>>(emptyMap())
+        val range = Publisher(10)
         val frame = basic(
-            result.binding
+            result
                 .map { map ->
                     map.entries.asSequence()
                         .sortedByDescending { it.value.first }
@@ -392,19 +407,21 @@ class BarFrameBuilderTest {
                         .toList()
                 }
         )
-            .withWingspan(range.binding)
+            .withWingspan(range)
             .build()
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.max.toDouble() }, IsEqual(10.0))
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.min.toDouble() }, IsEqual(-10.0))
-        result.value = mapOf(
-            Pair("LIB", Color.RED) to Pair(157, -27),
-            Pair("CON", Color.BLUE) to Pair(121, +22),
-            Pair("NDP", Color.ORANGE) to Pair(24, -20),
-            Pair("BQ", Color.CYAN) to Pair(32, +22),
-            Pair("GRN", Color.GREEN) to Pair(3, +2),
-            Pair("IND", Color.GRAY) to Pair(1, +1)
+        result.submit(
+            mapOf(
+                Pair("LIB", Color.RED) to Pair(157, -27),
+                Pair("CON", Color.BLUE) to Pair(121, +22),
+                Pair("NDP", Color.ORANGE) to Pair(24, -20),
+                Pair("BQ", Color.CYAN) to Pair(32, +22),
+                Pair("GRN", Color.GREEN) to Pair(3, +2),
+                Pair("IND", Color.GRAY) to Pair(1, +1)
+            )
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.max.toDouble() }, IsEqual(27.0))
@@ -414,10 +431,9 @@ class BarFrameBuilderTest {
 
     @Test
     fun testDualValueBars() {
-        val result = BindableWrapper<Map<Pair<String, Color>, Pair<Int, Int>>>(emptyMap())
+        val result = Publisher<Map<Pair<String, Color>, Pair<Int, Int>>>(emptyMap())
         val frame = dual(
             result
-                .binding
                 .map { map ->
                     map.entries.asSequence()
                         .sortedByDescending { it.value.second }
@@ -428,13 +444,15 @@ class BarFrameBuilderTest {
             .build()
         Assert.assertEquals(0, frame.numBars.toLong())
         Assert.assertEquals(0, frame.numLines.toLong())
-        result.value = mapOf(
-            Pair("LIBERAL", Color.RED) to Pair(26, 157),
-            Pair("CONSERVATIVE", Color.BLUE) to Pair(4, 121),
-            Pair("NEW DEMOCRATIC PARTY", Color.ORANGE) to Pair(1, 24),
-            Pair("BLOC QU\u00c9B\u00c9COIS", Color.CYAN) to Pair(0, 32),
-            Pair("GREEN", Color.GREEN) to Pair(1, 3),
-            Pair("INDEPENDENT", Color.GRAY) to Pair(0, 1)
+        result.submit(
+            mapOf(
+                Pair("LIBERAL", Color.RED) to Pair(26, 157),
+                Pair("CONSERVATIVE", Color.BLUE) to Pair(4, 121),
+                Pair("NEW DEMOCRATIC PARTY", Color.ORANGE) to Pair(1, 24),
+                Pair("BLOC QU\u00c9B\u00c9COIS", Color.CYAN) to Pair(0, 32),
+                Pair("GREEN", Color.GREEN) to Pair(1, 3),
+                Pair("INDEPENDENT", Color.GRAY) to Pair(0, 1)
+            )
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numBars }, IsEqual(6))
@@ -486,9 +504,9 @@ class BarFrameBuilderTest {
 
     @Test
     fun testDualReversedValueBars() {
-        val result = BindableWrapper<Map<Pair<String, Color>, Pair<Int, Int>>>(emptyMap())
+        val result = Publisher<Map<Pair<String, Color>, Pair<Int, Int>>>(emptyMap())
         val frame = dualReversed(
-            result.binding
+            result
                 .map { map ->
                     map.entries.asSequence()
                         .sortedByDescending { it.value.second }
@@ -499,13 +517,15 @@ class BarFrameBuilderTest {
             .build()
         Assert.assertEquals(0, frame.numBars.toLong())
         Assert.assertEquals(0, frame.numLines.toLong())
-        result.value = mapOf(
-            Pair("LIBERAL", Color.RED) to Pair(26, 157),
-            Pair("CONSERVATIVE", Color.BLUE) to Pair(4, 121),
-            Pair("NEW DEMOCRATIC PARTY", Color.ORANGE) to Pair(1, 24),
-            Pair("BLOC QU\u00c9B\u00c9COIS", Color.CYAN) to Pair(0, 32),
-            Pair("GREEN", Color.GREEN) to Pair(1, 3),
-            Pair("INDEPENDENT", Color.GRAY) to Pair(0, 1)
+        result.submit(
+            mapOf(
+                Pair("LIBERAL", Color.RED) to Pair(26, 157),
+                Pair("CONSERVATIVE", Color.BLUE) to Pair(4, 121),
+                Pair("NEW DEMOCRATIC PARTY", Color.ORANGE) to Pair(1, 24),
+                Pair("BLOC QU\u00c9B\u00c9COIS", Color.CYAN) to Pair(0, 32),
+                Pair("GREEN", Color.GREEN) to Pair(1, 3),
+                Pair("INDEPENDENT", Color.GRAY) to Pair(0, 1)
+            )
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numBars }, IsEqual(6))
@@ -557,9 +577,9 @@ class BarFrameBuilderTest {
 
     @Test
     fun testDualChangeBars() {
-        val result = BindableWrapper<Map<Pair<String, Color>, Triple<Int, Int, Int>>>(emptyMap())
+        val result = Publisher<Map<Pair<String, Color>, Triple<Int, Int, Int>>>(emptyMap())
         val frame = dual(
-            result.binding
+            result
                 .map { map ->
                     map.entries.asSequence()
                         .sortedByDescending { it.value.third }
@@ -570,13 +590,15 @@ class BarFrameBuilderTest {
             .build()
         Assert.assertEquals(0, frame.numBars.toLong())
         Assert.assertEquals(0, frame.numLines.toLong())
-        result.value = mapOf(
-            Pair("LIB", Color.RED) to Triple(-6, -27, 157),
-            Pair("CON", Color.BLUE) to Triple(+4, +22, 121),
-            Pair("NDP", Color.ORANGE) to Triple(+1, -20, 24),
-            Pair("BQ", Color.CYAN) to Triple(0, +22, 32),
-            Pair("GRN", Color.GREEN) to Triple(+1, +2, 3),
-            Pair("IND", Color.GRAY) to Triple(0, +1, 1)
+        result.submit(
+            mapOf(
+                Pair("LIB", Color.RED) to Triple(-6, -27, 157),
+                Pair("CON", Color.BLUE) to Triple(+4, +22, 121),
+                Pair("NDP", Color.ORANGE) to Triple(+1, -20, 24),
+                Pair("BQ", Color.CYAN) to Triple(0, +22, 32),
+                Pair("GRN", Color.GREEN) to Triple(+1, +2, 3),
+                Pair("IND", Color.GRAY) to Triple(0, +1, 1)
+            )
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numBars }, IsEqual(6))
@@ -634,9 +656,9 @@ class BarFrameBuilderTest {
 
     @Test
     fun testDualChangeRangeBars() {
-        val result = BindableWrapper<Map<Pair<String, Color>, Triple<Int, Int, Int>>>(emptyMap())
+        val result = Publisher<Map<Pair<String, Color>, Triple<Int, Int, Int>>>(emptyMap())
         val frame = dual(
-            result.binding
+            result
                 .map { map ->
                     map.entries.asSequence()
                         .sortedByDescending { it.value.third }
@@ -647,13 +669,15 @@ class BarFrameBuilderTest {
             .build()
         Assert.assertEquals(0, frame.numBars.toLong())
         Assert.assertEquals(0, frame.numLines.toLong())
-        result.value = mapOf(
-            Pair("LIB", Color.RED) to Triple(-27, -6, 157),
-            Pair("CON", Color.BLUE) to Triple(+4, +22, 121),
-            Pair("NDP", Color.ORANGE) to Triple(-20, +1, 24),
-            Pair("BQ", Color.CYAN) to Triple(0, +22, 32),
-            Pair("GRN", Color.GREEN) to Triple(+1, +2, 3),
-            Pair("IND", Color.GRAY) to Triple(0, +1, 1)
+        result.submit(
+            mapOf(
+                Pair("LIB", Color.RED) to Triple(-27, -6, 157),
+                Pair("CON", Color.BLUE) to Triple(+4, +22, 121),
+                Pair("NDP", Color.ORANGE) to Triple(-20, +1, 24),
+                Pair("BQ", Color.CYAN) to Triple(0, +22, 32),
+                Pair("GRN", Color.GREEN) to Triple(+1, +2, 3),
+                Pair("IND", Color.GRAY) to Triple(0, +1, 1)
+            )
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numBars }, IsEqual(6))
@@ -713,7 +737,7 @@ class BarFrameBuilderTest {
             BasicBar("Wales", Color.BLACK, 4),
             BasicBar("Northern Ireland", Color.BLACK, 3)
         )
-        val frame = basic(Binding.fixedBinding(regions)).build()
+        val frame = basic(regions.asOneTimePublisher()).build()
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numBars }, IsEqual(12))
         Assert.assertEquals("East Midlands", frame.getLeftText(0))
@@ -743,7 +767,7 @@ class BarFrameBuilderTest {
             DualBar("Wales", Color.BLACK, 30, 40, "40 > 30"),
             DualBar("Northern Ireland", Color.BLACK, 16, 18, "18 > 16")
         )
-        val frame = dual(Binding.fixedBinding(regions)).build()
+        val frame = dual(regions.asOneTimePublisher()).build()
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numBars }, IsEqual(12))
         Assert.assertEquals("East Midlands", frame.getLeftText(0))
@@ -784,50 +808,50 @@ class BarFrameBuilderTest {
             Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
                 .until({ act.second.toDouble() }, IsEqual(exp.second.toDouble()))
         }
-        val regions = BindableWrapper(listOf(DualBar("", Color.BLACK, 0.0, 0.0, "")))
-        val frame = dual(regions.binding).build()
+        val regions = Publisher(listOf(DualBar("", Color.BLACK, 0.0, 0.0, "")))
+        val frame = dual(regions).build()
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numBars }, IsEqual(1))
         doAssert(Pair(Color.BLACK, 0.0), frame.getSeries(0)[0])
         doAssert(Pair(Color.BLACK, 0.0), frame.getSeries(0)[1])
         doAssert(Pair(lighten(Color.BLACK), 0.0), frame.getSeries(0)[2])
-        regions.value = listOf(DualBar("", Color.BLACK, 0.0, 2.0, ""))
+        regions.submit(listOf(DualBar("", Color.BLACK, 0.0, 2.0, "")))
         doAssert(Pair(Color.BLACK, 0.0), frame.getSeries(0)[0])
         doAssert(Pair(Color.BLACK, 0.0), frame.getSeries(0)[1])
         doAssert(Pair(lighten(Color.BLACK), 2.0), frame.getSeries(0)[2])
-        regions.value = listOf(DualBar("", Color.BLACK, 2.0, 0.0, ""))
+        regions.submit(listOf(DualBar("", Color.BLACK, 2.0, 0.0, "")))
         doAssert(Pair(Color.BLACK, 0.0), frame.getSeries(0)[0])
         doAssert(Pair(Color.BLACK, 0.0), frame.getSeries(0)[1])
         doAssert(Pair(lighten(Color.BLACK), 2.0), frame.getSeries(0)[2])
-        regions.value = listOf(DualBar("", Color.BLACK, 0.0, -2.0, ""))
+        regions.submit(listOf(DualBar("", Color.BLACK, 0.0, -2.0, "")))
         doAssert(Pair(Color.BLACK, 0.0), frame.getSeries(0)[0])
         doAssert(Pair(Color.BLACK, 0.0), frame.getSeries(0)[1])
         doAssert(Pair(lighten(Color.BLACK), -2.0), frame.getSeries(0)[2])
-        regions.value = listOf(DualBar("", Color.BLACK, -2.0, 0.0, ""))
+        regions.submit(listOf(DualBar("", Color.BLACK, -2.0, 0.0, "")))
         doAssert(Pair(Color.BLACK, 0.0), frame.getSeries(0)[0])
         doAssert(Pair(Color.BLACK, 0.0), frame.getSeries(0)[1])
         doAssert(Pair(lighten(Color.BLACK), -2.0), frame.getSeries(0)[2])
-        regions.value = listOf(DualBar("", Color.BLACK, 1.0, 3.0, ""))
+        regions.submit(listOf(DualBar("", Color.BLACK, 1.0, 3.0, "")))
         doAssert(Pair(Color.BLACK, 0.0), frame.getSeries(0)[0])
         doAssert(Pair(Color.BLACK, 1.0), frame.getSeries(0)[1])
         doAssert(Pair(lighten(Color.BLACK), 2.0), frame.getSeries(0)[2])
-        regions.value = listOf(DualBar("", Color.BLACK, 3.0, 1.0, ""))
+        regions.submit(listOf(DualBar("", Color.BLACK, 3.0, 1.0, "")))
         doAssert(Pair(Color.BLACK, 0.0), frame.getSeries(0)[0])
         doAssert(Pair(Color.BLACK, 1.0), frame.getSeries(0)[1])
         doAssert(Pair(lighten(Color.BLACK), 2.0), frame.getSeries(0)[2])
-        regions.value = listOf(DualBar("", Color.BLACK, -1.0, -3.0, ""))
+        regions.submit(listOf(DualBar("", Color.BLACK, -1.0, -3.0, "")))
         doAssert(Pair(Color.BLACK, 0.0), frame.getSeries(0)[0])
         doAssert(Pair(Color.BLACK, -1.0), frame.getSeries(0)[1])
         doAssert(Pair(lighten(Color.BLACK), -2.0), frame.getSeries(0)[2])
-        regions.value = listOf(DualBar("", Color.BLACK, -3.0, -1.0, ""))
+        regions.submit(listOf(DualBar("", Color.BLACK, -3.0, -1.0, "")))
         doAssert(Pair(Color.BLACK, 0.0), frame.getSeries(0)[0])
         doAssert(Pair(Color.BLACK, -1.0), frame.getSeries(0)[1])
         doAssert(Pair(lighten(Color.BLACK), -2.0), frame.getSeries(0)[2])
-        regions.value = listOf(DualBar("", Color.BLACK, -1.0, +1.0, ""))
+        regions.submit(listOf(DualBar("", Color.BLACK, -1.0, +1.0, "")))
         doAssert(Pair(Color.BLACK, 0.0), frame.getSeries(0)[0])
         doAssert(Pair(lighten(Color.BLACK), -1.0), frame.getSeries(0)[1])
         doAssert(Pair(lighten(Color.BLACK), +1.0), frame.getSeries(0)[2])
-        regions.value = listOf(DualBar("", Color.BLACK, +1.0, -1.0, ""))
+        regions.submit(listOf(DualBar("", Color.BLACK, +1.0, -1.0, "")))
         doAssert(Pair(Color.BLACK, 0.0), frame.getSeries(0)[0])
         doAssert(Pair(lighten(Color.BLACK), +1.0), frame.getSeries(0)[1])
         doAssert(Pair(lighten(Color.BLACK), -1.0), frame.getSeries(0)[2])
@@ -835,27 +859,29 @@ class BarFrameBuilderTest {
 
     @Test
     fun expandBarSpace() {
-        val bars = BindableWrapper<List<BasicBar>>(listOf())
-        val minBars = BindableWrapper(0)
-        val barFrame = basic(bars.binding).withMinBarCount(minBars.binding).build()
+        val bars = Publisher<List<BasicBar>>(listOf())
+        val minBars = Publisher(0)
+        val barFrame = basic(bars).withMinBarCount(minBars).build()
         Assert.assertEquals(0, barFrame.numBars)
 
-        bars.value = listOf(
-            BasicBar("JOE BIDEN", Color.BLUE, 306),
-            BasicBar("DONALD TRUMP", Color.RED, 232)
+        bars.submit(
+            listOf(
+                BasicBar("JOE BIDEN", Color.BLUE, 306),
+                BasicBar("DONALD TRUMP", Color.RED, 232)
+            )
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ barFrame.numBars }, IsEqual(2))
 
-        minBars.value = 3
+        minBars.submit(3)
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ barFrame.numBars }, IsEqual(3))
 
-        minBars.value = 1
+        minBars.submit(1)
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ barFrame.numBars }, IsEqual(2))
 
-        bars.value = emptyList()
+        bars.submit(emptyList())
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ barFrame.numBars }, IsEqual(1))
     }

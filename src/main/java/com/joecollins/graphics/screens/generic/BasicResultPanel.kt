@@ -387,13 +387,13 @@ class BasicResultPanel private constructor(
                 Result.Property.SEATS,
                 Result.Property.WINNER
             )
-            var builder = BarFrameBuilder.basic(bars)
-                .withHeader(header.getBinding())
-                .withSubhead(subhead.getBinding())
-                .withNotes(this.notes?.getBinding() ?: Binding.fixedBinding(null))
+            var builder = BarFrameBuilder.basic(bars.toPublisher())
+                .withHeader(header.getBinding().toPublisher())
+                .withSubhead(subhead.getBinding().toPublisher())
+                .withNotes(this.notes?.getBinding()?.toPublisher() ?: (null as String?).asOneTimePublisher())
             val total = this.total
             if (total != null) {
-                builder = builder.withMax(total.getBinding { it * 2 / 3 })
+                builder = builder.withMax(total.getBinding { it * 2 / 3 }.toPublisher())
             }
             applyMajorityLine(builder)
             return builder.build()
@@ -408,7 +408,7 @@ class BasicResultPanel private constructor(
                     if (show) listOf(tot / 2 + 1)
                     else emptyList()
                 }
-                builder.withLines(lines) { t -> majorityFunction!!(t) }
+                builder.withLines(lines.toPublisher()) { t -> majorityFunction!!(t) }
             }
         }
 
@@ -429,10 +429,10 @@ class BasicResultPanel private constructor(
                             }
                             .toList()
                     }
-                var builder = BarFrameBuilder.basic(bars).withHeader(classificationHeader.getBinding())
+                var builder = BarFrameBuilder.basic(bars.toPublisher()).withHeader(classificationHeader.getBinding().toPublisher())
                 val total = this.total
                 if (total != null) {
-                    builder = builder.withMax(total.getBinding { it * 2 / 3 })
+                    builder = builder.withMax(total.getBinding { it * 2 / 3 }.toPublisher())
                 }
                 applyMajorityLine(builder)
                 return builder.build()
@@ -454,12 +454,12 @@ class BasicResultPanel private constructor(
                         }
                         .toList()
                 }
-                var builder = BarFrameBuilder.basic(bars)
-                    .withHeader(changeHeader.getBinding())
-                    .withSubhead(changeSubhead?.getBinding() ?: Binding.fixedBinding(null))
+                var builder = BarFrameBuilder.basic(bars.toPublisher())
+                    .withHeader(changeHeader.getBinding().toPublisher())
+                    .withSubhead(changeSubhead?.getBinding()?.toPublisher() ?: (null as String?).asOneTimePublisher())
                 val total = this.total
                 if (total != null) {
-                    builder = builder.withWingspan(total.getBinding { (it / 20).coerceAtLeast(1) })
+                    builder = builder.withWingspan(total.getBinding { (it / 20).coerceAtLeast(1) }.toPublisher())
                 }
                 return builder.build()
             }
@@ -559,17 +559,17 @@ class BasicResultPanel private constructor(
                 Result.Property.WINNER
             )
             var builder = if (focusLocation == FocusLocation.FIRST) {
-                BarFrameBuilder.dual(bars)
+                BarFrameBuilder.dual(bars.toPublisher())
             } else {
-                BarFrameBuilder.dualReversed(bars)
+                BarFrameBuilder.dualReversed(bars.toPublisher())
             }
             builder = builder
-                .withHeader(header.getBinding())
-                .withSubhead(subhead.getBinding())
-                .withNotes(this.notes?.getBinding() ?: Binding.fixedBinding(null))
+                .withHeader(header.getBinding().toPublisher())
+                .withSubhead(subhead.getBinding().toPublisher())
+                .withNotes(this.notes?.getBinding()?.toPublisher() ?: (null as String?).asOneTimePublisher())
             val total = this.total
             if (total != null) {
-                builder = builder.withMax(total.getBinding { it * 2 / 3 })
+                builder = builder.withMax(total.getBinding { it * 2 / 3 }.toPublisher())
             }
             val showMajority = this.showMajority
             if (showMajority != null) {
@@ -581,7 +581,7 @@ class BasicResultPanel private constructor(
                     if (show) listOf(tot / 2 + 1)
                     else emptyList()
                 }
-                builder = builder.withLines(lines) { t -> majorityFunction!!(t) }
+                builder = builder.withLines(lines.toPublisher()) { t -> majorityFunction!!(t) }
             }
             return builder.build()
         }
@@ -615,15 +615,15 @@ class BasicResultPanel private constructor(
                         .toList()
                 }
                 var builder = if (focusLocation == FocusLocation.FIRST)
-                    BarFrameBuilder.dual(bars)
+                    BarFrameBuilder.dual(bars.toPublisher())
                 else
-                    BarFrameBuilder.dualReversed(bars)
+                    BarFrameBuilder.dualReversed(bars.toPublisher())
                 builder = builder
-                    .withHeader(changeHeader.getBinding())
-                    .withSubhead(changeSubhead?.getBinding() ?: Binding.fixedBinding(null))
+                    .withHeader(changeHeader.getBinding().toPublisher())
+                    .withSubhead(changeSubhead?.getBinding()?.toPublisher() ?: (null as String?).asOneTimePublisher())
                 val total = this.total
                 if (total != null) {
-                    builder = builder.withWingspan(total.getBinding { (it / 20).coerceAtLeast(1) })
+                    builder = builder.withWingspan(total.getBinding { (it / 20).coerceAtLeast(1) }.toPublisher())
                 }
                 return builder.build()
             }
@@ -713,13 +713,13 @@ class BasicResultPanel private constructor(
                 Result.Property.WINNER
             )
             val notes = this.notes
-            var builder = BarFrameBuilder.dual(bars)
-                .withHeader(header.getBinding())
-                .withSubhead(subhead.getBinding())
-                .withNotes(notes?.getBinding() ?: Binding.fixedBinding(null))
+            var builder = BarFrameBuilder.dual(bars.toPublisher())
+                .withHeader(header.getBinding().toPublisher())
+                .withSubhead(subhead.getBinding().toPublisher())
+                .withNotes(notes?.getBinding()?.toPublisher() ?: (null as String?).asOneTimePublisher())
             val total = this.total
             if (total != null) {
-                builder = builder.withMax(total.getBinding { it * 2 / 3 })
+                builder = builder.withMax(total.getBinding { it * 2 / 3 }.toPublisher())
             }
             val showMajority = this.showMajority
             if (showMajority != null) {
@@ -731,7 +731,7 @@ class BasicResultPanel private constructor(
                     if (show) listOf(tot / 2 + 1)
                     else emptyList()
                 }
-                builder = builder.withLines(lines) { t -> majorityFunction!!(t) }
+                builder = builder.withLines(lines.toPublisher()) { t -> majorityFunction!!(t) }
             }
             return builder.build()
         }
@@ -766,12 +766,12 @@ class BasicResultPanel private constructor(
                         }
                         .toList()
                 }
-                var builder = BarFrameBuilder.dual(bars)
-                    .withHeader(changeHeader.getBinding())
-                    .withSubhead(changeSubhead?.getBinding() ?: Binding.fixedBinding(null))
+                var builder = BarFrameBuilder.dual(bars.toPublisher())
+                    .withHeader(changeHeader.getBinding().toPublisher())
+                    .withSubhead(changeSubhead?.getBinding()?.toPublisher() ?: (null as String?).asOneTimePublisher())
                 val total = this.total
                 if (total != null) {
-                    builder = builder.withWingspan(total.getBinding { (it / 20).coerceAtLeast(1) })
+                    builder = builder.withWingspan(total.getBinding { (it / 20).coerceAtLeast(1) }.toPublisher())
                 }
                 return builder.build()
             }
@@ -1124,12 +1124,12 @@ class BasicResultPanel private constructor(
             )
             val notes = this.notes
             val pctReporting = this.pctReporting
-            val builder = BarFrameBuilder.basic(bars)
-                .withHeader(header.getBinding())
-                .withSubhead(subhead.getBinding())
-                .withNotes(notes?.getBinding() ?: Binding.fixedBinding(null))
+            val builder = BarFrameBuilder.basic(bars.toPublisher())
+                .withHeader(header.getBinding().toPublisher())
+                .withSubhead(subhead.getBinding().toPublisher())
+                .withNotes(notes?.getBinding()?.toPublisher() ?: (null as String?).asOneTimePublisher())
                 .withMax(
-                    pctReporting?.getBinding { 2.0 / 3 / it.coerceAtLeast(1e-6) } ?: Binding.fixedBinding(2.0 / 3)
+                    pctReporting?.getBinding { 2.0 / 3 / it.coerceAtLeast(1e-6) }?.toPublisher() ?: (2.0 / 3).asOneTimePublisher()
                 )
             applyMajorityLine(builder)
             return builder.build()
@@ -1146,7 +1146,7 @@ class BasicResultPanel private constructor(
                     if (show) listOf(0.5 / pct.coerceAtLeast(1e-6))
                     else emptyList()
                 }
-                builder.withLines(lines) { majorityLabel!!.value }
+                builder.withLines(lines.toPublisher()) { majorityLabel!!.value }
             }
         }
 
@@ -1218,16 +1218,16 @@ class BasicResultPanel private constructor(
                     Result.Property.RUNOFF
                 )
                 val preferencePctReporting = this.preferencePctReporting
-                return BarFrameBuilder.basic(bars)
-                    .withHeader(preferenceHeader!!.getBinding())
-                    .withSubhead(preferenceSubhead?.getBinding() ?: Binding.fixedBinding(null))
+                return BarFrameBuilder.basic(bars.toPublisher())
+                    .withHeader(preferenceHeader!!.getBinding().toPublisher())
+                    .withSubhead(preferenceSubhead?.getBinding()?.toPublisher() ?: (null as String?).asOneTimePublisher())
                     .withLines(
-                        preferencePctReporting?.getBinding { listOf(0.5 / it.coerceAtLeast(1e-6)) }
-                            ?: Binding.fixedBinding(listOf(0.5))
+                        preferencePctReporting?.getBinding { listOf(0.5 / it.coerceAtLeast(1e-6)) }?.toPublisher()
+                            ?: listOf(0.5).asOneTimePublisher()
                     ) { "50%" }
                     .withMax(
-                        preferencePctReporting?.getBinding { 2.0 / 3 / it.coerceAtLeast(1e-6) }
-                            ?: Binding.fixedBinding(2.0 / 3)
+                        preferencePctReporting?.getBinding { 2.0 / 3 / it.coerceAtLeast(1e-6) }?.toPublisher()
+                            ?: (2.0 / 3).asOneTimePublisher()
                     )
                     .build()
             }
@@ -1255,10 +1255,10 @@ class BasicResultPanel private constructor(
                             .toList()
                     }
                 val pctReporting = this.pctReporting
-                val builder = BarFrameBuilder.basic(bars)
-                    .withHeader(classificationHeader.getBinding())
+                val builder = BarFrameBuilder.basic(bars.toPublisher())
+                    .withHeader(classificationHeader.getBinding().toPublisher())
                     .withMax(
-                        pctReporting?.getBinding { 2.0 / 3 / it.coerceAtLeast(1e-6) } ?: Binding.fixedBinding(2.0 / 3)
+                        pctReporting?.getBinding { 2.0 / 3 / it.coerceAtLeast(1e-6) }?.toPublisher() ?: (2.0 / 3).asOneTimePublisher()
                     )
                 applyMajorityLine(builder)
                 return builder.build()
@@ -1334,12 +1334,12 @@ class BasicResultPanel private constructor(
                     Change.Property.PREV
                 )
                 val pctReporting = this.pctReporting
-                return BarFrameBuilder.basic(bars)
+                return BarFrameBuilder.basic(bars.toPublisher())
                     .withWingspan(
-                        pctReporting?.getBinding { 0.1 / it.coerceAtLeast(1e-6) } ?: Binding.fixedBinding(0.1)
+                        pctReporting?.getBinding { 0.1 / it.coerceAtLeast(1e-6) }?.toPublisher() ?: 0.1.asOneTimePublisher()
                     )
-                    .withHeader(changeHeader!!.getBinding())
-                    .withSubhead(changeSubhead?.getBinding() ?: Binding.fixedBinding(null))
+                    .withHeader(changeHeader!!.getBinding().toPublisher())
+                    .withSubhead(changeSubhead?.getBinding()?.toPublisher() ?: (null as String?).asOneTimePublisher())
                     .build()
             }
         }
@@ -1437,17 +1437,17 @@ class BasicResultPanel private constructor(
                     .toList()
             }
             val notes = notes
-            var builder = BarFrameBuilder.dual(bars)
-                .withHeader(header.getBinding())
-                .withSubhead(subhead.getBinding())
-                .withNotes(notes?.getBinding() ?: Binding.fixedBinding(null))
-                .withMax(Binding.fixedBinding(2.0 / 3))
+            var builder = BarFrameBuilder.dual(bars.toPublisher())
+                .withHeader(header.getBinding().toPublisher())
+                .withSubhead(subhead.getBinding().toPublisher())
+                .withNotes(notes?.getBinding()?.toPublisher() ?: (null as String?).asOneTimePublisher())
+                .withMax((2.0 / 3).asOneTimePublisher())
             val showMajority = showMajority
             if (showMajority != null) {
                 val lines = showMajority.getBinding().map {
                     if (it) listOf(0.5) else emptyList()
                 }
-                builder = builder.withLines(lines) { majorityLabel!!.value }
+                builder = builder.withLines(lines.toPublisher()) { majorityLabel!!.value }
             }
             return builder.build()
         }
@@ -1518,10 +1518,10 @@ class BasicResultPanel private constructor(
                     Change.Property.CURR,
                     Change.Property.PREV
                 )
-                return BarFrameBuilder.dual(bars)
-                    .withWingspan(Binding.fixedBinding(0.1))
-                    .withHeader(changeHeader!!.getBinding())
-                    .withSubhead(changeSubhead?.getBinding() ?: Binding.fixedBinding(null))
+                return BarFrameBuilder.dual(bars.toPublisher())
+                    .withWingspan(0.1.asOneTimePublisher())
+                    .withHeader(changeHeader!!.getBinding().toPublisher())
+                    .withSubhead(changeSubhead?.getBinding()?.toPublisher() ?: (null as String?).asOneTimePublisher())
                     .build()
             }
         }
@@ -1552,12 +1552,12 @@ class BasicResultPanel private constructor(
                         }
                         .toList()
                 }
-                var builder = BarFrameBuilder.dual(bars)
-                    .withHeader(preferenceHeader!!.getBinding())
-                    .withSubhead(preferenceSubhead?.getBinding() ?: Binding.fixedBinding(null))
-                    .withMax(Binding.fixedBinding(2.0 / 3))
+                var builder = BarFrameBuilder.dual(bars.toPublisher())
+                    .withHeader(preferenceHeader!!.getBinding().toPublisher())
+                    .withSubhead(preferenceSubhead?.getBinding()?.toPublisher() ?: (null as String?).asOneTimePublisher())
+                    .withMax((2.0 / 3).asOneTimePublisher())
                 val lines = Binding.fixedBinding(listOf(0.5))
-                builder = builder.withLines(lines) { "50%" }
+                builder = builder.withLines(lines.toPublisher()) { "50%" }
                 return builder.build()
             }
         }

@@ -13,6 +13,7 @@ import com.joecollins.graphics.utils.StandardFont
 import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
+import com.joecollins.pubsub.asOneTimePublisher
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Component
@@ -244,10 +245,10 @@ class MixedMemberResultPanel private constructor(
                 Result.Property.VOTES,
                 Result.Property.WINNER
             )
-            return BarFrameBuilder.basic(bars)
-                .withHeader(candidateVoteHeader.getBinding())
-                .withSubhead(candidateVoteSubheader.getBinding())
-                .withMax(candidatePctReporting?.getBinding { x: Double -> 2.0 / 3 / x.coerceAtLeast(1e-6) } ?: Binding.fixedBinding(2.0 / 3))
+            return BarFrameBuilder.basic(bars.toPublisher())
+                .withHeader(candidateVoteHeader.getBinding().toPublisher())
+                .withSubhead(candidateVoteSubheader.getBinding().toPublisher())
+                .withMax(candidatePctReporting?.getBinding { x: Double -> 2.0 / 3 / x.coerceAtLeast(1e-6) }?.toPublisher() ?: (2.0 / 3).asOneTimePublisher())
                 .build()
         }
 
@@ -335,9 +336,9 @@ class MixedMemberResultPanel private constructor(
                 Change.Property.CURR,
                 Change.Property.PREV
             )
-            return BarFrameBuilder.basic(bars)
-                .withHeader(candidateChangeHeader.getBinding())
-                .withWingspan(candidatePctReporting?.getBinding { x: Double -> 0.05 / x.coerceAtLeast(1e-6) } ?: Binding.fixedBinding(0.05))
+            return BarFrameBuilder.basic(bars.toPublisher())
+                .withHeader(candidateChangeHeader.getBinding().toPublisher())
+                .withWingspan(candidatePctReporting?.getBinding { x: Double -> 0.05 / x.coerceAtLeast(1e-6) }?.toPublisher() ?: 0.05.asOneTimePublisher())
                 .build()
         }
 
@@ -360,10 +361,10 @@ class MixedMemberResultPanel private constructor(
                             )
                         }
                         .toList()
-                }
+                }.toPublisher()
             )
-                .withHeader(partyVoteHeader.getBinding())
-                .withMax(partyPctReporting?.getBinding { x: Double -> 2.0 / 3 / x.coerceAtLeast(1e-6) } ?: Binding.fixedBinding(2.0 / 3))
+                .withHeader(partyVoteHeader.getBinding().toPublisher())
+                .withMax(partyPctReporting?.getBinding { x: Double -> 2.0 / 3 / x.coerceAtLeast(1e-6) }?.toPublisher() ?: (2.0 / 3).asOneTimePublisher())
                 .build()
         }
 
@@ -425,9 +426,9 @@ class MixedMemberResultPanel private constructor(
                 Change.Property.CURR,
                 Change.Property.PREV
             )
-            return BarFrameBuilder.basic(bars)
-                .withHeader(partyChangeHeader.getBinding())
-                .withWingspan(partyPctReporting?.getBinding { x: Double -> 0.05 / x.coerceAtLeast(1e-6) } ?: Binding.fixedBinding(0.05))
+            return BarFrameBuilder.basic(bars.toPublisher())
+                .withHeader(partyChangeHeader.getBinding().toPublisher())
+                .withWingspan(partyPctReporting?.getBinding { x: Double -> 0.05 / x.coerceAtLeast(1e-6) }?.toPublisher() ?: 0.05.asOneTimePublisher())
                 .build()
         }
 

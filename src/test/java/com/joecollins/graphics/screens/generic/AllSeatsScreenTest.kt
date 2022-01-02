@@ -1,12 +1,13 @@
 package com.joecollins.graphics.screens.generic
 
-import com.joecollins.bindings.Binding.Companion.fixedBinding
 import com.joecollins.graphics.utils.BindableWrapper
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
 import com.joecollins.models.general.PartyResult.Companion.elected
 import com.joecollins.models.general.PartyResult.Companion.leading
+import com.joecollins.pubsub.Publisher
+import com.joecollins.pubsub.asOneTimePublisher
 import org.junit.Test
 import java.awt.Color
 import java.io.IOException
@@ -19,16 +20,16 @@ class AllSeatsScreenTest {
     fun testAllSeats() {
         val prevResult = BindableWrapper(bcPrevResult())
         val currResult = BindableWrapper<Map<String, PartyResult?>>(emptyMap())
-        val numRows = BindableWrapper(15)
+        val numRows = Publisher(15)
         val title = BindableWrapper("BRITISH COLUMBIA")
         val nameShortener = { obj: String -> obj.uppercase() }
         val panel = AllSeatsScreen.of(
             prevResult.binding,
             currResult.binding,
             { nameShortener(it) },
-            fixedBinding("SEATS CHANGING")
+            "SEATS CHANGING".asOneTimePublisher()
         )
-            .withNumRows(numRows.binding)
+            .withNumRows(numRows)
             .build(title.binding)
         panel.setSize(1024, 512)
         compareRendering("AllSeatsScreen", "Basic-1", panel)
@@ -57,7 +58,7 @@ class AllSeatsScreenTest {
     fun testFilteredSeats() {
         val prevResult = BindableWrapper(bcPrevResult())
         val currResult = BindableWrapper<Map<String, PartyResult?>>(emptyMap())
-        val numRows = BindableWrapper(15)
+        val numRows = Publisher(15)
         val title = BindableWrapper("VANCOUVER")
         val filteredSeats = BindableWrapper(
             prevResult.value.keys
@@ -69,9 +70,9 @@ class AllSeatsScreenTest {
             prevResult.binding,
             currResult.binding,
             { nameShortener(it) },
-            fixedBinding("SEATS CHANGING")
+            "SEATS CHANGING".asOneTimePublisher()
         )
-            .withNumRows(numRows.binding)
+            .withNumRows(numRows)
             .withSeatFilter(filteredSeats.binding)
             .build(title.binding)
         panel.setSize(1024, 512)
@@ -103,16 +104,16 @@ class AllSeatsScreenTest {
         val results: MutableMap<String, PartyResult?> = HashMap(bcCurrResult())
         results.keys.forEach { riding: String -> results[riding] = null }
         val currResult = BindableWrapper<Map<String, PartyResult?>>(results)
-        val numRows = BindableWrapper(15)
+        val numRows = Publisher(15)
         val title = BindableWrapper("BRITISH COLUMBIA")
         val nameShortener = { obj: String -> obj.uppercase() }
         val panel = AllSeatsScreen.of(
             prevResult.binding,
             currResult.binding,
             { nameShortener(it) },
-            fixedBinding("SEATS CHANGING")
+            "SEATS CHANGING".asOneTimePublisher()
         )
-            .withNumRows(numRows.binding)
+            .withNumRows(numRows)
             .build(title.binding)
         panel.setSize(1024, 512)
         compareRendering("AllSeatsScreen", "Basic-1", panel)

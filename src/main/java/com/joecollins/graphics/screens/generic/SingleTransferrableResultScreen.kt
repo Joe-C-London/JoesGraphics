@@ -196,12 +196,12 @@ class SingleTransferrableResultScreen private constructor(
                     sequenceOf(alreadyElectedSequence, thisRoundSequence)
                         .flatten()
                         .toList()
-                }
+                }.toPublisher()
             )
-                .withHeader(candidateHeader.getBinding())
-                .withSubhead(candidateSubhead.getBinding())
-                .withMax(quota.getBinding { (it?.toDouble() ?: 1.0) * 2 })
-                .withLines(quota.getBinding { if (it == null) emptyList() else listOf(it) }) { "QUOTA: " + formatString(it) }
+                .withHeader(candidateHeader.getBinding().toPublisher())
+                .withSubhead(candidateSubhead.getBinding().toPublisher())
+                .withMax(quota.getBinding { (it?.toDouble() ?: 1.0) * 2 }.toPublisher())
+                .withLines(quota.getBinding { if (it == null) emptyList() else listOf(it) }.toPublisher()) { "QUOTA: " + formatString(it) }
                 .build()
         }
 
@@ -233,11 +233,11 @@ class SingleTransferrableResultScreen private constructor(
                                 valueLabel = formatString(it.value)
                             )
                         }
-                }
+                }.toPublisher()
             )
-                .withHeader(partyHeader!!.getBinding())
-                .withMax(totalSeats!!.getBinding())
-                .withLines(totalSeats!!.getBinding { (1 until it).toList() }) { i -> "$i QUOTA${if (i == 1) "" else "S"}" }
+                .withHeader(partyHeader!!.getBinding().toPublisher())
+                .withMax(totalSeats!!.getBinding().toPublisher())
+                .withLines(totalSeats!!.getBinding { (1 until it).toList() }.toPublisher()) { i -> "$i QUOTA${if (i == 1) "" else "S"}" }
                 .build()
         }
 
@@ -256,10 +256,10 @@ class SingleTransferrableResultScreen private constructor(
                                 value = it.value
                             )
                         }
-                }
+                }.toPublisher()
             )
-                .withMax(prevSeats!!.getBinding { prev -> prev.values.sum() / 2 })
-                .withHeader(prevHeader!!.getBinding())
+                .withMax(prevSeats!!.getBinding { prev -> prev.values.sum() / 2 }.toPublisher())
+                .withHeader(prevHeader!!.getBinding().toPublisher())
                 .build()
         }
 
