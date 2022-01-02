@@ -1,14 +1,13 @@
 package com.joecollins.graphics.components
 
 import com.joecollins.bindings.Bindable
-import com.joecollins.bindings.Binding
-import com.joecollins.bindings.Binding.Companion.fixedBinding
 import com.joecollins.graphics.components.HemicycleFrameBuilder.Companion.of
 import com.joecollins.graphics.components.HemicycleFrameBuilder.Companion.ofElectedLeading
 import com.joecollins.graphics.components.HemicycleFrameBuilder.Tiebreaker
-import com.joecollins.graphics.utils.BindableWrapper
 import com.joecollins.graphics.utils.ColorUtils.lighten
 import com.joecollins.models.general.Party
+import com.joecollins.pubsub.Publisher
+import com.joecollins.pubsub.asOneTimePublisher
 import org.awaitility.Awaitility
 import org.hamcrest.core.IsEqual
 import org.junit.Assert
@@ -30,24 +29,24 @@ class HemicycleFrameBuilderTest {
         dots.addAll(Collections.nCopies(6, Pair(Color.RED, Color.RED)))
         dots.addAll(Collections.nCopies(5, Pair(Color.BLUE, Color.RED)))
         dots.addAll(Collections.nCopies(8, Pair(Color.BLUE, Color.BLUE)))
-        val leftSeatBars = BindableWrapper(listOf(Pair(Color.GREEN, 8)))
-        val rightSeatBars = BindableWrapper(listOf(Pair(Color.BLUE, 13)))
-        val middleSeatBars = BindableWrapper(listOf(Pair(Color.RED, 6)))
-        val leftChangeBars = BindableWrapper(listOf(Pair(Color.GREEN, +7)))
-        val rightChangeBars = BindableWrapper(listOf(Pair(Color.BLUE, +5)))
+        val leftSeatBars = Publisher(listOf(Pair(Color.GREEN, 8)))
+        val rightSeatBars = Publisher(listOf(Pair(Color.BLUE, 13)))
+        val middleSeatBars = Publisher(listOf(Pair(Color.RED, 6)))
+        val leftChangeBars = Publisher(listOf(Pair(Color.GREEN, +7)))
+        val rightChangeBars = Publisher(listOf(Pair(Color.BLUE, +5)))
         val frame = of(
             rows,
             dots,
-            { fixedBinding(it.first) },
-            { fixedBinding(it.second) },
+            { it.first.asOneTimePublisher() },
+            { it.second.asOneTimePublisher() },
             Tiebreaker.FRONT_ROW_FROM_RIGHT
         )
-            .withLeftSeatBars(leftSeatBars.binding, { it.first }, { it.second }, fixedBinding("GREEN: 8"))
-            .withRightSeatBars(rightSeatBars.binding, { it.first }, { it.second }, fixedBinding("PROGRESSIVE CONSERVATIVE: 13"))
-            .withMiddleSeatBars(middleSeatBars.binding, { it.first }, { it.second }, fixedBinding("LIBERAL: 6"))
-            .withLeftChangeBars(leftChangeBars.binding, { it.first }, { it.second }, fixedBinding(1), fixedBinding("GRN: +7"))
-            .withRightChangeBars(rightChangeBars.binding, { it.first }, { it.second }, fixedBinding(8), fixedBinding("PC: +5"))
-            .withHeader(fixedBinding("PEI"))
+            .withLeftSeatBars(leftSeatBars, { it.first }, { it.second }, "GREEN: 8".asOneTimePublisher())
+            .withRightSeatBars(rightSeatBars, { it.first }, { it.second }, "PROGRESSIVE CONSERVATIVE: 13".asOneTimePublisher())
+            .withMiddleSeatBars(middleSeatBars, { it.first }, { it.second }, "LIBERAL: 6".asOneTimePublisher())
+            .withLeftChangeBars(leftChangeBars, { it.first }, { it.second }, 1.asOneTimePublisher(), "GRN: +7".asOneTimePublisher())
+            .withRightChangeBars(rightChangeBars, { it.first }, { it.second }, 8.asOneTimePublisher(), "PC: +5".asOneTimePublisher())
+            .withHeader("PEI".asOneTimePublisher())
             .build()
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numRows }, IsEqual(3))
@@ -125,7 +124,7 @@ class HemicycleFrameBuilderTest {
         val frame = ofElectedLeading(
             listOf(ridings.size),
             ridings,
-            { fixedBinding(HemicycleFrameBuilder.Result(it.leader, it.hasWon)) },
+            { HemicycleFrameBuilder.Result(it.leader, it.hasWon).asOneTimePublisher() },
             { it.prev },
             lib,
             yp,
@@ -135,7 +134,7 @@ class HemicycleFrameBuilderTest {
             { e: Int, l: Int -> l > 0 },
             { e: Int, l: Int -> DecimalFormat("+0;-0").format(e) + "/" + DecimalFormat("+0;-0").format(l) },
             Tiebreaker.FRONT_ROW_FROM_LEFT,
-            fixedBinding("YUKON")
+            "YUKON".asOneTimePublisher()
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numDots }, IsEqual(19))
@@ -182,21 +181,13 @@ class HemicycleFrameBuilderTest {
         val dem = Party("Democratic", "DEM", Color.BLUE)
         val gop = Party("Republican", "GOP", Color.RED)
 
-        class Result(var leader: Party?, var hasWon: Boolean, val prev: Party) : Bindable<Result, Property>() {
-            val binding: Binding<HemicycleFrameBuilder.Result?>
-                get() = Binding.propertyBinding(
-                    this,
-                    {
-                        if (leader == null) null
-                        else HemicycleFrameBuilder.Result(leader, hasWon)
-                    },
-                    Property.PROP
-                )
+        class Result(var leader: Party?, var hasWon: Boolean, val prev: Party) {
+            val publisher = Publisher(if (leader == null) null else HemicycleFrameBuilder.Result(leader, hasWon))
 
             fun setResult(leader: Party?, hasWon: Boolean) {
                 this.leader = leader
                 this.hasWon = hasWon
-                onPropertyRefreshed(Property.PROP)
+                publisher.submit(if (leader == null) null else HemicycleFrameBuilder.Result(leader, hasWon))
             }
         }
 
@@ -205,7 +196,7 @@ class HemicycleFrameBuilderTest {
         val frame = ofElectedLeading(
             listOf(results.size),
             results,
-            { it.binding },
+            { it.publisher },
             { it.prev },
             dem,
             gop,
@@ -215,7 +206,7 @@ class HemicycleFrameBuilderTest {
             { e: Int, l: Int -> l > 0 },
             { e: Int, l: Int -> DecimalFormat("+0;-0").format(e) + "/" + DecimalFormat("+0;-0").format(l) },
             Tiebreaker.FRONT_ROW_FROM_LEFT,
-            fixedBinding("TEST")
+            "TEST".asOneTimePublisher()
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numDots }, IsEqual(30))
@@ -263,21 +254,13 @@ class HemicycleFrameBuilderTest {
         val dem = Party("Democratic", "DEM", Color.BLUE)
         val gop = Party("Republican", "GOP", Color.RED)
 
-        class Result(var leader: Party?, var hasWon: Boolean, val prev: Party, val numSeats: Int) : Bindable<Result, Property>() {
-            val binding: Binding<HemicycleFrameBuilder.Result?>
-                get() = Binding.propertyBinding(
-                    this,
-                    {
-                        if (leader == null) return@propertyBinding null
-                        HemicycleFrameBuilder.Result(leader, hasWon)
-                    },
-                    Property.PROP
-                )
+        class Result(var leader: Party?, var hasWon: Boolean, val prev: Party, val numSeats: Int) {
+            val publisher = Publisher(if (leader == null) null else HemicycleFrameBuilder.Result(leader, hasWon))
 
             fun setResult(leader: Party?, hasWon: Boolean) {
                 this.leader = leader
                 this.hasWon = hasWon
-                onPropertyRefreshed(Property.PROP)
+                publisher.submit(if (leader == null) null else HemicycleFrameBuilder.Result(leader, hasWon))
             }
         }
 
@@ -287,7 +270,7 @@ class HemicycleFrameBuilderTest {
             listOf(results.map { it.numSeats }.sum()),
             results,
             { it.numSeats },
-            { it.binding },
+            { it.publisher },
             { it.prev },
             dem,
             gop,
@@ -297,7 +280,7 @@ class HemicycleFrameBuilderTest {
             { e: Int, l: Int -> true },
             { e: Int, l: Int -> DecimalFormat("+0;-0").format(e) + "/" + DecimalFormat("+0;-0").format(l) },
             Tiebreaker.FRONT_ROW_FROM_LEFT,
-            fixedBinding("TEST")
+            "TEST".asOneTimePublisher()
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numDots }, IsEqual(30))
@@ -376,15 +359,12 @@ class HemicycleFrameBuilderTest {
         val gop = Party("Republican", "GOP", Color.RED)
 
         class Result(var leader: Party?, var hasWon: Boolean, val prev: Party, val numSeats: Int) : Bindable<Result, Property>() {
-            val binding: Binding<HemicycleFrameBuilder.Result?>
-                get() = Binding.propertyBinding(
-                    this, { HemicycleFrameBuilder.Result(leader, hasWon) }, Property.PROP
-                )
+            val publisher = Publisher<HemicycleFrameBuilder.Result?>(HemicycleFrameBuilder.Result(leader, hasWon))
 
             fun setResult(leader: Party?, hasWon: Boolean) {
                 this.leader = leader
                 this.hasWon = hasWon
-                onPropertyRefreshed(Property.PROP)
+                publisher.submit(HemicycleFrameBuilder.Result(leader, hasWon))
             }
         }
 
@@ -394,7 +374,7 @@ class HemicycleFrameBuilderTest {
             listOf(results.map { it.numSeats }.sum()),
             results,
             { it.numSeats },
-            { it.binding },
+            { it.publisher },
             { it.prev },
             dem,
             gop,
@@ -404,7 +384,7 @@ class HemicycleFrameBuilderTest {
             { e: Int, l: Int -> true },
             { e: Int, l: Int -> DecimalFormat("+0;-0").format(e) + "/" + DecimalFormat("+0;-0").format(l) },
             Tiebreaker.FRONT_ROW_FROM_LEFT,
-            fixedBinding("TEST")
+            "TEST".asOneTimePublisher()
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numDots }, IsEqual(30))

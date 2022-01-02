@@ -136,6 +136,26 @@ fun <T, U, R> Flow.Publisher<T>.merge(other: Flow.Publisher<U>, func: (T, U) -> 
     return publisher
 }
 
+fun <T, R> List<Flow.Publisher<T>>.mapReduce(identity: R, onValueAdd: (R, T) -> R, onValueRemove: (R, T) -> R): Flow.Publisher<R> {
+    data class Wrapper(val item: T)
+    val publisher = Publisher<R>()
+    val list: MutableList<Wrapper?> = this.map { null }.toMutableList()
+    var value = identity
+    this.forEachIndexed { index, pub ->
+        pub.subscribe(
+            Subscriber { newVal ->
+                synchronized(list) {
+                    list[index]?.let { oldValWrap -> value = onValueRemove(value, oldValWrap.item) }
+                    list[index] = Wrapper(newVal)
+                    value = onValueAdd(value, newVal)
+                    publisher.submit(value)
+                }
+            }
+        )
+    }
+    return publisher
+}
+
 fun <T> List<Flow.Publisher<T>>.combine(): Flow.Publisher<List<T>> {
     data class Wrapper(val item: T)
     val publisher = Publisher<List<T>>()

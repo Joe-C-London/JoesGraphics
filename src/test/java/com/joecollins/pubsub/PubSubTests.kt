@@ -1,5 +1,6 @@
 package com.joecollins.pubsub
 
+import com.joecollins.graphics.utils.BoundResult
 import org.awaitility.Awaitility
 import org.hamcrest.core.IsEqual
 import org.hamcrest.core.IsNull
@@ -272,5 +273,20 @@ class PubSubTests {
 
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ output }, IsEqual((0..10).toList()))
+    }
+
+    @Test
+    fun testMapReducePublisher() {
+        val boundValue: BoundResult<Int> = BoundResult()
+        val publishers = listOf(Publisher(1), Publisher(2), Publisher(3))
+        publishers.mapReduce(0, { a: Int, v: Int -> a + v }, { a: Int, v: Int -> a - v })
+            .subscribe(Subscriber { boundValue.value = it })
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ boundValue.value }, IsEqual(6))
+        publishers[0].submit(4)
+        publishers[1].submit(5)
+        publishers[2].submit(6)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ boundValue.value }, IsEqual(15))
     }
 }

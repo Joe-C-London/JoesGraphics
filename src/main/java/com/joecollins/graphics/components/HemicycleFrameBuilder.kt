@@ -1,120 +1,123 @@
 package com.joecollins.graphics.components
 
 import com.google.common.annotations.Beta
-import com.joecollins.bindings.Binding
-import com.joecollins.bindings.BindingReceiver
-import com.joecollins.bindings.mapElements
 import com.joecollins.graphics.utils.ColorUtils
 import com.joecollins.models.general.Party
 import com.joecollins.pubsub.asOneTimePublisher
+import com.joecollins.pubsub.combine
+import com.joecollins.pubsub.map
+import com.joecollins.pubsub.mapElements
+import com.joecollins.pubsub.mapReduce
+import com.joecollins.pubsub.merge
 import java.awt.Color
 import java.awt.Point
 import java.util.ArrayList
 import java.util.Comparator
+import java.util.concurrent.Flow
 import kotlin.math.abs
 
 class HemicycleFrameBuilder {
-    private var headerBinding: Binding<String?>? = null
-    private var leftSeatBarBinding: Binding<List<HemicycleFrame.Bar>>? = null
-    private var leftSeatBarLabelBinding: Binding<String>? = null
-    private var rightSeatBarBinding: Binding<List<HemicycleFrame.Bar>>? = null
-    private var rightSeatBarLabelBinding: Binding<String>? = null
-    private var middleSeatBarBinding: Binding<List<HemicycleFrame.Bar>>? = null
-    private var middleSeatBarLabelBinding: Binding<String>? = null
-    private var leftChangeBarBinding: Binding<List<HemicycleFrame.Bar>>? = null
-    private var leftChangeBarStartBinding: Binding<Int>? = null
-    private var leftChangeBarLabelBinding: Binding<String>? = null
-    private var rightChangeBarBinding: Binding<List<HemicycleFrame.Bar>>? = null
-    private var rightChangeBarStartBinding: Binding<Int>? = null
-    private var rightChangeBarLabelBinding: Binding<String>? = null
-    private var rowsBinding: Binding<List<Int>>? = null
-    private var dotsBinding: Binding<List<HemicycleFrame.Dot>>? = null
+    private var headerPublisher: Flow.Publisher<out String?>? = null
+    private var leftSeatBarPublisher: Flow.Publisher<out List<HemicycleFrame.Bar>>? = null
+    private var leftSeatBarLabelPublisher: Flow.Publisher<out String>? = null
+    private var rightSeatBarPublisher: Flow.Publisher<out List<HemicycleFrame.Bar>>? = null
+    private var rightSeatBarLabelPublisher: Flow.Publisher<out String>? = null
+    private var middleSeatBarPublisher: Flow.Publisher<out List<HemicycleFrame.Bar>>? = null
+    private var middleSeatBarLabelPublisher: Flow.Publisher<out String>? = null
+    private var leftChangeBarPublisher: Flow.Publisher<out List<HemicycleFrame.Bar>>? = null
+    private var leftChangeBarStartPublisher: Flow.Publisher<out Int>? = null
+    private var leftChangeBarLabelPublisher: Flow.Publisher<out String>? = null
+    private var rightChangeBarPublisher: Flow.Publisher<out List<HemicycleFrame.Bar>>? = null
+    private var rightChangeBarStartPublisher: Flow.Publisher<out Int>? = null
+    private var rightChangeBarLabelPublisher: Flow.Publisher<out String>? = null
+    private var rowsPublisher: Flow.Publisher<out List<Int>>? = null
+    private var dotsPublisher: Flow.Publisher<out List<HemicycleFrame.Dot>>? = null
 
     enum class Tiebreaker {
         FRONT_ROW_FROM_LEFT, FRONT_ROW_FROM_RIGHT
     }
 
-    fun withHeader(headerBinding: Binding<String?>): HemicycleFrameBuilder {
-        this.headerBinding = headerBinding
+    fun withHeader(headerPublisher: Flow.Publisher<out String?>): HemicycleFrameBuilder {
+        this.headerPublisher = headerPublisher
         return this
     }
 
     fun <T> withLeftSeatBars(
-        bars: Binding<List<T>>,
+        bars: Flow.Publisher<out List<T>>,
         colorFunc: (T) -> Color,
         seatFunc: (T) -> Int,
-        labelBinding: Binding<String>
+        labelPublisher: Flow.Publisher<out String>
     ): HemicycleFrameBuilder {
-        this.leftSeatBarBinding = bars.mapElements { HemicycleFrame.Bar(color = colorFunc(it), size = seatFunc(it)) }
-        this.leftSeatBarLabelBinding = labelBinding
+        this.leftSeatBarPublisher = bars.mapElements { HemicycleFrame.Bar(color = colorFunc(it), size = seatFunc(it)) }
+        this.leftSeatBarLabelPublisher = labelPublisher
         return this
     }
 
     fun <T> withRightSeatBars(
-        bars: Binding<List<T>>,
+        bars: Flow.Publisher<out List<T>>,
         colorFunc: (T) -> Color,
         seatFunc: (T) -> Int,
-        labelBinding: Binding<String>
+        labelPublisher: Flow.Publisher<out String>
     ): HemicycleFrameBuilder {
-        this.rightSeatBarBinding = bars.mapElements { HemicycleFrame.Bar(color = colorFunc(it), size = seatFunc(it)) }
-        this.rightSeatBarLabelBinding = labelBinding
+        this.rightSeatBarPublisher = bars.mapElements { HemicycleFrame.Bar(color = colorFunc(it), size = seatFunc(it)) }
+        this.rightSeatBarLabelPublisher = labelPublisher
         return this
     }
 
     fun <T> withMiddleSeatBars(
-        bars: Binding<List<T>>,
+        bars: Flow.Publisher<out List<T>>,
         colorFunc: (T) -> Color,
         seatFunc: (T) -> Int,
-        labelBinding: Binding<String>
+        labelPublisher: Flow.Publisher<out String>
     ): HemicycleFrameBuilder {
-        this.middleSeatBarBinding = bars.mapElements { HemicycleFrame.Bar(color = colorFunc(it), size = seatFunc(it)) }
-        this.middleSeatBarLabelBinding = labelBinding
+        this.middleSeatBarPublisher = bars.mapElements { HemicycleFrame.Bar(color = colorFunc(it), size = seatFunc(it)) }
+        this.middleSeatBarLabelPublisher = labelPublisher
         return this
     }
 
     fun <T> withLeftChangeBars(
-        bars: Binding<List<T>>,
+        bars: Flow.Publisher<out List<T>>,
         colorFunc: (T) -> Color,
         seatFunc: (T) -> Int,
-        startBinding: Binding<Int>,
-        labelBinding: Binding<String>
+        startPublisher: Flow.Publisher<out Int>,
+        labelPublisher: Flow.Publisher<out String>
     ): HemicycleFrameBuilder {
-        this.leftChangeBarBinding = bars.mapElements { HemicycleFrame.Bar(color = colorFunc(it), size = seatFunc(it)) }
-        this.leftChangeBarStartBinding = startBinding
-        this.leftChangeBarLabelBinding = labelBinding
+        this.leftChangeBarPublisher = bars.mapElements { HemicycleFrame.Bar(color = colorFunc(it), size = seatFunc(it)) }
+        this.leftChangeBarStartPublisher = startPublisher
+        this.leftChangeBarLabelPublisher = labelPublisher
         return this
     }
 
     fun <T> withRightChangeBars(
-        bars: Binding<List<T>>,
+        bars: Flow.Publisher<out List<T>>,
         colorFunc: (T) -> Color,
         seatFunc: (T) -> Int,
-        startBinding: Binding<Int>,
-        labelBinding: Binding<String>
+        startPublisher: Flow.Publisher<out Int>,
+        labelPublisher: Flow.Publisher<out String>
     ): HemicycleFrameBuilder {
-        this.rightChangeBarBinding = bars.mapElements { HemicycleFrame.Bar(color = colorFunc(it), size = seatFunc(it)) }
-        this.rightChangeBarStartBinding = startBinding
-        this.rightChangeBarLabelBinding = labelBinding
+        this.rightChangeBarPublisher = bars.mapElements { HemicycleFrame.Bar(color = colorFunc(it), size = seatFunc(it)) }
+        this.rightChangeBarStartPublisher = startPublisher
+        this.rightChangeBarLabelPublisher = labelPublisher
         return this
     }
 
     fun build(): HemicycleFrame {
         return HemicycleFrame(
-            headerPublisher = headerBinding?.toPublisher() ?: (null as String?).asOneTimePublisher(),
-            rowsPublisher = rowsBinding?.toPublisher(),
-            dotsPublisher = dotsBinding?.toPublisher() ?: emptyList<HemicycleFrame.Dot>().asOneTimePublisher(),
-            leftSeatBarPublisher = leftSeatBarBinding?.toPublisher(),
-            leftSeatBarLabelPublisher = leftSeatBarLabelBinding?.toPublisher(),
-            rightSeatBarPublisher = rightSeatBarBinding?.toPublisher(),
-            rightSeatBarLabelPublisher = rightSeatBarLabelBinding?.toPublisher(),
-            middleSeatBarPublisher = middleSeatBarBinding?.toPublisher(),
-            middleSeatBarLabelPublisher = middleSeatBarLabelBinding?.toPublisher(),
-            leftChangeBarPublisher = leftChangeBarBinding?.toPublisher(),
-            leftChangeBarStartPublisher = leftChangeBarStartBinding?.toPublisher(),
-            leftChangeBarLabelPublisher = leftChangeBarLabelBinding?.toPublisher(),
-            rightChangeBarPublisher = rightChangeBarBinding?.toPublisher(),
-            rightChangeBarStartPublisher = rightChangeBarStartBinding?.toPublisher(),
-            rightChangeBarLabelPublisher = rightChangeBarLabelBinding?.toPublisher()
+            headerPublisher = headerPublisher ?: (null as String?).asOneTimePublisher(),
+            rowsPublisher = rowsPublisher,
+            dotsPublisher = dotsPublisher ?: emptyList<HemicycleFrame.Dot>().asOneTimePublisher(),
+            leftSeatBarPublisher = leftSeatBarPublisher,
+            leftSeatBarLabelPublisher = leftSeatBarLabelPublisher,
+            rightSeatBarPublisher = rightSeatBarPublisher,
+            rightSeatBarLabelPublisher = rightSeatBarLabelPublisher,
+            middleSeatBarPublisher = middleSeatBarPublisher,
+            middleSeatBarLabelPublisher = middleSeatBarLabelPublisher,
+            leftChangeBarPublisher = leftChangeBarPublisher,
+            leftChangeBarStartPublisher = leftChangeBarStartPublisher,
+            leftChangeBarLabelPublisher = leftChangeBarLabelPublisher,
+            rightChangeBarPublisher = rightChangeBarPublisher,
+            rightChangeBarStartPublisher = rightChangeBarStartPublisher,
+            rightChangeBarLabelPublisher = rightChangeBarLabelPublisher
         )
     }
 
@@ -123,7 +126,7 @@ class HemicycleFrameBuilder {
         @JvmStatic fun <T> of(
             rows: List<Int>,
             entries: List<T>,
-            colorFunc: (T) -> Binding<Color>,
+            colorFunc: (T) -> Flow.Publisher<out Color>,
             tiebreaker: Tiebreaker
         ): HemicycleFrameBuilder {
             return of(rows, entries, colorFunc, colorFunc, tiebreaker)
@@ -132,8 +135,8 @@ class HemicycleFrameBuilder {
         @JvmStatic fun <T> of(
             rows: List<Int>,
             entries: List<T>,
-            colorFunc: (T) -> Binding<Color>,
-            borderFunc: (T) -> Binding<Color>,
+            colorFunc: (T) -> Flow.Publisher<out Color>,
+            borderFunc: (T) -> Flow.Publisher<out Color>,
             tiebreaker: Tiebreaker
         ): HemicycleFrameBuilder {
             return ofClustered(rows, entries, { 1 }, colorFunc, borderFunc, tiebreaker)
@@ -144,7 +147,7 @@ class HemicycleFrameBuilder {
             rows: List<Int>,
             entries: List<T>,
             seatsFunc: (T) -> Int,
-            colorFunc: (T) -> Binding<Color>,
+            colorFunc: (T) -> Flow.Publisher<out Color>,
             tiebreaker: Tiebreaker
         ): HemicycleFrameBuilder {
             return ofClustered(rows, entries, seatsFunc, colorFunc, colorFunc, tiebreaker)
@@ -155,8 +158,8 @@ class HemicycleFrameBuilder {
             rows: List<Int>,
             entries: List<T>,
             seatsFunc: (T) -> Int,
-            colorFunc: (T) -> Binding<Color>,
-            borderFunc: (T) -> Binding<Color>,
+            colorFunc: (T) -> Flow.Publisher<out Color>,
+            borderFunc: (T) -> Flow.Publisher<out Color>,
             tiebreaker: Tiebreaker
         ): HemicycleFrameBuilder {
             val points = rows.indices
@@ -196,7 +199,7 @@ class HemicycleFrameBuilder {
                 }
             }
             val builder = HemicycleFrameBuilder()
-            builder.rowsBinding = Binding.fixedBinding(rows)
+            builder.rowsPublisher = rows.asOneTimePublisher()
             val dots: List<T> = points
                 .sortedWith(
                     Comparator.comparingInt { it: Pair<Point, T?> -> it.first.x }
@@ -204,14 +207,14 @@ class HemicycleFrameBuilder {
                 )
                 .map { it.second!! }
                 .toList()
-            builder.dotsBinding = Binding.listBinding(
+            builder.dotsPublisher =
                 dots.map {
                     colorFunc(it).merge(borderFunc(it)) {
                         color, border ->
                         HemicycleFrame.Dot(color = color, border = border)
                     }
                 }
-            )
+                    .combine()
             return builder
         }
 
@@ -237,7 +240,7 @@ class HemicycleFrameBuilder {
         @JvmStatic fun <T> ofElectedLeading(
             rows: List<Int>,
             entries: List<T>,
-            resultFunc: (T) -> Binding<Result?>,
+            resultFunc: (T) -> Flow.Publisher<out Result?>,
             prevResultFunc: (T) -> Party,
             leftParty: Party,
             rightParty: Party,
@@ -247,7 +250,7 @@ class HemicycleFrameBuilder {
             showChange: (Int, Int) -> Boolean,
             changeLabel: (Int, Int) -> String,
             tiebreaker: Tiebreaker,
-            header: Binding<String?>
+            header: Flow.Publisher<out String?>
         ): HemicycleFrame {
             return ofElectedLeading(
                 rows,
@@ -272,7 +275,7 @@ class HemicycleFrameBuilder {
             rows: List<Int>,
             entries: List<T>,
             seatsFunc: (T) -> Int,
-            resultFunc: (T) -> Binding<Result?>,
+            resultFunc: (T) -> Flow.Publisher<out Result?>,
             prevResultFunc: (T) -> Party,
             leftParty: Party,
             rightParty: Party,
@@ -282,53 +285,49 @@ class HemicycleFrameBuilder {
             showChange: (Int, Int) -> Boolean,
             changeLabel: (Int, Int) -> String,
             tiebreaker: Tiebreaker,
-            header: Binding<String?>
+            header: Flow.Publisher<out String?>
         ): HemicycleFrame {
-            val results: Map<T, BindingReceiver<Result?>> = entries
+            val results: Map<T, Flow.Publisher<out Result?>> = entries
                 .distinct()
-                .associateWith { BindingReceiver(resultFunc(it)) }
+                .associateWith { resultFunc(it) }
             val prev = entries.distinct().associateWith(prevResultFunc)
-            val resultBindings = entries
+            val resultPublishers = entries
                 .map {
-                    BindingReceiver(
-                        results[it]!!.getBinding { x: Result? -> Pair(x, seatsFunc(it)) }
-                    )
+                    results[it]!!.map { x: Result? -> Pair(x, seatsFunc(it)) }
                 }
                 .toList()
-            val resultWithPrevBindings: List<BindingReceiver<Triple<Result?, Party, Int>>> = entries
+            val resultWithPrevPublishers: List<Flow.Publisher<Triple<Result?, Party, Int>>> = entries
                 .map {
-                    BindingReceiver(
-                        results[it]!!.getBinding { result: Result? -> Triple(result, prev[it]!!, seatsFunc(it)) }
-                    )
+                    results[it]!!.map { result: Result? -> Triple(result, prev[it]!!, seatsFunc(it)) }
                 }
                 .toList()
-            val leftSeats = createSeatBarBinding(resultBindings) { it == leftParty }
-            val leftList = leftSeats.getBinding {
+            val leftSeats = createSeatBarPublisher(resultPublishers) { it == leftParty }
+            val leftList = leftSeats.map {
                 listOf(
                     Pair(leftParty.color, it.first),
                     Pair(ColorUtils.lighten(leftParty.color), it.second - it.first)
                 )
             }
-            val rightSeats = createSeatBarBinding(resultBindings) { it == rightParty }
-            val rightList = rightSeats.getBinding {
+            val rightSeats = createSeatBarPublisher(resultPublishers) { it == rightParty }
+            val rightList = rightSeats.map {
                 listOf(
                     Pair(rightParty.color, it.first),
                     Pair(ColorUtils.lighten(rightParty.color), it.second - it.first)
                 )
             }
-            val middleSeats = createSeatBarBinding(
-                resultBindings
+            val middleSeats = createSeatBarPublisher(
+                resultPublishers
             ) { party: Party? -> party != null && party != leftParty && party != rightParty }
-            val middleList = middleSeats.getBinding {
+            val middleList = middleSeats.map {
                 listOf(
                     Pair(Party.OTHERS.color, it.first),
                     Pair(ColorUtils.lighten(Party.OTHERS.color), it.second - it.first)
                 )
             }
-            val leftChange = createChangeBarBinding(
-                resultWithPrevBindings
+            val leftChange = createChangeBarPublisher(
+                resultWithPrevPublishers
             ) { it == leftParty }
-            val leftChangeList = leftChange.getBinding {
+            val leftChangeList = leftChange.map {
                 if (showChange(it.first, it.second)) {
                     listOf(
                         Pair(leftParty.color, it.first),
@@ -338,10 +337,10 @@ class HemicycleFrameBuilder {
                     emptyList()
                 }
             }
-            val rightChange = createChangeBarBinding(
-                resultWithPrevBindings
+            val rightChange = createChangeBarPublisher(
+                resultWithPrevPublishers
             ) { it == rightParty }
-            val rightChangeList = rightChange.getBinding {
+            val rightChangeList = rightChange.map {
                 if (showChange(it.first, it.second)) {
                     listOf(
                         Pair(rightParty.color, it.first),
@@ -360,7 +359,7 @@ class HemicycleFrameBuilder {
                 entries,
                 seatsFunc,
                 {
-                    results[it]!!.getBinding { result: Result? ->
+                    results[it]!!.map { result: Result? ->
                         when {
                             result?.winner == null -> Color.WHITE
                             result.hasWon -> result.winner.color
@@ -368,30 +367,30 @@ class HemicycleFrameBuilder {
                         }
                     }
                 },
-                { Binding.fixedBinding(prevResultFunc(it).color) },
+                { prevResultFunc(it).color.asOneTimePublisher() },
                 tiebreaker
             )
                 .withLeftSeatBars(
                     leftList, { it.first }, { it.second },
-                    leftSeats.getBinding { leftLabel(it.first, it.second) }
+                    leftSeats.map { leftLabel(it.first, it.second) }
                 )
                 .withRightSeatBars(
                     rightList, { it.first }, { it.second },
-                    rightSeats.getBinding { rightLabel(it.first, it.second) }
+                    rightSeats.map { rightLabel(it.first, it.second) }
                 )
                 .withMiddleSeatBars(
                     middleList, { it.first }, { it.second },
-                    middleSeats.getBinding { otherLabel(it.first, it.second) }
+                    middleSeats.map { otherLabel(it.first, it.second) }
                 )
                 .withLeftChangeBars(
                     leftChangeList, { it.first }, { it.second },
-                    Binding.fixedBinding(calcPrevForParty(allPrevs, leftParty)),
-                    leftChange.getBinding(changeLabelFunc)
+                    calcPrevForParty(allPrevs, leftParty).asOneTimePublisher(),
+                    leftChange.map(changeLabelFunc)
                 )
                 .withRightChangeBars(
                     rightChangeList, { it.first }, { it.second },
-                    Binding.fixedBinding(calcPrevForParty(allPrevs, rightParty)),
-                    rightChange.getBinding(changeLabelFunc)
+                    calcPrevForParty(allPrevs, rightParty).asOneTimePublisher(),
+                    rightChange.map(changeLabelFunc)
                 )
                 .withHeader(header)
                 .build()
@@ -401,12 +400,11 @@ class HemicycleFrameBuilder {
             return prev.filter { party == it.first }.map { it.second }.sum()
         }
 
-        private fun createSeatBarBinding(
-            results: List<BindingReceiver<Pair<Result?, Int>>>,
+        private fun createSeatBarPublisher(
+            results: List<Flow.Publisher<Pair<Result?, Int>>>,
             partyFilter: (Party?) -> Boolean
-        ): BindingReceiver<Pair<Int, Int>> {
-            val binding = Binding.mapReduceBinding(
-                results.map { it.getBinding() }.toList(),
+        ): Flow.Publisher<Pair<Int, Int>> {
+            return results.mapReduce(
                 Pair(0, 0),
                 { p: Pair<Int, Int>, r: Pair<Result?, Int> ->
                     val result = r.first
@@ -425,15 +423,13 @@ class HemicycleFrameBuilder {
                     }
                 }
             )
-            return BindingReceiver(binding)
         }
 
-        private fun createChangeBarBinding(
-            resultWithPrev: List<BindingReceiver<Triple<Result?, Party, Int>>>,
+        private fun createChangeBarPublisher(
+            resultWithPrev: List<Flow.Publisher<Triple<Result?, Party, Int>>>,
             partyFilter: (Party?) -> Boolean
-        ): BindingReceiver<Pair<Int, Int>> {
-            val binding = Binding.mapReduceBinding(
-                resultWithPrev.map { it.getBinding() }.toList(),
+        ): Flow.Publisher<Pair<Int, Int>> {
+            return resultWithPrev.mapReduce(
                 Pair(0, 0),
                 { p: Pair<Int, Int>, r: Triple<Result?, Party, Int> ->
                     var ret = p
@@ -466,7 +462,6 @@ class HemicycleFrameBuilder {
                     }
                 }
             )
-            return BindingReceiver(binding)
         }
     }
 }

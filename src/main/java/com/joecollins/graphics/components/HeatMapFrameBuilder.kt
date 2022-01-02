@@ -1,93 +1,96 @@
 package com.joecollins.graphics.components
 
-import com.joecollins.bindings.Binding
-import com.joecollins.bindings.BindingReceiver
-import com.joecollins.bindings.mapElements
 import com.joecollins.graphics.utils.ColorUtils
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
 import com.joecollins.pubsub.asOneTimePublisher
+import com.joecollins.pubsub.combine
+import com.joecollins.pubsub.map
+import com.joecollins.pubsub.mapElements
+import com.joecollins.pubsub.mapReduce
+import com.joecollins.pubsub.merge
 import java.awt.Color
+import java.util.concurrent.Flow
 
 class HeatMapFrameBuilder {
-    private var seatBarsBinding: Binding<List<HeatMapFrame.Bar>>? = null
-    private var seatBarLabelBinding: Binding<String>? = null
-    private var changeBarsBinding: Binding<List<HeatMapFrame.Bar>>? = null
-    private var changeBarStartBinding: Binding<Int>? = null
-    private var changeBarLabelBinding: Binding<String>? = null
-    private var headerBinding: Binding<String?>? = null
-    private var borderColorBinding: Binding<Color>? = null
-    private var numRowsBinding: Binding<Int>? = null
-    private var squaresBinding: Binding<List<HeatMapFrame.Square>>? = null
+    private var seatBarsPublisher: Flow.Publisher<out List<HeatMapFrame.Bar>>? = null
+    private var seatBarLabelPublisher: Flow.Publisher<out String>? = null
+    private var changeBarsPublisher: Flow.Publisher<out List<HeatMapFrame.Bar>>? = null
+    private var changeBarStartPublisher: Flow.Publisher<out Int>? = null
+    private var changeBarLabelPublisher: Flow.Publisher<out String>? = null
+    private var headerPublisher: Flow.Publisher<out String?>? = null
+    private var borderColorPublisher: Flow.Publisher<out Color>? = null
+    private var numRowsPublisher: Flow.Publisher<out Int>? = null
+    private var squaresPublisher: Flow.Publisher<out List<HeatMapFrame.Square>>? = null
 
     fun <T> withSeatBars(
-        bars: Binding<List<T>>,
+        bars: Flow.Publisher<out List<T>>,
         colorFunc: (T) -> Color,
         seatFunc: (T) -> Int,
-        labelBinding: Binding<String>
+        labelPublisher: Flow.Publisher<out String>
     ): HeatMapFrameBuilder {
-        this.seatBarsBinding = bars.mapElements { HeatMapFrame.Bar(colorFunc(it), seatFunc(it)) }
-        this.seatBarLabelBinding = labelBinding
+        this.seatBarsPublisher = bars.mapElements { HeatMapFrame.Bar(colorFunc(it), seatFunc(it)) }
+        this.seatBarLabelPublisher = labelPublisher
         return this
     }
 
     fun <T> withChangeBars(
-        bars: Binding<List<T>>,
+        bars: Flow.Publisher<out List<T>>,
         colorFunc: (T) -> Color,
         seatFunc: (T) -> Int,
-        startBinding: Binding<Int>,
-        labelBinding: Binding<String>
+        startPublisher: Flow.Publisher<out Int>,
+        labelPublisher: Flow.Publisher<out String>
     ): HeatMapFrameBuilder {
-        this.changeBarsBinding = bars.mapElements { HeatMapFrame.Bar(colorFunc(it), seatFunc(it)) }
-        this.changeBarStartBinding = startBinding
-        this.changeBarLabelBinding = labelBinding
+        this.changeBarsPublisher = bars.mapElements { HeatMapFrame.Bar(colorFunc(it), seatFunc(it)) }
+        this.changeBarStartPublisher = startPublisher
+        this.changeBarLabelPublisher = labelPublisher
         return this
     }
 
-    fun withHeader(headerBinding: Binding<String?>): HeatMapFrameBuilder {
-        this.headerBinding = headerBinding
+    fun withHeader(headerPublisher: Flow.Publisher<out String?>): HeatMapFrameBuilder {
+        this.headerPublisher = headerPublisher
         return this
     }
 
-    fun withBorder(colorBinding: Binding<Color>): HeatMapFrameBuilder {
-        this.borderColorBinding = colorBinding
+    fun withBorder(colorPublisher: Flow.Publisher<out Color>): HeatMapFrameBuilder {
+        this.borderColorPublisher = colorPublisher
         return this
     }
 
     fun build(): HeatMapFrame {
         return HeatMapFrame(
-            headerPublisher = headerBinding?.toPublisher() ?: (null as String?).asOneTimePublisher(),
-            borderColorPublisher = borderColorBinding?.toPublisher(),
-            numRowsPublisher = numRowsBinding?.toPublisher() ?: 1.asOneTimePublisher(),
-            squaresPublisher = squaresBinding?.toPublisher() ?: emptyList<HeatMapFrame.Square>().asOneTimePublisher(),
-            seatBarsPublisher = seatBarsBinding?.toPublisher(),
-            seatBarLabelPublisher = seatBarLabelBinding?.toPublisher(),
-            changeBarsPublisher = changeBarsBinding?.toPublisher(),
-            changeBarStartPublisher = changeBarStartBinding?.toPublisher(),
-            changeBarLabelPublisher = changeBarLabelBinding?.toPublisher()
+            headerPublisher = headerPublisher ?: (null as String?).asOneTimePublisher(),
+            borderColorPublisher = borderColorPublisher,
+            numRowsPublisher = numRowsPublisher ?: 1.asOneTimePublisher(),
+            squaresPublisher = squaresPublisher ?: emptyList<HeatMapFrame.Square>().asOneTimePublisher(),
+            seatBarsPublisher = seatBarsPublisher,
+            seatBarLabelPublisher = seatBarLabelPublisher,
+            changeBarsPublisher = changeBarsPublisher,
+            changeBarStartPublisher = changeBarStartPublisher,
+            changeBarLabelPublisher = changeBarLabelPublisher
         )
     }
 
     companion object {
         @JvmStatic fun <T> of(
-            numRows: Binding<Int>,
+            numRows: Flow.Publisher<out Int>,
             entries: List<T>,
-            colorFunc: (T) -> Binding<Color>,
-            labelFunc: (T) -> Binding<String?> = { Binding.fixedBinding(null) }
+            colorFunc: (T) -> Flow.Publisher<out Color>,
+            labelFunc: (T) -> Flow.Publisher<out String?> = { (null as String?).asOneTimePublisher() }
         ): HeatMapFrameBuilder {
             return of(numRows, entries, colorFunc, colorFunc, labelFunc)
         }
 
         @JvmStatic fun <T> of(
-            numRows: Binding<Int>,
+            numRows: Flow.Publisher<out Int>,
             entries: List<T>,
-            fillFunc: (T) -> Binding<Color>,
-            borderFunc: (T) -> Binding<Color>,
-            labelFunc: (T) -> Binding<String?> = { Binding.fixedBinding(null) }
+            fillFunc: (T) -> Flow.Publisher<out Color>,
+            borderFunc: (T) -> Flow.Publisher<out Color>,
+            labelFunc: (T) -> Flow.Publisher<out String?> = { (null as String?).asOneTimePublisher() }
         ): HeatMapFrameBuilder {
             val builder = HeatMapFrameBuilder()
-            builder.numRowsBinding = numRows
-            builder.squaresBinding = Binding.listBinding(
+            builder.numRowsPublisher = numRows
+            builder.squaresPublisher =
                 entries.map {
                     fillFunc(it).merge(borderFunc(it)) {
                         fill, border ->
@@ -97,17 +100,17 @@ class HeatMapFrameBuilder {
                         HeatMapFrame.Square(fillColor = fill, borderColor = border, label = label)
                     }
                 }
-            )
+                    .combine()
             return builder
         }
 
         @JvmStatic fun <T> ofClustered(
-            numRows: Binding<Int>,
+            numRows: Flow.Publisher<out Int>,
             entries: List<T>,
             seatFunc: (T) -> Int,
-            fillFunc: (T) -> Binding<Color>,
-            borderFunc: (T) -> Binding<Color>,
-            labelFunc: (T) -> Binding<String?> = { Binding.fixedBinding(null) }
+            fillFunc: (T) -> Flow.Publisher<out Color>,
+            borderFunc: (T) -> Flow.Publisher<out Color>,
+            labelFunc: (T) -> Flow.Publisher<out String?> = { (null as String?).asOneTimePublisher() }
         ): HeatMapFrameBuilder {
             val allEntries = entries
                 .flatMap { generateSequence { it }.take(seatFunc(it)) }
@@ -116,16 +119,16 @@ class HeatMapFrameBuilder {
         }
 
         @JvmStatic fun <T> ofElectedLeading(
-            rows: Binding<Int>,
+            rows: Flow.Publisher<out Int>,
             entries: List<T>,
-            resultFunc: (T) -> Binding<PartyResult?>,
+            resultFunc: (T) -> Flow.Publisher<out PartyResult?>,
             prevResultFunc: (T) -> Party,
             party: Party,
             seatLabel: (Int, Int) -> String,
             showChange: (Int, Int) -> Boolean,
             changeLabel: (Int, Int) -> String,
-            header: Binding<String?>,
-            labelFunc: (T) -> Binding<String?> = { Binding.fixedBinding(null) }
+            header: Flow.Publisher<out String?>,
+            labelFunc: (T) -> Flow.Publisher<out String?> = { (null as String?).asOneTimePublisher() }
         ): HeatMapFrame {
             return ofElectedLeading(
                 rows,
@@ -143,43 +146,43 @@ class HeatMapFrameBuilder {
         }
 
         @JvmStatic fun <T> ofElectedLeading(
-            rows: Binding<Int>,
+            rows: Flow.Publisher<out Int>,
             entries: List<T>,
             seatsFunc: (T) -> Int,
-            resultFunc: (T) -> Binding<PartyResult?>,
+            resultFunc: (T) -> Flow.Publisher<out PartyResult?>,
             prevResultFunc: (T) -> Party,
             party: Party,
             seatLabel: (Int, Int) -> String,
             showChange: (Int, Int) -> Boolean,
             changeLabel: (Int, Int) -> String,
-            header: Binding<String?>,
-            labelFunc: (T) -> Binding<String?> = { Binding.fixedBinding(null) }
+            header: Flow.Publisher<out String?>,
+            labelFunc: (T) -> Flow.Publisher<out String?> = { (null as String?).asOneTimePublisher() }
         ): HeatMapFrame {
-            val results: Map<T, BindingReceiver<PartyResult?>> = entries
+            val results: Map<T, Flow.Publisher<out PartyResult?>> = entries
                 .distinct()
-                .associateWith { BindingReceiver(resultFunc(it)) }
+                .associateWith { resultFunc(it) }
             val prev = entries.distinct().associateWith(prevResultFunc)
-            val resultBindings = entries
+            val resultPublishers = entries
                 .map { e: T ->
-                    BindingReceiver(results[e]!!.getBinding { Pair(it, seatsFunc(e)) })
+                    results[e]!!.map { Pair(it, seatsFunc(e)) }
                 }
                 .toList()
-            val resultWithPrevBindings: List<BindingReceiver<Triple<PartyResult?, Party, Int>>> = entries
+            val resultWithPrevPublishers: List<Flow.Publisher<Triple<PartyResult?, Party, Int>>> = entries
                 .map { e: T ->
-                    BindingReceiver(results[e]!!.getBinding { Triple(it, prev[e]!!, seatsFunc(e)) })
+                    results[e]!!.map { Triple(it, prev[e]!!, seatsFunc(e)) }
                 }
                 .toList()
-            val seats = createSeatBarBinding(resultBindings) { party == it }
-            val seatList = seats.getBinding {
+            val seats = createSeatBarPublisher(resultPublishers) { party == it }
+            val seatList = seats.map {
                 listOf(
                     Pair(party.color, it.first),
                     Pair(ColorUtils.lighten(party.color), it.second - it.first)
                 )
             }
 
-            val change = createChangeBarBinding(resultWithPrevBindings) { party == it }
+            val change = createChangeBarPublisher(resultWithPrevPublishers) { party == it }
             val changeLabelFunc = { p: Pair<Int, Int> -> if (showChange(p.first, p.second)) changeLabel(p.first, p.second) else "" }
-            val changeList = change.getBinding()
+            val changeList = change
                 .map {
                     if (showChange(it.first, it.second)) {
                         listOf(
@@ -198,7 +201,7 @@ class HeatMapFrameBuilder {
                 entries,
                 seatsFunc,
                 { e: T ->
-                    results[e]!!.getBinding {
+                    results[e]!!.map {
                         when {
                             it?.party == null -> Color.WHITE
                             it.isElected -> it.party.color
@@ -206,20 +209,20 @@ class HeatMapFrameBuilder {
                         }
                     }
                 },
-                { Binding.fixedBinding(prevResultFunc(it).color) },
+                { prevResultFunc(it).color.asOneTimePublisher() },
                 labelFunc
             )
                 .withSeatBars(
                     seatList, { it.first }, { it.second },
-                    seats.getBinding { seatLabel(it.first, it.second) }
+                    seats.map { seatLabel(it.first, it.second) }
                 )
                 .withChangeBars(
                     changeList, { it.first }, { it.second },
-                    Binding.fixedBinding(calcPrevForParty(allPrevs, party)),
-                    change.getBinding(changeLabelFunc)
+                    calcPrevForParty(allPrevs, party).asOneTimePublisher(),
+                    change.map(changeLabelFunc)
                 )
                 .withHeader(header)
-                .withBorder(Binding.fixedBinding(party.color))
+                .withBorder(party.color.asOneTimePublisher())
                 .build()
         }
 
@@ -227,12 +230,11 @@ class HeatMapFrameBuilder {
             return prev.filter { party == it.first }.map { it.second }.sum()
         }
 
-        private fun createSeatBarBinding(
-            results: List<BindingReceiver<Pair<PartyResult?, Int>>>,
+        private fun createSeatBarPublisher(
+            results: List<Flow.Publisher<Pair<PartyResult?, Int>>>,
             partyFilter: (Party?) -> Boolean
-        ): BindingReceiver<Pair<Int, Int>> {
-            val binding = Binding.mapReduceBinding(
-                results.map { it.getBinding() }.toList(),
+        ): Flow.Publisher<Pair<Int, Int>> {
+            return results.mapReduce(
                 Pair(0, 0),
                 { p: Pair<Int, Int>, r: Pair<PartyResult?, Int> ->
                     val left = r.first
@@ -251,15 +253,13 @@ class HeatMapFrameBuilder {
                     }
                 }
             )
-            return BindingReceiver(binding)
         }
 
-        private fun createChangeBarBinding(
-            resultWithPrev: List<BindingReceiver<Triple<PartyResult?, Party, Int>>>,
+        private fun createChangeBarPublisher(
+            resultWithPrev: List<Flow.Publisher<Triple<PartyResult?, Party, Int>>>,
             partyFilter: (Party?) -> Boolean
-        ): BindingReceiver<Pair<Int, Int>> {
-            val binding = Binding.mapReduceBinding(
-                resultWithPrev.map { it.getBinding() }.toList(),
+        ): Flow.Publisher<Pair<Int, Int>> {
+            return resultWithPrev.mapReduce(
                 Pair(0, 0),
                 { p: Pair<Int, Int>, r: Triple<PartyResult?, Party, Int> ->
                     val left = r.first
@@ -304,7 +304,6 @@ class HeatMapFrameBuilder {
                     }
                 }
             )
-            return BindingReceiver(binding)
         }
     }
 }

@@ -1,15 +1,12 @@
 package com.joecollins.graphics.components
 
-import com.joecollins.bindings.Bindable
-import com.joecollins.bindings.Binding
-import com.joecollins.bindings.Binding.Companion.fixedBinding
-import com.joecollins.bindings.Binding.Companion.propertyBinding
 import com.joecollins.graphics.components.HeatMapFrameBuilder.Companion.of
 import com.joecollins.graphics.components.HeatMapFrameBuilder.Companion.ofElectedLeading
-import com.joecollins.graphics.utils.BindableWrapper
 import com.joecollins.graphics.utils.ColorUtils.lighten
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
+import com.joecollins.pubsub.Publisher
+import com.joecollins.pubsub.asOneTimePublisher
 import org.awaitility.Awaitility
 import org.hamcrest.core.IsEqual
 import org.junit.Assert
@@ -29,23 +26,23 @@ class HeatMapFrameBuilderTest {
         dots.addAll(Collections.nCopies(6, Pair(Color.RED, Color.RED)))
         dots.addAll(Collections.nCopies(5, Pair(Color.BLUE, Color.RED)))
         dots.addAll(Collections.nCopies(8, Pair(Color.BLUE, Color.BLUE)))
-        val seatBars = BindableWrapper(listOf(Pair(Color.GREEN, 8)))
-        val changeBars = BindableWrapper(listOf(Pair(Color.GREEN, +7)))
+        val seatBars = Publisher(listOf(Pair(Color.GREEN, 8)))
+        val changeBars = Publisher(listOf(Pair(Color.GREEN, +7)))
         val frame = of(
-            fixedBinding(3),
+            3.asOneTimePublisher(),
             dots,
-            { fixedBinding(it.first) },
-            { fixedBinding(it.second) },
-            { fixedBinding(null) }
+            { it.first.asOneTimePublisher() },
+            { it.second.asOneTimePublisher() },
+            { null.asOneTimePublisher() }
         )
-            .withSeatBars(seatBars.binding, { it.first }, { it.second }, fixedBinding("GREEN: 8"))
+            .withSeatBars(seatBars, { it.first }, { it.second }, "GREEN: 8".asOneTimePublisher())
             .withChangeBars(
-                changeBars.binding, { it.first }, { it.second },
-                fixedBinding(1),
-                fixedBinding("GRN: +7")
+                changeBars, { it.first }, { it.second },
+                1.asOneTimePublisher(),
+                "GRN: +7".asOneTimePublisher()
             )
-            .withHeader(fixedBinding("PEI"))
-            .withBorder(fixedBinding(Color.GREEN))
+            .withHeader("PEI".asOneTimePublisher())
+            .withBorder(Color.GREEN.asOneTimePublisher())
             .build()
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numRows }, IsEqual(3))
@@ -110,15 +107,15 @@ class HeatMapFrameBuilderTest {
         ridings.add(Riding("Lake Laberge", yp, true, yp))
         ridings.add(Riding("Whitehorse West", lib, false, yp))
         val frame = ofElectedLeading(
-            fixedBinding(3),
+            3.asOneTimePublisher(),
             ridings,
-            { fixedBinding(PartyResult(it.leader, it.hasWon)) },
+            { PartyResult(it.leader, it.hasWon).asOneTimePublisher() },
             { it.prev },
             lib,
             { e: Int, l: Int -> "LIB: $e/$l" },
             { _: Int, l: Int -> l > 0 },
             { e: Int, l: Int -> DecimalFormat("+0;-0").format(e) + "/" + DecimalFormat("+0;-0").format(l) },
-            fixedBinding("YUKON")
+            "YUKON".asOneTimePublisher()
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numSquares }, IsEqual(19))
@@ -150,36 +147,28 @@ class HeatMapFrameBuilderTest {
         val dem = Party("Democratic", "DEM", Color.BLUE)
         val gop = Party("Republican", "GOP", Color.RED)
 
-        class Result(var leader: Party?, var hasWon: Boolean, val prev: Party) : Bindable<Result, Property>() {
-            val binding: Binding<PartyResult?>
-                get() = propertyBinding(
-                    this,
-                    {
-                        if (leader == null) null
-                        else PartyResult(leader, hasWon)
-                    },
-                    Property.PROP
-                )
+        class Result(var leader: Party?, var hasWon: Boolean, val prev: Party) {
+            val publisher = Publisher(if (leader == null) null else PartyResult(leader, hasWon))
 
             fun setResult(leader: Party?, hasWon: Boolean) {
                 this.leader = leader
                 this.hasWon = hasWon
-                onPropertyRefreshed(Property.PROP)
+                publisher.submit(if (leader == null) null else PartyResult(leader, hasWon))
             }
         }
 
         val result = Result(null, false, gop)
         val results = Collections.nCopies(30, result)
         val frame = ofElectedLeading(
-            fixedBinding(results.size),
+            results.size.asOneTimePublisher(),
             results,
-            { it.binding },
+            { it.publisher },
             { it.prev },
             dem,
             { e: Int, l: Int -> "DEM: $e/$l" },
             { _: Int, l: Int -> l > 0 },
             { e: Int, l: Int -> DecimalFormat("+0;-0").format(e) + "/" + DecimalFormat("+0;-0").format(l) },
-            fixedBinding("TEST")
+            "TEST".asOneTimePublisher()
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numSquares }, IsEqual(30))
@@ -208,37 +197,29 @@ class HeatMapFrameBuilderTest {
         val dem = Party("Democratic", "DEM", Color.BLUE)
         val gop = Party("Republican", "GOP", Color.RED)
 
-        class Result(var leader: Party?, var hasWon: Boolean, val prev: Party, val numSeats: Int) : Bindable<Result, Property>() {
-            val binding: Binding<PartyResult?>
-                get() = propertyBinding(
-                    this,
-                    {
-                        if (leader == null) null
-                        else PartyResult(leader, hasWon)
-                    },
-                    Property.PROP
-                )
+        class Result(var leader: Party?, var hasWon: Boolean, val prev: Party, val numSeats: Int) {
+            val publisher = Publisher(if (leader == null) null else PartyResult(leader, hasWon))
 
             fun setResult(leader: Party?, hasWon: Boolean) {
                 this.leader = leader
                 this.hasWon = hasWon
-                onPropertyRefreshed(Property.PROP)
+                publisher.submit(if (leader == null) null else PartyResult(leader, hasWon))
             }
         }
 
         val result = Result(null, false, gop, 30)
         val results = listOf(result)
         val frame = ofElectedLeading(
-            fixedBinding(results.map { it.numSeats }.sum()),
+            results.sumOf { it.numSeats }.asOneTimePublisher(),
             results,
             { it.numSeats },
-            { it.binding },
+            { it.publisher },
             { it.prev },
             dem,
             { e: Int, l: Int -> "DEM: $e/$l" },
             { _: Int, _: Int -> true },
             { e: Int, l: Int -> DecimalFormat("+0;-0").format(e) + "/" + DecimalFormat("+0;-0").format(l) },
-            fixedBinding("TEST")
+            "TEST".asOneTimePublisher()
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numSquares }, IsEqual(30))
@@ -280,30 +261,29 @@ class HeatMapFrameBuilderTest {
         val dem = Party("Democratic", "DEM", Color.BLUE)
         val gop = Party("Republican", "GOP", Color.RED)
 
-        class Result(var leader: Party?, var hasWon: Boolean, val prev: Party, val numSeats: Int) : Bindable<Result, Property>() {
-            val binding: Binding<PartyResult?>
-                get() = propertyBinding(this, { PartyResult(leader, hasWon) }, Property.PROP)
+        class Result(var leader: Party?, var hasWon: Boolean, val prev: Party, val numSeats: Int) {
+            val publisher = Publisher(PartyResult(leader, hasWon))
 
             fun setResult(leader: Party?, hasWon: Boolean) {
                 this.leader = leader
                 this.hasWon = hasWon
-                onPropertyRefreshed(Property.PROP)
+                publisher.submit(PartyResult(leader, hasWon))
             }
         }
 
         val result = Result(null, false, gop, 30)
         val results = listOf(result)
         val frame = ofElectedLeading(
-            fixedBinding(results.map { it.numSeats }.sum()),
+            results.sumOf { it.numSeats }.asOneTimePublisher(),
             results,
             { it.numSeats },
-            { it.binding },
+            { it.publisher },
             { it.prev },
             dem,
             { e: Int, l: Int -> "DEM: $e/$l" },
             { _: Int, _: Int -> true },
             { e: Int, l: Int -> DecimalFormat("+0;-0").format(e) + "/" + DecimalFormat("+0;-0").format(l) },
-            fixedBinding("TEST")
+            "TEST".asOneTimePublisher()
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numSquares }, IsEqual(30))
