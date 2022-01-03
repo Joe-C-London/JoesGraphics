@@ -7,6 +7,7 @@ import com.joecollins.graphics.components.ListingFrameBuilder
 import com.joecollins.graphics.utils.StandardFont
 import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.Party
+import com.joecollins.models.general.PartyResult
 import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.map
 import java.awt.BorderLayout
@@ -115,23 +116,23 @@ class CandidateListingScreen private constructor(
         }
 
         fun <K> withMap(
-            shapes: Binding<out Map<K, Shape>>,
-            selectedShape: Binding<out K>,
-            focus: Binding<out List<K>?>,
-            header: Binding<out String>
+            shapes: Flow.Publisher<out Map<K, Shape>>,
+            selectedShape: Flow.Publisher<out K>,
+            focus: Flow.Publisher<out List<K>?>,
+            header: Flow.Publisher<out String>
         ): Builder {
-            mapPanel = MapBuilder(shapes, selectedShape, Binding.fixedBinding(null), focus, header).createMapFrame()
+            mapPanel = MapBuilder(shapes, selectedShape, (null as PartyResult?).asOneTimePublisher(), focus, header).createMapFrame()
             return this
         }
 
         fun <K> withMap(
-            shapes: Binding<out Map<K, Shape>>,
-            selectedShape: Binding<out K>,
-            focus: Binding<out List<K>?>,
-            additionalHighlight: Binding<out List<K>?>,
-            header: Binding<out String>
+            shapes: Flow.Publisher<out Map<K, Shape>>,
+            selectedShape: Flow.Publisher<out K>,
+            focus: Flow.Publisher<out List<K>?>,
+            additionalHighlight: Flow.Publisher<out List<K>?>,
+            header: Flow.Publisher<out String>
         ): Builder {
-            mapPanel = MapBuilder(shapes, selectedShape, Binding.fixedBinding(null), focus, additionalHighlight, header).createMapFrame()
+            mapPanel = MapBuilder(shapes, selectedShape, (null as PartyResult?).asOneTimePublisher(), focus, additionalHighlight, header).createMapFrame()
             return this
         }
 

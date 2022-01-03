@@ -1,9 +1,7 @@
 package com.joecollins.graphics.screens.generic
 
-import com.joecollins.bindings.Binding.Companion.fixedBinding
 import com.joecollins.graphics.components.MapFrameTest
 import com.joecollins.graphics.screens.generic.MixedMemberResultPanel.Companion.builder
-import com.joecollins.graphics.utils.BindableWrapper
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.graphics.utils.ShapefileReader.readShapes
 import com.joecollins.models.general.Aggregators.topAndOthers
@@ -13,6 +11,7 @@ import com.joecollins.models.general.PartyResult
 import com.joecollins.models.general.PartyResult.Companion.elected
 import com.joecollins.models.general.PartyResult.Companion.leading
 import com.joecollins.pubsub.Publisher
+import com.joecollins.pubsub.asOneTimePublisher
 import org.junit.Test
 import java.awt.Color
 import java.awt.Shape
@@ -31,27 +30,27 @@ class MixedMemberResultPanelTest {
         val candidateChangeHeader = Publisher("CANDIDATE CHANGE SINCE 2015")
         val partyHeader = Publisher("PARTY VOTES")
         val partyChangeHeader = Publisher("PARTY CHANGE SINCE 2015")
-        val mapHeader = BindableWrapper("CHARLOTTETOWN")
+        val mapHeader = Publisher("CHARLOTTETOWN")
         val shapesByDistrict = peiShapesByDistrict()
-        val focus = BindableWrapper(shapesByDistrict.keys.filter { it in 10..14 })
-        val selectedShape = BindableWrapper(10)
-        val selectedResult = BindableWrapper<PartyResult?>(null)
+        val focus = Publisher(shapesByDistrict.keys.filter { it in 10..14 })
+        val selectedShape = Publisher(10)
+        val selectedResult = Publisher<PartyResult?>(null)
         val lib = Party("Liberal", "LIB", Color.RED)
         val grn = Party("Green", "GRN", Color.GREEN.darker())
         val pc = Party("Progressive Conservative", "PC", Color.BLUE)
         val ndp = Party("New Democratic Party", "NDP", Color.ORANGE)
-        selectedResult.value = elected(lib)
+        selectedResult.submit(elected(lib))
         val panel = builder()
             .withCandidateVotes(currentCandidateVotes, candidateHeader)
             .withPrevCandidateVotes(previousCandidateVotes, candidateChangeHeader)
             .withPartyVotes(currentPartyVotes, partyHeader)
             .withPrevPartyVotes(previousPartyVotes, partyChangeHeader)
             .withResultMap(
-                fixedBinding(shapesByDistrict),
-                selectedShape.binding,
-                selectedResult.binding,
-                focus.binding,
-                mapHeader.binding
+                shapesByDistrict.asOneTimePublisher(),
+                selectedShape,
+                selectedResult,
+                focus,
+                mapHeader
             )
             .build(header)
         panel.setSize(1024, 512)
@@ -94,11 +93,11 @@ class MixedMemberResultPanelTest {
         val candidateChangeHeader = Publisher("CANDIDATE CHANGE SINCE 2015")
         val partyHeader = Publisher("PARTY VOTES")
         val partyChangeHeader = Publisher("PARTY CHANGE SINCE 2015")
-        val mapHeader = BindableWrapper("CHARLOTTETOWN")
+        val mapHeader = Publisher("CHARLOTTETOWN")
         val shapesByDistrict = peiShapesByDistrict()
-        val focus = BindableWrapper(shapesByDistrict.keys.filter { it in 10..14 })
-        val selectedShape = BindableWrapper(10)
-        val selectedResult = BindableWrapper<PartyResult?>(null)
+        val focus = Publisher(shapesByDistrict.keys.filter { it in 10..14 })
+        val selectedShape = Publisher(10)
+        val selectedResult = Publisher<PartyResult?>(null)
         val candidatePctReporting = Publisher(0.0)
         val partyPctReporting = Publisher(0.0)
         val winner = Publisher<Candidate?>(null)
@@ -115,11 +114,11 @@ class MixedMemberResultPanelTest {
             .withPrevPartyVotes(previousPartyVotes, partyChangeHeader)
             .withPartyPctReporting(partyPctReporting)
             .withResultMap(
-                fixedBinding(shapesByDistrict),
-                selectedShape.binding,
-                selectedResult.binding,
-                focus.binding,
-                mapHeader.binding
+                shapesByDistrict.asOneTimePublisher(),
+                selectedShape,
+                selectedResult,
+                focus,
+                mapHeader
             )
             .build(header)
         panel.setSize(1024, 512)
@@ -150,7 +149,7 @@ class MixedMemberResultPanelTest {
         previousPartyVotes.submit(prevPartyVotes)
         candidatePctReporting.submit(0.2)
         partyPctReporting.submit(0.1)
-        selectedResult.value = leading(lib)
+        selectedResult.submit(leading(lib))
         compareRendering("MixedMemberResultPanel", "PctReporting", panel)
     }
 
@@ -166,11 +165,11 @@ class MixedMemberResultPanelTest {
         val candidateChangeHeader = Publisher("CANDIDATE CHANGE SINCE 2015")
         val partyHeader = Publisher("PARTY VOTES")
         val partyChangeHeader = Publisher("PARTY CHANGE SINCE 2015")
-        val mapHeader = BindableWrapper("CHARLOTTETOWN")
+        val mapHeader = Publisher("CHARLOTTETOWN")
         val shapesByDistrict = peiShapesByDistrict()
-        val focus = BindableWrapper(shapesByDistrict.keys.filter { it in 10..14 })
-        val selectedShape = BindableWrapper(10)
-        val selectedResult = BindableWrapper<PartyResult?>(null)
+        val focus = Publisher(shapesByDistrict.keys.filter { it in 10..14 })
+        val selectedShape = Publisher(10)
+        val selectedResult = Publisher<PartyResult?>(null)
         val candidatePctReporting = Publisher(0.0)
         val partyPctReporting = Publisher(0.0)
         val lib = Party("Liberal", "LIB", Color.RED)
@@ -185,11 +184,11 @@ class MixedMemberResultPanelTest {
             .withPrevPartyVotes(previousPartyVotes, partyChangeHeader)
             .withPartyPctReporting(partyPctReporting)
             .withResultMap(
-                fixedBinding(shapesByDistrict),
-                selectedShape.binding,
-                selectedResult.binding,
-                focus.binding,
-                mapHeader.binding
+                shapesByDistrict.asOneTimePublisher(),
+                selectedShape,
+                selectedResult,
+                focus,
+                mapHeader
             )
             .build(header)
         panel.setSize(1024, 512)
@@ -238,11 +237,11 @@ class MixedMemberResultPanelTest {
         val candidateChangeHeader = Publisher("CANDIDATE CHANGE SINCE 2015")
         val partyHeader = Publisher("PARTY VOTES")
         val partyChangeHeader = Publisher("PARTY CHANGE SINCE 2015")
-        val mapHeader = BindableWrapper("CHARLOTTETOWN")
+        val mapHeader = Publisher("CHARLOTTETOWN")
         val shapesByDistrict = peiShapesByDistrict()
-        val focus = BindableWrapper(shapesByDistrict.keys.filter { it in 10..14 })
-        val selectedShape = BindableWrapper(10)
-        val selectedResult = BindableWrapper(leading(lib))
+        val focus = Publisher(shapesByDistrict.keys.filter { it in 10..14 })
+        val selectedShape = Publisher(10)
+        val selectedResult = Publisher(leading(lib))
         val candidatePctReporting = Publisher(0.0)
         val partyPctReporting = Publisher(0.0)
         val panel = builder()
@@ -253,11 +252,11 @@ class MixedMemberResultPanelTest {
             .withPrevPartyVotes(previousPartyVotes, partyChangeHeader)
             .withPartyPctReporting(partyPctReporting)
             .withResultMap(
-                fixedBinding(shapesByDistrict),
-                selectedShape.binding,
-                selectedResult.binding,
-                focus.binding,
-                mapHeader.binding
+                shapesByDistrict.asOneTimePublisher(),
+                selectedShape,
+                selectedResult,
+                focus,
+                mapHeader
             )
             .build(header)
         panel.setSize(1024, 512)
@@ -302,26 +301,26 @@ class MixedMemberResultPanelTest {
         val candidateChangeHeader = Publisher("CANDIDATE CHANGE SINCE 2015")
         val partyHeader = Publisher("PARTY VOTES")
         val partyChangeHeader = Publisher("PARTY CHANGE SINCE 2015")
-        val mapHeader = BindableWrapper("CHARLOTTETOWN")
+        val mapHeader = Publisher("CHARLOTTETOWN")
         val shapesByDistrict = peiShapesByDistrict()
-        val focus = BindableWrapper(shapesByDistrict.keys.filter { it in 10..14 })
-        val selectedShape = BindableWrapper(10)
-        val selectedResult = BindableWrapper<PartyResult?>(null)
+        val focus = Publisher(shapesByDistrict.keys.filter { it in 10..14 })
+        val selectedShape = Publisher(10)
+        val selectedResult = Publisher<PartyResult?>(null)
         val lib = Party("Liberal", "LIB", Color.RED)
         val grn = Party("Green", "GRN", Color.GREEN.darker())
         val pc = Party("Progressive Conservative", "PC", Color.BLUE)
-        selectedResult.value = elected(lib)
+        selectedResult.submit(elected(lib))
         val panel = builder()
             .withCandidateVotes(currentCandidateVotes, candidateHeader)
             .withPrevCandidateVotes(previousCandidateVotes, candidateChangeHeader)
             .withPartyVotes(currentPartyVotes, partyHeader)
             .withPrevPartyVotes(previousPartyVotes, partyChangeHeader)
             .withResultMap(
-                fixedBinding(shapesByDistrict),
-                selectedShape.binding,
-                selectedResult.binding,
-                focus.binding,
-                mapHeader.binding
+                shapesByDistrict.asOneTimePublisher(),
+                selectedShape,
+                selectedResult,
+                focus,
+                mapHeader
             )
             .build(header)
         panel.setSize(1024, 512)
@@ -360,17 +359,17 @@ class MixedMemberResultPanelTest {
         val candidateChangeHeader = Publisher("CANDIDATE CHANGE SINCE 2015")
         val partyHeader = Publisher("PARTY VOTES")
         val partyChangeHeader = Publisher("PARTY CHANGE SINCE 2015")
-        val mapHeader = BindableWrapper("CHARLOTTETOWN")
+        val mapHeader = Publisher("CHARLOTTETOWN")
         val shapesByDistrict = peiShapesByDistrict()
-        val focus = BindableWrapper(shapesByDistrict.keys.filter { it in 10..14 })
-        val additionalHighlight = BindableWrapper(listOf(9))
-        val selectedShape = BindableWrapper(10)
-        val selectedResult = BindableWrapper<PartyResult?>(null)
+        val focus = Publisher(shapesByDistrict.keys.filter { it in 10..14 })
+        val additionalHighlight = Publisher(listOf(9))
+        val selectedShape = Publisher(10)
+        val selectedResult = Publisher<PartyResult?>(null)
         val lib = Party("Liberal", "LIB", Color.RED)
         val grn = Party("Green", "GRN", Color.GREEN.darker())
         val pc = Party("Progressive Conservative", "PC", Color.BLUE)
         val ndp = Party("New Democratic Party", "NDP", Color.ORANGE)
-        selectedResult.value = elected(lib)
+        selectedResult.submit(elected(lib))
         val panel = builder()
             .withCandidateVotes(currentCandidateVotes, candidateHeader)
             .withPrevCandidateVotes(previousCandidateVotes, candidateChangeHeader)
@@ -378,12 +377,12 @@ class MixedMemberResultPanelTest {
             .withPartyVotes(currentPartyVotes, partyHeader)
             .withPrevPartyVotes(previousPartyVotes, partyChangeHeader)
             .withResultMap(
-                fixedBinding(shapesByDistrict),
-                selectedShape.binding,
-                selectedResult.binding,
-                focus.binding,
-                additionalHighlight.binding,
-                mapHeader.binding
+                shapesByDistrict.asOneTimePublisher(),
+                selectedShape,
+                selectedResult,
+                focus,
+                additionalHighlight,
+                mapHeader
             )
             .build(header)
         panel.setSize(1024, 512)
@@ -422,26 +421,26 @@ class MixedMemberResultPanelTest {
         val header = Publisher("CHARLOTTETOWN-WINSLOE")
         val candidateHeader = Publisher("CANDIDATE VOTES")
         val partyHeader = Publisher("PARTY VOTES")
-        val mapHeader = BindableWrapper("CHARLOTTETOWN")
+        val mapHeader = Publisher("CHARLOTTETOWN")
         val shapesByDistrict = peiShapesByDistrict()
-        val focus = BindableWrapper(shapesByDistrict.keys.filter { it in 10..14 })
-        val selectedShape = BindableWrapper(10)
-        val selectedResult = BindableWrapper<PartyResult?>(null)
+        val focus = Publisher(shapesByDistrict.keys.filter { it in 10..14 })
+        val selectedShape = Publisher(10)
+        val selectedResult = Publisher<PartyResult?>(null)
         val lib = Party("Liberal", "LIB", Color.RED)
         val grn = Party("Green", "GRN", Color.GREEN.darker())
         val pc = Party("Progressive Conservative", "PC", Color.BLUE)
         val ndp = Party("New Democratic Party", "NDP", Color.ORANGE)
-        selectedResult.value = elected(lib)
+        selectedResult.submit(elected(lib))
         val panel = builder()
             .withCandidateVotes(currentCandidateVotes, candidateHeader)
             .withPartyVotes(currentPartyVotes, partyHeader)
             .withIncumbentMarker("(MLA)")
             .withResultMap(
-                fixedBinding(shapesByDistrict),
-                selectedShape.binding,
-                selectedResult.binding,
-                focus.binding,
-                mapHeader.binding
+                shapesByDistrict.asOneTimePublisher(),
+                selectedShape,
+                selectedResult,
+                focus,
+                mapHeader
             )
             .build(header)
         panel.setSize(1024, 512)
@@ -469,16 +468,16 @@ class MixedMemberResultPanelTest {
         val candidateHeader = Publisher("CANDIDATE VOTES")
         val candidateSubhead = Publisher("LIB WIN IN 2015")
         val partyHeader = Publisher("PARTY VOTES")
-        val mapHeader = BindableWrapper("CHARLOTTETOWN")
+        val mapHeader = Publisher("CHARLOTTETOWN")
         val shapesByDistrict = peiShapesByDistrict()
-        val focus = BindableWrapper(shapesByDistrict.keys.filter { it in 10..14 })
-        val selectedShape = BindableWrapper(10)
-        val selectedResult = BindableWrapper<PartyResult?>(null)
+        val focus = Publisher(shapesByDistrict.keys.filter { it in 10..14 })
+        val selectedShape = Publisher(10)
+        val selectedResult = Publisher<PartyResult?>(null)
         val lib = Party("Liberal", "LIB", Color.RED)
         val grn = Party("Green", "GRN", Color.GREEN.darker())
         val pc = Party("Progressive Conservative", "PC", Color.BLUE)
         val ndp = Party("New Democratic Party", "NDP", Color.ORANGE)
-        selectedResult.value = elected(lib)
+        selectedResult.submit(elected(lib))
         val panel = builder()
             .withCandidateVotes(
                 currentCandidateVotes,
@@ -488,11 +487,11 @@ class MixedMemberResultPanelTest {
             .withPartyVotes(currentPartyVotes, partyHeader)
             .withIncumbentMarker("(MLA)")
             .withResultMap(
-                fixedBinding(shapesByDistrict),
-                selectedShape.binding,
-                selectedResult.binding,
-                focus.binding,
-                mapHeader.binding
+                shapesByDistrict.asOneTimePublisher(),
+                selectedShape,
+                selectedResult,
+                focus,
+                mapHeader
             )
             .build(header)
         panel.setSize(1024, 512)
@@ -519,28 +518,28 @@ class MixedMemberResultPanelTest {
         val header = Publisher("CHARLOTTETOWN-WINSLOE")
         val candidateHeader = Publisher("CANDIDATE VOTES")
         val partyHeader = Publisher("PARTY VOTES")
-        val mapHeader = BindableWrapper("CHARLOTTETOWN")
+        val mapHeader = Publisher("CHARLOTTETOWN")
         val shapesByDistrict = peiShapesByDistrict()
-        val focus = BindableWrapper(shapesByDistrict.keys.filter { it in 10..14 })
-        val selectedShape = BindableWrapper(10)
-        val selectedResult = BindableWrapper<PartyResult?>(null)
+        val focus = Publisher(shapesByDistrict.keys.filter { it in 10..14 })
+        val selectedShape = Publisher(10)
+        val selectedResult = Publisher<PartyResult?>(null)
         val winner = Publisher<Candidate?>(null)
         val lib = Party("Liberal", "LIB", Color.RED)
         val grn = Party("Green", "GRN", Color.GREEN.darker())
         val pc = Party("Progressive Conservative", "PC", Color.BLUE)
         val ndp = Party("New Democratic Party", "NDP", Color.ORANGE)
-        selectedResult.value = elected(lib)
+        selectedResult.submit(elected(lib))
         val panel = builder()
             .withCandidateVotes(currentCandidateVotes, candidateHeader)
             .withPartyVotes(currentPartyVotes, partyHeader)
             .withIncumbentMarker("(MLA)")
             .withWinner(winner)
             .withResultMap(
-                fixedBinding(shapesByDistrict),
-                selectedShape.binding,
-                selectedResult.binding,
-                focus.binding,
-                mapHeader.binding
+                shapesByDistrict.asOneTimePublisher(),
+                selectedShape,
+                selectedResult,
+                focus,
+                mapHeader
             )
             .build(header)
         panel.setSize(1024, 512)
@@ -568,28 +567,28 @@ class MixedMemberResultPanelTest {
         val header = Publisher("CHARLOTTETOWN-WINSLOE")
         val candidateHeader = Publisher("CANDIDATE VOTES")
         val partyHeader = Publisher("PARTY VOTES")
-        val mapHeader = BindableWrapper("CHARLOTTETOWN")
+        val mapHeader = Publisher("CHARLOTTETOWN")
         val shapesByDistrict = peiShapesByDistrict()
-        val focus = BindableWrapper(shapesByDistrict.keys.filter { it in 10..14 })
-        val selectedShape = BindableWrapper(10)
-        val selectedResult = BindableWrapper<PartyResult?>(null)
+        val focus = Publisher(shapesByDistrict.keys.filter { it in 10..14 })
+        val selectedShape = Publisher(10)
+        val selectedResult = Publisher<PartyResult?>(null)
         val winner = Publisher<Candidate?>(null)
         val lib = Party("Liberal", "LIB", Color.RED)
         val grn = Party("Green", "GRN", Color.GREEN.darker())
         val pc = Party("Progressive Conservative", "PC", Color.BLUE)
         val ndp = Party("New Democratic Party", "NDP", Color.ORANGE)
-        selectedResult.value = elected(lib)
+        selectedResult.submit(elected(lib))
         val panel = builder()
             .withCandidateVotes(currentCandidateVotes, candidateHeader)
             .withPartyVotes(currentPartyVotes, partyHeader)
             .withIncumbentMarker("(MLA)")
             .withWinner(winner)
             .withResultMap(
-                fixedBinding(shapesByDistrict),
-                selectedShape.binding,
-                selectedResult.binding,
-                focus.binding,
-                mapHeader.binding
+                shapesByDistrict.asOneTimePublisher(),
+                selectedShape,
+                selectedResult,
+                focus,
+                mapHeader
             )
             .build(header)
         panel.setSize(1024, 512)

@@ -289,4 +289,37 @@ class PubSubTests {
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ boundValue.value }, IsEqual(15))
     }
+
+    @Test
+    fun testComposePublisher() {
+        var output: Int? = null
+        val innerPublisher1 = Publisher(7)
+        val outerPublisher = Publisher(innerPublisher1)
+        outerPublisher.compose { it }.subscribe(Subscriber { output = it })
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ output }, IsEqual(7))
+
+        innerPublisher1.submit(42)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ output }, IsEqual(42))
+
+        val innerPublisher2 = Publisher(12)
+        outerPublisher.submit(innerPublisher2)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ output }, IsEqual(12))
+
+        innerPublisher1.submit(1)
+        Thread.sleep(500)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ output }, IsEqual(12))
+
+        innerPublisher2.submit(27)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ output }, IsEqual(27))
+
+        innerPublisher1.submit(3)
+        Thread.sleep(500)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ output }, IsEqual(27))
+    }
 }

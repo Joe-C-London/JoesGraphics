@@ -1,6 +1,5 @@
 package com.joecollins.graphics.screens.generic
 
-import com.joecollins.bindings.Binding
 import com.joecollins.graphics.ImageGenerator
 import com.joecollins.graphics.components.BarFrame
 import com.joecollins.graphics.components.BarFrameBuilder
@@ -143,23 +142,23 @@ class MixedMemberResultPanel private constructor(
         }
 
         fun <T> withResultMap(
-            shapes: Binding<out Map<T, Shape>>,
-            selectedShape: Binding<out T>,
-            leadingParty: Binding<out PartyResult?>,
-            focus: Binding<out List<T>?>,
-            header: Binding<out String>
+            shapes: Flow.Publisher<out Map<T, Shape>>,
+            selectedShape: Flow.Publisher<out T>,
+            leadingParty: Flow.Publisher<out PartyResult?>,
+            focus: Flow.Publisher<out List<T>?>,
+            header: Flow.Publisher<out String>
         ): Builder {
             mapBuilder = MapBuilder(shapes, selectedShape, leadingParty, focus, header)
             return this
         }
 
         fun <T> withResultMap(
-            shapes: Binding<out Map<T, Shape>>,
-            selectedShape: Binding<out T>,
-            leadingParty: Binding<out PartyResult?>,
-            focus: Binding<out List<T>?>,
-            additionalHighlight: Binding<out List<T>?>,
-            header: Binding<out String>
+            shapes: Flow.Publisher<out Map<T, Shape>>,
+            selectedShape: Flow.Publisher<out T>,
+            leadingParty: Flow.Publisher<out PartyResult?>,
+            focus: Flow.Publisher<out List<T>?>,
+            additionalHighlight: Flow.Publisher<out List<T>?>,
+            header: Flow.Publisher<out String>
         ): Builder {
             mapBuilder = MapBuilder(shapes, selectedShape, leadingParty, focus, additionalHighlight, header)
             return this

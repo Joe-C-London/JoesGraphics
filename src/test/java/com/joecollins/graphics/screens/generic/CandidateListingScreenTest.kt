@@ -94,10 +94,10 @@ class CandidateListingScreenTest {
             "[MLA]"
         )
             .withMap(
-                Binding.fixedBinding(shapes),
-                Binding.fixedBinding(1),
-                Binding.fixedBinding(listOf(1, 2, 3, 4, 5, 6, 7)),
-                Binding.fixedBinding("CARDIGAN")
+                shapes.asOneTimePublisher(),
+                1.asOneTimePublisher(),
+                listOf(1, 2, 3, 4, 5, 6, 7).asOneTimePublisher(),
+                "CARDIGAN".asOneTimePublisher()
             )
             .withPrev(
                 prev.asOneTimePublisher(),
@@ -136,10 +136,10 @@ class CandidateListingScreenTest {
             "[MLA]"
         )
             .withMap(
-                Binding.fixedBinding(shapes),
-                Binding.fixedBinding(14),
-                Binding.fixedBinding(listOf(9, 10, 11, 12, 13, 14)),
-                Binding.fixedBinding("CHARLOTTETOWN")
+                shapes.asOneTimePublisher(),
+                14.asOneTimePublisher(),
+                listOf(9, 10, 11, 12, 13, 14).asOneTimePublisher(),
+                "CHARLOTTETOWN".asOneTimePublisher()
             )
             .withPrev(
                 prev.asOneTimePublisher(),
@@ -181,10 +181,10 @@ class CandidateListingScreenTest {
             "[MLA]"
         )
             .withMap(
-                Binding.fixedBinding(shapes),
-                Binding.fixedBinding(1),
-                Binding.fixedBinding(listOf(1, 2, 3, 4, 5, 6, 7)),
-                Binding.fixedBinding("CARDIGAN")
+                shapes.asOneTimePublisher(),
+                1.asOneTimePublisher(),
+                listOf(1, 2, 3, 4, 5, 6, 7).asOneTimePublisher(),
+                "CARDIGAN".asOneTimePublisher()
             )
             .withPrev(
                 prev.asOneTimePublisher(),
@@ -274,10 +274,10 @@ class CandidateListingScreenTest {
                 ndp to 2404
             )
         )
-        val region = BindableWrapper("CARDIGAN")
+        val region = Publisher("CARDIGAN")
         val districtName = BindableWrapper("GEORGETOWN-POWNAL")
-        val districtNum = BindableWrapper(2)
-        val focus = BindableWrapper(listOf(1, 2, 3, 4, 5, 6, 7))
+        val districtNum = Publisher(2)
+        val focus = Publisher(listOf(1, 2, 3, 4, 5, 6, 7))
         val shapes = peiShapesByDistrict()
         val screen = CandidateListingScreen.of(
             candidates,
@@ -286,10 +286,10 @@ class CandidateListingScreenTest {
             "[MLA]"
         )
             .withMap(
-                Binding.fixedBinding(shapes),
-                districtNum.binding,
-                focus.binding,
-                region.binding
+                shapes.asOneTimePublisher(),
+                districtNum,
+                focus,
+                region
             )
             .withPrev(
                 prev,
@@ -315,10 +315,10 @@ class CandidateListingScreenTest {
         )
         prev.submit(mapOf(lib to 1938, pc to 1338, grn to 347, ndp to 442))
         secondaryPrev.submit(mapOf(lib to 7767, pc to 8169, grn to 4011, ndp to 1427))
-        region.value = "MALPEQUE"
+        region.submit("MALPEQUE")
         districtName.value = "STANHOME-MARSFIELD"
-        districtNum.value = 8
-        focus.value = listOf(8, 15, 16, 17, 18, 19, 20)
+        districtNum.submit(8)
+        focus.submit(listOf(8, 15, 16, 17, 18, 19, 20))
         RenderTestUtils.compareRendering("CandidateListingScreen", "CandidatesUpdating-2", screen)
     }
 

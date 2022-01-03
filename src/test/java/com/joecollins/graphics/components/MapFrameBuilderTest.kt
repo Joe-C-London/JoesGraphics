@@ -1,9 +1,11 @@
 package com.joecollins.graphics.components
 
-import com.joecollins.bindings.Binding.Companion.fixedBinding
 import com.joecollins.bindings.mapElements
 import com.joecollins.graphics.components.MapFrameBuilder.Companion.from
-import com.joecollins.graphics.utils.BindableWrapper
+import com.joecollins.pubsub.Publisher
+import com.joecollins.pubsub.asOneTimePublisher
+import com.joecollins.pubsub.map
+import com.joecollins.pubsub.mapElements
 import org.awaitility.Awaitility
 import org.hamcrest.core.IsEqual
 import org.hamcrest.core.IsNot
@@ -20,13 +22,13 @@ import java.util.concurrent.TimeUnit
 class MapFrameBuilderTest {
     @Test
     fun testBasicMapFrame() {
-        val shapes = BindableWrapper(
+        val shapes = Publisher(
             listOf(
                 Pair(Ellipse2D.Double(2.0, 2.0, 1.0, 1.0), Color.RED),
                 Pair(Rectangle2D.Double(5.0, 5.0, 2.0, 2.0), Color.BLUE)
             )
         )
-        val frame = from(shapes.binding).withHeader(fixedBinding("MAP")).build()
+        val frame = from(shapes).withHeader("MAP".asOneTimePublisher()).build()
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numShapes }, IsEqual(2))
         Assert.assertEquals(Ellipse2D.Double::class.java, frame.getShape(0).javaClass)
@@ -43,7 +45,7 @@ class MapFrameBuilderTest {
         val shapes: MutableList<Pair<Shape, Color>> = ArrayList()
         shapes.add(Pair(Ellipse2D.Double(2.0, 2.0, 1.0, 1.0), Color.RED))
         shapes.add(Pair(Rectangle2D.Double(5.0, 5.0, 2.0, 2.0), Color.BLUE))
-        val frame: MapFrame = from(fixedBinding(shapes)).withHeader(fixedBinding("MAP")).build()
+        val frame: MapFrame = from(shapes.asOneTimePublisher()).withHeader("MAP".asOneTimePublisher()).build()
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numShapes }, IsEqual(2))
         Assert.assertEquals(Ellipse2D.Double::class.java, frame.getShape(0).javaClass)
@@ -62,8 +64,8 @@ class MapFrameBuilderTest {
         val shapes: MutableList<ConstituencyPair> = ArrayList()
         shapes.add(ConstituencyPair(Ellipse2D.Double(2.0, 2.0, 1.0, 1.0), Color.RED))
         shapes.add(ConstituencyPair(Rectangle2D.Double(5.0, 5.0, 2.0, 2.0), Color.BLUE))
-        val frame = from(fixedBinding(shapes), { it.shape }, { fixedBinding(it.color) })
-            .withHeader(fixedBinding("MAP"))
+        val frame = from(shapes.asOneTimePublisher(), { it.shape }, { it.color.asOneTimePublisher() })
+            .withHeader("MAP".asOneTimePublisher())
             .build()
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numShapes }, IsEqual(2))
@@ -78,15 +80,15 @@ class MapFrameBuilderTest {
 
     @Test
     fun testMapItemPropertyBinding() {
-        val shapes: MutableList<Pair<Shape, BindableWrapper<Color>>> = ArrayList()
+        val shapes: MutableList<Pair<Shape, Publisher<Color>>> = ArrayList()
         shapes.add(
-            Pair(Ellipse2D.Double(2.0, 2.0, 1.0, 1.0), BindableWrapper(Color.RED))
+            Pair(Ellipse2D.Double(2.0, 2.0, 1.0, 1.0), Publisher(Color.RED))
         )
         shapes.add(
-            Pair(Rectangle2D.Double(5.0, 5.0, 2.0, 2.0), BindableWrapper(Color.BLUE))
+            Pair(Rectangle2D.Double(5.0, 5.0, 2.0, 2.0), Publisher(Color.BLUE))
         )
-        val frame = from(fixedBinding(shapes), { it.first }, { it.second.binding })
-            .withHeader(fixedBinding("MAP"))
+        val frame = from(shapes.asOneTimePublisher(), { it.first }, { it.second })
+            .withHeader("MAP".asOneTimePublisher())
             .build()
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numShapes }, IsEqual(2))
@@ -94,11 +96,11 @@ class MapFrameBuilderTest {
         Assert.assertEquals(Color.RED, frame.getColor(0))
         Assert.assertEquals(Rectangle2D.Double::class.java, frame.getShape(1).javaClass)
         Assert.assertEquals(Color.BLUE, frame.getColor(1))
-        shapes[0].second.value = Color.GREEN
+        shapes[0].second.submit(Color.GREEN)
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.getColor(0) }, IsEqual(Color.GREEN))
         Assert.assertEquals(Color.BLUE, frame.getColor(1))
-        shapes[1].second.value = Color.ORANGE
+        shapes[1].second.submit(Color.ORANGE)
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.getColor(1) }, IsEqual(Color.ORANGE))
         Assert.assertEquals(Color.GREEN, frame.getColor(0))
@@ -106,15 +108,15 @@ class MapFrameBuilderTest {
 
     @Test
     fun testFocusBox() {
-        val shapes = BindableWrapper(
+        val shapes = Publisher(
             listOf(
                 Pair(Ellipse2D.Double(2.0, 2.0, 1.0, 1.0), Color.RED),
                 Pair(Rectangle2D.Double(5.0, 5.0, 2.0, 2.0), Color.BLUE)
             )
         )
-        val binding = shapes.binding.map { s -> listOf(s[0].first) }
-        val frame = from(shapes.binding)
-            .withHeader(fixedBinding("MAP"))
+        val binding = shapes.map { s -> listOf(s[0].first) }
+        val frame = from(shapes)
+            .withHeader("MAP".asOneTimePublisher())
             .withFocus(binding)
             .build()
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
@@ -124,15 +126,15 @@ class MapFrameBuilderTest {
 
     @Test
     fun testMultiFocusBox() {
-        val shapes = BindableWrapper(
+        val shapes = Publisher(
             listOf(
                 Pair(Ellipse2D.Double(2.0, 2.0, 1.0, 1.0), Color.RED),
                 Pair(Rectangle2D.Double(5.0, 5.0, 2.0, 2.0), Color.BLUE)
             )
         )
-        val binding = shapes.binding.mapElements { it.first }
-        val frame = from(shapes.binding)
-            .withHeader(fixedBinding("MAP"))
+        val binding = shapes.mapElements { it.first }
+        val frame = from(shapes)
+            .withHeader("MAP".asOneTimePublisher())
             .withFocus(binding)
             .build()
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
@@ -142,15 +144,15 @@ class MapFrameBuilderTest {
 
     @Test
     fun testNotes() {
-        val shapes = BindableWrapper(
+        val shapes = Publisher(
             listOf(
                 Pair(Ellipse2D.Double(2.0, 2.0, 1.0, 1.0), Color.RED),
                 Pair(Rectangle2D.Double(5.0, 5.0, 2.0, 2.0), Color.BLUE)
             )
         )
-        val frame = from(shapes.binding)
-            .withHeader(fixedBinding("MAP"))
-            .withNotes(fixedBinding("A note"))
+        val frame = from(shapes)
+            .withHeader("MAP".asOneTimePublisher())
+            .withNotes("A note".asOneTimePublisher())
             .build()
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.notes }, IsEqual("A note"))
@@ -158,15 +160,15 @@ class MapFrameBuilderTest {
 
     @Test
     fun testBorderColor() {
-        val shapes = BindableWrapper(
+        val shapes = Publisher(
             listOf(
                 Pair(Ellipse2D.Double(2.0, 2.0, 1.0, 1.0), Color.RED),
                 Pair(Rectangle2D.Double(5.0, 5.0, 2.0, 2.0), Color.BLUE)
             )
         )
-        val frame = from(shapes.binding)
-            .withHeader(fixedBinding("MAP"))
-            .withBorderColor(fixedBinding(Color.GRAY))
+        val frame = from(shapes)
+            .withHeader("MAP".asOneTimePublisher())
+            .withBorderColor(Color.GRAY.asOneTimePublisher())
             .build()
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.borderColor }, IsEqual(Color.GRAY))

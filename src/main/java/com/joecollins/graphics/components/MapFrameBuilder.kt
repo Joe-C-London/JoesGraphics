@@ -1,23 +1,25 @@
 package com.joecollins.graphics.components
 
-import com.joecollins.bindings.Binding
-import com.joecollins.bindings.BindingReceiver
 import com.joecollins.pubsub.asOneTimePublisher
+import com.joecollins.pubsub.combine
+import com.joecollins.pubsub.compose
+import com.joecollins.pubsub.map
 import java.awt.Color
 import java.awt.Shape
 import java.awt.geom.Rectangle2D
+import java.util.concurrent.Flow
 
 class MapFrameBuilder {
 
-    private var focusBoxBinding: Binding<Rectangle2D?>? = null
-    private var headerBinding: Binding<String?>? = null
-    private var notesBinding: Binding<String?>? = null
-    private var borderColorBinding: Binding<Color>? = null
-    private var outlineBinding: Binding<List<Shape>>? = null
-    private var shapesBinding: Binding<List<Pair<Shape, Color>>>? = null
+    private var focusBoxPublisher: Flow.Publisher<out Rectangle2D?>? = null
+    private var headerPublisher: Flow.Publisher<out String?>? = null
+    private var notesPublisher: Flow.Publisher<out String?>? = null
+    private var borderColorPublisher: Flow.Publisher<out Color>? = null
+    private var outlinePublisher: Flow.Publisher<out List<Shape>>? = null
+    private var shapesPublisher: Flow.Publisher<out List<Pair<Shape, Color>>>? = null
 
-    fun withFocus(focusBinding: Binding<List<Shape>?>): MapFrameBuilder {
-        this.focusBoxBinding = focusBinding.map { shapes ->
+    fun withFocus(focusPublisher: Flow.Publisher<out List<Shape>?>): MapFrameBuilder {
+        this.focusBoxPublisher = focusPublisher.map { shapes ->
             shapes
                 ?.map { it.bounds2D }
                 ?.reduceOrNull { a, b ->
@@ -29,57 +31,54 @@ class MapFrameBuilder {
         return this
     }
 
-    fun withHeader(headerBinding: Binding<String?>): MapFrameBuilder {
-        this.headerBinding = headerBinding
+    fun withHeader(headerPublisher: Flow.Publisher<out String?>): MapFrameBuilder {
+        this.headerPublisher = headerPublisher
         return this
     }
 
-    fun withNotes(notesBinding: Binding<String?>): MapFrameBuilder {
-        this.notesBinding = notesBinding
+    fun withNotes(notesPublisher: Flow.Publisher<out String?>): MapFrameBuilder {
+        this.notesPublisher = notesPublisher
         return this
     }
 
-    fun withBorderColor(borderColorBinding: Binding<Color>): MapFrameBuilder {
-        this.borderColorBinding = borderColorBinding
+    fun withBorderColor(borderColorPublisher: Flow.Publisher<out Color>): MapFrameBuilder {
+        this.borderColorPublisher = borderColorPublisher
         return this
     }
 
-    fun withOutline(outlineBinding: Binding<List<Shape>>): MapFrameBuilder {
-        this.outlineBinding = outlineBinding
+    fun withOutline(outlinePublisher: Flow.Publisher<out List<Shape>>): MapFrameBuilder {
+        this.outlinePublisher = outlinePublisher
         return this
     }
 
     fun build(): MapFrame {
         return MapFrame(
-            headerPublisher = headerBinding?.toPublisher() ?: (null as String?).asOneTimePublisher(),
-            shapesPublisher = shapesBinding?.toPublisher() ?: emptyList<Pair<Shape, Color>>().asOneTimePublisher(),
-            focusBoxPublisher = focusBoxBinding?.toPublisher(),
-            notesPublisher = notesBinding?.toPublisher(),
-            borderColorPublisher = borderColorBinding?.toPublisher(),
-            outlineShapesPublisher = outlineBinding?.toPublisher()
+            headerPublisher = headerPublisher ?: (null as String?).asOneTimePublisher(),
+            shapesPublisher = shapesPublisher ?: emptyList<Pair<Shape, Color>>().asOneTimePublisher(),
+            focusBoxPublisher = focusBoxPublisher,
+            notesPublisher = notesPublisher,
+            borderColorPublisher = borderColorPublisher,
+            outlineShapesPublisher = outlinePublisher
         )
     }
 
     companion object {
-        @JvmStatic fun from(shapes: Binding<List<Pair<Shape, Color>>>): MapFrameBuilder {
+        @JvmStatic fun from(shapes: Flow.Publisher<out List<Pair<Shape, Color>>>): MapFrameBuilder {
             val mapFrameBuilder = MapFrameBuilder()
-            mapFrameBuilder.shapesBinding = shapes
+            mapFrameBuilder.shapesPublisher = shapes
             return mapFrameBuilder
         }
 
-        @JvmStatic fun <T> from(
-            itemsBinding: Binding<List<T>>,
+        @JvmStatic
+        fun <T> from(
+            itemsBinding: Flow.Publisher<out List<T>>,
             shapeFunc: (T) -> Shape,
-            colorFunc: (T) -> Binding<Color>
+            colorFunc: (T) -> Flow.Publisher<out Color>
         ): MapFrameBuilder {
-            val itemsReceiver = BindingReceiver(itemsBinding)
-            val list = itemsReceiver.getFlatBinding { items ->
-                Binding.listBinding(
-                    items.map { colorFunc(it).map { c -> Pair(shapeFunc(it), c) } }
-                )
+            val list = itemsBinding.compose { items ->
+                items.map { colorFunc(it).map { c -> Pair(shapeFunc(it), c) } }.combine()
             }
-            val ret = from(list)
-            return ret
+            return from(list)
         }
     }
 }

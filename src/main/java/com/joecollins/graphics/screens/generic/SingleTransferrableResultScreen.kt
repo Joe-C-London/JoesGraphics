@@ -138,7 +138,7 @@ class SingleTransferrableResultScreen private constructor(
             focus: Binding<List<T>?>,
             header: Binding<String?>
         ): Builder {
-            mapBuilder = MapBuilder(shapes, selectedShape, leadingParty.map { party: Party? -> PartyResult.elected(party) }, focus, header)
+            mapBuilder = MapBuilder(shapes.toPublisher(), selectedShape.toPublisher(), leadingParty.map { party: Party? -> PartyResult.elected(party) }.toPublisher(), focus.toPublisher(), header.toPublisher())
             return this
         }
 

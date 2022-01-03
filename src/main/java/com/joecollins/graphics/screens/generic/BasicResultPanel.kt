@@ -237,7 +237,7 @@ class BasicResultPanel private constructor(
             headerBinding: Binding<String?>
         ): SeatScreenBuilder<KT, CT, PT> {
             mapBuilder = MapBuilder(
-                shapes, winners.map { m: Map<T, Party?> -> partyMapToResultMap(m) }, focus, headerBinding
+                shapes.toPublisher(), winners.map { m: Map<T, Party?> -> partyMapToResultMap(m) }.toPublisher(), focus.toPublisher(), headerBinding.toPublisher()
             )
             return this
         }
@@ -248,7 +248,7 @@ class BasicResultPanel private constructor(
             focus: Binding<List<T>?>,
             headerBinding: Binding<String?>
         ): SeatScreenBuilder<KT, CT, PT> {
-            mapBuilder = MapBuilder(shapes, winners, focus, headerBinding)
+            mapBuilder = MapBuilder(shapes.toPublisher(), winners.toPublisher(), focus.toPublisher(), headerBinding.toPublisher())
             return this
         }
 
@@ -259,7 +259,7 @@ class BasicResultPanel private constructor(
             additionalHighlight: Binding<List<T>?>,
             headerBinding: Binding<String?>
         ): SeatScreenBuilder<KT, CT, PT> {
-            mapBuilder = MapBuilder(shapes, winners, Pair(focus, additionalHighlight), headerBinding)
+            mapBuilder = MapBuilder(shapes.toPublisher(), winners.toPublisher(), Pair(focus.toPublisher(), additionalHighlight.toPublisher()), headerBinding.toPublisher())
             return this
         }
 
@@ -908,7 +908,7 @@ class BasicResultPanel private constructor(
             focus: Binding<List<T>?>,
             headerBinding: Binding<String?>
         ): VoteScreenBuilder<KT, CT, CPT, PT> {
-            mapBuilder = MapBuilder(shapes, winners.map { m: Map<T, Party?> -> partyMapToResultMap(m) }, focus, headerBinding)
+            mapBuilder = MapBuilder(shapes.toPublisher(), winners.map { m: Map<T, Party?> -> partyMapToResultMap(m) }.toPublisher(), focus.toPublisher(), headerBinding.toPublisher())
             return this
         }
 
@@ -919,7 +919,7 @@ class BasicResultPanel private constructor(
             focus: Binding<List<T>?>,
             header: Binding<String?>
         ): VoteScreenBuilder<KT, CT, CPT, PT> {
-            mapBuilder = MapBuilder(shapes, selectedShape, leadingParty.map { party: Party? -> PartyResult.elected(party) }, focus, header)
+            mapBuilder = MapBuilder(shapes.toPublisher(), selectedShape.toPublisher(), leadingParty.map { party: Party? -> PartyResult.elected(party) }.toPublisher(), focus.toPublisher(), header.toPublisher())
             return this
         }
 
@@ -929,7 +929,7 @@ class BasicResultPanel private constructor(
             focus: Binding<List<T>?>,
             headerBinding: Binding<String?>
         ): VoteScreenBuilder<KT, CT, CPT, PT> {
-            mapBuilder = MapBuilder(shapes, winners, focus, headerBinding)
+            mapBuilder = MapBuilder(shapes.toPublisher(), winners.toPublisher(), focus.toPublisher(), headerBinding.toPublisher())
             return this
         }
 
@@ -939,7 +939,7 @@ class BasicResultPanel private constructor(
             focus: Pair<Binding<List<T>?>, Binding<List<T>?>>,
             headerBinding: Binding<String?>
         ): VoteScreenBuilder<KT, CT, CPT, PT> {
-            mapBuilder = MapBuilder(shapes, winners, focus, headerBinding)
+            mapBuilder = MapBuilder(shapes.toPublisher(), winners.toPublisher(), focus.let { it.first.toPublisher() to it.second.toPublisher() }, headerBinding.toPublisher())
             return this
         }
 
@@ -950,7 +950,7 @@ class BasicResultPanel private constructor(
             focus: Binding<List<T>?>,
             header: Binding<String?>
         ): VoteScreenBuilder<KT, CT, CPT, PT> {
-            mapBuilder = MapBuilder(shapes, selectedShape, leadingParty, focus, header)
+            mapBuilder = MapBuilder(shapes.toPublisher(), selectedShape.toPublisher(), leadingParty.toPublisher(), focus.toPublisher(), header.toPublisher())
             return this
         }
 
@@ -962,7 +962,7 @@ class BasicResultPanel private constructor(
             additionalHighlight: Binding<List<T>?>,
             header: Binding<String?>
         ): VoteScreenBuilder<KT, CT, CPT, PT> {
-            mapBuilder = MapBuilder(shapes, selectedShape, leadingParty, focus, additionalHighlight, header)
+            mapBuilder = MapBuilder(shapes.toPublisher(), selectedShape.toPublisher(), leadingParty.toPublisher(), focus.toPublisher(), additionalHighlight.toPublisher(), header.toPublisher())
             return this
         }
 
@@ -1638,7 +1638,7 @@ class BasicResultPanel private constructor(
             focus: Binding<List<T>?>,
             header: Binding<String?>
         ): PartyQuotaScreenBuilder {
-            mapBuilder = MapBuilder(shapes, selectedShape, leadingParty.map { party: Party? -> PartyResult.elected(party) }, focus, header)
+            mapBuilder = MapBuilder(shapes.toPublisher(), selectedShape.toPublisher(), leadingParty.map { party: Party? -> PartyResult.elected(party) }.toPublisher(), focus.toPublisher(), header.toPublisher())
             return this
         }
 
