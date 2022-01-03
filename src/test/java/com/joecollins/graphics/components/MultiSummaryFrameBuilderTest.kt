@@ -1,11 +1,9 @@
 package com.joecollins.graphics.components
 
-import com.joecollins.bindings.Bindable
-import com.joecollins.bindings.Binding
-import com.joecollins.bindings.Binding.Companion.fixedBinding
-import com.joecollins.bindings.Binding.Companion.propertyBinding
 import com.joecollins.graphics.components.MultiSummaryFrameBuilder.Companion.tooClose
 import com.joecollins.models.general.Party
+import com.joecollins.pubsub.Publisher
+import com.joecollins.pubsub.asOneTimePublisher
 import org.awaitility.Awaitility
 import org.hamcrest.core.IsEqual
 import org.hamcrest.core.IsNot
@@ -35,10 +33,10 @@ class MultiSummaryFrameBuilderTest {
         ridings.add(Riding("Watson Lake")) // 7
         val frame = tooClose(
             ridings, { it.isTooClose }, { it.margin },
-            { fixedBinding(it.name.uppercase()) }, { it.boxes },
+            { it.name.uppercase().asOneTimePublisher() }, { it.boxes },
             2
         )
-            .withHeader(fixedBinding("TOO CLOSE TO CALL"))
+            .withHeader("TOO CLOSE TO CALL".asOneTimePublisher())
             .build()
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.header }, IsNot(IsEqual("")))
@@ -137,60 +135,47 @@ class MultiSummaryFrameBuilderTest {
         Assert.assertEquals("YP: 338", frame.getValue(1, 0))
     }
 
-    private class Riding(val name: String) : Bindable<Riding, Riding.Property>() {
-        enum class Property {
-            RESULT, WINNER
-        }
-
+    private class Riding(val name: String) {
         private var results: Map<Party, Int> = HashMap()
         private var winner: Party? = null
 
         fun setResults(results: Map<Party, Int>) {
             this.results = results
-            onPropertyRefreshed(Property.RESULT)
+            updateTooClose()
+            updateMargin()
+            updateBoxes()
         }
 
         fun setWinner(winner: Party?) {
             this.winner = winner
-            onPropertyRefreshed(Property.WINNER)
+            updateTooClose()
         }
 
-        val isTooClose: Binding<Boolean>
-            get() = propertyBinding(
-                this,
-                { it.winner == null && it.results.values.sum() > 0 },
-                Property.RESULT,
-                Property.WINNER
-            )
+        val isTooClose = Publisher(calculateTooClose())
+        private fun updateTooClose() = isTooClose.submit(calculateTooClose())
+        private fun calculateTooClose() = winner == null && results.values.sum() > 0
 
-        val margin: Binding<Int>
-            get() = propertyBinding(
-                this,
-                {
-                    val topTwoVotes = results.values.sortedDescending()
-                    if (topTwoVotes.isEmpty())
-                        0
-                    else
-                        topTwoVotes[0] - topTwoVotes[1]
-                },
-                Property.RESULT
-            )
+        val margin = Publisher(calculateMargin())
+        private fun updateMargin() = margin.submit(calculateMargin())
+        private fun calculateMargin(): Int {
+            val topTwoVotes = results.values.sortedDescending()
+            return if (topTwoVotes.isEmpty())
+                0
+            else
+                topTwoVotes[0] - topTwoVotes[1]
+        }
 
-        val boxes: Binding<List<kotlin.Pair<Color, String>>>
-            get() = propertyBinding(
-                this,
-                { me ->
-                    me.results.entries.asSequence()
-                        .sortedByDescending { it.value }
-                        .map {
-                            Pair(
-                                it.key.color,
-                                it.key.abbreviation + ": " + it.value
-                            )
-                        }
-                        .toList()
-                },
-                Property.RESULT
-            )
+        val boxes = Publisher(calculateBoxes())
+        private fun updateBoxes() = boxes.submit(calculateBoxes())
+        private fun calculateBoxes() =
+            results.entries.asSequence()
+                .sortedByDescending { it.value }
+                .map {
+                    Pair(
+                        it.key.color,
+                        it.key.abbreviation + ": " + it.value
+                    )
+                }
+                .toList()
     }
 }

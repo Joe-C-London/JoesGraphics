@@ -1,38 +1,41 @@
 package com.joecollins.graphics.screens.generic
 
-import com.joecollins.bindings.Bindable
-import com.joecollins.bindings.Binding
-import com.joecollins.bindings.BindingReceiver
 import com.joecollins.graphics.components.FontSizeAdjustingLabel
 import com.joecollins.graphics.components.MultiSummaryFrame
 import com.joecollins.graphics.utils.StandardFont
 import com.joecollins.models.general.Party
+import com.joecollins.pubsub.Publisher
+import com.joecollins.pubsub.Subscriber
+import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
+import com.joecollins.pubsub.asOneTimePublisher
+import com.joecollins.pubsub.combine
+import com.joecollins.pubsub.map
+import com.joecollins.pubsub.merge
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.GridLayout
 import java.text.DecimalFormat
 import java.util.ArrayList
+import java.util.concurrent.Flow
 import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.border.EmptyBorder
 
 class RegionalBreakdownScreen private constructor(titleLabel: JLabel, multiSummaryFrame: MultiSummaryFrame) : JPanel() {
     interface Entry {
-        val headerBinding: Binding<String>
-        val valueBinding: Binding<List<Pair<Color, String>>>
+        val headerPublisher: Flow.Publisher<out String>
+        val valuePublisher: Flow.Publisher<out List<Pair<Color, String>>>
     }
 
     private class BlankEntry : Entry {
-        override val headerBinding: Binding<String>
-            get() = Binding.fixedBinding("")
-        override val valueBinding: Binding<List<Pair<Color, String>>>
-            get() = Binding.fixedBinding(listOf())
+        override val headerPublisher: Flow.Publisher<out String>
+            get() = "".asOneTimePublisher()
+        override val valuePublisher: Flow.Publisher<out List<Pair<Color, String>>>
+            get() = listOf<Pair<Color, String>>().asOneTimePublisher()
     }
 
-    private open class SeatEntry : Bindable<SeatEntry, SeatEntry.Property>(), Entry {
-        enum class Property {
-            PARTY_ORDER, NAME, SEATS, TOTAL_SEATS
-        }
+    private open class SeatEntry : Entry {
+        enum class Property
 
         private var _partyOrder: List<Party> = emptyList()
         private var _name = ""
@@ -43,49 +46,50 @@ class RegionalBreakdownScreen private constructor(titleLabel: JLabel, multiSumma
             get() = _partyOrder
             set(partyOrder) {
                 _partyOrder = partyOrder
-                onPropertyRefreshed(Property.PARTY_ORDER)
+                updateValue()
             }
+        val partyOrderPublisher = Publisher(_partyOrder)
 
         var name: String
             get() = _name
             set(name) {
                 _name = name
-                onPropertyRefreshed(Property.NAME)
+                namePublisher.submit(name)
             }
 
         var seats: Map<Party, Int>
             get() = _seats
             set(seats) {
                 _seats = seats
-                onPropertyRefreshed(Property.SEATS)
+                updateValue()
             }
 
         var totalSeats: Int
             get() = _totalSeats
             set(totalSeats) {
                 _totalSeats = totalSeats
-                onPropertyRefreshed(Property.TOTAL_SEATS)
+                updateValue()
             }
 
-        override val headerBinding: Binding<String>
-            get() = Binding.propertyBinding(this, { t: SeatEntry -> t.name }, Property.NAME)
-        override val valueBinding: Binding<List<Pair<Color, String>>>
-            get() = Binding.propertyBinding(
-                this,
-                { t: SeatEntry ->
-                    val ret: MutableList<Pair<Color, String>> = t.partyOrder.map { t.getPartyLabel(it) }.toMutableList()
-                    ret.add(
-                        Pair(
-                            Color.WHITE,
-                            seats.values.sum().toString() + "/" + totalSeats
-                        )
-                    )
-                    ret
-                },
-                Property.PARTY_ORDER,
-                Property.SEATS,
-                Property.TOTAL_SEATS
+        private val namePublisher = Publisher(_name)
+        override val headerPublisher: Flow.Publisher<out String>
+            get() = namePublisher
+
+        private val _valuePublisher = Publisher(calculateValue())
+        override val valuePublisher: Flow.Publisher<out List<Pair<Color, String>>>
+            get() = _valuePublisher
+        protected fun updateValue() = synchronized(this) { _valuePublisher.submit(calculateValue()) }
+
+        private fun calculateValue(): MutableList<Pair<Color, String>> {
+            val ret: MutableList<Pair<Color, String>> = this.partyOrder.map { this.getPartyLabel(it) }.toMutableList()
+            ret.add(
+                Pair(
+                    Color.WHITE,
+                    seats.values.sum().toString() + "/" + totalSeats
+                )
             )
+            return ret
+        }
 
         protected open fun getPartyLabel(party: Party): Pair<Color, String> {
             return Pair(party.color, (seats[party] ?: 0).toString())
@@ -99,7 +103,7 @@ class RegionalBreakdownScreen private constructor(titleLabel: JLabel, multiSumma
             get() = _diff
             set(diff) {
                 _diff = diff
-                onPropertyRefreshed(Property.SEATS)
+                updateValue()
             }
 
         override fun getPartyLabel(party: Party): Pair<Color, String> {
@@ -123,7 +127,7 @@ class RegionalBreakdownScreen private constructor(titleLabel: JLabel, multiSumma
             get() = _prev
             set(prev) {
                 _prev = prev
-                onPropertyRefreshed(Property.SEATS)
+                updateValue()
             }
 
         override fun getPartyLabel(party: Party): Pair<Color, String> {
@@ -141,39 +145,39 @@ class RegionalBreakdownScreen private constructor(titleLabel: JLabel, multiSumma
     }
 
     open class MultiPartyResultBuilder(
-        titleBinding: Binding<String>
+        titlePublisher: Flow.Publisher<out String>
     ) {
-        protected val title: BindingReceiver<String> = BindingReceiver(titleBinding)
+        protected val title: Flow.Publisher<out String> = titlePublisher
         protected val entries: MutableList<Entry> = ArrayList()
-        protected var partyOrder: BindingReceiver<List<Party>>? = null
+        protected var partyOrder: Flow.Publisher<out List<Party>>? = null
 
-        fun build(titleBinding: Binding<String?>): RegionalBreakdownScreen {
+        fun build(titlePublisher: Flow.Publisher<out String?>): RegionalBreakdownScreen {
             val headerLabel = FontSizeAdjustingLabel()
             headerLabel.font = StandardFont.readBoldFont(32)
             headerLabel.horizontalAlignment = JLabel.CENTER
             headerLabel.border = EmptyBorder(5, 0, -5, 0)
-            titleBinding.bind { headerLabel.text = it }
+            titlePublisher.subscribe(Subscriber(eventQueueWrapper { headerLabel.text = it }))
             return RegionalBreakdownScreen(headerLabel, createFrame())
         }
 
         private fun createFrame(): MultiSummaryFrame {
             return MultiSummaryFrame(
-                headerPublisher = title.getBinding().toPublisher(),
-                rowsPublisher = Binding.listBinding(
-                    entries.map {
-                        it.headerBinding.merge(it.valueBinding) { h, v -> MultiSummaryFrame.Row(h, v) }
-                    }
-                ).toPublisher()
+                headerPublisher = title,
+                rowsPublisher =
+                entries.map {
+                    it.headerPublisher.merge(it.valuePublisher) { h, v -> MultiSummaryFrame.Row(h, v) }
+                }
+                    .combine()
             )
         }
     }
 
     class SeatBuilder(
-        totalHeaderBinding: Binding<String>,
-        totalSeatsBinding: Binding<Map<Party, Int>>,
-        numTotalSeatsBinding: Binding<Int>,
-        titleBinding: Binding<String>
-    ) : MultiPartyResultBuilder(titleBinding) {
+        totalHeaderPublisher: Flow.Publisher<out String>,
+        totalSeatsPublisher: Flow.Publisher<out Map<Party, Int>>,
+        numTotalSeatsPublisher: Flow.Publisher<out Int>,
+        titlePublisher: Flow.Publisher<out String>
+    ) : MultiPartyResultBuilder(titlePublisher) {
 
         fun withBlankRow(): SeatBuilder {
             entries.add(BlankEntry())
@@ -181,86 +185,81 @@ class RegionalBreakdownScreen private constructor(titleLabel: JLabel, multiSumma
         }
 
         fun withRegion(
-            nameBinding: Binding<String>,
-            seatsBinding: Binding<Map<Party, Int>>,
-            numSeatsBinding: Binding<Int>,
-            partyMapBinding: Binding<Map<Party, Party>> = Binding.fixedBinding(emptyMap())
+            namePublisher: Flow.Publisher<out String>,
+            seatsPublisher: Flow.Publisher<out Map<Party, Int>>,
+            numSeatsPublisher: Flow.Publisher<out Int>,
+            partyMapPublisher: Flow.Publisher<out Map<Party, Party>> = emptyMap<Party, Party>().asOneTimePublisher()
         ): SeatBuilder {
             val newEntry = SeatEntry()
-            transformPartyOrder(partyOrder!!.getBinding(), partyMapBinding).bind { newEntry.partyOrder = it }
-            nameBinding.bind { newEntry.name = it }
-            seatsBinding.bind { newEntry.seats = it }
-            numSeatsBinding.bind { newEntry.totalSeats = it }
+            transformPartyOrder(partyOrder!!, partyMapPublisher).subscribe(Subscriber { newEntry.partyOrder = it })
+            namePublisher.subscribe(Subscriber { newEntry.name = it })
+            seatsPublisher.subscribe(Subscriber { newEntry.seats = it })
+            numSeatsPublisher.subscribe(Subscriber { newEntry.totalSeats = it })
             entries.add(newEntry)
             return this
         }
 
         init {
-            val totalSeats = BindingReceiver(totalSeatsBinding)
-            partyOrder = BindingReceiver(totalSeats.getBinding { result: Map<Party, Int> -> extractPartyOrder(result) })
+            partyOrder = totalSeatsPublisher.map { result: Map<Party, Int> -> extractPartyOrder(result) }
             val topEntry = SeatEntry()
-            partyOrder!!.getBinding().bind { topEntry.partyOrder = it }
-            totalHeaderBinding.bind { topEntry.name = it }
-            totalSeats.getBinding().bind { topEntry.seats = it }
-            numTotalSeatsBinding.bind { topEntry.totalSeats = it }
+            partyOrder!!.subscribe(Subscriber { topEntry.partyOrder = it })
+            totalHeaderPublisher.subscribe(Subscriber { topEntry.name = it })
+            totalSeatsPublisher.subscribe(Subscriber { topEntry.seats = it })
+            numTotalSeatsPublisher.subscribe(Subscriber { topEntry.totalSeats = it })
             entries.add(topEntry)
         }
     }
 
     class SeatDiffBuilder(
-        totalHeaderBinding: Binding<String>,
-        totalSeatsBinding: Binding<Map<Party, Int>>,
-        seatDiffBinding: Binding<Map<Party, Int>>,
-        numTotalSeatsBinding: Binding<Int>,
-        titleBinding: Binding<String>
-    ) : MultiPartyResultBuilder(titleBinding) {
+        totalHeaderPublisher: Flow.Publisher<out String>,
+        totalSeatsPublisher: Flow.Publisher<out Map<Party, Int>>,
+        seatDiffPublisher: Flow.Publisher<out Map<Party, Int>>,
+        numTotalSeatsPublisher: Flow.Publisher<out Int>,
+        titlePublisher: Flow.Publisher<out String>
+    ) : MultiPartyResultBuilder(titlePublisher) {
         fun withBlankRow(): SeatDiffBuilder {
             entries.add(BlankEntry())
             return this
         }
 
         fun withRegion(
-            nameBinding: Binding<String>,
-            seatsBinding: Binding<Map<Party, Int>>,
-            diffBinding: Binding<Map<Party, Int>>,
-            numSeatsBinding: Binding<Int>,
-            partyMapBinding: Binding<Map<Party, Party>> = Binding.fixedBinding(emptyMap())
+            namePublisher: Flow.Publisher<out String>,
+            seatsPublisher: Flow.Publisher<out Map<Party, Int>>,
+            diffPublisher: Flow.Publisher<out Map<Party, Int>>,
+            numSeatsPublisher: Flow.Publisher<out Int>,
+            partyMapPublisher: Flow.Publisher<out Map<Party, Party>> = emptyMap<Party, Party>().asOneTimePublisher()
         ): SeatDiffBuilder {
             val newEntry = SeatDiffEntry()
-            transformPartyOrder(partyOrder!!.getBinding(), partyMapBinding).bind { newEntry.partyOrder = it }
-            nameBinding.bind { newEntry.name = it }
-            seatsBinding.bind { newEntry.seats = it }
-            diffBinding.bind { newEntry.diff = it }
-            numSeatsBinding.bind { newEntry.totalSeats = it }
+            transformPartyOrder(partyOrder!!, partyMapPublisher).subscribe(Subscriber { newEntry.partyOrder = it })
+            namePublisher.subscribe(Subscriber { newEntry.name = it })
+            seatsPublisher.subscribe(Subscriber { newEntry.seats = it })
+            diffPublisher.subscribe(Subscriber { newEntry.diff = it })
+            numSeatsPublisher.subscribe(Subscriber { newEntry.totalSeats = it })
             entries.add(newEntry)
             return this
         }
 
         init {
-            val totalSeats = BindingReceiver(totalSeatsBinding)
-            val seatDiff = BindingReceiver(seatDiffBinding)
-            partyOrder = BindingReceiver(
-                totalSeats
-                    .getBinding()
-                    .merge(seatDiff.getBinding()) { result, diff -> extractPartyOrder(result, diff) }
-            )
+            partyOrder =
+                totalSeatsPublisher
+                    .merge(seatDiffPublisher) { result, diff -> extractPartyOrder(result, diff) }
             val topEntry = SeatDiffEntry()
-            partyOrder!!.getBinding().bind { topEntry.partyOrder = it }
-            totalHeaderBinding.bind { topEntry.name = it }
-            totalSeats.getBinding().bind { topEntry.seats = it }
-            seatDiff.getBinding().bind { topEntry.diff = it }
-            numTotalSeatsBinding.bind { topEntry.totalSeats = it }
+            partyOrder!!.subscribe(Subscriber { topEntry.partyOrder = it })
+            totalHeaderPublisher.subscribe(Subscriber { topEntry.name = it })
+            totalSeatsPublisher.subscribe(Subscriber { topEntry.seats = it })
+            seatDiffPublisher.subscribe(Subscriber { topEntry.diff = it })
+            numTotalSeatsPublisher.subscribe(Subscriber { topEntry.totalSeats = it })
             entries.add(topEntry)
         }
     }
 
     class SeatPrevBuilder(
-        totalHeaderBinding: Binding<String>,
-        totalSeatsBinding: Binding<Map<Party, Int>>,
-        prevSeatBinding: Binding<Map<Party, Int>>,
-        numTotalSeatsBinding: Binding<Int>,
-        titleBinding: Binding<String>
-    ) : MultiPartyResultBuilder(titleBinding) {
+        totalHeaderPublisher: Flow.Publisher<out String>,
+        totalSeatsPublisher: Flow.Publisher<out Map<Party, Int>>,
+        prevSeatPublisher: Flow.Publisher<out Map<Party, Int>>,
+        numTotalSeatsPublisher: Flow.Publisher<out Int>,
+        titlePublisher: Flow.Publisher<out String>
+    ) : MultiPartyResultBuilder(titlePublisher) {
 
         fun withBlankRow(): SeatPrevBuilder {
             entries.add(BlankEntry())
@@ -268,77 +267,75 @@ class RegionalBreakdownScreen private constructor(titleLabel: JLabel, multiSumma
         }
 
         fun withRegion(
-            nameBinding: Binding<String>,
-            seatsBinding: Binding<Map<Party, Int>>,
-            prevBinding: Binding<Map<Party, Int>>,
-            numSeatsBinding: Binding<Int>,
-            partyMapBinding: Binding<Map<Party, Party>> = Binding.fixedBinding(emptyMap())
+            namePublisher: Flow.Publisher<out String>,
+            seatsPublisher: Flow.Publisher<out Map<Party, Int>>,
+            prevPublisher: Flow.Publisher<out Map<Party, Int>>,
+            numSeatsPublisher: Flow.Publisher<out Int>,
+            partyMapPublisher: Flow.Publisher<out Map<Party, Party>> = emptyMap<Party, Party>().asOneTimePublisher()
         ): SeatPrevBuilder {
             val newEntry = SeatPrevEntry()
-            transformPartyOrder(partyOrder!!.getBinding(), partyMapBinding).bind { newEntry.partyOrder = it }
-            nameBinding.bind { newEntry.name = it }
-            seatsBinding.bind { newEntry.seats = it }
-            prevBinding.bind { newEntry.prev = it }
-            numSeatsBinding.bind { newEntry.totalSeats = it }
+            transformPartyOrder(partyOrder!!, partyMapPublisher).subscribe(Subscriber { newEntry.partyOrder = it })
+            namePublisher.subscribe(Subscriber { newEntry.name = it })
+            seatsPublisher.subscribe(Subscriber { newEntry.seats = it })
+            prevPublisher.subscribe(Subscriber { newEntry.prev = it })
+            numSeatsPublisher.subscribe(Subscriber { newEntry.totalSeats = it })
             entries.add(newEntry)
             return this
         }
 
         init {
-            val totalSeats = BindingReceiver(totalSeatsBinding)
-            val prevSeats = BindingReceiver(prevSeatBinding)
-            partyOrder = BindingReceiver(
-                totalSeats
-                    .getBinding()
-                    .merge(prevSeats.getBinding()) { result: Map<Party, Int>, diff: Map<Party, Int> -> extractPartyOrder(result, diff) }
-            )
+            partyOrder =
+                totalSeatsPublisher
+                    .merge(
+                        prevSeatPublisher
+                    ) { result: Map<Party, Int>, diff: Map<Party, Int> -> extractPartyOrder(result, diff) }
             val topEntry = SeatPrevEntry()
-            partyOrder!!.getBinding().bind { topEntry.partyOrder = it }
-            totalHeaderBinding.bind { topEntry.name = it }
-            totalSeats.getBinding().bind { topEntry.seats = it }
-            prevSeats.getBinding().bind { topEntry.prev = it }
-            numTotalSeatsBinding.bind { topEntry.totalSeats = it }
+            partyOrder!!.subscribe(Subscriber { topEntry.partyOrder = it })
+            totalHeaderPublisher.subscribe(Subscriber { topEntry.name = it })
+            totalSeatsPublisher.subscribe(Subscriber { topEntry.seats = it })
+            prevSeatPublisher.subscribe(Subscriber { topEntry.prev = it })
+            numTotalSeatsPublisher.subscribe(Subscriber { topEntry.totalSeats = it })
             entries.add(topEntry)
         }
     }
 
     companion object {
         @JvmStatic fun seats(
-            totalHeaderBinding: Binding<String>,
-            totalSeatsBinding: Binding<Map<Party, Int>>,
-            numTotalSeatsBinding: Binding<Int>,
-            titleBinding: Binding<String>
+            totalHeaderPublisher: Flow.Publisher<out String>,
+            totalSeatsPublisher: Flow.Publisher<out Map<Party, Int>>,
+            numTotalSeatsPublisher: Flow.Publisher<out Int>,
+            titlePublisher: Flow.Publisher<out String>
         ): SeatBuilder {
             return SeatBuilder(
-                totalHeaderBinding, totalSeatsBinding, numTotalSeatsBinding, titleBinding
+                totalHeaderPublisher, totalSeatsPublisher, numTotalSeatsPublisher, titlePublisher
             )
         }
 
         @JvmStatic fun seatsWithDiff(
-            totalHeaderBinding: Binding<String>,
-            totalSeatsBinding: Binding<Map<Party, Int>>,
-            seatDiffBinding: Binding<Map<Party, Int>>,
-            numTotalSeatsBinding: Binding<Int>,
-            titleBinding: Binding<String>
+            totalHeaderPublisher: Flow.Publisher<out String>,
+            totalSeatsPublisher: Flow.Publisher<out Map<Party, Int>>,
+            seatDiffPublisher: Flow.Publisher<out Map<Party, Int>>,
+            numTotalSeatsPublisher: Flow.Publisher<out Int>,
+            titlePublisher: Flow.Publisher<out String>
         ): SeatDiffBuilder {
             return SeatDiffBuilder(
-                totalHeaderBinding, totalSeatsBinding, seatDiffBinding, numTotalSeatsBinding, titleBinding
+                totalHeaderPublisher, totalSeatsPublisher, seatDiffPublisher, numTotalSeatsPublisher, titlePublisher
             )
         }
 
         @JvmStatic fun seatsWithPrev(
-            totalHeaderBinding: Binding<String>,
-            totalSeatsBinding: Binding<Map<Party, Int>>,
-            prevSeatsBinding: Binding<Map<Party, Int>>,
-            numTotalSeatsBinding: Binding<Int>,
-            titleBinding: Binding<String>
+            totalHeaderPublisher: Flow.Publisher<out String>,
+            totalSeatsPublisher: Flow.Publisher<out Map<Party, Int>>,
+            prevSeatsPublisher: Flow.Publisher<out Map<Party, Int>>,
+            numTotalSeatsPublisher: Flow.Publisher<out Int>,
+            titlePublisher: Flow.Publisher<out String>
         ): SeatPrevBuilder {
             return SeatPrevBuilder(
-                totalHeaderBinding,
-                totalSeatsBinding,
-                prevSeatsBinding,
-                numTotalSeatsBinding,
-                titleBinding
+                totalHeaderPublisher,
+                totalSeatsPublisher,
+                prevSeatsPublisher,
+                numTotalSeatsPublisher,
+                titlePublisher
             )
         }
 
@@ -362,9 +359,9 @@ class RegionalBreakdownScreen private constructor(titleLabel: JLabel, multiSumma
         }
 
         private fun transformPartyOrder(
-            partyOrder: Binding<List<Party>>,
-            partyMapping: Binding<Map<Party, Party>>
-        ): Binding<List<Party>> =
+            partyOrder: Flow.Publisher<out List<Party>>,
+            partyMapping: Flow.Publisher<out Map<Party, Party>>
+        ): Flow.Publisher<out List<Party>> =
             partyOrder.merge(partyMapping) { po, pm -> po.map { pm[it] ?: it } }
     }
 

@@ -1,38 +1,37 @@
 package com.joecollins.graphics.screens.generic
 
-import com.joecollins.bindings.Binding
-import com.joecollins.bindings.BindingReceiver
 import com.joecollins.graphics.components.ProjectionFrame
 import com.joecollins.pubsub.asOneTimePublisher
 import java.awt.Color
 import java.awt.GridLayout
 import java.awt.Image
+import java.util.concurrent.Flow
 import javax.swing.JPanel
 import javax.swing.border.EmptyBorder
 
 class ProjectionScreen private constructor(
-    text: Binding<String?>,
-    color: Binding<Color>,
-    image: Binding<Image?>,
-    imageAlignment: Binding<ProjectionFrame.Alignment>
+    text: Flow.Publisher<out String?>,
+    color: Flow.Publisher<out Color>,
+    image: Flow.Publisher<out Image?>,
+    imageAlignment: Flow.Publisher<out ProjectionFrame.Alignment>
 ) : JPanel() {
 
     companion object {
         @JvmStatic fun createScreen(
-            text: Binding<String?>,
-            color: Binding<Color>,
-            image: Binding<Image?>
+            text: Flow.Publisher<out String?>,
+            color: Flow.Publisher<out Color>,
+            image: Flow.Publisher<out Image?>
         ): ProjectionScreen {
             return ProjectionScreen(
-                text, color, image, Binding.fixedBinding(ProjectionFrame.Alignment.BOTTOM)
+                text, color, image, ProjectionFrame.Alignment.BOTTOM.asOneTimePublisher()
             )
         }
 
         @JvmStatic fun createScreen(
-            text: Binding<String?>,
-            color: Binding<Color>,
-            image: Binding<Image?>,
-            imageAlignment: Binding<ProjectionFrame.Alignment>
+            text: Flow.Publisher<out String?>,
+            color: Flow.Publisher<out Color>,
+            image: Flow.Publisher<out Image?>,
+            imageAlignment: Flow.Publisher<out ProjectionFrame.Alignment>
         ): ProjectionScreen {
             return ProjectionScreen(text, color, image, imageAlignment)
         }
@@ -42,14 +41,13 @@ class ProjectionScreen private constructor(
         layout = GridLayout(1, 1)
         background = Color.WHITE
         border = EmptyBorder(5, 5, 5, 5)
-        val colorReceiver = BindingReceiver(color)
         val frame = ProjectionFrame(
             headerPublisher = "PROJECTION".asOneTimePublisher(),
-            borderColorPublisher = colorReceiver.getBinding().toPublisher(),
-            imagePublisher = image.toPublisher(),
-            backColorPublisher = colorReceiver.getBinding().toPublisher(),
-            footerTextPublisher = text.toPublisher(),
-            imageAlignmentPublisher = imageAlignment.toPublisher()
+            borderColorPublisher = color,
+            imagePublisher = image,
+            backColorPublisher = color,
+            footerTextPublisher = text,
+            imageAlignmentPublisher = imageAlignment
         )
         add(frame)
     }

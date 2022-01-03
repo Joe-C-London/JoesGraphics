@@ -1,10 +1,10 @@
 package com.joecollins.graphics.screens.generic
 
-import com.joecollins.bindings.Binding
-import com.joecollins.graphics.utils.BindableWrapper
 import com.joecollins.graphics.utils.RenderTestUtils
 import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.Party
+import com.joecollins.pubsub.Publisher
+import com.joecollins.pubsub.asOneTimePublisher
 import org.junit.Test
 import java.awt.Color
 import java.util.TreeMap
@@ -20,16 +20,16 @@ class RecountScreenTest {
 
         val candidateVotesRaw: MutableMap<String, Map<Candidate, Int>> = TreeMap()
         val pctReportingRaw: MutableMap<String, Double> = TreeMap()
-        val candidateVotes = BindableWrapper<Map<String, Map<Candidate, Int>>>(candidateVotesRaw)
-        val pctReporting = BindableWrapper<Map<String, Double>>(pctReportingRaw)
+        val candidateVotes = Publisher<Map<String, Map<Candidate, Int>>>(candidateVotesRaw)
+        val pctReporting = Publisher<Map<String, Double>>(pctReportingRaw)
         val screen = RecountScreen.of(
-            candidateVotes.binding,
+            candidateVotes,
             { it.uppercase() },
             10,
-            Binding.fixedBinding("AUTOMATIC RECOUNTS")
+            "AUTOMATIC RECOUNTS".asOneTimePublisher()
         )
-            .withPctReporting(pctReporting.binding)
-            .build(Binding.fixedBinding("YUKON"))
+            .withPctReporting(pctReporting)
+            .build("YUKON".asOneTimePublisher())
         screen.setSize(1024, 512)
         RenderTestUtils.compareRendering("RecountScreen", "RecountVotes-1", screen)
 
@@ -55,8 +55,8 @@ class RecountScreenTest {
         )
         pctReportingRaw["Watson Lake"] = 2.0 / 6
 
-        candidateVotes.value = candidateVotesRaw
-        pctReporting.value = pctReportingRaw
+        candidateVotes.submit(candidateVotesRaw)
+        pctReporting.submit(pctReportingRaw)
         RenderTestUtils.compareRendering("RecountScreen", "RecountVotes-2", screen)
 
         candidateVotesRaw["Mountainview"] = mapOf(
@@ -74,8 +74,8 @@ class RecountScreenTest {
         )
         pctReportingRaw["Watson Lake"] = 6.0 / 6
 
-        candidateVotes.value = candidateVotesRaw
-        pctReporting.value = pctReportingRaw
+        candidateVotes.submit(candidateVotesRaw)
+        pctReporting.submit(pctReportingRaw)
         RenderTestUtils.compareRendering("RecountScreen", "RecountVotes-3", screen)
     }
 
@@ -89,14 +89,14 @@ class RecountScreenTest {
         val ind = Party("Independent", "IND", Color.GRAY)
 
         val candidateVotesRaw: MutableMap<String, Map<Candidate, Int>> = TreeMap()
-        val candidateVotes = BindableWrapper<Map<String, Map<Candidate, Int>>>(candidateVotesRaw)
+        val candidateVotes = Publisher<Map<String, Map<Candidate, Int>>>(candidateVotesRaw)
         val screen = RecountScreen.of(
-            candidateVotes.binding,
+            candidateVotes,
             { it.uppercase() },
             0.001,
-            Binding.fixedBinding("AUTOMATIC RECOUNTS")
+            "AUTOMATIC RECOUNTS".asOneTimePublisher()
         )
-            .build(Binding.fixedBinding("CANADA"))
+            .build("CANADA".asOneTimePublisher())
         screen.setSize(1024, 512)
         RenderTestUtils.compareRendering("RecountScreen", "RecountPct-1", screen)
 
@@ -128,7 +128,7 @@ class RecountScreenTest {
             Candidate("Frank Komarniski", ind) to 118
         )
 
-        candidateVotes.value = candidateVotesRaw
+        candidateVotes.submit(candidateVotesRaw)
         RenderTestUtils.compareRendering("RecountScreen", "RecountPct-2", screen)
     }
 }

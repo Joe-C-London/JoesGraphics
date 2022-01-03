@@ -1,13 +1,12 @@
 package com.joecollins.graphics.screens.generic
 
-import com.joecollins.bindings.Binding.Companion.fixedBinding
-import com.joecollins.bindings.toFixedBinding
 import com.joecollins.graphics.screens.generic.RegionalBreakdownScreen.Companion.seats
 import com.joecollins.graphics.screens.generic.RegionalBreakdownScreen.Companion.seatsWithDiff
 import com.joecollins.graphics.screens.generic.RegionalBreakdownScreen.Companion.seatsWithPrev
-import com.joecollins.graphics.utils.BindableWrapper
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.models.general.Party
+import com.joecollins.pubsub.Publisher
+import com.joecollins.pubsub.asOneTimePublisher
 import org.junit.Test
 import java.awt.Color
 import java.io.IOException
@@ -17,125 +16,125 @@ class RegionalBreakdownScreenTest {
     @Test
     @Throws(IOException::class)
     fun testSeats() {
-        val peiSeats = BindableWrapper<Map<Party, Int>>(emptyMap())
-        val cardiganSeats = BindableWrapper<Map<Party, Int>>(emptyMap())
-        val malpequeSeats = BindableWrapper<Map<Party, Int>>(emptyMap())
-        val charlottetownSeats = BindableWrapper<Map<Party, Int>>(emptyMap())
-        val egmontSeats = BindableWrapper<Map<Party, Int>>(emptyMap())
+        val peiSeats = Publisher<Map<Party, Int>>(emptyMap())
+        val cardiganSeats = Publisher<Map<Party, Int>>(emptyMap())
+        val malpequeSeats = Publisher<Map<Party, Int>>(emptyMap())
+        val charlottetownSeats = Publisher<Map<Party, Int>>(emptyMap())
+        val egmontSeats = Publisher<Map<Party, Int>>(emptyMap())
         val screen = seats(
-            fixedBinding("PRINCE EDWARD ISLAND"),
-            peiSeats.binding,
-            fixedBinding(27),
-            fixedBinding("SEATS BY REGION")
+            "PRINCE EDWARD ISLAND".asOneTimePublisher(),
+            peiSeats,
+            27.asOneTimePublisher(),
+            "SEATS BY REGION".asOneTimePublisher()
         )
             .withBlankRow()
-            .withRegion(fixedBinding("CARDIGAN"), cardiganSeats.binding, fixedBinding(7))
-            .withRegion(fixedBinding("MALPEQUE"), malpequeSeats.binding, fixedBinding(7))
-            .withRegion(fixedBinding("CHARLOTTETOWN"), charlottetownSeats.binding, fixedBinding(6))
-            .withRegion(fixedBinding("EGMONT"), egmontSeats.binding, fixedBinding(7))
-            .build(fixedBinding("PRINCE EDWARD ISLAND"))
+            .withRegion("CARDIGAN".asOneTimePublisher(), cardiganSeats, 7.asOneTimePublisher())
+            .withRegion("MALPEQUE".asOneTimePublisher(), malpequeSeats, 7.asOneTimePublisher())
+            .withRegion("CHARLOTTETOWN".asOneTimePublisher(), charlottetownSeats, 6.asOneTimePublisher())
+            .withRegion("EGMONT".asOneTimePublisher(), egmontSeats, 7.asOneTimePublisher())
+            .build("PRINCE EDWARD ISLAND".asOneTimePublisher())
         screen.setSize(1024, 512)
         compareRendering("RegionalBreakdownScreen", "Seats-1", screen)
-        peiSeats.value = mapOf(grn to 1)
-        cardiganSeats.value = mapOf(grn to 1)
+        peiSeats.submit(mapOf(grn to 1))
+        cardiganSeats.submit(mapOf(grn to 1))
         compareRendering("RegionalBreakdownScreen", "Seats-2", screen)
-        peiSeats.value = mapOf(pc to 13, grn to 8, lib to 6)
-        cardiganSeats.value = mapOf(pc to 6, grn to 1)
-        malpequeSeats.value = mapOf(pc to 5, grn to 1, lib to 1)
-        charlottetownSeats.value = mapOf(grn to 3, lib to 2, pc to 1)
-        egmontSeats.value = mapOf(grn to 3, lib to 3, pc to 1)
+        peiSeats.submit(mapOf(pc to 13, grn to 8, lib to 6))
+        cardiganSeats.submit(mapOf(pc to 6, grn to 1))
+        malpequeSeats.submit(mapOf(pc to 5, grn to 1, lib to 1))
+        charlottetownSeats.submit(mapOf(grn to 3, lib to 2, pc to 1))
+        egmontSeats.submit(mapOf(grn to 3, lib to 3, pc to 1))
         compareRendering("RegionalBreakdownScreen", "Seats-3", screen)
     }
 
     @Test
     @Throws(IOException::class)
     fun testSeatsWithDiff() {
-        val peiSeats = BindableWrapper<Map<Party, Int>>(emptyMap())
-        val cardiganSeats = BindableWrapper<Map<Party, Int>>(emptyMap())
-        val malpequeSeats = BindableWrapper<Map<Party, Int>>(emptyMap())
-        val charlottetownSeats = BindableWrapper<Map<Party, Int>>(emptyMap())
-        val egmontSeats = BindableWrapper<Map<Party, Int>>(emptyMap())
-        val peiDiff = BindableWrapper<Map<Party, Int>>(emptyMap())
-        val cardiganDiff = BindableWrapper<Map<Party, Int>>(emptyMap())
-        val malpequeDiff = BindableWrapper<Map<Party, Int>>(emptyMap())
-        val charlottetownDiff = BindableWrapper<Map<Party, Int>>(emptyMap())
-        val egmontDiff = BindableWrapper<Map<Party, Int>>(emptyMap())
+        val peiSeats = Publisher<Map<Party, Int>>(emptyMap())
+        val cardiganSeats = Publisher<Map<Party, Int>>(emptyMap())
+        val malpequeSeats = Publisher<Map<Party, Int>>(emptyMap())
+        val charlottetownSeats = Publisher<Map<Party, Int>>(emptyMap())
+        val egmontSeats = Publisher<Map<Party, Int>>(emptyMap())
+        val peiDiff = Publisher<Map<Party, Int>>(emptyMap())
+        val cardiganDiff = Publisher<Map<Party, Int>>(emptyMap())
+        val malpequeDiff = Publisher<Map<Party, Int>>(emptyMap())
+        val charlottetownDiff = Publisher<Map<Party, Int>>(emptyMap())
+        val egmontDiff = Publisher<Map<Party, Int>>(emptyMap())
         val screen = seatsWithDiff(
-            fixedBinding("PRINCE EDWARD ISLAND"),
-            peiSeats.binding,
-            peiDiff.binding,
-            fixedBinding(27),
-            fixedBinding("SEATS BY REGION")
+            "PRINCE EDWARD ISLAND".asOneTimePublisher(),
+            peiSeats,
+            peiDiff,
+            27.asOneTimePublisher(),
+            "SEATS BY REGION".asOneTimePublisher()
         )
             .withBlankRow()
-            .withRegion(fixedBinding("CARDIGAN"), cardiganSeats.binding, cardiganDiff.binding, fixedBinding(7))
-            .withRegion(fixedBinding("MALPEQUE"), malpequeSeats.binding, malpequeDiff.binding, fixedBinding(7))
-            .withRegion(fixedBinding("CHARLOTTETOWN"), charlottetownSeats.binding, charlottetownDiff.binding, fixedBinding(6))
-            .withRegion(fixedBinding("EGMONT"), egmontSeats.binding, egmontDiff.binding, fixedBinding(7))
-            .build(fixedBinding("PRINCE EDWARD ISLAND"))
+            .withRegion("CARDIGAN".asOneTimePublisher(), cardiganSeats, cardiganDiff, 7.asOneTimePublisher())
+            .withRegion("MALPEQUE".asOneTimePublisher(), malpequeSeats, malpequeDiff, 7.asOneTimePublisher())
+            .withRegion("CHARLOTTETOWN".asOneTimePublisher(), charlottetownSeats, charlottetownDiff, 6.asOneTimePublisher())
+            .withRegion("EGMONT".asOneTimePublisher(), egmontSeats, egmontDiff, 7.asOneTimePublisher())
+            .build("PRINCE EDWARD ISLAND".asOneTimePublisher())
         screen.setSize(1024, 512)
         compareRendering("RegionalBreakdownScreen", "SeatsWithDiff-1", screen)
-        peiSeats.value = mapOf(grn to 1)
-        peiDiff.value = mapOf(grn to +1, lib to -1)
-        cardiganSeats.value = mapOf(grn to 1)
-        cardiganDiff.value = mapOf(grn to +1, lib to -1)
+        peiSeats.submit(mapOf(grn to 1))
+        peiDiff.submit(mapOf(grn to +1, lib to -1))
+        cardiganSeats.submit(mapOf(grn to 1))
+        cardiganDiff.submit(mapOf(grn to +1, lib to -1))
         compareRendering("RegionalBreakdownScreen", "SeatsWithDiff-2", screen)
-        peiSeats.value = mapOf(pc to 13, grn to 8, lib to 6)
-        peiDiff.value = mapOf(pc to +5, grn to +7, lib to -12)
-        cardiganSeats.value = mapOf(pc to 6, grn to 1)
-        cardiganDiff.value = mapOf(pc to +1, grn to +1, lib to -2)
-        malpequeSeats.value = mapOf(pc to 5, grn to 1, lib to 1)
-        malpequeDiff.value = mapOf(pc to +2, grn to 0, lib to -1)
-        charlottetownSeats.value = mapOf(grn to 3, lib to 2, pc to 1)
-        charlottetownDiff.value = mapOf(grn to +3, lib to -5, pc to +1)
-        egmontSeats.value = mapOf(grn to 3, lib to 3, pc to 1)
-        egmontDiff.value = mapOf(grn to +3, lib to -4, pc to +1)
+        peiSeats.submit(mapOf(pc to 13, grn to 8, lib to 6))
+        peiDiff.submit(mapOf(pc to +5, grn to +7, lib to -12))
+        cardiganSeats.submit(mapOf(pc to 6, grn to 1))
+        cardiganDiff.submit(mapOf(pc to +1, grn to +1, lib to -2))
+        malpequeSeats.submit(mapOf(pc to 5, grn to 1, lib to 1))
+        malpequeDiff.submit(mapOf(pc to +2, grn to 0, lib to -1))
+        charlottetownSeats.submit(mapOf(grn to 3, lib to 2, pc to 1))
+        charlottetownDiff.submit(mapOf(grn to +3, lib to -5, pc to +1))
+        egmontSeats.submit(mapOf(grn to 3, lib to 3, pc to 1))
+        egmontDiff.submit(mapOf(grn to +3, lib to -4, pc to +1))
         compareRendering("RegionalBreakdownScreen", "SeatsWithDiff-3", screen)
     }
 
     @Test
     @Throws(IOException::class)
     fun testSeatsWithPrev() {
-        val peiSeats = BindableWrapper<Map<Party, Int>>(emptyMap())
-        val cardiganSeats = BindableWrapper<Map<Party, Int>>(emptyMap())
-        val malpequeSeats = BindableWrapper<Map<Party, Int>>(emptyMap())
-        val charlottetownSeats = BindableWrapper<Map<Party, Int>>(emptyMap())
-        val egmontSeats = BindableWrapper<Map<Party, Int>>(emptyMap())
-        val peiPrev = BindableWrapper<Map<Party, Int>>(emptyMap())
-        val cardiganPrev = BindableWrapper<Map<Party, Int>>(emptyMap())
-        val malpequePrev = BindableWrapper<Map<Party, Int>>(emptyMap())
-        val charlottetownPrev = BindableWrapper<Map<Party, Int>>(emptyMap())
-        val egmontPrev = BindableWrapper<Map<Party, Int>>(emptyMap())
+        val peiSeats = Publisher<Map<Party, Int>>(emptyMap())
+        val cardiganSeats = Publisher<Map<Party, Int>>(emptyMap())
+        val malpequeSeats = Publisher<Map<Party, Int>>(emptyMap())
+        val charlottetownSeats = Publisher<Map<Party, Int>>(emptyMap())
+        val egmontSeats = Publisher<Map<Party, Int>>(emptyMap())
+        val peiPrev = Publisher<Map<Party, Int>>(emptyMap())
+        val cardiganPrev = Publisher<Map<Party, Int>>(emptyMap())
+        val malpequePrev = Publisher<Map<Party, Int>>(emptyMap())
+        val charlottetownPrev = Publisher<Map<Party, Int>>(emptyMap())
+        val egmontPrev = Publisher<Map<Party, Int>>(emptyMap())
         val screen = seatsWithPrev(
-            fixedBinding("PRINCE EDWARD ISLAND"),
-            peiSeats.binding,
-            peiPrev.binding,
-            fixedBinding(27),
-            fixedBinding("SEATS BY REGION")
+            "PRINCE EDWARD ISLAND".asOneTimePublisher(),
+            peiSeats,
+            peiPrev,
+            27.asOneTimePublisher(),
+            "SEATS BY REGION".asOneTimePublisher()
         )
             .withBlankRow()
-            .withRegion(fixedBinding("CARDIGAN"), cardiganSeats.binding, cardiganPrev.binding, fixedBinding(7))
-            .withRegion(fixedBinding("MALPEQUE"), malpequeSeats.binding, malpequePrev.binding, fixedBinding(7))
-            .withRegion(fixedBinding("CHARLOTTETOWN"), charlottetownSeats.binding, charlottetownPrev.binding, fixedBinding(6))
-            .withRegion(fixedBinding("EGMONT"), egmontSeats.binding, egmontPrev.binding, fixedBinding(7))
-            .build(fixedBinding("PRINCE EDWARD ISLAND"))
+            .withRegion("CARDIGAN".asOneTimePublisher(), cardiganSeats, cardiganPrev, 7.asOneTimePublisher())
+            .withRegion("MALPEQUE".asOneTimePublisher(), malpequeSeats, malpequePrev, 7.asOneTimePublisher())
+            .withRegion("CHARLOTTETOWN".asOneTimePublisher(), charlottetownSeats, charlottetownPrev, 6.asOneTimePublisher())
+            .withRegion("EGMONT".asOneTimePublisher(), egmontSeats, egmontPrev, 7.asOneTimePublisher())
+            .build("PRINCE EDWARD ISLAND".asOneTimePublisher())
         screen.setSize(1024, 512)
         compareRendering("RegionalBreakdownScreen", "SeatsWithDiff-1", screen)
-        peiSeats.value = mapOf(grn to 1)
-        peiPrev.value = mapOf(lib to 1)
-        cardiganSeats.value = mapOf(grn to 1)
-        cardiganPrev.value = mapOf(lib to 1)
+        peiSeats.submit(mapOf(grn to 1))
+        peiPrev.submit(mapOf(lib to 1))
+        cardiganSeats.submit(mapOf(grn to 1))
+        cardiganPrev.submit(mapOf(lib to 1))
         compareRendering("RegionalBreakdownScreen", "SeatsWithDiff-2", screen)
-        peiSeats.value = mapOf(pc to 13, grn to 8, lib to 6)
-        peiPrev.value = mapOf(pc to 8, grn to 1, lib to 18)
-        cardiganSeats.value = mapOf(pc to 6, grn to 1)
-        cardiganPrev.value = mapOf(pc to 5, lib to 2)
-        malpequeSeats.value = mapOf(pc to 5, grn to 1, lib to 1)
-        malpequePrev.value = mapOf(pc to 3, grn to 1, lib to 2)
-        charlottetownSeats.value = mapOf(grn to 3, lib to 2, pc to 1)
-        charlottetownPrev.value = mapOf(lib to 7)
-        egmontSeats.value = mapOf(grn to 3, lib to 3, pc to 1)
-        egmontPrev.value = mapOf(lib to 7)
+        peiSeats.submit(mapOf(pc to 13, grn to 8, lib to 6))
+        peiPrev.submit(mapOf(pc to 8, grn to 1, lib to 18))
+        cardiganSeats.submit(mapOf(pc to 6, grn to 1))
+        cardiganPrev.submit(mapOf(pc to 5, lib to 2))
+        malpequeSeats.submit(mapOf(pc to 5, grn to 1, lib to 1))
+        malpequePrev.submit(mapOf(pc to 3, grn to 1, lib to 2))
+        charlottetownSeats.submit(mapOf(grn to 3, lib to 2, pc to 1))
+        charlottetownPrev.submit(mapOf(lib to 7))
+        egmontSeats.submit(mapOf(grn to 3, lib to 3, pc to 1))
+        egmontPrev.submit(mapOf(lib to 7))
         compareRendering("RegionalBreakdownScreen", "SeatsWithDiff-3", screen)
     }
 
@@ -149,21 +148,21 @@ class RegionalBreakdownScreenTest {
         val oth = Party.OTHERS
 
         val screen = seats(
-            fixedBinding("AUSTRALIA"),
-            mapOf(alp to 68, coa to 77, oth to 6).toFixedBinding(),
-            fixedBinding(151),
-            fixedBinding("SEATS BY STATE")
+            "AUSTRALIA".asOneTimePublisher(),
+            mapOf(alp to 68, coa to 77, oth to 6).asOneTimePublisher(),
+            151.asOneTimePublisher(),
+            "SEATS BY STATE".asOneTimePublisher()
         )
             .withBlankRow()
-            .withRegion(fixedBinding("NEW SOUTH WALES"), mapOf(coa to 22, alp to 24, oth to 1).toFixedBinding(), fixedBinding(47))
-            .withRegion(fixedBinding("VICTORIA"), mapOf(coa to 15, alp to 21, oth to 2).toFixedBinding(), fixedBinding(38))
-            .withRegion(fixedBinding("QUEENSLAND"), mapOf(lnp to 23, alp to 6, oth to 1).toFixedBinding(), fixedBinding(30), mapOf(coa to lnp).toFixedBinding())
-            .withRegion(fixedBinding("WESTERN AUSTRALIA"), mapOf(coa to 11, alp to 5).toFixedBinding(), fixedBinding(16))
-            .withRegion(fixedBinding("SOUTH AUSTRALIA"), mapOf(coa to 4, alp to 5, oth to 1).toFixedBinding(), fixedBinding(10))
-            .withRegion(fixedBinding("TASMANIA"), mapOf(coa to 2, alp to 2, oth to 1).toFixedBinding(), fixedBinding(5))
-            .withRegion(fixedBinding("AUSTRALIAN CAPITAL TERRITORY"), mapOf(alp to 3).toFixedBinding(), fixedBinding(3), mapOf(coa to lib).toFixedBinding())
-            .withRegion(fixedBinding("NORTHERN TERRITORY"), mapOf(alp to 2).toFixedBinding(), fixedBinding(2), mapOf(coa to clp).toFixedBinding())
-            .build(fixedBinding("AUSTRALIA"))
+            .withRegion("NEW SOUTH WALES".asOneTimePublisher(), mapOf(coa to 22, alp to 24, oth to 1).asOneTimePublisher(), 47.asOneTimePublisher())
+            .withRegion("VICTORIA".asOneTimePublisher(), mapOf(coa to 15, alp to 21, oth to 2).asOneTimePublisher(), 38.asOneTimePublisher())
+            .withRegion("QUEENSLAND".asOneTimePublisher(), mapOf(lnp to 23, alp to 6, oth to 1).asOneTimePublisher(), 30.asOneTimePublisher(), mapOf(coa to lnp).asOneTimePublisher())
+            .withRegion("WESTERN AUSTRALIA".asOneTimePublisher(), mapOf(coa to 11, alp to 5).asOneTimePublisher(), 16.asOneTimePublisher())
+            .withRegion("SOUTH AUSTRALIA".asOneTimePublisher(), mapOf(coa to 4, alp to 5, oth to 1).asOneTimePublisher(), 10.asOneTimePublisher())
+            .withRegion("TASMANIA".asOneTimePublisher(), mapOf(coa to 2, alp to 2, oth to 1).asOneTimePublisher(), 5.asOneTimePublisher())
+            .withRegion("AUSTRALIAN CAPITAL TERRITORY".asOneTimePublisher(), mapOf(alp to 3).asOneTimePublisher(), 3.asOneTimePublisher(), mapOf(coa to lib).asOneTimePublisher())
+            .withRegion("NORTHERN TERRITORY".asOneTimePublisher(), mapOf(alp to 2).asOneTimePublisher(), 2.asOneTimePublisher(), mapOf(coa to clp).asOneTimePublisher())
+            .build("AUSTRALIA".asOneTimePublisher())
         screen.setSize(1024, 512)
         compareRendering("RegionalBreakdownScreen", "Seats-C", screen)
     }
@@ -178,22 +177,22 @@ class RegionalBreakdownScreenTest {
         val oth = Party.OTHERS
 
         val screen = seatsWithPrev(
-            fixedBinding("AUSTRALIA"),
-            mapOf(alp to 68, coa to 77, oth to 6).toFixedBinding(),
-            mapOf(alp to 69, coa to 76, oth to 5).toFixedBinding(),
-            fixedBinding(151),
-            fixedBinding("SEATS BY STATE")
+            "AUSTRALIA".asOneTimePublisher(),
+            mapOf(alp to 68, coa to 77, oth to 6).asOneTimePublisher(),
+            mapOf(alp to 69, coa to 76, oth to 5).asOneTimePublisher(),
+            151.asOneTimePublisher(),
+            "SEATS BY STATE".asOneTimePublisher()
         )
             .withBlankRow()
-            .withRegion(fixedBinding("NEW SOUTH WALES"), mapOf(coa to 22, alp to 24, oth to 1).toFixedBinding(), mapOf(coa to 23, alp to 24).toFixedBinding(), fixedBinding(47))
-            .withRegion(fixedBinding("VICTORIA"), mapOf(coa to 15, alp to 21, oth to 2).toFixedBinding(), mapOf(coa to 17, alp to 18, oth to 2).toFixedBinding(), fixedBinding(38))
-            .withRegion(fixedBinding("QUEENSLAND"), mapOf(lnp to 23, alp to 6, oth to 1).toFixedBinding(), mapOf(lnp to 21, alp to 8, oth to 1).toFixedBinding(), fixedBinding(30), mapOf(coa to lnp).toFixedBinding())
-            .withRegion(fixedBinding("WESTERN AUSTRALIA"), mapOf(coa to 11, alp to 5).toFixedBinding(), mapOf(coa to 11, alp to 5).toFixedBinding(), fixedBinding(16))
-            .withRegion(fixedBinding("SOUTH AUSTRALIA"), mapOf(coa to 4, alp to 5, oth to 1).toFixedBinding(), mapOf(coa to 4, alp to 6, oth to 1).toFixedBinding(), fixedBinding(10))
-            .withRegion(fixedBinding("TASMANIA"), mapOf(coa to 2, alp to 2, oth to 1).toFixedBinding(), mapOf(alp to 4, oth to 1).toFixedBinding(), fixedBinding(5))
-            .withRegion(fixedBinding("AUSTRALIAN CAPITAL TERRITORY"), mapOf(alp to 3).toFixedBinding(), mapOf(alp to 2).toFixedBinding(), fixedBinding(3), mapOf(coa to lib).toFixedBinding())
-            .withRegion(fixedBinding("NORTHERN TERRITORY"), mapOf(alp to 2).toFixedBinding(), mapOf(alp to 2).toFixedBinding(), fixedBinding(2), mapOf(coa to clp).toFixedBinding())
-            .build(fixedBinding("AUSTRALIA"))
+            .withRegion("NEW SOUTH WALES".asOneTimePublisher(), mapOf(coa to 22, alp to 24, oth to 1).asOneTimePublisher(), mapOf(coa to 23, alp to 24).asOneTimePublisher(), 47.asOneTimePublisher())
+            .withRegion("VICTORIA".asOneTimePublisher(), mapOf(coa to 15, alp to 21, oth to 2).asOneTimePublisher(), mapOf(coa to 17, alp to 18, oth to 2).asOneTimePublisher(), 38.asOneTimePublisher())
+            .withRegion("QUEENSLAND".asOneTimePublisher(), mapOf(lnp to 23, alp to 6, oth to 1).asOneTimePublisher(), mapOf(lnp to 21, alp to 8, oth to 1).asOneTimePublisher(), 30.asOneTimePublisher(), mapOf(coa to lnp).asOneTimePublisher())
+            .withRegion("WESTERN AUSTRALIA".asOneTimePublisher(), mapOf(coa to 11, alp to 5).asOneTimePublisher(), mapOf(coa to 11, alp to 5).asOneTimePublisher(), 16.asOneTimePublisher())
+            .withRegion("SOUTH AUSTRALIA".asOneTimePublisher(), mapOf(coa to 4, alp to 5, oth to 1).asOneTimePublisher(), mapOf(coa to 4, alp to 6, oth to 1).asOneTimePublisher(), 10.asOneTimePublisher())
+            .withRegion("TASMANIA".asOneTimePublisher(), mapOf(coa to 2, alp to 2, oth to 1).asOneTimePublisher(), mapOf(alp to 4, oth to 1).asOneTimePublisher(), 5.asOneTimePublisher())
+            .withRegion("AUSTRALIAN CAPITAL TERRITORY".asOneTimePublisher(), mapOf(alp to 3).asOneTimePublisher(), mapOf(alp to 2).asOneTimePublisher(), 3.asOneTimePublisher(), mapOf(coa to lib).asOneTimePublisher())
+            .withRegion("NORTHERN TERRITORY".asOneTimePublisher(), mapOf(alp to 2).asOneTimePublisher(), mapOf(alp to 2).asOneTimePublisher(), 2.asOneTimePublisher(), mapOf(coa to clp).asOneTimePublisher())
+            .build("AUSTRALIA".asOneTimePublisher())
         screen.setSize(1024, 512)
         compareRendering("RegionalBreakdownScreen", "SeatsWithPrev-C", screen)
     }
@@ -208,22 +207,22 @@ class RegionalBreakdownScreenTest {
         val oth = Party.OTHERS
 
         val screen = seatsWithDiff(
-            fixedBinding("AUSTRALIA"),
-            mapOf(alp to 68, coa to 77, oth to 6).toFixedBinding(),
-            mapOf(alp to -1, coa to +1, oth to +1).toFixedBinding(),
-            fixedBinding(151),
-            fixedBinding("SEATS BY STATE")
+            "AUSTRALIA".asOneTimePublisher(),
+            mapOf(alp to 68, coa to 77, oth to 6).asOneTimePublisher(),
+            mapOf(alp to -1, coa to +1, oth to +1).asOneTimePublisher(),
+            151.asOneTimePublisher(),
+            "SEATS BY STATE".asOneTimePublisher()
         )
             .withBlankRow()
-            .withRegion(fixedBinding("NEW SOUTH WALES"), mapOf(coa to 22, alp to 24, oth to 1).toFixedBinding(), mapOf(coa to -1, oth to +1).toFixedBinding(), fixedBinding(47))
-            .withRegion(fixedBinding("VICTORIA"), mapOf(coa to 15, alp to 21, oth to 2).toFixedBinding(), mapOf(coa to -2, alp to +3).toFixedBinding(), fixedBinding(38))
-            .withRegion(fixedBinding("QUEENSLAND"), mapOf(lnp to 23, alp to 6, oth to 1).toFixedBinding(), mapOf(lnp to +2, alp to -2).toFixedBinding(), fixedBinding(30), mapOf(coa to lnp).toFixedBinding())
-            .withRegion(fixedBinding("WESTERN AUSTRALIA"), mapOf(coa to 11, alp to 5).toFixedBinding(), mapOf<Party, Int>().toFixedBinding(), fixedBinding(16))
-            .withRegion(fixedBinding("SOUTH AUSTRALIA"), mapOf(coa to 4, alp to 5, oth to 1).toFixedBinding(), mapOf(alp to -1).toFixedBinding(), fixedBinding(10))
-            .withRegion(fixedBinding("TASMANIA"), mapOf(coa to 2, alp to 2, oth to 1).toFixedBinding(), mapOf(coa to +2, alp to -2).toFixedBinding(), fixedBinding(5))
-            .withRegion(fixedBinding("AUSTRALIAN CAPITAL TERRITORY"), mapOf(alp to 3).toFixedBinding(), mapOf(alp to +1).toFixedBinding(), fixedBinding(3), mapOf(coa to lib).toFixedBinding())
-            .withRegion(fixedBinding("NORTHERN TERRITORY"), mapOf(alp to 2).toFixedBinding(), mapOf(alp to 0).toFixedBinding(), fixedBinding(2), mapOf(coa to clp).toFixedBinding())
-            .build(fixedBinding("AUSTRALIA"))
+            .withRegion("NEW SOUTH WALES".asOneTimePublisher(), mapOf(coa to 22, alp to 24, oth to 1).asOneTimePublisher(), mapOf(coa to -1, oth to +1).asOneTimePublisher(), 47.asOneTimePublisher())
+            .withRegion("VICTORIA".asOneTimePublisher(), mapOf(coa to 15, alp to 21, oth to 2).asOneTimePublisher(), mapOf(coa to -2, alp to +3).asOneTimePublisher(), 38.asOneTimePublisher())
+            .withRegion("QUEENSLAND".asOneTimePublisher(), mapOf(lnp to 23, alp to 6, oth to 1).asOneTimePublisher(), mapOf(lnp to +2, alp to -2).asOneTimePublisher(), 30.asOneTimePublisher(), mapOf(coa to lnp).asOneTimePublisher())
+            .withRegion("WESTERN AUSTRALIA".asOneTimePublisher(), mapOf(coa to 11, alp to 5).asOneTimePublisher(), mapOf<Party, Int>().asOneTimePublisher(), 16.asOneTimePublisher())
+            .withRegion("SOUTH AUSTRALIA".asOneTimePublisher(), mapOf(coa to 4, alp to 5, oth to 1).asOneTimePublisher(), mapOf(alp to -1).asOneTimePublisher(), 10.asOneTimePublisher())
+            .withRegion("TASMANIA".asOneTimePublisher(), mapOf(coa to 2, alp to 2, oth to 1).asOneTimePublisher(), mapOf(coa to +2, alp to -2).asOneTimePublisher(), 5.asOneTimePublisher())
+            .withRegion("AUSTRALIAN CAPITAL TERRITORY".asOneTimePublisher(), mapOf(alp to 3).asOneTimePublisher(), mapOf(alp to +1).asOneTimePublisher(), 3.asOneTimePublisher(), mapOf(coa to lib).asOneTimePublisher())
+            .withRegion("NORTHERN TERRITORY".asOneTimePublisher(), mapOf(alp to 2).asOneTimePublisher(), mapOf(alp to 0).asOneTimePublisher(), 2.asOneTimePublisher(), mapOf(coa to clp).asOneTimePublisher())
+            .build("AUSTRALIA".asOneTimePublisher())
         screen.setSize(1024, 512)
         compareRendering("RegionalBreakdownScreen", "SeatsWithPrev-C", screen)
     }
