@@ -1,7 +1,10 @@
 package com.joecollins.models.general
 
 import com.joecollins.bindings.Binding
+import com.joecollins.pubsub.Publisher
+import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.map
+import com.joecollins.pubsub.merge
 import java.lang.Integer.max
 import java.util.concurrent.Flow
 
@@ -103,6 +106,11 @@ object Aggregators {
     @JvmStatic fun <K, T : Int?> topAndOthers(result: Binding<Map<K, T>>, limit: Int, others: K) = topAndOthers(result, limit, others, Binding.fixedBinding(Array<Any?>(0) { null } as Array<K>))
 
     @JvmStatic fun <K, T : Int?> topAndOthers(result: Binding<Map<K, T>>, limit: Int, others: K, mustInclude: Binding<Array<K>>) = result.merge(mustInclude) { m, w -> topAndOthers(m, limit, others, *w) }
+
+    @Suppress("UNCHECKED_CAST")
+    @JvmStatic fun <K, T : Int?> topAndOthers(result: Flow.Publisher<Map<K, T>>, limit: Int, others: K) = topAndOthers(result, limit, others, (Array<Any?>(0) { null } as Array<K>).asOneTimePublisher())
+
+    @JvmStatic fun <K, T : Int?> topAndOthers(result: Flow.Publisher<out Map<K, T>>, limit: Int, others: K, mustInclude: Flow.Publisher<out Array<K>>) = result.merge(mustInclude) { m, w -> topAndOthers(m, limit, others, *w) }
 
     @Suppress("UNCHECKED_CAST")
     @JvmStatic fun <K, T : Int?> topAndOthers(result: Map<K, T>, limit: Int, others: K, vararg mustInclude: K): Map<K, T> {

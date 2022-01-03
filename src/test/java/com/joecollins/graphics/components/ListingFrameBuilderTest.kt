@@ -1,9 +1,9 @@
 package com.joecollins.graphics.components
 
-import com.joecollins.bindings.Binding.Companion.fixedBinding
 import com.joecollins.graphics.components.ListingFrameBuilder.Companion.of
 import com.joecollins.graphics.components.ListingFrameBuilder.Companion.ofFixedList
-import com.joecollins.graphics.utils.BindableWrapper
+import com.joecollins.pubsub.Publisher
+import com.joecollins.pubsub.asOneTimePublisher
 import org.awaitility.Awaitility
 import org.hamcrest.core.IsEqual
 import org.junit.Assert
@@ -18,9 +18,9 @@ class ListingFrameBuilderTest {
         val list: MutableList<Triple<String, Color, String>> = ArrayList()
         list.add(Triple("JUSTIN TRUDEAU", Color.RED, "LIBERAL"))
         list.add(Triple("ANDREW SCHEER", Color.BLUE, "CONSERVATIVE"))
-        val frame: BarFrame = of(fixedBinding(list), { it.first }, { it.third }) { it.second }
-            .withHeader(fixedBinding("HEADER"))
-            .withSubhead(fixedBinding("SUBHEAD"))
+        val frame: BarFrame = of(list.asOneTimePublisher(), { it.first }, { it.third }) { it.second }
+            .withHeader("HEADER".asOneTimePublisher())
+            .withSubhead("SUBHEAD".asOneTimePublisher())
             .build()
         Assert.assertEquals(0, frame.numLines.toLong())
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
@@ -45,24 +45,24 @@ class ListingFrameBuilderTest {
 
     @Test
     fun testBasicFixedListFrame() {
-        val list: MutableList<Triple<BindableWrapper<String>, BindableWrapper<Color>, BindableWrapper<String>>> = ArrayList()
+        val list: MutableList<Triple<Publisher<String>, Publisher<Color>, Publisher<String>>> = ArrayList()
         list.add(
             Triple(
-                BindableWrapper("JUSTIN TRUDEAU"),
-                BindableWrapper(Color.RED),
-                BindableWrapper("LIBERAL")
+                Publisher("JUSTIN TRUDEAU"),
+                Publisher(Color.RED),
+                Publisher("LIBERAL")
             )
         )
         list.add(
             Triple(
-                BindableWrapper("ANDREW SCHEER"),
-                BindableWrapper(Color.BLUE),
-                BindableWrapper("CONSERVATIVE")
+                Publisher("ANDREW SCHEER"),
+                Publisher(Color.BLUE),
+                Publisher("CONSERVATIVE")
             )
         )
-        val frame = ofFixedList(list, { it.first.binding }, { it.third.binding }) { it.second.binding }
-            .withHeader(fixedBinding("HEADER"))
-            .withSubhead(fixedBinding("SUBHEAD"))
+        val frame = ofFixedList(list, { it.first }, { it.third }) { it.second }
+            .withHeader("HEADER".asOneTimePublisher())
+            .withSubhead("SUBHEAD".asOneTimePublisher())
             .build()
         Assert.assertEquals(0, frame.numLines.toLong())
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)

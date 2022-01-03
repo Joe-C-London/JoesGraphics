@@ -1,50 +1,53 @@
 package com.joecollins.graphics.components
 
-import com.joecollins.bindings.Binding
 import com.joecollins.pubsub.asOneTimePublisher
+import com.joecollins.pubsub.combine
+import com.joecollins.pubsub.map
+import com.joecollins.pubsub.merge
 import java.awt.Color
+import java.util.concurrent.Flow
 
 class ListingFrameBuilder {
 
-    private var headerBinding: Binding<String?>? = null
-    private var subheadTextBinding: Binding<String?>? = null
-    private var notesBinding: Binding<String?>? = null
-    private var barsBinding: Binding<List<BarFrame.Bar>>? = null
+    private var headerPublisher: Flow.Publisher<out String?>? = null
+    private var subheadTextPublisher: Flow.Publisher<out String?>? = null
+    private var notesPublisher: Flow.Publisher<out String?>? = null
+    private var barsPublisher: Flow.Publisher<out List<BarFrame.Bar>>? = null
 
-    fun withHeader(headerBinding: Binding<String?>): ListingFrameBuilder {
-        this.headerBinding = headerBinding
+    fun withHeader(headerPublisher: Flow.Publisher<out String?>): ListingFrameBuilder {
+        this.headerPublisher = headerPublisher
         return this
     }
 
-    fun withSubhead(subheadBinding: Binding<String?>): ListingFrameBuilder {
-        this.subheadTextBinding = subheadBinding
+    fun withSubhead(subheadPublisher: Flow.Publisher<out String?>): ListingFrameBuilder {
+        this.subheadTextPublisher = subheadPublisher
         return this
     }
 
-    fun withNotes(notesBinding: Binding<String?>): ListingFrameBuilder {
-        this.notesBinding = notesBinding
+    fun withNotes(notesPublisher: Flow.Publisher<out String?>): ListingFrameBuilder {
+        this.notesPublisher = notesPublisher
         return this
     }
 
     fun build(): BarFrame {
         return BarFrame(
-            headerPublisher = headerBinding?.toPublisher() ?: (null as String?).asOneTimePublisher(),
-            subheadTextPublisher = subheadTextBinding?.toPublisher(),
-            notesPublisher = notesBinding?.toPublisher(),
-            barsPublisher = barsBinding?.toPublisher() ?: emptyList<BarFrame.Bar>().asOneTimePublisher()
+            headerPublisher = headerPublisher ?: (null as String?).asOneTimePublisher(),
+            subheadTextPublisher = subheadTextPublisher,
+            notesPublisher = notesPublisher,
+            barsPublisher = barsPublisher ?: emptyList<BarFrame.Bar>().asOneTimePublisher()
         )
     }
 
     companion object {
         @JvmStatic
         fun <T> of(
-            list: Binding<List<T>>,
+            list: Flow.Publisher<out List<T>>,
             leftTextFunc: (T) -> String,
             rightTextFunc: (T) -> String,
             colorFunc: (T) -> Color
         ): ListingFrameBuilder {
             val builder = ListingFrameBuilder()
-            builder.barsBinding = list.map { l ->
+            builder.barsPublisher = list.map { l ->
                 l.map {
                     BarFrame.Bar(leftTextFunc(it), rightTextFunc(it), null, listOf(Pair(colorFunc(it), 1)))
                 }
@@ -54,12 +57,12 @@ class ListingFrameBuilder {
 
         @JvmStatic fun <T> ofFixedList(
             list: List<T>,
-            leftTextFunc: (T) -> Binding<String>,
-            rightTextFunc: (T) -> Binding<String>,
-            colorFunc: (T) -> Binding<Color>
+            leftTextFunc: (T) -> Flow.Publisher<out String>,
+            rightTextFunc: (T) -> Flow.Publisher<out String>,
+            colorFunc: (T) -> Flow.Publisher<out Color>
         ): ListingFrameBuilder {
             val builder = ListingFrameBuilder()
-            builder.barsBinding = Binding.listBinding(
+            builder.barsPublisher =
                 list.map {
                     leftTextFunc(it).merge(rightTextFunc(it)) { left, right -> Pair(left, right) }
                         .merge(colorFunc(it)) {
@@ -67,7 +70,7 @@ class ListingFrameBuilder {
                             BarFrame.Bar(left, right, listOf(Pair(color, 1)))
                         }
                 }
-            )
+                    .combine()
             return builder
         }
     }

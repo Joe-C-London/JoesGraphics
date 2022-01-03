@@ -8,6 +8,7 @@ import com.joecollins.graphics.utils.StandardFont
 import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.Party
 import com.joecollins.pubsub.asOneTimePublisher
+import com.joecollins.pubsub.map
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Component
@@ -17,6 +18,7 @@ import java.awt.LayoutManager
 import java.awt.Point
 import java.awt.Shape
 import java.text.DecimalFormat
+import java.util.concurrent.Flow
 import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.border.EmptyBorder
@@ -52,16 +54,16 @@ class CandidateListingScreen private constructor(
     }
 
     companion object {
-        fun of(candidates: Binding<List<Candidate>>, header: Binding<String?>, subhead: Binding<String?>): Builder {
+        fun of(candidates: Flow.Publisher<out List<Candidate>>, header: Flow.Publisher<out String?>, subhead: Flow.Publisher<out String?>): Builder {
             return Builder(candidates, header, subhead, null)
         }
 
-        fun of(candidates: Binding<List<Candidate>>, header: Binding<String?>, subhead: Binding<String?>, incumbentMarker: String): Builder {
+        fun of(candidates: Flow.Publisher<out List<Candidate>>, header: Flow.Publisher<out String?>, subhead: Flow.Publisher<out String?>, incumbentMarker: String): Builder {
             return Builder(candidates, header, subhead, incumbentMarker)
         }
     }
 
-    class Builder internal constructor(candidates: Binding<List<Candidate>>, header: Binding<String?>, subhead: Binding<String?> = Binding.fixedBinding(""), incumbentMarker: String?) {
+    class Builder internal constructor(candidates: Flow.Publisher<out List<Candidate>>, header: Flow.Publisher<out String?>, subhead: Flow.Publisher<out String?> = "".asOneTimePublisher(), incumbentMarker: String?) {
         internal val candidatesPanel: JPanel
         internal var prevPanel: JPanel? = null
         internal var secondaryPrevPanel: JPanel? = null
@@ -79,20 +81,20 @@ class CandidateListingScreen private constructor(
                 .build()
         }
 
-        fun withPrev(prevVotes: Binding<Map<Party, Int>>, header: Binding<String?>, subhead: Binding<String?> = Binding.fixedBinding(null)): Builder {
-            prevPanel = BarFrameBuilder.basic(prevVotes.map { v -> createBars(v) }.toPublisher())
+        fun withPrev(prevVotes: Flow.Publisher<out Map<Party, Int>>, header: Flow.Publisher<out String?>, subhead: Flow.Publisher<out String?> = (null as String?).asOneTimePublisher()): Builder {
+            prevPanel = BarFrameBuilder.basic(prevVotes.map { v -> createBars(v) })
                 .withMax((2.0 / 3).asOneTimePublisher())
-                .withHeader(header.toPublisher())
-                .withSubhead(subhead.toPublisher())
+                .withHeader(header)
+                .withSubhead(subhead)
                 .build()
             return this
         }
 
-        fun withSecondaryPrev(prevVotes: Binding<Map<Party, Int>>, header: Binding<String?>, subhead: Binding<String?> = Binding.fixedBinding(null)): Builder {
-            secondaryPrevPanel = BarFrameBuilder.basic(prevVotes.map { v -> createBars(v) }.toPublisher())
+        fun withSecondaryPrev(prevVotes: Flow.Publisher<out Map<Party, Int>>, header: Flow.Publisher<out String?>, subhead: Flow.Publisher<out String?> = (null as String?).asOneTimePublisher()): Builder {
+            secondaryPrevPanel = BarFrameBuilder.basic(prevVotes.map { v -> createBars(v) })
                 .withMax((2.0 / 3).asOneTimePublisher())
-                .withHeader(header.toPublisher())
-                .withSubhead(subhead.toPublisher())
+                .withHeader(header)
+                .withSubhead(subhead)
                 .build()
             return this
         }
@@ -113,31 +115,31 @@ class CandidateListingScreen private constructor(
         }
 
         fun <K> withMap(
-            shapes: Binding<Map<K, Shape>>,
-            selectedShape: Binding<K>,
-            focus: Binding<List<K>?>,
-            header: Binding<String>
+            shapes: Binding<out Map<K, Shape>>,
+            selectedShape: Binding<out K>,
+            focus: Binding<out List<K>?>,
+            header: Binding<out String>
         ): Builder {
             mapPanel = MapBuilder(shapes, selectedShape, Binding.fixedBinding(null), focus, header).createMapFrame()
             return this
         }
 
         fun <K> withMap(
-            shapes: Binding<Map<K, Shape>>,
-            selectedShape: Binding<K>,
-            focus: Binding<List<K>?>,
-            additionalHighlight: Binding<List<K>?>,
-            header: Binding<String>
+            shapes: Binding<out Map<K, Shape>>,
+            selectedShape: Binding<out K>,
+            focus: Binding<out List<K>?>,
+            additionalHighlight: Binding<out List<K>?>,
+            header: Binding<out String>
         ): Builder {
             mapPanel = MapBuilder(shapes, selectedShape, Binding.fixedBinding(null), focus, additionalHighlight, header).createMapFrame()
             return this
         }
 
-        fun build(title: Binding<String>): CandidateListingScreen {
+        fun build(title: Binding<out String>): CandidateListingScreen {
             return CandidateListingScreen(createHeaderLabel(title), this)
         }
 
-        private fun createHeaderLabel(textBinding: Binding<String>): JLabel {
+        private fun createHeaderLabel(textBinding: Binding<out String>): JLabel {
             val headerLabel = FontSizeAdjustingLabel()
             headerLabel.font = StandardFont.readBoldFont(32)
             headerLabel.horizontalAlignment = JLabel.CENTER

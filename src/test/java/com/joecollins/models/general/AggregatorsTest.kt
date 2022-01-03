@@ -14,6 +14,7 @@ import com.joecollins.models.general.Aggregators.toPct
 import com.joecollins.models.general.Aggregators.topAndOthers
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.Subscriber
+import com.joecollins.pubsub.map
 import org.awaitility.Awaitility
 import org.hamcrest.core.IsEqual
 import org.junit.Assert
@@ -306,61 +307,85 @@ class AggregatorsTest {
 
     @Test
     fun testTopAndOthersBelowLimit() {
-        val votes = BindableWrapper(mapOf("ABC" to 5, "DEF" to 3))
+        val votes = Publisher(mapOf("ABC" to 5, "DEF" to 3))
         val output: BoundResult<Map<String, Int>> = BoundResult()
-        topAndOthers(votes.binding, 3, "OTHERS").bind { output.value = it }
-        Assert.assertEquals(mapOf("ABC" to 5, "DEF" to 3), output.value)
-        votes.value = mapOf("ABC" to 5, "DEF" to 7)
-        Assert.assertEquals(mapOf("ABC" to 5, "DEF" to 7), output.value)
+        topAndOthers(votes, 3, "OTHERS").subscribe(Subscriber { output.value = it })
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .ignoreException(NullPointerException::class.java)
+            .until({ output.value }, IsEqual(mapOf("ABC" to 5, "DEF" to 3)))
+        votes.submit(mapOf("ABC" to 5, "DEF" to 7))
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .ignoreException(NullPointerException::class.java)
+            .until({ output.value }, IsEqual(mapOf("ABC" to 5, "DEF" to 7)))
     }
 
     @Test
     fun testTopAndOthersAtLimit() {
-        val votes = BindableWrapper(mapOf("ABC" to 5, "DEF" to 3, "GHI" to 2))
+        val votes = Publisher(mapOf("ABC" to 5, "DEF" to 3, "GHI" to 2))
         val output: BoundResult<Map<String, Int>> = BoundResult()
-        topAndOthers(votes.binding, 3, "OTHERS").bind { output.value = it }
-        Assert.assertEquals(mapOf("ABC" to 5, "DEF" to 3, "GHI" to 2), output.value)
-        votes.value = mapOf("ABC" to 5, "DEF" to 7, "GHI" to 6)
-        Assert.assertEquals(mapOf("ABC" to 5, "DEF" to 7, "GHI" to 6), output.value)
+        topAndOthers(votes, 3, "OTHERS").subscribe(Subscriber { output.value = it })
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .ignoreException(NullPointerException::class.java)
+            .until({ output.value }, IsEqual(mapOf("ABC" to 5, "DEF" to 3, "GHI" to 2)))
+        votes.submit(mapOf("ABC" to 5, "DEF" to 7, "GHI" to 6))
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .ignoreException(NullPointerException::class.java)
+            .until({ output.value }, IsEqual(mapOf("ABC" to 5, "DEF" to 7, "GHI" to 6)))
     }
 
     @Test
     fun testTopAndOthersAboveLimit() {
-        val votes = BindableWrapper(mapOf("ABC" to 5, "DEF" to 3, "GHI" to 2, "JKL" to 4))
+        val votes = Publisher(mapOf("ABC" to 5, "DEF" to 3, "GHI" to 2, "JKL" to 4))
         val output: BoundResult<Map<String, Int>> = BoundResult()
-        topAndOthers(votes.binding, 3, "OTHERS").bind { output.value = it }
-        Assert.assertEquals(mapOf("ABC" to 5, "JKL" to 4, "OTHERS" to 5), output.value)
-        votes.value = mapOf("ABC" to 5, "DEF" to 7, "GHI" to 6, "JKL" to 4)
-        Assert.assertEquals(mapOf("DEF" to 7, "GHI" to 6, "OTHERS" to 9), output.value)
+        topAndOthers(votes, 3, "OTHERS").subscribe(Subscriber { output.value = it })
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .ignoreException(NullPointerException::class.java)
+            .until({ output.value }, IsEqual(mapOf("ABC" to 5, "JKL" to 4, "OTHERS" to 5)))
+        votes.submit(mapOf("ABC" to 5, "DEF" to 7, "GHI" to 6, "JKL" to 4))
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .ignoreException(NullPointerException::class.java)
+            .until({ output.value }, IsEqual(mapOf("DEF" to 7, "GHI" to 6, "OTHERS" to 9)))
     }
 
     @Test
     fun testTopAndOthersAboveLimitWithOthers() {
-        val votes = BindableWrapper(mapOf("ABC" to 5, "DEF" to 3, "GHI" to 2, "JKL" to 4, "OTHERS" to 6))
+        val votes = Publisher(mapOf("ABC" to 5, "DEF" to 3, "GHI" to 2, "JKL" to 4, "OTHERS" to 6))
         val output: BoundResult<Map<String, Int>> = BoundResult()
-        topAndOthers(votes.binding, 3, "OTHERS").bind { output.value = it }
-        Assert.assertEquals(mapOf("ABC" to 5, "JKL" to 4, "OTHERS" to 11), output.value)
-        votes.value = mapOf("ABC" to 5, "DEF" to 7, "GHI" to 6, "JKL" to 4, "OTHERS" to 7)
-        Assert.assertEquals(mapOf("DEF" to 7, "GHI" to 6, "OTHERS" to 16), output.value)
+        topAndOthers(votes, 3, "OTHERS").subscribe(Subscriber { output.value = it })
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .ignoreException(NullPointerException::class.java)
+            .until({ output.value }, IsEqual(mapOf("ABC" to 5, "JKL" to 4, "OTHERS" to 11)))
+        votes.submit(mapOf("ABC" to 5, "DEF" to 7, "GHI" to 6, "JKL" to 4, "OTHERS" to 7))
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .ignoreException(NullPointerException::class.java)
+            .until({ output.value }, IsEqual(mapOf("DEF" to 7, "GHI" to 6, "OTHERS" to 16)))
     }
 
     @Test
     fun testTopAndOthersAboveLimitWithMandatoryInclusion() {
-        val votes = BindableWrapper(mapOf("ABC" to 5, "DEF" to 3, "GHI" to 2, "JKL" to 4))
-        val winner = BindableWrapper<String?>(null)
+        val votes = Publisher(mapOf("ABC" to 5, "DEF" to 3, "GHI" to 2, "JKL" to 4))
+        val winner = Publisher<String?>(null)
         val output: BoundResult<Map<String, Int>> = BoundResult()
         topAndOthers(
-            votes.binding, 3, "OTHERS", winner.binding.map { if (it == null) emptyArray() else arrayOf(it) }
+            votes, 3, "OTHERS", winner.map { if (it == null) emptyArray() else arrayOf(it) }
         )
-            .bind { output.value = it }
-        Assert.assertEquals(mapOf("ABC" to 5, "JKL" to 4, "OTHERS" to 5), output.value)
-        votes.value = mapOf("ABC" to 5, "DEF" to 7, "GHI" to 6, "JKL" to 4)
-        winner.value = "ABC"
-        Assert.assertEquals(mapOf("DEF" to 7, "ABC" to 5, "OTHERS" to 10), output.value)
-        winner.value = null
-        Assert.assertEquals(mapOf("DEF" to 7, "GHI" to 6, "OTHERS" to 9), output.value)
-        winner.value = "DEF"
-        Assert.assertEquals(mapOf("DEF" to 7, "GHI" to 6, "OTHERS" to 9), output.value)
+            .subscribe(Subscriber { output.value = it })
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .ignoreException(NullPointerException::class.java)
+            .until({ output.value }, IsEqual(mapOf("ABC" to 5, "JKL" to 4, "OTHERS" to 5)))
+        votes.submit(mapOf("ABC" to 5, "DEF" to 7, "GHI" to 6, "JKL" to 4))
+        winner.submit("ABC")
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .ignoreException(NullPointerException::class.java)
+            .until({ output.value }, IsEqual(mapOf("DEF" to 7, "ABC" to 5, "OTHERS" to 10)))
+        winner.submit(null)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .ignoreException(NullPointerException::class.java)
+            .until({ output.value }, IsEqual(mapOf("DEF" to 7, "GHI" to 6, "OTHERS" to 9)))
+        winner.submit("DEF")
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .ignoreException(NullPointerException::class.java)
+            .until({ output.value }, IsEqual(mapOf("DEF" to 7, "GHI" to 6, "OTHERS" to 9)))
     }
 
     @Test

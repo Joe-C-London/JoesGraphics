@@ -7,6 +7,8 @@ import com.joecollins.graphics.utils.RenderTestUtils
 import com.joecollins.graphics.utils.ShapefileReader
 import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.Party
+import com.joecollins.pubsub.Publisher
+import com.joecollins.pubsub.asOneTimePublisher
 import org.junit.Test
 import java.awt.Color
 import java.awt.Dimension
@@ -26,9 +28,9 @@ class CandidateListingScreenTest {
             Candidate("Boyd Leard", grn)
         )
         val screen = CandidateListingScreen.of(
-            Binding.fixedBinding(candidates),
-            Binding.fixedBinding("CANDIDATES"),
-            Binding.fixedBinding(""),
+            candidates.asOneTimePublisher(),
+            "CANDIDATES".asOneTimePublisher(),
+            "".asOneTimePublisher(),
             "[MLA]"
         )
             .build(Binding.fixedBinding("SOURIS-ELMIRA"))
@@ -53,15 +55,15 @@ class CandidateListingScreenTest {
             ndp to 528
         )
         val screen = CandidateListingScreen.of(
-            Binding.fixedBinding(candidates),
-            Binding.fixedBinding("CANDIDATES"),
-            Binding.fixedBinding(""),
+            candidates.asOneTimePublisher(),
+            "CANDIDATES".asOneTimePublisher(),
+            "".asOneTimePublisher(),
             "[MLA]"
         )
             .withPrev(
-                Binding.fixedBinding(prev),
-                Binding.fixedBinding("2015 RESULT"),
-                Binding.fixedBinding(null)
+                prev.asOneTimePublisher(),
+                "2015 RESULT".asOneTimePublisher(),
+                null.asOneTimePublisher()
             )
             .build(Binding.fixedBinding("SOURIS-ELMIRA"))
         screen.size = Dimension(1024, 512)
@@ -86,9 +88,9 @@ class CandidateListingScreenTest {
         )
         val shapes = peiShapesByDistrict()
         val screen = CandidateListingScreen.of(
-            Binding.fixedBinding(candidates),
-            Binding.fixedBinding("CANDIDATES"),
-            Binding.fixedBinding(""),
+            candidates.asOneTimePublisher(),
+            "CANDIDATES".asOneTimePublisher(),
+            "".asOneTimePublisher(),
             "[MLA]"
         )
             .withMap(
@@ -98,9 +100,9 @@ class CandidateListingScreenTest {
                 Binding.fixedBinding("CARDIGAN")
             )
             .withPrev(
-                Binding.fixedBinding(prev),
-                Binding.fixedBinding("2015 RESULT"),
-                Binding.fixedBinding(null)
+                prev.asOneTimePublisher(),
+                "2015 RESULT".asOneTimePublisher(),
+                null.asOneTimePublisher()
             )
             .build(Binding.fixedBinding("SOURIS-ELMIRA"))
         screen.size = Dimension(1024, 512)
@@ -128,9 +130,9 @@ class CandidateListingScreenTest {
         )
         val shapes = peiShapesByDistrict()
         val screen = CandidateListingScreen.of(
-            Binding.fixedBinding(candidates),
-            Binding.fixedBinding("CANDIDATES"),
-            Binding.fixedBinding(""),
+            candidates.asOneTimePublisher(),
+            "CANDIDATES".asOneTimePublisher(),
+            "".asOneTimePublisher(),
             "[MLA]"
         )
             .withMap(
@@ -140,9 +142,9 @@ class CandidateListingScreenTest {
                 Binding.fixedBinding("CHARLOTTETOWN")
             )
             .withPrev(
-                Binding.fixedBinding(prev),
-                Binding.fixedBinding("2015 RESULT"),
-                Binding.fixedBinding(null)
+                prev.asOneTimePublisher(),
+                "2015 RESULT".asOneTimePublisher(),
+                null.asOneTimePublisher()
             )
             .build(Binding.fixedBinding("CHARLOTTETOWN-WEST ROYALTY"))
         screen.size = Dimension(1024, 512)
@@ -173,9 +175,9 @@ class CandidateListingScreenTest {
         )
         val shapes = peiShapesByDistrict()
         val screen = CandidateListingScreen.of(
-            Binding.fixedBinding(candidates),
-            Binding.fixedBinding("CANDIDATES"),
-            Binding.fixedBinding(""),
+            candidates.asOneTimePublisher(),
+            "CANDIDATES".asOneTimePublisher(),
+            "".asOneTimePublisher(),
             "[MLA]"
         )
             .withMap(
@@ -185,14 +187,14 @@ class CandidateListingScreenTest {
                 Binding.fixedBinding("CARDIGAN")
             )
             .withPrev(
-                Binding.fixedBinding(prev),
-                Binding.fixedBinding("2015 RESULT"),
-                Binding.fixedBinding(null)
+                prev.asOneTimePublisher(),
+                "2015 RESULT".asOneTimePublisher(),
+                null.asOneTimePublisher()
             )
             .withSecondaryPrev(
-                Binding.fixedBinding(secondaryPrev),
-                Binding.fixedBinding("2015 REGIONAL RESULT"),
-                Binding.fixedBinding(null)
+                secondaryPrev.asOneTimePublisher(),
+                "2015 REGIONAL RESULT".asOneTimePublisher(),
+                null.asOneTimePublisher()
             )
             .build(Binding.fixedBinding("SOURIS-ELMIRA"))
         screen.size = Dimension(1024, 512)
@@ -222,20 +224,20 @@ class CandidateListingScreenTest {
             ndp to 2404
         )
         val screen = CandidateListingScreen.of(
-            Binding.fixedBinding(candidates),
-            Binding.fixedBinding("CANDIDATES"),
-            Binding.fixedBinding(""),
+            candidates.asOneTimePublisher(),
+            "CANDIDATES".asOneTimePublisher(),
+            "".asOneTimePublisher(),
             "[MLA]"
         )
             .withPrev(
-                Binding.fixedBinding(prev),
-                Binding.fixedBinding("2015 RESULT"),
-                Binding.fixedBinding(null)
+                prev.asOneTimePublisher(),
+                "2015 RESULT".asOneTimePublisher(),
+                null.asOneTimePublisher()
             )
             .withSecondaryPrev(
-                Binding.fixedBinding(secondaryPrev),
-                Binding.fixedBinding("2015 REGIONAL RESULT"),
-                Binding.fixedBinding(null)
+                secondaryPrev.asOneTimePublisher(),
+                "2015 REGIONAL RESULT".asOneTimePublisher(),
+                null.asOneTimePublisher()
             )
             .build(Binding.fixedBinding("SOURIS-ELMIRA"))
         screen.size = Dimension(1024, 512)
@@ -248,7 +250,7 @@ class CandidateListingScreenTest {
         val grn = Party("Green", "GRN", Color.GREEN.darker())
         val pc = Party("Progressive Conservative", "PC", Color.BLUE)
         val ndp = Party("New Democratic Party", "NDP", Color.ORANGE)
-        val candidates = BindableWrapper(
+        val candidates = Publisher(
             listOf(
                 Candidate("Kevin Doyle", lib),
                 Candidate("Susan Hartley", grn),
@@ -256,7 +258,7 @@ class CandidateListingScreenTest {
                 Candidate("Steven Myers", pc, true)
             )
         )
-        val prev = BindableWrapper(
+        val prev = Publisher(
             mapOf(
                 lib to 1170,
                 pc to 1448,
@@ -264,7 +266,7 @@ class CandidateListingScreenTest {
                 ndp to 256
             )
         )
-        val secondaryPrev = BindableWrapper(
+        val secondaryPrev = Publisher(
             mapOf(
                 lib to 8016,
                 pc to 9444,
@@ -278,9 +280,9 @@ class CandidateListingScreenTest {
         val focus = BindableWrapper(listOf(1, 2, 3, 4, 5, 6, 7))
         val shapes = peiShapesByDistrict()
         val screen = CandidateListingScreen.of(
-            candidates.binding,
-            Binding.fixedBinding("CANDIDATES"),
-            Binding.fixedBinding(""),
+            candidates,
+            "CANDIDATES".asOneTimePublisher(),
+            "".asOneTimePublisher(),
             "[MLA]"
         )
             .withMap(
@@ -290,27 +292,29 @@ class CandidateListingScreenTest {
                 region.binding
             )
             .withPrev(
-                prev.binding,
-                Binding.fixedBinding("2015 RESULT"),
-                Binding.fixedBinding(null)
+                prev,
+                "2015 RESULT".asOneTimePublisher(),
+                null.asOneTimePublisher()
             )
             .withSecondaryPrev(
-                secondaryPrev.binding,
-                Binding.fixedBinding("2015 REGIONAL RESULT"),
-                Binding.fixedBinding(null)
+                secondaryPrev,
+                "2015 REGIONAL RESULT".asOneTimePublisher(),
+                null.asOneTimePublisher()
             )
             .build(districtName.binding)
         screen.size = Dimension(1024, 512)
         RenderTestUtils.compareRendering("CandidateListingScreen", "CandidatesUpdating-1", screen)
 
-        candidates.value = listOf(
-            Candidate("Sarah Donald", grn),
-            Candidate("Wade MacLauchlan", lib, true),
-            Candidate("Bloyce Thompson", pc),
-            Candidate("Marian White", ndp)
+        candidates.submit(
+            listOf(
+                Candidate("Sarah Donald", grn),
+                Candidate("Wade MacLauchlan", lib, true),
+                Candidate("Bloyce Thompson", pc),
+                Candidate("Marian White", ndp)
+            )
         )
-        prev.value = mapOf(lib to 1938, pc to 1338, grn to 347, ndp to 442)
-        secondaryPrev.value = mapOf(lib to 7767, pc to 8169, grn to 4011, ndp to 1427)
+        prev.submit(mapOf(lib to 1938, pc to 1338, grn to 347, ndp to 442))
+        secondaryPrev.submit(mapOf(lib to 7767, pc to 8169, grn to 4011, ndp to 1427))
         region.value = "MALPEQUE"
         districtName.value = "STANHOME-MARSFIELD"
         districtNum.value = 8
