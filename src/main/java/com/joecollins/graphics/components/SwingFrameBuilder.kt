@@ -1,23 +1,19 @@
 package com.joecollins.graphics.components
 
-import com.joecollins.bindings.Bindable
-import com.joecollins.bindings.Binding
-import com.joecollins.graphics.components.SwingFrameBuilder.SwingProperties.SwingProperty
 import com.joecollins.models.general.Party
+import com.joecollins.pubsub.Publisher
+import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.asOneTimePublisher
 import org.apache.commons.collections4.ComparatorUtils
 import java.awt.Color
 import java.text.DecimalFormat
 import java.util.Comparator
 import java.util.HashMap
+import java.util.concurrent.Flow
 import kotlin.math.sign
 
 class SwingFrameBuilder {
-    private class SwingProperties : Bindable<SwingProperties, SwingProperty>() {
-        enum class SwingProperty {
-            LEFT_COLOR, RIGHT_COLOR, VALUE, TEXT, BOTTOM_COLOR
-        }
-
+    private class SwingProperties {
         private var _leftColor = Color.BLACK
         private var _rightColor = Color.BLACK
         private var _value: Number = 0
@@ -28,86 +24,89 @@ class SwingFrameBuilder {
             get() { return _leftColor }
             set(leftColor) {
                 _leftColor = leftColor
-                onPropertyRefreshed(SwingProperty.LEFT_COLOR)
+                leftColorPublisher.submit(leftColor)
             }
+        val leftColorPublisher = Publisher(_leftColor)
 
         var rightColor: Color
             get() { return _rightColor }
             set(rightColor) {
                 this._rightColor = rightColor
-                onPropertyRefreshed(SwingProperty.RIGHT_COLOR)
+                rightColorPublisher.submit(rightColor)
             }
+        val rightColorPublisher = Publisher(_rightColor)
 
         var value: Number
             get() { return _value }
             set(value) {
                 this._value = value
-                onPropertyRefreshed(SwingProperty.VALUE)
+                valuePublisher.submit(value)
             }
+        val valuePublisher = Publisher(_value)
 
         var text: String
             get() { return _text }
             set(text) {
                 this._text = text
-                onPropertyRefreshed(SwingProperty.TEXT)
+                textPublisher.submit(text)
             }
+        val textPublisher = Publisher(_text)
 
         var bottomColor: Color
             get() { return _bottomColor }
             set(bottomColor) {
                 this._bottomColor = bottomColor
-                onPropertyRefreshed(SwingProperty.BOTTOM_COLOR)
+                bottomColorPublisher.submit(bottomColor)
             }
+        val bottomColorPublisher = Publisher(_bottomColor)
     }
 
-    private var rangeBinding: Binding<Number>? = null
-    private var headerBinding: Binding<String?>? = null
-    private var leftColorBinding: Binding<Color>? = null
-    private var rightColorBinding: Binding<Color>? = null
-    private var valueBinding: Binding<Number>? = null
-    private var bottomColorBinding: Binding<Color>? = null
-    private var bottomTextBinding: Binding<String>? = null
+    private var rangePublisher: Flow.Publisher<out Number>? = null
+    private var headerPublisher: Flow.Publisher<out String?>? = null
+    private var leftColorPublisher: Flow.Publisher<out Color>? = null
+    private var rightColorPublisher: Flow.Publisher<out Color>? = null
+    private var valuePublisher: Flow.Publisher<out Number>? = null
+    private var bottomColorPublisher: Flow.Publisher<out Color>? = null
+    private var bottomTextPublisher: Flow.Publisher<out String>? = null
 
     private val props = SwingProperties()
     private var neutralColor = Color.BLACK
 
-    private enum class SingletonProperty {
-        ALL
-    }
-
-    fun withRange(rangeBinding: Binding<Number>): SwingFrameBuilder {
-        this.rangeBinding = rangeBinding
+    fun withRange(rangePublisher: Flow.Publisher<out Number>): SwingFrameBuilder {
+        this.rangePublisher = rangePublisher
         return this
     }
 
-    fun withNeutralColor(neutralColorBinding: Binding<Color>): SwingFrameBuilder {
-        neutralColorBinding.bind {
-            neutralColor = it
-            if (props.value.toDouble() == 0.0) {
-                props.bottomColor = it
+    fun withNeutralColor(neutralColorPublisher: Flow.Publisher<out Color>): SwingFrameBuilder {
+        neutralColorPublisher.subscribe(
+            Subscriber {
+                neutralColor = it
+                if (props.value.toDouble() == 0.0) {
+                    props.bottomColor = it
+                }
             }
-        }
+        )
         return this
     }
 
-    fun withHeader(headerBinding: Binding<String?>): SwingFrameBuilder {
-        this.headerBinding = headerBinding
+    fun withHeader(headerPublisher: Flow.Publisher<out String?>): SwingFrameBuilder {
+        this.headerPublisher = headerPublisher
         return this
     }
 
     fun build(): SwingFrame {
         return SwingFrame(
-            headerPublisher = headerBinding?.toPublisher() ?: (null as String?).asOneTimePublisher(),
-            rangePublisher = rangeBinding?.toPublisher() ?: 1.asOneTimePublisher(),
-            valuePublisher = valueBinding?.toPublisher() ?: 0.asOneTimePublisher(),
-            leftColorPublisher = leftColorBinding?.toPublisher() ?: Color.BLACK.asOneTimePublisher(),
-            rightColorPublisher = rightColorBinding?.toPublisher() ?: Color.BLACK.asOneTimePublisher(),
-            bottomColorPublisher = bottomColorBinding?.toPublisher() ?: Color.BLACK.asOneTimePublisher(),
-            bottomTextPublisher = bottomTextBinding?.toPublisher() ?: null.asOneTimePublisher()
+            headerPublisher = headerPublisher ?: (null as String?).asOneTimePublisher(),
+            rangePublisher = rangePublisher ?: 1.asOneTimePublisher(),
+            valuePublisher = valuePublisher ?: 0.asOneTimePublisher(),
+            leftColorPublisher = leftColorPublisher ?: Color.BLACK.asOneTimePublisher(),
+            rightColorPublisher = rightColorPublisher ?: Color.BLACK.asOneTimePublisher(),
+            bottomColorPublisher = bottomColorPublisher ?: Color.BLACK.asOneTimePublisher(),
+            bottomTextPublisher = bottomTextPublisher ?: null.asOneTimePublisher()
         )
     }
 
-    private class BindablePrevCurrPct : Bindable<BindablePrevCurrPct, SingletonProperty>() {
+    private class SelfPublishingPrevCurrPct {
         private var prevPct: Map<Party, Double> = HashMap()
         private var currPct: Map<Party, Double> = HashMap()
         var fromParty: Party? = null
@@ -124,55 +123,59 @@ class SwingFrameBuilder {
             setProperties()
         }
 
+        val publisher = Publisher(this)
+
         fun setProperties() {
-            fromParty = prevPct.entries
-                .filter { e -> !java.lang.Double.isNaN(e.value) }
-                .maxByOrNull { it.value }
-                ?.key
-            toParty = currPct.entries
-                .filter { e -> e.key != fromParty }
-                .filter { e -> !java.lang.Double.isNaN(e.value) }
-                .maxByOrNull { it.value }
-                ?.key
-            if (fromParty != null && toParty != null) {
-                val fromSwing = (currPct[fromParty] ?: 0.0) - (prevPct[fromParty] ?: 0.0)
-                val toSwing = (currPct[toParty] ?: 0.0) - (prevPct[toParty] ?: 0.0)
-                swing = (toSwing - fromSwing) / 2
+            synchronized(this) {
+                fromParty = prevPct.entries
+                    .filter { e -> !java.lang.Double.isNaN(e.value) }
+                    .maxByOrNull { it.value }
+                    ?.key
+                toParty = currPct.entries
+                    .filter { e -> e.key != fromParty }
+                    .filter { e -> !java.lang.Double.isNaN(e.value) }
+                    .maxByOrNull { it.value }
+                    ?.key
+                if (fromParty != null && toParty != null) {
+                    val fromSwing = (currPct[fromParty] ?: 0.0) - (prevPct[fromParty] ?: 0.0)
+                    val toSwing = (currPct[toParty] ?: 0.0) - (prevPct[toParty] ?: 0.0)
+                    swing = (toSwing - fromSwing) / 2
+                }
+                if (swing < 0) {
+                    swing *= -1.0
+                    val temp = fromParty
+                    fromParty = toParty
+                    toParty = temp
+                }
+                publisher.submit(this)
             }
-            if (swing < 0) {
-                swing *= -1.0
-                val temp = fromParty
-                fromParty = toParty
-                toParty = temp
-            }
-            onPropertyRefreshed(SingletonProperty.ALL)
         }
     }
 
     companion object {
         @JvmStatic fun prevCurr(
-            prevBinding: Binding<Map<Party, Number>>,
-            currBinding: Binding<Map<Party, Number>>,
+            prevPublisher: Flow.Publisher<out Map<Party, Number>>,
+            currPublisher: Flow.Publisher<out Map<Party, Number>>,
             partyOrder: Comparator<Party>
         ): SwingFrameBuilder {
-            return prevCurr(prevBinding, currBinding, partyOrder, false)
+            return prevCurr(prevPublisher, currPublisher, partyOrder, false)
         }
 
         private fun <C : Map<Party, Number>, P : Map<Party, Number>> prevCurr(
-            prevBinding: Binding<P>,
-            currBinding: Binding<C>,
+            prevPublisher: Flow.Publisher<out P>,
+            currPublisher: Flow.Publisher<out C>,
             partyOrder: Comparator<Party>,
             normalised: Boolean
         ): SwingFrameBuilder {
-            val prevCurr = BindablePrevCurrPct()
+            val prevCurr = SelfPublishingPrevCurrPct()
             val toPctFunc = { votes: Map<Party, Number> ->
                 val total: Double = if (normalised) 1.0 else votes.values.map { it.toDouble() }.sum()
                 votes.mapValues { e -> e.value.toDouble() / total }
             }
-            prevBinding.bind { prevCurr.setPrevPct(toPctFunc(it)) }
-            currBinding.bind { prevCurr.setCurrPct(toPctFunc(it)) }
+            prevPublisher.subscribe(Subscriber { prevCurr.setPrevPct(toPctFunc(it)) })
+            currPublisher.subscribe(Subscriber { prevCurr.setCurrPct(toPctFunc(it)) })
             val ret = basic(
-                Binding.propertyBinding(prevCurr, { it }, SingletonProperty.ALL),
+                prevCurr.publisher,
                 {
                     val fromParty = it.fromParty
                     val toParty = it.toParty
@@ -226,21 +229,21 @@ class SwingFrameBuilder {
                     }
                 }
             )
-                .withRange(Binding.fixedBinding(0.1))
-                .withNeutralColor(Binding.fixedBinding(Color.LIGHT_GRAY))
+                .withRange(0.1.asOneTimePublisher())
+                .withNeutralColor(Color.LIGHT_GRAY.asOneTimePublisher())
             return ret
         }
 
         @JvmStatic fun prevCurrNormalised(
-            prevBinding: Binding<Map<Party, Double>>,
-            currBinding: Binding<Map<Party, Double>>,
+            prevPublisher: Flow.Publisher<out Map<Party, Double>>,
+            currPublisher: Flow.Publisher<out Map<Party, Double>>,
             partyOrder: Comparator<Party>
         ): SwingFrameBuilder {
-            return prevCurr(prevBinding, currBinding, partyOrder, true)
+            return prevCurr(prevPublisher, currPublisher, partyOrder, true)
         }
 
         @JvmStatic fun <T> basic(
-            binding: Binding<T>,
+            items: Flow.Publisher<out T>,
             leftColorFunc: (T) -> Color,
             rightColorFunc: (T) -> Color,
             valueFunc: (T) -> Number,
@@ -248,33 +251,30 @@ class SwingFrameBuilder {
         ): SwingFrameBuilder {
             val builder = SwingFrameBuilder()
             val props = builder.props
-            builder.leftColorBinding =
-                Binding.propertyBinding(props, { p: SwingProperties -> p.leftColor }, SwingProperty.LEFT_COLOR)
-            builder.rightColorBinding = Binding.propertyBinding(
-                props, { p: SwingProperties -> p.rightColor }, SwingProperty.RIGHT_COLOR
-            )
-            builder.valueBinding = Binding.propertyBinding(props, { p: SwingProperties -> p.value }, SwingProperty.VALUE)
-            builder.bottomColorBinding = Binding.propertyBinding(
-                props, { p: SwingProperties -> p.bottomColor }, SwingProperty.BOTTOM_COLOR
-            )
-            builder.bottomTextBinding = Binding.propertyBinding(props, { p: SwingProperties -> p.text }, SwingProperty.TEXT)
-            binding.bind {
-                props.leftColor = leftColorFunc(it)
-                props.rightColor = rightColorFunc(it)
-                props.value = valueFunc(it)
-                props.text = textFunc(it)
-                props.bottomColor = when {
-                    props.value.toDouble() > 0 -> {
-                        leftColorFunc(it)
-                    }
-                    props.value.toDouble() < 0 -> {
-                        rightColorFunc(it)
-                    }
-                    else -> {
-                        builder.neutralColor
+            builder.leftColorPublisher = props.leftColorPublisher
+            builder.rightColorPublisher = props.rightColorPublisher
+            builder.valuePublisher = props.valuePublisher
+            builder.bottomColorPublisher = props.bottomColorPublisher
+            builder.bottomTextPublisher = props.textPublisher
+            items.subscribe(
+                Subscriber {
+                    props.leftColor = leftColorFunc(it)
+                    props.rightColor = rightColorFunc(it)
+                    props.value = valueFunc(it)
+                    props.text = textFunc(it)
+                    props.bottomColor = when {
+                        props.value.toDouble() > 0 -> {
+                            leftColorFunc(it)
+                        }
+                        props.value.toDouble() < 0 -> {
+                            rightColorFunc(it)
+                        }
+                        else -> {
+                            builder.neutralColor
+                        }
                     }
                 }
-            }
+            )
             return builder
         }
     }

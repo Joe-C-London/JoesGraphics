@@ -9,6 +9,7 @@ import com.joecollins.graphics.components.SwingometerFrameBuilder
 import com.joecollins.graphics.utils.StandardFont
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
+import com.joecollins.pubsub.asOneTimePublisher
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.GridLayout
@@ -124,7 +125,7 @@ class SwingometerScreen private constructor(title: JLabel, frame: SwingometerFra
                         Pair(inputs.parties.first.color, inputs.parties.second.color)
                     },
                     Inputs.Property.PARTIES
-                ),
+                ).toPublisher(),
                 Binding.propertyBinding(
                     inputs,
                     { inputs: Inputs<T> ->
@@ -134,12 +135,12 @@ class SwingometerScreen private constructor(title: JLabel, frame: SwingometerFra
                     },
                     Inputs.Property.PARTIES,
                     Inputs.Property.SWINGS
-                )
+                ).toPublisher()
             )
-                .withDotsSolid(dotsList, { obj -> obj.first }, { obj -> obj.second }) { obj -> obj.third }
-                .withHeader(header.getBinding())
-                .withRange(Binding.propertyBinding(inputs, { inputs: Inputs<T> -> inputs.range }, Inputs.Property.RANGE))
-                .withTickInterval(Binding.fixedBinding(0.01)) { n: Number -> (n.toDouble() * 100).roundToInt().toString() }
+                .withDotsSolid(dotsList.toPublisher(), { obj -> obj.first }, { obj -> obj.second }) { obj -> obj.third }
+                .withHeader(header.getBinding().toPublisher())
+                .withRange(Binding.propertyBinding(inputs, { inputs: Inputs<T> -> inputs.range }, Inputs.Property.RANGE).toPublisher())
+                .withTickInterval(0.01.asOneTimePublisher()) { n: Number -> (n.toDouble() * 100).roundToInt().toString() }
                 .withLeftNeedingToWin(
                     Binding.propertyBinding(
                         inputs,
@@ -150,7 +151,7 @@ class SwingometerScreen private constructor(title: JLabel, frame: SwingometerFra
                         },
                         Inputs.Property.PREV,
                         Inputs.Property.PARTIES
-                    )
+                    ).toPublisher()
                 )
                 .withRightNeedingToWin(
                     Binding.propertyBinding(
@@ -162,10 +163,10 @@ class SwingometerScreen private constructor(title: JLabel, frame: SwingometerFra
                         },
                         Inputs.Property.PREV,
                         Inputs.Property.PARTIES
-                    )
+                    ).toPublisher()
                 )
-                .withBucketSize(Binding.fixedBinding(0.005))
-                .withOuterLabels(outerLabels, { obj -> obj.first }, { obj -> obj.third }) { obj -> obj.second }
+                .withBucketSize(0.005.asOneTimePublisher())
+                .withOuterLabels(outerLabels.toPublisher(), { obj -> obj.first }, { obj -> obj.third }) { obj -> obj.second }
                 .build()
         }
 

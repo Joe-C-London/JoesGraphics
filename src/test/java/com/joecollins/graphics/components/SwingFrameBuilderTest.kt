@@ -1,12 +1,11 @@
 package com.joecollins.graphics.components
 
-import com.joecollins.bindings.Binding
-import com.joecollins.bindings.Binding.Companion.fixedBinding
 import com.joecollins.graphics.components.SwingFrameBuilder.Companion.basic
 import com.joecollins.graphics.components.SwingFrameBuilder.Companion.prevCurr
 import com.joecollins.graphics.components.SwingFrameBuilder.Companion.prevCurrNormalised
-import com.joecollins.graphics.utils.BindableWrapper
 import com.joecollins.models.general.Party
+import com.joecollins.pubsub.Publisher
+import com.joecollins.pubsub.asOneTimePublisher
 import org.awaitility.Awaitility
 import org.hamcrest.core.IsEqual
 import org.junit.Assert
@@ -19,16 +18,16 @@ class SwingFrameBuilderTest {
 
     @Test
     fun basicTest() {
-        val swingProps = BindableWrapper(SwingProperties(Color.RED, Color.BLUE, 0.02, "2% SWING"))
+        val swingProps = Publisher(SwingProperties(Color.RED, Color.BLUE, 0.02, "2% SWING"))
         val frame = basic(
-            swingProps.binding,
+            swingProps,
             { p: SwingProperties -> p.leftColor },
             { p: SwingProperties -> p.rightColor },
             { p: SwingProperties -> p.value },
             { p: SwingProperties -> p.text }
         )
-            .withRange(fixedBinding(0.10))
-            .withHeader(fixedBinding("SWING"))
+            .withRange(0.10.asOneTimePublisher())
+            .withHeader("SWING".asOneTimePublisher())
             .build()
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.getLeftColor() }, IsEqual(Color.RED))
@@ -38,7 +37,7 @@ class SwingFrameBuilderTest {
         Assert.assertEquals("2% SWING", frame.getBottomText())
         Assert.assertEquals(0.10, frame.getRange())
         Assert.assertEquals("SWING", frame.header)
-        swingProps.value = SwingProperties(Color.GREEN, Color.ORANGE, -0.05, "5% SWING")
+        swingProps.submit(SwingProperties(Color.GREEN, Color.ORANGE, -0.05, "5% SWING"))
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.getLeftColor() }, IsEqual(Color.GREEN))
         Assert.assertEquals(Color.ORANGE, frame.getRightColor())
@@ -49,30 +48,30 @@ class SwingFrameBuilderTest {
 
     @Test
     fun testNeutralBottomColor() {
-        val swingProps = BindableWrapper(SwingProperties(Color.RED, Color.BLUE, 0.02, "2% SWING"))
-        val neutralColor = BindableWrapper(Color.GRAY)
+        val swingProps = Publisher(SwingProperties(Color.RED, Color.BLUE, 0.02, "2% SWING"))
+        val neutralColor = Publisher(Color.GRAY)
         val frame = basic(
-            swingProps.binding,
+            swingProps,
             { p: SwingProperties -> p.leftColor },
             { p: SwingProperties -> p.rightColor },
             { p: SwingProperties -> p.value },
             { p: SwingProperties -> p.text }
         )
-            .withRange(fixedBinding(0.10))
-            .withNeutralColor(neutralColor.binding)
+            .withRange(0.10.asOneTimePublisher())
+            .withNeutralColor(neutralColor)
             .build()
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.getBottomColor() }, IsEqual(Color.RED))
-        swingProps.value = SwingProperties(Color.GREEN, Color.ORANGE, -0.05, "5% SWING")
+        swingProps.submit(SwingProperties(Color.GREEN, Color.ORANGE, -0.05, "5% SWING"))
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.getBottomColor() }, IsEqual(Color.ORANGE))
-        neutralColor.value = Color.LIGHT_GRAY
+        neutralColor.submit(Color.LIGHT_GRAY)
         Awaitility.await().atMost(600, TimeUnit.MILLISECONDS).pollDelay(500, TimeUnit.MILLISECONDS)
             .until({ frame.getBottomColor() }, IsEqual(Color.ORANGE))
-        swingProps.value = SwingProperties(Color.GREEN, Color.ORANGE, 0.00, "NO SWING")
+        swingProps.submit(SwingProperties(Color.GREEN, Color.ORANGE, 0.00, "NO SWING"))
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.getBottomColor() }, IsEqual(Color.LIGHT_GRAY))
-        neutralColor.value = Color.BLACK
+        neutralColor.submit(Color.BLACK)
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.getBottomColor() }, IsEqual(Color.BLACK))
     }
@@ -82,8 +81,8 @@ class SwingFrameBuilderTest {
         val lib = Party("LIBERAL", "LIB", Color.RED)
         val con = Party("CONSERVATIVE", "CON", Color.BLUE)
         val ndp = Party("NEW DEMOCRATIC PARTY", "NDP", Color.ORANGE)
-        val prevBinding: Binding<Map<Party, Int>> = fixedBinding(mapOf(lib to 25, con to 15, ndp to 10))
-        val currBinding: Binding<Map<Party, Int>> = fixedBinding(mapOf(lib to 16, con to 13, ndp to 11))
+        val prevBinding = mapOf(lib to 25, con to 15, ndp to 10).asOneTimePublisher()
+        val currBinding = mapOf(lib to 16, con to 13, ndp to 11).asOneTimePublisher()
         // LIB: 50.00 -> 40.00 (-10.00)
         // CON: 30.00 -> 32.25 (+ 2.25)
         // NDP: 20.00 -> 27.75 (+ 7.75)
@@ -106,8 +105,8 @@ class SwingFrameBuilderTest {
         val lib = Party("LIBERAL", "LIB", Color.RED)
         val con = Party("CONSERVATIVE", "CON", Color.BLUE)
         val ndp = Party("NEW DEMOCRATIC PARTY", "NDP", Color.ORANGE)
-        val prevBinding: Binding<Map<Party, Int>> = fixedBinding(mapOf(lib to 25, con to 15, ndp to 10))
-        val currBinding: Binding<Map<Party, Int>> = fixedBinding(mapOf(lib to 26, con to 10, ndp to 4))
+        val prevBinding = mapOf(lib to 25, con to 15, ndp to 10).asOneTimePublisher()
+        val currBinding = mapOf(lib to 26, con to 10, ndp to 4).asOneTimePublisher()
         // LIB: 50.00 -> 65.00 (+15.00)
         // CON: 30.00 -> 25.00 (- 5.00)
         // NDP: 20.00 -> 10.00 (-10.00)
@@ -127,8 +126,8 @@ class SwingFrameBuilderTest {
         val lib = Party("LIBERAL", "LIB", Color.RED)
         val con = Party("CONSERVATIVE", "CON", Color.BLUE)
         val ndp = Party("NEW DEMOCRATIC PARTY", "NDP", Color.ORANGE)
-        val prevBinding: Binding<Map<Party, Int>> = fixedBinding(mapOf(lib to 25, con to 15, ndp to 10))
-        val currBinding: Binding<Map<Party, Int>> = fixedBinding(mapOf(lib to 26, con to 10, ndp to 4))
+        val prevBinding = mapOf(lib to 25, con to 15, ndp to 10).asOneTimePublisher()
+        val currBinding = mapOf(lib to 26, con to 10, ndp to 4).asOneTimePublisher()
         // LIB: 50.00 -> 65.00 (+15.00)
         // CON: 30.00 -> 25.00 (- 5.00)
         // NDP: 20.00 -> 10.00 (-10.00)
@@ -155,8 +154,8 @@ class SwingFrameBuilderTest {
         val lib = Party("LIBERAL", "LIB", Color.RED)
         val con = Party("CONSERVATIVE", "CON", Color.BLUE)
         val ndp = Party("NEW DEMOCRATIC PARTY", "NDP", Color.ORANGE)
-        val prevBinding: Binding<Map<Party, Int>> = fixedBinding(mapOf(lib to 15, con to 25, ndp to 10))
-        val currBinding: Binding<Map<Party, Int>> = fixedBinding(mapOf(lib to 6, con to 10, ndp to 24))
+        val prevBinding = mapOf(lib to 15, con to 25, ndp to 10).asOneTimePublisher()
+        val currBinding = mapOf(lib to 6, con to 10, ndp to 24).asOneTimePublisher()
         // LIB: 30.00 -> 15.00 (-15.00)
         // CON: 50.00 -> 25.00 (-25.00)
         // NDP: 20.00 -> 60.00 (+40.00)
@@ -176,8 +175,8 @@ class SwingFrameBuilderTest {
         val lib = Party("LIBERAL", "LIB", Color.RED)
         val con = Party("CONSERVATIVE", "CON", Color.BLUE)
         val ndp = Party("NEW DEMOCRATIC PARTY", "NDP", Color.ORANGE)
-        val prevBinding: Binding<Map<Party, Int>> = fixedBinding(mapOf(lib to 15, con to 25, ndp to 10))
-        val currBinding: Binding<Map<Party, Int>> = fixedBinding(mapOf(lib to 15, con to 25, ndp to 10))
+        val prevBinding = mapOf(lib to 15, con to 25, ndp to 10).asOneTimePublisher()
+        val currBinding = mapOf(lib to 15, con to 25, ndp to 10).asOneTimePublisher()
         val partyOrder = listOf(ndp, lib, con)
         val swingFrame = prevCurr(prevBinding, currBinding, Comparator.comparing { o: Party -> partyOrder.indexOf(o) }).build()
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
@@ -194,8 +193,8 @@ class SwingFrameBuilderTest {
         val lib = Party("LIBERAL", "LIB", Color.RED)
         val con = Party("CONSERVATIVE", "CON", Color.BLUE)
         val ndp = Party("NEW DEMOCRATIC PARTY", "NDP", Color.ORANGE)
-        val prevBinding: Binding<Map<Party, Int>> = fixedBinding(mapOf(lib to 15, con to 25, ndp to 10))
-        val currBinding: Binding<Map<Party, Int>> = fixedBinding(emptyMap())
+        val prevBinding = mapOf(lib to 15, con to 25, ndp to 10).asOneTimePublisher()
+        val currBinding = emptyMap<Party, Int>().asOneTimePublisher()
         val partyOrder = listOf(ndp, lib, con)
         val swingFrame = prevCurr(prevBinding, currBinding, Comparator.comparing { o: Party -> partyOrder.indexOf(o) }).build()
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
@@ -212,8 +211,8 @@ class SwingFrameBuilderTest {
         val lib = Party("LIBERAL", "LIB", Color.RED)
         val con = Party("CONSERVATIVE", "CON", Color.BLUE)
         val ndp = Party("NEW DEMOCRATIC PARTY", "NDP", Color.ORANGE)
-        val prevBinding: Binding<Map<Party, Double>> = fixedBinding(mapOf(lib to 0.40, con to 0.30, ndp to 0.20))
-        val currBinding: Binding<Map<Party, Double>> = fixedBinding(mapOf(lib to 0.38, con to 0.35, ndp to 0.18))
+        val prevBinding = mapOf(lib to 0.40, con to 0.30, ndp to 0.20).asOneTimePublisher()
+        val currBinding = mapOf(lib to 0.38, con to 0.35, ndp to 0.18).asOneTimePublisher()
         // LIB: 40.00 -> 38.00 (- 2.00)
         // CON: 30.00 -> 35.00 (+ 5.00)
         // NDP: 20.00 -> 18.00 (- 2.00)

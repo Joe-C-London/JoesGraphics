@@ -1,13 +1,13 @@
 package com.joecollins.graphics.screens.generic
 
-import com.joecollins.bindings.Binding.Companion.fixedBinding
 import com.joecollins.graphics.screens.generic.SeatsChangingScreen.Companion.of
-import com.joecollins.graphics.utils.BindableWrapper
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
 import com.joecollins.models.general.PartyResult.Companion.elected
 import com.joecollins.models.general.PartyResult.Companion.leading
+import com.joecollins.pubsub.Publisher
+import com.joecollins.pubsub.asOneTimePublisher
 import org.junit.Test
 import java.awt.Color
 import java.io.IOException
@@ -18,97 +18,105 @@ class SeatsChangingScreenTest {
     @Test
     @Throws(IOException::class)
     fun testSeatsChanging() {
-        val prevResult = BindableWrapper(bcPrevResult())
-        val currResult = BindableWrapper<Map<String, PartyResult?>>(emptyMap())
-        val numRows = BindableWrapper(15)
-        val title = BindableWrapper("BRITISH COLUMBIA")
+        val prevResult = Publisher(bcPrevResult())
+        val currResult = Publisher<Map<String, PartyResult?>>(emptyMap())
+        val numRows = Publisher(15)
+        val title = Publisher("BRITISH COLUMBIA")
         val nameShortener = { obj: String -> obj.uppercase() }
         val panel = of(
-            prevResult.binding,
-            currResult.binding, { nameShortener(it) },
-            fixedBinding("SEATS CHANGING")
+            prevResult,
+            currResult, { nameShortener(it) },
+            "SEATS CHANGING".asOneTimePublisher()
         )
-            .withNumRows(numRows.binding)
-            .build(title.binding)
+            .withNumRows(numRows)
+            .build(title)
         panel.setSize(1024, 512)
         compareRendering("SeatsChangingScreen", "Basic-1", panel)
-        currResult.value = mapOf(
-            "Coquitlam-Burke Mountain" to leading(ndp),
-            "Fraser-Nicola" to leading(ndp),
-            "Vancouver-False Creek" to leading(ndp)
+        currResult.submit(
+            mapOf(
+                "Coquitlam-Burke Mountain" to leading(ndp),
+                "Fraser-Nicola" to leading(ndp),
+                "Vancouver-False Creek" to leading(ndp)
+            )
         )
         compareRendering("SeatsChangingScreen", "Basic-2", panel)
-        currResult.value = mapOf(
-            "Coquitlam-Burke Mountain" to elected(ndp),
-            "Fraser-Nicola" to leading(lib),
-            "Richmond-Queensborough" to leading(ndp),
-            "Vancouver-False Creek" to leading(ndp)
+        currResult.submit(
+            mapOf(
+                "Coquitlam-Burke Mountain" to elected(ndp),
+                "Fraser-Nicola" to leading(lib),
+                "Richmond-Queensborough" to leading(ndp),
+                "Vancouver-False Creek" to leading(ndp)
+            )
         )
         compareRendering("SeatsChangingScreen", "Basic-3", panel)
-        currResult.value = bcCurrResult()
+        currResult.submit(bcCurrResult())
         compareRendering("SeatsChangingScreen", "Basic-4", panel)
     }
 
     @Test
     @Throws(IOException::class)
     fun testFilteredSeatsChanging() {
-        val prevResult = BindableWrapper(bcPrevResult())
-        val currResult = BindableWrapper<Map<String, PartyResult?>>(emptyMap())
-        val numRows = BindableWrapper(15)
-        val title = BindableWrapper("VANCOUVER")
-        val filteredSeats = BindableWrapper(
-            prevResult.value.keys
+        val prevResult = Publisher(bcPrevResult())
+        val currResult = Publisher<Map<String, PartyResult?>>(emptyMap())
+        val numRows = Publisher(15)
+        val title = Publisher("VANCOUVER")
+        val filteredSeats = Publisher(
+            bcPrevResult().keys
                 .filter { k: String -> k.startsWith("Vancouver") }
                 .toSet()
         )
         val nameShortener = { obj: String -> obj.uppercase() }
         val panel = of(
-            prevResult.binding,
-            currResult.binding, { nameShortener(it) },
-            fixedBinding("SEATS CHANGING")
+            prevResult,
+            currResult, { nameShortener(it) },
+            "SEATS CHANGING".asOneTimePublisher()
         )
-            .withNumRows(numRows.binding)
-            .withSeatFilter(filteredSeats.binding)
-            .build(title.binding)
+            .withNumRows(numRows)
+            .withSeatFilter(filteredSeats)
+            .build(title)
         panel.setSize(1024, 512)
         compareRendering("SeatsChangingScreen", "Filtered-1", panel)
-        currResult.value = mapOf(
-            "Coquitlam-Burke Mountain" to leading(ndp),
-            "Fraser-Nicola" to leading(ndp),
-            "Vancouver-False Creek" to leading(ndp)
+        currResult.submit(
+            mapOf(
+                "Coquitlam-Burke Mountain" to leading(ndp),
+                "Fraser-Nicola" to leading(ndp),
+                "Vancouver-False Creek" to leading(ndp)
+            )
         )
         compareRendering("SeatsChangingScreen", "Filtered-2", panel)
-        currResult.value = mapOf(
-            "Coquitlam-Burke Mountain" to elected(ndp),
-            "Fraser-Nicola" to leading(lib),
-            "Richmond-Queensborough" to leading(ndp),
-            "Vancouver-False Creek" to leading(ndp)
+        currResult.submit(
+            mapOf(
+                "Coquitlam-Burke Mountain" to elected(ndp),
+                "Fraser-Nicola" to leading(lib),
+                "Richmond-Queensborough" to leading(ndp),
+                "Vancouver-False Creek" to leading(ndp)
+            )
         )
         compareRendering("SeatsChangingScreen", "Filtered-3", panel)
-        currResult.value = bcCurrResult()
+        currResult.submit(bcCurrResult())
         compareRendering("SeatsChangingScreen", "Filtered-4", panel)
     }
 
     @Test
     @Throws(IOException::class)
     fun testSeatsChangingNullResults() {
-        val prevResult = BindableWrapper(bcPrevResult())
+        val prevResult = Publisher(bcPrevResult())
         val results = bcCurrResult()
         results.keys.forEach { riding: String -> results[riding] = null }
-        val currResult = BindableWrapper<Map<String, PartyResult?>>(results)
-        val numRows = BindableWrapper(15)
-        val title = BindableWrapper("BRITISH COLUMBIA")
+        val currResult = Publisher<Map<String, PartyResult?>>(results)
+        val numRows = Publisher(15)
+        val title = Publisher("BRITISH COLUMBIA")
         val nameShortener = { obj: String -> obj.uppercase() }
         val panel = of(
-            prevResult.binding,
-            currResult.binding, { nameShortener(it) },
-            fixedBinding("SEATS CHANGING")
+            prevResult,
+            currResult, { nameShortener(it) },
+            "SEATS CHANGING".asOneTimePublisher()
         )
-            .withNumRows(numRows.binding)
-            .build(title.binding)
+            .withNumRows(numRows)
+            .build(title)
         panel.setSize(1024, 512)
         compareRendering("SeatsChangingScreen", "Basic-1", panel)
-        currResult.value = bcCurrResult()
+        currResult.submit(bcCurrResult())
         compareRendering("SeatsChangingScreen", "Basic-4", panel)
     }
 

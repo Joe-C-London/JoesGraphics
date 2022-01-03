@@ -433,16 +433,16 @@ class MultiResultScreen private constructor() : JPanel() {
             add(barFrame)
             if (swingPartyOrder != null) {
                 swingFrame = SwingFrameBuilder.prevCurr(
-                    prevVotes.binding,
+                    prevVotes.binding.toPublisher(),
                     votes.binding
                         .map { m: Map<Candidate, Int> ->
                             val ret: MutableMap<Party, Int> = LinkedHashMap()
                             m.forEach { (k: Candidate, v: Int) -> ret.merge(k.party, v) { a, b -> Integer.sum(a, b) } }
                             ret
-                        },
+                        }.toPublisher(),
                     swingPartyOrder
                 )
-                    .withHeader(swingHeader.binding)
+                    .withHeader(swingHeader.binding.toPublisher())
                     .build()
                 add(swingFrame)
             }

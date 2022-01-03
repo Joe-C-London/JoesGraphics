@@ -1,25 +1,25 @@
 package com.joecollins.graphics.components
 
 import com.joecollins.bindings.Bindable
-import com.joecollins.bindings.Binding
-import com.joecollins.bindings.Binding.Companion.fixedBinding
 import com.joecollins.graphics.components.SwingometerFrameBuilder.Companion.basic
-import com.joecollins.graphics.utils.BindableWrapper
+import com.joecollins.pubsub.Publisher
+import com.joecollins.pubsub.asOneTimePublisher
 import org.awaitility.Awaitility
 import org.hamcrest.core.IsEqual
 import org.junit.Assert
 import org.junit.Test
 import java.awt.Color
 import java.text.DecimalFormat
+import java.util.concurrent.Flow
 import java.util.concurrent.TimeUnit
 
 class SwingometerFrameBuilderTest {
     @Test
     fun testBasic() {
-        val colors = BindableWrapper(Pair(Color.BLUE, Color.RED))
-        val value = BindableWrapper(-1.0)
-        val frame = basic(colors.binding, value.binding)
-            .withHeader(fixedBinding("SWINGOMETER"))
+        val colors = Publisher(Pair(Color.BLUE, Color.RED))
+        val value = Publisher(-1.0)
+        val frame = basic(colors, value)
+            .withHeader("SWINGOMETER".asOneTimePublisher())
             .build()
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.header }, IsEqual("SWINGOMETER"))
@@ -30,10 +30,10 @@ class SwingometerFrameBuilderTest {
 
     @Test
     fun testNaNIsZero() {
-        val colors = BindableWrapper(Pair(Color.BLUE, Color.RED))
-        val value = BindableWrapper(Double.NaN)
-        val frame = basic(colors.binding, value.binding)
-            .withHeader(fixedBinding("SWINGOMETER"))
+        val colors = Publisher(Pair(Color.BLUE, Color.RED))
+        val value = Publisher(Double.NaN)
+        val frame = basic(colors, value)
+            .withHeader("SWINGOMETER".asOneTimePublisher())
             .build()
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.header }, IsEqual("SWINGOMETER"))
@@ -44,34 +44,34 @@ class SwingometerFrameBuilderTest {
 
     @Test
     fun testMax() {
-        val colors = BindableWrapper(Pair(Color.BLUE, Color.RED))
-        val value = BindableWrapper(-1.0)
-        val range = BindableWrapper(10.0)
-        val bucketSize = BindableWrapper(0.5)
-        val frame = basic(colors.binding, value.binding)
-            .withRange(range.binding)
-            .withBucketSize(bucketSize.binding)
+        val colors = Publisher(Pair(Color.BLUE, Color.RED))
+        val value = Publisher(-1.0)
+        val range = Publisher(10.0)
+        val bucketSize = Publisher(0.5)
+        val frame = basic(colors, value)
+            .withRange(range)
+            .withBucketSize(bucketSize)
             .build()
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.value.toDouble() }, IsEqual(-1.0))
         Assert.assertEquals(10.0, frame.range.toDouble(), 0.0)
         Assert.assertEquals(20, frame.numBucketsPerSide.toLong())
-        value.value = 14.8
+        value.submit(14.8)
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.value.toDouble() }, IsEqual(14.8))
         Assert.assertEquals(15.0, frame.range.toDouble(), 0.0)
         Assert.assertEquals(30, frame.numBucketsPerSide.toLong())
-        value.value = -11.2
+        value.submit(-11.2)
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.value.toDouble() }, IsEqual(-11.2))
         Assert.assertEquals(11.5, frame.range.toDouble(), 0.0)
         Assert.assertEquals(23, frame.numBucketsPerSide.toLong())
-        value.value = 2.7
+        value.submit(2.7)
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.value.toDouble() }, IsEqual(2.7))
         Assert.assertEquals(10.0, frame.range.toDouble(), 0.0)
         Assert.assertEquals(20, frame.numBucketsPerSide.toLong())
-        value.value = -3.4
+        value.submit(-3.4)
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.value.toDouble() }, IsEqual(-3.4))
         Assert.assertEquals(10.0, frame.range.toDouble(), 0.0)
@@ -80,13 +80,13 @@ class SwingometerFrameBuilderTest {
 
     @Test
     fun testTicks() {
-        val colors = BindableWrapper(Pair(Color.BLUE, Color.RED))
-        val value = BindableWrapper(-1.0)
-        val range = BindableWrapper(10.0)
-        val tickInterval = BindableWrapper(1.0)
-        val frame = basic(colors.binding, value.binding)
-            .withRange(range.binding)
-            .withTickInterval(tickInterval.binding) { DecimalFormat("0").format(it) }
+        val colors = Publisher(Pair(Color.BLUE, Color.RED))
+        val value = Publisher(-1.0)
+        val range = Publisher(10.0)
+        val tickInterval = Publisher(1.0)
+        val frame = basic(colors, value)
+            .withRange(range)
+            .withTickInterval(tickInterval) { DecimalFormat("0").format(it) }
             .build()
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numTicks }, IsEqual(19))
@@ -94,20 +94,20 @@ class SwingometerFrameBuilderTest {
         Assert.assertEquals("9", ticks[-9.0])
         Assert.assertEquals("0", ticks[0.0])
         Assert.assertEquals("5", ticks[5.0])
-        value.value = 11.3
+        value.submit(11.3)
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numTicks }, IsEqual(23))
     }
 
     @Test
     fun testNeededToWin() {
-        val colors = BindableWrapper(Pair(Color.BLUE, Color.RED))
-        val value = BindableWrapper(-1.0)
-        val leftToWin = BindableWrapper(-2.0)
-        val rightToWin = BindableWrapper(4.0)
-        val frame = basic(colors.binding, value.binding)
-            .withLeftNeedingToWin(leftToWin.binding)
-            .withRightNeedingToWin(rightToWin.binding)
+        val colors = Publisher(Pair(Color.BLUE, Color.RED))
+        val value = Publisher(-1.0)
+        val leftToWin = Publisher(-2.0)
+        val rightToWin = Publisher(4.0)
+        val frame = basic(colors, value)
+            .withLeftNeedingToWin(leftToWin)
+            .withRightNeedingToWin(rightToWin)
             .build()
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.leftToWin.toDouble() }, IsEqual(-2.0))
@@ -118,7 +118,7 @@ class SwingometerFrameBuilderTest {
     fun testOuterLabels() {
         class OuterLabel(val color: Color, val label: String, val position: Double)
 
-        val labels = fixedBinding(
+        val labels =
             listOf(
                 OuterLabel(Color.RED, "306", 0.0),
                 OuterLabel(Color.RED, "350", 2.66),
@@ -131,10 +131,10 @@ class SwingometerFrameBuilderTest {
                 OuterLabel(Color.BLUE, "450", -9.455),
                 OuterLabel(Color.BLUE, "500", -13.86)
             )
-        )
-        val colors = BindableWrapper(Pair(Color.BLUE, Color.RED))
-        val value = BindableWrapper(-1.0)
-        val frame = basic(colors.binding, value.binding)
+                .asOneTimePublisher()
+        val colors = Publisher(Pair(Color.BLUE, Color.RED))
+        val value = Publisher(-1.0)
+        val frame = basic(colors, value)
             .withOuterLabels(labels, { it.position }, { it.label }, { it.color })
             .build()
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
@@ -149,7 +149,7 @@ class SwingometerFrameBuilderTest {
     fun testDotsWithoutLabels() {
         class Dot(val position: Double, val color: Color)
 
-        val dots = fixedBinding(
+        val dots =
             listOf(
                 Dot(0.115, Color.RED),
                 Dot(0.36, Color.RED),
@@ -159,10 +159,10 @@ class SwingometerFrameBuilderTest {
                 Dot(-0.76, Color.BLUE),
                 Dot(-0.76, Color.BLUE)
             )
-        )
-        val colors = BindableWrapper(Pair(Color.BLUE, Color.RED))
-        val value = BindableWrapper(-1.0)
-        val frame = basic(colors.binding, value.binding)
+                .asOneTimePublisher()
+        val colors = Publisher(Pair(Color.BLUE, Color.RED))
+        val value = Publisher(-1.0)
+        val frame = basic(colors, value)
             .withDots(dots, { it.position }, { it.color })
             .build()
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
@@ -176,7 +176,7 @@ class SwingometerFrameBuilderTest {
     fun testDotsWithLabels() {
         class Dot(val position: Double, val color: Color, val label: String)
 
-        val dots = fixedBinding(
+        val dots =
             listOf(
                 Dot(0.115, Color.RED, "16"),
                 Dot(0.36, Color.RED, "20"),
@@ -186,10 +186,10 @@ class SwingometerFrameBuilderTest {
                 Dot(-0.76, Color.BLUE, "10"),
                 Dot(-0.76, Color.BLUE, "6")
             )
-        )
-        val colors = BindableWrapper(Pair(Color.BLUE, Color.RED))
-        val value = BindableWrapper(-1.0)
-        val frame = basic(colors.binding, value.binding)
+                .asOneTimePublisher()
+        val colors = Publisher(Pair(Color.BLUE, Color.RED))
+        val value = Publisher(-1.0)
+        val frame = basic(colors, value)
             .withDots(dots, { it.position }, { it.color }, { it.label })
             .build()
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
@@ -203,7 +203,7 @@ class SwingometerFrameBuilderTest {
     fun testDotsSolidOrEmpty() {
         class Dot(val position: Double, val color: Color, val solid: Boolean)
 
-        val dots = fixedBinding(
+        val dots =
             listOf(
                 Dot(0.115, Color.RED, true),
                 Dot(0.36, Color.RED, true),
@@ -213,10 +213,10 @@ class SwingometerFrameBuilderTest {
                 Dot(-0.76, Color.BLUE, true),
                 Dot(-0.76, Color.BLUE, false)
             )
-        )
-        val colors = BindableWrapper(Pair(Color.BLUE, Color.RED))
-        val value = BindableWrapper(-1.0)
-        val frame = basic(colors.binding, value.binding)
+                .asOneTimePublisher()
+        val colors = Publisher(Pair(Color.BLUE, Color.RED))
+        val value = Publisher(-1.0)
+        val frame = basic(colors, value)
             .withDotsSolid(dots, { it.position }, { it.color }, { it.solid })
             .build()
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
@@ -234,13 +234,14 @@ class SwingometerFrameBuilderTest {
     @Test
     fun testFixedDots() {
         class Dot(val position: Double, private var color: Color) : Bindable<Dot, Property>() {
-            fun getColor(): Binding<Color> {
-                return Binding.propertyBinding(this, { it.color }, Property.PROP)
+            private val colorPublisher = Publisher(color)
+            fun getColor(): Flow.Publisher<Color> {
+                return colorPublisher
             }
 
             fun setColor(color: Color) {
                 this.color = color
-                onPropertyRefreshed(Property.PROP)
+                colorPublisher.submit(color)
             }
         }
 
@@ -252,9 +253,9 @@ class SwingometerFrameBuilderTest {
         dots.add(Dot(-0.185, Color.BLUE))
         dots.add(Dot(-0.76, Color.BLUE))
         dots.add(Dot(-0.76, Color.BLUE))
-        val colors = BindableWrapper(Pair(Color.BLUE, Color.RED))
-        val value = BindableWrapper(-1.0)
-        val frame = basic(colors.binding, value.binding)
+        val colors = Publisher(Pair(Color.BLUE, Color.RED))
+        val value = Publisher(-1.0)
+        val frame = basic(colors, value)
             .withFixedDots(dots, { it.position }, { it.getColor() })
             .build()
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)

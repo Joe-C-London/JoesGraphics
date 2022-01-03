@@ -298,11 +298,11 @@ class BasicResultPanel private constructor(
                 val curr = currVotes!!
                 val func = classificationFunc
                 SwingFrameBuilder.prevCurr(
-                    if (func == null) prev.getBinding() else Aggregators.adjustKey(prev.getBinding(), func),
-                    if (func == null) curr.getBinding() else Aggregators.adjustKey(curr.getBinding(), func),
+                    (if (func == null) prev.getBinding() else Aggregators.adjustKey(prev.getBinding(), func)).toPublisher(),
+                    (if (func == null) curr.getBinding() else Aggregators.adjustKey(curr.getBinding(), func)).toPublisher(),
                     swingComparator!!
                 )
-                    .withHeader(header.getBinding())
+                    .withHeader(header.getBinding().toPublisher())
                     .build()
             }
         }
@@ -1384,11 +1384,11 @@ class BasicResultPanel private constructor(
                 }
                 val classificationFunc = classificationFunc
                 return SwingFrameBuilder.prevCurr(
-                    if (classificationFunc == null) prev else Aggregators.adjustKey(prev, classificationFunc),
-                    if (classificationFunc == null) curr else Aggregators.adjustKey(curr, classificationFunc),
+                    (if (classificationFunc == null) prev else Aggregators.adjustKey(prev, classificationFunc)).toPublisher(),
+                    (if (classificationFunc == null) curr else Aggregators.adjustKey(curr, classificationFunc)).toPublisher(),
                     swingComparator!!
                 )
-                    .withHeader(swingHeader.getBinding())
+                    .withHeader(swingHeader.getBinding().toPublisher())
                     .build()
             }
         }
@@ -1571,8 +1571,8 @@ class BasicResultPanel private constructor(
                         m.forEach { (p: Party, r: ClosedRange<Double>) -> ret[p] = (1000000 * (r.start + r.endInclusive) / 2).roundToInt() }
                         ret
                     }
-                return SwingFrameBuilder.prevCurr(prev!!.getBinding(), curr, swingComparator!!)
-                    .withHeader(swingHeader.getBinding())
+                return SwingFrameBuilder.prevCurr(prev!!.getBinding().toPublisher(), curr.toPublisher(), swingComparator!!)
+                    .withHeader(swingHeader.getBinding().toPublisher())
                     .build()
             }
         }
@@ -1710,11 +1710,11 @@ class BasicResultPanel private constructor(
                 val prev = swingPrevVotes!!
                 val curr = swingCurrVotes!!
                 SwingFrameBuilder.prevCurr(
-                    prev.getBinding(),
-                    curr.getBinding(),
+                    prev.getBinding().toPublisher(),
+                    curr.getBinding().toPublisher(),
                     swingComparator!!
                 )
-                    .withHeader(header.getBinding())
+                    .withHeader(header.getBinding().toPublisher())
                     .build()
             }
         }
