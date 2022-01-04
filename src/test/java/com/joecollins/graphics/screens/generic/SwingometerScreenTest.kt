@@ -1,12 +1,12 @@
 package com.joecollins.graphics.screens.generic
 
-import com.joecollins.bindings.Binding.Companion.fixedBinding
 import com.joecollins.graphics.screens.generic.SwingometerScreen.Companion.of
-import com.joecollins.graphics.utils.BindableWrapper
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
 import com.joecollins.models.general.PartyResult.Companion.elected
+import com.joecollins.pubsub.Publisher
+import com.joecollins.pubsub.asOneTimePublisher
 import org.junit.Test
 import java.awt.Color
 import java.io.IOException
@@ -18,60 +18,60 @@ class SwingometerScreenTest {
     @Test
     @Throws(IOException::class)
     fun testBasicTwoParties() {
-        val prevResult = BindableWrapper(nbPrevResult())
-        val currResult = BindableWrapper<Map<String, PartyResult?>>(nbCurrResult())
-        val parties = BindableWrapper(Pair(lib, pc))
-        val swing = BindableWrapper(mapOf(pc to +0.0745, lib to -0.0345, grn to +0.0336, pa to -0.0339, ndp to -0.0335, ind to -0.0062))
+        val prevResult = Publisher(nbPrevResult())
+        val currResult = Publisher<Map<String, PartyResult?>>(nbCurrResult())
+        val parties = Publisher(Pair(lib, pc))
+        val swing = Publisher(mapOf(pc to +0.0745, lib to -0.0345, grn to +0.0336, pa to -0.0339, ndp to -0.0335, ind to -0.0062))
         val panel = of(
-            prevResult.binding,
-            currResult.binding,
-            swing.binding,
-            parties.binding,
-            fixedBinding("SWINGOMETER")
+            prevResult,
+            currResult,
+            swing,
+            parties,
+            "SWINGOMETER".asOneTimePublisher()
         )
-            .withSeatLabelIncrements(fixedBinding(3))
-            .build(fixedBinding("NEW BRUNSWICK"))
+            .withSeatLabelIncrements(3.asOneTimePublisher())
+            .build("NEW BRUNSWICK".asOneTimePublisher())
         panel.setSize(1024, 512)
         compareRendering("SwingometerScreen", "Basic-TwoParty-1", panel)
-        parties.value = Pair(grn, pc)
+        parties.submit(Pair(grn, pc))
         compareRendering("SwingometerScreen", "Basic-TwoParty-2", panel)
-        parties.value = Pair(pa, pc)
+        parties.submit(Pair(pa, pc))
         compareRendering("SwingometerScreen", "Basic-TwoParty-3", panel)
     }
 
     @Test
     @Throws(IOException::class)
     fun testBasicSwingUpdates() {
-        val prevResult = BindableWrapper(nbPrevResult())
+        val prevResult = Publisher(nbPrevResult())
         val result = nbCurrResult()
         result.keys.forEach { result[it] = null }
-        val currResult = BindableWrapper<Map<String, PartyResult?>>(result)
-        val parties = BindableWrapper(Pair(lib, pc))
-        val swing = BindableWrapper<Map<Party, Double>>(emptyMap())
+        val currResult = Publisher<Map<String, PartyResult?>>(result)
+        val parties = Publisher(Pair(lib, pc))
+        val swing = Publisher<Map<Party, Double>>(emptyMap())
         val panel = of(
-            prevResult.binding,
-            currResult.binding,
-            swing.binding,
-            parties.binding,
-            fixedBinding("SWINGOMETER")
+            prevResult,
+            currResult,
+            swing,
+            parties,
+            "SWINGOMETER".asOneTimePublisher()
         )
-            .withSeatLabelIncrements(fixedBinding(3))
-            .build(fixedBinding("NEW BRUNSWICK"))
+            .withSeatLabelIncrements(3.asOneTimePublisher())
+            .build("NEW BRUNSWICK".asOneTimePublisher())
         panel.setSize(1024, 512)
         compareRendering("SwingometerScreen", "Basic-Updates-1", panel)
-        currResult.value = nbCurrResult()
-        swing.value = mapOf(pc to +0.0745, lib to -0.0345, grn to +0.0336, pa to -0.0339, ndp to -0.0335, ind to -0.0062)
+        currResult.submit(nbCurrResult())
+        swing.submit(mapOf(pc to +0.0745, lib to -0.0345, grn to +0.0336, pa to -0.0339, ndp to -0.0335, ind to -0.0062))
         compareRendering("SwingometerScreen", "Basic-Updates-2", panel)
     }
 
     @Test
     @Throws(IOException::class)
     fun testFilteredTwoParties() {
-        val prevResult = BindableWrapper(nbPrevResult())
-        val currResult = BindableWrapper<Map<String, PartyResult?>>(nbCurrResult())
-        val parties = BindableWrapper(Pair(lib, pc))
-        val swing = BindableWrapper(mapOf(pc to +0.0745, lib to -0.0345, grn to +0.0336, pa to -0.0339, ndp to -0.0335, ind to -0.0062))
-        val seatsFiltered = BindableWrapper<Set<String>?>(
+        val prevResult = Publisher(nbPrevResult())
+        val currResult = Publisher<Map<String, PartyResult?>>(nbCurrResult())
+        val parties = Publisher(Pair(lib, pc))
+        val swing = Publisher(mapOf(pc to +0.0745, lib to -0.0345, grn to +0.0336, pa to -0.0339, ndp to -0.0335, ind to -0.0062))
+        val seatsFiltered = Publisher<Set<String>?>(
             setOf(
                 "Oromocto-Lincoln-Fredericton",
                 "Fredericton-Grand Lake",
@@ -84,20 +84,20 @@ class SwingometerScreenTest {
             )
         )
         val panel = of(
-            prevResult.binding,
-            currResult.binding,
-            swing.binding,
-            parties.binding,
-            fixedBinding("SWINGOMETER")
+            prevResult,
+            currResult,
+            swing,
+            parties,
+            "SWINGOMETER".asOneTimePublisher()
         )
-            .withSeatLabelIncrements(fixedBinding(3))
-            .withSeatFilter(seatsFiltered.binding)
-            .build(fixedBinding("NEW BRUNSWICK"))
+            .withSeatLabelIncrements(3.asOneTimePublisher())
+            .withSeatFilter(seatsFiltered)
+            .build("NEW BRUNSWICK".asOneTimePublisher())
         panel.setSize(1024, 512)
         compareRendering("SwingometerScreen", "Filtered-TwoParty-1", panel)
-        seatsFiltered.value = emptySet()
+        seatsFiltered.submit(emptySet())
         compareRendering("SwingometerScreen", "Filtered-TwoParty-2", panel)
-        seatsFiltered.value = null
+        seatsFiltered.submit(null)
         compareRendering("SwingometerScreen", "Filtered-TwoParty-3", panel)
     }
 

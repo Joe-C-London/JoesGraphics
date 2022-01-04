@@ -12,6 +12,7 @@ import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.Subscriber
+import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
 import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.map
 import com.joecollins.pubsub.merge
@@ -442,7 +443,7 @@ class MixedMemberResultPanel private constructor(
             headerLabel.font = StandardFont.readBoldFont(32)
             headerLabel.horizontalAlignment = JLabel.CENTER
             headerLabel.border = EmptyBorder(5, 0, -5, 0)
-            textPublisher.subscribe(Subscriber { headerLabel.text = it })
+            textPublisher.subscribe(Subscriber(eventQueueWrapper { headerLabel.text = it }))
             return headerLabel
         }
     }

@@ -1,7 +1,5 @@
 package com.joecollins.graphics.screens.generic
 
-import com.joecollins.bindings.Binding
-import com.joecollins.bindings.BindingReceiver
 import com.joecollins.graphics.ImageGenerator
 import com.joecollins.graphics.components.BarFrameBuilder
 import com.joecollins.graphics.components.FontSizeAdjustingLabel
@@ -9,6 +7,10 @@ import com.joecollins.graphics.utils.StandardFont
 import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
+import com.joecollins.pubsub.Subscriber
+import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
+import com.joecollins.pubsub.map
+import com.joecollins.pubsub.merge
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Component
@@ -17,6 +19,7 @@ import java.awt.Dimension
 import java.awt.LayoutManager
 import java.awt.Shape
 import java.text.DecimalFormat
+import java.util.concurrent.Flow
 import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.border.EmptyBorder
@@ -75,74 +78,74 @@ class SingleTransferrableResultScreen private constructor(
     companion object {
 
         fun withCandidates(
-            candidateVotes: Binding<Map<Candidate, Number?>>,
-            quota: Binding<Number?>,
-            elected: Binding<List<Pair<Candidate, Int>>>,
-            excluded: Binding<List<Candidate>>,
-            header: Binding<String?>,
-            subhead: Binding<String?>,
+            candidateVotes: Flow.Publisher<out Map<Candidate, Number?>>,
+            quota: Flow.Publisher<out Number?>,
+            elected: Flow.Publisher<out List<Pair<Candidate, Int>>>,
+            excluded: Flow.Publisher<out List<Candidate>>,
+            header: Flow.Publisher<out String?>,
+            subhead: Flow.Publisher<out String?>,
             incumbentMarker: String = ""
         ): Builder {
             return Builder(
-                BindingReceiver(candidateVotes),
-                BindingReceiver(quota),
-                BindingReceiver(elected),
-                BindingReceiver(excluded),
-                BindingReceiver(header),
-                BindingReceiver(subhead),
+                candidateVotes,
+                quota,
+                elected,
+                excluded,
+                header,
+                subhead,
                 incumbentMarker
             )
         }
     }
 
     class Builder(
-        private val candidateVotes: BindingReceiver<Map<Candidate, Number?>>,
-        private val quota: BindingReceiver<Number?>,
-        private val elected: BindingReceiver<List<Pair<Candidate, Int>>>,
-        private val excluded: BindingReceiver<List<Candidate>>,
-        private val candidateHeader: BindingReceiver<String?>,
-        private val candidateSubhead: BindingReceiver<String?>,
+        private val candidateVotes: Flow.Publisher<out Map<Candidate, Number?>>,
+        private val quota: Flow.Publisher<out Number?>,
+        private val elected: Flow.Publisher<out List<Pair<Candidate, Int>>>,
+        private val excluded: Flow.Publisher<out List<Candidate>>,
+        private val candidateHeader: Flow.Publisher<out String?>,
+        private val candidateSubhead: Flow.Publisher<out String?>,
         private val incumbentMarker: String
     ) {
 
-        private var totalSeats: BindingReceiver<Int>? = null
-        private var partyHeader: BindingReceiver<String?>? = null
+        private var totalSeats: Flow.Publisher<out Int>? = null
+        private var partyHeader: Flow.Publisher<out String?>? = null
 
-        private var prevSeats: BindingReceiver<Map<Party, Int>>? = null
-        private var prevHeader: BindingReceiver<String?>? = null
+        private var prevSeats: Flow.Publisher<out Map<Party, Int>>? = null
+        private var prevHeader: Flow.Publisher<out String?>? = null
 
         private var mapBuilder: MapBuilder<*>? = null
 
         fun withPartyTotals(
-            totalSeats: Binding<Int>,
-            partyHeader: Binding<String?>
+            totalSeats: Flow.Publisher<out Int>,
+            partyHeader: Flow.Publisher<out String?>
         ): Builder {
-            this.totalSeats = BindingReceiver(totalSeats)
-            this.partyHeader = BindingReceiver(partyHeader)
+            this.totalSeats = totalSeats
+            this.partyHeader = partyHeader
             return this
         }
 
         fun withPrevSeats(
-            prevSeats: Binding<Map<Party, Int>>,
-            prevHeader: Binding<String?>
+            prevSeats: Flow.Publisher<out Map<Party, Int>>,
+            prevHeader: Flow.Publisher<out String?>
         ): Builder {
-            this.prevSeats = BindingReceiver(prevSeats)
-            this.prevHeader = BindingReceiver(prevHeader)
+            this.prevSeats = prevSeats
+            this.prevHeader = prevHeader
             return this
         }
 
         fun <T> withPartyMap(
-            shapes: Binding<Map<T, Shape>>,
-            selectedShape: Binding<T>,
-            leadingParty: Binding<Party?>,
-            focus: Binding<List<T>?>,
-            header: Binding<String?>
+            shapes: Flow.Publisher<out Map<T, Shape>>,
+            selectedShape: Flow.Publisher<out T>,
+            leadingParty: Flow.Publisher<out Party?>,
+            focus: Flow.Publisher<out List<T>?>,
+            header: Flow.Publisher<out String?>
         ): Builder {
-            mapBuilder = MapBuilder(shapes.toPublisher(), selectedShape.toPublisher(), leadingParty.map { party: Party? -> PartyResult.elected(party) }.toPublisher(), focus.toPublisher(), header.toPublisher())
+            mapBuilder = MapBuilder(shapes, selectedShape, leadingParty.map { party: Party? -> PartyResult.elected(party) }, focus, header)
             return this
         }
 
-        fun build(title: Binding<String>): SingleTransferrableResultScreen {
+        fun build(title: Flow.Publisher<out String>): SingleTransferrableResultScreen {
             return SingleTransferrableResultScreen(
                 createHeaderLabel(title),
                 createCandidatesPanel(),
@@ -152,18 +155,18 @@ class SingleTransferrableResultScreen private constructor(
             )
         }
 
-        private fun createHeaderLabel(textBinding: Binding<String>): JLabel {
+        private fun createHeaderLabel(textPublisher: Flow.Publisher<out String>): JLabel {
             val headerLabel = FontSizeAdjustingLabel()
             headerLabel.font = StandardFont.readBoldFont(32)
             headerLabel.horizontalAlignment = JLabel.CENTER
             headerLabel.border = EmptyBorder(5, 0, -5, 0)
-            textBinding.bind { headerLabel.text = it }
+            textPublisher.subscribe(Subscriber(eventQueueWrapper { headerLabel.text = it }))
             return headerLabel
         }
 
         private fun createCandidatesPanel(): JPanel {
-            val votesQuota = candidateVotes.getBinding().merge(quota.getBinding()) { v, q -> v to q }
-            val inOut = elected.getBinding().merge(excluded.getBinding()) { el, ex -> el to ex }
+            val votesQuota = candidateVotes.merge(quota) { v, q -> v to q }
+            val inOut = elected.merge(excluded) { el, ex -> el to ex }
             return BarFrameBuilder.basic(
                 votesQuota.merge(inOut) { (votes, quota), (elected, excluded) ->
                     val electedCandidates = elected.map { it.first }
@@ -196,12 +199,12 @@ class SingleTransferrableResultScreen private constructor(
                     sequenceOf(alreadyElectedSequence, thisRoundSequence)
                         .flatten()
                         .toList()
-                }.toPublisher()
+                }
             )
-                .withHeader(candidateHeader.getBinding().toPublisher())
-                .withSubhead(candidateSubhead.getBinding().toPublisher())
-                .withMax(quota.getBinding { (it?.toDouble() ?: 1.0) * 2 }.toPublisher())
-                .withLines(quota.getBinding { if (it == null) emptyList() else listOf(it) }.toPublisher()) { "QUOTA: " + formatString(it) }
+                .withHeader(candidateHeader)
+                .withSubhead(candidateSubhead)
+                .withMax(quota.map { (it?.toDouble() ?: 1.0) * 2 })
+                .withLines(quota.map { if (it == null) emptyList() else listOf(it) }) { "QUOTA: " + formatString(it) }
                 .build()
         }
 
@@ -209,9 +212,9 @@ class SingleTransferrableResultScreen private constructor(
             if (partyHeader == null) {
                 return null
             }
-            val quotaAndElected = quota.getBinding().merge(elected.getBinding { e -> e.map { it.first } }) { q, e -> q to e }
+            val quotaAndElected = quota.merge(elected.map { e -> e.map { it.first } }) { q, e -> q to e }
             return BarFrameBuilder.basic(
-                candidateVotes.getBinding().merge(quotaAndElected) { votes, (quota, elected) ->
+                candidateVotes.merge(quotaAndElected) { votes, (quota, elected) ->
                     val electedEarlier = elected.filter { !votes.containsKey(it) }
                         .groupingBy { it.party }
                         .eachCount()
@@ -233,11 +236,11 @@ class SingleTransferrableResultScreen private constructor(
                                 valueLabel = formatString(it.value)
                             )
                         }
-                }.toPublisher()
+                }
             )
-                .withHeader(partyHeader!!.getBinding().toPublisher())
-                .withMax(totalSeats!!.getBinding().toPublisher())
-                .withLines(totalSeats!!.getBinding { (1 until it).toList() }.toPublisher()) { i -> "$i QUOTA${if (i == 1) "" else "S"}" }
+                .withHeader(partyHeader!!)
+                .withMax(totalSeats!!)
+                .withLines(totalSeats!!.map { (1 until it).toList() }) { i -> "$i QUOTA${if (i == 1) "" else "S"}" }
                 .build()
         }
 
@@ -246,7 +249,7 @@ class SingleTransferrableResultScreen private constructor(
                 return null
             }
             return BarFrameBuilder.basic(
-                prevSeats!!.getBinding { prev ->
+                prevSeats!!.map { prev ->
                     prev.entries
                         .sortedByDescending { it.value }
                         .map {
@@ -256,10 +259,10 @@ class SingleTransferrableResultScreen private constructor(
                                 value = it.value
                             )
                         }
-                }.toPublisher()
+                }
             )
-                .withMax(prevSeats!!.getBinding { prev -> prev.values.sum() / 2 }.toPublisher())
-                .withHeader(prevHeader!!.getBinding().toPublisher())
+                .withMax(prevSeats!!.map { prev -> prev.values.sum() / 2 })
+                .withHeader(prevHeader!!)
                 .build()
         }
 

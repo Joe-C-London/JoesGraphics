@@ -8,6 +8,8 @@ import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.graphics.utils.ShapefileReader
 import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.Party
+import com.joecollins.pubsub.Publisher
+import com.joecollins.pubsub.asOneTimePublisher
 import org.junit.Test
 import java.awt.Color
 import java.awt.Dimension
@@ -258,7 +260,7 @@ class SingleTransferrableResultScreenTest {
         val odonnell = Candidate("Mair\u00e9ad O'Donnell", sf)
         val robinson = Candidate("Courtney Robinson", labalt)
 
-        val candidateVotes = BindableWrapper<Map<Candidate, Number?>>(
+        val candidateVotes = Publisher<Map<Candidate, Number?>>(
             mapOf(
                 allen to null,
                 bodel to null,
@@ -276,203 +278,225 @@ class SingleTransferrableResultScreenTest {
                 robinson to null
             )
         )
-        val quota = BindableWrapper<Int?>(null)
-        val elected = BindableWrapper<List<Pair<Candidate, Int>>>(emptyList())
-        val excluded = BindableWrapper<List<Candidate>>(emptyList())
-        val candidateHeader = BindableWrapper("WAITING FOR RESULTS...")
-        val candidateSubhead = BindableWrapper("0 OF 5 SEATS ELECTED")
-        val currWinner = BindableWrapper<Party?>(null)
+        val quota = Publisher<Int?>(null)
+        val elected = Publisher<List<Pair<Candidate, Int>>>(emptyList())
+        val excluded = Publisher<List<Candidate>>(emptyList())
+        val candidateHeader = Publisher("WAITING FOR RESULTS...")
+        val candidateSubhead = Publisher("0 OF 5 SEATS ELECTED")
+        val currWinner = Publisher<Party?>(null)
 
         val panel = SingleTransferrableResultScreen.withCandidates(
-            candidateVotes.binding,
-            quota.binding,
-            elected.binding,
-            excluded.binding,
-            candidateHeader.binding,
-            candidateSubhead.binding,
+            candidateVotes,
+            quota,
+            elected,
+            excluded,
+            candidateHeader,
+            candidateSubhead,
             "[MLA]"
         )
             .withPartyTotals(
-                Binding.fixedBinding(5),
-                Binding.fixedBinding("TOTAL QUOTAS BY PARTY")
+                5.asOneTimePublisher(),
+                "TOTAL QUOTAS BY PARTY".asOneTimePublisher()
             )
             .withPrevSeats(
-                Binding.fixedBinding(mapOf(dup to 3, apni to 2, uup to 1)),
-                Binding.fixedBinding("SEATS IN 2016")
+                mapOf(dup to 3, apni to 2, uup to 1).asOneTimePublisher(),
+                "SEATS IN 2016".asOneTimePublisher()
             )
             .withPartyMap(
-                Binding.fixedBinding(niShapesByConstituency()),
-                Binding.fixedBinding(9),
-                currWinner.binding,
-                Binding.fixedBinding(listOf(9, 10, 12, 15)),
-                Binding.fixedBinding("BELFAST")
+                niShapesByConstituency().asOneTimePublisher(),
+                9.asOneTimePublisher(),
+                currWinner,
+                listOf(9, 10, 12, 15).asOneTimePublisher(),
+                "BELFAST".asOneTimePublisher()
             )
-            .build(Binding.fixedBinding("BELFAST EAST"))
+            .build("BELFAST EAST".asOneTimePublisher())
         panel.size = Dimension(1024, 512)
         compareRendering("SingleTransferrableResultScreen", "Candidates-0", panel)
 
-        candidateVotes.value = mapOf(
-            long to 7610,
-            lyttle to 5059,
-            allen to 5275,
-            bunting to 6007,
-            newton to 4729,
-            douglas to 4431,
-            kyle to 2658,
-            milne to 1447,
-            odonnell to 1173,
-            girvin to 917,
-            robinson to 442,
-            bodel to 275,
-            defaoite to 250,
-            mckeag to 84
+        candidateVotes.submit(
+            mapOf(
+                long to 7610,
+                lyttle to 5059,
+                allen to 5275,
+                bunting to 6007,
+                newton to 4729,
+                douglas to 4431,
+                kyle to 2658,
+                milne to 1447,
+                odonnell to 1173,
+                girvin to 917,
+                robinson to 442,
+                bodel to 275,
+                defaoite to 250,
+                mckeag to 84
+            )
         )
-        elected.value = listOf(long to 1)
-        candidateHeader.value = "COUNT 1"
-        candidateSubhead.value = "1 OF 5 SEATS ELECTED"
-        quota.value = 6727
-        currWinner.value = dup
+        elected.submit(listOf(long to 1))
+        candidateHeader.submit("COUNT 1")
+        candidateSubhead.submit("1 OF 5 SEATS ELECTED")
+        quota.submit(6727)
+        currWinner.submit(dup)
         compareRendering("SingleTransferrableResultScreen", "Candidates-1", panel)
 
-        candidateVotes.value = mapOf(
-            lyttle to 5760.03,
-            allen to 5313.17,
-            bunting to 6016.02,
-            newton to 4734.50,
-            douglas to 4435.18,
-            kyle to 2673.29,
-            milne to 1474.06,
-            odonnell to 1183.34,
-            girvin to 918.65,
-            robinson to 449.48,
-            bodel to 276.32,
-            defaoite to 260.45,
-            mckeag to 85.43
+        candidateVotes.submit(
+            mapOf(
+                lyttle to 5760.03,
+                allen to 5313.17,
+                bunting to 6016.02,
+                newton to 4734.50,
+                douglas to 4435.18,
+                kyle to 2673.29,
+                milne to 1474.06,
+                odonnell to 1183.34,
+                girvin to 918.65,
+                robinson to 449.48,
+                bodel to 276.32,
+                defaoite to 260.45,
+                mckeag to 85.43
+            )
         )
-        excluded.value = listOf(mckeag)
-        candidateHeader.value = "COUNT 2"
+        excluded.submit(listOf(mckeag))
+        candidateHeader.submit("COUNT 2")
         compareRendering("SingleTransferrableResultScreen", "Candidates-2", panel)
 
-        candidateVotes.value = mapOf(
-            lyttle to 5780.25,
-            allen to 5323.39,
-            bunting to 6021.02,
-            newton to 4736.50,
-            douglas to 4436.18,
-            kyle to 2678.51,
-            milne to 1500.28,
-            odonnell to 1185.45,
-            girvin to 920.65,
-            robinson to 456.48,
-            bodel to 278.43,
-            defaoite to 260.56
+        candidateVotes.submit(
+            mapOf(
+                lyttle to 5780.25,
+                allen to 5323.39,
+                bunting to 6021.02,
+                newton to 4736.50,
+                douglas to 4436.18,
+                kyle to 2678.51,
+                milne to 1500.28,
+                odonnell to 1185.45,
+                girvin to 920.65,
+                robinson to 456.48,
+                bodel to 278.43,
+                defaoite to 260.56
+            )
         )
-        excluded.value = listOf(mckeag, defaoite)
-        candidateHeader.value = "COUNT 3"
+        excluded.submit(listOf(mckeag, defaoite))
+        candidateHeader.submit("COUNT 3")
         compareRendering("SingleTransferrableResultScreen", "Candidates-3", panel)
 
-        candidateVotes.value = mapOf(
-            lyttle to 5885.86,
-            allen to 5356.60,
-            bunting to 6026.13,
-            newton to 4739.50,
-            douglas to 4440.18,
-            kyle to 2685.73,
-            milne to 1539.49,
-            odonnell to 1216.66,
-            girvin to 924.76,
-            robinson to 467.81,
-            bodel to 280.43
+        candidateVotes.submit(
+            mapOf(
+                lyttle to 5885.86,
+                allen to 5356.60,
+                bunting to 6026.13,
+                newton to 4739.50,
+                douglas to 4440.18,
+                kyle to 2685.73,
+                milne to 1539.49,
+                odonnell to 1216.66,
+                girvin to 924.76,
+                robinson to 467.81,
+                bodel to 280.43
+            )
         )
-        excluded.value = listOf(mckeag, defaoite, bodel, robinson)
-        candidateHeader.value = "COUNT 4"
+        excluded.submit(listOf(mckeag, defaoite, bodel, robinson))
+        candidateHeader.submit("COUNT 4")
         compareRendering("SingleTransferrableResultScreen", "Candidates-4", panel)
 
-        candidateVotes.value = mapOf(
-            lyttle to 6032.81,
-            allen to 5498.59,
-            bunting to 6057.35,
-            newton to 4774.50,
-            douglas to 4455.40,
-            kyle to 2751.95,
-            milne to 1763.36,
-            odonnell to 1232.88,
-            girvin to 958.87
+        candidateVotes.submit(
+            mapOf(
+                lyttle to 6032.81,
+                allen to 5498.59,
+                bunting to 6057.35,
+                newton to 4774.50,
+                douglas to 4455.40,
+                kyle to 2751.95,
+                milne to 1763.36,
+                odonnell to 1232.88,
+                girvin to 958.87
+            )
         )
-        excluded.value = listOf(mckeag, defaoite, bodel, robinson, girvin)
-        candidateHeader.value = "COUNT 5"
+        excluded.submit(listOf(mckeag, defaoite, bodel, robinson, girvin))
+        candidateHeader.submit("COUNT 5")
         compareRendering("SingleTransferrableResultScreen", "Candidates-5", panel)
 
-        candidateVotes.value = mapOf(
-            lyttle to 6072.14,
-            allen to 5767.92,
-            bunting to 6217.46,
-            newton to 4862.61,
-            douglas to 4568.40,
-            kyle to 2936.28,
-            milne to 1801.58,
-            odonnell to 1235.10
+        candidateVotes.submit(
+            mapOf(
+                lyttle to 6072.14,
+                allen to 5767.92,
+                bunting to 6217.46,
+                newton to 4862.61,
+                douglas to 4568.40,
+                kyle to 2936.28,
+                milne to 1801.58,
+                odonnell to 1235.10
+            )
         )
-        excluded.value = listOf(mckeag, defaoite, bodel, robinson, girvin, odonnell)
-        candidateHeader.value = "COUNT 6"
+        excluded.submit(listOf(mckeag, defaoite, bodel, robinson, girvin, odonnell))
+        candidateHeader.submit("COUNT 6")
         compareRendering("SingleTransferrableResultScreen", "Candidates-6", panel)
 
-        candidateVotes.value = mapOf(
-            lyttle to 6367.87,
-            allen to 5783.14,
-            bunting to 6228.46,
-            newton to 4865.61,
-            douglas to 4572.40,
-            kyle to 2950.28,
-            milne to 2080.65
+        candidateVotes.submit(
+            mapOf(
+                lyttle to 6367.87,
+                allen to 5783.14,
+                bunting to 6228.46,
+                newton to 4865.61,
+                douglas to 4572.40,
+                kyle to 2950.28,
+                milne to 2080.65
+            )
         )
-        excluded.value = listOf(mckeag, defaoite, bodel, robinson, girvin, odonnell, milne)
-        candidateHeader.value = "COUNT 7"
+        excluded.submit(listOf(mckeag, defaoite, bodel, robinson, girvin, odonnell, milne))
+        candidateHeader.submit("COUNT 7")
         compareRendering("SingleTransferrableResultScreen", "Candidates-7", panel)
 
-        candidateVotes.value = mapOf(
-            lyttle to 7268.87,
-            allen to 6048.62,
-            bunting to 6275.01,
-            newton to 4890.72,
-            douglas to 4599.73,
-            kyle to 3148.79
+        candidateVotes.submit(
+            mapOf(
+                lyttle to 7268.87,
+                allen to 6048.62,
+                bunting to 6275.01,
+                newton to 4890.72,
+                douglas to 4599.73,
+                kyle to 3148.79
+            )
         )
-        candidateSubhead.value = "2 OF 5 SEATS ELECTED"
-        elected.value = listOf(long to 1, lyttle to 8)
-        excluded.value = listOf(mckeag, defaoite, bodel, robinson, girvin, odonnell, milne, kyle)
-        candidateHeader.value = "COUNT 8"
+        candidateSubhead.submit("2 OF 5 SEATS ELECTED")
+        elected.submit(listOf(long to 1, lyttle to 8))
+        excluded.submit(listOf(mckeag, defaoite, bodel, robinson, girvin, odonnell, milne, kyle))
+        candidateHeader.submit("COUNT 8")
         compareRendering("SingleTransferrableResultScreen", "Candidates-8", panel)
 
-        candidateVotes.value = mapOf(
-            allen to 7257.62,
-            bunting to 6759.01,
-            newton to 5268.26,
-            douglas to 4995.25
+        candidateVotes.submit(
+            mapOf(
+                allen to 7257.62,
+                bunting to 6759.01,
+                newton to 5268.26,
+                douglas to 4995.25
+            )
         )
-        candidateSubhead.value = "4 OF 5 SEATS ELECTED"
-        elected.value = listOf(long to 1, lyttle to 8, allen to 9, bunting to 9)
-        excluded.value = listOf(mckeag, defaoite, bodel, robinson, girvin, odonnell, milne, kyle)
-        candidateHeader.value = "COUNT 9"
+        candidateSubhead.submit("4 OF 5 SEATS ELECTED")
+        elected.submit(listOf(long to 1, lyttle to 8, allen to 9, bunting to 9))
+        excluded.submit(listOf(mckeag, defaoite, bodel, robinson, girvin, odonnell, milne, kyle))
+        candidateHeader.submit("COUNT 9")
         compareRendering("SingleTransferrableResultScreen", "Candidates-9", panel)
 
-        candidateVotes.value = mapOf(
-            newton to 5333.26,
-            douglas to 5093.25
+        candidateVotes.submit(
+            mapOf(
+                newton to 5333.26,
+                douglas to 5093.25
+            )
         )
-        elected.value = listOf(long to 1, lyttle to 8, allen to 9, bunting to 9)
-        excluded.value = listOf(mckeag, defaoite, bodel, robinson, girvin, odonnell, milne, kyle)
-        candidateHeader.value = "COUNT 10"
+        elected.submit(listOf(long to 1, lyttle to 8, allen to 9, bunting to 9))
+        excluded.submit(listOf(mckeag, defaoite, bodel, robinson, girvin, odonnell, milne, kyle))
+        candidateHeader.submit("COUNT 10")
         compareRendering("SingleTransferrableResultScreen", "Candidates-10", panel)
 
-        candidateVotes.value = mapOf(
-            newton to 5541.65,
-            douglas to 5410.84
+        candidateVotes.submit(
+            mapOf(
+                newton to 5541.65,
+                douglas to 5410.84
+            )
         )
-        candidateSubhead.value = "5 OF 5 SEATS ELECTED"
-        elected.value = listOf(long to 1, lyttle to 8, allen to 9, bunting to 9, newton to 11)
-        excluded.value = listOf(mckeag, defaoite, bodel, robinson, girvin, odonnell, milne, kyle, douglas)
-        candidateHeader.value = "COUNT 11"
+        candidateSubhead.submit("5 OF 5 SEATS ELECTED")
+        elected.submit(listOf(long to 1, lyttle to 8, allen to 9, bunting to 9, newton to 11))
+        excluded.submit(listOf(mckeag, defaoite, bodel, robinson, girvin, odonnell, milne, kyle, douglas))
+        candidateHeader.submit("COUNT 11")
         compareRendering("SingleTransferrableResultScreen", "Candidates-11", panel)
     }
 
