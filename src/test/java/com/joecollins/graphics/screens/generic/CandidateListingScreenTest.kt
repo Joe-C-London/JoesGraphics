@@ -1,8 +1,6 @@
 package com.joecollins.graphics.screens.generic
 
-import com.joecollins.bindings.Binding
 import com.joecollins.graphics.components.MapFrameTest
-import com.joecollins.graphics.utils.BindableWrapper
 import com.joecollins.graphics.utils.RenderTestUtils
 import com.joecollins.graphics.utils.ShapefileReader
 import com.joecollins.models.general.Candidate
@@ -33,7 +31,7 @@ class CandidateListingScreenTest {
             "".asOneTimePublisher(),
             "[MLA]"
         )
-            .build(Binding.fixedBinding("SOURIS-ELMIRA"))
+            .build("SOURIS-ELMIRA".asOneTimePublisher())
         screen.size = Dimension(1024, 512)
         RenderTestUtils.compareRendering("CandidateListingScreen", "CandidatesOnly", screen)
     }
@@ -65,7 +63,7 @@ class CandidateListingScreenTest {
                 "2015 RESULT".asOneTimePublisher(),
                 null.asOneTimePublisher()
             )
-            .build(Binding.fixedBinding("SOURIS-ELMIRA"))
+            .build("SOURIS-ELMIRA".asOneTimePublisher())
         screen.size = Dimension(1024, 512)
         RenderTestUtils.compareRendering("CandidateListingScreen", "CandidatesWithPrev", screen)
     }
@@ -104,7 +102,7 @@ class CandidateListingScreenTest {
                 "2015 RESULT".asOneTimePublisher(),
                 null.asOneTimePublisher()
             )
-            .build(Binding.fixedBinding("SOURIS-ELMIRA"))
+            .build("SOURIS-ELMIRA".asOneTimePublisher())
         screen.size = Dimension(1024, 512)
         RenderTestUtils.compareRendering("CandidateListingScreen", "CandidatesWithPrevAndMap", screen)
     }
@@ -146,7 +144,7 @@ class CandidateListingScreenTest {
                 "2015 RESULT".asOneTimePublisher(),
                 null.asOneTimePublisher()
             )
-            .build(Binding.fixedBinding("CHARLOTTETOWN-WEST ROYALTY"))
+            .build("CHARLOTTETOWN-WEST ROYALTY".asOneTimePublisher())
         screen.size = Dimension(1024, 512)
         RenderTestUtils.compareRendering("CandidateListingScreen", "CandidatesWithPrevOtherAndMap", screen)
     }
@@ -196,7 +194,7 @@ class CandidateListingScreenTest {
                 "2015 REGIONAL RESULT".asOneTimePublisher(),
                 null.asOneTimePublisher()
             )
-            .build(Binding.fixedBinding("SOURIS-ELMIRA"))
+            .build("SOURIS-ELMIRA".asOneTimePublisher())
         screen.size = Dimension(1024, 512)
         RenderTestUtils.compareRendering("CandidateListingScreen", "CandidatesWithSecondaryPrevAndMap", screen)
     }
@@ -239,7 +237,7 @@ class CandidateListingScreenTest {
                 "2015 REGIONAL RESULT".asOneTimePublisher(),
                 null.asOneTimePublisher()
             )
-            .build(Binding.fixedBinding("SOURIS-ELMIRA"))
+            .build("SOURIS-ELMIRA".asOneTimePublisher())
         screen.size = Dimension(1024, 512)
         RenderTestUtils.compareRendering("CandidateListingScreen", "CandidatesWithSecondaryPrev", screen)
     }
@@ -275,7 +273,7 @@ class CandidateListingScreenTest {
             )
         )
         val region = Publisher("CARDIGAN")
-        val districtName = BindableWrapper("GEORGETOWN-POWNAL")
+        val districtName = Publisher("GEORGETOWN-POWNAL")
         val districtNum = Publisher(2)
         val focus = Publisher(listOf(1, 2, 3, 4, 5, 6, 7))
         val shapes = peiShapesByDistrict()
@@ -301,7 +299,7 @@ class CandidateListingScreenTest {
                 "2015 REGIONAL RESULT".asOneTimePublisher(),
                 null.asOneTimePublisher()
             )
-            .build(districtName.binding)
+            .build(districtName)
         screen.size = Dimension(1024, 512)
         RenderTestUtils.compareRendering("CandidateListingScreen", "CandidatesUpdating-1", screen)
 
@@ -316,7 +314,7 @@ class CandidateListingScreenTest {
         prev.submit(mapOf(lib to 1938, pc to 1338, grn to 347, ndp to 442))
         secondaryPrev.submit(mapOf(lib to 7767, pc to 8169, grn to 4011, ndp to 1427))
         region.submit("MALPEQUE")
-        districtName.value = "STANHOME-MARSFIELD"
+        districtName.submit("STANHOME-MARSFIELD")
         districtNum.submit(8)
         focus.submit(listOf(8, 15, 16, 17, 18, 19, 20))
         RenderTestUtils.compareRendering("CandidateListingScreen", "CandidatesUpdating-2", screen)

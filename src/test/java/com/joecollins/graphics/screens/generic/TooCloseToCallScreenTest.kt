@@ -1,9 +1,7 @@
 package com.joecollins.graphics.screens.generic
 
-import com.joecollins.bindings.Binding.Companion.fixedBinding
 import com.joecollins.graphics.screens.generic.TooCloseToCallScreen.Companion.of
 import com.joecollins.graphics.screens.generic.TooCloseToCallScreen.Companion.ofParty
-import com.joecollins.graphics.utils.BindableWrapper
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.models.general.Aggregators.adjustKey
 import com.joecollins.models.general.Candidate
@@ -11,6 +9,9 @@ import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
 import com.joecollins.models.general.PartyResult.Companion.elected
 import com.joecollins.models.general.PartyResult.Companion.leading
+import com.joecollins.pubsub.Publisher
+import com.joecollins.pubsub.asOneTimePublisher
+import com.joecollins.pubsub.map
 import org.junit.Test
 import java.awt.Color
 import java.io.IOException
@@ -24,32 +25,32 @@ class TooCloseToCallScreenTest {
     fun testBasic() {
         val candidateVotesRaw: MutableMap<Int, Map<Candidate, Int>> = HashMap()
         val partyResultsRaw: MutableMap<Int, PartyResult> = HashMap()
-        val candidateVotes = BindableWrapper<Map<Int, Map<Candidate, Int>>>(candidateVotesRaw)
-        val partyResults = BindableWrapper<Map<Int, PartyResult>>(partyResultsRaw)
+        val candidateVotes = Publisher<Map<Int, Map<Candidate, Int>>>(candidateVotesRaw)
+        val partyResults = Publisher<Map<Int, PartyResult>>(partyResultsRaw)
         val screen = of(
-            candidateVotes.binding,
-            partyResults.binding,
+            candidateVotes,
+            partyResults,
             { "DISTRICT $it" },
-            fixedBinding("TOO CLOSE TO CALL")
+            "TOO CLOSE TO CALL".asOneTimePublisher()
         )
-            .build(fixedBinding("PRINCE EDWARD ISLAND"))
+            .build("PRINCE EDWARD ISLAND".asOneTimePublisher())
         screen.setSize(1024, 512)
         compareRendering("TooCloseToCallScreen", "Basic-1", screen)
         setupFirstAdvancePoll(candidateVotesRaw, partyResultsRaw, HashMap())
-        candidateVotes.value = candidateVotesRaw
-        partyResults.value = partyResultsRaw
+        candidateVotes.submit(candidateVotesRaw)
+        partyResults.submit(partyResultsRaw)
         compareRendering("TooCloseToCallScreen", "Basic-2", screen)
         setupAllAdvancePolls(candidateVotesRaw, partyResultsRaw, HashMap())
-        candidateVotes.value = candidateVotesRaw
-        partyResults.value = partyResultsRaw
+        candidateVotes.submit(candidateVotesRaw)
+        partyResults.submit(partyResultsRaw)
         compareRendering("TooCloseToCallScreen", "Basic-3", screen)
         setupHalfOfPolls(candidateVotesRaw, partyResultsRaw, HashMap())
-        candidateVotes.value = candidateVotesRaw
-        partyResults.value = partyResultsRaw
+        candidateVotes.submit(candidateVotesRaw)
+        partyResults.submit(partyResultsRaw)
         compareRendering("TooCloseToCallScreen", "Basic-4", screen)
         setupFullResults(candidateVotesRaw, partyResultsRaw, HashMap())
-        candidateVotes.value = candidateVotesRaw
-        partyResults.value = partyResultsRaw
+        candidateVotes.submit(candidateVotesRaw)
+        partyResults.submit(partyResultsRaw)
         compareRendering("TooCloseToCallScreen", "Basic-1", screen)
     }
 
@@ -59,34 +60,34 @@ class TooCloseToCallScreenTest {
         val candidateVotesRaw: MutableMap<Int, Map<Candidate, Int>> = HashMap()
         val partyResultsRaw: MutableMap<Int, PartyResult> = HashMap()
         val pctReportingRaw: MutableMap<Int, Double> = HashMap()
-        val candidateVotes = BindableWrapper<Map<Int, Map<Candidate, Int>>>(candidateVotesRaw)
-        val partyResults = BindableWrapper<Map<Int, PartyResult>>(partyResultsRaw)
-        val pctReporting = BindableWrapper<Map<Int, Double>>(pctReportingRaw)
+        val candidateVotes = Publisher<Map<Int, Map<Candidate, Int>>>(candidateVotesRaw)
+        val partyResults = Publisher<Map<Int, PartyResult>>(partyResultsRaw)
+        val pctReporting = Publisher<Map<Int, Double>>(pctReportingRaw)
         val screen = of(
-            candidateVotes.binding,
-            partyResults.binding,
+            candidateVotes,
+            partyResults,
             { "DISTRICT $it" },
-            fixedBinding("TOO CLOSE TO CALL")
+            "TOO CLOSE TO CALL".asOneTimePublisher()
         )
-            .withPctReporting(pctReporting.binding)
-            .build(fixedBinding("PRINCE EDWARD ISLAND"))
+            .withPctReporting(pctReporting)
+            .build("PRINCE EDWARD ISLAND".asOneTimePublisher())
         screen.setSize(1024, 512)
         compareRendering("TooCloseToCallScreen", "PctReporting-1", screen)
         setupFirstAdvancePoll(candidateVotesRaw, partyResultsRaw, pctReportingRaw)
-        candidateVotes.value = candidateVotesRaw
-        partyResults.value = partyResultsRaw
+        candidateVotes.submit(candidateVotesRaw)
+        partyResults.submit(partyResultsRaw)
         compareRendering("TooCloseToCallScreen", "PctReporting-2", screen)
         setupAllAdvancePolls(candidateVotesRaw, partyResultsRaw, pctReportingRaw)
-        candidateVotes.value = candidateVotesRaw
-        partyResults.value = partyResultsRaw
+        candidateVotes.submit(candidateVotesRaw)
+        partyResults.submit(partyResultsRaw)
         compareRendering("TooCloseToCallScreen", "PctReporting-3", screen)
         setupHalfOfPolls(candidateVotesRaw, partyResultsRaw, pctReportingRaw)
-        candidateVotes.value = candidateVotesRaw
-        partyResults.value = partyResultsRaw
+        candidateVotes.submit(candidateVotesRaw)
+        partyResults.submit(partyResultsRaw)
         compareRendering("TooCloseToCallScreen", "PctReporting-4", screen)
         setupFullResults(candidateVotesRaw, partyResultsRaw, pctReportingRaw)
-        candidateVotes.value = candidateVotesRaw
-        partyResults.value = partyResultsRaw
+        candidateVotes.submit(candidateVotesRaw)
+        partyResults.submit(partyResultsRaw)
         compareRendering("TooCloseToCallScreen", "PctReporting-1", screen)
     }
 
@@ -96,35 +97,35 @@ class TooCloseToCallScreenTest {
         val candidateVotesRaw: MutableMap<Int, Map<Candidate, Int>> = HashMap()
         val partyResultsRaw: MutableMap<Int, PartyResult> = HashMap()
         val pctReportingRaw: MutableMap<Int, Double> = HashMap()
-        val candidateVotes = BindableWrapper<Map<Int, Map<Candidate, Int>>>(candidateVotesRaw)
-        val partyResults = BindableWrapper<Map<Int, PartyResult>>(partyResultsRaw)
-        val pctReporting = BindableWrapper<Map<Int, Double>>(pctReportingRaw)
+        val candidateVotes = Publisher<Map<Int, Map<Candidate, Int>>>(candidateVotesRaw)
+        val partyResults = Publisher<Map<Int, PartyResult>>(partyResultsRaw)
+        val pctReporting = Publisher<Map<Int, Double>>(pctReportingRaw)
         val screen = of(
-            candidateVotes.binding,
-            partyResults.binding,
+            candidateVotes,
+            partyResults,
             { "DISTRICT $it" },
-            fixedBinding("TOO CLOSE TO CALL")
+            "TOO CLOSE TO CALL".asOneTimePublisher()
         )
-            .withPctReporting(pctReporting.binding)
-            .withMaxRows(fixedBinding(15))
-            .build(fixedBinding("PRINCE EDWARD ISLAND"))
+            .withPctReporting(pctReporting)
+            .withMaxRows(15.asOneTimePublisher())
+            .build("PRINCE EDWARD ISLAND".asOneTimePublisher())
         screen.setSize(1024, 512)
         compareRendering("TooCloseToCallScreen", "LimitRows-1", screen)
         setupFirstAdvancePoll(candidateVotesRaw, partyResultsRaw, pctReportingRaw)
-        candidateVotes.value = candidateVotesRaw
-        partyResults.value = partyResultsRaw
+        candidateVotes.submit(candidateVotesRaw)
+        partyResults.submit(partyResultsRaw)
         compareRendering("TooCloseToCallScreen", "LimitRows-2", screen)
         setupAllAdvancePolls(candidateVotesRaw, partyResultsRaw, pctReportingRaw)
-        candidateVotes.value = candidateVotesRaw
-        partyResults.value = partyResultsRaw
+        candidateVotes.submit(candidateVotesRaw)
+        partyResults.submit(partyResultsRaw)
         compareRendering("TooCloseToCallScreen", "LimitRows-3", screen)
         setupHalfOfPolls(candidateVotesRaw, partyResultsRaw, pctReportingRaw)
-        candidateVotes.value = candidateVotesRaw
-        partyResults.value = partyResultsRaw
+        candidateVotes.submit(candidateVotesRaw)
+        partyResults.submit(partyResultsRaw)
         compareRendering("TooCloseToCallScreen", "LimitRows-4", screen)
         setupFullResults(candidateVotesRaw, partyResultsRaw, pctReportingRaw)
-        candidateVotes.value = candidateVotesRaw
-        partyResults.value = partyResultsRaw
+        candidateVotes.submit(candidateVotesRaw)
+        partyResults.submit(partyResultsRaw)
         compareRendering("TooCloseToCallScreen", "LimitRows-1", screen)
     }
 
@@ -134,35 +135,35 @@ class TooCloseToCallScreenTest {
         val candidateVotesRaw: MutableMap<Int, Map<Candidate, Int>> = HashMap()
         val partyResultsRaw: MutableMap<Int, PartyResult> = HashMap()
         val pctReportingRaw: MutableMap<Int, Double> = HashMap()
-        val candidateVotes = BindableWrapper<Map<Int, Map<Candidate, Int>>>(candidateVotesRaw)
-        val partyResults = BindableWrapper<Map<Int, PartyResult>>(partyResultsRaw)
-        val pctReporting = BindableWrapper<Map<Int, Double>>(pctReportingRaw)
+        val candidateVotes = Publisher<Map<Int, Map<Candidate, Int>>>(candidateVotesRaw)
+        val partyResults = Publisher<Map<Int, PartyResult>>(partyResultsRaw)
+        val pctReporting = Publisher<Map<Int, Double>>(pctReportingRaw)
         val screen = of(
-            candidateVotes.binding,
-            partyResults.binding,
+            candidateVotes,
+            partyResults,
             { "DISTRICT $it" },
-            fixedBinding("TOO CLOSE TO CALL")
+            "TOO CLOSE TO CALL".asOneTimePublisher()
         )
-            .withPctReporting(pctReporting.binding)
-            .withNumberOfCandidates(fixedBinding(5))
-            .build(fixedBinding("PRINCE EDWARD ISLAND"))
+            .withPctReporting(pctReporting)
+            .withNumberOfCandidates(5.asOneTimePublisher())
+            .build("PRINCE EDWARD ISLAND".asOneTimePublisher())
         screen.setSize(1024, 512)
         compareRendering("TooCloseToCallScreen", "NumCandidates-1", screen)
         setupFirstAdvancePoll(candidateVotesRaw, partyResultsRaw, pctReportingRaw)
-        candidateVotes.value = candidateVotesRaw
-        partyResults.value = partyResultsRaw
+        candidateVotes.submit(candidateVotesRaw)
+        partyResults.submit(partyResultsRaw)
         compareRendering("TooCloseToCallScreen", "NumCandidates-2", screen)
         setupAllAdvancePolls(candidateVotesRaw, partyResultsRaw, pctReportingRaw)
-        candidateVotes.value = candidateVotesRaw
-        partyResults.value = partyResultsRaw
+        candidateVotes.submit(candidateVotesRaw)
+        partyResults.submit(partyResultsRaw)
         compareRendering("TooCloseToCallScreen", "NumCandidates-3", screen)
         setupHalfOfPolls(candidateVotesRaw, partyResultsRaw, pctReportingRaw)
-        candidateVotes.value = candidateVotesRaw
-        partyResults.value = partyResultsRaw
+        candidateVotes.submit(candidateVotesRaw)
+        partyResults.submit(partyResultsRaw)
         compareRendering("TooCloseToCallScreen", "NumCandidates-4", screen)
         setupFullResults(candidateVotesRaw, partyResultsRaw, pctReportingRaw)
-        candidateVotes.value = candidateVotesRaw
-        partyResults.value = partyResultsRaw
+        candidateVotes.submit(candidateVotesRaw)
+        partyResults.submit(partyResultsRaw)
         compareRendering("TooCloseToCallScreen", "NumCandidates-1", screen)
     }
 
@@ -171,32 +172,32 @@ class TooCloseToCallScreenTest {
     fun testParty() {
         val candidateVotesRaw: MutableMap<Int, Map<Candidate, Int>> = HashMap()
         val partyResultsRaw: MutableMap<Int, PartyResult> = HashMap()
-        val candidateVotes = BindableWrapper<Map<Int, Map<Candidate, Int>>>(candidateVotesRaw)
-        val partyResults = BindableWrapper<Map<Int, PartyResult>>(partyResultsRaw)
+        val candidateVotes = Publisher<Map<Int, Map<Candidate, Int>>>(candidateVotesRaw)
+        val partyResults = Publisher<Map<Int, PartyResult>>(partyResultsRaw)
         val screen = ofParty(
-            candidateVotes.binding.map { all -> all.mapValues { e -> adjustKey(e.value) { it.party } } },
-            partyResults.binding,
+            candidateVotes.map { all -> all.mapValues { e -> adjustKey(e.value) { it.party } } },
+            partyResults,
             { "DISTRICT $it" },
-            fixedBinding("TOO CLOSE TO CALL")
+            "TOO CLOSE TO CALL".asOneTimePublisher()
         )
-            .build(fixedBinding("PRINCE EDWARD ISLAND"))
+            .build("PRINCE EDWARD ISLAND".asOneTimePublisher())
         screen.setSize(1024, 512)
         compareRendering("TooCloseToCallScreen", "Basic-1", screen)
         setupFirstAdvancePoll(candidateVotesRaw, partyResultsRaw, HashMap())
-        candidateVotes.value = candidateVotesRaw
-        partyResults.value = partyResultsRaw
+        candidateVotes.submit(candidateVotesRaw)
+        partyResults.submit(partyResultsRaw)
         compareRendering("TooCloseToCallScreen", "Basic-2", screen)
         setupAllAdvancePolls(candidateVotesRaw, partyResultsRaw, HashMap())
-        candidateVotes.value = candidateVotesRaw
-        partyResults.value = partyResultsRaw
+        candidateVotes.submit(candidateVotesRaw)
+        partyResults.submit(partyResultsRaw)
         compareRendering("TooCloseToCallScreen", "Basic-3", screen)
         setupHalfOfPolls(candidateVotesRaw, partyResultsRaw, HashMap())
-        candidateVotes.value = candidateVotesRaw
-        partyResults.value = partyResultsRaw
+        candidateVotes.submit(candidateVotesRaw)
+        partyResults.submit(partyResultsRaw)
         compareRendering("TooCloseToCallScreen", "Basic-4", screen)
         setupFullResults(candidateVotesRaw, partyResultsRaw, HashMap())
-        candidateVotes.value = candidateVotesRaw
-        partyResults.value = partyResultsRaw
+        candidateVotes.submit(candidateVotesRaw)
+        partyResults.submit(partyResultsRaw)
         compareRendering("TooCloseToCallScreen", "Basic-1", screen)
     }
 
@@ -205,32 +206,32 @@ class TooCloseToCallScreenTest {
     fun testNullResults() {
         val candidateVotesRaw: MutableMap<Int, Map<Candidate, Int>> = (1..27).associateWith { emptyMap<Candidate, Int>() }.toMutableMap()
         val partyResultsRaw: MutableMap<Int, PartyResult?> = (1..27).associateWith { null }.toMutableMap()
-        val candidateVotes = BindableWrapper<Map<Int, Map<Candidate, Int>>>(candidateVotesRaw)
-        val partyResults = BindableWrapper<Map<Int, PartyResult?>>(partyResultsRaw)
+        val candidateVotes = Publisher<Map<Int, Map<Candidate, Int>>>(candidateVotesRaw)
+        val partyResults = Publisher<Map<Int, PartyResult?>>(partyResultsRaw)
         val screen = ofParty(
-            candidateVotes.binding.map { all -> all.mapValues { e -> adjustKey(e.value) { it.party } } },
-            partyResults.binding,
+            candidateVotes.map { all -> all.mapValues { e -> adjustKey(e.value) { it.party } } },
+            partyResults,
             { "DISTRICT $it" },
-            fixedBinding("TOO CLOSE TO CALL")
+            "TOO CLOSE TO CALL".asOneTimePublisher()
         )
-            .build(fixedBinding("PRINCE EDWARD ISLAND"))
+            .build("PRINCE EDWARD ISLAND".asOneTimePublisher())
         screen.setSize(1024, 512)
         compareRendering("TooCloseToCallScreen", "Basic-1", screen)
         setupFirstAdvancePoll(candidateVotesRaw, partyResultsRaw, HashMap())
-        candidateVotes.value = candidateVotesRaw
-        partyResults.value = partyResultsRaw
+        candidateVotes.submit(candidateVotesRaw)
+        partyResults.submit(partyResultsRaw)
         compareRendering("TooCloseToCallScreen", "Basic-2", screen)
         setupAllAdvancePolls(candidateVotesRaw, partyResultsRaw, HashMap())
-        candidateVotes.value = candidateVotesRaw
-        partyResults.value = partyResultsRaw
+        candidateVotes.submit(candidateVotesRaw)
+        partyResults.submit(partyResultsRaw)
         compareRendering("TooCloseToCallScreen", "Basic-3", screen)
         setupHalfOfPolls(candidateVotesRaw, partyResultsRaw, HashMap())
-        candidateVotes.value = candidateVotesRaw
-        partyResults.value = partyResultsRaw
+        candidateVotes.submit(candidateVotesRaw)
+        partyResults.submit(partyResultsRaw)
         compareRendering("TooCloseToCallScreen", "Basic-4", screen)
         setupFullResults(candidateVotesRaw, partyResultsRaw, HashMap())
-        candidateVotes.value = candidateVotesRaw
-        partyResults.value = partyResultsRaw
+        candidateVotes.submit(candidateVotesRaw)
+        partyResults.submit(partyResultsRaw)
         compareRendering("TooCloseToCallScreen", "Basic-1", screen)
     }
 

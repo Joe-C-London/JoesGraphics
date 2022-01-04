@@ -1,30 +1,33 @@
 package com.joecollins.graphics
 
-import com.joecollins.bindings.Binding
 import com.joecollins.graphics.components.lowerthird.LowerThird
 import com.joecollins.graphics.utils.StandardFont.readBoldFont
+import com.joecollins.pubsub.Subscriber
+import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
+import com.joecollins.pubsub.asOneTimePublisher
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Dimension
+import java.util.concurrent.Flow
 import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.border.EmptyBorder
 
 class GenericPanelWithHeaderAndLowerThird<T : JPanel>(
     panel: T,
-    label: Binding<String>?,
+    label: Flow.Publisher<String>?,
     lowerThird: LowerThird?
 ) : JPanel() {
 
     private val _label: JLabel = JLabel()
 
-    constructor(panel: T, label: String) : this(panel, Binding.fixedBinding<String>(label), null)
-    constructor(panel: T, lowerThird: LowerThird?) : this(panel, null as Binding<String>?, lowerThird)
-    constructor(panel: T, label: String, lowerThird: LowerThird?) : this(panel, Binding.fixedBinding<String>(label), lowerThird)
+    constructor(panel: T, label: String) : this(panel, label.asOneTimePublisher(), null)
+    constructor(panel: T, lowerThird: LowerThird?) : this(panel, null as Flow.Publisher<String>?, lowerThird)
+    constructor(panel: T, label: String, lowerThird: LowerThird?) : this(panel, label.asOneTimePublisher(), lowerThird)
 
     init {
         if (label != null) {
-            label.bind { text: String? -> this._label.text = text ?: "" }
+            label.subscribe(Subscriber(eventQueueWrapper { text: String? -> this._label.text = text ?: "" }))
             this._label.horizontalAlignment = JLabel.CENTER
             this._label.border = EmptyBorder(5, 0, -5, 0)
             this._label.font = readBoldFont(32)

@@ -1,6 +1,5 @@
 package com.joecollins.graphics.screens.generic
 
-import com.joecollins.bindings.Binding
 import com.joecollins.graphics.components.BarFrameBuilder
 import com.joecollins.graphics.components.FontSizeAdjustingLabel
 import com.joecollins.graphics.components.ListingFrameBuilder
@@ -8,6 +7,8 @@ import com.joecollins.graphics.utils.StandardFont
 import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
+import com.joecollins.pubsub.Subscriber
+import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
 import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.map
 import java.awt.BorderLayout
@@ -136,16 +137,16 @@ class CandidateListingScreen private constructor(
             return this
         }
 
-        fun build(title: Binding<out String>): CandidateListingScreen {
+        fun build(title: Flow.Publisher<out String>): CandidateListingScreen {
             return CandidateListingScreen(createHeaderLabel(title), this)
         }
 
-        private fun createHeaderLabel(textBinding: Binding<out String>): JLabel {
+        private fun createHeaderLabel(textPublisher: Flow.Publisher<out String>): JLabel {
             val headerLabel = FontSizeAdjustingLabel()
             headerLabel.font = StandardFont.readBoldFont(32)
             headerLabel.horizontalAlignment = JLabel.CENTER
             headerLabel.border = EmptyBorder(5, 0, -5, 0)
-            textBinding.bind { headerLabel.text = it }
+            textPublisher.subscribe(Subscriber(eventQueueWrapper { headerLabel.text = it }))
             return headerLabel
         }
     }
