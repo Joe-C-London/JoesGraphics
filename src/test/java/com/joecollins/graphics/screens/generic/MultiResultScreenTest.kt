@@ -1,24 +1,24 @@
 package com.joecollins.graphics.screens.generic
 
-import com.joecollins.bindings.Bindable
-import com.joecollins.bindings.Binding
-import com.joecollins.bindings.Binding.Companion.fixedBinding
-import com.joecollins.bindings.Binding.Companion.propertyBinding
 import com.joecollins.graphics.components.MapFrameTest
 import com.joecollins.graphics.screens.generic.MultiResultScreen.Companion.of
 import com.joecollins.graphics.screens.generic.MultiResultScreen.Companion.ofParties
-import com.joecollins.graphics.utils.BindableWrapper
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.graphics.utils.ShapefileReader.readShapes
 import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
+import com.joecollins.pubsub.Publisher
+import com.joecollins.pubsub.asOneTimePublisher
+import com.joecollins.pubsub.map
 import org.junit.Test
 import java.awt.Color
 import java.awt.Shape
 import java.io.IOException
+import java.util.concurrent.Flow
 
 class MultiResultScreenTest {
+
     @Test
     @Throws(IOException::class)
     fun testSimplePanel() {
@@ -83,28 +83,28 @@ class MultiResultScreenTest {
         val shapesByDistrict = peiShapesByDistrict()
         val swingometerOrder = listOf(ndp, grn, lib, ind, pc)
         val panel = of(
-            fixedBinding(districts),
-            { fixedBinding(it.votes) },
-            { fixedBinding("DISTRICT " + it.districtNum) },
-            { fixedBinding(it.name.uppercase()) }
+            districts.asOneTimePublisher(),
+            { it.votes.asOneTimePublisher() },
+            { ("DISTRICT " + it.districtNum).asOneTimePublisher() },
+            { it.name.uppercase().asOneTimePublisher() }
         )
             .withIncumbentMarker("(MLA)")
-            .withWinner { fixedBinding(if (it.leaderHasWon) it.votes.entries.maxByOrNull { e -> e.value }!!.key else null) }
+            .withWinner { (if (it.leaderHasWon) it.votes.entries.maxByOrNull { e -> e.value }!!.key else null).asOneTimePublisher() }
             .withPrev(
-                { fixedBinding(it.prevVotes) },
-                { fixedBinding("SWING SINCE 2015") },
+                { it.prevVotes.asOneTimePublisher() },
+                { "SWING SINCE 2015".asOneTimePublisher() },
                 compareBy { swingometerOrder.indexOf(it) }
             )
             .withMap(
                 { shapesByDistrict },
                 { it.districtNum },
-                { fixedBinding(PartyResult(it.votes.entries.maxByOrNull { e -> e.value }?.key?.party, it.leaderHasWon)) },
+                { PartyResult(it.votes.entries.maxByOrNull { e -> e.value }?.key?.party, it.leaderHasWon).asOneTimePublisher() },
                 { if (it.districtNum < 10) listOf(1, 2, 3, 4, 5, 6, 7, 8) else listOf(15, 16, 17, 18, 19, 20) },
-                { fixedBinding(if (it.districtNum < 10) "CARDIGAN" else "MALPEQUE") }
+                { (if (it.districtNum < 10) "CARDIGAN" else "MALPEQUE").asOneTimePublisher() }
             )
-            .build(fixedBinding("PARTY LEADERS"))
+            .build("PARTY LEADERS".asOneTimePublisher())
         panel.setSize(1024, 512)
-        compareRendering("MultiResultPanel", "Basic-1", panel)
+        compareRendering("MultiResultPanel", "Basic-1", panel, 2)
     }
 
     @Test
@@ -167,22 +167,22 @@ class MultiResultScreenTest {
             "0 OF 10 POLLS REPORTING",
             0.0
         )
-        val districts = BindableWrapper(listOf(district15, district17))
+        val districts = Publisher(listOf(district15, district17))
         val shapesByDistrict = peiShapesByDistrict()
         val swingometerOrder = listOf(ndp, grn, lib, ind, pc)
-        val title = BindableWrapper("MAJOR PARTY LEADERS")
+        val title = Publisher("MAJOR PARTY LEADERS")
         val panel = of(
-            districts.binding,
+            districts,
             { it.getVotes() },
-            { fixedBinding(it.name.uppercase()) },
+            { it.name.uppercase().asOneTimePublisher() },
             { it.getStatus() }
         )
             .withIncumbentMarker("(MLA)")
             .withPctReporting { it.getPctReporting() }
             .withWinner { it.winner }
             .withPrev(
-                { fixedBinding(it.prevVotes) },
-                { fixedBinding("SWING SINCE 2015") },
+                { it.prevVotes.asOneTimePublisher() },
+                { "SWING SINCE 2015".asOneTimePublisher() },
                 compareBy { swingometerOrder.indexOf(it) }
             )
             .withMap(
@@ -197,9 +197,9 @@ class MultiResultScreenTest {
                     }
                 },
                 { if (it.districtNum < 10) listOf(1, 2, 3, 4, 5, 6, 7, 8) else listOf(15, 16, 17, 18, 19, 20) },
-                { fixedBinding(if (it.districtNum < 10) "CARDIGAN" else "MALPEQUE") }
+                { (if (it.districtNum < 10) "CARDIGAN" else "MALPEQUE").asOneTimePublisher() }
             )
-            .build(title.binding)
+            .build(title)
         panel.setSize(1024, 512)
         compareRendering("MultiResultPanel", "Update-1", panel)
         district17.update(
@@ -213,8 +213,8 @@ class MultiResultScreenTest {
             )
         )
         compareRendering("MultiResultPanel", "Update-2", panel)
-        districts.value = listOf(district8, district15, district17)
-        title.value = "PARTY LEADERS"
+        districts.submit(listOf(district8, district15, district17))
+        title.submit("PARTY LEADERS")
         compareRendering("MultiResultPanel", "Update-3", panel)
         district15.update(
             "1 OF 10 POLLS REPORTING",
@@ -250,8 +250,8 @@ class MultiResultScreenTest {
             true
         )
         compareRendering("MultiResultPanel", "Update-6", panel)
-        districts.value = listOf(district8, district17)
-        title.value = "PARTY LEADERS IN DOUBT"
+        districts.submit(listOf(district8, district17))
+        title.submit("PARTY LEADERS IN DOUBT")
         compareRendering("MultiResultPanel", "Update-7", panel)
         district15.update(
             "10 OF 10 POLLS REPORTING",
@@ -360,26 +360,26 @@ class MultiResultScreenTest {
         )
         val swingometerOrder = listOf(ndp, grn, lib, ind, pc, pa)
         val panel = of(
-            fixedBinding(districts),
-            { fixedBinding(it.votes) },
-            { fixedBinding("DISTRICT " + it.districtNum) },
-            { fixedBinding(it.name.uppercase()) }
+            districts.asOneTimePublisher(),
+            { it.votes.asOneTimePublisher() },
+            { ("DISTRICT " + it.districtNum).asOneTimePublisher() },
+            { it.name.uppercase().asOneTimePublisher() }
         )
             .withIncumbentMarker("(MLA)")
             .withWinner { d ->
-                fixedBinding(
+                (
                     if (d.leaderHasWon)
                         d.votes.entries.maxByOrNull { it.value }!!.key
                     else
                         null
-                )
+                    ).asOneTimePublisher()
             }
             .withPrev(
-                { fixedBinding(it.prevVotes) },
-                { fixedBinding("SWING SINCE 2018") },
+                { it.prevVotes.asOneTimePublisher() },
+                { "SWING SINCE 2018".asOneTimePublisher() },
                 compareBy { swingometerOrder.indexOf(it) }
             )
-            .build(fixedBinding("SAINT JOHN"))
+            .build("SAINT JOHN".asOneTimePublisher())
         panel.setSize(1024, 512)
         compareRendering("MultiResultPanel", "Others-1", panel)
     }
@@ -516,17 +516,17 @@ class MultiResultScreenTest {
         )
         val swingometerOrder = listOf(ndp, grn, lib, ind, pc, pa)
         val panel = ofParties(
-            fixedBinding(districts),
-            { fixedBinding(it.votes.mapKeys { it.key.party }) },
-            { fixedBinding("DISTRICT " + it.districtNum) },
-            { fixedBinding(it.name.uppercase()) }
+            districts.asOneTimePublisher(),
+            { it.votes.mapKeys { it.key.party }.asOneTimePublisher() },
+            { ("DISTRICT " + it.districtNum).asOneTimePublisher() },
+            { it.name.uppercase().asOneTimePublisher() }
         )
             .withPrev(
-                { fixedBinding(it.prevVotes) },
-                { fixedBinding("SWING SINCE 2018") },
+                { it.prevVotes.asOneTimePublisher() },
+                { "SWING SINCE 2018".asOneTimePublisher() },
                 compareBy { swingometerOrder.indexOf(it) }
             )
-            .build(fixedBinding("SAINT JOHN"))
+            .build("SAINT JOHN".asOneTimePublisher())
         panel.setSize(1024, 512)
         compareRendering("MultiResultPanel", "OthersParty-1", panel)
     }
@@ -622,28 +622,28 @@ class MultiResultScreenTest {
             )
         )
         val swingometerOrder = listOf(ndp, grn, lib, ind, pc, pa)
-        val districtsBinding = BindableWrapper(districts)
+        val districtsPublisher = Publisher(districts)
         val panel = of(
-            districtsBinding.binding,
-            { fixedBinding(it.votes) },
-            { fixedBinding("DISTRICT " + it.districtNum) },
-            { fixedBinding(it.name.uppercase()) }
+            districtsPublisher,
+            { it.votes.asOneTimePublisher() },
+            { ("DISTRICT " + it.districtNum).asOneTimePublisher() },
+            { it.name.uppercase().asOneTimePublisher() }
         )
             .withIncumbentMarker("(MLA)")
             .withWinner { d ->
-                fixedBinding(
+                (
                     if (d.leaderHasWon)
                         d.votes.entries.maxByOrNull { it.value }!!.key
                     else
                         null
-                )
+                    ).asOneTimePublisher()
             }
             .withPrev(
-                { fixedBinding(it.prevVotes) },
-                { fixedBinding("SWING SINCE 2018") },
+                { it.prevVotes.asOneTimePublisher() },
+                { "SWING SINCE 2018".asOneTimePublisher() },
                 compareBy { swingometerOrder.indexOf(it) }
             )
-            .build(fixedBinding("ELECTION 2020: NEW BRUNSWICK DECIDES"))
+            .build("ELECTION 2020: NEW BRUNSWICK DECIDES".asOneTimePublisher())
         panel.setSize(1024, 512)
         compareRendering("MultiResultPanel", "MultipleRows-1", panel)
         districts.add(
@@ -688,13 +688,13 @@ class MultiResultScreenTest {
                 )
             )
         )
-        districtsBinding.value = districts
+        districtsPublisher.submit(districts)
         compareRendering("MultiResultPanel", "MultipleRows-2", panel)
         districts.removeAt(3)
         districts.removeAt(2)
         districts.removeAt(1)
         districts.removeAt(0)
-        districtsBinding.value = districts
+        districtsPublisher.submit(districts)
         compareRendering("MultiResultPanel", "MultipleRows-3", panel)
     }
 
@@ -731,13 +731,13 @@ class MultiResultScreenTest {
             )
         )
         val panel = of(
-            fixedBinding(districts),
-            { fixedBinding(it.votes) },
-            { fixedBinding(it.name.uppercase()) },
-            { fixedBinding("CLASS " + it.districtNum) }
+            districts.asOneTimePublisher(),
+            { it.votes.asOneTimePublisher() },
+            { it.name.uppercase().asOneTimePublisher() },
+            { ("CLASS " + it.districtNum).asOneTimePublisher() }
         )
             .withRunoff { it.runoff }
-            .build(fixedBinding("GEORGIA SENATE"))
+            .build("GEORGIA SENATE".asOneTimePublisher())
         panel.setSize(1024, 512)
         compareRendering("MultiResultPanel", "Runoff-1", panel)
         districts.forEach { it.declareRunoff() }
@@ -808,34 +808,34 @@ class MultiResultScreenTest {
         val shapesByDistrict = peiShapesByDistrict()
         val swingometerOrder = listOf(ndp, grn, lib, ind, pc)
         val panel = of(
-            fixedBinding(districts),
-            { fixedBinding(it.votes) },
-            { fixedBinding("DISTRICT " + it.districtNum) },
-            { fixedBinding(it.name.uppercase()) }
+            districts.asOneTimePublisher(),
+            { it.votes.asOneTimePublisher() },
+            { ("DISTRICT " + it.districtNum).asOneTimePublisher() },
+            { it.name.uppercase().asOneTimePublisher() }
         )
             .withIncumbentMarker("(MLA)")
             .withWinner { d ->
-                fixedBinding(
+                (
                     if (d.leaderHasWon)
                         d.votes.entries.maxByOrNull { it.value }!!.key
                     else
                         null
-                )
+                    ).asOneTimePublisher()
             }
             .withPrev(
-                { fixedBinding(it.prevVotes) },
-                { fixedBinding("SWING SINCE 2015") },
+                { it.prevVotes.asOneTimePublisher() },
+                { "SWING SINCE 2015".asOneTimePublisher() },
                 compareBy { swingometerOrder.indexOf(it) }
             )
             .withMap(
                 { shapesByDistrict },
                 { it.districtNum },
-                { d -> fixedBinding(PartyResult(d.votes.entries.maxByOrNull { it.value }?.key?.party, d.leaderHasWon)) },
+                { d -> PartyResult(d.votes.entries.maxByOrNull { it.value }?.key?.party, d.leaderHasWon).asOneTimePublisher() },
                 { listOf(10, 11, 12, 13, 14) },
                 { listOf(9, 10, 11, 12, 13, 14) },
-                { fixedBinding("CHARLOTTETOWN") }
+                { "CHARLOTTETOWN".asOneTimePublisher() }
             )
-            .build(fixedBinding("CABINET MEMBERS IN CHARLOTTETOWN"))
+            .build("CABINET MEMBERS IN CHARLOTTETOWN".asOneTimePublisher())
         panel.setSize(1024, 512)
         compareRendering("MultiResultPanel", "MapAdditionalHighlights-1", panel)
     }
@@ -931,19 +931,19 @@ class MultiResultScreenTest {
             )
         )
         val swingometerOrder = listOf(ndp, grn, lib, ind, pc, pa)
-        val districtBinding = BindableWrapper(districts)
+        val districtPublisher = Publisher(districts)
         val panel = ofParties(
-            districtBinding.binding,
+            districtPublisher,
             { it.partyVotes },
-            { fixedBinding("DISTRICT " + it.districtNum) },
-            { fixedBinding(it.name.uppercase()) }
+            { ("DISTRICT " + it.districtNum).asOneTimePublisher() },
+            { it.name.uppercase().asOneTimePublisher() }
         )
             .withPrev(
-                { fixedBinding(it.prevVotes) },
-                { fixedBinding("SWING SINCE 2018") },
+                { it.prevVotes.asOneTimePublisher() },
+                { "SWING SINCE 2018".asOneTimePublisher() },
                 compareBy { swingometerOrder.indexOf(it) }
             )
-            .build(fixedBinding("ELECTION 2020: NEW BRUNSWICK DECIDES"))
+            .build("ELECTION 2020: NEW BRUNSWICK DECIDES".asOneTimePublisher())
         panel.setSize(1024, 512)
         compareRendering("MultiResultPanel", "PartiesOnly-1", panel)
         districts.add(
@@ -988,13 +988,13 @@ class MultiResultScreenTest {
                 )
             )
         )
-        districtBinding.value = districts
+        districtPublisher.submit(districts)
         compareRendering("MultiResultPanel", "PartiesOnly-2", panel)
         districts.removeAt(3)
         districts.removeAt(2)
         districts.removeAt(1)
         districts.removeAt(0)
-        districtBinding.value = districts
+        districtPublisher.submit(districts)
         compareRendering("MultiResultPanel", "PartiesOnly-3", panel)
     }
 
@@ -1014,84 +1014,65 @@ class MultiResultScreenTest {
         val prevVotes: Map<Party, Int>,
         private var status: String = "100% REPORTING",
         private var pctReporting: Double = 1.0
-    ) : Bindable<District, District.Property>() {
-        enum class Property {
-            PROP
-        }
-
+    ) {
         private var topTwoToRunoff = false
-        fun getStatus(): Binding<String> {
-            return propertyBinding(this, { it.status }, Property.PROP)
+
+        private val statusPublisher = Publisher(status)
+        fun getStatus(): Flow.Publisher<String> {
+            return statusPublisher
         }
 
-        fun getPctReporting(): Binding<Double> {
-            return propertyBinding(this, { it.pctReporting }, Property.PROP)
+        private val pctReportingPublisher = Publisher(pctReporting)
+        fun getPctReporting(): Flow.Publisher<Double> {
+            return pctReportingPublisher
         }
 
-        fun getVotes(): Binding<Map<Candidate, Int>> {
-            return propertyBinding(this, { it.votes }, Property.PROP)
+        private val votesPublisher = Publisher(votes)
+        fun getVotes(): Flow.Publisher<Map<Candidate, Int>> {
+            return votesPublisher
         }
 
-        val partyVotes: Binding<Map<Party, Int>>
-            get() = propertyBinding(
-                this,
-                { d ->
-                    d.votes.entries
-                        .groupBy { it.key.party }
-                        .mapValues { e -> e.value.map { it.value }.sum() }
-                },
-                Property.PROP
-            )
+        val partyVotes = Publisher<Map<Party, Int>>(calculatePartyVotes())
+        private fun calculatePartyVotes() =
+            votes.entries
+                .groupBy { it.key.party }
+                .mapValues { e -> e.value.map { it.value }.sum() }
 
-        fun getLeaderHasWon(): Binding<Boolean> {
-            return propertyBinding(this, { it.leaderHasWon }, Property.PROP)
+        private val leaderHasWonPublisher = Publisher(leaderHasWon)
+        fun getLeaderHasWon(): Flow.Publisher<Boolean> {
+            return leaderHasWonPublisher
         }
 
-        val winner: Binding<Candidate?>
-            get() = propertyBinding(
-                this,
-                {
-                    if (leaderHasWon) votes.entries.maxByOrNull { it.value }!!.key else null
-                },
-                Property.PROP
-            )
-        val runoff: Binding<Set<Candidate>?>
-            get() = propertyBinding(
-                this,
-                { d ->
-                    if (!d.topTwoToRunoff)
-                        null
-                    else
-                        d.votes.entries.asSequence().sortedByDescending { it.value }
-                            .take(2)
-                            .map { it.key }
-                            .toSet()
-                },
-                Property.PROP
-            )
-        val leader: Binding<Pair<Candidate, Boolean>?>
-            get() = propertyBinding(
-                this,
-                {
-                    if (votes.values.all { it == 0 })
-                        null
-                    else
-                        Pair(
-                            votes.entries.asSequence()
-                                .filter { it.value > 0 }
-                                .maxByOrNull { it.value }
-                            !!.key,
-                            leaderHasWon
-                        )
-                },
-                Property.PROP
+        val winner = Publisher(calculateWinner())
+        private fun calculateWinner() = if (leaderHasWon) votes.entries.maxByOrNull { it.value }!!.key else null
+
+        val runoff = Publisher(calculateRunoff())
+        private fun calculateRunoff() =
+            if (!topTwoToRunoff)
+                null
+            else
+                votes.entries.asSequence().sortedByDescending { it.value }
+                    .take(2)
+                    .map { it.key }
+                    .toSet()
+
+        val leader = Publisher(calculateLeader())
+        private fun calculateLeader() = if (votes.values.all { it == 0 })
+            null
+        else
+            Pair(
+                votes.entries.asSequence()
+                    .filter { it.value > 0 }
+                    .maxByOrNull { it.value }
+                !!.key,
+                leaderHasWon
             )
 
         fun update(status: String, pctReporting: Double, votes: Map<Candidate, Int>) {
             this.status = status
             this.pctReporting = pctReporting
             this.votes = votes
-            onPropertyRefreshed(Property.PROP)
+            update()
         }
 
         fun update(
@@ -1104,12 +1085,23 @@ class MultiResultScreenTest {
             this.pctReporting = pctReporting
             this.votes = votes
             this.leaderHasWon = leaderHasWon
-            onPropertyRefreshed(Property.PROP)
+            update()
         }
 
         fun declareRunoff() {
             topTwoToRunoff = true
-            onPropertyRefreshed(Property.PROP)
+            update()
+        }
+
+        private fun update() {
+            statusPublisher.submit(status)
+            pctReportingPublisher.submit(pctReporting)
+            votesPublisher.submit(votes)
+            partyVotes.submit(calculatePartyVotes())
+            leaderHasWonPublisher.submit(leaderHasWon)
+            winner.submit(calculateWinner())
+            runoff.submit(calculateRunoff())
+            leader.submit(calculateLeader())
         }
     }
 

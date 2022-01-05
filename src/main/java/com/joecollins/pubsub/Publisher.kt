@@ -178,31 +178,42 @@ fun <T> List<Flow.Publisher<T>>.combine(): Flow.Publisher<List<T>> {
     return publisher
 }
 
-fun <T, R> Flow.Publisher<T>.compose(func: (T) -> Flow.Publisher<R>): Flow.Publisher<R> {
+fun <T, R> Flow.Publisher<T>.compose(func: (T) -> Flow.Publisher<out R>): Flow.Publisher<R> {
     val ret = Publisher<R>()
     var currSubscription: Flow.Subscription? = null
     this.subscribe(
         Subscriber<T> { t ->
             val nestedPublisher = func(t)
-            currSubscription?.cancel()
-            nestedPublisher.subscribe(object : Flow.Subscriber<R> {
-                override fun onSubscribe(subscription: Flow.Subscription) {
-                    currSubscription = subscription
-                    subscription.request(1)
-                }
+            synchronized(ret) {
+                currSubscription?.cancel()
+                nestedPublisher.subscribe(object : Flow.Subscriber<R> {
+                    private var thisSubscription: Flow.Subscription? = null
 
-                override fun onNext(item: R) {
-                    ret.submit(item)
-                    currSubscription!!.request(1)
-                }
+                    override fun onSubscribe(subscription: Flow.Subscription) {
+                        synchronized(ret) {
+                            currSubscription = subscription
+                            thisSubscription = subscription
+                            subscription.request(1)
+                        }
+                    }
 
-                override fun onError(throwable: Throwable) {
-                    throwable.printStackTrace()
-                }
+                    override fun onNext(item: R) {
+                        synchronized(ret) {
+                            if (thisSubscription === currSubscription) {
+                                ret.submit(item)
+                                currSubscription!!.request(1)
+                            }
+                        }
+                    }
 
-                override fun onComplete() {
-                }
-            })
+                    override fun onError(throwable: Throwable) {
+                        throwable.printStackTrace()
+                    }
+
+                    override fun onComplete() {
+                    }
+                })
+            }
         }
     )
     return ret
