@@ -1,15 +1,14 @@
 package com.joecollins.graphics.screens.generic
 
-import com.joecollins.bindings.Binding
-import com.joecollins.bindings.toFixedBinding
 import com.joecollins.graphics.components.MapFrameTest
-import com.joecollins.graphics.utils.BindableWrapper
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.graphics.utils.ShapefileReader
 import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.Party
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
+import com.joecollins.pubsub.map
+import com.joecollins.pubsub.merge
 import org.junit.Test
 import java.awt.Color
 import java.awt.Dimension
@@ -46,35 +45,35 @@ class SingleTransferrableResultScreenTest {
             con to 477,
             sdlp to 141
         )
-        val currQuota = BindableWrapper(1)
+        val currQuota = Publisher(1)
         val prevQuota = 5311.0
-        val currRound = BindableWrapper(emptyMap<Party, Double>())
-        val prevRound = BindableWrapper(prevVotes.mapValues { it.value / prevQuota })
-        val currVotes = BindableWrapper(emptyMap<Party, Int>())
-        val currWinner = BindableWrapper<Party?>(null)
-        val round = BindableWrapper(0)
+        val currRound = Publisher(emptyMap<Party, Double>())
+        val prevRound = Publisher(prevVotes.mapValues { it.value / prevQuota })
+        val currVotes = Publisher(emptyMap<Party, Int>())
+        val currWinner = Publisher<Party?>(null)
+        val round = Publisher(0)
 
         val panel = BasicResultPanel.partyQuotas(
-            currRound.binding.merge(currQuota.binding) { votes, quota -> votes.mapValues { it.value / quota } },
-            Binding.fixedBinding(5),
-            Binding.fixedBinding("PARTY SUMMARY"),
-            round.binding.map { if (it == 0) "WAITING..." else "COUNT $it" }
+            currRound.merge(currQuota) { votes, quota -> votes.mapValues { it.value / quota } },
+            5.asOneTimePublisher(),
+            "PARTY SUMMARY".asOneTimePublisher(),
+            round.map { if (it == 0) "WAITING..." else "COUNT $it" }
         ).withPrev(
-            prevRound.binding,
-            round.binding.map { if (it <= 1) "CHANGE SINCE 2016" else "CHANGE FROM COUNT ${it - 1}" }
+            prevRound,
+            round.map { if (it <= 1) "CHANGE SINCE 2016" else "CHANGE FROM COUNT ${it - 1}" }
         ).withSwing(
-            currVotes.binding,
-            Binding.fixedBinding(prevVotes),
+            currVotes,
+            prevVotes.asOneTimePublisher(),
             Comparator.comparing { listOf(sf, apni, dup).indexOf(it) },
-            Binding.fixedBinding("FIRST PREF SWING")
+            "FIRST PREF SWING".asOneTimePublisher()
         ).withPartyMap(
-            Binding.fixedBinding(niShapesByConstituency()),
-            Binding.fixedBinding(9),
-            currWinner.binding,
-            Binding.fixedBinding(listOf(9, 10, 12, 15)),
-            Binding.fixedBinding("BELFAST")
+            niShapesByConstituency().asOneTimePublisher(),
+            9.asOneTimePublisher(),
+            currWinner,
+            listOf(9, 10, 12, 15).asOneTimePublisher(),
+            "BELFAST".asOneTimePublisher()
         ).build(
-            Binding.fixedBinding("BELFAST EAST")
+            "BELFAST EAST".asOneTimePublisher()
         )
         panel.setSize(1024, 512)
         compareRendering("SingleTransferrableResultScreen", "Quotas-0", panel)
@@ -92,11 +91,11 @@ class SingleTransferrableResultScreenTest {
             sdlp to 250,
             ind to 84
         )
-        currVotes.value = round1
+        currVotes.submit(round1)
         val quota = 6727.0
-        currRound.value = round1.mapValues { it.value / quota }
-        round.value = 1
-        currWinner.value = dup
+        currRound.submit(round1.mapValues { it.value / quota })
+        round.submit(1)
+        currWinner.submit(dup)
         compareRendering("SingleTransferrableResultScreen", "Quotas-1", panel)
 
         val round2 = mapOf(
@@ -112,9 +111,9 @@ class SingleTransferrableResultScreenTest {
             sdlp to 260.45,
             ind to 85.43
         )
-        currRound.value = round2.mapValues { it.value / quota }
-        prevRound.value = round1.mapValues { it.value / quota }
-        round.value = 2
+        currRound.submit(round2.mapValues { it.value / quota })
+        prevRound.submit(round1.mapValues { it.value / quota })
+        round.submit(2)
         compareRendering("SingleTransferrableResultScreen", "Quotas-2", panel)
 
         val round3 = mapOf(
@@ -129,9 +128,9 @@ class SingleTransferrableResultScreenTest {
             con to 278.43,
             sdlp to 260.56
         )
-        currRound.value = round3.mapValues { it.value / quota }
-        prevRound.value = round2.mapValues { it.value / quota }
-        round.value = 3
+        currRound.submit(round3.mapValues { it.value / quota })
+        prevRound.submit(round2.mapValues { it.value / quota })
+        round.submit(3)
         compareRendering("SingleTransferrableResultScreen", "Quotas-3", panel)
 
         val round4 = mapOf(
@@ -145,9 +144,9 @@ class SingleTransferrableResultScreenTest {
             labalt to 467.81,
             con to 280.43
         )
-        currRound.value = round4.mapValues { it.value / quota }
-        prevRound.value = round3.mapValues { it.value / quota }
-        round.value = 4
+        currRound.submit(round4.mapValues { it.value / quota })
+        prevRound.submit(round3.mapValues { it.value / quota })
+        round.submit(4)
         compareRendering("SingleTransferrableResultScreen", "Quotas-4", panel)
 
         val round5 = mapOf(
@@ -159,9 +158,9 @@ class SingleTransferrableResultScreenTest {
             sf to 1232.88,
             tuv to 958.87
         )
-        currRound.value = round5.mapValues { it.value / quota }
-        prevRound.value = round4.mapValues { it.value / quota }
-        round.value = 5
+        currRound.submit(round5.mapValues { it.value / quota })
+        prevRound.submit(round4.mapValues { it.value / quota })
+        round.submit(5)
         compareRendering("SingleTransferrableResultScreen", "Quotas-5", panel)
 
         val round6 = mapOf(
@@ -172,9 +171,9 @@ class SingleTransferrableResultScreenTest {
             grn to 1801.58,
             sf to 1235.10
         )
-        currRound.value = round6.mapValues { it.value / quota }
-        prevRound.value = round5.mapValues { it.value / quota }
-        round.value = 6
+        currRound.submit(round6.mapValues { it.value / quota })
+        prevRound.submit(round5.mapValues { it.value / quota })
+        round.submit(6)
         compareRendering("SingleTransferrableResultScreen", "Quotas-6", panel)
 
         val round7 = mapOf(
@@ -184,9 +183,9 @@ class SingleTransferrableResultScreenTest {
             pup to 2950.28,
             grn to 2080.65
         )
-        currRound.value = round7.mapValues { it.value / quota }
-        prevRound.value = round6.mapValues { it.value / quota }
-        round.value = 7
+        currRound.submit(round7.mapValues { it.value / quota })
+        prevRound.submit(round6.mapValues { it.value / quota })
+        round.submit(7)
         compareRendering("SingleTransferrableResultScreen", "Quotas-7", panel)
 
         val round8 = mapOf(
@@ -195,9 +194,9 @@ class SingleTransferrableResultScreenTest {
             dup to 6275.01 + 4890.72 + 4599.73,
             pup to 3148.79
         )
-        currRound.value = round8.mapValues { it.value / quota }
-        prevRound.value = round7.mapValues { it.value / quota }
-        round.value = 8
+        currRound.submit(round8.mapValues { it.value / quota })
+        prevRound.submit(round7.mapValues { it.value / quota })
+        round.submit(8)
         compareRendering("SingleTransferrableResultScreen", "Quotas-8", panel)
 
         val round9 = mapOf(
@@ -205,9 +204,9 @@ class SingleTransferrableResultScreenTest {
             uup to 7257.62,
             dup to 6759.01 + 5268.26 + 4995.25
         )
-        currRound.value = round9.mapValues { it.value / quota }
-        prevRound.value = round8.mapValues { it.value / quota }
-        round.value = 9
+        currRound.submit(round9.mapValues { it.value / quota })
+        prevRound.submit(round8.mapValues { it.value / quota })
+        round.submit(9)
         compareRendering("SingleTransferrableResultScreen", "Quotas-9", panel)
 
         val round10 = mapOf(
@@ -215,9 +214,9 @@ class SingleTransferrableResultScreenTest {
             uup to quota,
             dup to quota + 5333.26 + 5093.25
         )
-        currRound.value = round10.mapValues { it.value / quota }
-        prevRound.value = round9.mapValues { it.value / quota }
-        round.value = 10
+        currRound.submit(round10.mapValues { it.value / quota })
+        prevRound.submit(round9.mapValues { it.value / quota })
+        round.submit(10)
         compareRendering("SingleTransferrableResultScreen", "Quotas-10", panel)
 
         val round11 = mapOf(
@@ -225,9 +224,9 @@ class SingleTransferrableResultScreenTest {
             uup to quota,
             dup to quota + 5541.65 + 5410.84
         )
-        currRound.value = round11.mapValues { it.value / quota }
-        prevRound.value = round10.mapValues { it.value / quota }
-        round.value = 11
+        currRound.submit(round11.mapValues { it.value / quota })
+        prevRound.submit(round10.mapValues { it.value / quota })
+        round.submit(11)
         compareRendering("SingleTransferrableResultScreen", "Quotas-11", panel)
     }
 
@@ -521,19 +520,19 @@ class SingleTransferrableResultScreenTest {
         )
         val currQuota = 156404.0
         val prevQuota = 151596.0
-        val currRound = BindableWrapper(currVotes.mapValues { it.value / currQuota })
-        val prevRound = BindableWrapper(prevVotes.mapValues { it.value / prevQuota })
+        val currRound = Publisher(currVotes.mapValues { it.value / currQuota })
+        val prevRound = Publisher(prevVotes.mapValues { it.value / prevQuota })
 
         val panel = BasicResultPanel.partyQuotas(
-            currRound.binding,
-            Binding.fixedBinding(6),
-            Binding.fixedBinding("PARTY SUMMARY"),
-            Binding.fixedBinding("FIRST PREFERENCES")
+            currRound,
+            6.asOneTimePublisher(),
+            "PARTY SUMMARY".asOneTimePublisher(),
+            "FIRST PREFERENCES".asOneTimePublisher()
         ).withPrev(
-            prevRound.binding,
-            "CHANGE SINCE 2016".toFixedBinding()
+            prevRound,
+            "CHANGE SINCE 2016".asOneTimePublisher()
         ).build(
-            Binding.fixedBinding("SOUTH AUSTRALIA")
+            "SOUTH AUSTRALIA".asOneTimePublisher()
         )
         panel.setSize(1024, 512)
         compareRendering("SingleTransferrableResultScreen", "Quotas-Oth", panel)

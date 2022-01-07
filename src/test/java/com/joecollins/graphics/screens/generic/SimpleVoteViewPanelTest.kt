@@ -1,13 +1,10 @@
 package com.joecollins.graphics.screens.generic
 
-import com.joecollins.bindings.Binding.Companion.fixedBinding
-import com.joecollins.bindings.toFixedBinding
 import com.joecollins.graphics.components.MapFrameTest
 import com.joecollins.graphics.screens.generic.BasicResultPanel.Companion.candidateVotes
 import com.joecollins.graphics.screens.generic.BasicResultPanel.Companion.candidateVotesPctOnly
 import com.joecollins.graphics.screens.generic.BasicResultPanel.Companion.partyRangeVotes
 import com.joecollins.graphics.screens.generic.BasicResultPanel.Companion.partyVotes
-import com.joecollins.graphics.utils.BindableWrapper
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.graphics.utils.ShapefileReader.readShapes
 import com.joecollins.models.general.Aggregators.topAndOthers
@@ -16,6 +13,9 @@ import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
 import com.joecollins.models.general.PartyResult.Companion.elected
 import com.joecollins.models.general.PartyResult.Companion.leading
+import com.joecollins.pubsub.Publisher
+import com.joecollins.pubsub.asOneTimePublisher
+import com.joecollins.pubsub.map
 import org.junit.Test
 import java.awt.Color
 import java.awt.Shape
@@ -44,26 +44,26 @@ class SimpleVoteViewPanelTest {
         prev[pc.party] = 785
         prev[lib.party] = 1060
         prev[grn.party] = 106
-        val currentVotes = BindableWrapper(curr)
-        val previousVotes = BindableWrapper(prev)
-        val header = BindableWrapper("MONTAGUE-KILMUIR")
-        val voteHeader = BindableWrapper("9 OF 9 POLLS REPORTING")
-        val voteSubhead = BindableWrapper("PROJECTION: PC GAIN FROM LIB")
-        val changeHeader = BindableWrapper("CHANGE SINCE 2015")
-        val swingHeader = BindableWrapper("SWING SINCE 2015")
-        val mapHeader = BindableWrapper("CARDIGAN")
-        val leader = BindableWrapper(pc.party)
+        val currentVotes = Publisher(curr)
+        val previousVotes = Publisher(prev)
+        val header = Publisher("MONTAGUE-KILMUIR")
+        val voteHeader = Publisher("9 OF 9 POLLS REPORTING")
+        val voteSubhead = Publisher("PROJECTION: PC GAIN FROM LIB")
+        val changeHeader = Publisher("CHANGE SINCE 2015")
+        val swingHeader = Publisher("SWING SINCE 2015")
+        val mapHeader = Publisher("CARDIGAN")
+        val leader = Publisher(pc.party)
         val swingPartyOrder = listOf(ndp.party, grn.party, lib.party, pc.party)
         val shapesByDistrict = peiShapesByDistrict()
-        val focus = BindableWrapper(shapesByDistrict.keys.filter { it <= 7 })
-        val selectedDistrict = BindableWrapper(3)
+        val focus = Publisher(shapesByDistrict.keys.filter { it <= 7 })
+        val selectedDistrict = Publisher(3)
         val panel = candidateVotes(
-            currentVotes.binding, voteHeader.binding, voteSubhead.binding
+            currentVotes, voteHeader, voteSubhead
         )
-            .withPrev(previousVotes.binding, changeHeader.binding)
-            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader.binding)
-            .withPartyMap(fixedBinding(shapesByDistrict), selectedDistrict.binding, leader.binding, focus.binding, mapHeader.binding)
-            .build(header.binding)
+            .withPrev(previousVotes, changeHeader)
+            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader)
+            .withPartyMap(shapesByDistrict.asOneTimePublisher(), selectedDistrict, leader, focus, mapHeader)
+            .build(header)
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "Basic-1", panel)
     }
@@ -98,23 +98,23 @@ class SimpleVoteViewPanelTest {
         prev[lib.party] = 23603
         prev[grn.party] = 1717
         prev[bq.party] = 9164
-        val currentVotes = BindableWrapper(curr)
-        val previousVotes = BindableWrapper(prev)
-        val header = BindableWrapper("LASALLE\u2014\u00c9MARD\u2014VERDUN")
-        val voteHeader = BindableWrapper("100% OF POLLS REPORTING")
-        val voteSubhead = BindableWrapper("PROJECTION: LIB HOLD")
-        val changeHeader = BindableWrapper("CHANGE SINCE 2015")
-        val swingHeader = BindableWrapper("SWING SINCE 2015")
+        val currentVotes = Publisher(curr)
+        val previousVotes = Publisher(prev)
+        val header = Publisher("LASALLE\u2014\u00c9MARD\u2014VERDUN")
+        val voteHeader = Publisher("100% OF POLLS REPORTING")
+        val voteSubhead = Publisher("PROJECTION: LIB HOLD")
+        val changeHeader = Publisher("CHANGE SINCE 2015")
+        val swingHeader = Publisher("SWING SINCE 2015")
         val swingPartyOrder = listOf(ndp.party, grn.party, lib.party, bq.party, con.party)
         val panel = candidateVotes(
-            currentVotes.binding,
-            voteHeader.binding,
-            voteSubhead.binding,
+            currentVotes,
+            voteHeader,
+            voteSubhead,
             "(MP)"
         )
-            .withPrev(previousVotes.binding, changeHeader.binding)
-            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader.binding)
-            .build(header.binding)
+            .withPrev(previousVotes, changeHeader)
+            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader)
+            .build(header)
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "Basic-2", panel)
     }
@@ -136,27 +136,27 @@ class SimpleVoteViewPanelTest {
         prev[pc.party] = 785
         prev[lib.party] = 1060
         prev[grn.party] = 106
-        val currentVotes = BindableWrapper(curr)
-        val previousVotes = BindableWrapper(prev)
-        val header = BindableWrapper("MONTAGUE-KILMUIR")
-        val voteHeader = BindableWrapper("9 OF 9 POLLS REPORTING")
-        val voteSubhead = BindableWrapper("PROJECTION: PC GAIN FROM LIB")
-        val changeHeader = BindableWrapper("CHANGE SINCE 2015")
-        val swingHeader = BindableWrapper("SWING SINCE 2015")
-        val mapHeader = BindableWrapper("CARDIGAN")
-        val leader = BindableWrapper(pc.party)
+        val currentVotes = Publisher(curr)
+        val previousVotes = Publisher(prev)
+        val header = Publisher("MONTAGUE-KILMUIR")
+        val voteHeader = Publisher("9 OF 9 POLLS REPORTING")
+        val voteSubhead = Publisher("PROJECTION: PC GAIN FROM LIB")
+        val changeHeader = Publisher("CHANGE SINCE 2015")
+        val swingHeader = Publisher("SWING SINCE 2015")
+        val mapHeader = Publisher("CARDIGAN")
+        val leader = Publisher(pc.party)
         val swingPartyOrder = listOf(ndp.party, grn.party, lib.party, pc.party)
         val shapesByDistrict = peiShapesByDistrict()
-        val focus = BindableWrapper(shapesByDistrict.keys.filter { it <= 7 })
-        val selectedDistrict = BindableWrapper(3)
+        val focus = Publisher(shapesByDistrict.keys.filter { it <= 7 })
+        val selectedDistrict = Publisher(3)
         val panel = candidateVotesPctOnly(
-            currentVotes.binding, voteHeader.binding, voteSubhead.binding
+            currentVotes, voteHeader, voteSubhead
         )
-            .withPrev(previousVotes.binding, changeHeader.binding)
-            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader.binding)
-            .withPartyMap(fixedBinding(shapesByDistrict), selectedDistrict.binding, leader.binding, focus.binding, mapHeader.binding)
-            .withNotes(fixedBinding("SOURCE: Elections PEI"))
-            .build(header.binding)
+            .withPrev(previousVotes, changeHeader)
+            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader)
+            .withPartyMap(shapesByDistrict.asOneTimePublisher(), selectedDistrict, leader, focus, mapHeader)
+            .withNotes("SOURCE: Elections PEI".asOneTimePublisher())
+            .build(header)
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "PctOnly-1", panel)
     }
@@ -178,30 +178,30 @@ class SimpleVoteViewPanelTest {
         prev[pc.party] = 785
         prev[lib.party] = 1060
         prev[grn.party] = 106
-        val currentVotes = BindableWrapper(curr)
-        val previousVotes = BindableWrapper(prev)
-        val pctReporting = BindableWrapper(0.0)
-        val header = BindableWrapper("MONTAGUE-KILMUIR")
-        val voteHeader = BindableWrapper("0 OF 9 POLLS REPORTING")
-        val voteSubhead = BindableWrapper("WAITING FOR RESULTS...")
-        val changeHeader = BindableWrapper("CHANGE SINCE 2015")
-        val swingHeader = BindableWrapper("SWING SINCE 2015")
-        val mapHeader = BindableWrapper("CARDIGAN")
-        val leader = BindableWrapper<PartyResult?>(null)
-        val winner = BindableWrapper<Candidate?>(null)
+        val currentVotes = Publisher(curr)
+        val previousVotes = Publisher(prev)
+        val pctReporting = Publisher(0.0)
+        val header = Publisher("MONTAGUE-KILMUIR")
+        val voteHeader = Publisher("0 OF 9 POLLS REPORTING")
+        val voteSubhead = Publisher("WAITING FOR RESULTS...")
+        val changeHeader = Publisher("CHANGE SINCE 2015")
+        val swingHeader = Publisher("SWING SINCE 2015")
+        val mapHeader = Publisher("CARDIGAN")
+        val leader = Publisher<PartyResult?>(null)
+        val winner = Publisher<Candidate?>(null)
         val swingPartyOrder = listOf(ndp.party, grn.party, lib.party, pc.party)
         val shapesByDistrict = peiShapesByDistrict()
-        val focus = BindableWrapper(shapesByDistrict.keys.filter { it <= 7 })
-        val selectedDistrict = BindableWrapper(3)
+        val focus = Publisher(shapesByDistrict.keys.filter { it <= 7 })
+        val selectedDistrict = Publisher(3)
         val panel = candidateVotes(
-            currentVotes.binding, voteHeader.binding, voteSubhead.binding
+            currentVotes, voteHeader, voteSubhead
         )
-            .withPrev(previousVotes.binding, changeHeader.binding)
-            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader.binding)
-            .withResultMap(fixedBinding(shapesByDistrict), selectedDistrict.binding, leader.binding, focus.binding, mapHeader.binding)
-            .withWinner(winner.binding)
-            .withPctReporting(pctReporting.binding)
-            .build(header.binding)
+            .withPrev(previousVotes, changeHeader)
+            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader)
+            .withResultMap(shapesByDistrict.asOneTimePublisher(), selectedDistrict, leader, focus, mapHeader)
+            .withWinner(winner)
+            .withPctReporting(pctReporting)
+            .build(header)
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "Update-1", panel)
 
@@ -209,48 +209,48 @@ class SimpleVoteViewPanelTest {
         curr[pc] = 47
         curr[lib] = 58
         curr[grn] = 52
-        currentVotes.value = curr
-        voteHeader.value = "1 OF 9 POLLS REPORTING"
-        voteSubhead.value = "PROJECTION: TOO EARLY TO CALL"
-        pctReporting.value = 1.0 / 9
-        leader.value = leading(lib.party)
+        currentVotes.submit(curr)
+        voteHeader.submit("1 OF 9 POLLS REPORTING")
+        voteSubhead.submit("PROJECTION: TOO EARLY TO CALL")
+        pctReporting.submit(1.0 / 9)
+        leader.submit(leading(lib.party))
         compareRendering("SimpleVoteViewPanel", "Update-2", panel)
 
         curr[ndp] = 8
         curr[pc] = 91
         curr[lib] = 100
         curr[grn] = 106
-        currentVotes.value = curr
-        voteHeader.value = "2 OF 9 POLLS REPORTING"
-        voteSubhead.value = "PROJECTION: TOO EARLY TO CALL"
-        pctReporting.value = 2.0 / 9
-        leader.value = leading(grn.party)
+        currentVotes.submit(curr)
+        voteHeader.submit("2 OF 9 POLLS REPORTING")
+        voteSubhead.submit("PROJECTION: TOO EARLY TO CALL")
+        pctReporting.submit(2.0 / 9)
+        leader.submit(leading(grn.party))
         compareRendering("SimpleVoteViewPanel", "Update-3", panel)
 
         curr[ndp] = 18
         curr[pc] = 287
         curr[lib] = 197
         curr[grn] = 243
-        currentVotes.value = curr
-        voteHeader.value = "5 OF 9 POLLS REPORTING"
-        voteSubhead.value = "PROJECTION: TOO EARLY TO CALL"
-        pctReporting.value = 5.0 / 9
-        leader.value = leading(pc.party)
+        currentVotes.submit(curr)
+        voteHeader.submit("5 OF 9 POLLS REPORTING")
+        voteSubhead.submit("PROJECTION: TOO EARLY TO CALL")
+        pctReporting.submit(5.0 / 9)
+        leader.submit(leading(pc.party))
         compareRendering("SimpleVoteViewPanel", "Update-4", panel)
 
         curr[ndp] = 124
         curr[pc] = 1373
         curr[lib] = 785
         curr[grn] = 675
-        currentVotes.value = curr
-        voteHeader.value = "9 OF 9 POLLS REPORTING"
-        voteSubhead.value = "PROJECTION: PC GAIN FROM LIB"
-        pctReporting.value = 9.0 / 9
-        leader.value = elected(pc.party)
-        winner.value = pc
+        currentVotes.submit(curr)
+        voteHeader.submit("9 OF 9 POLLS REPORTING")
+        voteSubhead.submit("PROJECTION: PC GAIN FROM LIB")
+        pctReporting.submit(9.0 / 9)
+        leader.submit(elected(pc.party))
+        winner.submit(pc)
         compareRendering("SimpleVoteViewPanel", "Update-5", panel)
 
-        winner.value = null
+        winner.submit(null)
         compareRendering("SimpleVoteViewPanel", "Update-6", panel)
     }
 
@@ -271,30 +271,30 @@ class SimpleVoteViewPanelTest {
         prev[pc.party] = 785
         prev[lib.party] = 1060
         prev[grn.party] = 106
-        val currentVotes = BindableWrapper(curr)
-        val previousVotes = BindableWrapper(prev)
-        val pctReporting = BindableWrapper(1.0 / 9)
-        val header = BindableWrapper("MONTAGUE-KILMUIR")
-        val voteHeader = BindableWrapper("1 OF 9 POLLS REPORTING")
-        val voteSubhead = BindableWrapper("WAITING FOR RESULTS...")
-        val changeHeader = BindableWrapper("CHANGE SINCE 2015")
-        val swingHeader = BindableWrapper("SWING SINCE 2015")
-        val mapHeader = BindableWrapper("CARDIGAN")
-        val leader = BindableWrapper(leading(lib.party))
-        val winner = BindableWrapper<Candidate?>(null)
+        val currentVotes = Publisher(curr)
+        val previousVotes = Publisher(prev)
+        val pctReporting = Publisher(1.0 / 9)
+        val header = Publisher("MONTAGUE-KILMUIR")
+        val voteHeader = Publisher("1 OF 9 POLLS REPORTING")
+        val voteSubhead = Publisher("WAITING FOR RESULTS...")
+        val changeHeader = Publisher("CHANGE SINCE 2015")
+        val swingHeader = Publisher("SWING SINCE 2015")
+        val mapHeader = Publisher("CARDIGAN")
+        val leader = Publisher(leading(lib.party))
+        val winner = Publisher<Candidate?>(null)
         val swingPartyOrder = listOf(ndp.party, grn.party, lib.party, pc.party)
         val shapesByDistrict = peiShapesByDistrict()
-        val focus = BindableWrapper(shapesByDistrict.keys.filter { it <= 7 })
-        val selectedDistrict = BindableWrapper(3)
+        val focus = Publisher(shapesByDistrict.keys.filter { it <= 7 })
+        val selectedDistrict = Publisher(3)
         val panel = candidateVotes(
-            currentVotes.binding, voteHeader.binding, voteSubhead.binding
+            currentVotes, voteHeader, voteSubhead
         )
-            .withPrev(previousVotes.binding, changeHeader.binding)
-            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader.binding)
-            .withResultMap(fixedBinding(shapesByDistrict), selectedDistrict.binding, leader.binding, focus.binding, mapHeader.binding)
-            .withWinner(winner.binding)
-            .withPctReporting(pctReporting.binding)
-            .build(header.binding)
+            .withPrev(previousVotes, changeHeader)
+            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader)
+            .withResultMap(shapesByDistrict.asOneTimePublisher(), selectedDistrict, leader, focus, mapHeader)
+            .withWinner(winner)
+            .withPctReporting(pctReporting)
+            .build(header)
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "ZeroVotes-1", panel)
     }
@@ -308,27 +308,27 @@ class SimpleVoteViewPanelTest {
         val grn = Party("Green", "GRN", Color.GREEN.darker())
         val curr = LinkedHashMap<Party, Int>()
         val prev = LinkedHashMap<Party, Int>()
-        val currentVotes = BindableWrapper(curr)
-        val previousVotes = BindableWrapper(prev)
-        val pctReporting = BindableWrapper(0.0)
-        val header = BindableWrapper("PRINCE EDWARD ISLAND")
-        val voteHeader = BindableWrapper("0 OF 27 DISTRICTS DECLARED")
-        val voteSubhead = BindableWrapper("WAITING FOR RESULTS...")
-        val changeHeader = BindableWrapper("CHANGE SINCE 2015")
-        val swingHeader = BindableWrapper("SWING SINCE 2015")
-        val mapHeader = BindableWrapper("PEI")
+        val currentVotes = Publisher(curr)
+        val previousVotes = Publisher(prev)
+        val pctReporting = Publisher(0.0)
+        val header = Publisher("PRINCE EDWARD ISLAND")
+        val voteHeader = Publisher("0 OF 27 DISTRICTS DECLARED")
+        val voteSubhead = Publisher("WAITING FOR RESULTS...")
+        val changeHeader = Publisher("CHANGE SINCE 2015")
+        val swingHeader = Publisher("SWING SINCE 2015")
+        val mapHeader = Publisher("PEI")
         val swingPartyOrder = listOf(ndp, grn, lib, pc)
         val shapesByDistrict = peiShapesByDistrict()
-        val focus = BindableWrapper<List<Int>?>(null)
-        val winnersByDistrict = BindableWrapper<Map<Int, Party?>>(HashMap())
+        val focus = Publisher<List<Int>?>(null)
+        val winnersByDistrict = Publisher<Map<Int, Party?>>(HashMap())
         val panel = partyVotes(
-            currentVotes.binding, voteHeader.binding, voteSubhead.binding
+            currentVotes, voteHeader, voteSubhead
         )
-            .withPrev(previousVotes.binding, changeHeader.binding)
-            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader.binding)
-            .withPctReporting(pctReporting.binding)
-            .withPartyMap(fixedBinding(shapesByDistrict), winnersByDistrict.binding, focus.binding, mapHeader.binding)
-            .build(header.binding)
+            .withPrev(previousVotes, changeHeader)
+            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader)
+            .withPctReporting(pctReporting)
+            .withPartyMap(shapesByDistrict.asOneTimePublisher(), winnersByDistrict, focus, mapHeader)
+            .build(header)
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "PopularVote-1", panel)
 
@@ -337,24 +337,24 @@ class SimpleVoteViewPanelTest {
         curr[pc] = 1373
         curr[lib] = 785
         curr[grn] = 675
-        currentVotes.value = curr
+        currentVotes.submit(curr)
         prev[ndp] = 585
         prev[pc] = 785
         prev[lib] = 1060
         prev[grn] = 106
-        previousVotes.value = prev
-        voteHeader.value = "1 OF 27 DISTRICTS DECLARED"
-        voteSubhead.value = "PROJECTION: TOO EARLY TO CALL"
-        pctReporting.value = 1.0 / 27
+        previousVotes.submit(prev)
+        voteHeader.submit("1 OF 27 DISTRICTS DECLARED")
+        voteSubhead.submit("PROJECTION: TOO EARLY TO CALL")
+        pctReporting.submit(1.0 / 27)
         winners[3] = pc
-        winnersByDistrict.value = winners
+        winnersByDistrict.submit(winners)
         compareRendering("SimpleVoteViewPanel", "PopularVote-2", panel)
 
-        focus.value = shapesByDistrict.keys.filter { it <= 7 }
-        mapHeader.value = "CARDIGAN"
-        header.value = "CARDIGAN"
-        pctReporting.value = 1.0 / 7
-        voteHeader.value = "1 OF 7 DISTRICTS DECLARED"
+        focus.submit(shapesByDistrict.keys.filter { it <= 7 })
+        mapHeader.submit("CARDIGAN")
+        header.submit("CARDIGAN")
+        pctReporting.submit(1.0 / 7)
+        voteHeader.submit("1 OF 7 DISTRICTS DECLARED")
         compareRendering("SimpleVoteViewPanel", "PopularVote-3", panel)
     }
 
@@ -371,24 +371,24 @@ class SimpleVoteViewPanelTest {
         prev[dem] = 61776554
         prev[gop] = 63173815
         prev[Party.OTHERS] = 3676641
-        val currentVotes = BindableWrapper(curr)
-        val previousVotes = BindableWrapper(prev)
-        val pctReporting = BindableWrapper(1.0)
-        val header = BindableWrapper("UNITED STATES")
-        val voteHeader = BindableWrapper("HOUSE OF REPRESENTATIVES")
-        val voteSubhead = BindableWrapper("")
-        val changeHeader = BindableWrapper("CHANGE SINCE 2016")
-        val swingHeader = BindableWrapper("SWING SINCE 2016")
-        val winner = BindableWrapper(dem)
+        val currentVotes = Publisher(curr)
+        val previousVotes = Publisher(prev)
+        val pctReporting = Publisher(1.0)
+        val header = Publisher("UNITED STATES")
+        val voteHeader = Publisher("HOUSE OF REPRESENTATIVES")
+        val voteSubhead = Publisher("")
+        val changeHeader = Publisher("CHANGE SINCE 2016")
+        val swingHeader = Publisher("SWING SINCE 2016")
+        val winner = Publisher(dem)
         val swingPartyOrder = listOf(dem, gop)
         val panel = partyVotes(
-            currentVotes.binding, voteHeader.binding, voteSubhead.binding
+            currentVotes, voteHeader, voteSubhead
         )
-            .withPrev(previousVotes.binding, changeHeader.binding)
-            .withWinner(winner.binding)
-            .withPctReporting(pctReporting.binding)
-            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader.binding)
-            .build(header.binding)
+            .withPrev(previousVotes, changeHeader)
+            .withWinner(winner)
+            .withPctReporting(pctReporting)
+            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader)
+            .build(header)
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "PartyTick-1", panel)
     }
@@ -413,22 +413,22 @@ class SimpleVoteViewPanelTest {
         val prev = LinkedHashMap<Party, Int>()
         prev[dem] = 88329
         prev[gop] = 142251
-        val currentVotes = BindableWrapper(curr)
-        val previousVotes = BindableWrapper(prev)
-        val header = BindableWrapper("TEXAS DISTRICT 27")
-        val voteHeader = BindableWrapper("OFFICIAL RESULT")
-        val voteSubhead = BindableWrapper("GOP HOLD")
-        val changeHeader = BindableWrapper("CHANGE SINCE 2016")
-        val swingHeader = BindableWrapper("SWING SINCE 2016")
-        val winner = BindableWrapper(curr.entries.maxByOrNull { it.value }!!.key)
+        val currentVotes = Publisher(curr)
+        val previousVotes = Publisher(prev)
+        val header = Publisher("TEXAS DISTRICT 27")
+        val voteHeader = Publisher("OFFICIAL RESULT")
+        val voteSubhead = Publisher("GOP HOLD")
+        val changeHeader = Publisher("CHANGE SINCE 2016")
+        val swingHeader = Publisher("SWING SINCE 2016")
+        val winner = Publisher(curr.entries.maxByOrNull { it.value }!!.key)
         val swingPartyOrder = listOf(dem, gop)
         val panel = candidateVotes(
-            currentVotes.binding, voteHeader.binding, voteSubhead.binding
+            currentVotes, voteHeader, voteSubhead
         )
-            .withPrev(previousVotes.binding, changeHeader.binding)
-            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader.binding)
-            .withWinner(winner.binding)
-            .build(header.binding)
+            .withPrev(previousVotes, changeHeader)
+            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader)
+            .withWinner(winner)
+            .build(header)
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "SameParty-1", panel)
     }
@@ -441,36 +441,36 @@ class SimpleVoteViewPanelTest {
         val curr = LinkedHashMap<Candidate, Int>()
         curr[Candidate("Emmanuel Macron", lrem)] = 20743128
         curr[Candidate("Marine Le Pen", fn)] = 10638475
-        val currentVotes = BindableWrapper(curr)
-        val header = BindableWrapper("FRANCE PRESIDENT: ROUND 2")
-        val voteHeader = BindableWrapper("OFFICIAL RESULT")
-        val voteSubhead = BindableWrapper("MACRON WIN")
-        val showMajority = BindableWrapper(true)
-        val pctReporting = BindableWrapper(1.0)
-        val winner = BindableWrapper<Candidate?>(curr.entries.maxByOrNull { it.value }!!.key)
+        val currentVotes = Publisher(curr)
+        val header = Publisher("FRANCE PRESIDENT: ROUND 2")
+        val voteHeader = Publisher("OFFICIAL RESULT")
+        val voteSubhead = Publisher("MACRON WIN")
+        val showMajority = Publisher(true)
+        val pctReporting = Publisher(1.0)
+        val winner = Publisher<Candidate?>(curr.entries.maxByOrNull { it.value }!!.key)
         val panel = candidateVotes(
-            currentVotes.binding, voteHeader.binding, voteSubhead.binding
+            currentVotes, voteHeader, voteSubhead
         )
-            .withWinner(winner.binding)
-            .withMajorityLine(showMajority.binding, fixedBinding("50% TO WIN"))
-            .withPctReporting(pctReporting.binding)
-            .build(header.binding)
+            .withWinner(winner)
+            .withMajorityLine(showMajority, "50% TO WIN")
+            .withPctReporting(pctReporting)
+            .build(header)
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "MajorityLine-1", panel)
-        voteHeader.value = "15.4% REPORTING"
-        voteSubhead.value = "PROJECTION: MACRON WIN"
-        pctReporting.value = 0.154
-        winner.value = null
+        voteHeader.submit("15.4% REPORTING")
+        voteSubhead.submit("PROJECTION: MACRON WIN")
+        pctReporting.submit(0.154)
+        winner.submit(null)
         curr[Candidate("Emmanuel Macron", lrem)] = 3825279
         curr[Candidate("Marine Le Pen", fn)] = 1033686
-        currentVotes.value = curr
+        currentVotes.submit(curr)
         compareRendering("SimpleVoteViewPanel", "MajorityLine-2", panel)
-        pctReporting.value = 0.0
+        pctReporting.submit(0.0)
         curr[Candidate("Emmanuel Macron", lrem)] = 0
         curr[Candidate("Marine Le Pen", fn)] = 0
-        currentVotes.value = curr
-        voteHeader.value = "0.0% REPORTING"
-        voteSubhead.value = ""
+        currentVotes.submit(curr)
+        voteHeader.submit("0.0% REPORTING")
+        voteSubhead.submit("")
         compareRendering("SimpleVoteViewPanel", "MajorityLine-3", panel)
     }
 
@@ -491,28 +491,28 @@ class SimpleVoteViewPanelTest {
         prev[pc.party] = 785
         prev[lib.party] = 1060
         prev[grn.party] = 106
-        val currentVotes = BindableWrapper(curr)
-        val previousVotes = BindableWrapper(prev)
-        val header = BindableWrapper("MONTAGUE-KILMUIR")
-        val voteHeader = BindableWrapper("9 OF 9 POLLS REPORTING")
-        val voteSubhead = BindableWrapper("PROJECTION: PC GAIN FROM LIB")
-        val changeHeader = BindableWrapper("CHANGE SINCE 2015")
-        val changeSubhead = BindableWrapper("ADJUSTED FOR BOUNDARY CHANGES")
-        val swingHeader = BindableWrapper("SWING SINCE 2015")
-        val mapHeader = BindableWrapper("CARDIGAN")
-        val leader = BindableWrapper(pc.party)
+        val currentVotes = Publisher(curr)
+        val previousVotes = Publisher(prev)
+        val header = Publisher("MONTAGUE-KILMUIR")
+        val voteHeader = Publisher("9 OF 9 POLLS REPORTING")
+        val voteSubhead = Publisher("PROJECTION: PC GAIN FROM LIB")
+        val changeHeader = Publisher("CHANGE SINCE 2015")
+        val changeSubhead = Publisher("ADJUSTED FOR BOUNDARY CHANGES")
+        val swingHeader = Publisher("SWING SINCE 2015")
+        val mapHeader = Publisher("CARDIGAN")
+        val leader = Publisher(pc.party)
         val swingPartyOrder = listOf(ndp.party, grn.party, lib.party, pc.party)
         val shapesByDistrict = peiShapesByDistrict()
-        val focus = BindableWrapper(shapesByDistrict.keys.filter { it <= 7 })
-        val additionalHighlight = BindableWrapper<List<Int>>(ArrayList(shapesByDistrict.keys))
-        val selectedDistrict = BindableWrapper(3)
+        val focus = Publisher(shapesByDistrict.keys.filter { it <= 7 })
+        val additionalHighlight = Publisher<List<Int>>(ArrayList(shapesByDistrict.keys))
+        val selectedDistrict = Publisher(3)
         val panel = candidateVotes(
-            currentVotes.binding, voteHeader.binding, voteSubhead.binding
+            currentVotes, voteHeader, voteSubhead
         )
-            .withPrev(previousVotes.binding, changeHeader.binding, changeSubhead.binding)
-            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader.binding)
-            .withResultMap(fixedBinding(shapesByDistrict), selectedDistrict.binding, leader.binding.map { elected(it) }, focus.binding, additionalHighlight.binding, mapHeader.binding)
-            .build(header.binding)
+            .withPrev(previousVotes, changeHeader, changeSubhead)
+            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader)
+            .withResultMap(shapesByDistrict.asOneTimePublisher(), selectedDistrict, leader.map { elected(it) }, focus, additionalHighlight, mapHeader)
+            .build(header)
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "AdditionalHighlightMap-1", panel)
     }
@@ -526,20 +526,20 @@ class SimpleVoteViewPanelTest {
         val prev = LinkedHashMap<Party, Int>()
         prev[dem.party] = 265823
         prev[Party("Republican", "GOP", Color.RED)] = 113055
-        val currentVotes = BindableWrapper(curr)
-        val previousVotes = BindableWrapper(prev)
-        val header = BindableWrapper("MASSACHUSETTS DISTRICT 4")
-        val voteHeader = BindableWrapper("0.0% OF POLLS REPORTING")
-        val voteSubhead = BindableWrapper("")
-        val changeHeader = BindableWrapper("CHANGE SINCE 2016")
-        val swingHeader = BindableWrapper("SWING SINCE 2016")
+        val currentVotes = Publisher(curr)
+        val previousVotes = Publisher(prev)
+        val header = Publisher("MASSACHUSETTS DISTRICT 4")
+        val voteHeader = Publisher("0.0% OF POLLS REPORTING")
+        val voteSubhead = Publisher("")
+        val changeHeader = Publisher("CHANGE SINCE 2016")
+        val swingHeader = Publisher("SWING SINCE 2016")
         val swingPartyOrder: List<Party> = ArrayList(prev.keys)
         val panel = candidateVotes(
-            currentVotes.binding, voteHeader.binding, voteSubhead.binding
+            currentVotes, voteHeader, voteSubhead
         )
-            .withPrev(previousVotes.binding, changeHeader.binding)
-            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader.binding)
-            .build(header.binding)
+            .withPrev(previousVotes, changeHeader)
+            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader)
+            .build(header)
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "Uncontested-1", panel)
     }
@@ -566,21 +566,21 @@ class SimpleVoteViewPanelTest {
         result2019[Candidate("William Tobin", Party("Independent", "IND", Color.GRAY))] = 5
         result2019[Candidate("Alfie Utting", Party("Independent", "IND", Color.GRAY))] = 44
         result2019[Candidate("Yace \"Interplanetary Time Lord\" Yogenstein", Party("Independent", "IND", Color.GRAY))] = 23
-        val currentVotes = BindableWrapper(result2017)
-        val header = BindableWrapper("UXBRIDGE AND SOUTH RUISLIP")
-        val voteHeader = BindableWrapper("2017 RESULT")
-        val voteSubhead = BindableWrapper("")
-        val winner = BindableWrapper(Candidate("Boris Johnson", Party("Conservative", "CON", Color.BLUE)))
-        val panel = candidateVotes(currentVotes.binding, voteHeader.binding, voteSubhead.binding)
-            .withWinner(winner.binding)
-            .build(header.binding)
+        val currentVotes = Publisher(result2017)
+        val header = Publisher("UXBRIDGE AND SOUTH RUISLIP")
+        val voteHeader = Publisher("2017 RESULT")
+        val voteSubhead = Publisher("")
+        val winner = Publisher(Candidate("Boris Johnson", Party("Conservative", "CON", Color.BLUE)))
+        val panel = candidateVotes(currentVotes, voteHeader, voteSubhead)
+            .withWinner(winner)
+            .build(header)
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "LotsOfCandidates-1", panel)
-        currentVotes.value = result2019
-        voteHeader.value = "2019 RESULT"
+        currentVotes.submit(result2019)
+        voteHeader.submit("2019 RESULT")
         compareRendering("SimpleVoteViewPanel", "LotsOfCandidates-2", panel)
-        currentVotes.value = result2017
-        voteHeader.value = "2017 RESULT"
+        currentVotes.submit(result2017)
+        voteHeader.submit("2017 RESULT")
         compareRendering("SimpleVoteViewPanel", "LotsOfCandidates-1", panel)
     }
 
@@ -601,45 +601,45 @@ class SimpleVoteViewPanelTest {
         prev[pc.party] = 785
         prev[lib.party] = 1060
         prev[grn.party] = 106
-        val currentVotes = BindableWrapper(curr)
-        val previousVotes = BindableWrapper(prev)
-        val pctReporting = BindableWrapper(0.0)
-        val header = BindableWrapper("MONTAGUE-KILMUIR")
-        val voteHeader = BindableWrapper("0 OF 9 POLLS REPORTING")
-        val voteSubhead = BindableWrapper("WAITING FOR RESULTS...")
-        val changeHeader = BindableWrapper("CHANGE SINCE 2015")
-        val swingHeader = BindableWrapper("SWING SINCE 2015")
-        val mapHeader = BindableWrapper("CARDIGAN")
-        val leader = BindableWrapper<PartyResult?>(null)
-        val winner = BindableWrapper<Candidate?>(null)
+        val currentVotes = Publisher(curr)
+        val previousVotes = Publisher(prev)
+        val pctReporting = Publisher(0.0)
+        val header = Publisher("MONTAGUE-KILMUIR")
+        val voteHeader = Publisher("0 OF 9 POLLS REPORTING")
+        val voteSubhead = Publisher("WAITING FOR RESULTS...")
+        val changeHeader = Publisher("CHANGE SINCE 2015")
+        val swingHeader = Publisher("SWING SINCE 2015")
+        val mapHeader = Publisher("CARDIGAN")
+        val leader = Publisher<PartyResult?>(null)
+        val winner = Publisher<Candidate?>(null)
         val swingPartyOrder = listOf(ndp.party, grn.party, lib.party, pc.party)
         val shapesByDistrict = peiShapesByDistrict()
-        val focus = BindableWrapper(shapesByDistrict.keys.filter { it <= 7 })
-        val selectedDistrict = BindableWrapper(3)
+        val focus = Publisher(shapesByDistrict.keys.filter { it <= 7 })
+        val selectedDistrict = Publisher(3)
         val panel = candidateVotes(
-            currentVotes.binding, voteHeader.binding, voteSubhead.binding
+            currentVotes, voteHeader, voteSubhead
         )
-            .withPrev(previousVotes.binding, changeHeader.binding)
+            .withPrev(previousVotes, changeHeader)
             .withLimit(3)
-            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader.binding)
-            .withResultMap(fixedBinding(shapesByDistrict), selectedDistrict.binding, leader.binding, focus.binding, mapHeader.binding)
-            .withWinner(winner.binding)
-            .withPctReporting(pctReporting.binding)
-            .build(header.binding)
+            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader)
+            .withResultMap(shapesByDistrict.asOneTimePublisher(), selectedDistrict, leader, focus, mapHeader)
+            .withWinner(winner)
+            .withPctReporting(pctReporting)
+            .build(header)
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "CandidateOthers-1", panel)
-        winner.value = lib
+        winner.submit(lib)
         compareRendering("SimpleVoteViewPanel", "CandidateOthers-2", panel)
         curr[ndp] = 124
         curr[pc] = 1373
         curr[lib] = 785
         curr[grn] = 675
-        currentVotes.value = curr
-        voteHeader.value = "9 OF 9 POLLS REPORTING"
-        voteSubhead.value = "PROJECTION: PC GAIN FROM LIB"
-        pctReporting.value = 9.0 / 9
-        leader.value = elected(pc.party)
-        winner.value = pc
+        currentVotes.submit(curr)
+        voteHeader.submit("9 OF 9 POLLS REPORTING")
+        voteSubhead.submit("PROJECTION: PC GAIN FROM LIB")
+        pctReporting.submit(9.0 / 9)
+        leader.submit(elected(pc.party))
+        winner.submit(pc)
         compareRendering("SimpleVoteViewPanel", "CandidateOthers-3", panel)
     }
 
@@ -660,45 +660,45 @@ class SimpleVoteViewPanelTest {
         prev[pc.party] = 785
         prev[lib.party] = 1060
         prev[grn.party] = 106
-        val currentVotes = BindableWrapper(curr)
-        val previousVotes = BindableWrapper(prev)
-        val pctReporting = BindableWrapper(0.0)
-        val header = BindableWrapper("MONTAGUE-KILMUIR")
-        val voteHeader = BindableWrapper("0 OF 9 POLLS REPORTING")
-        val voteSubhead = BindableWrapper("WAITING FOR RESULTS...")
-        val changeHeader = BindableWrapper("CHANGE SINCE 2015")
-        val swingHeader = BindableWrapper("SWING SINCE 2015")
-        val mapHeader = BindableWrapper("CARDIGAN")
-        val leader = BindableWrapper<PartyResult?>(null)
-        val winner = BindableWrapper<Candidate?>(null)
+        val currentVotes = Publisher(curr)
+        val previousVotes = Publisher(prev)
+        val pctReporting = Publisher(0.0)
+        val header = Publisher("MONTAGUE-KILMUIR")
+        val voteHeader = Publisher("0 OF 9 POLLS REPORTING")
+        val voteSubhead = Publisher("WAITING FOR RESULTS...")
+        val changeHeader = Publisher("CHANGE SINCE 2015")
+        val swingHeader = Publisher("SWING SINCE 2015")
+        val mapHeader = Publisher("CARDIGAN")
+        val leader = Publisher<PartyResult?>(null)
+        val winner = Publisher<Candidate?>(null)
         val swingPartyOrder = listOf(ndp.party, grn.party, lib.party, pc.party)
         val shapesByDistrict = peiShapesByDistrict()
-        val focus = BindableWrapper(shapesByDistrict.keys.filter { it <= 7 })
-        val selectedDistrict = BindableWrapper(3)
+        val focus = Publisher(shapesByDistrict.keys.filter { it <= 7 })
+        val selectedDistrict = Publisher(3)
         val panel = candidateVotes(
-            currentVotes.binding, voteHeader.binding, voteSubhead.binding
+            currentVotes, voteHeader, voteSubhead
         )
-            .withPrev(previousVotes.binding, changeHeader.binding)
+            .withPrev(previousVotes, changeHeader)
             .withLimit(3, pc.party, lib.party)
-            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader.binding)
-            .withResultMap(fixedBinding(shapesByDistrict), selectedDistrict.binding, leader.binding, focus.binding, mapHeader.binding)
-            .withWinner(winner.binding)
-            .withPctReporting(pctReporting.binding)
-            .build(header.binding)
+            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader)
+            .withResultMap(shapesByDistrict.asOneTimePublisher(), selectedDistrict, leader, focus, mapHeader)
+            .withWinner(winner)
+            .withPctReporting(pctReporting)
+            .build(header)
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "CandidateOthersMandatory-1", panel)
-        winner.value = lib
+        winner.submit(lib)
         compareRendering("SimpleVoteViewPanel", "CandidateOthersMandatory-2", panel)
         curr[ndp] = 124
         curr[pc] = 1373
         curr[lib] = 785
         curr[grn] = 675
-        currentVotes.value = curr
-        voteHeader.value = "9 OF 9 POLLS REPORTING"
-        voteSubhead.value = "PROJECTION: PC GAIN FROM LIB"
-        pctReporting.value = 9.0 / 9
-        leader.value = elected(pc.party)
-        winner.value = pc
+        currentVotes.submit(curr)
+        voteHeader.submit("9 OF 9 POLLS REPORTING")
+        voteSubhead.submit("PROJECTION: PC GAIN FROM LIB")
+        pctReporting.submit(9.0 / 9)
+        leader.submit(elected(pc.party))
+        winner.submit(pc)
         compareRendering("SimpleVoteViewPanel", "CandidateOthersMandatory-3", panel)
     }
 
@@ -717,22 +717,22 @@ class SimpleVoteViewPanelTest {
         prev[ndp] = 578
         prev[pc.party] = 4048
         prev[lib.party] = 3949
-        val currentVotes = BindableWrapper(curr)
-        val previousVotes = BindableWrapper(prev)
-        val header = BindableWrapper("SHIPPAGAN-LAM\u00c8QUE-MISCOU")
-        val voteHeader = BindableWrapper("OFFICIAL RESULT")
-        val voteSubhead = BindableWrapper("")
-        val changeHeader = BindableWrapper("CHANGE SINCE 2018")
-        val swingHeader = BindableWrapper("SWING SINCE 2018")
-        val winner = BindableWrapper(lib)
+        val currentVotes = Publisher(curr)
+        val previousVotes = Publisher(prev)
+        val header = Publisher("SHIPPAGAN-LAM\u00c8QUE-MISCOU")
+        val voteHeader = Publisher("OFFICIAL RESULT")
+        val voteSubhead = Publisher("")
+        val changeHeader = Publisher("CHANGE SINCE 2018")
+        val swingHeader = Publisher("SWING SINCE 2018")
+        val winner = Publisher(lib)
         val swingPartyOrder = listOf(ndp, grn.party, lib.party, pc.party)
         val panel = candidateVotes(
-            currentVotes.binding, voteHeader.binding, voteSubhead.binding
+            currentVotes, voteHeader, voteSubhead
         )
-            .withPrev(previousVotes.binding, changeHeader.binding)
-            .withWinner(winner.binding)
-            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader.binding)
-            .build(header.binding)
+            .withPrev(previousVotes, changeHeader)
+            .withWinner(winner)
+            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader)
+            .build(header)
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "PartiesNotRunningAgain-1", panel)
     }
@@ -754,22 +754,22 @@ class SimpleVoteViewPanelTest {
         prev[pc.party] = 4048
         prev[lib.party] = 3949
         prev[grn.party] = 0
-        val currentVotes = BindableWrapper(curr)
-        val previousVotes = BindableWrapper(prev)
-        val header = BindableWrapper("SHIPPAGAN-LAM\u00c8QUE-MISCOU")
-        val voteHeader = BindableWrapper("OFFICIAL RESULT")
-        val voteSubhead = BindableWrapper("")
-        val changeHeader = BindableWrapper("CHANGE SINCE 2018")
-        val swingHeader = BindableWrapper("SWING SINCE 2018")
-        val winner = BindableWrapper(lib)
+        val currentVotes = Publisher(curr)
+        val previousVotes = Publisher(prev)
+        val header = Publisher("SHIPPAGAN-LAM\u00c8QUE-MISCOU")
+        val voteHeader = Publisher("OFFICIAL RESULT")
+        val voteSubhead = Publisher("")
+        val changeHeader = Publisher("CHANGE SINCE 2018")
+        val swingHeader = Publisher("SWING SINCE 2018")
+        val winner = Publisher(lib)
         val swingPartyOrder = listOf(grn.party, lib.party, pc.party)
         val panel = candidateVotes(
-            currentVotes.binding, voteHeader.binding, voteSubhead.binding
+            currentVotes, voteHeader, voteSubhead
         )
-            .withPrev(previousVotes.binding, changeHeader.binding)
-            .withWinner(winner.binding)
-            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader.binding)
-            .build(header.binding)
+            .withPrev(previousVotes, changeHeader)
+            .withWinner(winner)
+            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader)
+            .build(header)
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "PartiesNotRunningAgain-1", panel)
     }
@@ -789,22 +789,22 @@ class SimpleVoteViewPanelTest {
         prev[ndp] = 578
         prev[pc.party] = 4048
         prev[lib.party] = 3949
-        val currentVotes = BindableWrapper(curr)
-        val previousVotes = BindableWrapper(prev)
-        val header = BindableWrapper("SHIPPAGAN-LAM\u00c8QUE-MISCOU")
-        val voteHeader = BindableWrapper("OFFICIAL RESULT")
-        val voteSubhead = BindableWrapper("")
-        val changeHeader = BindableWrapper("CHANGE SINCE 2018")
-        val swingHeader = BindableWrapper("SWING SINCE 2018")
-        val winner = BindableWrapper(lib)
+        val currentVotes = Publisher(curr)
+        val previousVotes = Publisher(prev)
+        val header = Publisher("SHIPPAGAN-LAM\u00c8QUE-MISCOU")
+        val voteHeader = Publisher("OFFICIAL RESULT")
+        val voteSubhead = Publisher("")
+        val changeHeader = Publisher("CHANGE SINCE 2018")
+        val swingHeader = Publisher("SWING SINCE 2018")
+        val winner = Publisher(lib)
         val swingPartyOrder = listOf(ndp, oth.party, lib.party, pc.party)
         val panel = candidateVotes(
-            currentVotes.binding, voteHeader.binding, voteSubhead.binding
+            currentVotes, voteHeader, voteSubhead
         )
-            .withPrev(previousVotes.binding, changeHeader.binding)
-            .withWinner(winner.binding)
-            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader.binding)
-            .build(header.binding)
+            .withPrev(previousVotes, changeHeader)
+            .withWinner(winner)
+            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader)
+            .build(header)
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "PartiesNotRunningAgainOthers-1", panel)
     }
@@ -825,22 +825,22 @@ class SimpleVoteViewPanelTest {
         prev[ndp] = 289
         prev[pc.party] = 4048
         prev[lib.party] = 3949
-        val currentVotes = BindableWrapper(curr)
-        val previousVotes = BindableWrapper(prev)
-        val header = BindableWrapper("SHIPPAGAN-LAM\u00c8QUE-MISCOU")
-        val voteHeader = BindableWrapper("OFFICIAL RESULT")
-        val voteSubhead = BindableWrapper("")
-        val changeHeader = BindableWrapper("CHANGE SINCE 2018")
-        val swingHeader = BindableWrapper("SWING SINCE 2018")
-        val winner = BindableWrapper(lib)
+        val currentVotes = Publisher(curr)
+        val previousVotes = Publisher(prev)
+        val header = Publisher("SHIPPAGAN-LAM\u00c8QUE-MISCOU")
+        val voteHeader = Publisher("OFFICIAL RESULT")
+        val voteSubhead = Publisher("")
+        val changeHeader = Publisher("CHANGE SINCE 2018")
+        val swingHeader = Publisher("SWING SINCE 2018")
+        val winner = Publisher(lib)
         val swingPartyOrder = listOf(ndp, oth.party, lib.party, pc.party)
         val panel = candidateVotes(
-            currentVotes.binding, voteHeader.binding, voteSubhead.binding
+            currentVotes, voteHeader, voteSubhead
         )
-            .withPrev(previousVotes.binding, changeHeader.binding)
-            .withWinner(winner.binding)
-            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader.binding)
-            .build(header.binding)
+            .withPrev(previousVotes, changeHeader)
+            .withWinner(winner)
+            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader)
+            .build(header)
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "PartiesNotRunningAgainOthers-1", panel)
     }
@@ -869,21 +869,21 @@ class SimpleVoteViewPanelTest {
         prev[grn] = 8574
         prev[ind.party] = 5638
         prev[ukip] = 4168
-        val currentVotes = BindableWrapper(curr)
-        val previousVotes = BindableWrapper(prev)
-        val header = BindableWrapper("BUCKINGHAM")
-        val voteHeader = BindableWrapper("OFFICIAL RESULT")
-        val voteSubhead = BindableWrapper("")
-        val changeHeader = BindableWrapper("CHANGE SINCE 2017")
-        val changeSubhead = BindableWrapper("NOT APPLICABLE: PREVIOUSLY SPEAKER'S SEAT")
-        val swingHeader = BindableWrapper("SWING SINCE 2017")
-        val winner = BindableWrapper(con)
+        val currentVotes = Publisher(curr)
+        val previousVotes = Publisher(prev)
+        val header = Publisher("BUCKINGHAM")
+        val voteHeader = Publisher("OFFICIAL RESULT")
+        val voteSubhead = Publisher("")
+        val changeHeader = Publisher("CHANGE SINCE 2017")
+        val changeSubhead = Publisher("NOT APPLICABLE: PREVIOUSLY SPEAKER'S SEAT")
+        val swingHeader = Publisher("SWING SINCE 2017")
+        val winner = Publisher(con)
         val swingPartyOrder = listOf(lab.party, ld.party, con.party, bxp.party)
-        val panel = candidateVotes(currentVotes.binding, voteHeader.binding, voteSubhead.binding)
-            .withPrev(previousVotes.binding, changeHeader.binding, changeSubhead.binding)
-            .withWinner(winner.binding)
-            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader.binding)
-            .build(header.binding)
+        val panel = candidateVotes(currentVotes, voteHeader, voteSubhead)
+            .withPrev(previousVotes, changeHeader, changeSubhead)
+            .withWinner(winner)
+            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader)
+            .build(header)
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "WinningPartyNotRunningAgain-1", panel)
     }
@@ -914,18 +914,18 @@ class SimpleVoteViewPanelTest {
         curr[asselineau] = 332547
         curr[arthaud] = 232384
         curr[cheminade] = 65586
-        val currentVotes = BindableWrapper(curr)
-        val header = BindableWrapper("ELECTION 2017: FRANCE DECIDES")
-        val voteHeader = BindableWrapper("FIRST ROUND RESULT")
-        val voteSubhead = BindableWrapper("")
-        val runoff = BindableWrapper<Set<Candidate>?>(null)
-        val panel = candidateVotes(currentVotes.binding, voteHeader.binding, voteSubhead.binding)
-            .withRunoff(runoff.binding)
-            .withMajorityLine(fixedBinding(true), fixedBinding("50% TO WIN"))
-            .build(header.binding)
+        val currentVotes = Publisher(curr)
+        val header = Publisher("ELECTION 2017: FRANCE DECIDES")
+        val voteHeader = Publisher("FIRST ROUND RESULT")
+        val voteSubhead = Publisher("")
+        val runoff = Publisher<Set<Candidate>?>(null)
+        val panel = candidateVotes(currentVotes, voteHeader, voteSubhead)
+            .withRunoff(runoff)
+            .withMajorityLine(true.asOneTimePublisher(), "50% TO WIN")
+            .build(header)
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "CandidateRunoffSingleLine-1", panel)
-        runoff.value = setOf(macron, lePen)
+        runoff.submit(setOf(macron, lePen))
         compareRendering("SimpleVoteViewPanel", "CandidateRunoffSingleLine-2", panel)
     }
 
@@ -955,18 +955,18 @@ class SimpleVoteViewPanelTest {
         curr[asselineau] = 332547
         curr[arthaud] = 232384
         curr[cheminade] = 65586
-        val currentVotes = BindableWrapper(topAndOthers(curr, 6, Candidate.OTHERS))
-        val header = BindableWrapper("ELECTION 2017: FRANCE DECIDES")
-        val voteHeader = BindableWrapper("FIRST ROUND RESULT")
-        val voteSubhead = BindableWrapper("")
-        val runoff = BindableWrapper<Set<Candidate>?>(null)
-        val panel = candidateVotes(currentVotes.binding, voteHeader.binding, voteSubhead.binding)
-            .withRunoff(runoff.binding)
-            .withMajorityLine(fixedBinding(true), fixedBinding("50% TO WIN"))
-            .build(header.binding)
+        val currentVotes = Publisher(topAndOthers(curr, 6, Candidate.OTHERS))
+        val header = Publisher("ELECTION 2017: FRANCE DECIDES")
+        val voteHeader = Publisher("FIRST ROUND RESULT")
+        val voteSubhead = Publisher("")
+        val runoff = Publisher<Set<Candidate>?>(null)
+        val panel = candidateVotes(currentVotes, voteHeader, voteSubhead)
+            .withRunoff(runoff)
+            .withMajorityLine(true.asOneTimePublisher(), "50% TO WIN")
+            .build(header)
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "CandidateRunoffDualLine-1", panel)
-        runoff.value = setOf(macron, lePen)
+        runoff.submit(setOf(macron, lePen))
         compareRendering("SimpleVoteViewPanel", "CandidateRunoffDualLine-2", panel)
     }
 
@@ -987,22 +987,22 @@ class SimpleVoteViewPanelTest {
         prev[pc] = 30663
         prev[lib] = 33481
         prev[grn] = 8857
-        val currentVotes = BindableWrapper(curr)
-        val previousVotes = BindableWrapper(prev)
-        val header = BindableWrapper("PRINCE EDWARD ISLAND")
-        val voteHeader = BindableWrapper("OPINION POLL RANGE")
-        val voteSubhead = BindableWrapper("SINCE ELECTION CALL")
-        val changeHeader = BindableWrapper("CHANGE SINCE 2015")
-        val swingHeader = BindableWrapper("SWING SINCE 2015")
-        val mapHeader = BindableWrapper("PEI")
+        val currentVotes = Publisher(curr)
+        val previousVotes = Publisher(prev)
+        val header = Publisher("PRINCE EDWARD ISLAND")
+        val voteHeader = Publisher("OPINION POLL RANGE")
+        val voteSubhead = Publisher("SINCE ELECTION CALL")
+        val changeHeader = Publisher("CHANGE SINCE 2015")
+        val swingHeader = Publisher("SWING SINCE 2015")
+        val mapHeader = Publisher("PEI")
         val swingPartyOrder = listOf(ndp, grn, lib, pc)
         val shapesByDistrict = peiShapesByDistrict()
         val winners: Map<Int, Party> = HashMap()
-        val panel = partyRangeVotes(currentVotes.binding, voteHeader.binding, voteSubhead.binding)
-            .withPrev(previousVotes.binding, changeHeader.binding)
-            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader.binding)
-            .withPartyMap(fixedBinding(shapesByDistrict), fixedBinding(winners), fixedBinding(null), mapHeader.binding)
-            .build(header.binding)
+        val panel = partyRangeVotes(currentVotes, voteHeader, voteSubhead)
+            .withPrev(previousVotes, changeHeader)
+            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader)
+            .withPartyMap(shapesByDistrict.asOneTimePublisher(), winners.asOneTimePublisher(), null.asOneTimePublisher(), mapHeader)
+            .build(header)
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "Range-1", panel)
     }
@@ -1024,50 +1024,50 @@ class SimpleVoteViewPanelTest {
         prev[pc.party] = 785
         prev[lib.party] = 1060
         prev[grn.party] = 106
-        val currentVotes = BindableWrapper(curr)
-        val previousVotes = BindableWrapper(prev)
-        val header = BindableWrapper("MONTAGUE-KILMUIR")
-        val voteHeader = BindableWrapper("OFFICIAL RESULT")
-        val voteSubhead = BindableWrapper("")
-        val changeHeader = BindableWrapper("CHANGE SINCE 2015")
-        val swingHeader = BindableWrapper("SWING SINCE 2015")
-        val mapHeader = BindableWrapper("CARDIGAN")
-        val leader = BindableWrapper<Party?>(null)
+        val currentVotes = Publisher(curr)
+        val previousVotes = Publisher(prev)
+        val header = Publisher("MONTAGUE-KILMUIR")
+        val voteHeader = Publisher("OFFICIAL RESULT")
+        val voteSubhead = Publisher("")
+        val changeHeader = Publisher("CHANGE SINCE 2015")
+        val swingHeader = Publisher("SWING SINCE 2015")
+        val mapHeader = Publisher("CARDIGAN")
+        val leader = Publisher<Party?>(null)
         val swingPartyOrder = listOf(ndp.party, grn.party, lib.party, pc.party)
         val shapesByDistrict = peiShapesByDistrict()
-        val focus = BindableWrapper(shapesByDistrict.keys.filter { it <= 7 })
-        val selectedDistrict = BindableWrapper(3)
-        val panel = candidateVotes(currentVotes.binding, voteHeader.binding, voteSubhead.binding)
-            .withPrev(previousVotes.binding, changeHeader.binding)
-            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader.binding)
-            .withPartyMap(fixedBinding(shapesByDistrict), selectedDistrict.binding, leader.binding, focus.binding, mapHeader.binding)
-            .build(header.binding)
+        val focus = Publisher(shapesByDistrict.keys.filter { it <= 7 })
+        val selectedDistrict = Publisher(3)
+        val panel = candidateVotes(currentVotes, voteHeader, voteSubhead)
+            .withPrev(previousVotes, changeHeader)
+            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader)
+            .withPartyMap(shapesByDistrict.asOneTimePublisher(), selectedDistrict, leader, focus, mapHeader)
+            .build(header)
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "MidDeclaration-1", panel)
         curr[ndp] = 124
         curr[pc] = null
         curr[lib] = null
         curr[grn] = null
-        currentVotes.value = curr
+        currentVotes.submit(curr)
         compareRendering("SimpleVoteViewPanel", "MidDeclaration-2", panel)
         curr[ndp] = 124
         curr[pc] = 1373
         curr[lib] = null
         curr[grn] = null
-        currentVotes.value = curr
+        currentVotes.submit(curr)
         compareRendering("SimpleVoteViewPanel", "MidDeclaration-3", panel)
         curr[ndp] = 124
         curr[pc] = 1373
         curr[lib] = 785
         curr[grn] = null
-        currentVotes.value = curr
+        currentVotes.submit(curr)
         compareRendering("SimpleVoteViewPanel", "MidDeclaration-4", panel)
         curr[ndp] = 124
         curr[pc] = 1373
         curr[lib] = 785
         curr[grn] = 675
-        currentVotes.value = curr
-        leader.value = pc.party
+        currentVotes.submit(curr)
+        leader.submit(pc.party)
         compareRendering("SimpleVoteViewPanel", "MidDeclaration-5", panel)
     }
 
@@ -1098,17 +1098,17 @@ class SimpleVoteViewPanelTest {
         sequenceOf(dup, uup, tuv, con, pup, ukip, ind_u).forEach { mapping[it] = unionists }
         sequenceOf(sf, sdlp, wp, ind_n).forEach { mapping[it] = nationalists }
         sequenceOf(apni, grn, pbp, lab, ind_o).forEach { mapping[it] = others }
-        val currentVotes = BindableWrapper(LinkedHashMap<Party, Int>())
-        val previousVotes = BindableWrapper(LinkedHashMap<Party, Int>())
-        val header = BindableWrapper("NORTHERN IRELAND")
-        val seatHeader = BindableWrapper("2017 RESULTS")
-        val seatSubhead = BindableWrapper<String?>(null)
-        val changeHeader = BindableWrapper("NOTIONAL CHANGE SINCE 2016")
-        val panel = partyVotes(currentVotes.binding, seatHeader.binding, seatSubhead.binding)
-            .withPrev(previousVotes.binding, changeHeader.binding)
-            .withClassification({ mapping.getOrDefault(it, others) }, fixedBinding("BY DESIGNATION"))
-            .withSwing(compareBy { listOf(nationalists, others, unionists).indexOf(it) }, fixedBinding("FIRST PREFERENCE SWING SINCE 2016"))
-            .build(header.binding)
+        val currentVotes = Publisher(LinkedHashMap<Party, Int>())
+        val previousVotes = Publisher(LinkedHashMap<Party, Int>())
+        val header = Publisher("NORTHERN IRELAND")
+        val seatHeader = Publisher("2017 RESULTS")
+        val seatSubhead = Publisher<String?>(null)
+        val changeHeader = Publisher("NOTIONAL CHANGE SINCE 2016")
+        val panel = partyVotes(currentVotes, seatHeader, seatSubhead)
+            .withPrev(previousVotes, changeHeader)
+            .withClassification({ mapping.getOrDefault(it, others) }, "BY DESIGNATION".asOneTimePublisher())
+            .withSwing(compareBy { listOf(nationalists, others, unionists).indexOf(it) }, "FIRST PREFERENCE SWING SINCE 2016".asOneTimePublisher())
+            .build(header)
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "PartyClassifications-1", panel)
         val currVotes = LinkedHashMap<Party, Int>()
@@ -1129,7 +1129,7 @@ class SimpleVoteViewPanelTest {
         currVotes[ind_u] = 4918
         currVotes[ind_n] = 1639
         currVotes[ind_o] = 7850
-        currentVotes.value = currVotes
+        currentVotes.submit(currVotes)
         val prevVotes = LinkedHashMap<Party, Int>()
         prevVotes[dup] = 202567
         prevVotes[sf] = 166785
@@ -1148,7 +1148,7 @@ class SimpleVoteViewPanelTest {
         prevVotes[ind_u] = 351 + 3270
         prevVotes[ind_n] = 0
         prevVotes[ind_o] = 224 + 124 + 32 + 19380
-        previousVotes.value = prevVotes
+        previousVotes.submit(prevVotes)
         compareRendering("SimpleVoteViewPanel", "PartyClassifications-2", panel)
     }
 
@@ -1191,9 +1191,9 @@ class SimpleVoteViewPanelTest {
             Candidate("Anne Marie Waters", FOR_BRITAIN) to 97
         )
         val prev = mapOf(LABOUR to 22594, CONSERVATIVE to 19069, INDEPENDENT to 6432, LIBDEM to 2462, REFORM to 1678, GREEN to 692)
-        val panel = candidateVotes(curr.toFixedBinding(), "DECLARED RESULT".toFixedBinding(), "".toFixedBinding())
-            .withPrev(prev.toFixedBinding(), "CHANGE SINCE 2019".toFixedBinding())
-            .build("BATLEY AND SPEN".toFixedBinding())
+        val panel = candidateVotes(curr.asOneTimePublisher(), "DECLARED RESULT".asOneTimePublisher(), "".asOneTimePublisher())
+            .withPrev(prev.asOneTimePublisher(), "CHANGE SINCE 2019".asOneTimePublisher())
+            .build("BATLEY AND SPEN".asOneTimePublisher())
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "ConsolidateInDiffIfTooMany-1", panel)
     }
@@ -1233,13 +1233,13 @@ class SimpleVoteViewPanelTest {
             lib to 62470,
             alp to 31547
         )
-        val panel = candidateVotes(curr.toFixedBinding(), "PRIMARY VOTE".toFixedBinding(), "100% REPORTING".toFixedBinding())
-            .withPrev(prev.toFixedBinding(), "CHANGE SINCE 2016".toFixedBinding())
-            .withPreferences(curr2CP.toFixedBinding(), "TWO CANDIDATE PREFERRED".toFixedBinding(), "100% REPORTING".toFixedBinding())
-            .withPrevPreferences(prev2CP.toFixedBinding())
-            .withSwing(Comparator.comparing { when (it) { lib -> 1; alp -> -1; else -> 0 } }, "SWING SINCE 2016".toFixedBinding())
-            .withWinner(Candidate("Julian Leeser", lib, true).toFixedBinding())
-            .build("BEROWRA".toFixedBinding())
+        val panel = candidateVotes(curr.asOneTimePublisher(), "PRIMARY VOTE".asOneTimePublisher(), "100% REPORTING".asOneTimePublisher())
+            .withPrev(prev.asOneTimePublisher(), "CHANGE SINCE 2016".asOneTimePublisher())
+            .withPreferences(curr2CP.asOneTimePublisher(), "TWO CANDIDATE PREFERRED".asOneTimePublisher(), "100% REPORTING".asOneTimePublisher())
+            .withPrevPreferences(prev2CP.asOneTimePublisher())
+            .withSwing(Comparator.comparing { when (it) { lib -> 1; alp -> -1; else -> 0 } }, "SWING SINCE 2016".asOneTimePublisher())
+            .withWinner(Candidate("Julian Leeser", lib, true).asOneTimePublisher())
+            .build("BEROWRA".asOneTimePublisher())
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "NewPartiesCandidatesMergedWithPrevOthers", panel)
     }
