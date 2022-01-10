@@ -1,5 +1,6 @@
 package com.joecollins.graphics.components
 
+import com.joecollins.graphics.utils.ColorUtils
 import com.joecollins.graphics.utils.StandardFont
 import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
@@ -165,7 +166,7 @@ class MultiSummaryFrame(
                 }
                 for (i in values.indices) {
                     entry.panels[i].background = values[i].first
-                    entry.labels[i].foreground = if (values[i].first == Color.WHITE) Color.BLACK else Color.WHITE
+                    entry.labels[i].foreground = ColorUtils.foregroundToContrast(values[i].first)
                     entry.labels[i].text = values[i].second
                 }
                 entries.forEach { e: EntryPanel ->
