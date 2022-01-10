@@ -1,6 +1,5 @@
 package com.joecollins.graphics.components
 
-import com.joecollins.bindings.mapElements
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher

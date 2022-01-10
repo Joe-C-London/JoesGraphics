@@ -1,6 +1,5 @@
 package com.joecollins.graphics.components
 
-import com.joecollins.bindings.Bindable
 import com.joecollins.graphics.components.SwingometerFrameBuilder.Companion.basic
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
@@ -233,7 +232,7 @@ class SwingometerFrameBuilderTest {
 
     @Test
     fun testFixedDots() {
-        class Dot(val position: Double, private var color: Color) : Bindable<Dot, Property>() {
+        class Dot(val position: Double, private var color: Color) {
             private val colorPublisher = Publisher(color)
             fun getColor(): Flow.Publisher<Color> {
                 return colorPublisher

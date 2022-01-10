@@ -1,6 +1,5 @@
 package com.joecollins.graphics.components
 
-import com.joecollins.bindings.Bindable
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.graphics.utils.ShapefileReader.readShapes
 import com.joecollins.pubsub.Publisher
@@ -210,23 +209,11 @@ class MapFrameTest {
         return readShapes(peiMap, "DIST_NO", Int::class.java)
     }
 
-    private class MapEntry(private var _shape: Shape, private var _color: Color) : Bindable<MapEntry, MapEntry.Property>() {
-        enum class Property {
-            SHAPE, COLOR
-        }
-
-        var shape: Shape
+    private class MapEntry(private val _shape: Shape, private val _color: Color) {
+        val shape: Shape
             get() = _shape
-            set(shape) {
-                this._shape = shape
-                onPropertyRefreshed(Property.SHAPE)
-            }
 
-        var color: Color
+        val color: Color
             get() = _color
-            set(color) {
-                this._color = color
-                onPropertyRefreshed(Property.COLOR)
-            }
     }
 }

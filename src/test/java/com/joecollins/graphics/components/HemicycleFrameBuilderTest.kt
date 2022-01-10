@@ -1,6 +1,5 @@
 package com.joecollins.graphics.components
 
-import com.joecollins.bindings.Bindable
 import com.joecollins.graphics.components.HemicycleFrameBuilder.Companion.of
 import com.joecollins.graphics.components.HemicycleFrameBuilder.Companion.ofElectedLeading
 import com.joecollins.graphics.components.HemicycleFrameBuilder.Tiebreaker
@@ -170,10 +169,6 @@ class HemicycleFrameBuilderTest {
         Assert.assertEquals(11, frame.getRightChangeBarStart().toLong())
         Assert.assertEquals(0, frame.rightChangeBarCount.toLong())
         Assert.assertEquals("", frame.getRightChangeBarLabel())
-    }
-
-    internal enum class Property {
-        PROP
     }
 
     @Test
@@ -358,7 +353,7 @@ class HemicycleFrameBuilderTest {
         val dem = Party("Democratic", "DEM", Color.BLUE)
         val gop = Party("Republican", "GOP", Color.RED)
 
-        class Result(var leader: Party?, var hasWon: Boolean, val prev: Party, val numSeats: Int) : Bindable<Result, Property>() {
+        class Result(var leader: Party?, var hasWon: Boolean, val prev: Party, val numSeats: Int) {
             val publisher = Publisher<HemicycleFrameBuilder.Result?>(HemicycleFrameBuilder.Result(leader, hasWon))
 
             fun setResult(leader: Party?, hasWon: Boolean) {

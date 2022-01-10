@@ -1,7 +1,5 @@
 package com.joecollins.graphics.components
 
-import com.joecollins.bindings.Bindable
-import com.joecollins.bindings.mapElements
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
@@ -193,7 +191,7 @@ class ResultListingFrameTest {
         compareRendering("ResultListingFrame", "Reversed-3", frame)
     }
 
-    private class Item(private var _text: String, private var _background: Color, private var _foreground: Color, private var _border: Color) : Bindable<Item, Item.Property>() {
+    private class Item(private var _text: String, private var _background: Color, private var _foreground: Color, private var _border: Color) {
         enum class Property {
             TEXT, FOREGROUND, BACKGROUND, BORDER
         }
@@ -202,28 +200,24 @@ class ResultListingFrameTest {
             get() = _text
             set(text) {
                 this._text = text
-                onPropertyRefreshed(Property.TEXT)
             }
 
         var foreground: Color
             get() = _foreground
             set(foreground) {
                 this._foreground = foreground
-                onPropertyRefreshed(Property.FOREGROUND)
             }
 
         var background: Color
             get() = _background
             set(background) {
                 this._background = background
-                onPropertyRefreshed(Property.BACKGROUND)
             }
 
         var border: Color
             get() = _border
             set(border) {
                 this._border = border
-                onPropertyRefreshed(Property.BORDER)
             }
     }
 }

@@ -1,6 +1,5 @@
 package com.joecollins.graphics.components
 
-import com.joecollins.bindings.Bindable
 import com.joecollins.graphics.ImageGenerator.createHalfTickShape
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.pubsub.Publisher
@@ -809,69 +808,35 @@ class BarFrameTest {
     }
 
     private class RidingResult @JvmOverloads constructor(
-        private var candidateName: String,
-        private var partyName: String,
-        private var partyColor: Color,
-        private var numVotes: Int,
-        private var votePct: Double,
-        private var elected: Boolean = false
-    ) : Bindable<RidingResult, RidingResult.Properties>() {
-        enum class Properties {
-            CANDIDATE_NAME, PARTY_NAME, PARTY_COLOR, NUM_VOTES, VOTE_PCT, ELECTED
-        }
-
+        private val candidateName: String,
+        private val partyName: String,
+        private val partyColor: Color,
+        private val numVotes: Int,
+        private val votePct: Double,
+        private val elected: Boolean = false
+    ) {
         fun getCandidateName(): String {
             return candidateName
-        }
-
-        fun setCandidateName(candidateName: String) {
-            this.candidateName = candidateName
-            onPropertyRefreshed(Properties.CANDIDATE_NAME)
         }
 
         fun getPartyName(): String {
             return partyName
         }
 
-        fun setPartyName(partyName: String) {
-            this.partyName = partyName
-            onPropertyRefreshed(Properties.PARTY_NAME)
-        }
-
         fun getPartyColor(): Color {
             return partyColor
-        }
-
-        fun setPartyColor(partyColor: Color) {
-            this.partyColor = partyColor
-            onPropertyRefreshed(Properties.PARTY_COLOR)
         }
 
         fun getNumVotes(): Int {
             return numVotes
         }
 
-        fun setNumVotes(numVotes: Int) {
-            this.numVotes = numVotes
-            onPropertyRefreshed(Properties.NUM_VOTES)
-        }
-
         fun getVotePct(): Double {
             return votePct
         }
 
-        fun setVotePct(votePct: Double) {
-            this.votePct = votePct
-            onPropertyRefreshed(Properties.VOTE_PCT)
-        }
-
         fun isElected(): Boolean {
             return elected
-        }
-
-        fun setElected(elected: Boolean) {
-            this.elected = elected
-            onPropertyRefreshed(Properties.ELECTED)
         }
     }
 
