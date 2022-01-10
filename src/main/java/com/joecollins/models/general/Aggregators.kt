@@ -1,21 +1,21 @@
 package com.joecollins.models.general
 
-import com.joecollins.bindings.Binding
 import com.joecollins.pubsub.Publisher
+import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.map
+import com.joecollins.pubsub.mapReduce
 import com.joecollins.pubsub.merge
 import java.lang.Integer.max
 import java.util.concurrent.Flow
 
 object Aggregators {
 
-    @JvmStatic fun <T, K> combine(items: Collection<T>, result: (T) -> Binding<Map<K, Int>>) = combine(items, result, HashMap())
+    @JvmStatic fun <T, K> combine(items: Collection<T>, result: (T) -> Flow.Publisher<Map<K, Int>>) = combine(items, result, HashMap())
 
-    @JvmStatic fun <T, K> combine(items: Collection<T>, result: (T) -> Binding<Map<K, Int>>, identity: Map<K, Int> = HashMap()): Binding<Map<K, Int>> {
+    @JvmStatic fun <T, K> combine(items: Collection<T>, result: (T) -> Flow.Publisher<Map<K, Int>>, identity: Map<K, Int> = HashMap()): Flow.Publisher<Map<K, Int>> {
         val seededKeys = identity.keys
-        return Binding.mapReduceBinding(
-            items.map(result),
+        return items.map(result).mapReduce(
             identity,
             { a, r ->
                 val ret = LinkedHashMap(a)
@@ -30,14 +30,13 @@ object Aggregators {
         )
     }
 
-    @JvmStatic fun <T, K> combineDual(items: Collection<T>, result: (T) -> Binding<Map<K, Pair<Int, Int>>>) = combineDual(items, result, HashMap())
+    @JvmStatic fun <T, K> combineDual(items: Collection<T>, result: (T) -> Flow.Publisher<Map<K, Pair<Int, Int>>>) = combineDual(items, result, HashMap())
 
-    @JvmStatic fun <T, K> combineDual(items: Collection<T>, result: (T) -> Binding<Map<K, Pair<Int, Int>>>, identity: Map<K, Pair<Int, Int>> = HashMap()): Binding<Map<K, Pair<Int, Int>>> {
+    @JvmStatic fun <T, K> combineDual(items: Collection<T>, result: (T) -> Flow.Publisher<Map<K, Pair<Int, Int>>>, identity: Map<K, Pair<Int, Int>> = HashMap()): Flow.Publisher<Map<K, Pair<Int, Int>>> {
         val seededKeys = identity.keys
         val sum: (Pair<Int, Int>, Pair<Int, Int>) -> Pair<Int, Int> =
             { a, b -> Pair(a.first + b.first, a.second + b.second) }
-        return Binding.mapReduceBinding(
-            items.map(result),
+        return items.map(result).mapReduce(
             identity,
             { a, r ->
                 val ret = LinkedHashMap(a)
@@ -52,17 +51,15 @@ object Aggregators {
         )
     }
 
-    @JvmStatic fun <T> sum(items: Collection<T>, value: (T) -> Binding<Int>): Binding<Int> {
-        return Binding.mapReduceBinding(
-            items.map(value), 0, { t, v -> t + v }, { t, v -> t - v }
-        )
+    @JvmStatic fun <T> sum(items: Collection<T>, value: (T) -> Flow.Publisher<Int>): Flow.Publisher<Int> {
+        return items.map(value).mapReduce(0, { t, v -> t + v }, { t, v -> t - v })
     }
 
-    @JvmStatic fun <T> count(items: Collection<T>, value: (T) -> Binding<Boolean>): Binding<Int> {
+    @JvmStatic fun <T> count(items: Collection<T>, value: (T) -> Flow.Publisher<Boolean>): Flow.Publisher<Int> {
         return sum(items) { t -> value(t).map { if (it) 1 else 0 } }
     }
 
-    @JvmStatic fun <K> adjustForPctReporting(result: Binding<Map<K, Int>>, pctReporting: Binding<Double>): Binding<Map<K, Int>> {
+    @JvmStatic fun <K> adjustForPctReporting(result: Flow.Publisher<Map<K, Int>>, pctReporting: Flow.Publisher<Double>): Flow.Publisher<Map<K, Int>> {
         return result.merge(pctReporting) { r, p ->
             val ret: LinkedHashMap<K, Int> = LinkedHashMap()
             r.forEach { (k, v) -> ret[k] = (v * p).toInt() }
@@ -70,22 +67,19 @@ object Aggregators {
         }
     }
 
-    @JvmStatic fun <T> combinePctReporting(items: Collection<T>, pctReportingFunc: (T) -> Binding<Double>) = combinePctReporting(items, pctReportingFunc) { 1.0 }
+    @JvmStatic fun <T> combinePctReporting(items: Collection<T>, pctReportingFunc: (T) -> Flow.Publisher<Double>) = combinePctReporting(items, pctReportingFunc) { 1.0 }
 
-    @JvmStatic fun <T> combinePctReporting(items: Collection<T>, pctReportingFunc: (T) -> Binding<Double>, weightFunc: (T) -> Double): Binding<Double> {
+    @JvmStatic fun <T> combinePctReporting(items: Collection<T>, pctReportingFunc: (T) -> Flow.Publisher<Double>, weightFunc: (T) -> Double): Flow.Publisher<Double> {
         val totalWeight = items.map(weightFunc).sum()
-        return Binding.mapReduceBinding(
-            items.map { e ->
-                val weight = weightFunc(e)
-                pctReportingFunc(e).map { it * weight }
-            },
+        return items.map { e ->
+            val weight = weightFunc(e)
+            pctReportingFunc(e).map { it * weight }
+        }.mapReduce(
             0.0,
             { a, p -> a + (p / totalWeight) },
             { a, p -> a - (p / totalWeight) }
         )
     }
-
-    @JvmStatic fun <K1, K2> adjustKey(result: Binding<Map<K1, Int>>, func: (K1) -> K2) = result.map { adjustKey(it, func) }
 
     @JvmStatic fun <K1, K2> adjustKey(result: Flow.Publisher<out Map<K1, Int>>, func: (K1) -> K2) = result.map { adjustKey(it, func) }
 
@@ -95,17 +89,12 @@ object Aggregators {
         return ret
     }
 
-    @JvmStatic fun <K> toPct(result: Binding<Map<K, Int>>) = result.map { toPct(it) }
+    @JvmStatic fun <K> toPct(result: Flow.Publisher<Map<K, Int>>) = result.map { toPct(it) }
 
     @JvmStatic fun <K> toPct(result: Map<K, Int>): Map<K, Double> {
         val total = result.values.sum()
         return result.mapValues { if (total == 0) 0.0 else (1.0 * it.value / total) }
     }
-
-    @Suppress("UNCHECKED_CAST")
-    @JvmStatic fun <K, T : Int?> topAndOthers(result: Binding<Map<K, T>>, limit: Int, others: K) = topAndOthers(result, limit, others, Binding.fixedBinding(Array<Any?>(0) { null } as Array<K>))
-
-    @JvmStatic fun <K, T : Int?> topAndOthers(result: Binding<Map<K, T>>, limit: Int, others: K, mustInclude: Binding<Array<K>>) = result.merge(mustInclude) { m, w -> topAndOthers(m, limit, others, *w) }
 
     @Suppress("UNCHECKED_CAST")
     @JvmStatic fun <K, T : Int?> topAndOthers(result: Flow.Publisher<Map<K, T>>, limit: Int, others: K) = topAndOthers(result, limit, others, (Array<Any?>(0) { null } as Array<K>).asOneTimePublisher())
@@ -142,39 +131,25 @@ object Aggregators {
         return ret
     }
 
-    @JvmStatic fun <K, V> toMap(keys: Collection<K>, bindingFunc: (K) -> Binding<V>) = toMap(keys, { it }, bindingFunc)
+    @JvmStatic fun <K, V> toMap(keys: Collection<K>, func: (K) -> Flow.Publisher<V>) = toMap(keys, { it }, func)
 
-    @JvmStatic fun <T, K, V> toMap(entries: Collection<T>, keyFunc: (T) -> K, bindingFunc: (T) -> Binding<V>): Binding<Map<K, V>> {
-        return object : Binding<Map<K, V>> {
-            private var bindings: List<Binding<V>>? = null
-            private var map: Map<K, V>? = null
-
-            override fun bind(onUpdate: (Map<K, V>) -> Unit) {
-                check(bindings == null) { "Binding is already used" }
-                map = HashMap()
-                val bindingsMap = HashMap<K, Binding<V>>()
-                entries.forEach { e ->
-                    val key = keyFunc(e)
-                    val binding = bindingFunc(e)
-                    bindingsMap[key] = binding
-                    binding.bind {
-                        val updated = HashMap<K, V>(map)
-                        updated[key] = it
-                        map = updated
-                        if (bindings != null) onUpdate(updated)
+    @JvmStatic fun <T, K, V> toMap(entries: Collection<T>, keyFunc: (T) -> K, func: (T) -> Flow.Publisher<V>): Flow.Publisher<Map<K, V>> {
+        val ret = Publisher<Map<K, V>>()
+        val map = HashMap<K, V>()
+        val publishersMap = HashMap<K, Flow.Publisher<V>>()
+        entries.forEach { e ->
+            val key = keyFunc(e)
+            val publisher = func(e)
+            publishersMap[key] = publisher
+            publisher.subscribe(
+                Subscriber {
+                    synchronized(map) {
+                        map[key] = it
+                        if (map.size == entries.size) ret.submit(map)
                     }
                 }
-                onUpdate(map!!)
-                bindings = bindingsMap.values.toList()
-            }
-            override fun unbind() {
-                val bindings = this.bindings
-                if (bindings != null) {
-                    bindings.forEach { it.unbind() }
-                    this.bindings = null
-                    map = null
-                }
-            }
+            )
         }
+        return ret
     }
 }

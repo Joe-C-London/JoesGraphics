@@ -1,6 +1,5 @@
 package com.joecollins.models.general
 
-import com.joecollins.graphics.utils.BindableWrapper
 import com.joecollins.graphics.utils.BoundResult
 import com.joecollins.models.general.Aggregators.adjustForPctReporting
 import com.joecollins.models.general.Aggregators.adjustKey
@@ -17,7 +16,7 @@ import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.map
 import org.awaitility.Awaitility
 import org.hamcrest.core.IsEqual
-import org.junit.Assert
+import org.hamcrest.number.IsCloseTo
 import org.junit.Test
 import java.util.ArrayList
 import java.util.concurrent.TimeUnit
@@ -25,12 +24,14 @@ import java.util.concurrent.TimeUnit
 class AggregatorsTest {
     @Test
     fun testKeyChange() {
-        val input = BindableWrapper(mapOf("ABC" to 5, "DEF" to 7))
+        val input = Publisher(mapOf("ABC" to 5, "DEF" to 7))
         val output: BoundResult<Map<String, Int>> = BoundResult()
-        adjustKey(input.binding) { it.substring(0, 1) }.bind { output.value = it }
-        Assert.assertEquals(mapOf("A" to 5, "D" to 7), output.value)
-        input.value = mapOf("ABC" to 10, "DEF" to 9, "GHI" to 1)
-        Assert.assertEquals(mapOf("A" to 10, "D" to 9, "G" to 1), output.value)
+        adjustKey(input) { it.substring(0, 1) }.subscribe(Subscriber { output.value = it })
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ output.value }, IsEqual(mapOf("A" to 5, "D" to 7)))
+        input.submit(mapOf("ABC" to 10, "DEF" to 9, "GHI" to 1))
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ output.value }, IsEqual(mapOf("A" to 10, "D" to 9, "G" to 1)))
     }
 
     @Test
@@ -49,260 +50,293 @@ class AggregatorsTest {
 
     @Test
     fun testCombine() {
-        val inputs: MutableList<BindableWrapper<Map<String, Int>>> = ArrayList()
-        inputs.add(BindableWrapper(mapOf("ABC" to 8, "DEF" to 6)))
-        inputs.add(BindableWrapper(mapOf("ABC" to 7, "GHI" to 3)))
+        val inputs: MutableList<Publisher<Map<String, Int>>> = ArrayList()
+        inputs.add(Publisher(mapOf("ABC" to 8, "DEF" to 6)))
+        inputs.add(Publisher(mapOf("ABC" to 7, "GHI" to 3)))
         val output: BoundResult<Map<String, Int>> = BoundResult()
-        combine(inputs) { it.binding }.bind { output.value = it }
-        Assert.assertEquals(mapOf("ABC" to 15, "DEF" to 6, "GHI" to 3), output.value)
-        inputs[0].value = mapOf("ABC" to 12, "DEF" to 7)
-        Assert.assertEquals(mapOf("ABC" to 19, "DEF" to 7, "GHI" to 3), output.value)
-        inputs[1].value = mapOf("ABC" to 3)
-        Assert.assertEquals(mapOf("ABC" to 15, "DEF" to 7), output.value)
-        inputs[0].value = mapOf("ABC" to 6, "DEF" to 0)
-        Assert.assertEquals(mapOf("ABC" to 9, "DEF" to 0), output.value)
-        inputs[1].value = mapOf("ABC" to 4)
-        Assert.assertEquals(mapOf("ABC" to 10, "DEF" to 0), output.value)
+        combine(inputs) { it }.subscribe(Subscriber { output.value = it })
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ output.value }, IsEqual(mapOf("ABC" to 8 + 7, "DEF" to 6, "GHI" to 3)))
+        inputs[0].submit(mapOf("ABC" to 12, "DEF" to 7))
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ output.value }, IsEqual(mapOf("ABC" to 12 + 7, "DEF" to 7, "GHI" to 3)))
+        inputs[1].submit(mapOf("ABC" to 3))
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ output.value }, IsEqual(mapOf("ABC" to 12 + 3, "DEF" to 7)))
+        inputs[0].submit(mapOf("ABC" to 6, "DEF" to 0))
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ output.value }, IsEqual(mapOf("ABC" to 6 + 3, "DEF" to 0)))
+        inputs[1].submit(mapOf("ABC" to 4))
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ output.value }, IsEqual(mapOf("ABC" to 6 + 4, "DEF" to 0)))
     }
 
     @Test
     fun testCombineWithSeed() {
         val seed = mapOf("ABC" to 0, "DEF" to 0)
-        val inputs: MutableList<BindableWrapper<Map<String, Int>>> = ArrayList()
-        inputs.add(BindableWrapper(mapOf("ABC" to 8, "DEF" to 6)))
-        inputs.add(BindableWrapper(mapOf("ABC" to 7, "GHI" to 3)))
+        val inputs: MutableList<Publisher<Map<String, Int>>> = ArrayList()
+        inputs.add(Publisher(mapOf("ABC" to 8, "DEF" to 6)))
+        inputs.add(Publisher(mapOf("ABC" to 7, "GHI" to 3)))
         val output: BoundResult<Map<String, Int>> = BoundResult()
-        combine(inputs, { it.binding }, seed).bind { output.value = it }
-        Assert.assertEquals(mapOf("ABC" to 15, "DEF" to 6, "GHI" to 3), output.value)
-        inputs[0].value = mapOf("ABC" to 12, "DEF" to 7)
-        Assert.assertEquals(mapOf("ABC" to 19, "DEF" to 7, "GHI" to 3), output.value)
-        inputs[1].value = mapOf("ABC" to 3)
-        Assert.assertEquals(mapOf("ABC" to 15, "DEF" to 7), output.value)
-        inputs[0].value = mapOf("ABC" to 6)
-        Assert.assertEquals(mapOf("ABC" to 9, "DEF" to 0), output.value)
-        inputs[1].value = mapOf("ABC" to 4)
-        Assert.assertEquals(mapOf("ABC" to 10, "DEF" to 0), output.value)
+        combine(inputs, { it }, seed).subscribe(Subscriber { output.value = it })
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ output.value }, IsEqual(mapOf("ABC" to 8 + 7, "DEF" to 6, "GHI" to 3)))
+        inputs[0].submit(mapOf("ABC" to 12, "DEF" to 7))
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ output.value }, IsEqual(mapOf("ABC" to 12 + 7, "DEF" to 7, "GHI" to 3)))
+        inputs[1].submit(mapOf("ABC" to 3))
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ output.value }, IsEqual(mapOf("ABC" to 12 + 3, "DEF" to 7)))
+        inputs[0].submit(mapOf("ABC" to 6))
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ output.value }, IsEqual(mapOf("ABC" to 6 + 3, "DEF" to 0)))
+        inputs[1].submit(mapOf("ABC" to 4))
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ output.value }, IsEqual(mapOf("ABC" to 6 + 4, "DEF" to 0)))
     }
 
     @Test
     fun testCombineDual() {
-        val inputs: MutableList<BindableWrapper<Map<String, Pair<Int, Int>>>> = ArrayList()
+        val inputs: MutableList<Publisher<Map<String, Pair<Int, Int>>>> = ArrayList()
         inputs.add(
-            BindableWrapper(
+            Publisher(
                 mapOf("ABC" to Pair(4, 8), "DEF" to Pair(1, 6))
             )
         )
         inputs.add(
-            BindableWrapper(
+            Publisher(
                 mapOf("ABC" to Pair(2, 7), "GHI" to Pair(0, 3))
             )
         )
         val output: BoundResult<Map<String, Pair<Int, Int>>> = BoundResult()
-        combineDual(inputs) { it.binding }.bind { output.value = it }
-        Assert.assertEquals(
-            mapOf(
-                "ABC" to
-                    Pair(6, 15),
-                "DEF" to
-                    Pair(1, 6),
-                "GHI" to
-                    Pair(0, 3)
-            ),
-            output.value
-        )
-        inputs[0].value = mapOf("ABC" to Pair(5, 12), "DEF" to Pair(4, 7))
-        Assert.assertEquals(
-            mapOf(
-                "ABC" to
-                    Pair(7, 19),
-                "DEF" to
-                    Pair(4, 7),
-                "GHI" to
-                    Pair(0, 3)
-            ),
-            output.value
-        )
-        inputs[1].value = mapOf("ABC" to Pair(2, 3))
-        Assert.assertEquals(
-            mapOf("ABC" to Pair(7, 15), "DEF" to Pair(4, 7)), output.value
-        )
-        inputs[0].value = mapOf("ABC" to Pair(0, 6), "DEF" to Pair(0, 0))
-        Assert.assertEquals(
-            mapOf("ABC" to Pair(2, 9), "DEF" to Pair(0, 0)), output.value
-        )
-        inputs[1].value = mapOf("ABC" to Pair(4, 4))
-        Assert.assertEquals(
-            mapOf("ABC" to Pair(4, 10), "DEF" to Pair(0, 0)), output.value
-        )
+        combineDual(inputs) { it }.subscribe(Subscriber { output.value = it })
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until(
+                { output.value },
+                IsEqual(
+                    mapOf(
+                        "ABC" to
+                            Pair(6, 15),
+                        "DEF" to
+                            Pair(1, 6),
+                        "GHI" to
+                            Pair(0, 3)
+                    )
+                )
+            )
+        inputs[0].submit(mapOf("ABC" to Pair(5, 12), "DEF" to Pair(4, 7)))
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until(
+                { output.value },
+                IsEqual(
+                    mapOf(
+                        "ABC" to
+                            Pair(7, 19),
+                        "DEF" to
+                            Pair(4, 7),
+                        "GHI" to
+                            Pair(0, 3)
+                    )
+                )
+            )
+        inputs[1].submit(mapOf("ABC" to Pair(2, 3)))
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ output.value }, IsEqual(mapOf("ABC" to Pair(7, 15), "DEF" to Pair(4, 7))))
+        inputs[0].submit(mapOf("ABC" to Pair(0, 6), "DEF" to Pair(0, 0)))
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ output.value }, IsEqual(mapOf("ABC" to Pair(2, 9), "DEF" to Pair(0, 0))))
+        inputs[1].submit(mapOf("ABC" to Pair(4, 4)))
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ output.value }, IsEqual(mapOf("ABC" to Pair(4, 10), "DEF" to Pair(0, 0))))
     }
 
     @Test
     fun testCombineDualWithSeeding() {
         val seed: Map<String, Pair<Int, Int>> = mapOf("ABC" to Pair(0, 0), "DEF" to Pair(0, 0))
-        val inputs: MutableList<BindableWrapper<Map<String, Pair<Int, Int>>>> = ArrayList()
+        val inputs: MutableList<Publisher<Map<String, Pair<Int, Int>>>> = ArrayList()
         inputs.add(
-            BindableWrapper(
+            Publisher(
                 mapOf("ABC" to Pair(4, 8), "DEF" to Pair(1, 6))
             )
         )
         inputs.add(
-            BindableWrapper(
+            Publisher(
                 mapOf("ABC" to Pair(2, 7), "GHI" to Pair(0, 3))
             )
         )
         val output: BoundResult<Map<String, Pair<Int, Int>>> = BoundResult()
-        combineDual(inputs, { it.binding }, seed).bind { output.value = it }
-        Assert.assertEquals(
-            mapOf(
-                "ABC" to
-                    Pair(6, 15),
-                "DEF" to
-                    Pair(1, 6),
-                "GHI" to
-                    Pair(0, 3)
-            ),
-            output.value
-        )
-        inputs[0].value = mapOf("ABC" to Pair(5, 12), "DEF" to Pair(4, 7))
-        Assert.assertEquals(
-            mapOf(
-                "ABC" to
-                    Pair(7, 19),
-                "DEF" to
-                    Pair(4, 7),
-                "GHI" to
-                    Pair(0, 3)
-            ),
-            output.value
-        )
-        inputs[1].value = mapOf("ABC" to Pair(2, 3))
-        Assert.assertEquals(
-            mapOf("ABC" to Pair(7, 15), "DEF" to Pair(4, 7)), output.value
-        )
-        inputs[0].value = mapOf("ABC" to Pair(0, 6))
-        Assert.assertEquals(
-            mapOf("ABC" to Pair(2, 9), "DEF" to Pair(0, 0)), output.value
-        )
-        inputs[1].value = mapOf("ABC" to Pair(4, 4))
-        Assert.assertEquals(
-            mapOf("ABC" to Pair(4, 10), "DEF" to Pair(0, 0)), output.value
-        )
+        combineDual(inputs, { it }, seed).subscribe(Subscriber { output.value = it })
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until(
+                { output.value },
+                IsEqual(
+                    mapOf(
+                        "ABC" to
+                            Pair(6, 15),
+                        "DEF" to
+                            Pair(1, 6),
+                        "GHI" to
+                            Pair(0, 3)
+                    )
+                )
+            )
+        inputs[0].submit(mapOf("ABC" to Pair(5, 12), "DEF" to Pair(4, 7)))
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until(
+                { output.value },
+                IsEqual(
+                    mapOf(
+                        "ABC" to
+                            Pair(7, 19),
+                        "DEF" to
+                            Pair(4, 7),
+                        "GHI" to
+                            Pair(0, 3)
+                    )
+                )
+            )
+        inputs[1].submit(mapOf("ABC" to Pair(2, 3)))
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ output.value }, IsEqual(mapOf("ABC" to Pair(7, 15), "DEF" to Pair(4, 7))))
+        inputs[0].submit(mapOf("ABC" to Pair(0, 6)))
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ output.value }, IsEqual(mapOf("ABC" to Pair(2, 9), "DEF" to Pair(0, 0))))
+        inputs[1].submit(mapOf("ABC" to Pair(4, 4)))
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ output.value }, IsEqual(mapOf("ABC" to Pair(4, 10), "DEF" to Pair(0, 0))))
     }
 
     @Test
     fun testNestedCombinedStillPropagates() {
-        val inputs1: MutableList<BindableWrapper<Map<String, Int>>> = ArrayList()
-        inputs1.add(BindableWrapper(mapOf("ABC" to 8, "DEF" to 6)))
-        inputs1.add(BindableWrapper(mapOf("ABC" to 7, "GHI" to 3)))
-        val inputs2: MutableList<BindableWrapper<Map<String, Int>>> = ArrayList()
-        inputs2.add(BindableWrapper(mapOf("ABC" to 8, "DEF" to 6)))
-        inputs2.add(BindableWrapper(mapOf("ABC" to 7, "GHI" to 3)))
+        val inputs1: MutableList<Publisher<Map<String, Int>>> = ArrayList()
+        inputs1.add(Publisher(mapOf("ABC" to 8, "DEF" to 6)))
+        inputs1.add(Publisher(mapOf("ABC" to 7, "GHI" to 3)))
+        val inputs2: MutableList<Publisher<Map<String, Int>>> = ArrayList()
+        inputs2.add(Publisher(mapOf("ABC" to 8, "DEF" to 6)))
+        inputs2.add(Publisher(mapOf("ABC" to 7, "GHI" to 3)))
         val output: BoundResult<Map<String, Int>> = BoundResult()
         val combined = sequenceOf(inputs1, inputs2)
-            .map { inputs -> combine(inputs) { it.binding } }
+            .map { inputs -> combine(inputs) { it } }
             .toList()
-        combine(combined) { it }.bind { output.value = it }
-        Assert.assertEquals(mapOf("ABC" to 30, "DEF" to 12, "GHI" to 6), output.value)
-        inputs1[0].value = mapOf("ABC" to 9, "DEF" to 5)
-        Assert.assertEquals(mapOf("ABC" to 31, "DEF" to 11, "GHI" to 6), output.value)
+        combine(combined) { it }.subscribe(Subscriber { output.value = it })
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ output.value }, IsEqual(mapOf("ABC" to 30, "DEF" to 12, "GHI" to 6)))
+        inputs1[0].submit(mapOf("ABC" to 9, "DEF" to 5))
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ output.value }, IsEqual(mapOf("ABC" to 31, "DEF" to 11, "GHI" to 6)))
     }
 
     @Test
     fun testNestedCombinedDualStillPropagates() {
-        val inputs1: MutableList<BindableWrapper<Map<String, Pair<Int, Int>>>> = ArrayList()
+        val inputs1: MutableList<Publisher<Map<String, Pair<Int, Int>>>> = ArrayList()
         inputs1.add(
-            BindableWrapper(
+            Publisher(
                 mapOf("ABC" to Pair(4, 8), "DEF" to Pair(1, 6))
             )
         )
         inputs1.add(
-            BindableWrapper(
+            Publisher(
                 mapOf("ABC" to Pair(2, 7), "GHI" to Pair(0, 3))
             )
         )
-        val inputs2: MutableList<BindableWrapper<Map<String, Pair<Int, Int>>>> = ArrayList()
+        val inputs2: MutableList<Publisher<Map<String, Pair<Int, Int>>>> = ArrayList()
         inputs2.add(
-            BindableWrapper(
+            Publisher(
                 mapOf("ABC" to Pair(4, 8), "DEF" to Pair(1, 6))
             )
         )
         inputs2.add(
-            BindableWrapper(
+            Publisher(
                 mapOf("ABC" to Pair(2, 7), "GHI" to Pair(0, 3))
             )
         )
         val output: BoundResult<Map<String, Pair<Int, Int>>> = BoundResult()
         val combined = sequenceOf(inputs1, inputs2)
-            .map { inputs -> combineDual(inputs) { it.binding } }
+            .map { inputs -> combineDual(inputs) { it } }
             .toList()
-        combineDual(combined) { it }.bind { output.value = it }
-        Assert.assertEquals(
-            mapOf(
-                "ABC" to
-                    Pair(12, 30),
-                "DEF" to
-                    Pair(2, 12),
-                "GHI" to
-                    Pair(0, 6)
-            ),
-            output.value
-        )
-        inputs1[0].value = mapOf("ABC" to Pair(3, 9), "DEF" to Pair(2, 5))
-        Assert.assertEquals(
-            mapOf(
-                "ABC" to
-                    Pair(11, 31),
-                "DEF" to
-                    Pair(3, 11),
-                "GHI" to
-                    Pair(0, 6)
-            ),
-            output.value
-        )
+        combineDual(combined) { it }.subscribe(Subscriber { output.value = it })
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until(
+                { output.value },
+                IsEqual(
+                    mapOf(
+                        "ABC" to
+                            Pair(12, 30),
+                        "DEF" to
+                            Pair(2, 12),
+                        "GHI" to
+                            Pair(0, 6)
+                    )
+                )
+            )
+        inputs1[0].submit(mapOf("ABC" to Pair(3, 9), "DEF" to Pair(2, 5)))
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until(
+                { output.value },
+                IsEqual(
+                    mapOf(
+                        "ABC" to
+                            Pair(11, 31),
+                        "DEF" to
+                            Pair(3, 11),
+                        "GHI" to
+                            Pair(0, 6)
+                    )
+                )
+            )
     }
 
     @Test
     fun testAdjustForPctReporting() {
-        val votes = BindableWrapper(mapOf("ABC" to 500, "DEF" to 300))
-        val pctReporting = BindableWrapper(0.01)
+        val votes = Publisher(mapOf("ABC" to 500, "DEF" to 300))
+        val pctReporting = Publisher(0.01)
         val output: BoundResult<Map<String, Int>> = BoundResult()
-        adjustForPctReporting(votes.binding, pctReporting.binding)
-            .bind { output.value = it }
-        Assert.assertEquals(mapOf("ABC" to 5, "DEF" to 3), output.value)
-        pctReporting.value = 0.10
-        Assert.assertEquals(mapOf("ABC" to 50, "DEF" to 30), output.value)
-        votes.value = mapOf("ABC" to 750, "GHI" to 30)
-        Assert.assertEquals(mapOf("ABC" to 75, "GHI" to 3), output.value)
+        adjustForPctReporting(votes, pctReporting)
+            .subscribe(Subscriber { output.value = it })
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ output.value }, IsEqual(mapOf("ABC" to 5, "DEF" to 3)))
+        pctReporting.submit(0.10)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ output.value }, IsEqual(mapOf("ABC" to 50, "DEF" to 30)))
+        votes.submit(mapOf("ABC" to 750, "GHI" to 30))
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ output.value }, IsEqual(mapOf("ABC" to 75, "GHI" to 3)))
     }
 
     @Test
     fun testCombinePctReporting() {
-        val inputs: MutableList<BindableWrapper<Double>> = ArrayList()
-        inputs.add(BindableWrapper(0.5))
-        inputs.add(BindableWrapper(0.3))
+        val inputs: MutableList<Publisher<Double>> = ArrayList()
+        inputs.add(Publisher(0.5))
+        inputs.add(Publisher(0.3))
         val output = BoundResult<Double>()
-        combinePctReporting(inputs) { it.binding }
-            .bind { output.value = it }
-        Assert.assertEquals(0.4, output.value, 1e-6)
-        inputs[0].value = 0.6
-        Assert.assertEquals(0.45, output.value, 1e-6)
-        inputs[1].value = 0.7
-        Assert.assertEquals(0.65, output.value, 1e-6)
+        combinePctReporting(inputs) { it }
+            .subscribe(Subscriber { output.value = it })
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ output.value }, IsCloseTo(0.4, 1e-6))
+        inputs[0].submit(0.6)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ output.value }, IsCloseTo(0.45, 1e-6))
+        inputs[1].submit(0.7)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ output.value }, IsCloseTo(0.65, 1e-6))
     }
 
     @Test
     fun testCombinePctReportingWithWeights() {
-        val inputs: MutableList<Pair<BindableWrapper<Double>, Double>> = ArrayList()
-        inputs.add(Pair(BindableWrapper(0.5), 2.0))
-        inputs.add(Pair(BindableWrapper(0.3), 3.0))
+        val inputs: MutableList<Pair<Publisher<Double>, Double>> = ArrayList()
+        inputs.add(Pair(Publisher(0.5), 2.0))
+        inputs.add(Pair(Publisher(0.3), 3.0))
         val output = BoundResult<Double>()
-        combinePctReporting(inputs, { it.first.binding }, { it.second })
-            .bind { output.value = it }
-        Assert.assertEquals(0.38, output.value, 1e-6)
-        inputs[0].first.value = 0.6
-        Assert.assertEquals(0.42, output.value, 1e-6)
-        inputs[1].first.value = 0.7
-        Assert.assertEquals(0.66, output.value, 1e-6)
+        combinePctReporting(inputs, { it.first }, { it.second })
+            .subscribe(Subscriber { output.value = it })
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ output.value }, IsCloseTo(0.38, 1e-6))
+        inputs[0].first.submit(0.6)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ output.value }, IsCloseTo(0.42, 1e-6))
+        inputs[1].first.submit(0.7)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ output.value }, IsCloseTo(0.66, 1e-6))
     }
 
     @Test
@@ -390,74 +424,73 @@ class AggregatorsTest {
 
     @Test
     fun testToMap() {
-        val inputs = mapOf("ABC" to BindableWrapper(1), "DEF" to BindableWrapper(2))
+        val inputs = mapOf("ABC" to Publisher(1), "DEF" to Publisher(2))
         val output: BoundResult<Map<String, Int>> = BoundResult()
-        val outputBinding = toMap(inputs.keys) { inputs[it]!!.binding }
-        outputBinding.bind { output.value = it }
-        Assert.assertEquals(mapOf("ABC" to 1, "DEF" to 2), output.value)
-        inputs["ABC"]!!.value = 7
-        Assert.assertEquals(mapOf("ABC" to 7, "DEF" to 2), output.value)
-        outputBinding.unbind()
-        inputs["DEF"]!!.value = 9
-        Assert.assertEquals(mapOf("ABC" to 7, "DEF" to 2), output.value)
+        toMap(inputs.keys) { inputs[it]!! }.subscribe(Subscriber { output.value = it })
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ output.value }, IsEqual(mapOf("ABC" to 1, "DEF" to 2)))
+        inputs["ABC"]!!.submit(7)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ output.value }, IsEqual(mapOf("ABC" to 7, "DEF" to 2)))
     }
 
     @Test
     fun testToMapTransformedKey() {
-        val inputs = mapOf("abc" to BindableWrapper(1), "def" to BindableWrapper(2))
+        val inputs = mapOf("abc" to Publisher(1), "def" to Publisher(2))
         val output: BoundResult<Map<String, Int>> = BoundResult()
-        val outputBinding = toMap(inputs.keys, { it.uppercase() }) { inputs[it]!!.binding }
-        outputBinding.bind { output.value = it }
-        Assert.assertEquals(mapOf("ABC" to 1, "DEF" to 2), output.value)
-        inputs["abc"]!!.value = 7
-        Assert.assertEquals(mapOf("ABC" to 7, "DEF" to 2), output.value)
-        outputBinding.unbind()
-        inputs["def"]!!.value = 9
-        Assert.assertEquals(mapOf("ABC" to 7, "DEF" to 2), output.value)
+        toMap(inputs.keys, { it.uppercase() }) { inputs[it]!! }.subscribe(Subscriber { output.value = it })
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ output.value }, IsEqual(mapOf("ABC" to 1, "DEF" to 2)))
+        inputs["abc"]!!.submit(7)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ output.value }, IsEqual(mapOf("ABC" to 7, "DEF" to 2)))
     }
 
     @Test
     fun testToPct() {
-        val votes = BindableWrapper(mapOf("ABC" to 5, "DEF" to 3, "GHI" to 2, "JKL" to 4))
+        val votes = Publisher(mapOf("ABC" to 5, "DEF" to 3, "GHI" to 2, "JKL" to 4))
         val output: BoundResult<Map<String, Double>> = BoundResult()
-        val outputBinding = toPct(votes.binding)
-        outputBinding.bind { output.value = it }
-        Assert.assertEquals(
-            mapOf("ABC" to 5.0 / 14, "DEF" to 3.0 / 14, "GHI" to 2.0 / 14, "JKL" to 4.0 / 14),
-            output.value
-        )
-        votes.value = mapOf("ABC" to 5, "DEF" to 7, "GHI" to 6, "JKL" to 4)
-        Assert.assertEquals(
-            mapOf("ABC" to 5.0 / 22, "DEF" to 7.0 / 22, "GHI" to 6.0 / 22, "JKL" to 4.0 / 22),
-            output.value
-        )
-        votes.value = mapOf("ABC" to 0, "DEF" to 0, "GHI" to 0)
-        Assert.assertEquals(mapOf("ABC" to 0.0, "DEF" to 0.0, "GHI" to 0.0), output.value)
+        toPct(votes).subscribe(Subscriber { output.value = it })
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ output.value }, IsEqual(mapOf("ABC" to 5.0 / 14, "DEF" to 3.0 / 14, "GHI" to 2.0 / 14, "JKL" to 4.0 / 14)))
+        votes.submit(mapOf("ABC" to 5, "DEF" to 7, "GHI" to 6, "JKL" to 4))
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ output.value }, IsEqual(mapOf("ABC" to 5.0 / 22, "DEF" to 7.0 / 22, "GHI" to 6.0 / 22, "JKL" to 4.0 / 22)))
+        votes.submit(mapOf("ABC" to 0, "DEF" to 0, "GHI" to 0))
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ output.value }, IsEqual(mapOf("ABC" to 0.0, "DEF" to 0.0, "GHI" to 0.0)))
     }
 
     @Test
     fun testSum() {
-        val inputs = listOf(BindableWrapper(1), BindableWrapper(2), BindableWrapper(3))
+        val inputs = listOf(Publisher(1), Publisher(2), Publisher(3))
         val output = BoundResult<Int>()
-        sum(inputs) { it.binding }.bind { output.value = it }
-        Assert.assertEquals(6, output.value.toLong())
-        inputs[1].value = 7
-        Assert.assertEquals(11, output.value.toLong())
+        sum(inputs) { it }.subscribe(Subscriber { output.value = it })
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ output.value }, IsEqual(6))
+        inputs[1].submit(7)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ output.value }, IsEqual(11))
     }
 
     @Test
     fun testCount() {
-        val inputs = listOf(BindableWrapper(true), BindableWrapper(false), BindableWrapper(false))
+        val inputs = listOf(Publisher(true), Publisher(false), Publisher(false))
         val output = BoundResult<Int>()
-        count(inputs) { it.binding }.bind { output.value = it }
-        Assert.assertEquals(1, output.value.toLong())
-        inputs[1].value = true
-        Assert.assertEquals(2, output.value.toLong())
-        inputs[0].value = false
-        Assert.assertEquals(1, output.value.toLong())
-        inputs[2].value = false
-        Assert.assertEquals(1, output.value.toLong())
-        inputs[1].value = true
-        Assert.assertEquals(1, output.value.toLong())
+        count(inputs) { it }.subscribe(Subscriber { output.value = it })
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ output.value }, IsEqual(1))
+        inputs[1].submit(true)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ output.value }, IsEqual(2))
+        inputs[0].submit(false)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ output.value }, IsEqual(1))
+        inputs[2].submit(false)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ output.value }, IsEqual(1))
+        inputs[1].submit(true)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ output.value }, IsEqual(1))
     }
 }
