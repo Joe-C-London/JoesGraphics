@@ -25,8 +25,22 @@ class Subscriber<T>(private val next: (T) -> Unit) : Flow.Subscriber<T> {
 
     companion object {
         fun <T> eventQueueWrapper(func: (T) -> Unit): (T) -> Unit {
+            data class Wrapper(val item: T)
+            val lock = Object()
+            var wrapper: Wrapper? = null
             return { item ->
-                EventQueue.invokeLater { func(item) }
+                synchronized(lock) {
+                    val submit = wrapper == null
+                    wrapper = Wrapper(item)
+                    if (submit) {
+                        EventQueue.invokeLater {
+                            synchronized(lock) {
+                                func(wrapper!!.item)
+                                wrapper = null
+                            }
+                        }
+                    }
+                }
             }
         }
     }
