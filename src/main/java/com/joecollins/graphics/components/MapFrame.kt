@@ -18,7 +18,8 @@ import java.awt.geom.NoninvertibleTransformException
 import java.awt.geom.PathIterator
 import java.awt.geom.Point2D
 import java.awt.geom.Rectangle2D
-import java.util.WeakHashMap
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.Executors
 import java.util.concurrent.Flow
 import javax.swing.JPanel
 import kotlin.math.min
@@ -36,10 +37,12 @@ class MapFrame(
     notesPublisher = notesPublisher,
     borderColorPublisher = borderColorPublisher
 ) {
+    private val executor = Executors.newWorkStealingPool()
     private var shapesToDraw: List<Pair<Shape, Color>> = ArrayList()
     private var focus: Rectangle2D? = null
     private var outlineShapes: List<Shape> = ArrayList()
-    private val transformedShapesCache: MutableMap<Shape, Shape> = WeakHashMap()
+    private val transformedShapesCache: MutableMap<Shape, CompletableFuture<Shape>> = HashMap()
+    private val mergedShapes: MutableMap<List<Shape>, CompletableFuture<Shape>> = HashMap()
 
     private fun createTransformedShape(transform: AffineTransform, shape: Shape): Shape {
         val pathIterator = transform.createTransformedShape(shape).getPathIterator(null)
@@ -164,18 +167,37 @@ class MapFrame(
                     .filter { inScope(it.first) }
                     .map {
                         Pair(
-                            transformedShapesCache.computeIfAbsent(it.first) { shape: Shape -> createTransformedShape(transform, shape) },
+                            transformedShapesCache.computeIfAbsent(it.first) { shape: Shape ->
+                                CompletableFuture.supplyAsync({
+                                    val s = createTransformedShape(transform, shape)
+                                    repaint()
+                                    s
+                                }, executor)
+                            },
                             it.second
                         )
                     }
                     .groupBy { it.second }
                     .asSequence()
-                    .map {
-                        val a = it.value.parallelStream()
-                            .map { e -> e.first }
-                            .sorted(compareBy { s -> s.bounds.width * s.bounds.height })
-                            .collect({ Area() }, { a, s -> a.add(Area(s)) }, { a, s -> a.add(s) })
-                        Pair(a, it.key)
+                    .flatMap { shapeGroup ->
+                        if (shapeGroup.value.all { it.first.isDone }) {
+                            val allShapes = shapeGroup.value.map { it.first.join() }
+                            val mergedShapeFuture = mergedShapes.computeIfAbsent(allShapes) {
+                                CompletableFuture.supplyAsync({
+                                    val ret = it
+                                        .sortedBy { s -> s.bounds.width * s.bounds.height }
+                                        .fold(Area()) { a, s -> a.add(Area(s)); a }
+                                    repaint()
+                                    ret
+                                }, executor)
+                            }
+                            if (mergedShapeFuture.isDone) {
+                                return@flatMap sequenceOf(mergedShapeFuture.join() to shapeGroup.key)
+                            }
+                        }
+                        shapeGroup.value.asSequence()
+                            .filter { it.first.isDone }
+                            .map { it.first.join() to shapeGroup.key }
                     }
                     .forEach {
                         g2d.color = it.second
@@ -186,8 +208,15 @@ class MapFrame(
                     .map {
                         transformedShapesCache.computeIfAbsent(
                             it
-                        ) { s: Shape -> createTransformedShape(transform, s) }
+                        ) { shape: Shape ->
+                            CompletableFuture.supplyAsync({
+                                val s = createTransformedShape(transform, shape)
+                                repaint()
+                                s
+                            }, executor)
+                        }
                     }
+                    .mapNotNull { f -> if (f.isDone) f.join() else null }
                     .forEach {
                         g2d.color = Color.WHITE
                         g2d.stroke = BasicStroke(sqrt(0.5).toFloat())
@@ -209,14 +238,23 @@ class MapFrame(
         add(panel, BorderLayout.CENTER)
 
         val onShapesUpdate: (List<Pair<Shape, Color>>) -> Unit = { s ->
-            shapesToDraw = s
+            if (this.shapesToDraw != s) {
+                shapesToDraw = s
+                mergedShapes.values.forEach { it.cancel(true) }
+                mergedShapes.clear()
+            }
             repaint()
         }
         shapesPublisher.subscribe(Subscriber(eventQueueWrapper(onShapesUpdate)))
 
         val onFocusBoxUpdate: (Rectangle2D?) -> Unit = { focus ->
-            this.focus = focus
-            transformedShapesCache.clear()
+            if (this.focus != focus) {
+                this.focus = focus
+                transformedShapesCache.values.forEach { it.cancel(true) }
+                transformedShapesCache.clear()
+                mergedShapes.values.forEach { it.cancel(true) }
+                mergedShapes.clear()
+            }
             repaint()
         }
         if (focusBoxPublisher != null)
