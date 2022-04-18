@@ -1,5 +1,6 @@
 package com.joecollins.graphics.components.lowerthird
 
+import com.joecollins.graphics.components.FontSizeAdjustingLabel
 import com.joecollins.graphics.utils.StandardFont
 import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
@@ -90,7 +91,7 @@ open class LowerThird internal constructor(
         }
 
         private var _timezone: ZoneId = ZoneOffset.UTC
-        private val _placeLabel: JLabel = JLabel("UTC")
+        private val _placeLabel: JLabel = FontSizeAdjustingLabel("UTC")
         private val _timeLabel: JLabel
         private val _timezoneLabel: JLabel
 

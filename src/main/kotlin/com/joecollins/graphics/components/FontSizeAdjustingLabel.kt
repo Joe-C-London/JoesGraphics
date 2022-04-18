@@ -6,7 +6,11 @@ import java.awt.font.FontRenderContext
 import java.awt.geom.AffineTransform
 import javax.swing.JLabel
 
-class FontSizeAdjustingLabel : JLabel() {
+class FontSizeAdjustingLabel() : JLabel() {
+
+    constructor(text: String) : this() {
+        this.text = text
+    }
 
     override fun paintComponent(g: Graphics) {
         val font = super.getFont()

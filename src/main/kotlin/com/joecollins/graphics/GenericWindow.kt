@@ -7,9 +7,12 @@ import twitter4j.TwitterFactory
 import twitter4j.conf.ConfigurationBuilder
 import java.awt.BorderLayout
 import java.awt.Color
+import java.awt.Component
+import java.awt.Container
 import java.awt.Dimension
-import java.awt.FlowLayout
 import java.awt.GridLayout
+import java.awt.LayoutManager
+import java.awt.Point
 import java.awt.Toolkit
 import java.awt.datatransfer.Clipboard
 import java.awt.datatransfer.ClipboardOwner
@@ -40,11 +43,12 @@ import javax.swing.border.EmptyBorder
 import javax.swing.filechooser.FileFilter
 import kotlin.Throws
 import kotlin.jvm.JvmOverloads
+import kotlin.math.max
 
 class GenericWindow<T : JPanel> @JvmOverloads constructor(private val panel: T, title: String? = panel.javaClass.simpleName) : JFrame() {
 
     fun withControlPanel(panel: JPanel): GenericWindow<T> {
-        add(panel)
+        contentPane.add(panel, "control-panel")
         return this
     }
 
@@ -192,7 +196,7 @@ class GenericWindow<T : JPanel> @JvmOverloads constructor(private val panel: T, 
         extendedState = MAXIMIZED_BOTH
         setTitle(title)
         isVisible = true
-        contentPane.layout = FlowLayout()
+        contentPane.layout = GenericWindowLayout()
         contentPane.background = Color.BLACK
         val p: JPanel
         if (panel is GraphicsFrame) {
@@ -204,7 +208,7 @@ class GenericWindow<T : JPanel> @JvmOverloads constructor(private val panel: T, 
         } else {
             p = panel
         }
-        contentPane.add(p)
+        contentPane.add(p, "main")
         val menuBar = JMenuBar()
         jMenuBar = menuBar
         val imageMenu = JMenu("Image")
@@ -222,5 +226,56 @@ class GenericWindow<T : JPanel> @JvmOverloads constructor(private val panel: T, 
         }
         imageMenu.add(tweetItem)
         requestFocus()
+    }
+
+    private class GenericWindowLayout : LayoutManager {
+        private var main: Component? = null
+        private var controlPanel: Component? = null
+
+        override fun addLayoutComponent(name: String, comp: Component) {
+            when (name) {
+                "main" -> main = comp
+                "control-panel" -> controlPanel = comp
+                else -> throw java.lang.IllegalArgumentException("Invalid name $name")
+            }
+        }
+
+        override fun removeLayoutComponent(comp: Component) {
+            if (comp == main) main = null
+            if (comp == controlPanel) controlPanel = null
+        }
+
+        override fun preferredLayoutSize(parent: Container): Dimension {
+            val main = this.main?.preferredSize
+            val controlPanel = this.controlPanel?.preferredSize
+            return Dimension(
+                (main?.width ?: 0) + (controlPanel?.width ?: 0),
+                max(main?.height ?: 0, controlPanel?.height ?: 0)
+            )
+        }
+
+        override fun minimumLayoutSize(parent: Container): Dimension {
+            val main = this.main?.minimumSize
+            val controlPanel = this.controlPanel?.minimumSize
+            return Dimension(
+                (main?.width ?: 0) + (controlPanel?.width ?: 0),
+                max(main?.height ?: 0, controlPanel?.height ?: 0)
+            )
+        }
+
+        override fun layoutContainer(parent: Container) {
+            val main = this.main
+            val controlPanel = this.controlPanel
+            val mainSize = main?.preferredSize ?: Dimension(0, 0)
+            val controlPanelSize = controlPanel?.preferredSize ?: Dimension(0, 0)
+            if (main != null) {
+                main.location = Point(0, 0)
+                main.size = mainSize
+            }
+            if (controlPanel != null) {
+                controlPanel.location = Point(mainSize.width, 0)
+                controlPanel.size = Dimension(controlPanelSize.width.coerceAtMost(parent.width - mainSize.width), controlPanelSize.height)
+            }
+        }
     }
 }
