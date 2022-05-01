@@ -22,8 +22,7 @@ class LowerThirdTest {
         val image = createImage("BREAKING NEWS", Color.WHITE, Color.RED)
         val lowerThird = LowerThird(
             leftImagePublisher = image.asOneTimePublisher(),
-            placePublisher = "OTTAWA".asOneTimePublisher(),
-            timezonePublisher = ZoneId.of("Canada/Eastern").asOneTimePublisher()
+            placePublisher = ("OTTAWA" to ZoneId.of("Canada/Eastern")).asOneTimePublisher(),
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ lowerThird.leftImage }, IsEqual(image))
@@ -34,8 +33,7 @@ class LowerThirdTest {
     fun testLocationAndTimeZone() {
         val lowerThird = LowerThird(
             leftImagePublisher = createImage("BREAKING NEWS", Color.WHITE, Color.RED).asOneTimePublisher(),
-            placePublisher = "OTTAWA".asOneTimePublisher(),
-            timezonePublisher = ZoneId.of("Canada/Eastern").asOneTimePublisher(),
+            placePublisher = ("OTTAWA" to ZoneId.of("Canada/Eastern")).asOneTimePublisher(),
             clock = Clock.fixed(Instant.parse("2019-10-22T01:30:00Z"), ZoneId.systemDefault())
         )
         Thread.sleep(100)
@@ -48,8 +46,7 @@ class LowerThirdTest {
     fun testRenderBlankMiddle() {
         val lowerThird = LowerThird(
             leftImagePublisher = createImage("BREAKING NEWS", Color.WHITE, Color.RED).asOneTimePublisher(),
-            placePublisher = "OTTAWA".asOneTimePublisher(),
-            timezonePublisher = ZoneId.of("Canada/Eastern").asOneTimePublisher(),
+            placePublisher = ("OTTAWA" to ZoneId.of("Canada/Eastern")).asOneTimePublisher(),
             clock = Clock.fixed(Instant.parse("2019-10-22T01:30:00Z"), ZoneId.systemDefault())
         )
         lowerThird.setSize(1024, 50)
@@ -61,8 +58,7 @@ class LowerThirdTest {
     fun testRenderBlankMiddleShowingTimeZone() {
         val lowerThird = LowerThird(
             leftImagePublisher = createImage("BREAKING NEWS", Color.WHITE, Color.RED).asOneTimePublisher(),
-            placePublisher = "OTTAWA".asOneTimePublisher(),
-            timezonePublisher = ZoneId.of("Canada/Eastern").asOneTimePublisher(),
+            placePublisher = ("OTTAWA" to ZoneId.of("Canada/Eastern")).asOneTimePublisher(),
             showTimeZone = true,
             clock = Clock.fixed(Instant.parse("2019-10-22T01:30:00Z"), ZoneId.systemDefault())
         )

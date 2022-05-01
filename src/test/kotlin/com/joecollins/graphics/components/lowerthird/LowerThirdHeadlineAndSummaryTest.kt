@@ -19,8 +19,7 @@ class LowerThirdHeadlineAndSummaryTest {
     fun testHeadline() {
         val lowerThird = LowerThirdHeadlineAndSummary(
             leftImagePublisher = createImage("", Color.RED, Color.WHITE).asOneTimePublisher(),
-            placePublisher = "".asOneTimePublisher(),
-            timezonePublisher = ZoneId.systemDefault().asOneTimePublisher(),
+            placePublisher = ("" to ZoneId.systemDefault()).asOneTimePublisher(),
             headlinePublisher = "POLLS CLOSE ACROSS CENTRAL CANADA".asOneTimePublisher(),
             subheadPublisher = "Polls open for 30 minutes on west coast".asOneTimePublisher(),
             summaryEntriesPublisher =
@@ -38,8 +37,7 @@ class LowerThirdHeadlineAndSummaryTest {
     fun testSubhead() {
         val lowerThird = LowerThirdHeadlineAndSummary(
             leftImagePublisher = createImage("", Color.RED, Color.WHITE).asOneTimePublisher(),
-            placePublisher = "".asOneTimePublisher(),
-            timezonePublisher = ZoneId.systemDefault().asOneTimePublisher(),
+            placePublisher = ("" to ZoneId.systemDefault()).asOneTimePublisher(),
             headlinePublisher = "POLLS CLOSE ACROSS CENTRAL CANADA".asOneTimePublisher(),
             subheadPublisher = "Polls open for 30 minutes on west coast".asOneTimePublisher(),
             summaryEntriesPublisher =
@@ -57,8 +55,7 @@ class LowerThirdHeadlineAndSummaryTest {
     fun testSummaryPanel() {
         val lowerThird = LowerThirdHeadlineAndSummary(
             leftImagePublisher = createImage("", Color.RED, Color.WHITE).asOneTimePublisher(),
-            placePublisher = "".asOneTimePublisher(),
-            timezonePublisher = ZoneId.systemDefault().asOneTimePublisher(),
+            placePublisher = ("" to ZoneId.systemDefault()).asOneTimePublisher(),
             headlinePublisher = "POLLS CLOSE ACROSS CENTRAL CANADA".asOneTimePublisher(),
             subheadPublisher = "Polls open for 30 minutes on west coast".asOneTimePublisher(),
             summaryEntriesPublisher =
@@ -89,8 +86,7 @@ class LowerThirdHeadlineAndSummaryTest {
                     .getResource("com/joecollins/graphics/lowerthird-left.png")
             )
                 .asOneTimePublisher(),
-            placePublisher = "OTTAWA".asOneTimePublisher(),
-            timezonePublisher = ZoneId.of("Canada/Eastern").asOneTimePublisher(),
+            placePublisher = ("OTTAWA" to ZoneId.of("Canada/Eastern")).asOneTimePublisher(),
             headlineBinding = "CENTRAL CANADA POLLS CLOSE".asOneTimePublisher(),
             subheadBinding = "Polls open for 30 minutes on west coast".asOneTimePublisher(),
             summaryEntriesBinding =

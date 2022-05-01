@@ -19,8 +19,7 @@ class LowerThirdHeadlineAndSummaryHeaderAndLabelsTest {
     fun testHeadline() {
         val lowerThird = LowerThirdHeadlineAndSummaryHeaderAndLabels(
             leftImagePublisher = createImage("", Color.RED, Color.WHITE).asOneTimePublisher(),
-            placePublisher = "".asOneTimePublisher(),
-            timezonePublisher = ZoneId.systemDefault().asOneTimePublisher(),
+            placePublisher = ("" to ZoneId.systemDefault()).asOneTimePublisher(),
             headlinePublisher = "POLLS CLOSE ACROSS CENTRAL CANADA".asOneTimePublisher(),
             subheadPublisher = "Polls open for 30 minutes on west coast".asOneTimePublisher(),
             summaryHeaderPublisher = "170 SEATS FOR MAJORITY".asOneTimePublisher(),
@@ -39,8 +38,7 @@ class LowerThirdHeadlineAndSummaryHeaderAndLabelsTest {
     fun testSubhead() {
         val lowerThird = LowerThirdHeadlineAndSummaryHeaderAndLabels(
             leftImagePublisher = createImage("", Color.RED, Color.WHITE).asOneTimePublisher(),
-            placePublisher = "".asOneTimePublisher(),
-            timezonePublisher = ZoneId.systemDefault().asOneTimePublisher(),
+            placePublisher = ("" to ZoneId.systemDefault()).asOneTimePublisher(),
             headlinePublisher = "POLLS CLOSE ACROSS CENTRAL CANADA".asOneTimePublisher(),
             subheadPublisher = "Polls open for 30 minutes on west coast".asOneTimePublisher(),
             summaryHeaderPublisher = "170 SEATS FOR MAJORITY".asOneTimePublisher(),
@@ -59,8 +57,7 @@ class LowerThirdHeadlineAndSummaryHeaderAndLabelsTest {
     fun testSummaryPanel() {
         val lowerThird = LowerThirdHeadlineAndSummaryHeaderAndLabels(
             leftImagePublisher = createImage("", Color.RED, Color.WHITE).asOneTimePublisher(),
-            placePublisher = "".asOneTimePublisher(),
-            timezonePublisher = ZoneId.systemDefault().asOneTimePublisher(),
+            placePublisher = ("" to ZoneId.systemDefault()).asOneTimePublisher(),
             headlinePublisher = "POLLS CLOSE ACROSS CENTRAL CANADA".asOneTimePublisher(),
             subheadPublisher = "Polls open for 30 minutes on west coast".asOneTimePublisher(),
             summaryHeaderPublisher = "170 SEATS FOR MAJORITY".asOneTimePublisher(),
@@ -93,8 +90,7 @@ class LowerThirdHeadlineAndSummaryHeaderAndLabelsTest {
                     .getResource("com/joecollins/graphics/lowerthird-left.png")
             )
                 .asOneTimePublisher(),
-            placePublisher = "OTTAWA".asOneTimePublisher(),
-            timezonePublisher = ZoneId.of("Canada/Eastern").asOneTimePublisher(),
+            placePublisher = ("OTTAWA" to ZoneId.of("Canada/Eastern")).asOneTimePublisher(),
             headlinePublisher = "CENTRAL CANADA POLLS CLOSE".asOneTimePublisher(),
             subheadPublisher = "Polls open for 30 minutes on west coast".asOneTimePublisher(),
             summaryHeaderPublisher = "170 SEATS FOR MAJORITY".asOneTimePublisher(),
@@ -121,8 +117,7 @@ class LowerThirdHeadlineAndSummaryHeaderAndLabelsTest {
                     .getResource("com/joecollins/graphics/lowerthird-left.png")
             )
                 .asOneTimePublisher(),
-            placePublisher = "OTTAWA".asOneTimePublisher(),
-            timezonePublisher = ZoneId.of("Canada/Eastern").asOneTimePublisher(),
+            placePublisher = ("OTTAWA" to ZoneId.of("Canada/Eastern")).asOneTimePublisher(),
             headlinePublisher = "POLLS CLOSE ACROSS CENTRAL CANADA".asOneTimePublisher(),
             subheadPublisher = "Polls open for another 30 minutes in British Columbia, Yukon".asOneTimePublisher(),
             summaryHeaderPublisher = "170 SEATS FOR MAJORITY".asOneTimePublisher(),

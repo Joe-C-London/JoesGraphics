@@ -10,25 +10,22 @@ import java.util.concurrent.Flow
 
 class LowerThirdHeadlineOnly internal constructor(
     leftImagePublisher: Flow.Publisher<out Image>,
-    placePublisher: Flow.Publisher<out String>,
-    timezonePublisher: Flow.Publisher<out ZoneId>,
+    placePublisher: Flow.Publisher<out Pair<String, ZoneId>>,
     private val headlinePublisher: Flow.Publisher<out String?>,
     private val subheadPublisher: Flow.Publisher<out String?>,
     clock: Clock,
     showTimeZone: Boolean = false
-) : LowerThird(leftImagePublisher, placePublisher, timezonePublisher, clock, showTimeZone) {
+) : LowerThird(leftImagePublisher, placePublisher, clock, showTimeZone) {
 
     constructor(
         leftImagePublisher: Flow.Publisher<out Image>,
-        placePublisher: Flow.Publisher<out String>,
-        timezonePublisher: Flow.Publisher<out ZoneId>,
+        placePublisher: Flow.Publisher<out Pair<String, ZoneId>>,
         headlinePublisher: Flow.Publisher<out String?>,
         subheadPublisher: Flow.Publisher<out String?>,
         showTimeZone: Boolean = false
     ) : this(
         leftImagePublisher,
         placePublisher,
-        timezonePublisher,
         headlinePublisher,
         subheadPublisher,
         Clock.systemDefaultZone(),

@@ -22,8 +22,7 @@ class LowerThirdHeadlineAndSummaryBothEndsTest {
     fun testHeadline() {
         val lowerThird = LowerThirdHeadlineAndSummaryBothEnds(
             leftImagePublisher = createImage("", Color.RED, Color.WHITE).asOneTimePublisher(),
-            placePublisher = "".asOneTimePublisher(),
-            timezonePublisher = ZoneId.systemDefault().asOneTimePublisher(),
+            placePublisher = ("" to ZoneId.systemDefault()).asOneTimePublisher(),
             headlinePublisher = "POLLS CLOSE ACROSS CENTRAL CANADA".asOneTimePublisher(),
             subheadPublisher = "Polls open for 30 minutes on west coast".asOneTimePublisher(),
             summaryHeaderPublisher = "270 TO WIN".asOneTimePublisher(),
@@ -39,8 +38,7 @@ class LowerThirdHeadlineAndSummaryBothEndsTest {
     fun testSubhead() {
         val lowerThird = LowerThirdHeadlineAndSummaryBothEnds(
             leftImagePublisher = createImage("", Color.RED, Color.WHITE).asOneTimePublisher(),
-            placePublisher = "".asOneTimePublisher(),
-            timezonePublisher = ZoneId.systemDefault().asOneTimePublisher(),
+            placePublisher = ("" to ZoneId.systemDefault()).asOneTimePublisher(),
             headlinePublisher = "POLLS CLOSE ACROSS CENTRAL CANADA".asOneTimePublisher(),
             subheadPublisher = "Polls open for 30 minutes on west coast".asOneTimePublisher(),
             summaryHeaderPublisher = "270 TO WIN".asOneTimePublisher(),
@@ -56,8 +54,7 @@ class LowerThirdHeadlineAndSummaryBothEndsTest {
     fun testSummaryPanel() {
         val lowerThird = LowerThirdHeadlineAndSummaryBothEnds(
             leftImagePublisher = createImage("", Color.RED, Color.WHITE).asOneTimePublisher(),
-            placePublisher = "".asOneTimePublisher(),
-            timezonePublisher = ZoneId.systemDefault().asOneTimePublisher(),
+            placePublisher = ("" to ZoneId.systemDefault()).asOneTimePublisher(),
             headlinePublisher = "POLLS CLOSE ACROSS CENTRAL CANADA".asOneTimePublisher(),
             subheadPublisher = "Polls open for 30 minutes on west coast".asOneTimePublisher(),
             summaryHeaderPublisher = "270 TO WIN".asOneTimePublisher(),
@@ -74,8 +71,7 @@ class LowerThirdHeadlineAndSummaryBothEndsTest {
     fun testTwoPartySummary() {
         val lowerThird = LowerThirdHeadlineAndSummaryBothEnds(
             leftImagePublisher = createImage("", Color.RED, Color.WHITE).asOneTimePublisher(),
-            placePublisher = "".asOneTimePublisher(),
-            timezonePublisher = ZoneId.systemDefault().asOneTimePublisher(),
+            placePublisher = ("" to ZoneId.systemDefault()).asOneTimePublisher(),
             headlinePublisher = "POLLS CLOSE ACROSS CENTRAL CANADA".asOneTimePublisher(),
             subheadPublisher = "Polls open for 30 minutes on west coast".asOneTimePublisher(),
             summaryHeaderPublisher = "270 TO WIN".asOneTimePublisher(),
@@ -97,8 +93,7 @@ class LowerThirdHeadlineAndSummaryBothEndsTest {
     fun testThreePartySummary() {
         val lowerThird = LowerThirdHeadlineAndSummaryBothEnds(
             leftImagePublisher = createImage("", Color.RED, Color.WHITE).asOneTimePublisher(),
-            placePublisher = "".asOneTimePublisher(),
-            timezonePublisher = ZoneId.systemDefault().asOneTimePublisher(),
+            placePublisher = ("" to ZoneId.systemDefault()).asOneTimePublisher(),
             headlinePublisher = "POLLS CLOSE ACROSS CENTRAL CANADA".asOneTimePublisher(),
             subheadPublisher = "Polls open for 30 minutes on west coast".asOneTimePublisher(),
             summaryHeaderPublisher = "270 TO WIN".asOneTimePublisher(),
@@ -127,8 +122,7 @@ class LowerThirdHeadlineAndSummaryBothEndsTest {
         val right = Publisher(SummaryFromBothEnds.Entry(Color.RED, "TRUMP", 0))
         val lowerThird = LowerThirdHeadlineAndSummaryBothEnds(
             leftImagePublisher = createImage("AMERICA VOTES", Color.WHITE, Color.RED).asOneTimePublisher(),
-            placePublisher = "WASHINGTON".asOneTimePublisher(),
-            timezonePublisher = ZoneId.of("US/Eastern").asOneTimePublisher(),
+            placePublisher = ("WASHINGTON" to ZoneId.of("US/Eastern")).asOneTimePublisher(),
             headlinePublisher = "TRUMP WINS ELECTION".asOneTimePublisher(),
             subheadPublisher = null.asOneTimePublisher(),
             summaryHeaderPublisher = "270 TO WIN".asOneTimePublisher(),
@@ -157,8 +151,7 @@ class LowerThirdHeadlineAndSummaryBothEndsTest {
         val right = Publisher(SummaryFromBothEnds.Entry(Color.RED, "MCCAIN", 0))
         val lowerThird = LowerThirdHeadlineAndSummaryBothEnds(
             leftImagePublisher = createImage("AMERICA VOTES", Color.WHITE, Color.RED).asOneTimePublisher(),
-            placePublisher = "WASHINGTON".asOneTimePublisher(),
-            timezonePublisher = ZoneId.of("US/Eastern").asOneTimePublisher(),
+            placePublisher = ("WASHINGTON" to ZoneId.of("US/Eastern")).asOneTimePublisher(),
             headlinePublisher = "OBAMA WINS ELECTION".asOneTimePublisher(),
             subheadPublisher = null.asOneTimePublisher(),
             summaryHeaderPublisher = "270 TO WIN".asOneTimePublisher(),
@@ -187,8 +180,7 @@ class LowerThirdHeadlineAndSummaryBothEndsTest {
         val right = Publisher(SummaryFromBothEnds.Entry(Color.RED, "REAGAN", 0))
         val lowerThird = LowerThirdHeadlineAndSummaryBothEnds(
             leftImagePublisher = createImage("AMERICA VOTES", Color.WHITE, Color.RED).asOneTimePublisher(),
-            placePublisher = "WASHINGTON".asOneTimePublisher(),
-            timezonePublisher = ZoneId.of("US/Eastern").asOneTimePublisher(),
+            placePublisher = ("WASHINGTON" to ZoneId.of("US/Eastern")).asOneTimePublisher(),
             headlinePublisher = "REAGAN WINS RE-ELECTION".asOneTimePublisher(),
             subheadPublisher = null.asOneTimePublisher(),
             summaryHeaderPublisher = "270 TO WIN".asOneTimePublisher(),
@@ -217,8 +209,7 @@ class LowerThirdHeadlineAndSummaryBothEndsTest {
         val right = Publisher(SummaryFromBothEnds.Entry(Color.RED, "LANDON", 0))
         val lowerThird = LowerThirdHeadlineAndSummaryBothEnds(
             leftImagePublisher = createImage("AMERICA VOTES", Color.WHITE, Color.RED).asOneTimePublisher(),
-            placePublisher = "WASHINGTON".asOneTimePublisher(),
-            timezonePublisher = ZoneId.of("US/Eastern").asOneTimePublisher(),
+            placePublisher = ("WASHINGTON" to ZoneId.of("US/Eastern")).asOneTimePublisher(),
             headlinePublisher = "ROOSEVELT WINS RE-ELECTION".asOneTimePublisher(),
             subheadPublisher = null.asOneTimePublisher(),
             summaryHeaderPublisher = "266 TO WIN".asOneTimePublisher(),
@@ -248,8 +239,7 @@ class LowerThirdHeadlineAndSummaryBothEndsTest {
         val middle = Publisher<SummaryFromBothEnds.Entry?>(null)
         val lowerThird = LowerThirdHeadlineAndSummaryBothEnds(
             leftImagePublisher = createImage("AMERICA VOTES", Color.WHITE, Color.RED).asOneTimePublisher(),
-            placePublisher = "WASHINGTON".asOneTimePublisher(),
-            timezonePublisher = ZoneId.of("US/Eastern").asOneTimePublisher(),
+            placePublisher = ("WASHINGTON" to ZoneId.of("US/Eastern")).asOneTimePublisher(),
             headlinePublisher = "NO SENATE MAJORITY".asOneTimePublisher(),
             subheadPublisher = null.asOneTimePublisher(),
             summaryHeaderPublisher = "51 FOR CONTROL".asOneTimePublisher(),
@@ -279,8 +269,7 @@ class LowerThirdHeadlineAndSummaryBothEndsTest {
         val middle = Publisher(SummaryFromBothEnds.Entry(Color.GRAY, "OTHERS", 2))
         val lowerThird = LowerThirdHeadlineAndSummaryBothEnds(
             leftImagePublisher = createImage("AMERICA VOTES", Color.WHITE, Color.RED).asOneTimePublisher(),
-            placePublisher = "WASHINGTON".asOneTimePublisher(),
-            timezonePublisher = ZoneId.of("US/Eastern").asOneTimePublisher(),
+            placePublisher = ("WASHINGTON" to ZoneId.of("US/Eastern")).asOneTimePublisher(),
             headlinePublisher = "DEMOCRATIC SENATE MAJORITY".asOneTimePublisher(),
             subheadPublisher = null.asOneTimePublisher(),
             summaryHeaderPublisher = "51 FOR CONTROL".asOneTimePublisher(),
@@ -310,8 +299,7 @@ class LowerThirdHeadlineAndSummaryBothEndsTest {
         val middle = Publisher(SummaryFromBothEnds.Entry(Color.GRAY, "OTHERS", 1))
         val lowerThird = LowerThirdHeadlineAndSummaryBothEnds(
             leftImagePublisher = createImage("AMERICA VOTES", Color.WHITE, Color.RED).asOneTimePublisher(),
-            placePublisher = "WASHINGTON".asOneTimePublisher(),
-            timezonePublisher = ZoneId.of("US/Eastern").asOneTimePublisher(),
+            placePublisher = ("WASHINGTON" to ZoneId.of("US/Eastern")).asOneTimePublisher(),
             headlinePublisher = "REPUBLICAN SENATE MAJORITY".asOneTimePublisher(),
             subheadPublisher = null.asOneTimePublisher(),
             summaryHeaderPublisher = "51 FOR CONTROL".asOneTimePublisher(),

@@ -13,19 +13,17 @@ import javax.swing.JPanel
 
 class LowerThirdHeadlineAndSummary internal constructor(
     leftImagePublisher: Flow.Publisher<out Image>,
-    placePublisher: Flow.Publisher<out String>,
-    timezonePublisher: Flow.Publisher<out ZoneId>,
+    placePublisher: Flow.Publisher<out Pair<String, ZoneId>>,
     private val headlineBinding: Flow.Publisher<out String?>,
     private val subheadBinding: Flow.Publisher<out String?>,
     summaryEntriesBinding: Flow.Publisher<out List<SummaryWithLabels.Entry>>,
     clock: Clock,
     showTimeZone: Boolean = false
-) : LowerThird(leftImagePublisher, placePublisher, timezonePublisher, clock, showTimeZone) {
+) : LowerThird(leftImagePublisher, placePublisher, clock, showTimeZone) {
 
     constructor(
         leftImagePublisher: Flow.Publisher<out Image>,
-        placePublisher: Flow.Publisher<out String>,
-        timezonePublisher: Flow.Publisher<out ZoneId>,
+        placePublisher: Flow.Publisher<out Pair<String, ZoneId>>,
         headlinePublisher: Flow.Publisher<out String?>,
         subheadPublisher: Flow.Publisher<out String?>,
         summaryEntriesPublisher: Flow.Publisher<out List<SummaryWithLabels.Entry>>,
@@ -33,7 +31,6 @@ class LowerThirdHeadlineAndSummary internal constructor(
     ) : this(
         leftImagePublisher,
         placePublisher,
-        timezonePublisher,
         headlinePublisher,
         subheadPublisher,
         summaryEntriesPublisher,

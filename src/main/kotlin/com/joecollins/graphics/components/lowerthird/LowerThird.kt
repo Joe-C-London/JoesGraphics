@@ -34,18 +34,16 @@ import kotlin.math.max
 
 open class LowerThird internal constructor(
     private val leftImagePublisher: Flow.Publisher<out Image>,
-    private val placePublisher: Flow.Publisher<out String>,
-    private val timezonePublisher: Flow.Publisher<out ZoneId>,
+    private val placePublisher: Flow.Publisher<out Pair<String, ZoneId>>,
     private val clock: Clock,
     private val showTimeZone: Boolean = false
 ) : JPanel() {
 
     constructor(
         leftImagePublisher: Flow.Publisher<out Image>,
-        placePublisher: Flow.Publisher<out String>,
-        timezonePublisher: Flow.Publisher<out ZoneId>,
+        placePublisher: Flow.Publisher<out Pair<String, ZoneId>>,
         showTimeZone: Boolean = false
-    ) : this(leftImagePublisher, placePublisher, timezonePublisher, Clock.systemDefaultZone(), showTimeZone)
+    ) : this(leftImagePublisher, placePublisher, Clock.systemDefaultZone(), showTimeZone)
 
     private val leftPanel: ImagePanel = ImagePanel()
     private val rightPanel = PlaceAndTimePanel()
@@ -242,7 +240,13 @@ open class LowerThird internal constructor(
         add(rightPanel, BorderLayout.EAST)
         preferredSize = Dimension(1024, 50)
         this.leftImagePublisher.subscribe(Subscriber(eventQueueWrapper { leftPanel.setImage(it) }))
-        this.placePublisher.subscribe(Subscriber(eventQueueWrapper { rightPanel.place = it }))
-        this.timezonePublisher.subscribe(Subscriber(eventQueueWrapper { rightPanel.timezone = it }))
+        this.placePublisher.subscribe(
+            Subscriber(
+                eventQueueWrapper {
+                    rightPanel.place = it.first
+                    rightPanel.timezone = it.second
+                }
+            )
+        )
     }
 }

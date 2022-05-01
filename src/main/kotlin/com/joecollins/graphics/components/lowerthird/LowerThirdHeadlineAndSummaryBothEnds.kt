@@ -13,8 +13,7 @@ import javax.swing.JPanel
 
 class LowerThirdHeadlineAndSummaryBothEnds internal constructor(
     leftImagePublisher: Flow.Publisher<out Image>,
-    placePublisher: Flow.Publisher<out String>,
-    timezonePublisher: Flow.Publisher<out ZoneId>,
+    placePublisher: Flow.Publisher<out Pair<String, ZoneId>>,
     private val headlinePublisher: Flow.Publisher<out String?>,
     private val subheadPublisher: Flow.Publisher<out String?>,
     summaryHeaderPublisher: Flow.Publisher<out String>,
@@ -24,12 +23,11 @@ class LowerThirdHeadlineAndSummaryBothEnds internal constructor(
     summaryMiddlePublisher: Flow.Publisher<out SummaryFromBothEnds.Entry?> = (null as SummaryFromBothEnds.Entry?).asOneTimePublisher(),
     clock: Clock,
     showTimeZone: Boolean = false
-) : LowerThird(leftImagePublisher, placePublisher, timezonePublisher, clock, showTimeZone) {
+) : LowerThird(leftImagePublisher, placePublisher, clock, showTimeZone) {
 
     constructor(
         leftImagePublisher: Flow.Publisher<out Image>,
-        placePublisher: Flow.Publisher<out String>,
-        timezonePublisher: Flow.Publisher<out ZoneId>,
+        placePublisher: Flow.Publisher<out Pair<String, ZoneId>>,
         headlinePublisher: Flow.Publisher<out String?>,
         subheadPublisher: Flow.Publisher<out String?>,
         summaryHeaderPublisher: Flow.Publisher<out String>,
@@ -41,7 +39,6 @@ class LowerThirdHeadlineAndSummaryBothEnds internal constructor(
     ) : this(
         leftImagePublisher,
         placePublisher,
-        timezonePublisher,
         headlinePublisher,
         subheadPublisher,
         summaryHeaderPublisher,

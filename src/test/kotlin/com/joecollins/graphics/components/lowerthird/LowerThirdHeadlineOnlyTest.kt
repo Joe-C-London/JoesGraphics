@@ -20,8 +20,7 @@ class LowerThirdHeadlineOnlyTest {
     fun testHeadline() {
         val lowerThird = LowerThirdHeadlineOnly(
             leftImagePublisher = createImage("", Color.RED, Color.WHITE).asOneTimePublisher(),
-            placePublisher = "".asOneTimePublisher(),
-            timezonePublisher = ZoneId.systemDefault().asOneTimePublisher(),
+            placePublisher = ("" to ZoneId.systemDefault()).asOneTimePublisher(),
             headlinePublisher = "POLLS CLOSE ACROSS CENTRAL CANADA".asOneTimePublisher(),
             subheadPublisher = "Polls open for 30 minutes on west coast".asOneTimePublisher()
         )
@@ -33,8 +32,7 @@ class LowerThirdHeadlineOnlyTest {
     fun testSubhead() {
         val lowerThird = LowerThirdHeadlineOnly(
             leftImagePublisher = createImage("", Color.RED, Color.WHITE).asOneTimePublisher(),
-            placePublisher = "".asOneTimePublisher(),
-            timezonePublisher = ZoneId.systemDefault().asOneTimePublisher(),
+            placePublisher = ("" to ZoneId.systemDefault()).asOneTimePublisher(),
             headlinePublisher = "POLLS CLOSE ACROSS CENTRAL CANADA".asOneTimePublisher(),
             subheadPublisher = "Polls open for 30 minutes on west coast".asOneTimePublisher()
         )
@@ -47,8 +45,7 @@ class LowerThirdHeadlineOnlyTest {
     fun testRenderHeadlineSubhead() {
         val lowerThird = LowerThirdHeadlineOnly(
             leftImagePublisher = createImage("BREAKING NEWS", Color.WHITE, Color.RED).asOneTimePublisher(),
-            placePublisher = "OTTAWA".asOneTimePublisher(),
-            timezonePublisher = ZoneId.of("Canada/Eastern").asOneTimePublisher(),
+            placePublisher = ("OTTAWA" to ZoneId.of("Canada/Eastern")).asOneTimePublisher(),
             headlinePublisher = "POLLS CLOSE ACROSS CENTRAL CANADA".asOneTimePublisher(),
             subheadPublisher = "Polls open for 30 minutes on west coast".asOneTimePublisher(),
             clock = Clock.fixed(Instant.parse("2019-10-22T01:30:00Z"), ZoneId.systemDefault())
@@ -63,8 +60,7 @@ class LowerThirdHeadlineOnlyTest {
     fun testRenderHeadlineOnly() {
         val lowerThird = LowerThirdHeadlineOnly(
             leftImagePublisher = createImage("BREAKING NEWS", Color.WHITE, Color.RED).asOneTimePublisher(),
-            placePublisher = "OTTAWA".asOneTimePublisher(),
-            timezonePublisher = ZoneId.of("Canada/Eastern").asOneTimePublisher(),
+            placePublisher = ("OTTAWA" to ZoneId.of("Canada/Eastern")).asOneTimePublisher(),
             headlinePublisher = "POLLS CLOSE ACROSS CENTRAL CANADA".asOneTimePublisher(),
             subheadPublisher = null.asOneTimePublisher(),
             clock = Clock.fixed(Instant.parse("2019-10-22T01:30:00Z"), ZoneId.systemDefault())
@@ -80,8 +76,7 @@ class LowerThirdHeadlineOnlyTest {
             leftImagePublisher =
             createImage("\u00c9LECTION FRAN\u00c7AIS", Color.WHITE, Color.RED)
                 .asOneTimePublisher(),
-            placePublisher = "SAINT-\u00c9TIENNE".asOneTimePublisher(),
-            timezonePublisher = ZoneId.of("Europe/Paris").asOneTimePublisher(),
+            placePublisher = ("SAINT-\u00c9TIENNE" to ZoneId.of("Europe/Paris")).asOneTimePublisher(),
             headlinePublisher = "\u00c9LECTION FRAN\u00c7AIS EST FINI".asOneTimePublisher(),
             subheadPublisher = "\u00c9lection fran\u00e7ais est s\u00fbr".asOneTimePublisher(),
             clock = Clock.fixed(Instant.parse("2019-10-22T01:30:00Z"), ZoneId.systemDefault())
