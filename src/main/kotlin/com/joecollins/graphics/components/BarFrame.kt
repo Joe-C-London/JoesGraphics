@@ -1,5 +1,6 @@
 package com.joecollins.graphics.components
 
+import com.joecollins.graphics.utils.ColorUtils
 import com.joecollins.graphics.utils.StandardFont
 import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
@@ -182,7 +183,7 @@ class BarFrame(
             val font = StandardFont.readBoldFont(barHeight * 3 / 4 / maxLines)
             g.setFont(font)
             val mainColor = if (_series.isEmpty()) Color.BLACK else _series[0].first
-            g.setColor(mainColor)
+            g.setColor(ColorUtils.contrastForBackground(mainColor))
             drawText(g, font)
             val zero = getPixelOfValue(0.0).toInt()
             var posLeft = zero
@@ -204,7 +205,7 @@ class BarFrame(
             }
             val oldClip = g.getClip()
             g.setClip(negRight, 0, posLeft - negRight, height)
-            g.setColor(Color.WHITE)
+            g.setColor(ColorUtils.foregroundToContrast(mainColor))
             drawText(g, font)
             g.setClip(oldClip)
         }

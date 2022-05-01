@@ -1,5 +1,6 @@
 package com.joecollins.graphics.components
 
+import com.joecollins.graphics.utils.ColorUtils
 import com.joecollins.graphics.utils.StandardFont
 import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
@@ -158,11 +159,12 @@ class FiguresFrame(
                 centralPanel.remove(entries.removeAt(e.size))
             }
             e.forEachIndexed { idx, entry ->
-                entries[idx].foreground = entry.color
+                entries[idx].foreground = ColorUtils.contrastForBackground(entry.color)
                 entries[idx].nameLabel.text = entry.name
                 entries[idx].descriptionLabel.text = entry.description
                 entries[idx].resultLabel.text = entry.result
                 entries[idx].resultPanel.background = entry.resultColor
+                entries[idx].resultLabel.foreground = ColorUtils.foregroundToContrast(entry.resultColor)
             }
         }
         entriesPublisher.subscribe(Subscriber(eventQueueWrapper(onEntriesUpdate)))

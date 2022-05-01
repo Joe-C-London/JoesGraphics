@@ -1,5 +1,6 @@
 package com.joecollins.graphics.components
 
+import com.joecollins.graphics.utils.ColorUtils
 import com.joecollins.graphics.utils.StandardFont
 import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
@@ -51,7 +52,7 @@ class SwingFrame(
                 }
             )
         )
-        bottomColorPublisher.subscribe(Subscriber(eventQueueWrapper { bottomLabel.foreground = it }))
+        bottomColorPublisher.subscribe(Subscriber(eventQueueWrapper { bottomLabel.foreground = ColorUtils.contrastForBackground(it) }))
     }
 
     internal fun getRange(): Number {

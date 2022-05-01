@@ -2,6 +2,7 @@ package com.joecollins.graphics.utils
 
 import java.awt.Color
 import kotlin.math.pow
+import kotlin.math.roundToInt
 
 object ColorUtils {
     @JvmStatic fun lighten(color: Color): Color {
@@ -11,11 +12,27 @@ object ColorUtils {
     }
 
     @JvmStatic fun foregroundToContrast(color: Color): Color {
+        val l = calcLum(color)
+        return if (l > 0.5) Color.BLACK else Color.WHITE
+    }
+
+    @JvmStatic fun contrastForBackground(color: Color): Color {
+        val l = calcLum(color)
+        val factor = (0.5 / l).coerceAtMost(1.0)
+        return Color(
+            (color.red * factor).roundToInt(),
+            (color.green * factor).roundToInt(),
+            (color.blue * factor).roundToInt(),
+            color.alpha
+        )
+    }
+
+    private fun calcLum(color: Color): Double {
         val toLum = { f: Double -> if (f <= 0.03928) f / 12.92 else ((f + 0.055) / 1.055).pow(2.4) }
         val r = toLum(color.red / 255.0)
         val g = toLum(color.green / 255.0)
         val b = toLum(color.blue / 255.0)
         val l = 0.2126 * r + 0.7152 * g + 0.0722 * b
-        return if (l > 0.5) Color.BLACK else Color.WHITE
+        return l
     }
 }
