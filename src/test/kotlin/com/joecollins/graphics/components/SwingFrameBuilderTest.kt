@@ -3,7 +3,6 @@ package com.joecollins.graphics.components
 import com.joecollins.graphics.components.SwingFrameBuilder.Companion.basic
 import com.joecollins.graphics.components.SwingFrameBuilder.Companion.prevCurr
 import com.joecollins.graphics.components.SwingFrameBuilder.Companion.prevCurrNormalised
-import com.joecollins.graphics.utils.ColorUtils
 import com.joecollins.models.general.Party
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
@@ -42,7 +41,7 @@ class SwingFrameBuilderTest {
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.getLeftColor() }, IsEqual(Color.GREEN))
         Assert.assertEquals(Color.ORANGE, frame.getRightColor())
-        Assert.assertEquals(ColorUtils.contrastForBackground(Color.ORANGE), frame.getBottomColor())
+        Assert.assertEquals(Color.ORANGE, frame.getBottomColor())
         Assert.assertEquals(-0.05, frame.getValue().toDouble(), 1e-6)
         Assert.assertEquals("5% SWING", frame.getBottomText())
     }
@@ -65,13 +64,13 @@ class SwingFrameBuilderTest {
             .until({ frame.getBottomColor() }, IsEqual(Color.RED))
         swingProps.submit(SwingProperties(Color.GREEN, Color.ORANGE, -0.05, "5% SWING"))
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ frame.getBottomColor() }, IsEqual(ColorUtils.contrastForBackground(Color.ORANGE)))
+            .until({ frame.getBottomColor() }, IsEqual(Color.ORANGE))
         neutralColor.submit(Color.LIGHT_GRAY)
         Awaitility.await().atMost(600, TimeUnit.MILLISECONDS).pollDelay(500, TimeUnit.MILLISECONDS)
-            .until({ frame.getBottomColor() }, IsEqual(ColorUtils.contrastForBackground(Color.ORANGE)))
+            .until({ frame.getBottomColor() }, IsEqual(Color.ORANGE))
         swingProps.submit(SwingProperties(Color.GREEN, Color.ORANGE, 0.00, "NO SWING"))
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ frame.getBottomColor() }, IsEqual(ColorUtils.contrastForBackground(Color.LIGHT_GRAY)))
+            .until({ frame.getBottomColor() }, IsEqual(Color.LIGHT_GRAY))
         neutralColor.submit(Color.BLACK)
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.getBottomColor() }, IsEqual(Color.BLACK))
@@ -165,7 +164,7 @@ class SwingFrameBuilderTest {
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ swingFrame.getLeftColor() }, IsEqual(Color.BLUE))
         Assert.assertEquals(Color.ORANGE, swingFrame.getRightColor())
-        Assert.assertEquals(ColorUtils.contrastForBackground(Color.ORANGE), swingFrame.getBottomColor())
+        Assert.assertEquals(Color.ORANGE, swingFrame.getBottomColor())
         Assert.assertEquals(-0.325, swingFrame.getValue().toDouble(), 1e-6)
         Assert.assertEquals(0.1, swingFrame.getRange().toDouble(), 1e-6)
         Assert.assertEquals("32.5% SWING CON TO NDP", swingFrame.getBottomText())
@@ -183,7 +182,7 @@ class SwingFrameBuilderTest {
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ swingFrame.getLeftColor() }, IsEqual(Color.BLUE))
         Assert.assertEquals(Color.RED, swingFrame.getRightColor())
-        Assert.assertEquals(ColorUtils.contrastForBackground(Color.LIGHT_GRAY), swingFrame.getBottomColor())
+        Assert.assertEquals(Color.LIGHT_GRAY, swingFrame.getBottomColor())
         Assert.assertEquals(0.0, swingFrame.getValue().toDouble(), 1e-6)
         Assert.assertEquals(0.1, swingFrame.getRange().toDouble(), 1e-6)
         Assert.assertEquals("NO SWING", swingFrame.getBottomText())
@@ -201,7 +200,7 @@ class SwingFrameBuilderTest {
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ swingFrame.getLeftColor() }, IsEqual(Color.LIGHT_GRAY))
         Assert.assertEquals(Color.LIGHT_GRAY, swingFrame.getRightColor())
-        Assert.assertEquals(ColorUtils.contrastForBackground(Color.LIGHT_GRAY), swingFrame.getBottomColor())
+        Assert.assertEquals(Color.LIGHT_GRAY, swingFrame.getBottomColor())
         Assert.assertEquals(0.0, swingFrame.getValue().toDouble(), 1e-6)
         Assert.assertEquals(0.1, swingFrame.getRange().toDouble(), 1e-6)
         Assert.assertEquals("NOT AVAILABLE", swingFrame.getBottomText())

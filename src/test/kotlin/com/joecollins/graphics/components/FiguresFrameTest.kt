@@ -1,6 +1,5 @@
 package com.joecollins.graphics.components
 
-import com.joecollins.graphics.utils.ColorUtils
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.pubsub.asOneTimePublisher
 import org.awaitility.Awaitility
@@ -35,7 +34,7 @@ class FiguresFrameTest {
         Assert.assertEquals("NDP Leader", frame.getDescription(2))
         Assert.assertEquals(Color.RED, frame.getColor(0))
         Assert.assertEquals(Color.BLUE, frame.getColor(1))
-        Assert.assertEquals(ColorUtils.contrastForBackground(Color.ORANGE), frame.getColor(2))
+        Assert.assertEquals(Color.ORANGE, frame.getColor(2))
     }
 
     @Test

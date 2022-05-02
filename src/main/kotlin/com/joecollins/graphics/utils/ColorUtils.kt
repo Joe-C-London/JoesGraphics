@@ -13,12 +13,12 @@ object ColorUtils {
 
     @JvmStatic fun foregroundToContrast(color: Color): Color {
         val l = calcLum(color)
-        return if (l > 0.5) Color.BLACK else Color.WHITE
+        return if (l > 0.75) Color.BLACK else Color.WHITE
     }
 
     @JvmStatic fun contrastForBackground(color: Color): Color {
         val l = calcLum(color)
-        val factor = (0.5 / l).coerceAtMost(1.0)
+        val factor = (0.75 / l).coerceAtMost(1.0)
         return Color(
             (color.red * factor).roundToInt(),
             (color.green * factor).roundToInt(),
