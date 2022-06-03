@@ -145,10 +145,12 @@ fun <T, R> List<Flow.Publisher<T>>.mapReduce(identity: R, onValueAdd: (R, T) -> 
         pub.subscribe(
             Subscriber { newVal ->
                 synchronized(list) {
-                    list[index]?.let { oldValWrap -> value = onValueRemove(value, oldValWrap.item) }
-                    list[index] = Wrapper(newVal)
-                    value = onValueAdd(value, newVal)
-                    publisher.submit(value)
+                    if (list[index]?.item != newVal) {
+                        list[index]?.let { oldValWrap -> value = onValueRemove(value, oldValWrap.item) }
+                        list[index] = Wrapper(newVal)
+                        value = onValueAdd(value, newVal)
+                        publisher.submit(value)
+                    }
                 }
             }
         )
