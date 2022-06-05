@@ -14,6 +14,9 @@ object Aggregators {
     @JvmStatic fun <T, K> combine(items: Collection<T>, result: (T) -> Flow.Publisher<Map<K, Int>>) = combine(items, result, HashMap())
 
     @JvmStatic fun <T, K> combine(items: Collection<T>, result: (T) -> Flow.Publisher<Map<K, Int>>, identity: Map<K, Int> = HashMap()): Flow.Publisher<Map<K, Int>> {
+        if (items.isEmpty()) {
+            return identity.asOneTimePublisher()
+        }
         val seededKeys = identity.keys
         return items.map(result).mapReduce(
             identity,

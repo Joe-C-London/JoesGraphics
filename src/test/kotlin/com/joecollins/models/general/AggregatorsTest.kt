@@ -493,4 +493,13 @@ class AggregatorsTest {
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ output.value }, IsEqual(1))
     }
+
+    @Test
+    fun testIdentityPublished() {
+        val inputs: MutableList<Publisher<Map<String, Int>>> = ArrayList()
+        val output: BoundResult<Map<String, Int>> = BoundResult()
+        combine(inputs) { it }.subscribe(Subscriber { output.value = it })
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ output.value }, IsEqual(emptyMap()))
+    }
 }
