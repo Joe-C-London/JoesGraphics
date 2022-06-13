@@ -4,7 +4,6 @@ import java.awt.Font
 import java.awt.FontFormatException
 import java.io.IOException
 import java.lang.RuntimeException
-import java.lang.Void
 import java.util.HashMap
 
 object StandardFont {
@@ -41,38 +40,5 @@ object StandardFont {
     @Synchronized
     @JvmStatic fun readNormalFont(size: Int): Font {
         return normalFontCache.computeIfAbsent(size, normalFont)
-    }
-
-    @Synchronized
-    @JvmStatic fun setFont(name: String, style: Int): Void? {
-        boldFont = { size ->
-            try {
-                Font.createFont(
-                    Font.TRUETYPE_FONT,
-                    StandardFont::class.java.classLoader.getResourceAsStream(name)
-                )
-                    .deriveFont(Font.BOLD or style, size.toFloat())
-            } catch (e: FontFormatException) {
-                throw RuntimeException(e)
-            } catch (e: IOException) {
-                throw RuntimeException(e)
-            }
-        }
-        normalFont = { size ->
-            try {
-                Font.createFont(
-                    Font.TRUETYPE_FONT,
-                    StandardFont::class.java.classLoader.getResourceAsStream(name)
-                )
-                    .deriveFont(style, size.toFloat())
-            } catch (e: FontFormatException) {
-                throw RuntimeException(e)
-            } catch (e: IOException) {
-                throw RuntimeException(e)
-            }
-        }
-        boldFontCache.clear()
-        normalFontCache.clear()
-        return null
     }
 }
