@@ -1,5 +1,6 @@
 package com.joecollins.graphics.components
 
+import com.joecollins.graphics.utils.ColorUtils
 import com.joecollins.graphics.utils.StandardFont
 import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
@@ -83,6 +84,7 @@ open class GraphicsFrame(
             border = MatteBorder(1, 1, 1, 1, it)
             headerPanel.background = it
             notesLabel.foreground = it
+            headerLabel.foreground = ColorUtils.foregroundToContrast(it)
         }
         if (borderColorPublisher != null)
             borderColorPublisher.subscribe(Subscriber(eventQueueWrapper(onBorderColorUpdate)))
