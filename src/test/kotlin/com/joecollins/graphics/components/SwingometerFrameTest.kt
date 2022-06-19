@@ -3,6 +3,7 @@ package com.joecollins.graphics.components
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
+import com.joecollins.pubsub.map
 import com.joecollins.pubsub.mapElements
 import org.awaitility.Awaitility
 import org.hamcrest.core.IsEqual
@@ -396,6 +397,69 @@ class SwingometerFrameTest {
         )
         frame.setSize(1024, 512)
         compareRendering("SwingometerFrame", "EmptyDots", frame)
+    }
+
+    @Test
+    @Throws(IOException::class)
+    fun testNeededToWinGoesBeyondBoundary() {
+        val outerLabels = Publisher(
+            listOf(
+                Triple(0.0, 332, Color.BLUE),
+                Triple(-3.91, 350, Color.BLUE),
+                Triple(-5.235, 400, Color.BLUE),
+                Triple(-7.895, 450, Color.BLUE),
+                Triple(2.68, 270, Color.RED),
+                Triple(5.075, 350, Color.RED),
+                Triple(8.665, 400, Color.RED)
+            )
+        )
+        val dots = Publisher(emptyList<SwingometerFrame.Dot>())
+        val range = Publisher(10)
+        val leftToWin = Publisher(-2.68)
+        val rightToWin = Publisher(2.68)
+        val value = Publisher(0.885)
+        val leftColor = Publisher(Color.BLUE)
+        val rightColor = Publisher(Color.RED)
+        val ticks = range.map { (-it + 1..it - 1).toList() }
+        val frame = SwingometerFrame(
+            headerPublisher = "2016 PRESIDENT SWINGOMETER".asOneTimePublisher(),
+            rangePublisher = range,
+            valuePublisher = value,
+            leftColorPublisher = leftColor,
+            rightColorPublisher = rightColor,
+            leftToWinPublisher = leftToWin,
+            rightToWinPublisher = rightToWin,
+            numBucketsPerSidePublisher = 20.asOneTimePublisher(),
+            dotsPublisher = dots,
+            ticksPublisher = ticks.mapElements { SwingometerFrame.Tick(it, it.toString()) },
+            outerLabelsPublisher = outerLabels.mapElements { SwingometerFrame.OuterLabel(it.first, it.second.toString(), it.third) }
+        )
+        frame.setSize(1024, 512)
+        compareRendering("SwingometerFrame", "BeyondBoundary-1", frame)
+
+        range.submit(2)
+        compareRendering("SwingometerFrame", "BeyondBoundary-2", frame)
+
+        outerLabels.submit(
+            listOf(
+                Triple(0.0, 332, Color.BLUE),
+                Triple(3.91, 350, Color.BLUE),
+                Triple(5.235, 400, Color.BLUE),
+                Triple(7.895, 450, Color.BLUE),
+                Triple(-2.68, 270, Color.RED),
+                Triple(-5.075, 350, Color.RED),
+                Triple(-8.665, 400, Color.RED)
+            )
+        )
+        leftToWin.submit(2.68)
+        rightToWin.submit(-2.68)
+        leftColor.submit(Color.RED)
+        rightColor.submit(Color.BLUE)
+        value.submit(-0.885)
+        compareRendering("SwingometerFrame", "BeyondBoundary-3", frame)
+
+        range.submit(10)
+        compareRendering("SwingometerFrame", "BeyondBoundary-4", frame)
     }
 
     private fun createSwingometerDotsWithLabels(): Publisher<List<Triple<Pair<String, Int>, Double, Color>>> {

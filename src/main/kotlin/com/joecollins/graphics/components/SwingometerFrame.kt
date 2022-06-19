@@ -310,12 +310,27 @@ class SwingometerFrame(
                     180,
                     arcAngle + 90
                 )
+            } else if (leftToWin.toDouble() <= -range.toDouble()) {
+                g.setColor(leftColor)
+                g.drawArc(
+                    (width - boundary) / 2,
+                    arcY - boundary / 2,
+                    boundary,
+                    boundary,
+                    180,
+                    180
+                )
             }
             if (abs(rightToWin.toDouble()) < range.toDouble()) {
                 val arcAngle = (90 * rightToWin.toDouble() / range.toDouble()).roundToLong().toInt()
                 g.setColor(rightColor)
                 g.drawArc(
                     (width - boundary) / 2, arcY - boundary / 2, boundary, boundary, 0, arcAngle - 90
+                )
+            } else if (rightToWin.toDouble() <= -range.toDouble()) {
+                g.setColor(rightColor)
+                g.drawArc(
+                    (width - boundary) / 2, arcY - boundary / 2, boundary, boundary, 0, -180
                 )
             }
             g.setColor(background)
