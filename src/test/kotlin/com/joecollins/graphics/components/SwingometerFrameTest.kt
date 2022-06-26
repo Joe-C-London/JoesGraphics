@@ -420,7 +420,7 @@ class SwingometerFrameTest {
         val value = Publisher(0.885)
         val leftColor = Publisher(Color.BLUE)
         val rightColor = Publisher(Color.RED)
-        val ticks = range.map { (-it + 1..it - 1).toList() }
+        @Suppress("ReplaceRangeToWithUntil") val ticks = range.map { (-it + 1..it - 1).toList() }
         val frame = SwingometerFrame(
             headerPublisher = "2016 PRESIDENT SWINGOMETER".asOneTimePublisher(),
             rangePublisher = range,

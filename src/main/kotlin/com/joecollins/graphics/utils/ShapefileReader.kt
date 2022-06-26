@@ -41,7 +41,7 @@ object ShapefileReader {
 
     @Throws(IOException::class)
     @JvmStatic fun <T> readShapes(file: URL, keyFunc: (SimpleFeature) -> T): Map<T, Shape> {
-        return readShapes(file, keyFunc, { true })
+        return readShapes(file, keyFunc) { true }
     }
 
     @Throws(IOException::class)
@@ -67,13 +67,12 @@ object ShapefileReader {
                 val geom = feature.getAttribute("the_geom") as Geometry
                 shapes.merge(
                     key,
-                    toShape(geom),
-                    { s1, s2 ->
-                        val s = Area(s1)
-                        s.add(Area(s2))
-                        s
-                    }
-                )
+                    toShape(geom)
+                ) { s1, s2 ->
+                    val s = Area(s1)
+                    s.add(Area(s2))
+                    s
+                }
             }
             shapes
         } finally {

@@ -517,7 +517,7 @@ class MultiResultScreenTest {
         val swingometerOrder = listOf(ndp, grn, lib, ind, pc, pa)
         val panel = ofParties(
             districts.asOneTimePublisher(),
-            { it.votes.mapKeys { it.key.party }.asOneTimePublisher() },
+            { it.votes.mapKeys { e -> e.key.party }.asOneTimePublisher() },
             { ("DISTRICT " + it.districtNum).asOneTimePublisher() },
             { it.name.uppercase().asOneTimePublisher() }
         )
@@ -1032,11 +1032,11 @@ class MultiResultScreenTest {
             return votesPublisher
         }
 
-        val partyVotes = Publisher<Map<Party, Int>>(calculatePartyVotes())
+        val partyVotes = Publisher(calculatePartyVotes())
         private fun calculatePartyVotes() =
             votes.entries
                 .groupBy { it.key.party }
-                .mapValues { e -> e.value.map { it.value }.sum() }
+                .mapValues { e -> e.value.sumOf { it.value } }
 
         private val leaderHasWonPublisher = Publisher(leaderHasWon)
         fun getLeaderHasWon(): Flow.Publisher<Boolean> {

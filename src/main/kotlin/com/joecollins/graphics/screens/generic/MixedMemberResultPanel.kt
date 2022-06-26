@@ -177,10 +177,6 @@ class MixedMemberResultPanel private constructor(
         }
 
         private class Result {
-            enum class Property {
-                VOTES, WINNER
-            }
-
             private var _votes: Map<Candidate, Int?> = HashMap()
             private var _winner: Candidate? = null
 
@@ -321,8 +317,7 @@ class MixedMemberResultPanel private constructor(
                         .sum() +
                         prev.entries
                             .filter { it.key === Party.OTHERS || !currParties.contains(it.key) }
-                            .map { -1.0 * it.value / prevTotal }
-                            .sum()
+                            .sumOf { -1.0 * it.value / prevTotal }
                     )
                 val nonMatchingBars = if (othersPct == 0.0) emptySequence() else sequenceOf(
                     BasicBar(
@@ -400,13 +395,10 @@ class MixedMemberResultPanel private constructor(
                     }
                 val otherTotal = (
                     curr.entries
-                        .filter { it.key === Party.OTHERS }
-                        .map { 1.0 * it.value / currTotal }
-                        .sum() +
+                        .filter { it.key === Party.OTHERS }.sumOf { 1.0 * it.value / currTotal } +
                         prev.entries
                             .filter { it.key === Party.OTHERS || !curr.containsKey(it.key) }
-                            .map { -1.0 * it.value / prevTotal }
-                            .sum()
+                            .sumOf { -1.0 * it.value / prevTotal }
                     )
                 val absentBars = if (otherTotal == 0.0) emptySequence() else sequenceOf(
                     BasicBar(

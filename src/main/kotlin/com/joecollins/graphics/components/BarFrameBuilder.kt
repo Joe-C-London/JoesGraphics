@@ -29,10 +29,6 @@ class BarFrameBuilder private constructor() {
     private val rangeFinder = RangeFinder()
 
     private class RangeFinder {
-        enum class Property {
-            MIN, MAX
-        }
-
         private var _highest: Number = 0
         private var _lowest: Number = 0
         private var _minFunction = { rf: RangeFinder -> rf.lowest }

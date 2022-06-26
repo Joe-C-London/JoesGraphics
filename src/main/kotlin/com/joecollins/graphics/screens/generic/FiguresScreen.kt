@@ -61,10 +61,6 @@ class FiguresScreen private constructor(headerLabel: JLabel, frames: Array<Figur
     }
 
     private class Entry(val candidate: Candidate, val description: String) {
-        enum class Property {
-            LEADER, STATUS
-        }
-
         private var _leader: Party? = null
         private var _status: String = ""
 

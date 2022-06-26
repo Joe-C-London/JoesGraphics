@@ -1,5 +1,5 @@
 buildscript {
-    ext.kotlin_version = '1.6.0'
+    ext.kotlin_version = '1.7.0'
     repositories {
         mavenCentral()
     }
@@ -8,8 +8,8 @@ buildscript {
     }
 }
 plugins {
-    id "com.github.ben-manes.versions" version "0.39.0"
-    id "com.diffplug.spotless" version "6.0.4"
+    id "com.github.ben-manes.versions" version "0.42.0"
+    id "com.diffplug.spotless" version "6.7.2"
     id "jacoco"
 }
 
@@ -29,7 +29,7 @@ repositories {
     mavenCentral()
 }
 
-def geotoolsVersion = '26.1'
+def geotoolsVersion = '27.0'
 
 dependencies {
     api group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.30'
@@ -37,14 +37,14 @@ dependencies {
     api group: 'org.geotools', name: 'gt-metadata', version: geotoolsVersion
     api group: 'org.twitter4j', name: 'twitter4j-core', version: '4.0.7'
     api group: 'org.apache.commons', name: 'commons-collections4', version: '4.4'
-    api group: 'com.google.guava', name: 'guava', version: '31.0.1-jre'
-    api group: 'org.jsoup', name: 'jsoup', version: '1.14.3'
+    api group: 'com.google.guava', name: 'guava', version: '31.1-jre'
+    api group: 'org.jsoup', name: 'jsoup', version: '1.15.1'
     implementation group: 'io.webfolder', name: 'cdp4j', version: '3.0.15'
     implementation 'com.fasterxml:jackson-xml-databind:0.6.2'
     testImplementation group: 'junit', name: 'junit', version: '4.13.2'
     testImplementation group: 'commons-io', name: 'commons-io', version: '2.11.0'
-    testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.2.0'
-    testImplementation group: 'org.awaitility', name: 'awaitility', version: '4.1.1'
+    testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.6.1'
+    testImplementation group: 'org.awaitility', name: 'awaitility', version: '4.2.0'
     api "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
 }
 
@@ -59,7 +59,7 @@ spotless {
 
 jacoco {
     toolVersion = "0.8.7"
-    reportsDir = file("$buildDir/jacocoReports")
+    reportsDirectory = file("$buildDir/jacocoReports")
 }
 
 jacocoTestReport {

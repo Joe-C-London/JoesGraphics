@@ -138,10 +138,6 @@ class HeatMapFrameBuilderTest {
         Assert.assertEquals("+2/+9", frame.changeBarLabel)
     }
 
-    internal enum class Property {
-        PROP
-    }
-
     @Test
     fun testLeadingElectedSeatsRepeated() {
         val dem = Party("Democratic", "DEM", Color.BLUE)

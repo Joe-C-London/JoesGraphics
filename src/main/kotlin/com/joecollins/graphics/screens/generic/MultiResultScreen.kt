@@ -47,16 +47,16 @@ class MultiResultScreen private constructor() : JPanel() {
     ) {
         private val itemPublishers: MutableList<Flow.Publisher<out T?>> = ArrayList()
 
-        var pctReportingFunc: (T) -> Flow.Publisher<out Double> = { 1.0.asOneTimePublisher() }
-        var winnerFunc: (T) -> Flow.Publisher<out Candidate?> = { (null as Candidate?).asOneTimePublisher() }
-        var runoffFunc: (T) -> Flow.Publisher<out Set<Candidate>?> = { setOf<Candidate>().asOneTimePublisher() }
-        var incumbentMarker = ""
-        var prevFunc: ((T) -> Flow.Publisher<out Map<Party, Int>>)? = null
-        var swingHeaderFunc: ((T) -> Flow.Publisher<out String>)? = null
-        var swingPartyOrder: Comparator<Party>? = null
-        var mapShapeFunc: ((T) -> List<Pair<Shape, Flow.Publisher<out Color>>>)? = null
-        var mapFocusFunc: ((T) -> List<Shape>?)? = null
-        var mapHeaderFunc: ((T) -> Flow.Publisher<out String>)? = null
+        private var pctReportingFunc: (T) -> Flow.Publisher<out Double> = { 1.0.asOneTimePublisher() }
+        private var winnerFunc: (T) -> Flow.Publisher<out Candidate?> = { (null as Candidate?).asOneTimePublisher() }
+        private var runoffFunc: (T) -> Flow.Publisher<out Set<Candidate>?> = { setOf<Candidate>().asOneTimePublisher() }
+        private var incumbentMarker = ""
+        private var prevFunc: ((T) -> Flow.Publisher<out Map<Party, Int>>)? = null
+        private var swingHeaderFunc: ((T) -> Flow.Publisher<out String>)? = null
+        private var swingPartyOrder: Comparator<Party>? = null
+        private var mapShapeFunc: ((T) -> List<Pair<Shape, Flow.Publisher<out Color>>>)? = null
+        private var mapFocusFunc: ((T) -> List<Shape>?)? = null
+        private var mapHeaderFunc: ((T) -> Flow.Publisher<out String>)? = null
 
         fun withIncumbentMarker(incumbentMarker: String): Builder<T> {
             this.incumbentMarker = incumbentMarker
@@ -313,17 +313,17 @@ class MultiResultScreen private constructor() : JPanel() {
     }
 
     private class ResultPanel constructor(
-        private val incumbentMarker: String,
+        incumbentMarker: String,
         swingPartyOrder: Comparator<Party>?,
         hasMap: Boolean,
         partiesOnly: Boolean,
-        private val index: Int
+        index: Int
     ) : JPanel() {
         private val barFrame: BarFrame
         private var swingFrame: SwingFrame? = null
         private var mapFrame: MapFrame? = null
         var displayBothRows = true
-        private val votes: Publisher<Flow.Publisher<out Map<Candidate, Int>>> = Publisher(Publisher(emptyMap<Candidate, Int>()))
+        private val votes: Publisher<Flow.Publisher<out Map<Candidate, Int>>> = Publisher(Publisher(emptyMap()))
         private val header: Publisher<Flow.Publisher<out String>> = Publisher(Publisher(""))
         private val subhead: Publisher<Flow.Publisher<out String?>> = Publisher(Publisher(null))
         private val pctReporting: Publisher<Flow.Publisher<out Double>> = Publisher(Publisher(1.0))

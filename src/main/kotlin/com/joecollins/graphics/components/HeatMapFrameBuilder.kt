@@ -93,10 +93,10 @@ class HeatMapFrameBuilder {
             builder.squaresPublisher =
                 entries.map {
                     fillFunc(it).merge(borderFunc(it)) {
-                        fill, border ->
+                            fill, border ->
                         fill to border
                     }.merge(labelFunc(it)) {
-                        (fill, border), label ->
+                            (fill, border), label ->
                         HeatMapFrame.Square(fillColor = fill, borderColor = border, label = label)
                     }
                 }
@@ -227,7 +227,7 @@ class HeatMapFrameBuilder {
         }
 
         private fun calcPrevForParty(prev: List<Pair<Party, Int>>, party: Party): Int {
-            return prev.filter { party == it.first }.map { it.second }.sum()
+            return prev.filter { party == it.first }.sumOf { it.second }
         }
 
         private fun createSeatBarPublisher(

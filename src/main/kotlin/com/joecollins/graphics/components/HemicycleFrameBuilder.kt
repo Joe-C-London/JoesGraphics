@@ -210,7 +210,7 @@ class HemicycleFrameBuilder {
             builder.dotsPublisher =
                 dots.map {
                     colorFunc(it).merge(borderFunc(it)) {
-                        color, border ->
+                            color, border ->
                         HemicycleFrame.Dot(color = color, border = border)
                     }
                 }
@@ -397,7 +397,7 @@ class HemicycleFrameBuilder {
         }
 
         private fun calcPrevForParty(prev: List<Pair<Party, Int>>, party: Party): Int {
-            return prev.filter { party == it.first }.map { it.second }.sum()
+            return prev.filter { party == it.first }.sumOf { it.second }
         }
 
         private fun createSeatBarPublisher(

@@ -146,13 +146,13 @@ class BasicResultPanel private constructor(
         protected var diff: Flow.Publisher<out Map<Party, CurrDiff<CT>>>? = null
         protected var changeHeader: Flow.Publisher<out String?>? = null
         protected var changeSubhead: Flow.Publisher<out String?>? = null
-        protected var currVotes: Flow.Publisher<out Map<Party, Int>>? = null
-        protected var prevVotes: Flow.Publisher<out Map<Party, Int>>? = null
-        protected var swingHeader: Flow.Publisher<out String?>? = null
-        protected var swingComparator: Comparator<Party>? = null
+        private var currVotes: Flow.Publisher<out Map<Party, Int>>? = null
+        private var prevVotes: Flow.Publisher<out Map<Party, Int>>? = null
+        private var swingHeader: Flow.Publisher<out String?>? = null
+        private var swingComparator: Comparator<Party>? = null
         protected var classificationFunc: ((Party) -> Party)? = null
         protected var classificationHeader: Flow.Publisher<out String?>? = null
-        protected var mapBuilder: MapBuilder<*>? = null
+        private var mapBuilder: MapBuilder<*>? = null
 
         fun withTotal(totalSeats: Flow.Publisher<out Int>): SeatScreenBuilder<KT, CT, PT> {
             total = totalSeats
@@ -401,7 +401,7 @@ class BasicResultPanel private constructor(
             if (showMajority != null) {
                 val total = this.total ?: throw IllegalArgumentException("Cannot show majority line without total")
                 val lines = showMajority.merge(total) {
-                    show, tot ->
+                        show, tot ->
                     if (show) listOf(tot / 2 + 1)
                     else emptyList()
                 }
@@ -571,7 +571,7 @@ class BasicResultPanel private constructor(
                     throw IllegalStateException("Cannot show majority line without total")
                 }
                 val lines = showMajority.merge(total) {
-                    show, tot ->
+                        show, tot ->
                     if (show) listOf(tot / 2 + 1)
                     else emptyList()
                 }
@@ -718,7 +718,7 @@ class BasicResultPanel private constructor(
                     throw IllegalStateException("Cannot show majority without total")
                 }
                 val lines = showMajority.merge(total) {
-                    show, tot ->
+                        show, tot ->
                     if (show) listOf(tot / 2 + 1)
                     else emptyList()
                 }
@@ -814,7 +814,7 @@ class BasicResultPanel private constructor(
         protected var majorityLabel: String? = null
         protected var winner: Flow.Publisher<out KT?>? = null
         protected var runoff: Flow.Publisher<out Set<KT>?>? = null
-        protected var pctReporting: Flow.Publisher<out Double>? = null
+        protected var pctReporting: Flow.Publisher<Double>? = null
         protected var notes: Flow.Publisher<out String?>? = null
         protected var limit = Int.MAX_VALUE
         protected var mandatoryParties: Set<Party> = emptySet()
@@ -830,7 +830,7 @@ class BasicResultPanel private constructor(
         protected var swingComparator: Comparator<Party>? = null
         protected var classificationFunc: ((Party) -> Party)? = null
         protected var classificationHeader: Flow.Publisher<out String?>? = null
-        protected var mapBuilder: MapBuilder<*>? = null
+        private var mapBuilder: MapBuilder<*>? = null
 
         @JvmOverloads
         fun withPrev(
@@ -872,7 +872,7 @@ class BasicResultPanel private constructor(
             return this
         }
 
-        fun withPctReporting(pctReporting: Flow.Publisher<out Double>): VoteScreenBuilder<KT, CT, CPT, PT> {
+        fun withPctReporting(pctReporting: Flow.Publisher<Double>): VoteScreenBuilder<KT, CT, CPT, PT> {
             this.pctReporting = pctReporting
             return this
         }
@@ -1128,9 +1128,9 @@ class BasicResultPanel private constructor(
             val pctReporting = this.pctReporting
             if (showMajority != null) {
                 val lines = showMajority.merge(
-                    pctReporting ?: (1.0.asOneTimePublisher() as Flow.Publisher<Double>)
+                    pctReporting ?: 1.0.asOneTimePublisher()
                 ) {
-                    show, pct ->
+                        show, pct ->
                     if (show) listOf(0.5 / pct.coerceAtLeast(1e-6))
                     else emptyList()
                 }
@@ -1619,11 +1619,10 @@ class BasicResultPanel private constructor(
         private fun createDiffFrame(): BarFrame? {
             if (prevQuotas == null) return null
             return BarFrame(
-                barsPublisher = quotas.merge(prevQuotas!!) { curr, prevRaw ->
+                barsPublisher = quotas.merge(prevQuotas!!) { curr, prev ->
                     if (curr.isEmpty()) {
                         emptyList()
                     } else {
-                        val prev = prevRaw
                         sequenceOf(
                             curr.asSequence().sortedByDescending { if (it.key == Party.OTHERS) -1.0 else it.value }.map { it.key },
                             prev.keys.asSequence().filter { !curr.containsKey(it) }.sortedByDescending { if (it == Party.OTHERS) -1 else 0 }

@@ -15,6 +15,7 @@ import java.nio.file.StandardCopyOption
 import java.util.HashMap
 import kotlin.Throws
 
+@Suppress("BlockingMethodInNonBlockingContext")
 class FileWatcherServiceTest {
     private var tempPath: Path? = null
     @Before

@@ -262,7 +262,7 @@ class HemicycleFrameBuilderTest {
         val result = Result(null, false, gop, 30)
         val results = listOf(result)
         val frame = ofElectedLeading(
-            listOf(results.map { it.numSeats }.sum()),
+            listOf(results.sumOf { it.numSeats }),
             results,
             { it.numSeats },
             { it.publisher },
@@ -366,7 +366,7 @@ class HemicycleFrameBuilderTest {
         val result = Result(null, false, gop, 30)
         val results = listOf(result)
         val frame = ofElectedLeading(
-            listOf(results.map { it.numSeats }.sum()),
+            listOf(results.sumOf { it.numSeats }),
             results,
             { it.numSeats },
             { it.publisher },

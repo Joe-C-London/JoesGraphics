@@ -103,7 +103,7 @@ class BarFrame(
     }
 
     private val maxLines: Int
-        get() = bars.map { obj: BarPanel -> obj.numLines }.maxOrNull() ?: 1
+        get() = bars.maxOfOrNull { obj: BarPanel -> obj.numLines } ?: 1
 
     internal val numLines: Int
         get() = lines.size
@@ -217,19 +217,15 @@ class BarFrame(
             val sumsPosNeg = _series
                 .map { it.second.toDouble() }
                 .groupBy { it > 0 }
-                .mapValues { e -> e.value.map { abs(it) }.sum() }
+                .mapValues { e -> e.value.sumOf { abs(it) } }
             val isNetPositive = (sumsPosNeg[true] ?: 0).toDouble() >= (sumsPosNeg[false] ?: 0).toDouble()
             val zero = getPixelOfValue(0.0)
             val leftText = leftText.split("\n").toTypedArray()
             val rightText = rightText.split("\n").toTypedArray()
             val maxLeftWidth =
-                leftText
-                    .map { str -> g.getFontMetrics(font).stringWidth(str) }
-                    .maxOrNull() ?: 0
+                leftText.maxOfOrNull { str -> g.getFontMetrics(font).stringWidth(str) } ?: 0
             val maxRightWidth =
-                rightText
-                    .map { str -> g.getFontMetrics(font).stringWidth(str) }
-                    .maxOrNull() ?: 0
+                rightText.maxOfOrNull { str -> g.getFontMetrics(font).stringWidth(str) } ?: 0
             val leftIconWidth: Int = if (leftIcon != null) {
                 val leftIconBounds = leftIcon!!.bounds
                 val leftIconScale = (barHeight - 2 * BAR_MARGIN) / leftIconBounds.getHeight()
@@ -398,9 +394,7 @@ class BarFrame(
             }
             val barHeight = (
                 (
-                    bars
-                        .map { i -> i.preferredSize.height }
-                        .maxOrNull() ?: 0
+                    bars.maxOfOrNull { i -> i.preferredSize.height } ?: 0
                     ) *
                     factor
                 ).toInt()

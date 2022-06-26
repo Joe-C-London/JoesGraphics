@@ -1088,16 +1088,16 @@ class SimpleVoteViewPanelTest {
         val ukip = Party("UK Independence Party", "UKIP", Color.MAGENTA.darker())
         val cista = Party("Cannabis is Safer than Alcohol", "CISTA", Color.GRAY)
         val wp = Party("Workers' Party", "WP", Color.RED)
-        val ind_u = Party("Independent", "IND", Color.GRAY)
-        val ind_n = Party("Independent", "IND", Color.GRAY)
-        val ind_o = Party("Independent", "IND", Color.GRAY)
+        val indU = Party("Independent", "IND", Color.GRAY)
+        val indN = Party("Independent", "IND", Color.GRAY)
+        val indO = Party("Independent", "IND", Color.GRAY)
         val unionists = Party("Unionists", "Unionists", Color(0xff8200))
         val nationalists = Party("Nationalists", "Nationalists", Color(0x169b62))
         val others = Party.OTHERS
         val mapping: MutableMap<Party, Party> = IdentityHashMap()
-        sequenceOf(dup, uup, tuv, con, pup, ukip, ind_u).forEach { mapping[it] = unionists }
-        sequenceOf(sf, sdlp, wp, ind_n).forEach { mapping[it] = nationalists }
-        sequenceOf(apni, grn, pbp, lab, ind_o).forEach { mapping[it] = others }
+        sequenceOf(dup, uup, tuv, con, pup, ukip, indU).forEach { mapping[it] = unionists }
+        sequenceOf(sf, sdlp, wp, indN).forEach { mapping[it] = nationalists }
+        sequenceOf(apni, grn, pbp, lab, indO).forEach { mapping[it] = others }
         val currentVotes = Publisher(LinkedHashMap<Party, Int>())
         val previousVotes = Publisher(LinkedHashMap<Party, Int>())
         val header = Publisher("NORTHERN IRELAND")
@@ -1126,9 +1126,9 @@ class SimpleVoteViewPanelTest {
         currVotes[ukip] = 1579
         currVotes[cista] = 1273
         currVotes[wp] = 1261
-        currVotes[ind_u] = 4918
-        currVotes[ind_n] = 1639
-        currVotes[ind_o] = 7850
+        currVotes[indU] = 4918
+        currVotes[indN] = 1639
+        currVotes[indO] = 7850
         currentVotes.submit(currVotes)
         val prevVotes = LinkedHashMap<Party, Int>()
         prevVotes[dup] = 202567
@@ -1145,13 +1145,14 @@ class SimpleVoteViewPanelTest {
         prevVotes[cista] = 2510
         prevVotes[lab] = 1939 + 1577
         prevVotes[wp] = 1565
-        prevVotes[ind_u] = 351 + 3270
-        prevVotes[ind_n] = 0
-        prevVotes[ind_o] = 224 + 124 + 32 + 19380
+        prevVotes[indU] = 351 + 3270
+        prevVotes[indN] = 0
+        prevVotes[indO] = 224 + 124 + 32 + 19380
         previousVotes.submit(prevVotes)
         compareRendering("SimpleVoteViewPanel", "PartyClassifications-2", panel)
     }
 
+    @Suppress("LocalVariableName")
     @Test
     fun testPartiesConsolidatedInDiffIfTooMany() {
         val CPA = Party("Christian Peoples Alliance", "CPA", Color(148, 0, 170))

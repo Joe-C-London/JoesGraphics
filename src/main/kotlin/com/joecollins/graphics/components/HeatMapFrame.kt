@@ -214,7 +214,7 @@ class HeatMapFrame(
             val seatBaseline = height * 4 / 5 + height
             g.color = if (changeBars.isEmpty()) Color.BLACK else changeBars[0].color
             var leftLeft = getLeftPosition(changeBarStart) + 5
-            if (changeBars.map { i: Bar -> i.size }.sum() < 0) {
+            if (changeBars.sumOf { i: Bar -> i.size } < 0) {
                 leftLeft -= g.fontMetrics.stringWidth(changeBarLabel) + 10
             }
             g.drawString(changeBarLabel, leftLeft, seatBaseline)
@@ -302,26 +302,22 @@ class HeatMapFrame(
 
         private val numCols: Int
             get() {
-                val numCols = ceil(1.0 * _squares.size / numRows).toInt()
-                return numCols
+                return ceil(1.0 * _squares.size / numRows).toInt()
             }
 
         private val squareSize: Int
             get() {
-                val squareSize = min((this.width - 10) / this.numCols, (this.height - 10) / numRows)
-                return squareSize
+                return min((width - 10) / numCols, (height - 10) / numRows)
             }
 
         private val farLeft: Int
             get() {
-                val farLeft = (this.width - this.squareSize * this.numCols) / 2
-                return farLeft
+                return (width - squareSize * numCols) / 2
             }
 
         private val farTop: Int
             get() {
-                val farTop = (this.height - this.squareSize * numRows) / 2
-                return farTop
+                return (height - squareSize * numRows) / 2
             }
 
         private val padding: Int

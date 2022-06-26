@@ -169,7 +169,7 @@ class SwingFrameBuilder {
         ): SwingFrameBuilder {
             val prevCurr = SelfPublishingPrevCurrPct()
             val toPctFunc = { votes: Map<Party, Number> ->
-                val total: Double = if (normalised) 1.0 else votes.values.map { it.toDouble() }.sum()
+                val total: Double = if (normalised) 1.0 else votes.values.sumOf { it.toDouble() }
                 votes.mapValues { e -> e.value.toDouble() / total }
             }
             prevPublisher.subscribe(Subscriber { prevCurr.setPrevPct(toPctFunc(it)) })

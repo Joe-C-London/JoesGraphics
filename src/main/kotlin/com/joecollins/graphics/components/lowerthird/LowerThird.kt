@@ -32,6 +32,7 @@ import javax.swing.JPanel
 import javax.swing.border.EmptyBorder
 import kotlin.math.max
 
+@Suppress("LeakingThis")
 open class LowerThird internal constructor(
     private val leftImagePublisher: Flow.Publisher<out Image>,
     private val placePublisher: Flow.Publisher<out Pair<String, ZoneId>>,

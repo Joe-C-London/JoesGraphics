@@ -192,10 +192,6 @@ class ResultListingFrameTest {
     }
 
     private class Item(private var _text: String, private var _background: Color, private var _foreground: Color, private var _border: Color) {
-        enum class Property {
-            TEXT, FOREGROUND, BACKGROUND, BORDER
-        }
-
         var text: String
             get() = _text
             set(text) {

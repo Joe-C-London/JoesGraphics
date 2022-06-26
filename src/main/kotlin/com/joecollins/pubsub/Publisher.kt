@@ -1,7 +1,6 @@
 package com.joecollins.pubsub
 
 import org.apache.commons.lang3.tuple.MutablePair
-import java.sql.Wrapper
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Flow
 import java.util.concurrent.LinkedBlockingQueue

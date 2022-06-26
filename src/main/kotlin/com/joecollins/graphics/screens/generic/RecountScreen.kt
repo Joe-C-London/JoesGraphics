@@ -91,7 +91,7 @@ class RecountScreen private constructor(headerLabel: JLabel, frame: MultiSummary
         val key: T,
         val votes: Map<Candidate, Int>,
         val pctReporting: Double?,
-        val voteThreshold: Int?,
+        voteThreshold: Int?,
         val pctThreshold: Double?
     ) {
         val topCandidates: List<Map.Entry<Candidate, Int>> = votes.entries

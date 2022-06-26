@@ -374,7 +374,7 @@ class SwingometerScreen private constructor(title: JLabel, frame: SwingometerFra
             }
 
             private fun getNumSeats(swings: List<Double>): Int {
-                return swings.filter { s: Double -> s < 0 }.count()
+                return swings.count { s: Double -> s < 0 }
             }
 
             private fun <T> getSwingNeededForMajority(

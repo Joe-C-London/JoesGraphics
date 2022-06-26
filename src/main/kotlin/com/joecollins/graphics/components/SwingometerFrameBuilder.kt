@@ -167,7 +167,7 @@ class SwingometerFrameBuilder {
         positionFunc: (T) -> Number,
         colorFunc: (T) -> Color
     ): SwingometerFrameBuilder {
-        return withDots(dots, positionFunc, colorFunc, { "" })
+        return withDots(dots, positionFunc, colorFunc) { "" }
     }
 
     fun <T> withDots(
@@ -176,7 +176,7 @@ class SwingometerFrameBuilder {
         colorFunc: (T) -> Color,
         labelFunc: (T) -> String
     ): SwingometerFrameBuilder {
-        return withDots(dots, positionFunc, colorFunc, labelFunc, { true })
+        return withDots(dots, positionFunc, colorFunc, labelFunc) { true }
     }
 
     fun <T> withDotsSolid(
@@ -188,6 +188,7 @@ class SwingometerFrameBuilder {
         return withDots(dots, positionFunc, colorFunc, { "" }, solidFunc)
     }
 
+    @Suppress("MemberVisibilityCanBePrivate", "MemberVisibilityCanBePrivate", "MemberVisibilityCanBePrivate")
     fun <T> withDots(
         dots: Flow.Publisher<out List<T>>,
         positionFunc: (T) -> Number,
@@ -205,16 +206,17 @@ class SwingometerFrameBuilder {
         positionFunc: (T) -> Number,
         colorFunc: (T) -> Flow.Publisher<out Color>
     ): SwingometerFrameBuilder {
-        return withFixedDots(dots, positionFunc, colorFunc, { "" })
+        return withFixedDots(dots, positionFunc, colorFunc) { "" }
     }
 
+    @Suppress("MemberVisibilityCanBePrivate")
     fun <T> withFixedDots(
         dots: List<T>,
         positionFunc: (T) -> Number,
         colorFunc: (T) -> Flow.Publisher<out Color>,
         labelFunc: (T) -> String
     ): SwingometerFrameBuilder {
-        return withFixedDots(dots, positionFunc, colorFunc, labelFunc, { true })
+        return withFixedDots(dots, positionFunc, colorFunc, labelFunc) { true }
     }
 
     fun <T> withFixedDotsSolid(
@@ -226,6 +228,7 @@ class SwingometerFrameBuilder {
         return withFixedDots(dots, positionFunc, colorFunc, { "" }, solidFunc)
     }
 
+    @Suppress("MemberVisibilityCanBePrivate")
     fun <T> withFixedDots(
         dots: List<T>,
         positionFunc: (T) -> Number,

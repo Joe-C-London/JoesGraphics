@@ -226,10 +226,6 @@ class SwingometerFrameBuilderTest {
         Assert.assertFalse(frame.isDotSolid(4))
     }
 
-    internal enum class Property {
-        PROP
-    }
-
     @Test
     fun testFixedDots() {
         class Dot(val position: Double, private var color: Color) {

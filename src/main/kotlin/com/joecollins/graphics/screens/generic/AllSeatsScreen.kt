@@ -68,10 +68,6 @@ class AllSeatsScreen private constructor(title: JLabel, frame: ResultListingFram
     }
 
     private class Input<T>(private val nameFunc: (T) -> String) {
-        private enum class Property {
-            PREV, CURR, FILTER
-        }
-
         private var prevResults: List<Pair<T, Party>> = emptyList()
         private var currResults: Map<T, PartyResult?> = emptyMap()
         private var seatFilter: Set<T>? = null
@@ -99,21 +95,24 @@ class AllSeatsScreen private constructor(title: JLabel, frame: ResultListingFram
                     )
                 }
                 .toList()
-            _resultPublisher.submit(toEntries())
+            publishResults()
         }
 
         fun setCurrResults(currResults: Map<T, PartyResult?>) {
             this.currResults = currResults
-            _resultPublisher.submit(toEntries())
+            publishResults()
         }
 
         fun setSeatFilter(seatFilter: Set<T>?) {
             this.seatFilter = seatFilter
-            _resultPublisher.submit(toEntries())
+            publishResults()
         }
 
-        val _resultPublisher = Publisher(toEntries())
-        val resultPublisher: Flow.Publisher<out List<Entry<T>>> = _resultPublisher
+        private fun publishResults() {
+            (resultPublisher as Publisher<List<Entry<T>>>).submit(toEntries())
+        }
+
+        val resultPublisher: Flow.Publisher<List<Entry<T>>> = Publisher(toEntries())
 
         private fun toEntries() = this.prevResults
             .asSequence()

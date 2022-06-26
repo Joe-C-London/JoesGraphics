@@ -994,7 +994,7 @@ class SeatViewPanelTest {
         val focus = Publisher(shapesByDistrict.keys.filter { it <= 7 })
         val additionalHighlight = Publisher<List<Int>>(ArrayList(shapesByDistrict.keys))
         val winnerByDistrict = Publisher(mapOf<Int, PartyResult>())
-        val panel = BasicResultPanel.partySeats(
+        val panel = partySeats(
             currentSeats, seatHeader, seatSubhead
         )
             .withPrev(previousSeats, changeHeader, changeSubhead)
@@ -1023,16 +1023,16 @@ class SeatViewPanelTest {
         val ukip = Party("UK Independence Party", "UKIP", Color.MAGENTA.darker())
         val cista = Party("Cannabis is Safer than Alcohol", "CISTA", Color.GRAY)
         val wp = Party("Workers' Party", "WP", Color.RED)
-        val ind_u = Party("Independent", "IND", Color.GRAY)
-        val ind_n = Party("Independent", "IND", Color.GRAY)
-        val ind_o = Party("Independent", "IND", Color.GRAY)
+        val indU = Party("Independent", "IND", Color.GRAY)
+        val indN = Party("Independent", "IND", Color.GRAY)
+        val indO = Party("Independent", "IND", Color.GRAY)
         val unionists = Party("Unionists", "Unionists", Color(0xff8200))
         val nationalists = Party("Nationalists", "Nationalists", Color(0x169b62))
         val others = Party.OTHERS
         val mapping: MutableMap<Party, Party> = IdentityHashMap()
-        sequenceOf(dup, uup, tuv, con, pup, ukip, ind_u).forEach { mapping[it] = unionists }
-        sequenceOf(sf, sdlp, wp, ind_n).forEach { mapping[it] = nationalists }
-        sequenceOf(apni, grn, pbp, lab, ind_o).forEach { mapping[it] = others }
+        sequenceOf(dup, uup, tuv, con, pup, ukip, indU).forEach { mapping[it] = unionists }
+        sequenceOf(sf, sdlp, wp, indN).forEach { mapping[it] = nationalists }
+        sequenceOf(apni, grn, pbp, lab, indO).forEach { mapping[it] = others }
         val currentSeats = Publisher(LinkedHashMap<Party, Int>())
         val previousSeats = Publisher(LinkedHashMap<Party, Int>())
         val currentVotes = Publisher(LinkedHashMap<Party, Int>())
@@ -1062,7 +1062,7 @@ class SeatViewPanelTest {
         currSeats[grn] = 2
         currSeats[tuv] = 1
         currSeats[pbp] = 1
-        currSeats[ind_u] = 1
+        currSeats[indU] = 1
         currentSeats.submit(currSeats)
         val prevSeats = LinkedHashMap<Party, Int>()
         prevSeats[dup] = 33
@@ -1089,9 +1089,9 @@ class SeatViewPanelTest {
         currVotes[ukip] = 1579
         currVotes[cista] = 1273
         currVotes[wp] = 1261
-        currVotes[ind_u] = 4918
-        currVotes[ind_n] = 1639
-        currVotes[ind_o] = 7850
+        currVotes[indU] = 4918
+        currVotes[indN] = 1639
+        currVotes[indO] = 7850
         currentVotes.submit(currVotes)
         val prevVotes = LinkedHashMap<Party, Int>()
         prevVotes[dup] = 202567
@@ -1108,9 +1108,9 @@ class SeatViewPanelTest {
         prevVotes[cista] = 2510
         prevVotes[lab] = 1939 + 1577
         prevVotes[wp] = 1565
-        prevVotes[ind_u] = 351 + 3270
-        prevVotes[ind_n] = 0
-        prevVotes[ind_o] = 224 + 124 + 32 + 19380
+        prevVotes[indU] = 351 + 3270
+        prevVotes[indN] = 0
+        prevVotes[indO] = 224 + 124 + 32 + 19380
         previousVotes.submit(prevVotes)
         compareRendering("SeatViewPanel", "PartyClassifications-2", panel)
     }

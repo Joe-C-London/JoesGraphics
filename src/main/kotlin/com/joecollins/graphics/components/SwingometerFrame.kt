@@ -236,9 +236,7 @@ class SwingometerFrame(
                             ceil(abs(e.position.toDouble() / bucketSize)).toInt()
                         )
                 }
-            val maxBucketSize = bucketedDots.values
-                .map { obj: List<Dot> -> obj.size }
-                .maxOrNull() ?: 0
+            val maxBucketSize = bucketedDots.values.maxOfOrNull { obj: List<Dot> -> obj.size } ?: 0
             val theta = Math.PI / 2 / numBucketsPerSide
             val dotSize = (
                 (
@@ -268,8 +266,7 @@ class SwingometerFrame(
                     while (size > 1) {
                         font = StandardFont.readNormalFont(size)
                         val maxWidth =
-                            text.map { str -> g.getFontMetrics(font).stringWidth(str) }
-                                .maxOrNull() ?: 0
+                            text.maxOfOrNull { str -> g.getFontMetrics(font).stringWidth(str) } ?: 0
                         if (maxWidth < dotSize - 8) {
                             break
                         }

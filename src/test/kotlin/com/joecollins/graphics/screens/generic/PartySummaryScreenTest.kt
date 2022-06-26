@@ -12,12 +12,12 @@ import java.io.IOException
 import kotlin.Throws
 
 class PartySummaryScreenTest {
-    var lib = Party("Liberal", "LIB", Color.RED)
-    var con = Party("Conservative", "CON", Color.BLUE)
-    var ndp = Party("New Democratic Party", "NDP", Color.ORANGE)
-    var bq = Party("Bloc Qu\u00e9b\u00e9cois", "BQ", Color.CYAN.darker())
-    var grn = Party("Green", "GRN", Color.GREEN.darker())
-    var oth = Party.OTHERS
+    private var lib = Party("Liberal", "LIB", Color.RED)
+    private var con = Party("Conservative", "CON", Color.BLUE)
+    private var ndp = Party("New Democratic Party", "NDP", Color.ORANGE)
+    private var bq = Party("Bloc Qu\u00e9b\u00e9cois", "BQ", Color.CYAN.darker())
+    private var grn = Party("Green", "GRN", Color.GREEN.darker())
+    private var oth = Party.OTHERS
     @Test
     @Throws(IOException::class)
     fun testBasicPartySummaryWithDiff() {

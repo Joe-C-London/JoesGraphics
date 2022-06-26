@@ -35,8 +35,6 @@ class RegionalBreakdownScreen private constructor(titleLabel: JLabel, multiSumma
     }
 
     private open class SeatEntry : Entry {
-        enum class Property
-
         private var _partyOrder: List<Party> = emptyList()
         private var _name = ""
         private var _seats: Map<Party, Int> = emptyMap()
@@ -353,7 +351,7 @@ class RegionalBreakdownScreen private constructor(titleLabel: JLabel, multiSumma
         ): List<Party> {
             return sequenceOf(result.keys.asSequence(), diff.keys.asSequence()).flatten()
                 .distinct()
-                .filter { party -> result[party] ?: 0 > 0 || diff[party] ?: 0 != 0 }
+                .filter { party -> (result[party] ?: 0) > 0 || (diff[party] ?: 0) != 0 }
                 .sortedByDescending { party -> result[party] ?: 0 }
                 .toList()
         }

@@ -32,7 +32,6 @@ object ColorUtils {
         val r = toLum(color.red / 255.0)
         val g = toLum(color.green / 255.0)
         val b = toLum(color.blue / 255.0)
-        val l = 0.2126 * r + 0.7152 * g + 0.0722 * b
-        return l
+        return 0.2126 * r + 0.7152 * g + 0.0722 * b
     }
 }

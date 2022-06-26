@@ -402,9 +402,9 @@ class HemicycleFrame(
         }
 
         private fun getMiddleStartPosition(seats: Int): Int {
-            val midSize = getSize(middleSeatBars.map { e: Bar -> e.size }.sum())
-            val leftSize = getSize(leftSeatBars.map { e: Bar -> e.size }.sum())
-            val rightSize = getSize(rightSeatBars.map { e: Bar -> e.size }.sum())
+            val midSize = getSize(middleSeatBars.sumOf { e: Bar -> e.size })
+            val leftSize = getSize(leftSeatBars.sumOf { e: Bar -> e.size })
+            val rightSize = getSize(rightSeatBars.sumOf { e: Bar -> e.size })
             val midPoint: Int = when {
                 leftSize + midSize / 2 > width / 2 -> {
                     leftSize + midSize / 2

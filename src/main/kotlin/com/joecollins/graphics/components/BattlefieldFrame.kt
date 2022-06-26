@@ -9,10 +9,10 @@ import java.awt.Graphics
 import java.awt.Graphics2D
 import java.awt.Point
 import java.awt.RenderingHints
-import java.lang.Math.sqrt
 import java.util.concurrent.Flow
 import javax.swing.JPanel
 import kotlin.math.roundToInt
+import kotlin.math.sqrt
 
 class BattlefieldFrame(
     headerPublisher: Flow.Publisher<out String?>,
@@ -24,6 +24,7 @@ class BattlefieldFrame(
 ) : GraphicsFrame(
     headerPublisher = headerPublisher
 ) {
+    @Suppress("PrivatePropertyName")
     private val SQRT_3 = sqrt(3.0)
 
     private val panel = BattlefieldPanel()
@@ -82,9 +83,9 @@ class BattlefieldFrame(
             val bottomToLeft = (dot.bottom.toDouble() - dot.left.toDouble()) / 2
             val bottomToRight = (dot.bottom.toDouble() - dot.right.toDouble()) / 2
 
-            val left_b = bottomToLeft * 2 / SQRT_3
-            val right_b = bottomToRight * 2 / SQRT_3
-            val bottomToTop = (left_b + right_b) / 2
+            val leftBot = bottomToLeft * 2 / SQRT_3
+            val rightBot = bottomToRight * 2 / SQRT_3
+            val bottomToTop = (leftBot + rightBot) / 2
 
             val increment = width / limit / 2
             return Point(width / 2 + (leftToRight * increment).roundToInt(), height * 3 / 5 - (bottomToTop * increment).roundToInt())

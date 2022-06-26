@@ -32,9 +32,9 @@ class BattlefieldScreen private constructor(title: JLabel, frame: BattlefieldFra
     class Builder<T>(
         private val prevVotesPublisher: Flow.Publisher<out Map<T, Map<Party, Int>>>,
         private val resultsPublisher: Flow.Publisher<out Map<T, PartyResult?>>,
-        private val leftPartyPublisher: Flow.Publisher<Party>,
-        private val rightPartyPublisher: Flow.Publisher<Party>,
-        private val bottomPartyPublisher: Flow.Publisher<Party>,
+        leftPartyPublisher: Flow.Publisher<Party>,
+        rightPartyPublisher: Flow.Publisher<Party>,
+        bottomPartyPublisher: Flow.Publisher<Party>,
         private val headerPublisher: Flow.Publisher<out String?>
     ) {
         private data class Parties(val left: Party, val right: Party, val bottom: Party) {
@@ -132,7 +132,7 @@ class BattlefieldScreen private constructor(title: JLabel, frame: BattlefieldFra
             val numIncrements = (limit / incrementSize).toInt()
 
             val swings = (-numIncrements..numIncrements).asSequence().map { incrementSize * it }
-                .mapNotNull { otherSwing -> calculateSwing(party, otherParties, prevPcts, otherSwing)?.let { otherSwing to it } }
+                .map { otherSwing -> calculateSwing(party, otherParties, prevPcts, otherSwing).let { otherSwing to it } }
                 .map { (otherSwing, partySwing) ->
                     when (party) {
                         allParties.left -> BattlefieldFrame.Dot(partySwing, -otherSwing, otherSwing)
@@ -146,7 +146,7 @@ class BattlefieldScreen private constructor(title: JLabel, frame: BattlefieldFra
             return BattlefieldFrame.Line(swings) to party.color
         }
 
-        private fun calculateSwing(party: Party, otherParties: Pair<Party, Party>, prevPcts: Map<T, Map<Party, Double>>, swing: Double): Double? {
+        private fun calculateSwing(party: Party, otherParties: Pair<Party, Party>, prevPcts: Map<T, Map<Party, Double>>, swing: Double): Double {
             val majority = prevPcts.size / 2 + 1
             val stage1Pcts = prevPcts.mapValues { (_, pcts) ->
                 pcts.mapValues {

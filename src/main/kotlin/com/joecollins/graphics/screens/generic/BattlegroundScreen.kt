@@ -36,14 +36,11 @@ class BattlegroundScreen private constructor(
 ) : JPanel() {
 
     class SinglePartyBuilder<T>(
-        prevResults: Flow.Publisher<out Map<T, Map<Party, Int>>>,
-        currResults: Flow.Publisher<out Map<T, PartyResult?>>,
+        private val prevResults: Flow.Publisher<out Map<T, Map<Party, Int>>>,
+        private val currResults: Flow.Publisher<out Map<T, PartyResult?>>,
         private val nameFunc: (T) -> String,
-        party: Flow.Publisher<out Party>
+        private val party: Flow.Publisher<out Party>
     ) {
-        private val prevResults: Flow.Publisher<out Map<T, Map<Party, Int>>> = prevResults
-        private val currResults: Flow.Publisher<out Map<T, PartyResult?>> = currResults
-        private val party: Flow.Publisher<out Party> = party
         private var defenseSeatCount: Flow.Publisher<out Int> = 100.asOneTimePublisher()
         private var targetSeatCount: Flow.Publisher<out Int> = 100.asOneTimePublisher()
         private var numRows: Flow.Publisher<out Int> = 20.asOneTimePublisher()
@@ -142,10 +139,6 @@ class BattlegroundScreen private constructor(
     }
 
     private class BattlegroundInput<T> {
-        private enum class Property {
-            PREV, CURR, PARTY, COUNT, SIDE, FILTERED_SEATS
-        }
-
         enum class Side {
             DEFENSE, TARGET
         }
@@ -189,12 +182,11 @@ class BattlegroundScreen private constructor(
 
         private fun submit() {
             synchronized(this) {
-                _items.submit(getItemsList(this))
+                (items as Publisher<List<Entry<T>>>).submit(getItemsList(this))
             }
         }
 
-        val _items = Publisher(getItemsList(this))
-        val items: Flow.Publisher<List<Entry<T>>> = _items
+        val items: Flow.Publisher<List<Entry<T>>> = Publisher(getItemsList(this))
 
         companion object {
             @JvmStatic private fun <T> getItemsList(t: BattlegroundInput<T>): List<Entry<T>> {
