@@ -15,7 +15,6 @@ import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.GridLayout
 import java.text.DecimalFormat
-import java.util.ArrayList
 import java.util.concurrent.Flow
 import javax.swing.JLabel
 import javax.swing.JPanel
@@ -340,7 +339,7 @@ class RegionalBreakdownScreen private constructor(titleLabel: JLabel, multiSumma
         private fun extractPartyOrder(result: Map<Party, Int>): List<Party> {
             return result.entries.asSequence()
                 .filter { it.value > 0 }
-                .sortedByDescending { it.value }
+                .sortedByDescending { if (it.key == Party.OTHERS) -1 else it.value }
                 .map { it.key }
                 .toList()
         }
@@ -352,7 +351,7 @@ class RegionalBreakdownScreen private constructor(titleLabel: JLabel, multiSumma
             return sequenceOf(result.keys.asSequence(), diff.keys.asSequence()).flatten()
                 .distinct()
                 .filter { party -> (result[party] ?: 0) > 0 || (diff[party] ?: 0) != 0 }
-                .sortedByDescending { party -> result[party] ?: 0 }
+                .sortedByDescending { party -> if (party == Party.OTHERS) -1 else (result[party] ?: 0) }
                 .toList()
         }
 
