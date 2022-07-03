@@ -220,6 +220,11 @@ class SwingometerScreen private constructor(title: JLabel, frame: SwingometerFra
             return this
         }
 
+        fun withRange(rangePublisher: Flow.Publisher<Number>): Builder<T> {
+            rangePublisher.subscribe(Subscriber { inputs.range = it })
+            return this
+        }
+
         fun build(title: Flow.Publisher<out String?>): SwingometerScreen {
             val headerLabel = FontSizeAdjustingLabel()
             headerLabel.font = StandardFont.readBoldFont(32)
