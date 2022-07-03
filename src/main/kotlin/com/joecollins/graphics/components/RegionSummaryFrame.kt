@@ -1,5 +1,6 @@
 package com.joecollins.graphics.components
 
+import com.joecollins.graphics.utils.ColorUtils
 import com.joecollins.graphics.utils.StandardFont
 import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
@@ -131,7 +132,7 @@ class RegionSummaryFrame private constructor(
             val startFontSize = 61.coerceAtMost(height * 2 / 3 - 9)
             val valueFonts = ArrayList<Int>()
             for (i in values.indices) {
-                g.setColor(values[i].first)
+                g.setColor(ColorUtils.contrastForBackground(values[i].first))
                 val value = values[i].second
                 var valueWidth: Int
                 var fontSize = startFontSize
@@ -148,7 +149,7 @@ class RegionSummaryFrame private constructor(
                 )
                 valueFonts.add(fontSize)
             }
-            g.setColor(summaryColor)
+            g.setColor(ColorUtils.contrastForBackground(summaryColor))
             var headerFontSize = 30.coerceAtMost(height / 3 - 5).coerceAtMost((valueFonts.maxOrNull() ?: Int.MAX_VALUE) / 2)
             var headerFont: Font
             var headerWidth: Int

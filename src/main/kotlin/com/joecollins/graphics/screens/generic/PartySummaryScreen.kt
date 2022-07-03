@@ -2,6 +2,7 @@ package com.joecollins.graphics.screens.generic
 
 import com.joecollins.graphics.components.FontSizeAdjustingLabel
 import com.joecollins.graphics.components.RegionSummaryFrame
+import com.joecollins.graphics.utils.ColorUtils
 import com.joecollins.graphics.utils.StandardFont.readBoldFont
 import com.joecollins.models.general.Party
 import com.joecollins.pubsub.Publisher
@@ -16,7 +17,6 @@ import java.awt.Container
 import java.awt.Dimension
 import java.awt.LayoutManager
 import java.text.DecimalFormat
-import java.util.ArrayList
 import java.util.concurrent.Flow
 import javax.swing.JLabel
 import javax.swing.JPanel
@@ -149,7 +149,7 @@ class PartySummaryScreen private constructor(
             headerLabel.horizontalAlignment = JLabel.CENTER
             headerLabel.border = EmptyBorder(5, 0, -5, 0)
             partyPublisher.map { it.name.uppercase() + " SUMMARY" }.subscribe(Subscriber(eventQueueWrapper { headerLabel.text = it }))
-            partyPublisher.map(Party::color).subscribe(Subscriber(eventQueueWrapper { headerLabel.foreground = it }))
+            partyPublisher.map(Party::color).subscribe(Subscriber(eventQueueWrapper { headerLabel.foreground = ColorUtils.contrastForBackground(it) }))
             val mainFrame = createFrame(mainRegion, partyPublisher)
             val otherFrames = regions.map { createFrame(it, partyPublisher) }
             return PartySummaryScreen(headerLabel, mainFrame, otherFrames, numRows)
