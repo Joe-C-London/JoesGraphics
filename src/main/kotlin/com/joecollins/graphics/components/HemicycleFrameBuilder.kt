@@ -287,6 +287,9 @@ class HemicycleFrameBuilder {
             tiebreaker: Tiebreaker,
             header: Flow.Publisher<out String?>
         ): HemicycleFrame {
+            if (entries.sumOf(seatsFunc) != rows.sum()) {
+                throw IllegalArgumentException("Hemicycle Mismatch: ${entries.sumOf(seatsFunc)}/${rows.sum()}")
+            }
             val results: Map<T, Flow.Publisher<out Result?>> = entries
                 .distinct()
                 .associateWith { resultFunc(it) }
