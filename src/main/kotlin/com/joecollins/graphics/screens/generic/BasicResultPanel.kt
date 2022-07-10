@@ -143,6 +143,7 @@ class BasicResultPanel private constructor(
         protected var majorityFunction: ((Int) -> String)? = null
         protected var winner: Flow.Publisher<out KT?>? = null
         protected var notes: Flow.Publisher<out String?>? = null
+        protected var changeNotes: Flow.Publisher<out String?>? = null
         protected var diff: Flow.Publisher<out Map<Party, CurrDiff<CT>>>? = null
         protected var changeHeader: Flow.Publisher<out String?>? = null
         protected var changeSubhead: Flow.Publisher<out String?>? = null
@@ -265,6 +266,11 @@ class BasicResultPanel private constructor(
 
         fun withNotes(notes: Flow.Publisher<out String?>): SeatScreenBuilder<KT, CT, PT> {
             this.notes = notes
+            return this
+        }
+
+        fun withChangeNotes(notes: Flow.Publisher<out String?>): SeatScreenBuilder<KT, CT, PT> {
+            this.changeNotes = notes
             return this
         }
 
@@ -458,6 +464,10 @@ class BasicResultPanel private constructor(
                 if (total != null) {
                     builder = builder.withWingspan(total.map { (it / 20).coerceAtLeast(1) })
                 }
+                val changeNotes = this.changeNotes
+                if (changeNotes != null) {
+                    builder = builder.withNotes(changeNotes)
+                }
                 return builder.build()
             }
         }
@@ -619,6 +629,10 @@ class BasicResultPanel private constructor(
                 if (total != null) {
                     builder = builder.withWingspan(total.map { (it / 20).coerceAtLeast(1) })
                 }
+                val changeNotes = this.changeNotes
+                if (changeNotes != null) {
+                    builder = builder.withNotes(changeNotes)
+                }
                 return builder.build()
             }
         }
@@ -763,6 +777,10 @@ class BasicResultPanel private constructor(
                 val total = this.total
                 if (total != null) {
                     builder = builder.withWingspan(total.map { (it / 20).coerceAtLeast(1) })
+                }
+                val changeNotes = this.changeNotes
+                if (changeNotes != null) {
+                    builder = builder.withNotes(changeNotes)
                 }
                 return builder.build()
             }
