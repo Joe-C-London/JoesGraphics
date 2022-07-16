@@ -11,6 +11,7 @@ import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
 import org.junit.Test
 import java.awt.Color
+import java.awt.Dimension
 import java.io.IOException
 import kotlin.Throws
 
@@ -227,6 +228,122 @@ class RegionalBreakdownScreenTest {
             .build("AUSTRALIA".asOneTimePublisher())
         screen.setSize(1024, 512)
         compareRendering("RegionalBreakdownScreen", "SeatsWithPrev-C", screen)
+    }
+
+    @Test
+    fun testSeatsWithLimitedColumns() {
+        val lib = Party("Liberal", "LIB", Color.RED)
+        val con = Party("Conservative", "CON", Color.BLUE)
+        val ndp = Party("New Democratic Party", "NDP", Color.ORANGE)
+        val bq = Party("Bloc Quebecois", "BQ", Color.CYAN.darker())
+        val grn = Party("Green", "GRN", Color.GREEN.darker())
+        val ind = Party("Independent", "IND", Party.OTHERS.color)
+
+        val federalSeats = Publisher(emptyMap<Party, Int>()) to Publisher(emptyMap<Party, Int>())
+        val provincialSeats = listOf(
+            "Newfoundland and Labrador" to 7,
+            "Nova Scotia" to 11,
+            "Prince Edward Island" to 4,
+            "New Brunswick" to 10,
+            "Quebec" to 78,
+            "Ontario" to 121,
+            "Manitoba" to 14,
+            "Saskatchewan" to 14,
+            "Alberta" to 34,
+            "British Columbia" to 42,
+            "Northern Canada" to 3
+        ).associateWith { Publisher(emptyMap<Party, Int>()) to Publisher(emptyMap<Party, Int>()) }
+        val builder = seatsWithPrev(
+            "CANADA".asOneTimePublisher(),
+            federalSeats.first,
+            federalSeats.second,
+            338.asOneTimePublisher(),
+            "SEATS BY PROVINCE".asOneTimePublisher(),
+            maxColumnsPublisher = 4.asOneTimePublisher()
+        ).withBlankRow()
+        provincialSeats.forEach { (name, seats), (curr, prev) ->
+            builder.withRegion(
+                name.uppercase().asOneTimePublisher(),
+                curr,
+                prev,
+                seats.asOneTimePublisher()
+            )
+        }
+        val screen = builder.build("CANADA".asOneTimePublisher())
+        screen.size = Dimension(1024, 512)
+        compareRendering("RegionalBreakdownScreen", "SeatsWithLimitedColumns-1", screen)
+
+        federalSeats.also {
+            it.first.submit(mapOf(lib to 6, ndp to 1))
+            it.second.submit(mapOf(lib to 7))
+        }
+        provincialSeats["Newfoundland and Labrador" to 7]!!.also {
+            it.first.submit(mapOf(lib to 6, ndp to 1))
+            it.second.submit(mapOf(lib to 7))
+        }
+        compareRendering("RegionalBreakdownScreen", "SeatsWithLimitedColumns-2", screen)
+
+        federalSeats.also {
+            it.first.submit(mapOf(lib to 26, con to 4, ndp to 1, grn to 1))
+            it.second.submit(mapOf(lib to 32))
+        }
+        provincialSeats["Nova Scotia" to 11]!!.also {
+            it.first.submit(mapOf(lib to 10, con to 1))
+            it.second.submit(mapOf(lib to 11))
+        }
+        provincialSeats["Prince Edward Island" to 4]!!.also {
+            it.first.submit(mapOf(lib to 4))
+            it.second.submit(mapOf(lib to 4))
+        }
+        provincialSeats["New Brunswick" to 10]!!.also {
+            it.first.submit(mapOf(lib to 6, con to 3, grn to 1))
+            it.second.submit(mapOf(lib to 10))
+        }
+        compareRendering("RegionalBreakdownScreen", "SeatsWithLimitedColumns-3", screen)
+
+        federalSeats.also {
+            it.first.submit(mapOf(lib to 145, con to 104, ndp to 13, bq to 32, grn to 1))
+            it.second.submit(mapOf(lib to 166, con to 89, ndp to 30, bq to 10))
+        }
+        provincialSeats["Quebec" to 78]!!.also {
+            it.first.submit(mapOf(lib to 35, con to 10, ndp to 1, bq to 32))
+            it.second.submit(mapOf(lib to 40, con to 12, ndp to 16, bq to 10))
+        }
+        provincialSeats["Ontario" to 121]!!.also {
+            it.first.submit(mapOf(lib to 79, con to 36, ndp to 6))
+            it.second.submit(mapOf(lib to 80, con to 33, ndp to 8))
+        }
+        provincialSeats["Manitoba" to 14]!!.also {
+            it.first.submit(mapOf(lib to 4, con to 7, ndp to 3))
+            it.second.submit(mapOf(lib to 7, con to 5, ndp to 2))
+        }
+        provincialSeats["Saskatchewan" to 14]!!.also {
+            it.first.submit(mapOf(con to 14))
+            it.second.submit(mapOf(lib to 1, con to 10, ndp to 3))
+        }
+        provincialSeats["Alberta" to 34]!!.also {
+            it.first.submit(mapOf(con to 33, ndp to 1))
+            it.second.submit(mapOf(lib to 4, con to 29, ndp to 1))
+        }
+        provincialSeats["Northern Canada" to 3]!!.also {
+            it.first.submit(mapOf(lib to 1, ndp to 1))
+            it.second.submit(mapOf(lib to 2))
+        }
+        compareRendering("RegionalBreakdownScreen", "SeatsWithLimitedColumns-4", screen)
+
+        federalSeats.also {
+            it.first.submit(mapOf(lib to 157, con to 121, ndp to 24, bq to 32, grn to 3, ind to 1))
+            it.second.submit(mapOf(lib to 184, con to 99, ndp to 44, bq to 10, grn to 1))
+        }
+        provincialSeats["British Columbia" to 42]!!.also {
+            it.first.submit(mapOf(lib to 11, con to 17, ndp to 11, grn to 2, ind to 1))
+            it.second.submit(mapOf(lib to 17, con to 10, ndp to 14, grn to 1))
+        }
+        provincialSeats["Northern Canada" to 3]!!.also {
+            it.first.submit(mapOf(lib to 2, ndp to 1))
+            it.second.submit(mapOf(lib to 3))
+        }
+        compareRendering("RegionalBreakdownScreen", "SeatsWithLimitedColumns-5", screen)
     }
 
     @Test
@@ -473,6 +590,113 @@ class RegionalBreakdownScreenTest {
             .build("AUSTRALIA".asOneTimePublisher())
         screen.setSize(1024, 512)
         compareRendering("RegionalBreakdownScreen", "VotesWithPrev-C", screen)
+    }
+
+    @Test
+    fun testVotesWithLimitedColumns() {
+        val lib = Party("Liberal", "LIB", Color.RED)
+        val con = Party("Conservative", "CON", Color.BLUE)
+        val ndp = Party("New Democratic Party", "NDP", Color.ORANGE)
+        val bq = Party("Bloc Quebecois", "BQ", Color.CYAN.darker())
+        val grn = Party("Green", "GRN", Color.GREEN.darker())
+        val ppc = Party("Peoples", "PPC", Color.MAGENTA.darker())
+        val oth = Party.OTHERS
+
+        val federalVotes = Triple(Publisher(emptyMap<Party, Int>()), Publisher(emptyMap<Party, Int>()), Publisher(0.0))
+        val provincialVotes = listOf(
+            "Newfoundland and Labrador",
+            "Nova Scotia",
+            "Prince Edward Island",
+            "New Brunswick",
+            "Quebec",
+            "Ontario",
+            "Manitoba",
+            "Saskatchewan",
+            "Alberta",
+            "British Columbia",
+            "Northern Canada"
+        ).associateWith { Triple(Publisher(emptyMap<Party, Int>()), Publisher(emptyMap<Party, Int>()), Publisher(0.0)) }
+        val builder = votesWithPrev(
+            "CANADA".asOneTimePublisher(),
+            federalVotes.first,
+            federalVotes.second,
+            federalVotes.third,
+            "POPULAR VOTE BY PROVINCE".asOneTimePublisher(),
+            maxColumnsPublisher = 4.asOneTimePublisher()
+        ).withBlankRow()
+        provincialVotes.forEach { name, (curr, prev, pct) ->
+            builder.withRegion(
+                name.uppercase().asOneTimePublisher(),
+                curr,
+                prev,
+                pct
+            )
+        }
+        val screen = builder.build("CANADA".asOneTimePublisher())
+        screen.size = Dimension(1024, 512)
+        compareRendering("RegionalBreakdownScreen", "VotesWithLimitedColumns-1", screen)
+
+        federalVotes.also {
+            it.first.submit(mapOf(lib to 331, con to 343, ndp to 160, bq to 76, grn to 65, ppc to 16, oth to 2))
+            it.second.submit(mapOf(lib to 395, con to 319, ndp to 197, bq to 47, grn to 34, oth to 2))
+            it.third.submit(1.0)
+        }
+        provincialVotes["Newfoundland and Labrador"]!!.also {
+            it.first.submit(mapOf(lib to 449, con to 279, ndp to 237, grn to 31, ppc to 1, oth to 2))
+            it.second.submit(mapOf(lib to 645, con to 103, ndp to 210, grn to 11, oth to 29))
+            it.third.submit(1.0)
+        }
+        provincialVotes["Nova Scotia"]!!.also {
+            it.first.submit(mapOf(lib to 414, con to 257, ndp to 189, grn to 110, ppc to 12, oth to 18))
+            it.second.submit(mapOf(lib to 619, con to 179, ndp to 164, grn to 34, oth to 3))
+            it.third.submit(1.0)
+        }
+        provincialVotes["Prince Edward Island"]!!.also {
+            it.first.submit(mapOf(lib to 437, con to 273, ndp to 76, grn to 209, oth to 5))
+            it.second.submit(mapOf(lib to 583, con to 193, ndp to 160, grn to 60))
+            it.third.submit(1.0)
+        }
+        provincialVotes["New Brunswick"]!!.also {
+            it.first.submit(mapOf(lib to 375, con to 328, ndp to 94, grn to 172, ppc to 20, oth to 11))
+            it.second.submit(mapOf(lib to 516, con to 253, ndp to 183, grn to 46, oth to 1))
+            it.third.submit(1.0)
+        }
+        provincialVotes["Quebec"]!!.also {
+            it.first.submit(mapOf(lib to 343, con to 160, ndp to 108, bq to 324, grn to 45, ppc to 15, oth to 1))
+            it.second.submit(mapOf(lib to 357, con to 167, ndp to 254, bq to 193, grn to 23, oth to 1))
+            it.third.submit(1.0)
+        }
+        provincialVotes["Ontario"]!!.also {
+            it.first.submit(mapOf(lib to 416, con to 331, ndp to 168, grn to 62, ppc to 16, oth to 2))
+            it.second.submit(mapOf(lib to 448, con to 350, ndp to 166, grn to 29, oth to 2))
+            it.third.submit(1.0)
+        }
+        provincialVotes["Manitoba"]!!.also {
+            it.first.submit(mapOf(lib to 265, con to 452, ndp to 208, grn to 51, ppc to 17, oth to 6))
+            it.second.submit(mapOf(lib to 446, con to 373, ndp to 138, grn to 32, oth to 6))
+            it.third.submit(1.0)
+        }
+        provincialVotes["Saskatchewan"]!!.also {
+            it.first.submit(mapOf(lib to 117, con to 640, ndp to 196, grn to 26, ppc to 18, oth to 2))
+            it.second.submit(mapOf(lib to 239, con to 485, ndp to 251, grn to 21, oth to 2))
+            it.third.submit(1.0)
+        }
+        provincialVotes["Alberta"]!!.also {
+            it.first.submit(mapOf(lib to 138, con to 690, ndp to 116, grn to 28, ppc to 22, oth to 5))
+            it.second.submit(mapOf(lib to 246, con to 595, ndp to 116, grn to 25, oth to 8))
+            it.third.submit(1.0)
+        }
+        provincialVotes["British Columbia"]!!.also {
+            it.first.submit(mapOf(lib to 262, con to 340, ndp to 244, grn to 125, ppc to 17, oth to 13))
+            it.second.submit(mapOf(lib to 352, con to 300, ndp to 259, grn to 82, oth to 1))
+            it.third.submit(1.0)
+        }
+        provincialVotes["Northern Canada"]!!.also {
+            it.first.submit(mapOf(lib to 347, con to 281, ndp to 284, grn to 78, ppc to 11))
+            it.second.submit(mapOf(lib to 497, con to 223, ndp to 256, grn to 24))
+            it.third.submit(1.0)
+        }
+        compareRendering("RegionalBreakdownScreen", "VotesWithLimitedColumns-2", screen)
     }
 
     companion object {
