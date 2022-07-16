@@ -849,6 +849,64 @@ class BasicResultPanel private constructor(
         protected var classificationFunc: ((Party) -> Party)? = null
         protected var classificationHeader: Flow.Publisher<out String?>? = null
         private var mapBuilder: MapBuilder<*>? = null
+        private var runoffSubhead: Flow.Publisher<String>? = null
+        private var winnerNotRunningAgain: Flow.Publisher<String>? = null
+
+        protected val filteredPrev: Flow.Publisher<out Map<Party, PT>>?
+            get() {
+                val prev = this.prev
+                if (prev == null) return prev
+                if (runoffSubhead != null)
+                    return current.merge(prev) { c, p ->
+                        if (c.keys.map { keyTemplate.toParty(it) }.toSet() == p.keys)
+                            p
+                        else
+                            emptyMap()
+                    }
+                if (winnerNotRunningAgain != null)
+                    return current.merge(prev) { c, p ->
+                        val winner = p.entries.filter { it.value is Number }.maxByOrNull { (it.value as Number).toDouble() } ?: return@merge p
+                        if (c.keys.map { keyTemplate.toParty(it) }.contains(winner.key))
+                            p
+                        else
+                            emptyMap()
+                    }
+                return prev
+            }
+        protected val filteredChangeSubhead: Flow.Publisher<out String?>?
+            get() {
+                val runoffSubhead = this.runoffSubhead
+                val winnerNotRunningAgain = this.winnerNotRunningAgain
+                val changeSubhead = this.changeSubhead
+                val prev = this.prev
+                if (prev == null || changeSubhead == null) return changeSubhead
+                if (runoffSubhead != null) {
+                    return current.merge(prev) { c, p ->
+                        c.keys.map { keyTemplate.toParty(it) }.toSet() == p.keys
+                    }.merge(runoffSubhead) { sameParties, subhead -> if (sameParties) null else subhead }
+                        .let { subhead ->
+                            changeSubhead.merge(subhead) { c, s ->
+                                if (c == null) s
+                                else if (s == null) c
+                                else "$c / $s"
+                            }
+                        }
+                }
+                if (winnerNotRunningAgain != null) {
+                    return current.merge(prev) { c, p ->
+                        val winner = p.entries.filter { it.value is Number }.maxByOrNull { (it.value as Number).toDouble() } ?: return@merge true
+                        c.keys.map { keyTemplate.toParty(it) }.contains(winner.key)
+                    }.merge(winnerNotRunningAgain) { winnerRunningAgain, subhead -> if (winnerRunningAgain) null else subhead }
+                        .let { subhead ->
+                            changeSubhead.merge(subhead) { c, s ->
+                                if (c == null) s
+                                else if (s == null) c
+                                else "$c / $s"
+                            }
+                        }
+                }
+                return changeSubhead
+            }
 
         @JvmOverloads
         fun withPrev(
@@ -1002,6 +1060,16 @@ class BasicResultPanel private constructor(
         ): VoteScreenBuilder<KT, CT, CPT, PT> {
             this.classificationFunc = classificationFunc
             this.classificationHeader = classificationHeader
+            return this
+        }
+
+        fun inRunoffMode(changeSubhead: Flow.Publisher<String>): VoteScreenBuilder<KT, CT, CPT, PT> {
+            this.runoffSubhead = changeSubhead
+            return this
+        }
+
+        fun whenWinnerNotRunningAgain(changeSubhead: Flow.Publisher<String>): VoteScreenBuilder<KT, CT, CPT, PT> {
+            this.winnerNotRunningAgain = changeSubhead
             return this
         }
 
@@ -1194,13 +1262,6 @@ class BasicResultPanel private constructor(
                         .sortedByDescending { it.value!! }
                         .map { keyTemplate.toParty(it.key) }
                 ).flatten().filterNotNull().distinct().take(10).toSet()
-                if (prevWinner == null ||
-                    cVotes.keys
-                        .map { key: KT -> keyTemplate.toParty(key) }
-                        .none { it == prevWinner }
-                ) {
-                    return emptyList()
-                }
                 val currTotal = cVotes.values.filterNotNull().sum()
                 val prevTotal = pVotes.values.sum()
                 if (currTotal == 0 || prevTotal == 0) {
@@ -1293,7 +1354,7 @@ class BasicResultPanel private constructor(
         }
 
         override fun createDiffFrame(): BarFrame? {
-            return prev?.let { prev ->
+            return filteredPrev?.let { prev ->
                 val change = Change()
                 current.subscribe(Subscriber { change.currVotes = it })
                 prev.subscribe(Subscriber { change.prevVotes = it })
@@ -1304,7 +1365,7 @@ class BasicResultPanel private constructor(
                         pctReporting?.map { 0.1 / it.coerceAtLeast(1e-6) } ?: 0.1.asOneTimePublisher()
                     )
                     .withHeader(changeHeader!!)
-                    .withSubhead(changeSubhead ?: (null as String?).asOneTimePublisher())
+                    .withSubhead(filteredChangeSubhead ?: (null as String?).asOneTimePublisher())
                     .build()
             }
         }
@@ -1329,7 +1390,7 @@ class BasicResultPanel private constructor(
                         }
                 } else {
                     curr = current.map { currTotalByParty(it) }
-                    prev = this.prev!!
+                    prev = this.filteredPrev!!
                         .merge(current) { p: Map<Party, Int>, c: Map<KT, Int?> ->
                             val prevWinner: Party? = p.entries
                                 .maxByOrNull { it.value }
@@ -1473,7 +1534,7 @@ class BasicResultPanel private constructor(
         }
 
         override fun createDiffFrame(): BarFrame? {
-            return prev?.let { prev ->
+            return filteredPrev?.let { prev ->
                 val change = Change()
                 current.subscribe(Subscriber { change.currVotes = it })
                 prev.subscribe(Subscriber { change.prevVotes = it })
@@ -1481,7 +1542,7 @@ class BasicResultPanel private constructor(
                 return BarFrameBuilder.dual(bars)
                     .withWingspan(0.1.asOneTimePublisher())
                     .withHeader(changeHeader!!)
-                    .withSubhead(changeSubhead ?: (null as String?).asOneTimePublisher())
+                    .withSubhead(filteredChangeSubhead ?: (null as String?).asOneTimePublisher())
                     .build()
             }
         }
@@ -1531,7 +1592,7 @@ class BasicResultPanel private constructor(
                         m.forEach { (p: Party, r: ClosedRange<Double>) -> ret[p] = (1000000 * (r.start + r.endInclusive) / 2).roundToInt() }
                         ret
                     }
-                return SwingFrameBuilder.prevCurr(prev!!, curr, swingComparator!!)
+                return SwingFrameBuilder.prevCurr(filteredPrev!!, curr, swingComparator!!)
                     .withHeader(swingHeader)
                     .build()
             }

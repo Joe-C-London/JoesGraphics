@@ -18,6 +18,7 @@ import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.map
 import org.junit.Test
 import java.awt.Color
+import java.awt.Dimension
 import java.awt.Shape
 import java.io.IOException
 import java.util.ArrayList
@@ -857,25 +858,13 @@ class SimpleVoteViewPanelTest {
         val spkr = Party("Speaker", "SPKR", Color.GRAY)
         val grn = Party("Green", "GRN", Color.GREEN.darker())
         val ukip = Party("UK Independence Party", "UKIP", Color.MAGENTA.darker())
-        val curr = LinkedHashMap<Candidate, Int>()
-        curr[con] = 37035
-        curr[ld] = 16624
-        curr[lab] = 7638
-        curr[bxp] = 1286
-        curr[ind] = 681
-        curr[ed] = 194
-        val prev = LinkedHashMap<Party, Int>()
-        prev[spkr] = 34299
-        prev[grn] = 8574
-        prev[ind.party] = 5638
-        prev[ukip] = 4168
-        val currentVotes = Publisher(curr)
-        val previousVotes = Publisher(prev)
+        val currentVotes = Publisher(mapOf(con to 37035, ld to 16624, lab to 7638, bxp to 1286, ind to 681, ed to 194))
+        val previousVotes = Publisher(mapOf(spkr to 34299, grn to 8574, ind.party to 5638, ukip to 4168))
         val header = Publisher("BUCKINGHAM")
         val voteHeader = Publisher("OFFICIAL RESULT")
         val voteSubhead = Publisher("")
         val changeHeader = Publisher("CHANGE SINCE 2017")
-        val changeSubhead = Publisher("NOT APPLICABLE: PREVIOUSLY SPEAKER'S SEAT")
+        val changeSubhead = Publisher(null)
         val swingHeader = Publisher("SWING SINCE 2017")
         val winner = Publisher(con)
         val swingPartyOrder = listOf(lab.party, ld.party, con.party, bxp.party)
@@ -883,9 +872,50 @@ class SimpleVoteViewPanelTest {
             .withPrev(previousVotes, changeHeader, changeSubhead)
             .withWinner(winner)
             .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader)
+            .whenWinnerNotRunningAgain("NOT APPLICABLE: PREVIOUSLY SPEAKER'S SEAT".asOneTimePublisher())
             .build(header)
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "WinningPartyNotRunningAgain-1", panel)
+
+        previousVotes.submit(mapOf(con.party to 27748, lab.party to 9619, ld.party to 9508, ukip to 1432))
+        changeHeader.submit("CHANGE SINCE 2005")
+        swingHeader.submit("SWING SINCE 2005")
+        compareRendering("SimpleVoteViewPanel", "WinningPartyNotRunningAgain-2", panel)
+    }
+
+    @Test
+    fun testRunoffMode() {
+        val nupes = Party("New Ecological and Social People's Union", "NUPES", Color.RED)
+        val lr = Party("The Republicans", "LR", Color.BLUE)
+        val modem = Party("Democratic Movement", "MODEM", Color.ORANGE)
+        val ens = Party("Together", "ENS", Color.YELLOW)
+        val rn = Party("National Rally", "RN", Color.BLUE.darker())
+        val swingPartyOrder = listOf(nupes, modem, ens, lr, rn)
+
+        val curr = Publisher(mapOf(Candidate("Nicolas Dragos", rn) to 17058, Candidate("Aude Bono-Vandrome", ens) to 14208))
+        val prev = Publisher(mapOf(ens to 16684, rn to 12994))
+        val constituency = Publisher("AISNE 1st CONSTITUENCY")
+
+        val panel = candidateVotes(
+            curr,
+            "SECOND ROUND RESULT".asOneTimePublisher(),
+            "100.0% REPORTING".asOneTimePublisher()
+        )
+            .withPrev(
+                prev,
+                "CHANGE SINCE 2018".asOneTimePublisher(),
+                null.asOneTimePublisher()
+            )
+            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, "SWING SINCE 2018".asOneTimePublisher())
+            .inRunoffMode("NOT APPLICABLE: DIFFERENT PARTIES IN RUNOFF".asOneTimePublisher())
+            .build(constituency)
+        panel.size = Dimension(1024, 512)
+        compareRendering("SimpleVoteViewPanel", "RunoffMode-1", panel)
+
+        curr.submit(mapOf(Candidate("Xavier Breton", lr) to 24407, Candidate("Sebastien Gueraud", nupes) to 14202))
+        prev.submit(mapOf(modem to 15114, lr to 17564))
+        constituency.submit("AIN 1st CONSTITUENCY")
+        compareRendering("SimpleVoteViewPanel", "RunoffMode-2", panel)
     }
 
     @Test
