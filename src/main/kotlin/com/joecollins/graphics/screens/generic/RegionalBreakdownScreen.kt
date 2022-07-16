@@ -34,41 +34,32 @@ class RegionalBreakdownScreen private constructor(titleLabel: JLabel, multiSumma
     }
 
     private open class SeatEntry : Entry {
-        private var _partyOrder: List<Party> = emptyList()
-        private var _name = ""
-        private var _seats: Map<Party, Int> = emptyMap()
-        private var _totalSeats = 0
-
-        var partyOrder: List<Party>
-            get() = _partyOrder
-            set(partyOrder) {
-                _partyOrder = partyOrder
-                updateValue()
-            }
-        val partyOrderPublisher = Publisher(_partyOrder)
-
-        var name: String
-            get() = _name
-            set(name) {
-                _name = name
-                namePublisher.submit(name)
-            }
-
-        var seats: Map<Party, Int>
-            get() = _seats
-            set(seats) {
-                _seats = seats
+        var partyOrder: List<Party> = emptyList()
+            set(value) {
+                field = value
                 updateValue()
             }
 
-        var totalSeats: Int
-            get() = _totalSeats
-            set(totalSeats) {
-                _totalSeats = totalSeats
+        var name = ""
+            set(value) {
+                field = value
+                namePublisher.submit(value)
+            }
+
+        var seats: Map<Party, Int> = emptyMap()
+            set(value) {
+                field = value
                 updateValue()
             }
 
-        private val namePublisher = Publisher(_name)
+        var totalSeats = 0
+            set(value) {
+                field = value
+                updateValue()
+            }
+
+        val partyOrderPublisher = Publisher(partyOrder)
+        private val namePublisher = Publisher(name)
         override val headerPublisher: Flow.Publisher<out String>
             get() = namePublisher
 
@@ -94,12 +85,9 @@ class RegionalBreakdownScreen private constructor(titleLabel: JLabel, multiSumma
     }
 
     private class SeatDiffEntry : SeatEntry() {
-        private var _diff: Map<Party, Int> = emptyMap()
-
-        var diff: Map<Party, Int>
-            get() = _diff
-            set(diff) {
-                _diff = diff
+        var diff: Map<Party, Int> = emptyMap()
+            set(value) {
+                field = value
                 updateValue()
             }
 
@@ -118,12 +106,9 @@ class RegionalBreakdownScreen private constructor(titleLabel: JLabel, multiSumma
     }
 
     private class SeatPrevEntry : SeatEntry() {
-        private var _prev: Map<Party, Int> = emptyMap()
-
-        var prev: Map<Party, Int>
-            get() = _prev
-            set(prev) {
-                _prev = prev
+        var prev: Map<Party, Int> = emptyMap()
+            set(value) {
+                field = value
                 updateValue()
             }
 
@@ -138,6 +123,83 @@ class RegionalBreakdownScreen private constructor(titleLabel: JLabel, multiSumma
 
         companion object {
             private val DIFF_FORMAT = DecimalFormat("+0;-0")
+        }
+    }
+
+    private open class VoteEntry : Entry {
+        var partyOrder: List<Party> = emptyList()
+            set(value) {
+                field = value
+                updateValue()
+            }
+
+        var name = ""
+            set(value) {
+                field = value
+                namePublisher.submit(value)
+            }
+
+        var votes: Map<Party, Int> = emptyMap()
+            set(value) {
+                field = value
+                updateValue()
+            }
+
+        var pctReporting = 0.0
+            set(value) {
+                field = value
+                updateValue()
+            }
+
+        val partyOrderPublisher = Publisher(partyOrder)
+        private val namePublisher = Publisher(name)
+        override val headerPublisher: Flow.Publisher<out String>
+            get() = namePublisher
+
+        private val _valuePublisher = Publisher(calculateValue())
+        override val valuePublisher: Flow.Publisher<out List<Pair<Color, String>>>
+            get() = _valuePublisher
+        protected fun updateValue() = synchronized(this) { _valuePublisher.submit(calculateValue()) }
+
+        private fun calculateValue(): MutableList<Pair<Color, String>> {
+            val ret: MutableList<Pair<Color, String>> = this.partyOrder.map { this.getPartyLabel(it) }.toMutableList()
+            ret.add(
+                Pair(
+                    Color.WHITE,
+                    PCT_FORMAT.format(pctReporting) + " IN"
+                )
+            )
+            return ret
+        }
+
+        protected open fun getPartyLabel(party: Party): Pair<Color, String> {
+            return Pair(party.color, PCT_FORMAT.format((votes[party] ?: 0) / votes.values.sum().coerceAtLeast(1).toDouble()))
+        }
+
+        companion object {
+            private val PCT_FORMAT = DecimalFormat("0.0%")
+        }
+    }
+
+    private class VotePrevEntry : VoteEntry() {
+        var prev: Map<Party, Int> = emptyMap()
+            set(value) {
+                field = value
+                updateValue()
+            }
+
+        override fun getPartyLabel(party: Party): Pair<Color, String> {
+            val votes = (votes[party] ?: 0) / votes.values.sum().coerceAtLeast(1).toDouble()
+            val diff = votes - (prev[party] ?: 0) / prev.values.sum().coerceAtLeast(1).toDouble()
+            return Pair(
+                party.color,
+                PCT_FORMAT.format(votes) + " (" + (if (diff == 0.0) "\u00b10.0" else DIFF_FORMAT.format(diff * 100)) + ")"
+            )
+        }
+
+        companion object {
+            private val PCT_FORMAT = DecimalFormat("0.0%")
+            private val DIFF_FORMAT = DecimalFormat("+0.0;-0.0")
         }
     }
 
@@ -296,6 +358,90 @@ class RegionalBreakdownScreen private constructor(titleLabel: JLabel, multiSumma
         }
     }
 
+    class VoteBuilder(
+        totalHeaderPublisher: Flow.Publisher<out String>,
+        totalVotesPublisher: Flow.Publisher<out Map<Party, Int>>,
+        pctReportingPublisher: Flow.Publisher<out Double>,
+        titlePublisher: Flow.Publisher<out String>
+    ) : MultiPartyResultBuilder(titlePublisher) {
+
+        fun withBlankRow(): VoteBuilder {
+            entries.add(BlankEntry())
+            return this
+        }
+
+        fun withRegion(
+            namePublisher: Flow.Publisher<out String>,
+            votesPublisher: Flow.Publisher<out Map<Party, Int>>,
+            pctReportingPublisher: Flow.Publisher<out Double>,
+            partyMapPublisher: Flow.Publisher<out Map<Party, Party>> = emptyMap<Party, Party>().asOneTimePublisher()
+        ): VoteBuilder {
+            val newEntry = VoteEntry()
+            transformPartyOrder(partyOrder!!, partyMapPublisher).subscribe(Subscriber { newEntry.partyOrder = it })
+            namePublisher.subscribe(Subscriber { newEntry.name = it })
+            votesPublisher.subscribe(Subscriber { newEntry.votes = it })
+            pctReportingPublisher.subscribe(Subscriber { newEntry.pctReporting = it })
+            entries.add(newEntry)
+            return this
+        }
+
+        init {
+            partyOrder = totalVotesPublisher.map { result: Map<Party, Int> -> extractPartyOrder(result) }
+            val topEntry = VoteEntry()
+            partyOrder!!.subscribe(Subscriber { topEntry.partyOrder = it })
+            totalHeaderPublisher.subscribe(Subscriber { topEntry.name = it })
+            totalVotesPublisher.subscribe(Subscriber { topEntry.votes = it })
+            pctReportingPublisher.subscribe(Subscriber { topEntry.pctReporting = it })
+            entries.add(topEntry)
+        }
+    }
+
+    class VotePrevBuilder(
+        totalHeaderPublisher: Flow.Publisher<out String>,
+        totalVotesPublisher: Flow.Publisher<out Map<Party, Int>>,
+        prevVotesPublisher: Flow.Publisher<out Map<Party, Int>>,
+        pctReportingPublisher: Flow.Publisher<out Double>,
+        titlePublisher: Flow.Publisher<out String>
+    ) : MultiPartyResultBuilder(titlePublisher) {
+
+        fun withBlankRow(): VotePrevBuilder {
+            entries.add(BlankEntry())
+            return this
+        }
+
+        fun withRegion(
+            namePublisher: Flow.Publisher<out String>,
+            votesPublisher: Flow.Publisher<out Map<Party, Int>>,
+            prevVotesPublisher: Flow.Publisher<out Map<Party, Int>>,
+            pctReportingPublisher: Flow.Publisher<out Double>,
+            partyMapPublisher: Flow.Publisher<out Map<Party, Party>> = emptyMap<Party, Party>().asOneTimePublisher()
+        ): VotePrevBuilder {
+            val newEntry = VotePrevEntry()
+            transformPartyOrder(partyOrder!!, partyMapPublisher).subscribe(Subscriber { newEntry.partyOrder = it })
+            namePublisher.subscribe(Subscriber { newEntry.name = it })
+            votesPublisher.subscribe(Subscriber { newEntry.votes = it })
+            prevVotesPublisher.subscribe(Subscriber { newEntry.prev = it })
+            pctReportingPublisher.subscribe(Subscriber { newEntry.pctReporting = it })
+            entries.add(newEntry)
+            return this
+        }
+
+        init {
+            partyOrder =
+                totalVotesPublisher
+                    .merge(
+                        prevVotesPublisher
+                    ) { result: Map<Party, Int>, diff: Map<Party, Int> -> extractPartyOrder(result, diff) }
+            val topEntry = VotePrevEntry()
+            partyOrder!!.subscribe(Subscriber { topEntry.partyOrder = it })
+            totalHeaderPublisher.subscribe(Subscriber { topEntry.name = it })
+            totalVotesPublisher.subscribe(Subscriber { topEntry.votes = it })
+            prevVotesPublisher.subscribe(Subscriber { topEntry.prev = it })
+            pctReportingPublisher.subscribe(Subscriber { topEntry.pctReporting = it })
+            entries.add(topEntry)
+        }
+    }
+
     companion object {
         @JvmStatic fun seats(
             totalHeaderPublisher: Flow.Publisher<out String>,
@@ -333,6 +479,29 @@ class RegionalBreakdownScreen private constructor(titleLabel: JLabel, multiSumma
                 prevSeatsPublisher,
                 numTotalSeatsPublisher,
                 titlePublisher
+            )
+        }
+
+        @JvmStatic fun votes(
+            totalHeaderPublisher: Flow.Publisher<out String>,
+            totalVotesPublisher: Flow.Publisher<out Map<Party, Int>>,
+            pctReportingPublisher: Flow.Publisher<out Double>,
+            titlePublisher: Flow.Publisher<out String>
+        ): VoteBuilder {
+            return VoteBuilder(
+                totalHeaderPublisher, totalVotesPublisher, pctReportingPublisher, titlePublisher
+            )
+        }
+
+        @JvmStatic fun votesWithPrev(
+            totalHeaderPublisher: Flow.Publisher<out String>,
+            totalVotesPublisher: Flow.Publisher<out Map<Party, Int>>,
+            prevVotesPublisher: Flow.Publisher<out Map<Party, Int>>,
+            pctReportingPublisher: Flow.Publisher<out Double>,
+            titlePublisher: Flow.Publisher<out String>
+        ): VotePrevBuilder {
+            return VotePrevBuilder(
+                totalHeaderPublisher, totalVotesPublisher, prevVotesPublisher, pctReportingPublisher, titlePublisher
             )
         }
 
