@@ -1,5 +1,6 @@
 package com.joecollins.graphics.components.lowerthird
 
+import com.joecollins.graphics.components.FontSizeAdjustingLabel
 import com.joecollins.graphics.utils.ColorUtils
 import com.joecollins.graphics.utils.StandardFont
 import com.joecollins.pubsub.Subscriber
@@ -53,13 +54,11 @@ class SummaryWithHeaderAndLabels(
                 layout = GridLayout(1, 1)
             }
         }
-        private val topLabel: JLabel = object : JLabel() {
-            init {
-                font = StandardFont.readNormalFont(16)
-                horizontalAlignment = CENTER
-                foreground = Color.WHITE
-                border = EmptyBorder(3, 0, -3, 0)
-            }
+        private val topLabel: JLabel = FontSizeAdjustingLabel().also {
+            it.font = StandardFont.readNormalFont(16)
+            it.horizontalAlignment = JLabel.CENTER
+            it.foreground = Color.WHITE
+            it.border = EmptyBorder(3, 0, -3, 0)
         }
 
         var top: String
@@ -80,21 +79,17 @@ class SummaryWithHeaderAndLabels(
                 layout = GridBagLayout()
             }
         }
-        val bottomHeaderLabel: JLabel = object : JLabel() {
-            init {
-                font = StandardFont.readNormalFont(10)
-                horizontalAlignment = CENTER
-                foreground = Color.BLACK
-                border = EmptyBorder(2, 0, 0, 0)
-            }
+        val bottomHeaderLabel: JLabel = FontSizeAdjustingLabel().also {
+            it.font = StandardFont.readNormalFont(10)
+            it.horizontalAlignment = JLabel.CENTER
+            it.foreground = Color.BLACK
+            it.border = EmptyBorder(2, 0, 0, 0)
         }
-        val bottomValueLabel: JLabel = object : JLabel() {
-            init {
-                font = StandardFont.readBoldFont(20)
-                horizontalAlignment = CENTER
-                foreground = Color.BLACK
-                border = EmptyBorder(0, 0, -4, 0)
-            }
+        val bottomValueLabel: JLabel = FontSizeAdjustingLabel().also {
+            it.font = StandardFont.readBoldFont(20)
+            it.horizontalAlignment = JLabel.CENTER
+            it.foreground = Color.BLACK
+            it.border = EmptyBorder(0, 0, -4, 0)
         }
 
         init {

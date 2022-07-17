@@ -1,5 +1,6 @@
 package com.joecollins.graphics.components.lowerthird
 
+import com.joecollins.graphics.components.FontSizeAdjustingLabel
 import com.joecollins.graphics.utils.ColorUtils
 import com.joecollins.graphics.utils.StandardFont
 import com.joecollins.pubsub.Subscriber
@@ -46,13 +47,11 @@ class SummaryWithLabels(
                 layout = GridLayout(1, 1)
             }
         }
-        val topLabel: JLabel = object : JLabel() {
-            init {
-                font = StandardFont.readNormalFont(16)
-                horizontalAlignment = CENTER
-                foreground = Color.WHITE
-                border = EmptyBorder(3, 0, -3, 0)
-            }
+        val topLabel: JLabel = FontSizeAdjustingLabel().also {
+            it.font = StandardFont.readNormalFont(16)
+            it.horizontalAlignment = JLabel.CENTER
+            it.foreground = Color.WHITE
+            it.border = EmptyBorder(3, 0, -3, 0)
         }
         val bottomPanel: JPanel = object : JPanel() {
             init {
@@ -60,13 +59,11 @@ class SummaryWithLabels(
                 layout = GridLayout(1, 1)
             }
         }
-        val bottomLabel: JLabel = object : JLabel() {
-            init {
-                font = StandardFont.readBoldFont(24)
-                horizontalAlignment = CENTER
-                foreground = Color.BLACK
-                border = EmptyBorder(4, 0, -4, 0)
-            }
+        val bottomLabel: JLabel = FontSizeAdjustingLabel().also {
+            it.font = StandardFont.readBoldFont(24)
+            it.horizontalAlignment = JLabel.CENTER
+            it.foreground = Color.BLACK
+            it.border = EmptyBorder(4, 0, -4, 0)
         }
 
         private inner class EntryLayout : LayoutManager {
