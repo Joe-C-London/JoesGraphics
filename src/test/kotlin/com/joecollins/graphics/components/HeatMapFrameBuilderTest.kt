@@ -139,6 +139,94 @@ class HeatMapFrameBuilderTest {
     }
 
     @Test
+    fun testBasicLeadingElectedFiltered() {
+        val lib = Party("Liberal", "LIB", Color.RED)
+        val yp = Party("Yukon Party", "YP", Color.BLUE)
+        val ndp = Party("New Democratic Party", "NDP", Color.ORANGE)
+
+        class Riding(val name: String, val leader: Party, val hasWon: Boolean, val prev: Party, val isWhitehorse: Boolean)
+
+        val ridings: MutableList<Riding> = ArrayList()
+        ridings.add(Riding("Vuntut Gwitchin", lib, false, lib, false))
+        ridings.add(Riding("Klondike", lib, true, lib, false))
+        ridings.add(Riding("Takhini-Copper King", ndp, false, ndp, true))
+        ridings.add(Riding("Whitehorse Centre", ndp, false, ndp, true))
+        ridings.add(Riding("Mayo-Tatchun", lib, true, ndp, false))
+        ridings.add(Riding("Mount Lorne-Southern Lakes", lib, false, ndp, false))
+        ridings.add(Riding("Riverdale South", lib, false, ndp, true))
+        ridings.add(Riding("Copperbelt South", yp, false, ndp, true))
+        ridings.add(Riding("Porter Creek South", lib, false, yp, true))
+        ridings.add(Riding("Watson Lake", yp, true, yp, true))
+        ridings.add(Riding("Porter Creek Centre", lib, false, yp, true))
+        ridings.add(Riding("Riverdale North", lib, true, yp, true))
+        ridings.add(Riding("Kluane", yp, false, yp, false))
+        ridings.add(Riding("Mountainview", lib, false, yp, false))
+        ridings.add(Riding("Copperbelt North", lib, false, yp, true))
+        ridings.add(Riding("Pelly-Nisutlin", yp, true, yp, false))
+        ridings.add(Riding("Porter Creek North", yp, false, yp, true))
+        ridings.add(Riding("Lake Laberge", yp, true, yp, false))
+        ridings.add(Riding("Whitehorse West", lib, false, yp, true))
+        val filter = Publisher<(Riding) -> Boolean> { true }
+        val frame = ofElectedLeading(
+            3.asOneTimePublisher(),
+            ridings,
+            { PartyResult(it.leader, it.hasWon).asOneTimePublisher() },
+            { it.prev },
+            lib,
+            { e: Int, l: Int -> "LIB: $e/$l" },
+            { _: Int, l: Int -> l > 0 },
+            { e: Int, l: Int -> DecimalFormat("+0;-0").format(e) + "/" + DecimalFormat("+0;-0").format(l) },
+            "YUKON".asOneTimePublisher(),
+            filterFunc = filter
+        )
+
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.numSquares }, IsEqual(19))
+        Assert.assertEquals(Color.RED, frame.getSquareBorder(0))
+        Assert.assertEquals(lighten(Color.RED), frame.getSquareFill(0))
+        Assert.assertEquals(Color.ORANGE, frame.getSquareBorder(2))
+        Assert.assertEquals(lighten(Color.ORANGE), frame.getSquareFill(2))
+        Assert.assertEquals("YUKON", frame.header)
+        Assert.assertEquals(Color.RED, frame.borderColor)
+        Assert.assertEquals(2, frame.seatBarCount.toLong())
+        Assert.assertEquals(Color.RED, frame.getSeatBarColor(0))
+        Assert.assertEquals(3, frame.getSeatBarSize(0).toLong())
+        Assert.assertEquals(lighten(Color.RED), frame.getSeatBarColor(1))
+        Assert.assertEquals(8, frame.getSeatBarSize(1).toLong())
+        Assert.assertEquals("LIB: 3/11", frame.seatBarLabel)
+        Assert.assertEquals(2, frame.changeBarStart.toLong())
+        Assert.assertEquals(2, frame.changeBarCount.toLong())
+        Assert.assertEquals(Color.RED, frame.getChangeBarColor(0))
+        Assert.assertEquals(2, frame.getChangeBarSize(0).toLong())
+        Assert.assertEquals(lighten(Color.RED), frame.getChangeBarColor(1))
+        Assert.assertEquals(7, frame.getChangeBarSize(1).toLong())
+        Assert.assertEquals("+2/+9", frame.changeBarLabel)
+
+        filter.submit { it.isWhitehorse }
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ frame.getSquareBorder(0) }, IsEqual(Color.WHITE))
+        Assert.assertEquals(Color.WHITE, frame.getSquareBorder(0))
+        Assert.assertEquals(Color.WHITE, frame.getSquareFill(0))
+        Assert.assertEquals(Color.ORANGE, frame.getSquareBorder(2))
+        Assert.assertEquals(lighten(Color.ORANGE), frame.getSquareFill(2))
+        Assert.assertEquals("YUKON", frame.header)
+        Assert.assertEquals(Color.RED, frame.borderColor)
+        Assert.assertEquals(2, frame.seatBarCount.toLong())
+        Assert.assertEquals(Color.RED, frame.getSeatBarColor(0))
+        Assert.assertEquals(3, frame.getSeatBarSize(0).toLong())
+        Assert.assertEquals(lighten(Color.RED), frame.getSeatBarColor(1))
+        Assert.assertEquals(8, frame.getSeatBarSize(1).toLong())
+        Assert.assertEquals("LIB: 3/11", frame.seatBarLabel)
+        Assert.assertEquals(2, frame.changeBarStart.toLong())
+        Assert.assertEquals(2, frame.changeBarCount.toLong())
+        Assert.assertEquals(Color.RED, frame.getChangeBarColor(0))
+        Assert.assertEquals(2, frame.getChangeBarSize(0).toLong())
+        Assert.assertEquals(lighten(Color.RED), frame.getChangeBarColor(1))
+        Assert.assertEquals(7, frame.getChangeBarSize(1).toLong())
+        Assert.assertEquals("+2/+9", frame.changeBarLabel)
+    }
+
+    @Test
     fun testLeadingElectedSeatsRepeated() {
         val dem = Party("Democratic", "DEM", Color.BLUE)
         val gop = Party("Republican", "GOP", Color.RED)
@@ -208,14 +296,14 @@ class HeatMapFrameBuilderTest {
         val frame = ofElectedLeading(
             results.sumOf { it.numSeats }.asOneTimePublisher(),
             results,
-            { it.numSeats },
             { it.publisher },
             { it.prev },
             dem,
             { e: Int, l: Int -> "DEM: $e/$l" },
             { _: Int, _: Int -> true },
             { e: Int, l: Int -> DecimalFormat("+0;-0").format(e) + "/" + DecimalFormat("+0;-0").format(l) },
-            "TEST".asOneTimePublisher()
+            "TEST".asOneTimePublisher(),
+            seatsFunc = { it.numSeats }
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numSquares }, IsEqual(30))
@@ -272,14 +360,14 @@ class HeatMapFrameBuilderTest {
         val frame = ofElectedLeading(
             results.sumOf { it.numSeats }.asOneTimePublisher(),
             results,
-            { it.numSeats },
             { it.publisher },
             { it.prev },
             dem,
             { e: Int, l: Int -> "DEM: $e/$l" },
             { _: Int, _: Int -> true },
             { e: Int, l: Int -> DecimalFormat("+0;-0").format(e) + "/" + DecimalFormat("+0;-0").format(l) },
-            "TEST".asOneTimePublisher()
+            "TEST".asOneTimePublisher(),
+            seatsFunc = { it.numSeats }
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numSquares }, IsEqual(30))

@@ -128,35 +128,9 @@ class HeatMapFrameBuilder {
             showChange: (Int, Int) -> Boolean,
             changeLabel: (Int, Int) -> String,
             header: Flow.Publisher<out String?>,
-            labelFunc: (T) -> Flow.Publisher<out String?> = { (null as String?).asOneTimePublisher() }
-        ): HeatMapFrame {
-            return ofElectedLeading(
-                rows,
-                entries,
-                { 1 },
-                resultFunc,
-                prevResultFunc,
-                party,
-                seatLabel,
-                showChange,
-                changeLabel,
-                header,
-                labelFunc
-            )
-        }
-
-        @JvmStatic fun <T> ofElectedLeading(
-            rows: Flow.Publisher<out Int>,
-            entries: List<T>,
-            seatsFunc: (T) -> Int,
-            resultFunc: (T) -> Flow.Publisher<out PartyResult?>,
-            prevResultFunc: (T) -> Party,
-            party: Party,
-            seatLabel: (Int, Int) -> String,
-            showChange: (Int, Int) -> Boolean,
-            changeLabel: (Int, Int) -> String,
-            header: Flow.Publisher<out String?>,
-            labelFunc: (T) -> Flow.Publisher<out String?> = { (null as String?).asOneTimePublisher() }
+            labelFunc: (T) -> Flow.Publisher<out String?> = { (null as String?).asOneTimePublisher() },
+            seatsFunc: (T) -> Int = { 1 },
+            filterFunc: Flow.Publisher<(T) -> Boolean> = { t: T -> true }.asOneTimePublisher()
         ): HeatMapFrame {
             val results: Map<T, Flow.Publisher<out PartyResult?>> = entries
                 .distinct()
@@ -201,15 +175,16 @@ class HeatMapFrameBuilder {
                 entries,
                 seatsFunc,
                 { e: T ->
-                    results[e]!!.map {
+                    results[e]!!.merge(filterFunc) { t, filter ->
                         when {
-                            it?.party == null -> Color.WHITE
-                            it.isElected -> it.party.color
-                            else -> ColorUtils.lighten(it.party.color)
+                            !filter(e) -> Color.WHITE
+                            t?.party == null -> Color.WHITE
+                            t.isElected -> t.party.color
+                            else -> ColorUtils.lighten(t.party.color)
                         }
                     }
                 },
-                { prevResultFunc(it).color.asOneTimePublisher() },
+                { e: T -> filterFunc.map { filter -> if (filter(e)) prevResultFunc(e).color else Color.WHITE } },
                 labelFunc
             )
                 .withSeatBars(
