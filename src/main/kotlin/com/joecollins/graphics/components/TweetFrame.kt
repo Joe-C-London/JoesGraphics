@@ -79,7 +79,7 @@ class TweetFrame(tweet: Flow.Publisher<out Status>, private val timezone: ZoneId
         tweet.subscribe(
             Subscriber(
                 eventQueueWrapper { status ->
-                    val urls = status.urlEntities
+                    val urls = status.urlEntities.filter { !it.expandedURL.startsWith("https://twitter.com/") }
                     val quotedURL = status.quotedStatus?.let { "https://twitter.com/${it.user.screenName}/status/${it.id}" }
                     urlPanel.isVisible = urls.isNotEmpty()
                     urlPanel.removeAll()
@@ -161,8 +161,11 @@ class TweetFrame(tweet: Flow.Publisher<out Status>, private val timezone: ZoneId
         status.userMentionEntities.forEach {
             htmlText = htmlText.replace("@${it.text}", "<span style='color:#$twitterColorHex'>@${it.text}</span>")
         }
-        status.urlEntities.forEach {
+        status.urlEntities.filter { isQuoted || !it.expandedURL.startsWith("https://twitter.com/") }.forEach {
             htmlText = htmlText.replace(it.url, if (!isQuoted && it.expandedURL == quotedURL) "" else "<span style='color:#$twitterColorHex'>${it.displayURL}(${it.url})</span>")
+        }
+        status.urlEntities.filter { !isQuoted && it.expandedURL.startsWith("https://twitter.com/") }.forEach {
+            htmlText = htmlText.replace(it.url, "")
         }
         status.mediaEntities.forEach {
             htmlText = htmlText.replace(it.displayURL, "")
