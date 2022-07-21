@@ -5,6 +5,7 @@ import com.joecollins.graphics.utils.StandardFont
 import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
 import com.joecollins.pubsub.map
+import com.vdurmont.emoji.EmojiParser
 import io.webfolder.cdp.Launcher
 import twitter4j.MediaEntity
 import twitter4j.Status
@@ -146,7 +147,14 @@ class TweetFrame(tweet: Flow.Publisher<out Status>, private val timezone: ZoneId
                 "This user's tweets are protected, and this tweet has therefore been blocked from this frame." +
                 "</span></html>"
         }
-        var htmlText = status.text.replace("\n", "<br/>")
+        var htmlText = status.text.replace("\n", "<br/>").let { text ->
+            EmojiParser.parseFromUnicode(text) { e ->
+                e.emoji.htmlHexadecimal.split(";").asSequence()
+                    .filter { it.isNotEmpty() }
+                    .joinToString("-") { it.replace("&#x", "") }
+                    .let { "<img src='https://images.emojiterra.com/twitter/v14.0/512px/$it.png' height='16' width='16' />" }
+            }
+        }
         status.hashtagEntities.forEach {
             htmlText = htmlText.replace("#${it.text}", "<span style='color:#$twitterColorHex'>#${it.text}</span>")
         }

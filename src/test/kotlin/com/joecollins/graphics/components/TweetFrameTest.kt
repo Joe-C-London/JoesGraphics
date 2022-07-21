@@ -358,4 +358,30 @@ class TweetFrameTest {
         frame.size = Dimension(512, 512)
         RenderTestUtils.compareRendering("TweetFrame", "QuoteTweet", frame)
     }
+
+    @Test
+    fun testTweetWithEmoji() {
+        val status = Mockito.mock(Status::class.java)
+        val user = Mockito.mock(User::class.java)
+        Mockito.`when`(status.user).thenReturn(user)
+        Mockito.`when`(user.screenName).thenReturn("Joe_C_London")
+        Mockito.`when`(user.name).thenReturn("Joe C")
+        Mockito.`when`(user.profileImageURL).thenReturn(javaClass.classLoader.getResource("com/joecollins/graphics/twitter-inputs/letter-j.png")!!.toString())
+        Mockito.`when`(user.isVerified).thenReturn(false)
+        Mockito.`when`(status.text).thenReturn("How do you get emojis to appear in your tweet? \uD83E\uDDF5")
+        Mockito.`when`(status.createdAt).thenReturn(Date.from(Instant.parse("2022-07-21T19:26:57Z")))
+        Mockito.`when`(status.inReplyToStatusId).thenReturn(-1)
+        Mockito.`when`(status.inReplyToUserId).thenReturn(-1)
+        Mockito.`when`(status.inReplyToScreenName).thenReturn("null")
+        Mockito.`when`(status.contributors).thenReturn(LongArray(0))
+        Mockito.`when`(status.userMentionEntities).thenReturn(emptyArray())
+        Mockito.`when`(status.urlEntities).thenReturn(emptyArray())
+        Mockito.`when`(status.hashtagEntities).thenReturn(emptyArray())
+        Mockito.`when`(status.mediaEntities).thenReturn(emptyArray())
+        Mockito.`when`(status.symbolEntities).thenReturn(emptyArray())
+
+        val frame = TweetFrame(status.asOneTimePublisher())
+        frame.size = Dimension(512, 256)
+        RenderTestUtils.compareRendering("TweetFrame", "Emoji", frame)
+    }
 }
