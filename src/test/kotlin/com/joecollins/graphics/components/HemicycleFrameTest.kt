@@ -10,10 +10,7 @@ import org.hamcrest.core.IsEqual
 import org.junit.Assert
 import org.junit.Test
 import java.awt.Color
-import java.io.IOException
-import java.util.Collections
 import java.util.concurrent.TimeUnit
-import kotlin.Throws
 
 class HemicycleFrameTest {
     @Test
@@ -176,7 +173,6 @@ class HemicycleFrameTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testRenderDotsOnly() {
         val rowCounts = listOf(7, 9, 11)
         val dotColors = listOf(
@@ -199,10 +195,9 @@ class HemicycleFrameTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testRenderSeatsBars() {
         val rowCounts = listOf(7, 9, 11)
-        val dotColors = Publisher(Collections.nCopies(27, Color.WHITE))
+        val dotColors = Publisher(generateSequence { Color.WHITE }.take(27).toList())
         val dotBorders = listOf(
             Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.BLUE, Color.BLUE, //
             Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.BLUE, Color.BLUE, Color.BLUE, //
@@ -268,10 +263,9 @@ class HemicycleFrameTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testRenderPositiveChangeBars() {
         val rowCounts = listOf(7, 9, 11)
-        val dotColors = Publisher(Collections.nCopies(27, Color.WHITE))
+        val dotColors = Publisher(generateSequence { Color.WHITE }.take(27).toList())
         val dotBorders = listOf(
             Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.BLUE, Color.BLUE, //
             Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.BLUE, Color.BLUE, Color.BLUE, //
@@ -348,16 +342,15 @@ class HemicycleFrameTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testRenderNegativeChangeBars() {
         val rowCounts = listOf(87)
-        val dotColors = Publisher<List<Color>>(
-            listOf(
-                Collections.nCopies(5, Color.RED),
-                Collections.nCopies(4, Color.ORANGE),
-                Collections.nCopies(17, Color.GREEN.darker()),
-                Collections.nCopies(61, Color.BLUE)
-            ).flatten()
+        val dotColors = Publisher(
+            sequenceOf(
+                generateSequence { Color.RED }.take(5),
+                generateSequence { Color.ORANGE }.take(4),
+                generateSequence { Color.GREEN.darker() }.take(17),
+                generateSequence { Color.BLUE }.take(61),
+            ).flatten().toList()
         )
         val leftSeats = Publisher(listOf(5))
         val middleSeats = Publisher(listOf(21))

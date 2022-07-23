@@ -29,44 +29,35 @@ class BarFrameBuilder private constructor() {
     private val rangeFinder = RangeFinder()
 
     private class RangeFinder {
-        private var _highest: Number = 0
-        private var _lowest: Number = 0
-        private var _minFunction = { rf: RangeFinder -> rf.lowest }
-        private var _maxFunction = { rf: RangeFinder -> rf.highest }
-
-        var highest: Number
-            get() { return _highest }
-            set(highest) {
-                _highest = highest
+        var highest: Number = 0
+            set(value) {
+                field = value
                 synchronized(this) {
                     minPublisher.submit(minFunction(this))
                     maxPublisher.submit(maxFunction(this))
                 }
             }
 
-        var lowest: Number
-            get() { return _lowest }
-            set(lowest) {
-                _lowest = lowest
+        var lowest: Number = 0
+            set(value) {
+                field = value
                 synchronized(this) {
                     minPublisher.submit(minFunction(this))
                     maxPublisher.submit(maxFunction(this))
                 }
             }
 
-        var minFunction: (RangeFinder) -> Number
-            get() { return _minFunction }
-            set(minFunction) {
-                _minFunction = minFunction
+        var minFunction: (RangeFinder) -> Number = { rf -> rf.lowest }
+            set(value) {
+                field = value
                 synchronized(this) {
                     minPublisher.submit(minFunction(this))
                 }
             }
 
-        var maxFunction: (RangeFinder) -> Number
-            get() { return _maxFunction }
-            set(maxFunction) {
-                _maxFunction = maxFunction
+        var maxFunction: (RangeFinder) -> Number = { rf -> rf.highest }
+            set(value) {
+                field = value
                 synchronized(this) {
                     maxPublisher.submit(maxFunction(this))
                 }
@@ -137,10 +128,10 @@ class BarFrameBuilder private constructor() {
                     rangeFinder.maxFunction = { max(limit.max.toDouble(), it.highest.toDouble()) }
                 }
                 if (limit.wingspan != null) {
-                    val f = { it: RangeFinder ->
+                    val f = { rf: RangeFinder ->
                         max(
                             limit.wingspan.toDouble(),
-                            max(abs(it.lowest.toDouble()), abs(it.highest.toDouble()))
+                            max(abs(rf.lowest.toDouble()), abs(rf.highest.toDouble()))
                         )
                     }
                     rangeFinder.minFunction = { -f(it) }
@@ -215,7 +206,7 @@ class BarFrameBuilder private constructor() {
     }
 
     companion object {
-        @JvmStatic fun basic(publisher: Flow.Publisher<out List<BasicBar>>): BarFrameBuilder {
+        fun basic(publisher: Flow.Publisher<out List<BasicBar>>): BarFrameBuilder {
             val builder = BarFrameBuilder()
             val rangeFinder = builder.rangeFinder
             builder.barsPublisher = publisher.map { bars ->
@@ -226,12 +217,12 @@ class BarFrameBuilder private constructor() {
             builder.minPublisher = rangeFinder.minPublisher
             builder.maxPublisher = rangeFinder.maxPublisher
             publisher.subscribe(
-                Subscriber { map: List<BasicBar> ->
-                    rangeFinder.highest = map
+                Subscriber { bars ->
+                    rangeFinder.highest = bars
                         .map { it.value }
                         .map { it.toDouble() }
                         .fold(0.0) { a, b -> max(a, b) }
-                    rangeFinder.lowest = map
+                    rangeFinder.lowest = bars
                         .map { it.value }
                         .map { it.toDouble() }
                         .fold(0.0) { a, b -> min(a, b) }
@@ -240,7 +231,7 @@ class BarFrameBuilder private constructor() {
             return builder
         }
 
-        @JvmStatic fun dual(bars: Flow.Publisher<out List<DualBar>>): BarFrameBuilder {
+        fun dual(bars: Flow.Publisher<out List<DualBar>>): BarFrameBuilder {
             val builder = BarFrameBuilder()
             val rangeFinder = builder.rangeFinder
             val differentDirections =
@@ -285,7 +276,7 @@ class BarFrameBuilder private constructor() {
             return builder
         }
 
-        @JvmStatic fun dualReversed(bars: Flow.Publisher<out List<DualBar>>): BarFrameBuilder {
+        fun dualReversed(bars: Flow.Publisher<out List<DualBar>>): BarFrameBuilder {
             val builder = BarFrameBuilder()
             val rangeFinder = builder.rangeFinder
             val differentDirections =
@@ -316,12 +307,12 @@ class BarFrameBuilder private constructor() {
             builder.minPublisher = rangeFinder.minPublisher
             builder.maxPublisher = rangeFinder.maxPublisher
             bars.subscribe(
-                Subscriber { map: List<DualBar> ->
-                    rangeFinder.highest = map
+                Subscriber { bars ->
+                    rangeFinder.highest = bars
                         .flatMap { sequenceOf(it.value1, it.value2) }
                         .map { it.toDouble() }
-                        .fold(0.0) { a: Double, b: Double -> max(a, b) }
-                    rangeFinder.lowest = map
+                        .fold(0.0) { a, b -> max(a, b) }
+                    rangeFinder.lowest = bars
                         .flatMap { sequenceOf(it.value1, it.value2) }
                         .map { it.toDouble() }
                         .fold(0.0) { a, b -> min(a, b) }

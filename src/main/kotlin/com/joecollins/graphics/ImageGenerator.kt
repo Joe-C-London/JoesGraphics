@@ -9,7 +9,7 @@ import java.awt.geom.Rectangle2D
 
 object ImageGenerator {
 
-    @JvmStatic fun createTickShape(): Shape {
+    fun createTickShape(): Shape {
         val shape = Area(Rectangle(0, 0, 100, 100))
         shape.subtract(
             Area(
@@ -19,7 +19,7 @@ object ImageGenerator {
         return shape
     }
 
-    @JvmStatic fun createHalfTickShape(): Shape {
+    fun createHalfTickShape(): Shape {
         return createHalfShape(createTickShape())
     }
 
@@ -29,7 +29,7 @@ object ImageGenerator {
         return shape
     }
 
-    @JvmStatic fun createMidTickShape(): Shape {
+    fun createMidTickShape(): Shape {
         val transform = AffineTransform.getTranslateInstance(0.0, 50.0)
         val shape = Area(transform.createTransformedShape(createTickShape()))
         shape.add(Area(Rectangle2D.Double(200.0, 200.0, 1e-6, 1e-6)))
@@ -37,7 +37,7 @@ object ImageGenerator {
         return shape
     }
 
-    @JvmStatic fun createCrossShape(): Shape {
+    fun createCrossShape(): Shape {
         val shape = Area(Rectangle(0, 0, 100, 100))
         shape.subtract(
             Area(
@@ -50,7 +50,7 @@ object ImageGenerator {
         return shape
     }
 
-    @JvmStatic fun createRunoffShape(): Shape {
+    fun createRunoffShape(): Shape {
         val shape = Area(Rectangle(0, 0, 100, 100))
         shape.subtract(
             Area(
@@ -63,7 +63,7 @@ object ImageGenerator {
         return shape
     }
 
-    @JvmStatic fun createHalfRunoffShape(): Shape {
+    fun createHalfRunoffShape(): Shape {
         return createHalfShape(createRunoffShape())
     }
 }

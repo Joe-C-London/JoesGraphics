@@ -6,14 +6,14 @@ import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.map
 import com.joecollins.pubsub.mapReduce
 import com.joecollins.pubsub.merge
-import java.lang.Integer.max
 import java.util.concurrent.Flow
+import kotlin.math.max
 
 object Aggregators {
 
-    @JvmStatic fun <T, K> combine(items: Collection<T>, result: (T) -> Flow.Publisher<Map<K, Int>>) = combine(items, result, HashMap())
+    fun <T, K> combine(items: Collection<T>, result: (T) -> Flow.Publisher<Map<K, Int>>) = combine(items, result, HashMap())
 
-    @JvmStatic fun <T, K> combine(items: Collection<T>, result: (T) -> Flow.Publisher<Map<K, Int>>, identity: Map<K, Int> = HashMap()): Flow.Publisher<Map<K, Int>> {
+    fun <T, K> combine(items: Collection<T>, result: (T) -> Flow.Publisher<Map<K, Int>>, identity: Map<K, Int> = HashMap()): Flow.Publisher<Map<K, Int>> {
         if (items.isEmpty()) {
             return identity.asOneTimePublisher()
         }
@@ -33,9 +33,9 @@ object Aggregators {
         )
     }
 
-    @JvmStatic fun <T, K> combineDual(items: Collection<T>, result: (T) -> Flow.Publisher<Map<K, Pair<Int, Int>>>) = combineDual(items, result, HashMap())
+    fun <T, K> combineDual(items: Collection<T>, result: (T) -> Flow.Publisher<Map<K, Pair<Int, Int>>>) = combineDual(items, result, HashMap())
 
-    @JvmStatic fun <T, K> combineDual(items: Collection<T>, result: (T) -> Flow.Publisher<Map<K, Pair<Int, Int>>>, identity: Map<K, Pair<Int, Int>> = HashMap()): Flow.Publisher<Map<K, Pair<Int, Int>>> {
+    fun <T, K> combineDual(items: Collection<T>, result: (T) -> Flow.Publisher<Map<K, Pair<Int, Int>>>, identity: Map<K, Pair<Int, Int>> = HashMap()): Flow.Publisher<Map<K, Pair<Int, Int>>> {
         val seededKeys = identity.keys
         val sum: (Pair<Int, Int>, Pair<Int, Int>) -> Pair<Int, Int> =
             { a, b -> Pair(a.first + b.first, a.second + b.second) }
@@ -54,15 +54,15 @@ object Aggregators {
         )
     }
 
-    @JvmStatic fun <T> sum(items: Collection<T>, value: (T) -> Flow.Publisher<Int>): Flow.Publisher<Int> {
+    fun <T> sum(items: Collection<T>, value: (T) -> Flow.Publisher<Int>): Flow.Publisher<Int> {
         return items.map(value).mapReduce(0, { t, v -> t + v }, { t, v -> t - v })
     }
 
-    @JvmStatic fun <T> count(items: Collection<T>, value: (T) -> Flow.Publisher<Boolean>): Flow.Publisher<Int> {
+    fun <T> count(items: Collection<T>, value: (T) -> Flow.Publisher<Boolean>): Flow.Publisher<Int> {
         return sum(items) { t -> value(t).map { if (it) 1 else 0 } }
     }
 
-    @JvmStatic fun <K> adjustForPctReporting(result: Flow.Publisher<Map<K, Int>>, pctReporting: Flow.Publisher<Double>): Flow.Publisher<Map<K, Int>> {
+    fun <K> adjustForPctReporting(result: Flow.Publisher<Map<K, Int>>, pctReporting: Flow.Publisher<Double>): Flow.Publisher<Map<K, Int>> {
         return result.merge(pctReporting) { r, p ->
             val ret: LinkedHashMap<K, Int> = LinkedHashMap()
             r.forEach { (k, v) -> ret[k] = (v * p).toInt() }
@@ -70,9 +70,9 @@ object Aggregators {
         }
     }
 
-    @JvmStatic fun <T> combinePctReporting(items: Collection<T>, pctReportingFunc: (T) -> Flow.Publisher<Double>) = combinePctReporting(items, pctReportingFunc) { 1.0 }
+    fun <T> combinePctReporting(items: Collection<T>, pctReportingFunc: (T) -> Flow.Publisher<Double>) = combinePctReporting(items, pctReportingFunc) { 1.0 }
 
-    @JvmStatic fun <T> combinePctReporting(items: Collection<T>, pctReportingFunc: (T) -> Flow.Publisher<Double>, weightFunc: (T) -> Double): Flow.Publisher<Double> {
+    fun <T> combinePctReporting(items: Collection<T>, pctReportingFunc: (T) -> Flow.Publisher<Double>, weightFunc: (T) -> Double): Flow.Publisher<Double> {
         val totalWeight = items.map(weightFunc).sum()
         return items.map { e ->
             val weight = weightFunc(e)
@@ -84,28 +84,28 @@ object Aggregators {
         )
     }
 
-    @JvmStatic fun <K1, K2> adjustKey(result: Flow.Publisher<out Map<K1, Int>>, func: (K1) -> K2) = result.map { adjustKey(it, func) }
+    fun <K1, K2> adjustKey(result: Flow.Publisher<out Map<K1, Int>>, func: (K1) -> K2) = result.map { adjustKey(it, func) }
 
-    @JvmStatic fun <K1, K2> adjustKey(result: Map<K1, Int>, func: (K1) -> K2): Map<K2, Int> {
+    fun <K1, K2> adjustKey(result: Map<K1, Int>, func: (K1) -> K2): Map<K2, Int> {
         val ret: LinkedHashMap<K2, Int> = LinkedHashMap()
         result.forEach { (k, v) -> ret.merge(func(k), v) { a, b -> a + b } }
         return ret
     }
 
-    @JvmStatic fun <K> toPct(result: Flow.Publisher<Map<K, Int>>) = result.map { toPct(it) }
+    fun <K> toPct(result: Flow.Publisher<Map<K, Int>>) = result.map { toPct(it) }
 
-    @JvmStatic fun <K> toPct(result: Map<K, Int>): Map<K, Double> {
+    fun <K> toPct(result: Map<K, Int>): Map<K, Double> {
         val total = result.values.sum()
         return result.mapValues { if (total == 0) 0.0 else (1.0 * it.value / total) }
     }
 
     @Suppress("UNCHECKED_CAST")
-    @JvmStatic fun <K, T : Int?> topAndOthers(result: Flow.Publisher<Map<K, T>>, limit: Int, others: K) = topAndOthers(result, limit, others, (Array<Any?>(0) { null } as Array<K>).asOneTimePublisher())
+    fun <K, T : Int?> topAndOthers(result: Flow.Publisher<Map<K, T>>, limit: Int, others: K) = topAndOthers(result, limit, others, (Array<Any?>(0) { null } as Array<K>).asOneTimePublisher())
 
-    @JvmStatic fun <K, T : Int?> topAndOthers(result: Flow.Publisher<out Map<K, T>>, limit: Int, others: K, mustInclude: Flow.Publisher<out Array<K>>) = result.merge(mustInclude) { m, w -> topAndOthers(m, limit, others, *w) }
+    fun <K, T : Int?> topAndOthers(result: Flow.Publisher<out Map<K, T>>, limit: Int, others: K, mustInclude: Flow.Publisher<out Array<K>>) = result.merge(mustInclude) { m, w -> topAndOthers(m, limit, others, *w) }
 
     @Suppress("UNCHECKED_CAST")
-    @JvmStatic fun <K, T : Int?> topAndOthers(result: Map<K, T>, limit: Int, others: K, vararg mustInclude: K): Map<K, T> {
+    fun <K, T : Int?> topAndOthers(result: Map<K, T>, limit: Int, others: K, vararg mustInclude: K): Map<K, T> {
         if (result.size <= limit) {
             return result
         }
@@ -134,9 +134,9 @@ object Aggregators {
         return ret
     }
 
-    @JvmStatic fun <K, V> toMap(keys: Collection<K>, func: (K) -> Flow.Publisher<V>) = toMap(keys, { it }, func)
+    fun <K, V> toMap(keys: Collection<K>, func: (K) -> Flow.Publisher<V>) = toMap(keys, { it }, func)
 
-    @JvmStatic fun <T, K, V> toMap(entries: Collection<T>, keyFunc: (T) -> K, func: (T) -> Flow.Publisher<V>): Flow.Publisher<Map<K, V>> {
+    fun <T, K, V> toMap(entries: Collection<T>, keyFunc: (T) -> K, func: (T) -> Flow.Publisher<V>): Flow.Publisher<Map<K, V>> {
         val ret = Publisher<Map<K, V>>()
         val map = HashMap<K, V>()
         val publishersMap = HashMap<K, Flow.Publisher<V>>()

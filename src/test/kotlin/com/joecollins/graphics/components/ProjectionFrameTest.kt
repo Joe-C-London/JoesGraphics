@@ -9,13 +9,10 @@ import org.junit.Assert
 import org.junit.Test
 import java.awt.Color
 import java.awt.Image
-import java.io.IOException
 import java.util.concurrent.TimeUnit
-import kotlin.Throws
 
 class ProjectionFrameTest {
     @Test
-    @Throws(IOException::class)
     fun testImage() {
         val image = peiLeg()
         val frame = ProjectionFrame(
@@ -82,7 +79,6 @@ class ProjectionFrameTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testRendering() {
         val frame = ProjectionFrame(
             headerPublisher = "PROJECTION".asOneTimePublisher(),
@@ -96,7 +92,6 @@ class ProjectionFrameTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testLongRendering() {
         val frame = ProjectionFrame(
             headerPublisher = "PROJECTION".asOneTimePublisher(),
@@ -110,7 +105,6 @@ class ProjectionFrameTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testCenterRendering() {
         val frame = ProjectionFrame(
             headerPublisher = "PROJECTION".asOneTimePublisher(),
@@ -124,7 +118,6 @@ class ProjectionFrameTest {
         compareRendering("ProjectionFrame", "Center", frame)
     }
 
-    @Throws(IOException::class)
     private fun peiLeg(): Image {
         return createImage(
             ProjectionFrameTest::class.java

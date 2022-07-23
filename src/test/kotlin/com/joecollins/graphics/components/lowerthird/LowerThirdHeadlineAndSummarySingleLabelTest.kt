@@ -8,7 +8,6 @@ import org.hamcrest.core.IsEqual
 import org.junit.Assert
 import org.junit.Test
 import java.awt.Color
-import java.io.IOException
 import java.time.Clock
 import java.time.Instant
 import java.time.ZoneId
@@ -78,7 +77,6 @@ class LowerThirdHeadlineAndSummarySingleLabelTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testRenderHeadlineAndSummary() {
         val lowerThird = LowerThirdHeadlineAndSummarySingleLabel(
             leftImagePublisher =
@@ -105,7 +103,6 @@ class LowerThirdHeadlineAndSummarySingleLabelTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testRenderLongHeadlineAndSummary() {
         val lowerThird = LowerThirdHeadlineAndSummarySingleLabel(
             leftImagePublisher =

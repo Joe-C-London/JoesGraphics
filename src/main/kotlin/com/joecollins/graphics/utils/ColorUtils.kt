@@ -5,18 +5,18 @@ import kotlin.math.pow
 import kotlin.math.roundToInt
 
 object ColorUtils {
-    @JvmStatic fun lighten(color: Color): Color {
+    fun lighten(color: Color): Color {
         return Color(
             128 + color.red / 2, 128 + color.green / 2, 128 + color.blue / 2
         )
     }
 
-    @JvmStatic fun foregroundToContrast(color: Color): Color {
+    fun foregroundToContrast(color: Color): Color {
         val l = calcLum(color)
         return if (l > 0.75) Color.BLACK else Color.WHITE
     }
 
-    @JvmStatic fun contrastForBackground(color: Color): Color {
+    fun contrastForBackground(color: Color): Color {
         val l = calcLum(color)
         val factor = (0.75 / l).coerceAtMost(1.0)
         return Color(

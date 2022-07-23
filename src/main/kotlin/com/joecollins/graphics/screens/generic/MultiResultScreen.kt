@@ -108,34 +108,34 @@ class MultiResultScreen private constructor() : JPanel() {
             mapHeaderFunc: (T) -> Flow.Publisher<out String>
         ): Builder<T> {
             this.mapHeaderFunc = mapHeaderFunc
-            mapFocusFunc = label@{ t: T ->
-                val focus = focusFunc(t) ?: return@label emptyList()
+            mapFocusFunc = mapFocusFunc@{ t: T ->
+                val focus = focusFunc(t) ?: return@mapFocusFunc emptyList()
                 val shapes = shapesFunc(t)
-                focus.mapNotNull { key: K -> shapes[key] }
+                focus.mapNotNull { shapes[it] }
             }
             mapShapeFunc = { t: T ->
                 val selected = selectedShapeFunc(t)
                 val focus = focusFunc(t)
                 val additionalHighlight = additionalHighlightsFunc(t)
-                val leader = leadingPartyFunc(t).map { p: PartyResult? -> p ?: PartyResult.NO_RESULT }
+                val leader = leadingPartyFunc(t).map { it ?: PartyResult.NO_RESULT }
                 shapesFunc(t).entries.asSequence()
-                    .map { e: Map.Entry<K, Shape> ->
+                    .map {
                         when {
-                            e.key == selected -> {
-                                Pair(e.value, leader.map(PartyResult::color))
+                            it.key == selected -> {
+                                Pair(it.value, leader.map(PartyResult::color))
                             }
-                            focus == null || focus.isEmpty() || focus.contains(e.key) -> {
+                            focus == null || focus.isEmpty() || focus.contains(it.key) -> {
                                 Pair(
-                                    e.value, Color.LIGHT_GRAY.asOneTimePublisher()
+                                    it.value, Color.LIGHT_GRAY.asOneTimePublisher()
                                 )
                             }
-                            additionalHighlight != null && additionalHighlight.contains(e.key) -> {
+                            additionalHighlight != null && additionalHighlight.contains(it.key) -> {
                                 Pair(
-                                    e.value, Color.LIGHT_GRAY.asOneTimePublisher()
+                                    it.value, Color.LIGHT_GRAY.asOneTimePublisher()
                                 )
                             }
                             else -> Pair(
-                                e.value, Color(220, 220, 220).asOneTimePublisher()
+                                it.value, Color(220, 220, 220).asOneTimePublisher()
                             )
                         }
                     }
@@ -200,9 +200,9 @@ class MultiResultScreen private constructor() : JPanel() {
                     }
                     val numRows = if (size > 4) 2 else 1
                     center.layout = GridLayout(numRows, 0)
-                    screen.panels.forEach { p: ResultPanel ->
-                        p.displayBothRows = numRows == 1
-                        p.setMaxBarsPublisher(
+                    screen.panels.forEach {
+                        it.displayBothRows = numRows == 1
+                        it.setMaxBarsPublisher(
                             (
                                 (if (numRows == 2) 4 else 5) * if (this.partiesOnly) 2 else 1
                                 ).asOneTimePublisher()
@@ -223,36 +223,27 @@ class MultiResultScreen private constructor() : JPanel() {
     }
 
     private class Result(private val index: Int, private val partiesOnly: Boolean, private val incumbentMarker: String) {
-        private var _votes: Map<Candidate, Int> = HashMap()
-        private var _winner: Candidate? = null
-        private var _runoff: Set<Candidate> = emptySet()
-        private var _maxBars = 0
-
-        var votes: Map<Candidate, Int>
-            get() = _votes
-            set(votes) {
-                _votes = votes
+        var votes: Map<Candidate, Int> = emptyMap()
+            set(value) {
+                field = value
                 updateBars()
             }
 
-        var winner: Candidate?
-            get() = _winner
-            set(winner) {
-                _winner = winner
+        var winner: Candidate? = null
+            set(value) {
+                field = value
                 updateBars()
             }
 
-        var runoff: Set<Candidate>
-            get() = _runoff
-            set(runoff) {
-                _runoff = runoff
+        var runoff: Set<Candidate> = emptySet()
+            set(value) {
+                field = value
                 updateBars()
             }
 
-        var maxBars: Int
-            get() = _maxBars
-            set(maxBars) {
-                _maxBars = maxBars
+        var maxBars: Int = 0
+            set(value) {
+                field = value
                 updateBars()
             }
 
@@ -290,7 +281,7 @@ class MultiResultScreen private constructor() : JPanel() {
                         }
                     }
                     val rightLabel: String = when {
-                        java.lang.Double.isNaN(pct) -> {
+                        pct.isNaN() -> {
                             "WAITING..."
                         }
                         partiesOnly -> {
@@ -303,7 +294,7 @@ class MultiResultScreen private constructor() : JPanel() {
                     BasicBar(
                         leftLabel,
                         candidate.party.color,
-                        if (java.lang.Double.isNaN(pct)) 0 else pct,
+                        if (pct.isNaN()) 0 else pct,
                         rightLabel,
                         shape
                     )
@@ -435,7 +426,7 @@ class MultiResultScreen private constructor() : JPanel() {
             maxBars.selfCompose().subscribe(Subscriber { result.maxBars = it })
             val bars = result.toBars
             barFrame = BarFrameBuilder.basic(bars)
-                .withMax(pctReporting.selfCompose().map { d: Double -> 0.5 / d.coerceAtLeast(1e-6) })
+                .withMax(pctReporting.selfCompose().map { 0.5 / it.coerceAtLeast(1e-6) })
                 .withHeader(header.selfCompose())
                 .withSubhead(subhead.selfCompose())
                 .build()
@@ -444,10 +435,8 @@ class MultiResultScreen private constructor() : JPanel() {
                 swingFrame = SwingFrameBuilder.prevCurr(
                     prevVotes.selfCompose(),
                     votes.selfCompose()
-                        .map { m: Map<Candidate, Int> ->
-                            val ret: MutableMap<Party, Int> = LinkedHashMap()
-                            m.forEach { (k: Candidate, v: Int) -> ret.merge(k.party, v) { a, b -> Integer.sum(a, b) } }
-                            ret
+                        .map { m ->
+                            m.entries.groupingBy { it.key.party }.fold(0) { a, e -> a + e.value }
                         },
                     swingPartyOrder
                 )
@@ -459,9 +448,9 @@ class MultiResultScreen private constructor() : JPanel() {
                 mapFrame = MapFrame(
                     headerPublisher = mapHeader.selfCompose(),
                     shapesPublisher = mapShape.selfCompose(),
-                    focusBoxPublisher = mapFocus.selfCompose().map {
-                        it.asSequence()
-                            .map { obj: Shape -> obj.bounds2D }
+                    focusBoxPublisher = mapFocus.selfCompose().map { shapes ->
+                        shapes.asSequence()
+                            .map { it.bounds2D }
                             .reduceOrNull { agg, r -> agg.createUnion(r) }
                     }
                 )
@@ -480,7 +469,7 @@ class MultiResultScreen private constructor() : JPanel() {
             return headerLabel
         }
 
-        @JvmStatic fun <T> of(
+        fun <T> of(
             list: Flow.Publisher<out List<T>>,
             votesFunc: (T) -> Flow.Publisher<out Map<Candidate, Int>>,
             headerFunc: (T) -> Flow.Publisher<out String>,
@@ -489,7 +478,7 @@ class MultiResultScreen private constructor() : JPanel() {
             return Builder(list, votesFunc, headerFunc, subheadFunc, false)
         }
 
-        @JvmStatic fun <T> ofParties(
+        fun <T> ofParties(
             list: Flow.Publisher<out List<T>>,
             votesFunc: (T) -> Flow.Publisher<out Map<Party, Int>>,
             headerFunc: (T) -> Flow.Publisher<out String>,

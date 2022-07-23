@@ -13,7 +13,6 @@ import org.junit.Test
 import java.awt.Color
 import java.awt.Dimension
 import java.awt.Shape
-import java.io.IOException
 
 class SingleTransferrableResultScreenTest {
 
@@ -538,7 +537,6 @@ class SingleTransferrableResultScreenTest {
         compareRendering("SingleTransferrableResultScreen", "Quotas-Oth", panel)
     }
 
-    @Throws(IOException::class)
     private fun niShapesByConstituency(): Map<Int, Shape> {
         val niMap = MapFrameTest::class.java
             .classLoader

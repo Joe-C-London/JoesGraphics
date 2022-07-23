@@ -104,7 +104,7 @@ class PartySummaryScreen private constructor(
                 curr.merge(prev) { c, p ->
                     sequenceOf(c.keys.asSequence(), p.keys.asSequence()).flatten()
                         .distinct()
-                        .associateWith { party: Party -> (c[party] ?: 0) - (p[party] ?: 0) }
+                        .associateWith { (c[it] ?: 0) - (p[it] ?: 0) }
                 }
             }
             return withSeatAndDiff(seatFunc, seatDiffFunc, seatsHeader)
@@ -132,7 +132,7 @@ class PartySummaryScreen private constructor(
                 curr.merge(prev) { c, p ->
                     sequenceOf(c.keys.asSequence(), p.keys.asSequence()).flatten()
                         .distinct()
-                        .associateWith { party: Party -> (c[party] ?: 0.0) - (p[party] ?: 0.0) }
+                        .associateWith { (c[it] ?: 0.0) - (p[it] ?: 0.0) }
                 }
             }
             return withVotePctAndDiff(votePctFunc, votePctDiffFunc, voteHeader)
@@ -180,44 +180,33 @@ class PartySummaryScreen private constructor(
     }
 
     private class SinglePartyInput {
-        private var _seats: Map<Party, Int> = emptyMap()
-        private var _seatDiff: Map<Party, Int> = emptyMap()
-        private var _votePct: Map<Party, Double> = emptyMap()
-        private var _votePctDiff: Map<Party, Double> = emptyMap()
-        private var _party: Party? = null
-
-        var seats: Map<Party, Int>
-            get() = _seats
-            set(seats) {
-                this._seats = seats
+        var seats: Map<Party, Int> = emptyMap()
+            set(value) {
+                field = value
                 updateSeats()
             }
 
-        var seatDiff: Map<Party, Int>
-            get() = _seatDiff
-            set(seatDiff) {
-                this._seatDiff = seatDiff
+        var seatDiff: Map<Party, Int> = emptyMap()
+            set(value) {
+                field = value
                 updateSeats()
             }
 
-        var votePct: Map<Party, Double>
-            get() = _votePct
-            set(votePct) {
-                this._votePct = votePct
+        var votePct: Map<Party, Double> = emptyMap()
+            set(value) {
+                field = value
                 updateVotes()
             }
 
-        var votePctDiff: Map<Party, Double>
-            get() = _votePctDiff
-            set(votePctDiff) {
-                this._votePctDiff = votePctDiff
+        var votePctDiff: Map<Party, Double> = emptyMap()
+            set(value) {
+                field = value
                 updateVotes()
             }
 
-        var party: Party?
-            get() = _party
-            set(party) {
-                this._party = party
+        var party: Party? = null
+            set(value) {
+                field = value
                 updateSeats()
                 updateVotes()
             }
@@ -246,7 +235,7 @@ class PartySummaryScreen private constructor(
     }
 
     companion object {
-        @JvmStatic fun <T> of(
+        fun <T> of(
             mainRegion: T,
             titleFunc: (T) -> Flow.Publisher<out String>,
             numRows: Int
@@ -254,7 +243,7 @@ class PartySummaryScreen private constructor(
             return Builder(mainRegion, titleFunc, numRows)
         }
 
-        @JvmStatic fun <T> ofDiff(
+        fun <T> ofDiff(
             mainRegion: T,
             titleFunc: (T) -> Flow.Publisher<out String>,
             seatFunc: (T) -> Flow.Publisher<out Map<Party, Int>>,
@@ -268,7 +257,7 @@ class PartySummaryScreen private constructor(
                 .withVotePctAndDiff(votePctFunc, votePctDiffFunc)
         }
 
-        @JvmStatic fun <T> ofPrev(
+        fun <T> ofPrev(
             mainRegion: T,
             titleFunc: (T) -> Flow.Publisher<out String>,
             seatFunc: (T) -> Flow.Publisher<out Map<Party, Int>>,

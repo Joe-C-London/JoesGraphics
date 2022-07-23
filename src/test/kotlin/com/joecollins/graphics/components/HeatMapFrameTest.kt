@@ -9,9 +9,7 @@ import org.hamcrest.core.IsEqual
 import org.junit.Assert
 import org.junit.Test
 import java.awt.Color
-import java.io.IOException
 import java.util.concurrent.TimeUnit
-import kotlin.Throws
 
 class HeatMapFrameTest {
     @Test
@@ -114,7 +112,6 @@ class HeatMapFrameTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testRenderEvenWide() {
         val results = peiResults
         val squares = Publisher(
@@ -168,7 +165,6 @@ class HeatMapFrameTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testRenderEvenHigh() {
         val results = peiResults
         val squares = Publisher(
@@ -222,7 +218,6 @@ class HeatMapFrameTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testRenderUneven() {
         val results = peiResults
         val squares = Publisher(
@@ -285,7 +280,6 @@ class HeatMapFrameTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testRenderChangeReversals() {
         val results = peiResults
         val squares = Publisher(

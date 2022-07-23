@@ -13,8 +13,6 @@ import org.junit.Assert
 import org.junit.Test
 import java.awt.Color
 import java.text.DecimalFormat
-import java.util.ArrayList
-import java.util.Collections
 import java.util.concurrent.TimeUnit
 
 @Suppress("UNUSED_ANONYMOUS_PARAMETER")
@@ -22,12 +20,13 @@ class HemicycleFrameBuilderTest {
     @Test
     fun testHemicycleBasic() {
         val rows = listOf(7, 9, 11)
-        val dots: MutableList<Pair<Color, Color>> = ArrayList()
-        dots.addAll(Collections.nCopies(1, Pair(Color.GREEN, Color.GREEN)))
-        dots.addAll(Collections.nCopies(7, Pair(Color.GREEN, Color.RED)))
-        dots.addAll(Collections.nCopies(6, Pair(Color.RED, Color.RED)))
-        dots.addAll(Collections.nCopies(5, Pair(Color.BLUE, Color.RED)))
-        dots.addAll(Collections.nCopies(8, Pair(Color.BLUE, Color.BLUE)))
+        val dots = sequenceOf(
+            sequenceOf(Pair(Color.GREEN, Color.GREEN)),
+            generateSequence { Pair(Color.GREEN, Color.RED) }.take(7),
+            generateSequence { Pair(Color.RED, Color.RED) }.take(6),
+            generateSequence { Pair(Color.BLUE, Color.RED) }.take(5),
+            generateSequence { Pair(Color.BLUE, Color.BLUE) }.take(8),
+        ).flatten().toList()
         val leftSeatBars = Publisher(listOf(Pair(Color.GREEN, 8)))
         val rightSeatBars = Publisher(listOf(Pair(Color.BLUE, 13)))
         val middleSeatBars = Publisher(listOf(Pair(Color.RED, 6)))
@@ -100,26 +99,27 @@ class HemicycleFrameBuilderTest {
 
         class Riding(val name: String, val leader: Party, val hasWon: Boolean, val prev: Party)
 
-        val ridings: MutableList<Riding> = ArrayList()
-        ridings.add(Riding("Vuntut Gwitchin", lib, false, lib))
-        ridings.add(Riding("Klondike", lib, true, lib))
-        ridings.add(Riding("Takhini-Copper King", ndp, false, ndp))
-        ridings.add(Riding("Whitehorse Centre", ndp, false, ndp))
-        ridings.add(Riding("Mayo-Tatchun", lib, true, ndp))
-        ridings.add(Riding("Mount Lorne-Southern Lakes", lib, false, ndp))
-        ridings.add(Riding("Riverdale South", lib, false, ndp))
-        ridings.add(Riding("Copperbelt South", yp, false, ndp))
-        ridings.add(Riding("Porter Creek South", lib, false, yp))
-        ridings.add(Riding("Watson Lake", yp, true, yp))
-        ridings.add(Riding("Porter Creek Centre", lib, false, yp))
-        ridings.add(Riding("Riverdale North", lib, true, yp))
-        ridings.add(Riding("Kluane", yp, false, yp))
-        ridings.add(Riding("Mountainview", lib, false, yp))
-        ridings.add(Riding("Copperbelt North", lib, false, yp))
-        ridings.add(Riding("Pelly-Nisutlin", yp, true, yp))
-        ridings.add(Riding("Porter Creek North", yp, false, yp))
-        ridings.add(Riding("Lake Laberge", yp, true, yp))
-        ridings.add(Riding("Whitehorse West", lib, false, yp))
+        val ridings = listOf(
+            Riding("Vuntut Gwitchin", lib, false, lib),
+            Riding("Klondike", lib, true, lib),
+            Riding("Takhini-Copper King", ndp, false, ndp),
+            Riding("Whitehorse Centre", ndp, false, ndp),
+            Riding("Mayo-Tatchun", lib, true, ndp),
+            Riding("Mount Lorne-Southern Lakes", lib, false, ndp),
+            Riding("Riverdale South", lib, false, ndp),
+            Riding("Copperbelt South", yp, false, ndp),
+            Riding("Porter Creek South", lib, false, yp),
+            Riding("Watson Lake", yp, true, yp),
+            Riding("Porter Creek Centre", lib, false, yp),
+            Riding("Riverdale North", lib, true, yp),
+            Riding("Kluane", yp, false, yp),
+            Riding("Mountainview", lib, false, yp),
+            Riding("Copperbelt North", lib, false, yp),
+            Riding("Pelly-Nisutlin", yp, true, yp),
+            Riding("Porter Creek North", yp, false, yp),
+            Riding("Lake Laberge", yp, true, yp),
+            Riding("Whitehorse West", lib, false, yp),
+        )
         val frame = ofElectedLeading(
             listOf(ridings.size),
             ridings,
@@ -127,11 +127,11 @@ class HemicycleFrameBuilderTest {
             { it.prev },
             lib,
             yp,
-            { e: Int, l: Int -> "LIB: $e/$l" },
-            { e: Int, l: Int -> "YP: $e/$l" },
-            { e: Int, l: Int -> "OTH: $e/$l" },
-            { e: Int, l: Int -> l > 0 },
-            { e: Int, l: Int -> DecimalFormat("+0;-0").format(e) + "/" + DecimalFormat("+0;-0").format(l) },
+            { e, l -> "LIB: $e/$l" },
+            { e, l -> "YP: $e/$l" },
+            { e, l -> "OTH: $e/$l" },
+            { e, l -> l > 0 },
+            { e, l -> DecimalFormat("+0;-0").format(e) + "/" + DecimalFormat("+0;-0").format(l) },
             Tiebreaker.FRONT_ROW_FROM_LEFT,
             "YUKON".asOneTimePublisher()
         )
@@ -187,7 +187,7 @@ class HemicycleFrameBuilderTest {
         }
 
         val result = Result(null, false, gop)
-        val results = Collections.nCopies(30, result)
+        val results = generateSequence { result }.take(30).toList()
         val frame = ofElectedLeading(
             listOf(results.size),
             results,
@@ -195,11 +195,11 @@ class HemicycleFrameBuilderTest {
             { it.prev },
             dem,
             gop,
-            { e: Int, l: Int -> "DEM: $e/$l" },
-            { e: Int, l: Int -> "GOP: $e/$l" },
-            { e: Int, l: Int -> "OTH: $e/$l" },
-            { e: Int, l: Int -> l > 0 },
-            { e: Int, l: Int -> DecimalFormat("+0;-0").format(e) + "/" + DecimalFormat("+0;-0").format(l) },
+            { e, l -> "DEM: $e/$l" },
+            { e, l -> "GOP: $e/$l" },
+            { e, l -> "OTH: $e/$l" },
+            { e, l -> l > 0 },
+            { e, l -> DecimalFormat("+0;-0").format(e) + "/" + DecimalFormat("+0;-0").format(l) },
             Tiebreaker.FRONT_ROW_FROM_LEFT,
             "TEST".asOneTimePublisher()
         )
@@ -269,11 +269,11 @@ class HemicycleFrameBuilderTest {
             { it.prev },
             dem,
             gop,
-            { e: Int, l: Int -> "DEM: $e/$l" },
-            { e: Int, l: Int -> "GOP: $e/$l" },
-            { e: Int, l: Int -> "OTH: $e/$l" },
-            { e: Int, l: Int -> true },
-            { e: Int, l: Int -> DecimalFormat("+0;-0").format(e) + "/" + DecimalFormat("+0;-0").format(l) },
+            { e, l -> "DEM: $e/$l" },
+            { e, l -> "GOP: $e/$l" },
+            { e, l -> "OTH: $e/$l" },
+            { e, l -> true },
+            { e, l -> DecimalFormat("+0;-0").format(e) + "/" + DecimalFormat("+0;-0").format(l) },
             Tiebreaker.FRONT_ROW_FROM_LEFT,
             "TEST".asOneTimePublisher()
         )
@@ -373,11 +373,11 @@ class HemicycleFrameBuilderTest {
             { it.prev },
             dem,
             gop,
-            { e: Int, l: Int -> "DEM: $e/$l" },
-            { e: Int, l: Int -> "GOP: $e/$l" },
-            { e: Int, l: Int -> "OTH: $e/$l" },
-            { e: Int, l: Int -> true },
-            { e: Int, l: Int -> DecimalFormat("+0;-0").format(e) + "/" + DecimalFormat("+0;-0").format(l) },
+            { e, l -> "DEM: $e/$l" },
+            { e, l -> "GOP: $e/$l" },
+            { e, l -> "OTH: $e/$l" },
+            { e, l -> true },
+            { e, l -> DecimalFormat("+0;-0").format(e) + "/" + DecimalFormat("+0;-0").format(l) },
             Tiebreaker.FRONT_ROW_FROM_LEFT,
             "TEST".asOneTimePublisher()
         )

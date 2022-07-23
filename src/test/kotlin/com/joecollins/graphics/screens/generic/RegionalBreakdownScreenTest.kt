@@ -12,12 +12,9 @@ import com.joecollins.pubsub.asOneTimePublisher
 import org.junit.Test
 import java.awt.Color
 import java.awt.Dimension
-import java.io.IOException
-import kotlin.Throws
 
 class RegionalBreakdownScreenTest {
     @Test
-    @Throws(IOException::class)
     fun testSeats() {
         val peiSeats = Publisher<Map<Party, Int>>(emptyMap())
         val cardiganSeats = Publisher<Map<Party, Int>>(emptyMap())
@@ -50,7 +47,6 @@ class RegionalBreakdownScreenTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testSeatsWithDiff() {
         val peiSeats = Publisher<Map<Party, Int>>(emptyMap())
         val cardiganSeats = Publisher<Map<Party, Int>>(emptyMap())
@@ -96,7 +92,6 @@ class RegionalBreakdownScreenTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testSeatsWithPrev() {
         val peiSeats = Publisher<Map<Party, Int>>(emptyMap())
         val cardiganSeats = Publisher<Map<Party, Int>>(emptyMap())
@@ -347,7 +342,6 @@ class RegionalBreakdownScreenTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testVotes() {
         val peiVotes = Publisher<Map<Party, Int>>(emptyMap())
         val cardiganVotes = Publisher<Map<Party, Int>>(emptyMap())
@@ -392,7 +386,6 @@ class RegionalBreakdownScreenTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testVotesWithPrev() {
         val peiVotes = Publisher<Map<Party, Int>>(emptyMap())
         val cardiganVotes = Publisher<Map<Party, Int>>(emptyMap())

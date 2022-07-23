@@ -11,10 +11,10 @@ import java.awt.Graphics
 import java.awt.Graphics2D
 import java.awt.RenderingHints
 import java.awt.geom.AffineTransform
-import java.lang.Double.NEGATIVE_INFINITY
-import java.lang.Double.POSITIVE_INFINITY
 import java.util.concurrent.Flow
 import javax.swing.JPanel
+import kotlin.Double.Companion.NEGATIVE_INFINITY
+import kotlin.Double.Companion.POSITIVE_INFINITY
 import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.cos
@@ -114,84 +114,63 @@ class SwingometerFrame(
     class Dot(val position: Number, val color: Color, val label: String = "", val solid: Boolean = true)
 
     private inner class SwingPanel : JPanel() {
-        private var _leftColor = Color.BLACK
-        private var _rightColor = Color.BLACK
-        private var _value: Number = 0
-        private var _range: Number = 1
-        private var _leftToWin: Number = Double.POSITIVE_INFINITY
-        private var _rightToWin: Number = Double.NEGATIVE_INFINITY
-        private var _ticks: List<Tick> = ArrayList()
-        private var _outerLabels: List<OuterLabel> = ArrayList()
-        private var _numBucketsPerSide = 1
-        private var _dots: List<Dot> = ArrayList()
-
-        var leftColor: Color
-            get() { return _leftColor }
-            set(leftColor) {
-                _leftColor = leftColor
-                repaint()
-            }
-
-        var rightColor: Color
-            get() { return _rightColor }
-            set(rightColor) {
-                _rightColor = rightColor
-                repaint()
-            }
-
-        var value: Number
-            get() { return _value }
+        var leftColor: Color = Color.BLACK
             set(value) {
-                _value = value
+                field = value
                 repaint()
             }
 
-        var range: Number
-            get() { return _range }
-            set(range) {
-                _range = range
+        var rightColor: Color = Color.BLACK
+            set(value) {
+                field = value
                 repaint()
             }
 
-        var leftToWin: Number
-            get() { return _leftToWin }
-            set(leftToWin) {
-                _leftToWin = leftToWin
+        var value: Number = 0
+            set(value) {
+                field = value
                 repaint()
             }
 
-        var rightToWin: Number
-            get() { return _rightToWin }
-            set(rightToWin) {
-                _rightToWin = rightToWin
+        var range: Number = 1
+            set(value) {
+                field = value
                 repaint()
             }
 
-        var ticks: List<Tick>
-            get() { return _ticks }
-            set(ticks) {
-                _ticks = ticks
+        var leftToWin: Number = POSITIVE_INFINITY
+            set(value) {
+                field = value
                 repaint()
             }
 
-        var outerLabels: List<OuterLabel>
-            get() { return _outerLabels }
-            set(outerLabels) {
-                _outerLabels = outerLabels
+        var rightToWin: Number = NEGATIVE_INFINITY
+            set(value) {
+                field = value
                 repaint()
             }
 
-        var numBucketsPerSide: Int
-            get() { return _numBucketsPerSide }
-            set(numBucketsPerSide) {
-                _numBucketsPerSide = numBucketsPerSide
+        var ticks: List<Tick> = emptyList()
+            set(value) {
+                field = value
                 repaint()
             }
 
-        var dots: List<Dot>
-            get() { return _dots }
-            set(dots) {
-                _dots = dots
+        var outerLabels: List<OuterLabel> = emptyList()
+            set(value) {
+                field = value
+                repaint()
+            }
+
+        var numBucketsPerSide: Int = 1
+            set(value) {
+                field = value
+                repaint()
+            }
+
+        var dots: List<Dot> = emptyList()
+            set(value) {
+                field = value
                 repaint()
             }
 
@@ -227,16 +206,16 @@ class SwingometerFrame(
             }
             val bucketSize = range.toDouble() / numBucketsPerSide
             val bucketedDots = dots
-                .filter { e: Dot -> abs(e.position.toDouble()) <= range.toDouble() }
-                .sortedBy { e: Dot -> abs(e.position.toDouble()) }
-                .groupBy { e: Dot ->
+                .filter { abs(it.position.toDouble()) <= range.toDouble() }
+                .sortedBy { abs(it.position.toDouble()) }
+                .groupBy {
                     (
-                        sign(e.position.toDouble())
+                        sign(it.position.toDouble())
                             .toInt() *
-                            ceil(abs(e.position.toDouble() / bucketSize)).toInt()
+                            ceil(abs(it.position.toDouble() / bucketSize)).toInt()
                         )
                 }
-            val maxBucketSize = bucketedDots.values.maxOfOrNull { obj: List<Dot> -> obj.size } ?: 0
+            val maxBucketSize = bucketedDots.values.maxOfOrNull { it.size } ?: 0
             val theta = Math.PI / 2 / numBucketsPerSide
             val dotSize = (
                 (
@@ -251,8 +230,8 @@ class SwingometerFrame(
                 for (dotNum in value.indices) {
                     val dot = value[dotNum]
                     g.setColor(dot.color)
-                    val drawer: (Int, Int, Int, Int) -> Unit = if (dot.solid) { x: Int, y: Int, width: Int, height: Int -> g.fillOval(x, y, width, height) }
-                    else { x: Int, y: Int, width: Int, height: Int -> g.drawOval(x, y, width, height) }
+                    val drawer: (Int, Int, Int, Int) -> Unit = if (dot.solid) { x, y, width, height -> g.fillOval(x, y, width, height) }
+                    else { x, y, width, height -> g.drawOval(x, y, width, height) }
                     drawer.invoke(
                         (width - dotSize) / 2 + 2,
                         inner / 2 - (dotNum + 1) * dotSize + 2,

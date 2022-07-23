@@ -55,7 +55,7 @@ class ListingFrameBuilder {
             return builder
         }
 
-        @JvmStatic fun <T> ofFixedList(
+        fun <T> ofFixedList(
             list: List<T>,
             leftTextFunc: (T) -> Flow.Publisher<out String>,
             rightTextFunc: (T) -> Flow.Publisher<out String>,

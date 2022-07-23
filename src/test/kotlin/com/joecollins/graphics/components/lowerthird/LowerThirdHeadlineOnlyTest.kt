@@ -7,13 +7,10 @@ import org.awaitility.Awaitility
 import org.hamcrest.core.IsEqual
 import org.junit.Test
 import java.awt.Color
-import java.io.IOException
-import java.lang.InterruptedException
 import java.time.Clock
 import java.time.Instant
 import java.time.ZoneId
 import java.util.concurrent.TimeUnit
-import kotlin.Throws
 
 class LowerThirdHeadlineOnlyTest {
     @Test
@@ -41,7 +38,6 @@ class LowerThirdHeadlineOnlyTest {
     }
 
     @Test
-    @Throws(IOException::class, InterruptedException::class)
     fun testRenderHeadlineSubhead() {
         val lowerThird = LowerThirdHeadlineOnly(
             leftImagePublisher = createImage("BREAKING NEWS", Color.WHITE, Color.RED).asOneTimePublisher(),
@@ -56,7 +52,6 @@ class LowerThirdHeadlineOnlyTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testRenderHeadlineOnly() {
         val lowerThird = LowerThirdHeadlineOnly(
             leftImagePublisher = createImage("BREAKING NEWS", Color.WHITE, Color.RED).asOneTimePublisher(),
@@ -70,7 +65,6 @@ class LowerThirdHeadlineOnlyTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testRenderHeadlineSubheadAccents() {
         val lowerThird = LowerThirdHeadlineOnly(
             leftImagePublisher =

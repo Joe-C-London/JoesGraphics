@@ -72,7 +72,7 @@ class HeatMapFrameBuilder {
     }
 
     companion object {
-        @JvmStatic fun <T> of(
+        fun <T> of(
             numRows: Flow.Publisher<out Int>,
             entries: List<T>,
             colorFunc: (T) -> Flow.Publisher<out Color>,
@@ -81,7 +81,7 @@ class HeatMapFrameBuilder {
             return of(numRows, entries, colorFunc, colorFunc, labelFunc)
         }
 
-        @JvmStatic fun <T> of(
+        fun <T> of(
             numRows: Flow.Publisher<out Int>,
             entries: List<T>,
             fillFunc: (T) -> Flow.Publisher<out Color>,
@@ -104,7 +104,7 @@ class HeatMapFrameBuilder {
             return builder
         }
 
-        @JvmStatic fun <T> ofClustered(
+        fun <T> ofClustered(
             numRows: Flow.Publisher<out Int>,
             entries: List<T>,
             seatFunc: (T) -> Int,
@@ -118,7 +118,7 @@ class HeatMapFrameBuilder {
             return of(numRows, allEntries, fillFunc, borderFunc, labelFunc)
         }
 
-        @JvmStatic fun <T> ofElectedLeading(
+        fun <T> ofElectedLeading(
             rows: Flow.Publisher<out Int>,
             entries: List<T>,
             resultFunc: (T) -> Flow.Publisher<out PartyResult?>,
@@ -137,13 +137,13 @@ class HeatMapFrameBuilder {
                 .associateWith { resultFunc(it) }
             val prev = entries.distinct().associateWith(prevResultFunc)
             val resultPublishers = entries
-                .map { e: T ->
-                    results[e]!!.map { Pair(it, seatsFunc(e)) }
+                .map { t ->
+                    results[t]!!.map { Pair(it, seatsFunc(t)) }
                 }
                 .toList()
             val resultWithPrevPublishers: List<Flow.Publisher<Triple<PartyResult?, Party, Int>>> = entries
-                .map { e: T ->
-                    results[e]!!.map { Triple(it, prev[e]!!, seatsFunc(e)) }
+                .map { t ->
+                    results[t]!!.map { Triple(it, prev[t]!!, seatsFunc(t)) }
                 }
                 .toList()
             val seats = createSeatBarPublisher(resultPublishers) { party == it }
@@ -174,17 +174,17 @@ class HeatMapFrameBuilder {
                 rows,
                 entries,
                 seatsFunc,
-                { e: T ->
-                    results[e]!!.merge(filterFunc) { t, filter ->
+                { t ->
+                    results[t]!!.merge(filterFunc) { result, filter ->
                         when {
-                            !filter(e) -> Color.WHITE
-                            t?.party == null -> Color.WHITE
-                            t.isElected -> t.party.color
-                            else -> ColorUtils.lighten(t.party.color)
+                            !filter(t) -> Color.WHITE
+                            result?.party == null -> Color.WHITE
+                            result.isElected -> result.party.color
+                            else -> ColorUtils.lighten(result.party.color)
                         }
                     }
                 },
-                { e: T -> filterFunc.map { filter -> if (filter(e)) prevResultFunc(e).color else Color.WHITE } },
+                { t -> filterFunc.map { filter -> if (filter(t)) prevResultFunc(t).color else Color.WHITE } },
                 labelFunc
             )
                 .withSeatBars(
@@ -211,7 +211,7 @@ class HeatMapFrameBuilder {
         ): Flow.Publisher<Pair<Int, Int>> {
             return results.mapReduce(
                 Pair(0, 0),
-                { p: Pair<Int, Int>, r: Pair<PartyResult?, Int> ->
+                { p, r ->
                     val left = r.first
                     if (left == null || !partyFilter(left.party)) {
                         p
@@ -219,7 +219,7 @@ class HeatMapFrameBuilder {
                         Pair(p.first + if (left.isElected) r.second else 0, p.second + r.second)
                     }
                 },
-                { p: Pair<Int, Int>, r: Pair<PartyResult?, Int> ->
+                { p, r ->
                     val left = r.first
                     if (left == null || !partyFilter(left.party)) {
                         p
@@ -236,7 +236,7 @@ class HeatMapFrameBuilder {
         ): Flow.Publisher<Pair<Int, Int>> {
             return resultWithPrev.mapReduce(
                 Pair(0, 0),
-                { p: Pair<Int, Int>, r: Triple<PartyResult?, Party, Int> ->
+                { p, r ->
                     val left = r.first
                     if (left?.party == null) {
                         p
@@ -257,7 +257,7 @@ class HeatMapFrameBuilder {
                         ret
                     }
                 },
-                { p: Pair<Int, Int>, r: Triple<PartyResult?, Party, Int> ->
+                { p, r ->
                     val left = r.first
                     if (left?.party == null) {
                         p

@@ -77,36 +77,27 @@ class SummaryFromBothEnds(
 
     class Entry(val color: Color, val label: String, val value: Int)
     private inner class EntryPanel : JPanel() {
-        private var _total = 0
-        private var _left: Entry? = null
-        private var _right: Entry? = null
-        private var _middle: Entry? = null
-
-        var total: Int
-            get() { return _total }
-            set(total) {
-                _total = total
+        var total: Int = 0
+            set(value) {
+                field = value
                 repaint()
             }
 
-        var left: Entry?
-            get() { return _left }
-            set(left) {
-                _left = left
+        var left: Entry? = null
+            set(value) {
+                field = value
                 repaint()
             }
 
-        var right: Entry?
-            get() { return _right }
-            set(right) {
-                _right = right
+        var right: Entry? = null
+            set(value) {
+                field = value
                 repaint()
             }
 
-        var middle: Entry?
-            get() { return _middle }
-            set(middle) {
-                _middle = middle
+        var middle: Entry? = null
+            set(value) {
+                field = value
                 repaint()
             }
 
@@ -118,9 +109,9 @@ class SummaryFromBothEnds(
                 )
             val labelFont = StandardFont.readNormalFont(12)
             val valueFont = StandardFont.readBoldFont(20)
-            val leftWidth = (1.0 * width * (if (_left == null) 0 else _left!!.value) / _total).roundToInt()
-            val rightWidth = (1.0 * width * (if (_right == null) 0 else _right!!.value) / _total).roundToInt()
-            val midWidth = (1.0 * width * (if (_middle == null) 0 else _middle!!.value) / _total).roundToInt()
+            val leftWidth = (1.0 * width * (if (left == null) 0 else left!!.value) / total).roundToInt()
+            val rightWidth = (1.0 * width * (if (right == null) 0 else right!!.value) / total).roundToInt()
+            val midWidth = (1.0 * width * (if (middle == null) 0 else middle!!.value) / total).roundToInt()
             var midCentre = width / 2
             if (midCentre - midWidth / 2 < leftWidth) {
                 midCentre = leftWidth + midWidth / 2
@@ -128,20 +119,20 @@ class SummaryFromBothEnds(
             if (midCentre + midWidth / 2 > width - rightWidth) {
                 midCentre = width - rightWidth - midWidth / 2
             }
-            if (_left != null) {
-                g.setColor(_left!!.color)
+            if (left != null) {
+                g.setColor(left!!.color)
                 g.fillRect(0, 0, leftWidth, height)
             }
-            if (_right != null) {
-                g.setColor(_right!!.color)
+            if (right != null) {
+                g.setColor(right!!.color)
                 g.fillRect(width - rightWidth, 0, rightWidth, height)
             }
-            if (_middle != null) {
-                g.setColor(_middle!!.color)
+            if (middle != null) {
+                g.setColor(middle!!.color)
                 g.fillRect(midCentre - midWidth / 2, 0, midWidth, height)
             }
-            if (_left != null) {
-                g.setColor(_left!!.color)
+            if (left != null) {
+                g.setColor(left!!.color)
                 drawLeftLabels(g, labelFont, valueFont)
                 val oldClip = g.getClip()
                 g.setClip(0, 0, leftWidth, height)
@@ -149,8 +140,8 @@ class SummaryFromBothEnds(
                 drawLeftLabels(g, labelFont, valueFont)
                 g.setClip(oldClip)
             }
-            if (_right != null) {
-                g.setColor(_right!!.color)
+            if (right != null) {
+                g.setColor(right!!.color)
                 drawRightLabels(g, labelFont, valueFont)
                 val oldClip = g.getClip()
                 g.setClip(width - rightWidth, 0, rightWidth, height)
@@ -158,8 +149,8 @@ class SummaryFromBothEnds(
                 drawRightLabels(g, labelFont, valueFont)
                 g.setClip(oldClip)
             }
-            if (_middle != null) {
-                g.setColor(_middle!!.color)
+            if (middle != null) {
+                g.setColor(middle!!.color)
                 drawMidLabels(g, labelFont, valueFont, midCentre)
                 val oldClip = g.getClip()
                 g.setClip(midCentre - midWidth / 2, 0, midWidth, height)
@@ -173,25 +164,25 @@ class SummaryFromBothEnds(
 
         private fun drawMidLabels(g: Graphics, labelFont: Font, valueFont: Font, midCentre: Int) {
             g.font = labelFont
-            g.drawString(_middle!!.label, midCentre - g.fontMetrics.stringWidth(_middle!!.label) / 2, 10)
+            g.drawString(middle!!.label, midCentre - g.fontMetrics.stringWidth(middle!!.label) / 2, 10)
             g.font = valueFont
-            val rightValue = _middle!!.value.toString()
+            val rightValue = middle!!.value.toString()
             g.drawString(rightValue, midCentre - g.fontMetrics.stringWidth(rightValue) / 2, 28)
         }
 
         private fun drawRightLabels(g: Graphics, labelFont: Font, valueFont: Font) {
             g.font = labelFont
-            g.drawString(_right!!.label, width - g.fontMetrics.stringWidth(_right!!.label), 10)
+            g.drawString(right!!.label, width - g.fontMetrics.stringWidth(right!!.label), 10)
             g.font = valueFont
-            val rightValue = _right!!.value.toString()
+            val rightValue = right!!.value.toString()
             g.drawString(rightValue, width - g.fontMetrics.stringWidth(rightValue), 28)
         }
 
         private fun drawLeftLabels(g: Graphics, labelFont: Font, valueFont: Font) {
             g.font = labelFont
-            g.drawString(_left!!.label, 0, 10)
+            g.drawString(left!!.label, 0, 10)
             g.font = valueFont
-            g.drawString(_left!!.value.toString(), 0, 28)
+            g.drawString(left!!.value.toString(), 0, 28)
         }
 
         init {

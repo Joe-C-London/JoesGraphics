@@ -13,7 +13,6 @@ import java.awt.GridBagConstraints
 import java.awt.GridBagLayout
 import java.awt.GridLayout
 import java.awt.LayoutManager
-import java.util.ArrayList
 import java.util.concurrent.Flow
 import javax.swing.JLabel
 import javax.swing.JPanel

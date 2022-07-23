@@ -7,9 +7,7 @@ import org.hamcrest.core.IsEqual
 import org.junit.Assert
 import org.junit.Test
 import java.awt.Color
-import java.io.IOException
 import java.util.concurrent.TimeUnit
-import kotlin.Throws
 
 class SwingFrameTest {
     @Test
@@ -75,7 +73,6 @@ class SwingFrameTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testRenderNoSwing() {
         val frame = SwingFrame(
             headerPublisher = "SWING SINCE 2015".asOneTimePublisher(),
@@ -91,7 +88,6 @@ class SwingFrameTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testRenderSwingRight() {
         val frame = SwingFrame(
             headerPublisher = "SWING SINCE 2015".asOneTimePublisher(),
@@ -107,7 +103,6 @@ class SwingFrameTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testRenderSwingLeft() {
         val frame = SwingFrame(
             headerPublisher = "SWING SINCE 2015".asOneTimePublisher(),
@@ -123,7 +118,6 @@ class SwingFrameTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testRenderMaxSwingRight() {
         val frame = SwingFrame(
             headerPublisher = "SWING SINCE 2015".asOneTimePublisher(),
@@ -139,7 +133,6 @@ class SwingFrameTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testRenderMaxSwingLeft() {
         val frame = SwingFrame(
             headerPublisher = "SWING SINCE 2015".asOneTimePublisher(),
@@ -155,7 +148,6 @@ class SwingFrameTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testRenderAccents() {
         val frame = SwingFrame(
             headerPublisher = "CHANGES APR\u00c8S 2014".asOneTimePublisher(),

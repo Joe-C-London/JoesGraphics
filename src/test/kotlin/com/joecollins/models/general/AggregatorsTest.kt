@@ -18,7 +18,6 @@ import org.awaitility.Awaitility
 import org.hamcrest.core.IsEqual
 import org.hamcrest.number.IsCloseTo
 import org.junit.Test
-import java.util.ArrayList
 import java.util.concurrent.TimeUnit
 
 class AggregatorsTest {
@@ -50,9 +49,10 @@ class AggregatorsTest {
 
     @Test
     fun testCombine() {
-        val inputs: MutableList<Publisher<Map<String, Int>>> = ArrayList()
-        inputs.add(Publisher(mapOf("ABC" to 8, "DEF" to 6)))
-        inputs.add(Publisher(mapOf("ABC" to 7, "GHI" to 3)))
+        val inputs = listOf(
+            Publisher(mapOf("ABC" to 8, "DEF" to 6)),
+            Publisher(mapOf("ABC" to 7, "GHI" to 3)),
+        )
         val output: BoundResult<Map<String, Int>> = BoundResult()
         combine(inputs) { it }.subscribe(Subscriber { output.value = it })
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
@@ -74,9 +74,10 @@ class AggregatorsTest {
     @Test
     fun testCombineWithSeed() {
         val seed = mapOf("ABC" to 0, "DEF" to 0)
-        val inputs: MutableList<Publisher<Map<String, Int>>> = ArrayList()
-        inputs.add(Publisher(mapOf("ABC" to 8, "DEF" to 6)))
-        inputs.add(Publisher(mapOf("ABC" to 7, "GHI" to 3)))
+        val inputs = listOf(
+            Publisher(mapOf("ABC" to 8, "DEF" to 6)),
+            Publisher(mapOf("ABC" to 7, "GHI" to 3)),
+        )
         val output: BoundResult<Map<String, Int>> = BoundResult()
         combine(inputs, { it }, seed).subscribe(Subscriber { output.value = it })
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
@@ -97,13 +98,10 @@ class AggregatorsTest {
 
     @Test
     fun testCombineDual() {
-        val inputs: MutableList<Publisher<Map<String, Pair<Int, Int>>>> = ArrayList()
-        inputs.add(
+        val inputs = listOf(
             Publisher(
                 mapOf("ABC" to Pair(4, 8), "DEF" to Pair(1, 6))
-            )
-        )
-        inputs.add(
+            ),
             Publisher(
                 mapOf("ABC" to Pair(2, 7), "GHI" to Pair(0, 3))
             )
@@ -153,13 +151,10 @@ class AggregatorsTest {
     @Test
     fun testCombineDualWithSeeding() {
         val seed: Map<String, Pair<Int, Int>> = mapOf("ABC" to Pair(0, 0), "DEF" to Pair(0, 0))
-        val inputs: MutableList<Publisher<Map<String, Pair<Int, Int>>>> = ArrayList()
-        inputs.add(
+        val inputs = listOf(
             Publisher(
                 mapOf("ABC" to Pair(4, 8), "DEF" to Pair(1, 6))
-            )
-        )
-        inputs.add(
+            ),
             Publisher(
                 mapOf("ABC" to Pair(2, 7), "GHI" to Pair(0, 3))
             )
@@ -208,12 +203,14 @@ class AggregatorsTest {
 
     @Test
     fun testNestedCombinedStillPropagates() {
-        val inputs1: MutableList<Publisher<Map<String, Int>>> = ArrayList()
-        inputs1.add(Publisher(mapOf("ABC" to 8, "DEF" to 6)))
-        inputs1.add(Publisher(mapOf("ABC" to 7, "GHI" to 3)))
-        val inputs2: MutableList<Publisher<Map<String, Int>>> = ArrayList()
-        inputs2.add(Publisher(mapOf("ABC" to 8, "DEF" to 6)))
-        inputs2.add(Publisher(mapOf("ABC" to 7, "GHI" to 3)))
+        val inputs1 = listOf(
+            Publisher(mapOf("ABC" to 8, "DEF" to 6)),
+            Publisher(mapOf("ABC" to 7, "GHI" to 3)),
+        )
+        val inputs2 = listOf(
+            Publisher(mapOf("ABC" to 8, "DEF" to 6)),
+            Publisher(mapOf("ABC" to 7, "GHI" to 3)),
+        )
         val output: BoundResult<Map<String, Int>> = BoundResult()
         val combined = sequenceOf(inputs1, inputs2)
             .map { inputs -> combine(inputs) { it } }
@@ -228,24 +225,18 @@ class AggregatorsTest {
 
     @Test
     fun testNestedCombinedDualStillPropagates() {
-        val inputs1: MutableList<Publisher<Map<String, Pair<Int, Int>>>> = ArrayList()
-        inputs1.add(
+        val inputs1 = listOf(
             Publisher(
                 mapOf("ABC" to Pair(4, 8), "DEF" to Pair(1, 6))
-            )
-        )
-        inputs1.add(
+            ),
             Publisher(
                 mapOf("ABC" to Pair(2, 7), "GHI" to Pair(0, 3))
             )
         )
-        val inputs2: MutableList<Publisher<Map<String, Pair<Int, Int>>>> = ArrayList()
-        inputs2.add(
+        val inputs2 = listOf(
             Publisher(
                 mapOf("ABC" to Pair(4, 8), "DEF" to Pair(1, 6))
-            )
-        )
-        inputs2.add(
+            ),
             Publisher(
                 mapOf("ABC" to Pair(2, 7), "GHI" to Pair(0, 3))
             )
@@ -305,9 +296,10 @@ class AggregatorsTest {
 
     @Test
     fun testCombinePctReporting() {
-        val inputs: MutableList<Publisher<Double>> = ArrayList()
-        inputs.add(Publisher(0.5))
-        inputs.add(Publisher(0.3))
+        val inputs = listOf(
+            Publisher(0.5),
+            Publisher(0.3),
+        )
         val output = BoundResult<Double>()
         combinePctReporting(inputs) { it }
             .subscribe(Subscriber { output.value = it })
@@ -323,9 +315,10 @@ class AggregatorsTest {
 
     @Test
     fun testCombinePctReportingWithWeights() {
-        val inputs: MutableList<Pair<Publisher<Double>, Double>> = ArrayList()
-        inputs.add(Pair(Publisher(0.5), 2.0))
-        inputs.add(Pair(Publisher(0.3), 3.0))
+        val inputs = listOf(
+            Pair(Publisher(0.5), 2.0),
+            Pair(Publisher(0.3), 3.0),
+        )
         val output = BoundResult<Double>()
         combinePctReporting(inputs, { it.first }, { it.second })
             .subscribe(Subscriber { output.value = it })
@@ -496,7 +489,7 @@ class AggregatorsTest {
 
     @Test
     fun testIdentityPublished() {
-        val inputs: MutableList<Publisher<Map<String, Int>>> = ArrayList()
+        val inputs = emptyList<Publisher<Map<String, Int>>>()
         val output: BoundResult<Map<String, Int>> = BoundResult()
         combine(inputs) { it }.subscribe(Subscriber { output.value = it })
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)

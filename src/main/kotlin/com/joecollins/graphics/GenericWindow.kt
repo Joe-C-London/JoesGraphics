@@ -2,7 +2,6 @@ package com.joecollins.graphics
 
 import com.joecollins.graphics.components.GraphicsFrame
 import twitter4j.StatusUpdate
-import twitter4j.TwitterException
 import twitter4j.TwitterFactory
 import twitter4j.conf.ConfigurationBuilder
 import java.awt.BorderLayout
@@ -24,8 +23,6 @@ import java.awt.event.KeyEvent
 import java.awt.image.BufferedImage
 import java.io.File
 import java.io.IOException
-import java.lang.Exception
-import java.lang.IllegalStateException
 import java.util.Properties
 import javax.imageio.ImageIO
 import javax.swing.JButton
@@ -41,7 +38,6 @@ import javax.swing.JPanel
 import javax.swing.JTextArea
 import javax.swing.border.EmptyBorder
 import javax.swing.filechooser.FileFilter
-import kotlin.Throws
 import kotlin.jvm.JvmOverloads
 import kotlin.math.max
 
@@ -53,7 +49,6 @@ class GenericWindow<T : JPanel> @JvmOverloads constructor(private val panel: T, 
     }
 
     class TweetFrame(panel: JPanel) : JDialog() {
-        @Throws(IOException::class, TwitterException::class)
         private fun sendTweet(tweet: String, image: File) {
             val status = StatusUpdate(tweet)
             status.media(image)
@@ -170,7 +165,6 @@ class GenericWindow<T : JPanel> @JvmOverloads constructor(private val panel: T, 
                     return DataFlavor.imageFlavor.equals(flavor)
                 }
 
-                @Throws(UnsupportedFlavorException::class)
                 override fun getTransferData(flavor: DataFlavor): Any {
                     return if (DataFlavor.imageFlavor.equals(flavor)) {
                         img
@@ -236,7 +230,7 @@ class GenericWindow<T : JPanel> @JvmOverloads constructor(private val panel: T, 
             when (name) {
                 "main" -> main = comp
                 "control-panel" -> controlPanel = comp
-                else -> throw java.lang.IllegalArgumentException("Invalid name $name")
+                else -> throw IllegalArgumentException("Invalid name $name")
             }
         }
 

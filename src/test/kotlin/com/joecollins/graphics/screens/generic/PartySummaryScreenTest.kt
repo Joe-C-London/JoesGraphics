@@ -8,8 +8,6 @@ import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
 import org.junit.Test
 import java.awt.Color
-import java.io.IOException
-import kotlin.Throws
 
 class PartySummaryScreenTest {
     private var lib = Party("Liberal", "LIB", Color.RED)
@@ -19,7 +17,6 @@ class PartySummaryScreenTest {
     private var grn = Party("Green", "GRN", Color.GREEN.darker())
     private var oth = Party.OTHERS
     @Test
-    @Throws(IOException::class)
     fun testBasicPartySummaryWithDiff() {
         val canada = Region("Canada")
         val bc = Region("British Columbia")
@@ -99,7 +96,6 @@ class PartySummaryScreenTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testBasicPartySummaryWithPrev() {
         val canada = Region("Canada")
         val bc = Region("British Columbia")
@@ -179,7 +175,6 @@ class PartySummaryScreenTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testBasicPartySummarySeatsOnly() {
         val canada = Region("Canada")
         val bc = Region("British Columbia")
@@ -260,7 +255,6 @@ class PartySummaryScreenTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testBasicPartySummaryVotesOnly() {
         val canada = Region("Canada")
         val bc = Region("British Columbia")
@@ -341,46 +335,37 @@ class PartySummaryScreenTest {
     }
 
     private class Region constructor(val name: String) {
-        private var _seats: Map<Party, Int> = emptyMap()
-        private var _seatDiff: Map<Party, Int> = emptyMap()
-        private var _votePct: Map<Party, Double> = emptyMap()
-        private var _votePctDiff: Map<Party, Double> = emptyMap()
-
-        var seats: Map<Party, Int>
-            get() = _seats
-            set(seats) {
-                this._seats = seats
+        var seats: Map<Party, Int> = emptyMap()
+            set(value) {
+                field = value
                 seatsPublisher.submit(seats)
                 prevSeatPublisher.submit(prevSeats)
             }
-        val seatsPublisher = Publisher(_seats)
+        val seatsPublisher = Publisher(seats)
 
-        var seatDiff: Map<Party, Int>
-            get() = _seatDiff
-            set(seatDiff) {
-                this._seatDiff = seatDiff
+        var seatDiff: Map<Party, Int> = emptyMap()
+            set(value) {
+                field = value
                 seatDiffPublisher.submit(seatDiff)
                 prevSeatPublisher.submit(prevSeats)
             }
-        val seatDiffPublisher = Publisher(_seatDiff)
+        val seatDiffPublisher = Publisher(seatDiff)
 
-        var votePct: Map<Party, Double>
-            get() = _votePct
-            set(votePct) {
-                this._votePct = votePct
+        var votePct: Map<Party, Double> = emptyMap()
+            set(value) {
+                field = value
                 votePublisher.submit(votePct)
                 prevVotePublisher.submit(prevVotePct)
             }
-        val votePublisher = Publisher(_votePct)
+        val votePublisher = Publisher(votePct)
 
-        var votePctDiff: Map<Party, Double>
-            get() = _votePctDiff
-            set(votePctDiff) {
-                this._votePctDiff = votePctDiff
+        var votePctDiff: Map<Party, Double> = emptyMap()
+            set(value) {
+                field = value
                 voteDiffPublisher.submit(votePctDiff)
                 prevVotePublisher.submit(prevVotePct)
             }
-        val voteDiffPublisher = Publisher(_votePctDiff)
+        val voteDiffPublisher = Publisher(votePctDiff)
 
         val prevSeats: Map<Party, Int>
             get() = sequenceOf(seats.keys, seatDiff.keys)

@@ -9,21 +9,16 @@ import java.awt.Container
 import java.awt.EventQueue
 import java.awt.image.BufferedImage
 import java.io.File
-import java.io.IOException
-import java.lang.AssertionError
-import java.lang.InterruptedException
 import java.lang.reflect.InvocationTargetException
 import java.util.LinkedList
 import java.util.Queue
 import java.util.concurrent.TimeUnit
 import javax.imageio.ImageIO
 import javax.swing.JPanel
-import kotlin.Throws
 
 object RenderTestUtils {
 
-    @Throws(IOException::class)
-    @JvmStatic fun compareRendering(testClass: String, testMethod: String, panel: JPanel, timeoutSeconds: Long = 1) {
+    fun compareRendering(testClass: String, testMethod: String, panel: JPanel, timeoutSeconds: Long = 1) {
         val expectedFile = File(
             "src\\test\\resources\\com\\joecollins\\graphics\\$testClass\\$testMethod.png"
         )

@@ -14,14 +14,10 @@ import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.map
 import org.junit.Test
 import java.awt.Color
-import java.io.IOException
-import java.util.HashMap
-import kotlin.Throws
 
 @Suppress("UNCHECKED_CAST")
 class TooCloseToCallScreenTest {
     @Test
-    @Throws(IOException::class)
     fun testBasic() {
         val candidateVotesRaw: MutableMap<Int, Map<Candidate, Int>> = HashMap()
         val partyResultsRaw: MutableMap<Int, PartyResult> = HashMap()
@@ -55,7 +51,6 @@ class TooCloseToCallScreenTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testPctReporting() {
         val candidateVotesRaw: MutableMap<Int, Map<Candidate, Int>> = HashMap()
         val partyResultsRaw: MutableMap<Int, PartyResult> = HashMap()
@@ -92,7 +87,6 @@ class TooCloseToCallScreenTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testLimitRows() {
         val candidateVotesRaw: MutableMap<Int, Map<Candidate, Int>> = HashMap()
         val partyResultsRaw: MutableMap<Int, PartyResult> = HashMap()
@@ -130,7 +124,6 @@ class TooCloseToCallScreenTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testNumberOfCandidates() {
         val candidateVotesRaw: MutableMap<Int, Map<Candidate, Int>> = HashMap()
         val partyResultsRaw: MutableMap<Int, PartyResult> = HashMap()
@@ -168,7 +161,6 @@ class TooCloseToCallScreenTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testParty() {
         val candidateVotesRaw: MutableMap<Int, Map<Candidate, Int>> = HashMap()
         val partyResultsRaw: MutableMap<Int, PartyResult> = HashMap()
@@ -202,7 +194,6 @@ class TooCloseToCallScreenTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testNullResults() {
         val candidateVotesRaw: MutableMap<Int, Map<Candidate, Int>> = (1..27).associateWith { emptyMap<Candidate, Int>() }.toMutableMap()
         val partyResultsRaw: MutableMap<Int, PartyResult?> = (1..27).associateWith { null }.toMutableMap()

@@ -177,25 +177,20 @@ class MixedMemberResultPanel private constructor(
         }
 
         private class Result {
-            private var _votes: Map<Candidate, Int?> = HashMap()
-            private var _winner: Candidate? = null
-
-            var votes: Map<Candidate, Int?>
-                get() = _votes
-                set(votes) {
-                    _votes = votes
-                    votesPublisher.submit(votes)
+            var votes: Map<Candidate, Int?> = emptyMap()
+                set(value) {
+                    field = value
+                    votesPublisher.submit(value)
                 }
 
-            var winner: Candidate?
-                get() = _winner
-                set(winner) {
-                    _winner = winner
-                    winnerPublisher.submit(winner)
+            var winner: Candidate? = null
+                set(value) {
+                    field = value
+                    winnerPublisher.submit(value)
                 }
 
-            var votesPublisher = Publisher(_votes)
-            var winnerPublisher = Publisher(_winner)
+            var votesPublisher = Publisher(votes)
+            var winnerPublisher = Publisher(winner)
         }
 
         private fun createCandidateVotes(): BarFrame {
@@ -208,36 +203,36 @@ class MixedMemberResultPanel private constructor(
                 val total = votes.values.filterNotNull().sum()
                 val partialDeclaration = votes.values.any { it == null }
                 votes.entries
-                    .sortedByDescending { e: Map.Entry<Candidate, Int?> ->
-                        val value = e.value
-                        if (e.key === Candidate.OTHERS || value == null) Int.MIN_VALUE else value
+                    .sortedByDescending {
+                        val value = it.value
+                        if (it.key === Candidate.OTHERS || value == null) Int.MIN_VALUE else value
                     }
-                    .map { e: Map.Entry<Candidate, Int?> ->
-                        val candidate = e.key
-                        val votes = e.value ?: 0
-                        val pct = e.value?.toDouble()?.div(total) ?: Double.NaN
+                    .map {
+                        val candidate = it.key
+                        val numVotes = it.value ?: 0
+                        val pct = it.value?.toDouble()?.div(total) ?: Double.NaN
                         val leftLabel: String
                         var rightLabel: String
                         if (candidate.name.isBlank()) {
                             leftLabel = candidate.party.name.uppercase()
-                            rightLabel = ("${THOUSANDS_FORMAT.format(votes.toLong())} (${PCT_FORMAT.format(pct)})")
+                            rightLabel = ("${THOUSANDS_FORMAT.format(numVotes.toLong())} (${PCT_FORMAT.format(pct)})")
                         } else if (showBothLines) {
                             leftLabel =
                                 ("${candidate.name.uppercase()}${if (candidate.isIncumbent()) incumbentMarker else ""}\n${candidate.party.name.uppercase()}")
-                            rightLabel = "${THOUSANDS_FORMAT.format(votes.toLong())}\n${PCT_FORMAT.format(pct)}"
+                            rightLabel = "${THOUSANDS_FORMAT.format(numVotes.toLong())}\n${PCT_FORMAT.format(pct)}"
                         } else {
                             leftLabel =
                                 ("${candidate.name.uppercase()}${if (candidate.isIncumbent()) incumbentMarker else ""} (${candidate.party.abbreviation.uppercase()})")
-                            rightLabel = ("${THOUSANDS_FORMAT.format(votes.toLong())} (${PCT_FORMAT.format(pct)})")
+                            rightLabel = ("${THOUSANDS_FORMAT.format(numVotes.toLong())} (${PCT_FORMAT.format(pct)})")
                         }
                         if (partialDeclaration) {
-                            rightLabel = THOUSANDS_FORMAT.format(votes.toLong())
+                            rightLabel = THOUSANDS_FORMAT.format(numVotes.toLong())
                         }
                         BasicBar(
                             if (candidate === Candidate.OTHERS) "OTHERS" else leftLabel,
                             candidate.party.color,
-                            if (java.lang.Double.isNaN(pct)) 0 else pct,
-                            (if (java.lang.Double.isNaN(pct)) "WAITING..." else rightLabel),
+                            if (pct.isNaN()) 0 else pct,
+                            (if (pct.isNaN()) "WAITING..." else rightLabel),
                             if (candidate == winner) (if (candidate.name.isBlank()) ImageGenerator.createTickShape() else shape) else null
                         )
                     }
@@ -247,32 +242,27 @@ class MixedMemberResultPanel private constructor(
                 .withHeader(candidateVoteHeader)
                 .withSubhead(candidateVoteSubheader)
                 .withMax(
-                    candidatePctReporting?.map { x: Double -> 2.0 / 3 / x.coerceAtLeast(1e-6) }
+                    candidatePctReporting?.map { 2.0 / 3 / it.coerceAtLeast(1e-6) }
                         ?: (2.0 / 3).asOneTimePublisher()
                 )
                 .build()
         }
 
         private class Change<C> {
-            private var _curr: Map<C, Int?> = HashMap()
-            private var _prev: Map<Party, Int> = HashMap()
-
-            var curr: Map<C, Int?>
-                get() = _curr
-                set(curr) {
-                    _curr = curr
-                    currPublisher.submit(curr)
+            var curr: Map<C, Int?> = emptyMap()
+                set(value) {
+                    field = value
+                    currPublisher.submit(value)
                 }
 
-            var prev: Map<Party, Int>
-                get() = _prev
-                set(prev) {
-                    _prev = prev
-                    prevPublisher.submit(prev)
+            var prev: Map<Party, Int> = emptyMap()
+                set(value) {
+                    field = value
+                    prevPublisher.submit(value)
                 }
 
-            val currPublisher = Publisher(_curr)
-            val prevPublisher = Publisher(_prev)
+            val currPublisher = Publisher(curr)
+            val prevPublisher = Publisher(prev)
         }
 
         private fun createCandidateChange(): BarFrame? {
@@ -296,16 +286,16 @@ class MixedMemberResultPanel private constructor(
                 val matchingBars = curr.entries.asSequence()
                     .filter { it.key.party !== Party.OTHERS }
                     .sortedByDescending { it.value }
-                    .map { e: Map.Entry<Candidate, Int> ->
+                    .map {
                         val pct = (
-                            1.0 * e.value / currTotal -
+                            1.0 * it.value / currTotal -
                                 1.0 *
-                                (prev[e.key.party] ?: 0) /
+                                (prev[it.key.party] ?: 0) /
                                 prevTotal
                             )
                         BasicBar(
-                            e.key.party.abbreviation.uppercase(),
-                            e.key.party.color,
+                            it.key.party.abbreviation.uppercase(),
+                            it.key.party.color,
                             pct,
                             PCT_DIFF_FORMAT.format(pct)
                         )
@@ -331,25 +321,25 @@ class MixedMemberResultPanel private constructor(
             }
             return BarFrameBuilder.basic(bars)
                 .withHeader(candidateChangeHeader)
-                .withWingspan(candidatePctReporting?.map { x: Double -> 0.05 / x.coerceAtLeast(1e-6) } ?: 0.05.asOneTimePublisher())
+                .withWingspan(candidatePctReporting?.map { 0.05 / it.coerceAtLeast(1e-6) } ?: 0.05.asOneTimePublisher())
                 .build()
         }
 
         private fun createPartyVotes(): BarFrame {
             return BarFrameBuilder.basic(
-                partyVotes.map { v: Map<Party, Int?> ->
-                    val total = v.values.filterNotNull().sum()
-                    val partialDeclaration = v.values.any { it == null }
-                    v.entries
-                        .sortedByDescending { e: Map.Entry<Party, Int?> -> if (e.key === Party.OTHERS) Int.MIN_VALUE else (e.value ?: -1) }
-                        .map { e: Map.Entry<Party, Int?> ->
-                            val value = e.value
+                partyVotes.map { votes ->
+                    val total = votes.values.filterNotNull().sum()
+                    val partialDeclaration = votes.values.any { it == null }
+                    votes.entries
+                        .sortedByDescending { if (it.key === Party.OTHERS) Int.MIN_VALUE else (it.value ?: -1) }
+                        .map {
+                            val value = it.value
                             val pct = if (value == null) Double.NaN else 1.0 * value / total
                             BasicBar(
-                                e.key.name.uppercase(),
-                                e.key.color,
-                                if (java.lang.Double.isNaN(pct)) 0 else pct,
-                                if (java.lang.Double.isNaN(pct)) "WAITING..." else THOUSANDS_FORMAT.format(e.value) +
+                                it.key.name.uppercase(),
+                                it.key.color,
+                                if (pct.isNaN()) 0 else pct,
+                                if (pct.isNaN()) "WAITING..." else THOUSANDS_FORMAT.format(it.value) +
                                     if (partialDeclaration) "" else " (" + PCT_FORMAT.format(pct) + ")"
                             )
                         }
@@ -357,7 +347,7 @@ class MixedMemberResultPanel private constructor(
                 }
             )
                 .withHeader(partyVoteHeader)
-                .withMax(partyPctReporting?.map { x: Double -> 2.0 / 3 / x.coerceAtLeast(1e-6) } ?: (2.0 / 3).asOneTimePublisher())
+                .withMax(partyPctReporting?.map { 2.0 / 3 / it.coerceAtLeast(1e-6) } ?: (2.0 / 3).asOneTimePublisher())
                 .build()
         }
 
@@ -381,14 +371,14 @@ class MixedMemberResultPanel private constructor(
                 val presentBars = curr.entries.asSequence()
                     .filter { it.key !== Party.OTHERS }
                     .sortedByDescending { it.value }
-                    .map { e: Map.Entry<Party, Int> ->
+                    .map {
                         val pct = (
-                            1.0 * e.value / currTotal -
-                                1.0 * (prev[e.key] ?: 0) / prevTotal
+                            1.0 * it.value / currTotal -
+                                1.0 * (prev[it.key] ?: 0) / prevTotal
                             )
                         BasicBar(
-                            e.key.abbreviation.uppercase(),
-                            e.key.color,
+                            it.key.abbreviation.uppercase(),
+                            it.key.color,
                             pct,
                             PCT_DIFF_FORMAT.format(pct)
                         )
@@ -412,7 +402,7 @@ class MixedMemberResultPanel private constructor(
             }
             return BarFrameBuilder.basic(bars)
                 .withHeader(partyChangeHeader)
-                .withWingspan(partyPctReporting?.map { x: Double -> 0.05 / x.coerceAtLeast(1e-6) } ?: 0.05.asOneTimePublisher())
+                .withWingspan(partyPctReporting?.map { 0.05 / it.coerceAtLeast(1e-6) } ?: 0.05.asOneTimePublisher())
                 .build()
         }
 
@@ -426,7 +416,7 @@ class MixedMemberResultPanel private constructor(
         private val PCT_DIFF_FORMAT = DecimalFormat("+0.0%;-0.0%")
         private val THOUSANDS_FORMAT = DecimalFormat("#,##0")
 
-        @JvmStatic fun builder(): Builder {
+        fun builder(): Builder {
             return Builder()
         }
 

@@ -19,16 +19,10 @@ import org.junit.Test
 import java.awt.Color
 import java.awt.Dimension
 import java.awt.Shape
-import java.io.IOException
-import java.util.ArrayList
-import java.util.HashMap
 import java.util.IdentityHashMap
-import java.util.LinkedHashMap
-import kotlin.Throws
 
 class SeatViewPanelTest {
     @Test
-    @Throws(IOException::class)
     fun testBasicCurrPrev() {
         val currentSeats = Publisher(LinkedHashMap<Party, Int>())
         val previousSeats = Publisher(LinkedHashMap<Party, Int>())
@@ -113,7 +107,6 @@ class SeatViewPanelTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testBasicCurrDiff() {
         val currentSeats = Publisher(LinkedHashMap<Party, Int>())
         val seatDiff = Publisher(LinkedHashMap<Party, Int>())
@@ -197,7 +190,6 @@ class SeatViewPanelTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testSwing() {
         val currentSeats = Publisher(LinkedHashMap<Party, Int>())
         val previousSeats = Publisher(LinkedHashMap<Party, Int>())
@@ -254,7 +246,6 @@ class SeatViewPanelTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testMap() {
         val currentSeats = Publisher(LinkedHashMap<Party, Int>())
         val previousSeats = Publisher(LinkedHashMap<Party, Int>())
@@ -362,7 +353,6 @@ class SeatViewPanelTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testDualCurrPrev() {
         val currentSeats = Publisher(LinkedHashMap<Party, Pair<Int, Int>>())
         val previousSeats = Publisher(LinkedHashMap<Party, Pair<Int, Int>>())
@@ -456,7 +446,6 @@ class SeatViewPanelTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testDualReversedCurrPrev() {
         val currentSeats = Publisher(LinkedHashMap<Party, Pair<Int, Int>>())
         val previousSeats = Publisher(LinkedHashMap<Party, Pair<Int, Int>>())
@@ -550,7 +539,6 @@ class SeatViewPanelTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testDualCurrDiff() {
         val currentSeats = Publisher(LinkedHashMap<Party, Pair<Int, Int>>())
         val seatDiff = Publisher(LinkedHashMap<Party, Pair<Int, Int>>())
@@ -651,7 +639,6 @@ class SeatViewPanelTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testRangeCurrPrev() {
         val currentSeats = Publisher(LinkedHashMap<Party, IntRange>())
         val previousSeats = Publisher(LinkedHashMap<Party, Int>())
@@ -723,7 +710,6 @@ class SeatViewPanelTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testRangeCurrDiff() {
         val currentSeats = Publisher(LinkedHashMap<Party, IntRange>())
         val seatDiff = Publisher(LinkedHashMap<Party, IntRange>())
@@ -799,7 +785,6 @@ class SeatViewPanelTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testCandidates() {
         val currentSeats = Publisher(LinkedHashMap<Candidate, Int>())
         val previousSeats = Publisher(LinkedHashMap<Party, Int>())
@@ -836,7 +821,6 @@ class SeatViewPanelTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testCandidatesDual() {
         val currentSeats = Publisher(LinkedHashMap<Candidate, Pair<Int, Int>>())
         val previousSeats = Publisher(LinkedHashMap<Party, Pair<Int, Int>>())
@@ -871,7 +855,6 @@ class SeatViewPanelTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testCandidatesRange() {
         val currentSeats = Publisher(LinkedHashMap<Candidate, IntRange>())
         val previousSeats = Publisher(LinkedHashMap<Party, Int>())
@@ -903,7 +886,6 @@ class SeatViewPanelTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testPartySeatsTicked() {
         val currentSeats = Publisher(LinkedHashMap<Party, Int>())
         val previousSeats = Publisher(LinkedHashMap<Party, Int>())
@@ -938,7 +920,6 @@ class SeatViewPanelTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testPartySeatsTickedDual() {
         val currentSeats = Publisher(LinkedHashMap<Party, Pair<Int, Int>>())
         val previousSeats = Publisher(LinkedHashMap<Party, Pair<Int, Int>>())
@@ -973,7 +954,6 @@ class SeatViewPanelTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testAdditionalHighlightMapWithNoResults() {
         val ndp = Party("New Democratic Party", "NDP", Color.ORANGE)
         val pc = Party("Progressive Conservative", "PC", Color.BLUE)
@@ -1008,7 +988,6 @@ class SeatViewPanelTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testPartyClassification() {
         val dup = Party("Democratic Unionist Party", "DUP", Color.ORANGE.darker())
         val sf = Party("Sinn F\u00e9in", "SF", Color.GREEN.darker().darker())
@@ -1030,7 +1009,7 @@ class SeatViewPanelTest {
         val unionists = Party("Unionists", "Unionists", Color(0xff8200))
         val nationalists = Party("Nationalists", "Nationalists", Color(0x169b62))
         val others = Party.OTHERS
-        val mapping: MutableMap<Party, Party> = IdentityHashMap()
+        val mapping = IdentityHashMap<Party, Party>()
         sequenceOf(dup, uup, tuv, con, pup, ukip, indU).forEach { mapping[it] = unionists }
         sequenceOf(sf, sdlp, wp, indN).forEach { mapping[it] = nationalists }
         sequenceOf(apni, grn, pbp, lab, indO).forEach { mapping[it] = others }
@@ -1350,7 +1329,6 @@ class SeatViewPanelTest {
         compareRendering("SeatViewPanel", "PrevRangeSeats-2", panel)
     }
 
-    @Throws(IOException::class)
     private fun peiShapesByDistrict(): Map<Int, Shape> {
         val peiMap = MapFrameTest::class.java
             .classLoader

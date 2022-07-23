@@ -9,13 +9,9 @@ import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
 import org.junit.Test
 import java.awt.Color
-import java.io.IOException
-import java.util.LinkedHashMap
-import kotlin.Throws
 
 class PreferenceVoteViewPanelTest {
     @Test
-    @Throws(IOException::class)
     fun testCandidateBasicResult() {
         val alp = Candidate("Mark Monaghan", Party("Labor", "ALP", Color.RED))
         val clp = Candidate("Kylie Bonanni", Party("Country Liberal", "CLP", Color.ORANGE))
@@ -64,7 +60,6 @@ class PreferenceVoteViewPanelTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testCandidateScreenUpdating() {
         val alp = Candidate("Mark Monaghan", Party("Labor", "ALP", Color.RED))
         val clp = Candidate("Kylie Bonanni", Party("Country Liberal", "CLP", Color.ORANGE))
@@ -159,7 +154,6 @@ class PreferenceVoteViewPanelTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testCandidatesSwitchingBetweenSingleAndDoubleLines() {
         val alp = Party("Labor", "ALP", Color.RED)
         val clp = Party("Country Liberal", "CLP", Color.ORANGE)
@@ -232,7 +226,6 @@ class PreferenceVoteViewPanelTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testSinglePreference() {
         val alp = Candidate("Kate Worden", Party("Labor", "ALP", Color.RED))
         val clp = Candidate("Derek Mayger", Party("Country Liberal", "CLP", Color.ORANGE))
@@ -279,7 +272,6 @@ class PreferenceVoteViewPanelTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testNoPrevPreference() {
         val alp = Candidate("Selena Uibo", Party("Labor", "ALP", Color.RED))
         val clp = Candidate("Jerry Amato", Party("Country Liberal", "CLP", Color.ORANGE))
@@ -326,7 +318,6 @@ class PreferenceVoteViewPanelTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testChangeInPreference() {
         val alp = Candidate("Sophie Ismail", Party("Labor", "ALP", Color.RED))
         val lib = Candidate("Le Liu", Party("Liberal", "LIB", Color.BLUE))
@@ -378,7 +369,6 @@ class PreferenceVoteViewPanelTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testRanges() {
         val alp = Party("Labor", "ALP", Color.RED)
         val coa = Party("Coalition", "L/NP", Color.BLUE)
@@ -428,7 +418,6 @@ class PreferenceVoteViewPanelTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testPreferencesDeclarationInProgress() {
         val lab = Candidate("Sadiq Khan", Party("Labour", "LAB", Color.RED))
         val con = Candidate("Zac Goldsmith", Party("Conservative", "CON", Color.BLUE))

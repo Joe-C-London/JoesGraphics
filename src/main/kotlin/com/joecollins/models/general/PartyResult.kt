@@ -20,8 +20,8 @@ data class PartyResult(val party: Party?, val elected: Boolean) {
 
         @JvmField val TIE = PartyResult(Party("TIE", "TIE", Color.DARK_GRAY), false)
 
-        @JvmStatic fun elected(party: Party?) = PartyResult(party, true)
+        fun elected(party: Party?) = PartyResult(party, true)
 
-        @JvmStatic fun leading(party: Party?) = PartyResult(party, false)
+        fun leading(party: Party?) = PartyResult(party, false)
     }
 }

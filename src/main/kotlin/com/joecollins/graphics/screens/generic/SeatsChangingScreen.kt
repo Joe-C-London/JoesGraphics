@@ -77,22 +77,22 @@ class SeatsChangingScreen private constructor(title: JLabel, frame: ResultListin
         fun setPrevResults(prevResults: Map<T, Map<Party, Int>>) {
             this.prevResults = prevResults.entries
                 .asSequence()
-                .map { e: Map.Entry<T, Map<Party, Int>> ->
-                    val votes = e.value
+                .map {
+                    val votes = it.value
                     val total = votes.values.sum()
                     val topTwo = votes.values
                         .sortedDescending()
                         .take(2)
                         .toList()
-                    Pair(e, 1.0 * (topTwo[0] - topTwo[1]) / total)
+                    Pair(it, 1.0 * (topTwo[0] - topTwo[1]) / total)
                 }
                 .sortedBy { it.second }
                 .map { it.first }
-                .map { it: Map.Entry<T, Map<Party, Int>> ->
+                .map {
                     Pair(
                         it.key,
                         it.value.entries
-                            .maxByOrNull { it.value }
+                            .maxByOrNull { e -> e.value }
                         !!.key
                     )
                 }
@@ -127,9 +127,8 @@ class SeatsChangingScreen private constructor(title: JLabel, frame: ResultListin
             .map {
                 val seatFilter = seatFilter
                 val colorFunc =
-                    if (seatFilter == null || seatFilter.contains(it.first)) { c: Color -> c } else { c: Color ->
-                        lighten(lighten(c))
-                    }
+                    if (seatFilter == null || seatFilter.contains(it.first)) { c: Color -> c }
+                    else { c -> lighten(lighten(c)) }
                 Entry(
                     it.first,
                     colorFunc(it.second.color),
@@ -142,7 +141,7 @@ class SeatsChangingScreen private constructor(title: JLabel, frame: ResultListin
 
     private class Entry<T>(val key: T, val prevColor: Color, val resultColor: Color, val fill: Boolean)
     companion object {
-        @JvmStatic fun <T> of(
+        fun <T> of(
             prevResultPublisher: Flow.Publisher<out Map<T, Map<Party, Int>>>,
             currResultPublisher: Flow.Publisher<out Map<T, PartyResult?>>,
             nameFunc: (T) -> String,

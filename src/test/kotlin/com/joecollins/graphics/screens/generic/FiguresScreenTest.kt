@@ -8,12 +8,9 @@ import com.joecollins.models.general.Party
 import com.joecollins.pubsub.asOneTimePublisher
 import org.junit.Test
 import java.awt.Color
-import java.io.IOException
-import kotlin.Throws
 
 class FiguresScreenTest {
     @Test
-    @Throws(IOException::class)
     fun testFigures() {
         val screen = of()
             .withSection(

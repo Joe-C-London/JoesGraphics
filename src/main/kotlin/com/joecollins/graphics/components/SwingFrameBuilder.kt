@@ -8,57 +8,45 @@ import org.apache.commons.collections4.ComparatorUtils
 import java.awt.Color
 import java.text.DecimalFormat
 import java.util.Comparator
-import java.util.HashMap
 import java.util.concurrent.Flow
 import kotlin.math.sign
 
 class SwingFrameBuilder {
     private class SwingProperties {
-        private var _leftColor = Color.BLACK
-        private var _rightColor = Color.BLACK
-        private var _value: Number = 0
-        private var _text = ""
-        private var _bottomColor = Color.BLACK
-
-        var leftColor: Color
-            get() { return _leftColor }
-            set(leftColor) {
-                _leftColor = leftColor
+        var leftColor: Color = Color.BLACK
+            set(value) {
+                field = value
                 leftColorPublisher.submit(leftColor)
             }
-        val leftColorPublisher = Publisher(_leftColor)
+        val leftColorPublisher = Publisher(leftColor)
 
-        var rightColor: Color
-            get() { return _rightColor }
-            set(rightColor) {
-                this._rightColor = rightColor
+        var rightColor: Color = Color.BLACK
+            set(value) {
+                field = value
                 rightColorPublisher.submit(rightColor)
             }
-        val rightColorPublisher = Publisher(_rightColor)
+        val rightColorPublisher = Publisher(rightColor)
 
-        var value: Number
-            get() { return _value }
+        var value: Number = 0
             set(value) {
-                this._value = value
+                field = value
                 valuePublisher.submit(value)
             }
-        val valuePublisher = Publisher(_value)
+        val valuePublisher = Publisher(value)
 
-        var text: String
-            get() { return _text }
-            set(text) {
-                this._text = text
+        var text: String = ""
+            set(value) {
+                field = value
                 textPublisher.submit(text)
             }
-        val textPublisher = Publisher(_text)
+        val textPublisher = Publisher(text)
 
-        var bottomColor: Color
-            get() { return _bottomColor }
-            set(bottomColor) {
-                this._bottomColor = bottomColor
+        var bottomColor: Color = Color.BLACK
+            set(value) {
+                field = value
                 bottomColorPublisher.submit(bottomColor)
             }
-        val bottomColorPublisher = Publisher(_bottomColor)
+        val bottomColorPublisher = Publisher(bottomColor)
     }
 
     private var rangePublisher: Flow.Publisher<out Number>? = null
@@ -128,12 +116,12 @@ class SwingFrameBuilder {
         fun setProperties() {
             synchronized(this) {
                 fromParty = prevPct.entries
-                    .filter { e -> !java.lang.Double.isNaN(e.value) }
+                    .filter { e -> !e.value.isNaN() }
                     .maxByOrNull { it.value }
                     ?.key
                 toParty = currPct.entries
                     .filter { e -> e.key != fromParty }
-                    .filter { e -> !java.lang.Double.isNaN(e.value) }
+                    .filter { e -> !e.value.isNaN() }
                     .maxByOrNull { it.value }
                     ?.key
                 if (fromParty != null && toParty != null) {
@@ -153,7 +141,7 @@ class SwingFrameBuilder {
     }
 
     companion object {
-        @JvmStatic fun prevCurr(
+        fun prevCurr(
             prevPublisher: Flow.Publisher<out Map<Party, Number>>,
             currPublisher: Flow.Publisher<out Map<Party, Number>>,
             partyOrder: Comparator<Party>
@@ -234,7 +222,7 @@ class SwingFrameBuilder {
             return ret
         }
 
-        @JvmStatic fun prevCurrNormalised(
+        fun prevCurrNormalised(
             prevPublisher: Flow.Publisher<out Map<Party, Double>>,
             currPublisher: Flow.Publisher<out Map<Party, Double>>,
             partyOrder: Comparator<Party>
@@ -242,7 +230,7 @@ class SwingFrameBuilder {
             return prevCurr(prevPublisher, currPublisher, partyOrder, true)
         }
 
-        @JvmStatic fun <T> basic(
+        fun <T> basic(
             items: Flow.Publisher<out T>,
             leftColorFunc: (T) -> Color,
             rightColorFunc: (T) -> Color,

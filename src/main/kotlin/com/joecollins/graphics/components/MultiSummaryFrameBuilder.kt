@@ -25,7 +25,7 @@ class MultiSummaryFrameBuilder private constructor() {
     }
 
     companion object {
-        @JvmStatic fun <T> tooClose(
+        fun <T> tooClose(
             items: List<T>,
             display: (T) -> Flow.Publisher<out Boolean>,
             sortFunc: (T) -> Flow.Publisher<out Number>,

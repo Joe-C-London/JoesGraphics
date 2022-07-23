@@ -11,7 +11,6 @@ import org.hamcrest.core.IsNull
 import org.junit.Assert
 import org.junit.Test
 import java.awt.Color
-import java.io.IOException
 import java.time.Clock
 import java.time.Instant
 import java.time.ZoneId
@@ -116,7 +115,6 @@ class LowerThirdHeadlineAndSummaryBothEndsTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testRenderRightWin() {
         val left = Publisher(SummaryFromBothEnds.Entry(Color.BLUE, "CLINTON", 0))
         val right = Publisher(SummaryFromBothEnds.Entry(Color.RED, "TRUMP", 0))
@@ -145,7 +143,6 @@ class LowerThirdHeadlineAndSummaryBothEndsTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testRenderLeftWin() {
         val left = Publisher(SummaryFromBothEnds.Entry(Color.BLUE, "OBAMA", 0))
         val right = Publisher(SummaryFromBothEnds.Entry(Color.RED, "MCCAIN", 0))
@@ -174,7 +171,6 @@ class LowerThirdHeadlineAndSummaryBothEndsTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testRenderRightLandslide() {
         val left = Publisher(SummaryFromBothEnds.Entry(Color.BLUE, "MONDALE", 0))
         val right = Publisher(SummaryFromBothEnds.Entry(Color.RED, "REAGAN", 0))
@@ -203,7 +199,6 @@ class LowerThirdHeadlineAndSummaryBothEndsTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testRenderLeftLandslide() {
         val left = Publisher(SummaryFromBothEnds.Entry(Color.BLUE, "ROOSEVELT", 0))
         val right = Publisher(SummaryFromBothEnds.Entry(Color.RED, "LANDON", 0))
@@ -232,7 +227,6 @@ class LowerThirdHeadlineAndSummaryBothEndsTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testRenderWithMiddleNoMajority() {
         val left = Publisher(SummaryFromBothEnds.Entry(Color.BLUE, "DEMOCRATS", 27))
         val right = Publisher(SummaryFromBothEnds.Entry(Color.RED, "REPUBLICANS", 40))
@@ -262,7 +256,6 @@ class LowerThirdHeadlineAndSummaryBothEndsTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testRenderWithMiddleLeftMajority() {
         val left = Publisher(SummaryFromBothEnds.Entry(Color.BLUE, "DEMOCRATS", 37))
         val right = Publisher(SummaryFromBothEnds.Entry(Color.RED, "REPUBLICANS", 26))
@@ -292,7 +285,6 @@ class LowerThirdHeadlineAndSummaryBothEndsTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testRenderWithMiddleRightMajority() {
         val left = Publisher(SummaryFromBothEnds.Entry(Color.BLUE, "DEMOCRATS", 29))
         val right = Publisher(SummaryFromBothEnds.Entry(Color.RED, "REPUBLICANS", 36))

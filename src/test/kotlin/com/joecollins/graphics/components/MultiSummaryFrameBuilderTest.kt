@@ -10,8 +10,6 @@ import org.hamcrest.core.IsNot
 import org.junit.Assert
 import org.junit.Test
 import java.awt.Color
-import java.util.ArrayList
-import java.util.HashMap
 import java.util.concurrent.TimeUnit
 
 class MultiSummaryFrameBuilderTest {
@@ -22,15 +20,16 @@ class MultiSummaryFrameBuilderTest {
         val lib = Party("Liberal", "LIB", Color.RED)
         val grn = Party("Green", "GRN", Color.GREEN)
         val ind = Party("Independent", "IND", Color.GRAY)
-        val ridings: MutableList<Riding> = ArrayList()
-        ridings.add(Riding("Klondike")) // 0
-        ridings.add(Riding("Kluane")) // 1
-        ridings.add(Riding("Lake Laberge")) // 2
-        ridings.add(Riding("Mayo-Tatchun")) // 3
-        ridings.add(Riding("Mount Lorne-Southern Lakes")) // 4
-        ridings.add(Riding("Pelly-Nisutlin")) // 5
-        ridings.add(Riding("Vuntut Gwitchin")) // 6
-        ridings.add(Riding("Watson Lake")) // 7
+        val ridings = listOf(
+            Riding("Klondike"), // 0
+            Riding("Kluane"), // 1
+            Riding("Lake Laberge"), // 2
+            Riding("Mayo-Tatchun"), // 3
+            Riding("Mount Lorne-Southern Lakes"), // 4
+            Riding("Pelly-Nisutlin"), // 5
+            Riding("Vuntut Gwitchin"), // 6
+            Riding("Watson Lake"), // 7
+        )
         val frame = tooClose(
             ridings, { it.isTooClose }, { it.margin },
             { it.name.uppercase().asOneTimePublisher() }, { it.boxes },

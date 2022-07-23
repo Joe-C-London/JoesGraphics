@@ -15,11 +15,9 @@ import com.joecollins.pubsub.asOneTimePublisher
 import org.junit.Test
 import java.awt.Color
 import java.awt.Shape
-import java.io.IOException
 
 class MixedMemberResultPanelTest {
     @Test
-    @Throws(Exception::class)
     fun testBasicMMP() {
         val currentCandidateVotes = Publisher(LinkedHashMap<Candidate, Int>())
         val previousCandidateVotes = Publisher(LinkedHashMap<Party, Int>())
@@ -82,7 +80,6 @@ class MixedMemberResultPanelTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun testMMPWithPctReporting() {
         val currentCandidateVotes = Publisher(LinkedHashMap<Candidate, Int>())
         val previousCandidateVotes = Publisher(LinkedHashMap<Party, Int>())
@@ -154,7 +151,6 @@ class MixedMemberResultPanelTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun testMMPWaiting() {
         val currentCandidateVotes = Publisher(LinkedHashMap<Candidate, Int>())
         val previousCandidateVotes = Publisher(LinkedHashMap<Party, Int>())
@@ -222,7 +218,6 @@ class MixedMemberResultPanelTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testZeroVotesForSingleEntry() {
         val lib = Party("Liberal", "LIB", Color.RED)
         val grn = Party("Green", "GRN", Color.GREEN.darker())
@@ -290,7 +285,6 @@ class MixedMemberResultPanelTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun testOtherMMP() {
         val currentCandidateVotes = Publisher(LinkedHashMap<Candidate, Int>())
         val previousCandidateVotes = Publisher(LinkedHashMap<Party, Int>())
@@ -348,7 +342,6 @@ class MixedMemberResultPanelTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun testMapAdditionalHighlights() {
         val currentCandidateVotes = Publisher(LinkedHashMap<Candidate, Int>())
         val previousCandidateVotes = Publisher(LinkedHashMap<Party, Int>())
@@ -414,7 +407,6 @@ class MixedMemberResultPanelTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun testWithoutPrev() {
         val currentCandidateVotes = Publisher(LinkedHashMap<Candidate, Int>())
         val currentPartyVotes = Publisher(LinkedHashMap<Party, Int>())
@@ -460,7 +452,6 @@ class MixedMemberResultPanelTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun testSubheadWithoutPrev() {
         val currentCandidateVotes = Publisher(LinkedHashMap<Candidate, Int>())
         val currentPartyVotes = Publisher(LinkedHashMap<Party, Int>())
@@ -511,7 +502,6 @@ class MixedMemberResultPanelTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun testTickWithoutPrev() {
         val currentCandidateVotes = Publisher(LinkedHashMap<Candidate, Int>())
         val currentPartyVotes = Publisher(LinkedHashMap<Party, Int>())
@@ -560,7 +550,6 @@ class MixedMemberResultPanelTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun testPartyOnlyForCandidateVote() {
         val currentCandidateVotes = Publisher(LinkedHashMap<Candidate, Int>())
         val currentPartyVotes = Publisher(LinkedHashMap<Party, Int>())
@@ -609,7 +598,6 @@ class MixedMemberResultPanelTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testDeclarationInProgress() {
         val lab = Party("Labour", "LAB", Color.RED)
         val grn = Party("Green", "GRN", Color.GREEN.darker())
@@ -742,7 +730,6 @@ class MixedMemberResultPanelTest {
         compareRendering("MixedMemberResultPanel", "Declaration-10", panel)
     }
 
-    @Throws(IOException::class)
     private fun peiShapesByDistrict(): Map<Int, Shape> {
         val peiMap = MapFrameTest::class.java
             .classLoader

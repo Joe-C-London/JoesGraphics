@@ -19,7 +19,6 @@ import java.awt.Shape
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
 import java.awt.geom.AffineTransform
-import java.util.ArrayList
 import java.util.concurrent.Flow
 import javax.swing.JComponent
 import javax.swing.JLabel
@@ -103,7 +102,7 @@ class BarFrame(
     }
 
     private val maxLines: Int
-        get() = bars.maxOfOrNull { obj: BarPanel -> obj.numLines } ?: 1
+        get() = bars.maxOfOrNull { it.numLines } ?: 1
 
     internal val numLines: Int
         get() = lines.size
@@ -117,52 +116,44 @@ class BarFrame(
     }
 
     private inner class BarPanel : JPanel() {
-        private var _leftText = ""
-        private var _rightText = ""
-        private var _series: List<Pair<Color, Number>> = ArrayList()
-        private var _leftIcon: Shape? = null
 
         private fun resetPreferredSize() {
             preferredSize = Dimension(1024, 30 * numLines)
         }
 
-        var leftText: String
-            get() { return _leftText }
-            set(leftText) {
-                _leftText = leftText
+        var leftText: String = ""
+            set(value) {
+                field = value
                 resetPreferredSize()
                 repaint()
             }
 
-        var rightText: String
-            get() { return _rightText }
-            set(rightText) {
-                _rightText = rightText
+        var rightText: String = ""
+            set(value) {
+                field = value
                 resetPreferredSize()
                 repaint()
             }
 
-        var leftIcon: Shape?
-            get() { return _leftIcon }
-            set(leftIcon) {
-                _leftIcon = leftIcon
+        var leftIcon: Shape? = null
+            set(value) {
+                field = value
                 repaint()
             }
 
-        var series: List<Pair<Color, Number>>
-            get() { return _series }
-            set(series) {
-                _series = series
+        var series: List<Pair<Color, Number>> = emptyList()
+            set(value) {
+                field = value
                 repaint()
             }
 
         val totalPositive: Number
-            get() = _series
+            get() = series
                 .map { it.second.toDouble() }
                 .filter { it > 0 }
                 .sum()
         val totalNegative: Number
-            get() = _series
+            get() = series
                 .map { it.second.toDouble() }
                 .filter { it < 0 }
                 .sum()
@@ -182,13 +173,13 @@ class BarFrame(
             drawLines(g, 0, height)
             val font = StandardFont.readBoldFont(barHeight * 3 / 4 / maxLines)
             g.setFont(font)
-            val mainColor = if (_series.isEmpty()) Color.BLACK else _series[0].first
+            val mainColor = if (series.isEmpty()) Color.BLACK else series[0].first
             g.setColor(ColorUtils.contrastForBackground(mainColor))
             drawText(g, font)
             val zero = getPixelOfValue(0.0).toInt()
             var posLeft = zero
             var negRight = zero
-            for (seriesItem in _series) {
+            for (seriesItem in series) {
                 g.setColor(seriesItem.first)
                 val width = getPixelOfValue(seriesItem.second).toInt() - zero
                 if (width > 0) {
@@ -214,7 +205,7 @@ class BarFrame(
             get() = height - 2 * BAR_MARGIN
 
         private fun drawText(g: Graphics, font: Font) {
-            val sumsPosNeg = _series
+            val sumsPosNeg = series
                 .map { it.second.toDouble() }
                 .groupBy { it > 0 }
                 .mapValues { e -> e.value.sumOf { abs(it) } }
@@ -352,11 +343,11 @@ class BarFrame(
         override fun addLayoutComponent(name: String, comp: Component) {}
         override fun removeLayoutComponent(comp: Component) {}
         override fun preferredLayoutSize(parent: Container): Dimension {
-            return getLayoutSize { obj: JComponent -> obj.preferredSize }
+            return getLayoutSize { it.preferredSize }
         }
 
         override fun minimumLayoutSize(parent: Container): Dimension {
-            return getLayoutSize { obj: JComponent -> obj.minimumSize }
+            return getLayoutSize { it.minimumSize }
         }
 
         private fun getLayoutSize(func: (JComponent) -> Dimension): Dimension {
@@ -517,7 +508,7 @@ class BarFrame(
             this.min = min
             repaint()
         }
-        val minFromBars = { bl: List<Bar> -> bl.minOfOrNull { b -> b.series.sumOf { min(it.second.toDouble(), 0.0) } } ?: 0.0 }
+        val minFromBars = { bars: List<Bar> -> bars.minOfOrNull { bar -> bar.series.sumOf { min(it.second.toDouble(), 0.0) } } ?: 0.0 }
         (minPublisher ?: barsPublisher.map(minFromBars))
             .subscribe(Subscriber(eventQueueWrapper(onMinUpdate)))
 

@@ -13,9 +13,6 @@ import com.joecollins.pubsub.asOneTimePublisher
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.GridLayout
-import java.util.HashMap
-import java.util.HashSet
-import java.util.LinkedList
 import java.util.concurrent.Flow
 import javax.swing.JLabel
 import javax.swing.JPanel
@@ -32,48 +29,36 @@ class SwingometerScreen private constructor(title: JLabel, frame: SwingometerFra
         headerPublisher: Flow.Publisher<out String?>
     ) {
         private class Inputs<T> {
-            private var _prevVotes: Map<T, Map<Party, Int>> = HashMap()
-            private var _results: Map<T, PartyResult?> = HashMap()
-            private var _filteredSeats: Set<T>? = null
-            private var _parties: Pair<Party, Party>? = null
-            private var _partySwings: Map<Party, Double> = HashMap()
-            private var _range: Number = 0.09999
-            private var _seatLabelIncrement = Int.MAX_VALUE
-
-            var prevVotes: Map<T, Map<Party, Int>>
-                get() = _prevVotes
-                set(prevVotes) {
+            var prevVotes: Map<T, Map<Party, Int>> = emptyMap()
+                set(value) {
                     synchronized(this) {
-                        this._prevVotes = prevVotes
+                        field = value
                         updateLeftAndRightToWin()
                         updateOuterLabels()
                         updateDots()
                     }
                 }
 
-            var results: Map<T, PartyResult?>
-                get() = _results
-                set(results) {
+            var results: Map<T, PartyResult?> = emptyMap()
+                set(value) {
                     synchronized(this) {
-                        this._results = results
+                        field = value
                         updateDots()
                     }
                 }
 
-            var seatFilter: Set<T>?
-                get() = _filteredSeats
-                set(filteredSeats) {
+            var seatFilter: Set<T>? = null
+                set(value) {
                     synchronized(this) {
-                        this._filteredSeats = filteredSeats
+                        field = value
                         updateDots()
                     }
                 }
 
-            var parties: Pair<Party, Party>
-                get() = _parties!!
-                set(parties) {
+            var parties: Pair<Party, Party> = Party.OTHERS to Party.OTHERS
+                set(value) {
                     synchronized(this) {
-                        this._parties = parties
+                        field = value
                         updateColors()
                         updateValue()
                         updateLeftAndRightToWin()
@@ -82,29 +67,26 @@ class SwingometerScreen private constructor(title: JLabel, frame: SwingometerFra
                     }
                 }
 
-            var partySwings: Map<Party, Double>
-                get() = _partySwings
-                set(partySwings) {
+            var partySwings: Map<Party, Double> = emptyMap()
+                set(value) {
                     synchronized(this) {
-                        this._partySwings = partySwings
+                        field = value
                         updateValue()
                     }
                 }
 
-            var range: Number
-                get() = _range
-                set(range) {
+            var range: Number = 0.09999
+                set(value) {
                     synchronized(this) {
-                        this._range = range
+                        field = value
                         rangePublisher.submit(range)
                     }
                 }
 
-            var seatLabelIncrement: Int
-                get() = _seatLabelIncrement
-                set(seatLabelIncrement) {
+            var seatLabelIncrement: Int = Int.MAX_VALUE
+                set(value) {
                     synchronized(this) {
-                        this._seatLabelIncrement = seatLabelIncrement
+                        field = value
                         updateOuterLabels()
                     }
                 }
@@ -115,14 +97,17 @@ class SwingometerScreen private constructor(title: JLabel, frame: SwingometerFra
                 Pair(parties.first.color, parties.second.color)
 
             val valuePublisher = Publisher<Double>()
-            private fun updateValue() { if (_parties != null) valuePublisher.submit(calculateValue()) }
+            private fun updateValue() {
+                if (parties != null) valuePublisher.submit(calculateValue())
+            }
+
             private fun calculateValue(): Double {
                 val left = partySwings[parties.first] ?: 0.0
                 val right = partySwings[parties.second] ?: 0.0
                 return (right - left) / 2
             }
 
-            val rangePublisher = Publisher(_range)
+            val rangePublisher = Publisher(range)
 
             val leftToWinPublisher = Publisher<Double>()
             private fun calculateLeftToWin() =
@@ -137,14 +122,15 @@ class SwingometerScreen private constructor(title: JLabel, frame: SwingometerFra
                 )
 
             private fun updateLeftAndRightToWin() {
-                if (_parties != null) {
-                    leftToWinPublisher.submit(calculateLeftToWin())
-                    rightToWinPublisher.submit(calculateRightToWin())
-                }
+                leftToWinPublisher.submit(calculateLeftToWin())
+                rightToWinPublisher.submit(calculateRightToWin())
             }
 
             val outerLabelsPublisher = Publisher<List<Triple<Double, Color, String>>>()
-            private fun updateOuterLabels() { if (_parties != null) outerLabelsPublisher.submit(calculateOuterLabels()) }
+            private fun updateOuterLabels() {
+                outerLabelsPublisher.submit(calculateOuterLabels())
+            }
+
             private fun calculateOuterLabels(): List<Triple<Double, Color, String>> {
                 val leftSwingList = createSwingList(
                     prevVotes.values, parties.first, parties.second
@@ -152,33 +138,32 @@ class SwingometerScreen private constructor(title: JLabel, frame: SwingometerFra
                 val rightSwingList = createSwingList(
                     prevVotes.values, parties.second, parties.first
                 )
-                val ret: MutableList<Triple<Double, Color, String>> = LinkedList()
                 val leftSeats = getNumSeats(leftSwingList)
                 val rightSeats = getNumSeats(rightSwingList)
                 val majority = prevVotes.size / 2 + 1
-                addZeroLabel(ret, parties, leftSeats, rightSeats)
-                addMajorityLabels(ret, parties, leftSwingList, rightSwingList, majority)
-                addLeadChangeLabel(
-                    ret, parties, leftSwingList, rightSwingList, leftSeats, rightSeats
-                )
-                addIncrementLabels(
-                    ret,
-                    leftSwingList,
-                    rightSwingList,
-                    leftSeats,
-                    rightSeats,
-                    prevVotes,
-                    seatLabelIncrement,
-                    parties
-                )
-                filterNearbyLabels(ret)
-                return ret
+                return sequenceOf(
+                    sequenceOf(zeroLabel(parties, leftSeats, rightSeats)),
+                    majorityLabels(parties, leftSwingList, rightSwingList, majority).asSequence(),
+                    if (leftSeats != rightSeats) sequenceOf(leadChangeLabel(parties, leftSwingList, rightSwingList, leftSeats, rightSeats)) else emptySequence(),
+                    incrementLabels(
+                        leftSwingList,
+                        rightSwingList,
+                        leftSeats,
+                        rightSeats,
+                        prevVotes,
+                        seatLabelIncrement,
+                        parties
+                    ).asSequence()
+                ).flatten()
+                    .let { filterNearbyLabels(it) }
+                    .toList()
             }
 
             val dotsPublisher = Publisher<List<Triple<Double, Color, Boolean>>>()
             private fun updateDots() {
-                if (_parties != null) dotsPublisher.submit(calculateDots())
+                dotsPublisher.submit(calculateDots())
             }
+
             private fun calculateDots(): List<Triple<Double, Color, Boolean>> =
                 prevVotes.entries.asSequence()
                     .map { e ->
@@ -243,10 +228,10 @@ class SwingometerScreen private constructor(title: JLabel, frame: SwingometerFra
             val leftToWinPublisher = inputs.leftToWinPublisher
             val rightToWinPublisher = inputs.rightToWinPublisher
             return SwingometerFrameBuilder.basic(colorsPublisher, valuePublisher)
-                .withDotsSolid(dotsList, { obj -> obj.first }, { obj -> obj.second }) { obj -> obj.third }
+                .withDotsSolid(dotsList, { it.first }, { it.second }) { it.third }
                 .withHeader(header)
                 .withRange(rangePublisher)
-                .withTickInterval(0.01.asOneTimePublisher()) { n: Number -> (n.toDouble() * 100).roundToInt().toString() }
+                .withTickInterval(0.01.asOneTimePublisher()) { (it.toDouble() * 100).roundToInt().toString() }
                 .withLeftNeedingToWin(leftToWinPublisher)
                 .withRightNeedingToWin(rightToWinPublisher)
                 .withBucketSize(0.005.asOneTimePublisher())
@@ -261,8 +246,7 @@ class SwingometerScreen private constructor(title: JLabel, frame: SwingometerFra
 
         companion object {
 
-            private fun <T> addIncrementLabels(
-                list: MutableList<Triple<Double, Color, String>>,
+            private fun <T> incrementLabels(
                 leftSwingList: List<Double>,
                 rightSwingList: List<Double>,
                 leftSeats: Int,
@@ -270,7 +254,8 @@ class SwingometerScreen private constructor(title: JLabel, frame: SwingometerFra
                 prevVotes: Map<T, Map<Party, Int>>,
                 seatLabelIncrement: Int,
                 parties: Pair<Party, Party>
-            ) {
+            ): ArrayList<Triple<Double, Color, String>> {
+                val ret = ArrayList<Triple<Double, Color, String>>()
                 var i = 0
                 while (i < prevVotes.size) {
                     if (i <= (leftSeats + rightSeats) / 2) {
@@ -278,71 +263,68 @@ class SwingometerScreen private constructor(title: JLabel, frame: SwingometerFra
                         continue
                     }
                     if (i <= leftSwingList.size) {
-                        list.add(
+                        ret.add(
                             Triple(-leftSwingList[i - 1], parties.first.color, i.toString())
                         )
                     }
                     if (i <= rightSwingList.size) {
-                        list.add(
+                        ret.add(
                             Triple(rightSwingList[i - 1], parties.second.color, i.toString())
                         )
                     }
                     i += seatLabelIncrement
                 }
+                return ret
             }
 
-            private fun filterNearbyLabels(ret: MutableList<Triple<Double, Color, String>>) {
+            private fun filterNearbyLabels(ret: Sequence<Triple<Double, Color, String>>): Sequence<Triple<Double, Color, String>> {
                 val ranges: MutableSet<ClosedRange<Double>> = HashSet()
-                val it = ret.iterator()
-                while (it.hasNext()) {
-                    val item = it.next()
+                return ret.filter { item ->
                     if (ranges.any { range -> range.contains(item.first) }) {
-                        it.remove()
+                        false
                     } else {
                         ranges.add((item.first - 0.005).rangeTo(item.first + 0.005))
+                        true
                     }
                 }
             }
 
-            private fun addLeadChangeLabel(
-                list: MutableList<Triple<Double, Color, String>>,
+            private fun leadChangeLabel(
                 parties: Pair<Party, Party>,
                 leftSwingList: List<Double>,
                 rightSwingList: List<Double>,
                 leftSeats: Int,
                 rightSeats: Int
-            ) {
-                if (leftSeats != rightSeats) {
-                    val newLeadSeats = ceil(0.5 * (leftSeats + rightSeats)).toInt()
-                    val swing: Double
-                    val color: Color
-                    if (leftSeats > rightSeats) {
-                        swing = rightSwingList
-                            .drop(newLeadSeats - 1)
-                            .firstOrNull()
-                            ?: Double.POSITIVE_INFINITY
-                        color = if ((leftSeats + rightSeats) % 2 == 0) Color.BLACK else parties.second.color
-                    } else {
-                        swing = -1 *
-                            (
-                                leftSwingList
-                                    .drop(newLeadSeats - 1)
-                                    .firstOrNull()
-                                    ?: Double.POSITIVE_INFINITY
-                                )
-                        color = if ((leftSeats + rightSeats) % 2 == 0) Color.BLACK else parties.first.color
-                    }
-                    list.add(Triple(swing, color, newLeadSeats.toString()))
+            ): Triple<Double, Color, String> {
+                val newLeadSeats = ceil(0.5 * (leftSeats + rightSeats)).toInt()
+                val swing: Double
+                val color: Color
+                if (leftSeats > rightSeats) {
+                    swing = rightSwingList
+                        .drop(newLeadSeats - 1)
+                        .firstOrNull()
+                        ?: Double.POSITIVE_INFINITY
+                    color = if ((leftSeats + rightSeats) % 2 == 0) Color.BLACK else parties.second.color
+                } else {
+                    swing = -1 *
+                        (
+                            leftSwingList
+                                .drop(newLeadSeats - 1)
+                                .firstOrNull()
+                                ?: Double.POSITIVE_INFINITY
+                            )
+                    color = if ((leftSeats + rightSeats) % 2 == 0) Color.BLACK else parties.first.color
                 }
+                return Triple(swing, color, newLeadSeats.toString())
             }
 
-            private fun addMajorityLabels(
-                list: MutableList<Triple<Double, Color, String>>,
+            private fun majorityLabels(
                 parties: Pair<Party, Party>,
                 leftSwingList: List<Double>,
                 rightSwingList: List<Double>,
                 majority: Int
-            ) {
+            ): ArrayList<Triple<Double, Color, String>> {
+                val ret = ArrayList<Triple<Double, Color, String>>()
                 val leftMajority = -1 *
                     (
                         leftSwingList
@@ -352,34 +334,30 @@ class SwingometerScreen private constructor(title: JLabel, frame: SwingometerFra
                         )
                 val rightMajority = rightSwingList.drop((majority - 1)).firstOrNull() ?: Double.POSITIVE_INFINITY
                 if (leftMajority != rightMajority || leftMajority < 0) {
-                    list.add(
+                    ret.add(
                         Triple(leftMajority, parties.first.color, majority.toString())
                     )
                 }
                 if (leftMajority != rightMajority || rightMajority > 0) {
-                    list.add(
+                    ret.add(
                         Triple(rightMajority, parties.second.color, majority.toString())
                     )
                 }
+                return ret
             }
 
-            private fun addZeroLabel(
-                list: MutableList<Triple<Double, Color, String>>,
+            private fun zeroLabel(
                 parties: Pair<Party, Party>,
                 leftSeats: Int,
                 rightSeats: Int
-            ) {
-                list.add(
-                    when {
-                        leftSeats > rightSeats -> Triple(0.0, parties.first.color, leftSeats.toString())
-                        rightSeats > leftSeats -> Triple(0.0, parties.second.color, rightSeats.toString())
-                        else -> Triple(0.0, Color.BLACK, rightSeats.toString())
-                    }
-                )
+            ) = when {
+                leftSeats > rightSeats -> Triple(0.0, parties.first.color, leftSeats.toString())
+                rightSeats > leftSeats -> Triple(0.0, parties.second.color, rightSeats.toString())
+                else -> Triple(0.0, Color.BLACK, rightSeats.toString())
             }
 
             private fun getNumSeats(swings: List<Double>): Int {
-                return swings.count { s: Double -> s < 0 }
+                return swings.count { it < 0 }
             }
 
             private fun <T> getSwingNeededForMajority(
@@ -429,7 +407,7 @@ class SwingometerScreen private constructor(title: JLabel, frame: SwingometerFra
     }
 
     companion object {
-        @JvmStatic fun <T> of(
+        fun <T> of(
             prevVotes: Flow.Publisher<out Map<T, Map<Party, Int>>>,
             results: Flow.Publisher<out Map<T, PartyResult?>>,
             swing: Flow.Publisher<out Map<Party, Double>>,

@@ -13,7 +13,6 @@ import java.awt.Graphics
 import java.awt.Graphics2D
 import java.awt.GridLayout
 import java.awt.RenderingHints
-import java.util.ArrayList
 import java.util.concurrent.Flow
 import javax.swing.JPanel
 
@@ -105,20 +104,15 @@ class RegionSummaryFrame private constructor(
     }
 
     private inner class SectionPanel : JPanel() {
-        private var _header: String = ""
-        private var _values: List<Pair<Color, String>> = emptyList()
-
-        var header: String
-            get() { return _header }
-            set(header) {
-                _header = header
+        var header: String = ""
+            set(value) {
+                field = value
                 repaint()
             }
 
-        var values: List<Pair<Color, String>>
-            get() { return _values }
-            set(values) {
-                _values = values
+        var values: List<Pair<Color, String>> = emptyList()
+            set(value) {
+                field = value
                 repaint()
             }
 

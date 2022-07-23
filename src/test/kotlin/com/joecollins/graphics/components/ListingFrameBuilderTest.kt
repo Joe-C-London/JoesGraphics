@@ -9,15 +9,15 @@ import org.hamcrest.core.IsEqual
 import org.junit.Assert
 import org.junit.Test
 import java.awt.Color
-import java.util.ArrayList
 import java.util.concurrent.TimeUnit
 
 class ListingFrameBuilderTest {
     @Test
     fun testBasicListingFrameWithListBinding() {
-        val list: MutableList<Triple<String, Color, String>> = ArrayList()
-        list.add(Triple("JUSTIN TRUDEAU", Color.RED, "LIBERAL"))
-        list.add(Triple("ANDREW SCHEER", Color.BLUE, "CONSERVATIVE"))
+        val list = listOf(
+            Triple("JUSTIN TRUDEAU", Color.RED, "LIBERAL"),
+            Triple("ANDREW SCHEER", Color.BLUE, "CONSERVATIVE"),
+        )
         val frame: BarFrame = of(list.asOneTimePublisher(), { it.first }, { it.third }) { it.second }
             .withHeader("HEADER".asOneTimePublisher())
             .withSubhead("SUBHEAD".asOneTimePublisher())
@@ -45,15 +45,12 @@ class ListingFrameBuilderTest {
 
     @Test
     fun testBasicFixedListFrame() {
-        val list: MutableList<Triple<Publisher<String>, Publisher<Color>, Publisher<String>>> = ArrayList()
-        list.add(
+        val list = listOf(
             Triple(
                 Publisher("JUSTIN TRUDEAU"),
                 Publisher(Color.RED),
                 Publisher("LIBERAL")
-            )
-        )
-        list.add(
+            ),
             Triple(
                 Publisher("ANDREW SCHEER"),
                 Publisher(Color.BLUE),

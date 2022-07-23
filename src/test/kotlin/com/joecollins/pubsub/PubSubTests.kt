@@ -279,7 +279,7 @@ class PubSubTests {
     fun testMapReducePublisher() {
         val boundValue: BoundResult<Int> = BoundResult()
         val publishers = listOf(Publisher(1), Publisher(2), Publisher(3))
-        publishers.mapReduce(0, { a: Int, v: Int -> a + v }, { a: Int, v: Int -> a - v })
+        publishers.mapReduce(0, { a, v -> a + v }, { a, v -> a - v })
             .subscribe(Subscriber { boundValue.value = it })
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ boundValue.value }, IsEqual(6))

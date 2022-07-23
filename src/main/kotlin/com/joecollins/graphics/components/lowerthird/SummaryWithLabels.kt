@@ -11,7 +11,6 @@ import java.awt.Container
 import java.awt.Dimension
 import java.awt.GridLayout
 import java.awt.LayoutManager
-import java.util.ArrayList
 import java.util.concurrent.Flow
 import javax.swing.JLabel
 import javax.swing.JPanel
@@ -127,7 +126,7 @@ class SummaryWithLabels(
 
         this.entriesBinding.subscribe(
             Subscriber(
-                eventQueueWrapper { entries: List<Entry> ->
+                eventQueueWrapper { entries ->
                     while (entryPanels.size < entries.size) {
                         val newPanel = EntryPanel()
                         add(newPanel)

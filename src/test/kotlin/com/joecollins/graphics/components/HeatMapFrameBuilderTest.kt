@@ -13,19 +13,18 @@ import org.junit.Assert
 import org.junit.Test
 import java.awt.Color
 import java.text.DecimalFormat
-import java.util.ArrayList
-import java.util.Collections
 import java.util.concurrent.TimeUnit
 
 class HeatMapFrameBuilderTest {
     @Test
     fun testHeatMapBasic() {
-        val dots: MutableList<Pair<Color, Color>> = ArrayList()
-        dots.addAll(Collections.nCopies(1, Pair(Color.GREEN, Color.GREEN)))
-        dots.addAll(Collections.nCopies(7, Pair(Color.GREEN, Color.RED)))
-        dots.addAll(Collections.nCopies(6, Pair(Color.RED, Color.RED)))
-        dots.addAll(Collections.nCopies(5, Pair(Color.BLUE, Color.RED)))
-        dots.addAll(Collections.nCopies(8, Pair(Color.BLUE, Color.BLUE)))
+        val dots = sequenceOf(
+            sequenceOf(Pair(Color.GREEN, Color.GREEN)),
+            generateSequence { Pair(Color.GREEN, Color.RED) }.take(7),
+            generateSequence { Pair(Color.RED, Color.RED) }.take(6),
+            generateSequence { Pair(Color.BLUE, Color.RED) }.take(5),
+            generateSequence { Pair(Color.BLUE, Color.BLUE) }.take(8),
+        ).flatten().toList()
         val seatBars = Publisher(listOf(Pair(Color.GREEN, 8)))
         val changeBars = Publisher(listOf(Pair(Color.GREEN, +7)))
         val frame = of(
@@ -48,16 +47,16 @@ class HeatMapFrameBuilderTest {
             .until({ frame.numRows }, IsEqual(3))
         Assert.assertEquals(27, frame.numSquares.toLong())
         val expectedFills = sequenceOf(
-            Collections.nCopies(8, Color.GREEN),
-            Collections.nCopies(6, Color.RED),
-            Collections.nCopies(13, Color.BLUE)
+            generateSequence { Color.GREEN }.take(8),
+            generateSequence { Color.RED }.take(6),
+            generateSequence { Color.BLUE }.take(13)
         )
             .flatten()
             .toList()
         val expectedBorders = sequenceOf(
-            Collections.nCopies(1, Color.GREEN),
-            Collections.nCopies(18, Color.RED),
-            Collections.nCopies(8, Color.BLUE)
+            generateSequence { Color.GREEN }.take(1),
+            generateSequence { Color.RED }.take(18),
+            generateSequence { Color.BLUE }.take(8),
         )
             .flatten()
             .toList()
@@ -86,35 +85,36 @@ class HeatMapFrameBuilderTest {
 
         class Riding(val name: String, val leader: Party, val hasWon: Boolean, val prev: Party)
 
-        val ridings: MutableList<Riding> = ArrayList()
-        ridings.add(Riding("Vuntut Gwitchin", lib, false, lib))
-        ridings.add(Riding("Klondike", lib, true, lib))
-        ridings.add(Riding("Takhini-Copper King", ndp, false, ndp))
-        ridings.add(Riding("Whitehorse Centre", ndp, false, ndp))
-        ridings.add(Riding("Mayo-Tatchun", lib, true, ndp))
-        ridings.add(Riding("Mount Lorne-Southern Lakes", lib, false, ndp))
-        ridings.add(Riding("Riverdale South", lib, false, ndp))
-        ridings.add(Riding("Copperbelt South", yp, false, ndp))
-        ridings.add(Riding("Porter Creek South", lib, false, yp))
-        ridings.add(Riding("Watson Lake", yp, true, yp))
-        ridings.add(Riding("Porter Creek Centre", lib, false, yp))
-        ridings.add(Riding("Riverdale North", lib, true, yp))
-        ridings.add(Riding("Kluane", yp, false, yp))
-        ridings.add(Riding("Mountainview", lib, false, yp))
-        ridings.add(Riding("Copperbelt North", lib, false, yp))
-        ridings.add(Riding("Pelly-Nisutlin", yp, true, yp))
-        ridings.add(Riding("Porter Creek North", yp, false, yp))
-        ridings.add(Riding("Lake Laberge", yp, true, yp))
-        ridings.add(Riding("Whitehorse West", lib, false, yp))
+        val ridings = listOf(
+            Riding("Vuntut Gwitchin", lib, false, lib),
+            Riding("Klondike", lib, true, lib),
+            Riding("Takhini-Copper King", ndp, false, ndp),
+            Riding("Whitehorse Centre", ndp, false, ndp),
+            Riding("Mayo-Tatchun", lib, true, ndp),
+            Riding("Mount Lorne-Southern Lakes", lib, false, ndp),
+            Riding("Riverdale South", lib, false, ndp),
+            Riding("Copperbelt South", yp, false, ndp),
+            Riding("Porter Creek South", lib, false, yp),
+            Riding("Watson Lake", yp, true, yp),
+            Riding("Porter Creek Centre", lib, false, yp),
+            Riding("Riverdale North", lib, true, yp),
+            Riding("Kluane", yp, false, yp),
+            Riding("Mountainview", lib, false, yp),
+            Riding("Copperbelt North", lib, false, yp),
+            Riding("Pelly-Nisutlin", yp, true, yp),
+            Riding("Porter Creek North", yp, false, yp),
+            Riding("Lake Laberge", yp, true, yp),
+            Riding("Whitehorse West", lib, false, yp),
+        )
         val frame = ofElectedLeading(
             3.asOneTimePublisher(),
             ridings,
             { PartyResult(it.leader, it.hasWon).asOneTimePublisher() },
             { it.prev },
             lib,
-            { e: Int, l: Int -> "LIB: $e/$l" },
-            { _: Int, l: Int -> l > 0 },
-            { e: Int, l: Int -> DecimalFormat("+0;-0").format(e) + "/" + DecimalFormat("+0;-0").format(l) },
+            { e, l -> "LIB: $e/$l" },
+            { _, l -> l > 0 },
+            { e, l -> DecimalFormat("+0;-0").format(e) + "/" + DecimalFormat("+0;-0").format(l) },
             "YUKON".asOneTimePublisher()
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
@@ -146,26 +146,27 @@ class HeatMapFrameBuilderTest {
 
         class Riding(val name: String, val leader: Party, val hasWon: Boolean, val prev: Party, val isWhitehorse: Boolean)
 
-        val ridings: MutableList<Riding> = ArrayList()
-        ridings.add(Riding("Vuntut Gwitchin", lib, false, lib, false))
-        ridings.add(Riding("Klondike", lib, true, lib, false))
-        ridings.add(Riding("Takhini-Copper King", ndp, false, ndp, true))
-        ridings.add(Riding("Whitehorse Centre", ndp, false, ndp, true))
-        ridings.add(Riding("Mayo-Tatchun", lib, true, ndp, false))
-        ridings.add(Riding("Mount Lorne-Southern Lakes", lib, false, ndp, false))
-        ridings.add(Riding("Riverdale South", lib, false, ndp, true))
-        ridings.add(Riding("Copperbelt South", yp, false, ndp, true))
-        ridings.add(Riding("Porter Creek South", lib, false, yp, true))
-        ridings.add(Riding("Watson Lake", yp, true, yp, true))
-        ridings.add(Riding("Porter Creek Centre", lib, false, yp, true))
-        ridings.add(Riding("Riverdale North", lib, true, yp, true))
-        ridings.add(Riding("Kluane", yp, false, yp, false))
-        ridings.add(Riding("Mountainview", lib, false, yp, false))
-        ridings.add(Riding("Copperbelt North", lib, false, yp, true))
-        ridings.add(Riding("Pelly-Nisutlin", yp, true, yp, false))
-        ridings.add(Riding("Porter Creek North", yp, false, yp, true))
-        ridings.add(Riding("Lake Laberge", yp, true, yp, false))
-        ridings.add(Riding("Whitehorse West", lib, false, yp, true))
+        val ridings = listOf(
+            Riding("Vuntut Gwitchin", lib, false, lib, false),
+            Riding("Klondike", lib, true, lib, false),
+            Riding("Takhini-Copper King", ndp, false, ndp, true),
+            Riding("Whitehorse Centre", ndp, false, ndp, true),
+            Riding("Mayo-Tatchun", lib, true, ndp, false),
+            Riding("Mount Lorne-Southern Lakes", lib, false, ndp, false),
+            Riding("Riverdale South", lib, false, ndp, true),
+            Riding("Copperbelt South", yp, false, ndp, true),
+            Riding("Porter Creek South", lib, false, yp, true),
+            Riding("Watson Lake", yp, true, yp, true),
+            Riding("Porter Creek Centre", lib, false, yp, true),
+            Riding("Riverdale North", lib, true, yp, true),
+            Riding("Kluane", yp, false, yp, false),
+            Riding("Mountainview", lib, false, yp, false),
+            Riding("Copperbelt North", lib, false, yp, true),
+            Riding("Pelly-Nisutlin", yp, true, yp, false),
+            Riding("Porter Creek North", yp, false, yp, true),
+            Riding("Lake Laberge", yp, true, yp, false),
+            Riding("Whitehorse West", lib, false, yp, true),
+        )
         val filter = Publisher<(Riding) -> Boolean> { true }
         val frame = ofElectedLeading(
             3.asOneTimePublisher(),
@@ -173,9 +174,9 @@ class HeatMapFrameBuilderTest {
             { PartyResult(it.leader, it.hasWon).asOneTimePublisher() },
             { it.prev },
             lib,
-            { e: Int, l: Int -> "LIB: $e/$l" },
-            { _: Int, l: Int -> l > 0 },
-            { e: Int, l: Int -> DecimalFormat("+0;-0").format(e) + "/" + DecimalFormat("+0;-0").format(l) },
+            { e, l -> "LIB: $e/$l" },
+            { _, l -> l > 0 },
+            { e, l -> DecimalFormat("+0;-0").format(e) + "/" + DecimalFormat("+0;-0").format(l) },
             "YUKON".asOneTimePublisher(),
             filterFunc = filter
         )
@@ -242,16 +243,16 @@ class HeatMapFrameBuilderTest {
         }
 
         val result = Result(null, false, gop)
-        val results = Collections.nCopies(30, result)
+        val results = generateSequence { result }.take(30).toList()
         val frame = ofElectedLeading(
             results.size.asOneTimePublisher(),
             results,
             { it.publisher },
             { it.prev },
             dem,
-            { e: Int, l: Int -> "DEM: $e/$l" },
-            { _: Int, l: Int -> l > 0 },
-            { e: Int, l: Int -> DecimalFormat("+0;-0").format(e) + "/" + DecimalFormat("+0;-0").format(l) },
+            { e, l -> "DEM: $e/$l" },
+            { _, l -> l > 0 },
+            { e, l -> DecimalFormat("+0;-0").format(e) + "/" + DecimalFormat("+0;-0").format(l) },
             "TEST".asOneTimePublisher()
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
@@ -299,9 +300,9 @@ class HeatMapFrameBuilderTest {
             { it.publisher },
             { it.prev },
             dem,
-            { e: Int, l: Int -> "DEM: $e/$l" },
-            { _: Int, _: Int -> true },
-            { e: Int, l: Int -> DecimalFormat("+0;-0").format(e) + "/" + DecimalFormat("+0;-0").format(l) },
+            { e, l -> "DEM: $e/$l" },
+            { _, _ -> true },
+            { e, l -> DecimalFormat("+0;-0").format(e) + "/" + DecimalFormat("+0;-0").format(l) },
             "TEST".asOneTimePublisher(),
             seatsFunc = { it.numSeats }
         )
@@ -363,9 +364,9 @@ class HeatMapFrameBuilderTest {
             { it.publisher },
             { it.prev },
             dem,
-            { e: Int, l: Int -> "DEM: $e/$l" },
-            { _: Int, _: Int -> true },
-            { e: Int, l: Int -> DecimalFormat("+0;-0").format(e) + "/" + DecimalFormat("+0;-0").format(l) },
+            { e, l -> "DEM: $e/$l" },
+            { _, _ -> true },
+            { e, l -> DecimalFormat("+0;-0").format(e) + "/" + DecimalFormat("+0;-0").format(l) },
             "TEST".asOneTimePublisher(),
             seatsFunc = { it.numSeats }
         )

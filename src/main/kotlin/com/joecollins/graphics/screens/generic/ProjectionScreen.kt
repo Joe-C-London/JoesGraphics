@@ -17,7 +17,7 @@ class ProjectionScreen private constructor(
 ) : JPanel() {
 
     companion object {
-        @JvmStatic fun createScreen(
+        fun createScreen(
             text: Flow.Publisher<out String?>,
             color: Flow.Publisher<out Color>,
             image: Flow.Publisher<out Image?>
@@ -27,7 +27,7 @@ class ProjectionScreen private constructor(
             )
         }
 
-        @JvmStatic fun createScreen(
+        fun createScreen(
             text: Flow.Publisher<out String?>,
             color: Flow.Publisher<out Color>,
             image: Flow.Publisher<out Image?>,

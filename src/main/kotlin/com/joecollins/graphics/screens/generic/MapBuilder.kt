@@ -49,7 +49,7 @@ class MapBuilder<T> {
             }
         }
         this.winners =
-            shapesToParties.merge(allFocusShapes) { r: List<Pair<Shape, PartyResult?>>, f: List<Shape>? ->
+            shapesToParties.merge(allFocusShapes) { r, f ->
                 r.map { Pair(it.first, extractColor(f, it.first, it.second)) }
                     .toList()
             }
@@ -103,7 +103,7 @@ class MapBuilder<T> {
                 }
             }
         val focusedShapeWinners =
-            shapeWinners.merge(allFocusShapes) { sw: List<Pair<Shape, Color>>, f: List<Shape>? ->
+            shapeWinners.merge(allFocusShapes) { sw, f ->
                 if (f == null) {
                     sw
                 } else {
@@ -122,8 +122,8 @@ class MapBuilder<T> {
 
     private fun <T> createFocusShapes(shapes: Map<T, Shape>, focus: List<T>?): List<Shape>? {
         return focus
-            ?.filter { key: T -> shapes.containsKey(key) }
-            ?.map { key: T -> shapes[key]!! }
+            ?.filter { shapes.containsKey(it) }
+            ?.map { shapes[it]!! }
             ?.toList()
     }
 

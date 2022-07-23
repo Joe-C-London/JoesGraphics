@@ -11,8 +11,6 @@ import com.joecollins.pubsub.mapReduce
 import com.joecollins.pubsub.merge
 import java.awt.Color
 import java.awt.Point
-import java.util.ArrayList
-import java.util.Comparator
 import java.util.concurrent.Flow
 import kotlin.math.abs
 
@@ -123,7 +121,7 @@ class HemicycleFrameBuilder {
 
     class Result(val winner: Party?, val hasWon: Boolean)
     companion object {
-        @JvmStatic fun <T> of(
+        fun <T> of(
             rows: List<Int>,
             entries: List<T>,
             colorFunc: (T) -> Flow.Publisher<out Color>,
@@ -132,7 +130,7 @@ class HemicycleFrameBuilder {
             return of(rows, entries, colorFunc, colorFunc, tiebreaker)
         }
 
-        @JvmStatic fun <T> of(
+        fun <T> of(
             rows: List<Int>,
             entries: List<T>,
             colorFunc: (T) -> Flow.Publisher<out Color>,
@@ -143,7 +141,7 @@ class HemicycleFrameBuilder {
         }
 
         @Beta
-        @JvmStatic fun <T> ofClustered(
+        fun <T> ofClustered(
             rows: List<Int>,
             entries: List<T>,
             seatsFunc: (T) -> Int,
@@ -154,7 +152,7 @@ class HemicycleFrameBuilder {
         }
 
         @Beta
-        @JvmStatic fun <T> ofClustered(
+        fun <T> ofClustered(
             rows: List<Int>,
             entries: List<T>,
             seatsFunc: (T) -> Int,
@@ -163,12 +161,12 @@ class HemicycleFrameBuilder {
             tiebreaker: Tiebreaker
         ): HemicycleFrameBuilder {
             val points = rows.indices
-                .flatMap { row -> (0 until rows[row]).map { idx: Int -> Point(row, idx) } }
+                .flatMap { row -> (0 until rows[row]).map { idx -> Point(row, idx) } }
                 .sortedWith(
                     Comparator.comparingDouble { p: Point -> 180.0 * p.y / (rows[p.x] - 1) }
                         .thenComparingInt { p: Point -> (if (tiebreaker == Tiebreaker.FRONT_ROW_FROM_LEFT) 1 else -1) * p.x }
                 )
-                .map { point: Point -> Pair(point, null as T?) }
+                .map { Pair(it, null as T?) }
                 .toMutableList()
             for (entry in entries) {
                 val rejectedPoints: MutableList<Point> = ArrayList()
@@ -183,7 +181,7 @@ class HemicycleFrameBuilder {
                             (
                                 selectedPoints.isEmpty() ||
                                     selectedPoints
-                                        .any { point: Point -> pointsAreBesideEachOther(point, it.value.first, rows) }
+                                        .any { point -> pointsAreBesideEachOther(point, it.value.first, rows) }
                                 )
                         }
                     if (nextPoint == null) {
@@ -202,8 +200,8 @@ class HemicycleFrameBuilder {
             builder.rowsPublisher = rows.asOneTimePublisher()
             val dots: List<T> = points
                 .sortedWith(
-                    Comparator.comparingInt { it: Pair<Point, T?> -> it.first.x }
-                        .thenComparing { it -> it.first.y }
+                    Comparator.comparingInt { p: Pair<Point, T?> -> p.first.x }
+                        .thenComparing { p -> p.first.y }
                 )
                 .map { it.second!! }
                 .toList()
@@ -237,7 +235,7 @@ class HemicycleFrameBuilder {
             return abs(aY - bY) <= 0.5
         }
 
-        @JvmStatic fun <T> ofElectedLeading(
+        fun <T> ofElectedLeading(
             rows: List<Int>,
             entries: List<T>,
             resultFunc: (T) -> Flow.Publisher<out Result?>,
@@ -271,7 +269,7 @@ class HemicycleFrameBuilder {
         }
 
         @Beta
-        @JvmStatic fun <T> ofElectedLeading(
+        fun <T> ofElectedLeading(
             rows: List<Int>,
             entries: List<T>,
             seatsFunc: (T) -> Int,
@@ -295,13 +293,13 @@ class HemicycleFrameBuilder {
                 .associateWith { resultFunc(it) }
             val prev = entries.distinct().associateWith(prevResultFunc)
             val resultPublishers = entries
-                .map {
-                    results[it]!!.map { x: Result? -> Pair(x, seatsFunc(it)) }
+                .map { t ->
+                    results[t]!!.map { Pair(it, seatsFunc(t)) }
                 }
                 .toList()
             val resultWithPrevPublishers: List<Flow.Publisher<Triple<Result?, Party, Int>>> = entries
                 .map {
-                    results[it]!!.map { result: Result? -> Triple(result, prev[it]!!, seatsFunc(it)) }
+                    results[it]!!.map { result -> Triple(result, prev[it]!!, seatsFunc(it)) }
                 }
                 .toList()
             val leftSeats = createSeatBarPublisher(resultPublishers) { it == leftParty }
@@ -320,7 +318,7 @@ class HemicycleFrameBuilder {
             }
             val middleSeats = createSeatBarPublisher(
                 resultPublishers
-            ) { party: Party? -> party != null && party != leftParty && party != rightParty }
+            ) { party -> party != null && party != leftParty && party != rightParty }
             val middleList = middleSeats.map {
                 listOf(
                     Pair(Party.OTHERS.color, it.first),
@@ -362,7 +360,7 @@ class HemicycleFrameBuilder {
                 entries,
                 seatsFunc,
                 {
-                    results[it]!!.map { result: Result? ->
+                    results[it]!!.map { result ->
                         when {
                             result?.winner == null -> Color.WHITE
                             result.hasWon -> result.winner.color
@@ -409,7 +407,7 @@ class HemicycleFrameBuilder {
         ): Flow.Publisher<Pair<Int, Int>> {
             return results.mapReduce(
                 Pair(0, 0),
-                { p: Pair<Int, Int>, r: Pair<Result?, Int> ->
+                { p, r ->
                     val result = r.first
                     if (result == null || !partyFilter(result.winner)) {
                         p
@@ -417,7 +415,7 @@ class HemicycleFrameBuilder {
                         Pair(p.first + if (result.hasWon) r.second else 0, p.second + r.second)
                     }
                 },
-                { p: Pair<Int, Int>, r: Pair<Result?, Int> ->
+                { p, r ->
                     val result = r.first
                     if (result == null || !partyFilter(result.winner)) {
                         p
@@ -434,7 +432,7 @@ class HemicycleFrameBuilder {
         ): Flow.Publisher<Pair<Int, Int>> {
             return resultWithPrev.mapReduce(
                 Pair(0, 0),
-                { p: Pair<Int, Int>, r: Triple<Result?, Party, Int> ->
+                { p, r ->
                     var ret = p
                     val result = r.first
                     if (result?.winner == null) {
@@ -449,7 +447,7 @@ class HemicycleFrameBuilder {
                         ret
                     }
                 },
-                { p: Pair<Int, Int>, r: Triple<Result?, Party, Int> ->
+                { p, r ->
                     var ret = p
                     val result = r.first
                     if (result?.winner == null) {

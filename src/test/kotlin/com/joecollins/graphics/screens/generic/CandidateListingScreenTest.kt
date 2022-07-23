@@ -11,7 +11,6 @@ import org.junit.Test
 import java.awt.Color
 import java.awt.Dimension
 import java.awt.Shape
-import java.io.IOException
 
 class CandidateListingScreenTest {
 
@@ -320,7 +319,6 @@ class CandidateListingScreenTest {
         RenderTestUtils.compareRendering("CandidateListingScreen", "CandidatesUpdating-2", screen)
     }
 
-    @Throws(IOException::class)
     private fun peiShapesByDistrict(): Map<Int, Shape> {
         val peiMap = MapFrameTest::class.java
             .classLoader

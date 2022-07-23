@@ -139,30 +139,29 @@ class TooCloseToCallScreen private constructor(titleLabel: JLabel, multiSummaryF
             val pctFormatter = DecimalFormat("0.0%")
             val frame = MultiSummaryFrame(
                 headerPublisher = header,
-                rowsPublisher = entries.mapElements {
-                    val header = rowHeaderFunc(it.key)
-                    val values = run {
-                        val ret: MutableList<Pair<Color, String>> = sequenceOf(
-                            it.topCandidates.asSequence()
-                                .map { v: Map.Entry<Candidate, Int> ->
-                                    Pair(
-                                        v.key.party.color,
-                                        v.key.party.abbreviation.uppercase() +
-                                            ": " +
-                                            thousandsFormatter.format(v.value)
-                                    )
-                                },
-                            generateSequence { Pair(Color.WHITE, "") }
+                rowsPublisher = entries.mapElements { entry ->
+                    val header = rowHeaderFunc(entry.key)
+                    val values =
+                        sequenceOf(
+                            sequenceOf(
+                                entry.topCandidates.asSequence()
+                                    .map { e ->
+                                        Pair(
+                                            e.key.party.color,
+                                            e.key.party.abbreviation.uppercase() +
+                                                ": " +
+                                                thousandsFormatter.format(e.value)
+                                        )
+                                    },
+                                generateSequence { Pair(Color.WHITE, "") }
+                            )
+                                .flatten()
+                                .take(entry.numCandidates),
+                            sequenceOf(Color.WHITE to ("LEAD: " + thousandsFormatter.format(entry.lead))),
+                            pctReporting?.let { sequenceOf(Color.WHITE to (pctFormatter.format(entry.pctReporting) + " IN")) } ?: emptySequence()
                         )
                             .flatten()
-                            .take(it.numCandidates)
-                            .toMutableList()
-                        ret.add(Pair(Color.WHITE, "LEAD: " + thousandsFormatter.format(it.lead.toLong())))
-                        if (pctReporting != null) {
-                            ret.add(Pair(Color.WHITE, pctFormatter.format(it.pctReporting) + " IN"))
-                        }
-                        ret
-                    }
+                            .toList()
                     MultiSummaryFrame.Row(header, values)
                 }
             )
@@ -171,7 +170,7 @@ class TooCloseToCallScreen private constructor(titleLabel: JLabel, multiSummaryF
     }
 
     companion object {
-        @JvmStatic fun <T> of(
+        fun <T> of(
             votesPublisher: Flow.Publisher<out Map<T, Map<Candidate, Int>>>,
             resultPublisher: Flow.Publisher<out Map<T, PartyResult?>>,
             labelFunc: (T) -> String,
@@ -180,7 +179,7 @@ class TooCloseToCallScreen private constructor(titleLabel: JLabel, multiSummaryF
             return Builder(headerPublisher, votesPublisher, resultPublisher, labelFunc)
         }
 
-        @JvmStatic fun <T> ofParty(
+        fun <T> ofParty(
             votesPublisher: Flow.Publisher<out Map<T, Map<Party, Int>>>,
             resultPublisher: Flow.Publisher<out Map<T, PartyResult?>>,
             labelFunc: (T) -> String,
@@ -189,7 +188,7 @@ class TooCloseToCallScreen private constructor(titleLabel: JLabel, multiSummaryF
             return Builder(
                 headerPublisher,
                 votesPublisher.map { votes ->
-                    votes.mapValues { adjustKey(it.value) { p: Party -> Candidate("", p) } }
+                    votes.mapValues { adjustKey(it.value) { p -> Candidate("", p) } }
                 },
                 resultPublisher,
                 labelFunc

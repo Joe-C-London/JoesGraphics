@@ -82,20 +82,15 @@ class ProjectionFrame(
     }
 
     private inner class ImagePanel : JPanel() {
-        private var _image: Image? = null
-        private var _alignment: Alignment = Alignment.BOTTOM
-
-        var image: Image?
-            get() { return _image }
+        var image: Image? = null
             set(value) {
-                _image = value
+                field = value
                 repaint()
             }
 
-        var alignment: Alignment
-            get() { return _alignment }
+        var alignment: Alignment = Alignment.BOTTOM
             set(value) {
-                _alignment = value
+                field = value
                 repaint()
             }
 

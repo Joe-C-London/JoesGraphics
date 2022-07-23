@@ -80,36 +80,27 @@ class SwingFrame(
     }
 
     private inner class SwingPanel : JPanel() {
-        private var _range: Number = 1
-        private var _value: Number = 0
-        private var _leftColor: Color = Color.BLACK
-        private var _rightColor: Color = Color.BLACK
-
-        var range: Number
-            get() { return _range }
-            set(range) {
-                _range = range
-                repaint()
-            }
-
-        var value: Number
-            get() { return _value }
+        var range: Number = 1
             set(value) {
-                _value = value
+                field = value
                 repaint()
             }
 
-        var leftColor: Color
-            get() { return _leftColor }
-            set(leftColor) {
-                _leftColor = leftColor
+        var value: Number = 0
+            set(value) {
+                field = value
                 repaint()
             }
 
-        var rightColor: Color
-            get() { return _rightColor }
-            set(rightColor) {
-                _rightColor = rightColor
+        var leftColor: Color = Color.BLACK
+            set(value) {
+                field = value
+                repaint()
+            }
+
+        var rightColor: Color = Color.BLACK
+            set(value) {
+                field = value
                 repaint()
             }
 

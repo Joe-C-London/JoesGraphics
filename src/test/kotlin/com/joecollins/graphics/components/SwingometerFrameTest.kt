@@ -10,9 +10,7 @@ import org.hamcrest.core.IsEqual
 import org.junit.Assert
 import org.junit.Test
 import java.awt.Color
-import java.io.IOException
 import java.util.concurrent.TimeUnit
-import kotlin.Throws
 import kotlin.math.abs
 
 class SwingometerFrameTest {
@@ -215,7 +213,6 @@ class SwingometerFrameTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testRenderBasic() {
         val ticks = (-9..9).toList()
         val outerLabels = Publisher(
@@ -248,7 +245,6 @@ class SwingometerFrameTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testRenderBasicTinyDots() {
         val ticks = (-9..9).toList()
         val outerLabels = Publisher(
@@ -321,7 +317,6 @@ class SwingometerFrameTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testRenderLabels() {
         val ticks = (-9..9).toList()
         val outerLabels = Publisher(
@@ -360,7 +355,6 @@ class SwingometerFrameTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testRenderEmptyDots() {
         val ticks = (-9..9).toList()
         val outerLabels = Publisher(
@@ -400,7 +394,6 @@ class SwingometerFrameTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testNeededToWinGoesBeyondBoundary() {
         val outerLabels = Publisher(
             listOf(
@@ -524,7 +517,6 @@ class SwingometerFrameTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testRenderMultiLineLabels() {
         val ticks = (-9..9).toList()
         val outerLabels = Publisher(

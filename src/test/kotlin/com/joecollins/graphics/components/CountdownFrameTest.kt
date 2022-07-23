@@ -7,15 +7,12 @@ import org.hamcrest.core.IsEqual
 import org.junit.Assert
 import org.junit.Test
 import java.awt.Color
-import java.io.IOException
-import java.lang.InterruptedException
 import java.time.Clock
 import java.time.Duration
 import java.time.Instant
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.concurrent.TimeUnit
-import kotlin.Throws
 
 class CountdownFrameTest {
     @Test
@@ -46,7 +43,6 @@ class CountdownFrameTest {
     }
 
     @Test
-    @Throws(InterruptedException::class)
     fun testCountdown() {
         val frame = CountdownFrame(
             headerPublisher = "".asOneTimePublisher(),
@@ -88,7 +84,6 @@ class CountdownFrameTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testRenderWithoutAdditionalInfo() {
         val frame = CountdownFrame(
             headerPublisher = "TRUMP TERM END".asOneTimePublisher(),
@@ -103,7 +98,6 @@ class CountdownFrameTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testRenderWithAdditionalInfo() {
         val frame = CountdownFrame(
             headerPublisher = "1ST POLLS CLOSE".asOneTimePublisher(),

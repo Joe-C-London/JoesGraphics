@@ -91,8 +91,8 @@ class MultiSummaryFrame(
             override fun layoutContainer(parent: Container) {
                 val width = parent.width
                 val height = parent.height
-                val numCells = entries.map { e: EntryPanel -> e.panels.size }
-                    .fold(0) { a: Int, b: Int -> max(a, b) }
+                val numCells = entries.map { it.panels.size }
+                    .fold(0) { a, b -> max(a, b) }
                 headerLabel.setLocation(0, 1)
                 headerLabel.setSize(width * 3 / (3 + numCells), height - 3)
                 for (i in panels.indices) {
@@ -169,9 +169,9 @@ class MultiSummaryFrame(
                     entry.labels[i].foreground = ColorUtils.foregroundToContrast(values[i].first)
                     entry.labels[i].text = values[i].second
                 }
-                entries.forEach { e: EntryPanel ->
-                    e.invalidate()
-                    e.revalidate()
+                entries.forEach {
+                    it.invalidate()
+                    it.revalidate()
                 }
             }
             repaint()

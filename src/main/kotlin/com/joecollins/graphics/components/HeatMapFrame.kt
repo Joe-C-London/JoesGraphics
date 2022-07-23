@@ -117,44 +117,33 @@ class HeatMapFrame(
         get() = barsPanel.changeBarStart
 
     private inner class SeatBarPanel : JPanel() {
-        private var _seatBars: List<Bar> = ArrayList()
-        private var _seatBarLabel = ""
-        private var _changeBars: List<Bar> = ArrayList()
-        private var _changeBarLabel = ""
-        private var _changeBarStart = 0
-
-        var seatBars: List<Bar>
-            get() { return _seatBars }
-            set(seatBars) {
-                _seatBars = seatBars
+        var seatBars: List<Bar> = emptyList()
+            set(value) {
+                field = value
                 repaint()
             }
 
-        var seatBarLabel: String
-            get() { return _seatBarLabel }
-            set(seatBarLabel) {
-                _seatBarLabel = seatBarLabel
+        var seatBarLabel: String = ""
+            set(value) {
+                field = value
                 repaint()
             }
 
-        var changeBars: List<Bar>
-            get() { return _changeBars }
-            set(changeBars) {
-                _changeBars = changeBars
+        var changeBars: List<Bar> = emptyList()
+            set(value) {
+                field = value
                 repaint()
             }
 
-        var changeBarLabel: String
-            get() { return _changeBarLabel }
-            set(changeBarLabel) {
-                _changeBarLabel = changeBarLabel
+        var changeBarLabel: String = ""
+            set(value) {
+                field = value
                 repaint()
             }
 
-        var changeBarStart: Int
-            get() { return _changeBarStart }
-            set(changeBarStart) {
-                _changeBarStart = changeBarStart
+        var changeBarStart: Int = 0
+            set(value) {
+                field = value
                 repaint()
             }
 
@@ -214,7 +203,7 @@ class HeatMapFrame(
             val seatBaseline = height * 4 / 5 + height
             g.color = if (changeBars.isEmpty()) Color.BLACK else changeBars[0].color
             var leftLeft = getLeftPosition(changeBarStart) + 5
-            if (changeBars.sumOf { i: Bar -> i.size } < 0) {
+            if (changeBars.sumOf { it.size } < 0) {
                 leftLeft -= g.fontMetrics.stringWidth(changeBarLabel) + 10
             }
             g.drawString(changeBarLabel, leftLeft, seatBaseline)
@@ -222,7 +211,7 @@ class HeatMapFrame(
             val changeBarTop = height / 10 + height
             val changeBarMid = changeBarTop + changeBarHeight / 2
             val changeBarBottom = changeBarTop + changeBarHeight
-            val sideFunc: (Int, Int) -> Int = { zero: Int, point: Int ->
+            val sideFunc: (Int, Int) -> Int = { zero, point ->
                 if (point > zero) {
                     max(zero, point - changeBarHeight / 2)
                 } else {
@@ -238,16 +227,17 @@ class HeatMapFrame(
                 val startSide = sideFunc(leftBase, start)
                 val endSide = sideFunc(leftBase, end)
                 g.color = bar.color
-                val points: MutableList<Point> = ArrayList()
-                points.add(Point(startSide, changeBarTop))
-                points.add(Point(start, changeBarMid))
-                points.add(Point(startSide, changeBarBottom))
-                points.add(Point(endSide, changeBarBottom))
-                points.add(Point(end, changeBarMid))
-                points.add(Point(endSide, changeBarTop))
+                val points = listOf(
+                    Point(startSide, changeBarTop),
+                    Point(start, changeBarMid),
+                    Point(startSide, changeBarBottom),
+                    Point(endSide, changeBarBottom),
+                    Point(end, changeBarMid),
+                    Point(endSide, changeBarTop)
+                )
                 val polygon = Polygon(
-                    points.map { p: Point -> p.getX().toInt() }.toIntArray(),
-                    points.map { p: Point -> p.getY().toInt() }.toIntArray(),
+                    points.map { it.getX().toInt() }.toIntArray(),
+                    points.map { it.getY().toInt() }.toIntArray(),
                     points.size
                 )
                 g.fillPolygon(polygon)
@@ -277,20 +267,15 @@ class HeatMapFrame(
     class Bar(val color: Color = Color.WHITE, val size: Int = 0)
 
     private inner class SquaresPanel : JPanel() {
-        private var _numRows = 1
-        private var _squares: List<Square> = ArrayList()
-
-        var numRows: Int
-            get() { return _numRows }
-            set(numRows) {
-                _numRows = numRows
+        var numRows: Int = 1
+            set(value) {
+                field = value
                 repaint()
             }
 
-        var squares: List<Square>
-            get() { return _squares }
-            set(squares) {
-                _squares = squares
+        var squares: List<Square> = emptyList()
+            set(value) {
+                field = value
                 repaint()
             }
 
@@ -302,7 +287,7 @@ class HeatMapFrame(
 
         private val numCols: Int
             get() {
-                return ceil(1.0 * _squares.size / numRows).toInt()
+                return ceil(1.0 * squares.size / numRows).toInt()
             }
 
         private val squareSize: Int
@@ -322,8 +307,8 @@ class HeatMapFrame(
 
         private val padding: Int
             get() {
-                val padding: Int = if (_squares.size % numRows != 0) {
-                    ceil(0.5 * (numRows - _squares.size % numRows)).toInt()
+                val padding: Int = if (squares.size % numRows != 0) {
+                    ceil(0.5 * (numRows - squares.size % numRows)).toInt()
                 } else {
                     0
                 }
@@ -340,9 +325,9 @@ class HeatMapFrame(
                 )
             g.setColor(Color.BLACK)
             g.drawLine(width / 2, 0, width / 2, height)
-            if (_squares.isEmpty()) return
-            for (i in _squares.indices) {
-                val square = _squares[i]
+            if (squares.isEmpty()) return
+            for (i in squares.indices) {
+                val square = squares[i]
                 val index = i + padding
                 val row = index % numRows
                 val col = index / numRows

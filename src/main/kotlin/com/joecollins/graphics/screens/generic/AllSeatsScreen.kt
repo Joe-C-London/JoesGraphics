@@ -116,19 +116,19 @@ class AllSeatsScreen private constructor(title: JLabel, frame: ResultListingFram
 
         private fun toEntries() = this.prevResults
             .asSequence()
-            .filter { e: Pair<T, Party> -> this.seatFilter?.contains(e.first) ?: true }
-            .map { e: Pair<T, Party> ->
+            .filter { this.seatFilter?.contains(it.first) ?: true }
+            .map {
                 Triple(
-                    e.first,
-                    e.second,
-                    this.currResults[e.first] ?: PartyResult.NO_RESULT
+                    it.first,
+                    it.second,
+                    this.currResults[it.first] ?: PartyResult.NO_RESULT
                 )
             }
-            .map { e: Triple<T, Party, PartyResult?> ->
-                val result = e.third ?: PartyResult.NO_RESULT
+            .map {
+                val result = it.third
                 Entry(
-                    e.first,
-                    e.second.color,
+                    it.first,
+                    it.second.color,
                     result.party?.color ?: Color.BLACK,
                     result.isElected
                 )
@@ -138,7 +138,7 @@ class AllSeatsScreen private constructor(title: JLabel, frame: ResultListingFram
 
     private class Entry<T>(val key: T, val prevColor: Color, val resultColor: Color, val fill: Boolean)
     companion object {
-        @JvmStatic fun <T> of(
+        fun <T> of(
             prevResultPublisher: Flow.Publisher<out Map<T, Map<Party, Int>>>,
             currResultPublisher: Flow.Publisher<out Map<T, PartyResult?>>,
             nameFunc: (T) -> String,

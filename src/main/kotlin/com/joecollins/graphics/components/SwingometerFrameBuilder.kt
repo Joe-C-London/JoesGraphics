@@ -7,7 +7,6 @@ import com.joecollins.pubsub.combine
 import com.joecollins.pubsub.map
 import com.joecollins.pubsub.mapElements
 import java.awt.Color
-import java.util.ArrayList
 import java.util.concurrent.Flow
 import kotlin.math.abs
 import kotlin.math.ceil
@@ -17,52 +16,41 @@ import kotlin.math.roundToInt
 class SwingometerFrameBuilder {
     private inner class Properties {
 
-        private var _value: Number = 0
-        private var _max: Number = 1
-        private var _bucketSize: Number = 1
-        private var _tickInterval: Number = 1
-        private var _tickStringFunc: (Number) -> String = { it.toString() }
-
-        var value: Number
-            get() { return _value }
+        var value: Number = 0
             set(value) {
-                _value = if (java.lang.Double.isNaN(value.toDouble())) 0.0 else value
+                field = if (value.toDouble().isNaN()) 0.0 else value
                 update()
             }
 
-        val valuePublisher = Publisher(_value)
+        val valuePublisher = Publisher(value)
 
-        var max: Number
-            get() { return _max }
-            set(max) {
-                this._max = max
+        var max: Number = 1
+            set(value) {
+                field = value
                 update()
             }
 
-        var bucketSize: Number
-            get() { return _bucketSize }
-            set(bucketSize) {
-                this._bucketSize = bucketSize
+        var bucketSize: Number = 1
+            set(value) {
+                field = value
                 update()
             }
 
-        var tickInterval: Number
-            get() { return _tickInterval }
-            set(tickInterval) {
-                this._tickInterval = tickInterval
+        var tickInterval: Number = 1
+            set(value) {
+                field = value
                 update()
             }
 
-        var tickStringFunc: (Number) -> String
-            get() { return _tickStringFunc }
-            set(tickStringFunc) {
-                this._tickStringFunc = tickStringFunc
+        var tickStringFunc: (Number) -> String = { it.toString() }
+            set(value) {
+                field = value
                 update()
             }
 
         private fun update() {
             synchronized(this) {
-                valuePublisher.submit(_value)
+                valuePublisher.submit(value)
                 maxPublisher.submit(getMax())
                 numBucketsPerSidePublisher.submit(getNumBucketsPerSide())
                 ticksPublisher.submit(getTicks())
@@ -266,7 +254,7 @@ class SwingometerFrameBuilder {
     }
 
     companion object {
-        @JvmStatic fun basic(
+        fun basic(
             colors: Flow.Publisher<out Pair<Color, Color>>,
             value: Flow.Publisher<out Number>
         ): SwingometerFrameBuilder {

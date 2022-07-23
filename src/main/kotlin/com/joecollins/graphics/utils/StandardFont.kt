@@ -3,7 +3,6 @@ package com.joecollins.graphics.utils
 import java.awt.Font
 import java.awt.FontFormatException
 import java.io.IOException
-import java.lang.RuntimeException
 import java.util.HashMap
 
 object StandardFont {
@@ -33,12 +32,12 @@ object StandardFont {
     private var normalFont = { size: Int -> KLAVIKA_REGULAR.deriveFont(Font.PLAIN, size.toFloat()) }
 
     @Synchronized
-    @JvmStatic fun readBoldFont(size: Int): Font {
+    fun readBoldFont(size: Int): Font {
         return boldFontCache.computeIfAbsent(size, boldFont)
     }
 
     @Synchronized
-    @JvmStatic fun readNormalFont(size: Int): Font {
+    fun readNormalFont(size: Int): Font {
         return normalFontCache.computeIfAbsent(size, normalFont)
     }
 }

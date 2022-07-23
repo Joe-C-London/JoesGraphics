@@ -10,14 +10,12 @@ import org.opengis.feature.simple.SimpleFeature
 import java.awt.Shape
 import java.awt.geom.AffineTransform
 import java.awt.geom.Area
-import java.io.IOException
 import java.net.URL
 import kotlin.reflect.cast
 
 object ShapefileReader {
 
-    @Throws(IOException::class)
-    @JvmStatic fun <T> readShapes(file: URL, keyProperty: String, keyType: Class<T>): Map<T, Shape> {
+    fun <T> readShapes(file: URL, keyProperty: String, keyType: Class<T>): Map<T, Shape> {
         if (keyType == Int::class.java) {
             return readShapes(file) { feature ->
                 @Suppress("UNCHECKED_CAST")
@@ -39,13 +37,11 @@ object ShapefileReader {
         return readShapes(file) { feature -> keyType.cast(feature.getAttribute(keyProperty)) }
     }
 
-    @Throws(IOException::class)
-    @JvmStatic fun <T> readShapes(file: URL, keyFunc: (SimpleFeature) -> T): Map<T, Shape> {
+    fun <T> readShapes(file: URL, keyFunc: (SimpleFeature) -> T): Map<T, Shape> {
         return readShapes(file, keyFunc) { true }
     }
 
-    @Throws(IOException::class)
-    @JvmStatic fun <T> readShapes(
+    fun <T> readShapes(
         file: URL,
         keyFunc: (SimpleFeature) -> T,
         filter: (SimpleFeature) -> Boolean

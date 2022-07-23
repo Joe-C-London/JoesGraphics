@@ -19,7 +19,7 @@ class GenericPanelWithHeaderAndLowerThird<T : JPanel>(
     lowerThird: LowerThird?
 ) : JPanel() {
 
-    private val _label: JLabel = JLabel()
+    private val label: JLabel = JLabel()
 
     constructor(panel: T, label: String) : this(panel, label.asOneTimePublisher(), null)
     constructor(panel: T, lowerThird: LowerThird?) : this(panel, null as Flow.Publisher<String>?, lowerThird)
@@ -27,16 +27,16 @@ class GenericPanelWithHeaderAndLowerThird<T : JPanel>(
 
     init {
         if (label != null) {
-            label.subscribe(Subscriber(eventQueueWrapper { text: String? -> this._label.text = text ?: "" }))
-            this._label.horizontalAlignment = JLabel.CENTER
-            this._label.border = EmptyBorder(5, 0, -5, 0)
-            this._label.font = readBoldFont(32)
+            label.subscribe(Subscriber(eventQueueWrapper { this.label.text = it ?: "" }))
+            this.label.horizontalAlignment = JLabel.CENTER
+            this.label.border = EmptyBorder(5, 0, -5, 0)
+            this.label.font = readBoldFont(32)
         }
         background = Color.WHITE
         layout = BorderLayout()
         preferredSize = Dimension(1024, 512)
         if (label != null) {
-            add(this._label, BorderLayout.NORTH)
+            add(this.label, BorderLayout.NORTH)
         }
         if (lowerThird != null) {
             add(lowerThird, BorderLayout.SOUTH)

@@ -63,7 +63,7 @@ class MapFrameBuilder {
     }
 
     companion object {
-        @JvmStatic fun from(shapes: Flow.Publisher<out List<Pair<Shape, Color>>>): MapFrameBuilder {
+        fun from(shapes: Flow.Publisher<out List<Pair<Shape, Color>>>): MapFrameBuilder {
             val mapFrameBuilder = MapFrameBuilder()
             mapFrameBuilder.shapesPublisher = shapes
             return mapFrameBuilder

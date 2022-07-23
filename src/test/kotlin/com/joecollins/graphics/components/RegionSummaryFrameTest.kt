@@ -7,9 +7,7 @@ import org.hamcrest.core.IsEqual
 import org.junit.Assert
 import org.junit.Test
 import java.awt.Color
-import java.io.IOException
 import java.util.concurrent.TimeUnit
-import kotlin.Throws
 
 class RegionSummaryFrameTest {
     @Test
@@ -66,7 +64,6 @@ class RegionSummaryFrameTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testRenderDifferentColors() {
         val frame = RegionSummaryFrame(
             headerPublisher = "UNITED STATES".asOneTimePublisher(),
@@ -96,7 +93,6 @@ class RegionSummaryFrameTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testRenderSameColor() {
         val frame = RegionSummaryFrame(
             headerPublisher = "USA".asOneTimePublisher(),
@@ -113,7 +109,6 @@ class RegionSummaryFrameTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testRenderSingleLevel() {
         val frame = RegionSummaryFrame(
             headerPublisher = "CANADA".asOneTimePublisher(),

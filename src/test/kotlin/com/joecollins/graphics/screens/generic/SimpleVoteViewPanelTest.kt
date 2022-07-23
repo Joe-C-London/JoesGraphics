@@ -20,16 +20,10 @@ import org.junit.Test
 import java.awt.Color
 import java.awt.Dimension
 import java.awt.Shape
-import java.io.IOException
-import java.util.ArrayList
-import java.util.HashMap
 import java.util.IdentityHashMap
-import java.util.LinkedHashMap
-import kotlin.Throws
 
 class SimpleVoteViewPanelTest {
     @Test
-    @Throws(IOException::class)
     fun testCandidatesBasicResult() {
         val ndp = Candidate("Billy Cann", Party("New Democratic Party", "NDP", Color.ORANGE))
         val pc = Candidate("Cory Deagle", Party("Progressive Conservative", "PC", Color.BLUE))
@@ -70,7 +64,6 @@ class SimpleVoteViewPanelTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testCandidatesBasicResultShrinkToFit() {
         val ndp = Candidate("Steven Scott", Party("New Democratic Party", "NDP", Color.ORANGE))
         val con = Candidate("Claudio Rocchi", Party("Conservative", "CON", Color.BLUE))
@@ -121,7 +114,6 @@ class SimpleVoteViewPanelTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testCandidatesBasicResultPctOnly() {
         val ndp = Candidate("Billy Cann", Party("New Democratic Party", "NDP", Color.ORANGE))
         val pc = Candidate("Cory Deagle", Party("Progressive Conservative", "PC", Color.BLUE))
@@ -163,7 +155,6 @@ class SimpleVoteViewPanelTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testCandidateScreenUpdating() {
         val ndp = Candidate("Billy Cann", Party("New Democratic Party", "NDP", Color.ORANGE))
         val pc = Candidate("Cory Deagle", Party("Progressive Conservative", "PC", Color.BLUE))
@@ -256,7 +247,6 @@ class SimpleVoteViewPanelTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testZeroVotesSingleCandidate() {
         val ndp = Candidate("Billy Cann", Party("New Democratic Party", "NDP", Color.ORANGE))
         val pc = Candidate("Cory Deagle", Party("Progressive Conservative", "PC", Color.BLUE))
@@ -301,7 +291,6 @@ class SimpleVoteViewPanelTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testPartyVoteScreen() {
         val ndp = Party("New Democratic Party", "NDP", Color.ORANGE)
         val pc = Party("Progressive Conservative", "PC", Color.BLUE)
@@ -360,7 +349,6 @@ class SimpleVoteViewPanelTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testPartyVoteTickScreen() {
         val dem = Party("DEMOCRAT", "DEM", Color.BLUE)
         val gop = Party("REPUBLICAN", "GOP", Color.RED)
@@ -395,7 +383,6 @@ class SimpleVoteViewPanelTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testMultipleCandidatesSameParty() {
         val dem = Party("DEMOCRAT", "DEM", Color.BLUE)
         val gop = Party("REPUBLICAN", "GOP", Color.RED)
@@ -435,7 +422,6 @@ class SimpleVoteViewPanelTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testCandidateMajorityLine() {
         val lrem = Party("LA R\u00c9PUBLIQUE EN MARCHE", "LREM", Color.ORANGE)
         val fn = Party("FRONT NATIONAL", "FN", Color.BLUE)
@@ -476,7 +462,6 @@ class SimpleVoteViewPanelTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testAdditionalHighlightMap() {
         val ndp = Candidate("Billy Cann", Party("New Democratic Party", "NDP", Color.ORANGE))
         val pc = Candidate("Cory Deagle", Party("Progressive Conservative", "PC", Color.BLUE))
@@ -519,7 +504,6 @@ class SimpleVoteViewPanelTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testCandidateUncontested() {
         val dem = Candidate("Joe Kennedy III", Party("Democratic", "DEM", Color.BLUE))
         val curr = LinkedHashMap<Candidate, Int>()
@@ -546,7 +530,6 @@ class SimpleVoteViewPanelTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testCandidatesSwitchingBetweenSingleAndDoubleLines() {
         val result2017 = LinkedHashMap<Candidate, Int>()
         result2017[Candidate("Boris Johnson", Party("Conservative", "CON", Color.BLUE))] = 23716
@@ -586,7 +569,6 @@ class SimpleVoteViewPanelTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testCandidatesLimit() {
         val ndp = Candidate("Billy Cann", Party("New Democratic Party", "NDP", Color.ORANGE))
         val pc = Candidate("Cory Deagle", Party("Progressive Conservative", "PC", Color.BLUE))
@@ -645,7 +627,6 @@ class SimpleVoteViewPanelTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testCandidatesLimitWithMandatoryParties() {
         val ndp = Candidate("Billy Cann", Party("New Democratic Party", "NDP", Color.ORANGE))
         val pc = Candidate("Cory Deagle", Party("Progressive Conservative", "PC", Color.BLUE))
@@ -704,7 +685,6 @@ class SimpleVoteViewPanelTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testPartiesNotRunningAgain() {
         val ndp = Party("New Democratic Party", "NDP", Color.ORANGE)
         val pc = Candidate("Jean-G\u00e9rard Chiasson", Party("Progressive Conservative", "PC", Color.BLUE))
@@ -739,7 +719,6 @@ class SimpleVoteViewPanelTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testPartiesNotRunningAgainPrevOthers() {
         val ndp = Party("New Democratic Party", "NDP", Color.ORANGE)
         val pc = Candidate("Jean-G\u00e9rard Chiasson", Party("Progressive Conservative", "PC", Color.BLUE))
@@ -776,7 +755,6 @@ class SimpleVoteViewPanelTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testPartiesNotRunningAgainOthers() {
         val ndp = Party("New Democratic Party", "NDP", Color.ORANGE)
         val pc = Candidate("Jean-G\u00e9rard Chiasson", Party("Progressive Conservative", "PC", Color.BLUE))
@@ -811,7 +789,6 @@ class SimpleVoteViewPanelTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testPartiesNotRunningAgainOthersPrevOthers() {
         val ndp = Party("New Democratic Party", "NDP", Color.ORANGE)
         val pc = Candidate("Jean-G\u00e9rard Chiasson", Party("Progressive Conservative", "PC", Color.BLUE))
@@ -847,7 +824,6 @@ class SimpleVoteViewPanelTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testWinningPartyNotRunningAgain() {
         val con = Candidate("Greg Smith", Party("Conservative", "CON", Color.BLUE))
         val ld = Candidate("Stephen Dorrell", Party("Liberal Democrats", "LD", Color.ORANGE))
@@ -919,7 +895,6 @@ class SimpleVoteViewPanelTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testCandidateRunoffSingleLine() {
         val macron = Candidate("Emmanuel Macron", Party("En Marche!", "EM", Color.ORANGE))
         val lePen = Candidate("Marine Le Pen", Party("National Front", "FN", Color.BLUE.darker()))
@@ -960,7 +935,6 @@ class SimpleVoteViewPanelTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testCandidateRunoffDualLine() {
         val macron = Candidate("Emmanuel Macron", Party("En Marche!", "EM", Color.ORANGE))
         val lePen = Candidate("Marine Le Pen", Party("National Front", "FN", Color.BLUE.darker()))
@@ -1001,7 +975,6 @@ class SimpleVoteViewPanelTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testVoteRangeScreen() {
         val ndp = Party("New Democratic Party", "NDP", Color.ORANGE)
         val pc = Party("Progressive Conservative", "PC", Color.BLUE)
@@ -1038,7 +1011,6 @@ class SimpleVoteViewPanelTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testCandidatesResultMidDeclaration() {
         val ndp = Candidate("Billy Cann", Party("New Democratic Party", "NDP", Color.ORANGE))
         val pc = Candidate("Cory Deagle", Party("Progressive Conservative", "PC", Color.BLUE))
@@ -1102,7 +1074,6 @@ class SimpleVoteViewPanelTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testPartyClassification() {
         val dup = Party("Democratic Unionist Party", "DUP", Color.ORANGE.darker())
         val sf = Party("Sinn F\u00e9in", "SF", Color.GREEN.darker().darker())
@@ -1124,7 +1095,7 @@ class SimpleVoteViewPanelTest {
         val unionists = Party("Unionists", "Unionists", Color(0xff8200))
         val nationalists = Party("Nationalists", "Nationalists", Color(0x169b62))
         val others = Party.OTHERS
-        val mapping: MutableMap<Party, Party> = IdentityHashMap()
+        val mapping = IdentityHashMap<Party, Party>()
         sequenceOf(dup, uup, tuv, con, pup, ukip, indU).forEach { mapping[it] = unionists }
         sequenceOf(sf, sdlp, wp, indN).forEach { mapping[it] = nationalists }
         sequenceOf(apni, grn, pbp, lab, indO).forEach { mapping[it] = others }
@@ -1447,7 +1418,6 @@ class SimpleVoteViewPanelTest {
         compareRendering("SimpleVoteViewPanel", "PrevRangeVotes-2", panel)
     }
 
-    @Throws(IOException::class)
     private fun peiShapesByDistrict(): Map<Int, Shape> {
         val peiMap = MapFrameTest::class.java
             .classLoader

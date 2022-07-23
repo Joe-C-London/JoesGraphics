@@ -9,9 +9,7 @@ import org.hamcrest.core.IsEqual
 import org.junit.Assert
 import org.junit.Test
 import java.awt.Color
-import java.io.IOException
 import java.util.concurrent.TimeUnit
-import kotlin.Throws
 
 class ResultListingFrameTest {
     @Test
@@ -27,15 +25,16 @@ class ResultListingFrameTest {
 
     @Test
     fun testItems() {
-        val rawItems: MutableList<Item> = ArrayList()
-        rawItems.add(Item("BELFAST-MURRAY RIVER", Color.WHITE, Color.BLACK, Color.BLUE))
-        rawItems.add(Item("SOURIS-ELMIRA", Color.WHITE, Color.BLACK, Color.BLUE))
-        rawItems.add(Item("GEORGETOWN-ST. PETERS", Color.WHITE, Color.BLACK, Color.BLUE))
-        rawItems.add(Item("MORRELL-MERMAID", Color.WHITE, Color.BLACK, Color.BLUE))
-        rawItems.add(Item("RUSTICO-EMERALD", Color.WHITE, Color.BLACK, Color.BLUE))
-        rawItems.add(Item("BORDEN-KINKORA", Color.WHITE, Color.BLACK, Color.BLUE))
-        rawItems.add(Item("STRATFORD-KINLOCK", Color.WHITE, Color.BLACK, Color.BLUE))
-        rawItems.add(Item("KENSINGTON-MALPEQUE", Color.WHITE, Color.BLACK, Color.BLUE))
+        val rawItems = listOf(
+            Item("BELFAST-MURRAY RIVER", Color.WHITE, Color.BLACK, Color.BLUE),
+            Item("SOURIS-ELMIRA", Color.WHITE, Color.BLACK, Color.BLUE),
+            Item("GEORGETOWN-ST. PETERS", Color.WHITE, Color.BLACK, Color.BLUE),
+            Item("MORRELL-MERMAID", Color.WHITE, Color.BLACK, Color.BLUE),
+            Item("RUSTICO-EMERALD", Color.WHITE, Color.BLACK, Color.BLUE),
+            Item("BORDEN-KINKORA", Color.WHITE, Color.BLACK, Color.BLUE),
+            Item("STRATFORD-KINLOCK", Color.WHITE, Color.BLACK, Color.BLUE),
+            Item("KENSINGTON-MALPEQUE", Color.WHITE, Color.BLACK, Color.BLUE),
+        )
         val items: Publisher<List<Item>> = Publisher(rawItems)
         val frame = ResultListingFrame(
             headerPublisher = (null as String?).asOneTimePublisher(),
@@ -67,19 +66,19 @@ class ResultListingFrameTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testSingleFullColumn() {
-        val rawItems: MutableList<Item> = ArrayList()
-        rawItems.add(Item("Mermaid-Stratford", Color.WHITE, Color.BLACK, Color.RED)) // 0.0
-        rawItems.add(Item("Charlottetown-Brighton", Color.WHITE, Color.BLACK, Color.RED)) // 0.8
-        rawItems.add(Item("Summerside-Wilmot", Color.WHITE, Color.BLACK, Color.RED)) // 1.0
-        rawItems.add(Item("Brackley-Hunter River", Color.WHITE, Color.BLACK, Color.RED)) // 1.6
-        rawItems.add(Item("Summerside-South Drive", Color.WHITE, Color.BLACK, Color.RED)) // 4.9
-        rawItems.add(Item("Charlottetown-West Royalty", Color.WHITE, Color.BLACK, Color.RED)) // 7.3
-        rawItems.add(Item("O'Leary-Inverness", Color.WHITE, Color.BLACK, Color.RED)) // 9.2
-        rawItems.add(Item("Montague-Kilmuir", Color.WHITE, Color.BLACK, Color.RED)) // 10.8
-        rawItems.add(Item("Charlottetown-Victoria Park", Color.WHITE, Color.BLACK, Color.RED)) // 11.9
-        rawItems.add(Item("Cornwall-Meadowbank", Color.WHITE, Color.BLACK, Color.RED)) // 12.5
+        val rawItems = listOf(
+            Item("Mermaid-Stratford", Color.WHITE, Color.BLACK, Color.RED), // 0.0
+            Item("Charlottetown-Brighton", Color.WHITE, Color.BLACK, Color.RED), // 0.8
+            Item("Summerside-Wilmot", Color.WHITE, Color.BLACK, Color.RED), // 1.0
+            Item("Brackley-Hunter River", Color.WHITE, Color.BLACK, Color.RED), // 1.6
+            Item("Summerside-South Drive", Color.WHITE, Color.BLACK, Color.RED), // 4.9
+            Item("Charlottetown-West Royalty", Color.WHITE, Color.BLACK, Color.RED), // 7.3
+            Item("O'Leary-Inverness", Color.WHITE, Color.BLACK, Color.RED), // 9.2
+            Item("Montague-Kilmuir", Color.WHITE, Color.BLACK, Color.RED), // 10.8
+            Item("Charlottetown-Victoria Park", Color.WHITE, Color.BLACK, Color.RED), // 11.9
+            Item("Cornwall-Meadowbank", Color.WHITE, Color.BLACK, Color.RED), // 12.5
+        )
         val items: Publisher<List<Item>> = Publisher(rawItems)
         val frame = ResultListingFrame(
             headerPublisher = "PC TARGETS".asOneTimePublisher(),
@@ -111,7 +110,6 @@ class ResultListingFrameTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testVaryingItems() {
         val rawItems: MutableList<Item> = ArrayList()
         val items: Publisher<List<Item>> = Publisher(rawItems)
@@ -151,7 +149,6 @@ class ResultListingFrameTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testVaryingItemsInReverse() {
         val rawItems: MutableList<Item> = ArrayList()
         val items: Publisher<List<Item>> = Publisher(rawItems)
@@ -191,29 +188,5 @@ class ResultListingFrameTest {
         compareRendering("ResultListingFrame", "Reversed-3", frame)
     }
 
-    private class Item(private var _text: String, private var _background: Color, private var _foreground: Color, private var _border: Color) {
-        var text: String
-            get() = _text
-            set(text) {
-                this._text = text
-            }
-
-        var foreground: Color
-            get() = _foreground
-            set(foreground) {
-                this._foreground = foreground
-            }
-
-        var background: Color
-            get() = _background
-            set(background) {
-                this._background = background
-            }
-
-        var border: Color
-            get() = _border
-            set(border) {
-                this._border = border
-            }
-    }
+    private class Item(var text: String, var background: Color, var foreground: Color, var border: Color)
 }

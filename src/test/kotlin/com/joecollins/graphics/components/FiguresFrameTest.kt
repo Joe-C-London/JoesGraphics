@@ -7,9 +7,7 @@ import org.hamcrest.core.IsEqual
 import org.junit.Assert
 import org.junit.Test
 import java.awt.Color
-import java.io.IOException
 import java.util.concurrent.TimeUnit
-import kotlin.Throws
 
 class FiguresFrameTest {
     @Test
@@ -60,7 +58,6 @@ class FiguresFrameTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testRenderEntries() {
         val frame = FiguresFrame(
             headerPublisher = "PARTY LEADERS".asOneTimePublisher(),
@@ -77,7 +74,6 @@ class FiguresFrameTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testRenderOverflow() {
         val frame = FiguresFrame(
             headerPublisher = "PARTY LEADERS".asOneTimePublisher(),
@@ -100,7 +96,6 @@ class FiguresFrameTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testRenderLongStrings() {
         val frame = FiguresFrame(
             headerPublisher = "PARTY LEADERS".asOneTimePublisher(),

@@ -14,7 +14,6 @@ import java.awt.event.ComponentEvent
 import java.awt.geom.AffineTransform
 import java.awt.geom.Area
 import java.awt.geom.GeneralPath
-import java.awt.geom.NoninvertibleTransformException
 import java.awt.geom.PathIterator
 import java.awt.geom.Point2D
 import java.awt.geom.Rectangle2D
@@ -153,21 +152,17 @@ class MapFrame(
                 transform.scale(scale, scale)
                 transform.translate(-bounds.minX, -bounds.minY)
                 val inScope: (Shape) -> Boolean
-                try {
-                    val inverted = transform.createInverse()
-                    val drawArea = inverted.createTransformedShape(
-                        Rectangle2D.Double(0.0, 0.0, width.toDouble(), height.toDouble())
-                    )
-                    inScope = { s: Shape -> drawArea.intersects(s.bounds) }
-                } catch (e: NoninvertibleTransformException) {
-                    throw RuntimeException(e)
-                }
+                val inverted = transform.createInverse()
+                val drawArea = inverted.createTransformedShape(
+                    Rectangle2D.Double(0.0, 0.0, width.toDouble(), height.toDouble())
+                )
+                inScope = { s: Shape -> drawArea.intersects(s.bounds) }
                 shapesToDraw
                     .asSequence()
                     .filter { inScope(it.first) }
                     .map {
                         Pair(
-                            transformedShapesCache.computeIfAbsent(it.first) { shape: Shape ->
+                            transformedShapesCache.computeIfAbsent(it.first) { shape ->
                                 CompletableFuture.supplyAsync({
                                     val s = createTransformedShape(transform, shape)
                                     repaint()
@@ -208,7 +203,7 @@ class MapFrame(
                     .map {
                         transformedShapesCache.computeIfAbsent(
                             it
-                        ) { shape: Shape ->
+                        ) { shape ->
                             CompletableFuture.supplyAsync({
                                 val s = createTransformedShape(transform, shape)
                                 repaint()

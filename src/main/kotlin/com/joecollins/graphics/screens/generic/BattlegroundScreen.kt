@@ -21,7 +21,6 @@ import java.awt.Component
 import java.awt.Container
 import java.awt.Dimension
 import java.awt.LayoutManager
-import java.util.HashMap
 import java.util.concurrent.Flow
 import javax.swing.JLabel
 import javax.swing.JPanel
@@ -82,7 +81,7 @@ class BattlegroundScreen private constructor(
             defenseInput.setSide(Side.DEFENSE)
             val defenseItems = defenseInput.items
             val defenseFrame = ResultListingFrame(
-                headerPublisher = party.map { p: Party -> "$p DEFENSE SEATS" },
+                headerPublisher = party.map { "$it DEFENSE SEATS" },
                 borderColorPublisher = party.map(Party::color),
                 headerAlignmentPublisher = GraphicsFrame.Alignment.RIGHT.asOneTimePublisher(),
                 numRowsPublisher = numRows,
@@ -106,7 +105,7 @@ class BattlegroundScreen private constructor(
             targetInput.setSide(Side.TARGET)
             val targetItems = targetInput.items
             val targetFrame = ResultListingFrame(
-                headerPublisher = party.map { p: Party -> "$p TARGET SEATS" },
+                headerPublisher = party.map { "$it TARGET SEATS" },
                 borderColorPublisher = party.map(Party::color),
                 headerAlignmentPublisher = GraphicsFrame.Alignment.LEFT.asOneTimePublisher(),
                 numRowsPublisher = numRows,
@@ -125,13 +124,13 @@ class BattlegroundScreen private constructor(
                 headerLabel,
                 defenseFrame,
                 targetFrame
-            ) { screen: BattlegroundScreen ->
+            ) { screen ->
                 val layout = screen.Layout()
                 defenseSeatCount
-                    .merge(numRows) { c: Int, n: Int -> n * ceil(1.0 * c / n).toInt() }
+                    .merge(numRows) { c, n -> n * ceil(1.0 * c / n).toInt() }
                     .subscribe(Subscriber(eventQueueWrapper { layout.setLeft(it) }))
                 targetSeatCount
-                    .merge(numRows) { c: Int, n: Int -> n * ceil(1.0 * c / n).toInt() }
+                    .merge(numRows) { c, n -> n * ceil(1.0 * c / n).toInt() }
                     .subscribe(Subscriber(eventQueueWrapper { layout.setRight(it) }))
                 layout
             }
@@ -189,9 +188,9 @@ class BattlegroundScreen private constructor(
         val items: Flow.Publisher<List<Entry<T>>> = Publisher(getItemsList(this))
 
         companion object {
-            @JvmStatic private fun <T> getItemsList(t: BattlegroundInput<T>): List<Entry<T>> {
+            private fun <T> getItemsList(t: BattlegroundInput<T>): List<Entry<T>> {
                 return t.prev.entries.asSequence()
-                    .map { e: Map.Entry<T, Map<Party, Int>> ->
+                    .map { e ->
                         val votes = e.value
                         val total = votes.values.sum()
                         val topTwo = votes.entries
@@ -215,7 +214,7 @@ class BattlegroundScreen private constructor(
                         }
                         Triple(e.key, margin, topTwo[0].key.color)
                     }
-                    .filter { !java.lang.Double.isNaN(it.second) }
+                    .filter { !it.second.isNaN() }
                     .sortedBy { it.second }
                     .take(t.count)
                     .map {
@@ -229,7 +228,7 @@ class BattlegroundScreen private constructor(
                             resultColor = partyResult.party?.color ?: Color.BLACK
                             fill = partyResult.isElected
                         }
-                        val colorFunc = if (t.filteredSeats?.contains(it.first) != false) { c -> c } else { c: Color -> lighten(lighten(c)) }
+                        val colorFunc = if (t.filteredSeats?.contains(it.first) != false) { c: Color -> c } else { c -> lighten(lighten(c)) }
                         Entry(
                             it.first, colorFunc(it.third), colorFunc(resultColor), fill
                         )
@@ -289,7 +288,7 @@ class BattlegroundScreen private constructor(
     }
 
     companion object {
-        @JvmStatic fun <T> singleParty(
+        fun <T> singleParty(
             prevResultsPublisher: Flow.Publisher<out Map<T, Map<Party, Int>>>,
             currResultsPublisher: Flow.Publisher<out Map<T, PartyResult?>>,
             nameFunc: (T) -> String,

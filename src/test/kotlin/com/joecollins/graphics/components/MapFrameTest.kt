@@ -12,13 +12,10 @@ import java.awt.Color
 import java.awt.Shape
 import java.awt.geom.Area
 import java.awt.geom.Rectangle2D
-import java.io.IOException
 import java.util.concurrent.TimeUnit
-import kotlin.Throws
 
 class MapFrameTest {
     @Test
-    @Throws(IOException::class)
     fun testBindShapes() {
         val shapes = loadShapes { getDistrictColor(it) }
         val mapFrame = MapFrame(
@@ -32,7 +29,6 @@ class MapFrameTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testDefaultFocusAreaEncompassesAllShapes() {
         val shapes = loadShapes { getDistrictColor(it) }
         val mapFrame = MapFrame(
@@ -51,7 +47,6 @@ class MapFrameTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testFocusBox() {
         val shapes = loadShapes { getDistrictColor(it) }
         val cityBox = loadCityBox()
@@ -65,7 +60,6 @@ class MapFrameTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testOutlines() {
         val regions = loadRegions()
         val mapFrame = MapFrame(
@@ -79,7 +73,6 @@ class MapFrameTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testRenderFull() {
         val shapes = loadShapes { getDistrictColor(it) }
         val mapFrame = MapFrame(
@@ -91,9 +84,8 @@ class MapFrameTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testRenderFullThin() {
-        val shapes = loadShapes { district: Int -> getDistrictColor(district) }
+        val shapes = loadShapes { district -> getDistrictColor(district) }
         val mapFrame = MapFrame(
             headerPublisher = "PEI".asOneTimePublisher(),
             shapesPublisher = shapes.map { Pair(it.shape, it.color) }.asOneTimePublisher()
@@ -103,7 +95,6 @@ class MapFrameTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testRenderZoomedIn() {
         val shapes = loadShapes { if (it in 9..14) getDistrictColor(it) else Color.GRAY }
         val zoomBox = loadCityBox()
@@ -117,7 +108,6 @@ class MapFrameTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testRenderWithBorders() {
         val shapes = loadShapes { getDistrictColor(it) }
         val zoomBox = loadCityBox()
@@ -137,7 +127,6 @@ class MapFrameTest {
         compareRendering("MapFrame", "RenderBorders-2", mapFrame)
     }
 
-    @Throws(IOException::class)
     private fun loadShapes(colorFunc: (Int) -> Color): List<MapEntry> {
         val shapesByDistrict = shapesByDistrict()
         return shapesByDistrict.map { (district: Int, shape: Shape) ->
@@ -146,7 +135,6 @@ class MapFrameTest {
         }
     }
 
-    @Throws(IOException::class)
     private fun loadRegions(): List<Shape> {
         val shapesByDistrict = shapesByDistrict()
         val regions = ArrayList<Shape>()
@@ -188,7 +176,6 @@ class MapFrameTest {
         }
     }
 
-    @Throws(IOException::class)
     private fun loadCityBox(): Rectangle2D {
         return shapesByDistrict().entries.asSequence()
             .filter { it.key in 10..14 }
@@ -201,7 +188,6 @@ class MapFrameTest {
             .bounds2D
     }
 
-    @Throws(IOException::class)
     private fun shapesByDistrict(): Map<Int, Shape> {
         val peiMap = MapFrameTest::class.java
             .classLoader
@@ -209,11 +195,5 @@ class MapFrameTest {
         return readShapes(peiMap, "DIST_NO", Int::class.java)
     }
 
-    private class MapEntry(private val _shape: Shape, private val _color: Color) {
-        val shape: Shape
-            get() = _shape
-
-        val color: Color
-            get() = _color
-    }
+    private class MapEntry(val shape: Shape, val color: Color)
 }

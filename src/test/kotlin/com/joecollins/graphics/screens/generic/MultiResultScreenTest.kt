@@ -14,13 +14,11 @@ import com.joecollins.pubsub.map
 import org.junit.Test
 import java.awt.Color
 import java.awt.Shape
-import java.io.IOException
 import java.util.concurrent.Flow
 
 class MultiResultScreenTest {
 
     @Test
-    @Throws(IOException::class)
     fun testSimplePanel() {
         val districts = ArrayList<District>()
         districts.add(
@@ -108,7 +106,6 @@ class MultiResultScreenTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testVariousUpdates() {
         val district8 = District(
             8,
@@ -290,7 +287,6 @@ class MultiResultScreenTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testOthersPanel() {
         val districts = ArrayList<District>()
         districts.add(
@@ -385,7 +381,6 @@ class MultiResultScreenTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testOthersPartyPanel() {
         val districts = ArrayList<District>()
         districts.add(
@@ -532,7 +527,6 @@ class MultiResultScreenTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testMultipleRowsPanel() {
         val districts = ArrayList<District>()
         districts.add(
@@ -699,7 +693,6 @@ class MultiResultScreenTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testRunoffs() {
         val districts = ArrayList<District>()
         districts.add(
@@ -745,7 +738,6 @@ class MultiResultScreenTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testMapAdditionalHighlights() {
         val districts = ArrayList<District>()
         districts.add(
@@ -841,7 +833,6 @@ class MultiResultScreenTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testPartiesOnly() {
         val districts = ArrayList<District>()
         districts.add(
@@ -998,7 +989,6 @@ class MultiResultScreenTest {
         compareRendering("MultiResultPanel", "PartiesOnly-3", panel)
     }
 
-    @Throws(IOException::class)
     private fun peiShapesByDistrict(): Map<Int, Shape> {
         val peiMap = MapFrameTest::class.java
             .classLoader

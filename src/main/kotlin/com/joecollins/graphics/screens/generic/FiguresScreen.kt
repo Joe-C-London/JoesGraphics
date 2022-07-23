@@ -61,20 +61,15 @@ class FiguresScreen private constructor(headerLabel: JLabel, frames: Array<Figur
     }
 
     private class Entry(val candidate: Candidate, val description: String) {
-        private var _leader: Party? = null
-        private var _status: String = ""
-
-        var leader: Party?
-            get() = _leader
-            set(leader) {
-                this._leader = leader
+        var leader: Party? = null
+            set(value) {
+                field = value
                 colorPublisher.submit((leader ?: Party.OTHERS).color)
             }
 
-        var status: String
-            get() = _status
-            set(status) {
-                this._status = status
+        var status: String = ""
+            set(value) {
+                field = value
                 statusPublisher.submit(status)
             }
 
@@ -102,11 +97,11 @@ class FiguresScreen private constructor(headerLabel: JLabel, frames: Array<Figur
     }
 
     companion object {
-        @JvmStatic fun of(): Builder {
+        fun of(): Builder {
             return Builder()
         }
 
-        @JvmStatic fun section(sectionHeader: String): Section {
+        fun section(sectionHeader: String): Section {
             return Section(sectionHeader)
         }
     }

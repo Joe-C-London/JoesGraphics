@@ -161,18 +161,15 @@ fun <T> List<Flow.Publisher<T>>.combine(): Flow.Publisher<List<T>> {
     data class Wrapper(val item: T)
     val publisher = Publisher<List<T>>()
     val list: MutableList<Wrapper?> = this.map { null }.toMutableList()
-    val onUpdate = {
-        synchronized(list) {
-            if (list.none { it == null }) {
-                publisher.submit(list.map { it!!.item })
-            }
-        }
-    }
     this.forEachIndexed { index, pub ->
         pub.subscribe(
             Subscriber {
-                list[index] = Wrapper(it)
-                onUpdate()
+                synchronized(list) {
+                    list[index] = Wrapper(it)
+                    if (list.none { it == null }) {
+                        publisher.submit(list.map { it!!.item })
+                    }
+                }
             }
         )
     }

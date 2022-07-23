@@ -21,10 +21,10 @@ class SwingFrameBuilderTest {
         val swingProps = Publisher(SwingProperties(Color.RED, Color.BLUE, 0.02, "2% SWING"))
         val frame = basic(
             swingProps,
-            { p: SwingProperties -> p.leftColor },
-            { p: SwingProperties -> p.rightColor },
-            { p: SwingProperties -> p.value },
-            { p: SwingProperties -> p.text }
+            { it.leftColor },
+            { it.rightColor },
+            { it.value },
+            { it.text }
         )
             .withRange(0.10.asOneTimePublisher())
             .withHeader("SWING".asOneTimePublisher())
@@ -52,10 +52,10 @@ class SwingFrameBuilderTest {
         val neutralColor = Publisher(Color.GRAY)
         val frame = basic(
             swingProps,
-            { p: SwingProperties -> p.leftColor },
-            { p: SwingProperties -> p.rightColor },
-            { p: SwingProperties -> p.value },
-            { p: SwingProperties -> p.text }
+            { it.leftColor },
+            { it.rightColor },
+            { it.value },
+            { it.text }
         )
             .withRange(0.10.asOneTimePublisher())
             .withNeutralColor(neutralColor)
@@ -178,7 +178,7 @@ class SwingFrameBuilderTest {
         val prevBinding = mapOf(lib to 15, con to 25, ndp to 10).asOneTimePublisher()
         val currBinding = mapOf(lib to 15, con to 25, ndp to 10).asOneTimePublisher()
         val partyOrder = listOf(ndp, lib, con)
-        val swingFrame = prevCurr(prevBinding, currBinding, Comparator.comparing { o: Party -> partyOrder.indexOf(o) }).build()
+        val swingFrame = prevCurr(prevBinding, currBinding, Comparator.comparing { partyOrder.indexOf(it) }).build()
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ swingFrame.getLeftColor() }, IsEqual(Color.BLUE))
         Assert.assertEquals(Color.RED, swingFrame.getRightColor())
@@ -196,7 +196,7 @@ class SwingFrameBuilderTest {
         val prevBinding = mapOf(lib to 15, con to 25, ndp to 10).asOneTimePublisher()
         val currBinding = emptyMap<Party, Int>().asOneTimePublisher()
         val partyOrder = listOf(ndp, lib, con)
-        val swingFrame = prevCurr(prevBinding, currBinding, Comparator.comparing { o: Party -> partyOrder.indexOf(o) }).build()
+        val swingFrame = prevCurr(prevBinding, currBinding, Comparator.comparing { partyOrder.indexOf(it) }).build()
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ swingFrame.getLeftColor() }, IsEqual(Color.LIGHT_GRAY))
         Assert.assertEquals(Color.LIGHT_GRAY, swingFrame.getRightColor())
@@ -217,7 +217,7 @@ class SwingFrameBuilderTest {
         // CON: 30.00 -> 35.00 (+ 5.00)
         // NDP: 20.00 -> 18.00 (- 2.00)
         val partyOrder = listOf(ndp, lib, con)
-        val swingFrame = prevCurrNormalised(prevBinding, currBinding, Comparator.comparing { o: Party -> partyOrder.indexOf(o) }).build()
+        val swingFrame = prevCurrNormalised(prevBinding, currBinding, Comparator.comparing { partyOrder.indexOf(it) }).build()
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ swingFrame.getLeftColor() }, IsEqual(Color.BLUE))
         Assert.assertEquals(Color.RED, swingFrame.getRightColor())

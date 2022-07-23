@@ -117,7 +117,7 @@ class CountdownFrame(
     }
 
     companion object {
-        @JvmStatic fun formatDDHHMMSS(duration: Duration): String {
+        fun formatDDHHMMSS(duration: Duration): String {
             return String.format(
                 "%d:%02d:%02d:%02d",
                 duration.toHours() / 24,
@@ -127,13 +127,13 @@ class CountdownFrame(
             )
         }
 
-        @JvmStatic fun formatHHMMSS(duration: Duration): String {
+        fun formatHHMMSS(duration: Duration): String {
             return String.format(
                 "%d:%02d:%02d", duration.toHours(), duration.toMinutesPart(), duration.toSecondsPart()
             )
         }
 
-        @JvmStatic fun formatMMSS(duration: Duration): String {
+        fun formatMMSS(duration: Duration): String {
             return String.format("%d:%02d", duration.toMinutes(), duration.toSecondsPart())
         }
     }

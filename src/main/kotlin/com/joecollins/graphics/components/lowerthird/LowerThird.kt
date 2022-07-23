@@ -16,7 +16,6 @@ import java.awt.Image
 import java.awt.RenderingHints
 import java.awt.geom.Rectangle2D
 import java.awt.image.BufferedImage
-import java.io.IOException
 import java.net.URL
 import java.time.Clock
 import java.time.ZoneId
@@ -82,69 +81,67 @@ open class LowerThird internal constructor(
     private inner class PlaceAndTimePanel : JPanel() {
         private val formatter = DateTimeFormatter.ofPattern("HH:mm")
         private val tzFormatter = DateTimeFormatter.ofPattern("zzz", Locale.ENGLISH)
-        private val executor = Executors.newSingleThreadScheduledExecutor { r: Runnable? ->
+        private val executor = Executors.newSingleThreadScheduledExecutor { r: Runnable ->
             val t = Thread(r)
             t.name = "LowerThird-Timer-" + this.hashCode()
             t.isDaemon = true
             t
         }
 
-        private var _timezone: ZoneId = ZoneOffset.UTC
-        private val _placeLabel: JLabel = FontSizeAdjustingLabel("UTC")
-        private val _timeLabel: JLabel
-        private val _timezoneLabel: JLabel
-
-        init {
-            _placeLabel.font = StandardFont.readBoldFont(12)
-            _placeLabel.horizontalAlignment = JLabel.CENTER
-            _placeLabel.verticalAlignment = JLabel.CENTER
-            _placeLabel.foreground = Color.BLACK
-            _placeLabel.border = EmptyBorder(10, 0, 0, 0)
-
-            _timeLabel = JLabel(formatter.format(java.time.ZonedDateTime.now(_timezone)))
-            _timeLabel.font = StandardFont.readBoldFont(24)
-            _timeLabel.horizontalAlignment = JLabel.CENTER
-            _timeLabel.verticalAlignment = JLabel.CENTER
-            _timeLabel.foreground = Color.BLACK
-            _timeLabel.border = EmptyBorder(if (showTimeZone) 5 else 0, 0, if (showTimeZone) -5 else 0, 0)
-
-            _timezoneLabel = JLabel("UTC")
-            _timezoneLabel.font = StandardFont.readNormalFont(10)
-            _timezoneLabel.horizontalAlignment = JLabel.CENTER
-            _timezoneLabel.verticalAlignment = JLabel.CENTER
-            _timezoneLabel.foreground = Color.BLACK
-            _timezoneLabel.border = EmptyBorder(5, 0, 1, 0)
-        }
+        private val placeLabel: JLabel = FontSizeAdjustingLabel("UTC")
+        private val timeLabel: JLabel
+        private val timezoneLabel: JLabel
 
         var place: String
-            get() { return _placeLabel.text }
+            get() { return placeLabel.text }
             set(place) {
-                _placeLabel.text = place
+                placeLabel.text = place
                 repaint()
             }
 
-        var timezone: ZoneId
-            get() { return _timezone }
-            set(timezone) {
-                _timezone = timezone
+        var timezone: ZoneId = ZoneOffset.UTC
+            set(value) {
+                field = value
                 updateTime()
             }
 
         val time: String
-            get() { return _timeLabel.text }
+            get() { return timeLabel.text }
+
+        init {
+            placeLabel.font = StandardFont.readBoldFont(12)
+            placeLabel.horizontalAlignment = JLabel.CENTER
+            placeLabel.verticalAlignment = JLabel.CENTER
+            placeLabel.foreground = Color.BLACK
+            placeLabel.border = EmptyBorder(10, 0, 0, 0)
+
+            timeLabel = JLabel(formatter.format(java.time.ZonedDateTime.now(timezone)))
+            timeLabel.font = StandardFont.readBoldFont(24)
+            timeLabel.horizontalAlignment = JLabel.CENTER
+            timeLabel.verticalAlignment = JLabel.CENTER
+            timeLabel.foreground = Color.BLACK
+            timeLabel.border = EmptyBorder(if (showTimeZone) 5 else 0, 0, if (showTimeZone) -5 else 0, 0)
+
+            timezoneLabel = JLabel("UTC")
+            timezoneLabel.font = StandardFont.readNormalFont(10)
+            timezoneLabel.horizontalAlignment = JLabel.CENTER
+            timezoneLabel.verticalAlignment = JLabel.CENTER
+            timezoneLabel.foreground = Color.BLACK
+            timezoneLabel.border = EmptyBorder(5, 0, 1, 0)
+        }
 
         fun updateTime() {
             try {
-                val now = clock.instant().atZone(_timezone)
+                val now = clock.instant().atZone(timezone)
                 val newTime = formatter.format(now)
                 val newTz = tzFormatter.format(now)
-                if (newTime != _timeLabel.text) {
-                    _timeLabel.text = newTime
-                    EventQueue.invokeLater { _timeLabel.repaint() }
+                if (newTime != timeLabel.text) {
+                    timeLabel.text = newTime
+                    EventQueue.invokeLater { timeLabel.repaint() }
                 }
-                if (newTz != _timezoneLabel.text) {
-                    _timezoneLabel.text = newTz
-                    EventQueue.invokeLater { _timezoneLabel.repaint() }
+                if (newTz != timezoneLabel.text) {
+                    timezoneLabel.text = newTz
+                    EventQueue.invokeLater { timezoneLabel.repaint() }
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -156,7 +153,7 @@ open class LowerThird internal constructor(
             background = Color.YELLOW
             layout = GridBagLayout()
             add(
-                _placeLabel,
+                placeLabel,
                 object : GridBagConstraints() {
                     init {
                         fill = BOTH
@@ -170,7 +167,7 @@ open class LowerThird internal constructor(
                 }
             )
             add(
-                _timeLabel,
+                timeLabel,
                 object : GridBagConstraints() {
                     init {
                         fill = BOTH
@@ -185,7 +182,7 @@ open class LowerThird internal constructor(
             )
             if (showTimeZone) {
                 add(
-                    _timezoneLabel,
+                    timezoneLabel,
                     object : GridBagConstraints() {
                         init {
                             fill = BOTH
@@ -205,12 +202,11 @@ open class LowerThird internal constructor(
 
     companion object {
         private val DEFAULT_IMAGE = BufferedImage(200, 50, BufferedImage.TYPE_4BYTE_ABGR)
-        @Throws(IOException::class)
-        @JvmStatic fun createImage(url: URL): Image {
+        fun createImage(url: URL): Image {
             return ImageIO.read(url)
         }
 
-        @JvmStatic fun createImage(text: String, foreground: Color, background: Color): Image {
+        fun createImage(text: String, foreground: Color, background: Color): Image {
             val font = StandardFont.readBoldFont(24)
             var bounds: Rectangle2D
             run {

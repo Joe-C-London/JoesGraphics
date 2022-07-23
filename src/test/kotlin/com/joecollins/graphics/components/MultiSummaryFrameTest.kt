@@ -7,9 +7,7 @@ import org.hamcrest.core.IsEqual
 import org.junit.Assert
 import org.junit.Test
 import java.awt.Color
-import java.io.IOException
 import java.util.concurrent.TimeUnit
-import kotlin.Throws
 
 class MultiSummaryFrameTest {
     @Test
@@ -101,7 +99,6 @@ class MultiSummaryFrameTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testRenderBasicSummary() {
         val frame = MultiSummaryFrame(
             headerPublisher = "SEATS BY REGION".asOneTimePublisher(),
@@ -168,7 +165,6 @@ class MultiSummaryFrameTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testRenderOverflowSummary() {
         val frame = MultiSummaryFrame(
             headerPublisher = "SEATS BY PROVINCE".asOneTimePublisher(),
@@ -323,7 +319,6 @@ class MultiSummaryFrameTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testRenderDifferentColCounts() {
         val frame = MultiSummaryFrame(
             headerPublisher = "SENATE SEATS".asOneTimePublisher(),

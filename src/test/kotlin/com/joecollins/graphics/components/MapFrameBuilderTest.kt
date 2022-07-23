@@ -15,7 +15,6 @@ import java.awt.Color
 import java.awt.Shape
 import java.awt.geom.Ellipse2D
 import java.awt.geom.Rectangle2D
-import java.util.ArrayList
 import java.util.concurrent.TimeUnit
 
 class MapFrameBuilderTest {
@@ -41,9 +40,10 @@ class MapFrameBuilderTest {
 
     @Test
     fun testBasicMapFrameWithListBinding() {
-        val shapes: MutableList<Pair<Shape, Color>> = ArrayList()
-        shapes.add(Pair(Ellipse2D.Double(2.0, 2.0, 1.0, 1.0), Color.RED))
-        shapes.add(Pair(Rectangle2D.Double(5.0, 5.0, 2.0, 2.0), Color.BLUE))
+        val shapes = listOf(
+            Pair(Ellipse2D.Double(2.0, 2.0, 1.0, 1.0), Color.RED),
+            Pair(Rectangle2D.Double(5.0, 5.0, 2.0, 2.0), Color.BLUE),
+        )
         val frame: MapFrame = from(shapes.asOneTimePublisher()).withHeader("MAP".asOneTimePublisher()).build()
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numShapes }, IsEqual(2))
@@ -60,9 +60,10 @@ class MapFrameBuilderTest {
     fun testMapPropertyBinding() {
         class ConstituencyPair(val shape: Shape, val color: Color)
 
-        val shapes: MutableList<ConstituencyPair> = ArrayList()
-        shapes.add(ConstituencyPair(Ellipse2D.Double(2.0, 2.0, 1.0, 1.0), Color.RED))
-        shapes.add(ConstituencyPair(Rectangle2D.Double(5.0, 5.0, 2.0, 2.0), Color.BLUE))
+        val shapes = listOf(
+            ConstituencyPair(Ellipse2D.Double(2.0, 2.0, 1.0, 1.0), Color.RED),
+            ConstituencyPair(Rectangle2D.Double(5.0, 5.0, 2.0, 2.0), Color.BLUE),
+        )
         val frame = from(shapes.asOneTimePublisher(), { it.shape }, { it.color.asOneTimePublisher() })
             .withHeader("MAP".asOneTimePublisher())
             .build()
@@ -79,12 +80,9 @@ class MapFrameBuilderTest {
 
     @Test
     fun testMapItemPropertyBinding() {
-        val shapes: MutableList<Pair<Shape, Publisher<Color>>> = ArrayList()
-        shapes.add(
-            Pair(Ellipse2D.Double(2.0, 2.0, 1.0, 1.0), Publisher(Color.RED))
-        )
-        shapes.add(
-            Pair(Rectangle2D.Double(5.0, 5.0, 2.0, 2.0), Publisher(Color.BLUE))
+        val shapes = listOf(
+            Pair(Ellipse2D.Double(2.0, 2.0, 1.0, 1.0), Publisher(Color.RED)),
+            Pair(Rectangle2D.Double(5.0, 5.0, 2.0, 2.0), Publisher(Color.BLUE)),
         )
         val frame = from(shapes.asOneTimePublisher(), { it.first }, { it.second })
             .withHeader("MAP".asOneTimePublisher())

@@ -16,10 +16,8 @@ import java.awt.Rectangle
 import java.awt.Shape
 import java.awt.geom.Area
 import java.awt.geom.Ellipse2D
-import java.io.IOException
 import java.text.DecimalFormat
 import java.util.concurrent.TimeUnit
-import kotlin.Throws
 import kotlin.jvm.JvmOverloads
 import kotlin.math.sign
 
@@ -369,7 +367,6 @@ class BarFrameTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testRenderSingleSeriesAllPositive() {
         val results: Publisher<List<ElectionResult>> = Publisher(
             listOf(
@@ -398,7 +395,6 @@ class BarFrameTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testRenderSingleSeriesWithSubhead() {
         val results: Publisher<List<ElectionResult>> = Publisher(
             listOf(
@@ -429,7 +425,6 @@ class BarFrameTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testRenderSingleSeriesShrinkToFit() {
         val results: Publisher<List<ElectionResult>> = Publisher(
             listOf(
@@ -461,7 +456,6 @@ class BarFrameTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testRenderMultiSeriesAllPositive() {
         val results: Publisher<List<ElectionResult>> = Publisher(
             listOf(
@@ -491,7 +485,6 @@ class BarFrameTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testRenderSingleSeriesBothDirections() {
         val results: Publisher<List<ElectionResult>> = Publisher(
             listOf(
@@ -521,7 +514,6 @@ class BarFrameTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testRenderMultiSeriesBothDirections() {
         val results: Publisher<List<ElectionResult>> = Publisher(
             listOf(
@@ -552,7 +544,6 @@ class BarFrameTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testRenderTwoLinedBars() {
         val results: Publisher<List<RidingResult>> = Publisher(
             listOf(
@@ -581,7 +572,6 @@ class BarFrameTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testRenderTwoLinedBarWithIcon() {
         val results: Publisher<List<RidingResult>> = Publisher(
             listOf(
@@ -612,7 +602,6 @@ class BarFrameTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testRenderTwoLinedBarWithNegativeIcon() {
         val results: Publisher<List<RidingResult>> = Publisher(
             listOf(
@@ -640,7 +629,6 @@ class BarFrameTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testRenderVerticalLine() {
         val results: Publisher<List<ElectionResult>> = Publisher(
             listOf(
@@ -675,7 +663,6 @@ class BarFrameTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testRenderAccents() {
         val results: Publisher<List<ElectionResult>> = Publisher(
             listOf(
@@ -705,7 +692,6 @@ class BarFrameTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testRenderMultiLineAccents() {
         val results: Publisher<List<ElectionResult>> = Publisher(
             listOf(
@@ -735,7 +721,6 @@ class BarFrameTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testBarFrameOverlaps() {
         val lines = Publisher(listOf(Triple("THIS IS A VERY VERY LONG\nLEFT HAND SIDE", "RIGHT\nSIDE", false)))
         val barFrame = BarFrame(

@@ -8,13 +8,10 @@ import org.hamcrest.core.IsEqual
 import org.junit.Assert
 import org.junit.Test
 import java.awt.Color
-import java.io.IOException
-import java.lang.InterruptedException
 import java.time.Clock
 import java.time.Instant
 import java.time.ZoneId
 import java.util.concurrent.TimeUnit
-import kotlin.Throws
 
 class LowerThirdTest {
     @Test
@@ -29,7 +26,6 @@ class LowerThirdTest {
     }
 
     @Test
-    @Throws(InterruptedException::class)
     fun testLocationAndTimeZone() {
         val lowerThird = LowerThird(
             leftImagePublisher = createImage("BREAKING NEWS", Color.WHITE, Color.RED).asOneTimePublisher(),
@@ -42,7 +38,6 @@ class LowerThirdTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testRenderBlankMiddle() {
         val lowerThird = LowerThird(
             leftImagePublisher = createImage("BREAKING NEWS", Color.WHITE, Color.RED).asOneTimePublisher(),
@@ -54,7 +49,6 @@ class LowerThirdTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testRenderBlankMiddleShowingTimeZone() {
         val lowerThird = LowerThird(
             leftImagePublisher = createImage("BREAKING NEWS", Color.WHITE, Color.RED).asOneTimePublisher(),

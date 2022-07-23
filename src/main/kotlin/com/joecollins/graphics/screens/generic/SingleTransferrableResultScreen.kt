@@ -141,7 +141,7 @@ class SingleTransferrableResultScreen private constructor(
             focus: Flow.Publisher<out List<T>?>,
             header: Flow.Publisher<out String?>
         ): Builder {
-            mapBuilder = MapBuilder(shapes, selectedShape, leadingParty.map { party: Party? -> PartyResult.elected(party) }, focus, header)
+            mapBuilder = MapBuilder(shapes, selectedShape, leadingParty.map { PartyResult.elected(it) }, focus, header)
             return this
         }
 

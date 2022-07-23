@@ -9,23 +9,19 @@ import org.hamcrest.core.IsEqual
 import org.junit.Test
 import java.awt.BorderLayout
 import java.awt.Color
-import java.io.IOException
 import java.util.concurrent.TimeUnit
 import javax.swing.JPanel
-import kotlin.Throws
 
 class GraphicsFrameTest {
     private class TestObject {
 
-        private var _numPolls = 0
-        val numPollsPublisher = Publisher(numPolls)
-
-        var numPolls: Int
-            get() = _numPolls
-            set(numPolls) {
-                this._numPolls = numPolls
+        var numPolls: Int = 0
+            set(value) {
+                field = value
                 numPollsPublisher.submit(numPolls)
             }
+
+        val numPollsPublisher = Publisher(numPolls)
     }
 
     @Test
@@ -80,7 +76,6 @@ class GraphicsFrameTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testRenderingHeaderOnly() {
         val graphicsFrame: GraphicsFrame = object : GraphicsFrame(
             headerPublisher = "HEADER".asOneTimePublisher()
@@ -96,7 +91,6 @@ class GraphicsFrameTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testRenderingHeaderAndNotes() {
         val graphicsFrame: GraphicsFrame = object : GraphicsFrame(
             headerPublisher = "HEADER".asOneTimePublisher(),
@@ -113,7 +107,6 @@ class GraphicsFrameTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testRenderingNoHeader() {
         val graphicsFrame: GraphicsFrame = object : GraphicsFrame(
             headerPublisher = (null as String?).asOneTimePublisher()
@@ -129,7 +122,6 @@ class GraphicsFrameTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testRenderingBorderColor() {
         val graphicsFrame: GraphicsFrame = object : GraphicsFrame(
             headerPublisher = "HEADER".asOneTimePublisher(),
@@ -147,7 +139,6 @@ class GraphicsFrameTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testRenderingAccents() {
         val graphicsFrame: GraphicsFrame = object : GraphicsFrame(
             headerPublisher = "\u00c7A C'EST GR\u00c2VE".asOneTimePublisher(),
@@ -164,7 +155,6 @@ class GraphicsFrameTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testHeaderFontSize() {
         val headerWrapper = Publisher("THIS IS A HEADER")
         val graphicsFrame: GraphicsFrame = object : GraphicsFrame(
@@ -185,7 +175,6 @@ class GraphicsFrameTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun testRenderHeaderAlignment() {
         val alignment = Publisher(GraphicsFrame.Alignment.CENTER)
         val graphicsFrame: GraphicsFrame = object : GraphicsFrame(

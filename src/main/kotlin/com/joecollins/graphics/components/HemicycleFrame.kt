@@ -20,7 +20,6 @@ import java.awt.RenderingHints
 import java.awt.Shape
 import java.awt.geom.AffineTransform
 import java.awt.geom.Area
-import java.util.ArrayList
 import java.util.concurrent.Flow
 import javax.swing.JPanel
 import kotlin.math.max
@@ -328,16 +327,17 @@ class HemicycleFrame(
                 val startSide = sideFunc(leftBase, start)
                 val endSide = sideFunc(leftBase, end)
                 g.color = bar.color
-                val points: MutableList<Point> = ArrayList()
-                points.add(Point(startSide, changeBarTop))
-                points.add(Point(start, changeBarMid))
-                points.add(Point(startSide, changeBarBottom))
-                points.add(Point(endSide, changeBarBottom))
-                points.add(Point(end, changeBarMid))
-                points.add(Point(endSide, changeBarTop))
+                val points = listOf(
+                    Point(startSide, changeBarTop),
+                    Point(start, changeBarMid),
+                    Point(startSide, changeBarBottom),
+                    Point(endSide, changeBarBottom),
+                    Point(end, changeBarMid),
+                    Point(endSide, changeBarTop)
+                )
                 g.fillPolygon(
-                    points.map { p: Point -> p.getX().toInt() }.toIntArray(),
-                    points.map { p: Point -> p.getY().toInt() }.toIntArray(),
+                    points.map { it.getX().toInt() }.toIntArray(),
+                    points.map { it.getY().toInt() }.toIntArray(),
                     points.size
                 )
                 leftSoFar += bar.size
@@ -359,16 +359,17 @@ class HemicycleFrame(
                 val startSide = sideFunc(rightBase, start)
                 val endSide = sideFunc(rightBase, end)
                 g.color = bar.color
-                val points: MutableList<Point> = ArrayList()
-                points.add(Point(startSide, changeBarTop))
-                points.add(Point(start, changeBarMid))
-                points.add(Point(startSide, changeBarBottom))
-                points.add(Point(endSide, changeBarBottom))
-                points.add(Point(end, changeBarMid))
-                points.add(Point(endSide, changeBarTop))
+                val points = listOf(
+                    Point(startSide, changeBarTop),
+                    Point(start, changeBarMid),
+                    Point(startSide, changeBarBottom),
+                    Point(endSide, changeBarBottom),
+                    Point(end, changeBarMid),
+                    Point(endSide, changeBarTop),
+                )
                 g.fillPolygon(
-                    points.map { p: Point -> p.getX().toInt() }.toIntArray(),
-                    points.map { p: Point -> p.getY().toInt() }.toIntArray(),
+                    points.map { it.getX().toInt() }.toIntArray(),
+                    points.map { it.getY().toInt() }.toIntArray(),
                     points.size
                 )
                 rightSoFar += bar.size
@@ -402,9 +403,9 @@ class HemicycleFrame(
         }
 
         private fun getMiddleStartPosition(seats: Int): Int {
-            val midSize = getSize(middleSeatBars.sumOf { e: Bar -> e.size })
-            val leftSize = getSize(leftSeatBars.sumOf { e: Bar -> e.size })
-            val rightSize = getSize(rightSeatBars.sumOf { e: Bar -> e.size })
+            val midSize = getSize(middleSeatBars.sumOf { it.size })
+            val leftSize = getSize(leftSeatBars.sumOf { it.size })
+            val rightSize = getSize(rightSeatBars.sumOf { it.size })
             val midPoint: Int = when {
                 leftSize + midSize / 2 > width / 2 -> {
                     leftSize + midSize / 2
@@ -458,12 +459,12 @@ class HemicycleFrame(
             val arcY = (height - d / 2).roundToInt()
             g.setColor(Color.BLACK)
             g.drawLine(width / 2, 0, width / 2, (height - d / 2).roundToInt())
-            val rowStartIndexes: MutableList<Int> = ArrayList(rows.size)
-            for (i in rows.indices) {
-                if (i == 0) {
-                    rowStartIndexes.add(0)
-                } else {
-                    rowStartIndexes.add(rowStartIndexes[i - 1] + rows[i - 1])
+            val rowStartIndexes = run {
+                var total = 0
+                rows.map { row ->
+                    val prevTotal = total
+                    total += row
+                    prevTotal
                 }
             }
             val originalTransform = g.transform
@@ -502,17 +503,6 @@ class HemicycleFrame(
 
         init {
             background = Color.WHITE
-        }
-    }
-
-    companion object {
-        private fun <T> setSize(list: MutableList<T>, size: Int, defaultItem: () -> T) {
-            while (size > list.size) {
-                list.add(defaultItem())
-            }
-            while (size < list.size) {
-                list.removeAt(size)
-            }
         }
     }
 

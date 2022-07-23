@@ -12,7 +12,6 @@ import java.awt.Graphics
 import java.awt.Graphics2D
 import java.awt.LayoutManager
 import java.awt.RenderingHints
-import java.util.ArrayList
 import java.util.concurrent.Flow
 import javax.swing.JPanel
 import kotlin.math.ceil
@@ -102,25 +101,20 @@ class ResultListingFrame(
     }
 
     private inner class ItemPanel : JPanel() {
-        private var _text = ""
-        private var _borderColor = Color.WHITE
-
         init {
             foreground = Color.BLACK
             background = Color.WHITE
         }
 
-        var text: String
-            get() { return _text }
-            set(text) {
-                _text = text
+        var text: String = ""
+            set(value) {
+                field = value
                 repaint()
             }
 
-        var borderColor: Color
-            get() { return _borderColor }
-            set(borderColor) {
-                _borderColor = borderColor
+        var borderColor: Color = Color.WHITE
+            set(value) {
+                field = value
                 repaint()
             }
 
@@ -145,20 +139,15 @@ class ResultListingFrame(
     }
 
     private inner class Layout : LayoutManager {
-        private var _numRows = 0
-        private var _reversed = false
-
-        var numRows: Int
-            get() { return _numRows }
-            set(numRows) {
-                _numRows = numRows
+        var numRows: Int = 0
+            set(value) {
+                field = value
                 layoutContainer(centralPanel)
             }
 
-        var reversed: Boolean
-            get() { return _reversed }
-            set(reversed) {
-                _reversed = reversed
+        var reversed: Boolean = false
+            set(value) {
+                field = value
                 layoutContainer(centralPanel)
             }
 

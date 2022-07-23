@@ -15,7 +15,7 @@ class FileWatcherService(private val executor: ExecutorService, private val task
 
     companion object {
 
-        @JvmStatic fun createService(path: Path, onUpdate: (Path) -> Unit): FileWatcherService {
+        fun createService(path: Path, onUpdate: (Path) -> Unit): FileWatcherService {
             val executor = Executors.newSingleThreadExecutor {
                 val t = Executors.defaultThreadFactory().newThread(it)
                 t.isDaemon = true
