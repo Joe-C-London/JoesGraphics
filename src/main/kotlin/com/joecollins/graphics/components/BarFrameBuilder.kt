@@ -115,22 +115,37 @@ class BarFrameBuilder private constructor() {
     }
 
     fun withMax(maxPublisher: Flow.Publisher<out Number>): BarFrameBuilder {
-        rangeFinder.minFunction = { 0 }
-        maxPublisher.subscribe(Subscriber { max: Number -> rangeFinder.maxFunction = { max(max.toDouble(), it.highest.toDouble()) } })
-        return this
+        return withLimits(maxPublisher.map { Limit(max = it) })
     }
 
     fun withWingspan(wingspanPublisher: Flow.Publisher<out Number>): BarFrameBuilder {
-        wingspanPublisher.subscribe(
-            Subscriber { wingspan: Number ->
-                val f = { it: RangeFinder ->
-                    max(
-                        wingspan.toDouble(),
-                        max(abs(it.lowest.toDouble()), abs(it.highest.toDouble()))
-                    )
+        return withLimits(wingspanPublisher.map { Limit(wingspan = it) })
+    }
+
+    data class Limit(val max: Number? = null, val wingspan: Number? = null) {
+        init {
+            if (sequenceOf(max, wingspan).filterNotNull().count() != 1) {
+                throw IllegalArgumentException("Must have precisely one limit")
+            }
+        }
+    }
+    fun withLimits(limitsPublisher: Flow.Publisher<Limit>): BarFrameBuilder {
+        limitsPublisher.subscribe(
+            Subscriber { limit ->
+                if (limit.max != null) {
+                    rangeFinder.minFunction = { 0 }
+                    rangeFinder.maxFunction = { max(limit.max.toDouble(), it.highest.toDouble()) }
                 }
-                rangeFinder.minFunction = { -f(it) }
-                rangeFinder.maxFunction = { +f(it) }
+                if (limit.wingspan != null) {
+                    val f = { it: RangeFinder ->
+                        max(
+                            limit.wingspan.toDouble(),
+                            max(abs(it.lowest.toDouble()), abs(it.highest.toDouble()))
+                        )
+                    }
+                    rangeFinder.minFunction = { -f(it) }
+                    rangeFinder.maxFunction = { +f(it) }
+                }
             }
         )
         return this

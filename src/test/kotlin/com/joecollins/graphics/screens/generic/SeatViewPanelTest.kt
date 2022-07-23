@@ -17,6 +17,7 @@ import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
 import org.junit.Test
 import java.awt.Color
+import java.awt.Dimension
 import java.awt.Shape
 import java.io.IOException
 import java.util.ArrayList
@@ -1113,6 +1114,240 @@ class SeatViewPanelTest {
         prevVotes[indO] = 224 + 124 + 32 + 19380
         previousVotes.submit(prevVotes)
         compareRendering("SeatViewPanel", "PartyClassifications-2", panel)
+    }
+
+    @Test
+    fun testShowPrevSeats() {
+        val ldp = Party("Liberal Democratic Party", "LDP", Color(60, 163, 36))
+        val cdp = Party("Constitutional Democratic Party", "CDP", Color(24, 69, 137))
+        val kibo = Party("Kib\u014d no T\u014d", "KIB\u014c", Color(24, 100, 57))
+        val nippon = Party("Nippon Ishin no Kai", "NIPPON", Color(184, 206, 67))
+        val komeito = Party("Komeito", "KOMEITO", Color(245, 88, 129))
+        val jcp = Party("Japanese Communist Party", "JCP", Color(219, 0, 28))
+        val dpp = Party("Democratic Party for the People", "DPP", Color(255, 215, 0))
+        val reiwa = Party("Reiwa Shinsengumi", "REIWA", Color(237, 0, 140))
+        val sdp = Party("Social Democratic Party", "SDP", Color(28, 169, 233))
+        val ind = Party("Independent", "IND", Party.OTHERS.color)
+
+        val curr = Publisher(
+            mapOf(
+                ldp to 259,
+                cdp to 96,
+                nippon to 41,
+                komeito to 32,
+                jcp to 10,
+                dpp to 11,
+                reiwa to 3,
+                sdp to 1,
+                ind to 12
+            )
+        )
+        val prev = Publisher(
+            mapOf(
+                ldp to 284,
+                cdp to 55,
+                kibo to 50,
+                komeito to 29,
+                jcp to 12,
+                nippon to 11,
+                sdp to 2,
+                ind to 22
+            )
+        )
+        val seatsHeader = Publisher("HOUSE OF REPRESENTATIVES")
+        val changeHeader = Publisher("2017 RESULT")
+        val total = Publisher(465)
+        val showMajority = Publisher(true)
+        val showPrevRaw = Publisher(true)
+
+        val panel = partySeats(curr, seatsHeader, "".asOneTimePublisher())
+            .withPrev(prev, changeHeader, showPrevRaw = showPrevRaw)
+            .withTotal(total)
+            .withMajorityLine(showMajority) { "$it FOR MAJORITY" }
+            .build("JAPAN".asOneTimePublisher())
+        panel.size = Dimension(1024, 512)
+        compareRendering("SeatViewPanel", "PrevSeats-1", panel)
+
+        curr.submit(
+            mapOf(
+                ldp to 187,
+                cdp to 57,
+                nippon to 16,
+                komeito to 9,
+                jcp to 1,
+                dpp to 6,
+                sdp to 1
+            )
+        )
+        prev.submit(
+            mapOf(
+                ldp to 218,
+                cdp to 18,
+                kibo to 18,
+                komeito to 8,
+                jcp to 1,
+                nippon to 3,
+                sdp to 1
+            )
+        )
+        seatsHeader.submit("CONSTITUENCY SEATS")
+        total.submit(289)
+        showMajority.submit(false)
+        compareRendering("SeatViewPanel", "PrevSeats-2", panel)
+
+        showPrevRaw.submit(false)
+        changeHeader.submit("CHANGE SINCE 2017")
+        compareRendering("SeatViewPanel", "PrevSeats-3", panel)
+
+        curr.submit(
+            mapOf(
+                ldp to 259,
+                cdp to 96,
+                nippon to 41,
+                komeito to 32,
+                jcp to 10,
+                dpp to 11,
+                reiwa to 3,
+                sdp to 1,
+                ind to 12
+            )
+        )
+        prev.submit(
+            mapOf(
+                ldp to 284,
+                cdp to 55,
+                kibo to 50,
+                komeito to 29,
+                jcp to 12,
+                nippon to 11,
+                sdp to 2,
+                ind to 22
+            )
+        )
+        seatsHeader.submit("HOUSE OF REPRESENTATIVES")
+        showMajority.submit(true)
+        total.submit(465)
+        compareRendering("SeatViewPanel", "PrevSeats-4", panel)
+
+        showPrevRaw.submit(true)
+        changeHeader.submit("2017 RESULT")
+        compareRendering("SeatViewPanel", "PrevSeats-1", panel)
+    }
+
+    @Test
+    fun testShowPrevDualSeats() {
+        val ldp = Party("Liberal Democratic Party", "LDP", Color(60, 163, 36))
+        val cdp = Party("Constitutional Democratic Party", "CDP", Color(24, 69, 137))
+        val kibo = Party("Kib\u014d no T\u014d", "KIB\u014c", Color(24, 100, 57))
+        val nippon = Party("Nippon Ishin no Kai", "NIPPON", Color(184, 206, 67))
+        val komeito = Party("Komeito", "KOMEITO", Color(245, 88, 129))
+        val jcp = Party("Japanese Communist Party", "JCP", Color(219, 0, 28))
+        val dpp = Party("Democratic Party for the People", "DPP", Color(255, 215, 0))
+        val reiwa = Party("Reiwa Shinsengumi", "REIWA", Color(237, 0, 140))
+        val sdp = Party("Social Democratic Party", "SDP", Color(28, 169, 233))
+        val ind = Party("Independent", "IND", Party.OTHERS.color)
+
+        val curr = Publisher(
+            mapOf(
+                ldp to (187 to 259),
+                cdp to (57 to 96),
+                nippon to (16 to 41),
+                komeito to (9 to 32),
+                jcp to (1 to 10),
+                dpp to (6 to 11),
+                reiwa to (0 to 3),
+                sdp to (1 to 1),
+                ind to (12 to 12)
+            )
+        )
+        val prev = Publisher(
+            mapOf(
+                ldp to (218 to 284),
+                cdp to (18 to 55),
+                kibo to (18 to 50),
+                komeito to (8 to 29),
+                jcp to (1 to 12),
+                nippon to (3 to 11),
+                sdp to (1 to 2),
+                ind to (22 to 22)
+            )
+        )
+        val seatsHeader = Publisher("HOUSE OF REPRESENTATIVES")
+        val seatsSubhead = Publisher("CONSTITUENCIES / TOTAL SEATS")
+        val changeHeader = Publisher("2017 RESULT")
+        val total = Publisher(465)
+        val showMajority = Publisher(true)
+        val showPrevRaw = Publisher(true)
+
+        val panel = partyDualSeats(curr, seatsHeader, seatsSubhead)
+            .withPrev(prev, changeHeader, showPrevRaw = showPrevRaw)
+            .withTotal(total)
+            .withMajorityLine(showMajority) { "$it FOR MAJORITY" }
+            .build("JAPAN".asOneTimePublisher())
+        panel.size = Dimension(1024, 512)
+        compareRendering("SeatViewPanel", "PrevDualSeats-1", panel)
+
+        showPrevRaw.submit(false)
+        changeHeader.submit("CHANGE SINCE 2017")
+        compareRendering("SeatViewPanel", "PrevDualSeats-2", panel)
+    }
+
+    @Test
+    fun showPrevRangeSeats() {
+        val ldp = Party("Liberal Democratic Party", "LDP", Color(60, 163, 36))
+        val cdp = Party("Constitutional Democratic Party", "CDP", Color(24, 69, 137))
+        val kibo = Party("Kib\u014d no T\u014d", "KIB\u014c", Color(24, 100, 57))
+        val nippon = Party("Nippon Ishin no Kai", "NIPPON", Color(184, 206, 67))
+        val komeito = Party("Komeito", "KOMEITO", Color(245, 88, 129))
+        val jcp = Party("Japanese Communist Party", "JCP", Color(219, 0, 28))
+        val dpp = Party("Democratic Party for the People", "DPP", Color(255, 215, 0))
+        val reiwa = Party("Reiwa Shinsengumi", "REIWA", Color(237, 0, 140))
+        val sdp = Party("Social Democratic Party", "SDP", Color(28, 169, 233))
+        val ind = Party("Independent", "IND", Party.OTHERS.color)
+
+        val curr = Publisher(
+            mapOf(
+                ldp to 251..279,
+                cdp to 94..120,
+                nippon to 25..36,
+                komeito to 25..37,
+                jcp to 9..21,
+                dpp to 5..12,
+                reiwa to 3..3,
+                sdp to 2..2,
+                ind to 4..9
+            )
+        )
+        val prev = Publisher(
+            mapOf(
+                ldp to 284,
+                cdp to 55,
+                kibo to 50,
+                komeito to 29,
+                jcp to 12,
+                nippon to 11,
+                sdp to 2,
+                ind to 22
+            )
+        )
+        val seatsHeader = Publisher("ASAHI SHIMBUN SEAT PROJECTION")
+        val seatsSubhead = Publisher("FIELDWORK: 23-24 OCTOBER 2021")
+        val changeHeader = Publisher("2017 RESULT")
+        val total = Publisher(465)
+        val showMajority = Publisher(true)
+        val showPrevRaw = Publisher(true)
+
+        val panel = partyRangeSeats(curr, seatsHeader, seatsSubhead)
+            .withPrev(prev, changeHeader, showPrevRaw = showPrevRaw)
+            .withTotal(total)
+            .withMajorityLine(showMajority) { "$it FOR MAJORITY" }
+            .build("JAPAN".asOneTimePublisher())
+        panel.size = Dimension(1024, 512)
+        compareRendering("SeatViewPanel", "PrevRangeSeats-1", panel)
+
+        showPrevRaw.submit(false)
+        changeHeader.submit("CHANGE SINCE 2017")
+        compareRendering("SeatViewPanel", "PrevRangeSeats-2", panel)
     }
 
     @Throws(IOException::class)

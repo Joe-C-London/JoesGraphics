@@ -18,6 +18,7 @@ import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
 import com.joecollins.pubsub.asOneTimePublisher
+import com.joecollins.pubsub.compose
 import com.joecollins.pubsub.map
 import com.joecollins.pubsub.merge
 import java.awt.BorderLayout
@@ -144,7 +145,9 @@ class BasicResultPanel private constructor(
         protected var winner: Flow.Publisher<out KT?>? = null
         protected var notes: Flow.Publisher<out String?>? = null
         protected var changeNotes: Flow.Publisher<out String?>? = null
+        protected var prev: Flow.Publisher<out Map<Party, PT>>? = null
         protected var diff: Flow.Publisher<out Map<Party, CurrDiff<CT>>>? = null
+        protected var showPrevRaw: Flow.Publisher<Boolean>? = null
         protected var changeHeader: Flow.Publisher<out String?>? = null
         protected var changeSubhead: Flow.Publisher<out String?>? = null
         private var currVotes: Flow.Publisher<out Map<Party, Int>>? = null
@@ -200,9 +203,11 @@ class BasicResultPanel private constructor(
         fun withPrev(
             prev: Flow.Publisher<out Map<Party, PT>>,
             changeHeader: Flow.Publisher<out String?>,
-            changeSubhead: Flow.Publisher<out String?> = null.asOneTimePublisher()
+            changeSubhead: Flow.Publisher<out String?> = null.asOneTimePublisher(),
+            showPrevRaw: Flow.Publisher<Boolean> = false.asOneTimePublisher()
         ): SeatScreenBuilder<KT, CT, PT> {
-            diff =
+            this.prev = prev
+            this.diff =
                 current
                     .merge(prev) { c, p ->
                         val ret = LinkedHashMap<Party, CurrDiff<CT>>()
@@ -210,6 +215,7 @@ class BasicResultPanel private constructor(
                         p.forEach { (k, v) -> ret.putIfAbsent(k, createFromPrev(v)) }
                         ret
                     }
+            this.showPrevRaw = showPrevRaw
             this.changeHeader = changeHeader
             this.changeSubhead = changeSubhead
             return this
@@ -398,14 +404,20 @@ class BasicResultPanel private constructor(
             if (total != null) {
                 builder = builder.withMax(total.map { it * 2 / 3 })
             }
-            applyMajorityLine(builder)
+            applyMajorityLine(
+                builder,
+                showMajority,
+                this.total ?: throw IllegalArgumentException("Cannot show majority line without total")
+            )
             return builder.build()
         }
 
-        private fun applyMajorityLine(builder: BarFrameBuilder) {
-            val showMajority = this.showMajority
+        private fun applyMajorityLine(
+            builder: BarFrameBuilder,
+            showMajority: Flow.Publisher<out Boolean>?,
+            total: Flow.Publisher<out Int>
+        ) {
             if (showMajority != null) {
-                val total = this.total ?: throw IllegalArgumentException("Cannot show majority line without total")
                 val lines = showMajority.merge(total) {
                         show, tot ->
                     if (show) listOf(tot / 2 + 1)
@@ -437,32 +449,58 @@ class BasicResultPanel private constructor(
                 if (total != null) {
                     builder = builder.withMax(total.map { it * 2 / 3 })
                 }
-                applyMajorityLine(builder)
+                applyMajorityLine(
+                    builder,
+                    showMajority,
+                    this.total ?: throw IllegalArgumentException("Cannot show majority line without total")
+                )
                 return builder.build()
             }
         }
 
         override fun createDiffFrame(): BarFrame? {
+            val diffBars = diff!!.map { map: Map<Party, CurrDiff<Int>> ->
+                map.entries.asSequence()
+                    .sortedByDescending { e: Map.Entry<Party, CurrDiff<Int>> -> if (e.key === Party.OTHERS) Int.MIN_VALUE else e.value.curr }
+                    .map { e: Map.Entry<Party, CurrDiff<Int>> ->
+                        BasicBar(
+                            e.key.abbreviation.uppercase(),
+                            e.key.color,
+                            e.value.diff,
+                            changeStr(e.value.diff)
+                        )
+                    }
+                    .toList()
+            }
+            val prevBars = prev?.map { map: Map<Party, Int> ->
+                map.entries.asSequence()
+                    .sortedByDescending { it.value }
+                    .map {
+                        BasicBar(
+                            it.key.abbreviation.uppercase(),
+                            it.key.color,
+                            it.value
+                        )
+                    }
+                    .toList()
+            }
+            val showPrevRaw = showPrevRaw ?: false.asOneTimePublisher()
             return changeHeader?.let { changeHeader ->
-                val bars = diff!!.map { map: Map<Party, CurrDiff<Int>> ->
-                    map.entries.asSequence()
-                        .sortedByDescending { e: Map.Entry<Party, CurrDiff<Int>> -> if (e.key === Party.OTHERS) Int.MIN_VALUE else e.value.curr }
-                        .map { e: Map.Entry<Party, CurrDiff<Int>> ->
-                            BasicBar(
-                                e.key.abbreviation.uppercase(),
-                                e.key.color,
-                                e.value.diff,
-                                changeStr(e.value.diff)
-                            )
-                        }
-                        .toList()
-                }
+                val bars = showPrevRaw.compose { showRaw -> if (showRaw) prevBars!! else diffBars }
                 var builder = BarFrameBuilder.basic(bars)
                     .withHeader(changeHeader)
                     .withSubhead(changeSubhead ?: (null as String?).asOneTimePublisher())
                 val total = this.total
                 if (total != null) {
-                    builder = builder.withWingspan(total.map { (it / 20).coerceAtLeast(1) })
+                    builder = builder.withLimits(
+                        total.merge(showPrevRaw) { totalSeats, showRaw ->
+                            if (showRaw) BarFrameBuilder.Limit(max = totalSeats * 2 / 3)
+                            else BarFrameBuilder.Limit(wingspan = (totalSeats / 20).coerceAtLeast(1))
+                        }
+                    )
+                }
+                this.showMajority?.let { showMajority ->
+                    applyMajorityLine(builder, showMajority.merge(showPrevRaw) { m, r -> m && r }, prev?.map { it.values.sum() } ?: 0.asOneTimePublisher())
                 }
                 val changeNotes = this.changeNotes
                 if (changeNotes != null) {
@@ -575,19 +613,22 @@ class BasicResultPanel private constructor(
             if (total != null) {
                 builder = builder.withMax(total.map { it * 2 / 3 })
             }
-            val showMajority = this.showMajority
-            if (showMajority != null) {
-                if (total == null) {
-                    throw IllegalStateException("Cannot show majority line without total")
-                }
-                val lines = showMajority.merge(total) {
-                        show, tot ->
-                    if (show) listOf(tot / 2 + 1)
-                    else emptyList()
-                }
-                builder = builder.withLines(lines) { t -> majorityFunction!!(t) }
+            this.showMajority?.let { showMajority ->
+                builder = applyMajorityLine(builder, showMajority, total ?: throw IllegalStateException("Cannot show majority line without total"))
             }
             return builder.build()
+        }
+
+        private fun applyMajorityLine(
+            builder: BarFrameBuilder,
+            showMajority: Flow.Publisher<out Boolean>,
+            total: Flow.Publisher<out Int>
+        ): BarFrameBuilder {
+            val lines = showMajority.merge(total) { show, tot ->
+                if (show) listOf(tot / 2 + 1)
+                else emptyList()
+            }
+            return builder.withLines(lines) { t -> majorityFunction!!(t) }
         }
 
         override fun createClassificationFrame(): BarFrame? {
@@ -598,26 +639,47 @@ class BasicResultPanel private constructor(
         }
 
         override fun createDiffFrame(): BarFrame? {
+            val diffBars = diff!!.map { map: Map<Party, CurrDiff<Pair<Int, Int>>> ->
+                map.entries.asSequence()
+                    .sortedByDescending { e: Map.Entry<Party, CurrDiff<Pair<Int, Int>>> -> if (e.key === Party.OTHERS) Int.MIN_VALUE else e.value.curr.second }
+                    .map { e: Map.Entry<Party, CurrDiff<Pair<Int, Int>>> ->
+                        DualBar(
+                            e.key.abbreviation.uppercase(),
+                            e.key.color,
+                            if (focusLocation == FocusLocation.FIRST ||
+                                (e.value.diff.first != 0 && sign(e.value.diff.first.toDouble()) != sign(e.value.diff.second.toDouble())) ||
+                                abs(e.value.diff.first.toDouble()) > abs(e.value.diff.second.toDouble())
+                            ) e.value.diff.first else (e.value.diff.second - e.value.diff.first),
+                            e.value.diff.second,
+                            changeStr(e.value.diff.first) +
+                                "/" +
+                                changeStr(e.value.diff.second)
+                        )
+                    }
+                    .toList()
+            }
+            val prevBars = prev?.map { map ->
+                map.entries.asSequence()
+                    .sortedByDescending { if (it.key === Party.OTHERS) Int.MIN_VALUE else it.value.second }
+                    .map {
+                        DualBar(
+                            it.key.abbreviation.uppercase(),
+                            it.key.color,
+                            if (focusLocation == FocusLocation.FIRST ||
+                                (it.value.first != 0 && sign(it.value.first.toDouble()) != sign(it.value.second.toDouble())) ||
+                                abs(it.value.first.toDouble()) > abs(it.value.second.toDouble())
+                            ) it.value.first else (it.value.second - it.value.first),
+                            it.value.second,
+                            it.value.first.toString() +
+                                "/" +
+                                it.value.second.toString()
+                        )
+                    }
+                    .toList()
+            }
+            val showPrevRaw = showPrevRaw ?: false.asOneTimePublisher()
             return changeHeader?.let { changeHeader ->
-                val bars = diff!!.map { map: Map<Party, CurrDiff<Pair<Int, Int>>> ->
-                    map.entries.asSequence()
-                        .sortedByDescending { e: Map.Entry<Party, CurrDiff<Pair<Int, Int>>> -> if (e.key === Party.OTHERS) Int.MIN_VALUE else e.value.curr.second }
-                        .map { e: Map.Entry<Party, CurrDiff<Pair<Int, Int>>> ->
-                            DualBar(
-                                e.key.abbreviation.uppercase(),
-                                e.key.color,
-                                if (focusLocation == FocusLocation.FIRST ||
-                                    (e.value.diff.first != 0 && sign(e.value.diff.first.toDouble()) != sign(e.value.diff.second.toDouble())) ||
-                                    abs(e.value.diff.first.toDouble()) > abs(e.value.diff.second.toDouble())
-                                ) e.value.diff.first else (e.value.diff.second - e.value.diff.first),
-                                e.value.diff.second,
-                                changeStr(e.value.diff.first) +
-                                    "/" +
-                                    changeStr(e.value.diff.second)
-                            )
-                        }
-                        .toList()
-                }
+                val bars = showPrevRaw.compose { showRaw -> if (showRaw) prevBars!! else diffBars }
                 var builder = if (focusLocation == FocusLocation.FIRST)
                     BarFrameBuilder.dual(bars)
                 else
@@ -627,7 +689,15 @@ class BasicResultPanel private constructor(
                     .withSubhead(changeSubhead ?: (null as String?).asOneTimePublisher())
                 val total = this.total
                 if (total != null) {
-                    builder = builder.withWingspan(total.map { (it / 20).coerceAtLeast(1) })
+                    builder = builder.withLimits(
+                        total.merge(showPrevRaw) { totalSeats, showRaw ->
+                            if (showRaw) BarFrameBuilder.Limit(max = totalSeats * 2 / 3)
+                            else BarFrameBuilder.Limit(wingspan = (totalSeats / 20).coerceAtLeast(1))
+                        }
+                    )
+                }
+                this.showMajority?.let { showMajority ->
+                    applyMajorityLine(builder, showMajority.merge(showPrevRaw) { m, r -> m && r }, prev?.map { it.values.sumOf { e -> e.second } } ?: 0.asOneTimePublisher())
                 }
                 val changeNotes = this.changeNotes
                 if (changeNotes != null) {
@@ -731,14 +801,21 @@ class BasicResultPanel private constructor(
                 if (total == null) {
                     throw IllegalStateException("Cannot show majority without total")
                 }
-                val lines = showMajority.merge(total) {
-                        show, tot ->
-                    if (show) listOf(tot / 2 + 1)
-                    else emptyList()
-                }
-                builder = builder.withLines(lines) { t -> majorityFunction!!(t) }
+                builder = applyMajorityLine(builder, showMajority, total)
             }
             return builder.build()
+        }
+
+        private fun applyMajorityLine(
+            builder: BarFrameBuilder,
+            showMajority: Flow.Publisher<out Boolean>,
+            total: Flow.Publisher<out Int>
+        ): BarFrameBuilder {
+            val lines = showMajority.merge(total) { show, tot ->
+                if (show) listOf(tot / 2 + 1)
+                else emptyList()
+            }
+            return builder.withLines(lines) { t -> majorityFunction!!(t) }
         }
 
         override fun createClassificationFrame(): BarFrame? {
@@ -749,34 +826,61 @@ class BasicResultPanel private constructor(
         }
 
         override fun createDiffFrame(): BarFrame? {
+            val diffBars = diff!!.map { map: Map<Party, CurrDiff<IntRange>> ->
+                map.entries.asSequence()
+                    .sortedByDescending { e: Map.Entry<Party, CurrDiff<IntRange>> ->
+                        if (e.key === Party.OTHERS) Int.MIN_VALUE
+                        else (e.value.curr.first + e.value.curr.last)
+                    }
+                    .map { e: Map.Entry<Party, CurrDiff<IntRange>> ->
+                        DualBar(
+                            e.key.abbreviation.uppercase(),
+                            e.key.color,
+                            e.value.diff.first,
+                            e.value.diff.last,
+                            "(" +
+                                changeStr(e.value.diff.first) +
+                                ")-(" +
+                                changeStr(e.value.diff.last) +
+                                ")"
+                        )
+                    }
+                    .toList()
+            }
+            val prevBars = prev?.map { map ->
+                map.entries.asSequence()
+                    .sortedByDescending { e ->
+                        if (e.key === Party.OTHERS) Int.MIN_VALUE
+                        else e.value
+                    }
+                    .map { e ->
+                        DualBar(
+                            e.key.abbreviation.uppercase(),
+                            e.key.color,
+                            e.value,
+                            e.value,
+                            e.value.toString()
+                        )
+                    }
+                    .toList()
+            }
+            val showPrevRaw = this.showPrevRaw ?: false.asOneTimePublisher()
             return changeHeader?.let { changeHeader ->
-                val bars = diff!!.map { map: Map<Party, CurrDiff<IntRange>> ->
-                    map.entries.asSequence()
-                        .sortedByDescending { e: Map.Entry<Party, CurrDiff<IntRange>> ->
-                            if (e.key === Party.OTHERS) Int.MIN_VALUE
-                            else (e.value.curr.first + e.value.curr.last)
-                        }
-                        .map { e: Map.Entry<Party, CurrDiff<IntRange>> ->
-                            DualBar(
-                                e.key.abbreviation.uppercase(),
-                                e.key.color,
-                                e.value.diff.first,
-                                e.value.diff.last,
-                                "(" +
-                                    changeStr(e.value.diff.first) +
-                                    ")-(" +
-                                    changeStr(e.value.diff.last) +
-                                    ")"
-                            )
-                        }
-                        .toList()
-                }
+                val bars = showPrevRaw.compose { showRaw -> if (showRaw) prevBars!! else diffBars }
                 var builder = BarFrameBuilder.dual(bars)
                     .withHeader(changeHeader)
                     .withSubhead(changeSubhead ?: (null as String?).asOneTimePublisher())
                 val total = this.total
                 if (total != null) {
-                    builder = builder.withWingspan(total.map { (it / 20).coerceAtLeast(1) })
+                    builder = builder.withLimits(
+                        total.merge(showPrevRaw) { totalSeats, showRaw ->
+                            if (showRaw) BarFrameBuilder.Limit(max = totalSeats * 2 / 3)
+                            else BarFrameBuilder.Limit(wingspan = (totalSeats / 20).coerceAtLeast(1))
+                        }
+                    )
+                }
+                this.showMajority?.let { showMajority ->
+                    applyMajorityLine(builder, showMajority.merge(showPrevRaw) { m, r -> m && r }, prev?.map { it.values.sum() } ?: 0.asOneTimePublisher())
                 }
                 val changeNotes = this.changeNotes
                 if (changeNotes != null) {
