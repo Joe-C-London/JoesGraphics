@@ -1275,6 +1275,178 @@ class SimpleVoteViewPanelTest {
         compareRendering("SimpleVoteViewPanel", "NewPartiesCandidatesMergedWithPrevOthers", panel)
     }
 
+    @Test
+    fun testShowPrev() {
+        val ldp = Party("Liberal Democratic Party", "LDP", Color(60, 163, 36))
+        val cdp = Party("Constitutional Democratic Party", "CDP", Color(24, 69, 137))
+        val kibo = Party("Kib\u014d no T\u014d", "KIB\u014c", Color(24, 100, 57))
+        val nippon = Party("Nippon Ishin no Kai", "NIPPON", Color(184, 206, 67))
+        val komeito = Party("Komeito", "KOMEITO", Color(245, 88, 129))
+        val jcp = Party("Japanese Communist Party", "JCP", Color(219, 0, 28))
+        val dpp = Party("Democratic Party for the People", "DPP", Color(255, 215, 0))
+        val reiwa = Party("Reiwa Shinsengumi", "REIWA", Color(237, 0, 140))
+        val sdp = Party("Social Democratic Party", "SDP", Color(28, 169, 233))
+        val oth = Party.OTHERS
+
+        val curr = Publisher(emptyMap<Party, Int>())
+        val prev = Publisher(
+            mapOf(
+                ldp to 18_555_717,
+                cdp to 11_084_890,
+                kibo to 9_677_524,
+                komeito to 6_977_712,
+                jcp to 4_404_081,
+                nippon to 3_387_097,
+                sdp to 941_324,
+                oth to 729_207
+            )
+        )
+        val voteHeader = Publisher("PROPORTIONAL VOTES")
+        val changeHeader = Publisher("2017 RESULT")
+        val showPrevRaw = Publisher(true)
+
+        val panel = partyVotes(curr, voteHeader, "".asOneTimePublisher())
+            .withPrev(prev, changeHeader, showPrevRaw = showPrevRaw)
+            .build("JAPAN".asOneTimePublisher())
+        panel.size = Dimension(1024, 512)
+        compareRendering("SimpleVoteViewPanel", "PrevVotes-0", panel)
+
+        curr.submit(
+            mapOf(
+                ldp to 19_914_883,
+                cdp to 11_492_095,
+                nippon to 8_050_830,
+                komeito to 7_114_282,
+                jcp to 4_166_076,
+                dpp to 2_593_396,
+                reiwa to 2_215_648,
+                sdp to 1_018_588,
+                oth to 900_181
+            )
+        )
+        compareRendering("SimpleVoteViewPanel", "PrevVotes-1", panel)
+
+        curr.submit(
+            mapOf(
+                ldp to 27_626_235,
+                cdp to 17_215_621,
+                nippon to 4_802_793,
+                komeito to 872_931,
+                jcp to 2_639_631,
+                dpp to 1_246_812,
+                reiwa to 248_280,
+                sdp to 313_193,
+                oth to 2_491_536
+            )
+        )
+        prev.submit(
+            mapOf(
+                ldp to 26_500_777,
+                cdp to 4_726_326,
+                kibo to 11_437_602,
+                komeito to 832_453,
+                jcp to 4_998_932,
+                nippon to 1_765_053,
+                sdp to 634_770,
+                oth to 4_526_280
+            )
+        )
+        voteHeader.submit("CONSTITUENCY VOTES")
+        compareRendering("SimpleVoteViewPanel", "PrevVotes-2", panel)
+
+        showPrevRaw.submit(false)
+        changeHeader.submit("CHANGE SINCE 2017")
+        compareRendering("SimpleVoteViewPanel", "PrevVotes-3", panel)
+
+        curr.submit(
+            mapOf(
+                ldp to 19_914_883,
+                cdp to 11_492_095,
+                nippon to 8_050_830,
+                komeito to 7_114_282,
+                jcp to 4_166_076,
+                dpp to 2_593_396,
+                reiwa to 2_215_648,
+                sdp to 1_018_588,
+                oth to 900_181
+            )
+        )
+        prev.submit(
+            mapOf(
+                ldp to 18_555_717,
+                cdp to 11_084_890,
+                kibo to 9_677_524,
+                komeito to 6_977_712,
+                jcp to 4_404_081,
+                nippon to 3_387_097,
+                sdp to 941_324,
+                oth to 729_207
+            )
+        )
+        voteHeader.submit("PROPORTIONAL VOTES")
+        compareRendering("SimpleVoteViewPanel", "PrevVotes-4", panel)
+
+        showPrevRaw.submit(true)
+        changeHeader.submit("2017 RESULT")
+        compareRendering("SimpleVoteViewPanel", "PrevVotes-1", panel)
+    }
+
+    @Test
+    fun testShowPrevRange() {
+        val ldp = Party("Liberal Democratic Party", "LDP", Color(60, 163, 36))
+        val cdp = Party("Constitutional Democratic Party", "CDP", Color(24, 69, 137))
+        val kibo = Party("Kib\u014d no T\u014d", "KIB\u014c", Color(24, 100, 57))
+        val nippon = Party("Nippon Ishin no Kai", "NIPPON", Color(184, 206, 67))
+        val komeito = Party("Komeito", "KOMEITO", Color(245, 88, 129))
+        val jcp = Party("Japanese Communist Party", "JCP", Color(219, 0, 28))
+        val dpp = Party("Democratic Party for the People", "DPP", Color(255, 215, 0))
+        val reiwa = Party("Reiwa Shinsengumi", "REIWA", Color(237, 0, 140))
+        val sdp = Party("Social Democratic Party", "SDP", Color(28, 169, 233))
+        val oth = Party.OTHERS
+
+        val curr = Publisher(emptyMap<Party, ClosedRange<Double>>())
+        val prev = Publisher(
+            mapOf(
+                ldp to 18_555_717,
+                cdp to 11_084_890,
+                kibo to 9_677_524,
+                komeito to 6_977_712,
+                jcp to 4_404_081,
+                nippon to 3_387_097,
+                sdp to 941_324,
+                oth to 729_207
+            )
+        )
+        val voteHeader = Publisher("PROPORTIONAL VOTES")
+        val changeHeader = Publisher("2017 RESULT")
+        val showPrevRaw = Publisher(true)
+
+        val panel = partyRangeVotes(curr, voteHeader, "".asOneTimePublisher())
+            .withPrev(prev, changeHeader, showPrevRaw = showPrevRaw)
+            .build("JAPAN".asOneTimePublisher())
+        panel.size = Dimension(1024, 512)
+        compareRendering("SimpleVoteViewPanel", "PrevVotes-0", panel)
+
+        curr.submit(
+            mapOf(
+                ldp to 0.320..0.380,
+                cdp to 0.130..0.210,
+                nippon to 0.040..0.123,
+                komeito to 0.070..0.084,
+                jcp to 0.050..0.076,
+                dpp to 0.020..0.024,
+                reiwa to 0.010..0.016,
+                sdp to 0.010..0.014,
+                oth to 0.017..0.030
+            )
+        )
+        compareRendering("SimpleVoteViewPanel", "PrevRangeVotes-1", panel)
+
+        showPrevRaw.submit(false)
+        changeHeader.submit("CHANGE SINCE 2017")
+        compareRendering("SimpleVoteViewPanel", "PrevRangeVotes-2", panel)
+    }
+
     @Throws(IOException::class)
     private fun peiShapesByDistrict(): Map<Int, Shape> {
         val peiMap = MapFrameTest::class.java
