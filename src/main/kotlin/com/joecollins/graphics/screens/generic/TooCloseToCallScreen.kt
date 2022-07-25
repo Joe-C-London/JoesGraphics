@@ -3,6 +3,7 @@ package com.joecollins.graphics.screens.generic
 import com.joecollins.graphics.components.FontSizeAdjustingLabel
 import com.joecollins.graphics.components.MultiSummaryFrame
 import com.joecollins.graphics.utils.StandardFont.readBoldFont
+import com.joecollins.models.general.Aggregators
 import com.joecollins.models.general.Aggregators.adjustKey
 import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.Party
@@ -10,6 +11,7 @@ import com.joecollins.models.general.PartyResult
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
+import com.joecollins.pubsub.compose
 import com.joecollins.pubsub.map
 import com.joecollins.pubsub.mapElements
 import java.awt.BorderLayout
@@ -23,36 +25,36 @@ import javax.swing.border.EmptyBorder
 
 class TooCloseToCallScreen private constructor(titleLabel: JLabel, multiSummaryFrame: MultiSummaryFrame) : JPanel() {
     private class Input<T> {
-        private var votes: Map<T, Map<Candidate, Int>> = HashMap()
-        private var results: Map<T, PartyResult?> = HashMap()
-        private var pctReporting: Map<T, Double> = HashMap()
-        private var maxRows = Int.MAX_VALUE
-        private var numCandidates = 2
-
-        fun setVotes(votes: Map<T, Map<Candidate, Int>>) {
-            this.votes = votes
-            update()
-        }
-
-        fun setResults(results: Map<T, PartyResult?>) {
-            this.results = results
-            update()
-        }
-
-        fun setPctReporting(pctReporting: Map<T, Double>) {
-            this.pctReporting = pctReporting
-            update()
-        }
-
-        fun setMaxRows(maxRows: Int) {
-            this.maxRows = maxRows
-            update()
-        }
-
-        fun setNumCandidates(numCandidates: Int) {
-            this.numCandidates = numCandidates
-            update()
-        }
+        var votes: Map<T, Map<Candidate, Int>> = HashMap()
+            set(value) {
+                field = value
+                update()
+            }
+        var results: Map<T, PartyResult?> = HashMap()
+            set(value) {
+                field = value
+                update()
+            }
+        var headers: Map<T, String> = HashMap()
+            set(value) {
+                field = value
+                update()
+            }
+        var pctReporting: Map<T, Double> = HashMap()
+            set(value) {
+                field = value
+                update()
+            }
+        var maxRows = Int.MAX_VALUE
+            set(value) {
+                field = value
+                update()
+            }
+        var numCandidates = 2
+            set(value) {
+                field = value
+                update()
+            }
 
         private val entriesPublisher = Publisher(calculateEntries())
         fun toEntries() = entriesPublisher
@@ -63,6 +65,7 @@ class TooCloseToCallScreen private constructor(titleLabel: JLabel, multiSummaryF
             .map {
                 Entry(
                     it.key,
+                    headers[it.key] ?: "",
                     it.value,
                     results[it.key],
                     pctReporting[it.key] ?: 0.0,
@@ -78,6 +81,7 @@ class TooCloseToCallScreen private constructor(titleLabel: JLabel, multiSummaryF
 
     private class Entry<T> constructor(
         val key: T,
+        val header: String,
         val votes: Map<Candidate, Int>,
         val result: PartyResult?,
         val pctReporting: Double,
@@ -93,18 +97,22 @@ class TooCloseToCallScreen private constructor(titleLabel: JLabel, multiSummaryF
         }
     }
 
-    class Builder<T>(
+    class Builder<T> internal constructor(
         private val header: Flow.Publisher<out String?>,
-        private val votes: Flow.Publisher<out Map<T, Map<Candidate, Int>>>,
-        private val results: Flow.Publisher<out Map<T, PartyResult?>>,
-        private val rowHeaderFunc: (T) -> String
+        private val entries: Flow.Publisher<out Set<T>>,
+        votesFunc: (T) -> Flow.Publisher<out Map<Candidate, Int>>,
+        resultsFunc: (T) -> Flow.Publisher<out PartyResult?>,
+        rowHeaderFunc: (T) -> Flow.Publisher<String>
     ) {
+        private val votes = entries.compose { set -> Aggregators.toMap(set) { votesFunc(it) } }
+        private val results = entries.compose { set -> Aggregators.toMap(set) { resultsFunc(it) } }
+        private val rowHeaders = entries.compose { set -> Aggregators.toMap(set) { rowHeaderFunc(it) } }
         private var pctReporting: Flow.Publisher<out Map<T, Double>>? = null
         private var rowsLimit: Flow.Publisher<out Int>? = null
         private var numCandidates: Flow.Publisher<out Int>? = null
 
-        fun withPctReporting(pctReportingPublisher: Flow.Publisher<out Map<T, Double>>): Builder<T> {
-            pctReporting = pctReportingPublisher
+        fun withPctReporting(pctReportingFunc: (T) -> Flow.Publisher<Double>): Builder<T> {
+            pctReporting = entries.compose { set -> Aggregators.toMap(set) { pctReportingFunc(it) } }
             return this
         }
 
@@ -129,18 +137,19 @@ class TooCloseToCallScreen private constructor(titleLabel: JLabel, multiSummaryF
 
         private fun createFrame(): MultiSummaryFrame {
             val input = Input<T>()
-            votes.subscribe(Subscriber { input.setVotes(it) })
-            results.subscribe(Subscriber { input.setResults(it) })
-            pctReporting?.subscribe(Subscriber { input.setPctReporting(it) })
-            rowsLimit?.subscribe(Subscriber { input.setMaxRows(it) })
-            numCandidates?.subscribe(Subscriber { input.setNumCandidates(it) })
+            votes.subscribe(Subscriber { input.votes = it })
+            results.subscribe(Subscriber { input.results = it })
+            rowHeaders.subscribe(Subscriber { input.headers = it })
+            pctReporting?.subscribe(Subscriber { input.pctReporting = it })
+            rowsLimit?.subscribe(Subscriber { input.maxRows = it })
+            numCandidates?.subscribe(Subscriber { input.numCandidates = it })
             val entries = input.toEntries()
             val thousandsFormatter = DecimalFormat("#,##0")
             val pctFormatter = DecimalFormat("0.0%")
             val frame = MultiSummaryFrame(
                 headerPublisher = header,
                 rowsPublisher = entries.mapElements { entry ->
-                    val header = rowHeaderFunc(entry.key)
+                    val header = entry.header
                     val values =
                         sequenceOf(
                             sequenceOf(
@@ -171,25 +180,26 @@ class TooCloseToCallScreen private constructor(titleLabel: JLabel, multiSummaryF
 
     companion object {
         fun <T> of(
-            votesPublisher: Flow.Publisher<out Map<T, Map<Candidate, Int>>>,
-            resultPublisher: Flow.Publisher<out Map<T, PartyResult?>>,
-            labelFunc: (T) -> String,
+            entries: Flow.Publisher<Set<T>>,
+            votesPublisher: (T) -> Flow.Publisher<out Map<Candidate, Int>>,
+            resultPublisher: (T) -> Flow.Publisher<out PartyResult?>,
+            labelFunc: (T) -> Flow.Publisher<String>,
             headerPublisher: Flow.Publisher<out String?>
         ): Builder<T> {
-            return Builder(headerPublisher, votesPublisher, resultPublisher, labelFunc)
+            return Builder(headerPublisher, entries, votesPublisher, resultPublisher, labelFunc)
         }
 
         fun <T> ofParty(
-            votesPublisher: Flow.Publisher<out Map<T, Map<Party, Int>>>,
-            resultPublisher: Flow.Publisher<out Map<T, PartyResult?>>,
-            labelFunc: (T) -> String,
+            entries: Flow.Publisher<Set<T>>,
+            votesPublisher: (T) -> Flow.Publisher<out Map<Party, Int>>,
+            resultPublisher: (T) -> Flow.Publisher<out PartyResult?>,
+            labelFunc: (T) -> Flow.Publisher<String>,
             headerPublisher: Flow.Publisher<out String?>
         ): Builder<T> {
             return Builder(
                 headerPublisher,
-                votesPublisher.map { votes ->
-                    votes.mapValues { adjustKey(it.value) { p -> Candidate("", p) } }
-                },
+                entries,
+                { t: T -> votesPublisher(t).map { v -> adjustKey(v) { p -> Candidate("", p) } } },
                 resultPublisher,
                 labelFunc
             )
