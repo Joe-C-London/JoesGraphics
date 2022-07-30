@@ -19,7 +19,8 @@ open class GraphicsFrame(
     headerPublisher: Flow.Publisher<out String?>,
     notesPublisher: Flow.Publisher<out String?>? = null,
     borderColorPublisher: Flow.Publisher<out Color>? = null,
-    headerAlignmentPublisher: Flow.Publisher<out Alignment>? = null
+    headerAlignmentPublisher: Flow.Publisher<out Alignment>? = null,
+    headerTextColorPublisher: Flow.Publisher<out Color>? = null
 ) : JPanel() {
 
     enum class Alignment(val jlabelAlignment: Int) {
@@ -84,12 +85,21 @@ open class GraphicsFrame(
             border = MatteBorder(1, 1, 1, 1, it)
             headerPanel.background = it
             notesLabel.foreground = it
-            headerLabel.foreground = ColorUtils.foregroundToContrast(it)
         }
         if (borderColorPublisher != null)
             borderColorPublisher.subscribe(Subscriber(eventQueueWrapper(onBorderColorUpdate)))
         else
             onBorderColorUpdate(Color.BLACK)
+
+        val onForegroundColorUpdate: (Color) -> Unit = {
+            headerLabel.foreground = it
+        }
+        if (headerTextColorPublisher != null)
+            headerTextColorPublisher.subscribe(Subscriber(eventQueueWrapper(onForegroundColorUpdate)))
+        else if (borderColorPublisher != null)
+            borderColorPublisher.subscribe(Subscriber(eventQueueWrapper { onForegroundColorUpdate(ColorUtils.foregroundToContrast(it)) }))
+        else
+            onForegroundColorUpdate(Color.WHITE)
     }
 
     internal val header: String? get() = if (headerPanel.isVisible) headerLabel.text.trim() else null
@@ -99,4 +109,6 @@ open class GraphicsFrame(
     internal val notes: String? get() = if (notesLabel.isVisible) notesLabel.text.trim() else null
 
     internal val borderColor: Color get() = headerPanel.background
+
+    internal val headerTextColor: Color get() = headerLabel.foreground
 }

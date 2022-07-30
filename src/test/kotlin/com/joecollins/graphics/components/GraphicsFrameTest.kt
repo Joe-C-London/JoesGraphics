@@ -73,6 +73,21 @@ class GraphicsFrameTest {
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ graphicsFrame.borderColor }, IsEqual(Color.BLUE))
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ graphicsFrame.headerTextColor }, IsEqual(Color.WHITE))
+    }
+
+    @Test
+    fun testHeaderTextColor() {
+        val graphicsFrame = GraphicsFrame(
+            headerPublisher = (null as String?).asOneTimePublisher(),
+            borderColorPublisher = Color.BLUE.asOneTimePublisher(),
+            headerTextColorPublisher = Color.YELLOW.asOneTimePublisher()
+        )
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ graphicsFrame.borderColor }, IsEqual(Color.BLUE))
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ graphicsFrame.headerTextColor }, IsEqual(Color.YELLOW))
     }
 
     @Test
@@ -136,6 +151,24 @@ class GraphicsFrameTest {
         }
         graphicsFrame.setSize(256, 128)
         compareRendering("GraphicsFrame", "BorderColor", graphicsFrame)
+    }
+
+    @Test
+    fun testRenderingHeaderTextColor() {
+        val graphicsFrame: GraphicsFrame = object : GraphicsFrame(
+            headerPublisher = "HEADER".asOneTimePublisher(),
+            notesPublisher = "SOURCE: BBC".asOneTimePublisher(),
+            borderColorPublisher = Color.RED.asOneTimePublisher(),
+            headerTextColorPublisher = Color.YELLOW.asOneTimePublisher()
+        ) {
+            init {
+                val panel = JPanel()
+                panel.background = Color.YELLOW
+                add(panel, BorderLayout.CENTER)
+            }
+        }
+        graphicsFrame.setSize(256, 128)
+        compareRendering("GraphicsFrame", "HeaderTextColor", graphicsFrame)
     }
 
     @Test
