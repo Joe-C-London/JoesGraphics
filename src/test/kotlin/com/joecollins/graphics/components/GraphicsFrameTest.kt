@@ -227,4 +227,64 @@ class GraphicsFrameTest {
         alignment.submit(GraphicsFrame.Alignment.RIGHT)
         compareRendering("GraphicsFrame", "HeaderAlignment-3", graphicsFrame)
     }
+
+    @Test
+    fun testRightHandLabel() {
+        val alignment = Publisher(GraphicsFrame.Alignment.CENTER)
+        val headerText = Publisher("HEADER")
+        val graphicsFrame: GraphicsFrame = object : GraphicsFrame(
+            headerPublisher = headerText,
+            headerAlignmentPublisher = alignment,
+            headerLabelsPublisher = mapOf(HeaderLabelLocation.RIGHT to "100%").asOneTimePublisher()
+        ) {
+            init {
+                val panel = JPanel()
+                panel.background = Color.YELLOW
+                add(panel, BorderLayout.CENTER)
+            }
+        }
+        graphicsFrame.setSize(256, 128)
+        compareRendering("GraphicsFrame", "RightHandLabel-C", graphicsFrame)
+        alignment.submit(GraphicsFrame.Alignment.LEFT)
+        compareRendering("GraphicsFrame", "RightHandLabel-L", graphicsFrame)
+        alignment.submit(GraphicsFrame.Alignment.RIGHT)
+        compareRendering("GraphicsFrame", "RightHandLabel-R", graphicsFrame)
+        alignment.submit(GraphicsFrame.Alignment.CENTER)
+        headerText.submit("THE MAIN HEADER TEXT")
+        compareRendering("GraphicsFrame", "RightHandLabel-C2", graphicsFrame)
+        alignment.submit(GraphicsFrame.Alignment.LEFT)
+        compareRendering("GraphicsFrame", "RightHandLabel-L2", graphicsFrame)
+        alignment.submit(GraphicsFrame.Alignment.RIGHT)
+        compareRendering("GraphicsFrame", "RightHandLabel-R2", graphicsFrame)
+    }
+
+    @Test
+    fun testLeftHandLabel() {
+        val alignment = Publisher(GraphicsFrame.Alignment.CENTER)
+        val headerText = Publisher("HEADER")
+        val graphicsFrame: GraphicsFrame = object : GraphicsFrame(
+            headerPublisher = headerText,
+            headerAlignmentPublisher = alignment,
+            headerLabelsPublisher = mapOf(HeaderLabelLocation.LEFT to "100%").asOneTimePublisher()
+        ) {
+            init {
+                val panel = JPanel()
+                panel.background = Color.YELLOW
+                add(panel, BorderLayout.CENTER)
+            }
+        }
+        graphicsFrame.setSize(256, 128)
+        compareRendering("GraphicsFrame", "LeftHandLabel-C", graphicsFrame)
+        alignment.submit(GraphicsFrame.Alignment.LEFT)
+        compareRendering("GraphicsFrame", "LeftHandLabel-L", graphicsFrame)
+        alignment.submit(GraphicsFrame.Alignment.RIGHT)
+        compareRendering("GraphicsFrame", "LeftHandLabel-R", graphicsFrame)
+        alignment.submit(GraphicsFrame.Alignment.CENTER)
+        headerText.submit("THE MAIN HEADER TEXT")
+        compareRendering("GraphicsFrame", "LeftHandLabel-C2", graphicsFrame)
+        alignment.submit(GraphicsFrame.Alignment.LEFT)
+        compareRendering("GraphicsFrame", "LeftHandLabel-L2", graphicsFrame)
+        alignment.submit(GraphicsFrame.Alignment.RIGHT)
+        compareRendering("GraphicsFrame", "LeftHandLabel-R2", graphicsFrame)
+    }
 }
