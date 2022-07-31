@@ -4,9 +4,12 @@ import com.joecollins.graphics.screens.generic.RegionalBreakdownScreen.Companion
 import com.joecollins.graphics.screens.generic.RegionalBreakdownScreen.Companion.seatsWithDiff
 import com.joecollins.graphics.screens.generic.RegionalBreakdownScreen.Companion.seatsWithPrev
 import com.joecollins.graphics.screens.generic.RegionalBreakdownScreen.Companion.votes
+import com.joecollins.graphics.screens.generic.RegionalBreakdownScreen.Companion.votesPollsReporting
 import com.joecollins.graphics.screens.generic.RegionalBreakdownScreen.Companion.votesWithPrev
+import com.joecollins.graphics.screens.generic.RegionalBreakdownScreen.Companion.votesWithPrevPollsReporting
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.models.general.Party
+import com.joecollins.models.general.PollsReporting
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
 import org.junit.Test
@@ -386,6 +389,50 @@ class RegionalBreakdownScreenTest {
     }
 
     @Test
+    fun testVotesPollsReporting() {
+        val peiVotes = Publisher<Map<Party, Int>>(emptyMap())
+        val cardiganVotes = Publisher<Map<Party, Int>>(emptyMap())
+        val malpequeVotes = Publisher<Map<Party, Int>>(emptyMap())
+        val charlottetownVotes = Publisher<Map<Party, Int>>(emptyMap())
+        val egmontVotes = Publisher<Map<Party, Int>>(emptyMap())
+        val peiPct = Publisher(PollsReporting(0, 27))
+        val cardiganPct = Publisher(PollsReporting(0, 7))
+        val malpequePct = Publisher(PollsReporting(0, 7))
+        val charlottetownPct = Publisher(PollsReporting(0, 6))
+        val egmontPct = Publisher(PollsReporting(0, 7))
+        val screen = votesPollsReporting(
+            "PRINCE EDWARD ISLAND".asOneTimePublisher(),
+            peiVotes,
+            peiPct,
+            "VOTES BY REGION".asOneTimePublisher()
+        )
+            .withBlankRow()
+            .withRegion("CARDIGAN".asOneTimePublisher(), cardiganVotes, cardiganPct)
+            .withRegion("MALPEQUE".asOneTimePublisher(), malpequeVotes, malpequePct)
+            .withRegion("CHARLOTTETOWN".asOneTimePublisher(), charlottetownVotes, charlottetownPct)
+            .withRegion("EGMONT".asOneTimePublisher(), egmontVotes, egmontPct)
+            .build("PRINCE EDWARD ISLAND".asOneTimePublisher())
+        screen.setSize(1024, 512)
+        compareRendering("RegionalBreakdownScreen", "VotesPollsReporting-1", screen)
+        peiVotes.submit(mapOf(lib to 902, pc to 934, grn to 1152, ndp to 38))
+        peiPct.submit(PollsReporting(1, 27))
+        cardiganVotes.submit(mapOf(lib to 902, pc to 934, grn to 1152, ndp to 38))
+        cardiganPct.submit(PollsReporting(1, 7))
+        compareRendering("RegionalBreakdownScreen", "VotesPollsReporting-2", screen)
+        peiVotes.submit(mapOf(lib to 24346, pc to 30415, grn to 25302, ndp to 2454, ind to 282))
+        peiPct.submit(PollsReporting(27, 27))
+        cardiganVotes.submit(mapOf(lib to 5265, pc to 9714, grn to 5779, ndp to 277))
+        cardiganPct.submit(PollsReporting(7, 7))
+        malpequeVotes.submit(mapOf(lib to 5548, pc to 9893, grn to 7378, ndp to 244, ind to 80))
+        malpequePct.submit(PollsReporting(7, 7))
+        charlottetownVotes.submit(mapOf(lib to 6078, pc to 4932, grn to 6591, ndp to 674, ind to 202))
+        charlottetownPct.submit(PollsReporting(6, 6))
+        egmontVotes.submit(mapOf(lib to 7455, pc to 5876, grn to 5554, ndp to 1259))
+        egmontPct.submit(PollsReporting(7, 7))
+        compareRendering("RegionalBreakdownScreen", "VotesPollsReporting-3", screen)
+    }
+
+    @Test
     fun testVotesWithPrev() {
         val peiVotes = Publisher<Map<Party, Int>>(emptyMap())
         val cardiganVotes = Publisher<Map<Party, Int>>(emptyMap())
@@ -440,6 +487,63 @@ class RegionalBreakdownScreenTest {
         egmontPrevVotes.submit(mapOf(lib to 9312, pc to 6646, grn to 1138, ndp to 1902))
         egmontPct.submit(1.0)
         compareRendering("RegionalBreakdownScreen", "VotesWithPrev-3", screen)
+    }
+
+    @Test
+    fun testVotesWithPrevPollsReporting() {
+        val peiVotes = Publisher<Map<Party, Int>>(emptyMap())
+        val cardiganVotes = Publisher<Map<Party, Int>>(emptyMap())
+        val malpequeVotes = Publisher<Map<Party, Int>>(emptyMap())
+        val charlottetownVotes = Publisher<Map<Party, Int>>(emptyMap())
+        val egmontVotes = Publisher<Map<Party, Int>>(emptyMap())
+        val peiPrevVotes = Publisher<Map<Party, Int>>(emptyMap())
+        val cardiganPrevVotes = Publisher<Map<Party, Int>>(emptyMap())
+        val malpequePrevVotes = Publisher<Map<Party, Int>>(emptyMap())
+        val charlottetownPrevVotes = Publisher<Map<Party, Int>>(emptyMap())
+        val egmontPrevVotes = Publisher<Map<Party, Int>>(emptyMap())
+        val peiPct = Publisher(PollsReporting(0, 27))
+        val cardiganPct = Publisher(PollsReporting(0, 7))
+        val malpequePct = Publisher(PollsReporting(0, 7))
+        val charlottetownPct = Publisher(PollsReporting(0, 6))
+        val egmontPct = Publisher(PollsReporting(0, 7))
+        val screen = votesWithPrevPollsReporting(
+            "PRINCE EDWARD ISLAND".asOneTimePublisher(),
+            peiVotes,
+            peiPrevVotes,
+            peiPct,
+            "VOTES BY REGION".asOneTimePublisher()
+        )
+            .withBlankRow()
+            .withRegion("CARDIGAN".asOneTimePublisher(), cardiganVotes, cardiganPrevVotes, cardiganPct)
+            .withRegion("MALPEQUE".asOneTimePublisher(), malpequeVotes, malpequePrevVotes, malpequePct)
+            .withRegion("CHARLOTTETOWN".asOneTimePublisher(), charlottetownVotes, charlottetownPrevVotes, charlottetownPct)
+            .withRegion("EGMONT".asOneTimePublisher(), egmontVotes, egmontPrevVotes, egmontPct)
+            .build("PRINCE EDWARD ISLAND".asOneTimePublisher())
+        screen.setSize(1024, 512)
+        compareRendering("RegionalBreakdownScreen", "VotesWithPrevPollsReporting-1", screen)
+        peiVotes.submit(mapOf(lib to 902, pc to 934, grn to 1152, ndp to 38))
+        peiPrevVotes.submit(mapOf(lib to 1173, pc to 1173, grn to 234, ndp to 258))
+        peiPct.submit(PollsReporting(1, 27))
+        cardiganVotes.submit(mapOf(lib to 902, pc to 934, grn to 1152, ndp to 38))
+        cardiganPrevVotes.submit(mapOf(lib to 1173, pc to 1173, grn to 234, ndp to 258))
+        cardiganPct.submit(PollsReporting(1, 7))
+        compareRendering("RegionalBreakdownScreen", "VotesWithPrevPollsReporting-2", screen)
+        peiVotes.submit(mapOf(lib to 24346, pc to 30415, grn to 25302, ndp to 2454, ind to 282))
+        peiPrevVotes.submit(mapOf(lib to 33481, pc to 30663, grn to 8857, ndp to 8997))
+        peiPct.submit(PollsReporting(27, 27))
+        cardiganVotes.submit(mapOf(lib to 5265, pc to 9714, grn to 5779, ndp to 277))
+        cardiganPrevVotes.submit(mapOf(lib to 8016, pc to 9444, grn to 1144, ndp to 2404))
+        cardiganPct.submit(PollsReporting(7, 7))
+        malpequeVotes.submit(mapOf(lib to 5548, pc to 9893, grn to 7378, ndp to 244, ind to 80))
+        malpequePrevVotes.submit(mapOf(lib to 7767, pc to 8169, grn to 4011, ndp to 1427))
+        malpequePct.submit(PollsReporting(7, 7))
+        charlottetownVotes.submit(mapOf(lib to 6078, pc to 4932, grn to 6591, ndp to 674, ind to 202))
+        charlottetownPrevVotes.submit(mapOf(lib to 8383, pc to 6405, grn to 2557, ndp to 3261))
+        charlottetownPct.submit(PollsReporting(6, 6))
+        egmontVotes.submit(mapOf(lib to 7455, pc to 5876, grn to 5554, ndp to 1259))
+        egmontPrevVotes.submit(mapOf(lib to 9312, pc to 6646, grn to 1138, ndp to 1902))
+        egmontPct.submit(PollsReporting(7, 7))
+        compareRendering("RegionalBreakdownScreen", "VotesWithPrevPollsReporting-3", screen)
     }
 
     @Test

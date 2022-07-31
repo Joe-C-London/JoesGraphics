@@ -4,10 +4,12 @@ import com.joecollins.graphics.components.FontSizeAdjustingLabel
 import com.joecollins.graphics.components.MultiSummaryFrame
 import com.joecollins.graphics.utils.StandardFont
 import com.joecollins.models.general.Candidate
+import com.joecollins.models.general.PollsReporting
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
 import com.joecollins.pubsub.asOneTimePublisher
+import com.joecollins.pubsub.map
 import com.joecollins.pubsub.mapElements
 import com.joecollins.pubsub.merge
 import java.awt.BorderLayout
@@ -121,6 +123,11 @@ class RecountScreen private constructor(headerLabel: JLabel, frame: MultiSummary
 
         fun withPctReporting(pctReporting: Flow.Publisher<out Map<T, Double>>): Builder<T> {
             this.pctReporting = pctReporting
+            return this
+        }
+
+        fun withPollsReporting(pollsReporting: Flow.Publisher<out Map<T, PollsReporting>>): Builder<T> {
+            this.pctReporting = pollsReporting.map { m -> m.mapValues { e -> e.value.toPct() } }
             return this
         }
 

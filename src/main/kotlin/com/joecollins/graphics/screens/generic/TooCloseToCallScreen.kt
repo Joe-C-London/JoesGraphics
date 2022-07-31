@@ -8,6 +8,7 @@ import com.joecollins.models.general.Aggregators.adjustKey
 import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
+import com.joecollins.models.general.PollsReporting
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
@@ -40,7 +41,7 @@ class TooCloseToCallScreen private constructor(titleLabel: JLabel, multiSummaryF
                 field = value
                 update()
             }
-        var pctReporting: Map<T, Double> = HashMap()
+        var reporting: Map<T, String> = HashMap()
             set(value) {
                 field = value
                 update()
@@ -68,7 +69,7 @@ class TooCloseToCallScreen private constructor(titleLabel: JLabel, multiSummaryF
                     headers[it.key] ?: "",
                     it.value,
                     results[it.key],
-                    pctReporting[it.key] ?: 0.0,
+                    reporting[it.key] ?: "",
                     numCandidates
                 )
             }
@@ -84,7 +85,7 @@ class TooCloseToCallScreen private constructor(titleLabel: JLabel, multiSummaryF
         val header: String,
         val votes: Map<Candidate, Int>,
         val result: PartyResult?,
-        val pctReporting: Double,
+        val reporting: String,
         val numCandidates: Int
     ) {
         val topCandidates: List<Map.Entry<Candidate, Int>> = votes.entries
@@ -107,12 +108,17 @@ class TooCloseToCallScreen private constructor(titleLabel: JLabel, multiSummaryF
         private val votes = entries.compose { set -> Aggregators.toMap(set) { votesFunc(it) } }
         private val results = entries.compose { set -> Aggregators.toMap(set) { resultsFunc(it) } }
         private val rowHeaders = entries.compose { set -> Aggregators.toMap(set) { rowHeaderFunc(it) } }
-        private var pctReporting: Flow.Publisher<out Map<T, Double>>? = null
+        private var reporting: Flow.Publisher<out Map<T, String>>? = null
         private var rowsLimit: Flow.Publisher<out Int>? = null
         private var numCandidates: Flow.Publisher<out Int>? = null
 
         fun withPctReporting(pctReportingFunc: (T) -> Flow.Publisher<Double>): Builder<T> {
-            pctReporting = entries.compose { set -> Aggregators.toMap(set) { pctReportingFunc(it) } }
+            reporting = entries.compose { set -> Aggregators.toMap(set) { pctReportingFunc(it).map { pct -> DecimalFormat("0.0%").format(pct) + " IN" } } }
+            return this
+        }
+
+        fun withPollsReporting(pollsReportingFunc: (T) -> Flow.Publisher<PollsReporting>): Builder<T> {
+            reporting = entries.compose { set -> Aggregators.toMap(set) { pollsReportingFunc(it).map { (reporting, total) -> "$reporting/$total" } } }
             return this
         }
 
@@ -140,7 +146,7 @@ class TooCloseToCallScreen private constructor(titleLabel: JLabel, multiSummaryF
             votes.subscribe(Subscriber { input.votes = it })
             results.subscribe(Subscriber { input.results = it })
             rowHeaders.subscribe(Subscriber { input.headers = it })
-            pctReporting?.subscribe(Subscriber { input.pctReporting = it })
+            reporting?.subscribe(Subscriber { input.reporting = it })
             rowsLimit?.subscribe(Subscriber { input.maxRows = it })
             numCandidates?.subscribe(Subscriber { input.numCandidates = it })
             val entries = input.toEntries()
@@ -167,7 +173,7 @@ class TooCloseToCallScreen private constructor(titleLabel: JLabel, multiSummaryF
                                 .flatten()
                                 .take(entry.numCandidates),
                             sequenceOf(Color.WHITE to ("LEAD: " + thousandsFormatter.format(entry.lead))),
-                            pctReporting?.let { sequenceOf(Color.WHITE to (pctFormatter.format(entry.pctReporting) + " IN")) } ?: emptySequence()
+                            reporting?.let { sequenceOf(Color.WHITE to entry.reporting) } ?: emptySequence()
                         )
                             .flatten()
                             .toList()

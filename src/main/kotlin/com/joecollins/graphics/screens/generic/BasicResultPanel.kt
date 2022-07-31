@@ -453,7 +453,7 @@ class BasicResultPanel private constructor(
         }
 
         override fun createDiffFrame(): BarFrame? {
-            val diffBars = diff!!.map { map ->
+            val diffBars = diff?.map { map ->
                 map.entries.asSequence()
                     .sortedByDescending { if (it.key === Party.OTHERS) Int.MIN_VALUE else it.value.curr }
                     .map {
@@ -480,7 +480,7 @@ class BasicResultPanel private constructor(
             }
             val showPrevRaw = showPrevRaw ?: false.asOneTimePublisher()
             return changeHeader?.let { changeHeader ->
-                val bars = showPrevRaw.compose { showRaw -> if (showRaw) prevBars!! else diffBars }
+                val bars = showPrevRaw.compose { showRaw -> if (showRaw) prevBars!! else diffBars!! }
                 var builder = BarFrameBuilder.basic(bars)
                     .withHeader(changeHeader)
                     .withSubhead(changeSubhead ?: (null as String?).asOneTimePublisher())
@@ -628,7 +628,7 @@ class BasicResultPanel private constructor(
         }
 
         override fun createDiffFrame(): BarFrame? {
-            val diffBars = diff!!.map { map ->
+            val diffBars = diff?.map { map ->
                 map.entries.asSequence()
                     .sortedByDescending { if (it.key === Party.OTHERS) Int.MIN_VALUE else it.value.curr.second }
                     .map {
@@ -668,7 +668,7 @@ class BasicResultPanel private constructor(
             }
             val showPrevRaw = showPrevRaw ?: false.asOneTimePublisher()
             return changeHeader?.let { changeHeader ->
-                val bars = showPrevRaw.compose { showRaw -> if (showRaw) prevBars!! else diffBars }
+                val bars = showPrevRaw.compose { showRaw -> if (showRaw) prevBars!! else diffBars!! }
                 var builder = if (focusLocation == FocusLocation.FIRST)
                     BarFrameBuilder.dual(bars)
                 else
@@ -810,7 +810,7 @@ class BasicResultPanel private constructor(
         }
 
         override fun createDiffFrame(): BarFrame? {
-            val diffBars = diff!!.map { map ->
+            val diffBars = diff?.map { map ->
                 map.entries.asSequence()
                     .sortedByDescending {
                         if (it.key === Party.OTHERS) Int.MIN_VALUE
@@ -850,7 +850,7 @@ class BasicResultPanel private constructor(
             }
             val showPrevRaw = this.showPrevRaw ?: false.asOneTimePublisher()
             return changeHeader?.let { changeHeader ->
-                val bars = showPrevRaw.compose { showRaw -> if (showRaw) prevBars!! else diffBars }
+                val bars = showPrevRaw.compose { showRaw -> if (showRaw) prevBars!! else diffBars!! }
                 var builder = BarFrameBuilder.dual(bars)
                     .withHeader(changeHeader)
                     .withSubhead(changeSubhead ?: (null as String?).asOneTimePublisher())

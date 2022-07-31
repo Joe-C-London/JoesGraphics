@@ -382,6 +382,6 @@ class TweetFrameTest {
 
         val frame = TweetFrame(status.asOneTimePublisher())
         frame.size = Dimension(512, 256)
-        RenderTestUtils.compareRendering("TweetFrame", "Emoji", frame)
+        RenderTestUtils.compareRendering("TweetFrame", "Emoji", frame, 15)
     }
 }

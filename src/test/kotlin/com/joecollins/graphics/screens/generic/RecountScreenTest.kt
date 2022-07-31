@@ -3,6 +3,7 @@ package com.joecollins.graphics.screens.generic
 import com.joecollins.graphics.utils.RenderTestUtils
 import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.Party
+import com.joecollins.models.general.PollsReporting
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
 import org.junit.Test
@@ -76,6 +77,74 @@ class RecountScreenTest {
 
         candidateVotes.submit(candidateVotesRaw)
         pctReporting.submit(pctReportingRaw)
+        RenderTestUtils.compareRendering("RecountScreen", "RecountVotes-3", screen)
+    }
+
+    @Test
+    fun testRecountVotesWithPollsReporting() {
+        val ndp = Party("New Democratic Party", "NDP", Color.ORANGE)
+        val yp = Party("Yukon Party", "YP", Color.BLUE)
+        val lib = Party("Liberal", "LIB", Color.RED)
+        val ind = Party("Independent", "IND", Color.GRAY)
+
+        val candidateVotesRaw: MutableMap<String, Map<Candidate, Int>> = TreeMap()
+        val pollsReportingRaw: MutableMap<String, PollsReporting> = TreeMap()
+        val candidateVotes = Publisher<Map<String, Map<Candidate, Int>>>(candidateVotesRaw)
+        val pollsReporting = Publisher<Map<String, PollsReporting>>(pollsReportingRaw)
+        val screen = RecountScreen.of(
+            candidateVotes,
+            { it.uppercase() },
+            10,
+            "AUTOMATIC RECOUNTS".asOneTimePublisher()
+        )
+            .withPollsReporting(pollsReporting)
+            .build("YUKON".asOneTimePublisher())
+        screen.setSize(1024, 512)
+        RenderTestUtils.compareRendering("RecountScreen", "RecountVotes-1", screen)
+
+        candidateVotesRaw["Mountainview"] = mapOf(
+            Candidate("Shaunagh Stikeman", ndp) to 62,
+            Candidate("Jeanie Davis", lib) to 68,
+            Candidate("Darrell Pasloski", yp) to 65
+        )
+        pollsReportingRaw["Mountainview"] = PollsReporting(1, 6)
+
+        candidateVotesRaw["Vuntut Gwitchin"] = mapOf(
+            Candidate("Pauline Frost", lib) to 77,
+            Candidate("Darius Elias", yp) to 70,
+            Candidate("Skeeter Wright", ndp) to 3
+        )
+        pollsReportingRaw["Vuntut Gwitchin"] = PollsReporting(3, 3)
+
+        candidateVotesRaw["Watson Lake"] = mapOf(
+            Candidate("Patti McLeod", yp) to 147,
+            Candidate("Victor Kisoun", ind) to 7,
+            Candidate("Erin Labonte", ndp) to 94,
+            Candidate("Ernie Jamieson", lib) to 103
+        )
+        pollsReportingRaw["Watson Lake"] = PollsReporting(2, 6)
+
+        candidateVotes.submit(candidateVotesRaw)
+        pollsReporting.submit(pollsReportingRaw)
+        RenderTestUtils.compareRendering("RecountScreen", "RecountVotes-2", screen)
+
+        candidateVotesRaw["Mountainview"] = mapOf(
+            Candidate("Shaunagh Stikeman", ndp) to 432,
+            Candidate("Jeanie Davis", lib) to 439,
+            Candidate("Darrell Pasloski", yp) to 399
+        )
+        pollsReportingRaw["Mountainview"] = PollsReporting(6, 6)
+
+        candidateVotesRaw["Watson Lake"] = mapOf(
+            Candidate("Patti McLeod", yp) to 299,
+            Candidate("Victor Kisoun", ind) to 38,
+            Candidate("Erin Labonte", ndp) to 219,
+            Candidate("Ernie Jamieson", lib) to 212
+        )
+        pollsReportingRaw["Watson Lake"] = PollsReporting(6, 6)
+
+        candidateVotes.submit(candidateVotesRaw)
+        pollsReporting.submit(pollsReportingRaw)
         RenderTestUtils.compareRendering("RecountScreen", "RecountVotes-3", screen)
     }
 
