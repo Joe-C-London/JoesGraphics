@@ -44,8 +44,8 @@ open class GraphicsFrame(
     }
 
     private val headerFont = StandardFont.readNormalFont(24)
-    private val additionalHeaderFont = StandardFont.readNormalFont(18)
-    private val additionalHeaderBorder = { c: Color -> MatteBorder(3, 3, 3, 3, c) }
+    private val additionalHeaderFont = StandardFont.readNormalFont(20)
+    private val additionalHeaderBorder = { c: Color -> MatteBorder(2, 2, 2, 2, c) }
 
     private val headerPanel = JPanel()
     private val headerLabel = FontSizeAdjustingLabel()
@@ -130,8 +130,8 @@ open class GraphicsFrame(
                     border = MatteBorder(1, 1, 1, 1, it)
                     headerPanel.background = it
                     notesLabel.foreground = it
-//                    additionalHeaderPanels.values.forEach { label -> label.border = additionalHeaderBorder(it) }
-//                    additionalHeaderLabels.values.forEach { label -> label.foreground = it }
+                    additionalHeaderPanels.values.forEach { label -> label.border = additionalHeaderBorder(it) }
+                    additionalHeaderLabels.values.forEach { label -> label.foreground = it }
                 }
             )
         )
@@ -144,7 +144,7 @@ open class GraphicsFrame(
                 Subscriber(
                     eventQueueWrapper {
                         headerLabel.foreground = it
-//                        additionalHeaderPanels.values.forEach { label -> label.background = it }
+                        additionalHeaderPanels.values.forEach { label -> label.background = it }
                     }
                 )
             )
