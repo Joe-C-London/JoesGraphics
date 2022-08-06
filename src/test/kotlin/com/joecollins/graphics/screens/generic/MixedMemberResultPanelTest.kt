@@ -151,6 +151,83 @@ class MixedMemberResultPanelTest {
     }
 
     @Test
+    fun testMMPWithProgressLabels() {
+        val currentCandidateVotes = Publisher(LinkedHashMap<Candidate, Int>())
+        val previousCandidateVotes = Publisher(LinkedHashMap<Party, Int>())
+        val currentPartyVotes = Publisher(LinkedHashMap<Party, Int>())
+        val previousPartyVotes = Publisher(LinkedHashMap<Party, Int>())
+        val header = Publisher("CHARLOTTETOWN-WINSLOE")
+        val candidateHeader = Publisher("CANDIDATE VOTES")
+        val candidateChangeHeader = Publisher("CANDIDATE CHANGE SINCE 2015")
+        val partyHeader = Publisher("PARTY VOTES")
+        val partyChangeHeader = Publisher("PARTY CHANGE SINCE 2015")
+        val mapHeader = Publisher("CHARLOTTETOWN")
+        val shapesByDistrict = peiShapesByDistrict()
+        val focus = Publisher(shapesByDistrict.keys.filter { it in 10..14 })
+        val selectedShape = Publisher(10)
+        val selectedResult = Publisher<PartyResult?>(null)
+        val candidatePctReporting = Publisher(0.0)
+        val partyPctReporting = Publisher(0.0)
+        val candidateProgress = Publisher("0% IN")
+        val partyProgress = Publisher("0% IN")
+        val winner = Publisher<Candidate?>(null)
+        val lib = Party("Liberal", "LIB", Color.RED)
+        val grn = Party("Green", "GRN", Color.GREEN.darker())
+        val pc = Party("Progressive Conservative", "PC", Color.BLUE)
+        val ndp = Party("New Democratic Party", "NDP", Color.ORANGE)
+        val panel = builder()
+            .withCandidateVotes(currentCandidateVotes, candidateHeader)
+            .withPrevCandidateVotes(previousCandidateVotes, candidateChangeHeader)
+            .withCandidatePctReporting(candidatePctReporting)
+            .withCandidateProgressLabel(candidateProgress)
+            .withWinner(winner)
+            .withPartyVotes(currentPartyVotes, partyHeader)
+            .withPrevPartyVotes(previousPartyVotes, partyChangeHeader)
+            .withPartyPctReporting(partyPctReporting)
+            .withPartyProgressLabel(partyProgress)
+            .withResultMap(
+                shapesByDistrict.asOneTimePublisher(),
+                selectedShape,
+                selectedResult,
+                focus,
+                mapHeader
+            )
+            .build(header)
+        panel.setSize(1024, 512)
+        val currCandVotes = LinkedHashMap<Candidate, Int>()
+        currCandVotes[Candidate("Jesse Reddin Cousins", ndp)] = 8
+        currCandVotes[Candidate("Mike Gillis", pc)] = 173
+        currCandVotes[Candidate("Robert Mitchell", lib, true)] = 284
+        currCandVotes[Candidate("Amanda Morrison", grn)] = 211
+        currentCandidateVotes.submit(currCandVotes)
+        winner.submit(currCandVotes.keys.first { it.party === lib })
+        val prevCandVotes = LinkedHashMap<Party, Int>()
+        prevCandVotes[lib] = 1425
+        prevCandVotes[pc] = 1031
+        prevCandVotes[ndp] = 360
+        prevCandVotes[grn] = 295
+        previousCandidateVotes.submit(prevCandVotes)
+        val currPartyVotes = LinkedHashMap<Party, Int>()
+        currPartyVotes[grn] = 110
+        currPartyVotes[lib] = 101
+        currPartyVotes[ndp] = 11
+        currPartyVotes[pc] = 82
+        currentPartyVotes.submit(currPartyVotes)
+        val prevPartyVotes = LinkedHashMap<Party, Int>()
+        prevPartyVotes[lib] = 1397
+        prevPartyVotes[pc] = 1062
+        prevPartyVotes[ndp] = 544
+        prevPartyVotes[grn] = 426
+        previousPartyVotes.submit(prevPartyVotes)
+        candidatePctReporting.submit(0.2)
+        candidateProgress.submit("20% IN")
+        partyPctReporting.submit(0.1)
+        partyProgress.submit("10% IN")
+        selectedResult.submit(leading(lib))
+        compareRendering("MixedMemberResultPanel", "ProgressLabels", panel)
+    }
+
+    @Test
     fun testMMPWaiting() {
         val currentCandidateVotes = Publisher(LinkedHashMap<Candidate, Int>())
         val previousCandidateVotes = Publisher(LinkedHashMap<Party, Int>())

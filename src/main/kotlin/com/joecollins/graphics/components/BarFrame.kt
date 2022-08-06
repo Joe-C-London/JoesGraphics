@@ -36,11 +36,13 @@ class BarFrame(
     minPublisher: Flow.Publisher<out Number>? = null,
     maxPublisher: Flow.Publisher<out Number>? = null,
     notesPublisher: Flow.Publisher<out String?>? = null,
-    borderColorPublisher: Flow.Publisher<out Color>? = null
+    borderColorPublisher: Flow.Publisher<out Color>? = null,
+    headerLabelsPublisher: Flow.Publisher<out Map<HeaderLabelLocation, String?>>? = null
 ) : GraphicsFrame(
     headerPublisher = headerPublisher,
     notesPublisher = notesPublisher,
-    borderColorPublisher = borderColorPublisher
+    borderColorPublisher = borderColorPublisher,
+    headerLabelsPublisher = headerLabelsPublisher
 ) {
     private val centralPanel: JPanel
     private val subheadLabel: FontSizeAdjustingLabel = FontSizeAdjustingLabel()

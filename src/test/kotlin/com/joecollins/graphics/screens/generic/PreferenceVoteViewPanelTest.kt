@@ -154,6 +154,104 @@ class PreferenceVoteViewPanelTest {
     }
 
     @Test
+    fun testCandidateScreenProgressLabel() {
+        val alp = Candidate("Mark Monaghan", Party("Labor", "ALP", Color.RED))
+        val clp = Candidate("Kylie Bonanni", Party("Country Liberal", "CLP", Color.ORANGE))
+        val ta = Candidate("Jeff Collins", Party("Territory Alliance", "TA", Color.BLUE), true)
+        val ind = Candidate("Amye Un", Party("Independent", "IND", Color.GRAY))
+        val currPrimary = LinkedHashMap<Candidate, Int?>()
+        currPrimary[alp] = 0
+        currPrimary[clp] = 0
+        currPrimary[ta] = 0
+        currPrimary[ind] = 0
+        val prevPrimary = LinkedHashMap<Party, Int>()
+        prevPrimary[alp.party] = 1802
+        prevPrimary[clp.party] = 1439
+        prevPrimary[ta.party] = 356
+        prevPrimary[ind.party] = 384
+        val curr2CP = LinkedHashMap<Candidate, Int>()
+        val prev2PP = LinkedHashMap<Party, Int>()
+        prev2PP[alp.party] = 2171
+        prev2PP[clp.party] = 1588
+        val currentPrimaryVotes = Publisher(currPrimary)
+        val previousPrimaryVotes = Publisher(prevPrimary)
+        val current2CPVotes = Publisher(curr2CP)
+        val previous2PPVotes = Publisher(prev2PP)
+        val pctReporting = Publisher(0.0)
+        val preferencePctReporting = Publisher(0.0)
+        val header = Publisher("FONG LIM")
+        val voteHeader = Publisher("PRIMARY VOTE")
+        val voteSubhead = Publisher("")
+        val voteProgress = Publisher("0/9")
+        val preferenceHeader = Publisher("TWO CANDIDATE PREFERRED")
+        val preferenceSubhead = Publisher("")
+        val preferenceProgress = Publisher("0/9")
+        val changeHeader = Publisher("PRIMARY CHANGE SINCE 2016")
+        val swingHeader = Publisher("PREFERENCE SWING SINCE 2016")
+        val leader = Publisher<Candidate?>(null)
+        val swingPartyOrder = listOf(alp.party, ta.party, clp.party)
+        val panel = candidateVotes(
+            currentPrimaryVotes, voteHeader, voteSubhead
+        )
+            .withPrev(previousPrimaryVotes, changeHeader)
+            .withPctReporting(pctReporting)
+            .withProgressLabel(voteProgress)
+            .withPreferences(current2CPVotes, preferenceHeader, preferenceSubhead)
+            .withPrevPreferences(previous2PPVotes)
+            .withPreferencePctReporting(preferencePctReporting)
+            .withPreferenceProgressLabel(preferenceProgress)
+            .withWinner(leader)
+            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader)
+            .build(header)
+        panel.setSize(1024, 512)
+        compareRendering("PreferenceVoteViewPanel", "ProgressLabels-1", panel)
+        currPrimary[alp] = 13
+        currPrimary[clp] = 13
+        currPrimary[ta] = 6
+        currPrimary[ind] = 5
+        currentPrimaryVotes.submit(currPrimary)
+        curr2CP[alp] = 0
+        curr2CP[clp] = 0
+        current2CPVotes.submit(curr2CP)
+        pctReporting.submit(1.0 / 9)
+        voteProgress.submit("1/9")
+        compareRendering("PreferenceVoteViewPanel", "ProgressLabels-2", panel)
+        currPrimary[alp] = 365
+        currPrimary[clp] = 262
+        currPrimary[ta] = 86
+        currPrimary[ind] = 83
+        currentPrimaryVotes.submit(currPrimary)
+        curr2CP[alp] = 18
+        curr2CP[clp] = 19
+        current2CPVotes.submit(curr2CP)
+        pctReporting.submit(3.0 / 9)
+        voteProgress.submit("3/9")
+        preferencePctReporting.submit(1.0 / 9)
+        preferenceProgress.submit("1/9")
+        compareRendering("PreferenceVoteViewPanel", "ProgressLabels-3", panel)
+        currPrimary[alp] = 1756
+        currPrimary[clp] = 1488
+        currPrimary[ta] = 497
+        currPrimary[ind] = 434
+        currentPrimaryVotes.submit(currPrimary)
+        curr2CP[alp] = 464
+        curr2CP[clp] = 332
+        current2CPVotes.submit(curr2CP)
+        pctReporting.submit(9.0 / 9)
+        voteProgress.submit("9/9")
+        preferencePctReporting.submit(3.0 / 9)
+        preferenceProgress.submit("3/9")
+        leader.submit(alp)
+        compareRendering("PreferenceVoteViewPanel", "ProgressLabels-4", panel)
+        curr2CP[alp] = 2197
+        curr2CP[clp] = 1978
+        current2CPVotes.submit(curr2CP)
+        preferencePctReporting.submit(9.0 / 9)
+        preferenceProgress.submit("9/9")
+        compareRendering("PreferenceVoteViewPanel", "ProgressLabels-5", panel)
+    }
+
+    @Test
     fun testCandidatesSwitchingBetweenSingleAndDoubleLines() {
         val alp = Party("Labor", "ALP", Color.RED)
         val clp = Party("Country Liberal", "CLP", Color.ORANGE)

@@ -71,10 +71,12 @@ class MixedMemberResultPanel private constructor(
         private var candidateVotes: Flow.Publisher<out Map<Candidate, Int?>> = emptyMap<Candidate, Int?>().asOneTimePublisher()
         private var candidatePrev: Flow.Publisher<out Map<Party, Int>>? = null
         private var candidatePctReporting: Flow.Publisher<out Double>? = null
+        private var candidateProgressLabel: Flow.Publisher<out String?> = null.asOneTimePublisher()
         private var winner: Flow.Publisher<out Candidate?> = (null as Candidate?).asOneTimePublisher()
         private var partyVotes: Flow.Publisher<out Map<Party, Int?>> = emptyMap<Party, Int?>().asOneTimePublisher()
         private var partyPrev: Flow.Publisher<out Map<Party, Int>>? = null
         private var partyPctReporting: Flow.Publisher<out Double>? = null
+        private var partyProgressLabel: Flow.Publisher<out String?> = null.asOneTimePublisher()
         private var incumbentMarker = ""
         private var candidateVoteHeader: Flow.Publisher<out String?> = (null as String?).asOneTimePublisher()
         private var candidateVoteSubheader: Flow.Publisher<out String?> = (null as String?).asOneTimePublisher()
@@ -137,8 +139,18 @@ class MixedMemberResultPanel private constructor(
             return this
         }
 
+        fun withCandidateProgressLabel(progressLabel: Flow.Publisher<out String?>): Builder {
+            candidateProgressLabel = progressLabel
+            return this
+        }
+
         fun withPartyPctReporting(pctReporting: Flow.Publisher<out Double>): Builder {
             partyPctReporting = pctReporting
+            return this
+        }
+
+        fun withPartyProgressLabel(progressLabel: Flow.Publisher<out String?>): Builder {
+            partyProgressLabel = progressLabel
             return this
         }
 
@@ -239,7 +251,7 @@ class MixedMemberResultPanel private constructor(
                     .toList()
             }
             return BarFrameBuilder.basic(bars)
-                .withHeader(candidateVoteHeader)
+                .withHeader(candidateVoteHeader, rightLabelPublisher = candidateProgressLabel)
                 .withSubhead(candidateVoteSubheader)
                 .withMax(
                     candidatePctReporting?.map { 2.0 / 3 / it.coerceAtLeast(1e-6) }
@@ -346,7 +358,7 @@ class MixedMemberResultPanel private constructor(
                         .toList()
                 }
             )
-                .withHeader(partyVoteHeader)
+                .withHeader(partyVoteHeader, rightLabelPublisher = partyProgressLabel)
                 .withMax(partyPctReporting?.map { 2.0 / 3 / it.coerceAtLeast(1e-6) } ?: (2.0 / 3).asOneTimePublisher())
                 .build()
         }

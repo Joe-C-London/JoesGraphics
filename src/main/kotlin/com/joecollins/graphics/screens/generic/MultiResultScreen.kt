@@ -48,6 +48,7 @@ class MultiResultScreen private constructor() : JPanel() {
         private val itemPublishers: MutableList<Flow.Publisher<out T?>> = ArrayList()
 
         private var pctReportingFunc: (T) -> Flow.Publisher<out Double> = { 1.0.asOneTimePublisher() }
+        private var progressLabelFunc: (T) -> Flow.Publisher<out String?> = { null.asOneTimePublisher() }
         private var winnerFunc: (T) -> Flow.Publisher<out Candidate?> = { (null as Candidate?).asOneTimePublisher() }
         private var runoffFunc: (T) -> Flow.Publisher<out Set<Candidate>?> = { setOf<Candidate>().asOneTimePublisher() }
         private var incumbentMarker = ""
@@ -75,6 +76,11 @@ class MultiResultScreen private constructor() : JPanel() {
 
         fun withPctReporting(pctReportingFunc: (T) -> Flow.Publisher<out Double>): Builder<T> {
             this.pctReportingFunc = pctReportingFunc
+            return this
+        }
+
+        fun withProgressLabel(progressLabelFunc: (T) -> Flow.Publisher<out String?>): Builder<T> {
+            this.progressLabelFunc = progressLabelFunc
             return this
         }
 
@@ -178,6 +184,7 @@ class MultiResultScreen private constructor() : JPanel() {
                         newPanel.setWinnerPublisher(itemPublisher.compose { it?.let(winnerFunc) ?: (null as Candidate?).asOneTimePublisher() })
                         newPanel.setRunoffPublisher(itemPublisher.compose { it?.let(runoffFunc) ?: (null as Set<Candidate>?).asOneTimePublisher() })
                         newPanel.setPctReportingPublisher(itemPublisher.compose { it?.let(pctReportingFunc) ?: 0.0.asOneTimePublisher() })
+                        newPanel.setProgressLabelPublisher(itemPublisher.compose { it?.let(progressLabelFunc) ?: null.asOneTimePublisher() })
                         newPanel.setHeaderPublisher(itemPublisher.compose { it?.let(headerFunc) ?: "".asOneTimePublisher() })
                         newPanel.setSubheadPublisher(itemPublisher.compose { it?.let(subheadFunc) ?: "".asOneTimePublisher() })
                         if (swingPartyOrder != null) {
@@ -318,6 +325,7 @@ class MultiResultScreen private constructor() : JPanel() {
         private val header: Publisher<Flow.Publisher<out String>> = Publisher(Publisher(""))
         private val subhead: Publisher<Flow.Publisher<out String?>> = Publisher(Publisher(null))
         private val pctReporting: Publisher<Flow.Publisher<out Double>> = Publisher(Publisher(1.0))
+        private val progressLabel: Publisher<Flow.Publisher<out String?>> = Publisher(Publisher(null))
         private val winner: Publisher<Flow.Publisher<out Candidate?>> = Publisher(Publisher(null))
         private val runoff: Publisher<Flow.Publisher<out Set<Candidate>?>> = Publisher(Publisher(emptySet()))
         private val prevVotes: Publisher<Flow.Publisher<out Map<Party, Int>>> = Publisher(Publisher(emptyMap()))
@@ -351,6 +359,10 @@ class MultiResultScreen private constructor() : JPanel() {
             pctReporting.submit(pctReportingPublisher)
         }
 
+        fun setProgressLabelPublisher(progressLabelPublisher: Flow.Publisher<out String?>) {
+            progressLabel.submit(progressLabelPublisher)
+        }
+
         fun setPrevPublisher(prevPublisher: Flow.Publisher<out Map<Party, Int>>) {
             prevVotes.submit(prevPublisher)
         }
@@ -382,6 +394,7 @@ class MultiResultScreen private constructor() : JPanel() {
             setWinnerPublisher(null.asOneTimePublisher())
             setRunoffPublisher(emptySet<Candidate>().asOneTimePublisher())
             setPctReportingPublisher(0.0.asOneTimePublisher())
+            setProgressLabelPublisher(null.asOneTimePublisher())
             setPrevPublisher(emptyMap<Party, Int>().asOneTimePublisher())
             setSwingHeaderPublisher("".asOneTimePublisher())
             setMapShapePublisher(emptyList<Pair<Shape, Color>>().asOneTimePublisher())
@@ -427,7 +440,7 @@ class MultiResultScreen private constructor() : JPanel() {
             val bars = result.toBars
             barFrame = BarFrameBuilder.basic(bars)
                 .withMax(pctReporting.selfCompose().map { 0.5 / it.coerceAtLeast(1e-6) })
-                .withHeader(header.selfCompose())
+                .withHeader(header.selfCompose(), rightLabelPublisher = progressLabel.selfCompose())
                 .withSubhead(subhead.selfCompose())
                 .build()
             add(barFrame)
@@ -473,7 +486,7 @@ class MultiResultScreen private constructor() : JPanel() {
             list: Flow.Publisher<out List<T>>,
             votesFunc: (T) -> Flow.Publisher<out Map<Candidate, Int>>,
             headerFunc: (T) -> Flow.Publisher<out String>,
-            subheadFunc: (T) -> Flow.Publisher<out String>
+            subheadFunc: (T) -> Flow.Publisher<out String?>
         ): Builder<T> {
             return Builder(list, votesFunc, headerFunc, subheadFunc, false)
         }

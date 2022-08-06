@@ -1418,6 +1418,97 @@ class SimpleVoteViewPanelTest {
         compareRendering("SimpleVoteViewPanel", "PrevRangeVotes-2", panel)
     }
 
+    @Test
+    fun testProgressLabel() {
+        val ndp = Candidate("Billy Cann", Party("New Democratic Party", "NDP", Color.ORANGE))
+        val pc = Candidate("Cory Deagle", Party("Progressive Conservative", "PC", Color.BLUE))
+        val lib = Candidate("Daphne Griffin", Party("Liberal", "LIB", Color.RED))
+        val grn = Candidate("John Allen MacLean", Party("Green", "GRN", Color.GREEN.darker()))
+        val curr = LinkedHashMap<Candidate, Int>()
+        curr[ndp] = 0
+        curr[pc] = 0
+        curr[lib] = 0
+        curr[grn] = 0
+        val prev = LinkedHashMap<Party, Int>()
+        prev[ndp.party] = 585
+        prev[pc.party] = 785
+        prev[lib.party] = 1060
+        prev[grn.party] = 106
+        val currentVotes = Publisher(curr)
+        val previousVotes = Publisher(prev)
+        val pctReporting = Publisher(0.0)
+        val header = Publisher("MONTAGUE-KILMUIR")
+        val voteHeader = Publisher("PROVISIONAL RESULTS")
+        val progressLabel = Publisher("0/9")
+        val voteSubhead = Publisher("WAITING FOR RESULTS...")
+        val changeHeader = Publisher("CHANGE SINCE 2015")
+        val swingHeader = Publisher("SWING SINCE 2015")
+        val mapHeader = Publisher("CARDIGAN")
+        val leader = Publisher<PartyResult?>(null)
+        val winner = Publisher<Candidate?>(null)
+        val swingPartyOrder = listOf(ndp.party, grn.party, lib.party, pc.party)
+        val shapesByDistrict = peiShapesByDistrict()
+        val focus = Publisher(shapesByDistrict.keys.filter { it <= 7 })
+        val selectedDistrict = Publisher(3)
+        val panel = candidateVotes(
+            currentVotes, voteHeader, voteSubhead
+        )
+            .withPrev(previousVotes, changeHeader)
+            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader)
+            .withResultMap(shapesByDistrict.asOneTimePublisher(), selectedDistrict, leader, focus, mapHeader)
+            .withWinner(winner)
+            .withPctReporting(pctReporting)
+            .withProgressLabel(progressLabel)
+            .build(header)
+        panel.setSize(1024, 512)
+        compareRendering("SimpleVoteViewPanel", "ProgressLabel-1", panel)
+
+        curr[ndp] = 5
+        curr[pc] = 47
+        curr[lib] = 58
+        curr[grn] = 52
+        currentVotes.submit(curr)
+        progressLabel.submit("1/9")
+        voteSubhead.submit("PROJECTION: TOO EARLY TO CALL")
+        pctReporting.submit(1.0 / 9)
+        leader.submit(leading(lib.party))
+        compareRendering("SimpleVoteViewPanel", "ProgressLabel-2", panel)
+
+        curr[ndp] = 8
+        curr[pc] = 91
+        curr[lib] = 100
+        curr[grn] = 106
+        currentVotes.submit(curr)
+        progressLabel.submit("2/9")
+        voteSubhead.submit("PROJECTION: TOO EARLY TO CALL")
+        pctReporting.submit(2.0 / 9)
+        leader.submit(leading(grn.party))
+        compareRendering("SimpleVoteViewPanel", "ProgressLabel-3", panel)
+
+        curr[ndp] = 18
+        curr[pc] = 287
+        curr[lib] = 197
+        curr[grn] = 243
+        currentVotes.submit(curr)
+        progressLabel.submit("5/9")
+        voteSubhead.submit("PROJECTION: TOO EARLY TO CALL")
+        pctReporting.submit(5.0 / 9)
+        leader.submit(leading(pc.party))
+        compareRendering("SimpleVoteViewPanel", "ProgressLabel-4", panel)
+
+        curr[ndp] = 124
+        curr[pc] = 1373
+        curr[lib] = 785
+        curr[grn] = 675
+        currentVotes.submit(curr)
+        progressLabel.submit("9/9")
+        voteSubhead.submit("PROJECTION: PC GAIN FROM LIB")
+        pctReporting.submit(9.0 / 9)
+        leader.submit(elected(pc.party))
+        winner.submit(pc)
+        compareRendering("SimpleVoteViewPanel", "ProgressLabel-5", panel)
+    }
+
     private fun peiShapesByDistrict(): Map<Int, Shape> {
         val peiMap = MapFrameTest::class.java
             .classLoader

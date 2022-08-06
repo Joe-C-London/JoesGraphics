@@ -16,6 +16,7 @@ import kotlin.math.sign
 
 class BarFrameBuilder private constructor() {
     private var headerPublisher: Flow.Publisher<out String?>? = null
+    private var rightHeaderLabelPublisher: Flow.Publisher<out String?>? = null
     private var subheadPublisher: Flow.Publisher<out String?>? = null
     private var notesPublisher: Flow.Publisher<out String?>? = null
     private var borderColorPublisher: Flow.Publisher<out Color>? = null
@@ -80,8 +81,12 @@ class BarFrameBuilder private constructor() {
         val shape: Shape? = null
     )
 
-    fun withHeader(headerPublisher: Flow.Publisher<out String?>): BarFrameBuilder {
+    fun withHeader(
+        headerPublisher: Flow.Publisher<out String?>,
+        rightLabelPublisher: Flow.Publisher<out String?> = null.asOneTimePublisher(),
+    ): BarFrameBuilder {
         this.headerPublisher = headerPublisher
+        this.rightHeaderLabelPublisher = rightLabelPublisher
         return this
     }
 
@@ -201,7 +206,8 @@ class BarFrameBuilder private constructor() {
             barsPublisher = barsPublisher,
             linesPublisher = linesPublisher,
             minPublisher = minPublisher,
-            maxPublisher = maxPublisher
+            maxPublisher = maxPublisher,
+            headerLabelsPublisher = rightHeaderLabelPublisher?.map { mapOf(GraphicsFrame.HeaderLabelLocation.RIGHT to it) }
         )
     }
 

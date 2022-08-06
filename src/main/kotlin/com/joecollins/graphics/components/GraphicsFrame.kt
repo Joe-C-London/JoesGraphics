@@ -29,7 +29,7 @@ open class GraphicsFrame(
     borderColorPublisher: Flow.Publisher<out Color>? = null,
     headerAlignmentPublisher: Flow.Publisher<out Alignment>? = null,
     headerTextColorPublisher: Flow.Publisher<out Color>? = null,
-    headerLabelsPublisher: Flow.Publisher<out Map<HeaderLabelLocation, String?>> = emptyMap<HeaderLabelLocation, String?>().asOneTimePublisher()
+    headerLabelsPublisher: Flow.Publisher<out Map<HeaderLabelLocation, String?>>? = null
 ) : JPanel() {
 
     enum class Alignment(val jlabelAlignment: Int) {
@@ -149,7 +149,7 @@ open class GraphicsFrame(
                 )
             )
 
-        headerLabelsPublisher.subscribe(
+        headerLabelsPublisher?.subscribe(
             Subscriber(
                 eventQueueWrapper { labels ->
                     HeaderLabelLocation.values().forEach { align ->

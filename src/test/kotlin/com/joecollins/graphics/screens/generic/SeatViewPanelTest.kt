@@ -1329,6 +1329,45 @@ class SeatViewPanelTest {
         compareRendering("SeatViewPanel", "PrevRangeSeats-2", panel)
     }
 
+    @Test
+    fun testProgressLabel() {
+        val currentSeats = Publisher(LinkedHashMap<Party, Int>())
+        val previousSeats = Publisher(LinkedHashMap<Party, Int>())
+        val totalSeats = Publisher(650)
+        val showMajority = Publisher(true)
+        val header = Publisher("UNITED KINGDOM")
+        val seatHeader = Publisher("SEATS DECLARED")
+        val progressLabel = Publisher("0/650")
+        val seatSubhead = Publisher("PROJECTION: TOO EARLY TO CALL")
+        val changeHeader = Publisher("CHANGE SINCE 2017")
+        val con = Party("Conservative", "CON", Color.BLUE)
+        val lab = Party("Labour", "LAB", Color.RED)
+        val ld = Party("Liberal Democrat", "LD", Color.ORANGE)
+        val snp = Party("Scottish National Party", "SNP", Color.YELLOW)
+        val pc = Party("Plaid Cymru", "PC", Color.GREEN.darker())
+        val grn = Party("Green", "GRN", Color.GREEN)
+        val oth = Party.OTHERS
+        val panel = partySeats(
+            currentSeats, seatHeader, seatSubhead
+        )
+            .withPrev(previousSeats, changeHeader)
+            .withTotal(totalSeats)
+            .withMajorityLine(showMajority) { "$it SEATS FOR MAJORITY" }
+            .withProgressLabel(progressLabel)
+            .build(header)
+        panel.setSize(1024, 512)
+        compareRendering("SeatViewPanel", "ProgressLabel-1", panel)
+
+        val currSeats = LinkedHashMap<Party, Int>()
+        val prevSeats = LinkedHashMap<Party, Int>()
+        currSeats[lab] = 1
+        currentSeats.submit(currSeats)
+        prevSeats[lab] = 1
+        previousSeats.submit(prevSeats)
+        progressLabel.submit("1/650")
+        compareRendering("SeatViewPanel", "ProgressLabel-2", panel)
+    }
+
     private fun peiShapesByDistrict(): Map<Int, Shape> {
         val peiMap = MapFrameTest::class.java
             .classLoader

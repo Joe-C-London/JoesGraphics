@@ -155,6 +155,7 @@ class BasicResultPanel private constructor(
         private var swingComparator: Comparator<Party>? = null
         protected var classificationFunc: ((Party) -> Party)? = null
         protected var classificationHeader: Flow.Publisher<out String?>? = null
+        protected var progressLabel: Flow.Publisher<out String?> = null.asOneTimePublisher()
         private var mapBuilder: MapBuilder<*>? = null
 
         fun withTotal(totalSeats: Flow.Publisher<out Int>): SeatScreenBuilder<KT, CT, PT> {
@@ -288,6 +289,11 @@ class BasicResultPanel private constructor(
             return this
         }
 
+        fun withProgressLabel(progressLabel: Flow.Publisher<out String?>): SeatScreenBuilder<KT, CT, PT> {
+            this.progressLabel = progressLabel
+            return this
+        }
+
         fun build(textHeader: Flow.Publisher<out String>): BasicResultPanel {
             return BasicResultPanel(
                 createHeaderLabel(textHeader),
@@ -391,7 +397,7 @@ class BasicResultPanel private constructor(
             winner?.subscribe(Subscriber { result.winner = it })
             val bars = result.barsPublisher
             var builder = BarFrameBuilder.basic(bars)
-                .withHeader(header)
+                .withHeader(header, rightLabelPublisher = progressLabel)
                 .withSubhead(subhead)
                 .withNotes(this.notes ?: (null as String?).asOneTimePublisher())
             val total = this.total
@@ -595,7 +601,7 @@ class BasicResultPanel private constructor(
                 BarFrameBuilder.dualReversed(bars)
             }
             builder = builder
-                .withHeader(header)
+                .withHeader(header, rightLabelPublisher = progressLabel)
                 .withSubhead(subhead)
                 .withNotes(this.notes ?: (null as String?).asOneTimePublisher())
             val total = this.total
@@ -773,7 +779,7 @@ class BasicResultPanel private constructor(
             val bars = result.barsPublisher
             val notes = this.notes
             var builder = BarFrameBuilder.dual(bars)
-                .withHeader(header)
+                .withHeader(header, rightLabelPublisher = progressLabel)
                 .withSubhead(subhead)
                 .withNotes(notes ?: (null as String?).asOneTimePublisher())
             val total = this.total
@@ -940,6 +946,8 @@ class BasicResultPanel private constructor(
         private var mapBuilder: MapBuilder<*>? = null
         private var runoffSubhead: Flow.Publisher<String>? = null
         private var winnerNotRunningAgain: Flow.Publisher<String>? = null
+        protected var progressLabel: Flow.Publisher<out String?> = null.asOneTimePublisher()
+        protected var preferenceProgressLabel: Flow.Publisher<out String?> = null.asOneTimePublisher()
 
         protected val filteredPrev: Flow.Publisher<out Map<Party, PT>>?
             get() {
@@ -1164,6 +1172,16 @@ class BasicResultPanel private constructor(
             return this
         }
 
+        fun withProgressLabel(progressLabel: Flow.Publisher<out String?>): VoteScreenBuilder<KT, CT, CPT, PT> {
+            this.progressLabel = progressLabel
+            return this
+        }
+
+        fun withPreferenceProgressLabel(progressLabel: Flow.Publisher<out String?>): VoteScreenBuilder<KT, CT, CPT, PT> {
+            this.preferenceProgressLabel = progressLabel
+            return this
+        }
+
         fun build(textHeader: Flow.Publisher<out String>): BasicResultPanel {
             return BasicResultPanel(
                 createHeaderLabel(textHeader),
@@ -1283,7 +1301,7 @@ class BasicResultPanel private constructor(
             val notes = this.notes
             val pctReporting = this.pctReporting
             val builder = BarFrameBuilder.basic(bars)
-                .withHeader(header)
+                .withHeader(header, rightLabelPublisher = progressLabel)
                 .withSubhead(subhead)
                 .withNotes(notes ?: (null as String?).asOneTimePublisher())
                 .withMax(
@@ -1404,7 +1422,7 @@ class BasicResultPanel private constructor(
                 val bars = result.barsPublisher
                 val preferencePctReporting = this.preferencePctReporting
                 return BarFrameBuilder.basic(bars)
-                    .withHeader(preferenceHeader!!)
+                    .withHeader(preferenceHeader!!, rightLabelPublisher = preferenceProgressLabel)
                     .withSubhead(preferenceSubhead ?: (null as String?).asOneTimePublisher())
                     .withLines(
                         preferencePctReporting?.map { listOf(0.5 / it.coerceAtLeast(1e-6)) }
@@ -1564,7 +1582,7 @@ class BasicResultPanel private constructor(
             }
             val notes = notes
             var builder = BarFrameBuilder.dual(bars)
-                .withHeader(header)
+                .withHeader(header, rightLabelPublisher = progressLabel)
                 .withSubhead(subhead)
                 .withNotes(notes ?: (null as String?).asOneTimePublisher())
                 .withMax((2.0 / 3).asOneTimePublisher())
@@ -1700,7 +1718,7 @@ class BasicResultPanel private constructor(
                         .toList()
                 }
                 var builder = BarFrameBuilder.dual(bars)
-                    .withHeader(preferenceHeader!!)
+                    .withHeader(preferenceHeader!!, rightLabelPublisher = preferenceProgressLabel)
                     .withSubhead(preferenceSubhead ?: (null as String?).asOneTimePublisher())
                     .withMax((2.0 / 3).asOneTimePublisher())
                 val lines = listOf(0.5).asOneTimePublisher()
