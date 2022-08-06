@@ -194,6 +194,7 @@ class SwingometerScreen private constructor(title: JLabel, frame: SwingometerFra
 
         private val inputs = Inputs<T>()
         private val header: Flow.Publisher<out String?>
+        private var progressLabel: Flow.Publisher<out String?> = null.asOneTimePublisher()
 
         fun withSeatLabelIncrements(incrementPublisher: Flow.Publisher<out Int>): Builder<T> {
             incrementPublisher.subscribe(Subscriber { inputs.seatLabelIncrement = it })
@@ -207,6 +208,11 @@ class SwingometerScreen private constructor(title: JLabel, frame: SwingometerFra
 
         fun withRange(rangePublisher: Flow.Publisher<Number>): Builder<T> {
             rangePublisher.subscribe(Subscriber { inputs.range = it })
+            return this
+        }
+
+        fun withProgressLabel(progressLabelPublisher: Flow.Publisher<String?>): Builder<T> {
+            this.progressLabel = progressLabelPublisher
             return this
         }
 
@@ -229,7 +235,7 @@ class SwingometerScreen private constructor(title: JLabel, frame: SwingometerFra
             val rightToWinPublisher = inputs.rightToWinPublisher
             return SwingometerFrameBuilder.basic(colorsPublisher, valuePublisher)
                 .withDotsSolid(dotsList, { it.first }, { it.second }) { it.third }
-                .withHeader(header)
+                .withHeader(header, rightLabel = progressLabel)
                 .withRange(rangePublisher)
                 .withTickInterval(0.01.asOneTimePublisher()) { (it.toDouble() * 100).roundToInt().toString() }
                 .withLeftNeedingToWin(leftToWinPublisher)

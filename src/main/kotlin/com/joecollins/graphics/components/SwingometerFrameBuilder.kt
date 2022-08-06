@@ -98,6 +98,7 @@ class SwingometerFrameBuilder {
     private var leftColorPublisher: Flow.Publisher<out Color>? = null
     private var rightColorPublisher: Flow.Publisher<out Color>? = null
     private var valuePublisher: Flow.Publisher<out Number>? = null
+    private var rightLabelPublisher: Flow.Publisher<out String?>? = null
 
     private val properties = Properties()
 
@@ -232,8 +233,9 @@ class SwingometerFrameBuilder {
         return this
     }
 
-    fun withHeader(header: Flow.Publisher<out String?>): SwingometerFrameBuilder {
+    fun withHeader(header: Flow.Publisher<out String?>, rightLabel: Flow.Publisher<out String?> = null.asOneTimePublisher()): SwingometerFrameBuilder {
         this.headerPublisher = header
+        this.rightLabelPublisher = rightLabel
         return this
     }
 
@@ -249,7 +251,8 @@ class SwingometerFrameBuilder {
             leftToWinPublisher = leftToWinPublisher,
             rightToWinPublisher = rightToWinPublisher,
             ticksPublisher = ticksPublisher,
-            outerLabelsPublisher = outerLabelsPublisher
+            outerLabelsPublisher = outerLabelsPublisher,
+            headerLabelsPublisher = rightLabelPublisher?.map { mapOf(GraphicsFrame.HeaderLabelLocation.RIGHT to it) }
         )
     }
 

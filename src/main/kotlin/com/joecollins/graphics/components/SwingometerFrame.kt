@@ -35,9 +35,11 @@ class SwingometerFrame(
     leftToWinPublisher: Flow.Publisher<out Number>? = null,
     rightToWinPublisher: Flow.Publisher<out Number>? = null,
     ticksPublisher: Flow.Publisher<out List<Tick>>? = null,
-    outerLabelsPublisher: Flow.Publisher<out List<OuterLabel>>? = null
+    outerLabelsPublisher: Flow.Publisher<out List<OuterLabel>>? = null,
+    headerLabelsPublisher: Flow.Publisher<out Map<HeaderLabelLocation, String?>>? = null
 ) : GraphicsFrame(
-    headerPublisher = headerPublisher
+    headerPublisher = headerPublisher,
+    headerLabelsPublisher = headerLabelsPublisher
 ) {
     class Tick(val position: Number, val text: String)
 
