@@ -192,7 +192,10 @@ open class GraphicsFrame(
             val mainWidth = headerLabel.preferredSize.width
             val rightWidth = additionalHeaderPanels[HeaderLabelLocation.RIGHT]!!.let { if (it.isVisible) it.preferredSize.width else 0 }
             val leftWidth = additionalHeaderPanels[HeaderLabelLocation.LEFT]!!.let { if (it.isVisible) it.preferredSize.width else 0 }
-            val ratio = (parent.width.toDouble() / (mainWidth + leftWidth + rightWidth).coerceAtLeast(1)).coerceAtMost(1.0)
+            val ratio = when (alignment) {
+                Alignment.CENTER -> 2 * max(leftWidth, rightWidth)
+                else -> leftWidth + rightWidth
+            }.let { sides -> (parent.width.toDouble() / (mainWidth + sides).coerceAtLeast(1)).coerceAtMost(1.0) }
             headerLabel.location = Point(
                 when (alignment) {
                     Alignment.CENTER -> (max(leftWidth, rightWidth) * ratio).roundToInt()
