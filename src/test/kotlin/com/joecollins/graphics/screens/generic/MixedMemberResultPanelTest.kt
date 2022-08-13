@@ -19,10 +19,10 @@ import java.awt.Shape
 class MixedMemberResultPanelTest {
     @Test
     fun testBasicMMP() {
-        val currentCandidateVotes = Publisher(LinkedHashMap<Candidate, Int>())
-        val previousCandidateVotes = Publisher(LinkedHashMap<Party, Int>())
-        val currentPartyVotes = Publisher(LinkedHashMap<Party, Int>())
-        val previousPartyVotes = Publisher(LinkedHashMap<Party, Int>())
+        val currentCandidateVotes = Publisher(emptyMap<Candidate, Int>())
+        val previousCandidateVotes = Publisher(emptyMap<Party, Int>())
+        val currentPartyVotes = Publisher(emptyMap<Party, Int>())
+        val previousPartyVotes = Publisher(emptyMap<Party, Int>())
         val header = Publisher("CHARLOTTETOWN-WINSLOE")
         val candidateHeader = Publisher("CANDIDATE VOTES")
         val candidateChangeHeader = Publisher("CANDIDATE CHANGE SINCE 2015")
@@ -52,39 +52,49 @@ class MixedMemberResultPanelTest {
             )
             .build(header)
         panel.setSize(1024, 512)
-        val currCandVotes = LinkedHashMap<Candidate, Int>()
-        currCandVotes[Candidate("Jesse Reddin Cousins", ndp)] = 41
-        currCandVotes[Candidate("Mike Gillis", pc)] = 865
-        currCandVotes[Candidate("Robert Mitchell", lib, true)] = 1420
-        currCandVotes[Candidate("Amanda Morrison", grn)] = 1057
-        currentCandidateVotes.submit(currCandVotes)
-        val prevCandVotes = LinkedHashMap<Party, Int>()
-        prevCandVotes[lib] = 1425
-        prevCandVotes[pc] = 1031
-        prevCandVotes[ndp] = 360
-        prevCandVotes[grn] = 295
-        previousCandidateVotes.submit(prevCandVotes)
-        val currPartyVotes = LinkedHashMap<Party, Int>()
-        currPartyVotes[grn] = 1098
-        currPartyVotes[lib] = 1013
-        currPartyVotes[ndp] = 112
-        currPartyVotes[pc] = 822
-        currentPartyVotes.submit(currPartyVotes)
-        val prevPartyVotes = LinkedHashMap<Party, Int>()
-        prevPartyVotes[lib] = 1397
-        prevPartyVotes[pc] = 1062
-        prevPartyVotes[ndp] = 544
-        prevPartyVotes[grn] = 426
-        previousPartyVotes.submit(prevPartyVotes)
+        currentCandidateVotes.submit(
+            mapOf(
+                Candidate("Jesse Reddin Cousins", ndp) to 41,
+                Candidate("Mike Gillis", pc) to 865,
+                Candidate("Robert Mitchell", lib, true) to 1420,
+                Candidate("Amanda Morrison", grn) to 1057,
+
+            )
+        )
+        previousCandidateVotes.submit(
+            mapOf(
+                lib to 1425,
+                pc to 1031,
+                ndp to 360,
+                grn to 295,
+            )
+        )
+        currentPartyVotes.submit(
+            mapOf(
+                grn to 1098,
+                lib to 1013,
+                ndp to 112,
+                pc to 822,
+
+            )
+        )
+        previousPartyVotes.submit(
+            mapOf(
+                lib to 1397,
+                pc to 1062,
+                ndp to 544,
+                grn to 426,
+            )
+        )
         compareRendering("MixedMemberResultPanel", "Basic", panel)
     }
 
     @Test
     fun testMMPWithPctReporting() {
-        val currentCandidateVotes = Publisher(LinkedHashMap<Candidate, Int>())
-        val previousCandidateVotes = Publisher(LinkedHashMap<Party, Int>())
-        val currentPartyVotes = Publisher(LinkedHashMap<Party, Int>())
-        val previousPartyVotes = Publisher(LinkedHashMap<Party, Int>())
+        val currentCandidateVotes = Publisher(emptyMap<Candidate, Int>())
+        val previousCandidateVotes = Publisher(emptyMap<Party, Int>())
+        val currentPartyVotes = Publisher(emptyMap<Party, Int>())
+        val previousPartyVotes = Publisher(emptyMap<Party, Int>())
         val header = Publisher("CHARLOTTETOWN-WINSLOE")
         val candidateHeader = Publisher("CANDIDATE VOTES")
         val candidateChangeHeader = Publisher("CANDIDATE CHANGE SINCE 2015")
@@ -119,31 +129,39 @@ class MixedMemberResultPanelTest {
             )
             .build(header)
         panel.setSize(1024, 512)
-        val currCandVotes = LinkedHashMap<Candidate, Int>()
-        currCandVotes[Candidate("Jesse Reddin Cousins", ndp)] = 8
-        currCandVotes[Candidate("Mike Gillis", pc)] = 173
-        currCandVotes[Candidate("Robert Mitchell", lib, true)] = 284
-        currCandVotes[Candidate("Amanda Morrison", grn)] = 211
-        currentCandidateVotes.submit(currCandVotes)
-        winner.submit(currCandVotes.keys.first { it.party === lib })
-        val prevCandVotes = LinkedHashMap<Party, Int>()
-        prevCandVotes[lib] = 1425
-        prevCandVotes[pc] = 1031
-        prevCandVotes[ndp] = 360
-        prevCandVotes[grn] = 295
-        previousCandidateVotes.submit(prevCandVotes)
-        val currPartyVotes = LinkedHashMap<Party, Int>()
-        currPartyVotes[grn] = 110
-        currPartyVotes[lib] = 101
-        currPartyVotes[ndp] = 11
-        currPartyVotes[pc] = 82
-        currentPartyVotes.submit(currPartyVotes)
-        val prevPartyVotes = LinkedHashMap<Party, Int>()
-        prevPartyVotes[lib] = 1397
-        prevPartyVotes[pc] = 1062
-        prevPartyVotes[ndp] = 544
-        prevPartyVotes[grn] = 426
-        previousPartyVotes.submit(prevPartyVotes)
+        currentCandidateVotes.submit(
+            mapOf(
+                Candidate("Jesse Reddin Cousins", ndp) to 8,
+                Candidate("Mike Gillis", pc) to 173,
+                Candidate("Robert Mitchell", lib, true) to 284,
+                Candidate("Amanda Morrison", grn) to 211,
+            )
+        )
+        winner.submit(Candidate("Robert Mitchell", lib, true))
+        previousCandidateVotes.submit(
+            mapOf(
+                lib to 1425,
+                pc to 1031,
+                ndp to 360,
+                grn to 295,
+            )
+        )
+        currentPartyVotes.submit(
+            mapOf(
+                grn to 110,
+                lib to 101,
+                ndp to 11,
+                pc to 82,
+            )
+        )
+        previousPartyVotes.submit(
+            mapOf(
+                lib to 1397,
+                pc to 1062,
+                ndp to 544,
+                grn to 426,
+            )
+        )
         candidatePctReporting.submit(0.2)
         partyPctReporting.submit(0.1)
         selectedResult.submit(leading(lib))
@@ -152,10 +170,10 @@ class MixedMemberResultPanelTest {
 
     @Test
     fun testMMPWithProgressLabels() {
-        val currentCandidateVotes = Publisher(LinkedHashMap<Candidate, Int>())
-        val previousCandidateVotes = Publisher(LinkedHashMap<Party, Int>())
-        val currentPartyVotes = Publisher(LinkedHashMap<Party, Int>())
-        val previousPartyVotes = Publisher(LinkedHashMap<Party, Int>())
+        val currentCandidateVotes = Publisher(emptyMap<Candidate, Int>())
+        val previousCandidateVotes = Publisher(emptyMap<Party, Int>())
+        val currentPartyVotes = Publisher(emptyMap<Party, Int>())
+        val previousPartyVotes = Publisher(emptyMap<Party, Int>())
         val header = Publisher("CHARLOTTETOWN-WINSLOE")
         val candidateHeader = Publisher("CANDIDATE VOTES")
         val candidateChangeHeader = Publisher("CANDIDATE CHANGE SINCE 2015")
@@ -194,31 +212,39 @@ class MixedMemberResultPanelTest {
             )
             .build(header)
         panel.setSize(1024, 512)
-        val currCandVotes = LinkedHashMap<Candidate, Int>()
-        currCandVotes[Candidate("Jesse Reddin Cousins", ndp)] = 8
-        currCandVotes[Candidate("Mike Gillis", pc)] = 173
-        currCandVotes[Candidate("Robert Mitchell", lib, true)] = 284
-        currCandVotes[Candidate("Amanda Morrison", grn)] = 211
-        currentCandidateVotes.submit(currCandVotes)
-        winner.submit(currCandVotes.keys.first { it.party === lib })
-        val prevCandVotes = LinkedHashMap<Party, Int>()
-        prevCandVotes[lib] = 1425
-        prevCandVotes[pc] = 1031
-        prevCandVotes[ndp] = 360
-        prevCandVotes[grn] = 295
-        previousCandidateVotes.submit(prevCandVotes)
-        val currPartyVotes = LinkedHashMap<Party, Int>()
-        currPartyVotes[grn] = 110
-        currPartyVotes[lib] = 101
-        currPartyVotes[ndp] = 11
-        currPartyVotes[pc] = 82
-        currentPartyVotes.submit(currPartyVotes)
-        val prevPartyVotes = LinkedHashMap<Party, Int>()
-        prevPartyVotes[lib] = 1397
-        prevPartyVotes[pc] = 1062
-        prevPartyVotes[ndp] = 544
-        prevPartyVotes[grn] = 426
-        previousPartyVotes.submit(prevPartyVotes)
+        currentCandidateVotes.submit(
+            mapOf(
+                Candidate("Jesse Reddin Cousins", ndp) to 8,
+                Candidate("Mike Gillis", pc) to 173,
+                Candidate("Robert Mitchell", lib, true) to 284,
+                Candidate("Amanda Morrison", grn) to 211,
+            )
+        )
+        winner.submit(Candidate("Robert Mitchell", lib, true))
+        previousCandidateVotes.submit(
+            mapOf(
+                lib to 1425,
+                pc to 1031,
+                ndp to 360,
+                grn to 295,
+            )
+        )
+        currentPartyVotes.submit(
+            mapOf(
+                grn to 110,
+                lib to 101,
+                ndp to 11,
+                pc to 82,
+            )
+        )
+        previousPartyVotes.submit(
+            mapOf(
+                lib to 1397,
+                pc to 1062,
+                ndp to 544,
+                grn to 426,
+            )
+        )
         candidatePctReporting.submit(0.2)
         candidateProgress.submit("20% IN")
         partyPctReporting.submit(0.1)
@@ -229,10 +255,10 @@ class MixedMemberResultPanelTest {
 
     @Test
     fun testMMPWaiting() {
-        val currentCandidateVotes = Publisher(LinkedHashMap<Candidate, Int>())
-        val previousCandidateVotes = Publisher(LinkedHashMap<Party, Int>())
-        val currentPartyVotes = Publisher(LinkedHashMap<Party, Int>())
-        val previousPartyVotes = Publisher(LinkedHashMap<Party, Int>())
+        val currentCandidateVotes = Publisher(emptyMap<Candidate, Int>())
+        val previousCandidateVotes = Publisher(emptyMap<Party, Int>())
+        val currentPartyVotes = Publisher(emptyMap<Party, Int>())
+        val previousPartyVotes = Publisher(emptyMap<Party, Int>())
         val header = Publisher("CHARLOTTETOWN-WINSLOE")
         val candidateHeader = Publisher("CANDIDATE VOTES")
         val candidateChangeHeader = Publisher("CANDIDATE CHANGE SINCE 2015")
@@ -265,30 +291,38 @@ class MixedMemberResultPanelTest {
             )
             .build(header)
         panel.setSize(1024, 512)
-        val currCandVotes = LinkedHashMap<Candidate, Int>()
-        currCandVotes[Candidate("Jesse Reddin Cousins", ndp)] = 0
-        currCandVotes[Candidate("Mike Gillis", pc)] = 0
-        currCandVotes[Candidate("Robert Mitchell", lib, true)] = 0
-        currCandVotes[Candidate("Amanda Morrison", grn)] = 0
-        currentCandidateVotes.submit(currCandVotes)
-        val prevCandVotes = LinkedHashMap<Party, Int>()
-        prevCandVotes[lib] = 1425
-        prevCandVotes[pc] = 1031
-        prevCandVotes[ndp] = 360
-        prevCandVotes[grn] = 295
-        previousCandidateVotes.submit(prevCandVotes)
-        val currPartyVotes = LinkedHashMap<Party, Int>()
-        currPartyVotes[grn] = 0
-        currPartyVotes[lib] = 0
-        currPartyVotes[ndp] = 0
-        currPartyVotes[pc] = 0
-        currentPartyVotes.submit(currPartyVotes)
-        val prevPartyVotes = LinkedHashMap<Party, Int>()
-        prevPartyVotes[lib] = 1397
-        prevPartyVotes[pc] = 1062
-        prevPartyVotes[ndp] = 544
-        prevPartyVotes[grn] = 426
-        previousPartyVotes.submit(prevPartyVotes)
+        currentCandidateVotes.submit(
+            mapOf(
+                Candidate("Jesse Reddin Cousins", ndp) to 0,
+                Candidate("Mike Gillis", pc) to 0,
+                Candidate("Robert Mitchell", lib, true) to 0,
+                Candidate("Amanda Morrison", grn) to 0,
+            )
+        )
+        previousCandidateVotes.submit(
+            mapOf(
+                lib to 1425,
+                pc to 1031,
+                ndp to 360,
+                grn to 295,
+            )
+        )
+        currentPartyVotes.submit(
+            mapOf(
+                grn to 0,
+                lib to 0,
+                ndp to 0,
+                pc to 0,
+            )
+        )
+        previousPartyVotes.submit(
+            mapOf(
+                lib to 1397,
+                pc to 1062,
+                ndp to 544,
+                grn to 426,
+            )
+        )
         candidatePctReporting.submit(0.0)
         partyPctReporting.submit(0.0)
         compareRendering("MixedMemberResultPanel", "Waiting", panel)
@@ -300,10 +334,10 @@ class MixedMemberResultPanelTest {
         val grn = Party("Green", "GRN", Color.GREEN.darker())
         val pc = Party("Progressive Conservative", "PC", Color.BLUE)
         val ndp = Party("New Democratic Party", "NDP", Color.ORANGE)
-        val currentCandidateVotes = Publisher(LinkedHashMap<Candidate, Int>())
-        val previousCandidateVotes = Publisher(LinkedHashMap<Party, Int>())
-        val currentPartyVotes = Publisher(LinkedHashMap<Party, Int>())
-        val previousPartyVotes = Publisher(LinkedHashMap<Party, Int>())
+        val currentCandidateVotes = Publisher(emptyMap<Candidate, Int>())
+        val previousCandidateVotes = Publisher(emptyMap<Party, Int>())
+        val currentPartyVotes = Publisher(emptyMap<Party, Int>())
+        val previousPartyVotes = Publisher(emptyMap<Party, Int>())
         val header = Publisher("CHARLOTTETOWN-WINSLOE")
         val candidateHeader = Publisher("CANDIDATE VOTES")
         val candidateChangeHeader = Publisher("CANDIDATE CHANGE SINCE 2015")
@@ -332,30 +366,38 @@ class MixedMemberResultPanelTest {
             )
             .build(header)
         panel.setSize(1024, 512)
-        val currCandVotes = LinkedHashMap<Candidate, Int>()
-        currCandVotes[Candidate("Jesse Reddin Cousins", ndp)] = 0
-        currCandVotes[Candidate("Mike Gillis", pc)] = 8
-        currCandVotes[Candidate("Robert Mitchell", lib, true)] = 14
-        currCandVotes[Candidate("Amanda Morrison", grn)] = 11
-        currentCandidateVotes.submit(currCandVotes)
-        val prevCandVotes = LinkedHashMap<Party, Int>()
-        prevCandVotes[lib] = 1425
-        prevCandVotes[pc] = 1031
-        prevCandVotes[ndp] = 360
-        prevCandVotes[grn] = 295
-        previousCandidateVotes.submit(prevCandVotes)
-        val currPartyVotes = LinkedHashMap<Party, Int>()
-        currPartyVotes[grn] = 11
-        currPartyVotes[lib] = 14
-        currPartyVotes[ndp] = 0
-        currPartyVotes[pc] = 8
-        currentPartyVotes.submit(currPartyVotes)
-        val prevPartyVotes = LinkedHashMap<Party, Int>()
-        prevPartyVotes[lib] = 1397
-        prevPartyVotes[pc] = 1062
-        prevPartyVotes[ndp] = 544
-        prevPartyVotes[grn] = 426
-        previousPartyVotes.submit(prevPartyVotes)
+        currentCandidateVotes.submit(
+            mapOf(
+                Candidate("Jesse Reddin Cousins", ndp) to 0,
+                Candidate("Mike Gillis", pc) to 8,
+                Candidate("Robert Mitchell", lib, true) to 14,
+                Candidate("Amanda Morrison", grn) to 11,
+            )
+        )
+        previousCandidateVotes.submit(
+            mapOf(
+                lib to 1425,
+                pc to 1031,
+                ndp to 360,
+                grn to 295,
+            )
+        )
+        currentPartyVotes.submit(
+            mapOf(
+                grn to 11,
+                lib to 14,
+                ndp to 0,
+                pc to 8,
+            )
+        )
+        previousPartyVotes.submit(
+            mapOf(
+                lib to 1397,
+                pc to 1062,
+                ndp to 544,
+                grn to 426,
+            )
+        )
         candidatePctReporting.submit(0.01)
         partyPctReporting.submit(0.01)
         compareRendering("MixedMemberResultPanel", "ZeroVotes", panel)
@@ -363,10 +405,10 @@ class MixedMemberResultPanelTest {
 
     @Test
     fun testOtherMMP() {
-        val currentCandidateVotes = Publisher(LinkedHashMap<Candidate, Int>())
-        val previousCandidateVotes = Publisher(LinkedHashMap<Party, Int>())
-        val currentPartyVotes = Publisher(LinkedHashMap<Party, Int>())
-        val previousPartyVotes = Publisher(LinkedHashMap<Party, Int>())
+        val currentCandidateVotes = Publisher(emptyMap<Candidate, Int>())
+        val previousCandidateVotes = Publisher(emptyMap<Party, Int>())
+        val currentPartyVotes = Publisher(emptyMap<Party, Int>())
+        val previousPartyVotes = Publisher(emptyMap<Party, Int>())
         val header = Publisher("CHARLOTTETOWN-WINSLOE")
         val candidateHeader = Publisher("CANDIDATE VOTES")
         val candidateChangeHeader = Publisher("CANDIDATE CHANGE SINCE 2015")
@@ -395,35 +437,43 @@ class MixedMemberResultPanelTest {
             )
             .build(header)
         panel.setSize(1024, 512)
-        val currCandVotes = LinkedHashMap<Candidate, Int>()
-        currCandVotes[Candidate.OTHERS] = 1106
-        currCandVotes[Candidate("Robert Mitchell", lib, true)] = 1420
-        currCandVotes[Candidate("Amanda Morrison", grn)] = 1057
-        currentCandidateVotes.submit(currCandVotes)
-        val prevCandVotes = LinkedHashMap<Party, Int>()
-        prevCandVotes[Party.OTHERS] = 1391
-        prevCandVotes[lib] = 1425
-        prevCandVotes[grn] = 295
-        previousCandidateVotes.submit(prevCandVotes)
-        val currPartyVotes = LinkedHashMap<Party, Int>()
-        currPartyVotes[pc] = 1098
-        currPartyVotes[lib] = 1013
-        currPartyVotes[Party.OTHERS] = 1050
-        currentPartyVotes.submit(currPartyVotes)
-        val prevPartyVotes = LinkedHashMap<Party, Int>()
-        prevPartyVotes[lib] = 1397
-        prevPartyVotes[pc] = 1062
-        prevPartyVotes[Party.OTHERS] = 1100
-        previousPartyVotes.submit(prevPartyVotes)
+        currentCandidateVotes.submit(
+            mapOf(
+                Candidate.OTHERS to 1106,
+                Candidate("Robert Mitchell", lib, true) to 1420,
+                Candidate("Amanda Morrison", grn) to 1057,
+            )
+        )
+        previousCandidateVotes.submit(
+            mapOf(
+                Party.OTHERS to 1391,
+                lib to 1425,
+                grn to 295,
+            )
+        )
+        currentPartyVotes.submit(
+            mapOf(
+                pc to 1098,
+                lib to 1013,
+                Party.OTHERS to 1050,
+            )
+        )
+        previousPartyVotes.submit(
+            mapOf(
+                lib to 1397,
+                pc to 1062,
+                Party.OTHERS to 1100,
+            )
+        )
         compareRendering("MixedMemberResultPanel", "Other", panel)
     }
 
     @Test
     fun testMapAdditionalHighlights() {
-        val currentCandidateVotes = Publisher(LinkedHashMap<Candidate, Int>())
-        val previousCandidateVotes = Publisher(LinkedHashMap<Party, Int>())
-        val currentPartyVotes = Publisher(LinkedHashMap<Party, Int>())
-        val previousPartyVotes = Publisher(LinkedHashMap<Party, Int>())
+        val currentCandidateVotes = Publisher(emptyMap<Candidate, Int>())
+        val previousCandidateVotes = Publisher(emptyMap<Party, Int>())
+        val currentPartyVotes = Publisher(emptyMap<Party, Int>())
+        val previousPartyVotes = Publisher(emptyMap<Party, Int>())
         val header = Publisher("CHARLOTTETOWN-WINSLOE")
         val candidateHeader = Publisher("CANDIDATE VOTES")
         val candidateChangeHeader = Publisher("CANDIDATE CHANGE SINCE 2015")
@@ -456,37 +506,45 @@ class MixedMemberResultPanelTest {
             )
             .build(header)
         panel.setSize(1024, 512)
-        val currCandVotes = LinkedHashMap<Candidate, Int>()
-        currCandVotes[Candidate("Jesse Reddin Cousins", ndp)] = 41
-        currCandVotes[Candidate("Mike Gillis", pc)] = 865
-        currCandVotes[Candidate("Robert Mitchell", lib, true)] = 1420
-        currCandVotes[Candidate("Amanda Morrison", grn)] = 1057
-        currentCandidateVotes.submit(currCandVotes)
-        val prevCandVotes = LinkedHashMap<Party, Int>()
-        prevCandVotes[lib] = 1425
-        prevCandVotes[pc] = 1031
-        prevCandVotes[ndp] = 360
-        prevCandVotes[grn] = 295
-        previousCandidateVotes.submit(prevCandVotes)
-        val currPartyVotes = LinkedHashMap<Party, Int>()
-        currPartyVotes[grn] = 1098
-        currPartyVotes[lib] = 1013
-        currPartyVotes[ndp] = 112
-        currPartyVotes[pc] = 822
-        currentPartyVotes.submit(currPartyVotes)
-        val prevPartyVotes = LinkedHashMap<Party, Int>()
-        prevPartyVotes[lib] = 1397
-        prevPartyVotes[pc] = 1062
-        prevPartyVotes[ndp] = 544
-        prevPartyVotes[grn] = 426
-        previousPartyVotes.submit(prevPartyVotes)
+        currentCandidateVotes.submit(
+            mapOf(
+                Candidate("Jesse Reddin Cousins", ndp) to 41,
+                Candidate("Mike Gillis", pc) to 865,
+                Candidate("Robert Mitchell", lib, true) to 1420,
+                Candidate("Amanda Morrison", grn) to 1057,
+            )
+        )
+        previousCandidateVotes.submit(
+            mapOf(
+                lib to 1425,
+                pc to 1031,
+                ndp to 360,
+                grn to 295,
+            )
+        )
+        currentPartyVotes.submit(
+            mapOf(
+                grn to 1098,
+                lib to 1013,
+                ndp to 112,
+                pc to 822,
+            )
+        )
+        previousPartyVotes.submit(
+            mapOf(
+                lib to 1397,
+                pc to 1062,
+                ndp to 544,
+                grn to 426,
+            )
+        )
         compareRendering("MixedMemberResultPanel", "MapAdditionalHighlight", panel)
     }
 
     @Test
     fun testWithoutPrev() {
-        val currentCandidateVotes = Publisher(LinkedHashMap<Candidate, Int>())
-        val currentPartyVotes = Publisher(LinkedHashMap<Party, Int>())
+        val currentCandidateVotes = Publisher(emptyMap<Candidate, Int>())
+        val currentPartyVotes = Publisher(emptyMap<Party, Int>())
         val header = Publisher("CHARLOTTETOWN-WINSLOE")
         val candidateHeader = Publisher("CANDIDATE VOTES")
         val partyHeader = Publisher("PARTY VOTES")
@@ -513,25 +571,29 @@ class MixedMemberResultPanelTest {
             )
             .build(header)
         panel.setSize(1024, 512)
-        val currCandVotes = LinkedHashMap<Candidate, Int>()
-        currCandVotes[Candidate("Jesse Reddin Cousins", ndp)] = 41
-        currCandVotes[Candidate("Mike Gillis", pc)] = 865
-        currCandVotes[Candidate("Robert Mitchell", lib, true)] = 1420
-        currCandVotes[Candidate("Amanda Morrison", grn)] = 1057
-        currentCandidateVotes.submit(currCandVotes)
-        val currPartyVotes = LinkedHashMap<Party, Int>()
-        currPartyVotes[grn] = 1098
-        currPartyVotes[lib] = 1013
-        currPartyVotes[ndp] = 112
-        currPartyVotes[pc] = 822
-        currentPartyVotes.submit(currPartyVotes)
+        currentCandidateVotes.submit(
+            mapOf(
+                Candidate("Jesse Reddin Cousins", ndp) to 41,
+                Candidate("Mike Gillis", pc) to 865,
+                Candidate("Robert Mitchell", lib, true) to 1420,
+                Candidate("Amanda Morrison", grn) to 1057,
+            )
+        )
+        currentPartyVotes.submit(
+            mapOf(
+                grn to 1098,
+                lib to 1013,
+                ndp to 112,
+                pc to 822,
+            )
+        )
         compareRendering("MixedMemberResultPanel", "NoPrev", panel)
     }
 
     @Test
     fun testSubheadWithoutPrev() {
-        val currentCandidateVotes = Publisher(LinkedHashMap<Candidate, Int>())
-        val currentPartyVotes = Publisher(LinkedHashMap<Party, Int>())
+        val currentCandidateVotes = Publisher(emptyMap<Candidate, Int>())
+        val currentPartyVotes = Publisher(emptyMap<Party, Int>())
         val header = Publisher("CHARLOTTETOWN-WINSLOE")
         val candidateHeader = Publisher("CANDIDATE VOTES")
         val candidateSubhead = Publisher("LIB WIN IN 2015")
@@ -563,25 +625,29 @@ class MixedMemberResultPanelTest {
             )
             .build(header)
         panel.setSize(1024, 512)
-        val currCandVotes = LinkedHashMap<Candidate, Int>()
-        currCandVotes[Candidate("Jesse Reddin Cousins", ndp)] = 41
-        currCandVotes[Candidate("Mike Gillis", pc)] = 865
-        currCandVotes[Candidate("Robert Mitchell", lib, true)] = 1420
-        currCandVotes[Candidate("Amanda Morrison", grn)] = 1057
-        currentCandidateVotes.submit(currCandVotes)
-        val currPartyVotes = LinkedHashMap<Party, Int>()
-        currPartyVotes[grn] = 1098
-        currPartyVotes[lib] = 1013
-        currPartyVotes[ndp] = 112
-        currPartyVotes[pc] = 822
-        currentPartyVotes.submit(currPartyVotes)
+        currentCandidateVotes.submit(
+            mapOf(
+                Candidate("Jesse Reddin Cousins", ndp) to 41,
+                Candidate("Mike Gillis", pc) to 865,
+                Candidate("Robert Mitchell", lib, true) to 1420,
+                Candidate("Amanda Morrison", grn) to 1057,
+            )
+        )
+        currentPartyVotes.submit(
+            mapOf(
+                grn to 1098,
+                lib to 1013,
+                ndp to 112,
+                pc to 822,
+            )
+        )
         compareRendering("MixedMemberResultPanel", "NoPrevSubhead", panel)
     }
 
     @Test
     fun testTickWithoutPrev() {
-        val currentCandidateVotes = Publisher(LinkedHashMap<Candidate, Int>())
-        val currentPartyVotes = Publisher(LinkedHashMap<Party, Int>())
+        val currentCandidateVotes = Publisher(emptyMap<Candidate, Int>())
+        val currentPartyVotes = Publisher(emptyMap<Party, Int>())
         val header = Publisher("CHARLOTTETOWN-WINSLOE")
         val candidateHeader = Publisher("CANDIDATE VOTES")
         val partyHeader = Publisher("PARTY VOTES")
@@ -610,26 +676,30 @@ class MixedMemberResultPanelTest {
             )
             .build(header)
         panel.setSize(1024, 512)
-        val currCandVotes = LinkedHashMap<Candidate, Int>()
-        currCandVotes[Candidate("Jesse Reddin Cousins", ndp)] = 41
-        currCandVotes[Candidate("Mike Gillis", pc)] = 865
-        currCandVotes[Candidate("Robert Mitchell", lib, true)] = 1420
-        currCandVotes[Candidate("Amanda Morrison", grn)] = 1057
-        currentCandidateVotes.submit(currCandVotes)
-        winner.submit(currCandVotes.keys.first { it.party === lib })
-        val currPartyVotes = LinkedHashMap<Party, Int>()
-        currPartyVotes[grn] = 1098
-        currPartyVotes[lib] = 1013
-        currPartyVotes[ndp] = 112
-        currPartyVotes[pc] = 822
-        currentPartyVotes.submit(currPartyVotes)
+        currentCandidateVotes.submit(
+            mapOf(
+                Candidate("Jesse Reddin Cousins", ndp) to 41,
+                Candidate("Mike Gillis", pc) to 865,
+                Candidate("Robert Mitchell", lib, true) to 1420,
+                Candidate("Amanda Morrison", grn) to 1057,
+            )
+        )
+        winner.submit(Candidate("Robert Mitchell", lib, true))
+        currentPartyVotes.submit(
+            mapOf(
+                grn to 1098,
+                lib to 1013,
+                ndp to 112,
+                pc to 822,
+            )
+        )
         compareRendering("MixedMemberResultPanel", "NoPrevTick", panel)
     }
 
     @Test
     fun testPartyOnlyForCandidateVote() {
-        val currentCandidateVotes = Publisher(LinkedHashMap<Candidate, Int>())
-        val currentPartyVotes = Publisher(LinkedHashMap<Party, Int>())
+        val currentCandidateVotes = Publisher(emptyMap<Candidate, Int>())
+        val currentPartyVotes = Publisher(emptyMap<Party, Int>())
         val header = Publisher("CHARLOTTETOWN-WINSLOE")
         val candidateHeader = Publisher("CANDIDATE VOTES")
         val partyHeader = Publisher("PARTY VOTES")
@@ -658,19 +728,23 @@ class MixedMemberResultPanelTest {
             )
             .build(header)
         panel.setSize(1024, 512)
-        val currCandVotes = LinkedHashMap<Candidate, Int>()
-        currCandVotes[Candidate("", ndp)] = 41
-        currCandVotes[Candidate("", pc)] = 865
-        currCandVotes[Candidate("", lib, true)] = 1420
-        currCandVotes[Candidate("", grn)] = 1057
-        currentCandidateVotes.submit(currCandVotes)
-        winner.submit(currCandVotes.keys.first { it.party === lib })
-        val currPartyVotes = LinkedHashMap<Party, Int>()
-        currPartyVotes[grn] = 1098
-        currPartyVotes[lib] = 1013
-        currPartyVotes[ndp] = 112
-        currPartyVotes[pc] = 822
-        currentPartyVotes.submit(currPartyVotes)
+        currentCandidateVotes.submit(
+            mapOf(
+                Candidate("", ndp) to 41,
+                Candidate("", pc) to 865,
+                Candidate("", lib, true) to 1420,
+                Candidate("", grn) to 1057,
+            )
+        )
+        winner.submit(Candidate("", lib, true))
+        currentPartyVotes.submit(
+            mapOf(
+                grn to 1098,
+                lib to 1013,
+                ndp to 112,
+                pc to 822,
+            )
+        )
         compareRendering("MixedMemberResultPanel", "PartyOnlyForCandidateVotes", panel)
     }
 
@@ -696,10 +770,10 @@ class MixedMemberResultPanelTest {
         val ed = Party("English Democrats", "ED", Color.GRAY)
         val tusc = Party("Trade Unionist and Socialist Coalition", "TUSC", Color.GRAY)
         val ind = Party("Independent", "IND", Color.GRAY)
-        val currentCandidateVotes = Publisher<Map<Candidate, Int?>>(LinkedHashMap())
-        val previousCandidateVotes = Publisher<Map<Party, Int>>(LinkedHashMap())
-        val currentPartyVotes = Publisher<Map<Party, Int?>>(LinkedHashMap())
-        val previousPartyVotes = Publisher<Map<Party, Int>>(LinkedHashMap())
+        val currentCandidateVotes = Publisher<Map<Candidate, Int?>>(emptyMap())
+        val previousCandidateVotes = Publisher<Map<Party, Int>>(emptyMap())
+        val currentPartyVotes = Publisher<Map<Party, Int?>>(emptyMap())
+        val previousPartyVotes = Publisher<Map<Party, Int>>(emptyMap())
         val header = Publisher("CITY & EAST")
         val candidateHeader = Publisher("CONSTITUENCY VOTES")
         val candidateChangeHeader = Publisher("CONSTITUENCY CHANGE SINCE 2012")
@@ -716,54 +790,60 @@ class MixedMemberResultPanelTest {
             .withPrevPartyVotes(previousPartyVotes, partyChangeHeader)
             .build(header)
         panel.setSize(1024, 512)
-        val currCandVotes = LinkedHashMap<Candidate, Int?>()
-        currCandVotes[Candidate("Elaine Sheila Bagshaw", ld)] = null
-        currCandVotes[Candidate("Christopher James Chapman", con)] = null
-        currCandVotes[Candidate("Rachel Collinson", grn)] = null
-        currCandVotes[Candidate("Unmesh Desai", lab)] = null
-        currCandVotes[Candidate("Aaron Anthony Jose Hasan D'Souza", app)] = null
-        currCandVotes[Candidate("Amina May Kay Gichinga", city)] = null
-        currCandVotes[Candidate("Peter James Harris", ukip)] = null
-        currCandVotes[Candidate("Rayne Mickail", resp)] = null
+        val currCandVotes = mutableMapOf<Candidate, Int?>(
+            Candidate("Elaine Sheila Bagshaw", ld) to null,
+            Candidate("Christopher James Chapman", con) to null,
+            Candidate("Rachel Collinson", grn) to null,
+            Candidate("Unmesh Desai", lab) to null,
+            Candidate("Aaron Anthony Jose Hasan D'Souza", app) to null,
+            Candidate("Amina May Kay Gichinga", city) to null,
+            Candidate("Peter James Harris", ukip) to null,
+            Candidate("Rayne Mickail", resp) to null,
+        )
         currentCandidateVotes.submit(currCandVotes)
-        val prevCandVotes = LinkedHashMap<Party, Int>()
-        prevCandVotes[lab] = 107667
-        prevCandVotes[bnp] = 7031
-        prevCandVotes[cl] = 1108
-        prevCandVotes[ld] = 7351
-        prevCandVotes[cup] = 6774
-        prevCandVotes[con] = 24923
-        prevCandVotes[grn] = 10891
-        prevCandVotes[fresh] = 5243
-        previousCandidateVotes.submit(prevCandVotes)
-        val currPartyVotes = LinkedHashMap<Party, Int?>()
-        currPartyVotes[awp] = null
-        currPartyVotes[bf] = null
-        currPartyVotes[bnp] = null
-        currPartyVotes[cpa] = null
-        currPartyVotes[con] = null
-        currPartyVotes[grn] = null
-        currPartyVotes[lab] = null
-        currPartyVotes[ld] = null
-        currPartyVotes[resp] = null
-        currPartyVotes[house] = null
-        currPartyVotes[ukip] = null
-        currPartyVotes[wep] = null
+        previousCandidateVotes.submit(
+            mapOf(
+                lab to 107667,
+                bnp to 7031,
+                cl to 1108,
+                ld to 7351,
+                cup to 6774,
+                con to 24923,
+                grn to 10891,
+                fresh to 5243,
+            )
+        )
+        val currPartyVotes = mutableMapOf<Party, Int?>(
+            awp to null,
+            bf to null,
+            bnp to null,
+            cpa to null,
+            con to null,
+            grn to null,
+            lab to null,
+            ld to null,
+            resp to null,
+            house to null,
+            ukip to null,
+            wep to null,
+        )
         currentPartyVotes.submit(currPartyVotes)
-        val prevPartyVotes = LinkedHashMap<Party, Int>()
-        prevPartyVotes[bnp] = 5702
-        prevPartyVotes[cpa] = 3360
-        prevPartyVotes[con] = 25128
-        prevPartyVotes[ed] = 1565
-        prevPartyVotes[grn] = 11086
-        prevPartyVotes[lab] = 108395
-        prevPartyVotes[ld] = 6140
-        prevPartyVotes[bf] = 749
-        prevPartyVotes[house] = 684
-        prevPartyVotes[tusc] = 1277
-        prevPartyVotes[ukip] = 5966
-        prevPartyVotes[ind] = 299 + 1171
-        previousPartyVotes.submit(prevPartyVotes)
+        previousPartyVotes.submit(
+            mapOf(
+                bnp to 5702,
+                cpa to 3360,
+                con to 25128,
+                ed to 1565,
+                grn to 11086,
+                lab to 108395,
+                ld to 6140,
+                bf to 749,
+                house to 684,
+                tusc to 1277,
+                ukip to 5966,
+                ind to 299 + 1171,
+            )
+        )
         compareRendering("MixedMemberResultPanel", "Declaration-1", panel)
         currCandVotes[Candidate("Elaine Sheila Bagshaw", ld)] = 10714
         currentCandidateVotes.submit(currCandVotes)

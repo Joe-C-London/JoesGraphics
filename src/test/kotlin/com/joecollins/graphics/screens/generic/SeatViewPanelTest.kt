@@ -24,8 +24,8 @@ import java.util.IdentityHashMap
 class SeatViewPanelTest {
     @Test
     fun testBasicCurrPrev() {
-        val currentSeats = Publisher(LinkedHashMap<Party, Int>())
-        val previousSeats = Publisher(LinkedHashMap<Party, Int>())
+        val currentSeats = Publisher(emptyMap<Party, Int>())
+        val previousSeats = Publisher(emptyMap<Party, Int>())
         val totalSeats = Publisher(650)
         val showMajority = Publisher(true)
         val header = Publisher("UNITED KINGDOM")
@@ -45,19 +45,13 @@ class SeatViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("SeatViewPanel", "Basic-1", panel)
 
-        val curr = LinkedHashMap<Party, Int>()
-        val prev = LinkedHashMap<Party, Int>()
-        curr[con] = 1
-        currentSeats.submit(curr)
-        prev[lab] = 1
-        previousSeats.submit(prev)
+        currentSeats.submit(mapOf(con to 1))
+        previousSeats.submit(mapOf(lab to 1))
         seatHeader.submit("1 OF 650 SEATS DECLARED")
         compareRendering("SeatViewPanel", "Basic-2", panel)
 
-        curr[lab] = 2
-        currentSeats.submit(curr)
-        prev[lab] = 3
-        previousSeats.submit(prev)
+        currentSeats.submit(mapOf(con to 1, lab to 2))
+        previousSeats.submit(mapOf(lab to 3))
         seatHeader.submit("3 OF 650 SEATS DECLARED")
         compareRendering("SeatViewPanel", "Basic-3", panel)
 
@@ -66,22 +60,28 @@ class SeatViewPanelTest {
         val pc = Party("Plaid Cymru", "PC", Color.GREEN.darker())
         val grn = Party("Green", "GRN", Color.GREEN)
         val oth = Party.OTHERS
-        curr[con] = 365
-        curr[lab] = 202
-        curr[ld] = 11
-        curr[snp] = 48
-        curr[grn] = 1
-        curr[pc] = 4
-        curr[oth] = 19
-        prev[con] = 317
-        prev[lab] = 262
-        prev[ld] = 12
-        prev[snp] = 35
-        prev[grn] = 1
-        prev[pc] = 4
-        prev[oth] = 19
-        currentSeats.submit(curr)
-        previousSeats.submit(prev)
+        currentSeats.submit(
+            mapOf(
+                con to 365,
+                lab to 202,
+                ld to 11,
+                snp to 48,
+                grn to 1,
+                pc to 4,
+                oth to 19,
+            )
+        )
+        previousSeats.submit(
+            mapOf(
+                lab to 262,
+                con to 317,
+                ld to 12,
+                snp to 35,
+                grn to 1,
+                pc to 4,
+                oth to 19,
+            )
+        )
         seatHeader.submit("650 OF 650 SEATS DECLARED")
         seatSubhead.submit("PROJECTION: CON MAJORITY")
         compareRendering("SeatViewPanel", "Basic-4", panel)
@@ -91,25 +91,15 @@ class SeatViewPanelTest {
         changeSubhead.submit(null)
         totalSeats.submit(59)
         showMajority.submit(false)
-        curr.clear()
-        prev.clear()
-        curr[snp] = 48
-        curr[con] = 6
-        curr[ld] = 4
-        curr[lab] = 1
-        currentSeats.submit(curr)
-        prev[snp] = 35
-        prev[con] = 13
-        prev[ld] = 4
-        prev[lab] = 7
-        previousSeats.submit(prev)
+        currentSeats.submit(mapOf(snp to 48, con to 6, ld to 4, lab to 1))
+        previousSeats.submit(mapOf(snp to 35, con to 13, lab to 7, ld to 4))
         compareRendering("SeatViewPanel", "Basic-5", panel)
     }
 
     @Test
     fun testBasicCurrDiff() {
-        val currentSeats = Publisher(LinkedHashMap<Party, Int>())
-        val seatDiff = Publisher(LinkedHashMap<Party, Int>())
+        val currentSeats = Publisher(emptyMap<Party, Int>())
+        val seatDiff = Publisher(emptyMap<Party, Int>())
         val totalSeats = Publisher(650)
         val showMajority = Publisher(true)
         val header = Publisher("UNITED KINGDOM")
@@ -129,18 +119,12 @@ class SeatViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("SeatViewPanel", "Basic-1", panel)
 
-        val curr = LinkedHashMap<Party, Int>()
-        val diff = LinkedHashMap<Party, Int>()
-        curr[con] = 1
-        currentSeats.submit(curr)
-        diff[con] = +1
-        diff[lab] = -1
-        seatDiff.submit(diff)
+        currentSeats.submit(mapOf(con to 1))
+        seatDiff.submit(mapOf(con to +1, lab to -1))
         seatHeader.submit("1 OF 650 SEATS DECLARED")
         compareRendering("SeatViewPanel", "Basic-2", panel)
 
-        curr[lab] = 2
-        currentSeats.submit(curr)
+        currentSeats.submit(mapOf(con to 1, lab to 2))
         seatHeader.submit("3 OF 650 SEATS DECLARED")
         compareRendering("SeatViewPanel", "Basic-3", panel)
 
@@ -149,22 +133,28 @@ class SeatViewPanelTest {
         val pc = Party("Plaid Cymru", "PC", Color.GREEN.darker())
         val grn = Party("Green", "GRN", Color.GREEN)
         val oth = Party.OTHERS
-        curr[con] = 365
-        curr[lab] = 202
-        curr[ld] = 11
-        curr[snp] = 48
-        curr[grn] = 1
-        curr[pc] = 4
-        curr[oth] = 19
-        diff[con] = +48
-        diff[lab] = -60
-        diff[ld] = -1
-        diff[snp] = +13
-        diff[grn] = 0
-        diff[pc] = 0
-        diff[oth] = 0
-        currentSeats.submit(curr)
-        seatDiff.submit(diff)
+        currentSeats.submit(
+            mapOf(
+                con to 365,
+                lab to 202,
+                ld to 11,
+                snp to 48,
+                grn to 1,
+                pc to 4,
+                oth to 19,
+            )
+        )
+        seatDiff.submit(
+            mapOf(
+                con to +48,
+                lab to -60,
+                ld to -1,
+                snp to +13,
+                grn to 0,
+                pc to 0,
+                oth to 0,
+            )
+        )
         seatHeader.submit("650 OF 650 SEATS DECLARED")
         seatSubhead.submit("PROJECTION: CON MAJORITY")
         compareRendering("SeatViewPanel", "Basic-4", panel)
@@ -174,27 +164,17 @@ class SeatViewPanelTest {
         changeSubhead.submit(null)
         totalSeats.submit(59)
         showMajority.submit(false)
-        curr.clear()
-        diff.clear()
-        curr[snp] = 48
-        curr[con] = 6
-        curr[ld] = 4
-        curr[lab] = 1
-        currentSeats.submit(curr)
-        diff[snp] = +13
-        diff[con] = -7
-        diff[ld] = 0
-        diff[lab] = -6
-        seatDiff.submit(diff)
+        currentSeats.submit(mapOf(snp to 48, con to 6, ld to 4, lab to 1))
+        seatDiff.submit(mapOf(snp to +13, con to -7, ld to 0, lab to -6))
         compareRendering("SeatViewPanel", "Basic-5", panel)
     }
 
     @Test
     fun testSwing() {
-        val currentSeats = Publisher(LinkedHashMap<Party, Int>())
-        val previousSeats = Publisher(LinkedHashMap<Party, Int>())
-        val currentVotes = Publisher(LinkedHashMap<Party, Int>())
-        val previousVotes = Publisher(LinkedHashMap<Party, Int>())
+        val currentSeats = Publisher(emptyMap<Party, Int>())
+        val previousSeats = Publisher(emptyMap<Party, Int>())
+        val currentVotes = Publisher(emptyMap<Party, Int>())
+        val previousVotes = Publisher(emptyMap<Party, Int>())
         val totalSeats = Publisher(650)
         val showMajority = Publisher(true)
         val header = Publisher("UNITED KINGDOM")
@@ -221,36 +201,36 @@ class SeatViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("SeatViewPanel", "Swing-1", panel)
 
-        val currSeats = LinkedHashMap<Party, Int>()
-        val prevSeats = LinkedHashMap<Party, Int>()
-        val currVotes = LinkedHashMap<Party, Int>()
-        val prevVotes = LinkedHashMap<Party, Int>()
-        currSeats[lab] = 1
-        currentSeats.submit(currSeats)
-        prevSeats[lab] = 1
-        previousSeats.submit(prevSeats)
-        currVotes[lab] = 21568
-        currVotes[con] = 9290
-        currVotes[ld] = 2709
-        currVotes[grn] = 1365
-        currVotes[oth] = 2542
-        currentVotes.submit(currVotes)
-        prevVotes[lab] = 24071
-        prevVotes[con] = 9134
-        prevVotes[ld] = 1812
-        prevVotes[grn] = 595
-        prevVotes[oth] = 1482
-        previousVotes.submit(prevVotes)
+        currentSeats.submit(mapOf(lab to 1))
+        previousSeats.submit(mapOf(lab to 1))
+        currentVotes.submit(
+            mapOf(
+                lab to 21568,
+                con to 9290,
+                ld to 2709,
+                grn to 1365,
+                oth to 2542,
+            )
+        )
+        previousVotes.submit(
+            mapOf(
+                lab to 24071,
+                con to 9134,
+                ld to 1812,
+                grn to 595,
+                oth to 1482,
+            )
+        )
         seatHeader.submit("1 OF 650 SEATS DECLARED")
         compareRendering("SeatViewPanel", "Swing-2", panel)
     }
 
     @Test
     fun testMap() {
-        val currentSeats = Publisher(LinkedHashMap<Party, Int>())
-        val previousSeats = Publisher(LinkedHashMap<Party, Int>())
-        val currentVotes = Publisher(LinkedHashMap<Party, Int>())
-        val previousVotes = Publisher(LinkedHashMap<Party, Int>())
+        val currentSeats = Publisher(emptyMap<Party, Int>())
+        val previousSeats = Publisher(emptyMap<Party, Int>())
+        val currentVotes = Publisher(emptyMap<Party, Int>())
+        val previousVotes = Publisher(emptyMap<Party, Int>())
         val totalSeats = Publisher(27)
         val showMajority = Publisher(true)
         val header = Publisher("PRINCE EDWARD ISLAND")
@@ -280,23 +260,11 @@ class SeatViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("SeatViewPanel", "Map-1", panel)
 
-        val currSeats = LinkedHashMap<Party, Int>()
-        val prevSeats = LinkedHashMap<Party, Int>()
-        val currVotes = LinkedHashMap<Party, Int>()
-        val prevVotes = LinkedHashMap<Party, Int>()
-        val winners = LinkedHashMap<Int, Party?>()
-        currSeats[pc] = 1
-        currentSeats.submit(currSeats)
-        prevSeats[pc] = 1
-        previousSeats.submit(prevSeats)
-        currVotes[pc] = 1347
-        currVotes[lib] = 861
-        currVotes[grn] = 804
-        currentVotes.submit(currVotes)
-        prevVotes[pc] = 1179
-        prevVotes[lib] = 951
-        prevVotes[ndp] = 528
-        previousVotes.submit(prevVotes)
+        val winners = mutableMapOf<Int, Party?>()
+        currentSeats.submit(mapOf(pc to 1))
+        previousSeats.submit(mapOf(pc to 1))
+        currentVotes.submit(mapOf(pc to 1347, lib to 861, grn to 804))
+        previousVotes.submit(mapOf(pc to 1179, lib to 951, ndp to 528))
         winners[1] = pc
         winnersByDistrict.submit(winners)
         seatHeader.submit("1 OF 27 DISTRICTS DECLARED")
@@ -315,20 +283,10 @@ class SeatViewPanelTest {
         winnersByDistrict.submit(winners)
         compareRendering("SeatViewPanel", "Map-3", panel)
 
-        currSeats[pc] = 2
-        currentSeats.submit(currSeats)
-        prevSeats[lib] = 1
-        previousSeats.submit(prevSeats)
-        currVotes[pc] = 2720
-        currVotes[lib] = 1646
-        currVotes[grn] = 1478
-        currVotes[ndp] = 124
-        currentVotes.submit(currVotes)
-        prevVotes[pc] = 1964
-        prevVotes[lib] = 2011
-        prevVotes[ndp] = 1113
-        prevVotes[grn] = 106
-        previousVotes.submit(prevVotes)
+        currentSeats.submit(mapOf(pc to 2))
+        previousSeats.submit(mapOf(pc to 1, lib to 1))
+        currentVotes.submit(mapOf(pc to 2720, lib to 1646, grn to 1478, ndp to 124))
+        previousVotes.submit(mapOf(pc to 1964, lib to 2011, ndp to 1113, grn to 106))
         winners[3] = pc
         winnersByDistrict.submit(winners)
         seatHeader.submit("2 OF 7 DISTRICTS DECLARED")
@@ -338,10 +296,8 @@ class SeatViewPanelTest {
         header.submit("PRINCE EDWARD ISLAND")
         seatHeader.submit("3 OF 27 DISTRICTS DECLARED")
         seatSubhead.submit("PROJECTION: TOO EARLY TO CALL")
-        currSeats[pc] = 3
-        currentSeats.submit(currSeats)
-        prevSeats[lib] = 2
-        previousSeats.submit(prevSeats)
+        currentSeats.submit(mapOf(pc to 3))
+        previousSeats.submit(mapOf(pc to 1, lib to 2))
         totalSeats.submit(27)
         showMajority.submit(true)
         mapHeader.submit("PEI")
@@ -354,8 +310,8 @@ class SeatViewPanelTest {
 
     @Test
     fun testDualCurrPrev() {
-        val currentSeats = Publisher(LinkedHashMap<Party, Pair<Int, Int>>())
-        val previousSeats = Publisher(LinkedHashMap<Party, Pair<Int, Int>>())
+        val currentSeats = Publisher(emptyMap<Party, Pair<Int, Int>>())
+        val previousSeats = Publisher(emptyMap<Party, Pair<Int, Int>>())
         val totalSeats = Publisher(338)
         val showMajority = Publisher(true)
         val header = Publisher("CANADA")
@@ -378,77 +334,105 @@ class SeatViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("SeatViewPanel", "Dual-1", panel)
 
-        val currSeats = LinkedHashMap<Party, Pair<Int, Int>>()
-        val prevSeats = LinkedHashMap<Party, Pair<Int, Int>>()
-        currSeats[lib] = Pair(0, 6)
-        currSeats[ndp] = Pair(0, 1)
-        currentSeats.submit(currSeats)
-        prevSeats[lib] = Pair(0, 7)
-        previousSeats.submit(prevSeats)
+        currentSeats.submit(
+            mapOf(
+                lib to (0 to 6),
+                ndp to (0 to 1),
+            )
+        )
+        previousSeats.submit(
+            mapOf(
+                lib to (0 to 7),
+            )
+        )
         seatHeader.submit("7 OF 338 RIDINGS REPORTING")
         compareRendering("SeatViewPanel", "Dual-2", panel)
 
-        currSeats[lib] = Pair(6, 26)
-        currSeats[ndp] = Pair(1, 1)
-        currSeats[con] = Pair(0, 4)
-        currSeats[grn] = Pair(0, 1)
-        currentSeats.submit(currSeats)
-        prevSeats[lib] = Pair(7, 32)
-        previousSeats.submit(prevSeats)
+        currentSeats.submit(
+            mapOf(
+                lib to (6 to 26),
+                ndp to (1 to 1),
+                con to (0 to 4),
+                grn to (0 to 1),
+            )
+        )
+        previousSeats.submit(
+            mapOf(
+                lib to (7 to 32),
+            )
+        )
         seatHeader.submit("32 OF 338 RIDINGS REPORTING")
         compareRendering("SeatViewPanel", "Dual-3", panel)
 
-        currSeats[lib] = Pair(26, 145)
-        currSeats[ndp] = Pair(1, 13)
-        currSeats[con] = Pair(4, 104)
-        currSeats[bq] = Pair(0, 32)
-        currSeats[grn] = Pair(1, 1)
-        currentSeats.submit(currSeats)
-        prevSeats[lib] = Pair(32, 166)
-        prevSeats[ndp] = Pair(0, 30)
-        prevSeats[con] = Pair(0, 89)
-        prevSeats[bq] = Pair(0, 10)
-        previousSeats.submit(prevSeats)
+        currentSeats.submit(
+            mapOf(
+                lib to (26 to 145),
+                ndp to (1 to 13),
+                con to (4 to 104),
+                bq to (0 to 32),
+                grn to (1 to 1),
+            )
+        )
+        previousSeats.submit(
+            mapOf(
+                lib to (32 to 166),
+                ndp to (0 to 30),
+                con to (0 to 89),
+                bq to (0 to 10),
+            )
+        )
         seatHeader.submit("295 OF 338 RIDINGS REPORTING")
         compareRendering("SeatViewPanel", "Dual-4", panel)
 
-        currSeats[lib] = Pair(145, 157)
-        currSeats[ndp] = Pair(13, 24)
-        currSeats[con] = Pair(104, 121)
-        currSeats[bq] = Pair(32, 32)
-        currSeats[grn] = Pair(1, 3)
-        currSeats[ind] = Pair(0, 1)
-        currentSeats.submit(currSeats)
-        prevSeats[lib] = Pair(166, 184)
-        prevSeats[ndp] = Pair(30, 44)
-        prevSeats[con] = Pair(89, 99)
-        prevSeats[bq] = Pair(10, 10)
-        prevSeats[grn] = Pair(0, 1)
-        previousSeats.submit(prevSeats)
+        currentSeats.submit(
+            mapOf(
+                lib to (145 to 157),
+                ndp to (13 to 24),
+                con to (104 to 121),
+                bq to (32 to 32),
+                grn to (1 to 3),
+                ind to (0 to 1),
+            )
+        )
+        previousSeats.submit(
+            mapOf(
+                lib to (166 to 184),
+                ndp to (30 to 44),
+                con to (89 to 99),
+                bq to (10 to 10),
+                grn to (0 to 1),
+            )
+        )
         seatHeader.submit("338 OF 338 RIDINGS REPORTING")
         compareRendering("SeatViewPanel", "Dual-5", panel)
 
-        currSeats[lib] = Pair(157, 157)
-        currSeats[ndp] = Pair(24, 24)
-        currSeats[con] = Pair(121, 121)
-        currSeats[bq] = Pair(32, 32)
-        currSeats[grn] = Pair(3, 3)
-        currSeats[ind] = Pair(1, 1)
-        currentSeats.submit(currSeats)
-        prevSeats[lib] = Pair(184, 184)
-        prevSeats[ndp] = Pair(44, 44)
-        prevSeats[con] = Pair(99, 99)
-        prevSeats[bq] = Pair(10, 10)
-        prevSeats[grn] = Pair(1, 1)
-        previousSeats.submit(prevSeats)
+        currentSeats.submit(
+            mapOf(
+                lib to (157 to 157),
+                ndp to (24 to 24),
+                con to (121 to 121),
+                bq to (32 to 32),
+                grn to (3 to 3),
+                ind to (1 to 1),
+            )
+        )
+        previousSeats.submit(
+            mapOf(
+                lib to (184 to 184),
+                ndp to (44 to 44),
+                con to (99 to 99),
+                bq to (10 to 10),
+                grn to (1 to 1),
+            )
+        )
         seatHeader.submit("338 OF 338 RIDINGS REPORTING")
         compareRendering("SeatViewPanel", "Dual-6", panel)
     }
 
     @Test
     fun testDualReversedCurrPrev() {
-        val currentSeats = Publisher(LinkedHashMap<Party, Pair<Int, Int>>())
-        val previousSeats = Publisher(LinkedHashMap<Party, Pair<Int, Int>>())
+        val currentSeats = Publisher(emptyMap<Party, Pair<Int, Int>>())
+        val previousSeats = Publisher(emptyMap<Party, Pair<Int, Int>>())
         val totalSeats = Publisher(338)
         val showMajority = Publisher(true)
         val header = Publisher("CANADA")
@@ -471,77 +455,105 @@ class SeatViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("SeatViewPanel", "DualReversed-1", panel)
 
-        val currSeats = LinkedHashMap<Party, Pair<Int, Int>>()
-        val prevSeats = LinkedHashMap<Party, Pair<Int, Int>>()
-        currSeats[lib] = Pair(0, 6)
-        currSeats[ndp] = Pair(0, 1)
-        currentSeats.submit(currSeats)
-        prevSeats[lib] = Pair(0, 7)
-        previousSeats.submit(prevSeats)
+        currentSeats.submit(
+            mapOf(
+                lib to (0 to 6),
+                ndp to (0 to 1),
+            )
+        )
+        previousSeats.submit(
+            mapOf(
+                lib to (0 to 7),
+            )
+        )
         seatHeader.submit("7 OF 338 RIDINGS REPORTING")
         compareRendering("SeatViewPanel", "DualReversed-2", panel)
 
-        currSeats[lib] = Pair(6, 26)
-        currSeats[ndp] = Pair(1, 1)
-        currSeats[con] = Pair(0, 4)
-        currSeats[grn] = Pair(0, 1)
-        currentSeats.submit(currSeats)
-        prevSeats[lib] = Pair(7, 32)
-        previousSeats.submit(prevSeats)
+        currentSeats.submit(
+            mapOf(
+                lib to (6 to 26),
+                ndp to (1 to 1),
+                con to (0 to 4),
+                grn to (0 to 1),
+            )
+        )
+        previousSeats.submit(
+            mapOf(
+                lib to (7 to 32),
+            )
+        )
         seatHeader.submit("32 OF 338 RIDINGS REPORTING")
         compareRendering("SeatViewPanel", "DualReversed-3", panel)
 
-        currSeats[lib] = Pair(26, 145)
-        currSeats[ndp] = Pair(1, 13)
-        currSeats[con] = Pair(4, 104)
-        currSeats[bq] = Pair(0, 32)
-        currSeats[grn] = Pair(1, 1)
-        currentSeats.submit(currSeats)
-        prevSeats[lib] = Pair(32, 166)
-        prevSeats[ndp] = Pair(0, 30)
-        prevSeats[con] = Pair(0, 89)
-        prevSeats[bq] = Pair(0, 10)
-        previousSeats.submit(prevSeats)
+        currentSeats.submit(
+            mapOf(
+                lib to (26 to 145),
+                ndp to (1 to 13),
+                con to (4 to 104),
+                bq to (0 to 32),
+                grn to (1 to 1),
+            )
+        )
+        previousSeats.submit(
+            mapOf(
+                lib to (32 to 166),
+                ndp to (0 to 30),
+                con to (0 to 89),
+                bq to (0 to 10),
+            )
+        )
         seatHeader.submit("295 OF 338 RIDINGS REPORTING")
         compareRendering("SeatViewPanel", "DualReversed-4", panel)
 
-        currSeats[lib] = Pair(145, 157)
-        currSeats[ndp] = Pair(13, 24)
-        currSeats[con] = Pair(104, 121)
-        currSeats[bq] = Pair(32, 32)
-        currSeats[grn] = Pair(1, 3)
-        currSeats[ind] = Pair(0, 1)
-        currentSeats.submit(currSeats)
-        prevSeats[lib] = Pair(166, 184)
-        prevSeats[ndp] = Pair(30, 44)
-        prevSeats[con] = Pair(89, 99)
-        prevSeats[bq] = Pair(10, 10)
-        prevSeats[grn] = Pair(0, 1)
-        previousSeats.submit(prevSeats)
+        currentSeats.submit(
+            mapOf(
+                lib to (145 to 157),
+                ndp to (13 to 24),
+                con to (104 to 121),
+                bq to (32 to 32),
+                grn to (1 to 3),
+                ind to (0 to 1),
+            )
+        )
+        previousSeats.submit(
+            mapOf(
+                lib to (166 to 184),
+                ndp to (30 to 44),
+                con to (89 to 99),
+                bq to (10 to 10),
+                grn to (0 to 1),
+            )
+        )
         seatHeader.submit("338 OF 338 RIDINGS REPORTING")
         compareRendering("SeatViewPanel", "DualReversed-5", panel)
 
-        currSeats[lib] = Pair(157, 157)
-        currSeats[ndp] = Pair(24, 24)
-        currSeats[con] = Pair(121, 121)
-        currSeats[bq] = Pair(32, 32)
-        currSeats[grn] = Pair(3, 3)
-        currSeats[ind] = Pair(1, 1)
-        currentSeats.submit(currSeats)
-        prevSeats[lib] = Pair(184, 184)
-        prevSeats[ndp] = Pair(44, 44)
-        prevSeats[con] = Pair(99, 99)
-        prevSeats[bq] = Pair(10, 10)
-        prevSeats[grn] = Pair(1, 1)
-        previousSeats.submit(prevSeats)
+        currentSeats.submit(
+            mapOf(
+                lib to (157 to 157),
+                ndp to (24 to 24),
+                con to (121 to 121),
+                bq to (32 to 32),
+                grn to (3 to 3),
+                ind to (1 to 1),
+            )
+        )
+        previousSeats.submit(
+            mapOf(
+                lib to (184 to 184),
+                ndp to (44 to 44),
+                con to (99 to 99),
+                bq to (10 to 10),
+                grn to (1 to 1),
+            )
+        )
         seatHeader.submit("338 OF 338 RIDINGS REPORTING")
         compareRendering("SeatViewPanel", "DualReversed-6", panel)
     }
 
     @Test
     fun testDualCurrDiff() {
-        val currentSeats = Publisher(LinkedHashMap<Party, Pair<Int, Int>>())
-        val seatDiff = Publisher(LinkedHashMap<Party, Pair<Int, Int>>())
+        val currentSeats = Publisher(emptyMap<Party, Pair<Int, Int>>())
+        val seatDiff = Publisher(emptyMap<Party, Pair<Int, Int>>())
         val totalSeats = Publisher(338)
         val showMajority = Publisher(true)
         val header = Publisher("CANADA")
@@ -564,84 +576,112 @@ class SeatViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("SeatViewPanel", "Dual-1", panel)
 
-        val currSeats = LinkedHashMap<Party, Pair<Int, Int>>()
-        val diff = LinkedHashMap<Party, Pair<Int, Int>>()
-        currSeats[lib] = Pair(0, 6)
-        currSeats[ndp] = Pair(0, 1)
-        currentSeats.submit(currSeats)
-        diff[lib] = Pair(0, -1)
-        diff[ndp] = Pair(0, +1)
-        seatDiff.submit(diff)
+        currentSeats.submit(
+            mapOf(
+                lib to (0 to 6),
+                ndp to (0 to 1)
+            )
+        )
+        seatDiff.submit(
+            mapOf(
+                lib to (0 to -1),
+                ndp to (0 to +1)
+            )
+        )
         seatHeader.submit("7 OF 338 RIDINGS REPORTING")
         compareRendering("SeatViewPanel", "Dual-2", panel)
 
-        currSeats[lib] = Pair(6, 26)
-        currSeats[ndp] = Pair(1, 1)
-        currSeats[con] = Pair(0, 4)
-        currSeats[grn] = Pair(0, 1)
-        currentSeats.submit(currSeats)
-        diff[lib] = Pair(-1, -6)
-        diff[ndp] = Pair(+1, +1)
-        diff[con] = Pair(0, +4)
-        diff[grn] = Pair(0, +1)
-        seatDiff.submit(diff)
+        currentSeats.submit(
+            mapOf(
+                lib to (6 to 26),
+                ndp to (1 to 1),
+                con to (0 to 4),
+                grn to (0 to 1)
+            )
+        )
+        seatDiff.submit(
+            mapOf(
+                lib to (-1 to -6),
+                ndp to (+1 to +1),
+                con to (0 to +4),
+                grn to (0 to +1)
+            )
+        )
         seatHeader.submit("32 OF 338 RIDINGS REPORTING")
         compareRendering("SeatViewPanel", "Dual-3", panel)
 
-        currSeats[lib] = Pair(26, 145)
-        currSeats[ndp] = Pair(1, 13)
-        currSeats[con] = Pair(4, 104)
-        currSeats[bq] = Pair(0, 32)
-        currSeats[grn] = Pair(1, 1)
-        currentSeats.submit(currSeats)
-        diff[lib] = Pair(-6, -21)
-        diff[ndp] = Pair(+1, -17)
-        diff[con] = Pair(+4, +15)
-        diff[bq] = Pair(0, +22)
-        diff[grn] = Pair(+1, +1)
-        seatDiff.submit(diff)
+        currentSeats.submit(
+            mapOf(
+                lib to (26 to 145),
+                ndp to (1 to 13),
+                con to (4 to 104),
+                bq to (0 to 32),
+                grn to (1 to 1)
+            )
+        )
+        seatDiff.submit(
+            mapOf(
+                lib to (-6 to -21),
+                ndp to (+1 to -17),
+                con to (+4 to +15),
+                bq to (0 to +22),
+                grn to (+1 to +1)
+            )
+        )
         seatHeader.submit("295 OF 338 RIDINGS REPORTING")
         compareRendering("SeatViewPanel", "Dual-4", panel)
 
-        currSeats[lib] = Pair(145, 157)
-        currSeats[ndp] = Pair(13, 24)
-        currSeats[con] = Pair(104, 121)
-        currSeats[bq] = Pair(32, 32)
-        currSeats[grn] = Pair(1, 3)
-        currSeats[ind] = Pair(0, 1)
-        currentSeats.submit(currSeats)
-        diff[lib] = Pair(-21, -27)
-        diff[ndp] = Pair(-17, -20)
-        diff[con] = Pair(+15, +22)
-        diff[bq] = Pair(+22, +22)
-        diff[grn] = Pair(+1, +2)
-        diff[ind] = Pair(0, +1)
-        seatDiff.submit(diff)
+        currentSeats.submit(
+            mapOf(
+                lib to (145 to 157),
+                ndp to (13 to 24),
+                con to (104 to 121),
+                bq to (32 to 32),
+                grn to (1 to 3),
+                ind to (0 to 1)
+            )
+        )
+        seatDiff.submit(
+            mapOf(
+                lib to (-21 to -27),
+                ndp to (-17 to -20),
+                con to (+15 to +22),
+                bq to (+22 to +22),
+                grn to (+1 to +2),
+                ind to (0 to +1)
+            )
+        )
         seatHeader.submit("338 OF 338 RIDINGS REPORTING")
         compareRendering("SeatViewPanel", "Dual-5", panel)
 
-        currSeats[lib] = Pair(157, 157)
-        currSeats[ndp] = Pair(24, 24)
-        currSeats[con] = Pair(121, 121)
-        currSeats[bq] = Pair(32, 32)
-        currSeats[grn] = Pair(3, 3)
-        currSeats[ind] = Pair(1, 1)
-        currentSeats.submit(currSeats)
-        diff[lib] = Pair(-27, -27)
-        diff[ndp] = Pair(-20, -20)
-        diff[con] = Pair(+22, +22)
-        diff[bq] = Pair(+22, +22)
-        diff[grn] = Pair(+2, +2)
-        diff[ind] = Pair(+1, +1)
-        seatDiff.submit(diff)
+        currentSeats.submit(
+            mapOf(
+                lib to (157 to 157),
+                ndp to (24 to 24),
+                con to (121 to 121),
+                bq to (32 to 32),
+                grn to (3 to 3),
+                ind to (1 to 1)
+            )
+        )
+        seatDiff.submit(
+            mapOf(
+                lib to (-27 to -27),
+                ndp to (-20 to -20),
+                con to (+22 to +22),
+                bq to (+22 to +22),
+                grn to (+2 to +2),
+                ind to (+1 to +1)
+            )
+        )
         seatHeader.submit("338 OF 338 RIDINGS REPORTING")
         compareRendering("SeatViewPanel", "Dual-6", panel)
     }
 
     @Test
     fun testRangeCurrPrev() {
-        val currentSeats = Publisher(LinkedHashMap<Party, IntRange>())
-        val previousSeats = Publisher(LinkedHashMap<Party, Int>())
+        val currentSeats = Publisher(emptyMap<Party, IntRange>())
+        val previousSeats = Publisher(emptyMap<Party, Int>())
         val totalSeats = Publisher(76)
         val showMajority = Publisher(true)
         val header = Publisher("AUSTRALIA")
@@ -664,55 +704,71 @@ class SeatViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("SeatViewPanel", "Range-1", panel)
 
-        val currSeats = LinkedHashMap<Party, IntRange>()
-        val prevSeats = LinkedHashMap<Party, Int>()
-        currSeats[lnp] = IntRange(4, 5)
-        currSeats[alp] = IntRange(4, 4)
-        currSeats[grn] = IntRange(0, 1)
-        currSeats[onp] = IntRange(0, 1)
-        currSeats[oth] = IntRange(0, 2)
-        currentSeats.submit(currSeats)
-        prevSeats[lnp] = 6
-        prevSeats[alp] = 4
-        prevSeats[grn] = 1
-        prevSeats[oth] = 1
-        previousSeats.submit(prevSeats)
+        currentSeats.submit(
+            mapOf(
+                lnp to 4..5,
+                alp to 4..4,
+                grn to 0..1,
+                onp to 0..1,
+                oth to 0..2
+            )
+        )
+        previousSeats.submit(
+            mapOf(
+                lnp to 6,
+                alp to 4,
+                grn to 1,
+                oth to 1
+            )
+        )
         compareRendering("SeatViewPanel", "Range-2", panel)
 
-        currSeats[lnp] = IntRange(8, 10)
-        currSeats[alp] = IntRange(7, 8)
-        currSeats[grn] = IntRange(0, 2)
-        currSeats[onp] = IntRange(1, 2)
-        currSeats[nxt] = IntRange(0, 1)
-        currSeats[oth] = IntRange(0, 4)
-        currentSeats.submit(currSeats)
-        prevSeats[lnp] = 12
-        prevSeats[alp] = 8
-        prevSeats[grn] = 2
-        prevSeats[oth] = 2
-        previousSeats.submit(prevSeats)
+        currentSeats.submit(
+            mapOf(
+                lnp to 8..10,
+                alp to 7..8,
+                grn to 0..2,
+                onp to 1..2,
+                nxt to 0..1,
+                oth to 0..4
+            )
+        )
+        previousSeats.submit(
+            mapOf(
+                lnp to 12,
+                alp to 8,
+                grn to 2,
+                oth to 2
+            )
+        )
         compareRendering("SeatViewPanel", "Range-3", panel)
 
-        currSeats[lnp] = IntRange(27, 31)
-        currSeats[alp] = IntRange(25, 27)
-        currSeats[grn] = IntRange(5, 9)
-        currSeats[onp] = IntRange(1, 4)
-        currSeats[nxt] = IntRange(3, 3)
-        currSeats[oth] = IntRange(1, 8)
-        currentSeats.submit(currSeats)
-        prevSeats[lnp] = 33
-        prevSeats[alp] = 25
-        prevSeats[grn] = 10
-        prevSeats[nxt] = 1
-        prevSeats[oth] = 7
-        previousSeats.submit(prevSeats)
+        currentSeats.submit(
+            mapOf(
+                lnp to 27..31,
+                alp to 25..27,
+                grn to 5..9,
+                onp to 1..4,
+                nxt to 3..3,
+                oth to 1..8
+            )
+        )
+        previousSeats.submit(
+            mapOf(
+                lnp to 33,
+                alp to 25,
+                grn to 10,
+                nxt to 1,
+                oth to 7
+            )
+        )
         compareRendering("SeatViewPanel", "Range-4", panel)
     }
 
     @Test
     fun testRangeCurrDiff() {
-        val currentSeats = Publisher(LinkedHashMap<Party, IntRange>())
-        val seatDiff = Publisher(LinkedHashMap<Party, IntRange>())
+        val currentSeats = Publisher(emptyMap<Party, IntRange>())
+        val seatDiff = Publisher(emptyMap<Party, IntRange>())
         val totalSeats = Publisher(76)
         val showMajority = Publisher(true)
         val header = Publisher("AUSTRALIA")
@@ -735,59 +791,75 @@ class SeatViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("SeatViewPanel", "Range-1", panel)
 
-        val currSeats = LinkedHashMap<Party, IntRange>()
-        val diff = LinkedHashMap<Party, IntRange>()
-        currSeats[lnp] = IntRange(4, 5)
-        currSeats[alp] = IntRange(4, 4)
-        currSeats[grn] = IntRange(0, 1)
-        currSeats[onp] = IntRange(0, 1)
-        currSeats[oth] = IntRange(0, 2)
-        currentSeats.submit(currSeats)
-        diff[lnp] = IntRange(-2, -1)
-        diff[alp] = IntRange(0, 0)
-        diff[grn] = IntRange(-1, 0)
-        diff[onp] = IntRange(0, +1)
-        diff[oth] = IntRange(-1, +1)
-        seatDiff.submit(diff)
+        currentSeats.submit(
+            mapOf(
+                lnp to 4..5,
+                alp to 4..4,
+                grn to 0..1,
+                onp to 0..1,
+                oth to 0..2
+            )
+        )
+        seatDiff.submit(
+            mapOf(
+                lnp to -2..-1,
+                alp to 0..0,
+                grn to -1..0,
+                onp to 0..+1,
+                oth to -1..+1
+            )
+        )
         compareRendering("SeatViewPanel", "Range-2", panel)
 
-        currSeats[lnp] = IntRange(8, 10)
-        currSeats[alp] = IntRange(7, 8)
-        currSeats[grn] = IntRange(0, 2)
-        currSeats[onp] = IntRange(1, 2)
-        currSeats[nxt] = IntRange(0, 1)
-        currSeats[oth] = IntRange(0, 4)
-        currentSeats.submit(currSeats)
-        diff[lnp] = IntRange(-4, -2)
-        diff[alp] = IntRange(-1, 0)
-        diff[grn] = IntRange(-2, 0)
-        diff[onp] = IntRange(+1, +2)
-        diff[nxt] = IntRange(0, +1)
-        diff[oth] = IntRange(-2, +2)
-        seatDiff.submit(diff)
+        currentSeats.submit(
+            mapOf(
+                lnp to 8..10,
+                alp to 7..8,
+                grn to 0..2,
+                onp to 1..2,
+                nxt to 0..1,
+                oth to 0..4
+            )
+        )
+        seatDiff.submit(
+            mapOf(
+                lnp to -4..-2,
+                alp to -1..0,
+                grn to -2..0,
+                onp to +1..+2,
+                nxt to 0..+1,
+                oth to -2..+2
+            )
+        )
         compareRendering("SeatViewPanel", "Range-3", panel)
 
-        currSeats[lnp] = IntRange(27, 31)
-        currSeats[alp] = IntRange(25, 27)
-        currSeats[grn] = IntRange(5, 9)
-        currSeats[onp] = IntRange(1, 4)
-        currSeats[nxt] = IntRange(3, 3)
-        currSeats[oth] = IntRange(1, 8)
-        currentSeats.submit(currSeats)
-        diff[lnp] = IntRange(-6, -2)
-        diff[alp] = IntRange(0, +2)
-        diff[grn] = IntRange(-5, -1)
-        diff[onp] = IntRange(+1, +4)
-        diff[nxt] = IntRange(+2, +2)
-        diff[oth] = IntRange(-6, +1)
-        seatDiff.submit(diff)
+        currentSeats.submit(
+            mapOf(
+                lnp to 27..31,
+                alp to 25..27,
+                grn to 5..9,
+                onp to 1..4,
+                nxt to 3..3,
+                oth to 1..8
+            )
+        )
+        seatDiff.submit(
+            mapOf(
+                lnp to -6..-2,
+                alp to 0..+2,
+                grn to -5..-1,
+                onp to +1..+4,
+                nxt to +2..+2,
+                oth to -6..+1
+            )
+        )
         compareRendering("SeatViewPanel", "Range-4", panel)
     }
 
     @Test
     fun testCandidates() {
-        val currentSeats = Publisher(LinkedHashMap<Candidate, Int>())
-        val previousSeats = Publisher(LinkedHashMap<Party, Int>())
+        val currentSeats = Publisher(emptyMap<Candidate, Int>())
+        val previousSeats = Publisher(emptyMap<Party, Int>())
         val totalSeats = Publisher(538)
         val showMajority = Publisher(true)
         val header = Publisher("UNITED STATES")
@@ -806,14 +878,8 @@ class SeatViewPanelTest {
             .withMajorityLine(showMajority) { "$it ELECTORAL VOTES TO WIN" }
             .build(header)
         panel.setSize(1024, 512)
-        val curr = LinkedHashMap<Candidate, Int>()
-        curr[clinton] = 232
-        curr[trump] = 306
-        currentSeats.submit(curr)
-        val prev = LinkedHashMap<Party, Int>()
-        prev[clinton.party] = 332
-        prev[trump.party] = 206
-        previousSeats.submit(prev)
+        currentSeats.submit(mapOf(clinton to 232, trump to 306))
+        previousSeats.submit(mapOf(clinton.party to 332, trump.party to 206))
         winner.submit(trump)
         compareRendering("SeatViewPanel", "Candidate-1", panel)
         winner.submit(null)
@@ -822,8 +888,8 @@ class SeatViewPanelTest {
 
     @Test
     fun testCandidatesDual() {
-        val currentSeats = Publisher(LinkedHashMap<Candidate, Pair<Int, Int>>())
-        val previousSeats = Publisher(LinkedHashMap<Party, Pair<Int, Int>>())
+        val currentSeats = Publisher(emptyMap<Candidate, Pair<Int, Int>>())
+        val previousSeats = Publisher(emptyMap<Party, Pair<Int, Int>>())
         val totalSeats = Publisher(538)
         val showMajority = Publisher(true)
         val header = Publisher("UNITED STATES")
@@ -842,22 +908,16 @@ class SeatViewPanelTest {
         panel.setSize(1024, 512)
         val clinton = Candidate("Hillary Clinton", Party("Democrat", "DEM", Color.BLUE))
         val trump = Candidate("Donald Trump", Party("Republican", "GOP", Color.RED))
-        val curr = LinkedHashMap<Candidate, Pair<Int, Int>>()
-        curr[clinton] = Pair(218, 232)
-        curr[trump] = Pair(276, 306)
-        currentSeats.submit(curr)
-        val prev = LinkedHashMap<Party, Pair<Int, Int>>()
-        prev[clinton.party] = Pair(302, 332)
-        prev[trump.party] = Pair(192, 206)
-        previousSeats.submit(prev)
+        currentSeats.submit(mapOf(clinton to (218 to 232), trump to (276 to 306)))
+        previousSeats.submit(mapOf(clinton.party to (302 to 332), trump.party to (192 to 206)))
         winner.submit(trump)
         compareRendering("SeatViewPanel", "Candidate-2", panel)
     }
 
     @Test
     fun testCandidatesRange() {
-        val currentSeats = Publisher(LinkedHashMap<Candidate, IntRange>())
-        val previousSeats = Publisher(LinkedHashMap<Party, Int>())
+        val currentSeats = Publisher(emptyMap<Candidate, IntRange>())
+        val previousSeats = Publisher(emptyMap<Party, Int>())
         val totalSeats = Publisher(538)
         val showMajority = Publisher(true)
         val header = Publisher("UNITED STATES")
@@ -866,14 +926,8 @@ class SeatViewPanelTest {
         val changeHeader = Publisher("CHANGE SINCE 2012")
         val clinton = Candidate("Hillary Clinton", Party("Democrat", "DEM", Color.BLUE))
         val trump = Candidate("Donald Trump", Party("Republican", "GOP", Color.RED))
-        val curr = LinkedHashMap<Candidate, IntRange>()
-        val prev = LinkedHashMap<Party, Int>()
-        curr[clinton] = IntRange(303 - 65, 303 + 65)
-        curr[trump] = IntRange(235 - 65, 235 + 65)
-        currentSeats.submit(curr)
-        prev[clinton.party] = 332
-        prev[trump.party] = 206
-        previousSeats.submit(prev)
+        currentSeats.submit(mapOf(clinton to 238..368, trump to 170..300))
+        previousSeats.submit(mapOf(clinton.party to 332, trump.party to 206))
         val panel = candidateRangeSeats(
             currentSeats, seatHeader, seatSubhead
         )
@@ -887,8 +941,8 @@ class SeatViewPanelTest {
 
     @Test
     fun testPartySeatsTicked() {
-        val currentSeats = Publisher(LinkedHashMap<Party, Int>())
-        val previousSeats = Publisher(LinkedHashMap<Party, Int>())
+        val currentSeats = Publisher(emptyMap<Party, Int>())
+        val previousSeats = Publisher(emptyMap<Party, Int>())
         val totalSeats = Publisher(435)
         val showMajority = Publisher(true)
         val header = Publisher("UNITED STATES")
@@ -907,22 +961,16 @@ class SeatViewPanelTest {
         panel.setSize(1024, 512)
         val dem = Party("Democrat", "DEM", Color.BLUE)
         val gop = Party("Republican", "GOP", Color.RED)
-        val curr = LinkedHashMap<Party, Int>()
-        curr[dem] = 235
-        curr[gop] = 200
-        currentSeats.submit(curr)
-        val prev = LinkedHashMap<Party, Int>()
-        prev[dem] = 194
-        prev[gop] = 241
-        previousSeats.submit(prev)
+        currentSeats.submit(mapOf(dem to 235, gop to 200))
+        previousSeats.submit(mapOf(dem to 194, gop to 241))
         winner.submit(dem)
         compareRendering("SeatViewPanel", "PartyTick-1", panel)
     }
 
     @Test
     fun testPartySeatsTickedDual() {
-        val currentSeats = Publisher(LinkedHashMap<Party, Pair<Int, Int>>())
-        val previousSeats = Publisher(LinkedHashMap<Party, Pair<Int, Int>>())
+        val currentSeats = Publisher(emptyMap<Party, Pair<Int, Int>>())
+        val previousSeats = Publisher(emptyMap<Party, Pair<Int, Int>>())
         val totalSeats = Publisher(435)
         val showMajority = Publisher(true)
         val header = Publisher("UNITED STATES")
@@ -941,14 +989,8 @@ class SeatViewPanelTest {
         panel.setSize(1024, 512)
         val dem = Party("Democrat", "DEM", Color.BLUE)
         val gop = Party("Republican", "GOP", Color.RED)
-        val curr = LinkedHashMap<Party, Pair<Int, Int>>()
-        curr[dem] = Pair(224, 235)
-        curr[gop] = Pair(192, 200)
-        currentSeats.submit(curr)
-        val prev = LinkedHashMap<Party, Pair<Int, Int>>()
-        prev[dem] = Pair(193, 194)
-        prev[gop] = Pair(223, 241)
-        previousSeats.submit(prev)
+        currentSeats.submit(mapOf(dem to (224 to 235), gop to (192 to 200)))
+        previousSeats.submit(mapOf(dem to (193 to 194), gop to (223 to 241)))
         winner.submit(dem)
         compareRendering("SeatViewPanel", "PartyTick-2", panel)
     }
@@ -973,7 +1015,7 @@ class SeatViewPanelTest {
         val swingPartyOrder = listOf(ndp, grn, lib, pc)
         val shapesByDistrict = peiShapesByDistrict()
         val focus = Publisher(shapesByDistrict.keys.filter { it <= 7 })
-        val additionalHighlight = Publisher<List<Int>>(ArrayList(shapesByDistrict.keys))
+        val additionalHighlight = Publisher<List<Int>>(shapesByDistrict.keys.toList())
         val winnerByDistrict = Publisher(mapOf<Int, PartyResult>())
         val panel = partySeats(
             currentSeats, seatHeader, seatSubhead
@@ -1013,10 +1055,10 @@ class SeatViewPanelTest {
         sequenceOf(dup, uup, tuv, con, pup, ukip, indU).forEach { mapping[it] = unionists }
         sequenceOf(sf, sdlp, wp, indN).forEach { mapping[it] = nationalists }
         sequenceOf(apni, grn, pbp, lab, indO).forEach { mapping[it] = others }
-        val currentSeats = Publisher(LinkedHashMap<Party, Int>())
-        val previousSeats = Publisher(LinkedHashMap<Party, Int>())
-        val currentVotes = Publisher(LinkedHashMap<Party, Int>())
-        val previousVotes = Publisher(LinkedHashMap<Party, Int>())
+        val currentSeats = Publisher(emptyMap<Party, Int>())
+        val previousSeats = Publisher(emptyMap<Party, Int>())
+        val currentVotes = Publisher(emptyMap<Party, Int>())
+        val previousVotes = Publisher(emptyMap<Party, Int>())
         val totalSeats = Publisher(90)
         val header = Publisher("NORTHERN IRELAND")
         val seatHeader = Publisher("2017 RESULTS")
@@ -1033,65 +1075,73 @@ class SeatViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("SeatViewPanel", "PartyClassifications-1", panel)
 
-        val currSeats = LinkedHashMap<Party, Int>()
-        currSeats[dup] = 28
-        currSeats[sf] = 27
-        currSeats[sdlp] = 12
-        currSeats[uup] = 10
-        currSeats[apni] = 8
-        currSeats[grn] = 2
-        currSeats[tuv] = 1
-        currSeats[pbp] = 1
-        currSeats[indU] = 1
-        currentSeats.submit(currSeats)
-        val prevSeats = LinkedHashMap<Party, Int>()
-        prevSeats[dup] = 33
-        prevSeats[sf] = 23
-        prevSeats[sdlp] = 11
-        prevSeats[uup] = 11
-        prevSeats[apni] = 8
-        prevSeats[grn] = 2
-        prevSeats[tuv] = 1
-        prevSeats[pbp] = 1
-        previousSeats.submit(prevSeats)
-        val currVotes = LinkedHashMap<Party, Int>()
-        currVotes[dup] = 225413
-        currVotes[sf] = 224245
-        currVotes[sdlp] = 95958
-        currVotes[uup] = 103314
-        currVotes[apni] = 72717
-        currVotes[grn] = 18527
-        currVotes[tuv] = 20523
-        currVotes[pbp] = 14100
-        currVotes[pup] = 5590
-        currVotes[con] = 2399
-        currVotes[lab] = 2009
-        currVotes[ukip] = 1579
-        currVotes[cista] = 1273
-        currVotes[wp] = 1261
-        currVotes[indU] = 4918
-        currVotes[indN] = 1639
-        currVotes[indO] = 7850
-        currentVotes.submit(currVotes)
-        val prevVotes = LinkedHashMap<Party, Int>()
-        prevVotes[dup] = 202567
-        prevVotes[sf] = 166785
-        prevVotes[uup] = 87302
-        prevVotes[sdlp] = 83368
-        prevVotes[apni] = 48447
-        prevVotes[tuv] = 23776
-        prevVotes[grn] = 18718
-        prevVotes[pbp] = 13761
-        prevVotes[ukip] = 10109
-        prevVotes[pup] = 5955
-        prevVotes[con] = 2554
-        prevVotes[cista] = 2510
-        prevVotes[lab] = 1939 + 1577
-        prevVotes[wp] = 1565
-        prevVotes[indU] = 351 + 3270
-        prevVotes[indN] = 0
-        prevVotes[indO] = 224 + 124 + 32 + 19380
-        previousVotes.submit(prevVotes)
+        currentSeats.submit(
+            mapOf(
+                dup to 28,
+                sf to 27,
+                sdlp to 12,
+                uup to 10,
+                apni to 8,
+                grn to 2,
+                tuv to 1,
+                pbp to 1,
+                indU to 1,
+            )
+        )
+        previousSeats.submit(
+            mapOf(
+                dup to 33,
+                sf to 23,
+                sdlp to 11,
+                uup to 11,
+                apni to 8,
+                grn to 2,
+                tuv to 1,
+                pbp to 1,
+            )
+        )
+        currentVotes.submit(
+            mapOf(
+                dup to 225413,
+                sf to 224245,
+                sdlp to 95958,
+                uup to 103314,
+                apni to 72717,
+                grn to 18527,
+                tuv to 20523,
+                pbp to 14100,
+                pup to 5590,
+                con to 2399,
+                lab to 2009,
+                ukip to 1579,
+                cista to 1273,
+                wp to 1261,
+                indU to 4918,
+                indN to 1639,
+                indO to 7850,
+            )
+        )
+        previousVotes.submit(
+            mapOf(
+                dup to 202567,
+                sf to 166785,
+                uup to 87302,
+                sdlp to 83368,
+                apni to 48447,
+                tuv to 23776,
+                grn to 18718,
+                pbp to 13761,
+                ukip to 10109,
+                pup to 5955,
+                con to 2554,
+                cista to 2510,
+                lab to 1939 + 1577,
+                wp to 1565,
+                indU to 351 + 3270,
+                indN to 0,
+                indO to 224 + 124 + 32 + 19380,
+            )
+        )
         compareRendering("SeatViewPanel", "PartyClassifications-2", panel)
     }
 
@@ -1331,8 +1381,8 @@ class SeatViewPanelTest {
 
     @Test
     fun testProgressLabel() {
-        val currentSeats = Publisher(LinkedHashMap<Party, Int>())
-        val previousSeats = Publisher(LinkedHashMap<Party, Int>())
+        val currentSeats = Publisher(emptyMap<Party, Int>())
+        val previousSeats = Publisher(emptyMap<Party, Int>())
         val totalSeats = Publisher(650)
         val showMajority = Publisher(true)
         val header = Publisher("UNITED KINGDOM")
@@ -1358,12 +1408,8 @@ class SeatViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("SeatViewPanel", "ProgressLabel-1", panel)
 
-        val currSeats = LinkedHashMap<Party, Int>()
-        val prevSeats = LinkedHashMap<Party, Int>()
-        currSeats[lab] = 1
-        currentSeats.submit(currSeats)
-        prevSeats[lab] = 1
-        previousSeats.submit(prevSeats)
+        currentSeats.submit(mapOf(lab to 1))
+        previousSeats.submit(mapOf(lab to 1))
         progressLabel.submit("1/650")
         compareRendering("SeatViewPanel", "ProgressLabel-2", panel)
     }

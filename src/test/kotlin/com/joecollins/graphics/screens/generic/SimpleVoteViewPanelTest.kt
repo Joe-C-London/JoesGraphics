@@ -29,18 +29,22 @@ class SimpleVoteViewPanelTest {
         val pc = Candidate("Cory Deagle", Party("Progressive Conservative", "PC", Color.BLUE))
         val lib = Candidate("Daphne Griffin", Party("Liberal", "LIB", Color.RED))
         val grn = Candidate("John Allen MacLean", Party("Green", "GRN", Color.GREEN.darker()))
-        val curr = LinkedHashMap<Candidate, Int>()
-        curr[ndp] = 124
-        curr[pc] = 1373
-        curr[lib] = 785
-        curr[grn] = 674
-        val prev = LinkedHashMap<Party, Int>()
-        prev[ndp.party] = 585
-        prev[pc.party] = 785
-        prev[lib.party] = 1060
-        prev[grn.party] = 106
-        val currentVotes = Publisher(curr)
-        val previousVotes = Publisher(prev)
+        val currentVotes = Publisher(
+            mapOf(
+                ndp to 124,
+                pc to 1373,
+                lib to 785,
+                grn to 674,
+            )
+        )
+        val previousVotes = Publisher(
+            mapOf(
+                ndp.party to 585,
+                pc.party to 785,
+                lib.party to 1060,
+                grn.party to 106,
+            )
+        )
         val header = Publisher("MONTAGUE-KILMUIR")
         val voteHeader = Publisher("9 OF 9 POLLS REPORTING")
         val voteSubhead = Publisher("PROJECTION: PC GAIN FROM LIB")
@@ -76,24 +80,28 @@ class SimpleVoteViewPanelTest {
         val ml = Candidate("Eileen Studd", Party("Marxist-Leninist", "M-L", Color.RED))
         val rhino = Candidate("Rhino Jacques B\u00e9langer", Party("Rhinoceros", "RHINO", Color.GRAY))
         val ind = Candidate("Julien C\u00f4t\u00e9", Party("Independent", "IND", Color.GRAY))
-        val curr = LinkedHashMap<Candidate, Int>()
-        curr[ndp] = 8628
-        curr[con] = 3690
-        curr[lib] = 22803
-        curr[grn] = 3583
-        curr[bq] = 12619
-        curr[ppc] = 490
-        curr[ml] = 39
-        curr[rhino] = 265
-        curr[ind] = 274
-        val prev = LinkedHashMap<Party, Int>()
-        prev[ndp.party] = 15566
-        prev[con.party] = 3713
-        prev[lib.party] = 23603
-        prev[grn.party] = 1717
-        prev[bq.party] = 9164
-        val currentVotes = Publisher(curr)
-        val previousVotes = Publisher(prev)
+        val currentVotes = Publisher(
+            mapOf(
+                ndp to 8628,
+                con to 3690,
+                lib to 22803,
+                grn to 3583,
+                bq to 12619,
+                ppc to 490,
+                ml to 39,
+                rhino to 265,
+                ind to 274,
+            )
+        )
+        val previousVotes = Publisher(
+            mapOf(
+                ndp.party to 15566,
+                con.party to 3713,
+                lib.party to 23603,
+                grn.party to 1717,
+                bq.party to 9164,
+            )
+        )
         val header = Publisher("LASALLE\u2014\u00c9MARD\u2014VERDUN")
         val voteHeader = Publisher("100% OF POLLS REPORTING")
         val voteSubhead = Publisher("PROJECTION: LIB HOLD")
@@ -119,18 +127,22 @@ class SimpleVoteViewPanelTest {
         val pc = Candidate("Cory Deagle", Party("Progressive Conservative", "PC", Color.BLUE))
         val lib = Candidate("Daphne Griffin", Party("Liberal", "LIB", Color.RED))
         val grn = Candidate("John Allen MacLean", Party("Green", "GRN", Color.GREEN.darker()))
-        val curr = LinkedHashMap<Candidate, Int>()
-        curr[ndp] = 124
-        curr[pc] = 1373
-        curr[lib] = 785
-        curr[grn] = 674
-        val prev = LinkedHashMap<Party, Int>()
-        prev[ndp.party] = 585
-        prev[pc.party] = 785
-        prev[lib.party] = 1060
-        prev[grn.party] = 106
-        val currentVotes = Publisher(curr)
-        val previousVotes = Publisher(prev)
+        val currentVotes = Publisher(
+            mapOf(
+                ndp to 124,
+                pc to 1373,
+                lib to 785,
+                grn to 674,
+            )
+        )
+        val previousVotes = Publisher(
+            mapOf(
+                ndp.party to 585,
+                pc.party to 785,
+                lib.party to 1060,
+                grn.party to 106,
+            )
+        )
         val header = Publisher("MONTAGUE-KILMUIR")
         val voteHeader = Publisher("9 OF 9 POLLS REPORTING")
         val voteSubhead = Publisher("PROJECTION: PC GAIN FROM LIB")
@@ -160,18 +172,15 @@ class SimpleVoteViewPanelTest {
         val pc = Candidate("Cory Deagle", Party("Progressive Conservative", "PC", Color.BLUE))
         val lib = Candidate("Daphne Griffin", Party("Liberal", "LIB", Color.RED))
         val grn = Candidate("John Allen MacLean", Party("Green", "GRN", Color.GREEN.darker()))
-        val curr = LinkedHashMap<Candidate, Int>()
-        curr[ndp] = 0
-        curr[pc] = 0
-        curr[lib] = 0
-        curr[grn] = 0
-        val prev = LinkedHashMap<Party, Int>()
-        prev[ndp.party] = 585
-        prev[pc.party] = 785
-        prev[lib.party] = 1060
-        prev[grn.party] = 106
-        val currentVotes = Publisher(curr)
-        val previousVotes = Publisher(prev)
+        val currentVotes = Publisher(sequenceOf(ndp, pc, lib, grn).associateWith { 0 })
+        val previousVotes = Publisher(
+            mapOf(
+                ndp.party to 585,
+                pc.party to 785,
+                lib.party to 1060,
+                grn.party to 106,
+            )
+        )
         val pctReporting = Publisher(0.0)
         val header = Publisher("MONTAGUE-KILMUIR")
         val voteHeader = Publisher("0 OF 9 POLLS REPORTING")
@@ -197,44 +206,56 @@ class SimpleVoteViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "Update-1", panel)
 
-        curr[ndp] = 5
-        curr[pc] = 47
-        curr[lib] = 58
-        curr[grn] = 52
-        currentVotes.submit(curr)
+        currentVotes.submit(
+            mapOf(
+                ndp to 5,
+                pc to 47,
+                lib to 58,
+                grn to 52,
+            )
+        )
         voteHeader.submit("1 OF 9 POLLS REPORTING")
         voteSubhead.submit("PROJECTION: TOO EARLY TO CALL")
         pctReporting.submit(1.0 / 9)
         leader.submit(leading(lib.party))
         compareRendering("SimpleVoteViewPanel", "Update-2", panel)
 
-        curr[ndp] = 8
-        curr[pc] = 91
-        curr[lib] = 100
-        curr[grn] = 106
-        currentVotes.submit(curr)
+        currentVotes.submit(
+            mapOf(
+                ndp to 8,
+                pc to 91,
+                lib to 100,
+                grn to 106,
+            )
+        )
         voteHeader.submit("2 OF 9 POLLS REPORTING")
         voteSubhead.submit("PROJECTION: TOO EARLY TO CALL")
         pctReporting.submit(2.0 / 9)
         leader.submit(leading(grn.party))
         compareRendering("SimpleVoteViewPanel", "Update-3", panel)
 
-        curr[ndp] = 18
-        curr[pc] = 287
-        curr[lib] = 197
-        curr[grn] = 243
-        currentVotes.submit(curr)
+        currentVotes.submit(
+            mapOf(
+                ndp to 18,
+                pc to 287,
+                lib to 197,
+                grn to 243,
+            )
+        )
         voteHeader.submit("5 OF 9 POLLS REPORTING")
         voteSubhead.submit("PROJECTION: TOO EARLY TO CALL")
         pctReporting.submit(5.0 / 9)
         leader.submit(leading(pc.party))
         compareRendering("SimpleVoteViewPanel", "Update-4", panel)
 
-        curr[ndp] = 124
-        curr[pc] = 1373
-        curr[lib] = 785
-        curr[grn] = 675
-        currentVotes.submit(curr)
+        currentVotes.submit(
+            mapOf(
+                ndp to 124,
+                pc to 1373,
+                lib to 785,
+                grn to 675,
+            )
+        )
         voteHeader.submit("9 OF 9 POLLS REPORTING")
         voteSubhead.submit("PROJECTION: PC GAIN FROM LIB")
         pctReporting.submit(9.0 / 9)
@@ -252,18 +273,22 @@ class SimpleVoteViewPanelTest {
         val pc = Candidate("Cory Deagle", Party("Progressive Conservative", "PC", Color.BLUE))
         val lib = Candidate("Daphne Griffin", Party("Liberal", "LIB", Color.RED))
         val grn = Candidate("John Allen MacLean", Party("Green", "GRN", Color.GREEN.darker()))
-        val curr = LinkedHashMap<Candidate, Int>()
-        curr[ndp] = 6
-        curr[pc] = 8
-        curr[lib] = 11
-        curr[grn] = 0
-        val prev = LinkedHashMap<Party, Int>()
-        prev[ndp.party] = 585
-        prev[pc.party] = 785
-        prev[lib.party] = 1060
-        prev[grn.party] = 106
-        val currentVotes = Publisher(curr)
-        val previousVotes = Publisher(prev)
+        val currentVotes = Publisher(
+            mapOf(
+                ndp to 6,
+                pc to 8,
+                lib to 11,
+                grn to 0,
+            )
+        )
+        val previousVotes = Publisher(
+            mapOf(
+                ndp.party to 585,
+                pc.party to 785,
+                lib.party to 1060,
+                grn.party to 106,
+            )
+        )
         val pctReporting = Publisher(1.0 / 9)
         val header = Publisher("MONTAGUE-KILMUIR")
         val voteHeader = Publisher("1 OF 9 POLLS REPORTING")
@@ -296,10 +321,8 @@ class SimpleVoteViewPanelTest {
         val pc = Party("Progressive Conservative", "PC", Color.BLUE)
         val lib = Party("Liberal", "LIB", Color.RED)
         val grn = Party("Green", "GRN", Color.GREEN.darker())
-        val curr = LinkedHashMap<Party, Int>()
-        val prev = LinkedHashMap<Party, Int>()
-        val currentVotes = Publisher(curr)
-        val previousVotes = Publisher(prev)
+        val currentVotes = Publisher(emptyMap<Party, Int>())
+        val previousVotes = Publisher(emptyMap<Party, Int>())
         val pctReporting = Publisher(0.0)
         val header = Publisher("PRINCE EDWARD ISLAND")
         val voteHeader = Publisher("0 OF 27 DISTRICTS DECLARED")
@@ -322,17 +345,23 @@ class SimpleVoteViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "PopularVote-1", panel)
 
-        val winners = LinkedHashMap<Int, Party?>()
-        curr[ndp] = 124
-        curr[pc] = 1373
-        curr[lib] = 785
-        curr[grn] = 675
-        currentVotes.submit(curr)
-        prev[ndp] = 585
-        prev[pc] = 785
-        prev[lib] = 1060
-        prev[grn] = 106
-        previousVotes.submit(prev)
+        val winners = mutableMapOf<Int, Party?>()
+        currentVotes.submit(
+            mapOf(
+                ndp to 124,
+                pc to 1373,
+                lib to 785,
+                grn to 675,
+            )
+        )
+        previousVotes.submit(
+            mapOf(
+                ndp to 585,
+                pc to 785,
+                lib to 1060,
+                grn to 106,
+            )
+        )
         voteHeader.submit("1 OF 27 DISTRICTS DECLARED")
         voteSubhead.submit("PROJECTION: TOO EARLY TO CALL")
         pctReporting.submit(1.0 / 27)
@@ -352,16 +381,20 @@ class SimpleVoteViewPanelTest {
     fun testPartyVoteTickScreen() {
         val dem = Party("DEMOCRAT", "DEM", Color.BLUE)
         val gop = Party("REPUBLICAN", "GOP", Color.RED)
-        val curr = LinkedHashMap<Party, Int>()
-        curr[dem] = 60572245
-        curr[gop] = 50861970
-        curr[Party.OTHERS] = 1978774
-        val prev = LinkedHashMap<Party, Int>()
-        prev[dem] = 61776554
-        prev[gop] = 63173815
-        prev[Party.OTHERS] = 3676641
-        val currentVotes = Publisher(curr)
-        val previousVotes = Publisher(prev)
+        val currentVotes = Publisher(
+            mapOf(
+                dem to 60572245,
+                gop to 50861970,
+                Party.OTHERS to 1978774,
+            )
+        )
+        val previousVotes = Publisher(
+            mapOf(
+                dem to 61776554,
+                gop to 63173815,
+                Party.OTHERS to 3676641,
+            )
+        )
         val pctReporting = Publisher(1.0)
         val header = Publisher("UNITED STATES")
         val voteHeader = Publisher("HOUSE OF REPRESENTATIVES")
@@ -388,27 +421,31 @@ class SimpleVoteViewPanelTest {
         val gop = Party("REPUBLICAN", "GOP", Color.RED)
         val lbt = Party("LIBERTARIAN", "LBT", Color.ORANGE)
         val ind = Party("INDEPENDENT", "IND", Color.GRAY)
-        val curr = LinkedHashMap<Candidate, Int>()
-        curr[Candidate("Raul Barrera", dem)] = 1747
-        curr[Candidate("Bech Bruun", gop)] = 1570
-        curr[Candidate("Michael Cloud", gop)] = 19856
-        curr[Candidate("Judith Cutright", ind)] = 172
-        curr[Candidate("Eric Holguin", dem)] = 11595
-        curr[Candidate("Marty Perez", gop)] = 276
-        curr[Candidate("Christopher Suprun", ind)] = 51
-        curr[Candidate("Daniel Tinus", lbt)] = 144
-        curr[Candidate("Mike Westergren", dem)] = 858
-        val prev = LinkedHashMap<Party, Int>()
-        prev[dem] = 88329
-        prev[gop] = 142251
-        val currentVotes = Publisher(curr)
-        val previousVotes = Publisher(prev)
+        val currentVotes = Publisher(
+            mapOf(
+                Candidate("Raul Barrera", dem) to 1747,
+                Candidate("Bech Bruun", gop) to 1570,
+                Candidate("Michael Cloud", gop) to 19856,
+                Candidate("Judith Cutright", ind) to 172,
+                Candidate("Eric Holguin", dem) to 11595,
+                Candidate("Marty Perez", gop) to 276,
+                Candidate("Christopher Suprun", ind) to 51,
+                Candidate("Daniel Tinus", lbt) to 144,
+                Candidate("Mike Westergren", dem) to 858,
+            )
+        )
+        val previousVotes = Publisher(
+            mapOf(
+                dem to 88329,
+                gop to 142251,
+            )
+        )
         val header = Publisher("TEXAS DISTRICT 27")
         val voteHeader = Publisher("OFFICIAL RESULT")
         val voteSubhead = Publisher("GOP HOLD")
         val changeHeader = Publisher("CHANGE SINCE 2016")
         val swingHeader = Publisher("SWING SINCE 2016")
-        val winner = Publisher(curr.entries.maxByOrNull { it.value }!!.key)
+        val winner = Publisher(Candidate("Michael Cloud", gop))
         val swingPartyOrder = listOf(dem, gop)
         val panel = candidateVotes(
             currentVotes, voteHeader, voteSubhead
@@ -425,16 +462,18 @@ class SimpleVoteViewPanelTest {
     fun testCandidateMajorityLine() {
         val lrem = Party("LA R\u00c9PUBLIQUE EN MARCHE", "LREM", Color.ORANGE)
         val fn = Party("FRONT NATIONAL", "FN", Color.BLUE)
-        val curr = LinkedHashMap<Candidate, Int>()
-        curr[Candidate("Emmanuel Macron", lrem)] = 20743128
-        curr[Candidate("Marine Le Pen", fn)] = 10638475
-        val currentVotes = Publisher(curr)
+        val currentVotes = Publisher(
+            mapOf(
+                Candidate("Emmanuel Macron", lrem) to 20743128,
+                Candidate("Marine Le Pen", fn) to 10638475,
+            )
+        )
         val header = Publisher("FRANCE PRESIDENT: ROUND 2")
         val voteHeader = Publisher("OFFICIAL RESULT")
         val voteSubhead = Publisher("MACRON WIN")
         val showMajority = Publisher(true)
         val pctReporting = Publisher(1.0)
-        val winner = Publisher<Candidate?>(curr.entries.maxByOrNull { it.value }!!.key)
+        val winner = Publisher<Candidate?>(Candidate("Emmanuel Macron", lrem))
         val panel = candidateVotes(
             currentVotes, voteHeader, voteSubhead
         )
@@ -448,14 +487,20 @@ class SimpleVoteViewPanelTest {
         voteSubhead.submit("PROJECTION: MACRON WIN")
         pctReporting.submit(0.154)
         winner.submit(null)
-        curr[Candidate("Emmanuel Macron", lrem)] = 3825279
-        curr[Candidate("Marine Le Pen", fn)] = 1033686
-        currentVotes.submit(curr)
+        currentVotes.submit(
+            mapOf(
+                Candidate("Emmanuel Macron", lrem) to 3825279,
+                Candidate("Marine Le Pen", fn) to 1033686,
+            )
+        )
         compareRendering("SimpleVoteViewPanel", "MajorityLine-2", panel)
         pctReporting.submit(0.0)
-        curr[Candidate("Emmanuel Macron", lrem)] = 0
-        curr[Candidate("Marine Le Pen", fn)] = 0
-        currentVotes.submit(curr)
+        currentVotes.submit(
+            mapOf(
+                Candidate("Emmanuel Macron", lrem) to 0,
+                Candidate("Marine Le Pen", fn) to 0,
+            )
+        )
         voteHeader.submit("0.0% REPORTING")
         voteSubhead.submit("")
         compareRendering("SimpleVoteViewPanel", "MajorityLine-3", panel)
@@ -467,18 +512,22 @@ class SimpleVoteViewPanelTest {
         val pc = Candidate("Cory Deagle", Party("Progressive Conservative", "PC", Color.BLUE))
         val lib = Candidate("Daphne Griffin", Party("Liberal", "LIB", Color.RED))
         val grn = Candidate("John Allen MacLean", Party("Green", "GRN", Color.GREEN.darker()))
-        val curr = LinkedHashMap<Candidate, Int>()
-        curr[ndp] = 124
-        curr[pc] = 1373
-        curr[lib] = 785
-        curr[grn] = 674
-        val prev = LinkedHashMap<Party, Int>()
-        prev[ndp.party] = 585
-        prev[pc.party] = 785
-        prev[lib.party] = 1060
-        prev[grn.party] = 106
-        val currentVotes = Publisher(curr)
-        val previousVotes = Publisher(prev)
+        val currentVotes = Publisher(
+            mapOf(
+                ndp to 124,
+                pc to 1373,
+                lib to 785,
+                grn to 674,
+            )
+        )
+        val previousVotes = Publisher(
+            mapOf(
+                ndp.party to 585,
+                pc.party to 785,
+                lib.party to 1060,
+                grn.party to 106,
+            )
+        )
         val header = Publisher("MONTAGUE-KILMUIR")
         val voteHeader = Publisher("9 OF 9 POLLS REPORTING")
         val voteSubhead = Publisher("PROJECTION: PC GAIN FROM LIB")
@@ -490,7 +539,7 @@ class SimpleVoteViewPanelTest {
         val swingPartyOrder = listOf(ndp.party, grn.party, lib.party, pc.party)
         val shapesByDistrict = peiShapesByDistrict()
         val focus = Publisher(shapesByDistrict.keys.filter { it <= 7 })
-        val additionalHighlight = Publisher<List<Int>>(ArrayList(shapesByDistrict.keys))
+        val additionalHighlight = Publisher<List<Int>>(shapesByDistrict.keys.toList())
         val selectedDistrict = Publisher(3)
         val panel = candidateVotes(
             currentVotes, voteHeader, voteSubhead
@@ -506,19 +555,20 @@ class SimpleVoteViewPanelTest {
     @Test
     fun testCandidateUncontested() {
         val dem = Candidate("Joe Kennedy III", Party("Democratic", "DEM", Color.BLUE))
-        val curr = LinkedHashMap<Candidate, Int>()
-        curr[dem] = 0
-        val prev = LinkedHashMap<Party, Int>()
-        prev[dem.party] = 265823
-        prev[Party("Republican", "GOP", Color.RED)] = 113055
-        val currentVotes = Publisher(curr)
-        val previousVotes = Publisher(prev)
+        val gop = Party("Republican", "GOP", Color.RED)
+        val currentVotes = Publisher(mapOf(dem to 0))
+        val previousVotes = Publisher(
+            mapOf(
+                dem.party to 265823,
+                gop to 113055
+            )
+        )
         val header = Publisher("MASSACHUSETTS DISTRICT 4")
         val voteHeader = Publisher("0.0% OF POLLS REPORTING")
         val voteSubhead = Publisher("")
         val changeHeader = Publisher("CHANGE SINCE 2016")
         val swingHeader = Publisher("SWING SINCE 2016")
-        val swingPartyOrder: List<Party> = ArrayList(prev.keys)
+        val swingPartyOrder: List<Party> = listOf(dem.party, gop)
         val panel = candidateVotes(
             currentVotes, voteHeader, voteSubhead
         )
@@ -531,26 +581,15 @@ class SimpleVoteViewPanelTest {
 
     @Test
     fun testCandidatesSwitchingBetweenSingleAndDoubleLines() {
-        val result2017 = LinkedHashMap<Candidate, Int>()
-        result2017[Candidate("Boris Johnson", Party("Conservative", "CON", Color.BLUE))] = 23716
-        result2017[Candidate("Vincent Lo", Party("Labour", "LAB", Color.RED))] = 18682
-        result2017[Candidate("Rosina Robson", Party("Liberal Democrats", "LD", Color.ORANGE))] = 1835
-        result2017[Candidate("Lizzy Kemp", Party("UK Independence Party", "UKIP", Color.MAGENTA.darker()))] = 1577
-        result2017[Candidate("Mark Keir", Party("Green", "GRN", Color.GREEN.darker()))] = 884
-        val result2019 = LinkedHashMap<Candidate, Int>()
-        result2019[Candidate("Count Binface", Party("Independent", "IND", Color.GRAY))] = 69
-        result2019[Candidate("Lord Buckethead", Party("Monster Raving Loony Party", "MRLP", Color.YELLOW))] = 125
-        result2019[Candidate("Norma Burke", Party("Independent", "IND", Color.GRAY))] = 22
-        result2019[Candidate("Geoffrey Courtenay", Party("UK Independence Party", "UKIP", Color.MAGENTA.darker()))] = 283
-        result2019[Candidate("Joanne Humphreys", Party("Liberal Democrats", "LD", Color.ORANGE))] = 3026
-        result2019[Candidate("Boris Johnson", Party("Conservative", "CON", Color.BLUE))] = 25351
-        result2019[Candidate("Mark Keir", Party("Green", "GRN", Color.GREEN.darker()))] = 1090
-        result2019[Candidate("Ali Milani", Party("Labour", "LAB", Color.RED))] = 18141
-        result2019[Candidate("Bobby Smith", Party("Independent", "IND", Color.GRAY))] = 8
-        result2019[Candidate("William Tobin", Party("Independent", "IND", Color.GRAY))] = 5
-        result2019[Candidate("Alfie Utting", Party("Independent", "IND", Color.GRAY))] = 44
-        result2019[Candidate("Yace \"Interplanetary Time Lord\" Yogenstein", Party("Independent", "IND", Color.GRAY))] = 23
-        val currentVotes = Publisher(result2017)
+        val currentVotes = Publisher(
+            mapOf(
+                Candidate("Boris Johnson", Party("Conservative", "CON", Color.BLUE)) to 23716,
+                Candidate("Vincent Lo", Party("Labour", "LAB", Color.RED)) to 18682,
+                Candidate("Rosina Robson", Party("Liberal Democrats", "LD", Color.ORANGE)) to 1835,
+                Candidate("Lizzy Kemp", Party("UK Independence Party", "UKIP", Color.MAGENTA.darker())) to 1577,
+                Candidate("Mark Keir", Party("Green", "GRN", Color.GREEN.darker())) to 884,
+            )
+        )
         val header = Publisher("UXBRIDGE AND SOUTH RUISLIP")
         val voteHeader = Publisher("2017 RESULT")
         val voteSubhead = Publisher("")
@@ -560,10 +599,33 @@ class SimpleVoteViewPanelTest {
             .build(header)
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "LotsOfCandidates-1", panel)
-        currentVotes.submit(result2019)
+        currentVotes.submit(
+            mapOf(
+                Candidate("Count Binface", Party("Independent", "IND", Color.GRAY)) to 69,
+                Candidate("Lord Buckethead", Party("Monster Raving Loony Party", "MRLP", Color.YELLOW)) to 125,
+                Candidate("Norma Burke", Party("Independent", "IND", Color.GRAY)) to 22,
+                Candidate("Geoffrey Courtenay", Party("UK Independence Party", "UKIP", Color.MAGENTA.darker())) to 283,
+                Candidate("Joanne Humphreys", Party("Liberal Democrats", "LD", Color.ORANGE)) to 3026,
+                Candidate("Boris Johnson", Party("Conservative", "CON", Color.BLUE)) to 25351,
+                Candidate("Mark Keir", Party("Green", "GRN", Color.GREEN.darker())) to 1090,
+                Candidate("Ali Milani", Party("Labour", "LAB", Color.RED)) to 18141,
+                Candidate("Bobby Smith", Party("Independent", "IND", Color.GRAY)) to 8,
+                Candidate("William Tobin", Party("Independent", "IND", Color.GRAY)) to 5,
+                Candidate("Alfie Utting", Party("Independent", "IND", Color.GRAY)) to 44,
+                Candidate("Yace \"Interplanetary Time Lord\" Yogenstein", Party("Independent", "IND", Color.GRAY)) to 23,
+            )
+        )
         voteHeader.submit("2019 RESULT")
         compareRendering("SimpleVoteViewPanel", "LotsOfCandidates-2", panel)
-        currentVotes.submit(result2017)
+        currentVotes.submit(
+            mapOf(
+                Candidate("Boris Johnson", Party("Conservative", "CON", Color.BLUE)) to 23716,
+                Candidate("Vincent Lo", Party("Labour", "LAB", Color.RED)) to 18682,
+                Candidate("Rosina Robson", Party("Liberal Democrats", "LD", Color.ORANGE)) to 1835,
+                Candidate("Lizzy Kemp", Party("UK Independence Party", "UKIP", Color.MAGENTA.darker())) to 1577,
+                Candidate("Mark Keir", Party("Green", "GRN", Color.GREEN.darker())) to 884,
+            )
+        )
         voteHeader.submit("2017 RESULT")
         compareRendering("SimpleVoteViewPanel", "LotsOfCandidates-1", panel)
     }
@@ -574,18 +636,15 @@ class SimpleVoteViewPanelTest {
         val pc = Candidate("Cory Deagle", Party("Progressive Conservative", "PC", Color.BLUE))
         val lib = Candidate("Daphne Griffin", Party("Liberal", "LIB", Color.RED))
         val grn = Candidate("John Allen MacLean", Party("Green", "GRN", Color.GREEN.darker()))
-        val curr = LinkedHashMap<Candidate, Int>()
-        curr[ndp] = 0
-        curr[pc] = 0
-        curr[lib] = 0
-        curr[grn] = 0
-        val prev = LinkedHashMap<Party, Int>()
-        prev[ndp.party] = 585
-        prev[pc.party] = 785
-        prev[lib.party] = 1060
-        prev[grn.party] = 106
-        val currentVotes = Publisher(curr)
-        val previousVotes = Publisher(prev)
+        val currentVotes = Publisher(sequenceOf(ndp, pc, lib, grn).associateWith { 0 })
+        val previousVotes = Publisher(
+            mapOf(
+                ndp.party to 585,
+                pc.party to 785,
+                lib.party to 1060,
+                grn.party to 106,
+            )
+        )
         val pctReporting = Publisher(0.0)
         val header = Publisher("MONTAGUE-KILMUIR")
         val voteHeader = Publisher("0 OF 9 POLLS REPORTING")
@@ -613,11 +672,14 @@ class SimpleVoteViewPanelTest {
         compareRendering("SimpleVoteViewPanel", "CandidateOthers-1", panel)
         winner.submit(lib)
         compareRendering("SimpleVoteViewPanel", "CandidateOthers-2", panel)
-        curr[ndp] = 124
-        curr[pc] = 1373
-        curr[lib] = 785
-        curr[grn] = 675
-        currentVotes.submit(curr)
+        currentVotes.submit(
+            mapOf(
+                ndp to 124,
+                pc to 1373,
+                lib to 785,
+                grn to 675,
+            )
+        )
         voteHeader.submit("9 OF 9 POLLS REPORTING")
         voteSubhead.submit("PROJECTION: PC GAIN FROM LIB")
         pctReporting.submit(9.0 / 9)
@@ -632,18 +694,15 @@ class SimpleVoteViewPanelTest {
         val pc = Candidate("Cory Deagle", Party("Progressive Conservative", "PC", Color.BLUE))
         val lib = Candidate("Daphne Griffin", Party("Liberal", "LIB", Color.RED))
         val grn = Candidate("John Allen MacLean", Party("Green", "GRN", Color.GREEN.darker()))
-        val curr = LinkedHashMap<Candidate, Int>()
-        curr[ndp] = 0
-        curr[pc] = 0
-        curr[lib] = 0
-        curr[grn] = 0
-        val prev = LinkedHashMap<Party, Int>()
-        prev[ndp.party] = 585
-        prev[pc.party] = 785
-        prev[lib.party] = 1060
-        prev[grn.party] = 106
-        val currentVotes = Publisher(curr)
-        val previousVotes = Publisher(prev)
+        val currentVotes = Publisher(sequenceOf(ndp, pc, lib, grn).associateWith { 0 })
+        val previousVotes = Publisher(
+            mapOf(
+                ndp.party to 585,
+                pc.party to 785,
+                lib.party to 1060,
+                grn.party to 106,
+            )
+        )
         val pctReporting = Publisher(0.0)
         val header = Publisher("MONTAGUE-KILMUIR")
         val voteHeader = Publisher("0 OF 9 POLLS REPORTING")
@@ -671,11 +730,14 @@ class SimpleVoteViewPanelTest {
         compareRendering("SimpleVoteViewPanel", "CandidateOthersMandatory-1", panel)
         winner.submit(lib)
         compareRendering("SimpleVoteViewPanel", "CandidateOthersMandatory-2", panel)
-        curr[ndp] = 124
-        curr[pc] = 1373
-        curr[lib] = 785
-        curr[grn] = 675
-        currentVotes.submit(curr)
+        currentVotes.submit(
+            mapOf(
+                ndp to 124,
+                pc to 1373,
+                lib to 785,
+                grn to 675,
+            )
+        )
         voteHeader.submit("9 OF 9 POLLS REPORTING")
         voteSubhead.submit("PROJECTION: PC GAIN FROM LIB")
         pctReporting.submit(9.0 / 9)
@@ -690,16 +752,20 @@ class SimpleVoteViewPanelTest {
         val pc = Candidate("Jean-G\u00e9rard Chiasson", Party("Progressive Conservative", "PC", Color.BLUE))
         val lib = Candidate("Eric Mallet", Party("Liberal", "LIB", Color.RED))
         val grn = Candidate("Marie Leclerc", Party("Green", "GRN", Color.GREEN.darker()))
-        val curr = LinkedHashMap<Candidate, Int>()
-        curr[pc] = 714
-        curr[lib] = 6834
-        curr[grn] = 609
-        val prev = LinkedHashMap<Party, Int>()
-        prev[ndp] = 578
-        prev[pc.party] = 4048
-        prev[lib.party] = 3949
-        val currentVotes = Publisher(curr)
-        val previousVotes = Publisher(prev)
+        val currentVotes = Publisher(
+            mapOf(
+                pc to 714,
+                lib to 6834,
+                grn to 609,
+            )
+        )
+        val previousVotes = Publisher(
+            mapOf(
+                ndp to 578,
+                pc.party to 4048,
+                lib.party to 3949,
+            )
+        )
         val header = Publisher("SHIPPAGAN-LAM\u00c8QUE-MISCOU")
         val voteHeader = Publisher("OFFICIAL RESULT")
         val voteSubhead = Publisher("")
@@ -724,18 +790,22 @@ class SimpleVoteViewPanelTest {
         val pc = Candidate("Jean-G\u00e9rard Chiasson", Party("Progressive Conservative", "PC", Color.BLUE))
         val lib = Candidate("Eric Mallet", Party("Liberal", "LIB", Color.RED))
         val grn = Candidate("Marie Leclerc", Party("Green", "GRN", Color.GREEN.darker()))
-        val curr = LinkedHashMap<Candidate, Int>()
-        curr[pc] = 714
-        curr[lib] = 6834
-        curr[grn] = 609
-        val prev = LinkedHashMap<Party, Int>()
-        prev[Party.OTHERS] = 289
-        prev[ndp] = 289
-        prev[pc.party] = 4048
-        prev[lib.party] = 3949
-        prev[grn.party] = 0
-        val currentVotes = Publisher(curr)
-        val previousVotes = Publisher(prev)
+        val currentVotes = Publisher(
+            mapOf(
+                pc to 714,
+                lib to 6834,
+                grn to 609,
+            )
+        )
+        val previousVotes = Publisher(
+            mapOf(
+                Party.OTHERS to 289,
+                ndp to 289,
+                pc.party to 4048,
+                lib.party to 3949,
+                grn.party to 0,
+            )
+        )
         val header = Publisher("SHIPPAGAN-LAM\u00c8QUE-MISCOU")
         val voteHeader = Publisher("OFFICIAL RESULT")
         val voteSubhead = Publisher("")
@@ -760,16 +830,20 @@ class SimpleVoteViewPanelTest {
         val pc = Candidate("Jean-G\u00e9rard Chiasson", Party("Progressive Conservative", "PC", Color.BLUE))
         val lib = Candidate("Eric Mallet", Party("Liberal", "LIB", Color.RED))
         val oth = Candidate.OTHERS
-        val curr = LinkedHashMap<Candidate, Int>()
-        curr[pc] = 714
-        curr[lib] = 6834
-        curr[oth] = 609
-        val prev = LinkedHashMap<Party, Int>()
-        prev[ndp] = 578
-        prev[pc.party] = 4048
-        prev[lib.party] = 3949
-        val currentVotes = Publisher(curr)
-        val previousVotes = Publisher(prev)
+        val currentVotes = Publisher(
+            mapOf(
+                pc to 714,
+                lib to 6834,
+                oth to 609,
+            )
+        )
+        val previousVotes = Publisher(
+            mapOf(
+                ndp to 578,
+                pc.party to 4048,
+                lib.party to 3949,
+            )
+        )
         val header = Publisher("SHIPPAGAN-LAM\u00c8QUE-MISCOU")
         val voteHeader = Publisher("OFFICIAL RESULT")
         val voteSubhead = Publisher("")
@@ -794,17 +868,21 @@ class SimpleVoteViewPanelTest {
         val pc = Candidate("Jean-G\u00e9rard Chiasson", Party("Progressive Conservative", "PC", Color.BLUE))
         val lib = Candidate("Eric Mallet", Party("Liberal", "LIB", Color.RED))
         val oth = Candidate.OTHERS
-        val curr = LinkedHashMap<Candidate, Int>()
-        curr[pc] = 714
-        curr[lib] = 6834
-        curr[oth] = 609
-        val prev = LinkedHashMap<Party, Int>()
-        prev[Party.OTHERS] = 289
-        prev[ndp] = 289
-        prev[pc.party] = 4048
-        prev[lib.party] = 3949
-        val currentVotes = Publisher(curr)
-        val previousVotes = Publisher(prev)
+        val currentVotes = Publisher(
+            mapOf(
+                pc to 714,
+                lib to 6834,
+                oth to 609,
+            )
+        )
+        val previousVotes = Publisher(
+            mapOf(
+                Party.OTHERS to 289,
+                ndp to 289,
+                pc.party to 4048,
+                lib.party to 3949,
+            )
+        )
         val header = Publisher("SHIPPAGAN-LAM\u00c8QUE-MISCOU")
         val voteHeader = Publisher("OFFICIAL RESULT")
         val voteSubhead = Publisher("")
@@ -907,19 +985,21 @@ class SimpleVoteViewPanelTest {
         val asselineau = Candidate("Fran\u00e7ois Asselineau", Party("Popular Republican Union", "UPR", Color.CYAN.darker().darker()))
         val arthaud = Candidate("Nathalie Arthaud", Party("Lutte Ouvri\u00e8re", "LO", Color.RED))
         val cheminade = Candidate("Jacques Cheminade", Party("Solidarity and Progress", "S&P", Color.GRAY))
-        val curr = LinkedHashMap<Candidate, Int>()
-        curr[macron] = 8656346
-        curr[lePen] = 7678491
-        curr[fillon] = 7212995
-        curr[melenchon] = 7059951
-        curr[hamon] = 2291288
-        curr[dupontAignan] = 1695000
-        curr[lasalle] = 435301
-        curr[poutou] = 394505
-        curr[asselineau] = 332547
-        curr[arthaud] = 232384
-        curr[cheminade] = 65586
-        val currentVotes = Publisher(curr)
+        val currentVotes = Publisher(
+            mapOf(
+                macron to 8656346,
+                lePen to 7678491,
+                fillon to 7212995,
+                melenchon to 7059951,
+                hamon to 2291288,
+                dupontAignan to 1695000,
+                lasalle to 435301,
+                poutou to 394505,
+                asselineau to 332547,
+                arthaud to 232384,
+                cheminade to 65586,
+            )
+        )
         val header = Publisher("ELECTION 2017: FRANCE DECIDES")
         val voteHeader = Publisher("FIRST ROUND RESULT")
         val voteSubhead = Publisher("")
@@ -947,19 +1027,24 @@ class SimpleVoteViewPanelTest {
         val asselineau = Candidate("Fran\u00e7ois Asselineau", Party("Popular Republican Union", "UPR", Color.CYAN.darker().darker()))
         val arthaud = Candidate("Nathalie Arthaud", Party("Lutte Ouvri\u00e8re", "LO", Color.RED))
         val cheminade = Candidate("Jacques Cheminade", Party("Solidarity and Progress", "S&P", Color.GRAY))
-        val curr = LinkedHashMap<Candidate, Int>()
-        curr[macron] = 8656346
-        curr[lePen] = 7678491
-        curr[fillon] = 7212995
-        curr[melenchon] = 7059951
-        curr[hamon] = 2291288
-        curr[dupontAignan] = 1695000
-        curr[lasalle] = 435301
-        curr[poutou] = 394505
-        curr[asselineau] = 332547
-        curr[arthaud] = 232384
-        curr[cheminade] = 65586
-        val currentVotes = Publisher(topAndOthers(curr, 6, Candidate.OTHERS))
+        val currentVotes = Publisher(
+            topAndOthers(
+                mapOf(
+                    macron to 8656346,
+                    lePen to 7678491,
+                    fillon to 7212995,
+                    melenchon to 7059951,
+                    hamon to 2291288,
+                    dupontAignan to 1695000,
+                    lasalle to 435301,
+                    poutou to 394505,
+                    asselineau to 332547,
+                    arthaud to 232384,
+                    cheminade to 65586,
+                ),
+                6, Candidate.OTHERS
+            )
+        )
         val header = Publisher("ELECTION 2017: FRANCE DECIDES")
         val voteHeader = Publisher("FIRST ROUND RESULT")
         val voteSubhead = Publisher("")
@@ -980,18 +1065,22 @@ class SimpleVoteViewPanelTest {
         val pc = Party("Progressive Conservative", "PC", Color.BLUE)
         val lib = Party("Liberal", "LIB", Color.RED)
         val grn = Party("Green", "GRN", Color.GREEN.darker())
-        val curr = LinkedHashMap<Party, ClosedRange<Double>>()
-        curr[ndp] = (0.030).rangeTo(0.046)
-        curr[pc] = (0.290).rangeTo(0.353)
-        curr[lib] = (0.257).rangeTo(0.292)
-        curr[grn] = (0.343).rangeTo(0.400)
-        val prev = LinkedHashMap<Party, Int>()
-        prev[ndp] = 8997
-        prev[pc] = 30663
-        prev[lib] = 33481
-        prev[grn] = 8857
-        val currentVotes = Publisher(curr)
-        val previousVotes = Publisher(prev)
+        val currentVotes = Publisher(
+            mapOf(
+                ndp to (0.030).rangeTo(0.046),
+                pc to (0.290).rangeTo(0.353),
+                lib to (0.257).rangeTo(0.292),
+                grn to (0.343).rangeTo(0.400),
+            )
+        )
+        val previousVotes = Publisher(
+            mapOf(
+                ndp to 8997,
+                pc to 30663,
+                lib to 33481,
+                grn to 8857,
+            )
+        )
         val header = Publisher("PRINCE EDWARD ISLAND")
         val voteHeader = Publisher("OPINION POLL RANGE")
         val voteSubhead = Publisher("SINCE ELECTION CALL")
@@ -1016,18 +1105,15 @@ class SimpleVoteViewPanelTest {
         val pc = Candidate("Cory Deagle", Party("Progressive Conservative", "PC", Color.BLUE))
         val lib = Candidate("Daphne Griffin", Party("Liberal", "LIB", Color.RED))
         val grn = Candidate("John Allen MacLean", Party("Green", "GRN", Color.GREEN.darker()))
-        val curr = LinkedHashMap<Candidate, Int?>()
-        curr[ndp] = null
-        curr[pc] = null
-        curr[lib] = null
-        curr[grn] = null
-        val prev = LinkedHashMap<Party, Int>()
-        prev[ndp.party] = 585
-        prev[pc.party] = 785
-        prev[lib.party] = 1060
-        prev[grn.party] = 106
-        val currentVotes = Publisher(curr)
-        val previousVotes = Publisher(prev)
+        val currentVotes = Publisher(sequenceOf(ndp, pc, lib, grn).associateWith { null as Int? })
+        val previousVotes = Publisher(
+            mapOf(
+                ndp.party to 585,
+                pc.party to 785,
+                lib.party to 1060,
+                grn.party to 106,
+            )
+        )
         val header = Publisher("MONTAGUE-KILMUIR")
         val voteHeader = Publisher("OFFICIAL RESULT")
         val voteSubhead = Publisher("")
@@ -1046,29 +1132,41 @@ class SimpleVoteViewPanelTest {
             .build(header)
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "MidDeclaration-1", panel)
-        curr[ndp] = 124
-        curr[pc] = null
-        curr[lib] = null
-        curr[grn] = null
-        currentVotes.submit(curr)
+        currentVotes.submit(
+            mapOf(
+                ndp to 124,
+                pc to null,
+                lib to null,
+                grn to null,
+            )
+        )
         compareRendering("SimpleVoteViewPanel", "MidDeclaration-2", panel)
-        curr[ndp] = 124
-        curr[pc] = 1373
-        curr[lib] = null
-        curr[grn] = null
-        currentVotes.submit(curr)
+        currentVotes.submit(
+            mapOf(
+                ndp to 124,
+                pc to 1373,
+                lib to null,
+                grn to null,
+            )
+        )
         compareRendering("SimpleVoteViewPanel", "MidDeclaration-3", panel)
-        curr[ndp] = 124
-        curr[pc] = 1373
-        curr[lib] = 785
-        curr[grn] = null
-        currentVotes.submit(curr)
+        currentVotes.submit(
+            mapOf(
+                ndp to 124,
+                pc to 1373,
+                lib to 785,
+                grn to null,
+            )
+        )
         compareRendering("SimpleVoteViewPanel", "MidDeclaration-4", panel)
-        curr[ndp] = 124
-        curr[pc] = 1373
-        curr[lib] = 785
-        curr[grn] = 675
-        currentVotes.submit(curr)
+        currentVotes.submit(
+            mapOf(
+                ndp to 124,
+                pc to 1373,
+                lib to 785,
+                grn to 675,
+            )
+        )
         leader.submit(pc.party)
         compareRendering("SimpleVoteViewPanel", "MidDeclaration-5", panel)
     }
@@ -1099,8 +1197,8 @@ class SimpleVoteViewPanelTest {
         sequenceOf(dup, uup, tuv, con, pup, ukip, indU).forEach { mapping[it] = unionists }
         sequenceOf(sf, sdlp, wp, indN).forEach { mapping[it] = nationalists }
         sequenceOf(apni, grn, pbp, lab, indO).forEach { mapping[it] = others }
-        val currentVotes = Publisher(LinkedHashMap<Party, Int>())
-        val previousVotes = Publisher(LinkedHashMap<Party, Int>())
+        val currentVotes = Publisher(emptyMap<Party, Int>())
+        val previousVotes = Publisher(emptyMap<Party, Int>())
         val header = Publisher("NORTHERN IRELAND")
         val seatHeader = Publisher("2017 RESULTS")
         val seatSubhead = Publisher<String?>(null)
@@ -1112,44 +1210,48 @@ class SimpleVoteViewPanelTest {
             .build(header)
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "PartyClassifications-1", panel)
-        val currVotes = LinkedHashMap<Party, Int>()
-        currVotes[dup] = 225413
-        currVotes[sf] = 224245
-        currVotes[sdlp] = 95958
-        currVotes[uup] = 103314
-        currVotes[apni] = 72717
-        currVotes[grn] = 18527
-        currVotes[tuv] = 20523
-        currVotes[pbp] = 14100
-        currVotes[pup] = 5590
-        currVotes[con] = 2399
-        currVotes[lab] = 2009
-        currVotes[ukip] = 1579
-        currVotes[cista] = 1273
-        currVotes[wp] = 1261
-        currVotes[indU] = 4918
-        currVotes[indN] = 1639
-        currVotes[indO] = 7850
-        currentVotes.submit(currVotes)
-        val prevVotes = LinkedHashMap<Party, Int>()
-        prevVotes[dup] = 202567
-        prevVotes[sf] = 166785
-        prevVotes[uup] = 87302
-        prevVotes[sdlp] = 83368
-        prevVotes[apni] = 48447
-        prevVotes[tuv] = 23776
-        prevVotes[grn] = 18718
-        prevVotes[pbp] = 13761
-        prevVotes[ukip] = 10109
-        prevVotes[pup] = 5955
-        prevVotes[con] = 2554
-        prevVotes[cista] = 2510
-        prevVotes[lab] = 1939 + 1577
-        prevVotes[wp] = 1565
-        prevVotes[indU] = 351 + 3270
-        prevVotes[indN] = 0
-        prevVotes[indO] = 224 + 124 + 32 + 19380
-        previousVotes.submit(prevVotes)
+        currentVotes.submit(
+            mapOf(
+                dup to 225413,
+                sf to 224245,
+                sdlp to 95958,
+                uup to 103314,
+                apni to 72717,
+                grn to 18527,
+                tuv to 20523,
+                pbp to 14100,
+                pup to 5590,
+                con to 2399,
+                lab to 2009,
+                ukip to 1579,
+                cista to 1273,
+                wp to 1261,
+                indU to 4918,
+                indN to 1639,
+                indO to 7850,
+            )
+        )
+        previousVotes.submit(
+            mapOf(
+                dup to 202567,
+                sf to 166785,
+                uup to 87302,
+                sdlp to 83368,
+                apni to 48447,
+                tuv to 23776,
+                grn to 18718,
+                pbp to 13761,
+                ukip to 10109,
+                pup to 5955,
+                con to 2554,
+                cista to 2510,
+                lab to 1939 + 1577,
+                wp to 1565,
+                indU to 351 + 3270,
+                indN to 0,
+                indO to 224 + 124 + 32 + 19380,
+            )
+        )
         compareRendering("SimpleVoteViewPanel", "PartyClassifications-2", panel)
     }
 
@@ -1424,18 +1526,15 @@ class SimpleVoteViewPanelTest {
         val pc = Candidate("Cory Deagle", Party("Progressive Conservative", "PC", Color.BLUE))
         val lib = Candidate("Daphne Griffin", Party("Liberal", "LIB", Color.RED))
         val grn = Candidate("John Allen MacLean", Party("Green", "GRN", Color.GREEN.darker()))
-        val curr = LinkedHashMap<Candidate, Int>()
-        curr[ndp] = 0
-        curr[pc] = 0
-        curr[lib] = 0
-        curr[grn] = 0
-        val prev = LinkedHashMap<Party, Int>()
-        prev[ndp.party] = 585
-        prev[pc.party] = 785
-        prev[lib.party] = 1060
-        prev[grn.party] = 106
-        val currentVotes = Publisher(curr)
-        val previousVotes = Publisher(prev)
+        val currentVotes = Publisher(sequenceOf(ndp, pc, lib, grn).associateWith { 0 })
+        val previousVotes = Publisher(
+            mapOf(
+                ndp.party to 585,
+                pc.party to 785,
+                lib.party to 1060,
+                grn.party to 106,
+            )
+        )
         val pctReporting = Publisher(0.0)
         val header = Publisher("MONTAGUE-KILMUIR")
         val voteHeader = Publisher("PROVISIONAL RESULTS")
@@ -1463,44 +1562,56 @@ class SimpleVoteViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "ProgressLabel-1", panel)
 
-        curr[ndp] = 5
-        curr[pc] = 47
-        curr[lib] = 58
-        curr[grn] = 52
-        currentVotes.submit(curr)
+        currentVotes.submit(
+            mapOf(
+                ndp to 5,
+                pc to 47,
+                lib to 58,
+                grn to 52,
+            )
+        )
         progressLabel.submit("1/9")
         voteSubhead.submit("PROJECTION: TOO EARLY TO CALL")
         pctReporting.submit(1.0 / 9)
         leader.submit(leading(lib.party))
         compareRendering("SimpleVoteViewPanel", "ProgressLabel-2", panel)
 
-        curr[ndp] = 8
-        curr[pc] = 91
-        curr[lib] = 100
-        curr[grn] = 106
-        currentVotes.submit(curr)
+        currentVotes.submit(
+            mapOf(
+                ndp to 8,
+                pc to 91,
+                lib to 100,
+                grn to 106,
+            )
+        )
         progressLabel.submit("2/9")
         voteSubhead.submit("PROJECTION: TOO EARLY TO CALL")
         pctReporting.submit(2.0 / 9)
         leader.submit(leading(grn.party))
         compareRendering("SimpleVoteViewPanel", "ProgressLabel-3", panel)
 
-        curr[ndp] = 18
-        curr[pc] = 287
-        curr[lib] = 197
-        curr[grn] = 243
-        currentVotes.submit(curr)
+        currentVotes.submit(
+            mapOf(
+                ndp to 18,
+                pc to 287,
+                lib to 197,
+                grn to 243,
+            )
+        )
         progressLabel.submit("5/9")
         voteSubhead.submit("PROJECTION: TOO EARLY TO CALL")
         pctReporting.submit(5.0 / 9)
         leader.submit(leading(pc.party))
         compareRendering("SimpleVoteViewPanel", "ProgressLabel-4", panel)
 
-        curr[ndp] = 124
-        curr[pc] = 1373
-        curr[lib] = 785
-        curr[grn] = 675
-        currentVotes.submit(curr)
+        currentVotes.submit(
+            mapOf(
+                ndp to 124,
+                pc to 1373,
+                lib to 785,
+                grn to 675,
+            )
+        )
         progressLabel.submit("9/9")
         voteSubhead.submit("PROJECTION: PC GAIN FROM LIB")
         pctReporting.submit(9.0 / 9)

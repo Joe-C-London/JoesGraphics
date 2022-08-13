@@ -137,34 +137,21 @@ class MapFrameTest {
 
     private fun loadRegions(): List<Shape> {
         val shapesByDistrict = shapesByDistrict()
-        val regions = ArrayList<Shape>()
         val areaReduce = { lhs: Area, rhs: Area ->
             val ret = Area(lhs)
             ret.add(rhs)
             ret
         }
-        regions.add(
-            (1..7).map { shapesByDistrict[it] }
+        return sequenceOf(
+            (1..7).asSequence(),
+            (9..14).asSequence(),
+            sequenceOf(8..8, 15..20).flatten(),
+            (21..27).asSequence()
+        ).map { seq ->
+            seq.map { shapesByDistrict[it] }
                 .map { Area(it) }
                 .reduce(areaReduce)
-        )
-        regions.add(
-            (9..14).map { shapesByDistrict[it] }
-                .map { Area(it) }
-                .reduce(areaReduce)
-        )
-        regions.add(
-            sequenceOf(8..8, 15..20).flatten()
-                .map { shapesByDistrict[it] }
-                .map { Area(it) }
-                .reduce(areaReduce)
-        )
-        regions.add(
-            (21..27).map { shapesByDistrict[it] }
-                .map { Area(it) }
-                .reduce(areaReduce)
-        )
-        return regions
+        }.toList()
     }
 
     private fun getDistrictColor(district: Int): Color {

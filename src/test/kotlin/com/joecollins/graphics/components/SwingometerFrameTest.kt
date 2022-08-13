@@ -277,43 +277,45 @@ class SwingometerFrameTest {
     }
 
     private fun createSwingometerDotsWithoutLabels(): Publisher<List<Triple<String, Double, Color>>> {
-        val dots = ArrayList<Triple<String, Double, Color>>()
-        dots.add(Triple("WY", -27.00, Color.RED))
-        dots.add(Triple("UT", -17.65, Color.RED))
-        dots.add(Triple("TN", -17.25, Color.RED))
-        dots.add(Triple("MS (S)", -11.00, Color.RED))
-        dots.add(Triple("MS", -8.30, Color.RED))
-        dots.add(Triple("TX", -7.90, Color.RED))
-        dots.add(Triple("NE", -7.80, Color.RED))
-        dots.add(Triple("AZ", -1.55, Color.BLUE))
-        dots.add(Triple("NV", -0.60, Color.BLUE))
-        dots.add(Triple("ND", +0.45, Color.RED))
-        dots.add(Triple("MT", +1.85, Color.BLUE))
-        dots.add(Triple("WI", +2.75, Color.BLUE))
-        dots.add(Triple("IN", +2.90, Color.RED))
-        dots.add(Triple("NM", +2.85, Color.BLUE))
-        dots.add(Triple("VA", +2.95, Color.BLUE))
-        dots.add(Triple("OH", +3.00, Color.BLUE))
-        dots.add(Triple("MA", +3.70, Color.BLUE))
-        dots.add(Triple("PA", +4.55, Color.BLUE))
-        dots.add(Triple("MN (S)", +5.15, Color.BLUE))
-        dots.add(Triple("CT", +5.85, Color.BLUE))
-        dots.add(Triple("FL", +6.50, Color.RED))
-        dots.add(Triple("MO", +7.90, Color.RED))
-        dots.add(Triple("NJ", +9.75, Color.BLUE))
-        dots.add(Triple("MI", +10.40, Color.BLUE))
-        dots.add(Triple("WA", +10.50, Color.BLUE))
-        dots.add(Triple("ME", +11.10, Color.BLUE))
-        dots.add(Triple("WV", +12.05, Color.BLUE))
-        dots.add(Triple("CA", +12.50, Color.BLUE))
-        dots.add(Triple("HI", +12.60, Color.BLUE))
-        dots.add(Triple("MD", +14.85, Color.BLUE))
-        dots.add(Triple("RI", +14.90, Color.BLUE))
-        dots.add(Triple("MN", +17.30, Color.BLUE))
-        dots.add(Triple("DE", +18.70, Color.BLUE))
-        dots.add(Triple("NY", +22.30, Color.BLUE))
-        dots.add(Triple("VT", +23.05, Color.BLUE))
-        return Publisher(dots)
+        return Publisher(
+            listOf(
+                Triple("WY", -27.00, Color.RED),
+                Triple("UT", -17.65, Color.RED),
+                Triple("TN", -17.25, Color.RED),
+                Triple("MS (S)", -11.00, Color.RED),
+                Triple("MS", -8.30, Color.RED),
+                Triple("TX", -7.90, Color.RED),
+                Triple("NE", -7.80, Color.RED),
+                Triple("AZ", -1.55, Color.BLUE),
+                Triple("NV", -0.60, Color.BLUE),
+                Triple("ND", +0.45, Color.RED),
+                Triple("MT", +1.85, Color.BLUE),
+                Triple("WI", +2.75, Color.BLUE),
+                Triple("IN", +2.90, Color.RED),
+                Triple("NM", +2.85, Color.BLUE),
+                Triple("VA", +2.95, Color.BLUE),
+                Triple("OH", +3.00, Color.BLUE),
+                Triple("MA", +3.70, Color.BLUE),
+                Triple("PA", +4.55, Color.BLUE),
+                Triple("MN (S)", +5.15, Color.BLUE),
+                Triple("CT", +5.85, Color.BLUE),
+                Triple("FL", +6.50, Color.RED),
+                Triple("MO", +7.90, Color.RED),
+                Triple("NJ", +9.75, Color.BLUE),
+                Triple("MI", +10.40, Color.BLUE),
+                Triple("WA", +10.50, Color.BLUE),
+                Triple("ME", +11.10, Color.BLUE),
+                Triple("WV", +12.05, Color.BLUE),
+                Triple("CA", +12.50, Color.BLUE),
+                Triple("HI", +12.60, Color.BLUE),
+                Triple("MD", +14.85, Color.BLUE),
+                Triple("RI", +14.90, Color.BLUE),
+                Triple("MN", +17.30, Color.BLUE),
+                Triple("DE", +18.70, Color.BLUE),
+                Triple("NY", +22.30, Color.BLUE),
+                Triple("VT", +23.05, Color.BLUE),
+            )
+        )
     }
 
     @Test
@@ -456,64 +458,66 @@ class SwingometerFrameTest {
     }
 
     private fun createSwingometerDotsWithLabels(): Publisher<List<Triple<Pair<String, Int>, Double, Color>>> {
-        val dots = ArrayList<Triple<Pair<String, Int>, Double, Color>>()
-        dots.add(Triple(Pair("UT", 6), -24.02, Color.RED))
-        dots.add(Triple(Pair("NE-03", 1), -21.31, Color.RED))
-        dots.add(Triple(Pair("WY", 3), -20.41, Color.RED))
-        dots.add(Triple(Pair("OK", 7), -17.27, Color.RED))
-        dots.add(Triple(Pair("ID", 4), -15.945, Color.RED))
-        dots.add(Triple(Pair("WV", 5), -13.42, Color.RED))
-        dots.add(Triple(Pair("AR", 6), -11.855, Color.RED))
-        dots.add(Triple(Pair("KY", 8), -11.345, Color.RED))
-        dots.add(Triple(Pair("AL", 9), -11.095, Color.RED))
-        dots.add(Triple(Pair("NE-AL", 2), -10.885, Color.RED))
-        dots.add(Triple(Pair("KS", 6), -10.86, Color.RED))
-        dots.add(Triple(Pair("TN", 11), -10.20, Color.RED))
-        dots.add(Triple(Pair("ND", 3), -9.815, Color.RED))
-        dots.add(Triple(Pair("SD", 3), -9.01, Color.RED))
-        dots.add(Triple(Pair("LA", 8), -8.60, Color.RED))
-        dots.add(Triple(Pair("NE-01", 1), -8.30, Color.RED))
-        dots.add(Triple(Pair("TX", 38), -7.895, Color.RED))
-        dots.add(Triple(Pair("AK", 3), -6.995, Color.RED))
-        dots.add(Triple(Pair("MT", 3), -6.825, Color.RED))
-        dots.add(Triple(Pair("MS", 6), -5.75, Color.RED))
-        dots.add(Triple(Pair("SC", 9), -5.235, Color.RED))
-        dots.add(Triple(Pair("IN", 11), -5.10, Color.RED))
-        dots.add(Triple(Pair("MO", 10), -4.69, Color.RED))
-        dots.add(Triple(Pair("AZ", 11), -4.53, Color.RED))
-        dots.add(Triple(Pair("GA", 16), -3.91, Color.RED))
-        dots.add(Triple(Pair("NE-02", 1), -3.575, Color.RED))
-        dots.add(Triple(Pair("NC", 15), -1.02, Color.RED))
-        dots.add(Triple(Pair("FL", 29), +0.44, Color.RED))
-        dots.add(Triple(Pair("OH", 18), +1.49, Color.RED))
-        dots.add(Triple(Pair("VA", 13), +1.94, Color.BLUE))
-        dots.add(Triple(Pair("CO", 9), +2.68, Color.BLUE))
-        dots.add(Triple(Pair("PA", 20), +2.69, Color.RED))
-        dots.add(Triple(Pair("NH", 4), +2.79, Color.BLUE))
-        dots.add(Triple(Pair("IA", 6), +2.905, Color.RED))
-        dots.add(Triple(Pair("NV", 6), +3.34, Color.BLUE))
-        dots.add(Triple(Pair("MN", 10), +3.845, Color.BLUE))
-        dots.add(Triple(Pair("ME-02", 1), +4.28, Color.RED))
-        dots.add(Triple(Pair("WI", 10), +4.47, Color.RED))
-        dots.add(Triple(Pair("MI", 16), +4.75, Color.RED))
-        dots.add(Triple(Pair("NM", 5), +5.075, Color.BLUE))
-        dots.add(Triple(Pair("OR", 7), +6.045, Color.BLUE))
-        dots.add(Triple(Pair("WA", 12), +7.435, Color.BLUE))
-        dots.add(Triple(Pair("ME-AL", 2), +7.645, Color.BLUE))
-        dots.add(Triple(Pair("IL", 20), +8.435, Color.BLUE))
-        dots.add(Triple(Pair("CT", 7), +8.665, Color.BLUE))
-        dots.add(Triple(Pair("NJ", 14), +8.895, Color.BLUE))
-        dots.add(Triple(Pair("DE", 3), +9.315, Color.BLUE))
-        dots.add(Triple(Pair("ME-01", 1), +10.695, Color.BLUE))
-        dots.add(Triple(Pair("CA", 55), +11.56, Color.BLUE))
-        dots.add(Triple(Pair("MA", 11), +11.57, Color.BLUE))
-        dots.add(Triple(Pair("MD", 10), +13.035, Color.BLUE))
-        dots.add(Triple(Pair("RI", 4), +13.92, Color.BLUE))
-        dots.add(Triple(Pair("NY", 29), +14.09, Color.BLUE))
-        dots.add(Triple(Pair("VT", 3), +17.80, Color.BLUE))
-        dots.add(Triple(Pair("HI", 4), +21.355, Color.BLUE))
-        dots.add(Triple(Pair("DC", 3), +46.815, Color.BLUE))
-        return Publisher(dots)
+        return Publisher(
+            listOf(
+                Triple(Pair("UT", 6), -24.02, Color.RED),
+                Triple(Pair("NE-03", 1), -21.31, Color.RED),
+                Triple(Pair("WY", 3), -20.41, Color.RED),
+                Triple(Pair("OK", 7), -17.27, Color.RED),
+                Triple(Pair("ID", 4), -15.945, Color.RED),
+                Triple(Pair("WV", 5), -13.42, Color.RED),
+                Triple(Pair("AR", 6), -11.855, Color.RED),
+                Triple(Pair("KY", 8), -11.345, Color.RED),
+                Triple(Pair("AL", 9), -11.095, Color.RED),
+                Triple(Pair("NE-AL", 2), -10.885, Color.RED),
+                Triple(Pair("KS", 6), -10.86, Color.RED),
+                Triple(Pair("TN", 11), -10.20, Color.RED),
+                Triple(Pair("ND", 3), -9.815, Color.RED),
+                Triple(Pair("SD", 3), -9.01, Color.RED),
+                Triple(Pair("LA", 8), -8.60, Color.RED),
+                Triple(Pair("NE-01", 1), -8.30, Color.RED),
+                Triple(Pair("TX", 38), -7.895, Color.RED),
+                Triple(Pair("AK", 3), -6.995, Color.RED),
+                Triple(Pair("MT", 3), -6.825, Color.RED),
+                Triple(Pair("MS", 6), -5.75, Color.RED),
+                Triple(Pair("SC", 9), -5.235, Color.RED),
+                Triple(Pair("IN", 11), -5.10, Color.RED),
+                Triple(Pair("MO", 10), -4.69, Color.RED),
+                Triple(Pair("AZ", 11), -4.53, Color.RED),
+                Triple(Pair("GA", 16), -3.91, Color.RED),
+                Triple(Pair("NE-02", 1), -3.575, Color.RED),
+                Triple(Pair("NC", 15), -1.02, Color.RED),
+                Triple(Pair("FL", 29), +0.44, Color.RED),
+                Triple(Pair("OH", 18), +1.49, Color.RED),
+                Triple(Pair("VA", 13), +1.94, Color.BLUE),
+                Triple(Pair("CO", 9), +2.68, Color.BLUE),
+                Triple(Pair("PA", 20), +2.69, Color.RED),
+                Triple(Pair("NH", 4), +2.79, Color.BLUE),
+                Triple(Pair("IA", 6), +2.905, Color.RED),
+                Triple(Pair("NV", 6), +3.34, Color.BLUE),
+                Triple(Pair("MN", 10), +3.845, Color.BLUE),
+                Triple(Pair("ME-02", 1), +4.28, Color.RED),
+                Triple(Pair("WI", 10), +4.47, Color.RED),
+                Triple(Pair("MI", 16), +4.75, Color.RED),
+                Triple(Pair("NM", 5), +5.075, Color.BLUE),
+                Triple(Pair("OR", 7), +6.045, Color.BLUE),
+                Triple(Pair("WA", 12), +7.435, Color.BLUE),
+                Triple(Pair("ME-AL", 2), +7.645, Color.BLUE),
+                Triple(Pair("IL", 20), +8.435, Color.BLUE),
+                Triple(Pair("CT", 7), +8.665, Color.BLUE),
+                Triple(Pair("NJ", 14), +8.895, Color.BLUE),
+                Triple(Pair("DE", 3), +9.315, Color.BLUE),
+                Triple(Pair("ME-01", 1), +10.695, Color.BLUE),
+                Triple(Pair("CA", 55), +11.56, Color.BLUE),
+                Triple(Pair("MA", 11), +11.57, Color.BLUE),
+                Triple(Pair("MD", 10), +13.035, Color.BLUE),
+                Triple(Pair("RI", 4), +13.92, Color.BLUE),
+                Triple(Pair("NY", 29), +14.09, Color.BLUE),
+                Triple(Pair("VT", 3), +17.80, Color.BLUE),
+                Triple(Pair("HI", 4), +21.355, Color.BLUE),
+                Triple(Pair("DC", 3), +46.815, Color.BLUE),
+            )
+        )
     }
 
     @Test

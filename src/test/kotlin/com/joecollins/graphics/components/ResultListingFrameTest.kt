@@ -111,7 +111,7 @@ class ResultListingFrameTest {
 
     @Test
     fun testVaryingItems() {
-        val rawItems: MutableList<Item> = ArrayList()
+        val rawItems: MutableList<Item> = mutableListOf()
         val items: Publisher<List<Item>> = Publisher(rawItems)
         val frame = ResultListingFrame(
             headerPublisher = "SEATS CHANGING".asOneTimePublisher(),
@@ -150,7 +150,7 @@ class ResultListingFrameTest {
 
     @Test
     fun testVaryingItemsInReverse() {
-        val rawItems: MutableList<Item> = ArrayList()
+        val rawItems: MutableList<Item> = mutableListOf()
         val items: Publisher<List<Item>> = Publisher(rawItems)
         val frame = ResultListingFrame(
             headerPublisher = "SEATS CHANGING".asOneTimePublisher(),

@@ -20,8 +20,7 @@ class MultiResultScreenTest {
 
     @Test
     fun testSimplePanel() {
-        val districts = ArrayList<District>()
-        districts.add(
+        val districts = listOf(
             District(
                 8,
                 "Stanhope-Marshfield",
@@ -38,9 +37,7 @@ class MultiResultScreenTest {
                     grn to 347,
                     ndp to 443
                 )
-            )
-        )
-        districts.add(
+            ),
             District(
                 15,
                 "Brackley-Hunter River",
@@ -57,9 +54,7 @@ class MultiResultScreenTest {
                     grn to 462,
                     ndp to 516
                 )
-            )
-        )
-        districts.add(
+            ),
             District(
                 17,
                 "New Haven-Rocky Point",
@@ -470,8 +465,7 @@ class MultiResultScreenTest {
 
     @Test
     fun testOthersPanel() {
-        val districts = ArrayList<District>()
-        districts.add(
+        val districts = listOf(
             District(
                 30,
                 "Saint John East",
@@ -490,9 +484,7 @@ class MultiResultScreenTest {
                     ndp to 402,
                     pa to 1047
                 )
-            )
-        )
-        districts.add(
+            ),
             District(
                 32,
                 "Saint John Harbour",
@@ -513,9 +505,7 @@ class MultiResultScreenTest {
                     ndp to 836,
                     pa to 393
                 )
-            )
-        )
-        districts.add(
+            ),
             District(
                 33,
                 "Saint John Lancaster",
@@ -564,8 +554,7 @@ class MultiResultScreenTest {
 
     @Test
     fun testOthersPartyPanel() {
-        val districts = ArrayList<District>()
-        districts.add(
+        val districts = listOf(
             District(
                 30,
                 "Saint John East",
@@ -584,9 +573,7 @@ class MultiResultScreenTest {
                     ndp to 402,
                     pa to 1047
                 )
-            )
-        )
-        districts.add(
+            ),
             District(
                 32,
                 "Saint John Harbour",
@@ -605,9 +592,7 @@ class MultiResultScreenTest {
                     ndp to 836,
                     pa to 393
                 )
-            )
-        )
-        districts.add(
+            ),
             District(
                 33,
                 "Saint John Lancaster",
@@ -626,9 +611,7 @@ class MultiResultScreenTest {
                     ndp to 414,
                     pa to 922
                 )
-            )
-        )
-        districts.add(
+            ),
             District(
                 38,
                 "Fredericton-Grand Lake",
@@ -647,9 +630,7 @@ class MultiResultScreenTest {
                     ndp to 114,
                     pa to 4799
                 )
-            )
-        )
-        districts.add(
+            ),
             District(
                 40,
                 "Fredericton South",
@@ -668,9 +649,7 @@ class MultiResultScreenTest {
                     ndp to 132,
                     pa to 616
                 )
-            )
-        )
-        districts.add(
+            ),
             District(
                 41,
                 "Fredericton North",
@@ -710,8 +689,7 @@ class MultiResultScreenTest {
 
     @Test
     fun testMultipleRowsPanel() {
-        val districts = ArrayList<District>()
-        districts.add(
+        val districts = mutableListOf(
             District(
                 30,
                 "Saint John East",
@@ -730,9 +708,7 @@ class MultiResultScreenTest {
                     ndp to 402,
                     pa to 1047
                 )
-            )
-        )
-        districts.add(
+            ),
             District(
                 31,
                 "Portland-Simonds",
@@ -751,9 +727,7 @@ class MultiResultScreenTest {
                     ndp to 449,
                     ind to 191
                 )
-            )
-        )
-        districts.add(
+            ),
             District(
                 32,
                 "Saint John Harbour",
@@ -774,9 +748,7 @@ class MultiResultScreenTest {
                     ndp to 836,
                     pa to 393
                 )
-            )
-        )
-        districts.add(
+            ),
             District(
                 33,
                 "Saint John Lancaster",
@@ -876,8 +848,7 @@ class MultiResultScreenTest {
 
     @Test
     fun testMultipleRowsPanelWithProgressLabels() {
-        val districts = ArrayList<District>()
-        districts.add(
+        val districts = mutableListOf(
             District(
                 30,
                 "Saint John East",
@@ -896,9 +867,7 @@ class MultiResultScreenTest {
                     ndp to 402,
                     pa to 1047
                 )
-            )
-        )
-        districts.add(
+            ),
             District(
                 31,
                 "Portland-Simonds",
@@ -917,9 +886,7 @@ class MultiResultScreenTest {
                     ndp to 449,
                     ind to 191
                 )
-            )
-        )
-        districts.add(
+            ),
             District(
                 32,
                 "Saint John Harbour",
@@ -940,9 +907,7 @@ class MultiResultScreenTest {
                     ndp to 836,
                     pa to 393
                 )
-            )
-        )
-        districts.add(
+            ),
             District(
                 33,
                 "Saint John Lancaster",
@@ -1043,8 +1008,7 @@ class MultiResultScreenTest {
 
     @Test
     fun testRunoffs() {
-        val districts = ArrayList<District>()
-        districts.add(
+        val districts = listOf(
             District(
                 2,
                 "Regular Election",
@@ -1055,9 +1019,7 @@ class MultiResultScreenTest {
                 ),
                 false,
                 emptyMap()
-            )
-        )
-        districts.add(
+            ),
             District(
                 3,
                 "Special Election",
@@ -1088,8 +1050,7 @@ class MultiResultScreenTest {
 
     @Test
     fun testMapAdditionalHighlights() {
-        val districts = ArrayList<District>()
-        districts.add(
+        val districts = listOf(
             District(
                 13,
                 "Charlottetown-Brighton",
@@ -1106,9 +1067,7 @@ class MultiResultScreenTest {
                     grn to 352,
                     ndp to 265
                 )
-            )
-        )
-        districts.add(
+            ),
             District(
                 12,
                 "Charlottetown-Victoria Park",
@@ -1125,9 +1084,7 @@ class MultiResultScreenTest {
                     grn to 456,
                     ndp to 348
                 )
-            )
-        )
-        districts.add(
+            ),
             District(
                 10,
                 "Charlottetown-Winsloe",
@@ -1183,8 +1140,7 @@ class MultiResultScreenTest {
 
     @Test
     fun testPartiesOnly() {
-        val districts = ArrayList<District>()
-        districts.add(
+        val districts = mutableListOf(
             District(
                 30,
                 "Saint John East",
@@ -1203,9 +1159,7 @@ class MultiResultScreenTest {
                     ndp to 402,
                     pa to 1047
                 )
-            )
-        )
-        districts.add(
+            ),
             District(
                 31,
                 "Portland-Simonds",
@@ -1224,9 +1178,7 @@ class MultiResultScreenTest {
                     ndp to 449,
                     ind to 191
                 )
-            )
-        )
-        districts.add(
+            ),
             District(
                 32,
                 "Saint John Harbour",
@@ -1247,9 +1199,7 @@ class MultiResultScreenTest {
                     ndp to 836,
                     pa to 393
                 )
-            )
-        )
-        districts.add(
+            ),
             District(
                 33,
                 "Saint John Lancaster",
