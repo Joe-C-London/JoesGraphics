@@ -1,5 +1,6 @@
 package com.joecollins.graphics.screens.generic
 
+import com.joecollins.graphics.screens.generic.BattlegroundScreen.Companion.doubleParty
 import com.joecollins.graphics.screens.generic.BattlegroundScreen.Companion.singleParty
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.models.general.Party
@@ -87,6 +88,45 @@ class BattlegroundScreenTest {
         compareRendering("BattlegroundScreen", "Filtered-SingleParty-3", panel)
         filteredSeats.submit(null)
         compareRendering("BattlegroundScreen", "Filtered-SingleParty-4", panel)
+    }
+    @Test
+    fun testDoublePartyBattleground() {
+        val prevResult = Publisher(bcPrevResult())
+        val currResult = Publisher<Map<String, PartyResult>>(emptyMap())
+        val parties = Publisher(ndp to lib)
+        val rightSeats = Publisher(30)
+        val leftSeats = Publisher(15)
+        val numRows = Publisher(15)
+        val title = Publisher("BATTLEGROUND")
+        val panel = doubleParty(
+            prevResult,
+            currResult,
+            { it.uppercase() },
+            parties
+        )
+            .withSeatsToShow(leftSeats, rightSeats)
+            .withNumRows(numRows)
+            .build(title)
+        panel.setSize(1024, 512)
+        compareRendering("BattlegroundScreen", "Basic-DoubleParty-1", panel)
+        parties.submit(grn to lib)
+        rightSeats.submit(30)
+        leftSeats.submit(15)
+        compareRendering("BattlegroundScreen", "Basic-DoubleParty-2", panel)
+        currResult.submit(bcCurrResult())
+        compareRendering("BattlegroundScreen", "Basic-DoubleParty-3", panel)
+        parties.submit(ndp to grn)
+        rightSeats.submit(15)
+        leftSeats.submit(15)
+        compareRendering("BattlegroundScreen", "Basic-DoubleParty-4", panel)
+        parties.submit(ndp to lib)
+        rightSeats.submit(30)
+        leftSeats.submit(0)
+        compareRendering("BattlegroundScreen", "Basic-DoubleParty-5", panel)
+        parties.submit(ndp to lib)
+        rightSeats.submit(0)
+        leftSeats.submit(30)
+        compareRendering("BattlegroundScreen", "Basic-DoubleParty-6", panel)
     }
 
     companion object {

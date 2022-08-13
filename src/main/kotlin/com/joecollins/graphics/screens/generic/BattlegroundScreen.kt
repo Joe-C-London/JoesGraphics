@@ -3,7 +3,6 @@ package com.joecollins.graphics.screens.generic
 import com.joecollins.graphics.components.FontSizeAdjustingLabel
 import com.joecollins.graphics.components.GraphicsFrame
 import com.joecollins.graphics.components.ResultListingFrame
-import com.joecollins.graphics.screens.generic.BattlegroundScreen.BattlegroundInput.Side
 import com.joecollins.graphics.utils.ColorUtils.lighten
 import com.joecollins.graphics.utils.StandardFont.readBoldFont
 import com.joecollins.models.general.Party
@@ -72,13 +71,12 @@ class BattlegroundScreen private constructor(
             title.subscribe(Subscriber(eventQueueWrapper { headerLabel.text = it }))
             party.map(Party::color).subscribe(Subscriber(eventQueueWrapper { headerLabel.foreground = it }))
 
-            val defenseInput = BattlegroundInput<T>()
-            prevResults.subscribe(Subscriber { defenseInput.setPrev(it) })
-            currResults.subscribe(Subscriber { defenseInput.setCurr(it) })
-            defenseSeatCount.subscribe(Subscriber { defenseInput.setCount(it) })
-            party.subscribe(Subscriber { defenseInput.setParty(it) })
-            seatFilter.subscribe(Subscriber { defenseInput.setFilteredSeats(it) })
-            defenseInput.setSide(Side.DEFENSE)
+            val defenseInput = DefenseBattlegroundInput<T>()
+            prevResults.subscribe(Subscriber { defenseInput.prev = it })
+            currResults.subscribe(Subscriber { defenseInput.curr = it })
+            defenseSeatCount.subscribe(Subscriber { defenseInput.count = it })
+            party.subscribe(Subscriber { defenseInput.party = it })
+            seatFilter.subscribe(Subscriber { defenseInput.filteredSeats = it })
             val defenseItems = defenseInput.items
             val defenseFrame = ResultListingFrame(
                 headerPublisher = party.map { "$it DEFENSE SEATS" },
@@ -96,13 +94,12 @@ class BattlegroundScreen private constructor(
                 reversedPublisher = true.asOneTimePublisher()
             )
 
-            val targetInput = BattlegroundInput<T>()
-            prevResults.subscribe(Subscriber { targetInput.setPrev(it) })
-            currResults.subscribe(Subscriber { targetInput.setCurr(it) })
-            targetSeatCount.subscribe(Subscriber { targetInput.setCount(it) })
-            party.subscribe(Subscriber { targetInput.setParty(it) })
-            seatFilter.subscribe(Subscriber { targetInput.setFilteredSeats(it) })
-            targetInput.setSide(Side.TARGET)
+            val targetInput = TargetBattlegroundInput<T>()
+            prevResults.subscribe(Subscriber { targetInput.prev = it })
+            currResults.subscribe(Subscriber { targetInput.curr = it })
+            targetSeatCount.subscribe(Subscriber { targetInput.count = it })
+            party.subscribe(Subscriber { targetInput.party = it })
+            seatFilter.subscribe(Subscriber { targetInput.filteredSeats = it })
             val targetItems = targetInput.items
             val targetFrame = ResultListingFrame(
                 headerPublisher = party.map { "$it TARGET SEATS" },
@@ -137,104 +134,229 @@ class BattlegroundScreen private constructor(
         }
     }
 
-    private class BattlegroundInput<T> {
-        enum class Side {
-            DEFENSE, TARGET
+    class DoublePartyBuilder<T>(
+        private val prevResults: Flow.Publisher<out Map<T, Map<Party, Int>>>,
+        private val currResults: Flow.Publisher<out Map<T, PartyResult?>>,
+        private val nameFunc: (T) -> String,
+        private val parties: Flow.Publisher<out Pair<Party, Party>>
+    ) {
+        private var leftSeatCount: Flow.Publisher<out Int> = 100.asOneTimePublisher()
+        private var rightSeatCount: Flow.Publisher<out Int> = 100.asOneTimePublisher()
+        private var numRows: Flow.Publisher<out Int> = 20.asOneTimePublisher()
+        private var seatFilter: Flow.Publisher<out Set<T>?> = (null as Set<T>?).asOneTimePublisher()
+        private var headerFunc: (Party) -> String = { "$it PREVIOUS SEATS" }
+
+        fun withSeatsToShow(
+            leftSeatCountPublisher: Flow.Publisher<out Int>,
+            rightSeatCountPublisher: Flow.Publisher<out Int>
+        ): DoublePartyBuilder<T> {
+            leftSeatCount = leftSeatCountPublisher
+            rightSeatCount = rightSeatCountPublisher
+            return this
         }
 
-        private var prev: Map<T, Map<Party, Int>> = HashMap()
-        private var curr: Map<T, PartyResult?> = HashMap()
-        private var count = 0
-        private var party: Party? = null
-        private var side = Side.TARGET
-        private var filteredSeats: Set<T>? = null
-
-        fun setPrev(prev: Map<T, Map<Party, Int>>) {
-            this.prev = prev
-            submit()
+        fun withNumRows(numRowsPublisher: Flow.Publisher<out Int>): DoublePartyBuilder<T> {
+            numRows = numRowsPublisher
+            return this
         }
 
-        fun setCurr(curr: Map<T, PartyResult?>) {
-            this.curr = curr
-            submit()
+        fun withSeatFilter(seatFilterPublisher: Flow.Publisher<out Set<T>?>): DoublePartyBuilder<T> {
+            seatFilter = seatFilterPublisher
+            return this
         }
 
-        fun setCount(count: Int) {
-            this.count = count
-            submit()
+        fun withHeaderFunc(headerFunc: (Party) -> String): DoublePartyBuilder<T> {
+            this.headerFunc = headerFunc
+            return this
         }
 
-        fun setParty(party: Party?) {
-            this.party = party
-            submit()
-        }
+        fun build(title: Flow.Publisher<out String?>): BattlegroundScreen {
+            val headerLabel = FontSizeAdjustingLabel()
+            headerLabel.font = readBoldFont(32)
+            headerLabel.horizontalAlignment = JLabel.CENTER
+            headerLabel.border = EmptyBorder(5, 0, -5, 0)
+            headerLabel.foreground = Color.BLACK
+            title.subscribe(Subscriber(eventQueueWrapper { headerLabel.text = it }))
 
-        fun setSide(side: Side) {
-            this.side = side
-            submit()
-        }
+            val leftInput = DoubleBattlegroundInput<T>()
+            prevResults.subscribe(Subscriber { leftInput.prev = it })
+            currResults.subscribe(Subscriber { leftInput.curr = it })
+            leftSeatCount.subscribe(Subscriber { leftInput.count = it })
+            parties.subscribe(Subscriber { leftInput.party = it })
+            seatFilter.subscribe(Subscriber { leftInput.filteredSeats = it })
+            val leftItems = leftInput.items
+            val leftFrame = ResultListingFrame(
+                headerPublisher = parties.map { headerFunc(it.first) },
+                borderColorPublisher = parties.map { it.first.color },
+                headerAlignmentPublisher = GraphicsFrame.Alignment.RIGHT.asOneTimePublisher(),
+                numRowsPublisher = numRows,
+                itemsPublisher = leftItems.mapElements {
+                    ResultListingFrame.Item(
+                        text = nameFunc(it.key),
+                        border = it.prevColor,
+                        background = (if (it.fill) it.resultColor else Color.WHITE),
+                        foreground = (if (!it.fill) it.resultColor else Color.WHITE)
+                    )
+                },
+                reversedPublisher = true.asOneTimePublisher()
+            )
 
-        fun setFilteredSeats(filteredSeats: Set<T>?) {
-            this.filteredSeats = filteredSeats
-            submit()
+            val rightInput = DoubleBattlegroundInput<T>()
+            prevResults.subscribe(Subscriber { rightInput.prev = it })
+            currResults.subscribe(Subscriber { rightInput.curr = it })
+            rightSeatCount.subscribe(Subscriber { rightInput.count = it })
+            parties.subscribe(Subscriber { rightInput.party = it.reverse() })
+            seatFilter.subscribe(Subscriber { rightInput.filteredSeats = it })
+            val rightItems = rightInput.items
+            val rightFrame = ResultListingFrame(
+                headerPublisher = parties.map { headerFunc(it.second) },
+                borderColorPublisher = parties.map { it.second.color },
+                headerAlignmentPublisher = GraphicsFrame.Alignment.LEFT.asOneTimePublisher(),
+                numRowsPublisher = numRows,
+                itemsPublisher = rightItems.mapElements {
+                    ResultListingFrame.Item(
+                        text = nameFunc(it.key),
+                        border = it.prevColor,
+                        background = (if (it.fill) it.resultColor else Color.WHITE),
+                        foreground = (if (!it.fill) it.resultColor else Color.WHITE)
+                    )
+                },
+                reversedPublisher = false.asOneTimePublisher()
+            )
+
+            return BattlegroundScreen(
+                headerLabel,
+                leftFrame,
+                rightFrame
+            ) { screen ->
+                val layout = screen.Layout()
+                leftSeatCount
+                    .merge(numRows) { c, n -> n * ceil(1.0 * c / n).toInt() }
+                    .subscribe(Subscriber(eventQueueWrapper { layout.setLeft(it) }))
+                rightSeatCount
+                    .merge(numRows) { c, n -> n * ceil(1.0 * c / n).toInt() }
+                    .subscribe(Subscriber(eventQueueWrapper { layout.setRight(it) }))
+                layout
+            }
         }
+    }
+
+    private abstract class BattlegroundInput<T, P> {
+        var prev: Map<T, Map<Party, Int>> = HashMap()
+            set(value) {
+                field = value
+                submit()
+            }
+
+        var curr: Map<T, PartyResult?> = HashMap()
+            set(value) {
+                field = value
+                submit()
+            }
+
+        var count = 0
+            set(value) {
+                field = value
+                submit()
+            }
+
+        var party: P? = null
+            set(value) {
+                field = value
+                submit()
+            }
+
+        var filteredSeats: Set<T>? = null
+            set(value) {
+                field = value
+                submit()
+            }
 
         private fun submit() {
             synchronized(this) {
-                (items as Publisher<List<Entry<T>>>).submit(getItemsList(this))
+                (items as Publisher<List<Entry<T>>>).submit(getItemsList())
             }
         }
 
-        val items: Flow.Publisher<List<Entry<T>>> = Publisher(getItemsList(this))
+        val items: Flow.Publisher<List<Entry<T>>> = Publisher(getItemsList())
 
-        companion object {
-            private fun <T> getItemsList(t: BattlegroundInput<T>): List<Entry<T>> {
-                return t.prev.entries.asSequence()
-                    .map { e ->
-                        val votes = e.value
-                        val total = votes.values.sum()
-                        val topTwo = votes.entries
-                            .sortedByDescending { it.value }
-                            .take(2)
-                            .toList()
-                        val margin: Double = if (t.side == Side.TARGET) {
-                            if (topTwo[0].key == t.party) Double.NaN else 1.0 * (
-                                topTwo[0].value - (
-                                    votes[t.party]
-                                        ?: 0
-                                    )
-                                ) / total
-                        } else {
-                            if (topTwo[0].key != t.party) Double.NaN else 1.0 * (
-                                (
-                                    votes[t.party]
-                                        ?: 0
-                                    ) - topTwo[1].value
-                                ) / total
-                        }
-                        Triple(e.key, margin, topTwo[0].key.color)
+        private fun getItemsList(): List<Entry<T>> {
+            return prev.entries.asSequence()
+                .mapNotNull { e ->
+                    val votes = e.value
+                    val prevWinner = votes.maxBy { it.value }.key
+                    val margin: Double? = getSortKey(votes)
+                    if (margin == null)
+                        null
+                    else
+                        Triple(e.key, margin, prevWinner.color)
+                }
+                .sortedBy { it.second }
+                .take(count)
+                .map {
+                    val partyResult = curr[it.first]
+                    val resultColor: Color
+                    val fill: Boolean
+                    if (partyResult == null) {
+                        resultColor = Color.BLACK
+                        fill = false
+                    } else {
+                        resultColor = partyResult.party?.color ?: Color.BLACK
+                        fill = partyResult.isElected
                     }
-                    .filter { !it.second.isNaN() }
-                    .sortedBy { it.second }
-                    .take(t.count)
-                    .map {
-                        val partyResult = t.curr[it.first]
-                        val resultColor: Color
-                        val fill: Boolean
-                        if (partyResult == null) {
-                            resultColor = Color.BLACK
-                            fill = false
-                        } else {
-                            resultColor = partyResult.party?.color ?: Color.BLACK
-                            fill = partyResult.isElected
-                        }
-                        val colorFunc = if (t.filteredSeats?.contains(it.first) != false) { c: Color -> c } else { c -> lighten(lighten(c)) }
-                        Entry(
-                            it.first, colorFunc(it.third), colorFunc(resultColor), fill
-                        )
-                    }
-                    .toList()
-            }
+                    val colorFunc = if (filteredSeats?.contains(it.first) != false) { c: Color -> c } else { c -> lighten(lighten(c)) }
+                    Entry(
+                        it.first, colorFunc(it.third), colorFunc(resultColor), fill
+                    )
+                }
+                .toList()
+        }
+
+        protected abstract fun getSortKey(votes: Map<Party, Int>): Double?
+    }
+
+    private class DefenseBattlegroundInput<T> : BattlegroundInput<T, Party>() {
+        override fun getSortKey(votes: Map<Party, Int>): Double? {
+            val total = votes.values.sum()
+            val topTwo = votes.entries
+                .sortedByDescending { it.value }
+                .take(2)
+                .toList()
+            return if (topTwo[0].key != party)
+                null
+            else
+                ((votes[party] ?: 0) - topTwo[1].value) / total.toDouble()
+        }
+    }
+
+    private class TargetBattlegroundInput<T> : BattlegroundInput<T, Party>() {
+        override fun getSortKey(votes: Map<Party, Int>): Double? {
+            val total = votes.values.sum()
+            val topTwo = votes.entries
+                .sortedByDescending { it.value }
+                .take(2)
+                .toList()
+            return if (topTwo[0].key == party)
+                null
+            else
+                (topTwo[0].value - (votes[party] ?: 0)) / total.toDouble()
+        }
+    }
+
+    private class DoubleBattlegroundInput<T> : BattlegroundInput<T, Pair<Party, Party>>() {
+        override fun getSortKey(votes: Map<Party, Int>): Double? {
+            val total = votes.values.sum()
+            val prevWinner = votes.entries.maxBy { it.value }.key
+            val topTwo = votes.entries
+                .filter { it.key == party?.first || it.key == party?.second }
+                .sortedByDescending { it.value }
+                .toList()
+            return if (topTwo.isEmpty() || prevWinner != party?.first)
+                null
+            else if (topTwo.size < 2)
+                topTwo[0].value / total.toDouble()
+            else
+                (topTwo[0].value - topTwo[1].value) / total.toDouble()
         }
     }
 
@@ -296,6 +418,15 @@ class BattlegroundScreen private constructor(
         ): SinglePartyBuilder<T> {
             return SinglePartyBuilder(prevResultsPublisher, currResultsPublisher, nameFunc, partyPublisher)
         }
+
+        fun <T> doubleParty(
+            prevResultsPublisher: Flow.Publisher<out Map<T, Map<Party, Int>>>,
+            currResultsPublisher: Flow.Publisher<out Map<T, PartyResult?>>,
+            nameFunc: (T) -> String,
+            partyPublisher: Flow.Publisher<out Pair<Party, Party>>
+        ): DoublePartyBuilder<T> {
+            return DoublePartyBuilder(prevResultsPublisher, currResultsPublisher, nameFunc, partyPublisher)
+        }
     }
 
     init {
@@ -310,4 +441,8 @@ class BattlegroundScreen private constructor(
         panel.add(rightPanel)
         add(panel, BorderLayout.CENTER)
     }
+}
+
+internal fun <L, R> Pair<L, R>.reverse(): Pair<R, L> {
+    return second to first
 }
