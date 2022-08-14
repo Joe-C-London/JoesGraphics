@@ -92,6 +92,16 @@ class SwingometerScreen private constructor(title: JLabel, frame: SwingometerFra
                     }
                 }
 
+            var carryovers: Map<Party, Int> = emptyMap()
+                set(value) {
+                    synchronized(this) {
+                        field = value
+                        updateLeftAndRightToWin()
+                        updateOuterLabels()
+                        updateDots()
+                    }
+                }
+
             val colorsPublisher = Publisher<Pair<Color, Color>>()
             private fun updateColors() = colorsPublisher.submit(calculateColors())
             private fun calculateColors() =
@@ -113,13 +123,13 @@ class SwingometerScreen private constructor(title: JLabel, frame: SwingometerFra
             val leftToWinPublisher = Publisher<Double>()
             private fun calculateLeftToWin() =
                 getSwingNeededForMajority(
-                    prevVotes, parties.first, parties.second
+                    prevVotes, parties.first, parties.second, carryovers
                 )
 
             val rightToWinPublisher = Publisher<Double>()
             private fun calculateRightToWin() =
                 getSwingNeededForMajority(
-                    prevVotes, parties.second, parties.first
+                    prevVotes, parties.second, parties.first, carryovers
                 )
 
             private fun updateLeftAndRightToWin() {
@@ -134,14 +144,14 @@ class SwingometerScreen private constructor(title: JLabel, frame: SwingometerFra
 
             private fun calculateOuterLabels(): List<Triple<Double, Color, String>> {
                 val leftSwingList = createSwingList(
-                    prevVotes.values, parties.first, parties.second
+                    prevVotes.values, parties.first, parties.second, carryovers
                 )
                 val rightSwingList = createSwingList(
-                    prevVotes.values, parties.second, parties.first
+                    prevVotes.values, parties.second, parties.first, carryovers
                 )
                 val leftSeats = getNumSeats(leftSwingList)
                 val rightSeats = getNumSeats(rightSwingList)
-                val majority = prevVotes.size / 2 + 1
+                val majority = (prevVotes.size + carryovers.values.sum()) / 2 + 1
                 return sequenceOf(
                     sequenceOf(zeroLabel(parties, leftSeats, rightSeats)),
                     majorityLabels(parties, leftSwingList, rightSwingList, majority).asSequence(),
@@ -153,7 +163,8 @@ class SwingometerScreen private constructor(title: JLabel, frame: SwingometerFra
                         rightSeats,
                         prevVotes,
                         seatLabelIncrement,
-                        parties
+                        parties,
+                        carryovers
                     ).asSequence()
                 ).flatten()
                     .let { filterNearbyLabels(it) }
@@ -217,6 +228,11 @@ class SwingometerScreen private constructor(title: JLabel, frame: SwingometerFra
             return this
         }
 
+        fun withCarryovers(seats: Flow.Publisher<Map<Party, Int>>): Builder<T> {
+            seats.subscribe(Subscriber { inputs.carryovers = it })
+            return this
+        }
+
         fun build(title: Flow.Publisher<out String?>): SwingometerScreen {
             val headerLabel = FontSizeAdjustingLabel()
             headerLabel.font = StandardFont.readBoldFont(32)
@@ -260,11 +276,12 @@ class SwingometerScreen private constructor(title: JLabel, frame: SwingometerFra
                 rightSeats: Int,
                 prevVotes: Map<T, Map<Party, Int>>,
                 seatLabelIncrement: Int,
-                parties: Pair<Party, Party>
+                parties: Pair<Party, Party>,
+                carryovers: Map<Party, Int>
             ): ArrayList<Triple<Double, Color, String>> {
                 val ret = ArrayList<Triple<Double, Color, String>>()
                 var i = 0
-                while (i < prevVotes.size) {
+                while (i < (prevVotes.size + carryovers.values.sum())) {
                     if (i <= (leftSeats + rightSeats) / 2) {
                         i += seatLabelIncrement
                         continue
@@ -350,6 +367,9 @@ class SwingometerScreen private constructor(title: JLabel, frame: SwingometerFra
                         Triple(rightMajority, parties.second.color, majority.toString())
                     )
                 }
+                if (rightMajority > 0) {
+                    ret.reverse()
+                }
                 return ret
             }
 
@@ -370,10 +390,11 @@ class SwingometerScreen private constructor(title: JLabel, frame: SwingometerFra
             private fun <T> getSwingNeededForMajority(
                 votes: Map<T, Map<Party, Int>>,
                 focusParty: Party?,
-                compParty: Party?
+                compParty: Party?,
+                carryovers: Map<Party, Int>
             ): Double {
-                val majority = votes.size / 2 + 1
-                return createSwingList(votes.values, focusParty, compParty)
+                val majority = (votes.size + carryovers.values.sum()) / 2 + 1
+                return createSwingList(votes.values, focusParty, compParty, carryovers)
                     .drop(majority - 1)
                     .firstOrNull()
                     ?: Double.POSITIVE_INFINITY
@@ -382,9 +403,10 @@ class SwingometerScreen private constructor(title: JLabel, frame: SwingometerFra
             private fun createSwingList(
                 results: Collection<Map<Party, Int>>,
                 focusParty: Party?,
-                compParty: Party?
+                compParty: Party?,
+                carryovers: Map<Party, Int>
             ): List<Double> {
-                return results.asSequence()
+                val contestedSeats = results.asSequence()
                     .filter { m ->
                         val winner = m.entries.maxByOrNull { it.value }!!.key
                         winner == focusParty || winner == compParty
@@ -395,6 +417,9 @@ class SwingometerScreen private constructor(title: JLabel, frame: SwingometerFra
                         val comp = m[compParty] ?: 0
                         0.5 * (comp - focus) / total
                     }
+                val focusCarries = generateSequence { Double.NEGATIVE_INFINITY }.take(carryovers[focusParty] ?: 0)
+                val compCarries = generateSequence { Double.POSITIVE_INFINITY }.take(carryovers[compParty] ?: 0)
+                return sequenceOf(contestedSeats, focusCarries, compCarries).flatten()
                     .sorted()
                     .toList()
             }

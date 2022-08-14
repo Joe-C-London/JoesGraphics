@@ -139,6 +139,65 @@ class SwingometerScreenTest {
         compareRendering("SwingometerScreen", "Basic-TwoPartyVotes-3", panel)
     }
 
+    @Test
+    fun testIncludingCarryovers() {
+        val dem = Party("Democrats", "DEM", Color.BLUE)
+        val gop = Party("Republicans", "GOP", Color.RED)
+        val oth = Party.OTHERS
+
+        val prevResult = mapOf(
+            "AL" to mapOf(gop to 640, dem to 358, oth to 2),
+            "AK" to mapOf(gop to 445, dem to 116, oth to 439),
+            "AZ" to mapOf(gop to 537, dem to 408, oth to 55),
+            "AR" to mapOf(gop to 597, dem to 363, oth to 40),
+            "CA" to mapOf(dem to 1000),
+            "CO" to mapOf(dem to 500, gop to 443, oth to 57),
+            "CT" to mapOf(dem to 632, gop to 346, oth to 22),
+            "FL" to mapOf(gop to 520, dem to 443, oth to 37),
+            "GA" to mapOf(gop to 548, dem to 410, oth to 42),
+            "HI" to mapOf(dem to 736, gop to 222, oth to 42),
+            "ID" to mapOf(gop to 661, dem to 278, oth to 61),
+            "IL" to mapOf(dem to 549, gop to 398, oth to 53),
+            "IN" to mapOf(gop to 521, dem to 424, oth to 55),
+            "IA" to mapOf(gop to 601, dem to 357, oth to 27),
+            "KS" to mapOf(gop to 621, dem to 322, oth to 57),
+            "KY" to mapOf(gop to 573, dem to 427),
+            "LA" to mapOf(gop to 606, dem to 394),
+            "MD" to mapOf(dem to 609, gop to 357, oth to 34),
+            "MO" to mapOf(gop to 493, dem to 462, oth to 45),
+            "NV" to mapOf(dem to 471, gop to 447, oth to 82),
+            "NH" to mapOf(dem to 480, gop to 479, oth to 41),
+            "NY" to mapOf(dem to 704, gop to 274, oth to 22),
+            "NC" to mapOf(gop to 511, dem to 453, oth to 36),
+            "ND" to mapOf(gop to 784, dem to 170, oth to 46),
+            "OH" to mapOf(gop to 580, dem to 371, oth to 49),
+            "OK" to mapOf(gop to 677, dem to 245, oth to 78),
+            "OR" to mapOf(dem to 561, gop to 334, oth to 105),
+            "PA" to mapOf(gop to 489, dem to 472, oth to 39),
+            "SC" to mapOf(gop to 605, dem to 370, oth to 25),
+            "SD" to mapOf(gop to 718, dem to 282),
+            "UT" to mapOf(gop to 681, dem to 271, oth to 48),
+            "VT" to mapOf(dem to 631, gop to 330, oth to 39),
+            "WA" to mapOf(dem to 588, gop to 409, oth to 3),
+            "WI" to mapOf(gop to 502, dem to 468, oth to 30),
+        ).asOneTimePublisher()
+        val parties = Publisher(dem to gop)
+        val panel = of(
+            prevResult,
+            emptyMap<String, PartyResult?>().asOneTimePublisher(),
+            emptyMap<Party, Double>().asOneTimePublisher(),
+            parties,
+            "SWINGOMETER".asOneTimePublisher()
+        )
+            .withSeatLabelIncrements(5.asOneTimePublisher())
+            .withCarryovers(mapOf(dem to 36, gop to 30).asOneTimePublisher())
+            .build("US SENATE".asOneTimePublisher())
+        panel.setSize(1024, 512)
+        compareRendering("SwingometerScreen", "Carryovers-1", panel)
+        parties.submit(gop to dem)
+        compareRendering("SwingometerScreen", "Carryovers-2", panel)
+    }
+
     companion object {
         private val lib = Party("Liberal", "LIB", Color.RED)
         private val grn = Party("Green", "GRN", Color.GREEN.darker())
