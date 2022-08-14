@@ -10,6 +10,7 @@ import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
 import com.joecollins.pubsub.asOneTimePublisher
+import com.joecollins.pubsub.merge
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.GridLayout
@@ -21,7 +22,7 @@ import kotlin.math.ceil
 import kotlin.math.roundToInt
 
 class SwingometerScreen private constructor(title: JLabel, frame: SwingometerFrame) : JPanel() {
-    class Builder<T>(
+    class Builder<T> internal constructor(
         prevVotesPublisher: Flow.Publisher<out Map<T, Map<Party, Int>>>,
         resultsPublisher: Flow.Publisher<out Map<T, PartyResult?>>,
         partiesPublisher: Flow.Publisher<out Pair<Party, Party>>,
@@ -98,7 +99,7 @@ class SwingometerScreen private constructor(title: JLabel, frame: SwingometerFra
 
             val valuePublisher = Publisher<Double>()
             private fun updateValue() {
-                if (parties != null) valuePublisher.submit(calculateValue())
+                valuePublisher.submit(calculateValue())
             }
 
             private fun calculateValue(): Double {
@@ -420,6 +421,25 @@ class SwingometerScreen private constructor(title: JLabel, frame: SwingometerFra
             parties: Flow.Publisher<out Pair<Party, Party>>,
             header: Flow.Publisher<out String?>
         ): Builder<T> {
+            return Builder(prevVotes, results, parties, swing, header)
+        }
+
+        fun <T> of(
+            prevVotes: Flow.Publisher<out Map<T, Map<Party, Int>>>,
+            results: Flow.Publisher<out Map<T, PartyResult?>>,
+            currTotal: Flow.Publisher<out Map<Party, Int>>,
+            prevTotal: Flow.Publisher<out Map<Party, Int>>,
+            parties: Flow.Publisher<out Pair<Party, Party>>,
+            header: Flow.Publisher<out String?>
+        ): Builder<T> {
+            val swing = currTotal.merge(prevTotal) { curr, prev ->
+                val ct = curr.values.sum().toDouble()
+                val pt = prev.values.sum().toDouble()
+                val parties: Set<Party> = sequenceOf(curr.keys.asSequence(), prev.keys.asSequence()).flatten().toSet()
+                parties.associateWith { p: Party? ->
+                    (curr[p] ?: 0) / ct.coerceAtLeast(1e-6) - (prev[p] ?: 0) / pt.coerceAtLeast(1e-6)
+                }
+            }
             return Builder(prevVotes, results, parties, swing, header)
         }
     }

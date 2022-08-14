@@ -114,6 +114,31 @@ class SwingometerScreenTest {
         compareRendering("SwingometerScreen", "Basic-ProgressLabel", panel)
     }
 
+    @Test
+    fun testBasicTwoPartiesWithVotes() {
+        val prevResult = Publisher(nbPrevResult())
+        val currResult = Publisher(nbCurrResult())
+        val parties = Publisher(Pair(lib, pc))
+        val curr = Publisher(mapOf(pc to 147790, lib to 129025, grn to 57252, pa to 34526, ndp to 6220, ind to 824))
+        val prev = Publisher(mapOf(pc to 121300, lib to 143791, grn to 45186, pa to 47860, ndp to 19039, ind to 3187))
+        val panel = of(
+            prevResult,
+            currResult,
+            curr,
+            prev,
+            parties,
+            "SWINGOMETER".asOneTimePublisher()
+        )
+            .withSeatLabelIncrements(3.asOneTimePublisher())
+            .build("NEW BRUNSWICK".asOneTimePublisher())
+        panel.setSize(1024, 512)
+        compareRendering("SwingometerScreen", "Basic-TwoPartyVotes-1", panel)
+        parties.submit(Pair(grn, pc))
+        compareRendering("SwingometerScreen", "Basic-TwoPartyVotes-2", panel)
+        parties.submit(Pair(pa, pc))
+        compareRendering("SwingometerScreen", "Basic-TwoPartyVotes-3", panel)
+    }
+
     companion object {
         private val lib = Party("Liberal", "LIB", Color.RED)
         private val grn = Party("Green", "GRN", Color.GREEN.darker())

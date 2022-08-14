@@ -15,6 +15,8 @@ data class PartyResult(val party: Party?, val elected: Boolean) {
         }
     }
 
+    val winner = party?.takeIf { elected }
+
     companion object {
         @JvmField val NO_RESULT = PartyResult(null, false)
 
