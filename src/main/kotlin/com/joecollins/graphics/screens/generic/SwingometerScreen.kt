@@ -29,7 +29,7 @@ class SwingometerScreen private constructor(title: JLabel, frame: SwingometerFra
         partySwingsPublisher: Flow.Publisher<out Map<Party, Double>>,
         headerPublisher: Flow.Publisher<out String?>
     ) {
-        private class Inputs<T> {
+        private inner class Inputs {
             var prevVotes: Map<T, Map<Party, Int>> = emptyMap()
                 set(value) {
                     synchronized(this) {
@@ -102,6 +102,16 @@ class SwingometerScreen private constructor(title: JLabel, frame: SwingometerFra
                     }
                 }
 
+            var weights: ((T) -> Int)? = null
+                set(value) {
+                    synchronized(this) {
+                        field = value
+                        updateLeftAndRightToWin()
+                        updateOuterLabels()
+                        updateDots()
+                    }
+                }
+
             val colorsPublisher = Publisher<Pair<Color, Color>>()
             private fun updateColors() = colorsPublisher.submit(calculateColors())
             private fun calculateColors() =
@@ -144,14 +154,14 @@ class SwingometerScreen private constructor(title: JLabel, frame: SwingometerFra
 
             private fun calculateOuterLabels(): List<Triple<Double, Color, String>> {
                 val leftSwingList = createSwingList(
-                    prevVotes.values, parties.first, parties.second, carryovers
+                    prevVotes, parties.first, parties.second, carryovers
                 )
                 val rightSwingList = createSwingList(
-                    prevVotes.values, parties.second, parties.first, carryovers
+                    prevVotes, parties.second, parties.first, carryovers
                 )
                 val leftSeats = getNumSeats(leftSwingList)
                 val rightSeats = getNumSeats(rightSwingList)
-                val majority = (prevVotes.size + carryovers.values.sum()) / 2 + 1
+                val majority = (prevVotes.keys.sumOf { weights?.let { f -> f(it) } ?: 1 } + carryovers.values.sum()) / 2 + 1
                 return sequenceOf(
                     sequenceOf(zeroLabel(parties, leftSeats, rightSeats)),
                     majorityLabels(parties, leftSwingList, rightSwingList, majority).asSequence(),
@@ -171,40 +181,41 @@ class SwingometerScreen private constructor(title: JLabel, frame: SwingometerFra
                     .toList()
             }
 
-            val dotsPublisher = Publisher<List<Triple<Double, Color, Boolean>>>()
+            val dotsPublisher = Publisher<List<Dot>>()
             private fun updateDots() {
                 dotsPublisher.submit(calculateDots())
             }
 
-            private fun calculateDots(): List<Triple<Double, Color, Boolean>> =
+            private fun calculateDots(): List<Dot> =
                 prevVotes.entries.asSequence()
                     .map { e ->
                         Triple(
-                            e.value,
+                            e,
                             results[e.key] ?: PartyResult(null, false),
                             seatFilter?.contains(e.key) ?: true
                         )
                     }
                     .filter { e ->
-                        val winner = e.first.entries
+                        val winner = e.first.value.entries
                             .maxByOrNull { it.value }!!
                             .key
                         winner == parties.first || winner == parties.second
                     }
                     .map { e ->
-                        val total = e.first.values.sum()
-                        val left = e.first[parties.first] ?: 0
-                        val right = e.first[parties.second] ?: 0
-                        Triple(
+                        val total = e.first.value.values.sum()
+                        val left = e.first.value[parties.first] ?: 0
+                        val right = e.first.value[parties.second] ?: 0
+                        Dot(
                             0.5 * (left - right) / total,
                             e.second.color,
-                            e.third
+                            e.third,
+                            weights?.let { f -> f(e.first.key).toString() }
                         )
                     }
                     .toList()
         }
 
-        private val inputs = Inputs<T>()
+        private val inputs = Inputs()
         private val header: Flow.Publisher<out String?>
         private var progressLabel: Flow.Publisher<out String?> = null.asOneTimePublisher()
 
@@ -233,6 +244,11 @@ class SwingometerScreen private constructor(title: JLabel, frame: SwingometerFra
             return this
         }
 
+        fun withWeights(weights: (T) -> Int): Builder<T> {
+            inputs.weights = weights
+            return this
+        }
+
         fun build(title: Flow.Publisher<out String?>): SwingometerScreen {
             val headerLabel = FontSizeAdjustingLabel()
             headerLabel.font = StandardFont.readBoldFont(32)
@@ -251,7 +267,7 @@ class SwingometerScreen private constructor(title: JLabel, frame: SwingometerFra
             val leftToWinPublisher = inputs.leftToWinPublisher
             val rightToWinPublisher = inputs.rightToWinPublisher
             return SwingometerFrameBuilder.basic(colorsPublisher, valuePublisher)
-                .withDotsSolid(dotsList, { it.first }, { it.second }) { it.third }
+                .withDots(dotsList, { it.position }, { it.color }, { it.label ?: "" }) { it.visible }
                 .withHeader(header, rightLabel = progressLabel)
                 .withRange(rangePublisher)
                 .withTickInterval(0.01.asOneTimePublisher()) { (it.toDouble() * 100).roundToInt().toString() }
@@ -267,165 +283,166 @@ class SwingometerScreen private constructor(title: JLabel, frame: SwingometerFra
                 return inputs.outerLabelsPublisher
             }
 
-        companion object {
-
-            private fun <T> incrementLabels(
-                leftSwingList: List<Double>,
-                rightSwingList: List<Double>,
-                leftSeats: Int,
-                rightSeats: Int,
-                prevVotes: Map<T, Map<Party, Int>>,
-                seatLabelIncrement: Int,
-                parties: Pair<Party, Party>,
-                carryovers: Map<Party, Int>
-            ): ArrayList<Triple<Double, Color, String>> {
-                val ret = ArrayList<Triple<Double, Color, String>>()
-                var i = 0
-                while (i < (prevVotes.size + carryovers.values.sum())) {
-                    if (i <= (leftSeats + rightSeats) / 2) {
-                        i += seatLabelIncrement
-                        continue
-                    }
-                    if (i <= leftSwingList.size) {
-                        ret.add(
-                            Triple(-leftSwingList[i - 1], parties.first.color, i.toString())
-                        )
-                    }
-                    if (i <= rightSwingList.size) {
-                        ret.add(
-                            Triple(rightSwingList[i - 1], parties.second.color, i.toString())
-                        )
-                    }
+        private fun incrementLabels(
+            leftSwingList: List<Double>,
+            rightSwingList: List<Double>,
+            leftSeats: Int,
+            rightSeats: Int,
+            prevVotes: Map<T, Map<Party, Int>>,
+            seatLabelIncrement: Int,
+            parties: Pair<Party, Party>,
+            carryovers: Map<Party, Int>
+        ): ArrayList<Triple<Double, Color, String>> {
+            val ret = ArrayList<Triple<Double, Color, String>>()
+            var i = 0
+            while (i < (prevVotes.keys.sumOf { inputs.weights?.let { f -> f(it) } ?: 1 } + carryovers.values.sum())) {
+                if (i <= (leftSeats + rightSeats) / 2) {
                     i += seatLabelIncrement
+                    continue
                 }
-                return ret
-            }
-
-            private fun filterNearbyLabels(ret: Sequence<Triple<Double, Color, String>>): Sequence<Triple<Double, Color, String>> {
-                val ranges: MutableSet<ClosedRange<Double>> = HashSet()
-                return ret.filter { item ->
-                    if (ranges.any { range -> range.contains(item.first) }) {
-                        false
-                    } else {
-                        ranges.add((item.first - 0.005).rangeTo(item.first + 0.005))
-                        true
-                    }
+                if (i <= leftSwingList.size) {
+                    ret.add(
+                        Triple(-leftSwingList[i - 1], parties.first.color, i.toString())
+                    )
                 }
+                if (i <= rightSwingList.size) {
+                    ret.add(
+                        Triple(rightSwingList[i - 1], parties.second.color, i.toString())
+                    )
+                }
+                i += seatLabelIncrement
             }
+            return ret
+        }
 
-            private fun leadChangeLabel(
-                parties: Pair<Party, Party>,
-                leftSwingList: List<Double>,
-                rightSwingList: List<Double>,
-                leftSeats: Int,
-                rightSeats: Int
-            ): Triple<Double, Color, String> {
-                val newLeadSeats = ceil(0.5 * (leftSeats + rightSeats)).toInt()
-                val swing: Double
-                val color: Color
-                if (leftSeats > rightSeats) {
-                    swing = rightSwingList
-                        .drop(newLeadSeats - 1)
-                        .firstOrNull()
-                        ?: Double.POSITIVE_INFINITY
-                    color = if ((leftSeats + rightSeats) % 2 == 0) Color.BLACK else parties.second.color
+        private fun filterNearbyLabels(ret: Sequence<Triple<Double, Color, String>>): Sequence<Triple<Double, Color, String>> {
+            val ranges: MutableSet<ClosedRange<Double>> = HashSet()
+            return ret.filter { item ->
+                if (ranges.any { range -> range.contains(item.first) }) {
+                    false
                 } else {
-                    swing = -1 *
-                        (
-                            leftSwingList
-                                .drop(newLeadSeats - 1)
-                                .firstOrNull()
-                                ?: Double.POSITIVE_INFINITY
-                            )
-                    color = if ((leftSeats + rightSeats) % 2 == 0) Color.BLACK else parties.first.color
+                    ranges.add((item.first - 0.005).rangeTo(item.first + 0.005))
+                    true
                 }
-                return Triple(swing, color, newLeadSeats.toString())
-            }
-
-            private fun majorityLabels(
-                parties: Pair<Party, Party>,
-                leftSwingList: List<Double>,
-                rightSwingList: List<Double>,
-                majority: Int
-            ): ArrayList<Triple<Double, Color, String>> {
-                val ret = ArrayList<Triple<Double, Color, String>>()
-                val leftMajority = -1 *
-                    (
-                        leftSwingList
-                            .drop((majority - 1))
-                            .firstOrNull()
-                            ?: Double.POSITIVE_INFINITY
-                        )
-                val rightMajority = rightSwingList.drop((majority - 1)).firstOrNull() ?: Double.POSITIVE_INFINITY
-                if (leftMajority != rightMajority || leftMajority < 0) {
-                    ret.add(
-                        Triple(leftMajority, parties.first.color, majority.toString())
-                    )
-                }
-                if (leftMajority != rightMajority || rightMajority > 0) {
-                    ret.add(
-                        Triple(rightMajority, parties.second.color, majority.toString())
-                    )
-                }
-                if (rightMajority > 0) {
-                    ret.reverse()
-                }
-                return ret
-            }
-
-            private fun zeroLabel(
-                parties: Pair<Party, Party>,
-                leftSeats: Int,
-                rightSeats: Int
-            ) = when {
-                leftSeats > rightSeats -> Triple(0.0, parties.first.color, leftSeats.toString())
-                rightSeats > leftSeats -> Triple(0.0, parties.second.color, rightSeats.toString())
-                else -> Triple(0.0, Color.BLACK, rightSeats.toString())
-            }
-
-            private fun getNumSeats(swings: List<Double>): Int {
-                return swings.count { it < 0 }
-            }
-
-            private fun <T> getSwingNeededForMajority(
-                votes: Map<T, Map<Party, Int>>,
-                focusParty: Party?,
-                compParty: Party?,
-                carryovers: Map<Party, Int>
-            ): Double {
-                val majority = (votes.size + carryovers.values.sum()) / 2 + 1
-                return createSwingList(votes.values, focusParty, compParty, carryovers)
-                    .drop(majority - 1)
-                    .firstOrNull()
-                    ?: Double.POSITIVE_INFINITY
-            }
-
-            private fun createSwingList(
-                results: Collection<Map<Party, Int>>,
-                focusParty: Party?,
-                compParty: Party?,
-                carryovers: Map<Party, Int>
-            ): List<Double> {
-                val contestedSeats = results.asSequence()
-                    .filter { m ->
-                        val winner = m.entries.maxByOrNull { it.value }!!.key
-                        winner == focusParty || winner == compParty
-                    }
-                    .map { m ->
-                        val total = m.values.sum()
-                        val focus = m[focusParty] ?: 0
-                        val comp = m[compParty] ?: 0
-                        0.5 * (comp - focus) / total
-                    }
-                val focusCarries = generateSequence { Double.NEGATIVE_INFINITY }.take(carryovers[focusParty] ?: 0)
-                val compCarries = generateSequence { Double.POSITIVE_INFINITY }.take(carryovers[compParty] ?: 0)
-                return sequenceOf(contestedSeats, focusCarries, compCarries).flatten()
-                    .sorted()
-                    .toList()
             }
         }
 
-        private fun createDotsForSwingometer(): Flow.Publisher<List<Triple<Double, Color, Boolean>>> {
+        private fun leadChangeLabel(
+            parties: Pair<Party, Party>,
+            leftSwingList: List<Double>,
+            rightSwingList: List<Double>,
+            leftSeats: Int,
+            rightSeats: Int
+        ): Triple<Double, Color, String> {
+            val newLeadSeats = ceil(0.5 * (leftSeats + rightSeats)).toInt()
+            val swing: Double
+            val color: Color
+            if (leftSeats > rightSeats) {
+                swing = rightSwingList
+                    .drop(newLeadSeats - 1)
+                    .firstOrNull()
+                    ?: Double.POSITIVE_INFINITY
+                color = if ((leftSeats + rightSeats) % 2 == 0) Color.BLACK else parties.second.color
+            } else {
+                swing = -1 *
+                    (
+                        leftSwingList
+                            .drop(newLeadSeats - 1)
+                            .firstOrNull()
+                            ?: Double.POSITIVE_INFINITY
+                        )
+                color = if ((leftSeats + rightSeats) % 2 == 0) Color.BLACK else parties.first.color
+            }
+            return Triple(swing, color, newLeadSeats.toString())
+        }
+
+        private fun majorityLabels(
+            parties: Pair<Party, Party>,
+            leftSwingList: List<Double>,
+            rightSwingList: List<Double>,
+            majority: Int
+        ): ArrayList<Triple<Double, Color, String>> {
+            val ret = ArrayList<Triple<Double, Color, String>>()
+            val leftMajority = -1 *
+                (
+                    leftSwingList
+                        .drop((majority - 1))
+                        .firstOrNull()
+                        ?: Double.POSITIVE_INFINITY
+                    )
+            val rightMajority = rightSwingList.drop((majority - 1)).firstOrNull() ?: Double.POSITIVE_INFINITY
+            if (leftMajority != rightMajority || leftMajority < 0) {
+                ret.add(
+                    Triple(leftMajority, parties.first.color, majority.toString())
+                )
+            }
+            if (leftMajority != rightMajority || rightMajority > 0) {
+                ret.add(
+                    Triple(rightMajority, parties.second.color, majority.toString())
+                )
+            }
+            if (rightMajority > 0) {
+                ret.reverse()
+            }
+            return ret
+        }
+
+        private fun zeroLabel(
+            parties: Pair<Party, Party>,
+            leftSeats: Int,
+            rightSeats: Int
+        ) = when {
+            leftSeats > rightSeats -> Triple(0.0, parties.first.color, leftSeats.toString())
+            rightSeats > leftSeats -> Triple(0.0, parties.second.color, rightSeats.toString())
+            else -> Triple(0.0, Color.BLACK, rightSeats.toString())
+        }
+
+        private fun getNumSeats(swings: List<Double>): Int {
+            return swings.count { it < 0 }
+        }
+
+        private fun getSwingNeededForMajority(
+            votes: Map<T, Map<Party, Int>>,
+            focusParty: Party?,
+            compParty: Party?,
+            carryovers: Map<Party, Int>
+        ): Double {
+            val majority = (votes.keys.sumOf { inputs.weights?.let { f -> f(it) } ?: 1 } + carryovers.values.sum()) / 2 + 1
+            return createSwingList(votes, focusParty, compParty, carryovers)
+                .drop(majority - 1)
+                .firstOrNull()
+                ?: Double.POSITIVE_INFINITY
+        }
+
+        private fun createSwingList(
+            results: Map<T, Map<Party, Int>>,
+            focusParty: Party?,
+            compParty: Party?,
+            carryovers: Map<Party, Int>
+        ): List<Double> {
+            val contestedSeats = results.asSequence()
+                .filter { m ->
+                    val winner = m.value.entries.maxByOrNull { it.value }!!.key
+                    winner == focusParty || winner == compParty
+                }
+                .flatMap { m ->
+                    val total = m.value.values.sum()
+                    val focus = m.value[focusParty] ?: 0
+                    val comp = m.value[compParty] ?: 0
+                    val position = 0.5 * (comp - focus) / total
+                    val count = inputs.weights?.let { f -> f(m.key) } ?: 1
+                    generateSequence { position }.take(count)
+                }
+            val focusCarries = generateSequence { Double.NEGATIVE_INFINITY }.take(carryovers[focusParty] ?: 0)
+            val compCarries = generateSequence { Double.POSITIVE_INFINITY }.take(carryovers[compParty] ?: 0)
+            return sequenceOf(contestedSeats, focusCarries, compCarries).flatten()
+                .sorted()
+                .toList()
+        }
+
+        private data class Dot(val position: Double, val color: Color, val visible: Boolean, val label: String?)
+
+        private fun createDotsForSwingometer(): Flow.Publisher<List<Dot>> {
             return inputs.dotsPublisher
         }
 

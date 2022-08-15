@@ -198,6 +198,87 @@ class SwingometerScreenTest {
         compareRendering("SwingometerScreen", "Carryovers-2", panel)
     }
 
+    @Test
+    fun testWeightedDots() {
+        val dem = Party("Democrats", "DEM", Color.BLUE)
+        val gop = Party("Republicans", "GOP", Color.RED)
+        val oth = Party.OTHERS
+
+        val prevResult = mapOf(
+            ("AL" to 9) to mapOf(dem to 729547, gop to 1318255, oth to 75570),
+            ("AK" to 3) to mapOf(dem to 116454, gop to 163387, oth to 38767),
+            ("AZ" to 11) to mapOf(dem to 1161167, gop to 1252401, oth to 191089),
+            ("AR" to 6) to mapOf(dem to 380494, gop to 684872, oth to 65310),
+            ("CA" to 55) to mapOf(dem to 8753788, gop to 4483810, oth to 943997),
+            ("CO" to 9) to mapOf(dem to 1338870, gop to 1202484, oth to 238893),
+            ("CT" to 7) to mapOf(dem to 897572, gop to 673215, oth to 74133),
+            ("DE" to 3) to mapOf(dem to 235603, gop to 185127, oth to 23084),
+            ("DC" to 3) to mapOf(dem to 282830, gop to 12723, oth to 15715),
+            ("FL" to 29) to mapOf(dem to 4504975, gop to 4617886, oth to 297178),
+            ("GA" to 16) to mapOf(dem to 1877963, gop to 2089104, oth to 147665),
+            ("HI" to 4) to mapOf(dem to 266891, gop to 128847, oth to 33199),
+            ("ID" to 4) to mapOf(dem to 189765, gop to 409055, oth to 91435),
+            ("IL" to 20) to mapOf(dem to 3090729, gop to 2146015, oth to 299680),
+            ("IN" to 11) to mapOf(dem to 1033126, gop to 1557286, oth to 144546),
+            ("IA" to 6) to mapOf(dem to 653669, gop to 800983, oth to 111379),
+            ("KS" to 6) to mapOf(dem to 427005, gop to 671018, oth to 86379),
+            ("KY" to 8) to mapOf(dem to 628854, gop to 1202971, oth to 92324),
+            ("LA" to 8) to mapOf(dem to 780154, gop to 1178638, oth to 70240),
+            ("ME" to 2) to mapOf(dem to 357735, gop to 335593, oth to 54599),
+            ("ME-01" to 1) to mapOf(dem to 212774, gop to 154384, oth to 27171),
+            ("ME-02" to 1) to mapOf(dem to 144817, gop to 181177, oth to 27422),
+            ("MD" to 10) to mapOf(dem to 1677928, gop to 943169, oth to 160349),
+            ("MA" to 11) to mapOf(dem to 1995196, gop to 1090893, oth to 238957),
+            ("MI" to 16) to mapOf(dem to 2268839, gop to 2279543, oth to 250902),
+            ("MN" to 10) to mapOf(dem to 1367716, gop to 1322951, oth to 254146),
+            ("MS" to 6) to mapOf(dem to 485131, gop to 700714, oth to 23512),
+            ("MO" to 10) to mapOf(dem to 1071068, gop to 1594511, oth to 143026),
+            ("MT" to 3) to mapOf(dem to 177709, gop to 279240, oth to 40198),
+            ("NE" to 2) to mapOf(dem to 284494, gop to 495961, oth to 63772),
+            ("NE-01" to 1) to mapOf(dem to 100132, gop to 158642, oth to 23588),
+            ("NE-02" to 1) to mapOf(dem to 131030, gop to 137564, oth to 23086),
+            ("NE-03" to 1) to mapOf(dem to 53332, gop to 199755, oth to 17173),
+            ("NV" to 6) to mapOf(dem to 539260, gop to 512058, oth to 74067),
+            ("NH" to 4) to mapOf(dem to 348526, gop to 345790, oth to 49980),
+            ("NJ" to 14) to mapOf(dem to 2148278, gop to 1601933, oth to 123835),
+            ("NM" to 5) to mapOf(dem to 385234, gop to 319667, oth to 93418),
+            ("NY" to 29) to mapOf(dem to 4556124, gop to 2819534, oth to 345795),
+            ("NC" to 15) to mapOf(dem to 2189316, gop to 2362631, oth to 189617),
+            ("ND" to 3) to mapOf(dem to 93758, gop to 216794, oth to 33808),
+            ("OH" to 18) to mapOf(dem to 2394164, gop to 2841005, oth to 261318),
+            ("OK" to 7) to mapOf(dem to 420375, gop to 949136, oth to 83481),
+            ("OR" to 7) to mapOf(dem to 1002106, gop to 782403, oth to 216827),
+            ("PA" to 20) to mapOf(dem to 2926441, gop to 2970733, oth to 268304),
+            ("RI" to 4) to mapOf(dem to 252525, gop to 180543, oth to 31076),
+            ("SC" to 9) to mapOf(dem to 855373, gop to 1155389, oth to 92265),
+            ("SD" to 3) to mapOf(dem to 117458, gop to 227721, oth to 24914),
+            ("TN" to 11) to mapOf(dem to 870695, gop to 1522925, oth to 114407),
+            ("TX" to 38) to mapOf(dem to 3877868, gop to 4685047, oth to 406311),
+            ("UT" to 6) to mapOf(dem to 310676, gop to 515231, oth to 305523),
+            ("VT" to 3) to mapOf(dem to 178573, gop to 95369, oth to 41125),
+            ("VA" to 13) to mapOf(dem to 1981473, gop to 1769443, oth to 233715),
+            ("WA" to 12) to mapOf(dem to 1742718, gop to 1221747, oth to 352554),
+            ("WV" to 5) to mapOf(dem to 188794, gop to 489371, oth to 36258),
+            ("WI" to 10) to mapOf(dem to 1382536, gop to 1405284, oth to 188330),
+            ("WY" to 3) to mapOf(dem to 55973, gop to 174419, oth to 25457),
+        ).asOneTimePublisher()
+        val parties = Publisher(dem to gop)
+        val panel = of(
+            prevResult,
+            emptyMap<Pair<String, Int>, PartyResult?>().asOneTimePublisher(),
+            emptyMap<Party, Double>().asOneTimePublisher(),
+            parties,
+            "SWINGOMETER".asOneTimePublisher()
+        )
+            .withSeatLabelIncrements(50.asOneTimePublisher())
+            .withWeights { it.second }
+            .build("US PRESIDENT".asOneTimePublisher())
+        panel.setSize(1024, 512)
+        compareRendering("SwingometerScreen", "Weights-1", panel)
+        parties.submit(gop to dem)
+        compareRendering("SwingometerScreen", "Weights-2", panel)
+    }
+
     companion object {
         private val lib = Party("Liberal", "LIB", Color.RED)
         private val grn = Party("Green", "GRN", Color.GREEN.darker())
