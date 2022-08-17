@@ -379,7 +379,7 @@ class BasicResultPanel private constructor(
                                 it.key, numBars > doubleLineBarLimit()
                             ),
                             keyTemplate.toParty(it.key).color,
-                            it.value, it.value.toString(),
+                            it.value, DecimalFormat("#,##0").format(it.value),
                             if (it.key == winner) keyTemplate.winnerShape(numBars > doubleLineBarLimit()) else null
                         )
                     }
@@ -404,11 +404,15 @@ class BasicResultPanel private constructor(
             if (total != null) {
                 builder = builder.withMax(total.map { it * 2 / 3 })
             }
-            applyMajorityLine(
-                builder,
-                showMajority,
-                this.total ?: throw IllegalArgumentException("Cannot show majority line without total")
-            )
+            val showMajority = showMajority
+            if (showMajority != null) {
+                applyMajorityLine(
+                    builder,
+                    showMajority,
+                    this.total
+                        ?: throw IllegalArgumentException("Cannot show majority line without total")
+                )
+            }
             return builder.build()
         }
 
@@ -578,7 +582,7 @@ class BasicResultPanel private constructor(
                             keyTemplate.toParty(it.key).color,
                             if (focusLocation == FocusLocation.FIRST) it.value.first else (it.value.second - it.value.first),
                             it.value.second,
-                            it.value.first.toString() + "/" + it.value.second,
+                            DecimalFormat("#,##0").format(it.value.first) + "/" + DecimalFormat("#,##0").format(it.value.second),
                             if (it.key == winner) keyTemplate.winnerShape(count > doubleLineBarLimit()) else null
                         )
                     }

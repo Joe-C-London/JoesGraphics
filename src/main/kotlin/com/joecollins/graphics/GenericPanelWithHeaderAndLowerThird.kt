@@ -8,6 +8,7 @@ import com.joecollins.pubsub.asOneTimePublisher
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Dimension
+import java.awt.GridLayout
 import java.util.concurrent.Flow
 import javax.swing.JLabel
 import javax.swing.JPanel
@@ -42,5 +43,16 @@ class GenericPanelWithHeaderAndLowerThird<T : JPanel>(
             add(lowerThird, BorderLayout.SOUTH)
         }
         add(panel, BorderLayout.CENTER)
+    }
+
+    companion object {
+        fun pad(panel: JPanel): JPanel {
+            val ret = JPanel()
+            ret.background = Color.WHITE
+            ret.layout = GridLayout(1, 1, 0, 0)
+            ret.border = EmptyBorder(5, 5, 5, 5)
+            ret.add(panel)
+            return ret
+        }
     }
 }
