@@ -1,8 +1,7 @@
 package com.joecollins.graphics.screens.generic
 
-import com.joecollins.graphics.components.FontSizeAdjustingLabel
+import com.joecollins.graphics.GenericPanel
 import com.joecollins.graphics.components.MultiSummaryFrame
-import com.joecollins.graphics.utils.StandardFont.readBoldFont
 import com.joecollins.models.general.Aggregators
 import com.joecollins.models.general.Aggregators.adjustKey
 import com.joecollins.models.general.Candidate
@@ -11,20 +10,14 @@ import com.joecollins.models.general.PartyResult
 import com.joecollins.models.general.PollsReporting
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.Subscriber
-import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
 import com.joecollins.pubsub.compose
 import com.joecollins.pubsub.map
 import com.joecollins.pubsub.mapElements
-import java.awt.BorderLayout
 import java.awt.Color
-import java.awt.GridLayout
 import java.text.DecimalFormat
 import java.util.concurrent.Flow
-import javax.swing.JLabel
-import javax.swing.JPanel
-import javax.swing.border.EmptyBorder
 
-class TooCloseToCallScreen private constructor(titleLabel: JLabel, multiSummaryFrame: MultiSummaryFrame) : JPanel() {
+class TooCloseToCallScreen private constructor(titleLabel: Flow.Publisher<out String?>, multiSummaryFrame: MultiSummaryFrame) : GenericPanel(pad(multiSummaryFrame), titleLabel) {
     private class Input<T> {
         var votes: Map<T, Map<Candidate, Int>> = HashMap()
             set(value) {
@@ -133,12 +126,7 @@ class TooCloseToCallScreen private constructor(titleLabel: JLabel, multiSummaryF
         }
 
         fun build(titlePublisher: Flow.Publisher<out String?>): TooCloseToCallScreen {
-            val headerLabel = FontSizeAdjustingLabel()
-            headerLabel.font = readBoldFont(32)
-            headerLabel.horizontalAlignment = JLabel.CENTER
-            headerLabel.border = EmptyBorder(5, 0, -5, 0)
-            titlePublisher.subscribe(Subscriber(eventQueueWrapper { headerLabel.text = it }))
-            return TooCloseToCallScreen(headerLabel, createFrame())
+            return TooCloseToCallScreen(titlePublisher, createFrame())
         }
 
         private fun createFrame(): MultiSummaryFrame {
@@ -210,17 +198,5 @@ class TooCloseToCallScreen private constructor(titleLabel: JLabel, multiSummaryF
                 labelFunc
             )
         }
-    }
-
-    init {
-        layout = BorderLayout()
-        background = Color.WHITE
-        add(titleLabel, BorderLayout.NORTH)
-        val panel = JPanel()
-        panel.background = Color.WHITE
-        panel.border = EmptyBorder(5, 5, 5, 5)
-        panel.layout = GridLayout(1, 1)
-        panel.add(multiSummaryFrame)
-        add(panel, BorderLayout.CENTER)
     }
 }

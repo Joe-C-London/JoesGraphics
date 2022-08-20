@@ -1,16 +1,13 @@
 package com.joecollins.graphics.screens.generic
 
-import com.joecollins.graphics.components.FontSizeAdjustingLabel
+import com.joecollins.graphics.GenericPanel
 import com.joecollins.graphics.components.RegionSummaryFrame
-import com.joecollins.graphics.utils.ColorUtils
-import com.joecollins.graphics.utils.StandardFont.readBoldFont
 import com.joecollins.models.general.Party
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
 import com.joecollins.pubsub.map
 import com.joecollins.pubsub.merge
-import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Component
 import java.awt.Container
@@ -18,17 +15,26 @@ import java.awt.Dimension
 import java.awt.LayoutManager
 import java.text.DecimalFormat
 import java.util.concurrent.Flow
-import javax.swing.JLabel
 import javax.swing.JPanel
-import javax.swing.border.EmptyBorder
 import kotlin.math.ceil
 
 class PartySummaryScreen private constructor(
-    headerLabel: JLabel,
+    partyPublisher: Flow.Publisher<out Party>,
     mainFrame: RegionSummaryFrame,
     otherFrames: List<RegionSummaryFrame>,
     numRows: Int
-) : JPanel() {
+) : GenericPanel({
+    val center = JPanel()
+    center.background = Color.WHITE
+    center.layout = Layout(numRows)
+    center.add(mainFrame, "main")
+    otherFrames.forEach { center.add(it, "other") }
+    center
+}, partyPublisher.map { it.name.uppercase() + " SUMMARY" }) {
+
+    init {
+        partyPublisher.subscribe(Subscriber(eventQueueWrapper { super.label.foreground = it.color }))
+    }
 
     private class Layout constructor(private val numRows: Int) : LayoutManager {
         private var main: Component = JPanel()
@@ -144,15 +150,12 @@ class PartySummaryScreen private constructor(
         }
 
         fun build(partyPublisher: Flow.Publisher<out Party>): PartySummaryScreen {
-            val headerLabel = FontSizeAdjustingLabel()
-            headerLabel.font = readBoldFont(32)
-            headerLabel.horizontalAlignment = JLabel.CENTER
-            headerLabel.border = EmptyBorder(5, 0, -5, 0)
-            partyPublisher.map { it.name.uppercase() + " SUMMARY" }.subscribe(Subscriber(eventQueueWrapper { headerLabel.text = it }))
-            partyPublisher.map(Party::color).subscribe(Subscriber(eventQueueWrapper { headerLabel.foreground = ColorUtils.contrastForBackground(it) }))
-            val mainFrame = createFrame(mainRegion, partyPublisher)
-            val otherFrames = regions.map { createFrame(it, partyPublisher) }
-            return PartySummaryScreen(headerLabel, mainFrame, otherFrames, numRows)
+            return PartySummaryScreen(
+                partyPublisher,
+                createFrame(mainRegion, partyPublisher),
+                regions.map { createFrame(it, partyPublisher) },
+                numRows
+            )
         }
 
         private fun createFrame(region: T, party: Flow.Publisher<out Party>): RegionSummaryFrame {
@@ -270,17 +273,5 @@ class PartySummaryScreen private constructor(
                 .withSeatAndPrev(seatFunc, seatPrevFunc)
                 .withVotePctAndPrev(votePctFunc, votePctPrevFunc)
         }
-    }
-
-    init {
-        background = Color.WHITE
-        layout = BorderLayout()
-        add(headerLabel, BorderLayout.NORTH)
-        val center = JPanel()
-        center.background = Color.WHITE
-        center.layout = Layout(numRows)
-        add(center, BorderLayout.CENTER)
-        center.add(mainFrame, "main")
-        otherFrames.forEach { center.add(it, "other") }
     }
 }

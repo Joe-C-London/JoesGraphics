@@ -1,10 +1,9 @@
 package com.joecollins.graphics.screens.generic
 
-import com.joecollins.graphics.components.FontSizeAdjustingLabel
+import com.joecollins.graphics.GenericPanel
 import com.joecollins.graphics.components.GraphicsFrame
 import com.joecollins.graphics.components.ResultListingFrame
 import com.joecollins.graphics.utils.ColorUtils.lighten
-import com.joecollins.graphics.utils.StandardFont.readBoldFont
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
 import com.joecollins.pubsub.Publisher
@@ -14,24 +13,39 @@ import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.map
 import com.joecollins.pubsub.mapElements
 import com.joecollins.pubsub.merge
-import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Component
 import java.awt.Container
 import java.awt.Dimension
 import java.awt.LayoutManager
 import java.util.concurrent.Flow
-import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.border.EmptyBorder
 import kotlin.math.ceil
 
 class BattlegroundScreen private constructor(
-    title: JLabel,
+    title: Flow.Publisher<out String?>,
     private val leftPanel: ResultListingFrame,
     private val rightPanel: ResultListingFrame,
-    lowerLayout: (BattlegroundScreen) -> Layout
-) : JPanel() {
+    private val leftColumns: Flow.Publisher<Int>,
+    private val rightColumns: Flow.Publisher<Int>,
+    val headerColor: Flow.Publisher<Color>? = null
+) : GenericPanel({
+    val panel = JPanel()
+    panel.background = Color.WHITE
+    panel.border = EmptyBorder(5, 5, 5, 5)
+    val layout = Layout(panel)
+    leftColumns.subscribe(Subscriber(eventQueueWrapper { layout.setLeft(it) }))
+    rightColumns.subscribe(Subscriber(eventQueueWrapper { layout.setRight(it) }))
+    panel.layout = layout
+    panel.add(leftPanel, Layout.WEST)
+    panel.add(rightPanel, Layout.EAST)
+    panel
+}, title) {
+
+    init {
+        headerColor?.subscribe(Subscriber(eventQueueWrapper { super.label.foreground = it }))
+    }
 
     class SinglePartyBuilder<T>(
         private val prevResults: Flow.Publisher<out Map<T, Map<Party, Int>>>,
@@ -64,13 +78,6 @@ class BattlegroundScreen private constructor(
         }
 
         fun build(title: Flow.Publisher<out String?>): BattlegroundScreen {
-            val headerLabel = FontSizeAdjustingLabel()
-            headerLabel.font = readBoldFont(32)
-            headerLabel.horizontalAlignment = JLabel.CENTER
-            headerLabel.border = EmptyBorder(5, 0, -5, 0)
-            title.subscribe(Subscriber(eventQueueWrapper { headerLabel.text = it }))
-            party.map(Party::color).subscribe(Subscriber(eventQueueWrapper { headerLabel.foreground = it }))
-
             val defenseInput = DefenseBattlegroundInput<T>()
             prevResults.subscribe(Subscriber { defenseInput.prev = it })
             currResults.subscribe(Subscriber { defenseInput.curr = it })
@@ -118,19 +125,15 @@ class BattlegroundScreen private constructor(
             )
 
             return BattlegroundScreen(
-                headerLabel,
+                title,
                 defenseFrame,
-                targetFrame
-            ) { screen ->
-                val layout = screen.Layout()
+                targetFrame,
                 defenseSeatCount
-                    .merge(numRows) { c, n -> n * ceil(1.0 * c / n).toInt() }
-                    .subscribe(Subscriber(eventQueueWrapper { layout.setLeft(it) }))
+                    .merge(numRows) { c, n -> n * ceil(1.0 * c / n).toInt() },
                 targetSeatCount
-                    .merge(numRows) { c, n -> n * ceil(1.0 * c / n).toInt() }
-                    .subscribe(Subscriber(eventQueueWrapper { layout.setRight(it) }))
-                layout
-            }
+                    .merge(numRows) { c, n -> n * ceil(1.0 * c / n).toInt() },
+                party.map { it.color }
+            )
         }
     }
 
@@ -171,13 +174,6 @@ class BattlegroundScreen private constructor(
         }
 
         fun build(title: Flow.Publisher<out String?>): BattlegroundScreen {
-            val headerLabel = FontSizeAdjustingLabel()
-            headerLabel.font = readBoldFont(32)
-            headerLabel.horizontalAlignment = JLabel.CENTER
-            headerLabel.border = EmptyBorder(5, 0, -5, 0)
-            headerLabel.foreground = Color.BLACK
-            title.subscribe(Subscriber(eventQueueWrapper { headerLabel.text = it }))
-
             val leftInput = DoubleBattlegroundInput<T>()
             prevResults.subscribe(Subscriber { leftInput.prev = it })
             currResults.subscribe(Subscriber { leftInput.curr = it })
@@ -225,19 +221,14 @@ class BattlegroundScreen private constructor(
             )
 
             return BattlegroundScreen(
-                headerLabel,
+                title,
                 leftFrame,
-                rightFrame
-            ) { screen ->
-                val layout = screen.Layout()
+                rightFrame,
                 leftSeatCount
-                    .merge(numRows) { c, n -> n * ceil(1.0 * c / n).toInt() }
-                    .subscribe(Subscriber(eventQueueWrapper { layout.setLeft(it) }))
+                    .merge(numRows) { c, n -> n * ceil(1.0 * c / n).toInt() },
                 rightSeatCount
                     .merge(numRows) { c, n -> n * ceil(1.0 * c / n).toInt() }
-                    .subscribe(Subscriber(eventQueueWrapper { layout.setRight(it) }))
-                layout
-            }
+            )
         }
     }
 
@@ -362,27 +353,38 @@ class BattlegroundScreen private constructor(
 
     private class Entry<T>(val key: T, val prevColor: Color, val resultColor: Color, val fill: Boolean)
 
-    private inner class Layout : LayoutManager {
-        private var left = 0
-        private var right = 0
+    private class Layout(val parent: JPanel) : LayoutManager {
+        private var leftColumn = 0
+        private var rightColumn = 0
+
+        private var leftPanel: Component = JPanel()
+        private var rightPanel: Component = JPanel()
+
+        companion object {
+            val WEST = "WEST"
+            val EAST = "EAST"
+        }
 
         fun setLeft(left: Int) {
-            this.left = left
+            this.leftColumn = left
             redoLayout()
         }
 
         fun setRight(right: Int) {
-            this.right = right
+            this.rightColumn = right
             redoLayout()
         }
 
         private fun redoLayout() {
-            invalidate()
-            revalidate()
-            repaint()
+            parent.invalidate()
+            parent.revalidate()
+            parent.repaint()
         }
 
-        override fun addLayoutComponent(name: String, comp: Component) {}
+        override fun addLayoutComponent(name: String, comp: Component) {
+            if (name == WEST) leftPanel = comp
+            if (name == EAST) rightPanel = comp
+        }
         override fun removeLayoutComponent(comp: Component) {}
         override fun preferredLayoutSize(parent: Container): Dimension? {
             return null
@@ -393,15 +395,15 @@ class BattlegroundScreen private constructor(
         }
 
         override fun layoutContainer(parent: Container) {
-            leftPanel.isVisible = left > 0
-            rightPanel.isVisible = right > 0
-            val total = left + right
+            leftPanel.isVisible = leftColumn > 0
+            rightPanel.isVisible = rightColumn > 0
+            val total = leftColumn + rightColumn
             if (total == 0) {
                 return
             }
             val width = parent.width
             val height = parent.height
-            val mid = width * left / total
+            val mid = width * leftColumn / total
             leftPanel.setLocation(5, 5)
             leftPanel.setSize(mid - 10, height - 10)
             rightPanel.setLocation(mid + 5, 5)
@@ -427,19 +429,6 @@ class BattlegroundScreen private constructor(
         ): DoublePartyBuilder<T> {
             return DoublePartyBuilder(prevResultsPublisher, currResultsPublisher, nameFunc, partyPublisher)
         }
-    }
-
-    init {
-        background = Color.WHITE
-        layout = BorderLayout()
-        add(title, BorderLayout.NORTH)
-        val panel = JPanel()
-        panel.background = Color.WHITE
-        panel.border = EmptyBorder(5, 5, 5, 5)
-        panel.layout = lowerLayout(this)
-        panel.add(leftPanel)
-        panel.add(rightPanel)
-        add(panel, BorderLayout.CENTER)
     }
 }
 

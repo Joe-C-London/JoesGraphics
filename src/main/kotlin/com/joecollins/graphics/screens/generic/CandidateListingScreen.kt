@@ -13,11 +13,6 @@ import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.map
 import java.awt.BorderLayout
 import java.awt.Color
-import java.awt.Component
-import java.awt.Container
-import java.awt.Dimension
-import java.awt.LayoutManager
-import java.awt.Point
 import java.awt.Shape
 import java.text.DecimalFormat
 import java.util.concurrent.Flow
@@ -40,18 +35,18 @@ class CandidateListingScreen private constructor(
         background = Color.WHITE
         add(header, BorderLayout.NORTH)
         val panel = JPanel()
-        panel.layout = ScreenLayout()
+        panel.layout = RightStackLayout()
         panel.background = Color.WHITE
         add(panel, BorderLayout.CENTER)
-        panel.add(candidatesPanel)
+        panel.add(candidatesPanel, RightStackLayout.WEST)
         if (prevPanel != null) {
-            panel.add(prevPanel)
+            panel.add(prevPanel, RightStackLayout.EAST)
         }
         if (secondaryPrevPanel != null) {
-            panel.add(secondaryPrevPanel)
+            panel.add(secondaryPrevPanel, RightStackLayout.EAST)
         }
         if (mapPanel != null) {
-            panel.add(mapPanel)
+            panel.add(mapPanel, RightStackLayout.EAST)
         }
     }
 
@@ -148,43 +143,6 @@ class CandidateListingScreen private constructor(
             headerLabel.border = EmptyBorder(5, 0, -5, 0)
             textPublisher.subscribe(Subscriber(eventQueueWrapper { headerLabel.text = it }))
             return headerLabel
-        }
-    }
-
-    private inner class ScreenLayout : LayoutManager {
-        override fun addLayoutComponent(name: String?, comp: Component?) {
-        }
-
-        override fun removeLayoutComponent(comp: Component?) {
-        }
-
-        override fun preferredLayoutSize(parent: Container?): Dimension {
-            return Dimension(1024, 512)
-        }
-
-        override fun minimumLayoutSize(parent: Container?): Dimension {
-            return Dimension(100, 50)
-        }
-
-        override fun layoutContainer(parent: Container) {
-            val width = parent.width
-            val height = parent.height
-            val numPanels = listOf(prevPanel, secondaryPrevPanel, mapPanel).count { it != null }
-            candidatesPanel.location = Point(5, 5)
-            val rightColStart = if (numPanels == 0) width else (width - width / (numPanels + 1))
-            candidatesPanel.size = Dimension(rightColStart - 10, height - 10)
-            if (prevPanel != null) {
-                prevPanel.location = Point(rightColStart + 5, 5)
-                prevPanel.size = Dimension(width / (numPanels + 1) - 10, (height / numPanels) - 10)
-            }
-            if (secondaryPrevPanel != null) {
-                secondaryPrevPanel.location = Point(rightColStart + 5, (if (prevPanel == null) 0 else 1) * height / numPanels + 5)
-                secondaryPrevPanel.size = Dimension(width / (numPanels + 1) - 10, (height / numPanels) - 10)
-            }
-            if (mapPanel != null) {
-                mapPanel.location = Point(rightColStart + 5, height - (height / (numPanels)) + 5)
-                mapPanel.size = Dimension(width / (numPanels + 1) - 10, (height / numPanels) - 10)
-            }
         }
     }
 }

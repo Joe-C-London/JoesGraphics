@@ -1,22 +1,19 @@
 package com.joecollins.graphics.screens.generic
 
+import com.joecollins.graphics.GenericPanel
 import com.joecollins.graphics.ImageGenerator
 import com.joecollins.graphics.components.BarFrame
 import com.joecollins.graphics.components.BarFrameBuilder
 import com.joecollins.graphics.components.BarFrameBuilder.BasicBar
-import com.joecollins.graphics.components.FontSizeAdjustingLabel
 import com.joecollins.graphics.components.MapFrame
-import com.joecollins.graphics.utils.StandardFont
 import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.Subscriber
-import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
 import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.map
 import com.joecollins.pubsub.merge
-import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Component
 import java.awt.Container
@@ -25,22 +22,45 @@ import java.awt.LayoutManager
 import java.awt.Shape
 import java.text.DecimalFormat
 import java.util.concurrent.Flow
-import javax.swing.JLabel
 import javax.swing.JPanel
-import javax.swing.border.EmptyBorder
 
 class MixedMemberResultPanel private constructor(
-    label: JLabel,
+    label: Flow.Publisher<out String?>,
     private val candidateFrame: BarFrame,
     private val candidateChangeFrame: BarFrame?,
     private val partyFrame: BarFrame,
     private val partyChangeFrame: BarFrame?,
     private val mapFrame: MapFrame?
-) : JPanel() {
+) : GenericPanel({
+    val panel = JPanel()
+    panel.layout = ScreenLayout()
+    panel.background = Color.WHITE
+    panel.add(candidateFrame, ScreenLayout.CANDIDATE)
+    candidateChangeFrame?.also { panel.add(it, ScreenLayout.CANDIDATE_DIFF) }
+    panel.add(partyFrame, ScreenLayout.PARTY)
+    partyChangeFrame?.also { panel.add(it, ScreenLayout.PARTY_DIFF) }
+    mapFrame?.also { panel.add(it, ScreenLayout.MAP) }
+    panel
+}, label) {
 
-    private inner class ScreenLayout : LayoutManager {
-        override fun addLayoutComponent(name: String, comp: Component) {}
-        override fun removeLayoutComponent(comp: Component) {}
+    private class ScreenLayout : LayoutManager {
+
+        companion object {
+            val CANDIDATE = "CANDIDATE"
+            val CANDIDATE_DIFF = "CANDIDATE_DIFF"
+            val PARTY = "PARTY"
+            val PARTY_DIFF = "PARTY_DIFF"
+            val MAP = "MAP"
+        }
+
+        private val components = HashMap<String, Component>()
+
+        override fun addLayoutComponent(name: String, comp: Component) {
+            components[name] = comp
+        }
+        override fun removeLayoutComponent(comp: Component) {
+            components.entries.firstOrNull { it.value == comp }?.let { components.remove(it.key) }
+        }
         override fun preferredLayoutSize(parent: Container): Dimension {
             return Dimension(1024, 512)
         }
@@ -52,6 +72,11 @@ class MixedMemberResultPanel private constructor(
         override fun layoutContainer(parent: Container) {
             val width = parent.width
             val height = parent.height
+            val candidateFrame = components[CANDIDATE]!!
+            val candidateChangeFrame = components[CANDIDATE_DIFF]
+            val partyFrame = components[PARTY]!!
+            val partyChangeFrame = components[PARTY_DIFF]
+            val mapFrame = components[MAP]
             candidateFrame.setLocation(5, 5)
             candidateFrame.setSize(
                 width * 3 / 5 - 10, height / (if (candidateChangeFrame == null) 1 else 2) - 10
@@ -179,7 +204,7 @@ class MixedMemberResultPanel private constructor(
 
         fun build(header: Flow.Publisher<out String>): MixedMemberResultPanel {
             return MixedMemberResultPanel(
-                createHeaderLabel(header),
+                header,
                 createCandidateVotes(),
                 createCandidateChange(),
                 createPartyVotes(),
@@ -431,29 +456,5 @@ class MixedMemberResultPanel private constructor(
         fun builder(): Builder {
             return Builder()
         }
-
-        private fun createHeaderLabel(textPublisher: Flow.Publisher<out String>): JLabel {
-            val headerLabel = FontSizeAdjustingLabel()
-            headerLabel.font = StandardFont.readBoldFont(32)
-            headerLabel.horizontalAlignment = JLabel.CENTER
-            headerLabel.border = EmptyBorder(5, 0, -5, 0)
-            textPublisher.subscribe(Subscriber(eventQueueWrapper { headerLabel.text = it }))
-            return headerLabel
-        }
-    }
-
-    init {
-        layout = BorderLayout()
-        background = Color.WHITE
-        add(label, BorderLayout.NORTH)
-        val panel = JPanel()
-        panel.layout = ScreenLayout()
-        panel.background = Color.WHITE
-        add(panel, BorderLayout.CENTER)
-        panel.add(candidateFrame)
-        candidateChangeFrame?.also { panel.add(it) }
-        panel.add(partyFrame)
-        partyChangeFrame?.also { panel.add(it) }
-        mapFrame?.also { panel.add(it) }
     }
 }

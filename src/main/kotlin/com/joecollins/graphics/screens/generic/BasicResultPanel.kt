@@ -1,80 +1,51 @@
 package com.joecollins.graphics.screens.generic
 
+import com.joecollins.graphics.GenericPanel
 import com.joecollins.graphics.ImageGenerator
 import com.joecollins.graphics.components.BarFrame
 import com.joecollins.graphics.components.BarFrameBuilder
 import com.joecollins.graphics.components.BarFrameBuilder.BasicBar
 import com.joecollins.graphics.components.BarFrameBuilder.DualBar
-import com.joecollins.graphics.components.FontSizeAdjustingLabel
 import com.joecollins.graphics.components.MapFrame
 import com.joecollins.graphics.components.SwingFrame
 import com.joecollins.graphics.components.SwingFrameBuilder
-import com.joecollins.graphics.utils.StandardFont
 import com.joecollins.models.general.Aggregators
 import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.Subscriber
-import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
 import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.compose
 import com.joecollins.pubsub.map
 import com.joecollins.pubsub.merge
-import java.awt.BorderLayout
 import java.awt.Color
-import java.awt.Component
-import java.awt.Container
-import java.awt.Dimension
-import java.awt.LayoutManager
 import java.awt.Shape
 import java.text.DecimalFormat
 import java.util.concurrent.Flow
-import javax.swing.JLabel
 import javax.swing.JPanel
-import javax.swing.border.EmptyBorder
 import kotlin.math.abs
 import kotlin.math.roundToInt
 import kotlin.math.sign
 
 class BasicResultPanel private constructor(
-    label: JLabel,
+    label: Flow.Publisher<out String?>,
     private val seatFrame: BarFrame,
     private val preferenceFrame: BarFrame?,
     private val changeFrame: BarFrame?,
     private val swingFrame: SwingFrame?,
     private val mapFrame: MapFrame?
-) : JPanel() {
-    private inner class ScreenLayout : LayoutManager {
-        override fun addLayoutComponent(name: String, comp: Component) {}
-        override fun removeLayoutComponent(comp: Component) {}
-        override fun preferredLayoutSize(parent: Container): Dimension {
-            return Dimension(1024, 512)
-        }
-
-        override fun minimumLayoutSize(parent: Container): Dimension {
-            return Dimension(0, 0)
-        }
-
-        override fun layoutContainer(parent: Container) {
-            val width = parent.width
-            val height = parent.height
-            seatFrame.setLocation(5, 5)
-            val seatFrameIsAlone = changeFrame == null && swingFrame == null && mapFrame == null
-            seatFrame.setSize(
-                width * (if (seatFrameIsAlone) 5 else 3) / 5 - 10,
-                height * (if (preferenceFrame == null) 3 else 2) / 3 - 10
-            )
-            preferenceFrame?.setLocation(5, height * 2 / 3 + 5)
-            preferenceFrame?.setSize(width * (if (seatFrameIsAlone) 5 else 3) / 5 - 10, height / 3 - 10)
-            changeFrame?.setLocation(width * 3 / 5 + 5, 5)
-            changeFrame?.setSize(width * 2 / 5 - 10, height * 2 / 3 - 10)
-            swingFrame?.setLocation(width * 3 / 5 + 5, height * 2 / 3 + 5)
-            swingFrame?.setSize(width * (if (mapFrame == null) 2 else 1) / 5 - 10, height / 3 - 10)
-            mapFrame?.setLocation(width * (if (swingFrame == null) 3 else 4) / 5 + 5, height * 2 / 3 + 5)
-            mapFrame?.setSize(width * (if (swingFrame == null) 2 else 1) / 5 - 10, height / 3 - 10)
-        }
-    }
+) : GenericPanel({
+    val panel = JPanel()
+    panel.layout = BasicResultLayout()
+    panel.background = Color.WHITE
+    panel.add(seatFrame, BasicResultLayout.MAIN)
+    if (preferenceFrame != null) panel.add(preferenceFrame, BasicResultLayout.PREF)
+    if (changeFrame != null) panel.add(changeFrame, BasicResultLayout.DIFF)
+    if (swingFrame != null) panel.add(swingFrame, BasicResultLayout.SWING)
+    if (mapFrame != null) panel.add(mapFrame, BasicResultLayout.MAP)
+    panel
+}, label) {
 
     interface KeyTemplate<KT> {
         fun toParty(key: KT): Party
@@ -296,7 +267,7 @@ class BasicResultPanel private constructor(
 
         fun build(textHeader: Flow.Publisher<out String>): BasicResultPanel {
             return BasicResultPanel(
-                createHeaderLabel(textHeader),
+                textHeader,
                 createFrame(),
                 createClassificationFrame(),
                 createDiffFrame(),
@@ -1188,7 +1159,7 @@ class BasicResultPanel private constructor(
 
         fun build(textHeader: Flow.Publisher<out String>): BasicResultPanel {
             return BasicResultPanel(
-                createHeaderLabel(textHeader),
+                textHeader,
                 createFrame(),
                 if (classificationHeader == null) createPreferenceFrame() else createClassificationFrame(),
                 createDiffFrame(),
@@ -1804,7 +1775,7 @@ class BasicResultPanel private constructor(
 
         fun build(textHeader: Flow.Publisher<out String>): BasicResultPanel {
             return BasicResultPanel(
-                createHeaderLabel(textHeader),
+                textHeader,
                 createFrame(),
                 null,
                 createDiffFrame(),
@@ -1885,15 +1856,6 @@ class BasicResultPanel private constructor(
         private val THOUSANDS_FORMAT = DecimalFormat("#,##0")
         private fun <T> partyMapToResultMap(m: Map<T, Party?>): Map<T, PartyResult?> {
             return m.mapValues { e -> e.value?.let { PartyResult.elected(it) } }
-        }
-
-        private fun createHeaderLabel(textPublisher: Flow.Publisher<out String>): JLabel {
-            val headerLabel = FontSizeAdjustingLabel()
-            headerLabel.font = StandardFont.readBoldFont(32)
-            headerLabel.horizontalAlignment = JLabel.CENTER
-            headerLabel.border = EmptyBorder(5, 0, -5, 0)
-            textPublisher.subscribe(Subscriber(eventQueueWrapper { headerLabel.text = it }))
-            return headerLabel
         }
 
         fun partySeats(
@@ -2095,20 +2057,5 @@ class BasicResultPanel private constructor(
                 subhead
             )
         }
-    }
-
-    init {
-        layout = BorderLayout()
-        background = Color.WHITE
-        add(label, BorderLayout.NORTH)
-        val panel = JPanel()
-        panel.layout = ScreenLayout()
-        panel.background = Color.WHITE
-        add(panel, BorderLayout.CENTER)
-        panel.add(seatFrame)
-        if (preferenceFrame != null) panel.add(preferenceFrame)
-        if (changeFrame != null) panel.add(changeFrame)
-        if (swingFrame != null) panel.add(swingFrame)
-        if (mapFrame != null) panel.add(mapFrame)
     }
 }

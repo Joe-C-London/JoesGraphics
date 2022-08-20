@@ -1,79 +1,35 @@
 package com.joecollins.graphics.screens.generic
 
+import com.joecollins.graphics.GenericPanel
 import com.joecollins.graphics.ImageGenerator
 import com.joecollins.graphics.components.BarFrameBuilder
-import com.joecollins.graphics.components.FontSizeAdjustingLabel
-import com.joecollins.graphics.utils.StandardFont
 import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
-import com.joecollins.pubsub.Subscriber
-import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
 import com.joecollins.pubsub.map
 import com.joecollins.pubsub.merge
-import java.awt.BorderLayout
 import java.awt.Color
-import java.awt.Component
-import java.awt.Container
-import java.awt.Dimension
-import java.awt.LayoutManager
 import java.awt.Shape
 import java.text.DecimalFormat
 import java.util.concurrent.Flow
-import javax.swing.JLabel
 import javax.swing.JPanel
-import javax.swing.border.EmptyBorder
 
 class SingleTransferrableResultScreen private constructor(
-    label: JLabel,
+    label: Flow.Publisher<out String?>,
     private val candidateFrame: JPanel,
     private val partyFrame: JPanel?,
     private val prevFrame: JPanel?,
     private val mapFrame: JPanel?
-) : JPanel() {
-
-    init {
-        layout = BorderLayout()
-        background = Color.WHITE
-        add(label, BorderLayout.NORTH)
-        val panel = JPanel()
-        panel.layout = ScreenLayout()
-        panel.background = Color.WHITE
-        add(panel, BorderLayout.CENTER)
-        panel.add(candidateFrame)
-        if (partyFrame != null) panel.add(partyFrame)
-        if (prevFrame != null) panel.add(prevFrame)
-        if (mapFrame != null) panel.add(mapFrame)
-    }
-
-    private inner class ScreenLayout : LayoutManager {
-        override fun addLayoutComponent(name: String, comp: Component) {}
-        override fun removeLayoutComponent(comp: Component) {}
-        override fun preferredLayoutSize(parent: Container): Dimension {
-            return Dimension(1024, 512)
-        }
-
-        override fun minimumLayoutSize(parent: Container): Dimension {
-            return Dimension(0, 0)
-        }
-
-        override fun layoutContainer(parent: Container) {
-            val width = parent.width
-            val height = parent.height
-            candidateFrame.setLocation(5, 5)
-            val seatFrameIsAlone = partyFrame == null // && swingFrame == null && mapFrame == null
-            candidateFrame.setSize(
-                width * (if (seatFrameIsAlone) 5 else 3) / 5 - 10,
-                height - 10
-            )
-            partyFrame?.setLocation(width * 3 / 5 + 5, 5)
-            partyFrame?.setSize(width * 2 / 5 - 10, height * 2 / 3 - 10)
-            prevFrame?.setLocation(width * 3 / 5 + 5, height * 2 / 3 + 5)
-            prevFrame?.setSize(width * (if (mapFrame == null) 2 else 1) / 5 - 10, height / 3 - 10)
-            mapFrame?.setLocation(width * (if (prevFrame == null) 3 else 4) / 5 + 5, height * 2 / 3 + 5)
-            mapFrame?.setSize(width * (if (prevFrame == null) 2 else 1) / 5 - 10, height / 3 - 10)
-        }
-    }
+) : GenericPanel({
+    val panel = JPanel()
+    panel.layout = BasicResultLayout()
+    panel.background = Color.WHITE
+    panel.add(candidateFrame, BasicResultLayout.MAIN)
+    if (partyFrame != null) panel.add(partyFrame, BasicResultLayout.DIFF)
+    if (prevFrame != null) panel.add(prevFrame, BasicResultLayout.SWING)
+    if (mapFrame != null) panel.add(mapFrame, BasicResultLayout.MAP)
+    panel
+}, label) {
 
     companion object {
 
@@ -147,21 +103,12 @@ class SingleTransferrableResultScreen private constructor(
 
         fun build(title: Flow.Publisher<out String>): SingleTransferrableResultScreen {
             return SingleTransferrableResultScreen(
-                createHeaderLabel(title),
+                title,
                 createCandidatesPanel(),
                 createPartiesPanel(),
                 createPrevPanel(),
                 mapBuilder?.createMapFrame()
             )
-        }
-
-        private fun createHeaderLabel(textPublisher: Flow.Publisher<out String>): JLabel {
-            val headerLabel = FontSizeAdjustingLabel()
-            headerLabel.font = StandardFont.readBoldFont(32)
-            headerLabel.horizontalAlignment = JLabel.CENTER
-            headerLabel.border = EmptyBorder(5, 0, -5, 0)
-            textPublisher.subscribe(Subscriber(eventQueueWrapper { headerLabel.text = it }))
-            return headerLabel
         }
 
         private fun createCandidatesPanel(): JPanel {

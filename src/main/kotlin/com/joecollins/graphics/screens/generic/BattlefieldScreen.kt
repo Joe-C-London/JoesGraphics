@@ -1,22 +1,15 @@
 package com.joecollins.graphics.screens.generic
 
+import com.joecollins.graphics.GenericPanel
 import com.joecollins.graphics.components.BattlefieldFrame
-import com.joecollins.graphics.components.FontSizeAdjustingLabel
-import com.joecollins.graphics.utils.StandardFont
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
-import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.merge
-import java.awt.BorderLayout
 import java.awt.Color
-import java.awt.GridLayout
 import java.util.concurrent.Flow
-import javax.swing.JLabel
-import javax.swing.JPanel
-import javax.swing.border.EmptyBorder
 
-class BattlefieldScreen private constructor(title: JLabel, frame: BattlefieldFrame) : JPanel() {
+class BattlefieldScreen private constructor(header: Flow.Publisher<out String?>, frame: BattlefieldFrame) : GenericPanel(pad(frame), header) {
 
     companion object {
         fun <T> build(
@@ -70,13 +63,8 @@ class BattlefieldScreen private constructor(title: JLabel, frame: BattlefieldFra
         }
 
         fun build(title: Flow.Publisher<out String?>): BattlefieldScreen {
-            val headerLabel = FontSizeAdjustingLabel()
-            headerLabel.font = StandardFont.readBoldFont(32)
-            headerLabel.horizontalAlignment = JLabel.CENTER
-            headerLabel.border = EmptyBorder(5, 0, -5, 0)
-            title.subscribe(Subscriber(Subscriber.eventQueueWrapper { headerLabel.text = it }))
             val swingometer = createBattlefield()
-            return BattlefieldScreen(headerLabel, swingometer)
+            return BattlefieldScreen(title, swingometer)
         }
 
         private fun createBattlefield(): BattlefieldFrame {
@@ -179,17 +167,5 @@ class BattlefieldScreen private constructor(title: JLabel, frame: BattlefieldFra
             }
             return pctNeeded
         }
-    }
-
-    init {
-        background = Color.WHITE
-        layout = BorderLayout()
-        add(title, BorderLayout.NORTH)
-        val panel = JPanel()
-        panel.background = Color.WHITE
-        panel.border = EmptyBorder(5, 5, 5, 5)
-        panel.layout = GridLayout(1, 1)
-        panel.add(frame)
-        add(panel, BorderLayout.CENTER)
     }
 }

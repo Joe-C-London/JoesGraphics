@@ -1,27 +1,33 @@
 package com.joecollins.graphics.screens.generic
 
+import com.joecollins.graphics.GenericPanel
 import com.joecollins.graphics.components.FiguresFrame
-import com.joecollins.graphics.components.FontSizeAdjustingLabel
-import com.joecollins.graphics.utils.StandardFont.readBoldFont
 import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.Party
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.Subscriber
-import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
 import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.combine
 import com.joecollins.pubsub.merge
-import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.GridLayout
 import java.util.LinkedList
 import java.util.concurrent.Flow
-import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.border.EmptyBorder
 import kotlin.collections.ArrayList
 
-class FiguresScreen private constructor(headerLabel: JLabel, frames: Array<FiguresFrame>) : JPanel() {
+class FiguresScreen private constructor(headerLabel: Flow.Publisher<out String?>, frames: Array<FiguresFrame>) :
+    GenericPanel({
+        val panel = JPanel()
+        panel.background = Color.WHITE
+        panel.layout = GridLayout(1, 0, 5, 5)
+        panel.border = EmptyBorder(5, 5, 5, 5)
+        for (frame in frames) {
+            panel.add(frame)
+        }
+        panel
+    }, headerLabel) {
 
     class Section(private val name: String) {
         private val entries: MutableList<Entry> = ArrayList()
@@ -81,13 +87,8 @@ class FiguresScreen private constructor(headerLabel: JLabel, frames: Array<Figur
         private val sections: MutableList<Section> = LinkedList()
 
         fun build(titlePublisher: Flow.Publisher<out String?>): FiguresScreen {
-            val headerLabel = FontSizeAdjustingLabel()
-            headerLabel.font = readBoldFont(32)
-            headerLabel.horizontalAlignment = JLabel.CENTER
-            headerLabel.border = EmptyBorder(5, 0, -5, 0)
-            titlePublisher.subscribe(Subscriber(eventQueueWrapper { headerLabel.text = it }))
             val frames: Array<FiguresFrame> = sections.map { it.createFrame() }.toTypedArray()
-            return FiguresScreen(headerLabel, frames)
+            return FiguresScreen(titlePublisher, frames)
         }
 
         fun withSection(section: Section): Builder {
@@ -103,20 +104,6 @@ class FiguresScreen private constructor(headerLabel: JLabel, frames: Array<Figur
 
         fun section(sectionHeader: String): Section {
             return Section(sectionHeader)
-        }
-    }
-
-    init {
-        background = Color.WHITE
-        layout = BorderLayout()
-        add(headerLabel, BorderLayout.NORTH)
-        val panel = JPanel()
-        panel.background = Color.WHITE
-        panel.layout = GridLayout(1, 0, 5, 5)
-        panel.border = EmptyBorder(5, 5, 5, 5)
-        add(panel, BorderLayout.CENTER)
-        for (frame in frames) {
-            panel.add(frame)
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.joecollins.graphics.screens.generic
 
+import com.joecollins.graphics.GenericPanel
 import com.joecollins.graphics.ImageGenerator
 import com.joecollins.graphics.components.BarFrame
 import com.joecollins.graphics.components.BarFrameBuilder
@@ -20,7 +21,6 @@ import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.combine
 import com.joecollins.pubsub.compose
 import com.joecollins.pubsub.map
-import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Component
 import java.awt.Container
@@ -35,7 +35,7 @@ import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.border.EmptyBorder
 
-class MultiResultScreen private constructor() : JPanel() {
+class MultiResultScreen private constructor(header: Flow.Publisher<out String?>, screen: JPanel) : GenericPanel(screen, header) {
     private val panels: MutableList<ResultPanel> = ArrayList()
 
     class Builder<T>(
@@ -151,14 +151,10 @@ class MultiResultScreen private constructor() : JPanel() {
         }
 
         fun build(textHeader: Flow.Publisher<out String?>): MultiResultScreen {
-            val screen = MultiResultScreen()
-            screen.background = Color.WHITE
-            screen.layout = BorderLayout()
-            screen.add(createHeaderLabel(textHeader), BorderLayout.NORTH)
             val center = JPanel()
+            val screen = MultiResultScreen(textHeader, center)
             center.layout = GridLayout(1, 0)
             center.background = Color.WHITE
-            screen.add(center, BorderLayout.CENTER)
             this.listPublisher.subscribe(
                 Subscriber { list ->
                     val size = list.size

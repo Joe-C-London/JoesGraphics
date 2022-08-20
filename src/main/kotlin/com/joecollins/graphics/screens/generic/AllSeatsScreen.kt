@@ -1,24 +1,17 @@
 package com.joecollins.graphics.screens.generic
 
-import com.joecollins.graphics.components.FontSizeAdjustingLabel
+import com.joecollins.graphics.GenericPanel
 import com.joecollins.graphics.components.ResultListingFrame
-import com.joecollins.graphics.utils.StandardFont.readBoldFont
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.Subscriber
-import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
 import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.mapElements
-import java.awt.BorderLayout
 import java.awt.Color
-import java.awt.GridLayout
 import java.util.concurrent.Flow
-import javax.swing.JLabel
-import javax.swing.JPanel
-import javax.swing.border.EmptyBorder
 
-class AllSeatsScreen private constructor(title: JLabel, frame: ResultListingFrame) : JPanel() {
+class AllSeatsScreen private constructor(title: Flow.Publisher<out String?>, frame: ResultListingFrame) : GenericPanel(pad(frame), title) {
     class Builder<T>(
         prevResultPublisher: Flow.Publisher<out Map<T, Map<Party, Int>>>,
         currResultPublisher: Flow.Publisher<out Map<T, PartyResult?>>,
@@ -42,11 +35,6 @@ class AllSeatsScreen private constructor(title: JLabel, frame: ResultListingFram
         }
 
         fun build(titlePublisher: Flow.Publisher<out String?>): AllSeatsScreen {
-            val headerLabel = FontSizeAdjustingLabel()
-            headerLabel.font = readBoldFont(32)
-            headerLabel.horizontalAlignment = JLabel.CENTER
-            headerLabel.border = EmptyBorder(5, 0, -5, 0)
-            titlePublisher.subscribe(Subscriber(eventQueueWrapper { headerLabel.text = it }))
             val inputs = Input(nameFunc)
             prevResults.subscribe(Subscriber { inputs.setPrevResults(it) })
             currResults.subscribe(Subscriber { inputs.setCurrResults(it) })
@@ -63,7 +51,7 @@ class AllSeatsScreen private constructor(title: JLabel, frame: ResultListingFram
                     )
                 }
             )
-            return AllSeatsScreen(headerLabel, frame)
+            return AllSeatsScreen(titlePublisher, frame)
         }
     }
 
@@ -146,17 +134,5 @@ class AllSeatsScreen private constructor(title: JLabel, frame: ResultListingFram
         ): Builder<T> {
             return Builder(prevResultPublisher, currResultPublisher, nameFunc, headerPublisher)
         }
-    }
-
-    init {
-        background = Color.WHITE
-        layout = BorderLayout()
-        add(title, BorderLayout.NORTH)
-        val panel = JPanel()
-        panel.background = Color.WHITE
-        panel.border = EmptyBorder(5, 5, 5, 5)
-        panel.layout = GridLayout(1, 1)
-        panel.add(frame)
-        add(panel, BorderLayout.CENTER)
     }
 }

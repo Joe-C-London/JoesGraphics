@@ -1,34 +1,20 @@
 package com.joecollins.graphics.screens.generic
 
-import com.joecollins.graphics.components.FontSizeAdjustingLabel
+import com.joecollins.graphics.GenericPanel
 import com.joecollins.graphics.components.MultiSummaryFrame
-import com.joecollins.graphics.utils.StandardFont
 import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.PollsReporting
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.Subscriber
-import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
 import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.map
 import com.joecollins.pubsub.mapElements
 import com.joecollins.pubsub.merge
-import java.awt.BorderLayout
 import java.awt.Color
 import java.text.DecimalFormat
 import java.util.concurrent.Flow
-import javax.swing.JLabel
-import javax.swing.JPanel
-import javax.swing.border.EmptyBorder
 
-class RecountScreen private constructor(headerLabel: JLabel, frame: MultiSummaryFrame) : JPanel() {
-
-    init {
-        background = Color.WHITE
-        border = EmptyBorder(5, 5, 5, 5)
-        layout = BorderLayout()
-        add(headerLabel, BorderLayout.NORTH)
-        add(frame, BorderLayout.CENTER)
-    }
+class RecountScreen private constructor(headerLabel: Flow.Publisher<out String?>, frame: MultiSummaryFrame) : GenericPanel(pad(frame), headerLabel) {
 
     companion object {
         fun <T> of(
@@ -132,11 +118,7 @@ class RecountScreen private constructor(headerLabel: JLabel, frame: MultiSummary
         }
 
         fun build(titlePublisher: Flow.Publisher<out String>): RecountScreen {
-            val headerLabel = FontSizeAdjustingLabel()
-            headerLabel.font = StandardFont.readBoldFont(32)
-            headerLabel.horizontalAlignment = JLabel.CENTER
-            titlePublisher.subscribe(Subscriber(eventQueueWrapper { headerLabel.text = it }))
-            return RecountScreen(headerLabel, buildFrame())
+            return RecountScreen(titlePublisher, buildFrame())
         }
 
         private fun buildFrame(): MultiSummaryFrame {

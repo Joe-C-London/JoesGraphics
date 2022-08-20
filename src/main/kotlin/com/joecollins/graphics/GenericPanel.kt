@@ -1,5 +1,6 @@
 package com.joecollins.graphics
 
+import com.joecollins.graphics.components.FontSizeAdjustingLabel
 import com.joecollins.graphics.components.lowerthird.LowerThird
 import com.joecollins.graphics.utils.StandardFont.readBoldFont
 import com.joecollins.pubsub.Subscriber
@@ -14,21 +15,30 @@ import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.border.EmptyBorder
 
-class GenericPanelWithHeaderAndLowerThird<T : JPanel>(
-    panel: T,
-    label: Flow.Publisher<String>?,
+open class GenericPanel(
+    panel: JPanel,
+    label: Flow.Publisher<out String?>?,
     lowerThird: LowerThird?
 ) : JPanel() {
 
-    private val label: JLabel = JLabel()
+    protected val label: JLabel = FontSizeAdjustingLabel()
 
-    constructor(panel: T, label: String) : this(panel, label.asOneTimePublisher(), null)
-    constructor(panel: T, lowerThird: LowerThird?) : this(panel, null as Flow.Publisher<String>?, lowerThird)
-    constructor(panel: T, label: String, lowerThird: LowerThird?) : this(panel, label.asOneTimePublisher(), lowerThird)
+    constructor(panel: JPanel, label: String) : this(panel, label.asOneTimePublisher(), null)
+    constructor(panel: JPanel, label: Flow.Publisher<out String?>) : this(panel, label, null)
+    constructor(panel: JPanel, lowerThird: LowerThird?) : this(panel, null as Flow.Publisher<String>?, lowerThird)
+    constructor(panel: JPanel, label: String, lowerThird: LowerThird?) : this(panel, label.asOneTimePublisher(), lowerThird)
+    constructor(panel: () -> JPanel, label: Flow.Publisher<out String?>) : this(panel(), label)
 
     init {
         if (label != null) {
-            label.subscribe(Subscriber(eventQueueWrapper { this.label.text = it ?: "" }))
+            label.subscribe(
+                Subscriber(
+                    eventQueueWrapper {
+                        this.label.text = it ?: ""
+                        this.label.isVisible = it != null
+                    }
+                )
+            )
             this.label.horizontalAlignment = JLabel.CENTER
             this.label.border = EmptyBorder(5, 0, -5, 0)
             this.label.font = readBoldFont(32)

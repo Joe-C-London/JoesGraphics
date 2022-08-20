@@ -1,27 +1,20 @@
 package com.joecollins.graphics.screens.generic
 
-import com.joecollins.graphics.components.FontSizeAdjustingLabel
+import com.joecollins.graphics.GenericPanel
 import com.joecollins.graphics.components.SwingometerFrame
 import com.joecollins.graphics.components.SwingometerFrameBuilder
-import com.joecollins.graphics.utils.StandardFont
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.Subscriber
-import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
 import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.merge
-import java.awt.BorderLayout
 import java.awt.Color
-import java.awt.GridLayout
 import java.util.concurrent.Flow
-import javax.swing.JLabel
-import javax.swing.JPanel
-import javax.swing.border.EmptyBorder
 import kotlin.math.ceil
 import kotlin.math.roundToInt
 
-class SwingometerScreen private constructor(title: JLabel, frame: SwingometerFrame) : JPanel() {
+class SwingometerScreen private constructor(title: Flow.Publisher<out String?>, frame: SwingometerFrame) : GenericPanel(pad(frame), title) {
     class Builder<T> internal constructor(
         prevVotesPublisher: Flow.Publisher<out Map<T, Map<Party, Int>>>,
         resultsPublisher: Flow.Publisher<out Map<T, PartyResult?>>,
@@ -250,13 +243,7 @@ class SwingometerScreen private constructor(title: JLabel, frame: SwingometerFra
         }
 
         fun build(title: Flow.Publisher<out String?>): SwingometerScreen {
-            val headerLabel = FontSizeAdjustingLabel()
-            headerLabel.font = StandardFont.readBoldFont(32)
-            headerLabel.horizontalAlignment = JLabel.CENTER
-            headerLabel.border = EmptyBorder(5, 0, -5, 0)
-            title.subscribe(Subscriber(eventQueueWrapper { headerLabel.text = it }))
-            val swingometer = createSwingometer()
-            return SwingometerScreen(headerLabel, swingometer)
+            return SwingometerScreen(title, createSwingometer())
         }
 
         private fun createSwingometer(): SwingometerFrame {
@@ -484,17 +471,5 @@ class SwingometerScreen private constructor(title: JLabel, frame: SwingometerFra
             }
             return Builder(prevVotes, results, parties, swing, header)
         }
-    }
-
-    init {
-        background = Color.WHITE
-        layout = BorderLayout()
-        add(title, BorderLayout.NORTH)
-        val panel = JPanel()
-        panel.background = Color.WHITE
-        panel.border = EmptyBorder(5, 5, 5, 5)
-        panel.layout = GridLayout(1, 1)
-        panel.add(frame)
-        add(panel, BorderLayout.CENTER)
     }
 }
