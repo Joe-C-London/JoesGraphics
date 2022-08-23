@@ -22,6 +22,8 @@ import java.awt.Graphics2D
 import java.awt.GridLayout
 import java.awt.Image
 import java.awt.RenderingHints
+import java.awt.event.ComponentAdapter
+import java.awt.event.ComponentEvent
 import java.awt.geom.AffineTransform
 import java.awt.geom.Ellipse2D
 import java.awt.image.BufferedImage
@@ -66,10 +68,18 @@ class TweetFrame(tweet: Flow.Publisher<out Status>, private val timezone: ZoneId
         tweetLabel.font = StandardFont.readNormalFont(16)
         tweetLabel.verticalAlignment = JLabel.TOP
         tweetLabel.horizontalAlignment = JLabel.LEFT
-        tweetLabel.maximumSize = Dimension(Int.MAX_VALUE, Int.MAX_VALUE)
         tweetLabel.alignmentX = Component.LEFT_ALIGNMENT
-        tweet.subscribe(Subscriber(eventQueueWrapper { tweetLabel.text = formatTweetText(it, false) }))
+        tweet.subscribe(Subscriber(eventQueueWrapper { tweetLabel.text = formatTweetText(it, false, tweetLabel) }))
         tweetPanel.add(tweetLabel)
+
+        tweetLabel.addComponentListener(object : ComponentAdapter() {
+            override fun componentResized(e: ComponentEvent) {
+                tweetLabel.text = tweetLabel.text.replace(Regex("<html><body width=[0-9]+>"), "<html><body width=${tweetLabel.width}>")
+                tweetPanel.invalidate()
+                tweetPanel.revalidate()
+                tweetPanel.repaint()
+            }
+        })
 
         val urlPanel = JPanel()
         urlPanel.background = Color.WHITE
@@ -131,6 +141,8 @@ class TweetFrame(tweet: Flow.Publisher<out Status>, private val timezone: ZoneId
             )
         )
 
+        tweetPanel.add(Box.createVerticalGlue())
+
         val timeLabel = JLabel()
         timeLabel.font = StandardFont.readNormalFont(12)
         timeLabel.border = EmptyBorder(2, 0, -2, 0)
@@ -139,13 +151,13 @@ class TweetFrame(tweet: Flow.Publisher<out Status>, private val timezone: ZoneId
         add(timeLabel, BorderLayout.SOUTH)
     }
 
-    private fun formatTweetText(status: Status, isQuoted: Boolean): String {
+    private fun formatTweetText(status: Status, isQuoted: Boolean, tweetLabel: JLabel): String {
         val twitterColorHex = (twitterColor.rgb.and(0xffffff)).toString(16)
         val quotedURL = status.quotedStatus?.let { "https://twitter.com/${it.user.screenName}/status/${it.id}" }
         if (status.user.isProtected) {
-            return "<html><span style='color:#$twitterColorHex'>" +
+            return "<html><body width=${tweetLabel.width}><span style='color:#$twitterColorHex'>" +
                 "This user's tweets are protected, and this tweet has therefore been blocked from this frame." +
-                "</span></html>"
+                "<br/>&nbsp;</span></body></html>"
         }
         var htmlText = status.text.replace("\n", "<br/>").let { text ->
             EmojiParser.parseFromUnicode(text) { e ->
@@ -170,7 +182,7 @@ class TweetFrame(tweet: Flow.Publisher<out Status>, private val timezone: ZoneId
         status.mediaEntities.forEach {
             htmlText = htmlText.replace(it.displayURL, "")
         }
-        return "<html>$htmlText</html>"
+        return "<html><body width=${tweetLabel.width}>$htmlText<br/>&nbsp;</body></html>"
     }
 
     private inner class TweetHeaderFrame(user: Flow.Publisher<out User>) : JPanel() {
@@ -308,11 +320,7 @@ class TweetFrame(tweet: Flow.Publisher<out Status>, private val timezone: ZoneId
     private inner class MediaPanel(mediaEntity: MediaEntity) : JPanel() {
         private var image: Image?
 
-        private val imageWidth = 300
-        private val imageHeight = imageWidth / 2
-
         init {
-            preferredSize = Dimension(imageWidth, imageHeight)
             border = MatteBorder(1, 1, 1, 1, Color.WHITE)
             background = Color.WHITE
 
@@ -322,6 +330,9 @@ class TweetFrame(tweet: Flow.Publisher<out Status>, private val timezone: ZoneId
                 e.printStackTrace()
                 null
             }
+            val imageWidth = image?.getWidth(null) ?: 300
+            val imageHeight = image?.getHeight(null) ?: 150
+            preferredSize = Dimension(imageWidth, imageHeight)
         }
 
         override fun paintComponent(g: Graphics) {
@@ -332,7 +343,7 @@ class TweetFrame(tweet: Flow.Publisher<out Status>, private val timezone: ZoneId
                 val scale = min(xScale, yScale)
                 val w = (it.getWidth(null) * scale).roundToInt()
                 val h = (it.getHeight(null) * scale).roundToInt()
-                g.drawImage(it, (width - w) / 2, (height - h) / 2, w, h, null)
+                g.drawImage(it, (width - w) / 2, 0, w, h, null)
             }
         }
     }
@@ -353,9 +364,18 @@ class TweetFrame(tweet: Flow.Publisher<out Status>, private val timezone: ZoneId
 
             val tweetLabel = JLabel()
             tweetLabel.font = StandardFont.readNormalFont(16)
-            tweetLabel.text = formatTweetText(quotedStatus, true)
+            tweetLabel.text = formatTweetText(quotedStatus, true, tweetLabel)
             tweetLabel.alignmentX = Component.LEFT_ALIGNMENT
             tweetPanel.add(tweetLabel)
+
+            tweetLabel.addComponentListener(object : ComponentAdapter() {
+                override fun componentResized(e: ComponentEvent) {
+                    tweetLabel.text = tweetLabel.text.replace(Regex("<html><body width=[0-9]+>"), "<html><body width=${tweetLabel.width}>")
+                    tweetPanel.invalidate()
+                    tweetPanel.revalidate()
+                    tweetPanel.repaint()
+                }
+            })
 
             if (quotedStatus.mediaEntities.isNotEmpty()) {
                 val media = quotedStatus.mediaEntities
@@ -369,6 +389,8 @@ class TweetFrame(tweet: Flow.Publisher<out Status>, private val timezone: ZoneId
                 }
                 tweetPanel.add(mediaPanel)
             }
+
+            tweetPanel.add(Box.createVerticalGlue())
 
             val timeLabel = JLabel()
             timeLabel.font = StandardFont.readNormalFont(12)
