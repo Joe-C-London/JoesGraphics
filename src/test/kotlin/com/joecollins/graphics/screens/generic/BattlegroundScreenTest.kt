@@ -8,6 +8,7 @@ import com.joecollins.models.general.PartyResult
 import com.joecollins.models.general.PartyResult.Companion.elected
 import com.joecollins.models.general.PartyResult.Companion.leading
 import com.joecollins.pubsub.Publisher
+import com.joecollins.pubsub.asOneTimePublisher
 import org.junit.Test
 import java.awt.Color
 
@@ -127,6 +128,28 @@ class BattlegroundScreenTest {
         rightSeats.submit(0)
         leftSeats.submit(30)
         compareRendering("BattlegroundScreen", "Basic-DoubleParty-6", panel)
+    }
+    @Test
+    fun testDoubleCoalitionBattleground() {
+        val coa = Party("Governing Coalition", "NDP/GRN", ndp.color)
+        val prevResult = Publisher(bcPrevResult())
+        val currResult = Publisher<Map<String, PartyResult>>(emptyMap())
+        val rightSeats = Publisher(30)
+        val leftSeats = Publisher(30)
+        val numRows = Publisher(15)
+        val title = Publisher("BATTLEGROUND")
+        val panel = doubleParty(
+            prevResult,
+            currResult,
+            { it.uppercase() },
+            (coa to lib).asOneTimePublisher()
+        )
+            .withSeatsToShow(leftSeats, rightSeats)
+            .withCoalitions(mapOf(coa to setOf(ndp, grn)))
+            .withNumRows(numRows)
+            .build(title)
+        panel.setSize(1024, 512)
+        compareRendering("BattlegroundScreen", "Basic-DoubleCoalition-1", panel)
     }
 
     companion object {

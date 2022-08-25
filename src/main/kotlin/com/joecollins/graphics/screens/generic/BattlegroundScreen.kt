@@ -148,6 +148,7 @@ class BattlegroundScreen private constructor(
         private var numRows: Flow.Publisher<out Int> = 20.asOneTimePublisher()
         private var seatFilter: Flow.Publisher<out Set<T>?> = (null as Set<T>?).asOneTimePublisher()
         private var headerFunc: (Party) -> String = { "$it PREVIOUS SEATS" }
+        private var coalitions = emptyMap<Party, Set<Party>>()
 
         fun withSeatsToShow(
             leftSeatCountPublisher: Flow.Publisher<out Int>,
@@ -168,6 +169,11 @@ class BattlegroundScreen private constructor(
             return this
         }
 
+        fun withCoalitions(coalitions: Map<Party, Set<Party>>): DoublePartyBuilder<T> {
+            this.coalitions = coalitions
+            return this
+        }
+
         fun withHeaderFunc(headerFunc: (Party) -> String): DoublePartyBuilder<T> {
             this.headerFunc = headerFunc
             return this
@@ -180,6 +186,7 @@ class BattlegroundScreen private constructor(
             leftSeatCount.subscribe(Subscriber { leftInput.count = it })
             parties.subscribe(Subscriber { leftInput.party = it })
             seatFilter.subscribe(Subscriber { leftInput.filteredSeats = it })
+            leftInput.coalitions = coalitions
             val leftItems = leftInput.items
             val leftFrame = ResultListingFrame(
                 headerPublisher = parties.map { headerFunc(it.first) },
@@ -203,6 +210,7 @@ class BattlegroundScreen private constructor(
             rightSeatCount.subscribe(Subscriber { rightInput.count = it })
             parties.subscribe(Subscriber { rightInput.party = it.reverse() })
             seatFilter.subscribe(Subscriber { rightInput.filteredSeats = it })
+            rightInput.coalitions = coalitions
             val rightItems = rightInput.items
             val rightFrame = ResultListingFrame(
                 headerPublisher = parties.map { headerFunc(it.second) },
@@ -263,7 +271,7 @@ class BattlegroundScreen private constructor(
                 submit()
             }
 
-        private fun submit() {
+        protected fun submit() {
             synchronized(this) {
                 (items as Publisher<List<Entry<T>>>).submit(getItemsList())
             }
@@ -335,14 +343,32 @@ class BattlegroundScreen private constructor(
     }
 
     private class DoubleBattlegroundInput<T> : BattlegroundInput<T, Pair<Party, Party>>() {
+
+        var coalitions: Map<Party, Set<Party>> = emptyMap()
+            set(value) {
+                field = value
+                submit()
+            }
+
         override fun getSortKey(votes: Map<Party, Int>): Double? {
             val total = votes.values.sum()
             val prevWinner = votes.entries.maxBy { it.value }.key
             val topTwo = votes.entries
-                .filter { it.key == party?.first || it.key == party?.second }
+                .filter { e ->
+                    sequenceOf(party?.first, party?.second)
+                        .filterNotNull()
+                        .flatMap { coalitions[it] ?: setOf(it) }
+                        .contains(e.key)
+                }
                 .sortedByDescending { it.value }
                 .toList()
-            return if (topTwo.isEmpty() || prevWinner != party?.first)
+            return if (
+                topTwo.isEmpty() ||
+                !sequenceOf(party?.first)
+                    .filterNotNull()
+                    .flatMap { coalitions[it] ?: setOf(it) }
+                    .contains(prevWinner)
+            )
                 null
             else if (topTwo.size < 2)
                 topTwo[0].value / total.toDouble()
