@@ -11,6 +11,8 @@ import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
 import org.junit.Test
 import java.awt.Color
+import java.lang.Math.abs
+import java.text.DecimalFormat
 
 class BattlegroundScreenTest {
     @Test
@@ -150,6 +152,60 @@ class BattlegroundScreenTest {
             .build(title)
         panel.setSize(1024, 512)
         compareRendering("BattlegroundScreen", "Basic-DoubleCoalition-1", panel)
+    }
+
+    @Test
+    fun testDoublePartyBattlegroundPreferences() {
+        val alp = Party("Labor", "ALP", Color.RED)
+        val clp = Party("Country Liberal", "CLP", Color.ORANGE)
+        val ta = Party("Territory Alliance", "TA", Color.BLUE.darker())
+        val ind = Party("Independent", "IND", Party.OTHERS.color)
+
+        val prevResults = listOf(
+            "Arafura" to mapOf(alp to 1388, clp to 1203),
+            "Araluen" to mapOf(ta to 2203, clp to 2161),
+            "Arnhem" to mapOf(alp to 1504, ind to 1420),
+            "Barkly" to mapOf(clp to 1723, alp to 1718),
+            "Blain" to mapOf(alp to 2095, clp to 2082),
+            "Braitling" to mapOf(clp to 2256, alp to 2139),
+            "Brennan" to mapOf(clp to 2242, alp to 2138),
+            "Casuarina" to mapOf(alp to 3033, clp to 1568),
+            "Daly" to mapOf(clp to 1984, alp to 1890),
+            "Drysdale" to mapOf(alp to 2263, clp to 1642),
+            "Fannie Bay" to mapOf(alp to 2589, clp to 1756),
+            "Fong Lim" to mapOf(alp to 2197, clp to 1978),
+            "Goyder" to mapOf(ind to 2665, clp to 2030),
+            "Gwoja" to mapOf(alp to 1729, clp to 929),
+            "Johnston" to mapOf(alp to 2851, clp to 1433),
+            "Karama" to mapOf(alp to 2491, clp to 1678),
+            "Katherine" to mapOf(clp to 2041, alp to 1845),
+            "Mulka" to mapOf(ind to 2252, alp to 1843),
+            "Namatjira" to mapOf(clp to 1814, alp to 1792),
+            "Nelson" to mapOf(clp to 2657, ind to 1904),
+            "Nightcliff" to mapOf(alp to 3286, clp to 1139),
+            "Port Darwin" to mapOf(alp to 2233, clp to 2068),
+            "Sanderson" to mapOf(alp to 3044, clp to 1351),
+            "Spillett" to mapOf(clp to 3219, alp to 1730),
+            "Wanguri" to mapOf(alp to 3349, clp to 1627),
+        )
+        val panel = doubleParty(
+            prevResults.associateWith { it.second }.asOneTimePublisher(),
+            emptyMap<Pair<String, Map<Party, Int>>, PartyResult?>().asOneTimePublisher(),
+            { e ->
+                val votes = e.second.values.toList()
+                val pct = abs(votes[0] - votes[1]) / votes.sum().toDouble()
+                DecimalFormat("0.0").format(50 * pct) +
+                    " " + e.first.uppercase() + " " +
+                    (e.second.keys.filter { !setOf(alp, clp).contains(it) }.takeUnless { it.isEmpty() }?.toString() ?: "")
+            },
+            (clp to alp).asOneTimePublisher()
+        )
+            .withSeatsToShow(15.asOneTimePublisher(), 15.asOneTimePublisher())
+            .withNumRows(15.asOneTimePublisher())
+            .withPreferences()
+            .build("PENDULUM".asOneTimePublisher())
+        panel.setSize(1024, 512)
+        compareRendering("BattlegroundScreen", "Basic-DoublePartyPreferences-1", panel)
     }
 
     companion object {

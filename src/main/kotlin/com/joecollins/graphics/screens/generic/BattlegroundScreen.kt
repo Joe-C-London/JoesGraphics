@@ -149,6 +149,7 @@ class BattlegroundScreen private constructor(
         private var seatFilter: Flow.Publisher<out Set<T>?> = (null as Set<T>?).asOneTimePublisher()
         private var headerFunc: (Party) -> String = { "$it PREVIOUS SEATS" }
         private var coalitions = emptyMap<Party, Set<Party>>()
+        private var preferences = false
 
         fun withSeatsToShow(
             leftSeatCountPublisher: Flow.Publisher<out Int>,
@@ -179,6 +180,11 @@ class BattlegroundScreen private constructor(
             return this
         }
 
+        fun withPreferences(): DoublePartyBuilder<T> {
+            this.preferences = true
+            return this
+        }
+
         fun build(title: Flow.Publisher<out String?>): BattlegroundScreen {
             val leftInput = DoubleBattlegroundInput<T>()
             prevResults.subscribe(Subscriber { leftInput.prev = it })
@@ -187,6 +193,7 @@ class BattlegroundScreen private constructor(
             parties.subscribe(Subscriber { leftInput.party = it })
             seatFilter.subscribe(Subscriber { leftInput.filteredSeats = it })
             leftInput.coalitions = coalitions
+            leftInput.preferences = preferences
             val leftItems = leftInput.items
             val leftFrame = ResultListingFrame(
                 headerPublisher = parties.map { headerFunc(it.first) },
@@ -211,6 +218,7 @@ class BattlegroundScreen private constructor(
             parties.subscribe(Subscriber { rightInput.party = it.reverse() })
             seatFilter.subscribe(Subscriber { rightInput.filteredSeats = it })
             rightInput.coalitions = coalitions
+            rightInput.preferences = preferences
             val rightItems = rightInput.items
             val rightFrame = ResultListingFrame(
                 headerPublisher = parties.map { headerFunc(it.second) },
@@ -350,25 +358,33 @@ class BattlegroundScreen private constructor(
                 submit()
             }
 
+        var preferences: Boolean = false
+            set(value) {
+                field = value
+                submit()
+            }
+
         override fun getSortKey(votes: Map<Party, Int>): Double? {
             val total = votes.values.sum()
             val prevWinner = votes.entries.maxBy { it.value }.key
+            if (!sequenceOf(party?.first)
+                .filterNotNull()
+                .flatMap { coalitions[it] ?: setOf(it) }
+                .contains(prevWinner)
+            ) {
+                return null
+            }
             val topTwo = votes.entries
                 .filter { e ->
-                    sequenceOf(party?.first, party?.second)
-                        .filterNotNull()
-                        .flatMap { coalitions[it] ?: setOf(it) }
-                        .contains(e.key)
+                    preferences ||
+                        sequenceOf(party?.first, party?.second)
+                            .filterNotNull()
+                            .flatMap { coalitions[it] ?: setOf(it) }
+                            .contains(e.key)
                 }
                 .sortedByDescending { it.value }
                 .toList()
-            return if (
-                topTwo.isEmpty() ||
-                !sequenceOf(party?.first)
-                    .filterNotNull()
-                    .flatMap { coalitions[it] ?: setOf(it) }
-                    .contains(prevWinner)
-            )
+            return if (topTwo.isEmpty())
                 null
             else if (topTwo.size < 2)
                 topTwo[0].value / total.toDouble()
