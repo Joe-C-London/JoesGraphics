@@ -6,6 +6,7 @@ import com.joecollins.graphics.components.BarFrame
 import com.joecollins.graphics.components.BarFrameBuilder
 import com.joecollins.graphics.components.BarFrameBuilder.BasicBar
 import com.joecollins.graphics.components.BarFrameBuilder.DualBar
+import com.joecollins.graphics.components.GraphicsFrame
 import com.joecollins.graphics.components.MapFrame
 import com.joecollins.graphics.components.SwingFrame
 import com.joecollins.graphics.components.SwingFrameBuilder
@@ -1732,6 +1733,7 @@ class BasicResultPanel private constructor(
     ) {
         private var prevQuotas: Flow.Publisher<out Map<Party, Double>>? = null
         private var changeHeader: Flow.Publisher<out String>? = null
+        private var progressLabel: Flow.Publisher<out String?>? = null
 
         private var swingCurrVotes: Flow.Publisher<out Map<Party, Int>>? = null
         private var swingPrevVotes: Flow.Publisher<out Map<Party, Int>>? = null
@@ -1773,6 +1775,11 @@ class BasicResultPanel private constructor(
             return this
         }
 
+        fun withProgressLabel(progressLabel: Flow.Publisher<out String?>): PartyQuotaScreenBuilder {
+            this.progressLabel = progressLabel
+            return this
+        }
+
         fun build(textHeader: Flow.Publisher<out String>): BasicResultPanel {
             return BasicResultPanel(
                 textHeader,
@@ -1780,7 +1787,7 @@ class BasicResultPanel private constructor(
                 null,
                 createDiffFrame(),
                 createSwingFrame(),
-                mapBuilder?.createMapFrame()
+                mapBuilder?.createMapFrame(),
             )
         }
 
@@ -1801,7 +1808,8 @@ class BasicResultPanel private constructor(
                 headerPublisher = header,
                 subheadTextPublisher = subhead,
                 maxPublisher = totalSeats,
-                linesPublisher = totalSeats.map { lines -> (1 until lines).map { BarFrame.Line(it, "$it QUOTA${if (it == 1) "" else "S"}") } }
+                linesPublisher = totalSeats.map { lines -> (1 until lines).map { BarFrame.Line(it, "$it QUOTA${if (it == 1) "" else "S"}") } },
+                headerLabelsPublisher = progressLabel?.map { mapOf(GraphicsFrame.HeaderLabelLocation.RIGHT to it) }
             )
         }
 
