@@ -7,7 +7,6 @@ import com.joecollins.pubsub.asOneTimePublisher
 import org.apache.commons.collections4.ComparatorUtils
 import java.awt.Color
 import java.text.DecimalFormat
-import java.util.Comparator
 import java.util.concurrent.Flow
 import kotlin.math.sign
 
@@ -51,6 +50,7 @@ class SwingFrameBuilder {
 
     private var rangePublisher: Flow.Publisher<out Number>? = null
     private var headerPublisher: Flow.Publisher<out String?>? = null
+    private var progressPublisher: Flow.Publisher<out String?>? = null
     private var leftColorPublisher: Flow.Publisher<out Color>? = null
     private var rightColorPublisher: Flow.Publisher<out Color>? = null
     private var valuePublisher: Flow.Publisher<out Number>? = null
@@ -77,8 +77,9 @@ class SwingFrameBuilder {
         return this
     }
 
-    fun withHeader(headerPublisher: Flow.Publisher<out String?>): SwingFrameBuilder {
+    fun withHeader(headerPublisher: Flow.Publisher<out String?>, progressPublisher: Flow.Publisher<out String?>? = null): SwingFrameBuilder {
         this.headerPublisher = headerPublisher
+        this.progressPublisher = progressPublisher
         return this
     }
 
@@ -90,7 +91,8 @@ class SwingFrameBuilder {
             leftColorPublisher = leftColorPublisher ?: Color.BLACK.asOneTimePublisher(),
             rightColorPublisher = rightColorPublisher ?: Color.BLACK.asOneTimePublisher(),
             bottomColorPublisher = bottomColorPublisher ?: Color.BLACK.asOneTimePublisher(),
-            bottomTextPublisher = bottomTextPublisher ?: null.asOneTimePublisher()
+            bottomTextPublisher = bottomTextPublisher ?: null.asOneTimePublisher(),
+            progressPublisher = progressPublisher
         )
     }
 

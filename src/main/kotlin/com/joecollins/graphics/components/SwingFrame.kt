@@ -4,6 +4,7 @@ import com.joecollins.graphics.utils.ColorUtils
 import com.joecollins.graphics.utils.StandardFont
 import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
+import com.joecollins.pubsub.map
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Graphics
@@ -22,9 +23,11 @@ class SwingFrame(
     leftColorPublisher: Flow.Publisher<out Color>,
     rightColorPublisher: Flow.Publisher<out Color>,
     bottomTextPublisher: Flow.Publisher<out String?>,
-    bottomColorPublisher: Flow.Publisher<out Color>
+    bottomColorPublisher: Flow.Publisher<out Color>,
+    progressPublisher: Flow.Publisher<out String?>? = null
 ) : GraphicsFrame(
-    headerPublisher = headerPublisher
+    headerPublisher = headerPublisher,
+    headerLabelsPublisher = progressPublisher?.map { p -> mapOf(HeaderLabelLocation.RIGHT to p) }
 ) {
     private val swingPanel = SwingPanel()
     private val bottomLabel: JLabel = FontSizeAdjustingLabel()
