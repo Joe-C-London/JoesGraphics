@@ -48,6 +48,10 @@ open class LowerThird internal constructor(
     private val leftPanel: ImagePanel = ImagePanel()
     private val rightPanel = PlaceAndTimePanel()
 
+    protected fun addHeadlinePanel(panel: JPanel) {
+        add(panel, BorderLayout.CENTER)
+    }
+
     internal val leftImage: Image
         get() { return leftPanel.leftImage }
 

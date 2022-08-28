@@ -28,6 +28,8 @@ open class GenericPanel(
     constructor(panel: JPanel, lowerThird: LowerThird?) : this(panel, null as Flow.Publisher<String>?, lowerThird)
     constructor(panel: JPanel, label: String, lowerThird: LowerThird?) : this(panel, label.asOneTimePublisher(), lowerThird)
     constructor(panel: () -> JPanel, label: Flow.Publisher<out String?>) : this(panel(), label)
+    constructor(panel: () -> JPanel, lowerThird: () -> LowerThird) : this(panel(), lowerThird())
+    constructor(panel: () -> JPanel, label: Flow.Publisher<out String?>, lowerThird: () -> LowerThird) : this(panel(), label, lowerThird())
 
     init {
         if (label != null) {

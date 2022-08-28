@@ -165,6 +165,10 @@ open class GraphicsFrame(
         )
     }
 
+    protected fun addCenter(panel: JPanel) {
+        add(panel, BorderLayout.CENTER)
+    }
+
     private inner class HeaderLayout : LayoutManager {
         override fun addLayoutComponent(name: String, comp: Component) {
         }
