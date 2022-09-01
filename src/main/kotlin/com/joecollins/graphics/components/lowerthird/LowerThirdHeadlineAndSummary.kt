@@ -1,11 +1,14 @@
 package com.joecollins.graphics.components.lowerthird
 
+import com.joecollins.models.general.Candidate
+import com.joecollins.models.general.Party
 import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.GridLayout
 import java.awt.Image
+import java.text.DecimalFormat
 import java.time.Clock
 import java.time.ZoneId
 import java.util.concurrent.Flow
@@ -70,5 +73,59 @@ class LowerThirdHeadlineAndSummary internal constructor(
         center.add(partySummary)
         this.headlineBinding.subscribe(Subscriber(eventQueueWrapper { headlinePanel.headline = it }))
         this.subheadBinding.subscribe(Subscriber(eventQueueWrapper { headlinePanel.subhead = it }))
+    }
+
+    companion object {
+        fun createSeatEntries(seats: Map<Party, Int>, totalSeats: Int = 0): List<SummaryWithLabels.Entry> {
+            val ret = seats.entries
+                .filter { it.value > 0 }
+                .sortedByDescending { if (it.key == Party.OTHERS) -1 else it.value }
+                .map { SummaryWithLabels.Entry(it.key.color, it.key.abbreviation, it.value.toString()) }
+                .toMutableList()
+            val inDoubt = totalSeats - seats.values.sum()
+            if (inDoubt > 0) {
+                ret.add(SummaryWithLabels.Entry(Color.WHITE, "?", inDoubt.toString()))
+            }
+            if (ret.isEmpty()) {
+                ret.add(SummaryWithLabels.Entry(Color.WHITE, "", "WAITING..."))
+            }
+            return ret
+        }
+
+        fun createVoteEntries(votes: Map<Party, Int>): List<SummaryWithLabels.Entry> {
+            val total = votes.values.sum().toDouble()
+            val ret = votes.entries
+                .filter { it.value > 0 }
+                .sortedByDescending { if (it.key == Party.OTHERS) -1 else it.value }
+                .map {
+                    SummaryWithLabels.Entry(
+                        it.key.color,
+                        it.key.abbreviation,
+                        DecimalFormat("0.0%").format(it.value / total)
+                    )
+                }.toMutableList()
+            if (ret.isEmpty()) {
+                ret.add(SummaryWithLabels.Entry(Color.WHITE, "", "WAITING..."))
+            }
+            return ret
+        }
+
+        fun createVoteEntries(votes: Map<Candidate, Int>, labelFunc: (Candidate) -> String): List<SummaryWithLabels.Entry> {
+            val total = votes.values.sum().toDouble()
+            val ret = votes.entries
+                .filter { it.value > 0 }
+                .sortedByDescending { if (it.key == Candidate.OTHERS) -1 else it.value }
+                .map {
+                    SummaryWithLabels.Entry(
+                        it.key.party.color,
+                        if (it.key == Candidate.OTHERS) Candidate.OTHERS.party.abbreviation else labelFunc(it.key),
+                        DecimalFormat("0.0%").format(it.value / total)
+                    )
+                }.toMutableList()
+            if (ret.isEmpty()) {
+                ret.add(SummaryWithLabels.Entry(Color.WHITE, "", "WAITING..."))
+            }
+            return ret
+        }
     }
 }
