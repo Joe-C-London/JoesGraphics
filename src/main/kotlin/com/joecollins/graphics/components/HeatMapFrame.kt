@@ -59,10 +59,10 @@ class HeatMapFrame(
         override fun layoutContainer(parent: Container) {
             var mid = 0
             if (barsPanel.hasSeats()) {
-                mid = min(25, parent.height / 10)
+                mid = min(20, parent.height / 6)
             }
             if (barsPanel.hasChange()) {
-                mid = min(50, parent.height / 5)
+                mid = min(40, parent.height / 3)
             }
             barsPanel.setLocation(0, 0)
             barsPanel.setSize(parent.width, mid)
