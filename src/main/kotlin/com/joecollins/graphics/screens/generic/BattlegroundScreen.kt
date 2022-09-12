@@ -5,6 +5,7 @@ import com.joecollins.graphics.components.GraphicsFrame
 import com.joecollins.graphics.components.ResultListingFrame
 import com.joecollins.graphics.utils.ColorUtils.lighten
 import com.joecollins.models.general.Party
+import com.joecollins.models.general.PartyOrCoalition
 import com.joecollins.models.general.PartyResult
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.Subscriber
@@ -141,14 +142,13 @@ class BattlegroundScreen private constructor(
         private val prevResults: Flow.Publisher<out Map<T, Map<Party, Int>>>,
         private val currResults: Flow.Publisher<out Map<T, PartyResult?>>,
         private val nameFunc: (T) -> String,
-        private val parties: Flow.Publisher<out Pair<Party, Party>>
+        private val parties: Flow.Publisher<out Pair<PartyOrCoalition, PartyOrCoalition>>
     ) {
         private var leftSeatCount: Flow.Publisher<out Int> = 100.asOneTimePublisher()
         private var rightSeatCount: Flow.Publisher<out Int> = 100.asOneTimePublisher()
         private var numRows: Flow.Publisher<out Int> = 20.asOneTimePublisher()
         private var seatFilter: Flow.Publisher<out Set<T>?> = (null as Set<T>?).asOneTimePublisher()
         private var headerFunc: (Party) -> String = { "$it PREVIOUS SEATS" }
-        private var coalitions = emptyMap<Party, Set<Party>>()
         private var preferences = false
 
         fun withSeatsToShow(
@@ -170,11 +170,6 @@ class BattlegroundScreen private constructor(
             return this
         }
 
-        fun withCoalitions(coalitions: Map<Party, Set<Party>>): DoublePartyBuilder<T> {
-            this.coalitions = coalitions
-            return this
-        }
-
         fun withHeaderFunc(headerFunc: (Party) -> String): DoublePartyBuilder<T> {
             this.headerFunc = headerFunc
             return this
@@ -192,11 +187,10 @@ class BattlegroundScreen private constructor(
             leftSeatCount.subscribe(Subscriber { leftInput.count = it })
             parties.subscribe(Subscriber { leftInput.party = it })
             seatFilter.subscribe(Subscriber { leftInput.filteredSeats = it })
-            leftInput.coalitions = coalitions
             leftInput.preferences = preferences
             val leftItems = leftInput.items
             val leftFrame = ResultListingFrame(
-                headerPublisher = parties.map { headerFunc(it.first) },
+                headerPublisher = parties.map { headerFunc(it.first.asParty) },
                 borderColorPublisher = parties.map { it.first.color },
                 headerAlignmentPublisher = GraphicsFrame.Alignment.RIGHT.asOneTimePublisher(),
                 numRowsPublisher = numRows,
@@ -217,11 +211,10 @@ class BattlegroundScreen private constructor(
             rightSeatCount.subscribe(Subscriber { rightInput.count = it })
             parties.subscribe(Subscriber { rightInput.party = it.reverse() })
             seatFilter.subscribe(Subscriber { rightInput.filteredSeats = it })
-            rightInput.coalitions = coalitions
             rightInput.preferences = preferences
             val rightItems = rightInput.items
             val rightFrame = ResultListingFrame(
-                headerPublisher = parties.map { headerFunc(it.second) },
+                headerPublisher = parties.map { headerFunc(it.second.asParty) },
                 borderColorPublisher = parties.map { it.second.color },
                 headerAlignmentPublisher = GraphicsFrame.Alignment.LEFT.asOneTimePublisher(),
                 numRowsPublisher = numRows,
@@ -350,13 +343,7 @@ class BattlegroundScreen private constructor(
         }
     }
 
-    private class DoubleBattlegroundInput<T> : BattlegroundInput<T, Pair<Party, Party>>() {
-
-        var coalitions: Map<Party, Set<Party>> = emptyMap()
-            set(value) {
-                field = value
-                submit()
-            }
+    private class DoubleBattlegroundInput<T> : BattlegroundInput<T, Pair<PartyOrCoalition, PartyOrCoalition>>() {
 
         var preferences: Boolean = false
             set(value) {
@@ -369,7 +356,7 @@ class BattlegroundScreen private constructor(
             val prevWinner = votes.entries.maxBy { it.value }.key
             if (!sequenceOf(party?.first)
                 .filterNotNull()
-                .flatMap { coalitions[it] ?: setOf(it) }
+                .flatMap { it.constituentParties }
                 .contains(prevWinner)
             ) {
                 return null
@@ -379,7 +366,7 @@ class BattlegroundScreen private constructor(
                     preferences ||
                         sequenceOf(party?.first, party?.second)
                             .filterNotNull()
-                            .flatMap { coalitions[it] ?: setOf(it) }
+                            .flatMap { it.constituentParties }
                             .contains(e.key)
                 }
                 .sortedByDescending { it.value }
@@ -467,7 +454,7 @@ class BattlegroundScreen private constructor(
             prevResultsPublisher: Flow.Publisher<out Map<T, Map<Party, Int>>>,
             currResultsPublisher: Flow.Publisher<out Map<T, PartyResult?>>,
             nameFunc: (T) -> String,
-            partyPublisher: Flow.Publisher<out Pair<Party, Party>>
+            partyPublisher: Flow.Publisher<out Pair<PartyOrCoalition, PartyOrCoalition>>
         ): DoublePartyBuilder<T> {
             return DoublePartyBuilder(prevResultsPublisher, currResultsPublisher, nameFunc, partyPublisher)
         }

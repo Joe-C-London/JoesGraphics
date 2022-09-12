@@ -8,6 +8,7 @@ import com.joecollins.graphics.screens.generic.RegionalBreakdownScreen.Companion
 import com.joecollins.graphics.screens.generic.RegionalBreakdownScreen.Companion.votesWithPrev
 import com.joecollins.graphics.screens.generic.RegionalBreakdownScreen.Companion.votesWithPrevPollsReporting
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
+import com.joecollins.models.general.Coalition
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PollsReporting
 import com.joecollins.pubsub.Publisher
@@ -141,10 +142,10 @@ class RegionalBreakdownScreenTest {
 
     @Test
     fun testSeatsCoalition() {
-        val coa = Party("Coalition", "L/NP", Color.BLUE.darker())
         val lib = Party("Liberal", "LIB", Color.BLUE.darker())
         val lnp = Party("Liberal National", "LNP", Color.BLUE)
         val clp = Party("Country Liberal", "CLP", Color.ORANGE)
+        val coa = Coalition("Coalition", "L/NP", lib, lnp, clp)
         val alp = Party("Labor", "ALP", Color.RED)
         val oth = Party.OTHERS
 
@@ -170,10 +171,10 @@ class RegionalBreakdownScreenTest {
 
     @Test
     fun testSeatsWithPrevCoalition() {
-        val coa = Party("Coalition", "L/NP", Color.BLUE.darker())
         val lib = Party("Liberal", "LIB", Color.BLUE.darker())
         val lnp = Party("Liberal National", "LNP", Color.BLUE)
         val clp = Party("Country Liberal", "CLP", Color.ORANGE)
+        val coa = Coalition("Coalition", "L/NP", lib, lnp, clp)
         val alp = Party("Labor", "ALP", Color.RED)
         val oth = Party.OTHERS
 
@@ -200,10 +201,10 @@ class RegionalBreakdownScreenTest {
 
     @Test
     fun testSeatsWithDiffCoalition() {
-        val coa = Party("Coalition", "L/NP", Color.BLUE.darker())
         val lib = Party("Liberal", "LIB", Color.BLUE.darker())
         val lnp = Party("Liberal National", "LNP", Color.BLUE)
         val clp = Party("Country Liberal", "CLP", Color.ORANGE)
+        val coa = Coalition("Coalition", "L/NP", lib, lnp, clp)
         val alp = Party("Labor", "ALP", Color.RED)
         val oth = Party.OTHERS
 
@@ -548,10 +549,10 @@ class RegionalBreakdownScreenTest {
 
     @Test
     fun testVotesCoalition() {
-        val coa = Party("Coalition", "L/NP", Color.BLUE.darker())
         val lib = Party("Liberal", "LIB", Color.BLUE.darker())
         val lnp = Party("Liberal National", "LNP", Color.BLUE)
         val clp = Party("Country Liberal", "CLP", Color.ORANGE)
+        val coa = Coalition("Coalition", "L/NP", lib, lnp, clp)
         val alp = Party("Labor", "ALP", Color.RED)
         val grn = Party("Greens", "GRN", Color.GREEN.darker())
         val onp = Party("One Nation", "ONP", Color.ORANGE.darker())
@@ -615,10 +616,10 @@ class RegionalBreakdownScreenTest {
 
     @Test
     fun testVotesWithPrevCoalition() {
-        val coa = Party("Coalition", "L/NP", Color.BLUE.darker())
         val lib = Party("Liberal", "LIB", Color.BLUE.darker())
         val lnp = Party("Liberal National", "LNP", Color.BLUE)
         val clp = Party("Country Liberal", "CLP", Color.ORANGE)
+        val coa = Coalition("Coalition", "L/NP", lib, lnp, clp)
         val alp = Party("Labor", "ALP", Color.RED)
         val grn = Party("Greens", "GRN", Color.GREEN.darker())
         val onp = Party("One Nation", "ONP", Color.ORANGE.darker())

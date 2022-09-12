@@ -3,6 +3,7 @@ package com.joecollins.graphics.screens.generic
 import com.joecollins.graphics.screens.generic.BattlegroundScreen.Companion.doubleParty
 import com.joecollins.graphics.screens.generic.BattlegroundScreen.Companion.singleParty
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
+import com.joecollins.models.general.Coalition
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
 import com.joecollins.models.general.PartyResult.Companion.elected
@@ -133,7 +134,7 @@ class BattlegroundScreenTest {
     }
     @Test
     fun testDoubleCoalitionBattleground() {
-        val coa = Party("Governing Coalition", "NDP/GRN", ndp.color)
+        val coa = Coalition("Governing Coalition", "NDP/GRN", ndp, grn)
         val prevResult = Publisher(bcPrevResult())
         val currResult = Publisher<Map<String, PartyResult>>(emptyMap())
         val rightSeats = Publisher(30)
@@ -147,7 +148,6 @@ class BattlegroundScreenTest {
             (coa to lib).asOneTimePublisher()
         )
             .withSeatsToShow(leftSeats, rightSeats)
-            .withCoalitions(mapOf(coa to setOf(ndp, grn)))
             .withNumRows(numRows)
             .build(title)
         panel.setSize(1024, 512)
