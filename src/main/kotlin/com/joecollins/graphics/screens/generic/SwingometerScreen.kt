@@ -4,6 +4,7 @@ import com.joecollins.graphics.GenericPanel
 import com.joecollins.graphics.components.SwingometerFrame
 import com.joecollins.graphics.components.SwingometerFrameBuilder
 import com.joecollins.models.general.Party
+import com.joecollins.models.general.PartyOrCoalition
 import com.joecollins.models.general.PartyResult
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.Subscriber
@@ -16,14 +17,14 @@ import kotlin.math.roundToInt
 
 class SwingometerScreen private constructor(title: Flow.Publisher<out String?>, frame: SwingometerFrame) : GenericPanel(pad(frame), title) {
     class Builder<T> internal constructor(
-        prevVotesPublisher: Flow.Publisher<out Map<T, Map<Party, Int>>>,
+        prevVotesPublisher: Flow.Publisher<out Map<T, Map<out PartyOrCoalition, Int>>>,
         resultsPublisher: Flow.Publisher<out Map<T, PartyResult?>>,
-        partiesPublisher: Flow.Publisher<out Pair<Party, Party>>,
-        partySwingsPublisher: Flow.Publisher<out Map<Party, Double>>,
+        partiesPublisher: Flow.Publisher<out Pair<PartyOrCoalition, PartyOrCoalition>>,
+        partySwingsPublisher: Flow.Publisher<out Map<out PartyOrCoalition, Double>>,
         headerPublisher: Flow.Publisher<out String?>
     ) {
         private inner class Inputs {
-            var prevVotes: Map<T, Map<Party, Int>> = emptyMap()
+            var prevVotes: Map<T, Map<out PartyOrCoalition, Int>> = emptyMap()
                 set(value) {
                     synchronized(this) {
                         field = value
@@ -49,7 +50,7 @@ class SwingometerScreen private constructor(title: Flow.Publisher<out String?>, 
                     }
                 }
 
-            var parties: Pair<Party, Party> = Party.OTHERS to Party.OTHERS
+            var parties: Pair<PartyOrCoalition, PartyOrCoalition> = Party.OTHERS to Party.OTHERS
                 set(value) {
                     synchronized(this) {
                         field = value
@@ -61,7 +62,7 @@ class SwingometerScreen private constructor(title: Flow.Publisher<out String?>, 
                     }
                 }
 
-            var partySwings: Map<Party, Double> = emptyMap()
+            var partySwings: Map<out PartyOrCoalition, Double> = emptyMap()
                 set(value) {
                     synchronized(this) {
                         field = value
@@ -275,10 +276,10 @@ class SwingometerScreen private constructor(title: Flow.Publisher<out String?>, 
             rightSwingList: List<Double>,
             leftSeats: Int,
             rightSeats: Int,
-            prevVotes: Map<T, Map<Party, Int>>,
+            prevVotes: Map<T, Map<out PartyOrCoalition, Int>>,
             seatLabelIncrement: Int,
-            parties: Pair<Party, Party>,
-            carryovers: Map<Party, Int>
+            parties: Pair<PartyOrCoalition, PartyOrCoalition>,
+            carryovers: Map<out PartyOrCoalition, Int>
         ): ArrayList<Triple<Double, Color, String>> {
             val ret = ArrayList<Triple<Double, Color, String>>()
             var i = 0
@@ -315,7 +316,7 @@ class SwingometerScreen private constructor(title: Flow.Publisher<out String?>, 
         }
 
         private fun leadChangeLabel(
-            parties: Pair<Party, Party>,
+            parties: Pair<PartyOrCoalition, PartyOrCoalition>,
             leftSwingList: List<Double>,
             rightSwingList: List<Double>,
             leftSeats: Int,
@@ -344,7 +345,7 @@ class SwingometerScreen private constructor(title: Flow.Publisher<out String?>, 
         }
 
         private fun majorityLabels(
-            parties: Pair<Party, Party>,
+            parties: Pair<PartyOrCoalition, PartyOrCoalition>,
             leftSwingList: List<Double>,
             rightSwingList: List<Double>,
             majority: Int
@@ -375,7 +376,7 @@ class SwingometerScreen private constructor(title: Flow.Publisher<out String?>, 
         }
 
         private fun zeroLabel(
-            parties: Pair<Party, Party>,
+            parties: Pair<PartyOrCoalition, PartyOrCoalition>,
             leftSeats: Int,
             rightSeats: Int
         ) = when {
@@ -389,9 +390,9 @@ class SwingometerScreen private constructor(title: Flow.Publisher<out String?>, 
         }
 
         private fun getSwingNeededForMajority(
-            votes: Map<T, Map<Party, Int>>,
-            focusParty: Party?,
-            compParty: Party?,
+            votes: Map<T, Map<out PartyOrCoalition, Int>>,
+            focusParty: PartyOrCoalition?,
+            compParty: PartyOrCoalition?,
             carryovers: Map<Party, Int>
         ): Double {
             val majority = (votes.keys.sumOf { inputs.weights?.let { f -> f(it) } ?: 1 } + carryovers.values.sum()) / 2 + 1
@@ -402,9 +403,9 @@ class SwingometerScreen private constructor(title: Flow.Publisher<out String?>, 
         }
 
         private fun createSwingList(
-            results: Map<T, Map<Party, Int>>,
-            focusParty: Party?,
-            compParty: Party?,
+            results: Map<T, Map<out PartyOrCoalition, Int>>,
+            focusParty: PartyOrCoalition?,
+            compParty: PartyOrCoalition?,
             carryovers: Map<Party, Int>
         ): List<Double> {
             val contestedSeats = results.asSequence()
@@ -458,18 +459,18 @@ class SwingometerScreen private constructor(title: Flow.Publisher<out String?>, 
         }
 
         fun <T> of(
-            prevVotes: Flow.Publisher<out Map<T, Map<Party, Int>>>,
+            prevVotes: Flow.Publisher<out Map<T, Map<out PartyOrCoalition, Int>>>,
             results: Flow.Publisher<out Map<T, PartyResult?>>,
-            currTotal: Flow.Publisher<out Map<Party, Int>>,
-            prevTotal: Flow.Publisher<out Map<Party, Int>>,
-            parties: Flow.Publisher<out Pair<Party, Party>>,
+            currTotal: Flow.Publisher<out Map<out PartyOrCoalition, Int>>,
+            prevTotal: Flow.Publisher<out Map<out PartyOrCoalition, Int>>,
+            parties: Flow.Publisher<out Pair<PartyOrCoalition, PartyOrCoalition>>,
             header: Flow.Publisher<out String?>
         ): Builder<T> {
             val swing = currTotal.merge(prevTotal) { curr, prev ->
                 val ct = curr.values.sum().toDouble()
                 val pt = prev.values.sum().toDouble()
-                val parties: Set<Party> = sequenceOf(curr.keys.asSequence(), prev.keys.asSequence()).flatten().toSet()
-                parties.associateWith { p: Party? ->
+                val parties: Set<PartyOrCoalition> = sequenceOf(curr.keys.asSequence(), prev.keys.asSequence()).flatten().toSet()
+                parties.associateWith { p: PartyOrCoalition? ->
                     (curr[p] ?: 0) / ct.coerceAtLeast(1e-6) - (prev[p] ?: 0) / pt.coerceAtLeast(1e-6)
                 }
             }

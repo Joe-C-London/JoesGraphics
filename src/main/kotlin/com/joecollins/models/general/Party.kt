@@ -4,7 +4,6 @@ import java.awt.Color
 
 data class Party(override val name: String, override val abbreviation: String, override val color: Color) : PartyOrCoalition {
     override val constituentParties = listOf(this)
-    override val asParty = this
 
     override fun toString(): String = abbreviation
 

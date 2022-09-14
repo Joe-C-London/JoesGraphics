@@ -148,7 +148,7 @@ class BattlegroundScreen private constructor(
         private var rightSeatCount: Flow.Publisher<out Int> = 100.asOneTimePublisher()
         private var numRows: Flow.Publisher<out Int> = 20.asOneTimePublisher()
         private var seatFilter: Flow.Publisher<out Set<T>?> = (null as Set<T>?).asOneTimePublisher()
-        private var headerFunc: (Party) -> String = { "$it PREVIOUS SEATS" }
+        private var headerFunc: (PartyOrCoalition) -> String = { "$it PREVIOUS SEATS" }
         private var preferences = false
 
         fun withSeatsToShow(
@@ -170,7 +170,7 @@ class BattlegroundScreen private constructor(
             return this
         }
 
-        fun withHeaderFunc(headerFunc: (Party) -> String): DoublePartyBuilder<T> {
+        fun withHeaderFunc(headerFunc: (PartyOrCoalition) -> String): DoublePartyBuilder<T> {
             this.headerFunc = headerFunc
             return this
         }
@@ -190,7 +190,7 @@ class BattlegroundScreen private constructor(
             leftInput.preferences = preferences
             val leftItems = leftInput.items
             val leftFrame = ResultListingFrame(
-                headerPublisher = parties.map { headerFunc(it.first.asParty) },
+                headerPublisher = parties.map { headerFunc(it.first) },
                 borderColorPublisher = parties.map { it.first.color },
                 headerAlignmentPublisher = GraphicsFrame.Alignment.RIGHT.asOneTimePublisher(),
                 numRowsPublisher = numRows,
@@ -214,7 +214,7 @@ class BattlegroundScreen private constructor(
             rightInput.preferences = preferences
             val rightItems = rightInput.items
             val rightFrame = ResultListingFrame(
-                headerPublisher = parties.map { headerFunc(it.second.asParty) },
+                headerPublisher = parties.map { headerFunc(it.second) },
                 borderColorPublisher = parties.map { it.second.color },
                 headerAlignmentPublisher = GraphicsFrame.Alignment.LEFT.asOneTimePublisher(),
                 numRowsPublisher = numRows,

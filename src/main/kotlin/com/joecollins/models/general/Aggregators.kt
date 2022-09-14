@@ -11,9 +11,9 @@ import kotlin.math.max
 
 object Aggregators {
 
-    fun <T, K> combine(items: Collection<T>, result: (T) -> Flow.Publisher<Map<K, Int>>) = combine(items, result, HashMap())
+    fun <T, K> combine(items: Collection<T>, result: (T) -> Flow.Publisher<out Map<out K, Int>>) = combine(items, result, HashMap())
 
-    fun <T, K> combine(items: Collection<T>, result: (T) -> Flow.Publisher<Map<K, Int>>, identity: Map<K, Int> = HashMap()): Flow.Publisher<Map<K, Int>> {
+    fun <T, K> combine(items: Collection<T>, result: (T) -> Flow.Publisher<out Map<out K, Int>>, identity: Map<K, Int> = HashMap()): Flow.Publisher<Map<K, Int>> {
         if (items.isEmpty()) {
             return identity.asOneTimePublisher()
         }
@@ -84,7 +84,7 @@ object Aggregators {
         )
     }
 
-    fun <K1, K2> adjustKey(result: Flow.Publisher<out Map<K1, Int>>, func: (K1) -> K2) = result.map { adjustKey(it, func) }
+    fun <K1, K2> adjustKey(result: Flow.Publisher<out Map<out K1, Int>>, func: (K1) -> K2) = result.map { adjustKey(it, func) }
 
     fun <K1, K2> adjustKey(result: Map<K1, Int>, func: (K1) -> K2): Map<K2, Int> {
         val ret: LinkedHashMap<K2, Int> = LinkedHashMap()
@@ -104,10 +104,13 @@ object Aggregators {
 
     fun <K, T : Int?> topAndOthers(result: Flow.Publisher<out Map<K, T>>, limit: Int, others: K, mustInclude: Flow.Publisher<out Array<K>>) = result.merge(mustInclude) { m, w -> topAndOthers(m, limit, others, *w) }
 
-    @Suppress("UNCHECKED_CAST")
-    fun <K, T : Int?> topAndOthers(result: Map<K, T>, limit: Int, others: K, vararg mustInclude: K): Map<K, T> {
+    fun <K, T : Int?> topAndOthers(result: Map<out K, T>, limit: Int, others: K, vararg mustInclude: K): Map<K, T> {
+        return topAndOthers(result, limit, others, mustInclude.toList())
+    }
+
+    fun <K, T : Int?> topAndOthers(result: Map<out K, T>, limit: Int, others: K, mustInclude: Collection<K>): Map<K, T> {
         if (result.size <= limit) {
-            return result
+            return result.mapKeys { it.key }
         }
         val mustIncludeSet = mustInclude.filterNotNull().toSet()
         val top = result.entries.asSequence()

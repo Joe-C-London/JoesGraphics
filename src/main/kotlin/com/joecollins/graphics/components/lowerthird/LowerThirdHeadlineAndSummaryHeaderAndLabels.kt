@@ -2,6 +2,7 @@ package com.joecollins.graphics.components.lowerthird
 
 import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.Party
+import com.joecollins.models.general.PartyOrCoalition
 import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
 import java.awt.BorderLayout
@@ -82,7 +83,7 @@ class LowerThirdHeadlineAndSummaryHeaderAndLabels internal constructor(
     }
 
     companion object {
-        fun createSeatEntries(seats: Map<Party, Int>, totalSeats: Int = 0): List<SummaryWithHeaderAndLabels.Entry> {
+        fun createSeatEntries(seats: Map<out PartyOrCoalition, Int>, totalSeats: Int = 0): List<SummaryWithHeaderAndLabels.Entry> {
             val ret = seats.entries
                 .filter { it.value > 0 }
                 .sortedByDescending { if (it.key == Party.OTHERS) -1 else it.value }

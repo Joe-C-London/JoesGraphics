@@ -1,6 +1,7 @@
 package com.joecollins.graphics.components
 
 import com.joecollins.models.general.Party
+import com.joecollins.models.general.PartyOrCoalition
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.asOneTimePublisher
@@ -96,19 +97,19 @@ class SwingFrameBuilder {
         )
     }
 
-    private class SelfPublishingPrevCurrPct {
-        private var prevPct: Map<Party, Double> = HashMap()
-        private var currPct: Map<Party, Double> = HashMap()
-        var fromParty: Party? = null
-        var toParty: Party? = null
+    private class SelfPublishingPrevCurrPct<POC : PartyOrCoalition> {
+        private var prevPct: Map<out POC, Double> = HashMap()
+        private var currPct: Map<out POC, Double> = HashMap()
+        var fromParty: POC? = null
+        var toParty: POC? = null
         var swing = 0.0
 
-        fun setPrevPct(prevPct: Map<Party, Double>) {
+        fun setPrevPct(prevPct: Map<out POC, Double>) {
             this.prevPct = prevPct
             setProperties()
         }
 
-        fun setCurrPct(currPct: Map<Party, Double>) {
+        fun setCurrPct(currPct: Map<out POC, Double>) {
             this.currPct = currPct
             setProperties()
         }
@@ -143,22 +144,22 @@ class SwingFrameBuilder {
     }
 
     companion object {
-        fun prevCurr(
-            prevPublisher: Flow.Publisher<out Map<Party, Number>>,
-            currPublisher: Flow.Publisher<out Map<Party, Number>>,
-            partyOrder: Comparator<Party>
+        fun <POC : PartyOrCoalition> prevCurr(
+            prevPublisher: Flow.Publisher<out Map<out POC, Number>>,
+            currPublisher: Flow.Publisher<out Map<out POC, Number>>,
+            partyOrder: Comparator<POC>
         ): SwingFrameBuilder {
             return prevCurr(prevPublisher, currPublisher, partyOrder, false)
         }
 
-        private fun <C : Map<Party, Number>, P : Map<Party, Number>> prevCurr(
+        private fun <POC : PartyOrCoalition, C : Map<out POC, Number>, P : Map<out POC, Number>> prevCurr(
             prevPublisher: Flow.Publisher<out P>,
             currPublisher: Flow.Publisher<out C>,
-            partyOrder: Comparator<Party>,
+            partyOrder: Comparator<POC>,
             normalised: Boolean
         ): SwingFrameBuilder {
-            val prevCurr = SelfPublishingPrevCurrPct()
-            val toPctFunc = { votes: Map<Party, Number> ->
+            val prevCurr = SelfPublishingPrevCurrPct<POC>()
+            val toPctFunc = { votes: Map<out POC, Number> ->
                 val total: Double = if (normalised) 1.0 else votes.values.sumOf { it.toDouble() }
                 votes.mapValues { e -> e.value.toDouble() / total }
             }

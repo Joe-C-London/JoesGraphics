@@ -2,6 +2,7 @@ package com.joecollins.graphics.components.lowerthird
 
 import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.Party
+import com.joecollins.models.general.PartyOrCoalition
 import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
 import java.awt.BorderLayout
@@ -85,7 +86,7 @@ class LowerThirdHeadlineAndBottomSummary internal constructor(
     }
 
     companion object {
-        fun createSeatEntries(seats: Map<Party, Int>, totalSeats: Int = 0, partiesToShow: Set<Party> = emptySet()): List<BottomSummary.Entry> {
+        fun createSeatEntries(seats: Map<out PartyOrCoalition, Int>, totalSeats: Int = 0, partiesToShow: Set<out PartyOrCoalition> = emptySet()): List<BottomSummary.Entry> {
             val ret = sequenceOf(
                 partiesToShow.asSequence(),
                 seats.entries.asSequence().filter { it.value > 0 }.map { it.key }

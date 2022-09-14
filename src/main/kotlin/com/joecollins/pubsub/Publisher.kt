@@ -135,7 +135,7 @@ fun <T, U, R> Flow.Publisher<T>.merge(other: Flow.Publisher<U>, func: (T, U) -> 
     return publisher
 }
 
-fun <T, R> List<Flow.Publisher<T>>.mapReduce(identity: R, onValueAdd: (R, T) -> R, onValueRemove: (R, T) -> R): Flow.Publisher<R> {
+fun <T, R> List<Flow.Publisher<out T>>.mapReduce(identity: R, onValueAdd: (R, T) -> R, onValueRemove: (R, T) -> R): Flow.Publisher<R> {
     data class Wrapper(val item: T)
     val publisher = Publisher<R>()
     val list: MutableList<Wrapper?> = this.map { null }.toMutableList()

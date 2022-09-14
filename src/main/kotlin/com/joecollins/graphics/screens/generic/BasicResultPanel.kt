@@ -13,7 +13,9 @@ import com.joecollins.graphics.components.SwingFrameBuilder
 import com.joecollins.models.general.Aggregators
 import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.Party
+import com.joecollins.models.general.PartyOrCoalition
 import com.joecollins.models.general.PartyResult
+import com.joecollins.models.general.toParty
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.asOneTimePublisher
@@ -48,19 +50,19 @@ class BasicResultPanel private constructor(
     panel
 }, label) {
 
-    interface KeyTemplate<KT> {
-        fun toParty(key: KT): Party
+    interface KeyTemplate<KT, KPT : PartyOrCoalition> {
+        fun toParty(key: KT): KPT
         fun toMainBarHeader(key: KT, forceSingleLine: Boolean): String
         fun winnerShape(forceSingleLine: Boolean): Shape
         fun runoffShape(forceSingleLine: Boolean): Shape
     }
 
-    private class PartyTemplate : KeyTemplate<Party> {
-        override fun toParty(key: Party): Party {
+    private class PartyTemplate<P : PartyOrCoalition> : KeyTemplate<P, P> {
+        override fun toParty(key: P): P {
             return key
         }
 
-        override fun toMainBarHeader(key: Party, forceSingleLine: Boolean): String {
+        override fun toMainBarHeader(key: P, forceSingleLine: Boolean): String {
             return key.name.uppercase()
         }
 
@@ -73,7 +75,7 @@ class BasicResultPanel private constructor(
         }
     }
 
-    private class CandidateTemplate : KeyTemplate<Candidate> {
+    private class CandidateTemplate : KeyTemplate<Candidate, Party> {
         private val incumbentMarker: String
 
         constructor() {
@@ -104,11 +106,11 @@ class BasicResultPanel private constructor(
         }
     }
 
-    abstract class SeatScreenBuilder<KT, CT, PT> internal constructor(
-        protected var current: Flow.Publisher<out Map<KT, CT>>,
+    abstract class SeatScreenBuilder<KT, KPT : PartyOrCoalition, CT, PT> internal constructor(
+        protected var current: Flow.Publisher<out Map<out KT, CT>>,
         protected var header: Flow.Publisher<out String?>,
         protected var subhead: Flow.Publisher<out String?>,
-        protected val keyTemplate: KeyTemplate<KT>
+        protected val keyTemplate: KeyTemplate<KT, KPT>
     ) {
         protected var total: Flow.Publisher<out Int>? = null
         protected var showMajority: Flow.Publisher<out Boolean>? = null
@@ -116,21 +118,21 @@ class BasicResultPanel private constructor(
         protected var winner: Flow.Publisher<out KT?>? = null
         protected var notes: Flow.Publisher<out String?>? = null
         protected var changeNotes: Flow.Publisher<out String?>? = null
-        protected var prev: Flow.Publisher<out Map<Party, PT>>? = null
-        protected var diff: Flow.Publisher<out Map<Party, CurrDiff<CT>>>? = null
+        protected var prev: Flow.Publisher<out Map<out KPT, PT>>? = null
+        protected var diff: Flow.Publisher<out Map<KPT, CurrDiff<CT>>>? = null
         protected var showPrevRaw: Flow.Publisher<Boolean>? = null
         protected var changeHeader: Flow.Publisher<out String?>? = null
         protected var changeSubhead: Flow.Publisher<out String?>? = null
-        private var currVotes: Flow.Publisher<out Map<Party, Int>>? = null
-        private var prevVotes: Flow.Publisher<out Map<Party, Int>>? = null
+        private var currVotes: Flow.Publisher<out Map<out KPT, Int>>? = null
+        private var prevVotes: Flow.Publisher<out Map<out KPT, Int>>? = null
         private var swingHeader: Flow.Publisher<out String?>? = null
-        private var swingComparator: Comparator<Party>? = null
-        protected var classificationFunc: ((Party) -> Party)? = null
+        private var swingComparator: Comparator<KPT>? = null
+        protected var classificationFunc: ((KPT) -> KPT)? = null
         protected var classificationHeader: Flow.Publisher<out String?>? = null
         protected var progressLabel: Flow.Publisher<out String?> = null.asOneTimePublisher()
         private var mapBuilder: MapBuilder<*>? = null
 
-        fun withTotal(totalSeats: Flow.Publisher<out Int>): SeatScreenBuilder<KT, CT, PT> {
+        fun withTotal(totalSeats: Flow.Publisher<out Int>): SeatScreenBuilder<KT, KPT, CT, PT> {
             total = totalSeats
             return this
         }
@@ -138,27 +140,27 @@ class BasicResultPanel private constructor(
         fun withMajorityLine(
             showMajority: Flow.Publisher<out Boolean>,
             majorityLabelFunc: (Int) -> String
-        ): SeatScreenBuilder<KT, CT, PT> {
+        ): SeatScreenBuilder<KT, KPT, CT, PT> {
             this.showMajority = showMajority
             majorityFunction = majorityLabelFunc
             return this
         }
 
-        fun withWinner(winner: Flow.Publisher<out KT?>): SeatScreenBuilder<KT, CT, PT> {
+        fun withWinner(winner: Flow.Publisher<out KT?>): SeatScreenBuilder<KT, KPT, CT, PT> {
             this.winner = winner
             return this
         }
 
         @JvmOverloads
         fun withDiff(
-            diff: Flow.Publisher<out Map<Party, CT>>,
+            diff: Flow.Publisher<out Map<KPT, CT>>,
             changeHeader: Flow.Publisher<out String?>,
             changeSubhead: Flow.Publisher<out String?> = null.asOneTimePublisher()
-        ): SeatScreenBuilder<KT, CT, PT> {
+        ): SeatScreenBuilder<KT, KPT, CT, PT> {
             this.diff =
                 current
                     .merge(diff) { c, d ->
-                        val ret = LinkedHashMap<Party, CurrDiff<CT>>()
+                        val ret = LinkedHashMap<KPT, CurrDiff<CT>>()
                         c.forEach { (k, v) -> ret[keyTemplate.toParty(k)] = createFromDiff(v, d[keyTemplate.toParty(k)]) }
                         d.forEach { (k, v) -> ret.putIfAbsent(k, createFromDiff(v)) }
                         ret
@@ -173,16 +175,16 @@ class BasicResultPanel private constructor(
 
         @JvmOverloads
         fun withPrev(
-            prev: Flow.Publisher<out Map<Party, PT>>,
+            prev: Flow.Publisher<out Map<out KPT, PT>>,
             changeHeader: Flow.Publisher<out String?>,
             changeSubhead: Flow.Publisher<out String?> = null.asOneTimePublisher(),
             showPrevRaw: Flow.Publisher<Boolean> = false.asOneTimePublisher()
-        ): SeatScreenBuilder<KT, CT, PT> {
+        ): SeatScreenBuilder<KT, KPT, CT, PT> {
             this.prev = prev
             this.diff =
                 current
                     .merge(prev) { c, p ->
-                        val ret = LinkedHashMap<Party, CurrDiff<CT>>()
+                        val ret = LinkedHashMap<KPT, CurrDiff<CT>>()
                         c.forEach { (k, v) -> ret[keyTemplate.toParty(k)] = createFromPrev(v, p[keyTemplate.toParty(k)]) }
                         p.forEach { (k, v) -> ret.putIfAbsent(k, createFromPrev(v)) }
                         ret
@@ -197,11 +199,11 @@ class BasicResultPanel private constructor(
         protected abstract fun createFromPrev(prev: PT): CurrDiff<CT>
 
         fun withSwing(
-            currVotes: Flow.Publisher<out Map<Party, Int>>,
-            prevVotes: Flow.Publisher<out Map<Party, Int>>,
-            comparator: Comparator<Party>,
+            currVotes: Flow.Publisher<out Map<out KPT, Int>>,
+            prevVotes: Flow.Publisher<out Map<out KPT, Int>>,
+            comparator: Comparator<KPT>,
             header: Flow.Publisher<out String?>
-        ): SeatScreenBuilder<KT, CT, PT> {
+        ): SeatScreenBuilder<KT, KPT, CT, PT> {
             swingHeader = header
             this.currVotes = currVotes
             this.prevVotes = prevVotes
@@ -211,10 +213,10 @@ class BasicResultPanel private constructor(
 
         fun <T> withPartyMap(
             shapes: Flow.Publisher<out Map<T, Shape>>,
-            winners: Flow.Publisher<out Map<T, Party?>>,
+            winners: Flow.Publisher<out Map<T, PartyOrCoalition?>>,
             focus: Flow.Publisher<out List<T>?>,
             headerPublisher: Flow.Publisher<out String?>
-        ): SeatScreenBuilder<KT, CT, PT> {
+        ): SeatScreenBuilder<KT, KPT, CT, PT> {
             mapBuilder = MapBuilder(
                 shapes, winners.map { m -> partyMapToResultMap(m) }, focus, headerPublisher
             )
@@ -226,7 +228,7 @@ class BasicResultPanel private constructor(
             winners: Flow.Publisher<out Map<T, PartyResult?>>,
             focus: Flow.Publisher<out List<T>?>,
             headerPublisher: Flow.Publisher<out String?>
-        ): SeatScreenBuilder<KT, CT, PT> {
+        ): SeatScreenBuilder<KT, KPT, CT, PT> {
             mapBuilder = MapBuilder(shapes, winners, focus, headerPublisher)
             return this
         }
@@ -237,31 +239,31 @@ class BasicResultPanel private constructor(
             focus: Flow.Publisher<out List<T>?>,
             additionalHighlight: Flow.Publisher<out List<T>?>,
             headerPublisher: Flow.Publisher<out String?>
-        ): SeatScreenBuilder<KT, CT, PT> {
+        ): SeatScreenBuilder<KT, KPT, CT, PT> {
             mapBuilder = MapBuilder(shapes, winners, Pair(focus, additionalHighlight), headerPublisher)
             return this
         }
 
-        fun withNotes(notes: Flow.Publisher<out String?>): SeatScreenBuilder<KT, CT, PT> {
+        fun withNotes(notes: Flow.Publisher<out String?>): SeatScreenBuilder<KT, KPT, CT, PT> {
             this.notes = notes
             return this
         }
 
-        fun withChangeNotes(notes: Flow.Publisher<out String?>): SeatScreenBuilder<KT, CT, PT> {
+        fun withChangeNotes(notes: Flow.Publisher<out String?>): SeatScreenBuilder<KT, KPT, CT, PT> {
             this.changeNotes = notes
             return this
         }
 
         fun withClassification(
-            classificationFunc: (Party) -> Party,
+            classificationFunc: (KPT) -> KPT,
             classificationHeader: Flow.Publisher<out String?>
-        ): SeatScreenBuilder<KT, CT, PT> {
+        ): SeatScreenBuilder<KT, KPT, CT, PT> {
             this.classificationFunc = classificationFunc
             this.classificationHeader = classificationHeader
             return this
         }
 
-        fun withProgressLabel(progressLabel: Flow.Publisher<out String?>): SeatScreenBuilder<KT, CT, PT> {
+        fun withProgressLabel(progressLabel: Flow.Publisher<out String?>): SeatScreenBuilder<KT, KPT, CT, PT> {
             this.progressLabel = progressLabel
             return this
         }
@@ -301,12 +303,12 @@ class BasicResultPanel private constructor(
         }
     }
 
-    private class BasicSeatScreenBuilder<KT>(
-        current: Flow.Publisher<out Map<KT, Int>>,
+    private class BasicSeatScreenBuilder<KT, KPT : PartyOrCoalition>(
+        current: Flow.Publisher<out Map<out KT, Int>>,
         header: Flow.Publisher<out String?>,
         subhead: Flow.Publisher<out String?>,
-        keyTemplate: KeyTemplate<KT>
-    ) : SeatScreenBuilder<KT, Int, Int>(current, header, subhead, keyTemplate) {
+        keyTemplate: KeyTemplate<KT, KPT>
+    ) : SeatScreenBuilder<KT, KPT, Int, Int>(current, header, subhead, keyTemplate) {
 
         override fun createFromDiff(curr: Int, diff: Int?): CurrDiff<Int> {
             return CurrDiff(curr, diff ?: 0)
@@ -325,7 +327,7 @@ class BasicResultPanel private constructor(
         }
 
         private inner class Result {
-            var seats: Map<KT, Int> = emptyMap()
+            var seats: Map<out KT, Int> = emptyMap()
                 set(value) {
                     field = value
                     updateBars()
@@ -344,7 +346,7 @@ class BasicResultPanel private constructor(
                 val winner = this.winner
                 val numBars = seats.size
                 return seats.entries.asSequence()
-                    .sortedByDescending { if (it.key === Party.OTHERS) Int.MIN_VALUE else it.value }
+                    .sortedByDescending { if (it.key === Party.OTHERS as KPT) Int.MIN_VALUE else it.value }
                     .map {
                         BasicBar(
                             keyTemplate.toMainBarHeader(
@@ -437,7 +439,7 @@ class BasicResultPanel private constructor(
         override fun createDiffFrame(): BarFrame? {
             val diffBars = diff?.map { map ->
                 map.entries.asSequence()
-                    .sortedByDescending { if (it.key === Party.OTHERS) Int.MIN_VALUE else it.value.curr }
+                    .sortedByDescending { if (it.key === Party.OTHERS as KPT) Int.MIN_VALUE else it.value.curr }
                     .map {
                         BasicBar(
                             it.key.abbreviation.uppercase(),
@@ -493,13 +495,13 @@ class BasicResultPanel private constructor(
         }
     }
 
-    private class DualSeatScreenBuilder<KT>(
-        current: Flow.Publisher<out Map<KT, Pair<Int, Int>>>,
+    private class DualSeatScreenBuilder<KT, KPT : PartyOrCoalition>(
+        current: Flow.Publisher<out Map<out KT, Pair<Int, Int>>>,
         header: Flow.Publisher<out String?>,
         subhead: Flow.Publisher<out String?>,
-        keyTemplate: KeyTemplate<KT>,
+        keyTemplate: KeyTemplate<KT, KPT>,
         val focusLocation: FocusLocation
-    ) : SeatScreenBuilder<KT, Pair<Int, Int>, Pair<Int, Int>>(current, header, subhead, keyTemplate) {
+    ) : SeatScreenBuilder<KT, KPT, Pair<Int, Int>, Pair<Int, Int>>(current, header, subhead, keyTemplate) {
 
         enum class FocusLocation { FIRST, LAST }
 
@@ -526,7 +528,7 @@ class BasicResultPanel private constructor(
         }
 
         private inner class Result {
-            var seats: Map<KT, Pair<Int, Int>> = emptyMap()
+            var seats: Map<out KT, Pair<Int, Int>> = emptyMap()
                 set(value) {
                     field = value
                     updateBars()
@@ -545,7 +547,7 @@ class BasicResultPanel private constructor(
                 val winner = this.winner
                 val count = seats.size
                 return seats.entries.asSequence()
-                    .sortedByDescending { if (it.key === Party.OTHERS) Int.MIN_VALUE else it.value.second }
+                    .sortedByDescending { if (it.key === Party.OTHERS as KPT) Int.MIN_VALUE else it.value.second }
                     .map {
                         DualBar(
                             keyTemplate.toMainBarHeader(
@@ -612,7 +614,7 @@ class BasicResultPanel private constructor(
         override fun createDiffFrame(): BarFrame? {
             val diffBars = diff?.map { map ->
                 map.entries.asSequence()
-                    .sortedByDescending { if (it.key === Party.OTHERS) Int.MIN_VALUE else it.value.curr.second }
+                    .sortedByDescending { if (it.key === Party.OTHERS as KPT) Int.MIN_VALUE else it.value.curr.second }
                     .map {
                         DualBar(
                             it.key.abbreviation.uppercase(),
@@ -631,7 +633,7 @@ class BasicResultPanel private constructor(
             }
             val prevBars = prev?.map { map ->
                 map.entries.asSequence()
-                    .sortedByDescending { if (it.key === Party.OTHERS) Int.MIN_VALUE else it.value.second }
+                    .sortedByDescending { if (it.key === Party.OTHERS as KPT) Int.MIN_VALUE else it.value.second }
                     .map {
                         DualBar(
                             it.key.abbreviation.uppercase(),
@@ -685,12 +687,12 @@ class BasicResultPanel private constructor(
         }
     }
 
-    private class RangeSeatScreenBuilder<KT>(
+    private class RangeSeatScreenBuilder<KT, KPT : PartyOrCoalition>(
         current: Flow.Publisher<out Map<KT, IntRange>>,
         header: Flow.Publisher<out String?>,
         subhead: Flow.Publisher<out String?>,
-        keyTemplate: KeyTemplate<KT>
-    ) : SeatScreenBuilder<KT, IntRange, Int>(current, header, subhead, keyTemplate) {
+        keyTemplate: KeyTemplate<KT, KPT>
+    ) : SeatScreenBuilder<KT, KPT, IntRange, Int>(current, header, subhead, keyTemplate) {
         override fun createFromDiff(curr: IntRange, diff: IntRange?): CurrDiff<IntRange> {
             return CurrDiff(curr, diff ?: IntRange(0, 0))
         }
@@ -708,7 +710,7 @@ class BasicResultPanel private constructor(
         }
 
         private inner class Result {
-            var seats: Map<KT, IntRange> = emptyMap()
+            var seats: Map<out KT, IntRange> = emptyMap()
                 set(value) {
                     field = value
                     updateBars()
@@ -727,7 +729,7 @@ class BasicResultPanel private constructor(
                 val winner = this.winner
                 val count = seats.size
                 return seats.entries.asSequence()
-                    .sortedByDescending { if (it.key === Party.OTHERS) Int.MIN_VALUE else (it.value.first + it.value.last) }
+                    .sortedByDescending { if (it.key === Party.OTHERS as KPT) Int.MIN_VALUE else (it.value.first + it.value.last) }
                     .map {
                         DualBar(
                             keyTemplate.toMainBarHeader(
@@ -795,7 +797,7 @@ class BasicResultPanel private constructor(
             val diffBars = diff?.map { map ->
                 map.entries.asSequence()
                     .sortedByDescending {
-                        if (it.key === Party.OTHERS) Int.MIN_VALUE
+                        if (it.key === Party.OTHERS as KPT) Int.MIN_VALUE
                         else (it.value.curr.first + it.value.curr.last)
                     }
                     .map {
@@ -816,7 +818,7 @@ class BasicResultPanel private constructor(
             val prevBars = prev?.map { map ->
                 map.entries.asSequence()
                     .sortedByDescending { e ->
-                        if (e.key === Party.OTHERS) Int.MIN_VALUE
+                        if (e.key === Party.OTHERS as KPT) Int.MIN_VALUE
                         else e.value
                     }
                     .map { e ->
@@ -890,11 +892,11 @@ class BasicResultPanel private constructor(
         }
     }
 
-    abstract class VoteScreenBuilder<KT, CT, CPT, PT> internal constructor(
-        protected var current: Flow.Publisher<out Map<KT, CT>>,
+    abstract class VoteScreenBuilder<KT, KPT : PartyOrCoalition, CT, CPT, PT> internal constructor(
+        protected var current: Flow.Publisher<out Map<out KT, CT>>,
         protected var header: Flow.Publisher<out String?>,
         protected var subhead: Flow.Publisher<out String?>,
-        protected val keyTemplate: KeyTemplate<KT>,
+        protected val keyTemplate: KeyTemplate<KT, KPT>,
         protected val voteTemplate: VoteTemplate,
         protected val others: KT
     ) {
@@ -905,19 +907,19 @@ class BasicResultPanel private constructor(
         protected var pctReporting: Flow.Publisher<Double>? = null
         protected var notes: Flow.Publisher<out String?>? = null
         protected var limit = Int.MAX_VALUE
-        protected var mandatoryParties: Set<Party> = emptySet()
-        protected var prev: Flow.Publisher<out Map<Party, PT>>? = null
+        protected var mandatoryParties: Set<KPT> = emptySet()
+        protected var prev: Flow.Publisher<out Map<out KPT, PT>>? = null
         protected var showPrevRaw: Flow.Publisher<Boolean>? = null
         protected var changeHeader: Flow.Publisher<out String?>? = null
         protected var changeSubhead: Flow.Publisher<out String?>? = null
-        protected var currPreferences: Flow.Publisher<out Map<KT, CT>>? = null
-        protected var prevPreferences: Flow.Publisher<out Map<Party, PT>>? = null
+        protected var currPreferences: Flow.Publisher<out Map<out KT, CT>>? = null
+        protected var prevPreferences: Flow.Publisher<out Map<out KPT, PT>>? = null
         protected var preferenceHeader: Flow.Publisher<out String?>? = null
         protected var preferenceSubhead: Flow.Publisher<out String?>? = null
         protected var preferencePctReporting: Flow.Publisher<out Double>? = null
         protected var swingHeader: Flow.Publisher<out String?>? = null
-        protected var swingComparator: Comparator<Party>? = null
-        protected var classificationFunc: ((Party) -> Party)? = null
+        protected var swingComparator: Comparator<KPT>? = null
+        protected var classificationFunc: ((KPT) -> KPT)? = null
         protected var classificationHeader: Flow.Publisher<out String?>? = null
         private var mapBuilder: MapBuilder<*>? = null
         private var runoffSubhead: Flow.Publisher<String>? = null
@@ -925,7 +927,7 @@ class BasicResultPanel private constructor(
         protected var progressLabel: Flow.Publisher<out String?> = null.asOneTimePublisher()
         protected var preferenceProgressLabel: Flow.Publisher<out String?> = null.asOneTimePublisher()
 
-        protected val filteredPrev: Flow.Publisher<out Map<Party, PT>>?
+        protected val filteredPrev: Flow.Publisher<out Map<out KPT, PT>>?
             get() {
                 val prev = this.prev
                 if (prev == null) return prev
@@ -983,11 +985,11 @@ class BasicResultPanel private constructor(
 
         @JvmOverloads
         fun withPrev(
-            prev: Flow.Publisher<out Map<Party, PT>>,
+            prev: Flow.Publisher<out Map<out KPT, PT>>,
             header: Flow.Publisher<out String?>,
             subhead: Flow.Publisher<out String?> = (null as String?).asOneTimePublisher(),
             showPrevRaw: Flow.Publisher<Boolean> = false.asOneTimePublisher()
-        ): VoteScreenBuilder<KT, CT, CPT, PT> {
+        ): VoteScreenBuilder<KT, KPT, CT, CPT, PT> {
             this.prev = prev
             changeHeader = header
             changeSubhead = subhead
@@ -996,10 +998,10 @@ class BasicResultPanel private constructor(
         }
 
         fun withPreferences(
-            preferences: Flow.Publisher<out Map<KT, CT>>,
+            preferences: Flow.Publisher<out Map<out KT, CT>>,
             preferenceHeader: Flow.Publisher<out String?>,
             preferenceSubhead: Flow.Publisher<out String?>
-        ): VoteScreenBuilder<KT, CT, CPT, PT> {
+        ): VoteScreenBuilder<KT, KPT, CT, CPT, PT> {
             currPreferences = preferences
             this.preferenceHeader = preferenceHeader
             this.preferenceSubhead = preferenceSubhead
@@ -1007,38 +1009,38 @@ class BasicResultPanel private constructor(
         }
 
         fun withPrevPreferences(
-            prevPreferences: Flow.Publisher<out Map<Party, PT>>
-        ): VoteScreenBuilder<KT, CT, CPT, PT> {
+            prevPreferences: Flow.Publisher<out Map<out KPT, PT>>
+        ): VoteScreenBuilder<KT, KPT, CT, CPT, PT> {
             this.prevPreferences = prevPreferences
             return this
         }
 
-        fun withWinner(winner: Flow.Publisher<out KT?>): VoteScreenBuilder<KT, CT, CPT, PT> {
+        fun withWinner(winner: Flow.Publisher<out KT?>): VoteScreenBuilder<KT, KPT, CT, CPT, PT> {
             this.winner = winner
             return this
         }
 
-        fun withRunoff(runoff: Flow.Publisher<out Set<KT>?>): VoteScreenBuilder<KT, CT, CPT, PT> {
+        fun withRunoff(runoff: Flow.Publisher<out Set<KT>?>): VoteScreenBuilder<KT, KPT, CT, CPT, PT> {
             this.runoff = runoff
             return this
         }
 
-        fun withPctReporting(pctReporting: Flow.Publisher<Double>): VoteScreenBuilder<KT, CT, CPT, PT> {
+        fun withPctReporting(pctReporting: Flow.Publisher<Double>): VoteScreenBuilder<KT, KPT, CT, CPT, PT> {
             this.pctReporting = pctReporting
             return this
         }
 
         fun withPreferencePctReporting(
             preferencePctReporting: Flow.Publisher<out Double>
-        ): VoteScreenBuilder<KT, CT, CPT, PT> {
+        ): VoteScreenBuilder<KT, KPT, CT, CPT, PT> {
             this.preferencePctReporting = preferencePctReporting
             return this
         }
 
         fun withSwing(
-            comparator: Comparator<Party>?,
+            comparator: Comparator<KPT>?,
             header: Flow.Publisher<out String?>
-        ): VoteScreenBuilder<KT, CT, CPT, PT> {
+        ): VoteScreenBuilder<KT, KPT, CT, CPT, PT> {
             swingComparator = comparator
             swingHeader = header
             return this
@@ -1046,10 +1048,10 @@ class BasicResultPanel private constructor(
 
         fun <T> withPartyMap(
             shapes: Flow.Publisher<out Map<T, Shape>>,
-            winners: Flow.Publisher<out Map<T, Party?>>,
+            winners: Flow.Publisher<out Map<T, PartyOrCoalition?>>,
             focus: Flow.Publisher<out List<T>?>,
             headerPublisher: Flow.Publisher<out String?>
-        ): VoteScreenBuilder<KT, CT, CPT, PT> {
+        ): VoteScreenBuilder<KT, KPT, CT, CPT, PT> {
             mapBuilder = MapBuilder(shapes, winners.map { m -> partyMapToResultMap(m) }, focus, headerPublisher)
             return this
         }
@@ -1060,7 +1062,7 @@ class BasicResultPanel private constructor(
             leadingParty: Flow.Publisher<out Party?>,
             focus: Flow.Publisher<out List<T>?>,
             header: Flow.Publisher<out String?>
-        ): VoteScreenBuilder<KT, CT, CPT, PT> {
+        ): VoteScreenBuilder<KT, KPT, CT, CPT, PT> {
             mapBuilder = MapBuilder(shapes, selectedShape, leadingParty.map { party -> PartyResult.elected(party) }, focus, header)
             return this
         }
@@ -1070,7 +1072,7 @@ class BasicResultPanel private constructor(
             winners: Flow.Publisher<out Map<T, PartyResult?>>,
             focus: Flow.Publisher<out List<T>?>,
             headerPublisher: Flow.Publisher<out String?>
-        ): VoteScreenBuilder<KT, CT, CPT, PT> {
+        ): VoteScreenBuilder<KT, KPT, CT, CPT, PT> {
             mapBuilder = MapBuilder(shapes, winners, focus, headerPublisher)
             return this
         }
@@ -1080,7 +1082,7 @@ class BasicResultPanel private constructor(
             winners: Flow.Publisher<out Map<T, PartyResult?>>,
             focus: Pair<Flow.Publisher<out List<T>?>, Flow.Publisher<out List<T>?>>,
             headerPublisher: Flow.Publisher<out String?>
-        ): VoteScreenBuilder<KT, CT, CPT, PT> {
+        ): VoteScreenBuilder<KT, KPT, CT, CPT, PT> {
             mapBuilder = MapBuilder(shapes, winners, focus, headerPublisher)
             return this
         }
@@ -1091,7 +1093,7 @@ class BasicResultPanel private constructor(
             leadingParty: Flow.Publisher<out PartyResult?>,
             focus: Flow.Publisher<out List<T>?>,
             header: Flow.Publisher<out String?>
-        ): VoteScreenBuilder<KT, CT, CPT, PT> {
+        ): VoteScreenBuilder<KT, KPT, CT, CPT, PT> {
             mapBuilder = MapBuilder(shapes, selectedShape, leadingParty, focus, header)
             return this
         }
@@ -1103,7 +1105,7 @@ class BasicResultPanel private constructor(
             focus: Flow.Publisher<out List<T>?>,
             additionalHighlight: Flow.Publisher<out List<T>?>,
             header: Flow.Publisher<out String?>
-        ): VoteScreenBuilder<KT, CT, CPT, PT> {
+        ): VoteScreenBuilder<KT, KPT, CT, CPT, PT> {
             mapBuilder = MapBuilder(shapes, selectedShape, leadingParty, focus, additionalHighlight, header)
             return this
         }
@@ -1111,18 +1113,18 @@ class BasicResultPanel private constructor(
         fun withMajorityLine(
             showMajority: Flow.Publisher<out Boolean>,
             majorityLabel: String
-        ): VoteScreenBuilder<KT, CT, CPT, PT> {
+        ): VoteScreenBuilder<KT, KPT, CT, CPT, PT> {
             this.showMajority = showMajority
             this.majorityLabel = majorityLabel
             return this
         }
 
-        fun withNotes(notes: Flow.Publisher<out String?>): VoteScreenBuilder<KT, CT, CPT, PT> {
+        fun withNotes(notes: Flow.Publisher<out String?>): VoteScreenBuilder<KT, KPT, CT, CPT, PT> {
             this.notes = notes
             return this
         }
 
-        fun withLimit(limit: Int, vararg mandatoryParties: Party): VoteScreenBuilder<KT, CT, CPT, PT> {
+        fun withLimit(limit: Int, vararg mandatoryParties: KPT): VoteScreenBuilder<KT, KPT, CT, CPT, PT> {
             require(limit > 0) { "Invalid limit: $limit" }
             this.limit = limit
             this.mandatoryParties = setOf(*mandatoryParties)
@@ -1130,30 +1132,30 @@ class BasicResultPanel private constructor(
         }
 
         fun withClassification(
-            classificationFunc: (Party) -> Party,
+            classificationFunc: (KPT) -> KPT,
             classificationHeader: Flow.Publisher<out String?>
-        ): VoteScreenBuilder<KT, CT, CPT, PT> {
+        ): VoteScreenBuilder<KT, KPT, CT, CPT, PT> {
             this.classificationFunc = classificationFunc
             this.classificationHeader = classificationHeader
             return this
         }
 
-        fun inRunoffMode(changeSubhead: Flow.Publisher<String>): VoteScreenBuilder<KT, CT, CPT, PT> {
+        fun inRunoffMode(changeSubhead: Flow.Publisher<String>): VoteScreenBuilder<KT, KPT, CT, CPT, PT> {
             this.runoffSubhead = changeSubhead
             return this
         }
 
-        fun whenWinnerNotRunningAgain(changeSubhead: Flow.Publisher<String>): VoteScreenBuilder<KT, CT, CPT, PT> {
+        fun whenWinnerNotRunningAgain(changeSubhead: Flow.Publisher<String>): VoteScreenBuilder<KT, KPT, CT, CPT, PT> {
             this.winnerNotRunningAgain = changeSubhead
             return this
         }
 
-        fun withProgressLabel(progressLabel: Flow.Publisher<out String?>): VoteScreenBuilder<KT, CT, CPT, PT> {
+        fun withProgressLabel(progressLabel: Flow.Publisher<out String?>): VoteScreenBuilder<KT, KPT, CT, CPT, PT> {
             this.progressLabel = progressLabel
             return this
         }
 
-        fun withPreferenceProgressLabel(progressLabel: Flow.Publisher<out String?>): VoteScreenBuilder<KT, CT, CPT, PT> {
+        fun withPreferenceProgressLabel(progressLabel: Flow.Publisher<out String?>): VoteScreenBuilder<KT, KPT, CT, CPT, PT> {
             this.preferenceProgressLabel = progressLabel
             return this
         }
@@ -1180,16 +1182,16 @@ class BasicResultPanel private constructor(
         }
     }
 
-    private class BasicVoteScreenBuilder<KT>(
-        current: Flow.Publisher<out Map<KT, Int?>>,
+    private class BasicVoteScreenBuilder<KT, KPT : PartyOrCoalition>(
+        current: Flow.Publisher<out Map<out KT, Int?>>,
         header: Flow.Publisher<out String?>,
         subhead: Flow.Publisher<out String?>,
-        keyTemplate: KeyTemplate<KT>,
+        keyTemplate: KeyTemplate<KT, KPT>,
         voteTemplate: VoteTemplate,
         others: KT
-    ) : VoteScreenBuilder<KT, Int?, Double, Int>(current, header, subhead, keyTemplate, voteTemplate, others) {
+    ) : VoteScreenBuilder<KT, KPT, Int?, Double, Int>(current, header, subhead, keyTemplate, voteTemplate, others) {
         private inner class Result(private val isPreference: Boolean) {
-            var votes: Map<KT, Int?> = emptyMap()
+            var votes: Map<out KT, Int?> = emptyMap()
                 set(value) {
                     field = value
                     updateBars()
@@ -1303,13 +1305,13 @@ class BasicResultPanel private constructor(
         }
 
         private inner class Change {
-            var currVotes: Map<KT, Int?> = emptyMap()
+            var currVotes: Map<out KT, Int?> = emptyMap()
                 set(value) {
                     field = value
                     updateBars()
                 }
 
-            var prevVotes: Map<Party, Int> = emptyMap()
+            var prevVotes: Map<out KPT, Int> = emptyMap()
                 set(value) {
                     field = value
                     updateBars()
@@ -1329,10 +1331,10 @@ class BasicResultPanel private constructor(
                     return emptyList()
                 }
                 val pVotes = this.prevVotes
-                val prevWinner: Party? = pVotes.entries
+                val prevWinner: KPT? = pVotes.entries
                     .maxByOrNull { it.value }
                     ?.key
-                val prevHasOther = pVotes.containsKey(Party.OTHERS)
+                val prevHasOther = pVotes.containsKey(Party.OTHERS as KPT)
                 val partiesToShow = sequenceOf(
                     sequenceOf(prevWinner),
                     cVotes.entries
@@ -1346,7 +1348,7 @@ class BasicResultPanel private constructor(
                 if (showPrevRaw) {
                     return if (prevTotal == 0) emptyList() else
                         pVotes.entries.asSequence()
-                            .sortedByDescending { if (it.key === Party.OTHERS) Int.MIN_VALUE else it.value }
+                            .sortedByDescending { if (it.key === Party.OTHERS as KPT) Int.MIN_VALUE else it.value }
                             .map {
                                 val pct = it.value.toDouble() / prevTotal
                                 BasicBar(
@@ -1364,19 +1366,19 @@ class BasicResultPanel private constructor(
                 val partyTotal = Aggregators.topAndOthers(
                     consolidate(currTotalByParty(cVotes), partiesToShow),
                     limit,
-                    Party.OTHERS,
-                    *mandatoryParties.toTypedArray()
+                    Party.OTHERS as KPT,
+                    mandatoryParties
                 )
                 val finalPartiesToShow = sequenceOf(
                     partyTotal.keys.asSequence(),
-                    pVotes.entries.asSequence().filter { !partyTotal.containsKey(it.key) }.map { Party.OTHERS }
+                    pVotes.entries.asSequence().filter { !partyTotal.containsKey(it.key) }.map { Party.OTHERS as KPT }
                 ).flatten().toSet()
-                val prevVotes: Map<Party, Int> = pVotes.entries
+                val prevVotes: Map<KPT, Int> = pVotes.entries
                     .groupingBy { if (finalPartiesToShow.contains(it.key)) it.key else Party.OTHERS }
                     .fold(0) { a, e -> a + e.value }
                 return finalPartiesToShow.asSequence()
-                    .sortedByDescending { if (it === Party.OTHERS) Int.MIN_VALUE else (partyTotal[it] ?: 0) }
-                    .map { e ->
+                    .sortedByDescending { if (it === Party.OTHERS as KPT) Int.MIN_VALUE else (partyTotal[it] ?: 0) }
+                    .map { e: KPT ->
                         val cpct = 1.0 * (partyTotal[e] ?: 0) / currTotal
                         val ppct = 1.0 * (prevVotes[e] ?: 0) / prevTotal
                         BasicBar(
@@ -1468,8 +1470,8 @@ class BasicResultPanel private constructor(
 
         override fun createSwingFrame(): SwingFrame? {
             return swingHeader?.let { swingHeader ->
-                val curr: Flow.Publisher<out Map<Party, Int>>
-                val prev: Flow.Publisher<out Map<Party, Int>>
+                val curr: Flow.Publisher<out Map<out KPT, Int>>
+                val prev: Flow.Publisher<out Map<out KPT, Int>>
                 val currPreferences = this.currPreferences
                 val prevPreferences = this.prevPreferences
                 if (currPreferences != null && prevPreferences != null) {
@@ -1488,7 +1490,7 @@ class BasicResultPanel private constructor(
                     curr = current.map { currTotalByParty(it) }
                     prev = this.filteredPrev!!
                         .merge(current) { p, c ->
-                            val prevWinner: Party? = p.entries
+                            val prevWinner: KPT? = p.entries
                                 .maxByOrNull { it.value }
                                 ?.key
                             if (prevWinner == null ||
@@ -1513,7 +1515,7 @@ class BasicResultPanel private constructor(
             }
         }
 
-        private fun currTotalByParty(curr: Map<KT, Int?>): Map<Party, Int> {
+        private fun currTotalByParty(curr: Map<out KT, Int?>): Map<KPT, Int> {
             if (curr.values.any { it == null }) {
                 return emptyMap()
             }
@@ -1522,19 +1524,19 @@ class BasicResultPanel private constructor(
                 .fold(0) { a, e -> a + (e.value ?: 0) }
         }
 
-        private fun consolidate(votes: Map<Party, Int>, parties: Set<Party>): Map<Party, Int> {
-            return votes.entries.groupingBy { if (parties.contains(it.key)) it.key else Party.OTHERS }.fold(0) { a, e -> a + e.value }
+        private fun consolidate(votes: Map<KPT, Int>, parties: Set<KPT>): Map<KPT, Int> {
+            return votes.entries.groupingBy { if (parties.contains(it.key)) it.key else Party.OTHERS as KPT }.fold(0) { a, e -> a + e.value }
         }
     }
 
-    private class RangeVoteScreenBuilder<KT>(
+    private class RangeVoteScreenBuilder<KT, KPT : PartyOrCoalition>(
         current: Flow.Publisher<out Map<KT, ClosedRange<Double>>>,
         header: Flow.Publisher<out String?>,
         subhead: Flow.Publisher<out String?>,
-        keyTemplate: KeyTemplate<KT>,
+        keyTemplate: KeyTemplate<KT, KPT>,
         voteTemplate: VoteTemplate,
         others: KT
-    ) : VoteScreenBuilder<KT, ClosedRange<Double>, Double, Int>(current, header, subhead, keyTemplate, voteTemplate, others) {
+    ) : VoteScreenBuilder<KT, KPT, ClosedRange<Double>, Double, Int>(current, header, subhead, keyTemplate, voteTemplate, others) {
         override fun createFrame(): BarFrame {
             val bars = current.map { curr ->
                 curr.entries.asSequence()
@@ -1573,13 +1575,13 @@ class BasicResultPanel private constructor(
         }
 
         private inner class Change {
-            var currVotes: Map<KT, ClosedRange<Double>> = emptyMap()
+            var currVotes: Map<out KT, ClosedRange<Double>> = emptyMap()
                 set(value) {
                     field = value
                     updateBars()
                 }
 
-            var prevVotes: Map<Party, Int> = emptyMap()
+            var prevVotes: Map<out KPT, Int> = emptyMap()
                 set(value) {
                     field = value
                     updateBars()
@@ -1601,7 +1603,7 @@ class BasicResultPanel private constructor(
                 }
                 if (showPrevRaw) {
                     return pVotes.entries.asSequence()
-                        .sortedByDescending { if (it.key === Party.OTHERS) Int.MIN_VALUE else it.value }
+                        .sortedByDescending { if (it.key === Party.OTHERS as KPT) Int.MIN_VALUE else it.value }
                         .map {
                             val pct = it.value.toDouble() / prevTotal
                             DualBar(
@@ -1618,13 +1620,13 @@ class BasicResultPanel private constructor(
                     .fold(0.0..0.0) { a, e -> (a.start + e.value.start)..(a.endInclusive + e.value.endInclusive) }
                 val finalPartiesToShow = sequenceOf(
                     partyTotal.keys.asSequence(),
-                    pVotes.entries.asSequence().filter { !partyTotal.containsKey(it.key) }.map { Party.OTHERS }
+                    pVotes.entries.asSequence().filter { !partyTotal.containsKey(it.key) }.map { Party.OTHERS as KPT }
                 ).flatten().toSet()
                 val prevVotes = pVotes.entries
-                    .groupingBy { if (partyTotal.containsKey(it.key)) it.key else Party.OTHERS }
+                    .groupingBy { if (partyTotal.containsKey(it.key)) it.key else Party.OTHERS as KPT }
                     .fold(0) { a, e -> a + e.value }
                 return finalPartiesToShow.asSequence()
-                    .sortedByDescending { e -> if (e === Party.OTHERS) Double.MIN_VALUE else partyTotal[e]!!.let { it.start + it.endInclusive } }
+                    .sortedByDescending { e -> if (e === Party.OTHERS as KPT) Double.MIN_VALUE else partyTotal[e]!!.let { it.start + it.endInclusive } }
                     .map {
                         val range = partyTotal[it] ?: (0.0..0.0)
                         val cpctMin = range.start
@@ -1725,38 +1727,38 @@ class BasicResultPanel private constructor(
         }
     }
 
-    class PartyQuotaScreenBuilder(
-        private val quotas: Flow.Publisher<out Map<Party, Double>>,
+    class PartyQuotaScreenBuilder<P : PartyOrCoalition>(
+        private val quotas: Flow.Publisher<out Map<out P, Double>>,
         private val totalSeats: Flow.Publisher<out Int>,
         private val header: Flow.Publisher<out String?>,
         private val subhead: Flow.Publisher<out String?>
     ) {
-        private var prevQuotas: Flow.Publisher<out Map<Party, Double>>? = null
+        private var prevQuotas: Flow.Publisher<out Map<out P, Double>>? = null
         private var changeHeader: Flow.Publisher<out String>? = null
         private var progressLabel: Flow.Publisher<out String?>? = null
 
-        private var swingCurrVotes: Flow.Publisher<out Map<Party, Int>>? = null
-        private var swingPrevVotes: Flow.Publisher<out Map<Party, Int>>? = null
-        private var swingComparator: Comparator<Party>? = null
+        private var swingCurrVotes: Flow.Publisher<out Map<out P, Int>>? = null
+        private var swingPrevVotes: Flow.Publisher<out Map<out P, Int>>? = null
+        private var swingComparator: Comparator<P>? = null
         private var swingHeader: Flow.Publisher<out String?>? = null
 
         private var mapBuilder: MapBuilder<*>? = null
 
         fun withPrev(
-            prevQuotas: Flow.Publisher<out Map<Party, Double>>,
+            prevQuotas: Flow.Publisher<out Map<out P, Double>>,
             changeHeader: Flow.Publisher<out String>
-        ): PartyQuotaScreenBuilder {
+        ): PartyQuotaScreenBuilder<P> {
             this.prevQuotas = prevQuotas
             this.changeHeader = changeHeader
             return this
         }
 
         fun withSwing(
-            currVotes: Flow.Publisher<out Map<Party, Int>>,
-            prevVotes: Flow.Publisher<out Map<Party, Int>>,
-            comparator: Comparator<Party>,
+            currVotes: Flow.Publisher<out Map<out P, Int>>,
+            prevVotes: Flow.Publisher<out Map<out P, Int>>,
+            comparator: Comparator<P>,
             header: Flow.Publisher<out String?>
-        ): PartyQuotaScreenBuilder {
+        ): PartyQuotaScreenBuilder<P> {
             this.swingCurrVotes = currVotes
             this.swingPrevVotes = prevVotes
             this.swingComparator = comparator
@@ -1767,15 +1769,15 @@ class BasicResultPanel private constructor(
         fun <T> withPartyMap(
             shapes: Flow.Publisher<out Map<T, Shape>>,
             selectedShape: Flow.Publisher<out T>,
-            leadingParty: Flow.Publisher<out Party?>,
+            leadingParty: Flow.Publisher<out P?>,
             focus: Flow.Publisher<out List<T>?>,
             header: Flow.Publisher<out String?>
-        ): PartyQuotaScreenBuilder {
-            mapBuilder = MapBuilder(shapes, selectedShape, leadingParty.map { PartyResult.elected(it) }, focus, header)
+        ): PartyQuotaScreenBuilder<P> {
+            mapBuilder = MapBuilder(shapes, selectedShape, leadingParty.map { PartyResult.elected(it?.toParty()) }, focus, header)
             return this
         }
 
-        fun withProgressLabel(progressLabel: Flow.Publisher<out String?>): PartyQuotaScreenBuilder {
+        fun withProgressLabel(progressLabel: Flow.Publisher<out String?>): PartyQuotaScreenBuilder<P> {
             this.progressLabel = progressLabel
             return this
         }
@@ -1862,15 +1864,15 @@ class BasicResultPanel private constructor(
     companion object {
         private val PCT_FORMAT = DecimalFormat("0.0%")
         private val THOUSANDS_FORMAT = DecimalFormat("#,##0")
-        private fun <T> partyMapToResultMap(m: Map<T, Party?>): Map<T, PartyResult?> {
-            return m.mapValues { e -> e.value?.let { PartyResult.elected(it) } }
+        private fun <T> partyMapToResultMap(m: Map<T, PartyOrCoalition?>): Map<T, PartyResult?> {
+            return m.mapValues { e -> e.value?.let { PartyResult.elected(it.toParty()) } }
         }
 
-        fun partySeats(
-            seats: Flow.Publisher<out Map<Party, Int>>,
+        fun <P : PartyOrCoalition> partySeats(
+            seats: Flow.Publisher<out Map<out P, Int>>,
             header: Flow.Publisher<out String?>,
             subhead: Flow.Publisher<out String?>
-        ): SeatScreenBuilder<Party, Int, Int> {
+        ): SeatScreenBuilder<P, P, Int, Int> {
             return BasicSeatScreenBuilder(
                 seats,
                 header,
@@ -1883,7 +1885,7 @@ class BasicResultPanel private constructor(
             seats: Flow.Publisher<out Map<Candidate, Int>>,
             header: Flow.Publisher<out String?>,
             subhead: Flow.Publisher<out String?>
-        ): SeatScreenBuilder<Candidate, Int, Int> {
+        ): SeatScreenBuilder<Candidate, Party, Int, Int> {
             return BasicSeatScreenBuilder(
                 seats,
                 header,
@@ -1892,11 +1894,11 @@ class BasicResultPanel private constructor(
             )
         }
 
-        fun partyDualSeats(
-            seats: Flow.Publisher<out Map<Party, Pair<Int, Int>>>,
+        fun <P : PartyOrCoalition> partyDualSeats(
+            seats: Flow.Publisher<out Map<out P, Pair<Int, Int>>>,
             header: Flow.Publisher<out String?>,
             subhead: Flow.Publisher<out String?>
-        ): SeatScreenBuilder<Party, Pair<Int, Int>, Pair<Int, Int>> {
+        ): SeatScreenBuilder<P, P, Pair<Int, Int>, Pair<Int, Int>> {
             return DualSeatScreenBuilder(
                 seats,
                 header,
@@ -1906,11 +1908,11 @@ class BasicResultPanel private constructor(
             )
         }
 
-        fun partyDualSeatsReversed(
-            seats: Flow.Publisher<out Map<Party, Pair<Int, Int>>>,
+        fun <P : PartyOrCoalition> partyDualSeatsReversed(
+            seats: Flow.Publisher<out Map<P, Pair<Int, Int>>>,
             header: Flow.Publisher<out String?>,
             subhead: Flow.Publisher<out String?>
-        ): SeatScreenBuilder<Party, Pair<Int, Int>, Pair<Int, Int>> {
+        ): SeatScreenBuilder<P, P, Pair<Int, Int>, Pair<Int, Int>> {
             return DualSeatScreenBuilder(
                 seats,
                 header,
@@ -1924,7 +1926,7 @@ class BasicResultPanel private constructor(
             seats: Flow.Publisher<out Map<Candidate, Pair<Int, Int>>>,
             header: Flow.Publisher<out String?>,
             subhead: Flow.Publisher<out String?>
-        ): SeatScreenBuilder<Candidate, Pair<Int, Int>, Pair<Int, Int>> {
+        ): SeatScreenBuilder<Candidate, Party, Pair<Int, Int>, Pair<Int, Int>> {
             return DualSeatScreenBuilder(
                 seats,
                 header,
@@ -1934,11 +1936,11 @@ class BasicResultPanel private constructor(
             )
         }
 
-        fun partyRangeSeats(
-            seats: Flow.Publisher<out Map<Party, IntRange>>,
+        fun <P : PartyOrCoalition> partyRangeSeats(
+            seats: Flow.Publisher<out Map<P, IntRange>>,
             header: Flow.Publisher<out String?>,
             subhead: Flow.Publisher<out String?>
-        ): SeatScreenBuilder<Party, IntRange, Int> {
+        ): SeatScreenBuilder<P, P, IntRange, Int> {
             return RangeSeatScreenBuilder(
                 seats,
                 header,
@@ -1951,7 +1953,7 @@ class BasicResultPanel private constructor(
             seats: Flow.Publisher<out Map<Candidate, IntRange>>,
             header: Flow.Publisher<out String?>,
             subhead: Flow.Publisher<out String?>
-        ): SeatScreenBuilder<Candidate, IntRange, Int> {
+        ): SeatScreenBuilder<Candidate, Party, IntRange, Int> {
             return RangeSeatScreenBuilder(
                 seats,
                 header,
@@ -1960,18 +1962,18 @@ class BasicResultPanel private constructor(
             )
         }
 
-        fun partyVotes(
-            votes: Flow.Publisher<out Map<Party, Int?>>,
+        fun <P : PartyOrCoalition> partyVotes(
+            votes: Flow.Publisher<out Map<out P, Int?>>,
             header: Flow.Publisher<out String?>,
             subhead: Flow.Publisher<out String?>
-        ): VoteScreenBuilder<Party, Int?, Double, Int> {
+        ): VoteScreenBuilder<P, P, Int?, Double, Int> {
             return BasicVoteScreenBuilder(
                 votes,
                 header,
                 subhead,
                 PartyTemplate(),
                 PctOnlyTemplate(),
-                Party.OTHERS
+                Party.OTHERS as P
             )
         }
 
@@ -1979,7 +1981,7 @@ class BasicResultPanel private constructor(
             votes: Flow.Publisher<out Map<Candidate, Int?>>,
             header: Flow.Publisher<out String?>,
             subhead: Flow.Publisher<out String?>
-        ): VoteScreenBuilder<Candidate, Int?, Double, Int> {
+        ): VoteScreenBuilder<Candidate, Party, Int?, Double, Int> {
             return BasicVoteScreenBuilder(
                 votes,
                 header,
@@ -1994,7 +1996,7 @@ class BasicResultPanel private constructor(
             votes: Flow.Publisher<out Map<Candidate, Int?>>,
             header: Flow.Publisher<out String?>,
             subhead: Flow.Publisher<out String?>
-        ): VoteScreenBuilder<Candidate, Int?, Double, Int> {
+        ): VoteScreenBuilder<Candidate, Party, Int?, Double, Int> {
             return BasicVoteScreenBuilder(
                 votes,
                 header,
@@ -2010,7 +2012,7 @@ class BasicResultPanel private constructor(
             header: Flow.Publisher<out String?>,
             subhead: Flow.Publisher<out String?>,
             incumbentMarker: String
-        ): VoteScreenBuilder<Candidate, Int?, Double, Int> {
+        ): VoteScreenBuilder<Candidate, Party, Int?, Double, Int> {
             return BasicVoteScreenBuilder(
                 votes,
                 header,
@@ -2026,7 +2028,7 @@ class BasicResultPanel private constructor(
             header: Flow.Publisher<out String?>,
             subhead: Flow.Publisher<out String?>,
             incumbentMarker: String
-        ): VoteScreenBuilder<Candidate, Int?, Double, Int> {
+        ): VoteScreenBuilder<Candidate, Party, Int?, Double, Int> {
             return BasicVoteScreenBuilder(
                 votes,
                 header,
@@ -2037,27 +2039,27 @@ class BasicResultPanel private constructor(
             )
         }
 
-        fun partyRangeVotes(
-            votes: Flow.Publisher<out Map<Party, ClosedRange<Double>>>,
+        fun <P : PartyOrCoalition> partyRangeVotes(
+            votes: Flow.Publisher<out Map<P, ClosedRange<Double>>>,
             header: Flow.Publisher<out String?>,
             subhead: Flow.Publisher<out String?>
-        ): VoteScreenBuilder<Party, ClosedRange<Double>, Double, Int> {
+        ): VoteScreenBuilder<P, P, ClosedRange<Double>, Double, Int> {
             return RangeVoteScreenBuilder(
                 votes,
                 header,
                 subhead,
                 PartyTemplate(),
                 PctOnlyTemplate(),
-                Party.OTHERS
+                Party.OTHERS as P
             )
         }
 
-        fun partyQuotas(
-            quotas: Flow.Publisher<out Map<Party, Double>>,
+        fun <P : PartyOrCoalition> partyQuotas(
+            quotas: Flow.Publisher<out Map<out P, Double>>,
             totalSeats: Flow.Publisher<out Int>,
             header: Flow.Publisher<out String?>,
             subhead: Flow.Publisher<out String?>
-        ): PartyQuotaScreenBuilder {
+        ): PartyQuotaScreenBuilder<P> {
             return PartyQuotaScreenBuilder(
                 quotas,
                 totalSeats,
