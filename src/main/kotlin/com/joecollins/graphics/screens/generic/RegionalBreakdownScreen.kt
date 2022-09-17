@@ -503,7 +503,7 @@ class RegionalBreakdownScreen private constructor(titleLabel: Flow.Publisher<out
 
         fun votesPollsReporting(
             totalHeaderPublisher: Flow.Publisher<out String>,
-            totalVotesPublisher: Flow.Publisher<out Map<Party, Int>>,
+            totalVotesPublisher: Flow.Publisher<out Map<out PartyOrCoalition, Int>>,
             reportingPublisher: Flow.Publisher<out PollsReporting>,
             titlePublisher: Flow.Publisher<out String>,
             maxColumnsPublisher: Flow.Publisher<Int?> = Publisher(null)
@@ -528,8 +528,8 @@ class RegionalBreakdownScreen private constructor(titleLabel: Flow.Publisher<out
 
         fun votesWithPrevPollsReporting(
             totalHeaderPublisher: Flow.Publisher<out String>,
-            totalVotesPublisher: Flow.Publisher<out Map<Party, Int>>,
-            prevVotesPublisher: Flow.Publisher<out Map<Party, Int>>,
+            totalVotesPublisher: Flow.Publisher<out Map<out PartyOrCoalition, Int>>,
+            prevVotesPublisher: Flow.Publisher<out Map<out PartyOrCoalition, Int>>,
             pctReportingPublisher: Flow.Publisher<out PollsReporting>,
             titlePublisher: Flow.Publisher<out String>,
             maxColumnsPublisher: Flow.Publisher<Int?> = Publisher(null)

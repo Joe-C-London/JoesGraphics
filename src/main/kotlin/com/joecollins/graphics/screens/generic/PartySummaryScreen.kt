@@ -2,7 +2,7 @@ package com.joecollins.graphics.screens.generic
 
 import com.joecollins.graphics.GenericPanel
 import com.joecollins.graphics.components.RegionSummaryFrame
-import com.joecollins.models.general.Party
+import com.joecollins.models.general.PartyOrCoalition
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
@@ -19,7 +19,7 @@ import javax.swing.JPanel
 import kotlin.math.ceil
 
 class PartySummaryScreen private constructor(
-    partyPublisher: Flow.Publisher<out Party>,
+    partyPublisher: Flow.Publisher<out PartyOrCoalition>,
     mainFrame: RegionSummaryFrame,
     otherFrames: List<RegionSummaryFrame>,
     numRows: Int
@@ -79,18 +79,18 @@ class PartySummaryScreen private constructor(
         private val titleFunc: (T) -> Flow.Publisher<out String>,
         private val numRows: Int
     ) {
-        private var seatFunc: ((T) -> Flow.Publisher<out Map<Party, Int>>)? = null
-        private var seatDiffFunc: ((T) -> Flow.Publisher<out Map<Party, Int>>)? = null
+        private var seatFunc: ((T) -> Flow.Publisher<out Map<out PartyOrCoalition, Int>>)? = null
+        private var seatDiffFunc: ((T) -> Flow.Publisher<out Map<out PartyOrCoalition, Int>>)? = null
         private var seatsHeader = "SEATS"
-        private var votePctFunc: ((T) -> Flow.Publisher<out Map<Party, Double>>)? = null
-        private var votePctDiffFunc: ((T) -> Flow.Publisher<out Map<Party, Double>>)? = null
+        private var votePctFunc: ((T) -> Flow.Publisher<out Map<out PartyOrCoalition, Double>>)? = null
+        private var votePctDiffFunc: ((T) -> Flow.Publisher<out Map<out PartyOrCoalition, Double>>)? = null
         private var voteHeader = "POPULAR VOTE"
 
         private val regions: MutableList<T> = ArrayList()
 
         fun withSeatAndDiff(
-            seatFunc: ((T) -> Flow.Publisher<out Map<Party, Int>>),
-            seatDiffFunc: ((T) -> Flow.Publisher<out Map<Party, Int>>),
+            seatFunc: ((T) -> Flow.Publisher<out Map<out PartyOrCoalition, Int>>),
+            seatDiffFunc: ((T) -> Flow.Publisher<out Map<out PartyOrCoalition, Int>>),
             seatsHeader: String = "SEATS"
         ): Builder<T> {
             this.seatFunc = seatFunc
@@ -100,8 +100,8 @@ class PartySummaryScreen private constructor(
         }
 
         fun withSeatAndPrev(
-            seatFunc: ((T) -> Flow.Publisher<out Map<Party, Int>>),
-            seatPrevFunc: ((T) -> Flow.Publisher<out Map<Party, Int>>),
+            seatFunc: ((T) -> Flow.Publisher<out Map<out PartyOrCoalition, Int>>),
+            seatPrevFunc: ((T) -> Flow.Publisher<out Map<out PartyOrCoalition, Int>>),
             seatsHeader: String = "SEATS"
         ): Builder<T> {
             val seatDiffFunc = { t: T ->
@@ -117,8 +117,8 @@ class PartySummaryScreen private constructor(
         }
 
         fun withVotePctAndDiff(
-            votePctFunc: ((T) -> Flow.Publisher<out Map<Party, Double>>),
-            votePctDiffFunc: ((T) -> Flow.Publisher<out Map<Party, Double>>),
+            votePctFunc: ((T) -> Flow.Publisher<out Map<out PartyOrCoalition, Double>>),
+            votePctDiffFunc: ((T) -> Flow.Publisher<out Map<out PartyOrCoalition, Double>>),
             voteHeader: String = "POPULAR VOTE"
         ): Builder<T> {
             this.votePctFunc = votePctFunc
@@ -128,8 +128,8 @@ class PartySummaryScreen private constructor(
         }
 
         fun withVotePctAndPrev(
-            votePctFunc: ((T) -> Flow.Publisher<out Map<Party, Double>>),
-            votePctPrevFunc: ((T) -> Flow.Publisher<out Map<Party, Double>>),
+            votePctFunc: ((T) -> Flow.Publisher<out Map<out PartyOrCoalition, Double>>),
+            votePctPrevFunc: ((T) -> Flow.Publisher<out Map<out PartyOrCoalition, Double>>),
             voteHeader: String = "POPULAR VOTE"
         ): Builder<T> {
             val votePctDiffFunc = { t: T ->
@@ -149,7 +149,7 @@ class PartySummaryScreen private constructor(
             return this
         }
 
-        fun build(partyPublisher: Flow.Publisher<out Party>): PartySummaryScreen {
+        fun build(partyPublisher: Flow.Publisher<out PartyOrCoalition>): PartySummaryScreen {
             return PartySummaryScreen(
                 partyPublisher,
                 createFrame(mainRegion, partyPublisher),
@@ -158,7 +158,7 @@ class PartySummaryScreen private constructor(
             )
         }
 
-        private fun createFrame(region: T, party: Flow.Publisher<out Party>): RegionSummaryFrame {
+        private fun createFrame(region: T, party: Flow.Publisher<out PartyOrCoalition>): RegionSummaryFrame {
             val input = SinglePartyInput()
             seatFunc?.invoke(region)?.subscribe(Subscriber { input.seats = it })
             seatDiffFunc?.invoke(region)?.subscribe(Subscriber { input.seatDiff = it })
@@ -183,31 +183,31 @@ class PartySummaryScreen private constructor(
     }
 
     private class SinglePartyInput {
-        var seats: Map<Party, Int> = emptyMap()
+        var seats: Map<out PartyOrCoalition, Int> = emptyMap()
             set(value) {
                 field = value
                 updateSeats()
             }
 
-        var seatDiff: Map<Party, Int> = emptyMap()
+        var seatDiff: Map<out PartyOrCoalition, Int> = emptyMap()
             set(value) {
                 field = value
                 updateSeats()
             }
 
-        var votePct: Map<Party, Double> = emptyMap()
+        var votePct: Map<out PartyOrCoalition, Double> = emptyMap()
             set(value) {
                 field = value
                 updateVotes()
             }
 
-        var votePctDiff: Map<Party, Double> = emptyMap()
+        var votePctDiff: Map<out PartyOrCoalition, Double> = emptyMap()
             set(value) {
                 field = value
                 updateVotes()
             }
 
-        var party: Party? = null
+        var party: PartyOrCoalition? = null
             set(value) {
                 field = value
                 updateSeats()
@@ -249,10 +249,10 @@ class PartySummaryScreen private constructor(
         fun <T> ofDiff(
             mainRegion: T,
             titleFunc: (T) -> Flow.Publisher<out String>,
-            seatFunc: (T) -> Flow.Publisher<out Map<Party, Int>>,
-            seatDiffFunc: (T) -> Flow.Publisher<out Map<Party, Int>>,
-            votePctFunc: (T) -> Flow.Publisher<out Map<Party, Double>>,
-            votePctDiffFunc: (T) -> Flow.Publisher<out Map<Party, Double>>,
+            seatFunc: (T) -> Flow.Publisher<out Map<out PartyOrCoalition, Int>>,
+            seatDiffFunc: (T) -> Flow.Publisher<out Map<out PartyOrCoalition, Int>>,
+            votePctFunc: (T) -> Flow.Publisher<out Map<out PartyOrCoalition, Double>>,
+            votePctDiffFunc: (T) -> Flow.Publisher<out Map<out PartyOrCoalition, Double>>,
             numRows: Int
         ): Builder<T> {
             return Builder(mainRegion, titleFunc, numRows)
@@ -263,10 +263,10 @@ class PartySummaryScreen private constructor(
         fun <T> ofPrev(
             mainRegion: T,
             titleFunc: (T) -> Flow.Publisher<out String>,
-            seatFunc: (T) -> Flow.Publisher<out Map<Party, Int>>,
-            seatPrevFunc: (T) -> Flow.Publisher<out Map<Party, Int>>,
-            votePctFunc: (T) -> Flow.Publisher<out Map<Party, Double>>,
-            votePctPrevFunc: (T) -> Flow.Publisher<out Map<Party, Double>>,
+            seatFunc: (T) -> Flow.Publisher<out Map<out PartyOrCoalition, Int>>,
+            seatPrevFunc: (T) -> Flow.Publisher<out Map<out PartyOrCoalition, Int>>,
+            votePctFunc: (T) -> Flow.Publisher<out Map<out PartyOrCoalition, Double>>,
+            votePctPrevFunc: (T) -> Flow.Publisher<out Map<out PartyOrCoalition, Double>>,
             numRows: Int
         ): Builder<T> {
             return Builder(mainRegion, titleFunc, numRows)

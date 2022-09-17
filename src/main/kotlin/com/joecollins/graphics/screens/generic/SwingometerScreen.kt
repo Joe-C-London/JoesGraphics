@@ -449,10 +449,10 @@ class SwingometerScreen private constructor(title: Flow.Publisher<out String?>, 
 
     companion object {
         fun <T> of(
-            prevVotes: Flow.Publisher<out Map<T, Map<Party, Int>>>,
+            prevVotes: Flow.Publisher<out Map<T, Map<out PartyOrCoalition, Int>>>,
             results: Flow.Publisher<out Map<T, PartyResult?>>,
-            swing: Flow.Publisher<out Map<Party, Double>>,
-            parties: Flow.Publisher<out Pair<Party, Party>>,
+            swing: Flow.Publisher<out Map<out PartyOrCoalition, Double>>,
+            parties: Flow.Publisher<out Pair<PartyOrCoalition, PartyOrCoalition>>,
             header: Flow.Publisher<out String?>
         ): Builder<T> {
             return Builder(prevVotes, results, parties, swing, header)

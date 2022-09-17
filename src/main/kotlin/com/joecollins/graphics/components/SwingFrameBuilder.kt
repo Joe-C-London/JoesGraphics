@@ -1,6 +1,5 @@
 package com.joecollins.graphics.components
 
-import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyOrCoalition
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.Subscriber
@@ -225,10 +224,10 @@ class SwingFrameBuilder {
             return ret
         }
 
-        fun prevCurrNormalised(
-            prevPublisher: Flow.Publisher<out Map<Party, Double>>,
-            currPublisher: Flow.Publisher<out Map<Party, Double>>,
-            partyOrder: Comparator<Party>
+        fun <POC : PartyOrCoalition> prevCurrNormalised(
+            prevPublisher: Flow.Publisher<out Map<out POC, Double>>,
+            currPublisher: Flow.Publisher<out Map<out POC, Double>>,
+            partyOrder: Comparator<POC>
         ): SwingFrameBuilder {
             return prevCurr(prevPublisher, currPublisher, partyOrder, true)
         }

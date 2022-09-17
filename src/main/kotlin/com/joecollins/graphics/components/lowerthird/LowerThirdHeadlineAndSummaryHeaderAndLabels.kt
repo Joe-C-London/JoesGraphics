@@ -99,7 +99,7 @@ class LowerThirdHeadlineAndSummaryHeaderAndLabels internal constructor(
             return ret
         }
 
-        fun createVoteEntries(votes: Map<Party, Int>): List<SummaryWithHeaderAndLabels.Entry> {
+        fun createVoteEntries(votes: Map<out PartyOrCoalition, Int>): List<SummaryWithHeaderAndLabels.Entry> {
             val total = votes.values.sum().toDouble()
             val ret = votes.entries
                 .filter { it.value > 0 }

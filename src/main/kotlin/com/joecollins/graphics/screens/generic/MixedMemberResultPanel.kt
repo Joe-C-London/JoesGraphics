@@ -8,6 +8,7 @@ import com.joecollins.graphics.components.BarFrameBuilder.BasicBar
 import com.joecollins.graphics.components.MapFrame
 import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.Party
+import com.joecollins.models.general.PartyOrCoalition
 import com.joecollins.models.general.PartyResult
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.Subscriber
@@ -94,12 +95,12 @@ class MixedMemberResultPanel private constructor(
 
     class Builder {
         private var candidateVotes: Flow.Publisher<out Map<Candidate, Int?>> = emptyMap<Candidate, Int?>().asOneTimePublisher()
-        private var candidatePrev: Flow.Publisher<out Map<Party, Int>>? = null
+        private var candidatePrev: Flow.Publisher<out Map<out PartyOrCoalition, Int>>? = null
         private var candidatePctReporting: Flow.Publisher<out Double>? = null
         private var candidateProgressLabel: Flow.Publisher<out String?> = null.asOneTimePublisher()
         private var winner: Flow.Publisher<out Candidate?> = (null as Candidate?).asOneTimePublisher()
-        private var partyVotes: Flow.Publisher<out Map<Party, Int?>> = emptyMap<Party, Int?>().asOneTimePublisher()
-        private var partyPrev: Flow.Publisher<out Map<Party, Int>>? = null
+        private var partyVotes: Flow.Publisher<out Map<out PartyOrCoalition, Int?>> = emptyMap<PartyOrCoalition, Int?>().asOneTimePublisher()
+        private var partyPrev: Flow.Publisher<out Map<out PartyOrCoalition, Int>>? = null
         private var partyPctReporting: Flow.Publisher<out Double>? = null
         private var partyProgressLabel: Flow.Publisher<out String?> = null.asOneTimePublisher()
         private var incumbentMarker = ""
@@ -133,7 +134,7 @@ class MixedMemberResultPanel private constructor(
         }
 
         fun withPrevCandidateVotes(
-            votes: Flow.Publisher<out Map<Party, Int>>,
+            votes: Flow.Publisher<out Map<out PartyOrCoalition, Int>>,
             header: Flow.Publisher<out String>
         ): Builder {
             candidatePrev = votes
@@ -142,7 +143,7 @@ class MixedMemberResultPanel private constructor(
         }
 
         fun withPartyVotes(
-            votes: Flow.Publisher<out Map<Party, Int?>>,
+            votes: Flow.Publisher<out Map<out PartyOrCoalition, Int?>>,
             header: Flow.Publisher<out String>
         ): Builder {
             partyVotes = votes
@@ -151,7 +152,7 @@ class MixedMemberResultPanel private constructor(
         }
 
         fun withPrevPartyVotes(
-            votes: Flow.Publisher<out Map<Party, Int>>,
+            votes: Flow.Publisher<out Map<out PartyOrCoalition, Int>>,
             header: Flow.Publisher<out String>
         ): Builder {
             partyPrev = votes
@@ -286,13 +287,13 @@ class MixedMemberResultPanel private constructor(
         }
 
         private class Change<C> {
-            var curr: Map<C, Int?> = emptyMap()
+            var curr: Map<out C, Int?> = emptyMap()
                 set(value) {
                     field = value
                     currPublisher.submit(value)
                 }
 
-            var prev: Map<Party, Int> = emptyMap()
+            var prev: Map<out PartyOrCoalition, Int> = emptyMap()
                 set(value) {
                     field = value
                     prevPublisher.submit(value)
@@ -392,7 +393,7 @@ class MixedMemberResultPanel private constructor(
             if (partyPrev == null) {
                 return null
             }
-            val change = Change<Party>()
+            val change = Change<PartyOrCoalition>()
             partyVotes.subscribe(Subscriber { change.curr = it })
             partyPrev!!.subscribe(Subscriber { change.prev = it })
             val bars = change.currPublisher.merge(change.prevPublisher) { currRaw, prev ->
@@ -403,7 +404,7 @@ class MixedMemberResultPanel private constructor(
                 if (currRaw.values.any { it == null }) {
                     return@merge listOf()
                 }
-                val curr: Map<Party, Int> = currRaw.mapValues { it.value!! }
+                val curr: Map<out PartyOrCoalition, Int> = currRaw.mapValues { it.value!! }
                 val prevTotal = prev.values.sum()
                 val presentBars = curr.entries.asSequence()
                     .filter { it.key !== Party.OTHERS }
