@@ -6,6 +6,8 @@ import org.geotools.data.simple.SimpleFeatureIterator
 import org.geotools.data.simple.SimpleFeatureSource
 import org.locationtech.jts.awt.ShapeWriter
 import org.locationtech.jts.geom.Geometry
+import org.locationtech.jts.geom.PrecisionModel
+import org.locationtech.jts.precision.GeometryPrecisionReducer
 import org.opengis.feature.simple.SimpleFeature
 import java.awt.Shape
 import java.awt.geom.AffineTransform
@@ -15,36 +17,37 @@ import kotlin.reflect.cast
 
 object ShapefileReader {
 
-    fun <T> readShapes(file: URL, keyProperty: String, keyType: Class<T>): Map<T, Shape> {
+    fun <T> readShapes(file: URL, keyProperty: String, keyType: Class<T>, reducePrecision: Boolean = false): Map<T, Shape> {
         if (keyType == Int::class.java) {
-            return readShapes(file) { feature ->
+            return readShapes(file, { feature ->
                 @Suppress("UNCHECKED_CAST")
                 Integer::class.cast(feature.getAttribute(keyProperty)).toInt() as T
-            }
+            }, reducePrecision)
         }
         if (keyType == Long::class.java) {
-            return readShapes(file) { feature ->
+            return readShapes(file, { feature ->
                 @Suppress("UNCHECKED_CAST")
                 Long::class.cast(feature.getAttribute(keyProperty)).toLong() as T
-            }
+            }, reducePrecision)
         }
         if (keyType == Double::class.java) {
-            return readShapes(file) { feature ->
+            return readShapes(file, { feature ->
                 @Suppress("UNCHECKED_CAST")
                 Double::class.cast(feature.getAttribute(keyProperty)).toDouble() as T
-            }
+            }, reducePrecision)
         }
-        return readShapes(file) { feature -> keyType.cast(feature.getAttribute(keyProperty)) }
+        return readShapes(file, { feature -> keyType.cast(feature.getAttribute(keyProperty)) }, reducePrecision)
     }
 
-    fun <T> readShapes(file: URL, keyFunc: (SimpleFeature) -> T): Map<T, Shape> {
-        return readShapes(file, keyFunc) { true }
+    fun <T> readShapes(file: URL, keyFunc: (SimpleFeature) -> T, reducePrecision: Boolean = false): Map<T, Shape> {
+        return readShapes(file, keyFunc, { true }, reducePrecision)
     }
 
     fun <T> readShapes(
         file: URL,
         keyFunc: (SimpleFeature) -> T,
-        filter: (SimpleFeature) -> Boolean
+        filter: (SimpleFeature) -> Boolean,
+        reducePrecision: Boolean = false
     ): Map<T, Shape> {
         val shapes: MutableMap<T, Shape> = HashMap()
         var store: FileDataStore? = null
@@ -63,7 +66,7 @@ object ShapefileReader {
                 val geom = feature.getAttribute("the_geom") as Geometry
                 shapes.merge(
                     key,
-                    toShape(geom)
+                    toShape(geom, reducePrecision)
                 ) { s1, s2 ->
                     val s = Area(s1)
                     s.add(Area(s2))
@@ -77,9 +80,11 @@ object ShapefileReader {
         }
     }
 
-    private fun toShape(geom: Geometry): Shape {
+    private fun toShape(geom: Geometry, reducePrecision: Boolean): Shape {
         val shapeWriter = ShapeWriter()
+        val pm = PrecisionModel(PrecisionModel.FIXED)
         val transform = AffineTransform.getScaleInstance(1.0, -1.0)
-        return transform.createTransformedShape(shapeWriter.toShape(geom))
+        val g = if (reducePrecision) GeometryPrecisionReducer.reduce(geom, pm) else geom
+        return transform.createTransformedShape(shapeWriter.toShape(g))
     }
 }

@@ -4,6 +4,7 @@ import com.joecollins.graphics.GenericPanel
 import com.joecollins.graphics.components.CountdownFrame
 import com.joecollins.graphics.components.MapFrameBuilder
 import com.joecollins.pubsub.asOneTimePublisher
+import com.joecollins.pubsub.map
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Dimension
@@ -25,21 +26,13 @@ class CountdownScreen private constructor(panel: JPanel, title: Flow.Publisher<S
 
     class Builder<K>(private val date: LocalDate, private val shapes: Map<K, Shape>) {
 
-        private val timings = ArrayList<Triple<Instant, String, Shape>>()
+        private val timings = ArrayList<Triple<Instant, String, Collection<Shape>>>()
         private var clock = Clock.systemDefaultZone()
         private var timesUpLabel = ""
 
         fun atTime(header: String, time: LocalTime, zone: ZoneId, predicate: (K) -> Boolean = { true }): Builder<K> {
             val instant = ZonedDateTime.of(date, time, zone).toInstant()
-            val shape = shapes
-                .entries
-                .filter { predicate(it.key) }
-                .map { it.value }
-                .fold(Area()) { a, s ->
-                    a.add(Area(s))
-                    a
-                }
-            timings.add(Triple(instant, header, shape))
+            timings.add(Triple(instant, header, shapes.entries.filter { predicate(it.key) }.map { it.value }))
             return this
         }
 
@@ -96,7 +89,7 @@ class CountdownScreen private constructor(panel: JPanel, title: Flow.Publisher<S
                 top.add(frame)
             }
 
-            val map = MapFrameBuilder.from((colors.indices).map { timings[it].third to colors[it] }.asOneTimePublisher())
+            val map = MapFrameBuilder.from((colors.indices).flatMap { idx -> timings[idx].third.map { s -> s to colors[idx] } }.asOneTimePublisher())
                 .withBorderColor(Color.WHITE.asOneTimePublisher())
                 .build()
             outer.add(map, BorderLayout.CENTER)
@@ -111,7 +104,7 @@ class CountdownScreen private constructor(panel: JPanel, title: Flow.Publisher<S
         }
 
         fun forDateWithMap(date: LocalDate, map: Collection<Shape>): Builder<Unit> {
-            return Builder(date, mapOf(Unit to map.fold(Area()) { a, s -> a.add(Area(s)); a }))
+            return Builder(date, mapOf(Unit to (map.map { Area(it) }.reduceOrNull { a, s -> a.add(Area(s)); a } ?: Area())))
         }
 
         fun <K> forDateWithMap(date: LocalDate, map: Map<K, Shape>): Builder<K> {

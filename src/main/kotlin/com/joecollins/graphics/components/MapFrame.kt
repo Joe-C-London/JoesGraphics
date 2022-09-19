@@ -181,7 +181,9 @@ class MapFrame(
                                 CompletableFuture.supplyAsync({
                                     val ret = it
                                         .sortedBy { s -> s.bounds.width * s.bounds.height }
-                                        .fold(Area()) { a, s -> a.add(Area(s)); a }
+                                        .map { Area(it) }
+                                        .reduceOrNull { a, s -> a.add(s); a }
+                                        ?: Area()
                                     repaint()
                                     ret
                                 }, executor)
