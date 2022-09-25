@@ -110,8 +110,8 @@ class SeatsChangingScreen private constructor(title: Flow.Publisher<out String?>
                     currResults[it.first] ?: PartyResult.NO_RESULT
                 )
             }
-            .filter { it.third.party != null }
-            .filter { it.second != it.third.party }
+            .filter { it.third != null }
+            .filter { it.second != it.third!!.party }
             .map {
                 val seatFilter = seatFilter
                 val colorFunc =
@@ -120,8 +120,8 @@ class SeatsChangingScreen private constructor(title: Flow.Publisher<out String?>
                 Entry(
                     it.first,
                     colorFunc(it.second.color),
-                    colorFunc(it.third.party!!.color),
-                    it.third.isElected
+                    colorFunc(it.third!!.party.color),
+                    it.third!!.isElected
                 )
             }
             .toList()

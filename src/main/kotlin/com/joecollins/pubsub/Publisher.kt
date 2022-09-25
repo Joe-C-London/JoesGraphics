@@ -106,6 +106,8 @@ fun <T, R> Flow.Publisher<T>.map(func: (T) -> R): Flow.Publisher<R> {
 
 fun <T, R> Flow.Publisher<out List<T>>.mapElements(func: (T) -> R): Flow.Publisher<List<R>> = map { it.map(func) }
 
+fun <K, V, R> Flow.Publisher<out Map<K, V>>.mapKeys(func: (K) -> R): Flow.Publisher<Map<R, V>> = map { map -> map.mapKeys { func(it.key) } }
+
 fun <T, U, R> Flow.Publisher<T>.merge(other: Flow.Publisher<U>, func: (T, U) -> R): Flow.Publisher<R> {
     data class Wrapper<T>(val item: T)
     val publisher = Publisher<R>()

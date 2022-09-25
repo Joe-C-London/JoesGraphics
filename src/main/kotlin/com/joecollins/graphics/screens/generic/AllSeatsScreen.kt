@@ -117,8 +117,8 @@ class AllSeatsScreen private constructor(title: Flow.Publisher<out String?>, fra
                 Entry(
                     it.first,
                     it.second.color,
-                    result.party?.color ?: Color.BLACK,
-                    result.isElected
+                    result?.party?.color ?: Color.BLACK,
+                    result?.isElected ?: false
                 )
             }
             .toList()

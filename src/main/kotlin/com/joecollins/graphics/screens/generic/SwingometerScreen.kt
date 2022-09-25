@@ -6,6 +6,7 @@ import com.joecollins.graphics.components.SwingometerFrameBuilder
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyOrCoalition
 import com.joecollins.models.general.PartyResult
+import com.joecollins.models.general.PartyResult.Companion.color
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.asOneTimePublisher
@@ -185,7 +186,7 @@ class SwingometerScreen private constructor(title: Flow.Publisher<out String?>, 
                     .map { e ->
                         Triple(
                             e,
-                            results[e.key] ?: PartyResult(null, false),
+                            results[e.key],
                             seatFilter?.contains(e.key) ?: true
                         )
                     }

@@ -233,7 +233,7 @@ class HeatMapFrameBuilderTest {
         val gop = Party("Republican", "GOP", Color.RED)
 
         class Result(var leader: Party?, var hasWon: Boolean, val prev: Party) {
-            val publisher = Publisher(if (leader == null) null else PartyResult(leader, hasWon))
+            val publisher = Publisher(leader?.let { PartyResult(it, hasWon) })
 
             fun setResult(leader: Party?, hasWon: Boolean) {
                 this.leader = leader
@@ -283,7 +283,7 @@ class HeatMapFrameBuilderTest {
         val gop = Party("Republican", "GOP", Color.RED)
 
         class Result(var leader: Party?, var hasWon: Boolean, val prev: Party, val numSeats: Int) {
-            val publisher = Publisher(if (leader == null) null else PartyResult(leader, hasWon))
+            val publisher = Publisher(leader?.let { PartyResult(it, hasWon) })
 
             fun setResult(leader: Party?, hasWon: Boolean) {
                 this.leader = leader
@@ -347,12 +347,12 @@ class HeatMapFrameBuilderTest {
         val gop = Party("Republican", "GOP", Color.RED)
 
         class Result(var leader: Party?, var hasWon: Boolean, val prev: Party, val numSeats: Int) {
-            val publisher = Publisher(PartyResult(leader, hasWon))
+            val publisher = Publisher(leader?.let { PartyResult(it, hasWon) })
 
             fun setResult(leader: Party?, hasWon: Boolean) {
                 this.leader = leader
                 this.hasWon = hasWon
-                publisher.submit(PartyResult(leader, hasWon))
+                publisher.submit(leader?.let { PartyResult(it, hasWon) })
             }
         }
 

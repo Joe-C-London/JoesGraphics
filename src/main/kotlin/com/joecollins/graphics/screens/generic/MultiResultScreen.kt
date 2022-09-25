@@ -14,6 +14,7 @@ import com.joecollins.models.general.Aggregators
 import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
+import com.joecollins.models.general.PartyResult.Companion.color
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
@@ -128,7 +129,7 @@ class MultiResultScreen private constructor(header: Flow.Publisher<out String?>,
                     .map {
                         when {
                             it.key == selected -> {
-                                Pair(it.value, leader.map(PartyResult::color))
+                                Pair(it.value, leader.map { it.color })
                             }
                             focus == null || focus.isEmpty() || focus.contains(it.key) -> {
                                 Pair(

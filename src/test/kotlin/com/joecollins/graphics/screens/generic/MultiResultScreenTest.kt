@@ -91,7 +91,7 @@ class MultiResultScreenTest {
             .withMap(
                 { shapesByDistrict },
                 { it.districtNum },
-                { PartyResult(it.votes.entries.maxByOrNull { e -> e.value }?.key?.party, it.leaderHasWon).asOneTimePublisher() },
+                { d -> d.votes.entries.maxByOrNull { e -> e.value }?.key?.party?.let { PartyResult(it, d.leaderHasWon) }.asOneTimePublisher() },
                 { if (it.districtNum < 10) listOf(1, 2, 3, 4, 5, 6, 7, 8) else listOf(15, 16, 17, 18, 19, 20) },
                 { (if (it.districtNum < 10) "CARDIGAN" else "MALPEQUE").asOneTimePublisher() }
             )
@@ -1128,7 +1128,7 @@ class MultiResultScreenTest {
             .withMap(
                 { shapesByDistrict },
                 { it.districtNum },
-                { d -> PartyResult(d.votes.entries.maxByOrNull { it.value }?.key?.party, d.leaderHasWon).asOneTimePublisher() },
+                { d -> d.votes.entries.maxByOrNull { it.value }?.key?.party?.let { PartyResult(it, d.leaderHasWon) }.asOneTimePublisher() },
                 { listOf(10, 11, 12, 13, 14) },
                 { listOf(9, 10, 11, 12, 13, 14) },
                 { "CHARLOTTETOWN".asOneTimePublisher() }

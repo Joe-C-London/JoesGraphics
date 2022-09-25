@@ -3,6 +3,8 @@ package com.joecollins.graphics.components
 import com.google.common.annotations.Beta
 import com.joecollins.graphics.utils.ColorUtils
 import com.joecollins.models.general.Party
+import com.joecollins.models.general.PartyResult
+import com.joecollins.models.general.PartyResult.Companion.color
 import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.combine
 import com.joecollins.pubsub.map
@@ -119,7 +121,6 @@ class HemicycleFrameBuilder {
         )
     }
 
-    class Result(val winner: Party?, val hasWon: Boolean)
     companion object {
         fun <T> of(
             rows: List<Int>,
@@ -238,7 +239,7 @@ class HemicycleFrameBuilder {
         fun <T> ofElectedLeading(
             rows: List<Int>,
             entries: List<T>,
-            resultFunc: (T) -> Flow.Publisher<out Result?>,
+            resultFunc: (T) -> Flow.Publisher<out PartyResult?>,
             prevResultFunc: (T) -> Party,
             leftParty: Party,
             rightParty: Party,
@@ -273,7 +274,7 @@ class HemicycleFrameBuilder {
             rows: List<Int>,
             entries: List<T>,
             seatsFunc: (T) -> Int,
-            resultFunc: (T) -> Flow.Publisher<out Result?>,
+            resultFunc: (T) -> Flow.Publisher<out PartyResult?>,
             prevResultFunc: (T) -> Party,
             leftParty: Party,
             rightParty: Party,
@@ -288,7 +289,7 @@ class HemicycleFrameBuilder {
             if (entries.sumOf(seatsFunc) != rows.sum()) {
                 throw IllegalArgumentException("Hemicycle Mismatch: ${entries.sumOf(seatsFunc)}/${rows.sum()}")
             }
-            val results: Map<T, Flow.Publisher<out Result?>> = entries
+            val results: Map<T, Flow.Publisher<out PartyResult?>> = entries
                 .distinct()
                 .associateWith { resultFunc(it) }
             val prev = entries.distinct().associateWith(prevResultFunc)
@@ -297,7 +298,7 @@ class HemicycleFrameBuilder {
                     results[t]!!.map { Pair(it, seatsFunc(t)) }
                 }
                 .toList()
-            val resultWithPrevPublishers: List<Flow.Publisher<Triple<Result?, Party, Int>>> = entries
+            val resultWithPrevPublishers: List<Flow.Publisher<Triple<PartyResult?, Party, Int>>> = entries
                 .map {
                     results[it]!!.map { result -> Triple(result, prev[it]!!, seatsFunc(it)) }
                 }
@@ -362,9 +363,8 @@ class HemicycleFrameBuilder {
                 {
                     results[it]!!.map { result ->
                         when {
-                            result?.winner == null -> Color.WHITE
-                            result.hasWon -> result.winner.color
-                            else -> ColorUtils.lighten(result.winner.color)
+                            result == null -> Color.WHITE
+                            else -> result.color
                         }
                     }
                 },
@@ -402,32 +402,32 @@ class HemicycleFrameBuilder {
         }
 
         private fun createSeatBarPublisher(
-            results: List<Flow.Publisher<Pair<Result?, Int>>>,
+            results: List<Flow.Publisher<Pair<PartyResult?, Int>>>,
             partyFilter: (Party?) -> Boolean
         ): Flow.Publisher<Pair<Int, Int>> {
             return results.mapReduce(
                 Pair(0, 0),
                 { p, r ->
                     val result = r.first
-                    if (result == null || !partyFilter(result.winner)) {
+                    if (result == null || !partyFilter(result.party)) {
                         p
                     } else {
-                        Pair(p.first + if (result.hasWon) r.second else 0, p.second + r.second)
+                        Pair(p.first + if (result.elected) r.second else 0, p.second + r.second)
                     }
                 },
                 { p, r ->
                     val result = r.first
-                    if (result == null || !partyFilter(result.winner)) {
+                    if (result == null || !partyFilter(result.party)) {
                         p
                     } else {
-                        Pair(p.first - if (result.hasWon) r.second else 0, p.second - r.second)
+                        Pair(p.first - if (result.elected) r.second else 0, p.second - r.second)
                     }
                 }
             )
         }
 
         private fun createChangeBarPublisher(
-            resultWithPrev: List<Flow.Publisher<Triple<Result?, Party, Int>>>,
+            resultWithPrev: List<Flow.Publisher<Triple<PartyResult?, Party, Int>>>,
             partyFilter: (Party?) -> Boolean
         ): Flow.Publisher<Pair<Int, Int>> {
             return resultWithPrev.mapReduce(
@@ -435,14 +435,14 @@ class HemicycleFrameBuilder {
                 { p, r ->
                     var ret = p
                     val result = r.first
-                    if (result?.winner == null) {
+                    if (result == null) {
                         ret
                     } else {
-                        if (partyFilter(result.winner)) {
-                            ret = Pair(ret.first + if (result.hasWon) r.third else 0, ret.second + r.third)
+                        if (partyFilter(result.party)) {
+                            ret = Pair(ret.first + if (result.elected) r.third else 0, ret.second + r.third)
                         }
                         if (partyFilter(r.second)) {
-                            ret = Pair(ret.first - if (result.hasWon) r.third else 0, ret.second - r.third)
+                            ret = Pair(ret.first - if (result.elected) r.third else 0, ret.second - r.third)
                         }
                         ret
                     }
@@ -450,14 +450,14 @@ class HemicycleFrameBuilder {
                 { p, r ->
                     var ret = p
                     val result = r.first
-                    if (result?.winner == null) {
+                    if (result == null) {
                         ret
                     } else {
-                        if (partyFilter(result.winner)) {
-                            ret = Pair(ret.first - if (result.hasWon) r.third else 0, ret.second - r.third)
+                        if (partyFilter(result.party)) {
+                            ret = Pair(ret.first - if (result.elected) r.third else 0, ret.second - r.third)
                         }
                         if (partyFilter(r.second)) {
-                            ret = Pair(ret.first + if (result.hasWon) r.third else 0, ret.second + r.third)
+                            ret = Pair(ret.first + if (result.elected) r.third else 0, ret.second + r.third)
                         }
                         ret
                     }

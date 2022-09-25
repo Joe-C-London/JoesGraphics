@@ -3,6 +3,7 @@ package com.joecollins.graphics.screens.generic
 import com.joecollins.graphics.components.MapFrame
 import com.joecollins.graphics.components.MapFrameBuilder
 import com.joecollins.models.general.PartyResult
+import com.joecollins.models.general.PartyResult.Companion.color
 import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.merge
 import java.awt.Color
@@ -84,7 +85,7 @@ class MapBuilder<T> {
                     .map {
                         val color =
                             if (it.key == ldr.first) {
-                                ldr.second?.color ?: Color.BLACK
+                                ldr.second.color
                             } else {
                                 Color.LIGHT_GRAY
                             }

@@ -1160,7 +1160,7 @@ class BasicResultPanel private constructor(
             return this
         }
 
-        fun build(textHeader: Flow.Publisher<out String>): BasicResultPanel {
+        fun build(textHeader: Flow.Publisher<out String?>): BasicResultPanel {
             return BasicResultPanel(
                 textHeader,
                 createFrame(),

@@ -5,6 +5,7 @@ import com.joecollins.graphics.components.HemicycleFrameBuilder.Companion.ofElec
 import com.joecollins.graphics.components.HemicycleFrameBuilder.Tiebreaker
 import com.joecollins.graphics.utils.ColorUtils.lighten
 import com.joecollins.models.general.Party
+import com.joecollins.models.general.PartyResult
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
 import org.awaitility.Awaitility
@@ -123,7 +124,7 @@ class HemicycleFrameBuilderTest {
         val frame = ofElectedLeading(
             listOf(ridings.size),
             ridings,
-            { HemicycleFrameBuilder.Result(it.leader, it.hasWon).asOneTimePublisher() },
+            { PartyResult(it.leader, it.hasWon).asOneTimePublisher() },
             { it.prev },
             lib,
             yp,
@@ -177,12 +178,12 @@ class HemicycleFrameBuilderTest {
         val gop = Party("Republican", "GOP", Color.RED)
 
         class Result(var leader: Party?, var hasWon: Boolean, val prev: Party) {
-            val publisher = Publisher(if (leader == null) null else HemicycleFrameBuilder.Result(leader, hasWon))
+            val publisher = Publisher(leader?.let { PartyResult(it, hasWon) })
 
             fun setResult(leader: Party?, hasWon: Boolean) {
                 this.leader = leader
                 this.hasWon = hasWon
-                publisher.submit(if (leader == null) null else HemicycleFrameBuilder.Result(leader, hasWon))
+                publisher.submit(if (leader == null) null else PartyResult(leader, hasWon))
             }
         }
 
@@ -250,12 +251,12 @@ class HemicycleFrameBuilderTest {
         val gop = Party("Republican", "GOP", Color.RED)
 
         class Result(var leader: Party?, var hasWon: Boolean, val prev: Party, val numSeats: Int) {
-            val publisher = Publisher(if (leader == null) null else HemicycleFrameBuilder.Result(leader, hasWon))
+            val publisher = Publisher(leader?.let { PartyResult(it, hasWon) })
 
             fun setResult(leader: Party?, hasWon: Boolean) {
                 this.leader = leader
                 this.hasWon = hasWon
-                publisher.submit(if (leader == null) null else HemicycleFrameBuilder.Result(leader, hasWon))
+                publisher.submit(if (leader == null) null else PartyResult(leader, hasWon))
             }
         }
 
@@ -354,12 +355,12 @@ class HemicycleFrameBuilderTest {
         val gop = Party("Republican", "GOP", Color.RED)
 
         class Result(var leader: Party?, var hasWon: Boolean, val prev: Party, val numSeats: Int) {
-            val publisher = Publisher<HemicycleFrameBuilder.Result?>(HemicycleFrameBuilder.Result(leader, hasWon))
+            val publisher = Publisher<PartyResult?>(leader?.let { PartyResult(it, hasWon) })
 
             fun setResult(leader: Party?, hasWon: Boolean) {
                 this.leader = leader
                 this.hasWon = hasWon
-                publisher.submit(HemicycleFrameBuilder.Result(leader, hasWon))
+                publisher.submit(leader?.let { PartyResult(it, hasWon) })
             }
         }
 

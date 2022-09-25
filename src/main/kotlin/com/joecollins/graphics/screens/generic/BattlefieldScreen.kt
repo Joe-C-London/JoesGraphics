@@ -4,6 +4,7 @@ import com.joecollins.graphics.GenericPanel
 import com.joecollins.graphics.components.BattlefieldFrame
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
+import com.joecollins.models.general.PartyResult.Companion.color
 import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.merge
 import java.awt.Color
@@ -79,7 +80,7 @@ class BattlefieldScreen private constructor(header: Flow.Publisher<out String?>,
                             -(pctByParty[parties.left] ?: 0.0),
                             -(pctByParty[parties.right] ?: 0.0),
                             -(pctByParty[parties.bottom] ?: 0.0),
-                        ) to (curr[key]?.color ?: Color.BLACK)
+                        ) to (curr[key].color)
                     }
                 }
 
