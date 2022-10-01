@@ -16,6 +16,7 @@ class PartySummaryScreenTest {
     private var bq = Party("Bloc Qu\u00e9b\u00e9cois", "BQ", Color.CYAN.darker())
     private var grn = Party("Green", "GRN", Color.GREEN.darker())
     private var oth = Party.OTHERS
+
     @Test
     fun testBasicPartySummaryWithDiff() {
         val canada = Region("Canada")

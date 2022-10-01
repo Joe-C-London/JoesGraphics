@@ -122,7 +122,7 @@ class LowerThirdHeadlineAndSummarySingleLabelTest {
             createSeatEntries(
                 mapOf(
                     Party("Liberal", "LIB", Color.RED) to 2,
-                    Party("Conservative", "CON", Color.BLUE) to 1,
+                    Party("Conservative", "CON", Color.BLUE) to 1
                 )
             )
                 .asOneTimePublisher(),

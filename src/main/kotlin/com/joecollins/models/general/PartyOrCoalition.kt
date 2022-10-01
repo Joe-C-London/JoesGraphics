@@ -10,6 +10,9 @@ interface PartyOrCoalition {
 }
 
 internal fun PartyOrCoalition.toParty(): Party {
-    return if (this is Party) this
-    else Party(this.name, this.abbreviation, this.color)
+    return if (this is Party) {
+        this
+    } else {
+        Party(this.name, this.abbreviation, this.color)
+    }
 }

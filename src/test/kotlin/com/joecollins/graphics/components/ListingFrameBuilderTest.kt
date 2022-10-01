@@ -16,7 +16,7 @@ class ListingFrameBuilderTest {
     fun testBasicListingFrameWithListBinding() {
         val list = listOf(
             Triple("JUSTIN TRUDEAU", Color.RED, "LIBERAL"),
-            Triple("ANDREW SCHEER", Color.BLUE, "CONSERVATIVE"),
+            Triple("ANDREW SCHEER", Color.BLUE, "CONSERVATIVE")
         )
         val frame: BarFrame = of(list.asOneTimePublisher(), { it.first }, { it.third }) { it.second }
             .withHeader("HEADER".asOneTimePublisher())

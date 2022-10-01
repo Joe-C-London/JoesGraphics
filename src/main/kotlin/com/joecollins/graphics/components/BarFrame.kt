@@ -170,7 +170,8 @@ class BarFrame(
             super.paintComponent(g)
             (g as Graphics2D)
                 .setRenderingHint(
-                    RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON
+                    RenderingHints.KEY_TEXT_ANTIALIASING,
+                    RenderingHints.VALUE_TEXT_ANTIALIAS_ON
                 )
             drawLines(g, 0, height)
             val font = StandardFont.readBoldFont(barHeight * 3 / 4 / maxLines)
@@ -299,7 +300,8 @@ class BarFrame(
                     transform.translate(leftMax + spaceWidth, (2 * BAR_MARGIN).toDouble())
                 } else {
                     transform.translate(
-                        leftMax - spaceWidth - leftIconScale * leftIconBounds.getWidth(), (2 * BAR_MARGIN).toDouble()
+                        leftMax - spaceWidth - leftIconScale * leftIconBounds.getWidth(),
+                        (2 * BAR_MARGIN).toDouble()
                     )
                 }
                 transform.scale(leftIconScale, leftIconScale)
@@ -330,7 +332,8 @@ class BarFrame(
                         override fun componentResized(e: ComponentEvent) {
                             font = StandardFont.readNormalFont(height * 2 / 3)
                         }
-                    })
+                    }
+                )
             }
         }
 
@@ -421,17 +424,20 @@ class BarFrame(
                 override fun componentResized(e: ComponentEvent) {
                     subheadLabel.font = StandardFont.readBoldFont(subheadLabel.height * 2 / 3)
                 }
-            })
+            }
+        )
         centralPanel = object : JPanel() {
             override fun paintComponent(g: Graphics) {
                 super.paintComponent(g)
                 (g as Graphics2D)
                     .setRenderingHint(
-                        RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON
+                        RenderingHints.KEY_TEXT_ANTIALIASING,
+                        RenderingHints.VALUE_TEXT_ANTIALIAS_ON
                     )
                 g
                     .setRenderingHint(
-                        RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON
+                        RenderingHints.KEY_ANTIALIASING,
+                        RenderingHints.VALUE_ANTIALIAS_ON
                     )
                 drawLines(
                     g,
@@ -452,16 +458,18 @@ class BarFrame(
             subheadLabel.isVisible = it != null
             subheadLabel.text = it ?: ""
         }
-        if (subheadTextPublisher != null)
+        if (subheadTextPublisher != null) {
             subheadTextPublisher.subscribe(Subscriber(eventQueueWrapper(onSubheadTextUpdate)))
-        else
+        } else {
             onSubheadTextUpdate(null)
+        }
 
         val onSubheadColorUpdate: (Color) -> Unit = { subheadLabel.foreground = it }
-        if (subheadColorPublisher != null)
+        if (subheadColorPublisher != null) {
             subheadColorPublisher.subscribe(Subscriber(eventQueueWrapper(onSubheadColorUpdate)))
-        else
+        } else {
             onSubheadColorUpdate(Color.BLACK)
+        }
 
         val onBarsUpdate: (List<Bar>) -> Unit = { b ->
             val numBars = b.size
@@ -501,10 +509,11 @@ class BarFrame(
                 lines[idx].label = line.label
             }
         }
-        if (linesPublisher != null)
+        if (linesPublisher != null) {
             linesPublisher.subscribe(Subscriber(eventQueueWrapper(onLinesUpdate)))
-        else
+        } else {
             onLinesUpdate(emptyList())
+        }
 
         val onMinUpdate: (Number) -> Unit = { min ->
             this.min = min

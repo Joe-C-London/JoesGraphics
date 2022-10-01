@@ -158,7 +158,8 @@ class ParliamentVoteFrame(
                             super.paintComponent(g)
                             (g as Graphics2D)
                                 .setRenderingHint(
-                                    RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON
+                                    RenderingHints.KEY_TEXT_ANTIALIASING,
+                                    RenderingHints.VALUE_TEXT_ANTIALIAS_ON
                                 )
 
                             g.color = party.color

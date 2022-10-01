@@ -26,7 +26,7 @@ class HemicycleFrameBuilderTest {
             generateSequence { Pair(Color.GREEN, Color.RED) }.take(7),
             generateSequence { Pair(Color.RED, Color.RED) }.take(6),
             generateSequence { Pair(Color.BLUE, Color.RED) }.take(5),
-            generateSequence { Pair(Color.BLUE, Color.BLUE) }.take(8),
+            generateSequence { Pair(Color.BLUE, Color.BLUE) }.take(8)
         ).flatten().toList()
         val leftSeatBars = Publisher(listOf(Pair(Color.GREEN, 8)))
         val rightSeatBars = Publisher(listOf(Pair(Color.BLUE, 13)))
@@ -119,7 +119,7 @@ class HemicycleFrameBuilderTest {
             Riding("Pelly-Nisutlin", yp, true, yp),
             Riding("Porter Creek North", yp, false, yp),
             Riding("Lake Laberge", yp, true, yp),
-            Riding("Whitehorse West", lib, false, yp),
+            Riding("Whitehorse West", lib, false, yp)
         )
         val frame = ofElectedLeading(
             listOf(ridings.size),

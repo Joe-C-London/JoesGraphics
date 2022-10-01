@@ -212,7 +212,7 @@ class AllSeatsScreenTest {
                 "Sannich North and the Islands" to mapOf(lib to 9321, ndp to 10764, grn to 14775, oth to 364),
                 "Saanich South" to mapOf(lib to 8716, ndp to 11912, grn to 7129, oth to 177 + 130),
                 "Victoria-Beacon Hill" to mapOf(lib to 4689, ndp to 16057, grn to 9194, oth to 190 + 102 + 35),
-                "Victoria-Swan Lake" to mapOf(lib to 4005, ndp to 13531, grn to 7491, oth to 207),
+                "Victoria-Swan Lake" to mapOf(lib to 4005, ndp to 13531, grn to 7491, oth to 207)
             )
         }
 
@@ -304,7 +304,7 @@ class AllSeatsScreenTest {
                 "Sannich North and the Islands" to elected(grn),
                 "Saanich South" to elected(ndp),
                 "Victoria-Beacon Hill" to elected(ndp),
-                "Victoria-Swan Lake" to elected(ndp),
+                "Victoria-Swan Lake" to elected(ndp)
             ).mapValues { it.value!! }
         }
     }

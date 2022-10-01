@@ -179,7 +179,7 @@ class SwingometerScreenTest {
             "UT" to mapOf(gop to 681, dem to 271, oth to 48),
             "VT" to mapOf(dem to 631, gop to 330, oth to 39),
             "WA" to mapOf(dem to 588, gop to 409, oth to 3),
-            "WI" to mapOf(gop to 502, dem to 468, oth to 30),
+            "WI" to mapOf(gop to 502, dem to 468, oth to 30)
         ).asOneTimePublisher()
         val parties = Publisher(dem to gop)
         val panel = of(
@@ -238,7 +238,7 @@ class SwingometerScreenTest {
             "UT" to mapOf(gop to 681, dem to 271, oth to 48),
             "VT" to mapOf(dem to 631, gop to 330, oth to 39),
             "WA" to mapOf(dem to 588, gop to 409, oth to 3),
-            "WI" to mapOf(gop to 502, dem to 468, oth to 30),
+            "WI" to mapOf(gop to 502, dem to 468, oth to 30)
         ).asOneTimePublisher()
         val parties = Publisher(dem to gop)
         val panel = of(
@@ -319,7 +319,7 @@ class SwingometerScreenTest {
             ("WA" to 12) to mapOf(dem to 1742718, gop to 1221747, oth to 352554),
             ("WV" to 5) to mapOf(dem to 188794, gop to 489371, oth to 36258),
             ("WI" to 10) to mapOf(dem to 1382536, gop to 1405284, oth to 188330),
-            ("WY" to 3) to mapOf(dem to 55973, gop to 174419, oth to 25457),
+            ("WY" to 3) to mapOf(dem to 55973, gop to 174419, oth to 25457)
         ).asOneTimePublisher()
         val parties = Publisher(dem to gop)
         val panel = of(
@@ -395,7 +395,7 @@ class SwingometerScreenTest {
                 "Carleton-Victoria" to mapOf(lib to 3116, pc to 2872, grn to 503, ndp to 114, pa to 960, ind to 58),
                 "Victoria-La Vallee" to mapOf(lib to 3570, pc to 3212, grn to 468, ndp to 307),
                 "Edmunston-Madawaska Centre" to mapOf(lib to 4668, pc to 1437, grn to 702, ndp to 206),
-                "Madawaska Les Lacs-Edmunston" to mapOf(lib to 4191, pc to 1826, grn to 945, ndp to 156),
+                "Madawaska Les Lacs-Edmunston" to mapOf(lib to 4191, pc to 1826, grn to 945, ndp to 156)
             )
         }
 
@@ -449,7 +449,7 @@ class SwingometerScreenTest {
                 "Carleton-Victoria" to elected(pc),
                 "Victoria-La Vallee" to elected(lib),
                 "Edmunston-Madawaska Centre" to elected(lib),
-                "Madawaska Les Lacs-Edmunston" to elected(lib),
+                "Madawaska Les Lacs-Edmunston" to elected(lib)
             )
         }
     }

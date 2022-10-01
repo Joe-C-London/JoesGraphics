@@ -372,24 +372,34 @@ class HemicycleFrameBuilder {
                 tiebreaker
             )
                 .withLeftSeatBars(
-                    leftList, { it.first }, { it.second },
+                    leftList,
+                    { it.first },
+                    { it.second },
                     leftSeats.map { leftLabel(it.first, it.second) }
                 )
                 .withRightSeatBars(
-                    rightList, { it.first }, { it.second },
+                    rightList,
+                    { it.first },
+                    { it.second },
                     rightSeats.map { rightLabel(it.first, it.second) }
                 )
                 .withMiddleSeatBars(
-                    middleList, { it.first }, { it.second },
+                    middleList,
+                    { it.first },
+                    { it.second },
                     middleSeats.map { otherLabel(it.first, it.second) }
                 )
                 .withLeftChangeBars(
-                    leftChangeList, { it.first }, { it.second },
+                    leftChangeList,
+                    { it.first },
+                    { it.second },
                     calcPrevForParty(allPrevs, leftParty).asOneTimePublisher(),
                     leftChange.map(changeLabelFunc)
                 )
                 .withRightChangeBars(
-                    rightChangeList, { it.first }, { it.second },
+                    rightChangeList,
+                    { it.first },
+                    { it.second },
                     calcPrevForParty(allPrevs, rightParty).asOneTimePublisher(),
                     rightChange.map(changeLabelFunc)
                 )

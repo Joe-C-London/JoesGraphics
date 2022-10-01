@@ -22,8 +22,11 @@ class RightStackLayout : LayoutManager {
     }
 
     override fun removeLayoutComponent(comp: Component) {
-        if (west == comp) west = JPanel()
-        else east.remove(comp)
+        if (west == comp) {
+            west = JPanel()
+        } else {
+            east.remove(comp)
+        }
     }
 
     override fun preferredLayoutSize(parent: Container?): Dimension {
@@ -42,10 +45,11 @@ class RightStackLayout : LayoutManager {
         val rightColStart = if (numPanels == 0) width else (width - width / (numPanels + 1))
         west.size = Dimension(rightColStart - 10, height - 10)
         east.forEachIndexed { index, component ->
-            if (index == east.size - 1)
+            if (index == east.size - 1) {
                 component.location = Point(rightColStart + 5, height - (height / numPanels) + 5)
-            else
+            } else {
                 component.location = Point(rightColStart + 5, (index * height / numPanels) + 5)
+            }
             component.size = Dimension(width / (numPanels + 1) - 10, (height / numPanels) - 10)
         }
     }

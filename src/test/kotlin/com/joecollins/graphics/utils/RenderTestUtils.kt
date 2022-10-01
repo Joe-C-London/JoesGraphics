@@ -37,7 +37,9 @@ object RenderTestUtils {
             println(actualFile.absolutePath)
             println(
                 String.format(
-                    "copy /Y %s %s", actualFile.absolutePath, expectedFile.absolutePath
+                    "copy /Y %s %s",
+                    actualFile.absolutePath,
+                    expectedFile.absolutePath
                 )
             )
         }

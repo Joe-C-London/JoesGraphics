@@ -134,7 +134,8 @@ class MapFrame(
                 super.paintComponent(g)
                 val g2d = g as Graphics2D
                 g2d.setRenderingHint(
-                    RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON
+                    RenderingHints.KEY_ANTIALIASING,
+                    RenderingHints.VALUE_ANTIALIAS_ON
                 )
                 if (shapesToDraw.isEmpty()) {
                     return
@@ -229,7 +230,8 @@ class MapFrame(
                             transformedShapesCache.clear()
                             repaint()
                         }
-                    })
+                    }
+                )
             }
         }
         add(panel, BorderLayout.CENTER)
@@ -254,17 +256,20 @@ class MapFrame(
             }
             repaint()
         }
-        if (focusBoxPublisher != null)
+        if (focusBoxPublisher != null) {
             focusBoxPublisher.subscribe(Subscriber(eventQueueWrapper(onFocusBoxUpdate)))
-        else onFocusBoxUpdate(null)
+        } else {
+            onFocusBoxUpdate(null)
+        }
 
         val onOutlineShapesUpdate: (List<Shape>) -> Unit = { s ->
             outlineShapes = s
             repaint()
         }
-        if (outlineShapesPublisher != null)
+        if (outlineShapesPublisher != null) {
             outlineShapesPublisher.subscribe(Subscriber(eventQueueWrapper(onOutlineShapesUpdate)))
-        else
+        } else {
             onOutlineShapesUpdate(emptyList())
+        }
     }
 }

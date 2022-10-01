@@ -26,7 +26,8 @@ class CountdownFrameTest {
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.getTimeRemaining().toDays() }, IsEqual(1L))
         Assert.assertEquals(
-            Duration.ofDays(1).plusHours(10).plusMinutes(25).plusSeconds(4), frame.getTimeRemaining()
+            Duration.ofDays(1).plusHours(10).plusMinutes(25).plusSeconds(4),
+            frame.getTimeRemaining()
         )
     }
 

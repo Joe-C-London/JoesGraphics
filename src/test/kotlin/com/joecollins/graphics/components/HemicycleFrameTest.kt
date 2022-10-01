@@ -349,7 +349,7 @@ class HemicycleFrameTest {
                 generateSequence { Color.RED }.take(5),
                 generateSequence { Color.ORANGE }.take(4),
                 generateSequence { Color.GREEN.darker() }.take(17),
-                generateSequence { Color.BLUE }.take(61),
+                generateSequence { Color.BLUE }.take(61)
             ).flatten().toList()
         )
         val leftSeats = Publisher(listOf(5))

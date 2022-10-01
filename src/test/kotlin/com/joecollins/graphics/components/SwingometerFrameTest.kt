@@ -313,7 +313,7 @@ class SwingometerFrameTest {
                 Triple("MN", +17.30, Color.BLUE),
                 Triple("DE", +18.70, Color.BLUE),
                 Triple("NY", +22.30, Color.BLUE),
-                Triple("VT", +23.05, Color.BLUE),
+                Triple("VT", +23.05, Color.BLUE)
             )
         )
     }
@@ -415,7 +415,9 @@ class SwingometerFrameTest {
         val value = Publisher(0.885)
         val leftColor = Publisher(Color.BLUE)
         val rightColor = Publisher(Color.RED)
-        @Suppress("ReplaceRangeToWithUntil") val ticks = range.map { (-it + 1..it - 1).toList() }
+
+        @Suppress("ReplaceRangeToWithUntil")
+        val ticks = range.map { (-it + 1..it - 1).toList() }
         val frame = SwingometerFrame(
             headerPublisher = "2016 PRESIDENT SWINGOMETER".asOneTimePublisher(),
             rangePublisher = range,
@@ -515,7 +517,7 @@ class SwingometerFrameTest {
                 Triple(Pair("NY", 29), +14.09, Color.BLUE),
                 Triple(Pair("VT", 3), +17.80, Color.BLUE),
                 Triple(Pair("HI", 4), +21.355, Color.BLUE),
-                Triple(Pair("DC", 3), +46.815, Color.BLUE),
+                Triple(Pair("DC", 3), +46.815, Color.BLUE)
             )
         )
     }

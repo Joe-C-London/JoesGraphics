@@ -23,7 +23,7 @@ class HeatMapFrameBuilderTest {
             generateSequence { Pair(Color.GREEN, Color.RED) }.take(7),
             generateSequence { Pair(Color.RED, Color.RED) }.take(6),
             generateSequence { Pair(Color.BLUE, Color.RED) }.take(5),
-            generateSequence { Pair(Color.BLUE, Color.BLUE) }.take(8),
+            generateSequence { Pair(Color.BLUE, Color.BLUE) }.take(8)
         ).flatten().toList()
         val seatBars = Publisher(listOf(Pair(Color.GREEN, 8)))
         val changeBars = Publisher(listOf(Pair(Color.GREEN, +7)))
@@ -36,7 +36,9 @@ class HeatMapFrameBuilderTest {
         )
             .withSeatBars(seatBars, { it.first }, { it.second }, "GREEN: 8".asOneTimePublisher())
             .withChangeBars(
-                changeBars, { it.first }, { it.second },
+                changeBars,
+                { it.first },
+                { it.second },
                 1.asOneTimePublisher(),
                 "GRN: +7".asOneTimePublisher()
             )
@@ -56,7 +58,7 @@ class HeatMapFrameBuilderTest {
         val expectedBorders = sequenceOf(
             generateSequence { Color.GREEN }.take(1),
             generateSequence { Color.RED }.take(18),
-            generateSequence { Color.BLUE }.take(8),
+            generateSequence { Color.BLUE }.take(8)
         )
             .flatten()
             .toList()
@@ -104,7 +106,7 @@ class HeatMapFrameBuilderTest {
             Riding("Pelly-Nisutlin", yp, true, yp),
             Riding("Porter Creek North", yp, false, yp),
             Riding("Lake Laberge", yp, true, yp),
-            Riding("Whitehorse West", lib, false, yp),
+            Riding("Whitehorse West", lib, false, yp)
         )
         val frame = ofElectedLeading(
             3.asOneTimePublisher(),
@@ -165,7 +167,7 @@ class HeatMapFrameBuilderTest {
             Riding("Pelly-Nisutlin", yp, true, yp, false),
             Riding("Porter Creek North", yp, false, yp, true),
             Riding("Lake Laberge", yp, true, yp, false),
-            Riding("Whitehorse West", lib, false, yp, true),
+            Riding("Whitehorse West", lib, false, yp, true)
         )
         val filter = Publisher<(Riding) -> Boolean> { true }
         val frame = ofElectedLeading(

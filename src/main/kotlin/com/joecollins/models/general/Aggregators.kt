@@ -125,8 +125,11 @@ object Aggregators {
         result.entries.forEach { e ->
             if (topAndRequired(e) || e.value != null) {
                 val key = if (topAndRequired(e)) e.key else others
-                if (ret.containsKey(key)) ret.merge(key, e.value!!) { a, b -> (a!!.toInt() + b!!.toInt()) as T }
-                else ret[key] = e.value
+                if (ret.containsKey(key)) {
+                    ret.merge(key, e.value!!) { a, b -> (a!!.toInt() + b!!.toInt()) as T }
+                } else {
+                    ret[key] = e.value
+                }
             } else {
                 needOthers = true
             }

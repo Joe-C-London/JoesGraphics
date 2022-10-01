@@ -40,7 +40,7 @@ class BattlefieldFrameTest {
                 BattlefieldFrame.Dot(-36.3, -41.2, -10.6) to Color.RED,
                 BattlefieldFrame.Dot(-38.4, -39.4, -9.9) to Color.RED,
                 BattlefieldFrame.Dot(-32.1, -58.2, -6.5) to Color.RED,
-                BattlefieldFrame.Dot(-30.3, -43.0, -9.0) to Color.RED,
+                BattlefieldFrame.Dot(-30.3, -43.0, -9.0) to Color.RED
             ).asOneTimePublisher()
         )
         frame.setSize(1024, 512)
@@ -81,7 +81,7 @@ class BattlefieldFrameTest {
                 BattlefieldFrame.Dot(-36.3, -41.2, -10.6) to Color.GREEN.darker(),
                 BattlefieldFrame.Dot(-38.4, -39.4, -9.9) to Color.GREEN.darker(),
                 BattlefieldFrame.Dot(-32.1, -58.2, -6.5) to Color.RED,
-                BattlefieldFrame.Dot(-30.3, -43.0, -9.0) to Color.GREEN.darker(),
+                BattlefieldFrame.Dot(-30.3, -43.0, -9.0) to Color.GREEN.darker()
             ).asOneTimePublisher(),
             linesPublisher = listOf(
                 BattlefieldFrame.Line(
@@ -103,7 +103,7 @@ class BattlefieldFrameTest {
                         BattlefieldFrame.Dot(-12.9, 0.0, 37.7),
                         BattlefieldFrame.Dot(-13.0, 0.0, 39.2),
                         BattlefieldFrame.Dot(-16.4, 0.0, 48.8),
-                        BattlefieldFrame.Dot(-26.0, 0.0, 51.7),
+                        BattlefieldFrame.Dot(-26.0, 0.0, 51.7)
                     )
                 ) to Color.RED,
                 BattlefieldFrame.Line(
@@ -117,7 +117,7 @@ class BattlefieldFrameTest {
                         BattlefieldFrame.Dot(0.0, -12.7, 43.2),
                         BattlefieldFrame.Dot(0.0, -12.7, 44.1),
                         BattlefieldFrame.Dot(0.0, -13.8, 44.1),
-                        BattlefieldFrame.Dot(0.0, -14.8, 44.4),
+                        BattlefieldFrame.Dot(0.0, -14.8, 44.4)
                     )
                 ) to Color.BLUE,
                 BattlefieldFrame.Line(
@@ -131,7 +131,7 @@ class BattlefieldFrameTest {
                         BattlefieldFrame.Dot(-43.2, -30.6, 0.0),
                         BattlefieldFrame.Dot(-44.1, -29.5, 0.0),
                         BattlefieldFrame.Dot(-44.1, -26.3, 0.0),
-                        BattlefieldFrame.Dot(-44.4, -26.0, 0.0),
+                        BattlefieldFrame.Dot(-44.4, -26.0, 0.0)
                     )
                 ) to Color.GREEN.darker()
             ).asOneTimePublisher()

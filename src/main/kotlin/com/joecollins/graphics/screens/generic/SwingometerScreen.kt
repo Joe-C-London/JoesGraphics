@@ -128,13 +128,19 @@ class SwingometerScreen private constructor(title: Flow.Publisher<out String?>, 
             val leftToWinPublisher = Publisher<Double>()
             private fun calculateLeftToWin() =
                 getSwingNeededForMajority(
-                    prevVotes, parties.first, parties.second, carryovers
+                    prevVotes,
+                    parties.first,
+                    parties.second,
+                    carryovers
                 )
 
             val rightToWinPublisher = Publisher<Double>()
             private fun calculateRightToWin() =
                 getSwingNeededForMajority(
-                    prevVotes, parties.second, parties.first, carryovers
+                    prevVotes,
+                    parties.second,
+                    parties.first,
+                    carryovers
                 )
 
             private fun updateLeftAndRightToWin() {
@@ -149,10 +155,16 @@ class SwingometerScreen private constructor(title: Flow.Publisher<out String?>, 
 
             private fun calculateOuterLabels(): List<Triple<Double, Color, String>> {
                 val leftSwingList = createSwingList(
-                    prevVotes, parties.first, parties.second, carryovers
+                    prevVotes,
+                    parties.first,
+                    parties.second,
+                    carryovers
                 )
                 val rightSwingList = createSwingList(
-                    prevVotes, parties.second, parties.first, carryovers
+                    prevVotes,
+                    parties.second,
+                    parties.first,
+                    carryovers
                 )
                 val leftSeats = getNumSeats(leftSwingList)
                 val rightSeats = getNumSeats(rightSwingList)
@@ -419,10 +431,11 @@ class SwingometerScreen private constructor(title: Flow.Publisher<out String?>, 
                     val focus = m.value[focusParty] ?: 0
                     val comp = m.value[compParty] ?: 0
                     val position: Double
-                    if (total == 0)
+                    if (total == 0) {
                         position = if (m.value.containsKey(focusParty)) Double.NEGATIVE_INFINITY else Double.POSITIVE_INFINITY
-                    else
+                    } else {
                         position = 0.5 * (comp - focus) / total
+                    }
                     val count = inputs.weights?.let { f -> f(m.key) } ?: 1
                     generateSequence { position }.take(count)
                 }

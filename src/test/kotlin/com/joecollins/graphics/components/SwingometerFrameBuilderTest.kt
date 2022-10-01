@@ -247,7 +247,7 @@ class SwingometerFrameBuilderTest {
             Dot(0.6, Color.RED),
             Dot(-0.185, Color.BLUE),
             Dot(-0.76, Color.BLUE),
-            Dot(-0.76, Color.BLUE),
+            Dot(-0.76, Color.BLUE)
         )
         val colors = Publisher(Pair(Color.BLUE, Color.RED))
         val value = Publisher(-1.0)

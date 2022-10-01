@@ -73,14 +73,15 @@ class CountdownScreen private constructor(panel: JPanel, title: Flow.Publisher<S
                     headerPublisher = timings[it].second.asOneTimePublisher(),
                     timePublisher = timings[it].first.asOneTimePublisher(),
                     labelFunc = {
-                        if (it.isNegative)
+                        if (it.isNegative) {
                             timesUpLabel
-                        else if (it.toHours() == 0L)
+                        } else if (it.toHours() == 0L) {
                             CountdownFrame.formatMMSS(it)
-                        else if (it.toDays() == 0L)
+                        } else if (it.toDays() == 0L) {
                             CountdownFrame.formatHHMMSS(it)
-                        else
+                        } else {
                             CountdownFrame.formatDDHHMMSS(it)
+                        }
                     },
                     borderColorPublisher = colors[it].asOneTimePublisher(),
                     countdownColorPublisher = colors[it].asOneTimePublisher()

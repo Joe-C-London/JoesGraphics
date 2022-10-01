@@ -34,7 +34,7 @@ class SimpleVoteViewPanelTest {
                 ndp to 124,
                 pc to 1373,
                 lib to 785,
-                grn to 674,
+                grn to 674
             )
         )
         val previousVotes = Publisher(
@@ -42,7 +42,7 @@ class SimpleVoteViewPanelTest {
                 ndp.party to 585,
                 pc.party to 785,
                 lib.party to 1060,
-                grn.party to 106,
+                grn.party to 106
             )
         )
         val header = Publisher("MONTAGUE-KILMUIR")
@@ -57,7 +57,9 @@ class SimpleVoteViewPanelTest {
         val focus = Publisher(shapesByDistrict.keys.filter { it <= 7 })
         val selectedDistrict = Publisher(3)
         val panel = candidateVotes(
-            currentVotes, voteHeader, voteSubhead
+            currentVotes,
+            voteHeader,
+            voteSubhead
         )
             .withPrev(previousVotes, changeHeader)
             .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader)
@@ -74,7 +76,8 @@ class SimpleVoteViewPanelTest {
         val lib = Candidate("David Lametti", Party("Liberal", "LIB", Color.RED), true)
         val grn = Candidate("Jency Mercier", Party("Green", "GRN", Color.GREEN.darker()))
         val bq = Candidate(
-            "Isabel Dion", Party("Bloc Qu\u00e9b\u00e9cois", "BQ", Color.CYAN.darker())
+            "Isabel Dion",
+            Party("Bloc Qu\u00e9b\u00e9cois", "BQ", Color.CYAN.darker())
         )
         val ppc = Candidate("Daniel Turgeon", Party("People's Party", "PPC", Color.MAGENTA.darker()))
         val ml = Candidate("Eileen Studd", Party("Marxist-Leninist", "M-L", Color.RED))
@@ -90,7 +93,7 @@ class SimpleVoteViewPanelTest {
                 ppc to 490,
                 ml to 39,
                 rhino to 265,
-                ind to 274,
+                ind to 274
             )
         )
         val previousVotes = Publisher(
@@ -99,7 +102,7 @@ class SimpleVoteViewPanelTest {
                 con.party to 3713,
                 lib.party to 23603,
                 grn.party to 1717,
-                bq.party to 9164,
+                bq.party to 9164
             )
         )
         val header = Publisher("LASALLE\u2014\u00c9MARD\u2014VERDUN")
@@ -132,7 +135,7 @@ class SimpleVoteViewPanelTest {
                 ndp to 124,
                 pc to 1373,
                 lib to 785,
-                grn to 674,
+                grn to 674
             )
         )
         val previousVotes = Publisher(
@@ -140,7 +143,7 @@ class SimpleVoteViewPanelTest {
                 ndp.party to 585,
                 pc.party to 785,
                 lib.party to 1060,
-                grn.party to 106,
+                grn.party to 106
             )
         )
         val header = Publisher("MONTAGUE-KILMUIR")
@@ -155,7 +158,9 @@ class SimpleVoteViewPanelTest {
         val focus = Publisher(shapesByDistrict.keys.filter { it <= 7 })
         val selectedDistrict = Publisher(3)
         val panel = candidateVotesPctOnly(
-            currentVotes, voteHeader, voteSubhead
+            currentVotes,
+            voteHeader,
+            voteSubhead
         )
             .withPrev(previousVotes, changeHeader)
             .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader)
@@ -178,7 +183,7 @@ class SimpleVoteViewPanelTest {
                 ndp.party to 585,
                 pc.party to 785,
                 lib.party to 1060,
-                grn.party to 106,
+                grn.party to 106
             )
         )
         val pctReporting = Publisher(0.0)
@@ -195,7 +200,9 @@ class SimpleVoteViewPanelTest {
         val focus = Publisher(shapesByDistrict.keys.filter { it <= 7 })
         val selectedDistrict = Publisher(3)
         val panel = candidateVotes(
-            currentVotes, voteHeader, voteSubhead
+            currentVotes,
+            voteHeader,
+            voteSubhead
         )
             .withPrev(previousVotes, changeHeader)
             .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader)
@@ -211,7 +218,7 @@ class SimpleVoteViewPanelTest {
                 ndp to 5,
                 pc to 47,
                 lib to 58,
-                grn to 52,
+                grn to 52
             )
         )
         voteHeader.submit("1 OF 9 POLLS REPORTING")
@@ -225,7 +232,7 @@ class SimpleVoteViewPanelTest {
                 ndp to 8,
                 pc to 91,
                 lib to 100,
-                grn to 106,
+                grn to 106
             )
         )
         voteHeader.submit("2 OF 9 POLLS REPORTING")
@@ -239,7 +246,7 @@ class SimpleVoteViewPanelTest {
                 ndp to 18,
                 pc to 287,
                 lib to 197,
-                grn to 243,
+                grn to 243
             )
         )
         voteHeader.submit("5 OF 9 POLLS REPORTING")
@@ -253,7 +260,7 @@ class SimpleVoteViewPanelTest {
                 ndp to 124,
                 pc to 1373,
                 lib to 785,
-                grn to 675,
+                grn to 675
             )
         )
         voteHeader.submit("9 OF 9 POLLS REPORTING")
@@ -278,7 +285,7 @@ class SimpleVoteViewPanelTest {
                 ndp to 6,
                 pc to 8,
                 lib to 11,
-                grn to 0,
+                grn to 0
             )
         )
         val previousVotes = Publisher(
@@ -286,7 +293,7 @@ class SimpleVoteViewPanelTest {
                 ndp.party to 585,
                 pc.party to 785,
                 lib.party to 1060,
-                grn.party to 106,
+                grn.party to 106
             )
         )
         val pctReporting = Publisher(1.0 / 9)
@@ -303,7 +310,9 @@ class SimpleVoteViewPanelTest {
         val focus = Publisher(shapesByDistrict.keys.filter { it <= 7 })
         val selectedDistrict = Publisher(3)
         val panel = candidateVotes(
-            currentVotes, voteHeader, voteSubhead
+            currentVotes,
+            voteHeader,
+            voteSubhead
         )
             .withPrev(previousVotes, changeHeader)
             .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader)
@@ -335,7 +344,9 @@ class SimpleVoteViewPanelTest {
         val focus = Publisher<List<Int>?>(null)
         val winnersByDistrict = Publisher<Map<Int, Party?>>(HashMap())
         val panel = partyVotes(
-            currentVotes, voteHeader, voteSubhead
+            currentVotes,
+            voteHeader,
+            voteSubhead
         )
             .withPrev(previousVotes, changeHeader)
             .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader)
@@ -351,7 +362,7 @@ class SimpleVoteViewPanelTest {
                 ndp to 124,
                 pc to 1373,
                 lib to 785,
-                grn to 675,
+                grn to 675
             )
         )
         previousVotes.submit(
@@ -359,7 +370,7 @@ class SimpleVoteViewPanelTest {
                 ndp to 585,
                 pc to 785,
                 lib to 1060,
-                grn to 106,
+                grn to 106
             )
         )
         voteHeader.submit("1 OF 27 DISTRICTS DECLARED")
@@ -385,14 +396,14 @@ class SimpleVoteViewPanelTest {
             mapOf(
                 dem to 60572245,
                 gop to 50861970,
-                Party.OTHERS to 1978774,
+                Party.OTHERS to 1978774
             )
         )
         val previousVotes = Publisher(
             mapOf(
                 dem to 61776554,
                 gop to 63173815,
-                Party.OTHERS to 3676641,
+                Party.OTHERS to 3676641
             )
         )
         val pctReporting = Publisher(1.0)
@@ -404,7 +415,9 @@ class SimpleVoteViewPanelTest {
         val winner = Publisher(dem)
         val swingPartyOrder = listOf(dem, gop)
         val panel = partyVotes(
-            currentVotes, voteHeader, voteSubhead
+            currentVotes,
+            voteHeader,
+            voteSubhead
         )
             .withPrev(previousVotes, changeHeader)
             .withWinner(winner)
@@ -431,13 +444,13 @@ class SimpleVoteViewPanelTest {
                 Candidate("Marty Perez", gop) to 276,
                 Candidate("Christopher Suprun", ind) to 51,
                 Candidate("Daniel Tinus", lbt) to 144,
-                Candidate("Mike Westergren", dem) to 858,
+                Candidate("Mike Westergren", dem) to 858
             )
         )
         val previousVotes = Publisher(
             mapOf(
                 dem to 88329,
-                gop to 142251,
+                gop to 142251
             )
         )
         val header = Publisher("TEXAS DISTRICT 27")
@@ -448,7 +461,9 @@ class SimpleVoteViewPanelTest {
         val winner = Publisher(Candidate("Michael Cloud", gop))
         val swingPartyOrder = listOf(dem, gop)
         val panel = candidateVotes(
-            currentVotes, voteHeader, voteSubhead
+            currentVotes,
+            voteHeader,
+            voteSubhead
         )
             .withPrev(previousVotes, changeHeader)
             .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader)
@@ -465,7 +480,7 @@ class SimpleVoteViewPanelTest {
         val currentVotes = Publisher(
             mapOf(
                 Candidate("Emmanuel Macron", lrem) to 20743128,
-                Candidate("Marine Le Pen", fn) to 10638475,
+                Candidate("Marine Le Pen", fn) to 10638475
             )
         )
         val header = Publisher("FRANCE PRESIDENT: ROUND 2")
@@ -475,7 +490,9 @@ class SimpleVoteViewPanelTest {
         val pctReporting = Publisher(1.0)
         val winner = Publisher<Candidate?>(Candidate("Emmanuel Macron", lrem))
         val panel = candidateVotes(
-            currentVotes, voteHeader, voteSubhead
+            currentVotes,
+            voteHeader,
+            voteSubhead
         )
             .withWinner(winner)
             .withMajorityLine(showMajority, "50% TO WIN")
@@ -490,7 +507,7 @@ class SimpleVoteViewPanelTest {
         currentVotes.submit(
             mapOf(
                 Candidate("Emmanuel Macron", lrem) to 3825279,
-                Candidate("Marine Le Pen", fn) to 1033686,
+                Candidate("Marine Le Pen", fn) to 1033686
             )
         )
         compareRendering("SimpleVoteViewPanel", "MajorityLine-2", panel)
@@ -498,7 +515,7 @@ class SimpleVoteViewPanelTest {
         currentVotes.submit(
             mapOf(
                 Candidate("Emmanuel Macron", lrem) to 0,
-                Candidate("Marine Le Pen", fn) to 0,
+                Candidate("Marine Le Pen", fn) to 0
             )
         )
         voteHeader.submit("0.0% REPORTING")
@@ -517,7 +534,7 @@ class SimpleVoteViewPanelTest {
                 ndp to 124,
                 pc to 1373,
                 lib to 785,
-                grn to 674,
+                grn to 674
             )
         )
         val previousVotes = Publisher(
@@ -525,7 +542,7 @@ class SimpleVoteViewPanelTest {
                 ndp.party to 585,
                 pc.party to 785,
                 lib.party to 1060,
-                grn.party to 106,
+                grn.party to 106
             )
         )
         val header = Publisher("MONTAGUE-KILMUIR")
@@ -542,7 +559,9 @@ class SimpleVoteViewPanelTest {
         val additionalHighlight = Publisher<List<Int>>(shapesByDistrict.keys.toList())
         val selectedDistrict = Publisher(3)
         val panel = candidateVotes(
-            currentVotes, voteHeader, voteSubhead
+            currentVotes,
+            voteHeader,
+            voteSubhead
         )
             .withPrev(previousVotes, changeHeader, changeSubhead)
             .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader)
@@ -570,7 +589,9 @@ class SimpleVoteViewPanelTest {
         val swingHeader = Publisher("SWING SINCE 2016")
         val swingPartyOrder: List<Party> = listOf(dem.party, gop)
         val panel = candidateVotes(
-            currentVotes, voteHeader, voteSubhead
+            currentVotes,
+            voteHeader,
+            voteSubhead
         )
             .withPrev(previousVotes, changeHeader)
             .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader)
@@ -587,7 +608,7 @@ class SimpleVoteViewPanelTest {
                 Candidate("Vincent Lo", Party("Labour", "LAB", Color.RED)) to 18682,
                 Candidate("Rosina Robson", Party("Liberal Democrats", "LD", Color.ORANGE)) to 1835,
                 Candidate("Lizzy Kemp", Party("UK Independence Party", "UKIP", Color.MAGENTA.darker())) to 1577,
-                Candidate("Mark Keir", Party("Green", "GRN", Color.GREEN.darker())) to 884,
+                Candidate("Mark Keir", Party("Green", "GRN", Color.GREEN.darker())) to 884
             )
         )
         val header = Publisher("UXBRIDGE AND SOUTH RUISLIP")
@@ -612,7 +633,7 @@ class SimpleVoteViewPanelTest {
                 Candidate("Bobby Smith", Party("Independent", "IND", Color.GRAY)) to 8,
                 Candidate("William Tobin", Party("Independent", "IND", Color.GRAY)) to 5,
                 Candidate("Alfie Utting", Party("Independent", "IND", Color.GRAY)) to 44,
-                Candidate("Yace \"Interplanetary Time Lord\" Yogenstein", Party("Independent", "IND", Color.GRAY)) to 23,
+                Candidate("Yace \"Interplanetary Time Lord\" Yogenstein", Party("Independent", "IND", Color.GRAY)) to 23
             )
         )
         voteHeader.submit("2019 RESULT")
@@ -623,7 +644,7 @@ class SimpleVoteViewPanelTest {
                 Candidate("Vincent Lo", Party("Labour", "LAB", Color.RED)) to 18682,
                 Candidate("Rosina Robson", Party("Liberal Democrats", "LD", Color.ORANGE)) to 1835,
                 Candidate("Lizzy Kemp", Party("UK Independence Party", "UKIP", Color.MAGENTA.darker())) to 1577,
-                Candidate("Mark Keir", Party("Green", "GRN", Color.GREEN.darker())) to 884,
+                Candidate("Mark Keir", Party("Green", "GRN", Color.GREEN.darker())) to 884
             )
         )
         voteHeader.submit("2017 RESULT")
@@ -642,7 +663,7 @@ class SimpleVoteViewPanelTest {
                 ndp.party to 585,
                 pc.party to 785,
                 lib.party to 1060,
-                grn.party to 106,
+                grn.party to 106
             )
         )
         val pctReporting = Publisher(0.0)
@@ -659,7 +680,9 @@ class SimpleVoteViewPanelTest {
         val focus = Publisher(shapesByDistrict.keys.filter { it <= 7 })
         val selectedDistrict = Publisher(3)
         val panel = candidateVotes(
-            currentVotes, voteHeader, voteSubhead
+            currentVotes,
+            voteHeader,
+            voteSubhead
         )
             .withPrev(previousVotes, changeHeader)
             .withLimit(3)
@@ -677,7 +700,7 @@ class SimpleVoteViewPanelTest {
                 ndp to 124,
                 pc to 1373,
                 lib to 785,
-                grn to 675,
+                grn to 675
             )
         )
         voteHeader.submit("9 OF 9 POLLS REPORTING")
@@ -700,7 +723,7 @@ class SimpleVoteViewPanelTest {
                 ndp.party to 585,
                 pc.party to 785,
                 lib.party to 1060,
-                grn.party to 106,
+                grn.party to 106
             )
         )
         val pctReporting = Publisher(0.0)
@@ -717,7 +740,9 @@ class SimpleVoteViewPanelTest {
         val focus = Publisher(shapesByDistrict.keys.filter { it <= 7 })
         val selectedDistrict = Publisher(3)
         val panel = candidateVotes(
-            currentVotes, voteHeader, voteSubhead
+            currentVotes,
+            voteHeader,
+            voteSubhead
         )
             .withPrev(previousVotes, changeHeader)
             .withLimit(3, pc.party, lib.party)
@@ -735,7 +760,7 @@ class SimpleVoteViewPanelTest {
                 ndp to 124,
                 pc to 1373,
                 lib to 785,
-                grn to 675,
+                grn to 675
             )
         )
         voteHeader.submit("9 OF 9 POLLS REPORTING")
@@ -756,14 +781,14 @@ class SimpleVoteViewPanelTest {
             mapOf(
                 pc to 714,
                 lib to 6834,
-                grn to 609,
+                grn to 609
             )
         )
         val previousVotes = Publisher(
             mapOf(
                 ndp to 578,
                 pc.party to 4048,
-                lib.party to 3949,
+                lib.party to 3949
             )
         )
         val header = Publisher("SHIPPAGAN-LAM\u00c8QUE-MISCOU")
@@ -774,7 +799,9 @@ class SimpleVoteViewPanelTest {
         val winner = Publisher(lib)
         val swingPartyOrder = listOf(ndp, grn.party, lib.party, pc.party)
         val panel = candidateVotes(
-            currentVotes, voteHeader, voteSubhead
+            currentVotes,
+            voteHeader,
+            voteSubhead
         )
             .withPrev(previousVotes, changeHeader)
             .withWinner(winner)
@@ -794,7 +821,7 @@ class SimpleVoteViewPanelTest {
             mapOf(
                 pc to 714,
                 lib to 6834,
-                grn to 609,
+                grn to 609
             )
         )
         val previousVotes = Publisher(
@@ -803,7 +830,7 @@ class SimpleVoteViewPanelTest {
                 ndp to 289,
                 pc.party to 4048,
                 lib.party to 3949,
-                grn.party to 0,
+                grn.party to 0
             )
         )
         val header = Publisher("SHIPPAGAN-LAM\u00c8QUE-MISCOU")
@@ -814,7 +841,9 @@ class SimpleVoteViewPanelTest {
         val winner = Publisher(lib)
         val swingPartyOrder = listOf(grn.party, lib.party, pc.party)
         val panel = candidateVotes(
-            currentVotes, voteHeader, voteSubhead
+            currentVotes,
+            voteHeader,
+            voteSubhead
         )
             .withPrev(previousVotes, changeHeader)
             .withWinner(winner)
@@ -834,14 +863,14 @@ class SimpleVoteViewPanelTest {
             mapOf(
                 pc to 714,
                 lib to 6834,
-                oth to 609,
+                oth to 609
             )
         )
         val previousVotes = Publisher(
             mapOf(
                 ndp to 578,
                 pc.party to 4048,
-                lib.party to 3949,
+                lib.party to 3949
             )
         )
         val header = Publisher("SHIPPAGAN-LAM\u00c8QUE-MISCOU")
@@ -852,7 +881,9 @@ class SimpleVoteViewPanelTest {
         val winner = Publisher(lib)
         val swingPartyOrder = listOf(ndp, oth.party, lib.party, pc.party)
         val panel = candidateVotes(
-            currentVotes, voteHeader, voteSubhead
+            currentVotes,
+            voteHeader,
+            voteSubhead
         )
             .withPrev(previousVotes, changeHeader)
             .withWinner(winner)
@@ -872,7 +903,7 @@ class SimpleVoteViewPanelTest {
             mapOf(
                 pc to 714,
                 lib to 6834,
-                oth to 609,
+                oth to 609
             )
         )
         val previousVotes = Publisher(
@@ -880,7 +911,7 @@ class SimpleVoteViewPanelTest {
                 Party.OTHERS to 289,
                 ndp to 289,
                 pc.party to 4048,
-                lib.party to 3949,
+                lib.party to 3949
             )
         )
         val header = Publisher("SHIPPAGAN-LAM\u00c8QUE-MISCOU")
@@ -891,7 +922,9 @@ class SimpleVoteViewPanelTest {
         val winner = Publisher(lib)
         val swingPartyOrder = listOf(ndp, oth.party, lib.party, pc.party)
         val panel = candidateVotes(
-            currentVotes, voteHeader, voteSubhead
+            currentVotes,
+            voteHeader,
+            voteSubhead
         )
             .withPrev(previousVotes, changeHeader)
             .withWinner(winner)
@@ -997,7 +1030,7 @@ class SimpleVoteViewPanelTest {
                 poutou to 394505,
                 asselineau to 332547,
                 arthaud to 232384,
-                cheminade to 65586,
+                cheminade to 65586
             )
         )
         val header = Publisher("ELECTION 2017: FRANCE DECIDES")
@@ -1040,9 +1073,10 @@ class SimpleVoteViewPanelTest {
                     poutou to 394505,
                     asselineau to 332547,
                     arthaud to 232384,
-                    cheminade to 65586,
+                    cheminade to 65586
                 ),
-                6, Candidate.OTHERS
+                6,
+                Candidate.OTHERS
             )
         )
         val header = Publisher("ELECTION 2017: FRANCE DECIDES")
@@ -1070,7 +1104,7 @@ class SimpleVoteViewPanelTest {
                 ndp to (0.030).rangeTo(0.046),
                 pc to (0.290).rangeTo(0.353),
                 lib to (0.257).rangeTo(0.292),
-                grn to (0.343).rangeTo(0.400),
+                grn to (0.343).rangeTo(0.400)
             )
         )
         val previousVotes = Publisher(
@@ -1078,7 +1112,7 @@ class SimpleVoteViewPanelTest {
                 ndp to 8997,
                 pc to 30663,
                 lib to 33481,
-                grn to 8857,
+                grn to 8857
             )
         )
         val header = Publisher("PRINCE EDWARD ISLAND")
@@ -1111,7 +1145,7 @@ class SimpleVoteViewPanelTest {
                 ndp.party to 585,
                 pc.party to 785,
                 lib.party to 1060,
-                grn.party to 106,
+                grn.party to 106
             )
         )
         val header = Publisher("MONTAGUE-KILMUIR")
@@ -1137,7 +1171,7 @@ class SimpleVoteViewPanelTest {
                 ndp to 124,
                 pc to null,
                 lib to null,
-                grn to null,
+                grn to null
             )
         )
         compareRendering("SimpleVoteViewPanel", "MidDeclaration-2", panel)
@@ -1146,7 +1180,7 @@ class SimpleVoteViewPanelTest {
                 ndp to 124,
                 pc to 1373,
                 lib to null,
-                grn to null,
+                grn to null
             )
         )
         compareRendering("SimpleVoteViewPanel", "MidDeclaration-3", panel)
@@ -1155,7 +1189,7 @@ class SimpleVoteViewPanelTest {
                 ndp to 124,
                 pc to 1373,
                 lib to 785,
-                grn to null,
+                grn to null
             )
         )
         compareRendering("SimpleVoteViewPanel", "MidDeclaration-4", panel)
@@ -1164,7 +1198,7 @@ class SimpleVoteViewPanelTest {
                 ndp to 124,
                 pc to 1373,
                 lib to 785,
-                grn to 675,
+                grn to 675
             )
         )
         leader.submit(pc.party)
@@ -1228,7 +1262,7 @@ class SimpleVoteViewPanelTest {
                 wp to 1261,
                 indU to 4918,
                 indN to 1639,
-                indO to 7850,
+                indO to 7850
             )
         )
         previousVotes.submit(
@@ -1249,7 +1283,7 @@ class SimpleVoteViewPanelTest {
                 wp to 1565,
                 indU to 351 + 3270,
                 indN to 0,
-                indO to 224 + 124 + 32 + 19380,
+                indO to 224 + 124 + 32 + 19380
             )
         )
         compareRendering("SimpleVoteViewPanel", "PartyClassifications-2", panel)
@@ -1532,7 +1566,7 @@ class SimpleVoteViewPanelTest {
                 ndp.party to 585,
                 pc.party to 785,
                 lib.party to 1060,
-                grn.party to 106,
+                grn.party to 106
             )
         )
         val pctReporting = Publisher(0.0)
@@ -1550,7 +1584,9 @@ class SimpleVoteViewPanelTest {
         val focus = Publisher(shapesByDistrict.keys.filter { it <= 7 })
         val selectedDistrict = Publisher(3)
         val panel = candidateVotes(
-            currentVotes, voteHeader, voteSubhead
+            currentVotes,
+            voteHeader,
+            voteSubhead
         )
             .withPrev(previousVotes, changeHeader)
             .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader)
@@ -1567,7 +1603,7 @@ class SimpleVoteViewPanelTest {
                 ndp to 5,
                 pc to 47,
                 lib to 58,
-                grn to 52,
+                grn to 52
             )
         )
         progressLabel.submit("1/9")
@@ -1581,7 +1617,7 @@ class SimpleVoteViewPanelTest {
                 ndp to 8,
                 pc to 91,
                 lib to 100,
-                grn to 106,
+                grn to 106
             )
         )
         progressLabel.submit("2/9")
@@ -1595,7 +1631,7 @@ class SimpleVoteViewPanelTest {
                 ndp to 18,
                 pc to 287,
                 lib to 197,
-                grn to 243,
+                grn to 243
             )
         )
         progressLabel.submit("5/9")
@@ -1609,7 +1645,7 @@ class SimpleVoteViewPanelTest {
                 ndp to 124,
                 pc to 1373,
                 lib to 785,
-                grn to 675,
+                grn to 675
             )
         )
         progressLabel.submit("9/9")

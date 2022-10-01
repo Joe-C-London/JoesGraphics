@@ -42,7 +42,8 @@ object ImageGenerator {
         shape.subtract(
             Area(
                 Polygon(
-                    intArrayOf(15, 25, 50, 75, 85, 60, 85, 75, 50, 25, 15, 40), intArrayOf(25, 15, 40, 15, 25, 50, 75, 85, 60, 85, 75, 50),
+                    intArrayOf(15, 25, 50, 75, 85, 60, 85, 75, 50, 25, 15, 40),
+                    intArrayOf(25, 15, 40, 15, 25, 50, 75, 85, 60, 85, 75, 50),
                     12
                 )
             )
@@ -55,7 +56,8 @@ object ImageGenerator {
         shape.subtract(
             Area(
                 Polygon(
-                    intArrayOf(10, 10, 50, 50, 90, 50, 50), intArrayOf(30, 70, 70, 90, 50, 10, 30),
+                    intArrayOf(10, 10, 50, 50, 90, 50, 50),
+                    intArrayOf(30, 70, 70, 90, 50, 10, 30),
                     7
                 )
             )

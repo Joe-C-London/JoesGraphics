@@ -79,7 +79,7 @@ class BattlefieldScreen private constructor(header: Flow.Publisher<out String?>,
                         BattlefieldFrame.Dot(
                             -(pctByParty[parties.left] ?: 0.0),
                             -(pctByParty[parties.right] ?: 0.0),
-                            -(pctByParty[parties.bottom] ?: 0.0),
+                            -(pctByParty[parties.bottom] ?: 0.0)
                         ) to (curr[key].color)
                     }
                 }
@@ -103,8 +103,11 @@ class BattlefieldScreen private constructor(header: Flow.Publisher<out String?>,
                 dotsPublisher = dotsPublisher,
                 linesPublisher = linesPublisher,
                 swingPublisher = partySwingsPublisher.merge(allParties) { swings, parties ->
-                    if (swings == null) null
-                    else BattlefieldFrame.Dot(swings[parties.left] ?: 0, swings[parties.right] ?: 0, swings[parties.bottom] ?: 0)
+                    if (swings == null) {
+                        null
+                    } else {
+                        BattlefieldFrame.Dot(swings[parties.left] ?: 0, swings[parties.right] ?: 0, swings[parties.bottom] ?: 0)
+                    }
                 }
             )
         }

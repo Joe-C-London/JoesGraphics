@@ -217,7 +217,8 @@ class HemicycleFrame(
                 .setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
             g
                 .setRenderingHint(
-                    RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON
+                    RenderingHints.KEY_TEXT_ANTIALIASING,
+                    RenderingHints.VALUE_TEXT_ANTIALIAS_ON
                 )
             g.setColor(Color.BLACK)
             g.drawLine(width / 2, 0, width / 2, height)
@@ -347,7 +348,11 @@ class HemicycleFrame(
             val leftClip: Shape = Polygon(
                 intArrayOf(leftBase, leftBase, leftSize, leftTip, leftSize),
                 intArrayOf(
-                    changeBarTop, changeBarBottom, changeBarBottom, changeBarMid, changeBarTop
+                    changeBarTop,
+                    changeBarBottom,
+                    changeBarBottom,
+                    changeBarMid,
+                    changeBarTop
                 ),
                 5
             )
@@ -365,7 +370,7 @@ class HemicycleFrame(
                     Point(startSide, changeBarBottom),
                     Point(endSide, changeBarBottom),
                     Point(end, changeBarMid),
-                    Point(endSide, changeBarTop),
+                    Point(endSide, changeBarTop)
                 )
                 g.fillPolygon(
                     points.map { it.getX().toInt() }.toIntArray(),
@@ -379,7 +384,11 @@ class HemicycleFrame(
             val rightClip: Shape = Polygon(
                 intArrayOf(rightBase, rightBase, rightSize, rightTip, rightSize),
                 intArrayOf(
-                    changeBarTop, changeBarBottom, changeBarBottom, changeBarMid, changeBarTop
+                    changeBarTop,
+                    changeBarBottom,
+                    changeBarBottom,
+                    changeBarMid,
+                    changeBarTop
                 ),
                 5
             )
@@ -444,7 +453,8 @@ class HemicycleFrame(
                 .setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
             g
                 .setRenderingHint(
-                    RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON
+                    RenderingHints.KEY_TEXT_ANTIALIASING,
+                    RenderingHints.VALUE_TEXT_ANTIALIAS_ON
                 )
             var dFrac = 1.0 / (rows.size - 0.5)
             for (rowsFromInner in rows.indices) {
@@ -529,108 +539,120 @@ class HemicycleFrame(
             barsPanel.leftSeatBars = b
             barsPanel.repaint()
         }
-        if (leftSeatBarPublisher != null)
+        if (leftSeatBarPublisher != null) {
             leftSeatBarPublisher.subscribe(Subscriber(eventQueueWrapper(onLeftSeatBarUpdate)))
-        else
+        } else {
             onLeftSeatBarUpdate(emptyList())
+        }
 
         val onLeftSeatBarLabelUpdate: (String) -> Unit = { label ->
             barsPanel.leftSeatBarLabel = label
             barsPanel.repaint()
         }
-        if (leftSeatBarLabelPublisher != null)
+        if (leftSeatBarLabelPublisher != null) {
             leftSeatBarLabelPublisher.subscribe(Subscriber(eventQueueWrapper(onLeftSeatBarLabelUpdate)))
-        else
+        } else {
             onLeftSeatBarLabelUpdate("")
+        }
 
         val onRightSeatBarUpdate: (List<Bar>) -> Unit = { b ->
             barsPanel.rightSeatBars = b
             barsPanel.repaint()
         }
-        if (rightSeatBarPublisher != null)
+        if (rightSeatBarPublisher != null) {
             rightSeatBarPublisher.subscribe(Subscriber(eventQueueWrapper(onRightSeatBarUpdate)))
-        else
+        } else {
             onRightSeatBarUpdate(emptyList())
+        }
 
         val onRightSeatBarLabelUpdate: (String) -> Unit = { label ->
             barsPanel.rightSeatBarLabel = label
             barsPanel.repaint()
         }
-        if (rightSeatBarLabelPublisher != null)
+        if (rightSeatBarLabelPublisher != null) {
             rightSeatBarLabelPublisher.subscribe(Subscriber(eventQueueWrapper(onRightSeatBarLabelUpdate)))
-        else
+        } else {
             onRightSeatBarLabelUpdate("")
+        }
 
         val onMiddleSeatBarUpdate: (List<Bar>) -> Unit = { b ->
             barsPanel.middleSeatBars = b
             barsPanel.repaint()
         }
-        if (middleSeatBarPublisher != null)
+        if (middleSeatBarPublisher != null) {
             middleSeatBarPublisher.subscribe(Subscriber(eventQueueWrapper(onMiddleSeatBarUpdate)))
-        else
+        } else {
             onMiddleSeatBarUpdate(emptyList())
+        }
 
         val onMiddleSeatBarLabelUpdate: (String) -> Unit = { label ->
             barsPanel.middleSeatBarLabel = label
             barsPanel.repaint()
         }
-        if (middleSeatBarLabelPublisher != null)
+        if (middleSeatBarLabelPublisher != null) {
             middleSeatBarLabelPublisher.subscribe(Subscriber(eventQueueWrapper(onMiddleSeatBarLabelUpdate)))
-        else
+        } else {
             onMiddleSeatBarLabelUpdate("")
+        }
 
         val onLeftChangeBarUpdate: (List<Bar>) -> Unit = { b ->
             barsPanel.leftChangeBars = b
             barsPanel.repaint()
         }
-        if (leftChangeBarPublisher != null)
+        if (leftChangeBarPublisher != null) {
             leftChangeBarPublisher.subscribe(Subscriber(eventQueueWrapper(onLeftChangeBarUpdate)))
-        else
+        } else {
             onLeftChangeBarUpdate(emptyList())
+        }
 
         val onLeftChangeBarStartUpdate: (Int) -> Unit = { start ->
             barsPanel.leftChangeBarStart = start
             barsPanel.repaint()
         }
-        if (leftChangeBarStartPublisher != null)
+        if (leftChangeBarStartPublisher != null) {
             leftChangeBarStartPublisher.subscribe(Subscriber(eventQueueWrapper(onLeftChangeBarStartUpdate)))
-        else
+        } else {
             onLeftChangeBarStartUpdate(0)
+        }
 
         val onLeftChangeBarLabelUpdate: (String) -> Unit = { label ->
             barsPanel.leftChangeBarLabel = label
             barsPanel.repaint()
         }
-        if (leftChangeBarLabelPublisher != null)
+        if (leftChangeBarLabelPublisher != null) {
             leftChangeBarLabelPublisher.subscribe(Subscriber(eventQueueWrapper(onLeftChangeBarLabelUpdate)))
-        else
+        } else {
             onLeftChangeBarLabelUpdate("")
+        }
 
         val onRightChangeBarUpdate: (List<Bar>) -> Unit = { b ->
             barsPanel.rightChangeBars = b
             barsPanel.repaint()
         }
-        if (rightChangeBarPublisher != null)
+        if (rightChangeBarPublisher != null) {
             rightChangeBarPublisher.subscribe(Subscriber(eventQueueWrapper(onRightChangeBarUpdate)))
-        else
+        } else {
             onRightChangeBarUpdate(emptyList())
+        }
 
         val onRightChangeBarStartUpdate: (Int) -> Unit = { start ->
             barsPanel.rightChangeBarStart = start
             barsPanel.repaint()
         }
-        if (rightChangeBarStartPublisher != null)
+        if (rightChangeBarStartPublisher != null) {
             rightChangeBarStartPublisher.subscribe(Subscriber(eventQueueWrapper(onRightChangeBarStartUpdate)))
-        else
+        } else {
             onRightChangeBarStartUpdate(0)
+        }
 
         val onRightChangeBarLabelUpdate: (String) -> Unit = { label ->
             barsPanel.rightChangeBarLabel = label
             barsPanel.repaint()
         }
-        if (rightChangeBarLabelPublisher != null)
+        if (rightChangeBarLabelPublisher != null) {
             rightChangeBarLabelPublisher.subscribe(Subscriber(eventQueueWrapper(onRightChangeBarLabelUpdate)))
-        else
+        } else {
             onRightChangeBarLabelUpdate("")
+        }
     }
 }

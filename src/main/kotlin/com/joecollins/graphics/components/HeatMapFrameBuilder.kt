@@ -188,11 +188,15 @@ class HeatMapFrameBuilder {
                 labelFunc
             )
                 .withSeatBars(
-                    seatList, { it.first }, { it.second },
+                    seatList,
+                    { it.first },
+                    { it.second },
                     seats.map { seatLabel(it.first, it.second) }
                 )
                 .withChangeBars(
-                    changeList, { it.first }, { it.second },
+                    changeList,
+                    { it.first },
+                    { it.second },
                     calcPrevForParty(allPrevs, party).asOneTimePublisher(),
                     change.map(changeLabelFunc)
                 )

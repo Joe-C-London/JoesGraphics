@@ -160,7 +160,8 @@ class HeatMapFrame(
             (g as Graphics2D)
                 .setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
             g.setRenderingHint(
-                RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON
+                RenderingHints.KEY_TEXT_ANTIALIASING,
+                RenderingHints.VALUE_TEXT_ANTIALIAS_ON
             )
             g.setColor(Color.BLACK)
             g.drawLine(width / 2, 0, width / 2, height)
@@ -321,7 +322,8 @@ class HeatMapFrame(
                 .setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
             g
                 .setRenderingHint(
-                    RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON
+                    RenderingHints.KEY_TEXT_ANTIALIASING,
+                    RenderingHints.VALUE_TEXT_ANTIALIAS_ON
                 )
             g.setColor(Color.BLACK)
             g.drawLine(width / 2, 0, width / 2, height)
@@ -406,33 +408,38 @@ class HeatMapFrame(
         squaresPublisher.subscribe(Subscriber(eventQueueWrapper(onSquaresUpdate)))
 
         val onSeatBarsUpdate: (List<Bar>) -> Unit = { bars -> barsPanel.seatBars = bars }
-        if (seatBarsPublisher != null)
+        if (seatBarsPublisher != null) {
             seatBarsPublisher.subscribe(Subscriber(eventQueueWrapper(onSeatBarsUpdate)))
-        else
+        } else {
             onSeatBarsUpdate(emptyList())
+        }
 
         val onSeatBarLabelUpdate: (String) -> Unit = { label -> barsPanel.seatBarLabel = label }
-        if (seatBarLabelPublisher != null)
+        if (seatBarLabelPublisher != null) {
             seatBarLabelPublisher.subscribe(Subscriber(eventQueueWrapper(onSeatBarLabelUpdate)))
-        else
+        } else {
             onSeatBarLabelUpdate("")
+        }
 
         val onChangeBarsUpdate: (List<Bar>) -> Unit = { bars -> barsPanel.changeBars = bars }
-        if (changeBarsPublisher != null)
+        if (changeBarsPublisher != null) {
             changeBarsPublisher.subscribe(Subscriber(eventQueueWrapper(onChangeBarsUpdate)))
-        else
+        } else {
             onChangeBarsUpdate(emptyList())
+        }
 
         val onChangeBarLabelUpdate: (String) -> Unit = { label -> barsPanel.changeBarLabel = label }
-        if (changeBarLabelPublisher != null)
+        if (changeBarLabelPublisher != null) {
             changeBarLabelPublisher.subscribe(Subscriber(eventQueueWrapper(onChangeBarLabelUpdate)))
-        else
+        } else {
             onChangeBarLabelUpdate("")
+        }
 
         val onChangeBarStartUpdate: (Int) -> Unit = { start -> barsPanel.changeBarStart = start }
-        if (changeBarStartPublisher != null)
+        if (changeBarStartPublisher != null) {
             changeBarStartPublisher.subscribe(Subscriber(eventQueueWrapper(onChangeBarStartUpdate)))
-        else
+        } else {
             onChangeBarStartUpdate(0)
+        }
     }
 }

@@ -32,7 +32,7 @@ class LowerThirdHeadlineAndBottomSummaryTest {
                 BottomSummary.Entry(Color.CYAN.darker(), "BQ", "0"),
                 BottomSummary.Entry(Color.GREEN.darker(), "GRN", "0"),
                 BottomSummary.Entry(Color.ORANGE, "NDP", "0"),
-                BottomSummary.Entry(Color.WHITE, "?", "335"),
+                BottomSummary.Entry(Color.WHITE, "?", "335")
             )
                 .asOneTimePublisher()
         )
@@ -56,7 +56,7 @@ class LowerThirdHeadlineAndBottomSummaryTest {
                 BottomSummary.Entry(Color.CYAN.darker(), "BQ", "0"),
                 BottomSummary.Entry(Color.GREEN.darker(), "GRN", "0"),
                 BottomSummary.Entry(Color.ORANGE, "NDP", "0"),
-                BottomSummary.Entry(Color.WHITE, "?", "335"),
+                BottomSummary.Entry(Color.WHITE, "?", "335")
             )
                 .asOneTimePublisher()
         )
@@ -80,7 +80,7 @@ class LowerThirdHeadlineAndBottomSummaryTest {
                 BottomSummary.Entry(Color.CYAN.darker(), "BQ", "0"),
                 BottomSummary.Entry(Color.GREEN.darker(), "GRN", "0"),
                 BottomSummary.Entry(Color.ORANGE, "NDP", "0"),
-                BottomSummary.Entry(Color.WHITE, "?", "335"),
+                BottomSummary.Entry(Color.WHITE, "?", "335")
             )
                 .asOneTimePublisher()
         )
@@ -121,7 +121,7 @@ class LowerThirdHeadlineAndBottomSummaryTest {
                 BottomSummary.Entry(Color.CYAN.darker(), "BQ", "0"),
                 BottomSummary.Entry(Color.GREEN.darker(), "GRN", "0"),
                 BottomSummary.Entry(Color.ORANGE, "NDP", "0"),
-                BottomSummary.Entry(Color.WHITE, "?", "335"),
+                BottomSummary.Entry(Color.WHITE, "?", "335")
             )
                 .asOneTimePublisher(),
             clock = Clock.fixed(Instant.parse("2019-10-22T01:30:00Z"), ZoneId.systemDefault())
@@ -154,7 +154,7 @@ class LowerThirdHeadlineAndBottomSummaryTest {
             createSeatEntries(
                 mapOf(
                     lib to 2,
-                    con to 1,
+                    con to 1
                 ),
                 338,
                 setOf(bq, con, grn, lib, ndp)

@@ -19,7 +19,7 @@ class LowerThirdTest {
         val image = createImage("BREAKING NEWS", Color.WHITE, Color.RED)
         val lowerThird = LowerThird(
             leftImagePublisher = image.asOneTimePublisher(),
-            placePublisher = ("OTTAWA" to ZoneId.of("Canada/Eastern")).asOneTimePublisher(),
+            placePublisher = ("OTTAWA" to ZoneId.of("Canada/Eastern")).asOneTimePublisher()
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ lowerThird.leftImage }, IsEqual(image))

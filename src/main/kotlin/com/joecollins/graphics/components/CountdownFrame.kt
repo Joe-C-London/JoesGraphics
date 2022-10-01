@@ -69,19 +69,21 @@ class CountdownFrame(
             additionalInfoLabel.text = it ?: ""
             additionalInfoLabel.isVisible = it != null
         }
-        if (additionalInfoPublisher != null)
+        if (additionalInfoPublisher != null) {
             additionalInfoPublisher.subscribe(Subscriber(eventQueueWrapper(onAdditionalInfoUpdate)))
-        else
+        } else {
             onAdditionalInfoUpdate(null)
+        }
 
         val onCountdownColorBinding: (Color) -> Unit = {
             timeRemainingLabel.foreground = it
             additionalInfoLabel.foreground = it
         }
-        if (countdownColorPublisher != null)
+        if (countdownColorPublisher != null) {
             countdownColorPublisher.subscribe(Subscriber(eventQueueWrapper(onCountdownColorBinding)))
-        else
+        } else {
             onCountdownColorBinding(Color.BLACK)
+        }
 
         val executor = Executors.newScheduledThreadPool(1) { r: Runnable ->
             val t = Executors.defaultThreadFactory().newThread(r)
@@ -89,7 +91,10 @@ class CountdownFrame(
             t
         }
         executor.scheduleAtFixedRate(
-            { this.refresh() }, 0, 100, TimeUnit.MILLISECONDS
+            { this.refresh() },
+            0,
+            100,
+            TimeUnit.MILLISECONDS
         )
     }
 
@@ -129,7 +134,10 @@ class CountdownFrame(
 
         fun formatHHMMSS(duration: Duration): String {
             return String.format(
-                "%d:%02d:%02d", duration.toHours(), duration.toMinutesPart(), duration.toSecondsPart()
+                "%d:%02d:%02d",
+                duration.toHours(),
+                duration.toMinutesPart(),
+                duration.toSecondsPart()
             )
         }
 

@@ -219,12 +219,15 @@ open class LowerThird internal constructor(
                 g.dispose()
             }
             val img = BufferedImage(
-                max(200, bounds.width.toInt() + 10), 50, BufferedImage.TYPE_4BYTE_ABGR
+                max(200, bounds.width.toInt() + 10),
+                50,
+                BufferedImage.TYPE_4BYTE_ABGR
             )
             val g = img.graphics
             (g as Graphics2D)
                 .setRenderingHint(
-                    RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON
+                    RenderingHints.KEY_TEXT_ANTIALIASING,
+                    RenderingHints.VALUE_TEXT_ANTIALIAS_ON
                 )
             g.setColor(background)
             g.fillRect(0, 0, img.width, 50)

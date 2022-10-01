@@ -87,7 +87,8 @@ class GenericWindow<T : JPanel> @JvmOverloads constructor(private val panel: T, 
                     override fun keyReleased(e: KeyEvent) {
                         charLabel.text = textArea.text.length.toString()
                     }
-                })
+                }
+            )
             val tweetButton = JButton("Tweet")
             tweetButton.background = twitterColor
             tweetButton.foreground = Color.WHITE
@@ -148,7 +149,10 @@ class GenericWindow<T : JPanel> @JvmOverloads constructor(private val panel: T, 
                 } catch (e: IOException) {
                     e.printStackTrace()
                     JOptionPane.showMessageDialog(
-                        panel, e.message, "Cannot save image", JOptionPane.ERROR_MESSAGE
+                        panel,
+                        e.message,
+                        "Cannot save image",
+                        JOptionPane.ERROR_MESSAGE
                     )
                 }
             }

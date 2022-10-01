@@ -88,7 +88,9 @@ class SwingFrameBuilderTest {
         // NDP: 20.00 -> 27.75 (+ 7.75)
         val partyOrder = listOf(ndp, lib, con)
         val swingFrame = prevCurr(
-            prevBinding, currBinding, compareBy { partyOrder.indexOf(it) }
+            prevBinding,
+            currBinding,
+            compareBy { partyOrder.indexOf(it) }
         )
             .build()
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
@@ -133,7 +135,9 @@ class SwingFrameBuilderTest {
         // NDP: 20.00 -> 10.00 (-10.00)
         val partyOrder: List<Party> = listOf()
         val swingFrame = prevCurr(
-            prevBinding, currBinding, compareBy { partyOrder.indexOf(it) }
+            prevBinding,
+            currBinding,
+            compareBy { partyOrder.indexOf(it) }
         )
             .build()
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)

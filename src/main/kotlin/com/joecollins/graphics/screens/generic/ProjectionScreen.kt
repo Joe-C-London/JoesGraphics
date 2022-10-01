@@ -23,7 +23,10 @@ class ProjectionScreen private constructor(
             image: Flow.Publisher<out Image?>
         ): ProjectionScreen {
             return ProjectionScreen(
-                text, color, image, ProjectionFrame.Alignment.BOTTOM.asOneTimePublisher()
+                text,
+                color,
+                image,
+                ProjectionFrame.Alignment.BOTTOM.asOneTimePublisher()
             )
         }
 

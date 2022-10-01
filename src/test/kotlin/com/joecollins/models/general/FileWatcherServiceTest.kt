@@ -15,6 +15,7 @@ import java.util.HashMap
 @Suppress("BlockingMethodInNonBlockingContext")
 class FileWatcherServiceTest {
     private var tempPath: Path? = null
+
     @Before
     fun setup() {
         tempPath = Files.createTempDirectory("fws-test")

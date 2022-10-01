@@ -182,10 +182,11 @@ class MultiResultScreenTest {
                 { it.districtNum },
                 {
                     it.leader.map { e ->
-                        if (e == null)
+                        if (e == null) {
                             null
-                        else
+                        } else {
                             PartyResult(e.first.party, e.second)
+                        }
                     }
                 },
                 { if (it.districtNum < 10) listOf(1, 2, 3, 4, 5, 6, 7, 8) else listOf(15, 16, 17, 18, 19, 20) },
@@ -364,10 +365,11 @@ class MultiResultScreenTest {
                 { it.districtNum },
                 {
                     it.leader.map { e ->
-                        if (e == null)
+                        if (e == null) {
                             null
-                        else
+                        } else {
                             PartyResult(e.first.party, e.second)
+                        }
                     }
                 },
                 { if (it.districtNum < 10) listOf(1, 2, 3, 4, 5, 6, 7, 8) else listOf(15, 16, 17, 18, 19, 20) },
@@ -536,10 +538,11 @@ class MultiResultScreenTest {
             .withIncumbentMarker("(MLA)")
             .withWinner { d ->
                 (
-                    if (d.leaderHasWon)
+                    if (d.leaderHasWon) {
                         d.votes.entries.maxByOrNull { it.value }!!.key
-                    else
+                    } else {
                         null
+                    }
                     ).asOneTimePublisher()
             }
             .withPrev(
@@ -780,10 +783,11 @@ class MultiResultScreenTest {
             .withIncumbentMarker("(MLA)")
             .withWinner { d ->
                 (
-                    if (d.leaderHasWon)
+                    if (d.leaderHasWon) {
                         d.votes.entries.maxByOrNull { it.value }!!.key
-                    else
+                    } else {
                         null
+                    }
                     ).asOneTimePublisher()
             }
             .withPrev(
@@ -940,10 +944,11 @@ class MultiResultScreenTest {
             .withProgressLabel { "100% IN".asOneTimePublisher() }
             .withWinner { d ->
                 (
-                    if (d.leaderHasWon)
+                    if (d.leaderHasWon) {
                         d.votes.entries.maxByOrNull { it.value }!!.key
-                    else
+                    } else {
                         null
+                    }
                     ).asOneTimePublisher()
             }
             .withPrev(
@@ -1114,10 +1119,11 @@ class MultiResultScreenTest {
             .withIncumbentMarker("(MLA)")
             .withWinner { d ->
                 (
-                    if (d.leaderHasWon)
+                    if (d.leaderHasWon) {
                         d.votes.entries.maxByOrNull { it.value }!!.key
-                    else
+                    } else {
                         null
+                    }
                     ).asOneTimePublisher()
             }
             .withPrev(
@@ -1337,25 +1343,26 @@ class MultiResultScreenTest {
 
         val runoff = Publisher(calculateRunoff())
         private fun calculateRunoff() =
-            if (!topTwoToRunoff)
+            if (!topTwoToRunoff) {
                 null
-            else
+            } else {
                 votes.entries.asSequence().sortedByDescending { it.value }
                     .take(2)
                     .map { it.key }
                     .toSet()
+            }
 
         val leader = Publisher(calculateLeader())
-        private fun calculateLeader() = if (votes.values.all { it == 0 })
+        private fun calculateLeader() = if (votes.values.all { it == 0 }) {
             null
-        else
+        } else {
             Pair(
                 votes.entries.asSequence()
                     .filter { it.value > 0 }
-                    .maxByOrNull { it.value }
-                !!.key,
+                    .maxByOrNull { it.value }!!.key,
                 leaderHasWon
             )
+        }
 
         fun update(status: String, pctReporting: Double, votes: Map<Candidate, Int>) {
             this.status = status

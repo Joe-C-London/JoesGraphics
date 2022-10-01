@@ -122,7 +122,8 @@ class MultiSummaryFrame(
                         headerLabel.border = border
                         labels.forEach { label -> label.border = border }
                     }
-                })
+                }
+            )
         }
     }
 

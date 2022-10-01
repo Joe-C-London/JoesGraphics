@@ -45,10 +45,11 @@ class ResultListingFrame(
         numRowsPublisher.subscribe(Subscriber(eventQueueWrapper(onNumRowsUpdate)))
 
         val onReversedUpdate: (Boolean) -> Unit = { layout.reversed = it }
-        if (reversedPublisher != null)
+        if (reversedPublisher != null) {
             reversedPublisher.subscribe(Subscriber(eventQueueWrapper(onReversedUpdate)))
-        else
+        } else {
             onReversedUpdate(false)
+        }
 
         val onItemsUpdate: (List<Item>) -> Unit = { i ->
             while (i.size > items.size) {
@@ -122,7 +123,8 @@ class ResultListingFrame(
             super.paintComponent(g)
             (g as Graphics2D)
                 .setRenderingHint(
-                    RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON
+                    RenderingHints.KEY_TEXT_ANTIALIASING,
+                    RenderingHints.VALUE_TEXT_ANTIALIAS_ON
                 )
             g.setColor(borderColor)
             g.fillRect(0, 0, width, height)

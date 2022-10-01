@@ -33,7 +33,7 @@ class ResultListingFrameTest {
             Item("RUSTICO-EMERALD", Color.WHITE, Color.BLACK, Color.BLUE),
             Item("BORDEN-KINKORA", Color.WHITE, Color.BLACK, Color.BLUE),
             Item("STRATFORD-KINLOCK", Color.WHITE, Color.BLACK, Color.BLUE),
-            Item("KENSINGTON-MALPEQUE", Color.WHITE, Color.BLACK, Color.BLUE),
+            Item("KENSINGTON-MALPEQUE", Color.WHITE, Color.BLACK, Color.BLUE)
         )
         val items: Publisher<List<Item>> = Publisher(rawItems)
         val frame = ResultListingFrame(
@@ -77,7 +77,7 @@ class ResultListingFrameTest {
             Item("O'Leary-Inverness", Color.WHITE, Color.BLACK, Color.RED), // 9.2
             Item("Montague-Kilmuir", Color.WHITE, Color.BLACK, Color.RED), // 10.8
             Item("Charlottetown-Victoria Park", Color.WHITE, Color.BLACK, Color.RED), // 11.9
-            Item("Cornwall-Meadowbank", Color.WHITE, Color.BLACK, Color.RED), // 12.5
+            Item("Cornwall-Meadowbank", Color.WHITE, Color.BLACK, Color.RED) // 12.5
         )
         val items: Publisher<List<Item>> = Publisher(rawItems)
         val frame = ResultListingFrame(

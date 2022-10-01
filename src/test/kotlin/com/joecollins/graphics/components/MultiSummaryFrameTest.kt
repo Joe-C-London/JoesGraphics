@@ -391,7 +391,8 @@ class MultiSummaryFrameTest {
                 ),
                 MultiSummaryFrame.Row("ACT", listOf(Pair(Color.RED, "ALP"), Pair(Color.BLUE, "LIB"))),
                 MultiSummaryFrame.Row(
-                    "NORTHERN TERRITORY", listOf(Pair(Color.RED, "ALP"), Pair(Color.ORANGE, "CLP"))
+                    "NORTHERN TERRITORY",
+                    listOf(Pair(Color.RED, "ALP"), Pair(Color.ORANGE, "CLP"))
                 )
             ).asOneTimePublisher()
         )

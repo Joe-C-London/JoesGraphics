@@ -133,16 +133,19 @@ class MultiResultScreen private constructor(header: Flow.Publisher<out String?>,
                             }
                             focus == null || focus.isEmpty() || focus.contains(it.key) -> {
                                 Pair(
-                                    it.value, Color.LIGHT_GRAY.asOneTimePublisher()
+                                    it.value,
+                                    Color.LIGHT_GRAY.asOneTimePublisher()
                                 )
                             }
                             additionalHighlight != null && additionalHighlight.contains(it.key) -> {
                                 Pair(
-                                    it.value, Color.LIGHT_GRAY.asOneTimePublisher()
+                                    it.value,
+                                    Color.LIGHT_GRAY.asOneTimePublisher()
                                 )
                             }
                             else -> Pair(
-                                it.value, Color(220, 220, 220).asOneTimePublisher()
+                                it.value,
+                                Color(220, 220, 220).asOneTimePublisher()
                             )
                         }
                     }

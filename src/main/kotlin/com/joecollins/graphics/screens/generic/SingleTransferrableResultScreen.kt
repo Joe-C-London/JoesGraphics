@@ -214,8 +214,11 @@ class SingleTransferrableResultScreen private constructor(
         }
 
         private fun formatString(value: Number): String {
-            return if (value is Int || value is Long) DecimalFormat("#,##0").format(value)
-            else DecimalFormat("#,##0.00").format(value)
+            return if (value is Int || value is Long) {
+                DecimalFormat("#,##0").format(value)
+            } else {
+                DecimalFormat("#,##0.00").format(value)
+            }
         }
     }
 }

@@ -22,7 +22,7 @@ class PreferenceVoteViewPanelTest {
                 alp to 1756,
                 clp to 1488,
                 ta to 497,
-                ind to 434,
+                ind to 434
             )
         )
         val previousPrimaryVotes = Publisher(
@@ -30,19 +30,19 @@ class PreferenceVoteViewPanelTest {
                 alp.party to 1802,
                 clp.party to 1439,
                 ta.party to 356,
-                ind.party to 384,
+                ind.party to 384
             )
         )
         val current2CPVotes = Publisher(
             mapOf(
                 alp to 2197,
-                clp to 1978,
+                clp to 1978
             )
         )
         val previous2PPVotes = Publisher(
             mapOf(
                 alp.party to 2171,
-                clp.party to 1588,
+                clp.party to 1588
             )
         )
         val header = Publisher("FONG LIM")
@@ -55,7 +55,9 @@ class PreferenceVoteViewPanelTest {
         val leader = Publisher(alp)
         val swingPartyOrder = listOf(alp.party, ta.party, clp.party)
         val panel = candidateVotes(
-            currentPrimaryVotes, voteHeader, voteSubhead
+            currentPrimaryVotes,
+            voteHeader,
+            voteSubhead
         )
             .withPrev(previousPrimaryVotes, changeHeader)
             .withPreferences(current2CPVotes, preferenceHeader, preferenceSubhead)
@@ -79,14 +81,14 @@ class PreferenceVoteViewPanelTest {
                 alp.party to 1802,
                 clp.party to 1439,
                 ta.party to 356,
-                ind.party to 384,
+                ind.party to 384
             )
         )
         val current2CPVotes = Publisher(emptyMap<Candidate, Int>())
         val previous2PPVotes = Publisher(
             mapOf(
                 alp.party to 2171,
-                clp.party to 1588,
+                clp.party to 1588
             )
         )
         val pctReporting = Publisher(0.0)
@@ -101,7 +103,9 @@ class PreferenceVoteViewPanelTest {
         val leader = Publisher<Candidate?>(null)
         val swingPartyOrder = listOf(alp.party, ta.party, clp.party)
         val panel = candidateVotes(
-            currentPrimaryVotes, voteHeader, voteSubhead
+            currentPrimaryVotes,
+            voteHeader,
+            voteSubhead
         )
             .withPrev(previousPrimaryVotes, changeHeader)
             .withPctReporting(pctReporting)
@@ -118,7 +122,7 @@ class PreferenceVoteViewPanelTest {
                 alp to 13,
                 clp to 13,
                 ta to 6,
-                ind to 5,
+                ind to 5
             )
         )
         current2CPVotes.submit(sequenceOf(alp, clp).associateWith { 0 })
@@ -130,13 +134,13 @@ class PreferenceVoteViewPanelTest {
                 alp to 365,
                 clp to 262,
                 ta to 86,
-                ind to 83,
+                ind to 83
             )
         )
         current2CPVotes.submit(
             mapOf(
                 alp to 18,
-                clp to 19,
+                clp to 19
             )
         )
         pctReporting.submit(3.0 / 9)
@@ -149,13 +153,13 @@ class PreferenceVoteViewPanelTest {
                 alp to 1756,
                 clp to 1488,
                 ta to 497,
-                ind to 434,
+                ind to 434
             )
         )
         current2CPVotes.submit(
             mapOf(
                 alp to 464,
-                clp to 332,
+                clp to 332
             )
         )
         pctReporting.submit(9.0 / 9)
@@ -167,7 +171,7 @@ class PreferenceVoteViewPanelTest {
         current2CPVotes.submit(
             mapOf(
                 alp to 2197,
-                clp to 1978,
+                clp to 1978
             )
         )
         preferencePctReporting.submit(9.0 / 9)
@@ -187,14 +191,14 @@ class PreferenceVoteViewPanelTest {
                 alp.party to 1802,
                 clp.party to 1439,
                 ta.party to 356,
-                ind.party to 384,
+                ind.party to 384
             )
         )
         val current2CPVotes = Publisher(emptyMap<Candidate, Int>())
         val previous2PPVotes = Publisher(
             mapOf(
                 alp.party to 2171,
-                clp.party to 1588,
+                clp.party to 1588
             )
         )
         val pctReporting = Publisher(0.0)
@@ -211,7 +215,9 @@ class PreferenceVoteViewPanelTest {
         val leader = Publisher<Candidate?>(null)
         val swingPartyOrder = listOf(alp.party, ta.party, clp.party)
         val panel = candidateVotes(
-            currentPrimaryVotes, voteHeader, voteSubhead
+            currentPrimaryVotes,
+            voteHeader,
+            voteSubhead
         )
             .withPrev(previousPrimaryVotes, changeHeader)
             .withPctReporting(pctReporting)
@@ -230,7 +236,7 @@ class PreferenceVoteViewPanelTest {
                 alp to 13,
                 clp to 13,
                 ta to 6,
-                ind to 5,
+                ind to 5
             )
         )
         current2CPVotes.submit(setOf(alp, clp).associateWith { 0 })
@@ -242,13 +248,13 @@ class PreferenceVoteViewPanelTest {
                 alp to 365,
                 clp to 262,
                 ta to 86,
-                ind to 83,
+                ind to 83
             )
         )
         current2CPVotes.submit(
             mapOf(
                 alp to 18,
-                clp to 19,
+                clp to 19
             )
         )
         pctReporting.submit(3.0 / 9)
@@ -261,13 +267,13 @@ class PreferenceVoteViewPanelTest {
                 alp to 1756,
                 clp to 1488,
                 ta to 497,
-                ind to 434,
+                ind to 434
             )
         )
         current2CPVotes.submit(
             mapOf(
                 alp to 464,
-                clp to 332,
+                clp to 332
             )
         )
         pctReporting.submit(9.0 / 9)
@@ -279,7 +285,7 @@ class PreferenceVoteViewPanelTest {
         current2CPVotes.submit(
             mapOf(
                 alp to 2197,
-                clp to 1978,
+                clp to 1978
             )
         )
         preferencePctReporting.submit(9.0 / 9)
@@ -369,7 +375,7 @@ class PreferenceVoteViewPanelTest {
             mapOf(
                 alp to 2632,
                 clp to 968,
-                ta to 795,
+                ta to 795
             )
         )
         val previousPrimaryVotes = Publisher(
@@ -377,14 +383,14 @@ class PreferenceVoteViewPanelTest {
                 alp.party to 2323,
                 clp.party to 1573,
                 ta.party to 135,
-                ind to 331 + 81,
+                ind to 331 + 81
             )
         )
         val current2CPVotes = Publisher(mapOf(alp to 0))
         val previous2PPVotes = Publisher(
             mapOf(
                 alp.party to 2578,
-                clp.party to 1680,
+                clp.party to 1680
             )
         )
         val header = Publisher("SANDERSON")
@@ -397,7 +403,9 @@ class PreferenceVoteViewPanelTest {
         val leader = Publisher(alp)
         val swingPartyOrder = listOf(alp.party, ta.party, clp.party)
         val panel = candidateVotes(
-            currentPrimaryVotes, voteHeader, voteSubhead
+            currentPrimaryVotes,
+            voteHeader,
+            voteSubhead
         )
             .withPrev(previousPrimaryVotes, changeHeader)
             .withPreferences(current2CPVotes, preferenceHeader, preferenceSubhead)
@@ -421,7 +429,7 @@ class PreferenceVoteViewPanelTest {
                 alp to 1207,
                 clp to 487,
                 lawrence to 243,
-                gumbula to 987,
+                gumbula to 987
             )
         )
         val previousPrimaryVotes = Publisher(
@@ -434,7 +442,7 @@ class PreferenceVoteViewPanelTest {
         val current2CPVotes = Publisher(
             mapOf(
                 alp to 1508,
-                gumbula to 1416,
+                gumbula to 1416
             )
         )
         val previous2PPVotes = Publisher(emptyMap<Party, Int>())
@@ -448,7 +456,9 @@ class PreferenceVoteViewPanelTest {
         val leader = Publisher(alp)
         val swingPartyOrder = listOf(alp.party, clp.party)
         val panel = candidateVotes(
-            currentPrimaryVotes, voteHeader, voteSubhead
+            currentPrimaryVotes,
+            voteHeader,
+            voteSubhead
         )
             .withPrev(previousPrimaryVotes, changeHeader)
             .withPreferences(current2CPVotes, preferenceHeader, preferenceSubhead)
@@ -471,7 +481,7 @@ class PreferenceVoteViewPanelTest {
                 alp to 23130,
                 lib to 23878,
                 grn to 41377,
-                ind to 6194,
+                ind to 6194
             )
         )
         val previousPrimaryVotes = Publisher(
@@ -479,19 +489,19 @@ class PreferenceVoteViewPanelTest {
                 alp.party to 22490,
                 lib.party to 19301,
                 grn.party to 36035,
-                ind.party to 6725,
+                ind.party to 6725
             )
         )
         val current2CPVotes = Publisher(
             mapOf(
                 grn to 64771,
-                lib to 29808,
+                lib to 29808
             )
         )
         val previous2PPVotes = Publisher(
             mapOf(
                 grn.party to 46732,
-                alp.party to 37819,
+                alp.party to 37819
             )
         )
         val header = Publisher("MELBOURNE")
@@ -582,7 +592,7 @@ class PreferenceVoteViewPanelTest {
             lab to null,
             ld to null,
             ukip to null,
-            oth to null,
+            oth to null
         )
         val curr2CP = mutableMapOf<Candidate, Int?>(
             con to null,
@@ -596,14 +606,14 @@ class PreferenceVoteViewPanelTest {
                 ld.party to 91774,
                 grn.party to 98913,
                 ukip.party to 43274,
-                oth.party to 83914 + 28751,
+                oth.party to 83914 + 28751
             )
         )
         val current2CPVotes = Publisher(curr2CP)
         val previous2PPVotes = Publisher(
             mapOf(
                 lab.party to 992273,
-                con.party to 1054811,
+                con.party to 1054811
             )
         )
         val header = Publisher("MAYOR OF LONDON")
@@ -616,7 +626,9 @@ class PreferenceVoteViewPanelTest {
         val leader = Publisher<Candidate?>(null)
         val swingPartyOrder = listOf(lab.party, grn.party, ld.party, con.party)
         val panel = candidateVotes(
-            currentPrimaryVotes, voteHeader, voteSubhead
+            currentPrimaryVotes,
+            voteHeader,
+            voteSubhead
         )
             .withPrev(previousPrimaryVotes, changeHeader)
             .withPreferences(current2CPVotes, preferenceHeader, preferenceSubhead)

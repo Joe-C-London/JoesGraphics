@@ -28,11 +28,14 @@ class MultiSummaryFrameBuilderTest {
             Riding("Mount Lorne-Southern Lakes"), // 4
             Riding("Pelly-Nisutlin"), // 5
             Riding("Vuntut Gwitchin"), // 6
-            Riding("Watson Lake"), // 7
+            Riding("Watson Lake") // 7
         )
         val frame = tooClose(
-            ridings, { it.isTooClose }, { it.margin },
-            { it.name.uppercase().asOneTimePublisher() }, { it.boxes },
+            ridings,
+            { it.isTooClose },
+            { it.margin },
+            { it.name.uppercase().asOneTimePublisher() },
+            { it.boxes },
             2
         )
             .withHeader("TOO CLOSE TO CALL".asOneTimePublisher())
@@ -158,10 +161,11 @@ class MultiSummaryFrameBuilderTest {
         private fun updateMargin() = margin.submit(calculateMargin())
         private fun calculateMargin(): Int {
             val topTwoVotes = results.values.sortedDescending()
-            return if (topTwoVotes.isEmpty())
+            return if (topTwoVotes.isEmpty()) {
                 0
-            else
+            } else {
                 topTwoVotes[0] - topTwoVotes[1]
+            }
         }
 
         val boxes = Publisher(calculateBoxes())

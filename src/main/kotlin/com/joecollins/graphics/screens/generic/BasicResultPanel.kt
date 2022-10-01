@@ -93,8 +93,10 @@ class BasicResultPanel private constructor(
         override fun toMainBarHeader(key: Candidate, forceSingleLine: Boolean): String {
             return if (key === Candidate.OTHERS) {
                 key.party.name.uppercase()
-            } else ("${key.name}${if (key.isIncumbent()) incumbentMarker else ""}${if (forceSingleLine) (" (" + key.party.abbreviation + ")") else ("\n" + key.party.name)}")
-                .uppercase()
+            } else {
+                ("${key.name}${if (key.isIncumbent()) incumbentMarker else ""}${if (forceSingleLine) (" (" + key.party.abbreviation + ")") else ("\n" + key.party.name)}")
+                    .uppercase()
+            }
         }
 
         override fun winnerShape(forceSingleLine: Boolean): Shape {
@@ -218,7 +220,10 @@ class BasicResultPanel private constructor(
             headerPublisher: Flow.Publisher<out String?>
         ): SeatScreenBuilder<KT, KPT, CT, PT> {
             mapBuilder = MapBuilder(
-                shapes, winners.map { m -> partyMapToResultMap(m) }, focus, headerPublisher
+                shapes,
+                winners.map { m -> partyMapToResultMap(m) },
+                focus,
+                headerPublisher
             )
             return this
         }
@@ -268,7 +273,7 @@ class BasicResultPanel private constructor(
             return this
         }
 
-        fun build(textHeader: Flow.Publisher<out String>): BasicResultPanel {
+        fun build(textHeader: Flow.Publisher<out String?>): BasicResultPanel {
             return BasicResultPanel(
                 textHeader,
                 createFrame(),
@@ -350,10 +355,12 @@ class BasicResultPanel private constructor(
                     .map {
                         BasicBar(
                             keyTemplate.toMainBarHeader(
-                                it.key, numBars > doubleLineBarLimit()
+                                it.key,
+                                numBars > doubleLineBarLimit()
                             ),
                             keyTemplate.toParty(it.key).color,
-                            it.value, DecimalFormat("#,##0").format(it.value),
+                            it.value,
+                            DecimalFormat("#,##0").format(it.value),
                             if (it.key == winner) keyTemplate.winnerShape(numBars > doubleLineBarLimit()) else null
                         )
                     }
@@ -398,8 +405,11 @@ class BasicResultPanel private constructor(
             if (showMajority != null) {
                 val lines = showMajority.merge(total) {
                         show, tot ->
-                    if (show) listOf(tot / 2 + 1)
-                    else emptyList()
+                    if (show) {
+                        listOf(tot / 2 + 1)
+                    } else {
+                        emptyList()
+                    }
                 }
                 builder.withLines(lines) { t -> majorityFunction!!(t) }
             }
@@ -472,8 +482,11 @@ class BasicResultPanel private constructor(
                 if (total != null) {
                     builder = builder.withLimits(
                         total.merge(showPrevRaw) { totalSeats, showRaw ->
-                            if (showRaw) BarFrameBuilder.Limit(max = totalSeats * 2 / 3)
-                            else BarFrameBuilder.Limit(wingspan = (totalSeats / 20).coerceAtLeast(1))
+                            if (showRaw) {
+                                BarFrameBuilder.Limit(max = totalSeats * 2 / 3)
+                            } else {
+                                BarFrameBuilder.Limit(wingspan = (totalSeats / 20).coerceAtLeast(1))
+                            }
                         }
                     )
                 }
@@ -551,7 +564,8 @@ class BasicResultPanel private constructor(
                     .map {
                         DualBar(
                             keyTemplate.toMainBarHeader(
-                                it.key, count > doubleLineBarLimit()
+                                it.key,
+                                count > doubleLineBarLimit()
                             ),
                             keyTemplate.toParty(it.key).color,
                             if (focusLocation == FocusLocation.FIRST) it.value.first else (it.value.second - it.value.first),
@@ -598,8 +612,11 @@ class BasicResultPanel private constructor(
             total: Flow.Publisher<out Int>
         ): BarFrameBuilder {
             val lines = showMajority.merge(total) { show, tot ->
-                if (show) listOf(tot / 2 + 1)
-                else emptyList()
+                if (show) {
+                    listOf(tot / 2 + 1)
+                } else {
+                    emptyList()
+                }
             }
             return builder.withLines(lines) { t -> majorityFunction!!(t) }
         }
@@ -622,7 +639,11 @@ class BasicResultPanel private constructor(
                             if (focusLocation == FocusLocation.FIRST ||
                                 (it.value.diff.first != 0 && sign(it.value.diff.first.toDouble()) != sign(it.value.diff.second.toDouble())) ||
                                 abs(it.value.diff.first.toDouble()) > abs(it.value.diff.second.toDouble())
-                            ) it.value.diff.first else (it.value.diff.second - it.value.diff.first),
+                            ) {
+                                it.value.diff.first
+                            } else {
+                                (it.value.diff.second - it.value.diff.first)
+                            },
                             it.value.diff.second,
                             changeStr(it.value.diff.first) +
                                 "/" +
@@ -641,7 +662,11 @@ class BasicResultPanel private constructor(
                             if (focusLocation == FocusLocation.FIRST ||
                                 (it.value.first != 0 && sign(it.value.first.toDouble()) != sign(it.value.second.toDouble())) ||
                                 abs(it.value.first.toDouble()) > abs(it.value.second.toDouble())
-                            ) it.value.first else (it.value.second - it.value.first),
+                            ) {
+                                it.value.first
+                            } else {
+                                (it.value.second - it.value.first)
+                            },
                             it.value.second,
                             it.value.first.toString() +
                                 "/" +
@@ -653,10 +678,11 @@ class BasicResultPanel private constructor(
             val showPrevRaw = showPrevRaw ?: false.asOneTimePublisher()
             return changeHeader?.let { changeHeader ->
                 val bars = showPrevRaw.compose { showRaw -> if (showRaw) prevBars!! else diffBars!! }
-                var builder = if (focusLocation == FocusLocation.FIRST)
+                var builder = if (focusLocation == FocusLocation.FIRST) {
                     BarFrameBuilder.dual(bars)
-                else
+                } else {
                     BarFrameBuilder.dualReversed(bars)
+                }
                 builder = builder
                     .withHeader(changeHeader)
                     .withSubhead(changeSubhead ?: (null as String?).asOneTimePublisher())
@@ -664,8 +690,11 @@ class BasicResultPanel private constructor(
                 if (total != null) {
                     builder = builder.withLimits(
                         total.merge(showPrevRaw) { totalSeats, showRaw ->
-                            if (showRaw) BarFrameBuilder.Limit(max = totalSeats * 2 / 3)
-                            else BarFrameBuilder.Limit(wingspan = (totalSeats / 20).coerceAtLeast(1))
+                            if (showRaw) {
+                                BarFrameBuilder.Limit(max = totalSeats * 2 / 3)
+                            } else {
+                                BarFrameBuilder.Limit(wingspan = (totalSeats / 20).coerceAtLeast(1))
+                            }
                         }
                     )
                 }
@@ -733,7 +762,8 @@ class BasicResultPanel private constructor(
                     .map {
                         DualBar(
                             keyTemplate.toMainBarHeader(
-                                it.key, count > doubleLineBarLimit()
+                                it.key,
+                                count > doubleLineBarLimit()
                             ),
                             keyTemplate.toParty(it.key).color,
                             it.value.first,
@@ -780,8 +810,11 @@ class BasicResultPanel private constructor(
             total: Flow.Publisher<out Int>
         ): BarFrameBuilder {
             val lines = showMajority.merge(total) { show, tot ->
-                if (show) listOf(tot / 2 + 1)
-                else emptyList()
+                if (show) {
+                    listOf(tot / 2 + 1)
+                } else {
+                    emptyList()
+                }
             }
             return builder.withLines(lines) { t -> majorityFunction!!(t) }
         }
@@ -797,8 +830,11 @@ class BasicResultPanel private constructor(
             val diffBars = diff?.map { map ->
                 map.entries.asSequence()
                     .sortedByDescending {
-                        if (it.key === Party.OTHERS as KPT) Int.MIN_VALUE
-                        else (it.value.curr.first + it.value.curr.last)
+                        if (it.key === Party.OTHERS as KPT) {
+                            Int.MIN_VALUE
+                        } else {
+                            (it.value.curr.first + it.value.curr.last)
+                        }
                     }
                     .map {
                         DualBar(
@@ -818,8 +854,11 @@ class BasicResultPanel private constructor(
             val prevBars = prev?.map { map ->
                 map.entries.asSequence()
                     .sortedByDescending { e ->
-                        if (e.key === Party.OTHERS as KPT) Int.MIN_VALUE
-                        else e.value
+                        if (e.key === Party.OTHERS as KPT) {
+                            Int.MIN_VALUE
+                        } else {
+                            e.value
+                        }
                     }
                     .map { e ->
                         DualBar(
@@ -842,8 +881,11 @@ class BasicResultPanel private constructor(
                 if (total != null) {
                     builder = builder.withLimits(
                         total.merge(showPrevRaw) { totalSeats, showRaw ->
-                            if (showRaw) BarFrameBuilder.Limit(max = totalSeats * 2 / 3)
-                            else BarFrameBuilder.Limit(wingspan = (totalSeats / 20).coerceAtLeast(1))
+                            if (showRaw) {
+                                BarFrameBuilder.Limit(max = totalSeats * 2 / 3)
+                            } else {
+                                BarFrameBuilder.Limit(wingspan = (totalSeats / 20).coerceAtLeast(1))
+                            }
                         }
                     )
                 }
@@ -931,21 +973,25 @@ class BasicResultPanel private constructor(
             get() {
                 val prev = this.prev
                 if (prev == null) return prev
-                if (runoffSubhead != null)
+                if (runoffSubhead != null) {
                     return current.merge(prev) { c, p ->
-                        if (c.keys.map { keyTemplate.toParty(it) }.toSet() == p.keys)
+                        if (c.keys.map { keyTemplate.toParty(it) }.toSet() == p.keys) {
                             p
-                        else
+                        } else {
                             emptyMap()
+                        }
                     }
-                if (winnerNotRunningAgain != null)
+                }
+                if (winnerNotRunningAgain != null) {
                     return current.merge(prev) { c, p ->
                         val winner = p.entries.filter { it.value is Number }.maxByOrNull { (it.value as Number).toDouble() } ?: return@merge p
-                        if (c.keys.map { keyTemplate.toParty(it) }.contains(winner.key))
+                        if (c.keys.map { keyTemplate.toParty(it) }.contains(winner.key)) {
                             p
-                        else
+                        } else {
                             emptyMap()
+                        }
                     }
+                }
                 return prev
             }
         protected val filteredChangeSubhead: Flow.Publisher<out String?>?
@@ -961,9 +1007,13 @@ class BasicResultPanel private constructor(
                     }.merge(runoffSubhead) { sameParties, subhead -> if (sameParties) null else subhead }
                         .let { subhead ->
                             changeSubhead.merge(subhead) { c, s ->
-                                if (c == null) s
-                                else if (s == null) c
-                                else "$c / $s"
+                                if (c == null) {
+                                    s
+                                } else if (s == null) {
+                                    c
+                                } else {
+                                    "$c / $s"
+                                }
                             }
                         }
                 }
@@ -974,9 +1024,13 @@ class BasicResultPanel private constructor(
                     }.merge(winnerNotRunningAgain) { winnerRunningAgain, subhead -> if (winnerRunningAgain) null else subhead }
                         .let { subhead ->
                             changeSubhead.merge(subhead) { c, s ->
-                                if (c == null) s
-                                else if (s == null) c
-                                else "$c / $s"
+                                if (c == null) {
+                                    s
+                                } else if (s == null) {
+                                    c
+                                } else {
+                                    "$c / $s"
+                                }
                             }
                         }
                 }
@@ -1216,7 +1270,9 @@ class BasicResultPanel private constructor(
                 val winner = this.winner
                 val runoff = this.runoff
                 val total = votes.values.filterNotNull().sum()
-                @Suppress("UNCHECKED_CAST") val mandatory = sequenceOf(
+
+                @Suppress("UNCHECKED_CAST")
+                val mandatory = sequenceOf(
                     votes.keys.asSequence()
                         .filter { mandatoryParties.contains(keyTemplate.toParty(it)) },
                     (runoff?.asSequence() ?: emptySequence()),
@@ -1232,8 +1288,11 @@ class BasicResultPanel private constructor(
                 val partialDeclaration = votes.values.any { it == null }
                 return aggregatedResult.entries.asSequence()
                     .sortedByDescending {
-                        if (it.key === others) Int.MIN_VALUE
-                        else (it.value ?: -1)
+                        if (it.key === others) {
+                            Int.MIN_VALUE
+                        } else {
+                            (it.value ?: -1)
+                        }
                     }
                     .map {
                         val pct = it.value?.toDouble()?.div(total) ?: Double.NaN
@@ -1249,7 +1308,9 @@ class BasicResultPanel private constructor(
                             }
                             else -> {
                                 voteTemplate.toBarString(
-                                    it.value!!, pct, count > doubleLineBarLimit()
+                                    it.value!!,
+                                    pct,
+                                    count > doubleLineBarLimit()
                                 )
                             }
                         }
@@ -1297,8 +1358,11 @@ class BasicResultPanel private constructor(
                     pctReporting ?: 1.0.asOneTimePublisher()
                 ) {
                         show, pct ->
-                    if (show) listOf(0.5 / pct.coerceAtLeast(1e-6))
-                    else emptyList()
+                    if (show) {
+                        listOf(0.5 / pct.coerceAtLeast(1e-6))
+                    } else {
+                        emptyList()
+                    }
                 }
                 builder.withLines(lines) { majorityLabel!! }
             }
@@ -1346,7 +1410,9 @@ class BasicResultPanel private constructor(
                 val currTotal = cVotes.values.filterNotNull().sum()
                 val prevTotal = pVotes.values.sum()
                 if (showPrevRaw) {
-                    return if (prevTotal == 0) emptyList() else
+                    return if (prevTotal == 0) {
+                        emptyList()
+                    } else {
                         pVotes.entries.asSequence()
                             .sortedByDescending { if (it.key === Party.OTHERS as KPT) Int.MIN_VALUE else it.value }
                             .map {
@@ -1359,6 +1425,7 @@ class BasicResultPanel private constructor(
                                 )
                             }
                             .toList()
+                    }
                 }
                 if (currTotal == 0 || prevTotal == 0) {
                     return emptyList()
@@ -1429,7 +1496,9 @@ class BasicResultPanel private constructor(
                                     it.key.color,
                                     1.0 * it.value / total,
                                     voteTemplate.toBarString(
-                                        it.value, 1.0 * it.value / total, true
+                                        it.value,
+                                        1.0 * it.value / total,
+                                        true
                                     )
                                 )
                             }
@@ -1458,8 +1527,11 @@ class BasicResultPanel private constructor(
                 return BarFrameBuilder.basic(bars)
                     .withLimits(
                         showPrevRaw.merge(pctReporting ?: 1.0.asOneTimePublisher()) { showRaw, pct ->
-                            if (showRaw) BarFrameBuilder.Limit(max = 2.0 / 3 / pct.coerceAtLeast(1e-6))
-                            else BarFrameBuilder.Limit(wingspan = 0.1 / pct.coerceAtLeast(1e-6))
+                            if (showRaw) {
+                                BarFrameBuilder.Limit(max = 2.0 / 3 / pct.coerceAtLeast(1e-6))
+                            } else {
+                                BarFrameBuilder.Limit(wingspan = 0.1 / pct.coerceAtLeast(1e-6))
+                            }
                         }
                     )
                     .withHeader(changeHeader!!)
@@ -1659,8 +1731,11 @@ class BasicResultPanel private constructor(
                 return BarFrameBuilder.dual(bars)
                     .withLimits(
                         showPrevRaw.merge(pctReporting ?: 1.0.asOneTimePublisher()) { showRaw, pct ->
-                            if (showRaw) BarFrameBuilder.Limit(max = 2.0 / 3 / pct.coerceAtLeast(1e-6))
-                            else BarFrameBuilder.Limit(wingspan = 0.1 / pct.coerceAtLeast(1e-6))
+                            if (showRaw) {
+                                BarFrameBuilder.Limit(max = 2.0 / 3 / pct.coerceAtLeast(1e-6))
+                            } else {
+                                BarFrameBuilder.Limit(wingspan = 0.1 / pct.coerceAtLeast(1e-6))
+                            }
                         }
                     )
                     .withHeader(changeHeader!!)
@@ -1789,7 +1864,7 @@ class BasicResultPanel private constructor(
                 null,
                 createDiffFrame(),
                 createSwingFrame(),
-                mapBuilder?.createMapFrame(),
+                mapBuilder?.createMapFrame()
             )
         }
 

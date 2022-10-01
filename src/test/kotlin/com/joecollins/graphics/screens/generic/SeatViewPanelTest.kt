@@ -36,7 +36,9 @@ class SeatViewPanelTest {
         val con = Party("Conservative", "CON", Color.BLUE)
         val lab = Party("Labour", "LAB", Color.RED)
         val panel = partySeats(
-            currentSeats, seatHeader, seatSubhead
+            currentSeats,
+            seatHeader,
+            seatSubhead
         )
             .withTotal(totalSeats)
             .withMajorityLine(showMajority) { "$it SEATS FOR MAJORITY" }
@@ -68,7 +70,7 @@ class SeatViewPanelTest {
                 snp to 48,
                 grn to 1,
                 pc to 4,
-                oth to 19,
+                oth to 19
             )
         )
         previousSeats.submit(
@@ -79,7 +81,7 @@ class SeatViewPanelTest {
                 snp to 35,
                 grn to 1,
                 pc to 4,
-                oth to 19,
+                oth to 19
             )
         )
         seatHeader.submit("650 OF 650 SEATS DECLARED")
@@ -110,7 +112,9 @@ class SeatViewPanelTest {
         val con = Party("Conservative", "CON", Color.BLUE)
         val lab = Party("Labour", "LAB", Color.RED)
         val panel = partySeats(
-            currentSeats, seatHeader, seatSubhead
+            currentSeats,
+            seatHeader,
+            seatSubhead
         )
             .withTotal(totalSeats)
             .withMajorityLine(showMajority) { "$it SEATS FOR MAJORITY" }
@@ -141,7 +145,7 @@ class SeatViewPanelTest {
                 snp to 48,
                 grn to 1,
                 pc to 4,
-                oth to 19,
+                oth to 19
             )
         )
         seatDiff.submit(
@@ -152,7 +156,7 @@ class SeatViewPanelTest {
                 snp to +13,
                 grn to 0,
                 pc to 0,
-                oth to 0,
+                oth to 0
             )
         )
         seatHeader.submit("650 OF 650 SEATS DECLARED")
@@ -191,7 +195,9 @@ class SeatViewPanelTest {
         val oth = Party.OTHERS
         val partyOrder = listOf(snp, lab, pc, grn, ld, oth, con)
         val panel = partySeats(
-            currentSeats, seatHeader, seatSubhead
+            currentSeats,
+            seatHeader,
+            seatSubhead
         )
             .withPrev(previousSeats, changeHeader)
             .withTotal(totalSeats)
@@ -209,7 +215,7 @@ class SeatViewPanelTest {
                 con to 9290,
                 ld to 2709,
                 grn to 1365,
-                oth to 2542,
+                oth to 2542
             )
         )
         previousVotes.submit(
@@ -218,7 +224,7 @@ class SeatViewPanelTest {
                 con to 9134,
                 ld to 1812,
                 grn to 595,
-                oth to 1482,
+                oth to 1482
             )
         )
         seatHeader.submit("1 OF 650 SEATS DECLARED")
@@ -249,7 +255,9 @@ class SeatViewPanelTest {
         val oth = Party.OTHERS
         val partyOrder = listOf(ndp, grn, lib, oth, pc)
         val panel = partySeats(
-            currentSeats, seatHeader, seatSubhead
+            currentSeats,
+            seatHeader,
+            seatSubhead
         )
             .withPrev(previousSeats, changeHeader)
             .withTotal(totalSeats)
@@ -325,7 +333,9 @@ class SeatViewPanelTest {
         val grn = Party("Green", "GRN", Color.GREEN.darker())
         val ind = Party("Independent", "IND", Color.GRAY)
         val panel = partyDualSeats(
-            currentSeats, seatHeader, seatSubhead
+            currentSeats,
+            seatHeader,
+            seatSubhead
         )
             .withPrev(previousSeats, changeHeader)
             .withTotal(totalSeats)
@@ -337,12 +347,12 @@ class SeatViewPanelTest {
         currentSeats.submit(
             mapOf(
                 lib to (0 to 6),
-                ndp to (0 to 1),
+                ndp to (0 to 1)
             )
         )
         previousSeats.submit(
             mapOf(
-                lib to (0 to 7),
+                lib to (0 to 7)
             )
         )
         seatHeader.submit("7 OF 338 RIDINGS REPORTING")
@@ -353,12 +363,12 @@ class SeatViewPanelTest {
                 lib to (6 to 26),
                 ndp to (1 to 1),
                 con to (0 to 4),
-                grn to (0 to 1),
+                grn to (0 to 1)
             )
         )
         previousSeats.submit(
             mapOf(
-                lib to (7 to 32),
+                lib to (7 to 32)
             )
         )
         seatHeader.submit("32 OF 338 RIDINGS REPORTING")
@@ -370,7 +380,7 @@ class SeatViewPanelTest {
                 ndp to (1 to 13),
                 con to (4 to 104),
                 bq to (0 to 32),
-                grn to (1 to 1),
+                grn to (1 to 1)
             )
         )
         previousSeats.submit(
@@ -378,7 +388,7 @@ class SeatViewPanelTest {
                 lib to (32 to 166),
                 ndp to (0 to 30),
                 con to (0 to 89),
-                bq to (0 to 10),
+                bq to (0 to 10)
             )
         )
         seatHeader.submit("295 OF 338 RIDINGS REPORTING")
@@ -391,7 +401,7 @@ class SeatViewPanelTest {
                 con to (104 to 121),
                 bq to (32 to 32),
                 grn to (1 to 3),
-                ind to (0 to 1),
+                ind to (0 to 1)
             )
         )
         previousSeats.submit(
@@ -400,7 +410,7 @@ class SeatViewPanelTest {
                 ndp to (30 to 44),
                 con to (89 to 99),
                 bq to (10 to 10),
-                grn to (0 to 1),
+                grn to (0 to 1)
             )
         )
         seatHeader.submit("338 OF 338 RIDINGS REPORTING")
@@ -413,7 +423,7 @@ class SeatViewPanelTest {
                 con to (121 to 121),
                 bq to (32 to 32),
                 grn to (3 to 3),
-                ind to (1 to 1),
+                ind to (1 to 1)
             )
         )
         previousSeats.submit(
@@ -422,7 +432,7 @@ class SeatViewPanelTest {
                 ndp to (44 to 44),
                 con to (99 to 99),
                 bq to (10 to 10),
-                grn to (1 to 1),
+                grn to (1 to 1)
             )
         )
         seatHeader.submit("338 OF 338 RIDINGS REPORTING")
@@ -446,7 +456,9 @@ class SeatViewPanelTest {
         val grn = Party("Green", "GRN", Color.GREEN.darker())
         val ind = Party("Independent", "IND", Color.GRAY)
         val panel = partyDualSeatsReversed(
-            currentSeats, seatHeader, seatSubhead
+            currentSeats,
+            seatHeader,
+            seatSubhead
         )
             .withPrev(previousSeats, changeHeader)
             .withTotal(totalSeats)
@@ -458,12 +470,12 @@ class SeatViewPanelTest {
         currentSeats.submit(
             mapOf(
                 lib to (0 to 6),
-                ndp to (0 to 1),
+                ndp to (0 to 1)
             )
         )
         previousSeats.submit(
             mapOf(
-                lib to (0 to 7),
+                lib to (0 to 7)
             )
         )
         seatHeader.submit("7 OF 338 RIDINGS REPORTING")
@@ -474,12 +486,12 @@ class SeatViewPanelTest {
                 lib to (6 to 26),
                 ndp to (1 to 1),
                 con to (0 to 4),
-                grn to (0 to 1),
+                grn to (0 to 1)
             )
         )
         previousSeats.submit(
             mapOf(
-                lib to (7 to 32),
+                lib to (7 to 32)
             )
         )
         seatHeader.submit("32 OF 338 RIDINGS REPORTING")
@@ -491,7 +503,7 @@ class SeatViewPanelTest {
                 ndp to (1 to 13),
                 con to (4 to 104),
                 bq to (0 to 32),
-                grn to (1 to 1),
+                grn to (1 to 1)
             )
         )
         previousSeats.submit(
@@ -499,7 +511,7 @@ class SeatViewPanelTest {
                 lib to (32 to 166),
                 ndp to (0 to 30),
                 con to (0 to 89),
-                bq to (0 to 10),
+                bq to (0 to 10)
             )
         )
         seatHeader.submit("295 OF 338 RIDINGS REPORTING")
@@ -512,7 +524,7 @@ class SeatViewPanelTest {
                 con to (104 to 121),
                 bq to (32 to 32),
                 grn to (1 to 3),
-                ind to (0 to 1),
+                ind to (0 to 1)
             )
         )
         previousSeats.submit(
@@ -521,7 +533,7 @@ class SeatViewPanelTest {
                 ndp to (30 to 44),
                 con to (89 to 99),
                 bq to (10 to 10),
-                grn to (0 to 1),
+                grn to (0 to 1)
             )
         )
         seatHeader.submit("338 OF 338 RIDINGS REPORTING")
@@ -534,7 +546,7 @@ class SeatViewPanelTest {
                 con to (121 to 121),
                 bq to (32 to 32),
                 grn to (3 to 3),
-                ind to (1 to 1),
+                ind to (1 to 1)
             )
         )
         previousSeats.submit(
@@ -543,7 +555,7 @@ class SeatViewPanelTest {
                 ndp to (44 to 44),
                 con to (99 to 99),
                 bq to (10 to 10),
-                grn to (1 to 1),
+                grn to (1 to 1)
             )
         )
         seatHeader.submit("338 OF 338 RIDINGS REPORTING")
@@ -567,7 +579,9 @@ class SeatViewPanelTest {
         val grn = Party("Green", "GRN", Color.GREEN.darker())
         val ind = Party("Independent", "IND", Color.GRAY)
         val panel = partyDualSeats(
-            currentSeats, seatHeader, seatSubhead
+            currentSeats,
+            seatHeader,
+            seatSubhead
         )
             .withDiff(seatDiff, changeHeader)
             .withTotal(totalSeats)
@@ -695,7 +709,9 @@ class SeatViewPanelTest {
         val nxt = Party("Nick Xenophon Team", "NXT", Color.ORANGE)
         val oth = Party.OTHERS
         val panel = partyRangeSeats(
-            currentSeats, seatHeader, seatSubhead
+            currentSeats,
+            seatHeader,
+            seatSubhead
         )
             .withPrev(previousSeats, changeHeader)
             .withTotal(totalSeats)
@@ -782,7 +798,9 @@ class SeatViewPanelTest {
         val nxt = Party("Nick Xenophon Team", "NXT", Color.ORANGE)
         val oth = Party.OTHERS
         val panel = partyRangeSeats(
-            currentSeats, seatHeader, seatSubhead
+            currentSeats,
+            seatHeader,
+            seatSubhead
         )
             .withDiff(seatDiff, changeHeader)
             .withTotal(totalSeats)
@@ -870,7 +888,9 @@ class SeatViewPanelTest {
         val clinton = Candidate("Hillary Clinton", Party("Democrat", "DEM", Color.BLUE))
         val trump = Candidate("Donald Trump", Party("Republican", "GOP", Color.RED))
         val panel = candidateSeats(
-            currentSeats, seatHeader, seatSubhead
+            currentSeats,
+            seatHeader,
+            seatSubhead
         )
             .withWinner(winner)
             .withPrev(previousSeats, changeHeader)
@@ -898,7 +918,9 @@ class SeatViewPanelTest {
         val changeHeader = Publisher("CHANGE SINCE 2012")
         val winner = Publisher<Candidate?>(null)
         val panel = candidateDualSeats(
-            currentSeats, seatHeader, seatSubhead
+            currentSeats,
+            seatHeader,
+            seatSubhead
         )
             .withWinner(winner)
             .withPrev(previousSeats, changeHeader)
@@ -929,7 +951,9 @@ class SeatViewPanelTest {
         currentSeats.submit(mapOf(clinton to 238..368, trump to 170..300))
         previousSeats.submit(mapOf(clinton.party to 332, trump.party to 206))
         val panel = candidateRangeSeats(
-            currentSeats, seatHeader, seatSubhead
+            currentSeats,
+            seatHeader,
+            seatSubhead
         )
             .withPrev(previousSeats, changeHeader)
             .withTotal(totalSeats)
@@ -951,7 +975,9 @@ class SeatViewPanelTest {
         val changeHeader = Publisher("CHANGE SINCE 2016")
         val winner = Publisher<Party?>(null)
         val panel = partySeats(
-            currentSeats, seatHeader, seatSubhead
+            currentSeats,
+            seatHeader,
+            seatSubhead
         )
             .withPrev(previousSeats, changeHeader)
             .withWinner(winner)
@@ -979,7 +1005,9 @@ class SeatViewPanelTest {
         val changeHeader = Publisher("CHANGE SINCE 2016")
         val winner = Publisher<Party?>(null)
         val panel = partyDualSeats(
-            currentSeats, seatHeader, seatSubhead
+            currentSeats,
+            seatHeader,
+            seatSubhead
         )
             .withWinner(winner)
             .withPrev(previousSeats, changeHeader)
@@ -1018,7 +1046,9 @@ class SeatViewPanelTest {
         val additionalHighlight = Publisher<List<Int>>(shapesByDistrict.keys.toList())
         val winnerByDistrict = Publisher(mapOf<Int, PartyResult>())
         val panel = partySeats(
-            currentSeats, seatHeader, seatSubhead
+            currentSeats,
+            seatHeader,
+            seatSubhead
         )
             .withPrev(previousSeats, changeHeader, changeSubhead)
             .withSwing(currentVotes, previousVotes, compareBy { swingPartyOrder.indexOf(it) }, swingHeader)
@@ -1065,7 +1095,9 @@ class SeatViewPanelTest {
         val seatSubhead = Publisher<String?>(null)
         val changeHeader = Publisher("NOTIONAL CHANGE SINCE 2016")
         val panel = partySeats(
-            currentSeats, seatHeader, seatSubhead
+            currentSeats,
+            seatHeader,
+            seatSubhead
         )
             .withPrev(previousSeats, changeHeader)
             .withTotal(totalSeats)
@@ -1085,7 +1117,7 @@ class SeatViewPanelTest {
                 grn to 2,
                 tuv to 1,
                 pbp to 1,
-                indU to 1,
+                indU to 1
             )
         )
         previousSeats.submit(
@@ -1097,7 +1129,7 @@ class SeatViewPanelTest {
                 apni to 8,
                 grn to 2,
                 tuv to 1,
-                pbp to 1,
+                pbp to 1
             )
         )
         currentVotes.submit(
@@ -1118,7 +1150,7 @@ class SeatViewPanelTest {
                 wp to 1261,
                 indU to 4918,
                 indN to 1639,
-                indO to 7850,
+                indO to 7850
             )
         )
         previousVotes.submit(
@@ -1139,7 +1171,7 @@ class SeatViewPanelTest {
                 wp to 1565,
                 indU to 351 + 3270,
                 indN to 0,
-                indO to 224 + 124 + 32 + 19380,
+                indO to 224 + 124 + 32 + 19380
             )
         )
         compareRendering("SeatViewPanel", "PartyClassifications-2", panel)
@@ -1398,7 +1430,9 @@ class SeatViewPanelTest {
         val grn = Party("Green", "GRN", Color.GREEN)
         val oth = Party.OTHERS
         val panel = partySeats(
-            currentSeats, seatHeader, seatSubhead
+            currentSeats,
+            seatHeader,
+            seatSubhead
         )
             .withPrev(previousSeats, changeHeader)
             .withTotal(totalSeats)

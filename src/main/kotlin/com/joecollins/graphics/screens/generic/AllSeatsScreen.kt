@@ -8,6 +8,7 @@ import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.mapElements
+import org.apache.commons.lang3.StringUtils
 import java.awt.Color
 import java.util.concurrent.Flow
 
@@ -72,14 +73,13 @@ class AllSeatsScreen private constructor(title: Flow.Publisher<out String?>, fra
                         .toList()
                     Pair(e, 1.0 * (topTwo[0] - topTwo[1]) / total)
                 }
-                .sortedBy { e -> nameFunc(e.first.key).uppercase() }
+                .sortedBy { e -> StringUtils.stripAccents(nameFunc(e.first.key)).uppercase() }
                 .map { it.first }
                 .map { e ->
                     Pair(
                         e.key,
                         e.value.entries
-                            .maxByOrNull { it.value }
-                        !!.key
+                            .maxByOrNull { it.value }!!.key
                     )
                 }
                 .toList()

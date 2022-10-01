@@ -115,8 +115,9 @@ fun <T, U, R> Flow.Publisher<T>.merge(other: Flow.Publisher<U>, func: (T, U) -> 
     val onUpdate = {
         val left = pair.left
         val right = pair.right
-        if (left != null && right != null)
+        if (left != null && right != null) {
             publisher.submit(func(left.item, right.item))
+        }
     }
     this.subscribe(
         Subscriber {

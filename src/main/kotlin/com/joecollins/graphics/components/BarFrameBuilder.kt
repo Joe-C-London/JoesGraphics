@@ -83,7 +83,7 @@ class BarFrameBuilder private constructor() {
 
     fun withHeader(
         headerPublisher: Flow.Publisher<out String?>,
-        rightLabelPublisher: Flow.Publisher<out String?> = null.asOneTimePublisher(),
+        rightLabelPublisher: Flow.Publisher<out String?> = null.asOneTimePublisher()
     ): BarFrameBuilder {
         this.headerPublisher = headerPublisher
         this.rightHeaderLabelPublisher = rightLabelPublisher
@@ -189,10 +189,13 @@ class BarFrameBuilder private constructor() {
         val barsPublisher = (
             minBarCountPublisher?.let { minPublisher ->
                 this.barsPublisher.merge(minPublisher) { bars, min ->
-                    if (bars.size >= min) bars
-                    else sequenceOf(bars, MutableList(min - bars.size) { BarFrame.Bar("", "", emptyList()) })
-                        .flatten()
-                        .toList()
+                    if (bars.size >= min) {
+                        bars
+                    } else {
+                        sequenceOf(bars, MutableList(min - bars.size) { BarFrame.Bar("", "", emptyList()) })
+                            .flatten()
+                            .toList()
+                    }
                 }
             }
                 ?: this.barsPublisher
@@ -253,7 +256,9 @@ class BarFrameBuilder private constructor() {
             builder.barsPublisher = bars.map { b ->
                 b.map {
                     BarFrame.Bar(
-                        it.label, it.valueLabel, it.shape,
+                        it.label,
+                        it.valueLabel,
+                        it.shape,
                         listOf(
                             Pair(it.color, 0),
                             Pair(if (differentDirections(it)) ColorUtils.lighten(it.color) else it.color, first(it)),
@@ -298,7 +303,9 @@ class BarFrameBuilder private constructor() {
             builder.barsPublisher = bars.map { b ->
                 b.map {
                     BarFrame.Bar(
-                        it.label, it.valueLabel, it.shape,
+                        it.label,
+                        it.valueLabel,
+                        it.shape,
                         listOf(
                             Pair(it.color, 0),
                             Pair(ColorUtils.lighten(it.color), first(it)),

@@ -204,7 +204,8 @@ class TweetFrame(tweet: Flow.Publisher<out Status>, private val timezone: ZoneId
                         val g = resizedImage.createGraphics()
                         (g as Graphics2D)
                             .setRenderingHint(
-                                RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON
+                                RenderingHints.KEY_ANTIALIASING,
+                                RenderingHints.VALUE_ANTIALIAS_ON
                             )
                         g.clip = Ellipse2D.Double(0.0, 0.0, size.toDouble(), size.toDouble())
                         g.drawImage(originalImage, 0, 0, size, size, null)
@@ -226,11 +227,13 @@ class TweetFrame(tweet: Flow.Publisher<out Status>, private val timezone: ZoneId
             super.paintComponent(g)
             (g as Graphics2D)
                 .setRenderingHint(
-                    RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON
+                    RenderingHints.KEY_ANTIALIASING,
+                    RenderingHints.VALUE_ANTIALIAS_ON
                 )
             g
                 .setRenderingHint(
-                    RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON
+                    RenderingHints.KEY_TEXT_ANTIALIASING,
+                    RenderingHints.VALUE_TEXT_ANTIALIAS_ON
                 )
             image?.let { g.drawImage(it, 1, 1, null) }
             g.color = Color.WHITE
@@ -287,11 +290,13 @@ class TweetFrame(tweet: Flow.Publisher<out Status>, private val timezone: ZoneId
             super.paintComponent(g)
             (g as Graphics2D)
                 .setRenderingHint(
-                    RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON
+                    RenderingHints.KEY_ANTIALIASING,
+                    RenderingHints.VALUE_ANTIALIAS_ON
                 )
             g
                 .setRenderingHint(
-                    RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON
+                    RenderingHints.KEY_TEXT_ANTIALIASING,
+                    RenderingHints.VALUE_TEXT_ANTIALIAS_ON
                 )
             image?.let {
                 val xScale = width.toDouble() / it.getWidth(null)
@@ -410,11 +415,13 @@ class TweetFrame(tweet: Flow.Publisher<out Status>, private val timezone: ZoneId
                 super.paintComponent(g)
                 (g as Graphics2D)
                     .setRenderingHint(
-                        RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON
+                        RenderingHints.KEY_ANTIALIASING,
+                        RenderingHints.VALUE_ANTIALIAS_ON
                     )
                 g
                     .setRenderingHint(
-                        RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON
+                        RenderingHints.KEY_TEXT_ANTIALIASING,
+                        RenderingHints.VALUE_TEXT_ANTIALIAS_ON
                     )
                 g.color = Color.WHITE
                 var x = 0

@@ -195,7 +195,11 @@ class SwingFrameBuilder {
                                 * sign(
                                     if (ComparatorUtils.max(fromParty, toParty, partyOrder)
                                         == fromParty
-                                    ) -1.0 else 1.0
+                                    ) {
+                                        -1.0
+                                    } else {
+                                        1.0
+                                    }
                                 )
                             )
                     }

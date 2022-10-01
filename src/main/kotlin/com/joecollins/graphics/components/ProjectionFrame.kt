@@ -59,10 +59,11 @@ class ProjectionFrame(
                 }
             )
         )
-        if (imageAlignmentPublisher != null)
+        if (imageAlignmentPublisher != null) {
             imageAlignmentPublisher.subscribe(Subscriber(eventQueueWrapper { imagePanel.alignment = it }))
-        else
+        } else {
             imagePanel.alignment = Alignment.BOTTOM
+        }
     }
 
     internal fun getImage(): Image? {

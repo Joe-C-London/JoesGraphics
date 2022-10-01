@@ -454,7 +454,11 @@ class RegionalBreakdownScreen private constructor(titleLabel: Flow.Publisher<out
             maxColumnsPublisher: Flow.Publisher<Int?> = Publisher(null)
         ): SeatBuilder {
             return SeatBuilder(
-                totalHeaderPublisher, totalSeatsPublisher, numTotalSeatsPublisher, titlePublisher, maxColumnsPublisher
+                totalHeaderPublisher,
+                totalSeatsPublisher,
+                numTotalSeatsPublisher,
+                titlePublisher,
+                maxColumnsPublisher
             )
         }
 
@@ -467,7 +471,12 @@ class RegionalBreakdownScreen private constructor(titleLabel: Flow.Publisher<out
             maxColumnsPublisher: Flow.Publisher<Int?> = Publisher(null)
         ): SeatDiffBuilder {
             return SeatDiffBuilder(
-                totalHeaderPublisher, totalSeatsPublisher, seatDiffPublisher, numTotalSeatsPublisher, titlePublisher, maxColumnsPublisher
+                totalHeaderPublisher,
+                totalSeatsPublisher,
+                seatDiffPublisher,
+                numTotalSeatsPublisher,
+                titlePublisher,
+                maxColumnsPublisher
             )
         }
 
@@ -497,7 +506,11 @@ class RegionalBreakdownScreen private constructor(titleLabel: Flow.Publisher<out
             maxColumnsPublisher: Flow.Publisher<Int?> = Publisher(null)
         ): VoteBuilder<Double> {
             return VoteBuilder(
-                totalHeaderPublisher, totalVotesPublisher, reportingPublisher, titlePublisher, maxColumnsPublisher
+                totalHeaderPublisher,
+                totalVotesPublisher,
+                reportingPublisher,
+                titlePublisher,
+                maxColumnsPublisher
             ) { DecimalFormat("0.0%").format(it) + " IN" }
         }
 
@@ -509,7 +522,11 @@ class RegionalBreakdownScreen private constructor(titleLabel: Flow.Publisher<out
             maxColumnsPublisher: Flow.Publisher<Int?> = Publisher(null)
         ): VoteBuilder<PollsReporting> {
             return VoteBuilder(
-                totalHeaderPublisher, totalVotesPublisher, reportingPublisher, titlePublisher, maxColumnsPublisher
+                totalHeaderPublisher,
+                totalVotesPublisher,
+                reportingPublisher,
+                titlePublisher,
+                maxColumnsPublisher
             ) { "${it.reporting}/${it.total}" }
         }
 
@@ -522,7 +539,12 @@ class RegionalBreakdownScreen private constructor(titleLabel: Flow.Publisher<out
             maxColumnsPublisher: Flow.Publisher<Int?> = Publisher(null)
         ): VotePrevBuilder<Double> {
             return VotePrevBuilder(
-                totalHeaderPublisher, totalVotesPublisher, prevVotesPublisher, pctReportingPublisher, titlePublisher, maxColumnsPublisher
+                totalHeaderPublisher,
+                totalVotesPublisher,
+                prevVotesPublisher,
+                pctReportingPublisher,
+                titlePublisher,
+                maxColumnsPublisher
             ) { DecimalFormat("0.0%").format(it) + " IN" }
         }
 
@@ -535,7 +557,12 @@ class RegionalBreakdownScreen private constructor(titleLabel: Flow.Publisher<out
             maxColumnsPublisher: Flow.Publisher<Int?> = Publisher(null)
         ): VotePrevBuilder<PollsReporting> {
             return VotePrevBuilder(
-                totalHeaderPublisher, totalVotesPublisher, prevVotesPublisher, pctReportingPublisher, titlePublisher, maxColumnsPublisher
+                totalHeaderPublisher,
+                totalVotesPublisher,
+                prevVotesPublisher,
+                pctReportingPublisher,
+                titlePublisher,
+                maxColumnsPublisher
             ) { "${it.reporting}/${it.total}" }
         }
 
@@ -559,10 +586,11 @@ class RegionalBreakdownScreen private constructor(titleLabel: Flow.Publisher<out
         }
 
         private fun takeTopParties(parties: List<PartyOrCoalition>, max: Int?): List<PartyOrCoalition> {
-            return if (max == null || parties.size <= max)
+            return if (max == null || parties.size <= max) {
                 parties
-            else
+            } else {
                 listOf(parties.take(max - 1), listOf(Party.OTHERS)).flatten()
+            }
         }
 
         private fun transformPartyOrder(
@@ -571,8 +599,9 @@ class RegionalBreakdownScreen private constructor(titleLabel: Flow.Publisher<out
         ): Flow.Publisher<out List<PartyOrCoalition>> =
             partyOrder.merge(partyMapping) { po, pm ->
                 pm.forEach { coalition, party ->
-                    if (!coalition.constituentParties.contains(party))
+                    if (!coalition.constituentParties.contains(party)) {
                         throw IllegalArgumentException("$party is not a constituent party of $coalition")
+                    }
                 }
                 po.map { pm[it] ?: it }
             }

@@ -286,10 +286,11 @@ class BattlegroundScreen private constructor(
                     val votes = e.value
                     val prevWinner = votes.maxBy { it.value }.key
                     val margin: Double? = getSortKey(votes)
-                    if (margin == null)
+                    if (margin == null) {
                         null
-                    else
+                    } else {
                         Triple(e.key, margin, prevWinner.color)
+                    }
                 }
                 .sortedBy { it.second }
                 .take(count)
@@ -306,7 +307,10 @@ class BattlegroundScreen private constructor(
                     }
                     val colorFunc = if (filteredSeats?.contains(it.first) != false) { c: Color -> c } else { c -> lighten(lighten(c)) }
                     Entry(
-                        it.first, colorFunc(it.third), colorFunc(resultColor), fill
+                        it.first,
+                        colorFunc(it.third),
+                        colorFunc(resultColor),
+                        fill
                     )
                 }
                 .toList()
@@ -322,10 +326,11 @@ class BattlegroundScreen private constructor(
                 .sortedByDescending { it.value }
                 .take(2)
                 .toList()
-            return if (topTwo[0].key != party)
+            return if (topTwo[0].key != party) {
                 null
-            else
+            } else {
                 ((votes[party] ?: 0) - topTwo[1].value) / total.toDouble()
+            }
         }
     }
 
@@ -336,10 +341,11 @@ class BattlegroundScreen private constructor(
                 .sortedByDescending { it.value }
                 .take(2)
                 .toList()
-            return if (topTwo[0].key == party)
+            return if (topTwo[0].key == party) {
                 null
-            else
+            } else {
                 (topTwo[0].value - (votes[party] ?: 0)) / total.toDouble()
+            }
         }
     }
 
@@ -371,12 +377,13 @@ class BattlegroundScreen private constructor(
                 }
                 .sortedByDescending { it.value }
                 .toList()
-            return if (topTwo.isEmpty())
+            return if (topTwo.isEmpty()) {
                 null
-            else if (topTwo.size < 2)
+            } else if (topTwo.size < 2) {
                 topTwo[0].value / total.toDouble()
-            else
+            } else {
                 (topTwo[0].value - topTwo[1].value) / total.toDouble()
+            }
         }
     }
 

@@ -120,7 +120,8 @@ class RegionSummaryFrame private constructor(
             super.paintComponent(g)
             (g as Graphics2D)
                 .setRenderingHint(
-                    RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON
+                    RenderingHints.KEY_TEXT_ANTIALIASING,
+                    RenderingHints.VALUE_TEXT_ANTIALIAS_ON
                 )
             var valueFont: Font
             val startFontSize = 61.coerceAtMost(height * 2 / 3 - 9)

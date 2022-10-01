@@ -33,7 +33,6 @@ class MultiSummaryFrameBuilder private constructor() {
             rowLabelsFunc: (T) -> Flow.Publisher<out List<Pair<Color, String>>>,
             limit: Int
         ): MultiSummaryFrameBuilder {
-
             class Row(val display: Boolean, val sort: Number, val row: MultiSummaryFrame.Row)
 
             val displayedRows =

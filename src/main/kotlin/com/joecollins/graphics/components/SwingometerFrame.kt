@@ -182,7 +182,8 @@ class SwingometerFrame(
                 .setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
             g
                 .setRenderingHint(
-                    RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON
+                    RenderingHints.KEY_TEXT_ANTIALIASING,
+                    RenderingHints.VALUE_TEXT_ANTIALIAS_ON
                 )
             val margin = 2
             val arcWidth = width / 2 - 2 * margin
@@ -232,8 +233,11 @@ class SwingometerFrame(
                 for (dotNum in value.indices) {
                     val dot = value[dotNum]
                     g.setColor(dot.color)
-                    val drawer: (Int, Int, Int, Int) -> Unit = if (dot.solid) { x, y, width, height -> g.fillOval(x, y, width, height) }
-                    else { x, y, width, height -> g.drawOval(x, y, width, height) }
+                    val drawer: (Int, Int, Int, Int) -> Unit = if (dot.solid) {
+                        { x, y, width, height -> g.fillOval(x, y, width, height) }
+                    } else {
+                        { x, y, width, height -> g.drawOval(x, y, width, height) }
+                    }
                     drawer.invoke(
                         (width - dotSize) / 2 + 2,
                         inner / 2 - (dotNum + 1) * dotSize + 2,
@@ -303,12 +307,22 @@ class SwingometerFrame(
                 val arcAngle = (90 * rightToWin.toDouble() / range.toDouble()).roundToLong().toInt()
                 g.setColor(rightColor)
                 g.drawArc(
-                    (width - boundary) / 2, arcY - boundary / 2, boundary, boundary, 0, arcAngle - 90
+                    (width - boundary) / 2,
+                    arcY - boundary / 2,
+                    boundary,
+                    boundary,
+                    0,
+                    arcAngle - 90
                 )
             } else if (rightToWin.toDouble() <= -range.toDouble()) {
                 g.setColor(rightColor)
                 g.drawArc(
-                    (width - boundary) / 2, arcY - boundary / 2, boundary, boundary, 0, -180
+                    (width - boundary) / 2,
+                    arcY - boundary / 2,
+                    boundary,
+                    boundary,
+                    0,
+                    -180
                 )
             }
             g.setColor(background)
@@ -318,11 +332,15 @@ class SwingometerFrame(
                 if (abs(outerLabel.position.toDouble()) <= range.toDouble()) {
                     g.setColor(outerLabel.color)
                     g.transform = createRotationTransform(
-                        outerLabel.position.toDouble(), originalTransform, arcY
+                        outerLabel.position.toDouble(),
+                        originalTransform,
+                        arcY
                     )
                     val textWidth = g.getFontMetrics().stringWidth(outerLabel.text)
                     g.drawString(
-                        outerLabel.text, (width - textWidth) / 2, arcY + boundary / 2 - 6
+                        outerLabel.text,
+                        (width - textWidth) / 2,
+                        arcY + boundary / 2 - 6
                     )
                     g.transform = originalTransform
                 }
@@ -371,27 +389,31 @@ class SwingometerFrame(
         dotsPublisher.subscribe(Subscriber(eventQueueWrapper(onDotsUpdate)))
 
         val onLeftToWinUpdate: (Number) -> Unit = { leftToWin -> swingPanel.leftToWin = leftToWin }
-        if (leftToWinPublisher != null)
+        if (leftToWinPublisher != null) {
             leftToWinPublisher.subscribe(Subscriber(eventQueueWrapper(onLeftToWinUpdate)))
-        else
+        } else {
             onLeftToWinUpdate(POSITIVE_INFINITY)
+        }
 
         val onRightToWinUpdate: (Number) -> Unit = { rightToWin -> swingPanel.rightToWin = rightToWin }
-        if (rightToWinPublisher != null)
+        if (rightToWinPublisher != null) {
             rightToWinPublisher.subscribe(Subscriber(eventQueueWrapper(onRightToWinUpdate)))
-        else
+        } else {
             onRightToWinUpdate(NEGATIVE_INFINITY)
+        }
 
         val onTicksUpdate: (List<Tick>) -> Unit = { t -> swingPanel.ticks = t }
-        if (ticksPublisher != null)
+        if (ticksPublisher != null) {
             ticksPublisher.subscribe(Subscriber(eventQueueWrapper(onTicksUpdate)))
-        else
+        } else {
             onTicksUpdate(emptyList())
+        }
 
         val onOuterLabelsUpdate: (List<OuterLabel>) -> Unit = { l -> swingPanel.outerLabels = l }
-        if (outerLabelsPublisher != null)
+        if (outerLabelsPublisher != null) {
             outerLabelsPublisher.subscribe(Subscriber(eventQueueWrapper(onOuterLabelsUpdate)))
-        else
+        } else {
             onOuterLabelsUpdate(emptyList())
+        }
     }
 }

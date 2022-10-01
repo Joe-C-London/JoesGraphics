@@ -80,8 +80,7 @@ class SeatsChangingScreen private constructor(title: Flow.Publisher<out String?>
                     Pair(
                         it.key,
                         it.value.entries
-                            .maxByOrNull { e -> e.value }
-                        !!.key
+                            .maxByOrNull { e -> e.value }!!.key
                     )
                 }
                 .toList()
@@ -115,8 +114,11 @@ class SeatsChangingScreen private constructor(title: Flow.Publisher<out String?>
             .map {
                 val seatFilter = seatFilter
                 val colorFunc =
-                    if (seatFilter == null || seatFilter.contains(it.first)) { c: Color -> c }
-                    else { c -> lighten(lighten(c)) }
+                    if (seatFilter == null || seatFilter.contains(it.first)) {
+                        { c: Color -> c }
+                    } else {
+                        { c -> lighten(lighten(c)) }
+                    }
                 Entry(
                     it.first,
                     colorFunc(it.second.color),

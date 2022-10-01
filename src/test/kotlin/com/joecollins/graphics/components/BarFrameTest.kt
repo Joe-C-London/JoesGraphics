@@ -145,7 +145,9 @@ class BarFrameTest {
             headerPublisher = (null as String?).asOneTimePublisher(),
             barsPublisher = results.mapElements {
                 BarFrame.Bar(
-                    it.getPartyName(), "${it.getNumSeats()}", null,
+                    it.getPartyName(),
+                    "${it.getNumSeats()}",
+                    null,
                     listOf(
                         Pair(it.getPartyColor(), it.getNumSeats()),
                         Pair(lighten(it.getPartyColor()), it.getSeatEstimate() - it.getNumSeats())
@@ -222,7 +224,9 @@ class BarFrameTest {
             headerPublisher = (null as String?).asOneTimePublisher(),
             barsPublisher = results.mapElements {
                 BarFrame.Bar(
-                    "", "", null,
+                    "",
+                    "",
+                    null,
                     listOf(
                         Pair(it.getPartyColor(), it.getNumSeats())
                     )
@@ -261,7 +265,9 @@ class BarFrameTest {
             headerPublisher = (null as String?).asOneTimePublisher(),
             barsPublisher = results.mapElements {
                 BarFrame.Bar(
-                    "", "", null,
+                    "",
+                    "",
+                    null,
                     listOf(
                         Pair(it.getPartyColor(), it.getNumSeats())
                     )
@@ -382,7 +388,9 @@ class BarFrameTest {
             headerPublisher = "2019 CANADIAN ELECTION RESULT".asOneTimePublisher(),
             barsPublisher = results.mapElements {
                 BarFrame.Bar(
-                    it.getPartyName(), "${it.getNumSeats()}", null,
+                    it.getPartyName(),
+                    "${it.getNumSeats()}",
+                    null,
                     listOf(
                         Pair(it.getPartyColor(), it.getNumSeats())
                     )
@@ -412,7 +420,9 @@ class BarFrameTest {
             subheadColorPublisher = Color.RED.asOneTimePublisher(),
             barsPublisher = results.mapElements {
                 BarFrame.Bar(
-                    it.getPartyName(), "${it.getNumSeats()}", null,
+                    it.getPartyName(),
+                    "${it.getNumSeats()}",
+                    null,
                     listOf(
                         Pair(it.getPartyColor(), it.getNumSeats())
                     )
@@ -444,7 +454,9 @@ class BarFrameTest {
             subheadColorPublisher = Color.RED.asOneTimePublisher(),
             barsPublisher = results.mapElements {
                 BarFrame.Bar(
-                    it.getPartyName(), "${it.getNumSeats()}", null,
+                    it.getPartyName(),
+                    "${it.getNumSeats()}",
+                    null,
                     listOf(
                         Pair(it.getPartyColor(), it.getNumSeats())
                     )
@@ -471,7 +483,9 @@ class BarFrameTest {
             headerPublisher = "2019 CANADIAN ELECTION RESULT".asOneTimePublisher(),
             barsPublisher = results.mapElements {
                 BarFrame.Bar(
-                    it.getPartyName(), it.getNumSeats().toString() + "/" + it.getSeatEstimate(), null,
+                    it.getPartyName(),
+                    it.getNumSeats().toString() + "/" + it.getSeatEstimate(),
+                    null,
                     listOf(
                         Pair(it.getPartyColor(), it.getNumSeats()),
                         Pair(lighten(it.getPartyColor()), it.getSeatEstimate() - it.getNumSeats())
@@ -500,7 +514,9 @@ class BarFrameTest {
             headerPublisher = "RESULT CHANGE SINCE 2015".asOneTimePublisher(),
             barsPublisher = results.mapElements {
                 BarFrame.Bar(
-                    it.getPartyName(), DecimalFormat("+0;-0").format(it.getNumSeats().toLong()), null,
+                    it.getPartyName(),
+                    DecimalFormat("+0;-0").format(it.getNumSeats().toLong()),
+                    null,
                     listOf(
                         Pair(it.getPartyColor(), it.getNumSeats())
                     )
@@ -529,7 +545,9 @@ class BarFrameTest {
             headerPublisher = "RESULT CHANGE SINCE 2015".asOneTimePublisher(),
             barsPublisher = results.mapElements {
                 BarFrame.Bar(
-                    it.getPartyName(), "${CHANGE_FORMAT.format(it.getNumSeats().toLong())}/${CHANGE_FORMAT.format(it.getSeatEstimate().toLong())}", null,
+                    it.getPartyName(),
+                    "${CHANGE_FORMAT.format(it.getNumSeats().toLong())}/${CHANGE_FORMAT.format(it.getSeatEstimate().toLong())}",
+                    null,
                     listOf(
                         Pair(it.getPartyColor(), it.getNumSeats()),
                         Pair(lighten(it.getPartyColor()), it.getSeatEstimate() - if (sign(it.getSeatEstimate().toFloat()) == sign(it.getNumSeats().toFloat())) it.getNumSeats() else 0)
@@ -831,7 +849,9 @@ class BarFrameTest {
         private val PERCENT_FORMAT = DecimalFormat("0.0%")
         private fun lighten(color: Color?): Color {
             return Color(
-                (color!!.red + 255) / 2, (color.green + 255) / 2, (color.blue + 255) / 2
+                (color!!.red + 255) / 2,
+                (color.green + 255) / 2,
+                (color.blue + 255) / 2
             )
         }
     }

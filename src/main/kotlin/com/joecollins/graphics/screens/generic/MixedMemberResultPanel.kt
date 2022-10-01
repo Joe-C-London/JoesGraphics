@@ -80,7 +80,8 @@ class MixedMemberResultPanel private constructor(
             val mapFrame = components[MAP]
             candidateFrame.setLocation(5, 5)
             candidateFrame.setSize(
-                width * 3 / 5 - 10, height / (if (candidateChangeFrame == null) 1 else 2) - 10
+                width * 3 / 5 - 10,
+                height / (if (candidateChangeFrame == null) 1 else 2) - 10
             )
             candidateChangeFrame?.setLocation(5, height / 2 + 5)
             candidateChangeFrame?.setSize(width * 3 / 5 - 10, height / 2 - 10)
@@ -347,14 +348,18 @@ class MixedMemberResultPanel private constructor(
                             .filter { it.key === Party.OTHERS || !currParties.contains(it.key) }
                             .sumOf { -1.0 * it.value / prevTotal }
                     )
-                val nonMatchingBars = if (othersPct == 0.0) emptySequence() else sequenceOf(
-                    BasicBar(
-                        Party.OTHERS.abbreviation.uppercase(),
-                        Party.OTHERS.color,
-                        othersPct,
-                        PCT_DIFF_FORMAT.format(othersPct)
+                val nonMatchingBars = if (othersPct == 0.0) {
+                    emptySequence()
+                } else {
+                    sequenceOf(
+                        BasicBar(
+                            Party.OTHERS.abbreviation.uppercase(),
+                            Party.OTHERS.color,
+                            othersPct,
+                            PCT_DIFF_FORMAT.format(othersPct)
+                        )
                     )
-                )
+                }
                 sequenceOf(matchingBars, nonMatchingBars).flatten().toList()
             }
             return BarFrameBuilder.basic(bars)
@@ -377,8 +382,12 @@ class MixedMemberResultPanel private constructor(
                                 it.key.name.uppercase(),
                                 it.key.color,
                                 if (pct.isNaN()) 0 else pct,
-                                if (pct.isNaN()) "WAITING..." else THOUSANDS_FORMAT.format(it.value) +
-                                    if (partialDeclaration) "" else " (" + PCT_FORMAT.format(pct) + ")"
+                                if (pct.isNaN()) {
+                                    "WAITING..."
+                                } else {
+                                    THOUSANDS_FORMAT.format(it.value) +
+                                        if (partialDeclaration) "" else " (" + PCT_FORMAT.format(pct) + ")"
+                                }
                             )
                         }
                         .toList()
@@ -428,14 +437,18 @@ class MixedMemberResultPanel private constructor(
                             .filter { it.key === Party.OTHERS || !curr.containsKey(it.key) }
                             .sumOf { -1.0 * it.value / prevTotal }
                     )
-                val absentBars = if (otherTotal == 0.0) emptySequence() else sequenceOf(
-                    BasicBar(
-                        Party.OTHERS.abbreviation.uppercase(),
-                        Party.OTHERS.color,
-                        otherTotal,
-                        PCT_DIFF_FORMAT.format(otherTotal)
+                val absentBars = if (otherTotal == 0.0) {
+                    emptySequence()
+                } else {
+                    sequenceOf(
+                        BasicBar(
+                            Party.OTHERS.abbreviation.uppercase(),
+                            Party.OTHERS.color,
+                            otherTotal,
+                            PCT_DIFF_FORMAT.format(otherTotal)
+                        )
                     )
-                )
+                }
                 sequenceOf(presentBars, absentBars).flatten().toList()
             }
             return BarFrameBuilder.basic(bars)

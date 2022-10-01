@@ -34,7 +34,8 @@ class FileWatcherService(private val executor: ExecutorService, private val task
                         try {
                             val kind = event.kind()
                             if (kind != OVERFLOW) {
-                                @Suppress("UNCHECKED_CAST") val ev = event as WatchEvent<Path>
+                                @Suppress("UNCHECKED_CAST")
+                                val ev = event as WatchEvent<Path>
                                 val filename = ev.context()
                                 onUpdate(path.resolve(filename))
                             }

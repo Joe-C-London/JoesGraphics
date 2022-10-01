@@ -51,7 +51,7 @@ class AggregatorsTest {
     fun testCombine() {
         val inputs = listOf(
             Publisher(mapOf("ABC" to 8, "DEF" to 6)),
-            Publisher(mapOf("ABC" to 7, "GHI" to 3)),
+            Publisher(mapOf("ABC" to 7, "GHI" to 3))
         )
         val output: BoundResult<Map<String, Int>> = BoundResult()
         combine(inputs) { it }.subscribe(Subscriber { output.value = it })
@@ -76,7 +76,7 @@ class AggregatorsTest {
         val seed = mapOf("ABC" to 0, "DEF" to 0)
         val inputs = listOf(
             Publisher(mapOf("ABC" to 8, "DEF" to 6)),
-            Publisher(mapOf("ABC" to 7, "GHI" to 3)),
+            Publisher(mapOf("ABC" to 7, "GHI" to 3))
         )
         val output: BoundResult<Map<String, Int>> = BoundResult()
         combine(inputs, { it }, seed).subscribe(Subscriber { output.value = it })
@@ -205,11 +205,11 @@ class AggregatorsTest {
     fun testNestedCombinedStillPropagates() {
         val inputs1 = listOf(
             Publisher(mapOf("ABC" to 8, "DEF" to 6)),
-            Publisher(mapOf("ABC" to 7, "GHI" to 3)),
+            Publisher(mapOf("ABC" to 7, "GHI" to 3))
         )
         val inputs2 = listOf(
             Publisher(mapOf("ABC" to 8, "DEF" to 6)),
-            Publisher(mapOf("ABC" to 7, "GHI" to 3)),
+            Publisher(mapOf("ABC" to 7, "GHI" to 3))
         )
         val output: BoundResult<Map<String, Int>> = BoundResult()
         val combined = sequenceOf(inputs1, inputs2)
@@ -298,7 +298,7 @@ class AggregatorsTest {
     fun testCombinePctReporting() {
         val inputs = listOf(
             Publisher(0.5),
-            Publisher(0.3),
+            Publisher(0.3)
         )
         val output = BoundResult<Double>()
         combinePctReporting(inputs) { it }
@@ -317,7 +317,7 @@ class AggregatorsTest {
     fun testCombinePctReportingWithWeights() {
         val inputs = listOf(
             Pair(Publisher(0.5), 2.0),
-            Pair(Publisher(0.3), 3.0),
+            Pair(Publisher(0.3), 3.0)
         )
         val output = BoundResult<Double>()
         combinePctReporting(inputs, { it.first }, { it.second })
@@ -394,7 +394,10 @@ class AggregatorsTest {
         val winner = Publisher<String?>(null)
         val output: BoundResult<Map<String, Int>> = BoundResult()
         topAndOthers(
-            votes, 3, "OTHERS", winner.map { if (it == null) emptyArray() else arrayOf(it) }
+            votes,
+            3,
+            "OTHERS",
+            winner.map { if (it == null) emptyArray() else arrayOf(it) }
         )
             .subscribe(Subscriber { output.value = it })
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)

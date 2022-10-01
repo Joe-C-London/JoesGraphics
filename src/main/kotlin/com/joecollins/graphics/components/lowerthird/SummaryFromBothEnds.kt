@@ -105,7 +105,8 @@ class SummaryFromBothEnds(
             super.paintComponent(g)
             (g as Graphics2D)
                 .setRenderingHint(
-                    RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON
+                    RenderingHints.KEY_TEXT_ANTIALIASING,
+                    RenderingHints.VALUE_TEXT_ANTIALIAS_ON
                 )
             val labelFont = StandardFont.readNormalFont(12)
             val valueFont = StandardFont.readBoldFont(20)

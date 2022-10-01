@@ -124,10 +124,14 @@ class ParliamentVoteFrameTest {
         partyVotes.submit(
             arrayOf(
                 listOf(
-                    dem to 48, gop to 7, ind to 2
+                    dem to 48,
+                    gop to 7,
+                    ind to 2
                 ),
                 listOf(
-                    dem to 0, gop to 43, ind to 0
+                    dem to 0,
+                    gop to 43,
+                    ind to 0
                 )
             )
         )
