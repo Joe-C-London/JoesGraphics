@@ -1448,6 +1448,33 @@ class SeatViewPanelTest {
         compareRendering("SeatViewPanel", "ProgressLabel-2", panel)
     }
 
+    @Test
+    fun testTiesAppearAtBottom() {
+        val lib = Party("Liberal", "LIB", Color.RED)
+        val yp = Party("Yukon Party", "YP", Color.BLUE)
+        val ndp = Party("New Democratic Party", "NDP", Color.ORANGE)
+        val ind = Party("Independent", "IND", Party.OTHERS.color)
+        val tie = Party.TIE
+
+        val panel = partyDualSeats(
+            mapOf(
+                lib to (0 to 5),
+                yp to (0 to 8),
+                ndp to (0 to 2),
+                tie to (0 to 4)
+            ).asOneTimePublisher(),
+            "SEATS ELECTED/LEADING".asOneTimePublisher(),
+            "".asOneTimePublisher()
+        ).withPrev(
+            mapOf(lib to (0 to 11), yp to (0 to 6), ndp to (0 to 2)).asOneTimePublisher(),
+            "CHANGE SINCE 2016".asOneTimePublisher()
+        ).withTotal(19.asOneTimePublisher())
+            .withMajorityLine(true.asOneTimePublisher()) { "$it FOR MAJORITY" }
+            .build("YUKON".asOneTimePublisher())
+        panel.setSize(1024, 512)
+        compareRendering("SeatViewPanel", "Tie", panel)
+    }
+
     private fun peiShapesByDistrict(): Map<Int, Shape> {
         val peiMap = MapFrameTest::class.java
             .classLoader

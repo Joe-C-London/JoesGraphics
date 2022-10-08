@@ -569,7 +569,7 @@ class RegionalBreakdownScreen private constructor(titleLabel: Flow.Publisher<out
         private fun extractPartyOrder(result: Map<out PartyOrCoalition, Int>): List<PartyOrCoalition> {
             return result.entries.asSequence()
                 .filter { it.value > 0 }
-                .sortedByDescending { if (it.key == Party.OTHERS) -1 else it.value }
+                .sortedByDescending { it.key.overrideSortOrder ?: it.value }
                 .map { it.key }
                 .toList()
         }
@@ -581,7 +581,7 @@ class RegionalBreakdownScreen private constructor(titleLabel: Flow.Publisher<out
             return sequenceOf(result.keys.asSequence(), diff.keys.asSequence()).flatten()
                 .distinct()
                 .filter { party -> (result[party] ?: 0) > 0 || (diff[party] ?: 0) != 0 }
-                .sortedByDescending { party -> if (party == Party.OTHERS) -1 else (result[party] ?: 0) }
+                .sortedByDescending { party -> party.overrideSortOrder ?: (result[party] ?: 0) }
                 .toList()
         }
 

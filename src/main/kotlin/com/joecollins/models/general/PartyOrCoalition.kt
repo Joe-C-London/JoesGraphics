@@ -2,11 +2,11 @@ package com.joecollins.models.general
 
 import java.awt.Color
 
-interface PartyOrCoalition {
-    val name: String
-    val abbreviation: String
-    val color: Color
-    val constituentParties: List<Party>
+abstract class PartyOrCoalition internal constructor() : CanOverrideSortOrder() {
+    abstract val name: String
+    abstract val abbreviation: String
+    abstract val color: Color
+    abstract val constituentParties: List<Party>
 }
 
 internal fun PartyOrCoalition.toParty(): Party {

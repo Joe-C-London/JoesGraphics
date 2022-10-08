@@ -1,7 +1,6 @@
 package com.joecollins.graphics.components.lowerthird
 
 import com.joecollins.models.general.Candidate
-import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyOrCoalition
 import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
@@ -94,7 +93,7 @@ class LowerThirdHeadlineAndBottomSummary internal constructor(
                 .flatten()
                 .distinct()
                 .map { it to (seats[it] ?: 0) }
-                .sortedByDescending { if (it.first == Party.OTHERS) -1 else it.second }
+                .sortedByDescending { it.first.overrideSortOrder ?: it.second }
                 .map { BottomSummary.Entry(it.first.color, it.first.abbreviation, it.second.toString()) }
                 .toMutableList()
             val inDoubt = totalSeats - seats.values.sum()
@@ -108,7 +107,7 @@ class LowerThirdHeadlineAndBottomSummary internal constructor(
             val total = votes.values.sum().toDouble()
             val ret = votes.entries
                 .filter { it.value > 0 }
-                .sortedByDescending { if (it.key == Party.OTHERS) -1 else it.value }
+                .sortedByDescending { it.key.overrideSortOrder ?: it.value }
                 .map {
                     SummaryWithHeaderAndLabels.Entry(
                         it.key.color,
@@ -127,7 +126,7 @@ class LowerThirdHeadlineAndBottomSummary internal constructor(
             val total = votes.values.sum().toDouble()
             val ret = votes.entries
                 .filter { it.value > 0 }
-                .sortedByDescending { if (it.key == Candidate.OTHERS) -1 else it.value }
+                .sortedByDescending { it.key.overrideSortOrder ?: it.value }
                 .map {
                     SummaryWithHeaderAndLabels.Entry(
                         it.key.party.color,

@@ -243,8 +243,7 @@ class MixedMemberResultPanel private constructor(
                 val partialDeclaration = votes.values.any { it == null }
                 votes.entries
                     .sortedByDescending {
-                        val value = it.value
-                        if (it.key === Candidate.OTHERS || value == null) Int.MIN_VALUE else value
+                        it.key.overrideSortOrder ?: it.value ?: 0
                     }
                     .map {
                         val candidate = it.key
@@ -374,7 +373,7 @@ class MixedMemberResultPanel private constructor(
                     val total = votes.values.filterNotNull().sum()
                     val partialDeclaration = votes.values.any { it == null }
                     votes.entries
-                        .sortedByDescending { if (it.key === Party.OTHERS) Int.MIN_VALUE else (it.value ?: -1) }
+                        .sortedByDescending { it.key.overrideSortOrder ?: (it.value ?: -1) }
                         .map {
                             val value = it.value
                             val pct = if (value == null) Double.NaN else 1.0 * value / total

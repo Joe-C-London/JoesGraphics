@@ -266,7 +266,7 @@ class MultiResultScreen private constructor(header: Flow.Publisher<out String?>,
             )
                 .entries
                 .asSequence()
-                .sortedByDescending { e -> if (e.key === Candidate.OTHERS) Int.MIN_VALUE else e.value }
+                .sortedByDescending { e -> e.key.overrideSortOrder ?: e.value }
                 .map { e ->
                     val candidate = e.key
                     val votes = e.value

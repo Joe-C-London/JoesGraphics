@@ -14,6 +14,8 @@ data class CandidateResult(val candidate: Candidate, val elected: Boolean) {
     }
 
     companion object {
+
+        val TIE = CandidateResult(Candidate("", Party.TIE), false)
         val CandidateResult?.color: Color get() {
             return when {
                 this == null -> Color.BLACK

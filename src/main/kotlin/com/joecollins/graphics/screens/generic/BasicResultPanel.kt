@@ -11,6 +11,7 @@ import com.joecollins.graphics.components.MapFrame
 import com.joecollins.graphics.components.SwingFrame
 import com.joecollins.graphics.components.SwingFrameBuilder
 import com.joecollins.models.general.Aggregators
+import com.joecollins.models.general.CanOverrideSortOrder
 import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyOrCoalition
@@ -308,7 +309,7 @@ class BasicResultPanel private constructor(
         }
     }
 
-    private class BasicSeatScreenBuilder<KT, KPT : PartyOrCoalition>(
+    private class BasicSeatScreenBuilder<KT : CanOverrideSortOrder, KPT : PartyOrCoalition>(
         current: Flow.Publisher<out Map<out KT, Int>>,
         header: Flow.Publisher<out String?>,
         subhead: Flow.Publisher<out String?>,
@@ -351,7 +352,7 @@ class BasicResultPanel private constructor(
                 val winner = this.winner
                 val numBars = seats.size
                 return seats.entries.asSequence()
-                    .sortedByDescending { if (it.key === Party.OTHERS as KPT) Int.MIN_VALUE else it.value }
+                    .sortedByDescending { it.key.overrideSortOrder ?: it.value }
                     .map {
                         BasicBar(
                             keyTemplate.toMainBarHeader(
@@ -449,7 +450,7 @@ class BasicResultPanel private constructor(
         override fun createDiffFrame(): BarFrame? {
             val diffBars = diff?.map { map ->
                 map.entries.asSequence()
-                    .sortedByDescending { if (it.key === Party.OTHERS as KPT) Int.MIN_VALUE else it.value.curr }
+                    .sortedByDescending { it.key.overrideSortOrder ?: it.value.curr }
                     .map {
                         BasicBar(
                             it.key.abbreviation.uppercase(),
@@ -508,7 +509,7 @@ class BasicResultPanel private constructor(
         }
     }
 
-    private class DualSeatScreenBuilder<KT, KPT : PartyOrCoalition>(
+    private class DualSeatScreenBuilder<KT : CanOverrideSortOrder, KPT : PartyOrCoalition>(
         current: Flow.Publisher<out Map<out KT, Pair<Int, Int>>>,
         header: Flow.Publisher<out String?>,
         subhead: Flow.Publisher<out String?>,
@@ -560,7 +561,7 @@ class BasicResultPanel private constructor(
                 val winner = this.winner
                 val count = seats.size
                 return seats.entries.asSequence()
-                    .sortedByDescending { if (it.key === Party.OTHERS as KPT) Int.MIN_VALUE else it.value.second }
+                    .sortedByDescending { it.key.overrideSortOrder ?: it.value.second }
                     .map {
                         DualBar(
                             keyTemplate.toMainBarHeader(
@@ -631,7 +632,7 @@ class BasicResultPanel private constructor(
         override fun createDiffFrame(): BarFrame? {
             val diffBars = diff?.map { map ->
                 map.entries.asSequence()
-                    .sortedByDescending { if (it.key === Party.OTHERS as KPT) Int.MIN_VALUE else it.value.curr.second }
+                    .sortedByDescending { it.key.overrideSortOrder ?: it.value.curr.second }
                     .map {
                         DualBar(
                             it.key.abbreviation.uppercase(),
@@ -654,7 +655,7 @@ class BasicResultPanel private constructor(
             }
             val prevBars = prev?.map { map ->
                 map.entries.asSequence()
-                    .sortedByDescending { if (it.key === Party.OTHERS as KPT) Int.MIN_VALUE else it.value.second }
+                    .sortedByDescending { it.key.overrideSortOrder ?: it.value.second }
                     .map {
                         DualBar(
                             it.key.abbreviation.uppercase(),
@@ -716,7 +717,7 @@ class BasicResultPanel private constructor(
         }
     }
 
-    private class RangeSeatScreenBuilder<KT, KPT : PartyOrCoalition>(
+    private class RangeSeatScreenBuilder<KT : CanOverrideSortOrder, KPT : PartyOrCoalition>(
         current: Flow.Publisher<out Map<KT, IntRange>>,
         header: Flow.Publisher<out String?>,
         subhead: Flow.Publisher<out String?>,
@@ -758,7 +759,7 @@ class BasicResultPanel private constructor(
                 val winner = this.winner
                 val count = seats.size
                 return seats.entries.asSequence()
-                    .sortedByDescending { if (it.key === Party.OTHERS as KPT) Int.MIN_VALUE else (it.value.first + it.value.last) }
+                    .sortedByDescending { it.key.overrideSortOrder ?: (it.value.first + it.value.last) }
                     .map {
                         DualBar(
                             keyTemplate.toMainBarHeader(
@@ -830,11 +831,7 @@ class BasicResultPanel private constructor(
             val diffBars = diff?.map { map ->
                 map.entries.asSequence()
                     .sortedByDescending {
-                        if (it.key === Party.OTHERS as KPT) {
-                            Int.MIN_VALUE
-                        } else {
-                            (it.value.curr.first + it.value.curr.last)
-                        }
+                        it.key.overrideSortOrder ?: (it.value.curr.first + it.value.curr.last)
                     }
                     .map {
                         DualBar(
@@ -854,11 +851,7 @@ class BasicResultPanel private constructor(
             val prevBars = prev?.map { map ->
                 map.entries.asSequence()
                     .sortedByDescending { e ->
-                        if (e.key === Party.OTHERS as KPT) {
-                            Int.MIN_VALUE
-                        } else {
-                            e.value
-                        }
+                        e.key.overrideSortOrder ?: e.value
                     }
                     .map { e ->
                         DualBar(
@@ -1414,7 +1407,7 @@ class BasicResultPanel private constructor(
                         emptyList()
                     } else {
                         pVotes.entries.asSequence()
-                            .sortedByDescending { if (it.key === Party.OTHERS as KPT) Int.MIN_VALUE else it.value }
+                            .sortedByDescending { it.key.overrideSortOrder ?: it.value }
                             .map {
                                 val pct = it.value.toDouble() / prevTotal
                                 BasicBar(
@@ -1444,7 +1437,7 @@ class BasicResultPanel private constructor(
                     .groupingBy { if (finalPartiesToShow.contains(it.key)) it.key else Party.OTHERS }
                     .fold(0) { a, e -> a + e.value }
                 return finalPartiesToShow.asSequence()
-                    .sortedByDescending { if (it === Party.OTHERS as KPT) Int.MIN_VALUE else (partyTotal[it] ?: 0) }
+                    .sortedByDescending { it.overrideSortOrder ?: (partyTotal[it] ?: 0) }
                     .map { e: KPT ->
                         val cpct = 1.0 * (partyTotal[e] ?: 0) / currTotal
                         val ppct = 1.0 * (prevVotes[e] ?: 0) / prevTotal
@@ -1675,7 +1668,7 @@ class BasicResultPanel private constructor(
                 }
                 if (showPrevRaw) {
                     return pVotes.entries.asSequence()
-                        .sortedByDescending { if (it.key === Party.OTHERS as KPT) Int.MIN_VALUE else it.value }
+                        .sortedByDescending { it.key.overrideSortOrder ?: it.value }
                         .map {
                             val pct = it.value.toDouble() / prevTotal
                             DualBar(
@@ -1698,7 +1691,7 @@ class BasicResultPanel private constructor(
                     .groupingBy { if (partyTotal.containsKey(it.key)) it.key else Party.OTHERS as KPT }
                     .fold(0) { a, e -> a + e.value }
                 return finalPartiesToShow.asSequence()
-                    .sortedByDescending { e -> if (e === Party.OTHERS as KPT) Double.MIN_VALUE else partyTotal[e]!!.let { it.start + it.endInclusive } }
+                    .sortedByDescending { e -> e.overrideSortOrder?.toDouble() ?: partyTotal[e]!!.let { it.start + it.endInclusive } }
                     .map {
                         val range = partyTotal[it] ?: (0.0..0.0)
                         val cpctMin = range.start
@@ -1872,7 +1865,7 @@ class BasicResultPanel private constructor(
             return BarFrame(
                 barsPublisher = quotas.map { q ->
                     q.entries.asSequence()
-                        .sortedByDescending { if (it.key == Party.OTHERS) -1.0 else it.value }
+                        .sortedByDescending { it.key.overrideSortOrder?.toDouble() ?: it.value }
                         .map {
                             BarFrame.Bar(
                                 leftText = it.key.name.uppercase(),
@@ -1898,8 +1891,8 @@ class BasicResultPanel private constructor(
                         emptyList()
                     } else {
                         sequenceOf(
-                            curr.asSequence().sortedByDescending { if (it.key == Party.OTHERS) -1.0 else it.value }.map { it.key },
-                            prev.keys.asSequence().filter { !curr.containsKey(it) }.sortedByDescending { if (it == Party.OTHERS) -1 else 0 }
+                            curr.asSequence().sortedByDescending { it.key.overrideSortOrder?.toDouble() ?: it.value }.map { it.key },
+                            prev.keys.asSequence().filter { !curr.containsKey(it) }.sortedByDescending { it.overrideSortOrder ?: 0 }
                         )
                             .flatten()
                             .distinct()

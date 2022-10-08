@@ -99,7 +99,7 @@ class CandidateListingScreen private constructor(
         private fun createBars(votes: Map<Party, Int>): List<BarFrameBuilder.BasicBar> {
             val total = votes.values.sum()
             return votes.asSequence()
-                .sortedByDescending { if (it.key == Party.OTHERS) -1 else it.value }
+                .sortedByDescending { it.key.overrideSortOrder ?: it.value }
                 .map {
                     BarFrameBuilder.BasicBar(
                         it.key.abbreviation.uppercase(),
