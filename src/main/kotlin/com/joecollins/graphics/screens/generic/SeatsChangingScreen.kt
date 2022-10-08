@@ -106,7 +106,7 @@ class SeatsChangingScreen private constructor(title: Flow.Publisher<out String?>
                 Triple(
                     it.first,
                     it.second,
-                    currResults[it.first] ?: PartyResult.NO_RESULT
+                    currResults[it.first]
                 )
             }
             .filter { it.third != null }

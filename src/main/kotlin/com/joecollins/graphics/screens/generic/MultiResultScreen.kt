@@ -124,7 +124,7 @@ class MultiResultScreen private constructor(header: Flow.Publisher<out String?>,
                 val selected = selectedShapeFunc(t)
                 val focus = focusFunc(t)
                 val additionalHighlight = additionalHighlightsFunc(t)
-                val leader = leadingPartyFunc(t).map { it ?: PartyResult.NO_RESULT }
+                val leader = leadingPartyFunc(t)
                 shapesFunc(t).entries.asSequence()
                     .map {
                         when {

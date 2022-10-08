@@ -109,7 +109,7 @@ class AllSeatsScreen private constructor(title: Flow.Publisher<out String?>, fra
                 Triple(
                     it.first,
                     it.second,
-                    this.currResults[it.first] ?: PartyResult.NO_RESULT
+                    this.currResults[it.first]
                 )
             }
             .map {

@@ -14,10 +14,6 @@ data class CandidateResult(val candidate: Candidate, val elected: Boolean) {
     }
 
     companion object {
-        @JvmField val NO_RESULT: CandidateResult? = null
-
-        @JvmField val TIE = CandidateResult(Candidate("TIE", Party("TIE", "TIE", Color.DARK_GRAY)), false)
-
         val CandidateResult?.color: Color get() {
             return when {
                 this == null -> Color.BLACK
