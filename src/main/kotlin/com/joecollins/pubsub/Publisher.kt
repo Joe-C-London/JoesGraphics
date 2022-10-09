@@ -98,6 +98,12 @@ fun <T> T.asOneTimePublisher(): Flow.Publisher<T> {
     return publisher
 }
 
+fun <T> CompletableFuture<T>.asPublisher(): Flow.Publisher<T> {
+    val publisher = Publisher<T>()
+    this.thenAccept { publisher.submit(it) }
+    return publisher
+}
+
 fun <T, R> Flow.Publisher<T>.map(func: (T) -> R): Flow.Publisher<R> {
     val publisher = Publisher<R>()
     subscribe(Subscriber { publisher.submit(func(it)) })

@@ -41,7 +41,7 @@ class PartyHeatMapScreen private constructor(panel: JPanel, title: Flow.Publishe
             items: Flow.Publisher<out Collection<T>>,
             parties: Flow.Publisher<out List<Party>>,
             prevResult: (T) -> Party,
-            currResult: (T) -> Flow.Publisher<PartyResult?>,
+            currResult: (T) -> Flow.Publisher<out PartyResult?>,
             sortOrder: (T, Party) -> Number
         ): Builder<T> {
             return Builder(items, parties, prevResult, currResult, sortOrder, true)
@@ -52,7 +52,7 @@ class PartyHeatMapScreen private constructor(panel: JPanel, title: Flow.Publishe
         private val items: Flow.Publisher<out Collection<T>>,
         private val parties: Flow.Publisher<out List<Party>>,
         private val prevResult: (T) -> Party,
-        private val currResult: (T) -> Flow.Publisher<PartyResult?>,
+        private val currResult: (T) -> Flow.Publisher<out PartyResult?>,
         private val sortOrder: (T, Party) -> Number,
         private val withLeading: Boolean
     ) {
