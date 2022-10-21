@@ -301,7 +301,7 @@ class TweetFrame(tweet: Flow.Publisher<out Status>, private val timezone: ZoneId
             image?.let {
                 val xScale = width.toDouble() / it.getWidth(null)
                 val yScale = (height - lowerHeight).toDouble() / it.getHeight(null)
-                val scale = min(xScale, yScale)
+                val scale = min(xScale, yScale).coerceAtMost(1.0)
                 val w = (it.getWidth(null) * scale).roundToInt()
                 val h = (it.getHeight(null) * scale).roundToInt()
                 g.drawImage(it, (width - w) / 2, (height - lowerHeight - h) / 2, w, h, null)

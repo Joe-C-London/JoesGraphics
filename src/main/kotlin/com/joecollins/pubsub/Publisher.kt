@@ -100,7 +100,15 @@ fun <T> T.asOneTimePublisher(): Flow.Publisher<T> {
 
 fun <T> CompletableFuture<T>.asPublisher(): Flow.Publisher<T> {
     val publisher = Publisher<T>()
-    this.thenAccept { publisher.submit(it) }
+    this.exceptionally { it.printStackTrace(); throw it; }
+        .thenAccept { publisher.submit(it) }
+    return publisher
+}
+
+fun <T> CompletableFuture<T>.asPublisher(init: T): Flow.Publisher<T> {
+    val publisher = Publisher(init)
+    this.exceptionally { it.printStackTrace(); throw it; }
+        .thenAccept { publisher.submit(it) }
     return publisher
 }
 
