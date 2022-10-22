@@ -1,6 +1,10 @@
 package com.joecollins.graphics
 
 import com.joecollins.graphics.components.GraphicsFrame
+import com.twitter.clientlib.TwitterCredentialsOAuth2
+import com.twitter.clientlib.api.TwitterApi
+import com.twitter.clientlib.model.TweetCreateRequest
+import com.twitter.clientlib.model.TweetCreateRequestMedia
 import twitter4j.StatusUpdate
 import twitter4j.TwitterFactory
 import twitter4j.conf.ConfigurationBuilder
@@ -50,6 +54,48 @@ class GenericWindow<T : JPanel> @JvmOverloads constructor(private val panel: T, 
 
     class TweetFrame(panel: JPanel) : JDialog() {
         private fun sendTweet(tweet: String, image: File) {
+            sendTweetV1(tweet, image)
+        }
+
+        private fun sendTweetV2(tweet: String, image: File) {
+            val twitterPropertiesFile = this::class.java.classLoader.getResourceAsStream("twitter.properties")
+                ?: throw IllegalStateException("Unable to find twitter.properties")
+            val properties = Properties()
+            properties.load(twitterPropertiesFile)
+            val instance = TwitterApi(
+                TwitterCredentialsOAuth2(
+                    properties["oauth2ClientId"].toString(),
+                    properties["oauth2ClientSecret"].toString(),
+                    properties["oauth2AccessToken"].toString(),
+                    properties["oauth2RefreshToken"].toString(),
+                    true
+                )
+            )
+            val mediaId = uploadMediaV1(image)
+            val mediaRequest = TweetCreateRequestMedia()
+            mediaRequest.mediaIds = listOf(mediaId.toString())
+            val tweetRequest = TweetCreateRequest()
+            tweetRequest.text = tweet
+            tweetRequest.media = mediaRequest
+            instance.tweets().createTweet(tweetRequest).execute()
+        }
+
+        private fun uploadMediaV1(image: File): Long {
+            val cb = ConfigurationBuilder()
+            val twitterPropertiesFile = this.javaClass.classLoader.getResourceAsStream("twitter.properties")
+                ?: throw IllegalStateException("Unable to find twitter.properties")
+            val properties = Properties()
+            properties.load(twitterPropertiesFile)
+            cb.setDebugEnabled(true)
+                .setOAuthConsumerKey(properties["oauthConsumerKey"].toString())
+                .setOAuthConsumerSecret(properties["oauthConsumerSecret"].toString())
+                .setOAuthAccessToken(properties["oauthAccessToken"].toString())
+                .setOAuthAccessTokenSecret(properties["oauthAccessTokenSecret"].toString())
+            val response = TwitterFactory(cb.build()).instance.uploadMedia(image)
+            return response.mediaId
+        }
+
+        private fun sendTweetV1(tweet: String, image: File) {
             val status = StatusUpdate(tweet)
             status.media(image)
             val cb = ConfigurationBuilder()

@@ -163,19 +163,19 @@ class TweetFrame(tweet: Flow.Publisher<out Tweet>, private val timezone: ZoneId 
                     .let { "<img src='https://images.emojiterra.com/twitter/v14.0/512px/$it.png' height='16' width='16' />" }
             }
         }
-        status.hashtagEntities.forEach {
+        status.hashtagEntities.filter { !status.user.isProtected }.forEach {
             htmlText = htmlText.replace("#${it.text}", "<span style='color:#$twitterColorHex'>#${it.text}</span>")
         }
-        status.userMentionEntities.forEach {
+        status.userMentionEntities.filter { !status.user.isProtected }.forEach {
             htmlText = htmlText.replace("@${it.text}", "<span style='color:#$twitterColorHex'>@${it.text}</span>")
         }
-        status.links.filter { isQuoted || !it.expandedURL.toString().startsWith("https://twitter.com/") }.forEach {
+        status.links.filter { !status.user.isProtected }.filter { isQuoted || !it.expandedURL.toString().startsWith("https://twitter.com/") }.forEach {
             htmlText = htmlText.replace(it.shortURL.toString(), if (!isQuoted && it.expandedURL.toString() == quotedURL) "" else "<span style='color:#$twitterColorHex'>${it.displayURL}(${it.shortURL})</span>")
         }
-        status.links.filter { !isQuoted && it.expandedURL.toString().startsWith("https://twitter.com/") }.forEach {
+        status.links.filter { !status.user.isProtected }.filter { !isQuoted && it.expandedURL.toString().startsWith("https://twitter.com/") }.forEach {
             htmlText = htmlText.replace(it.shortURL.toString(), "")
         }
-        status.mediaEntities.forEach {
+        status.mediaEntities.filter { !status.user.isProtected }.forEach {
             htmlText = htmlText.replace(it.displayURL, "")
         }
         return "<html><body width=${tweetLabel.width}>$htmlText<br/>&nbsp;</body></html>"

@@ -1,6 +1,7 @@
 package com.joecollins.models.general.twitter
 
 import com.twitter.clientlib.TwitterCredentialsBearer
+import com.twitter.clientlib.TwitterCredentialsOAuth2
 import com.twitter.clientlib.api.TwitterApi
 import com.twitter.clientlib.model.TweetReferencedTweets
 import java.time.Instant
@@ -28,7 +29,23 @@ object TweetLoader {
             ?: throw IllegalStateException("Unable to find twitter.properties")
         val properties = Properties()
         properties.load(twitterPropertiesFile)
-        val instance = TwitterApi(TwitterCredentialsBearer(properties["bearerToken"].toString()))
+        val instance: TwitterApi = when (properties["authMethod"].toString()) {
+            "OAuth2" -> TwitterApi(
+                TwitterCredentialsOAuth2(
+                    properties["oauth2ClientId"].toString(),
+                    properties["oauth2ClientSecret"].toString(),
+                    properties["oauth2AccessToken"].toString(),
+                    properties["oauth2RefreshToken"].toString(),
+                    true
+                )
+            )
+            "Bearer" -> TwitterApi(
+                TwitterCredentialsBearer(
+                    properties["bearerToken"].toString()
+                )
+            )
+            else -> throw IllegalArgumentException("Unrecognised auth method")
+        }
         return loadTweetV2(id, instance)
     }
 
