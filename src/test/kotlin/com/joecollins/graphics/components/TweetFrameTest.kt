@@ -1,198 +1,361 @@
 package com.joecollins.graphics.components
 
 import com.joecollins.graphics.utils.RenderTestUtils
-import com.joecollins.models.general.twitter.Tweet
+import com.joecollins.models.general.twitter.TweetLoader
 import com.joecollins.pubsub.asOneTimePublisher
+import com.twitter.clientlib.api.TweetsApi
+import com.twitter.clientlib.api.TweetsApi.APIfindTweetByIdRequest
+import com.twitter.clientlib.api.TwitterApi
+import com.twitter.clientlib.api.UsersApi
+import com.twitter.clientlib.api.UsersApi.APIfindUserByIdRequest
+import com.twitter.clientlib.model.FullTextEntities
+import com.twitter.clientlib.model.Get2TweetsIdResponse
+import com.twitter.clientlib.model.Get2UsersIdResponse
+import com.twitter.clientlib.model.HashtagEntity
+import com.twitter.clientlib.model.Media
+import com.twitter.clientlib.model.MentionEntity
+import com.twitter.clientlib.model.Photo
+import com.twitter.clientlib.model.ResourceUnauthorizedProblem
+import com.twitter.clientlib.model.TweetAttachments
+import com.twitter.clientlib.model.TweetReferencedTweets
+import com.twitter.clientlib.model.UrlEntity
+import com.twitter.clientlib.model.UrlImage
+import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito
-import twitter4j.HashtagEntity
-import twitter4j.MediaEntity
-import twitter4j.Status
-import twitter4j.URLEntity
-import twitter4j.User
-import twitter4j.UserMentionEntity
 import java.awt.Dimension
 import java.io.File
+import java.net.URL
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
 import java.time.Instant
-import java.util.Date
+import java.time.ZoneId
 import java.util.Scanner
 
 class TweetFrameTest {
 
+    private lateinit var mockTwitter: TwitterApi
+    private lateinit var mockTweetsApi: TweetsApi
+    private lateinit var mockUsersApi: UsersApi
+
+    @Before
+    fun setup() {
+        mockTwitter = Mockito.mock(TwitterApi::class.java)
+        mockTweetsApi = Mockito.mock(TweetsApi::class.java)
+        Mockito.`when`(mockTwitter.tweets()).thenReturn(mockTweetsApi)
+        mockUsersApi = Mockito.mock(UsersApi::class.java)
+        Mockito.`when`(mockTwitter.users()).thenReturn(mockUsersApi)
+    }
+
+    private fun setupTweetBuilder(id: String, authorId: String): TweetBuilder {
+        val tweetBuilder = TweetBuilder(id, authorId)
+        val mockTweetRequest = Mockito.mock(APIfindTweetByIdRequest::class.java)
+        val mockTweetResponse = Mockito.mock(Get2TweetsIdResponse::class.java)
+        Mockito.`when`(mockTweetsApi.findTweetById(id)).thenReturn(mockTweetRequest)
+        Mockito.`when`(mockTweetRequest.expansions(Mockito.anySet())).thenAnswer { inv ->
+            @Suppress("UNCHECKED_CAST")
+            tweetBuilder.expansions = inv.arguments[0] as Set<String>
+            inv.mock
+        }
+        Mockito.`when`(mockTweetRequest.tweetFields(Mockito.anySet())).thenAnswer { inv ->
+            @Suppress("UNCHECKED_CAST")
+            tweetBuilder.fields = inv.arguments[0] as Set<String>
+            inv.mock
+        }
+        Mockito.`when`(mockTweetRequest.userFields(Mockito.anySet())).thenAnswer { inv ->
+            @Suppress("UNCHECKED_CAST")
+            tweetBuilder.user.fields = inv.arguments[0] as Set<String>
+            inv.mock
+        }
+        Mockito.`when`(mockTweetRequest.mediaFields(Mockito.anySet())).thenAnswer { inv ->
+            @Suppress("UNCHECKED_CAST")
+            tweetBuilder.media.fields = inv.arguments[0] as Set<String>
+            inv.mock
+        }
+        Mockito.`when`(mockTweetRequest.execute()).thenReturn(mockTweetResponse)
+        Mockito.`when`(mockTweetResponse.data).thenAnswer { tweetBuilder.tweet }
+        Mockito.`when`(mockTweetResponse.includes).thenAnswer { tweetBuilder.includes }
+        return tweetBuilder
+    }
+
+    private fun setupUserBuilder(userId: String): UserBuilder {
+        val userBuilder = UserBuilder(userId)
+        val mockUserRequest = Mockito.mock(APIfindUserByIdRequest::class.java)
+        val mockUserResponse = Mockito.mock(Get2UsersIdResponse::class.java)
+        Mockito.`when`(mockUsersApi.findUserById(userId)).thenReturn(mockUserRequest)
+        Mockito.`when`(mockUserRequest.userFields(Mockito.anySet())).thenAnswer { inv ->
+            @Suppress("UNCHECKED_CAST")
+            userBuilder.fields = inv.arguments[0] as Set<String>
+            inv.mock
+        }
+        Mockito.`when`(mockUserRequest.execute()).thenReturn(mockUserResponse)
+        Mockito.`when`(mockUserResponse.data).thenAnswer { userBuilder.user }
+        return userBuilder
+    }
+
+    private class TweetBuilder(private val id: String, private val authorId: String) {
+        private val possibleFields = "attachments,author_id,context_annotations,conversation_id,created_at,edit_controls,edit_history_tweet_ids,entities,geo,id,in_reply_to_user_id,lang,non_public_metrics,organic_metrics,possibly_sensitive,promoted_metrics,public_metrics,referenced_tweets,reply_settings,source,text,withheld"
+            .split(",").toSet()
+
+        private val possibleExpansions = "author_id,referenced_tweets.id,referenced_tweets.id.author_id,entities.mentions.username,attachments.poll_ids,attachments.media_keys,in_reply_to_user_id,geo.place_id,edit_history_tweet_ids"
+            .split(",").toSet()
+
+        val tweet: com.twitter.clientlib.model.Tweet
+            get() {
+                val ret = com.twitter.clientlib.model.Tweet()
+                ret.id = id
+                ret.editHistoryTweetIds = listOf(id)
+                ret.text = text
+                if (fields.contains("author_id") || expansions.contains("author_id")) {
+                    ret.authorId = authorId
+                }
+                if (fields.contains("created_at")) {
+                    ret.createdAt = createdAt.atZone(ZoneId.systemDefault()).toOffsetDateTime()
+                }
+                if (fields.contains("entities")) {
+                    val entities = FullTextEntities()
+                    entities.hashtags = hashtags
+                    entities.mentions = mentions
+                    entities.urls = urls
+                    ret.entities = entities
+                }
+                if (fields.contains("referenced_tweets") || expansions.any { it.startsWith("referenced_tweets") }) {
+                    ret.referencedTweets = referencedTweets
+                }
+                if (fields.contains("attachments") || expansions.any { it.startsWith("attachments") }) {
+                    ret.attachments = TweetAttachments().also {
+                        if (media.mediaKey != null) {
+                            it.mediaKeys = listOf(media.mediaKey!!)
+                        }
+                    }
+                }
+                return ret
+            }
+
+        val includes: com.twitter.clientlib.model.Expansions?
+            get() {
+                if (expansions.isEmpty()) return null
+                val ret = com.twitter.clientlib.model.Expansions()
+                if (expansions.contains("author_id")) {
+                    ret.users = listOf(user.user)
+                }
+                if (expansions.contains("attachments.media_keys")) {
+                    ret.media = media.media
+                }
+                return ret
+            }
+
+        var fields: Set<String> = emptySet()
+            set(value) {
+                val invalid = value.filter { !possibleFields.contains(it) }
+                if (invalid.isNotEmpty()) {
+                    throw IllegalArgumentException("Unrecognised fields: $invalid")
+                }
+                field = value
+            }
+
+        var expansions: Set<String> = emptySet()
+            set(value) {
+                val invalid = value.filter { !possibleExpansions.contains(it) }
+                if (invalid.isNotEmpty()) {
+                    throw IllegalArgumentException("Unrecognised fields: $invalid")
+                }
+                field = value
+            }
+
+        lateinit var text: String
+        lateinit var createdAt: Instant
+        var hashtags: List<HashtagEntity>? = null
+        var mentions: List<MentionEntity>? = null
+        var urls: List<UrlEntity>? = null
+        var referencedTweets: List<TweetReferencedTweets>? = null
+
+        var user = UserBuilder(authorId)
+        var media = MediaBuilder()
+    }
+
+    private class UserBuilder(private val id: String) {
+        private val possibleFields = "created_at,description,entities,id,location,name,pinned_tweet_id,profile_image_url,protected,public_metrics,url,username,verified,withheld"
+            .split(",").toSet()
+
+        val user: com.twitter.clientlib.model.User
+            get() {
+                val ret = com.twitter.clientlib.model.User()
+                ret.id = id
+                ret.name = name
+                ret.username = username
+                if (fields.contains("profile_image_url")) {
+                    ret.profileImageUrl = profileImageUrl
+                }
+                if (fields.contains("protected")) {
+                    ret.protected = protected
+                }
+                if (fields.contains("verified")) {
+                    ret.verified = verified
+                }
+                return ret
+            }
+
+        var fields: Set<String> = emptySet()
+            set(value) {
+                val invalid = value.filter { !possibleFields.contains(it) }
+                if (invalid.isNotEmpty()) {
+                    throw IllegalArgumentException("Unrecognised fields: $invalid")
+                }
+                field = value
+            }
+
+        lateinit var username: String
+        lateinit var name: String
+        lateinit var profileImageUrl: URL
+        var protected = false
+        var verified = false
+    }
+
+    private class MediaBuilder() {
+        private val possibleFields = "alt_text,duration_ms,height,media_key,non_public_metrics,organic_metrics,preview_image_url,promoted_metrics,public_metrics,type,url,variants,width"
+            .split(",").toSet()
+
+        var fields: Set<String> = emptySet()
+            set(value) {
+                val invalid = value.filter { !possibleFields.contains(it) }
+                if (invalid.isNotEmpty()) {
+                    throw IllegalArgumentException("Unrecognised fields: $invalid")
+                }
+                field = value
+            }
+
+        val media: List<Media>
+            get() {
+                if (mediaKey == null) return emptyList()
+                val media: Media = when (type) {
+                    "photo" -> Photo().also {
+                        if (fields.contains("url")) {
+                            it.url = url
+                        }
+                    }
+                    else -> return emptyList()
+                }
+                media.mediaKey = mediaKey
+                media.type = type
+                return listOf(media)
+            }
+
+        var mediaKey: String? = null
+        lateinit var type: String
+        lateinit var url: URL
+    }
+
     @Test
     fun testBasicTweet() {
-        val status = Mockito.mock(Status::class.java)
-        val user = Mockito.mock(User::class.java)
-        Mockito.`when`(status.user).thenReturn(user)
-        Mockito.`when`(user.screenName).thenReturn("Joe_C_London")
-        Mockito.`when`(user.name).thenReturn("Joe C")
-        Mockito.`when`(user.profileImageURL).thenReturn(javaClass.classLoader.getResource("com/joecollins/graphics/twitter-inputs/letter-j.png")!!.toString())
-        Mockito.`when`(user.isVerified).thenReturn(false)
-        Mockito.`when`(status.text).thenReturn("This tweet will test whether this frame renders.  It will be long enough to wrap to the next line.")
-        Mockito.`when`(status.createdAt).thenReturn(Date.from(Instant.parse("2021-04-15T21:34:17Z")))
-        Mockito.`when`(status.inReplyToStatusId).thenReturn(-1)
-        Mockito.`when`(status.inReplyToUserId).thenReturn(-1)
-        Mockito.`when`(status.inReplyToScreenName).thenReturn("null")
-        Mockito.`when`(status.contributors).thenReturn(LongArray(0))
-        Mockito.`when`(status.userMentionEntities).thenReturn(emptyArray())
-        Mockito.`when`(status.urlEntities).thenReturn(emptyArray())
-        Mockito.`when`(status.hashtagEntities).thenReturn(emptyArray())
-        Mockito.`when`(status.mediaEntities).thenReturn(emptyArray())
-        Mockito.`when`(status.symbolEntities).thenReturn(emptyArray())
+        val tweetBuilder = setupTweetBuilder("123", "456")
+        tweetBuilder.text = "This tweet will test whether this frame renders.  It will be long enough to wrap to the next line."
+        tweetBuilder.createdAt = Instant.parse("2021-04-15T21:34:17Z")
 
-        val frame = TweetFrame(Tweet.fromV1(status).asOneTimePublisher())
+        val userBuilder = tweetBuilder.user
+        userBuilder.username = "Joe_C_London"
+        userBuilder.name = "Joe C"
+        userBuilder.profileImageUrl = javaClass.classLoader.getResource("com/joecollins/graphics/twitter-inputs/letter-j.png")!!
+
+        val frame = TweetFrame(TweetLoader.loadTweetV2(123L, mockTwitter).asOneTimePublisher())
         frame.size = Dimension(512, 256)
         RenderTestUtils.compareRendering("TweetFrame", "Basic", frame)
     }
 
     @Test
     fun testMultiLineTweet() {
-        val status = Mockito.mock(Status::class.java)
-        val user = Mockito.mock(User::class.java)
-        Mockito.`when`(status.user).thenReturn(user)
-        Mockito.`when`(user.screenName).thenReturn("Joe_C_London")
-        Mockito.`when`(user.name).thenReturn("Joe C")
-        Mockito.`when`(user.profileImageURL).thenReturn(javaClass.classLoader.getResource("com/joecollins/graphics/twitter-inputs/letter-j.png")!!.toString())
-        Mockito.`when`(user.isVerified).thenReturn(false)
-        Mockito.`when`(status.text).thenReturn("This tweet will test whether this frame renders.\n\nIt will contain deliberate line breaks.")
-        Mockito.`when`(status.createdAt).thenReturn(Date.from(Instant.parse("2021-04-15T21:34:17Z")))
-        Mockito.`when`(status.inReplyToStatusId).thenReturn(-1)
-        Mockito.`when`(status.inReplyToUserId).thenReturn(-1)
-        Mockito.`when`(status.inReplyToScreenName).thenReturn("null")
-        Mockito.`when`(status.contributors).thenReturn(LongArray(0))
-        Mockito.`when`(status.userMentionEntities).thenReturn(emptyArray())
-        Mockito.`when`(status.urlEntities).thenReturn(emptyArray())
-        Mockito.`when`(status.hashtagEntities).thenReturn(emptyArray())
-        Mockito.`when`(status.mediaEntities).thenReturn(emptyArray())
-        Mockito.`when`(status.symbolEntities).thenReturn(emptyArray())
+        val tweetBuilder = setupTweetBuilder("123", "456")
+        tweetBuilder.text = "This tweet will test whether this frame renders.\n\nIt will contain deliberate line breaks."
+        tweetBuilder.createdAt = Instant.parse("2021-04-15T21:34:17Z")
 
-        val frame = TweetFrame(Tweet.fromV1(status).asOneTimePublisher())
+        val userBuilder = tweetBuilder.user
+        userBuilder.username = "Joe_C_London"
+        userBuilder.name = "Joe C"
+        userBuilder.profileImageUrl = javaClass.classLoader.getResource("com/joecollins/graphics/twitter-inputs/letter-j.png")!!
+
+        val frame = TweetFrame(TweetLoader.loadTweetV2(123L, mockTwitter).asOneTimePublisher())
         frame.size = Dimension(512, 256)
         RenderTestUtils.compareRendering("TweetFrame", "MultiLine", frame)
     }
 
     @Test
     fun testVerifiedTweet() {
-        val status = Mockito.mock(Status::class.java)
-        val user = Mockito.mock(User::class.java)
-        Mockito.`when`(status.user).thenReturn(user)
-        Mockito.`when`(user.screenName).thenReturn("Joe_C_London")
-        Mockito.`when`(user.name).thenReturn("Joe C")
-        Mockito.`when`(user.profileImageURL).thenReturn(javaClass.classLoader.getResource("com/joecollins/graphics/twitter-inputs/letter-j.png")!!.toString())
-        Mockito.`when`(user.isVerified).thenReturn(true)
-        Mockito.`when`(status.text).thenReturn("This tweet will test whether this frame renders.  It will be long enough to wrap to the next line.")
-        Mockito.`when`(status.createdAt).thenReturn(Date.from(Instant.parse("2021-04-15T21:34:17Z")))
-        Mockito.`when`(status.inReplyToStatusId).thenReturn(-1)
-        Mockito.`when`(status.inReplyToUserId).thenReturn(-1)
-        Mockito.`when`(status.inReplyToScreenName).thenReturn("null")
-        Mockito.`when`(status.contributors).thenReturn(LongArray(0))
-        Mockito.`when`(status.userMentionEntities).thenReturn(emptyArray())
-        Mockito.`when`(status.urlEntities).thenReturn(emptyArray())
-        Mockito.`when`(status.hashtagEntities).thenReturn(emptyArray())
-        Mockito.`when`(status.mediaEntities).thenReturn(emptyArray())
-        Mockito.`when`(status.symbolEntities).thenReturn(emptyArray())
+        val tweetBuilder = setupTweetBuilder("123", "456")
+        tweetBuilder.text = "This tweet will test whether this frame renders.  It will be long enough to wrap to the next line."
+        tweetBuilder.createdAt = Instant.parse("2021-04-15T21:34:17Z")
 
-        val frame = TweetFrame(Tweet.fromV1(status).asOneTimePublisher())
+        val userBuilder = tweetBuilder.user
+        userBuilder.username = "Joe_C_London"
+        userBuilder.name = "Joe C"
+        userBuilder.profileImageUrl = javaClass.classLoader.getResource("com/joecollins/graphics/twitter-inputs/letter-j.png")!!
+        userBuilder.verified = true
+
+        val frame = TweetFrame(TweetLoader.loadTweetV2(123L, mockTwitter).asOneTimePublisher())
         frame.size = Dimension(512, 256)
         RenderTestUtils.compareRendering("TweetFrame", "Verified", frame)
     }
 
     @Test
     fun testProtectedTweet() {
-        val status = Mockito.mock(Status::class.java)
-        val user = Mockito.mock(User::class.java)
-        Mockito.`when`(status.user).thenReturn(user)
-        Mockito.`when`(user.screenName).thenReturn("Joe_C_London")
-        Mockito.`when`(user.name).thenReturn("Joe C")
-        Mockito.`when`(user.profileImageURL).thenReturn(javaClass.classLoader.getResource("com/joecollins/graphics/twitter-inputs/letter-j.png")!!.toString())
-        Mockito.`when`(user.isVerified).thenReturn(false)
-        Mockito.`when`(user.isProtected).thenReturn(true)
-        Mockito.`when`(status.text).thenReturn("This tweet should not be rendered in any way.")
-        Mockito.`when`(status.createdAt).thenReturn(Date.from(Instant.parse("2021-04-15T21:34:17Z")))
-        Mockito.`when`(status.inReplyToStatusId).thenReturn(-1)
-        Mockito.`when`(status.inReplyToUserId).thenReturn(-1)
-        Mockito.`when`(status.inReplyToScreenName).thenReturn("null")
-        Mockito.`when`(status.contributors).thenReturn(LongArray(0))
-        Mockito.`when`(status.userMentionEntities).thenReturn(emptyArray())
-        Mockito.`when`(status.urlEntities).thenReturn(emptyArray())
-        Mockito.`when`(status.hashtagEntities).thenReturn(emptyArray())
-        Mockito.`when`(status.mediaEntities).thenReturn(emptyArray())
-        Mockito.`when`(status.symbolEntities).thenReturn(emptyArray())
+        val tweetBuilder = setupTweetBuilder("123", "456")
+        tweetBuilder.text = "This tweet should not be rendered in any way."
+        tweetBuilder.createdAt = Instant.parse("2021-04-15T21:34:17Z")
 
-        val frame = TweetFrame(Tweet.fromV1(status).asOneTimePublisher())
+        val userBuilder = tweetBuilder.user
+        userBuilder.username = "Joe_C_London"
+        userBuilder.name = "Joe C"
+        userBuilder.profileImageUrl = javaClass.classLoader.getResource("com/joecollins/graphics/twitter-inputs/letter-j.png")!!
+        userBuilder.protected = true
+
+        val frame = TweetFrame(TweetLoader.loadTweetV2(123L, mockTwitter).asOneTimePublisher())
         frame.size = Dimension(512, 256)
         RenderTestUtils.compareRendering("TweetFrame", "Protected", frame)
     }
 
     @Test
     fun testMentionsAndHashtags() {
-        val status = Mockito.mock(Status::class.java)
-        val user = Mockito.mock(User::class.java)
-        Mockito.`when`(status.user).thenReturn(user)
-        Mockito.`when`(user.screenName).thenReturn("Joe_C_London")
-        Mockito.`when`(user.name).thenReturn("Joe C")
-        Mockito.`when`(user.profileImageURL).thenReturn(javaClass.classLoader.getResource("com/joecollins/graphics/twitter-inputs/letter-j.png")!!.toString())
-        Mockito.`when`(user.isVerified).thenReturn(false)
-        Mockito.`when`(status.text).thenReturn("Will @NicolaSturgeon win another term as FM?  Will @Douglas4Moray propel the Tories to a historic victory?  Or will @AnasSarwar lead Labour back to power?  Only three weeks to the #ScotParl election!  #Election2021")
-        Mockito.`when`(status.createdAt).thenReturn(Date.from(Instant.parse("2021-04-15T21:34:17Z")))
-        Mockito.`when`(status.inReplyToStatusId).thenReturn(-1)
-        Mockito.`when`(status.inReplyToUserId).thenReturn(-1)
-        Mockito.`when`(status.inReplyToScreenName).thenReturn("null")
-        Mockito.`when`(status.contributors).thenReturn(LongArray(0))
-        val userMentions = arrayOf(
-            run {
-                val userMention = Mockito.mock(UserMentionEntity::class.java)
-                Mockito.`when`(userMention.screenName).thenReturn("NicolaSturgeon")
-                Mockito.`when`(userMention.name).thenReturn("Nicola Sturgeon")
-                Mockito.`when`(userMention.start).thenReturn(5)
-                Mockito.`when`(userMention.end).thenReturn(20)
-                Mockito.`when`(userMention.text).thenReturn("NicolaSturgeon")
-                userMention
+        val tweetBuilder = setupTweetBuilder("123", "456")
+        tweetBuilder.text = "Will @NicolaSturgeon win another term as FM?  Will @Douglas4Moray propel the Tories to a historic victory?  Or will @AnasSarwar lead Labour back to power?  Only three weeks to the #ScotParl election!  #Election2021"
+        tweetBuilder.createdAt = Instant.parse("2021-04-15T21:34:17Z")
+        tweetBuilder.hashtags = listOf(
+            HashtagEntity().also {
+                it.start = 180
+                it.end = 189
+                it.tag = "ScotParl"
             },
-            run {
-                val userMention = Mockito.mock(UserMentionEntity::class.java)
-                Mockito.`when`(userMention.screenName).thenReturn("Douglas4Moray")
-                Mockito.`when`(userMention.name).thenReturn("Douglas Ross")
-                Mockito.`when`(userMention.start).thenReturn(51)
-                Mockito.`when`(userMention.end).thenReturn(65)
-                Mockito.`when`(userMention.text).thenReturn("Douglas4Moray")
-                userMention
-            },
-            run {
-                val userMention = Mockito.mock(UserMentionEntity::class.java)
-                Mockito.`when`(userMention.screenName).thenReturn("AnasSarwar")
-                Mockito.`when`(userMention.name).thenReturn("Anas Sarwar")
-                Mockito.`when`(userMention.start).thenReturn(116)
-                Mockito.`when`(userMention.end).thenReturn(127)
-                Mockito.`when`(userMention.text).thenReturn("AnasSarwar")
-                userMention
+            HashtagEntity().also {
+                it.start = 201
+                it.end = 214
+                it.tag = "Election2021"
             }
         )
-        Mockito.`when`(status.userMentionEntities).thenReturn(userMentions)
-        Mockito.`when`(status.urlEntities).thenReturn(emptyArray())
-        val hashTags = arrayOf(
-            run {
-                val hashtag = Mockito.mock(HashtagEntity::class.java)
-                Mockito.`when`(hashtag.start).thenReturn(180)
-                Mockito.`when`(hashtag.end).thenReturn(189)
-                Mockito.`when`(hashtag.text).thenReturn("ScotParl")
-                hashtag
+        tweetBuilder.mentions = listOf(
+            MentionEntity().also {
+                it.start = 5
+                it.end = 20
+                it.id = "111"
+                it.username = "NicolaSturgeon"
             },
-            run {
-                val hashtag = Mockito.mock(HashtagEntity::class.java)
-                Mockito.`when`(hashtag.start).thenReturn(201)
-                Mockito.`when`(hashtag.end).thenReturn(214)
-                Mockito.`when`(hashtag.text).thenReturn("Election2021")
-                hashtag
+            MentionEntity().also {
+                it.start = 51
+                it.end = 65
+                it.id = "222"
+                it.username = "Douglas4Moray"
+            },
+            MentionEntity().also {
+                it.start = 116
+                it.end = 127
+                it.id = "333"
+                it.username = "AnasSarwar"
             }
         )
-        Mockito.`when`(status.hashtagEntities).thenReturn(hashTags)
-        Mockito.`when`(status.mediaEntities).thenReturn(emptyArray())
-        Mockito.`when`(status.symbolEntities).thenReturn(emptyArray())
 
-        val frame = TweetFrame(Tweet.fromV1(status).asOneTimePublisher())
+        val userBuilder = tweetBuilder.user
+        userBuilder.username = "Joe_C_London"
+        userBuilder.name = "Joe C"
+        userBuilder.profileImageUrl = javaClass.classLoader.getResource("com/joecollins/graphics/twitter-inputs/letter-j.png")!!
+
+        val frame = TweetFrame(TweetLoader.loadTweetV2(123L, mockTwitter).asOneTimePublisher())
         frame.size = Dimension(512, 256)
         RenderTestUtils.compareRendering("TweetFrame", "MentionsAndHashtags", frame)
     }
@@ -211,178 +374,165 @@ class TweetFrameTest {
         Files.write(htmlFile.toPath(), htmlString.toByteArray())
         htmlFile.deleteOnExit()
 
-        val status = Mockito.mock(Status::class.java)
-        val user = Mockito.mock(User::class.java)
-        Mockito.`when`(status.user).thenReturn(user)
-        Mockito.`when`(user.screenName).thenReturn("Joe_C_London")
-        Mockito.`when`(user.name).thenReturn("Joe C")
-        Mockito.`when`(user.profileImageURL).thenReturn(javaClass.classLoader.getResource("com/joecollins/graphics/twitter-inputs/letter-j.png")!!.toString())
-        Mockito.`when`(user.isVerified).thenReturn(false)
-        Mockito.`when`(status.text).thenReturn("Go to https://t.co/XRFkC6ITop for an amusing story.")
-        Mockito.`when`(status.createdAt).thenReturn(Date.from(Instant.parse("2021-04-15T21:34:17Z")))
-        Mockito.`when`(status.inReplyToStatusId).thenReturn(-1)
-        Mockito.`when`(status.inReplyToUserId).thenReturn(-1)
-        Mockito.`when`(status.inReplyToScreenName).thenReturn("null")
-        Mockito.`when`(status.contributors).thenReturn(LongArray(0))
-        Mockito.`when`(status.userMentionEntities).thenReturn(emptyArray())
-        val urlEntities = arrayOf(
-            run {
-                val urlEntity = Mockito.mock(URLEntity::class.java)
-                Mockito.`when`(urlEntity.url).thenReturn("https://t.co/XRFkC6ITop")
-                Mockito.`when`(urlEntity.text).thenReturn("https://t.co/XRFkC6ITop")
-                Mockito.`when`(urlEntity.expandedURL).thenReturn(htmlFile.toURI().toURL().toString())
-                Mockito.`when`(urlEntity.displayURL).thenReturn("bbc.co.uk/news/world-eur…")
-                Mockito.`when`(urlEntity.start).thenReturn(6)
-                Mockito.`when`(urlEntity.end).thenReturn(29)
-                urlEntity
+        val tweetBuilder = setupTweetBuilder("123", "456")
+        tweetBuilder.text = "Go to https://t.co/XRFkC6ITop for an amusing story."
+        tweetBuilder.createdAt = Instant.parse("2021-04-15T21:34:17Z")
+        tweetBuilder.urls = listOf(
+            UrlEntity().also {
+                it.start = 6
+                it.end = 29
+                it.description = "Polish animal welfare officers responding to a call discover the creature is in fact a pastry."
+                it.displayUrl = "bbc.co.uk/news/world-eur…"
+                it.expandedUrl = URL("https://t.co/XRFkC6ITop")
+
+                it.images = listOf(
+                    UrlImage().also { img ->
+                        img.url = imageFile.toURI().toURL()
+                        img.height = 576
+                        img.width = 1024
+                    }
+                )
+                it.status = 200
+                it.title = "Mystery tree beast turns out to be croissant"
+                it.unwoundUrl = URL("https://www.bbc.co.uk/news/world-europe-56757956")
+                it.url = URL("https://t.co/XRFkC6ITop")
             }
         )
-        Mockito.`when`(status.urlEntities).thenReturn(urlEntities)
-        Mockito.`when`(status.hashtagEntities).thenReturn(emptyArray())
-        Mockito.`when`(status.mediaEntities).thenReturn(emptyArray())
-        Mockito.`when`(status.symbolEntities).thenReturn(emptyArray())
 
-        val frame = TweetFrame(Tweet.fromV1(status).asOneTimePublisher())
+        val userBuilder = tweetBuilder.user
+        userBuilder.username = "Joe_C_London"
+        userBuilder.name = "Joe C"
+        userBuilder.profileImageUrl = javaClass.classLoader.getResource("com/joecollins/graphics/twitter-inputs/letter-j.png")!!
+
+        val frame = TweetFrame(TweetLoader.loadTweetV2(123L, mockTwitter).asOneTimePublisher())
         frame.size = Dimension(512, 512)
-        RenderTestUtils.compareRendering("TweetFrame", "Links", frame, 15)
+        RenderTestUtils.compareRendering("TweetFrame", "Links", frame)
     }
 
     @Test
     fun testImages() {
-        val status = Mockito.mock(Status::class.java)
-        val user = Mockito.mock(User::class.java)
-        Mockito.`when`(status.user).thenReturn(user)
-        Mockito.`when`(user.screenName).thenReturn("Joe_C_London")
-        Mockito.`when`(user.name).thenReturn("Joe C")
-        Mockito.`when`(user.profileImageURL).thenReturn(javaClass.classLoader.getResource("com/joecollins/graphics/twitter-inputs/letter-j.png")!!.toString())
-        Mockito.`when`(user.isVerified).thenReturn(false)
-        Mockito.`when`(status.text).thenReturn("We should be able to render an image or two.\n\nLook!  A croissant!  https://t.co/VTphhEAioO")
-        Mockito.`when`(status.createdAt).thenReturn(Date.from(Instant.parse("2021-04-15T21:34:17Z")))
-        Mockito.`when`(status.inReplyToStatusId).thenReturn(-1)
-        Mockito.`when`(status.inReplyToUserId).thenReturn(-1)
-        Mockito.`when`(status.inReplyToScreenName).thenReturn("null")
-        Mockito.`when`(status.contributors).thenReturn(LongArray(0))
-        Mockito.`when`(status.userMentionEntities).thenReturn(emptyArray())
-        Mockito.`when`(status.urlEntities).thenReturn(emptyArray())
-        Mockito.`when`(status.hashtagEntities).thenReturn(emptyArray())
-        val images = arrayOf(
-            run {
-                val entity = Mockito.mock(MediaEntity::class.java)
-                Mockito.`when`(entity.mediaURL).thenReturn(
-                    TweetFrameTest::class.java.classLoader.getResource("com/joecollins/graphics/twitter-inputs/croissant.jpg")
-                        .toString()
-                )
-                Mockito.`when`(entity.displayURL).thenReturn("https://t.co/VTphhEAioO")
-                Mockito.`when`(entity.type).thenReturn("photo")
-                Mockito.`when`(entity.start).thenReturn(69)
-                Mockito.`when`(entity.end).thenReturn(92)
-                entity
+        val tweetBuilder = setupTweetBuilder("123", "456")
+        tweetBuilder.text = "We should be able to render an image or two.\n\nLook!  A croissant!  https://t.co/VTphhEAioO"
+        tweetBuilder.createdAt = Instant.parse("2021-04-15T21:34:17Z")
+        tweetBuilder.urls = listOf(
+            UrlEntity().also {
+                it.start = 69
+                it.end = 92
+                it.displayUrl = "pic.twitter.com/VTphhEAioO"
+                it.url = URL("https://t.co/VTphhEAioO")
+                it.expandedUrl = URL("https://twitter.com/Joe_C_London/status/123/photo/1")
+                it.mediaKey = "3_456"
             }
         )
-        Mockito.`when`(status.mediaEntities).thenReturn(images)
-        Mockito.`when`(status.symbolEntities).thenReturn(emptyArray())
+        tweetBuilder.media.mediaKey = "3_456"
+        tweetBuilder.media.type = "photo"
+        tweetBuilder.media.url = TweetFrameTest::class.java.classLoader.getResource("com/joecollins/graphics/twitter-inputs/croissant.jpg")
 
-        val frame = TweetFrame(Tweet.fromV1(status).asOneTimePublisher())
+        val userBuilder = tweetBuilder.user
+        userBuilder.username = "Joe_C_London"
+        userBuilder.name = "Joe C"
+        userBuilder.profileImageUrl = javaClass.classLoader.getResource("com/joecollins/graphics/twitter-inputs/letter-j.png")!!
+
+        val frame = TweetFrame(TweetLoader.loadTweetV2(123L, mockTwitter).asOneTimePublisher())
         frame.size = Dimension(512, 512)
         RenderTestUtils.compareRendering("TweetFrame", "Images", frame)
     }
 
     @Test
     fun testQuoteTweet() {
-        val quotedStatus = Mockito.mock(Status::class.java)
-        val quotedUser = Mockito.mock(User::class.java)
-        Mockito.`when`(quotedStatus.id).thenReturn(123456789)
-        Mockito.`when`(quotedStatus.user).thenReturn(quotedUser)
-        Mockito.`when`(quotedUser.screenName).thenReturn("Joe_C_London")
-        Mockito.`when`(quotedUser.name).thenReturn("Joe C")
-        Mockito.`when`(quotedUser.profileImageURL).thenReturn(javaClass.classLoader.getResource("com/joecollins/graphics/twitter-inputs/letter-j.png")!!.toString())
-        Mockito.`when`(quotedUser.isVerified).thenReturn(true)
-        Mockito.`when`(quotedStatus.text).thenReturn("We should be able to render an image or two.\n\nLook!  A croissant!  https://t.co/VTphhEAioO")
-        Mockito.`when`(quotedStatus.createdAt).thenReturn(Date.from(Instant.parse("2021-04-15T21:34:17Z")))
-        Mockito.`when`(quotedStatus.inReplyToStatusId).thenReturn(-1)
-        Mockito.`when`(quotedStatus.inReplyToUserId).thenReturn(-1)
-        Mockito.`when`(quotedStatus.inReplyToScreenName).thenReturn("null")
-        Mockito.`when`(quotedStatus.contributors).thenReturn(LongArray(0))
-        Mockito.`when`(quotedStatus.userMentionEntities).thenReturn(emptyArray())
-        Mockito.`when`(quotedStatus.urlEntities).thenReturn(emptyArray())
-        Mockito.`when`(quotedStatus.hashtagEntities).thenReturn(emptyArray())
-        val images = arrayOf(
-            run {
-                val entity = Mockito.mock(MediaEntity::class.java)
-                Mockito.`when`(entity.mediaURL).thenReturn(
-                    TweetFrameTest::class.java.classLoader.getResource("com/joecollins/graphics/twitter-inputs/croissant.jpg")
-                        .toString()
-                )
-                Mockito.`when`(entity.displayURL).thenReturn("https://t.co/VTphhEAioO")
-                Mockito.`when`(entity.type).thenReturn("photo")
-                Mockito.`when`(entity.start).thenReturn(69)
-                Mockito.`when`(entity.end).thenReturn(92)
-                entity
+        val tweetBuilder = setupTweetBuilder("321", "654")
+        tweetBuilder.text = "Amateurs!  https://t.co/zgM6sqOuwW"
+        tweetBuilder.createdAt = Instant.parse("2021-04-19T08:24:53+01:00")
+        tweetBuilder.urls = listOf(
+            UrlEntity().also {
+                it.start = 11
+                it.end = 34
+                it.displayUrl = "twitter.com/Joe_C_London/st…"
+                it.url = URL("https://t.co/zgM6sqOuwW")
+                it.expandedUrl = URL("https://twitter.com/Joe_C_London/status/123")
             }
         )
-        Mockito.`when`(quotedStatus.mediaEntities).thenReturn(images)
-        Mockito.`when`(quotedStatus.symbolEntities).thenReturn(emptyArray())
-
-        val status = Mockito.mock(Status::class.java)
-        val user = Mockito.mock(User::class.java)
-        Mockito.`when`(status.user).thenReturn(user)
-        Mockito.`when`(user.screenName).thenReturn("Frenchman")
-        Mockito.`when`(user.name).thenReturn("A Frenchman")
-        Mockito.`when`(user.profileImageURL).thenReturn(javaClass.classLoader.getResource("com/joecollins/graphics/twitter-inputs/tower.png")!!.toString())
-        Mockito.`when`(user.isVerified).thenReturn(false)
-        Mockito.`when`(status.text).thenReturn("Amateurs!  https://t.co/zgM6sqOuwW")
-        Mockito.`when`(status.createdAt).thenReturn(Date.from(Instant.parse("2021-04-19T08:24:53+01:00")))
-        Mockito.`when`(status.inReplyToStatusId).thenReturn(-1)
-        Mockito.`when`(status.inReplyToUserId).thenReturn(-1)
-        Mockito.`when`(status.inReplyToScreenName).thenReturn("null")
-        Mockito.`when`(status.contributors).thenReturn(LongArray(0))
-        Mockito.`when`(status.userMentionEntities).thenReturn(emptyArray())
-        val quotedUrl = arrayOf(
-            run {
-                val url = Mockito.mock(URLEntity::class.java)
-                Mockito.`when`(url.url).thenReturn("https://t.co/zgM6sqOuwW")
-                Mockito.`when`(url.expandedURL).thenReturn("https://twitter.com/Joe_C_London/status/123456789")
-                Mockito.`when`(url.displayURL).thenReturn("twitter.com/Joe_C_Lond…")
-                Mockito.`when`(url.start).thenReturn(11)
-                Mockito.`when`(url.end).thenReturn(34)
-                url
+        tweetBuilder.referencedTweets = listOf(
+            TweetReferencedTweets().also {
+                it.id = "123"
+                it.type = TweetReferencedTweets.TypeEnum.QUOTED
             }
         )
-        Mockito.`when`(status.urlEntities).thenReturn(quotedUrl)
-        Mockito.`when`(status.hashtagEntities).thenReturn(emptyArray())
-        Mockito.`when`(status.mediaEntities).thenReturn(emptyArray())
-        Mockito.`when`(status.symbolEntities).thenReturn(emptyArray())
-        Mockito.`when`(status.quotedStatus).thenReturn(quotedStatus)
-        Mockito.`when`(status.quotedStatusId).thenReturn(123456789)
 
-        val frame = TweetFrame(Tweet.fromV1(status).asOneTimePublisher())
+        val userBuilder = tweetBuilder.user
+        userBuilder.username = "Frenchman"
+        userBuilder.name = "A Frenchman"
+        userBuilder.profileImageUrl = javaClass.classLoader.getResource("com/joecollins/graphics/twitter-inputs/tower.png")
+
+        val quotedTweetBuilder = setupTweetBuilder("123", "456")
+        quotedTweetBuilder.text = "We should be able to render an image or two.\n\nLook!  A croissant!  https://t.co/VTphhEAioO"
+        quotedTweetBuilder.createdAt = Instant.parse("2021-04-15T21:34:17Z")
+        quotedTweetBuilder.urls = listOf(
+            UrlEntity().also {
+                it.start = 69
+                it.end = 92
+                it.displayUrl = "pic.twitter.com/VTphhEAioO"
+                it.url = URL("https://t.co/VTphhEAioO")
+                it.expandedUrl = TweetFrameTest::class.java.classLoader.getResource("com/joecollins/graphics/twitter-inputs/croissant.jpg")
+                it.mediaKey = "3_456"
+            }
+        )
+        quotedTweetBuilder.media.mediaKey = "3_456"
+        quotedTweetBuilder.media.type = "photo"
+        quotedTweetBuilder.media.url = TweetFrameTest::class.java.classLoader.getResource("com/joecollins/graphics/twitter-inputs/croissant.jpg")
+
+        val quotedUserBuilder = quotedTweetBuilder.user
+        quotedUserBuilder.username = "Joe_C_London"
+        quotedUserBuilder.name = "Joe C"
+        quotedUserBuilder.profileImageUrl = javaClass.classLoader.getResource("com/joecollins/graphics/twitter-inputs/letter-j.png")!!
+        quotedUserBuilder.verified = true
+
+        val frame = TweetFrame(TweetLoader.loadTweetV2(321L, mockTwitter).asOneTimePublisher())
         frame.size = Dimension(512, 512)
         RenderTestUtils.compareRendering("TweetFrame", "QuoteTweet", frame)
     }
 
     @Test
     fun testTweetWithEmoji() {
-        val status = Mockito.mock(Status::class.java)
-        val user = Mockito.mock(User::class.java)
-        Mockito.`when`(status.user).thenReturn(user)
-        Mockito.`when`(user.screenName).thenReturn("Joe_C_London")
-        Mockito.`when`(user.name).thenReturn("Joe C")
-        Mockito.`when`(user.profileImageURL).thenReturn(javaClass.classLoader.getResource("com/joecollins/graphics/twitter-inputs/letter-j.png")!!.toString())
-        Mockito.`when`(user.isVerified).thenReturn(false)
-        Mockito.`when`(status.text).thenReturn("How do you get emojis to appear in your tweet? \uD83E\uDDF5")
-        Mockito.`when`(status.createdAt).thenReturn(Date.from(Instant.parse("2022-07-21T19:26:57Z")))
-        Mockito.`when`(status.inReplyToStatusId).thenReturn(-1)
-        Mockito.`when`(status.inReplyToUserId).thenReturn(-1)
-        Mockito.`when`(status.inReplyToScreenName).thenReturn("null")
-        Mockito.`when`(status.contributors).thenReturn(LongArray(0))
-        Mockito.`when`(status.userMentionEntities).thenReturn(emptyArray())
-        Mockito.`when`(status.urlEntities).thenReturn(emptyArray())
-        Mockito.`when`(status.hashtagEntities).thenReturn(emptyArray())
-        Mockito.`when`(status.mediaEntities).thenReturn(emptyArray())
-        Mockito.`when`(status.symbolEntities).thenReturn(emptyArray())
+        val tweetBuilder = setupTweetBuilder("123", "456")
+        tweetBuilder.text = "How do you get emojis to appear in your tweet? \uD83E\uDDF5"
+        tweetBuilder.createdAt = Instant.parse("2022-07-21T19:26:57Z")
 
-        val frame = TweetFrame(Tweet.fromV1(status).asOneTimePublisher())
+        val userBuilder = tweetBuilder.user
+        userBuilder.username = "Joe_C_London"
+        userBuilder.name = "Joe C"
+        userBuilder.profileImageUrl = javaClass.classLoader.getResource("com/joecollins/graphics/twitter-inputs/letter-j.png")!!
+
+        val frame = TweetFrame(TweetLoader.loadTweetV2(123L, mockTwitter).asOneTimePublisher())
         frame.size = Dimension(512, 256)
         RenderTestUtils.compareRendering("TweetFrame", "Emoji", frame, 15)
+    }
+
+    @Test
+    fun testErrors() {
+        val mockTweetRequest = Mockito.mock(APIfindTweetByIdRequest::class.java)
+        val mockTweetResponse = Mockito.mock(Get2TweetsIdResponse::class.java)
+        Mockito.`when`(mockTweetsApi.findTweetById("123")).thenReturn(mockTweetRequest)
+        Mockito.`when`(mockTweetRequest.expansions(Mockito.anySet())).thenReturn(mockTweetRequest)
+        Mockito.`when`(mockTweetRequest.tweetFields(Mockito.anySet())).thenReturn(mockTweetRequest)
+        Mockito.`when`(mockTweetRequest.userFields(Mockito.anySet())).thenReturn(mockTweetRequest)
+        Mockito.`when`(mockTweetRequest.mediaFields(Mockito.anySet())).thenReturn(mockTweetRequest)
+        Mockito.`when`(mockTweetRequest.execute()).thenReturn(mockTweetResponse)
+        Mockito.`when`(mockTweetResponse.errors).thenAnswer {
+            val error = ResourceUnauthorizedProblem()
+            error.parameter = "id"
+            error.value = "123"
+            error.resourceId = "123"
+            error.resourceType = ResourceUnauthorizedProblem.ResourceTypeEnum.TWEET
+            error.section = ResourceUnauthorizedProblem.SectionEnum.DATA
+            error.detail = "Sorry, you are not authorized to see the Tweet with id: [123]."
+            error.title = "Authorization Error"
+            error.type = "https://api.twitter.com/2/problems/not-authorized-for-resource"
+            listOf(error)
+        }
+
+        val frame = TweetFrame(TweetLoader.loadTweetV2(123L, mockTwitter).asOneTimePublisher())
+        frame.size = Dimension(512, 256)
+        RenderTestUtils.compareRendering("TweetFrame", "Errors", frame)
     }
 }

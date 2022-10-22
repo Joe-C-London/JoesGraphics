@@ -1,5 +1,9 @@
 package com.joecollins.models.general.twitter
 
+import com.twitter.clientlib.TwitterCredentialsBearer
+import com.twitter.clientlib.api.TwitterApi
+import com.twitter.clientlib.model.TweetReferencedTweets
+import java.time.Instant
 import java.util.Properties
 
 object TweetLoader {
@@ -17,5 +21,53 @@ object TweetLoader {
             .setOAuthAccessTokenSecret(properties["oauthAccessTokenSecret"].toString())
         val instance = twitter4j.TwitterFactory(cb.build()).instance
         return Tweet.fromV1(instance.showStatus(id))
+    }
+
+    fun loadTweetV2(id: Long): Tweet {
+        val twitterPropertiesFile = this::class.java.classLoader.getResourceAsStream("twitter.properties")
+            ?: throw IllegalStateException("Unable to find twitter.properties")
+        val properties = Properties()
+        properties.load(twitterPropertiesFile)
+        val instance = TwitterApi(TwitterCredentialsBearer(properties["bearerToken"].toString()))
+        return loadTweetV2(id, instance)
+    }
+
+    internal fun loadTweetV2(id: Long, instance: TwitterApi): Tweet {
+        val response = instance.tweets().findTweetById(id.toString())
+            .expansions(setOf("author_id", "attachments.media_keys"))
+            .tweetFields(setOf("created_at", "entities", "referenced_tweets"))
+            .userFields(setOf("profile_image_url", "verified", "protected"))
+            .mediaFields(setOf("url"))
+            .execute()
+        val errors = response.errors?.takeIf { it.isNotEmpty() }
+        if (errors != null) {
+            return Tweet(
+                id,
+                errors.map { "${it.title}: ${it.detail}" }.joinToString("\n\n"),
+                User(
+                    "",
+                    "Error retrieving tweet",
+                    javaClass.classLoader.getResource("1x1.png"),
+                    false,
+                    false
+                ),
+                Instant.EPOCH,
+                null,
+                emptyList(),
+                emptyList(),
+                emptyList(),
+                emptyList()
+            )
+        }
+        val tweet = response
+            .data
+            ?: throw NoSuchElementException("No tweet with ID $id")
+        val user = response
+            .includes
+            ?: throw NoSuchElementException("No expansions for tweet with ID $id")
+        val quotedTweet = tweet.referencedTweets
+            ?.firstOrNull { it.type == TweetReferencedTweets.TypeEnum.QUOTED }
+            ?.let { loadTweetV2(it.id.toLong(), instance) }
+        return Tweet.fromV2(tweet, user, quotedTweet)
     }
 }

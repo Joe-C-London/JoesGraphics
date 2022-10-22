@@ -20,5 +20,15 @@ class User(
                 user.isProtected
             )
         }
+
+        fun fromV2(user: com.twitter.clientlib.model.User): User {
+            return User(
+                user.username,
+                user.name,
+                user.profileImageUrl!!,
+                user.verified!!,
+                user.protected!!
+            )
+        }
     }
 }

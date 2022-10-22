@@ -11,7 +11,6 @@ import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
 import com.joecollins.pubsub.map
 import com.vdurmont.emoji.EmojiParser
-import io.webfolder.cdp.Launcher
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Component
@@ -26,7 +25,6 @@ import java.awt.event.ComponentEvent
 import java.awt.geom.AffineTransform
 import java.awt.geom.Ellipse2D
 import java.awt.image.BufferedImage
-import java.net.URL
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.concurrent.Flow
@@ -250,9 +248,9 @@ class TweetFrame(tweet: Flow.Publisher<out Tweet>, private val timezone: ZoneId 
     }
 
     private inner class UrlPanel(link: Link) : JPanel() {
-        var image: Image?
-        var title: String
-        var domain: String
+        var image: Image? = link.image
+        var title: String = link.title
+        var domain: String = link.domain
 
         private val imageWidth = 300
         private val imageHeight = imageWidth / 2
@@ -262,26 +260,6 @@ class TweetFrame(tweet: Flow.Publisher<out Tweet>, private val timezone: ZoneId 
             preferredSize = Dimension(imageWidth, imageHeight + lowerHeight)
             border = MatteBorder(1, 1, 1, 1, Color.LIGHT_GRAY)
             background = Color.WHITE
-
-            try {
-                val launcher = Launcher()
-                launcher.launch().use { sessionFactory ->
-                    sessionFactory.create().use { session ->
-                        session.navigate(link.expandedURL.toString()).waitDocumentReady().wait(5000)
-                        val imageURL = session.getAttribute("//meta[@name='twitter:image:src']", "content")
-                        image = imageURL?.let { ImageIO.read(URL(it)) }
-                        title = session.getAttribute("//meta[@name='twitter:title']", "content")
-                            ?: session.getText("//title")
-                        domain = session.getAttribute("//meta[@name='twitter:domain']", "content")
-                            ?: link.expandedURL.toString().let { it.substring(it.indexOf("//") + 2) }.let { it.substring(0, it.indexOf("/")) }
-                    }
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-                image = null
-                title = "Unable to get title"
-                domain = ""
-            }
         }
 
         override fun paintComponent(g: Graphics) {
@@ -445,7 +423,7 @@ class TweetFrame(tweet: Flow.Publisher<out Tweet>, private val timezone: ZoneId 
 
     companion object {
         fun createTweetFrame(tweetId: Flow.Publisher<out Long>): TweetFrame {
-            return TweetFrame(tweetId.map { TweetLoader.loadTweetV1(it) })
+            return TweetFrame(tweetId.map { TweetLoader.loadTweetV2(it) })
         }
     }
 }

@@ -36,6 +36,7 @@ dependencies {
     api group: 'org.geotools', name: 'gt-shapefile', version: geotoolsVersion
     api group: 'org.geotools', name: 'gt-metadata', version: geotoolsVersion
     api group: 'org.twitter4j', name: 'twitter4j-core', version: '4.0.7'
+    api group: 'com.twitter', name: 'twitter-api-java-sdk', version: '2.0.3'
     api group: 'org.apache.commons', name: 'commons-collections4', version: '4.4'
     api group: 'com.google.guava', name: 'guava', version: '31.1-jre'
     api group: 'org.jsoup', name: 'jsoup', version: '1.15.3'

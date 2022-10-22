@@ -114,7 +114,15 @@ fun <T> CompletableFuture<T>.asPublisher(init: T): Flow.Publisher<T> {
 
 fun <T, R> Flow.Publisher<T>.map(func: (T) -> R): Flow.Publisher<R> {
     val publisher = Publisher<R>()
-    subscribe(Subscriber { publisher.submit(func(it)) })
+    subscribe(
+        Subscriber {
+            try {
+                publisher.submit(func(it))
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    )
     return publisher
 }
 
