@@ -1,6 +1,7 @@
 package com.joecollins.graphics.components
 
 import com.joecollins.graphics.utils.RenderTestUtils
+import com.joecollins.models.general.twitter.Tweet
 import com.joecollins.pubsub.asOneTimePublisher
 import org.junit.Test
 import org.mockito.Mockito
@@ -41,7 +42,7 @@ class TweetFrameTest {
         Mockito.`when`(status.mediaEntities).thenReturn(emptyArray())
         Mockito.`when`(status.symbolEntities).thenReturn(emptyArray())
 
-        val frame = TweetFrame(status.asOneTimePublisher())
+        val frame = TweetFrame(Tweet.fromV1(status).asOneTimePublisher())
         frame.size = Dimension(512, 256)
         RenderTestUtils.compareRendering("TweetFrame", "Basic", frame)
     }
@@ -67,7 +68,7 @@ class TweetFrameTest {
         Mockito.`when`(status.mediaEntities).thenReturn(emptyArray())
         Mockito.`when`(status.symbolEntities).thenReturn(emptyArray())
 
-        val frame = TweetFrame(status.asOneTimePublisher())
+        val frame = TweetFrame(Tweet.fromV1(status).asOneTimePublisher())
         frame.size = Dimension(512, 256)
         RenderTestUtils.compareRendering("TweetFrame", "MultiLine", frame)
     }
@@ -93,7 +94,7 @@ class TweetFrameTest {
         Mockito.`when`(status.mediaEntities).thenReturn(emptyArray())
         Mockito.`when`(status.symbolEntities).thenReturn(emptyArray())
 
-        val frame = TweetFrame(status.asOneTimePublisher())
+        val frame = TweetFrame(Tweet.fromV1(status).asOneTimePublisher())
         frame.size = Dimension(512, 256)
         RenderTestUtils.compareRendering("TweetFrame", "Verified", frame)
     }
@@ -120,7 +121,7 @@ class TweetFrameTest {
         Mockito.`when`(status.mediaEntities).thenReturn(emptyArray())
         Mockito.`when`(status.symbolEntities).thenReturn(emptyArray())
 
-        val frame = TweetFrame(status.asOneTimePublisher())
+        val frame = TweetFrame(Tweet.fromV1(status).asOneTimePublisher())
         frame.size = Dimension(512, 256)
         RenderTestUtils.compareRendering("TweetFrame", "Protected", frame)
     }
@@ -191,7 +192,7 @@ class TweetFrameTest {
         Mockito.`when`(status.mediaEntities).thenReturn(emptyArray())
         Mockito.`when`(status.symbolEntities).thenReturn(emptyArray())
 
-        val frame = TweetFrame(status.asOneTimePublisher())
+        val frame = TweetFrame(Tweet.fromV1(status).asOneTimePublisher())
         frame.size = Dimension(512, 256)
         RenderTestUtils.compareRendering("TweetFrame", "MentionsAndHashtags", frame)
     }
@@ -241,7 +242,7 @@ class TweetFrameTest {
         Mockito.`when`(status.mediaEntities).thenReturn(emptyArray())
         Mockito.`when`(status.symbolEntities).thenReturn(emptyArray())
 
-        val frame = TweetFrame(status.asOneTimePublisher())
+        val frame = TweetFrame(Tweet.fromV1(status).asOneTimePublisher())
         frame.size = Dimension(512, 512)
         RenderTestUtils.compareRendering("TweetFrame", "Links", frame, 15)
     }
@@ -281,7 +282,7 @@ class TweetFrameTest {
         Mockito.`when`(status.mediaEntities).thenReturn(images)
         Mockito.`when`(status.symbolEntities).thenReturn(emptyArray())
 
-        val frame = TweetFrame(status.asOneTimePublisher())
+        val frame = TweetFrame(Tweet.fromV1(status).asOneTimePublisher())
         frame.size = Dimension(512, 512)
         RenderTestUtils.compareRendering("TweetFrame", "Images", frame)
     }
@@ -354,7 +355,7 @@ class TweetFrameTest {
         Mockito.`when`(status.quotedStatus).thenReturn(quotedStatus)
         Mockito.`when`(status.quotedStatusId).thenReturn(123456789)
 
-        val frame = TweetFrame(status.asOneTimePublisher())
+        val frame = TweetFrame(Tweet.fromV1(status).asOneTimePublisher())
         frame.size = Dimension(512, 512)
         RenderTestUtils.compareRendering("TweetFrame", "QuoteTweet", frame)
     }
@@ -380,7 +381,7 @@ class TweetFrameTest {
         Mockito.`when`(status.mediaEntities).thenReturn(emptyArray())
         Mockito.`when`(status.symbolEntities).thenReturn(emptyArray())
 
-        val frame = TweetFrame(status.asOneTimePublisher())
+        val frame = TweetFrame(Tweet.fromV1(status).asOneTimePublisher())
         frame.size = Dimension(512, 256)
         RenderTestUtils.compareRendering("TweetFrame", "Emoji", frame, 15)
     }

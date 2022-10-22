@@ -2,17 +2,16 @@ package com.joecollins.graphics.components
 
 import com.joecollins.graphics.ImageGenerator
 import com.joecollins.graphics.utils.StandardFont
+import com.joecollins.models.general.twitter.Link
+import com.joecollins.models.general.twitter.Media
+import com.joecollins.models.general.twitter.Tweet
+import com.joecollins.models.general.twitter.TweetLoader
+import com.joecollins.models.general.twitter.User
 import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
 import com.joecollins.pubsub.map
 import com.vdurmont.emoji.EmojiParser
 import io.webfolder.cdp.Launcher
-import twitter4j.MediaEntity
-import twitter4j.Status
-import twitter4j.TwitterFactory
-import twitter4j.URLEntity
-import twitter4j.User
-import twitter4j.conf.ConfigurationBuilder
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Component
@@ -30,7 +29,6 @@ import java.awt.image.BufferedImage
 import java.net.URL
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
-import java.util.Properties
 import java.util.concurrent.Flow
 import javax.imageio.ImageIO
 import javax.swing.Box
@@ -44,7 +42,7 @@ import kotlin.math.min
 import kotlin.math.roundToInt
 import kotlin.math.sqrt
 
-class TweetFrame(tweet: Flow.Publisher<out Status>, private val timezone: ZoneId = ZoneId.systemDefault()) : JPanel() {
+class TweetFrame(tweet: Flow.Publisher<out Tweet>, private val timezone: ZoneId = ZoneId.systemDefault()) : JPanel() {
     private val twitterColor = Color(0x00acee)
 
     init {
@@ -89,12 +87,12 @@ class TweetFrame(tweet: Flow.Publisher<out Status>, private val timezone: ZoneId
         tweet.subscribe(
             Subscriber(
                 eventQueueWrapper { status ->
-                    val urls = status.urlEntities.filter { !it.expandedURL.startsWith("https://twitter.com/") }
-                    val quotedURL = status.quotedStatus?.let { "https://twitter.com/${it.user.screenName}/status/${it.id}" }
+                    val urls = status.links.filter { !it.expandedURL.toString().startsWith("https://twitter.com/") }
+                    val quotedURL = status.quotedTweet?.let { "https://twitter.com/${it.user.screenName}/status/${it.id}" }
                     urlPanel.isVisible = urls.isNotEmpty()
                     urlPanel.removeAll()
                     urlPanel.add(Box.createHorizontalGlue())
-                    urls.filter { it.expandedURL != quotedURL }.forEach {
+                    urls.filter { it.expandedURL.toString() != quotedURL }.forEach {
                         urlPanel.add(UrlPanel(it))
                     }
                     urlPanel.add(Box.createHorizontalGlue())
@@ -126,7 +124,7 @@ class TweetFrame(tweet: Flow.Publisher<out Status>, private val timezone: ZoneId
         quotedPanel.alignmentX = Component.LEFT_ALIGNMENT
         quotedPanel.border = EmptyBorder(0, 0, 5, 5)
         tweetPanel.add(quotedPanel)
-        tweet.map { it.quotedStatus }.subscribe(
+        tweet.map { it.quotedTweet }.subscribe(
             Subscriber(
                 eventQueueWrapper { status ->
                     quotedPanel.isVisible = (status != null)
@@ -147,13 +145,13 @@ class TweetFrame(tweet: Flow.Publisher<out Status>, private val timezone: ZoneId
         timeLabel.font = StandardFont.readNormalFont(12)
         timeLabel.border = EmptyBorder(2, 0, -2, 0)
         timeLabel.horizontalAlignment = JLabel.RIGHT
-        tweet.map { if (it.user.isProtected) null else it.createdAt }.subscribe(Subscriber(eventQueueWrapper { timeLabel.text = if (it == null) "" else DateTimeFormatter.ofPattern("d MMMM yyyy HH:mm:ss z ").format(it.toInstant().atZone(timezone)) }))
+        tweet.map { if (it.user.isProtected) null else it.createdAt }.subscribe(Subscriber(eventQueueWrapper { timeLabel.text = if (it == null) "" else DateTimeFormatter.ofPattern("d MMMM yyyy HH:mm:ss z ").format(it.atZone(timezone)) }))
         add(timeLabel, BorderLayout.SOUTH)
     }
 
-    private fun formatTweetText(status: Status, isQuoted: Boolean, tweetLabel: JLabel): String {
+    private fun formatTweetText(status: Tweet, isQuoted: Boolean, tweetLabel: JLabel): String {
         val twitterColorHex = (twitterColor.rgb.and(0xffffff)).toString(16)
-        val quotedURL = status.quotedStatus?.let { "https://twitter.com/${it.user.screenName}/status/${it.id}" }
+        val quotedURL = status.quotedTweet?.let { "https://twitter.com/${it.user.screenName}/status/${it.id}" }
         if (status.user.isProtected) {
             return "<html><body width=${tweetLabel.width}><span style='color:#$twitterColorHex'>" +
                 "This user's tweets are protected, and this tweet has therefore been blocked from this frame." +
@@ -173,11 +171,11 @@ class TweetFrame(tweet: Flow.Publisher<out Status>, private val timezone: ZoneId
         status.userMentionEntities.forEach {
             htmlText = htmlText.replace("@${it.text}", "<span style='color:#$twitterColorHex'>@${it.text}</span>")
         }
-        status.urlEntities.filter { isQuoted || !it.expandedURL.startsWith("https://twitter.com/") }.forEach {
-            htmlText = htmlText.replace(it.url, if (!isQuoted && it.expandedURL == quotedURL) "" else "<span style='color:#$twitterColorHex'>${it.displayURL}(${it.url})</span>")
+        status.links.filter { isQuoted || !it.expandedURL.toString().startsWith("https://twitter.com/") }.forEach {
+            htmlText = htmlText.replace(it.shortURL.toString(), if (!isQuoted && it.expandedURL.toString() == quotedURL) "" else "<span style='color:#$twitterColorHex'>${it.displayURL}(${it.shortURL})</span>")
         }
-        status.urlEntities.filter { !isQuoted && it.expandedURL.startsWith("https://twitter.com/") }.forEach {
-            htmlText = htmlText.replace(it.url, "")
+        status.links.filter { !isQuoted && it.expandedURL.toString().startsWith("https://twitter.com/") }.forEach {
+            htmlText = htmlText.replace(it.shortURL.toString(), "")
         }
         status.mediaEntities.forEach {
             htmlText = htmlText.replace(it.displayURL, "")
@@ -198,7 +196,7 @@ class TweetFrame(tweet: Flow.Publisher<out Status>, private val timezone: ZoneId
             user.subscribe(
                 Subscriber(
                     eventQueueWrapper {
-                        val originalImage = ImageIO.read(URL(it.profileImageURL))
+                        val originalImage = ImageIO.read(it.profileImageURL)
                         val size = 48
                         val resizedImage = BufferedImage(size, size, BufferedImage.TYPE_4BYTE_ABGR)
                         val g = resizedImage.createGraphics()
@@ -251,7 +249,7 @@ class TweetFrame(tweet: Flow.Publisher<out Status>, private val timezone: ZoneId
         }
     }
 
-    private inner class UrlPanel(urlEntity: URLEntity) : JPanel() {
+    private inner class UrlPanel(link: Link) : JPanel() {
         var image: Image?
         var title: String
         var domain: String
@@ -269,13 +267,13 @@ class TweetFrame(tweet: Flow.Publisher<out Status>, private val timezone: ZoneId
                 val launcher = Launcher()
                 launcher.launch().use { sessionFactory ->
                     sessionFactory.create().use { session ->
-                        session.navigate(urlEntity.expandedURL).waitDocumentReady().wait(5000)
+                        session.navigate(link.expandedURL.toString()).waitDocumentReady().wait(5000)
                         val imageURL = session.getAttribute("//meta[@name='twitter:image:src']", "content")
                         image = imageURL?.let { ImageIO.read(URL(it)) }
                         title = session.getAttribute("//meta[@name='twitter:title']", "content")
                             ?: session.getText("//title")
                         domain = session.getAttribute("//meta[@name='twitter:domain']", "content")
-                            ?: urlEntity.expandedURL.let { it.substring(it.indexOf("//") + 2) }.let { it.substring(0, it.indexOf("/")) }
+                            ?: link.expandedURL.toString().let { it.substring(it.indexOf("//") + 2) }.let { it.substring(0, it.indexOf("/")) }
                     }
                 }
             } catch (e: Exception) {
@@ -322,7 +320,7 @@ class TweetFrame(tweet: Flow.Publisher<out Status>, private val timezone: ZoneId
         }
     }
 
-    private inner class MediaPanel(mediaEntity: MediaEntity) : JPanel() {
+    private inner class MediaPanel(mediaEntity: Media) : JPanel() {
         private var image: Image?
 
         init {
@@ -330,7 +328,7 @@ class TweetFrame(tweet: Flow.Publisher<out Status>, private val timezone: ZoneId
             background = Color.WHITE
 
             image = try {
-                ImageIO.read(URL(mediaEntity.mediaURL))
+                ImageIO.read(mediaEntity.mediaURL)
             } catch (e: Exception) {
                 e.printStackTrace()
                 null
@@ -353,7 +351,7 @@ class TweetFrame(tweet: Flow.Publisher<out Status>, private val timezone: ZoneId
         }
     }
 
-    private inner class QuotedPanel(quotedStatus: Status) : JPanel() {
+    private inner class QuotedPanel(quotedStatus: Tweet) : JPanel() {
         init {
             border = MatteBorder(1, 1, 1, 1, twitterColor)
             background = Color.WHITE
@@ -401,7 +399,7 @@ class TweetFrame(tweet: Flow.Publisher<out Status>, private val timezone: ZoneId
             timeLabel.font = StandardFont.readNormalFont(12)
             timeLabel.border = EmptyBorder(2, 0, -2, 0)
             timeLabel.horizontalAlignment = JLabel.RIGHT
-            timeLabel.text = if (quotedStatus.user.isProtected) "" else DateTimeFormatter.ofPattern("d MMMM yyyy HH:mm:ss z ").format(quotedStatus.createdAt.toInstant().atZone(timezone))
+            timeLabel.text = if (quotedStatus.user.isProtected) "" else DateTimeFormatter.ofPattern("d MMMM yyyy HH:mm:ss z ").format(quotedStatus.createdAt.atZone(timezone))
             add(timeLabel, BorderLayout.SOUTH)
         }
 
@@ -447,18 +445,7 @@ class TweetFrame(tweet: Flow.Publisher<out Status>, private val timezone: ZoneId
 
     companion object {
         fun createTweetFrame(tweetId: Flow.Publisher<out Long>): TweetFrame {
-            val cb = ConfigurationBuilder()
-            val twitterPropertiesFile = this::class.java.classLoader.getResourceAsStream("twitter.properties")
-                ?: throw IllegalStateException("Unable to find twitter.properties")
-            val properties = Properties()
-            properties.load(twitterPropertiesFile)
-            cb.setDebugEnabled(true)
-                .setOAuthConsumerKey(properties["oauthConsumerKey"].toString())
-                .setOAuthConsumerSecret(properties["oauthConsumerSecret"].toString())
-                .setOAuthAccessToken(properties["oauthAccessToken"].toString())
-                .setOAuthAccessTokenSecret(properties["oauthAccessTokenSecret"].toString())
-            val instance = TwitterFactory(cb.build()).instance
-            return TweetFrame(tweetId.map { instance.showStatus(it) })
+            return TweetFrame(tweetId.map { TweetLoader.loadTweetV1(it) })
         }
     }
 }
