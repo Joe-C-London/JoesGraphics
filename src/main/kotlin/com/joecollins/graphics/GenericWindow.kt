@@ -53,7 +53,7 @@ class GenericWindow<T : JPanel> @JvmOverloads constructor(private val panel: T, 
 
     class TweetFrame(panel: JPanel) : JDialog() {
         private fun sendTweet(tweet: String, image: File) {
-            sendTweetV1(tweet, image)
+            sendTweetV2(tweet, image)
         }
 
         private fun sendTweetV2(tweet: String, image: File) {
