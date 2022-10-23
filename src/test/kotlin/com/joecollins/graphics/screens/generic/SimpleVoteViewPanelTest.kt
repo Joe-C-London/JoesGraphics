@@ -1139,7 +1139,7 @@ class SimpleVoteViewPanelTest {
         val pc = Candidate("Cory Deagle", Party("Progressive Conservative", "PC", Color.BLUE))
         val lib = Candidate("Daphne Griffin", Party("Liberal", "LIB", Color.RED))
         val grn = Candidate("John Allen MacLean", Party("Green", "GRN", Color.GREEN.darker()))
-        val currentVotes = Publisher(sequenceOf(ndp, pc, lib, grn).associateWith { null as Int? })
+        val currentVotes: Publisher<Map<Candidate, Int?>> = Publisher(sequenceOf(ndp, pc, lib, grn).associateWith { null })
         val previousVotes = Publisher(
             mapOf(
                 ndp.party to 585,

@@ -31,7 +31,7 @@ class RegionalBreakdownScreen private constructor(titleLabel: Flow.Publisher<out
     }
 
     private open class SeatEntry : Entry {
-        var partyOrder: List<out PartyOrCoalition> = emptyList()
+        var partyOrder: List<PartyOrCoalition> = emptyList()
             set(value) {
                 field = value
                 updateValue()
@@ -204,7 +204,7 @@ class RegionalBreakdownScreen private constructor(titleLabel: Flow.Publisher<out
     ) {
         protected val title: Flow.Publisher<out String> = titlePublisher
         protected val entries: MutableList<Entry> = ArrayList()
-        protected var partyOrder: Flow.Publisher<out List<out PartyOrCoalition>>? = null
+        protected var partyOrder: Flow.Publisher<out List<PartyOrCoalition>>? = null
 
         fun build(titlePublisher: Flow.Publisher<out String?>): RegionalBreakdownScreen {
             return RegionalBreakdownScreen(titlePublisher, createFrame())
@@ -577,7 +577,7 @@ class RegionalBreakdownScreen private constructor(titleLabel: Flow.Publisher<out
         private fun extractPartyOrder(
             result: Map<out PartyOrCoalition, Int>,
             diff: Map<out PartyOrCoalition, Int>
-        ): List<out PartyOrCoalition> {
+        ): List<PartyOrCoalition> {
             return sequenceOf(result.keys.asSequence(), diff.keys.asSequence()).flatten()
                 .distinct()
                 .filter { party -> (result[party] ?: 0) > 0 || (diff[party] ?: 0) != 0 }

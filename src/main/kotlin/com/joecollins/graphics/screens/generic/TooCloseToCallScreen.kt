@@ -139,7 +139,6 @@ class TooCloseToCallScreen private constructor(titleLabel: Flow.Publisher<out St
             numCandidates?.subscribe(Subscriber { input.numCandidates = it })
             val entries = input.toEntries()
             val thousandsFormatter = DecimalFormat("#,##0")
-            val pctFormatter = DecimalFormat("0.0%")
             val frame = MultiSummaryFrame(
                 headerPublisher = header,
                 rowsPublisher = entries.mapElements { entry ->

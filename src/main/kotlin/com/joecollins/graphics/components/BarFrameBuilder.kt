@@ -320,15 +320,15 @@ class BarFrameBuilder private constructor() {
             builder.minPublisher = rangeFinder.minPublisher
             builder.maxPublisher = rangeFinder.maxPublisher
             bars.subscribe(
-                Subscriber { bars ->
-                    rangeFinder.highest = bars
+                Subscriber { b ->
+                    rangeFinder.highest = b
                         .flatMap { sequenceOf(it.value1, it.value2) }
                         .map { it.toDouble() }
-                        .fold(0.0) { a, b -> max(a, b) }
-                    rangeFinder.lowest = bars
+                        .fold(0.0) { x, y -> max(x, y) }
+                    rangeFinder.lowest = b
                         .flatMap { sequenceOf(it.value1, it.value2) }
                         .map { it.toDouble() }
-                        .fold(0.0) { a, b -> min(a, b) }
+                        .fold(0.0) { x, y -> min(x, y) }
                 }
             )
             return builder

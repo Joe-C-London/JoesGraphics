@@ -57,7 +57,7 @@ class PartyHeatMapScreen private constructor(panel: JPanel, title: Flow.Publishe
         private val withLeading: Boolean
     ) {
         private var numRows = 5.asOneTimePublisher()
-        private var filter: Flow.Publisher<(T) -> Boolean> = { t: T -> true }.asOneTimePublisher()
+        private var filter: Flow.Publisher<(T) -> Boolean> = { _: T -> true }.asOneTimePublisher()
 
         fun withNumRows(numRows: Flow.Publisher<Int>): Builder<T> {
             this.numRows = numRows

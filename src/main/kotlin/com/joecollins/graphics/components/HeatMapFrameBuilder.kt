@@ -130,7 +130,7 @@ class HeatMapFrameBuilder {
             header: Flow.Publisher<out String?>,
             labelFunc: (T) -> Flow.Publisher<out String?> = { (null as String?).asOneTimePublisher() },
             seatsFunc: (T) -> Int = { 1 },
-            filterFunc: Flow.Publisher<(T) -> Boolean> = { t: T -> true }.asOneTimePublisher()
+            filterFunc: Flow.Publisher<(T) -> Boolean> = { _: T -> true }.asOneTimePublisher()
         ): HeatMapFrame {
             val results: Map<T, Flow.Publisher<out PartyResult?>> = entries
                 .distinct()

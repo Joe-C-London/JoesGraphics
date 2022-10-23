@@ -483,8 +483,8 @@ class SwingometerScreen private constructor(title: Flow.Publisher<out String?>, 
             val swing = currTotal.merge(prevTotal) { curr, prev ->
                 val ct = curr.values.sum().toDouble()
                 val pt = prev.values.sum().toDouble()
-                val parties: Set<PartyOrCoalition> = sequenceOf(curr.keys.asSequence(), prev.keys.asSequence()).flatten().toSet()
-                parties.associateWith { p: PartyOrCoalition? ->
+                val allParties: Set<PartyOrCoalition> = sequenceOf(curr.keys.asSequence(), prev.keys.asSequence()).flatten().toSet()
+                allParties.associateWith { p: PartyOrCoalition? ->
                     (curr[p] ?: 0) / ct.coerceAtLeast(1e-6) - (prev[p] ?: 0) / pt.coerceAtLeast(1e-6)
                 }
             }

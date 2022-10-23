@@ -1422,13 +1422,7 @@ class SeatViewPanelTest {
         val progressLabel = Publisher("0/650")
         val seatSubhead = Publisher("PROJECTION: TOO EARLY TO CALL")
         val changeHeader = Publisher("CHANGE SINCE 2017")
-        val con = Party("Conservative", "CON", Color.BLUE)
         val lab = Party("Labour", "LAB", Color.RED)
-        val ld = Party("Liberal Democrat", "LD", Color.ORANGE)
-        val snp = Party("Scottish National Party", "SNP", Color.YELLOW)
-        val pc = Party("Plaid Cymru", "PC", Color.GREEN.darker())
-        val grn = Party("Green", "GRN", Color.GREEN)
-        val oth = Party.OTHERS
         val panel = partySeats(
             currentSeats,
             seatHeader,
@@ -1453,7 +1447,6 @@ class SeatViewPanelTest {
         val lib = Party("Liberal", "LIB", Color.RED)
         val yp = Party("Yukon Party", "YP", Color.BLUE)
         val ndp = Party("New Democratic Party", "NDP", Color.ORANGE)
-        val ind = Party("Independent", "IND", Party.OTHERS.color)
         val tie = Party.TIE
 
         val panel = partyDualSeats(

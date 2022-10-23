@@ -373,7 +373,7 @@ class MixedMemberResultPanel private constructor(
                     val total = votes.values.filterNotNull().sum()
                     val partialDeclaration = votes.values.any { it == null }
                     votes.entries
-                        .sortedByDescending { it.key.overrideSortOrder ?: (it.value ?: -1) }
+                        .sortedByDescending { it.key.overrideSortOrder ?: (it.value ?: 0) }
                         .map {
                             val value = it.value
                             val pct = if (value == null) Double.NaN else 1.0 * value / total

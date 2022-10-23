@@ -302,7 +302,7 @@ class BattlegroundScreen private constructor(
                         resultColor = Color.BLACK
                         fill = false
                     } else {
-                        resultColor = partyResult.party?.color ?: Color.BLACK
+                        resultColor = partyResult.party.color
                         fill = partyResult.isElected
                     }
                     val colorFunc = if (filteredSeats?.contains(it.first) != false) { c: Color -> c } else { c -> lighten(lighten(c)) }

@@ -1,6 +1,5 @@
 package com.joecollins.graphics.components.lowerthird
 
-import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.PartyOrCoalition
 import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
@@ -96,19 +95,6 @@ class LowerThirdHeadlineAndSummarySingleLabel internal constructor(
                 .filter { it.value > 0 }
                 .sortedByDescending { it.key.overrideSortOrder ?: it.value }
                 .map { SummaryWithoutLabels.Entry(it.key.color, DecimalFormat("0.0%").format(it.value / total)) }
-                .toMutableList()
-            if (ret.isEmpty()) {
-                ret.add(SummaryWithoutLabels.Entry(Color.WHITE, "WAITING..."))
-            }
-            return ret
-        }
-
-        fun createVoteEntries(votes: Map<Candidate, Int>, labelFunc: (Candidate) -> String): List<SummaryWithoutLabels.Entry> {
-            val total = votes.values.sum().toDouble()
-            val ret = votes.entries
-                .filter { it.value > 0 }
-                .sortedByDescending { it.key.overrideSortOrder ?: it.value }
-                .map { SummaryWithoutLabels.Entry(it.key.party.color, DecimalFormat("0.0%").format(it.value / total)) }
                 .toMutableList()
             if (ret.isEmpty()) {
                 ret.add(SummaryWithoutLabels.Entry(Color.WHITE, "WAITING..."))

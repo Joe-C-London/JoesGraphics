@@ -1391,7 +1391,7 @@ class BasicResultPanel private constructor(
                 val prevWinner: KPT? = pVotes.entries
                     .maxByOrNull { it.value }
                     ?.key
-                val prevHasOther = pVotes.containsKey(Party.OTHERS as KPT)
+                val prevHasOther = pVotes.containsKey(Party.OTHERS as PartyOrCoalition)
                 val partiesToShow = sequenceOf(
                     sequenceOf(prevWinner),
                     cVotes.entries
@@ -1426,19 +1426,19 @@ class BasicResultPanel private constructor(
                 val partyTotal = Aggregators.topAndOthers(
                     consolidate(currTotalByParty(cVotes), partiesToShow),
                     limit,
-                    Party.OTHERS as KPT,
+                    Party.OTHERS as PartyOrCoalition,
                     mandatoryParties
                 )
                 val finalPartiesToShow = sequenceOf(
                     partyTotal.keys.asSequence(),
-                    pVotes.entries.asSequence().filter { !partyTotal.containsKey(it.key) }.map { Party.OTHERS as KPT }
+                    pVotes.entries.asSequence().filter { !partyTotal.containsKey(it.key) }.map { Party.OTHERS }
                 ).flatten().toSet()
-                val prevVotes: Map<KPT, Int> = pVotes.entries
+                val prevVotes: Map<PartyOrCoalition, Int> = pVotes.entries
                     .groupingBy { if (finalPartiesToShow.contains(it.key)) it.key else Party.OTHERS }
                     .fold(0) { a, e -> a + e.value }
                 return finalPartiesToShow.asSequence()
                     .sortedByDescending { it.overrideSortOrder ?: (partyTotal[it] ?: 0) }
-                    .map { e: KPT ->
+                    .map { e: PartyOrCoalition ->
                         val cpct = 1.0 * (partyTotal[e] ?: 0) / currTotal
                         val ppct = 1.0 * (prevVotes[e] ?: 0) / prevTotal
                         BasicBar(
@@ -1589,8 +1589,8 @@ class BasicResultPanel private constructor(
                 .fold(0) { a, e -> a + (e.value ?: 0) }
         }
 
-        private fun consolidate(votes: Map<KPT, Int>, parties: Set<KPT>): Map<KPT, Int> {
-            return votes.entries.groupingBy { if (parties.contains(it.key)) it.key else Party.OTHERS as KPT }.fold(0) { a, e -> a + e.value }
+        private fun consolidate(votes: Map<KPT, Int>, parties: Set<KPT>): Map<PartyOrCoalition, Int> {
+            return votes.entries.groupingBy { if (parties.contains(it.key)) it.key else Party.OTHERS }.fold(0) { a, e -> a + e.value }
         }
     }
 
@@ -1685,10 +1685,10 @@ class BasicResultPanel private constructor(
                     .fold(0.0..0.0) { a, e -> (a.start + e.value.start)..(a.endInclusive + e.value.endInclusive) }
                 val finalPartiesToShow = sequenceOf(
                     partyTotal.keys.asSequence(),
-                    pVotes.entries.asSequence().filter { !partyTotal.containsKey(it.key) }.map { Party.OTHERS as KPT }
+                    pVotes.entries.asSequence().filter { !partyTotal.containsKey(it.key) }.map { Party.OTHERS }
                 ).flatten().toSet()
                 val prevVotes = pVotes.entries
-                    .groupingBy { if (partyTotal.containsKey(it.key)) it.key else Party.OTHERS as KPT }
+                    .groupingBy { if (partyTotal.containsKey(it.key)) it.key else Party.OTHERS }
                     .fold(0) { a, e -> a + e.value }
                 return finalPartiesToShow.asSequence()
                     .sortedByDescending { e -> e.overrideSortOrder?.toDouble() ?: partyTotal[e]!!.let { it.start + it.endInclusive } }
@@ -2035,6 +2035,7 @@ class BasicResultPanel private constructor(
             header: Flow.Publisher<out String?>,
             subhead: Flow.Publisher<out String?>
         ): VoteScreenBuilder<P, P, Int?, Double, Int> {
+            @Suppress("UNCHECKED_CAST")
             return BasicVoteScreenBuilder(
                 votes,
                 header,
@@ -2112,6 +2113,7 @@ class BasicResultPanel private constructor(
             header: Flow.Publisher<out String?>,
             subhead: Flow.Publisher<out String?>
         ): VoteScreenBuilder<P, P, ClosedRange<Double>, Double, Int> {
+            @Suppress("UNCHECKED_CAST")
             return RangeVoteScreenBuilder(
                 votes,
                 header,

@@ -119,24 +119,16 @@ object Aggregators {
             .sortedByDescending { it.value ?: -1 }
             .take(max(0, limit - 1 - mustIncludeSet.size))
             .toSet()
-        val topAndRequired: (Map.Entry<K, Int?>) -> Boolean = { top.contains(it) || mustIncludeSet.contains(it.key) }
-        var needOthers = false
-        val ret: LinkedHashMap<K, T> = LinkedHashMap()
-        result.entries.forEach { e ->
-            if (topAndRequired(e) || e.value != null) {
-                val key = if (topAndRequired(e)) e.key else others
-                if (ret.containsKey(key)) {
-                    ret.merge(key, e.value!!) { a, b -> (a!!.toInt() + b!!.toInt()) as T }
-                } else {
-                    ret[key] = e.value
+        val topOrRequired: (Map.Entry<K, Int?>) -> Boolean = { top.contains(it) || mustIncludeSet.contains(it.key) }
+        val ret: Map<K, T> = result.entries
+            .map { e -> (if (topOrRequired(e)) e.key else others) to e.value }
+            .groupBy({ it.first }, { it.second })
+            .mapValues {
+                it.value.reduce { x, y ->
+                    @Suppress("UNCHECKED_CAST")
+                    (if (x == null || y == null) null else (x + y)) as T
                 }
-            } else {
-                needOthers = true
             }
-        }
-        if (needOthers) {
-            ret[others] = null as T
-        }
         return ret
     }
 

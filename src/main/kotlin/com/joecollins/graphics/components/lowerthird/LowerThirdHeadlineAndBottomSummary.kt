@@ -85,7 +85,7 @@ class LowerThirdHeadlineAndBottomSummary internal constructor(
     }
 
     companion object {
-        fun createSeatEntries(seats: Map<out PartyOrCoalition, Int>, totalSeats: Int = 0, partiesToShow: Set<out PartyOrCoalition> = emptySet()): List<BottomSummary.Entry> {
+        fun createSeatEntries(seats: Map<out PartyOrCoalition, Int>, totalSeats: Int = 0, partiesToShow: Set<PartyOrCoalition> = emptySet()): List<BottomSummary.Entry> {
             val ret = sequenceOf(
                 partiesToShow.asSequence(),
                 seats.entries.asSequence().filter { it.value > 0 }.map { it.key }
