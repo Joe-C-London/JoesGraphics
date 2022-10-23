@@ -1,8 +1,7 @@
 package com.joecollins.graphics
 
 import com.joecollins.graphics.components.GraphicsFrame
-import com.twitter.clientlib.TwitterCredentialsOAuth2
-import com.twitter.clientlib.api.TwitterApi
+import com.joecollins.models.general.twitter.TwitterV2InstanceFactory
 import com.twitter.clientlib.model.TweetCreateRequest
 import com.twitter.clientlib.model.TweetCreateRequestMedia
 import twitter4j.StatusUpdate
@@ -58,19 +57,7 @@ class GenericWindow<T : JPanel> @JvmOverloads constructor(private val panel: T, 
         }
 
         private fun sendTweetV2(tweet: String, image: File) {
-            val twitterPropertiesFile = this::class.java.classLoader.getResourceAsStream("twitter.properties")
-                ?: throw IllegalStateException("Unable to find twitter.properties")
-            val properties = Properties()
-            properties.load(twitterPropertiesFile)
-            val instance = TwitterApi(
-                TwitterCredentialsOAuth2(
-                    properties["oauth2ClientId"].toString(),
-                    properties["oauth2ClientSecret"].toString(),
-                    properties["oauth2AccessToken"].toString(),
-                    properties["oauth2RefreshToken"].toString(),
-                    true
-                )
-            )
+            val instance = TwitterV2InstanceFactory.instance
             val mediaId = uploadMediaV1(image)
             val mediaRequest = TweetCreateRequestMedia()
             mediaRequest.mediaIds = listOf(mediaId.toString())

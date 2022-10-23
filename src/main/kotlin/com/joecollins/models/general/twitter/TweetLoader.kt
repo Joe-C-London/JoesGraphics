@@ -1,7 +1,5 @@
 package com.joecollins.models.general.twitter
 
-import com.twitter.clientlib.TwitterCredentialsBearer
-import com.twitter.clientlib.TwitterCredentialsOAuth2
 import com.twitter.clientlib.api.TwitterApi
 import com.twitter.clientlib.model.TweetReferencedTweets
 import java.time.Instant
@@ -25,27 +23,7 @@ object TweetLoader {
     }
 
     fun loadTweetV2(id: Long): Tweet {
-        val twitterPropertiesFile = this::class.java.classLoader.getResourceAsStream("twitter.properties")
-            ?: throw IllegalStateException("Unable to find twitter.properties")
-        val properties = Properties()
-        properties.load(twitterPropertiesFile)
-        val instance: TwitterApi = when (properties["authMethod"].toString()) {
-            "OAuth2" -> TwitterApi(
-                TwitterCredentialsOAuth2(
-                    properties["oauth2ClientId"].toString(),
-                    properties["oauth2ClientSecret"].toString(),
-                    properties["oauth2AccessToken"].toString(),
-                    properties["oauth2RefreshToken"].toString(),
-                    true
-                )
-            )
-            "Bearer" -> TwitterApi(
-                TwitterCredentialsBearer(
-                    properties["bearerToken"].toString()
-                )
-            )
-            else -> throw IllegalArgumentException("Unrecognised auth method")
-        }
+        val instance: TwitterApi = TwitterV2InstanceFactory.instance
         return loadTweetV2(id, instance)
     }
 
@@ -60,7 +38,7 @@ object TweetLoader {
         if (errors != null) {
             return Tweet(
                 id,
-                errors.map { "${it.title}: ${it.detail}" }.joinToString("\n\n"),
+                errors.joinToString("\n\n") { "${it.title}: ${it.detail}" },
                 User(
                     "",
                     "Error retrieving tweet",

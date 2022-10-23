@@ -90,7 +90,7 @@ class TweetFrame(tweet: Flow.Publisher<out Tweet>, private val timezone: ZoneId 
                     urlPanel.isVisible = urls.isNotEmpty()
                     urlPanel.removeAll()
                     urlPanel.add(Box.createHorizontalGlue())
-                    urls.filter { it.expandedURL.toString() != quotedURL }.forEach {
+                    urls.filter { !status.user.isProtected }.filter { it.expandedURL.toString() != quotedURL }.forEach {
                         urlPanel.add(UrlPanel(it))
                     }
                     urlPanel.add(Box.createHorizontalGlue())
