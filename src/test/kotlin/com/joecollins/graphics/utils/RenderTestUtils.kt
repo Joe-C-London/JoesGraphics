@@ -1,8 +1,11 @@
 package com.joecollins.graphics.utils
 
+import com.joecollins.graphics.AltTextProvider
+import com.joecollins.pubsub.Subscriber
 import org.apache.commons.io.FileUtils
 import org.awaitility.Awaitility
 import org.awaitility.core.ConditionTimeoutException
+import org.hamcrest.Matchers
 import org.junit.Assert
 import java.awt.Component
 import java.awt.Container
@@ -67,5 +70,12 @@ object RenderTestUtils {
             throw AssertionError(e)
         }
         return img
+    }
+
+    fun compareAltTexts(panel: AltTextProvider, expected: String?) {
+        var result: String? = null
+        panel.altText.subscribe(Subscriber { result = it })
+        Awaitility.await().until({ result }, Matchers.equalTo(expected))
+        Awaitility.await().until({ (result ?: "").length }, Matchers.lessThanOrEqualTo(1000))
     }
 }

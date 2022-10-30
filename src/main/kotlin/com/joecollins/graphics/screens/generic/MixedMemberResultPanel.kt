@@ -32,17 +32,20 @@ class MixedMemberResultPanel private constructor(
     private val partyFrame: BarFrame,
     private val partyChangeFrame: BarFrame?,
     private val mapFrame: MapFrame?
-) : GenericPanel({
-    val panel = JPanel()
-    panel.layout = ScreenLayout()
-    panel.background = Color.WHITE
-    panel.add(candidateFrame, ScreenLayout.CANDIDATE)
-    candidateChangeFrame?.also { panel.add(it, ScreenLayout.CANDIDATE_DIFF) }
-    panel.add(partyFrame, ScreenLayout.PARTY)
-    partyChangeFrame?.also { panel.add(it, ScreenLayout.PARTY_DIFF) }
-    mapFrame?.also { panel.add(it, ScreenLayout.MAP) }
-    panel
-}, label) {
+) : GenericPanel(
+    run {
+        val panel = JPanel()
+        panel.layout = ScreenLayout()
+        panel.background = Color.WHITE
+        panel.add(candidateFrame, ScreenLayout.CANDIDATE)
+        candidateChangeFrame?.also { panel.add(it, ScreenLayout.CANDIDATE_DIFF) }
+        panel.add(partyFrame, ScreenLayout.PARTY)
+        partyChangeFrame?.also { panel.add(it, ScreenLayout.PARTY_DIFF) }
+        mapFrame?.also { panel.add(it, ScreenLayout.MAP) }
+        panel
+    },
+    label
+) {
 
     private class ScreenLayout : LayoutManager {
 

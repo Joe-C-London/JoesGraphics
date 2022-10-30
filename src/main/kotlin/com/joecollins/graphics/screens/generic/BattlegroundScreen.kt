@@ -31,18 +31,21 @@ class BattlegroundScreen private constructor(
     private val leftColumns: Flow.Publisher<Int>,
     private val rightColumns: Flow.Publisher<Int>,
     val headerColor: Flow.Publisher<Color>? = null
-) : GenericPanel({
-    val panel = JPanel()
-    panel.background = Color.WHITE
-    panel.border = EmptyBorder(5, 5, 5, 5)
-    val layout = Layout(panel)
-    leftColumns.subscribe(Subscriber(eventQueueWrapper { layout.setLeft(it) }))
-    rightColumns.subscribe(Subscriber(eventQueueWrapper { layout.setRight(it) }))
-    panel.layout = layout
-    panel.add(leftPanel, Layout.WEST)
-    panel.add(rightPanel, Layout.EAST)
-    panel
-}, title) {
+) : GenericPanel(
+    run {
+        val panel = JPanel()
+        panel.background = Color.WHITE
+        panel.border = EmptyBorder(5, 5, 5, 5)
+        val layout = Layout(panel)
+        leftColumns.subscribe(Subscriber(eventQueueWrapper { layout.setLeft(it) }))
+        rightColumns.subscribe(Subscriber(eventQueueWrapper { layout.setRight(it) }))
+        panel.layout = layout
+        panel.add(leftPanel, Layout.WEST)
+        panel.add(rightPanel, Layout.EAST)
+        panel
+    },
+    title
+) {
 
     init {
         headerColor?.subscribe(Subscriber(eventQueueWrapper { super.label.foreground = it }))

@@ -8,6 +8,7 @@ import com.joecollins.graphics.screens.generic.BasicResultPanel.Companion.partyD
 import com.joecollins.graphics.screens.generic.BasicResultPanel.Companion.partyDualSeatsReversed
 import com.joecollins.graphics.screens.generic.BasicResultPanel.Companion.partyRangeSeats
 import com.joecollins.graphics.screens.generic.BasicResultPanel.Companion.partySeats
+import com.joecollins.graphics.utils.RenderTestUtils.compareAltTexts
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.graphics.utils.ShapefileReader.readShapes
 import com.joecollins.models.general.Candidate
@@ -46,16 +47,47 @@ class SeatViewPanelTest {
             .build(header)
         panel.setSize(1024, 512)
         compareRendering("SeatViewPanel", "Basic-1", panel)
+        compareAltTexts(
+            panel,
+            """
+            UNITED KINGDOM
+            
+            0 OF 650 CONSTITUENCIES DECLARED, PROJECTION: TOO EARLY TO CALL (CHANGE SINCE 2017, CON NEED +9 FOR MAJORITY)
+            326 SEATS FOR MAJORITY
+            """.trimIndent()
+        )
 
         currentSeats.submit(mapOf(con to 1))
         previousSeats.submit(mapOf(lab to 1))
         seatHeader.submit("1 OF 650 SEATS DECLARED")
         compareRendering("SeatViewPanel", "Basic-2", panel)
+        compareAltTexts(
+            panel,
+            """
+            UNITED KINGDOM
+            
+            1 OF 650 SEATS DECLARED, PROJECTION: TOO EARLY TO CALL (CHANGE SINCE 2017, CON NEED +9 FOR MAJORITY)
+            CONSERVATIVE: 1 (+1)
+            LABOUR: 0 (-1)
+            326 SEATS FOR MAJORITY
+            """.trimIndent()
+        )
 
         currentSeats.submit(mapOf(con to 1, lab to 2))
         previousSeats.submit(mapOf(lab to 3))
         seatHeader.submit("3 OF 650 SEATS DECLARED")
         compareRendering("SeatViewPanel", "Basic-3", panel)
+        compareAltTexts(
+            panel,
+            """
+            UNITED KINGDOM
+            
+            3 OF 650 SEATS DECLARED, PROJECTION: TOO EARLY TO CALL (CHANGE SINCE 2017, CON NEED +9 FOR MAJORITY)
+            LABOUR: 2 (-1)
+            CONSERVATIVE: 1 (+1)
+            326 SEATS FOR MAJORITY
+            """.trimIndent()
+        )
 
         val ld = Party("Liberal Democrat", "LD", Color.ORANGE)
         val snp = Party("Scottish National Party", "SNP", Color.YELLOW)
@@ -87,6 +119,23 @@ class SeatViewPanelTest {
         seatHeader.submit("650 OF 650 SEATS DECLARED")
         seatSubhead.submit("PROJECTION: CON MAJORITY")
         compareRendering("SeatViewPanel", "Basic-4", panel)
+        compareAltTexts(
+            panel,
+            """
+            UNITED KINGDOM
+            
+            650 OF 650 SEATS DECLARED, PROJECTION: CON MAJORITY (CHANGE SINCE 2017, CON NEED +9 FOR MAJORITY)
+            CONSERVATIVE: 365 (+48)
+            LABOUR: 202 (-60)
+            SCOTTISH NATIONAL PARTY: 48 (+13)
+            LIBERAL DEMOCRAT: 11 (-1)
+            PLAID CYMRU: 4 (±0)
+            GREEN: 1 (±0)
+            OTHERS: 19 (±0)
+            326 SEATS FOR MAJORITY
+            """.trimIndent()
+        )
+
         header.submit("SCOTLAND")
         seatHeader.submit("59 OF 59 SEATS DECLARED")
         seatSubhead.submit("")
@@ -96,6 +145,18 @@ class SeatViewPanelTest {
         currentSeats.submit(mapOf(snp to 48, con to 6, ld to 4, lab to 1))
         previousSeats.submit(mapOf(snp to 35, con to 13, lab to 7, ld to 4))
         compareRendering("SeatViewPanel", "Basic-5", panel)
+        compareAltTexts(
+            panel,
+            """
+            SCOTLAND
+            
+            59 OF 59 SEATS DECLARED (CHANGE SINCE 2017)
+            SCOTTISH NATIONAL PARTY: 48 (+13)
+            CONSERVATIVE: 6 (-7)
+            LIBERAL DEMOCRAT: 4 (±0)
+            LABOUR: 1 (-6)
+            """.trimIndent()
+        )
     }
 
     @Test
@@ -122,15 +183,46 @@ class SeatViewPanelTest {
             .build(header)
         panel.setSize(1024, 512)
         compareRendering("SeatViewPanel", "Basic-1", panel)
+        compareAltTexts(
+            panel,
+            """
+            UNITED KINGDOM
+            
+            0 OF 650 CONSTITUENCIES DECLARED, PROJECTION: TOO EARLY TO CALL (CHANGE SINCE 2017, CON NEED +9 FOR MAJORITY)
+            326 SEATS FOR MAJORITY
+            """.trimIndent()
+        )
 
         currentSeats.submit(mapOf(con to 1))
         seatDiff.submit(mapOf(con to +1, lab to -1))
         seatHeader.submit("1 OF 650 SEATS DECLARED")
         compareRendering("SeatViewPanel", "Basic-2", panel)
+        compareAltTexts(
+            panel,
+            """
+            UNITED KINGDOM
+            
+            1 OF 650 SEATS DECLARED, PROJECTION: TOO EARLY TO CALL (CHANGE SINCE 2017, CON NEED +9 FOR MAJORITY)
+            CONSERVATIVE: 1 (+1)
+            LABOUR: 0 (-1)
+            326 SEATS FOR MAJORITY
+            """.trimIndent()
+        )
 
         currentSeats.submit(mapOf(con to 1, lab to 2))
         seatHeader.submit("3 OF 650 SEATS DECLARED")
         compareRendering("SeatViewPanel", "Basic-3", panel)
+        compareAltTexts(
+            panel,
+            """
+            UNITED KINGDOM
+            
+            3 OF 650 SEATS DECLARED, PROJECTION: TOO EARLY TO CALL (CHANGE SINCE 2017, CON NEED +9 FOR MAJORITY)
+            LABOUR: 2 (-1)
+            CONSERVATIVE: 1 (+1)
+            326 SEATS FOR MAJORITY
+            """.trimIndent()
+        )
 
         val ld = Party("Liberal Democrat", "LD", Color.ORANGE)
         val snp = Party("Scottish National Party", "SNP", Color.YELLOW)
@@ -162,6 +254,23 @@ class SeatViewPanelTest {
         seatHeader.submit("650 OF 650 SEATS DECLARED")
         seatSubhead.submit("PROJECTION: CON MAJORITY")
         compareRendering("SeatViewPanel", "Basic-4", panel)
+        compareAltTexts(
+            panel,
+            """
+            UNITED KINGDOM
+            
+            650 OF 650 SEATS DECLARED, PROJECTION: CON MAJORITY (CHANGE SINCE 2017, CON NEED +9 FOR MAJORITY)
+            CONSERVATIVE: 365 (+48)
+            LABOUR: 202 (-60)
+            SCOTTISH NATIONAL PARTY: 48 (+13)
+            LIBERAL DEMOCRAT: 11 (-1)
+            PLAID CYMRU: 4 (±0)
+            GREEN: 1 (±0)
+            OTHERS: 19 (±0)
+            326 SEATS FOR MAJORITY
+            """.trimIndent()
+        )
+
         header.submit("SCOTLAND")
         seatHeader.submit("59 OF 59 SEATS DECLARED")
         seatSubhead.submit("")
@@ -171,6 +280,18 @@ class SeatViewPanelTest {
         currentSeats.submit(mapOf(snp to 48, con to 6, ld to 4, lab to 1))
         seatDiff.submit(mapOf(snp to +13, con to -7, ld to 0, lab to -6))
         compareRendering("SeatViewPanel", "Basic-5", panel)
+        compareAltTexts(
+            panel,
+            """
+            SCOTLAND
+            
+            59 OF 59 SEATS DECLARED (CHANGE SINCE 2017)
+            SCOTTISH NATIONAL PARTY: 48 (+13)
+            CONSERVATIVE: 6 (-7)
+            LIBERAL DEMOCRAT: 4 (±0)
+            LABOUR: 1 (-6)
+            """.trimIndent()
+        )
     }
 
     @Test
@@ -206,6 +327,17 @@ class SeatViewPanelTest {
             .build(header)
         panel.setSize(1024, 512)
         compareRendering("SeatViewPanel", "Swing-1", panel)
+        compareAltTexts(
+            panel,
+            """
+            UNITED KINGDOM
+            
+            0 OF 650 CONSTITUENCIES DECLARED, PROJECTION: TOO EARLY TO CALL (CHANGE SINCE 2017)
+            326 SEATS FOR MAJORITY
+            
+            SWING SINCE 2017: NOT AVAILABLE
+            """.trimIndent()
+        )
 
         currentSeats.submit(mapOf(lab to 1))
         previousSeats.submit(mapOf(lab to 1))
@@ -229,6 +361,18 @@ class SeatViewPanelTest {
         )
         seatHeader.submit("1 OF 650 SEATS DECLARED")
         compareRendering("SeatViewPanel", "Swing-2", panel)
+        compareAltTexts(
+            panel,
+            """
+            UNITED KINGDOM
+            
+            1 OF 650 SEATS DECLARED, PROJECTION: TOO EARLY TO CALL (CHANGE SINCE 2017)
+            LABOUR: 1 (±0)
+            326 SEATS FOR MAJORITY
+            
+            SWING SINCE 2017: 3.8% SWING LAB TO CON
+            """.trimIndent()
+        )
     }
 
     @Test
@@ -267,6 +411,17 @@ class SeatViewPanelTest {
             .build(header)
         panel.setSize(1024, 512)
         compareRendering("SeatViewPanel", "Map-1", panel)
+        compareAltTexts(
+            panel,
+            """
+            PRINCE EDWARD ISLAND
+            
+            0 OF 27 DISTRICTS DECLARED, PROJECTION: TOO EARLY TO CALL (CHANGE SINCE 2015)
+            14 SEATS FOR MAJORITY
+            
+            SWING SINCE 2015: NOT AVAILABLE
+            """.trimIndent()
+        )
 
         val winners = mutableMapOf<Int, Party?>()
         currentSeats.submit(mapOf(pc to 1))
@@ -277,6 +432,18 @@ class SeatViewPanelTest {
         winnersByDistrict.submit(winners)
         seatHeader.submit("1 OF 27 DISTRICTS DECLARED")
         compareRendering("SeatViewPanel", "Map-2", panel)
+        compareAltTexts(
+            panel,
+            """
+            PRINCE EDWARD ISLAND
+            
+            1 OF 27 DISTRICTS DECLARED, PROJECTION: TOO EARLY TO CALL (CHANGE SINCE 2015)
+            PROGRESSIVE CONSERVATIVE: 1 (±0)
+            14 SEATS FOR MAJORITY
+            
+            SWING SINCE 2015: 3.8% SWING LIB TO PC
+            """.trimIndent()
+        )
 
         focus.submit(shapesByDistrict.keys.filter { it <= 7 })
         header.submit("CARDIGAN")
@@ -286,10 +453,32 @@ class SeatViewPanelTest {
         showMajority.submit(false)
         mapHeader.submit("CARDIGAN")
         compareRendering("SeatViewPanel", "Map-3", panel)
+        compareAltTexts(
+            panel,
+            """
+            CARDIGAN
+            
+            1 OF 7 DISTRICTS DECLARED (CHANGE SINCE 2015)
+            PROGRESSIVE CONSERVATIVE: 1 (±0)
+            
+            SWING SINCE 2015: 3.8% SWING LIB TO PC
+            """.trimIndent()
+        )
 
         winners[8] = pc
         winnersByDistrict.submit(winners)
         compareRendering("SeatViewPanel", "Map-3", panel)
+        compareAltTexts(
+            panel,
+            """
+            CARDIGAN
+            
+            1 OF 7 DISTRICTS DECLARED (CHANGE SINCE 2015)
+            PROGRESSIVE CONSERVATIVE: 1 (±0)
+            
+            SWING SINCE 2015: 3.8% SWING LIB TO PC
+            """.trimIndent()
+        )
 
         currentSeats.submit(mapOf(pc to 2))
         previousSeats.submit(mapOf(pc to 1, lib to 1))
@@ -299,6 +488,18 @@ class SeatViewPanelTest {
         winnersByDistrict.submit(winners)
         seatHeader.submit("2 OF 7 DISTRICTS DECLARED")
         compareRendering("SeatViewPanel", "Map-4", panel)
+        compareAltTexts(
+            panel,
+            """
+            CARDIGAN
+            
+            2 OF 7 DISTRICTS DECLARED (CHANGE SINCE 2015)
+            PROGRESSIVE CONSERVATIVE: 2 (+1)
+            LIBERAL: 0 (-1)
+            
+            SWING SINCE 2015: 9.5% SWING LIB TO PC
+            """.trimIndent()
+        )
 
         focus.submit(null)
         header.submit("PRINCE EDWARD ISLAND")
@@ -310,10 +511,36 @@ class SeatViewPanelTest {
         showMajority.submit(true)
         mapHeader.submit("PEI")
         compareRendering("SeatViewPanel", "Map-5", panel)
+        compareAltTexts(
+            panel,
+            """
+            PRINCE EDWARD ISLAND
+            
+            3 OF 27 DISTRICTS DECLARED, PROJECTION: TOO EARLY TO CALL (CHANGE SINCE 2015)
+            PROGRESSIVE CONSERVATIVE: 3 (+2)
+            LIBERAL: 0 (-2)
+            14 SEATS FOR MAJORITY
+            
+            SWING SINCE 2015: 9.5% SWING LIB TO PC
+            """.trimIndent()
+        )
 
         (1..27).forEach { winners.putIfAbsent(it, null) }
         winnersByDistrict.submit(winners)
         compareRendering("SeatViewPanel", "Map-5", panel)
+        compareAltTexts(
+            panel,
+            """
+            PRINCE EDWARD ISLAND
+            
+            3 OF 27 DISTRICTS DECLARED, PROJECTION: TOO EARLY TO CALL (CHANGE SINCE 2015)
+            PROGRESSIVE CONSERVATIVE: 3 (+2)
+            LIBERAL: 0 (-2)
+            14 SEATS FOR MAJORITY
+            
+            SWING SINCE 2015: 9.5% SWING LIB TO PC
+            """.trimIndent()
+        )
     }
 
     @Test
@@ -343,6 +570,15 @@ class SeatViewPanelTest {
             .build(header)
         panel.setSize(1024, 512)
         compareRendering("SeatViewPanel", "Dual-1", panel)
+        compareAltTexts(
+            panel,
+            """
+            CANADA
+            
+            0 OF 338 RIDINGS REPORTING (CHANGE SINCE 2015)
+            170 SEATS FOR MAJORITY
+            """.trimIndent()
+        )
 
         currentSeats.submit(
             mapOf(
@@ -357,6 +593,17 @@ class SeatViewPanelTest {
         )
         seatHeader.submit("7 OF 338 RIDINGS REPORTING")
         compareRendering("SeatViewPanel", "Dual-2", panel)
+        compareAltTexts(
+            panel,
+            """
+            CANADA
+            
+            7 OF 338 RIDINGS REPORTING (CHANGE SINCE 2015)
+            LIBERAL: 0/6 (±0/-1)
+            NEW DEMOCRATIC PARTY: 0/1 (±0/+1)
+            170 SEATS FOR MAJORITY
+            """.trimIndent()
+        )
 
         currentSeats.submit(
             mapOf(
@@ -373,6 +620,19 @@ class SeatViewPanelTest {
         )
         seatHeader.submit("32 OF 338 RIDINGS REPORTING")
         compareRendering("SeatViewPanel", "Dual-3", panel)
+        compareAltTexts(
+            panel,
+            """
+            CANADA
+            
+            32 OF 338 RIDINGS REPORTING (CHANGE SINCE 2015)
+            LIBERAL: 6/26 (-1/-6)
+            CONSERVATIVE: 0/4 (±0/+4)
+            NEW DEMOCRATIC PARTY: 1/1 (+1/+1)
+            GREEN: 0/1 (±0/+1)
+            170 SEATS FOR MAJORITY
+            """.trimIndent()
+        )
 
         currentSeats.submit(
             mapOf(
@@ -393,6 +653,20 @@ class SeatViewPanelTest {
         )
         seatHeader.submit("295 OF 338 RIDINGS REPORTING")
         compareRendering("SeatViewPanel", "Dual-4", panel)
+        compareAltTexts(
+            panel,
+            """
+            CANADA
+            
+            295 OF 338 RIDINGS REPORTING (CHANGE SINCE 2015)
+            LIBERAL: 26/145 (-6/-21)
+            CONSERVATIVE: 4/104 (+4/+15)
+            BLOC QUÉBÉCOIS: 0/32 (±0/+22)
+            NEW DEMOCRATIC PARTY: 1/13 (+1/-17)
+            GREEN: 1/1 (+1/+1)
+            170 SEATS FOR MAJORITY
+            """.trimIndent()
+        )
 
         currentSeats.submit(
             mapOf(
@@ -415,6 +689,21 @@ class SeatViewPanelTest {
         )
         seatHeader.submit("338 OF 338 RIDINGS REPORTING")
         compareRendering("SeatViewPanel", "Dual-5", panel)
+        compareAltTexts(
+            panel,
+            """
+            CANADA
+            
+            338 OF 338 RIDINGS REPORTING (CHANGE SINCE 2015)
+            LIBERAL: 145/157 (-21/-27)
+            CONSERVATIVE: 104/121 (+15/+22)
+            BLOC QUÉBÉCOIS: 32/32 (+22/+22)
+            NEW DEMOCRATIC PARTY: 13/24 (-17/-20)
+            GREEN: 1/3 (+1/+2)
+            INDEPENDENT: 0/1 (±0/+1)
+            170 SEATS FOR MAJORITY
+            """.trimIndent()
+        )
 
         currentSeats.submit(
             mapOf(
@@ -437,6 +726,21 @@ class SeatViewPanelTest {
         )
         seatHeader.submit("338 OF 338 RIDINGS REPORTING")
         compareRendering("SeatViewPanel", "Dual-6", panel)
+        compareAltTexts(
+            panel,
+            """
+            CANADA
+            
+            338 OF 338 RIDINGS REPORTING (CHANGE SINCE 2015)
+            LIBERAL: 157/157 (-27/-27)
+            CONSERVATIVE: 121/121 (+22/+22)
+            BLOC QUÉBÉCOIS: 32/32 (+22/+22)
+            NEW DEMOCRATIC PARTY: 24/24 (-20/-20)
+            GREEN: 3/3 (+2/+2)
+            INDEPENDENT: 1/1 (+1/+1)
+            170 SEATS FOR MAJORITY
+            """.trimIndent()
+        )
     }
 
     @Test
@@ -466,6 +770,15 @@ class SeatViewPanelTest {
             .build(header)
         panel.setSize(1024, 512)
         compareRendering("SeatViewPanel", "DualReversed-1", panel)
+        compareAltTexts(
+            panel,
+            """
+            CANADA
+            
+            0 OF 338 RIDINGS REPORTING (CHANGE SINCE 2015)
+            170 SEATS FOR MAJORITY
+            """.trimIndent()
+        )
 
         currentSeats.submit(
             mapOf(
@@ -480,6 +793,17 @@ class SeatViewPanelTest {
         )
         seatHeader.submit("7 OF 338 RIDINGS REPORTING")
         compareRendering("SeatViewPanel", "DualReversed-2", panel)
+        compareAltTexts(
+            panel,
+            """
+            CANADA
+            
+            7 OF 338 RIDINGS REPORTING (CHANGE SINCE 2015)
+            LIBERAL: 0/6 (±0/-1)
+            NEW DEMOCRATIC PARTY: 0/1 (±0/+1)
+            170 SEATS FOR MAJORITY
+            """.trimIndent()
+        )
 
         currentSeats.submit(
             mapOf(
@@ -496,6 +820,19 @@ class SeatViewPanelTest {
         )
         seatHeader.submit("32 OF 338 RIDINGS REPORTING")
         compareRendering("SeatViewPanel", "DualReversed-3", panel)
+        compareAltTexts(
+            panel,
+            """
+            CANADA
+            
+            32 OF 338 RIDINGS REPORTING (CHANGE SINCE 2015)
+            LIBERAL: 6/26 (-1/-6)
+            CONSERVATIVE: 0/4 (±0/+4)
+            NEW DEMOCRATIC PARTY: 1/1 (+1/+1)
+            GREEN: 0/1 (±0/+1)
+            170 SEATS FOR MAJORITY
+            """.trimIndent()
+        )
 
         currentSeats.submit(
             mapOf(
@@ -516,6 +853,20 @@ class SeatViewPanelTest {
         )
         seatHeader.submit("295 OF 338 RIDINGS REPORTING")
         compareRendering("SeatViewPanel", "DualReversed-4", panel)
+        compareAltTexts(
+            panel,
+            """
+            CANADA
+            
+            295 OF 338 RIDINGS REPORTING (CHANGE SINCE 2015)
+            LIBERAL: 26/145 (-6/-21)
+            CONSERVATIVE: 4/104 (+4/+15)
+            BLOC QUÉBÉCOIS: 0/32 (±0/+22)
+            NEW DEMOCRATIC PARTY: 1/13 (+1/-17)
+            GREEN: 1/1 (+1/+1)
+            170 SEATS FOR MAJORITY
+            """.trimIndent()
+        )
 
         currentSeats.submit(
             mapOf(
@@ -538,6 +889,21 @@ class SeatViewPanelTest {
         )
         seatHeader.submit("338 OF 338 RIDINGS REPORTING")
         compareRendering("SeatViewPanel", "DualReversed-5", panel)
+        compareAltTexts(
+            panel,
+            """
+            CANADA
+            
+            338 OF 338 RIDINGS REPORTING (CHANGE SINCE 2015)
+            LIBERAL: 145/157 (-21/-27)
+            CONSERVATIVE: 104/121 (+15/+22)
+            BLOC QUÉBÉCOIS: 32/32 (+22/+22)
+            NEW DEMOCRATIC PARTY: 13/24 (-17/-20)
+            GREEN: 1/3 (+1/+2)
+            INDEPENDENT: 0/1 (±0/+1)
+            170 SEATS FOR MAJORITY
+            """.trimIndent()
+        )
 
         currentSeats.submit(
             mapOf(
@@ -560,6 +926,21 @@ class SeatViewPanelTest {
         )
         seatHeader.submit("338 OF 338 RIDINGS REPORTING")
         compareRendering("SeatViewPanel", "DualReversed-6", panel)
+        compareAltTexts(
+            panel,
+            """
+            CANADA
+            
+            338 OF 338 RIDINGS REPORTING (CHANGE SINCE 2015)
+            LIBERAL: 157/157 (-27/-27)
+            CONSERVATIVE: 121/121 (+22/+22)
+            BLOC QUÉBÉCOIS: 32/32 (+22/+22)
+            NEW DEMOCRATIC PARTY: 24/24 (-20/-20)
+            GREEN: 3/3 (+2/+2)
+            INDEPENDENT: 1/1 (+1/+1)
+            170 SEATS FOR MAJORITY
+            """.trimIndent()
+        )
     }
 
     @Test
@@ -589,6 +970,15 @@ class SeatViewPanelTest {
             .build(header)
         panel.setSize(1024, 512)
         compareRendering("SeatViewPanel", "Dual-1", panel)
+        compareAltTexts(
+            panel,
+            """
+            CANADA
+            
+            0 OF 338 RIDINGS REPORTING (CHANGE SINCE 2015)
+            170 SEATS FOR MAJORITY
+            """.trimIndent()
+        )
 
         currentSeats.submit(
             mapOf(
@@ -604,6 +994,17 @@ class SeatViewPanelTest {
         )
         seatHeader.submit("7 OF 338 RIDINGS REPORTING")
         compareRendering("SeatViewPanel", "Dual-2", panel)
+        compareAltTexts(
+            panel,
+            """
+            CANADA
+            
+            7 OF 338 RIDINGS REPORTING (CHANGE SINCE 2015)
+            LIBERAL: 0/6 (±0/-1)
+            NEW DEMOCRATIC PARTY: 0/1 (±0/+1)
+            170 SEATS FOR MAJORITY
+            """.trimIndent()
+        )
 
         currentSeats.submit(
             mapOf(
@@ -623,6 +1024,19 @@ class SeatViewPanelTest {
         )
         seatHeader.submit("32 OF 338 RIDINGS REPORTING")
         compareRendering("SeatViewPanel", "Dual-3", panel)
+        compareAltTexts(
+            panel,
+            """
+            CANADA
+            
+            32 OF 338 RIDINGS REPORTING (CHANGE SINCE 2015)
+            LIBERAL: 6/26 (-1/-6)
+            CONSERVATIVE: 0/4 (±0/+4)
+            NEW DEMOCRATIC PARTY: 1/1 (+1/+1)
+            GREEN: 0/1 (±0/+1)
+            170 SEATS FOR MAJORITY
+            """.trimIndent()
+        )
 
         currentSeats.submit(
             mapOf(
@@ -644,6 +1058,20 @@ class SeatViewPanelTest {
         )
         seatHeader.submit("295 OF 338 RIDINGS REPORTING")
         compareRendering("SeatViewPanel", "Dual-4", panel)
+        compareAltTexts(
+            panel,
+            """
+            CANADA
+            
+            295 OF 338 RIDINGS REPORTING (CHANGE SINCE 2015)
+            LIBERAL: 26/145 (-6/-21)
+            CONSERVATIVE: 4/104 (+4/+15)
+            BLOC QUÉBÉCOIS: 0/32 (±0/+22)
+            NEW DEMOCRATIC PARTY: 1/13 (+1/-17)
+            GREEN: 1/1 (+1/+1)
+            170 SEATS FOR MAJORITY
+            """.trimIndent()
+        )
 
         currentSeats.submit(
             mapOf(
@@ -667,6 +1095,21 @@ class SeatViewPanelTest {
         )
         seatHeader.submit("338 OF 338 RIDINGS REPORTING")
         compareRendering("SeatViewPanel", "Dual-5", panel)
+        compareAltTexts(
+            panel,
+            """
+            CANADA
+            
+            338 OF 338 RIDINGS REPORTING (CHANGE SINCE 2015)
+            LIBERAL: 145/157 (-21/-27)
+            CONSERVATIVE: 104/121 (+15/+22)
+            BLOC QUÉBÉCOIS: 32/32 (+22/+22)
+            NEW DEMOCRATIC PARTY: 13/24 (-17/-20)
+            GREEN: 1/3 (+1/+2)
+            INDEPENDENT: 0/1 (±0/+1)
+            170 SEATS FOR MAJORITY
+            """.trimIndent()
+        )
 
         currentSeats.submit(
             mapOf(
@@ -690,6 +1133,21 @@ class SeatViewPanelTest {
         )
         seatHeader.submit("338 OF 338 RIDINGS REPORTING")
         compareRendering("SeatViewPanel", "Dual-6", panel)
+        compareAltTexts(
+            panel,
+            """
+            CANADA
+            
+            338 OF 338 RIDINGS REPORTING (CHANGE SINCE 2015)
+            LIBERAL: 157/157 (-27/-27)
+            CONSERVATIVE: 121/121 (+22/+22)
+            BLOC QUÉBÉCOIS: 32/32 (+22/+22)
+            NEW DEMOCRATIC PARTY: 24/24 (-20/-20)
+            GREEN: 3/3 (+2/+2)
+            INDEPENDENT: 1/1 (+1/+1)
+            170 SEATS FOR MAJORITY
+            """.trimIndent()
+        )
     }
 
     @Test
@@ -719,6 +1177,15 @@ class SeatViewPanelTest {
             .build(header)
         panel.setSize(1024, 512)
         compareRendering("SeatViewPanel", "Range-1", panel)
+        compareAltTexts(
+            panel,
+            """
+            AUSTRALIA
+            
+            SENATE SEATS (CHANGE SINCE 2013)
+            39 SEATS FOR MAJORITY
+            """.trimIndent()
+        )
 
         currentSeats.submit(
             mapOf(
@@ -738,6 +1205,20 @@ class SeatViewPanelTest {
             )
         )
         compareRendering("SeatViewPanel", "Range-2", panel)
+        compareAltTexts(
+            panel,
+            """
+            AUSTRALIA
+            
+            SENATE SEATS (CHANGE SINCE 2013)
+            LIBERAL/NATIONAL COALITION: 4-5 ((-2)-(-1))
+            LABOR PARTY: 4-4 ((±0)-(±0))
+            THE GREENS: 0-1 ((-1)-(±0))
+            ONE NATION PARTY: 0-1 ((±0)-(+1))
+            OTHERS: 0-2 ((-1)-(+1))
+            39 SEATS FOR MAJORITY
+            """.trimIndent()
+        )
 
         currentSeats.submit(
             mapOf(
@@ -758,6 +1239,21 @@ class SeatViewPanelTest {
             )
         )
         compareRendering("SeatViewPanel", "Range-3", panel)
+        compareAltTexts(
+            panel,
+            """
+            AUSTRALIA
+            
+            SENATE SEATS (CHANGE SINCE 2013)
+            LIBERAL/NATIONAL COALITION: 8-10 ((-4)-(-2))
+            LABOR PARTY: 7-8 ((-1)-(±0))
+            ONE NATION PARTY: 1-2 ((+1)-(+2))
+            THE GREENS: 0-2 ((-2)-(±0))
+            NICK XENOPHON TEAM: 0-1 ((±0)-(+1))
+            OTHERS: 0-4 ((-2)-(+2))
+            39 SEATS FOR MAJORITY
+            """.trimIndent()
+        )
 
         currentSeats.submit(
             mapOf(
@@ -779,6 +1275,21 @@ class SeatViewPanelTest {
             )
         )
         compareRendering("SeatViewPanel", "Range-4", panel)
+        compareAltTexts(
+            panel,
+            """
+            AUSTRALIA
+            
+            SENATE SEATS (CHANGE SINCE 2013)
+            LIBERAL/NATIONAL COALITION: 27-31 ((-6)-(-2))
+            LABOR PARTY: 25-27 ((±0)-(+2))
+            THE GREENS: 5-9 ((-5)-(-1))
+            NICK XENOPHON TEAM: 3-3 ((+2)-(+2))
+            ONE NATION PARTY: 1-4 ((+1)-(+4))
+            OTHERS: 1-8 ((-6)-(+1))
+            39 SEATS FOR MAJORITY
+            """.trimIndent()
+        )
     }
 
     @Test
@@ -808,6 +1319,15 @@ class SeatViewPanelTest {
             .build(header)
         panel.setSize(1024, 512)
         compareRendering("SeatViewPanel", "Range-1", panel)
+        compareAltTexts(
+            panel,
+            """
+            AUSTRALIA
+            
+            SENATE SEATS (CHANGE SINCE 2013)
+            39 SEATS FOR MAJORITY
+            """.trimIndent()
+        )
 
         currentSeats.submit(
             mapOf(
@@ -828,6 +1348,20 @@ class SeatViewPanelTest {
             )
         )
         compareRendering("SeatViewPanel", "Range-2", panel)
+        compareAltTexts(
+            panel,
+            """
+            AUSTRALIA
+            
+            SENATE SEATS (CHANGE SINCE 2013)
+            LIBERAL/NATIONAL COALITION: 4-5 ((-2)-(-1))
+            LABOR PARTY: 4-4 ((±0)-(±0))
+            THE GREENS: 0-1 ((-1)-(±0))
+            ONE NATION PARTY: 0-1 ((±0)-(+1))
+            OTHERS: 0-2 ((-1)-(+1))
+            39 SEATS FOR MAJORITY
+            """.trimIndent()
+        )
 
         currentSeats.submit(
             mapOf(
@@ -850,6 +1384,21 @@ class SeatViewPanelTest {
             )
         )
         compareRendering("SeatViewPanel", "Range-3", panel)
+        compareAltTexts(
+            panel,
+            """
+            AUSTRALIA
+            
+            SENATE SEATS (CHANGE SINCE 2013)
+            LIBERAL/NATIONAL COALITION: 8-10 ((-4)-(-2))
+            LABOR PARTY: 7-8 ((-1)-(±0))
+            ONE NATION PARTY: 1-2 ((+1)-(+2))
+            THE GREENS: 0-2 ((-2)-(±0))
+            NICK XENOPHON TEAM: 0-1 ((±0)-(+1))
+            OTHERS: 0-4 ((-2)-(+2))
+            39 SEATS FOR MAJORITY
+            """.trimIndent()
+        )
 
         currentSeats.submit(
             mapOf(
@@ -872,6 +1421,21 @@ class SeatViewPanelTest {
             )
         )
         compareRendering("SeatViewPanel", "Range-4", panel)
+        compareAltTexts(
+            panel,
+            """
+            AUSTRALIA
+            
+            SENATE SEATS (CHANGE SINCE 2013)
+            LIBERAL/NATIONAL COALITION: 27-31 ((-6)-(-2))
+            LABOR PARTY: 25-27 ((±0)-(+2))
+            THE GREENS: 5-9 ((-5)-(-1))
+            NICK XENOPHON TEAM: 3-3 ((+2)-(+2))
+            ONE NATION PARTY: 1-4 ((+1)-(+4))
+            OTHERS: 1-8 ((-6)-(+1))
+            39 SEATS FOR MAJORITY
+            """.trimIndent()
+        )
     }
 
     @Test
@@ -902,8 +1466,31 @@ class SeatViewPanelTest {
         previousSeats.submit(mapOf(clinton.party to 332, trump.party to 206))
         winner.submit(trump)
         compareRendering("SeatViewPanel", "Candidate-1", panel)
+        compareAltTexts(
+            panel,
+            """
+            UNITED STATES
+            
+            PRESIDENT (CHANGE SINCE 2012)
+            DONALD TRUMP (GOP): 306 (+100) ${"\u2611"}
+            HILLARY CLINTON (DEM): 232 (-100)
+            270 ELECTORAL VOTES TO WIN
+            """.trimIndent()
+        )
+
         winner.submit(null)
         compareRendering("SeatViewPanel", "Candidate-WinnerRemoved", panel)
+        compareAltTexts(
+            panel,
+            """
+            UNITED STATES
+            
+            PRESIDENT (CHANGE SINCE 2012)
+            DONALD TRUMP (GOP): 306 (+100)
+            HILLARY CLINTON (DEM): 232 (-100)
+            270 ELECTORAL VOTES TO WIN
+            """.trimIndent()
+        )
     }
 
     @Test
@@ -934,6 +1521,17 @@ class SeatViewPanelTest {
         previousSeats.submit(mapOf(clinton.party to (302 to 332), trump.party to (192 to 206)))
         winner.submit(trump)
         compareRendering("SeatViewPanel", "Candidate-2", panel)
+        compareAltTexts(
+            panel,
+            """
+            UNITED STATES
+            
+            PRESIDENT (CHANGE SINCE 2012)
+            DONALD TRUMP (GOP): 276/306 (+84/+100) ${"\u2611"}
+            HILLARY CLINTON (DEM): 218/232 (-84/-100)
+            270 ELECTORAL VOTES TO WIN
+            """.trimIndent()
+        )
     }
 
     @Test
@@ -961,6 +1559,17 @@ class SeatViewPanelTest {
             .build(header)
         panel.setSize(1024, 512)
         compareRendering("SeatViewPanel", "Candidate-3", panel)
+        compareAltTexts(
+            panel,
+            """
+            UNITED STATES
+            
+            PRESIDENT (CHANGE SINCE 2012)
+            HILLARY CLINTON (DEM): 238-368 ((-94)-(+36))
+            DONALD TRUMP (GOP): 170-300 ((-36)-(+94))
+            270 ELECTORAL VOTES TO WIN
+            """.trimIndent()
+        )
     }
 
     @Test
@@ -991,6 +1600,17 @@ class SeatViewPanelTest {
         previousSeats.submit(mapOf(dem to 194, gop to 241))
         winner.submit(dem)
         compareRendering("SeatViewPanel", "PartyTick-1", panel)
+        compareAltTexts(
+            panel,
+            """
+            UNITED STATES
+            
+            HOUSE OF REPRESENTATIVES (CHANGE SINCE 2016)
+            DEMOCRAT: 235 (+41) ${"\u2611"}
+            REPUBLICAN: 200 (-41)
+            218 SEATS FOR MAJORITY
+            """.trimIndent()
+        )
     }
 
     @Test
@@ -1021,6 +1641,17 @@ class SeatViewPanelTest {
         previousSeats.submit(mapOf(dem to (193 to 194), gop to (223 to 241)))
         winner.submit(dem)
         compareRendering("SeatViewPanel", "PartyTick-2", panel)
+        compareAltTexts(
+            panel,
+            """
+            UNITED STATES
+            
+            HOUSE OF REPRESENTATIVES (CHANGE SINCE 2016)
+            DEMOCRAT: 224/235 (+31/+41) ${"\u2611"}
+            REPUBLICAN: 192/200 (-31/-41)
+            218 SEATS FOR MAJORITY
+            """.trimIndent()
+        )
     }
 
     @Test
@@ -1057,6 +1688,16 @@ class SeatViewPanelTest {
             .build(header)
         panel.setSize(1024, 512)
         compareRendering("SeatViewPanel", "AdditionalHighlightMap-1", panel)
+        compareAltTexts(
+            panel,
+            """
+            CARDIGAN
+            
+            0 OF 7 RIDINGS REPORTING (CHANGE SINCE 2015)
+            
+            SWING SINCE 2015: NOT AVAILABLE
+            """.trimIndent()
+        )
     }
 
     @Test
@@ -1106,6 +1747,18 @@ class SeatViewPanelTest {
             .build(header)
         panel.setSize(1024, 512)
         compareRendering("SeatViewPanel", "PartyClassifications-1", panel)
+        compareAltTexts(
+            panel,
+            """
+            NORTHERN IRELAND
+            
+            2017 RESULTS (NOTIONAL CHANGE SINCE 2016)
+            
+            BY DESIGNATION
+            
+            FIRST PREFERENCE SWING SINCE 2016: NOT AVAILABLE
+            """.trimIndent()
+        )
 
         currentSeats.submit(
             mapOf(
@@ -1175,6 +1828,30 @@ class SeatViewPanelTest {
             )
         )
         compareRendering("SeatViewPanel", "PartyClassifications-2", panel)
+        compareAltTexts(
+            panel,
+            """
+            NORTHERN IRELAND
+            
+            2017 RESULTS (NOTIONAL CHANGE SINCE 2016)
+            DEMOCRATIC UNIONIST PARTY: 28 (-5)
+            SINN FÉIN: 27 (+4)
+            SOCIAL DEMOCRATIC AND LABOUR PARTY: 12 (+1)
+            ULSTER UNIONIST PARTY: 10 (-1)
+            ALLIANCE PARTY: 8 (±0)
+            GREEN PARTY: 2 (±0)
+            TRADITIONAL UNIONIST VOICE: 1 (±0)
+            PEOPLE BEFORE PROFIT: 1 (±0)
+            INDEPENDENT: 1 (+1)
+            
+            BY DESIGNATION
+            UNIONISTS: 40
+            NATIONALISTS: 39
+            OTHERS: 11
+            
+            FIRST PREFERENCE SWING SINCE 2016: 4.4% SWING UNIONISTS TO NATIONALISTS
+            """.trimIndent()
+        )
     }
 
     @Test
@@ -1228,6 +1905,35 @@ class SeatViewPanelTest {
             .build("JAPAN".asOneTimePublisher())
         panel.size = Dimension(1024, 512)
         compareRendering("SeatViewPanel", "PrevSeats-1", panel)
+        compareAltTexts(
+            panel,
+            """
+            JAPAN
+            
+            HOUSE OF REPRESENTATIVES
+            LIBERAL DEMOCRATIC PARTY: 259
+            CONSTITUTIONAL DEMOCRATIC PARTY: 96
+            NIPPON ISHIN NO KAI: 41
+            KOMEITO: 32
+            INDEPENDENT: 12
+            DEMOCRATIC PARTY FOR THE PEOPLE: 11
+            JAPANESE COMMUNIST PARTY: 10
+            REIWA SHINSENGUMI: 3
+            SOCIAL DEMOCRATIC PARTY: 1
+            233 FOR MAJORITY
+            
+            2017 RESULT
+            LDP: 284
+            CDP: 55
+            KIBŌ: 50
+            KOMEITO: 29
+            IND: 22
+            JCP: 12
+            NIPPON: 11
+            SDP: 2
+            233 FOR MAJORITY
+            """.trimIndent()
+        )
 
         curr.submit(
             mapOf(
@@ -1255,10 +1961,50 @@ class SeatViewPanelTest {
         total.submit(289)
         showMajority.submit(false)
         compareRendering("SeatViewPanel", "PrevSeats-2", panel)
+        compareAltTexts(
+            panel,
+            """
+            JAPAN
+            
+            CONSTITUENCY SEATS
+            LIBERAL DEMOCRATIC PARTY: 187
+            CONSTITUTIONAL DEMOCRATIC PARTY: 57
+            NIPPON ISHIN NO KAI: 16
+            KOMEITO: 9
+            DEMOCRATIC PARTY FOR THE PEOPLE: 6
+            JAPANESE COMMUNIST PARTY: 1
+            SOCIAL DEMOCRATIC PARTY: 1
+            
+            2017 RESULT
+            LDP: 218
+            CDP: 18
+            KIBŌ: 18
+            KOMEITO: 8
+            NIPPON: 3
+            JCP: 1
+            SDP: 1
+            """.trimIndent()
+        )
 
         showPrevRaw.submit(false)
         changeHeader.submit("CHANGE SINCE 2017")
         compareRendering("SeatViewPanel", "PrevSeats-3", panel)
+        compareAltTexts(
+            panel,
+            """
+            JAPAN
+            
+            CONSTITUENCY SEATS (CHANGE SINCE 2017)
+            LIBERAL DEMOCRATIC PARTY: 187 (-31)
+            CONSTITUTIONAL DEMOCRATIC PARTY: 57 (+39)
+            NIPPON ISHIN NO KAI: 16 (+13)
+            KOMEITO: 9 (+1)
+            DEMOCRATIC PARTY FOR THE PEOPLE: 6 (+6)
+            JAPANESE COMMUNIST PARTY: 1 (±0)
+            SOCIAL DEMOCRATIC PARTY: 1 (±0)
+            KIBŌ NO TŌ: 0 (-18)
+            """.trimIndent()
+        )
 
         curr.submit(
             mapOf(
@@ -1289,10 +2035,58 @@ class SeatViewPanelTest {
         showMajority.submit(true)
         total.submit(465)
         compareRendering("SeatViewPanel", "PrevSeats-4", panel)
+        compareAltTexts(
+            panel,
+            """
+            JAPAN
+            
+            HOUSE OF REPRESENTATIVES (CHANGE SINCE 2017)
+            LIBERAL DEMOCRATIC PARTY: 259 (-25)
+            CONSTITUTIONAL DEMOCRATIC PARTY: 96 (+41)
+            NIPPON ISHIN NO KAI: 41 (+30)
+            KOMEITO: 32 (+3)
+            INDEPENDENT: 12 (-10)
+            DEMOCRATIC PARTY FOR THE PEOPLE: 11 (+11)
+            JAPANESE COMMUNIST PARTY: 10 (-2)
+            REIWA SHINSENGUMI: 3 (+3)
+            SOCIAL DEMOCRATIC PARTY: 1 (-1)
+            KIBŌ NO TŌ: 0 (-50)
+            233 FOR MAJORITY
+            """.trimIndent()
+        )
 
         showPrevRaw.submit(true)
         changeHeader.submit("2017 RESULT")
         compareRendering("SeatViewPanel", "PrevSeats-1", panel)
+        compareAltTexts(
+            panel,
+            """
+            JAPAN
+            
+            HOUSE OF REPRESENTATIVES
+            LIBERAL DEMOCRATIC PARTY: 259
+            CONSTITUTIONAL DEMOCRATIC PARTY: 96
+            NIPPON ISHIN NO KAI: 41
+            KOMEITO: 32
+            INDEPENDENT: 12
+            DEMOCRATIC PARTY FOR THE PEOPLE: 11
+            JAPANESE COMMUNIST PARTY: 10
+            REIWA SHINSENGUMI: 3
+            SOCIAL DEMOCRATIC PARTY: 1
+            233 FOR MAJORITY
+            
+            2017 RESULT
+            LDP: 284
+            CDP: 55
+            KIBŌ: 50
+            KOMEITO: 29
+            IND: 22
+            JCP: 12
+            NIPPON: 11
+            SDP: 2
+            233 FOR MAJORITY
+            """.trimIndent()
+        )
     }
 
     @Test
@@ -1347,10 +2141,58 @@ class SeatViewPanelTest {
             .build("JAPAN".asOneTimePublisher())
         panel.size = Dimension(1024, 512)
         compareRendering("SeatViewPanel", "PrevDualSeats-1", panel)
+        compareAltTexts(
+            panel,
+            """
+            JAPAN
+            
+            HOUSE OF REPRESENTATIVES, CONSTITUENCIES / TOTAL SEATS
+            LIBERAL DEMOCRATIC PARTY: 187/259
+            CONSTITUTIONAL DEMOCRATIC PARTY: 57/96
+            NIPPON ISHIN NO KAI: 16/41
+            KOMEITO: 9/32
+            INDEPENDENT: 12/12
+            DEMOCRATIC PARTY FOR THE PEOPLE: 6/11
+            JAPANESE COMMUNIST PARTY: 1/10
+            REIWA SHINSENGUMI: 0/3
+            SOCIAL DEMOCRATIC PARTY: 1/1
+            233 FOR MAJORITY
+            
+            2017 RESULT
+            LDP: 218/284
+            CDP: 18/55
+            KIBŌ: 18/50
+            KOMEITO: 8/29
+            IND: 22/22
+            JCP: 1/12
+            NIPPON: 3/11
+            SDP: 1/2
+            233 FOR MAJORITY
+            """.trimIndent()
+        )
 
         showPrevRaw.submit(false)
         changeHeader.submit("CHANGE SINCE 2017")
         compareRendering("SeatViewPanel", "PrevDualSeats-2", panel)
+        compareAltTexts(
+            panel,
+            """
+            JAPAN
+            
+            HOUSE OF REPRESENTATIVES, CONSTITUENCIES / TOTAL SEATS (CHANGE SINCE 2017)
+            LIBERAL DEMOCRATIC PARTY: 187/259 (-31/-25)
+            CONSTITUTIONAL DEMOCRATIC PARTY: 57/96 (+39/+41)
+            NIPPON ISHIN NO KAI: 16/41 (+13/+30)
+            KOMEITO: 9/32 (+1/+3)
+            INDEPENDENT: 12/12 (-10/-10)
+            DEMOCRATIC PARTY FOR THE PEOPLE: 6/11 (+6/+11)
+            JAPANESE COMMUNIST PARTY: 1/10 (±0/-2)
+            REIWA SHINSENGUMI: 0/3 (±0/+3)
+            SOCIAL DEMOCRATIC PARTY: 1/1 (±0/-1)
+            KIBŌ NO TŌ: 0/0 (-18/-50)
+            233 FOR MAJORITY
+            """.trimIndent()
+        )
     }
 
     @Test
@@ -1405,10 +2247,58 @@ class SeatViewPanelTest {
             .build("JAPAN".asOneTimePublisher())
         panel.size = Dimension(1024, 512)
         compareRendering("SeatViewPanel", "PrevRangeSeats-1", panel)
+        compareAltTexts(
+            panel,
+            """
+            JAPAN
+            
+            ASAHI SHIMBUN SEAT PROJECTION, FIELDWORK: 23-24 OCTOBER 2021
+            LIBERAL DEMOCRATIC PARTY: 251-279
+            CONSTITUTIONAL DEMOCRATIC PARTY: 94-120
+            KOMEITO: 25-37
+            NIPPON ISHIN NO KAI: 25-36
+            JAPANESE COMMUNIST PARTY: 9-21
+            DEMOCRATIC PARTY FOR THE PEOPLE: 5-12
+            INDEPENDENT: 4-9
+            REIWA SHINSENGUMI: 3-3
+            SOCIAL DEMOCRATIC PARTY: 2-2
+            233 FOR MAJORITY
+            
+            2017 RESULT
+            LDP: 284
+            CDP: 55
+            KIBŌ: 50
+            KOMEITO: 29
+            IND: 22
+            JCP: 12
+            NIPPON: 11
+            SDP: 2
+            233 FOR MAJORITY
+            """.trimIndent()
+        )
 
         showPrevRaw.submit(false)
         changeHeader.submit("CHANGE SINCE 2017")
         compareRendering("SeatViewPanel", "PrevRangeSeats-2", panel)
+        compareAltTexts(
+            panel,
+            """
+            JAPAN
+            
+            ASAHI SHIMBUN SEAT PROJECTION, FIELDWORK: 23-24 OCTOBER 2021 (CHANGE SINCE 2017)
+            LIBERAL DEMOCRATIC PARTY: 251-279 ((-33)-(-5))
+            CONSTITUTIONAL DEMOCRATIC PARTY: 94-120 ((+39)-(+65))
+            KOMEITO: 25-37 ((-4)-(+8))
+            NIPPON ISHIN NO KAI: 25-36 ((+14)-(+25))
+            JAPANESE COMMUNIST PARTY: 9-21 ((-3)-(+9))
+            DEMOCRATIC PARTY FOR THE PEOPLE: 5-12 ((+5)-(+12))
+            INDEPENDENT: 4-9 ((-18)-(-13))
+            REIWA SHINSENGUMI: 3-3 ((+3)-(+3))
+            SOCIAL DEMOCRATIC PARTY: 2-2 ((±0)-(±0))
+            KIBŌ NO TŌ: 0-0 ((-50)-(-50))
+            233 FOR MAJORITY
+            """.trimIndent()
+        )
     }
 
     @Test
@@ -1435,11 +2325,30 @@ class SeatViewPanelTest {
             .build(header)
         panel.setSize(1024, 512)
         compareRendering("SeatViewPanel", "ProgressLabel-1", panel)
+        compareAltTexts(
+            panel,
+            """
+            UNITED KINGDOM
+            
+            SEATS DECLARED [0/650], PROJECTION: TOO EARLY TO CALL (CHANGE SINCE 2017)
+            326 SEATS FOR MAJORITY
+            """.trimIndent()
+        )
 
         currentSeats.submit(mapOf(lab to 1))
         previousSeats.submit(mapOf(lab to 1))
         progressLabel.submit("1/650")
         compareRendering("SeatViewPanel", "ProgressLabel-2", panel)
+        compareAltTexts(
+            panel,
+            """
+            UNITED KINGDOM
+            
+            SEATS DECLARED [1/650], PROJECTION: TOO EARLY TO CALL (CHANGE SINCE 2017)
+            LABOUR: 1 (±0)
+            326 SEATS FOR MAJORITY
+            """.trimIndent()
+        )
     }
 
     @Test
@@ -1466,6 +2375,19 @@ class SeatViewPanelTest {
             .build("YUKON".asOneTimePublisher())
         panel.setSize(1024, 512)
         compareRendering("SeatViewPanel", "Tie", panel)
+        compareAltTexts(
+            panel,
+            """
+            YUKON
+            
+            SEATS ELECTED/LEADING (CHANGE SINCE 2016)
+            YUKON PARTY: 0/8 (±0/+2)
+            LIBERAL: 0/5 (±0/-6)
+            NEW DEMOCRATIC PARTY: 0/2 (±0/±0)
+            TIE: 0/4 (±0/+4)
+            10 FOR MAJORITY
+            """.trimIndent()
+        )
     }
 
     private fun peiShapesByDistrict(): Map<Int, Shape> {

@@ -23,14 +23,17 @@ class PartySummaryScreen private constructor(
     mainFrame: RegionSummaryFrame,
     otherFrames: List<RegionSummaryFrame>,
     numRows: Int
-) : GenericPanel({
-    val center = JPanel()
-    center.background = Color.WHITE
-    center.layout = Layout(numRows)
-    center.add(mainFrame, "main")
-    otherFrames.forEach { center.add(it, "other") }
-    center
-}, partyPublisher.map { it.name.uppercase() + " SUMMARY" }) {
+) : GenericPanel(
+    run {
+        val center = JPanel()
+        center.background = Color.WHITE
+        center.layout = Layout(numRows)
+        center.add(mainFrame, "main")
+        otherFrames.forEach { center.add(it, "other") }
+        center
+    },
+    partyPublisher.map { it.name.uppercase() + " SUMMARY" }
+) {
 
     init {
         partyPublisher.subscribe(Subscriber(eventQueueWrapper { super.label.foreground = it.color }))

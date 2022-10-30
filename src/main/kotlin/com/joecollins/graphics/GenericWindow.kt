@@ -2,10 +2,19 @@ package com.joecollins.graphics
 
 import com.joecollins.graphics.components.GraphicsFrame
 import com.joecollins.models.general.twitter.TwitterV2InstanceFactory
+import com.joecollins.pubsub.Subscriber
+import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
 import com.twitter.clientlib.model.TweetCreateRequest
 import com.twitter.clientlib.model.TweetCreateRequestMedia
+import twitter4j.HttpClientFactory
+import twitter4j.HttpParameter
+import twitter4j.HttpResponseEvent
+import twitter4j.HttpResponseListener
+import twitter4j.JSONObject
 import twitter4j.StatusUpdate
 import twitter4j.TwitterFactory
+import twitter4j.auth.AuthorizationFactory
+import twitter4j.conf.Configuration
 import twitter4j.conf.ConfigurationBuilder
 import java.awt.BorderLayout
 import java.awt.Color
@@ -41,7 +50,6 @@ import javax.swing.JPanel
 import javax.swing.JTextArea
 import javax.swing.border.EmptyBorder
 import javax.swing.filechooser.FileFilter
-import kotlin.jvm.JvmOverloads
 import kotlin.math.max
 
 class GenericWindow<T : JPanel> @JvmOverloads constructor(private val panel: T, title: String? = panel.javaClass.simpleName) : JFrame() {
@@ -52,13 +60,13 @@ class GenericWindow<T : JPanel> @JvmOverloads constructor(private val panel: T, 
     }
 
     class TweetFrame(panel: JPanel) : JDialog() {
-        private fun sendTweet(tweet: String, image: File) {
-            sendTweetV2(tweet, image)
+        private fun sendTweet(tweet: String, image: File, altText: String? = null) {
+            sendTweetV2(tweet, image, altText)
         }
 
-        private fun sendTweetV2(tweet: String, image: File) {
+        private fun sendTweetV2(tweet: String, image: File, altText: String?) {
             val instance = TwitterV2InstanceFactory.instance
-            val mediaId = uploadMediaV1(image)
+            val mediaId = uploadMediaV1(image, altText)
             val mediaRequest = TweetCreateRequestMedia()
             mediaRequest.mediaIds = listOf(mediaId.toString())
             val tweetRequest = TweetCreateRequest()
@@ -67,7 +75,7 @@ class GenericWindow<T : JPanel> @JvmOverloads constructor(private val panel: T, 
             instance.tweets().createTweet(tweetRequest).execute()
         }
 
-        private fun uploadMediaV1(image: File): Long {
+        private fun uploadMediaV1(image: File, altText: String?): Long {
             val cb = ConfigurationBuilder()
             val twitterPropertiesFile = this.javaClass.classLoader.getResourceAsStream("twitter.properties")
                 ?: throw IllegalStateException("Unable to find twitter.properties")
@@ -78,8 +86,35 @@ class GenericWindow<T : JPanel> @JvmOverloads constructor(private val panel: T, 
                 .setOAuthConsumerSecret(properties["oauthConsumerSecret"].toString())
                 .setOAuthAccessToken(properties["oauthAccessToken"].toString())
                 .setOAuthAccessTokenSecret(properties["oauthAccessTokenSecret"].toString())
-            val response = TwitterFactory(cb.build()).instance.uploadMedia(image)
+            val conf = cb.build()
+            val twitter = TwitterFactory(conf).instance
+            val response = twitter.uploadMedia(image)
+
+            if (altText != null) {
+                addAltText(conf, response.mediaId, altText)
+            }
+
             return response.mediaId
+        }
+
+        private fun addAltText(conf: Configuration, mediaId: Long, altText: String) {
+            val client = HttpClientFactory.getInstance(conf.httpClientConfiguration)
+            val auth = AuthorizationFactory.getInstance(conf)
+            val params = JSONObject()
+            params.put("media_id", mediaId)
+            params.put("alt_text", JSONObject().also { it.put("text", altText) })
+            client.post(
+                "${conf.uploadBaseURL}/media/metadata/create.json",
+                arrayOf(
+                    HttpParameter(params)
+                ),
+                auth,
+                object : HttpResponseListener {
+                    override fun httpResponseReceived(event: HttpResponseEvent) {
+                        // no-op
+                    }
+                }
+            )
         }
 
         private fun sendTweetV1(tweet: String, image: File) {
@@ -99,29 +134,57 @@ class GenericWindow<T : JPanel> @JvmOverloads constructor(private val panel: T, 
         }
 
         init {
-            size = Dimension(300, 300)
+            size = Dimension(500, 500)
             isModal = true
             title = "Tweet"
             contentPane.layout = BorderLayout()
             val twitterColor = Color(0x00acee)
+
+            var subscriber: Subscriber<String?>? = null
+
+            val mainPanel = JPanel()
+            mainPanel.layout = GridLayout(0, 1)
+            contentPane.add(mainPanel, BorderLayout.CENTER)
+
             val textArea = JTextArea()
             textArea.lineWrap = true
             textArea.wrapStyleWord = true
-            contentPane.add(textArea, BorderLayout.CENTER)
+            mainPanel.add(textArea)
+
+            val altTextArea = JTextArea()
+            altTextArea.lineWrap = true
+            altTextArea.wrapStyleWord = true
+            altTextArea.isEditable = false
+            altTextArea.text = ""
+            altTextArea.background = Color.LIGHT_GRAY
+            mainPanel.add(altTextArea)
+
             val bottomPanel = JPanel()
             bottomPanel.background = twitterColor
             bottomPanel.layout = BorderLayout()
             contentPane.add(bottomPanel, BorderLayout.SOUTH)
-            val charLabel = JLabel("0")
+
+            val charLabel = JLabel("${textArea.text.length}/280 & ${altTextArea.text.length}/1000")
             charLabel.foreground = Color.WHITE
             bottomPanel.add(charLabel, BorderLayout.WEST)
             textArea.addKeyListener(
                 object : KeyAdapter() {
                     override fun keyReleased(e: KeyEvent) {
-                        charLabel.text = textArea.text.length.toString()
+                        charLabel.text = "${textArea.text.length}/280 & ${altTextArea.text.length}/1000"
                     }
                 }
             )
+
+            if (panel is AltTextProvider) {
+                subscriber = Subscriber(
+                    eventQueueWrapper {
+                        altTextArea.text = it ?: ""
+                        charLabel.text = "${textArea.text.length}/280 & ${(it ?: "").length}/1000"
+                    }
+                )
+                panel.altText.subscribe(subscriber)
+            }
+
             val tweetButton = JButton("Tweet")
             tweetButton.background = twitterColor
             tweetButton.foreground = Color.WHITE
@@ -142,8 +205,10 @@ class GenericWindow<T : JPanel> @JvmOverloads constructor(private val panel: T, 
                     tweetButton.isEnabled = false
                     tweetButton.text = "Tweeting..."
                     val tweet = textArea.text
-                    sendTweet(tweet, file)
+                    val altText = altTextArea.text.takeUnless { it.isNullOrEmpty() }
+                    sendTweet(tweet, file, altText)
                     isVisible = false
+                    subscriber?.unsubscribe()
                 } catch (exc: Exception) {
                     JOptionPane.showMessageDialog(panel, "Could not send tweet: " + exc.message)
                     exc.printStackTrace()

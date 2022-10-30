@@ -20,16 +20,19 @@ class SingleTransferrableResultScreen private constructor(
     private val partyFrame: JPanel?,
     private val prevFrame: JPanel?,
     private val mapFrame: JPanel?
-) : GenericPanel({
-    val panel = JPanel()
-    panel.layout = BasicResultLayout()
-    panel.background = Color.WHITE
-    panel.add(candidateFrame, BasicResultLayout.MAIN)
-    if (partyFrame != null) panel.add(partyFrame, BasicResultLayout.DIFF)
-    if (prevFrame != null) panel.add(prevFrame, BasicResultLayout.SWING)
-    if (mapFrame != null) panel.add(mapFrame, BasicResultLayout.MAP)
-    panel
-}, label) {
+) : GenericPanel(
+    run {
+        val panel = JPanel()
+        panel.layout = BasicResultLayout()
+        panel.background = Color.WHITE
+        panel.add(candidateFrame, BasicResultLayout.MAIN)
+        if (partyFrame != null) panel.add(partyFrame, BasicResultLayout.DIFF)
+        if (prevFrame != null) panel.add(prevFrame, BasicResultLayout.SWING)
+        if (mapFrame != null) panel.add(mapFrame, BasicResultLayout.MAP)
+        panel
+    },
+    label
+) {
 
     companion object {
 

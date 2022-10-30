@@ -23,6 +23,10 @@ class Subscriber<T>(private val next: (T) -> Unit) : Flow.Subscriber<T> {
     override fun onComplete() {
     }
 
+    fun unsubscribe() {
+        subscription?.cancel()
+    }
+
     companion object {
         fun <T> eventQueueWrapper(func: (T) -> Unit): (T) -> Unit {
             data class Wrapper(val item: T)

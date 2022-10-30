@@ -18,16 +18,19 @@ import javax.swing.border.EmptyBorder
 import kotlin.collections.ArrayList
 
 class FiguresScreen private constructor(headerLabel: Flow.Publisher<out String?>, frames: Array<FiguresFrame>) :
-    GenericPanel({
-        val panel = JPanel()
-        panel.background = Color.WHITE
-        panel.layout = GridLayout(1, 0, 5, 5)
-        panel.border = EmptyBorder(5, 5, 5, 5)
-        for (frame in frames) {
-            panel.add(frame)
-        }
-        panel
-    }, headerLabel) {
+    GenericPanel(
+        run {
+            val panel = JPanel()
+            panel.background = Color.WHITE
+            panel.layout = GridLayout(1, 0, 5, 5)
+            panel.border = EmptyBorder(5, 5, 5, 5)
+            for (frame in frames) {
+                panel.add(frame)
+            }
+            panel
+        },
+        headerLabel
+    ) {
 
     class Section(private val name: String) {
         private val entries: MutableList<Entry> = ArrayList()
