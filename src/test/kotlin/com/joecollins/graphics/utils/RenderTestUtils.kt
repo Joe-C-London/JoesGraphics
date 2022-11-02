@@ -72,10 +72,10 @@ object RenderTestUtils {
         return img
     }
 
-    fun compareAltTexts(panel: AltTextProvider, expected: String?) {
+    fun compareAltTexts(panel: AltTextProvider, expected: String?, timeoutSeconds: Long = 1) {
         var result: String? = null
         panel.altText.subscribe(Subscriber { result = it })
-        Awaitility.await().until({ result }, Matchers.equalTo(expected))
-        Awaitility.await().until({ (result ?: "").length }, Matchers.lessThanOrEqualTo(1000))
+        Awaitility.await().atMost(timeoutSeconds, TimeUnit.SECONDS).until({ result }, Matchers.equalTo(expected))
+        Awaitility.await().atMost(timeoutSeconds, TimeUnit.SECONDS).until({ (result ?: "").length }, Matchers.lessThanOrEqualTo(1000))
     }
 }

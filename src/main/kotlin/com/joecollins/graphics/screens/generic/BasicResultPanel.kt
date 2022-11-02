@@ -1103,7 +1103,7 @@ class BasicResultPanel private constructor(
             return PCT_FORMAT.format(pct) +
                 (
                     if (diffPct == null) {
-                        (if (symbols.isEmpty()) "" else "($symbols)")
+                        (if (symbols.isEmpty()) "" else " ($symbols)")
                     } else {
                         (" (" + PCT_DIFF_FORMAT.format(diffPct) + symbols + ")")
                     }
@@ -1883,7 +1883,7 @@ class BasicResultPanel private constructor(
                             .toList().toTypedArray() as Array<KT>
 
                         val filteredCurr = Aggregators.topAndOthers(current, limit, others, *mandatory)
-                        val filteredPrev = (if (this.usePrev && !this.showPrevRaw) this.prev else null) ?: emptyMap()
+                        val filteredPrev = (if (this.usePrev && !this.showPrevRaw) this.prev else null) ?: emptyMap<KPT, Int>()
 
                         val shapes: Map<KT, String> = if (this.winner != null) {
                             mapOf(this.winner!! to TICK)
@@ -1900,7 +1900,22 @@ class BasicResultPanel private constructor(
                         val currTotalByParty: Map<PartyOrCoalition, Int> = Aggregators.adjustKey(
                             filteredCurr.filterValues { it != null }
                                 .mapValues { it.value!! }
-                        ) { keyTemplate.toParty(it) }
+                        ) { keyTemplate.toParty(it) }.let { cVotes ->
+                            val pVotes = this.prev ?: emptyMap()
+                            val prevWinner: KPT? = pVotes.entries
+                                .maxByOrNull { it.value }
+                                ?.key
+                            val prevHasOther = pVotes.containsKey(Party.OTHERS as PartyOrCoalition)
+                            val partiesToShow = sequenceOf(
+                                sequenceOf(prevWinner),
+                                cVotes.entries
+                                    .asSequence()
+                                    .filter { !prevHasOther || pVotes.containsKey(it.key) }
+                                    .sortedByDescending { it.value }
+                                    .map { it.key }
+                            ).flatten().filterNotNull().distinct().toSet()
+                            Aggregators.adjustKey(cVotes) { if (partiesToShow.contains(it)) it else Party.OTHERS }
+                        }
                         val prevTotalByParty: Map<PartyOrCoalition, Int> = Aggregators.adjustKey(filteredPrev) {
                             if (currTotalByParty.containsKey(it)) {
                                 it
@@ -1908,6 +1923,8 @@ class BasicResultPanel private constructor(
                                 Party.OTHERS
                             }
                         }
+                        var somePartyAggregated = false
+                        var someOtherAggregated = false
                         val prevTotal = filteredPrev.values.sum().toDouble()
                         val currText = if (filteredCurr.keys.size == 1) {
                             filteredCurr.keys.joinToString("") { candidate ->
@@ -1921,6 +1938,10 @@ class BasicResultPanel private constructor(
                                 .sortedByDescending { keyTemplate.toParty(it).overrideSortOrder ?: filteredCurr[it] ?: 0 }
                                 .joinToString("") { candidate ->
                                     val party = keyTemplate.toParty(candidate)
+                                    val partyAggregated = prevTotal > 0 && (currGroupedByParty[party]?.size ?: 0) > 1 && currTotalByParty.containsKey(party)
+                                    val otherAggregated = !showPrevRaw && allDeclared && !currTotalByParty.containsKey(party)
+                                    somePartyAggregated = somePartyAggregated || partyAggregated
+                                    someOtherAggregated = someOtherAggregated || otherAggregated
                                     val line = barEntryLine(
                                         keyTemplate.toMainBarHeader(candidate, true),
                                         filteredCurr[candidate]?.takeUnless { currTotal == 0.0 },
@@ -1938,22 +1959,23 @@ class BasicResultPanel private constructor(
                                                 (currTotalByParty[party]!! / currTotal) - (prevTotalByParty[party] ?: 0) / prevTotal
                                             }
                                             ),
-                                        (if (prevTotal > 0 && (currGroupedByParty[party]?.size ?: 0) > 1) "^" else "")
+                                        (if (partyAggregated) "^" else "") +
+                                            (if (otherAggregated) "*" else "")
                                     )
                                     val shape = shapes[candidate]
                                     "\n$line" + (shape?.let { c -> " $c" } ?: "")
                                 }
                         }
-                        val othersText = if (prevTotal > 0 && filteredCurr.keys.size > 1 && filteredCurr.values.all { it != null } && !currTotalByParty.containsKey(Party.OTHERS) && prevTotalByParty.containsKey(Party.OTHERS)) {
-                            "\nOTHERS: - (${PCT_DIFF_FORMAT.format(-prevTotalByParty[Party.OTHERS]!! / prevTotal)})"
+                        val othersText = if (prevTotal > 0 && filteredCurr.keys.size > 1 && filteredCurr.values.all { it != null } && !filteredCurr.any { keyTemplate.toParty(it.key) == Party.OTHERS } && prevTotalByParty.containsKey(Party.OTHERS)) {
+                            "\nOTHERS: - (${PCT_DIFF_FORMAT.format(((currTotalByParty[Party.OTHERS] ?: 0) / currTotal) - prevTotalByParty[Party.OTHERS]!! / prevTotal)})"
                         } else {
                             ""
                         }
-                        val legendText = if (prevTotal > 0 && currGroupedByParty.any { it.value.size > 1 }) {
-                            "\n^ AGGREGATED ACROSS CANDIDATES IN PARTY"
-                        } else {
-                            ""
-                        }
+                        val legendText = (
+                            (if (somePartyAggregated) "\n^ AGGREGATED ACROSS CANDIDATES IN PARTY" else "")
+                            ) + (
+                            (if (someOtherAggregated) "\n* CHANGE INCLUDED IN OTHERS" else "")
+                            )
                         return currText + othersText + legendText
                     }
 
@@ -2029,15 +2051,47 @@ class BasicResultPanel private constructor(
                         }
                     }
 
+                var preferencesHeader: String? = null
+                    set(value) { field = value; updateResult() }
+
+                var preferencesSubhead: String? = null
+                    set(value) { field = value; updateResult() }
+
+                var preferencesProgress: String? = null
+                    set(value) { field = value; updateResult() }
+
+                var currPreferences: Map<out KT, Int?> = emptyMap()
+                    set(value) { field = value; updateResult() }
+
+                val preferences: String?
+                    get() {
+                        if (this.preferencesHeader == null) return null
+                        val total = this.currPreferences.takeUnless { v -> v.values.any { it == null } }?.values?.sumOf { it!! }?.toDouble()
+                        return this.preferencesHeader!! +
+                            (this.preferencesSubhead?.let { ", $it" } ?: "") +
+                            (this.preferencesProgress?.let { "[$it]" } ?: "") +
+                            this.currPreferences.entries.sortedByDescending { (if (it.key is CanOverrideSortOrder) (it.key as CanOverrideSortOrder).overrideSortOrder else null) ?: it.value ?: 0 }
+                                .joinToString("") {
+                                    "\n${keyTemplate.toMainBarHeader(it.key, true)}: ${
+                                    if (total == 0.0 || it.value == null) "WAITING..." else THOUSANDS_FORMAT.format(it.value)
+                                    }${
+                                    if (total == 0.0 || total == null) "" else " (${PCT_FORMAT.format(it.value!! / total)})"
+                                    }${
+                                    if (winner == it.key) " $TICK" else ""
+                                    }"
+                                }
+                    }
+
                 val result: String
                     get() {
                         return (if (this.textHeader == null) "" else this.textHeader + "\n\n") +
                             (this.mainText ?: "") + (if (this.changeText == null) "" else " (${this.changeText})") +
                             this.barsText +
-                            (if (this.majorityText == null) "" else "\n${this.majorityText}") +
-                            (if (this.prevText == null) "" else "\n\n${this.prevText}") +
-                            (if (this.classificationText == null) "" else "\n\n${this.classificationText}") +
-                            (if (this.swingText == null) "" else "\n\n${this.swingText}")
+                            (this.majorityText?.let { "\n$it" } ?: "") +
+                            (this.prevText?.let { "\n\n$it" } ?: "") +
+                            (this.classificationText?.let { "\n\n$it" } ?: "") +
+                            (this.preferences?.let { "\n\n$it" } ?: "") +
+                            (this.swingText?.let { "\n\n$it" } ?: "")
                     }
 
                 fun updateResult() {
@@ -2064,15 +2118,32 @@ class BasicResultPanel private constructor(
             this.runoffSubhead?.subscribe(Subscriber { inputs.runoffSubhead = it })
             this.showMajority?.subscribe(Subscriber { inputs.showMajority = it })
             this.classificationHeader?.subscribe(Subscriber { inputs.classificationHeader = it })
+            this.preferenceHeader?.subscribe(Subscriber { inputs.preferencesHeader = it })
+            this.preferenceSubhead?.subscribe(Subscriber { inputs.preferencesSubhead = it })
+            this.preferenceProgressLabel.subscribe(Subscriber { inputs.preferencesProgress = it })
+            this.currPreferences?.subscribe(Subscriber { inputs.currPreferences = it })
             this.swingHeader?.subscribe(Subscriber { inputs.swingHeader = it })
             if (prev != null && swingComparator != null) {
-                val currentNoNulls = this.current.map { v -> if (v.values.any { it == null }) emptyMap() else v.mapValues { it.value!! } }
-                val currentByParty: Flow.Publisher<Map<KPT, Int>> = Aggregators.adjustKey(currentNoNulls) { keyTemplate.toParty(it) }
-                SwingFrameBuilder.prevCurr(
-                    (if (classificationFunc == null) prev!! else Aggregators.adjustKey(prev!!, classificationFunc!!)),
-                    (if (classificationFunc == null) currentByParty else Aggregators.adjustKey(currentByParty, classificationFunc!!)),
-                    swingComparator!!
-                ).bottomText?.subscribe(Subscriber { inputs.swingBottom = it })
+                if (currPreferences != null && prevPreferences != null) {
+                    val currentNoNulls = this.currPreferences!!.map { v -> if (v.values.any { it == null }) emptyMap() else v.mapValues { it.value!! } }
+                    val curr = Aggregators.adjustKey(currentNoNulls) { keyTemplate.toParty(it) }
+                    val prev = prevPreferences!!.merge(curr) { p, c ->
+                        if (p.keys == c.keys) p else emptyMap()
+                    }
+                    SwingFrameBuilder.prevCurr(
+                        prev,
+                        curr,
+                        swingComparator!!
+                    ).bottomText?.subscribe(Subscriber { inputs.swingBottom = it })
+                } else {
+                    val currentNoNulls = this.current.map { v -> if (v.values.any { it == null }) emptyMap() else v.mapValues { it.value!! } }
+                    val currentByParty: Flow.Publisher<Map<KPT, Int>> = Aggregators.adjustKey(currentNoNulls) { keyTemplate.toParty(it) }
+                    SwingFrameBuilder.prevCurr(
+                        (if (classificationFunc == null) prev!! else Aggregators.adjustKey(prev!!, classificationFunc!!)),
+                        (if (classificationFunc == null) currentByParty else Aggregators.adjustKey(currentByParty, classificationFunc!!)),
+                        swingComparator!!
+                    ).bottomText?.subscribe(Subscriber { inputs.swingBottom = it })
+                }
             }
 
             return inputs.resultPublisher
@@ -2285,14 +2356,20 @@ class BasicResultPanel private constructor(
                 }
             }
             val mainText = header.merge(progressLabel) { h, p -> h + (p?.let { " [$it]" } ?: "") }.merge(subhead, combineHeadAndSub)
-            val changeText = (changeHeader ?: null.asOneTimePublisher())
+            val changeTitle = (changeHeader ?: null.asOneTimePublisher())
                 .merge((changeSubhead ?: null.asOneTimePublisher()), combineHeadAndSub)
-                .merge(showPrevRaw ?: false.asOneTimePublisher()) { text, raw -> if (raw) null else text }
+            val showPrevRaw: Flow.Publisher<Boolean> = showPrevRaw ?: false.asOneTimePublisher()
+            val changeText = changeTitle
+                .merge(showPrevRaw) { text, raw -> if (raw) null else text }
             val barEntryLine: (String, ClosedRange<Double>, ClosedRange<Double>?) -> String = { h, p, d ->
                 "$h: ${DecimalFormat("0.0").format(100 * p.start)}-${PCT_FORMAT.format(p.endInclusive)}" +
-                    d?.let { " ((${DecimalFormat("+0.0;-0.0").format(100 * it.start)})-(${DecimalFormat("+0.0;-0.0").format(100 * it.endInclusive)})%)" }
+                    (d?.let { " ((${DecimalFormat("+0.0;-0.0").format(100 * it.start)})-(${DecimalFormat("+0.0;-0.0").format(100 * it.endInclusive)})%)" } ?: "")
             }
-            val barsText = current.merge(prev ?: emptyMap<KPT, Int>().asOneTimePublisher()) { c, p ->
+            val filteredPrev: Flow.Publisher<Map<PartyOrCoalition, Int>>? = prev?.merge(current) { p, c ->
+                val parties = c.keys.map { keyTemplate.toParty(it) }
+                Aggregators.adjustKey(p) { if (parties.contains(it)) it else Party.OTHERS }
+            }
+            val barsText = current.merge(filteredPrev?.merge(showPrevRaw) { p, b -> if (b) emptyMap() else p } ?: emptyMap<KPT, Int>().asOneTimePublisher()) { c, p ->
                 val prevTotal = p.values.sum().toDouble()
                 c.keys
                     .sortedByDescending { keyTemplate.toParty(it).overrideSortOrder?.toDouble() ?: c[it]?.let { it.start + it.endInclusive } ?: 0.0 }
@@ -2307,6 +2384,14 @@ class BasicResultPanel private constructor(
                         "\n$line"
                     }
             }
+            val prevText: Flow.Publisher<out String?> =
+                (prev ?: emptyMap<KPT, Int>().asOneTimePublisher())
+                    .merge(changeTitle) { p, t ->
+                        val total = p.values.sum().toDouble()
+                        t + p.entries
+                            .sortedByDescending { it.value }
+                            .joinToString("") { "\n${it.key.abbreviation}: ${PCT_FORMAT.format(it.value / total)}" }
+                    }.merge(showPrevRaw) { t, b -> if (b) t else null }
             val swingText: Flow.Publisher<out String?> =
                 if (prev == null || swingComparator == null) {
                     null.asOneTimePublisher()
@@ -2336,6 +2421,7 @@ class BasicResultPanel private constructor(
             return mainText.merge(changeText) { main, change -> main + (if (change == null) "" else " ($change)") }
                 .merge(textHeader) { second, head -> "$head\n\n$second" }
                 .merge(barsText) { first, next -> first + next }
+                .merge(prevText) { text, prev -> text + (prev?.let { "\n\n$it" } ?: "") }
                 .merge(swingText) { text, swing -> text + (swing?.let { "\n\n$it" } ?: "") }
         }
 

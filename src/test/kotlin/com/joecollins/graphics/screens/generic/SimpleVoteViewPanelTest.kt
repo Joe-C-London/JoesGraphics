@@ -2126,6 +2126,31 @@ class SimpleVoteViewPanelTest {
             .build("BEROWRA".asOneTimePublisher())
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "NewPartiesCandidatesMergedWithPrevOthers", panel)
+        compareAltTexts(
+            panel,
+            """
+            BEROWRA
+            
+            PRIMARY VOTE, 100% REPORTING (CHANGE SINCE 2016)
+            JULIAN LEESER (LIB): 53,741 (57.2%, +0.1%) ${"\u2611"}
+            KATIE GOMPERTZ (ALP): 19,821 (21.1%, +1.2%)
+            MONICA TAN (GRN): 11,157 (11.9%, +0.4%)
+            SIMON TAYLOR (CDP): 2,163 (2.3%, *)
+            MICK GALLAGHER (IND): 2,104 (2.2%, *)
+            CRAIG MCLAUGHLIN (UAP): 1,576 (1.7%, *)
+            BRENDAN CLARKE (SCI): 1,465 (1.6%, *)
+            JUSTIN THOMAS (SUS): 1,425 (1.5%, *)
+            ROGER WOODWARD (IND): 495 (0.5%, *)
+            OTHERS: - (-1.7%)
+            * CHANGE INCLUDED IN OTHERS
+            
+            TWO CANDIDATE PREFERRED, 100% REPORTING
+            JULIAN LEESER (LIB): 61,675 (65.6%) ${"\u2611"}
+            KATIE GOMPERTZ (ALP): 32,272 (34.4%)
+            
+            SWING SINCE 2016: 0.8% SWING LIB TO ALP
+            """.trimIndent()
+        )
     }
 
     @Test
@@ -2292,12 +2317,13 @@ class SimpleVoteViewPanelTest {
             CONSTITUTIONAL DEMOCRATIC PARTY: 30.0% (+21.4%)
             NIPPON ISHIN NO KAI: 8.4% (+5.2%)
             JAPANESE COMMUNIST PARTY: 4.6% (-4.4%)
-            DEMOCRATIC PARTY FOR THE PEOPLE: 2.2% (+2.2%)
+            DEMOCRATIC PARTY FOR THE PEOPLE: 2.2% (*)
             KOMEITO: 1.5% (+0.0%)
             SOCIAL DEMOCRATIC PARTY: 0.5% (-0.6%)
-            REIWA SHINSENGUMI: 0.4% (+0.4%)
-            OTHERS: 4.3% (-24.5%)
-            """.trimIndent() //TODO: This is different from the image
+            REIWA SHINSENGUMI: 0.4% (*)
+            OTHERS: 4.3% (-21.9%)
+            * CHANGE INCLUDED IN OTHERS
+            """.trimIndent()
         )
 
         curr.submit(
@@ -2338,11 +2364,12 @@ class SimpleVoteViewPanelTest {
             NIPPON ISHIN NO KAI: 14.0% (+7.9%)
             KOMEITO: 12.4% (-0.1%)
             JAPANESE COMMUNIST PARTY: 7.2% (-0.6%)
-            DEMOCRATIC PARTY FOR THE PEOPLE: 4.5% (+4.5%)
-            REIWA SHINSENGUMI: 3.9% (+3.9%)
+            DEMOCRATIC PARTY FOR THE PEOPLE: 4.5% (*)
+            REIWA SHINSENGUMI: 3.9% (*)
             SOCIAL DEMOCRATIC PARTY: 1.8% (+0.1%)
-            OTHERS: 1.6% (-17.1%)
-            """.trimIndent() //TODO: This is different from the image
+            OTHERS: 1.6% (-8.7%)
+            * CHANGE INCLUDED IN OTHERS
+            """.trimIndent()
         )
 
         showPrevRaw.submit(true)
@@ -2412,6 +2439,24 @@ class SimpleVoteViewPanelTest {
             .build("JAPAN".asOneTimePublisher())
         panel.size = Dimension(1024, 512)
         compareRendering("SimpleVoteViewPanel", "PrevVotes-0", panel)
+        compareAltTexts(
+            panel,
+            """
+            JAPAN
+            
+            PROPORTIONAL VOTES
+            
+            2017 RESULT
+            LDP: 33.3%
+            CDP: 19.9%
+            KIBŌ: 17.4%
+            KOMEITO: 12.5%
+            JCP: 7.9%
+            NIPPON: 6.1%
+            SDP: 1.7%
+            OTH: 1.3%
+            """.trimIndent()
+        )
 
         curr.submit(
             mapOf(
@@ -2427,10 +2472,54 @@ class SimpleVoteViewPanelTest {
             )
         )
         compareRendering("SimpleVoteViewPanel", "PrevRangeVotes-1", panel)
+        compareAltTexts(
+            panel,
+            """
+            JAPAN
+            
+            PROPORTIONAL VOTES
+            LIBERAL DEMOCRATIC PARTY: 32.0-38.0%
+            CONSTITUTIONAL DEMOCRATIC PARTY: 13.0-21.0%
+            NIPPON ISHIN NO KAI: 4.0-12.3%
+            KOMEITO: 7.0-8.4%
+            JAPANESE COMMUNIST PARTY: 5.0-7.6%
+            DEMOCRATIC PARTY FOR THE PEOPLE: 2.0-2.4%
+            REIWA SHINSENGUMI: 1.0-1.6%
+            SOCIAL DEMOCRATIC PARTY: 1.0-1.4%
+            OTHERS: 1.7-3.0%
+            
+            2017 RESULT
+            LDP: 33.3%
+            CDP: 19.9%
+            KIBŌ: 17.4%
+            KOMEITO: 12.5%
+            JCP: 7.9%
+            NIPPON: 6.1%
+            SDP: 1.7%
+            OTH: 1.3%
+            """.trimIndent()
+        )
 
         showPrevRaw.submit(false)
         changeHeader.submit("CHANGE SINCE 2017")
         compareRendering("SimpleVoteViewPanel", "PrevRangeVotes-2", panel)
+        compareAltTexts(
+            panel,
+            """
+            JAPAN
+            
+            PROPORTIONAL VOTES (CHANGE SINCE 2017)
+            LIBERAL DEMOCRATIC PARTY: 32.0-38.0% ((-1.3)-(+4.7)%)
+            CONSTITUTIONAL DEMOCRATIC PARTY: 13.0-21.0% ((-6.9)-(+1.1)%)
+            NIPPON ISHIN NO KAI: 4.0-12.3% ((-2.1)-(+6.2)%)
+            KOMEITO: 7.0-8.4% ((-5.5)-(-4.1)%)
+            JAPANESE COMMUNIST PARTY: 5.0-7.6% ((-2.9)-(-0.3)%)
+            DEMOCRATIC PARTY FOR THE PEOPLE: 2.0-2.4% ((+2.0)-(+2.4)%)
+            REIWA SHINSENGUMI: 1.0-1.6% ((+1.0)-(+1.6)%)
+            SOCIAL DEMOCRATIC PARTY: 1.0-1.4% ((-0.7)-(-0.3)%)
+            OTHERS: 1.7-3.0% ((-17.0)-(-15.7)%)
+            """.trimIndent()
+        )
     }
 
     @Test
