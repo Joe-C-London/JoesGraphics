@@ -2,6 +2,7 @@ package com.joecollins.graphics.screens.generic
 
 import com.joecollins.graphics.screens.generic.BasicResultPanel.Companion.candidateVotes
 import com.joecollins.graphics.screens.generic.BasicResultPanel.Companion.partyRangeVotes
+import com.joecollins.graphics.utils.RenderTestUtils.compareAltTexts
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.Party
@@ -67,6 +68,24 @@ class PreferenceVoteViewPanelTest {
             .build(header)
         panel.setSize(1024, 512)
         compareRendering("PreferenceVoteViewPanel", "Basic-1", panel)
+        compareAltTexts(
+            panel,
+            """
+            FONG LIM
+            
+            PRIMARY VOTE, 9 OF 9 POLLS REPORTING (PRIMARY CHANGE SINCE 2016)
+            MARK MONAGHAN (ALP): 1,756 (42.1%, -3.2%) ${"\u2611"}
+            KYLIE BONANNI (CLP): 1,488 (35.6%, -0.5%)
+            JEFF COLLINS (TA): 497 (11.9%, +3.0%)
+            AMYE UN (IND): 434 (10.4%, +0.7%)
+            
+            TWO CANDIDATE PREFERRED, 9 OF 9 POLLS REPORTING
+            MARK MONAGHAN (ALP): 2,197 (52.6%) ${"\u2611"}
+            KYLIE BONANNI (CLP): 1,978 (47.4%)
+            
+            PREFERENCE SWING SINCE 2016: 5.1% SWING ALP TO CLP
+            """.trimIndent()
+        )
     }
 
     @Test
@@ -117,6 +136,23 @@ class PreferenceVoteViewPanelTest {
             .build(header)
         panel.setSize(1024, 512)
         compareRendering("PreferenceVoteViewPanel", "Update-1", panel)
+        compareAltTexts(
+            panel,
+            """
+            FONG LIM
+            
+            PRIMARY VOTE, 0 OF 9 POLLS REPORTING (PRIMARY CHANGE SINCE 2016)
+            MARK MONAGHAN (ALP): WAITING...
+            KYLIE BONANNI (CLP): WAITING...
+            JEFF COLLINS (TA): WAITING...
+            AMYE UN (IND): WAITING...
+            
+            TWO CANDIDATE PREFERRED, 0 OF 9 POLLS REPORTING
+            
+            PREFERENCE SWING SINCE 2016: NOT AVAILABLE
+            """.trimIndent()
+        )
+
         currentPrimaryVotes.submit(
             mapOf(
                 alp to 13,
@@ -129,6 +165,25 @@ class PreferenceVoteViewPanelTest {
         pctReporting.submit(1.0 / 9)
         voteSubhead.submit("1 OF 9 POLLS REPORTING")
         compareRendering("PreferenceVoteViewPanel", "Update-2", panel)
+        compareAltTexts(
+            panel,
+            """
+            FONG LIM
+            
+            PRIMARY VOTE, 1 OF 9 POLLS REPORTING (PRIMARY CHANGE SINCE 2016)
+            MARK MONAGHAN (ALP): 13 (35.1%, -10.1%)
+            KYLIE BONANNI (CLP): 13 (35.1%, -1.0%)
+            JEFF COLLINS (TA): 6 (16.2%, +7.3%)
+            AMYE UN (IND): 5 (13.5%, +3.9%)
+            
+            TWO CANDIDATE PREFERRED, 0 OF 9 POLLS REPORTING
+            MARK MONAGHAN (ALP): WAITING...
+            KYLIE BONANNI (CLP): WAITING...
+            
+            PREFERENCE SWING SINCE 2016: NOT AVAILABLE
+            """.trimIndent()
+        )
+
         currentPrimaryVotes.submit(
             mapOf(
                 alp to 365,
@@ -148,6 +203,25 @@ class PreferenceVoteViewPanelTest {
         preferencePctReporting.submit(1.0 / 9)
         preferenceSubhead.submit("1 OF 9 POLLS REPORTING")
         compareRendering("PreferenceVoteViewPanel", "Update-3", panel)
+        compareAltTexts(
+            panel,
+            """
+            FONG LIM
+            
+            PRIMARY VOTE, 3 OF 9 POLLS REPORTING (PRIMARY CHANGE SINCE 2016)
+            MARK MONAGHAN (ALP): 365 (45.9%, +0.6%)
+            KYLIE BONANNI (CLP): 262 (32.9%, -3.2%)
+            JEFF COLLINS (TA): 86 (10.8%, +1.9%)
+            AMYE UN (IND): 83 (10.4%, +0.8%)
+            
+            TWO CANDIDATE PREFERRED, 1 OF 9 POLLS REPORTING
+            KYLIE BONANNI (CLP): 19 (51.4%)
+            MARK MONAGHAN (ALP): 18 (48.6%)
+            
+            PREFERENCE SWING SINCE 2016: 9.1% SWING ALP TO CLP
+            """.trimIndent()
+        )
+
         currentPrimaryVotes.submit(
             mapOf(
                 alp to 1756,
@@ -168,6 +242,25 @@ class PreferenceVoteViewPanelTest {
         preferenceSubhead.submit("3 OF 9 POLLS REPORTING")
         leader.submit(alp)
         compareRendering("PreferenceVoteViewPanel", "Update-4", panel)
+        compareAltTexts(
+            panel,
+            """
+            FONG LIM
+            
+            PRIMARY VOTE, 9 OF 9 POLLS REPORTING (PRIMARY CHANGE SINCE 2016)
+            MARK MONAGHAN (ALP): 1,756 (42.1%, -3.2%) ${"\u2611"}
+            KYLIE BONANNI (CLP): 1,488 (35.6%, -0.5%)
+            JEFF COLLINS (TA): 497 (11.9%, +3.0%)
+            AMYE UN (IND): 434 (10.4%, +0.7%)
+            
+            TWO CANDIDATE PREFERRED, 3 OF 9 POLLS REPORTING
+            MARK MONAGHAN (ALP): 464 (58.3%) ${"\u2611"}
+            KYLIE BONANNI (CLP): 332 (41.7%)
+            
+            PREFERENCE SWING SINCE 2016: 0.5% SWING CLP TO ALP
+            """.trimIndent()
+        )
+
         current2CPVotes.submit(
             mapOf(
                 alp to 2197,
@@ -177,6 +270,24 @@ class PreferenceVoteViewPanelTest {
         preferencePctReporting.submit(9.0 / 9)
         preferenceSubhead.submit("9 OF 9 POLLS REPORTING")
         compareRendering("PreferenceVoteViewPanel", "Update-5", panel)
+        compareAltTexts(
+            panel,
+            """
+            FONG LIM
+            
+            PRIMARY VOTE, 9 OF 9 POLLS REPORTING (PRIMARY CHANGE SINCE 2016)
+            MARK MONAGHAN (ALP): 1,756 (42.1%, -3.2%) ${"\u2611"}
+            KYLIE BONANNI (CLP): 1,488 (35.6%, -0.5%)
+            JEFF COLLINS (TA): 497 (11.9%, +3.0%)
+            AMYE UN (IND): 434 (10.4%, +0.7%)
+            
+            TWO CANDIDATE PREFERRED, 9 OF 9 POLLS REPORTING
+            MARK MONAGHAN (ALP): 2,197 (52.6%) ${"\u2611"}
+            KYLIE BONANNI (CLP): 1,978 (47.4%)
+            
+            PREFERENCE SWING SINCE 2016: 5.1% SWING ALP TO CLP
+            """.trimIndent()
+        )
     }
 
     @Test
@@ -231,6 +342,23 @@ class PreferenceVoteViewPanelTest {
             .build(header)
         panel.setSize(1024, 512)
         compareRendering("PreferenceVoteViewPanel", "ProgressLabels-1", panel)
+        compareAltTexts(
+            panel,
+            """
+            FONG LIM
+            
+            PRIMARY VOTE [0/9] (PRIMARY CHANGE SINCE 2016)
+            MARK MONAGHAN (ALP): WAITING...
+            KYLIE BONANNI (CLP): WAITING...
+            JEFF COLLINS (TA): WAITING...
+            AMYE UN (IND): WAITING...
+            
+            TWO CANDIDATE PREFERRED [0/9]
+            
+            PREFERENCE SWING SINCE 2016: NOT AVAILABLE
+            """.trimIndent()
+        )
+
         currentPrimaryVotes.submit(
             mapOf(
                 alp to 13,
@@ -243,6 +371,25 @@ class PreferenceVoteViewPanelTest {
         pctReporting.submit(1.0 / 9)
         voteProgress.submit("1/9")
         compareRendering("PreferenceVoteViewPanel", "ProgressLabels-2", panel)
+        compareAltTexts(
+            panel,
+            """
+            FONG LIM
+            
+            PRIMARY VOTE [1/9] (PRIMARY CHANGE SINCE 2016)
+            MARK MONAGHAN (ALP): 13 (35.1%, -10.1%)
+            KYLIE BONANNI (CLP): 13 (35.1%, -1.0%)
+            JEFF COLLINS (TA): 6 (16.2%, +7.3%)
+            AMYE UN (IND): 5 (13.5%, +3.9%)
+            
+            TWO CANDIDATE PREFERRED [0/9]
+            MARK MONAGHAN (ALP): WAITING...
+            KYLIE BONANNI (CLP): WAITING...
+            
+            PREFERENCE SWING SINCE 2016: NOT AVAILABLE
+            """.trimIndent()
+        )
+
         currentPrimaryVotes.submit(
             mapOf(
                 alp to 365,
@@ -262,6 +409,25 @@ class PreferenceVoteViewPanelTest {
         preferencePctReporting.submit(1.0 / 9)
         preferenceProgress.submit("1/9")
         compareRendering("PreferenceVoteViewPanel", "ProgressLabels-3", panel)
+        compareAltTexts(
+            panel,
+            """
+            FONG LIM
+            
+            PRIMARY VOTE [3/9] (PRIMARY CHANGE SINCE 2016)
+            MARK MONAGHAN (ALP): 365 (45.9%, +0.6%)
+            KYLIE BONANNI (CLP): 262 (32.9%, -3.2%)
+            JEFF COLLINS (TA): 86 (10.8%, +1.9%)
+            AMYE UN (IND): 83 (10.4%, +0.8%)
+            
+            TWO CANDIDATE PREFERRED [1/9]
+            KYLIE BONANNI (CLP): 19 (51.4%)
+            MARK MONAGHAN (ALP): 18 (48.6%)
+            
+            PREFERENCE SWING SINCE 2016: 9.1% SWING ALP TO CLP
+            """.trimIndent()
+        )
+
         currentPrimaryVotes.submit(
             mapOf(
                 alp to 1756,
@@ -282,6 +448,25 @@ class PreferenceVoteViewPanelTest {
         preferenceProgress.submit("3/9")
         leader.submit(alp)
         compareRendering("PreferenceVoteViewPanel", "ProgressLabels-4", panel)
+        compareAltTexts(
+            panel,
+            """
+            FONG LIM
+            
+            PRIMARY VOTE [9/9] (PRIMARY CHANGE SINCE 2016)
+            MARK MONAGHAN (ALP): 1,756 (42.1%, -3.2%) ${"\u2611"}
+            KYLIE BONANNI (CLP): 1,488 (35.6%, -0.5%)
+            JEFF COLLINS (TA): 497 (11.9%, +3.0%)
+            AMYE UN (IND): 434 (10.4%, +0.7%)
+            
+            TWO CANDIDATE PREFERRED [3/9]
+            MARK MONAGHAN (ALP): 464 (58.3%) ${"\u2611"}
+            KYLIE BONANNI (CLP): 332 (41.7%)
+            
+            PREFERENCE SWING SINCE 2016: 0.5% SWING CLP TO ALP
+            """.trimIndent()
+        )
+
         current2CPVotes.submit(
             mapOf(
                 alp to 2197,
@@ -291,6 +476,24 @@ class PreferenceVoteViewPanelTest {
         preferencePctReporting.submit(9.0 / 9)
         preferenceProgress.submit("9/9")
         compareRendering("PreferenceVoteViewPanel", "ProgressLabels-5", panel)
+        compareAltTexts(
+            panel,
+            """
+            FONG LIM
+            
+            PRIMARY VOTE [9/9] (PRIMARY CHANGE SINCE 2016)
+            MARK MONAGHAN (ALP): 1,756 (42.1%, -3.2%) ${"\u2611"}
+            KYLIE BONANNI (CLP): 1,488 (35.6%, -0.5%)
+            JEFF COLLINS (TA): 497 (11.9%, +3.0%)
+            AMYE UN (IND): 434 (10.4%, +0.7%)
+            
+            TWO CANDIDATE PREFERRED [9/9]
+            MARK MONAGHAN (ALP): 2,197 (52.6%) ${"\u2611"}
+            KYLIE BONANNI (CLP): 1,978 (47.4%)
+            
+            PREFERENCE SWING SINCE 2016: 5.1% SWING ALP TO CLP
+            """.trimIndent()
+        )
     }
 
     @Test
@@ -339,6 +542,25 @@ class PreferenceVoteViewPanelTest {
             .build(header)
         panel.setSize(1024, 512)
         compareRendering("PreferenceVoteViewPanel", "LotsOfCandidates-1", panel)
+        compareAltTexts(
+            panel,
+            """
+            FONG LIM
+            
+            PRIMARY VOTE, 9 OF 9 POLLS REPORTING (PRIMARY CHANGE SINCE 2016)
+            MARK MONAGHAN (ALP): 1,756 (42.1%, -3.2%)
+            KYLIE BONANNI (CLP): 1,488 (35.6%, -0.5%)
+            JEFF COLLINS (MP) (TA): 497 (11.9%, +3.0%)
+            AMYE UN (IND): 434 (10.4%, +0.7%)
+            
+            TWO CANDIDATE PREFERRED, 9 OF 9 POLLS REPORTING
+            MARK MONAGHAN (ALP): 2,197 (52.6%)
+            KYLIE BONANNI (CLP): 1,978 (47.4%)
+            
+            PREFERENCE SWING SINCE 2016: 5.1% SWING ALP TO CLP
+            """.trimIndent()
+        )
+
         header.submit("GOYDER")
         voteSubhead.submit("12 OF 12 POLLS REPORTING")
         preferenceSubhead.submit("12 OF 12 POLLS REPORTING")
@@ -363,6 +585,29 @@ class PreferenceVoteViewPanelTest {
         )
         previous2PPVotes.submit(mapOf(ind to 3109, clp to 1020))
         compareRendering("PreferenceVoteViewPanel", "LotsOfCandidates-2", panel)
+        compareAltTexts(
+            panel,
+            """
+            GOYDER
+            
+            PRIMARY VOTE, 12 OF 12 POLLS REPORTING (PRIMARY CHANGE SINCE 2016)
+            KEZIA PURICK (MP) (IND): 1,459 (31.1%, -12.9%^)
+            PHIL BATTYE (CLP): 1,289 (27.5%, +7.2%)
+            RACHEL WRIGHT (TA): 614 (13.1%, +13.1%)
+            MICK TAYLOR (ALP): 590 (12.6%, -6.4%)
+            PAULINE CASS (IND): 283 (6.0%, ^)
+            TED WARREN (IND): 249 (5.3%, ^)
+            KAREN FLETCHER (GRN): 147 (3.1%, -1.0%)
+            TREVOR JENKINS (IND): 64 (1.4%, ^)
+            ^ AGGREGATED ACROSS CANDIDATES IN PARTY
+            
+            TWO CANDIDATE PREFERRED, 12 OF 12 POLLS REPORTING
+            KEZIA PURICK (MP) (IND): 2,665 (56.8%)
+            PHIL BATTYE (CLP): 2,030 (43.2%)
+            
+            PREFERENCE SWING SINCE 2016: 18.5% SWING IND TO CLP
+            """.trimIndent()
+        )
     }
 
     @Test
@@ -415,6 +660,23 @@ class PreferenceVoteViewPanelTest {
             .build(header)
         panel.setSize(1024, 512)
         compareRendering("PreferenceVoteViewPanel", "SinglePreference-1", panel)
+        compareAltTexts(
+            panel,
+            """
+            SANDERSON
+            
+            PRIMARY VOTE, 7 OF 7 POLLS REPORTING (PRIMARY CHANGE SINCE 2016)
+            KATE WORDEN (ALP): 2,632 (59.9%, +7.6%) ${"\u2611"}
+            DEREK MAYGER (CLP): 968 (22.0%, -13.4%)
+            AMELIA NUKU (TA): 795 (18.1%, +15.1%)
+            OTHERS: - (-9.3%)
+            
+            TWO CANDIDATE PREFERRED, 7 OF 7 POLLS REPORTING
+            KATE WORDEN (ALP): ELECTED ${"\u2611"}
+            
+            PREFERENCE SWING SINCE 2016: NOT AVAILABLE
+            """.trimIndent()
+        )
     }
 
     @Test
@@ -468,6 +730,25 @@ class PreferenceVoteViewPanelTest {
             .build(header)
         panel.setSize(1024, 512)
         compareRendering("PreferenceVoteViewPanel", "NoPrevPreference-1", panel)
+        compareAltTexts(
+            panel,
+            """
+            ARNHEM
+            
+            PRIMARY VOTE, 7 OF 7 POLLS REPORTING (PRIMARY CHANGE SINCE 2016)
+            SELENA UIBO (ALP): 1,207 (41.3%, -12.8%) ${"\u2611"}
+            IAN MONGUNU GUMBULA (IND): 987 (33.8%, +23.9%^)
+            JERRY AMATO (CLP): 487 (16.7%, -11.1%)
+            LANCE LAWRENCE (IND): 243 (8.3%, ^)
+            ^ AGGREGATED ACROSS CANDIDATES IN PARTY
+            
+            TWO CANDIDATE PREFERRED, 7 OF 7 POLLS REPORTING
+            SELENA UIBO (ALP): 1,508 (51.6%) ${"\u2611"}
+            IAN MONGUNU GUMBULA (IND): 1,416 (48.4%)
+            
+            PREFERENCE SWING SINCE 2016: NOT AVAILABLE
+            """.trimIndent()
+        )
     }
 
     @Test
@@ -527,6 +808,24 @@ class PreferenceVoteViewPanelTest {
             .build(header)
         panel.setSize(1024, 512)
         compareRendering("PreferenceVoteViewPanel", "ChangeInPreference-1", panel)
+        compareAltTexts(
+            panel,
+            """
+            MELBOURNE
+            
+            PRIMARY VOTE, 2016 RESULTS (PRIMARY CHANGE SINCE 2013)
+            ADAM BANDT (MP) (GRN): 41,377 (43.7%, +1.1%) ${"\u2611"}
+            LE LIU (LIB): 23,878 (25.2%, +2.4%)
+            SOPHIE ISMAIL (ALP): 23,130 (24.5%, -2.1%)
+            OTHERS (IND): 6,194 (6.5%, -1.4%)
+            
+            TWO CANDIDATE PREFERRED, 2016 RESULTS
+            ADAM BANDT (MP) (GRN): 64,771 (68.5%) ${"\u2611"}
+            LE LIU (LIB): 29,808 (31.5%)
+            
+            PREFERENCE SWING SINCE 2013: NOT AVAILABLE
+            """.trimIndent()
+        )
     }
 
     @Test
@@ -576,6 +875,25 @@ class PreferenceVoteViewPanelTest {
             .build("AUSTRALIA".asOneTimePublisher())
         panel.setSize(1024, 512)
         compareRendering("PreferenceVoteViewPanel", "Ranges-1", panel)
+        compareAltTexts(
+            panel,
+            """
+            AUSTRALIA
+            
+            POLLING RANGE, NOVEMBER 2020 (CHANGE SINCE 2019)
+            COALITION: 42.0-43.0% ((+0.6)-(+1.6)%)
+            LABOR: 34.0-36.0% ((+0.7)-(+2.7)%)
+            GREENS: 11.0-12.0% ((+0.6)-(+1.6)%)
+            ONE NATION: 2.0-4.0% ((-1.1)-(+0.9)%)
+            OTHERS: 8.0-8.0% ((-3.7)-(-3.7)%)
+            
+            TWO PARTY PREFERRED
+            COALITION: 50.5-51.0%
+            LABOR: 49.0-49.5%
+            
+            SWING SINCE 2019: 0.3% SWING L/NP TO ALP
+            """.trimIndent()
+        )
     }
 
     @Test
@@ -638,23 +956,148 @@ class PreferenceVoteViewPanelTest {
             .build(header)
         panel.setSize(1024, 512)
         compareRendering("PreferenceVoteViewPanel", "Declaration-1", panel)
+        compareAltTexts(
+            panel,
+            """
+            MAYOR OF LONDON
+            
+            FIRST CHOICE VOTES, 2016 RESULTS (FIRST CHOICE CHANGE SINCE 2012)
+            SIÂN BERRY (GRN): WAITING...
+            ZAC GOLDSMITH (CON): WAITING...
+            SADIQ KHAN (LAB): WAITING...
+            CAROLINE PIDGEON (LD): WAITING...
+            PETER WHITTLE (UKIP): WAITING...
+            OTHERS: WAITING...
+            
+            SECOND CHOICE VOTES, 2016 RESULTS
+            ZAC GOLDSMITH (CON): WAITING...
+            SADIQ KHAN (LAB): WAITING...
+            
+            SECOND CHOICE SWING SINCE 2012: NOT AVAILABLE
+            """.trimIndent()
+        )
+
         currPrimary[grn] = 150673
         currPrimary[con] = 909755
         currentPrimaryVotes.submit(currPrimary)
         compareRendering("PreferenceVoteViewPanel", "Declaration-2", panel)
+        compareAltTexts(
+            panel,
+            """
+            MAYOR OF LONDON
+            
+            FIRST CHOICE VOTES, 2016 RESULTS (FIRST CHOICE CHANGE SINCE 2012)
+            ZAC GOLDSMITH (CON): 909,755
+            SIÂN BERRY (GRN): 150,673
+            SADIQ KHAN (LAB): WAITING...
+            CAROLINE PIDGEON (LD): WAITING...
+            PETER WHITTLE (UKIP): WAITING...
+            OTHERS: WAITING...
+            
+            SECOND CHOICE VOTES, 2016 RESULTS
+            ZAC GOLDSMITH (CON): WAITING...
+            SADIQ KHAN (LAB): WAITING...
+            
+            SECOND CHOICE SWING SINCE 2012: NOT AVAILABLE
+            """.trimIndent()
+        )
+
         currPrimary[lab] = 1148716
         currPrimary[ld] = 120005
         currentPrimaryVotes.submit(currPrimary)
         compareRendering("PreferenceVoteViewPanel", "Declaration-3", panel)
+        compareAltTexts(
+            panel,
+            """
+            MAYOR OF LONDON
+            
+            FIRST CHOICE VOTES, 2016 RESULTS (FIRST CHOICE CHANGE SINCE 2012)
+            SADIQ KHAN (LAB): 1,148,716
+            ZAC GOLDSMITH (CON): 909,755
+            SIÂN BERRY (GRN): 150,673
+            CAROLINE PIDGEON (LD): 120,005
+            PETER WHITTLE (UKIP): WAITING...
+            OTHERS: WAITING...
+            
+            SECOND CHOICE VOTES, 2016 RESULTS
+            ZAC GOLDSMITH (CON): WAITING...
+            SADIQ KHAN (LAB): WAITING...
+            
+            SECOND CHOICE SWING SINCE 2012: NOT AVAILABLE
+            """.trimIndent()
+        )
+
         currPrimary[ukip] = 94373
         currPrimary[oth] = 53055 + 37007 + 31372 + 20537 + 13325 + 13202 + 4941
         currentPrimaryVotes.submit(currPrimary)
         compareRendering("PreferenceVoteViewPanel", "Declaration-4", panel)
+        compareAltTexts(
+            panel,
+            """
+            MAYOR OF LONDON
+            
+            FIRST CHOICE VOTES, 2016 RESULTS (FIRST CHOICE CHANGE SINCE 2012)
+            SADIQ KHAN (LAB): 1,148,716 (44.2%, +3.9%)
+            ZAC GOLDSMITH (CON): 909,755 (35.0%, -9.0%)
+            SIÂN BERRY (GRN): 150,673 (5.8%, +1.3%)
+            CAROLINE PIDGEON (LD): 120,005 (4.6%, +0.5%)
+            PETER WHITTLE (UKIP): 94,373 (3.6%, +1.7%)
+            OTHERS: 173,439 (6.7%, +1.6%)
+            
+            SECOND CHOICE VOTES, 2016 RESULTS
+            ZAC GOLDSMITH (CON): WAITING...
+            SADIQ KHAN (LAB): WAITING...
+            
+            SECOND CHOICE SWING SINCE 2012: NOT AVAILABLE
+            """.trimIndent()
+        )
+
         curr2CP[con] = 994614
         current2CPVotes.submit(curr2CP)
         compareRendering("PreferenceVoteViewPanel", "Declaration-5", panel)
+        compareAltTexts(
+            panel,
+            """
+            MAYOR OF LONDON
+            
+            FIRST CHOICE VOTES, 2016 RESULTS (FIRST CHOICE CHANGE SINCE 2012)
+            SADIQ KHAN (LAB): 1,148,716 (44.2%, +3.9%)
+            ZAC GOLDSMITH (CON): 909,755 (35.0%, -9.0%)
+            SIÂN BERRY (GRN): 150,673 (5.8%, +1.3%)
+            CAROLINE PIDGEON (LD): 120,005 (4.6%, +0.5%)
+            PETER WHITTLE (UKIP): 94,373 (3.6%, +1.7%)
+            OTHERS: 173,439 (6.7%, +1.6%)
+            
+            SECOND CHOICE VOTES, 2016 RESULTS
+            ZAC GOLDSMITH (CON): 994,614
+            SADIQ KHAN (LAB): WAITING...
+            
+            SECOND CHOICE SWING SINCE 2012: NOT AVAILABLE
+            """.trimIndent()
+        )
+
         curr2CP[lab] = 1310143
         current2CPVotes.submit(curr2CP)
         compareRendering("PreferenceVoteViewPanel", "Declaration-6", panel)
+        compareAltTexts(
+            panel,
+            """
+            MAYOR OF LONDON
+            
+            FIRST CHOICE VOTES, 2016 RESULTS (FIRST CHOICE CHANGE SINCE 2012)
+            SADIQ KHAN (LAB): 1,148,716 (44.2%, +3.9%)
+            ZAC GOLDSMITH (CON): 909,755 (35.0%, -9.0%)
+            SIÂN BERRY (GRN): 150,673 (5.8%, +1.3%)
+            CAROLINE PIDGEON (LD): 120,005 (4.6%, +0.5%)
+            PETER WHITTLE (UKIP): 94,373 (3.6%, +1.7%)
+            OTHERS: 173,439 (6.7%, +1.6%)
+            
+            SECOND CHOICE VOTES, 2016 RESULTS
+            SADIQ KHAN (LAB): 1,310,143 (56.8%)
+            ZAC GOLDSMITH (CON): 994,614 (43.2%)
+            
+            SECOND CHOICE SWING SINCE 2012: 8.4% SWING CON TO LAB
+            """.trimIndent()
+        )
     }
 }

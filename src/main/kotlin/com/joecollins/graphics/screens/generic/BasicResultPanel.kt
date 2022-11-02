@@ -2068,12 +2068,12 @@ class BasicResultPanel private constructor(
                         if (this.preferencesHeader == null) return null
                         val total = this.currPreferences.takeUnless { v -> v.values.any { it == null } }?.values?.sumOf { it!! }?.toDouble()
                         return this.preferencesHeader!! +
-                            (this.preferencesSubhead?.let { ", $it" } ?: "") +
-                            (this.preferencesProgress?.let { "[$it]" } ?: "") +
+                            (this.preferencesSubhead.takeUnless { it.isNullOrEmpty() }?.let { ", $it" } ?: "") +
+                            (this.preferencesProgress?.let { " [$it]" } ?: "") +
                             this.currPreferences.entries.sortedByDescending { (if (it.key is CanOverrideSortOrder) (it.key as CanOverrideSortOrder).overrideSortOrder else null) ?: it.value ?: 0 }
                                 .joinToString("") {
                                     "\n${keyTemplate.toMainBarHeader(it.key, true)}: ${
-                                    if (total == 0.0 || it.value == null) "WAITING..." else THOUSANDS_FORMAT.format(it.value)
+                                    if (this.currPreferences.size == 1) "ELECTED" else if (total == 0.0 || it.value == null) "WAITING..." else THOUSANDS_FORMAT.format(it.value)
                                     }${
                                     if (total == 0.0 || total == null) "" else " (${PCT_FORMAT.format(it.value!! / total)})"
                                     }${
@@ -2392,6 +2392,11 @@ class BasicResultPanel private constructor(
                             .sortedByDescending { it.value }
                             .joinToString("") { "\n${it.key.abbreviation}: ${PCT_FORMAT.format(it.value / total)}" }
                     }.merge(showPrevRaw) { t, b -> if (b) t else null }
+            val preferenceText = preferenceHeader?.merge(preferenceSubhead ?: null.asOneTimePublisher(), combineHeadAndSub)
+                ?.merge(currPreferences ?: emptyMap<KT, ClosedRange<Double>>().asOneTimePublisher()) { h, c ->
+                    h + c.entries.sortedByDescending { (if (it.key is CanOverrideSortOrder) (it.key as CanOverrideSortOrder).overrideSortOrder?.toDouble() else null) ?: it.value.let { v -> v.start + v.endInclusive } }
+                        .joinToString("") { "\n${barEntryLine(keyTemplate.toMainBarHeader(it.key, true), it.value, null)}" }
+                } ?: null.asOneTimePublisher()
             val swingText: Flow.Publisher<out String?> =
                 if (prev == null || swingComparator == null) {
                     null.asOneTimePublisher()
@@ -2422,6 +2427,7 @@ class BasicResultPanel private constructor(
                 .merge(textHeader) { second, head -> "$head\n\n$second" }
                 .merge(barsText) { first, next -> first + next }
                 .merge(prevText) { text, prev -> text + (prev?.let { "\n\n$it" } ?: "") }
+                .merge(preferenceText) { text, pref -> text + (pref?.let { "\n\n$it" } ?: "") }
                 .merge(swingText) { text, swing -> text + (swing?.let { "\n\n$it" } ?: "") }
         }
 
