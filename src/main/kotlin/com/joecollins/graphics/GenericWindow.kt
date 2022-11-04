@@ -178,8 +178,9 @@ class GenericWindow<T : JPanel> @JvmOverloads constructor(private val panel: T, 
             if (panel is AltTextProvider) {
                 subscriber = Subscriber(
                     eventQueueWrapper {
-                        altTextArea.text = it ?: ""
-                        charLabel.text = "${textArea.text.length}/280 & ${(it ?: "").length}/1000"
+                        val text = it?.takeIf { t -> t.length <= 1000 }
+                        altTextArea.text = text ?: ""
+                        charLabel.text = "${textArea.text.length}/280 & ${(text ?: "").length}/1000"
                     }
                 )
                 panel.altText.subscribe(subscriber)

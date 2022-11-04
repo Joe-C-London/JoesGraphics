@@ -2,6 +2,7 @@ package com.joecollins.graphics.screens.generic
 
 import com.joecollins.graphics.screens.generic.TooCloseToCallScreen.Companion.of
 import com.joecollins.graphics.screens.generic.TooCloseToCallScreen.Companion.ofParty
+import com.joecollins.graphics.utils.RenderTestUtils.compareAltTexts
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.models.general.Aggregators.adjustKey
 import com.joecollins.models.general.Candidate
@@ -34,22 +35,100 @@ class TooCloseToCallScreenTest {
             .build("PRINCE EDWARD ISLAND".asOneTimePublisher())
         screen.setSize(1024, 512)
         compareRendering("TooCloseToCallScreen", "Basic-1", screen)
+        compareAltTexts(
+            screen,
+            """
+            PRINCE EDWARD ISLAND
+            
+            TOO CLOSE TO CALL
+            (empty)
+            """.trimIndent()
+        )
+
         setupFirstAdvancePoll(candidateVotesRaw, partyResultsRaw, HashMap(), HashMap())
         candidateVotes.submit(candidateVotesRaw)
         partyResults.submit(partyResultsRaw)
         compareRendering("TooCloseToCallScreen", "Basic-2", screen)
+        compareAltTexts(
+            screen,
+            """
+            PRINCE EDWARD ISLAND
+            
+            TOO CLOSE TO CALL
+            DISTRICT 1: PC: 684; LIB: 467; LEAD: 217
+            """.trimIndent()
+        )
+
         setupAllAdvancePolls(candidateVotesRaw, partyResultsRaw, HashMap(), HashMap())
         candidateVotes.submit(candidateVotesRaw)
         partyResults.submit(partyResultsRaw)
         compareRendering("TooCloseToCallScreen", "Basic-3", screen)
+        compareAltTexts(
+            screen,
+            """
+            PRINCE EDWARD ISLAND
+            
+            TOO CLOSE TO CALL
+            DISTRICT 12: LIB: 478; GRN: 475; LEAD: 3
+            DISTRICT 23: PC: 436; GRN: 428; LEAD: 8
+            DISTRICT 8: LIB: 620; PC: 609; LEAD: 11
+            DISTRICT 26: PC: 700; LIB: 686; LEAD: 14
+            DISTRICT 5: PC: 533; LIB: 518; LEAD: 15
+            DISTRICT 25: LIB: 454; NDP: 425; LEAD: 29
+            DISTRICT 21: GRN: 617; PC: 577; LEAD: 40
+            DISTRICT 11: GRN: 636; PC: 595; LEAD: 41
+            DISTRICT 22: GRN: 602; LIB: 560; LEAD: 42
+            DISTRICT 24: LIB: 330; GRN: 197; LEAD: 133
+            DISTRICT 15: PC: 583; LIB: 425; LEAD: 158
+            DISTRICT 13: LIB: 717; GRN: 542; LEAD: 175
+            DISTRICT 6: PC: 725; LIB: 526; LEAD: 199
+            DISTRICT 14: LIB: 699; PC: 492; LEAD: 207
+            DISTRICT 1: PC: 684; LIB: 467; LEAD: 217
+            DISTRICT 9: PC: 620; LIB: 395; LEAD: 225
+            DISTRICT 27: LIB: 646; PC: 405; LEAD: 241
+            DISTRICT 2: PC: 555; GRN: 308; LEAD: 247
+            DISTRICT 10: LIB: 808; GRN: 516; LEAD: 292
+            DISTRICT 16: LIB: 983; GRN: 542; LEAD: 441
+            """.trimIndent()
+        )
+
         setupHalfOfPolls(candidateVotesRaw, partyResultsRaw, HashMap(), HashMap())
         candidateVotes.submit(candidateVotesRaw)
         partyResults.submit(partyResultsRaw)
         compareRendering("TooCloseToCallScreen", "Basic-4", screen)
+        compareAltTexts(
+            screen,
+            """
+            PRINCE EDWARD ISLAND
+            
+            TOO CLOSE TO CALL
+            DISTRICT 26: LIB: 919; PC: 890; LEAD: 29
+            DISTRICT 13: LIB: 952; GRN: 840; LEAD: 112
+            DISTRICT 8: PC: 948; LIB: 832; LEAD: 116
+            DISTRICT 5: GRN: 871; PC: 743; LEAD: 128
+            DISTRICT 12: GRN: 831; LIB: 639; LEAD: 192
+            DISTRICT 24: LIB: 774; GRN: 582; LEAD: 192
+            DISTRICT 14: LIB: 874; GRN: 660; LEAD: 214
+            DISTRICT 15: PC: 909; LIB: 652; LEAD: 257
+            DISTRICT 9: PC: 807; GRN: 533; LEAD: 274
+            DISTRICT 6: PC: 995; LIB: 684; LEAD: 311
+            DISTRICT 16: LIB: 1,286; GRN: 819; LEAD: 467
+            """.trimIndent()
+        )
+
         setupFullResults(candidateVotesRaw, partyResultsRaw, HashMap(), HashMap())
         candidateVotes.submit(candidateVotesRaw)
         partyResults.submit(partyResultsRaw)
         compareRendering("TooCloseToCallScreen", "Basic-1", screen)
+        compareAltTexts(
+            screen,
+            """
+            PRINCE EDWARD ISLAND
+            
+            TOO CLOSE TO CALL
+            (empty)
+            """.trimIndent()
+        )
     }
 
     @Test
@@ -71,26 +150,104 @@ class TooCloseToCallScreenTest {
             .build("PRINCE EDWARD ISLAND".asOneTimePublisher())
         screen.setSize(1024, 512)
         compareRendering("TooCloseToCallScreen", "PctReporting-1", screen)
+        compareAltTexts(
+            screen,
+            """
+            PRINCE EDWARD ISLAND
+            
+            TOO CLOSE TO CALL
+            (empty)
+            """.trimIndent()
+        )
+
         setupFirstAdvancePoll(candidateVotesRaw, partyResultsRaw, pctReportingRaw, HashMap())
         candidateVotes.submit(candidateVotesRaw)
         partyResults.submit(partyResultsRaw)
         pctReporting.submit(pctReportingRaw)
         compareRendering("TooCloseToCallScreen", "PctReporting-2", screen)
+        compareAltTexts(
+            screen,
+            """
+            PRINCE EDWARD ISLAND
+            
+            TOO CLOSE TO CALL
+            DISTRICT 1: PC: 684; LIB: 467; LEAD: 217; 10.0% IN
+            """.trimIndent()
+        )
+
         setupAllAdvancePolls(candidateVotesRaw, partyResultsRaw, pctReportingRaw, HashMap())
         candidateVotes.submit(candidateVotesRaw)
         partyResults.submit(partyResultsRaw)
         pctReporting.submit(pctReportingRaw)
         compareRendering("TooCloseToCallScreen", "PctReporting-3", screen)
+        compareAltTexts(
+            screen,
+            """
+            PRINCE EDWARD ISLAND
+            
+            TOO CLOSE TO CALL
+            DISTRICT 12: LIB: 478; GRN: 475; LEAD: 3; 10.0% IN
+            DISTRICT 23: PC: 436; GRN: 428; LEAD: 8; 10.0% IN
+            DISTRICT 8: LIB: 620; PC: 609; LEAD: 11; 10.0% IN
+            DISTRICT 26: PC: 700; LIB: 686; LEAD: 14; 10.0% IN
+            DISTRICT 5: PC: 533; LIB: 518; LEAD: 15; 12.5% IN
+            DISTRICT 25: LIB: 454; NDP: 425; LEAD: 29; 9.1% IN
+            DISTRICT 21: GRN: 617; PC: 577; LEAD: 40; 10.0% IN
+            DISTRICT 11: GRN: 636; PC: 595; LEAD: 41; 10.0% IN
+            DISTRICT 22: GRN: 602; LIB: 560; LEAD: 42; 10.0% IN
+            DISTRICT 24: LIB: 330; GRN: 197; LEAD: 133; 12.5% IN
+            DISTRICT 15: PC: 583; LIB: 425; LEAD: 158; 10.0% IN
+            DISTRICT 13: LIB: 717; GRN: 542; LEAD: 175; 10.0% IN
+            DISTRICT 6: PC: 725; LIB: 526; LEAD: 199; 11.1% IN
+            DISTRICT 14: LIB: 699; PC: 492; LEAD: 207; 10.0% IN
+            DISTRICT 1: PC: 684; LIB: 467; LEAD: 217; 10.0% IN
+            DISTRICT 9: PC: 620; LIB: 395; LEAD: 225; 9.1% IN
+            DISTRICT 27: LIB: 646; PC: 405; LEAD: 241; 10.0% IN
+            DISTRICT 2: PC: 555; GRN: 308; LEAD: 247; 10.0% IN
+            DISTRICT 10: LIB: 808; GRN: 516; LEAD: 292; 10.0% IN
+            DISTRICT 16: LIB: 983; GRN: 542; LEAD: 441; 10.0% IN
+            """.trimIndent()
+        )
+
         setupHalfOfPolls(candidateVotesRaw, partyResultsRaw, pctReportingRaw, HashMap())
         candidateVotes.submit(candidateVotesRaw)
         partyResults.submit(partyResultsRaw)
         pctReporting.submit(pctReportingRaw)
         compareRendering("TooCloseToCallScreen", "PctReporting-4", screen)
+        compareAltTexts(
+            screen,
+            """
+            PRINCE EDWARD ISLAND
+            
+            TOO CLOSE TO CALL
+            DISTRICT 26: LIB: 919; PC: 890; LEAD: 29; 50.0% IN
+            DISTRICT 13: LIB: 952; GRN: 840; LEAD: 112; 50.0% IN
+            DISTRICT 8: PC: 948; LIB: 832; LEAD: 116; 50.0% IN
+            DISTRICT 5: GRN: 871; PC: 743; LEAD: 128; 62.5% IN
+            DISTRICT 12: GRN: 831; LIB: 639; LEAD: 192; 50.0% IN
+            DISTRICT 24: LIB: 774; GRN: 582; LEAD: 192; 62.5% IN
+            DISTRICT 14: LIB: 874; GRN: 660; LEAD: 214; 50.0% IN
+            DISTRICT 15: PC: 909; LIB: 652; LEAD: 257; 50.0% IN
+            DISTRICT 9: PC: 807; GRN: 533; LEAD: 274; 45.5% IN
+            DISTRICT 6: PC: 995; LIB: 684; LEAD: 311; 55.6% IN
+            DISTRICT 16: LIB: 1,286; GRN: 819; LEAD: 467; 50.0% IN
+            """.trimIndent()
+        )
+
         setupFullResults(candidateVotesRaw, partyResultsRaw, pctReportingRaw, HashMap())
         candidateVotes.submit(candidateVotesRaw)
         partyResults.submit(partyResultsRaw)
         pctReporting.submit(pctReportingRaw)
         compareRendering("TooCloseToCallScreen", "PctReporting-1", screen)
+        compareAltTexts(
+            screen,
+            """
+            PRINCE EDWARD ISLAND
+            
+            TOO CLOSE TO CALL
+            (empty)
+            """.trimIndent()
+        )
     }
 
     @Test
@@ -112,26 +269,104 @@ class TooCloseToCallScreenTest {
             .build("PRINCE EDWARD ISLAND".asOneTimePublisher())
         screen.setSize(1024, 512)
         compareRendering("TooCloseToCallScreen", "PollsReporting-1", screen)
+        compareAltTexts(
+            screen,
+            """
+            PRINCE EDWARD ISLAND
+            
+            TOO CLOSE TO CALL
+            (empty)
+            """.trimIndent()
+        )
+
         setupFirstAdvancePoll(candidateVotesRaw, partyResultsRaw, HashMap(), pollsReportingRaw)
         candidateVotes.submit(candidateVotesRaw)
         partyResults.submit(partyResultsRaw)
         pollsReporting.submit(pollsReportingRaw)
         compareRendering("TooCloseToCallScreen", "PollsReporting-2", screen)
+        compareAltTexts(
+            screen,
+            """
+            PRINCE EDWARD ISLAND
+            
+            TOO CLOSE TO CALL
+            DISTRICT 1: PC: 684; LIB: 467; LEAD: 217; 1/10
+            """.trimIndent()
+        )
+
         setupAllAdvancePolls(candidateVotesRaw, partyResultsRaw, HashMap(), pollsReportingRaw)
         candidateVotes.submit(candidateVotesRaw)
         partyResults.submit(partyResultsRaw)
         pollsReporting.submit(pollsReportingRaw)
         compareRendering("TooCloseToCallScreen", "PollsReporting-3", screen)
+        compareAltTexts(
+            screen,
+            """
+            PRINCE EDWARD ISLAND
+            
+            TOO CLOSE TO CALL
+            DISTRICT 12: LIB: 478; GRN: 475; LEAD: 3; 1/10
+            DISTRICT 23: PC: 436; GRN: 428; LEAD: 8; 1/10
+            DISTRICT 8: LIB: 620; PC: 609; LEAD: 11; 1/10
+            DISTRICT 26: PC: 700; LIB: 686; LEAD: 14; 1/10
+            DISTRICT 5: PC: 533; LIB: 518; LEAD: 15; 1/8
+            DISTRICT 25: LIB: 454; NDP: 425; LEAD: 29; 1/11
+            DISTRICT 21: GRN: 617; PC: 577; LEAD: 40; 1/10
+            DISTRICT 11: GRN: 636; PC: 595; LEAD: 41; 1/10
+            DISTRICT 22: GRN: 602; LIB: 560; LEAD: 42; 1/10
+            DISTRICT 24: LIB: 330; GRN: 197; LEAD: 133; 1/8
+            DISTRICT 15: PC: 583; LIB: 425; LEAD: 158; 1/10
+            DISTRICT 13: LIB: 717; GRN: 542; LEAD: 175; 1/10
+            DISTRICT 6: PC: 725; LIB: 526; LEAD: 199; 1/9
+            DISTRICT 14: LIB: 699; PC: 492; LEAD: 207; 1/10
+            DISTRICT 1: PC: 684; LIB: 467; LEAD: 217; 1/10
+            DISTRICT 9: PC: 620; LIB: 395; LEAD: 225; 1/11
+            DISTRICT 27: LIB: 646; PC: 405; LEAD: 241; 1/10
+            DISTRICT 2: PC: 555; GRN: 308; LEAD: 247; 1/10
+            DISTRICT 10: LIB: 808; GRN: 516; LEAD: 292; 1/10
+            DISTRICT 16: LIB: 983; GRN: 542; LEAD: 441; 1/10
+            """.trimIndent()
+        )
+
         setupHalfOfPolls(candidateVotesRaw, partyResultsRaw, HashMap(), pollsReportingRaw)
         candidateVotes.submit(candidateVotesRaw)
         partyResults.submit(partyResultsRaw)
         pollsReporting.submit(pollsReportingRaw)
         compareRendering("TooCloseToCallScreen", "PollsReporting-4", screen)
+        compareAltTexts(
+            screen,
+            """
+            PRINCE EDWARD ISLAND
+            
+            TOO CLOSE TO CALL
+            DISTRICT 26: LIB: 919; PC: 890; LEAD: 29; 5/10
+            DISTRICT 13: LIB: 952; GRN: 840; LEAD: 112; 5/10
+            DISTRICT 8: PC: 948; LIB: 832; LEAD: 116; 5/10
+            DISTRICT 5: GRN: 871; PC: 743; LEAD: 128; 5/8
+            DISTRICT 12: GRN: 831; LIB: 639; LEAD: 192; 5/10
+            DISTRICT 24: LIB: 774; GRN: 582; LEAD: 192; 5/8
+            DISTRICT 14: LIB: 874; GRN: 660; LEAD: 214; 5/10
+            DISTRICT 15: PC: 909; LIB: 652; LEAD: 257; 5/10
+            DISTRICT 9: PC: 807; GRN: 533; LEAD: 274; 5/11
+            DISTRICT 6: PC: 995; LIB: 684; LEAD: 311; 5/9
+            DISTRICT 16: LIB: 1,286; GRN: 819; LEAD: 467; 5/10
+            """.trimIndent()
+        )
+
         setupFullResults(candidateVotesRaw, partyResultsRaw, HashMap(), pollsReportingRaw)
         candidateVotes.submit(candidateVotesRaw)
         partyResults.submit(partyResultsRaw)
         pollsReporting.submit(pollsReportingRaw)
         compareRendering("TooCloseToCallScreen", "PollsReporting-1", screen)
+        compareAltTexts(
+            screen,
+            """
+            PRINCE EDWARD ISLAND
+            
+            TOO CLOSE TO CALL
+            (empty)
+            """.trimIndent()
+        )
     }
 
     @Test
@@ -154,26 +389,99 @@ class TooCloseToCallScreenTest {
             .build("PRINCE EDWARD ISLAND".asOneTimePublisher())
         screen.setSize(1024, 512)
         compareRendering("TooCloseToCallScreen", "LimitRows-1", screen)
+        compareAltTexts(
+            screen,
+            """
+            PRINCE EDWARD ISLAND
+            
+            TOO CLOSE TO CALL
+            (empty)
+            """.trimIndent()
+        )
+
         setupFirstAdvancePoll(candidateVotesRaw, partyResultsRaw, pctReportingRaw, HashMap())
         candidateVotes.submit(candidateVotesRaw)
         partyResults.submit(partyResultsRaw)
         pctReporting.submit(pctReportingRaw)
         compareRendering("TooCloseToCallScreen", "LimitRows-2", screen)
+        compareAltTexts(
+            screen,
+            """
+            PRINCE EDWARD ISLAND
+            
+            TOO CLOSE TO CALL
+            DISTRICT 1: PC: 684; LIB: 467; LEAD: 217; 10.0% IN
+            """.trimIndent()
+        )
+
         setupAllAdvancePolls(candidateVotesRaw, partyResultsRaw, pctReportingRaw, HashMap())
         candidateVotes.submit(candidateVotesRaw)
         partyResults.submit(partyResultsRaw)
         pctReporting.submit(pctReportingRaw)
         compareRendering("TooCloseToCallScreen", "LimitRows-3", screen)
+        compareAltTexts(
+            screen,
+            """
+            PRINCE EDWARD ISLAND
+            
+            TOO CLOSE TO CALL
+            DISTRICT 12: LIB: 478; GRN: 475; LEAD: 3; 10.0% IN
+            DISTRICT 23: PC: 436; GRN: 428; LEAD: 8; 10.0% IN
+            DISTRICT 8: LIB: 620; PC: 609; LEAD: 11; 10.0% IN
+            DISTRICT 26: PC: 700; LIB: 686; LEAD: 14; 10.0% IN
+            DISTRICT 5: PC: 533; LIB: 518; LEAD: 15; 12.5% IN
+            DISTRICT 25: LIB: 454; NDP: 425; LEAD: 29; 9.1% IN
+            DISTRICT 21: GRN: 617; PC: 577; LEAD: 40; 10.0% IN
+            DISTRICT 11: GRN: 636; PC: 595; LEAD: 41; 10.0% IN
+            DISTRICT 22: GRN: 602; LIB: 560; LEAD: 42; 10.0% IN
+            DISTRICT 24: LIB: 330; GRN: 197; LEAD: 133; 12.5% IN
+            DISTRICT 15: PC: 583; LIB: 425; LEAD: 158; 10.0% IN
+            DISTRICT 13: LIB: 717; GRN: 542; LEAD: 175; 10.0% IN
+            DISTRICT 6: PC: 725; LIB: 526; LEAD: 199; 11.1% IN
+            DISTRICT 14: LIB: 699; PC: 492; LEAD: 207; 10.0% IN
+            DISTRICT 1: PC: 684; LIB: 467; LEAD: 217; 10.0% IN
+            """.trimIndent()
+        )
+
         setupHalfOfPolls(candidateVotesRaw, partyResultsRaw, pctReportingRaw, HashMap())
         candidateVotes.submit(candidateVotesRaw)
         partyResults.submit(partyResultsRaw)
         pctReporting.submit(pctReportingRaw)
         compareRendering("TooCloseToCallScreen", "LimitRows-4", screen)
+        compareAltTexts(
+            screen,
+            """
+            PRINCE EDWARD ISLAND
+            
+            TOO CLOSE TO CALL
+            DISTRICT 26: LIB: 919; PC: 890; LEAD: 29; 50.0% IN
+            DISTRICT 13: LIB: 952; GRN: 840; LEAD: 112; 50.0% IN
+            DISTRICT 8: PC: 948; LIB: 832; LEAD: 116; 50.0% IN
+            DISTRICT 5: GRN: 871; PC: 743; LEAD: 128; 62.5% IN
+            DISTRICT 12: GRN: 831; LIB: 639; LEAD: 192; 50.0% IN
+            DISTRICT 24: LIB: 774; GRN: 582; LEAD: 192; 62.5% IN
+            DISTRICT 14: LIB: 874; GRN: 660; LEAD: 214; 50.0% IN
+            DISTRICT 15: PC: 909; LIB: 652; LEAD: 257; 50.0% IN
+            DISTRICT 9: PC: 807; GRN: 533; LEAD: 274; 45.5% IN
+            DISTRICT 6: PC: 995; LIB: 684; LEAD: 311; 55.6% IN
+            DISTRICT 16: LIB: 1,286; GRN: 819; LEAD: 467; 50.0% IN
+            """.trimIndent()
+        )
+
         setupFullResults(candidateVotesRaw, partyResultsRaw, pctReportingRaw, HashMap())
         candidateVotes.submit(candidateVotesRaw)
         partyResults.submit(partyResultsRaw)
         pctReporting.submit(pctReportingRaw)
         compareRendering("TooCloseToCallScreen", "LimitRows-1", screen)
+        compareAltTexts(
+            screen,
+            """
+            PRINCE EDWARD ISLAND
+            
+            TOO CLOSE TO CALL
+            (empty)
+            """.trimIndent()
+        )
     }
 
     @Test
@@ -196,26 +504,104 @@ class TooCloseToCallScreenTest {
             .build("PRINCE EDWARD ISLAND".asOneTimePublisher())
         screen.setSize(1024, 512)
         compareRendering("TooCloseToCallScreen", "NumCandidates-1", screen)
+        compareAltTexts(
+            screen,
+            """
+            PRINCE EDWARD ISLAND
+            
+            TOO CLOSE TO CALL
+            (empty)
+            """.trimIndent()
+        )
+
         setupFirstAdvancePoll(candidateVotesRaw, partyResultsRaw, pctReportingRaw, HashMap())
         candidateVotes.submit(candidateVotesRaw)
         partyResults.submit(partyResultsRaw)
         pctReporting.submit(pctReportingRaw)
         compareRendering("TooCloseToCallScreen", "NumCandidates-2", screen)
+        compareAltTexts(
+            screen,
+            """
+            PRINCE EDWARD ISLAND
+            
+            TOO CLOSE TO CALL
+            DISTRICT 1: PC: 684; LIB: 467; GRN: 365; LEAD: 217; 10.0% IN
+            """.trimIndent()
+        )
+
         setupAllAdvancePolls(candidateVotesRaw, partyResultsRaw, pctReportingRaw, HashMap())
         candidateVotes.submit(candidateVotesRaw)
         partyResults.submit(partyResultsRaw)
         pctReporting.submit(pctReportingRaw)
         compareRendering("TooCloseToCallScreen", "NumCandidates-3", screen)
+        compareAltTexts(
+            screen,
+            """
+            PRINCE EDWARD ISLAND
+            
+            TOO CLOSE TO CALL
+            DISTRICT 12: LIB: 478; GRN: 475; PC: 352; NDP: 172; LEAD: 3; 10.0% IN
+            DISTRICT 23: PC: 436; GRN: 428; LIB: 379; NDP: 34; LEAD: 8; 10.0% IN
+            DISTRICT 8: LIB: 620; PC: 609; GRN: 285; NDP: 22; LEAD: 11; 10.0% IN
+            DISTRICT 26: PC: 700; LIB: 686; GRN: 122; NDP: 47; LEAD: 14; 10.0% IN
+            DISTRICT 5: PC: 533; LIB: 518; GRN: 482; NDP: 18; LEAD: 15; 12.5% IN
+            DISTRICT 25: LIB: 454; NDP: 425; PC: 177; GRN: 62; LEAD: 29; 9.1% IN
+            DISTRICT 21: GRN: 617; PC: 577; LIB: 563; NDP: 18; LEAD: 40; 10.0% IN
+            DISTRICT 11: GRN: 636; PC: 595; LIB: 534; NDP: 36; LEAD: 41; 10.0% IN
+            DISTRICT 22: GRN: 602; LIB: 560; PC: 335; NDP: 34; LEAD: 42; 10.0% IN
+            DISTRICT 24: LIB: 330; GRN: 197; PC: 144; NDP: 14; LEAD: 133; 12.5% IN
+            DISTRICT 15: PC: 583; LIB: 425; GRN: 287; NDP: 27; LEAD: 158; 10.0% IN
+            DISTRICT 13: LIB: 717; GRN: 542; PC: 331; NDP: 75; LEAD: 175; 10.0% IN
+            DISTRICT 6: PC: 725; LIB: 526; GRN: 348; NDP: 17; LEAD: 199; 11.1% IN
+            DISTRICT 14: LIB: 699; PC: 492; GRN: 437; IND: 131; NDP: 34; LEAD: 207; 10.0% IN
+            DISTRICT 1: PC: 684; LIB: 467; GRN: 365; LEAD: 217; 10.0% IN
+            DISTRICT 9: PC: 620; LIB: 395; GRN: 363; NDP: 19; LEAD: 225; 9.1% IN
+            DISTRICT 27: LIB: 646; PC: 405; GRN: 241; NDP: 18; LEAD: 241; 10.0% IN
+            DISTRICT 2: PC: 555; GRN: 308; LIB: 288; NDP: 23; LEAD: 247; 10.0% IN
+            DISTRICT 10: LIB: 808; GRN: 516; PC: 510; NDP: 27; LEAD: 292; 10.0% IN
+            DISTRICT 16: LIB: 983; GRN: 542; NDP: 425; PC: 296; LEAD: 441; 10.0% IN
+            """.trimIndent()
+        )
+
         setupHalfOfPolls(candidateVotesRaw, partyResultsRaw, pctReportingRaw, HashMap())
         candidateVotes.submit(candidateVotesRaw)
         partyResults.submit(partyResultsRaw)
         pctReporting.submit(pctReportingRaw)
         compareRendering("TooCloseToCallScreen", "NumCandidates-4", screen)
+        compareAltTexts(
+            screen,
+            """
+            PRINCE EDWARD ISLAND
+            
+            TOO CLOSE TO CALL
+            DISTRICT 26: LIB: 919; PC: 890; GRN: 198; NDP: 60; LEAD: 29; 50.0% IN
+            DISTRICT 13: LIB: 952; GRN: 840; PC: 437; NDP: 92; LEAD: 112; 50.0% IN
+            DISTRICT 8: PC: 948; LIB: 832; GRN: 490; NDP: 34; LEAD: 116; 50.0% IN
+            DISTRICT 5: GRN: 871; PC: 743; LIB: 742; NDP: 31; LEAD: 128; 62.5% IN
+            DISTRICT 12: GRN: 831; LIB: 639; PC: 479; NDP: 248; LEAD: 192; 50.0% IN
+            DISTRICT 24: LIB: 774; GRN: 582; PC: 434; NDP: 27; LEAD: 192; 62.5% IN
+            DISTRICT 14: LIB: 874; GRN: 660; PC: 624; IND: 171; NDP: 38; LEAD: 214; 50.0% IN
+            DISTRICT 15: PC: 909; LIB: 652; GRN: 567; NDP: 45; LEAD: 257; 50.0% IN
+            DISTRICT 9: PC: 807; GRN: 533; LIB: 492; NDP: 38; LEAD: 274; 45.5% IN
+            DISTRICT 6: PC: 995; LIB: 684; GRN: 578; NDP: 25; LEAD: 311; 55.6% IN
+            DISTRICT 16: LIB: 1,286; GRN: 819; NDP: 652; PC: 431; LEAD: 467; 50.0% IN
+            """.trimIndent()
+        )
+
         setupFullResults(candidateVotesRaw, partyResultsRaw, pctReportingRaw, HashMap())
         candidateVotes.submit(candidateVotesRaw)
         partyResults.submit(partyResultsRaw)
         pctReporting.submit(pctReportingRaw)
         compareRendering("TooCloseToCallScreen", "NumCandidates-1", screen)
+        compareAltTexts(
+            screen,
+            """
+            PRINCE EDWARD ISLAND
+            
+            TOO CLOSE TO CALL
+            (empty)
+            """.trimIndent()
+        )
     }
 
     @Test
@@ -234,22 +620,100 @@ class TooCloseToCallScreenTest {
             .build("PRINCE EDWARD ISLAND".asOneTimePublisher())
         screen.setSize(1024, 512)
         compareRendering("TooCloseToCallScreen", "Basic-1", screen)
+        compareAltTexts(
+            screen,
+            """
+            PRINCE EDWARD ISLAND
+            
+            TOO CLOSE TO CALL
+            (empty)
+            """.trimIndent()
+        )
+
         setupFirstAdvancePoll(candidateVotesRaw, partyResultsRaw, HashMap(), HashMap())
         candidateVotes.submit(candidateVotesRaw)
         partyResults.submit(partyResultsRaw)
         compareRendering("TooCloseToCallScreen", "Basic-2", screen)
+        compareAltTexts(
+            screen,
+            """
+            PRINCE EDWARD ISLAND
+            
+            TOO CLOSE TO CALL
+            DISTRICT 1: PC: 684; LIB: 467; LEAD: 217
+            """.trimIndent()
+        )
+
         setupAllAdvancePolls(candidateVotesRaw, partyResultsRaw, HashMap(), HashMap())
         candidateVotes.submit(candidateVotesRaw)
         partyResults.submit(partyResultsRaw)
         compareRendering("TooCloseToCallScreen", "Basic-3", screen)
+        compareAltTexts(
+            screen,
+            """
+            PRINCE EDWARD ISLAND
+            
+            TOO CLOSE TO CALL
+            DISTRICT 12: LIB: 478; GRN: 475; LEAD: 3
+            DISTRICT 23: PC: 436; GRN: 428; LEAD: 8
+            DISTRICT 8: LIB: 620; PC: 609; LEAD: 11
+            DISTRICT 26: PC: 700; LIB: 686; LEAD: 14
+            DISTRICT 5: PC: 533; LIB: 518; LEAD: 15
+            DISTRICT 25: LIB: 454; NDP: 425; LEAD: 29
+            DISTRICT 21: GRN: 617; PC: 577; LEAD: 40
+            DISTRICT 11: GRN: 636; PC: 595; LEAD: 41
+            DISTRICT 22: GRN: 602; LIB: 560; LEAD: 42
+            DISTRICT 24: LIB: 330; GRN: 197; LEAD: 133
+            DISTRICT 15: PC: 583; LIB: 425; LEAD: 158
+            DISTRICT 13: LIB: 717; GRN: 542; LEAD: 175
+            DISTRICT 6: PC: 725; LIB: 526; LEAD: 199
+            DISTRICT 14: LIB: 699; PC: 492; LEAD: 207
+            DISTRICT 1: PC: 684; LIB: 467; LEAD: 217
+            DISTRICT 9: PC: 620; LIB: 395; LEAD: 225
+            DISTRICT 27: LIB: 646; PC: 405; LEAD: 241
+            DISTRICT 2: PC: 555; GRN: 308; LEAD: 247
+            DISTRICT 10: LIB: 808; GRN: 516; LEAD: 292
+            DISTRICT 16: LIB: 983; GRN: 542; LEAD: 441
+            """.trimIndent()
+        )
+
         setupHalfOfPolls(candidateVotesRaw, partyResultsRaw, HashMap(), HashMap())
         candidateVotes.submit(candidateVotesRaw)
         partyResults.submit(partyResultsRaw)
         compareRendering("TooCloseToCallScreen", "Basic-4", screen)
+        compareAltTexts(
+            screen,
+            """
+            PRINCE EDWARD ISLAND
+            
+            TOO CLOSE TO CALL
+            DISTRICT 26: LIB: 919; PC: 890; LEAD: 29
+            DISTRICT 13: LIB: 952; GRN: 840; LEAD: 112
+            DISTRICT 8: PC: 948; LIB: 832; LEAD: 116
+            DISTRICT 5: GRN: 871; PC: 743; LEAD: 128
+            DISTRICT 12: GRN: 831; LIB: 639; LEAD: 192
+            DISTRICT 24: LIB: 774; GRN: 582; LEAD: 192
+            DISTRICT 14: LIB: 874; GRN: 660; LEAD: 214
+            DISTRICT 15: PC: 909; LIB: 652; LEAD: 257
+            DISTRICT 9: PC: 807; GRN: 533; LEAD: 274
+            DISTRICT 6: PC: 995; LIB: 684; LEAD: 311
+            DISTRICT 16: LIB: 1,286; GRN: 819; LEAD: 467
+            """.trimIndent()
+        )
+
         setupFullResults(candidateVotesRaw, partyResultsRaw, HashMap(), HashMap())
         candidateVotes.submit(candidateVotesRaw)
         partyResults.submit(partyResultsRaw)
         compareRendering("TooCloseToCallScreen", "Basic-1", screen)
+        compareAltTexts(
+            screen,
+            """
+            PRINCE EDWARD ISLAND
+            
+            TOO CLOSE TO CALL
+            (empty)
+            """.trimIndent()
+        )
     }
 
     @Test
@@ -268,22 +732,100 @@ class TooCloseToCallScreenTest {
             .build("PRINCE EDWARD ISLAND".asOneTimePublisher())
         screen.setSize(1024, 512)
         compareRendering("TooCloseToCallScreen", "Basic-1", screen)
+        compareAltTexts(
+            screen,
+            """
+            PRINCE EDWARD ISLAND
+            
+            TOO CLOSE TO CALL
+            (empty)
+            """.trimIndent()
+        )
+
         setupFirstAdvancePoll(candidateVotesRaw, partyResultsRaw, HashMap(), HashMap())
         candidateVotes.submit(candidateVotesRaw)
         partyResults.submit(partyResultsRaw)
         compareRendering("TooCloseToCallScreen", "Basic-2", screen)
+        compareAltTexts(
+            screen,
+            """
+            PRINCE EDWARD ISLAND
+            
+            TOO CLOSE TO CALL
+            DISTRICT 1: PC: 684; LIB: 467; LEAD: 217
+            """.trimIndent()
+        )
+
         setupAllAdvancePolls(candidateVotesRaw, partyResultsRaw, HashMap(), HashMap())
         candidateVotes.submit(candidateVotesRaw)
         partyResults.submit(partyResultsRaw)
         compareRendering("TooCloseToCallScreen", "Basic-3", screen)
+        compareAltTexts(
+            screen,
+            """
+            PRINCE EDWARD ISLAND
+            
+            TOO CLOSE TO CALL
+            DISTRICT 12: LIB: 478; GRN: 475; LEAD: 3
+            DISTRICT 23: PC: 436; GRN: 428; LEAD: 8
+            DISTRICT 8: LIB: 620; PC: 609; LEAD: 11
+            DISTRICT 26: PC: 700; LIB: 686; LEAD: 14
+            DISTRICT 5: PC: 533; LIB: 518; LEAD: 15
+            DISTRICT 25: LIB: 454; NDP: 425; LEAD: 29
+            DISTRICT 21: GRN: 617; PC: 577; LEAD: 40
+            DISTRICT 11: GRN: 636; PC: 595; LEAD: 41
+            DISTRICT 22: GRN: 602; LIB: 560; LEAD: 42
+            DISTRICT 24: LIB: 330; GRN: 197; LEAD: 133
+            DISTRICT 15: PC: 583; LIB: 425; LEAD: 158
+            DISTRICT 13: LIB: 717; GRN: 542; LEAD: 175
+            DISTRICT 6: PC: 725; LIB: 526; LEAD: 199
+            DISTRICT 14: LIB: 699; PC: 492; LEAD: 207
+            DISTRICT 1: PC: 684; LIB: 467; LEAD: 217
+            DISTRICT 9: PC: 620; LIB: 395; LEAD: 225
+            DISTRICT 27: LIB: 646; PC: 405; LEAD: 241
+            DISTRICT 2: PC: 555; GRN: 308; LEAD: 247
+            DISTRICT 10: LIB: 808; GRN: 516; LEAD: 292
+            DISTRICT 16: LIB: 983; GRN: 542; LEAD: 441
+            """.trimIndent()
+        )
+
         setupHalfOfPolls(candidateVotesRaw, partyResultsRaw, HashMap(), HashMap())
         candidateVotes.submit(candidateVotesRaw)
         partyResults.submit(partyResultsRaw)
         compareRendering("TooCloseToCallScreen", "Basic-4", screen)
+        compareAltTexts(
+            screen,
+            """
+            PRINCE EDWARD ISLAND
+            
+            TOO CLOSE TO CALL
+            DISTRICT 26: LIB: 919; PC: 890; LEAD: 29
+            DISTRICT 13: LIB: 952; GRN: 840; LEAD: 112
+            DISTRICT 8: PC: 948; LIB: 832; LEAD: 116
+            DISTRICT 5: GRN: 871; PC: 743; LEAD: 128
+            DISTRICT 12: GRN: 831; LIB: 639; LEAD: 192
+            DISTRICT 24: LIB: 774; GRN: 582; LEAD: 192
+            DISTRICT 14: LIB: 874; GRN: 660; LEAD: 214
+            DISTRICT 15: PC: 909; LIB: 652; LEAD: 257
+            DISTRICT 9: PC: 807; GRN: 533; LEAD: 274
+            DISTRICT 6: PC: 995; LIB: 684; LEAD: 311
+            DISTRICT 16: LIB: 1,286; GRN: 819; LEAD: 467
+            """.trimIndent()
+        )
+
         setupFullResults(candidateVotesRaw, partyResultsRaw, HashMap(), HashMap())
         candidateVotes.submit(candidateVotesRaw)
         partyResults.submit(partyResultsRaw)
         compareRendering("TooCloseToCallScreen", "Basic-1", screen)
+        compareAltTexts(
+            screen,
+            """
+            PRINCE EDWARD ISLAND
+            
+            TOO CLOSE TO CALL
+            (empty)
+            """.trimIndent()
+        )
     }
 
     private fun <R : PartyResult?> setupFirstAdvancePoll(

@@ -76,6 +76,6 @@ object RenderTestUtils {
         var result: String? = null
         panel.altText.subscribe(Subscriber { result = it })
         Awaitility.await().atMost(timeoutSeconds, TimeUnit.SECONDS).until({ result }, Matchers.equalTo(expected))
-        Awaitility.await().atMost(timeoutSeconds, TimeUnit.SECONDS).until({ (result ?: "").length }, Matchers.lessThanOrEqualTo(1000))
+//        Awaitility.await().atMost(timeoutSeconds, TimeUnit.SECONDS).until({ (result ?: "").length }, Matchers.lessThanOrEqualTo(1000))
     }
 }

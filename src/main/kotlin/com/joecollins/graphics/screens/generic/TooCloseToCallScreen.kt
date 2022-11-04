@@ -1,5 +1,6 @@
 package com.joecollins.graphics.screens.generic
 
+import com.joecollins.graphics.AltTextProvider
 import com.joecollins.graphics.GenericPanel
 import com.joecollins.graphics.components.MultiSummaryFrame
 import com.joecollins.models.general.Aggregators
@@ -13,11 +14,16 @@ import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.compose
 import com.joecollins.pubsub.map
 import com.joecollins.pubsub.mapElements
+import com.joecollins.pubsub.merge
 import java.awt.Color
 import java.text.DecimalFormat
 import java.util.concurrent.Flow
 
-class TooCloseToCallScreen private constructor(titleLabel: Flow.Publisher<out String?>, multiSummaryFrame: MultiSummaryFrame) : GenericPanel(pad(multiSummaryFrame), titleLabel) {
+class TooCloseToCallScreen private constructor(
+    titleLabel: Flow.Publisher<out String?>,
+    multiSummaryFrame: MultiSummaryFrame,
+    override val altText: Flow.Publisher<String?>
+) : GenericPanel(pad(multiSummaryFrame), titleLabel), AltTextProvider {
     private class Input<T> {
         var votes: Map<T, Map<Candidate, Int>> = HashMap()
             set(value) {
@@ -126,10 +132,6 @@ class TooCloseToCallScreen private constructor(titleLabel: Flow.Publisher<out St
         }
 
         fun build(titlePublisher: Flow.Publisher<out String?>): TooCloseToCallScreen {
-            return TooCloseToCallScreen(titlePublisher, createFrame())
-        }
-
-        private fun createFrame(): MultiSummaryFrame {
             val input = Input<T>()
             votes.subscribe(Subscriber { input.votes = it })
             results.subscribe(Subscriber { input.results = it })
@@ -137,6 +139,40 @@ class TooCloseToCallScreen private constructor(titleLabel: Flow.Publisher<out St
             reporting?.subscribe(Subscriber { input.reporting = it })
             rowsLimit?.subscribe(Subscriber { input.maxRows = it })
             numCandidates?.subscribe(Subscriber { input.numCandidates = it })
+            return TooCloseToCallScreen(titlePublisher, createFrame(input), createAltText(titlePublisher, input))
+        }
+
+        private fun createAltText(titlePublisher: Flow.Publisher<out String?>, input: Input<T>): Flow.Publisher<String?> {
+            val header = titlePublisher.merge(header) { title, header ->
+                if (title == null && header == null) {
+                    null
+                } else if (title == null) {
+                    header
+                } else if (header == null) {
+                    "$title\n"
+                } else {
+                    "$title\n\n$header"
+                }
+            }
+            return header.merge(input.toEntries()) { head, entries ->
+                val entriesText = entries.joinToString("\n") { e ->
+                    "${e.header}: ${
+                    e.topCandidates.take(e.numCandidates).joinToString("; ") { c -> "${c.key.party.abbreviation}: ${DecimalFormat("#,##0").format(c.value)}" }
+                    }; LEAD: ${e.lead}${
+                    if (e.reporting.isEmpty()) "" else "; ${e.reporting}"
+                    }"
+                }.let { it.ifEmpty { "(empty)" } }
+                if (entriesText.isEmpty()) {
+                    head
+                } else if (head.isNullOrEmpty()) {
+                    entriesText
+                } else {
+                    "${head}\n$entriesText"
+                }
+            }
+        }
+
+        private fun createFrame(input: Input<T>): MultiSummaryFrame {
             val entries = input.toEntries()
             val thousandsFormatter = DecimalFormat("#,##0")
             val frame = MultiSummaryFrame(
