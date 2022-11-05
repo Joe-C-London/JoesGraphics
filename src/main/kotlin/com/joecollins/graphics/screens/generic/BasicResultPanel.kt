@@ -1938,8 +1938,8 @@ class BasicResultPanel private constructor(
                                 .sortedByDescending { keyTemplate.toParty(it).overrideSortOrder ?: filteredCurr[it] ?: 0 }
                                 .joinToString("") { candidate ->
                                     val party = keyTemplate.toParty(candidate)
-                                    val partyAggregated = prevTotal > 0 && (currGroupedByParty[party]?.size ?: 0) > 1 && currTotalByParty.containsKey(party)
-                                    val otherAggregated = !showPrevRaw && allDeclared && !currTotalByParty.containsKey(party)
+                                    val partyAggregated = currTotal > 0 && prevTotal > 0 && (currGroupedByParty[party]?.size ?: 0) > 1 && currTotalByParty.containsKey(party)
+                                    val otherAggregated = currTotal > 0 && !showPrevRaw && allDeclared && !currTotalByParty.containsKey(party)
                                     somePartyAggregated = somePartyAggregated || partyAggregated
                                     someOtherAggregated = someOtherAggregated || otherAggregated
                                     val line = barEntryLine(
@@ -1966,7 +1966,7 @@ class BasicResultPanel private constructor(
                                     "\n$line" + (shape?.let { c -> " $c" } ?: "")
                                 }
                         }
-                        val othersText = if (prevTotal > 0 && filteredCurr.keys.size > 1 && filteredCurr.values.all { it != null } && !filteredCurr.any { keyTemplate.toParty(it.key) == Party.OTHERS } && prevTotalByParty.containsKey(Party.OTHERS)) {
+                        val othersText = if (prevTotal > 0 && currTotal > 0 && filteredCurr.keys.size > 1 && filteredCurr.values.all { it != null } && !filteredCurr.any { keyTemplate.toParty(it.key) == Party.OTHERS } && prevTotalByParty.containsKey(Party.OTHERS)) {
                             "\nOTHERS: - (${PCT_DIFF_FORMAT.format(((currTotalByParty[Party.OTHERS] ?: 0) / currTotal) - prevTotalByParty[Party.OTHERS]!! / prevTotal)})"
                         } else {
                             ""
@@ -2571,7 +2571,77 @@ class BasicResultPanel private constructor(
         }
 
         private fun createAltText(textHeader: Flow.Publisher<out String?>): Flow.Publisher<String?> {
-            return null.asOneTimePublisher()
+            val combineHeaderAndSubhead: (String?, String?) -> String? = { h, s ->
+                if (h == null) {
+                    s
+                } else if (s == null) {
+                    h
+                } else {
+                    "$h, $s"
+                }
+            }
+            val mainHeader = header.merge(subhead, combineHeaderAndSubhead)
+                .merge(changeHeader ?: null.asOneTimePublisher()) { h, c ->
+                    if (c == null) {
+                        h
+                    } else {
+                        "${h ?: ""} ($c)"
+                    }
+                }.merge(progressLabel ?: null.asOneTimePublisher()) { h, p ->
+                    if (p == null) {
+                        h
+                    } else {
+                        "${h ?: ""} [$p]"
+                    }
+                }
+            val mainEntries = quotas.merge(prevQuotas ?: null.asOneTimePublisher()) { curr, prev ->
+                val entries = curr.entries
+                    .sortedByDescending { it.key.overrideSortOrder?.toDouble() ?: it.value }
+                    .joinToString("") { e ->
+                        "\n${e.key.name.uppercase()}: ${DecimalFormat("0.00").format(e.value)} QUOTAS" +
+                            (if (prev == null) "" else " (${DecimalFormat("+0.00;-0.00").format(e.value - (prev[e.key] ?: 0.0))})")
+                    }
+                val others = prev?.filterKeys { curr.isNotEmpty() && !curr.containsKey(it) }
+                    ?.entries
+                    ?.sortedByDescending { it.value }
+                    ?.joinToString("") { "\n${it.key.name.uppercase()}: - (-${DecimalFormat("0.00").format(it.value)})" }
+                    ?: ""
+                entries + others
+            }
+            val mainText = mainHeader.merge(mainEntries) { h, e ->
+                if (h == null) {
+                    e
+                } else {
+                    ("$h$e")
+                }
+            }
+            val swingText = if (swingPrevVotes == null || swingCurrVotes == null) {
+                null
+            } else {
+                run {
+                    val prev = swingPrevVotes!!
+                    val curr = swingCurrVotes!!
+                    SwingFrameBuilder.prevCurr(
+                        prev,
+                        curr,
+                        swingComparator!!
+                    ).bottomText
+                }?.merge(swingHeader ?: null.asOneTimePublisher()) { t, h ->
+                    if (h == null) {
+                        t
+                    } else {
+                        "$h: $t"
+                    }
+                }
+            }
+            return textHeader.merge(mainText) { h, m -> "$h\n\n$m" }
+                .merge(swingText ?: null.asOneTimePublisher()) { h, s ->
+                    if (s == null) {
+                        h
+                    } else {
+                        "$h\n\n$s"
+                    }
+                }
         }
     }
 

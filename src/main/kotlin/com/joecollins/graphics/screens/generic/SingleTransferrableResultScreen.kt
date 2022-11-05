@@ -1,11 +1,13 @@
 package com.joecollins.graphics.screens.generic
 
+import com.joecollins.graphics.AltTextProvider
 import com.joecollins.graphics.GenericPanel
 import com.joecollins.graphics.ImageGenerator
 import com.joecollins.graphics.components.BarFrameBuilder
 import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
+import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.map
 import com.joecollins.pubsub.merge
 import java.awt.Color
@@ -14,12 +16,16 @@ import java.text.DecimalFormat
 import java.util.concurrent.Flow
 import javax.swing.JPanel
 
+private const val TICK = "\u2611"
+private const val CROSS = "\u2612"
+
 class SingleTransferrableResultScreen private constructor(
     label: Flow.Publisher<out String?>,
     private val candidateFrame: JPanel,
     private val partyFrame: JPanel?,
     private val prevFrame: JPanel?,
-    private val mapFrame: JPanel?
+    private val mapFrame: JPanel?,
+    override val altText: Flow.Publisher<String?>
 ) : GenericPanel(
     run {
         val panel = JPanel()
@@ -32,7 +38,8 @@ class SingleTransferrableResultScreen private constructor(
         panel
     },
     label
-) {
+),
+    AltTextProvider {
 
     companion object {
 
@@ -110,8 +117,85 @@ class SingleTransferrableResultScreen private constructor(
                 createCandidatesPanel(),
                 createPartiesPanel(),
                 createPrevPanel(),
-                mapBuilder?.createMapFrame()
+                mapBuilder?.createMapFrame(),
+                createAltText(title)
             )
+        }
+
+        private fun createAltText(title: Flow.Publisher<out String>): Flow.Publisher<String?> {
+            val candidateTop = candidateHeader.merge(candidateSubhead) { h, s ->
+                if (h.isNullOrEmpty()) {
+                    s
+                } else if (s.isNullOrEmpty()) {
+                    h
+                } else {
+                    "$h, $s"
+                }
+            }
+            val status = elected.merge(excluded) { el, ex -> el to ex }
+            val candidateEntries = candidateVotes.merge(quota) { v, q -> v to q }.merge(status) { (votes, q), (el, ex) ->
+                val candidateFunc: (Candidate) -> String = { c -> "${c.name.uppercase()}${if (c.incumbent) " $incumbentMarker" else ""} (${c.party.abbreviation})" }
+                val prevElected = el.filter { !votes.containsKey(it.first) }
+                    .joinToString("\n") { (c, r) -> "${candidateFunc(c)}: ELECTED IN $r $TICK" }
+                val currRound = votes.entries
+                    .sortedByDescending { it.value?.toDouble() ?: 0.0 }
+                    .joinToString("\n") { (c, v) ->
+                        "${candidateFunc(c)}: ${
+                        if (v == null) {
+                            "WAITING..."
+                        } else {
+                            "${if (v is Int) DecimalFormat("#,##0").format(v.toInt()) else DecimalFormat("#,##0.00").format(v.toDouble())}${if (q == null) "" else " (${DecimalFormat("0.00").format(v.toDouble() / q.toDouble())})"}"
+                        }
+                        }${if (el.any { it.first == c }) " $TICK" else if (ex.contains(c)) " $CROSS" else ""}"
+                    } +
+                    (q?.let { "\nQUOTA: ${if (it is Int) DecimalFormat("#,##0").format(it.toInt()) else DecimalFormat("#,##0.00").format(it.toDouble())}" } ?: "")
+                if (prevElected.isEmpty()) {
+                    currRound
+                } else if (currRound.isEmpty()) {
+                    prevElected
+                } else {
+                    "$prevElected\n$currRound"
+                }
+            }
+            val candidate = candidateTop.merge(candidateEntries) { t, e ->
+                if (t == null) e
+                "$t\n$e"
+            }
+
+            val partyEntries = candidateVotes.merge(quota) { v, q -> v to q }.merge(status) { (v, q), (el, ex) ->
+                if (q == null) return@merge null
+                val electedByParty = el.filter { !v.containsKey(it.first) }
+                    .groupingBy { it.first.party }
+                    .eachCount()
+                val currentByParty = v.entries
+                    .groupingBy { it.key.party }
+                    .fold(0.0) { a, e -> a + (e.value?.toDouble() ?: 0.0) }
+                    .mapValues { it.value / q.toDouble() }
+                val totalByParty = sequenceOf(electedByParty.keys, currentByParty.keys)
+                    .flatten()
+                    .distinct()
+                    .associateWith { (electedByParty[it] ?: 0) + (currentByParty[it] ?: 0.0) }
+                totalByParty.entries
+                    .sortedByDescending { it.value }
+                    .joinToString("") { "\n${it.key.name.uppercase()}: ${DecimalFormat("0.00").format(it.value)}" }
+            }
+            val party = partyHeader?.merge(partyEntries) { h, e ->
+                if (e == null) {
+                    h
+                } else {
+                    h + e
+                }
+            }
+
+            val prevSeats = prevHeader?.merge(prevSeats ?: emptyMap<Party, Int>().asOneTimePublisher()) { h, s ->
+                h + s.entries
+                    .sortedByDescending { it.value }
+                    .joinToString("") { "\n${it.key.abbreviation}: ${it.value}" }
+            }
+
+            return title.merge(candidate) { t, c -> "$t\n\n$c" }
+                .merge(party ?: (null as String?).asOneTimePublisher()) { t, p -> if (p == null) t else "$t\n\n$p" }
+                .merge(prevSeats ?: (null as String?).asOneTimePublisher()) { t, p -> if (p == null) t else "$t\n\n$p" }
         }
 
         private fun createCandidatesPanel(): JPanel {
