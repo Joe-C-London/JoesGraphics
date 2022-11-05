@@ -1,5 +1,6 @@
 package com.joecollins.graphics.screens.generic
 
+import com.joecollins.graphics.AltTextProvider
 import com.joecollins.graphics.GenericPanel
 import com.joecollins.graphics.ImageGenerator
 import com.joecollins.graphics.components.BarFrame
@@ -22,6 +23,7 @@ import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.combine
 import com.joecollins.pubsub.compose
 import com.joecollins.pubsub.map
+import com.joecollins.pubsub.merge
 import java.awt.Color
 import java.awt.Component
 import java.awt.Container
@@ -36,14 +38,21 @@ import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.border.EmptyBorder
 
-class MultiResultScreen private constructor(header: Flow.Publisher<out String?>, screen: JPanel) : GenericPanel(screen, header) {
+private const val TICK = "\u2611"
+private const val ARROW = "\u2348"
+
+class MultiResultScreen private constructor(
+    header: Flow.Publisher<out String?>,
+    screen: JPanel,
+    override val altText: Flow.Publisher<String?>
+) : GenericPanel(screen, header), AltTextProvider {
     private val panels: MutableList<ResultPanel> = ArrayList()
 
     class Builder<T>(
         private val listPublisher: Flow.Publisher<out List<T>>,
         private val votesFunc: (T) -> Flow.Publisher<out Map<Candidate, Int>>,
         private val headerFunc: (T) -> Flow.Publisher<out String>,
-        private val subheadFunc: (T) -> Flow.Publisher<out String>,
+        private val subheadFunc: (T) -> Flow.Publisher<out String?>,
         private val partiesOnly: Boolean
     ) {
         private val itemPublishers: MutableList<Flow.Publisher<out T?>> = ArrayList()
@@ -156,7 +165,63 @@ class MultiResultScreen private constructor(header: Flow.Publisher<out String?>,
 
         fun build(textHeader: Flow.Publisher<out String?>): MultiResultScreen {
             val center = JPanel()
-            val screen = MultiResultScreen(textHeader, center)
+            val altText: Flow.Publisher<String?> = this.listPublisher.map { list ->
+                list.filterNotNull().map { e ->
+                    val headerPub = headerFunc(e).merge(subheadFunc(e)) { head, sub ->
+                        if (sub.isNullOrEmpty()) {
+                            head
+                        } else if (head.isEmpty()) {
+                            sub
+                        } else {
+                            "$head, $sub"
+                        }
+                    }.merge(progressLabelFunc(e)) { head, prog ->
+                        head + (prog?.let { " [$it]" } ?: "")
+                    }
+                    val entriesPub = votesFunc(e).merge(winnerFunc(e).merge(runoffFunc(e)) { w, r -> w to r }) { votes, (winner, runoff) ->
+                        val total = votes.values.sum().toDouble()
+                        Aggregators.topAndOthers(votes, (if (list.size > 4) 4 else 5) * (if (partiesOnly) 2 else 1), Candidate.OTHERS).entries
+                            .sortedByDescending { if (it.key == Candidate.OTHERS) -1 else it.value }
+                            .joinToString("\n") { (c, v) ->
+                                "${
+                                if (c == Candidate.OTHERS) {
+                                    "OTHERS"
+                                } else if (partiesOnly) {
+                                    c.party.name.uppercase()
+                                } else {
+                                    "${c.name.uppercase()}${
+                                    if (incumbentMarker.isNotEmpty() && c.isIncumbent()) " $incumbentMarker" else ""
+                                    } (${c.party.abbreviation})"
+                                }
+                                }: ${
+                                if (total == 0.0) {
+                                    "WAITING..."
+                                } else if (partiesOnly) {
+                                    DecimalFormat("0.0%").format(v / total)
+                                } else {
+                                    "${DecimalFormat("#,##0").format(v)} (${DecimalFormat("0.0%").format(v / total)})"
+                                }
+                                }${
+                                if (c == winner) {
+                                    " $TICK"
+                                } else if (runoff?.contains(c) == true) {
+                                    " $ARROW"
+                                } else {
+                                    ""
+                                }
+                                }"
+                            }
+                    }
+                    headerPub.merge(entriesPub) { h, s -> "$h\n$s" }
+                }.combine().map { it.joinToString("\n\n") }
+            }.selfCompose().merge(textHeader) { items, head ->
+                if (head == null) {
+                    items
+                } else {
+                    "$head\n\n$items"
+                }
+            }
+            val screen = MultiResultScreen(textHeader, center, altText)
             center.layout = GridLayout(1, 0)
             center.background = Color.WHITE
             this.listPublisher.subscribe(

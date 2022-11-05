@@ -3,6 +3,7 @@ package com.joecollins.graphics.screens.generic
 import com.joecollins.graphics.components.MapFrameTest
 import com.joecollins.graphics.screens.generic.MultiResultScreen.Companion.of
 import com.joecollins.graphics.screens.generic.MultiResultScreen.Companion.ofParties
+import com.joecollins.graphics.utils.RenderTestUtils.compareAltTexts
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.graphics.utils.ShapefileReader.readShapes
 import com.joecollins.models.general.Candidate
@@ -98,6 +99,30 @@ class MultiResultScreenTest {
             .build("PARTY LEADERS".asOneTimePublisher())
         panel.setSize(1024, 512)
         compareRendering("MultiResultPanel", "Basic-1", panel, 2)
+        compareAltTexts(
+            panel,
+            """
+            PARTY LEADERS
+            
+            DISTRICT 8, STANHOPE-MARSHFIELD
+            BLOYCE THOMPSON (PCP): 1,300 (39.5%)
+            WADE MACLAUCHLAN (MLA) (LIB): 1,196 (36.4%)
+            SARAH DONALD (GRN): 747 (22.7%)
+            MARIAN WHITE (NDP): 46 (1.4%)
+            
+            DISTRICT 15, BRACKLEY-HUNTER RIVER
+            DENNIS KING (MLA) (PCP): 1,315 (41.7%) ${"\u2611"}
+            WINDSOR WIGHT (LIB): 899 (28.5%)
+            GREG BRADLEY (GRN): 879 (27.9%)
+            LEAH-JANE HAYWARD (NDP): 57 (1.8%)
+            
+            DISTRICT 17, NEW HAVEN-ROCKY POINT
+            PETER BEVAN-BAKER (MLA) (GRN): 1,870 (53.8%) ${"\u2611"}
+            KRIS CURRIE (PCP): 1,068 (30.7%)
+            JUDY MACNEVIN (LIB): 515 (14.8%)
+            DON WILLS (IND): 26 (0.7%)
+            """.trimIndent()
+        )
     }
 
     @Test
@@ -195,6 +220,25 @@ class MultiResultScreenTest {
             .build(title)
         panel.setSize(1024, 512)
         compareRendering("MultiResultPanel", "Update-1", panel)
+        compareAltTexts(
+            panel,
+            """
+            MAJOR PARTY LEADERS
+            
+            BRACKLEY-HUNTER RIVER, 0 OF 10 POLLS REPORTING
+            GREG BRADLEY (GRN): WAITING...
+            LEAH-JANE HAYWARD (NDP): WAITING...
+            DENNIS KING (MLA) (PCP): WAITING...
+            WINDSOR WIGHT (LIB): WAITING...
+            
+            NEW HAVEN-ROCKY POINT, 0 OF 10 POLLS REPORTING
+            PETER BEVAN-BAKER (MLA) (GRN): WAITING...
+            KRIS CURRIE (PCP): WAITING...
+            JUDY MACNEVIN (LIB): WAITING...
+            DON WILLS (IND): WAITING...
+            """.trimIndent()
+        )
+
         district17.update(
             "1 OF 10 POLLS REPORTING",
             0.1,
@@ -206,9 +250,53 @@ class MultiResultScreenTest {
             )
         )
         compareRendering("MultiResultPanel", "Update-2", panel)
+        compareAltTexts(
+            panel,
+            """
+            MAJOR PARTY LEADERS
+            
+            BRACKLEY-HUNTER RIVER, 0 OF 10 POLLS REPORTING
+            GREG BRADLEY (GRN): WAITING...
+            LEAH-JANE HAYWARD (NDP): WAITING...
+            DENNIS KING (MLA) (PCP): WAITING...
+            WINDSOR WIGHT (LIB): WAITING...
+            
+            NEW HAVEN-ROCKY POINT, 1 OF 10 POLLS REPORTING
+            PETER BEVAN-BAKER (MLA) (GRN): 851 (51.3%)
+            KRIS CURRIE (PCP): 512 (30.8%)
+            JUDY MACNEVIN (LIB): 290 (17.5%)
+            DON WILLS (IND): 7 (0.4%)
+            """.trimIndent()
+        )
+
         districts.submit(listOf(district8, district15, district17))
         title.submit("PARTY LEADERS")
         compareRendering("MultiResultPanel", "Update-3", panel)
+        compareAltTexts(
+            panel,
+            """
+            PARTY LEADERS
+            
+            STANHOPE-MARSHFIELD, 0 OF 10 POLLS REPORTING
+            SARAH DONALD (GRN): WAITING...
+            WADE MACLAUCHLAN (MLA) (LIB): WAITING...
+            BLOYCE THOMPSON (PCP): WAITING...
+            MARIAN WHITE (NDP): WAITING...
+            
+            BRACKLEY-HUNTER RIVER, 0 OF 10 POLLS REPORTING
+            GREG BRADLEY (GRN): WAITING...
+            LEAH-JANE HAYWARD (NDP): WAITING...
+            DENNIS KING (MLA) (PCP): WAITING...
+            WINDSOR WIGHT (LIB): WAITING...
+            
+            NEW HAVEN-ROCKY POINT, 1 OF 10 POLLS REPORTING
+            PETER BEVAN-BAKER (MLA) (GRN): 851 (51.3%)
+            KRIS CURRIE (PCP): 512 (30.8%)
+            JUDY MACNEVIN (LIB): 290 (17.5%)
+            DON WILLS (IND): 7 (0.4%)
+            """.trimIndent()
+        )
+
         district15.update(
             "1 OF 10 POLLS REPORTING",
             0.1,
@@ -220,6 +308,31 @@ class MultiResultScreenTest {
             )
         )
         compareRendering("MultiResultPanel", "Update-4", panel)
+        compareAltTexts(
+            panel,
+            """
+            PARTY LEADERS
+            
+            STANHOPE-MARSHFIELD, 0 OF 10 POLLS REPORTING
+            SARAH DONALD (GRN): WAITING...
+            WADE MACLAUCHLAN (MLA) (LIB): WAITING...
+            BLOYCE THOMPSON (PCP): WAITING...
+            MARIAN WHITE (NDP): WAITING...
+            
+            BRACKLEY-HUNTER RIVER, 1 OF 10 POLLS REPORTING
+            DENNIS KING (MLA) (PCP): 583 (44.1%)
+            WINDSOR WIGHT (LIB): 425 (32.1%)
+            GREG BRADLEY (GRN): 287 (21.7%)
+            LEAH-JANE HAYWARD (NDP): 27 (2.0%)
+            
+            NEW HAVEN-ROCKY POINT, 1 OF 10 POLLS REPORTING
+            PETER BEVAN-BAKER (MLA) (GRN): 851 (51.3%)
+            KRIS CURRIE (PCP): 512 (30.8%)
+            JUDY MACNEVIN (LIB): 290 (17.5%)
+            DON WILLS (IND): 7 (0.4%)
+            """.trimIndent()
+        )
+
         district8.update(
             "1 OF 10 POLLS REPORTING",
             0.1,
@@ -231,6 +344,31 @@ class MultiResultScreenTest {
             )
         )
         compareRendering("MultiResultPanel", "Update-5", panel)
+        compareAltTexts(
+            panel,
+            """
+            PARTY LEADERS
+            
+            STANHOPE-MARSHFIELD, 1 OF 10 POLLS REPORTING
+            WADE MACLAUCHLAN (MLA) (LIB): 620 (40.4%)
+            BLOYCE THOMPSON (PCP): 609 (39.6%)
+            SARAH DONALD (GRN): 285 (18.6%)
+            MARIAN WHITE (NDP): 22 (1.4%)
+            
+            BRACKLEY-HUNTER RIVER, 1 OF 10 POLLS REPORTING
+            DENNIS KING (MLA) (PCP): 583 (44.1%)
+            WINDSOR WIGHT (LIB): 425 (32.1%)
+            GREG BRADLEY (GRN): 287 (21.7%)
+            LEAH-JANE HAYWARD (NDP): 27 (2.0%)
+            
+            NEW HAVEN-ROCKY POINT, 1 OF 10 POLLS REPORTING
+            PETER BEVAN-BAKER (MLA) (GRN): 851 (51.3%)
+            KRIS CURRIE (PCP): 512 (30.8%)
+            JUDY MACNEVIN (LIB): 290 (17.5%)
+            DON WILLS (IND): 7 (0.4%)
+            """.trimIndent()
+        )
+
         district15.update(
             "5 OF 10 POLLS REPORTING",
             0.5,
@@ -243,9 +381,53 @@ class MultiResultScreenTest {
             true
         )
         compareRendering("MultiResultPanel", "Update-6", panel)
+        compareAltTexts(
+            panel,
+            """
+            PARTY LEADERS
+            
+            STANHOPE-MARSHFIELD, 1 OF 10 POLLS REPORTING
+            WADE MACLAUCHLAN (MLA) (LIB): 620 (40.4%)
+            BLOYCE THOMPSON (PCP): 609 (39.6%)
+            SARAH DONALD (GRN): 285 (18.6%)
+            MARIAN WHITE (NDP): 22 (1.4%)
+            
+            BRACKLEY-HUNTER RIVER, 5 OF 10 POLLS REPORTING
+            DENNIS KING (MLA) (PCP): 909 (41.8%) ${"\u2611"}
+            WINDSOR WIGHT (LIB): 652 (30.0%)
+            GREG BRADLEY (GRN): 567 (26.1%)
+            LEAH-JANE HAYWARD (NDP): 45 (2.1%)
+            
+            NEW HAVEN-ROCKY POINT, 1 OF 10 POLLS REPORTING
+            PETER BEVAN-BAKER (MLA) (GRN): 851 (51.3%)
+            KRIS CURRIE (PCP): 512 (30.8%)
+            JUDY MACNEVIN (LIB): 290 (17.5%)
+            DON WILLS (IND): 7 (0.4%)
+            """.trimIndent()
+        )
+
         districts.submit(listOf(district8, district17))
         title.submit("PARTY LEADERS IN DOUBT")
         compareRendering("MultiResultPanel", "Update-7", panel)
+        compareAltTexts(
+            panel,
+            """
+            PARTY LEADERS IN DOUBT
+            
+            STANHOPE-MARSHFIELD, 1 OF 10 POLLS REPORTING
+            WADE MACLAUCHLAN (MLA) (LIB): 620 (40.4%)
+            BLOYCE THOMPSON (PCP): 609 (39.6%)
+            SARAH DONALD (GRN): 285 (18.6%)
+            MARIAN WHITE (NDP): 22 (1.4%)
+            
+            NEW HAVEN-ROCKY POINT, 1 OF 10 POLLS REPORTING
+            PETER BEVAN-BAKER (MLA) (GRN): 851 (51.3%)
+            KRIS CURRIE (PCP): 512 (30.8%)
+            JUDY MACNEVIN (LIB): 290 (17.5%)
+            DON WILLS (IND): 7 (0.4%)
+            """.trimIndent()
+        )
+
         district15.update(
             "10 OF 10 POLLS REPORTING",
             1.0,
@@ -258,6 +440,25 @@ class MultiResultScreenTest {
         )
         // intentionally same as before, as this district is no longer displayed
         compareRendering("MultiResultPanel", "Update-7", panel)
+        compareAltTexts(
+            panel,
+            """
+            PARTY LEADERS IN DOUBT
+            
+            STANHOPE-MARSHFIELD, 1 OF 10 POLLS REPORTING
+            WADE MACLAUCHLAN (MLA) (LIB): 620 (40.4%)
+            BLOYCE THOMPSON (PCP): 609 (39.6%)
+            SARAH DONALD (GRN): 285 (18.6%)
+            MARIAN WHITE (NDP): 22 (1.4%)
+            
+            NEW HAVEN-ROCKY POINT, 1 OF 10 POLLS REPORTING
+            PETER BEVAN-BAKER (MLA) (GRN): 851 (51.3%)
+            KRIS CURRIE (PCP): 512 (30.8%)
+            JUDY MACNEVIN (LIB): 290 (17.5%)
+            DON WILLS (IND): 7 (0.4%)
+            """.trimIndent()
+        )
+
         district17.update(
             "2 OF 10 POLLS REPORTING",
             0.2,
@@ -269,6 +470,25 @@ class MultiResultScreenTest {
             )
         )
         compareRendering("MultiResultPanel", "Update-8", panel)
+        compareAltTexts(
+            panel,
+            """
+            PARTY LEADERS IN DOUBT
+            
+            STANHOPE-MARSHFIELD, 1 OF 10 POLLS REPORTING
+            WADE MACLAUCHLAN (MLA) (LIB): 620 (40.4%)
+            BLOYCE THOMPSON (PCP): 609 (39.6%)
+            SARAH DONALD (GRN): 285 (18.6%)
+            MARIAN WHITE (NDP): 22 (1.4%)
+            
+            NEW HAVEN-ROCKY POINT, 2 OF 10 POLLS REPORTING
+            PETER BEVAN-BAKER (MLA) (GRN): 968 (51.0%)
+            KRIS CURRIE (PCP): 602 (31.7%)
+            JUDY MACNEVIN (LIB): 318 (16.7%)
+            DON WILLS (IND): 11 (0.6%)
+            """.trimIndent()
+        )
+
         district8.update(
             "2 OF 10 POLLS REPORTING",
             0.2,
@@ -280,6 +500,24 @@ class MultiResultScreenTest {
             )
         )
         compareRendering("MultiResultPanel", "Update-9", panel)
+        compareAltTexts(
+            panel,
+            """
+            PARTY LEADERS IN DOUBT
+            
+            STANHOPE-MARSHFIELD, 2 OF 10 POLLS REPORTING
+            BLOYCE THOMPSON (PCP): 721 (40.7%)
+            WADE MACLAUCHLAN (MLA) (LIB): 688 (38.8%)
+            SARAH DONALD (GRN): 335 (18.9%)
+            MARIAN WHITE (NDP): 29 (1.6%)
+            
+            NEW HAVEN-ROCKY POINT, 2 OF 10 POLLS REPORTING
+            PETER BEVAN-BAKER (MLA) (GRN): 968 (51.0%)
+            KRIS CURRIE (PCP): 602 (31.7%)
+            JUDY MACNEVIN (LIB): 318 (16.7%)
+            DON WILLS (IND): 11 (0.6%)
+            """.trimIndent()
+        )
     }
 
     @Test
@@ -378,6 +616,25 @@ class MultiResultScreenTest {
             .build(title)
         panel.setSize(1024, 512)
         compareRendering("MultiResultPanel", "ProgressLabels-1", panel)
+        compareAltTexts(
+            panel,
+            """
+            MAJOR PARTY LEADERS
+            
+            BRACKLEY-HUNTER RIVER [0/10]
+            GREG BRADLEY (GRN): WAITING...
+            LEAH-JANE HAYWARD (NDP): WAITING...
+            DENNIS KING (MLA) (PCP): WAITING...
+            WINDSOR WIGHT (LIB): WAITING...
+            
+            NEW HAVEN-ROCKY POINT [0/10]
+            PETER BEVAN-BAKER (MLA) (GRN): WAITING...
+            KRIS CURRIE (PCP): WAITING...
+            JUDY MACNEVIN (LIB): WAITING...
+            DON WILLS (IND): WAITING...
+            """.trimIndent()
+        )
+
         district17.update(
             "1/10",
             0.1,
@@ -389,9 +646,53 @@ class MultiResultScreenTest {
             )
         )
         compareRendering("MultiResultPanel", "ProgressLabels-2", panel)
+        compareAltTexts(
+            panel,
+            """
+            MAJOR PARTY LEADERS
+            
+            BRACKLEY-HUNTER RIVER [0/10]
+            GREG BRADLEY (GRN): WAITING...
+            LEAH-JANE HAYWARD (NDP): WAITING...
+            DENNIS KING (MLA) (PCP): WAITING...
+            WINDSOR WIGHT (LIB): WAITING...
+            
+            NEW HAVEN-ROCKY POINT [1/10]
+            PETER BEVAN-BAKER (MLA) (GRN): 851 (51.3%)
+            KRIS CURRIE (PCP): 512 (30.8%)
+            JUDY MACNEVIN (LIB): 290 (17.5%)
+            DON WILLS (IND): 7 (0.4%)
+            """.trimIndent()
+        )
+
         districts.submit(listOf(district8, district15, district17))
         title.submit("PARTY LEADERS")
         compareRendering("MultiResultPanel", "ProgressLabels-3", panel)
+        compareAltTexts(
+            panel,
+            """
+            PARTY LEADERS
+            
+            STANHOPE-MARSHFIELD [0/10]
+            SARAH DONALD (GRN): WAITING...
+            WADE MACLAUCHLAN (MLA) (LIB): WAITING...
+            BLOYCE THOMPSON (PCP): WAITING...
+            MARIAN WHITE (NDP): WAITING...
+            
+            BRACKLEY-HUNTER RIVER [0/10]
+            GREG BRADLEY (GRN): WAITING...
+            LEAH-JANE HAYWARD (NDP): WAITING...
+            DENNIS KING (MLA) (PCP): WAITING...
+            WINDSOR WIGHT (LIB): WAITING...
+            
+            NEW HAVEN-ROCKY POINT [1/10]
+            PETER BEVAN-BAKER (MLA) (GRN): 851 (51.3%)
+            KRIS CURRIE (PCP): 512 (30.8%)
+            JUDY MACNEVIN (LIB): 290 (17.5%)
+            DON WILLS (IND): 7 (0.4%)
+            """.trimIndent()
+        )
+
         district15.update(
             "1/10",
             0.1,
@@ -403,6 +704,31 @@ class MultiResultScreenTest {
             )
         )
         compareRendering("MultiResultPanel", "ProgressLabels-4", panel)
+        compareAltTexts(
+            panel,
+            """
+            PARTY LEADERS
+            
+            STANHOPE-MARSHFIELD [0/10]
+            SARAH DONALD (GRN): WAITING...
+            WADE MACLAUCHLAN (MLA) (LIB): WAITING...
+            BLOYCE THOMPSON (PCP): WAITING...
+            MARIAN WHITE (NDP): WAITING...
+            
+            BRACKLEY-HUNTER RIVER [1/10]
+            DENNIS KING (MLA) (PCP): 583 (44.1%)
+            WINDSOR WIGHT (LIB): 425 (32.1%)
+            GREG BRADLEY (GRN): 287 (21.7%)
+            LEAH-JANE HAYWARD (NDP): 27 (2.0%)
+            
+            NEW HAVEN-ROCKY POINT [1/10]
+            PETER BEVAN-BAKER (MLA) (GRN): 851 (51.3%)
+            KRIS CURRIE (PCP): 512 (30.8%)
+            JUDY MACNEVIN (LIB): 290 (17.5%)
+            DON WILLS (IND): 7 (0.4%)
+            """.trimIndent()
+        )
+
         district8.update(
             "1/10",
             0.1,
@@ -414,6 +740,31 @@ class MultiResultScreenTest {
             )
         )
         compareRendering("MultiResultPanel", "ProgressLabels-5", panel)
+        compareAltTexts(
+            panel,
+            """
+            PARTY LEADERS
+            
+            STANHOPE-MARSHFIELD [1/10]
+            WADE MACLAUCHLAN (MLA) (LIB): 620 (40.4%)
+            BLOYCE THOMPSON (PCP): 609 (39.6%)
+            SARAH DONALD (GRN): 285 (18.6%)
+            MARIAN WHITE (NDP): 22 (1.4%)
+            
+            BRACKLEY-HUNTER RIVER [1/10]
+            DENNIS KING (MLA) (PCP): 583 (44.1%)
+            WINDSOR WIGHT (LIB): 425 (32.1%)
+            GREG BRADLEY (GRN): 287 (21.7%)
+            LEAH-JANE HAYWARD (NDP): 27 (2.0%)
+            
+            NEW HAVEN-ROCKY POINT [1/10]
+            PETER BEVAN-BAKER (MLA) (GRN): 851 (51.3%)
+            KRIS CURRIE (PCP): 512 (30.8%)
+            JUDY MACNEVIN (LIB): 290 (17.5%)
+            DON WILLS (IND): 7 (0.4%)
+            """.trimIndent()
+        )
+
         district15.update(
             "5/10",
             0.5,
@@ -426,9 +777,53 @@ class MultiResultScreenTest {
             true
         )
         compareRendering("MultiResultPanel", "ProgressLabels-6", panel)
+        compareAltTexts(
+            panel,
+            """
+            PARTY LEADERS
+            
+            STANHOPE-MARSHFIELD [1/10]
+            WADE MACLAUCHLAN (MLA) (LIB): 620 (40.4%)
+            BLOYCE THOMPSON (PCP): 609 (39.6%)
+            SARAH DONALD (GRN): 285 (18.6%)
+            MARIAN WHITE (NDP): 22 (1.4%)
+            
+            BRACKLEY-HUNTER RIVER [5/10]
+            DENNIS KING (MLA) (PCP): 909 (41.8%) ${"\u2611"}
+            WINDSOR WIGHT (LIB): 652 (30.0%)
+            GREG BRADLEY (GRN): 567 (26.1%)
+            LEAH-JANE HAYWARD (NDP): 45 (2.1%)
+            
+            NEW HAVEN-ROCKY POINT [1/10]
+            PETER BEVAN-BAKER (MLA) (GRN): 851 (51.3%)
+            KRIS CURRIE (PCP): 512 (30.8%)
+            JUDY MACNEVIN (LIB): 290 (17.5%)
+            DON WILLS (IND): 7 (0.4%)
+            """.trimIndent()
+        )
+
         districts.submit(listOf(district8, district17))
         title.submit("PARTY LEADERS IN DOUBT")
         compareRendering("MultiResultPanel", "ProgressLabels-7", panel)
+        compareAltTexts(
+            panel,
+            """
+            PARTY LEADERS IN DOUBT
+            
+            STANHOPE-MARSHFIELD [1/10]
+            WADE MACLAUCHLAN (MLA) (LIB): 620 (40.4%)
+            BLOYCE THOMPSON (PCP): 609 (39.6%)
+            SARAH DONALD (GRN): 285 (18.6%)
+            MARIAN WHITE (NDP): 22 (1.4%)
+            
+            NEW HAVEN-ROCKY POINT [1/10]
+            PETER BEVAN-BAKER (MLA) (GRN): 851 (51.3%)
+            KRIS CURRIE (PCP): 512 (30.8%)
+            JUDY MACNEVIN (LIB): 290 (17.5%)
+            DON WILLS (IND): 7 (0.4%)
+            """.trimIndent()
+        )
+
         district15.update(
             "10/10",
             1.0,
@@ -441,6 +836,25 @@ class MultiResultScreenTest {
         )
         // intentionally same as before, as this district is no longer displayed
         compareRendering("MultiResultPanel", "ProgressLabels-7", panel)
+        compareAltTexts(
+            panel,
+            """
+            PARTY LEADERS IN DOUBT
+            
+            STANHOPE-MARSHFIELD [1/10]
+            WADE MACLAUCHLAN (MLA) (LIB): 620 (40.4%)
+            BLOYCE THOMPSON (PCP): 609 (39.6%)
+            SARAH DONALD (GRN): 285 (18.6%)
+            MARIAN WHITE (NDP): 22 (1.4%)
+            
+            NEW HAVEN-ROCKY POINT [1/10]
+            PETER BEVAN-BAKER (MLA) (GRN): 851 (51.3%)
+            KRIS CURRIE (PCP): 512 (30.8%)
+            JUDY MACNEVIN (LIB): 290 (17.5%)
+            DON WILLS (IND): 7 (0.4%)
+            """.trimIndent()
+        )
+
         district17.update(
             "2/10",
             0.2,
@@ -452,6 +866,25 @@ class MultiResultScreenTest {
             )
         )
         compareRendering("MultiResultPanel", "ProgressLabels-8", panel)
+        compareAltTexts(
+            panel,
+            """
+            PARTY LEADERS IN DOUBT
+            
+            STANHOPE-MARSHFIELD [1/10]
+            WADE MACLAUCHLAN (MLA) (LIB): 620 (40.4%)
+            BLOYCE THOMPSON (PCP): 609 (39.6%)
+            SARAH DONALD (GRN): 285 (18.6%)
+            MARIAN WHITE (NDP): 22 (1.4%)
+            
+            NEW HAVEN-ROCKY POINT [2/10]
+            PETER BEVAN-BAKER (MLA) (GRN): 968 (51.0%)
+            KRIS CURRIE (PCP): 602 (31.7%)
+            JUDY MACNEVIN (LIB): 318 (16.7%)
+            DON WILLS (IND): 11 (0.6%)
+            """.trimIndent()
+        )
+
         district8.update(
             "2/10",
             0.2,
@@ -463,6 +896,24 @@ class MultiResultScreenTest {
             )
         )
         compareRendering("MultiResultPanel", "ProgressLabels-9", panel)
+        compareAltTexts(
+            panel,
+            """
+            PARTY LEADERS IN DOUBT
+            
+            STANHOPE-MARSHFIELD [2/10]
+            BLOYCE THOMPSON (PCP): 721 (40.7%)
+            WADE MACLAUCHLAN (MLA) (LIB): 688 (38.8%)
+            SARAH DONALD (GRN): 335 (18.9%)
+            MARIAN WHITE (NDP): 29 (1.6%)
+            
+            NEW HAVEN-ROCKY POINT [2/10]
+            PETER BEVAN-BAKER (MLA) (GRN): 968 (51.0%)
+            KRIS CURRIE (PCP): 602 (31.7%)
+            JUDY MACNEVIN (LIB): 318 (16.7%)
+            DON WILLS (IND): 11 (0.6%)
+            """.trimIndent()
+        )
     }
 
     @Test
@@ -553,6 +1004,33 @@ class MultiResultScreenTest {
             .build("SAINT JOHN".asOneTimePublisher())
         panel.setSize(1024, 512)
         compareRendering("MultiResultPanel", "Others-1", panel)
+        compareAltTexts(
+            panel,
+            """
+            SAINT JOHN
+            
+            DISTRICT 30, SAINT JOHN EAST
+            GLEN SAVOIE (MLA) (PCP): 3,507 (56.4%) ${"\u2611"}
+            PHIL COMEAU (LIB): 1,639 (26.3%)
+            PATRICK KEMP (PA): 434 (7.0%)
+            GERALD IRISH (GRN): 394 (6.3%)
+            JOSH FLOYD (NDP): 248 (4.0%)
+            
+            DISTRICT 32, SAINT JOHN HARBOUR
+            ARLENE DUNN (PCP): 2,181 (41.4%)
+            BRENT HARRIS (GRN): 1,224 (23.2%)
+            ALICE MCKIM (LIB): 1,207 (22.9%)
+            COURTNEY PYRKE (NDP): 309 (5.9%)
+            OTHERS: 347 (6.6%)
+            
+            DISTRICT 33, SAINT JOHN LANCASTER
+            DOROTHY SHEPHARD (MLA) (PCP): 3,560 (54.2%) ${"\u2611"}
+            SHARON TEARE (LIB): 1,471 (22.4%)
+            JOANNA KILLEN (GRN): 938 (14.3%)
+            PAUL SEELYE (PA): 394 (6.0%)
+            DON DURANT (NDP): 201 (3.1%)
+            """.trimIndent()
+        )
     }
 
     @Test
@@ -688,6 +1166,54 @@ class MultiResultScreenTest {
             .build("SAINT JOHN".asOneTimePublisher())
         panel.setSize(1024, 512)
         compareRendering("MultiResultPanel", "OthersParty-1", panel)
+        compareAltTexts(
+            panel,
+            """
+            SAINT JOHN
+            
+            DISTRICT 30, SAINT JOHN EAST
+            PROGRESSIVE CONSERVATIVE: 56.4%
+            LIBERAL: 26.3%
+            PEOPLE'S ALLIANCE: 7.0%
+            GREEN: 6.3%
+            NEW DEMOCRATIC PARTY: 4.0%
+            
+            DISTRICT 32, SAINT JOHN HARBOUR
+            PROGRESSIVE CONSERVATIVE: 41.4%
+            GREEN: 23.2%
+            LIBERAL: 22.9%
+            NEW DEMOCRATIC PARTY: 5.9%
+            OTHERS: 6.6%
+            
+            DISTRICT 33, SAINT JOHN LANCASTER
+            PROGRESSIVE CONSERVATIVE: 54.2%
+            LIBERAL: 22.4%
+            GREEN: 14.3%
+            PEOPLE'S ALLIANCE: 6.0%
+            NEW DEMOCRATIC PARTY: 3.1%
+            
+            DISTRICT 38, FREDERICTON-GRAND LAKE
+            PROGRESSIVE CONSERVATIVE: 44.3%
+            LIBERAL: 27.2%
+            GREEN: 17.1%
+            PEOPLE'S ALLIANCE: 9.8%
+            NEW DEMOCRATIC PARTY: 1.7%
+            
+            DISTRICT 40, FREDERICTON SOUTH
+            GREEN: 54.0%
+            PROGRESSIVE CONSERVATIVE: 30.0%
+            LIBERAL: 11.5%
+            PEOPLE'S ALLIANCE: 3.0%
+            NEW DEMOCRATIC PARTY: 1.5%
+            
+            DISTRICT 41, FREDERICTON NORTH
+            PROGRESSIVE CONSERVATIVE: 41.1%
+            GREEN: 31.4%
+            LIBERAL: 18.7%
+            PEOPLE'S ALLIANCE: 7.5%
+            NEW DEMOCRATIC PARTY: 1.3%
+            """.trimIndent()
+        )
     }
 
     @Test
@@ -798,6 +1324,41 @@ class MultiResultScreenTest {
             .build("ELECTION 2020: NEW BRUNSWICK DECIDES".asOneTimePublisher())
         panel.setSize(1024, 512)
         compareRendering("MultiResultPanel", "MultipleRows-1", panel)
+        compareAltTexts(
+            panel,
+            """
+            ELECTION 2020: NEW BRUNSWICK DECIDES
+            
+            DISTRICT 30, SAINT JOHN EAST
+            GLEN SAVOIE (MLA) (PCP): 3,507 (56.4%) ${"\u2611"}
+            PHIL COMEAU (LIB): 1,639 (26.3%)
+            PATRICK KEMP (PA): 434 (7.0%)
+            GERALD IRISH (GRN): 394 (6.3%)
+            JOSH FLOYD (NDP): 248 (4.0%)
+            
+            DISTRICT 31, PORTLAND-SIMONDS
+            TREVOR HOLDER (MLA) (PCP): 3,170 (55.1%) ${"\u2611"}
+            TIM JONES (LIB): 1,654 (28.8%)
+            STEFAN WARNER (GRN): 483 (8.4%)
+            DARELLA JACKSON (PA): 282 (4.9%)
+            ERIK HEINZE-MILNE (NDP): 164 (2.9%)
+            
+            DISTRICT 32, SAINT JOHN HARBOUR
+            ARLENE DUNN (PCP): 2,181 (41.4%)
+            BRENT HARRIS (GRN): 1,224 (23.2%)
+            ALICE MCKIM (LIB): 1,207 (22.9%)
+            COURTNEY PYRKE (NDP): 309 (5.9%)
+            OTHERS: 347 (6.6%)
+            
+            DISTRICT 33, SAINT JOHN LANCASTER
+            DOROTHY SHEPHARD (MLA) (PCP): 3,560 (54.2%) ${"\u2611"}
+            SHARON TEARE (LIB): 1,471 (22.4%)
+            JOANNA KILLEN (GRN): 938 (14.3%)
+            PAUL SEELYE (PA): 394 (6.0%)
+            DON DURANT (NDP): 201 (3.1%)
+            """.trimIndent()
+        )
+
         districts.add(
             District(
                 34,
@@ -842,12 +1403,75 @@ class MultiResultScreenTest {
         )
         districtsPublisher.submit(districts)
         compareRendering("MultiResultPanel", "MultipleRows-2", panel)
+        compareAltTexts(
+            panel,
+            """
+            ELECTION 2020: NEW BRUNSWICK DECIDES
+            
+            DISTRICT 30, SAINT JOHN EAST
+            GLEN SAVOIE (MLA) (PCP): 3,507 (56.4%) ${"\u2611"}
+            PHIL COMEAU (LIB): 1,639 (26.3%)
+            PATRICK KEMP (PA): 434 (7.0%)
+            OTHERS: 642 (10.3%)
+            
+            DISTRICT 31, PORTLAND-SIMONDS
+            TREVOR HOLDER (MLA) (PCP): 3,170 (55.1%) ${"\u2611"}
+            TIM JONES (LIB): 1,654 (28.8%)
+            STEFAN WARNER (GRN): 483 (8.4%)
+            OTHERS: 446 (7.8%)
+            
+            DISTRICT 32, SAINT JOHN HARBOUR
+            ARLENE DUNN (PCP): 2,181 (41.4%)
+            BRENT HARRIS (GRN): 1,224 (23.2%)
+            ALICE MCKIM (LIB): 1,207 (22.9%)
+            OTHERS: 656 (12.5%)
+            
+            DISTRICT 33, SAINT JOHN LANCASTER
+            DOROTHY SHEPHARD (MLA) (PCP): 3,560 (54.2%) ${"\u2611"}
+            SHARON TEARE (LIB): 1,471 (22.4%)
+            JOANNA KILLEN (GRN): 938 (14.3%)
+            OTHERS: 595 (9.1%)
+            
+            DISTRICT 34, KINGS CENTRE
+            BILL OLIVER (MLA) (PCP): 4,583 (61.5%) ${"\u2611"}
+            BRUCE BRYER (GRN): 1,006 (13.5%)
+            PAUL ADAMS (LIB): 911 (12.2%)
+            OTHERS: 947 (12.7%)
+            
+            DISTRICT 35, FUNDY-THE ISLES-SAINT JOHN WEST
+            ANDREA ANDERSON-MASON (MLA) (PCP): 4,740 (66.5%) ${"\u2611"}
+            TONY MANN (LIB): 726 (10.2%)
+            VINCENT EDGETT (PA): 688 (9.6%)
+            OTHERS: 977 (13.7%)
+            """.trimIndent()
+        )
+
         districts.removeAt(3)
         districts.removeAt(2)
         districts.removeAt(1)
         districts.removeAt(0)
         districtsPublisher.submit(districts)
         compareRendering("MultiResultPanel", "MultipleRows-3", panel)
+        compareAltTexts(
+            panel,
+            """
+            ELECTION 2020: NEW BRUNSWICK DECIDES
+            
+            DISTRICT 34, KINGS CENTRE
+            BILL OLIVER (MLA) (PCP): 4,583 (61.5%) ${"\u2611"}
+            BRUCE BRYER (GRN): 1,006 (13.5%)
+            PAUL ADAMS (LIB): 911 (12.2%)
+            WILLIAM EDGETT (PA): 693 (9.3%)
+            MARGARET ANDERSON KILFOIL (NDP): 254 (3.4%)
+            
+            DISTRICT 35, FUNDY-THE ISLES-SAINT JOHN WEST
+            ANDREA ANDERSON-MASON (MLA) (PCP): 4,740 (66.5%) ${"\u2611"}
+            TONY MANN (LIB): 726 (10.2%)
+            VINCENT EDGETT (PA): 688 (9.6%)
+            LOIS MITCHELL (GRN): 686 (9.6%)
+            SHARON GREENLAW (NDP): 291 (4.1%)
+            """.trimIndent()
+        )
     }
 
     @Test
@@ -959,6 +1583,41 @@ class MultiResultScreenTest {
             .build("ELECTION 2020: NEW BRUNSWICK DECIDES".asOneTimePublisher())
         panel.setSize(1024, 512)
         compareRendering("MultiResultPanel", "MultipleRowsProgressLabels-1", panel)
+        compareAltTexts(
+            panel,
+            """
+            ELECTION 2020: NEW BRUNSWICK DECIDES
+            
+            DISTRICT 30, SAINT JOHN EAST [100% IN]
+            GLEN SAVOIE (MLA) (PCP): 3,507 (56.4%) ${"\u2611"}
+            PHIL COMEAU (LIB): 1,639 (26.3%)
+            PATRICK KEMP (PA): 434 (7.0%)
+            GERALD IRISH (GRN): 394 (6.3%)
+            JOSH FLOYD (NDP): 248 (4.0%)
+            
+            DISTRICT 31, PORTLAND-SIMONDS [100% IN]
+            TREVOR HOLDER (MLA) (PCP): 3,170 (55.1%) ${"\u2611"}
+            TIM JONES (LIB): 1,654 (28.8%)
+            STEFAN WARNER (GRN): 483 (8.4%)
+            DARELLA JACKSON (PA): 282 (4.9%)
+            ERIK HEINZE-MILNE (NDP): 164 (2.9%)
+            
+            DISTRICT 32, SAINT JOHN HARBOUR [100% IN]
+            ARLENE DUNN (PCP): 2,181 (41.4%)
+            BRENT HARRIS (GRN): 1,224 (23.2%)
+            ALICE MCKIM (LIB): 1,207 (22.9%)
+            COURTNEY PYRKE (NDP): 309 (5.9%)
+            OTHERS: 347 (6.6%)
+            
+            DISTRICT 33, SAINT JOHN LANCASTER [100% IN]
+            DOROTHY SHEPHARD (MLA) (PCP): 3,560 (54.2%) ${"\u2611"}
+            SHARON TEARE (LIB): 1,471 (22.4%)
+            JOANNA KILLEN (GRN): 938 (14.3%)
+            PAUL SEELYE (PA): 394 (6.0%)
+            DON DURANT (NDP): 201 (3.1%)
+            """.trimIndent()
+        )
+
         districts.add(
             District(
                 34,
@@ -1003,12 +1662,75 @@ class MultiResultScreenTest {
         )
         districtsPublisher.submit(districts)
         compareRendering("MultiResultPanel", "MultipleRowsProgressLabels-2", panel)
+        compareAltTexts(
+            panel,
+            """
+            ELECTION 2020: NEW BRUNSWICK DECIDES
+            
+            DISTRICT 30, SAINT JOHN EAST [100% IN]
+            GLEN SAVOIE (MLA) (PCP): 3,507 (56.4%) ${"\u2611"}
+            PHIL COMEAU (LIB): 1,639 (26.3%)
+            PATRICK KEMP (PA): 434 (7.0%)
+            OTHERS: 642 (10.3%)
+            
+            DISTRICT 31, PORTLAND-SIMONDS [100% IN]
+            TREVOR HOLDER (MLA) (PCP): 3,170 (55.1%) ${"\u2611"}
+            TIM JONES (LIB): 1,654 (28.8%)
+            STEFAN WARNER (GRN): 483 (8.4%)
+            OTHERS: 446 (7.8%)
+            
+            DISTRICT 32, SAINT JOHN HARBOUR [100% IN]
+            ARLENE DUNN (PCP): 2,181 (41.4%)
+            BRENT HARRIS (GRN): 1,224 (23.2%)
+            ALICE MCKIM (LIB): 1,207 (22.9%)
+            OTHERS: 656 (12.5%)
+            
+            DISTRICT 33, SAINT JOHN LANCASTER [100% IN]
+            DOROTHY SHEPHARD (MLA) (PCP): 3,560 (54.2%) ${"\u2611"}
+            SHARON TEARE (LIB): 1,471 (22.4%)
+            JOANNA KILLEN (GRN): 938 (14.3%)
+            OTHERS: 595 (9.1%)
+            
+            DISTRICT 34, KINGS CENTRE [100% IN]
+            BILL OLIVER (MLA) (PCP): 4,583 (61.5%) ${"\u2611"}
+            BRUCE BRYER (GRN): 1,006 (13.5%)
+            PAUL ADAMS (LIB): 911 (12.2%)
+            OTHERS: 947 (12.7%)
+            
+            DISTRICT 35, FUNDY-THE ISLES-SAINT JOHN WEST [100% IN]
+            ANDREA ANDERSON-MASON (MLA) (PCP): 4,740 (66.5%) ${"\u2611"}
+            TONY MANN (LIB): 726 (10.2%)
+            VINCENT EDGETT (PA): 688 (9.6%)
+            OTHERS: 977 (13.7%)
+            """.trimIndent()
+        )
+
         districts.removeAt(3)
         districts.removeAt(2)
         districts.removeAt(1)
         districts.removeAt(0)
         districtsPublisher.submit(districts)
         compareRendering("MultiResultPanel", "MultipleRowsProgressLabels-3", panel)
+        compareAltTexts(
+            panel,
+            """
+            ELECTION 2020: NEW BRUNSWICK DECIDES
+            
+            DISTRICT 34, KINGS CENTRE [100% IN]
+            BILL OLIVER (MLA) (PCP): 4,583 (61.5%) ${"\u2611"}
+            BRUCE BRYER (GRN): 1,006 (13.5%)
+            PAUL ADAMS (LIB): 911 (12.2%)
+            WILLIAM EDGETT (PA): 693 (9.3%)
+            MARGARET ANDERSON KILFOIL (NDP): 254 (3.4%)
+            
+            DISTRICT 35, FUNDY-THE ISLES-SAINT JOHN WEST [100% IN]
+            ANDREA ANDERSON-MASON (MLA) (PCP): 4,740 (66.5%) ${"\u2611"}
+            TONY MANN (LIB): 726 (10.2%)
+            VINCENT EDGETT (PA): 688 (9.6%)
+            LOIS MITCHELL (GRN): 686 (9.6%)
+            SHARON GREENLAW (NDP): 291 (4.1%)
+            """.trimIndent()
+        )
     }
 
     @Test
@@ -1049,8 +1771,45 @@ class MultiResultScreenTest {
             .build("GEORGIA SENATE".asOneTimePublisher())
         panel.setSize(1024, 512)
         compareRendering("MultiResultPanel", "Runoff-1", panel)
+        compareAltTexts(
+            panel,
+            """
+            GEORGIA SENATE
+            
+            REGULAR ELECTION, CLASS 2
+            DAVID PERDUE (GOP): 2,458,453 (49.7%)
+            JON OSSOFF (DEM): 2,371,921 (48.0%)
+            SHANE HAZEL (IND): 114,873 (2.3%)
+            
+            SPECIAL ELECTION, CLASS 3
+            RAPHAEL WARNOCK (DEM): 1,615,550 (32.9%)
+            KELLY LOEFFLER (GOP): 1,271,320 (25.9%)
+            DOUG COLLINS (GOP): 979,052 (19.9%)
+            DEBORAH JACKSON (DEM): 323,833 (6.6%)
+            OTHERS: 718,808 (14.6%)
+            """.trimIndent()
+        )
+
         districts.forEach { it.declareRunoff() }
         compareRendering("MultiResultPanel", "Runoff-2", panel)
+        compareAltTexts(
+            panel,
+            """
+            GEORGIA SENATE
+            
+            REGULAR ELECTION, CLASS 2
+            DAVID PERDUE (GOP): 2,458,453 (49.7%) ${"\u2348"}
+            JON OSSOFF (DEM): 2,371,921 (48.0%) ${"\u2348"}
+            SHANE HAZEL (IND): 114,873 (2.3%)
+            
+            SPECIAL ELECTION, CLASS 3
+            RAPHAEL WARNOCK (DEM): 1,615,550 (32.9%) ${"\u2348"}
+            KELLY LOEFFLER (GOP): 1,271,320 (25.9%) ${"\u2348"}
+            DOUG COLLINS (GOP): 979,052 (19.9%)
+            DEBORAH JACKSON (DEM): 323,833 (6.6%)
+            OTHERS: 718,808 (14.6%)
+            """.trimIndent()
+        )
     }
 
     @Test
@@ -1142,6 +1901,30 @@ class MultiResultScreenTest {
             .build("CABINET MEMBERS IN CHARLOTTETOWN".asOneTimePublisher())
         panel.setSize(1024, 512)
         compareRendering("MultiResultPanel", "MapAdditionalHighlights-1", panel)
+        compareAltTexts(
+            panel,
+            """
+            CABINET MEMBERS IN CHARLOTTETOWN
+            
+            DISTRICT 13, CHARLOTTETOWN-BRIGHTON
+            OLE HAMMARLUND (GRN): 1,301 (40.3%)
+            JORDAN BROWN (MLA) (LIB): 1,223 (37.9%)
+            DONNA HURRY (PCP): 567 (17.6%)
+            SIMONE WEBSTER (NDP): 138 (4.3%)
+            
+            DISTRICT 12, CHARLOTTETOWN-VICTORIA PARK
+            KARLA BERNARD (GRN): 1,272 (40.5%)
+            RICHARD BROWN (MLA) (LIB): 875 (27.9%)
+            TIM KEIZER (PCP): 656 (20.9%)
+            JOE BYRNE (NDP): 338 (10.8%)
+            
+            DISTRICT 10, CHARLOTTETOWN-WINSLOE
+            ROBERT MITCHELL (MLA) (LIB): 1,420 (42.0%)
+            AMANDA MORRISON (GRN): 1,057 (31.2%)
+            MIKE GILLIS (PCP): 865 (25.6%)
+            JESSE REDDIN COUSINS (NDP): 41 (1.2%)
+            """.trimIndent()
+        )
     }
 
     @Test
@@ -1242,6 +2025,42 @@ class MultiResultScreenTest {
             .build("ELECTION 2020: NEW BRUNSWICK DECIDES".asOneTimePublisher())
         panel.setSize(1024, 512)
         compareRendering("MultiResultPanel", "PartiesOnly-1", panel)
+        compareAltTexts(
+            panel,
+            """
+            ELECTION 2020: NEW BRUNSWICK DECIDES
+            
+            DISTRICT 30, SAINT JOHN EAST
+            PROGRESSIVE CONSERVATIVE: 56.4%
+            LIBERAL: 26.3%
+            PEOPLE'S ALLIANCE: 7.0%
+            GREEN: 6.3%
+            NEW DEMOCRATIC PARTY: 4.0%
+            
+            DISTRICT 31, PORTLAND-SIMONDS
+            PROGRESSIVE CONSERVATIVE: 55.1%
+            LIBERAL: 28.8%
+            GREEN: 8.4%
+            PEOPLE'S ALLIANCE: 4.9%
+            NEW DEMOCRATIC PARTY: 2.9%
+            
+            DISTRICT 32, SAINT JOHN HARBOUR
+            PROGRESSIVE CONSERVATIVE: 41.4%
+            GREEN: 23.2%
+            LIBERAL: 22.9%
+            NEW DEMOCRATIC PARTY: 5.9%
+            PEOPLE'S ALLIANCE: 3.5%
+            INDEPENDENT: 3.1%
+            
+            DISTRICT 33, SAINT JOHN LANCASTER
+            PROGRESSIVE CONSERVATIVE: 54.2%
+            LIBERAL: 22.4%
+            GREEN: 14.3%
+            PEOPLE'S ALLIANCE: 6.0%
+            NEW DEMOCRATIC PARTY: 3.1%
+            """.trimIndent()
+        )
+
         districts.add(
             District(
                 34,
@@ -1286,12 +2105,82 @@ class MultiResultScreenTest {
         )
         districtPublisher.submit(districts)
         compareRendering("MultiResultPanel", "PartiesOnly-2", panel)
+        compareAltTexts(
+            panel,
+            """
+            ELECTION 2020: NEW BRUNSWICK DECIDES
+            
+            DISTRICT 30, SAINT JOHN EAST
+            PROGRESSIVE CONSERVATIVE: 56.4%
+            LIBERAL: 26.3%
+            PEOPLE'S ALLIANCE: 7.0%
+            GREEN: 6.3%
+            NEW DEMOCRATIC PARTY: 4.0%
+            
+            DISTRICT 31, PORTLAND-SIMONDS
+            PROGRESSIVE CONSERVATIVE: 55.1%
+            LIBERAL: 28.8%
+            GREEN: 8.4%
+            PEOPLE'S ALLIANCE: 4.9%
+            NEW DEMOCRATIC PARTY: 2.9%
+            
+            DISTRICT 32, SAINT JOHN HARBOUR
+            PROGRESSIVE CONSERVATIVE: 41.4%
+            GREEN: 23.2%
+            LIBERAL: 22.9%
+            NEW DEMOCRATIC PARTY: 5.9%
+            PEOPLE'S ALLIANCE: 3.5%
+            INDEPENDENT: 3.1%
+            
+            DISTRICT 33, SAINT JOHN LANCASTER
+            PROGRESSIVE CONSERVATIVE: 54.2%
+            LIBERAL: 22.4%
+            GREEN: 14.3%
+            PEOPLE'S ALLIANCE: 6.0%
+            NEW DEMOCRATIC PARTY: 3.1%
+            
+            DISTRICT 34, KINGS CENTRE
+            PROGRESSIVE CONSERVATIVE: 61.5%
+            GREEN: 13.5%
+            LIBERAL: 12.2%
+            PEOPLE'S ALLIANCE: 9.3%
+            NEW DEMOCRATIC PARTY: 3.4%
+            
+            DISTRICT 35, FUNDY-THE ISLES-SAINT JOHN WEST
+            PROGRESSIVE CONSERVATIVE: 66.5%
+            LIBERAL: 10.2%
+            PEOPLE'S ALLIANCE: 9.6%
+            GREEN: 9.6%
+            NEW DEMOCRATIC PARTY: 4.1%
+            """.trimIndent()
+        )
+
         districts.removeAt(3)
         districts.removeAt(2)
         districts.removeAt(1)
         districts.removeAt(0)
         districtPublisher.submit(districts)
         compareRendering("MultiResultPanel", "PartiesOnly-3", panel)
+        compareAltTexts(
+            panel,
+            """
+            ELECTION 2020: NEW BRUNSWICK DECIDES
+            
+            DISTRICT 34, KINGS CENTRE
+            PROGRESSIVE CONSERVATIVE: 61.5%
+            GREEN: 13.5%
+            LIBERAL: 12.2%
+            PEOPLE'S ALLIANCE: 9.3%
+            NEW DEMOCRATIC PARTY: 3.4%
+            
+            DISTRICT 35, FUNDY-THE ISLES-SAINT JOHN WEST
+            PROGRESSIVE CONSERVATIVE: 66.5%
+            LIBERAL: 10.2%
+            PEOPLE'S ALLIANCE: 9.6%
+            GREEN: 9.6%
+            NEW DEMOCRATIC PARTY: 4.1%
+            """.trimIndent()
+        )
     }
 
     private fun peiShapesByDistrict(): Map<Int, Shape> {

@@ -1,7 +1,9 @@
 package com.joecollins.graphics.screens.generic
 
+import com.joecollins.graphics.AltTextProvider
 import com.joecollins.graphics.components.ProjectionFrame
 import com.joecollins.pubsub.asOneTimePublisher
+import com.joecollins.pubsub.map
 import java.awt.Color
 import java.awt.GridLayout
 import java.awt.Image
@@ -14,7 +16,9 @@ class ProjectionScreen private constructor(
     color: Flow.Publisher<out Color>,
     image: Flow.Publisher<out Image?>,
     imageAlignment: Flow.Publisher<out ProjectionFrame.Alignment>
-) : JPanel() {
+) : JPanel(), AltTextProvider {
+
+    override val altText: Flow.Publisher<String?> = text.map { t -> t?.let { "PROJECTION: $it" } }
 
     companion object {
         fun createScreen(
