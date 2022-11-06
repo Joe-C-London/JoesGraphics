@@ -159,10 +159,10 @@ class SingleTransferrableResultScreen private constructor(
             }
             val candidate = candidateTop.merge(candidateEntries) { t, e ->
                 if (t == null) e
-                "$t\n$e"
+                else "$t\n$e"
             }
 
-            val partyEntries = candidateVotes.merge(quota) { v, q -> v to q }.merge(status) { (v, q), (el, ex) ->
+            val partyEntries = candidateVotes.merge(quota) { v, q -> v to q }.merge(status) { (v, q), (el, _) ->
                 if (q == null) return@merge null
                 val electedByParty = el.filter { !v.containsKey(it.first) }
                     .groupingBy { it.first.party }
