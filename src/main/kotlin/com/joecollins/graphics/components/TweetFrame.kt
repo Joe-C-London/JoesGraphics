@@ -209,7 +209,6 @@ class TweetFrame(tweet: Flow.Publisher<out Tweet>, private val timezone: ZoneId 
                         image = resizedImage
                         fullName = it.name
                         screenName = it.screenName
-                        verified = it.isVerified
                         repaint()
                     }
                 )

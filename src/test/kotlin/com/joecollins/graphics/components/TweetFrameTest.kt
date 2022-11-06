@@ -279,7 +279,7 @@ class TweetFrameTest {
     }
 
     @Test
-    fun testVerifiedTweet() {
+    fun testVerifiedTweetMeansNothing() {
         val tweetBuilder = setupTweetBuilder("123", "456")
         tweetBuilder.text = "This tweet will test whether this frame renders.  It will be long enough to wrap to the next line."
         tweetBuilder.createdAt = Instant.parse("2021-04-15T21:34:17Z")
