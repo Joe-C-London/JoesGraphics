@@ -47,6 +47,7 @@ import javax.swing.JMenuBar
 import javax.swing.JMenuItem
 import javax.swing.JOptionPane
 import javax.swing.JPanel
+import javax.swing.JScrollPane
 import javax.swing.JTextArea
 import javax.swing.border.EmptyBorder
 import javax.swing.filechooser.FileFilter
@@ -157,7 +158,7 @@ class GenericWindow<T : JPanel> @JvmOverloads constructor(private val panel: T, 
             altTextArea.isEditable = false
             altTextArea.text = ""
             altTextArea.background = Color.LIGHT_GRAY
-            mainPanel.add(altTextArea)
+            mainPanel.add(JScrollPane(altTextArea, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER))
 
             val bottomPanel = JPanel()
             bottomPanel.background = twitterColor
