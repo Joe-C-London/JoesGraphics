@@ -165,13 +165,13 @@ class GenericWindow<T : JPanel> @JvmOverloads constructor(private val panel: T, 
             bottomPanel.layout = BorderLayout()
             contentPane.add(bottomPanel, BorderLayout.SOUTH)
 
-            val charLabel = JLabel("${textArea.text.length}/280 & ${altTextArea.text.length}/1000")
+            val charLabel = JLabel("${textArea.text.length}/280 & ${altTextArea.text.length}/$ALT_TEXT_MAX_LENGTH")
             charLabel.foreground = Color.WHITE
             bottomPanel.add(charLabel, BorderLayout.WEST)
             textArea.addKeyListener(
                 object : KeyAdapter() {
                     override fun keyReleased(e: KeyEvent) {
-                        charLabel.text = "${textArea.text.length}/280 & ${altTextArea.text.length}/1000"
+                        charLabel.text = "${textArea.text.length}/280 & ${altTextArea.text.length}/$ALT_TEXT_MAX_LENGTH"
                     }
                 }
             )
@@ -179,9 +179,9 @@ class GenericWindow<T : JPanel> @JvmOverloads constructor(private val panel: T, 
             if (panel is AltTextProvider) {
                 subscriber = Subscriber(
                     eventQueueWrapper {
-                        val text = it?.takeIf { t -> t.length <= 1000 }
+                        val text = it?.takeIf { t -> t.length <= ALT_TEXT_MAX_LENGTH }
                         altTextArea.text = text ?: ""
-                        charLabel.text = "${textArea.text.length}/280 & ${(text ?: "").length}/1000"
+                        charLabel.text = "${textArea.text.length}/280 & ${(text ?: "").length}/$ALT_TEXT_MAX_LENGTH"
                     }
                 )
                 panel.altText.subscribe(subscriber)
@@ -222,6 +222,8 @@ class GenericWindow<T : JPanel> @JvmOverloads constructor(private val panel: T, 
     }
 
     companion object {
+        const val ALT_TEXT_MAX_LENGTH = 1000
+
         private fun saveImageToFile(panel: JPanel) {
             val fileChooser = JFileChooser()
             fileChooser.currentDirectory = File(System.getProperty("user.home"), "Pictures/Joe's Politics")

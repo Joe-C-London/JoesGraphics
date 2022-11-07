@@ -204,8 +204,7 @@ class TooCloseToCallScreenTest {
             DISTRICT 9: PC: 620; LIB: 395; LEAD: 225; 9.1% IN
             DISTRICT 27: LIB: 646; PC: 405; LEAD: 241; 10.0% IN
             DISTRICT 2: PC: 555; GRN: 308; LEAD: 247; 10.0% IN
-            DISTRICT 10: LIB: 808; GRN: 516; LEAD: 292; 10.0% IN
-            DISTRICT 16: LIB: 983; GRN: 542; LEAD: 441; 10.0% IN
+            (...)
             """.trimIndent()
         )
 
@@ -553,13 +552,7 @@ class TooCloseToCallScreenTest {
             DISTRICT 15: PC: 583; LIB: 425; GRN: 287; NDP: 27; LEAD: 158; 10.0% IN
             DISTRICT 13: LIB: 717; GRN: 542; PC: 331; NDP: 75; LEAD: 175; 10.0% IN
             DISTRICT 6: PC: 725; LIB: 526; GRN: 348; NDP: 17; LEAD: 199; 11.1% IN
-            DISTRICT 14: LIB: 699; PC: 492; GRN: 437; IND: 131; NDP: 34; LEAD: 207; 10.0% IN
-            DISTRICT 1: PC: 684; LIB: 467; GRN: 365; LEAD: 217; 10.0% IN
-            DISTRICT 9: PC: 620; LIB: 395; GRN: 363; NDP: 19; LEAD: 225; 9.1% IN
-            DISTRICT 27: LIB: 646; PC: 405; GRN: 241; NDP: 18; LEAD: 241; 10.0% IN
-            DISTRICT 2: PC: 555; GRN: 308; LIB: 288; NDP: 23; LEAD: 247; 10.0% IN
-            DISTRICT 10: LIB: 808; GRN: 516; PC: 510; NDP: 27; LEAD: 292; 10.0% IN
-            DISTRICT 16: LIB: 983; GRN: 542; NDP: 425; PC: 296; LEAD: 441; 10.0% IN
+            (...)
             """.trimIndent()
         )
 

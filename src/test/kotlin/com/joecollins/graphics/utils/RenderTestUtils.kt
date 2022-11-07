@@ -73,9 +73,9 @@ object RenderTestUtils {
     }
 
     fun compareAltTexts(panel: AltTextProvider, expected: String?, timeoutSeconds: Long = 1) {
+//        MatcherAssert.assertThat("Expected length is too long", (expected ?: "").length, Matchers.lessThanOrEqualTo(GenericWindow.ALT_TEXT_MAX_LENGTH))
         var result: String? = null
         panel.altText.subscribe(Subscriber { result = it })
         Awaitility.await().atMost(timeoutSeconds, TimeUnit.SECONDS).until({ result }, Matchers.equalTo(expected))
-//        Awaitility.await().atMost(timeoutSeconds, TimeUnit.SECONDS).until({ (result ?: "").length }, Matchers.lessThanOrEqualTo(1000))
     }
 }

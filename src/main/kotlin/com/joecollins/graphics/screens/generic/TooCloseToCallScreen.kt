@@ -2,6 +2,7 @@ package com.joecollins.graphics.screens.generic
 
 import com.joecollins.graphics.AltTextProvider
 import com.joecollins.graphics.GenericPanel
+import com.joecollins.graphics.GenericWindow
 import com.joecollins.graphics.components.MultiSummaryFrame
 import com.joecollins.models.general.Aggregators
 import com.joecollins.models.general.Aggregators.adjustKey
@@ -155,13 +156,24 @@ class TooCloseToCallScreen private constructor(
                 }
             }
             return header.merge(input.toEntries()) { head, entries ->
-                val entriesText = entries.joinToString("\n") { e ->
-                    "${e.header}: ${
+                var size = head?.length ?: -1
+                var dotDotDot = false
+                val entriesText = entries.mapNotNull { e ->
+                    val entry = "${e.header}: ${
                     e.topCandidates.take(e.numCandidates).joinToString("; ") { c -> "${c.key.party.abbreviation}: ${DecimalFormat("#,##0").format(c.value)}" }
                     }; LEAD: ${e.lead}${
                     if (e.reporting.isEmpty()) "" else "; ${e.reporting}"
                     }"
-                }.let { it.ifEmpty { "(empty)" } }
+                    if (dotDotDot) {
+                        null
+                    } else if (size + entry.length < GenericWindow.ALT_TEXT_MAX_LENGTH - 10) {
+                        size += entry.length + 1
+                        entry
+                    } else {
+                        dotDotDot = true
+                        "(...)"
+                    }
+                }.joinToString("\n").let { it.ifEmpty { "(empty)" } }
                 if (entriesText.isEmpty()) {
                     head
                 } else if (head.isNullOrEmpty()) {
