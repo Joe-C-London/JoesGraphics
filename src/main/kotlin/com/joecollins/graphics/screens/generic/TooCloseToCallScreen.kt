@@ -161,7 +161,7 @@ class TooCloseToCallScreen private constructor(
                 val entriesText = entries.mapNotNull { e ->
                     val entry = "${e.header}: ${
                     e.topCandidates.take(e.numCandidates).joinToString("; ") { c -> "${c.key.party.abbreviation}: ${DecimalFormat("#,##0").format(c.value)}" }
-                    }; LEAD: ${e.lead}${
+                    }; LEAD: ${DecimalFormat("#,##0").format(e.lead)}${
                     if (e.reporting.isEmpty()) "" else "; ${e.reporting}"
                     }"
                     if (dotDotDot) {

@@ -323,7 +323,7 @@ class MultiResultScreen private constructor(
         private fun updateBars() = synchronized(this) { toBars.submit(calculateBars()) }
         private fun calculateBars(): List<BasicBar> {
             val total = votes.values.sum()
-            return Aggregators.topAndOthers(
+            val bars = Aggregators.topAndOthers(
                 votes,
                 maxBars,
                 Candidate.OTHERS,
@@ -371,6 +371,10 @@ class MultiResultScreen private constructor(
                         shape
                     )
                 }
+                .toList()
+            return sequenceOf(bars.asSequence(), generateSequence { BasicBar("", Color.WHITE, 0, "") })
+                .flatten()
+                .take(maxBars)
                 .toList()
         }
     }
