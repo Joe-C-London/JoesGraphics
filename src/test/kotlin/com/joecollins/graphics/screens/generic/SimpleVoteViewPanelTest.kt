@@ -379,7 +379,7 @@ class SimpleVoteViewPanelTest {
             MONTAGUE-KILMUIR
             
             9 OF 9 POLLS REPORTING, PROJECTION: PC GAIN FROM LIB (CHANGE SINCE 2015)
-            CORY DEAGLE (PC): 1,373 (46.4%, +15.5%) ${"\u2611"}
+            CORY DEAGLE (PC): 1,373 (46.4%, +15.5%) WINNER
             DAPHNE GRIFFIN (LIB): 785 (26.5%, -15.3%)
             JOHN ALLEN MACLEAN (GRN): 675 (22.8%, +18.6%)
             BILLY CANN (NDP): 124 (4.2%, -18.9%)
@@ -616,7 +616,7 @@ class SimpleVoteViewPanelTest {
             UNITED STATES
             
             HOUSE OF REPRESENTATIVES (CHANGE SINCE 2016)
-            DEMOCRAT: 53.4% (+5.4%) ${"\u2611"}
+            DEMOCRAT: 53.4% (+5.4%) WINNER
             REPUBLICAN: 44.8% (-4.3%)
             OTHERS: 1.7% (-1.1%)
             
@@ -674,7 +674,7 @@ class SimpleVoteViewPanelTest {
             TEXAS DISTRICT 27
             
             OFFICIAL RESULT, GOP HOLD (CHANGE SINCE 2016)
-            MICHAEL CLOUD (GOP): 19,856 (54.7%, -1.9%^) ${"\u2611"}
+            MICHAEL CLOUD (GOP): 19,856 (54.7%, -1.9%^) WINNER
             ERIC HOLGUIN (DEM): 11,595 (32.0%, +0.8%^)
             RAUL BARRERA (DEM): 1,747 (4.8%, ^)
             BECH BRUUN (GOP): 1,570 (4.3%, ^)
@@ -723,7 +723,7 @@ class SimpleVoteViewPanelTest {
             FRANCE PRESIDENT: ROUND 2
             
             OFFICIAL RESULT, MACRON WIN
-            EMMANUEL MACRON (LREM): 20,743,128 (66.1%) ${"\u2611"}
+            EMMANUEL MACRON (LREM): 20,743,128 (66.1%) WINNER
             MARINE LE PEN (FN): 10,638,475 (33.9%)
             50% TO WIN
             """.trimIndent()
@@ -903,7 +903,7 @@ class SimpleVoteViewPanelTest {
             UXBRIDGE AND SOUTH RUISLIP
             
             2017 RESULT
-            BORIS JOHNSON (CON): 23,716 (50.8%) ${"\u2611"}
+            BORIS JOHNSON (CON): 23,716 (50.8%) WINNER
             VINCENT LO (LAB): 18,682 (40.0%)
             ROSINA ROBSON (LD): 1,835 (3.9%)
             LIZZY KEMP (UKIP): 1,577 (3.4%)
@@ -935,7 +935,7 @@ class SimpleVoteViewPanelTest {
             UXBRIDGE AND SOUTH RUISLIP
             
             2019 RESULT
-            BORIS JOHNSON (CON): 25,351 (52.6%) ${"\u2611"}
+            BORIS JOHNSON (CON): 25,351 (52.6%) WINNER
             ALI MILANI (LAB): 18,141 (37.6%)
             JOANNE HUMPHREYS (LD): 3,026 (6.3%)
             MARK KEIR (GRN): 1,090 (2.3%)
@@ -967,7 +967,7 @@ class SimpleVoteViewPanelTest {
             UXBRIDGE AND SOUTH RUISLIP
             
             2017 RESULT
-            BORIS JOHNSON (CON): 23,716 (50.8%) ${"\u2611"}
+            BORIS JOHNSON (CON): 23,716 (50.8%) WINNER
             VINCENT LO (LAB): 18,682 (40.0%)
             ROSINA ROBSON (LD): 1,835 (3.9%)
             LIZZY KEMP (UKIP): 1,577 (3.4%)
@@ -1041,7 +1041,7 @@ class SimpleVoteViewPanelTest {
             
             0 OF 9 POLLS REPORTING, WAITING FOR RESULTS... (CHANGE SINCE 2015)
             BILLY CANN (NDP): WAITING...
-            DAPHNE GRIFFIN (LIB): WAITING... ${"\u2611"}
+            DAPHNE GRIFFIN (LIB): WAITING... WINNER
             OTHERS: WAITING...
             
             SWING SINCE 2015: NOT AVAILABLE
@@ -1068,7 +1068,7 @@ class SimpleVoteViewPanelTest {
             MONTAGUE-KILMUIR
             
             9 OF 9 POLLS REPORTING, PROJECTION: PC GAIN FROM LIB (CHANGE SINCE 2015)
-            CORY DEAGLE (PC): 1,373 (46.4%, +15.5%) ${"\u2611"}
+            CORY DEAGLE (PC): 1,373 (46.4%, +15.5%) WINNER
             DAPHNE GRIFFIN (LIB): 785 (26.5%, -15.3%)
             OTHERS: 799 (27.0%, -0.2%)
             
@@ -1142,7 +1142,7 @@ class SimpleVoteViewPanelTest {
             
             0 OF 9 POLLS REPORTING, WAITING FOR RESULTS... (CHANGE SINCE 2015)
             CORY DEAGLE (PC): WAITING...
-            DAPHNE GRIFFIN (LIB): WAITING... ${"\u2611"}
+            DAPHNE GRIFFIN (LIB): WAITING... WINNER
             OTHERS: WAITING...
             
             SWING SINCE 2015: NOT AVAILABLE
@@ -1169,7 +1169,7 @@ class SimpleVoteViewPanelTest {
             MONTAGUE-KILMUIR
             
             9 OF 9 POLLS REPORTING, PROJECTION: PC GAIN FROM LIB (CHANGE SINCE 2015)
-            CORY DEAGLE (PC): 1,373 (46.4%, +15.5%) ${"\u2611"}
+            CORY DEAGLE (PC): 1,373 (46.4%, +15.5%) WINNER
             DAPHNE GRIFFIN (LIB): 785 (26.5%, -15.3%)
             OTHERS: 799 (27.0%, -0.2%)
             
@@ -1222,7 +1222,7 @@ class SimpleVoteViewPanelTest {
             SHIPPAGAN-LAMÈQUE-MISCOU
             
             OFFICIAL RESULT (CHANGE SINCE 2018)
-            ERIC MALLET (LIB): 6,834 (83.8%, +37.7%) ${"\u2611"}
+            ERIC MALLET (LIB): 6,834 (83.8%, +37.7%) WINNER
             JEAN-GÉRARD CHIASSON (PC): 714 (8.8%, -38.5%)
             MARIE LECLERC (GRN): 609 (7.5%, +7.5%)
             OTHERS: - (-6.7%)
@@ -1278,7 +1278,7 @@ class SimpleVoteViewPanelTest {
             SHIPPAGAN-LAMÈQUE-MISCOU
             
             OFFICIAL RESULT (CHANGE SINCE 2018)
-            ERIC MALLET (LIB): 6,834 (83.8%, +37.7%) ${"\u2611"}
+            ERIC MALLET (LIB): 6,834 (83.8%, +37.7%) WINNER
             JEAN-GÉRARD CHIASSON (PC): 714 (8.8%, -38.5%)
             MARIE LECLERC (GRN): 609 (7.5%, +7.5%)
             OTHERS: - (-6.7%)
@@ -1332,7 +1332,7 @@ class SimpleVoteViewPanelTest {
             SHIPPAGAN-LAMÈQUE-MISCOU
             
             OFFICIAL RESULT (CHANGE SINCE 2018)
-            ERIC MALLET (LIB): 6,834 (83.8%, +37.7%) ${"\u2611"}
+            ERIC MALLET (LIB): 6,834 (83.8%, +37.7%) WINNER
             JEAN-GÉRARD CHIASSON (PC): 714 (8.8%, -38.5%)
             OTHERS: 609 (7.5%, +0.7%)
             
@@ -1386,7 +1386,7 @@ class SimpleVoteViewPanelTest {
             SHIPPAGAN-LAMÈQUE-MISCOU
             
             OFFICIAL RESULT (CHANGE SINCE 2018)
-            ERIC MALLET (LIB): 6,834 (83.8%, +37.7%) ${"\u2611"}
+            ERIC MALLET (LIB): 6,834 (83.8%, +37.7%) WINNER
             JEAN-GÉRARD CHIASSON (PC): 714 (8.8%, -38.5%)
             OTHERS: 609 (7.5%, +0.7%)
             
@@ -1430,7 +1430,7 @@ class SimpleVoteViewPanelTest {
             BUCKINGHAM
             
             OFFICIAL RESULT (CHANGE SINCE 2017 NOT APPLICABLE: PREVIOUSLY SPEAKER'S SEAT)
-            GREG SMITH (CON): 37,035 (58.4%) ${"\u2611"}
+            GREG SMITH (CON): 37,035 (58.4%) WINNER
             STEPHEN DORRELL (LD): 16,624 (26.2%)
             DAVID MORGAN (LAB): 7,638 (12.0%)
             ANDREW BELL (BXP): 1,286 (2.0%)
@@ -1451,7 +1451,7 @@ class SimpleVoteViewPanelTest {
             BUCKINGHAM
             
             OFFICIAL RESULT (CHANGE SINCE 2005)
-            GREG SMITH (CON): 37,035 (58.4%, +0.9%) ${"\u2611"}
+            GREG SMITH (CON): 37,035 (58.4%, +0.9%) WINNER
             STEPHEN DORRELL (LD): 16,624 (26.2%, +6.5%)
             DAVID MORGAN (LAB): 7,638 (12.0%, -7.9%)
             ANDREW BELL (BXP): 1,286 (2.0%, +2.0%)
@@ -1590,8 +1590,8 @@ class SimpleVoteViewPanelTest {
             ELECTION 2017: FRANCE DECIDES
             
             FIRST ROUND RESULT
-            EMMANUEL MACRON (EM): 8,656,346 (24.0%) ${"\u2348"}
-            MARINE LE PEN (FN): 7,678,491 (21.3%) ${"\u2348"}
+            EMMANUEL MACRON (EM): 8,656,346 (24.0%) RUNOFF
+            MARINE LE PEN (FN): 7,678,491 (21.3%) RUNOFF
             FRANÇOIS FILLON (LR): 7,212,995 (20.0%)
             JEAN-LUC MÉLENCHON (FI): 7,059,951 (19.6%)
             BENOÎT HAMON (PS): 2,291,288 (6.4%)
@@ -1672,8 +1672,8 @@ class SimpleVoteViewPanelTest {
             ELECTION 2017: FRANCE DECIDES
             
             FIRST ROUND RESULT
-            EMMANUEL MACRON (EM): 8,656,346 (24.0%) ${"\u2348"}
-            MARINE LE PEN (FN): 7,678,491 (21.3%) ${"\u2348"}
+            EMMANUEL MACRON (EM): 8,656,346 (24.0%) RUNOFF
+            MARINE LE PEN (FN): 7,678,491 (21.3%) RUNOFF
             FRANÇOIS FILLON (LR): 7,212,995 (20.0%)
             JEAN-LUC MÉLENCHON (FI): 7,059,951 (19.6%)
             BENOÎT HAMON (PS): 2,291,288 (6.4%)
@@ -2132,7 +2132,7 @@ class SimpleVoteViewPanelTest {
             BEROWRA
             
             PRIMARY VOTE, 100% REPORTING (CHANGE SINCE 2016)
-            JULIAN LEESER (LIB): 53,741 (57.2%, +0.1%) ${"\u2611"}
+            JULIAN LEESER (LIB): 53,741 (57.2%, +0.1%) WINNER
             KATIE GOMPERTZ (ALP): 19,821 (21.1%, +1.2%)
             MONICA TAN (GRN): 11,157 (11.9%, +0.4%)
             SIMON TAYLOR (CDP): 2,163 (2.3%, *)
@@ -2145,7 +2145,7 @@ class SimpleVoteViewPanelTest {
             * CHANGE INCLUDED IN OTHERS
             
             TWO CANDIDATE PREFERRED, 100% REPORTING
-            JULIAN LEESER (LIB): 61,675 (65.6%) ${"\u2611"}
+            JULIAN LEESER (LIB): 61,675 (65.6%) WINNER
             KATIE GOMPERTZ (ALP): 32,272 (34.4%)
             
             SWING SINCE 2016: 0.8% SWING LIB TO ALP
@@ -2684,7 +2684,7 @@ class SimpleVoteViewPanelTest {
             MONTAGUE-KILMUIR
             
             PROVISIONAL RESULTS [9/9], PROJECTION: PC GAIN FROM LIB (CHANGE SINCE 2015)
-            CORY DEAGLE (PC): 1,373 (46.4%, +15.5%) ${"\u2611"}
+            CORY DEAGLE (PC): 1,373 (46.4%, +15.5%) WINNER
             DAPHNE GRIFFIN (LIB): 785 (26.5%, -15.3%)
             JOHN ALLEN MACLEAN (GRN): 675 (22.8%, +18.6%)
             BILLY CANN (NDP): 124 (4.2%, -18.9%)

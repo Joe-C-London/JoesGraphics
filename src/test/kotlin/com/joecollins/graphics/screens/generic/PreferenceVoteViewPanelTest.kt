@@ -74,13 +74,13 @@ class PreferenceVoteViewPanelTest {
             FONG LIM
             
             PRIMARY VOTE, 9 OF 9 POLLS REPORTING (PRIMARY CHANGE SINCE 2016)
-            MARK MONAGHAN (ALP): 1,756 (42.1%, -3.2%) ${"\u2611"}
+            MARK MONAGHAN (ALP): 1,756 (42.1%, -3.2%) WINNER
             KYLIE BONANNI (CLP): 1,488 (35.6%, -0.5%)
             JEFF COLLINS (TA): 497 (11.9%, +3.0%)
             AMYE UN (IND): 434 (10.4%, +0.7%)
             
             TWO CANDIDATE PREFERRED, 9 OF 9 POLLS REPORTING
-            MARK MONAGHAN (ALP): 2,197 (52.6%) ${"\u2611"}
+            MARK MONAGHAN (ALP): 2,197 (52.6%) WINNER
             KYLIE BONANNI (CLP): 1,978 (47.4%)
             
             PREFERENCE SWING SINCE 2016: 5.1% SWING ALP TO CLP
@@ -248,13 +248,13 @@ class PreferenceVoteViewPanelTest {
             FONG LIM
             
             PRIMARY VOTE, 9 OF 9 POLLS REPORTING (PRIMARY CHANGE SINCE 2016)
-            MARK MONAGHAN (ALP): 1,756 (42.1%, -3.2%) ${"\u2611"}
+            MARK MONAGHAN (ALP): 1,756 (42.1%, -3.2%) WINNER
             KYLIE BONANNI (CLP): 1,488 (35.6%, -0.5%)
             JEFF COLLINS (TA): 497 (11.9%, +3.0%)
             AMYE UN (IND): 434 (10.4%, +0.7%)
             
             TWO CANDIDATE PREFERRED, 3 OF 9 POLLS REPORTING
-            MARK MONAGHAN (ALP): 464 (58.3%) ${"\u2611"}
+            MARK MONAGHAN (ALP): 464 (58.3%) WINNER
             KYLIE BONANNI (CLP): 332 (41.7%)
             
             PREFERENCE SWING SINCE 2016: 0.5% SWING CLP TO ALP
@@ -276,13 +276,13 @@ class PreferenceVoteViewPanelTest {
             FONG LIM
             
             PRIMARY VOTE, 9 OF 9 POLLS REPORTING (PRIMARY CHANGE SINCE 2016)
-            MARK MONAGHAN (ALP): 1,756 (42.1%, -3.2%) ${"\u2611"}
+            MARK MONAGHAN (ALP): 1,756 (42.1%, -3.2%) WINNER
             KYLIE BONANNI (CLP): 1,488 (35.6%, -0.5%)
             JEFF COLLINS (TA): 497 (11.9%, +3.0%)
             AMYE UN (IND): 434 (10.4%, +0.7%)
             
             TWO CANDIDATE PREFERRED, 9 OF 9 POLLS REPORTING
-            MARK MONAGHAN (ALP): 2,197 (52.6%) ${"\u2611"}
+            MARK MONAGHAN (ALP): 2,197 (52.6%) WINNER
             KYLIE BONANNI (CLP): 1,978 (47.4%)
             
             PREFERENCE SWING SINCE 2016: 5.1% SWING ALP TO CLP
@@ -454,13 +454,13 @@ class PreferenceVoteViewPanelTest {
             FONG LIM
             
             PRIMARY VOTE [9/9] (PRIMARY CHANGE SINCE 2016)
-            MARK MONAGHAN (ALP): 1,756 (42.1%, -3.2%) ${"\u2611"}
+            MARK MONAGHAN (ALP): 1,756 (42.1%, -3.2%) WINNER
             KYLIE BONANNI (CLP): 1,488 (35.6%, -0.5%)
             JEFF COLLINS (TA): 497 (11.9%, +3.0%)
             AMYE UN (IND): 434 (10.4%, +0.7%)
             
             TWO CANDIDATE PREFERRED [3/9]
-            MARK MONAGHAN (ALP): 464 (58.3%) ${"\u2611"}
+            MARK MONAGHAN (ALP): 464 (58.3%) WINNER
             KYLIE BONANNI (CLP): 332 (41.7%)
             
             PREFERENCE SWING SINCE 2016: 0.5% SWING CLP TO ALP
@@ -482,13 +482,13 @@ class PreferenceVoteViewPanelTest {
             FONG LIM
             
             PRIMARY VOTE [9/9] (PRIMARY CHANGE SINCE 2016)
-            MARK MONAGHAN (ALP): 1,756 (42.1%, -3.2%) ${"\u2611"}
+            MARK MONAGHAN (ALP): 1,756 (42.1%, -3.2%) WINNER
             KYLIE BONANNI (CLP): 1,488 (35.6%, -0.5%)
             JEFF COLLINS (TA): 497 (11.9%, +3.0%)
             AMYE UN (IND): 434 (10.4%, +0.7%)
             
             TWO CANDIDATE PREFERRED [9/9]
-            MARK MONAGHAN (ALP): 2,197 (52.6%) ${"\u2611"}
+            MARK MONAGHAN (ALP): 2,197 (52.6%) WINNER
             KYLIE BONANNI (CLP): 1,978 (47.4%)
             
             PREFERENCE SWING SINCE 2016: 5.1% SWING ALP TO CLP
@@ -666,13 +666,13 @@ class PreferenceVoteViewPanelTest {
             SANDERSON
             
             PRIMARY VOTE, 7 OF 7 POLLS REPORTING (PRIMARY CHANGE SINCE 2016)
-            KATE WORDEN (ALP): 2,632 (59.9%, +7.6%) ${"\u2611"}
+            KATE WORDEN (ALP): 2,632 (59.9%, +7.6%) WINNER
             DEREK MAYGER (CLP): 968 (22.0%, -13.4%)
             AMELIA NUKU (TA): 795 (18.1%, +15.1%)
             OTHERS: - (-9.3%)
             
             TWO CANDIDATE PREFERRED, 7 OF 7 POLLS REPORTING
-            KATE WORDEN (ALP): ELECTED ${"\u2611"}
+            KATE WORDEN (ALP): ELECTED WINNER
             
             PREFERENCE SWING SINCE 2016: NOT AVAILABLE
             """.trimIndent()
@@ -736,14 +736,14 @@ class PreferenceVoteViewPanelTest {
             ARNHEM
             
             PRIMARY VOTE, 7 OF 7 POLLS REPORTING (PRIMARY CHANGE SINCE 2016)
-            SELENA UIBO (ALP): 1,207 (41.3%, -12.8%) ${"\u2611"}
+            SELENA UIBO (ALP): 1,207 (41.3%, -12.8%) WINNER
             IAN MONGUNU GUMBULA (IND): 987 (33.8%, +23.9%^)
             JERRY AMATO (CLP): 487 (16.7%, -11.1%)
             LANCE LAWRENCE (IND): 243 (8.3%, ^)
             ^ AGGREGATED ACROSS CANDIDATES IN PARTY
             
             TWO CANDIDATE PREFERRED, 7 OF 7 POLLS REPORTING
-            SELENA UIBO (ALP): 1,508 (51.6%) ${"\u2611"}
+            SELENA UIBO (ALP): 1,508 (51.6%) WINNER
             IAN MONGUNU GUMBULA (IND): 1,416 (48.4%)
             
             PREFERENCE SWING SINCE 2016: NOT AVAILABLE
@@ -814,13 +814,13 @@ class PreferenceVoteViewPanelTest {
             MELBOURNE
             
             PRIMARY VOTE, 2016 RESULTS (PRIMARY CHANGE SINCE 2013)
-            ADAM BANDT (MP) (GRN): 41,377 (43.7%, +1.1%) ${"\u2611"}
+            ADAM BANDT (MP) (GRN): 41,377 (43.7%, +1.1%) WINNER
             LE LIU (LIB): 23,878 (25.2%, +2.4%)
             SOPHIE ISMAIL (ALP): 23,130 (24.5%, -2.1%)
             OTHERS (IND): 6,194 (6.5%, -1.4%)
             
             TWO CANDIDATE PREFERRED, 2016 RESULTS
-            ADAM BANDT (MP) (GRN): 64,771 (68.5%) ${"\u2611"}
+            ADAM BANDT (MP) (GRN): 64,771 (68.5%) WINNER
             LE LIU (LIB): 29,808 (31.5%)
             
             PREFERENCE SWING SINCE 2013: NOT AVAILABLE

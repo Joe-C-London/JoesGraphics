@@ -16,9 +16,6 @@ import java.text.DecimalFormat
 import java.util.concurrent.Flow
 import javax.swing.JPanel
 
-private const val TICK = "\u2611"
-private const val CROSS = "\u2612"
-
 class SingleTransferrableResultScreen private constructor(
     label: Flow.Publisher<out String?>,
     private val candidateFrame: JPanel,
@@ -136,7 +133,7 @@ class SingleTransferrableResultScreen private constructor(
             val candidateEntries = candidateVotes.merge(quota) { v, q -> v to q }.merge(status) { (votes, q), (el, ex) ->
                 val candidateFunc: (Candidate) -> String = { c -> "${c.name.uppercase()}${if (c.incumbent) " $incumbentMarker" else ""} (${c.party.abbreviation})" }
                 val prevElected = el.filter { !votes.containsKey(it.first) }
-                    .joinToString("\n") { (c, r) -> "${candidateFunc(c)}: ELECTED IN $r $TICK" }
+                    .joinToString("\n") { (c, r) -> "${candidateFunc(c)}: ELECTED IN $r" }
                 val currRound = votes.entries
                     .sortedByDescending { it.value?.toDouble() ?: 0.0 }
                     .joinToString("\n") { (c, v) ->
@@ -146,7 +143,7 @@ class SingleTransferrableResultScreen private constructor(
                         } else {
                             "${if (v is Int) DecimalFormat("#,##0").format(v.toInt()) else DecimalFormat("#,##0.00").format(v.toDouble())}${if (q == null) "" else " (${DecimalFormat("0.00").format(v.toDouble() / q.toDouble())})"}"
                         }
-                        }${if (el.any { it.first == c }) " $TICK" else if (ex.contains(c)) " $CROSS" else ""}"
+                        }${if (el.any { it.first == c }) " ELECTED" else if (ex.contains(c)) " EXCLUDED" else ""}"
                     } +
                     (q?.let { "\nQUOTA: ${if (it is Int) DecimalFormat("#,##0").format(it.toInt()) else DecimalFormat("#,##0.00").format(it.toDouble())}" } ?: "")
                 if (prevElected.isEmpty()) {

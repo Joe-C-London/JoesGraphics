@@ -32,9 +32,6 @@ import kotlin.math.abs
 import kotlin.math.roundToInt
 import kotlin.math.sign
 
-private const val TICK = "\u2611"
-private const val ARROW = "\u2348"
-
 class BasicResultPanel private constructor(
     label: Flow.Publisher<out String?>,
     private val seatFrame: BarFrame,
@@ -404,7 +401,7 @@ class BasicResultPanel private constructor(
                 .merge(showPrevRaw ?: false.asOneTimePublisher()) { text, raw -> if (raw) null else text }
             val prevRaw = (changeHeader ?: null.asOneTimePublisher()).merge((changeSubhead ?: null.asOneTimePublisher()), combineHeadAndSub)
                 .merge(showPrevRaw ?: false.asOneTimePublisher()) { text, raw -> if (raw) text else null }
-            val shapes = (winner ?: null.asOneTimePublisher()).map { if (it == null) emptyMap() else mapOf(it to TICK) }
+            val shapes = (winner ?: null.asOneTimePublisher()).map { if (it == null) emptyMap() else mapOf(it to "WINNER") }
             val barsText = current.merge(diff?.merge(showPrevRaw ?: false.asOneTimePublisher()) { d, raw -> if (raw) emptyMap() else d } ?: emptyMap<KPT, CurrDiff<CT>>().asOneTimePublisher()) { c, d -> c to d }.merge(shapes) { (c, d), s ->
                 val currText = c.keys
                     .sortedByDescending { keyTemplate.toParty(it).overrideSortOrder ?: seatTemplate.sortOrder(c[it]) ?: 0 }
@@ -1886,9 +1883,9 @@ class BasicResultPanel private constructor(
                         val filteredPrev = (if (this.usePrev && !this.showPrevRaw) this.prev else null) ?: emptyMap<KPT, Int>()
 
                         val shapes: Map<KT, String> = if (this.winner != null) {
-                            mapOf(this.winner!! to TICK)
+                            mapOf(this.winner!! to "WINNER")
                         } else if (this.runoff != null) {
-                            this.runoff!!.associateWith { ARROW }
+                            this.runoff!!.associateWith { "RUNOFF" }
                         } else {
                             emptyMap()
                         }
@@ -2077,7 +2074,7 @@ class BasicResultPanel private constructor(
                                     }${
                                     if (total == 0.0 || total == null) "" else " (${PCT_FORMAT.format(it.value!! / total)})"
                                     }${
-                                    if (winner == it.key) " $TICK" else ""
+                                    if (winner == it.key) " WINNER" else ""
                                     }"
                                 }
                     }

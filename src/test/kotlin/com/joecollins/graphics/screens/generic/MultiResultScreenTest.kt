@@ -111,13 +111,13 @@ class MultiResultScreenTest {
             MARIAN WHITE (NDP): 46 (1.4%)
             
             DISTRICT 15, BRACKLEY-HUNTER RIVER
-            DENNIS KING (MLA) (PCP): 1,315 (41.7%) ${"\u2611"}
+            DENNIS KING (MLA) (PCP): 1,315 (41.7%) WINNER
             WINDSOR WIGHT (LIB): 899 (28.5%)
             GREG BRADLEY (GRN): 879 (27.9%)
             LEAH-JANE HAYWARD (NDP): 57 (1.8%)
             
             DISTRICT 17, NEW HAVEN-ROCKY POINT
-            PETER BEVAN-BAKER (MLA) (GRN): 1,870 (53.8%) ${"\u2611"}
+            PETER BEVAN-BAKER (MLA) (GRN): 1,870 (53.8%) WINNER
             KRIS CURRIE (PCP): 1,068 (30.7%)
             JUDY MACNEVIN (LIB): 515 (14.8%)
             DON WILLS (IND): 26 (0.7%)
@@ -393,7 +393,7 @@ class MultiResultScreenTest {
             MARIAN WHITE (NDP): 22 (1.4%)
             
             BRACKLEY-HUNTER RIVER, 5 OF 10 POLLS REPORTING
-            DENNIS KING (MLA) (PCP): 909 (41.8%) ${"\u2611"}
+            DENNIS KING (MLA) (PCP): 909 (41.8%) WINNER
             WINDSOR WIGHT (LIB): 652 (30.0%)
             GREG BRADLEY (GRN): 567 (26.1%)
             LEAH-JANE HAYWARD (NDP): 45 (2.1%)
@@ -789,7 +789,7 @@ class MultiResultScreenTest {
             MARIAN WHITE (NDP): 22 (1.4%)
             
             BRACKLEY-HUNTER RIVER [5/10]
-            DENNIS KING (MLA) (PCP): 909 (41.8%) ${"\u2611"}
+            DENNIS KING (MLA) (PCP): 909 (41.8%) WINNER
             WINDSOR WIGHT (LIB): 652 (30.0%)
             GREG BRADLEY (GRN): 567 (26.1%)
             LEAH-JANE HAYWARD (NDP): 45 (2.1%)
@@ -1010,7 +1010,7 @@ class MultiResultScreenTest {
             SAINT JOHN
             
             DISTRICT 30, SAINT JOHN EAST
-            GLEN SAVOIE (MLA) (PCP): 3,507 (56.4%) ${"\u2611"}
+            GLEN SAVOIE (MLA) (PCP): 3,507 (56.4%) WINNER
             PHIL COMEAU (LIB): 1,639 (26.3%)
             PATRICK KEMP (PA): 434 (7.0%)
             GERALD IRISH (GRN): 394 (6.3%)
@@ -1024,7 +1024,7 @@ class MultiResultScreenTest {
             OTHERS: 347 (6.6%)
             
             DISTRICT 33, SAINT JOHN LANCASTER
-            DOROTHY SHEPHARD (MLA) (PCP): 3,560 (54.2%) ${"\u2611"}
+            DOROTHY SHEPHARD (MLA) (PCP): 3,560 (54.2%) WINNER
             SHARON TEARE (LIB): 1,471 (22.4%)
             JOANNA KILLEN (GRN): 938 (14.3%)
             PAUL SEELYE (PA): 394 (6.0%)
@@ -1330,14 +1330,14 @@ class MultiResultScreenTest {
             ELECTION 2020: NEW BRUNSWICK DECIDES
             
             DISTRICT 30, SAINT JOHN EAST
-            GLEN SAVOIE (MLA) (PCP): 3,507 (56.4%) ${"\u2611"}
+            GLEN SAVOIE (MLA) (PCP): 3,507 (56.4%) WINNER
             PHIL COMEAU (LIB): 1,639 (26.3%)
             PATRICK KEMP (PA): 434 (7.0%)
             GERALD IRISH (GRN): 394 (6.3%)
             JOSH FLOYD (NDP): 248 (4.0%)
             
             DISTRICT 31, PORTLAND-SIMONDS
-            TREVOR HOLDER (MLA) (PCP): 3,170 (55.1%) ${"\u2611"}
+            TREVOR HOLDER (MLA) (PCP): 3,170 (55.1%) WINNER
             TIM JONES (LIB): 1,654 (28.8%)
             STEFAN WARNER (GRN): 483 (8.4%)
             DARELLA JACKSON (PA): 282 (4.9%)
@@ -1351,7 +1351,7 @@ class MultiResultScreenTest {
             OTHERS: 347 (6.6%)
             
             DISTRICT 33, SAINT JOHN LANCASTER
-            DOROTHY SHEPHARD (MLA) (PCP): 3,560 (54.2%) ${"\u2611"}
+            DOROTHY SHEPHARD (MLA) (PCP): 3,560 (54.2%) WINNER
             SHARON TEARE (LIB): 1,471 (22.4%)
             JOANNA KILLEN (GRN): 938 (14.3%)
             PAUL SEELYE (PA): 394 (6.0%)
@@ -1409,13 +1409,13 @@ class MultiResultScreenTest {
             ELECTION 2020: NEW BRUNSWICK DECIDES
             
             DISTRICT 30, SAINT JOHN EAST
-            GLEN SAVOIE (MLA) (PCP): 3,507 (56.4%) ${"\u2611"}
+            GLEN SAVOIE (MLA) (PCP): 3,507 (56.4%) WINNER
             PHIL COMEAU (LIB): 1,639 (26.3%)
             PATRICK KEMP (PA): 434 (7.0%)
             OTHERS: 642 (10.3%)
             
             DISTRICT 31, PORTLAND-SIMONDS
-            TREVOR HOLDER (MLA) (PCP): 3,170 (55.1%) ${"\u2611"}
+            TREVOR HOLDER (MLA) (PCP): 3,170 (55.1%) WINNER
             TIM JONES (LIB): 1,654 (28.8%)
             STEFAN WARNER (GRN): 483 (8.4%)
             OTHERS: 446 (7.8%)
@@ -1427,19 +1427,19 @@ class MultiResultScreenTest {
             OTHERS: 656 (12.5%)
             
             DISTRICT 33, SAINT JOHN LANCASTER
-            DOROTHY SHEPHARD (MLA) (PCP): 3,560 (54.2%) ${"\u2611"}
+            DOROTHY SHEPHARD (MLA) (PCP): 3,560 (54.2%) WINNER
             SHARON TEARE (LIB): 1,471 (22.4%)
             JOANNA KILLEN (GRN): 938 (14.3%)
             OTHERS: 595 (9.1%)
             
             DISTRICT 34, KINGS CENTRE
-            BILL OLIVER (MLA) (PCP): 4,583 (61.5%) ${"\u2611"}
+            BILL OLIVER (MLA) (PCP): 4,583 (61.5%) WINNER
             BRUCE BRYER (GRN): 1,006 (13.5%)
             PAUL ADAMS (LIB): 911 (12.2%)
             OTHERS: 947 (12.7%)
             
             DISTRICT 35, FUNDY-THE ISLES-SAINT JOHN WEST
-            ANDREA ANDERSON-MASON (MLA) (PCP): 4,740 (66.5%) ${"\u2611"}
+            ANDREA ANDERSON-MASON (MLA) (PCP): 4,740 (66.5%) WINNER
             TONY MANN (LIB): 726 (10.2%)
             VINCENT EDGETT (PA): 688 (9.6%)
             OTHERS: 977 (13.7%)
@@ -1458,14 +1458,14 @@ class MultiResultScreenTest {
             ELECTION 2020: NEW BRUNSWICK DECIDES
             
             DISTRICT 34, KINGS CENTRE
-            BILL OLIVER (MLA) (PCP): 4,583 (61.5%) ${"\u2611"}
+            BILL OLIVER (MLA) (PCP): 4,583 (61.5%) WINNER
             BRUCE BRYER (GRN): 1,006 (13.5%)
             PAUL ADAMS (LIB): 911 (12.2%)
             WILLIAM EDGETT (PA): 693 (9.3%)
             MARGARET ANDERSON KILFOIL (NDP): 254 (3.4%)
             
             DISTRICT 35, FUNDY-THE ISLES-SAINT JOHN WEST
-            ANDREA ANDERSON-MASON (MLA) (PCP): 4,740 (66.5%) ${"\u2611"}
+            ANDREA ANDERSON-MASON (MLA) (PCP): 4,740 (66.5%) WINNER
             TONY MANN (LIB): 726 (10.2%)
             VINCENT EDGETT (PA): 688 (9.6%)
             LOIS MITCHELL (GRN): 686 (9.6%)
@@ -1589,14 +1589,14 @@ class MultiResultScreenTest {
             ELECTION 2020: NEW BRUNSWICK DECIDES
             
             DISTRICT 30, SAINT JOHN EAST [100% IN]
-            GLEN SAVOIE (MLA) (PCP): 3,507 (56.4%) ${"\u2611"}
+            GLEN SAVOIE (MLA) (PCP): 3,507 (56.4%) WINNER
             PHIL COMEAU (LIB): 1,639 (26.3%)
             PATRICK KEMP (PA): 434 (7.0%)
             GERALD IRISH (GRN): 394 (6.3%)
             JOSH FLOYD (NDP): 248 (4.0%)
             
             DISTRICT 31, PORTLAND-SIMONDS [100% IN]
-            TREVOR HOLDER (MLA) (PCP): 3,170 (55.1%) ${"\u2611"}
+            TREVOR HOLDER (MLA) (PCP): 3,170 (55.1%) WINNER
             TIM JONES (LIB): 1,654 (28.8%)
             STEFAN WARNER (GRN): 483 (8.4%)
             DARELLA JACKSON (PA): 282 (4.9%)
@@ -1610,7 +1610,7 @@ class MultiResultScreenTest {
             OTHERS: 347 (6.6%)
             
             DISTRICT 33, SAINT JOHN LANCASTER [100% IN]
-            DOROTHY SHEPHARD (MLA) (PCP): 3,560 (54.2%) ${"\u2611"}
+            DOROTHY SHEPHARD (MLA) (PCP): 3,560 (54.2%) WINNER
             SHARON TEARE (LIB): 1,471 (22.4%)
             JOANNA KILLEN (GRN): 938 (14.3%)
             PAUL SEELYE (PA): 394 (6.0%)
@@ -1668,13 +1668,13 @@ class MultiResultScreenTest {
             ELECTION 2020: NEW BRUNSWICK DECIDES
             
             DISTRICT 30, SAINT JOHN EAST [100% IN]
-            GLEN SAVOIE (MLA) (PCP): 3,507 (56.4%) ${"\u2611"}
+            GLEN SAVOIE (MLA) (PCP): 3,507 (56.4%) WINNER
             PHIL COMEAU (LIB): 1,639 (26.3%)
             PATRICK KEMP (PA): 434 (7.0%)
             OTHERS: 642 (10.3%)
             
             DISTRICT 31, PORTLAND-SIMONDS [100% IN]
-            TREVOR HOLDER (MLA) (PCP): 3,170 (55.1%) ${"\u2611"}
+            TREVOR HOLDER (MLA) (PCP): 3,170 (55.1%) WINNER
             TIM JONES (LIB): 1,654 (28.8%)
             STEFAN WARNER (GRN): 483 (8.4%)
             OTHERS: 446 (7.8%)
@@ -1686,19 +1686,19 @@ class MultiResultScreenTest {
             OTHERS: 656 (12.5%)
             
             DISTRICT 33, SAINT JOHN LANCASTER [100% IN]
-            DOROTHY SHEPHARD (MLA) (PCP): 3,560 (54.2%) ${"\u2611"}
+            DOROTHY SHEPHARD (MLA) (PCP): 3,560 (54.2%) WINNER
             SHARON TEARE (LIB): 1,471 (22.4%)
             JOANNA KILLEN (GRN): 938 (14.3%)
             OTHERS: 595 (9.1%)
             
             DISTRICT 34, KINGS CENTRE [100% IN]
-            BILL OLIVER (MLA) (PCP): 4,583 (61.5%) ${"\u2611"}
+            BILL OLIVER (MLA) (PCP): 4,583 (61.5%) WINNER
             BRUCE BRYER (GRN): 1,006 (13.5%)
             PAUL ADAMS (LIB): 911 (12.2%)
             OTHERS: 947 (12.7%)
             
             DISTRICT 35, FUNDY-THE ISLES-SAINT JOHN WEST [100% IN]
-            ANDREA ANDERSON-MASON (MLA) (PCP): 4,740 (66.5%) ${"\u2611"}
+            ANDREA ANDERSON-MASON (MLA) (PCP): 4,740 (66.5%) WINNER
             TONY MANN (LIB): 726 (10.2%)
             VINCENT EDGETT (PA): 688 (9.6%)
             OTHERS: 977 (13.7%)
@@ -1717,14 +1717,14 @@ class MultiResultScreenTest {
             ELECTION 2020: NEW BRUNSWICK DECIDES
             
             DISTRICT 34, KINGS CENTRE [100% IN]
-            BILL OLIVER (MLA) (PCP): 4,583 (61.5%) ${"\u2611"}
+            BILL OLIVER (MLA) (PCP): 4,583 (61.5%) WINNER
             BRUCE BRYER (GRN): 1,006 (13.5%)
             PAUL ADAMS (LIB): 911 (12.2%)
             WILLIAM EDGETT (PA): 693 (9.3%)
             MARGARET ANDERSON KILFOIL (NDP): 254 (3.4%)
             
             DISTRICT 35, FUNDY-THE ISLES-SAINT JOHN WEST [100% IN]
-            ANDREA ANDERSON-MASON (MLA) (PCP): 4,740 (66.5%) ${"\u2611"}
+            ANDREA ANDERSON-MASON (MLA) (PCP): 4,740 (66.5%) WINNER
             TONY MANN (LIB): 726 (10.2%)
             VINCENT EDGETT (PA): 688 (9.6%)
             LOIS MITCHELL (GRN): 686 (9.6%)
@@ -1798,13 +1798,13 @@ class MultiResultScreenTest {
             GEORGIA SENATE
             
             REGULAR ELECTION, CLASS 2
-            DAVID PERDUE (GOP): 2,458,453 (49.7%) ${"\u2348"}
-            JON OSSOFF (DEM): 2,371,921 (48.0%) ${"\u2348"}
+            DAVID PERDUE (GOP): 2,458,453 (49.7%) RUNOFF
+            JON OSSOFF (DEM): 2,371,921 (48.0%) RUNOFF
             SHANE HAZEL (IND): 114,873 (2.3%)
             
             SPECIAL ELECTION, CLASS 3
-            RAPHAEL WARNOCK (DEM): 1,615,550 (32.9%) ${"\u2348"}
-            KELLY LOEFFLER (GOP): 1,271,320 (25.9%) ${"\u2348"}
+            RAPHAEL WARNOCK (DEM): 1,615,550 (32.9%) RUNOFF
+            KELLY LOEFFLER (GOP): 1,271,320 (25.9%) RUNOFF
             DOUG COLLINS (GOP): 979,052 (19.9%)
             DEBORAH JACKSON (DEM): 323,833 (6.6%)
             OTHERS: 718,808 (14.6%)

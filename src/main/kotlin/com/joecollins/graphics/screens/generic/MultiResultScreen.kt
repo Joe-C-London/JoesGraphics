@@ -38,9 +38,6 @@ import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.border.EmptyBorder
 
-private const val TICK = "\u2611"
-private const val ARROW = "\u2348"
-
 class MultiResultScreen private constructor(
     header: Flow.Publisher<out String?>,
     screen: JPanel,
@@ -203,9 +200,9 @@ class MultiResultScreen private constructor(
                                 }
                                 }${
                                 if (c == winner) {
-                                    " $TICK"
+                                    " WINNER"
                                 } else if (runoff?.contains(c) == true) {
-                                    " $ARROW"
+                                    " RUNOFF"
                                 } else {
                                     ""
                                 }

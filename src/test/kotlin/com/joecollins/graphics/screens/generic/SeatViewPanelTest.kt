@@ -1472,7 +1472,7 @@ class SeatViewPanelTest {
             UNITED STATES
             
             PRESIDENT (CHANGE SINCE 2012)
-            DONALD TRUMP (GOP): 306 (+100) ${"\u2611"}
+            DONALD TRUMP (GOP): 306 (+100) WINNER
             HILLARY CLINTON (DEM): 232 (-100)
             270 ELECTORAL VOTES TO WIN
             """.trimIndent()
@@ -1527,7 +1527,7 @@ class SeatViewPanelTest {
             UNITED STATES
             
             PRESIDENT (CHANGE SINCE 2012)
-            DONALD TRUMP (GOP): 276/306 (+84/+100) ${"\u2611"}
+            DONALD TRUMP (GOP): 276/306 (+84/+100) WINNER
             HILLARY CLINTON (DEM): 218/232 (-84/-100)
             270 ELECTORAL VOTES TO WIN
             """.trimIndent()
@@ -1606,7 +1606,7 @@ class SeatViewPanelTest {
             UNITED STATES
             
             HOUSE OF REPRESENTATIVES (CHANGE SINCE 2016)
-            DEMOCRAT: 235 (+41) ${"\u2611"}
+            DEMOCRAT: 235 (+41) WINNER
             REPUBLICAN: 200 (-41)
             218 SEATS FOR MAJORITY
             """.trimIndent()
@@ -1647,7 +1647,7 @@ class SeatViewPanelTest {
             UNITED STATES
             
             HOUSE OF REPRESENTATIVES (CHANGE SINCE 2016)
-            DEMOCRAT: 224/235 (+31/+41) ${"\u2611"}
+            DEMOCRAT: 224/235 (+31/+41) WINNER
             REPUBLICAN: 192/200 (-31/-41)
             218 SEATS FOR MAJORITY
             """.trimIndent()

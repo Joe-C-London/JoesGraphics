@@ -572,7 +572,7 @@ class SingleTransferrableResultScreenTest {
             BELFAST EAST
             
             COUNT 1, 1 OF 5 SEATS ELECTED
-            NAOMI LONG [MLA] (APNI): 7,610 (1.13) ${"\u2611"}
+            NAOMI LONG [MLA] (APNI): 7,610 (1.13) ELECTED
             JOANNE BUNTING [MLA] (DUP): 6,007 (0.89)
             ANDY ALLEN [MLA] (UUP): 5,275 (0.78)
             CHRIS LYTTLE [MLA] (APNI): 5,059 (0.75)
@@ -634,7 +634,7 @@ class SingleTransferrableResultScreenTest {
             BELFAST EAST
             
             COUNT 2, 1 OF 5 SEATS ELECTED
-            NAOMI LONG [MLA] (APNI): ELECTED IN 1 ${"\u2611"}
+            NAOMI LONG [MLA] (APNI): ELECTED IN 1
             JOANNE BUNTING [MLA] (DUP): 6,016.02 (0.89)
             CHRIS LYTTLE [MLA] (APNI): 5,760.03 (0.86)
             ANDY ALLEN [MLA] (UUP): 5,313.17 (0.79)
@@ -647,7 +647,7 @@ class SingleTransferrableResultScreenTest {
             COURTNEY ROBINSON (LAB-ALT): 449.48 (0.07)
             SHEILA BODEL (CON): 276.32 (0.04)
             SÉAMUS DE FAOITE (SDLP): 260.45 (0.04)
-            JORDY MCKEAG (IND): 85.43 (0.01) ${"\u2612"}
+            JORDY MCKEAG (IND): 85.43 (0.01) EXCLUDED
             QUOTA: 6,727
             
             TOTAL QUOTAS BY PARTY
@@ -695,7 +695,7 @@ class SingleTransferrableResultScreenTest {
             BELFAST EAST
             
             COUNT 3, 1 OF 5 SEATS ELECTED
-            NAOMI LONG [MLA] (APNI): ELECTED IN 1 ${"\u2611"}
+            NAOMI LONG [MLA] (APNI): ELECTED IN 1
             JOANNE BUNTING [MLA] (DUP): 6,021.02 (0.90)
             CHRIS LYTTLE [MLA] (APNI): 5,780.25 (0.86)
             ANDY ALLEN [MLA] (UUP): 5,323.39 (0.79)
@@ -707,7 +707,7 @@ class SingleTransferrableResultScreenTest {
             ANDREW GIRVIN (TUV): 920.65 (0.14)
             COURTNEY ROBINSON (LAB-ALT): 456.48 (0.07)
             SHEILA BODEL (CON): 278.43 (0.04)
-            SÉAMUS DE FAOITE (SDLP): 260.56 (0.04) ${"\u2612"}
+            SÉAMUS DE FAOITE (SDLP): 260.56 (0.04) EXCLUDED
             QUOTA: 6,727
             
             TOTAL QUOTAS BY PARTY
@@ -753,7 +753,7 @@ class SingleTransferrableResultScreenTest {
             BELFAST EAST
             
             COUNT 4, 1 OF 5 SEATS ELECTED
-            NAOMI LONG [MLA] (APNI): ELECTED IN 1 ${"\u2611"}
+            NAOMI LONG [MLA] (APNI): ELECTED IN 1
             JOANNE BUNTING [MLA] (DUP): 6,026.13 (0.90)
             CHRIS LYTTLE [MLA] (APNI): 5,885.86 (0.87)
             ANDY ALLEN [MLA] (UUP): 5,356.60 (0.80)
@@ -763,8 +763,8 @@ class SingleTransferrableResultScreenTest {
             GEORGINA MILNE (GRN): 1,539.49 (0.23)
             MAIRÉAD O'DONNELL (SF): 1,216.66 (0.18)
             ANDREW GIRVIN (TUV): 924.76 (0.14)
-            COURTNEY ROBINSON (LAB-ALT): 467.81 (0.07) ${"\u2612"}
-            SHEILA BODEL (CON): 280.43 (0.04) ${"\u2612"}
+            COURTNEY ROBINSON (LAB-ALT): 467.81 (0.07) EXCLUDED
+            SHEILA BODEL (CON): 280.43 (0.04) EXCLUDED
             QUOTA: 6,727
             
             TOTAL QUOTAS BY PARTY
@@ -807,7 +807,7 @@ class SingleTransferrableResultScreenTest {
             BELFAST EAST
             
             COUNT 5, 1 OF 5 SEATS ELECTED
-            NAOMI LONG [MLA] (APNI): ELECTED IN 1 ${"\u2611"}
+            NAOMI LONG [MLA] (APNI): ELECTED IN 1
             JOANNE BUNTING [MLA] (DUP): 6,057.35 (0.90)
             CHRIS LYTTLE [MLA] (APNI): 6,032.81 (0.90)
             ANDY ALLEN [MLA] (UUP): 5,498.59 (0.82)
@@ -816,7 +816,7 @@ class SingleTransferrableResultScreenTest {
             JOHN KYLE (PUP): 2,751.95 (0.41)
             GEORGINA MILNE (GRN): 1,763.36 (0.26)
             MAIRÉAD O'DONNELL (SF): 1,232.88 (0.18)
-            ANDREW GIRVIN (TUV): 958.87 (0.14) ${"\u2612"}
+            ANDREW GIRVIN (TUV): 958.87 (0.14) EXCLUDED
             QUOTA: 6,727
             
             TOTAL QUOTAS BY PARTY
@@ -856,7 +856,7 @@ class SingleTransferrableResultScreenTest {
             BELFAST EAST
             
             COUNT 6, 1 OF 5 SEATS ELECTED
-            NAOMI LONG [MLA] (APNI): ELECTED IN 1 ${"\u2611"}
+            NAOMI LONG [MLA] (APNI): ELECTED IN 1
             JOANNE BUNTING [MLA] (DUP): 6,217.46 (0.92)
             CHRIS LYTTLE [MLA] (APNI): 6,072.14 (0.90)
             ANDY ALLEN [MLA] (UUP): 5,767.92 (0.86)
@@ -864,7 +864,7 @@ class SingleTransferrableResultScreenTest {
             DAVID DOUGLAS (DUP): 4,568.40 (0.68)
             JOHN KYLE (PUP): 2,936.28 (0.44)
             GEORGINA MILNE (GRN): 1,801.58 (0.27)
-            MAIRÉAD O'DONNELL (SF): 1,235.10 (0.18) ${"\u2612"}
+            MAIRÉAD O'DONNELL (SF): 1,235.10 (0.18) EXCLUDED
             QUOTA: 6,727
             
             TOTAL QUOTAS BY PARTY
@@ -902,14 +902,14 @@ class SingleTransferrableResultScreenTest {
             BELFAST EAST
             
             COUNT 7, 1 OF 5 SEATS ELECTED
-            NAOMI LONG [MLA] (APNI): ELECTED IN 1 ${"\u2611"}
+            NAOMI LONG [MLA] (APNI): ELECTED IN 1
             CHRIS LYTTLE [MLA] (APNI): 6,367.87 (0.95)
             JOANNE BUNTING [MLA] (DUP): 6,228.46 (0.93)
             ANDY ALLEN [MLA] (UUP): 5,783.14 (0.86)
             ROBIN NEWTON [MLA] (DUP): 4,865.61 (0.72)
             DAVID DOUGLAS (DUP): 4,572.40 (0.68)
             JOHN KYLE (PUP): 2,950.28 (0.44)
-            GEORGINA MILNE (GRN): 2,080.65 (0.31) ${"\u2612"}
+            GEORGINA MILNE (GRN): 2,080.65 (0.31) EXCLUDED
             QUOTA: 6,727
             
             TOTAL QUOTAS BY PARTY
@@ -947,13 +947,13 @@ class SingleTransferrableResultScreenTest {
             BELFAST EAST
             
             COUNT 8, 2 OF 5 SEATS ELECTED
-            NAOMI LONG [MLA] (APNI): ELECTED IN 1 ${"\u2611"}
-            CHRIS LYTTLE [MLA] (APNI): 7,268.87 (1.08) ${"\u2611"}
+            NAOMI LONG [MLA] (APNI): ELECTED IN 1
+            CHRIS LYTTLE [MLA] (APNI): 7,268.87 (1.08) ELECTED
             JOANNE BUNTING [MLA] (DUP): 6,275.01 (0.93)
             ANDY ALLEN [MLA] (UUP): 6,048.62 (0.90)
             ROBIN NEWTON [MLA] (DUP): 4,890.72 (0.73)
             DAVID DOUGLAS (DUP): 4,599.73 (0.68)
-            JOHN KYLE (PUP): 3,148.79 (0.47) ${"\u2612"}
+            JOHN KYLE (PUP): 3,148.79 (0.47) EXCLUDED
             QUOTA: 6,727
             
             TOTAL QUOTAS BY PARTY
@@ -988,10 +988,10 @@ class SingleTransferrableResultScreenTest {
             BELFAST EAST
             
             COUNT 9, 4 OF 5 SEATS ELECTED
-            NAOMI LONG [MLA] (APNI): ELECTED IN 1 ${"\u2611"}
-            CHRIS LYTTLE [MLA] (APNI): ELECTED IN 8 ${"\u2611"}
-            ANDY ALLEN [MLA] (UUP): 7,257.62 (1.08) ${"\u2611"}
-            JOANNE BUNTING [MLA] (DUP): 6,759.01 (1.00) ${"\u2611"}
+            NAOMI LONG [MLA] (APNI): ELECTED IN 1
+            CHRIS LYTTLE [MLA] (APNI): ELECTED IN 8
+            ANDY ALLEN [MLA] (UUP): 7,257.62 (1.08) ELECTED
+            JOANNE BUNTING [MLA] (DUP): 6,759.01 (1.00) ELECTED
             ROBIN NEWTON [MLA] (DUP): 5,268.26 (0.78)
             DAVID DOUGLAS (DUP): 4,995.25 (0.74)
             QUOTA: 6,727
@@ -1024,10 +1024,10 @@ class SingleTransferrableResultScreenTest {
             BELFAST EAST
             
             COUNT 10, 4 OF 5 SEATS ELECTED
-            NAOMI LONG [MLA] (APNI): ELECTED IN 1 ${"\u2611"}
-            CHRIS LYTTLE [MLA] (APNI): ELECTED IN 8 ${"\u2611"}
-            ANDY ALLEN [MLA] (UUP): ELECTED IN 9 ${"\u2611"}
-            JOANNE BUNTING [MLA] (DUP): ELECTED IN 9 ${"\u2611"}
+            NAOMI LONG [MLA] (APNI): ELECTED IN 1
+            CHRIS LYTTLE [MLA] (APNI): ELECTED IN 8
+            ANDY ALLEN [MLA] (UUP): ELECTED IN 9
+            JOANNE BUNTING [MLA] (DUP): ELECTED IN 9
             ROBIN NEWTON [MLA] (DUP): 5,333.26 (0.79)
             DAVID DOUGLAS (DUP): 5,093.25 (0.76)
             QUOTA: 6,727
@@ -1061,12 +1061,12 @@ class SingleTransferrableResultScreenTest {
             BELFAST EAST
             
             COUNT 11, 5 OF 5 SEATS ELECTED
-            NAOMI LONG [MLA] (APNI): ELECTED IN 1 ${"\u2611"}
-            CHRIS LYTTLE [MLA] (APNI): ELECTED IN 8 ${"\u2611"}
-            ANDY ALLEN [MLA] (UUP): ELECTED IN 9 ${"\u2611"}
-            JOANNE BUNTING [MLA] (DUP): ELECTED IN 9 ${"\u2611"}
-            ROBIN NEWTON [MLA] (DUP): 5,541.65 (0.82) ${"\u2611"}
-            DAVID DOUGLAS (DUP): 5,410.84 (0.80) ${"\u2612"}
+            NAOMI LONG [MLA] (APNI): ELECTED IN 1
+            CHRIS LYTTLE [MLA] (APNI): ELECTED IN 8
+            ANDY ALLEN [MLA] (UUP): ELECTED IN 9
+            JOANNE BUNTING [MLA] (DUP): ELECTED IN 9
+            ROBIN NEWTON [MLA] (DUP): 5,541.65 (0.82) ELECTED
+            DAVID DOUGLAS (DUP): 5,410.84 (0.80) EXCLUDED
             QUOTA: 6,727
             
             TOTAL QUOTAS BY PARTY
