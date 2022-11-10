@@ -196,31 +196,35 @@ open class GraphicsFrame(
             val mainWidth = headerLabel.preferredSize.width
             val rightWidth = additionalHeaderPanels[HeaderLabelLocation.RIGHT]!!.let { if (it.isVisible) it.preferredSize.width else 0 }
             val leftWidth = additionalHeaderPanels[HeaderLabelLocation.LEFT]!!.let { if (it.isVisible) it.preferredSize.width else 0 }
-            val ratio = when (alignment) {
-                Alignment.CENTER -> 2 * max(leftWidth, rightWidth)
-                else -> leftWidth + rightWidth
-            }.let { sides -> (parent.width.toDouble() / (mainWidth + sides).coerceAtLeast(1)).coerceAtMost(1.0) }
-            headerLabel.location = Point(
-                when (alignment) {
-                    Alignment.CENTER -> (max(leftWidth, rightWidth) * ratio).roundToInt()
-                    else -> (leftWidth * ratio).roundToInt()
-                },
-                0
-            )
-            headerLabel.size = Dimension(
-                parent.width - when (alignment) {
-                    Alignment.CENTER -> 2 * (max(leftWidth, rightWidth) * ratio).roundToInt()
-                    else -> (leftWidth * ratio).roundToInt() + (rightWidth * ratio).roundToInt()
-                },
-                parent.height
-            )
+
+            val ratio = (parent.width.toDouble() / (mainWidth + leftWidth + rightWidth).coerceAtLeast(1)).coerceAtMost(1.0)
+
+            val leftWidthFinal = (leftWidth * ratio).roundToInt()
+            val rightWidthFinal = (rightWidth * ratio).roundToInt()
+            val mainWidthFinal = when (alignment) {
+                Alignment.CENTER -> when {
+                    mainWidth + 2 * max(leftWidth, rightWidth) < parent.width -> parent.width - 2 * (max(leftWidth, rightWidth) * ratio).roundToInt()
+                    else -> (mainWidth * ratio).roundToInt()
+                }
+                else -> parent.width - (leftWidthFinal + rightWidthFinal)
+            }
+            val mainLeftFinal = when (alignment) {
+                Alignment.CENTER -> when {
+                    mainWidth + 2 * max(leftWidth, rightWidth) < parent.width -> (max(leftWidth, rightWidth) * ratio).roundToInt()
+                    else -> (max(leftWidth, parent.width - mainWidth - rightWidth) * ratio).roundToInt()
+                }
+                else -> leftWidthFinal
+            }
+
+            headerLabel.location = Point(mainLeftFinal, 0)
+            headerLabel.size = Dimension(mainWidthFinal, parent.height)
             additionalHeaderPanels[HeaderLabelLocation.RIGHT]!!.also { panel ->
-                panel.location = Point(parent.width - (rightWidth * ratio).roundToInt(), 0)
-                panel.size = Dimension((rightWidth * ratio).roundToInt(), parent.height)
+                panel.location = Point(parent.width - rightWidthFinal, 0)
+                panel.size = Dimension(rightWidthFinal, parent.height)
             }
             additionalHeaderPanels[HeaderLabelLocation.LEFT]!!.also { panel ->
                 panel.location = Point(0, 0)
-                panel.size = Dimension((leftWidth * ratio).roundToInt(), parent.height)
+                panel.size = Dimension(leftWidthFinal, parent.height)
             }
         }
     }

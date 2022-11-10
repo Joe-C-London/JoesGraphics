@@ -137,7 +137,7 @@ class MultiResultScreen private constructor(
                             it.key == selected -> {
                                 Pair(it.value, leader.map { it.color })
                             }
-                            focus == null || focus.isEmpty() || focus.contains(it.key) -> {
+                            focus.isNullOrEmpty() || focus.contains(it.key) -> {
                                 Pair(
                                     it.value,
                                     Color.LIGHT_GRAY.asOneTimePublisher()
