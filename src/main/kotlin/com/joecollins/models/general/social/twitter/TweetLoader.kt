@@ -1,4 +1,4 @@
-package com.joecollins.models.general.twitter
+package com.joecollins.models.general.social.twitter
 
 import com.twitter.clientlib.api.TwitterApi
 import com.twitter.clientlib.model.TweetReferencedTweets

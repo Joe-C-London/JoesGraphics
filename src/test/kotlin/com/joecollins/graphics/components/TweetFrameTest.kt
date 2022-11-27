@@ -1,7 +1,7 @@
 package com.joecollins.graphics.components
 
 import com.joecollins.graphics.utils.RenderTestUtils
-import com.joecollins.models.general.twitter.TweetLoader
+import com.joecollins.models.general.social.twitter.TweetLoader
 import com.joecollins.pubsub.asOneTimePublisher
 import com.twitter.clientlib.api.TweetsApi
 import com.twitter.clientlib.api.TweetsApi.APIfindTweetByIdRequest

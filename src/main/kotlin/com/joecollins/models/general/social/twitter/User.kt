@@ -1,14 +1,14 @@
-package com.joecollins.models.general.twitter
+package com.joecollins.models.general.social.twitter
 
 import java.net.URL
 
 class User(
-    val screenName: String,
-    val name: String,
-    val profileImageURL: URL,
-    val isVerified: Boolean,
-    val isProtected: Boolean
-) {
+    override val screenName: String,
+    override val name: String,
+    override val profileImageURL: URL,
+    override val isVerified: Boolean,
+    override val isProtected: Boolean
+) : com.joecollins.models.general.social.generic.User {
 
     companion object {
         fun fromV1(user: twitter4j.User): User {

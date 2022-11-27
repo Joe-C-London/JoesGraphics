@@ -1,19 +1,23 @@
-package com.joecollins.models.general.twitter
+package com.joecollins.models.general.social.twitter
 
+import com.joecollins.models.general.social.generic.Post
 import com.twitter.clientlib.model.Photo
+import java.net.URL
 import java.time.Instant
 
 class Tweet(
-    val id: Long,
-    val text: String,
-    val user: User,
-    val createdAt: Instant,
-    val quotedTweet: Tweet?,
-    val links: List<Link>,
-    val mediaEntities: List<Media>,
-    val hashtagEntities: List<Hashtag>,
-    val userMentionEntities: List<UserMention>
-) {
+    override val id: Long,
+    override val text: String,
+    override val user: User,
+    override val createdAt: Instant,
+    override val quoted: Tweet?,
+    override val links: List<Link>,
+    override val mediaEntities: List<Media>,
+    override val hashtagEntities: List<Hashtag>,
+    override val userMentionEntities: List<UserMention>
+) : Post {
+
+    override val url: URL = URL("https://twitter.com/${user.screenName}/status/$id")
 
     companion object {
         fun fromV1(status: twitter4j.Status): Tweet {

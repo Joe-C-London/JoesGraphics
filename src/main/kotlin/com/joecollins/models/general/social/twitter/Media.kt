@@ -1,8 +1,11 @@
-package com.joecollins.models.general.twitter
+package com.joecollins.models.general.social.twitter
 
 import java.net.URL
 
-class Media(val mediaURL: URL, val displayURL: String) {
+class Media(
+    override val mediaURL: URL,
+    override val displayURL: String
+) : com.joecollins.models.general.social.generic.Media {
 
     companion object {
         fun fromV1(mediaEntity: twitter4j.MediaEntity): Media {

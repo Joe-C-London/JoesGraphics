@@ -1,4 +1,4 @@
-package com.joecollins.models.general.twitter
+package com.joecollins.models.general.social.twitter
 
 import io.webfolder.cdp.Launcher
 import java.awt.Image
@@ -6,13 +6,15 @@ import java.net.URL
 import javax.imageio.ImageIO
 
 class Link(
-    val shortURL: URL,
-    val expandedURL: URL,
-    val displayURL: String,
-    val image: Image?,
-    val title: String,
-    val domain: String
-) {
+    override val shortURL: URL,
+    override val expandedURL: URL,
+    override val displayURL: String,
+    override val image: Image?,
+    override val title: String,
+    override val domain: String
+) : com.joecollins.models.general.social.generic.Link {
+
+    override val isFromSocialNetwork: Boolean = expandedURL.toString().startsWith("https://twitter.com/")
 
     companion object {
         fun fromV1(urlEntity: twitter4j.URLEntity): Link {

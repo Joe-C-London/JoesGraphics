@@ -1,4 +1,4 @@
-package com.joecollins.models.general.twitter
+package com.joecollins.models.general.social.twitter
 
 import com.github.scribejava.core.model.OAuth2AccessToken
 import com.github.scribejava.core.model.OAuth2AccessTokenErrorResponse
@@ -31,7 +31,7 @@ object TwitterV2InstanceFactory {
     val instance: TwitterApi
 
     init {
-        this.instance = createInstance(false)
+        instance = createInstance(false)
     }
 
     private fun createInstance(isRetry: Boolean): TwitterApi {

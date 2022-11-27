@@ -1,6 +1,6 @@
 package com.joecollins.graphics.dialogs
 
-import com.joecollins.models.general.twitter.TwitterV2InstanceFactory
+import com.joecollins.models.general.social.twitter.TwitterV2InstanceFactory
 import com.twitter.clientlib.model.TweetCreateRequest
 import com.twitter.clientlib.model.TweetCreateRequestMedia
 import twitter4j.HttpClientFactory
