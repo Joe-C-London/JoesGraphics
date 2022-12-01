@@ -4,7 +4,6 @@ import java.net.URL
 import java.time.Instant
 
 interface Post {
-    val id: Long
     val text: String
     val user: User
     val createdAt: Instant

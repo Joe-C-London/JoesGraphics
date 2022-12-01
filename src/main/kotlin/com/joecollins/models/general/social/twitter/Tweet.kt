@@ -6,7 +6,7 @@ import java.net.URL
 import java.time.Instant
 
 class Tweet(
-    override val id: Long,
+    id: Long,
     override val text: String,
     override val user: User,
     override val createdAt: Instant,

@@ -241,7 +241,7 @@ class SwingometerScreen private constructor(title: Flow.Publisher<out String?>, 
             return this
         }
 
-        fun withProgressLabel(progressLabelPublisher: Flow.Publisher<String?>): Builder<T> {
+        fun withProgressLabel(progressLabelPublisher: Flow.Publisher<out String?>): Builder<T> {
             this.progressLabel = progressLabelPublisher
             return this
         }
