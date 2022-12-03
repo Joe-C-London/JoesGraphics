@@ -4,11 +4,11 @@ class UserMention(override val text: String) : com.joecollins.models.general.soc
 
     companion object {
         fun fromV1(userMention: twitter4j.UserMentionEntity): UserMention {
-            return UserMention(userMention.text)
+            return UserMention("@${userMention.text}")
         }
 
         fun fromV2(userMention: com.twitter.clientlib.model.MentionEntity): UserMention {
-            return UserMention(userMention.username)
+            return UserMention("@${userMention.username}")
         }
     }
 }

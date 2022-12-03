@@ -4,5 +4,5 @@ import java.net.URL
 
 interface Media {
     val mediaURL: URL
-    val displayURL: String
+    val displayURL: String?
 }

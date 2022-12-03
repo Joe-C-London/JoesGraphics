@@ -7,7 +7,7 @@ import java.awt.Color
 import java.time.ZoneId
 import java.util.concurrent.Flow
 
-class TweetFrame(tweet: Flow.Publisher<out Tweet>, private val timezone: ZoneId = ZoneId.systemDefault()) : SocialMediaFrame(tweet, timezone) {
+class TweetFrame internal constructor(tweet: Flow.Publisher<out Tweet>, timezone: ZoneId = ZoneId.systemDefault()) : SocialMediaFrame<Tweet>(tweet, timezone) {
     override val color
         get() = Color(0x00acee)
 

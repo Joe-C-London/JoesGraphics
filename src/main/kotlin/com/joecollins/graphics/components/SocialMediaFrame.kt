@@ -38,7 +38,7 @@ import kotlin.math.min
 import kotlin.math.roundToInt
 import kotlin.math.sqrt
 
-abstract class SocialMediaFrame(post: Flow.Publisher<out Post>, private val timezone: ZoneId = ZoneId.systemDefault()) : JPanel() {
+abstract class SocialMediaFrame<P : Post<P>>(post: Flow.Publisher<out Post<P>>, private val timezone: ZoneId = ZoneId.systemDefault()) : JPanel() {
 
     abstract val color: Color
     abstract val emojiVersion: String
@@ -148,7 +148,7 @@ abstract class SocialMediaFrame(post: Flow.Publisher<out Post>, private val time
         add(timeLabel, BorderLayout.SOUTH)
     }
 
-    private fun formatText(status: Post, isQuoted: Boolean, postLabel: JLabel): String {
+    private fun formatText(status: Post<P>, isQuoted: Boolean, postLabel: JLabel): String {
         val colorHex = (color.rgb.and(0xffffff)).toString(16)
         val quotedURL = status.quoted?.url?.toString()
         if (status.user.isProtected) {
@@ -168,16 +168,16 @@ abstract class SocialMediaFrame(post: Flow.Publisher<out Post>, private val time
             htmlText = htmlText.replace("#${it.text}", "<span style='color:#$colorHex'>#${it.text}</span>")
         }
         status.userMentionEntities.filter { !status.user.isProtected }.forEach {
-            htmlText = htmlText.replace("@${it.text}", "<span style='color:#$colorHex'>@${it.text}</span>")
+            htmlText = htmlText.replace(it.text, "<span style='color:#$colorHex'>${it.display}</span>")
         }
         status.links.filter { !status.user.isProtected }.filter { isQuoted || !it.isFromSocialNetwork }.forEach {
-            htmlText = htmlText.replace(it.shortURL.toString(), if (!isQuoted && it.expandedURL.toString() == quotedURL) "" else "<span style='color:#$colorHex'>${it.displayURL}(${it.shortURL})</span>")
+            htmlText = htmlText.replace(it.shortURL.toString(), if (!isQuoted && it.expandedURL.toString() == quotedURL) "" else "<span style='color:#$colorHex'>${it.displayURL}${if (it.displayURL == it.shortURL.toString()) "" else "(${it.shortURL})"}</span>")
         }
         status.links.filter { !status.user.isProtected }.filter { !isQuoted && it.isFromSocialNetwork }.forEach {
             htmlText = htmlText.replace(it.shortURL.toString(), "")
         }
-        status.mediaEntities.filter { !status.user.isProtected }.forEach {
-            htmlText = htmlText.replace(it.displayURL, "")
+        status.mediaEntities.filter { !status.user.isProtected }.filter { it.displayURL != null }.forEach {
+            htmlText = htmlText.replace(it.displayURL!!, "")
         }
         return "<html><body width=${postLabel.width}>$htmlText<br/>&nbsp;</body></html>"
     }
@@ -236,7 +236,7 @@ abstract class SocialMediaFrame(post: Flow.Publisher<out Post>, private val time
             g.font = fullNameFont
             g.drawString(fullName, 55, 22)
             g.font = screenNameFont
-            g.drawString("@$screenName", 55, 42)
+            g.drawString(screenName, 55, 42)
             if (verified) {
                 val transform = AffineTransform()
                 transform.translate(65.0 + g.getFontMetrics(fullNameFont).stringWidth(fullName), 4.0)
@@ -329,7 +329,7 @@ abstract class SocialMediaFrame(post: Flow.Publisher<out Post>, private val time
         }
     }
 
-    private inner class QuotedPanel(quotedStatus: Post) : JPanel() {
+    private inner class QuotedPanel(quotedStatus: Post<P>) : JPanel() {
         init {
             border = MatteBorder(1, 1, 1, 1, color)
             background = Color.WHITE
@@ -416,7 +416,7 @@ abstract class SocialMediaFrame(post: Flow.Publisher<out Post>, private val time
                 }
 
                 g.font = StandardFont.readNormalFont(14)
-                g.drawString("@${user.screenName}", x, 18)
+                g.drawString(user.screenName, x, 18)
             }
         }
     }

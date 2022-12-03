@@ -15,7 +15,7 @@ class Tweet(
     override val mediaEntities: List<Media>,
     override val hashtagEntities: List<Hashtag>,
     override val userMentionEntities: List<UserMention>
-) : Post {
+) : Post<Tweet> {
 
     override val url: URL = URL("https://twitter.com/${user.screenName}/status/$id")
 
