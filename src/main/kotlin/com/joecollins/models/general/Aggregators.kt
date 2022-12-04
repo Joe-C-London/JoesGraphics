@@ -87,8 +87,14 @@ object Aggregators {
     fun <K1, K2> adjustKey(result: Flow.Publisher<out Map<out K1, Int>>, func: (K1) -> K2) = result.map { adjustKey(it, func) }
 
     fun <K1, K2> adjustKey(result: Map<K1, Int>, func: (K1) -> K2): Map<K2, Int> {
-        val ret: LinkedHashMap<K2, Int> = LinkedHashMap()
-        result.forEach { (k, v) -> ret.merge(func(k), v) { a, b -> a + b } }
+        return adjustKey(result, func) { a, b -> a + b }
+    }
+
+    fun <K1, K2, V : Any> adjustKey(result: Flow.Publisher<out Map<out K1, V>>, keyFunc: (K1) -> K2, valueMergeFunc: (V, V) -> V): Flow.Publisher<Map<K2, V>> = result.map { adjustKey(it, keyFunc, valueMergeFunc) }
+
+    fun <K1, K2, V : Any> adjustKey(result: Map<K1, V>, keyFunc: (K1) -> K2, valueMergeFunc: (V, V) -> V): Map<K2, V> {
+        val ret: LinkedHashMap<K2, V> = LinkedHashMap()
+        result.forEach { (k, v) -> ret.merge(keyFunc(k), v, valueMergeFunc) }
         return ret
     }
 

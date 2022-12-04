@@ -114,7 +114,7 @@ class BasicResultPanel private constructor(
         }
     }
 
-    interface SeatTemplate<CT, PT> {
+    interface SeatTemplate<CT, PT, BAR> {
         fun sortOrder(value: CT?): Int?
 
         fun prevSortOrder(value: PT?): Int?
@@ -125,9 +125,17 @@ class BasicResultPanel private constructor(
         fun diffLabelText(value: CT): String
 
         fun prevLabelText(value: PT): String
+
+        fun combine(value1: CT, value2: CT): CT
+
+        fun createBar(keyLabel: String, baseColor: Color, value: CT, shape: Shape?): BAR
+
+        fun createPrevBar(keyLabel: String, baseColor: Color, value: PT): BAR
+
+        fun createDiffBar(keyLabel: String, baseColor: Color, diff: CT): BAR
     }
 
-    private class SingleSeatTemplate : SeatTemplate<Int, Int> {
+    private class SingleSeatTemplate : SeatTemplate<Int, Int, BasicBar> {
         override fun sortOrder(value: Int?): Int? = value
 
         override fun prevSortOrder(value: Int?): Int? = value
@@ -145,9 +153,41 @@ class BasicResultPanel private constructor(
         }
 
         override fun prevLabelText(value: Int): String = value.toString()
+
+        override fun combine(value1: Int, value2: Int): Int {
+            return value1 + value2
+        }
+
+        override fun createBar(keyLabel: String, baseColor: Color, value: Int, shape: Shape?): BasicBar {
+            return BasicBar(
+                keyLabel,
+                baseColor,
+                value,
+                labelText(value),
+                shape
+            )
+        }
+
+        override fun createPrevBar(keyLabel: String, baseColor: Color, value: Int): BasicBar {
+            return BasicBar(
+                keyLabel,
+                baseColor,
+                value,
+                prevLabelText(value)
+            )
+        }
+
+        override fun createDiffBar(keyLabel: String, baseColor: Color, diff: Int): BasicBar {
+            return BasicBar(
+                keyLabel,
+                baseColor,
+                diff,
+                diffLabelText(diff)
+            )
+        }
     }
 
-    private class DualSeatTemplate : SeatTemplate<Pair<Int, Int>, Pair<Int, Int>> {
+    private class DualSeatTemplate(val focusLocation: DualSeatScreenBuilder.FocusLocation) : SeatTemplate<Pair<Int, Int>, Pair<Int, Int>, DualBar> {
         override fun sortOrder(value: Pair<Int, Int>?): Int? = value?.second
         override fun prevSortOrder(value: Pair<Int, Int>?): Int? = sortOrder(value)
 
@@ -162,9 +202,52 @@ class BasicResultPanel private constructor(
         }
 
         override fun prevLabelText(value: Pair<Int, Int>): String = labelText(value)
+
+        override fun combine(value1: Pair<Int, Int>, value2: Pair<Int, Int>): Pair<Int, Int> {
+            return (value1.first + value2.first) to (value1.second + value2.second)
+        }
+
+        override fun createBar(keyLabel: String, baseColor: Color, value: Pair<Int, Int>, shape: Shape?): DualBar {
+            return DualBar(
+                keyLabel,
+                baseColor,
+                if (focusLocation == DualSeatScreenBuilder.FocusLocation.FIRST) value.first else (value.second - value.first),
+                value.second,
+                labelText(value),
+                shape
+            )
+        }
+
+        override fun createPrevBar(keyLabel: String, baseColor: Color, value: Pair<Int, Int>): DualBar {
+            return DualBar(
+                keyLabel,
+                baseColor,
+                if (focusLocation == DualSeatScreenBuilder.FocusLocation.FIRST) value.first else (value.second - value.first),
+                value.second,
+                prevLabelText(value)
+            )
+        }
+
+        override fun createDiffBar(keyLabel: String, baseColor: Color, diff: Pair<Int, Int>): DualBar {
+            return DualBar(
+                keyLabel,
+                baseColor,
+                if (
+                    focusLocation == DualSeatScreenBuilder.FocusLocation.FIRST ||
+                    (diff.first != 0 && sign(diff.first.toDouble()) != sign(diff.second.toDouble())) ||
+                    abs(diff.first.toDouble()) > abs(diff.second.toDouble())
+                ) {
+                    diff.first
+                } else {
+                    (diff.second - diff.first)
+                },
+                diff.second,
+                diffLabelText(diff)
+            )
+        }
     }
 
-    private class RangeSeatTemplate : SeatTemplate<IntRange, Int> {
+    private class RangeSeatTemplate : SeatTemplate<IntRange, Int, DualBar> {
         override fun sortOrder(value: IntRange?): Int? = value?.let { it.first + it.last }
 
         override fun prevSortOrder(value: Int?): Int? = value
@@ -180,14 +263,49 @@ class BasicResultPanel private constructor(
         }
 
         override fun prevLabelText(value: Int): String = value.toString()
+
+        override fun combine(value1: IntRange, value2: IntRange): IntRange {
+            throw UnsupportedOperationException("Combining ranges is unsupported")
+        }
+
+        override fun createBar(keyLabel: String, baseColor: Color, value: IntRange, shape: Shape?): DualBar {
+            return DualBar(
+                keyLabel,
+                baseColor,
+                value.first,
+                value.last,
+                labelText(value),
+                shape
+            )
+        }
+
+        override fun createPrevBar(keyLabel: String, baseColor: Color, value: Int): DualBar {
+            return DualBar(
+                keyLabel,
+                baseColor,
+                value,
+                value,
+                prevLabelText(value)
+            )
+        }
+
+        override fun createDiffBar(keyLabel: String, baseColor: Color, diff: IntRange): DualBar {
+            return DualBar(
+                keyLabel,
+                baseColor,
+                diff.first,
+                diff.last,
+                diffLabelText(diff)
+            )
+        }
     }
 
-    abstract class SeatScreenBuilder<KT, KPT : PartyOrCoalition, CT, PT> internal constructor(
+    abstract class SeatScreenBuilder<KT : Any, KPT : PartyOrCoalition, CT : Any, PT : Any, BAR> internal constructor(
         protected var current: Flow.Publisher<out Map<out KT, CT>>,
         protected var header: Flow.Publisher<out String?>,
         protected var subhead: Flow.Publisher<out String?>,
         protected val keyTemplate: KeyTemplate<KT, KPT>,
-        private val seatTemplate: SeatTemplate<CT, PT>
+        private val seatTemplate: SeatTemplate<CT, PT, BAR>
     ) {
         protected var total: Flow.Publisher<out Int>? = null
         protected var showMajority: Flow.Publisher<out Boolean>? = null
@@ -209,7 +327,7 @@ class BasicResultPanel private constructor(
         protected var progressLabel: Flow.Publisher<out String?> = null.asOneTimePublisher()
         private var mapBuilder: MapBuilder<*>? = null
 
-        fun withTotal(totalSeats: Flow.Publisher<out Int>): SeatScreenBuilder<KT, KPT, CT, PT> {
+        fun withTotal(totalSeats: Flow.Publisher<out Int>): SeatScreenBuilder<KT, KPT, CT, PT, BAR> {
             total = totalSeats
             return this
         }
@@ -217,13 +335,13 @@ class BasicResultPanel private constructor(
         fun withMajorityLine(
             showMajority: Flow.Publisher<out Boolean>,
             majorityLabelFunc: (Int) -> String
-        ): SeatScreenBuilder<KT, KPT, CT, PT> {
+        ): SeatScreenBuilder<KT, KPT, CT, PT, BAR> {
             this.showMajority = showMajority
             majorityFunction = majorityLabelFunc
             return this
         }
 
-        fun withWinner(winner: Flow.Publisher<out KT?>): SeatScreenBuilder<KT, KPT, CT, PT> {
+        fun withWinner(winner: Flow.Publisher<out KT?>): SeatScreenBuilder<KT, KPT, CT, PT, BAR> {
             this.winner = winner
             return this
         }
@@ -233,7 +351,7 @@ class BasicResultPanel private constructor(
             diff: Flow.Publisher<out Map<KPT, CT>>,
             changeHeader: Flow.Publisher<out String?>,
             changeSubhead: Flow.Publisher<out String?> = null.asOneTimePublisher()
-        ): SeatScreenBuilder<KT, KPT, CT, PT> {
+        ): SeatScreenBuilder<KT, KPT, CT, PT, BAR> {
             this.diff =
                 current
                     .merge(diff) { c, d ->
@@ -256,7 +374,7 @@ class BasicResultPanel private constructor(
             changeHeader: Flow.Publisher<out String?>,
             changeSubhead: Flow.Publisher<out String?> = null.asOneTimePublisher(),
             showPrevRaw: Flow.Publisher<Boolean> = false.asOneTimePublisher()
-        ): SeatScreenBuilder<KT, KPT, CT, PT> {
+        ): SeatScreenBuilder<KT, KPT, CT, PT, BAR> {
             this.prev = prev
             this.diff =
                 current
@@ -280,7 +398,7 @@ class BasicResultPanel private constructor(
             prevVotes: Flow.Publisher<out Map<out KPT, Int>>,
             comparator: Comparator<KPT>,
             header: Flow.Publisher<out String?>
-        ): SeatScreenBuilder<KT, KPT, CT, PT> {
+        ): SeatScreenBuilder<KT, KPT, CT, PT, BAR> {
             swingHeader = header
             this.currVotes = currVotes
             this.prevVotes = prevVotes
@@ -293,7 +411,7 @@ class BasicResultPanel private constructor(
             winners: Flow.Publisher<out Map<T, PartyOrCoalition?>>,
             focus: Flow.Publisher<out List<T>?>,
             headerPublisher: Flow.Publisher<out String?>
-        ): SeatScreenBuilder<KT, KPT, CT, PT> {
+        ): SeatScreenBuilder<KT, KPT, CT, PT, BAR> {
             mapBuilder = MapBuilder(
                 shapes,
                 winners.map { m -> partyMapToResultMap(m) },
@@ -308,7 +426,7 @@ class BasicResultPanel private constructor(
             winners: Flow.Publisher<out Map<T, PartyResult?>>,
             focus: Flow.Publisher<out List<T>?>,
             headerPublisher: Flow.Publisher<out String?>
-        ): SeatScreenBuilder<KT, KPT, CT, PT> {
+        ): SeatScreenBuilder<KT, KPT, CT, PT, BAR> {
             mapBuilder = MapBuilder(shapes, winners, focus, headerPublisher)
             return this
         }
@@ -319,17 +437,17 @@ class BasicResultPanel private constructor(
             focus: Flow.Publisher<out List<T>?>,
             additionalHighlight: Flow.Publisher<out List<T>?>,
             headerPublisher: Flow.Publisher<out String?>
-        ): SeatScreenBuilder<KT, KPT, CT, PT> {
+        ): SeatScreenBuilder<KT, KPT, CT, PT, BAR> {
             mapBuilder = MapBuilder(shapes, winners, Pair(focus, additionalHighlight), headerPublisher)
             return this
         }
 
-        fun withNotes(notes: Flow.Publisher<out String?>): SeatScreenBuilder<KT, KPT, CT, PT> {
+        fun withNotes(notes: Flow.Publisher<out String?>): SeatScreenBuilder<KT, KPT, CT, PT, BAR> {
             this.notes = notes
             return this
         }
 
-        fun withChangeNotes(notes: Flow.Publisher<out String?>): SeatScreenBuilder<KT, KPT, CT, PT> {
+        fun withChangeNotes(notes: Flow.Publisher<out String?>): SeatScreenBuilder<KT, KPT, CT, PT, BAR> {
             this.changeNotes = notes
             return this
         }
@@ -337,13 +455,13 @@ class BasicResultPanel private constructor(
         fun withClassification(
             classificationFunc: (KPT) -> KPT,
             classificationHeader: Flow.Publisher<out String?>
-        ): SeatScreenBuilder<KT, KPT, CT, PT> {
+        ): SeatScreenBuilder<KT, KPT, CT, PT, BAR> {
             this.classificationFunc = classificationFunc
             this.classificationHeader = classificationHeader
             return this
         }
 
-        fun withProgressLabel(progressLabel: Flow.Publisher<out String?>): SeatScreenBuilder<KT, KPT, CT, PT> {
+        fun withProgressLabel(progressLabel: Flow.Publisher<out String?>): SeatScreenBuilder<KT, KPT, CT, PT, BAR> {
             this.progressLabel = progressLabel
             return this
         }
@@ -360,9 +478,124 @@ class BasicResultPanel private constructor(
             )
         }
 
-        protected abstract fun createFrame(): BarFrame
-        protected abstract fun createClassificationFrame(): BarFrame?
-        protected abstract fun createDiffFrame(): BarFrame?
+        private fun createFrame(): BarFrame {
+            val forceSingleLine = current.map { it.size > doubleLineBarLimit() }
+            val shapes = (winner ?: null.asOneTimePublisher()).merge(forceSingleLine) { win, sl -> if (win == null) emptyMap() else mapOf(win to keyTemplate.winnerShape(sl)) }
+            val bars = current.merge(forceSingleLine) { c, sl -> c to sl }.merge(shapes) { (c, sl), sh ->
+                c.keys
+                    .sortedByDescending { keyTemplate.toParty(it).overrideSortOrder ?: seatTemplate.sortOrder(c[it]) ?: 0 }
+                    .map { seatTemplate.createBar(keyTemplate.toMainBarHeader(it, sl), keyTemplate.toParty(it).color, c[it] ?: seatTemplate.default, sh[it]) }
+            }
+            return createBarFrameBuilder(bars)
+                .withHeader(header, rightLabelPublisher = progressLabel)
+                .withSubhead(subhead)
+                .withNotes(notes ?: (null as String?).asOneTimePublisher())
+                .also { b -> total?.let { t -> b.withMax(t.map { it * 2 / 3 }) } }
+                .also { b ->
+                    showMajority?.let { s ->
+                        val t = total ?: throw IllegalArgumentException("Cannot show majority line without total")
+                        val lines = s.merge(t) { show, total ->
+                            if (show) {
+                                listOf(total / 2 + 1)
+                            } else {
+                                emptyList()
+                            }
+                        }
+                        b.withLines(lines) { majorityFunction!!(it) }
+                    }
+                }
+                .build()
+        }
+
+        private fun createClassificationFrame(): BarFrame? {
+            return classificationHeader?.let { classificationHeader ->
+                val adjustedCurr = Aggregators.adjustKey(current, { classificationFunc!!(keyTemplate.toParty(it)) }, { v1, v2 -> seatTemplate.combine(v1, v2) })
+                val bars = adjustedCurr.map { c ->
+                    c.keys
+                        .sortedByDescending { it.overrideSortOrder ?: seatTemplate.sortOrder(c[it]) ?: 0 }
+                        .map { seatTemplate.createBar(it.name.uppercase(), it.color, c[it] ?: seatTemplate.default, null) }
+                }
+                return createBarFrameBuilder(bars)
+                    .withHeader(classificationHeader)
+                    .also { b -> total?.let { t -> b.withMax(t.map { it * 2 / 3 }) } }
+                    .also { b ->
+                        showMajority?.let { s ->
+                            val t = total ?: throw IllegalArgumentException("Cannot show majority line without total")
+                            val lines = s.merge(t) { show, total ->
+                                if (show) {
+                                    listOf(total / 2 + 1)
+                                } else {
+                                    emptyList()
+                                }
+                            }
+                            b.withLines(lines) { majorityFunction!!(it) }
+                        }
+                    }
+                    .build()
+            }
+        }
+        private fun createDiffFrame(): BarFrame? {
+            val diffBars = diff?.map { map ->
+                map.entries.asSequence()
+                    .sortedByDescending { it.key.overrideSortOrder ?: seatTemplate.sortOrder(it.value.curr) }
+                    .map {
+                        seatTemplate.createDiffBar(
+                            it.key.abbreviation.uppercase(),
+                            it.key.color,
+                            it.value.diff
+                        )
+                    }
+                    .toList()
+            }
+
+            val prevBars = prev?.map { map ->
+                map.entries.asSequence()
+                    .sortedByDescending { seatTemplate.prevSortOrder(it.value) }
+                    .map {
+                        seatTemplate.createPrevBar(
+                            it.key.abbreviation.uppercase(),
+                            it.key.color,
+                            it.value
+                        )
+                    }
+                    .toList()
+            }
+            val showPrevRaw = showPrevRaw ?: false.asOneTimePublisher()
+            return changeHeader?.let { changeHeader ->
+                val bars = showPrevRaw.compose { showRaw -> if (showRaw) prevBars!! else diffBars!! }
+                return createBarFrameBuilder(bars)
+                    .withHeader(changeHeader)
+                    .withSubhead(changeSubhead ?: (null as String?).asOneTimePublisher())
+                    .also { b ->
+                        total?.let { t ->
+                            b.withLimits(
+                                t.merge(showPrevRaw) { total, raw ->
+                                    if (raw) {
+                                        BarFrameBuilder.Limit(max = total * 2 / 3)
+                                    } else {
+                                        BarFrameBuilder.Limit(wingspan = (total / 20).coerceAtLeast(1))
+                                    }
+                                }
+                            )
+                        }
+                    }
+                    .also { b ->
+                        showMajority?.merge(showPrevRaw) { sm, sr -> sm && sr }?.let { s ->
+                            val t = prev?.map { it.values.sumOf { v -> seatTemplate.prevSortOrder(v) ?: 0 } } ?: 0.asOneTimePublisher()
+                            val lines = s.merge(t) { show, total ->
+                                if (show) {
+                                    listOf(total / 2 + 1)
+                                } else {
+                                    emptyList()
+                                }
+                            }
+                            b.withLines(lines) { majorityFunction!!(it) }
+                        }
+                    }
+                    .also { b -> changeNotes?.let { cn -> b.withNotes(cn) } }
+                    .build()
+            }
+        }
 
         private fun createSwingFrame(): SwingFrame? {
             return swingHeader?.let { header ->
@@ -382,6 +615,10 @@ class BasicResultPanel private constructor(
         private fun createMapFrame(): MapFrame? {
             return mapBuilder?.createMapFrame()
         }
+
+        protected abstract fun doubleLineBarLimit(): Int
+
+        protected abstract fun createBarFrameBuilder(bars: Flow.Publisher<List<BAR>>): BarFrameBuilder
 
         private fun createAltText(textHeader: Flow.Publisher<out String?>): Flow.Publisher<String?> {
             val combineHeadAndSub: (String?, String?) -> String? = { h, s ->
@@ -446,9 +683,9 @@ class BasicResultPanel private constructor(
                 }
             val classificationText: Flow.Publisher<out String?> = classificationHeader?.merge(current) { h, c ->
                 val cv: Map<KT, Int> = c.mapValues { seatTemplate.sortOrder(it.value)!! }
-                val cg: Map<KPT, Int> = Aggregators.adjustKey(cv) { classificationFunc!!(keyTemplate.toParty(it)) }
+                val cg: Map<KPT, CT> = Aggregators.adjustKey(c, { classificationFunc!!(keyTemplate.toParty(it)) }, { v1, v2 -> seatTemplate.combine(v1, v2) })
                 (h ?: "") + cg.entries
-                    .sortedByDescending { it.key.overrideSortOrder ?: it.value }
+                    .sortedByDescending { it.key.overrideSortOrder ?: seatTemplate.sortOrder(it.value) }
                     .joinToString("") { "\n${it.key.name.uppercase()}: ${it.value}" }
             } ?: null.asOneTimePublisher()
             val prevRawText: Flow.Publisher<out String?> = prev?.merge(showPrevRaw ?: false.asOneTimePublisher()) { p, raw -> if (raw) p else null }
@@ -478,7 +715,7 @@ class BasicResultPanel private constructor(
         header: Flow.Publisher<out String?>,
         subhead: Flow.Publisher<out String?>,
         keyTemplate: KeyTemplate<KT, KPT>
-    ) : SeatScreenBuilder<KT, KPT, Int, Int>(current, header, subhead, keyTemplate, SingleSeatTemplate()) {
+    ) : SeatScreenBuilder<KT, KPT, Int, Int, BasicBar>(current, header, subhead, keyTemplate, SingleSeatTemplate()) {
 
         override fun createFromDiff(curr: Int, diff: Int?): CurrDiff<Int> {
             return CurrDiff(curr, diff ?: 0)
@@ -533,33 +770,12 @@ class BasicResultPanel private constructor(
             }
         }
 
-        private fun doubleLineBarLimit(): Int {
+        override fun doubleLineBarLimit(): Int {
             return 10
         }
 
-        override fun createFrame(): BarFrame {
-            val result = Result()
-            current.subscribe(Subscriber { result.seats = it })
-            winner?.subscribe(Subscriber { result.winner = it })
-            val bars = result.barsPublisher
-            var builder = BarFrameBuilder.basic(bars)
-                .withHeader(header, rightLabelPublisher = progressLabel)
-                .withSubhead(subhead)
-                .withNotes(this.notes ?: (null as String?).asOneTimePublisher())
-            val total = this.total
-            if (total != null) {
-                builder = builder.withMax(total.map { it * 2 / 3 })
-            }
-            val showMajority = showMajority
-            if (showMajority != null) {
-                applyMajorityLine(
-                    builder,
-                    showMajority,
-                    this.total
-                        ?: throw IllegalArgumentException("Cannot show majority line without total")
-                )
-            }
-            return builder.build()
+        override fun createBarFrameBuilder(bars: Flow.Publisher<List<BasicBar>>): BarFrameBuilder {
+            return BarFrameBuilder.basic(bars)
         }
 
         private fun applyMajorityLine(
@@ -580,92 +796,6 @@ class BasicResultPanel private constructor(
             }
         }
 
-        override fun createClassificationFrame(): BarFrame? {
-            return classificationHeader?.let { classificationHeader ->
-                val bars: Flow.Publisher<out List<BasicBar>> = Aggregators.adjustKey(
-                    current
-                ) { classificationFunc!!(keyTemplate.toParty(it)) }
-                    .map { seats ->
-                        seats.entries.asSequence()
-                            .sortedByDescending { it.value }
-                            .map {
-                                BasicBar(
-                                    it.key.name.uppercase(),
-                                    it.key.color,
-                                    it.value
-                                )
-                            }
-                            .toList()
-                    }
-                var builder = BarFrameBuilder.basic(bars).withHeader(classificationHeader)
-                val total = this.total
-                if (total != null) {
-                    builder = builder.withMax(total.map { it * 2 / 3 })
-                }
-                applyMajorityLine(
-                    builder,
-                    showMajority,
-                    this.total ?: throw IllegalArgumentException("Cannot show majority line without total")
-                )
-                return builder.build()
-            }
-        }
-
-        override fun createDiffFrame(): BarFrame? {
-            val diffBars = diff?.map { map ->
-                map.entries.asSequence()
-                    .sortedByDescending { it.key.overrideSortOrder ?: it.value.curr }
-                    .map {
-                        BasicBar(
-                            it.key.abbreviation.uppercase(),
-                            it.key.color,
-                            it.value.diff,
-                            changeStr(it.value.diff)
-                        )
-                    }
-                    .toList()
-            }
-            val prevBars = prev?.map { map ->
-                map.entries.asSequence()
-                    .sortedByDescending { it.value }
-                    .map {
-                        BasicBar(
-                            it.key.abbreviation.uppercase(),
-                            it.key.color,
-                            it.value
-                        )
-                    }
-                    .toList()
-            }
-            val showPrevRaw = showPrevRaw ?: false.asOneTimePublisher()
-            return changeHeader?.let { changeHeader ->
-                val bars = showPrevRaw.compose { showRaw -> if (showRaw) prevBars!! else diffBars!! }
-                var builder = BarFrameBuilder.basic(bars)
-                    .withHeader(changeHeader)
-                    .withSubhead(changeSubhead ?: (null as String?).asOneTimePublisher())
-                val total = this.total
-                if (total != null) {
-                    builder = builder.withLimits(
-                        total.merge(showPrevRaw) { totalSeats, showRaw ->
-                            if (showRaw) {
-                                BarFrameBuilder.Limit(max = totalSeats * 2 / 3)
-                            } else {
-                                BarFrameBuilder.Limit(wingspan = (totalSeats / 20).coerceAtLeast(1))
-                            }
-                        }
-                    )
-                }
-                this.showMajority?.let { showMajority ->
-                    applyMajorityLine(builder, showMajority.merge(showPrevRaw) { m, r -> m && r }, prev?.map { it.values.sum() } ?: 0.asOneTimePublisher())
-                }
-                val changeNotes = this.changeNotes
-                if (changeNotes != null) {
-                    builder = builder.withNotes(changeNotes)
-                }
-                return builder.build()
-            }
-        }
-
         companion object {
             private fun changeStr(seats: Int): String {
                 return if (seats == 0) "\u00b10" else DecimalFormat("+0;-0").format(seats)
@@ -679,7 +809,7 @@ class BasicResultPanel private constructor(
         subhead: Flow.Publisher<out String?>,
         keyTemplate: KeyTemplate<KT, KPT>,
         val focusLocation: FocusLocation
-    ) : SeatScreenBuilder<KT, KPT, Pair<Int, Int>, Pair<Int, Int>>(current, header, subhead, keyTemplate, DualSeatTemplate()) {
+    ) : SeatScreenBuilder<KT, KPT, Pair<Int, Int>, Pair<Int, Int>, DualBar>(current, header, subhead, keyTemplate, DualSeatTemplate(focusLocation)) {
 
         enum class FocusLocation { FIRST, LAST }
 
@@ -743,32 +873,16 @@ class BasicResultPanel private constructor(
             }
         }
 
-        private fun doubleLineBarLimit(): Int {
+        override fun doubleLineBarLimit(): Int {
             return 10
         }
 
-        override fun createFrame(): BarFrame {
-            val result = Result()
-            current.subscribe(Subscriber { result.seats = it })
-            winner?.subscribe(Subscriber { result.winner = it })
-            val bars = result.barsPublisher
-            var builder = if (focusLocation == FocusLocation.FIRST) {
+        override fun createBarFrameBuilder(bars: Flow.Publisher<List<DualBar>>): BarFrameBuilder {
+            return if (focusLocation == FocusLocation.FIRST) {
                 BarFrameBuilder.dual(bars)
             } else {
                 BarFrameBuilder.dualReversed(bars)
             }
-            builder = builder
-                .withHeader(header, rightLabelPublisher = progressLabel)
-                .withSubhead(subhead)
-                .withNotes(this.notes ?: (null as String?).asOneTimePublisher())
-            val total = this.total
-            if (total != null) {
-                builder = builder.withMax(total.map { it * 2 / 3 })
-            }
-            this.showMajority?.let { showMajority ->
-                builder = applyMajorityLine(builder, showMajority, total ?: throw IllegalStateException("Cannot show majority line without total"))
-            }
-            return builder.build()
         }
 
         private fun applyMajorityLine(
@@ -786,94 +900,6 @@ class BasicResultPanel private constructor(
             return builder.withLines(lines) { t -> majorityFunction!!(t) }
         }
 
-        override fun createClassificationFrame(): BarFrame? {
-            if (classificationHeader == null) {
-                return null
-            }
-            throw UnsupportedOperationException("Classification frame not supported on dual frame")
-        }
-
-        override fun createDiffFrame(): BarFrame? {
-            val diffBars = diff?.map { map ->
-                map.entries.asSequence()
-                    .sortedByDescending { it.key.overrideSortOrder ?: it.value.curr.second }
-                    .map {
-                        DualBar(
-                            it.key.abbreviation.uppercase(),
-                            it.key.color,
-                            if (focusLocation == FocusLocation.FIRST ||
-                                (it.value.diff.first != 0 && sign(it.value.diff.first.toDouble()) != sign(it.value.diff.second.toDouble())) ||
-                                abs(it.value.diff.first.toDouble()) > abs(it.value.diff.second.toDouble())
-                            ) {
-                                it.value.diff.first
-                            } else {
-                                (it.value.diff.second - it.value.diff.first)
-                            },
-                            it.value.diff.second,
-                            changeStr(it.value.diff.first) +
-                                "/" +
-                                changeStr(it.value.diff.second)
-                        )
-                    }
-                    .toList()
-            }
-            val prevBars = prev?.map { map ->
-                map.entries.asSequence()
-                    .sortedByDescending { it.key.overrideSortOrder ?: it.value.second }
-                    .map {
-                        DualBar(
-                            it.key.abbreviation.uppercase(),
-                            it.key.color,
-                            if (focusLocation == FocusLocation.FIRST ||
-                                (it.value.first != 0 && sign(it.value.first.toDouble()) != sign(it.value.second.toDouble())) ||
-                                abs(it.value.first.toDouble()) > abs(it.value.second.toDouble())
-                            ) {
-                                it.value.first
-                            } else {
-                                (it.value.second - it.value.first)
-                            },
-                            it.value.second,
-                            it.value.first.toString() +
-                                "/" +
-                                it.value.second.toString()
-                        )
-                    }
-                    .toList()
-            }
-            val showPrevRaw = showPrevRaw ?: false.asOneTimePublisher()
-            return changeHeader?.let { changeHeader ->
-                val bars = showPrevRaw.compose { showRaw -> if (showRaw) prevBars!! else diffBars!! }
-                var builder = if (focusLocation == FocusLocation.FIRST) {
-                    BarFrameBuilder.dual(bars)
-                } else {
-                    BarFrameBuilder.dualReversed(bars)
-                }
-                builder = builder
-                    .withHeader(changeHeader)
-                    .withSubhead(changeSubhead ?: (null as String?).asOneTimePublisher())
-                val total = this.total
-                if (total != null) {
-                    builder = builder.withLimits(
-                        total.merge(showPrevRaw) { totalSeats, showRaw ->
-                            if (showRaw) {
-                                BarFrameBuilder.Limit(max = totalSeats * 2 / 3)
-                            } else {
-                                BarFrameBuilder.Limit(wingspan = (totalSeats / 20).coerceAtLeast(1))
-                            }
-                        }
-                    )
-                }
-                this.showMajority?.let { showMajority ->
-                    applyMajorityLine(builder, showMajority.merge(showPrevRaw) { m, r -> m && r }, prev?.map { it.values.sumOf { e -> e.second } } ?: 0.asOneTimePublisher())
-                }
-                val changeNotes = this.changeNotes
-                if (changeNotes != null) {
-                    builder = builder.withNotes(changeNotes)
-                }
-                return builder.build()
-            }
-        }
-
         companion object {
             private fun changeStr(seats: Int): String {
                 return if (seats == 0) "\u00b10" else DecimalFormat("+0;-0").format(seats)
@@ -886,7 +912,7 @@ class BasicResultPanel private constructor(
         header: Flow.Publisher<out String?>,
         subhead: Flow.Publisher<out String?>,
         keyTemplate: KeyTemplate<KT, KPT>
-    ) : SeatScreenBuilder<KT, KPT, IntRange, Int>(current, header, subhead, keyTemplate, RangeSeatTemplate()) {
+    ) : SeatScreenBuilder<KT, KPT, IntRange, Int, DualBar>(current, header, subhead, keyTemplate, RangeSeatTemplate()) {
         override fun createFromDiff(curr: IntRange, diff: IntRange?): CurrDiff<IntRange> {
             return CurrDiff(curr, diff ?: IntRange(0, 0))
         }
@@ -941,32 +967,12 @@ class BasicResultPanel private constructor(
             }
         }
 
-        private fun doubleLineBarLimit(): Int {
+        override fun doubleLineBarLimit(): Int {
             return 10
         }
 
-        override fun createFrame(): BarFrame {
-            val result = Result()
-            current.subscribe(Subscriber { result.seats = it })
-            winner?.subscribe(Subscriber { result.winner = it })
-            val bars = result.barsPublisher
-            val notes = this.notes
-            var builder = BarFrameBuilder.dual(bars)
-                .withHeader(header, rightLabelPublisher = progressLabel)
-                .withSubhead(subhead)
-                .withNotes(notes ?: (null as String?).asOneTimePublisher())
-            val total = this.total
-            if (total != null) {
-                builder = builder.withMax(total.map { it * 2 / 3 })
-            }
-            val showMajority = this.showMajority
-            if (showMajority != null) {
-                if (total == null) {
-                    throw IllegalStateException("Cannot show majority without total")
-                }
-                builder = applyMajorityLine(builder, showMajority, total)
-            }
-            return builder.build()
+        override fun createBarFrameBuilder(bars: Flow.Publisher<List<DualBar>>): BarFrameBuilder {
+            return BarFrameBuilder.dual(bars)
         }
 
         private fun applyMajorityLine(
@@ -982,79 +988,6 @@ class BasicResultPanel private constructor(
                 }
             }
             return builder.withLines(lines) { t -> majorityFunction!!(t) }
-        }
-
-        override fun createClassificationFrame(): BarFrame? {
-            if (classificationHeader == null) {
-                return null
-            }
-            throw UnsupportedOperationException("Classification frame not supported on range frame")
-        }
-
-        override fun createDiffFrame(): BarFrame? {
-            val diffBars = diff?.map { map ->
-                map.entries.asSequence()
-                    .sortedByDescending {
-                        it.key.overrideSortOrder ?: (it.value.curr.first + it.value.curr.last)
-                    }
-                    .map {
-                        DualBar(
-                            it.key.abbreviation.uppercase(),
-                            it.key.color,
-                            it.value.diff.first,
-                            it.value.diff.last,
-                            "(" +
-                                changeStr(it.value.diff.first) +
-                                ")-(" +
-                                changeStr(it.value.diff.last) +
-                                ")"
-                        )
-                    }
-                    .toList()
-            }
-            val prevBars = prev?.map { map ->
-                map.entries.asSequence()
-                    .sortedByDescending { e ->
-                        e.key.overrideSortOrder ?: e.value
-                    }
-                    .map { e ->
-                        DualBar(
-                            e.key.abbreviation.uppercase(),
-                            e.key.color,
-                            e.value,
-                            e.value,
-                            e.value.toString()
-                        )
-                    }
-                    .toList()
-            }
-            val showPrevRaw = this.showPrevRaw ?: false.asOneTimePublisher()
-            return changeHeader?.let { changeHeader ->
-                val bars = showPrevRaw.compose { showRaw -> if (showRaw) prevBars!! else diffBars!! }
-                var builder = BarFrameBuilder.dual(bars)
-                    .withHeader(changeHeader)
-                    .withSubhead(changeSubhead ?: (null as String?).asOneTimePublisher())
-                val total = this.total
-                if (total != null) {
-                    builder = builder.withLimits(
-                        total.merge(showPrevRaw) { totalSeats, showRaw ->
-                            if (showRaw) {
-                                BarFrameBuilder.Limit(max = totalSeats * 2 / 3)
-                            } else {
-                                BarFrameBuilder.Limit(wingspan = (totalSeats / 20).coerceAtLeast(1))
-                            }
-                        }
-                    )
-                }
-                this.showMajority?.let { showMajority ->
-                    applyMajorityLine(builder, showMajority.merge(showPrevRaw) { m, r -> m && r }, prev?.map { it.values.sum() } ?: 0.asOneTimePublisher())
-                }
-                val changeNotes = this.changeNotes
-                if (changeNotes != null) {
-                    builder = builder.withNotes(changeNotes)
-                }
-                return builder.build()
-            }
         }
 
         companion object {
@@ -2655,7 +2588,7 @@ class BasicResultPanel private constructor(
             seats: Flow.Publisher<out Map<out P, Int>>,
             header: Flow.Publisher<out String?>,
             subhead: Flow.Publisher<out String?>
-        ): SeatScreenBuilder<P, P, Int, Int> {
+        ): SeatScreenBuilder<P, P, Int, Int, *> {
             return BasicSeatScreenBuilder(
                 seats,
                 header,
@@ -2668,7 +2601,7 @@ class BasicResultPanel private constructor(
             seats: Flow.Publisher<out Map<Candidate, Int>>,
             header: Flow.Publisher<out String?>,
             subhead: Flow.Publisher<out String?>
-        ): SeatScreenBuilder<Candidate, Party, Int, Int> {
+        ): SeatScreenBuilder<Candidate, Party, Int, Int, *> {
             return BasicSeatScreenBuilder(
                 seats,
                 header,
@@ -2681,7 +2614,7 @@ class BasicResultPanel private constructor(
             seats: Flow.Publisher<out Map<out P, Pair<Int, Int>>>,
             header: Flow.Publisher<out String?>,
             subhead: Flow.Publisher<out String?>
-        ): SeatScreenBuilder<P, P, Pair<Int, Int>, Pair<Int, Int>> {
+        ): SeatScreenBuilder<P, P, Pair<Int, Int>, Pair<Int, Int>, *> {
             return DualSeatScreenBuilder(
                 seats,
                 header,
@@ -2695,7 +2628,7 @@ class BasicResultPanel private constructor(
             seats: Flow.Publisher<out Map<P, Pair<Int, Int>>>,
             header: Flow.Publisher<out String?>,
             subhead: Flow.Publisher<out String?>
-        ): SeatScreenBuilder<P, P, Pair<Int, Int>, Pair<Int, Int>> {
+        ): SeatScreenBuilder<P, P, Pair<Int, Int>, Pair<Int, Int>, *> {
             return DualSeatScreenBuilder(
                 seats,
                 header,
@@ -2709,7 +2642,7 @@ class BasicResultPanel private constructor(
             seats: Flow.Publisher<out Map<Candidate, Pair<Int, Int>>>,
             header: Flow.Publisher<out String?>,
             subhead: Flow.Publisher<out String?>
-        ): SeatScreenBuilder<Candidate, Party, Pair<Int, Int>, Pair<Int, Int>> {
+        ): SeatScreenBuilder<Candidate, Party, Pair<Int, Int>, Pair<Int, Int>, *> {
             return DualSeatScreenBuilder(
                 seats,
                 header,
@@ -2723,7 +2656,7 @@ class BasicResultPanel private constructor(
             seats: Flow.Publisher<out Map<P, IntRange>>,
             header: Flow.Publisher<out String?>,
             subhead: Flow.Publisher<out String?>
-        ): SeatScreenBuilder<P, P, IntRange, Int> {
+        ): SeatScreenBuilder<P, P, IntRange, Int, *> {
             return RangeSeatScreenBuilder(
                 seats,
                 header,
@@ -2736,7 +2669,7 @@ class BasicResultPanel private constructor(
             seats: Flow.Publisher<out Map<Candidate, IntRange>>,
             header: Flow.Publisher<out String?>,
             subhead: Flow.Publisher<out String?>
-        ): SeatScreenBuilder<Candidate, Party, IntRange, Int> {
+        ): SeatScreenBuilder<Candidate, Party, IntRange, Int, *> {
             return RangeSeatScreenBuilder(
                 seats,
                 header,
