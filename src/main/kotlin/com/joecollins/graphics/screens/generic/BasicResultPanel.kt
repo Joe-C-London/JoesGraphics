@@ -682,7 +682,6 @@ class BasicResultPanel private constructor(
                     }
                 }
             val classificationText: Flow.Publisher<out String?> = classificationHeader?.merge(current) { h, c ->
-                val cv: Map<KT, Int> = c.mapValues { seatTemplate.sortOrder(it.value)!! }
                 val cg: Map<KPT, CT> = Aggregators.adjustKey(c, { classificationFunc!!(keyTemplate.toParty(it)) }, { v1, v2 -> seatTemplate.combine(v1, v2) })
                 (h ?: "") + cg.entries
                     .sortedByDescending { it.key.overrideSortOrder ?: seatTemplate.sortOrder(it.value) }
@@ -733,73 +732,12 @@ class BasicResultPanel private constructor(
             return CurrDiff(0, -prev)
         }
 
-        private inner class Result {
-            var seats: Map<out KT, Int> = emptyMap()
-                set(value) {
-                    field = value
-                    updateBars()
-                }
-
-            var winner: KT? = null
-                set(value) {
-                    field = value
-                    updateBars()
-                }
-
-            val barsPublisher = Publisher(calculateBars())
-            private fun updateBars() = synchronized(this) { barsPublisher.submit(calculateBars()) }
-            private fun calculateBars(): List<BasicBar> {
-                val seats = this.seats
-                val winner = this.winner
-                val numBars = seats.size
-                return seats.entries.asSequence()
-                    .sortedByDescending { it.key.overrideSortOrder ?: it.value }
-                    .map {
-                        BasicBar(
-                            keyTemplate.toMainBarHeader(
-                                it.key,
-                                numBars > doubleLineBarLimit()
-                            ),
-                            keyTemplate.toParty(it.key).color,
-                            it.value,
-                            DecimalFormat("#,##0").format(it.value),
-                            if (it.key == winner) keyTemplate.winnerShape(numBars > doubleLineBarLimit()) else null
-                        )
-                    }
-                    .toList()
-            }
-        }
-
         override fun doubleLineBarLimit(): Int {
             return 10
         }
 
         override fun createBarFrameBuilder(bars: Flow.Publisher<List<BasicBar>>): BarFrameBuilder {
             return BarFrameBuilder.basic(bars)
-        }
-
-        private fun applyMajorityLine(
-            builder: BarFrameBuilder,
-            showMajority: Flow.Publisher<out Boolean>?,
-            total: Flow.Publisher<out Int>
-        ) {
-            if (showMajority != null) {
-                val lines = showMajority.merge(total) {
-                        show, tot ->
-                    if (show) {
-                        listOf(tot / 2 + 1)
-                    } else {
-                        emptyList()
-                    }
-                }
-                builder.withLines(lines) { t -> majorityFunction!!(t) }
-            }
-        }
-
-        companion object {
-            private fun changeStr(seats: Int): String {
-                return if (seats == 0) "\u00b10" else DecimalFormat("+0;-0").format(seats)
-            }
         }
     }
 
@@ -835,44 +773,6 @@ class BasicResultPanel private constructor(
             return CurrDiff(Pair(0, 0), Pair(-prev.first, -prev.second))
         }
 
-        private inner class Result {
-            var seats: Map<out KT, Pair<Int, Int>> = emptyMap()
-                set(value) {
-                    field = value
-                    updateBars()
-                }
-
-            var winner: KT? = null
-                set(value) {
-                    field = value
-                    updateBars()
-                }
-
-            val barsPublisher = Publisher(calculateBars())
-            private fun updateBars() = synchronized(this) { barsPublisher.submit(calculateBars()) }
-            private fun calculateBars(): List<DualBar> {
-                val seats = this.seats
-                val winner = this.winner
-                val count = seats.size
-                return seats.entries.asSequence()
-                    .sortedByDescending { it.key.overrideSortOrder ?: it.value.second }
-                    .map {
-                        DualBar(
-                            keyTemplate.toMainBarHeader(
-                                it.key,
-                                count > doubleLineBarLimit()
-                            ),
-                            keyTemplate.toParty(it.key).color,
-                            if (focusLocation == FocusLocation.FIRST) it.value.first else (it.value.second - it.value.first),
-                            it.value.second,
-                            DecimalFormat("#,##0").format(it.value.first) + "/" + DecimalFormat("#,##0").format(it.value.second),
-                            if (it.key == winner) keyTemplate.winnerShape(count > doubleLineBarLimit()) else null
-                        )
-                    }
-                    .toList()
-            }
-        }
-
         override fun doubleLineBarLimit(): Int {
             return 10
         }
@@ -882,27 +782,6 @@ class BasicResultPanel private constructor(
                 BarFrameBuilder.dual(bars)
             } else {
                 BarFrameBuilder.dualReversed(bars)
-            }
-        }
-
-        private fun applyMajorityLine(
-            builder: BarFrameBuilder,
-            showMajority: Flow.Publisher<out Boolean>,
-            total: Flow.Publisher<out Int>
-        ): BarFrameBuilder {
-            val lines = showMajority.merge(total) { show, tot ->
-                if (show) {
-                    listOf(tot / 2 + 1)
-                } else {
-                    emptyList()
-                }
-            }
-            return builder.withLines(lines) { t -> majorityFunction!!(t) }
-        }
-
-        companion object {
-            private fun changeStr(seats: Int): String {
-                return if (seats == 0) "\u00b10" else DecimalFormat("+0;-0").format(seats)
             }
         }
     }
@@ -929,71 +808,12 @@ class BasicResultPanel private constructor(
             return CurrDiff(IntRange(0, 0), IntRange(-prev, -prev))
         }
 
-        private inner class Result {
-            var seats: Map<out KT, IntRange> = emptyMap()
-                set(value) {
-                    field = value
-                    updateBars()
-                }
-
-            var winner: KT? = null
-                set(value) {
-                    field = value
-                    updateBars()
-                }
-
-            val barsPublisher = Publisher(createBars())
-            private fun updateBars() = synchronized(this) { barsPublisher.submit(createBars()) }
-            private fun createBars(): List<DualBar> {
-                val seats = this.seats
-                val winner = this.winner
-                val count = seats.size
-                return seats.entries.asSequence()
-                    .sortedByDescending { it.key.overrideSortOrder ?: (it.value.first + it.value.last) }
-                    .map {
-                        DualBar(
-                            keyTemplate.toMainBarHeader(
-                                it.key,
-                                count > doubleLineBarLimit()
-                            ),
-                            keyTemplate.toParty(it.key).color,
-                            it.value.first,
-                            it.value.last,
-                            it.value.first.toString() + "-" + it.value.last,
-                            if (it.key == winner) keyTemplate.winnerShape(count > doubleLineBarLimit()) else null
-                        )
-                    }
-                    .toList()
-            }
-        }
-
         override fun doubleLineBarLimit(): Int {
             return 10
         }
 
         override fun createBarFrameBuilder(bars: Flow.Publisher<List<DualBar>>): BarFrameBuilder {
             return BarFrameBuilder.dual(bars)
-        }
-
-        private fun applyMajorityLine(
-            builder: BarFrameBuilder,
-            showMajority: Flow.Publisher<out Boolean>,
-            total: Flow.Publisher<out Int>
-        ): BarFrameBuilder {
-            val lines = showMajority.merge(total) { show, tot ->
-                if (show) {
-                    listOf(tot / 2 + 1)
-                } else {
-                    emptyList()
-                }
-            }
-            return builder.withLines(lines) { t -> majorityFunction!!(t) }
-        }
-
-        companion object {
-            private fun changeStr(seats: Int): String {
-                return if (seats == 0) "\u00b10" else DecimalFormat("+0;-0").format(seats)
-            }
         }
     }
 
