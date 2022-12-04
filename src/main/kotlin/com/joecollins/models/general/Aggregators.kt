@@ -159,4 +159,14 @@ object Aggregators {
         }
         return ret
     }
+
+    fun <P : PartyOrCoalition> partyChanges(result: Flow.Publisher<out Map<out P, Int>>, partyChanges: Flow.Publisher<out Map<out P, P>>): Flow.Publisher<Map<P, Int>> {
+        return partyChanges(result, partyChanges) { a, b -> a + b }
+    }
+
+    fun <P : PartyOrCoalition, V : Any> partyChanges(result: Flow.Publisher<out Map<out P, V>>, partyChanges: Flow.Publisher<out Map<out P, P>>, mergeFunc: (V, V) -> V): Flow.Publisher<Map<P, V>> {
+        return result.merge(partyChanges) { r, c ->
+            adjustKey(r, { c[it] ?: it }, mergeFunc)
+        }
+    }
 }

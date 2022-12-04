@@ -16,6 +16,7 @@ import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
+import com.joecollins.pubsub.map
 import org.junit.Test
 import java.awt.Color
 import java.awt.Dimension
@@ -2386,6 +2387,297 @@ class SeatViewPanelTest {
             NEW DEMOCRATIC PARTY: 0/2 (±0/±0)
             TIE: 0/4 (±0/+4)
             10 FOR MAJORITY
+            """.trimIndent()
+        )
+    }
+
+    @Test
+    fun testPartyMerger() {
+        val lib = Party("Liberal", "LIB", Color(234, 109, 106))
+        val con = Party("Conservative", "CON", Color(100, 149, 237))
+        val bq = Party("Bloc Québécois", "BQ", Color(135, 206, 250))
+        val ndp = Party("New Democratic Party", "NDP", Color(244, 164, 96))
+        val pc = Party("Progressive Conservative", "PC", Color(153, 153, 255))
+        val ca = Party("Canadian Alliance", "CA", Color(95, 158, 160))
+        val ind = Party("Independent", "IND", Party.OTHERS.color)
+        val oth = Party.OTHERS
+
+        val currSeats = mapOf(
+            lib to 135,
+            con to 99,
+            bq to 54,
+            ndp to 19,
+            ind to 1
+        )
+        val prevSeats = mapOf(
+            lib to 172,
+            ca to 66,
+            bq to 38,
+            ndp to 13,
+            pc to 12
+        )
+        val currVotes = mapOf(
+            lib to 4982220,
+            con to 4019498,
+            bq to 1680109,
+            ndp to 2127403,
+            oth to 755472
+        )
+        val prevVotes = mapOf(
+            lib to 5252031,
+            ca to 3276929,
+            bq to 1377727,
+            ndp to 1093868,
+            pc to 1566998,
+            oth to 290220
+        )
+        val showPrev = Publisher(false)
+        val swingOrder = Comparator.comparing { p: Party -> listOf(ndp, lib, ind, oth, pc, bq, con, ca).indexOf(p) }
+        val partyChanges = mapOf(ca to con, pc to con).asOneTimePublisher()
+
+        val panel = partySeats(currSeats.asOneTimePublisher(), "2004 RESULT".asOneTimePublisher(), "".asOneTimePublisher())
+            .withPrev(prevSeats.asOneTimePublisher(), showPrev.map { if (it) "2000 RESULT" else "CHANGE SINCE 2000" }, showPrevRaw = showPrev, partyChanges = partyChanges)
+            .withSwing(currVotes.asOneTimePublisher(), prevVotes.asOneTimePublisher(), swingOrder, "SWING SINCE 2000".asOneTimePublisher(), partyChanges = partyChanges)
+            .withTotal(308.asOneTimePublisher())
+            .withMajorityLine(true.asOneTimePublisher()) { "$it FOR MAJORITY" }
+            .build("CANADA".asOneTimePublisher())
+        panel.setSize(1024, 512)
+        compareRendering("SeatViewPanel", "PartyMerge-1", panel)
+        compareAltTexts(
+            panel,
+            """
+            CANADA
+            
+            2004 RESULT (CHANGE SINCE 2000)
+            LIBERAL: 135 (-37)
+            CONSERVATIVE: 99 (+21)
+            BLOC QUÉBÉCOIS: 54 (+16)
+            NEW DEMOCRATIC PARTY: 19 (+6)
+            INDEPENDENT: 1 (+1)
+            155 FOR MAJORITY
+            
+            SWING SINCE 2000: 2.0% SWING CON TO LIB
+            """.trimIndent()
+        )
+
+        showPrev.submit(true)
+        compareRendering("SeatViewPanel", "PartyMerge-2", panel)
+        compareAltTexts(
+            panel,
+            """
+            CANADA
+            
+            2004 RESULT
+            LIBERAL: 135
+            CONSERVATIVE: 99
+            BLOC QUÉBÉCOIS: 54
+            NEW DEMOCRATIC PARTY: 19
+            INDEPENDENT: 1
+            155 FOR MAJORITY
+            
+            2000 RESULT
+            LIB: 172
+            CA: 66
+            BQ: 38
+            NDP: 13
+            PC: 12
+            151 FOR MAJORITY
+            
+            SWING SINCE 2000: 2.0% SWING CON TO LIB
+            """.trimIndent()
+        )
+    }
+
+    @Test
+    fun testPartyMergerDual() {
+        val lib = Party("Liberal", "LIB", Color(234, 109, 106))
+        val con = Party("Conservative", "CON", Color(100, 149, 237))
+        val bq = Party("Bloc Québécois", "BQ", Color(135, 206, 250))
+        val ndp = Party("New Democratic Party", "NDP", Color(244, 164, 96))
+        val pc = Party("Progressive Conservative", "PC", Color(153, 153, 255))
+        val ca = Party("Canadian Alliance", "CA", Color(95, 158, 160))
+        val ind = Party("Independent", "IND", Party.OTHERS.color)
+        val oth = Party.OTHERS
+
+        val currSeats = mapOf(
+            lib to (22 to 135),
+            con to (7 to 99),
+            bq to (0 to 54),
+            ndp to (3 to 19),
+            ind to (0 to 1)
+        )
+        val prevSeats = mapOf(
+            lib to (19 to 172),
+            ca to (0 to 66),
+            bq to (0 to 38),
+            ndp to (4 to 13),
+            pc to (9 to 12)
+        )
+        val currVotes = mapOf(
+            lib to 4982220,
+            con to 4019498,
+            bq to 1680109,
+            ndp to 2127403,
+            oth to 755472
+        )
+        val prevVotes = mapOf(
+            lib to 5252031,
+            ca to 3276929,
+            bq to 1377727,
+            ndp to 1093868,
+            pc to 1566998,
+            oth to 290220
+        )
+        val showPrev = Publisher(false)
+        val swingOrder = Comparator.comparing { p: Party -> listOf(ndp, lib, ind, oth, pc, bq, con, ca).indexOf(p) }
+        val partyChanges = mapOf(ca to con, pc to con).asOneTimePublisher()
+
+        val panel = partyDualSeats(currSeats.asOneTimePublisher(), "2004 RESULT".asOneTimePublisher(), "".asOneTimePublisher())
+            .withPrev(prevSeats.asOneTimePublisher(), showPrev.map { if (it) "2000 RESULT" else "CHANGE SINCE 2000" }, showPrevRaw = showPrev, partyChanges = partyChanges)
+            .withSwing(currVotes.asOneTimePublisher(), prevVotes.asOneTimePublisher(), swingOrder, "SWING SINCE 2000".asOneTimePublisher(), partyChanges = partyChanges)
+            .withTotal(308.asOneTimePublisher())
+            .withMajorityLine(true.asOneTimePublisher()) { "$it FOR MAJORITY" }
+            .build("CANADA".asOneTimePublisher())
+        panel.setSize(1024, 512)
+        compareRendering("SeatViewPanel", "PartyMergeDual-1", panel)
+        compareAltTexts(
+            panel,
+            """
+            CANADA
+            
+            2004 RESULT (CHANGE SINCE 2000)
+            LIBERAL: 22/135 (+3/-37)
+            CONSERVATIVE: 7/99 (-2/+21)
+            BLOC QUÉBÉCOIS: 0/54 (±0/+16)
+            NEW DEMOCRATIC PARTY: 3/19 (-1/+6)
+            INDEPENDENT: 0/1 (±0/+1)
+            155 FOR MAJORITY
+            
+            SWING SINCE 2000: 2.0% SWING CON TO LIB
+            """.trimIndent()
+        )
+
+        showPrev.submit(true)
+        compareRendering("SeatViewPanel", "PartyMergeDual-2", panel)
+        compareAltTexts(
+            panel,
+            """
+            CANADA
+            
+            2004 RESULT
+            LIBERAL: 22/135
+            CONSERVATIVE: 7/99
+            BLOC QUÉBÉCOIS: 0/54
+            NEW DEMOCRATIC PARTY: 3/19
+            INDEPENDENT: 0/1
+            155 FOR MAJORITY
+            
+            2000 RESULT
+            LIB: 19/172
+            CA: 0/66
+            BQ: 0/38
+            NDP: 4/13
+            PC: 9/12
+            151 FOR MAJORITY
+            
+            SWING SINCE 2000: 2.0% SWING CON TO LIB
+            """.trimIndent()
+        )
+    }
+
+    @Test
+    fun testPartyMergerRange() {
+        val lib = Party("Liberal", "LIB", Color(234, 109, 106))
+        val con = Party("Conservative", "CON", Color(100, 149, 237))
+        val bq = Party("Bloc Québécois", "BQ", Color(135, 206, 250))
+        val ndp = Party("New Democratic Party", "NDP", Color(244, 164, 96))
+        val pc = Party("Progressive Conservative", "PC", Color(153, 153, 255))
+        val ca = Party("Canadian Alliance", "CA", Color(95, 158, 160))
+        val ind = Party("Independent", "IND", Party.OTHERS.color)
+        val oth = Party.OTHERS
+
+        val currSeats = mapOf(
+            lib to 103..135,
+            con to 99..124,
+            bq to 51..54,
+            ndp to 19..29,
+            ind to 1..1
+        )
+        val prevSeats = mapOf(
+            lib to 172,
+            ca to 66,
+            bq to 38,
+            ndp to 13,
+            pc to 12
+        )
+        val currVotes = mapOf(
+            lib to 4982220,
+            con to 4019498,
+            bq to 1680109,
+            ndp to 2127403,
+            oth to 755472
+        )
+        val prevVotes = mapOf(
+            lib to 5252031,
+            ca to 3276929,
+            bq to 1377727,
+            ndp to 1093868,
+            pc to 1566998,
+            oth to 290220
+        )
+        val showPrev = Publisher(false)
+        val swingOrder = Comparator.comparing { p: Party -> listOf(ndp, lib, ind, oth, pc, bq, con, ca).indexOf(p) }
+        val partyChanges = mapOf(ca to con, pc to con).asOneTimePublisher()
+
+        val panel = partyRangeSeats(currSeats.asOneTimePublisher(), "2004-2006 RESULTS".asOneTimePublisher(), "".asOneTimePublisher())
+            .withPrev(prevSeats.asOneTimePublisher(), showPrev.map { if (it) "2000 RESULT" else "CHANGE SINCE 2000" }, showPrevRaw = showPrev, partyChanges = partyChanges)
+            .withSwing(currVotes.asOneTimePublisher(), prevVotes.asOneTimePublisher(), swingOrder, "SWING SINCE 2000".asOneTimePublisher(), partyChanges = partyChanges)
+            .withTotal(308.asOneTimePublisher())
+            .withMajorityLine(true.asOneTimePublisher()) { "$it FOR MAJORITY" }
+            .build("CANADA".asOneTimePublisher())
+        panel.setSize(1024, 512)
+        compareRendering("SeatViewPanel", "PartyMergeRange-1", panel)
+        compareAltTexts(
+            panel,
+            """
+            CANADA
+            
+            2004-2006 RESULTS (CHANGE SINCE 2000)
+            LIBERAL: 103-135 ((-69)-(-37))
+            CONSERVATIVE: 99-124 ((+21)-(+46))
+            BLOC QUÉBÉCOIS: 51-54 ((+13)-(+16))
+            NEW DEMOCRATIC PARTY: 19-29 ((+6)-(+16))
+            INDEPENDENT: 1-1 ((+1)-(+1))
+            155 FOR MAJORITY
+            
+            SWING SINCE 2000: 2.0% SWING CON TO LIB
+            """.trimIndent()
+        )
+
+        showPrev.submit(true)
+        compareRendering("SeatViewPanel", "PartyMergeRange-2", panel)
+        compareAltTexts(
+            panel,
+            """
+            CANADA
+            
+            2004-2006 RESULTS
+            LIBERAL: 103-135
+            CONSERVATIVE: 99-124
+            BLOC QUÉBÉCOIS: 51-54
+            NEW DEMOCRATIC PARTY: 19-29
+            INDEPENDENT: 1-1
+            155 FOR MAJORITY
+            
+            2000 RESULT
+            LIB: 172
+            CA: 66
+            BQ: 38
+            NDP: 13
+            PC: 12
+            151 FOR MAJORITY
+            
+            SWING SINCE 2000: 2.0% SWING CON TO LIB
             """.trimIndent()
         )
     }

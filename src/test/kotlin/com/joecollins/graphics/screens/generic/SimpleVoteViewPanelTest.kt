@@ -2694,6 +2694,170 @@ class SimpleVoteViewPanelTest {
         )
     }
 
+    @Test
+    fun testPartyMerger() {
+        val lib = Party("Liberal", "LIB", Color(234, 109, 106))
+        val con = Party("Conservative", "CON", Color(100, 149, 237))
+        val bq = Party("Bloc Québécois", "BQ", Color(135, 206, 250))
+        val ndp = Party("New Democratic Party", "NDP", Color(244, 164, 96))
+        val pc = Party("Progressive Conservative", "PC", Color(153, 153, 255))
+        val ca = Party("Canadian Alliance", "CA", Color(95, 158, 160))
+        val oth = Party.OTHERS
+
+        val currVotes = mapOf(
+            lib to 4982220,
+            con to 4019498,
+            bq to 1680109,
+            ndp to 2127403,
+            oth to 755472
+        )
+        val prevVotes = mapOf(
+            lib to 5252031,
+            ca to 3276929,
+            bq to 1377727,
+            ndp to 1093868,
+            pc to 1566998,
+            oth to 290220
+        )
+        val showPrev = Publisher(false)
+        val swingOrder = Comparator.comparing { p: Party -> listOf(ndp, lib, oth, pc, bq, con, ca).indexOf(p) }
+        val partyChanges = mapOf(ca to con, pc to con).asOneTimePublisher()
+
+        val panel = partyVotes(
+            currVotes.asOneTimePublisher(),
+            "2004 VOTE SHARE".asOneTimePublisher(),
+            "".asOneTimePublisher()
+        )
+            .withPrev(prevVotes.asOneTimePublisher(), showPrev.map { if (it) "2000 VOTE SHARE" else "CHANGE SINCE 2000" }, showPrevRaw = showPrev, partyChanges = partyChanges)
+            .withSwing(swingOrder, "SWING SINCE 2000".asOneTimePublisher())
+            .build("CANADA".asOneTimePublisher())
+        panel.setSize(1024, 512)
+        compareRendering("SimpleVoteViewPanel", "PartyMerge-1", panel)
+        compareAltTexts(
+            panel,
+            """
+            CANADA
+            
+            2004 VOTE SHARE (CHANGE SINCE 2000)
+            LIBERAL: 36.7% (-4.1%)
+            CONSERVATIVE: 29.6% (-8.0%)
+            NEW DEMOCRATIC PARTY: 15.7% (+7.2%)
+            BLOC QUÉBÉCOIS: 12.4% (+1.7%)
+            OTHERS: 5.6% (+3.3%)
+            
+            SWING SINCE 2000: 2.0% SWING CON TO LIB
+            """.trimIndent()
+        )
+
+        showPrev.submit(true)
+        compareRendering("SimpleVoteViewPanel", "PartyMerge-2", panel)
+        compareAltTexts(
+            panel,
+            """
+            CANADA
+            
+            2004 VOTE SHARE
+            LIBERAL: 36.7%
+            CONSERVATIVE: 29.6%
+            NEW DEMOCRATIC PARTY: 15.7%
+            BLOC QUÉBÉCOIS: 12.4%
+            OTHERS: 5.6%
+            
+            2000 VOTE SHARE
+            LIB: 40.8%
+            CA: 25.5%
+            PC: 12.2%
+            BQ: 10.7%
+            NDP: 8.5%
+            OTH: 2.3%
+            
+            SWING SINCE 2000: 2.0% SWING CON TO LIB
+            """.trimIndent()
+        )
+    }
+
+    @Test
+    fun testPartyMergerRange() {
+        val lib = Party("Liberal", "LIB", Color(234, 109, 106))
+        val con = Party("Conservative", "CON", Color(100, 149, 237))
+        val bq = Party("Bloc Québécois", "BQ", Color(135, 206, 250))
+        val ndp = Party("New Democratic Party", "NDP", Color(244, 164, 96))
+        val pc = Party("Progressive Conservative", "PC", Color(153, 153, 255))
+        val ca = Party("Canadian Alliance", "CA", Color(95, 158, 160))
+        val oth = Party.OTHERS
+
+        val currVotes = mapOf(
+            lib to 0.29..0.41,
+            con to 0.25..0.37,
+            bq to 0.09..0.13,
+            ndp to 0.15..0.22,
+            oth to 0.02..0.07
+        )
+        val prevVotes = mapOf(
+            lib to 5252031,
+            ca to 3276929,
+            bq to 1377727,
+            ndp to 1093868,
+            pc to 1566998,
+            oth to 290220
+        )
+        val showPrev = Publisher(false)
+        val swingOrder = Comparator.comparing { p: Party -> listOf(ndp, lib, oth, pc, bq, con, ca).indexOf(p) }
+        val partyChanges = mapOf(ca to con, pc to con).asOneTimePublisher()
+
+        val panel = partyRangeVotes(
+            currVotes.asOneTimePublisher(),
+            "2004 POLLING RANGE".asOneTimePublisher(),
+            "".asOneTimePublisher()
+        )
+            .withPrev(prevVotes.asOneTimePublisher(), showPrev.map { if (it) "2000 VOTE SHARE" else "CHANGE SINCE 2000" }, showPrevRaw = showPrev, partyChanges = partyChanges)
+            .withSwing(swingOrder, "SWING SINCE 2000".asOneTimePublisher())
+            .build("CANADA".asOneTimePublisher())
+        panel.setSize(1024, 512)
+        compareRendering("SimpleVoteViewPanel", "PartyMergeRange-1", panel)
+        compareAltTexts(
+            panel,
+            """
+            CANADA
+            
+            2004 POLLING RANGE (CHANGE SINCE 2000)
+            LIBERAL: 29.0-41.0% ((-11.8)-(+0.2)%)
+            CONSERVATIVE: 25.0-37.0% ((-12.7)-(-0.7)%)
+            NEW DEMOCRATIC PARTY: 15.0-22.0% ((+6.5)-(+13.5)%)
+            BLOC QUÉBÉCOIS: 9.0-13.0% ((-1.7)-(+2.3)%)
+            OTHERS: 2.0-7.0% ((-0.3)-(+4.7)%)
+            
+            SWING SINCE 2000: 0.4% SWING CON TO LIB
+            """.trimIndent()
+        )
+
+        showPrev.submit(true)
+        compareRendering("SimpleVoteViewPanel", "PartyMergeRange-2", panel)
+        compareAltTexts(
+            panel,
+            """
+            CANADA
+            
+            2004 POLLING RANGE
+            LIBERAL: 29.0-41.0%
+            CONSERVATIVE: 25.0-37.0%
+            NEW DEMOCRATIC PARTY: 15.0-22.0%
+            BLOC QUÉBÉCOIS: 9.0-13.0%
+            OTHERS: 2.0-7.0%
+            
+            2000 VOTE SHARE
+            LIB: 40.8%
+            CA: 25.5%
+            PC: 12.2%
+            BQ: 10.7%
+            NDP: 8.5%
+            OTH: 2.3%
+            
+            SWING SINCE 2000: 0.4% SWING CON TO LIB
+            """.trimIndent()
+        )
+    }
+
     private fun peiShapesByDistrict(): Map<Int, Shape> {
         val peiMap = MapFrameTest::class.java
             .classLoader

@@ -128,6 +128,8 @@ class BasicResultPanel private constructor(
 
         fun combine(value1: CT, value2: CT): CT
 
+        fun prevCombine(value1: PT, value2: PT): PT
+
         fun createBar(keyLabel: String, baseColor: Color, value: CT, shape: Shape?): BAR
 
         fun createPrevBar(keyLabel: String, baseColor: Color, value: PT): BAR
@@ -155,6 +157,10 @@ class BasicResultPanel private constructor(
         override fun prevLabelText(value: Int): String = value.toString()
 
         override fun combine(value1: Int, value2: Int): Int {
+            return value1 + value2
+        }
+
+        override fun prevCombine(value1: Int, value2: Int): Int {
             return value1 + value2
         }
 
@@ -204,6 +210,10 @@ class BasicResultPanel private constructor(
         override fun prevLabelText(value: Pair<Int, Int>): String = labelText(value)
 
         override fun combine(value1: Pair<Int, Int>, value2: Pair<Int, Int>): Pair<Int, Int> {
+            return (value1.first + value2.first) to (value1.second + value2.second)
+        }
+
+        override fun prevCombine(value1: Pair<Int, Int>, value2: Pair<Int, Int>): Pair<Int, Int> {
             return (value1.first + value2.first) to (value1.second + value2.second)
         }
 
@@ -266,6 +276,10 @@ class BasicResultPanel private constructor(
 
         override fun combine(value1: IntRange, value2: IntRange): IntRange {
             throw UnsupportedOperationException("Combining ranges is unsupported")
+        }
+
+        override fun prevCombine(value1: Int, value2: Int): Int {
+            return value1 + value2
         }
 
         override fun createBar(keyLabel: String, baseColor: Color, value: IntRange, shape: Shape?): DualBar {
@@ -373,12 +387,13 @@ class BasicResultPanel private constructor(
             prev: Flow.Publisher<out Map<out KPT, PT>>,
             changeHeader: Flow.Publisher<out String?>,
             changeSubhead: Flow.Publisher<out String?> = null.asOneTimePublisher(),
-            showPrevRaw: Flow.Publisher<Boolean> = false.asOneTimePublisher()
+            showPrevRaw: Flow.Publisher<Boolean> = false.asOneTimePublisher(),
+            partyChanges: Flow.Publisher<Map<KPT, KPT>> = emptyMap<KPT, KPT>().asOneTimePublisher()
         ): SeatScreenBuilder<KT, KPT, CT, PT, BAR> {
             this.prev = prev
             this.diff =
                 current
-                    .merge(prev) { c, p ->
+                    .merge(Aggregators.partyChanges(prev, partyChanges) { a, b -> seatTemplate.prevCombine(a, b) }) { c, p ->
                         val ret = LinkedHashMap<KPT, CurrDiff<CT>>()
                         c.forEach { (k, v) -> ret[keyTemplate.toParty(k)] = createFromPrev(v, p[keyTemplate.toParty(k)]) }
                         p.forEach { (k, v) -> ret.putIfAbsent(k, createFromPrev(v)) }
@@ -397,11 +412,12 @@ class BasicResultPanel private constructor(
             currVotes: Flow.Publisher<out Map<out KPT, Int>>,
             prevVotes: Flow.Publisher<out Map<out KPT, Int>>,
             comparator: Comparator<KPT>,
-            header: Flow.Publisher<out String?>
+            header: Flow.Publisher<out String?>,
+            partyChanges: Flow.Publisher<Map<KPT, KPT>> = emptyMap<KPT, KPT>().asOneTimePublisher()
         ): SeatScreenBuilder<KT, KPT, CT, PT, BAR> {
             swingHeader = header
             this.currVotes = currVotes
-            this.prevVotes = prevVotes
+            this.prevVotes = Aggregators.partyChanges(prevVotes, partyChanges)
             swingComparator = comparator
             return this
         }
@@ -861,7 +877,7 @@ class BasicResultPanel private constructor(
         }
     }
 
-    abstract class VoteScreenBuilder<KT, KPT : PartyOrCoalition, CT, CPT, PT> internal constructor(
+    abstract class VoteScreenBuilder<KT : Any, KPT : PartyOrCoalition, CT, CPT : Any, PT : Any> internal constructor(
         protected var current: Flow.Publisher<out Map<out KT, CT>>,
         protected var header: Flow.Publisher<out String?>,
         protected var subhead: Flow.Publisher<out String?>,
@@ -878,6 +894,7 @@ class BasicResultPanel private constructor(
         protected var limit = Int.MAX_VALUE
         protected var mandatoryParties: Set<KPT> = emptySet()
         protected var prev: Flow.Publisher<out Map<out KPT, PT>>? = null
+        protected var prevRaw: Flow.Publisher<out Map<out KPT, PT>>? = null
         protected var showPrevRaw: Flow.Publisher<Boolean>? = null
         protected var changeHeader: Flow.Publisher<out String?>? = null
         protected var changeSubhead: Flow.Publisher<out String?>? = null
@@ -969,14 +986,18 @@ class BasicResultPanel private constructor(
             prev: Flow.Publisher<out Map<out KPT, PT>>,
             header: Flow.Publisher<out String?>,
             subhead: Flow.Publisher<out String?> = (null as String?).asOneTimePublisher(),
-            showPrevRaw: Flow.Publisher<Boolean> = false.asOneTimePublisher()
+            showPrevRaw: Flow.Publisher<Boolean> = false.asOneTimePublisher(),
+            partyChanges: Flow.Publisher<Map<KPT, KPT>> = emptyMap<KPT, KPT>().asOneTimePublisher()
         ): VoteScreenBuilder<KT, KPT, CT, CPT, PT> {
-            this.prev = prev
+            this.prevRaw = prev
+            this.prev = Aggregators.partyChanges(prev, partyChanges) { a, b -> prevCombine(a, b) }
             changeHeader = header
             changeSubhead = subhead
             this.showPrevRaw = showPrevRaw
             return this
         }
+
+        protected abstract fun prevCombine(value1: PT, value2: PT): PT
 
         fun withPreferences(
             preferences: Flow.Publisher<out Map<out KT, CT>>,
@@ -1166,7 +1187,7 @@ class BasicResultPanel private constructor(
         protected abstract fun createAltText(textHeader: Flow.Publisher<out String?>): Flow.Publisher<String?>
     }
 
-    private class BasicVoteScreenBuilder<KT, KPT : PartyOrCoalition>(
+    private class BasicVoteScreenBuilder<KT : Any, KPT : PartyOrCoalition>(
         current: Flow.Publisher<out Map<out KT, Int?>>,
         header: Flow.Publisher<out String?>,
         subhead: Flow.Publisher<out String?>,
@@ -1311,6 +1332,12 @@ class BasicResultPanel private constructor(
                     updateBars()
                 }
 
+            var prevVotesRaw: Map<out KPT, Int> = emptyMap()
+                set(value) {
+                    field = value
+                    updateBars()
+                }
+
             var showPrevRaw: Boolean = false
                 set(value) {
                     field = value
@@ -1324,7 +1351,7 @@ class BasicResultPanel private constructor(
                 if (cVotes.values.any { it == null }) {
                     return emptyList()
                 }
-                val pVotes = this.prevVotes
+                val pVotes = if (showPrevRaw) this.prevVotesRaw else this.prevVotes
                 val prevWinner: KPT? = pVotes.entries
                     .maxByOrNull { it.value }
                     ?.key
@@ -1389,6 +1416,10 @@ class BasicResultPanel private constructor(
             }
         }
 
+        override fun prevCombine(value1: Int, value2: Int): Int {
+            return value1 + value2
+        }
+
         override fun createPreferenceFrame(): BarFrame? {
             return currPreferences?.let { currPreferences ->
                 val result = Result(true)
@@ -1451,6 +1482,7 @@ class BasicResultPanel private constructor(
                 val change = Change()
                 current.subscribe(Subscriber { change.currVotes = it })
                 prev.subscribe(Subscriber { change.prevVotes = it })
+                (prevRaw ?: prev).subscribe(Subscriber { change.prevVotesRaw = it })
                 showPrevRaw.subscribe(Subscriber { change.showPrevRaw = it })
                 val bars = change.barsPublisher
                 val pctReporting = this.pctReporting
@@ -1540,6 +1572,9 @@ class BasicResultPanel private constructor(
                     set(value) { field = value; updateResult() }
 
                 var prev: Map<out KPT, Int>? = null
+                    set(value) { field = value; updateResult() }
+
+                var prevRaw: Map<out KPT, Int>? = null
                     set(value) { field = value; updateResult() }
 
                 var showPrevRaw: Boolean = false
@@ -1779,7 +1814,7 @@ class BasicResultPanel private constructor(
                 val prevText: String?
                     get() {
                         if (!this.showPrevRaw) return null
-                        val prev = this.prev ?: emptyMap()
+                        val prev = this.prevRaw ?: emptyMap()
                         val total = prev.values.sum().toDouble()
                         return (changeHeader ?: "") +
                             prev.entries
@@ -1856,6 +1891,7 @@ class BasicResultPanel private constructor(
             textHeader.subscribe(Subscriber { inputs.textHeader = it })
             this.current.subscribe(Subscriber { inputs.current = it })
             this.prev?.subscribe(Subscriber { inputs.prev = it })
+            (this.prevRaw ?: this.prev)?.subscribe(Subscriber { inputs.prevRaw = it })
             this.showPrevRaw?.subscribe(Subscriber { inputs.showPrevRaw = it })
             this.header.subscribe(Subscriber { inputs.header = it })
             this.subhead.subscribe(Subscriber { inputs.subhead = it })
@@ -1900,7 +1936,7 @@ class BasicResultPanel private constructor(
         }
     }
 
-    private class RangeVoteScreenBuilder<KT, KPT : PartyOrCoalition>(
+    private class RangeVoteScreenBuilder<KT : Any, KPT : PartyOrCoalition>(
         current: Flow.Publisher<out Map<KT, ClosedRange<Double>>>,
         header: Flow.Publisher<out String?>,
         subhead: Flow.Publisher<out String?>,
@@ -1958,6 +1994,12 @@ class BasicResultPanel private constructor(
                     updateBars()
                 }
 
+            var prevVotesRaw: Map<out KPT, Int> = emptyMap()
+                set(value) {
+                    field = value
+                    updateBars()
+                }
+
             var showPrevRaw: Boolean = false
                 set(value) {
                     field = value
@@ -1967,7 +2009,7 @@ class BasicResultPanel private constructor(
             val barsPublisher = Publisher(createBars())
             private fun updateBars() = synchronized(this) { barsPublisher.submit(createBars()) }
             private fun createBars(): List<DualBar> {
-                val pVotes = this.prevVotes
+                val pVotes = if (this.showPrevRaw) this.prevVotesRaw else this.prevVotes
                 val prevTotal = pVotes.values.sum()
                 if (prevTotal == 0) {
                     return emptyList()
@@ -2025,6 +2067,7 @@ class BasicResultPanel private constructor(
                 val change = Change()
                 current.subscribe(Subscriber { change.currVotes = it })
                 prev.subscribe(Subscriber { change.prevVotes = it })
+                (prevRaw ?: prev).subscribe(Subscriber { change.prevVotesRaw = it })
                 showPrevRaw.subscribe(Subscriber { change.showPrevRaw = it })
                 val bars = change.barsPublisher
                 return BarFrameBuilder.dual(bars)
@@ -2041,6 +2084,10 @@ class BasicResultPanel private constructor(
                     .withSubhead(filteredChangeSubhead ?: (null as String?).asOneTimePublisher())
                     .build()
             }
+        }
+
+        override fun prevCombine(value1: Int, value2: Int): Int {
+            return value1 + value2
         }
 
         override fun createClassificationFrame(): BarFrame? {
@@ -2135,7 +2182,9 @@ class BasicResultPanel private constructor(
                     }
             }
             val prevText: Flow.Publisher<out String?> =
-                (prev ?: emptyMap<KPT, Int>().asOneTimePublisher())
+                showPrevRaw.compose {
+                    (if (it) prevRaw else prev) ?: emptyMap<KPT, Int>().asOneTimePublisher()
+                }
                     .merge(changeTitle) { p, t ->
                         val total = p.values.sum().toDouble()
                         t + p.entries
