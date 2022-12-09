@@ -7,6 +7,7 @@ import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.Party
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
+import com.joecollins.pubsub.map
 import org.junit.Test
 import java.awt.Color
 import java.awt.Dimension
@@ -317,6 +318,81 @@ class CandidateListingScreenTest {
         districtNum.submit(8)
         focus.submit(listOf(8, 15, 16, 17, 18, 19, 20))
         RenderTestUtils.compareRendering("CandidateListingScreen", "CandidatesUpdating-2", screen)
+    }
+
+    @Test
+    fun testCandidatesInTwoColumns() {
+        val lib = Party("Liberal", "LIB", Color.RED)
+        val con = Party("Conservative", "CON", Color.BLUE)
+        val ndp = Party("New Democratic Party", "NDP", Color.ORANGE)
+        val grn = Party("Green", "GRN", Color.GREEN.darker())
+        val ppc = Party("People's Party", "PPC", Color.MAGENTA.darker())
+        val rhino = Party("Rhinoceros", "RHINO", Color.PINK)
+        val ind = Party("Independent", "IND", Party.OTHERS.color)
+
+        val candidatesPublisher = Publisher(
+            listOf(
+                Candidate("Michael Ras", con),
+                Candidate("Elizabeth Robertson", grn),
+                Candidate("Vahid Seyfaie", ppc),
+                Candidate("Sven Spengemann", lib, true),
+                Candidate("Kayleigh Tahk", rhino),
+                Candidate("Sarah Walji", ndp)
+            )
+        )
+        val header = Publisher("2021 GENERAL ELECTION CANDIDATES")
+        val screen = CandidateListingScreen.of(candidatesPublisher, header, "".asOneTimePublisher())
+            .withTwoColumns(candidatesPublisher.map { it.size > 20 })
+            .build("MISSISSAUGA—LAKESHORE".asOneTimePublisher())
+        screen.size = Dimension(1024, 512)
+        RenderTestUtils.compareRendering("CandidateListingScreen", "TwoColumns-1", screen)
+
+        candidatesPublisher.submit(
+            listOf(
+                Candidate("Khaled Al-Sudani", ppc),
+                Candidate("Mélodie Anderson", ind),
+                Candidate("Myriam Beaulieu", ind),
+                Candidate("Line Bélanger", ind),
+                Candidate("Mylène Bonneau", ind),
+                Candidate("Jean-Denis Parent Boudreault", ind),
+                Candidate("Jevin David Carroll", ind),
+                Candidate("Sean Carson", ind),
+                Candidate("Ron Chhinzer", con),
+                Candidate("Sébastien CoRhino", rhino),
+                Candidate("Charles Currie", ind),
+                Candidate("Stephen Davis", ind),
+                Candidate("Mark Dejewski", ind),
+                Candidate("Ysack Dupont", ind),
+                Candidate("Donovan Eckstrom", ind),
+                Candidate("Alexandra Engering", ind),
+                Candidate("Daniel Gagnon", ind),
+                Candidate("Donald Gagnon", ind),
+                Candidate("Kerri Hildebrandt", ind),
+                Candidate("Peter House", ind),
+                Candidate("Martin Acetaria Caesar Jubinville", ind),
+                Candidate("Samuel Jubinville", ind),
+                Candidate("Mary Kidnew", grn),
+                Candidate("Julia Kole", ndp),
+                Candidate("Alain Lamontagne", ind),
+                Candidate("Marie-Hélène LeBel", ind),
+                Candidate("Conrad Lukawski", ind),
+                Candidate("Spencer Rocchi", ind),
+                Candidate("Eliana Rosenblum", ind),
+                Candidate("Julian Selody", ind),
+                Candidate("Roger Sherwood", ind),
+                Candidate("Adam Smith", ind),
+                Candidate("Charles Sousa", lib),
+                Candidate("Julie St-Amand", ind),
+                Candidate("Pascal St-Amand", ind),
+                Candidate("Patrick Strzalkowski", ind),
+                Candidate("Tomas Szuchewycz", ind),
+                Candidate("Ben Teichman", ind),
+                Candidate("John The Engineer Turmel", ind),
+                Candidate("Darcy Justin Vanderwater", ind)
+            )
+        )
+        header.submit("2022 BY-ELECTION CANDIDATES")
+        RenderTestUtils.compareRendering("CandidateListingScreen", "TwoColumns-2", screen)
     }
 
     private fun peiShapesByDistrict(): Map<Int, Shape> {

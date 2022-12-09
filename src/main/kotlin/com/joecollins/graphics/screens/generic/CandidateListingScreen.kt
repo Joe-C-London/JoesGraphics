@@ -1,8 +1,8 @@
 package com.joecollins.graphics.screens.generic
 
+import com.joecollins.graphics.components.BarFrame
 import com.joecollins.graphics.components.BarFrameBuilder
 import com.joecollins.graphics.components.FontSizeAdjustingLabel
-import com.joecollins.graphics.components.ListingFrameBuilder
 import com.joecollins.graphics.utils.StandardFont
 import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.Party
@@ -11,6 +11,7 @@ import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
 import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.map
+import com.joecollins.pubsub.merge
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Shape
@@ -22,13 +23,11 @@ import javax.swing.border.EmptyBorder
 
 class CandidateListingScreen private constructor(
     header: JLabel,
-    builder: Builder
+    internal val candidatesPanel: JPanel,
+    internal val prevPanel: JPanel?,
+    internal val secondaryPrevPanel: JPanel?,
+    internal val mapPanel: JPanel?
 ) : JPanel() {
-
-    internal val candidatesPanel = builder.candidatesPanel
-    internal val prevPanel = builder.prevPanel
-    internal val secondaryPrevPanel = builder.secondaryPrevPanel
-    internal val mapPanel = builder.mapPanel
 
     init {
         layout = BorderLayout()
@@ -51,35 +50,60 @@ class CandidateListingScreen private constructor(
     }
 
     companion object {
-        fun of(candidates: Flow.Publisher<out List<Candidate>>, header: Flow.Publisher<out String?>, subhead: Flow.Publisher<out String?>): Builder {
-            return Builder(candidates, header, subhead, null)
-        }
-
-        fun of(candidates: Flow.Publisher<out List<Candidate>>, header: Flow.Publisher<out String?>, subhead: Flow.Publisher<out String?>, incumbentMarker: String): Builder {
+        fun of(candidates: Flow.Publisher<out List<Candidate>>, header: Flow.Publisher<out String?>, subhead: Flow.Publisher<out String?>, incumbentMarker: String? = null): Builder {
             return Builder(candidates, header, subhead, incumbentMarker)
         }
     }
 
     class Builder internal constructor(candidates: Flow.Publisher<out List<Candidate>>, header: Flow.Publisher<out String?>, subhead: Flow.Publisher<out String?> = "".asOneTimePublisher(), incumbentMarker: String?) {
-        internal val candidatesPanel: JPanel
-        internal var prevPanel: JPanel? = null
-        internal var secondaryPrevPanel: JPanel? = null
-        internal var mapPanel: JPanel? = null
+        private val candidatesPanel: () -> JPanel
+        private var prevPanel: JPanel? = null
+        private var secondaryPrevPanel: JPanel? = null
+        private var mapPanel: JPanel? = null
+
+        private var showTwoColumns: Flow.Publisher<Boolean>? = null
 
         init {
-            candidatesPanel = ListingFrameBuilder.of(
-                candidates,
-                { it.name.uppercase() + (if (!it.incumbent || incumbentMarker == null) "" else (" $incumbentMarker")) },
-                { it.party.name.uppercase() },
-                { it.party.color }
-            )
-                .withHeader(header)
-                .withSubhead(subhead)
-                .build()
+            candidatesPanel = {
+                BarFrame(
+                    barsPublisher = candidates.merge(showTwoColumns ?: false.asOneTimePublisher()) { cList, show ->
+                        if (show) {
+                            val mid = cList.size / 2
+                            val first = cList.take(mid)
+                            val last = cList.drop(mid)
+                            (0 until mid).map { idx ->
+                                val left = first[idx]
+                                val right = if (idx == last.size) null else last[idx]
+                                val func = { c: Candidate -> c.name.uppercase() + (if (!c.incumbent || incumbentMarker == null) "" else (" $incumbentMarker")) + " (${c.party}) " }
+                                BarFrame.Bar(
+                                    func(left),
+                                    right?.let(func) ?: "",
+                                    listOf(
+                                        left.party.color to 0.49,
+                                        Color.WHITE to 0.02,
+                                        (right?.party?.color ?: Color.WHITE) to 0.49
+                                    )
+                                )
+                            }
+                        } else {
+                            cList.map {
+                                BarFrame.Bar(
+                                    it.name.uppercase() + (if (!it.incumbent || incumbentMarker == null) "" else (" $incumbentMarker")),
+                                    it.party.name.uppercase(),
+                                    listOf(it.party.color to 1.0)
+                                )
+                            }
+                        }
+                    },
+                    headerPublisher = header,
+                    subheadTextPublisher = subhead,
+                    maxPublisher = 1.0.asOneTimePublisher()
+                )
+            }
         }
 
         fun withPrev(prevVotes: Flow.Publisher<out Map<Party, Int>>, header: Flow.Publisher<out String?>, subhead: Flow.Publisher<out String?> = (null as String?).asOneTimePublisher()): Builder {
-            prevPanel = BarFrameBuilder.basic(prevVotes.map { v -> createBars(v) })
+            prevPanel = BarFrameBuilder.basic(prevVotes.map { v -> createVoteBars(v) })
                 .withMax((2.0 / 3).asOneTimePublisher())
                 .withHeader(header)
                 .withSubhead(subhead)
@@ -88,7 +112,7 @@ class CandidateListingScreen private constructor(
         }
 
         fun withSecondaryPrev(prevVotes: Flow.Publisher<out Map<Party, Int>>, header: Flow.Publisher<out String?>, subhead: Flow.Publisher<out String?> = (null as String?).asOneTimePublisher()): Builder {
-            secondaryPrevPanel = BarFrameBuilder.basic(prevVotes.map { v -> createBars(v) })
+            secondaryPrevPanel = BarFrameBuilder.basic(prevVotes.map { v -> createVoteBars(v) })
                 .withMax((2.0 / 3).asOneTimePublisher())
                 .withHeader(header)
                 .withSubhead(subhead)
@@ -96,7 +120,7 @@ class CandidateListingScreen private constructor(
             return this
         }
 
-        private fun createBars(votes: Map<Party, Int>): List<BarFrameBuilder.BasicBar> {
+        private fun createVoteBars(votes: Map<Party, Int>): List<BarFrameBuilder.BasicBar> {
             val total = votes.values.sum()
             return votes.asSequence()
                 .sortedByDescending { it.key.overrideSortOrder ?: it.value }
@@ -132,8 +156,19 @@ class CandidateListingScreen private constructor(
             return this
         }
 
+        fun withTwoColumns(showTwoColumns: Flow.Publisher<Boolean>): Builder {
+            this.showTwoColumns = showTwoColumns
+            return this
+        }
+
         fun build(title: Flow.Publisher<out String>): CandidateListingScreen {
-            return CandidateListingScreen(createHeaderLabel(title), this)
+            return CandidateListingScreen(
+                createHeaderLabel(title),
+                this.candidatesPanel(),
+                this.prevPanel,
+                this.secondaryPrevPanel,
+                this.mapPanel
+            )
         }
 
         private fun createHeaderLabel(textPublisher: Flow.Publisher<out String>): JLabel {
