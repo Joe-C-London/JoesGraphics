@@ -23,10 +23,10 @@ import javax.swing.border.EmptyBorder
 
 class CandidateListingScreen private constructor(
     header: JLabel,
-    internal val candidatesPanel: JPanel,
-    internal val prevPanel: JPanel?,
-    internal val secondaryPrevPanel: JPanel?,
-    internal val mapPanel: JPanel?
+    candidatesPanel: JPanel,
+    prevPanel: JPanel?,
+    secondaryPrevPanel: JPanel?,
+    mapPanel: JPanel?
 ) : JPanel() {
 
     init {
