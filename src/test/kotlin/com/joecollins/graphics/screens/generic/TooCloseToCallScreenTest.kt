@@ -1590,6 +1590,119 @@ class TooCloseToCallScreenTest {
         pollsReporting[27] = PollsReporting(10, 10)
     }
 
+    @Test
+    fun testPct() {
+        val candidateVotesRaw: MutableMap<Int, Map<Candidate, Int>> = HashMap()
+        val partyResultsRaw: MutableMap<Int, PartyResult> = HashMap()
+        val candidateVotes = Publisher<Map<Int, Map<Candidate, Int>>>(candidateVotesRaw)
+        val partyResults = Publisher<Map<Int, PartyResult>>(partyResultsRaw)
+        val screen = of(
+            (1..27).toSet().asOneTimePublisher(),
+            { candidateVotes.map { v -> v[it] ?: emptyMap() } },
+            { partyResults.map { v -> v[it] } },
+            { "DISTRICT $it".asOneTimePublisher() },
+            "TOO CLOSE TO CALL".asOneTimePublisher()
+        )
+            .sortByPcts()
+            .build("PRINCE EDWARD ISLAND".asOneTimePublisher())
+        screen.setSize(1024, 512)
+        compareRendering("TooCloseToCallScreen", "Pct-1", screen)
+        compareAltTexts(
+            screen,
+            """
+            PRINCE EDWARD ISLAND
+            
+            TOO CLOSE TO CALL
+            (empty)
+            """.trimIndent()
+        )
+
+        setupFirstAdvancePoll(candidateVotesRaw, partyResultsRaw, HashMap(), HashMap())
+        candidateVotes.submit(candidateVotesRaw)
+        partyResults.submit(partyResultsRaw)
+        compareRendering("TooCloseToCallScreen", "Pct-2", screen)
+        compareAltTexts(
+            screen,
+            """
+            PRINCE EDWARD ISLAND
+            
+            TOO CLOSE TO CALL
+            DISTRICT 1: PC: 45.1%; LIB: 30.8%; LEAD: 14.3%
+            """.trimIndent()
+        )
+
+        setupAllAdvancePolls(candidateVotesRaw, partyResultsRaw, HashMap(), HashMap())
+        candidateVotes.submit(candidateVotesRaw)
+        partyResults.submit(partyResultsRaw)
+        compareRendering("TooCloseToCallScreen", "Pct-3", screen)
+        compareAltTexts(
+            screen,
+            """
+            PRINCE EDWARD ISLAND
+            
+            TOO CLOSE TO CALL
+            DISTRICT 12: LIB: 32.4%; GRN: 32.2%; LEAD: 0.2%
+            DISTRICT 23: PC: 34.1%; GRN: 33.5%; LEAD: 0.6%
+            DISTRICT 8: LIB: 40.4%; PC: 39.6%; LEAD: 0.7%
+            DISTRICT 26: PC: 45.0%; LIB: 44.1%; LEAD: 0.9%
+            DISTRICT 5: PC: 34.4%; LIB: 33.4%; LEAD: 1.0%
+            DISTRICT 21: GRN: 34.8%; PC: 32.5%; LEAD: 2.3%
+            DISTRICT 11: GRN: 35.3%; PC: 33.0%; LEAD: 2.3%
+            DISTRICT 25: LIB: 40.6%; NDP: 38.0%; LEAD: 2.6%
+            DISTRICT 22: GRN: 39.3%; LIB: 36.6%; LEAD: 2.7%
+            DISTRICT 13: LIB: 43.1%; GRN: 32.6%; LEAD: 10.5%
+            DISTRICT 14: LIB: 39.0%; PC: 27.4%; LEAD: 11.5%
+            DISTRICT 15: PC: 44.1%; LIB: 32.1%; LEAD: 12.0%
+            DISTRICT 6: PC: 44.9%; LIB: 32.5%; LEAD: 12.3%
+            DISTRICT 1: PC: 45.1%; LIB: 30.8%; LEAD: 14.3%
+            DISTRICT 10: LIB: 43.4%; GRN: 27.7%; LEAD: 15.7%
+            DISTRICT 9: PC: 44.4%; LIB: 28.3%; LEAD: 16.1%
+            DISTRICT 27: LIB: 49.3%; PC: 30.9%; LEAD: 18.4%
+            DISTRICT 24: LIB: 48.2%; GRN: 28.8%; LEAD: 19.4%
+            DISTRICT 16: LIB: 43.8%; GRN: 24.1%; LEAD: 19.6%
+            (...)
+            """.trimIndent()
+        )
+
+        setupHalfOfPolls(candidateVotesRaw, partyResultsRaw, HashMap(), HashMap())
+        candidateVotes.submit(candidateVotesRaw)
+        partyResults.submit(partyResultsRaw)
+        compareRendering("TooCloseToCallScreen", "Pct-4", screen)
+        compareAltTexts(
+            screen,
+            """
+            PRINCE EDWARD ISLAND
+            
+            TOO CLOSE TO CALL
+            DISTRICT 26: LIB: 44.5%; PC: 43.1%; LEAD: 1.4%
+            DISTRICT 13: LIB: 41.0%; GRN: 36.2%; LEAD: 4.8%
+            DISTRICT 8: PC: 41.1%; LIB: 36.1%; LEAD: 5.0%
+            DISTRICT 5: GRN: 36.5%; PC: 31.1%; LEAD: 5.4%
+            DISTRICT 12: GRN: 37.8%; LIB: 29.1%; LEAD: 8.7%
+            DISTRICT 14: LIB: 36.9%; GRN: 27.9%; LEAD: 9.0%
+            DISTRICT 24: LIB: 42.6%; GRN: 32.0%; LEAD: 10.6%
+            DISTRICT 15: PC: 41.8%; LIB: 30.0%; LEAD: 11.8%
+            DISTRICT 6: PC: 43.6%; LIB: 30.0%; LEAD: 13.6%
+            DISTRICT 16: LIB: 40.3%; GRN: 25.7%; LEAD: 14.6%
+            DISTRICT 9: PC: 43.2%; GRN: 28.5%; LEAD: 14.7%
+            """.trimIndent()
+        )
+
+        setupFullResults(candidateVotesRaw, partyResultsRaw, HashMap(), HashMap())
+        candidateVotes.submit(candidateVotesRaw)
+        partyResults.submit(partyResultsRaw)
+        compareRendering("TooCloseToCallScreen", "Pct-1", screen)
+        compareAltTexts(
+            screen,
+            """
+            PRINCE EDWARD ISLAND
+            
+            TOO CLOSE TO CALL
+            (empty)
+            """.trimIndent()
+        )
+    }
+
     companion object {
         private val ndp = Party("New Democratic Party", "NDP", Color.ORANGE)
         private val pc = Party("Progressive Conservative", "PC", Color.BLUE)

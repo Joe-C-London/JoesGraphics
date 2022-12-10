@@ -56,6 +56,11 @@ class TooCloseToCallScreen private constructor(
                 field = value
                 update()
             }
+        var showPcts = false
+            set(value) {
+                field = value
+                update()
+            }
 
         private val entriesPublisher = Publisher(calculateEntries())
         fun toEntries() = entriesPublisher
@@ -75,7 +80,7 @@ class TooCloseToCallScreen private constructor(
             }
             .filter { it.votes.values.sum() > 0 }
             .filter { it.result == null || !it.result.isElected }
-            .sortedBy { it.lead }
+            .sortedBy { if (showPcts) it.pctLead else it.lead.toDouble() }
             .take(maxRows)
             .toList()
     }
@@ -91,11 +96,12 @@ class TooCloseToCallScreen private constructor(
         val topCandidates: List<Map.Entry<Candidate, Int>> = votes.entries
             .sortedByDescending { it.value }
             .toList()
-        var lead = when (topCandidates.size) {
+        val lead = when (topCandidates.size) {
             0 -> 0
             1 -> topCandidates[0].value
             else -> topCandidates[0].value - topCandidates[1].value
         }
+        val pctLead = lead / votes.values.sum().toDouble()
     }
 
     class Builder<T> internal constructor(
@@ -111,6 +117,7 @@ class TooCloseToCallScreen private constructor(
         private var reporting: Flow.Publisher<out Map<T, String>>? = null
         private var rowsLimit: Flow.Publisher<out Int>? = null
         private var numCandidates: Flow.Publisher<out Int>? = null
+        private var showPcts: Boolean = false
 
         fun withPctReporting(pctReportingFunc: (T) -> Flow.Publisher<Double>): Builder<T> {
             reporting = entries.compose { set -> Aggregators.toMap(set) { pctReportingFunc(it).map { pct -> DecimalFormat("0.0%").format(pct) + " IN" } } }
@@ -132,6 +139,11 @@ class TooCloseToCallScreen private constructor(
             return this
         }
 
+        fun sortByPcts(): Builder<T> {
+            showPcts = true
+            return this
+        }
+
         fun build(titlePublisher: Flow.Publisher<out String?>): TooCloseToCallScreen {
             val input = Input<T>()
             votes.subscribe(Subscriber { input.votes = it })
@@ -140,6 +152,7 @@ class TooCloseToCallScreen private constructor(
             reporting?.subscribe(Subscriber { input.reporting = it })
             rowsLimit?.subscribe(Subscriber { input.maxRows = it })
             numCandidates?.subscribe(Subscriber { input.numCandidates = it })
+            input.showPcts = showPcts
             return TooCloseToCallScreen(titlePublisher, createFrame(input), createAltText(titlePublisher, input))
         }
 
@@ -159,9 +172,10 @@ class TooCloseToCallScreen private constructor(
                 var size = head?.length ?: -1
                 var dotDotDot = false
                 val entriesText = entries.mapNotNull { e ->
+                    val total = e.votes.values.sum().toDouble()
                     val entry = "${e.header}: ${
-                    e.topCandidates.take(e.numCandidates).joinToString("; ") { c -> "${c.key.party.abbreviation}: ${DecimalFormat("#,##0").format(c.value)}" }
-                    }; LEAD: ${DecimalFormat("#,##0").format(e.lead)}${
+                    e.topCandidates.take(e.numCandidates).joinToString("; ") { c -> "${c.key.party.abbreviation}: ${if (input.showPcts) DecimalFormat("0.0%").format(c.value / total) else DecimalFormat("#,##0").format(c.value)}" }
+                    }; LEAD: ${if (input.showPcts) DecimalFormat("0.0%").format(e.pctLead) else DecimalFormat("#,##0").format(e.lead)}${
                     if (e.reporting.isEmpty()) "" else "; ${e.reporting}"
                     }"
                     if (dotDotDot) {
@@ -187,9 +201,11 @@ class TooCloseToCallScreen private constructor(
         private fun createFrame(input: Input<T>): MultiSummaryFrame {
             val entries = input.toEntries()
             val thousandsFormatter = DecimalFormat("#,##0")
+            val pctFormatter = DecimalFormat("0.0%")
             val frame = MultiSummaryFrame(
                 headerPublisher = header,
                 rowsPublisher = entries.mapElements { entry ->
+                    val total = entry.votes.values.sum().toDouble()
                     val header = entry.header
                     val values =
                         sequenceOf(
@@ -200,14 +216,20 @@ class TooCloseToCallScreen private constructor(
                                             e.key.party.color,
                                             e.key.party.abbreviation.uppercase() +
                                                 ": " +
-                                                thousandsFormatter.format(e.value)
+                                                (
+                                                    if (input.showPcts) {
+                                                        pctFormatter.format(e.value / total)
+                                                    } else {
+                                                        thousandsFormatter.format(e.value)
+                                                    }
+                                                    )
                                         )
                                     },
                                 generateSequence { Pair(Color.WHITE, "") }
                             )
                                 .flatten()
                                 .take(entry.numCandidates),
-                            sequenceOf(Color.WHITE to ("LEAD: " + thousandsFormatter.format(entry.lead))),
+                            sequenceOf(Color.WHITE to ("LEAD: " + (if (input.showPcts) pctFormatter.format(entry.pctLead) else thousandsFormatter.format(entry.lead)))),
                             reporting?.let { sequenceOf(Color.WHITE to entry.reporting) } ?: emptySequence()
                         )
                             .flatten()
