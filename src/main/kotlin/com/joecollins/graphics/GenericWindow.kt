@@ -136,11 +136,11 @@ class GenericWindow<T : JPanel> @JvmOverloads constructor(private val panel: T, 
         val fileItem = JMenuItem("Save to File...")
         fileItem.addActionListener { saveImageToFile(p) }
         imageMenu.add(fileItem)
-        val tweetItem = JMenuItem("Tweet...")
-        tweetItem.addActionListener {
-            TweetDialog(p).isVisible = true
-        }
-        imageMenu.add(tweetItem)
+//        val tweetItem = JMenuItem("Tweet...")
+//        tweetItem.addActionListener {
+//            TweetDialog(p).isVisible = true
+//        }
+//        imageMenu.add(tweetItem)
         val mastodonItem = JMenuItem("Mastodon...")
         mastodonItem.addActionListener {
             MastodonDialog(p).isVisible = true
