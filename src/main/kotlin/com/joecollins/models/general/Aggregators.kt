@@ -3,6 +3,7 @@ package com.joecollins.models.general
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.asOneTimePublisher
+import com.joecollins.pubsub.combine
 import com.joecollins.pubsub.map
 import com.joecollins.pubsub.mapReduce
 import com.joecollins.pubsub.merge
@@ -70,18 +71,14 @@ object Aggregators {
         }
     }
 
-    fun <T> combinePctReporting(items: Collection<T>, pctReportingFunc: (T) -> Flow.Publisher<Double>) = combinePctReporting(items, pctReportingFunc) { 1.0 }
+    fun <T> combinePctReporting(items: Collection<T>, pctReportingFunc: (T) -> Flow.Publisher<Double>) = combinePctReporting(items, pctReportingFunc) { 1.0.asOneTimePublisher() }
 
-    fun <T> combinePctReporting(items: Collection<T>, pctReportingFunc: (T) -> Flow.Publisher<Double>, weightFunc: (T) -> Double): Flow.Publisher<Double> {
-        val totalWeight = items.map(weightFunc).sum()
+    fun <T> combinePctReporting(items: Collection<T>, pctReportingFunc: (T) -> Flow.Publisher<Double>, weightFunc: (T) -> Flow.Publisher<Double>): Flow.Publisher<Double> {
+        val totalWeight = items.map(weightFunc).combine().map { it.sum().coerceAtLeast(1e-6) }
         return items.map { e ->
-            val weight = weightFunc(e)
-            pctReportingFunc(e).map { it * weight }
-        }.mapReduce(
-            0.0,
-            { a, p -> a + (p / totalWeight) },
-            { a, p -> a - (p / totalWeight) }
-        )
+            val weight = weightFunc(e).merge(totalWeight) { w, tw -> w / tw }
+            pctReportingFunc(e).merge(weight) { p, w -> p * w }
+        }.combine().map { it.sum() }
     }
 
     fun <K1, K2> adjustKey(result: Flow.Publisher<out Map<out K1, Int>>, func: (K1) -> K2) = result.map { adjustKey(it, func) }

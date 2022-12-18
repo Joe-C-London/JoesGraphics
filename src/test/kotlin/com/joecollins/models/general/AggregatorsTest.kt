@@ -316,8 +316,8 @@ class AggregatorsTest {
     @Test
     fun testCombinePctReportingWithWeights() {
         val inputs = listOf(
-            Pair(Publisher(0.5), 2.0),
-            Pair(Publisher(0.3), 3.0)
+            Pair(Publisher(0.5), Publisher(2.0)),
+            Pair(Publisher(0.3), Publisher(3.0))
         )
         val output = BoundResult<Double>()
         combinePctReporting(inputs, { it.first }, { it.second })
@@ -330,6 +330,10 @@ class AggregatorsTest {
         inputs[1].first.submit(0.7)
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ output.value }, IsCloseTo(0.66, 1e-6))
+
+        inputs[0].second.submit(5.0)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            .until({ output.value }, IsCloseTo(0.6375, 1e-6))
     }
 
     @Test
