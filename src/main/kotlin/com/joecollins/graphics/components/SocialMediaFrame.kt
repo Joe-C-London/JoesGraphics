@@ -1,5 +1,6 @@
 package com.joecollins.graphics.components
 
+import com.joecollins.graphics.GenericPanel.Companion.pad
 import com.joecollins.graphics.ImageGenerator
 import com.joecollins.graphics.utils.StandardFont
 import com.joecollins.models.general.social.generic.Link
@@ -7,6 +8,7 @@ import com.joecollins.models.general.social.generic.Media
 import com.joecollins.models.general.social.generic.Post
 import com.joecollins.models.general.social.generic.User
 import com.joecollins.pubsub.Subscriber
+import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
 import com.joecollins.pubsub.map
 import com.vdurmont.emoji.EmojiParser
 import java.awt.BorderLayout
@@ -23,6 +25,7 @@ import java.awt.event.ComponentEvent
 import java.awt.geom.AffineTransform
 import java.awt.geom.Ellipse2D
 import java.awt.image.BufferedImage
+import java.text.DecimalFormat
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.concurrent.Flow
@@ -137,6 +140,29 @@ abstract class SocialMediaFrame<P : Post<P>>(post: Flow.Publisher<out Post<P>>, 
                 }
             )
         )
+
+        val pollPanel = BarFrameBuilder.basic(
+            post.map { p ->
+                val polls = p.polls
+                if (polls.isNotEmpty()) {
+                    val options = polls[0].options
+                    val total = options.values.sum().toDouble().coerceAtLeast(1e-6)
+                    options.entries.map { BarFrameBuilder.BasicBar(it.key, color, it.value, "${DecimalFormat("#,##0").format(it.value)} (${DecimalFormat("0.0%").format(it.value / total)})") }
+                } else {
+                    emptyList()
+                }
+            }
+        ).build().let { pad(it) }
+        post.subscribe(
+            Subscriber(
+                eventQueueWrapper {
+                    pollPanel.isVisible = it.polls.isNotEmpty()
+                    pollPanel.invalidate()
+                    pollPanel.revalidate()
+                }
+            )
+        )
+        postPanel.add(pollPanel)
 
         postPanel.add(Box.createVerticalGlue())
 

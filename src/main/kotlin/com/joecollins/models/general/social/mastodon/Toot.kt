@@ -20,7 +20,8 @@ data class Toot(
     private val tags: List<Tag> = emptyList(),
     private val card: Card? = null,
     @JsonProperty("media_attachments") private val mediaAttachments: List<MediaAttachment> = emptyList(),
-    private val emojis: List<Emoji> = emptyList()
+    private val emojis: List<Emoji> = emptyList(),
+    private val poll: Poll? = null
 ) : Post<Toot> {
 
     override val text: String = content
@@ -56,4 +57,6 @@ data class Toot(
     }
 
     override val userMentionEntities: List<UserMention> = mentions
+
+    override val polls: List<com.joecollins.models.general.social.generic.Poll> = poll?.let { listOf(it) } ?: emptyList()
 }

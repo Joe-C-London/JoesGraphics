@@ -15,6 +15,8 @@ import com.twitter.clientlib.model.HashtagEntity
 import com.twitter.clientlib.model.Media
 import com.twitter.clientlib.model.MentionEntity
 import com.twitter.clientlib.model.Photo
+import com.twitter.clientlib.model.Poll
+import com.twitter.clientlib.model.PollOption
 import com.twitter.clientlib.model.ResourceUnauthorizedProblem
 import com.twitter.clientlib.model.TweetAttachments
 import com.twitter.clientlib.model.TweetReferencedTweets
@@ -142,6 +144,9 @@ class TweetFrameTest {
                 if (expansions.contains("attachments.media_keys")) {
                     ret.media = media.media
                 }
+                if (expansions.contains("attachments.poll_ids")) {
+                    ret.polls = poll?.let { listOf(it) } ?: emptyList()
+                }
                 return ret
             }
 
@@ -172,6 +177,8 @@ class TweetFrameTest {
 
         var user = UserBuilder(authorId)
         var media = MediaBuilder()
+
+        var poll: Poll? = null
     }
 
     private class UserBuilder(private val id: String) {
@@ -534,5 +541,27 @@ class TweetFrameTest {
         val frame = TweetFrame(TweetLoader.loadTweetV2(123L, mockTwitter).asOneTimePublisher())
         frame.size = Dimension(512, 256)
         RenderTestUtils.compareRendering("TweetFrame", "Errors", frame)
+    }
+
+    @Test
+    fun testPoll() {
+        val tweetBuilder = setupTweetBuilder("123", "456")
+        tweetBuilder.text = "Is this something that should render?"
+        tweetBuilder.createdAt = Instant.parse("2021-04-15T21:34:17Z")
+        tweetBuilder.poll = Poll().also { poll ->
+            poll.options = listOf(
+                PollOption().also { it.label = "Yes"; it.votes = 100; it.position = 1 },
+                PollOption().also { it.label = "No"; it.votes = 150; it.position = 2 }
+            )
+        }
+
+        val userBuilder = tweetBuilder.user
+        userBuilder.username = "Joe_C_London"
+        userBuilder.name = "Joe C"
+        userBuilder.profileImageUrl = javaClass.classLoader.getResource("com/joecollins/graphics/twitter-inputs/letter-j.png")!!
+
+        val frame = TweetFrame(TweetLoader.loadTweetV2(123L, mockTwitter).asOneTimePublisher())
+        frame.size = Dimension(512, 256)
+        RenderTestUtils.compareRendering("TweetFrame", "Poll", frame)
     }
 }

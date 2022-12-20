@@ -14,7 +14,8 @@ class Tweet(
     override val links: List<Link>,
     override val mediaEntities: List<Media>,
     override val hashtagEntities: List<Hashtag>,
-    override val userMentionEntities: List<UserMention>
+    override val userMentionEntities: List<UserMention>,
+    override val polls: List<Poll>
 ) : Post<Tweet> {
 
     override val url: URL = URL("https://twitter.com/${user.screenName}/status/$id")
@@ -30,7 +31,8 @@ class Tweet(
                 status.urlEntities.map { Link.fromV1(it) },
                 status.mediaEntities.map { Media.fromV1(it) },
                 status.hashtagEntities.map { Hashtag.fromV1(it) },
-                status.userMentionEntities.map { UserMention.fromV1(it) }
+                status.userMentionEntities.map { UserMention.fromV1(it) },
+                emptyList()
             )
         }
 
@@ -51,7 +53,8 @@ class Tweet(
                 tweet.entities?.urls?.mapNotNull { Link.fromV2(it) } ?: emptyList(),
                 tweet.entities?.urls?.mapNotNull { Media.fromV2(it, media) } ?: emptyList(),
                 tweet.entities?.hashtags?.map { Hashtag.fromV2(it) } ?: emptyList(),
-                tweet.entities?.mentions?.map { UserMention.fromV2(it) } ?: emptyList()
+                tweet.entities?.mentions?.map { UserMention.fromV2(it) } ?: emptyList(),
+                expansions.polls?.map { Poll.fromV2(it) } ?: emptyList()
             )
         }
     }

@@ -3,7 +3,7 @@ package com.joecollins.models.general.social.twitter
 import com.twitter.clientlib.api.TwitterApi
 import com.twitter.clientlib.model.TweetReferencedTweets
 import java.time.Instant
-import java.util.Properties
+import java.util.*
 
 object TweetLoader {
 
@@ -29,7 +29,7 @@ object TweetLoader {
 
     internal fun loadTweetV2(id: Long, instance: TwitterApi): Tweet {
         val response = instance.tweets().findTweetById(id.toString())
-            .expansions(setOf("author_id", "attachments.media_keys"))
+            .expansions(setOf("author_id", "attachments.media_keys", "attachments.poll_ids"))
             .tweetFields(setOf("created_at", "entities", "referenced_tweets"))
             .userFields(setOf("profile_image_url", "verified", "protected"))
             .mediaFields(setOf("url"))
@@ -48,6 +48,7 @@ object TweetLoader {
                 ),
                 Instant.EPOCH,
                 null,
+                emptyList(),
                 emptyList(),
                 emptyList(),
                 emptyList(),

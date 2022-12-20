@@ -5,6 +5,7 @@ import com.joecollins.models.general.social.mastodon.Card
 import com.joecollins.models.general.social.mastodon.Emoji
 import com.joecollins.models.general.social.mastodon.MediaAttachment
 import com.joecollins.models.general.social.mastodon.Mention
+import com.joecollins.models.general.social.mastodon.Poll
 import com.joecollins.models.general.social.mastodon.Tag
 import com.joecollins.models.general.social.mastodon.Toot
 import com.joecollins.models.general.social.mastodon.User
@@ -223,7 +224,7 @@ class MastodonFrameTest {
 
         val frame = MastodonFrame(toot.asOneTimePublisher())
         frame.size = Dimension(512, 256)
-        RenderTestUtils.compareRendering("MastodonFrame", "Emoji", frame, 2)
+        RenderTestUtils.compareRendering("MastodonFrame", "Emoji", frame, 5)
     }
 
     @Test
@@ -233,5 +234,31 @@ class MastodonFrameTest {
         val frame = MastodonFrame(toot.asOneTimePublisher())
         frame.size = Dimension(512, 256)
         RenderTestUtils.compareRendering("MastodonFrame", "Errors", frame)
+    }
+
+    @Test
+    fun testPoll() {
+        val toot = Toot(
+            content = "<p>Should we render this poll?</p>",
+            account = User(
+                username = "Joe_C_London",
+                acct = "Joe_C_London",
+                displayName = "Joe C",
+                avatar = javaClass.classLoader.getResource("com/joecollins/graphics/twitter-inputs/letter-j.png")!!,
+                url = URL("https://mastodon.world/@Joe_C_London")
+            ),
+            createdAt = Instant.parse("2021-04-15T21:34:17Z"),
+            url = URL("https://mastodon.world/@Joe_C_London/123"),
+            poll = Poll(
+                opts = listOf(
+                    Poll.Option("Yes", 50),
+                    Poll.Option("No", 100)
+                )
+            )
+        )
+
+        val frame = MastodonFrame(toot.asOneTimePublisher())
+        frame.size = Dimension(512, 256)
+        RenderTestUtils.compareRendering("MastodonFrame", "Poll", frame, 5)
     }
 }
