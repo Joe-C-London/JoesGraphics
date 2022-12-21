@@ -157,6 +157,51 @@ class BattlegroundScreenTest {
     }
 
     @Test
+    fun testSinglePartyBattlegroundWithPartyChange() {
+        val prevResult = Publisher(bcPrevResult())
+        val currResult = Publisher<Map<String, PartyResult>>(emptyMap())
+        val party = Publisher(ndp)
+        val targetSeats = Publisher(30)
+        val defenseSeats = Publisher(15)
+        val numRows = Publisher(15)
+        val title = Publisher("NDP BATTLEGROUND")
+        val panel = singleParty(
+            prevResult,
+            currResult,
+            { it.uppercase() },
+            party
+        )
+            .withSeatsToShow(defenseSeats, targetSeats)
+            .withNumRows(numRows)
+            .withPartyChanges(mapOf(lib to bcu).asOneTimePublisher())
+            .build(title)
+        panel.setSize(1024, 512)
+        compareRendering("BattlegroundScreen", "Basic-SingleParty-1", panel)
+        party.submit(bcu)
+        targetSeats.submit(15)
+        defenseSeats.submit(30)
+        title.submit("BC UNITED BATTLEGROUND")
+        compareRendering("BattlegroundScreen", "Basic-SingleParty-PartyChange-2", panel)
+        currResult.submit(bcCurrResult().mapValues { if (it.value.party == lib) PartyResult(bcu, it.value.elected) else it.value })
+        compareRendering("BattlegroundScreen", "Basic-SingleParty-PartyChange-3", panel)
+        party.submit(grn)
+        targetSeats.submit(30)
+        defenseSeats.submit(5)
+        title.submit("GREEN BATTLEGROUND")
+        compareRendering("BattlegroundScreen", "Basic-SingleParty-PartyChange-4", panel)
+        party.submit(ndp)
+        targetSeats.submit(30)
+        defenseSeats.submit(0)
+        title.submit("NDP TARGETS")
+        compareRendering("BattlegroundScreen", "Basic-SingleParty-PartyChange-5", panel)
+        party.submit(bcu)
+        targetSeats.submit(0)
+        defenseSeats.submit(30)
+        title.submit("BC UNITED DEFENSE")
+        compareRendering("BattlegroundScreen", "Basic-SingleParty-PartyChange-6", panel)
+    }
+
+    @Test
     fun testDoublePartyBattlegroundPreferences() {
         val alp = Party("Labor", "ALP", Color.RED)
         val clp = Party("Country Liberal", "CLP", Color.ORANGE)
@@ -212,6 +257,7 @@ class BattlegroundScreenTest {
 
     companion object {
         private val lib = Party("Liberal", "LIB", Color.RED)
+        private val bcu = Party("BC United", "BCU", Color.BLUE)
         private val ndp = Party("New Democratic Party", "NDP", Color.ORANGE)
         private val grn = Party("Green", "GRN", Color.GREEN.darker())
         private val ind = Party("Independent", "IND", Color.GRAY)

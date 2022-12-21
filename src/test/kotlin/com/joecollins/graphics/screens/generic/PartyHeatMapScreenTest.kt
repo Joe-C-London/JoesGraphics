@@ -101,8 +101,55 @@ class PartyHeatMapScreenTest {
         RenderTestUtils.compareRendering("PartyHeatMapScreen", "ElectedLeading-4", panel)
     }
 
+    @Test
+    fun testPartyChanges() {
+        val prevResults = bcPrevResult()
+        val currResults = Publisher(emptyMap<String, PartyResult?>())
+        val parties = Publisher(listOf(bcu, ndp))
+        val rows = Publisher(4)
+        val panel = PartyHeatMapScreen.ofElectedLeading(
+            prevResults.keys.asOneTimePublisher(),
+            parties,
+            { riding ->
+                prevResults[riding]!!.maxBy { it.value }.key
+            },
+            { riding ->
+                currResults.map { r -> r[riding] }
+            }
+        ) { riding, party ->
+            val result = prevResults[riding]!!
+            val me = result[if (party == bcu) lib else party] ?: 0
+            val oth = result.filter { it.key != (if (party == bcu) lib else party) }.maxOf { it.value }
+            val total = result.values.sum().toDouble()
+            (oth - me) / total
+        }
+            .withNumRows(rows)
+            .withPartyChanges(mapOf(lib to bcu).asOneTimePublisher())
+            .build("PARTY HEAT MAPS".asOneTimePublisher())
+        panel.setSize(1024, 512)
+        RenderTestUtils.compareRendering("PartyHeatMapScreen", "PartyChanges-1", panel)
+
+        currResults.submit(
+            mapOf(
+                "Coquitlam-Burke Mountain" to PartyResult.elected(ndp),
+                "Fraser-Nicola" to PartyResult.leading(bcu),
+                "Richmond-Queensborough" to PartyResult.leading(ndp),
+                "Vancouver-False Creek" to PartyResult.leading(ndp)
+            )
+        )
+        RenderTestUtils.compareRendering("PartyHeatMapScreen", "PartyChanges-2", panel)
+
+        currResults.submit(bcCurrResult().mapValues { if (it.value?.party == lib) PartyResult(bcu, it.value!!.elected) else it.value })
+        RenderTestUtils.compareRendering("PartyHeatMapScreen", "PartyChanges-3", panel)
+
+        parties.submit(listOf(bcu, ndp, grn))
+        rows.submit(2)
+        RenderTestUtils.compareRendering("PartyHeatMapScreen", "PartyChanges-4", panel)
+    }
+
     companion object {
         private val lib = Party("Liberal", "LIB", Color.RED)
+        private val bcu = Party("BC United", "BCU", Color.BLUE)
         private val ndp = Party("New Democratic Party", "NDP", Color.ORANGE)
         private val grn = Party("Green", "GRN", Color.GREEN.darker())
         private val ind = Party("Independent", "IND", Color.GRAY)

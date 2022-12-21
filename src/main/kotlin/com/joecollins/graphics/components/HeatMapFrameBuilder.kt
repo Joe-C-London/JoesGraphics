@@ -130,7 +130,8 @@ class HeatMapFrameBuilder {
             header: Flow.Publisher<out String?>,
             labelFunc: (T) -> Flow.Publisher<out String?> = { (null as String?).asOneTimePublisher() },
             seatsFunc: (T) -> Int = { 1 },
-            filterFunc: Flow.Publisher<(T) -> Boolean> = { _: T -> true }.asOneTimePublisher()
+            filterFunc: Flow.Publisher<(T) -> Boolean> = { _: T -> true }.asOneTimePublisher(),
+            partyChanges: Flow.Publisher<Map<Party, Party>> = emptyMap<Party, Party>().asOneTimePublisher()
         ): HeatMapFrame {
             val results: Map<T, Flow.Publisher<out PartyResult?>> = entries
                 .distinct()
@@ -143,7 +144,7 @@ class HeatMapFrameBuilder {
                 .toList()
             val resultWithPrevPublishers: List<Flow.Publisher<Triple<PartyResult?, Party, Int>>> = entries
                 .map { t ->
-                    results[t]!!.map { Triple(it, prev[t]!!, seatsFunc(t)) }
+                    results[t]!!.merge(partyChanges) { res, changes -> Triple(res, prev[t]!!.let { changes[it] ?: it }, seatsFunc(t)) }
                 }
                 .toList()
             val seats = createSeatBarPublisher(resultPublishers) { party == it }
@@ -197,7 +198,7 @@ class HeatMapFrameBuilder {
                     changeList,
                     { it.first },
                     { it.second },
-                    calcPrevForParty(allPrevs, party).asOneTimePublisher(),
+                    partyChanges.map { calcPrevForParty(allPrevs, party, it) },
                     change.map(changeLabelFunc)
                 )
                 .withHeader(header)
@@ -205,8 +206,8 @@ class HeatMapFrameBuilder {
                 .build()
         }
 
-        private fun calcPrevForParty(prev: List<Pair<Party, Int>>, party: Party): Int {
-            return prev.filter { party == it.first }.sumOf { it.second }
+        private fun calcPrevForParty(prev: List<Pair<Party, Int>>, party: Party, changes: Map<Party, Party>): Int {
+            return prev.filter { party == it.first || party == changes[it.first] }.sumOf { it.second }
         }
 
         private fun createSeatBarPublisher(

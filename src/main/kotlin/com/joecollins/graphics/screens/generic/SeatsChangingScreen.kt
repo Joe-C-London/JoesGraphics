@@ -25,6 +25,7 @@ class SeatsChangingScreen private constructor(title: Flow.Publisher<out String?>
         private val header: Flow.Publisher<out String> = headerPublisher
         private var numRows: Flow.Publisher<out Int> = 20.asOneTimePublisher()
         private var seatFilter: Flow.Publisher<out Set<T>?> = Publisher(null)
+        private var partyChanges: Flow.Publisher<Map<Party, Party>> = Publisher(emptyMap())
 
         fun withNumRows(numRowsPublisher: Flow.Publisher<out Int>): Builder<T> {
             numRows = numRowsPublisher
@@ -36,11 +37,17 @@ class SeatsChangingScreen private constructor(title: Flow.Publisher<out String?>
             return this
         }
 
+        fun withPartyChanges(changes: Flow.Publisher<Map<Party, Party>>): Builder<T> {
+            partyChanges = changes
+            return this
+        }
+
         fun build(titlePublisher: Flow.Publisher<out String?>): SeatsChangingScreen {
             val inputs = Input<T>()
             prevResults.subscribe(Subscriber { inputs.setPrevResults(it) })
             currResults.subscribe(Subscriber { inputs.setCurrResults(it) })
             seatFilter.subscribe(Subscriber { inputs.setSeatFilter(it) })
+            partyChanges.subscribe(Subscriber { inputs.setPartyChanges(it) })
             val frame = ResultListingFrame(
                 headerPublisher = header,
                 numRowsPublisher = numRows,
@@ -61,6 +68,7 @@ class SeatsChangingScreen private constructor(title: Flow.Publisher<out String?>
         private var prevResults: List<Pair<T, Party>> = emptyList()
         private var currResults: Map<T, PartyResult?> = emptyMap()
         private var seatFilter: Set<T>? = null
+        private var partyChanges: Map<Party, Party> = emptyMap()
 
         fun setPrevResults(prevResults: Map<T, Map<Party, Int>>) {
             this.prevResults = prevResults.entries
@@ -97,6 +105,11 @@ class SeatsChangingScreen private constructor(title: Flow.Publisher<out String?>
             update()
         }
 
+        fun setPartyChanges(changes: Map<Party, Party>) {
+            this.partyChanges = changes
+            update()
+        }
+
         val resultPublisher = Publisher(calculateEntries())
 
         private fun update() = synchronized(this) { resultPublisher.submit(calculateEntries()) }
@@ -110,7 +123,7 @@ class SeatsChangingScreen private constructor(title: Flow.Publisher<out String?>
                 )
             }
             .filter { it.third != null }
-            .filter { it.second != it.third!!.party }
+            .filter { (partyChanges[it.second] ?: it.second) != it.third!!.party }
             .map {
                 val seatFilter = seatFilter
                 val colorFunc =

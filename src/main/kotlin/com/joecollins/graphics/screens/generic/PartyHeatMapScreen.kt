@@ -58,6 +58,7 @@ class PartyHeatMapScreen private constructor(panel: JPanel, title: Flow.Publishe
     ) {
         private var numRows = 5.asOneTimePublisher()
         private var filter: Flow.Publisher<(T) -> Boolean> = { _: T -> true }.asOneTimePublisher()
+        private var partyChanges: Flow.Publisher<Map<Party, Party>> = emptyMap<Party, Party>().asOneTimePublisher()
 
         fun withNumRows(numRows: Flow.Publisher<Int>): Builder<T> {
             this.numRows = numRows
@@ -66,6 +67,11 @@ class PartyHeatMapScreen private constructor(panel: JPanel, title: Flow.Publishe
 
         fun withFilter(filter: Flow.Publisher<(T) -> Boolean>): Builder<T> {
             this.filter = filter
+            return this
+        }
+
+        fun withPartyChanges(changes: Flow.Publisher<Map<Party, Party>>): Builder<T> {
+            this.partyChanges = changes
             return this
         }
 
@@ -88,7 +94,8 @@ class PartyHeatMapScreen private constructor(panel: JPanel, title: Flow.Publishe
                         changeLabel = { e, l -> if (withLeading) "${changeLabel(e)}/${changeLabel(l)}" else changeLabel(e) },
                         header = party.name.uppercase().asOneTimePublisher(),
                         labelFunc = { it.toString().asOneTimePublisher() },
-                        filterFunc = filter
+                        filterFunc = filter,
+                        partyChanges = partyChanges
                     )
                 }
             }.subscribe(
