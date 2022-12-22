@@ -160,7 +160,7 @@ abstract class SocialMediaFrame<P : Post<P>>(post: Flow.Publisher<out Post<P>>, 
                     emptyList()
                 }
             }
-        ).build().pad()
+        ).build().pad().also { it.isVisible = false }
         post.subscribe(
             Subscriber(
                 eventQueueWrapper {
