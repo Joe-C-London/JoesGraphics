@@ -10,10 +10,10 @@ import com.joecollins.models.general.social.mastodon.Tag
 import com.joecollins.models.general.social.mastodon.Toot
 import com.joecollins.models.general.social.mastodon.User
 import com.joecollins.pubsub.asOneTimePublisher
-import org.junit.Test
 import java.awt.Dimension
 import java.net.URL
 import java.time.Instant
+import org.junit.jupiter.api.Test
 
 class MastodonFrameTest {
 
@@ -91,13 +91,31 @@ class MastodonFrameTest {
             createdAt = Instant.parse("2021-04-15T21:34:17Z"),
             url = URL("https://mastodon.world/@Joe_C_London/123"),
             mentions = listOf(
-                Mention("NicolaSturgeon", URL("https://mastodon.snp.scot/@NicolaSturgeon"), "NicolaSturgeon@mastodon.snp.scot"),
-                Mention("Douglas4Moray", URL("https://mastodon.tory.scot/@Douglas4Moray"), "Douglas4Moray@mastodon.tory.scot"),
-                Mention("AnasSarwar", URL("https://mastodon.labour.scot/@AnasSarwar"), "AnasSarwar@mastodon.labour.scot")
+                Mention(
+                    "NicolaSturgeon",
+                    URL("https://mastodon.snp.scot/@NicolaSturgeon"),
+                    "NicolaSturgeon@mastodon.snp.scot"
+                ),
+                Mention(
+                    "Douglas4Moray",
+                    URL("https://mastodon.tory.scot/@Douglas4Moray"),
+                    "Douglas4Moray@mastodon.tory.scot"
+                ),
+                Mention(
+                    "AnasSarwar",
+                    URL("https://mastodon.labour.scot/@AnasSarwar"),
+                    "AnasSarwar@mastodon.labour.scot"
+                )
             ),
             tags = listOf(
-                Tag("scotparl", URL("https://mastodon.social/tags/scotparl")),
-                Tag("election2021", URL("https://mastodon.social/tags/election2021"))
+                Tag(
+                    "scotparl",
+                    URL("https://mastodon.social/tags/scotparl")
+                ),
+                Tag(
+                    "election2021",
+                    URL("https://mastodon.social/tags/election2021")
+                )
             )
         )
 

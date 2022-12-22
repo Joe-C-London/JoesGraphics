@@ -1,0 +1,42 @@
+buildscript {
+    ext.kotlin_version = '1.7.20'
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+plugins {
+    id 'kotlin'
+}
+
+group 'com.joecollins'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation parent.parent.project('base')
+    implementation parent.parent.project('shapes')
+    implementation parent.parent.project('social')
+
+    implementation parent.project('barframe')
+
+    implementation 'com.fasterxml:jackson-xml-databind:0.6.2'
+    implementation 'com.fasterxml.jackson.module:jackson-module-kotlin:2.14.1'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.14.1'
+    implementation 'com.vdurmont:emoji-java:5.1.1'
+    implementation group: 'io.webfolder', name: 'cdp4j', version: '3.0.15'
+
+    testImplementation parent.parent.project('testutils')
+    testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.8.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+}
+
+test {
+    useJUnitPlatform()
+}

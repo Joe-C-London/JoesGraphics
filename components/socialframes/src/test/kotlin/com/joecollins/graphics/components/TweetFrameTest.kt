@@ -8,6 +8,7 @@ import com.twitter.clientlib.api.TweetsApi.APIfindTweetByIdRequest
 import com.twitter.clientlib.api.TwitterApi
 import com.twitter.clientlib.api.UsersApi
 import com.twitter.clientlib.api.UsersApi.APIfindUserByIdRequest
+import com.twitter.clientlib.model.Expansions
 import com.twitter.clientlib.model.FullTextEntities
 import com.twitter.clientlib.model.Get2TweetsIdResponse
 import com.twitter.clientlib.model.Get2UsersIdResponse
@@ -18,13 +19,13 @@ import com.twitter.clientlib.model.Photo
 import com.twitter.clientlib.model.Poll
 import com.twitter.clientlib.model.PollOption
 import com.twitter.clientlib.model.ResourceUnauthorizedProblem
+import com.twitter.clientlib.model.Tweet
 import com.twitter.clientlib.model.TweetAttachments
 import com.twitter.clientlib.model.TweetReferencedTweets
 import com.twitter.clientlib.model.UrlEntity
 import com.twitter.clientlib.model.UrlImage
-import org.junit.Before
-import org.junit.Test
-import org.mockito.Mockito
+import com.twitter.clientlib.model.User
+import org.junit.jupiter.api.BeforeEach
 import java.awt.Dimension
 import java.io.File
 import java.net.URL
@@ -33,6 +34,8 @@ import java.nio.file.StandardCopyOption
 import java.time.Instant
 import java.time.ZoneId
 import java.util.Scanner
+import org.junit.jupiter.api.Test
+import org.mockito.Mockito
 
 class TweetFrameTest {
 
@@ -40,7 +43,7 @@ class TweetFrameTest {
     private lateinit var mockTweetsApi: TweetsApi
     private lateinit var mockUsersApi: UsersApi
 
-    @Before
+    @BeforeEach
     fun setup() {
         mockTwitter = Mockito.mock(TwitterApi::class.java)
         mockTweetsApi = Mockito.mock(TweetsApi::class.java)
@@ -51,7 +54,8 @@ class TweetFrameTest {
 
     private fun setupTweetBuilder(id: String, authorId: String): TweetBuilder {
         val tweetBuilder = TweetBuilder(id, authorId)
-        val mockTweetRequest = Mockito.mock(APIfindTweetByIdRequest::class.java)
+        val mockTweetRequest =
+            Mockito.mock(APIfindTweetByIdRequest::class.java)
         val mockTweetResponse = Mockito.mock(Get2TweetsIdResponse::class.java)
         Mockito.`when`(mockTweetsApi.findTweetById(id)).thenReturn(mockTweetRequest)
         Mockito.`when`(mockTweetRequest.expansions(Mockito.anySet())).thenAnswer { inv ->
@@ -82,7 +86,8 @@ class TweetFrameTest {
 
     private fun setupUserBuilder(userId: String): UserBuilder {
         val userBuilder = UserBuilder(userId)
-        val mockUserRequest = Mockito.mock(APIfindUserByIdRequest::class.java)
+        val mockUserRequest =
+            Mockito.mock(APIfindUserByIdRequest::class.java)
         val mockUserResponse = Mockito.mock(Get2UsersIdResponse::class.java)
         Mockito.`when`(mockUsersApi.findUserById(userId)).thenReturn(mockUserRequest)
         Mockito.`when`(mockUserRequest.userFields(Mockito.anySet())).thenAnswer { inv ->
@@ -102,9 +107,9 @@ class TweetFrameTest {
         private val possibleExpansions = "author_id,referenced_tweets.id,referenced_tweets.id.author_id,entities.mentions.username,attachments.poll_ids,attachments.media_keys,in_reply_to_user_id,geo.place_id,edit_history_tweet_ids"
             .split(",").toSet()
 
-        val tweet: com.twitter.clientlib.model.Tweet
+        val tweet: Tweet
             get() {
-                val ret = com.twitter.clientlib.model.Tweet()
+                val ret = Tweet()
                 ret.id = id
                 ret.editHistoryTweetIds = listOf(id)
                 ret.text = text
@@ -134,10 +139,10 @@ class TweetFrameTest {
                 return ret
             }
 
-        val includes: com.twitter.clientlib.model.Expansions?
+        val includes: Expansions?
             get() {
                 if (expansions.isEmpty()) return null
-                val ret = com.twitter.clientlib.model.Expansions()
+                val ret = Expansions()
                 if (expansions.contains("author_id")) {
                     ret.users = listOf(user.user)
                 }
@@ -185,9 +190,9 @@ class TweetFrameTest {
         private val possibleFields = "created_at,description,entities,id,location,name,pinned_tweet_id,profile_image_url,protected,public_metrics,url,username,verified,withheld"
             .split(",").toSet()
 
-        val user: com.twitter.clientlib.model.User
+        val user: User
             get() {
-                val ret = com.twitter.clientlib.model.User()
+                val ret = User()
                 ret.id = id
                 ret.name = name
                 ret.username = username
@@ -264,7 +269,9 @@ class TweetFrameTest {
         userBuilder.name = "Joe C"
         userBuilder.profileImageUrl = javaClass.classLoader.getResource("com/joecollins/graphics/twitter-inputs/letter-j.png")!!
 
-        val frame = TweetFrame(TweetLoader.loadTweetV2(123L, mockTwitter).asOneTimePublisher())
+        val frame = TweetFrame(
+            TweetLoader.loadTweetV2(123L, mockTwitter).asOneTimePublisher()
+        )
         frame.size = Dimension(512, 256)
         RenderTestUtils.compareRendering("TweetFrame", "Basic", frame)
     }
@@ -280,7 +287,9 @@ class TweetFrameTest {
         userBuilder.name = "Joe C"
         userBuilder.profileImageUrl = javaClass.classLoader.getResource("com/joecollins/graphics/twitter-inputs/letter-j.png")!!
 
-        val frame = TweetFrame(TweetLoader.loadTweetV2(123L, mockTwitter).asOneTimePublisher())
+        val frame = TweetFrame(
+            TweetLoader.loadTweetV2(123L, mockTwitter).asOneTimePublisher()
+        )
         frame.size = Dimension(512, 256)
         RenderTestUtils.compareRendering("TweetFrame", "MultiLine", frame)
     }
@@ -297,7 +306,9 @@ class TweetFrameTest {
         userBuilder.profileImageUrl = javaClass.classLoader.getResource("com/joecollins/graphics/twitter-inputs/letter-j.png")!!
         userBuilder.verified = true
 
-        val frame = TweetFrame(TweetLoader.loadTweetV2(123L, mockTwitter).asOneTimePublisher())
+        val frame = TweetFrame(
+            TweetLoader.loadTweetV2(123L, mockTwitter).asOneTimePublisher()
+        )
         frame.size = Dimension(512, 256)
         RenderTestUtils.compareRendering("TweetFrame", "Verified", frame)
     }
@@ -314,7 +325,9 @@ class TweetFrameTest {
         userBuilder.profileImageUrl = javaClass.classLoader.getResource("com/joecollins/graphics/twitter-inputs/letter-j.png")!!
         userBuilder.protected = true
 
-        val frame = TweetFrame(TweetLoader.loadTweetV2(123L, mockTwitter).asOneTimePublisher())
+        val frame = TweetFrame(
+            TweetLoader.loadTweetV2(123L, mockTwitter).asOneTimePublisher()
+        )
         frame.size = Dimension(512, 256)
         RenderTestUtils.compareRendering("TweetFrame", "Protected", frame)
     }
@@ -362,7 +375,9 @@ class TweetFrameTest {
         userBuilder.name = "Joe C"
         userBuilder.profileImageUrl = javaClass.classLoader.getResource("com/joecollins/graphics/twitter-inputs/letter-j.png")!!
 
-        val frame = TweetFrame(TweetLoader.loadTweetV2(123L, mockTwitter).asOneTimePublisher())
+        val frame = TweetFrame(
+            TweetLoader.loadTweetV2(123L, mockTwitter).asOneTimePublisher()
+        )
         frame.size = Dimension(512, 256)
         RenderTestUtils.compareRendering("TweetFrame", "MentionsAndHashtags", frame)
     }
@@ -371,10 +386,15 @@ class TweetFrameTest {
     fun testLinks() {
         val imageFile = File.createTempFile("croissant", ".jpg")
         imageFile.deleteOnExit()
-        Files.copy(javaClass.classLoader.getResourceAsStream("com/joecollins/graphics/twitter-inputs/croissant.jpg"), imageFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
+        Files.copy(
+            javaClass.classLoader.getResourceAsStream("com/joecollins/graphics/twitter-inputs/croissant.jpg"),
+            imageFile.toPath(),
+            StandardCopyOption.REPLACE_EXISTING
+        )
         val htmlFile = File.createTempFile("head", ".html")
         val htmlString = run {
-            val scanner = Scanner(javaClass.classLoader.getResourceAsStream("com/joecollins/graphics/twitter-inputs/head.html"))
+            val scanner =
+                Scanner(javaClass.classLoader.getResourceAsStream("com/joecollins/graphics/twitter-inputs/head.html"))
             scanner.useDelimiter("\\A")
             scanner.next()
         }.replace("\${imageurl}", imageFile.toURI().toURL().toString())
@@ -411,7 +431,9 @@ class TweetFrameTest {
         userBuilder.name = "Joe C"
         userBuilder.profileImageUrl = javaClass.classLoader.getResource("com/joecollins/graphics/twitter-inputs/letter-j.png")!!
 
-        val frame = TweetFrame(TweetLoader.loadTweetV2(123L, mockTwitter).asOneTimePublisher())
+        val frame = TweetFrame(
+            TweetLoader.loadTweetV2(123L, mockTwitter).asOneTimePublisher()
+        )
         frame.size = Dimension(512, 512)
         RenderTestUtils.compareRendering("TweetFrame", "Links", frame)
     }
@@ -440,7 +462,9 @@ class TweetFrameTest {
         userBuilder.name = "Joe C"
         userBuilder.profileImageUrl = javaClass.classLoader.getResource("com/joecollins/graphics/twitter-inputs/letter-j.png")!!
 
-        val frame = TweetFrame(TweetLoader.loadTweetV2(123L, mockTwitter).asOneTimePublisher())
+        val frame = TweetFrame(
+            TweetLoader.loadTweetV2(123L, mockTwitter).asOneTimePublisher()
+        )
         frame.size = Dimension(512, 512)
         RenderTestUtils.compareRendering("TweetFrame", "Images", frame)
     }
@@ -494,7 +518,9 @@ class TweetFrameTest {
         quotedUserBuilder.profileImageUrl = javaClass.classLoader.getResource("com/joecollins/graphics/twitter-inputs/letter-j.png")!!
         quotedUserBuilder.verified = true
 
-        val frame = TweetFrame(TweetLoader.loadTweetV2(321L, mockTwitter).asOneTimePublisher())
+        val frame = TweetFrame(
+            TweetLoader.loadTweetV2(321L, mockTwitter).asOneTimePublisher()
+        )
         frame.size = Dimension(512, 512)
         RenderTestUtils.compareRendering("TweetFrame", "QuoteTweet", frame)
     }
@@ -510,14 +536,17 @@ class TweetFrameTest {
         userBuilder.name = "Joe C"
         userBuilder.profileImageUrl = javaClass.classLoader.getResource("com/joecollins/graphics/twitter-inputs/letter-j.png")!!
 
-        val frame = TweetFrame(TweetLoader.loadTweetV2(123L, mockTwitter).asOneTimePublisher())
+        val frame = TweetFrame(
+            TweetLoader.loadTweetV2(123L, mockTwitter).asOneTimePublisher()
+        )
         frame.size = Dimension(512, 256)
         RenderTestUtils.compareRendering("TweetFrame", "Emoji", frame, 15)
     }
 
     @Test
     fun testErrors() {
-        val mockTweetRequest = Mockito.mock(APIfindTweetByIdRequest::class.java)
+        val mockTweetRequest =
+            Mockito.mock(APIfindTweetByIdRequest::class.java)
         val mockTweetResponse = Mockito.mock(Get2TweetsIdResponse::class.java)
         Mockito.`when`(mockTweetsApi.findTweetById("123")).thenReturn(mockTweetRequest)
         Mockito.`when`(mockTweetRequest.expansions(Mockito.anySet())).thenReturn(mockTweetRequest)
@@ -538,7 +567,9 @@ class TweetFrameTest {
             listOf(error)
         }
 
-        val frame = TweetFrame(TweetLoader.loadTweetV2(123L, mockTwitter).asOneTimePublisher())
+        val frame = TweetFrame(
+            TweetLoader.loadTweetV2(123L, mockTwitter).asOneTimePublisher()
+        )
         frame.size = Dimension(512, 256)
         RenderTestUtils.compareRendering("TweetFrame", "Errors", frame)
     }
@@ -560,7 +591,9 @@ class TweetFrameTest {
         userBuilder.name = "Joe C"
         userBuilder.profileImageUrl = javaClass.classLoader.getResource("com/joecollins/graphics/twitter-inputs/letter-j.png")!!
 
-        val frame = TweetFrame(TweetLoader.loadTweetV2(123L, mockTwitter).asOneTimePublisher())
+        val frame = TweetFrame(
+            TweetLoader.loadTweetV2(123L, mockTwitter).asOneTimePublisher()
+        )
         frame.size = Dimension(512, 256)
         RenderTestUtils.compareRendering("TweetFrame", "Poll", frame)
     }

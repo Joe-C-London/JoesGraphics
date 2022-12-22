@@ -2,6 +2,7 @@ package com.joecollins.graphics
 
 import com.joecollins.graphics.components.FontSizeAdjustingLabel
 import com.joecollins.graphics.components.lowerthird.LowerThird
+import com.joecollins.graphics.utils.PanelUtils.pad
 import com.joecollins.graphics.utils.StandardFont.readBoldFont
 import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
@@ -10,7 +11,6 @@ import com.joecollins.pubsub.merge
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Dimension
-import java.awt.GridLayout
 import java.util.concurrent.Flow
 import javax.swing.JLabel
 import javax.swing.JPanel
@@ -58,12 +58,7 @@ open class GenericPanel(
 
     companion object {
         fun pad(panel: JPanel): JPanel {
-            val ret = JPanel()
-            ret.background = Color.WHITE
-            ret.layout = GridLayout(1, 1, 0, 0)
-            ret.border = EmptyBorder(5, 5, 5, 5)
-            ret.add(panel)
-            return ret
+            return panel.pad()
         }
 
         private fun createAltText(panel: JPanel, label: Flow.Publisher<out String?>): Flow.Publisher<String?> {

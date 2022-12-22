@@ -1,7 +1,7 @@
 package com.joecollins.graphics.components
 
-import com.joecollins.graphics.GenericPanel.Companion.pad
 import com.joecollins.graphics.ImageGenerator
+import com.joecollins.graphics.utils.PanelUtils.pad
 import com.joecollins.graphics.utils.StandardFont
 import com.joecollins.models.general.social.generic.Link
 import com.joecollins.models.general.social.generic.Media
@@ -13,7 +13,6 @@ import com.joecollins.pubsub.map
 import com.vdurmont.emoji.EmojiParser
 import java.awt.BorderLayout
 import java.awt.Color
-import java.awt.Component
 import java.awt.Dimension
 import java.awt.Graphics
 import java.awt.Graphics2D
@@ -68,8 +67,10 @@ abstract class SocialMediaFrame<P : Post<P>>(post: Flow.Publisher<out Post<P>>, 
         postLabel.font = StandardFont.readNormalFont(16)
         postLabel.verticalAlignment = JLabel.TOP
         postLabel.horizontalAlignment = JLabel.LEFT
-        postLabel.alignmentX = Component.LEFT_ALIGNMENT
-        post.subscribe(Subscriber(eventQueueWrapper { postLabel.text = formatText(it, false, postLabel) }))
+        postLabel.alignmentX = LEFT_ALIGNMENT
+        post.subscribe(Subscriber(eventQueueWrapper {
+            postLabel.text = formatText(it, false, postLabel)
+        }))
         postPanel.add(postLabel)
 
         postLabel.addComponentListener(object : ComponentAdapter() {
@@ -84,7 +85,7 @@ abstract class SocialMediaFrame<P : Post<P>>(post: Flow.Publisher<out Post<P>>, 
         val urlPanel = JPanel()
         urlPanel.background = Color.WHITE
         urlPanel.layout = BoxLayout(urlPanel, BoxLayout.X_AXIS)
-        urlPanel.alignmentX = Component.LEFT_ALIGNMENT
+        urlPanel.alignmentX = LEFT_ALIGNMENT
         postPanel.add(urlPanel)
         post.subscribe(
             Subscriber(
@@ -105,7 +106,7 @@ abstract class SocialMediaFrame<P : Post<P>>(post: Flow.Publisher<out Post<P>>, 
         val mediaPanel = JPanel()
         mediaPanel.background = Color.WHITE
         mediaPanel.layout = GridLayout(0, 1)
-        mediaPanel.alignmentX = Component.LEFT_ALIGNMENT
+        mediaPanel.alignmentX = LEFT_ALIGNMENT
         postPanel.add(mediaPanel)
         post.map { it.mediaEntities }.subscribe(
             Subscriber(
@@ -123,7 +124,7 @@ abstract class SocialMediaFrame<P : Post<P>>(post: Flow.Publisher<out Post<P>>, 
         val quotedPanel = JPanel()
         quotedPanel.background = Color.WHITE
         quotedPanel.layout = GridLayout(0, 1)
-        quotedPanel.alignmentX = Component.LEFT_ALIGNMENT
+        quotedPanel.alignmentX = LEFT_ALIGNMENT
         quotedPanel.border = EmptyBorder(0, 0, 5, 5)
         postPanel.add(quotedPanel)
         post.map { it.quoted }.subscribe(
@@ -147,12 +148,19 @@ abstract class SocialMediaFrame<P : Post<P>>(post: Flow.Publisher<out Post<P>>, 
                 if (polls.isNotEmpty()) {
                     val options = polls[0].options
                     val total = options.values.sum().toDouble().coerceAtLeast(1e-6)
-                    options.entries.map { BarFrameBuilder.BasicBar(it.key, color, it.value, "${DecimalFormat("#,##0").format(it.value)} (${DecimalFormat("0.0%").format(it.value / total)})") }
+                    options.entries.map {
+                        BarFrameBuilder.BasicBar(
+                            it.key,
+                            color,
+                            it.value,
+                            "${DecimalFormat("#,##0").format(it.value)} (${DecimalFormat("0.0%").format(it.value / total)})"
+                        )
+                    }
                 } else {
                     emptyList()
                 }
             }
-        ).build().let { pad(it) }
+        ).build().pad()
         post.subscribe(
             Subscriber(
                 eventQueueWrapper {
@@ -170,7 +178,13 @@ abstract class SocialMediaFrame<P : Post<P>>(post: Flow.Publisher<out Post<P>>, 
         timeLabel.font = StandardFont.readNormalFont(12)
         timeLabel.border = EmptyBorder(2, 0, -2, 0)
         timeLabel.horizontalAlignment = JLabel.RIGHT
-        post.map { if (it.user.isProtected) null else it.createdAt }.subscribe(Subscriber(eventQueueWrapper { timeLabel.text = if (it == null) "" else DateTimeFormatter.ofPattern("d MMMM yyyy HH:mm:ss z ").format(it.atZone(timezone)) }))
+        post.map { if (it.user.isProtected) null else it.createdAt }.subscribe(Subscriber(eventQueueWrapper {
+            timeLabel.text =
+                if (it == null)
+                    ""
+                else
+                    DateTimeFormatter.ofPattern("d MMMM yyyy HH:mm:ss z ").format(it.atZone(timezone))
+        }))
         add(timeLabel, BorderLayout.SOUTH)
     }
 
@@ -372,7 +386,7 @@ abstract class SocialMediaFrame<P : Post<P>>(post: Flow.Publisher<out Post<P>>, 
             val postLabel = JLabel()
             postLabel.font = StandardFont.readNormalFont(16)
             postLabel.text = formatText(quotedStatus, true, postLabel)
-            postLabel.alignmentX = Component.LEFT_ALIGNMENT
+            postLabel.alignmentX = LEFT_ALIGNMENT
             postPanel.add(postLabel)
 
             postLabel.addComponentListener(object : ComponentAdapter() {
@@ -389,7 +403,7 @@ abstract class SocialMediaFrame<P : Post<P>>(post: Flow.Publisher<out Post<P>>, 
                 val mediaPanel = JPanel()
                 mediaPanel.background = Color.WHITE
                 mediaPanel.layout = GridLayout(0, 1)
-                mediaPanel.alignmentX = Component.LEFT_ALIGNMENT
+                mediaPanel.alignmentX = LEFT_ALIGNMENT
                 mediaPanel.layout = GridLayout(0, ceil(sqrt(media.size.toDouble())).toInt().coerceAtLeast(1))
                 media.forEach {
                     mediaPanel.add(MediaPanel(it))
@@ -403,7 +417,11 @@ abstract class SocialMediaFrame<P : Post<P>>(post: Flow.Publisher<out Post<P>>, 
             timeLabel.font = StandardFont.readNormalFont(12)
             timeLabel.border = EmptyBorder(2, 0, -2, 0)
             timeLabel.horizontalAlignment = JLabel.RIGHT
-            timeLabel.text = if (quotedStatus.user.isProtected) "" else DateTimeFormatter.ofPattern("d MMMM yyyy HH:mm:ss z ").format(quotedStatus.createdAt.atZone(timezone))
+            timeLabel.text =
+                if (quotedStatus.user.isProtected)
+                    ""
+                else
+                    DateTimeFormatter.ofPattern("d MMMM yyyy HH:mm:ss z ").format(quotedStatus.createdAt.atZone(timezone))
             add(timeLabel, BorderLayout.SOUTH)
         }
 
