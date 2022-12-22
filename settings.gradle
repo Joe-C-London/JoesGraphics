@@ -4,4 +4,10 @@ rootDir.listFiles().each {
         include ":${it.name}"
     }
 }
+project(':components').projectDir.listFiles().each {
+    if (it.directory && new File(it, 'build.gradle').exists()) {
+        println ":components:${it.name}"
+        include ":components:${it.name}"
+    }
+}
 

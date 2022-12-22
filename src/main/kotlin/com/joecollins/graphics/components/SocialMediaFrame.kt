@@ -69,7 +69,7 @@ abstract class SocialMediaFrame<P : Post<P>>(post: Flow.Publisher<out Post<P>>, 
         postLabel.verticalAlignment = JLabel.TOP
         postLabel.horizontalAlignment = JLabel.LEFT
         postLabel.alignmentX = Component.LEFT_ALIGNMENT
-        post.subscribe(Subscriber(Subscriber.eventQueueWrapper { postLabel.text = formatText(it, false, postLabel) }))
+        post.subscribe(Subscriber(eventQueueWrapper { postLabel.text = formatText(it, false, postLabel) }))
         postPanel.add(postLabel)
 
         postLabel.addComponentListener(object : ComponentAdapter() {
@@ -88,7 +88,7 @@ abstract class SocialMediaFrame<P : Post<P>>(post: Flow.Publisher<out Post<P>>, 
         postPanel.add(urlPanel)
         post.subscribe(
             Subscriber(
-                Subscriber.eventQueueWrapper { status ->
+                eventQueueWrapper { status ->
                     val urls = status.links.filter { !it.isFromSocialNetwork }
                     val quotedURL = status.quoted?.url.toString()
                     urlPanel.isVisible = urls.isNotEmpty()
@@ -109,7 +109,7 @@ abstract class SocialMediaFrame<P : Post<P>>(post: Flow.Publisher<out Post<P>>, 
         postPanel.add(mediaPanel)
         post.map { it.mediaEntities }.subscribe(
             Subscriber(
-                Subscriber.eventQueueWrapper { media ->
+                eventQueueWrapper { media ->
                     mediaPanel.isVisible = media.isNotEmpty()
                     mediaPanel.removeAll()
                     mediaPanel.layout = GridLayout(0, ceil(sqrt(media.size.toDouble())).toInt().coerceAtLeast(1))
@@ -128,7 +128,7 @@ abstract class SocialMediaFrame<P : Post<P>>(post: Flow.Publisher<out Post<P>>, 
         postPanel.add(quotedPanel)
         post.map { it.quoted }.subscribe(
             Subscriber(
-                Subscriber.eventQueueWrapper { status ->
+                eventQueueWrapper { status ->
                     quotedPanel.isVisible = (status != null)
                     quotedPanel.removeAll()
                     status?.let { quotedPanel.add(QuotedPanel(it)) }
@@ -170,7 +170,7 @@ abstract class SocialMediaFrame<P : Post<P>>(post: Flow.Publisher<out Post<P>>, 
         timeLabel.font = StandardFont.readNormalFont(12)
         timeLabel.border = EmptyBorder(2, 0, -2, 0)
         timeLabel.horizontalAlignment = JLabel.RIGHT
-        post.map { if (it.user.isProtected) null else it.createdAt }.subscribe(Subscriber(Subscriber.eventQueueWrapper { timeLabel.text = if (it == null) "" else DateTimeFormatter.ofPattern("d MMMM yyyy HH:mm:ss z ").format(it.atZone(timezone)) }))
+        post.map { if (it.user.isProtected) null else it.createdAt }.subscribe(Subscriber(eventQueueWrapper { timeLabel.text = if (it == null) "" else DateTimeFormatter.ofPattern("d MMMM yyyy HH:mm:ss z ").format(it.atZone(timezone)) }))
         add(timeLabel, BorderLayout.SOUTH)
     }
 
@@ -220,7 +220,7 @@ abstract class SocialMediaFrame<P : Post<P>>(post: Flow.Publisher<out Post<P>>, 
 
             user.subscribe(
                 Subscriber(
-                    Subscriber.eventQueueWrapper {
+                    eventQueueWrapper {
                         val originalImage = ImageIO.read(it.profileImageURL)
                         val size = 48
                         val resizedImage = BufferedImage(size, size, BufferedImage.TYPE_4BYTE_ABGR)

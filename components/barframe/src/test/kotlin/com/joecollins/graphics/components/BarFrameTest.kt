@@ -8,8 +8,6 @@ import com.joecollins.pubsub.map
 import com.joecollins.pubsub.mapElements
 import org.awaitility.Awaitility
 import org.hamcrest.core.IsEqual
-import org.junit.Assert
-import org.junit.Test
 import java.awt.Color
 import java.awt.Polygon
 import java.awt.Rectangle
@@ -18,8 +16,9 @@ import java.awt.geom.Area
 import java.awt.geom.Ellipse2D
 import java.text.DecimalFormat
 import java.util.concurrent.TimeUnit
-import kotlin.jvm.JvmOverloads
 import kotlin.math.sign
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.Assertions
 
 class BarFrameTest {
     @Test
@@ -50,7 +49,7 @@ class BarFrameTest {
             headerPublisher = (null as String?).asOneTimePublisher(),
             barsPublisher = results.mapElements { BarFrame.Bar("", "", null, listOf()) }
         )
-        Assert.assertEquals(0, frame.numBars.toLong())
+        Assertions.assertEquals(0, frame.numBars.toLong())
         list.add(ElectionResult("LIBERAL", Color.RED, 1))
         results.submit(list)
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
@@ -96,12 +95,12 @@ class BarFrameTest {
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numBars }, IsEqual(6))
-        Assert.assertEquals("LIBERAL", frame.getLeftText(0))
-        Assert.assertEquals("CONSERVATIVE", frame.getLeftText(1))
-        Assert.assertEquals("BLOC QUEBECOIS", frame.getLeftText(2))
-        Assert.assertEquals("NEW DEMOCRATIC PARTY", frame.getLeftText(3))
-        Assert.assertEquals("GREEN", frame.getLeftText(4))
-        Assert.assertEquals("INDEPENDENT", frame.getLeftText(5))
+        Assertions.assertEquals("LIBERAL", frame.getLeftText(0))
+        Assertions.assertEquals("CONSERVATIVE", frame.getLeftText(1))
+        Assertions.assertEquals("BLOC QUEBECOIS", frame.getLeftText(2))
+        Assertions.assertEquals("NEW DEMOCRATIC PARTY", frame.getLeftText(3))
+        Assertions.assertEquals("GREEN", frame.getLeftText(4))
+        Assertions.assertEquals("INDEPENDENT", frame.getLeftText(5))
     }
 
     @Test
@@ -118,16 +117,23 @@ class BarFrameTest {
         )
         val frame = BarFrame(
             headerPublisher = (null as String?).asOneTimePublisher(),
-            barsPublisher = results.mapElements { BarFrame.Bar(it.getPartyName(), "${it.getNumSeats()}", null, listOf()) }
+            barsPublisher = results.mapElements {
+                BarFrame.Bar(
+                    it.getPartyName(),
+                    "${it.getNumSeats()}",
+                    null,
+                    listOf()
+                )
+            }
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numBars }, IsEqual(6))
-        Assert.assertEquals("157", frame.getRightText(0))
-        Assert.assertEquals("121", frame.getRightText(1))
-        Assert.assertEquals("32", frame.getRightText(2))
-        Assert.assertEquals("24", frame.getRightText(3))
-        Assert.assertEquals("3", frame.getRightText(4))
-        Assert.assertEquals("1", frame.getRightText(5))
+        Assertions.assertEquals("157", frame.getRightText(0))
+        Assertions.assertEquals("121", frame.getRightText(1))
+        Assertions.assertEquals("32", frame.getRightText(2))
+        Assertions.assertEquals("24", frame.getRightText(3))
+        Assertions.assertEquals("3", frame.getRightText(4))
+        Assertions.assertEquals("1", frame.getRightText(5))
     }
 
     @Test
@@ -159,28 +165,28 @@ class BarFrameTest {
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numBars }, IsEqual(6))
         var libSeries = frame.getSeries(0)
-        Assert.assertEquals(Color.RED, libSeries[0].first)
-        Assert.assertEquals(2, libSeries[0].second.toInt().toLong())
-        Assert.assertEquals(lightRed, libSeries[1].first)
-        Assert.assertEquals(155, libSeries[1].second.toInt().toLong())
+        Assertions.assertEquals(Color.RED, libSeries[0].first)
+        Assertions.assertEquals(2, libSeries[0].second.toInt().toLong())
+        Assertions.assertEquals(lightRed, libSeries[1].first)
+        Assertions.assertEquals(155, libSeries[1].second.toInt().toLong())
         list[0].setSeatEstimate(158)
         results.submit(list)
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.getSeries(0)[1].second.toInt() }, IsEqual(156))
         libSeries = frame.getSeries(0)
-        Assert.assertEquals(Color.RED, libSeries[0].first)
-        Assert.assertEquals(2, libSeries[0].second.toInt().toLong())
-        Assert.assertEquals(lightRed, libSeries[1].first)
-        Assert.assertEquals(156, libSeries[1].second.toInt().toLong())
+        Assertions.assertEquals(Color.RED, libSeries[0].first)
+        Assertions.assertEquals(2, libSeries[0].second.toInt().toLong())
+        Assertions.assertEquals(lightRed, libSeries[1].first)
+        Assertions.assertEquals(156, libSeries[1].second.toInt().toLong())
         list[0].setNumSeats(3)
         results.submit(list)
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.getSeries(0)[0].second.toInt() }, IsEqual(3))
         libSeries = frame.getSeries(0)
-        Assert.assertEquals(Color.RED, libSeries[0].first)
-        Assert.assertEquals(3, libSeries[0].second.toInt().toLong())
-        Assert.assertEquals(lightRed, libSeries[1].first)
-        Assert.assertEquals(155, libSeries[1].second.toInt().toLong())
+        Assertions.assertEquals(Color.RED, libSeries[0].first)
+        Assertions.assertEquals(3, libSeries[0].second.toInt().toLong())
+        Assertions.assertEquals(lightRed, libSeries[1].first)
+        Assertions.assertEquals(155, libSeries[1].second.toInt().toLong())
     }
 
     @Test
@@ -197,16 +203,23 @@ class BarFrameTest {
         val shape: Shape = Ellipse2D.Double()
         val frame = BarFrame(
             headerPublisher = (null as String?).asOneTimePublisher(),
-            barsPublisher = results.mapElements { BarFrame.Bar("", "", if (it.getNumSeats() > 150) shape else null, listOf()) }
+            barsPublisher = results.mapElements {
+                BarFrame.Bar(
+                    "",
+                    "",
+                    if (it.getNumSeats() > 150) shape else null,
+                    listOf()
+                )
+            }
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numBars }, IsEqual(6))
-        Assert.assertEquals(shape, frame.getLeftIcon(0))
-        Assert.assertNull(frame.getLeftIcon(1))
-        Assert.assertNull(frame.getLeftIcon(2))
-        Assert.assertNull(frame.getLeftIcon(3))
-        Assert.assertNull(frame.getLeftIcon(4))
-        Assert.assertNull(frame.getLeftIcon(5))
+        Assertions.assertEquals(shape, frame.getLeftIcon(0))
+        Assertions.assertNull(frame.getLeftIcon(1))
+        Assertions.assertNull(frame.getLeftIcon(2))
+        Assertions.assertNull(frame.getLeftIcon(3))
+        Assertions.assertNull(frame.getLeftIcon(4))
+        Assertions.assertNull(frame.getLeftIcon(5))
     }
 
     @Test
@@ -311,7 +324,7 @@ class BarFrameTest {
             headerPublisher = (null as String?).asOneTimePublisher(),
             barsPublisher = emptyList<BarFrame.Bar>().asOneTimePublisher()
         )
-        Assert.assertEquals(Color.BLACK, frame.subheadColor)
+        Assertions.assertEquals(Color.BLACK, frame.subheadColor)
     }
 
     @Test
@@ -335,8 +348,8 @@ class BarFrameTest {
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numLines }, IsEqual(1))
-        Assert.assertEquals(170, frame.getLineLevel(0))
-        Assert.assertEquals("170 SEATS FOR MAJORITY", frame.getLineLabel(0))
+        Assertions.assertEquals(170, frame.getLineLevel(0))
+        Assertions.assertEquals("170 SEATS FOR MAJORITY", frame.getLineLabel(0))
     }
 
     @Test
@@ -346,7 +359,7 @@ class BarFrameTest {
             headerPublisher = (null as String?).asOneTimePublisher(),
             barsPublisher = results.mapElements { BarFrame.Bar(it.first, "", null, listOf()) }
         )
-        Assert.assertEquals(0, frame.numBars.toLong())
+        Assertions.assertEquals(0, frame.numBars.toLong())
         results.submit(
             listOf(
                 Triple("LIBERALS", Color.RED, 3),
@@ -356,9 +369,9 @@ class BarFrameTest {
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numBars }, IsEqual(3))
-        Assert.assertEquals("LIBERALS", frame.getLeftText(0))
-        Assert.assertEquals("CONSERVATIVES", frame.getLeftText(1))
-        Assert.assertEquals("NDP", frame.getLeftText(2))
+        Assertions.assertEquals("LIBERALS", frame.getLeftText(0))
+        Assertions.assertEquals("CONSERVATIVES", frame.getLeftText(1))
+        Assertions.assertEquals("NDP", frame.getLeftText(2))
         results.submit(
             listOf(
                 Triple("LIBERALS", Color.RED, 3),
@@ -367,9 +380,9 @@ class BarFrameTest {
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numBars }, IsEqual(2))
-        Assert.assertEquals(2, frame.numBars.toLong())
-        Assert.assertEquals("LIBERALS", frame.getLeftText(0))
-        Assert.assertEquals("CONSERVATIVES", frame.getLeftText(1))
+        Assertions.assertEquals(2, frame.numBars.toLong())
+        Assertions.assertEquals("LIBERALS", frame.getLeftText(0))
+        Assertions.assertEquals("CONSERVATIVES", frame.getLeftText(1))
     }
 
     @Test
@@ -526,7 +539,11 @@ class BarFrameTest {
             minPublisher = (-28).asOneTimePublisher()
         )
         barFrame.setSize(512, 256)
-        compareRendering("BarFrame", "SingleSeriesBothDirections", barFrame)
+        compareRendering(
+            "BarFrame",
+            "SingleSeriesBothDirections",
+            barFrame
+        )
     }
 
     @Test
@@ -546,11 +563,21 @@ class BarFrameTest {
             barsPublisher = results.mapElements {
                 BarFrame.Bar(
                     it.getPartyName(),
-                    "${CHANGE_FORMAT.format(it.getNumSeats().toLong())}/${CHANGE_FORMAT.format(it.getSeatEstimate().toLong())}",
+                    "${CHANGE_FORMAT.format(it.getNumSeats().toLong())}/${
+                        CHANGE_FORMAT.format(
+                            it.getSeatEstimate().toLong()
+                        )
+                    }",
                     null,
                     listOf(
                         Pair(it.getPartyColor(), it.getNumSeats()),
-                        Pair(lighten(it.getPartyColor()), it.getSeatEstimate() - if (sign(it.getSeatEstimate().toFloat()) == sign(it.getNumSeats().toFloat())) it.getNumSeats() else 0)
+                        Pair(
+                            lighten(it.getPartyColor()),
+                            it.getSeatEstimate() - if (sign(it.getSeatEstimate().toFloat()) == sign(
+                                    it.getNumSeats().toFloat()
+                                )
+                            ) it.getNumSeats() else 0
+                        )
                     )
                 )
             },
@@ -558,7 +585,11 @@ class BarFrameTest {
             minPublisher = (-28).asOneTimePublisher()
         )
         barFrame.setSize(512, 256)
-        compareRendering("BarFrame", "MultiSeriesBothDirections", barFrame)
+        compareRendering(
+            "BarFrame",
+            "MultiSeriesBothDirections",
+            barFrame
+        )
     }
 
     @Test
@@ -643,7 +674,11 @@ class BarFrameTest {
             }
         )
         barFrame.setSize(512, 256)
-        compareRendering("BarFrame", "TwoLinedBarWithNegativeIcon", barFrame)
+        compareRendering(
+            "BarFrame",
+            "TwoLinedBarWithNegativeIcon",
+            barFrame
+        )
     }
 
     @Test

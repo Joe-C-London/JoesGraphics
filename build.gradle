@@ -33,6 +33,8 @@ def geotoolsVersion = '27.1'
 
 dependencies {
     api project('base')
+    api project('components')
+    api project('shapes')
     api project('social')
     api project('window')
 
@@ -74,7 +76,7 @@ jacoco {
 }
 
 subprojects.each {
-    test.dependsOn(":${it.name}:test")
+    test.dependsOn("${it.path}:test")
 }
 
 jacocoTestReport {

@@ -19,9 +19,12 @@ repositories {
 }
 
 dependencies {
-    api group: 'org.awaitility', name: 'awaitility', version: '4.2.0'
-    implementation group: 'commons-io', name: 'commons-io', version: '2.11.0'
-    implementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    implementation parent.parent.project('base')
+
+    testImplementation parent.parent.project('shapes')
+    testImplementation parent.parent.project('testutils')
+
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
 }
 
