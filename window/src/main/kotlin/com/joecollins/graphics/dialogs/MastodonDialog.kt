@@ -8,8 +8,8 @@ import org.apache.hc.client5.http.impl.classic.HttpClients
 import org.apache.hc.core5.http.ContentType
 import org.apache.hc.core5.http.io.entity.BasicHttpEntity
 import org.apache.hc.core5.http.io.entity.EntityUtils
-import twitter4j.JSONArray
-import twitter4j.JSONObject
+import org.json.JSONObject
+import org.json.JSONArray
 import java.awt.Color
 import java.io.File
 import java.nio.charset.Charset

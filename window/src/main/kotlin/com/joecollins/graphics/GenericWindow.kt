@@ -194,7 +194,10 @@ class GenericWindow<T : JPanel> @JvmOverloads constructor(private val panel: T, 
             }
             if (controlPanel != null) {
                 controlPanel.location = Point(mainSize.width, 0)
-                controlPanel.size = Dimension(controlPanelSize.width.coerceAtMost(parent.width - mainSize.width), controlPanelSize.height)
+                controlPanel.size = Dimension(
+                    controlPanelSize.width.coerceAtMost(parent.width - mainSize.width),
+                    controlPanelSize.height
+                )
             }
         }
     }

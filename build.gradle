@@ -33,6 +33,8 @@ def geotoolsVersion = '27.1'
 
 dependencies {
     api project('base')
+    api project('social')
+    api project('window')
 
     testImplementation project('testutils')
 
