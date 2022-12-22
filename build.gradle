@@ -32,6 +32,10 @@ repositories {
 def geotoolsVersion = '27.1'
 
 dependencies {
+    api project('base')
+
+    testImplementation project('testutils')
+
     api group: 'org.slf4j', name: 'slf4j-simple', version: '2.0.3'
     api group: 'org.geotools', name: 'gt-shapefile', version: geotoolsVersion
     api group: 'org.geotools', name: 'gt-metadata', version: geotoolsVersion
@@ -65,6 +69,10 @@ spotless {
 jacoco {
     toolVersion = "0.8.7"
     reportsDirectory = file("$buildDir/jacocoReports")
+}
+
+subprojects.each {
+    test.dependsOn(":${it.name}:test")
 }
 
 jacocoTestReport {

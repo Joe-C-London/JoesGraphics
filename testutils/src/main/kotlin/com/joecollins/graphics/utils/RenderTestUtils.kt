@@ -1,12 +1,9 @@
 package com.joecollins.graphics.utils
 
-import com.joecollins.graphics.AltTextProvider
-import com.joecollins.pubsub.Subscriber
 import org.apache.commons.io.FileUtils
 import org.awaitility.Awaitility
 import org.awaitility.core.ConditionTimeoutException
-import org.hamcrest.Matchers
-import org.junit.Assert
+import org.junit.jupiter.api.Assertions
 import java.awt.Component
 import java.awt.Container
 import java.awt.EventQueue
@@ -46,7 +43,7 @@ object RenderTestUtils {
                 )
             )
         }
-        Assert.assertTrue(isMatch)
+        Assertions.assertTrue(isMatch)
         actualFile.deleteOnExit()
     }
 
@@ -72,10 +69,4 @@ object RenderTestUtils {
         return img
     }
 
-    fun compareAltTexts(panel: AltTextProvider, expected: String?, timeoutSeconds: Long = 1) {
-//        MatcherAssert.assertThat("Expected length is too long", (expected ?: "").length, Matchers.lessThanOrEqualTo(GenericWindow.ALT_TEXT_MAX_LENGTH))
-        var result: String? = null
-        panel.altText.subscribe(Subscriber { result = it })
-        Awaitility.await().atMost(timeoutSeconds, TimeUnit.SECONDS).until({ result }, Matchers.equalTo(expected))
-    }
 }

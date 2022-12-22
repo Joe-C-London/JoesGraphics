@@ -4,8 +4,8 @@ import com.joecollins.graphics.utils.BoundResult
 import org.awaitility.Awaitility
 import org.hamcrest.core.IsEqual
 import org.hamcrest.core.IsNull
-import org.junit.Assert
-import org.junit.Test
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
 import java.util.LinkedList
 import java.util.concurrent.Flow
 import java.util.concurrent.SubmissionPublisher
@@ -99,7 +99,7 @@ class PubSubTests {
             }
 
             override fun onComplete() {
-                Assert.fail()
+                Assertions.fail<Unit>()
             }
         }
         publisher.subscribe(subscriber)
@@ -135,7 +135,7 @@ class PubSubTests {
             }
 
             override fun onComplete() {
-                Assert.fail()
+                Assertions.fail<Unit>()
             }
         }
         publisher.subscribe(subscriber)
@@ -209,7 +209,7 @@ class PubSubTests {
         (0..limit).forEach { publisher.submit(it) }
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ output.size }, IsEqual(limit + 1))
-        Assert.assertEquals((0..limit).toList(), output)
+        Assertions.assertEquals((0..limit).toList(), output)
     }
 
     @Test
@@ -231,7 +231,7 @@ class PubSubTests {
             }
 
             override fun onComplete() {
-                Assert.fail("Shouldn't be completing")
+                Assertions.fail<Unit>("Shouldn't be completing")
             }
         }
         publisher.subscribe(subscriber)
@@ -239,7 +239,7 @@ class PubSubTests {
         (0..limit).forEach { publisher.submit(it) }
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ output.size }, IsEqual(limit + 1))
-        Assert.assertEquals((0..limit).toList(), output)
+        Assertions.assertEquals((0..limit).toList(), output)
     }
 
     @Test

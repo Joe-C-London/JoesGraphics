@@ -197,7 +197,7 @@ class MastodonFrameTest {
 
         val frame = MastodonFrame(toot.asOneTimePublisher())
         frame.size = Dimension(512, 256)
-        RenderTestUtils.compareRendering("MastodonFrame", "Emoji", frame, 2)
+        RenderTestUtils.compareRendering("MastodonFrame", "Emoji", frame, 5)
     }
 
     @Test

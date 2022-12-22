@@ -4,16 +4,16 @@ import java.awt.EventQueue
 import java.util.concurrent.Flow
 
 class Subscriber<T>(private val next: (T) -> Unit) : Flow.Subscriber<T> {
-    private var subscription: Flow.Subscription? = null
+    private lateinit var subscription: Flow.Subscription
 
     override fun onSubscribe(subscription: Flow.Subscription) {
         this.subscription = subscription
-        this.subscription?.request(1)
+        this.subscription.request(1)
     }
 
     override fun onNext(item: T) {
         next(item)
-        this.subscription?.request(1)
+        this.subscription.request(1)
     }
 
     override fun onError(throwable: Throwable) {
@@ -24,7 +24,7 @@ class Subscriber<T>(private val next: (T) -> Unit) : Flow.Subscriber<T> {
     }
 
     fun unsubscribe() {
-        subscription?.cancel()
+        subscription.cancel()
     }
 
     companion object {

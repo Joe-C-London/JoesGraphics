@@ -5,7 +5,7 @@ import com.joecollins.graphics.screens.generic.BasicResultPanel.Companion.candid
 import com.joecollins.graphics.screens.generic.BasicResultPanel.Companion.candidateVotesPctOnly
 import com.joecollins.graphics.screens.generic.BasicResultPanel.Companion.partyRangeVotes
 import com.joecollins.graphics.screens.generic.BasicResultPanel.Companion.partyVotes
-import com.joecollins.graphics.utils.RenderTestUtils.compareAltTexts
+import com.joecollins.graphics.utils.PublisherTestUtils.assertPublishes
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.graphics.utils.ShapefileReader.readShapes
 import com.joecollins.models.general.Aggregators.topAndOthers
@@ -68,18 +68,18 @@ class SimpleVoteViewPanelTest {
             .build(header)
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "Basic-1", panel)
-        compareAltTexts(
-            panel,
+        assertPublishes(
+            panel.altText,
             """
-            MONTAGUE-KILMUIR
-            
-            9 OF 9 POLLS REPORTING, PROJECTION: PC GAIN FROM LIB (CHANGE SINCE 2015)
-            CORY DEAGLE (PC): 1,373 (46.4%, +15.5%)
-            DAPHNE GRIFFIN (LIB): 785 (26.6%, -15.2%)
-            JOHN ALLEN MACLEAN (GRN): 674 (22.8%, +18.6%)
-            BILLY CANN (NDP): 124 (4.2%, -18.9%)
-            
-            SWING SINCE 2015: 15.4% SWING LIB TO PC
+                MONTAGUE-KILMUIR
+                
+                9 OF 9 POLLS REPORTING, PROJECTION: PC GAIN FROM LIB (CHANGE SINCE 2015)
+                CORY DEAGLE (PC): 1,373 (46.4%, +15.5%)
+                DAPHNE GRIFFIN (LIB): 785 (26.6%, -15.2%)
+                JOHN ALLEN MACLEAN (GRN): 674 (22.8%, +18.6%)
+                BILLY CANN (NDP): 124 (4.2%, -18.9%)
+                
+                SWING SINCE 2015: 15.4% SWING LIB TO PC
             """.trimIndent()
         )
     }
@@ -137,23 +137,23 @@ class SimpleVoteViewPanelTest {
             .build(header)
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "Basic-2", panel)
-        compareAltTexts(
-            panel,
+        assertPublishes(
+            panel.altText,
             """
-            LASALLE—ÉMARD—VERDUN
-            
-            100% OF POLLS REPORTING, PROJECTION: LIB HOLD (CHANGE SINCE 2015)
-            DAVID LAMETTI (MP) (LIB): 22,803 (43.5%, -0.4%)
-            ISABEL DION (BQ): 12,619 (24.1%, +7.0%)
-            STEVEN SCOTT (NDP): 8,628 (16.5%, -12.5%)
-            CLAUDIO ROCCHI (CON): 3,690 (7.0%, +0.1%)
-            JENCY MERCIER (GRN): 3,583 (6.8%, +3.6%)
-            DANIEL TURGEON (PPC): 490 (0.9%, +0.9%)
-            JULIEN CÔTÉ (IND): 274 (0.5%, +0.5%)
-            RHINO JACQUES BÉLANGER (RHINO): 265 (0.5%, +0.5%)
-            EILEEN STUDD (M-L): 39 (0.1%, +0.1%)
-            
-            SWING SINCE 2015: 3.7% SWING LIB TO BQ
+                LASALLE—ÉMARD—VERDUN
+                
+                100% OF POLLS REPORTING, PROJECTION: LIB HOLD (CHANGE SINCE 2015)
+                DAVID LAMETTI (MP) (LIB): 22,803 (43.5%, -0.4%)
+                ISABEL DION (BQ): 12,619 (24.1%, +7.0%)
+                STEVEN SCOTT (NDP): 8,628 (16.5%, -12.5%)
+                CLAUDIO ROCCHI (CON): 3,690 (7.0%, +0.1%)
+                JENCY MERCIER (GRN): 3,583 (6.8%, +3.6%)
+                DANIEL TURGEON (PPC): 490 (0.9%, +0.9%)
+                JULIEN CÔTÉ (IND): 274 (0.5%, +0.5%)
+                RHINO JACQUES BÉLANGER (RHINO): 265 (0.5%, +0.5%)
+                EILEEN STUDD (M-L): 39 (0.1%, +0.1%)
+                
+                SWING SINCE 2015: 3.7% SWING LIB TO BQ
             """.trimIndent()
         )
     }
@@ -203,18 +203,18 @@ class SimpleVoteViewPanelTest {
             .build(header)
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "PctOnly-1", panel)
-        compareAltTexts(
-            panel,
+        assertPublishes(
+            panel.altText,
             """
-            MONTAGUE-KILMUIR
-            
-            9 OF 9 POLLS REPORTING, PROJECTION: PC GAIN FROM LIB (CHANGE SINCE 2015)
-            CORY DEAGLE (PC): 46.4% (+15.5%)
-            DAPHNE GRIFFIN (LIB): 26.6% (-15.2%)
-            JOHN ALLEN MACLEAN (GRN): 22.8% (+18.6%)
-            BILLY CANN (NDP): 4.2% (-18.9%)
-            
-            SWING SINCE 2015: 15.4% SWING LIB TO PC
+                MONTAGUE-KILMUIR
+                
+                9 OF 9 POLLS REPORTING, PROJECTION: PC GAIN FROM LIB (CHANGE SINCE 2015)
+                CORY DEAGLE (PC): 46.4% (+15.5%)
+                DAPHNE GRIFFIN (LIB): 26.6% (-15.2%)
+                JOHN ALLEN MACLEAN (GRN): 22.8% (+18.6%)
+                BILLY CANN (NDP): 4.2% (-18.9%)
+                
+                SWING SINCE 2015: 15.4% SWING LIB TO PC
             """.trimIndent()
         )
     }
@@ -260,18 +260,18 @@ class SimpleVoteViewPanelTest {
             .build(header)
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "Update-1", panel)
-        compareAltTexts(
-            panel,
+        assertPublishes(
+            panel.altText,
             """
-            MONTAGUE-KILMUIR
-            
-            0 OF 9 POLLS REPORTING, WAITING FOR RESULTS... (CHANGE SINCE 2015)
-            BILLY CANN (NDP): WAITING...
-            CORY DEAGLE (PC): WAITING...
-            DAPHNE GRIFFIN (LIB): WAITING...
-            JOHN ALLEN MACLEAN (GRN): WAITING...
-            
-            SWING SINCE 2015: NOT AVAILABLE
+                MONTAGUE-KILMUIR
+                
+                0 OF 9 POLLS REPORTING, WAITING FOR RESULTS... (CHANGE SINCE 2015)
+                BILLY CANN (NDP): WAITING...
+                CORY DEAGLE (PC): WAITING...
+                DAPHNE GRIFFIN (LIB): WAITING...
+                JOHN ALLEN MACLEAN (GRN): WAITING...
+                
+                SWING SINCE 2015: NOT AVAILABLE
             """.trimIndent()
         )
 
@@ -288,18 +288,18 @@ class SimpleVoteViewPanelTest {
         pctReporting.submit(1.0 / 9)
         leader.submit(leading(lib.party))
         compareRendering("SimpleVoteViewPanel", "Update-2", panel)
-        compareAltTexts(
-            panel,
+        assertPublishes(
+            panel.altText,
             """
-            MONTAGUE-KILMUIR
-            
-            1 OF 9 POLLS REPORTING, PROJECTION: TOO EARLY TO CALL (CHANGE SINCE 2015)
-            DAPHNE GRIFFIN (LIB): 58 (35.8%, -6.0%)
-            JOHN ALLEN MACLEAN (GRN): 52 (32.1%, +27.9%)
-            CORY DEAGLE (PC): 47 (29.0%, -1.9%)
-            BILLY CANN (NDP): 5 (3.1%, -20.0%)
-            
-            SWING SINCE 2015: 17.0% SWING LIB TO GRN
+                MONTAGUE-KILMUIR
+                
+                1 OF 9 POLLS REPORTING, PROJECTION: TOO EARLY TO CALL (CHANGE SINCE 2015)
+                DAPHNE GRIFFIN (LIB): 58 (35.8%, -6.0%)
+                JOHN ALLEN MACLEAN (GRN): 52 (32.1%, +27.9%)
+                CORY DEAGLE (PC): 47 (29.0%, -1.9%)
+                BILLY CANN (NDP): 5 (3.1%, -20.0%)
+                
+                SWING SINCE 2015: 17.0% SWING LIB TO GRN
             """.trimIndent()
         )
 
@@ -316,18 +316,18 @@ class SimpleVoteViewPanelTest {
         pctReporting.submit(2.0 / 9)
         leader.submit(leading(grn.party))
         compareRendering("SimpleVoteViewPanel", "Update-3", panel)
-        compareAltTexts(
-            panel,
+        assertPublishes(
+            panel.altText,
             """
-            MONTAGUE-KILMUIR
-            
-            2 OF 9 POLLS REPORTING, PROJECTION: TOO EARLY TO CALL (CHANGE SINCE 2015)
-            JOHN ALLEN MACLEAN (GRN): 106 (34.8%, +30.6%)
-            DAPHNE GRIFFIN (LIB): 100 (32.8%, -9.0%)
-            CORY DEAGLE (PC): 91 (29.8%, -1.1%)
-            BILLY CANN (NDP): 8 (2.6%, -20.4%)
-            
-            SWING SINCE 2015: 19.8% SWING LIB TO GRN
+                MONTAGUE-KILMUIR
+                
+                2 OF 9 POLLS REPORTING, PROJECTION: TOO EARLY TO CALL (CHANGE SINCE 2015)
+                JOHN ALLEN MACLEAN (GRN): 106 (34.8%, +30.6%)
+                DAPHNE GRIFFIN (LIB): 100 (32.8%, -9.0%)
+                CORY DEAGLE (PC): 91 (29.8%, -1.1%)
+                BILLY CANN (NDP): 8 (2.6%, -20.4%)
+                
+                SWING SINCE 2015: 19.8% SWING LIB TO GRN
             """.trimIndent()
         )
 
@@ -344,18 +344,18 @@ class SimpleVoteViewPanelTest {
         pctReporting.submit(5.0 / 9)
         leader.submit(leading(pc.party))
         compareRendering("SimpleVoteViewPanel", "Update-4", panel)
-        compareAltTexts(
-            panel,
+        assertPublishes(
+            panel.altText,
             """
-            MONTAGUE-KILMUIR
-            
-            5 OF 9 POLLS REPORTING, PROJECTION: TOO EARLY TO CALL (CHANGE SINCE 2015)
-            CORY DEAGLE (PC): 287 (38.5%, +7.6%)
-            JOHN ALLEN MACLEAN (GRN): 243 (32.6%, +28.4%)
-            DAPHNE GRIFFIN (LIB): 197 (26.4%, -15.4%)
-            BILLY CANN (NDP): 18 (2.4%, -20.7%)
-            
-            SWING SINCE 2015: 11.5% SWING LIB TO PC
+                MONTAGUE-KILMUIR
+                
+                5 OF 9 POLLS REPORTING, PROJECTION: TOO EARLY TO CALL (CHANGE SINCE 2015)
+                CORY DEAGLE (PC): 287 (38.5%, +7.6%)
+                JOHN ALLEN MACLEAN (GRN): 243 (32.6%, +28.4%)
+                DAPHNE GRIFFIN (LIB): 197 (26.4%, -15.4%)
+                BILLY CANN (NDP): 18 (2.4%, -20.7%)
+                
+                SWING SINCE 2015: 11.5% SWING LIB TO PC
             """.trimIndent()
         )
 
@@ -373,35 +373,35 @@ class SimpleVoteViewPanelTest {
         leader.submit(elected(pc.party))
         winner.submit(pc)
         compareRendering("SimpleVoteViewPanel", "Update-5", panel)
-        compareAltTexts(
-            panel,
+        assertPublishes(
+            panel.altText,
             """
-            MONTAGUE-KILMUIR
-            
-            9 OF 9 POLLS REPORTING, PROJECTION: PC GAIN FROM LIB (CHANGE SINCE 2015)
-            CORY DEAGLE (PC): 1,373 (46.4%, +15.5%) WINNER
-            DAPHNE GRIFFIN (LIB): 785 (26.5%, -15.3%)
-            JOHN ALLEN MACLEAN (GRN): 675 (22.8%, +18.6%)
-            BILLY CANN (NDP): 124 (4.2%, -18.9%)
-            
-            SWING SINCE 2015: 15.4% SWING LIB TO PC
+                MONTAGUE-KILMUIR
+                
+                9 OF 9 POLLS REPORTING, PROJECTION: PC GAIN FROM LIB (CHANGE SINCE 2015)
+                CORY DEAGLE (PC): 1,373 (46.4%, +15.5%) WINNER
+                DAPHNE GRIFFIN (LIB): 785 (26.5%, -15.3%)
+                JOHN ALLEN MACLEAN (GRN): 675 (22.8%, +18.6%)
+                BILLY CANN (NDP): 124 (4.2%, -18.9%)
+                
+                SWING SINCE 2015: 15.4% SWING LIB TO PC
             """.trimIndent()
         )
 
         winner.submit(null)
         compareRendering("SimpleVoteViewPanel", "Update-6", panel)
-        compareAltTexts(
-            panel,
+        assertPublishes(
+            panel.altText,
             """
-            MONTAGUE-KILMUIR
-            
-            9 OF 9 POLLS REPORTING, PROJECTION: PC GAIN FROM LIB (CHANGE SINCE 2015)
-            CORY DEAGLE (PC): 1,373 (46.4%, +15.5%)
-            DAPHNE GRIFFIN (LIB): 785 (26.5%, -15.3%)
-            JOHN ALLEN MACLEAN (GRN): 675 (22.8%, +18.6%)
-            BILLY CANN (NDP): 124 (4.2%, -18.9%)
-            
-            SWING SINCE 2015: 15.4% SWING LIB TO PC
+                MONTAGUE-KILMUIR
+                
+                9 OF 9 POLLS REPORTING, PROJECTION: PC GAIN FROM LIB (CHANGE SINCE 2015)
+                CORY DEAGLE (PC): 1,373 (46.4%, +15.5%)
+                DAPHNE GRIFFIN (LIB): 785 (26.5%, -15.3%)
+                JOHN ALLEN MACLEAN (GRN): 675 (22.8%, +18.6%)
+                BILLY CANN (NDP): 124 (4.2%, -18.9%)
+                
+                SWING SINCE 2015: 15.4% SWING LIB TO PC
             """.trimIndent()
         )
     }
@@ -454,18 +454,18 @@ class SimpleVoteViewPanelTest {
             .build(header)
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "ZeroVotes-1", panel)
-        compareAltTexts(
-            panel,
+        assertPublishes(
+            panel.altText,
             """
-            MONTAGUE-KILMUIR
-            
-            1 OF 9 POLLS REPORTING, WAITING FOR RESULTS... (CHANGE SINCE 2015)
-            DAPHNE GRIFFIN (LIB): 11 (44.0%, +2.2%)
-            CORY DEAGLE (PC): 8 (32.0%, +1.0%)
-            BILLY CANN (NDP): 6 (24.0%, +0.9%)
-            JOHN ALLEN MACLEAN (GRN): 0 (0.0%, -4.2%)
-            
-            SWING SINCE 2015: 0.6% SWING PC TO LIB
+                MONTAGUE-KILMUIR
+                
+                1 OF 9 POLLS REPORTING, WAITING FOR RESULTS... (CHANGE SINCE 2015)
+                DAPHNE GRIFFIN (LIB): 11 (44.0%, +2.2%)
+                CORY DEAGLE (PC): 8 (32.0%, +1.0%)
+                BILLY CANN (NDP): 6 (24.0%, +0.9%)
+                JOHN ALLEN MACLEAN (GRN): 0 (0.0%, -4.2%)
+                
+                SWING SINCE 2015: 0.6% SWING PC TO LIB
             """.trimIndent()
         )
     }
@@ -501,14 +501,14 @@ class SimpleVoteViewPanelTest {
             .build(header)
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "PopularVote-1", panel)
-        compareAltTexts(
-            panel,
+        assertPublishes(
+            panel.altText,
             """
-            PRINCE EDWARD ISLAND
-            
-            0 OF 27 DISTRICTS DECLARED, WAITING FOR RESULTS... (CHANGE SINCE 2015)
-            
-            SWING SINCE 2015: NOT AVAILABLE
+                PRINCE EDWARD ISLAND
+                
+                0 OF 27 DISTRICTS DECLARED, WAITING FOR RESULTS... (CHANGE SINCE 2015)
+                
+                SWING SINCE 2015: NOT AVAILABLE
             """.trimIndent()
         )
 
@@ -535,18 +535,18 @@ class SimpleVoteViewPanelTest {
         winners[3] = pc
         winnersByDistrict.submit(winners)
         compareRendering("SimpleVoteViewPanel", "PopularVote-2", panel)
-        compareAltTexts(
-            panel,
+        assertPublishes(
+            panel.altText,
             """
-            PRINCE EDWARD ISLAND
-            
-            1 OF 27 DISTRICTS DECLARED, PROJECTION: TOO EARLY TO CALL (CHANGE SINCE 2015)
-            PROGRESSIVE CONSERVATIVE: 46.4% (+15.5%)
-            LIBERAL: 26.5% (-15.3%)
-            GREEN: 22.8% (+18.6%)
-            NEW DEMOCRATIC PARTY: 4.2% (-18.9%)
-            
-            SWING SINCE 2015: 15.4% SWING LIB TO PC
+                PRINCE EDWARD ISLAND
+                
+                1 OF 27 DISTRICTS DECLARED, PROJECTION: TOO EARLY TO CALL (CHANGE SINCE 2015)
+                PROGRESSIVE CONSERVATIVE: 46.4% (+15.5%)
+                LIBERAL: 26.5% (-15.3%)
+                GREEN: 22.8% (+18.6%)
+                NEW DEMOCRATIC PARTY: 4.2% (-18.9%)
+                
+                SWING SINCE 2015: 15.4% SWING LIB TO PC
             """.trimIndent()
         )
 
@@ -556,18 +556,18 @@ class SimpleVoteViewPanelTest {
         pctReporting.submit(1.0 / 7)
         voteHeader.submit("1 OF 7 DISTRICTS DECLARED")
         compareRendering("SimpleVoteViewPanel", "PopularVote-3", panel)
-        compareAltTexts(
-            panel,
+        assertPublishes(
+            panel.altText,
             """
-            CARDIGAN
-            
-            1 OF 7 DISTRICTS DECLARED, PROJECTION: TOO EARLY TO CALL (CHANGE SINCE 2015)
-            PROGRESSIVE CONSERVATIVE: 46.4% (+15.5%)
-            LIBERAL: 26.5% (-15.3%)
-            GREEN: 22.8% (+18.6%)
-            NEW DEMOCRATIC PARTY: 4.2% (-18.9%)
-            
-            SWING SINCE 2015: 15.4% SWING LIB TO PC
+                CARDIGAN
+                
+                1 OF 7 DISTRICTS DECLARED, PROJECTION: TOO EARLY TO CALL (CHANGE SINCE 2015)
+                PROGRESSIVE CONSERVATIVE: 46.4% (+15.5%)
+                LIBERAL: 26.5% (-15.3%)
+                GREEN: 22.8% (+18.6%)
+                NEW DEMOCRATIC PARTY: 4.2% (-18.9%)
+                
+                SWING SINCE 2015: 15.4% SWING LIB TO PC
             """.trimIndent()
         )
     }
@@ -610,17 +610,17 @@ class SimpleVoteViewPanelTest {
             .build(header)
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "PartyTick-1", panel)
-        compareAltTexts(
-            panel,
+        assertPublishes(
+            panel.altText,
             """
-            UNITED STATES
-            
-            HOUSE OF REPRESENTATIVES (CHANGE SINCE 2016)
-            DEMOCRAT: 53.4% (+5.4%) WINNER
-            REPUBLICAN: 44.8% (-4.3%)
-            OTHERS: 1.7% (-1.1%)
-            
-            SWING SINCE 2016: 4.8% SWING GOP TO DEM
+                UNITED STATES
+                
+                HOUSE OF REPRESENTATIVES (CHANGE SINCE 2016)
+                DEMOCRAT: 53.4% (+5.4%) WINNER
+                REPUBLICAN: 44.8% (-4.3%)
+                OTHERS: 1.7% (-1.1%)
+                
+                SWING SINCE 2016: 4.8% SWING GOP TO DEM
             """.trimIndent()
         )
     }
@@ -668,24 +668,24 @@ class SimpleVoteViewPanelTest {
             .build(header)
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "SameParty-1", panel)
-        compareAltTexts(
-            panel,
+        assertPublishes(
+            panel.altText,
             """
-            TEXAS DISTRICT 27
-            
-            OFFICIAL RESULT, GOP HOLD (CHANGE SINCE 2016)
-            MICHAEL CLOUD (GOP): 19,856 (54.7%, -1.9%^) WINNER
-            ERIC HOLGUIN (DEM): 11,595 (32.0%, +0.8%^)
-            RAUL BARRERA (DEM): 1,747 (4.8%, ^)
-            BECH BRUUN (GOP): 1,570 (4.3%, ^)
-            MIKE WESTERGREN (DEM): 858 (2.4%, ^)
-            MARTY PEREZ (GOP): 276 (0.8%, ^)
-            JUDITH CUTRIGHT (IND): 172 (0.5%, +0.6%^)
-            DANIEL TINUS (LBT): 144 (0.4%, +0.4%)
-            CHRISTOPHER SUPRUN (IND): 51 (0.1%, ^)
-            ^ AGGREGATED ACROSS CANDIDATES IN PARTY
-            
-            SWING SINCE 2016: 1.4% SWING GOP TO DEM
+                TEXAS DISTRICT 27
+                
+                OFFICIAL RESULT, GOP HOLD (CHANGE SINCE 2016)
+                MICHAEL CLOUD (GOP): 19,856 (54.7%, -1.9%^) WINNER
+                ERIC HOLGUIN (DEM): 11,595 (32.0%, +0.8%^)
+                RAUL BARRERA (DEM): 1,747 (4.8%, ^)
+                BECH BRUUN (GOP): 1,570 (4.3%, ^)
+                MIKE WESTERGREN (DEM): 858 (2.4%, ^)
+                MARTY PEREZ (GOP): 276 (0.8%, ^)
+                JUDITH CUTRIGHT (IND): 172 (0.5%, +0.6%^)
+                DANIEL TINUS (LBT): 144 (0.4%, +0.4%)
+                CHRISTOPHER SUPRUN (IND): 51 (0.1%, ^)
+                ^ AGGREGATED ACROSS CANDIDATES IN PARTY
+                
+                SWING SINCE 2016: 1.4% SWING GOP TO DEM
             """.trimIndent()
         )
     }
@@ -717,15 +717,15 @@ class SimpleVoteViewPanelTest {
             .build(header)
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "MajorityLine-1", panel)
-        compareAltTexts(
-            panel,
+        assertPublishes(
+            panel.altText,
             """
-            FRANCE PRESIDENT: ROUND 2
-            
-            OFFICIAL RESULT, MACRON WIN
-            EMMANUEL MACRON (LREM): 20,743,128 (66.1%) WINNER
-            MARINE LE PEN (FN): 10,638,475 (33.9%)
-            50% TO WIN
+                FRANCE PRESIDENT: ROUND 2
+                
+                OFFICIAL RESULT, MACRON WIN
+                EMMANUEL MACRON (LREM): 20,743,128 (66.1%) WINNER
+                MARINE LE PEN (FN): 10,638,475 (33.9%)
+                50% TO WIN
             """.trimIndent()
         )
 
@@ -740,15 +740,15 @@ class SimpleVoteViewPanelTest {
             )
         )
         compareRendering("SimpleVoteViewPanel", "MajorityLine-2", panel)
-        compareAltTexts(
-            panel,
+        assertPublishes(
+            panel.altText,
             """
-            FRANCE PRESIDENT: ROUND 2
-            
-            15.4% REPORTING, PROJECTION: MACRON WIN
-            EMMANUEL MACRON (LREM): 3,825,279 (78.7%)
-            MARINE LE PEN (FN): 1,033,686 (21.3%)
-            50% TO WIN
+                FRANCE PRESIDENT: ROUND 2
+                
+                15.4% REPORTING, PROJECTION: MACRON WIN
+                EMMANUEL MACRON (LREM): 3,825,279 (78.7%)
+                MARINE LE PEN (FN): 1,033,686 (21.3%)
+                50% TO WIN
             """.trimIndent()
         )
 
@@ -762,15 +762,15 @@ class SimpleVoteViewPanelTest {
         voteHeader.submit("0.0% REPORTING")
         voteSubhead.submit("")
         compareRendering("SimpleVoteViewPanel", "MajorityLine-3", panel)
-        compareAltTexts(
-            panel,
+        assertPublishes(
+            panel.altText,
             """
-            FRANCE PRESIDENT: ROUND 2
-            
-            0.0% REPORTING
-            EMMANUEL MACRON (LREM): WAITING...
-            MARINE LE PEN (FN): WAITING...
-            50% TO WIN
+                FRANCE PRESIDENT: ROUND 2
+                
+                0.0% REPORTING
+                EMMANUEL MACRON (LREM): WAITING...
+                MARINE LE PEN (FN): WAITING...
+                50% TO WIN
             """.trimIndent()
         )
     }
@@ -817,22 +817,29 @@ class SimpleVoteViewPanelTest {
         )
             .withPrev(previousVotes, changeHeader, changeSubhead)
             .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader)
-            .withResultMap(shapesByDistrict.asOneTimePublisher(), selectedDistrict, leader.map { elected(it) }, focus, additionalHighlight, mapHeader)
+            .withResultMap(
+                shapesByDistrict.asOneTimePublisher(),
+                selectedDistrict,
+                leader.map { elected(it) },
+                focus,
+                additionalHighlight,
+                mapHeader
+            )
             .build(header)
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "AdditionalHighlightMap-1", panel)
-        compareAltTexts(
-            panel,
+        assertPublishes(
+            panel.altText,
             """
-            MONTAGUE-KILMUIR
-            
-            9 OF 9 POLLS REPORTING, PROJECTION: PC GAIN FROM LIB (CHANGE SINCE 2015, ADJUSTED FOR BOUNDARY CHANGES)
-            CORY DEAGLE (PC): 1,373 (46.4%, +15.5%)
-            DAPHNE GRIFFIN (LIB): 785 (26.6%, -15.2%)
-            JOHN ALLEN MACLEAN (GRN): 674 (22.8%, +18.6%)
-            BILLY CANN (NDP): 124 (4.2%, -18.9%)
-            
-            SWING SINCE 2015: 15.4% SWING LIB TO PC
+                MONTAGUE-KILMUIR
+                
+                9 OF 9 POLLS REPORTING, PROJECTION: PC GAIN FROM LIB (CHANGE SINCE 2015, ADJUSTED FOR BOUNDARY CHANGES)
+                CORY DEAGLE (PC): 1,373 (46.4%, +15.5%)
+                DAPHNE GRIFFIN (LIB): 785 (26.6%, -15.2%)
+                JOHN ALLEN MACLEAN (GRN): 674 (22.8%, +18.6%)
+                BILLY CANN (NDP): 124 (4.2%, -18.9%)
+                
+                SWING SINCE 2015: 15.4% SWING LIB TO PC
             """.trimIndent()
         )
     }
@@ -864,15 +871,15 @@ class SimpleVoteViewPanelTest {
             .build(header)
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "Uncontested-1", panel)
-        compareAltTexts(
-            panel,
+        assertPublishes(
+            panel.altText,
             """
-            MASSACHUSETTS DISTRICT 4
-            
-            0.0% OF POLLS REPORTING (CHANGE SINCE 2016)
-            JOE KENNEDY III (DEM): UNCONTESTED
-            
-            SWING SINCE 2016: NOT AVAILABLE
+                MASSACHUSETTS DISTRICT 4
+                
+                0.0% OF POLLS REPORTING (CHANGE SINCE 2016)
+                JOE KENNEDY III (DEM): UNCONTESTED
+                
+                SWING SINCE 2016: NOT AVAILABLE
             """.trimIndent()
         )
     }
@@ -897,17 +904,17 @@ class SimpleVoteViewPanelTest {
             .build(header)
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "LotsOfCandidates-1", panel)
-        compareAltTexts(
-            panel,
+        assertPublishes(
+            panel.altText,
             """
-            UXBRIDGE AND SOUTH RUISLIP
-            
-            2017 RESULT
-            BORIS JOHNSON (CON): 23,716 (50.8%) WINNER
-            VINCENT LO (LAB): 18,682 (40.0%)
-            ROSINA ROBSON (LD): 1,835 (3.9%)
-            LIZZY KEMP (UKIP): 1,577 (3.4%)
-            MARK KEIR (GRN): 884 (1.9%)
+                UXBRIDGE AND SOUTH RUISLIP
+                
+                2017 RESULT
+                BORIS JOHNSON (CON): 23,716 (50.8%) WINNER
+                VINCENT LO (LAB): 18,682 (40.0%)
+                ROSINA ROBSON (LD): 1,835 (3.9%)
+                LIZZY KEMP (UKIP): 1,577 (3.4%)
+                MARK KEIR (GRN): 884 (1.9%)
             """.trimIndent()
         )
 
@@ -929,24 +936,24 @@ class SimpleVoteViewPanelTest {
         )
         voteHeader.submit("2019 RESULT")
         compareRendering("SimpleVoteViewPanel", "LotsOfCandidates-2", panel)
-        compareAltTexts(
-            panel,
+        assertPublishes(
+            panel.altText,
             """
-            UXBRIDGE AND SOUTH RUISLIP
-            
-            2019 RESULT
-            BORIS JOHNSON (CON): 25,351 (52.6%) WINNER
-            ALI MILANI (LAB): 18,141 (37.6%)
-            JOANNE HUMPHREYS (LD): 3,026 (6.3%)
-            MARK KEIR (GRN): 1,090 (2.3%)
-            GEOFFREY COURTENAY (UKIP): 283 (0.6%)
-            LORD BUCKETHEAD (MRLP): 125 (0.3%)
-            COUNT BINFACE (IND): 69 (0.1%)
-            ALFIE UTTING (IND): 44 (0.1%)
-            YACE "INTERPLANETARY TIME LORD" YOGENSTEIN (IND): 23 (0.0%)
-            NORMA BURKE (IND): 22 (0.0%)
-            BOBBY SMITH (IND): 8 (0.0%)
-            WILLIAM TOBIN (IND): 5 (0.0%)
+                UXBRIDGE AND SOUTH RUISLIP
+                
+                2019 RESULT
+                BORIS JOHNSON (CON): 25,351 (52.6%) WINNER
+                ALI MILANI (LAB): 18,141 (37.6%)
+                JOANNE HUMPHREYS (LD): 3,026 (6.3%)
+                MARK KEIR (GRN): 1,090 (2.3%)
+                GEOFFREY COURTENAY (UKIP): 283 (0.6%)
+                LORD BUCKETHEAD (MRLP): 125 (0.3%)
+                COUNT BINFACE (IND): 69 (0.1%)
+                ALFIE UTTING (IND): 44 (0.1%)
+                YACE "INTERPLANETARY TIME LORD" YOGENSTEIN (IND): 23 (0.0%)
+                NORMA BURKE (IND): 22 (0.0%)
+                BOBBY SMITH (IND): 8 (0.0%)
+                WILLIAM TOBIN (IND): 5 (0.0%)
             """.trimIndent()
         )
 
@@ -961,17 +968,17 @@ class SimpleVoteViewPanelTest {
         )
         voteHeader.submit("2017 RESULT")
         compareRendering("SimpleVoteViewPanel", "LotsOfCandidates-1", panel)
-        compareAltTexts(
-            panel,
+        assertPublishes(
+            panel.altText,
             """
-            UXBRIDGE AND SOUTH RUISLIP
-            
-            2017 RESULT
-            BORIS JOHNSON (CON): 23,716 (50.8%) WINNER
-            VINCENT LO (LAB): 18,682 (40.0%)
-            ROSINA ROBSON (LD): 1,835 (3.9%)
-            LIZZY KEMP (UKIP): 1,577 (3.4%)
-            MARK KEIR (GRN): 884 (1.9%)
+                UXBRIDGE AND SOUTH RUISLIP
+                
+                2017 RESULT
+                BORIS JOHNSON (CON): 23,716 (50.8%) WINNER
+                VINCENT LO (LAB): 18,682 (40.0%)
+                ROSINA ROBSON (LD): 1,835 (3.9%)
+                LIZZY KEMP (UKIP): 1,577 (3.4%)
+                MARK KEIR (GRN): 884 (1.9%)
             """.trimIndent()
         )
     }
@@ -1018,33 +1025,33 @@ class SimpleVoteViewPanelTest {
             .build(header)
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "CandidateOthers-1", panel)
-        compareAltTexts(
-            panel,
+        assertPublishes(
+            panel.altText,
             """
-            MONTAGUE-KILMUIR
-            
-            0 OF 9 POLLS REPORTING, WAITING FOR RESULTS... (CHANGE SINCE 2015)
-            BILLY CANN (NDP): WAITING...
-            CORY DEAGLE (PC): WAITING...
-            OTHERS: WAITING...
-            
-            SWING SINCE 2015: NOT AVAILABLE
+                MONTAGUE-KILMUIR
+                
+                0 OF 9 POLLS REPORTING, WAITING FOR RESULTS... (CHANGE SINCE 2015)
+                BILLY CANN (NDP): WAITING...
+                CORY DEAGLE (PC): WAITING...
+                OTHERS: WAITING...
+                
+                SWING SINCE 2015: NOT AVAILABLE
             """.trimIndent()
         )
 
         winner.submit(lib)
         compareRendering("SimpleVoteViewPanel", "CandidateOthers-2", panel)
-        compareAltTexts(
-            panel,
+        assertPublishes(
+            panel.altText,
             """
-            MONTAGUE-KILMUIR
-            
-            0 OF 9 POLLS REPORTING, WAITING FOR RESULTS... (CHANGE SINCE 2015)
-            BILLY CANN (NDP): WAITING...
-            DAPHNE GRIFFIN (LIB): WAITING... WINNER
-            OTHERS: WAITING...
-            
-            SWING SINCE 2015: NOT AVAILABLE
+                MONTAGUE-KILMUIR
+                
+                0 OF 9 POLLS REPORTING, WAITING FOR RESULTS... (CHANGE SINCE 2015)
+                BILLY CANN (NDP): WAITING...
+                DAPHNE GRIFFIN (LIB): WAITING... WINNER
+                OTHERS: WAITING...
+                
+                SWING SINCE 2015: NOT AVAILABLE
             """.trimIndent()
         )
 
@@ -1062,17 +1069,17 @@ class SimpleVoteViewPanelTest {
         leader.submit(elected(pc.party))
         winner.submit(pc)
         compareRendering("SimpleVoteViewPanel", "CandidateOthers-3", panel)
-        compareAltTexts(
-            panel,
+        assertPublishes(
+            panel.altText,
             """
-            MONTAGUE-KILMUIR
-            
-            9 OF 9 POLLS REPORTING, PROJECTION: PC GAIN FROM LIB (CHANGE SINCE 2015)
-            CORY DEAGLE (PC): 1,373 (46.4%, +15.5%) WINNER
-            DAPHNE GRIFFIN (LIB): 785 (26.5%, -15.3%)
-            OTHERS: 799 (27.0%, -0.2%)
-            
-            SWING SINCE 2015: 15.4% SWING LIB TO PC
+                MONTAGUE-KILMUIR
+                
+                9 OF 9 POLLS REPORTING, PROJECTION: PC GAIN FROM LIB (CHANGE SINCE 2015)
+                CORY DEAGLE (PC): 1,373 (46.4%, +15.5%) WINNER
+                DAPHNE GRIFFIN (LIB): 785 (26.5%, -15.3%)
+                OTHERS: 799 (27.0%, -0.2%)
+                
+                SWING SINCE 2015: 15.4% SWING LIB TO PC
             """.trimIndent()
         )
     }
@@ -1119,33 +1126,33 @@ class SimpleVoteViewPanelTest {
             .build(header)
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "CandidateOthersMandatory-1", panel)
-        compareAltTexts(
-            panel,
+        assertPublishes(
+            panel.altText,
             """
-            MONTAGUE-KILMUIR
-            
-            0 OF 9 POLLS REPORTING, WAITING FOR RESULTS... (CHANGE SINCE 2015)
-            CORY DEAGLE (PC): WAITING...
-            DAPHNE GRIFFIN (LIB): WAITING...
-            OTHERS: WAITING...
-            
-            SWING SINCE 2015: NOT AVAILABLE
+                MONTAGUE-KILMUIR
+                
+                0 OF 9 POLLS REPORTING, WAITING FOR RESULTS... (CHANGE SINCE 2015)
+                CORY DEAGLE (PC): WAITING...
+                DAPHNE GRIFFIN (LIB): WAITING...
+                OTHERS: WAITING...
+                
+                SWING SINCE 2015: NOT AVAILABLE
             """.trimIndent()
         )
 
         winner.submit(lib)
         compareRendering("SimpleVoteViewPanel", "CandidateOthersMandatory-2", panel)
-        compareAltTexts(
-            panel,
+        assertPublishes(
+            panel.altText,
             """
-            MONTAGUE-KILMUIR
-            
-            0 OF 9 POLLS REPORTING, WAITING FOR RESULTS... (CHANGE SINCE 2015)
-            CORY DEAGLE (PC): WAITING...
-            DAPHNE GRIFFIN (LIB): WAITING... WINNER
-            OTHERS: WAITING...
-            
-            SWING SINCE 2015: NOT AVAILABLE
+                MONTAGUE-KILMUIR
+                
+                0 OF 9 POLLS REPORTING, WAITING FOR RESULTS... (CHANGE SINCE 2015)
+                CORY DEAGLE (PC): WAITING...
+                DAPHNE GRIFFIN (LIB): WAITING... WINNER
+                OTHERS: WAITING...
+                
+                SWING SINCE 2015: NOT AVAILABLE
             """.trimIndent()
         )
 
@@ -1163,17 +1170,17 @@ class SimpleVoteViewPanelTest {
         leader.submit(elected(pc.party))
         winner.submit(pc)
         compareRendering("SimpleVoteViewPanel", "CandidateOthersMandatory-3", panel)
-        compareAltTexts(
-            panel,
+        assertPublishes(
+            panel.altText,
             """
-            MONTAGUE-KILMUIR
-            
-            9 OF 9 POLLS REPORTING, PROJECTION: PC GAIN FROM LIB (CHANGE SINCE 2015)
-            CORY DEAGLE (PC): 1,373 (46.4%, +15.5%) WINNER
-            DAPHNE GRIFFIN (LIB): 785 (26.5%, -15.3%)
-            OTHERS: 799 (27.0%, -0.2%)
-            
-            SWING SINCE 2015: 15.4% SWING LIB TO PC
+                MONTAGUE-KILMUIR
+                
+                9 OF 9 POLLS REPORTING, PROJECTION: PC GAIN FROM LIB (CHANGE SINCE 2015)
+                CORY DEAGLE (PC): 1,373 (46.4%, +15.5%) WINNER
+                DAPHNE GRIFFIN (LIB): 785 (26.5%, -15.3%)
+                OTHERS: 799 (27.0%, -0.2%)
+                
+                SWING SINCE 2015: 15.4% SWING LIB TO PC
             """.trimIndent()
         )
     }
@@ -1216,18 +1223,18 @@ class SimpleVoteViewPanelTest {
             .build(header)
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "PartiesNotRunningAgain-1", panel)
-        compareAltTexts(
-            panel,
+        assertPublishes(
+            panel.altText,
             """
-            SHIPPAGAN-LAMÈQUE-MISCOU
-            
-            OFFICIAL RESULT (CHANGE SINCE 2018)
-            ERIC MALLET (LIB): 6,834 (83.8%, +37.7%) WINNER
-            JEAN-GÉRARD CHIASSON (PC): 714 (8.8%, -38.5%)
-            MARIE LECLERC (GRN): 609 (7.5%, +7.5%)
-            OTHERS: - (-6.7%)
-            
-            SWING SINCE 2018: 38.1% SWING PC TO LIB
+                SHIPPAGAN-LAMÈQUE-MISCOU
+                
+                OFFICIAL RESULT (CHANGE SINCE 2018)
+                ERIC MALLET (LIB): 6,834 (83.8%, +37.7%) WINNER
+                JEAN-GÉRARD CHIASSON (PC): 714 (8.8%, -38.5%)
+                MARIE LECLERC (GRN): 609 (7.5%, +7.5%)
+                OTHERS: - (-6.7%)
+                
+                SWING SINCE 2018: 38.1% SWING PC TO LIB
             """.trimIndent()
         )
     }
@@ -1272,18 +1279,18 @@ class SimpleVoteViewPanelTest {
             .build(header)
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "PartiesNotRunningAgain-1", panel)
-        compareAltTexts(
-            panel,
+        assertPublishes(
+            panel.altText,
             """
-            SHIPPAGAN-LAMÈQUE-MISCOU
-            
-            OFFICIAL RESULT (CHANGE SINCE 2018)
-            ERIC MALLET (LIB): 6,834 (83.8%, +37.7%) WINNER
-            JEAN-GÉRARD CHIASSON (PC): 714 (8.8%, -38.5%)
-            MARIE LECLERC (GRN): 609 (7.5%, +7.5%)
-            OTHERS: - (-6.7%)
-            
-            SWING SINCE 2018: 38.1% SWING PC TO LIB
+                SHIPPAGAN-LAMÈQUE-MISCOU
+                
+                OFFICIAL RESULT (CHANGE SINCE 2018)
+                ERIC MALLET (LIB): 6,834 (83.8%, +37.7%) WINNER
+                JEAN-GÉRARD CHIASSON (PC): 714 (8.8%, -38.5%)
+                MARIE LECLERC (GRN): 609 (7.5%, +7.5%)
+                OTHERS: - (-6.7%)
+                
+                SWING SINCE 2018: 38.1% SWING PC TO LIB
             """.trimIndent()
         )
     }
@@ -1326,17 +1333,17 @@ class SimpleVoteViewPanelTest {
             .build(header)
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "PartiesNotRunningAgainOthers-1", panel)
-        compareAltTexts(
-            panel,
+        assertPublishes(
+            panel.altText,
             """
-            SHIPPAGAN-LAMÈQUE-MISCOU
-            
-            OFFICIAL RESULT (CHANGE SINCE 2018)
-            ERIC MALLET (LIB): 6,834 (83.8%, +37.7%) WINNER
-            JEAN-GÉRARD CHIASSON (PC): 714 (8.8%, -38.5%)
-            OTHERS: 609 (7.5%, +0.7%)
-            
-            SWING SINCE 2018: 38.1% SWING PC TO LIB
+                SHIPPAGAN-LAMÈQUE-MISCOU
+                
+                OFFICIAL RESULT (CHANGE SINCE 2018)
+                ERIC MALLET (LIB): 6,834 (83.8%, +37.7%) WINNER
+                JEAN-GÉRARD CHIASSON (PC): 714 (8.8%, -38.5%)
+                OTHERS: 609 (7.5%, +0.7%)
+                
+                SWING SINCE 2018: 38.1% SWING PC TO LIB
             """.trimIndent()
         )
     }
@@ -1380,17 +1387,17 @@ class SimpleVoteViewPanelTest {
             .build(header)
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "PartiesNotRunningAgainOthers-1", panel)
-        compareAltTexts(
-            panel,
+        assertPublishes(
+            panel.altText,
             """
-            SHIPPAGAN-LAMÈQUE-MISCOU
-            
-            OFFICIAL RESULT (CHANGE SINCE 2018)
-            ERIC MALLET (LIB): 6,834 (83.8%, +37.7%) WINNER
-            JEAN-GÉRARD CHIASSON (PC): 714 (8.8%, -38.5%)
-            OTHERS: 609 (7.5%, +0.7%)
-            
-            SWING SINCE 2018: 38.1% SWING PC TO LIB
+                SHIPPAGAN-LAMÈQUE-MISCOU
+                
+                OFFICIAL RESULT (CHANGE SINCE 2018)
+                ERIC MALLET (LIB): 6,834 (83.8%, +37.7%) WINNER
+                JEAN-GÉRARD CHIASSON (PC): 714 (8.8%, -38.5%)
+                OTHERS: 609 (7.5%, +0.7%)
+                
+                SWING SINCE 2018: 38.1% SWING PC TO LIB
             """.trimIndent()
         )
     }
@@ -1424,20 +1431,20 @@ class SimpleVoteViewPanelTest {
             .build(header)
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "WinningPartyNotRunningAgain-1", panel)
-        compareAltTexts(
-            panel,
+        assertPublishes(
+            panel.altText,
             """
-            BUCKINGHAM
-            
-            OFFICIAL RESULT (CHANGE SINCE 2017 NOT APPLICABLE: PREVIOUSLY SPEAKER'S SEAT)
-            GREG SMITH (CON): 37,035 (58.4%) WINNER
-            STEPHEN DORRELL (LD): 16,624 (26.2%)
-            DAVID MORGAN (LAB): 7,638 (12.0%)
-            ANDREW BELL (BXP): 1,286 (2.0%)
-            NED THOMPSON (IND): 681 (1.1%)
-            ANTONIO VITIELLO (ED): 194 (0.3%)
-            
-            SWING SINCE 2017: NOT AVAILABLE
+                BUCKINGHAM
+                
+                OFFICIAL RESULT (CHANGE SINCE 2017 NOT APPLICABLE: PREVIOUSLY SPEAKER'S SEAT)
+                GREG SMITH (CON): 37,035 (58.4%) WINNER
+                STEPHEN DORRELL (LD): 16,624 (26.2%)
+                DAVID MORGAN (LAB): 7,638 (12.0%)
+                ANDREW BELL (BXP): 1,286 (2.0%)
+                NED THOMPSON (IND): 681 (1.1%)
+                ANTONIO VITIELLO (ED): 194 (0.3%)
+                
+                SWING SINCE 2017: NOT AVAILABLE
             """.trimIndent()
         )
 
@@ -1445,21 +1452,21 @@ class SimpleVoteViewPanelTest {
         changeHeader.submit("CHANGE SINCE 2005")
         swingHeader.submit("SWING SINCE 2005")
         compareRendering("SimpleVoteViewPanel", "WinningPartyNotRunningAgain-2", panel)
-        compareAltTexts(
-            panel,
+        assertPublishes(
+            panel.altText,
             """
-            BUCKINGHAM
-            
-            OFFICIAL RESULT (CHANGE SINCE 2005)
-            GREG SMITH (CON): 37,035 (58.4%, +0.9%) WINNER
-            STEPHEN DORRELL (LD): 16,624 (26.2%, +6.5%)
-            DAVID MORGAN (LAB): 7,638 (12.0%, -7.9%)
-            ANDREW BELL (BXP): 1,286 (2.0%, +2.0%)
-            NED THOMPSON (IND): 681 (1.1%, +1.1%)
-            ANTONIO VITIELLO (ED): 194 (0.3%, +0.3%)
-            OTHERS: - (-3.0%)
-            
-            SWING SINCE 2005: 2.8% SWING CON TO LD
+                BUCKINGHAM
+                
+                OFFICIAL RESULT (CHANGE SINCE 2005)
+                GREG SMITH (CON): 37,035 (58.4%, +0.9%) WINNER
+                STEPHEN DORRELL (LD): 16,624 (26.2%, +6.5%)
+                DAVID MORGAN (LAB): 7,638 (12.0%, -7.9%)
+                ANDREW BELL (BXP): 1,286 (2.0%, +2.0%)
+                NED THOMPSON (IND): 681 (1.1%, +1.1%)
+                ANTONIO VITIELLO (ED): 194 (0.3%, +0.3%)
+                OTHERS: - (-3.0%)
+                
+                SWING SINCE 2005: 2.8% SWING CON TO LD
             """.trimIndent()
         )
     }
@@ -1473,7 +1480,8 @@ class SimpleVoteViewPanelTest {
         val rn = Party("National Rally", "RN", Color.BLUE.darker())
         val swingPartyOrder = listOf(nupes, modem, ens, lr, rn)
 
-        val curr = Publisher(mapOf(Candidate("Nicolas Dragos", rn) to 17058, Candidate("Aude Bono-Vandrome", ens) to 14208))
+        val curr =
+            Publisher(mapOf(Candidate("Nicolas Dragos", rn) to 17058, Candidate("Aude Bono-Vandrome", ens) to 14208))
         val prev = Publisher(mapOf(ens to 16684, rn to 12994))
         val constituency = Publisher("AISNE 1st CONSTITUENCY")
 
@@ -1492,16 +1500,16 @@ class SimpleVoteViewPanelTest {
             .build(constituency)
         panel.size = Dimension(1024, 512)
         compareRendering("SimpleVoteViewPanel", "RunoffMode-1", panel)
-        compareAltTexts(
-            panel,
+        assertPublishes(
+            panel.altText,
             """
-            AISNE 1st CONSTITUENCY
-            
-            SECOND ROUND RESULT, 100.0% REPORTING (CHANGE SINCE 2018)
-            NICOLAS DRAGOS (RN): 17,058 (54.6%, +10.8%)
-            AUDE BONO-VANDROME (ENS): 14,208 (45.4%, -10.8%)
-            
-            SWING SINCE 2018: 10.8% SWING ENS TO RN
+                AISNE 1st CONSTITUENCY
+                
+                SECOND ROUND RESULT, 100.0% REPORTING (CHANGE SINCE 2018)
+                NICOLAS DRAGOS (RN): 17,058 (54.6%, +10.8%)
+                AUDE BONO-VANDROME (ENS): 14,208 (45.4%, -10.8%)
+                
+                SWING SINCE 2018: 10.8% SWING ENS TO RN
             """.trimIndent()
         )
 
@@ -1509,16 +1517,16 @@ class SimpleVoteViewPanelTest {
         prev.submit(mapOf(modem to 15114, lr to 17564))
         constituency.submit("AIN 1st CONSTITUENCY")
         compareRendering("SimpleVoteViewPanel", "RunoffMode-2", panel)
-        compareAltTexts(
-            panel,
+        assertPublishes(
+            panel.altText,
             """
-            AIN 1st CONSTITUENCY
-            
-            SECOND ROUND RESULT, 100.0% REPORTING (CHANGE SINCE 2018 NOT APPLICABLE: DIFFERENT PARTIES IN RUNOFF)
-            XAVIER BRETON (LR): 24,407 (63.2%)
-            SEBASTIEN GUERAUD (NUPES): 14,202 (36.8%)
-            
-            SWING SINCE 2018: NOT AVAILABLE
+                AIN 1st CONSTITUENCY
+                
+                SECOND ROUND RESULT, 100.0% REPORTING (CHANGE SINCE 2018 NOT APPLICABLE: DIFFERENT PARTIES IN RUNOFF)
+                XAVIER BRETON (LR): 24,407 (63.2%)
+                SEBASTIEN GUERAUD (NUPES): 14,202 (36.8%)
+                
+                SWING SINCE 2018: NOT AVAILABLE
             """.trimIndent()
         )
     }
@@ -1533,7 +1541,10 @@ class SimpleVoteViewPanelTest {
         val dupontAignan = Candidate("Nicolas Dupont-Aignan", Party("Debout la France", "DLF", Color.CYAN.darker()))
         val lasalle = Candidate("Jean Lasalle", Party("R\u00e9sistons!", "R\u00c9S", Color.CYAN))
         val poutou = Candidate("Philippe Poutou", Party("New Anticapitalist Party", "NPA", Color.RED.darker()))
-        val asselineau = Candidate("Fran\u00e7ois Asselineau", Party("Popular Republican Union", "UPR", Color.CYAN.darker().darker()))
+        val asselineau = Candidate(
+            "Fran\u00e7ois Asselineau",
+            Party("Popular Republican Union", "UPR", Color.CYAN.darker().darker())
+        )
         val arthaud = Candidate("Nathalie Arthaud", Party("Lutte Ouvri\u00e8re", "LO", Color.RED))
         val cheminade = Candidate("Jacques Cheminade", Party("Solidarity and Progress", "S&P", Color.GRAY))
         val currentVotes = Publisher(
@@ -1561,47 +1572,47 @@ class SimpleVoteViewPanelTest {
             .build(header)
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "CandidateRunoffSingleLine-1", panel)
-        compareAltTexts(
-            panel,
+        assertPublishes(
+            panel.altText,
             """
-            ELECTION 2017: FRANCE DECIDES
-            
-            FIRST ROUND RESULT
-            EMMANUEL MACRON (EM): 8,656,346 (24.0%)
-            MARINE LE PEN (FN): 7,678,491 (21.3%)
-            FRANÇOIS FILLON (LR): 7,212,995 (20.0%)
-            JEAN-LUC MÉLENCHON (FI): 7,059,951 (19.6%)
-            BENOÎT HAMON (PS): 2,291,288 (6.4%)
-            NICOLAS DUPONT-AIGNAN (DLF): 1,695,000 (4.7%)
-            JEAN LASALLE (RÉS): 435,301 (1.2%)
-            PHILIPPE POUTOU (NPA): 394,505 (1.1%)
-            FRANÇOIS ASSELINEAU (UPR): 332,547 (0.9%)
-            NATHALIE ARTHAUD (LO): 232,384 (0.6%)
-            JACQUES CHEMINADE (S&P): 65,586 (0.2%)
-            50% TO WIN
+                ELECTION 2017: FRANCE DECIDES
+                
+                FIRST ROUND RESULT
+                EMMANUEL MACRON (EM): 8,656,346 (24.0%)
+                MARINE LE PEN (FN): 7,678,491 (21.3%)
+                FRANÇOIS FILLON (LR): 7,212,995 (20.0%)
+                JEAN-LUC MÉLENCHON (FI): 7,059,951 (19.6%)
+                BENOÎT HAMON (PS): 2,291,288 (6.4%)
+                NICOLAS DUPONT-AIGNAN (DLF): 1,695,000 (4.7%)
+                JEAN LASALLE (RÉS): 435,301 (1.2%)
+                PHILIPPE POUTOU (NPA): 394,505 (1.1%)
+                FRANÇOIS ASSELINEAU (UPR): 332,547 (0.9%)
+                NATHALIE ARTHAUD (LO): 232,384 (0.6%)
+                JACQUES CHEMINADE (S&P): 65,586 (0.2%)
+                50% TO WIN
             """.trimIndent()
         )
 
         runoff.submit(setOf(macron, lePen))
         compareRendering("SimpleVoteViewPanel", "CandidateRunoffSingleLine-2", panel)
-        compareAltTexts(
-            panel,
+        assertPublishes(
+            panel.altText,
             """
-            ELECTION 2017: FRANCE DECIDES
-            
-            FIRST ROUND RESULT
-            EMMANUEL MACRON (EM): 8,656,346 (24.0%) RUNOFF
-            MARINE LE PEN (FN): 7,678,491 (21.3%) RUNOFF
-            FRANÇOIS FILLON (LR): 7,212,995 (20.0%)
-            JEAN-LUC MÉLENCHON (FI): 7,059,951 (19.6%)
-            BENOÎT HAMON (PS): 2,291,288 (6.4%)
-            NICOLAS DUPONT-AIGNAN (DLF): 1,695,000 (4.7%)
-            JEAN LASALLE (RÉS): 435,301 (1.2%)
-            PHILIPPE POUTOU (NPA): 394,505 (1.1%)
-            FRANÇOIS ASSELINEAU (UPR): 332,547 (0.9%)
-            NATHALIE ARTHAUD (LO): 232,384 (0.6%)
-            JACQUES CHEMINADE (S&P): 65,586 (0.2%)
-            50% TO WIN
+                ELECTION 2017: FRANCE DECIDES
+                
+                FIRST ROUND RESULT
+                EMMANUEL MACRON (EM): 8,656,346 (24.0%) RUNOFF
+                MARINE LE PEN (FN): 7,678,491 (21.3%) RUNOFF
+                FRANÇOIS FILLON (LR): 7,212,995 (20.0%)
+                JEAN-LUC MÉLENCHON (FI): 7,059,951 (19.6%)
+                BENOÎT HAMON (PS): 2,291,288 (6.4%)
+                NICOLAS DUPONT-AIGNAN (DLF): 1,695,000 (4.7%)
+                JEAN LASALLE (RÉS): 435,301 (1.2%)
+                PHILIPPE POUTOU (NPA): 394,505 (1.1%)
+                FRANÇOIS ASSELINEAU (UPR): 332,547 (0.9%)
+                NATHALIE ARTHAUD (LO): 232,384 (0.6%)
+                JACQUES CHEMINADE (S&P): 65,586 (0.2%)
+                50% TO WIN
             """.trimIndent()
         )
     }
@@ -1616,7 +1627,10 @@ class SimpleVoteViewPanelTest {
         val dupontAignan = Candidate("Nicolas Dupont-Aignan", Party("Debout la France", "DLF", Color.CYAN.darker()))
         val lasalle = Candidate("Jean Lasalle", Party("R\u00e9sistons!", "R\u00c9S", Color.CYAN))
         val poutou = Candidate("Philippe Poutou", Party("New Anticapitalist Party", "NPA", Color.RED.darker()))
-        val asselineau = Candidate("Fran\u00e7ois Asselineau", Party("Popular Republican Union", "UPR", Color.CYAN.darker().darker()))
+        val asselineau = Candidate(
+            "Fran\u00e7ois Asselineau",
+            Party("Popular Republican Union", "UPR", Color.CYAN.darker().darker())
+        )
         val arthaud = Candidate("Nathalie Arthaud", Party("Lutte Ouvri\u00e8re", "LO", Color.RED))
         val cheminade = Candidate("Jacques Cheminade", Party("Solidarity and Progress", "S&P", Color.GRAY))
         val currentVotes = Publisher(
@@ -1648,37 +1662,37 @@ class SimpleVoteViewPanelTest {
             .build(header)
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "CandidateRunoffDualLine-1", panel)
-        compareAltTexts(
-            panel,
+        assertPublishes(
+            panel.altText,
             """
-            ELECTION 2017: FRANCE DECIDES
-            
-            FIRST ROUND RESULT
-            EMMANUEL MACRON (EM): 8,656,346 (24.0%)
-            MARINE LE PEN (FN): 7,678,491 (21.3%)
-            FRANÇOIS FILLON (LR): 7,212,995 (20.0%)
-            JEAN-LUC MÉLENCHON (FI): 7,059,951 (19.6%)
-            BENOÎT HAMON (PS): 2,291,288 (6.4%)
-            OTHERS: 3,155,323 (8.8%)
-            50% TO WIN
+                ELECTION 2017: FRANCE DECIDES
+                
+                FIRST ROUND RESULT
+                EMMANUEL MACRON (EM): 8,656,346 (24.0%)
+                MARINE LE PEN (FN): 7,678,491 (21.3%)
+                FRANÇOIS FILLON (LR): 7,212,995 (20.0%)
+                JEAN-LUC MÉLENCHON (FI): 7,059,951 (19.6%)
+                BENOÎT HAMON (PS): 2,291,288 (6.4%)
+                OTHERS: 3,155,323 (8.8%)
+                50% TO WIN
             """.trimIndent()
         )
 
         runoff.submit(setOf(macron, lePen))
         compareRendering("SimpleVoteViewPanel", "CandidateRunoffDualLine-2", panel)
-        compareAltTexts(
-            panel,
+        assertPublishes(
+            panel.altText,
             """
-            ELECTION 2017: FRANCE DECIDES
-            
-            FIRST ROUND RESULT
-            EMMANUEL MACRON (EM): 8,656,346 (24.0%) RUNOFF
-            MARINE LE PEN (FN): 7,678,491 (21.3%) RUNOFF
-            FRANÇOIS FILLON (LR): 7,212,995 (20.0%)
-            JEAN-LUC MÉLENCHON (FI): 7,059,951 (19.6%)
-            BENOÎT HAMON (PS): 2,291,288 (6.4%)
-            OTHERS: 3,155,323 (8.8%)
-            50% TO WIN
+                ELECTION 2017: FRANCE DECIDES
+                
+                FIRST ROUND RESULT
+                EMMANUEL MACRON (EM): 8,656,346 (24.0%) RUNOFF
+                MARINE LE PEN (FN): 7,678,491 (21.3%) RUNOFF
+                FRANÇOIS FILLON (LR): 7,212,995 (20.0%)
+                JEAN-LUC MÉLENCHON (FI): 7,059,951 (19.6%)
+                BENOÎT HAMON (PS): 2,291,288 (6.4%)
+                OTHERS: 3,155,323 (8.8%)
+                50% TO WIN
             """.trimIndent()
         )
     }
@@ -1717,22 +1731,27 @@ class SimpleVoteViewPanelTest {
         val panel = partyRangeVotes(currentVotes, voteHeader, voteSubhead)
             .withPrev(previousVotes, changeHeader)
             .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader)
-            .withPartyMap(shapesByDistrict.asOneTimePublisher(), winners.asOneTimePublisher(), null.asOneTimePublisher(), mapHeader)
+            .withPartyMap(
+                shapesByDistrict.asOneTimePublisher(),
+                winners.asOneTimePublisher(),
+                null.asOneTimePublisher(),
+                mapHeader
+            )
             .build(header)
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "Range-1", panel)
-        compareAltTexts(
-            panel,
+        assertPublishes(
+            panel.altText,
             """
-            PRINCE EDWARD ISLAND
-            
-            OPINION POLL RANGE, SINCE ELECTION CALL (CHANGE SINCE 2015)
-            GREEN: 34.3-40.0% ((+23.5)-(+29.2)%)
-            PROGRESSIVE CONSERVATIVE: 29.0-35.3% ((-8.4)-(-2.1)%)
-            LIBERAL: 25.7-29.2% ((-15.1)-(-11.6)%)
-            NEW DEMOCRATIC PARTY: 3.0-4.6% ((-8.0)-(-6.4)%)
-            
-            SWING SINCE 2015: 19.8% SWING LIB TO GRN
+                PRINCE EDWARD ISLAND
+                
+                OPINION POLL RANGE, SINCE ELECTION CALL (CHANGE SINCE 2015)
+                GREEN: 34.3-40.0% ((+23.5)-(+29.2)%)
+                PROGRESSIVE CONSERVATIVE: 29.0-35.3% ((-8.4)-(-2.1)%)
+                LIBERAL: 25.7-29.2% ((-15.1)-(-11.6)%)
+                NEW DEMOCRATIC PARTY: 3.0-4.6% ((-8.0)-(-6.4)%)
+                
+                SWING SINCE 2015: 19.8% SWING LIB TO GRN
             """.trimIndent()
         )
     }
@@ -1743,7 +1762,8 @@ class SimpleVoteViewPanelTest {
         val pc = Candidate("Cory Deagle", Party("Progressive Conservative", "PC", Color.BLUE))
         val lib = Candidate("Daphne Griffin", Party("Liberal", "LIB", Color.RED))
         val grn = Candidate("John Allen MacLean", Party("Green", "GRN", Color.GREEN.darker()))
-        val currentVotes: Publisher<Map<Candidate, Int?>> = Publisher(sequenceOf(ndp, pc, lib, grn).associateWith { null })
+        val currentVotes: Publisher<Map<Candidate, Int?>> =
+            Publisher(sequenceOf(ndp, pc, lib, grn).associateWith { null })
         val previousVotes = Publisher(
             mapOf(
                 ndp.party to 585,
@@ -1770,18 +1790,18 @@ class SimpleVoteViewPanelTest {
             .build(header)
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "MidDeclaration-1", panel)
-        compareAltTexts(
-            panel,
+        assertPublishes(
+            panel.altText,
             """
-            MONTAGUE-KILMUIR
-            
-            OFFICIAL RESULT (CHANGE SINCE 2015)
-            BILLY CANN (NDP): WAITING...
-            CORY DEAGLE (PC): WAITING...
-            DAPHNE GRIFFIN (LIB): WAITING...
-            JOHN ALLEN MACLEAN (GRN): WAITING...
-            
-            SWING SINCE 2015: NOT AVAILABLE
+                MONTAGUE-KILMUIR
+                
+                OFFICIAL RESULT (CHANGE SINCE 2015)
+                BILLY CANN (NDP): WAITING...
+                CORY DEAGLE (PC): WAITING...
+                DAPHNE GRIFFIN (LIB): WAITING...
+                JOHN ALLEN MACLEAN (GRN): WAITING...
+                
+                SWING SINCE 2015: NOT AVAILABLE
             """.trimIndent()
         )
 
@@ -1794,18 +1814,18 @@ class SimpleVoteViewPanelTest {
             )
         )
         compareRendering("SimpleVoteViewPanel", "MidDeclaration-2", panel)
-        compareAltTexts(
-            panel,
+        assertPublishes(
+            panel.altText,
             """
-            MONTAGUE-KILMUIR
-            
-            OFFICIAL RESULT (CHANGE SINCE 2015)
-            BILLY CANN (NDP): 124
-            CORY DEAGLE (PC): WAITING...
-            DAPHNE GRIFFIN (LIB): WAITING...
-            JOHN ALLEN MACLEAN (GRN): WAITING...
-            
-            SWING SINCE 2015: NOT AVAILABLE
+                MONTAGUE-KILMUIR
+                
+                OFFICIAL RESULT (CHANGE SINCE 2015)
+                BILLY CANN (NDP): 124
+                CORY DEAGLE (PC): WAITING...
+                DAPHNE GRIFFIN (LIB): WAITING...
+                JOHN ALLEN MACLEAN (GRN): WAITING...
+                
+                SWING SINCE 2015: NOT AVAILABLE
             """.trimIndent()
         )
 
@@ -1818,18 +1838,18 @@ class SimpleVoteViewPanelTest {
             )
         )
         compareRendering("SimpleVoteViewPanel", "MidDeclaration-3", panel)
-        compareAltTexts(
-            panel,
+        assertPublishes(
+            panel.altText,
             """
-            MONTAGUE-KILMUIR
-            
-            OFFICIAL RESULT (CHANGE SINCE 2015)
-            CORY DEAGLE (PC): 1,373
-            BILLY CANN (NDP): 124
-            DAPHNE GRIFFIN (LIB): WAITING...
-            JOHN ALLEN MACLEAN (GRN): WAITING...
-            
-            SWING SINCE 2015: NOT AVAILABLE
+                MONTAGUE-KILMUIR
+                
+                OFFICIAL RESULT (CHANGE SINCE 2015)
+                CORY DEAGLE (PC): 1,373
+                BILLY CANN (NDP): 124
+                DAPHNE GRIFFIN (LIB): WAITING...
+                JOHN ALLEN MACLEAN (GRN): WAITING...
+                
+                SWING SINCE 2015: NOT AVAILABLE
             """.trimIndent()
         )
 
@@ -1842,18 +1862,18 @@ class SimpleVoteViewPanelTest {
             )
         )
         compareRendering("SimpleVoteViewPanel", "MidDeclaration-4", panel)
-        compareAltTexts(
-            panel,
+        assertPublishes(
+            panel.altText,
             """
-            MONTAGUE-KILMUIR
-            
-            OFFICIAL RESULT (CHANGE SINCE 2015)
-            CORY DEAGLE (PC): 1,373
-            DAPHNE GRIFFIN (LIB): 785
-            BILLY CANN (NDP): 124
-            JOHN ALLEN MACLEAN (GRN): WAITING...
-            
-            SWING SINCE 2015: NOT AVAILABLE
+                MONTAGUE-KILMUIR
+                
+                OFFICIAL RESULT (CHANGE SINCE 2015)
+                CORY DEAGLE (PC): 1,373
+                DAPHNE GRIFFIN (LIB): 785
+                BILLY CANN (NDP): 124
+                JOHN ALLEN MACLEAN (GRN): WAITING...
+                
+                SWING SINCE 2015: NOT AVAILABLE
             """.trimIndent()
         )
 
@@ -1867,18 +1887,18 @@ class SimpleVoteViewPanelTest {
         )
         leader.submit(pc.party)
         compareRendering("SimpleVoteViewPanel", "MidDeclaration-5", panel)
-        compareAltTexts(
-            panel,
+        assertPublishes(
+            panel.altText,
             """
-            MONTAGUE-KILMUIR
-            
-            OFFICIAL RESULT (CHANGE SINCE 2015)
-            CORY DEAGLE (PC): 1,373 (46.4%, +15.5%)
-            DAPHNE GRIFFIN (LIB): 785 (26.5%, -15.3%)
-            JOHN ALLEN MACLEAN (GRN): 675 (22.8%, +18.6%)
-            BILLY CANN (NDP): 124 (4.2%, -18.9%)
-            
-            SWING SINCE 2015: 15.4% SWING LIB TO PC
+                MONTAGUE-KILMUIR
+                
+                OFFICIAL RESULT (CHANGE SINCE 2015)
+                CORY DEAGLE (PC): 1,373 (46.4%, +15.5%)
+                DAPHNE GRIFFIN (LIB): 785 (26.5%, -15.3%)
+                JOHN ALLEN MACLEAN (GRN): 675 (22.8%, +18.6%)
+                BILLY CANN (NDP): 124 (4.2%, -18.9%)
+                
+                SWING SINCE 2015: 15.4% SWING LIB TO PC
             """.trimIndent()
         )
     }
@@ -1918,20 +1938,23 @@ class SimpleVoteViewPanelTest {
         val panel = partyVotes(currentVotes, seatHeader, seatSubhead)
             .withPrev(previousVotes, changeHeader)
             .withClassification({ mapping.getOrDefault(it, others) }, "BY DESIGNATION".asOneTimePublisher())
-            .withSwing(compareBy { listOf(nationalists, others, unionists).indexOf(it) }, "FIRST PREFERENCE SWING SINCE 2016".asOneTimePublisher())
+            .withSwing(
+                compareBy { listOf(nationalists, others, unionists).indexOf(it) },
+                "FIRST PREFERENCE SWING SINCE 2016".asOneTimePublisher()
+            )
             .build(header)
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "PartyClassifications-1", panel)
-        compareAltTexts(
-            panel,
+        assertPublishes(
+            panel.altText,
             """
-            NORTHERN IRELAND
-            
-            2017 RESULTS (NOTIONAL CHANGE SINCE 2016)
-            
-            BY DESIGNATION
-            
-            FIRST PREFERENCE SWING SINCE 2016: NOT AVAILABLE
+                NORTHERN IRELAND
+                
+                2017 RESULTS (NOTIONAL CHANGE SINCE 2016)
+                
+                BY DESIGNATION
+                
+                FIRST PREFERENCE SWING SINCE 2016: NOT AVAILABLE
             """.trimIndent()
         )
 
@@ -1978,34 +2001,34 @@ class SimpleVoteViewPanelTest {
             )
         )
         compareRendering("SimpleVoteViewPanel", "PartyClassifications-2", panel)
-        compareAltTexts(
-            panel,
+        assertPublishes(
+            panel.altText,
             """
-            NORTHERN IRELAND
-            
-            2017 RESULTS (NOTIONAL CHANGE SINCE 2016)
-            DEMOCRATIC UNIONIST PARTY: 28.3% (-1.0%)
-            SINN FÉIN: 28.1% (+4.0%)
-            ULSTER UNIONIST PARTY: 13.0% (+0.3%)
-            SOCIAL DEMOCRATIC AND LABOUR PARTY: 12.0% (-0.0%)
-            ALLIANCE PARTY: 9.1% (+2.1%)
-            TRADITIONAL UNIONIST VOICE: 2.6% (-0.9%)
-            GREEN PARTY: 2.3% (-0.4%)
-            PEOPLE BEFORE PROFIT: 1.8% (-0.2%)
-            INDEPENDENT: 1.0% (-1.9%)
-            PROGRESSIVE UNIONIST PARTY: 0.7% (-0.2%)
-            NI CONSERVATIVES: 0.3% (-0.1%)
-            LABOUR ALTERNATIVE: 0.3% (-0.3%)
-            UK INDEPENDENCE PARTY: 0.2% (-1.3%)
-            CANNABIS IS SAFER THAN ALCOHOL: 0.2% (-0.2%)
-            WORKERS' PARTY: 0.2% (-0.1%)
-            
-            BY DESIGNATION
-            UNIONISTS: 46.0%
-            NATIONALISTS: 40.3%
-            OTHERS: 13.6%
-            
-            FIRST PREFERENCE SWING SINCE 2016: 4.4% SWING UNIONISTS TO NATIONALISTS
+                NORTHERN IRELAND
+                
+                2017 RESULTS (NOTIONAL CHANGE SINCE 2016)
+                DEMOCRATIC UNIONIST PARTY: 28.3% (-1.0%)
+                SINN FÉIN: 28.1% (+4.0%)
+                ULSTER UNIONIST PARTY: 13.0% (+0.3%)
+                SOCIAL DEMOCRATIC AND LABOUR PARTY: 12.0% (-0.0%)
+                ALLIANCE PARTY: 9.1% (+2.1%)
+                TRADITIONAL UNIONIST VOICE: 2.6% (-0.9%)
+                GREEN PARTY: 2.3% (-0.4%)
+                PEOPLE BEFORE PROFIT: 1.8% (-0.2%)
+                INDEPENDENT: 1.0% (-1.9%)
+                PROGRESSIVE UNIONIST PARTY: 0.7% (-0.2%)
+                NI CONSERVATIVES: 0.3% (-0.1%)
+                LABOUR ALTERNATIVE: 0.3% (-0.3%)
+                UK INDEPENDENCE PARTY: 0.2% (-1.3%)
+                CANNABIS IS SAFER THAN ALCOHOL: 0.2% (-0.2%)
+                WORKERS' PARTY: 0.2% (-0.1%)
+                
+                BY DESIGNATION
+                UNIONISTS: 46.0%
+                NATIONALISTS: 40.3%
+                OTHERS: 13.6%
+                
+                FIRST PREFERENCE SWING SINCE 2016: 4.4% SWING UNIONISTS TO NATIONALISTS
             """.trimIndent()
         )
     }
@@ -2049,35 +2072,43 @@ class SimpleVoteViewPanelTest {
             Candidate("Jonathon Tilt", FREE_ALL) to 100,
             Candidate("Anne Marie Waters", FOR_BRITAIN) to 97
         )
-        val prev = mapOf(LABOUR to 22594, CONSERVATIVE to 19069, INDEPENDENT to 6432, LIBDEM to 2462, REFORM to 1678, GREEN to 692)
-        val panel = candidateVotes(curr.asOneTimePublisher(), "DECLARED RESULT".asOneTimePublisher(), "".asOneTimePublisher())
-            .withPrev(prev.asOneTimePublisher(), "CHANGE SINCE 2019".asOneTimePublisher())
-            .build("BATLEY AND SPEN".asOneTimePublisher())
+        val prev = mapOf(
+            LABOUR to 22594,
+            CONSERVATIVE to 19069,
+            INDEPENDENT to 6432,
+            LIBDEM to 2462,
+            REFORM to 1678,
+            GREEN to 692
+        )
+        val panel =
+            candidateVotes(curr.asOneTimePublisher(), "DECLARED RESULT".asOneTimePublisher(), "".asOneTimePublisher())
+                .withPrev(prev.asOneTimePublisher(), "CHANGE SINCE 2019".asOneTimePublisher())
+                .build("BATLEY AND SPEN".asOneTimePublisher())
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "ConsolidateInDiffIfTooMany-1", panel)
-        compareAltTexts(
-            panel,
+        assertPublishes(
+            panel.altText,
             """
-            BATLEY AND SPEN
-            
-            DECLARED RESULT (CHANGE SINCE 2019)
-            KIM LEADBEATER (LAB): 13,296 (35.3%, -7.4%)
-            RYAN STEPHENSON (CON): 12,973 (34.4%, -1.6%)
-            GEORGE GALLOWAY (WP): 8,264 (21.9%, +21.9%)
-            TOM GORDON (LD): 1,254 (3.3%, -1.3%)
-            COREY ROBINSON (YP): 816 (2.2%, +2.2%)
-            THÉRÈSE HIRST (ED): 207 (0.5%, +0.5%)
-            JACK THOMSON (UKIP): 151 (0.4%, +0.4%)
-            HOWLING LAUD HOPE (MRLP): 107 (0.3%, +0.3%)
-            MIKE DAVIES (AGS): 104 (0.3%, +0.3%)
-            PAUL BICKERDIKE (CPA): 102 (0.3%, +0.3%)
-            JONATHON TILT (FREE-ALL): 100 (0.3%, +0.3%)
-            ANNE MARIE WATERS (FOR): 97 (0.3%, +0.3%)
-            ANDREW SMITH (REJOIN): 75 (0.2%, +0.2%)
-            OLLIE PURSER (SDP): 66 (0.2%, +0.2%)
-            JAYDA FRANSEN (IND): 50 (0.1%, -12.0%)
-            SUSAN LAIRD (HERITAGE): 33 (0.1%, +0.1%)
-            OTHERS: - (-4.5%)
+                BATLEY AND SPEN
+                
+                DECLARED RESULT (CHANGE SINCE 2019)
+                KIM LEADBEATER (LAB): 13,296 (35.3%, -7.4%)
+                RYAN STEPHENSON (CON): 12,973 (34.4%, -1.6%)
+                GEORGE GALLOWAY (WP): 8,264 (21.9%, +21.9%)
+                TOM GORDON (LD): 1,254 (3.3%, -1.3%)
+                COREY ROBINSON (YP): 816 (2.2%, +2.2%)
+                THÉRÈSE HIRST (ED): 207 (0.5%, +0.5%)
+                JACK THOMSON (UKIP): 151 (0.4%, +0.4%)
+                HOWLING LAUD HOPE (MRLP): 107 (0.3%, +0.3%)
+                MIKE DAVIES (AGS): 104 (0.3%, +0.3%)
+                PAUL BICKERDIKE (CPA): 102 (0.3%, +0.3%)
+                JONATHON TILT (FREE-ALL): 100 (0.3%, +0.3%)
+                ANNE MARIE WATERS (FOR): 97 (0.3%, +0.3%)
+                ANDREW SMITH (REJOIN): 75 (0.2%, +0.2%)
+                OLLIE PURSER (SDP): 66 (0.2%, +0.2%)
+                JAYDA FRANSEN (IND): 50 (0.1%, -12.0%)
+                SUSAN LAIRD (HERITAGE): 33 (0.1%, +0.1%)
+                OTHERS: - (-4.5%)
             """.trimIndent()
         )
     }
@@ -2117,38 +2148,53 @@ class SimpleVoteViewPanelTest {
             lib to 62470,
             alp to 31547
         )
-        val panel = candidateVotes(curr.asOneTimePublisher(), "PRIMARY VOTE".asOneTimePublisher(), "100% REPORTING".asOneTimePublisher())
+        val panel = candidateVotes(
+            curr.asOneTimePublisher(),
+            "PRIMARY VOTE".asOneTimePublisher(),
+            "100% REPORTING".asOneTimePublisher()
+        )
             .withPrev(prev.asOneTimePublisher(), "CHANGE SINCE 2016".asOneTimePublisher())
-            .withPreferences(curr2CP.asOneTimePublisher(), "TWO CANDIDATE PREFERRED".asOneTimePublisher(), "100% REPORTING".asOneTimePublisher())
+            .withPreferences(
+                curr2CP.asOneTimePublisher(),
+                "TWO CANDIDATE PREFERRED".asOneTimePublisher(),
+                "100% REPORTING".asOneTimePublisher()
+            )
             .withPrevPreferences(prev2CP.asOneTimePublisher())
-            .withSwing(Comparator.comparing { when (it) { lib -> 1; alp -> -1; else -> 0 } }, "SWING SINCE 2016".asOneTimePublisher())
+            .withSwing(
+                Comparator.comparing {
+                    when (it) {
+                        lib -> 1; alp -> -1; else -> 0
+                    }
+                },
+                "SWING SINCE 2016".asOneTimePublisher()
+            )
             .withWinner(Candidate("Julian Leeser", lib, true).asOneTimePublisher())
             .build("BEROWRA".asOneTimePublisher())
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "NewPartiesCandidatesMergedWithPrevOthers", panel)
-        compareAltTexts(
-            panel,
+        assertPublishes(
+            panel.altText,
             """
-            BEROWRA
-            
-            PRIMARY VOTE, 100% REPORTING (CHANGE SINCE 2016)
-            JULIAN LEESER (LIB): 53,741 (57.2%, +0.1%) WINNER
-            KATIE GOMPERTZ (ALP): 19,821 (21.1%, +1.2%)
-            MONICA TAN (GRN): 11,157 (11.9%, +0.4%)
-            SIMON TAYLOR (CDP): 2,163 (2.3%, *)
-            MICK GALLAGHER (IND): 2,104 (2.2%, *)
-            CRAIG MCLAUGHLIN (UAP): 1,576 (1.7%, *)
-            BRENDAN CLARKE (SCI): 1,465 (1.6%, *)
-            JUSTIN THOMAS (SUS): 1,425 (1.5%, *)
-            ROGER WOODWARD (IND): 495 (0.5%, *)
-            OTHERS: - (-1.7%)
-            * CHANGE INCLUDED IN OTHERS
-            
-            TWO CANDIDATE PREFERRED, 100% REPORTING
-            JULIAN LEESER (LIB): 61,675 (65.6%) WINNER
-            KATIE GOMPERTZ (ALP): 32,272 (34.4%)
-            
-            SWING SINCE 2016: 0.8% SWING LIB TO ALP
+                BEROWRA
+                
+                PRIMARY VOTE, 100% REPORTING (CHANGE SINCE 2016)
+                JULIAN LEESER (LIB): 53,741 (57.2%, +0.1%) WINNER
+                KATIE GOMPERTZ (ALP): 19,821 (21.1%, +1.2%)
+                MONICA TAN (GRN): 11,157 (11.9%, +0.4%)
+                SIMON TAYLOR (CDP): 2,163 (2.3%, *)
+                MICK GALLAGHER (IND): 2,104 (2.2%, *)
+                CRAIG MCLAUGHLIN (UAP): 1,576 (1.7%, *)
+                BRENDAN CLARKE (SCI): 1,465 (1.6%, *)
+                JUSTIN THOMAS (SUS): 1,425 (1.5%, *)
+                ROGER WOODWARD (IND): 495 (0.5%, *)
+                OTHERS: - (-1.7%)
+                * CHANGE INCLUDED IN OTHERS
+                
+                TWO CANDIDATE PREFERRED, 100% REPORTING
+                JULIAN LEESER (LIB): 61,675 (65.6%) WINNER
+                KATIE GOMPERTZ (ALP): 32,272 (34.4%)
+                
+                SWING SINCE 2016: 0.8% SWING LIB TO ALP
             """.trimIndent()
         )
     }
@@ -2188,22 +2234,22 @@ class SimpleVoteViewPanelTest {
             .build("JAPAN".asOneTimePublisher())
         panel.size = Dimension(1024, 512)
         compareRendering("SimpleVoteViewPanel", "PrevVotes-0", panel)
-        compareAltTexts(
-            panel,
+        assertPublishes(
+            panel.altText,
             """
-            JAPAN
-            
-            PROPORTIONAL VOTES
-            
-            2017 RESULT
-            LDP: 33.3%
-            CDP: 19.9%
-            KIBŌ: 17.4%
-            KOMEITO: 12.5%
-            JCP: 7.9%
-            NIPPON: 6.1%
-            SDP: 1.7%
-            OTH: 1.3%
+                JAPAN
+                
+                PROPORTIONAL VOTES
+                
+                2017 RESULT
+                LDP: 33.3%
+                CDP: 19.9%
+                KIBŌ: 17.4%
+                KOMEITO: 12.5%
+                JCP: 7.9%
+                NIPPON: 6.1%
+                SDP: 1.7%
+                OTH: 1.3%
             """.trimIndent()
         )
 
@@ -2221,31 +2267,31 @@ class SimpleVoteViewPanelTest {
             )
         )
         compareRendering("SimpleVoteViewPanel", "PrevVotes-1", panel)
-        compareAltTexts(
-            panel,
+        assertPublishes(
+            panel.altText,
             """
-            JAPAN
-            
-            PROPORTIONAL VOTES
-            LIBERAL DEMOCRATIC PARTY: 34.7%
-            CONSTITUTIONAL DEMOCRATIC PARTY: 20.0%
-            NIPPON ISHIN NO KAI: 14.0%
-            KOMEITO: 12.4%
-            JAPANESE COMMUNIST PARTY: 7.2%
-            DEMOCRATIC PARTY FOR THE PEOPLE: 4.5%
-            REIWA SHINSENGUMI: 3.9%
-            SOCIAL DEMOCRATIC PARTY: 1.8%
-            OTHERS: 1.6%
-            
-            2017 RESULT
-            LDP: 33.3%
-            CDP: 19.9%
-            KIBŌ: 17.4%
-            KOMEITO: 12.5%
-            JCP: 7.9%
-            NIPPON: 6.1%
-            SDP: 1.7%
-            OTH: 1.3%
+                JAPAN
+                
+                PROPORTIONAL VOTES
+                LIBERAL DEMOCRATIC PARTY: 34.7%
+                CONSTITUTIONAL DEMOCRATIC PARTY: 20.0%
+                NIPPON ISHIN NO KAI: 14.0%
+                KOMEITO: 12.4%
+                JAPANESE COMMUNIST PARTY: 7.2%
+                DEMOCRATIC PARTY FOR THE PEOPLE: 4.5%
+                REIWA SHINSENGUMI: 3.9%
+                SOCIAL DEMOCRATIC PARTY: 1.8%
+                OTHERS: 1.6%
+                
+                2017 RESULT
+                LDP: 33.3%
+                CDP: 19.9%
+                KIBŌ: 17.4%
+                KOMEITO: 12.5%
+                JCP: 7.9%
+                NIPPON: 6.1%
+                SDP: 1.7%
+                OTH: 1.3%
             """.trimIndent()
         )
 
@@ -2276,53 +2322,53 @@ class SimpleVoteViewPanelTest {
         )
         voteHeader.submit("CONSTITUENCY VOTES")
         compareRendering("SimpleVoteViewPanel", "PrevVotes-2", panel)
-        compareAltTexts(
-            panel,
+        assertPublishes(
+            panel.altText,
             """
-            JAPAN
-            
-            CONSTITUENCY VOTES
-            LIBERAL DEMOCRATIC PARTY: 48.1%
-            CONSTITUTIONAL DEMOCRATIC PARTY: 30.0%
-            NIPPON ISHIN NO KAI: 8.4%
-            JAPANESE COMMUNIST PARTY: 4.6%
-            DEMOCRATIC PARTY FOR THE PEOPLE: 2.2%
-            KOMEITO: 1.5%
-            SOCIAL DEMOCRATIC PARTY: 0.5%
-            REIWA SHINSENGUMI: 0.4%
-            OTHERS: 4.3%
-            
-            2017 RESULT
-            LDP: 47.8%
-            KIBŌ: 20.6%
-            JCP: 9.0%
-            CDP: 8.5%
-            NIPPON: 3.2%
-            KOMEITO: 1.5%
-            SDP: 1.1%
-            OTH: 8.2%
+                JAPAN
+                
+                CONSTITUENCY VOTES
+                LIBERAL DEMOCRATIC PARTY: 48.1%
+                CONSTITUTIONAL DEMOCRATIC PARTY: 30.0%
+                NIPPON ISHIN NO KAI: 8.4%
+                JAPANESE COMMUNIST PARTY: 4.6%
+                DEMOCRATIC PARTY FOR THE PEOPLE: 2.2%
+                KOMEITO: 1.5%
+                SOCIAL DEMOCRATIC PARTY: 0.5%
+                REIWA SHINSENGUMI: 0.4%
+                OTHERS: 4.3%
+                
+                2017 RESULT
+                LDP: 47.8%
+                KIBŌ: 20.6%
+                JCP: 9.0%
+                CDP: 8.5%
+                NIPPON: 3.2%
+                KOMEITO: 1.5%
+                SDP: 1.1%
+                OTH: 8.2%
             """.trimIndent()
         )
 
         showPrevRaw.submit(false)
         changeHeader.submit("CHANGE SINCE 2017")
         compareRendering("SimpleVoteViewPanel", "PrevVotes-3", panel)
-        compareAltTexts(
-            panel,
+        assertPublishes(
+            panel.altText,
             """
-            JAPAN
-            
-            CONSTITUENCY VOTES (CHANGE SINCE 2017)
-            LIBERAL DEMOCRATIC PARTY: 48.1% (+0.3%)
-            CONSTITUTIONAL DEMOCRATIC PARTY: 30.0% (+21.4%)
-            NIPPON ISHIN NO KAI: 8.4% (+5.2%)
-            JAPANESE COMMUNIST PARTY: 4.6% (-4.4%)
-            DEMOCRATIC PARTY FOR THE PEOPLE: 2.2% (*)
-            KOMEITO: 1.5% (+0.0%)
-            SOCIAL DEMOCRATIC PARTY: 0.5% (-0.6%)
-            REIWA SHINSENGUMI: 0.4% (*)
-            OTHERS: 4.3% (-21.9%)
-            * CHANGE INCLUDED IN OTHERS
+                JAPAN
+                
+                CONSTITUENCY VOTES (CHANGE SINCE 2017)
+                LIBERAL DEMOCRATIC PARTY: 48.1% (+0.3%)
+                CONSTITUTIONAL DEMOCRATIC PARTY: 30.0% (+21.4%)
+                NIPPON ISHIN NO KAI: 8.4% (+5.2%)
+                JAPANESE COMMUNIST PARTY: 4.6% (-4.4%)
+                DEMOCRATIC PARTY FOR THE PEOPLE: 2.2% (*)
+                KOMEITO: 1.5% (+0.0%)
+                SOCIAL DEMOCRATIC PARTY: 0.5% (-0.6%)
+                REIWA SHINSENGUMI: 0.4% (*)
+                OTHERS: 4.3% (-21.9%)
+                * CHANGE INCLUDED IN OTHERS
             """.trimIndent()
         )
 
@@ -2353,53 +2399,53 @@ class SimpleVoteViewPanelTest {
         )
         voteHeader.submit("PROPORTIONAL VOTES")
         compareRendering("SimpleVoteViewPanel", "PrevVotes-4", panel)
-        compareAltTexts(
-            panel,
+        assertPublishes(
+            panel.altText,
             """
-            JAPAN
-            
-            PROPORTIONAL VOTES (CHANGE SINCE 2017)
-            LIBERAL DEMOCRATIC PARTY: 34.7% (+1.4%)
-            CONSTITUTIONAL DEMOCRATIC PARTY: 20.0% (+0.1%)
-            NIPPON ISHIN NO KAI: 14.0% (+7.9%)
-            KOMEITO: 12.4% (-0.1%)
-            JAPANESE COMMUNIST PARTY: 7.2% (-0.6%)
-            DEMOCRATIC PARTY FOR THE PEOPLE: 4.5% (*)
-            REIWA SHINSENGUMI: 3.9% (*)
-            SOCIAL DEMOCRATIC PARTY: 1.8% (+0.1%)
-            OTHERS: 1.6% (-8.7%)
-            * CHANGE INCLUDED IN OTHERS
+                JAPAN
+                
+                PROPORTIONAL VOTES (CHANGE SINCE 2017)
+                LIBERAL DEMOCRATIC PARTY: 34.7% (+1.4%)
+                CONSTITUTIONAL DEMOCRATIC PARTY: 20.0% (+0.1%)
+                NIPPON ISHIN NO KAI: 14.0% (+7.9%)
+                KOMEITO: 12.4% (-0.1%)
+                JAPANESE COMMUNIST PARTY: 7.2% (-0.6%)
+                DEMOCRATIC PARTY FOR THE PEOPLE: 4.5% (*)
+                REIWA SHINSENGUMI: 3.9% (*)
+                SOCIAL DEMOCRATIC PARTY: 1.8% (+0.1%)
+                OTHERS: 1.6% (-8.7%)
+                * CHANGE INCLUDED IN OTHERS
             """.trimIndent()
         )
 
         showPrevRaw.submit(true)
         changeHeader.submit("2017 RESULT")
         compareRendering("SimpleVoteViewPanel", "PrevVotes-1", panel)
-        compareAltTexts(
-            panel,
+        assertPublishes(
+            panel.altText,
             """
-            JAPAN
-            
-            PROPORTIONAL VOTES
-            LIBERAL DEMOCRATIC PARTY: 34.7%
-            CONSTITUTIONAL DEMOCRATIC PARTY: 20.0%
-            NIPPON ISHIN NO KAI: 14.0%
-            KOMEITO: 12.4%
-            JAPANESE COMMUNIST PARTY: 7.2%
-            DEMOCRATIC PARTY FOR THE PEOPLE: 4.5%
-            REIWA SHINSENGUMI: 3.9%
-            SOCIAL DEMOCRATIC PARTY: 1.8%
-            OTHERS: 1.6%
-            
-            2017 RESULT
-            LDP: 33.3%
-            CDP: 19.9%
-            KIBŌ: 17.4%
-            KOMEITO: 12.5%
-            JCP: 7.9%
-            NIPPON: 6.1%
-            SDP: 1.7%
-            OTH: 1.3%
+                JAPAN
+                
+                PROPORTIONAL VOTES
+                LIBERAL DEMOCRATIC PARTY: 34.7%
+                CONSTITUTIONAL DEMOCRATIC PARTY: 20.0%
+                NIPPON ISHIN NO KAI: 14.0%
+                KOMEITO: 12.4%
+                JAPANESE COMMUNIST PARTY: 7.2%
+                DEMOCRATIC PARTY FOR THE PEOPLE: 4.5%
+                REIWA SHINSENGUMI: 3.9%
+                SOCIAL DEMOCRATIC PARTY: 1.8%
+                OTHERS: 1.6%
+                
+                2017 RESULT
+                LDP: 33.3%
+                CDP: 19.9%
+                KIBŌ: 17.4%
+                KOMEITO: 12.5%
+                JCP: 7.9%
+                NIPPON: 6.1%
+                SDP: 1.7%
+                OTH: 1.3%
             """.trimIndent()
         )
     }
@@ -2439,22 +2485,22 @@ class SimpleVoteViewPanelTest {
             .build("JAPAN".asOneTimePublisher())
         panel.size = Dimension(1024, 512)
         compareRendering("SimpleVoteViewPanel", "PrevVotes-0", panel)
-        compareAltTexts(
-            panel,
+        assertPublishes(
+            panel.altText,
             """
-            JAPAN
-            
-            PROPORTIONAL VOTES
-            
-            2017 RESULT
-            LDP: 33.3%
-            CDP: 19.9%
-            KIBŌ: 17.4%
-            KOMEITO: 12.5%
-            JCP: 7.9%
-            NIPPON: 6.1%
-            SDP: 1.7%
-            OTH: 1.3%
+                JAPAN
+                
+                PROPORTIONAL VOTES
+                
+                2017 RESULT
+                LDP: 33.3%
+                CDP: 19.9%
+                KIBŌ: 17.4%
+                KOMEITO: 12.5%
+                JCP: 7.9%
+                NIPPON: 6.1%
+                SDP: 1.7%
+                OTH: 1.3%
             """.trimIndent()
         )
 
@@ -2472,52 +2518,52 @@ class SimpleVoteViewPanelTest {
             )
         )
         compareRendering("SimpleVoteViewPanel", "PrevRangeVotes-1", panel)
-        compareAltTexts(
-            panel,
+        assertPublishes(
+            panel.altText,
             """
-            JAPAN
-            
-            PROPORTIONAL VOTES
-            LIBERAL DEMOCRATIC PARTY: 32.0-38.0%
-            CONSTITUTIONAL DEMOCRATIC PARTY: 13.0-21.0%
-            NIPPON ISHIN NO KAI: 4.0-12.3%
-            KOMEITO: 7.0-8.4%
-            JAPANESE COMMUNIST PARTY: 5.0-7.6%
-            DEMOCRATIC PARTY FOR THE PEOPLE: 2.0-2.4%
-            REIWA SHINSENGUMI: 1.0-1.6%
-            SOCIAL DEMOCRATIC PARTY: 1.0-1.4%
-            OTHERS: 1.7-3.0%
-            
-            2017 RESULT
-            LDP: 33.3%
-            CDP: 19.9%
-            KIBŌ: 17.4%
-            KOMEITO: 12.5%
-            JCP: 7.9%
-            NIPPON: 6.1%
-            SDP: 1.7%
-            OTH: 1.3%
+                JAPAN
+                
+                PROPORTIONAL VOTES
+                LIBERAL DEMOCRATIC PARTY: 32.0-38.0%
+                CONSTITUTIONAL DEMOCRATIC PARTY: 13.0-21.0%
+                NIPPON ISHIN NO KAI: 4.0-12.3%
+                KOMEITO: 7.0-8.4%
+                JAPANESE COMMUNIST PARTY: 5.0-7.6%
+                DEMOCRATIC PARTY FOR THE PEOPLE: 2.0-2.4%
+                REIWA SHINSENGUMI: 1.0-1.6%
+                SOCIAL DEMOCRATIC PARTY: 1.0-1.4%
+                OTHERS: 1.7-3.0%
+                
+                2017 RESULT
+                LDP: 33.3%
+                CDP: 19.9%
+                KIBŌ: 17.4%
+                KOMEITO: 12.5%
+                JCP: 7.9%
+                NIPPON: 6.1%
+                SDP: 1.7%
+                OTH: 1.3%
             """.trimIndent()
         )
 
         showPrevRaw.submit(false)
         changeHeader.submit("CHANGE SINCE 2017")
         compareRendering("SimpleVoteViewPanel", "PrevRangeVotes-2", panel)
-        compareAltTexts(
-            panel,
+        assertPublishes(
+            panel.altText,
             """
-            JAPAN
-            
-            PROPORTIONAL VOTES (CHANGE SINCE 2017)
-            LIBERAL DEMOCRATIC PARTY: 32.0-38.0% ((-1.3)-(+4.7)%)
-            CONSTITUTIONAL DEMOCRATIC PARTY: 13.0-21.0% ((-6.9)-(+1.1)%)
-            NIPPON ISHIN NO KAI: 4.0-12.3% ((-2.1)-(+6.2)%)
-            KOMEITO: 7.0-8.4% ((-5.5)-(-4.1)%)
-            JAPANESE COMMUNIST PARTY: 5.0-7.6% ((-2.9)-(-0.3)%)
-            DEMOCRATIC PARTY FOR THE PEOPLE: 2.0-2.4% ((+2.0)-(+2.4)%)
-            REIWA SHINSENGUMI: 1.0-1.6% ((+1.0)-(+1.6)%)
-            SOCIAL DEMOCRATIC PARTY: 1.0-1.4% ((-0.7)-(-0.3)%)
-            OTHERS: 1.7-3.0% ((-17.0)-(-15.7)%)
+                JAPAN
+                
+                PROPORTIONAL VOTES (CHANGE SINCE 2017)
+                LIBERAL DEMOCRATIC PARTY: 32.0-38.0% ((-1.3)-(+4.7)%)
+                CONSTITUTIONAL DEMOCRATIC PARTY: 13.0-21.0% ((-6.9)-(+1.1)%)
+                NIPPON ISHIN NO KAI: 4.0-12.3% ((-2.1)-(+6.2)%)
+                KOMEITO: 7.0-8.4% ((-5.5)-(-4.1)%)
+                JAPANESE COMMUNIST PARTY: 5.0-7.6% ((-2.9)-(-0.3)%)
+                DEMOCRATIC PARTY FOR THE PEOPLE: 2.0-2.4% ((+2.0)-(+2.4)%)
+                REIWA SHINSENGUMI: 1.0-1.6% ((+1.0)-(+1.6)%)
+                SOCIAL DEMOCRATIC PARTY: 1.0-1.4% ((-0.7)-(-0.3)%)
+                OTHERS: 1.7-3.0% ((-17.0)-(-15.7)%)
             """.trimIndent()
         )
     }
@@ -2565,18 +2611,18 @@ class SimpleVoteViewPanelTest {
             .build(header)
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "ProgressLabel-1", panel)
-        compareAltTexts(
-            panel,
+        assertPublishes(
+            panel.altText,
             """
-            MONTAGUE-KILMUIR
-            
-            PROVISIONAL RESULTS [0/9], WAITING FOR RESULTS... (CHANGE SINCE 2015)
-            BILLY CANN (NDP): WAITING...
-            CORY DEAGLE (PC): WAITING...
-            DAPHNE GRIFFIN (LIB): WAITING...
-            JOHN ALLEN MACLEAN (GRN): WAITING...
-            
-            SWING SINCE 2015: NOT AVAILABLE
+                MONTAGUE-KILMUIR
+                
+                PROVISIONAL RESULTS [0/9], WAITING FOR RESULTS... (CHANGE SINCE 2015)
+                BILLY CANN (NDP): WAITING...
+                CORY DEAGLE (PC): WAITING...
+                DAPHNE GRIFFIN (LIB): WAITING...
+                JOHN ALLEN MACLEAN (GRN): WAITING...
+                
+                SWING SINCE 2015: NOT AVAILABLE
             """.trimIndent()
         )
 
@@ -2593,18 +2639,18 @@ class SimpleVoteViewPanelTest {
         pctReporting.submit(1.0 / 9)
         leader.submit(leading(lib.party))
         compareRendering("SimpleVoteViewPanel", "ProgressLabel-2", panel)
-        compareAltTexts(
-            panel,
+        assertPublishes(
+            panel.altText,
             """
-            MONTAGUE-KILMUIR
-            
-            PROVISIONAL RESULTS [1/9], PROJECTION: TOO EARLY TO CALL (CHANGE SINCE 2015)
-            DAPHNE GRIFFIN (LIB): 58 (35.8%, -6.0%)
-            JOHN ALLEN MACLEAN (GRN): 52 (32.1%, +27.9%)
-            CORY DEAGLE (PC): 47 (29.0%, -1.9%)
-            BILLY CANN (NDP): 5 (3.1%, -20.0%)
-            
-            SWING SINCE 2015: 17.0% SWING LIB TO GRN
+                MONTAGUE-KILMUIR
+                
+                PROVISIONAL RESULTS [1/9], PROJECTION: TOO EARLY TO CALL (CHANGE SINCE 2015)
+                DAPHNE GRIFFIN (LIB): 58 (35.8%, -6.0%)
+                JOHN ALLEN MACLEAN (GRN): 52 (32.1%, +27.9%)
+                CORY DEAGLE (PC): 47 (29.0%, -1.9%)
+                BILLY CANN (NDP): 5 (3.1%, -20.0%)
+                
+                SWING SINCE 2015: 17.0% SWING LIB TO GRN
             """.trimIndent()
         )
 
@@ -2621,18 +2667,18 @@ class SimpleVoteViewPanelTest {
         pctReporting.submit(2.0 / 9)
         leader.submit(leading(grn.party))
         compareRendering("SimpleVoteViewPanel", "ProgressLabel-3", panel)
-        compareAltTexts(
-            panel,
+        assertPublishes(
+            panel.altText,
             """
-            MONTAGUE-KILMUIR
-            
-            PROVISIONAL RESULTS [2/9], PROJECTION: TOO EARLY TO CALL (CHANGE SINCE 2015)
-            JOHN ALLEN MACLEAN (GRN): 106 (34.8%, +30.6%)
-            DAPHNE GRIFFIN (LIB): 100 (32.8%, -9.0%)
-            CORY DEAGLE (PC): 91 (29.8%, -1.1%)
-            BILLY CANN (NDP): 8 (2.6%, -20.4%)
-            
-            SWING SINCE 2015: 19.8% SWING LIB TO GRN
+                MONTAGUE-KILMUIR
+                
+                PROVISIONAL RESULTS [2/9], PROJECTION: TOO EARLY TO CALL (CHANGE SINCE 2015)
+                JOHN ALLEN MACLEAN (GRN): 106 (34.8%, +30.6%)
+                DAPHNE GRIFFIN (LIB): 100 (32.8%, -9.0%)
+                CORY DEAGLE (PC): 91 (29.8%, -1.1%)
+                BILLY CANN (NDP): 8 (2.6%, -20.4%)
+                
+                SWING SINCE 2015: 19.8% SWING LIB TO GRN
             """.trimIndent()
         )
 
@@ -2649,18 +2695,18 @@ class SimpleVoteViewPanelTest {
         pctReporting.submit(5.0 / 9)
         leader.submit(leading(pc.party))
         compareRendering("SimpleVoteViewPanel", "ProgressLabel-4", panel)
-        compareAltTexts(
-            panel,
+        assertPublishes(
+            panel.altText,
             """
-            MONTAGUE-KILMUIR
-            
-            PROVISIONAL RESULTS [5/9], PROJECTION: TOO EARLY TO CALL (CHANGE SINCE 2015)
-            CORY DEAGLE (PC): 287 (38.5%, +7.6%)
-            JOHN ALLEN MACLEAN (GRN): 243 (32.6%, +28.4%)
-            DAPHNE GRIFFIN (LIB): 197 (26.4%, -15.4%)
-            BILLY CANN (NDP): 18 (2.4%, -20.7%)
-            
-            SWING SINCE 2015: 11.5% SWING LIB TO PC
+                MONTAGUE-KILMUIR
+                
+                PROVISIONAL RESULTS [5/9], PROJECTION: TOO EARLY TO CALL (CHANGE SINCE 2015)
+                CORY DEAGLE (PC): 287 (38.5%, +7.6%)
+                JOHN ALLEN MACLEAN (GRN): 243 (32.6%, +28.4%)
+                DAPHNE GRIFFIN (LIB): 197 (26.4%, -15.4%)
+                BILLY CANN (NDP): 18 (2.4%, -20.7%)
+                
+                SWING SINCE 2015: 11.5% SWING LIB TO PC
             """.trimIndent()
         )
 
@@ -2678,18 +2724,18 @@ class SimpleVoteViewPanelTest {
         leader.submit(elected(pc.party))
         winner.submit(pc)
         compareRendering("SimpleVoteViewPanel", "ProgressLabel-5", panel)
-        compareAltTexts(
-            panel,
+        assertPublishes(
+            panel.altText,
             """
-            MONTAGUE-KILMUIR
-            
-            PROVISIONAL RESULTS [9/9], PROJECTION: PC GAIN FROM LIB (CHANGE SINCE 2015)
-            CORY DEAGLE (PC): 1,373 (46.4%, +15.5%) WINNER
-            DAPHNE GRIFFIN (LIB): 785 (26.5%, -15.3%)
-            JOHN ALLEN MACLEAN (GRN): 675 (22.8%, +18.6%)
-            BILLY CANN (NDP): 124 (4.2%, -18.9%)
-            
-            SWING SINCE 2015: 15.4% SWING LIB TO PC
+                MONTAGUE-KILMUIR
+                
+                PROVISIONAL RESULTS [9/9], PROJECTION: PC GAIN FROM LIB (CHANGE SINCE 2015)
+                CORY DEAGLE (PC): 1,373 (46.4%, +15.5%) WINNER
+                DAPHNE GRIFFIN (LIB): 785 (26.5%, -15.3%)
+                JOHN ALLEN MACLEAN (GRN): 675 (22.8%, +18.6%)
+                BILLY CANN (NDP): 124 (4.2%, -18.9%)
+                
+                SWING SINCE 2015: 15.4% SWING LIB TO PC
             """.trimIndent()
         )
     }
@@ -2728,50 +2774,55 @@ class SimpleVoteViewPanelTest {
             "2004 VOTE SHARE".asOneTimePublisher(),
             "".asOneTimePublisher()
         )
-            .withPrev(prevVotes.asOneTimePublisher(), showPrev.map { if (it) "2000 VOTE SHARE" else "CHANGE SINCE 2000" }, showPrevRaw = showPrev, partyChanges = partyChanges)
+            .withPrev(
+                prevVotes.asOneTimePublisher(),
+                showPrev.map { if (it) "2000 VOTE SHARE" else "CHANGE SINCE 2000" },
+                showPrevRaw = showPrev,
+                partyChanges = partyChanges
+            )
             .withSwing(swingOrder, "SWING SINCE 2000".asOneTimePublisher())
             .build("CANADA".asOneTimePublisher())
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "PartyMerge-1", panel)
-        compareAltTexts(
-            panel,
+        assertPublishes(
+            panel.altText,
             """
-            CANADA
-            
-            2004 VOTE SHARE (CHANGE SINCE 2000)
-            LIBERAL: 36.7% (-4.1%)
-            CONSERVATIVE: 29.6% (-8.0%)
-            NEW DEMOCRATIC PARTY: 15.7% (+7.2%)
-            BLOC QUÉBÉCOIS: 12.4% (+1.7%)
-            OTHERS: 5.6% (+3.3%)
-            
-            SWING SINCE 2000: 2.0% SWING CON TO LIB
+                CANADA
+                
+                2004 VOTE SHARE (CHANGE SINCE 2000)
+                LIBERAL: 36.7% (-4.1%)
+                CONSERVATIVE: 29.6% (-8.0%)
+                NEW DEMOCRATIC PARTY: 15.7% (+7.2%)
+                BLOC QUÉBÉCOIS: 12.4% (+1.7%)
+                OTHERS: 5.6% (+3.3%)
+                
+                SWING SINCE 2000: 2.0% SWING CON TO LIB
             """.trimIndent()
         )
 
         showPrev.submit(true)
         compareRendering("SimpleVoteViewPanel", "PartyMerge-2", panel)
-        compareAltTexts(
-            panel,
+        assertPublishes(
+            panel.altText,
             """
-            CANADA
-            
-            2004 VOTE SHARE
-            LIBERAL: 36.7%
-            CONSERVATIVE: 29.6%
-            NEW DEMOCRATIC PARTY: 15.7%
-            BLOC QUÉBÉCOIS: 12.4%
-            OTHERS: 5.6%
-            
-            2000 VOTE SHARE
-            LIB: 40.8%
-            CA: 25.5%
-            PC: 12.2%
-            BQ: 10.7%
-            NDP: 8.5%
-            OTH: 2.3%
-            
-            SWING SINCE 2000: 2.0% SWING CON TO LIB
+                CANADA
+                
+                2004 VOTE SHARE
+                LIBERAL: 36.7%
+                CONSERVATIVE: 29.6%
+                NEW DEMOCRATIC PARTY: 15.7%
+                BLOC QUÉBÉCOIS: 12.4%
+                OTHERS: 5.6%
+                
+                2000 VOTE SHARE
+                LIB: 40.8%
+                CA: 25.5%
+                PC: 12.2%
+                BQ: 10.7%
+                NDP: 8.5%
+                OTH: 2.3%
+                
+                SWING SINCE 2000: 2.0% SWING CON TO LIB
             """.trimIndent()
         )
     }
@@ -2810,50 +2861,55 @@ class SimpleVoteViewPanelTest {
             "2004 POLLING RANGE".asOneTimePublisher(),
             "".asOneTimePublisher()
         )
-            .withPrev(prevVotes.asOneTimePublisher(), showPrev.map { if (it) "2000 VOTE SHARE" else "CHANGE SINCE 2000" }, showPrevRaw = showPrev, partyChanges = partyChanges)
+            .withPrev(
+                prevVotes.asOneTimePublisher(),
+                showPrev.map { if (it) "2000 VOTE SHARE" else "CHANGE SINCE 2000" },
+                showPrevRaw = showPrev,
+                partyChanges = partyChanges
+            )
             .withSwing(swingOrder, "SWING SINCE 2000".asOneTimePublisher())
             .build("CANADA".asOneTimePublisher())
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "PartyMergeRange-1", panel)
-        compareAltTexts(
-            panel,
+        assertPublishes(
+            panel.altText,
             """
-            CANADA
-            
-            2004 POLLING RANGE (CHANGE SINCE 2000)
-            LIBERAL: 29.0-41.0% ((-11.8)-(+0.2)%)
-            CONSERVATIVE: 25.0-37.0% ((-12.7)-(-0.7)%)
-            NEW DEMOCRATIC PARTY: 15.0-22.0% ((+6.5)-(+13.5)%)
-            BLOC QUÉBÉCOIS: 9.0-13.0% ((-1.7)-(+2.3)%)
-            OTHERS: 2.0-7.0% ((-0.3)-(+4.7)%)
-            
-            SWING SINCE 2000: 0.4% SWING CON TO LIB
+                CANADA
+                
+                2004 POLLING RANGE (CHANGE SINCE 2000)
+                LIBERAL: 29.0-41.0% ((-11.8)-(+0.2)%)
+                CONSERVATIVE: 25.0-37.0% ((-12.7)-(-0.7)%)
+                NEW DEMOCRATIC PARTY: 15.0-22.0% ((+6.5)-(+13.5)%)
+                BLOC QUÉBÉCOIS: 9.0-13.0% ((-1.7)-(+2.3)%)
+                OTHERS: 2.0-7.0% ((-0.3)-(+4.7)%)
+                
+                SWING SINCE 2000: 0.4% SWING CON TO LIB
             """.trimIndent()
         )
 
         showPrev.submit(true)
         compareRendering("SimpleVoteViewPanel", "PartyMergeRange-2", panel)
-        compareAltTexts(
-            panel,
+        assertPublishes(
+            panel.altText,
             """
-            CANADA
-            
-            2004 POLLING RANGE
-            LIBERAL: 29.0-41.0%
-            CONSERVATIVE: 25.0-37.0%
-            NEW DEMOCRATIC PARTY: 15.0-22.0%
-            BLOC QUÉBÉCOIS: 9.0-13.0%
-            OTHERS: 2.0-7.0%
-            
-            2000 VOTE SHARE
-            LIB: 40.8%
-            CA: 25.5%
-            PC: 12.2%
-            BQ: 10.7%
-            NDP: 8.5%
-            OTH: 2.3%
-            
-            SWING SINCE 2000: 0.4% SWING CON TO LIB
+                CANADA
+                
+                2004 POLLING RANGE
+                LIBERAL: 29.0-41.0%
+                CONSERVATIVE: 25.0-37.0%
+                NEW DEMOCRATIC PARTY: 15.0-22.0%
+                BLOC QUÉBÉCOIS: 9.0-13.0%
+                OTHERS: 2.0-7.0%
+                
+                2000 VOTE SHARE
+                LIB: 40.8%
+                CA: 25.5%
+                PC: 12.2%
+                BQ: 10.7%
+                NDP: 8.5%
+                OTH: 2.3%
+                
+                SWING SINCE 2000: 0.4% SWING CON TO LIB
             """.trimIndent()
         )
     }

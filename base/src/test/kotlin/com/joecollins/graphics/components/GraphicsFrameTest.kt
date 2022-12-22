@@ -6,7 +6,7 @@ import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.map
 import org.awaitility.Awaitility
 import org.hamcrest.core.IsEqual
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import java.awt.BorderLayout
 import java.awt.Color
 import java.util.concurrent.TimeUnit
@@ -168,7 +168,11 @@ class GraphicsFrameTest {
             }
         }
         graphicsFrame.setSize(256, 128)
-        compareRendering("GraphicsFrame", "HeaderTextColor", graphicsFrame)
+        compareRendering(
+            "GraphicsFrame",
+            "HeaderTextColor",
+            graphicsFrame
+        )
     }
 
     @Test
@@ -200,11 +204,23 @@ class GraphicsFrameTest {
             }
         }
         graphicsFrame.setSize(256, 128)
-        compareRendering("GraphicsFrame", "HeaderFontSize-1", graphicsFrame)
+        compareRendering(
+            "GraphicsFrame",
+            "HeaderFontSize-1",
+            graphicsFrame
+        )
         headerWrapper.submit("THIS IS A VERY MUCH LONGER HEADER")
-        compareRendering("GraphicsFrame", "HeaderFontSize-2", graphicsFrame)
+        compareRendering(
+            "GraphicsFrame",
+            "HeaderFontSize-2",
+            graphicsFrame
+        )
         graphicsFrame.setSize(512, 128)
-        compareRendering("GraphicsFrame", "HeaderFontSize-3", graphicsFrame)
+        compareRendering(
+            "GraphicsFrame",
+            "HeaderFontSize-3",
+            graphicsFrame
+        )
     }
 
     @Test
@@ -221,11 +237,23 @@ class GraphicsFrameTest {
             }
         }
         graphicsFrame.setSize(256, 128)
-        compareRendering("GraphicsFrame", "HeaderAlignment-1", graphicsFrame)
+        compareRendering(
+            "GraphicsFrame",
+            "HeaderAlignment-1",
+            graphicsFrame
+        )
         alignment.submit(GraphicsFrame.Alignment.LEFT)
-        compareRendering("GraphicsFrame", "HeaderAlignment-2", graphicsFrame)
+        compareRendering(
+            "GraphicsFrame",
+            "HeaderAlignment-2",
+            graphicsFrame
+        )
         alignment.submit(GraphicsFrame.Alignment.RIGHT)
-        compareRendering("GraphicsFrame", "HeaderAlignment-3", graphicsFrame)
+        compareRendering(
+            "GraphicsFrame",
+            "HeaderAlignment-3",
+            graphicsFrame
+        )
     }
 
     @Test
@@ -244,18 +272,42 @@ class GraphicsFrameTest {
             }
         }
         graphicsFrame.setSize(256, 128)
-        compareRendering("GraphicsFrame", "RightHandLabel-C", graphicsFrame)
+        compareRendering(
+            "GraphicsFrame",
+            "RightHandLabel-C",
+            graphicsFrame
+        )
         alignment.submit(GraphicsFrame.Alignment.LEFT)
-        compareRendering("GraphicsFrame", "RightHandLabel-L", graphicsFrame)
+        compareRendering(
+            "GraphicsFrame",
+            "RightHandLabel-L",
+            graphicsFrame
+        )
         alignment.submit(GraphicsFrame.Alignment.RIGHT)
-        compareRendering("GraphicsFrame", "RightHandLabel-R", graphicsFrame)
+        compareRendering(
+            "GraphicsFrame",
+            "RightHandLabel-R",
+            graphicsFrame
+        )
         alignment.submit(GraphicsFrame.Alignment.CENTER)
         headerText.submit("THE MAIN HEADER TEXT IS LONG")
-        compareRendering("GraphicsFrame", "RightHandLabel-C2", graphicsFrame)
+        compareRendering(
+            "GraphicsFrame",
+            "RightHandLabel-C2",
+            graphicsFrame
+        )
         alignment.submit(GraphicsFrame.Alignment.LEFT)
-        compareRendering("GraphicsFrame", "RightHandLabel-L2", graphicsFrame)
+        compareRendering(
+            "GraphicsFrame",
+            "RightHandLabel-L2",
+            graphicsFrame
+        )
         alignment.submit(GraphicsFrame.Alignment.RIGHT)
-        compareRendering("GraphicsFrame", "RightHandLabel-R2", graphicsFrame)
+        compareRendering(
+            "GraphicsFrame",
+            "RightHandLabel-R2",
+            graphicsFrame
+        )
     }
 
     @Test
@@ -274,17 +326,41 @@ class GraphicsFrameTest {
             }
         }
         graphicsFrame.setSize(256, 128)
-        compareRendering("GraphicsFrame", "LeftHandLabel-C", graphicsFrame)
+        compareRendering(
+            "GraphicsFrame",
+            "LeftHandLabel-C",
+            graphicsFrame
+        )
         alignment.submit(GraphicsFrame.Alignment.LEFT)
-        compareRendering("GraphicsFrame", "LeftHandLabel-L", graphicsFrame)
+        compareRendering(
+            "GraphicsFrame",
+            "LeftHandLabel-L",
+            graphicsFrame
+        )
         alignment.submit(GraphicsFrame.Alignment.RIGHT)
-        compareRendering("GraphicsFrame", "LeftHandLabel-R", graphicsFrame)
+        compareRendering(
+            "GraphicsFrame",
+            "LeftHandLabel-R",
+            graphicsFrame
+        )
         alignment.submit(GraphicsFrame.Alignment.CENTER)
         headerText.submit("THE MAIN HEADER TEXT IS LONG")
-        compareRendering("GraphicsFrame", "LeftHandLabel-C2", graphicsFrame)
+        compareRendering(
+            "GraphicsFrame",
+            "LeftHandLabel-C2",
+            graphicsFrame
+        )
         alignment.submit(GraphicsFrame.Alignment.LEFT)
-        compareRendering("GraphicsFrame", "LeftHandLabel-L2", graphicsFrame)
+        compareRendering(
+            "GraphicsFrame",
+            "LeftHandLabel-L2",
+            graphicsFrame
+        )
         alignment.submit(GraphicsFrame.Alignment.RIGHT)
-        compareRendering("GraphicsFrame", "LeftHandLabel-R2", graphicsFrame)
+        compareRendering(
+            "GraphicsFrame",
+            "LeftHandLabel-R2",
+            graphicsFrame
+        )
     }
 }
