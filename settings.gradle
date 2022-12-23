@@ -1,13 +1,12 @@
 rootProject.name = 'JoesGraphics'
-rootDir.listFiles().each {
-    if (it.directory && new File(it, 'build.gradle').exists()) {
-        include ":${it.name}"
-    }
-}
-project(':components').projectDir.listFiles().each {
-    if (it.directory && new File(it, 'build.gradle').exists()) {
-        println ":components:${it.name}"
-        include ":components:${it.name}"
+rootDir.listFiles().each { File level1 ->
+    if (level1.directory && new File(level1, 'build.gradle').exists()) {
+        include ":${level1.name}"
+        level1.listFiles().each { File level2 ->
+            if (level2.directory && new File(level2, 'build.gradle').exists()) {
+                include ":${level1.name}:${level2.name}"
+            }
+        }
     }
 }
 
