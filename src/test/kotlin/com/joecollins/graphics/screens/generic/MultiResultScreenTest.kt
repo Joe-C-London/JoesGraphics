@@ -1,6 +1,5 @@
 package com.joecollins.graphics.screens.generic
 
-import com.joecollins.graphics.components.MapFrameTest
 import com.joecollins.graphics.screens.generic.MultiResultScreen.Companion.of
 import com.joecollins.graphics.screens.generic.MultiResultScreen.Companion.ofParties
 import com.joecollins.graphics.utils.PublisherTestUtils.assertPublishes
@@ -2190,7 +2189,7 @@ class MultiResultScreenTest {
     }
 
     private fun peiShapesByDistrict(): Map<Int, Shape> {
-        val peiMap = MapFrameTest::class.java
+        val peiMap = MultiResultScreenTest::class.java
             .classLoader
             .getResource("com/joecollins/graphics/shapefiles/pei-districts.shp")
         return readShapes(peiMap, "DIST_NO", Int::class.java)

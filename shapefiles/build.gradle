@@ -15,13 +15,17 @@ group 'com.joecollins'
 version '1.0-SNAPSHOT'
 
 repositories {
+    maven {
+        url "https://repo.osgeo.org/repository/release/"
+    }
     mavenCentral()
 }
 
+def geotoolsVersion = '27.1'
+
 dependencies {
-    api project('barframe')
-    api project('mapframe')
-    api project('socialframes')
+    api group: 'org.geotools', name: 'gt-shapefile', version: geotoolsVersion
+    api group: 'org.geotools', name: 'gt-metadata', version: geotoolsVersion
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'

@@ -1,6 +1,5 @@
 package com.joecollins.graphics.screens.generic
 
-import com.joecollins.graphics.components.MapFrameTest
 import com.joecollins.graphics.utils.PublisherTestUtils.assertPublishes
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.graphics.utils.ShapefileReader
@@ -1134,7 +1133,7 @@ class SingleTransferrableResultScreenTest {
     }
 
     private fun niShapesByConstituency(): Map<Int, Shape> {
-        val niMap = MapFrameTest::class.java
+        val niMap = SingleTransferrableResultScreenTest::class.java
             .classLoader
             .getResource("com/joecollins/graphics/shapefiles/ni-constituencies.shp")
         return ShapefileReader.readShapes(niMap, "OBJECTID", Int::class.java)

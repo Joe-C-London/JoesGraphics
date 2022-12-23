@@ -1,7 +1,5 @@
 package com.joecollins.graphics.components
 
-import com.joecollins.pubsub.Subscriber
-import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
 import java.awt.BasicStroke
 import java.awt.BorderLayout
 import java.awt.Color
@@ -31,7 +29,7 @@ class MapFrame(
     outlineShapesPublisher: Flow.Publisher<out List<Shape>>? = null,
     notesPublisher: Flow.Publisher<out String?>? = null,
     borderColorPublisher: Flow.Publisher<out Color>? = null
-) : GraphicsFrame(
+) : com.joecollins.graphics.components.GraphicsFrame(
     headerPublisher = headerPublisher,
     notesPublisher = notesPublisher,
     borderColorPublisher = borderColorPublisher
@@ -244,7 +242,13 @@ class MapFrame(
             }
             repaint()
         }
-        shapesPublisher.subscribe(Subscriber(eventQueueWrapper(onShapesUpdate)))
+        shapesPublisher.subscribe(
+            com.joecollins.pubsub.Subscriber(
+                com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper(
+                    onShapesUpdate
+                )
+            )
+        )
 
         val onFocusBoxUpdate: (Rectangle2D?) -> Unit = { focus ->
             if (this.focus != focus) {
@@ -257,7 +261,13 @@ class MapFrame(
             repaint()
         }
         if (focusBoxPublisher != null) {
-            focusBoxPublisher.subscribe(Subscriber(eventQueueWrapper(onFocusBoxUpdate)))
+            focusBoxPublisher.subscribe(
+                com.joecollins.pubsub.Subscriber(
+                    com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper(
+                        onFocusBoxUpdate
+                    )
+                )
+            )
         } else {
             onFocusBoxUpdate(null)
         }
@@ -267,7 +277,13 @@ class MapFrame(
             repaint()
         }
         if (outlineShapesPublisher != null) {
-            outlineShapesPublisher.subscribe(Subscriber(eventQueueWrapper(onOutlineShapesUpdate)))
+            outlineShapesPublisher.subscribe(
+                com.joecollins.pubsub.Subscriber(
+                    com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper(
+                        onOutlineShapesUpdate
+                    )
+                )
+            )
         } else {
             onOutlineShapesUpdate(emptyList())
         }

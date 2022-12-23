@@ -1,14 +1,5 @@
 package com.joecollins.graphics.utils
 
-import org.geotools.data.FileDataStore
-import org.geotools.data.FileDataStoreFinder
-import org.geotools.data.simple.SimpleFeatureIterator
-import org.geotools.data.simple.SimpleFeatureSource
-import org.locationtech.jts.awt.ShapeWriter
-import org.locationtech.jts.geom.Geometry
-import org.locationtech.jts.geom.PrecisionModel
-import org.locationtech.jts.precision.GeometryPrecisionReducer
-import org.opengis.feature.simple.SimpleFeature
 import java.awt.Shape
 import java.awt.geom.AffineTransform
 import java.awt.geom.Area
@@ -39,22 +30,22 @@ object ShapefileReader {
         return readShapes(file, { feature -> keyType.cast(feature.getAttribute(keyProperty)) }, reducePrecision)
     }
 
-    fun <T> readShapes(file: URL, keyFunc: (SimpleFeature) -> T, reducePrecision: Boolean = false): Map<T, Shape> {
+    fun <T> readShapes(file: URL, keyFunc: (org.opengis.feature.simple.SimpleFeature) -> T, reducePrecision: Boolean = false): Map<T, Shape> {
         return readShapes(file, keyFunc, { true }, reducePrecision)
     }
 
     fun <T> readShapes(
         file: URL,
-        keyFunc: (SimpleFeature) -> T,
-        filter: (SimpleFeature) -> Boolean,
+        keyFunc: (org.opengis.feature.simple.SimpleFeature) -> T,
+        filter: (org.opengis.feature.simple.SimpleFeature) -> Boolean,
         reducePrecision: Boolean = false
     ): Map<T, Shape> {
         val shapes: MutableMap<T, Shape> = HashMap()
-        var store: FileDataStore? = null
-        val featureSource: SimpleFeatureSource
-        var features: SimpleFeatureIterator? = null
+        var store: org.geotools.data.FileDataStore? = null
+        val featureSource: org.geotools.data.simple.SimpleFeatureSource
+        var features: org.geotools.data.simple.SimpleFeatureIterator? = null
         return try {
-            store = FileDataStoreFinder.getDataStore(file)
+            store = org.geotools.data.FileDataStoreFinder.getDataStore(file)
             featureSource = store.featureSource
             features = featureSource.features.features()
             while (features.hasNext()) {
@@ -63,7 +54,7 @@ object ShapefileReader {
                     continue
                 }
                 val key = keyFunc(feature)
-                val geom = feature.getAttribute("the_geom") as Geometry
+                val geom = feature.getAttribute("the_geom") as org.locationtech.jts.geom.Geometry
                 shapes.merge(
                     key,
                     toShape(geom, reducePrecision)
@@ -80,11 +71,11 @@ object ShapefileReader {
         }
     }
 
-    private fun toShape(geom: Geometry, reducePrecision: Boolean): Shape {
-        val shapeWriter = ShapeWriter()
-        val pm = PrecisionModel(PrecisionModel.FIXED)
+    private fun toShape(geom: org.locationtech.jts.geom.Geometry, reducePrecision: Boolean): Shape {
+        val shapeWriter = org.locationtech.jts.awt.ShapeWriter()
+        val pm = org.locationtech.jts.geom.PrecisionModel(org.locationtech.jts.geom.PrecisionModel.FIXED)
         val transform = AffineTransform.getScaleInstance(1.0, -1.0)
-        val g = if (reducePrecision) GeometryPrecisionReducer.reduce(geom, pm) else geom
+        val g = if (reducePrecision) org.locationtech.jts.precision.GeometryPrecisionReducer.reduce(geom, pm) else geom
         return transform.createTransformedShape(shapeWriter.toShape(g))
     }
 }

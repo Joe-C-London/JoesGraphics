@@ -1,18 +1,18 @@
 package com.joecollins.graphics.components
 
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
-import com.joecollins.graphics.utils.ShapefileReader.readShapes
+import com.joecollins.graphics.utils.ShapefileReader
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
 import org.awaitility.Awaitility
 import org.hamcrest.core.IsEqual
-import org.junit.Assert
-import org.junit.Test
 import java.awt.Color
 import java.awt.Shape
 import java.awt.geom.Area
 import java.awt.geom.Rectangle2D
 import java.util.concurrent.TimeUnit
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.Assertions
 
 class MapFrameTest {
     @Test
@@ -24,8 +24,8 @@ class MapFrameTest {
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ mapFrame.numShapes }, IsEqual(27))
-        Assert.assertEquals(shapes[0].shape, mapFrame.getShape(0))
-        Assert.assertEquals(shapes[0].color, mapFrame.getColor(0))
+        Assertions.assertEquals(shapes[0].shape, mapFrame.getShape(0))
+        Assertions.assertEquals(shapes[0].color, mapFrame.getColor(0))
     }
 
     @Test
@@ -43,7 +43,7 @@ class MapFrameTest {
                 ret
             }
             .bounds2D
-        Assert.assertEquals(bindingBox, mapFrame.focusBox)
+        Assertions.assertEquals(bindingBox, mapFrame.focusBox)
     }
 
     @Test
@@ -69,7 +69,7 @@ class MapFrameTest {
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ mapFrame.numOutlineShapes }, IsEqual(4))
-        Assert.assertEquals(regions[0], mapFrame.getOutlineShape(0))
+        Assertions.assertEquals(regions[0], mapFrame.getOutlineShape(0))
     }
 
     @Test
@@ -179,7 +179,7 @@ class MapFrameTest {
         val peiMap = MapFrameTest::class.java
             .classLoader
             .getResource("com/joecollins/graphics/shapefiles/pei-districts.shp")
-        return readShapes(peiMap, "DIST_NO", Int::class.java)
+        return ShapefileReader.readShapes(peiMap, "DIST_NO", Int::class.java)
     }
 
     private class MapEntry(val shape: Shape, val color: Color)

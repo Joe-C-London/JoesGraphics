@@ -1,6 +1,5 @@
 package com.joecollins.graphics.screens.generic
 
-import com.joecollins.graphics.components.MapFrameTest
 import com.joecollins.graphics.screens.generic.MixedMemberResultPanel.Companion.builder
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.graphics.utils.ShapefileReader.readShapes
@@ -888,7 +887,7 @@ class MixedMemberResultPanelTest {
     }
 
     private fun peiShapesByDistrict(): Map<Int, Shape> {
-        val peiMap = MapFrameTest::class.java
+        val peiMap = MixedMemberResultPanelTest::class.java
             .classLoader
             .getResource("com/joecollins/graphics/shapefiles/pei-districts.shp")
         return readShapes(peiMap, "DIST_NO", Int::class.java)

@@ -1,6 +1,5 @@
 package com.joecollins.graphics.screens.generic
 
-import com.joecollins.graphics.components.MapFrameTest
 import com.joecollins.graphics.screens.generic.BasicResultPanel.Companion.candidateVotes
 import com.joecollins.graphics.screens.generic.BasicResultPanel.Companion.candidateVotesPctOnly
 import com.joecollins.graphics.screens.generic.BasicResultPanel.Companion.partyRangeVotes
@@ -2915,7 +2914,7 @@ class SimpleVoteViewPanelTest {
     }
 
     private fun peiShapesByDistrict(): Map<Int, Shape> {
-        val peiMap = MapFrameTest::class.java
+        val peiMap = SimpleVoteViewPanelTest::class.java
             .classLoader
             .getResource("com/joecollins/graphics/shapefiles/pei-districts.shp")
         return readShapes(peiMap, "DIST_NO", Int::class.java)

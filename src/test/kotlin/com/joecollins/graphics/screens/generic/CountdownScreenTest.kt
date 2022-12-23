@@ -1,6 +1,5 @@
 package com.joecollins.graphics.screens.generic
 
-import com.joecollins.graphics.components.MapFrameTest
 import com.joecollins.graphics.utils.RenderTestUtils
 import com.joecollins.graphics.utils.ShapefileReader
 import com.joecollins.pubsub.asOneTimePublisher
@@ -91,7 +90,7 @@ class CountdownScreenTest {
     }
 
     private fun peiShapesByDistrict(): Map<Int, Shape> {
-        val peiMap = MapFrameTest::class.java
+        val peiMap = CountdownScreenTest::class.java
             .classLoader
             .getResource("com/joecollins/graphics/shapefiles/pei-districts.shp")
         return ShapefileReader.readShapes(peiMap, "DIST_NO", Int::class.java)
