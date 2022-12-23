@@ -19,10 +19,7 @@ repositories {
 }
 
 dependencies {
-    api project('barframe')
-    api project('mapframe')
-    api project('socialframes')
-    api project('swingframe')
+    implementation parent.project('base')
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'

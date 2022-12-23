@@ -12,6 +12,6 @@ data class Party private constructor(override val name: String, override val abb
 
     companion object {
         val OTHERS = Party("Others", "OTH", Color.DARK_GRAY, -1)
-        internal val TIE = Party("TIE", "TIE", Color.DARK_GRAY, -2)
+        val TIE = Party("TIE", "TIE", Color.DARK_GRAY, -2)
     }
 }

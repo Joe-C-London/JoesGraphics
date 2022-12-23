@@ -4,10 +4,10 @@ import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.pubsub.asOneTimePublisher
 import org.awaitility.Awaitility
 import org.hamcrest.core.IsEqual
-import org.junit.Assert
-import org.junit.Test
 import java.awt.Color
 import java.util.concurrent.TimeUnit
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.Assertions
 
 class SwingFrameTest {
     @Test
@@ -53,7 +53,7 @@ class SwingFrameTest {
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.getLeftColor() }, IsEqual(Color.BLUE))
-        Assert.assertEquals(Color.RED, frame.getRightColor())
+        Assertions.assertEquals(Color.RED, frame.getRightColor())
     }
 
     @Test
@@ -69,7 +69,7 @@ class SwingFrameTest {
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.getBottomColor() }, IsEqual(Color.BLUE))
-        Assert.assertEquals("4.7% SWING LIB TO CON", frame.getBottomText())
+        Assertions.assertEquals("4.7% SWING LIB TO CON", frame.getBottomText())
     }
 
     @Test

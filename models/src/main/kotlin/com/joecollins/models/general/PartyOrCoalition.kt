@@ -9,7 +9,7 @@ abstract class PartyOrCoalition internal constructor() : CanOverrideSortOrder() 
     abstract val constituentParties: List<Party>
 }
 
-internal fun PartyOrCoalition.toParty(): Party {
+fun PartyOrCoalition.toParty(): Party {
     return if (this is Party) {
         this
     } else {

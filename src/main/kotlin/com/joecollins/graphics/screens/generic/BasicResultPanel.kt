@@ -685,7 +685,7 @@ class BasicResultPanel private constructor(
                         (if (classificationFunc == null) prevVotes!! else Aggregators.adjustKey(prevVotes!!, classificationFunc)),
                         (if (classificationFunc == null) currVotes!! else Aggregators.adjustKey(currVotes!!, classificationFunc)),
                         swingComparator!!
-                    ).bottomText ?: null.asOneTimePublisher()
+                    ).buildBottomText() ?: null.asOneTimePublisher()
                 }.merge(this.swingHeader ?: null.asOneTimePublisher()) { text, head ->
                     if (text == null && head == null) {
                         null
@@ -1920,7 +1920,7 @@ class BasicResultPanel private constructor(
                         prev,
                         curr,
                         swingComparator!!
-                    ).bottomText?.subscribe(Subscriber { inputs.swingBottom = it })
+                    ).buildBottomText()?.subscribe(Subscriber { inputs.swingBottom = it })
                 } else {
                     val currentNoNulls = this.current.map { v -> if (v.values.any { it == null }) emptyMap() else v.mapValues { it.value!! } }
                     val currentByParty: Flow.Publisher<Map<KPT, Int>> = Aggregators.adjustKey(currentNoNulls) { keyTemplate.toParty(it) }
@@ -1928,7 +1928,7 @@ class BasicResultPanel private constructor(
                         (if (classificationFunc == null) prev!! else Aggregators.adjustKey(prev!!, classificationFunc!!)),
                         (if (classificationFunc == null) currentByParty else Aggregators.adjustKey(currentByParty, classificationFunc!!)),
                         swingComparator!!
-                    ).bottomText?.subscribe(Subscriber { inputs.swingBottom = it })
+                    ).buildBottomText()?.subscribe(Subscriber { inputs.swingBottom = it })
                 }
             }
 
@@ -2210,7 +2210,7 @@ class BasicResultPanel private constructor(
                         (if (classificationFunc == null) p else Aggregators.adjustKey(p, classificationFunc)),
                         (if (classificationFunc == null) c else Aggregators.adjustKey(c, classificationFunc)),
                         swingComparator!!
-                    ).bottomText ?: null.asOneTimePublisher()
+                    ).buildBottomText() ?: null.asOneTimePublisher()
                 }.merge(this.swingHeader ?: null.asOneTimePublisher()) { text, head ->
                     if (text == null && head == null) {
                         null
@@ -2424,7 +2424,7 @@ class BasicResultPanel private constructor(
                         prev,
                         curr,
                         swingComparator!!
-                    ).bottomText
+                    ).buildBottomText()
                 }?.merge(swingHeader ?: null.asOneTimePublisher()) { t, h ->
                     if (h == null) {
                         t

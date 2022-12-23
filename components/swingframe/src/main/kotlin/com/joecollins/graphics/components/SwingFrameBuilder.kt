@@ -96,8 +96,7 @@ class SwingFrameBuilder {
         )
     }
 
-    internal val bottomText: Flow.Publisher<out String>?
-        get() = bottomTextPublisher
+    fun buildBottomText(): Flow.Publisher<out String>? = bottomTextPublisher
 
     private class SelfPublishingPrevCurrPct<POC : PartyOrCoalition> {
         private var prevPct: Map<out POC, Double> = HashMap()
