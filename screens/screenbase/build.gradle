@@ -19,8 +19,8 @@ repositories {
 }
 
 dependencies {
-    implementation parent.parent.project('base')
-    implementation parent.parent.project('window')
+    api parent.parent.project('base')
+    api parent.parent.project('window')
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'

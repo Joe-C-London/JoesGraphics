@@ -193,7 +193,8 @@ class BasicResultPanel private constructor(
         }
     }
 
-    private class DualSeatTemplate(val focusLocation: DualSeatScreenBuilder.FocusLocation) : SeatTemplate<Pair<Int, Int>, Pair<Int, Int>, DualBar> {
+    private class DualSeatTemplate(val focusLocation: DualSeatScreenBuilder.FocusLocation) :
+        SeatTemplate<Pair<Int, Int>, Pair<Int, Int>, DualBar> {
         override fun sortOrder(value: Pair<Int, Int>?): Int? = value?.second
         override fun prevSortOrder(value: Pair<Int, Int>?): Int? = sortOrder(value)
 
