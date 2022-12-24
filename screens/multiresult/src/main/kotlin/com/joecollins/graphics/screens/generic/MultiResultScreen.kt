@@ -1,5 +1,6 @@
 package com.joecollins.graphics.screens.generic
 
+import ResultColorUtils.color
 import com.joecollins.graphics.AltTextProvider
 import com.joecollins.graphics.GenericPanel
 import com.joecollins.graphics.ImageGenerator
@@ -16,7 +17,6 @@ import com.joecollins.models.general.Aggregators
 import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
-import com.joecollins.models.general.PartyResult.Companion.color
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
