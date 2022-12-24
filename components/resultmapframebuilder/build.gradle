@@ -19,12 +19,8 @@ repositories {
 }
 
 dependencies {
-    api project('barframe')
-    api project('countdownframe')
-    api project('mapframe')
-    api project('resultmapframebuilder')
-    api project('socialframes')
-    api project('swingframe')
+    api parent.project('mapframe')
+    api parent.parent.project('models')
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'

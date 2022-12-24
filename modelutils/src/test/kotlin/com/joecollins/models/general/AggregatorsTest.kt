@@ -1,31 +1,22 @@
 package com.joecollins.models.general
 
 import com.joecollins.graphics.utils.BoundResult
-import com.joecollins.models.general.Aggregators.adjustForPctReporting
-import com.joecollins.models.general.Aggregators.adjustKey
-import com.joecollins.models.general.Aggregators.combine
-import com.joecollins.models.general.Aggregators.combineDual
-import com.joecollins.models.general.Aggregators.combinePctReporting
-import com.joecollins.models.general.Aggregators.count
-import com.joecollins.models.general.Aggregators.sum
-import com.joecollins.models.general.Aggregators.toMap
-import com.joecollins.models.general.Aggregators.toPct
-import com.joecollins.models.general.Aggregators.topAndOthers
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.map
 import org.awaitility.Awaitility
 import org.hamcrest.core.IsEqual
 import org.hamcrest.number.IsCloseTo
-import org.junit.Test
 import java.util.concurrent.TimeUnit
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.Assertions
 
 class AggregatorsTest {
     @Test
     fun testKeyChange() {
         val input = Publisher(mapOf("ABC" to 5, "DEF" to 7))
         val output: BoundResult<Map<String, Int>> = BoundResult()
-        adjustKey(input) { it.substring(0, 1) }.subscribe(Subscriber { output.value = it })
+        Aggregators.adjustKey(input) { it.substring(0, 1) }.subscribe(Subscriber { output.value = it })
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ output.value }, IsEqual(mapOf("A" to 5, "D" to 7)))
         input.submit(mapOf("ABC" to 10, "DEF" to 9, "GHI" to 1))
@@ -37,7 +28,7 @@ class AggregatorsTest {
     fun testKeyChangeWithMerge() {
         val input = Publisher(mapOf("ABC" to 5, "AZY" to 7))
         val output: BoundResult<Map<String, Int>> = BoundResult()
-        adjustKey(input) { it.substring(0, 1) }.subscribe(Subscriber { output.value = it })
+        Aggregators.adjustKey(input) { it.substring(0, 1) }.subscribe(Subscriber { output.value = it })
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .ignoreException(NullPointerException::class.java)
             .until({ output.value }, IsEqual(mapOf("A" to 12)))
@@ -54,7 +45,7 @@ class AggregatorsTest {
             Publisher(mapOf("ABC" to 7, "GHI" to 3))
         )
         val output: BoundResult<Map<String, Int>> = BoundResult()
-        combine(inputs) { it }.subscribe(Subscriber { output.value = it })
+        Aggregators.combine(inputs) { it }.subscribe(Subscriber { output.value = it })
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ output.value }, IsEqual(mapOf("ABC" to 8 + 7, "DEF" to 6, "GHI" to 3)))
         inputs[0].submit(mapOf("ABC" to 12, "DEF" to 7))
@@ -79,7 +70,7 @@ class AggregatorsTest {
             Publisher(mapOf("ABC" to 7, "GHI" to 3))
         )
         val output: BoundResult<Map<String, Int>> = BoundResult()
-        combine(inputs, { it }, seed).subscribe(Subscriber { output.value = it })
+        Aggregators.combine(inputs, { it }, seed).subscribe(Subscriber { output.value = it })
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ output.value }, IsEqual(mapOf("ABC" to 8 + 7, "DEF" to 6, "GHI" to 3)))
         inputs[0].submit(mapOf("ABC" to 12, "DEF" to 7))
@@ -107,18 +98,18 @@ class AggregatorsTest {
             )
         )
         val output: BoundResult<Map<String, Pair<Int, Int>>> = BoundResult()
-        combineDual(inputs) { it }.subscribe(Subscriber { output.value = it })
+        Aggregators.combineDual(inputs) { it }.subscribe(Subscriber { output.value = it })
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until(
                 { output.value },
                 IsEqual(
                     mapOf(
                         "ABC" to
-                            Pair(6, 15),
+                                Pair(6, 15),
                         "DEF" to
-                            Pair(1, 6),
+                                Pair(1, 6),
                         "GHI" to
-                            Pair(0, 3)
+                                Pair(0, 3)
                     )
                 )
             )
@@ -129,11 +120,11 @@ class AggregatorsTest {
                 IsEqual(
                     mapOf(
                         "ABC" to
-                            Pair(7, 19),
+                                Pair(7, 19),
                         "DEF" to
-                            Pair(4, 7),
+                                Pair(4, 7),
                         "GHI" to
-                            Pair(0, 3)
+                                Pair(0, 3)
                     )
                 )
             )
@@ -160,18 +151,18 @@ class AggregatorsTest {
             )
         )
         val output: BoundResult<Map<String, Pair<Int, Int>>> = BoundResult()
-        combineDual(inputs, { it }, seed).subscribe(Subscriber { output.value = it })
+        Aggregators.combineDual(inputs, { it }, seed).subscribe(Subscriber { output.value = it })
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until(
                 { output.value },
                 IsEqual(
                     mapOf(
                         "ABC" to
-                            Pair(6, 15),
+                                Pair(6, 15),
                         "DEF" to
-                            Pair(1, 6),
+                                Pair(1, 6),
                         "GHI" to
-                            Pair(0, 3)
+                                Pair(0, 3)
                     )
                 )
             )
@@ -182,11 +173,11 @@ class AggregatorsTest {
                 IsEqual(
                     mapOf(
                         "ABC" to
-                            Pair(7, 19),
+                                Pair(7, 19),
                         "DEF" to
-                            Pair(4, 7),
+                                Pair(4, 7),
                         "GHI" to
-                            Pair(0, 3)
+                                Pair(0, 3)
                     )
                 )
             )
@@ -213,9 +204,9 @@ class AggregatorsTest {
         )
         val output: BoundResult<Map<String, Int>> = BoundResult()
         val combined = sequenceOf(inputs1, inputs2)
-            .map { inputs -> combine(inputs) { it } }
+            .map { inputs -> Aggregators.combine(inputs) { it } }
             .toList()
-        combine(combined) { it }.subscribe(Subscriber { output.value = it })
+        Aggregators.combine(combined) { it }.subscribe(Subscriber { output.value = it })
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ output.value }, IsEqual(mapOf("ABC" to 30, "DEF" to 12, "GHI" to 6)))
         inputs1[0].submit(mapOf("ABC" to 9, "DEF" to 5))
@@ -243,20 +234,20 @@ class AggregatorsTest {
         )
         val output: BoundResult<Map<String, Pair<Int, Int>>> = BoundResult()
         val combined = sequenceOf(inputs1, inputs2)
-            .map { inputs -> combineDual(inputs) { it } }
+            .map { inputs -> Aggregators.combineDual(inputs) { it } }
             .toList()
-        combineDual(combined) { it }.subscribe(Subscriber { output.value = it })
+        Aggregators.combineDual(combined) { it }.subscribe(Subscriber { output.value = it })
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until(
                 { output.value },
                 IsEqual(
                     mapOf(
                         "ABC" to
-                            Pair(12, 30),
+                                Pair(12, 30),
                         "DEF" to
-                            Pair(2, 12),
+                                Pair(2, 12),
                         "GHI" to
-                            Pair(0, 6)
+                                Pair(0, 6)
                     )
                 )
             )
@@ -267,11 +258,11 @@ class AggregatorsTest {
                 IsEqual(
                     mapOf(
                         "ABC" to
-                            Pair(11, 31),
+                                Pair(11, 31),
                         "DEF" to
-                            Pair(3, 11),
+                                Pair(3, 11),
                         "GHI" to
-                            Pair(0, 6)
+                                Pair(0, 6)
                     )
                 )
             )
@@ -282,7 +273,7 @@ class AggregatorsTest {
         val votes = Publisher(mapOf("ABC" to 500, "DEF" to 300))
         val pctReporting = Publisher(0.01)
         val output: BoundResult<Map<String, Int>> = BoundResult()
-        adjustForPctReporting(votes, pctReporting)
+        Aggregators.adjustForPctReporting(votes, pctReporting)
             .subscribe(Subscriber { output.value = it })
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ output.value }, IsEqual(mapOf("ABC" to 5, "DEF" to 3)))
@@ -301,7 +292,7 @@ class AggregatorsTest {
             Publisher(0.3)
         )
         val output = BoundResult<Double>()
-        combinePctReporting(inputs) { it }
+        Aggregators.combinePctReporting(inputs) { it }
             .subscribe(Subscriber { output.value = it })
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ output.value }, IsCloseTo(0.4, 1e-6))
@@ -320,7 +311,7 @@ class AggregatorsTest {
             Pair(Publisher(0.3), Publisher(3.0))
         )
         val output = BoundResult<Double>()
-        combinePctReporting(inputs, { it.first }, { it.second })
+        Aggregators.combinePctReporting(inputs, { it.first }, { it.second })
             .subscribe(Subscriber { output.value = it })
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ output.value }, IsCloseTo(0.38, 1e-6))
@@ -340,7 +331,7 @@ class AggregatorsTest {
     fun testTopAndOthersBelowLimit() {
         val votes = Publisher(mapOf("ABC" to 5, "DEF" to 3))
         val output: BoundResult<Map<String, Int>> = BoundResult()
-        topAndOthers(votes, 3, "OTHERS").subscribe(Subscriber { output.value = it })
+        Aggregators.topAndOthers(votes, 3, "OTHERS").subscribe(Subscriber { output.value = it })
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .ignoreException(NullPointerException::class.java)
             .until({ output.value }, IsEqual(mapOf("ABC" to 5, "DEF" to 3)))
@@ -354,7 +345,7 @@ class AggregatorsTest {
     fun testTopAndOthersAtLimit() {
         val votes = Publisher(mapOf("ABC" to 5, "DEF" to 3, "GHI" to 2))
         val output: BoundResult<Map<String, Int>> = BoundResult()
-        topAndOthers(votes, 3, "OTHERS").subscribe(Subscriber { output.value = it })
+        Aggregators.topAndOthers(votes, 3, "OTHERS").subscribe(Subscriber { output.value = it })
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .ignoreException(NullPointerException::class.java)
             .until({ output.value }, IsEqual(mapOf("ABC" to 5, "DEF" to 3, "GHI" to 2)))
@@ -368,7 +359,7 @@ class AggregatorsTest {
     fun testTopAndOthersAboveLimit() {
         val votes = Publisher(mapOf("ABC" to 5, "DEF" to 3, "GHI" to 2, "JKL" to 4))
         val output: BoundResult<Map<String, Int>> = BoundResult()
-        topAndOthers(votes, 3, "OTHERS").subscribe(Subscriber { output.value = it })
+        Aggregators.topAndOthers(votes, 3, "OTHERS").subscribe(Subscriber { output.value = it })
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .ignoreException(NullPointerException::class.java)
             .until({ output.value }, IsEqual(mapOf("ABC" to 5, "JKL" to 4, "OTHERS" to 5)))
@@ -382,7 +373,7 @@ class AggregatorsTest {
     fun testTopAndOthersAboveLimitWithOthers() {
         val votes = Publisher(mapOf("ABC" to 5, "DEF" to 3, "GHI" to 2, "JKL" to 4, "OTHERS" to 6))
         val output: BoundResult<Map<String, Int>> = BoundResult()
-        topAndOthers(votes, 3, "OTHERS").subscribe(Subscriber { output.value = it })
+        Aggregators.topAndOthers(votes, 3, "OTHERS").subscribe(Subscriber { output.value = it })
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .ignoreException(NullPointerException::class.java)
             .until({ output.value }, IsEqual(mapOf("ABC" to 5, "JKL" to 4, "OTHERS" to 11)))
@@ -397,7 +388,7 @@ class AggregatorsTest {
         val votes = Publisher(mapOf("ABC" to 5, "DEF" to 3, "GHI" to 2, "JKL" to 4))
         val winner = Publisher<String?>(null)
         val output: BoundResult<Map<String, Int>> = BoundResult()
-        topAndOthers(
+        Aggregators.topAndOthers(
             votes,
             3,
             "OTHERS",
@@ -426,7 +417,7 @@ class AggregatorsTest {
     fun testToMap() {
         val inputs = mapOf("ABC" to Publisher(1), "DEF" to Publisher(2))
         val output: BoundResult<Map<String, Int>> = BoundResult()
-        toMap(inputs.keys) { inputs[it]!! }.subscribe(Subscriber { output.value = it })
+        Aggregators.toMap(inputs.keys) { inputs[it]!! }.subscribe(Subscriber { output.value = it })
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ output.value }, IsEqual(mapOf("ABC" to 1, "DEF" to 2)))
         inputs["ABC"]!!.submit(7)
@@ -438,7 +429,9 @@ class AggregatorsTest {
     fun testToMapTransformedKey() {
         val inputs = mapOf("abc" to Publisher(1), "def" to Publisher(2))
         val output: BoundResult<Map<String, Int>> = BoundResult()
-        toMap(inputs.keys, { it.uppercase() }) { inputs[it]!! }.subscribe(Subscriber { output.value = it })
+        Aggregators.toMap(inputs.keys, { it.uppercase() }) { inputs[it]!! }.subscribe(Subscriber {
+            output.value = it
+        })
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ output.value }, IsEqual(mapOf("ABC" to 1, "DEF" to 2)))
         inputs["abc"]!!.submit(7)
@@ -450,12 +443,30 @@ class AggregatorsTest {
     fun testToPct() {
         val votes = Publisher(mapOf("ABC" to 5, "DEF" to 3, "GHI" to 2, "JKL" to 4))
         val output: BoundResult<Map<String, Double>> = BoundResult()
-        toPct(votes).subscribe(Subscriber { output.value = it })
+        Aggregators.toPct(votes).subscribe(Subscriber { output.value = it })
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ output.value }, IsEqual(mapOf("ABC" to 5.0 / 14, "DEF" to 3.0 / 14, "GHI" to 2.0 / 14, "JKL" to 4.0 / 14)))
+            .until({ output.value },
+                IsEqual(
+                    mapOf(
+                        "ABC" to 5.0 / 14,
+                        "DEF" to 3.0 / 14,
+                        "GHI" to 2.0 / 14,
+                        "JKL" to 4.0 / 14
+                    )
+                )
+            )
         votes.submit(mapOf("ABC" to 5, "DEF" to 7, "GHI" to 6, "JKL" to 4))
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ output.value }, IsEqual(mapOf("ABC" to 5.0 / 22, "DEF" to 7.0 / 22, "GHI" to 6.0 / 22, "JKL" to 4.0 / 22)))
+            .until({ output.value },
+                IsEqual(
+                    mapOf(
+                        "ABC" to 5.0 / 22,
+                        "DEF" to 7.0 / 22,
+                        "GHI" to 6.0 / 22,
+                        "JKL" to 4.0 / 22
+                    )
+                )
+            )
         votes.submit(mapOf("ABC" to 0, "DEF" to 0, "GHI" to 0))
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ output.value }, IsEqual(mapOf("ABC" to 0.0, "DEF" to 0.0, "GHI" to 0.0)))
@@ -463,9 +474,13 @@ class AggregatorsTest {
 
     @Test
     fun testSum() {
-        val inputs = listOf(Publisher(1), Publisher(2), Publisher(3))
+        val inputs = listOf(
+            Publisher(1),
+            Publisher(2),
+            Publisher(3)
+        )
         val output = BoundResult<Int>()
-        sum(inputs) { it }.subscribe(Subscriber { output.value = it })
+        Aggregators.sum(inputs) { it }.subscribe(Subscriber { output.value = it })
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ output.value }, IsEqual(6))
         inputs[1].submit(7)
@@ -475,9 +490,13 @@ class AggregatorsTest {
 
     @Test
     fun testCount() {
-        val inputs = listOf(Publisher(true), Publisher(false), Publisher(false))
+        val inputs = listOf(
+            Publisher(true),
+            Publisher(false),
+            Publisher(false)
+        )
         val output = BoundResult<Int>()
-        count(inputs) { it }.subscribe(Subscriber { output.value = it })
+        Aggregators.count(inputs) { it }.subscribe(Subscriber { output.value = it })
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ output.value }, IsEqual(1))
         inputs[1].submit(true)
@@ -498,7 +517,7 @@ class AggregatorsTest {
     fun testIdentityPublished() {
         val inputs = emptyList<Publisher<Map<String, Int>>>()
         val output: BoundResult<Map<String, Int>> = BoundResult()
-        combine(inputs) { it }.subscribe(Subscriber { output.value = it })
+        Aggregators.combine(inputs) { it }.subscribe(Subscriber { output.value = it })
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ output.value }, IsEqual(emptyMap()))
     }

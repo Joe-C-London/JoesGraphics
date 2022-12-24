@@ -22,7 +22,7 @@ repositories {
 }
 
 dependencies {
-    implementation parent.parent.project('base')
+    api parent.parent.project('base')
 
     testImplementation parent.parent.project('shapefiles')
     testImplementation parent.parent.project('testutils')
