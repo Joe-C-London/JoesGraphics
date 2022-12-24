@@ -1,21 +1,18 @@
 package com.joecollins.graphics.screens.generic
 
-import com.joecollins.graphics.screens.generic.MultiResultScreen.Companion.of
-import com.joecollins.graphics.screens.generic.MultiResultScreen.Companion.ofParties
 import com.joecollins.graphics.utils.PublisherTestUtils.assertPublishes
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
-import com.joecollins.graphics.utils.ShapefileReader.readShapes
+import com.joecollins.graphics.utils.ShapefileReader
 import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.map
-import org.junit.Test
 import java.awt.Color
 import java.awt.Shape
 import java.util.concurrent.Flow
-
+import org.junit.jupiter.api.Test
 class MultiResultScreenTest {
 
     @Test
@@ -75,7 +72,7 @@ class MultiResultScreenTest {
         )
         val shapesByDistrict = peiShapesByDistrict()
         val swingometerOrder = listOf(ndp, grn, lib, ind, pc)
-        val panel = of(
+        val panel = MultiResultScreen.of(
             districts.asOneTimePublisher(),
             { it.votes.asOneTimePublisher() },
             { ("DISTRICT " + it.districtNum).asOneTimePublisher() },
@@ -190,7 +187,7 @@ class MultiResultScreenTest {
         val shapesByDistrict = peiShapesByDistrict()
         val swingometerOrder = listOf(ndp, grn, lib, ind, pc)
         val title = Publisher("MAJOR PARTY LEADERS")
-        val panel = of(
+        val panel = MultiResultScreen.of(
             districts,
             { it.getVotes() },
             { it.name.uppercase().asOneTimePublisher() },
@@ -585,7 +582,7 @@ class MultiResultScreenTest {
         val shapesByDistrict = peiShapesByDistrict()
         val swingometerOrder = listOf(ndp, grn, lib, ind, pc)
         val title = Publisher("MAJOR PARTY LEADERS")
-        val panel = of(
+        val panel = MultiResultScreen.of(
             districts,
             { it.getVotes() },
             { it.name.uppercase().asOneTimePublisher() },
@@ -982,7 +979,7 @@ class MultiResultScreenTest {
             )
         )
         val swingometerOrder = listOf(ndp, grn, lib, ind, pc, pa)
-        val panel = of(
+        val panel = MultiResultScreen.of(
             districts.asOneTimePublisher(),
             { it.votes.asOneTimePublisher() },
             { ("DISTRICT " + it.districtNum).asOneTimePublisher() },
@@ -1154,7 +1151,7 @@ class MultiResultScreenTest {
             )
         )
         val swingometerOrder = listOf(ndp, grn, lib, ind, pc, pa)
-        val panel = ofParties(
+        val panel = MultiResultScreen.ofParties(
             districts.asOneTimePublisher(),
             { it.votes.mapKeys { e -> e.key.party }.asOneTimePublisher() },
             { ("DISTRICT " + it.districtNum).asOneTimePublisher() },
@@ -1302,7 +1299,7 @@ class MultiResultScreenTest {
         )
         val swingometerOrder = listOf(ndp, grn, lib, ind, pc, pa)
         val districtsPublisher = Publisher(districts)
-        val panel = of(
+        val panel = MultiResultScreen.of(
             districtsPublisher,
             { it.votes.asOneTimePublisher() },
             { ("DISTRICT " + it.districtNum).asOneTimePublisher() },
@@ -1560,7 +1557,7 @@ class MultiResultScreenTest {
         )
         val swingometerOrder = listOf(ndp, grn, lib, ind, pc, pa)
         val districtsPublisher = Publisher(districts)
-        val panel = of(
+        val panel = MultiResultScreen.of(
             districtsPublisher,
             { it.votes.asOneTimePublisher() },
             { ("DISTRICT " + it.districtNum).asOneTimePublisher() },
@@ -1763,7 +1760,7 @@ class MultiResultScreenTest {
                 emptyMap()
             )
         )
-        val panel = of(
+        val panel = MultiResultScreen.of(
             districts.asOneTimePublisher(),
             { it.votes.asOneTimePublisher() },
             { it.name.uppercase().asOneTimePublisher() },
@@ -1871,7 +1868,7 @@ class MultiResultScreenTest {
         )
         val shapesByDistrict = peiShapesByDistrict()
         val swingometerOrder = listOf(ndp, grn, lib, ind, pc)
-        val panel = of(
+        val panel = MultiResultScreen.of(
             districts.asOneTimePublisher(),
             { it.votes.asOneTimePublisher() },
             { ("DISTRICT " + it.districtNum).asOneTimePublisher() },
@@ -1896,7 +1893,12 @@ class MultiResultScreenTest {
                 { shapesByDistrict },
                 { it.districtNum },
                 { d ->
-                    d.votes.entries.maxByOrNull { it.value }?.key?.party?.let { PartyResult(it, d.leaderHasWon) }
+                    d.votes.entries.maxByOrNull { it.value }?.key?.party?.let {
+                        PartyResult(
+                            it,
+                            d.leaderHasWon
+                        )
+                    }
                         .asOneTimePublisher()
                 },
                 { listOf(10, 11, 12, 13, 14) },
@@ -2016,7 +2018,7 @@ class MultiResultScreenTest {
         )
         val swingometerOrder = listOf(ndp, grn, lib, ind, pc, pa)
         val districtPublisher = Publisher(districts)
-        val panel = ofParties(
+        val panel = MultiResultScreen.ofParties(
             districtPublisher,
             { it.partyVotes },
             { ("DISTRICT " + it.districtNum).asOneTimePublisher() },
@@ -2192,7 +2194,7 @@ class MultiResultScreenTest {
         val peiMap = MultiResultScreenTest::class.java
             .classLoader
             .getResource("com/joecollins/graphics/shapefiles/pei-districts.shp")
-        return readShapes(peiMap, "DIST_NO", Int::class.java)
+        return ShapefileReader.readShapes(peiMap, "DIST_NO", Int::class.java)
     }
 
     private class District(

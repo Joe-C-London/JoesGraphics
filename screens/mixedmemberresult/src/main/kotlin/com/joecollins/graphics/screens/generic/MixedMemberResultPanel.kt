@@ -4,10 +4,10 @@ import com.joecollins.graphics.GenericPanel
 import com.joecollins.graphics.ImageGenerator
 import com.joecollins.graphics.components.BarFrame
 import com.joecollins.graphics.components.BarFrameBuilder
-import com.joecollins.graphics.components.BarFrameBuilder.BasicBar
 import com.joecollins.graphics.components.MapFrame
 import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.Party
+import com.joecollins.models.general.Party.Companion
 import com.joecollins.models.general.PartyOrCoalition
 import com.joecollins.models.general.PartyResult
 import com.joecollins.pubsub.Publisher
@@ -269,7 +269,7 @@ class MixedMemberResultPanel private constructor(
                         if (partialDeclaration) {
                             rightLabel = THOUSANDS_FORMAT.format(numVotes.toLong())
                         }
-                        BasicBar(
+                        BarFrameBuilder.BasicBar(
                             if (candidate === Candidate.OTHERS) "OTHERS" else leftLabel,
                             candidate.party.color,
                             if (pct.isNaN()) 0 else pct,
@@ -334,7 +334,7 @@ class MixedMemberResultPanel private constructor(
                                 (prev[it.key.party] ?: 0) /
                                 prevTotal
                             )
-                        BasicBar(
+                        BarFrameBuilder.BasicBar(
                             it.key.party.abbreviation.uppercase(),
                             it.key.party.color,
                             pct,
@@ -354,7 +354,7 @@ class MixedMemberResultPanel private constructor(
                     emptySequence()
                 } else {
                     sequenceOf(
-                        BasicBar(
+                        BarFrameBuilder.BasicBar(
                             Party.OTHERS.abbreviation.uppercase(),
                             Party.OTHERS.color,
                             othersPct,
@@ -380,7 +380,7 @@ class MixedMemberResultPanel private constructor(
                         .map {
                             val value = it.value
                             val pct = if (value == null) Double.NaN else 1.0 * value / total
-                            BasicBar(
+                            BarFrameBuilder.BasicBar(
                                 it.key.name.uppercase(),
                                 it.key.color,
                                 if (pct.isNaN()) 0 else pct,
@@ -388,7 +388,7 @@ class MixedMemberResultPanel private constructor(
                                     "WAITING..."
                                 } else {
                                     THOUSANDS_FORMAT.format(it.value) +
-                                        if (partialDeclaration) "" else " (" + PCT_FORMAT.format(pct) + ")"
+                                            if (partialDeclaration) "" else " (" + PCT_FORMAT.format(pct) + ")"
                                 }
                             )
                         }
@@ -425,7 +425,7 @@ class MixedMemberResultPanel private constructor(
                             1.0 * it.value / currTotal -
                                 1.0 * (prev[it.key] ?: 0) / prevTotal
                             )
-                        BasicBar(
+                        BarFrameBuilder.BasicBar(
                             it.key.abbreviation.uppercase(),
                             it.key.color,
                             pct,
@@ -443,7 +443,7 @@ class MixedMemberResultPanel private constructor(
                     emptySequence()
                 } else {
                     sequenceOf(
-                        BasicBar(
+                        BarFrameBuilder.BasicBar(
                             Party.OTHERS.abbreviation.uppercase(),
                             Party.OTHERS.color,
                             otherTotal,

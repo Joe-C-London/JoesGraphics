@@ -1,19 +1,16 @@
 package com.joecollins.graphics.screens.generic
 
-import com.joecollins.graphics.screens.generic.MixedMemberResultPanel.Companion.builder
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
-import com.joecollins.graphics.utils.ShapefileReader.readShapes
-import com.joecollins.models.general.Aggregators.topAndOthers
+import com.joecollins.graphics.utils.ShapefileReader
+import com.joecollins.models.general.Aggregators
 import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
-import com.joecollins.models.general.PartyResult.Companion.elected
-import com.joecollins.models.general.PartyResult.Companion.leading
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
-import org.junit.Test
 import java.awt.Color
 import java.awt.Shape
+import org.junit.jupiter.api.Test
 
 class MixedMemberResultPanelTest {
     @Test
@@ -36,8 +33,8 @@ class MixedMemberResultPanelTest {
         val grn = Party("Green", "GRN", Color.GREEN.darker())
         val pc = Party("Progressive Conservative", "PC", Color.BLUE)
         val ndp = Party("New Democratic Party", "NDP", Color.ORANGE)
-        selectedResult.submit(elected(lib))
-        val panel = builder()
+        selectedResult.submit(PartyResult.elected(lib))
+        val panel = MixedMemberResultPanel.builder()
             .withCandidateVotes(currentCandidateVotes, candidateHeader)
             .withPrevCandidateVotes(previousCandidateVotes, candidateChangeHeader)
             .withPartyVotes(currentPartyVotes, partyHeader)
@@ -111,7 +108,7 @@ class MixedMemberResultPanelTest {
         val grn = Party("Green", "GRN", Color.GREEN.darker())
         val pc = Party("Progressive Conservative", "PC", Color.BLUE)
         val ndp = Party("New Democratic Party", "NDP", Color.ORANGE)
-        val panel = builder()
+        val panel = MixedMemberResultPanel.builder()
             .withCandidateVotes(currentCandidateVotes, candidateHeader)
             .withPrevCandidateVotes(previousCandidateVotes, candidateChangeHeader)
             .withCandidatePctReporting(candidatePctReporting)
@@ -163,7 +160,7 @@ class MixedMemberResultPanelTest {
         )
         candidatePctReporting.submit(0.2)
         partyPctReporting.submit(0.1)
-        selectedResult.submit(leading(lib))
+        selectedResult.submit(PartyResult.leading(lib))
         compareRendering("MixedMemberResultPanel", "PctReporting", panel)
     }
 
@@ -192,7 +189,7 @@ class MixedMemberResultPanelTest {
         val grn = Party("Green", "GRN", Color.GREEN.darker())
         val pc = Party("Progressive Conservative", "PC", Color.BLUE)
         val ndp = Party("New Democratic Party", "NDP", Color.ORANGE)
-        val panel = builder()
+        val panel = MixedMemberResultPanel.builder()
             .withCandidateVotes(currentCandidateVotes, candidateHeader)
             .withPrevCandidateVotes(previousCandidateVotes, candidateChangeHeader)
             .withCandidatePctReporting(candidatePctReporting)
@@ -248,7 +245,7 @@ class MixedMemberResultPanelTest {
         candidateProgress.submit("20% IN")
         partyPctReporting.submit(0.1)
         partyProgress.submit("10% IN")
-        selectedResult.submit(leading(lib))
+        selectedResult.submit(PartyResult.leading(lib))
         compareRendering("MixedMemberResultPanel", "ProgressLabels", panel)
     }
 
@@ -274,7 +271,7 @@ class MixedMemberResultPanelTest {
         val grn = Party("Green", "GRN", Color.GREEN.darker())
         val pc = Party("Progressive Conservative", "PC", Color.BLUE)
         val ndp = Party("New Democratic Party", "NDP", Color.ORANGE)
-        val panel = builder()
+        val panel = MixedMemberResultPanel.builder()
             .withCandidateVotes(currentCandidateVotes, candidateHeader)
             .withPrevCandidateVotes(previousCandidateVotes, candidateChangeHeader)
             .withCandidatePctReporting(candidatePctReporting)
@@ -346,10 +343,10 @@ class MixedMemberResultPanelTest {
         val shapesByDistrict = peiShapesByDistrict()
         val focus = Publisher(shapesByDistrict.keys.filter { it in 10..14 })
         val selectedShape = Publisher(10)
-        val selectedResult = Publisher(leading(lib))
+        val selectedResult = Publisher(PartyResult.leading(lib))
         val candidatePctReporting = Publisher(0.0)
         val partyPctReporting = Publisher(0.0)
-        val panel = builder()
+        val panel = MixedMemberResultPanel.builder()
             .withCandidateVotes(currentCandidateVotes, candidateHeader)
             .withPrevCandidateVotes(previousCandidateVotes, candidateChangeHeader)
             .withCandidatePctReporting(candidatePctReporting)
@@ -421,8 +418,8 @@ class MixedMemberResultPanelTest {
         val lib = Party("Liberal", "LIB", Color.RED)
         val grn = Party("Green", "GRN", Color.GREEN.darker())
         val pc = Party("Progressive Conservative", "PC", Color.BLUE)
-        selectedResult.submit(elected(lib))
-        val panel = builder()
+        selectedResult.submit(PartyResult.elected(lib))
+        val panel = MixedMemberResultPanel.builder()
             .withCandidateVotes(currentCandidateVotes, candidateHeader)
             .withPrevCandidateVotes(previousCandidateVotes, candidateChangeHeader)
             .withPartyVotes(currentPartyVotes, partyHeader)
@@ -488,8 +485,8 @@ class MixedMemberResultPanelTest {
         val grn = Party("Green", "GRN", Color.GREEN.darker())
         val pc = Party("Progressive Conservative", "PC", Color.BLUE)
         val ndp = Party("New Democratic Party", "NDP", Color.ORANGE)
-        selectedResult.submit(elected(lib))
-        val panel = builder()
+        selectedResult.submit(PartyResult.elected(lib))
+        val panel = MixedMemberResultPanel.builder()
             .withCandidateVotes(currentCandidateVotes, candidateHeader)
             .withPrevCandidateVotes(previousCandidateVotes, candidateChangeHeader)
             .withIncumbentMarker("(MLA)")
@@ -556,8 +553,8 @@ class MixedMemberResultPanelTest {
         val grn = Party("Green", "GRN", Color.GREEN.darker())
         val pc = Party("Progressive Conservative", "PC", Color.BLUE)
         val ndp = Party("New Democratic Party", "NDP", Color.ORANGE)
-        selectedResult.submit(elected(lib))
-        val panel = builder()
+        selectedResult.submit(PartyResult.elected(lib))
+        val panel = MixedMemberResultPanel.builder()
             .withCandidateVotes(currentCandidateVotes, candidateHeader)
             .withPartyVotes(currentPartyVotes, partyHeader)
             .withIncumbentMarker("(MLA)")
@@ -606,8 +603,8 @@ class MixedMemberResultPanelTest {
         val grn = Party("Green", "GRN", Color.GREEN.darker())
         val pc = Party("Progressive Conservative", "PC", Color.BLUE)
         val ndp = Party("New Democratic Party", "NDP", Color.ORANGE)
-        selectedResult.submit(elected(lib))
-        val panel = builder()
+        selectedResult.submit(PartyResult.elected(lib))
+        val panel = MixedMemberResultPanel.builder()
             .withCandidateVotes(
                 currentCandidateVotes,
                 candidateHeader,
@@ -660,8 +657,8 @@ class MixedMemberResultPanelTest {
         val grn = Party("Green", "GRN", Color.GREEN.darker())
         val pc = Party("Progressive Conservative", "PC", Color.BLUE)
         val ndp = Party("New Democratic Party", "NDP", Color.ORANGE)
-        selectedResult.submit(elected(lib))
-        val panel = builder()
+        selectedResult.submit(PartyResult.elected(lib))
+        val panel = MixedMemberResultPanel.builder()
             .withCandidateVotes(currentCandidateVotes, candidateHeader)
             .withPartyVotes(currentPartyVotes, partyHeader)
             .withIncumbentMarker("(MLA)")
@@ -712,8 +709,8 @@ class MixedMemberResultPanelTest {
         val grn = Party("Green", "GRN", Color.GREEN.darker())
         val pc = Party("Progressive Conservative", "PC", Color.BLUE)
         val ndp = Party("New Democratic Party", "NDP", Color.ORANGE)
-        selectedResult.submit(elected(lib))
-        val panel = builder()
+        selectedResult.submit(PartyResult.elected(lib))
+        val panel = MixedMemberResultPanel.builder()
             .withCandidateVotes(currentCandidateVotes, candidateHeader)
             .withPartyVotes(currentPartyVotes, partyHeader)
             .withIncumbentMarker("(MLA)")
@@ -779,11 +776,11 @@ class MixedMemberResultPanelTest {
         val partyHeader = Publisher("AT-LARGE VOTES")
         val partyChangeHeader = Publisher("AT-LARGE CHANGE SINCE 2012")
         val topPartiesWaiting = Publisher(arrayOf(con, lab, ld, grn))
-        val panel = builder()
+        val panel = MixedMemberResultPanel.builder()
             .withCandidateVotes(currentCandidateVotes, candidateHeader)
             .withPrevCandidateVotes(previousCandidateVotes, candidateChangeHeader)
             .withPartyVotes(
-                topAndOthers(currentPartyVotes, 5, Party.OTHERS, topPartiesWaiting),
+                Aggregators.topAndOthers(currentPartyVotes, 5, Party.OTHERS, topPartiesWaiting),
                 partyHeader
             )
             .withPrevPartyVotes(previousPartyVotes, partyChangeHeader)
@@ -882,7 +879,9 @@ class MixedMemberResultPanelTest {
         currPartyVotes[wep] = 5718
         currentPartyVotes.submit(currPartyVotes)
         compareRendering("MixedMemberResultPanel", "Declaration-9", panel)
-        currentCandidateVotes.submit(topAndOthers(currCandVotes, 6, Candidate.OTHERS))
+        currentCandidateVotes.submit(
+            Aggregators.topAndOthers(currCandVotes, 6, Candidate.OTHERS)
+        )
         compareRendering("MixedMemberResultPanel", "Declaration-10", panel)
     }
 
@@ -890,6 +889,6 @@ class MixedMemberResultPanelTest {
         val peiMap = MixedMemberResultPanelTest::class.java
             .classLoader
             .getResource("com/joecollins/graphics/shapefiles/pei-districts.shp")
-        return readShapes(peiMap, "DIST_NO", Int::class.java)
+        return ShapefileReader.readShapes(peiMap, "DIST_NO", Int::class.java)
     }
 }

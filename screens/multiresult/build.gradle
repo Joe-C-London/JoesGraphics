@@ -1,0 +1,46 @@
+buildscript {
+    ext.kotlin_version = '1.7.20'
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+plugins {
+    id 'kotlin'
+}
+
+group 'com.joecollins'
+version '1.0-SNAPSHOT'
+
+repositories {
+    maven {
+        url "https://repo.osgeo.org/repository/release/"
+    }
+    mavenCentral()
+}
+
+var topLevel = parent.parent
+
+dependencies {
+    implementation topLevel.project('base')
+    implementation topLevel.project('models')
+    implementation topLevel.project('modelutils')
+    implementation topLevel.project('shapes')
+    implementation topLevel.project('components:barframe')
+    implementation topLevel.project('components:resultmapframebuilder')
+    implementation topLevel.project('components:swingframe')
+
+    implementation parent.project('screenbase')
+
+    testImplementation topLevel.project('shapefiles')
+    testImplementation topLevel.project('testutils')
+
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+}
+
+test {
+    useJUnitPlatform()
+}
