@@ -18,14 +18,13 @@ repositories {
     mavenCentral()
 }
 
+var topLevel = parent.parent
+
 dependencies {
-    api project('barframe')
-    api project('countdownframe')
-    api project('mapframe')
-    api project('multisummaryframe')
-    api project('resultmapframebuilder')
-    api project('socialframes')
-    api project('swingframe')
+    implementation topLevel.project('base')
+
+    testImplementation topLevel.project('models')
+    testImplementation topLevel.project('testutils')
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'

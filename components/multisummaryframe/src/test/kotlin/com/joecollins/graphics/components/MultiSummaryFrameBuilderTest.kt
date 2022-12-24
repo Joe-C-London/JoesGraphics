@@ -1,16 +1,15 @@
 package com.joecollins.graphics.components
 
-import com.joecollins.graphics.components.MultiSummaryFrameBuilder.Companion.tooClose
 import com.joecollins.models.general.Party
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
 import org.awaitility.Awaitility
 import org.hamcrest.core.IsEqual
 import org.hamcrest.core.IsNot
-import org.junit.Assert
-import org.junit.Test
 import java.awt.Color
 import java.util.concurrent.TimeUnit
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.Assertions
 
 class MultiSummaryFrameBuilderTest {
     @Test
@@ -30,7 +29,7 @@ class MultiSummaryFrameBuilderTest {
             Riding("Vuntut Gwitchin"), // 6
             Riding("Watson Lake") // 7
         )
-        val frame = tooClose(
+        val frame = MultiSummaryFrameBuilder.dynamicallyFiltered(
             ridings,
             { it.isTooClose },
             { it.margin },
@@ -42,99 +41,99 @@ class MultiSummaryFrameBuilderTest {
             .build()
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.header }, IsNot(IsEqual("")))
-        Assert.assertEquals("TOO CLOSE TO CALL", frame.header)
-        Assert.assertEquals(0, frame.numRows.toLong())
+        Assertions.assertEquals("TOO CLOSE TO CALL", frame.header)
+        Assertions.assertEquals(0, frame.numRows.toLong())
 
         // add first (36)
         ridings[5].setResults(mapOf(yp to 140, ndp to 104, lib to 76, grn to 11))
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numRows }, IsEqual(1))
-        Assert.assertEquals("PELLY-NISUTLIN", frame.getRowHeader(0))
-        Assert.assertEquals(Color.BLUE, frame.getColor(0, 0))
-        Assert.assertEquals("YP: 140", frame.getValue(0, 0))
+        Assertions.assertEquals("PELLY-NISUTLIN", frame.getRowHeader(0))
+        Assertions.assertEquals(Color.BLUE, frame.getColor(0, 0))
+        Assertions.assertEquals("YP: 140", frame.getValue(0, 0))
 
         // add to top (3/36)
         ridings[6].setResults(mapOf(yp to 35, ndp to 2, lib to 38))
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numRows }, IsEqual(2))
-        Assert.assertEquals("VUNTUT GWITCHIN", frame.getRowHeader(0))
-        Assert.assertEquals(Color.RED, frame.getColor(0, 0))
-        Assert.assertEquals("LIB: 38", frame.getValue(0, 0))
-        Assert.assertEquals("PELLY-NISUTLIN", frame.getRowHeader(1))
-        Assert.assertEquals(Color.BLUE, frame.getColor(1, 0))
-        Assert.assertEquals("YP: 140", frame.getValue(1, 0))
+        Assertions.assertEquals("VUNTUT GWITCHIN", frame.getRowHeader(0))
+        Assertions.assertEquals(Color.RED, frame.getColor(0, 0))
+        Assertions.assertEquals("LIB: 38", frame.getValue(0, 0))
+        Assertions.assertEquals("PELLY-NISUTLIN", frame.getRowHeader(1))
+        Assertions.assertEquals(Color.BLUE, frame.getColor(1, 0))
+        Assertions.assertEquals("YP: 140", frame.getValue(1, 0))
 
         // add beyond limit (3/36/40)
         ridings[7].setResults(mapOf(yp to 150, ndp to 110, lib to 106, ind to 19))
-        Assert.assertEquals(2, frame.numRows.toLong())
+        Assertions.assertEquals(2, frame.numRows.toLong())
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.getRowHeader(0) }, IsEqual("VUNTUT GWITCHIN"))
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.getNumValues(0) }, IsNot(IsEqual(0)))
-        Assert.assertEquals(Color.RED, frame.getColor(0, 0))
-        Assert.assertEquals("LIB: 38", frame.getValue(0, 0))
-        Assert.assertEquals("PELLY-NISUTLIN", frame.getRowHeader(1))
-        Assert.assertEquals(Color.BLUE, frame.getColor(1, 0))
-        Assert.assertEquals("YP: 140", frame.getValue(1, 0))
+        Assertions.assertEquals(Color.RED, frame.getColor(0, 0))
+        Assertions.assertEquals("LIB: 38", frame.getValue(0, 0))
+        Assertions.assertEquals("PELLY-NISUTLIN", frame.getRowHeader(1))
+        Assertions.assertEquals(Color.BLUE, frame.getColor(1, 0))
+        Assertions.assertEquals("YP: 140", frame.getValue(1, 0))
 
         // existing updated, sorted to bottom (3/40/72)
         ridings[5].setResults(mapOf(yp to 280, ndp to 207, lib to 152, grn to 22))
-        Assert.assertEquals("VUNTUT GWITCHIN", frame.getRowHeader(0))
-        Assert.assertEquals(Color.RED, frame.getColor(0, 0))
+        Assertions.assertEquals("VUNTUT GWITCHIN", frame.getRowHeader(0))
+        Assertions.assertEquals(Color.RED, frame.getColor(0, 0))
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.getRowHeader(1) }, IsEqual("WATSON LAKE"))
-        Assert.assertEquals("LIB: 38", frame.getValue(0, 0))
-        Assert.assertEquals(Color.BLUE, frame.getColor(1, 0))
-        Assert.assertEquals("YP: 150", frame.getValue(1, 0))
+        Assertions.assertEquals("LIB: 38", frame.getValue(0, 0))
+        Assertions.assertEquals(Color.BLUE, frame.getColor(1, 0))
+        Assertions.assertEquals("YP: 150", frame.getValue(1, 0))
 
         // bottom (out of view) removed (3/40)
         ridings[5].setWinner(yp)
-        Assert.assertEquals("VUNTUT GWITCHIN", frame.getRowHeader(0))
-        Assert.assertEquals(Color.RED, frame.getColor(0, 0))
-        Assert.assertEquals("LIB: 38", frame.getValue(0, 0))
-        Assert.assertEquals("WATSON LAKE", frame.getRowHeader(1))
-        Assert.assertEquals(Color.BLUE, frame.getColor(1, 0))
-        Assert.assertEquals("YP: 150", frame.getValue(1, 0))
+        Assertions.assertEquals("VUNTUT GWITCHIN", frame.getRowHeader(0))
+        Assertions.assertEquals(Color.RED, frame.getColor(0, 0))
+        Assertions.assertEquals("LIB: 38", frame.getValue(0, 0))
+        Assertions.assertEquals("WATSON LAKE", frame.getRowHeader(1))
+        Assertions.assertEquals(Color.BLUE, frame.getColor(1, 0))
+        Assertions.assertEquals("YP: 150", frame.getValue(1, 0))
 
         // update in view (7/40)
         ridings[6].setResults(mapOf(yp to 70, ndp to 3, lib to 77))
-        Assert.assertEquals("VUNTUT GWITCHIN", frame.getRowHeader(0))
-        Assert.assertEquals(Color.RED, frame.getColor(0, 0))
+        Assertions.assertEquals("VUNTUT GWITCHIN", frame.getRowHeader(0))
+        Assertions.assertEquals(Color.RED, frame.getColor(0, 0))
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.getRowHeader(1) }, IsEqual("WATSON LAKE"))
-        Assert.assertEquals("LIB: 77", frame.getValue(0, 0))
-        Assert.assertEquals(Color.BLUE, frame.getColor(1, 0))
-        Assert.assertEquals("YP: 150", frame.getValue(1, 0))
+        Assertions.assertEquals("LIB: 77", frame.getValue(0, 0))
+        Assertions.assertEquals(Color.BLUE, frame.getColor(1, 0))
+        Assertions.assertEquals("YP: 150", frame.getValue(1, 0))
 
         // remove from in view (40)
         ridings[6].setWinner(lib)
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numRows }, IsEqual(1))
-        Assert.assertEquals("WATSON LAKE", frame.getRowHeader(0))
-        Assert.assertEquals(Color.BLUE, frame.getColor(0, 0))
-        Assert.assertEquals("YP: 150", frame.getValue(0, 0))
+        Assertions.assertEquals("WATSON LAKE", frame.getRowHeader(0))
+        Assertions.assertEquals(Color.BLUE, frame.getColor(0, 0))
+        Assertions.assertEquals("YP: 150", frame.getValue(0, 0))
 
         // add to top (25/40)
         ridings[1].setResults(mapOf(yp to 169, ndp to 76, lib to 144))
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numRows }, IsEqual(2))
-        Assert.assertEquals("KLUANE", frame.getRowHeader(0))
-        Assert.assertEquals(Color.BLUE, frame.getColor(0, 0))
-        Assert.assertEquals("YP: 169", frame.getValue(0, 0))
-        Assert.assertEquals("WATSON LAKE", frame.getRowHeader(1))
-        Assert.assertEquals(Color.BLUE, frame.getColor(1, 0))
-        Assert.assertEquals("YP: 150", frame.getValue(1, 0))
+        Assertions.assertEquals("KLUANE", frame.getRowHeader(0))
+        Assertions.assertEquals(Color.BLUE, frame.getColor(0, 0))
+        Assertions.assertEquals("YP: 169", frame.getValue(0, 0))
+        Assertions.assertEquals("WATSON LAKE", frame.getRowHeader(1))
+        Assertions.assertEquals(Color.BLUE, frame.getColor(1, 0))
+        Assertions.assertEquals("YP: 150", frame.getValue(1, 0))
 
         // update in view, sorted (40/49)
         ridings[1].setResults(mapOf(yp to 338, ndp to 153, lib to 289))
-        Assert.assertEquals(2, frame.numRows.toLong())
+        Assertions.assertEquals(2, frame.numRows.toLong())
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.getRowHeader(0) }, IsEqual("WATSON LAKE"))
-        Assert.assertEquals(Color.BLUE, frame.getColor(0, 0))
-        Assert.assertEquals("YP: 150", frame.getValue(0, 0))
-        Assert.assertEquals("KLUANE", frame.getRowHeader(1))
-        Assert.assertEquals(Color.BLUE, frame.getColor(1, 0))
-        Assert.assertEquals("YP: 338", frame.getValue(1, 0))
+        Assertions.assertEquals(Color.BLUE, frame.getColor(0, 0))
+        Assertions.assertEquals("YP: 150", frame.getValue(0, 0))
+        Assertions.assertEquals("KLUANE", frame.getRowHeader(1))
+        Assertions.assertEquals(Color.BLUE, frame.getColor(1, 0))
+        Assertions.assertEquals("YP: 338", frame.getValue(1, 0))
     }
 
     private class Riding(val name: String) {
