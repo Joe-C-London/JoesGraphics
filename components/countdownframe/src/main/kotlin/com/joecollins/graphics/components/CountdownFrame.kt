@@ -3,6 +3,7 @@ package com.joecollins.graphics.components
 import com.joecollins.graphics.utils.StandardFont
 import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
+import org.jetbrains.annotations.TestOnly
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.EventQueue
@@ -30,7 +31,8 @@ class CountdownFrame(
     borderColorPublisher = borderColorPublisher
 ) {
 
-    internal var clock: Clock = Clock.systemDefaultZone()
+    var clock: Clock = Clock.systemDefaultZone()
+        @TestOnly
         set(value) {
             field = value
             refresh()

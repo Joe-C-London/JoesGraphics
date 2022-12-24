@@ -4,8 +4,6 @@ import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.pubsub.asOneTimePublisher
 import org.awaitility.Awaitility
 import org.hamcrest.core.IsEqual
-import org.junit.Assert
-import org.junit.Test
 import java.awt.Color
 import java.time.Clock
 import java.time.Duration
@@ -13,6 +11,8 @@ import java.time.Instant
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.concurrent.TimeUnit
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.Assertions
 
 class CountdownFrameTest {
     @Test
@@ -25,7 +25,7 @@ class CountdownFrameTest {
         frame.clock = Clock.fixed(Instant.parse("2020-07-04T12:34:56Z"), ZoneId.of("UTC"))
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.getTimeRemaining().toDays() }, IsEqual(1L))
-        Assert.assertEquals(
+        Assertions.assertEquals(
             Duration.ofDays(1).plusHours(10).plusMinutes(25).plusSeconds(4),
             frame.getTimeRemaining()
         )
@@ -53,7 +53,7 @@ class CountdownFrameTest {
         frame.clock = Clock.fixed(Instant.parse("2020-07-04T12:34:56Z"), ZoneId.of("UTC"))
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.getTimeRemainingString() }, IsEqual("1:10:25:04"))
-        Assert.assertEquals("1:10:25:04", frame.getTimeRemainingString())
+        Assertions.assertEquals("1:10:25:04", frame.getTimeRemainingString())
         frame.clock = Clock.fixed(Instant.parse("2020-07-04T12:34:57Z"), ZoneId.of("UTC"))
         Thread.sleep(200)
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
