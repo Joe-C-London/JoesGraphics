@@ -21,11 +21,13 @@ targetCompatibility = 17
 group 'com.joecollins'
 version '1.0-SNAPSHOT'
 
-repositories {
-    maven {
-        url "https://repo.osgeo.org/repository/release/"
+allprojects {
+    repositories {
+        maven {
+            url "https://repo.osgeo.org/repository/release/"
+        }
+        mavenCentral()
     }
-    mavenCentral()
 }
 
 def geotoolsVersion = '27.1'
