@@ -15,18 +15,23 @@ group 'com.joecollins'
 version '1.0-SNAPSHOT'
 
 repositories {
+    maven {
+        url "https://repo.osgeo.org/repository/release/"
+    }
     mavenCentral()
 }
 
-dependencies {
-    api project('screenbase')
+var topLevel = parent.parent
 
-    api project('basicresult')
-    api project('candidatelisting')
-    api project('countdown')
-    api project('mixedmemberresult')
-    api project('multiresult')
-    api project('tooclosetocall')
+dependencies {
+    implementation parent.project('screenbase')
+
+    implementation topLevel.project('models')
+    implementation topLevel.project('components:barframe')
+    implementation topLevel.project('components:resultmapframebuilder')
+
+    testImplementation topLevel.project('shapefiles')
+    testImplementation topLevel.project('testutils')
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'

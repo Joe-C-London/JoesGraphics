@@ -1,16 +1,16 @@
 package com.joecollins.graphics.screens.generic
 
-import com.joecollins.graphics.utils.RenderTestUtils
+import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.graphics.utils.ShapefileReader
 import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.Party
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.map
-import org.junit.Test
 import java.awt.Color
 import java.awt.Dimension
 import java.awt.Shape
+import org.junit.jupiter.api.Test
 
 class CandidateListingScreenTest {
 
@@ -32,7 +32,7 @@ class CandidateListingScreenTest {
         )
             .build("SOURIS-ELMIRA".asOneTimePublisher())
         screen.size = Dimension(1024, 512)
-        RenderTestUtils.compareRendering("CandidateListingScreen", "CandidatesOnly", screen)
+        compareRendering("CandidateListingScreen", "CandidatesOnly", screen)
     }
 
     @Test
@@ -64,7 +64,7 @@ class CandidateListingScreenTest {
             )
             .build("SOURIS-ELMIRA".asOneTimePublisher())
         screen.size = Dimension(1024, 512)
-        RenderTestUtils.compareRendering("CandidateListingScreen", "CandidatesWithPrev", screen)
+        compareRendering("CandidateListingScreen", "CandidatesWithPrev", screen)
     }
 
     @Test
@@ -103,7 +103,7 @@ class CandidateListingScreenTest {
             )
             .build("SOURIS-ELMIRA".asOneTimePublisher())
         screen.size = Dimension(1024, 512)
-        RenderTestUtils.compareRendering("CandidateListingScreen", "CandidatesWithPrevAndMap", screen)
+        compareRendering("CandidateListingScreen", "CandidatesWithPrevAndMap", screen)
     }
 
     @Test
@@ -145,7 +145,7 @@ class CandidateListingScreenTest {
             )
             .build("CHARLOTTETOWN-WEST ROYALTY".asOneTimePublisher())
         screen.size = Dimension(1024, 512)
-        RenderTestUtils.compareRendering("CandidateListingScreen", "CandidatesWithPrevOtherAndMap", screen)
+        compareRendering("CandidateListingScreen", "CandidatesWithPrevOtherAndMap", screen)
     }
 
     @Test
@@ -195,7 +195,7 @@ class CandidateListingScreenTest {
             )
             .build("SOURIS-ELMIRA".asOneTimePublisher())
         screen.size = Dimension(1024, 512)
-        RenderTestUtils.compareRendering("CandidateListingScreen", "CandidatesWithSecondaryPrevAndMap", screen)
+        compareRendering("CandidateListingScreen", "CandidatesWithSecondaryPrevAndMap", screen)
     }
 
     @Test
@@ -238,7 +238,7 @@ class CandidateListingScreenTest {
             )
             .build("SOURIS-ELMIRA".asOneTimePublisher())
         screen.size = Dimension(1024, 512)
-        RenderTestUtils.compareRendering("CandidateListingScreen", "CandidatesWithSecondaryPrev", screen)
+        compareRendering("CandidateListingScreen", "CandidatesWithSecondaryPrev", screen)
     }
 
     @Test
@@ -300,7 +300,7 @@ class CandidateListingScreenTest {
             )
             .build(districtName)
         screen.size = Dimension(1024, 512)
-        RenderTestUtils.compareRendering("CandidateListingScreen", "CandidatesUpdating-1", screen)
+        compareRendering("CandidateListingScreen", "CandidatesUpdating-1", screen)
 
         candidates.submit(
             listOf(
@@ -316,7 +316,7 @@ class CandidateListingScreenTest {
         districtName.submit("STANHOME-MARSFIELD")
         districtNum.submit(8)
         focus.submit(listOf(8, 15, 16, 17, 18, 19, 20))
-        RenderTestUtils.compareRendering("CandidateListingScreen", "CandidatesUpdating-2", screen)
+        compareRendering("CandidateListingScreen", "CandidatesUpdating-2", screen)
     }
 
     @Test
@@ -344,7 +344,7 @@ class CandidateListingScreenTest {
             .withTwoColumns(candidatesPublisher.map { it.size > 20 })
             .build("MISSISSAUGA—LAKESHORE".asOneTimePublisher())
         screen.size = Dimension(1024, 512)
-        RenderTestUtils.compareRendering("CandidateListingScreen", "TwoColumns-1", screen)
+        compareRendering("CandidateListingScreen", "TwoColumns-1", screen)
 
         candidatesPublisher.submit(
             listOf(
@@ -391,7 +391,7 @@ class CandidateListingScreenTest {
             )
         )
         header.submit("2022 BY-ELECTION CANDIDATES")
-        RenderTestUtils.compareRendering("CandidateListingScreen", "TwoColumns-2", screen)
+        compareRendering("CandidateListingScreen", "TwoColumns-2", screen)
     }
 
     private fun peiShapesByDistrict(): Map<Int, Shape> {

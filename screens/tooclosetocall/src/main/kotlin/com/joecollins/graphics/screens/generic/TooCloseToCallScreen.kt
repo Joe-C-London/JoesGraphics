@@ -2,10 +2,10 @@ package com.joecollins.graphics.screens.generic
 
 import com.joecollins.graphics.AltTextProvider
 import com.joecollins.graphics.GenericPanel
-import com.joecollins.graphics.GenericWindow
+import com.joecollins.graphics.GenericWindow.Companion
+import com.joecollins.graphics.GenericWindow.Companion.ALT_TEXT_MAX_LENGTH
 import com.joecollins.graphics.components.MultiSummaryFrame
 import com.joecollins.models.general.Aggregators
-import com.joecollins.models.general.Aggregators.adjustKey
 import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
@@ -180,7 +180,7 @@ class TooCloseToCallScreen private constructor(
                     }"
                     if (dotDotDot) {
                         null
-                    } else if (size + entry.length < GenericWindow.ALT_TEXT_MAX_LENGTH - 10) {
+                    } else if (size + entry.length < ALT_TEXT_MAX_LENGTH - 10) {
                         size += entry.length + 1
                         entry
                     } else {
@@ -215,14 +215,14 @@ class TooCloseToCallScreen private constructor(
                                         Pair(
                                             e.key.party.color,
                                             e.key.party.abbreviation.uppercase() +
-                                                ": " +
-                                                (
-                                                    if (input.showPcts) {
-                                                        pctFormatter.format(e.value / total)
-                                                    } else {
-                                                        thousandsFormatter.format(e.value)
-                                                    }
-                                                    )
+                                                    ": " +
+                                                    (
+                                                            if (input.showPcts) {
+                                                                pctFormatter.format(e.value / total)
+                                                            } else {
+                                                                thousandsFormatter.format(e.value)
+                                                            }
+                                                            )
                                         )
                                     },
                                 generateSequence { Pair(Color.WHITE, "") }
@@ -262,7 +262,7 @@ class TooCloseToCallScreen private constructor(
             return Builder(
                 headerPublisher,
                 entries,
-                { t: T -> votesPublisher(t).map { v -> adjustKey(v) { p -> Candidate("", p) } } },
+                { t: T -> votesPublisher(t).map { v -> Aggregators.adjustKey(v) { p -> Candidate("", p) } } },
                 resultPublisher,
                 labelFunc
             )

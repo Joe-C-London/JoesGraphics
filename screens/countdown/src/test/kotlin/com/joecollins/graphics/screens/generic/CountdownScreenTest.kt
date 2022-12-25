@@ -1,9 +1,8 @@
 package com.joecollins.graphics.screens.generic
 
-import com.joecollins.graphics.utils.RenderTestUtils
+import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.graphics.utils.ShapefileReader
 import com.joecollins.pubsub.asOneTimePublisher
-import org.junit.Test
 import java.awt.Dimension
 import java.awt.Shape
 import java.time.Clock
@@ -11,6 +10,8 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.Assertions
 
 class CountdownScreenTest {
 
@@ -21,7 +22,7 @@ class CountdownScreenTest {
             .withClock(Clock.fixed(Instant.parse("2022-08-29T18:58:39.300Z"), ZoneId.of("UTC")))
             .build("COUNTDOWN TO THE CLOSE".asOneTimePublisher())
         screen.size = Dimension(1024, 512)
-        RenderTestUtils.compareRendering("CountdownScreen", "SingleCountdown", screen, 10)
+        compareRendering("CountdownScreen", "SingleCountdown", screen, 10)
     }
 
     @Test
@@ -31,7 +32,7 @@ class CountdownScreenTest {
             .withClock(Clock.fixed(Instant.parse("2022-08-29T18:58:39.300Z"), ZoneId.of("UTC")))
             .build("COUNTDOWN TO THE CLOSE".asOneTimePublisher())
         screen.size = Dimension(1024, 512)
-        RenderTestUtils.compareRendering("CountdownScreen", "SingleCountdownAsCollection", screen)
+        compareRendering("CountdownScreen", "SingleCountdownAsCollection", screen)
     }
 
     @Test
@@ -42,7 +43,7 @@ class CountdownScreenTest {
             .withClock(Clock.fixed(Instant.parse("2022-08-29T18:58:39.300Z"), ZoneId.of("UTC")))
             .build("COUNTDOWN TO THE CLOSE".asOneTimePublisher())
         screen.size = Dimension(1024, 512)
-        RenderTestUtils.compareRendering("CountdownScreen", "DoubleCountdownSameTime", screen, 10)
+        compareRendering("CountdownScreen", "DoubleCountdownSameTime", screen, 10)
     }
 
     @Test
@@ -55,7 +56,7 @@ class CountdownScreenTest {
             .withClock(Clock.fixed(Instant.parse("2022-08-29T18:58:39.300Z"), ZoneId.of("UTC")))
             .build("COUNTDOWN TO THE CLOSE".asOneTimePublisher())
         screen.size = Dimension(1024, 512)
-        RenderTestUtils.compareRendering("CountdownScreen", "QuadrupleCountdownDifferentTimes", screen)
+        compareRendering("CountdownScreen", "QuadrupleCountdownDifferentTimes", screen)
     }
 
     @Test
@@ -70,7 +71,7 @@ class CountdownScreenTest {
             .withClock(Clock.fixed(Instant.parse("2021-08-29T18:58:39.300Z"), ZoneId.of("UTC")))
             .build("COUNTDOWN TO THE CLOSE".asOneTimePublisher())
         screen.size = Dimension(1024, 512)
-        RenderTestUtils.compareRendering("CountdownScreen", "SixWithoutMap", screen)
+        compareRendering("CountdownScreen", "SixWithoutMap", screen)
     }
 
     @Test
@@ -86,7 +87,7 @@ class CountdownScreenTest {
             .withTimesUpLabel("POLLS CLOSED")
             .build("COUNTDOWN TO THE CLOSE".asOneTimePublisher())
         screen.size = Dimension(1024, 512)
-        RenderTestUtils.compareRendering("CountdownScreen", "CompletionLabel", screen)
+        compareRendering("CountdownScreen", "CompletionLabel", screen)
     }
 
     private fun peiShapesByDistrict(): Map<Int, Shape> {

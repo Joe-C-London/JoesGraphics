@@ -141,7 +141,13 @@ class CandidateListingScreen private constructor(
             focus: Flow.Publisher<out List<K>?>,
             header: Flow.Publisher<out String>
         ): Builder {
-            mapPanel = MapBuilder(shapes, selectedShape, (null as PartyResult?).asOneTimePublisher(), focus, header).createMapFrame()
+            mapPanel = MapBuilder(
+                shapes,
+                selectedShape,
+                (null as PartyResult?).asOneTimePublisher(),
+                focus,
+                header
+            ).createMapFrame()
             return this
         }
 
@@ -152,7 +158,14 @@ class CandidateListingScreen private constructor(
             additionalHighlight: Flow.Publisher<out List<K>?>,
             header: Flow.Publisher<out String>
         ): Builder {
-            mapPanel = MapBuilder(shapes, selectedShape, (null as PartyResult?).asOneTimePublisher(), focus, additionalHighlight, header).createMapFrame()
+            mapPanel = MapBuilder(
+                shapes,
+                selectedShape,
+                (null as PartyResult?).asOneTimePublisher(),
+                focus,
+                additionalHighlight,
+                header
+            ).createMapFrame()
             return this
         }
 

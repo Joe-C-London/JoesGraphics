@@ -1,5 +1,7 @@
 package com.joecollins.graphics.components
 
+import com.joecollins.pubsub.Subscriber
+import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
 import java.awt.BasicStroke
 import java.awt.BorderLayout
 import java.awt.Color
@@ -29,7 +31,7 @@ class MapFrame(
     outlineShapesPublisher: Flow.Publisher<out List<Shape>>? = null,
     notesPublisher: Flow.Publisher<out String?>? = null,
     borderColorPublisher: Flow.Publisher<out Color>? = null
-) : com.joecollins.graphics.components.GraphicsFrame(
+) : GraphicsFrame(
     headerPublisher = headerPublisher,
     notesPublisher = notesPublisher,
     borderColorPublisher = borderColorPublisher
@@ -242,13 +244,7 @@ class MapFrame(
             }
             repaint()
         }
-        shapesPublisher.subscribe(
-            com.joecollins.pubsub.Subscriber(
-                com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper(
-                    onShapesUpdate
-                )
-            )
-        )
+        shapesPublisher.subscribe(Subscriber(eventQueueWrapper(onShapesUpdate)))
 
         val onFocusBoxUpdate: (Rectangle2D?) -> Unit = { focus ->
             if (this.focus != focus) {
@@ -262,8 +258,8 @@ class MapFrame(
         }
         if (focusBoxPublisher != null) {
             focusBoxPublisher.subscribe(
-                com.joecollins.pubsub.Subscriber(
-                    com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper(
+                Subscriber(
+                    eventQueueWrapper(
                         onFocusBoxUpdate
                     )
                 )
@@ -278,8 +274,8 @@ class MapFrame(
         }
         if (outlineShapesPublisher != null) {
             outlineShapesPublisher.subscribe(
-                com.joecollins.pubsub.Subscriber(
-                    com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper(
+                Subscriber(
+                    eventQueueWrapper(
                         onOutlineShapesUpdate
                     )
                 )

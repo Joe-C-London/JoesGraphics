@@ -2,16 +2,15 @@ package com.joecollins.graphics.screens.generic
 
 import com.joecollins.graphics.GenericPanel
 import com.joecollins.graphics.components.CountdownFrame
+import com.joecollins.graphics.components.MapFrame
 import com.joecollins.graphics.components.MapFrameBuilder
 import com.joecollins.pubsub.asOneTimePublisher
-import com.joecollins.pubsub.map
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Dimension
 import java.awt.GridLayout
 import java.awt.Shape
 import java.awt.geom.Area
-import java.lang.Math.random
 import java.time.Clock
 import java.time.Instant
 import java.time.LocalDate
@@ -65,7 +64,7 @@ class CountdownScreen private constructor(panel: JPanel, title: Flow.Publisher<S
                 4 -> listOf(Color.RED, Color.GREEN.darker(), Color.BLUE, Color.MAGENTA)
                 5 -> listOf(Color.RED, Color.ORANGE, Color.GREEN.darker(), Color.BLUE, Color.MAGENTA)
                 6 -> listOf(Color.RED, Color.ORANGE, Color.GREEN.darker(), Color.CYAN.darker(), Color.BLUE, Color.MAGENTA)
-                else -> generateSequence { Color((0x1000000 * random()).toInt()) }.take(timings.size).toList()
+                else -> generateSequence { Color((0x1000000 * Math.random()).toInt()) }.take(timings.size).toList()
             }
 
             (colors.indices).forEach {
@@ -90,9 +89,11 @@ class CountdownScreen private constructor(panel: JPanel, title: Flow.Publisher<S
                 top.add(frame)
             }
 
-            val map = MapFrameBuilder.from((colors.indices).flatMap { idx -> timings[idx].third.map { s -> s to colors[idx] } }.asOneTimePublisher())
-                .withBorderColor(Color.WHITE.asOneTimePublisher())
-                .build()
+            val map = MapFrame(
+                shapesPublisher = (colors.indices).flatMap { idx -> timings[idx].third.map { s -> s to colors[idx] } }.asOneTimePublisher(),
+                headerPublisher = null.asOneTimePublisher(),
+                borderColorPublisher = Color.WHITE.asOneTimePublisher()
+            )
             outer.add(map, BorderLayout.CENTER)
 
             return CountdownScreen(outer, title)

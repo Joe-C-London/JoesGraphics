@@ -1,10 +1,8 @@
 package com.joecollins.graphics.screens.generic
 
-import com.joecollins.graphics.screens.generic.TooCloseToCallScreen.Companion.of
-import com.joecollins.graphics.screens.generic.TooCloseToCallScreen.Companion.ofParty
 import com.joecollins.graphics.utils.PublisherTestUtils.assertPublishes
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
-import com.joecollins.models.general.Aggregators.adjustKey
+import com.joecollins.models.general.Aggregators
 import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
@@ -14,8 +12,8 @@ import com.joecollins.models.general.PollsReporting
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.map
-import org.junit.Test
 import java.awt.Color
+import org.junit.jupiter.api.Test
 
 @Suppress("UNCHECKED_CAST")
 class TooCloseToCallScreenTest {
@@ -25,7 +23,7 @@ class TooCloseToCallScreenTest {
         val partyResultsRaw: MutableMap<Int, PartyResult> = HashMap()
         val candidateVotes = Publisher<Map<Int, Map<Candidate, Int>>>(candidateVotesRaw)
         val partyResults = Publisher<Map<Int, PartyResult>>(partyResultsRaw)
-        val screen = of(
+        val screen = TooCloseToCallScreen.of(
             (1..27).toSet().asOneTimePublisher(),
             { candidateVotes.map { v -> v[it] ?: emptyMap() } },
             { partyResults.map { v -> v[it] } },
@@ -139,7 +137,7 @@ class TooCloseToCallScreenTest {
         val candidateVotes = Publisher<Map<Int, Map<Candidate, Int>>>(candidateVotesRaw)
         val partyResults = Publisher<Map<Int, PartyResult>>(partyResultsRaw)
         val pctReporting = Publisher<Map<Int, Double>>(pctReportingRaw)
-        val screen = of(
+        val screen = TooCloseToCallScreen.of(
             (1..27).toSet().asOneTimePublisher(),
             { candidateVotes.map { v -> v[it] ?: emptyMap() } },
             { partyResults.map { v -> v[it] } },
@@ -257,7 +255,7 @@ class TooCloseToCallScreenTest {
         val candidateVotes = Publisher<Map<Int, Map<Candidate, Int>>>(candidateVotesRaw)
         val partyResults = Publisher<Map<Int, PartyResult>>(partyResultsRaw)
         val pollsReporting = Publisher<Map<Int, PollsReporting>>(pollsReportingRaw)
-        val screen = of(
+        val screen = TooCloseToCallScreen.of(
             (1..27).toSet().asOneTimePublisher(),
             { candidateVotes.map { v -> v[it] ?: emptyMap() } },
             { partyResults.map { v -> v[it] } },
@@ -376,7 +374,7 @@ class TooCloseToCallScreenTest {
         val candidateVotes = Publisher<Map<Int, Map<Candidate, Int>>>(candidateVotesRaw)
         val partyResults = Publisher<Map<Int, PartyResult>>(partyResultsRaw)
         val pctReporting = Publisher<Map<Int, Double>>(pctReportingRaw)
-        val screen = of(
+        val screen = TooCloseToCallScreen.of(
             (1..27).toSet().asOneTimePublisher(),
             { candidateVotes.map { v -> v[it] ?: emptyMap() } },
             { partyResults.map { v -> v[it] } },
@@ -491,7 +489,7 @@ class TooCloseToCallScreenTest {
         val candidateVotes = Publisher<Map<Int, Map<Candidate, Int>>>(candidateVotesRaw)
         val partyResults = Publisher<Map<Int, PartyResult>>(partyResultsRaw)
         val pctReporting = Publisher<Map<Int, Double>>(pctReportingRaw)
-        val screen = of(
+        val screen = TooCloseToCallScreen.of(
             (1..27).toSet().asOneTimePublisher(),
             { candidateVotes.map { v -> v[it] ?: emptyMap() } },
             { partyResults.map { v -> v[it] } },
@@ -603,9 +601,9 @@ class TooCloseToCallScreenTest {
         val partyResultsRaw: MutableMap<Int, PartyResult> = HashMap()
         val candidateVotes = Publisher<Map<Int, Map<Candidate, Int>>>(candidateVotesRaw)
         val partyResults = Publisher<Map<Int, PartyResult>>(partyResultsRaw)
-        val screen = ofParty(
+        val screen = TooCloseToCallScreen.ofParty(
             (1..27).toSet().asOneTimePublisher(),
-            { candidateVotes.map { v -> adjustKey(v[it] ?: emptyMap()) { c -> c.party } } },
+            { candidateVotes.map { v -> Aggregators.adjustKey(v[it] ?: emptyMap()) { c -> c.party } } },
             { partyResults.map { v -> v[it] } },
             { "DISTRICT $it".asOneTimePublisher() },
             "TOO CLOSE TO CALL".asOneTimePublisher()
@@ -716,9 +714,9 @@ class TooCloseToCallScreenTest {
         val partyResultsRaw: MutableMap<Int, PartyResult?> = (1..27).associateWith { null }.toMutableMap()
         val candidateVotes = Publisher<Map<Int, Map<Candidate, Int>>>(candidateVotesRaw)
         val partyResults = Publisher<Map<Int, PartyResult?>>(partyResultsRaw)
-        val screen = ofParty(
+        val screen = TooCloseToCallScreen.ofParty(
             (1..27).toSet().asOneTimePublisher(),
-            { candidateVotes.map { v -> adjustKey(v[it] ?: emptyMap()) { c -> c.party } } },
+            { candidateVotes.map { v -> Aggregators.adjustKey(v[it] ?: emptyMap()) { c -> c.party } } },
             { partyResults.map { v -> v[it] } },
             { "DISTRICT $it".asOneTimePublisher() },
             "TOO CLOSE TO CALL".asOneTimePublisher()
@@ -1597,7 +1595,7 @@ class TooCloseToCallScreenTest {
         val partyResultsRaw: MutableMap<Int, PartyResult> = HashMap()
         val candidateVotes = Publisher<Map<Int, Map<Candidate, Int>>>(candidateVotesRaw)
         val partyResults = Publisher<Map<Int, PartyResult>>(partyResultsRaw)
-        val screen = of(
+        val screen = TooCloseToCallScreen.of(
             (1..27).toSet().asOneTimePublisher(),
             { candidateVotes.map { v -> v[it] ?: emptyMap() } },
             { partyResults.map { v -> v[it] } },
