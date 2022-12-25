@@ -6,7 +6,6 @@ import com.joecollins.graphics.ImageGenerator
 import com.joecollins.graphics.components.BarFrameBuilder
 import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.Party
-import com.joecollins.models.general.PartyResult
 import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.map
 import com.joecollins.pubsub.merge
@@ -104,7 +103,13 @@ class SingleTransferrableResultScreen private constructor(
             focus: Flow.Publisher<out List<T>?>,
             header: Flow.Publisher<out String?>
         ): Builder {
-            mapBuilder = MapBuilder(shapes, selectedShape, leadingParty.map { PartyResult.elected(it) }, focus, header)
+            mapBuilder = MapBuilder(
+                shapes,
+                selectedShape,
+                leadingParty.map { com.joecollins.models.general.PartyResult.elected(it) },
+                focus,
+                header
+            )
             return this
         }
 
@@ -141,7 +146,11 @@ class SingleTransferrableResultScreen private constructor(
                         if (v == null) {
                             "WAITING..."
                         } else {
-                            "${if (v is Int) DecimalFormat("#,##0").format(v.toInt()) else DecimalFormat("#,##0.00").format(v.toDouble())}${if (q == null) "" else " (${DecimalFormat("0.00").format(v.toDouble() / q.toDouble())})"}"
+                            "${if (v is Int) 
+                                DecimalFormat("#,##0").format(v.toInt()) 
+                            else DecimalFormat("#,##0.00").format(v.toDouble())}${if (q == null) "" else " (${
+                                DecimalFormat("0.00").format(v.toDouble() / q.toDouble())
+                            })"}"
                         }
                         }${if (el.any { it.first == c }) " ELECTED" else if (ex.contains(c)) " EXCLUDED" else ""}"
                     } +
@@ -220,7 +229,10 @@ class SingleTransferrableResultScreen private constructor(
                         .map {
                             BarFrameBuilder.BasicBar(
                                 label = it.key.name.uppercase() + (if (it.key.incumbent) " $incumbentMarker" else "") + " (${it.key.party.abbreviation.uppercase()})",
-                                valueLabel = if (it.value == null) "WAITING..." else (formatString(it.value!!) + (if (quota == null) "" else (" (" + formatString(it.value!!.toDouble() / quota.toDouble()) + ")"))),
+                                valueLabel = if (it.value == null)
+                                    "WAITING..."
+                                else
+                                    (formatString(it.value!!) + (if (quota == null) "" else (" (" + formatString(it.value!!.toDouble() / quota.toDouble()) + ")"))),
                                 color = it.key.party.color,
                                 value = (it.value ?: 0),
                                 shape = when {

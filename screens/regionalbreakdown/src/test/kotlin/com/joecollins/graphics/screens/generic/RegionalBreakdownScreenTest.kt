@@ -1,19 +1,12 @@
 package com.joecollins.graphics.screens.generic
 
-import com.joecollins.graphics.screens.generic.RegionalBreakdownScreen.Companion.seats
-import com.joecollins.graphics.screens.generic.RegionalBreakdownScreen.Companion.seatsWithDiff
-import com.joecollins.graphics.screens.generic.RegionalBreakdownScreen.Companion.seatsWithPrev
-import com.joecollins.graphics.screens.generic.RegionalBreakdownScreen.Companion.votes
-import com.joecollins.graphics.screens.generic.RegionalBreakdownScreen.Companion.votesPollsReporting
-import com.joecollins.graphics.screens.generic.RegionalBreakdownScreen.Companion.votesWithPrev
-import com.joecollins.graphics.screens.generic.RegionalBreakdownScreen.Companion.votesWithPrevPollsReporting
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.models.general.Coalition
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PollsReporting
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import java.awt.Color
 import java.awt.Dimension
 
@@ -25,7 +18,7 @@ class RegionalBreakdownScreenTest {
         val malpequeSeats = Publisher<Map<Party, Int>>(emptyMap())
         val charlottetownSeats = Publisher<Map<Party, Int>>(emptyMap())
         val egmontSeats = Publisher<Map<Party, Int>>(emptyMap())
-        val screen = seats(
+        val screen = RegionalBreakdownScreen.seats(
             "PRINCE EDWARD ISLAND".asOneTimePublisher(),
             peiSeats,
             27.asOneTimePublisher(),
@@ -62,7 +55,7 @@ class RegionalBreakdownScreenTest {
         val malpequeDiff = Publisher<Map<Party, Int>>(emptyMap())
         val charlottetownDiff = Publisher<Map<Party, Int>>(emptyMap())
         val egmontDiff = Publisher<Map<Party, Int>>(emptyMap())
-        val screen = seatsWithDiff(
+        val screen = RegionalBreakdownScreen.seatsWithDiff(
             "PRINCE EDWARD ISLAND".asOneTimePublisher(),
             peiSeats,
             peiDiff,
@@ -77,11 +70,13 @@ class RegionalBreakdownScreenTest {
             .build("PRINCE EDWARD ISLAND".asOneTimePublisher())
         screen.setSize(1024, 512)
         compareRendering("RegionalBreakdownScreen", "SeatsWithDiff-1", screen)
+
         peiSeats.submit(mapOf(grn to 1))
         peiDiff.submit(mapOf(grn to +1, lib to -1))
         cardiganSeats.submit(mapOf(grn to 1))
         cardiganDiff.submit(mapOf(grn to +1, lib to -1))
         compareRendering("RegionalBreakdownScreen", "SeatsWithDiff-2", screen)
+
         peiSeats.submit(mapOf(pc to 13, grn to 8, lib to 6))
         peiDiff.submit(mapOf(pc to +5, grn to +7, lib to -12))
         cardiganSeats.submit(mapOf(pc to 6, grn to 1))
@@ -107,7 +102,7 @@ class RegionalBreakdownScreenTest {
         val malpequePrev = Publisher<Map<Party, Int>>(emptyMap())
         val charlottetownPrev = Publisher<Map<Party, Int>>(emptyMap())
         val egmontPrev = Publisher<Map<Party, Int>>(emptyMap())
-        val screen = seatsWithPrev(
+        val screen = RegionalBreakdownScreen.seatsWithPrev(
             "PRINCE EDWARD ISLAND".asOneTimePublisher(),
             peiSeats,
             peiPrev,
@@ -122,11 +117,13 @@ class RegionalBreakdownScreenTest {
             .build("PRINCE EDWARD ISLAND".asOneTimePublisher())
         screen.setSize(1024, 512)
         compareRendering("RegionalBreakdownScreen", "SeatsWithDiff-1", screen)
+        
         peiSeats.submit(mapOf(grn to 1))
         peiPrev.submit(mapOf(lib to 1))
         cardiganSeats.submit(mapOf(grn to 1))
         cardiganPrev.submit(mapOf(lib to 1))
         compareRendering("RegionalBreakdownScreen", "SeatsWithDiff-2", screen)
+
         peiSeats.submit(mapOf(pc to 13, grn to 8, lib to 6))
         peiPrev.submit(mapOf(pc to 8, grn to 1, lib to 18))
         cardiganSeats.submit(mapOf(pc to 6, grn to 1))
@@ -149,7 +146,7 @@ class RegionalBreakdownScreenTest {
         val alp = Party("Labor", "ALP", Color.RED)
         val oth = Party.OTHERS
 
-        val screen = seats(
+        val screen = RegionalBreakdownScreen.seats(
             "AUSTRALIA".asOneTimePublisher(),
             mapOf(alp to 68, coa to 77, oth to 6).asOneTimePublisher(),
             151.asOneTimePublisher(),
@@ -178,7 +175,7 @@ class RegionalBreakdownScreenTest {
         val alp = Party("Labor", "ALP", Color.RED)
         val oth = Party.OTHERS
 
-        val screen = seatsWithPrev(
+        val screen = RegionalBreakdownScreen.seatsWithPrev(
             "AUSTRALIA".asOneTimePublisher(),
             mapOf(alp to 68, coa to 77, oth to 6).asOneTimePublisher(),
             mapOf(alp to 69, coa to 76, oth to 5).asOneTimePublisher(),
@@ -208,7 +205,7 @@ class RegionalBreakdownScreenTest {
         val alp = Party("Labor", "ALP", Color.RED)
         val oth = Party.OTHERS
 
-        val screen = seatsWithDiff(
+        val screen = RegionalBreakdownScreen.seatsWithDiff(
             "AUSTRALIA".asOneTimePublisher(),
             mapOf(alp to 68, coa to 77, oth to 6).asOneTimePublisher(),
             mapOf(alp to -1, coa to +1, oth to +1).asOneTimePublisher(),
@@ -252,7 +249,7 @@ class RegionalBreakdownScreenTest {
             "British Columbia" to 42,
             "Northern Canada" to 3
         ).associateWith { Publisher(emptyMap<Party, Int>()) to Publisher(emptyMap<Party, Int>()) }
-        val builder = seatsWithPrev(
+        val builder = RegionalBreakdownScreen.seatsWithPrev(
             "CANADA".asOneTimePublisher(),
             federalSeats.first,
             federalSeats.second,
@@ -357,7 +354,7 @@ class RegionalBreakdownScreenTest {
         val malpequePct = Publisher(0.0)
         val charlottetownPct = Publisher(0.0)
         val egmontPct = Publisher(0.0)
-        val screen = votes(
+        val screen = RegionalBreakdownScreen.votes(
             "PRINCE EDWARD ISLAND".asOneTimePublisher(),
             peiVotes,
             peiPct,
@@ -401,7 +398,7 @@ class RegionalBreakdownScreenTest {
         val malpequePct = Publisher(PollsReporting(0, 7))
         val charlottetownPct = Publisher(PollsReporting(0, 6))
         val egmontPct = Publisher(PollsReporting(0, 7))
-        val screen = votesPollsReporting(
+        val screen = RegionalBreakdownScreen.votesPollsReporting(
             "PRINCE EDWARD ISLAND".asOneTimePublisher(),
             peiVotes,
             peiPct,
@@ -450,7 +447,7 @@ class RegionalBreakdownScreenTest {
         val malpequePct = Publisher(0.0)
         val charlottetownPct = Publisher(0.0)
         val egmontPct = Publisher(0.0)
-        val screen = votesWithPrev(
+        val screen = RegionalBreakdownScreen.votesWithPrev(
             "PRINCE EDWARD ISLAND".asOneTimePublisher(),
             peiVotes,
             peiPrevVotes,
@@ -507,7 +504,7 @@ class RegionalBreakdownScreenTest {
         val malpequePct = Publisher(PollsReporting(0, 7))
         val charlottetownPct = Publisher(PollsReporting(0, 6))
         val egmontPct = Publisher(PollsReporting(0, 7))
-        val screen = votesWithPrevPollsReporting(
+        val screen = RegionalBreakdownScreen.votesWithPrevPollsReporting(
             "PRINCE EDWARD ISLAND".asOneTimePublisher(),
             peiVotes,
             peiPrevVotes,
@@ -559,9 +556,16 @@ class RegionalBreakdownScreenTest {
         val uap = Party("United Australia", "UAP", Color.YELLOW)
         val oth = Party.OTHERS
 
-        val screen = votes(
+        val screen = RegionalBreakdownScreen.votes(
             "AUSTRALIA".asOneTimePublisher(),
-            mapOf(alp to 4776030, coa to 5233334, grn to 1795985, onp to 727464, uap to 604536, oth to 1521693).asOneTimePublisher(),
+            mapOf(
+                alp to 4776030,
+                coa to 5233334,
+                grn to 1795985,
+                onp to 727464,
+                uap to 604536,
+                oth to 1521693
+            ).asOneTimePublisher(),
             0.8982.asOneTimePublisher(),
             "PRIMARY VOTE BY STATE".asOneTimePublisher()
         )
@@ -626,10 +630,24 @@ class RegionalBreakdownScreenTest {
         val uap = Party("United Australia", "UAP", Color.YELLOW)
         val oth = Party.OTHERS
 
-        val screen = votesWithPrev(
+        val screen = RegionalBreakdownScreen.votesWithPrev(
             "AUSTRALIA".asOneTimePublisher(),
-            mapOf(alp to 4776030, coa to 5233334, grn to 1795985, onp to 727464, uap to 604536, oth to 1521693).asOneTimePublisher(),
-            mapOf(alp to 4752110, coa to 5906884, grn to 1482923, onp to 438587, uap to 488817, oth to 1184031).asOneTimePublisher(),
+            mapOf(
+                alp to 4776030,
+                coa to 5233334,
+                grn to 1795985,
+                onp to 727464,
+                uap to 604536,
+                oth to 1521693
+            ).asOneTimePublisher(),
+            mapOf(
+                alp to 4752110,
+                coa to 5906884,
+                grn to 1482923,
+                onp to 438587,
+                uap to 488817,
+                oth to 1184031
+            ).asOneTimePublisher(),
             0.8982.asOneTimePublisher(),
             "PRIMARY VOTE BY STATE".asOneTimePublisher()
         )
@@ -700,7 +718,11 @@ class RegionalBreakdownScreenTest {
         val ppc = Party("Peoples", "PPC", Color.MAGENTA.darker())
         val oth = Party.OTHERS
 
-        val federalVotes = Triple(Publisher(emptyMap<Party, Int>()), Publisher(emptyMap<Party, Int>()), Publisher(0.0))
+        val federalVotes = Triple(
+            Publisher(emptyMap<Party, Int>()),
+            Publisher(emptyMap<Party, Int>()),
+            Publisher(0.0)
+        )
         val provincialVotes = listOf(
             "Newfoundland and Labrador",
             "Nova Scotia",
@@ -713,8 +735,12 @@ class RegionalBreakdownScreenTest {
             "Alberta",
             "British Columbia",
             "Northern Canada"
-        ).associateWith { Triple(Publisher(emptyMap<Party, Int>()), Publisher(emptyMap<Party, Int>()), Publisher(0.0)) }
-        val builder = votesWithPrev(
+        ).associateWith { Triple(
+            Publisher(emptyMap<Party, Int>()),
+            Publisher(emptyMap<Party, Int>()),
+            Publisher(0.0)
+        ) }
+        val builder = RegionalBreakdownScreen.votesWithPrev(
             "CANADA".asOneTimePublisher(),
             federalVotes.first,
             federalVotes.second,

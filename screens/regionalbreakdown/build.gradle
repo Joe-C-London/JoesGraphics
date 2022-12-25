@@ -18,17 +18,16 @@ repositories {
     mavenCentral()
 }
 
-dependencies {
-    api project('screenbase')
+var topLevel = parent.parent
 
-    api project('basicresult')
-    api project('candidatelisting')
-    api project('countdown')
-    api project('mixedmemberresult')
-    api project('multiresult')
-    api project('regionalbreakdown')
-    api project('singletransferrableresult')
-    api project('tooclosetocall')
+dependencies {
+    implementation parent.project('screenbase')
+
+    implementation topLevel.project('models')
+    implementation topLevel.project('modelutils')
+    implementation topLevel.project('components:multisummaryframe')
+
+    testImplementation topLevel.project('testutils')
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
