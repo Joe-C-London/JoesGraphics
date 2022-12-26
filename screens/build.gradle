@@ -30,6 +30,7 @@ dependencies {
     api project('multiresult')
     api project('partyheatmap')
     api project('partysummary')
+    api project('projection')
     api project('regionalbreakdown')
     api project('seatschanging')
     api project('singletransferrableresult')

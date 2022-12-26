@@ -1,15 +1,16 @@
 package com.joecollins.graphics.components
 
-import com.joecollins.graphics.components.lowerthird.LowerThird.Companion.createImage
+import com.joecollins.graphics.utils.RenderTestUtils
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.pubsub.asOneTimePublisher
 import org.awaitility.Awaitility
 import org.hamcrest.core.IsEqual
-import org.junit.Assert
-import org.junit.Test
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
 import java.awt.Color
 import java.awt.Image
 import java.util.concurrent.TimeUnit
+import javax.imageio.ImageIO
 
 class ProjectionFrameTest {
     @Test
@@ -75,7 +76,7 @@ class ProjectionFrameTest {
             backColorPublisher = Color.GRAY.asOneTimePublisher(),
             footerTextPublisher = "MINORITY LEGISLATURE".asOneTimePublisher()
         )
-        Assert.assertEquals(ProjectionFrame.Alignment.BOTTOM, frame.getImageAlignment())
+        Assertions.assertEquals(ProjectionFrame.Alignment.BOTTOM, frame.getImageAlignment())
     }
 
     @Test
@@ -119,7 +120,7 @@ class ProjectionFrameTest {
     }
 
     private fun peiLeg(): Image {
-        return createImage(
+        return ImageIO.read(
             ProjectionFrameTest::class.java
                 .classLoader
                 .getResource("com/joecollins/graphics/pei-leg.png")

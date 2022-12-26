@@ -26,6 +26,7 @@ dependencies {
     api project('hemicycleframe')
     api project('mapframe')
     api project('multisummaryframe')
+    api project('projectionframe')
     api project('regionsummaryframe')
     api project('resultlistingframe')
     api project('resultmapframebuilder')

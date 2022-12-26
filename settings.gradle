@@ -9,6 +9,4 @@ rootDir.listFiles().each { File level1 ->
         }
     }
 }
-include 'screens:partyheatmap'
-findProject(':screens:partyheatmap')?.name = 'partyheatmap'
 

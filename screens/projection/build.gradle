@@ -14,17 +14,16 @@ plugins {
 group 'com.joecollins'
 version '1.0-SNAPSHOT'
 
+repositories {
+    mavenCentral()
+}
+
 var topLevel = parent.parent
 
 dependencies {
     implementation parent.project('screenbase')
+    implementation topLevel.project('components:projectionframe')
 
-
-    implementation topLevel.project('models')
-    implementation topLevel.project('components:barframe')
-    implementation topLevel.project('components:resultmapframebuilder')
-
-    testImplementation topLevel.project('shapefiles')
     testImplementation topLevel.project('testutils')
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
