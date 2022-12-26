@@ -18,13 +18,16 @@ repositories {
     mavenCentral()
 }
 
+var topLevel = parent.parent
+
 dependencies {
-    implementation parent.parent.project('base')
-    implementation parent.parent.project('models')
+    api topLevel.project('pubsub')
+    api parent.project('componentbase')
+    implementation topLevel.project('models')
 
     implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.4'
 
-    testImplementation parent.parent.project('testutils')
+    testImplementation topLevel.project('testutils')
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'

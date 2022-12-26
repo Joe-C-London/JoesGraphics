@@ -1,12 +1,10 @@
 package com.joecollins.graphics
 
-import com.joecollins.graphics.components.GraphicsFrame
 import com.joecollins.graphics.dialogs.MastodonDialog
 import java.awt.Color
 import java.awt.Component
 import java.awt.Container
 import java.awt.Dimension
-import java.awt.GridLayout
 import java.awt.LayoutManager
 import java.awt.Point
 import java.awt.Toolkit
@@ -26,7 +24,6 @@ import javax.swing.JMenuBar
 import javax.swing.JMenuItem
 import javax.swing.JOptionPane
 import javax.swing.JPanel
-import javax.swing.border.EmptyBorder
 import javax.swing.filechooser.FileFilter
 import kotlin.math.max
 
@@ -113,26 +110,16 @@ class GenericWindow<T : JPanel> @JvmOverloads constructor(private val panel: T, 
         isVisible = true
         contentPane.layout = GenericWindowLayout()
         contentPane.background = Color.BLACK
-        val p: JPanel
-        if (panel is GraphicsFrame) {
-            p = JPanel()
-            p.background = Color.WHITE
-            p.layout = GridLayout(1, 1)
-            p.border = EmptyBorder(5, 5, 5, 5)
-            p.add(panel)
-        } else {
-            p = panel
-        }
-        contentPane.add(p, "main")
+        contentPane.add(panel, "main")
         val menuBar = JMenuBar()
         jMenuBar = menuBar
         val imageMenu = JMenu("Image")
         menuBar.add(imageMenu)
         val copyItem = JMenuItem("Copy to Clipboard")
-        copyItem.addActionListener { copyImageToClipboard(p) }
+        copyItem.addActionListener { copyImageToClipboard(panel) }
         imageMenu.add(copyItem)
         val fileItem = JMenuItem("Save to File...")
-        fileItem.addActionListener { saveImageToFile(p) }
+        fileItem.addActionListener { saveImageToFile(panel) }
         imageMenu.add(fileItem)
 //        val tweetItem = JMenuItem("Tweet...")
 //        tweetItem.addActionListener {
@@ -141,7 +128,7 @@ class GenericWindow<T : JPanel> @JvmOverloads constructor(private val panel: T, 
 //        imageMenu.add(tweetItem)
         val mastodonItem = JMenuItem("Mastodon...")
         mastodonItem.addActionListener {
-            MastodonDialog(p).isVisible = true
+            MastodonDialog(panel).isVisible = true
         }
         imageMenu.add(mastodonItem)
         requestFocus()

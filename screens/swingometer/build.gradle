@@ -18,6 +18,7 @@ var topLevel = parent.parent
 
 dependencies {
     implementation parent.project('screenbase')
+    api topLevel.project('pubsub')
 
     implementation topLevel.project('models')
     implementation topLevel.project('modelutils')

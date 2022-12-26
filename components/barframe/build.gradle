@@ -18,11 +18,14 @@ repositories {
     mavenCentral()
 }
 
-dependencies {
-    implementation parent.parent.project('base')
+var topLevel = parent.parent
 
-    testImplementation parent.parent.project('shapes')
-    testImplementation parent.parent.project('testutils')
+dependencies {
+    api topLevel.project('pubsub')
+    api parent.project('componentbase')
+
+    testImplementation topLevel.project('shapes')
+    testImplementation topLevel.project('testutils')
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'

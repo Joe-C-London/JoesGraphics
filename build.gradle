@@ -39,6 +39,7 @@ dependencies {
     api project('lowerthird:lowerthirdutils')
     api project('models')
     api project('modelutils')
+    api project('pubsub')
     api project('screens')
     api project('shapefiles')
     api project('shapes')

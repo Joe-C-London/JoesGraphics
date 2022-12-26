@@ -26,6 +26,7 @@ dependencies {
     implementation topLevel.project('components:swingframe')
 
     implementation parent.project('screenbase')
+    api topLevel.project('pubsub')
 
     testImplementation topLevel.project('shapefiles')
     testImplementation topLevel.project('testutils')

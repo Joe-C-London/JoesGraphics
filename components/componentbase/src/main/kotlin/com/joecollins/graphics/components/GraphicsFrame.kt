@@ -15,12 +15,12 @@ import java.awt.Dimension
 import java.awt.GridLayout
 import java.awt.LayoutManager
 import java.awt.Point
-import java.lang.Integer.max
 import java.util.concurrent.Flow
 import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.border.EmptyBorder
 import javax.swing.border.MatteBorder
+import kotlin.math.max
 import kotlin.math.roundToInt
 
 @Suppress("LeakingThis")
