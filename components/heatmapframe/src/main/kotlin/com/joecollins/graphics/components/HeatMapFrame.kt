@@ -3,6 +3,7 @@ package com.joecollins.graphics.components
 import com.joecollins.graphics.utils.StandardFont
 import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
+import org.jetbrains.annotations.TestOnly
 import java.awt.BasicStroke
 import java.awt.BorderLayout
 import java.awt.Color
@@ -71,50 +72,50 @@ class HeatMapFrame(
         }
     }
 
-    internal val numRows: Int
-        get() = squaresPanel.numRows
+    val numRows: Int
+        @TestOnly get() = squaresPanel.numRows
 
-    internal val numSquares: Int
-        get() = squaresPanel.squares.size
+    val numSquares: Int
+        @TestOnly get() = squaresPanel.squares.size
 
-    internal fun getSquareBorder(index: Int): Color? {
+    @TestOnly fun getSquareBorder(index: Int): Color? {
         return squaresPanel.squares[index].borderColor
     }
 
-    internal fun getSquareFill(index: Int): Color {
+    @TestOnly fun getSquareFill(index: Int): Color {
         return squaresPanel.squares[index].fillColor
     }
 
-    internal val seatBarCount: Int
-        get() = barsPanel.seatBars.size
+    val seatBarCount: Int
+        @TestOnly get() = barsPanel.seatBars.size
 
-    internal fun getSeatBarColor(index: Int): Color {
+    @TestOnly fun getSeatBarColor(index: Int): Color {
         return barsPanel.seatBars[index].color
     }
 
-    internal fun getSeatBarSize(index: Int): Int {
+    @TestOnly fun getSeatBarSize(index: Int): Int {
         return barsPanel.seatBars[index].size
     }
 
-    internal val seatBarLabel: String
-        get() = barsPanel.seatBarLabel
+    val seatBarLabel: String
+        @TestOnly get() = barsPanel.seatBarLabel
 
-    internal val changeBarCount: Int
-        get() = barsPanel.changeBars.size
+    val changeBarCount: Int
+        @TestOnly get() = barsPanel.changeBars.size
 
-    internal fun getChangeBarColor(index: Int): Color {
+    @TestOnly fun getChangeBarColor(index: Int): Color {
         return barsPanel.changeBars[index].color
     }
 
-    internal fun getChangeBarSize(index: Int): Int {
+    @TestOnly fun getChangeBarSize(index: Int): Int {
         return barsPanel.changeBars[index].size
     }
 
-    internal val changeBarLabel: String
-        get() = barsPanel.changeBarLabel
+    val changeBarLabel: String
+        @TestOnly get() = barsPanel.changeBarLabel
 
-    internal val changeBarStart: Int
-        get() = barsPanel.changeBarStart
+    val changeBarStart: Int
+        @TestOnly get() = barsPanel.changeBarStart
 
     private inner class SeatBarPanel : JPanel() {
         var seatBars: List<Bar> = emptyList()

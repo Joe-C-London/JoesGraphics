@@ -1,7 +1,5 @@
 package com.joecollins.graphics.components
 
-import com.joecollins.graphics.components.HeatMapFrameBuilder.Companion.of
-import com.joecollins.graphics.components.HeatMapFrameBuilder.Companion.ofElectedLeading
 import com.joecollins.graphics.utils.ColorUtils.lighten
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
@@ -9,8 +7,8 @@ import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
 import org.awaitility.Awaitility
 import org.hamcrest.core.IsEqual
-import org.junit.Assert
-import org.junit.Test
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
 import java.awt.Color
 import java.text.DecimalFormat
 import java.util.concurrent.TimeUnit
@@ -27,7 +25,7 @@ class HeatMapFrameBuilderTest {
         ).flatten().toList()
         val seatBars = Publisher(listOf(Pair(Color.GREEN, 8)))
         val changeBars = Publisher(listOf(Pair(Color.GREEN, +7)))
-        val frame = of(
+        val frame = HeatMapFrameBuilder.of(
             3.asOneTimePublisher(),
             dots,
             { it.first.asOneTimePublisher() },
@@ -47,7 +45,7 @@ class HeatMapFrameBuilderTest {
             .build()
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numRows }, IsEqual(3))
-        Assert.assertEquals(27, frame.numSquares.toLong())
+        Assertions.assertEquals(27, frame.numSquares.toLong())
         val expectedFills = sequenceOf(
             generateSequence { Color.GREEN }.take(8),
             generateSequence { Color.RED }.take(6),
@@ -63,20 +61,20 @@ class HeatMapFrameBuilderTest {
             .flatten()
             .toList()
         for (i in 0 until frame.numSquares) {
-            Assert.assertEquals("Square fill $i", expectedFills[i], frame.getSquareFill(i))
-            Assert.assertEquals("Square border $i", expectedBorders[i], frame.getSquareBorder(i))
+            Assertions.assertEquals(expectedFills[i], frame.getSquareFill(i), "Square fill $i")
+            Assertions.assertEquals(expectedBorders[i], frame.getSquareBorder(i), "Square border $i")
         }
-        Assert.assertEquals(1, frame.seatBarCount.toLong())
-        Assert.assertEquals(Color.GREEN, frame.getSeatBarColor(0))
-        Assert.assertEquals(8, frame.getSeatBarSize(0).toLong())
-        Assert.assertEquals("GREEN: 8", frame.seatBarLabel)
-        Assert.assertEquals(1, frame.changeBarCount.toLong())
-        Assert.assertEquals(Color.GREEN, frame.getChangeBarColor(0))
-        Assert.assertEquals(7, frame.getChangeBarSize(0).toLong())
-        Assert.assertEquals(1, frame.changeBarStart.toLong())
-        Assert.assertEquals("GRN: +7", frame.changeBarLabel)
-        Assert.assertEquals("PEI", frame.header)
-        Assert.assertEquals(Color.GREEN, frame.borderColor)
+        Assertions.assertEquals(1, frame.seatBarCount.toLong())
+        Assertions.assertEquals(Color.GREEN, frame.getSeatBarColor(0))
+        Assertions.assertEquals(8, frame.getSeatBarSize(0).toLong())
+        Assertions.assertEquals("GREEN: 8", frame.seatBarLabel)
+        Assertions.assertEquals(1, frame.changeBarCount.toLong())
+        Assertions.assertEquals(Color.GREEN, frame.getChangeBarColor(0))
+        Assertions.assertEquals(7, frame.getChangeBarSize(0).toLong())
+        Assertions.assertEquals(1, frame.changeBarStart.toLong())
+        Assertions.assertEquals("GRN: +7", frame.changeBarLabel)
+        Assertions.assertEquals("PEI", frame.header)
+        Assertions.assertEquals(Color.GREEN, frame.borderColor)
     }
 
     @Test
@@ -108,7 +106,7 @@ class HeatMapFrameBuilderTest {
             Riding("Lake Laberge", yp, true, yp),
             Riding("Whitehorse West", lib, false, yp)
         )
-        val frame = ofElectedLeading(
+        val frame = HeatMapFrameBuilder.ofElectedLeading(
             3.asOneTimePublisher(),
             ridings,
             { PartyResult(it.leader, it.hasWon).asOneTimePublisher() },
@@ -121,23 +119,23 @@ class HeatMapFrameBuilderTest {
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numSquares }, IsEqual(19))
-        Assert.assertEquals(Color.RED, frame.getSquareBorder(0))
-        Assert.assertEquals(lighten(Color.RED), frame.getSquareFill(0))
-        Assert.assertEquals("YUKON", frame.header)
-        Assert.assertEquals(Color.RED, frame.borderColor)
-        Assert.assertEquals(2, frame.seatBarCount.toLong())
-        Assert.assertEquals(Color.RED, frame.getSeatBarColor(0))
-        Assert.assertEquals(3, frame.getSeatBarSize(0).toLong())
-        Assert.assertEquals(lighten(Color.RED), frame.getSeatBarColor(1))
-        Assert.assertEquals(8, frame.getSeatBarSize(1).toLong())
-        Assert.assertEquals("LIB: 3/11", frame.seatBarLabel)
-        Assert.assertEquals(2, frame.changeBarStart.toLong())
-        Assert.assertEquals(2, frame.changeBarCount.toLong())
-        Assert.assertEquals(Color.RED, frame.getChangeBarColor(0))
-        Assert.assertEquals(2, frame.getChangeBarSize(0).toLong())
-        Assert.assertEquals(lighten(Color.RED), frame.getChangeBarColor(1))
-        Assert.assertEquals(7, frame.getChangeBarSize(1).toLong())
-        Assert.assertEquals("+2/+9", frame.changeBarLabel)
+        Assertions.assertEquals(Color.RED, frame.getSquareBorder(0))
+        Assertions.assertEquals(lighten(Color.RED), frame.getSquareFill(0))
+        Assertions.assertEquals("YUKON", frame.header)
+        Assertions.assertEquals(Color.RED, frame.borderColor)
+        Assertions.assertEquals(2, frame.seatBarCount.toLong())
+        Assertions.assertEquals(Color.RED, frame.getSeatBarColor(0))
+        Assertions.assertEquals(3, frame.getSeatBarSize(0).toLong())
+        Assertions.assertEquals(lighten(Color.RED), frame.getSeatBarColor(1))
+        Assertions.assertEquals(8, frame.getSeatBarSize(1).toLong())
+        Assertions.assertEquals("LIB: 3/11", frame.seatBarLabel)
+        Assertions.assertEquals(2, frame.changeBarStart.toLong())
+        Assertions.assertEquals(2, frame.changeBarCount.toLong())
+        Assertions.assertEquals(Color.RED, frame.getChangeBarColor(0))
+        Assertions.assertEquals(2, frame.getChangeBarSize(0).toLong())
+        Assertions.assertEquals(lighten(Color.RED), frame.getChangeBarColor(1))
+        Assertions.assertEquals(7, frame.getChangeBarSize(1).toLong())
+        Assertions.assertEquals("+2/+9", frame.changeBarLabel)
     }
 
     @Test
@@ -170,7 +168,7 @@ class HeatMapFrameBuilderTest {
             Riding("Whitehorse West", lib, false, yp, true)
         )
         val filter = Publisher<(Riding) -> Boolean> { true }
-        val frame = ofElectedLeading(
+        val frame = HeatMapFrameBuilder.ofElectedLeading(
             3.asOneTimePublisher(),
             ridings,
             { PartyResult(it.leader, it.hasWon).asOneTimePublisher() },
@@ -185,48 +183,48 @@ class HeatMapFrameBuilderTest {
 
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numSquares }, IsEqual(19))
-        Assert.assertEquals(Color.RED, frame.getSquareBorder(0))
-        Assert.assertEquals(lighten(Color.RED), frame.getSquareFill(0))
-        Assert.assertEquals(Color.ORANGE, frame.getSquareBorder(2))
-        Assert.assertEquals(lighten(Color.ORANGE), frame.getSquareFill(2))
-        Assert.assertEquals("YUKON", frame.header)
-        Assert.assertEquals(Color.RED, frame.borderColor)
-        Assert.assertEquals(2, frame.seatBarCount.toLong())
-        Assert.assertEquals(Color.RED, frame.getSeatBarColor(0))
-        Assert.assertEquals(3, frame.getSeatBarSize(0).toLong())
-        Assert.assertEquals(lighten(Color.RED), frame.getSeatBarColor(1))
-        Assert.assertEquals(8, frame.getSeatBarSize(1).toLong())
-        Assert.assertEquals("LIB: 3/11", frame.seatBarLabel)
-        Assert.assertEquals(2, frame.changeBarStart.toLong())
-        Assert.assertEquals(2, frame.changeBarCount.toLong())
-        Assert.assertEquals(Color.RED, frame.getChangeBarColor(0))
-        Assert.assertEquals(2, frame.getChangeBarSize(0).toLong())
-        Assert.assertEquals(lighten(Color.RED), frame.getChangeBarColor(1))
-        Assert.assertEquals(7, frame.getChangeBarSize(1).toLong())
-        Assert.assertEquals("+2/+9", frame.changeBarLabel)
+        Assertions.assertEquals(Color.RED, frame.getSquareBorder(0))
+        Assertions.assertEquals(lighten(Color.RED), frame.getSquareFill(0))
+        Assertions.assertEquals(Color.ORANGE, frame.getSquareBorder(2))
+        Assertions.assertEquals(lighten(Color.ORANGE), frame.getSquareFill(2))
+        Assertions.assertEquals("YUKON", frame.header)
+        Assertions.assertEquals(Color.RED, frame.borderColor)
+        Assertions.assertEquals(2, frame.seatBarCount.toLong())
+        Assertions.assertEquals(Color.RED, frame.getSeatBarColor(0))
+        Assertions.assertEquals(3, frame.getSeatBarSize(0).toLong())
+        Assertions.assertEquals(lighten(Color.RED), frame.getSeatBarColor(1))
+        Assertions.assertEquals(8, frame.getSeatBarSize(1).toLong())
+        Assertions.assertEquals("LIB: 3/11", frame.seatBarLabel)
+        Assertions.assertEquals(2, frame.changeBarStart.toLong())
+        Assertions.assertEquals(2, frame.changeBarCount.toLong())
+        Assertions.assertEquals(Color.RED, frame.getChangeBarColor(0))
+        Assertions.assertEquals(2, frame.getChangeBarSize(0).toLong())
+        Assertions.assertEquals(lighten(Color.RED), frame.getChangeBarColor(1))
+        Assertions.assertEquals(7, frame.getChangeBarSize(1).toLong())
+        Assertions.assertEquals("+2/+9", frame.changeBarLabel)
 
         filter.submit { it.isWhitehorse }
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.getSquareBorder(0) }, IsEqual(Color.WHITE))
-        Assert.assertEquals(Color.WHITE, frame.getSquareBorder(0))
-        Assert.assertEquals(Color.WHITE, frame.getSquareFill(0))
-        Assert.assertEquals(Color.ORANGE, frame.getSquareBorder(2))
-        Assert.assertEquals(lighten(Color.ORANGE), frame.getSquareFill(2))
-        Assert.assertEquals("YUKON", frame.header)
-        Assert.assertEquals(Color.RED, frame.borderColor)
-        Assert.assertEquals(2, frame.seatBarCount.toLong())
-        Assert.assertEquals(Color.RED, frame.getSeatBarColor(0))
-        Assert.assertEquals(3, frame.getSeatBarSize(0).toLong())
-        Assert.assertEquals(lighten(Color.RED), frame.getSeatBarColor(1))
-        Assert.assertEquals(8, frame.getSeatBarSize(1).toLong())
-        Assert.assertEquals("LIB: 3/11", frame.seatBarLabel)
-        Assert.assertEquals(2, frame.changeBarStart.toLong())
-        Assert.assertEquals(2, frame.changeBarCount.toLong())
-        Assert.assertEquals(Color.RED, frame.getChangeBarColor(0))
-        Assert.assertEquals(2, frame.getChangeBarSize(0).toLong())
-        Assert.assertEquals(lighten(Color.RED), frame.getChangeBarColor(1))
-        Assert.assertEquals(7, frame.getChangeBarSize(1).toLong())
-        Assert.assertEquals("+2/+9", frame.changeBarLabel)
+        Assertions.assertEquals(Color.WHITE, frame.getSquareBorder(0))
+        Assertions.assertEquals(Color.WHITE, frame.getSquareFill(0))
+        Assertions.assertEquals(Color.ORANGE, frame.getSquareBorder(2))
+        Assertions.assertEquals(lighten(Color.ORANGE), frame.getSquareFill(2))
+        Assertions.assertEquals("YUKON", frame.header)
+        Assertions.assertEquals(Color.RED, frame.borderColor)
+        Assertions.assertEquals(2, frame.seatBarCount.toLong())
+        Assertions.assertEquals(Color.RED, frame.getSeatBarColor(0))
+        Assertions.assertEquals(3, frame.getSeatBarSize(0).toLong())
+        Assertions.assertEquals(lighten(Color.RED), frame.getSeatBarColor(1))
+        Assertions.assertEquals(8, frame.getSeatBarSize(1).toLong())
+        Assertions.assertEquals("LIB: 3/11", frame.seatBarLabel)
+        Assertions.assertEquals(2, frame.changeBarStart.toLong())
+        Assertions.assertEquals(2, frame.changeBarCount.toLong())
+        Assertions.assertEquals(Color.RED, frame.getChangeBarColor(0))
+        Assertions.assertEquals(2, frame.getChangeBarSize(0).toLong())
+        Assertions.assertEquals(lighten(Color.RED), frame.getChangeBarColor(1))
+        Assertions.assertEquals(7, frame.getChangeBarSize(1).toLong())
+        Assertions.assertEquals("+2/+9", frame.changeBarLabel)
     }
 
     @Test
@@ -246,7 +244,7 @@ class HeatMapFrameBuilderTest {
 
         val result = Result(null, false, gop)
         val results = generateSequence { result }.take(30).toList()
-        val frame = ofElectedLeading(
+        val frame = HeatMapFrameBuilder.ofElectedLeading(
             results.size.asOneTimePublisher(),
             results,
             { it.publisher },
@@ -259,24 +257,24 @@ class HeatMapFrameBuilderTest {
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numSquares }, IsEqual(30))
-        Assert.assertEquals(Color.RED, frame.getSquareBorder(0))
-        Assert.assertEquals(Color.WHITE, frame.getSquareFill(0))
-        Assert.assertEquals(0, frame.getSeatBarSize(0).toLong())
-        Assert.assertEquals(0, frame.getSeatBarSize(1).toLong())
+        Assertions.assertEquals(Color.RED, frame.getSquareBorder(0))
+        Assertions.assertEquals(Color.WHITE, frame.getSquareFill(0))
+        Assertions.assertEquals(0, frame.getSeatBarSize(0).toLong())
+        Assertions.assertEquals(0, frame.getSeatBarSize(1).toLong())
         result.setResult(gop, false)
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.getSquareFill(0) }, IsEqual(lighten(Color.RED)))
-        Assert.assertEquals(Color.RED, frame.getSquareBorder(0))
-        Assert.assertEquals(lighten(Color.RED), frame.getSquareFill(0))
-        Assert.assertEquals(0, frame.getSeatBarSize(0).toLong())
-        Assert.assertEquals(0, frame.getSeatBarSize(1).toLong())
+        Assertions.assertEquals(Color.RED, frame.getSquareBorder(0))
+        Assertions.assertEquals(lighten(Color.RED), frame.getSquareFill(0))
+        Assertions.assertEquals(0, frame.getSeatBarSize(0).toLong())
+        Assertions.assertEquals(0, frame.getSeatBarSize(1).toLong())
         result.setResult(dem, true)
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.getSquareFill(0) }, IsEqual(Color.BLUE))
-        Assert.assertEquals(Color.RED, frame.getSquareBorder(0))
-        Assert.assertEquals(Color.BLUE, frame.getSquareFill(0))
-        Assert.assertEquals(30, frame.getSeatBarSize(0).toLong())
-        Assert.assertEquals(0, frame.getSeatBarSize(1).toLong())
+        Assertions.assertEquals(Color.RED, frame.getSquareBorder(0))
+        Assertions.assertEquals(Color.BLUE, frame.getSquareFill(0))
+        Assertions.assertEquals(30, frame.getSeatBarSize(0).toLong())
+        Assertions.assertEquals(0, frame.getSeatBarSize(1).toLong())
     }
 
     @Test
@@ -296,7 +294,7 @@ class HeatMapFrameBuilderTest {
 
         val result = Result(null, false, gop, 30)
         val results = listOf(result)
-        val frame = ofElectedLeading(
+        val frame = HeatMapFrameBuilder.ofElectedLeading(
             results.sumOf { it.numSeats }.asOneTimePublisher(),
             results,
             { it.publisher },
@@ -310,37 +308,37 @@ class HeatMapFrameBuilderTest {
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numSquares }, IsEqual(30))
-        Assert.assertEquals(Color.RED, frame.getSquareBorder(0))
-        Assert.assertEquals(Color.WHITE, frame.getSquareFill(0))
-        Assert.assertEquals(0, frame.getSeatBarSize(0).toLong())
-        Assert.assertEquals(0, frame.getSeatBarSize(1).toLong())
-        Assert.assertEquals(0, frame.getChangeBarSize(0).toLong())
-        Assert.assertEquals(0, frame.getChangeBarSize(1).toLong())
+        Assertions.assertEquals(Color.RED, frame.getSquareBorder(0))
+        Assertions.assertEquals(Color.WHITE, frame.getSquareFill(0))
+        Assertions.assertEquals(0, frame.getSeatBarSize(0).toLong())
+        Assertions.assertEquals(0, frame.getSeatBarSize(1).toLong())
+        Assertions.assertEquals(0, frame.getChangeBarSize(0).toLong())
+        Assertions.assertEquals(0, frame.getChangeBarSize(1).toLong())
         result.setResult(gop, false)
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.getSquareFill(0) }, IsEqual(lighten(Color.RED)))
-        Assert.assertEquals(Color.RED, frame.getSquareBorder(0))
-        Assert.assertEquals(lighten(Color.RED), frame.getSquareFill(0))
-        Assert.assertEquals(0, frame.getSeatBarSize(0).toLong())
-        Assert.assertEquals(0, frame.getSeatBarSize(1).toLong())
-        Assert.assertEquals(0, frame.getChangeBarSize(0).toLong())
-        Assert.assertEquals(0, frame.getChangeBarSize(1).toLong())
+        Assertions.assertEquals(Color.RED, frame.getSquareBorder(0))
+        Assertions.assertEquals(lighten(Color.RED), frame.getSquareFill(0))
+        Assertions.assertEquals(0, frame.getSeatBarSize(0).toLong())
+        Assertions.assertEquals(0, frame.getSeatBarSize(1).toLong())
+        Assertions.assertEquals(0, frame.getChangeBarSize(0).toLong())
+        Assertions.assertEquals(0, frame.getChangeBarSize(1).toLong())
         result.setResult(dem, false)
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.getSquareFill(0) }, IsEqual(lighten(Color.BLUE)))
-        Assert.assertEquals(Color.RED, frame.getSquareBorder(0))
-        Assert.assertEquals(0, frame.getSeatBarSize(0).toLong())
-        Assert.assertEquals(30, frame.getSeatBarSize(1).toLong())
-        Assert.assertEquals(0, frame.getChangeBarSize(0).toLong())
-        Assert.assertEquals(30, frame.getChangeBarSize(1).toLong())
+        Assertions.assertEquals(Color.RED, frame.getSquareBorder(0))
+        Assertions.assertEquals(0, frame.getSeatBarSize(0).toLong())
+        Assertions.assertEquals(30, frame.getSeatBarSize(1).toLong())
+        Assertions.assertEquals(0, frame.getChangeBarSize(0).toLong())
+        Assertions.assertEquals(30, frame.getChangeBarSize(1).toLong())
         result.setResult(dem, true)
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.getSquareFill(0) }, IsEqual(Color.BLUE))
-        Assert.assertEquals(Color.RED, frame.getSquareBorder(0))
-        Assert.assertEquals(30, frame.getSeatBarSize(0).toLong())
-        Assert.assertEquals(0, frame.getSeatBarSize(1).toLong())
-        Assert.assertEquals(30, frame.getChangeBarSize(0).toLong())
-        Assert.assertEquals(0, frame.getChangeBarSize(1).toLong())
+        Assertions.assertEquals(Color.RED, frame.getSquareBorder(0))
+        Assertions.assertEquals(30, frame.getSeatBarSize(0).toLong())
+        Assertions.assertEquals(0, frame.getSeatBarSize(1).toLong())
+        Assertions.assertEquals(30, frame.getChangeBarSize(0).toLong())
+        Assertions.assertEquals(0, frame.getChangeBarSize(1).toLong())
     }
 
     @Test
@@ -360,7 +358,7 @@ class HeatMapFrameBuilderTest {
 
         val result = Result(null, false, gop, 30)
         val results = listOf(result)
-        val frame = ofElectedLeading(
+        val frame = HeatMapFrameBuilder.ofElectedLeading(
             results.sumOf { it.numSeats }.asOneTimePublisher(),
             results,
             { it.publisher },
@@ -374,18 +372,18 @@ class HeatMapFrameBuilderTest {
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numSquares }, IsEqual(30))
-        Assert.assertEquals(Color.RED, frame.getSquareBorder(0))
-        Assert.assertEquals(Color.WHITE, frame.getSquareFill(0))
-        Assert.assertEquals(0, frame.getSeatBarSize(0).toLong())
-        Assert.assertEquals(0, frame.getSeatBarSize(1).toLong())
-        Assert.assertEquals(0, frame.getChangeBarSize(0).toLong())
-        Assert.assertEquals(0, frame.getChangeBarSize(1).toLong())
+        Assertions.assertEquals(Color.RED, frame.getSquareBorder(0))
+        Assertions.assertEquals(Color.WHITE, frame.getSquareFill(0))
+        Assertions.assertEquals(0, frame.getSeatBarSize(0).toLong())
+        Assertions.assertEquals(0, frame.getSeatBarSize(1).toLong())
+        Assertions.assertEquals(0, frame.getChangeBarSize(0).toLong())
+        Assertions.assertEquals(0, frame.getChangeBarSize(1).toLong())
         result.setResult(null, false)
-        Assert.assertEquals(Color.RED, frame.getSquareBorder(0))
-        Assert.assertEquals(Color.WHITE, frame.getSquareFill(0))
-        Assert.assertEquals(0, frame.getSeatBarSize(0).toLong())
-        Assert.assertEquals(0, frame.getSeatBarSize(1).toLong())
-        Assert.assertEquals(0, frame.getChangeBarSize(0).toLong())
-        Assert.assertEquals(0, frame.getChangeBarSize(1).toLong())
+        Assertions.assertEquals(Color.RED, frame.getSquareBorder(0))
+        Assertions.assertEquals(Color.WHITE, frame.getSquareFill(0))
+        Assertions.assertEquals(0, frame.getSeatBarSize(0).toLong())
+        Assertions.assertEquals(0, frame.getSeatBarSize(1).toLong())
+        Assertions.assertEquals(0, frame.getChangeBarSize(0).toLong())
+        Assertions.assertEquals(0, frame.getChangeBarSize(1).toLong())
     }
 }

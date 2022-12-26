@@ -6,6 +6,7 @@ import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
 import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.map
+import org.jetbrains.annotations.TestOnly
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Component
@@ -229,13 +230,13 @@ open class GraphicsFrame(
         }
     }
 
-    internal val header: String? get() = if (headerPanel.isVisible) headerLabel.text.trim() else null
+    val header: String? @TestOnly get() = if (headerPanel.isVisible) headerLabel.text.trim() else null
 
-    protected val alignment: Alignment get() = Alignment.values().find { it.jlabelAlignment == headerLabel.horizontalAlignment }!!
+    val alignment: Alignment @TestOnly get() = Alignment.values().find { it.jlabelAlignment == headerLabel.horizontalAlignment }!!
 
-    internal val notes: String? get() = if (notesLabel.isVisible) notesLabel.text.trim() else null
+    val notes: String? @TestOnly get() = if (notesLabel.isVisible) notesLabel.text.trim() else null
 
-    internal val borderColor: Color get() = headerPanel.background
+    val borderColor: Color @TestOnly get() = headerPanel.background
 
-    internal val headerTextColor: Color get() = headerLabel.foreground
+    val headerTextColor: Color @TestOnly get() = headerLabel.foreground
 }

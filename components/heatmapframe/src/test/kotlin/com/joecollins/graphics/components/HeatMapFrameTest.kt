@@ -1,13 +1,14 @@
 package com.joecollins.graphics.components
 
+import com.joecollins.graphics.utils.RenderTestUtils
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.mapElements
 import org.awaitility.Awaitility
 import org.hamcrest.core.IsEqual
-import org.junit.Assert
-import org.junit.Test
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
 import java.awt.Color
 import java.util.concurrent.TimeUnit
 
@@ -53,18 +54,20 @@ class HeatMapFrameTest {
         val frame = HeatMapFrame(
             headerPublisher = (null as String?).asOneTimePublisher(),
             numRowsPublisher = 3.asOneTimePublisher(),
-            squaresPublisher = borderColors.zip(fillColors) { border, fill -> HeatMapFrame.Square(borderColor = border, fillColor = fill) }.asOneTimePublisher()
+            squaresPublisher = borderColors.zip(fillColors) { border, fill ->
+                HeatMapFrame.Square(borderColor = border, fillColor = fill)
+            }.asOneTimePublisher()
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numRows }, IsEqual(3))
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numSquares }, IsEqual(27))
-        Assert.assertEquals(Color.BLUE, frame.getSquareBorder(0))
-        Assert.assertEquals(Color.RED, frame.getSquareBorder(12))
-        Assert.assertEquals(DARK_GREEN, frame.getSquareBorder(26))
-        Assert.assertEquals(Color.BLUE, frame.getSquareFill(0))
-        Assert.assertEquals(DARK_GREEN, frame.getSquareFill(12))
-        Assert.assertEquals(DARK_GREEN, frame.getSquareFill(26))
+        Assertions.assertEquals(Color.BLUE, frame.getSquareBorder(0))
+        Assertions.assertEquals(Color.RED, frame.getSquareBorder(12))
+        Assertions.assertEquals(DARK_GREEN, frame.getSquareBorder(26))
+        Assertions.assertEquals(Color.BLUE, frame.getSquareFill(0))
+        Assertions.assertEquals(DARK_GREEN, frame.getSquareFill(12))
+        Assertions.assertEquals(DARK_GREEN, frame.getSquareFill(26))
     }
 
     @Test
@@ -83,9 +86,9 @@ class HeatMapFrameTest {
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.seatBarCount }, IsEqual(2))
-        Assert.assertEquals(Color.BLUE, frame.getSeatBarColor(0))
-        Assert.assertEquals(5, frame.getSeatBarSize(1).toLong())
-        Assert.assertEquals("8/13", frame.seatBarLabel)
+        Assertions.assertEquals(Color.BLUE, frame.getSeatBarColor(0))
+        Assertions.assertEquals(5, frame.getSeatBarSize(1).toLong())
+        Assertions.assertEquals("8/13", frame.seatBarLabel)
     }
 
     @Test
@@ -105,10 +108,10 @@ class HeatMapFrameTest {
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.changeBarCount }, IsEqual(2))
-        Assert.assertEquals(Color.BLUE, frame.getChangeBarColor(0))
-        Assert.assertEquals(2, frame.getChangeBarSize(1).toLong())
-        Assert.assertEquals("+3/+5", frame.changeBarLabel)
-        Assert.assertEquals(5, frame.changeBarStart.toLong())
+        Assertions.assertEquals(Color.BLUE, frame.getChangeBarColor(0))
+        Assertions.assertEquals(2, frame.getChangeBarSize(1).toLong())
+        Assertions.assertEquals("+3/+5", frame.changeBarLabel)
+        Assertions.assertEquals(5, frame.changeBarStart.toLong())
     }
 
     @Test

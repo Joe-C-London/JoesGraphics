@@ -18,20 +18,17 @@ repositories {
     mavenCentral()
 }
 
+group 'com.joecollins'
+version '1.0-SNAPSHOT'
+
+var topLevel = parent.parent
+
 dependencies {
-    api project('barframe')
-    api project('countdownframe')
-    api project('heatmapframe')
-    api project('heatmapframeresultbuilder')
-    api project('hemicycleframe')
-    api project('mapframe')
-    api project('multisummaryframe')
-    api project('regionsummaryframe')
-    api project('resultlistingframe')
-    api project('resultmapframebuilder')
-    api project('socialframes')
-    api project('swingframe')
-    api project('swingometerframe')
+    api parent.project('heatmapframe')
+
+    api topLevel.project('models')
+
+    testImplementation topLevel.project('testutils')
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
