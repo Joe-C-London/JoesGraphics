@@ -1,13 +1,12 @@
 package com.joecollins.graphics.screens.generic
 
-import com.joecollins.graphics.screens.generic.SwingometerScreen.Companion.of
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
 import com.joecollins.models.general.PartyResult.Companion.elected
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import java.awt.Color
 
 class SwingometerScreenTest {
@@ -17,8 +16,17 @@ class SwingometerScreenTest {
         val prevResult = Publisher(nbPrevResult())
         val currResult = Publisher(nbCurrResult())
         val parties = Publisher(Pair(lib, pc))
-        val swing = Publisher(mapOf(pc to +0.0745, lib to -0.0345, grn to +0.0336, pa to -0.0339, ndp to -0.0335, ind to -0.0062))
-        val panel = of(
+        val swing = Publisher(
+            mapOf(
+                pc to +0.0745,
+                lib to -0.0345,
+                grn to +0.0336,
+                pa to -0.0339,
+                ndp to -0.0335,
+                ind to -0.0062
+            )
+        )
+        val panel = SwingometerScreen.of(
             prevResult,
             currResult,
             swing,
@@ -42,7 +50,7 @@ class SwingometerScreenTest {
         val currResult = Publisher<Map<String, PartyResult?>>(result)
         val parties = Publisher(Pair(lib, pc))
         val swing = Publisher<Map<Party, Double>>(emptyMap())
-        val panel = of(
+        val panel = SwingometerScreen.of(
             prevResult,
             currResult,
             swing,
@@ -63,7 +71,16 @@ class SwingometerScreenTest {
         val prevResult = Publisher(nbPrevResult())
         val currResult = Publisher(nbCurrResult())
         val parties = Publisher(Pair(lib, pc))
-        val swing = Publisher(mapOf(pc to +0.0745, lib to -0.0345, grn to +0.0336, pa to -0.0339, ndp to -0.0335, ind to -0.0062))
+        val swing = Publisher(
+            mapOf(
+                pc to +0.0745,
+                lib to -0.0345,
+                grn to +0.0336,
+                pa to -0.0339,
+                ndp to -0.0335,
+                ind to -0.0062
+            )
+        )
         val seatsFiltered = Publisher<Set<String>?>(
             setOf(
                 "Oromocto-Lincoln-Fredericton",
@@ -76,7 +93,7 @@ class SwingometerScreenTest {
                 "Carleton-York"
             )
         )
-        val panel = of(
+        val panel = SwingometerScreen.of(
             prevResult,
             currResult,
             swing,
@@ -99,8 +116,17 @@ class SwingometerScreenTest {
         val prevResult = Publisher(nbPrevResult())
         val currResult = Publisher(nbCurrResult())
         val parties = Publisher(Pair(lib, pc))
-        val swing = Publisher(mapOf(pc to +0.0745, lib to -0.0345, grn to +0.0336, pa to -0.0339, ndp to -0.0335, ind to -0.0062))
-        val panel = of(
+        val swing = Publisher(
+            mapOf(
+                pc to +0.0745,
+                lib to -0.0345,
+                grn to +0.0336,
+                pa to -0.0339,
+                ndp to -0.0335,
+                ind to -0.0062
+            )
+        )
+        val panel = SwingometerScreen.of(
             prevResult,
             currResult,
             swing,
@@ -121,7 +147,7 @@ class SwingometerScreenTest {
         val parties = Publisher(Pair(lib, pc))
         val curr = Publisher(mapOf(pc to 147790, lib to 129025, grn to 57252, pa to 34526, ndp to 6220, ind to 824))
         val prev = Publisher(mapOf(pc to 121300, lib to 143791, grn to 45186, pa to 47860, ndp to 19039, ind to 3187))
-        val panel = of(
+        val panel = SwingometerScreen.of(
             prevResult,
             currResult,
             curr,
@@ -182,7 +208,7 @@ class SwingometerScreenTest {
             "WI" to mapOf(gop to 502, dem to 468, oth to 30)
         ).asOneTimePublisher()
         val parties = Publisher(dem to gop)
-        val panel = of(
+        val panel = SwingometerScreen.of(
             prevResult,
             emptyMap<String, PartyResult?>().asOneTimePublisher(),
             emptyMap<Party, Double>().asOneTimePublisher(),
@@ -241,7 +267,7 @@ class SwingometerScreenTest {
             "WI" to mapOf(gop to 502, dem to 468, oth to 30)
         ).asOneTimePublisher()
         val parties = Publisher(dem to gop)
-        val panel = of(
+        val panel = SwingometerScreen.of(
             prevResult,
             emptyMap<String, PartyResult?>().asOneTimePublisher(),
             emptyMap<Party, Double>().asOneTimePublisher(),
@@ -322,7 +348,7 @@ class SwingometerScreenTest {
             ("WY" to 3) to mapOf(dem to 55973, gop to 174419, oth to 25457)
         ).asOneTimePublisher()
         val parties = Publisher(dem to gop)
-        val panel = of(
+        val panel = SwingometerScreen.of(
             prevResult,
             emptyMap<Pair<String, Int>, PartyResult?>().asOneTimePublisher(),
             emptyMap<Party, Double>().asOneTimePublisher(),

@@ -13,8 +13,6 @@ import java.awt.RenderingHints
 import java.awt.geom.AffineTransform
 import java.util.concurrent.Flow
 import javax.swing.JPanel
-import kotlin.Double.Companion.NEGATIVE_INFINITY
-import kotlin.Double.Companion.POSITIVE_INFINITY
 import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.cos
@@ -140,13 +138,13 @@ class SwingometerFrame(
                 repaint()
             }
 
-        var leftToWin: Number = POSITIVE_INFINITY
+        var leftToWin: Number = Double.POSITIVE_INFINITY
             set(value) {
                 field = value
                 repaint()
             }
 
-        var rightToWin: Number = NEGATIVE_INFINITY
+        var rightToWin: Number = Double.NEGATIVE_INFINITY
             set(value) {
                 field = value
                 repaint()
@@ -392,14 +390,14 @@ class SwingometerFrame(
         if (leftToWinPublisher != null) {
             leftToWinPublisher.subscribe(Subscriber(eventQueueWrapper(onLeftToWinUpdate)))
         } else {
-            onLeftToWinUpdate(POSITIVE_INFINITY)
+            onLeftToWinUpdate(Double.POSITIVE_INFINITY)
         }
 
         val onRightToWinUpdate: (Number) -> Unit = { rightToWin -> swingPanel.rightToWin = rightToWin }
         if (rightToWinPublisher != null) {
             rightToWinPublisher.subscribe(Subscriber(eventQueueWrapper(onRightToWinUpdate)))
         } else {
-            onRightToWinUpdate(NEGATIVE_INFINITY)
+            onRightToWinUpdate(Double.NEGATIVE_INFINITY)
         }
 
         val onTicksUpdate: (List<Tick>) -> Unit = { t -> swingPanel.ticks = t }

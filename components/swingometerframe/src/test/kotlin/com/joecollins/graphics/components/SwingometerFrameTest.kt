@@ -7,8 +7,8 @@ import com.joecollins.pubsub.map
 import com.joecollins.pubsub.mapElements
 import org.awaitility.Awaitility
 import org.hamcrest.core.IsEqual
-import org.junit.Assert
-import org.junit.Test
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
 import java.awt.Color
 import java.util.concurrent.TimeUnit
 import kotlin.math.abs
@@ -27,8 +27,8 @@ class SwingometerFrameTest {
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.leftColor }, IsEqual(Color.BLUE))
-        Assert.assertEquals(Color.BLUE, frame.leftColor)
-        Assert.assertEquals(Color.RED, frame.rightColor)
+        Assertions.assertEquals(Color.BLUE, frame.leftColor)
+        Assertions.assertEquals(Color.RED, frame.rightColor)
     }
 
     @Test
@@ -77,14 +77,14 @@ class SwingometerFrameTest {
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numTicks }, IsEqual(21))
         for (i in 0..20) {
-            Assert.assertEquals("Position at index $i", i - 10, frame.getTickPosition(i))
+            Assertions.assertEquals(i - 10, frame.getTickPosition(i), "Position at index $i")
         }
         for (i in 0..10) {
             val text = i.toString()
             val leftPos = 10 - i
             val rightPos = 10 + i
-            Assert.assertEquals("Text at index $leftPos", text, frame.getTickText(leftPos))
-            Assert.assertEquals("Text at index $rightPos", text, frame.getTickText(rightPos))
+            Assertions.assertEquals(text, frame.getTickText(leftPos), "Text at index $leftPos")
+            Assertions.assertEquals(text, frame.getTickText(rightPos), "Text at index $rightPos")
         }
     }
 
@@ -103,7 +103,7 @@ class SwingometerFrameTest {
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.leftToWin }, IsEqual(3.0))
-        Assert.assertEquals(-2.0, frame.rightToWin)
+        Assertions.assertEquals(-2.0, frame.rightToWin)
     }
 
     @Test
@@ -127,9 +127,9 @@ class SwingometerFrameTest {
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numOuterLabels }, IsEqual(3))
-        Assert.assertEquals(0.0, frame.getOuterLabelPosition(0))
-        Assert.assertEquals("75", frame.getOuterLabelText(1))
-        Assert.assertEquals(Color.BLUE, frame.getOuterLabelColor(2))
+        Assertions.assertEquals(0.0, frame.getOuterLabelPosition(0))
+        Assertions.assertEquals("75", frame.getOuterLabelText(1))
+        Assertions.assertEquals(Color.BLUE, frame.getOuterLabelColor(2))
     }
 
     @Test
@@ -152,9 +152,9 @@ class SwingometerFrameTest {
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numBucketsPerSide }, IsEqual(20))
-        Assert.assertEquals(3, frame.numDots.toLong())
-        Assert.assertEquals(0.3, frame.getDotPosition(0))
-        Assert.assertEquals(Color.RED, frame.getDotColor(1))
+        Assertions.assertEquals(3, frame.numDots.toLong())
+        Assertions.assertEquals(0.3, frame.getDotPosition(0))
+        Assertions.assertEquals(Color.RED, frame.getDotColor(1))
     }
 
     @Test
@@ -177,11 +177,11 @@ class SwingometerFrameTest {
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numDots }, IsEqual(3))
-        Assert.assertEquals(20, frame.numBucketsPerSide.toLong())
-        Assert.assertEquals(0.3, frame.getDotPosition(0))
-        Assert.assertEquals(Color.RED, frame.getDotColor(1))
-        Assert.assertEquals("C", frame.getDotLabel(2))
-        Assert.assertTrue(frame.isDotSolid(2))
+        Assertions.assertEquals(20, frame.numBucketsPerSide.toLong())
+        Assertions.assertEquals(0.3, frame.getDotPosition(0))
+        Assertions.assertEquals(Color.RED, frame.getDotColor(1))
+        Assertions.assertEquals("C", frame.getDotLabel(2))
+        Assertions.assertTrue(frame.isDotSolid(2))
     }
 
     @Test
@@ -204,12 +204,12 @@ class SwingometerFrameTest {
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numDots }, IsEqual(3))
-        Assert.assertEquals(20, frame.numBucketsPerSide.toLong())
-        Assert.assertEquals(0.3, frame.getDotPosition(0))
-        Assert.assertEquals(Color.RED, frame.getDotColor(1))
-        Assert.assertTrue(frame.isDotSolid(0))
-        Assert.assertFalse(frame.isDotSolid(1))
-        Assert.assertTrue(frame.isDotSolid(2))
+        Assertions.assertEquals(20, frame.numBucketsPerSide.toLong())
+        Assertions.assertEquals(0.3, frame.getDotPosition(0))
+        Assertions.assertEquals(Color.RED, frame.getDotColor(1))
+        Assertions.assertTrue(frame.isDotSolid(0))
+        Assertions.assertFalse(frame.isDotSolid(1))
+        Assertions.assertTrue(frame.isDotSolid(2))
     }
 
     @Test
@@ -238,7 +238,9 @@ class SwingometerFrameTest {
             numBucketsPerSidePublisher = 20.asOneTimePublisher(),
             dotsPublisher = dots.mapElements { SwingometerFrame.Dot(it.second, it.third) },
             ticksPublisher = ticks.map { SwingometerFrame.Tick(it, it.toString()) }.asOneTimePublisher(),
-            outerLabelsPublisher = outerLabels.mapElements { SwingometerFrame.OuterLabel(it.first, it.second.toString(), it.third) }
+            outerLabelsPublisher = outerLabels.mapElements {
+                SwingometerFrame.OuterLabel(it.first, it.second.toString(), it.third)
+            }
         )
         frame.setSize(1024, 512)
         compareRendering("SwingometerFrame", "Unlabelled", frame)
@@ -270,7 +272,9 @@ class SwingometerFrameTest {
             numBucketsPerSidePublisher = 80.asOneTimePublisher(),
             dotsPublisher = dots.mapElements { SwingometerFrame.Dot(it.second, it.third) },
             ticksPublisher = ticks.map { SwingometerFrame.Tick(it, it.toString()) }.asOneTimePublisher(),
-            outerLabelsPublisher = outerLabels.mapElements { SwingometerFrame.OuterLabel(it.first, it.second.toString(), it.third) }
+            outerLabelsPublisher = outerLabels.mapElements {
+                SwingometerFrame.OuterLabel(it.first, it.second.toString(), it.third)
+            }
         )
         frame.setSize(1024, 512)
         compareRendering("SwingometerFrame", "Unlabelled-TinyDots", frame)
@@ -343,14 +347,12 @@ class SwingometerFrameTest {
             rightToWinPublisher = 2.68.asOneTimePublisher(),
             numBucketsPerSidePublisher = 20.asOneTimePublisher(),
             dotsPublisher = dots.mapElements {
-                SwingometerFrame.Dot(
-                    it.second,
-                    it.third,
-                    label = it.first.second.toString()
-                )
+                SwingometerFrame.Dot(it.second, it.third, label = it.first.second.toString())
             },
             ticksPublisher = ticks.map { SwingometerFrame.Tick(it, it.toString()) }.asOneTimePublisher(),
-            outerLabelsPublisher = outerLabels.mapElements { SwingometerFrame.OuterLabel(it.first, it.second.toString(), it.third) }
+            outerLabelsPublisher = outerLabels.mapElements {
+                SwingometerFrame.OuterLabel(it.first, it.second.toString(), it.third)
+            }
         )
         frame.setSize(1024, 512)
         compareRendering("SwingometerFrame", "Labels", frame)
@@ -389,7 +391,9 @@ class SwingometerFrameTest {
                 )
             },
             ticksPublisher = ticks.map { SwingometerFrame.Tick(it, it.toString()) }.asOneTimePublisher(),
-            outerLabelsPublisher = outerLabels.mapElements { SwingometerFrame.OuterLabel(it.first, it.second.toString(), it.third) }
+            outerLabelsPublisher = outerLabels.mapElements {
+                SwingometerFrame.OuterLabel(it.first, it.second.toString(), it.third)
+            }
         )
         frame.setSize(1024, 512)
         compareRendering("SwingometerFrame", "EmptyDots", frame)
@@ -429,7 +433,9 @@ class SwingometerFrameTest {
             numBucketsPerSidePublisher = 20.asOneTimePublisher(),
             dotsPublisher = dots,
             ticksPublisher = ticks.mapElements { SwingometerFrame.Tick(it, it.toString()) },
-            outerLabelsPublisher = outerLabels.mapElements { SwingometerFrame.OuterLabel(it.first, it.second.toString(), it.third) }
+            outerLabelsPublisher = outerLabels.mapElements {
+                SwingometerFrame.OuterLabel(it.first, it.second.toString(), it.third)
+            }
         )
         frame.setSize(1024, 512)
         compareRendering("SwingometerFrame", "BeyondBoundary-1", frame)
@@ -558,7 +564,9 @@ class SwingometerFrameTest {
                 )
             },
             ticksPublisher = ticks.map { SwingometerFrame.Tick(it, it.toString()) }.asOneTimePublisher(),
-            outerLabelsPublisher = outerLabels.mapElements { SwingometerFrame.OuterLabel(it.first, it.second.toString(), it.third) }
+            outerLabelsPublisher = outerLabels.mapElements {
+                SwingometerFrame.OuterLabel(it.first, it.second.toString(), it.third)
+            }
         )
         frame.setSize(1024, 512)
         compareRendering("SwingometerFrame", "MultiLineLabels", frame)
