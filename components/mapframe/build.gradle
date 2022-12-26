@@ -17,8 +17,8 @@ version '1.0-SNAPSHOT'
 var topLevel = parent.parent
 
 dependencies {
-
     api parent.project('componentbase')
+    implementation topLevel.project('pubsub')
 
     testImplementation topLevel.project('shapefiles')
     testImplementation topLevel.project('testutils')

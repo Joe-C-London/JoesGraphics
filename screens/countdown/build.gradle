@@ -19,6 +19,7 @@ var topLevel = parent.parent
 dependencies {
     implementation topLevel.project('components:countdownframe')
     implementation topLevel.project('components:mapframe')
+    implementation topLevel.project('pubsub')
     implementation parent.project('screenbase')
 
 

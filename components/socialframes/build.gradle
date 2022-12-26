@@ -18,10 +18,13 @@ repositories {
     mavenCentral()
 }
 
+var topLevel = parent.parent
+
 dependencies {
-    implementation parent.parent.project('base')
-    implementation parent.parent.project('shapes')
-    implementation parent.parent.project('social')
+    implementation topLevel.project('base')
+    implementation topLevel.project('shapes')
+    implementation topLevel.project('pubsub')
+    implementation topLevel.project('social')
 
     implementation parent.project('barframe')
 

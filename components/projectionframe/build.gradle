@@ -14,10 +14,13 @@ plugins {
 group 'com.joecollins'
 version '1.0-SNAPSHOT'
 
+var topLevel = parent.parent
+
 dependencies {
     api parent.project('componentbase')
+    implementation topLevel.project('pubsub')
 
-    testImplementation parent.parent.project('testutils')
+    testImplementation topLevel.project('testutils')
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'

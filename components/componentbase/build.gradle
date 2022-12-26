@@ -17,6 +17,7 @@ version '1.0-SNAPSHOT'
 
 dependencies {
     api parent.parent.project('base')
+    implementation parent.parent.project('pubsub')
 
     testImplementation parent.parent.project('testutils')
 

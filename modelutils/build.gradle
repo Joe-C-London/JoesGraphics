@@ -21,6 +21,7 @@ repositories {
 dependencies {
     api parent.project('base')
     api parent.project('models')
+    api parent.project('pubsub')
 
     testImplementation parent.project('testutils')
 

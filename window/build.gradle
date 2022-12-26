@@ -20,6 +20,7 @@ repositories {
 
 dependencies {
     implementation parent.project('base')
+    implementation parent.project('pubsub')
     implementation parent.project('social')
 
     implementation 'com.fasterxml:jackson-xml-databind:0.6.2'

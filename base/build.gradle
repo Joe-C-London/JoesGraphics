@@ -19,7 +19,7 @@ repositories {
 }
 
 dependencies {
-    api parent.project('pubsub')
+    implementation parent.project('pubsub')
 
     testImplementation parent.project('testutils')
 

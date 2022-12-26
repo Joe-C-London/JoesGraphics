@@ -18,7 +18,7 @@ var topLevel = parent.parent
 
 dependencies {
     implementation topLevel.project('base')
-    implementation topLevel.project('models')
+    api topLevel.project('models')
     implementation topLevel.project('modelutils')
     implementation topLevel.project('shapes')
 

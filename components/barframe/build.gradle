@@ -21,8 +21,8 @@ repositories {
 var topLevel = parent.parent
 
 dependencies {
-
     api parent.project('componentbase')
+    implementation topLevel.project('pubsub')
 
     testImplementation topLevel.project('shapes')
     testImplementation topLevel.project('testutils')

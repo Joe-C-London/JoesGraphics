@@ -21,9 +21,9 @@ repositories {
 var topLevel = parent.parent
 
 dependencies {
-
     api parent.project('componentbase')
-    implementation topLevel.project('models')
+    api topLevel.project('models')
+    implementation topLevel.project('pubsub')
 
     implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.4'
 

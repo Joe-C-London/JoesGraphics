@@ -18,8 +18,7 @@ var topLevel = parent.parent
 
 dependencies {
     implementation parent.project('screenbase')
-
-
+    implementation topLevel.project('pubsub')
     implementation topLevel.project('components:heatmapframeresultbuilder')
 
     testImplementation topLevel.project('testutils')
