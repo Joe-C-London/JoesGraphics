@@ -2,7 +2,6 @@ package com.joecollins.graphics.screens.generic
 
 import com.joecollins.graphics.AltTextProvider
 import com.joecollins.graphics.GenericPanel
-import com.joecollins.graphics.GenericWindow.Companion
 import com.joecollins.graphics.GenericWindow.Companion.ALT_TEXT_MAX_LENGTH
 import com.joecollins.graphics.components.MultiSummaryFrame
 import com.joecollins.models.general.Aggregators

@@ -10,8 +10,6 @@ import com.joecollins.graphics.components.FontSizeAdjustingLabel
 import com.joecollins.graphics.components.MapFrame
 import com.joecollins.graphics.components.SwingFrame
 import com.joecollins.graphics.components.SwingFrameBuilder
-import com.joecollins.graphics.components.SwingFrameBuilder.Companion
-import com.joecollins.graphics.screens.generic.selfCompose
 import com.joecollins.graphics.utils.StandardFont
 import com.joecollins.models.general.Aggregators
 import com.joecollins.models.general.Candidate
