@@ -2,7 +2,6 @@ package com.joecollins.graphics.screens.generic
 
 import com.joecollins.graphics.AltTextProvider
 import com.joecollins.graphics.GenericPanel
-import com.joecollins.graphics.GenericWindow.Companion.ALT_TEXT_MAX_LENGTH
 import com.joecollins.graphics.components.MultiSummaryFrame
 import com.joecollins.models.general.Aggregators
 import com.joecollins.models.general.Candidate
@@ -179,7 +178,7 @@ class TooCloseToCallScreen private constructor(
                     }"
                     if (dotDotDot) {
                         null
-                    } else if (size + entry.length < ALT_TEXT_MAX_LENGTH - 10) {
+                    } else if (size + entry.length < AltTextProvider.ALT_TEXT_MAX_LENGTH - 10) {
                         size += entry.length + 1
                         entry
                     } else {

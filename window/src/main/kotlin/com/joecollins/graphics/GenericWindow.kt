@@ -38,7 +38,6 @@ class GenericWindow<T : JPanel> @JvmOverloads constructor(private val panel: T, 
     }
 
     companion object {
-        const val ALT_TEXT_MAX_LENGTH = 1000
 
         private fun saveImageToFile(panel: JPanel) {
             val fileChooser = JFileChooser()
