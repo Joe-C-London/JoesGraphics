@@ -1,12 +1,11 @@
 package com.joecollins.graphics.screens.generic
 
-import com.joecollins.graphics.screens.generic.PartySummaryScreen.Companion.ofDiff
-import com.joecollins.graphics.screens.generic.PartySummaryScreen.Companion.ofPrev
+import com.joecollins.graphics.utils.RenderTestUtils
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.models.general.Party
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import java.awt.Color
 
 class PartySummaryScreenTest {
@@ -27,7 +26,7 @@ class PartySummaryScreenTest {
         val atlantic = Region("Atlantic")
         val north = Region("North")
         val partySelected = Publisher(lib)
-        val screen = ofDiff(
+        val screen = PartySummaryScreen.ofDiff(
             canada,
             { r -> r.name.uppercase().asOneTimePublisher() },
             { r -> r.seatsPublisher },
@@ -106,7 +105,7 @@ class PartySummaryScreenTest {
         val atlantic = Region("Atlantic")
         val north = Region("North")
         val partySelected = Publisher(lib)
-        val screen = ofPrev(
+        val screen = PartySummaryScreen.ofPrev(
             canada,
             { r -> r.name.uppercase().asOneTimePublisher() },
             { r -> r.seatsPublisher },

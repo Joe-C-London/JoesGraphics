@@ -14,20 +14,15 @@ plugins {
 group 'com.joecollins'
 version '1.0-SNAPSHOT'
 
-repositories {
-    mavenCentral()
-}
+var topLevel = parent.parent
 
 dependencies {
-    api project('barframe')
-    api project('countdownframe')
-    api project('mapframe')
-    api project('multisummaryframe')
-    api project('regionsummaryframe')
-    api project('resultlistingframe')
-    api project('resultmapframebuilder')
-    api project('socialframes')
-    api project('swingframe')
+    implementation parent.project('screenbase')
+
+    implementation topLevel.project('models')
+    implementation topLevel.project('components:regionsummaryframe')
+
+    testImplementation topLevel.project('testutils')
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'

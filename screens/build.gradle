@@ -28,6 +28,7 @@ dependencies {
     api project('countdown')
     api project('mixedmemberresult')
     api project('multiresult')
+    api project('partysummary')
     api project('regionalbreakdown')
     api project('seatschanging')
     api project('singletransferrableresult')

@@ -4,8 +4,8 @@ import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.pubsub.asOneTimePublisher
 import org.awaitility.Awaitility
 import org.hamcrest.core.IsEqual
-import org.junit.Assert
-import org.junit.Test
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
 import java.awt.Color
 import java.util.concurrent.TimeUnit
 
@@ -37,10 +37,10 @@ class RegionSummaryFrameTest {
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.getNumSections() }, IsEqual(2))
-        Assert.assertEquals(Color.BLACK, frame.getSummaryColor())
-        Assert.assertEquals("ELECTORAL VOTES", frame.getSectionHeader(0))
-        Assert.assertEquals(Color.BLUE, frame.getValueColor(1, 0))
-        Assert.assertEquals("<< 1.0%", frame.getValue(1, 1))
+        Assertions.assertEquals(Color.BLACK, frame.getSummaryColor())
+        Assertions.assertEquals("ELECTORAL VOTES", frame.getSectionHeader(0))
+        Assertions.assertEquals(Color.BLUE, frame.getValueColor(1, 0))
+        Assertions.assertEquals("<< 1.0%", frame.getValue(1, 1))
     }
 
     @Test
@@ -57,10 +57,10 @@ class RegionSummaryFrameTest {
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.getNumSections() }, IsEqual(2))
-        Assert.assertEquals(Color.BLUE, frame.getSummaryColor())
-        Assert.assertEquals("ELECTORAL VOTES", frame.getSectionHeader(0))
-        Assert.assertEquals(Color.BLUE, frame.getValueColor(1, 0))
-        Assert.assertEquals("+1.0%", frame.getValue(1, 1))
+        Assertions.assertEquals(Color.BLUE, frame.getSummaryColor())
+        Assertions.assertEquals("ELECTORAL VOTES", frame.getSectionHeader(0))
+        Assertions.assertEquals(Color.BLUE, frame.getValueColor(1, 0))
+        Assertions.assertEquals("+1.0%", frame.getValue(1, 1))
     }
 
     @Test
