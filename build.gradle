@@ -35,6 +35,8 @@ def geotoolsVersion = '27.1'
 dependencies {
     api project('base')
     api project('components')
+    api project('lowerthird')
+    api project('lowerthird:lowerthirdutils')
     api project('models')
     api project('modelutils')
     api project('screens')
