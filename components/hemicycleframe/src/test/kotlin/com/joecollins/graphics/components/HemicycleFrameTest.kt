@@ -7,8 +7,8 @@ import com.joecollins.pubsub.map
 import com.joecollins.pubsub.mapElements
 import org.awaitility.Awaitility
 import org.hamcrest.core.IsEqual
-import org.junit.Assert
-import org.junit.Test
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
 import java.awt.Color
 import java.util.concurrent.TimeUnit
 
@@ -23,11 +23,11 @@ class HemicycleFrameTest {
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numRows }, IsEqual(4))
-        Assert.assertEquals(4, frame.numRows.toLong())
-        Assert.assertEquals(5, frame.getRowCount(0).toLong())
-        Assert.assertEquals(6, frame.getRowCount(1).toLong())
-        Assert.assertEquals(7, frame.getRowCount(2).toLong())
-        Assert.assertEquals(9, frame.getRowCount(3).toLong())
+        Assertions.assertEquals(4, frame.numRows.toLong())
+        Assertions.assertEquals(5, frame.getRowCount(0).toLong())
+        Assertions.assertEquals(6, frame.getRowCount(1).toLong())
+        Assertions.assertEquals(7, frame.getRowCount(2).toLong())
+        Assertions.assertEquals(9, frame.getRowCount(3).toLong())
     }
 
     @Test
@@ -44,9 +44,9 @@ class HemicycleFrameTest {
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numDots }, IsEqual(27))
-        Assert.assertEquals(Color.GREEN, frame.getDotColor(0))
-        Assert.assertEquals(Color.RED, frame.getDotColor(7))
-        Assert.assertEquals(Color.BLUE, frame.getDotColor(17))
+        Assertions.assertEquals(Color.GREEN, frame.getDotColor(0))
+        Assertions.assertEquals(Color.RED, frame.getDotColor(7))
+        Assertions.assertEquals(Color.BLUE, frame.getDotColor(17))
     }
 
     @Test
@@ -63,9 +63,9 @@ class HemicycleFrameTest {
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numDots }, IsEqual(27))
-        Assert.assertEquals(Color.RED, frame.getDotBorder(0))
-        Assert.assertEquals(Color.BLUE, frame.getDotBorder(9))
-        Assert.assertEquals(Color.GREEN, frame.getDotBorder(18))
+        Assertions.assertEquals(Color.RED, frame.getDotBorder(0))
+        Assertions.assertEquals(Color.BLUE, frame.getDotBorder(9))
+        Assertions.assertEquals(Color.GREEN, frame.getDotBorder(18))
     }
 
     @Test
@@ -83,9 +83,9 @@ class HemicycleFrameTest {
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.leftSeatBarCount }, IsEqual(2))
-        Assert.assertEquals(Color.GREEN, frame.getLeftSeatBarColor(0))
-        Assert.assertEquals(7, frame.getLeftSeatBarSize(1).toLong())
-        Assert.assertEquals("GREEN: 1/8", frame.getLeftSeatBarLabel())
+        Assertions.assertEquals(Color.GREEN, frame.getLeftSeatBarColor(0))
+        Assertions.assertEquals(7, frame.getLeftSeatBarSize(1).toLong())
+        Assertions.assertEquals("GREEN: 1/8", frame.getLeftSeatBarLabel())
     }
 
     @Test
@@ -103,9 +103,9 @@ class HemicycleFrameTest {
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.rightSeatBarCount }, IsEqual(2))
-        Assert.assertEquals(Color.BLUE, frame.getRightSeatBarColor(0))
-        Assert.assertEquals(5, frame.getRightSeatBarSize(1).toLong())
-        Assert.assertEquals("PROGRESSIVE CONSERVATIVE: 8/13", frame.getRightSeatBarLabel())
+        Assertions.assertEquals(Color.BLUE, frame.getRightSeatBarColor(0))
+        Assertions.assertEquals(5, frame.getRightSeatBarSize(1).toLong())
+        Assertions.assertEquals("PROGRESSIVE CONSERVATIVE: 8/13", frame.getRightSeatBarLabel())
     }
 
     @Test
@@ -123,9 +123,9 @@ class HemicycleFrameTest {
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.middleSeatBarCount }, IsEqual(2))
-        Assert.assertEquals(Color.RED, frame.getMiddleSeatBarColor(0))
-        Assert.assertEquals(4, frame.getMiddleSeatBarSize(1).toLong())
-        Assert.assertEquals("LIBERAL: 2/6", frame.getMiddleSeatBarLabel())
+        Assertions.assertEquals(Color.RED, frame.getMiddleSeatBarColor(0))
+        Assertions.assertEquals(4, frame.getMiddleSeatBarSize(1).toLong())
+        Assertions.assertEquals("LIBERAL: 2/6", frame.getMiddleSeatBarLabel())
     }
 
     @Test
@@ -144,10 +144,10 @@ class HemicycleFrameTest {
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.leftChangeBarCount }, IsEqual(2))
-        Assert.assertEquals(Color.GREEN, frame.getLeftChangeBarColor(0))
-        Assert.assertEquals(6, frame.getLeftChangeBarSize(1).toLong())
-        Assert.assertEquals(1, frame.getLeftChangeBarStart().toLong())
-        Assert.assertEquals("GRN: +1/+7", frame.getLeftChangeBarLabel())
+        Assertions.assertEquals(Color.GREEN, frame.getLeftChangeBarColor(0))
+        Assertions.assertEquals(6, frame.getLeftChangeBarSize(1).toLong())
+        Assertions.assertEquals(1, frame.getLeftChangeBarStart().toLong())
+        Assertions.assertEquals("GRN: +1/+7", frame.getLeftChangeBarLabel())
     }
 
     @Test
@@ -166,10 +166,10 @@ class HemicycleFrameTest {
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.rightChangeBarCount }, IsEqual(2))
-        Assert.assertEquals(Color.BLUE, frame.getRightChangeBarColor(0))
-        Assert.assertEquals(2, frame.getRightChangeBarSize(1).toLong())
-        Assert.assertEquals(8, frame.getRightChangeBarStart().toLong())
-        Assert.assertEquals("PC: +3/+5", frame.getRightChangeBarLabel())
+        Assertions.assertEquals(Color.BLUE, frame.getRightChangeBarColor(0))
+        Assertions.assertEquals(2, frame.getRightChangeBarSize(1).toLong())
+        Assertions.assertEquals(8, frame.getRightChangeBarStart().toLong())
+        Assertions.assertEquals("PC: +3/+5", frame.getRightChangeBarLabel())
     }
 
     @Test
