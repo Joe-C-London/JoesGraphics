@@ -23,6 +23,7 @@ dependencies {
     api project('countdownframe')
     api project('mapframe')
     api project('multisummaryframe')
+    api project('resultlistingframe')
     api project('resultmapframebuilder')
     api project('socialframes')
     api project('swingframe')

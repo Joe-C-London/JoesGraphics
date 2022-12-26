@@ -3,7 +3,8 @@ package com.joecollins.graphics.screens.generic
 import com.joecollins.graphics.GenericPanel
 import com.joecollins.graphics.components.GraphicsFrame
 import com.joecollins.graphics.components.ResultListingFrame
-import com.joecollins.graphics.utils.ColorUtils.lighten
+import com.joecollins.graphics.screens.generic.reverse
+import com.joecollins.graphics.utils.ColorUtils
 import com.joecollins.models.general.Aggregators
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyOrCoalition
@@ -323,7 +324,12 @@ class BattlegroundScreen private constructor(
                         resultColor = partyResult.party.color
                         fill = partyResult.isElected
                     }
-                    val colorFunc = if (filteredSeats?.contains(it.first) != false) { c: Color -> c } else { c -> lighten(lighten(c)) }
+                    val colorFunc =
+                        if (filteredSeats?.contains(it.first) != false)
+                            { c: Color -> c }
+                        else
+                            { c -> ColorUtils.lighten(ColorUtils.lighten(c))
+                    }
                     Entry(
                         it.first,
                         colorFunc(it.third),

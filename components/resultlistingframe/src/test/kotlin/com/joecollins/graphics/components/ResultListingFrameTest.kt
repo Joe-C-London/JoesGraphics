@@ -6,8 +6,8 @@ import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.mapElements
 import org.awaitility.Awaitility
 import org.hamcrest.core.IsEqual
-import org.junit.Assert
-import org.junit.Test
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
 import java.awt.Color
 import java.util.concurrent.TimeUnit
 
@@ -50,19 +50,19 @@ class ResultListingFrameTest {
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.getNumItems() }, IsEqual(8))
-        Assert.assertEquals("BELFAST-MURRAY RIVER", frame.getText(0))
-        Assert.assertEquals(Color.WHITE, frame.getBackground(1))
-        Assert.assertEquals(Color.BLACK, frame.getForeground(2))
-        Assert.assertEquals(Color.BLUE, frame.getBorder(3))
+        Assertions.assertEquals("BELFAST-MURRAY RIVER", frame.getText(0))
+        Assertions.assertEquals(Color.WHITE, frame.getBackground(1))
+        Assertions.assertEquals(Color.BLACK, frame.getForeground(2))
+        Assertions.assertEquals(Color.BLUE, frame.getBorder(3))
 
         rawItems[4].foreground = Color.WHITE
         rawItems[4].background = Color.BLUE
         items.submit(rawItems)
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.getBackground(4) }, IsEqual(Color.BLUE))
-        Assert.assertEquals(Color.BLUE, frame.getBackground(4))
-        Assert.assertEquals(Color.WHITE, frame.getForeground(4))
-        Assert.assertEquals(Color.BLUE, frame.getBorder(4))
+        Assertions.assertEquals(Color.BLUE, frame.getBackground(4))
+        Assertions.assertEquals(Color.WHITE, frame.getForeground(4))
+        Assertions.assertEquals(Color.BLUE, frame.getBorder(4))
     }
 
     @Test

@@ -1,154 +1,256 @@
 package com.joecollins.graphics.screens.generic
 
-import com.joecollins.graphics.screens.generic.SeatsChangingScreen.Companion.of
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
+import com.joecollins.models.general.Coalition
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
 import com.joecollins.models.general.PartyResult.Companion.elected
 import com.joecollins.models.general.PartyResult.Companion.leading
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import java.awt.Color
+import java.text.DecimalFormat
+import kotlin.math.abs
 
-class SeatsChangingScreenTest {
+class BattlegroundScreenTest {
     @Test
-    fun testSeatsChanging() {
+    fun testSinglePartyBattleground() {
         val prevResult = Publisher(bcPrevResult())
-        val currResult = Publisher<Map<String, PartyResult?>>(emptyMap())
+        val currResult = Publisher<Map<String, PartyResult>>(emptyMap())
+        val party = Publisher(ndp)
+        val targetSeats = Publisher(30)
+        val defenseSeats = Publisher(15)
         val numRows = Publisher(15)
-        val title = Publisher("BRITISH COLUMBIA")
-        val panel = of(
+        val title = Publisher("NDP BATTLEGROUND")
+        val panel = BattlegroundScreen.singleParty(
             prevResult,
             currResult,
             { it.uppercase() },
-            "SEATS CHANGING".asOneTimePublisher()
+            party
         )
+            .withSeatsToShow(defenseSeats, targetSeats)
             .withNumRows(numRows)
             .build(title)
         panel.setSize(1024, 512)
-        compareRendering("SeatsChangingScreen", "Basic-1", panel)
-        currResult.submit(
-            mapOf(
-                "Coquitlam-Burke Mountain" to leading(ndp),
-                "Fraser-Nicola" to leading(ndp),
-                "Vancouver-False Creek" to leading(ndp)
-            )
-        )
-        compareRendering("SeatsChangingScreen", "Basic-2", panel)
-        currResult.submit(
-            mapOf(
-                "Coquitlam-Burke Mountain" to elected(ndp),
-                "Fraser-Nicola" to leading(lib),
-                "Richmond-Queensborough" to leading(ndp),
-                "Vancouver-False Creek" to leading(ndp)
-            )
-        )
-        compareRendering("SeatsChangingScreen", "Basic-3", panel)
+        compareRendering("BattlegroundScreen", "Basic-SingleParty-1", panel)
+        party.submit(lib)
+        targetSeats.submit(15)
+        defenseSeats.submit(30)
+        title.submit("LIBERAL BATTLEGROUND")
+        compareRendering("BattlegroundScreen", "Basic-SingleParty-2", panel)
         currResult.submit(bcCurrResult())
-        compareRendering("SeatsChangingScreen", "Basic-4", panel)
+        compareRendering("BattlegroundScreen", "Basic-SingleParty-3", panel)
+        party.submit(grn)
+        targetSeats.submit(30)
+        defenseSeats.submit(5)
+        title.submit("GREEN BATTLEGROUND")
+        compareRendering("BattlegroundScreen", "Basic-SingleParty-4", panel)
+        party.submit(ndp)
+        targetSeats.submit(30)
+        defenseSeats.submit(0)
+        title.submit("NDP TARGETS")
+        compareRendering("BattlegroundScreen", "Basic-SingleParty-5", panel)
+        party.submit(lib)
+        targetSeats.submit(0)
+        defenseSeats.submit(30)
+        title.submit("LIBERAL DEFENSE")
+        compareRendering("BattlegroundScreen", "Basic-SingleParty-6", panel)
     }
 
     @Test
-    fun testFilteredSeatsChanging() {
+    fun testSinglePartyFilteredBattleground() {
         val prevResult = Publisher(bcPrevResult())
         val currResult = Publisher<Map<String, PartyResult?>>(emptyMap())
+        val party = Publisher(ndp)
+        val targetSeats = Publisher(30)
+        val defenseSeats = Publisher(15)
         val numRows = Publisher(15)
-        val title = Publisher("VANCOUVER")
-        val filteredSeats = Publisher(
+        val filteredSeats = Publisher<Set<String>?>(
             bcPrevResult().keys
                 .filter { it.startsWith("Vancouver") }
                 .toSet()
         )
-        val panel = of(
+        val title = Publisher("NDP BATTLEGROUND")
+        val panel = BattlegroundScreen.singleParty(
             prevResult,
             currResult,
             { it.uppercase() },
-            "SEATS CHANGING".asOneTimePublisher()
+            party
         )
+            .withSeatsToShow(defenseSeats, targetSeats)
             .withNumRows(numRows)
             .withSeatFilter(filteredSeats)
             .build(title)
         panel.setSize(1024, 512)
-        compareRendering("SeatsChangingScreen", "Filtered-1", panel)
-        currResult.submit(
-            mapOf(
-                "Coquitlam-Burke Mountain" to leading(ndp),
-                "Fraser-Nicola" to leading(ndp),
-                "Vancouver-False Creek" to leading(ndp)
-            )
-        )
-        compareRendering("SeatsChangingScreen", "Filtered-2", panel)
-        currResult.submit(
-            mapOf(
-                "Coquitlam-Burke Mountain" to elected(ndp),
-                "Fraser-Nicola" to leading(lib),
-                "Richmond-Queensborough" to leading(ndp),
-                "Vancouver-False Creek" to leading(ndp)
-            )
-        )
-        compareRendering("SeatsChangingScreen", "Filtered-3", panel)
+        compareRendering("BattlegroundScreen", "Filtered-SingleParty-1", panel)
         currResult.submit(bcCurrResult())
-        compareRendering("SeatsChangingScreen", "Filtered-4", panel)
+        compareRendering("BattlegroundScreen", "Filtered-SingleParty-2", panel)
+        filteredSeats.submit(emptySet())
+        compareRendering("BattlegroundScreen", "Filtered-SingleParty-3", panel)
+        filteredSeats.submit(null)
+        compareRendering("BattlegroundScreen", "Filtered-SingleParty-4", panel)
     }
 
     @Test
-    fun testSeatsChangingNullResults() {
+    fun testDoublePartyBattleground() {
         val prevResult = Publisher(bcPrevResult())
-        val results = bcCurrResult().mapValues { null }
-        val currResult = Publisher<Map<String, PartyResult?>>(results)
+        val currResult = Publisher<Map<String, PartyResult>>(emptyMap())
+        val parties = Publisher(ndp to lib)
+        val rightSeats = Publisher(30)
+        val leftSeats = Publisher(15)
         val numRows = Publisher(15)
-        val title = Publisher("BRITISH COLUMBIA")
-        val panel = of(
+        val title = Publisher("BATTLEGROUND")
+        val panel = BattlegroundScreen.doubleParty(
             prevResult,
             currResult,
             { it.uppercase() },
-            "SEATS CHANGING".asOneTimePublisher()
+            parties
         )
+            .withSeatsToShow(leftSeats, rightSeats)
             .withNumRows(numRows)
             .build(title)
         panel.setSize(1024, 512)
-        compareRendering("SeatsChangingScreen", "Basic-1", panel)
+        compareRendering("BattlegroundScreen", "Basic-DoubleParty-1", panel)
+        parties.submit(grn to lib)
+        rightSeats.submit(30)
+        leftSeats.submit(15)
+        compareRendering("BattlegroundScreen", "Basic-DoubleParty-2", panel)
         currResult.submit(bcCurrResult())
-        compareRendering("SeatsChangingScreen", "Basic-4", panel)
+        compareRendering("BattlegroundScreen", "Basic-DoubleParty-3", panel)
+        parties.submit(ndp to grn)
+        rightSeats.submit(15)
+        leftSeats.submit(15)
+        compareRendering("BattlegroundScreen", "Basic-DoubleParty-4", panel)
+        parties.submit(ndp to lib)
+        rightSeats.submit(30)
+        leftSeats.submit(0)
+        compareRendering("BattlegroundScreen", "Basic-DoubleParty-5", panel)
+        parties.submit(ndp to lib)
+        rightSeats.submit(0)
+        leftSeats.submit(30)
+        compareRendering("BattlegroundScreen", "Basic-DoubleParty-6", panel)
     }
 
     @Test
-    fun testSeatsChangingWithPartyChanges() {
+    fun testDoubleCoalitionBattleground() {
+        val coa = Coalition("Governing Coalition", "NDP/GRN", ndp, grn)
         val prevResult = Publisher(bcPrevResult())
-        val currResult = Publisher<Map<String, PartyResult?>>(emptyMap())
+        val currResult = Publisher<Map<String, PartyResult>>(emptyMap())
+        val rightSeats = Publisher(30)
+        val leftSeats = Publisher(30)
         val numRows = Publisher(15)
-        val title = Publisher("BRITISH COLUMBIA")
-        val panel = of(
+        val title = Publisher("BATTLEGROUND")
+        val panel = BattlegroundScreen.doubleParty(
             prevResult,
             currResult,
             { it.uppercase() },
-            "SEATS CHANGING".asOneTimePublisher()
+            (coa to lib).asOneTimePublisher()
         )
+            .withSeatsToShow(leftSeats, rightSeats)
+            .withNumRows(numRows)
+            .build(title)
+        panel.setSize(1024, 512)
+        compareRendering("BattlegroundScreen", "Basic-DoubleCoalition-1", panel)
+    }
+
+    @Test
+    fun testSinglePartyBattlegroundWithPartyChange() {
+        val prevResult = Publisher(bcPrevResult())
+        val currResult = Publisher<Map<String, PartyResult>>(emptyMap())
+        val party = Publisher(ndp)
+        val targetSeats = Publisher(30)
+        val defenseSeats = Publisher(15)
+        val numRows = Publisher(15)
+        val title = Publisher("NDP BATTLEGROUND")
+        val panel = BattlegroundScreen.singleParty(
+            prevResult,
+            currResult,
+            { it.uppercase() },
+            party
+        )
+            .withSeatsToShow(defenseSeats, targetSeats)
             .withNumRows(numRows)
             .withPartyChanges(mapOf(lib to bcu).asOneTimePublisher())
             .build(title)
         panel.setSize(1024, 512)
-        compareRendering("SeatsChangingScreen", "PartyChanges-1", panel)
-        currResult.submit(
-            mapOf(
-                "Coquitlam-Burke Mountain" to leading(ndp),
-                "Fraser-Nicola" to leading(ndp),
-                "Vancouver-False Creek" to leading(ndp)
-            )
+        compareRendering("BattlegroundScreen", "Basic-SingleParty-1", panel)
+        party.submit(bcu)
+        targetSeats.submit(15)
+        defenseSeats.submit(30)
+        title.submit("BC UNITED BATTLEGROUND")
+        compareRendering("BattlegroundScreen", "Basic-SingleParty-PartyChange-2", panel)
+        currResult.submit(bcCurrResult().mapValues { if (it.value.party == lib) PartyResult(bcu, it.value.elected) else it.value })
+        compareRendering("BattlegroundScreen", "Basic-SingleParty-PartyChange-3", panel)
+        party.submit(grn)
+        targetSeats.submit(30)
+        defenseSeats.submit(5)
+        title.submit("GREEN BATTLEGROUND")
+        compareRendering("BattlegroundScreen", "Basic-SingleParty-PartyChange-4", panel)
+        party.submit(ndp)
+        targetSeats.submit(30)
+        defenseSeats.submit(0)
+        title.submit("NDP TARGETS")
+        compareRendering("BattlegroundScreen", "Basic-SingleParty-PartyChange-5", panel)
+        party.submit(bcu)
+        targetSeats.submit(0)
+        defenseSeats.submit(30)
+        title.submit("BC UNITED DEFENSE")
+        compareRendering("BattlegroundScreen", "Basic-SingleParty-PartyChange-6", panel)
+    }
+
+    @Test
+    fun testDoublePartyBattlegroundPreferences() {
+        val alp = Party("Labor", "ALP", Color.RED)
+        val clp = Party("Country Liberal", "CLP", Color.ORANGE)
+        val ta = Party("Territory Alliance", "TA", Color.BLUE.darker())
+        val ind = Party("Independent", "IND", Party.OTHERS.color)
+
+        val prevResults = listOf(
+            "Arafura" to mapOf(alp to 1388, clp to 1203),
+            "Araluen" to mapOf(ta to 2203, clp to 2161),
+            "Arnhem" to mapOf(alp to 1504, ind to 1420),
+            "Barkly" to mapOf(clp to 1723, alp to 1718),
+            "Blain" to mapOf(alp to 2095, clp to 2082),
+            "Braitling" to mapOf(clp to 2256, alp to 2139),
+            "Brennan" to mapOf(clp to 2242, alp to 2138),
+            "Casuarina" to mapOf(alp to 3033, clp to 1568),
+            "Daly" to mapOf(clp to 1984, alp to 1890),
+            "Drysdale" to mapOf(alp to 2263, clp to 1642),
+            "Fannie Bay" to mapOf(alp to 2589, clp to 1756),
+            "Fong Lim" to mapOf(alp to 2197, clp to 1978),
+            "Goyder" to mapOf(ind to 2665, clp to 2030),
+            "Gwoja" to mapOf(alp to 1729, clp to 929),
+            "Johnston" to mapOf(alp to 2851, clp to 1433),
+            "Karama" to mapOf(alp to 2491, clp to 1678),
+            "Katherine" to mapOf(clp to 2041, alp to 1845),
+            "Mulka" to mapOf(ind to 2252, alp to 1843),
+            "Namatjira" to mapOf(clp to 1814, alp to 1792),
+            "Nelson" to mapOf(clp to 2657, ind to 1904),
+            "Nightcliff" to mapOf(alp to 3286, clp to 1139),
+            "Port Darwin" to mapOf(alp to 2233, clp to 2068),
+            "Sanderson" to mapOf(alp to 3044, clp to 1351),
+            "Spillett" to mapOf(clp to 3219, alp to 1730),
+            "Wanguri" to mapOf(alp to 3349, clp to 1627)
         )
-        compareRendering("SeatsChangingScreen", "PartyChanges-2", panel)
-        currResult.submit(
-            mapOf(
-                "Coquitlam-Burke Mountain" to elected(ndp),
-                "Fraser-Nicola" to leading(bcu),
-                "Richmond-Queensborough" to leading(ndp),
-                "Vancouver-False Creek" to leading(ndp)
-            )
+        val panel = BattlegroundScreen.doubleParty(
+            prevResults.associateWith { it.second }.asOneTimePublisher(),
+            emptyMap<Pair<String, Map<Party, Int>>, PartyResult?>().asOneTimePublisher(),
+            { e ->
+                val votes = e.second.values.toList()
+                val pct = abs(votes[0] - votes[1]) / votes.sum().toDouble()
+                DecimalFormat("0.0").format(50 * pct) +
+                    " " + e.first.uppercase() + " " +
+                    (e.second.keys.filter { !setOf(alp, clp).contains(it) }.takeUnless { it.isEmpty() }?.toString() ?: "")
+            },
+            (clp to alp).asOneTimePublisher()
         )
-        compareRendering("SeatsChangingScreen", "PartyChanges-3", panel)
-        currResult.submit(bcCurrResult().mapValues { if (it.value?.party == lib) PartyResult(bcu, it.value!!.elected) else it.value })
-        compareRendering("SeatsChangingScreen", "PartyChanges-4", panel)
+            .withSeatsToShow(15.asOneTimePublisher(), 15.asOneTimePublisher())
+            .withNumRows(15.asOneTimePublisher())
+            .withPreferences()
+            .build("PENDULUM".asOneTimePublisher())
+        panel.setSize(1024, 512)
+        compareRendering("BattlegroundScreen", "Basic-DoublePartyPreferences-1", panel)
     }
 
     companion object {
@@ -250,7 +352,7 @@ class SeatsChangingScreenTest {
             )
         }
 
-        private fun bcCurrResult(): Map<String, PartyResult?> {
+        private fun bcCurrResult(): Map<String, PartyResult> {
             return mapOf(
                 "Nechako Lakes" to elected(lib),
                 "North Coast" to elected(ndp),
@@ -339,7 +441,7 @@ class SeatsChangingScreenTest {
                 "Saanich South" to elected(ndp),
                 "Victoria-Beacon Hill" to elected(ndp),
                 "Victoria-Swan Lake" to elected(ndp)
-            )
+            ).mapValues { it.value!! }
         }
     }
 }

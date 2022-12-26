@@ -7,17 +7,17 @@ import com.joecollins.models.general.PartyResult.Companion.elected
 import com.joecollins.models.general.PartyResult.Companion.leading
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import java.awt.Color
 
-class AllSeatsScreenTest {
+class SeatsChangingScreenTest {
     @Test
-    fun testAllSeats() {
+    fun testSeatsChanging() {
         val prevResult = Publisher(bcPrevResult())
         val currResult = Publisher<Map<String, PartyResult?>>(emptyMap())
         val numRows = Publisher(15)
         val title = Publisher("BRITISH COLUMBIA")
-        val panel = AllSeatsScreen.of(
+        val panel = SeatsChangingScreen.of(
             prevResult,
             currResult,
             { it.uppercase() },
@@ -26,8 +26,7 @@ class AllSeatsScreenTest {
             .withNumRows(numRows)
             .build(title)
         panel.setSize(1024, 512)
-        compareRendering("AllSeatsScreen", "Basic-1", panel)
-
+        compareRendering("SeatsChangingScreen", "Basic-1", panel)
         currResult.submit(
             mapOf(
                 "Coquitlam-Burke Mountain" to leading(ndp),
@@ -35,8 +34,7 @@ class AllSeatsScreenTest {
                 "Vancouver-False Creek" to leading(ndp)
             )
         )
-        compareRendering("AllSeatsScreen", "Basic-2", panel)
-
+        compareRendering("SeatsChangingScreen", "Basic-2", panel)
         currResult.submit(
             mapOf(
                 "Coquitlam-Burke Mountain" to elected(ndp),
@@ -45,14 +43,13 @@ class AllSeatsScreenTest {
                 "Vancouver-False Creek" to leading(ndp)
             )
         )
-        compareRendering("AllSeatsScreen", "Basic-3", panel)
-
+        compareRendering("SeatsChangingScreen", "Basic-3", panel)
         currResult.submit(bcCurrResult())
-        compareRendering("AllSeatsScreen", "Basic-4", panel)
+        compareRendering("SeatsChangingScreen", "Basic-4", panel)
     }
 
     @Test
-    fun testFilteredSeats() {
+    fun testFilteredSeatsChanging() {
         val prevResult = Publisher(bcPrevResult())
         val currResult = Publisher<Map<String, PartyResult?>>(emptyMap())
         val numRows = Publisher(15)
@@ -62,7 +59,7 @@ class AllSeatsScreenTest {
                 .filter { it.startsWith("Vancouver") }
                 .toSet()
         )
-        val panel = AllSeatsScreen.of(
+        val panel = SeatsChangingScreen.of(
             prevResult,
             currResult,
             { it.uppercase() },
@@ -72,8 +69,7 @@ class AllSeatsScreenTest {
             .withSeatFilter(filteredSeats)
             .build(title)
         panel.setSize(1024, 512)
-        compareRendering("AllSeatsScreen", "Filtered-1", panel)
-
+        compareRendering("SeatsChangingScreen", "Filtered-1", panel)
         currResult.submit(
             mapOf(
                 "Coquitlam-Burke Mountain" to leading(ndp),
@@ -81,8 +77,7 @@ class AllSeatsScreenTest {
                 "Vancouver-False Creek" to leading(ndp)
             )
         )
-        compareRendering("AllSeatsScreen", "Filtered-2", panel)
-
+        compareRendering("SeatsChangingScreen", "Filtered-2", panel)
         currResult.submit(
             mapOf(
                 "Coquitlam-Burke Mountain" to elected(ndp),
@@ -91,19 +86,19 @@ class AllSeatsScreenTest {
                 "Vancouver-False Creek" to leading(ndp)
             )
         )
-        compareRendering("AllSeatsScreen", "Filtered-3", panel)
-
+        compareRendering("SeatsChangingScreen", "Filtered-3", panel)
         currResult.submit(bcCurrResult())
-        compareRendering("AllSeatsScreen", "Filtered-4", panel)
+        compareRendering("SeatsChangingScreen", "Filtered-4", panel)
     }
 
     @Test
-    fun testAllSeatsWithNullResults() {
+    fun testSeatsChangingNullResults() {
         val prevResult = Publisher(bcPrevResult())
-        val currResult = Publisher<Map<String, PartyResult?>>(bcCurrResult().mapValues { null })
+        val results = bcCurrResult().mapValues { null }
+        val currResult = Publisher<Map<String, PartyResult?>>(results)
         val numRows = Publisher(15)
         val title = Publisher("BRITISH COLUMBIA")
-        val panel = AllSeatsScreen.of(
+        val panel = SeatsChangingScreen.of(
             prevResult,
             currResult,
             { it.uppercase() },
@@ -112,14 +107,57 @@ class AllSeatsScreenTest {
             .withNumRows(numRows)
             .build(title)
         panel.setSize(1024, 512)
-        compareRendering("AllSeatsScreen", "Basic-1", panel)
-
+        compareRendering("SeatsChangingScreen", "Basic-1", panel)
         currResult.submit(bcCurrResult())
-        compareRendering("AllSeatsScreen", "Basic-4", panel)
+        compareRendering("SeatsChangingScreen", "Basic-4", panel)
+    }
+
+    @Test
+    fun testSeatsChangingWithPartyChanges() {
+        val prevResult = Publisher(bcPrevResult())
+        val currResult = Publisher<Map<String, PartyResult?>>(emptyMap())
+        val numRows = Publisher(15)
+        val title = Publisher("BRITISH COLUMBIA")
+        val panel = SeatsChangingScreen.of(
+            prevResult,
+            currResult,
+            { it.uppercase() },
+            "SEATS CHANGING".asOneTimePublisher()
+        )
+            .withNumRows(numRows)
+            .withPartyChanges(mapOf(lib to bcu).asOneTimePublisher())
+            .build(title)
+        panel.setSize(1024, 512)
+        compareRendering("SeatsChangingScreen", "PartyChanges-1", panel)
+        currResult.submit(
+            mapOf(
+                "Coquitlam-Burke Mountain" to leading(ndp),
+                "Fraser-Nicola" to leading(ndp),
+                "Vancouver-False Creek" to leading(ndp)
+            )
+        )
+        compareRendering("SeatsChangingScreen", "PartyChanges-2", panel)
+        currResult.submit(
+            mapOf(
+                "Coquitlam-Burke Mountain" to elected(ndp),
+                "Fraser-Nicola" to leading(bcu),
+                "Richmond-Queensborough" to leading(ndp),
+                "Vancouver-False Creek" to leading(ndp)
+            )
+        )
+        compareRendering("SeatsChangingScreen", "PartyChanges-3", panel)
+        currResult.submit(bcCurrResult().mapValues {
+            if (it.value?.party == lib)
+                PartyResult(bcu,it.value!!.elected)
+            else
+                it.value
+        })
+        compareRendering("SeatsChangingScreen", "PartyChanges-4", panel)
     }
 
     companion object {
         private val lib = Party("Liberal", "LIB", Color.RED)
+        private val bcu = Party("BC United", "BCU", Color.BLUE)
         private val ndp = Party("New Democratic Party", "NDP", Color.ORANGE)
         private val grn = Party("Green", "GRN", Color.GREEN.darker())
         private val ind = Party("Independent", "IND", Color.GRAY)
@@ -216,7 +254,7 @@ class AllSeatsScreenTest {
             )
         }
 
-        private fun bcCurrResult(): Map<String, PartyResult> {
+        private fun bcCurrResult(): Map<String, PartyResult?> {
             return mapOf(
                 "Nechako Lakes" to elected(lib),
                 "North Coast" to elected(ndp),
@@ -305,7 +343,7 @@ class AllSeatsScreenTest {
                 "Saanich South" to elected(ndp),
                 "Victoria-Beacon Hill" to elected(ndp),
                 "Victoria-Swan Lake" to elected(ndp)
-            ).mapValues { it.value!! }
+            )
         }
     }
 }
