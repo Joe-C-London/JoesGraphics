@@ -20,6 +20,7 @@ dependencies {
     implementation topLevel.project('base')
     api topLevel.project('models')
     implementation topLevel.project('modelutils')
+    implementation topLevel.project('pubsub')
     implementation topLevel.project('shapes')
     implementation topLevel.project('components:barframe')
     implementation topLevel.project('components:resultmapframebuilder')

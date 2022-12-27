@@ -19,9 +19,9 @@ var topLevel = parent.parent
 dependencies {
     implementation parent.project('screenbase')
 
-
     api topLevel.project('models')
     implementation topLevel.project('modelutils')
+    implementation topLevel.project('pubsub')
     implementation topLevel.project('components:swingometerframe')
 
     testImplementation topLevel.project('testutils')

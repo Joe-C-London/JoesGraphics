@@ -22,6 +22,7 @@ dependencies {
     api parent.project('mapframe')
     api parent.parent.project('models')
     implementation parent.parent.project('modelutils')
+    implementation parent.parent.project('pubsub')
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'

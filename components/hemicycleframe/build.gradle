@@ -17,10 +17,10 @@ version '1.0-SNAPSHOT'
 var topLevel = parent.parent
 
 dependencies {
-
     api parent.project('componentbase')
     api topLevel.project('models')
     implementation topLevel.project('modelutils')
+    implementation topLevel.project('pubsub')
 
     implementation group: 'com.google.guava', name: 'guava', version: '31.1-jre'
 
