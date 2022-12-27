@@ -9,10 +9,10 @@ import com.joecollins.models.general.PartyResult
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.map
+import org.junit.jupiter.api.Test
 import java.awt.Color
 import java.awt.Shape
 import java.util.concurrent.Flow
-import org.junit.jupiter.api.Test
 class MultiResultScreenTest {
 
     @Test

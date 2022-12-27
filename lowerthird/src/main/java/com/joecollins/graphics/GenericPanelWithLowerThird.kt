@@ -11,7 +11,7 @@ import javax.swing.JPanel
 class GenericPanelWithLowerThird(
     private val panel: JPanel,
     lowerThird: LowerThird
-): JPanel(), AltTextProvider {
+) : JPanel(), AltTextProvider {
 
     init {
         background = Color.WHITE
@@ -22,9 +22,9 @@ class GenericPanelWithLowerThird(
     }
 
     override val altText: Flow.Publisher<String?> =
-        if (panel is AltTextProvider)
+        if (panel is AltTextProvider) {
             panel.altText
-        else
+        } else {
             (null as String?).asOneTimePublisher()
-
+        }
 }

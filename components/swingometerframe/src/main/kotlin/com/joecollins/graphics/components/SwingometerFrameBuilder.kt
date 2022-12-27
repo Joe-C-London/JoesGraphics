@@ -61,7 +61,7 @@ class SwingometerFrameBuilder {
             return max(
                 max.toDouble(),
                 bucketSize.toDouble() *
-                        ceil(abs(value.toDouble() / bucketSize.toDouble()))
+                    ceil(abs(value.toDouble() / bucketSize.toDouble()))
             )
         }
         val maxPublisher = Publisher(getMax())

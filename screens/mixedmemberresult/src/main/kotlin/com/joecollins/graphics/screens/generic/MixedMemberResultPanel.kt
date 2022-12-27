@@ -7,7 +7,6 @@ import com.joecollins.graphics.components.BarFrameBuilder
 import com.joecollins.graphics.components.MapFrame
 import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.Party
-import com.joecollins.models.general.Party.Companion
 import com.joecollins.models.general.PartyOrCoalition
 import com.joecollins.models.general.PartyResult
 import com.joecollins.pubsub.Publisher
@@ -388,7 +387,7 @@ class MixedMemberResultPanel private constructor(
                                     "WAITING..."
                                 } else {
                                     THOUSANDS_FORMAT.format(it.value) +
-                                            if (partialDeclaration) "" else " (" + PCT_FORMAT.format(pct) + ")"
+                                        if (partialDeclaration) "" else " (" + PCT_FORMAT.format(pct) + ")"
                                 }
                             )
                         }

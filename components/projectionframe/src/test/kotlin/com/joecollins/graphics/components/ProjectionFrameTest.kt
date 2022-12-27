@@ -1,6 +1,5 @@
 package com.joecollins.graphics.components
 
-import com.joecollins.graphics.utils.RenderTestUtils
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.pubsub.asOneTimePublisher
 import org.awaitility.Awaitility

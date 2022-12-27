@@ -8,9 +8,9 @@ import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
+import org.junit.jupiter.api.Test
 import java.awt.Color
 import java.awt.Shape
-import org.junit.jupiter.api.Test
 
 class MixedMemberResultPanelTest {
     @Test

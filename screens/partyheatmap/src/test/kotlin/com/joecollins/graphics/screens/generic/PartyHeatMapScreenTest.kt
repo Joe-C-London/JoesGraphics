@@ -139,12 +139,15 @@ class PartyHeatMapScreenTest {
         )
         RenderTestUtils.compareRendering("PartyHeatMapScreen", "PartyChanges-2", panel)
 
-        currResults.submit(bcCurrResult().mapValues {
-            if (it.value?.party == lib)
-                PartyResult(bcu, it.value!!.elected)
-            else
-                it.value
-        })
+        currResults.submit(
+            bcCurrResult().mapValues {
+                if (it.value?.party == lib) {
+                    PartyResult(bcu, it.value!!.elected)
+                } else {
+                    it.value
+                }
+            }
+        )
         RenderTestUtils.compareRendering("PartyHeatMapScreen", "PartyChanges-3", panel)
 
         parties.submit(listOf(bcu, ndp, grn))

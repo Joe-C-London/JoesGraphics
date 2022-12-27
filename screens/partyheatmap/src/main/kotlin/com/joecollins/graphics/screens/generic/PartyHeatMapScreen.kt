@@ -92,10 +92,11 @@ class PartyHeatMapScreen private constructor(panel: JPanel, title: Flow.Publishe
                         seatLabel = { e, l -> if (withLeading) "$e/$l" else e.toString() },
                         showChange = { _, _ -> true },
                         changeLabel = { e, l ->
-                            if (withLeading)
+                            if (withLeading) {
                                 "${changeLabel(e)}/${changeLabel(l)}"
-                            else
+                            } else {
                                 changeLabel(e)
+                            }
                         },
                         header = party.name.uppercase().asOneTimePublisher(),
                         labelFunc = { it.toString().asOneTimePublisher() },

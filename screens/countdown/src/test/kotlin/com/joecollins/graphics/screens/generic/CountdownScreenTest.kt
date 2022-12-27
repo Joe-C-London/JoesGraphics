@@ -3,6 +3,7 @@ package com.joecollins.graphics.screens.generic
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.graphics.utils.ShapefileReader
 import com.joecollins.pubsub.asOneTimePublisher
+import org.junit.jupiter.api.Test
 import java.awt.Dimension
 import java.awt.Shape
 import java.time.Clock
@@ -10,8 +11,6 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.Assertions
 
 class CountdownScreenTest {
 

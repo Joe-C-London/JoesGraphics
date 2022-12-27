@@ -146,12 +146,15 @@ class SeatsChangingScreenTest {
             )
         )
         compareRendering("SeatsChangingScreen", "PartyChanges-3", panel)
-        currResult.submit(bcCurrResult().mapValues {
-            if (it.value?.party == lib)
-                PartyResult(bcu,it.value!!.elected)
-            else
-                it.value
-        })
+        currResult.submit(
+            bcCurrResult().mapValues {
+                if (it.value?.party == lib) {
+                    PartyResult(bcu, it.value!!.elected)
+                } else {
+                    it.value
+                }
+            }
+        )
         compareRendering("SeatsChangingScreen", "PartyChanges-4", panel)
     }
 

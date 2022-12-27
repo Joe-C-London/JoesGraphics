@@ -28,6 +28,14 @@ allprojects {
         }
         mavenCentral()
     }
+
+    apply plugin: "com.diffplug.spotless"
+
+    spotless {
+        kotlin {
+            ktlint()
+        }
+    }
 }
 
 def geotoolsVersion = '27.1'
@@ -70,19 +78,9 @@ dependencies {
     api "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
 }
 
-spotless {
-    kotlin {
-        ktlint()
-    }
-}
-
 jacoco {
     toolVersion = "0.8.7"
     reportsDirectory = file("$buildDir/jacocoReports")
-}
-
-subprojects.each {
-    test.dependsOn("${it.path}:test")
 }
 
 jacocoTestReport {

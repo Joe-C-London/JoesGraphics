@@ -7,9 +7,8 @@ import com.joecollins.pubsub.map
 import org.awaitility.Awaitility
 import org.hamcrest.core.IsEqual
 import org.hamcrest.number.IsCloseTo
-import java.util.concurrent.TimeUnit
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.Assertions
+import java.util.concurrent.TimeUnit
 
 class AggregatorsTest {
     @Test
@@ -105,11 +104,11 @@ class AggregatorsTest {
                 IsEqual(
                     mapOf(
                         "ABC" to
-                                Pair(6, 15),
+                            Pair(6, 15),
                         "DEF" to
-                                Pair(1, 6),
+                            Pair(1, 6),
                         "GHI" to
-                                Pair(0, 3)
+                            Pair(0, 3)
                     )
                 )
             )
@@ -120,11 +119,11 @@ class AggregatorsTest {
                 IsEqual(
                     mapOf(
                         "ABC" to
-                                Pair(7, 19),
+                            Pair(7, 19),
                         "DEF" to
-                                Pair(4, 7),
+                            Pair(4, 7),
                         "GHI" to
-                                Pair(0, 3)
+                            Pair(0, 3)
                     )
                 )
             )
@@ -158,11 +157,11 @@ class AggregatorsTest {
                 IsEqual(
                     mapOf(
                         "ABC" to
-                                Pair(6, 15),
+                            Pair(6, 15),
                         "DEF" to
-                                Pair(1, 6),
+                            Pair(1, 6),
                         "GHI" to
-                                Pair(0, 3)
+                            Pair(0, 3)
                     )
                 )
             )
@@ -173,11 +172,11 @@ class AggregatorsTest {
                 IsEqual(
                     mapOf(
                         "ABC" to
-                                Pair(7, 19),
+                            Pair(7, 19),
                         "DEF" to
-                                Pair(4, 7),
+                            Pair(4, 7),
                         "GHI" to
-                                Pair(0, 3)
+                            Pair(0, 3)
                     )
                 )
             )
@@ -243,11 +242,11 @@ class AggregatorsTest {
                 IsEqual(
                     mapOf(
                         "ABC" to
-                                Pair(12, 30),
+                            Pair(12, 30),
                         "DEF" to
-                                Pair(2, 12),
+                            Pair(2, 12),
                         "GHI" to
-                                Pair(0, 6)
+                            Pair(0, 6)
                     )
                 )
             )
@@ -258,11 +257,11 @@ class AggregatorsTest {
                 IsEqual(
                     mapOf(
                         "ABC" to
-                                Pair(11, 31),
+                            Pair(11, 31),
                         "DEF" to
-                                Pair(3, 11),
+                            Pair(3, 11),
                         "GHI" to
-                                Pair(0, 6)
+                            Pair(0, 6)
                     )
                 )
             )
@@ -429,9 +428,11 @@ class AggregatorsTest {
     fun testToMapTransformedKey() {
         val inputs = mapOf("abc" to Publisher(1), "def" to Publisher(2))
         val output: BoundResult<Map<String, Int>> = BoundResult()
-        Aggregators.toMap(inputs.keys, { it.uppercase() }) { inputs[it]!! }.subscribe(Subscriber {
-            output.value = it
-        })
+        Aggregators.toMap(inputs.keys, { it.uppercase() }) { inputs[it]!! }.subscribe(
+            Subscriber {
+                output.value = it
+            }
+        )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ output.value }, IsEqual(mapOf("ABC" to 1, "DEF" to 2)))
         inputs["abc"]!!.submit(7)
@@ -445,7 +446,8 @@ class AggregatorsTest {
         val output: BoundResult<Map<String, Double>> = BoundResult()
         Aggregators.toPct(votes).subscribe(Subscriber { output.value = it })
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ output.value },
+            .until(
+                { output.value },
                 IsEqual(
                     mapOf(
                         "ABC" to 5.0 / 14,
@@ -457,7 +459,8 @@ class AggregatorsTest {
             )
         votes.submit(mapOf("ABC" to 5, "DEF" to 7, "GHI" to 6, "JKL" to 4))
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ output.value },
+            .until(
+                { output.value },
                 IsEqual(
                     mapOf(
                         "ABC" to 5.0 / 22,

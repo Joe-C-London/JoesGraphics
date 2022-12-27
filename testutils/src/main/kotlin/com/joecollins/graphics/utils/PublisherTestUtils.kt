@@ -14,7 +14,7 @@ object PublisherTestUtils {
     ) {
         data class Wrapper<T>(val item: T)
         var result: Wrapper<T>? = null
-        publisher.subscribe(object: Flow.Subscriber<T> {
+        publisher.subscribe(object : Flow.Subscriber<T> {
             private lateinit var subscription: Flow.Subscription
 
             override fun onSubscribe(subscription: Flow.Subscription) {
@@ -27,14 +27,12 @@ object PublisherTestUtils {
             }
 
             override fun onComplete() {
-
             }
 
             override fun onNext(item: T) {
                 result = Wrapper(item)
                 this.subscription.request(1)
             }
-
         })
         Awaitility.await().atMost(timeoutSeconds, TimeUnit.SECONDS)
             .ignoreException(NullPointerException::class.java)

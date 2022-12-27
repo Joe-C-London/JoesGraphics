@@ -131,7 +131,7 @@ class RecountScreen private constructor(headerLabel: Flow.Publisher<out String?>
                 headerPublisher = header,
                 rowsPublisher = input.toEntries().mapElements { e ->
                     val partyCells = e.topCandidates.take(2)
-                        .map {it.key.party.color to "${it.key.party.abbreviation.uppercase()}: ${voteFormatter.format(it.value)}" }
+                        .map { it.key.party.color to "${it.key.party.abbreviation.uppercase()}: ${voteFormatter.format(it.value)}" }
                     val marginCell = Color.WHITE to "MARGIN: ${e.margin}" + (if (e.pctThreshold == null) "" else " (${pctFormatter.format(e.pctMargin)})")
                     MultiSummaryFrame.Row(rowHeaderFunc(e.key), listOf(partyCells, listOf(marginCell)).flatten())
                 },

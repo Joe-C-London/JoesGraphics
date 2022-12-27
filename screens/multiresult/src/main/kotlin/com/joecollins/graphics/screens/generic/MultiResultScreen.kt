@@ -241,67 +241,93 @@ class MultiResultScreen private constructor(
                             this.partiesOnly,
                             idx
                         )
-                        newPanel.setVotesPublisher(itemPublisher.compose {
-                            it?.let(votesFunc)
-                                ?: emptyMap<Candidate, Int>().asOneTimePublisher()
-                        })
-                        newPanel.setWinnerPublisher(itemPublisher.compose {
-                            it?.let(winnerFunc)
-                                ?: (null as Candidate?).asOneTimePublisher()
-                        })
-                        newPanel.setRunoffPublisher(itemPublisher.compose {
-                            it?.let(runoffFunc)
-                                ?: (null as Set<Candidate>?).asOneTimePublisher()
-                        })
-                        newPanel.setPctReportingPublisher(itemPublisher.compose {
-                            it?.let(pctReportingFunc) ?: 0.0.asOneTimePublisher()
-                        })
-                        newPanel.setProgressLabelPublisher(itemPublisher.compose {
-                            it?.let(progressLabelFunc) ?: null.asOneTimePublisher()
-                        })
-                        newPanel.setHeaderPublisher(itemPublisher.compose {
-                            it?.let(headerFunc) ?: "".asOneTimePublisher()
-                        })
-                        newPanel.setSubheadPublisher(itemPublisher.compose {
-                            it?.let(subheadFunc) ?: "".asOneTimePublisher()
-                        })
+                        newPanel.setVotesPublisher(
+                            itemPublisher.compose {
+                                it?.let(votesFunc)
+                                    ?: emptyMap<Candidate, Int>().asOneTimePublisher()
+                            }
+                        )
+                        newPanel.setWinnerPublisher(
+                            itemPublisher.compose {
+                                it?.let(winnerFunc)
+                                    ?: (null as Candidate?).asOneTimePublisher()
+                            }
+                        )
+                        newPanel.setRunoffPublisher(
+                            itemPublisher.compose {
+                                it?.let(runoffFunc)
+                                    ?: (null as Set<Candidate>?).asOneTimePublisher()
+                            }
+                        )
+                        newPanel.setPctReportingPublisher(
+                            itemPublisher.compose {
+                                it?.let(pctReportingFunc) ?: 0.0.asOneTimePublisher()
+                            }
+                        )
+                        newPanel.setProgressLabelPublisher(
+                            itemPublisher.compose {
+                                it?.let(progressLabelFunc) ?: null.asOneTimePublisher()
+                            }
+                        )
+                        newPanel.setHeaderPublisher(
+                            itemPublisher.compose {
+                                it?.let(headerFunc) ?: "".asOneTimePublisher()
+                            }
+                        )
+                        newPanel.setSubheadPublisher(
+                            itemPublisher.compose {
+                                it?.let(subheadFunc) ?: "".asOneTimePublisher()
+                            }
+                        )
                         if (swingPartyOrder != null) {
                             prevFunc?.let { f ->
-                                newPanel.setPrevPublisher(itemPublisher.compose {
-                                    it?.let(f)
-                                        ?: emptyMap<Party, Int>().asOneTimePublisher()
-                                })
+                                newPanel.setPrevPublisher(
+                                    itemPublisher.compose {
+                                        it?.let(f)
+                                            ?: emptyMap<Party, Int>().asOneTimePublisher()
+                                    }
+                                )
                             }
                             swingHeaderFunc?.let { f ->
-                                newPanel.setSwingHeaderPublisher(itemPublisher.compose {
-                                    it?.let(
-                                        f
-                                    ) ?: "".asOneTimePublisher()
-                                })
+                                newPanel.setSwingHeaderPublisher(
+                                    itemPublisher.compose {
+                                        it?.let(
+                                            f
+                                        ) ?: "".asOneTimePublisher()
+                                    }
+                                )
                             }
                         }
                         if (mapHeaderFunc != null) {
                             mapShapeFunc?.let { f ->
-                                newPanel.setMapShapePublisher(itemPublisher.compose {
-                                    ((it?.let(f) ?: emptyList()).map { e ->
-                                        e.second.map { c ->
-                                            Pair(
-                                                e.first,
-                                                c
-                                            )
-                                        }
-                                    }).combine()
-                                })
+                                newPanel.setMapShapePublisher(
+                                    itemPublisher.compose {
+                                        (
+                                            (it?.let(f) ?: emptyList()).map { e ->
+                                                e.second.map { c ->
+                                                    Pair(
+                                                        e.first,
+                                                        c
+                                                    )
+                                                }
+                                            }
+                                            ).combine()
+                                    }
+                                )
                             }
                             mapFocusFunc?.let { f ->
-                                newPanel.setMapFocusPublisher(itemPublisher.map {
-                                    it?.let(f) ?: emptyList()
-                                })
+                                newPanel.setMapFocusPublisher(
+                                    itemPublisher.map {
+                                        it?.let(f) ?: emptyList()
+                                    }
+                                )
                             }
                             mapHeaderFunc?.let { f ->
-                                newPanel.setMapHeaderPublisher(itemPublisher.compose {
-                                    it?.let(f) ?: "".asOneTimePublisher()
-                                })
+                                newPanel.setMapHeaderPublisher(
+                                    itemPublisher.compose {
+                                        it?.let(f) ?: "".asOneTimePublisher()
+                                    }
+                                )
                             }
                         }
                         center.add(newPanel)
@@ -319,8 +345,8 @@ class MultiResultScreen private constructor(
                         it.displayBothRows = numRows == 1
                         it.setMaxBarsPublisher(
                             (
-                                    (if (numRows == 2) 4 else 5) * if (this.partiesOnly) 2 else 1
-                                    ).asOneTimePublisher()
+                                (if (numRows == 2) 4 else 5) * if (this.partiesOnly) 2 else 1
+                                ).asOneTimePublisher()
                         )
                     }
                     EventQueue.invokeLater {
@@ -415,9 +441,12 @@ class MultiResultScreen private constructor(
                     )
                 }
                 .toList()
-            return sequenceOf(bars.asSequence(), generateSequence {
-                BarFrameBuilder.BasicBar("", Color.WHITE, 0, "")
-            })
+            return sequenceOf(
+                bars.asSequence(),
+                generateSequence {
+                    BarFrameBuilder.BasicBar("", Color.WHITE, 0, "")
+                }
+            )
                 .flatten()
                 .take(maxBars)
                 .toList()
@@ -611,14 +640,17 @@ class MultiResultScreen private constructor(
             headerFunc: (T) -> Flow.Publisher<out String>,
             subheadFunc: (T) -> Flow.Publisher<out String>
         ): Builder<T> {
-            val adjustedVoteFunc = { t: T -> votesFunc(t).map { m: Map<Party, Int> ->
-                Aggregators.adjustKey(m) { k: Party ->
-                    if (k == Party.OTHERS)
-                        Candidate.OTHERS
-                    else
-                        Candidate("", k)
+            val adjustedVoteFunc = { t: T ->
+                votesFunc(t).map { m: Map<Party, Int> ->
+                    Aggregators.adjustKey(m) { k: Party ->
+                        if (k == Party.OTHERS) {
+                            Candidate.OTHERS
+                        } else {
+                            Candidate("", k)
+                        }
+                    }
                 }
-            } }
+            }
             return Builder(list, adjustedVoteFunc, headerFunc, subheadFunc, true)
         }
     }

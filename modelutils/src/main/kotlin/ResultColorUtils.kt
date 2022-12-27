@@ -7,12 +7,12 @@ object ResultColorUtils {
 
     val CandidateResult?.color: Color
         get() {
-        return when {
-            this == null -> java.awt.Color.BLACK
-            elected -> candidate.party.color
-            else -> ColorUtils.lighten(candidate.party.color)
+            return when {
+                this == null -> java.awt.Color.BLACK
+                elected -> candidate.party.color
+                else -> ColorUtils.lighten(candidate.party.color)
+            }
         }
-    }
 
     val PartyResult?.color: Color get() {
         return when {

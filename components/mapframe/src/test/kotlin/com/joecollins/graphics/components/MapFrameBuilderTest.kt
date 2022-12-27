@@ -8,13 +8,13 @@ import org.awaitility.Awaitility
 import org.hamcrest.core.IsEqual
 import org.hamcrest.core.IsNot
 import org.hamcrest.core.IsNull
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
 import java.awt.Color
 import java.awt.Shape
 import java.awt.geom.Ellipse2D
 import java.awt.geom.Rectangle2D
 import java.util.concurrent.TimeUnit
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.Assertions
 
 class MapFrameBuilderTest {
     @Test

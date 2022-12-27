@@ -117,7 +117,7 @@ class RegionalBreakdownScreenTest {
             .build("PRINCE EDWARD ISLAND".asOneTimePublisher())
         screen.setSize(1024, 512)
         compareRendering("RegionalBreakdownScreen", "SeatsWithDiff-1", screen)
-        
+
         peiSeats.submit(mapOf(grn to 1))
         peiPrev.submit(mapOf(lib to 1))
         cardiganSeats.submit(mapOf(grn to 1))
@@ -735,11 +735,13 @@ class RegionalBreakdownScreenTest {
             "Alberta",
             "British Columbia",
             "Northern Canada"
-        ).associateWith { Triple(
-            Publisher(emptyMap<Party, Int>()),
-            Publisher(emptyMap<Party, Int>()),
-            Publisher(0.0)
-        ) }
+        ).associateWith {
+            Triple(
+                Publisher(emptyMap<Party, Int>()),
+                Publisher(emptyMap<Party, Int>()),
+                Publisher(0.0)
+            )
+        }
         val builder = RegionalBreakdownScreen.votesWithPrev(
             "CANADA".asOneTimePublisher(),
             federalVotes.first,

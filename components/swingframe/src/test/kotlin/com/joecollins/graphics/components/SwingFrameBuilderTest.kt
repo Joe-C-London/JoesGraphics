@@ -8,10 +8,10 @@ import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
 import org.awaitility.Awaitility
 import org.hamcrest.core.IsEqual
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
 import java.awt.Color
 import java.util.concurrent.TimeUnit
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.Assertions
 
 class SwingFrameBuilderTest {
     private class SwingProperties(val leftColor: Color, val rightColor: Color, val value: Number, val text: String)

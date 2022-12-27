@@ -10,10 +10,10 @@ import com.joecollins.models.general.social.mastodon.Tag
 import com.joecollins.models.general.social.mastodon.Toot
 import com.joecollins.models.general.social.mastodon.User
 import com.joecollins.pubsub.asOneTimePublisher
+import org.junit.jupiter.api.Test
 import java.awt.Dimension
 import java.net.URL
 import java.time.Instant
-import org.junit.jupiter.api.Test
 
 class MastodonFrameTest {
 

@@ -213,14 +213,14 @@ class TooCloseToCallScreen private constructor(
                                         Pair(
                                             e.key.party.color,
                                             e.key.party.abbreviation.uppercase() +
-                                                    ": " +
-                                                    (
-                                                            if (input.showPcts) {
-                                                                pctFormatter.format(e.value / total)
-                                                            } else {
-                                                                thousandsFormatter.format(e.value)
-                                                            }
-                                                            )
+                                                ": " +
+                                                (
+                                                    if (input.showPcts) {
+                                                        pctFormatter.format(e.value / total)
+                                                    } else {
+                                                        thousandsFormatter.format(e.value)
+                                                    }
+                                                    )
                                         )
                                     },
                                 generateSequence { Pair(Color.WHITE, "") }

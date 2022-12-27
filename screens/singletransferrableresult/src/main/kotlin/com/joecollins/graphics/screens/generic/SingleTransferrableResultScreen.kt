@@ -146,11 +146,17 @@ class SingleTransferrableResultScreen private constructor(
                         if (v == null) {
                             "WAITING..."
                         } else {
-                            "${if (v is Int) 
-                                DecimalFormat("#,##0").format(v.toInt()) 
-                            else DecimalFormat("#,##0.00").format(v.toDouble())}${if (q == null) "" else " (${
+                            "${if (v is Int) {
+                                DecimalFormat("#,##0").format(v.toInt())
+                            } else {
+                                DecimalFormat("#,##0.00").format(v.toDouble())
+                            }}${if (q == null) {
+                                ""
+                            } else {
+                                " (${
                                 DecimalFormat("0.00").format(v.toDouble() / q.toDouble())
-                            })"}"
+                                })"
+                            }}"
                         }
                         }${if (el.any { it.first == c }) " ELECTED" else if (ex.contains(c)) " EXCLUDED" else ""}"
                     } +
@@ -229,10 +235,11 @@ class SingleTransferrableResultScreen private constructor(
                         .map {
                             BarFrameBuilder.BasicBar(
                                 label = it.key.name.uppercase() + (if (it.key.incumbent) " $incumbentMarker" else "") + " (${it.key.party.abbreviation.uppercase()})",
-                                valueLabel = if (it.value == null)
+                                valueLabel = if (it.value == null) {
                                     "WAITING..."
-                                else
-                                    (formatString(it.value!!) + (if (quota == null) "" else (" (" + formatString(it.value!!.toDouble() / quota.toDouble()) + ")"))),
+                                } else {
+                                    (formatString(it.value!!) + (if (quota == null) "" else (" (" + formatString(it.value!!.toDouble() / quota.toDouble()) + ")")))
+                                },
                                 color = it.key.party.color,
                                 value = (it.value ?: 0),
                                 shape = when {

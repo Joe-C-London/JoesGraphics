@@ -30,5 +30,4 @@ object SummaryEntriesSingleLabel {
         }
         return ret
     }
-
 }

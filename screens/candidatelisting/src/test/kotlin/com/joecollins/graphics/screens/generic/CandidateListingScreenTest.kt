@@ -7,10 +7,10 @@ import com.joecollins.models.general.Party
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.map
+import org.junit.jupiter.api.Test
 import java.awt.Color
 import java.awt.Dimension
 import java.awt.Shape
-import org.junit.jupiter.api.Test
 
 class CandidateListingScreenTest {
 

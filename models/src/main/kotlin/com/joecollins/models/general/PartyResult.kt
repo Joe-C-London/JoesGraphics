@@ -13,6 +13,5 @@ data class PartyResult(val party: Party, val elected: Boolean) {
         fun elected(party: Party?) = if (party == null) null else PartyResult(party, true)
 
         fun leading(party: Party?) = if (party == null) null else PartyResult(party, false)
-
     }
 }

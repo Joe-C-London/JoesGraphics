@@ -3,7 +3,6 @@ package com.joecollins.graphics.screens.generic
 import com.joecollins.graphics.GenericPanel
 import com.joecollins.graphics.components.CountdownFrame
 import com.joecollins.graphics.components.MapFrame
-import com.joecollins.graphics.components.MapFrameBuilder
 import com.joecollins.pubsub.asOneTimePublisher
 import java.awt.BorderLayout
 import java.awt.Color

@@ -8,6 +8,8 @@ import com.joecollins.pubsub.map
 import com.joecollins.pubsub.mapElements
 import org.awaitility.Awaitility
 import org.hamcrest.core.IsEqual
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
 import java.awt.Color
 import java.awt.Polygon
 import java.awt.Rectangle
@@ -17,8 +19,6 @@ import java.awt.geom.Ellipse2D
 import java.text.DecimalFormat
 import java.util.concurrent.TimeUnit
 import kotlin.math.sign
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.Assertions
 
 class BarFrameTest {
     @Test
@@ -564,9 +564,9 @@ class BarFrameTest {
                 BarFrame.Bar(
                     it.getPartyName(),
                     "${CHANGE_FORMAT.format(it.getNumSeats().toLong())}/${
-                        CHANGE_FORMAT.format(
-                            it.getSeatEstimate().toLong()
-                        )
+                    CHANGE_FORMAT.format(
+                        it.getSeatEstimate().toLong()
+                    )
                     }",
                     null,
                     listOf(
@@ -576,7 +576,11 @@ class BarFrameTest {
                             it.getSeatEstimate() - if (sign(it.getSeatEstimate().toFloat()) == sign(
                                     it.getNumSeats().toFloat()
                                 )
-                            ) it.getNumSeats() else 0
+                            ) {
+                                it.getNumSeats()
+                            } else {
+                                0
+                            }
                         )
                     )
                 )

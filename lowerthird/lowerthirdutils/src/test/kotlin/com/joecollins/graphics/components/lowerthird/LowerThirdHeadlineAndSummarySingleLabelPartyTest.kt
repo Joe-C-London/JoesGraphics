@@ -1,6 +1,5 @@
 package com.joecollins.graphics.components.lowerthird
 
-import com.joecollins.graphics.utils.RenderTestUtils
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.models.general.Party
 import com.joecollins.pubsub.asOneTimePublisher

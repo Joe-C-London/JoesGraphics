@@ -68,9 +68,13 @@ abstract class SocialMediaFrame<P : Post<P>>(post: Flow.Publisher<out Post<P>>, 
         postLabel.verticalAlignment = JLabel.TOP
         postLabel.horizontalAlignment = JLabel.LEFT
         postLabel.alignmentX = LEFT_ALIGNMENT
-        post.subscribe(Subscriber(eventQueueWrapper {
-            postLabel.text = formatText(it, false, postLabel)
-        }))
+        post.subscribe(
+            Subscriber(
+                eventQueueWrapper {
+                    postLabel.text = formatText(it, false, postLabel)
+                }
+            )
+        )
         postPanel.add(postLabel)
 
         postLabel.addComponentListener(object : ComponentAdapter() {
@@ -178,13 +182,18 @@ abstract class SocialMediaFrame<P : Post<P>>(post: Flow.Publisher<out Post<P>>, 
         timeLabel.font = StandardFont.readNormalFont(12)
         timeLabel.border = EmptyBorder(2, 0, -2, 0)
         timeLabel.horizontalAlignment = JLabel.RIGHT
-        post.map { if (it.user.isProtected) null else it.createdAt }.subscribe(Subscriber(eventQueueWrapper {
-            timeLabel.text =
-                if (it == null)
-                    ""
-                else
-                    DateTimeFormatter.ofPattern("d MMMM yyyy HH:mm:ss z ").format(it.atZone(timezone))
-        }))
+        post.map { if (it.user.isProtected) null else it.createdAt }.subscribe(
+            Subscriber(
+                eventQueueWrapper {
+                    timeLabel.text =
+                        if (it == null) {
+                            ""
+                        } else {
+                            DateTimeFormatter.ofPattern("d MMMM yyyy HH:mm:ss z ").format(it.atZone(timezone))
+                        }
+                }
+            )
+        )
         add(timeLabel, BorderLayout.SOUTH)
     }
 
@@ -418,10 +427,11 @@ abstract class SocialMediaFrame<P : Post<P>>(post: Flow.Publisher<out Post<P>>, 
             timeLabel.border = EmptyBorder(2, 0, -2, 0)
             timeLabel.horizontalAlignment = JLabel.RIGHT
             timeLabel.text =
-                if (quotedStatus.user.isProtected)
+                if (quotedStatus.user.isProtected) {
                     ""
-                else
+                } else {
                     DateTimeFormatter.ofPattern("d MMMM yyyy HH:mm:ss z ").format(quotedStatus.createdAt.atZone(timezone))
+                }
             add(timeLabel, BorderLayout.SOUTH)
         }
 

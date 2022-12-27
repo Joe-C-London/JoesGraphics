@@ -12,8 +12,8 @@ import com.joecollins.models.general.PollsReporting
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.map
-import java.awt.Color
 import org.junit.jupiter.api.Test
+import java.awt.Color
 
 @Suppress("UNCHECKED_CAST")
 class TooCloseToCallScreenTest {

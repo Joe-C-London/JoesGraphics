@@ -9,8 +9,8 @@ import com.joecollins.graphics.utils.ColorUtils
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.map
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
 import java.awt.Color
 import java.awt.geom.Rectangle2D
 import java.text.DecimalFormat

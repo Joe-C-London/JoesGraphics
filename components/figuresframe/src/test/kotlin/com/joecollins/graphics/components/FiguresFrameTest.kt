@@ -104,7 +104,7 @@ class FiguresFrameTest {
                 FiguresFrame.Entry(Color.RED, "JUSTIN TRUDEAU", "Liberal Leader, Papineau", "ELECTED", Color.RED),
                 FiguresFrame.Entry(Color.BLUE, "ANDREW SCHEER", "Conservative Leader, Regina-Qu'Apelle", "ELECTED", Color.BLUE),
                 FiguresFrame.Entry(Color.ORANGE, "JAGMEET SINGH", "NDP Leader, Burnaby South", "ELECTED", Color.ORANGE),
-                FiguresFrame.Entry(Color.CYAN.darker(), "YVES-FRAN\u00c7OIS BLANCHET", "Bloc Qu\u00e9b\u00e9cois Leader, Beloeil-Chambly", "ELECTED", Color.CYAN.darker() ),
+                FiguresFrame.Entry(Color.CYAN.darker(), "YVES-FRAN\u00c7OIS BLANCHET", "Bloc Qu\u00e9b\u00e9cois Leader, Beloeil-Chambly", "ELECTED", Color.CYAN.darker()),
                 FiguresFrame.Entry(Color.GREEN.darker(), "ELIZABETH MAY", "Green Leader, Saanich-Gulf Islands", "ELECTED", Color.GREEN.darker()),
                 FiguresFrame.Entry(Color.MAGENTA.darker(), "MAXIME BERNIER", "People's Party Leader, Beauce", "DEFEATED", Color.BLUE),
                 FiguresFrame.Entry(Color.MAGENTA, "ROD TAYLOR", "CHP Leader, Skeena-Bulkley Valley", "DEFEATED", Color.ORANGE),

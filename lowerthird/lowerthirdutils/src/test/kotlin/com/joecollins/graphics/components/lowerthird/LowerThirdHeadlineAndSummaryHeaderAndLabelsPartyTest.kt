@@ -38,5 +38,4 @@ class LowerThirdHeadlineAndSummaryHeaderAndLabelsPartyTest {
         lowerThird.setSize(1024, 50)
         compareRendering("LowerThird", "HeadlineAndSummaryHeaderAndLabels", lowerThird)
     }
-
 }
