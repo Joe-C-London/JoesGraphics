@@ -21,7 +21,7 @@ repositories {
 var topLevel = parent.parent
 
 dependencies {
-    implementation parent.project('screenbase')
+    api parent.project('screenbase')
 
     api topLevel.project('models')
     implementation topLevel.project('modelutils')

@@ -26,7 +26,7 @@ dependencies {
     implementation topLevel.project('components:resultmapframebuilder')
     implementation topLevel.project('components:swingframe')
 
-    implementation parent.project('screenbase')
+    api parent.project('screenbase')
 
 
     testImplementation topLevel.project('shapefiles')

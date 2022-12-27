@@ -17,7 +17,7 @@ version '1.0-SNAPSHOT'
 var topLevel = parent.parent
 
 dependencies {
-    implementation parent.project('screenbase')
+    api parent.project('screenbase')
     api topLevel.project('models')
     implementation topLevel.project('pubsub')
     implementation topLevel.project('components:resultlistingframe')

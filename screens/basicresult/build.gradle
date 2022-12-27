@@ -23,7 +23,7 @@ dependencies {
     implementation topLevel.project('pubsub')
     implementation topLevel.project('shapes')
 
-    implementation topLevel.project('screens:screenbase')
+    api topLevel.project('screens:screenbase')
     implementation topLevel.project('components:barframe')
     implementation topLevel.project('components:resultmapframebuilder')
     implementation topLevel.project('components:swingframe')

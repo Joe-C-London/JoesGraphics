@@ -26,7 +26,7 @@ dependencies {
     implementation topLevel.project('modelutils')
     implementation topLevel.project('pubsub')
 
-    implementation parent.project('screenbase')
+    api parent.project('screenbase')
     implementation topLevel.project('components:battlefieldframe')
 
     testImplementation topLevel.project('testutils')

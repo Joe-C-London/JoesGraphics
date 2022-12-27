@@ -24,7 +24,7 @@ dependencies {
     implementation topLevel.project('components:figuresframe')
     implementation topLevel.project('models')
     implementation topLevel.project('pubsub')
-    implementation parent.project('screenbase')
+    api parent.project('screenbase')
 
     testImplementation topLevel.project('testutils')
 

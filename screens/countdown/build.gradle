@@ -20,7 +20,7 @@ dependencies {
     implementation topLevel.project('components:countdownframe')
     implementation topLevel.project('components:mapframe')
     implementation topLevel.project('pubsub')
-    implementation parent.project('screenbase')
+    api parent.project('screenbase')
 
     testImplementation topLevel.project('shapefiles')
     testImplementation topLevel.project('testutils')
