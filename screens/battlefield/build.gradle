@@ -14,15 +14,21 @@ plugins {
 group 'com.joecollins'
 version '1.0-SNAPSHOT'
 
+repositories {
+    mavenCentral()
+}
+
 var topLevel = parent.parent
 
 dependencies {
-    implementation topLevel.project('components:countdownframe')
-    implementation topLevel.project('components:mapframe')
+    implementation topLevel.project('base')
+    api topLevel.project('models')
+    implementation topLevel.project('modelutils')
     implementation topLevel.project('pubsub')
-    implementation parent.project('screenbase')
 
-    testImplementation topLevel.project('shapefiles')
+    implementation parent.project('screenbase')
+    implementation topLevel.project('components:battlefieldframe')
+
     testImplementation topLevel.project('testutils')
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'

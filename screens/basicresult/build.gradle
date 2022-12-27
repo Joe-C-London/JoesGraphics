@@ -23,7 +23,6 @@ dependencies {
     implementation topLevel.project('shapes')
 
     implementation topLevel.project('screens:screenbase')
-
     implementation topLevel.project('components:barframe')
     implementation topLevel.project('components:resultmapframebuilder')
     implementation topLevel.project('components:swingframe')

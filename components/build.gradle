@@ -20,7 +20,9 @@ repositories {
 
 dependencies {
     api project('barframe')
+    api project('battlefieldframe')
     api project('countdownframe')
+    api project('figuresframe')
     api project('heatmapframe')
     api project('heatmapframeresultbuilder')
     api project('hemicycleframe')
