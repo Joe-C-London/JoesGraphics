@@ -28,7 +28,7 @@ class MastodonFrame(toot: Flow.Publisher<out Toot>, timezone: ZoneId = ZoneId.sy
         private val objectMapper = ObjectMapper()
             .registerModule(KotlinModule.Builder().build())
             .registerModule(JavaTimeModule())
-        fun createFrame(postId: Flow.Publisher<out Pair<String, Long>>): MastodonFrame {
+        fun createFrame(postId: Flow.Publisher<out Pair<String, Long>>, timezone: ZoneId = ZoneId.systemDefault()): MastodonFrame {
             return MastodonFrame(
                 postId.map { (server, id) ->
                     val url = URL("https://$server/api/v1/statuses/$id")
@@ -41,7 +41,8 @@ class MastodonFrame(toot: Flow.Publisher<out Toot>, timezone: ZoneId = ZoneId.sy
                         val error = objectMapper.readTree(connection.errorStream)["error"].asText()
                         fromError(error, url)
                     }
-                }
+                },
+                timezone
             )
         }
 

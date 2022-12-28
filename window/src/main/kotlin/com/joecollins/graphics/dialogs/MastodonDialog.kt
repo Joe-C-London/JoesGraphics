@@ -13,10 +13,9 @@ import org.json.JSONObject
 import java.awt.Color
 import java.io.File
 import java.nio.charset.Charset
-import java.util.Properties
 import javax.swing.JPanel
 
-class MastodonDialog(panel: JPanel) : GenericSocialDialog(panel) {
+class MastodonDialog(panel: JPanel, private val server: String, private val token: String) : GenericSocialDialog(panel) {
 
     override val siteColor: Color
         get() = Color(99, 100, 255)
@@ -35,14 +34,6 @@ class MastodonDialog(panel: JPanel) : GenericSocialDialog(panel) {
     }
 
     override fun send(post: String, image: File, altText: String?) {
-        val mastodonPropertiesFile = this.javaClass.classLoader.getResourceAsStream("mastodon.properties")
-            ?: throw IllegalStateException("Unable to find mastodon.properties")
-        val properties = Properties()
-        properties.load(mastodonPropertiesFile)
-
-        val server = properties["instance.server"].toString()
-        val token = properties["instance.token"].toString()
-
         HttpClients.createDefault().use { client: CloseableHttpClient ->
             val imageId = uploadImage(client, server, token, image, altText)
             sendPost(client, server, token, post, imageId)

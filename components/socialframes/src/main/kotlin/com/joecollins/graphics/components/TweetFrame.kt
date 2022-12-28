@@ -18,8 +18,8 @@ class TweetFrame internal constructor(tweet: Flow.Publisher<out Tweet>, timezone
         get() = "This user's tweets are protected, and this tweet has therefore been blocked from this frame."
 
     companion object {
-        fun createTweetFrame(tweetId: Flow.Publisher<out Long>): TweetFrame {
-            return TweetFrame(tweetId.map { TweetLoader.loadTweetV2(it) })
+        fun createTweetFrame(tweetId: Flow.Publisher<out Long>, timezone: ZoneId = ZoneId.systemDefault()): TweetFrame {
+            return TweetFrame(tweetId.map { TweetLoader.loadTweetV2(it) }, timezone)
         }
     }
 }

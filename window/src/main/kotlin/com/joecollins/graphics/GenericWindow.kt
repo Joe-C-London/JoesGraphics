@@ -1,6 +1,7 @@
 package com.joecollins.graphics
 
 import com.joecollins.graphics.dialogs.MastodonDialog
+import com.joecollins.graphics.dialogs.TweetDialog
 import java.awt.Color
 import java.awt.Component
 import java.awt.Container
@@ -16,6 +17,7 @@ import java.awt.datatransfer.UnsupportedFlavorException
 import java.awt.image.BufferedImage
 import java.io.File
 import java.io.IOException
+import java.util.Properties
 import javax.imageio.ImageIO
 import javax.swing.JFileChooser
 import javax.swing.JFrame
@@ -121,18 +123,47 @@ class GenericWindow<T : JPanel> @JvmOverloads constructor(private val panel: T, 
         val fileItem = JMenuItem("Save to File...")
         fileItem.addActionListener { saveImageToFile(panel) }
         imageMenu.add(fileItem)
-//        val tweetItem = JMenuItem("Tweet...")
-//        tweetItem.addActionListener {
-//            TweetDialog(p).isVisible = true
-//        }
-//        imageMenu.add(tweetItem)
-        val mastodonItem = JMenuItem("Mastodon...")
-        mastodonItem.addActionListener {
-            MastodonDialog(panel).isVisible = true
+        if (isTweetingEnabled) {
+            val tweetItem = JMenuItem("Tweet...")
+            tweetItem.addActionListener {
+                TweetDialog(panel).isVisible = true
+            }
+            imageMenu.add(tweetItem)
         }
-        imageMenu.add(mastodonItem)
+        mastodonInstances.forEach { (server, token) ->
+            val mastodonItem = JMenuItem("Mastodon ($server)...")
+            mastodonItem.addActionListener {
+                MastodonDialog(panel, server, token).isVisible = true
+            }
+            imageMenu.add(mastodonItem)
+        }
         requestFocus()
     }
+
+    private val isTweetingEnabled: Boolean
+        get() {
+            val twitterPropertiesFile = this::class.java.classLoader.getResourceAsStream("twitter.properties") ?: return false
+            val properties = Properties()
+            properties.load(twitterPropertiesFile)
+            return properties.getProperty("enabled")?.toBoolean() ?: true
+        }
+
+    private val mastodonInstances: List<Pair<String, String>>
+        get() {
+            val mastodonPropertiesFile = this.javaClass.classLoader.getResourceAsStream("mastodon.properties") ?: return emptyList()
+            val properties = Properties()
+            properties.load(mastodonPropertiesFile)
+
+            val instances = ArrayList<Pair<String, String>>()
+            generateSequence(1) { it + 1 }.forEach { idx ->
+                val prefix = "instance${if (idx == 1) "" else "$idx"}"
+                val server = properties["$prefix.server"]?.toString() ?: return instances
+                val token = properties["$prefix.token"]?.toString() ?: return instances
+                val enabled = properties["$prefix.enabled"]?.toString()?.toBoolean() ?: true
+                if (enabled) instances.add(server to token)
+            }
+            return instances
+        }
 
     private class GenericWindowLayout : LayoutManager {
         private var main: Component? = null
