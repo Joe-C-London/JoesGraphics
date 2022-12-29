@@ -30,7 +30,7 @@ class MastodonDialog(panel: JPanel, private val server: String, private val toke
         get() = 500
 
     init {
-        title = "Mastodon"
+        title = "Mastodon ($server)"
     }
 
     override fun send(post: String, image: File, altText: String?) {
