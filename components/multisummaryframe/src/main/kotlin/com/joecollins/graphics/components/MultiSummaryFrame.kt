@@ -23,10 +23,10 @@ import kotlin.math.max
 class MultiSummaryFrame(
     headerPublisher: Flow.Publisher<out String?>,
     rowsPublisher: Flow.Publisher<out List<Row>>,
-    notesPublisher: Flow.Publisher<out String?>? = null
+    notesPublisher: Flow.Publisher<out String?>? = null,
 ) : GraphicsFrame(
     headerPublisher = headerPublisher,
-    notesPublisher = notesPublisher
+    notesPublisher = notesPublisher,
 ) {
     private val centralPanel: JPanel
     private val entries: MutableList<EntryPanel> = ArrayList()
@@ -122,7 +122,7 @@ class MultiSummaryFrame(
                         headerLabel.border = border
                         labels.forEach { label -> label.border = border }
                     }
-                }
+                },
             )
         }
     }

@@ -25,7 +25,7 @@ class PartyHeatMapScreenTest {
             },
             { riding ->
                 currResults.map { r -> r[riding] }
-            }
+            },
         ) { riding, party ->
             val result = prevResults[riding]!!
             val me = result[party] ?: 0
@@ -40,18 +40,18 @@ class PartyHeatMapScreenTest {
 
         currResults.submit(
             mapOf(
-                "Coquitlam-Burke Mountain" to ndp
-            )
+                "Coquitlam-Burke Mountain" to ndp,
+            ),
         )
         RenderTestUtils.compareRendering("PartyHeatMapScreen", "Elected-2", panel)
 
         currResults.submit(
-            bcCurrResult().mapValues { r -> r.value?.let { if (it.elected) it.party else null } }
+            bcCurrResult().mapValues { r -> r.value?.let { if (it.elected) it.party else null } },
         )
         RenderTestUtils.compareRendering("PartyHeatMapScreen", "Elected-3", panel)
 
         currResults.submit(
-            bcCurrResult().mapValues { r -> r.value?.party }
+            bcCurrResult().mapValues { r -> r.value?.party },
         )
         RenderTestUtils.compareRendering("PartyHeatMapScreen", "Elected-4", panel)
     }
@@ -70,7 +70,7 @@ class PartyHeatMapScreenTest {
             },
             { riding ->
                 currResults.map { r -> r[riding] }
-            }
+            },
         ) { riding, party ->
             val result = prevResults[riding]!!
             val me = result[party] ?: 0
@@ -88,8 +88,8 @@ class PartyHeatMapScreenTest {
                 "Coquitlam-Burke Mountain" to PartyResult.elected(ndp),
                 "Fraser-Nicola" to PartyResult.leading(lib),
                 "Richmond-Queensborough" to PartyResult.leading(ndp),
-                "Vancouver-False Creek" to PartyResult.leading(ndp)
-            )
+                "Vancouver-False Creek" to PartyResult.leading(ndp),
+            ),
         )
         RenderTestUtils.compareRendering("PartyHeatMapScreen", "ElectedLeading-2", panel)
 
@@ -115,7 +115,7 @@ class PartyHeatMapScreenTest {
             },
             { riding ->
                 currResults.map { r -> r[riding] }
-            }
+            },
         ) { riding, party ->
             val result = prevResults[riding]!!
             val me = result[if (party == bcu) lib else party] ?: 0
@@ -134,8 +134,8 @@ class PartyHeatMapScreenTest {
                 "Coquitlam-Burke Mountain" to PartyResult.elected(ndp),
                 "Fraser-Nicola" to PartyResult.leading(bcu),
                 "Richmond-Queensborough" to PartyResult.leading(ndp),
-                "Vancouver-False Creek" to PartyResult.leading(ndp)
-            )
+                "Vancouver-False Creek" to PartyResult.leading(ndp),
+            ),
         )
         RenderTestUtils.compareRendering("PartyHeatMapScreen", "PartyChanges-2", panel)
 
@@ -146,7 +146,7 @@ class PartyHeatMapScreenTest {
                 } else {
                     it.value
                 }
-            }
+            },
         )
         RenderTestUtils.compareRendering("PartyHeatMapScreen", "PartyChanges-3", panel)
 
@@ -250,7 +250,7 @@ class PartyHeatMapScreenTest {
                 "Sannich North and the Islands" to mapOf(lib to 9321, ndp to 10764, grn to 14775, oth to 364),
                 "Saanich South" to mapOf(lib to 8716, ndp to 11912, grn to 7129, oth to 177 + 130),
                 "Victoria-Beacon Hill" to mapOf(lib to 4689, ndp to 16057, grn to 9194, oth to 190 + 102 + 35),
-                "Victoria-Swan Lake" to mapOf(lib to 4005, ndp to 13531, grn to 7491, oth to 207)
+                "Victoria-Swan Lake" to mapOf(lib to 4005, ndp to 13531, grn to 7491, oth to 207),
             )
         }
 
@@ -342,7 +342,7 @@ class PartyHeatMapScreenTest {
                 "Sannich North and the Islands" to PartyResult.elected(grn),
                 "Saanich South" to PartyResult.elected(ndp),
                 "Victoria-Beacon Hill" to PartyResult.elected(ndp),
-                "Victoria-Swan Lake" to PartyResult.elected(ndp)
+                "Victoria-Swan Lake" to PartyResult.elected(ndp),
             )
         }
     }

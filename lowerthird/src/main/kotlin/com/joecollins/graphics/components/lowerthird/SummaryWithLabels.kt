@@ -18,7 +18,7 @@ import javax.swing.border.EmptyBorder
 import javax.swing.border.MatteBorder
 
 class SummaryWithLabels(
-    private val entriesBinding: Flow.Publisher<out List<SummaryEntry>>
+    private val entriesBinding: Flow.Publisher<out List<SummaryEntry>>,
 ) : JPanel() {
     private val entryPanels: MutableList<EntryPanel> = ArrayList()
 
@@ -143,8 +143,8 @@ class SummaryWithLabels(
                     invalidate()
                     revalidate()
                     repaint()
-                }
-            )
+                },
+            ),
         )
     }
 }

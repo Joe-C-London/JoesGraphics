@@ -36,13 +36,13 @@ open class LowerThird internal constructor(
     private val leftImagePublisher: Flow.Publisher<out Image>,
     private val placePublisher: Flow.Publisher<out Pair<String, ZoneId>>,
     private val clock: Clock,
-    private val showTimeZone: Boolean = false
+    private val showTimeZone: Boolean = false,
 ) : JPanel() {
 
     constructor(
         leftImagePublisher: Flow.Publisher<out Image>,
         placePublisher: Flow.Publisher<out Pair<String, ZoneId>>,
-        showTimeZone: Boolean = false
+        showTimeZone: Boolean = false,
     ) : this(leftImagePublisher, placePublisher, Clock.systemDefaultZone(), showTimeZone)
 
     private val leftPanel: ImagePanel = ImagePanel()
@@ -168,7 +168,7 @@ open class LowerThird internal constructor(
                         weightx = 1.0
                         weighty = 1.0
                     }
-                }
+                },
             )
             add(
                 timeLabel,
@@ -182,7 +182,7 @@ open class LowerThird internal constructor(
                         weightx = 1.0
                         weighty = 1.0
                     }
-                }
+                },
             )
             if (showTimeZone) {
                 add(
@@ -197,7 +197,7 @@ open class LowerThird internal constructor(
                             weightx = 1.0
                             weighty = 1.0
                         }
-                    }
+                    },
                 )
             }
             executor.scheduleAtFixedRate({ updateTime() }, 0, 100, TimeUnit.MILLISECONDS)
@@ -221,13 +221,13 @@ open class LowerThird internal constructor(
             val img = BufferedImage(
                 max(200, bounds.width.toInt() + 10),
                 50,
-                BufferedImage.TYPE_4BYTE_ABGR
+                BufferedImage.TYPE_4BYTE_ABGR,
             )
             val g = img.graphics
             (g as Graphics2D)
                 .setRenderingHint(
                     RenderingHints.KEY_TEXT_ANTIALIASING,
-                    RenderingHints.VALUE_TEXT_ANTIALIAS_ON
+                    RenderingHints.VALUE_TEXT_ANTIALIAS_ON,
                 )
             g.setColor(background)
             g.fillRect(0, 0, img.width, 50)
@@ -249,8 +249,8 @@ open class LowerThird internal constructor(
                 eventQueueWrapper {
                     rightPanel.place = it.first
                     rightPanel.timezone = it.second
-                }
-            )
+                },
+            ),
         )
     }
 }

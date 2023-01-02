@@ -26,7 +26,7 @@ class CandidateListingScreen private constructor(
     candidatesPanel: JPanel,
     prevPanel: JPanel?,
     secondaryPrevPanel: JPanel?,
-    mapPanel: JPanel?
+    mapPanel: JPanel?,
 ) : JPanel() {
 
     init {
@@ -81,8 +81,8 @@ class CandidateListingScreen private constructor(
                                     listOf(
                                         left.party.color to 0.49,
                                         Color.WHITE to 0.02,
-                                        (right?.party?.color ?: Color.WHITE) to 0.49
-                                    )
+                                        (right?.party?.color ?: Color.WHITE) to 0.49,
+                                    ),
                                 )
                             }
                         } else {
@@ -90,14 +90,14 @@ class CandidateListingScreen private constructor(
                                 BarFrame.Bar(
                                     it.name.uppercase() + (if (!it.incumbent || incumbentMarker == null) "" else (" $incumbentMarker")),
                                     it.party.name.uppercase(),
-                                    listOf(it.party.color to 1.0)
+                                    listOf(it.party.color to 1.0),
                                 )
                             }
                         }
                     },
                     headerPublisher = header,
                     subheadTextPublisher = subhead,
-                    maxPublisher = 1.0.asOneTimePublisher()
+                    maxPublisher = 1.0.asOneTimePublisher(),
                 )
             }
         }
@@ -129,7 +129,7 @@ class CandidateListingScreen private constructor(
                         it.key.abbreviation.uppercase(),
                         it.key.color,
                         it.value.toDouble() / total,
-                        DecimalFormat("0.0%").format(it.value.toDouble() / total)
+                        DecimalFormat("0.0%").format(it.value.toDouble() / total),
                     )
                 }
                 .toList()
@@ -139,14 +139,14 @@ class CandidateListingScreen private constructor(
             shapes: Flow.Publisher<out Map<K, Shape>>,
             selectedShape: Flow.Publisher<out K>,
             focus: Flow.Publisher<out List<K>?>,
-            header: Flow.Publisher<out String>
+            header: Flow.Publisher<out String>,
         ): Builder {
             mapPanel = MapBuilder(
                 shapes,
                 selectedShape,
                 (null as PartyResult?).asOneTimePublisher(),
                 focus,
-                header
+                header,
             ).createMapFrame()
             return this
         }
@@ -156,7 +156,7 @@ class CandidateListingScreen private constructor(
             selectedShape: Flow.Publisher<out K>,
             focus: Flow.Publisher<out List<K>?>,
             additionalHighlight: Flow.Publisher<out List<K>?>,
-            header: Flow.Publisher<out String>
+            header: Flow.Publisher<out String>,
         ): Builder {
             mapPanel = MapBuilder(
                 shapes,
@@ -164,7 +164,7 @@ class CandidateListingScreen private constructor(
                 (null as PartyResult?).asOneTimePublisher(),
                 focus,
                 additionalHighlight,
-                header
+                header,
             ).createMapFrame()
             return this
         }
@@ -180,7 +180,7 @@ class CandidateListingScreen private constructor(
                 this.candidatesPanel(),
                 this.prevPanel,
                 this.secondaryPrevPanel,
-                this.mapPanel
+                this.mapPanel,
             )
         }
 

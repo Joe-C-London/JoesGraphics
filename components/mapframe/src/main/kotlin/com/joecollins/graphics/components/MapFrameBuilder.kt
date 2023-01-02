@@ -58,7 +58,7 @@ class MapFrameBuilder {
             focusBoxPublisher = focusBoxPublisher,
             notesPublisher = notesPublisher,
             borderColorPublisher = borderColorPublisher,
-            outlineShapesPublisher = outlinePublisher
+            outlineShapesPublisher = outlinePublisher,
         )
     }
 
@@ -73,7 +73,7 @@ class MapFrameBuilder {
         fun <T> from(
             itemsBinding: Flow.Publisher<out List<T>>,
             shapeFunc: (T) -> Shape,
-            colorFunc: (T) -> Flow.Publisher<out Color>
+            colorFunc: (T) -> Flow.Publisher<out Color>,
         ): MapFrameBuilder {
             val list = itemsBinding.compose { items ->
                 items.map { colorFunc(it).map { c -> Pair(shapeFunc(it), c) } }.combine()

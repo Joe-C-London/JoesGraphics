@@ -30,9 +30,9 @@ class LowerThirdHeadlineAndBottomSummaryTest {
                 SummaryEntry(Color.CYAN.darker(), "BQ", "0"),
                 SummaryEntry(Color.GREEN.darker(), "GRN", "0"),
                 SummaryEntry(Color.ORANGE, "NDP", "0"),
-                SummaryEntry(Color.WHITE, "?", "335")
+                SummaryEntry(Color.WHITE, "?", "335"),
             )
-                .asOneTimePublisher()
+                .asOneTimePublisher(),
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ lowerThird.headline }, IsEqual("POLLS CLOSE ACROSS CENTRAL CANADA"))
@@ -54,9 +54,9 @@ class LowerThirdHeadlineAndBottomSummaryTest {
                 SummaryEntry(Color.CYAN.darker(), "BQ", "0"),
                 SummaryEntry(Color.GREEN.darker(), "GRN", "0"),
                 SummaryEntry(Color.ORANGE, "NDP", "0"),
-                SummaryEntry(Color.WHITE, "?", "335")
+                SummaryEntry(Color.WHITE, "?", "335"),
             )
-                .asOneTimePublisher()
+                .asOneTimePublisher(),
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ lowerThird.subhead }, IsEqual("Polls open for 30 minutes on west coast"))
@@ -78,9 +78,9 @@ class LowerThirdHeadlineAndBottomSummaryTest {
                 SummaryEntry(Color.CYAN.darker(), "BQ", "0"),
                 SummaryEntry(Color.GREEN.darker(), "GRN", "0"),
                 SummaryEntry(Color.ORANGE, "NDP", "0"),
-                SummaryEntry(Color.WHITE, "?", "335")
+                SummaryEntry(Color.WHITE, "?", "335"),
             )
-                .asOneTimePublisher()
+                .asOneTimePublisher(),
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ lowerThird.numSummaryEntries }, IsEqual(6))
@@ -104,7 +104,7 @@ class LowerThirdHeadlineAndBottomSummaryTest {
             createImage(
                 LowerThirdHeadlineAndBottomSummaryTest::class.java
                     .classLoader
-                    .getResource("com/joecollins/graphics/lowerthird-left.png")
+                    .getResource("com/joecollins/graphics/lowerthird-left.png"),
             )
                 .asOneTimePublisher(),
             placePublisher = ("OTTAWA" to ZoneId.of("Canada/Eastern")).asOneTimePublisher(),
@@ -119,10 +119,10 @@ class LowerThirdHeadlineAndBottomSummaryTest {
                 SummaryEntry(Color.CYAN.darker(), "BQ", "0"),
                 SummaryEntry(Color.GREEN.darker(), "GRN", "0"),
                 SummaryEntry(Color.ORANGE, "NDP", "0"),
-                SummaryEntry(Color.WHITE, "?", "335")
+                SummaryEntry(Color.WHITE, "?", "335"),
             )
                 .asOneTimePublisher(),
-            clock = Clock.fixed(Instant.parse("2019-10-22T01:30:00Z"), ZoneId.systemDefault())
+            clock = Clock.fixed(Instant.parse("2019-10-22T01:30:00Z"), ZoneId.systemDefault()),
         )
         lowerThird.setSize(1024, 70)
         compareRendering("LowerThird", "HeadlineAndBottomSummaryHeader", lowerThird)

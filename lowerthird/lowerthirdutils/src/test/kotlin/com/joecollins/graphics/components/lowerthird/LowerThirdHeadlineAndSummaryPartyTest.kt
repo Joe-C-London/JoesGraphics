@@ -18,7 +18,7 @@ class LowerThirdHeadlineAndSummaryPartyTest {
             LowerThird.createImage(
                 LowerThirdHeadlineAndSummaryPartyTest::class.java
                     .classLoader
-                    .getResource("com/joecollins/graphics/lowerthird-left.png")
+                    .getResource("com/joecollins/graphics/lowerthird-left.png"),
             )
                 .asOneTimePublisher(),
             placePublisher = ("OTTAWA" to ZoneId.of("Canada/Eastern")).asOneTimePublisher(),
@@ -28,11 +28,11 @@ class LowerThirdHeadlineAndSummaryPartyTest {
             SummaryEntries.createSeatEntries(
                 mapOf(
                     Party("Liberal", "LIB", Color.RED) to 2,
-                    Party("Conservative", "CON", Color.BLUE) to 1
-                )
+                    Party("Conservative", "CON", Color.BLUE) to 1,
+                ),
             )
                 .asOneTimePublisher(),
-            clock = Clock.fixed(Instant.parse("2019-10-22T01:30:00Z"), ZoneId.systemDefault())
+            clock = Clock.fixed(Instant.parse("2019-10-22T01:30:00Z"), ZoneId.systemDefault()),
         )
         lowerThird.setSize(1024, 50)
         RenderTestUtils.compareRendering("LowerThird", "HeadlineAndSummary", lowerThird)

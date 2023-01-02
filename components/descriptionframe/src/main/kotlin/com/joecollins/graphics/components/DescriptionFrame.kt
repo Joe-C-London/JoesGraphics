@@ -19,8 +19,8 @@ class DescriptionFrame(header: Flow.Publisher<out String?>, text: Flow.Publisher
                 eventQueueWrapper { desc: String? ->
                     centerLabel.text = "<html><center>${desc?.replace("\n", "<br/>")}</center></html>"
                     centerLabel.isVisible = desc != null
-                }
-            )
+                },
+            ),
         )
     }
 }

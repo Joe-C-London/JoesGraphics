@@ -46,7 +46,7 @@ class HemicycleFrameBuilder {
         bars: Flow.Publisher<out List<T>>,
         colorFunc: (T) -> Color,
         seatFunc: (T) -> Int,
-        labelPublisher: Flow.Publisher<out String>
+        labelPublisher: Flow.Publisher<out String>,
     ): HemicycleFrameBuilder {
         this.leftSeatBarPublisher = bars.mapElements { HemicycleFrame.Bar(color = colorFunc(it), size = seatFunc(it)) }
         this.leftSeatBarLabelPublisher = labelPublisher
@@ -57,7 +57,7 @@ class HemicycleFrameBuilder {
         bars: Flow.Publisher<out List<T>>,
         colorFunc: (T) -> Color,
         seatFunc: (T) -> Int,
-        labelPublisher: Flow.Publisher<out String>
+        labelPublisher: Flow.Publisher<out String>,
     ): HemicycleFrameBuilder {
         this.rightSeatBarPublisher = bars.mapElements { HemicycleFrame.Bar(color = colorFunc(it), size = seatFunc(it)) }
         this.rightSeatBarLabelPublisher = labelPublisher
@@ -68,7 +68,7 @@ class HemicycleFrameBuilder {
         bars: Flow.Publisher<out List<T>>,
         colorFunc: (T) -> Color,
         seatFunc: (T) -> Int,
-        labelPublisher: Flow.Publisher<out String>
+        labelPublisher: Flow.Publisher<out String>,
     ): HemicycleFrameBuilder {
         this.middleSeatBarPublisher = bars.mapElements { HemicycleFrame.Bar(color = colorFunc(it), size = seatFunc(it)) }
         this.middleSeatBarLabelPublisher = labelPublisher
@@ -80,7 +80,7 @@ class HemicycleFrameBuilder {
         colorFunc: (T) -> Color,
         seatFunc: (T) -> Int,
         startPublisher: Flow.Publisher<out Int>,
-        labelPublisher: Flow.Publisher<out String>
+        labelPublisher: Flow.Publisher<out String>,
     ): HemicycleFrameBuilder {
         this.leftChangeBarPublisher = bars.mapElements { HemicycleFrame.Bar(color = colorFunc(it), size = seatFunc(it)) }
         this.leftChangeBarStartPublisher = startPublisher
@@ -93,7 +93,7 @@ class HemicycleFrameBuilder {
         colorFunc: (T) -> Color,
         seatFunc: (T) -> Int,
         startPublisher: Flow.Publisher<out Int>,
-        labelPublisher: Flow.Publisher<out String>
+        labelPublisher: Flow.Publisher<out String>,
     ): HemicycleFrameBuilder {
         this.rightChangeBarPublisher = bars.mapElements { HemicycleFrame.Bar(color = colorFunc(it), size = seatFunc(it)) }
         this.rightChangeBarStartPublisher = startPublisher
@@ -117,7 +117,7 @@ class HemicycleFrameBuilder {
             leftChangeBarLabelPublisher = leftChangeBarLabelPublisher,
             rightChangeBarPublisher = rightChangeBarPublisher,
             rightChangeBarStartPublisher = rightChangeBarStartPublisher,
-            rightChangeBarLabelPublisher = rightChangeBarLabelPublisher
+            rightChangeBarLabelPublisher = rightChangeBarLabelPublisher,
         )
     }
 
@@ -126,7 +126,7 @@ class HemicycleFrameBuilder {
             rows: List<Int>,
             entries: List<T>,
             colorFunc: (T) -> Flow.Publisher<out Color>,
-            tiebreaker: Tiebreaker
+            tiebreaker: Tiebreaker,
         ): HemicycleFrameBuilder {
             return of(rows, entries, colorFunc, colorFunc, tiebreaker)
         }
@@ -136,7 +136,7 @@ class HemicycleFrameBuilder {
             entries: List<T>,
             colorFunc: (T) -> Flow.Publisher<out Color>,
             borderFunc: (T) -> Flow.Publisher<out Color>,
-            tiebreaker: Tiebreaker
+            tiebreaker: Tiebreaker,
         ): HemicycleFrameBuilder {
             return ofClustered(rows, entries, { 1 }, colorFunc, borderFunc, tiebreaker)
         }
@@ -147,7 +147,7 @@ class HemicycleFrameBuilder {
             entries: List<T>,
             seatsFunc: (T) -> Int,
             colorFunc: (T) -> Flow.Publisher<out Color>,
-            tiebreaker: Tiebreaker
+            tiebreaker: Tiebreaker,
         ): HemicycleFrameBuilder {
             return ofClustered(rows, entries, seatsFunc, colorFunc, colorFunc, tiebreaker)
         }
@@ -159,13 +159,13 @@ class HemicycleFrameBuilder {
             seatsFunc: (T) -> Int,
             colorFunc: (T) -> Flow.Publisher<out Color>,
             borderFunc: (T) -> Flow.Publisher<out Color>,
-            tiebreaker: Tiebreaker
+            tiebreaker: Tiebreaker,
         ): HemicycleFrameBuilder {
             val points = rows.indices
                 .flatMap { row -> (0 until rows[row]).map { idx -> Point(row, idx) } }
                 .sortedWith(
                     Comparator.comparingDouble { p: Point -> 180.0 * p.y / (rows[p.x] - 1) }
-                        .thenComparingInt { p: Point -> (if (tiebreaker == Tiebreaker.FRONT_ROW_FROM_LEFT) 1 else -1) * p.x }
+                        .thenComparingInt { p: Point -> (if (tiebreaker == Tiebreaker.FRONT_ROW_FROM_LEFT) 1 else -1) * p.x },
                 )
                 .map { Pair(it, null as T?) }
                 .toMutableList()
@@ -202,7 +202,7 @@ class HemicycleFrameBuilder {
             val dots: List<T> = points
                 .sortedWith(
                     Comparator.comparingInt { p: Pair<Point, T?> -> p.first.x }
-                        .thenComparing { p -> p.first.y }
+                        .thenComparing { p -> p.first.y },
                 )
                 .map { it.second!! }
                 .toList()
@@ -249,7 +249,7 @@ class HemicycleFrameBuilder {
             showChange: (Int, Int) -> Boolean,
             changeLabel: (Int, Int) -> String,
             tiebreaker: Tiebreaker,
-            header: Flow.Publisher<out String?>
+            header: Flow.Publisher<out String?>,
         ): HemicycleFrame {
             return ofElectedLeading(
                 rows,
@@ -265,7 +265,7 @@ class HemicycleFrameBuilder {
                 showChange,
                 changeLabel,
                 tiebreaker,
-                header
+                header,
             )
         }
 
@@ -284,7 +284,7 @@ class HemicycleFrameBuilder {
             showChange: (Int, Int) -> Boolean,
             changeLabel: (Int, Int) -> String,
             tiebreaker: Tiebreaker,
-            header: Flow.Publisher<out String?>
+            header: Flow.Publisher<out String?>,
         ): HemicycleFrame {
             if (entries.sumOf(seatsFunc) != rows.sum()) {
                 throw IllegalArgumentException("Hemicycle Mismatch: ${entries.sumOf(seatsFunc)}/${rows.sum()}")
@@ -307,46 +307,46 @@ class HemicycleFrameBuilder {
             val leftList = leftSeats.map {
                 listOf(
                     Pair(leftParty.color, it.first),
-                    Pair(ColorUtils.lighten(leftParty.color), it.second - it.first)
+                    Pair(ColorUtils.lighten(leftParty.color), it.second - it.first),
                 )
             }
             val rightSeats = createSeatBarPublisher(resultPublishers) { it == rightParty }
             val rightList = rightSeats.map {
                 listOf(
                     Pair(rightParty.color, it.first),
-                    Pair(ColorUtils.lighten(rightParty.color), it.second - it.first)
+                    Pair(ColorUtils.lighten(rightParty.color), it.second - it.first),
                 )
             }
             val middleSeats = createSeatBarPublisher(
-                resultPublishers
+                resultPublishers,
             ) { party -> party != null && party != leftParty && party != rightParty }
             val middleList = middleSeats.map {
                 listOf(
                     Pair(Party.OTHERS.color, it.first),
-                    Pair(ColorUtils.lighten(Party.OTHERS.color), it.second - it.first)
+                    Pair(ColorUtils.lighten(Party.OTHERS.color), it.second - it.first),
                 )
             }
             val leftChange = createChangeBarPublisher(
-                resultWithPrevPublishers
+                resultWithPrevPublishers,
             ) { it == leftParty }
             val leftChangeList = leftChange.map {
                 if (showChange(it.first, it.second)) {
                     listOf(
                         Pair(leftParty.color, it.first),
-                        Pair(ColorUtils.lighten(leftParty.color), it.second - it.first)
+                        Pair(ColorUtils.lighten(leftParty.color), it.second - it.first),
                     )
                 } else {
                     emptyList()
                 }
             }
             val rightChange = createChangeBarPublisher(
-                resultWithPrevPublishers
+                resultWithPrevPublishers,
             ) { it == rightParty }
             val rightChangeList = rightChange.map {
                 if (showChange(it.first, it.second)) {
                     listOf(
                         Pair(rightParty.color, it.first),
-                        Pair(ColorUtils.lighten(rightParty.color), it.second - it.first)
+                        Pair(ColorUtils.lighten(rightParty.color), it.second - it.first),
                     )
                 } else {
                     emptyList()
@@ -369,39 +369,39 @@ class HemicycleFrameBuilder {
                     }
                 },
                 { prevResultFunc(it).color.asOneTimePublisher() },
-                tiebreaker
+                tiebreaker,
             )
                 .withLeftSeatBars(
                     leftList,
                     { it.first },
                     { it.second },
-                    leftSeats.map { leftLabel(it.first, it.second) }
+                    leftSeats.map { leftLabel(it.first, it.second) },
                 )
                 .withRightSeatBars(
                     rightList,
                     { it.first },
                     { it.second },
-                    rightSeats.map { rightLabel(it.first, it.second) }
+                    rightSeats.map { rightLabel(it.first, it.second) },
                 )
                 .withMiddleSeatBars(
                     middleList,
                     { it.first },
                     { it.second },
-                    middleSeats.map { otherLabel(it.first, it.second) }
+                    middleSeats.map { otherLabel(it.first, it.second) },
                 )
                 .withLeftChangeBars(
                     leftChangeList,
                     { it.first },
                     { it.second },
                     calcPrevForParty(allPrevs, leftParty).asOneTimePublisher(),
-                    leftChange.map(changeLabelFunc)
+                    leftChange.map(changeLabelFunc),
                 )
                 .withRightChangeBars(
                     rightChangeList,
                     { it.first },
                     { it.second },
                     calcPrevForParty(allPrevs, rightParty).asOneTimePublisher(),
-                    rightChange.map(changeLabelFunc)
+                    rightChange.map(changeLabelFunc),
                 )
                 .withHeader(header)
                 .build()
@@ -413,7 +413,7 @@ class HemicycleFrameBuilder {
 
         private fun createSeatBarPublisher(
             results: List<Flow.Publisher<Pair<PartyResult?, Int>>>,
-            partyFilter: (Party?) -> Boolean
+            partyFilter: (Party?) -> Boolean,
         ): Flow.Publisher<Pair<Int, Int>> {
             return results.mapReduce(
                 Pair(0, 0),
@@ -432,13 +432,13 @@ class HemicycleFrameBuilder {
                     } else {
                         Pair(p.first - if (result.elected) r.second else 0, p.second - r.second)
                     }
-                }
+                },
             )
         }
 
         private fun createChangeBarPublisher(
             resultWithPrev: List<Flow.Publisher<Triple<PartyResult?, Party, Int>>>,
-            partyFilter: (Party?) -> Boolean
+            partyFilter: (Party?) -> Boolean,
         ): Flow.Publisher<Pair<Int, Int>> {
             return resultWithPrev.mapReduce(
                 Pair(0, 0),
@@ -471,7 +471,7 @@ class HemicycleFrameBuilder {
                         }
                         ret
                     }
-                }
+                },
             )
         }
     }

@@ -72,8 +72,8 @@ abstract class SocialMediaFrame<P : Post<P>>(post: Flow.Publisher<out Post<P>>, 
             Subscriber(
                 eventQueueWrapper {
                     postLabel.text = formatText(it, false, postLabel)
-                }
-            )
+                },
+            ),
         )
         postPanel.add(postLabel)
 
@@ -103,8 +103,8 @@ abstract class SocialMediaFrame<P : Post<P>>(post: Flow.Publisher<out Post<P>>, 
                         urlPanel.add(UrlPanel(it))
                     }
                     urlPanel.add(Box.createHorizontalGlue())
-                }
-            )
+                },
+            ),
         )
 
         val mediaPanel = JPanel()
@@ -121,8 +121,8 @@ abstract class SocialMediaFrame<P : Post<P>>(post: Flow.Publisher<out Post<P>>, 
                     media.forEach {
                         mediaPanel.add(MediaPanel(it))
                     }
-                }
-            )
+                },
+            ),
         )
 
         val quotedPanel = JPanel()
@@ -142,8 +142,8 @@ abstract class SocialMediaFrame<P : Post<P>>(post: Flow.Publisher<out Post<P>>, 
                     postPanel.invalidate()
                     postPanel.revalidate()
                     repaint()
-                }
-            )
+                },
+            ),
         )
 
         val pollPanel = BarFrameBuilder.basic(
@@ -157,13 +157,13 @@ abstract class SocialMediaFrame<P : Post<P>>(post: Flow.Publisher<out Post<P>>, 
                             it.key,
                             color,
                             it.value,
-                            "${DecimalFormat("#,##0").format(it.value)} (${DecimalFormat("0.0%").format(it.value / total)})"
+                            "${DecimalFormat("#,##0").format(it.value)} (${DecimalFormat("0.0%").format(it.value / total)})",
                         )
                     }
                 } else {
                     emptyList()
                 }
-            }
+            },
         ).build().pad().also { it.isVisible = false }
         post.subscribe(
             Subscriber(
@@ -171,8 +171,8 @@ abstract class SocialMediaFrame<P : Post<P>>(post: Flow.Publisher<out Post<P>>, 
                     pollPanel.isVisible = it.polls.isNotEmpty()
                     pollPanel.invalidate()
                     pollPanel.revalidate()
-                }
-            )
+                },
+            ),
         )
         postPanel.add(pollPanel)
 
@@ -191,8 +191,8 @@ abstract class SocialMediaFrame<P : Post<P>>(post: Flow.Publisher<out Post<P>>, 
                         } else {
                             DateTimeFormatter.ofPattern("d MMMM yyyy HH:mm:ss z ").format(it.atZone(timezone))
                         }
-                }
-            )
+                },
+            ),
         )
         add(timeLabel, BorderLayout.SOUTH)
     }
@@ -251,7 +251,7 @@ abstract class SocialMediaFrame<P : Post<P>>(post: Flow.Publisher<out Post<P>>, 
                         (g as Graphics2D)
                             .setRenderingHint(
                                 RenderingHints.KEY_ANTIALIASING,
-                                RenderingHints.VALUE_ANTIALIAS_ON
+                                RenderingHints.VALUE_ANTIALIAS_ON,
                             )
                         g.clip = Ellipse2D.Double(0.0, 0.0, size.toDouble(), size.toDouble())
                         g.drawImage(originalImage, 0, 0, size, size, null)
@@ -260,8 +260,8 @@ abstract class SocialMediaFrame<P : Post<P>>(post: Flow.Publisher<out Post<P>>, 
                         fullName = it.name
                         screenName = it.screenName
                         repaint()
-                    }
-                )
+                    },
+                ),
             )
         }
 
@@ -273,12 +273,12 @@ abstract class SocialMediaFrame<P : Post<P>>(post: Flow.Publisher<out Post<P>>, 
             (g as Graphics2D)
                 .setRenderingHint(
                     RenderingHints.KEY_ANTIALIASING,
-                    RenderingHints.VALUE_ANTIALIAS_ON
+                    RenderingHints.VALUE_ANTIALIAS_ON,
                 )
             g
                 .setRenderingHint(
                     RenderingHints.KEY_TEXT_ANTIALIASING,
-                    RenderingHints.VALUE_TEXT_ANTIALIAS_ON
+                    RenderingHints.VALUE_TEXT_ANTIALIAS_ON,
                 )
             image?.let { g.drawImage(it, 1, 1, null) }
             g.color = Color.WHITE
@@ -316,12 +316,12 @@ abstract class SocialMediaFrame<P : Post<P>>(post: Flow.Publisher<out Post<P>>, 
             (g as Graphics2D)
                 .setRenderingHint(
                     RenderingHints.KEY_ANTIALIASING,
-                    RenderingHints.VALUE_ANTIALIAS_ON
+                    RenderingHints.VALUE_ANTIALIAS_ON,
                 )
             g
                 .setRenderingHint(
                     RenderingHints.KEY_TEXT_ANTIALIASING,
-                    RenderingHints.VALUE_TEXT_ANTIALIAS_ON
+                    RenderingHints.VALUE_TEXT_ANTIALIAS_ON,
                 )
             image?.let {
                 val xScale = width.toDouble() / it.getWidth(null)
@@ -446,12 +446,12 @@ abstract class SocialMediaFrame<P : Post<P>>(post: Flow.Publisher<out Post<P>>, 
                 (g as Graphics2D)
                     .setRenderingHint(
                         RenderingHints.KEY_ANTIALIASING,
-                        RenderingHints.VALUE_ANTIALIAS_ON
+                        RenderingHints.VALUE_ANTIALIAS_ON,
                     )
                 g
                     .setRenderingHint(
                         RenderingHints.KEY_TEXT_ANTIALIASING,
-                        RenderingHints.VALUE_TEXT_ANTIALIAS_ON
+                        RenderingHints.VALUE_TEXT_ANTIALIAS_ON,
                     )
                 g.color = Color.WHITE
                 var x = 0

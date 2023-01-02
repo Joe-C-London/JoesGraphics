@@ -30,12 +30,12 @@ class BarFrameTest {
                 ElectionResult("BLOC QUEBECOIS", Color.CYAN, 32),
                 ElectionResult("NEW DEMOCRATIC PARTY", Color.ORANGE, 24),
                 ElectionResult("GREEN", Color.GREEN, 3),
-                ElectionResult("INDEPENDENT", Color.LIGHT_GRAY, 1)
-            )
+                ElectionResult("INDEPENDENT", Color.LIGHT_GRAY, 1),
+            ),
         )
         val frame = BarFrame(
             headerPublisher = (null as String?).asOneTimePublisher(),
-            barsPublisher = results.mapElements { BarFrame.Bar("", "", null, listOf()) }
+            barsPublisher = results.mapElements { BarFrame.Bar("", "", null, listOf()) },
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numBars }, IsEqual(6))
@@ -47,7 +47,7 @@ class BarFrameTest {
         val results = Publisher(list)
         val frame = BarFrame(
             headerPublisher = (null as String?).asOneTimePublisher(),
-            barsPublisher = results.mapElements { BarFrame.Bar("", "", null, listOf()) }
+            barsPublisher = results.mapElements { BarFrame.Bar("", "", null, listOf()) },
         )
         Assertions.assertEquals(0, frame.numBars.toLong())
         list.add(ElectionResult("LIBERAL", Color.RED, 1))
@@ -57,8 +57,8 @@ class BarFrameTest {
         list.addAll(
             listOf(
                 ElectionResult("CONSERVATIVE", Color.BLUE, 1),
-                ElectionResult("NEW DEMOCRATIC PARTY", Color.ORANGE, 1)
-            )
+                ElectionResult("NEW DEMOCRATIC PARTY", Color.ORANGE, 1),
+            ),
         )
         results.submit(list)
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
@@ -86,12 +86,12 @@ class BarFrameTest {
                 ElectionResult("BLOC QUEBECOIS", Color.CYAN, 32),
                 ElectionResult("NEW DEMOCRATIC PARTY", Color.ORANGE, 24),
                 ElectionResult("GREEN", Color.GREEN, 3),
-                ElectionResult("INDEPENDENT", Color.LIGHT_GRAY, 1)
-            )
+                ElectionResult("INDEPENDENT", Color.LIGHT_GRAY, 1),
+            ),
         )
         val frame = BarFrame(
             headerPublisher = (null as String?).asOneTimePublisher(),
-            barsPublisher = results.mapElements { BarFrame.Bar(it.getPartyName(), "", null, listOf()) }
+            barsPublisher = results.mapElements { BarFrame.Bar(it.getPartyName(), "", null, listOf()) },
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numBars }, IsEqual(6))
@@ -112,8 +112,8 @@ class BarFrameTest {
                 ElectionResult("BLOC QUEBECOIS", Color.CYAN, 32),
                 ElectionResult("NEW DEMOCRATIC PARTY", Color.ORANGE, 24),
                 ElectionResult("GREEN", Color.GREEN, 3),
-                ElectionResult("INDEPENDENT", Color.LIGHT_GRAY, 1)
-            )
+                ElectionResult("INDEPENDENT", Color.LIGHT_GRAY, 1),
+            ),
         )
         val frame = BarFrame(
             headerPublisher = (null as String?).asOneTimePublisher(),
@@ -122,9 +122,9 @@ class BarFrameTest {
                     it.getPartyName(),
                     "${it.getNumSeats()}",
                     null,
-                    listOf()
+                    listOf(),
                 )
-            }
+            },
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numBars }, IsEqual(6))
@@ -144,7 +144,7 @@ class BarFrameTest {
             ElectionResult("BLOC QUEBECOIS", Color.CYAN, 0, 32),
             ElectionResult("NEW DEMOCRATIC PARTY", Color.ORANGE, 1, 24),
             ElectionResult("GREEN", Color.GREEN, 0, 3),
-            ElectionResult("INDEPENDENT", Color.LIGHT_GRAY, 0, 1)
+            ElectionResult("INDEPENDENT", Color.LIGHT_GRAY, 0, 1),
         )
         val results = Publisher(list)
         val frame = BarFrame(
@@ -156,10 +156,10 @@ class BarFrameTest {
                     null,
                     listOf(
                         Pair(it.getPartyColor(), it.getNumSeats()),
-                        Pair(lighten(it.getPartyColor()), it.getSeatEstimate() - it.getNumSeats())
-                    )
+                        Pair(lighten(it.getPartyColor()), it.getSeatEstimate() - it.getNumSeats()),
+                    ),
                 )
-            }
+            },
         )
         val lightRed = Color(255, 127, 127)
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
@@ -197,7 +197,7 @@ class BarFrameTest {
             ElectionResult("BLOC QUEBECOIS", Color.CYAN, 32),
             ElectionResult("NEW DEMOCRATIC PARTY", Color.ORANGE, 24),
             ElectionResult("GREEN", Color.GREEN, 3),
-            ElectionResult("INDEPENDENT", Color.LIGHT_GRAY, 1)
+            ElectionResult("INDEPENDENT", Color.LIGHT_GRAY, 1),
         )
         val results = Publisher(list)
         val shape: Shape = Ellipse2D.Double()
@@ -208,9 +208,9 @@ class BarFrameTest {
                     "",
                     "",
                     if (it.getNumSeats() > 150) shape else null,
-                    listOf()
+                    listOf(),
                 )
-            }
+            },
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numBars }, IsEqual(6))
@@ -230,7 +230,7 @@ class BarFrameTest {
             ElectionResult("BLOC QUEBECOIS", Color.CYAN, 32),
             ElectionResult("NEW DEMOCRATIC PARTY", Color.ORANGE, 24),
             ElectionResult("GREEN", Color.GREEN, 3),
-            ElectionResult("INDEPENDENT", Color.LIGHT_GRAY, 1)
+            ElectionResult("INDEPENDENT", Color.LIGHT_GRAY, 1),
         )
         val results = Publisher(list)
         val frame = BarFrame(
@@ -241,10 +241,10 @@ class BarFrameTest {
                     "",
                     null,
                     listOf(
-                        Pair(it.getPartyColor(), it.getNumSeats())
-                    )
+                        Pair(it.getPartyColor(), it.getNumSeats()),
+                    ),
                 )
-            }
+            },
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.min.toInt() }, IsEqual(0))
@@ -271,7 +271,7 @@ class BarFrameTest {
             ElectionResult("BLOC QUEBECOIS", Color.CYAN, 32),
             ElectionResult("NEW DEMOCRATIC PARTY", Color.ORANGE, 24),
             ElectionResult("GREEN", Color.GREEN, 3),
-            ElectionResult("INDEPENDENT", Color.LIGHT_GRAY, 1)
+            ElectionResult("INDEPENDENT", Color.LIGHT_GRAY, 1),
         )
         val results = Publisher(list)
         val frame = BarFrame(
@@ -282,12 +282,12 @@ class BarFrameTest {
                     "",
                     null,
                     listOf(
-                        Pair(it.getPartyColor(), it.getNumSeats())
-                    )
+                        Pair(it.getPartyColor(), it.getNumSeats()),
+                    ),
                 )
             },
             minPublisher = (-30).asOneTimePublisher(),
-            maxPublisher = 30.asOneTimePublisher()
+            maxPublisher = 30.asOneTimePublisher(),
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.min.toInt() }, IsEqual(-30))
@@ -312,7 +312,7 @@ class BarFrameTest {
         val frame = BarFrame(
             headerPublisher = (null as String?).asOneTimePublisher(),
             subheadTextPublisher = "PROJECTION: LIB MINORITY".asOneTimePublisher(),
-            barsPublisher = emptyList<BarFrame.Bar>().asOneTimePublisher()
+            barsPublisher = emptyList<BarFrame.Bar>().asOneTimePublisher(),
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.subheadText }, IsEqual("PROJECTION: LIB MINORITY"))
@@ -322,7 +322,7 @@ class BarFrameTest {
     fun testDefaultSubheadColor() {
         val frame = BarFrame(
             headerPublisher = (null as String?).asOneTimePublisher(),
-            barsPublisher = emptyList<BarFrame.Bar>().asOneTimePublisher()
+            barsPublisher = emptyList<BarFrame.Bar>().asOneTimePublisher(),
         )
         Assertions.assertEquals(Color.BLACK, frame.subheadColor)
     }
@@ -333,7 +333,7 @@ class BarFrameTest {
             headerPublisher = (null as String?).asOneTimePublisher(),
             subheadTextPublisher = "PROJECTION: LIB MINORITY".asOneTimePublisher(),
             subheadColorPublisher = Color.RED.asOneTimePublisher(),
-            barsPublisher = emptyList<BarFrame.Bar>().asOneTimePublisher()
+            barsPublisher = emptyList<BarFrame.Bar>().asOneTimePublisher(),
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.subheadColor }, IsEqual(Color.RED))
@@ -344,7 +344,7 @@ class BarFrameTest {
         val frame = BarFrame(
             headerPublisher = (null as String?).asOneTimePublisher(),
             barsPublisher = emptyList<BarFrame.Bar>().asOneTimePublisher(),
-            linesPublisher = listOf(BarFrame.Line(170, "170 SEATS FOR MAJORITY")).asOneTimePublisher()
+            linesPublisher = listOf(BarFrame.Line(170, "170 SEATS FOR MAJORITY")).asOneTimePublisher(),
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numLines }, IsEqual(1))
@@ -357,15 +357,15 @@ class BarFrameTest {
         val results = Publisher<List<Triple<String, Color, Int>>>(listOf())
         val frame = BarFrame(
             headerPublisher = (null as String?).asOneTimePublisher(),
-            barsPublisher = results.mapElements { BarFrame.Bar(it.first, "", null, listOf()) }
+            barsPublisher = results.mapElements { BarFrame.Bar(it.first, "", null, listOf()) },
         )
         Assertions.assertEquals(0, frame.numBars.toLong())
         results.submit(
             listOf(
                 Triple("LIBERALS", Color.RED, 3),
                 Triple("CONSERVATIVES", Color.BLUE, 2),
-                Triple("NDP", Color.ORANGE, 1)
-            )
+                Triple("NDP", Color.ORANGE, 1),
+            ),
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numBars }, IsEqual(3))
@@ -375,8 +375,8 @@ class BarFrameTest {
         results.submit(
             listOf(
                 Triple("LIBERALS", Color.RED, 3),
-                Triple("CONSERVATIVES", Color.BLUE, 3)
-            )
+                Triple("CONSERVATIVES", Color.BLUE, 3),
+            ),
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numBars }, IsEqual(2))
@@ -394,8 +394,8 @@ class BarFrameTest {
                 ElectionResult("BLOC QUEBECOIS", Color.CYAN, 32),
                 ElectionResult("NEW DEMOCRATIC PARTY", Color.ORANGE, 24),
                 ElectionResult("GREEN", Color.GREEN, 3),
-                ElectionResult("INDEPENDENT", Color.LIGHT_GRAY, 1)
-            )
+                ElectionResult("INDEPENDENT", Color.LIGHT_GRAY, 1),
+            ),
         )
         val barFrame = BarFrame(
             headerPublisher = "2019 CANADIAN ELECTION RESULT".asOneTimePublisher(),
@@ -405,11 +405,11 @@ class BarFrameTest {
                     "${it.getNumSeats()}",
                     null,
                     listOf(
-                        Pair(it.getPartyColor(), it.getNumSeats())
-                    )
+                        Pair(it.getPartyColor(), it.getNumSeats()),
+                    ),
                 )
             },
-            maxPublisher = 160.asOneTimePublisher()
+            maxPublisher = 160.asOneTimePublisher(),
         )
         barFrame.setSize(512, 256)
         compareRendering("BarFrame", "SingleSeriesAllPositive", barFrame)
@@ -424,8 +424,8 @@ class BarFrameTest {
                 ElectionResult("BLOC QUEBECOIS", Color.CYAN, 32),
                 ElectionResult("NEW DEMOCRATIC PARTY", Color.ORANGE, 24),
                 ElectionResult("GREEN", Color.GREEN, 3),
-                ElectionResult("INDEPENDENT", Color.LIGHT_GRAY, 1)
-            )
+                ElectionResult("INDEPENDENT", Color.LIGHT_GRAY, 1),
+            ),
         )
         val barFrame = BarFrame(
             headerPublisher = "2019 CANADIAN ELECTION RESULT".asOneTimePublisher(),
@@ -437,11 +437,11 @@ class BarFrameTest {
                     "${it.getNumSeats()}",
                     null,
                     listOf(
-                        Pair(it.getPartyColor(), it.getNumSeats())
-                    )
+                        Pair(it.getPartyColor(), it.getNumSeats()),
+                    ),
                 )
             },
-            maxPublisher = 160.asOneTimePublisher()
+            maxPublisher = 160.asOneTimePublisher(),
         )
         barFrame.setSize(512, 256)
         compareRendering("BarFrame", "SingleSeriesWithSubhead", barFrame)
@@ -458,8 +458,8 @@ class BarFrameTest {
                 ElectionResult("INDEPENDENT", Color.LIGHT_GRAY, 8),
                 ElectionResult("GREEN", Color.GREEN, 2),
                 ElectionResult("CO-OPERATIVE COMMONWEALTH FEDERATION", Color.ORANGE.darker(), 1),
-                ElectionResult("PEOPLE'S PARTY", Color.MAGENTA.darker(), 1)
-            )
+                ElectionResult("PEOPLE'S PARTY", Color.MAGENTA.darker(), 1),
+            ),
         )
         val barFrame = BarFrame(
             headerPublisher = "SEATS AT DISSOLUTION".asOneTimePublisher(),
@@ -471,10 +471,10 @@ class BarFrameTest {
                     "${it.getNumSeats()}",
                     null,
                     listOf(
-                        Pair(it.getPartyColor(), it.getNumSeats())
-                    )
+                        Pair(it.getPartyColor(), it.getNumSeats()),
+                    ),
                 )
-            }
+            },
         )
         barFrame.setSize(512, 256)
         compareRendering("BarFrame", "SingleSeriesShrinkToFit", barFrame)
@@ -489,8 +489,8 @@ class BarFrameTest {
                 ElectionResult("BLOC QUEBECOIS", Color.CYAN, 2, 32),
                 ElectionResult("NEW DEMOCRATIC PARTY", Color.ORANGE, 4, 24),
                 ElectionResult("GREEN", Color.GREEN, 1, 3),
-                ElectionResult("INDEPENDENT", Color.LIGHT_GRAY, 0, 1)
-            )
+                ElectionResult("INDEPENDENT", Color.LIGHT_GRAY, 0, 1),
+            ),
         )
         val barFrame = BarFrame(
             headerPublisher = "2019 CANADIAN ELECTION RESULT".asOneTimePublisher(),
@@ -501,11 +501,11 @@ class BarFrameTest {
                     null,
                     listOf(
                         Pair(it.getPartyColor(), it.getNumSeats()),
-                        Pair(lighten(it.getPartyColor()), it.getSeatEstimate() - it.getNumSeats())
-                    )
+                        Pair(lighten(it.getPartyColor()), it.getSeatEstimate() - it.getNumSeats()),
+                    ),
                 )
             },
-            maxPublisher = 160.asOneTimePublisher()
+            maxPublisher = 160.asOneTimePublisher(),
         )
         barFrame.setSize(512, 256)
         compareRendering("BarFrame", "MultiSeriesAllPositive", barFrame)
@@ -520,8 +520,8 @@ class BarFrameTest {
                 ElectionResult("BQ", Color.CYAN, +22),
                 ElectionResult("NDP", Color.ORANGE, -20),
                 ElectionResult("GRN", Color.GREEN, +2),
-                ElectionResult("IND", Color.LIGHT_GRAY, +1)
-            )
+                ElectionResult("IND", Color.LIGHT_GRAY, +1),
+            ),
         )
         val barFrame = BarFrame(
             headerPublisher = "RESULT CHANGE SINCE 2015".asOneTimePublisher(),
@@ -531,18 +531,18 @@ class BarFrameTest {
                     DecimalFormat("+0;-0").format(it.getNumSeats().toLong()),
                     null,
                     listOf(
-                        Pair(it.getPartyColor(), it.getNumSeats())
-                    )
+                        Pair(it.getPartyColor(), it.getNumSeats()),
+                    ),
                 )
             },
             maxPublisher = 28.asOneTimePublisher(),
-            minPublisher = (-28).asOneTimePublisher()
+            minPublisher = (-28).asOneTimePublisher(),
         )
         barFrame.setSize(512, 256)
         compareRendering(
             "BarFrame",
             "SingleSeriesBothDirections",
-            barFrame
+            barFrame,
         )
     }
 
@@ -555,8 +555,8 @@ class BarFrameTest {
                 ElectionResult("BQ", Color.CYAN, +0, +22),
                 ElectionResult("NDP", Color.ORANGE, +2, -20),
                 ElectionResult("GRN", Color.GREEN, +1, +2),
-                ElectionResult("IND", Color.LIGHT_GRAY, +0, +1)
-            )
+                ElectionResult("IND", Color.LIGHT_GRAY, +0, +1),
+            ),
         )
         val barFrame = BarFrame(
             headerPublisher = "RESULT CHANGE SINCE 2015".asOneTimePublisher(),
@@ -564,9 +564,9 @@ class BarFrameTest {
                 BarFrame.Bar(
                     it.getPartyName(),
                     "${CHANGE_FORMAT.format(it.getNumSeats().toLong())}/${
-                    CHANGE_FORMAT.format(
-                        it.getSeatEstimate().toLong()
-                    )
+                        CHANGE_FORMAT.format(
+                            it.getSeatEstimate().toLong(),
+                        )
                     }",
                     null,
                     listOf(
@@ -574,25 +574,25 @@ class BarFrameTest {
                         Pair(
                             lighten(it.getPartyColor()),
                             it.getSeatEstimate() - if (sign(it.getSeatEstimate().toFloat()) == sign(
-                                    it.getNumSeats().toFloat()
+                                    it.getNumSeats().toFloat(),
                                 )
                             ) {
                                 it.getNumSeats()
                             } else {
                                 0
-                            }
-                        )
-                    )
+                            },
+                        ),
+                    ),
                 )
             },
             maxPublisher = 28.asOneTimePublisher(),
-            minPublisher = (-28).asOneTimePublisher()
+            minPublisher = (-28).asOneTimePublisher(),
         )
         barFrame.setSize(512, 256)
         compareRendering(
             "BarFrame",
             "MultiSeriesBothDirections",
-            barFrame
+            barFrame,
         )
     }
 
@@ -604,8 +604,8 @@ class BarFrameTest {
                 RidingResult("JERRY ZHANG", "CONSERVATIVE", Color.BLUE, 15615, 0.2451),
                 RidingResult("LORI CAMPBELL", "NEW DEMOCRATIC PARTY", Color.ORANGE, 9710, 0.1524),
                 RidingResult("KIRSTEN WRIGHT", "GREEN", Color.GREEN, 6184, 0.0971),
-                RidingResult("ERIKA TRAUB", "PEOPLE'S PARTY", Color.MAGENTA.darker(), 1112, 0.0175)
-            )
+                RidingResult("ERIKA TRAUB", "PEOPLE'S PARTY", Color.MAGENTA.darker(), 1112, 0.0175),
+            ),
         )
         val barFrame = BarFrame(
             headerPublisher = "WATERLOO".asOneTimePublisher(),
@@ -615,10 +615,10 @@ class BarFrameTest {
                 BarFrame.Bar(
                     "${it.getCandidateName()}\n${it.getPartyName()}",
                     "${THOUSANDS_FORMAT.format(it.getNumVotes().toLong())}\n${PERCENT_FORMAT.format(it.getVotePct())}",
-                    listOf(Pair(it.getPartyColor(), it.getNumVotes()))
+                    listOf(Pair(it.getPartyColor(), it.getNumVotes())),
                 )
             },
-            maxPublisher = results.map { r -> r.sumOf { it.getNumVotes() } / 2 }
+            maxPublisher = results.map { r -> r.sumOf { it.getNumVotes() } / 2 },
         )
         barFrame.setSize(512, 256)
         compareRendering("BarFrame", "TwoLinedBars", barFrame)
@@ -632,8 +632,8 @@ class BarFrameTest {
                 RidingResult("JERRY ZHANG", "CONSERVATIVE", Color.BLUE, 15615, 0.2451),
                 RidingResult("LORI CAMPBELL", "NEW DEMOCRATIC PARTY", Color.ORANGE, 9710, 0.1524),
                 RidingResult("KIRSTEN WRIGHT", "GREEN", Color.GREEN, 6184, 0.0971),
-                RidingResult("ERIKA TRAUB", "PEOPLE'S PARTY", Color.MAGENTA.darker(), 1112, 0.0175)
-            )
+                RidingResult("ERIKA TRAUB", "PEOPLE'S PARTY", Color.MAGENTA.darker(), 1112, 0.0175),
+            ),
         )
         val shape = createTickShape()
         val barFrame = BarFrame(
@@ -645,10 +645,10 @@ class BarFrameTest {
                     "${it.getCandidateName()}\n${it.getPartyName()}",
                     "${THOUSANDS_FORMAT.format(it.getNumVotes().toLong())}\n${PERCENT_FORMAT.format(it.getVotePct())}",
                     if (it.isElected()) shape else null,
-                    listOf(Pair(it.getPartyColor(), it.getNumVotes()))
+                    listOf(Pair(it.getPartyColor(), it.getNumVotes())),
                 )
             },
-            maxPublisher = results.map { r -> r.sumOf { it.getNumVotes() } / 2 }
+            maxPublisher = results.map { r -> r.sumOf { it.getNumVotes() } / 2 },
         )
         barFrame.setSize(512, 256)
         compareRendering("BarFrame", "TwoLinedBarWithIcon", barFrame)
@@ -662,8 +662,8 @@ class BarFrameTest {
                 RidingResult("JERRY ZHANG", "CON", Color.BLUE, 15615, -0.077),
                 RidingResult("LORI CAMPBELL", "NDP", Color.ORANGE, 9710, +0.003),
                 RidingResult("KIRSTEN WRIGHT", "GRN", Color.GREEN, 6184, +0.068),
-                RidingResult("ERIKA TRAUB", "PPC", Color.MAGENTA.darker(), 1112, +0.017)
-            )
+                RidingResult("ERIKA TRAUB", "PPC", Color.MAGENTA.darker(), 1112, +0.017),
+            ),
         )
         val shape = createTickShape()
         val barFrame = BarFrame(
@@ -673,15 +673,15 @@ class BarFrameTest {
                     it.getPartyName(),
                     PERCENT_FORMAT.format(it.getVotePct()),
                     if (it.isElected()) shape else null,
-                    listOf(Pair(it.getPartyColor(), it.getVotePct()))
+                    listOf(Pair(it.getPartyColor(), it.getVotePct())),
                 )
-            }
+            },
         )
         barFrame.setSize(512, 256)
         compareRendering(
             "BarFrame",
             "TwoLinedBarWithNegativeIcon",
-            barFrame
+            barFrame,
         )
     }
 
@@ -696,8 +696,8 @@ class BarFrameTest {
                 ElectionResult("INDEPENDENT", Color.LIGHT_GRAY, 8),
                 ElectionResult("GREEN", Color.GREEN, 2),
                 ElectionResult("CO-OPERATIVE COMMONWEALTH FEDERATION", Color.ORANGE.darker(), 1),
-                ElectionResult("PEOPLE'S PARTY", Color.MAGENTA.darker(), 1)
-            )
+                ElectionResult("PEOPLE'S PARTY", Color.MAGENTA.darker(), 1),
+            ),
         )
         val barFrame = BarFrame(
             headerPublisher = "SEATS AT DISSOLUTION".asOneTimePublisher(),
@@ -708,12 +708,12 @@ class BarFrameTest {
                     it.getPartyName(),
                     "${it.getNumSeats()}",
                     listOf(
-                        Pair(it.getPartyColor(), it.getNumSeats())
-                    )
+                        Pair(it.getPartyColor(), it.getNumSeats()),
+                    ),
                 )
             },
             linesPublisher = listOf(BarFrame.Line(170, "MAJORITY")).asOneTimePublisher(),
-            maxPublisher = 225.asOneTimePublisher()
+            maxPublisher = 225.asOneTimePublisher(),
         )
         barFrame.setSize(512, 256)
         compareRendering("BarFrame", "VerticalLine", barFrame)
@@ -726,8 +726,8 @@ class BarFrameTest {
                 ElectionResult("COALITION AVENIR QU\u00c9BEC: FRAN\u00c7OIS LEGAULT", Color.BLUE, 74),
                 ElectionResult("LIB\u00c9RAL: PHILIPPE COUILLARD", Color.RED, 31),
                 ElectionResult("PARTI QU\u00c9BECOIS: JEAN-FRAN\u00c7OIS LIS\u00c9E", Color.CYAN, 10),
-                ElectionResult("QU\u00c9BEC SOLIDAIRE: MANON MASS\u00c9", Color.ORANGE, 10)
-            )
+                ElectionResult("QU\u00c9BEC SOLIDAIRE: MANON MASS\u00c9", Color.ORANGE, 10),
+            ),
         )
         val barFrame = BarFrame(
             headerPublisher = "\u00c9LECTION 2018".asOneTimePublisher(),
@@ -737,12 +737,12 @@ class BarFrameTest {
                     it.getPartyName(),
                     "${it.getNumSeats()}",
                     listOf(
-                        Pair(it.getPartyColor(), it.getNumSeats())
-                    )
+                        Pair(it.getPartyColor(), it.getNumSeats()),
+                    ),
                 )
             },
             linesPublisher = listOf(BarFrame.Line(63, "MAJORIT\u00c9")).asOneTimePublisher(),
-            maxPublisher = 83.asOneTimePublisher()
+            maxPublisher = 83.asOneTimePublisher(),
         )
         barFrame.setSize(512, 256)
         compareRendering("BarFrame", "Accents", barFrame)
@@ -755,8 +755,8 @@ class BarFrameTest {
                 ElectionResult("COALITION AVENIR QU\u00c9BEC\nFRAN\u00c7OIS LEGAULT", Color.BLUE, 74),
                 ElectionResult("LIB\u00c9RAL\nPHILIPPE COUILLARD", Color.RED, 31),
                 ElectionResult("PARTI QU\u00c9BECOIS\nJEAN-FRAN\u00c7OIS LIS\u00c9E", Color.CYAN, 10),
-                ElectionResult("QU\u00c9BEC SOLIDAIRE\nMANON MASS\u00c9", Color.ORANGE, 10)
-            )
+                ElectionResult("QU\u00c9BEC SOLIDAIRE\nMANON MASS\u00c9", Color.ORANGE, 10),
+            ),
         )
         val barFrame = BarFrame(
             headerPublisher = "\u00c9LECTION 2018".asOneTimePublisher(),
@@ -766,12 +766,12 @@ class BarFrameTest {
                     it.getPartyName(),
                     "${it.getNumSeats()}",
                     listOf(
-                        Pair(it.getPartyColor(), it.getNumSeats())
-                    )
+                        Pair(it.getPartyColor(), it.getNumSeats()),
+                    ),
                 )
             },
             linesPublisher = listOf(BarFrame.Line(63, "MAJORIT\u00c9")).asOneTimePublisher(),
-            maxPublisher = 83.asOneTimePublisher()
+            maxPublisher = 83.asOneTimePublisher(),
         )
         barFrame.setSize(512, 256)
         compareRendering("BarFrame", "MultiLineAccents", barFrame)
@@ -788,11 +788,11 @@ class BarFrameTest {
                     it.first,
                     it.second,
                     if (it.third) createHalfTickShape() else null,
-                    listOf(Pair(Color.RED, 1))
+                    listOf(Pair(Color.RED, 1)),
                 )
             },
             linesPublisher = listOf(BarFrame.Line(0.5, "")).asOneTimePublisher(),
-            maxPublisher = 1.asOneTimePublisher()
+            maxPublisher = 1.asOneTimePublisher(),
         )
         barFrame.setSize(256, 128)
         compareRendering("BarFrame", "FrameOverlap-1", barFrame)
@@ -855,7 +855,7 @@ class BarFrameTest {
         private val partyColor: Color,
         private val numVotes: Int,
         private val votePct: Double,
-        private val elected: Boolean = false
+        private val elected: Boolean = false,
     ) {
         fun getCandidateName(): String {
             return candidateName
@@ -890,7 +890,7 @@ class BarFrameTest {
             return Color(
                 (color!!.red + 255) / 2,
                 (color.green + 255) / 2,
-                (color.blue + 255) / 2
+                (color.blue + 255) / 2,
             )
         }
     }

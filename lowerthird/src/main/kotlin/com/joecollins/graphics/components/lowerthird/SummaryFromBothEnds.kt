@@ -27,7 +27,7 @@ class SummaryFromBothEnds(
     private val totalPublisher: Flow.Publisher<out Int>,
     private val leftPublisher: Flow.Publisher<out Entry?>,
     private val rightPublisher: Flow.Publisher<out Entry?>,
-    private val middlePublisher: Flow.Publisher<out Entry?> = (null as Entry?).asOneTimePublisher()
+    private val middlePublisher: Flow.Publisher<out Entry?> = (null as Entry?).asOneTimePublisher(),
 ) : JPanel() {
 
     private val headlinePanel: HeadlinePanel = HeadlinePanel()
@@ -106,7 +106,7 @@ class SummaryFromBothEnds(
             (g as Graphics2D)
                 .setRenderingHint(
                     RenderingHints.KEY_TEXT_ANTIALIASING,
-                    RenderingHints.VALUE_TEXT_ANTIALIAS_ON
+                    RenderingHints.VALUE_TEXT_ANTIALIAS_ON,
                 )
             val labelFont = StandardFont.readNormalFont(12)
             val valueFont = StandardFont.readBoldFont(20)

@@ -18,7 +18,7 @@ import javax.swing.border.EmptyBorder
 open class GenericPanel(
     panel: JPanel,
     label: Flow.Publisher<out String?>,
-    override val altText: Flow.Publisher<String?> = null.asOneTimePublisher()
+    override val altText: Flow.Publisher<String?> = null.asOneTimePublisher(),
 ) : JPanel(), AltTextProvider {
 
     protected val label: JLabel = FontSizeAdjustingLabel()
@@ -31,8 +31,8 @@ open class GenericPanel(
                 eventQueueWrapper {
                     this.label.text = it ?: ""
                     this.label.isVisible = it != null
-                }
-            )
+                },
+            ),
         )
         this.label.horizontalAlignment = JLabel.CENTER
         this.label.border = EmptyBorder(5, 0, -5, 0)

@@ -22,7 +22,7 @@ class RegionalBreakdownScreenTest {
             "PRINCE EDWARD ISLAND".asOneTimePublisher(),
             peiSeats,
             27.asOneTimePublisher(),
-            "SEATS BY REGION".asOneTimePublisher()
+            "SEATS BY REGION".asOneTimePublisher(),
         )
             .withBlankRow()
             .withRegion("CARDIGAN".asOneTimePublisher(), cardiganSeats, 7.asOneTimePublisher())
@@ -60,7 +60,7 @@ class RegionalBreakdownScreenTest {
             peiSeats,
             peiDiff,
             27.asOneTimePublisher(),
-            "SEATS BY REGION".asOneTimePublisher()
+            "SEATS BY REGION".asOneTimePublisher(),
         )
             .withBlankRow()
             .withRegion("CARDIGAN".asOneTimePublisher(), cardiganSeats, cardiganDiff, 7.asOneTimePublisher())
@@ -107,7 +107,7 @@ class RegionalBreakdownScreenTest {
             peiSeats,
             peiPrev,
             27.asOneTimePublisher(),
-            "SEATS BY REGION".asOneTimePublisher()
+            "SEATS BY REGION".asOneTimePublisher(),
         )
             .withBlankRow()
             .withRegion("CARDIGAN".asOneTimePublisher(), cardiganSeats, cardiganPrev, 7.asOneTimePublisher())
@@ -150,7 +150,7 @@ class RegionalBreakdownScreenTest {
             "AUSTRALIA".asOneTimePublisher(),
             mapOf(alp to 68, coa to 77, oth to 6).asOneTimePublisher(),
             151.asOneTimePublisher(),
-            "SEATS BY STATE".asOneTimePublisher()
+            "SEATS BY STATE".asOneTimePublisher(),
         )
             .withBlankRow()
             .withRegion("NEW SOUTH WALES".asOneTimePublisher(), mapOf(coa to 22, alp to 24, oth to 1).asOneTimePublisher(), 47.asOneTimePublisher())
@@ -180,7 +180,7 @@ class RegionalBreakdownScreenTest {
             mapOf(alp to 68, coa to 77, oth to 6).asOneTimePublisher(),
             mapOf(alp to 69, coa to 76, oth to 5).asOneTimePublisher(),
             151.asOneTimePublisher(),
-            "SEATS BY STATE".asOneTimePublisher()
+            "SEATS BY STATE".asOneTimePublisher(),
         )
             .withBlankRow()
             .withRegion("NEW SOUTH WALES".asOneTimePublisher(), mapOf(coa to 22, alp to 24, oth to 1).asOneTimePublisher(), mapOf(coa to 23, alp to 24).asOneTimePublisher(), 47.asOneTimePublisher())
@@ -210,7 +210,7 @@ class RegionalBreakdownScreenTest {
             mapOf(alp to 68, coa to 77, oth to 6).asOneTimePublisher(),
             mapOf(alp to -1, coa to +1, oth to +1).asOneTimePublisher(),
             151.asOneTimePublisher(),
-            "SEATS BY STATE".asOneTimePublisher()
+            "SEATS BY STATE".asOneTimePublisher(),
         )
             .withBlankRow()
             .withRegion("NEW SOUTH WALES".asOneTimePublisher(), mapOf(coa to 22, alp to 24, oth to 1).asOneTimePublisher(), mapOf(coa to -1, oth to +1).asOneTimePublisher(), 47.asOneTimePublisher())
@@ -247,7 +247,7 @@ class RegionalBreakdownScreenTest {
             "Saskatchewan" to 14,
             "Alberta" to 34,
             "British Columbia" to 42,
-            "Northern Canada" to 3
+            "Northern Canada" to 3,
         ).associateWith { Publisher(emptyMap<Party, Int>()) to Publisher(emptyMap<Party, Int>()) }
         val builder = RegionalBreakdownScreen.seatsWithPrev(
             "CANADA".asOneTimePublisher(),
@@ -255,14 +255,14 @@ class RegionalBreakdownScreenTest {
             federalSeats.second,
             338.asOneTimePublisher(),
             "SEATS BY PROVINCE".asOneTimePublisher(),
-            maxColumnsPublisher = 4.asOneTimePublisher()
+            maxColumnsPublisher = 4.asOneTimePublisher(),
         ).withBlankRow()
         provincialSeats.forEach { (name, seats), (curr, prev) ->
             builder.withRegion(
                 name.uppercase().asOneTimePublisher(),
                 curr,
                 prev,
-                seats.asOneTimePublisher()
+                seats.asOneTimePublisher(),
             )
         }
         val screen = builder.build("CANADA".asOneTimePublisher())
@@ -358,7 +358,7 @@ class RegionalBreakdownScreenTest {
             "PRINCE EDWARD ISLAND".asOneTimePublisher(),
             peiVotes,
             peiPct,
-            "VOTES BY REGION".asOneTimePublisher()
+            "VOTES BY REGION".asOneTimePublisher(),
         )
             .withBlankRow()
             .withRegion("CARDIGAN".asOneTimePublisher(), cardiganVotes, cardiganPct)
@@ -402,7 +402,7 @@ class RegionalBreakdownScreenTest {
             "PRINCE EDWARD ISLAND".asOneTimePublisher(),
             peiVotes,
             peiPct,
-            "VOTES BY REGION".asOneTimePublisher()
+            "VOTES BY REGION".asOneTimePublisher(),
         )
             .withBlankRow()
             .withRegion("CARDIGAN".asOneTimePublisher(), cardiganVotes, cardiganPct)
@@ -452,7 +452,7 @@ class RegionalBreakdownScreenTest {
             peiVotes,
             peiPrevVotes,
             peiPct,
-            "VOTES BY REGION".asOneTimePublisher()
+            "VOTES BY REGION".asOneTimePublisher(),
         )
             .withBlankRow()
             .withRegion("CARDIGAN".asOneTimePublisher(), cardiganVotes, cardiganPrevVotes, cardiganPct)
@@ -509,7 +509,7 @@ class RegionalBreakdownScreenTest {
             peiVotes,
             peiPrevVotes,
             peiPct,
-            "VOTES BY REGION".asOneTimePublisher()
+            "VOTES BY REGION".asOneTimePublisher(),
         )
             .withBlankRow()
             .withRegion("CARDIGAN".asOneTimePublisher(), cardiganVotes, cardiganPrevVotes, cardiganPct)
@@ -564,54 +564,54 @@ class RegionalBreakdownScreenTest {
                 grn to 1795985,
                 onp to 727464,
                 uap to 604536,
-                oth to 1521693
+                oth to 1521693,
             ).asOneTimePublisher(),
             0.8982.asOneTimePublisher(),
-            "PRIMARY VOTE BY STATE".asOneTimePublisher()
+            "PRIMARY VOTE BY STATE".asOneTimePublisher(),
         )
             .withBlankRow()
             .withRegion(
                 "NEW SOUTH WALES".asOneTimePublisher(),
                 mapOf(coa to 1699323, alp to 1552684, grn to 466069, onp to 224965, uap to 183174, oth to 524725).asOneTimePublisher(),
-                0.9070.asOneTimePublisher()
+                0.9070.asOneTimePublisher(),
             )
             .withRegion(
                 "VICTORIA".asOneTimePublisher(),
                 mapOf(coa to 1239280, alp to 1230842, grn to 514893, onp to 143558, uap to 177745, oth to 440115).asOneTimePublisher(),
-                0.9059.asOneTimePublisher()
+                0.9059.asOneTimePublisher(),
             )
             .withRegion(
                 "QUEENSLAND".asOneTimePublisher(),
                 mapOf(lnp to 1172515, alp to 811069, grn to 382900, onp to 221640, uap to 149255, oth to 220647).asOneTimePublisher(),
                 0.8816.asOneTimePublisher(),
-                mapOf(coa to lnp).asOneTimePublisher()
+                mapOf(coa to lnp).asOneTimePublisher(),
             )
             .withRegion(
                 "WESTERN AUSTRALIA".asOneTimePublisher(),
                 mapOf(coa to 512414, alp to 542667, grn to 184094, onp to 58226, uap to 33863, oth to 141961).asOneTimePublisher(),
-                0.8799.asOneTimePublisher()
+                0.8799.asOneTimePublisher(),
             )
             .withRegion(
                 "SOUTH AUSTRALIA".asOneTimePublisher(),
                 mapOf(coa to 390195, alp to 378329, grn to 140227, onp to 53057, uap to 42688, oth to 93290).asOneTimePublisher(),
-                0.9107.asOneTimePublisher()
+                0.9107.asOneTimePublisher(),
             )
             .withRegion(
                 "TASMANIA".asOneTimePublisher(),
                 mapOf(coa to 115184, alp to 95322, grn to 41972, onp to 13970, uap to 6437, oth to 76813).asOneTimePublisher(),
-                0.9243.asOneTimePublisher()
+                0.9243.asOneTimePublisher(),
             )
             .withRegion(
                 "AUSTRALIAN CAPITAL TERRITORY".asOneTimePublisher(),
                 mapOf(lib to 74759, alp to 126595, grn to 52648, onp to 6630, uap to 6864, oth to 14501).asOneTimePublisher(),
                 0.9207.asOneTimePublisher(),
-                mapOf(coa to lib).asOneTimePublisher()
+                mapOf(coa to lib).asOneTimePublisher(),
             )
             .withRegion(
                 "NORTHERN TERRITORY".asOneTimePublisher(),
                 mapOf(clp to 29664, alp to 38522, grn to 13182, onp to 5418, uap to 4510, oth to 9641).asOneTimePublisher(),
                 0.7308.asOneTimePublisher(),
-                mapOf(coa to clp).asOneTimePublisher()
+                mapOf(coa to clp).asOneTimePublisher(),
             )
             .build("AUSTRALIA".asOneTimePublisher())
         screen.setSize(1024, 512)
@@ -638,7 +638,7 @@ class RegionalBreakdownScreenTest {
                 grn to 1795985,
                 onp to 727464,
                 uap to 604536,
-                oth to 1521693
+                oth to 1521693,
             ).asOneTimePublisher(),
             mapOf(
                 alp to 4752110,
@@ -646,62 +646,62 @@ class RegionalBreakdownScreenTest {
                 grn to 1482923,
                 onp to 438587,
                 uap to 488817,
-                oth to 1184031
+                oth to 1184031,
             ).asOneTimePublisher(),
             0.8982.asOneTimePublisher(),
-            "PRIMARY VOTE BY STATE".asOneTimePublisher()
+            "PRIMARY VOTE BY STATE".asOneTimePublisher(),
         )
             .withBlankRow()
             .withRegion(
                 "NEW SOUTH WALES".asOneTimePublisher(),
                 mapOf(coa to 1699323, alp to 1552684, grn to 466069, onp to 224965, uap to 183174, oth to 524725).asOneTimePublisher(),
                 mapOf(coa to 1930426, alp to 1568173, grn to 395238, onp to 59464, uap to 153477, oth to 430508).asOneTimePublisher(),
-                0.9070.asOneTimePublisher()
+                0.9070.asOneTimePublisher(),
             )
             .withRegion(
                 "VICTORIA".asOneTimePublisher(),
                 mapOf(coa to 1239280, alp to 1230842, grn to 514893, onp to 143558, uap to 177745, oth to 440115).asOneTimePublisher(),
                 mapOf(coa to 1425542, alp to 1361913, grn to 439169, onp to 35177, uap to 134581, oth to 298650).asOneTimePublisher(),
-                0.9059.asOneTimePublisher()
+                0.9059.asOneTimePublisher(),
             )
             .withRegion(
                 "QUEENSLAND".asOneTimePublisher(),
                 mapOf(lnp to 1172515, alp to 811069, grn to 382900, onp to 221640, uap to 149255, oth to 220647).asOneTimePublisher(),
                 mapOf(lnp to 1236401, alp to 754792, grn to 292059, onp to 250779, uap to 99329, oth to 195658).asOneTimePublisher(),
                 0.8816.asOneTimePublisher(),
-                mapOf(coa to lnp).asOneTimePublisher()
+                mapOf(coa to lnp).asOneTimePublisher(),
             )
             .withRegion(
                 "WESTERN AUSTRALIA".asOneTimePublisher(),
                 mapOf(coa to 512414, alp to 542667, grn to 184094, onp to 58226, uap to 33863, oth to 141961).asOneTimePublisher(),
                 mapOf(coa to 633930, alp to 417727, grn to 162876, onp to 74478, uap to 28488, oth to 84375).asOneTimePublisher(),
-                0.8799.asOneTimePublisher()
+                0.8799.asOneTimePublisher(),
             )
             .withRegion(
                 "SOUTH AUSTRALIA".asOneTimePublisher(),
                 mapOf(coa to 390195, alp to 378329, grn to 140227, onp to 53057, uap to 42688, oth to 93290).asOneTimePublisher(),
                 mapOf(coa to 438022, alp to 379495, grn to 103036, onp to 8990, uap to 46007, oth to 97101).asOneTimePublisher(),
-                0.9107.asOneTimePublisher()
+                0.9107.asOneTimePublisher(),
             )
             .withRegion(
                 "TASMANIA".asOneTimePublisher(),
                 mapOf(coa to 115184, alp to 95322, grn to 41972, onp to 13970, uap to 6437, oth to 76813).asOneTimePublisher(),
                 mapOf(coa to 120415, alp to 116955, grn to 35229, onp to 9699, uap to 16868, oth to 48826).asOneTimePublisher(),
-                0.9243.asOneTimePublisher()
+                0.9243.asOneTimePublisher(),
             )
             .withRegion(
                 "AUSTRALIAN CAPITAL TERRITORY".asOneTimePublisher(),
                 mapOf(lib to 74759, alp to 126595, grn to 52648, onp to 6630, uap to 6864, oth to 14501).asOneTimePublisher(),
                 mapOf(lib to 83311, alp to 109300, grn to 44804, uap to 7117, oth to 21443).asOneTimePublisher(),
                 0.9207.asOneTimePublisher(),
-                mapOf(coa to lib).asOneTimePublisher()
+                mapOf(coa to lib).asOneTimePublisher(),
             )
             .withRegion(
                 "NORTHERN TERRITORY".asOneTimePublisher(),
                 mapOf(clp to 29664, alp to 38522, grn to 13182, onp to 5418, uap to 4510, oth to 9641).asOneTimePublisher(),
                 mapOf(clp to 38837, alp to 43755, grn to 10512, uap to 2950, oth to 7464).asOneTimePublisher(),
                 0.7308.asOneTimePublisher(),
-                mapOf(coa to clp).asOneTimePublisher()
+                mapOf(coa to clp).asOneTimePublisher(),
             )
             .build("AUSTRALIA".asOneTimePublisher())
         screen.setSize(1024, 512)
@@ -721,7 +721,7 @@ class RegionalBreakdownScreenTest {
         val federalVotes = Triple(
             Publisher(emptyMap<Party, Int>()),
             Publisher(emptyMap<Party, Int>()),
-            Publisher(0.0)
+            Publisher(0.0),
         )
         val provincialVotes = listOf(
             "Newfoundland and Labrador",
@@ -734,12 +734,12 @@ class RegionalBreakdownScreenTest {
             "Saskatchewan",
             "Alberta",
             "British Columbia",
-            "Northern Canada"
+            "Northern Canada",
         ).associateWith {
             Triple(
                 Publisher(emptyMap<Party, Int>()),
                 Publisher(emptyMap<Party, Int>()),
-                Publisher(0.0)
+                Publisher(0.0),
             )
         }
         val builder = RegionalBreakdownScreen.votesWithPrev(
@@ -748,14 +748,14 @@ class RegionalBreakdownScreenTest {
             federalVotes.second,
             federalVotes.third,
             "POPULAR VOTE BY PROVINCE".asOneTimePublisher(),
-            maxColumnsPublisher = 4.asOneTimePublisher()
+            maxColumnsPublisher = 4.asOneTimePublisher(),
         ).withBlankRow()
         provincialVotes.forEach { name, (curr, prev, pct) ->
             builder.withRegion(
                 name.uppercase().asOneTimePublisher(),
                 curr,
                 prev,
-                pct
+                pct,
             )
         }
         val screen = builder.build("CANADA".asOneTimePublisher())

@@ -34,10 +34,10 @@ class SwingometerFrame(
     rightToWinPublisher: Flow.Publisher<out Number>? = null,
     ticksPublisher: Flow.Publisher<out List<Tick>>? = null,
     outerLabelsPublisher: Flow.Publisher<out List<OuterLabel>>? = null,
-    headerLabelsPublisher: Flow.Publisher<out Map<HeaderLabelLocation, String?>>? = null
+    headerLabelsPublisher: Flow.Publisher<out Map<HeaderLabelLocation, String?>>? = null,
 ) : GraphicsFrame(
     headerPublisher = headerPublisher,
-    headerLabelsPublisher = headerLabelsPublisher
+    headerLabelsPublisher = headerLabelsPublisher,
 ) {
     class Tick(val position: Number, val text: String)
 
@@ -181,7 +181,7 @@ class SwingometerFrame(
             g
                 .setRenderingHint(
                     RenderingHints.KEY_TEXT_ANTIALIASING,
-                    RenderingHints.VALUE_TEXT_ANTIALIAS_ON
+                    RenderingHints.VALUE_TEXT_ANTIALIAS_ON,
                 )
             val margin = 2
             val arcWidth = width / 2 - 2 * margin
@@ -240,7 +240,7 @@ class SwingometerFrame(
                         (width - dotSize) / 2 + 2,
                         inner / 2 - (dotNum + 1) * dotSize + 2,
                         dotSize - 4,
-                        dotSize - 4
+                        dotSize - 4,
                     )
                     g.setColor(if (dot.solid) Color.WHITE else dot.color)
                     val text = dot.label.split("\n").toTypedArray()
@@ -263,7 +263,7 @@ class SwingometerFrame(
                             text[i],
                             (width - strWidth) / 2,
                             inner / 2 - dotNum * dotSize - (dotSize - totalHeight * 3 / 4) / 2 +
-                                (i - text.size + 1) * size
+                                (i - text.size + 1) * size,
                         )
                     }
                 }
@@ -275,7 +275,7 @@ class SwingometerFrame(
             g.fillPolygon(
                 intArrayOf(width / 2, width / 2 - 6, width / 2 + 6),
                 intArrayOf(arcY + inner / 2, arcY + inner / 2 - 10, arcY + inner / 2 - 10),
-                3
+                3,
             )
             g.transform = originalTransform
             g.stroke = BasicStroke(3f)
@@ -288,7 +288,7 @@ class SwingometerFrame(
                     boundary,
                     boundary,
                     180,
-                    arcAngle + 90
+                    arcAngle + 90,
                 )
             } else if (leftToWin.toDouble() <= -range.toDouble()) {
                 g.setColor(leftColor)
@@ -298,7 +298,7 @@ class SwingometerFrame(
                     boundary,
                     boundary,
                     180,
-                    180
+                    180,
                 )
             }
             if (abs(rightToWin.toDouble()) < range.toDouble()) {
@@ -310,7 +310,7 @@ class SwingometerFrame(
                     boundary,
                     boundary,
                     0,
-                    arcAngle - 90
+                    arcAngle - 90,
                 )
             } else if (rightToWin.toDouble() <= -range.toDouble()) {
                 g.setColor(rightColor)
@@ -320,7 +320,7 @@ class SwingometerFrame(
                     boundary,
                     boundary,
                     0,
-                    -180
+                    -180,
                 )
             }
             g.setColor(background)
@@ -332,13 +332,13 @@ class SwingometerFrame(
                     g.transform = createRotationTransform(
                         outerLabel.position.toDouble(),
                         originalTransform,
-                        arcY
+                        arcY,
                     )
                     val textWidth = g.getFontMetrics().stringWidth(outerLabel.text)
                     g.drawString(
                         outerLabel.text,
                         (width - textWidth) / 2,
-                        arcY + boundary / 2 - 6
+                        arcY + boundary / 2 - 6,
                     )
                     g.transform = originalTransform
                 }
@@ -348,7 +348,7 @@ class SwingometerFrame(
         private fun createRotationTransform(
             value: Number,
             originalTransform: AffineTransform,
-            arcY: Int
+            arcY: Int,
         ): AffineTransform {
             val arcAngle = -Math.PI / 2 * value.toDouble() / range.toDouble()
             val newTransform = AffineTransform(originalTransform)

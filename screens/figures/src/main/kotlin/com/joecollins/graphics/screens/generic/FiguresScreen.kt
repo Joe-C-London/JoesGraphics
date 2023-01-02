@@ -28,7 +28,7 @@ class FiguresScreen private constructor(headerLabel: Flow.Publisher<out String?>
             }
             panel
         },
-        headerLabel
+        headerLabel,
     ) {
 
     class Section(private val name: String) {
@@ -38,7 +38,7 @@ class FiguresScreen private constructor(headerLabel: Flow.Publisher<out String?>
             candidate: Candidate,
             description: String,
             leader: Flow.Publisher<out Party?>,
-            status: Flow.Publisher<out String>
+            status: Flow.Publisher<out String>,
         ): Section {
             val entry = Entry(candidate, description)
             leader.subscribe(Subscriber { entry.leader = it })
@@ -58,11 +58,11 @@ class FiguresScreen private constructor(headerLabel: Flow.Publisher<out String?>
                             color = e.candidate.party.color,
                             description = e.description,
                             resultColor = color,
-                            result = status
+                            result = status,
                         )
                     }
                 }
-                    .combine()
+                    .combine(),
             )
             return frame
         }

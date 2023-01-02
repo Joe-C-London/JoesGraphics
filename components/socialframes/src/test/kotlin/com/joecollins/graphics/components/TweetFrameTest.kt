@@ -270,7 +270,7 @@ class TweetFrameTest {
         userBuilder.profileImageUrl = javaClass.classLoader.getResource("com/joecollins/graphics/twitter-inputs/letter-j.png")!!
 
         val frame = TweetFrame(
-            TweetLoader.loadTweetV2(123L, mockTwitter).asOneTimePublisher()
+            TweetLoader.loadTweetV2(123L, mockTwitter).asOneTimePublisher(),
         )
         frame.size = Dimension(512, 256)
         RenderTestUtils.compareRendering("TweetFrame", "Basic", frame)
@@ -288,7 +288,7 @@ class TweetFrameTest {
         userBuilder.profileImageUrl = javaClass.classLoader.getResource("com/joecollins/graphics/twitter-inputs/letter-j.png")!!
 
         val frame = TweetFrame(
-            TweetLoader.loadTweetV2(123L, mockTwitter).asOneTimePublisher()
+            TweetLoader.loadTweetV2(123L, mockTwitter).asOneTimePublisher(),
         )
         frame.size = Dimension(512, 256)
         RenderTestUtils.compareRendering("TweetFrame", "MultiLine", frame)
@@ -307,7 +307,7 @@ class TweetFrameTest {
         userBuilder.verified = true
 
         val frame = TweetFrame(
-            TweetLoader.loadTweetV2(123L, mockTwitter).asOneTimePublisher()
+            TweetLoader.loadTweetV2(123L, mockTwitter).asOneTimePublisher(),
         )
         frame.size = Dimension(512, 256)
         RenderTestUtils.compareRendering("TweetFrame", "Verified", frame)
@@ -326,7 +326,7 @@ class TweetFrameTest {
         userBuilder.protected = true
 
         val frame = TweetFrame(
-            TweetLoader.loadTweetV2(123L, mockTwitter).asOneTimePublisher()
+            TweetLoader.loadTweetV2(123L, mockTwitter).asOneTimePublisher(),
         )
         frame.size = Dimension(512, 256)
         RenderTestUtils.compareRendering("TweetFrame", "Protected", frame)
@@ -347,7 +347,7 @@ class TweetFrameTest {
                 it.start = 201
                 it.end = 214
                 it.tag = "Election2021"
-            }
+            },
         )
         tweetBuilder.mentions = listOf(
             MentionEntity().also {
@@ -367,7 +367,7 @@ class TweetFrameTest {
                 it.end = 127
                 it.id = "333"
                 it.username = "AnasSarwar"
-            }
+            },
         )
 
         val userBuilder = tweetBuilder.user
@@ -376,7 +376,7 @@ class TweetFrameTest {
         userBuilder.profileImageUrl = javaClass.classLoader.getResource("com/joecollins/graphics/twitter-inputs/letter-j.png")!!
 
         val frame = TweetFrame(
-            TweetLoader.loadTweetV2(123L, mockTwitter).asOneTimePublisher()
+            TweetLoader.loadTweetV2(123L, mockTwitter).asOneTimePublisher(),
         )
         frame.size = Dimension(512, 256)
         RenderTestUtils.compareRendering("TweetFrame", "MentionsAndHashtags", frame)
@@ -389,7 +389,7 @@ class TweetFrameTest {
         Files.copy(
             javaClass.classLoader.getResourceAsStream("com/joecollins/graphics/twitter-inputs/croissant.jpg"),
             imageFile.toPath(),
-            StandardCopyOption.REPLACE_EXISTING
+            StandardCopyOption.REPLACE_EXISTING,
         )
         val htmlFile = File.createTempFile("head", ".html")
         val htmlString = run {
@@ -417,13 +417,13 @@ class TweetFrameTest {
                         img.url = imageFile.toURI().toURL()
                         img.height = 576
                         img.width = 1024
-                    }
+                    },
                 )
                 it.status = 200
                 it.title = "Mystery tree beast turns out to be croissant"
                 it.unwoundUrl = URL("https://www.bbc.co.uk/news/world-europe-56757956")
                 it.url = URL("https://t.co/XRFkC6ITop")
-            }
+            },
         )
 
         val userBuilder = tweetBuilder.user
@@ -432,7 +432,7 @@ class TweetFrameTest {
         userBuilder.profileImageUrl = javaClass.classLoader.getResource("com/joecollins/graphics/twitter-inputs/letter-j.png")!!
 
         val frame = TweetFrame(
-            TweetLoader.loadTweetV2(123L, mockTwitter).asOneTimePublisher()
+            TweetLoader.loadTweetV2(123L, mockTwitter).asOneTimePublisher(),
         )
         frame.size = Dimension(512, 512)
         RenderTestUtils.compareRendering("TweetFrame", "Links", frame)
@@ -451,7 +451,7 @@ class TweetFrameTest {
                 it.url = URL("https://t.co/VTphhEAioO")
                 it.expandedUrl = URL("https://twitter.com/Joe_C_London/status/123/photo/1")
                 it.mediaKey = "3_456"
-            }
+            },
         )
         tweetBuilder.media.mediaKey = "3_456"
         tweetBuilder.media.type = "photo"
@@ -463,7 +463,7 @@ class TweetFrameTest {
         userBuilder.profileImageUrl = javaClass.classLoader.getResource("com/joecollins/graphics/twitter-inputs/letter-j.png")!!
 
         val frame = TweetFrame(
-            TweetLoader.loadTweetV2(123L, mockTwitter).asOneTimePublisher()
+            TweetLoader.loadTweetV2(123L, mockTwitter).asOneTimePublisher(),
         )
         frame.size = Dimension(512, 512)
         RenderTestUtils.compareRendering("TweetFrame", "Images", frame)
@@ -481,13 +481,13 @@ class TweetFrameTest {
                 it.displayUrl = "twitter.com/Joe_C_London/st…"
                 it.url = URL("https://t.co/zgM6sqOuwW")
                 it.expandedUrl = URL("https://twitter.com/Joe_C_London/status/123")
-            }
+            },
         )
         tweetBuilder.referencedTweets = listOf(
             TweetReferencedTweets().also {
                 it.id = "123"
                 it.type = TweetReferencedTweets.TypeEnum.QUOTED
-            }
+            },
         )
 
         val userBuilder = tweetBuilder.user
@@ -506,7 +506,7 @@ class TweetFrameTest {
                 it.url = URL("https://t.co/VTphhEAioO")
                 it.expandedUrl = TweetFrameTest::class.java.classLoader.getResource("com/joecollins/graphics/twitter-inputs/croissant.jpg")
                 it.mediaKey = "3_456"
-            }
+            },
         )
         quotedTweetBuilder.media.mediaKey = "3_456"
         quotedTweetBuilder.media.type = "photo"
@@ -519,7 +519,7 @@ class TweetFrameTest {
         quotedUserBuilder.verified = true
 
         val frame = TweetFrame(
-            TweetLoader.loadTweetV2(321L, mockTwitter).asOneTimePublisher()
+            TweetLoader.loadTweetV2(321L, mockTwitter).asOneTimePublisher(),
         )
         frame.size = Dimension(512, 512)
         RenderTestUtils.compareRendering("TweetFrame", "QuoteTweet", frame)
@@ -537,7 +537,7 @@ class TweetFrameTest {
         userBuilder.profileImageUrl = javaClass.classLoader.getResource("com/joecollins/graphics/twitter-inputs/letter-j.png")!!
 
         val frame = TweetFrame(
-            TweetLoader.loadTweetV2(123L, mockTwitter).asOneTimePublisher()
+            TweetLoader.loadTweetV2(123L, mockTwitter).asOneTimePublisher(),
         )
         frame.size = Dimension(512, 256)
         RenderTestUtils.compareRendering("TweetFrame", "Emoji", frame, 15)
@@ -568,7 +568,7 @@ class TweetFrameTest {
         }
 
         val frame = TweetFrame(
-            TweetLoader.loadTweetV2(123L, mockTwitter).asOneTimePublisher()
+            TweetLoader.loadTweetV2(123L, mockTwitter).asOneTimePublisher(),
         )
         frame.size = Dimension(512, 256)
         RenderTestUtils.compareRendering("TweetFrame", "Errors", frame)
@@ -582,7 +582,7 @@ class TweetFrameTest {
         tweetBuilder.poll = Poll().also { poll ->
             poll.options = listOf(
                 PollOption().also { it.label = "Yes"; it.votes = 100; it.position = 1 },
-                PollOption().also { it.label = "No"; it.votes = 150; it.position = 2 }
+                PollOption().also { it.label = "No"; it.votes = 150; it.position = 2 },
             )
         }
 
@@ -592,7 +592,7 @@ class TweetFrameTest {
         userBuilder.profileImageUrl = javaClass.classLoader.getResource("com/joecollins/graphics/twitter-inputs/letter-j.png")!!
 
         val frame = TweetFrame(
-            TweetLoader.loadTweetV2(123L, mockTwitter).asOneTimePublisher()
+            TweetLoader.loadTweetV2(123L, mockTwitter).asOneTimePublisher(),
         )
         frame.size = Dimension(512, 256)
         RenderTestUtils.compareRendering("TweetFrame", "Poll", frame)

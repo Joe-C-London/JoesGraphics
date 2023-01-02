@@ -14,7 +14,7 @@ data class Card(
     val description: String,
     @JsonProperty("image") private val imageURL: URL,
     @JsonProperty("provider_name") val providerName: String,
-    val type: String
+    val type: String,
 ) : Link {
 
     override val image: Image = ImageIO.read(imageURL)

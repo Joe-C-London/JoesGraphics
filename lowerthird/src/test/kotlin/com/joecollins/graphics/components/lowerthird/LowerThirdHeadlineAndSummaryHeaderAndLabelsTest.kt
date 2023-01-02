@@ -25,9 +25,9 @@ class LowerThirdHeadlineAndSummaryHeaderAndLabelsTest {
             summaryEntriesPublisher =
             listOf(
                 SummaryEntry(Color.RED, "LIB", "2"),
-                SummaryEntry(Color.BLUE, "CON", "1")
+                SummaryEntry(Color.BLUE, "CON", "1"),
             )
-                .asOneTimePublisher()
+                .asOneTimePublisher(),
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ lowerThird.headline }, IsEqual("POLLS CLOSE ACROSS CENTRAL CANADA"))
@@ -44,9 +44,9 @@ class LowerThirdHeadlineAndSummaryHeaderAndLabelsTest {
             summaryEntriesPublisher =
             listOf(
                 SummaryEntry(Color.RED, "LIB", "2"),
-                SummaryEntry(Color.BLUE, "CON", "1")
+                SummaryEntry(Color.BLUE, "CON", "1"),
             )
-                .asOneTimePublisher()
+                .asOneTimePublisher(),
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ lowerThird.subhead }, IsEqual("Polls open for 30 minutes on west coast"))
@@ -63,9 +63,9 @@ class LowerThirdHeadlineAndSummaryHeaderAndLabelsTest {
             summaryEntriesPublisher =
             listOf(
                 SummaryEntry(Color.RED, "LIB", "2"),
-                SummaryEntry(Color.BLUE, "CON", "1")
+                SummaryEntry(Color.BLUE, "CON", "1"),
             )
-                .asOneTimePublisher()
+                .asOneTimePublisher(),
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ lowerThird.numSummaryEntries }, IsEqual(2))
@@ -85,7 +85,7 @@ class LowerThirdHeadlineAndSummaryHeaderAndLabelsTest {
             createImage(
                 LowerThirdHeadlineAndSummaryHeaderAndLabelsTest::class.java
                     .classLoader
-                    .getResource("com/joecollins/graphics/lowerthird-left.png")
+                    .getResource("com/joecollins/graphics/lowerthird-left.png"),
             )
                 .asOneTimePublisher(),
             placePublisher = ("OTTAWA" to ZoneId.of("Canada/Eastern")).asOneTimePublisher(),
@@ -95,10 +95,10 @@ class LowerThirdHeadlineAndSummaryHeaderAndLabelsTest {
             summaryEntriesPublisher =
             listOf(
                 SummaryEntry(Color.RED, "LIB", "2"),
-                SummaryEntry(Color.BLUE, "CON", "1")
+                SummaryEntry(Color.BLUE, "CON", "1"),
             )
                 .asOneTimePublisher(),
-            clock = Clock.fixed(Instant.parse("2019-10-22T01:30:00Z"), ZoneId.systemDefault())
+            clock = Clock.fixed(Instant.parse("2019-10-22T01:30:00Z"), ZoneId.systemDefault()),
         )
         lowerThird.setSize(1024, 50)
         compareRendering("LowerThird", "HeadlineAndSummaryHeaderAndLabels", lowerThird)
@@ -111,7 +111,7 @@ class LowerThirdHeadlineAndSummaryHeaderAndLabelsTest {
             createImage(
                 LowerThirdHeadlineAndSummaryHeaderAndLabelsTest::class.java
                     .classLoader
-                    .getResource("com/joecollins/graphics/lowerthird-left.png")
+                    .getResource("com/joecollins/graphics/lowerthird-left.png"),
             )
                 .asOneTimePublisher(),
             placePublisher = ("OTTAWA" to ZoneId.of("Canada/Eastern")).asOneTimePublisher(),
@@ -121,10 +121,10 @@ class LowerThirdHeadlineAndSummaryHeaderAndLabelsTest {
             summaryEntriesPublisher =
             listOf(
                 SummaryEntry(Color.RED, "LIB", "2"),
-                SummaryEntry(Color.BLUE, "CON", "1")
+                SummaryEntry(Color.BLUE, "CON", "1"),
             )
                 .asOneTimePublisher(),
-            clock = Clock.fixed(Instant.parse("2019-10-22T01:30:00Z"), ZoneId.systemDefault())
+            clock = Clock.fixed(Instant.parse("2019-10-22T01:30:00Z"), ZoneId.systemDefault()),
         )
         lowerThird.setSize(1024, 50)
         compareRendering("LowerThird", "LongHeadlineAndSummaryHeaderAndLabels", lowerThird)

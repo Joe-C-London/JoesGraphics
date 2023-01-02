@@ -24,10 +24,10 @@ class SwingFrame(
     rightColorPublisher: Flow.Publisher<out Color>,
     bottomTextPublisher: Flow.Publisher<out String?>,
     bottomColorPublisher: Flow.Publisher<out Color>,
-    progressPublisher: Flow.Publisher<out String?>? = null
+    progressPublisher: Flow.Publisher<out String?>? = null,
 ) : GraphicsFrame(
     headerPublisher = headerPublisher,
-    headerLabelsPublisher = progressPublisher?.map { p -> mapOf(HeaderLabelLocation.RIGHT to p) }
+    headerLabelsPublisher = progressPublisher?.map { p -> mapOf(HeaderLabelLocation.RIGHT to p) },
 ) {
     private val swingPanel = SwingPanel()
     private val bottomLabel: JLabel = FontSizeAdjustingLabel()
@@ -52,8 +52,8 @@ class SwingFrame(
                 eventQueueWrapper {
                     bottomLabel.isVisible = it != null
                     bottomLabel.text = it ?: ""
-                }
-            )
+                },
+            ),
         )
         bottomColorPublisher.subscribe(Subscriber(eventQueueWrapper { bottomLabel.foreground = ColorUtils.contrastForBackground(it) }))
     }

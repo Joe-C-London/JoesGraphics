@@ -42,7 +42,7 @@ class MastodonFrame(toot: Flow.Publisher<out Toot>, timezone: ZoneId = ZoneId.sy
                         fromError(error, url)
                     }
                 },
-                timezone
+                timezone,
             )
         }
 
@@ -54,10 +54,10 @@ class MastodonFrame(toot: Flow.Publisher<out Toot>, timezone: ZoneId = ZoneId.sy
                     acct = "",
                     displayName = "Error retrieving post",
                     url = this::class.java.classLoader.getResource("1x1.png"),
-                    avatar = this::class.java.classLoader.getResource("1x1.png")
+                    avatar = this::class.java.classLoader.getResource("1x1.png"),
                 ),
                 createdAt = Instant.EPOCH,
-                url = url
+                url = url,
             )
         }
     }

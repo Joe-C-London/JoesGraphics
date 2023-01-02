@@ -23,28 +23,28 @@ class PreferenceVoteViewPanelTest {
                 alp to 1756,
                 clp to 1488,
                 ta to 497,
-                ind to 434
-            )
+                ind to 434,
+            ),
         )
         val previousPrimaryVotes = Publisher(
             mapOf(
                 alp.party to 1802,
                 clp.party to 1439,
                 ta.party to 356,
-                ind.party to 384
-            )
+                ind.party to 384,
+            ),
         )
         val current2CPVotes = Publisher(
             mapOf(
                 alp to 2197,
-                clp to 1978
-            )
+                clp to 1978,
+            ),
         )
         val previous2PPVotes = Publisher(
             mapOf(
                 alp.party to 2171,
-                clp.party to 1588
-            )
+                clp.party to 1588,
+            ),
         )
         val header = Publisher("FONG LIM")
         val voteHeader = Publisher("PRIMARY VOTE")
@@ -58,7 +58,7 @@ class PreferenceVoteViewPanelTest {
         val panel = candidateVotes(
             currentPrimaryVotes,
             voteHeader,
-            voteSubhead
+            voteSubhead,
         )
             .withPrev(previousPrimaryVotes, changeHeader)
             .withPreferences(current2CPVotes, preferenceHeader, preferenceSubhead)
@@ -84,7 +84,7 @@ class PreferenceVoteViewPanelTest {
                 KYLIE BONANNI (CLP): 1,978 (47.4%)
                 
                 PREFERENCE SWING SINCE 2016: 5.1% SWING ALP TO CLP
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -100,15 +100,15 @@ class PreferenceVoteViewPanelTest {
                 alp.party to 1802,
                 clp.party to 1439,
                 ta.party to 356,
-                ind.party to 384
-            )
+                ind.party to 384,
+            ),
         )
         val current2CPVotes = Publisher(emptyMap<Candidate, Int>())
         val previous2PPVotes = Publisher(
             mapOf(
                 alp.party to 2171,
-                clp.party to 1588
-            )
+                clp.party to 1588,
+            ),
         )
         val pctReporting = Publisher(0.0)
         val preferencePctReporting = Publisher(0.0)
@@ -124,7 +124,7 @@ class PreferenceVoteViewPanelTest {
         val panel = candidateVotes(
             currentPrimaryVotes,
             voteHeader,
-            voteSubhead
+            voteSubhead,
         )
             .withPrev(previousPrimaryVotes, changeHeader)
             .withPctReporting(pctReporting)
@@ -150,7 +150,7 @@ class PreferenceVoteViewPanelTest {
                 TWO CANDIDATE PREFERRED, 0 OF 9 POLLS REPORTING
                 
                 PREFERENCE SWING SINCE 2016: NOT AVAILABLE
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         currentPrimaryVotes.submit(
@@ -158,8 +158,8 @@ class PreferenceVoteViewPanelTest {
                 alp to 13,
                 clp to 13,
                 ta to 6,
-                ind to 5
-            )
+                ind to 5,
+            ),
         )
         current2CPVotes.submit(sequenceOf(alp, clp).associateWith { 0 })
         pctReporting.submit(1.0 / 9)
@@ -181,7 +181,7 @@ class PreferenceVoteViewPanelTest {
                 KYLIE BONANNI (CLP): WAITING...
                 
                 PREFERENCE SWING SINCE 2016: NOT AVAILABLE
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         currentPrimaryVotes.submit(
@@ -189,14 +189,14 @@ class PreferenceVoteViewPanelTest {
                 alp to 365,
                 clp to 262,
                 ta to 86,
-                ind to 83
-            )
+                ind to 83,
+            ),
         )
         current2CPVotes.submit(
             mapOf(
                 alp to 18,
-                clp to 19
-            )
+                clp to 19,
+            ),
         )
         pctReporting.submit(3.0 / 9)
         voteSubhead.submit("3 OF 9 POLLS REPORTING")
@@ -219,7 +219,7 @@ class PreferenceVoteViewPanelTest {
                 MARK MONAGHAN (ALP): 18 (48.6%)
                 
                 PREFERENCE SWING SINCE 2016: 9.1% SWING ALP TO CLP
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         currentPrimaryVotes.submit(
@@ -227,14 +227,14 @@ class PreferenceVoteViewPanelTest {
                 alp to 1756,
                 clp to 1488,
                 ta to 497,
-                ind to 434
-            )
+                ind to 434,
+            ),
         )
         current2CPVotes.submit(
             mapOf(
                 alp to 464,
-                clp to 332
-            )
+                clp to 332,
+            ),
         )
         pctReporting.submit(9.0 / 9)
         voteSubhead.submit("9 OF 9 POLLS REPORTING")
@@ -258,14 +258,14 @@ class PreferenceVoteViewPanelTest {
                 KYLIE BONANNI (CLP): 332 (41.7%)
                 
                 PREFERENCE SWING SINCE 2016: 0.5% SWING CLP TO ALP
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         current2CPVotes.submit(
             mapOf(
                 alp to 2197,
-                clp to 1978
-            )
+                clp to 1978,
+            ),
         )
         preferencePctReporting.submit(9.0 / 9)
         preferenceSubhead.submit("9 OF 9 POLLS REPORTING")
@@ -286,7 +286,7 @@ class PreferenceVoteViewPanelTest {
                 KYLIE BONANNI (CLP): 1,978 (47.4%)
                 
                 PREFERENCE SWING SINCE 2016: 5.1% SWING ALP TO CLP
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -302,15 +302,15 @@ class PreferenceVoteViewPanelTest {
                 alp.party to 1802,
                 clp.party to 1439,
                 ta.party to 356,
-                ind.party to 384
-            )
+                ind.party to 384,
+            ),
         )
         val current2CPVotes = Publisher(emptyMap<Candidate, Int>())
         val previous2PPVotes = Publisher(
             mapOf(
                 alp.party to 2171,
-                clp.party to 1588
-            )
+                clp.party to 1588,
+            ),
         )
         val pctReporting = Publisher(0.0)
         val preferencePctReporting = Publisher(0.0)
@@ -328,7 +328,7 @@ class PreferenceVoteViewPanelTest {
         val panel = candidateVotes(
             currentPrimaryVotes,
             voteHeader,
-            voteSubhead
+            voteSubhead,
         )
             .withPrev(previousPrimaryVotes, changeHeader)
             .withPctReporting(pctReporting)
@@ -356,7 +356,7 @@ class PreferenceVoteViewPanelTest {
                 TWO CANDIDATE PREFERRED [0/9]
                 
                 PREFERENCE SWING SINCE 2016: NOT AVAILABLE
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         currentPrimaryVotes.submit(
@@ -364,8 +364,8 @@ class PreferenceVoteViewPanelTest {
                 alp to 13,
                 clp to 13,
                 ta to 6,
-                ind to 5
-            )
+                ind to 5,
+            ),
         )
         current2CPVotes.submit(setOf(alp, clp).associateWith { 0 })
         pctReporting.submit(1.0 / 9)
@@ -387,7 +387,7 @@ class PreferenceVoteViewPanelTest {
                 KYLIE BONANNI (CLP): WAITING...
                 
                 PREFERENCE SWING SINCE 2016: NOT AVAILABLE
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         currentPrimaryVotes.submit(
@@ -395,14 +395,14 @@ class PreferenceVoteViewPanelTest {
                 alp to 365,
                 clp to 262,
                 ta to 86,
-                ind to 83
-            )
+                ind to 83,
+            ),
         )
         current2CPVotes.submit(
             mapOf(
                 alp to 18,
-                clp to 19
-            )
+                clp to 19,
+            ),
         )
         pctReporting.submit(3.0 / 9)
         voteProgress.submit("3/9")
@@ -425,7 +425,7 @@ class PreferenceVoteViewPanelTest {
                 MARK MONAGHAN (ALP): 18 (48.6%)
                 
                 PREFERENCE SWING SINCE 2016: 9.1% SWING ALP TO CLP
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         currentPrimaryVotes.submit(
@@ -433,14 +433,14 @@ class PreferenceVoteViewPanelTest {
                 alp to 1756,
                 clp to 1488,
                 ta to 497,
-                ind to 434
-            )
+                ind to 434,
+            ),
         )
         current2CPVotes.submit(
             mapOf(
                 alp to 464,
-                clp to 332
-            )
+                clp to 332,
+            ),
         )
         pctReporting.submit(9.0 / 9)
         voteProgress.submit("9/9")
@@ -464,14 +464,14 @@ class PreferenceVoteViewPanelTest {
                 KYLIE BONANNI (CLP): 332 (41.7%)
                 
                 PREFERENCE SWING SINCE 2016: 0.5% SWING CLP TO ALP
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         current2CPVotes.submit(
             mapOf(
                 alp to 2197,
-                clp to 1978
-            )
+                clp to 1978,
+            ),
         )
         preferencePctReporting.submit(9.0 / 9)
         preferenceProgress.submit("9/9")
@@ -492,7 +492,7 @@ class PreferenceVoteViewPanelTest {
                 KYLIE BONANNI (CLP): 1,978 (47.4%)
                 
                 PREFERENCE SWING SINCE 2016: 5.1% SWING ALP TO CLP
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -508,15 +508,15 @@ class PreferenceVoteViewPanelTest {
                 Candidate("Amye Un", ind) to 434,
                 Candidate("Mark Monaghan", alp) to 1756,
                 Candidate("Jeff Collins", ta, true) to 497,
-                Candidate("Kylie Bonanni", clp) to 1488
-            )
+                Candidate("Kylie Bonanni", clp) to 1488,
+            ),
         )
         val previousPrimaryVotes = Publisher(mapOf(alp to 1802, clp to 1439, ta to 356, ind to 384))
         val current2CPVotes = Publisher(
             mapOf(
                 Candidate("Mark Monaghan", alp) to 2197,
-                Candidate("Kylie Bonanni", clp) to 1978
-            )
+                Candidate("Kylie Bonanni", clp) to 1978,
+            ),
         )
         val previous2PPVotes = Publisher(mapOf(alp to 2171, clp to 1588))
         val header = Publisher("FONG LIM")
@@ -532,7 +532,7 @@ class PreferenceVoteViewPanelTest {
             currentPrimaryVotes,
             voteHeader,
             voteSubhead,
-            "(MP)"
+            "(MP)",
         )
             .withPrev(previousPrimaryVotes, changeHeader)
             .withPreferences(current2CPVotes, preferenceHeader, preferenceSubhead)
@@ -558,7 +558,7 @@ class PreferenceVoteViewPanelTest {
                 KYLIE BONANNI (CLP): 1,978 (47.4%)
                 
                 PREFERENCE SWING SINCE 2016: 5.1% SWING ALP TO CLP
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         header.submit("GOYDER")
@@ -573,15 +573,15 @@ class PreferenceVoteViewPanelTest {
                 Candidate("Kezia Purick", ind, true) to 1459,
                 Candidate("Mick Taylor", alp) to 590,
                 Candidate("Karen Fletcher", grn) to 147,
-                Candidate("Pauline Cass", ind) to 283
-            )
+                Candidate("Pauline Cass", ind) to 283,
+            ),
         )
         previousPrimaryVotes.submit(mapOf(ind to 2496 + 76, clp to 919, grn to 188, alp to 860))
         current2CPVotes.submit(
             mapOf(
                 Candidate("Phil Battye", clp) to 2030,
-                Candidate("Kezia Purick", ind, true) to 2665
-            )
+                Candidate("Kezia Purick", ind, true) to 2665,
+            ),
         )
         previous2PPVotes.submit(mapOf(ind to 3109, clp to 1020))
         compareRendering("PreferenceVoteViewPanel", "LotsOfCandidates-2", panel)
@@ -606,7 +606,7 @@ class PreferenceVoteViewPanelTest {
                 PHIL BATTYE (CLP): 2,030 (43.2%)
                 
                 PREFERENCE SWING SINCE 2016: 18.5% SWING IND TO CLP
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -620,23 +620,23 @@ class PreferenceVoteViewPanelTest {
             mapOf(
                 alp to 2632,
                 clp to 968,
-                ta to 795
-            )
+                ta to 795,
+            ),
         )
         val previousPrimaryVotes = Publisher(
             mapOf(
                 alp.party to 2323,
                 clp.party to 1573,
                 ta.party to 135,
-                ind to 331 + 81
-            )
+                ind to 331 + 81,
+            ),
         )
         val current2CPVotes = Publisher(mapOf(alp to 0))
         val previous2PPVotes = Publisher(
             mapOf(
                 alp.party to 2578,
-                clp.party to 1680
-            )
+                clp.party to 1680,
+            ),
         )
         val header = Publisher("SANDERSON")
         val voteHeader = Publisher("PRIMARY VOTE")
@@ -650,7 +650,7 @@ class PreferenceVoteViewPanelTest {
         val panel = candidateVotes(
             currentPrimaryVotes,
             voteHeader,
-            voteSubhead
+            voteSubhead,
         )
             .withPrev(previousPrimaryVotes, changeHeader)
             .withPreferences(current2CPVotes, preferenceHeader, preferenceSubhead)
@@ -675,7 +675,7 @@ class PreferenceVoteViewPanelTest {
                 KATE WORDEN (ALP): ELECTED WINNER
                 
                 PREFERENCE SWING SINCE 2016: NOT AVAILABLE
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -691,21 +691,21 @@ class PreferenceVoteViewPanelTest {
                 alp to 1207,
                 clp to 487,
                 lawrence to 243,
-                gumbula to 987
-            )
+                gumbula to 987,
+            ),
         )
         val previousPrimaryVotes = Publisher(
             mapOf(
                 alp.party to 1565,
                 clp.party to 804,
-                ind to 211 + 197 + 117
-            )
+                ind to 211 + 197 + 117,
+            ),
         )
         val current2CPVotes = Publisher(
             mapOf(
                 alp to 1508,
-                gumbula to 1416
-            )
+                gumbula to 1416,
+            ),
         )
         val previous2PPVotes = Publisher(emptyMap<Party, Int>())
         val header = Publisher("ARNHEM")
@@ -720,7 +720,7 @@ class PreferenceVoteViewPanelTest {
         val panel = candidateVotes(
             currentPrimaryVotes,
             voteHeader,
-            voteSubhead
+            voteSubhead,
         )
             .withPrev(previousPrimaryVotes, changeHeader)
             .withPreferences(current2CPVotes, preferenceHeader, preferenceSubhead)
@@ -747,7 +747,7 @@ class PreferenceVoteViewPanelTest {
                 IAN MONGUNU GUMBULA (IND): 1,416 (48.4%)
                 
                 PREFERENCE SWING SINCE 2016: NOT AVAILABLE
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -762,28 +762,28 @@ class PreferenceVoteViewPanelTest {
                 alp to 23130,
                 lib to 23878,
                 grn to 41377,
-                ind to 6194
-            )
+                ind to 6194,
+            ),
         )
         val previousPrimaryVotes = Publisher(
             mapOf(
                 alp.party to 22490,
                 lib.party to 19301,
                 grn.party to 36035,
-                ind.party to 6725
-            )
+                ind.party to 6725,
+            ),
         )
         val current2CPVotes = Publisher(
             mapOf(
                 grn to 64771,
-                lib to 29808
-            )
+                lib to 29808,
+            ),
         )
         val previous2PPVotes = Publisher(
             mapOf(
                 grn.party to 46732,
-                alp.party to 37819
-            )
+                alp.party to 37819,
+            ),
         )
         val header = Publisher("MELBOURNE")
         val voteHeader = Publisher("PRIMARY VOTE")
@@ -798,7 +798,7 @@ class PreferenceVoteViewPanelTest {
             currentPrimaryVotes,
             voteHeader,
             voteSubhead,
-            "(MP)"
+            "(MP)",
         )
             .withPrev(previousPrimaryVotes, changeHeader)
             .withPreferences(current2CPVotes, preferenceHeader, preferenceSubhead)
@@ -824,7 +824,7 @@ class PreferenceVoteViewPanelTest {
                 LE LIU (LIB): 29,808 (31.5%)
                 
                 PREFERENCE SWING SINCE 2013: NOT AVAILABLE
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -841,11 +841,11 @@ class PreferenceVoteViewPanelTest {
                 coa to (0.42).rangeTo(0.43),
                 grn to (0.11).rangeTo(0.12),
                 onp to (0.02).rangeTo(0.04),
-                oth to (0.08).rangeTo(0.08)
+                oth to (0.08).rangeTo(0.08),
             )
                 .asOneTimePublisher(),
             "POLLING RANGE".asOneTimePublisher(),
-            "NOVEMBER 2020".asOneTimePublisher()
+            "NOVEMBER 2020".asOneTimePublisher(),
         )
             .withPrev(
                 mapOf(
@@ -853,24 +853,24 @@ class PreferenceVoteViewPanelTest {
                     coa to 5906875,
                     grn to 1482923,
                     onp to 438587,
-                    oth to 488817 + 69736 + 46931 + 479836 + 587528
+                    oth to 488817 + 69736 + 46931 + 479836 + 587528,
                 )
                     .asOneTimePublisher(),
-                "CHANGE SINCE 2019".asOneTimePublisher()
+                "CHANGE SINCE 2019".asOneTimePublisher(),
             )
             .withPreferences(
                 mapOf(
                     alp to (0.49).rangeTo(0.495),
-                    coa to (0.505).rangeTo(0.51)
+                    coa to (0.505).rangeTo(0.51),
                 )
                     .asOneTimePublisher(),
                 "TWO PARTY PREFERRED".asOneTimePublisher(),
-                "".asOneTimePublisher()
+                "".asOneTimePublisher(),
             )
             .withPrevPreferences(mapOf(alp to 6908580, coa to 7344813).asOneTimePublisher())
             .withSwing(
                 compareBy { listOf(alp, coa).indexOf(it) },
-                "SWING SINCE 2019".asOneTimePublisher()
+                "SWING SINCE 2019".asOneTimePublisher(),
             )
             .build("AUSTRALIA".asOneTimePublisher())
         panel.setSize(1024, 512)
@@ -892,7 +892,7 @@ class PreferenceVoteViewPanelTest {
                 LABOR: 49.0-49.5%
                 
                 SWING SINCE 2019: 0.3% SWING L/NP TO ALP
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -910,11 +910,11 @@ class PreferenceVoteViewPanelTest {
             lab to null,
             ld to null,
             ukip to null,
-            oth to null
+            oth to null,
         )
         val curr2CP = mutableMapOf<Candidate, Int?>(
             con to null,
-            lab to null
+            lab to null,
         )
         val currentPrimaryVotes = Publisher(currPrimary)
         val previousPrimaryVotes = Publisher(
@@ -924,15 +924,15 @@ class PreferenceVoteViewPanelTest {
                 ld.party to 91774,
                 grn.party to 98913,
                 ukip.party to 43274,
-                oth.party to 83914 + 28751
-            )
+                oth.party to 83914 + 28751,
+            ),
         )
         val current2CPVotes = Publisher(curr2CP)
         val previous2PPVotes = Publisher(
             mapOf(
                 lab.party to 992273,
-                con.party to 1054811
-            )
+                con.party to 1054811,
+            ),
         )
         val header = Publisher("MAYOR OF LONDON")
         val voteHeader = Publisher("FIRST CHOICE VOTES")
@@ -946,7 +946,7 @@ class PreferenceVoteViewPanelTest {
         val panel = candidateVotes(
             currentPrimaryVotes,
             voteHeader,
-            voteSubhead
+            voteSubhead,
         )
             .withPrev(previousPrimaryVotes, changeHeader)
             .withPreferences(current2CPVotes, preferenceHeader, preferenceSubhead)
@@ -974,7 +974,7 @@ class PreferenceVoteViewPanelTest {
                 SADIQ KHAN (LAB): WAITING...
                 
                 SECOND CHOICE SWING SINCE 2012: NOT AVAILABLE
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         currPrimary[grn] = 150673
@@ -999,7 +999,7 @@ class PreferenceVoteViewPanelTest {
                 SADIQ KHAN (LAB): WAITING...
                 
                 SECOND CHOICE SWING SINCE 2012: NOT AVAILABLE
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         currPrimary[lab] = 1148716
@@ -1024,7 +1024,7 @@ class PreferenceVoteViewPanelTest {
                 SADIQ KHAN (LAB): WAITING...
                 
                 SECOND CHOICE SWING SINCE 2012: NOT AVAILABLE
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         currPrimary[ukip] = 94373
@@ -1049,7 +1049,7 @@ class PreferenceVoteViewPanelTest {
                 SADIQ KHAN (LAB): WAITING...
                 
                 SECOND CHOICE SWING SINCE 2012: NOT AVAILABLE
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         curr2CP[con] = 994614
@@ -1073,7 +1073,7 @@ class PreferenceVoteViewPanelTest {
                 SADIQ KHAN (LAB): WAITING...
                 
                 SECOND CHOICE SWING SINCE 2012: NOT AVAILABLE
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         curr2CP[lab] = 1310143
@@ -1097,7 +1097,7 @@ class PreferenceVoteViewPanelTest {
                 ZAC GOLDSMITH (CON): 994,614 (43.2%)
                 
                 SECOND CHOICE SWING SINCE 2012: 8.4% SWING CON TO LAB
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 }

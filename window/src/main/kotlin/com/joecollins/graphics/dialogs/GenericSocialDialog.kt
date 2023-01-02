@@ -54,8 +54,8 @@ abstract class GenericSocialDialog(panel: JPanel) : JDialog() {
             JScrollPane(
                 altTextArea,
                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                JScrollPane.HORIZONTAL_SCROLLBAR_NEVER
-            )
+                JScrollPane.HORIZONTAL_SCROLLBAR_NEVER,
+            ),
         )
 
         val bottomPanel = JPanel()
@@ -73,7 +73,7 @@ abstract class GenericSocialDialog(panel: JPanel) : JDialog() {
                     charLabel.text =
                         "${textArea.text.length}/$maxLength & ${altTextArea.text.length}/${AltTextProvider.ALT_TEXT_MAX_LENGTH}"
                 }
-            }
+            },
         )
 
         if (panel is AltTextProvider) {
@@ -83,7 +83,7 @@ abstract class GenericSocialDialog(panel: JPanel) : JDialog() {
                     altTextArea.text = text ?: ""
                     charLabel.text =
                         "${textArea.text.length}/$maxLength & ${(text ?: "").length}/${AltTextProvider.ALT_TEXT_MAX_LENGTH}"
-                }
+                },
             )
             panel.altText.subscribe(subscriber)
         }

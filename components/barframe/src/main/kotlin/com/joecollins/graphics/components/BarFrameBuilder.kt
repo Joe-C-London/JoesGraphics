@@ -78,12 +78,12 @@ class BarFrameBuilder private constructor() {
         val value1: Number,
         val value2: Number,
         val valueLabel: String,
-        val shape: Shape? = null
+        val shape: Shape? = null,
     )
 
     fun withHeader(
         headerPublisher: Flow.Publisher<out String?>,
-        rightLabelPublisher: Flow.Publisher<out String?> = null.asOneTimePublisher()
+        rightLabelPublisher: Flow.Publisher<out String?> = null.asOneTimePublisher(),
     ): BarFrameBuilder {
         this.headerPublisher = headerPublisher
         this.rightHeaderLabelPublisher = rightLabelPublisher
@@ -136,20 +136,20 @@ class BarFrameBuilder private constructor() {
                     val f = { rf: RangeFinder ->
                         max(
                             limit.wingspan.toDouble(),
-                            max(abs(rf.lowest.toDouble()), abs(rf.highest.toDouble()))
+                            max(abs(rf.lowest.toDouble()), abs(rf.highest.toDouble())),
                         )
                     }
                     rangeFinder.minFunction = { -f(it) }
                     rangeFinder.maxFunction = { +f(it) }
                 }
-            }
+            },
         )
         return this
     }
 
     fun <T : Number> withTarget(
         targetPublisher: Flow.Publisher<out T>,
-        labelFunc: (T) -> String
+        labelFunc: (T) -> String,
     ): BarFrameBuilder {
         this.linesPublisher = targetPublisher.map {
             val str = labelFunc(it)
@@ -161,7 +161,7 @@ class BarFrameBuilder private constructor() {
     fun <T> withLines(
         lines: Flow.Publisher<out List<T>>,
         labelFunc: (T) -> String,
-        valueFunc: (T) -> Number
+        valueFunc: (T) -> Number,
     ): BarFrameBuilder {
         this.linesPublisher = lines.map { l ->
             l.map {
@@ -175,7 +175,7 @@ class BarFrameBuilder private constructor() {
 
     fun <T : Number> withLines(
         linesPublisher: Flow.Publisher<out List<T>>,
-        labelFunc: (T) -> String
+        labelFunc: (T) -> String,
     ): BarFrameBuilder {
         return withLines(linesPublisher, labelFunc) { it }
     }
@@ -210,7 +210,7 @@ class BarFrameBuilder private constructor() {
             linesPublisher = linesPublisher,
             minPublisher = minPublisher,
             maxPublisher = maxPublisher,
-            headerLabelsPublisher = rightHeaderLabelPublisher?.map { mapOf(GraphicsFrame.HeaderLabelLocation.RIGHT to it) }
+            headerLabelsPublisher = rightHeaderLabelPublisher?.map { mapOf(GraphicsFrame.HeaderLabelLocation.RIGHT to it) },
         )
     }
 
@@ -235,7 +235,7 @@ class BarFrameBuilder private constructor() {
                         .map { it.value }
                         .map { it.toDouble() }
                         .fold(0.0) { a, b -> min(a, b) }
-                }
+                },
             )
             return builder
         }
@@ -264,9 +264,9 @@ class BarFrameBuilder private constructor() {
                             Pair(if (differentDirections(it)) ColorUtils.lighten(it.color) else it.color, first(it)),
                             Pair(
                                 ColorUtils.lighten(it.color),
-                                second(it).toDouble() - if (differentDirections(it)) 0.0 else first(it).toDouble()
-                            )
-                        )
+                                second(it).toDouble() - if (differentDirections(it)) 0.0 else first(it).toDouble(),
+                            ),
+                        ),
                     )
                 }
             }
@@ -282,7 +282,7 @@ class BarFrameBuilder private constructor() {
                         .flatMap { sequenceOf(it.value1, it.value2) }
                         .map { it.toDouble() }
                         .fold(0.0) { a, b -> min(a, b) }
-                }
+                },
             )
             return builder
         }
@@ -311,9 +311,9 @@ class BarFrameBuilder private constructor() {
                             Pair(ColorUtils.lighten(it.color), first(it)),
                             Pair(
                                 if (differentDirections(it)) ColorUtils.lighten(it.color) else it.color,
-                                second(it).toDouble() - if (differentDirections(it)) 0.0 else first(it).toDouble()
-                            )
-                        )
+                                second(it).toDouble() - if (differentDirections(it)) 0.0 else first(it).toDouble(),
+                            ),
+                        ),
                     )
                 }
             }
@@ -329,7 +329,7 @@ class BarFrameBuilder private constructor() {
                         .flatMap { sequenceOf(it.value1, it.value2) }
                         .map { it.toDouble() }
                         .fold(0.0) { x, y -> min(x, y) }
-                }
+                },
             )
             return builder
         }

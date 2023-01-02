@@ -20,7 +20,7 @@ class MapFrameTest {
         val shapes = loadShapes { getDistrictColor(it) }
         val mapFrame = MapFrame(
             headerPublisher = (null as String?).asOneTimePublisher(),
-            shapesPublisher = shapes.map { Pair(it.shape, it.color) }.asOneTimePublisher()
+            shapesPublisher = shapes.map { Pair(it.shape, it.color) }.asOneTimePublisher(),
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ mapFrame.numShapes }, IsEqual(27))
@@ -33,7 +33,7 @@ class MapFrameTest {
         val shapes = loadShapes { getDistrictColor(it) }
         val mapFrame = MapFrame(
             headerPublisher = (null as String?).asOneTimePublisher(),
-            shapesPublisher = shapes.map { Pair(it.shape, it.color) }.asOneTimePublisher()
+            shapesPublisher = shapes.map { Pair(it.shape, it.color) }.asOneTimePublisher(),
         )
         val bindingBox = shapes.asSequence()
             .map { Area(it.shape) }
@@ -53,7 +53,7 @@ class MapFrameTest {
         val mapFrame = MapFrame(
             headerPublisher = (null as String?).asOneTimePublisher(),
             shapesPublisher = shapes.map { Pair(it.shape, it.color) }.asOneTimePublisher(),
-            focusBoxPublisher = cityBox.asOneTimePublisher()
+            focusBoxPublisher = cityBox.asOneTimePublisher(),
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ mapFrame.focusBox }, IsEqual(cityBox))
@@ -65,7 +65,7 @@ class MapFrameTest {
         val mapFrame = MapFrame(
             headerPublisher = (null as String?).asOneTimePublisher(),
             shapesPublisher = regions.map { Pair(it, Color.BLACK) }.asOneTimePublisher(),
-            outlineShapesPublisher = regions.asOneTimePublisher()
+            outlineShapesPublisher = regions.asOneTimePublisher(),
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ mapFrame.numOutlineShapes }, IsEqual(4))
@@ -77,7 +77,7 @@ class MapFrameTest {
         val shapes = loadShapes { getDistrictColor(it) }
         val mapFrame = MapFrame(
             headerPublisher = "PEI".asOneTimePublisher(),
-            shapesPublisher = shapes.map { Pair(it.shape, it.color) }.asOneTimePublisher()
+            shapesPublisher = shapes.map { Pair(it.shape, it.color) }.asOneTimePublisher(),
         )
         mapFrame.setSize(256, 128)
         compareRendering("MapFrame", "RenderFull", mapFrame)
@@ -88,7 +88,7 @@ class MapFrameTest {
         val shapes = loadShapes { district -> getDistrictColor(district) }
         val mapFrame = MapFrame(
             headerPublisher = "PEI".asOneTimePublisher(),
-            shapesPublisher = shapes.map { Pair(it.shape, it.color) }.asOneTimePublisher()
+            shapesPublisher = shapes.map { Pair(it.shape, it.color) }.asOneTimePublisher(),
         )
         mapFrame.setSize(64, 128)
         compareRendering("MapFrame", "RenderFullThin", mapFrame)
@@ -101,7 +101,7 @@ class MapFrameTest {
         val mapFrame = MapFrame(
             headerPublisher = "CHARLOTTETOWN".asOneTimePublisher(),
             shapesPublisher = shapes.map { Pair(it.shape, it.color) }.asOneTimePublisher(),
-            focusBoxPublisher = zoomBox.asOneTimePublisher()
+            focusBoxPublisher = zoomBox.asOneTimePublisher(),
         )
         mapFrame.setSize(256, 128)
         compareRendering("MapFrame", "RenderZoomedIn", mapFrame)
@@ -118,7 +118,7 @@ class MapFrameTest {
             headerPublisher = header,
             shapesPublisher = shapes.map { Pair(it.shape, it.color) }.asOneTimePublisher(),
             focusBoxPublisher = focusBox,
-            outlineShapesPublisher = regions.asOneTimePublisher()
+            outlineShapesPublisher = regions.asOneTimePublisher(),
         )
         mapFrame.setSize(256, 128)
         compareRendering("MapFrame", "RenderBorders-1", mapFrame)
@@ -146,7 +146,7 @@ class MapFrameTest {
             (1..7).asSequence(),
             (9..14).asSequence(),
             sequenceOf(8..8, 15..20).flatten(),
-            (21..27).asSequence()
+            (21..27).asSequence(),
         ).map { seq ->
             seq.map { shapesByDistrict[it] }
                 .map { Area(it) }

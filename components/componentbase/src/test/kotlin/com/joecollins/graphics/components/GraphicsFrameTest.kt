@@ -27,7 +27,7 @@ class GraphicsFrameTest {
     @Test
     fun testFixedHeader() {
         val graphicsFrame = GraphicsFrame(
-            headerPublisher = "HEADER".asOneTimePublisher()
+            headerPublisher = "HEADER".asOneTimePublisher(),
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ graphicsFrame.header }, IsEqual("HEADER"))
@@ -36,7 +36,7 @@ class GraphicsFrameTest {
     @Test
     fun testDynamicHeader() {
         val graphicsFrame = GraphicsFrame(
-            headerPublisher = TestObject().numPollsPublisher.map { "$it POLLS REPORTING" }
+            headerPublisher = TestObject().numPollsPublisher.map { "$it POLLS REPORTING" },
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ graphicsFrame.header }, IsEqual("0 POLLS REPORTING"))
@@ -46,7 +46,7 @@ class GraphicsFrameTest {
     fun testDynamicHeaderRefreshed() {
         val obj = TestObject()
         val graphicsFrame = GraphicsFrame(
-            headerPublisher = obj.numPollsPublisher.map { "$it POLLS REPORTING" }
+            headerPublisher = obj.numPollsPublisher.map { "$it POLLS REPORTING" },
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ graphicsFrame.header }, IsEqual("0 POLLS REPORTING"))
@@ -59,7 +59,7 @@ class GraphicsFrameTest {
     fun testFixedNotes() {
         val graphicsFrame = GraphicsFrame(
             headerPublisher = (null as String?).asOneTimePublisher(),
-            notesPublisher = "SOURCE: BBC".asOneTimePublisher()
+            notesPublisher = "SOURCE: BBC".asOneTimePublisher(),
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ graphicsFrame.notes }, IsEqual("SOURCE: BBC"))
@@ -69,7 +69,7 @@ class GraphicsFrameTest {
     fun testBorderColor() {
         val graphicsFrame = GraphicsFrame(
             headerPublisher = (null as String?).asOneTimePublisher(),
-            borderColorPublisher = Color.BLUE.asOneTimePublisher()
+            borderColorPublisher = Color.BLUE.asOneTimePublisher(),
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ graphicsFrame.borderColor }, IsEqual(Color.BLUE))
@@ -82,7 +82,7 @@ class GraphicsFrameTest {
         val graphicsFrame = GraphicsFrame(
             headerPublisher = (null as String?).asOneTimePublisher(),
             borderColorPublisher = Color.BLUE.asOneTimePublisher(),
-            headerTextColorPublisher = Color.YELLOW.asOneTimePublisher()
+            headerTextColorPublisher = Color.YELLOW.asOneTimePublisher(),
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ graphicsFrame.borderColor }, IsEqual(Color.BLUE))
@@ -93,7 +93,7 @@ class GraphicsFrameTest {
     @Test
     fun testRenderingHeaderOnly() {
         val graphicsFrame: GraphicsFrame = object : GraphicsFrame(
-            headerPublisher = "HEADER".asOneTimePublisher()
+            headerPublisher = "HEADER".asOneTimePublisher(),
         ) {
             init {
                 val panel = JPanel()
@@ -109,7 +109,7 @@ class GraphicsFrameTest {
     fun testRenderingHeaderAndNotes() {
         val graphicsFrame: GraphicsFrame = object : GraphicsFrame(
             headerPublisher = "HEADER".asOneTimePublisher(),
-            notesPublisher = "SOURCE: BBC".asOneTimePublisher()
+            notesPublisher = "SOURCE: BBC".asOneTimePublisher(),
         ) {
             init {
                 val panel = JPanel()
@@ -124,7 +124,7 @@ class GraphicsFrameTest {
     @Test
     fun testRenderingNoHeader() {
         val graphicsFrame: GraphicsFrame = object : GraphicsFrame(
-            headerPublisher = (null as String?).asOneTimePublisher()
+            headerPublisher = (null as String?).asOneTimePublisher(),
         ) {
             init {
                 val panel = JPanel()
@@ -141,7 +141,7 @@ class GraphicsFrameTest {
         val graphicsFrame: GraphicsFrame = object : GraphicsFrame(
             headerPublisher = "HEADER".asOneTimePublisher(),
             notesPublisher = "SOURCE: BBC".asOneTimePublisher(),
-            borderColorPublisher = Color.RED.asOneTimePublisher()
+            borderColorPublisher = Color.RED.asOneTimePublisher(),
         ) {
             init {
                 val panel = JPanel()
@@ -159,7 +159,7 @@ class GraphicsFrameTest {
             headerPublisher = "HEADER".asOneTimePublisher(),
             notesPublisher = "SOURCE: BBC".asOneTimePublisher(),
             borderColorPublisher = Color.RED.asOneTimePublisher(),
-            headerTextColorPublisher = Color.YELLOW.asOneTimePublisher()
+            headerTextColorPublisher = Color.YELLOW.asOneTimePublisher(),
         ) {
             init {
                 val panel = JPanel()
@@ -171,7 +171,7 @@ class GraphicsFrameTest {
         compareRendering(
             "GraphicsFrame",
             "HeaderTextColor",
-            graphicsFrame
+            graphicsFrame,
         )
     }
 
@@ -179,7 +179,7 @@ class GraphicsFrameTest {
     fun testRenderingAccents() {
         val graphicsFrame: GraphicsFrame = object : GraphicsFrame(
             headerPublisher = "\u00c7A C'EST GR\u00c2VE".asOneTimePublisher(),
-            notesPublisher = "JOYEUX NO\u00cbL, GAR\u00c7ON!".asOneTimePublisher()
+            notesPublisher = "JOYEUX NO\u00cbL, GAR\u00c7ON!".asOneTimePublisher(),
         ) {
             init {
                 val panel = JPanel()
@@ -195,7 +195,7 @@ class GraphicsFrameTest {
     fun testHeaderFontSize() {
         val headerWrapper = Publisher("THIS IS A HEADER")
         val graphicsFrame: GraphicsFrame = object : GraphicsFrame(
-            headerPublisher = headerWrapper
+            headerPublisher = headerWrapper,
         ) {
             init {
                 val panel = JPanel()
@@ -207,19 +207,19 @@ class GraphicsFrameTest {
         compareRendering(
             "GraphicsFrame",
             "HeaderFontSize-1",
-            graphicsFrame
+            graphicsFrame,
         )
         headerWrapper.submit("THIS IS A VERY MUCH LONGER HEADER")
         compareRendering(
             "GraphicsFrame",
             "HeaderFontSize-2",
-            graphicsFrame
+            graphicsFrame,
         )
         graphicsFrame.setSize(512, 128)
         compareRendering(
             "GraphicsFrame",
             "HeaderFontSize-3",
-            graphicsFrame
+            graphicsFrame,
         )
     }
 
@@ -228,7 +228,7 @@ class GraphicsFrameTest {
         val alignment = Publisher(GraphicsFrame.Alignment.CENTER)
         val graphicsFrame: GraphicsFrame = object : GraphicsFrame(
             headerPublisher = "HEADER".asOneTimePublisher(),
-            headerAlignmentPublisher = alignment
+            headerAlignmentPublisher = alignment,
         ) {
             init {
                 val panel = JPanel()
@@ -240,19 +240,19 @@ class GraphicsFrameTest {
         compareRendering(
             "GraphicsFrame",
             "HeaderAlignment-1",
-            graphicsFrame
+            graphicsFrame,
         )
         alignment.submit(GraphicsFrame.Alignment.LEFT)
         compareRendering(
             "GraphicsFrame",
             "HeaderAlignment-2",
-            graphicsFrame
+            graphicsFrame,
         )
         alignment.submit(GraphicsFrame.Alignment.RIGHT)
         compareRendering(
             "GraphicsFrame",
             "HeaderAlignment-3",
-            graphicsFrame
+            graphicsFrame,
         )
     }
 
@@ -263,7 +263,7 @@ class GraphicsFrameTest {
         val graphicsFrame: GraphicsFrame = object : GraphicsFrame(
             headerPublisher = headerText,
             headerAlignmentPublisher = alignment,
-            headerLabelsPublisher = mapOf(HeaderLabelLocation.RIGHT to "100%").asOneTimePublisher()
+            headerLabelsPublisher = mapOf(HeaderLabelLocation.RIGHT to "100%").asOneTimePublisher(),
         ) {
             init {
                 val panel = JPanel()
@@ -275,38 +275,38 @@ class GraphicsFrameTest {
         compareRendering(
             "GraphicsFrame",
             "RightHandLabel-C",
-            graphicsFrame
+            graphicsFrame,
         )
         alignment.submit(GraphicsFrame.Alignment.LEFT)
         compareRendering(
             "GraphicsFrame",
             "RightHandLabel-L",
-            graphicsFrame
+            graphicsFrame,
         )
         alignment.submit(GraphicsFrame.Alignment.RIGHT)
         compareRendering(
             "GraphicsFrame",
             "RightHandLabel-R",
-            graphicsFrame
+            graphicsFrame,
         )
         alignment.submit(GraphicsFrame.Alignment.CENTER)
         headerText.submit("THE MAIN HEADER TEXT IS LONG")
         compareRendering(
             "GraphicsFrame",
             "RightHandLabel-C2",
-            graphicsFrame
+            graphicsFrame,
         )
         alignment.submit(GraphicsFrame.Alignment.LEFT)
         compareRendering(
             "GraphicsFrame",
             "RightHandLabel-L2",
-            graphicsFrame
+            graphicsFrame,
         )
         alignment.submit(GraphicsFrame.Alignment.RIGHT)
         compareRendering(
             "GraphicsFrame",
             "RightHandLabel-R2",
-            graphicsFrame
+            graphicsFrame,
         )
     }
 
@@ -317,7 +317,7 @@ class GraphicsFrameTest {
         val graphicsFrame: GraphicsFrame = object : GraphicsFrame(
             headerPublisher = headerText,
             headerAlignmentPublisher = alignment,
-            headerLabelsPublisher = mapOf(HeaderLabelLocation.LEFT to "100%").asOneTimePublisher()
+            headerLabelsPublisher = mapOf(HeaderLabelLocation.LEFT to "100%").asOneTimePublisher(),
         ) {
             init {
                 val panel = JPanel()
@@ -329,38 +329,38 @@ class GraphicsFrameTest {
         compareRendering(
             "GraphicsFrame",
             "LeftHandLabel-C",
-            graphicsFrame
+            graphicsFrame,
         )
         alignment.submit(GraphicsFrame.Alignment.LEFT)
         compareRendering(
             "GraphicsFrame",
             "LeftHandLabel-L",
-            graphicsFrame
+            graphicsFrame,
         )
         alignment.submit(GraphicsFrame.Alignment.RIGHT)
         compareRendering(
             "GraphicsFrame",
             "LeftHandLabel-R",
-            graphicsFrame
+            graphicsFrame,
         )
         alignment.submit(GraphicsFrame.Alignment.CENTER)
         headerText.submit("THE MAIN HEADER TEXT IS LONG")
         compareRendering(
             "GraphicsFrame",
             "LeftHandLabel-C2",
-            graphicsFrame
+            graphicsFrame,
         )
         alignment.submit(GraphicsFrame.Alignment.LEFT)
         compareRendering(
             "GraphicsFrame",
             "LeftHandLabel-L2",
-            graphicsFrame
+            graphicsFrame,
         )
         alignment.submit(GraphicsFrame.Alignment.RIGHT)
         compareRendering(
             "GraphicsFrame",
             "LeftHandLabel-R2",
-            graphicsFrame
+            graphicsFrame,
         )
     }
 }

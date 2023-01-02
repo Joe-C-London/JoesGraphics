@@ -14,7 +14,7 @@ class LowerThirdHeadlineOnly internal constructor(
     private val headlinePublisher: Flow.Publisher<out String?>,
     private val subheadPublisher: Flow.Publisher<out String?>,
     clock: Clock,
-    showTimeZone: Boolean = false
+    showTimeZone: Boolean = false,
 ) : LowerThird(leftImagePublisher, placePublisher, clock, showTimeZone) {
 
     constructor(
@@ -22,14 +22,14 @@ class LowerThirdHeadlineOnly internal constructor(
         placePublisher: Flow.Publisher<out Pair<String, ZoneId>>,
         headlinePublisher: Flow.Publisher<out String?>,
         subheadPublisher: Flow.Publisher<out String?>,
-        showTimeZone: Boolean = false
+        showTimeZone: Boolean = false,
     ) : this(
         leftImagePublisher,
         placePublisher,
         headlinePublisher,
         subheadPublisher,
         Clock.systemDefaultZone(),
-        showTimeZone
+        showTimeZone,
     )
 
     private val headlinePanel = HeadlinePanel()

@@ -38,10 +38,10 @@ class HeatMapFrame(
     changeBarsPublisher: Flow.Publisher<out List<Bar>>? = null,
     changeBarLabelPublisher: Flow.Publisher<out String>? = null,
     changeBarStartPublisher: Flow.Publisher<out Int>? = null,
-    borderColorPublisher: Flow.Publisher<out Color>? = null
+    borderColorPublisher: Flow.Publisher<out Color>? = null,
 ) : GraphicsFrame(
     headerPublisher = headerPublisher,
-    borderColorPublisher = borderColorPublisher
+    borderColorPublisher = borderColorPublisher,
 ) {
     private val barsPanel = SeatBarPanel()
     private val squaresPanel = SquaresPanel()
@@ -162,7 +162,7 @@ class HeatMapFrame(
                 .setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
             g.setRenderingHint(
                 RenderingHints.KEY_TEXT_ANTIALIASING,
-                RenderingHints.VALUE_TEXT_ANTIALIAS_ON
+                RenderingHints.VALUE_TEXT_ANTIALIAS_ON,
             )
             g.setColor(Color.BLACK)
             g.drawLine(width / 2, 0, width / 2, height)
@@ -235,12 +235,12 @@ class HeatMapFrame(
                     Point(startSide, changeBarBottom),
                     Point(endSide, changeBarBottom),
                     Point(end, changeBarMid),
-                    Point(endSide, changeBarTop)
+                    Point(endSide, changeBarTop),
                 )
                 val polygon = Polygon(
                     points.map { it.getX().toInt() }.toIntArray(),
                     points.map { it.getY().toInt() }.toIntArray(),
-                    points.size
+                    points.size,
                 )
                 g.fillPolygon(polygon)
                 newClip.add(Area(polygon))
@@ -324,7 +324,7 @@ class HeatMapFrame(
             g
                 .setRenderingHint(
                     RenderingHints.KEY_TEXT_ANTIALIASING,
-                    RenderingHints.VALUE_TEXT_ANTIALIAS_ON
+                    RenderingHints.VALUE_TEXT_ANTIALIAS_ON,
                 )
             g.setColor(Color.BLACK)
             g.drawLine(width / 2, 0, width / 2, height)
@@ -346,7 +346,7 @@ class HeatMapFrame(
                         left + borderSize / 2,
                         top + borderSize / 2,
                         squareSize - borderSize,
-                        squareSize - borderSize
+                        squareSize - borderSize,
                     )
                 }
                 g.stroke = BasicStroke(1f)

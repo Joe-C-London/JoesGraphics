@@ -20,7 +20,7 @@ class ProjectionFrameTest {
             borderColorPublisher = Color.GRAY.asOneTimePublisher(),
             imagePublisher = image.asOneTimePublisher(),
             backColorPublisher = Color.GRAY.asOneTimePublisher(),
-            footerTextPublisher = "MINORITY LEGISLATURE".asOneTimePublisher()
+            footerTextPublisher = "MINORITY LEGISLATURE".asOneTimePublisher(),
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.getImage() }, IsEqual(image))
@@ -33,7 +33,7 @@ class ProjectionFrameTest {
             borderColorPublisher = Color.GRAY.asOneTimePublisher(),
             imagePublisher = peiLeg().asOneTimePublisher(),
             backColorPublisher = Color.GRAY.asOneTimePublisher(),
-            footerTextPublisher = "MINORITY LEGISLATURE".asOneTimePublisher()
+            footerTextPublisher = "MINORITY LEGISLATURE".asOneTimePublisher(),
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.getBackColor() }, IsEqual(Color.GRAY))
@@ -46,7 +46,7 @@ class ProjectionFrameTest {
             borderColorPublisher = Color.GRAY.asOneTimePublisher(),
             imagePublisher = peiLeg().asOneTimePublisher(),
             backColorPublisher = Color.GRAY.asOneTimePublisher(),
-            footerTextPublisher = "MINORITY LEGISLATURE".asOneTimePublisher()
+            footerTextPublisher = "MINORITY LEGISLATURE".asOneTimePublisher(),
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.getFooterText() }, IsEqual("MINORITY LEGISLATURE"))
@@ -60,7 +60,7 @@ class ProjectionFrameTest {
             imagePublisher = peiLeg().asOneTimePublisher(),
             backColorPublisher = Color.GRAY.asOneTimePublisher(),
             footerTextPublisher = "MINORITY LEGISLATURE".asOneTimePublisher(),
-            imageAlignmentPublisher = ProjectionFrame.Alignment.MIDDLE.asOneTimePublisher()
+            imageAlignmentPublisher = ProjectionFrame.Alignment.MIDDLE.asOneTimePublisher(),
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.getImageAlignment() }, IsEqual(ProjectionFrame.Alignment.MIDDLE))
@@ -73,7 +73,7 @@ class ProjectionFrameTest {
             borderColorPublisher = Color.GRAY.asOneTimePublisher(),
             imagePublisher = peiLeg().asOneTimePublisher(),
             backColorPublisher = Color.GRAY.asOneTimePublisher(),
-            footerTextPublisher = "MINORITY LEGISLATURE".asOneTimePublisher()
+            footerTextPublisher = "MINORITY LEGISLATURE".asOneTimePublisher(),
         )
         Assertions.assertEquals(ProjectionFrame.Alignment.BOTTOM, frame.getImageAlignment())
     }
@@ -85,7 +85,7 @@ class ProjectionFrameTest {
             borderColorPublisher = Color.GRAY.asOneTimePublisher(),
             imagePublisher = peiLeg().asOneTimePublisher(),
             backColorPublisher = Color.GRAY.asOneTimePublisher(),
-            footerTextPublisher = "MINORITY LEGISLATURE".asOneTimePublisher()
+            footerTextPublisher = "MINORITY LEGISLATURE".asOneTimePublisher(),
         )
         frame.setSize(1024, 512)
         compareRendering("ProjectionFrame", "Basic", frame)
@@ -98,7 +98,7 @@ class ProjectionFrameTest {
             borderColorPublisher = Color.GRAY.asOneTimePublisher(),
             imagePublisher = peiLeg().asOneTimePublisher(),
             backColorPublisher = Color.GRAY.asOneTimePublisher(),
-            footerTextPublisher = "WE ARE NOW PROJECTING A MINORITY LEGISLATURE".asOneTimePublisher()
+            footerTextPublisher = "WE ARE NOW PROJECTING A MINORITY LEGISLATURE".asOneTimePublisher(),
         )
         frame.setSize(1024, 512)
         compareRendering("ProjectionFrame", "Long", frame)
@@ -112,7 +112,7 @@ class ProjectionFrameTest {
             imagePublisher = peiLeg().asOneTimePublisher(),
             backColorPublisher = Color.GRAY.asOneTimePublisher(),
             imageAlignmentPublisher = ProjectionFrame.Alignment.MIDDLE.asOneTimePublisher(),
-            footerTextPublisher = "MINORITY LEGISLATURE".asOneTimePublisher()
+            footerTextPublisher = "MINORITY LEGISLATURE".asOneTimePublisher(),
         )
         frame.setSize(1024, 512)
         compareRendering("ProjectionFrame", "Center", frame)
@@ -122,7 +122,7 @@ class ProjectionFrameTest {
         return ImageIO.read(
             ProjectionFrameTest::class.java
                 .classLoader
-                .getResource("com/joecollins/graphics/pei-leg.png")
+                .getResource("com/joecollins/graphics/pei-leg.png"),
         )
     }
 }

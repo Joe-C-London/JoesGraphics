@@ -27,7 +27,7 @@ class BattlegroundScreenTest {
             prevResult,
             currResult,
             { it.uppercase() },
-            party
+            party,
         )
             .withSeatsToShow(defenseSeats, targetSeats)
             .withNumRows(numRows)
@@ -69,14 +69,14 @@ class BattlegroundScreenTest {
         val filteredSeats = Publisher<Set<String>?>(
             bcPrevResult().keys
                 .filter { it.startsWith("Vancouver") }
-                .toSet()
+                .toSet(),
         )
         val title = Publisher("NDP BATTLEGROUND")
         val panel = BattlegroundScreen.singleParty(
             prevResult,
             currResult,
             { it.uppercase() },
-            party
+            party,
         )
             .withSeatsToShow(defenseSeats, targetSeats)
             .withNumRows(numRows)
@@ -105,7 +105,7 @@ class BattlegroundScreenTest {
             prevResult,
             currResult,
             { it.uppercase() },
-            parties
+            parties,
         )
             .withSeatsToShow(leftSeats, rightSeats)
             .withNumRows(numRows)
@@ -145,7 +145,7 @@ class BattlegroundScreenTest {
             prevResult,
             currResult,
             { it.uppercase() },
-            (coa to lib).asOneTimePublisher()
+            (coa to lib).asOneTimePublisher(),
         )
             .withSeatsToShow(leftSeats, rightSeats)
             .withNumRows(numRows)
@@ -167,7 +167,7 @@ class BattlegroundScreenTest {
             prevResult,
             currResult,
             { it.uppercase() },
-            party
+            party,
         )
             .withSeatsToShow(defenseSeats, targetSeats)
             .withNumRows(numRows)
@@ -231,7 +231,7 @@ class BattlegroundScreenTest {
             "Port Darwin" to mapOf(alp to 2233, clp to 2068),
             "Sanderson" to mapOf(alp to 3044, clp to 1351),
             "Spillett" to mapOf(clp to 3219, alp to 1730),
-            "Wanguri" to mapOf(alp to 3349, clp to 1627)
+            "Wanguri" to mapOf(alp to 3349, clp to 1627),
         )
         val panel = BattlegroundScreen.doubleParty(
             prevResults.associateWith { it.second }.asOneTimePublisher(),
@@ -243,7 +243,7 @@ class BattlegroundScreenTest {
                     " " + e.first.uppercase() + " " +
                     (e.second.keys.filter { !setOf(alp, clp).contains(it) }.takeUnless { it.isEmpty() }?.toString() ?: "")
             },
-            (clp to alp).asOneTimePublisher()
+            (clp to alp).asOneTimePublisher(),
         )
             .withSeatsToShow(15.asOneTimePublisher(), 15.asOneTimePublisher())
             .withNumRows(15.asOneTimePublisher())
@@ -348,7 +348,7 @@ class BattlegroundScreenTest {
                 "Sannich North and the Islands" to mapOf(lib to 9321, ndp to 10764, grn to 14775, oth to 364),
                 "Saanich South" to mapOf(lib to 8716, ndp to 11912, grn to 7129, oth to 177 + 130),
                 "Victoria-Beacon Hill" to mapOf(lib to 4689, ndp to 16057, grn to 9194, oth to 190 + 102 + 35),
-                "Victoria-Swan Lake" to mapOf(lib to 4005, ndp to 13531, grn to 7491, oth to 207)
+                "Victoria-Swan Lake" to mapOf(lib to 4005, ndp to 13531, grn to 7491, oth to 207),
             )
         }
 
@@ -440,7 +440,7 @@ class BattlegroundScreenTest {
                 "Sannich North and the Islands" to elected(grn),
                 "Saanich South" to elected(ndp),
                 "Victoria-Beacon Hill" to elected(ndp),
-                "Victoria-Swan Lake" to elected(ndp)
+                "Victoria-Swan Lake" to elected(ndp),
             ).mapValues { it.value!! }
         }
     }

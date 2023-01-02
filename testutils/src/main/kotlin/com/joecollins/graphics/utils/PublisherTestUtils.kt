@@ -10,7 +10,7 @@ object PublisherTestUtils {
     fun <T> assertPublishes(
         publisher: Flow.Publisher<T>,
         expected: T,
-        timeoutSeconds: Long = 1
+        timeoutSeconds: Long = 1,
     ) {
         data class Wrapper<T>(val item: T)
         var result: Wrapper<T>? = null

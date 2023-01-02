@@ -19,7 +19,7 @@ class LowerThirdHeadlineOnlyTest {
             leftImagePublisher = createImage("", Color.RED, Color.WHITE).asOneTimePublisher(),
             placePublisher = ("" to ZoneId.systemDefault()).asOneTimePublisher(),
             headlinePublisher = "POLLS CLOSE ACROSS CENTRAL CANADA".asOneTimePublisher(),
-            subheadPublisher = "Polls open for 30 minutes on west coast".asOneTimePublisher()
+            subheadPublisher = "Polls open for 30 minutes on west coast".asOneTimePublisher(),
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ lowerThird.headline }, IsEqual("POLLS CLOSE ACROSS CENTRAL CANADA"))
@@ -31,7 +31,7 @@ class LowerThirdHeadlineOnlyTest {
             leftImagePublisher = createImage("", Color.RED, Color.WHITE).asOneTimePublisher(),
             placePublisher = ("" to ZoneId.systemDefault()).asOneTimePublisher(),
             headlinePublisher = "POLLS CLOSE ACROSS CENTRAL CANADA".asOneTimePublisher(),
-            subheadPublisher = "Polls open for 30 minutes on west coast".asOneTimePublisher()
+            subheadPublisher = "Polls open for 30 minutes on west coast".asOneTimePublisher(),
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ lowerThird.subhead }, IsEqual("Polls open for 30 minutes on west coast"))
@@ -44,7 +44,7 @@ class LowerThirdHeadlineOnlyTest {
             placePublisher = ("OTTAWA" to ZoneId.of("Canada/Eastern")).asOneTimePublisher(),
             headlinePublisher = "POLLS CLOSE ACROSS CENTRAL CANADA".asOneTimePublisher(),
             subheadPublisher = "Polls open for 30 minutes on west coast".asOneTimePublisher(),
-            clock = Clock.fixed(Instant.parse("2019-10-22T01:30:00Z"), ZoneId.systemDefault())
+            clock = Clock.fixed(Instant.parse("2019-10-22T01:30:00Z"), ZoneId.systemDefault()),
         )
         lowerThird.setSize(1024, 50)
         Thread.sleep(100)
@@ -58,7 +58,7 @@ class LowerThirdHeadlineOnlyTest {
             placePublisher = ("OTTAWA" to ZoneId.of("Canada/Eastern")).asOneTimePublisher(),
             headlinePublisher = "POLLS CLOSE ACROSS CENTRAL CANADA".asOneTimePublisher(),
             subheadPublisher = null.asOneTimePublisher(),
-            clock = Clock.fixed(Instant.parse("2019-10-22T01:30:00Z"), ZoneId.systemDefault())
+            clock = Clock.fixed(Instant.parse("2019-10-22T01:30:00Z"), ZoneId.systemDefault()),
         )
         lowerThird.setSize(1024, 50)
         compareRendering("LowerThird", "HeadlineOnly", lowerThird)
@@ -73,7 +73,7 @@ class LowerThirdHeadlineOnlyTest {
             placePublisher = ("SAINT-\u00c9TIENNE" to ZoneId.of("Europe/Paris")).asOneTimePublisher(),
             headlinePublisher = "\u00c9LECTION FRAN\u00c7AIS EST FINI".asOneTimePublisher(),
             subheadPublisher = "\u00c9lection fran\u00e7ais est s\u00fbr".asOneTimePublisher(),
-            clock = Clock.fixed(Instant.parse("2019-10-22T01:30:00Z"), ZoneId.systemDefault())
+            clock = Clock.fixed(Instant.parse("2019-10-22T01:30:00Z"), ZoneId.systemDefault()),
         )
         lowerThird.setSize(1024, 50)
         compareRendering("LowerThird", "HeadlineAndSubheadAccents", lowerThird)

@@ -27,7 +27,7 @@ class RecountScreenTest {
             candidateVotes,
             { it.uppercase() },
             10,
-            "AUTOMATIC RECOUNTS".asOneTimePublisher()
+            "AUTOMATIC RECOUNTS".asOneTimePublisher(),
         )
             .withPctReporting(pctReporting)
             .build("YUKON".asOneTimePublisher())
@@ -37,14 +37,14 @@ class RecountScreenTest {
         candidateVotesRaw["Mountainview"] = mapOf(
             Candidate("Shaunagh Stikeman", ndp) to 62,
             Candidate("Jeanie Davis", lib) to 68,
-            Candidate("Darrell Pasloski", yp) to 65
+            Candidate("Darrell Pasloski", yp) to 65,
         )
         pctReportingRaw["Mountainview"] = 1.0 / 6
 
         candidateVotesRaw["Vuntut Gwitchin"] = mapOf(
             Candidate("Pauline Frost", lib) to 77,
             Candidate("Darius Elias", yp) to 70,
-            Candidate("Skeeter Wright", ndp) to 3
+            Candidate("Skeeter Wright", ndp) to 3,
         )
         pctReportingRaw["Vuntut Gwitchin"] = 3.0 / 3
 
@@ -52,7 +52,7 @@ class RecountScreenTest {
             Candidate("Patti McLeod", yp) to 147,
             Candidate("Victor Kisoun", ind) to 7,
             Candidate("Erin Labonte", ndp) to 94,
-            Candidate("Ernie Jamieson", lib) to 103
+            Candidate("Ernie Jamieson", lib) to 103,
         )
         pctReportingRaw["Watson Lake"] = 2.0 / 6
 
@@ -63,7 +63,7 @@ class RecountScreenTest {
         candidateVotesRaw["Mountainview"] = mapOf(
             Candidate("Shaunagh Stikeman", ndp) to 432,
             Candidate("Jeanie Davis", lib) to 439,
-            Candidate("Darrell Pasloski", yp) to 399
+            Candidate("Darrell Pasloski", yp) to 399,
         )
         pctReportingRaw["Mountainview"] = 6.0 / 6
 
@@ -71,7 +71,7 @@ class RecountScreenTest {
             Candidate("Patti McLeod", yp) to 299,
             Candidate("Victor Kisoun", ind) to 38,
             Candidate("Erin Labonte", ndp) to 219,
-            Candidate("Ernie Jamieson", lib) to 212
+            Candidate("Ernie Jamieson", lib) to 212,
         )
         pctReportingRaw["Watson Lake"] = 6.0 / 6
 
@@ -95,7 +95,7 @@ class RecountScreenTest {
             candidateVotes,
             { it.uppercase() },
             10,
-            "AUTOMATIC RECOUNTS".asOneTimePublisher()
+            "AUTOMATIC RECOUNTS".asOneTimePublisher(),
         )
             .withPollsReporting(pollsReporting)
             .build("YUKON".asOneTimePublisher())
@@ -105,14 +105,14 @@ class RecountScreenTest {
         candidateVotesRaw["Mountainview"] = mapOf(
             Candidate("Shaunagh Stikeman", ndp) to 62,
             Candidate("Jeanie Davis", lib) to 68,
-            Candidate("Darrell Pasloski", yp) to 65
+            Candidate("Darrell Pasloski", yp) to 65,
         )
         pollsReportingRaw["Mountainview"] = PollsReporting(1, 6)
 
         candidateVotesRaw["Vuntut Gwitchin"] = mapOf(
             Candidate("Pauline Frost", lib) to 77,
             Candidate("Darius Elias", yp) to 70,
-            Candidate("Skeeter Wright", ndp) to 3
+            Candidate("Skeeter Wright", ndp) to 3,
         )
         pollsReportingRaw["Vuntut Gwitchin"] = PollsReporting(3, 3)
 
@@ -120,7 +120,7 @@ class RecountScreenTest {
             Candidate("Patti McLeod", yp) to 147,
             Candidate("Victor Kisoun", ind) to 7,
             Candidate("Erin Labonte", ndp) to 94,
-            Candidate("Ernie Jamieson", lib) to 103
+            Candidate("Ernie Jamieson", lib) to 103,
         )
         pollsReportingRaw["Watson Lake"] = PollsReporting(2, 6)
 
@@ -131,7 +131,7 @@ class RecountScreenTest {
         candidateVotesRaw["Mountainview"] = mapOf(
             Candidate("Shaunagh Stikeman", ndp) to 432,
             Candidate("Jeanie Davis", lib) to 439,
-            Candidate("Darrell Pasloski", yp) to 399
+            Candidate("Darrell Pasloski", yp) to 399,
         )
         pollsReportingRaw["Mountainview"] = PollsReporting(6, 6)
 
@@ -139,7 +139,7 @@ class RecountScreenTest {
             Candidate("Patti McLeod", yp) to 299,
             Candidate("Victor Kisoun", ind) to 38,
             Candidate("Erin Labonte", ndp) to 219,
-            Candidate("Ernie Jamieson", lib) to 212
+            Candidate("Ernie Jamieson", lib) to 212,
         )
         pollsReportingRaw["Watson Lake"] = PollsReporting(6, 6)
 
@@ -163,7 +163,7 @@ class RecountScreenTest {
             candidateVotes,
             { it.uppercase() },
             0.001,
-            "AUTOMATIC RECOUNTS".asOneTimePublisher()
+            "AUTOMATIC RECOUNTS".asOneTimePublisher(),
         )
             .build("CANADA".asOneTimePublisher())
         screen.setSize(1024, 512)
@@ -174,27 +174,27 @@ class RecountScreenTest {
             Candidate("Borys Wrzesnewskyj", lib) to 21618,
             Candidate("Ana Maria Rivero", ndp) to 7735,
             Candidate("Katarina Zoricic", grn) to 1377,
-            Candidate("Sarah Thompson", ind) to 149
+            Candidate("Sarah Thompson", ind) to 149,
         )
         candidateVotesRaw["Montmagny\u2014L'Islet\u2014Kamouraska\u2014Rivi\u00e8re-du-Loup"] = mapOf(
             Candidate("Fran\u00e7ois Lapointe", ndp) to 17285,
             Candidate("Bernard G\u00e9n\u00e9reux", con) to 17276,
             Candidate("Nathalie Arsenault", bq) to 9550,
             Candidate("Andrew Caddell", lib) to 2743,
-            Candidate("Lynette Tremblay", grn) to 691
+            Candidate("Lynette Tremblay", grn) to 691,
         )
         candidateVotesRaw["Nipissing\u2014Timiskaming"] = mapOf(
             Candidate("Jay Aspin", con) to 15495,
             Candidate("Anthony Rota", lib) to 15477,
             Candidate("Rona Eckert", ndp) to 8781,
-            Candidate("Scott Daley", grn) to 2518
+            Candidate("Scott Daley", grn) to 2518,
         )
         candidateVotesRaw["Winnipeg North"] = mapOf(
             Candidate("Kevin Lamoureux", lib) to 9097,
             Candidate("Rebecca Blaikie", ndp) to 9053,
             Candidate("Ann Matejicka", con) to 6701,
             Candidate("John Harvie", grn) to 458,
-            Candidate("Frank Komarniski", ind) to 118
+            Candidate("Frank Komarniski", ind) to 118,
         )
 
         candidateVotes.submit(candidateVotesRaw)

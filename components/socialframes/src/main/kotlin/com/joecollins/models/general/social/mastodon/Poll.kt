@@ -6,12 +6,12 @@ import com.fasterxml.jackson.annotation.JsonProperty
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class Poll(
-    @JsonProperty("options") val opts: List<Option>
+    @JsonProperty("options") val opts: List<Option>,
 ) : com.joecollins.models.general.social.generic.Poll {
 
     data class Option(
         val title: String,
-        @JsonProperty("votes_count") val votesCount: Int
+        @JsonProperty("votes_count") val votesCount: Int,
     )
 
     @JsonIgnore

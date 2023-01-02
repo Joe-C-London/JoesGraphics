@@ -82,7 +82,7 @@ class CountdownScreen private constructor(panel: JPanel, title: Flow.Publisher<S
                         }
                     },
                     borderColorPublisher = colors[it].asOneTimePublisher(),
-                    countdownColorPublisher = colors[it].asOneTimePublisher()
+                    countdownColorPublisher = colors[it].asOneTimePublisher(),
                 )
                 frame.clock = clock
                 top.add(frame)
@@ -91,7 +91,7 @@ class CountdownScreen private constructor(panel: JPanel, title: Flow.Publisher<S
             val map = MapFrame(
                 shapesPublisher = (colors.indices).flatMap { idx -> timings[idx].third.map { s -> s to colors[idx] } }.asOneTimePublisher(),
                 headerPublisher = null.asOneTimePublisher(),
-                borderColorPublisher = Color.WHITE.asOneTimePublisher()
+                borderColorPublisher = Color.WHITE.asOneTimePublisher(),
             )
             outer.add(map, BorderLayout.CENTER)
 

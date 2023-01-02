@@ -20,7 +20,7 @@ class MultiSummaryFrameBuilder private constructor() {
     fun build(): MultiSummaryFrame {
         return MultiSummaryFrame(
             headerPublisher = headerPublisher ?: (null as String?).asOneTimePublisher(),
-            rowsPublisher = rowsPublisher ?: emptyList<MultiSummaryFrame.Row>().asOneTimePublisher()
+            rowsPublisher = rowsPublisher ?: emptyList<MultiSummaryFrame.Row>().asOneTimePublisher(),
         )
     }
 
@@ -31,7 +31,7 @@ class MultiSummaryFrameBuilder private constructor() {
             sortFunc: (T) -> Flow.Publisher<out Number>,
             rowHeaderFunc: (T) -> Flow.Publisher<out String>,
             rowLabelsFunc: (T) -> Flow.Publisher<out List<Pair<Color, String>>>,
-            limit: Int
+            limit: Int,
         ): MultiSummaryFrameBuilder {
             class Row(val display: Boolean, val sort: Number, val row: MultiSummaryFrame.Row)
 

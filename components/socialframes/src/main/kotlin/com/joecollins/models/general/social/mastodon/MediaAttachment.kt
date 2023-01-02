@@ -7,7 +7,7 @@ import java.net.URL
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class MediaAttachment(
     val type: String,
-    val url: URL
+    val url: URL,
 ) : Media {
     override val mediaURL: URL = url
     override val displayURL: String? = null

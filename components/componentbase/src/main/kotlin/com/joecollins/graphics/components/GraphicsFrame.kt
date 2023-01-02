@@ -30,18 +30,18 @@ open class GraphicsFrame(
     borderColorPublisher: Flow.Publisher<out Color>? = null,
     headerAlignmentPublisher: Flow.Publisher<out Alignment>? = null,
     headerTextColorPublisher: Flow.Publisher<out Color>? = null,
-    headerLabelsPublisher: Flow.Publisher<out Map<HeaderLabelLocation, String?>>? = null
+    headerLabelsPublisher: Flow.Publisher<out Map<HeaderLabelLocation, String?>>? = null,
 ) : JPanel() {
 
     enum class Alignment(val jlabelAlignment: Int) {
         LEFT(JLabel.LEFT),
         CENTER(JLabel.CENTER),
-        RIGHT(JLabel.RIGHT)
+        RIGHT(JLabel.RIGHT),
     }
 
     enum class HeaderLabelLocation {
         LEFT,
-        RIGHT
+        RIGHT,
     }
 
     private val headerFont = StandardFont.readNormalFont(24)
@@ -100,8 +100,8 @@ open class GraphicsFrame(
                     headerPanel.invalidate()
                     headerPanel.revalidate()
                     repaint()
-                }
-            )
+                },
+            ),
         )
 
         (headerAlignmentPublisher ?: Alignment.CENTER.asOneTimePublisher()).subscribe(
@@ -111,8 +111,8 @@ open class GraphicsFrame(
                     headerPanel.invalidate()
                     headerPanel.revalidate()
                     repaint()
-                }
-            )
+                },
+            ),
         )
 
         (notesPublisher ?: null.asOneTimePublisher()).subscribe(
@@ -120,8 +120,8 @@ open class GraphicsFrame(
                 eventQueueWrapper {
                     notesLabel.isVisible = (it != null)
                     notesLabel.text = (it ?: "") + " "
-                }
-            )
+                },
+            ),
         )
 
         val borderColor = borderColorPublisher ?: Color.BLACK.asOneTimePublisher()
@@ -133,8 +133,8 @@ open class GraphicsFrame(
                     notesLabel.foreground = it
                     additionalHeaderPanels.values.forEach { label -> label.border = additionalHeaderBorder(it) }
                     additionalHeaderLabels.values.forEach { label -> label.foreground = it }
-                }
-            )
+                },
+            ),
         )
 
         val headerTextColor = headerTextColorPublisher
@@ -146,8 +146,8 @@ open class GraphicsFrame(
                     eventQueueWrapper {
                         headerLabel.foreground = it
                         additionalHeaderPanels.values.forEach { label -> label.background = it }
-                    }
-                )
+                    },
+                ),
             )
 
         headerLabelsPublisher?.subscribe(
@@ -161,8 +161,8 @@ open class GraphicsFrame(
                         headerPanel.revalidate()
                         repaint()
                     }
-                }
-            )
+                },
+            ),
         )
     }
 

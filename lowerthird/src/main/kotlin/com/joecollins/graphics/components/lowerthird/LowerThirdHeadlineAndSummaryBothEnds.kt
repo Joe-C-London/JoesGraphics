@@ -22,7 +22,7 @@ class LowerThirdHeadlineAndSummaryBothEnds internal constructor(
     summaryRightPublisher: Flow.Publisher<out SummaryFromBothEnds.Entry?>,
     summaryMiddlePublisher: Flow.Publisher<out SummaryFromBothEnds.Entry?> = (null as SummaryFromBothEnds.Entry?).asOneTimePublisher(),
     clock: Clock,
-    showTimeZone: Boolean = false
+    showTimeZone: Boolean = false,
 ) : LowerThird(leftImagePublisher, placePublisher, clock, showTimeZone) {
 
     constructor(
@@ -35,7 +35,7 @@ class LowerThirdHeadlineAndSummaryBothEnds internal constructor(
         summaryLeftPublisher: Flow.Publisher<out SummaryFromBothEnds.Entry?>,
         summaryRightPublisher: Flow.Publisher<out SummaryFromBothEnds.Entry?>,
         summaryMiddlePublisher: Flow.Publisher<out SummaryFromBothEnds.Entry?> = (null as SummaryFromBothEnds.Entry?).asOneTimePublisher(),
-        showTimeZone: Boolean = false
+        showTimeZone: Boolean = false,
     ) : this(
         leftImagePublisher,
         placePublisher,
@@ -47,7 +47,7 @@ class LowerThirdHeadlineAndSummaryBothEnds internal constructor(
         summaryRightPublisher,
         summaryMiddlePublisher,
         Clock.systemDefaultZone(),
-        showTimeZone
+        showTimeZone,
     )
 
     private val headlinePanel = HeadlinePanel()

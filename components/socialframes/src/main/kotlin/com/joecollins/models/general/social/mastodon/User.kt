@@ -11,7 +11,7 @@ data class User(
     private val acct: String,
     @JsonProperty("display_name") private val displayName: String,
     private val url: URL,
-    private val avatar: URL
+    private val avatar: URL,
 ) : User {
 
     override val screenName: String = if (username.isEmpty()) "" else "@$username@${url.host}"

@@ -22,7 +22,7 @@ class SwingometerScreen private constructor(title: Flow.Publisher<out String?>, 
         resultsPublisher: Flow.Publisher<out Map<T, PartyResult?>>,
         partiesPublisher: Flow.Publisher<out Pair<PartyOrCoalition, PartyOrCoalition>>,
         partySwingsPublisher: Flow.Publisher<out Map<out PartyOrCoalition, Double>>,
-        headerPublisher: Flow.Publisher<out String?>
+        headerPublisher: Flow.Publisher<out String?>,
     ) {
         private inner class Inputs {
             var prevVotes: Map<T, Map<out PartyOrCoalition, Int>> = emptyMap()
@@ -131,7 +131,7 @@ class SwingometerScreen private constructor(title: Flow.Publisher<out String?>, 
                     prevVotes,
                     parties.first,
                     parties.second,
-                    carryovers
+                    carryovers,
                 )
 
             val rightToWinPublisher = Publisher<Double>()
@@ -140,7 +140,7 @@ class SwingometerScreen private constructor(title: Flow.Publisher<out String?>, 
                     prevVotes,
                     parties.second,
                     parties.first,
-                    carryovers
+                    carryovers,
                 )
 
             private fun updateLeftAndRightToWin() {
@@ -158,13 +158,13 @@ class SwingometerScreen private constructor(title: Flow.Publisher<out String?>, 
                     prevVotes,
                     parties.first,
                     parties.second,
-                    carryovers
+                    carryovers,
                 )
                 val rightSwingList = createSwingList(
                     prevVotes,
                     parties.second,
                     parties.first,
-                    carryovers
+                    carryovers,
                 )
                 val leftSeats = getNumSeats(leftSwingList)
                 val rightSeats = getNumSeats(rightSwingList)
@@ -181,8 +181,8 @@ class SwingometerScreen private constructor(title: Flow.Publisher<out String?>, 
                         prevVotes,
                         seatLabelIncrement,
                         parties,
-                        carryovers
-                    ).asSequence()
+                        carryovers,
+                    ).asSequence(),
                 ).flatten()
                     .let { filterNearbyLabels(it) }
                     .toList()
@@ -199,7 +199,7 @@ class SwingometerScreen private constructor(title: Flow.Publisher<out String?>, 
                         Triple(
                             e,
                             results[e.key],
-                            seatFilter?.contains(e.key) ?: true
+                            seatFilter?.contains(e.key) ?: true,
                         )
                     }
                     .filter { e ->
@@ -216,7 +216,7 @@ class SwingometerScreen private constructor(title: Flow.Publisher<out String?>, 
                             0.5 * (left - right) / total,
                             e.second.color,
                             e.third,
-                            weights?.let { f -> f(e.first.key).toString() }
+                            weights?.let { f -> f(e.first.key).toString() },
                         )
                     }
                     .toList()
@@ -292,7 +292,7 @@ class SwingometerScreen private constructor(title: Flow.Publisher<out String?>, 
             prevVotes: Map<T, Map<out PartyOrCoalition, Int>>,
             seatLabelIncrement: Int,
             parties: Pair<PartyOrCoalition, PartyOrCoalition>,
-            carryovers: Map<out PartyOrCoalition, Int>
+            carryovers: Map<out PartyOrCoalition, Int>,
         ): ArrayList<Triple<Double, Color, String>> {
             val ret = ArrayList<Triple<Double, Color, String>>()
             var i = 0
@@ -303,12 +303,12 @@ class SwingometerScreen private constructor(title: Flow.Publisher<out String?>, 
                 }
                 if (i <= leftSwingList.size) {
                     ret.add(
-                        Triple(-leftSwingList[i - 1], parties.first.color, i.toString())
+                        Triple(-leftSwingList[i - 1], parties.first.color, i.toString()),
                     )
                 }
                 if (i <= rightSwingList.size) {
                     ret.add(
-                        Triple(rightSwingList[i - 1], parties.second.color, i.toString())
+                        Triple(rightSwingList[i - 1], parties.second.color, i.toString()),
                     )
                 }
                 i += seatLabelIncrement
@@ -333,7 +333,7 @@ class SwingometerScreen private constructor(title: Flow.Publisher<out String?>, 
             leftSwingList: List<Double>,
             rightSwingList: List<Double>,
             leftSeats: Int,
-            rightSeats: Int
+            rightSeats: Int,
         ): Triple<Double, Color, String> {
             val newLeadSeats = ceil(0.5 * (leftSeats + rightSeats)).toInt()
             val swing: Double
@@ -361,7 +361,7 @@ class SwingometerScreen private constructor(title: Flow.Publisher<out String?>, 
             parties: Pair<PartyOrCoalition, PartyOrCoalition>,
             leftSwingList: List<Double>,
             rightSwingList: List<Double>,
-            majority: Int
+            majority: Int,
         ): ArrayList<Triple<Double, Color, String>> {
             val ret = ArrayList<Triple<Double, Color, String>>()
             val leftMajority = -1 *
@@ -374,12 +374,12 @@ class SwingometerScreen private constructor(title: Flow.Publisher<out String?>, 
             val rightMajority = rightSwingList.drop((majority - 1)).firstOrNull() ?: Double.POSITIVE_INFINITY
             if (leftMajority != rightMajority || leftMajority < 0) {
                 ret.add(
-                    Triple(leftMajority, parties.first.color, majority.toString())
+                    Triple(leftMajority, parties.first.color, majority.toString()),
                 )
             }
             if (leftMajority != rightMajority || rightMajority > 0) {
                 ret.add(
-                    Triple(rightMajority, parties.second.color, majority.toString())
+                    Triple(rightMajority, parties.second.color, majority.toString()),
                 )
             }
             if (rightMajority > 0) {
@@ -391,7 +391,7 @@ class SwingometerScreen private constructor(title: Flow.Publisher<out String?>, 
         private fun zeroLabel(
             parties: Pair<PartyOrCoalition, PartyOrCoalition>,
             leftSeats: Int,
-            rightSeats: Int
+            rightSeats: Int,
         ) = when {
             leftSeats > rightSeats -> Triple(0.0, parties.first.color, leftSeats.toString())
             rightSeats > leftSeats -> Triple(0.0, parties.second.color, rightSeats.toString())
@@ -406,7 +406,7 @@ class SwingometerScreen private constructor(title: Flow.Publisher<out String?>, 
             votes: Map<T, Map<out PartyOrCoalition, Int>>,
             focusParty: PartyOrCoalition?,
             compParty: PartyOrCoalition?,
-            carryovers: Map<Party, Int>
+            carryovers: Map<Party, Int>,
         ): Double {
             val majority = (votes.keys.sumOf { inputs.weights?.let { f -> f(it) } ?: 1 } + carryovers.values.sum()) / 2 + 1
             return createSwingList(votes, focusParty, compParty, carryovers)
@@ -419,7 +419,7 @@ class SwingometerScreen private constructor(title: Flow.Publisher<out String?>, 
             results: Map<T, Map<out PartyOrCoalition, Int>>,
             focusParty: PartyOrCoalition?,
             compParty: PartyOrCoalition?,
-            carryovers: Map<Party, Int>
+            carryovers: Map<Party, Int>,
         ): List<Double> {
             val contestedSeats = results.asSequence()
                 .filter { m ->
@@ -467,7 +467,7 @@ class SwingometerScreen private constructor(title: Flow.Publisher<out String?>, 
             results: Flow.Publisher<out Map<T, PartyResult?>>,
             swing: Flow.Publisher<out Map<out PartyOrCoalition, Double>>,
             parties: Flow.Publisher<out Pair<PartyOrCoalition, PartyOrCoalition>>,
-            header: Flow.Publisher<out String?>
+            header: Flow.Publisher<out String?>,
         ): Builder<T> {
             return Builder(prevVotes, results, parties, swing, header)
         }
@@ -478,7 +478,7 @@ class SwingometerScreen private constructor(title: Flow.Publisher<out String?>, 
             currTotal: Flow.Publisher<out Map<out PartyOrCoalition, Int>>,
             prevTotal: Flow.Publisher<out Map<out PartyOrCoalition, Int>>,
             parties: Flow.Publisher<out Pair<PartyOrCoalition, PartyOrCoalition>>,
-            header: Flow.Publisher<out String?>
+            header: Flow.Publisher<out String?>,
         ): Builder<T> {
             val swing = currTotal.merge(prevTotal) { curr, prev ->
                 val ct = curr.values.sum().toDouble()

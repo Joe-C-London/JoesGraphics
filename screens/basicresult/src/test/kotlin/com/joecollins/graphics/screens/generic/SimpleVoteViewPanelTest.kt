@@ -34,16 +34,16 @@ class SimpleVoteViewPanelTest {
                 ndp to 124,
                 pc to 1373,
                 lib to 785,
-                grn to 674
-            )
+                grn to 674,
+            ),
         )
         val previousVotes = Publisher(
             mapOf(
                 ndp.party to 585,
                 pc.party to 785,
                 lib.party to 1060,
-                grn.party to 106
-            )
+                grn.party to 106,
+            ),
         )
         val header = Publisher("MONTAGUE-KILMUIR")
         val voteHeader = Publisher("9 OF 9 POLLS REPORTING")
@@ -59,7 +59,7 @@ class SimpleVoteViewPanelTest {
         val panel = candidateVotes(
             currentVotes,
             voteHeader,
-            voteSubhead
+            voteSubhead,
         )
             .withPrev(previousVotes, changeHeader)
             .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader)
@@ -79,7 +79,7 @@ class SimpleVoteViewPanelTest {
                 BILLY CANN (NDP): 124 (4.2%, -18.9%)
                 
                 SWING SINCE 2015: 15.4% SWING LIB TO PC
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -91,7 +91,7 @@ class SimpleVoteViewPanelTest {
         val grn = Candidate("Jency Mercier", Party("Green", "GRN", Color.GREEN.darker()))
         val bq = Candidate(
             "Isabel Dion",
-            Party("Bloc Qu\u00e9b\u00e9cois", "BQ", Color.CYAN.darker())
+            Party("Bloc Qu\u00e9b\u00e9cois", "BQ", Color.CYAN.darker()),
         )
         val ppc = Candidate("Daniel Turgeon", Party("People's Party", "PPC", Color.MAGENTA.darker()))
         val ml = Candidate("Eileen Studd", Party("Marxist-Leninist", "M-L", Color.RED))
@@ -107,8 +107,8 @@ class SimpleVoteViewPanelTest {
                 ppc to 490,
                 ml to 39,
                 rhino to 265,
-                ind to 274
-            )
+                ind to 274,
+            ),
         )
         val previousVotes = Publisher(
             mapOf(
@@ -116,8 +116,8 @@ class SimpleVoteViewPanelTest {
                 con.party to 3713,
                 lib.party to 23603,
                 grn.party to 1717,
-                bq.party to 9164
-            )
+                bq.party to 9164,
+            ),
         )
         val header = Publisher("LASALLE\u2014\u00c9MARD\u2014VERDUN")
         val voteHeader = Publisher("100% OF POLLS REPORTING")
@@ -129,7 +129,7 @@ class SimpleVoteViewPanelTest {
             currentVotes,
             voteHeader,
             voteSubhead,
-            "(MP)"
+            "(MP)",
         )
             .withPrev(previousVotes, changeHeader)
             .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader)
@@ -153,7 +153,7 @@ class SimpleVoteViewPanelTest {
                 EILEEN STUDD (M-L): 39 (0.1%, +0.1%)
                 
                 SWING SINCE 2015: 3.7% SWING LIB TO BQ
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -168,16 +168,16 @@ class SimpleVoteViewPanelTest {
                 ndp to 124,
                 pc to 1373,
                 lib to 785,
-                grn to 674
-            )
+                grn to 674,
+            ),
         )
         val previousVotes = Publisher(
             mapOf(
                 ndp.party to 585,
                 pc.party to 785,
                 lib.party to 1060,
-                grn.party to 106
-            )
+                grn.party to 106,
+            ),
         )
         val header = Publisher("MONTAGUE-KILMUIR")
         val voteHeader = Publisher("9 OF 9 POLLS REPORTING")
@@ -193,7 +193,7 @@ class SimpleVoteViewPanelTest {
         val panel = candidateVotesPctOnly(
             currentVotes,
             voteHeader,
-            voteSubhead
+            voteSubhead,
         )
             .withPrev(previousVotes, changeHeader)
             .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader)
@@ -214,7 +214,7 @@ class SimpleVoteViewPanelTest {
                 BILLY CANN (NDP): 4.2% (-18.9%)
                 
                 SWING SINCE 2015: 15.4% SWING LIB TO PC
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -230,8 +230,8 @@ class SimpleVoteViewPanelTest {
                 ndp.party to 585,
                 pc.party to 785,
                 lib.party to 1060,
-                grn.party to 106
-            )
+                grn.party to 106,
+            ),
         )
         val pctReporting = Publisher(0.0)
         val header = Publisher("MONTAGUE-KILMUIR")
@@ -249,7 +249,7 @@ class SimpleVoteViewPanelTest {
         val panel = candidateVotes(
             currentVotes,
             voteHeader,
-            voteSubhead
+            voteSubhead,
         )
             .withPrev(previousVotes, changeHeader)
             .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader)
@@ -271,7 +271,7 @@ class SimpleVoteViewPanelTest {
                 JOHN ALLEN MACLEAN (GRN): WAITING...
                 
                 SWING SINCE 2015: NOT AVAILABLE
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         currentVotes.submit(
@@ -279,8 +279,8 @@ class SimpleVoteViewPanelTest {
                 ndp to 5,
                 pc to 47,
                 lib to 58,
-                grn to 52
-            )
+                grn to 52,
+            ),
         )
         voteHeader.submit("1 OF 9 POLLS REPORTING")
         voteSubhead.submit("PROJECTION: TOO EARLY TO CALL")
@@ -299,7 +299,7 @@ class SimpleVoteViewPanelTest {
                 BILLY CANN (NDP): 5 (3.1%, -20.0%)
                 
                 SWING SINCE 2015: 17.0% SWING LIB TO GRN
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         currentVotes.submit(
@@ -307,8 +307,8 @@ class SimpleVoteViewPanelTest {
                 ndp to 8,
                 pc to 91,
                 lib to 100,
-                grn to 106
-            )
+                grn to 106,
+            ),
         )
         voteHeader.submit("2 OF 9 POLLS REPORTING")
         voteSubhead.submit("PROJECTION: TOO EARLY TO CALL")
@@ -327,7 +327,7 @@ class SimpleVoteViewPanelTest {
                 BILLY CANN (NDP): 8 (2.6%, -20.4%)
                 
                 SWING SINCE 2015: 19.8% SWING LIB TO GRN
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         currentVotes.submit(
@@ -335,8 +335,8 @@ class SimpleVoteViewPanelTest {
                 ndp to 18,
                 pc to 287,
                 lib to 197,
-                grn to 243
-            )
+                grn to 243,
+            ),
         )
         voteHeader.submit("5 OF 9 POLLS REPORTING")
         voteSubhead.submit("PROJECTION: TOO EARLY TO CALL")
@@ -355,7 +355,7 @@ class SimpleVoteViewPanelTest {
                 BILLY CANN (NDP): 18 (2.4%, -20.7%)
                 
                 SWING SINCE 2015: 11.5% SWING LIB TO PC
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         currentVotes.submit(
@@ -363,8 +363,8 @@ class SimpleVoteViewPanelTest {
                 ndp to 124,
                 pc to 1373,
                 lib to 785,
-                grn to 675
-            )
+                grn to 675,
+            ),
         )
         voteHeader.submit("9 OF 9 POLLS REPORTING")
         voteSubhead.submit("PROJECTION: PC GAIN FROM LIB")
@@ -384,7 +384,7 @@ class SimpleVoteViewPanelTest {
                 BILLY CANN (NDP): 124 (4.2%, -18.9%)
                 
                 SWING SINCE 2015: 15.4% SWING LIB TO PC
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         winner.submit(null)
@@ -401,7 +401,7 @@ class SimpleVoteViewPanelTest {
                 BILLY CANN (NDP): 124 (4.2%, -18.9%)
                 
                 SWING SINCE 2015: 15.4% SWING LIB TO PC
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -416,16 +416,16 @@ class SimpleVoteViewPanelTest {
                 ndp to 6,
                 pc to 8,
                 lib to 11,
-                grn to 0
-            )
+                grn to 0,
+            ),
         )
         val previousVotes = Publisher(
             mapOf(
                 ndp.party to 585,
                 pc.party to 785,
                 lib.party to 1060,
-                grn.party to 106
-            )
+                grn.party to 106,
+            ),
         )
         val pctReporting = Publisher(1.0 / 9)
         val header = Publisher("MONTAGUE-KILMUIR")
@@ -443,7 +443,7 @@ class SimpleVoteViewPanelTest {
         val panel = candidateVotes(
             currentVotes,
             voteHeader,
-            voteSubhead
+            voteSubhead,
         )
             .withPrev(previousVotes, changeHeader)
             .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader)
@@ -465,7 +465,7 @@ class SimpleVoteViewPanelTest {
                 JOHN ALLEN MACLEAN (GRN): 0 (0.0%, -4.2%)
                 
                 SWING SINCE 2015: 0.6% SWING PC TO LIB
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -491,7 +491,7 @@ class SimpleVoteViewPanelTest {
         val panel = partyVotes(
             currentVotes,
             voteHeader,
-            voteSubhead
+            voteSubhead,
         )
             .withPrev(previousVotes, changeHeader)
             .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader)
@@ -508,7 +508,7 @@ class SimpleVoteViewPanelTest {
                 0 OF 27 DISTRICTS DECLARED, WAITING FOR RESULTS... (CHANGE SINCE 2015)
                 
                 SWING SINCE 2015: NOT AVAILABLE
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         val winners = mutableMapOf<Int, Party?>()
@@ -517,16 +517,16 @@ class SimpleVoteViewPanelTest {
                 ndp to 124,
                 pc to 1373,
                 lib to 785,
-                grn to 675
-            )
+                grn to 675,
+            ),
         )
         previousVotes.submit(
             mapOf(
                 ndp to 585,
                 pc to 785,
                 lib to 1060,
-                grn to 106
-            )
+                grn to 106,
+            ),
         )
         voteHeader.submit("1 OF 27 DISTRICTS DECLARED")
         voteSubhead.submit("PROJECTION: TOO EARLY TO CALL")
@@ -546,7 +546,7 @@ class SimpleVoteViewPanelTest {
                 NEW DEMOCRATIC PARTY: 4.2% (-18.9%)
                 
                 SWING SINCE 2015: 15.4% SWING LIB TO PC
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         focus.submit(shapesByDistrict.keys.filter { it <= 7 })
@@ -567,7 +567,7 @@ class SimpleVoteViewPanelTest {
                 NEW DEMOCRATIC PARTY: 4.2% (-18.9%)
                 
                 SWING SINCE 2015: 15.4% SWING LIB TO PC
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -579,15 +579,15 @@ class SimpleVoteViewPanelTest {
             mapOf(
                 dem to 60572245,
                 gop to 50861970,
-                Party.OTHERS to 1978774
-            )
+                Party.OTHERS to 1978774,
+            ),
         )
         val previousVotes = Publisher(
             mapOf(
                 dem to 61776554,
                 gop to 63173815,
-                Party.OTHERS to 3676641
-            )
+                Party.OTHERS to 3676641,
+            ),
         )
         val pctReporting = Publisher(1.0)
         val header = Publisher("UNITED STATES")
@@ -600,7 +600,7 @@ class SimpleVoteViewPanelTest {
         val panel = partyVotes(
             currentVotes,
             voteHeader,
-            voteSubhead
+            voteSubhead,
         )
             .withPrev(previousVotes, changeHeader)
             .withWinner(winner)
@@ -620,7 +620,7 @@ class SimpleVoteViewPanelTest {
                 OTHERS: 1.7% (-1.1%)
                 
                 SWING SINCE 2016: 4.8% SWING GOP TO DEM
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -640,14 +640,14 @@ class SimpleVoteViewPanelTest {
                 Candidate("Marty Perez", gop) to 276,
                 Candidate("Christopher Suprun", ind) to 51,
                 Candidate("Daniel Tinus", lbt) to 144,
-                Candidate("Mike Westergren", dem) to 858
-            )
+                Candidate("Mike Westergren", dem) to 858,
+            ),
         )
         val previousVotes = Publisher(
             mapOf(
                 dem to 88329,
-                gop to 142251
-            )
+                gop to 142251,
+            ),
         )
         val header = Publisher("TEXAS DISTRICT 27")
         val voteHeader = Publisher("OFFICIAL RESULT")
@@ -659,7 +659,7 @@ class SimpleVoteViewPanelTest {
         val panel = candidateVotes(
             currentVotes,
             voteHeader,
-            voteSubhead
+            voteSubhead,
         )
             .withPrev(previousVotes, changeHeader)
             .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader)
@@ -685,7 +685,7 @@ class SimpleVoteViewPanelTest {
                 ^ AGGREGATED ACROSS CANDIDATES IN PARTY
                 
                 SWING SINCE 2016: 1.4% SWING GOP TO DEM
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -696,8 +696,8 @@ class SimpleVoteViewPanelTest {
         val currentVotes = Publisher(
             mapOf(
                 Candidate("Emmanuel Macron", lrem) to 20743128,
-                Candidate("Marine Le Pen", fn) to 10638475
-            )
+                Candidate("Marine Le Pen", fn) to 10638475,
+            ),
         )
         val header = Publisher("FRANCE PRESIDENT: ROUND 2")
         val voteHeader = Publisher("OFFICIAL RESULT")
@@ -708,7 +708,7 @@ class SimpleVoteViewPanelTest {
         val panel = candidateVotes(
             currentVotes,
             voteHeader,
-            voteSubhead
+            voteSubhead,
         )
             .withWinner(winner)
             .withMajorityLine(showMajority, "50% TO WIN")
@@ -725,7 +725,7 @@ class SimpleVoteViewPanelTest {
                 EMMANUEL MACRON (LREM): 20,743,128 (66.1%) WINNER
                 MARINE LE PEN (FN): 10,638,475 (33.9%)
                 50% TO WIN
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         voteHeader.submit("15.4% REPORTING")
@@ -735,8 +735,8 @@ class SimpleVoteViewPanelTest {
         currentVotes.submit(
             mapOf(
                 Candidate("Emmanuel Macron", lrem) to 3825279,
-                Candidate("Marine Le Pen", fn) to 1033686
-            )
+                Candidate("Marine Le Pen", fn) to 1033686,
+            ),
         )
         compareRendering("SimpleVoteViewPanel", "MajorityLine-2", panel)
         assertPublishes(
@@ -748,15 +748,15 @@ class SimpleVoteViewPanelTest {
                 EMMANUEL MACRON (LREM): 3,825,279 (78.7%)
                 MARINE LE PEN (FN): 1,033,686 (21.3%)
                 50% TO WIN
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         pctReporting.submit(0.0)
         currentVotes.submit(
             mapOf(
                 Candidate("Emmanuel Macron", lrem) to 0,
-                Candidate("Marine Le Pen", fn) to 0
-            )
+                Candidate("Marine Le Pen", fn) to 0,
+            ),
         )
         voteHeader.submit("0.0% REPORTING")
         voteSubhead.submit("")
@@ -770,7 +770,7 @@ class SimpleVoteViewPanelTest {
                 EMMANUEL MACRON (LREM): WAITING...
                 MARINE LE PEN (FN): WAITING...
                 50% TO WIN
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -785,16 +785,16 @@ class SimpleVoteViewPanelTest {
                 ndp to 124,
                 pc to 1373,
                 lib to 785,
-                grn to 674
-            )
+                grn to 674,
+            ),
         )
         val previousVotes = Publisher(
             mapOf(
                 ndp.party to 585,
                 pc.party to 785,
                 lib.party to 1060,
-                grn.party to 106
-            )
+                grn.party to 106,
+            ),
         )
         val header = Publisher("MONTAGUE-KILMUIR")
         val voteHeader = Publisher("9 OF 9 POLLS REPORTING")
@@ -812,7 +812,7 @@ class SimpleVoteViewPanelTest {
         val panel = candidateVotes(
             currentVotes,
             voteHeader,
-            voteSubhead
+            voteSubhead,
         )
             .withPrev(previousVotes, changeHeader, changeSubhead)
             .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader)
@@ -822,7 +822,7 @@ class SimpleVoteViewPanelTest {
                 leader.map { elected(it) },
                 focus,
                 additionalHighlight,
-                mapHeader
+                mapHeader,
             )
             .build(header)
         panel.setSize(1024, 512)
@@ -839,7 +839,7 @@ class SimpleVoteViewPanelTest {
                 BILLY CANN (NDP): 124 (4.2%, -18.9%)
                 
                 SWING SINCE 2015: 15.4% SWING LIB TO PC
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -851,8 +851,8 @@ class SimpleVoteViewPanelTest {
         val previousVotes = Publisher(
             mapOf(
                 dem.party to 265823,
-                gop to 113055
-            )
+                gop to 113055,
+            ),
         )
         val header = Publisher("MASSACHUSETTS DISTRICT 4")
         val voteHeader = Publisher("0.0% OF POLLS REPORTING")
@@ -863,7 +863,7 @@ class SimpleVoteViewPanelTest {
         val panel = candidateVotes(
             currentVotes,
             voteHeader,
-            voteSubhead
+            voteSubhead,
         )
             .withPrev(previousVotes, changeHeader)
             .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader)
@@ -879,7 +879,7 @@ class SimpleVoteViewPanelTest {
                 JOE KENNEDY III (DEM): UNCONTESTED
                 
                 SWING SINCE 2016: NOT AVAILABLE
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -891,8 +891,8 @@ class SimpleVoteViewPanelTest {
                 Candidate("Vincent Lo", Party("Labour", "LAB", Color.RED)) to 18682,
                 Candidate("Rosina Robson", Party("Liberal Democrats", "LD", Color.ORANGE)) to 1835,
                 Candidate("Lizzy Kemp", Party("UK Independence Party", "UKIP", Color.MAGENTA.darker())) to 1577,
-                Candidate("Mark Keir", Party("Green", "GRN", Color.GREEN.darker())) to 884
-            )
+                Candidate("Mark Keir", Party("Green", "GRN", Color.GREEN.darker())) to 884,
+            ),
         )
         val header = Publisher("UXBRIDGE AND SOUTH RUISLIP")
         val voteHeader = Publisher("2017 RESULT")
@@ -914,7 +914,7 @@ class SimpleVoteViewPanelTest {
                 ROSINA ROBSON (LD): 1,835 (3.9%)
                 LIZZY KEMP (UKIP): 1,577 (3.4%)
                 MARK KEIR (GRN): 884 (1.9%)
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         currentVotes.submit(
@@ -930,8 +930,8 @@ class SimpleVoteViewPanelTest {
                 Candidate("Bobby Smith", Party("Independent", "IND", Color.GRAY)) to 8,
                 Candidate("William Tobin", Party("Independent", "IND", Color.GRAY)) to 5,
                 Candidate("Alfie Utting", Party("Independent", "IND", Color.GRAY)) to 44,
-                Candidate("Yace \"Interplanetary Time Lord\" Yogenstein", Party("Independent", "IND", Color.GRAY)) to 23
-            )
+                Candidate("Yace \"Interplanetary Time Lord\" Yogenstein", Party("Independent", "IND", Color.GRAY)) to 23,
+            ),
         )
         voteHeader.submit("2019 RESULT")
         compareRendering("SimpleVoteViewPanel", "LotsOfCandidates-2", panel)
@@ -953,7 +953,7 @@ class SimpleVoteViewPanelTest {
                 NORMA BURKE (IND): 22 (0.0%)
                 BOBBY SMITH (IND): 8 (0.0%)
                 WILLIAM TOBIN (IND): 5 (0.0%)
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         currentVotes.submit(
@@ -962,8 +962,8 @@ class SimpleVoteViewPanelTest {
                 Candidate("Vincent Lo", Party("Labour", "LAB", Color.RED)) to 18682,
                 Candidate("Rosina Robson", Party("Liberal Democrats", "LD", Color.ORANGE)) to 1835,
                 Candidate("Lizzy Kemp", Party("UK Independence Party", "UKIP", Color.MAGENTA.darker())) to 1577,
-                Candidate("Mark Keir", Party("Green", "GRN", Color.GREEN.darker())) to 884
-            )
+                Candidate("Mark Keir", Party("Green", "GRN", Color.GREEN.darker())) to 884,
+            ),
         )
         voteHeader.submit("2017 RESULT")
         compareRendering("SimpleVoteViewPanel", "LotsOfCandidates-1", panel)
@@ -978,7 +978,7 @@ class SimpleVoteViewPanelTest {
                 ROSINA ROBSON (LD): 1,835 (3.9%)
                 LIZZY KEMP (UKIP): 1,577 (3.4%)
                 MARK KEIR (GRN): 884 (1.9%)
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -994,8 +994,8 @@ class SimpleVoteViewPanelTest {
                 ndp.party to 585,
                 pc.party to 785,
                 lib.party to 1060,
-                grn.party to 106
-            )
+                grn.party to 106,
+            ),
         )
         val pctReporting = Publisher(0.0)
         val header = Publisher("MONTAGUE-KILMUIR")
@@ -1013,7 +1013,7 @@ class SimpleVoteViewPanelTest {
         val panel = candidateVotes(
             currentVotes,
             voteHeader,
-            voteSubhead
+            voteSubhead,
         )
             .withPrev(previousVotes, changeHeader)
             .withLimit(3)
@@ -1035,7 +1035,7 @@ class SimpleVoteViewPanelTest {
                 OTHERS: WAITING...
                 
                 SWING SINCE 2015: NOT AVAILABLE
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         winner.submit(lib)
@@ -1051,7 +1051,7 @@ class SimpleVoteViewPanelTest {
                 OTHERS: WAITING...
                 
                 SWING SINCE 2015: NOT AVAILABLE
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         currentVotes.submit(
@@ -1059,8 +1059,8 @@ class SimpleVoteViewPanelTest {
                 ndp to 124,
                 pc to 1373,
                 lib to 785,
-                grn to 675
-            )
+                grn to 675,
+            ),
         )
         voteHeader.submit("9 OF 9 POLLS REPORTING")
         voteSubhead.submit("PROJECTION: PC GAIN FROM LIB")
@@ -1079,7 +1079,7 @@ class SimpleVoteViewPanelTest {
                 OTHERS: 799 (27.0%, -0.2%)
                 
                 SWING SINCE 2015: 15.4% SWING LIB TO PC
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -1095,8 +1095,8 @@ class SimpleVoteViewPanelTest {
                 ndp.party to 585,
                 pc.party to 785,
                 lib.party to 1060,
-                grn.party to 106
-            )
+                grn.party to 106,
+            ),
         )
         val pctReporting = Publisher(0.0)
         val header = Publisher("MONTAGUE-KILMUIR")
@@ -1114,7 +1114,7 @@ class SimpleVoteViewPanelTest {
         val panel = candidateVotes(
             currentVotes,
             voteHeader,
-            voteSubhead
+            voteSubhead,
         )
             .withPrev(previousVotes, changeHeader)
             .withLimit(3, pc.party, lib.party)
@@ -1136,7 +1136,7 @@ class SimpleVoteViewPanelTest {
                 OTHERS: WAITING...
                 
                 SWING SINCE 2015: NOT AVAILABLE
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         winner.submit(lib)
@@ -1152,7 +1152,7 @@ class SimpleVoteViewPanelTest {
                 OTHERS: WAITING...
                 
                 SWING SINCE 2015: NOT AVAILABLE
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         currentVotes.submit(
@@ -1160,8 +1160,8 @@ class SimpleVoteViewPanelTest {
                 ndp to 124,
                 pc to 1373,
                 lib to 785,
-                grn to 675
-            )
+                grn to 675,
+            ),
         )
         voteHeader.submit("9 OF 9 POLLS REPORTING")
         voteSubhead.submit("PROJECTION: PC GAIN FROM LIB")
@@ -1180,7 +1180,7 @@ class SimpleVoteViewPanelTest {
                 OTHERS: 799 (27.0%, -0.2%)
                 
                 SWING SINCE 2015: 15.4% SWING LIB TO PC
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -1194,15 +1194,15 @@ class SimpleVoteViewPanelTest {
             mapOf(
                 pc to 714,
                 lib to 6834,
-                grn to 609
-            )
+                grn to 609,
+            ),
         )
         val previousVotes = Publisher(
             mapOf(
                 ndp to 578,
                 pc.party to 4048,
-                lib.party to 3949
-            )
+                lib.party to 3949,
+            ),
         )
         val header = Publisher("SHIPPAGAN-LAM\u00c8QUE-MISCOU")
         val voteHeader = Publisher("OFFICIAL RESULT")
@@ -1214,7 +1214,7 @@ class SimpleVoteViewPanelTest {
         val panel = candidateVotes(
             currentVotes,
             voteHeader,
-            voteSubhead
+            voteSubhead,
         )
             .withPrev(previousVotes, changeHeader)
             .withWinner(winner)
@@ -1234,7 +1234,7 @@ class SimpleVoteViewPanelTest {
                 OTHERS: - (-6.7%)
                 
                 SWING SINCE 2018: 38.1% SWING PC TO LIB
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -1248,8 +1248,8 @@ class SimpleVoteViewPanelTest {
             mapOf(
                 pc to 714,
                 lib to 6834,
-                grn to 609
-            )
+                grn to 609,
+            ),
         )
         val previousVotes = Publisher(
             mapOf(
@@ -1257,8 +1257,8 @@ class SimpleVoteViewPanelTest {
                 ndp to 289,
                 pc.party to 4048,
                 lib.party to 3949,
-                grn.party to 0
-            )
+                grn.party to 0,
+            ),
         )
         val header = Publisher("SHIPPAGAN-LAM\u00c8QUE-MISCOU")
         val voteHeader = Publisher("OFFICIAL RESULT")
@@ -1270,7 +1270,7 @@ class SimpleVoteViewPanelTest {
         val panel = candidateVotes(
             currentVotes,
             voteHeader,
-            voteSubhead
+            voteSubhead,
         )
             .withPrev(previousVotes, changeHeader)
             .withWinner(winner)
@@ -1290,7 +1290,7 @@ class SimpleVoteViewPanelTest {
                 OTHERS: - (-6.7%)
                 
                 SWING SINCE 2018: 38.1% SWING PC TO LIB
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -1304,15 +1304,15 @@ class SimpleVoteViewPanelTest {
             mapOf(
                 pc to 714,
                 lib to 6834,
-                oth to 609
-            )
+                oth to 609,
+            ),
         )
         val previousVotes = Publisher(
             mapOf(
                 ndp to 578,
                 pc.party to 4048,
-                lib.party to 3949
-            )
+                lib.party to 3949,
+            ),
         )
         val header = Publisher("SHIPPAGAN-LAM\u00c8QUE-MISCOU")
         val voteHeader = Publisher("OFFICIAL RESULT")
@@ -1324,7 +1324,7 @@ class SimpleVoteViewPanelTest {
         val panel = candidateVotes(
             currentVotes,
             voteHeader,
-            voteSubhead
+            voteSubhead,
         )
             .withPrev(previousVotes, changeHeader)
             .withWinner(winner)
@@ -1343,7 +1343,7 @@ class SimpleVoteViewPanelTest {
                 OTHERS: 609 (7.5%, +0.7%)
                 
                 SWING SINCE 2018: 38.1% SWING PC TO LIB
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -1357,16 +1357,16 @@ class SimpleVoteViewPanelTest {
             mapOf(
                 pc to 714,
                 lib to 6834,
-                oth to 609
-            )
+                oth to 609,
+            ),
         )
         val previousVotes = Publisher(
             mapOf(
                 Party.OTHERS to 289,
                 ndp to 289,
                 pc.party to 4048,
-                lib.party to 3949
-            )
+                lib.party to 3949,
+            ),
         )
         val header = Publisher("SHIPPAGAN-LAM\u00c8QUE-MISCOU")
         val voteHeader = Publisher("OFFICIAL RESULT")
@@ -1378,7 +1378,7 @@ class SimpleVoteViewPanelTest {
         val panel = candidateVotes(
             currentVotes,
             voteHeader,
-            voteSubhead
+            voteSubhead,
         )
             .withPrev(previousVotes, changeHeader)
             .withWinner(winner)
@@ -1397,7 +1397,7 @@ class SimpleVoteViewPanelTest {
                 OTHERS: 609 (7.5%, +0.7%)
                 
                 SWING SINCE 2018: 38.1% SWING PC TO LIB
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -1444,7 +1444,7 @@ class SimpleVoteViewPanelTest {
                 ANTONIO VITIELLO (ED): 194 (0.3%)
                 
                 SWING SINCE 2017: NOT AVAILABLE
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         previousVotes.submit(mapOf(con.party to 27748, lab.party to 9619, ld.party to 9508, ukip to 1432))
@@ -1466,7 +1466,7 @@ class SimpleVoteViewPanelTest {
                 OTHERS: - (-3.0%)
                 
                 SWING SINCE 2005: 2.8% SWING CON TO LD
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -1487,12 +1487,12 @@ class SimpleVoteViewPanelTest {
         val panel = candidateVotes(
             curr,
             "SECOND ROUND RESULT".asOneTimePublisher(),
-            "100.0% REPORTING".asOneTimePublisher()
+            "100.0% REPORTING".asOneTimePublisher(),
         )
             .withPrev(
                 prev,
                 "CHANGE SINCE 2018".asOneTimePublisher(),
-                null.asOneTimePublisher()
+                null.asOneTimePublisher(),
             )
             .withSwing(compareBy { swingPartyOrder.indexOf(it) }, "SWING SINCE 2018".asOneTimePublisher())
             .inRunoffMode("NOT APPLICABLE: DIFFERENT PARTIES IN RUNOFF".asOneTimePublisher())
@@ -1509,7 +1509,7 @@ class SimpleVoteViewPanelTest {
                 AUDE BONO-VANDROME (ENS): 14,208 (45.4%, -10.8%)
                 
                 SWING SINCE 2018: 10.8% SWING ENS TO RN
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         curr.submit(mapOf(Candidate("Xavier Breton", lr) to 24407, Candidate("Sebastien Gueraud", nupes) to 14202))
@@ -1526,7 +1526,7 @@ class SimpleVoteViewPanelTest {
                 SEBASTIEN GUERAUD (NUPES): 14,202 (36.8%)
                 
                 SWING SINCE 2018: NOT AVAILABLE
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -1542,7 +1542,7 @@ class SimpleVoteViewPanelTest {
         val poutou = Candidate("Philippe Poutou", Party("New Anticapitalist Party", "NPA", Color.RED.darker()))
         val asselineau = Candidate(
             "Fran\u00e7ois Asselineau",
-            Party("Popular Republican Union", "UPR", Color.CYAN.darker().darker())
+            Party("Popular Republican Union", "UPR", Color.CYAN.darker().darker()),
         )
         val arthaud = Candidate("Nathalie Arthaud", Party("Lutte Ouvri\u00e8re", "LO", Color.RED))
         val cheminade = Candidate("Jacques Cheminade", Party("Solidarity and Progress", "S&P", Color.GRAY))
@@ -1558,8 +1558,8 @@ class SimpleVoteViewPanelTest {
                 poutou to 394505,
                 asselineau to 332547,
                 arthaud to 232384,
-                cheminade to 65586
-            )
+                cheminade to 65586,
+            ),
         )
         val header = Publisher("ELECTION 2017: FRANCE DECIDES")
         val voteHeader = Publisher("FIRST ROUND RESULT")
@@ -1589,7 +1589,7 @@ class SimpleVoteViewPanelTest {
                 NATHALIE ARTHAUD (LO): 232,384 (0.6%)
                 JACQUES CHEMINADE (S&P): 65,586 (0.2%)
                 50% TO WIN
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         runoff.submit(setOf(macron, lePen))
@@ -1612,7 +1612,7 @@ class SimpleVoteViewPanelTest {
                 NATHALIE ARTHAUD (LO): 232,384 (0.6%)
                 JACQUES CHEMINADE (S&P): 65,586 (0.2%)
                 50% TO WIN
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -1628,7 +1628,7 @@ class SimpleVoteViewPanelTest {
         val poutou = Candidate("Philippe Poutou", Party("New Anticapitalist Party", "NPA", Color.RED.darker()))
         val asselineau = Candidate(
             "Fran\u00e7ois Asselineau",
-            Party("Popular Republican Union", "UPR", Color.CYAN.darker().darker())
+            Party("Popular Republican Union", "UPR", Color.CYAN.darker().darker()),
         )
         val arthaud = Candidate("Nathalie Arthaud", Party("Lutte Ouvri\u00e8re", "LO", Color.RED))
         val cheminade = Candidate("Jacques Cheminade", Party("Solidarity and Progress", "S&P", Color.GRAY))
@@ -1645,11 +1645,11 @@ class SimpleVoteViewPanelTest {
                     poutou to 394505,
                     asselineau to 332547,
                     arthaud to 232384,
-                    cheminade to 65586
+                    cheminade to 65586,
                 ),
                 6,
-                Candidate.OTHERS
-            )
+                Candidate.OTHERS,
+            ),
         )
         val header = Publisher("ELECTION 2017: FRANCE DECIDES")
         val voteHeader = Publisher("FIRST ROUND RESULT")
@@ -1674,7 +1674,7 @@ class SimpleVoteViewPanelTest {
                 BENOÎT HAMON (PS): 2,291,288 (6.4%)
                 OTHERS: 3,155,323 (8.8%)
                 50% TO WIN
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         runoff.submit(setOf(macron, lePen))
@@ -1692,7 +1692,7 @@ class SimpleVoteViewPanelTest {
                 BENOÎT HAMON (PS): 2,291,288 (6.4%)
                 OTHERS: 3,155,323 (8.8%)
                 50% TO WIN
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -1707,16 +1707,16 @@ class SimpleVoteViewPanelTest {
                 ndp to (0.030).rangeTo(0.046),
                 pc to (0.290).rangeTo(0.353),
                 lib to (0.257).rangeTo(0.292),
-                grn to (0.343).rangeTo(0.400)
-            )
+                grn to (0.343).rangeTo(0.400),
+            ),
         )
         val previousVotes = Publisher(
             mapOf(
                 ndp to 8997,
                 pc to 30663,
                 lib to 33481,
-                grn to 8857
-            )
+                grn to 8857,
+            ),
         )
         val header = Publisher("PRINCE EDWARD ISLAND")
         val voteHeader = Publisher("OPINION POLL RANGE")
@@ -1734,7 +1734,7 @@ class SimpleVoteViewPanelTest {
                 shapesByDistrict.asOneTimePublisher(),
                 winners.asOneTimePublisher(),
                 null.asOneTimePublisher(),
-                mapHeader
+                mapHeader,
             )
             .build(header)
         panel.setSize(1024, 512)
@@ -1751,7 +1751,7 @@ class SimpleVoteViewPanelTest {
                 NEW DEMOCRATIC PARTY: 3.0-4.6% ((-8.0)-(-6.4)%)
                 
                 SWING SINCE 2015: 19.8% SWING LIB TO GRN
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -1768,8 +1768,8 @@ class SimpleVoteViewPanelTest {
                 ndp.party to 585,
                 pc.party to 785,
                 lib.party to 1060,
-                grn.party to 106
-            )
+                grn.party to 106,
+            ),
         )
         val header = Publisher("MONTAGUE-KILMUIR")
         val voteHeader = Publisher("OFFICIAL RESULT")
@@ -1801,7 +1801,7 @@ class SimpleVoteViewPanelTest {
                 JOHN ALLEN MACLEAN (GRN): WAITING...
                 
                 SWING SINCE 2015: NOT AVAILABLE
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         currentVotes.submit(
@@ -1809,8 +1809,8 @@ class SimpleVoteViewPanelTest {
                 ndp to 124,
                 pc to null,
                 lib to null,
-                grn to null
-            )
+                grn to null,
+            ),
         )
         compareRendering("SimpleVoteViewPanel", "MidDeclaration-2", panel)
         assertPublishes(
@@ -1825,7 +1825,7 @@ class SimpleVoteViewPanelTest {
                 JOHN ALLEN MACLEAN (GRN): WAITING...
                 
                 SWING SINCE 2015: NOT AVAILABLE
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         currentVotes.submit(
@@ -1833,8 +1833,8 @@ class SimpleVoteViewPanelTest {
                 ndp to 124,
                 pc to 1373,
                 lib to null,
-                grn to null
-            )
+                grn to null,
+            ),
         )
         compareRendering("SimpleVoteViewPanel", "MidDeclaration-3", panel)
         assertPublishes(
@@ -1849,7 +1849,7 @@ class SimpleVoteViewPanelTest {
                 JOHN ALLEN MACLEAN (GRN): WAITING...
                 
                 SWING SINCE 2015: NOT AVAILABLE
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         currentVotes.submit(
@@ -1857,8 +1857,8 @@ class SimpleVoteViewPanelTest {
                 ndp to 124,
                 pc to 1373,
                 lib to 785,
-                grn to null
-            )
+                grn to null,
+            ),
         )
         compareRendering("SimpleVoteViewPanel", "MidDeclaration-4", panel)
         assertPublishes(
@@ -1873,7 +1873,7 @@ class SimpleVoteViewPanelTest {
                 JOHN ALLEN MACLEAN (GRN): WAITING...
                 
                 SWING SINCE 2015: NOT AVAILABLE
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         currentVotes.submit(
@@ -1881,8 +1881,8 @@ class SimpleVoteViewPanelTest {
                 ndp to 124,
                 pc to 1373,
                 lib to 785,
-                grn to 675
-            )
+                grn to 675,
+            ),
         )
         leader.submit(pc.party)
         compareRendering("SimpleVoteViewPanel", "MidDeclaration-5", panel)
@@ -1898,7 +1898,7 @@ class SimpleVoteViewPanelTest {
                 BILLY CANN (NDP): 124 (4.2%, -18.9%)
                 
                 SWING SINCE 2015: 15.4% SWING LIB TO PC
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -1939,7 +1939,7 @@ class SimpleVoteViewPanelTest {
             .withClassification({ mapping.getOrDefault(it, others) }, "BY DESIGNATION".asOneTimePublisher())
             .withSwing(
                 compareBy { listOf(nationalists, others, unionists).indexOf(it) },
-                "FIRST PREFERENCE SWING SINCE 2016".asOneTimePublisher()
+                "FIRST PREFERENCE SWING SINCE 2016".asOneTimePublisher(),
             )
             .build(header)
         panel.setSize(1024, 512)
@@ -1954,7 +1954,7 @@ class SimpleVoteViewPanelTest {
                 BY DESIGNATION
                 
                 FIRST PREFERENCE SWING SINCE 2016: NOT AVAILABLE
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         currentVotes.submit(
@@ -1975,8 +1975,8 @@ class SimpleVoteViewPanelTest {
                 wp to 1261,
                 indU to 4918,
                 indN to 1639,
-                indO to 7850
-            )
+                indO to 7850,
+            ),
         )
         previousVotes.submit(
             mapOf(
@@ -1996,8 +1996,8 @@ class SimpleVoteViewPanelTest {
                 wp to 1565,
                 indU to 351 + 3270,
                 indN to 0,
-                indO to 224 + 124 + 32 + 19380
-            )
+                indO to 224 + 124 + 32 + 19380,
+            ),
         )
         compareRendering("SimpleVoteViewPanel", "PartyClassifications-2", panel)
         assertPublishes(
@@ -2028,7 +2028,7 @@ class SimpleVoteViewPanelTest {
                 OTHERS: 13.6%
                 
                 FIRST PREFERENCE SWING SINCE 2016: 4.4% SWING UNIONISTS TO NATIONALISTS
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -2069,7 +2069,7 @@ class SimpleVoteViewPanelTest {
             Candidate("Ryan Stephenson", CONSERVATIVE) to 12973,
             Candidate("Jack Thomson", UKIP) to 151,
             Candidate("Jonathon Tilt", FREE_ALL) to 100,
-            Candidate("Anne Marie Waters", FOR_BRITAIN) to 97
+            Candidate("Anne Marie Waters", FOR_BRITAIN) to 97,
         )
         val prev = mapOf(
             LABOUR to 22594,
@@ -2077,7 +2077,7 @@ class SimpleVoteViewPanelTest {
             INDEPENDENT to 6432,
             LIBDEM to 2462,
             REFORM to 1678,
-            GREEN to 692
+            GREEN to 692,
         )
         val panel =
             candidateVotes(curr.asOneTimePublisher(), "DECLARED RESULT".asOneTimePublisher(), "".asOneTimePublisher())
@@ -2108,7 +2108,7 @@ class SimpleVoteViewPanelTest {
                 JAYDA FRANSEN (IND): 50 (0.1%, -12.0%)
                 SUSAN LAIRD (HERITAGE): 33 (0.1%, +0.1%)
                 OTHERS: - (-4.5%)
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -2131,32 +2131,32 @@ class SimpleVoteViewPanelTest {
             Candidate("Craig McLaughlin", uap) to 1576,
             Candidate("Brendan Clarke", sci) to 1465,
             Candidate("Justin Thomas", sus) to 1425,
-            Candidate("Roger Woodward", ind) to 495
+            Candidate("Roger Woodward", ind) to 495,
         )
         val curr2CP = mapOf(
             Candidate("Julian Leeser", lib, true) to 61675,
-            Candidate("Katie Gompertz", alp) to 32272
+            Candidate("Katie Gompertz", alp) to 32272,
         )
         val prev = mapOf(
             lib to 53678,
             alp to 18693,
             grn to 10815,
-            Party.OTHERS to 5213 + 2859 + 1933 + 826
+            Party.OTHERS to 5213 + 2859 + 1933 + 826,
         )
         val prev2CP = mapOf(
             lib to 62470,
-            alp to 31547
+            alp to 31547,
         )
         val panel = candidateVotes(
             curr.asOneTimePublisher(),
             "PRIMARY VOTE".asOneTimePublisher(),
-            "100% REPORTING".asOneTimePublisher()
+            "100% REPORTING".asOneTimePublisher(),
         )
             .withPrev(prev.asOneTimePublisher(), "CHANGE SINCE 2016".asOneTimePublisher())
             .withPreferences(
                 curr2CP.asOneTimePublisher(),
                 "TWO CANDIDATE PREFERRED".asOneTimePublisher(),
-                "100% REPORTING".asOneTimePublisher()
+                "100% REPORTING".asOneTimePublisher(),
             )
             .withPrevPreferences(prev2CP.asOneTimePublisher())
             .withSwing(
@@ -2165,7 +2165,7 @@ class SimpleVoteViewPanelTest {
                         lib -> 1; alp -> -1; else -> 0
                     }
                 },
-                "SWING SINCE 2016".asOneTimePublisher()
+                "SWING SINCE 2016".asOneTimePublisher(),
             )
             .withWinner(Candidate("Julian Leeser", lib, true).asOneTimePublisher())
             .build("BEROWRA".asOneTimePublisher())
@@ -2194,7 +2194,7 @@ class SimpleVoteViewPanelTest {
                 KATIE GOMPERTZ (ALP): 32,272 (34.4%)
                 
                 SWING SINCE 2016: 0.8% SWING LIB TO ALP
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -2221,8 +2221,8 @@ class SimpleVoteViewPanelTest {
                 jcp to 4_404_081,
                 nippon to 3_387_097,
                 sdp to 941_324,
-                oth to 729_207
-            )
+                oth to 729_207,
+            ),
         )
         val voteHeader = Publisher("PROPORTIONAL VOTES")
         val changeHeader = Publisher("2017 RESULT")
@@ -2249,7 +2249,7 @@ class SimpleVoteViewPanelTest {
                 NIPPON: 6.1%
                 SDP: 1.7%
                 OTH: 1.3%
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         curr.submit(
@@ -2262,8 +2262,8 @@ class SimpleVoteViewPanelTest {
                 dpp to 2_593_396,
                 reiwa to 2_215_648,
                 sdp to 1_018_588,
-                oth to 900_181
-            )
+                oth to 900_181,
+            ),
         )
         compareRendering("SimpleVoteViewPanel", "PrevVotes-1", panel)
         assertPublishes(
@@ -2291,7 +2291,7 @@ class SimpleVoteViewPanelTest {
                 NIPPON: 6.1%
                 SDP: 1.7%
                 OTH: 1.3%
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         curr.submit(
@@ -2304,8 +2304,8 @@ class SimpleVoteViewPanelTest {
                 dpp to 1_246_812,
                 reiwa to 248_280,
                 sdp to 313_193,
-                oth to 2_491_536
-            )
+                oth to 2_491_536,
+            ),
         )
         prev.submit(
             mapOf(
@@ -2316,8 +2316,8 @@ class SimpleVoteViewPanelTest {
                 jcp to 4_998_932,
                 nippon to 1_765_053,
                 sdp to 634_770,
-                oth to 4_526_280
-            )
+                oth to 4_526_280,
+            ),
         )
         voteHeader.submit("CONSTITUENCY VOTES")
         compareRendering("SimpleVoteViewPanel", "PrevVotes-2", panel)
@@ -2346,7 +2346,7 @@ class SimpleVoteViewPanelTest {
                 KOMEITO: 1.5%
                 SDP: 1.1%
                 OTH: 8.2%
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         showPrevRaw.submit(false)
@@ -2368,7 +2368,7 @@ class SimpleVoteViewPanelTest {
                 REIWA SHINSENGUMI: 0.4% (*)
                 OTHERS: 4.3% (-21.9%)
                 * CHANGE INCLUDED IN OTHERS
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         curr.submit(
@@ -2381,8 +2381,8 @@ class SimpleVoteViewPanelTest {
                 dpp to 2_593_396,
                 reiwa to 2_215_648,
                 sdp to 1_018_588,
-                oth to 900_181
-            )
+                oth to 900_181,
+            ),
         )
         prev.submit(
             mapOf(
@@ -2393,8 +2393,8 @@ class SimpleVoteViewPanelTest {
                 jcp to 4_404_081,
                 nippon to 3_387_097,
                 sdp to 941_324,
-                oth to 729_207
-            )
+                oth to 729_207,
+            ),
         )
         voteHeader.submit("PROPORTIONAL VOTES")
         compareRendering("SimpleVoteViewPanel", "PrevVotes-4", panel)
@@ -2414,7 +2414,7 @@ class SimpleVoteViewPanelTest {
                 SOCIAL DEMOCRATIC PARTY: 1.8% (+0.1%)
                 OTHERS: 1.6% (-8.7%)
                 * CHANGE INCLUDED IN OTHERS
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         showPrevRaw.submit(true)
@@ -2445,7 +2445,7 @@ class SimpleVoteViewPanelTest {
                 NIPPON: 6.1%
                 SDP: 1.7%
                 OTH: 1.3%
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -2472,8 +2472,8 @@ class SimpleVoteViewPanelTest {
                 jcp to 4_404_081,
                 nippon to 3_387_097,
                 sdp to 941_324,
-                oth to 729_207
-            )
+                oth to 729_207,
+            ),
         )
         val voteHeader = Publisher("PROPORTIONAL VOTES")
         val changeHeader = Publisher("2017 RESULT")
@@ -2500,7 +2500,7 @@ class SimpleVoteViewPanelTest {
                 NIPPON: 6.1%
                 SDP: 1.7%
                 OTH: 1.3%
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         curr.submit(
@@ -2513,8 +2513,8 @@ class SimpleVoteViewPanelTest {
                 dpp to 0.020..0.024,
                 reiwa to 0.010..0.016,
                 sdp to 0.010..0.014,
-                oth to 0.017..0.030
-            )
+                oth to 0.017..0.030,
+            ),
         )
         compareRendering("SimpleVoteViewPanel", "PrevRangeVotes-1", panel)
         assertPublishes(
@@ -2542,7 +2542,7 @@ class SimpleVoteViewPanelTest {
                 NIPPON: 6.1%
                 SDP: 1.7%
                 OTH: 1.3%
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         showPrevRaw.submit(false)
@@ -2563,7 +2563,7 @@ class SimpleVoteViewPanelTest {
                 REIWA SHINSENGUMI: 1.0-1.6% ((+1.0)-(+1.6)%)
                 SOCIAL DEMOCRATIC PARTY: 1.0-1.4% ((-0.7)-(-0.3)%)
                 OTHERS: 1.7-3.0% ((-17.0)-(-15.7)%)
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -2579,8 +2579,8 @@ class SimpleVoteViewPanelTest {
                 ndp.party to 585,
                 pc.party to 785,
                 lib.party to 1060,
-                grn.party to 106
-            )
+                grn.party to 106,
+            ),
         )
         val pctReporting = Publisher(0.0)
         val header = Publisher("MONTAGUE-KILMUIR")
@@ -2599,7 +2599,7 @@ class SimpleVoteViewPanelTest {
         val panel = candidateVotes(
             currentVotes,
             voteHeader,
-            voteSubhead
+            voteSubhead,
         )
             .withPrev(previousVotes, changeHeader)
             .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader)
@@ -2622,7 +2622,7 @@ class SimpleVoteViewPanelTest {
                 JOHN ALLEN MACLEAN (GRN): WAITING...
                 
                 SWING SINCE 2015: NOT AVAILABLE
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         currentVotes.submit(
@@ -2630,8 +2630,8 @@ class SimpleVoteViewPanelTest {
                 ndp to 5,
                 pc to 47,
                 lib to 58,
-                grn to 52
-            )
+                grn to 52,
+            ),
         )
         progressLabel.submit("1/9")
         voteSubhead.submit("PROJECTION: TOO EARLY TO CALL")
@@ -2650,7 +2650,7 @@ class SimpleVoteViewPanelTest {
                 BILLY CANN (NDP): 5 (3.1%, -20.0%)
                 
                 SWING SINCE 2015: 17.0% SWING LIB TO GRN
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         currentVotes.submit(
@@ -2658,8 +2658,8 @@ class SimpleVoteViewPanelTest {
                 ndp to 8,
                 pc to 91,
                 lib to 100,
-                grn to 106
-            )
+                grn to 106,
+            ),
         )
         progressLabel.submit("2/9")
         voteSubhead.submit("PROJECTION: TOO EARLY TO CALL")
@@ -2678,7 +2678,7 @@ class SimpleVoteViewPanelTest {
                 BILLY CANN (NDP): 8 (2.6%, -20.4%)
                 
                 SWING SINCE 2015: 19.8% SWING LIB TO GRN
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         currentVotes.submit(
@@ -2686,8 +2686,8 @@ class SimpleVoteViewPanelTest {
                 ndp to 18,
                 pc to 287,
                 lib to 197,
-                grn to 243
-            )
+                grn to 243,
+            ),
         )
         progressLabel.submit("5/9")
         voteSubhead.submit("PROJECTION: TOO EARLY TO CALL")
@@ -2706,7 +2706,7 @@ class SimpleVoteViewPanelTest {
                 BILLY CANN (NDP): 18 (2.4%, -20.7%)
                 
                 SWING SINCE 2015: 11.5% SWING LIB TO PC
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         currentVotes.submit(
@@ -2714,8 +2714,8 @@ class SimpleVoteViewPanelTest {
                 ndp to 124,
                 pc to 1373,
                 lib to 785,
-                grn to 675
-            )
+                grn to 675,
+            ),
         )
         progressLabel.submit("9/9")
         voteSubhead.submit("PROJECTION: PC GAIN FROM LIB")
@@ -2735,7 +2735,7 @@ class SimpleVoteViewPanelTest {
                 BILLY CANN (NDP): 124 (4.2%, -18.9%)
                 
                 SWING SINCE 2015: 15.4% SWING LIB TO PC
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -2754,7 +2754,7 @@ class SimpleVoteViewPanelTest {
             con to 4019498,
             bq to 1680109,
             ndp to 2127403,
-            oth to 755472
+            oth to 755472,
         )
         val prevVotes = mapOf(
             lib to 5252031,
@@ -2762,7 +2762,7 @@ class SimpleVoteViewPanelTest {
             bq to 1377727,
             ndp to 1093868,
             pc to 1566998,
-            oth to 290220
+            oth to 290220,
         )
         val showPrev = Publisher(false)
         val swingOrder = Comparator.comparing { p: Party -> listOf(ndp, lib, oth, pc, bq, con, ca).indexOf(p) }
@@ -2771,13 +2771,13 @@ class SimpleVoteViewPanelTest {
         val panel = partyVotes(
             currVotes.asOneTimePublisher(),
             "2004 VOTE SHARE".asOneTimePublisher(),
-            "".asOneTimePublisher()
+            "".asOneTimePublisher(),
         )
             .withPrev(
                 prevVotes.asOneTimePublisher(),
                 showPrev.map { if (it) "2000 VOTE SHARE" else "CHANGE SINCE 2000" },
                 showPrevRaw = showPrev,
-                partyChanges = partyChanges
+                partyChanges = partyChanges,
             )
             .withSwing(swingOrder, "SWING SINCE 2000".asOneTimePublisher())
             .build("CANADA".asOneTimePublisher())
@@ -2796,7 +2796,7 @@ class SimpleVoteViewPanelTest {
                 OTHERS: 5.6% (+3.3%)
                 
                 SWING SINCE 2000: 2.0% SWING CON TO LIB
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         showPrev.submit(true)
@@ -2822,7 +2822,7 @@ class SimpleVoteViewPanelTest {
                 OTH: 2.3%
                 
                 SWING SINCE 2000: 2.0% SWING CON TO LIB
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -2841,7 +2841,7 @@ class SimpleVoteViewPanelTest {
             con to 0.25..0.37,
             bq to 0.09..0.13,
             ndp to 0.15..0.22,
-            oth to 0.02..0.07
+            oth to 0.02..0.07,
         )
         val prevVotes = mapOf(
             lib to 5252031,
@@ -2849,7 +2849,7 @@ class SimpleVoteViewPanelTest {
             bq to 1377727,
             ndp to 1093868,
             pc to 1566998,
-            oth to 290220
+            oth to 290220,
         )
         val showPrev = Publisher(false)
         val swingOrder = Comparator.comparing { p: Party -> listOf(ndp, lib, oth, pc, bq, con, ca).indexOf(p) }
@@ -2858,13 +2858,13 @@ class SimpleVoteViewPanelTest {
         val panel = partyRangeVotes(
             currVotes.asOneTimePublisher(),
             "2004 POLLING RANGE".asOneTimePublisher(),
-            "".asOneTimePublisher()
+            "".asOneTimePublisher(),
         )
             .withPrev(
                 prevVotes.asOneTimePublisher(),
                 showPrev.map { if (it) "2000 VOTE SHARE" else "CHANGE SINCE 2000" },
                 showPrevRaw = showPrev,
-                partyChanges = partyChanges
+                partyChanges = partyChanges,
             )
             .withSwing(swingOrder, "SWING SINCE 2000".asOneTimePublisher())
             .build("CANADA".asOneTimePublisher())
@@ -2883,7 +2883,7 @@ class SimpleVoteViewPanelTest {
                 OTHERS: 2.0-7.0% ((-0.3)-(+4.7)%)
                 
                 SWING SINCE 2000: 0.4% SWING CON TO LIB
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         showPrev.submit(true)
@@ -2909,7 +2909,7 @@ class SimpleVoteViewPanelTest {
                 OTH: 2.3%
                 
                 SWING SINCE 2000: 0.4% SWING CON TO LIB
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 

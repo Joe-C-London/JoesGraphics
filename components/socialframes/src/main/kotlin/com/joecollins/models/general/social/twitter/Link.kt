@@ -11,7 +11,7 @@ class Link(
     override val displayURL: String,
     override val image: Image?,
     override val title: String,
-    override val domain: String
+    override val domain: String,
 ) : com.joecollins.models.general.social.generic.Link {
 
     override val isFromSocialNetwork: Boolean = expandedURL.toString().startsWith("https://twitter.com/")
@@ -40,7 +40,7 @@ class Link(
                 urlEntity.displayURL,
                 image,
                 title,
-                domain
+                domain,
             )
         }
 
@@ -53,7 +53,7 @@ class Link(
                 urlEntity.displayUrl!!,
                 urlEntity.images?.takeIf { it.isNotEmpty() }?.let { it[0].url }?.let { ImageIO.read(it) },
                 urlEntity.title ?: "",
-                fullUrl.host
+                fullUrl.host,
             )
         }
     }

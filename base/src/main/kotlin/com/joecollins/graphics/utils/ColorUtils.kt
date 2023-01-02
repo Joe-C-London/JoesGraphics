@@ -9,7 +9,7 @@ object ColorUtils {
         return Color(
             128 + color.red / 2,
             128 + color.green / 2,
-            128 + color.blue / 2
+            128 + color.blue / 2,
         )
     }
 
@@ -25,7 +25,7 @@ object ColorUtils {
             (color.red * factor).roundToInt(),
             (color.green * factor).roundToInt(),
             (color.blue * factor).roundToInt(),
-            color.alpha
+            color.alpha,
         )
     }
 

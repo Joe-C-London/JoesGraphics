@@ -19,7 +19,7 @@ class LowerThirdHeadlineAndSummary @TestOnly constructor(
     private val subheadBinding: Flow.Publisher<out String?>,
     summaryEntriesBinding: Flow.Publisher<out List<SummaryEntry>>,
     clock: Clock,
-    showTimeZone: Boolean = false
+    showTimeZone: Boolean = false,
 ) : LowerThird(leftImagePublisher, placePublisher, clock, showTimeZone) {
 
     constructor(
@@ -28,7 +28,7 @@ class LowerThirdHeadlineAndSummary @TestOnly constructor(
         headlinePublisher: Flow.Publisher<out String?>,
         subheadPublisher: Flow.Publisher<out String?>,
         summaryEntriesPublisher: Flow.Publisher<out List<SummaryEntry>>,
-        showTimeZone: Boolean = false
+        showTimeZone: Boolean = false,
     ) : this(
         leftImagePublisher,
         placePublisher,
@@ -36,7 +36,7 @@ class LowerThirdHeadlineAndSummary @TestOnly constructor(
         subheadPublisher,
         summaryEntriesPublisher,
         Clock.systemDefaultZone(),
-        showTimeZone
+        showTimeZone,
     )
 
     private val headlinePanel = HeadlinePanel()

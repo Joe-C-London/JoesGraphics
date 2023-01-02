@@ -24,7 +24,7 @@ class HemicycleFrameBuilderTest {
             generateSequence { Pair(Color.GREEN, Color.RED) }.take(7),
             generateSequence { Pair(Color.RED, Color.RED) }.take(6),
             generateSequence { Pair(Color.BLUE, Color.RED) }.take(5),
-            generateSequence { Pair(Color.BLUE, Color.BLUE) }.take(8)
+            generateSequence { Pair(Color.BLUE, Color.BLUE) }.take(8),
         ).flatten().toList()
         val leftSeatBars = Publisher(listOf(Pair(Color.GREEN, 8)))
         val rightSeatBars = Publisher(listOf(Pair(Color.BLUE, 13)))
@@ -36,7 +36,7 @@ class HemicycleFrameBuilderTest {
             dots,
             { it.first.asOneTimePublisher() },
             { it.second.asOneTimePublisher() },
-            Tiebreaker.FRONT_ROW_FROM_RIGHT
+            Tiebreaker.FRONT_ROW_FROM_RIGHT,
         )
             .withLeftSeatBars(leftSeatBars, { it.first }, { it.second }, "GREEN: 8".asOneTimePublisher())
             .withRightSeatBars(rightSeatBars, { it.first }, { it.second }, "PROGRESSIVE CONSERVATIVE: 13".asOneTimePublisher())
@@ -54,12 +54,12 @@ class HemicycleFrameBuilderTest {
         val expectedDots = listOf(
             Color.GREEN, Color.GREEN, Color.RED, Color.BLUE, Color.BLUE, Color.BLUE, Color.BLUE, //
             Color.GREEN, Color.GREEN, Color.GREEN, Color.RED, Color.RED, Color.BLUE, Color.BLUE, Color.BLUE, Color.BLUE, //
-            Color.GREEN, Color.GREEN, Color.GREEN, Color.RED, Color.RED, Color.RED, Color.BLUE, Color.BLUE, Color.BLUE, Color.BLUE, Color.BLUE
+            Color.GREEN, Color.GREEN, Color.GREEN, Color.RED, Color.RED, Color.RED, Color.BLUE, Color.BLUE, Color.BLUE, Color.BLUE, Color.BLUE,
         )
         val expectedBorders = listOf(
             Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.BLUE, Color.BLUE, //
             Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.BLUE, Color.BLUE, Color.BLUE, //
-            Color.GREEN, Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.BLUE, Color.BLUE, Color.BLUE
+            Color.GREEN, Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.BLUE, Color.BLUE, Color.BLUE,
         )
         for (i in 0 until frame.numDots) {
             Assertions.assertEquals(expectedDots[i], frame.getDotColor(i), "Dot color $i")
@@ -117,7 +117,7 @@ class HemicycleFrameBuilderTest {
             Riding("Pelly-Nisutlin", yp, true, yp),
             Riding("Porter Creek North", yp, false, yp),
             Riding("Lake Laberge", yp, true, yp),
-            Riding("Whitehorse West", lib, false, yp)
+            Riding("Whitehorse West", lib, false, yp),
         )
         val frame = HemicycleFrameBuilder.ofElectedLeading(
             listOf(ridings.size),
@@ -132,7 +132,7 @@ class HemicycleFrameBuilderTest {
             { e, l -> l > 0 },
             { e, l -> DecimalFormat("+0;-0").format(e) + "/" + DecimalFormat("+0;-0").format(l) },
             Tiebreaker.FRONT_ROW_FROM_LEFT,
-            "YUKON".asOneTimePublisher()
+            "YUKON".asOneTimePublisher(),
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numDots }, IsEqual(19))
@@ -200,7 +200,7 @@ class HemicycleFrameBuilderTest {
             { e, l -> l > 0 },
             { e, l -> DecimalFormat("+0;-0").format(e) + "/" + DecimalFormat("+0;-0").format(l) },
             Tiebreaker.FRONT_ROW_FROM_LEFT,
-            "TEST".asOneTimePublisher()
+            "TEST".asOneTimePublisher(),
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numDots }, IsEqual(30))
@@ -274,7 +274,7 @@ class HemicycleFrameBuilderTest {
             { e, l -> true },
             { e, l -> DecimalFormat("+0;-0").format(e) + "/" + DecimalFormat("+0;-0").format(l) },
             Tiebreaker.FRONT_ROW_FROM_LEFT,
-            "TEST".asOneTimePublisher()
+            "TEST".asOneTimePublisher(),
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numDots }, IsEqual(30))
@@ -378,7 +378,7 @@ class HemicycleFrameBuilderTest {
             { e, l -> true },
             { e, l -> DecimalFormat("+0;-0").format(e) + "/" + DecimalFormat("+0;-0").format(l) },
             Tiebreaker.FRONT_ROW_FROM_LEFT,
-            "TEST".asOneTimePublisher()
+            "TEST".asOneTimePublisher(),
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numDots }, IsEqual(30))

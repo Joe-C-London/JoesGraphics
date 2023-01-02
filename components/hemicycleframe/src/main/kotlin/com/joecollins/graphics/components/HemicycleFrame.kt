@@ -41,9 +41,9 @@ class HemicycleFrame(
     leftChangeBarLabelPublisher: Flow.Publisher<out String>? = null,
     rightChangeBarPublisher: Flow.Publisher<out List<Bar>>? = null,
     rightChangeBarStartPublisher: Flow.Publisher<out Int>? = null,
-    rightChangeBarLabelPublisher: Flow.Publisher<out String>? = null
+    rightChangeBarLabelPublisher: Flow.Publisher<out String>? = null,
 ) : GraphicsFrame(
-    headerPublisher = headerPublisher
+    headerPublisher = headerPublisher,
 ) {
     private val barsPanel = BarPanel()
     private val dotsPanel = DotsPanel()
@@ -218,7 +218,7 @@ class HemicycleFrame(
             g
                 .setRenderingHint(
                     RenderingHints.KEY_TEXT_ANTIALIASING,
-                    RenderingHints.VALUE_TEXT_ANTIALIAS_ON
+                    RenderingHints.VALUE_TEXT_ANTIALIAS_ON,
                 )
             g.setColor(Color.BLACK)
             g.drawLine(width / 2, 0, width / 2, height)
@@ -267,7 +267,7 @@ class HemicycleFrame(
                 getRightPosition(rightSoFar),
                 seatBarTop,
                 width - getRightPosition(rightSoFar),
-                seatBarHeight
+                seatBarHeight,
             )
             var middleSoFar = 0
             for (bar in middleSeatBars) {
@@ -284,7 +284,7 @@ class HemicycleFrame(
                 getMiddleStartPosition(middleSoFar),
                 seatBarTop,
                 getMiddleEndPosition(middleSoFar) - getMiddleStartPosition(middleSoFar),
-                seatBarHeight
+                seatBarHeight,
             )
             val oldClip = g.clip
             val newClip = Area()
@@ -334,12 +334,12 @@ class HemicycleFrame(
                     Point(startSide, changeBarBottom),
                     Point(endSide, changeBarBottom),
                     Point(end, changeBarMid),
-                    Point(endSide, changeBarTop)
+                    Point(endSide, changeBarTop),
                 )
                 g.fillPolygon(
                     points.map { it.getX().toInt() }.toIntArray(),
                     points.map { it.getY().toInt() }.toIntArray(),
-                    points.size
+                    points.size,
                 )
                 leftSoFar += bar.size
             }
@@ -352,9 +352,9 @@ class HemicycleFrame(
                     changeBarBottom,
                     changeBarBottom,
                     changeBarMid,
-                    changeBarTop
+                    changeBarTop,
                 ),
-                5
+                5,
             )
             var rightSoFar = rightChangeBarStart
             val rightBase = getRightPosition(rightChangeBarStart)
@@ -370,12 +370,12 @@ class HemicycleFrame(
                     Point(startSide, changeBarBottom),
                     Point(endSide, changeBarBottom),
                     Point(end, changeBarMid),
-                    Point(endSide, changeBarTop)
+                    Point(endSide, changeBarTop),
                 )
                 g.fillPolygon(
                     points.map { it.getX().toInt() }.toIntArray(),
                     points.map { it.getY().toInt() }.toIntArray(),
-                    points.size
+                    points.size,
                 )
                 rightSoFar += bar.size
             }
@@ -388,9 +388,9 @@ class HemicycleFrame(
                     changeBarBottom,
                     changeBarBottom,
                     changeBarMid,
-                    changeBarTop
+                    changeBarTop,
                 ),
-                5
+                5,
             )
             val oldClip = g.clip
             val newClip = Area()
@@ -454,7 +454,7 @@ class HemicycleFrame(
             g
                 .setRenderingHint(
                     RenderingHints.KEY_TEXT_ANTIALIASING,
-                    RenderingHints.VALUE_TEXT_ANTIALIAS_ON
+                    RenderingHints.VALUE_TEXT_ANTIALIAS_ON,
                 )
             var dFrac = 1.0 / (rows.size - 0.5)
             for (rowsFromInner in rows.indices) {
@@ -503,7 +503,7 @@ class HemicycleFrame(
         private fun createRotationTransform(
             frac: Double,
             originalTransform: AffineTransform,
-            arcY: Int
+            arcY: Int,
         ): AffineTransform {
             val arcAngle = Math.PI * (frac - 0.5)
             val newTransform = AffineTransform(originalTransform)

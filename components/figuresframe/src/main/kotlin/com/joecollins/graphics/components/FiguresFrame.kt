@@ -19,9 +19,9 @@ import javax.swing.border.MatteBorder
 
 class FiguresFrame(
     headerPublisher: Flow.Publisher<out String?>,
-    entriesPublisher: Flow.Publisher<out List<Entry>>
+    entriesPublisher: Flow.Publisher<out List<Entry>>,
 ) : GraphicsFrame(
-    headerPublisher = headerPublisher
+    headerPublisher = headerPublisher,
 ) {
 
     class Entry(
@@ -29,7 +29,7 @@ class FiguresFrame(
         val name: String,
         val description: String,
         val result: String,
-        val resultColor: Color
+        val resultColor: Color,
     )
 
     private val centralPanel: JPanel = JPanel()

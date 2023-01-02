@@ -30,7 +30,7 @@ class MixedMemberResultPanel private constructor(
     private val candidateChangeFrame: BarFrame?,
     private val partyFrame: BarFrame,
     private val partyChangeFrame: BarFrame?,
-    private val mapFrame: MapFrame?
+    private val mapFrame: MapFrame?,
 ) : GenericPanel(
     run {
         val panel = JPanel()
@@ -43,7 +43,7 @@ class MixedMemberResultPanel private constructor(
         mapFrame?.also { panel.add(it, ScreenLayout.MAP) }
         panel
     },
-    label
+    label,
 ) {
 
     private class ScreenLayout : LayoutManager {
@@ -83,7 +83,7 @@ class MixedMemberResultPanel private constructor(
             candidateFrame.setLocation(5, 5)
             candidateFrame.setSize(
                 width * 3 / 5 - 10,
-                height / (if (candidateChangeFrame == null) 1 else 2) - 10
+                height / (if (candidateChangeFrame == null) 1 else 2) - 10,
             )
             candidateChangeFrame?.setLocation(5, height / 2 + 5)
             candidateChangeFrame?.setSize(width * 3 / 5 - 10, height / 2 - 10)
@@ -118,7 +118,7 @@ class MixedMemberResultPanel private constructor(
         fun withCandidateVotes(
             votes: Flow.Publisher<out Map<Candidate, Int?>>,
             header: Flow.Publisher<out String>,
-            subheader: Flow.Publisher<out String?> = (null as String?).asOneTimePublisher()
+            subheader: Flow.Publisher<out String?> = (null as String?).asOneTimePublisher(),
         ): Builder {
             candidateVotes = votes
             candidateVoteHeader = header
@@ -138,7 +138,7 @@ class MixedMemberResultPanel private constructor(
 
         fun withPrevCandidateVotes(
             votes: Flow.Publisher<out Map<out PartyOrCoalition, Int>>,
-            header: Flow.Publisher<out String>
+            header: Flow.Publisher<out String>,
         ): Builder {
             candidatePrev = votes
             candidateChangeHeader = header
@@ -147,7 +147,7 @@ class MixedMemberResultPanel private constructor(
 
         fun withPartyVotes(
             votes: Flow.Publisher<out Map<out PartyOrCoalition, Int?>>,
-            header: Flow.Publisher<out String>
+            header: Flow.Publisher<out String>,
         ): Builder {
             partyVotes = votes
             partyVoteHeader = header
@@ -156,7 +156,7 @@ class MixedMemberResultPanel private constructor(
 
         fun withPrevPartyVotes(
             votes: Flow.Publisher<out Map<out PartyOrCoalition, Int>>,
-            header: Flow.Publisher<out String>
+            header: Flow.Publisher<out String>,
         ): Builder {
             partyPrev = votes
             partyChangeHeader = header
@@ -188,7 +188,7 @@ class MixedMemberResultPanel private constructor(
             selectedShape: Flow.Publisher<out T>,
             leadingParty: Flow.Publisher<out PartyResult?>,
             focus: Flow.Publisher<out List<T>?>,
-            header: Flow.Publisher<out String>
+            header: Flow.Publisher<out String>,
         ): Builder {
             mapBuilder = MapBuilder(shapes, selectedShape, leadingParty, focus, header)
             return this
@@ -200,7 +200,7 @@ class MixedMemberResultPanel private constructor(
             leadingParty: Flow.Publisher<out PartyResult?>,
             focus: Flow.Publisher<out List<T>?>,
             additionalHighlight: Flow.Publisher<out List<T>?>,
-            header: Flow.Publisher<out String>
+            header: Flow.Publisher<out String>,
         ): Builder {
             mapBuilder = MapBuilder(shapes, selectedShape, leadingParty, focus, additionalHighlight, header)
             return this
@@ -213,7 +213,7 @@ class MixedMemberResultPanel private constructor(
                 createCandidateChange(),
                 createPartyVotes(),
                 createPartyChange(),
-                createMapFrame()
+                createMapFrame(),
             )
         }
 
@@ -273,7 +273,7 @@ class MixedMemberResultPanel private constructor(
                             candidate.party.color,
                             if (pct.isNaN()) 0 else pct,
                             (if (pct.isNaN()) "WAITING..." else rightLabel),
-                            if (candidate == winner) (if (candidate.name.isBlank()) ImageGenerator.createTickShape() else shape) else null
+                            if (candidate == winner) (if (candidate.name.isBlank()) ImageGenerator.createTickShape() else shape) else null,
                         )
                     }
                     .toList()
@@ -283,7 +283,7 @@ class MixedMemberResultPanel private constructor(
                 .withSubhead(candidateVoteSubheader)
                 .withMax(
                     candidatePctReporting?.map { 2.0 / 3 / it.coerceAtLeast(1e-6) }
-                        ?: (2.0 / 3).asOneTimePublisher()
+                        ?: (2.0 / 3).asOneTimePublisher(),
                 )
                 .build()
         }
@@ -337,7 +337,7 @@ class MixedMemberResultPanel private constructor(
                             it.key.party.abbreviation.uppercase(),
                             it.key.party.color,
                             pct,
-                            PCT_DIFF_FORMAT.format(pct)
+                            PCT_DIFF_FORMAT.format(pct),
                         )
                     }
                 val othersPct = (
@@ -357,8 +357,8 @@ class MixedMemberResultPanel private constructor(
                             Party.OTHERS.abbreviation.uppercase(),
                             Party.OTHERS.color,
                             othersPct,
-                            PCT_DIFF_FORMAT.format(othersPct)
-                        )
+                            PCT_DIFF_FORMAT.format(othersPct),
+                        ),
                     )
                 }
                 sequenceOf(matchingBars, nonMatchingBars).flatten().toList()
@@ -388,11 +388,11 @@ class MixedMemberResultPanel private constructor(
                                 } else {
                                     THOUSANDS_FORMAT.format(it.value) +
                                         if (partialDeclaration) "" else " (" + PCT_FORMAT.format(pct) + ")"
-                                }
+                                },
                             )
                         }
                         .toList()
-                }
+                },
             )
                 .withHeader(partyVoteHeader, rightLabelPublisher = partyProgressLabel)
                 .withMax(partyPctReporting?.map { 2.0 / 3 / it.coerceAtLeast(1e-6) } ?: (2.0 / 3).asOneTimePublisher())
@@ -428,7 +428,7 @@ class MixedMemberResultPanel private constructor(
                             it.key.abbreviation.uppercase(),
                             it.key.color,
                             pct,
-                            PCT_DIFF_FORMAT.format(pct)
+                            PCT_DIFF_FORMAT.format(pct),
                         )
                     }
                 val otherTotal = (
@@ -446,8 +446,8 @@ class MixedMemberResultPanel private constructor(
                             Party.OTHERS.abbreviation.uppercase(),
                             Party.OTHERS.color,
                             otherTotal,
-                            PCT_DIFF_FORMAT.format(otherTotal)
-                        )
+                            PCT_DIFF_FORMAT.format(otherTotal),
+                        ),
                     )
                 }
                 sequenceOf(presentBars, absentBars).flatten().toList()

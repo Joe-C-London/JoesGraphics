@@ -20,7 +20,7 @@ import javax.swing.border.EmptyBorder
 class BottomSummary(
     private val headerPublisher: Flow.Publisher<out String>,
     private val footerPublisher: Flow.Publisher<out String>,
-    private val entriesPublisher: Flow.Publisher<out List<SummaryEntry>>
+    private val entriesPublisher: Flow.Publisher<out List<SummaryEntry>>,
 ) : JPanel() {
     private val headerPanel: LabelWithBackground = LabelWithBackground()
     private val footerPanel: LabelWithBackground = LabelWithBackground()
@@ -167,8 +167,8 @@ class BottomSummary(
                     invalidate()
                     revalidate()
                     repaint()
-                }
-            )
+                },
+            ),
         )
     }
 

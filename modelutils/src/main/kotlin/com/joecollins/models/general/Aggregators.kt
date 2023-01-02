@@ -30,7 +30,7 @@ object Aggregators {
                 val ret = LinkedHashMap(a)
                 r.forEach { (k, v) -> ret.merge(k, -v) { a, b -> a + b } }
                 ret.filter { seededKeys.contains(it.key) || it.value != 0 || !r.containsKey(it.key) }
-            }
+            },
         )
     }
 
@@ -51,7 +51,7 @@ object Aggregators {
                 val ret = LinkedHashMap(a)
                 r.forEach { (k, v) -> ret.merge(k, Pair(-v.first, -v.second), sum) }
                 ret.filter { e -> seededKeys.contains(e.key) || e.value.first != 0 || e.value.second != 0 || !r.containsKey(e.key) }
-            }
+            },
         )
     }
 
@@ -151,7 +151,7 @@ object Aggregators {
                         map[key] = it
                         if (map.size == entries.size) ret.submit(map)
                     }
-                }
+                },
             )
         }
         return ret

@@ -7,7 +7,7 @@ import java.net.URL
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class Tag(
     val name: String,
-    val url: URL
+    val url: URL,
 ) : Hashtag {
     override val text: String = name
 }

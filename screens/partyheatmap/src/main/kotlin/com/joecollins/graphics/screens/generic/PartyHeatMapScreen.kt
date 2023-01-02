@@ -23,7 +23,7 @@ class PartyHeatMapScreen private constructor(panel: JPanel, title: Flow.Publishe
             parties: Flow.Publisher<out List<Party>>,
             prevResult: (T) -> Party,
             currResult: (T) -> Flow.Publisher<Party?>,
-            sortOrder: (T, Party) -> Number
+            sortOrder: (T, Party) -> Number,
         ): Builder<T> {
             return Builder(
                 items,
@@ -33,7 +33,7 @@ class PartyHeatMapScreen private constructor(panel: JPanel, title: Flow.Publishe
                     currResult(t).map { p -> p?.let { PartyResult.elected(it) } }
                 },
                 sortOrder,
-                false
+                false,
             )
         }
 
@@ -42,7 +42,7 @@ class PartyHeatMapScreen private constructor(panel: JPanel, title: Flow.Publishe
             parties: Flow.Publisher<out List<Party>>,
             prevResult: (T) -> Party,
             currResult: (T) -> Flow.Publisher<out PartyResult?>,
-            sortOrder: (T, Party) -> Number
+            sortOrder: (T, Party) -> Number,
         ): Builder<T> {
             return Builder(items, parties, prevResult, currResult, sortOrder, true)
         }
@@ -54,7 +54,7 @@ class PartyHeatMapScreen private constructor(panel: JPanel, title: Flow.Publishe
         private val prevResult: (T) -> Party,
         private val currResult: (T) -> Flow.Publisher<out PartyResult?>,
         private val sortOrder: (T, Party) -> Number,
-        private val withLeading: Boolean
+        private val withLeading: Boolean,
     ) {
         private var numRows = 5.asOneTimePublisher()
         private var filter: Flow.Publisher<(T) -> Boolean> = { _: T -> true }.asOneTimePublisher()
@@ -101,7 +101,7 @@ class PartyHeatMapScreen private constructor(panel: JPanel, title: Flow.Publishe
                         header = party.name.uppercase().asOneTimePublisher(),
                         labelFunc = { it.toString().asOneTimePublisher() },
                         filterFunc = filter,
-                        partyChanges = partyChanges
+                        partyChanges = partyChanges,
                     )
                 }
             }.subscribe(
@@ -109,8 +109,8 @@ class PartyHeatMapScreen private constructor(panel: JPanel, title: Flow.Publishe
                     eventQueueWrapper { panels ->
                         panel.removeAll()
                         panels.forEach { panel.add(it) }
-                    }
-                )
+                    },
+                ),
             )
 
             return PartyHeatMapScreen(pad(panel), title)

@@ -40,7 +40,7 @@ class PartyQuotasPanelTest {
             Party.OTHERS to 631 + 78,
             labalt to 517,
             con to 477,
-            sdlp to 141
+            sdlp to 141,
         )
         val currQuota = Publisher(1)
         val prevQuota = 5311.0
@@ -54,23 +54,23 @@ class PartyQuotasPanelTest {
             currRound.merge(currQuota) { votes, quota -> votes.mapValues { it.value / quota } },
             5.asOneTimePublisher(),
             "PARTY SUMMARY".asOneTimePublisher(),
-            round.map { if (it == 0) "WAITING..." else "COUNT $it" }
+            round.map { if (it == 0) "WAITING..." else "COUNT $it" },
         ).withPrev(
             prevRound,
-            round.map { if (it <= 1) "CHANGE SINCE 2016" else "CHANGE FROM COUNT ${it - 1}" }
+            round.map { if (it <= 1) "CHANGE SINCE 2016" else "CHANGE FROM COUNT ${it - 1}" },
         ).withSwing(
             currVotes,
             prevVotes.asOneTimePublisher(),
             Comparator.comparing { listOf(sf, apni, dup).indexOf(it) },
-            "FIRST PREF SWING".asOneTimePublisher()
+            "FIRST PREF SWING".asOneTimePublisher(),
         ).withPartyMap(
             niShapesByConstituency().asOneTimePublisher(),
             9.asOneTimePublisher(),
             currWinner,
             listOf(9, 10, 12, 15).asOneTimePublisher(),
-            "BELFAST".asOneTimePublisher()
+            "BELFAST".asOneTimePublisher(),
         ).build(
-            "BELFAST EAST".asOneTimePublisher()
+            "BELFAST EAST".asOneTimePublisher(),
         )
         panel.setSize(1024, 512)
         compareRendering("PartyQuotasPanel", "Quotas-0", panel)
@@ -82,7 +82,7 @@ class PartyQuotasPanelTest {
                 PARTY SUMMARY, WAITING... (CHANGE SINCE 2016)
                 
                 FIRST PREF SWING: NOT AVAILABLE
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         val round1 = mapOf(
@@ -96,7 +96,7 @@ class PartyQuotasPanelTest {
             labalt to 442,
             con to 275,
             sdlp to 250,
-            ind to 84
+            ind to 84,
         )
         currVotes.submit(round1)
         val quota = 6727.0
@@ -124,7 +124,7 @@ class PartyQuotasPanelTest {
                 OTHERS: - (-0.13)
                 
                 FIRST PREF SWING: 1.0% SWING DUP TO APNI
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         val round2 = mapOf(
@@ -138,7 +138,7 @@ class PartyQuotasPanelTest {
             labalt to 449.48,
             con to 276.32,
             sdlp to 260.45,
-            ind to 85.43
+            ind to 85.43,
         )
         currRound.submit(round2.mapValues { it.value / quota })
         prevRound.submit(round1.mapValues { it.value / quota })
@@ -163,7 +163,7 @@ class PartyQuotasPanelTest {
                 INDEPENDENT: 0.01 QUOTAS (+0.00)
                 
                 FIRST PREF SWING: 1.0% SWING DUP TO APNI
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         val round3 = mapOf(
@@ -176,7 +176,7 @@ class PartyQuotasPanelTest {
             tuv to 920.65,
             labalt to 456.48,
             con to 278.43,
-            sdlp to 260.56
+            sdlp to 260.56,
         )
         currRound.submit(round3.mapValues { it.value / quota })
         prevRound.submit(round2.mapValues { it.value / quota })
@@ -201,7 +201,7 @@ class PartyQuotasPanelTest {
                 INDEPENDENT: - (-0.01)
                 
                 FIRST PREF SWING: 1.0% SWING DUP TO APNI
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         val round4 = mapOf(
@@ -213,7 +213,7 @@ class PartyQuotasPanelTest {
             sf to 1216.66,
             tuv to 924.76,
             labalt to 467.81,
-            con to 280.43
+            con to 280.43,
         )
         currRound.submit(round4.mapValues { it.value / quota })
         prevRound.submit(round3.mapValues { it.value / quota })
@@ -237,7 +237,7 @@ class PartyQuotasPanelTest {
                 SOCIAL DEMOCRATIC AND LABOUR PARTY: - (-0.04)
                 
                 FIRST PREF SWING: 1.0% SWING DUP TO APNI
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         val round5 = mapOf(
@@ -247,7 +247,7 @@ class PartyQuotasPanelTest {
             pup to 2751.95,
             grn to 1763.36,
             sf to 1232.88,
-            tuv to 958.87
+            tuv to 958.87,
         )
         currRound.submit(round5.mapValues { it.value / quota })
         prevRound.submit(round4.mapValues { it.value / quota })
@@ -270,7 +270,7 @@ class PartyQuotasPanelTest {
                 NI CONSERVATIVES: - (-0.04)
                 
                 FIRST PREF SWING: 1.0% SWING DUP TO APNI
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         val round6 = mapOf(
@@ -279,7 +279,7 @@ class PartyQuotasPanelTest {
             dup to 6217.46 + 4862.61 + 4568.40,
             pup to 2936.28,
             grn to 1801.58,
-            sf to 1235.10
+            sf to 1235.10,
         )
         currRound.submit(round6.mapValues { it.value / quota })
         prevRound.submit(round5.mapValues { it.value / quota })
@@ -300,7 +300,7 @@ class PartyQuotasPanelTest {
                 TRADITIONAL UNIONIST VOICE: - (-0.14)
                 
                 FIRST PREF SWING: 1.0% SWING DUP TO APNI
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         val round7 = mapOf(
@@ -308,7 +308,7 @@ class PartyQuotasPanelTest {
             uup to 5783.14,
             dup to 6228.46 + 4865.61 + 4572.40,
             pup to 2950.28,
-            grn to 2080.65
+            grn to 2080.65,
         )
         currRound.submit(round7.mapValues { it.value / quota })
         prevRound.submit(round6.mapValues { it.value / quota })
@@ -328,14 +328,14 @@ class PartyQuotasPanelTest {
                 SINN FÉIN: - (-0.18)
                 
                 FIRST PREF SWING: 1.0% SWING DUP TO APNI
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         val round8 = mapOf(
             apni to quota + 7268.87,
             uup to 6048.62,
             dup to 6275.01 + 4890.72 + 4599.73,
-            pup to 3148.79
+            pup to 3148.79,
         )
         currRound.submit(round8.mapValues { it.value / quota })
         prevRound.submit(round7.mapValues { it.value / quota })
@@ -354,13 +354,13 @@ class PartyQuotasPanelTest {
                 GREEN: - (-0.31)
                 
                 FIRST PREF SWING: 1.0% SWING DUP TO APNI
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         val round9 = mapOf(
             apni to quota + quota,
             uup to 7257.62,
-            dup to 6759.01 + 5268.26 + 4995.25
+            dup to 6759.01 + 5268.26 + 4995.25,
         )
         currRound.submit(round9.mapValues { it.value / quota })
         prevRound.submit(round8.mapValues { it.value / quota })
@@ -378,13 +378,13 @@ class PartyQuotasPanelTest {
                 PROGRESSIVE UNIONIST PARTY: - (-0.47)
                 
                 FIRST PREF SWING: 1.0% SWING DUP TO APNI
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         val round10 = mapOf(
             apni to quota + quota,
             uup to quota,
-            dup to quota + 5333.26 + 5093.25
+            dup to quota + 5333.26 + 5093.25,
         )
         currRound.submit(round10.mapValues { it.value / quota })
         prevRound.submit(round9.mapValues { it.value / quota })
@@ -401,13 +401,13 @@ class PartyQuotasPanelTest {
                 ULSTER UNIONIST PARTY: 1.00 QUOTAS (-0.08)
                 
                 FIRST PREF SWING: 1.0% SWING DUP TO APNI
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         val round11 = mapOf(
             apni to quota + quota,
             uup to quota,
-            dup to quota + 5541.65 + 5410.84
+            dup to quota + 5541.65 + 5410.84,
         )
         currRound.submit(round11.mapValues { it.value / quota })
         prevRound.submit(round10.mapValues { it.value / quota })
@@ -424,7 +424,7 @@ class PartyQuotasPanelTest {
                 ULSTER UNIONIST PARTY: 1.00 QUOTAS (+0.00)
                 
                 FIRST PREF SWING: 1.0% SWING DUP TO APNI
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -439,13 +439,13 @@ class PartyQuotasPanelTest {
             lib to 346423,
             alp to 289942,
             grn to 62345,
-            oth to 362455
+            oth to 362455,
         )
         val currVotes = mapOf(
             lib to 413957,
             alp to 332399,
             grn to 119470,
-            oth to 228997
+            oth to 228997,
         )
         val currQuota = 156404.0
         val prevQuota = 151596.0
@@ -456,12 +456,12 @@ class PartyQuotasPanelTest {
             currRound,
             6.asOneTimePublisher(),
             "PARTY SUMMARY".asOneTimePublisher(),
-            "FIRST PREFERENCES".asOneTimePublisher()
+            "FIRST PREFERENCES".asOneTimePublisher(),
         ).withPrev(
             prevRound,
-            "CHANGE SINCE 2016".asOneTimePublisher()
+            "CHANGE SINCE 2016".asOneTimePublisher(),
         ).build(
-            "SOUTH AUSTRALIA".asOneTimePublisher()
+            "SOUTH AUSTRALIA".asOneTimePublisher(),
         )
         panel.setSize(1024, 512)
         compareRendering("PartyQuotasPanel", "Quotas-Oth", panel)
@@ -475,7 +475,7 @@ class PartyQuotasPanelTest {
                 LABOR: 2.13 QUOTAS (+0.21)
                 GREENS: 0.76 QUOTAS (+0.35)
                 OTHERS: 1.46 QUOTAS (-0.93)
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 

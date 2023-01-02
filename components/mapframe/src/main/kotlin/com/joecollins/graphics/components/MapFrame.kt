@@ -30,11 +30,11 @@ class MapFrame(
     focusBoxPublisher: Flow.Publisher<out Rectangle2D?>? = null,
     outlineShapesPublisher: Flow.Publisher<out List<Shape>>? = null,
     notesPublisher: Flow.Publisher<out String?>? = null,
-    borderColorPublisher: Flow.Publisher<out Color>? = null
+    borderColorPublisher: Flow.Publisher<out Color>? = null,
 ) : GraphicsFrame(
     headerPublisher = headerPublisher,
     notesPublisher = notesPublisher,
-    borderColorPublisher = borderColorPublisher
+    borderColorPublisher = borderColorPublisher,
 ) {
     private val executor = Executors.newWorkStealingPool()
     private var shapesToDraw: List<Pair<Shape, Color>> = ArrayList()
@@ -135,7 +135,7 @@ class MapFrame(
                 val g2d = g as Graphics2D
                 g2d.setRenderingHint(
                     RenderingHints.KEY_ANTIALIASING,
-                    RenderingHints.VALUE_ANTIALIAS_ON
+                    RenderingHints.VALUE_ANTIALIAS_ON,
                 )
                 if (shapesToDraw.isEmpty()) {
                     return
@@ -155,7 +155,7 @@ class MapFrame(
                 val inScope: (Shape) -> Boolean
                 val inverted = transform.createInverse()
                 val drawArea = inverted.createTransformedShape(
-                    Rectangle2D.Double(0.0, 0.0, width.toDouble(), height.toDouble())
+                    Rectangle2D.Double(0.0, 0.0, width.toDouble(), height.toDouble()),
                 )
                 inScope = { s: Shape -> drawArea.intersects(s.bounds) }
                 shapesToDraw
@@ -170,7 +170,7 @@ class MapFrame(
                                     s
                                 }, executor)
                             },
-                            it.second
+                            it.second,
                         )
                     }
                     .groupBy { it.second }
@@ -205,7 +205,7 @@ class MapFrame(
                     .filter { inScope(it) }
                     .map {
                         transformedShapesCache.computeIfAbsent(
-                            it
+                            it,
                         ) { shape ->
                             CompletableFuture.supplyAsync({
                                 val s = createTransformedShape(transform, shape)
@@ -230,7 +230,7 @@ class MapFrame(
                             transformedShapesCache.clear()
                             repaint()
                         }
-                    }
+                    },
                 )
             }
         }
@@ -260,9 +260,9 @@ class MapFrame(
             focusBoxPublisher.subscribe(
                 Subscriber(
                     eventQueueWrapper(
-                        onFocusBoxUpdate
-                    )
-                )
+                        onFocusBoxUpdate,
+                    ),
+                ),
             )
         } else {
             onFocusBoxUpdate(null)
@@ -276,9 +276,9 @@ class MapFrame(
             outlineShapesPublisher.subscribe(
                 Subscriber(
                     eventQueueWrapper(
-                        onOutlineShapesUpdate
-                    )
-                )
+                        onOutlineShapesUpdate,
+                    ),
+                ),
             )
         } else {
             onOutlineShapesUpdate(emptyList())

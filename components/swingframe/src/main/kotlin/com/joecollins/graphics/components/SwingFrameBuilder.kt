@@ -72,7 +72,7 @@ class SwingFrameBuilder {
                 if (props.value.toDouble() == 0.0) {
                     props.bottomColor = it
                 }
-            }
+            },
         )
         return this
     }
@@ -92,7 +92,7 @@ class SwingFrameBuilder {
             rightColorPublisher = rightColorPublisher ?: Color.BLACK.asOneTimePublisher(),
             bottomColorPublisher = bottomColorPublisher ?: Color.BLACK.asOneTimePublisher(),
             bottomTextPublisher = bottomTextPublisher ?: null.asOneTimePublisher(),
-            progressPublisher = progressPublisher
+            progressPublisher = progressPublisher,
         )
     }
 
@@ -148,7 +148,7 @@ class SwingFrameBuilder {
         fun <POC : PartyOrCoalition> prevCurr(
             prevPublisher: Flow.Publisher<out Map<out POC, Number>>,
             currPublisher: Flow.Publisher<out Map<out POC, Number>>,
-            partyOrder: Comparator<POC>
+            partyOrder: Comparator<POC>,
         ): SwingFrameBuilder {
             return prevCurr(prevPublisher, currPublisher, partyOrder, false)
         }
@@ -157,7 +157,7 @@ class SwingFrameBuilder {
             prevPublisher: Flow.Publisher<out P>,
             currPublisher: Flow.Publisher<out C>,
             partyOrder: Comparator<POC>,
-            normalised: Boolean
+            normalised: Boolean,
         ): SwingFrameBuilder {
             val prevCurr = SelfPublishingPrevCurrPct<POC>()
             val toPctFunc = { votes: Map<out POC, Number> ->
@@ -201,7 +201,7 @@ class SwingFrameBuilder {
                                         -1.0
                                     } else {
                                         1.0
-                                    }
+                                    },
                                 )
                             )
                     }
@@ -223,7 +223,7 @@ class SwingFrameBuilder {
                                 toParty.abbreviation.uppercase()
                             )
                     }
-                }
+                },
             )
                 .withRange(0.1.asOneTimePublisher())
                 .withNeutralColor(Color.LIGHT_GRAY.asOneTimePublisher())
@@ -233,7 +233,7 @@ class SwingFrameBuilder {
         fun <POC : PartyOrCoalition> prevCurrNormalised(
             prevPublisher: Flow.Publisher<out Map<out POC, Double>>,
             currPublisher: Flow.Publisher<out Map<out POC, Double>>,
-            partyOrder: Comparator<POC>
+            partyOrder: Comparator<POC>,
         ): SwingFrameBuilder {
             return prevCurr(prevPublisher, currPublisher, partyOrder, true)
         }
@@ -243,7 +243,7 @@ class SwingFrameBuilder {
             leftColorFunc: (T) -> Color,
             rightColorFunc: (T) -> Color,
             valueFunc: (T) -> Number,
-            textFunc: (T) -> String
+            textFunc: (T) -> String,
         ): SwingFrameBuilder {
             val builder = SwingFrameBuilder()
             val props = builder.props
@@ -269,7 +269,7 @@ class SwingFrameBuilder {
                             builder.neutralColor
                         }
                     }
-                }
+                },
             )
             return builder
         }

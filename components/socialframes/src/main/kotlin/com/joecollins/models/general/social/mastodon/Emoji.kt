@@ -8,5 +8,5 @@ import java.net.URL
 data class Emoji(
     val shortcode: String,
     val url: URL,
-    @JsonProperty("static_url") val staticUrl: URL
+    @JsonProperty("static_url") val staticUrl: URL,
 )

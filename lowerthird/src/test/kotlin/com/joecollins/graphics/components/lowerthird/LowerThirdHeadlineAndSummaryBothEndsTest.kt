@@ -27,7 +27,7 @@ class LowerThirdHeadlineAndSummaryBothEndsTest {
             summaryHeaderPublisher = "270 TO WIN".asOneTimePublisher(),
             summaryTotalPublisher = 538.asOneTimePublisher(),
             summaryLeftPublisher = SummaryFromBothEnds.Entry(Color.BLUE, "CLINTON", 232).asOneTimePublisher(),
-            summaryRightPublisher = SummaryFromBothEnds.Entry(Color.RED, "TRUMP", 306).asOneTimePublisher()
+            summaryRightPublisher = SummaryFromBothEnds.Entry(Color.RED, "TRUMP", 306).asOneTimePublisher(),
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ lowerThird.headline }, IsEqual("POLLS CLOSE ACROSS CENTRAL CANADA"))
@@ -43,7 +43,7 @@ class LowerThirdHeadlineAndSummaryBothEndsTest {
             summaryHeaderPublisher = "270 TO WIN".asOneTimePublisher(),
             summaryTotalPublisher = 538.asOneTimePublisher(),
             summaryLeftPublisher = SummaryFromBothEnds.Entry(Color.BLUE, "CLINTON", 232).asOneTimePublisher(),
-            summaryRightPublisher = SummaryFromBothEnds.Entry(Color.RED, "TRUMP", 306).asOneTimePublisher()
+            summaryRightPublisher = SummaryFromBothEnds.Entry(Color.RED, "TRUMP", 306).asOneTimePublisher(),
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ lowerThird.subhead }, IsEqual("Polls open for 30 minutes on west coast"))
@@ -59,7 +59,7 @@ class LowerThirdHeadlineAndSummaryBothEndsTest {
             summaryHeaderPublisher = "270 TO WIN".asOneTimePublisher(),
             summaryTotalPublisher = 538.asOneTimePublisher(),
             summaryLeftPublisher = SummaryFromBothEnds.Entry(Color.BLUE, "CLINTON", 232).asOneTimePublisher(),
-            summaryRightPublisher = SummaryFromBothEnds.Entry(Color.RED, "TRUMP", 306).asOneTimePublisher()
+            summaryRightPublisher = SummaryFromBothEnds.Entry(Color.RED, "TRUMP", 306).asOneTimePublisher(),
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ lowerThird.summaryHeader }, IsEqual("270 TO WIN"))
@@ -76,7 +76,7 @@ class LowerThirdHeadlineAndSummaryBothEndsTest {
             summaryHeaderPublisher = "270 TO WIN".asOneTimePublisher(),
             summaryTotalPublisher = 538.asOneTimePublisher(),
             summaryLeftPublisher = SummaryFromBothEnds.Entry(Color.BLUE, "CLINTON", 232).asOneTimePublisher(),
-            summaryRightPublisher = SummaryFromBothEnds.Entry(Color.RED, "TRUMP", 306).asOneTimePublisher()
+            summaryRightPublisher = SummaryFromBothEnds.Entry(Color.RED, "TRUMP", 306).asOneTimePublisher(),
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ lowerThird.left }, IsNot(IsNull()))
@@ -99,7 +99,7 @@ class LowerThirdHeadlineAndSummaryBothEndsTest {
             summaryTotalPublisher = 538.asOneTimePublisher(),
             summaryLeftPublisher = SummaryFromBothEnds.Entry(Color.BLUE, "HUMPHREY", 191).asOneTimePublisher(),
             summaryRightPublisher = SummaryFromBothEnds.Entry(Color.RED, "NIXON", 301).asOneTimePublisher(),
-            summaryMiddlePublisher = SummaryFromBothEnds.Entry(Color.GRAY, "WALLACE", 46).asOneTimePublisher()
+            summaryMiddlePublisher = SummaryFromBothEnds.Entry(Color.GRAY, "WALLACE", 46).asOneTimePublisher(),
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ lowerThird.left }, IsNot(IsNull()))
@@ -127,7 +127,7 @@ class LowerThirdHeadlineAndSummaryBothEndsTest {
             summaryTotalPublisher = 538.asOneTimePublisher(),
             summaryLeftPublisher = left,
             summaryRightPublisher = right,
-            clock = Clock.fixed(Instant.parse("2016-11-09T06:00:00Z"), ZoneId.systemDefault())
+            clock = Clock.fixed(Instant.parse("2016-11-09T06:00:00Z"), ZoneId.systemDefault()),
         )
         lowerThird.setSize(1024, 50)
         compareRendering("LowerThird", "HeadlineAndSummaryBothEnds-RightWin-1", lowerThird)
@@ -155,7 +155,7 @@ class LowerThirdHeadlineAndSummaryBothEndsTest {
             summaryTotalPublisher = 538.asOneTimePublisher(),
             summaryLeftPublisher = left,
             summaryRightPublisher = right,
-            clock = Clock.fixed(Instant.parse("2008-11-05T06:00:00Z"), ZoneId.systemDefault())
+            clock = Clock.fixed(Instant.parse("2008-11-05T06:00:00Z"), ZoneId.systemDefault()),
         )
         lowerThird.setSize(1024, 50)
         compareRendering("LowerThird", "HeadlineAndSummaryBothEnds-LeftWin-1", lowerThird)
@@ -183,7 +183,7 @@ class LowerThirdHeadlineAndSummaryBothEndsTest {
             summaryTotalPublisher = 538.asOneTimePublisher(),
             summaryLeftPublisher = left,
             summaryRightPublisher = right,
-            clock = Clock.fixed(Instant.parse("1984-11-07T06:00:00Z"), ZoneId.systemDefault())
+            clock = Clock.fixed(Instant.parse("1984-11-07T06:00:00Z"), ZoneId.systemDefault()),
         )
         lowerThird.setSize(1024, 50)
         compareRendering("LowerThird", "HeadlineAndSummaryBothEnds-RightLandslide-1", lowerThird)
@@ -211,7 +211,7 @@ class LowerThirdHeadlineAndSummaryBothEndsTest {
             summaryTotalPublisher = 531.asOneTimePublisher(),
             summaryLeftPublisher = left,
             summaryRightPublisher = right,
-            clock = Clock.fixed(Instant.parse("1936-11-04T06:00:00Z"), ZoneId.systemDefault())
+            clock = Clock.fixed(Instant.parse("1936-11-04T06:00:00Z"), ZoneId.systemDefault()),
         )
         lowerThird.setSize(1024, 50)
         compareRendering("LowerThird", "HeadlineAndSummaryBothEnds-LeftLandslide-1", lowerThird)
@@ -241,7 +241,7 @@ class LowerThirdHeadlineAndSummaryBothEndsTest {
             summaryLeftPublisher = left,
             summaryRightPublisher = right,
             summaryMiddlePublisher = middle,
-            clock = Clock.fixed(Instant.parse("2006-11-08T06:00:00Z"), ZoneId.systemDefault())
+            clock = Clock.fixed(Instant.parse("2006-11-08T06:00:00Z"), ZoneId.systemDefault()),
         )
         lowerThird.setSize(1024, 50)
         compareRendering("LowerThird", "HeadlineAndSummaryBothEnds-MiddleNoMajority-1", lowerThird)
@@ -270,7 +270,7 @@ class LowerThirdHeadlineAndSummaryBothEndsTest {
             summaryLeftPublisher = left,
             summaryRightPublisher = right,
             summaryMiddlePublisher = middle,
-            clock = Clock.fixed(Instant.parse("2008-11-05T06:00:00Z"), ZoneId.systemDefault())
+            clock = Clock.fixed(Instant.parse("2008-11-05T06:00:00Z"), ZoneId.systemDefault()),
         )
         lowerThird.setSize(1024, 50)
         compareRendering("LowerThird", "HeadlineAndSummaryBothEnds-MiddleLeftMajority-1", lowerThird)
@@ -299,7 +299,7 @@ class LowerThirdHeadlineAndSummaryBothEndsTest {
             summaryLeftPublisher = left,
             summaryRightPublisher = right,
             summaryMiddlePublisher = middle,
-            clock = Clock.fixed(Instant.parse("2004-11-03T06:00:00Z"), ZoneId.systemDefault())
+            clock = Clock.fixed(Instant.parse("2004-11-03T06:00:00Z"), ZoneId.systemDefault()),
         )
         lowerThird.setSize(1024, 50)
         compareRendering("LowerThird", "HeadlineAndSummaryBothEnds-MiddleRightMajority-1", lowerThird)

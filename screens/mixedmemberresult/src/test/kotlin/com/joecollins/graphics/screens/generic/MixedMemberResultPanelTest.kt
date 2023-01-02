@@ -44,7 +44,7 @@ class MixedMemberResultPanelTest {
                 selectedShape,
                 selectedResult,
                 focus,
-                mapHeader
+                mapHeader,
             )
             .build(header)
         panel.setSize(1024, 512)
@@ -53,34 +53,34 @@ class MixedMemberResultPanelTest {
                 Candidate("Jesse Reddin Cousins", ndp) to 41,
                 Candidate("Mike Gillis", pc) to 865,
                 Candidate("Robert Mitchell", lib, true) to 1420,
-                Candidate("Amanda Morrison", grn) to 1057
+                Candidate("Amanda Morrison", grn) to 1057,
 
-            )
+            ),
         )
         previousCandidateVotes.submit(
             mapOf(
                 lib to 1425,
                 pc to 1031,
                 ndp to 360,
-                grn to 295
-            )
+                grn to 295,
+            ),
         )
         currentPartyVotes.submit(
             mapOf(
                 grn to 1098,
                 lib to 1013,
                 ndp to 112,
-                pc to 822
+                pc to 822,
 
-            )
+            ),
         )
         previousPartyVotes.submit(
             mapOf(
                 lib to 1397,
                 pc to 1062,
                 ndp to 544,
-                grn to 426
-            )
+                grn to 426,
+            ),
         )
         compareRendering("MixedMemberResultPanel", "Basic", panel)
     }
@@ -121,7 +121,7 @@ class MixedMemberResultPanelTest {
                 selectedShape,
                 selectedResult,
                 focus,
-                mapHeader
+                mapHeader,
             )
             .build(header)
         panel.setSize(1024, 512)
@@ -130,8 +130,8 @@ class MixedMemberResultPanelTest {
                 Candidate("Jesse Reddin Cousins", ndp) to 8,
                 Candidate("Mike Gillis", pc) to 173,
                 Candidate("Robert Mitchell", lib, true) to 284,
-                Candidate("Amanda Morrison", grn) to 211
-            )
+                Candidate("Amanda Morrison", grn) to 211,
+            ),
         )
         winner.submit(Candidate("Robert Mitchell", lib, true))
         previousCandidateVotes.submit(
@@ -139,24 +139,24 @@ class MixedMemberResultPanelTest {
                 lib to 1425,
                 pc to 1031,
                 ndp to 360,
-                grn to 295
-            )
+                grn to 295,
+            ),
         )
         currentPartyVotes.submit(
             mapOf(
                 grn to 110,
                 lib to 101,
                 ndp to 11,
-                pc to 82
-            )
+                pc to 82,
+            ),
         )
         previousPartyVotes.submit(
             mapOf(
                 lib to 1397,
                 pc to 1062,
                 ndp to 544,
-                grn to 426
-            )
+                grn to 426,
+            ),
         )
         candidatePctReporting.submit(0.2)
         partyPctReporting.submit(0.1)
@@ -204,7 +204,7 @@ class MixedMemberResultPanelTest {
                 selectedShape,
                 selectedResult,
                 focus,
-                mapHeader
+                mapHeader,
             )
             .build(header)
         panel.setSize(1024, 512)
@@ -213,8 +213,8 @@ class MixedMemberResultPanelTest {
                 Candidate("Jesse Reddin Cousins", ndp) to 8,
                 Candidate("Mike Gillis", pc) to 173,
                 Candidate("Robert Mitchell", lib, true) to 284,
-                Candidate("Amanda Morrison", grn) to 211
-            )
+                Candidate("Amanda Morrison", grn) to 211,
+            ),
         )
         winner.submit(Candidate("Robert Mitchell", lib, true))
         previousCandidateVotes.submit(
@@ -222,24 +222,24 @@ class MixedMemberResultPanelTest {
                 lib to 1425,
                 pc to 1031,
                 ndp to 360,
-                grn to 295
-            )
+                grn to 295,
+            ),
         )
         currentPartyVotes.submit(
             mapOf(
                 grn to 110,
                 lib to 101,
                 ndp to 11,
-                pc to 82
-            )
+                pc to 82,
+            ),
         )
         previousPartyVotes.submit(
             mapOf(
                 lib to 1397,
                 pc to 1062,
                 ndp to 544,
-                grn to 426
-            )
+                grn to 426,
+            ),
         )
         candidatePctReporting.submit(0.2)
         candidateProgress.submit("20% IN")
@@ -283,7 +283,7 @@ class MixedMemberResultPanelTest {
                 selectedShape,
                 selectedResult,
                 focus,
-                mapHeader
+                mapHeader,
             )
             .build(header)
         panel.setSize(1024, 512)
@@ -292,32 +292,32 @@ class MixedMemberResultPanelTest {
                 Candidate("Jesse Reddin Cousins", ndp) to 0,
                 Candidate("Mike Gillis", pc) to 0,
                 Candidate("Robert Mitchell", lib, true) to 0,
-                Candidate("Amanda Morrison", grn) to 0
-            )
+                Candidate("Amanda Morrison", grn) to 0,
+            ),
         )
         previousCandidateVotes.submit(
             mapOf(
                 lib to 1425,
                 pc to 1031,
                 ndp to 360,
-                grn to 295
-            )
+                grn to 295,
+            ),
         )
         currentPartyVotes.submit(
             mapOf(
                 grn to 0,
                 lib to 0,
                 ndp to 0,
-                pc to 0
-            )
+                pc to 0,
+            ),
         )
         previousPartyVotes.submit(
             mapOf(
                 lib to 1397,
                 pc to 1062,
                 ndp to 544,
-                grn to 426
-            )
+                grn to 426,
+            ),
         )
         candidatePctReporting.submit(0.0)
         partyPctReporting.submit(0.0)
@@ -358,7 +358,7 @@ class MixedMemberResultPanelTest {
                 selectedShape,
                 selectedResult,
                 focus,
-                mapHeader
+                mapHeader,
             )
             .build(header)
         panel.setSize(1024, 512)
@@ -367,32 +367,32 @@ class MixedMemberResultPanelTest {
                 Candidate("Jesse Reddin Cousins", ndp) to 0,
                 Candidate("Mike Gillis", pc) to 8,
                 Candidate("Robert Mitchell", lib, true) to 14,
-                Candidate("Amanda Morrison", grn) to 11
-            )
+                Candidate("Amanda Morrison", grn) to 11,
+            ),
         )
         previousCandidateVotes.submit(
             mapOf(
                 lib to 1425,
                 pc to 1031,
                 ndp to 360,
-                grn to 295
-            )
+                grn to 295,
+            ),
         )
         currentPartyVotes.submit(
             mapOf(
                 grn to 11,
                 lib to 14,
                 ndp to 0,
-                pc to 8
-            )
+                pc to 8,
+            ),
         )
         previousPartyVotes.submit(
             mapOf(
                 lib to 1397,
                 pc to 1062,
                 ndp to 544,
-                grn to 426
-            )
+                grn to 426,
+            ),
         )
         candidatePctReporting.submit(0.01)
         partyPctReporting.submit(0.01)
@@ -429,7 +429,7 @@ class MixedMemberResultPanelTest {
                 selectedShape,
                 selectedResult,
                 focus,
-                mapHeader
+                mapHeader,
             )
             .build(header)
         panel.setSize(1024, 512)
@@ -437,29 +437,29 @@ class MixedMemberResultPanelTest {
             mapOf(
                 Candidate.OTHERS to 1106,
                 Candidate("Robert Mitchell", lib, true) to 1420,
-                Candidate("Amanda Morrison", grn) to 1057
-            )
+                Candidate("Amanda Morrison", grn) to 1057,
+            ),
         )
         previousCandidateVotes.submit(
             mapOf(
                 Party.OTHERS to 1391,
                 lib to 1425,
-                grn to 295
-            )
+                grn to 295,
+            ),
         )
         currentPartyVotes.submit(
             mapOf(
                 pc to 1098,
                 lib to 1013,
-                Party.OTHERS to 1050
-            )
+                Party.OTHERS to 1050,
+            ),
         )
         previousPartyVotes.submit(
             mapOf(
                 lib to 1397,
                 pc to 1062,
-                Party.OTHERS to 1100
-            )
+                Party.OTHERS to 1100,
+            ),
         )
         compareRendering("MixedMemberResultPanel", "Other", panel)
     }
@@ -498,7 +498,7 @@ class MixedMemberResultPanelTest {
                 selectedResult,
                 focus,
                 additionalHighlight,
-                mapHeader
+                mapHeader,
             )
             .build(header)
         panel.setSize(1024, 512)
@@ -507,32 +507,32 @@ class MixedMemberResultPanelTest {
                 Candidate("Jesse Reddin Cousins", ndp) to 41,
                 Candidate("Mike Gillis", pc) to 865,
                 Candidate("Robert Mitchell", lib, true) to 1420,
-                Candidate("Amanda Morrison", grn) to 1057
-            )
+                Candidate("Amanda Morrison", grn) to 1057,
+            ),
         )
         previousCandidateVotes.submit(
             mapOf(
                 lib to 1425,
                 pc to 1031,
                 ndp to 360,
-                grn to 295
-            )
+                grn to 295,
+            ),
         )
         currentPartyVotes.submit(
             mapOf(
                 grn to 1098,
                 lib to 1013,
                 ndp to 112,
-                pc to 822
-            )
+                pc to 822,
+            ),
         )
         previousPartyVotes.submit(
             mapOf(
                 lib to 1397,
                 pc to 1062,
                 ndp to 544,
-                grn to 426
-            )
+                grn to 426,
+            ),
         )
         compareRendering("MixedMemberResultPanel", "MapAdditionalHighlight", panel)
     }
@@ -563,7 +563,7 @@ class MixedMemberResultPanelTest {
                 selectedShape,
                 selectedResult,
                 focus,
-                mapHeader
+                mapHeader,
             )
             .build(header)
         panel.setSize(1024, 512)
@@ -572,16 +572,16 @@ class MixedMemberResultPanelTest {
                 Candidate("Jesse Reddin Cousins", ndp) to 41,
                 Candidate("Mike Gillis", pc) to 865,
                 Candidate("Robert Mitchell", lib, true) to 1420,
-                Candidate("Amanda Morrison", grn) to 1057
-            )
+                Candidate("Amanda Morrison", grn) to 1057,
+            ),
         )
         currentPartyVotes.submit(
             mapOf(
                 grn to 1098,
                 lib to 1013,
                 ndp to 112,
-                pc to 822
-            )
+                pc to 822,
+            ),
         )
         compareRendering("MixedMemberResultPanel", "NoPrev", panel)
     }
@@ -608,7 +608,7 @@ class MixedMemberResultPanelTest {
             .withCandidateVotes(
                 currentCandidateVotes,
                 candidateHeader,
-                candidateSubhead
+                candidateSubhead,
             )
             .withPartyVotes(currentPartyVotes, partyHeader)
             .withIncumbentMarker("(MLA)")
@@ -617,7 +617,7 @@ class MixedMemberResultPanelTest {
                 selectedShape,
                 selectedResult,
                 focus,
-                mapHeader
+                mapHeader,
             )
             .build(header)
         panel.setSize(1024, 512)
@@ -626,16 +626,16 @@ class MixedMemberResultPanelTest {
                 Candidate("Jesse Reddin Cousins", ndp) to 41,
                 Candidate("Mike Gillis", pc) to 865,
                 Candidate("Robert Mitchell", lib, true) to 1420,
-                Candidate("Amanda Morrison", grn) to 1057
-            )
+                Candidate("Amanda Morrison", grn) to 1057,
+            ),
         )
         currentPartyVotes.submit(
             mapOf(
                 grn to 1098,
                 lib to 1013,
                 ndp to 112,
-                pc to 822
-            )
+                pc to 822,
+            ),
         )
         compareRendering("MixedMemberResultPanel", "NoPrevSubhead", panel)
     }
@@ -668,7 +668,7 @@ class MixedMemberResultPanelTest {
                 selectedShape,
                 selectedResult,
                 focus,
-                mapHeader
+                mapHeader,
             )
             .build(header)
         panel.setSize(1024, 512)
@@ -677,8 +677,8 @@ class MixedMemberResultPanelTest {
                 Candidate("Jesse Reddin Cousins", ndp) to 41,
                 Candidate("Mike Gillis", pc) to 865,
                 Candidate("Robert Mitchell", lib, true) to 1420,
-                Candidate("Amanda Morrison", grn) to 1057
-            )
+                Candidate("Amanda Morrison", grn) to 1057,
+            ),
         )
         winner.submit(Candidate("Robert Mitchell", lib, true))
         currentPartyVotes.submit(
@@ -686,8 +686,8 @@ class MixedMemberResultPanelTest {
                 grn to 1098,
                 lib to 1013,
                 ndp to 112,
-                pc to 822
-            )
+                pc to 822,
+            ),
         )
         compareRendering("MixedMemberResultPanel", "NoPrevTick", panel)
     }
@@ -720,7 +720,7 @@ class MixedMemberResultPanelTest {
                 selectedShape,
                 selectedResult,
                 focus,
-                mapHeader
+                mapHeader,
             )
             .build(header)
         panel.setSize(1024, 512)
@@ -729,8 +729,8 @@ class MixedMemberResultPanelTest {
                 Candidate("", ndp) to 41,
                 Candidate("", pc) to 865,
                 Candidate("", lib, true) to 1420,
-                Candidate("", grn) to 1057
-            )
+                Candidate("", grn) to 1057,
+            ),
         )
         winner.submit(Candidate("", lib, true))
         currentPartyVotes.submit(
@@ -738,8 +738,8 @@ class MixedMemberResultPanelTest {
                 grn to 1098,
                 lib to 1013,
                 ndp to 112,
-                pc to 822
-            )
+                pc to 822,
+            ),
         )
         compareRendering("MixedMemberResultPanel", "PartyOnlyForCandidateVotes", panel)
     }
@@ -781,7 +781,7 @@ class MixedMemberResultPanelTest {
             .withPrevCandidateVotes(previousCandidateVotes, candidateChangeHeader)
             .withPartyVotes(
                 Aggregators.topAndOthers(currentPartyVotes, 5, Party.OTHERS, topPartiesWaiting),
-                partyHeader
+                partyHeader,
             )
             .withPrevPartyVotes(previousPartyVotes, partyChangeHeader)
             .build(header)
@@ -794,7 +794,7 @@ class MixedMemberResultPanelTest {
             Candidate("Aaron Anthony Jose Hasan D'Souza", app) to null,
             Candidate("Amina May Kay Gichinga", city) to null,
             Candidate("Peter James Harris", ukip) to null,
-            Candidate("Rayne Mickail", resp) to null
+            Candidate("Rayne Mickail", resp) to null,
         )
         currentCandidateVotes.submit(currCandVotes)
         previousCandidateVotes.submit(
@@ -806,8 +806,8 @@ class MixedMemberResultPanelTest {
                 cup to 6774,
                 con to 24923,
                 grn to 10891,
-                fresh to 5243
-            )
+                fresh to 5243,
+            ),
         )
         val currPartyVotes = mutableMapOf<Party, Int?>(
             awp to null,
@@ -821,7 +821,7 @@ class MixedMemberResultPanelTest {
             resp to null,
             house to null,
             ukip to null,
-            wep to null
+            wep to null,
         )
         currentPartyVotes.submit(currPartyVotes)
         previousPartyVotes.submit(
@@ -837,8 +837,8 @@ class MixedMemberResultPanelTest {
                 house to 684,
                 tusc to 1277,
                 ukip to 5966,
-                ind to 299 + 1171
-            )
+                ind to 299 + 1171,
+            ),
         )
         compareRendering("MixedMemberResultPanel", "Declaration-1", panel)
         currCandVotes[Candidate("Elaine Sheila Bagshaw", ld)] = 10714
@@ -880,7 +880,7 @@ class MixedMemberResultPanelTest {
         currentPartyVotes.submit(currPartyVotes)
         compareRendering("MixedMemberResultPanel", "Declaration-9", panel)
         currentCandidateVotes.submit(
-            Aggregators.topAndOthers(currCandVotes, 6, Candidate.OTHERS)
+            Aggregators.topAndOthers(currCandVotes, 6, Candidate.OTHERS),
         )
         compareRendering("MixedMemberResultPanel", "Declaration-10", panel)
     }

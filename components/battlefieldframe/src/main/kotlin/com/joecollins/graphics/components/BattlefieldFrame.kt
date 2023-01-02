@@ -20,9 +20,9 @@ class BattlefieldFrame(
     incrementPublisher: Flow.Publisher<out Number>,
     dotsPublisher: Flow.Publisher<out List<Pair<Dot, Color>>> = emptyList<Pair<Dot, Color>>().asOneTimePublisher(),
     linesPublisher: Flow.Publisher<out List<Pair<Line, Color>>> = emptyList<Pair<Line, Color>>().asOneTimePublisher(),
-    swingPublisher: Flow.Publisher<out Dot?> = null.asOneTimePublisher()
+    swingPublisher: Flow.Publisher<out Dot?> = null.asOneTimePublisher(),
 ) : GraphicsFrame(
-    headerPublisher = headerPublisher
+    headerPublisher = headerPublisher,
 ) {
     @Suppress("PrivatePropertyName")
     private val SQRT_3 = sqrt(3.0)
@@ -90,7 +90,7 @@ class BattlefieldFrame(
             val increment = width / limit / 2
             return Point(
                 width / 2 + (leftToRight * increment).roundToInt(),
-                height * 3 / 5 - (bottomToTop * increment).roundToInt()
+                height * 3 / 5 - (bottomToTop * increment).roundToInt(),
             )
         }
 
@@ -101,7 +101,7 @@ class BattlefieldFrame(
             g
                 .setRenderingHint(
                     RenderingHints.KEY_TEXT_ANTIALIASING,
-                    RenderingHints.VALUE_TEXT_ANTIALIAS_ON
+                    RenderingHints.VALUE_TEXT_ANTIALIAS_ON,
                 )
 
             g.color = Color(224, 224, 224)

@@ -21,7 +21,7 @@ class SeatsChangingScreenTest {
             prevResult,
             currResult,
             { it.uppercase() },
-            "SEATS CHANGING".asOneTimePublisher()
+            "SEATS CHANGING".asOneTimePublisher(),
         )
             .withNumRows(numRows)
             .build(title)
@@ -31,8 +31,8 @@ class SeatsChangingScreenTest {
             mapOf(
                 "Coquitlam-Burke Mountain" to leading(ndp),
                 "Fraser-Nicola" to leading(ndp),
-                "Vancouver-False Creek" to leading(ndp)
-            )
+                "Vancouver-False Creek" to leading(ndp),
+            ),
         )
         compareRendering("SeatsChangingScreen", "Basic-2", panel)
         currResult.submit(
@@ -40,8 +40,8 @@ class SeatsChangingScreenTest {
                 "Coquitlam-Burke Mountain" to elected(ndp),
                 "Fraser-Nicola" to leading(lib),
                 "Richmond-Queensborough" to leading(ndp),
-                "Vancouver-False Creek" to leading(ndp)
-            )
+                "Vancouver-False Creek" to leading(ndp),
+            ),
         )
         compareRendering("SeatsChangingScreen", "Basic-3", panel)
         currResult.submit(bcCurrResult())
@@ -57,13 +57,13 @@ class SeatsChangingScreenTest {
         val filteredSeats = Publisher(
             bcPrevResult().keys
                 .filter { it.startsWith("Vancouver") }
-                .toSet()
+                .toSet(),
         )
         val panel = SeatsChangingScreen.of(
             prevResult,
             currResult,
             { it.uppercase() },
-            "SEATS CHANGING".asOneTimePublisher()
+            "SEATS CHANGING".asOneTimePublisher(),
         )
             .withNumRows(numRows)
             .withSeatFilter(filteredSeats)
@@ -74,8 +74,8 @@ class SeatsChangingScreenTest {
             mapOf(
                 "Coquitlam-Burke Mountain" to leading(ndp),
                 "Fraser-Nicola" to leading(ndp),
-                "Vancouver-False Creek" to leading(ndp)
-            )
+                "Vancouver-False Creek" to leading(ndp),
+            ),
         )
         compareRendering("SeatsChangingScreen", "Filtered-2", panel)
         currResult.submit(
@@ -83,8 +83,8 @@ class SeatsChangingScreenTest {
                 "Coquitlam-Burke Mountain" to elected(ndp),
                 "Fraser-Nicola" to leading(lib),
                 "Richmond-Queensborough" to leading(ndp),
-                "Vancouver-False Creek" to leading(ndp)
-            )
+                "Vancouver-False Creek" to leading(ndp),
+            ),
         )
         compareRendering("SeatsChangingScreen", "Filtered-3", panel)
         currResult.submit(bcCurrResult())
@@ -102,7 +102,7 @@ class SeatsChangingScreenTest {
             prevResult,
             currResult,
             { it.uppercase() },
-            "SEATS CHANGING".asOneTimePublisher()
+            "SEATS CHANGING".asOneTimePublisher(),
         )
             .withNumRows(numRows)
             .build(title)
@@ -122,7 +122,7 @@ class SeatsChangingScreenTest {
             prevResult,
             currResult,
             { it.uppercase() },
-            "SEATS CHANGING".asOneTimePublisher()
+            "SEATS CHANGING".asOneTimePublisher(),
         )
             .withNumRows(numRows)
             .withPartyChanges(mapOf(lib to bcu).asOneTimePublisher())
@@ -133,8 +133,8 @@ class SeatsChangingScreenTest {
             mapOf(
                 "Coquitlam-Burke Mountain" to leading(ndp),
                 "Fraser-Nicola" to leading(ndp),
-                "Vancouver-False Creek" to leading(ndp)
-            )
+                "Vancouver-False Creek" to leading(ndp),
+            ),
         )
         compareRendering("SeatsChangingScreen", "PartyChanges-2", panel)
         currResult.submit(
@@ -142,8 +142,8 @@ class SeatsChangingScreenTest {
                 "Coquitlam-Burke Mountain" to elected(ndp),
                 "Fraser-Nicola" to leading(bcu),
                 "Richmond-Queensborough" to leading(ndp),
-                "Vancouver-False Creek" to leading(ndp)
-            )
+                "Vancouver-False Creek" to leading(ndp),
+            ),
         )
         compareRendering("SeatsChangingScreen", "PartyChanges-3", panel)
         currResult.submit(
@@ -153,7 +153,7 @@ class SeatsChangingScreenTest {
                 } else {
                     it.value
                 }
-            }
+            },
         )
         compareRendering("SeatsChangingScreen", "PartyChanges-4", panel)
     }
@@ -253,7 +253,7 @@ class SeatsChangingScreenTest {
                 "Sannich North and the Islands" to mapOf(lib to 9321, ndp to 10764, grn to 14775, oth to 364),
                 "Saanich South" to mapOf(lib to 8716, ndp to 11912, grn to 7129, oth to 177 + 130),
                 "Victoria-Beacon Hill" to mapOf(lib to 4689, ndp to 16057, grn to 9194, oth to 190 + 102 + 35),
-                "Victoria-Swan Lake" to mapOf(lib to 4005, ndp to 13531, grn to 7491, oth to 207)
+                "Victoria-Swan Lake" to mapOf(lib to 4005, ndp to 13531, grn to 7491, oth to 207),
             )
         }
 
@@ -345,7 +345,7 @@ class SeatsChangingScreenTest {
                 "Sannich North and the Islands" to elected(grn),
                 "Saanich South" to elected(ndp),
                 "Victoria-Beacon Hill" to elected(ndp),
-                "Victoria-Swan Lake" to elected(ndp)
+                "Victoria-Swan Lake" to elected(ndp),
             )
         }
     }

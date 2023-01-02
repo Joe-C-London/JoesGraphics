@@ -22,7 +22,7 @@ class LowerThirdHeadlineAndBottomSummaryPartyTest {
             LowerThird.createImage(
                 LowerThirdHeadlineAndBottomSummaryPartyTest::class.java
                     .classLoader
-                    .getResource("com/joecollins/graphics/lowerthird-left.png")
+                    .getResource("com/joecollins/graphics/lowerthird-left.png"),
             )
                 .asOneTimePublisher(),
             placePublisher = ("OTTAWA" to ZoneId.of("Canada/Eastern")).asOneTimePublisher(),
@@ -34,13 +34,13 @@ class LowerThirdHeadlineAndBottomSummaryPartyTest {
             SummaryEntries.createSeatEntries(
                 mapOf(
                     lib to 2,
-                    con to 1
+                    con to 1,
                 ),
                 338,
-                setOf(bq, con, grn, lib, ndp)
+                setOf(bq, con, grn, lib, ndp),
             )
                 .asOneTimePublisher(),
-            clock = Clock.fixed(Instant.parse("2019-10-22T01:30:00Z"), ZoneId.systemDefault())
+            clock = Clock.fixed(Instant.parse("2019-10-22T01:30:00Z"), ZoneId.systemDefault()),
         )
         lowerThird.setSize(1024, 70)
         compareRendering("LowerThird", "HeadlineAndBottomSummaryHeader", lowerThird)

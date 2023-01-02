@@ -25,15 +25,15 @@ class MultiResultScreenTest {
                     Candidate("Wade MacLauchlan", lib, true) to 1196,
                     Candidate("Bloyce Thompson", pc) to 1300,
                     Candidate("Sarah Donald", grn) to 747,
-                    Candidate("Marian White", ndp) to 46
+                    Candidate("Marian White", ndp) to 46,
                 ),
                 false,
                 mapOf(
                     lib to 1938,
                     pc to 1338,
                     grn to 347,
-                    ndp to 443
-                )
+                    ndp to 443,
+                ),
             ),
             District(
                 15,
@@ -42,15 +42,15 @@ class MultiResultScreenTest {
                     Candidate("Windsor Wight", lib) to 899,
                     Candidate("Dennis King", pc, true) to 1315,
                     Candidate("Greg Bradley", grn) to 879,
-                    Candidate("Leah-Jane Hayward", ndp) to 57
+                    Candidate("Leah-Jane Hayward", ndp) to 57,
                 ),
                 true,
                 mapOf(
                     lib to 1389,
                     pc to 1330,
                     grn to 462,
-                    ndp to 516
-                )
+                    ndp to 516,
+                ),
             ),
             District(
                 17,
@@ -59,16 +59,16 @@ class MultiResultScreenTest {
                     Candidate("Judy MacNevin", lib) to 515,
                     Candidate("Kris Currie", pc) to 1068,
                     Candidate("Peter Bevan-Baker", grn, true) to 1870,
-                    Candidate("Don Wills", ind) to 26
+                    Candidate("Don Wills", ind) to 26,
                 ),
                 true,
                 mapOf(
                     lib to 1046,
                     pc to 609,
                     grn to 2077,
-                    ndp to 58
-                )
-            )
+                    ndp to 58,
+                ),
+            ),
         )
         val shapesByDistrict = peiShapesByDistrict()
         val swingometerOrder = listOf(ndp, grn, lib, ind, pc)
@@ -76,14 +76,14 @@ class MultiResultScreenTest {
             districts.asOneTimePublisher(),
             { it.votes.asOneTimePublisher() },
             { ("DISTRICT " + it.districtNum).asOneTimePublisher() },
-            { it.name.uppercase().asOneTimePublisher() }
+            { it.name.uppercase().asOneTimePublisher() },
         )
             .withIncumbentMarker("(MLA)")
             .withWinner { (if (it.leaderHasWon) it.votes.entries.maxByOrNull { e -> e.value }!!.key else null).asOneTimePublisher() }
             .withPrev(
                 { it.prevVotes.asOneTimePublisher() },
                 { "SWING SINCE 2015".asOneTimePublisher() },
-                compareBy { swingometerOrder.indexOf(it) }
+                compareBy { swingometerOrder.indexOf(it) },
             )
             .withMap(
                 { shapesByDistrict },
@@ -93,7 +93,7 @@ class MultiResultScreenTest {
                         .asOneTimePublisher()
                 },
                 { if (it.districtNum < 10) listOf(1, 2, 3, 4, 5, 6, 7, 8) else listOf(15, 16, 17, 18, 19, 20) },
-                { (if (it.districtNum < 10) "CARDIGAN" else "MALPEQUE").asOneTimePublisher() }
+                { (if (it.districtNum < 10) "CARDIGAN" else "MALPEQUE").asOneTimePublisher() },
             )
             .build("PARTY LEADERS".asOneTimePublisher())
         panel.setSize(1024, 512)
@@ -120,7 +120,7 @@ class MultiResultScreenTest {
                 KRIS CURRIE (PCP): 1,068 (30.7%)
                 JUDY MACNEVIN (LIB): 515 (14.8%)
                 DON WILLS (IND): 26 (0.7%)
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -133,17 +133,17 @@ class MultiResultScreenTest {
                 Candidate("Sarah Donald", grn) to 0,
                 Candidate("Wade MacLauchlan", lib, true) to 0,
                 Candidate("Bloyce Thompson", pc) to 0,
-                Candidate("Marian White", ndp) to 0
+                Candidate("Marian White", ndp) to 0,
             ),
             false,
             mapOf(
                 lib to 1938,
                 pc to 1338,
                 grn to 347,
-                ndp to 443
+                ndp to 443,
             ),
             "0 OF 10 POLLS REPORTING",
-            0.0
+            0.0,
         )
         val district15 = District(
             15,
@@ -152,17 +152,17 @@ class MultiResultScreenTest {
                 Candidate("Greg Bradley", grn) to 0,
                 Candidate("Leah-Jane Hayward", ndp) to 0,
                 Candidate("Dennis King", pc, true) to 0,
-                Candidate("Windsor Wight", lib) to 0
+                Candidate("Windsor Wight", lib) to 0,
             ),
             false,
             mapOf(
                 lib to 1389,
                 pc to 1330,
                 grn to 462,
-                ndp to 516
+                ndp to 516,
             ),
             "0 OF 10 POLLS REPORTING",
-            0.0
+            0.0,
         )
         val district17 = District(
             17,
@@ -171,17 +171,17 @@ class MultiResultScreenTest {
                 Candidate("Peter Bevan-Baker", grn, true) to 0,
                 Candidate("Kris Currie", pc) to 0,
                 Candidate("Judy MacNevin", lib) to 0,
-                Candidate("Don Wills", ind) to 0
+                Candidate("Don Wills", ind) to 0,
             ),
             false,
             mapOf(
                 lib to 1046,
                 pc to 609,
                 grn to 2077,
-                ndp to 58
+                ndp to 58,
             ),
             "0 OF 10 POLLS REPORTING",
-            0.0
+            0.0,
         )
         val districts = Publisher(listOf(district15, district17))
         val shapesByDistrict = peiShapesByDistrict()
@@ -191,7 +191,7 @@ class MultiResultScreenTest {
             districts,
             { it.getVotes() },
             { it.name.uppercase().asOneTimePublisher() },
-            { it.getStatus() }
+            { it.getStatus() },
         )
             .withIncumbentMarker("(MLA)")
             .withPctReporting { it.getPctReporting() }
@@ -199,7 +199,7 @@ class MultiResultScreenTest {
             .withPrev(
                 { it.prevVotes.asOneTimePublisher() },
                 { "SWING SINCE 2015".asOneTimePublisher() },
-                compareBy { swingometerOrder.indexOf(it) }
+                compareBy { swingometerOrder.indexOf(it) },
             )
             .withMap(
                 { shapesByDistrict },
@@ -214,7 +214,7 @@ class MultiResultScreenTest {
                     }
                 },
                 { if (it.districtNum < 10) listOf(1, 2, 3, 4, 5, 6, 7, 8) else listOf(15, 16, 17, 18, 19, 20) },
-                { (if (it.districtNum < 10) "CARDIGAN" else "MALPEQUE").asOneTimePublisher() }
+                { (if (it.districtNum < 10) "CARDIGAN" else "MALPEQUE").asOneTimePublisher() },
             )
             .build(title)
         panel.setSize(1024, 512)
@@ -235,7 +235,7 @@ class MultiResultScreenTest {
                 KRIS CURRIE (PCP): WAITING...
                 JUDY MACNEVIN (LIB): WAITING...
                 DON WILLS (IND): WAITING...
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         district17.update(
@@ -245,8 +245,8 @@ class MultiResultScreenTest {
                 Candidate("Peter Bevan-Baker", grn, true) to 851,
                 Candidate("Kris Currie", pc) to 512,
                 Candidate("Judy MacNevin", lib) to 290,
-                Candidate("Don Wills", ind) to 7
-            )
+                Candidate("Don Wills", ind) to 7,
+            ),
         )
         compareRendering("MultiResultPanel", "Update-2", panel)
         assertPublishes(
@@ -265,7 +265,7 @@ class MultiResultScreenTest {
                 KRIS CURRIE (PCP): 512 (30.8%)
                 JUDY MACNEVIN (LIB): 290 (17.5%)
                 DON WILLS (IND): 7 (0.4%)
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         districts.submit(listOf(district8, district15, district17))
@@ -293,7 +293,7 @@ class MultiResultScreenTest {
                 KRIS CURRIE (PCP): 512 (30.8%)
                 JUDY MACNEVIN (LIB): 290 (17.5%)
                 DON WILLS (IND): 7 (0.4%)
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         district15.update(
@@ -303,8 +303,8 @@ class MultiResultScreenTest {
                 Candidate("Greg Bradley", grn) to 287,
                 Candidate("Leah-Jane Hayward", ndp) to 27,
                 Candidate("Dennis King", pc, true) to 583,
-                Candidate("Windsor Wight", lib) to 425
-            )
+                Candidate("Windsor Wight", lib) to 425,
+            ),
         )
         compareRendering("MultiResultPanel", "Update-4", panel)
         assertPublishes(
@@ -329,7 +329,7 @@ class MultiResultScreenTest {
                 KRIS CURRIE (PCP): 512 (30.8%)
                 JUDY MACNEVIN (LIB): 290 (17.5%)
                 DON WILLS (IND): 7 (0.4%)
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         district8.update(
@@ -339,8 +339,8 @@ class MultiResultScreenTest {
                 Candidate("Sarah Donald", grn) to 285,
                 Candidate("Wade MacLauchlan", lib, true) to 620,
                 Candidate("Bloyce Thompson", pc) to 609,
-                Candidate("Marian White", ndp) to 22
-            )
+                Candidate("Marian White", ndp) to 22,
+            ),
         )
         compareRendering("MultiResultPanel", "Update-5", panel)
         assertPublishes(
@@ -365,7 +365,7 @@ class MultiResultScreenTest {
                 KRIS CURRIE (PCP): 512 (30.8%)
                 JUDY MACNEVIN (LIB): 290 (17.5%)
                 DON WILLS (IND): 7 (0.4%)
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         district15.update(
@@ -375,9 +375,9 @@ class MultiResultScreenTest {
                 Candidate("Greg Bradley", grn) to 287 + 72 + 91 + 79 + 38,
                 Candidate("Leah-Jane Hayward", ndp) to 27 + 7 + 7 + 1 + 3,
                 Candidate("Dennis King", pc, true) to 583 + 87 + 109 + 76 + 54,
-                Candidate("Windsor Wight", lib) to 425 + 73 + 66 + 58 + 30
+                Candidate("Windsor Wight", lib) to 425 + 73 + 66 + 58 + 30,
             ),
-            true
+            true,
         )
         compareRendering("MultiResultPanel", "Update-6", panel)
         assertPublishes(
@@ -402,7 +402,7 @@ class MultiResultScreenTest {
                 KRIS CURRIE (PCP): 512 (30.8%)
                 JUDY MACNEVIN (LIB): 290 (17.5%)
                 DON WILLS (IND): 7 (0.4%)
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         districts.submit(listOf(district8, district17))
@@ -424,7 +424,7 @@ class MultiResultScreenTest {
                 KRIS CURRIE (PCP): 512 (30.8%)
                 JUDY MACNEVIN (LIB): 290 (17.5%)
                 DON WILLS (IND): 7 (0.4%)
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         district15.update(
@@ -434,8 +434,8 @@ class MultiResultScreenTest {
                 Candidate("Greg Bradley", grn) to 879,
                 Candidate("Leah-Jane Hayward", ndp) to 57,
                 Candidate("Dennis King", pc, true) to 1315,
-                Candidate("Windsor Wight", lib) to 899
-            )
+                Candidate("Windsor Wight", lib) to 899,
+            ),
         )
         // intentionally same as before, as this district is no longer displayed
         compareRendering("MultiResultPanel", "Update-7", panel)
@@ -455,7 +455,7 @@ class MultiResultScreenTest {
                 KRIS CURRIE (PCP): 512 (30.8%)
                 JUDY MACNEVIN (LIB): 290 (17.5%)
                 DON WILLS (IND): 7 (0.4%)
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         district17.update(
@@ -465,8 +465,8 @@ class MultiResultScreenTest {
                 Candidate("Peter Bevan-Baker", grn, true) to 851 + 117,
                 Candidate("Kris Currie", pc) to 512 + 90,
                 Candidate("Judy MacNevin", lib) to 290 + 28,
-                Candidate("Don Wills", ind) to 7 + 4
-            )
+                Candidate("Don Wills", ind) to 7 + 4,
+            ),
         )
         compareRendering("MultiResultPanel", "Update-8", panel)
         assertPublishes(
@@ -485,7 +485,7 @@ class MultiResultScreenTest {
                 KRIS CURRIE (PCP): 602 (31.7%)
                 JUDY MACNEVIN (LIB): 318 (16.7%)
                 DON WILLS (IND): 11 (0.6%)
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         district8.update(
@@ -495,8 +495,8 @@ class MultiResultScreenTest {
                 Candidate("Sarah Donald", grn) to 285 + 50,
                 Candidate("Wade MacLauchlan", lib, true) to 620 + 68,
                 Candidate("Bloyce Thompson", pc) to 609 + 112,
-                Candidate("Marian White", ndp) to 22 + 7
-            )
+                Candidate("Marian White", ndp) to 22 + 7,
+            ),
         )
         compareRendering("MultiResultPanel", "Update-9", panel)
         assertPublishes(
@@ -515,7 +515,7 @@ class MultiResultScreenTest {
                 KRIS CURRIE (PCP): 602 (31.7%)
                 JUDY MACNEVIN (LIB): 318 (16.7%)
                 DON WILLS (IND): 11 (0.6%)
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -528,17 +528,17 @@ class MultiResultScreenTest {
                 Candidate("Sarah Donald", grn) to 0,
                 Candidate("Wade MacLauchlan", lib, true) to 0,
                 Candidate("Bloyce Thompson", pc) to 0,
-                Candidate("Marian White", ndp) to 0
+                Candidate("Marian White", ndp) to 0,
             ),
             false,
             mapOf(
                 lib to 1938,
                 pc to 1338,
                 grn to 347,
-                ndp to 443
+                ndp to 443,
             ),
             "0/10",
-            0.0
+            0.0,
         )
         val district15 = District(
             15,
@@ -547,17 +547,17 @@ class MultiResultScreenTest {
                 Candidate("Greg Bradley", grn) to 0,
                 Candidate("Leah-Jane Hayward", ndp) to 0,
                 Candidate("Dennis King", pc, true) to 0,
-                Candidate("Windsor Wight", lib) to 0
+                Candidate("Windsor Wight", lib) to 0,
             ),
             false,
             mapOf(
                 lib to 1389,
                 pc to 1330,
                 grn to 462,
-                ndp to 516
+                ndp to 516,
             ),
             "0/10",
-            0.0
+            0.0,
         )
         val district17 = District(
             17,
@@ -566,17 +566,17 @@ class MultiResultScreenTest {
                 Candidate("Peter Bevan-Baker", grn, true) to 0,
                 Candidate("Kris Currie", pc) to 0,
                 Candidate("Judy MacNevin", lib) to 0,
-                Candidate("Don Wills", ind) to 0
+                Candidate("Don Wills", ind) to 0,
             ),
             false,
             mapOf(
                 lib to 1046,
                 pc to 609,
                 grn to 2077,
-                ndp to 58
+                ndp to 58,
             ),
             "0/10",
-            0.0
+            0.0,
         )
         val districts = Publisher(listOf(district15, district17))
         val shapesByDistrict = peiShapesByDistrict()
@@ -586,7 +586,7 @@ class MultiResultScreenTest {
             districts,
             { it.getVotes() },
             { it.name.uppercase().asOneTimePublisher() },
-            { null.asOneTimePublisher() }
+            { null.asOneTimePublisher() },
         )
             .withIncumbentMarker("(MLA)")
             .withPctReporting { it.getPctReporting() }
@@ -595,7 +595,7 @@ class MultiResultScreenTest {
             .withPrev(
                 { it.prevVotes.asOneTimePublisher() },
                 { "SWING SINCE 2015".asOneTimePublisher() },
-                compareBy { swingometerOrder.indexOf(it) }
+                compareBy { swingometerOrder.indexOf(it) },
             )
             .withMap(
                 { shapesByDistrict },
@@ -610,7 +610,7 @@ class MultiResultScreenTest {
                     }
                 },
                 { if (it.districtNum < 10) listOf(1, 2, 3, 4, 5, 6, 7, 8) else listOf(15, 16, 17, 18, 19, 20) },
-                { (if (it.districtNum < 10) "CARDIGAN" else "MALPEQUE").asOneTimePublisher() }
+                { (if (it.districtNum < 10) "CARDIGAN" else "MALPEQUE").asOneTimePublisher() },
             )
             .build(title)
         panel.setSize(1024, 512)
@@ -631,7 +631,7 @@ class MultiResultScreenTest {
                 KRIS CURRIE (PCP): WAITING...
                 JUDY MACNEVIN (LIB): WAITING...
                 DON WILLS (IND): WAITING...
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         district17.update(
@@ -641,8 +641,8 @@ class MultiResultScreenTest {
                 Candidate("Peter Bevan-Baker", grn, true) to 851,
                 Candidate("Kris Currie", pc) to 512,
                 Candidate("Judy MacNevin", lib) to 290,
-                Candidate("Don Wills", ind) to 7
-            )
+                Candidate("Don Wills", ind) to 7,
+            ),
         )
         compareRendering("MultiResultPanel", "ProgressLabels-2", panel)
         assertPublishes(
@@ -661,7 +661,7 @@ class MultiResultScreenTest {
                 KRIS CURRIE (PCP): 512 (30.8%)
                 JUDY MACNEVIN (LIB): 290 (17.5%)
                 DON WILLS (IND): 7 (0.4%)
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         districts.submit(listOf(district8, district15, district17))
@@ -689,7 +689,7 @@ class MultiResultScreenTest {
                 KRIS CURRIE (PCP): 512 (30.8%)
                 JUDY MACNEVIN (LIB): 290 (17.5%)
                 DON WILLS (IND): 7 (0.4%)
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         district15.update(
@@ -699,8 +699,8 @@ class MultiResultScreenTest {
                 Candidate("Greg Bradley", grn) to 287,
                 Candidate("Leah-Jane Hayward", ndp) to 27,
                 Candidate("Dennis King", pc, true) to 583,
-                Candidate("Windsor Wight", lib) to 425
-            )
+                Candidate("Windsor Wight", lib) to 425,
+            ),
         )
         compareRendering("MultiResultPanel", "ProgressLabels-4", panel)
         assertPublishes(
@@ -725,7 +725,7 @@ class MultiResultScreenTest {
                 KRIS CURRIE (PCP): 512 (30.8%)
                 JUDY MACNEVIN (LIB): 290 (17.5%)
                 DON WILLS (IND): 7 (0.4%)
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         district8.update(
@@ -735,8 +735,8 @@ class MultiResultScreenTest {
                 Candidate("Sarah Donald", grn) to 285,
                 Candidate("Wade MacLauchlan", lib, true) to 620,
                 Candidate("Bloyce Thompson", pc) to 609,
-                Candidate("Marian White", ndp) to 22
-            )
+                Candidate("Marian White", ndp) to 22,
+            ),
         )
         compareRendering("MultiResultPanel", "ProgressLabels-5", panel)
         assertPublishes(
@@ -761,7 +761,7 @@ class MultiResultScreenTest {
                 KRIS CURRIE (PCP): 512 (30.8%)
                 JUDY MACNEVIN (LIB): 290 (17.5%)
                 DON WILLS (IND): 7 (0.4%)
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         district15.update(
@@ -771,9 +771,9 @@ class MultiResultScreenTest {
                 Candidate("Greg Bradley", grn) to 287 + 72 + 91 + 79 + 38,
                 Candidate("Leah-Jane Hayward", ndp) to 27 + 7 + 7 + 1 + 3,
                 Candidate("Dennis King", pc, true) to 583 + 87 + 109 + 76 + 54,
-                Candidate("Windsor Wight", lib) to 425 + 73 + 66 + 58 + 30
+                Candidate("Windsor Wight", lib) to 425 + 73 + 66 + 58 + 30,
             ),
-            true
+            true,
         )
         compareRendering("MultiResultPanel", "ProgressLabels-6", panel)
         assertPublishes(
@@ -798,7 +798,7 @@ class MultiResultScreenTest {
                 KRIS CURRIE (PCP): 512 (30.8%)
                 JUDY MACNEVIN (LIB): 290 (17.5%)
                 DON WILLS (IND): 7 (0.4%)
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         districts.submit(listOf(district8, district17))
@@ -820,7 +820,7 @@ class MultiResultScreenTest {
                 KRIS CURRIE (PCP): 512 (30.8%)
                 JUDY MACNEVIN (LIB): 290 (17.5%)
                 DON WILLS (IND): 7 (0.4%)
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         district15.update(
@@ -830,8 +830,8 @@ class MultiResultScreenTest {
                 Candidate("Greg Bradley", grn) to 879,
                 Candidate("Leah-Jane Hayward", ndp) to 57,
                 Candidate("Dennis King", pc, true) to 1315,
-                Candidate("Windsor Wight", lib) to 899
-            )
+                Candidate("Windsor Wight", lib) to 899,
+            ),
         )
         // intentionally same as before, as this district is no longer displayed
         compareRendering("MultiResultPanel", "ProgressLabels-7", panel)
@@ -851,7 +851,7 @@ class MultiResultScreenTest {
                 KRIS CURRIE (PCP): 512 (30.8%)
                 JUDY MACNEVIN (LIB): 290 (17.5%)
                 DON WILLS (IND): 7 (0.4%)
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         district17.update(
@@ -861,8 +861,8 @@ class MultiResultScreenTest {
                 Candidate("Peter Bevan-Baker", grn, true) to 851 + 117,
                 Candidate("Kris Currie", pc) to 512 + 90,
                 Candidate("Judy MacNevin", lib) to 290 + 28,
-                Candidate("Don Wills", ind) to 7 + 4
-            )
+                Candidate("Don Wills", ind) to 7 + 4,
+            ),
         )
         compareRendering("MultiResultPanel", "ProgressLabels-8", panel)
         assertPublishes(
@@ -881,7 +881,7 @@ class MultiResultScreenTest {
                 KRIS CURRIE (PCP): 602 (31.7%)
                 JUDY MACNEVIN (LIB): 318 (16.7%)
                 DON WILLS (IND): 11 (0.6%)
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         district8.update(
@@ -891,8 +891,8 @@ class MultiResultScreenTest {
                 Candidate("Sarah Donald", grn) to 285 + 50,
                 Candidate("Wade MacLauchlan", lib, true) to 620 + 68,
                 Candidate("Bloyce Thompson", pc) to 609 + 112,
-                Candidate("Marian White", ndp) to 22 + 7
-            )
+                Candidate("Marian White", ndp) to 22 + 7,
+            ),
         )
         compareRendering("MultiResultPanel", "ProgressLabels-9", panel)
         assertPublishes(
@@ -911,7 +911,7 @@ class MultiResultScreenTest {
                 KRIS CURRIE (PCP): 602 (31.7%)
                 JUDY MACNEVIN (LIB): 318 (16.7%)
                 DON WILLS (IND): 11 (0.6%)
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -926,7 +926,7 @@ class MultiResultScreenTest {
                     Candidate("Phil Comeau", lib) to 1639,
                     Candidate("Gerald Irish", grn) to 394,
                     Candidate("Patrick Kemp", pa) to 434,
-                    Candidate("Josh Floyd", ndp) to 248
+                    Candidate("Josh Floyd", ndp) to 248,
                 ),
                 true,
                 mapOf(
@@ -934,8 +934,8 @@ class MultiResultScreenTest {
                     pc to 3017,
                     grn to 373,
                     ndp to 402,
-                    pa to 1047
-                )
+                    pa to 1047,
+                ),
             ),
             District(
                 32,
@@ -947,7 +947,7 @@ class MultiResultScreenTest {
                     Candidate("Tony Gunn", pa) to 186,
                     Candidate("Courtney Pyrke", ndp) to 309,
                     Candidate("Mike Cyr", ind) to 47,
-                    Candidate("Arty Watson", ind) to 114
+                    Candidate("Arty Watson", ind) to 114,
                 ),
                 false,
                 mapOf(
@@ -955,8 +955,8 @@ class MultiResultScreenTest {
                     pc to 1855,
                     grn to 721,
                     ndp to 836,
-                    pa to 393
-                )
+                    pa to 393,
+                ),
             ),
             District(
                 33,
@@ -966,7 +966,7 @@ class MultiResultScreenTest {
                     Candidate("Sharon Teare", lib) to 1471,
                     Candidate("Joanna Killen", grn) to 938,
                     Candidate("Paul Seelye", pa) to 394,
-                    Candidate("Don Durant", ndp) to 201
+                    Candidate("Don Durant", ndp) to 201,
                 ),
                 true,
                 mapOf(
@@ -974,16 +974,16 @@ class MultiResultScreenTest {
                     pc to 3001,
                     grn to 582,
                     ndp to 414,
-                    pa to 922
-                )
-            )
+                    pa to 922,
+                ),
+            ),
         )
         val swingometerOrder = listOf(ndp, grn, lib, ind, pc, pa)
         val panel = MultiResultScreen.of(
             districts.asOneTimePublisher(),
             { it.votes.asOneTimePublisher() },
             { ("DISTRICT " + it.districtNum).asOneTimePublisher() },
-            { it.name.uppercase().asOneTimePublisher() }
+            { it.name.uppercase().asOneTimePublisher() },
         )
             .withIncumbentMarker("(MLA)")
             .withWinner { d ->
@@ -998,7 +998,7 @@ class MultiResultScreenTest {
             .withPrev(
                 { it.prevVotes.asOneTimePublisher() },
                 { "SWING SINCE 2018".asOneTimePublisher() },
-                compareBy { swingometerOrder.indexOf(it) }
+                compareBy { swingometerOrder.indexOf(it) },
             )
             .build("SAINT JOHN".asOneTimePublisher())
         panel.setSize(1024, 512)
@@ -1028,7 +1028,7 @@ class MultiResultScreenTest {
                 JOANNA KILLEN (GRN): 938 (14.3%)
                 PAUL SEELYE (PA): 394 (6.0%)
                 DON DURANT (NDP): 201 (3.1%)
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -1043,7 +1043,7 @@ class MultiResultScreenTest {
                     Candidate("Phil Comeau", lib) to 1639,
                     Candidate("Gerald Irish", grn) to 394,
                     Candidate("Patrick Kemp", pa) to 434,
-                    Candidate("Josh Floyd", ndp) to 248
+                    Candidate("Josh Floyd", ndp) to 248,
                 ),
                 true,
                 mapOf(
@@ -1051,8 +1051,8 @@ class MultiResultScreenTest {
                     pc to 3017,
                     grn to 373,
                     ndp to 402,
-                    pa to 1047
-                )
+                    pa to 1047,
+                ),
             ),
             District(
                 32,
@@ -1062,7 +1062,7 @@ class MultiResultScreenTest {
                     Candidate("Alice McKim", lib) to 1207,
                     Candidate("Brent Harris", grn) to 1224,
                     Candidate("Courtney Pyrke", ndp) to 309,
-                    Candidate("Others", Party.OTHERS) to 47 + 114 + 186
+                    Candidate("Others", Party.OTHERS) to 47 + 114 + 186,
                 ),
                 false,
                 mapOf(
@@ -1070,8 +1070,8 @@ class MultiResultScreenTest {
                     pc to 1855,
                     grn to 721,
                     ndp to 836,
-                    pa to 393
-                )
+                    pa to 393,
+                ),
             ),
             District(
                 33,
@@ -1081,7 +1081,7 @@ class MultiResultScreenTest {
                     Candidate("Sharon Teare", lib) to 1471,
                     Candidate("Joanna Killen", grn) to 938,
                     Candidate("Paul Seelye", pa) to 394,
-                    Candidate("Don Durant", ndp) to 201
+                    Candidate("Don Durant", ndp) to 201,
                 ),
                 true,
                 mapOf(
@@ -1089,8 +1089,8 @@ class MultiResultScreenTest {
                     pc to 3001,
                     grn to 582,
                     ndp to 414,
-                    pa to 922
-                )
+                    pa to 922,
+                ),
             ),
             District(
                 38,
@@ -1100,7 +1100,7 @@ class MultiResultScreenTest {
                     Candidate("Steven Burns", lib) to 2072,
                     Candidate("Gail Costello", grn) to 1306,
                     Candidate("Craig Rector", pa) to 745,
-                    Candidate("Natasha M Akhtar", ndp) to 127
+                    Candidate("Natasha M Akhtar", ndp) to 127,
                 ),
                 true,
                 mapOf(
@@ -1108,8 +1108,8 @@ class MultiResultScreenTest {
                     pc to 2433,
                     grn to 472,
                     ndp to 114,
-                    pa to 4799
-                )
+                    pa to 4799,
+                ),
             ),
             District(
                 40,
@@ -1119,7 +1119,7 @@ class MultiResultScreenTest {
                     Candidate("Nicole Picot", lib) to 895,
                     Candidate("David Coon", grn, true) to 4213,
                     Candidate("Wendell Betts", pa) to 234,
-                    Candidate("Geoffrey Noseworthy", ndp) to 117
+                    Candidate("Geoffrey Noseworthy", ndp) to 117,
                 ),
                 true,
                 mapOf(
@@ -1127,8 +1127,8 @@ class MultiResultScreenTest {
                     pc to 1042,
                     grn to 4273,
                     ndp to 132,
-                    pa to 616
-                )
+                    pa to 616,
+                ),
             ),
             District(
                 41,
@@ -1138,7 +1138,7 @@ class MultiResultScreenTest {
                     Candidate("Stephen Horsman", lib, true) to 1464,
                     Candidate("Luke Randall", grn) to 2464,
                     Candidate("Allen Price", pa) to 591,
-                    Candidate("Mackenzie Thomason", ndp) to 100
+                    Candidate("Mackenzie Thomason", ndp) to 100,
                 ),
                 true,
                 mapOf(
@@ -1146,21 +1146,21 @@ class MultiResultScreenTest {
                     pc to 2182,
                     grn to 1313,
                     ndp to 139,
-                    pa to 1651
-                )
-            )
+                    pa to 1651,
+                ),
+            ),
         )
         val swingometerOrder = listOf(ndp, grn, lib, ind, pc, pa)
         val panel = MultiResultScreen.ofParties(
             districts.asOneTimePublisher(),
             { it.votes.mapKeys { e -> e.key.party }.asOneTimePublisher() },
             { ("DISTRICT " + it.districtNum).asOneTimePublisher() },
-            { it.name.uppercase().asOneTimePublisher() }
+            { it.name.uppercase().asOneTimePublisher() },
         )
             .withPrev(
                 { it.prevVotes.asOneTimePublisher() },
                 { "SWING SINCE 2018".asOneTimePublisher() },
-                compareBy { swingometerOrder.indexOf(it) }
+                compareBy { swingometerOrder.indexOf(it) },
             )
             .build("SAINT JOHN".asOneTimePublisher())
         panel.setSize(1024, 512)
@@ -1211,7 +1211,7 @@ class MultiResultScreenTest {
                 LIBERAL: 18.7%
                 PEOPLE'S ALLIANCE: 7.5%
                 NEW DEMOCRATIC PARTY: 1.3%
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -1226,7 +1226,7 @@ class MultiResultScreenTest {
                     Candidate("Phil Comeau", lib) to 1639,
                     Candidate("Gerald Irish", grn) to 394,
                     Candidate("Patrick Kemp", pa) to 434,
-                    Candidate("Josh Floyd", ndp) to 248
+                    Candidate("Josh Floyd", ndp) to 248,
                 ),
                 true,
                 mapOf(
@@ -1234,8 +1234,8 @@ class MultiResultScreenTest {
                     pc to 3017,
                     grn to 373,
                     ndp to 402,
-                    pa to 1047
-                )
+                    pa to 1047,
+                ),
             ),
             District(
                 31,
@@ -1245,7 +1245,7 @@ class MultiResultScreenTest {
                     Candidate("Tim Jones", lib) to 1654,
                     Candidate("Stefan Warner", grn) to 483,
                     Candidate("Darella Jackson", pa) to 282,
-                    Candidate("Erik Heinze-Milne", ndp) to 164
+                    Candidate("Erik Heinze-Milne", ndp) to 164,
                 ),
                 true,
                 mapOf(
@@ -1253,8 +1253,8 @@ class MultiResultScreenTest {
                     pc to 3168,
                     grn to 435,
                     ndp to 449,
-                    ind to 191
-                )
+                    ind to 191,
+                ),
             ),
             District(
                 32,
@@ -1266,7 +1266,7 @@ class MultiResultScreenTest {
                     Candidate("Tony Gunn", pa) to 186,
                     Candidate("Courtney Pyrke", ndp) to 309,
                     Candidate("Mike Cyr", ind) to 47,
-                    Candidate("Arty Watson", ind) to 114
+                    Candidate("Arty Watson", ind) to 114,
                 ),
                 false,
                 mapOf(
@@ -1274,8 +1274,8 @@ class MultiResultScreenTest {
                     pc to 1855,
                     grn to 721,
                     ndp to 836,
-                    pa to 393
-                )
+                    pa to 393,
+                ),
             ),
             District(
                 33,
@@ -1285,7 +1285,7 @@ class MultiResultScreenTest {
                     Candidate("Sharon Teare", lib) to 1471,
                     Candidate("Joanna Killen", grn) to 938,
                     Candidate("Paul Seelye", pa) to 394,
-                    Candidate("Don Durant", ndp) to 201
+                    Candidate("Don Durant", ndp) to 201,
                 ),
                 true,
                 mapOf(
@@ -1293,9 +1293,9 @@ class MultiResultScreenTest {
                     pc to 3001,
                     grn to 582,
                     ndp to 414,
-                    pa to 922
-                )
-            )
+                    pa to 922,
+                ),
+            ),
         )
         val swingometerOrder = listOf(ndp, grn, lib, ind, pc, pa)
         val districtsPublisher = Publisher(districts)
@@ -1303,7 +1303,7 @@ class MultiResultScreenTest {
             districtsPublisher,
             { it.votes.asOneTimePublisher() },
             { ("DISTRICT " + it.districtNum).asOneTimePublisher() },
-            { it.name.uppercase().asOneTimePublisher() }
+            { it.name.uppercase().asOneTimePublisher() },
         )
             .withIncumbentMarker("(MLA)")
             .withWinner { d ->
@@ -1318,7 +1318,7 @@ class MultiResultScreenTest {
             .withPrev(
                 { it.prevVotes.asOneTimePublisher() },
                 { "SWING SINCE 2018".asOneTimePublisher() },
-                compareBy { swingometerOrder.indexOf(it) }
+                compareBy { swingometerOrder.indexOf(it) },
             )
             .build("ELECTION 2020: NEW BRUNSWICK DECIDES".asOneTimePublisher())
         panel.setSize(1024, 512)
@@ -1355,7 +1355,7 @@ class MultiResultScreenTest {
                 JOANNA KILLEN (GRN): 938 (14.3%)
                 PAUL SEELYE (PA): 394 (6.0%)
                 DON DURANT (NDP): 201 (3.1%)
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         districts.add(
@@ -1367,7 +1367,7 @@ class MultiResultScreenTest {
                     Candidate("Bruce Bryer", grn) to 1006,
                     Candidate("Paul Adams", lib) to 911,
                     Candidate("William Edgett", pa) to 693,
-                    Candidate("Margaret Anderson Kilfoil", ndp) to 254
+                    Candidate("Margaret Anderson Kilfoil", ndp) to 254,
                 ),
                 true,
                 mapOf(
@@ -1375,9 +1375,9 @@ class MultiResultScreenTest {
                     pc to 3267,
                     grn to 731,
                     ndp to 342,
-                    pa to 1454
-                )
-            )
+                    pa to 1454,
+                ),
+            ),
         )
         districts.add(
             District(
@@ -1388,7 +1388,7 @@ class MultiResultScreenTest {
                     Candidate("Tony Mann", lib) to 726,
                     Candidate("Vincent Edgett", pa) to 688,
                     Candidate("Lois Mitchell", grn) to 686,
-                    Candidate("Sharon Greenlaw", ndp) to 291
+                    Candidate("Sharon Greenlaw", ndp) to 291,
                 ),
                 true,
                 mapOf(
@@ -1396,9 +1396,9 @@ class MultiResultScreenTest {
                     pc to 3808,
                     grn to 469,
                     ndp to 203,
-                    pa to 1104
-                )
-            )
+                    pa to 1104,
+                ),
+            ),
         )
         districtsPublisher.submit(districts)
         compareRendering("MultiResultPanel", "MultipleRows-2", panel)
@@ -1442,7 +1442,7 @@ class MultiResultScreenTest {
                 TONY MANN (LIB): 726 (10.2%)
                 VINCENT EDGETT (PA): 688 (9.6%)
                 OTHERS: 977 (13.7%)
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         districts.removeAt(3)
@@ -1469,7 +1469,7 @@ class MultiResultScreenTest {
                 VINCENT EDGETT (PA): 688 (9.6%)
                 LOIS MITCHELL (GRN): 686 (9.6%)
                 SHARON GREENLAW (NDP): 291 (4.1%)
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -1484,7 +1484,7 @@ class MultiResultScreenTest {
                     Candidate("Phil Comeau", lib) to 1639,
                     Candidate("Gerald Irish", grn) to 394,
                     Candidate("Patrick Kemp", pa) to 434,
-                    Candidate("Josh Floyd", ndp) to 248
+                    Candidate("Josh Floyd", ndp) to 248,
                 ),
                 true,
                 mapOf(
@@ -1492,8 +1492,8 @@ class MultiResultScreenTest {
                     pc to 3017,
                     grn to 373,
                     ndp to 402,
-                    pa to 1047
-                )
+                    pa to 1047,
+                ),
             ),
             District(
                 31,
@@ -1503,7 +1503,7 @@ class MultiResultScreenTest {
                     Candidate("Tim Jones", lib) to 1654,
                     Candidate("Stefan Warner", grn) to 483,
                     Candidate("Darella Jackson", pa) to 282,
-                    Candidate("Erik Heinze-Milne", ndp) to 164
+                    Candidate("Erik Heinze-Milne", ndp) to 164,
                 ),
                 true,
                 mapOf(
@@ -1511,8 +1511,8 @@ class MultiResultScreenTest {
                     pc to 3168,
                     grn to 435,
                     ndp to 449,
-                    ind to 191
-                )
+                    ind to 191,
+                ),
             ),
             District(
                 32,
@@ -1524,7 +1524,7 @@ class MultiResultScreenTest {
                     Candidate("Tony Gunn", pa) to 186,
                     Candidate("Courtney Pyrke", ndp) to 309,
                     Candidate("Mike Cyr", ind) to 47,
-                    Candidate("Arty Watson", ind) to 114
+                    Candidate("Arty Watson", ind) to 114,
                 ),
                 false,
                 mapOf(
@@ -1532,8 +1532,8 @@ class MultiResultScreenTest {
                     pc to 1855,
                     grn to 721,
                     ndp to 836,
-                    pa to 393
-                )
+                    pa to 393,
+                ),
             ),
             District(
                 33,
@@ -1543,7 +1543,7 @@ class MultiResultScreenTest {
                     Candidate("Sharon Teare", lib) to 1471,
                     Candidate("Joanna Killen", grn) to 938,
                     Candidate("Paul Seelye", pa) to 394,
-                    Candidate("Don Durant", ndp) to 201
+                    Candidate("Don Durant", ndp) to 201,
                 ),
                 true,
                 mapOf(
@@ -1551,9 +1551,9 @@ class MultiResultScreenTest {
                     pc to 3001,
                     grn to 582,
                     ndp to 414,
-                    pa to 922
-                )
-            )
+                    pa to 922,
+                ),
+            ),
         )
         val swingometerOrder = listOf(ndp, grn, lib, ind, pc, pa)
         val districtsPublisher = Publisher(districts)
@@ -1561,7 +1561,7 @@ class MultiResultScreenTest {
             districtsPublisher,
             { it.votes.asOneTimePublisher() },
             { ("DISTRICT " + it.districtNum).asOneTimePublisher() },
-            { it.name.uppercase().asOneTimePublisher() }
+            { it.name.uppercase().asOneTimePublisher() },
         )
             .withIncumbentMarker("(MLA)")
             .withProgressLabel { "100% IN".asOneTimePublisher() }
@@ -1577,7 +1577,7 @@ class MultiResultScreenTest {
             .withPrev(
                 { it.prevVotes.asOneTimePublisher() },
                 { "SWING SINCE 2018".asOneTimePublisher() },
-                compareBy { swingometerOrder.indexOf(it) }
+                compareBy { swingometerOrder.indexOf(it) },
             )
             .build("ELECTION 2020: NEW BRUNSWICK DECIDES".asOneTimePublisher())
         panel.setSize(1024, 512)
@@ -1614,7 +1614,7 @@ class MultiResultScreenTest {
                 JOANNA KILLEN (GRN): 938 (14.3%)
                 PAUL SEELYE (PA): 394 (6.0%)
                 DON DURANT (NDP): 201 (3.1%)
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         districts.add(
@@ -1626,7 +1626,7 @@ class MultiResultScreenTest {
                     Candidate("Bruce Bryer", grn) to 1006,
                     Candidate("Paul Adams", lib) to 911,
                     Candidate("William Edgett", pa) to 693,
-                    Candidate("Margaret Anderson Kilfoil", ndp) to 254
+                    Candidate("Margaret Anderson Kilfoil", ndp) to 254,
                 ),
                 true,
                 mapOf(
@@ -1634,9 +1634,9 @@ class MultiResultScreenTest {
                     pc to 3267,
                     grn to 731,
                     ndp to 342,
-                    pa to 1454
-                )
-            )
+                    pa to 1454,
+                ),
+            ),
         )
         districts.add(
             District(
@@ -1647,7 +1647,7 @@ class MultiResultScreenTest {
                     Candidate("Tony Mann", lib) to 726,
                     Candidate("Vincent Edgett", pa) to 688,
                     Candidate("Lois Mitchell", grn) to 686,
-                    Candidate("Sharon Greenlaw", ndp) to 291
+                    Candidate("Sharon Greenlaw", ndp) to 291,
                 ),
                 true,
                 mapOf(
@@ -1655,9 +1655,9 @@ class MultiResultScreenTest {
                     pc to 3808,
                     grn to 469,
                     ndp to 203,
-                    pa to 1104
-                )
-            )
+                    pa to 1104,
+                ),
+            ),
         )
         districtsPublisher.submit(districts)
         compareRendering("MultiResultPanel", "MultipleRowsProgressLabels-2", panel)
@@ -1701,7 +1701,7 @@ class MultiResultScreenTest {
                 TONY MANN (LIB): 726 (10.2%)
                 VINCENT EDGETT (PA): 688 (9.6%)
                 OTHERS: 977 (13.7%)
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         districts.removeAt(3)
@@ -1728,7 +1728,7 @@ class MultiResultScreenTest {
                 VINCENT EDGETT (PA): 688 (9.6%)
                 LOIS MITCHELL (GRN): 686 (9.6%)
                 SHARON GREENLAW (NDP): 291 (4.1%)
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -1741,10 +1741,10 @@ class MultiResultScreenTest {
                 mapOf(
                     Candidate("David Perdue", gop) to 2458453,
                     Candidate("Jon Ossoff", dem) to 2371921,
-                    Candidate("Shane Hazel", ind) to 114873
+                    Candidate("Shane Hazel", ind) to 114873,
                 ),
                 false,
-                emptyMap()
+                emptyMap(),
             ),
             District(
                 3,
@@ -1754,17 +1754,17 @@ class MultiResultScreenTest {
                     Candidate("Kelly Loeffler", gop) to 1271320,
                     Candidate("Doug Collins", gop) to 979052,
                     Candidate("Deborah Jackson", dem) to 323833,
-                    Candidate.OTHERS to 718808
+                    Candidate.OTHERS to 718808,
                 ),
                 false,
-                emptyMap()
-            )
+                emptyMap(),
+            ),
         )
         val panel = MultiResultScreen.of(
             districts.asOneTimePublisher(),
             { it.votes.asOneTimePublisher() },
             { it.name.uppercase().asOneTimePublisher() },
-            { ("CLASS " + it.districtNum).asOneTimePublisher() }
+            { ("CLASS " + it.districtNum).asOneTimePublisher() },
         )
             .withRunoff { it.runoff }
             .build("GEORGIA SENATE".asOneTimePublisher())
@@ -1786,7 +1786,7 @@ class MultiResultScreenTest {
                 DOUG COLLINS (GOP): 979,052 (19.9%)
                 DEBORAH JACKSON (DEM): 323,833 (6.6%)
                 OTHERS: 718,808 (14.6%)
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         districts.forEach { it.declareRunoff() }
@@ -1807,7 +1807,7 @@ class MultiResultScreenTest {
                 DOUG COLLINS (GOP): 979,052 (19.9%)
                 DEBORAH JACKSON (DEM): 323,833 (6.6%)
                 OTHERS: 718,808 (14.6%)
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -1821,15 +1821,15 @@ class MultiResultScreenTest {
                     Candidate("Jordan Brown", lib, true) to 1223,
                     Candidate("Donna Hurry", pc) to 567,
                     Candidate("Ole Hammarlund", grn) to 1301,
-                    Candidate("Simone Webster", ndp) to 138
+                    Candidate("Simone Webster", ndp) to 138,
                 ),
                 false,
                 mapOf(
                     lib to 1054,
                     pc to 1032,
                     grn to 352,
-                    ndp to 265
-                )
+                    ndp to 265,
+                ),
             ),
             District(
                 12,
@@ -1838,15 +1838,15 @@ class MultiResultScreenTest {
                     Candidate("Richard Brown", lib, true) to 875,
                     Candidate("Tim Keizer", pc) to 656,
                     Candidate("Karla Bernard", grn) to 1272,
-                    Candidate("Joe Byrne", ndp) to 338
+                    Candidate("Joe Byrne", ndp) to 338,
                 ),
                 false,
                 mapOf(
                     lib to 955,
                     pc to 666,
                     grn to 456,
-                    ndp to 348
-                )
+                    ndp to 348,
+                ),
             ),
             District(
                 10,
@@ -1855,16 +1855,16 @@ class MultiResultScreenTest {
                     Candidate("Robert Mitchell", lib, true) to 1420,
                     Candidate("Mike Gillis", pc) to 865,
                     Candidate("Amanda Morrison", grn) to 1057,
-                    Candidate("Jesse Reddin Cousins", ndp) to 41
+                    Candidate("Jesse Reddin Cousins", ndp) to 41,
                 ),
                 false,
                 mapOf(
                     lib to 1425,
                     pc to 1031,
                     grn to 295,
-                    ndp to 360
-                )
-            )
+                    ndp to 360,
+                ),
+            ),
         )
         val shapesByDistrict = peiShapesByDistrict()
         val swingometerOrder = listOf(ndp, grn, lib, ind, pc)
@@ -1872,7 +1872,7 @@ class MultiResultScreenTest {
             districts.asOneTimePublisher(),
             { it.votes.asOneTimePublisher() },
             { ("DISTRICT " + it.districtNum).asOneTimePublisher() },
-            { it.name.uppercase().asOneTimePublisher() }
+            { it.name.uppercase().asOneTimePublisher() },
         )
             .withIncumbentMarker("(MLA)")
             .withWinner { d ->
@@ -1887,7 +1887,7 @@ class MultiResultScreenTest {
             .withPrev(
                 { it.prevVotes.asOneTimePublisher() },
                 { "SWING SINCE 2015".asOneTimePublisher() },
-                compareBy { swingometerOrder.indexOf(it) }
+                compareBy { swingometerOrder.indexOf(it) },
             )
             .withMap(
                 { shapesByDistrict },
@@ -1896,14 +1896,14 @@ class MultiResultScreenTest {
                     d.votes.entries.maxByOrNull { it.value }?.key?.party?.let {
                         PartyResult(
                             it,
-                            d.leaderHasWon
+                            d.leaderHasWon,
                         )
                     }
                         .asOneTimePublisher()
                 },
                 { listOf(10, 11, 12, 13, 14) },
                 { listOf(9, 10, 11, 12, 13, 14) },
-                { "CHARLOTTETOWN".asOneTimePublisher() }
+                { "CHARLOTTETOWN".asOneTimePublisher() },
             )
             .build("CABINET MEMBERS IN CHARLOTTETOWN".asOneTimePublisher())
         panel.setSize(1024, 512)
@@ -1930,7 +1930,7 @@ class MultiResultScreenTest {
                 AMANDA MORRISON (GRN): 1,057 (31.2%)
                 MIKE GILLIS (PCP): 865 (25.6%)
                 JESSE REDDIN COUSINS (NDP): 41 (1.2%)
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -1945,7 +1945,7 @@ class MultiResultScreenTest {
                     Candidate("Phil Comeau", lib) to 1639,
                     Candidate("Gerald Irish", grn) to 394,
                     Candidate("Patrick Kemp", pa) to 434,
-                    Candidate("Josh Floyd", ndp) to 248
+                    Candidate("Josh Floyd", ndp) to 248,
                 ),
                 true,
                 mapOf(
@@ -1953,8 +1953,8 @@ class MultiResultScreenTest {
                     pc to 3017,
                     grn to 373,
                     ndp to 402,
-                    pa to 1047
-                )
+                    pa to 1047,
+                ),
             ),
             District(
                 31,
@@ -1964,7 +1964,7 @@ class MultiResultScreenTest {
                     Candidate("Tim Jones", lib) to 1654,
                     Candidate("Stefan Warner", grn) to 483,
                     Candidate("Darella Jackson", pa) to 282,
-                    Candidate("Erik Heinze-Milne", ndp) to 164
+                    Candidate("Erik Heinze-Milne", ndp) to 164,
                 ),
                 true,
                 mapOf(
@@ -1972,8 +1972,8 @@ class MultiResultScreenTest {
                     pc to 3168,
                     grn to 435,
                     ndp to 449,
-                    ind to 191
-                )
+                    ind to 191,
+                ),
             ),
             District(
                 32,
@@ -1985,7 +1985,7 @@ class MultiResultScreenTest {
                     Candidate("Tony Gunn", pa) to 186,
                     Candidate("Courtney Pyrke", ndp) to 309,
                     Candidate("Mike Cyr", ind) to 47,
-                    Candidate("Arty Watson", ind) to 114
+                    Candidate("Arty Watson", ind) to 114,
                 ),
                 false,
                 mapOf(
@@ -1993,8 +1993,8 @@ class MultiResultScreenTest {
                     pc to 1855,
                     grn to 721,
                     ndp to 836,
-                    pa to 393
-                )
+                    pa to 393,
+                ),
             ),
             District(
                 33,
@@ -2004,7 +2004,7 @@ class MultiResultScreenTest {
                     Candidate("Sharon Teare", lib) to 1471,
                     Candidate("Joanna Killen", grn) to 938,
                     Candidate("Paul Seelye", pa) to 394,
-                    Candidate("Don Durant", ndp) to 201
+                    Candidate("Don Durant", ndp) to 201,
                 ),
                 true,
                 mapOf(
@@ -2012,9 +2012,9 @@ class MultiResultScreenTest {
                     pc to 3001,
                     grn to 582,
                     ndp to 414,
-                    pa to 922
-                )
-            )
+                    pa to 922,
+                ),
+            ),
         )
         val swingometerOrder = listOf(ndp, grn, lib, ind, pc, pa)
         val districtPublisher = Publisher(districts)
@@ -2022,12 +2022,12 @@ class MultiResultScreenTest {
             districtPublisher,
             { it.partyVotes },
             { ("DISTRICT " + it.districtNum).asOneTimePublisher() },
-            { it.name.uppercase().asOneTimePublisher() }
+            { it.name.uppercase().asOneTimePublisher() },
         )
             .withPrev(
                 { it.prevVotes.asOneTimePublisher() },
                 { "SWING SINCE 2018".asOneTimePublisher() },
-                compareBy { swingometerOrder.indexOf(it) }
+                compareBy { swingometerOrder.indexOf(it) },
             )
             .build("ELECTION 2020: NEW BRUNSWICK DECIDES".asOneTimePublisher())
         panel.setSize(1024, 512)
@@ -2065,7 +2065,7 @@ class MultiResultScreenTest {
                 GREEN: 14.3%
                 PEOPLE'S ALLIANCE: 6.0%
                 NEW DEMOCRATIC PARTY: 3.1%
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         districts.add(
@@ -2077,7 +2077,7 @@ class MultiResultScreenTest {
                     Candidate("Bruce Bryer", grn) to 1006,
                     Candidate("Paul Adams", lib) to 911,
                     Candidate("William Edgett", pa) to 693,
-                    Candidate("Margaret Anderson Kilfoil", ndp) to 254
+                    Candidate("Margaret Anderson Kilfoil", ndp) to 254,
                 ),
                 true,
                 mapOf(
@@ -2085,9 +2085,9 @@ class MultiResultScreenTest {
                     pc to 3267,
                     grn to 731,
                     ndp to 342,
-                    pa to 1454
-                )
-            )
+                    pa to 1454,
+                ),
+            ),
         )
         districts.add(
             District(
@@ -2098,7 +2098,7 @@ class MultiResultScreenTest {
                     Candidate("Tony Mann", lib) to 726,
                     Candidate("Vincent Edgett", pa) to 688,
                     Candidate("Lois Mitchell", grn) to 686,
-                    Candidate("Sharon Greenlaw", ndp) to 291
+                    Candidate("Sharon Greenlaw", ndp) to 291,
                 ),
                 true,
                 mapOf(
@@ -2106,9 +2106,9 @@ class MultiResultScreenTest {
                     pc to 3808,
                     grn to 469,
                     ndp to 203,
-                    pa to 1104
-                )
-            )
+                    pa to 1104,
+                ),
+            ),
         )
         districtPublisher.submit(districts)
         compareRendering("MultiResultPanel", "PartiesOnly-2", panel)
@@ -2159,7 +2159,7 @@ class MultiResultScreenTest {
                 PEOPLE'S ALLIANCE: 9.6%
                 GREEN: 9.6%
                 NEW DEMOCRATIC PARTY: 4.1%
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         districts.removeAt(3)
@@ -2186,7 +2186,7 @@ class MultiResultScreenTest {
                 PEOPLE'S ALLIANCE: 9.6%
                 GREEN: 9.6%
                 NEW DEMOCRATIC PARTY: 4.1%
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -2204,7 +2204,7 @@ class MultiResultScreenTest {
         var leaderHasWon: Boolean,
         val prevVotes: Map<Party, Int>,
         private var status: String = "100% REPORTING",
-        private var pctReporting: Double = 1.0
+        private var pctReporting: Double = 1.0,
     ) {
         private var topTwoToRunoff = false
 
@@ -2256,7 +2256,7 @@ class MultiResultScreenTest {
                 votes.entries.asSequence()
                     .filter { it.value > 0 }
                     .maxByOrNull { it.value }!!.key,
-                leaderHasWon
+                leaderHasWon,
             )
         }
 
@@ -2271,7 +2271,7 @@ class MultiResultScreenTest {
             status: String,
             pctReporting: Double,
             votes: Map<Candidate, Int>,
-            leaderHasWon: Boolean
+            leaderHasWon: Boolean,
         ) {
             this.status = status
             this.pctReporting = pctReporting

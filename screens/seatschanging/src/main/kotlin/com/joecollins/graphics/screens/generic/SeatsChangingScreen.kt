@@ -17,7 +17,7 @@ class SeatsChangingScreen private constructor(title: Flow.Publisher<out String?>
         prevResultPublisher: Flow.Publisher<out Map<T, Map<Party, Int>>>,
         currResultPublisher: Flow.Publisher<out Map<T, PartyResult?>>,
         private val nameFunc: (T) -> String,
-        headerPublisher: Flow.Publisher<out String?>
+        headerPublisher: Flow.Publisher<out String?>,
     ) {
 
         private val prevResults: Flow.Publisher<out Map<T, Map<Party, Int>>> = prevResultPublisher
@@ -56,9 +56,9 @@ class SeatsChangingScreen private constructor(title: Flow.Publisher<out String?>
                         text = nameFunc(it.key),
                         border = it.prevColor,
                         background = (if (it.fill) it.resultColor else Color.WHITE),
-                        foreground = (if (!it.fill) it.resultColor else Color.WHITE)
+                        foreground = (if (!it.fill) it.resultColor else Color.WHITE),
                     )
-                }
+                },
             )
             return SeatsChangingScreen(titlePublisher, frame)
         }
@@ -88,7 +88,7 @@ class SeatsChangingScreen private constructor(title: Flow.Publisher<out String?>
                     Pair(
                         it.key,
                         it.value.entries
-                            .maxByOrNull { e -> e.value }!!.key
+                            .maxByOrNull { e -> e.value }!!.key,
                     )
                 }
                 .toList()
@@ -119,7 +119,7 @@ class SeatsChangingScreen private constructor(title: Flow.Publisher<out String?>
                 Triple(
                     it.first,
                     it.second,
-                    currResults[it.first]
+                    currResults[it.first],
                 )
             }
             .filter { it.third != null }
@@ -136,7 +136,7 @@ class SeatsChangingScreen private constructor(title: Flow.Publisher<out String?>
                     it.first,
                     colorFunc(it.second.color),
                     colorFunc(it.third!!.party.color),
-                    it.third!!.isElected
+                    it.third!!.isElected,
                 )
             }
             .toList()
@@ -148,7 +148,7 @@ class SeatsChangingScreen private constructor(title: Flow.Publisher<out String?>
             prevResultPublisher: Flow.Publisher<out Map<T, Map<Party, Int>>>,
             currResultPublisher: Flow.Publisher<out Map<T, PartyResult?>>,
             nameFunc: (T) -> String,
-            headerPublisher: Flow.Publisher<out String?>
+            headerPublisher: Flow.Publisher<out String?>,
         ): Builder<T> {
             return Builder(prevResultPublisher, currResultPublisher, nameFunc, headerPublisher)
         }

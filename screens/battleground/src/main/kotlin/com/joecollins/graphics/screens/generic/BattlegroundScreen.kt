@@ -31,7 +31,7 @@ class BattlegroundScreen private constructor(
     private val rightPanel: ResultListingFrame,
     private val leftColumns: Flow.Publisher<Int>,
     private val rightColumns: Flow.Publisher<Int>,
-    val headerColor: Flow.Publisher<Color>? = null
+    val headerColor: Flow.Publisher<Color>? = null,
 ) : GenericPanel(
     run {
         val panel = JPanel()
@@ -45,7 +45,7 @@ class BattlegroundScreen private constructor(
         panel.add(rightPanel, Layout.EAST)
         panel
     },
-    title
+    title,
 ) {
 
     init {
@@ -56,7 +56,7 @@ class BattlegroundScreen private constructor(
         private val prevResults: Flow.Publisher<out Map<T, Map<Party, Int>>>,
         private val currResults: Flow.Publisher<out Map<T, PartyResult?>>,
         private val nameFunc: (T) -> String,
-        private val party: Flow.Publisher<out Party>
+        private val party: Flow.Publisher<out Party>,
     ) {
         private var defenseSeatCount: Flow.Publisher<out Int> = 100.asOneTimePublisher()
         private var targetSeatCount: Flow.Publisher<out Int> = 100.asOneTimePublisher()
@@ -66,7 +66,7 @@ class BattlegroundScreen private constructor(
 
         fun withSeatsToShow(
             defenseSeatCountPublisher: Flow.Publisher<out Int>,
-            targetSeatCountPublisher: Flow.Publisher<out Int>
+            targetSeatCountPublisher: Flow.Publisher<out Int>,
         ): SinglePartyBuilder<T> {
             defenseSeatCount = defenseSeatCountPublisher
             targetSeatCount = targetSeatCountPublisher
@@ -107,10 +107,10 @@ class BattlegroundScreen private constructor(
                         text = nameFunc(it.key),
                         border = it.prevColor,
                         background = (if (it.fill) it.resultColor else Color.WHITE),
-                        foreground = (if (!it.fill) it.resultColor else Color.WHITE)
+                        foreground = (if (!it.fill) it.resultColor else Color.WHITE),
                     )
                 },
-                reversedPublisher = true.asOneTimePublisher()
+                reversedPublisher = true.asOneTimePublisher(),
             )
 
             val targetInput = TargetBattlegroundInput<T>()
@@ -131,10 +131,10 @@ class BattlegroundScreen private constructor(
                         text = nameFunc(it.key),
                         border = it.prevColor,
                         background = (if (it.fill) it.resultColor else Color.WHITE),
-                        foreground = (if (!it.fill) it.resultColor else Color.WHITE)
+                        foreground = (if (!it.fill) it.resultColor else Color.WHITE),
                     )
                 },
-                reversedPublisher = false.asOneTimePublisher()
+                reversedPublisher = false.asOneTimePublisher(),
             )
 
             return BattlegroundScreen(
@@ -145,7 +145,7 @@ class BattlegroundScreen private constructor(
                     .merge(numRows) { c, n -> n * ceil(1.0 * c / n).toInt() },
                 targetSeatCount
                     .merge(numRows) { c, n -> n * ceil(1.0 * c / n).toInt() },
-                party.map { it.color }
+                party.map { it.color },
             )
         }
     }
@@ -154,7 +154,7 @@ class BattlegroundScreen private constructor(
         private val prevResults: Flow.Publisher<out Map<T, Map<Party, Int>>>,
         private val currResults: Flow.Publisher<out Map<T, PartyResult?>>,
         private val nameFunc: (T) -> String,
-        private val parties: Flow.Publisher<out Pair<PartyOrCoalition, PartyOrCoalition>>
+        private val parties: Flow.Publisher<out Pair<PartyOrCoalition, PartyOrCoalition>>,
     ) {
         private var leftSeatCount: Flow.Publisher<out Int> = 100.asOneTimePublisher()
         private var rightSeatCount: Flow.Publisher<out Int> = 100.asOneTimePublisher()
@@ -165,7 +165,7 @@ class BattlegroundScreen private constructor(
 
         fun withSeatsToShow(
             leftSeatCountPublisher: Flow.Publisher<out Int>,
-            rightSeatCountPublisher: Flow.Publisher<out Int>
+            rightSeatCountPublisher: Flow.Publisher<out Int>,
         ): DoublePartyBuilder<T> {
             leftSeatCount = leftSeatCountPublisher
             rightSeatCount = rightSeatCountPublisher
@@ -211,10 +211,10 @@ class BattlegroundScreen private constructor(
                         text = nameFunc(it.key),
                         border = it.prevColor,
                         background = (if (it.fill) it.resultColor else Color.WHITE),
-                        foreground = (if (!it.fill) it.resultColor else Color.WHITE)
+                        foreground = (if (!it.fill) it.resultColor else Color.WHITE),
                     )
                 },
-                reversedPublisher = true.asOneTimePublisher()
+                reversedPublisher = true.asOneTimePublisher(),
             )
 
             val rightInput = DoubleBattlegroundInput<T>()
@@ -235,10 +235,10 @@ class BattlegroundScreen private constructor(
                         text = nameFunc(it.key),
                         border = it.prevColor,
                         background = (if (it.fill) it.resultColor else Color.WHITE),
-                        foreground = (if (!it.fill) it.resultColor else Color.WHITE)
+                        foreground = (if (!it.fill) it.resultColor else Color.WHITE),
                     )
                 },
-                reversedPublisher = false.asOneTimePublisher()
+                reversedPublisher = false.asOneTimePublisher(),
             )
 
             return BattlegroundScreen(
@@ -248,7 +248,7 @@ class BattlegroundScreen private constructor(
                 leftSeatCount
                     .merge(numRows) { c, n -> n * ceil(1.0 * c / n).toInt() },
                 rightSeatCount
-                    .merge(numRows) { c, n -> n * ceil(1.0 * c / n).toInt() }
+                    .merge(numRows) { c, n -> n * ceil(1.0 * c / n).toInt() },
             )
         }
     }
@@ -335,7 +335,7 @@ class BattlegroundScreen private constructor(
                         it.first,
                         colorFunc(it.third),
                         colorFunc(resultColor),
-                        fill
+                        fill,
                     )
                 }
                 .toList()
@@ -390,9 +390,9 @@ class BattlegroundScreen private constructor(
             val total = votes.values.sum()
             val prevWinner = votes.entries.maxBy { it.value }.key
             if (!sequenceOf(party?.first)
-                .filterNotNull()
-                .flatMap { it.constituentParties }
-                .contains(prevWinner)
+                    .filterNotNull()
+                    .flatMap { it.constituentParties }
+                    .contains(prevWinner)
             ) {
                 return null
             }
@@ -481,7 +481,7 @@ class BattlegroundScreen private constructor(
             prevResultsPublisher: Flow.Publisher<out Map<T, Map<Party, Int>>>,
             currResultsPublisher: Flow.Publisher<out Map<T, PartyResult?>>,
             nameFunc: (T) -> String,
-            partyPublisher: Flow.Publisher<out Party>
+            partyPublisher: Flow.Publisher<out Party>,
         ): SinglePartyBuilder<T> {
             return SinglePartyBuilder(prevResultsPublisher, currResultsPublisher, nameFunc, partyPublisher)
         }
@@ -490,7 +490,7 @@ class BattlegroundScreen private constructor(
             prevResultsPublisher: Flow.Publisher<out Map<T, Map<Party, Int>>>,
             currResultsPublisher: Flow.Publisher<out Map<T, PartyResult?>>,
             nameFunc: (T) -> String,
-            partyPublisher: Flow.Publisher<out Pair<PartyOrCoalition, PartyOrCoalition>>
+            partyPublisher: Flow.Publisher<out Pair<PartyOrCoalition, PartyOrCoalition>>,
         ): DoublePartyBuilder<T> {
             return DoublePartyBuilder(prevResultsPublisher, currResultsPublisher, nameFunc, partyPublisher)
         }

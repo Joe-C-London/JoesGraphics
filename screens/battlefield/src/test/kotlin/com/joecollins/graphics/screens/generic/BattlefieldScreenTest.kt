@@ -43,7 +43,7 @@ class BattlefieldScreenTest {
             22 to mapOf(lib to 1246, pc to 1098, grn to 321, ndp to 358),
             21 to mapOf(lib to 1135, pc to 1105, grn to 285, ndp to 353),
             27 to mapOf(lib to 1486, pc to 818, grn to 167, ndp to 81),
-            23 to mapOf(lib to 1147, pc to 810, grn to 240, ndp to 473)
+            23 to mapOf(lib to 1147, pc to 810, grn to 240, ndp to 473),
         )
         val currResults = mapOf(
             4 to PartyResult.elected(pc),
@@ -71,7 +71,7 @@ class BattlefieldScreenTest {
             22 to PartyResult.elected(grn),
             21 to PartyResult.elected(grn),
             27 to PartyResult.elected(lib),
-            23 to PartyResult.leading(grn)
+            23 to PartyResult.leading(grn),
         )
 
         val prevTotal = mapOf(lib to 33481, pc to 30663, grn to 8857, ndp to 8997)
@@ -89,7 +89,7 @@ class BattlefieldScreenTest {
             pc.asOneTimePublisher(),
             lib.asOneTimePublisher(),
             grn.asOneTimePublisher(),
-            "BATTLEFIELD PEI: ADVANCING TO A MAJORITY".asOneTimePublisher()
+            "BATTLEFIELD PEI: ADVANCING TO A MAJORITY".asOneTimePublisher(),
         )
             .withPartySwings(swings.asOneTimePublisher())
             .withLines(true.asOneTimePublisher())

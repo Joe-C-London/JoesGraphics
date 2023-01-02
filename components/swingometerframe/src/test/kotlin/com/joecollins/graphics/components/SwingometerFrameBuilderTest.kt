@@ -127,7 +127,7 @@ class SwingometerFrameBuilderTest {
                 OuterLabel(Color.BLUE, "350", -2.565),
                 OuterLabel(Color.BLUE, "400", -4.495),
                 OuterLabel(Color.BLUE, "450", -9.455),
-                OuterLabel(Color.BLUE, "500", -13.86)
+                OuterLabel(Color.BLUE, "500", -13.86),
             )
                 .asOneTimePublisher()
         val colors = Publisher(Pair(Color.BLUE, Color.RED))
@@ -155,7 +155,7 @@ class SwingometerFrameBuilderTest {
                 Dot(0.6, Color.RED),
                 Dot(-0.185, Color.BLUE),
                 Dot(-0.76, Color.BLUE),
-                Dot(-0.76, Color.BLUE)
+                Dot(-0.76, Color.BLUE),
             )
                 .asOneTimePublisher()
         val colors = Publisher(Pair(Color.BLUE, Color.RED))
@@ -182,7 +182,7 @@ class SwingometerFrameBuilderTest {
                 Dot(0.6, Color.RED, "29"),
                 Dot(-0.185, Color.BLUE, "4"),
                 Dot(-0.76, Color.BLUE, "10"),
-                Dot(-0.76, Color.BLUE, "6")
+                Dot(-0.76, Color.BLUE, "6"),
             )
                 .asOneTimePublisher()
         val colors = Publisher(Pair(Color.BLUE, Color.RED))
@@ -209,7 +209,7 @@ class SwingometerFrameBuilderTest {
                 Dot(0.6, Color.RED, true),
                 Dot(-0.185, Color.BLUE, false),
                 Dot(-0.76, Color.BLUE, true),
-                Dot(-0.76, Color.BLUE, false)
+                Dot(-0.76, Color.BLUE, false),
             )
                 .asOneTimePublisher()
         val colors = Publisher(Pair(Color.BLUE, Color.RED))
@@ -246,7 +246,7 @@ class SwingometerFrameBuilderTest {
             Dot(0.6, Color.RED),
             Dot(-0.185, Color.BLUE),
             Dot(-0.76, Color.BLUE),
-            Dot(-0.76, Color.BLUE)
+            Dot(-0.76, Color.BLUE),
         )
         val colors = Publisher(Pair(Color.BLUE, Color.RED))
         val value = Publisher(-1.0)

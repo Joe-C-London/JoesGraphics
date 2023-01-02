@@ -68,7 +68,7 @@ class GenericWindow<T : JPanel> @JvmOverloads constructor(private val panel: T, 
                         panel,
                         e.message,
                         "Cannot save image",
-                        JOptionPane.ERROR_MESSAGE
+                        JOptionPane.ERROR_MESSAGE,
                     )
                 }
             }
@@ -187,7 +187,7 @@ class GenericWindow<T : JPanel> @JvmOverloads constructor(private val panel: T, 
             val controlPanel = this.controlPanel?.preferredSize
             return Dimension(
                 (main?.width ?: 0) + (controlPanel?.width ?: 0),
-                max(main?.height ?: 0, controlPanel?.height ?: 0)
+                max(main?.height ?: 0, controlPanel?.height ?: 0),
             )
         }
 
@@ -196,7 +196,7 @@ class GenericWindow<T : JPanel> @JvmOverloads constructor(private val panel: T, 
             val controlPanel = this.controlPanel?.minimumSize
             return Dimension(
                 (main?.width ?: 0) + (controlPanel?.width ?: 0),
-                max(main?.height ?: 0, controlPanel?.height ?: 0)
+                max(main?.height ?: 0, controlPanel?.height ?: 0),
             )
         }
 
@@ -213,7 +213,7 @@ class GenericWindow<T : JPanel> @JvmOverloads constructor(private val panel: T, 
                 controlPanel.location = Point(mainSize.width, 0)
                 controlPanel.size = Dimension(
                     controlPanelSize.width.coerceAtMost(parent.width - mainSize.width),
-                    controlPanelSize.height
+                    controlPanelSize.height,
                 )
             }
         }

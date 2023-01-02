@@ -28,11 +28,11 @@ class ParliamentVoteFrame(
     votes: Flow.Publisher<out IntArray>,
     private val partyRows: Int,
     partyVotes: Flow.Publisher<out Array<List<Pair<Party, Int>>>>,
-    resultText: Flow.Publisher<out String?> = (null as String?).asOneTimePublisher()
+    resultText: Flow.Publisher<out String?> = (null as String?).asOneTimePublisher(),
 ) : GraphicsFrame(
     headerPublisher = titlePublisher,
     notesPublisher = "SOURCE: $bodyName".asOneTimePublisher(),
-    borderColorPublisher = bodyColor.asOneTimePublisher()
+    borderColorPublisher = bodyColor.asOneTimePublisher(),
 ) {
 
     init {
@@ -159,7 +159,7 @@ class ParliamentVoteFrame(
                             (g as Graphics2D)
                                 .setRenderingHint(
                                     RenderingHints.KEY_TEXT_ANTIALIASING,
-                                    RenderingHints.VALUE_TEXT_ANTIALIAS_ON
+                                    RenderingHints.VALUE_TEXT_ANTIALIAS_ON,
                                 )
 
                             g.color = party.color
@@ -179,7 +179,7 @@ class ParliamentVoteFrame(
                             g.drawString(
                                 votes.toString(),
                                 (width - voteWidth) / 2,
-                                padding / 2 + labelFontSize + voteFontSize
+                                padding / 2 + labelFontSize + voteFontSize,
                             )
                         }
                     }

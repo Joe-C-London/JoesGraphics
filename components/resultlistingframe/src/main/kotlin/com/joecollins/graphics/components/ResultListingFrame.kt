@@ -23,12 +23,12 @@ class ResultListingFrame(
     reversedPublisher: Flow.Publisher<out Boolean>? = null,
     borderColorPublisher: Flow.Publisher<out Color>? = null,
     headerAlignmentPublisher: Flow.Publisher<out Alignment>? = null,
-    notesPublisher: Flow.Publisher<out String?>? = null
+    notesPublisher: Flow.Publisher<out String?>? = null,
 ) : GraphicsFrame(
     headerPublisher = headerPublisher,
     borderColorPublisher = borderColorPublisher,
     headerAlignmentPublisher = headerAlignmentPublisher,
-    notesPublisher = notesPublisher
+    notesPublisher = notesPublisher,
 ) {
     private val centralPanel = JPanel()
     private val layout = Layout()
@@ -124,7 +124,7 @@ class ResultListingFrame(
             (g as Graphics2D)
                 .setRenderingHint(
                     RenderingHints.KEY_TEXT_ANTIALIASING,
-                    RenderingHints.VALUE_TEXT_ANTIALIAS_ON
+                    RenderingHints.VALUE_TEXT_ANTIALIAS_ON,
                 )
             g.setColor(borderColor)
             g.fillRect(0, 0, width, height)

@@ -48,8 +48,8 @@ object TwitterV2InstanceFactory {
                     properties["oauth2ClientSecret"].toString(),
                     properties["oauth2AccessToken"].toString(),
                     properties["oauth2RefreshToken"].toString(),
-                    true
-                )
+                    true,
+                ),
             )
             instance.addCallback(object : ApiClientCallback {
                 override fun onAfterRefreshToken(accessToken: OAuth2AccessToken) {
@@ -89,8 +89,8 @@ object TwitterV2InstanceFactory {
                 BasicNameValuePair("grant_type", "authorization_code"),
                 BasicNameValuePair("client_id", clientId),
                 BasicNameValuePair("redirect_uri", redirectUri),
-                BasicNameValuePair("code_verifier", challenge)
-            )
+                BasicNameValuePair("code_verifier", challenge),
+            ),
         )
         client.execute(post) { response ->
             val entity = response.entity

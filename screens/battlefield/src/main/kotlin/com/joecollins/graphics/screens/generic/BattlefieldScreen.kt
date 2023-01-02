@@ -19,7 +19,7 @@ class BattlefieldScreen private constructor(header: Flow.Publisher<out String?>,
             leftPartyPublisher: Flow.Publisher<Party>,
             rightPartyPublisher: Flow.Publisher<Party>,
             bottomPartyPublisher: Flow.Publisher<Party>,
-            headerPublisher: Flow.Publisher<out String?>
+            headerPublisher: Flow.Publisher<out String?>,
         ) = Builder(prevVotesPublisher, resultsPublisher, leftPartyPublisher, rightPartyPublisher, bottomPartyPublisher, headerPublisher)
     }
 
@@ -29,7 +29,7 @@ class BattlefieldScreen private constructor(header: Flow.Publisher<out String?>,
         leftPartyPublisher: Flow.Publisher<Party>,
         rightPartyPublisher: Flow.Publisher<Party>,
         bottomPartyPublisher: Flow.Publisher<Party>,
-        private val headerPublisher: Flow.Publisher<out String?>
+        private val headerPublisher: Flow.Publisher<out String?>,
     ) {
         private data class Parties(val left: Party, val right: Party, val bottom: Party) {
             fun asSequence() = sequenceOf(left, right, bottom)
@@ -79,7 +79,7 @@ class BattlefieldScreen private constructor(header: Flow.Publisher<out String?>,
                         BattlefieldFrame.Dot(
                             -(pctByParty[parties.left] ?: 0.0),
                             -(pctByParty[parties.right] ?: 0.0),
-                            -(pctByParty[parties.bottom] ?: 0.0)
+                            -(pctByParty[parties.bottom] ?: 0.0),
                         ) to (curr[key].color)
                     }
                 }
@@ -109,10 +109,10 @@ class BattlefieldScreen private constructor(header: Flow.Publisher<out String?>,
                         BattlefieldFrame.Dot(
                             swings[parties.left] ?: 0,
                             swings[parties.right] ?: 0,
-                            swings[parties.bottom] ?: 0
+                            swings[parties.bottom] ?: 0,
                         )
                     }
-                }
+                },
             )
         }
 

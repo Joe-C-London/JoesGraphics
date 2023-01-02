@@ -4,7 +4,7 @@ import java.net.URL
 
 class Media(
     override val mediaURL: URL,
-    override val displayURL: String
+    override val displayURL: String,
 ) : com.joecollins.models.general.social.generic.Media {
 
     companion object {
@@ -17,7 +17,7 @@ class Media(
             if (!media.containsKey(urlEntity.mediaKey)) return null
             return Media(
                 media[urlEntity.mediaKey]!!,
-                urlEntity.url.toString()
+                urlEntity.url.toString(),
             )
         }
     }

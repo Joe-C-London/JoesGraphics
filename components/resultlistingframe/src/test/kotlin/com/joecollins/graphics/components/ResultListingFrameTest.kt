@@ -17,7 +17,7 @@ class ResultListingFrameTest {
         val frame = ResultListingFrame(
             headerPublisher = (null as String?).asOneTimePublisher(),
             numRowsPublisher = 20.asOneTimePublisher(),
-            itemsPublisher = emptyList<ResultListingFrame.Item>().asOneTimePublisher()
+            itemsPublisher = emptyList<ResultListingFrame.Item>().asOneTimePublisher(),
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.getNumRows() }, IsEqual(20))
@@ -33,7 +33,7 @@ class ResultListingFrameTest {
             Item("RUSTICO-EMERALD", Color.WHITE, Color.BLACK, Color.BLUE),
             Item("BORDEN-KINKORA", Color.WHITE, Color.BLACK, Color.BLUE),
             Item("STRATFORD-KINLOCK", Color.WHITE, Color.BLACK, Color.BLUE),
-            Item("KENSINGTON-MALPEQUE", Color.WHITE, Color.BLACK, Color.BLUE)
+            Item("KENSINGTON-MALPEQUE", Color.WHITE, Color.BLACK, Color.BLUE),
         )
         val items: Publisher<List<Item>> = Publisher(rawItems)
         val frame = ResultListingFrame(
@@ -44,9 +44,9 @@ class ResultListingFrameTest {
                     text = it.text,
                     border = it.border,
                     background = it.background,
-                    foreground = it.foreground
+                    foreground = it.foreground,
                 )
-            }
+            },
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.getNumItems() }, IsEqual(8))
@@ -77,7 +77,7 @@ class ResultListingFrameTest {
             Item("O'Leary-Inverness", Color.WHITE, Color.BLACK, Color.RED), // 9.2
             Item("Montague-Kilmuir", Color.WHITE, Color.BLACK, Color.RED), // 10.8
             Item("Charlottetown-Victoria Park", Color.WHITE, Color.BLACK, Color.RED), // 11.9
-            Item("Cornwall-Meadowbank", Color.WHITE, Color.BLACK, Color.RED) // 12.5
+            Item("Cornwall-Meadowbank", Color.WHITE, Color.BLACK, Color.RED), // 12.5
         )
         val items: Publisher<List<Item>> = Publisher(rawItems)
         val frame = ResultListingFrame(
@@ -89,9 +89,9 @@ class ResultListingFrameTest {
                     text = it.text.uppercase(),
                     border = it.border,
                     background = it.background,
-                    foreground = it.foreground
+                    foreground = it.foreground,
                 )
-            }
+            },
         )
         frame.setSize(512, 512)
         compareRendering("ResultListingFrame", "FullColumn-1", frame)
@@ -121,9 +121,9 @@ class ResultListingFrameTest {
                     text = it.text.uppercase(),
                     border = it.border,
                     background = it.background,
-                    foreground = it.foreground
+                    foreground = it.foreground,
                 )
-            }
+            },
         )
         frame.setSize(512, 256)
         compareRendering("ResultListingFrame", "Varying-1", frame)
@@ -161,9 +161,9 @@ class ResultListingFrameTest {
                     text = it.text.uppercase(),
                     border = it.border,
                     background = it.background,
-                    foreground = it.foreground
+                    foreground = it.foreground,
                 )
-            }
+            },
         )
         frame.setSize(512, 256)
         compareRendering("ResultListingFrame", "Reversed-1", frame)

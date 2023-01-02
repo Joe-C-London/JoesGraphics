@@ -21,7 +21,7 @@ import java.util.concurrent.Flow
 class TooCloseToCallScreen private constructor(
     titleLabel: Flow.Publisher<out String?>,
     multiSummaryFrame: MultiSummaryFrame,
-    override val altText: Flow.Publisher<String?>
+    override val altText: Flow.Publisher<String?>,
 ) : GenericPanel(pad(multiSummaryFrame), titleLabel), AltTextProvider {
     private class Input<T> {
         var votes: Map<T, Map<Candidate, Int>> = HashMap()
@@ -73,7 +73,7 @@ class TooCloseToCallScreen private constructor(
                     it.value,
                     results[it.key],
                     reporting[it.key] ?: "",
-                    numCandidates
+                    numCandidates,
                 )
             }
             .filter { it.votes.values.sum() > 0 }
@@ -89,7 +89,7 @@ class TooCloseToCallScreen private constructor(
         val votes: Map<Candidate, Int>,
         val result: PartyResult?,
         val reporting: String,
-        val numCandidates: Int
+        val numCandidates: Int,
     ) {
         val topCandidates: List<Map.Entry<Candidate, Int>> = votes.entries
             .sortedByDescending { it.value }
@@ -107,7 +107,7 @@ class TooCloseToCallScreen private constructor(
         private val entries: Flow.Publisher<out Set<T>>,
         votesFunc: (T) -> Flow.Publisher<out Map<Candidate, Int>>,
         resultsFunc: (T) -> Flow.Publisher<out PartyResult?>,
-        rowHeaderFunc: (T) -> Flow.Publisher<String>
+        rowHeaderFunc: (T) -> Flow.Publisher<String>,
     ) {
         private val votes = entries.compose { set -> Aggregators.toMap(set) { votesFunc(it) } }
         private val results = entries.compose { set -> Aggregators.toMap(set) { resultsFunc(it) } }
@@ -172,9 +172,9 @@ class TooCloseToCallScreen private constructor(
                 val entriesText = entries.mapNotNull { e ->
                     val total = e.votes.values.sum().toDouble()
                     val entry = "${e.header}: ${
-                    e.topCandidates.take(e.numCandidates).joinToString("; ") { c -> "${c.key.party.abbreviation}: ${if (input.showPcts) DecimalFormat("0.0%").format(c.value / total) else DecimalFormat("#,##0").format(c.value)}" }
+                        e.topCandidates.take(e.numCandidates).joinToString("; ") { c -> "${c.key.party.abbreviation}: ${if (input.showPcts) DecimalFormat("0.0%").format(c.value / total) else DecimalFormat("#,##0").format(c.value)}" }
                     }; LEAD: ${if (input.showPcts) DecimalFormat("0.0%").format(e.pctLead) else DecimalFormat("#,##0").format(e.lead)}${
-                    if (e.reporting.isEmpty()) "" else "; ${e.reporting}"
+                        if (e.reporting.isEmpty()) "" else "; ${e.reporting}"
                     }"
                     if (dotDotDot) {
                         null
@@ -220,20 +220,20 @@ class TooCloseToCallScreen private constructor(
                                                     } else {
                                                         thousandsFormatter.format(e.value)
                                                     }
-                                                    )
+                                                    ),
                                         )
                                     },
-                                generateSequence { Pair(Color.WHITE, "") }
+                                generateSequence { Pair(Color.WHITE, "") },
                             )
                                 .flatten()
                                 .take(entry.numCandidates),
                             sequenceOf(Color.WHITE to ("LEAD: " + (if (input.showPcts) pctFormatter.format(entry.pctLead) else thousandsFormatter.format(entry.lead)))),
-                            reporting?.let { sequenceOf(Color.WHITE to entry.reporting) } ?: emptySequence()
+                            reporting?.let { sequenceOf(Color.WHITE to entry.reporting) } ?: emptySequence(),
                         )
                             .flatten()
                             .toList()
                     MultiSummaryFrame.Row(header, values)
-                }
+                },
             )
             return frame
         }
@@ -245,7 +245,7 @@ class TooCloseToCallScreen private constructor(
             votesPublisher: (T) -> Flow.Publisher<out Map<Candidate, Int>>,
             resultPublisher: (T) -> Flow.Publisher<out PartyResult?>,
             labelFunc: (T) -> Flow.Publisher<String>,
-            headerPublisher: Flow.Publisher<out String?>
+            headerPublisher: Flow.Publisher<out String?>,
         ): Builder<T> {
             return Builder(headerPublisher, entries, votesPublisher, resultPublisher, labelFunc)
         }
@@ -255,14 +255,14 @@ class TooCloseToCallScreen private constructor(
             votesPublisher: (T) -> Flow.Publisher<out Map<Party, Int>>,
             resultPublisher: (T) -> Flow.Publisher<out PartyResult?>,
             labelFunc: (T) -> Flow.Publisher<String>,
-            headerPublisher: Flow.Publisher<out String?>
+            headerPublisher: Flow.Publisher<out String?>,
         ): Builder<T> {
             return Builder(
                 headerPublisher,
                 entries,
                 { t: T -> votesPublisher(t).map { v -> Aggregators.adjustKey(v) { p -> Candidate("", p) } } },
                 resultPublisher,
-                labelFunc
+                labelFunc,
             )
         }
     }

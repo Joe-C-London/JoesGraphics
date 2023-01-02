@@ -7,7 +7,6 @@ import org.apache.hc.client5.http.impl.classic.CloseableHttpClient
 import org.apache.hc.client5.http.impl.classic.HttpClients
 import org.apache.hc.core5.http.ContentType
 import org.apache.hc.core5.http.io.entity.BasicHttpEntity
-import org.apache.hc.core5.http.io.entity.EntityUtils
 import org.json.JSONArray
 import org.json.JSONObject
 import java.awt.Color
@@ -61,7 +60,7 @@ class MastodonDialog(panel: JPanel, private val server: String, private val toke
         params.put("media_ids", JSONArray().also { it.put(imageId) })
         post.entity = BasicHttpEntity(
             params.toString().byteInputStream(Charset.defaultCharset()),
-            ContentType.APPLICATION_JSON
+            ContentType.APPLICATION_JSON,
         )
         client.execute(post) {}
     }

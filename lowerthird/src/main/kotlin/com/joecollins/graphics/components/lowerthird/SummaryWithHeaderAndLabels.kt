@@ -21,7 +21,7 @@ import javax.swing.border.MatteBorder
 
 class SummaryWithHeaderAndLabels(
     private val headlinePublisher: Flow.Publisher<out String>,
-    private val entriesPublisher: Flow.Publisher<out List<SummaryEntry>>
+    private val entriesPublisher: Flow.Publisher<out List<SummaryEntry>>,
 ) : JPanel() {
     private val headlinePanel: HeadlinePanel = HeadlinePanel()
     private val entryPanels: MutableList<EntryPanel> = ArrayList()
@@ -103,7 +103,7 @@ class SummaryWithHeaderAndLabels(
                         weightx = 1.0
                         weighty = 1.0
                     }
-                }
+                },
             )
             bottomPanel.add(
                 bottomValueLabel,
@@ -117,7 +117,7 @@ class SummaryWithHeaderAndLabels(
                         weightx = 1.0
                         weighty = 1.0
                     }
-                }
+                },
             )
             layout = GridLayout(1, 1)
         }
@@ -178,8 +178,8 @@ class SummaryWithHeaderAndLabels(
                     invalidate()
                     revalidate()
                     repaint()
-                }
-            )
+                },
+            ),
         )
     }
 }

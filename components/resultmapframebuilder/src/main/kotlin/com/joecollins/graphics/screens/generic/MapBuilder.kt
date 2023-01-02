@@ -21,14 +21,14 @@ class MapBuilder<T> {
         shapes: Flow.Publisher<out Map<T, Shape>>,
         winners: Flow.Publisher<out Map<T, PartyResult?>>,
         focus: Flow.Publisher<out List<T>?>,
-        headerPublisher: Flow.Publisher<out String?>
+        headerPublisher: Flow.Publisher<out String?>,
     ) : this(shapes, winners, Pair(focus, (null as List<T>?).asOneTimePublisher()), headerPublisher)
 
     constructor(
         shapes: Flow.Publisher<out Map<T, Shape>>,
         winners: Flow.Publisher<out Map<T, PartyResult?>>,
         focus: Pair<Flow.Publisher<out List<T>?>, Flow.Publisher<out List<T>?>>,
-        headerPublisher: Flow.Publisher<out String?>
+        headerPublisher: Flow.Publisher<out String?>,
     ) {
         val shapesToParties = shapes
             .merge(winners) { s, w ->
@@ -62,7 +62,7 @@ class MapBuilder<T> {
         selectedShape: Flow.Publisher<out T>,
         leadingParty: Flow.Publisher<out PartyResult?>,
         focus: Flow.Publisher<out List<T>?>,
-        header: Flow.Publisher<out String?>
+        header: Flow.Publisher<out String?>,
     ) : this(shapes, selectedShape, leadingParty, focus, (null as List<T>?).asOneTimePublisher(), header)
 
     constructor(
@@ -71,7 +71,7 @@ class MapBuilder<T> {
         leadingParty: Flow.Publisher<out PartyResult?>,
         focus: Flow.Publisher<out List<T>?>,
         additionalHighlight: Flow.Publisher<out List<T>?>,
-        header: Flow.Publisher<out String?>
+        header: Flow.Publisher<out String?>,
     ) {
         val leaderWithShape =
             selectedShape.merge(leadingParty) { left, right -> Pair(left, right) }
@@ -95,7 +95,7 @@ class MapBuilder<T> {
             }
         val allFocusShapes = mapFocus
             .merge(
-                additionalFocusShapes
+                additionalFocusShapes,
             ) { l1: List<Shape>?, l2: List<Shape>? ->
                 when {
                     l1 == null -> l2

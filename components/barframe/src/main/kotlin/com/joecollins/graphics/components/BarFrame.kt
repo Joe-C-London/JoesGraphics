@@ -37,12 +37,12 @@ class BarFrame(
     maxPublisher: Flow.Publisher<out Number>? = null,
     notesPublisher: Flow.Publisher<out String?>? = null,
     borderColorPublisher: Flow.Publisher<out Color>? = null,
-    headerLabelsPublisher: Flow.Publisher<out Map<HeaderLabelLocation, String?>>? = null
+    headerLabelsPublisher: Flow.Publisher<out Map<HeaderLabelLocation, String?>>? = null,
 ) : GraphicsFrame(
     headerPublisher = headerPublisher,
     notesPublisher = notesPublisher,
     borderColorPublisher = borderColorPublisher,
-    headerLabelsPublisher = headerLabelsPublisher
+    headerLabelsPublisher = headerLabelsPublisher,
 ) {
     private val centralPanel: JPanel
     private val subheadLabel: FontSizeAdjustingLabel = FontSizeAdjustingLabel()
@@ -57,7 +57,7 @@ class BarFrame(
         val leftText: String,
         val rightText: String,
         val leftIcon: Shape? = null,
-        val series: List<Pair<Color, Number>>
+        val series: List<Pair<Color, Number>>,
     ) {
         constructor(leftText: String, rightText: String, series: List<Pair<Color, Number>>) : this(leftText, rightText, null, series)
     }
@@ -171,7 +171,7 @@ class BarFrame(
             (g as Graphics2D)
                 .setRenderingHint(
                     RenderingHints.KEY_TEXT_ANTIALIASING,
-                    RenderingHints.VALUE_TEXT_ANTIALIAS_ON
+                    RenderingHints.VALUE_TEXT_ANTIALIAS_ON,
                 )
             drawLines(g, 0, height)
             val font = StandardFont.readBoldFont(barHeight * 3 / 4 / maxLines)
@@ -301,7 +301,7 @@ class BarFrame(
                 } else {
                     transform.translate(
                         leftMax - spaceWidth - leftIconScale * leftIconBounds.getWidth(),
-                        (2 * BAR_MARGIN).toDouble()
+                        (2 * BAR_MARGIN).toDouble(),
                     )
                 }
                 transform.scale(leftIconScale, leftIconScale)
@@ -332,7 +332,7 @@ class BarFrame(
                         override fun componentResized(e: ComponentEvent) {
                             font = StandardFont.readNormalFont(height * 2 / 3)
                         }
-                    }
+                    },
                 )
             }
         }
@@ -424,7 +424,7 @@ class BarFrame(
                 override fun componentResized(e: ComponentEvent) {
                     subheadLabel.font = StandardFont.readBoldFont(subheadLabel.height * 2 / 3)
                 }
-            }
+            },
         )
         centralPanel = object : JPanel() {
             override fun paintComponent(g: Graphics) {
@@ -432,17 +432,17 @@ class BarFrame(
                 (g as Graphics2D)
                     .setRenderingHint(
                         RenderingHints.KEY_TEXT_ANTIALIASING,
-                        RenderingHints.VALUE_TEXT_ANTIALIAS_ON
+                        RenderingHints.VALUE_TEXT_ANTIALIAS_ON,
                     )
                 g
                     .setRenderingHint(
                         RenderingHints.KEY_ANTIALIASING,
-                        RenderingHints.VALUE_ANTIALIAS_ON
+                        RenderingHints.VALUE_ANTIALIAS_ON,
                     )
                 drawLines(
                     g,
                     if (subheadLabel.isVisible) subheadLabel.height else BAR_MARGIN,
-                    height - BAR_MARGIN
+                    height - BAR_MARGIN,
                 )
             }
 

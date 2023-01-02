@@ -7,7 +7,7 @@ class User(
     override val name: String,
     override val profileImageURL: URL,
     override val isVerified: Boolean,
-    override val isProtected: Boolean
+    override val isProtected: Boolean,
 ) : com.joecollins.models.general.social.generic.User {
 
     companion object {
@@ -17,7 +17,7 @@ class User(
                 user.name,
                 URL(user.profileImageURL),
                 user.isVerified,
-                user.isProtected
+                user.isProtected,
             )
         }
 
@@ -27,7 +27,7 @@ class User(
                 user.name,
                 user.profileImageUrl!!,
                 user.verified!!,
-                user.protected!!
+                user.protected!!,
             )
         }
     }

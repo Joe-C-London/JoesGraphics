@@ -39,7 +39,7 @@ class BasicResultPanel private constructor(
     private val changeFrame: BarFrame?,
     private val swingFrame: SwingFrame?,
     private val mapFrame: MapFrame?,
-    altText: Flow.Publisher<String?>
+    altText: Flow.Publisher<String?>,
 ) : GenericPanel(
     run {
         val panel = JPanel()
@@ -53,7 +53,7 @@ class BasicResultPanel private constructor(
         panel
     },
     label,
-    altText
+    altText,
 ) {
 
     interface KeyTemplate<KT, KPT : PartyOrCoalition> {
@@ -170,7 +170,7 @@ class BasicResultPanel private constructor(
                 baseColor,
                 value,
                 labelText(value),
-                shape
+                shape,
             )
         }
 
@@ -179,7 +179,7 @@ class BasicResultPanel private constructor(
                 keyLabel,
                 baseColor,
                 value,
-                prevLabelText(value)
+                prevLabelText(value),
             )
         }
 
@@ -188,7 +188,7 @@ class BasicResultPanel private constructor(
                 keyLabel,
                 baseColor,
                 diff,
-                diffLabelText(diff)
+                diffLabelText(diff),
             )
         }
     }
@@ -225,7 +225,7 @@ class BasicResultPanel private constructor(
                 if (focusLocation == DualSeatScreenBuilder.FocusLocation.FIRST) value.first else (value.second - value.first),
                 value.second,
                 labelText(value),
-                shape
+                shape,
             )
         }
 
@@ -235,7 +235,7 @@ class BasicResultPanel private constructor(
                 baseColor,
                 if (focusLocation == DualSeatScreenBuilder.FocusLocation.FIRST) value.first else (value.second - value.first),
                 value.second,
-                prevLabelText(value)
+                prevLabelText(value),
             )
         }
 
@@ -253,7 +253,7 @@ class BasicResultPanel private constructor(
                     (diff.second - diff.first)
                 },
                 diff.second,
-                diffLabelText(diff)
+                diffLabelText(diff),
             )
         }
     }
@@ -290,7 +290,7 @@ class BasicResultPanel private constructor(
                 value.first,
                 value.last,
                 labelText(value),
-                shape
+                shape,
             )
         }
 
@@ -300,7 +300,7 @@ class BasicResultPanel private constructor(
                 baseColor,
                 value,
                 value,
-                prevLabelText(value)
+                prevLabelText(value),
             )
         }
 
@@ -310,7 +310,7 @@ class BasicResultPanel private constructor(
                 baseColor,
                 diff.first,
                 diff.last,
-                diffLabelText(diff)
+                diffLabelText(diff),
             )
         }
     }
@@ -320,7 +320,7 @@ class BasicResultPanel private constructor(
         protected var header: Flow.Publisher<out String?>,
         protected var subhead: Flow.Publisher<out String?>,
         protected val keyTemplate: KeyTemplate<KT, KPT>,
-        private val seatTemplate: SeatTemplate<CT, PT, BAR>
+        private val seatTemplate: SeatTemplate<CT, PT, BAR>,
     ) {
         protected var total: Flow.Publisher<out Int>? = null
         protected var showMajority: Flow.Publisher<out Boolean>? = null
@@ -349,7 +349,7 @@ class BasicResultPanel private constructor(
 
         fun withMajorityLine(
             showMajority: Flow.Publisher<out Boolean>,
-            majorityLabelFunc: (Int) -> String
+            majorityLabelFunc: (Int) -> String,
         ): SeatScreenBuilder<KT, KPT, CT, PT, BAR> {
             this.showMajority = showMajority
             majorityFunction = majorityLabelFunc
@@ -365,7 +365,7 @@ class BasicResultPanel private constructor(
         fun withDiff(
             diff: Flow.Publisher<out Map<KPT, CT>>,
             changeHeader: Flow.Publisher<out String?>,
-            changeSubhead: Flow.Publisher<out String?> = null.asOneTimePublisher()
+            changeSubhead: Flow.Publisher<out String?> = null.asOneTimePublisher(),
         ): SeatScreenBuilder<KT, KPT, CT, PT, BAR> {
             this.diff =
                 current
@@ -389,7 +389,7 @@ class BasicResultPanel private constructor(
             changeHeader: Flow.Publisher<out String?>,
             changeSubhead: Flow.Publisher<out String?> = null.asOneTimePublisher(),
             showPrevRaw: Flow.Publisher<Boolean> = false.asOneTimePublisher(),
-            partyChanges: Flow.Publisher<Map<KPT, KPT>> = emptyMap<KPT, KPT>().asOneTimePublisher()
+            partyChanges: Flow.Publisher<Map<KPT, KPT>> = emptyMap<KPT, KPT>().asOneTimePublisher(),
         ): SeatScreenBuilder<KT, KPT, CT, PT, BAR> {
             this.prev = prev
             this.diff =
@@ -414,7 +414,7 @@ class BasicResultPanel private constructor(
             prevVotes: Flow.Publisher<out Map<out KPT, Int>>,
             comparator: Comparator<KPT>,
             header: Flow.Publisher<out String?>,
-            partyChanges: Flow.Publisher<Map<KPT, KPT>> = emptyMap<KPT, KPT>().asOneTimePublisher()
+            partyChanges: Flow.Publisher<Map<KPT, KPT>> = emptyMap<KPT, KPT>().asOneTimePublisher(),
         ): SeatScreenBuilder<KT, KPT, CT, PT, BAR> {
             swingHeader = header
             this.currVotes = currVotes
@@ -427,13 +427,13 @@ class BasicResultPanel private constructor(
             shapes: Flow.Publisher<out Map<T, Shape>>,
             winners: Flow.Publisher<out Map<T, PartyOrCoalition?>>,
             focus: Flow.Publisher<out List<T>?>,
-            headerPublisher: Flow.Publisher<out String?>
+            headerPublisher: Flow.Publisher<out String?>,
         ): SeatScreenBuilder<KT, KPT, CT, PT, BAR> {
             mapBuilder = MapBuilder(
                 shapes,
                 winners.map { m -> partyMapToResultMap(m) },
                 focus,
-                headerPublisher
+                headerPublisher,
             )
             return this
         }
@@ -442,7 +442,7 @@ class BasicResultPanel private constructor(
             shapes: Flow.Publisher<out Map<T, Shape>>,
             winners: Flow.Publisher<out Map<T, PartyResult?>>,
             focus: Flow.Publisher<out List<T>?>,
-            headerPublisher: Flow.Publisher<out String?>
+            headerPublisher: Flow.Publisher<out String?>,
         ): SeatScreenBuilder<KT, KPT, CT, PT, BAR> {
             mapBuilder = MapBuilder(shapes, winners, focus, headerPublisher)
             return this
@@ -453,7 +453,7 @@ class BasicResultPanel private constructor(
             winners: Flow.Publisher<out Map<T, PartyResult?>>,
             focus: Flow.Publisher<out List<T>?>,
             additionalHighlight: Flow.Publisher<out List<T>?>,
-            headerPublisher: Flow.Publisher<out String?>
+            headerPublisher: Flow.Publisher<out String?>,
         ): SeatScreenBuilder<KT, KPT, CT, PT, BAR> {
             mapBuilder = MapBuilder(shapes, winners, Pair(focus, additionalHighlight), headerPublisher)
             return this
@@ -471,7 +471,7 @@ class BasicResultPanel private constructor(
 
         fun withClassification(
             classificationFunc: (KPT) -> KPT,
-            classificationHeader: Flow.Publisher<out String?>
+            classificationHeader: Flow.Publisher<out String?>,
         ): SeatScreenBuilder<KT, KPT, CT, PT, BAR> {
             this.classificationFunc = classificationFunc
             this.classificationHeader = classificationHeader
@@ -491,7 +491,7 @@ class BasicResultPanel private constructor(
                 createDiffFrame(),
                 createSwingFrame(),
                 createMapFrame(),
-                createAltText(textHeader)
+                createAltText(textHeader),
             )
         }
 
@@ -559,7 +559,7 @@ class BasicResultPanel private constructor(
                         seatTemplate.createDiffBar(
                             it.key.abbreviation.uppercase(),
                             it.key.color,
-                            it.value.diff
+                            it.value.diff,
                         )
                     }
                     .toList()
@@ -572,7 +572,7 @@ class BasicResultPanel private constructor(
                         seatTemplate.createPrevBar(
                             it.key.abbreviation.uppercase(),
                             it.key.color,
-                            it.value
+                            it.value,
                         )
                     }
                     .toList()
@@ -592,7 +592,7 @@ class BasicResultPanel private constructor(
                                     } else {
                                         BarFrameBuilder.Limit(wingspan = (total / 20).coerceAtLeast(1))
                                     }
-                                }
+                                },
                             )
                         }
                     }
@@ -622,7 +622,7 @@ class BasicResultPanel private constructor(
                 SwingFrameBuilder.prevCurr(
                     (if (func == null) prev else Aggregators.adjustKey(prev, func)),
                     (if (func == null) curr else Aggregators.adjustKey(curr, func)),
-                    swingComparator!!
+                    swingComparator!!,
                 )
                     .withHeader(header)
                     .build()
@@ -685,7 +685,7 @@ class BasicResultPanel private constructor(
                     SwingFrameBuilder.prevCurr(
                         (if (classificationFunc == null) prevVotes!! else Aggregators.adjustKey(prevVotes!!, classificationFunc)),
                         (if (classificationFunc == null) currVotes!! else Aggregators.adjustKey(currVotes!!, classificationFunc)),
-                        swingComparator!!
+                        swingComparator!!,
                     ).buildBottomText() ?: null.asOneTimePublisher()
                 }.merge(this.swingHeader ?: null.asOneTimePublisher()) { text, head ->
                     if (text == null && head == null) {
@@ -730,7 +730,7 @@ class BasicResultPanel private constructor(
         current: Flow.Publisher<out Map<out KT, Int>>,
         header: Flow.Publisher<out String?>,
         subhead: Flow.Publisher<out String?>,
-        keyTemplate: KeyTemplate<KT, KPT>
+        keyTemplate: KeyTemplate<KT, KPT>,
     ) : SeatScreenBuilder<KT, KPT, Int, Int, BasicBar>(current, header, subhead, keyTemplate, SingleSeatTemplate()) {
 
         override fun createFromDiff(curr: Int, diff: Int?): CurrDiff<Int> {
@@ -763,14 +763,14 @@ class BasicResultPanel private constructor(
         header: Flow.Publisher<out String?>,
         subhead: Flow.Publisher<out String?>,
         keyTemplate: KeyTemplate<KT, KPT>,
-        val focusLocation: FocusLocation
+        val focusLocation: FocusLocation,
     ) : SeatScreenBuilder<KT, KPT, Pair<Int, Int>, Pair<Int, Int>, DualBar>(current, header, subhead, keyTemplate, DualSeatTemplate(focusLocation)) {
 
         enum class FocusLocation { FIRST, LAST }
 
         override fun createFromDiff(
             curr: Pair<Int, Int>,
-            diff: Pair<Int, Int>?
+            diff: Pair<Int, Int>?,
         ): CurrDiff<Pair<Int, Int>> {
             return CurrDiff(curr, diff ?: Pair(0, 0))
         }
@@ -781,7 +781,7 @@ class BasicResultPanel private constructor(
 
         override fun createFromPrev(
             curr: Pair<Int, Int>,
-            prev: Pair<Int, Int>?
+            prev: Pair<Int, Int>?,
         ): CurrDiff<Pair<Int, Int>> {
             return CurrDiff(curr, Pair(curr.first - (prev?.first ?: 0), curr.second - (prev?.second ?: 0)))
         }
@@ -807,7 +807,7 @@ class BasicResultPanel private constructor(
         current: Flow.Publisher<out Map<KT, IntRange>>,
         header: Flow.Publisher<out String?>,
         subhead: Flow.Publisher<out String?>,
-        keyTemplate: KeyTemplate<KT, KPT>
+        keyTemplate: KeyTemplate<KT, KPT>,
     ) : SeatScreenBuilder<KT, KPT, IntRange, Int, DualBar>(current, header, subhead, keyTemplate, RangeSeatTemplate()) {
         override fun createFromDiff(curr: IntRange, diff: IntRange?): CurrDiff<IntRange> {
             return CurrDiff(curr, diff ?: IntRange(0, 0))
@@ -884,7 +884,7 @@ class BasicResultPanel private constructor(
         protected var subhead: Flow.Publisher<out String?>,
         protected val keyTemplate: KeyTemplate<KT, KPT>,
         protected val voteTemplate: VoteTemplate,
-        protected val others: KT
+        protected val others: KT,
     ) {
         protected var showMajority: Flow.Publisher<out Boolean>? = null
         protected var majorityLabel: String? = null
@@ -988,7 +988,7 @@ class BasicResultPanel private constructor(
             header: Flow.Publisher<out String?>,
             subhead: Flow.Publisher<out String?> = (null as String?).asOneTimePublisher(),
             showPrevRaw: Flow.Publisher<Boolean> = false.asOneTimePublisher(),
-            partyChanges: Flow.Publisher<Map<KPT, KPT>> = emptyMap<KPT, KPT>().asOneTimePublisher()
+            partyChanges: Flow.Publisher<Map<KPT, KPT>> = emptyMap<KPT, KPT>().asOneTimePublisher(),
         ): VoteScreenBuilder<KT, KPT, CT, CPT, PT> {
             this.prevRaw = prev
             this.prev = Aggregators.partyChanges(prev, partyChanges) { a, b -> prevCombine(a, b) }
@@ -1003,7 +1003,7 @@ class BasicResultPanel private constructor(
         fun withPreferences(
             preferences: Flow.Publisher<out Map<out KT, CT>>,
             preferenceHeader: Flow.Publisher<out String?>,
-            preferenceSubhead: Flow.Publisher<out String?>
+            preferenceSubhead: Flow.Publisher<out String?>,
         ): VoteScreenBuilder<KT, KPT, CT, CPT, PT> {
             currPreferences = preferences
             this.preferenceHeader = preferenceHeader
@@ -1012,7 +1012,7 @@ class BasicResultPanel private constructor(
         }
 
         fun withPrevPreferences(
-            prevPreferences: Flow.Publisher<out Map<out KPT, PT>>
+            prevPreferences: Flow.Publisher<out Map<out KPT, PT>>,
         ): VoteScreenBuilder<KT, KPT, CT, CPT, PT> {
             this.prevPreferences = prevPreferences
             return this
@@ -1034,7 +1034,7 @@ class BasicResultPanel private constructor(
         }
 
         fun withPreferencePctReporting(
-            preferencePctReporting: Flow.Publisher<out Double>
+            preferencePctReporting: Flow.Publisher<out Double>,
         ): VoteScreenBuilder<KT, KPT, CT, CPT, PT> {
             this.preferencePctReporting = preferencePctReporting
             return this
@@ -1042,7 +1042,7 @@ class BasicResultPanel private constructor(
 
         fun withSwing(
             comparator: Comparator<KPT>?,
-            header: Flow.Publisher<out String?>
+            header: Flow.Publisher<out String?>,
         ): VoteScreenBuilder<KT, KPT, CT, CPT, PT> {
             swingComparator = comparator
             swingHeader = header
@@ -1053,7 +1053,7 @@ class BasicResultPanel private constructor(
             shapes: Flow.Publisher<out Map<T, Shape>>,
             winners: Flow.Publisher<out Map<T, PartyOrCoalition?>>,
             focus: Flow.Publisher<out List<T>?>,
-            headerPublisher: Flow.Publisher<out String?>
+            headerPublisher: Flow.Publisher<out String?>,
         ): VoteScreenBuilder<KT, KPT, CT, CPT, PT> {
             mapBuilder = MapBuilder(shapes, winners.map { m -> partyMapToResultMap(m) }, focus, headerPublisher)
             return this
@@ -1064,7 +1064,7 @@ class BasicResultPanel private constructor(
             selectedShape: Flow.Publisher<out T>,
             leadingParty: Flow.Publisher<out Party?>,
             focus: Flow.Publisher<out List<T>?>,
-            header: Flow.Publisher<out String?>
+            header: Flow.Publisher<out String?>,
         ): VoteScreenBuilder<KT, KPT, CT, CPT, PT> {
             mapBuilder = MapBuilder(shapes, selectedShape, leadingParty.map { party -> PartyResult.elected(party) }, focus, header)
             return this
@@ -1074,7 +1074,7 @@ class BasicResultPanel private constructor(
             shapes: Flow.Publisher<out Map<T, Shape>>,
             winners: Flow.Publisher<out Map<T, PartyResult?>>,
             focus: Flow.Publisher<out List<T>?>,
-            headerPublisher: Flow.Publisher<out String?>
+            headerPublisher: Flow.Publisher<out String?>,
         ): VoteScreenBuilder<KT, KPT, CT, CPT, PT> {
             mapBuilder = MapBuilder(shapes, winners, focus, headerPublisher)
             return this
@@ -1084,7 +1084,7 @@ class BasicResultPanel private constructor(
             shapes: Flow.Publisher<out Map<T, Shape>>,
             winners: Flow.Publisher<out Map<T, PartyResult?>>,
             focus: Pair<Flow.Publisher<out List<T>?>, Flow.Publisher<out List<T>?>>,
-            headerPublisher: Flow.Publisher<out String?>
+            headerPublisher: Flow.Publisher<out String?>,
         ): VoteScreenBuilder<KT, KPT, CT, CPT, PT> {
             mapBuilder = MapBuilder(shapes, winners, focus, headerPublisher)
             return this
@@ -1095,7 +1095,7 @@ class BasicResultPanel private constructor(
             selectedShape: Flow.Publisher<out T>,
             leadingParty: Flow.Publisher<out PartyResult?>,
             focus: Flow.Publisher<out List<T>?>,
-            header: Flow.Publisher<out String?>
+            header: Flow.Publisher<out String?>,
         ): VoteScreenBuilder<KT, KPT, CT, CPT, PT> {
             mapBuilder = MapBuilder(shapes, selectedShape, leadingParty, focus, header)
             return this
@@ -1107,7 +1107,7 @@ class BasicResultPanel private constructor(
             leadingParty: Flow.Publisher<out PartyResult?>,
             focus: Flow.Publisher<out List<T>?>,
             additionalHighlight: Flow.Publisher<out List<T>?>,
-            header: Flow.Publisher<out String?>
+            header: Flow.Publisher<out String?>,
         ): VoteScreenBuilder<KT, KPT, CT, CPT, PT> {
             mapBuilder = MapBuilder(shapes, selectedShape, leadingParty, focus, additionalHighlight, header)
             return this
@@ -1115,7 +1115,7 @@ class BasicResultPanel private constructor(
 
         fun withMajorityLine(
             showMajority: Flow.Publisher<out Boolean>,
-            majorityLabel: String
+            majorityLabel: String,
         ): VoteScreenBuilder<KT, KPT, CT, CPT, PT> {
             this.showMajority = showMajority
             this.majorityLabel = majorityLabel
@@ -1136,7 +1136,7 @@ class BasicResultPanel private constructor(
 
         fun withClassification(
             classificationFunc: (KPT) -> KPT,
-            classificationHeader: Flow.Publisher<out String?>
+            classificationHeader: Flow.Publisher<out String?>,
         ): VoteScreenBuilder<KT, KPT, CT, CPT, PT> {
             this.classificationFunc = classificationFunc
             this.classificationHeader = classificationHeader
@@ -1171,7 +1171,7 @@ class BasicResultPanel private constructor(
                 createDiffFrame(),
                 createSwingFrame(),
                 createMapFrame(),
-                createAltText(textHeader)
+                createAltText(textHeader),
             )
         }
 
@@ -1194,7 +1194,7 @@ class BasicResultPanel private constructor(
         subhead: Flow.Publisher<out String?>,
         keyTemplate: KeyTemplate<KT, KPT>,
         voteTemplate: VoteTemplate,
-        others: KT
+        others: KT,
     ) : VoteScreenBuilder<KT, KPT, Int?, Double, Int>(current, header, subhead, keyTemplate, voteTemplate, others) {
         private inner class Result(private val isPreference: Boolean) {
             var votes: Map<out KT, Int?> = emptyMap()
@@ -1229,7 +1229,7 @@ class BasicResultPanel private constructor(
                         .filter { mandatoryParties.contains(keyTemplate.toParty(it)) },
                     (runoff?.asSequence() ?: emptySequence()),
                     sequenceOf(winner)
-                        .filter { obj -> obj != null }
+                        .filter { obj -> obj != null },
                 )
                     .flatten()
                     .filter { it != null }
@@ -1262,7 +1262,7 @@ class BasicResultPanel private constructor(
                                 voteTemplate.toBarString(
                                     it.value!!,
                                     pct,
-                                    count > doubleLineBarLimit()
+                                    count > doubleLineBarLimit(),
                                 )
                             }
                         }
@@ -1272,7 +1272,7 @@ class BasicResultPanel private constructor(
                             keyTemplate.toParty(it.key).color,
                             if (pct.isNaN()) 0 else pct,
                             valueLabel,
-                            shape
+                            shape,
                         )
                     }
                     .toList()
@@ -1296,7 +1296,7 @@ class BasicResultPanel private constructor(
                 .withSubhead(subhead)
                 .withNotes(notes ?: (null as String?).asOneTimePublisher())
                 .withMax(
-                    pctReporting?.map { 2.0 / 3 / it.coerceAtLeast(1e-6) } ?: (2.0 / 3).asOneTimePublisher()
+                    pctReporting?.map { 2.0 / 3 / it.coerceAtLeast(1e-6) } ?: (2.0 / 3).asOneTimePublisher(),
                 )
             applyMajorityLine(builder)
             return builder.build()
@@ -1307,7 +1307,7 @@ class BasicResultPanel private constructor(
             val pctReporting = this.pctReporting
             if (showMajority != null) {
                 val lines = showMajority.merge(
-                    pctReporting ?: 1.0.asOneTimePublisher()
+                    pctReporting ?: 1.0.asOneTimePublisher(),
                 ) {
                         show, pct ->
                     if (show) {
@@ -1363,7 +1363,7 @@ class BasicResultPanel private constructor(
                         .asSequence()
                         .filter { !prevHasOther || pVotes.containsKey(keyTemplate.toParty(it.key)) }
                         .sortedByDescending { it.value!! }
-                        .map { keyTemplate.toParty(it.key) }
+                        .map { keyTemplate.toParty(it.key) },
                 ).flatten().filterNotNull().distinct().take(10).toSet()
                 val currTotal = cVotes.values.filterNotNull().sum()
                 val prevTotal = pVotes.values.sum()
@@ -1379,7 +1379,7 @@ class BasicResultPanel private constructor(
                                     it.key.abbreviation.uppercase(),
                                     it.key.color,
                                     pct,
-                                    DecimalFormat("0.0%").format(pct)
+                                    DecimalFormat("0.0%").format(pct),
                                 )
                             }
                             .toList()
@@ -1392,11 +1392,11 @@ class BasicResultPanel private constructor(
                     consolidate(currTotalByParty(cVotes), partiesToShow),
                     limit,
                     Party.OTHERS as PartyOrCoalition,
-                    mandatoryParties
+                    mandatoryParties,
                 )
                 val finalPartiesToShow = sequenceOf(
                     partyTotal.keys.asSequence(),
-                    pVotes.entries.asSequence().filter { !partyTotal.containsKey(it.key) }.map { Party.OTHERS }
+                    pVotes.entries.asSequence().filter { !partyTotal.containsKey(it.key) }.map { Party.OTHERS },
                 ).flatten().toSet()
                 val prevVotes: Map<PartyOrCoalition, Int> = pVotes.entries
                     .groupingBy { if (finalPartiesToShow.contains(it.key)) it.key else Party.OTHERS }
@@ -1410,7 +1410,7 @@ class BasicResultPanel private constructor(
                             e.abbreviation.uppercase(),
                             e.color,
                             cpct - ppct,
-                            DecimalFormat("+0.0%;-0.0%").format(cpct - ppct)
+                            DecimalFormat("+0.0%;-0.0%").format(cpct - ppct),
                         )
                     }
                     .toList()
@@ -1433,11 +1433,11 @@ class BasicResultPanel private constructor(
                     .withSubhead(preferenceSubhead ?: (null as String?).asOneTimePublisher())
                     .withLines(
                         preferencePctReporting?.map { listOf(0.5 / it.coerceAtLeast(1e-6)) }
-                            ?: listOf(0.5).asOneTimePublisher()
+                            ?: listOf(0.5).asOneTimePublisher(),
                     ) { "50%" }
                     .withMax(
                         preferencePctReporting?.map { 2.0 / 3 / it.coerceAtLeast(1e-6) }
-                            ?: (2.0 / 3).asOneTimePublisher()
+                            ?: (2.0 / 3).asOneTimePublisher(),
                     )
                     .build()
             }
@@ -1446,7 +1446,7 @@ class BasicResultPanel private constructor(
         override fun createClassificationFrame(): BarFrame? {
             return classificationHeader?.let { classificationHeader ->
                 val bars = Aggregators.adjustKey(
-                    current.map { it.mapValues { e -> e.value ?: throw UnsupportedOperationException("Classifications not supported for partial declarations") } }
+                    current.map { it.mapValues { e -> e.value ?: throw UnsupportedOperationException("Classifications not supported for partial declarations") } },
                 ) { classificationFunc!!(keyTemplate.toParty(it)) }
                     .map { votes ->
                         val total = votes.values.sum()
@@ -1460,8 +1460,8 @@ class BasicResultPanel private constructor(
                                     voteTemplate.toBarString(
                                         it.value,
                                         1.0 * it.value / total,
-                                        true
-                                    )
+                                        true,
+                                    ),
                                 )
                             }
                             .toList()
@@ -1470,7 +1470,7 @@ class BasicResultPanel private constructor(
                 val builder = BarFrameBuilder.basic(bars)
                     .withHeader(classificationHeader)
                     .withMax(
-                        pctReporting?.map { 2.0 / 3 / it.coerceAtLeast(1e-6) } ?: (2.0 / 3).asOneTimePublisher()
+                        pctReporting?.map { 2.0 / 3 / it.coerceAtLeast(1e-6) } ?: (2.0 / 3).asOneTimePublisher(),
                     )
                 applyMajorityLine(builder)
                 return builder.build()
@@ -1495,7 +1495,7 @@ class BasicResultPanel private constructor(
                             } else {
                                 BarFrameBuilder.Limit(wingspan = 0.1 / pct.coerceAtLeast(1e-6))
                             }
-                        }
+                        },
                     )
                     .withHeader(changeHeader!!)
                     .withSubhead(filteredChangeSubhead ?: (null as String?).asOneTimePublisher())
@@ -1513,7 +1513,7 @@ class BasicResultPanel private constructor(
                     curr = currPreferences.map { currTotalByParty(it) }
                     prev = prevPreferences
                         .merge(
-                            currPreferences.map { currTotalByParty(it) }
+                            currPreferences.map { currTotalByParty(it) },
                         ) { p, c ->
                             if (c.keys != p.keys) {
                                 emptyMap()
@@ -1543,7 +1543,7 @@ class BasicResultPanel private constructor(
                 return SwingFrameBuilder.prevCurr(
                     (if (classificationFunc == null) prev else Aggregators.adjustKey(prev, classificationFunc)),
                     (if (classificationFunc == null) curr else Aggregators.adjustKey(curr, classificationFunc)),
-                    swingComparator!!
+                    swingComparator!!,
                 )
                     .withHeader(swingHeader)
                     .build()
@@ -1635,7 +1635,7 @@ class BasicResultPanel private constructor(
                         val head = sequenceOf(
                             this.changeHeader,
                             if (isWinnerRunningAgain) null else this.winnerNotRunningAgain?.takeIf { it.isNotEmpty() },
-                            if (isRunoffSameParties) null else this.runoffSubhead?.takeIf { it.isNotEmpty() }
+                            if (isRunoffSameParties) null else this.runoffSubhead?.takeIf { it.isNotEmpty() },
                         ).filterNotNull().joinToString(" ").takeIf { it.isNotEmpty() }
                         return combineHeadAndSub(head, this.changeSubhead)
                     }
@@ -1661,7 +1661,7 @@ class BasicResultPanel private constructor(
                                 .filter { mandatoryParties.contains(keyTemplate.toParty(it)) },
                             (runoff?.asSequence() ?: emptySequence()),
                             sequenceOf(winner)
-                                .filter { obj -> obj != null }
+                                .filter { obj -> obj != null },
                         )
                             .flatten()
                             .filter { it != null }
@@ -1685,7 +1685,7 @@ class BasicResultPanel private constructor(
                                 .mapValues { v -> v.value.sortedByDescending { it.value ?: 0 }.map { it.key } }
                         val currTotalByParty: Map<PartyOrCoalition, Int> = Aggregators.adjustKey(
                             filteredCurr.filterValues { it != null }
-                                .mapValues { it.value!! }
+                                .mapValues { it.value!! },
                         ) { keyTemplate.toParty(it) }.let { cVotes ->
                             val pVotes = this.prev ?: emptyMap()
                             val prevWinner: KPT? = pVotes.entries
@@ -1698,7 +1698,7 @@ class BasicResultPanel private constructor(
                                     .asSequence()
                                     .filter { !prevHasOther || pVotes.containsKey(it.key) }
                                     .sortedByDescending { it.value }
-                                    .map { it.key }
+                                    .map { it.key },
                             ).flatten().filterNotNull().distinct().toSet()
                             Aggregators.adjustKey(cVotes) { if (partiesToShow.contains(it)) it else Party.OTHERS }
                         }
@@ -1716,7 +1716,7 @@ class BasicResultPanel private constructor(
                             filteredCurr.keys.joinToString("") { candidate ->
                                 "\n" + keyTemplate.toMainBarHeader(
                                     candidate,
-                                    true
+                                    true,
                                 ) + ": UNCONTESTED"
                             }
                         } else {
@@ -1746,7 +1746,7 @@ class BasicResultPanel private constructor(
                                             }
                                             ),
                                         (if (partyAggregated) "^" else "") +
-                                            (if (otherAggregated) "*" else "")
+                                            (if (otherAggregated) "*" else ""),
                                     )
                                     val shape = shapes[candidate]
                                     "\n$line" + (shape?.let { c -> " $c" } ?: "")
@@ -1767,13 +1767,13 @@ class BasicResultPanel private constructor(
 
                 private fun barEntryLine(header: String, curr: Int?, pct: Double?, diff: Double?, shapes: String): String {
                     return "$header: ${
-                    if (curr == null) {
-                        "WAITING..."
-                    } else if (pct == null) {
-                        DecimalFormat("#,##0").format(curr)
-                    } else {
-                        voteTemplate.toAltTextString(curr, pct, diff, shapes)
-                    }
+                        if (curr == null) {
+                            "WAITING..."
+                        } else if (pct == null) {
+                            DecimalFormat("#,##0").format(curr)
+                        } else {
+                            voteTemplate.toAltTextString(curr, pct, diff, shapes)
+                        }
                     }"
                 }
 
@@ -1859,11 +1859,11 @@ class BasicResultPanel private constructor(
                             this.currPreferences.entries.sortedByDescending { (if (it.key is CanOverrideSortOrder) (it.key as CanOverrideSortOrder).overrideSortOrder else null) ?: it.value ?: 0 }
                                 .joinToString("") {
                                     "\n${keyTemplate.toMainBarHeader(it.key, true)}: ${
-                                    if (this.currPreferences.size == 1) "ELECTED" else if (total == 0.0 || it.value == null) "WAITING..." else THOUSANDS_FORMAT.format(it.value)
+                                        if (this.currPreferences.size == 1) "ELECTED" else if (total == 0.0 || it.value == null) "WAITING..." else THOUSANDS_FORMAT.format(it.value)
                                     }${
-                                    if (total == 0.0 || total == null) "" else " (${PCT_FORMAT.format(it.value!! / total)})"
+                                        if (total == 0.0 || total == null) "" else " (${PCT_FORMAT.format(it.value!! / total)})"
                                     }${
-                                    if (winner == it.key) " WINNER" else ""
+                                        if (winner == it.key) " WINNER" else ""
                                     }"
                                 }
                     }
@@ -1920,7 +1920,7 @@ class BasicResultPanel private constructor(
                     SwingFrameBuilder.prevCurr(
                         prev,
                         curr,
-                        swingComparator!!
+                        swingComparator!!,
                     ).buildBottomText()?.subscribe(Subscriber { inputs.swingBottom = it })
                 } else {
                     val currentNoNulls = this.current.map { v -> if (v.values.any { it == null }) emptyMap() else v.mapValues { it.value!! } }
@@ -1928,7 +1928,7 @@ class BasicResultPanel private constructor(
                     SwingFrameBuilder.prevCurr(
                         (if (classificationFunc == null) prev!! else Aggregators.adjustKey(prev!!, classificationFunc!!)),
                         (if (classificationFunc == null) currentByParty else Aggregators.adjustKey(currentByParty, classificationFunc!!)),
-                        swingComparator!!
+                        swingComparator!!,
                     ).buildBottomText()?.subscribe(Subscriber { inputs.swingBottom = it })
                 }
             }
@@ -1943,7 +1943,7 @@ class BasicResultPanel private constructor(
         subhead: Flow.Publisher<out String?>,
         keyTemplate: KeyTemplate<KT, KPT>,
         voteTemplate: VoteTemplate,
-        others: KT
+        others: KT,
     ) : VoteScreenBuilder<KT, KPT, ClosedRange<Double>, Double, Int>(current, header, subhead, keyTemplate, voteTemplate, others) {
         override fun createFrame(): BarFrame {
             val bars = current.map { curr ->
@@ -1961,7 +1961,7 @@ class BasicResultPanel private constructor(
                             keyTemplate.toParty(it.key).color,
                             it.value.start,
                             it.value.endInclusive,
-                            valueLabel
+                            valueLabel,
                         )
                     }
                     .toList()
@@ -2025,7 +2025,7 @@ class BasicResultPanel private constructor(
                                 it.key.color,
                                 pct,
                                 pct,
-                                DecimalFormat("0.0%").format(pct)
+                                DecimalFormat("0.0%").format(pct),
                             )
                         }.toList()
                 }
@@ -2034,7 +2034,7 @@ class BasicResultPanel private constructor(
                     .fold(0.0..0.0) { a, e -> (a.start + e.value.start)..(a.endInclusive + e.value.endInclusive) }
                 val finalPartiesToShow = sequenceOf(
                     partyTotal.keys.asSequence(),
-                    pVotes.entries.asSequence().filter { !partyTotal.containsKey(it.key) }.map { Party.OTHERS }
+                    pVotes.entries.asSequence().filter { !partyTotal.containsKey(it.key) }.map { Party.OTHERS },
                 ).flatten().toSet()
                 val prevVotes = pVotes.entries
                     .groupingBy { if (partyTotal.containsKey(it.key)) it.key else Party.OTHERS }
@@ -2055,7 +2055,7 @@ class BasicResultPanel private constructor(
                                 CHANGE_DECIMAL_FORMAT.format(100.0 * (cpctMin - ppct)) +
                                 ")-(" +
                                 CHANGE_DECIMAL_FORMAT.format(100.0 * (cpctMax - ppct)) +
-                                ")%"
+                                ")%",
                         )
                     }
                     .toList()
@@ -2079,7 +2079,7 @@ class BasicResultPanel private constructor(
                             } else {
                                 BarFrameBuilder.Limit(wingspan = 0.1 / pct.coerceAtLeast(1e-6))
                             }
-                        }
+                        },
                     )
                     .withHeader(changeHeader!!)
                     .withSubhead(filteredChangeSubhead ?: (null as String?).asOneTimePublisher())
@@ -2112,7 +2112,7 @@ class BasicResultPanel private constructor(
                                 keyTemplate.toParty(it.key).color,
                                 it.value.start,
                                 it.value.endInclusive,
-                                valueLabel
+                                valueLabel,
                             )
                         }
                         .toList()
@@ -2177,7 +2177,7 @@ class BasicResultPanel private constructor(
                         val line = barEntryLine(
                             keyTemplate.toMainBarHeader(candidate, true),
                             c[candidate]!!,
-                            (if (c[candidate] == null || prevTotal == 0.0) null else c[candidate]!!.let { (it.start - prevPct)..(it.endInclusive - prevPct) })
+                            (if (c[candidate] == null || prevTotal == 0.0) null else c[candidate]!!.let { (it.start - prevPct)..(it.endInclusive - prevPct) }),
                         )
                         "\n$line"
                     }
@@ -2210,7 +2210,7 @@ class BasicResultPanel private constructor(
                     SwingFrameBuilder.prevCurr(
                         (if (classificationFunc == null) p else Aggregators.adjustKey(p, classificationFunc)),
                         (if (classificationFunc == null) c else Aggregators.adjustKey(c, classificationFunc)),
-                        swingComparator!!
+                        swingComparator!!,
                     ).buildBottomText() ?: null.asOneTimePublisher()
                 }.merge(this.swingHeader ?: null.asOneTimePublisher()) { text, head ->
                     if (text == null && head == null) {
@@ -2241,7 +2241,7 @@ class BasicResultPanel private constructor(
         private val quotas: Flow.Publisher<out Map<out P, Double>>,
         private val totalSeats: Flow.Publisher<out Int>,
         private val header: Flow.Publisher<out String?>,
-        private val subhead: Flow.Publisher<out String?>
+        private val subhead: Flow.Publisher<out String?>,
     ) {
         private var prevQuotas: Flow.Publisher<out Map<out P, Double>>? = null
         private var changeHeader: Flow.Publisher<out String>? = null
@@ -2256,7 +2256,7 @@ class BasicResultPanel private constructor(
 
         fun withPrev(
             prevQuotas: Flow.Publisher<out Map<out P, Double>>,
-            changeHeader: Flow.Publisher<out String>
+            changeHeader: Flow.Publisher<out String>,
         ): PartyQuotaScreenBuilder<P> {
             this.prevQuotas = prevQuotas
             this.changeHeader = changeHeader
@@ -2267,7 +2267,7 @@ class BasicResultPanel private constructor(
             currVotes: Flow.Publisher<out Map<out P, Int>>,
             prevVotes: Flow.Publisher<out Map<out P, Int>>,
             comparator: Comparator<P>,
-            header: Flow.Publisher<out String?>
+            header: Flow.Publisher<out String?>,
         ): PartyQuotaScreenBuilder<P> {
             this.swingCurrVotes = currVotes
             this.swingPrevVotes = prevVotes
@@ -2281,7 +2281,7 @@ class BasicResultPanel private constructor(
             selectedShape: Flow.Publisher<out T>,
             leadingParty: Flow.Publisher<out P?>,
             focus: Flow.Publisher<out List<T>?>,
-            header: Flow.Publisher<out String?>
+            header: Flow.Publisher<out String?>,
         ): PartyQuotaScreenBuilder<P> {
             mapBuilder = MapBuilder(shapes, selectedShape, leadingParty.map { PartyResult.elected(it?.toParty()) }, focus, header)
             return this
@@ -2300,7 +2300,7 @@ class BasicResultPanel private constructor(
                 createDiffFrame(),
                 createSwingFrame(),
                 mapBuilder?.createMapFrame(),
-                createAltText(textHeader)
+                createAltText(textHeader),
             )
         }
 
@@ -2313,7 +2313,7 @@ class BasicResultPanel private constructor(
                             BarFrame.Bar(
                                 leftText = it.key.name.uppercase(),
                                 rightText = DecimalFormat("0.00").format(it.value) + " QUOTAS",
-                                series = listOf(it.key.color to it.value)
+                                series = listOf(it.key.color to it.value),
                             )
                         }
                         .toList()
@@ -2322,7 +2322,7 @@ class BasicResultPanel private constructor(
                 subheadTextPublisher = subhead,
                 maxPublisher = totalSeats,
                 linesPublisher = totalSeats.map { lines -> (1 until lines).map { BarFrame.Line(it, "$it QUOTA${if (it == 1) "" else "S"}") } },
-                headerLabelsPublisher = progressLabel?.map { mapOf(GraphicsFrame.HeaderLabelLocation.RIGHT to it) }
+                headerLabelsPublisher = progressLabel?.map { mapOf(GraphicsFrame.HeaderLabelLocation.RIGHT to it) },
             )
         }
 
@@ -2335,7 +2335,7 @@ class BasicResultPanel private constructor(
                     } else {
                         sequenceOf(
                             curr.asSequence().sortedByDescending { it.key.overrideSortOrder?.toDouble() ?: it.value }.map { it.key },
-                            prev.keys.asSequence().filter { !curr.containsKey(it) }.sortedByDescending { it.overrideSortOrder ?: 0 }
+                            prev.keys.asSequence().filter { !curr.containsKey(it) }.sortedByDescending { it.overrideSortOrder ?: 0 },
                         )
                             .flatten()
                             .distinct()
@@ -2344,7 +2344,7 @@ class BasicResultPanel private constructor(
                                 BarFrame.Bar(
                                     leftText = party.abbreviation.uppercase(),
                                     rightText = DecimalFormat("+0.00;-0.00").format(diff),
-                                    series = listOf(party.color to diff)
+                                    series = listOf(party.color to diff),
                                 )
                             }
                             .toList()
@@ -2352,7 +2352,7 @@ class BasicResultPanel private constructor(
                 },
                 headerPublisher = changeHeader ?: (null as String?).asOneTimePublisher(),
                 maxPublisher = 1.asOneTimePublisher(),
-                minPublisher = (-1).asOneTimePublisher()
+                minPublisher = (-1).asOneTimePublisher(),
             )
         }
 
@@ -2363,7 +2363,7 @@ class BasicResultPanel private constructor(
                 SwingFrameBuilder.prevCurr(
                     prev,
                     curr,
-                    swingComparator!!
+                    swingComparator!!,
                 )
                     .withHeader(header)
                     .build()
@@ -2424,7 +2424,7 @@ class BasicResultPanel private constructor(
                     SwingFrameBuilder.prevCurr(
                         prev,
                         curr,
-                        swingComparator!!
+                        swingComparator!!,
                     ).buildBottomText()
                 }?.merge(swingHeader ?: null.asOneTimePublisher()) { t, h ->
                     if (h == null) {
@@ -2457,101 +2457,101 @@ class BasicResultPanel private constructor(
         fun <P : PartyOrCoalition> partySeats(
             seats: Flow.Publisher<out Map<out P, Int>>,
             header: Flow.Publisher<out String?>,
-            subhead: Flow.Publisher<out String?>
+            subhead: Flow.Publisher<out String?>,
         ): SeatScreenBuilder<P, P, Int, Int, *> {
             return BasicSeatScreenBuilder(
                 seats,
                 header,
                 subhead,
-                PartyTemplate()
+                PartyTemplate(),
             )
         }
 
         fun candidateSeats(
             seats: Flow.Publisher<out Map<Candidate, Int>>,
             header: Flow.Publisher<out String?>,
-            subhead: Flow.Publisher<out String?>
+            subhead: Flow.Publisher<out String?>,
         ): SeatScreenBuilder<Candidate, Party, Int, Int, *> {
             return BasicSeatScreenBuilder(
                 seats,
                 header,
                 subhead,
-                CandidateTemplate()
+                CandidateTemplate(),
             )
         }
 
         fun <P : PartyOrCoalition> partyDualSeats(
             seats: Flow.Publisher<out Map<out P, Pair<Int, Int>>>,
             header: Flow.Publisher<out String?>,
-            subhead: Flow.Publisher<out String?>
+            subhead: Flow.Publisher<out String?>,
         ): SeatScreenBuilder<P, P, Pair<Int, Int>, Pair<Int, Int>, *> {
             return DualSeatScreenBuilder(
                 seats,
                 header,
                 subhead,
                 PartyTemplate(),
-                DualSeatScreenBuilder.FocusLocation.FIRST
+                DualSeatScreenBuilder.FocusLocation.FIRST,
             )
         }
 
         fun <P : PartyOrCoalition> partyDualSeatsReversed(
             seats: Flow.Publisher<out Map<P, Pair<Int, Int>>>,
             header: Flow.Publisher<out String?>,
-            subhead: Flow.Publisher<out String?>
+            subhead: Flow.Publisher<out String?>,
         ): SeatScreenBuilder<P, P, Pair<Int, Int>, Pair<Int, Int>, *> {
             return DualSeatScreenBuilder(
                 seats,
                 header,
                 subhead,
                 PartyTemplate(),
-                DualSeatScreenBuilder.FocusLocation.LAST
+                DualSeatScreenBuilder.FocusLocation.LAST,
             )
         }
 
         fun candidateDualSeats(
             seats: Flow.Publisher<out Map<Candidate, Pair<Int, Int>>>,
             header: Flow.Publisher<out String?>,
-            subhead: Flow.Publisher<out String?>
+            subhead: Flow.Publisher<out String?>,
         ): SeatScreenBuilder<Candidate, Party, Pair<Int, Int>, Pair<Int, Int>, *> {
             return DualSeatScreenBuilder(
                 seats,
                 header,
                 subhead,
                 CandidateTemplate(),
-                DualSeatScreenBuilder.FocusLocation.FIRST
+                DualSeatScreenBuilder.FocusLocation.FIRST,
             )
         }
 
         fun <P : PartyOrCoalition> partyRangeSeats(
             seats: Flow.Publisher<out Map<P, IntRange>>,
             header: Flow.Publisher<out String?>,
-            subhead: Flow.Publisher<out String?>
+            subhead: Flow.Publisher<out String?>,
         ): SeatScreenBuilder<P, P, IntRange, Int, *> {
             return RangeSeatScreenBuilder(
                 seats,
                 header,
                 subhead,
-                PartyTemplate()
+                PartyTemplate(),
             )
         }
 
         fun candidateRangeSeats(
             seats: Flow.Publisher<out Map<Candidate, IntRange>>,
             header: Flow.Publisher<out String?>,
-            subhead: Flow.Publisher<out String?>
+            subhead: Flow.Publisher<out String?>,
         ): SeatScreenBuilder<Candidate, Party, IntRange, Int, *> {
             return RangeSeatScreenBuilder(
                 seats,
                 header,
                 subhead,
-                CandidateTemplate()
+                CandidateTemplate(),
             )
         }
 
         fun <P : PartyOrCoalition> partyVotes(
             votes: Flow.Publisher<out Map<out P, Int?>>,
             header: Flow.Publisher<out String?>,
-            subhead: Flow.Publisher<out String?>
+            subhead: Flow.Publisher<out String?>,
         ): VoteScreenBuilder<P, P, Int?, Double, Int> {
             @Suppress("UNCHECKED_CAST")
             return BasicVoteScreenBuilder(
@@ -2560,37 +2560,7 @@ class BasicResultPanel private constructor(
                 subhead,
                 PartyTemplate(),
                 VotePctOnlyTemplate(),
-                Party.OTHERS as P
-            )
-        }
-
-        fun candidateVotes(
-            votes: Flow.Publisher<out Map<Candidate, Int?>>,
-            header: Flow.Publisher<out String?>,
-            subhead: Flow.Publisher<out String?>
-        ): VoteScreenBuilder<Candidate, Party, Int?, Double, Int> {
-            return BasicVoteScreenBuilder(
-                votes,
-                header,
-                subhead,
-                CandidateTemplate(),
-                VotePctTemplate(),
-                Candidate.OTHERS
-            )
-        }
-
-        fun candidateVotesPctOnly(
-            votes: Flow.Publisher<out Map<Candidate, Int?>>,
-            header: Flow.Publisher<out String?>,
-            subhead: Flow.Publisher<out String?>
-        ): VoteScreenBuilder<Candidate, Party, Int?, Double, Int> {
-            return BasicVoteScreenBuilder(
-                votes,
-                header,
-                subhead,
-                CandidateTemplate(),
-                VotePctOnlyTemplate(),
-                Candidate.OTHERS
+                Party.OTHERS as P,
             )
         }
 
@@ -2598,15 +2568,14 @@ class BasicResultPanel private constructor(
             votes: Flow.Publisher<out Map<Candidate, Int?>>,
             header: Flow.Publisher<out String?>,
             subhead: Flow.Publisher<out String?>,
-            incumbentMarker: String
         ): VoteScreenBuilder<Candidate, Party, Int?, Double, Int> {
             return BasicVoteScreenBuilder(
                 votes,
                 header,
                 subhead,
-                CandidateTemplate(incumbentMarker),
+                CandidateTemplate(),
                 VotePctTemplate(),
-                Candidate.OTHERS
+                Candidate.OTHERS,
             )
         }
 
@@ -2614,7 +2583,38 @@ class BasicResultPanel private constructor(
             votes: Flow.Publisher<out Map<Candidate, Int?>>,
             header: Flow.Publisher<out String?>,
             subhead: Flow.Publisher<out String?>,
-            incumbentMarker: String
+        ): VoteScreenBuilder<Candidate, Party, Int?, Double, Int> {
+            return BasicVoteScreenBuilder(
+                votes,
+                header,
+                subhead,
+                CandidateTemplate(),
+                VotePctOnlyTemplate(),
+                Candidate.OTHERS,
+            )
+        }
+
+        fun candidateVotes(
+            votes: Flow.Publisher<out Map<Candidate, Int?>>,
+            header: Flow.Publisher<out String?>,
+            subhead: Flow.Publisher<out String?>,
+            incumbentMarker: String,
+        ): VoteScreenBuilder<Candidate, Party, Int?, Double, Int> {
+            return BasicVoteScreenBuilder(
+                votes,
+                header,
+                subhead,
+                CandidateTemplate(incumbentMarker),
+                VotePctTemplate(),
+                Candidate.OTHERS,
+            )
+        }
+
+        fun candidateVotesPctOnly(
+            votes: Flow.Publisher<out Map<Candidate, Int?>>,
+            header: Flow.Publisher<out String?>,
+            subhead: Flow.Publisher<out String?>,
+            incumbentMarker: String,
         ): VoteScreenBuilder<Candidate, Party, Int?, Double, Int> {
             return BasicVoteScreenBuilder(
                 votes,
@@ -2622,14 +2622,14 @@ class BasicResultPanel private constructor(
                 subhead,
                 CandidateTemplate(incumbentMarker),
                 VotePctOnlyTemplate(),
-                Candidate.OTHERS
+                Candidate.OTHERS,
             )
         }
 
         fun <P : PartyOrCoalition> partyRangeVotes(
             votes: Flow.Publisher<out Map<P, ClosedRange<Double>>>,
             header: Flow.Publisher<out String?>,
-            subhead: Flow.Publisher<out String?>
+            subhead: Flow.Publisher<out String?>,
         ): VoteScreenBuilder<P, P, ClosedRange<Double>, Double, Int> {
             @Suppress("UNCHECKED_CAST")
             return RangeVoteScreenBuilder(
@@ -2638,7 +2638,7 @@ class BasicResultPanel private constructor(
                 subhead,
                 PartyTemplate(),
                 VotePctOnlyTemplate(),
-                Party.OTHERS as P
+                Party.OTHERS as P,
             )
         }
 
@@ -2646,13 +2646,13 @@ class BasicResultPanel private constructor(
             quotas: Flow.Publisher<out Map<out P, Double>>,
             totalSeats: Flow.Publisher<out Int>,
             header: Flow.Publisher<out String?>,
-            subhead: Flow.Publisher<out String?>
+            subhead: Flow.Publisher<out String?>,
         ): PartyQuotaScreenBuilder<P> {
             return PartyQuotaScreenBuilder(
                 quotas,
                 totalSeats,
                 header,
-                subhead
+                subhead,
             )
         }
     }

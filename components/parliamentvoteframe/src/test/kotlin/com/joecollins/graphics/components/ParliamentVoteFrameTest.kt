@@ -22,7 +22,7 @@ class ParliamentVoteFrameTest {
             arrayOf("AYES", "NOES"),
             divisionResult,
             3,
-            partyVotes
+            partyVotes,
         )
         frame.setSize(500, 250)
         RenderTestUtils.compareRendering("ParliamentVoteFrame", "ukHouse-1", frame)
@@ -55,7 +55,7 @@ class ParliamentVoteFrameTest {
                     sdlp to 0,
                     grn to 0,
                     apni to 0,
-                    ind to 1
+                    ind to 1,
                 ),
                 listOf(
                     con to 0,
@@ -68,9 +68,9 @@ class ParliamentVoteFrameTest {
                     sdlp to 2,
                     grn to 1,
                     apni to 1,
-                    ind to 4
-                )
-            )
+                    ind to 4,
+                ),
+            ),
         )
         RenderTestUtils.compareRendering("ParliamentVoteFrame", "ukHouse-3", frame)
     }
@@ -88,7 +88,7 @@ class ParliamentVoteFrameTest {
             intArrayOf().asOneTimePublisher(),
             3,
             emptyArray<List<Pair<Party, Int>>>().asOneTimePublisher(),
-            resultText
+            resultText,
         )
         frame.setSize(500, 250)
         RenderTestUtils.compareRendering("ParliamentVoteFrame", "ukHouseNoDivision-1", frame)
@@ -110,7 +110,7 @@ class ParliamentVoteFrameTest {
             arrayOf("GUILTY", "NOT GUILTY"),
             divisionResult,
             1,
-            partyVotes
+            partyVotes,
         )
         frame.setSize(500, 250)
         RenderTestUtils.compareRendering("ParliamentVoteFrame", "usSenate-1", frame)
@@ -126,14 +126,14 @@ class ParliamentVoteFrameTest {
                 listOf(
                     dem to 48,
                     gop to 7,
-                    ind to 2
+                    ind to 2,
                 ),
                 listOf(
                     dem to 0,
                     gop to 43,
-                    ind to 0
-                )
-            )
+                    ind to 0,
+                ),
+            ),
         )
         RenderTestUtils.compareRendering("ParliamentVoteFrame", "usSenate-2", frame)
     }

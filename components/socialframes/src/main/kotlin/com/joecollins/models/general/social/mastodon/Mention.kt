@@ -8,7 +8,7 @@ import java.net.URL
 data class Mention(
     private val username: String,
     private val url: URL,
-    private val acct: String
+    private val acct: String,
 ) : UserMention {
 
     override val text: String = "@$username"

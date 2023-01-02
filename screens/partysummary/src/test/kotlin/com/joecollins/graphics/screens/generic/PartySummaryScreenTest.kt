@@ -32,7 +32,7 @@ class PartySummaryScreenTest {
             { r -> r.seatDiffPublisher },
             { r -> r.votePublisher },
             { r -> r.voteDiffPublisher },
-            3
+            3,
         )
             .withRegion(bc)
             .withRegion(prairies)
@@ -111,7 +111,7 @@ class PartySummaryScreenTest {
             { r -> r.prevSeatPublisher },
             { r -> r.votePublisher },
             { r -> r.prevVotePublisher },
-            3
+            3,
         )
             .withRegion(bc)
             .withRegion(prairies)
@@ -186,12 +186,12 @@ class PartySummaryScreenTest {
         val screen = PartySummaryScreen.of(
             canada,
             { r -> r.name.uppercase().asOneTimePublisher() },
-            3
+            3,
         )
             .withSeatAndDiff(
                 { r -> r.seatsPublisher },
                 { r -> r.seatDiffPublisher },
-                "SEAT PROJECTION"
+                "SEAT PROJECTION",
             )
             .withRegion(bc)
             .withRegion(prairies)
@@ -266,12 +266,12 @@ class PartySummaryScreenTest {
         val screen = PartySummaryScreen.of(
             canada,
             { r -> r.name.uppercase().asOneTimePublisher() },
-            3
+            3,
         )
             .withVotePctAndDiff(
                 { r -> r.votePublisher },
                 { r -> r.voteDiffPublisher },
-                "CENTRAL VOTE FORECAST"
+                "CENTRAL VOTE FORECAST",
             )
             .withRegion(bc)
             .withRegion(prairies)

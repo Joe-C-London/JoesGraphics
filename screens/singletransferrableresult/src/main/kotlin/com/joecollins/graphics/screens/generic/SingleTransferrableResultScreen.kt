@@ -21,7 +21,7 @@ class SingleTransferrableResultScreen private constructor(
     private val partyFrame: JPanel?,
     private val prevFrame: JPanel?,
     private val mapFrame: JPanel?,
-    override val altText: Flow.Publisher<String?>
+    override val altText: Flow.Publisher<String?>,
 ) : GenericPanel(
     run {
         val panel = JPanel()
@@ -33,7 +33,7 @@ class SingleTransferrableResultScreen private constructor(
         if (mapFrame != null) panel.add(mapFrame, BasicResultLayout.MAP)
         panel
     },
-    label
+    label,
 ),
     AltTextProvider {
 
@@ -46,7 +46,7 @@ class SingleTransferrableResultScreen private constructor(
             excluded: Flow.Publisher<out List<Candidate>>,
             header: Flow.Publisher<out String?>,
             subhead: Flow.Publisher<out String?>,
-            incumbentMarker: String = ""
+            incumbentMarker: String = "",
         ): Builder {
             return Builder(
                 candidateVotes,
@@ -55,7 +55,7 @@ class SingleTransferrableResultScreen private constructor(
                 excluded,
                 header,
                 subhead,
-                incumbentMarker
+                incumbentMarker,
             )
         }
     }
@@ -67,7 +67,7 @@ class SingleTransferrableResultScreen private constructor(
         private val excluded: Flow.Publisher<out List<Candidate>>,
         private val candidateHeader: Flow.Publisher<out String?>,
         private val candidateSubhead: Flow.Publisher<out String?>,
-        private val incumbentMarker: String
+        private val incumbentMarker: String,
     ) {
 
         private var totalSeats: Flow.Publisher<out Int>? = null
@@ -80,7 +80,7 @@ class SingleTransferrableResultScreen private constructor(
 
         fun withPartyTotals(
             totalSeats: Flow.Publisher<out Int>,
-            partyHeader: Flow.Publisher<out String?>
+            partyHeader: Flow.Publisher<out String?>,
         ): Builder {
             this.totalSeats = totalSeats
             this.partyHeader = partyHeader
@@ -89,7 +89,7 @@ class SingleTransferrableResultScreen private constructor(
 
         fun withPrevSeats(
             prevSeats: Flow.Publisher<out Map<Party, Int>>,
-            prevHeader: Flow.Publisher<out String?>
+            prevHeader: Flow.Publisher<out String?>,
         ): Builder {
             this.prevSeats = prevSeats
             this.prevHeader = prevHeader
@@ -101,14 +101,14 @@ class SingleTransferrableResultScreen private constructor(
             selectedShape: Flow.Publisher<out T>,
             leadingParty: Flow.Publisher<out Party?>,
             focus: Flow.Publisher<out List<T>?>,
-            header: Flow.Publisher<out String?>
+            header: Flow.Publisher<out String?>,
         ): Builder {
             mapBuilder = MapBuilder(
                 shapes,
                 selectedShape,
                 leadingParty.map { com.joecollins.models.general.PartyResult.elected(it) },
                 focus,
-                header
+                header,
             )
             return this
         }
@@ -120,7 +120,7 @@ class SingleTransferrableResultScreen private constructor(
                 createPartiesPanel(),
                 createPrevPanel(),
                 mapBuilder?.createMapFrame(),
-                createAltText(title)
+                createAltText(title),
             )
         }
 
@@ -143,21 +143,21 @@ class SingleTransferrableResultScreen private constructor(
                     .sortedByDescending { it.value?.toDouble() ?: 0.0 }
                     .joinToString("\n") { (c, v) ->
                         "${candidateFunc(c)}: ${
-                        if (v == null) {
-                            "WAITING..."
-                        } else {
-                            "${if (v is Int) {
-                                DecimalFormat("#,##0").format(v.toInt())
+                            if (v == null) {
+                                "WAITING..."
                             } else {
-                                DecimalFormat("#,##0.00").format(v.toDouble())
-                            }}${if (q == null) {
-                                ""
-                            } else {
-                                " (${
-                                DecimalFormat("0.00").format(v.toDouble() / q.toDouble())
-                                })"
-                            }}"
-                        }
+                                "${if (v is Int) {
+                                    DecimalFormat("#,##0").format(v.toInt())
+                                } else {
+                                    DecimalFormat("#,##0.00").format(v.toDouble())
+                                }}${if (q == null) {
+                                    ""
+                                } else {
+                                    " (${
+                                        DecimalFormat("0.00").format(v.toDouble() / q.toDouble())
+                                    })"
+                                }}"
+                            }
                         }${if (el.any { it.first == c }) " ELECTED" else if (ex.contains(c)) " EXCLUDED" else ""}"
                     } +
                     (q?.let { "\nQUOTA: ${if (it is Int) DecimalFormat("#,##0").format(it.toInt()) else DecimalFormat("#,##0.00").format(it.toDouble())}" } ?: "")
@@ -227,7 +227,7 @@ class SingleTransferrableResultScreen private constructor(
                                 valueLabel = "ELECTED IN ${it.second}",
                                 shape = ImageGenerator.createTickShape(),
                                 value = 0,
-                                color = it.first.party.color
+                                color = it.first.party.color,
                             )
                         }
                     val thisRoundSequence = votes.entries.asSequence()
@@ -246,13 +246,13 @@ class SingleTransferrableResultScreen private constructor(
                                     electedCandidates.contains(it.key) -> ImageGenerator.createTickShape()
                                     excluded.contains(it.key) -> ImageGenerator.createCrossShape()
                                     else -> null
-                                }
+                                },
                             )
                         }
                     sequenceOf(alreadyElectedSequence, thisRoundSequence)
                         .flatten()
                         .toList()
-                }
+                },
             )
                 .withHeader(candidateHeader)
                 .withSubhead(candidateSubhead)
@@ -286,10 +286,10 @@ class SingleTransferrableResultScreen private constructor(
                                 label = it.key.name.uppercase(),
                                 color = it.key.color,
                                 value = it.value,
-                                valueLabel = formatString(it.value)
+                                valueLabel = formatString(it.value),
                             )
                         }
-                }
+                },
             )
                 .withHeader(partyHeader!!)
                 .withMax(totalSeats!!)
@@ -309,10 +309,10 @@ class SingleTransferrableResultScreen private constructor(
                             BarFrameBuilder.BasicBar(
                                 label = it.key.abbreviation.uppercase(),
                                 color = it.key.color,
-                                value = it.value
+                                value = it.value,
                             )
                         }
-                }
+                },
             )
                 .withMax(prevSeats!!.map { prev -> prev.values.sum() / 2 })
                 .withHeader(prevHeader!!)

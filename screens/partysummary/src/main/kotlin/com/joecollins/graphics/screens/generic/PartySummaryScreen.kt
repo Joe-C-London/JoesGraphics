@@ -22,7 +22,7 @@ class PartySummaryScreen private constructor(
     partyPublisher: Flow.Publisher<out PartyOrCoalition>,
     mainFrame: RegionSummaryFrame,
     otherFrames: List<RegionSummaryFrame>,
-    numRows: Int
+    numRows: Int,
 ) : GenericPanel(
     run {
         val center = JPanel()
@@ -32,7 +32,7 @@ class PartySummaryScreen private constructor(
         otherFrames.forEach { center.add(it, "other") }
         center
     },
-    partyPublisher.map { it.name.uppercase() + " SUMMARY" }
+    partyPublisher.map { it.name.uppercase() + " SUMMARY" },
 ) {
 
     init {
@@ -80,7 +80,7 @@ class PartySummaryScreen private constructor(
     class Builder<T>(
         private val mainRegion: T,
         private val titleFunc: (T) -> Flow.Publisher<out String>,
-        private val numRows: Int
+        private val numRows: Int,
     ) {
         private var seatFunc: ((T) -> Flow.Publisher<out Map<out PartyOrCoalition, Int>>)? = null
         private var seatDiffFunc: ((T) -> Flow.Publisher<out Map<out PartyOrCoalition, Int>>)? = null
@@ -94,7 +94,7 @@ class PartySummaryScreen private constructor(
         fun withSeatAndDiff(
             seatFunc: ((T) -> Flow.Publisher<out Map<out PartyOrCoalition, Int>>),
             seatDiffFunc: ((T) -> Flow.Publisher<out Map<out PartyOrCoalition, Int>>),
-            seatsHeader: String = "SEATS"
+            seatsHeader: String = "SEATS",
         ): Builder<T> {
             this.seatFunc = seatFunc
             this.seatDiffFunc = seatDiffFunc
@@ -105,7 +105,7 @@ class PartySummaryScreen private constructor(
         fun withSeatAndPrev(
             seatFunc: ((T) -> Flow.Publisher<out Map<out PartyOrCoalition, Int>>),
             seatPrevFunc: ((T) -> Flow.Publisher<out Map<out PartyOrCoalition, Int>>),
-            seatsHeader: String = "SEATS"
+            seatsHeader: String = "SEATS",
         ): Builder<T> {
             val seatDiffFunc = { t: T ->
                 val curr = seatFunc(t)
@@ -122,7 +122,7 @@ class PartySummaryScreen private constructor(
         fun withVotePctAndDiff(
             votePctFunc: ((T) -> Flow.Publisher<out Map<out PartyOrCoalition, Double>>),
             votePctDiffFunc: ((T) -> Flow.Publisher<out Map<out PartyOrCoalition, Double>>),
-            voteHeader: String = "POPULAR VOTE"
+            voteHeader: String = "POPULAR VOTE",
         ): Builder<T> {
             this.votePctFunc = votePctFunc
             this.votePctDiffFunc = votePctDiffFunc
@@ -133,7 +133,7 @@ class PartySummaryScreen private constructor(
         fun withVotePctAndPrev(
             votePctFunc: ((T) -> Flow.Publisher<out Map<out PartyOrCoalition, Double>>),
             votePctPrevFunc: ((T) -> Flow.Publisher<out Map<out PartyOrCoalition, Double>>),
-            voteHeader: String = "POPULAR VOTE"
+            voteHeader: String = "POPULAR VOTE",
         ): Builder<T> {
             val votePctDiffFunc = { t: T ->
                 val curr = votePctFunc(t)
@@ -157,7 +157,7 @@ class PartySummaryScreen private constructor(
                 partyPublisher,
                 createFrame(mainRegion, partyPublisher),
                 regions.map { createFrame(it, partyPublisher) },
-                numRows
+                numRows,
             )
         }
 
@@ -180,7 +180,7 @@ class PartySummaryScreen private constructor(
                 summaryColorPublisher = party.map { it.color },
                 sectionsPublisher = values.map { value ->
                     value.zip(headers) { v, h -> RegionSummaryFrame.SectionWithoutColor(h, v) }
-                }
+                },
             )
         }
     }
@@ -224,7 +224,7 @@ class PartySummaryScreen private constructor(
             val diff = this.seatDiff[this.party] ?: 0
             return listOf(
                 seats.toString(),
-                if (diff == 0) "\u00b10" else DecimalFormat("+0;-0").format(diff)
+                if (diff == 0) "\u00b10" else DecimalFormat("+0;-0").format(diff),
             )
         }
 
@@ -235,7 +235,7 @@ class PartySummaryScreen private constructor(
             val diff = this.votePctDiff[this.party] ?: 0.0
             return listOf(
                 DecimalFormat("0.0%").format(vote),
-                if (diff == 0.0) "\u00b10.0%" else DecimalFormat("+0.0%;-0.0%").format(diff)
+                if (diff == 0.0) "\u00b10.0%" else DecimalFormat("+0.0%;-0.0%").format(diff),
             )
         }
     }
@@ -244,7 +244,7 @@ class PartySummaryScreen private constructor(
         fun <T> of(
             mainRegion: T,
             titleFunc: (T) -> Flow.Publisher<out String>,
-            numRows: Int
+            numRows: Int,
         ): Builder<T> {
             return Builder(mainRegion, titleFunc, numRows)
         }
@@ -256,7 +256,7 @@ class PartySummaryScreen private constructor(
             seatDiffFunc: (T) -> Flow.Publisher<out Map<out PartyOrCoalition, Int>>,
             votePctFunc: (T) -> Flow.Publisher<out Map<out PartyOrCoalition, Double>>,
             votePctDiffFunc: (T) -> Flow.Publisher<out Map<out PartyOrCoalition, Double>>,
-            numRows: Int
+            numRows: Int,
         ): Builder<T> {
             return Builder(mainRegion, titleFunc, numRows)
                 .withSeatAndDiff(seatFunc, seatDiffFunc)
@@ -270,7 +270,7 @@ class PartySummaryScreen private constructor(
             seatPrevFunc: (T) -> Flow.Publisher<out Map<out PartyOrCoalition, Int>>,
             votePctFunc: (T) -> Flow.Publisher<out Map<out PartyOrCoalition, Double>>,
             votePctPrevFunc: (T) -> Flow.Publisher<out Map<out PartyOrCoalition, Double>>,
-            numRows: Int
+            numRows: Int,
         ): Builder<T> {
             return Builder(mainRegion, titleFunc, numRows)
                 .withSeatAndPrev(seatFunc, seatPrevFunc)

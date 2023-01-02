@@ -61,7 +61,7 @@ class SwingometerFrameBuilder {
             return max(
                 max.toDouble(),
                 bucketSize.toDouble() *
-                    ceil(abs(value.toDouble() / bucketSize.toDouble()))
+                    ceil(abs(value.toDouble() / bucketSize.toDouble())),
             )
         }
         val maxPublisher = Publisher(getMax())
@@ -118,7 +118,7 @@ class SwingometerFrameBuilder {
 
     fun withTickInterval(
         tickInterval: Flow.Publisher<out Number>,
-        tickStringFunc: (Number) -> String
+        tickStringFunc: (Number) -> String,
     ): SwingometerFrameBuilder {
         properties.tickStringFunc = tickStringFunc
         tickInterval.subscribe(Subscriber { properties.tickInterval = it })
@@ -143,7 +143,7 @@ class SwingometerFrameBuilder {
         labels: Flow.Publisher<out List<T>>,
         positionFunc: (T) -> Number,
         labelFunc: (T) -> String,
-        colorFunc: (T) -> Color
+        colorFunc: (T) -> Color,
     ): SwingometerFrameBuilder {
         this.outerLabelsPublisher = labels.mapElements {
             SwingometerFrame.OuterLabel(positionFunc(it), labelFunc(it), colorFunc(it))
@@ -154,7 +154,7 @@ class SwingometerFrameBuilder {
     fun <T> withDots(
         dots: Flow.Publisher<out List<T>>,
         positionFunc: (T) -> Number,
-        colorFunc: (T) -> Color
+        colorFunc: (T) -> Color,
     ): SwingometerFrameBuilder {
         return withDots(dots, positionFunc, colorFunc) { "" }
     }
@@ -163,7 +163,7 @@ class SwingometerFrameBuilder {
         dots: Flow.Publisher<out List<T>>,
         positionFunc: (T) -> Number,
         colorFunc: (T) -> Color,
-        labelFunc: (T) -> String
+        labelFunc: (T) -> String,
     ): SwingometerFrameBuilder {
         return withDots(dots, positionFunc, colorFunc, labelFunc) { true }
     }
@@ -172,7 +172,7 @@ class SwingometerFrameBuilder {
         dots: Flow.Publisher<out List<T>>,
         positionFunc: (T) -> Number,
         colorFunc: (T) -> Color,
-        solidFunc: (T) -> Boolean
+        solidFunc: (T) -> Boolean,
     ): SwingometerFrameBuilder {
         return withDots(dots, positionFunc, colorFunc, { "" }, solidFunc)
     }
@@ -183,7 +183,7 @@ class SwingometerFrameBuilder {
         positionFunc: (T) -> Number,
         colorFunc: (T) -> Color,
         labelFunc: (T) -> String,
-        solidFunc: (T) -> Boolean
+        solidFunc: (T) -> Boolean,
     ): SwingometerFrameBuilder {
         this.dotsPublisher =
             dots.mapElements { SwingometerFrame.Dot(positionFunc(it), colorFunc(it), labelFunc(it), solidFunc(it)) }
@@ -193,7 +193,7 @@ class SwingometerFrameBuilder {
     fun <T> withFixedDots(
         dots: List<T>,
         positionFunc: (T) -> Number,
-        colorFunc: (T) -> Flow.Publisher<out Color>
+        colorFunc: (T) -> Flow.Publisher<out Color>,
     ): SwingometerFrameBuilder {
         return withFixedDots(dots, positionFunc, colorFunc) { "" }
     }
@@ -203,7 +203,7 @@ class SwingometerFrameBuilder {
         dots: List<T>,
         positionFunc: (T) -> Number,
         colorFunc: (T) -> Flow.Publisher<out Color>,
-        labelFunc: (T) -> String
+        labelFunc: (T) -> String,
     ): SwingometerFrameBuilder {
         return withFixedDots(dots, positionFunc, colorFunc, labelFunc) { true }
     }
@@ -212,7 +212,7 @@ class SwingometerFrameBuilder {
         dots: List<T>,
         positionFunc: (T) -> Number,
         colorFunc: (T) -> Flow.Publisher<out Color>,
-        solidFunc: (T) -> Boolean
+        solidFunc: (T) -> Boolean,
     ): SwingometerFrameBuilder {
         return withFixedDots(dots, positionFunc, colorFunc, { "" }, solidFunc)
     }
@@ -223,7 +223,7 @@ class SwingometerFrameBuilder {
         positionFunc: (T) -> Number,
         colorFunc: (T) -> Flow.Publisher<out Color>,
         labelFunc: (T) -> String,
-        solidFunc: (T) -> Boolean
+        solidFunc: (T) -> Boolean,
     ): SwingometerFrameBuilder {
         this.dotsPublisher =
             dots.map {
@@ -252,14 +252,14 @@ class SwingometerFrameBuilder {
             rightToWinPublisher = rightToWinPublisher,
             ticksPublisher = ticksPublisher,
             outerLabelsPublisher = outerLabelsPublisher,
-            headerLabelsPublisher = rightLabelPublisher?.map { mapOf(GraphicsFrame.HeaderLabelLocation.RIGHT to it) }
+            headerLabelsPublisher = rightLabelPublisher?.map { mapOf(GraphicsFrame.HeaderLabelLocation.RIGHT to it) },
         )
     }
 
     companion object {
         fun basic(
             colors: Flow.Publisher<out Pair<Color, Color>>,
-            value: Flow.Publisher<out Number>
+            value: Flow.Publisher<out Number>,
         ): SwingometerFrameBuilder {
             val builder = SwingometerFrameBuilder()
             value.subscribe(Subscriber { builder.properties.value = it })

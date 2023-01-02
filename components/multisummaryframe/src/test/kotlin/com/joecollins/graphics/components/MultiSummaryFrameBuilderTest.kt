@@ -27,7 +27,7 @@ class MultiSummaryFrameBuilderTest {
             Riding("Mount Lorne-Southern Lakes"), // 4
             Riding("Pelly-Nisutlin"), // 5
             Riding("Vuntut Gwitchin"), // 6
-            Riding("Watson Lake") // 7
+            Riding("Watson Lake"), // 7
         )
         val frame = MultiSummaryFrameBuilder.dynamicallyFiltered(
             ridings,
@@ -35,7 +35,7 @@ class MultiSummaryFrameBuilderTest {
             { it.margin },
             { it.name.uppercase().asOneTimePublisher() },
             { it.boxes },
-            2
+            2,
         )
             .withHeader("TOO CLOSE TO CALL".asOneTimePublisher())
             .build()
@@ -175,7 +175,7 @@ class MultiSummaryFrameBuilderTest {
                 .map {
                     Pair(
                         it.key.color,
-                        it.key.abbreviation + ": " + it.value
+                        it.key.abbreviation + ": " + it.value,
                     )
                 }
                 .toList()

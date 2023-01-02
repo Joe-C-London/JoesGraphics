@@ -21,10 +21,10 @@ class ProjectionFrame(
     backColorPublisher: Flow.Publisher<out Color>,
     borderColorPublisher: Flow.Publisher<out Color>,
     footerTextPublisher: Flow.Publisher<out String?>,
-    imageAlignmentPublisher: Flow.Publisher<out Alignment>? = null
+    imageAlignmentPublisher: Flow.Publisher<out Alignment>? = null,
 ) : GraphicsFrame(
     headerPublisher = headerPublisher,
-    borderColorPublisher = borderColorPublisher
+    borderColorPublisher = borderColorPublisher,
 ) {
 
     enum class Alignment { BOTTOM, MIDDLE }
@@ -56,8 +56,8 @@ class ProjectionFrame(
                 eventQueueWrapper {
                     footerLabel.text = it
                     footerLabel.isVisible = it != null
-                }
-            )
+                },
+            ),
         )
         if (imageAlignmentPublisher != null) {
             imageAlignmentPublisher.subscribe(Subscriber(eventQueueWrapper { imagePanel.alignment = it }))
@@ -110,7 +110,7 @@ class ProjectionFrame(
                 scaledImage,
                 (width - newWidth) / 2,
                 (height - newHeight) / if (alignment == Alignment.BOTTOM) 1 else 2,
-                null
+                null,
             )
         }
 

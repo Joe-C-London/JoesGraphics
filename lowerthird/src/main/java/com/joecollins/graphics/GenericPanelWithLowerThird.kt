@@ -10,7 +10,7 @@ import javax.swing.JPanel
 
 class GenericPanelWithLowerThird(
     private val panel: JPanel,
-    lowerThird: LowerThird
+    lowerThird: LowerThird,
 ) : JPanel(), AltTextProvider {
 
     init {

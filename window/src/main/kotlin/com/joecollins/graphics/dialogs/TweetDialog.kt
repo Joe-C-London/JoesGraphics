@@ -82,14 +82,14 @@ class TweetDialog(panel: JPanel) : GenericSocialDialog(panel) {
         client.post(
             "${conf.uploadBaseURL}/media/metadata/create.json",
             arrayOf(
-                HttpParameter(params)
+                HttpParameter(params),
             ),
             auth,
             object : HttpResponseListener {
                 override fun httpResponseReceived(event: HttpResponseEvent) {
                     // no-op
                 }
-            }
+            },
         )
     }
 

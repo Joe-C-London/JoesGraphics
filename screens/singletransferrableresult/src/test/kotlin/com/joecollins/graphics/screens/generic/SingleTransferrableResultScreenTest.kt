@@ -58,8 +58,8 @@ class SingleTransferrableResultScreenTest {
                 milne to null,
                 newton to null,
                 odonnell to null,
-                robinson to null
-            )
+                robinson to null,
+            ),
         )
         val quota = Publisher<Int?>(null)
         val elected = Publisher<List<Pair<Candidate, Int>>>(emptyList())
@@ -75,22 +75,22 @@ class SingleTransferrableResultScreenTest {
             excluded,
             candidateHeader,
             candidateSubhead,
-            "[MLA]"
+            "[MLA]",
         )
             .withPartyTotals(
                 5.asOneTimePublisher(),
-                "TOTAL QUOTAS BY PARTY".asOneTimePublisher()
+                "TOTAL QUOTAS BY PARTY".asOneTimePublisher(),
             )
             .withPrevSeats(
                 mapOf(dup to 3, apni to 2, uup to 1).asOneTimePublisher(),
-                "SEATS IN 2016".asOneTimePublisher()
+                "SEATS IN 2016".asOneTimePublisher(),
             )
             .withPartyMap(
                 niShapesByConstituency().asOneTimePublisher(),
                 9.asOneTimePublisher(),
                 currWinner,
                 listOf(9, 10, 12, 15).asOneTimePublisher(),
-                "BELFAST".asOneTimePublisher()
+                "BELFAST".asOneTimePublisher(),
             )
             .build("BELFAST EAST".asOneTimePublisher())
         panel.size = Dimension(1024, 512)
@@ -122,7 +122,7 @@ class SingleTransferrableResultScreenTest {
                 DUP: 3
                 APNI: 2
                 UUP: 1
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         candidateVotes.submit(
@@ -140,8 +140,8 @@ class SingleTransferrableResultScreenTest {
                 robinson to 442,
                 bodel to 275,
                 defaoite to 250,
-                mckeag to 84
-            )
+                mckeag to 84,
+            ),
         )
         elected.submit(listOf(long to 1))
         candidateHeader.submit("COUNT 1")
@@ -188,7 +188,7 @@ class SingleTransferrableResultScreenTest {
                 DUP: 3
                 APNI: 2
                 UUP: 1
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         candidateVotes.submit(
@@ -205,8 +205,8 @@ class SingleTransferrableResultScreenTest {
                 robinson to 449.48,
                 bodel to 276.32,
                 defaoite to 260.45,
-                mckeag to 85.43
-            )
+                mckeag to 85.43,
+            ),
         )
         excluded.submit(listOf(mckeag))
         candidateHeader.submit("COUNT 2")
@@ -250,7 +250,7 @@ class SingleTransferrableResultScreenTest {
                 DUP: 3
                 APNI: 2
                 UUP: 1
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         candidateVotes.submit(
@@ -266,8 +266,8 @@ class SingleTransferrableResultScreenTest {
                 girvin to 920.65,
                 robinson to 456.48,
                 bodel to 278.43,
-                defaoite to 260.56
-            )
+                defaoite to 260.56,
+            ),
         )
         excluded.submit(listOf(mckeag, defaoite))
         candidateHeader.submit("COUNT 3")
@@ -309,7 +309,7 @@ class SingleTransferrableResultScreenTest {
                 DUP: 3
                 APNI: 2
                 UUP: 1
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         candidateVotes.submit(
@@ -324,8 +324,8 @@ class SingleTransferrableResultScreenTest {
                 odonnell to 1216.66,
                 girvin to 924.76,
                 robinson to 467.81,
-                bodel to 280.43
-            )
+                bodel to 280.43,
+            ),
         )
         excluded.submit(listOf(mckeag, defaoite, bodel, robinson))
         candidateHeader.submit("COUNT 4")
@@ -365,7 +365,7 @@ class SingleTransferrableResultScreenTest {
                 DUP: 3
                 APNI: 2
                 UUP: 1
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         candidateVotes.submit(
@@ -378,8 +378,8 @@ class SingleTransferrableResultScreenTest {
                 kyle to 2751.95,
                 milne to 1763.36,
                 odonnell to 1232.88,
-                girvin to 958.87
-            )
+                girvin to 958.87,
+            ),
         )
         excluded.submit(listOf(mckeag, defaoite, bodel, robinson, girvin))
         candidateHeader.submit("COUNT 5")
@@ -415,7 +415,7 @@ class SingleTransferrableResultScreenTest {
                 DUP: 3
                 APNI: 2
                 UUP: 1
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         candidateVotes.submit(
@@ -427,8 +427,8 @@ class SingleTransferrableResultScreenTest {
                 douglas to 4568.40,
                 kyle to 2936.28,
                 milne to 1801.58,
-                odonnell to 1235.10
-            )
+                odonnell to 1235.10,
+            ),
         )
         excluded.submit(listOf(mckeag, defaoite, bodel, robinson, girvin, odonnell))
         candidateHeader.submit("COUNT 6")
@@ -462,7 +462,7 @@ class SingleTransferrableResultScreenTest {
                 DUP: 3
                 APNI: 2
                 UUP: 1
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         candidateVotes.submit(
@@ -473,8 +473,8 @@ class SingleTransferrableResultScreenTest {
                 newton to 4865.61,
                 douglas to 4572.40,
                 kyle to 2950.28,
-                milne to 2080.65
-            )
+                milne to 2080.65,
+            ),
         )
         excluded.submit(listOf(mckeag, defaoite, bodel, robinson, girvin, odonnell, milne))
         candidateHeader.submit("COUNT 7")
@@ -506,7 +506,7 @@ class SingleTransferrableResultScreenTest {
                 DUP: 3
                 APNI: 2
                 UUP: 1
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         candidateVotes.submit(
@@ -516,8 +516,8 @@ class SingleTransferrableResultScreenTest {
                 bunting to 6275.01,
                 newton to 4890.72,
                 douglas to 4599.73,
-                kyle to 3148.79
-            )
+                kyle to 3148.79,
+            ),
         )
         candidateSubhead.submit("2 OF 5 SEATS ELECTED")
         elected.submit(listOf(long to 1, lyttle to 8))
@@ -549,7 +549,7 @@ class SingleTransferrableResultScreenTest {
                 DUP: 3
                 APNI: 2
                 UUP: 1
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         candidateVotes.submit(
@@ -557,8 +557,8 @@ class SingleTransferrableResultScreenTest {
                 allen to 7257.62,
                 bunting to 6759.01,
                 newton to 5268.26,
-                douglas to 4995.25
-            )
+                douglas to 4995.25,
+            ),
         )
         candidateSubhead.submit("4 OF 5 SEATS ELECTED")
         elected.submit(listOf(long to 1, lyttle to 8, allen to 9, bunting to 9))
@@ -588,14 +588,14 @@ class SingleTransferrableResultScreenTest {
                 DUP: 3
                 APNI: 2
                 UUP: 1
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         candidateVotes.submit(
             mapOf(
                 newton to 5333.26,
-                douglas to 5093.25
-            )
+                douglas to 5093.25,
+            ),
         )
         elected.submit(listOf(long to 1, lyttle to 8, allen to 9, bunting to 9))
         excluded.submit(listOf(mckeag, defaoite, bodel, robinson, girvin, odonnell, milne, kyle))
@@ -624,14 +624,14 @@ class SingleTransferrableResultScreenTest {
                 DUP: 3
                 APNI: 2
                 UUP: 1
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         candidateVotes.submit(
             mapOf(
                 newton to 5541.65,
-                douglas to 5410.84
-            )
+                douglas to 5410.84,
+            ),
         )
         candidateSubhead.submit("5 OF 5 SEATS ELECTED")
         elected.submit(listOf(long to 1, lyttle to 8, allen to 9, bunting to 9, newton to 11))
@@ -661,7 +661,7 @@ class SingleTransferrableResultScreenTest {
                 DUP: 3
                 APNI: 2
                 UUP: 1
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 

@@ -24,8 +24,8 @@ class MultiSummaryFrameTest {
                         Pair(Color.ORANGE, "1"),
                         Pair(Color.CYAN.darker(), "0"),
                         Pair(Color.GREEN.darker(), "1"),
-                        Pair(Color.GRAY, "0")
-                    )
+                        Pair(Color.GRAY, "0"),
+                    ),
                 ),
                 MultiSummaryFrame.Row(
                     "QU\u00c9BEC",
@@ -35,8 +35,8 @@ class MultiSummaryFrameTest {
                         Pair(Color.ORANGE, "1"),
                         Pair(Color.CYAN.darker(), "32"),
                         Pair(Color.GREEN.darker(), "0"),
-                        Pair(Color.GRAY, "0")
-                    )
+                        Pair(Color.GRAY, "0"),
+                    ),
                 ),
                 MultiSummaryFrame.Row(
                     "ONTARIO",
@@ -46,8 +46,8 @@ class MultiSummaryFrameTest {
                         Pair(Color.ORANGE, "6"),
                         Pair(Color.CYAN.darker(), "0"),
                         Pair(Color.GREEN.darker(), "0"),
-                        Pair(Color.GRAY, "0")
-                    )
+                        Pair(Color.GRAY, "0"),
+                    ),
                 ),
                 MultiSummaryFrame.Row(
                     "WESTERN CANADA",
@@ -57,8 +57,8 @@ class MultiSummaryFrameTest {
                         Pair(Color.ORANGE, "15"),
                         Pair(Color.CYAN.darker(), "0"),
                         Pair(Color.GREEN.darker(), "2"),
-                        Pair(Color.GRAY, "1")
-                    )
+                        Pair(Color.GRAY, "1"),
+                    ),
                 ),
                 MultiSummaryFrame.Row(
                     "THE NORTH",
@@ -68,11 +68,11 @@ class MultiSummaryFrameTest {
                         Pair(Color.ORANGE, "1"),
                         Pair(Color.CYAN.darker(), "0"),
                         Pair(Color.GREEN.darker(), "0"),
-                        Pair(Color.GRAY, "0")
-                    )
-                )
+                        Pair(Color.GRAY, "0"),
+                    ),
+                ),
             )
-                .asOneTimePublisher()
+                .asOneTimePublisher(),
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numRows }, IsEqual(5))
@@ -111,8 +111,8 @@ class MultiSummaryFrameTest {
                         Pair(Color.ORANGE, "1"),
                         Pair(Color.CYAN.darker(), "0"),
                         Pair(Color.GREEN.darker(), "1"),
-                        Pair(Color.GRAY, "0")
-                    )
+                        Pair(Color.GRAY, "0"),
+                    ),
                 ),
                 MultiSummaryFrame.Row(
                     "QU\u00c9BEC",
@@ -122,8 +122,8 @@ class MultiSummaryFrameTest {
                         Pair(Color.ORANGE, "1"),
                         Pair(Color.CYAN.darker(), "32"),
                         Pair(Color.GREEN.darker(), "0"),
-                        Pair(Color.GRAY, "0")
-                    )
+                        Pair(Color.GRAY, "0"),
+                    ),
                 ),
                 MultiSummaryFrame.Row(
                     "ONTARIO",
@@ -133,8 +133,8 @@ class MultiSummaryFrameTest {
                         Pair(Color.ORANGE, "6"),
                         Pair(Color.CYAN.darker(), "0"),
                         Pair(Color.GREEN.darker(), "0"),
-                        Pair(Color.GRAY, "0")
-                    )
+                        Pair(Color.GRAY, "0"),
+                    ),
                 ),
                 MultiSummaryFrame.Row(
                     "WESTERN CANADA",
@@ -144,8 +144,8 @@ class MultiSummaryFrameTest {
                         Pair(Color.ORANGE, "15"),
                         Pair(Color.CYAN.darker(), "0"),
                         Pair(Color.GREEN.darker(), "2"),
-                        Pair(Color.GRAY, "1")
-                    )
+                        Pair(Color.GRAY, "1"),
+                    ),
                 ),
                 MultiSummaryFrame.Row(
                     "THE NORTH",
@@ -155,10 +155,10 @@ class MultiSummaryFrameTest {
                         Pair(Color.ORANGE, "1"),
                         Pair(Color.CYAN.darker(), "0"),
                         Pair(Color.GREEN.darker(), "0"),
-                        Pair(Color.GRAY, "0")
-                    )
-                )
-            ).asOneTimePublisher()
+                        Pair(Color.GRAY, "0"),
+                    ),
+                ),
+            ).asOneTimePublisher(),
         )
         frame.setSize(512, 256)
         compareRendering("MultiSummaryFrame", "Basic", frame)
@@ -177,8 +177,8 @@ class MultiSummaryFrameTest {
                         Pair(Color.ORANGE, "1"),
                         Pair(Color.CYAN.darker(), "0"),
                         Pair(Color.GREEN.darker(), "0"),
-                        Pair(Color.GRAY, "0")
-                    )
+                        Pair(Color.GRAY, "0"),
+                    ),
                 ),
                 MultiSummaryFrame.Row(
                     "NOVA SCOTIA",
@@ -188,8 +188,8 @@ class MultiSummaryFrameTest {
                         Pair(Color.ORANGE, "0"),
                         Pair(Color.CYAN.darker(), "0"),
                         Pair(Color.GREEN.darker(), "0"),
-                        Pair(Color.GRAY, "0")
-                    )
+                        Pair(Color.GRAY, "0"),
+                    ),
                 ),
                 MultiSummaryFrame.Row(
                     "PRINCE EDWARD ISLAND",
@@ -199,8 +199,8 @@ class MultiSummaryFrameTest {
                         Pair(Color.ORANGE, "0"),
                         Pair(Color.CYAN.darker(), "0"),
                         Pair(Color.GREEN.darker(), "0"),
-                        Pair(Color.GRAY, "0")
-                    )
+                        Pair(Color.GRAY, "0"),
+                    ),
                 ),
                 MultiSummaryFrame.Row(
                     "NEW BRUNSWICK",
@@ -210,8 +210,8 @@ class MultiSummaryFrameTest {
                         Pair(Color.ORANGE, "0"),
                         Pair(Color.CYAN.darker(), "0"),
                         Pair(Color.GREEN.darker(), "1"),
-                        Pair(Color.GRAY, "0")
-                    )
+                        Pair(Color.GRAY, "0"),
+                    ),
                 ),
                 MultiSummaryFrame.Row(
                     "QU\u00c9BEC",
@@ -221,8 +221,8 @@ class MultiSummaryFrameTest {
                         Pair(Color.ORANGE, "1"),
                         Pair(Color.CYAN.darker(), "32"),
                         Pair(Color.GREEN.darker(), "0"),
-                        Pair(Color.GRAY, "0")
-                    )
+                        Pair(Color.GRAY, "0"),
+                    ),
                 ),
                 MultiSummaryFrame.Row(
                     "ONTARIO",
@@ -232,8 +232,8 @@ class MultiSummaryFrameTest {
                         Pair(Color.ORANGE, "6"),
                         Pair(Color.CYAN.darker(), "0"),
                         Pair(Color.GREEN.darker(), "0"),
-                        Pair(Color.GRAY, "0")
-                    )
+                        Pair(Color.GRAY, "0"),
+                    ),
                 ),
                 MultiSummaryFrame.Row(
                     "MANITOBA",
@@ -243,8 +243,8 @@ class MultiSummaryFrameTest {
                         Pair(Color.ORANGE, "3"),
                         Pair(Color.CYAN.darker(), "0"),
                         Pair(Color.GREEN.darker(), "0"),
-                        Pair(Color.GRAY, "0")
-                    )
+                        Pair(Color.GRAY, "0"),
+                    ),
                 ),
                 MultiSummaryFrame.Row(
                     "SASKATCHEWAN",
@@ -254,8 +254,8 @@ class MultiSummaryFrameTest {
                         Pair(Color.ORANGE, "0"),
                         Pair(Color.CYAN.darker(), "0"),
                         Pair(Color.GREEN.darker(), "0"),
-                        Pair(Color.GRAY, "0")
-                    )
+                        Pair(Color.GRAY, "0"),
+                    ),
                 ),
                 MultiSummaryFrame.Row(
                     "ALBERTA",
@@ -265,8 +265,8 @@ class MultiSummaryFrameTest {
                         Pair(Color.ORANGE, "1"),
                         Pair(Color.CYAN.darker(), "0"),
                         Pair(Color.GREEN.darker(), "0"),
-                        Pair(Color.GRAY, "0")
-                    )
+                        Pair(Color.GRAY, "0"),
+                    ),
                 ),
                 MultiSummaryFrame.Row(
                     "BRITISH COLUMBIA",
@@ -276,8 +276,8 @@ class MultiSummaryFrameTest {
                         Pair(Color.ORANGE, "11"),
                         Pair(Color.CYAN.darker(), "0"),
                         Pair(Color.GREEN.darker(), "2"),
-                        Pair(Color.GRAY, "1")
-                    )
+                        Pair(Color.GRAY, "1"),
+                    ),
                 ),
                 MultiSummaryFrame.Row(
                     "YUKON",
@@ -287,8 +287,8 @@ class MultiSummaryFrameTest {
                         Pair(Color.ORANGE, "0"),
                         Pair(Color.CYAN.darker(), "0"),
                         Pair(Color.GREEN.darker(), "0"),
-                        Pair(Color.GRAY, "0")
-                    )
+                        Pair(Color.GRAY, "0"),
+                    ),
                 ),
                 MultiSummaryFrame.Row(
                     "NORTHWEST TERRITORIES",
@@ -298,8 +298,8 @@ class MultiSummaryFrameTest {
                         Pair(Color.ORANGE, "0"),
                         Pair(Color.CYAN.darker(), "0"),
                         Pair(Color.GREEN.darker(), "0"),
-                        Pair(Color.GRAY, "0")
-                    )
+                        Pair(Color.GRAY, "0"),
+                    ),
                 ),
                 MultiSummaryFrame.Row(
                     "NUNAVUT",
@@ -309,10 +309,10 @@ class MultiSummaryFrameTest {
                         Pair(Color.ORANGE, "1"),
                         Pair(Color.CYAN.darker(), "0"),
                         Pair(Color.GREEN.darker(), "0"),
-                        Pair(Color.GRAY, "0")
-                    )
-                )
-            ).asOneTimePublisher()
+                        Pair(Color.GRAY, "0"),
+                    ),
+                ),
+            ).asOneTimePublisher(),
         )
         frame.setSize(512, 256)
         compareRendering("MultiSummaryFrame", "Overflow", frame)
@@ -331,8 +331,8 @@ class MultiSummaryFrameTest {
                         Pair(Color.BLUE, "LIB"),
                         Pair(Color.RED, "ALP"),
                         Pair(Color.GREEN.darker().darker(), "NAT"),
-                        Pair(Color.GREEN.darker(), "GRN")
-                    )
+                        Pair(Color.GREEN.darker(), "GRN"),
+                    ),
                 ),
                 MultiSummaryFrame.Row(
                     "VICTORIA",
@@ -342,8 +342,8 @@ class MultiSummaryFrameTest {
                         Pair(Color.BLUE, "LIB"),
                         Pair(Color.RED, "ALP"),
                         Pair(Color.GREEN.darker(), "GRN"),
-                        Pair(Color.BLUE, "LIB")
-                    )
+                        Pair(Color.BLUE, "LIB"),
+                    ),
                 ),
                 MultiSummaryFrame.Row(
                     "QUEENSLAND",
@@ -353,8 +353,8 @@ class MultiSummaryFrameTest {
                         Pair(Color.BLUE, "LNP"),
                         Pair(Color.ORANGE, "ONP"),
                         Pair(Color.BLUE, "LNP"),
-                        Pair(Color.GREEN.darker(), "GRN")
-                    )
+                        Pair(Color.GREEN.darker(), "GRN"),
+                    ),
                 ),
                 MultiSummaryFrame.Row(
                     "WESTERN AUSTRALIA",
@@ -364,8 +364,8 @@ class MultiSummaryFrameTest {
                         Pair(Color.BLUE, "LIB"),
                         Pair(Color.BLUE, "LIB"),
                         Pair(Color.RED, "ALP"),
-                        Pair(Color.GREEN.darker(), "GRN")
-                    )
+                        Pair(Color.GREEN.darker(), "GRN"),
+                    ),
                 ),
                 MultiSummaryFrame.Row(
                     "SOUTH AUSTRALIA",
@@ -375,8 +375,8 @@ class MultiSummaryFrameTest {
                         Pair(Color.BLUE, "LIB"),
                         Pair(Color.RED, "ALP"),
                         Pair(Color.GREEN.darker(), "GRN"),
-                        Pair(Color.BLUE, "LIB")
-                    )
+                        Pair(Color.BLUE, "LIB"),
+                    ),
                 ),
                 MultiSummaryFrame.Row(
                     "TASMANIA",
@@ -386,15 +386,15 @@ class MultiSummaryFrameTest {
                         Pair(Color.BLUE, "LIB"),
                         Pair(Color.GREEN.darker(), "GRN"),
                         Pair(Color.RED, "ALP"),
-                        Pair(Color.YELLOW, "LAMB")
-                    )
+                        Pair(Color.YELLOW, "LAMB"),
+                    ),
                 ),
                 MultiSummaryFrame.Row("ACT", listOf(Pair(Color.RED, "ALP"), Pair(Color.BLUE, "LIB"))),
                 MultiSummaryFrame.Row(
                     "NORTHERN TERRITORY",
-                    listOf(Pair(Color.RED, "ALP"), Pair(Color.ORANGE, "CLP"))
-                )
-            ).asOneTimePublisher()
+                    listOf(Pair(Color.RED, "ALP"), Pair(Color.ORANGE, "CLP")),
+                ),
+            ).asOneTimePublisher(),
         )
         frame.setSize(512, 256)
         compareRendering("MultiSummaryFrame", "DiffColCounts", frame)

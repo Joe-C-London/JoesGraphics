@@ -10,7 +10,7 @@ class DescriptionFrameTest {
     fun renderBasic() {
         val frame = DescriptionFrame(
             header = "HOW DO MIDTERMS WORK?".asOneTimePublisher(),
-            text = "The House of Representatives is elected in its entirety every two years.\n\nThe Senate is elected in thirds every two years, with Senators serving six-year terms.".asOneTimePublisher()
+            text = "The House of Representatives is elected in its entirety every two years.\n\nThe Senate is elected in thirds every two years, with Senators serving six-year terms.".asOneTimePublisher(),
         )
         frame.setSize(512, 256)
         RenderTestUtils.compareRendering("DescriptionFrame", "Basic", frame)

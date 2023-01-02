@@ -121,7 +121,7 @@ fun <T, R> Flow.Publisher<T>.map(func: (T) -> R): Flow.Publisher<R> {
             } catch (e: Exception) {
                 e.printStackTrace()
             }
-        }
+        },
     )
     return publisher
 }
@@ -147,7 +147,7 @@ fun <T, U, R> Flow.Publisher<T>.merge(other: Flow.Publisher<out U>, func: (T, U)
                 pair.left = Wrapper(it)
                 onUpdate()
             }
-        }
+        },
     )
     other.subscribe(
         Subscriber {
@@ -155,7 +155,7 @@ fun <T, U, R> Flow.Publisher<T>.merge(other: Flow.Publisher<out U>, func: (T, U)
                 pair.right = Wrapper(it)
                 onUpdate()
             }
-        }
+        },
     )
     return publisher
 }
@@ -176,7 +176,7 @@ fun <T, R> List<Flow.Publisher<out T>>.mapReduce(identity: R, onValueAdd: (R, T)
                         publisher.submit(value)
                     }
                 }
-            }
+            },
         )
     }
     return publisher
@@ -195,7 +195,7 @@ fun <T> List<Flow.Publisher<T>>.combine(): Flow.Publisher<List<T>> {
                         publisher.submit(list.map { it!!.item })
                     }
                 }
-            }
+            },
         )
     }
     return publisher
@@ -237,7 +237,7 @@ fun <T, R> Flow.Publisher<T>.compose(func: (T) -> Flow.Publisher<out R>): Flow.P
                     }
                 })
             }
-        }
+        },
     )
     return ret
 }

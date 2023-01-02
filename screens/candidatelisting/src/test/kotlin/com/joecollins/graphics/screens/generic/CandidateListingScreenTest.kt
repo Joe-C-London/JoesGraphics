@@ -22,13 +22,13 @@ class CandidateListingScreenTest {
         val candidates = listOf(
             Candidate("Tommy Kickham", lib),
             Candidate("Colin LaVie", pc, true),
-            Candidate("Boyd Leard", grn)
+            Candidate("Boyd Leard", grn),
         )
         val screen = CandidateListingScreen.of(
             candidates.asOneTimePublisher(),
             "CANDIDATES".asOneTimePublisher(),
             "".asOneTimePublisher(),
-            "[MLA]"
+            "[MLA]",
         )
             .build("SOURIS-ELMIRA".asOneTimePublisher())
         screen.size = Dimension(1024, 512)
@@ -44,23 +44,23 @@ class CandidateListingScreenTest {
         val candidates = listOf(
             Candidate("Tommy Kickham", lib),
             Candidate("Colin LaVie", pc, true),
-            Candidate("Boyd Leard", grn)
+            Candidate("Boyd Leard", grn),
         )
         val prev = mapOf(
             lib to 951,
             pc to 1179,
-            ndp to 528
+            ndp to 528,
         )
         val screen = CandidateListingScreen.of(
             candidates.asOneTimePublisher(),
             "CANDIDATES".asOneTimePublisher(),
             "".asOneTimePublisher(),
-            "[MLA]"
+            "[MLA]",
         )
             .withPrev(
                 prev.asOneTimePublisher(),
                 "2015 RESULT".asOneTimePublisher(),
-                null.asOneTimePublisher()
+                null.asOneTimePublisher(),
             )
             .build("SOURIS-ELMIRA".asOneTimePublisher())
         screen.size = Dimension(1024, 512)
@@ -76,30 +76,30 @@ class CandidateListingScreenTest {
         val candidates = listOf(
             Candidate("Tommy Kickham", lib),
             Candidate("Colin LaVie", pc, true),
-            Candidate("Boyd Leard", grn)
+            Candidate("Boyd Leard", grn),
         )
         val prev = mapOf(
             lib to 951,
             pc to 1179,
-            ndp to 528
+            ndp to 528,
         )
         val shapes = peiShapesByDistrict()
         val screen = CandidateListingScreen.of(
             candidates.asOneTimePublisher(),
             "CANDIDATES".asOneTimePublisher(),
             "".asOneTimePublisher(),
-            "[MLA]"
+            "[MLA]",
         )
             .withMap(
                 shapes.asOneTimePublisher(),
                 1.asOneTimePublisher(),
                 listOf(1, 2, 3, 4, 5, 6, 7).asOneTimePublisher(),
-                "CARDIGAN".asOneTimePublisher()
+                "CARDIGAN".asOneTimePublisher(),
             )
             .withPrev(
                 prev.asOneTimePublisher(),
                 "2015 RESULT".asOneTimePublisher(),
-                null.asOneTimePublisher()
+                null.asOneTimePublisher(),
             )
             .build("SOURIS-ELMIRA".asOneTimePublisher())
         screen.size = Dimension(1024, 512)
@@ -118,30 +118,30 @@ class CandidateListingScreenTest {
             Candidate("Bush Dumville", ind),
             Candidate("Gavin Hall", grn),
             Candidate("Gord McNeilly", lib),
-            Candidate("Janis Newman", ndp)
+            Candidate("Janis Newman", ndp),
         )
         val prev = mapOf(
             lib to 1040,
             ndp to 931,
-            Party.OTHERS to 821 + 244
+            Party.OTHERS to 821 + 244,
         )
         val shapes = peiShapesByDistrict()
         val screen = CandidateListingScreen.of(
             candidates.asOneTimePublisher(),
             "CANDIDATES".asOneTimePublisher(),
             "".asOneTimePublisher(),
-            "[MLA]"
+            "[MLA]",
         )
             .withMap(
                 shapes.asOneTimePublisher(),
                 14.asOneTimePublisher(),
                 listOf(9, 10, 11, 12, 13, 14).asOneTimePublisher(),
-                "CHARLOTTETOWN".asOneTimePublisher()
+                "CHARLOTTETOWN".asOneTimePublisher(),
             )
             .withPrev(
                 prev.asOneTimePublisher(),
                 "2015 RESULT".asOneTimePublisher(),
-                null.asOneTimePublisher()
+                null.asOneTimePublisher(),
             )
             .build("CHARLOTTETOWN-WEST ROYALTY".asOneTimePublisher())
         screen.size = Dimension(1024, 512)
@@ -157,41 +157,41 @@ class CandidateListingScreenTest {
         val candidates = listOf(
             Candidate("Tommy Kickham", lib),
             Candidate("Colin LaVie", pc, true),
-            Candidate("Boyd Leard", grn)
+            Candidate("Boyd Leard", grn),
         )
         val prev = mapOf(
             lib to 951,
             pc to 1179,
-            ndp to 528
+            ndp to 528,
         )
         val secondaryPrev = mapOf(
             lib to 8016,
             pc to 9444,
             grn to 1144,
-            ndp to 2404
+            ndp to 2404,
         )
         val shapes = peiShapesByDistrict()
         val screen = CandidateListingScreen.of(
             candidates.asOneTimePublisher(),
             "CANDIDATES".asOneTimePublisher(),
             "".asOneTimePublisher(),
-            "[MLA]"
+            "[MLA]",
         )
             .withMap(
                 shapes.asOneTimePublisher(),
                 1.asOneTimePublisher(),
                 listOf(1, 2, 3, 4, 5, 6, 7).asOneTimePublisher(),
-                "CARDIGAN".asOneTimePublisher()
+                "CARDIGAN".asOneTimePublisher(),
             )
             .withPrev(
                 prev.asOneTimePublisher(),
                 "2015 RESULT".asOneTimePublisher(),
-                null.asOneTimePublisher()
+                null.asOneTimePublisher(),
             )
             .withSecondaryPrev(
                 secondaryPrev.asOneTimePublisher(),
                 "2015 REGIONAL RESULT".asOneTimePublisher(),
-                null.asOneTimePublisher()
+                null.asOneTimePublisher(),
             )
             .build("SOURIS-ELMIRA".asOneTimePublisher())
         screen.size = Dimension(1024, 512)
@@ -207,34 +207,34 @@ class CandidateListingScreenTest {
         val candidates = listOf(
             Candidate("Tommy Kickham", lib),
             Candidate("Colin LaVie", pc, true),
-            Candidate("Boyd Leard", grn)
+            Candidate("Boyd Leard", grn),
         )
         val prev = mapOf(
             lib to 951,
             pc to 1179,
-            ndp to 528
+            ndp to 528,
         )
         val secondaryPrev = mapOf(
             lib to 8016,
             pc to 9444,
             grn to 1144,
-            ndp to 2404
+            ndp to 2404,
         )
         val screen = CandidateListingScreen.of(
             candidates.asOneTimePublisher(),
             "CANDIDATES".asOneTimePublisher(),
             "".asOneTimePublisher(),
-            "[MLA]"
+            "[MLA]",
         )
             .withPrev(
                 prev.asOneTimePublisher(),
                 "2015 RESULT".asOneTimePublisher(),
-                null.asOneTimePublisher()
+                null.asOneTimePublisher(),
             )
             .withSecondaryPrev(
                 secondaryPrev.asOneTimePublisher(),
                 "2015 REGIONAL RESULT".asOneTimePublisher(),
-                null.asOneTimePublisher()
+                null.asOneTimePublisher(),
             )
             .build("SOURIS-ELMIRA".asOneTimePublisher())
         screen.size = Dimension(1024, 512)
@@ -252,24 +252,24 @@ class CandidateListingScreenTest {
                 Candidate("Kevin Doyle", lib),
                 Candidate("Susan Hartley", grn),
                 Candidate("Edith Perry", ndp),
-                Candidate("Steven Myers", pc, true)
-            )
+                Candidate("Steven Myers", pc, true),
+            ),
         )
         val prev = Publisher(
             mapOf(
                 lib to 1170,
                 pc to 1448,
                 grn to 145,
-                ndp to 256
-            )
+                ndp to 256,
+            ),
         )
         val secondaryPrev = Publisher(
             mapOf(
                 lib to 8016,
                 pc to 9444,
                 grn to 1144,
-                ndp to 2404
-            )
+                ndp to 2404,
+            ),
         )
         val region = Publisher("CARDIGAN")
         val districtName = Publisher("GEORGETOWN-POWNAL")
@@ -280,23 +280,23 @@ class CandidateListingScreenTest {
             candidates,
             "CANDIDATES".asOneTimePublisher(),
             "".asOneTimePublisher(),
-            "[MLA]"
+            "[MLA]",
         )
             .withMap(
                 shapes.asOneTimePublisher(),
                 districtNum,
                 focus,
-                region
+                region,
             )
             .withPrev(
                 prev,
                 "2015 RESULT".asOneTimePublisher(),
-                null.asOneTimePublisher()
+                null.asOneTimePublisher(),
             )
             .withSecondaryPrev(
                 secondaryPrev,
                 "2015 REGIONAL RESULT".asOneTimePublisher(),
-                null.asOneTimePublisher()
+                null.asOneTimePublisher(),
             )
             .build(districtName)
         screen.size = Dimension(1024, 512)
@@ -307,8 +307,8 @@ class CandidateListingScreenTest {
                 Candidate("Sarah Donald", grn),
                 Candidate("Wade MacLauchlan", lib, true),
                 Candidate("Bloyce Thompson", pc),
-                Candidate("Marian White", ndp)
-            )
+                Candidate("Marian White", ndp),
+            ),
         )
         prev.submit(mapOf(lib to 1938, pc to 1338, grn to 347, ndp to 442))
         secondaryPrev.submit(mapOf(lib to 7767, pc to 8169, grn to 4011, ndp to 1427))
@@ -336,8 +336,8 @@ class CandidateListingScreenTest {
                 Candidate("Vahid Seyfaie", ppc),
                 Candidate("Sven Spengemann", lib, true),
                 Candidate("Kayleigh Tahk", rhino),
-                Candidate("Sarah Walji", ndp)
-            )
+                Candidate("Sarah Walji", ndp),
+            ),
         )
         val header = Publisher("2021 GENERAL ELECTION CANDIDATES")
         val screen = CandidateListingScreen.of(candidatesPublisher, header, "".asOneTimePublisher())
@@ -387,8 +387,8 @@ class CandidateListingScreenTest {
                 Candidate("Tomas Szuchewycz", ind),
                 Candidate("Ben Teichman", ind),
                 Candidate("John The Engineer Turmel", ind),
-                Candidate("Darcy Justin Vanderwater", ind)
-            )
+                Candidate("Darcy Justin Vanderwater", ind),
+            ),
         )
         header.submit("2022 BY-ELECTION CANDIDATES")
         compareRendering("CandidateListingScreen", "TwoColumns-2", screen)

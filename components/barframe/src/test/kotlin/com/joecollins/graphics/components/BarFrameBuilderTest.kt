@@ -29,7 +29,7 @@ class BarFrameBuilderTest {
                         .sortedByDescending { it.value }
                         .map { BasicBar(it.key.first, it.key.second, it.value, THOUSANDS.format(it.value)) }
                         .toList()
-                }
+                },
         )
             .build()
         Assertions.assertEquals(0, frame.numBars.toLong())
@@ -37,8 +37,8 @@ class BarFrameBuilderTest {
         result.submit(
             mapOf(
                 Pair("CLINTON", Color.ORANGE) to 2842,
-                Pair("SANDERS", Color.GREEN) to 1865
-            )
+                Pair("SANDERS", Color.GREEN) to 1865,
+            ),
         )
         org.awaitility.Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numBars }, org.hamcrest.core.IsEqual(2))
@@ -64,7 +64,7 @@ class BarFrameBuilderTest {
                         .sortedByDescending { it.value.value }
                         .map { BasicBar(it.key.first, it.key.second, it.value.value, THOUSANDS.format(it.value.value)) }
                         .toList()
-                }
+                },
         )
             .build()
         Assertions.assertEquals(0, frame.numBars.toLong())
@@ -72,8 +72,8 @@ class BarFrameBuilderTest {
         result.submit(
             mapOf(
                 Pair("CLINTON", Color.ORANGE) to Wrapper(2842),
-                Pair("SANDERS", Color.GREEN) to Wrapper(1865)
-            )
+                Pair("SANDERS", Color.GREEN) to Wrapper(1865),
+            ),
         )
         org.awaitility.Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numBars }, org.hamcrest.core.IsEqual(2))
@@ -100,7 +100,7 @@ class BarFrameBuilderTest {
                         .sortedByDescending { it.value }
                         .map { BasicBar(it.key.first, it.key.second, it.value, THOUSANDS.format(it.value)) }
                         .toList()
-                }
+                },
         )
             .withMax(max)
             .build()
@@ -111,8 +111,8 @@ class BarFrameBuilderTest {
         result.submit(
             mapOf(
                 Pair("CLINTON", Color.ORANGE) to 2205,
-                Pair("SANDERS", Color.GREEN) to 1846
-            )
+                Pair("SANDERS", Color.GREEN) to 1846,
+            ),
         )
         org.awaitility.Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.min.toInt() }, org.hamcrest.core.IsEqual(0))
@@ -121,8 +121,8 @@ class BarFrameBuilderTest {
         result.submit(
             mapOf(
                 Pair("CLINTON", Color.ORANGE) to 2842,
-                Pair("SANDERS", Color.GREEN) to 1865
-            )
+                Pair("SANDERS", Color.GREEN) to 1865,
+            ),
         )
         org.awaitility.Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.min.toInt() }, org.hamcrest.core.IsEqual(0))
@@ -155,7 +155,7 @@ class BarFrameBuilderTest {
                         .sortedByDescending { it.value }
                         .map { BasicBar(it.key.first, it.key.second, it.value, THOUSANDS.format(it.value)) }
                         .toList()
-                }
+                },
         )
             .withHeader(header)
             .withSubhead(subhead)
@@ -197,7 +197,7 @@ class BarFrameBuilderTest {
                         .sortedByDescending { it.value }
                         .map { BasicBar(it.key.first, it.key.second, it.value, THOUSANDS.format(it.value)) }
                         .toList()
-                }
+                },
         )
             .withTarget(target) { THOUSANDS.format(it) + " TO WIN" }
             .build()
@@ -218,7 +218,7 @@ class BarFrameBuilderTest {
                         .sortedByDescending { it.value }
                         .map { BasicBar(it.key.first, it.key.second, it.value, THOUSANDS.format(it.value)) }
                         .toList()
-                }
+                },
         )
             .withLines(lines) { it.toString() + " QUOTA" + (if (it == 1) "" else "S") }
             .build()
@@ -249,7 +249,7 @@ class BarFrameBuilderTest {
                         .sortedByDescending { it.value }
                         .map { BasicBar(it.key.first, it.key.second, it.value, THOUSANDS.format(it.value)) }
                         .toList()
-                }
+                },
         )
             .withLines(lines, { it.first }) { it.second }
             .build()
@@ -257,8 +257,8 @@ class BarFrameBuilderTest {
         lines.submit(
             listOf(
                 Pair("The line is here", 1),
-                Pair("and here", 2)
-            )
+                Pair("and here", 2),
+            ),
         )
         org.awaitility.Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numLines }, org.hamcrest.core.IsEqual(2))
@@ -279,7 +279,7 @@ class BarFrameBuilderTest {
                         .sortedByDescending { it.value }
                         .map { BasicBar(it.key.first, it.key.second, it.value, THOUSANDS.format(it.value)) }
                         .toList()
-                }
+                },
         )
             .withLines(lines) { it.toString() + " QUOTA" + (if (it == 1) "" else "S") }
             .build()
@@ -310,7 +310,7 @@ class BarFrameBuilderTest {
                         .sortedByDescending { it.value.first }
                         .map { BasicBar(it.key.first, it.key.second, it.value.first, THOUSANDS.format(it.value.first), if (it.value.second) shape else null) }
                         .toList()
-                }
+                },
         )
             .build()
         Assertions.assertEquals(0, frame.numBars.toLong())
@@ -318,8 +318,8 @@ class BarFrameBuilderTest {
         result.submit(
             mapOf(
                 Pair("CLINTON", Color.ORANGE) to Pair(2842, true),
-                Pair("SANDERS", Color.GREEN) to Pair(1865, false)
-            )
+                Pair("SANDERS", Color.GREEN) to Pair(1865, false),
+            ),
         )
         org.awaitility.Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numBars }, org.hamcrest.core.IsEqual(2))
@@ -345,7 +345,7 @@ class BarFrameBuilderTest {
                         .sortedByDescending { it.value.first }
                         .map { BasicBar(it.key.first, it.key.second, it.value.second, DIFF.format(it.value.second)) }
                         .toList()
-                }
+                },
         )
             .build()
         Assertions.assertEquals(0, frame.numBars.toLong())
@@ -357,8 +357,8 @@ class BarFrameBuilderTest {
                 Pair("NDP", Color.ORANGE) to Pair(24, -20),
                 Pair("BQ", Color.CYAN) to Pair(32, +22),
                 Pair("GRN", Color.GREEN) to Pair(3, +2),
-                Pair("IND", Color.GRAY) to Pair(1, +1)
-            )
+                Pair("IND", Color.GRAY) to Pair(1, +1),
+            ),
         )
         org.awaitility.Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numBars }, org.hamcrest.core.IsEqual(6))
@@ -403,7 +403,7 @@ class BarFrameBuilderTest {
                         .sortedByDescending { it.value.first }
                         .map { BasicBar(it.key.first, it.key.second, it.value.second, DIFF.format(it.value.second)) }
                         .toList()
-                }
+                },
         )
             .withWingspan(range)
             .build()
@@ -418,8 +418,8 @@ class BarFrameBuilderTest {
                 Pair("NDP", Color.ORANGE) to Pair(24, -20),
                 Pair("BQ", Color.CYAN) to Pair(32, +22),
                 Pair("GRN", Color.GREEN) to Pair(3, +2),
-                Pair("IND", Color.GRAY) to Pair(1, +1)
-            )
+                Pair("IND", Color.GRAY) to Pair(1, +1),
+            ),
         )
         org.awaitility.Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.max.toDouble() }, org.hamcrest.core.IsEqual(27.0))
@@ -437,7 +437,7 @@ class BarFrameBuilderTest {
                         .sortedByDescending { it.value.second }
                         .map { DualBar(it.key.first, it.key.second, it.value.first, it.value.second, it.value.first.toString() + "/" + it.value.second) }
                         .toList()
-                }
+                },
         )
             .build()
         Assertions.assertEquals(0, frame.numBars.toLong())
@@ -449,8 +449,8 @@ class BarFrameBuilderTest {
                 Pair("NEW DEMOCRATIC PARTY", Color.ORANGE) to Pair(1, 24),
                 Pair("BLOC QU\u00c9B\u00c9COIS", Color.CYAN) to Pair(0, 32),
                 Pair("GREEN", Color.GREEN) to Pair(1, 3),
-                Pair("INDEPENDENT", Color.GRAY) to Pair(0, 1)
-            )
+                Pair("INDEPENDENT", Color.GRAY) to Pair(0, 1),
+            ),
         )
         org.awaitility.Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numBars }, org.hamcrest.core.IsEqual(6))
@@ -510,7 +510,7 @@ class BarFrameBuilderTest {
                         .sortedByDescending { it.value.second }
                         .map { DualBar(it.key.first, it.key.second, it.value.first, it.value.second, it.value.first.toString() + "/" + it.value.second) }
                         .toList()
-                }
+                },
         )
             .build()
         Assertions.assertEquals(0, frame.numBars.toLong())
@@ -522,8 +522,8 @@ class BarFrameBuilderTest {
                 Pair("NEW DEMOCRATIC PARTY", Color.ORANGE) to Pair(1, 24),
                 Pair("BLOC QU\u00c9B\u00c9COIS", Color.CYAN) to Pair(0, 32),
                 Pair("GREEN", Color.GREEN) to Pair(1, 3),
-                Pair("INDEPENDENT", Color.GRAY) to Pair(0, 1)
-            )
+                Pair("INDEPENDENT", Color.GRAY) to Pair(0, 1),
+            ),
         )
         org.awaitility.Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numBars }, org.hamcrest.core.IsEqual(6))
@@ -583,7 +583,7 @@ class BarFrameBuilderTest {
                         .sortedByDescending { it.value.third }
                         .map { DualBar(it.key.first, it.key.second, it.value.first, it.value.second, """${DIFF.format(it.value.first)}/${DIFF.format(it.value.second)}""") }
                         .toList()
-                }
+                },
         )
             .build()
         Assertions.assertEquals(0, frame.numBars.toLong())
@@ -595,8 +595,8 @@ class BarFrameBuilderTest {
                 Pair("NDP", Color.ORANGE) to Triple(+1, -20, 24),
                 Pair("BQ", Color.CYAN) to Triple(0, +22, 32),
                 Pair("GRN", Color.GREEN) to Triple(+1, +2, 3),
-                Pair("IND", Color.GRAY) to Triple(0, +1, 1)
-            )
+                Pair("IND", Color.GRAY) to Triple(0, +1, 1),
+            ),
         )
         org.awaitility.Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numBars }, org.hamcrest.core.IsEqual(6))
@@ -662,7 +662,7 @@ class BarFrameBuilderTest {
                         .sortedByDescending { it.value.third }
                         .map { DualBar(it.key.first, it.key.second, it.value.first, it.value.second, "(${DIFF.format(it.value.first)})-(${DIFF.format(it.value.second)})") }
                         .toList()
-                }
+                },
         )
             .build()
         Assertions.assertEquals(0, frame.numBars.toLong())
@@ -674,8 +674,8 @@ class BarFrameBuilderTest {
                 Pair("NDP", Color.ORANGE) to Triple(-20, +1, 24),
                 Pair("BQ", Color.CYAN) to Triple(0, +22, 32),
                 Pair("GRN", Color.GREEN) to Triple(+1, +2, 3),
-                Pair("IND", Color.GRAY) to Triple(0, +1, 1)
-            )
+                Pair("IND", Color.GRAY) to Triple(0, +1, 1),
+            ),
         )
         org.awaitility.Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numBars }, org.hamcrest.core.IsEqual(6))
@@ -733,7 +733,7 @@ class BarFrameBuilderTest {
             BasicBar("Yorkshire and the Humber", Color.BLACK, 6),
             BasicBar("Scotland", Color.BLACK, 6),
             BasicBar("Wales", Color.BLACK, 4),
-            BasicBar("Northern Ireland", Color.BLACK, 3)
+            BasicBar("Northern Ireland", Color.BLACK, 3),
         )
         val frame = basic(regions.asOneTimePublisher()).build()
         org.awaitility.Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
@@ -763,7 +763,7 @@ class BarFrameBuilderTest {
             DualBar("Yorkshire and the Humber", Color.BLACK, 50, 54, "54 > 50"),
             DualBar("Scotland", Color.BLACK, 52, 59, "59 > 52"),
             DualBar("Wales", Color.BLACK, 30, 40, "40 > 30"),
-            DualBar("Northern Ireland", Color.BLACK, 16, 18, "18 > 16")
+            DualBar("Northern Ireland", Color.BLACK, 16, 18, "18 > 16"),
         )
         val frame = dual(regions.asOneTimePublisher()).build()
         org.awaitility.Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
@@ -865,8 +865,8 @@ class BarFrameBuilderTest {
         bars.submit(
             listOf(
                 BasicBar("JOE BIDEN", Color.BLUE, 306),
-                BasicBar("DONALD TRUMP", Color.RED, 232)
-            )
+                BasicBar("DONALD TRUMP", Color.RED, 232),
+            ),
         )
         org.awaitility.Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ barFrame.numBars }, org.hamcrest.core.IsEqual(2))
@@ -892,7 +892,7 @@ class BarFrameBuilderTest {
             return Color(
                 128 + color.red / 2,
                 128 + color.green / 2,
-                128 + color.blue / 2
+                128 + color.blue / 2,
             )
         }
     }

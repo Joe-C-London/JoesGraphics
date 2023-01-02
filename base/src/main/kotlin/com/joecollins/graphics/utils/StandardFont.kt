@@ -13,11 +13,11 @@ object StandardFont {
         try {
             KLAVIKA_BOLD = Font.createFont(
                 Font.TRUETYPE_FONT,
-                StandardFont::class.java.classLoader.getResourceAsStream("Klavika Bold.otf")
+                StandardFont::class.java.classLoader.getResourceAsStream("Klavika Bold.otf"),
             )
             KLAVIKA_REGULAR = Font.createFont(
                 Font.TRUETYPE_FONT,
-                StandardFont::class.java.classLoader.getResourceAsStream("Klavika Regular.otf")
+                StandardFont::class.java.classLoader.getResourceAsStream("Klavika Regular.otf"),
             )
         } catch (e: FontFormatException) {
             throw RuntimeException(e)

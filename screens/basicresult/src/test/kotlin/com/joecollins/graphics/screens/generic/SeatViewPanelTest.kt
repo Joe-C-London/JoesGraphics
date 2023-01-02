@@ -39,7 +39,7 @@ class SeatViewPanelTest {
         val panel = partySeats(
             currentSeats,
             seatHeader,
-            seatSubhead
+            seatSubhead,
         )
             .withTotal(totalSeats)
             .withMajorityLine(showMajority) { "$it SEATS FOR MAJORITY" }
@@ -54,7 +54,7 @@ class SeatViewPanelTest {
                 
                 0 OF 650 CONSTITUENCIES DECLARED, PROJECTION: TOO EARLY TO CALL (CHANGE SINCE 2017, CON NEED +9 FOR MAJORITY)
                 326 SEATS FOR MAJORITY
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         currentSeats.submit(mapOf(con to 1))
@@ -70,7 +70,7 @@ class SeatViewPanelTest {
                 CONSERVATIVE: 1 (+1)
                 LABOUR: 0 (-1)
                 326 SEATS FOR MAJORITY
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         currentSeats.submit(mapOf(con to 1, lab to 2))
@@ -86,7 +86,7 @@ class SeatViewPanelTest {
                 LABOUR: 2 (-1)
                 CONSERVATIVE: 1 (+1)
                 326 SEATS FOR MAJORITY
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         val ld = Party("Liberal Democrat", "LD", Color.ORANGE)
@@ -102,8 +102,8 @@ class SeatViewPanelTest {
                 snp to 48,
                 grn to 1,
                 pc to 4,
-                oth to 19
-            )
+                oth to 19,
+            ),
         )
         previousSeats.submit(
             mapOf(
@@ -113,8 +113,8 @@ class SeatViewPanelTest {
                 snp to 35,
                 grn to 1,
                 pc to 4,
-                oth to 19
-            )
+                oth to 19,
+            ),
         )
         seatHeader.submit("650 OF 650 SEATS DECLARED")
         seatSubhead.submit("PROJECTION: CON MAJORITY")
@@ -133,7 +133,7 @@ class SeatViewPanelTest {
                 GREEN: 1 (±0)
                 OTHERS: 19 (±0)
                 326 SEATS FOR MAJORITY
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         header.submit("SCOTLAND")
@@ -155,7 +155,7 @@ class SeatViewPanelTest {
                 CONSERVATIVE: 6 (-7)
                 LIBERAL DEMOCRAT: 4 (±0)
                 LABOUR: 1 (-6)
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -175,7 +175,7 @@ class SeatViewPanelTest {
         val panel = partySeats(
             currentSeats,
             seatHeader,
-            seatSubhead
+            seatSubhead,
         )
             .withTotal(totalSeats)
             .withMajorityLine(showMajority) { "$it SEATS FOR MAJORITY" }
@@ -190,7 +190,7 @@ class SeatViewPanelTest {
                 
                 0 OF 650 CONSTITUENCIES DECLARED, PROJECTION: TOO EARLY TO CALL (CHANGE SINCE 2017, CON NEED +9 FOR MAJORITY)
                 326 SEATS FOR MAJORITY
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         currentSeats.submit(mapOf(con to 1))
@@ -206,7 +206,7 @@ class SeatViewPanelTest {
                 CONSERVATIVE: 1 (+1)
                 LABOUR: 0 (-1)
                 326 SEATS FOR MAJORITY
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         currentSeats.submit(mapOf(con to 1, lab to 2))
@@ -221,7 +221,7 @@ class SeatViewPanelTest {
                 LABOUR: 2 (-1)
                 CONSERVATIVE: 1 (+1)
                 326 SEATS FOR MAJORITY
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         val ld = Party("Liberal Democrat", "LD", Color.ORANGE)
@@ -237,8 +237,8 @@ class SeatViewPanelTest {
                 snp to 48,
                 grn to 1,
                 pc to 4,
-                oth to 19
-            )
+                oth to 19,
+            ),
         )
         seatDiff.submit(
             mapOf(
@@ -248,8 +248,8 @@ class SeatViewPanelTest {
                 snp to +13,
                 grn to 0,
                 pc to 0,
-                oth to 0
-            )
+                oth to 0,
+            ),
         )
         seatHeader.submit("650 OF 650 SEATS DECLARED")
         seatSubhead.submit("PROJECTION: CON MAJORITY")
@@ -268,7 +268,7 @@ class SeatViewPanelTest {
                 GREEN: 1 (±0)
                 OTHERS: 19 (±0)
                 326 SEATS FOR MAJORITY
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         header.submit("SCOTLAND")
@@ -290,7 +290,7 @@ class SeatViewPanelTest {
                 CONSERVATIVE: 6 (-7)
                 LIBERAL DEMOCRAT: 4 (±0)
                 LABOUR: 1 (-6)
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -318,7 +318,7 @@ class SeatViewPanelTest {
         val panel = partySeats(
             currentSeats,
             seatHeader,
-            seatSubhead
+            seatSubhead,
         )
             .withPrev(previousSeats, changeHeader)
             .withTotal(totalSeats)
@@ -336,7 +336,7 @@ class SeatViewPanelTest {
                 326 SEATS FOR MAJORITY
                 
                 SWING SINCE 2017: NOT AVAILABLE
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         currentSeats.submit(mapOf(lab to 1))
@@ -347,8 +347,8 @@ class SeatViewPanelTest {
                 con to 9290,
                 ld to 2709,
                 grn to 1365,
-                oth to 2542
-            )
+                oth to 2542,
+            ),
         )
         previousVotes.submit(
             mapOf(
@@ -356,8 +356,8 @@ class SeatViewPanelTest {
                 con to 9134,
                 ld to 1812,
                 grn to 595,
-                oth to 1482
-            )
+                oth to 1482,
+            ),
         )
         seatHeader.submit("1 OF 650 SEATS DECLARED")
         compareRendering("SeatViewPanel", "Swing-2", panel)
@@ -371,7 +371,7 @@ class SeatViewPanelTest {
                 326 SEATS FOR MAJORITY
                 
                 SWING SINCE 2017: 3.8% SWING LAB TO CON
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -401,7 +401,7 @@ class SeatViewPanelTest {
         val panel = partySeats(
             currentSeats,
             seatHeader,
-            seatSubhead
+            seatSubhead,
         )
             .withPrev(previousSeats, changeHeader)
             .withTotal(totalSeats)
@@ -420,7 +420,7 @@ class SeatViewPanelTest {
                 14 SEATS FOR MAJORITY
                 
                 SWING SINCE 2015: NOT AVAILABLE
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         val winners = mutableMapOf<Int, Party?>()
@@ -442,7 +442,7 @@ class SeatViewPanelTest {
                 14 SEATS FOR MAJORITY
                 
                 SWING SINCE 2015: 3.8% SWING LIB TO PC
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         focus.submit(shapesByDistrict.keys.filter { it <= 7 })
@@ -462,7 +462,7 @@ class SeatViewPanelTest {
                 PROGRESSIVE CONSERVATIVE: 1 (±0)
                 
                 SWING SINCE 2015: 3.8% SWING LIB TO PC
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         winners[8] = pc
@@ -477,7 +477,7 @@ class SeatViewPanelTest {
                 PROGRESSIVE CONSERVATIVE: 1 (±0)
                 
                 SWING SINCE 2015: 3.8% SWING LIB TO PC
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         currentSeats.submit(mapOf(pc to 2))
@@ -498,7 +498,7 @@ class SeatViewPanelTest {
                 LIBERAL: 0 (-1)
                 
                 SWING SINCE 2015: 9.5% SWING LIB TO PC
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         focus.submit(null)
@@ -522,7 +522,7 @@ class SeatViewPanelTest {
                 14 SEATS FOR MAJORITY
                 
                 SWING SINCE 2015: 9.5% SWING LIB TO PC
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         (1..27).forEach { winners.putIfAbsent(it, null) }
@@ -539,7 +539,7 @@ class SeatViewPanelTest {
                 14 SEATS FOR MAJORITY
                 
                 SWING SINCE 2015: 9.5% SWING LIB TO PC
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -562,7 +562,7 @@ class SeatViewPanelTest {
         val panel = partyDualSeats(
             currentSeats,
             seatHeader,
-            seatSubhead
+            seatSubhead,
         )
             .withPrev(previousSeats, changeHeader)
             .withTotal(totalSeats)
@@ -577,19 +577,19 @@ class SeatViewPanelTest {
                 
                 0 OF 338 RIDINGS REPORTING (CHANGE SINCE 2015)
                 170 SEATS FOR MAJORITY
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         currentSeats.submit(
             mapOf(
                 lib to (0 to 6),
-                ndp to (0 to 1)
-            )
+                ndp to (0 to 1),
+            ),
         )
         previousSeats.submit(
             mapOf(
-                lib to (0 to 7)
-            )
+                lib to (0 to 7),
+            ),
         )
         seatHeader.submit("7 OF 338 RIDINGS REPORTING")
         compareRendering("SeatViewPanel", "Dual-2", panel)
@@ -602,7 +602,7 @@ class SeatViewPanelTest {
                 LIBERAL: 0/6 (±0/-1)
                 NEW DEMOCRATIC PARTY: 0/1 (±0/+1)
                 170 SEATS FOR MAJORITY
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         currentSeats.submit(
@@ -610,13 +610,13 @@ class SeatViewPanelTest {
                 lib to (6 to 26),
                 ndp to (1 to 1),
                 con to (0 to 4),
-                grn to (0 to 1)
-            )
+                grn to (0 to 1),
+            ),
         )
         previousSeats.submit(
             mapOf(
-                lib to (7 to 32)
-            )
+                lib to (7 to 32),
+            ),
         )
         seatHeader.submit("32 OF 338 RIDINGS REPORTING")
         compareRendering("SeatViewPanel", "Dual-3", panel)
@@ -631,7 +631,7 @@ class SeatViewPanelTest {
                 NEW DEMOCRATIC PARTY: 1/1 (+1/+1)
                 GREEN: 0/1 (±0/+1)
                 170 SEATS FOR MAJORITY
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         currentSeats.submit(
@@ -640,16 +640,16 @@ class SeatViewPanelTest {
                 ndp to (1 to 13),
                 con to (4 to 104),
                 bq to (0 to 32),
-                grn to (1 to 1)
-            )
+                grn to (1 to 1),
+            ),
         )
         previousSeats.submit(
             mapOf(
                 lib to (32 to 166),
                 ndp to (0 to 30),
                 con to (0 to 89),
-                bq to (0 to 10)
-            )
+                bq to (0 to 10),
+            ),
         )
         seatHeader.submit("295 OF 338 RIDINGS REPORTING")
         compareRendering("SeatViewPanel", "Dual-4", panel)
@@ -665,7 +665,7 @@ class SeatViewPanelTest {
                 NEW DEMOCRATIC PARTY: 1/13 (+1/-17)
                 GREEN: 1/1 (+1/+1)
                 170 SEATS FOR MAJORITY
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         currentSeats.submit(
@@ -675,8 +675,8 @@ class SeatViewPanelTest {
                 con to (104 to 121),
                 bq to (32 to 32),
                 grn to (1 to 3),
-                ind to (0 to 1)
-            )
+                ind to (0 to 1),
+            ),
         )
         previousSeats.submit(
             mapOf(
@@ -684,8 +684,8 @@ class SeatViewPanelTest {
                 ndp to (30 to 44),
                 con to (89 to 99),
                 bq to (10 to 10),
-                grn to (0 to 1)
-            )
+                grn to (0 to 1),
+            ),
         )
         seatHeader.submit("338 OF 338 RIDINGS REPORTING")
         compareRendering("SeatViewPanel", "Dual-5", panel)
@@ -702,7 +702,7 @@ class SeatViewPanelTest {
                 GREEN: 1/3 (+1/+2)
                 INDEPENDENT: 0/1 (±0/+1)
                 170 SEATS FOR MAJORITY
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         currentSeats.submit(
@@ -712,8 +712,8 @@ class SeatViewPanelTest {
                 con to (121 to 121),
                 bq to (32 to 32),
                 grn to (3 to 3),
-                ind to (1 to 1)
-            )
+                ind to (1 to 1),
+            ),
         )
         previousSeats.submit(
             mapOf(
@@ -721,8 +721,8 @@ class SeatViewPanelTest {
                 ndp to (44 to 44),
                 con to (99 to 99),
                 bq to (10 to 10),
-                grn to (1 to 1)
-            )
+                grn to (1 to 1),
+            ),
         )
         seatHeader.submit("338 OF 338 RIDINGS REPORTING")
         compareRendering("SeatViewPanel", "Dual-6", panel)
@@ -739,7 +739,7 @@ class SeatViewPanelTest {
                 GREEN: 3/3 (+2/+2)
                 INDEPENDENT: 1/1 (+1/+1)
                 170 SEATS FOR MAJORITY
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -762,7 +762,7 @@ class SeatViewPanelTest {
         val panel = partyDualSeatsReversed(
             currentSeats,
             seatHeader,
-            seatSubhead
+            seatSubhead,
         )
             .withPrev(previousSeats, changeHeader)
             .withTotal(totalSeats)
@@ -777,19 +777,19 @@ class SeatViewPanelTest {
                 
                 0 OF 338 RIDINGS REPORTING (CHANGE SINCE 2015)
                 170 SEATS FOR MAJORITY
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         currentSeats.submit(
             mapOf(
                 lib to (0 to 6),
-                ndp to (0 to 1)
-            )
+                ndp to (0 to 1),
+            ),
         )
         previousSeats.submit(
             mapOf(
-                lib to (0 to 7)
-            )
+                lib to (0 to 7),
+            ),
         )
         seatHeader.submit("7 OF 338 RIDINGS REPORTING")
         compareRendering("SeatViewPanel", "DualReversed-2", panel)
@@ -802,7 +802,7 @@ class SeatViewPanelTest {
                 LIBERAL: 0/6 (±0/-1)
                 NEW DEMOCRATIC PARTY: 0/1 (±0/+1)
                 170 SEATS FOR MAJORITY
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         currentSeats.submit(
@@ -810,13 +810,13 @@ class SeatViewPanelTest {
                 lib to (6 to 26),
                 ndp to (1 to 1),
                 con to (0 to 4),
-                grn to (0 to 1)
-            )
+                grn to (0 to 1),
+            ),
         )
         previousSeats.submit(
             mapOf(
-                lib to (7 to 32)
-            )
+                lib to (7 to 32),
+            ),
         )
         seatHeader.submit("32 OF 338 RIDINGS REPORTING")
         compareRendering("SeatViewPanel", "DualReversed-3", panel)
@@ -831,7 +831,7 @@ class SeatViewPanelTest {
                 NEW DEMOCRATIC PARTY: 1/1 (+1/+1)
                 GREEN: 0/1 (±0/+1)
                 170 SEATS FOR MAJORITY
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         currentSeats.submit(
@@ -840,16 +840,16 @@ class SeatViewPanelTest {
                 ndp to (1 to 13),
                 con to (4 to 104),
                 bq to (0 to 32),
-                grn to (1 to 1)
-            )
+                grn to (1 to 1),
+            ),
         )
         previousSeats.submit(
             mapOf(
                 lib to (32 to 166),
                 ndp to (0 to 30),
                 con to (0 to 89),
-                bq to (0 to 10)
-            )
+                bq to (0 to 10),
+            ),
         )
         seatHeader.submit("295 OF 338 RIDINGS REPORTING")
         compareRendering("SeatViewPanel", "DualReversed-4", panel)
@@ -865,7 +865,7 @@ class SeatViewPanelTest {
                 NEW DEMOCRATIC PARTY: 1/13 (+1/-17)
                 GREEN: 1/1 (+1/+1)
                 170 SEATS FOR MAJORITY
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         currentSeats.submit(
@@ -875,8 +875,8 @@ class SeatViewPanelTest {
                 con to (104 to 121),
                 bq to (32 to 32),
                 grn to (1 to 3),
-                ind to (0 to 1)
-            )
+                ind to (0 to 1),
+            ),
         )
         previousSeats.submit(
             mapOf(
@@ -884,8 +884,8 @@ class SeatViewPanelTest {
                 ndp to (30 to 44),
                 con to (89 to 99),
                 bq to (10 to 10),
-                grn to (0 to 1)
-            )
+                grn to (0 to 1),
+            ),
         )
         seatHeader.submit("338 OF 338 RIDINGS REPORTING")
         compareRendering("SeatViewPanel", "DualReversed-5", panel)
@@ -902,7 +902,7 @@ class SeatViewPanelTest {
                 GREEN: 1/3 (+1/+2)
                 INDEPENDENT: 0/1 (±0/+1)
                 170 SEATS FOR MAJORITY
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         currentSeats.submit(
@@ -912,8 +912,8 @@ class SeatViewPanelTest {
                 con to (121 to 121),
                 bq to (32 to 32),
                 grn to (3 to 3),
-                ind to (1 to 1)
-            )
+                ind to (1 to 1),
+            ),
         )
         previousSeats.submit(
             mapOf(
@@ -921,8 +921,8 @@ class SeatViewPanelTest {
                 ndp to (44 to 44),
                 con to (99 to 99),
                 bq to (10 to 10),
-                grn to (1 to 1)
-            )
+                grn to (1 to 1),
+            ),
         )
         seatHeader.submit("338 OF 338 RIDINGS REPORTING")
         compareRendering("SeatViewPanel", "DualReversed-6", panel)
@@ -939,7 +939,7 @@ class SeatViewPanelTest {
                 GREEN: 3/3 (+2/+2)
                 INDEPENDENT: 1/1 (+1/+1)
                 170 SEATS FOR MAJORITY
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -962,7 +962,7 @@ class SeatViewPanelTest {
         val panel = partyDualSeats(
             currentSeats,
             seatHeader,
-            seatSubhead
+            seatSubhead,
         )
             .withDiff(seatDiff, changeHeader)
             .withTotal(totalSeats)
@@ -977,20 +977,20 @@ class SeatViewPanelTest {
                 
                 0 OF 338 RIDINGS REPORTING (CHANGE SINCE 2015)
                 170 SEATS FOR MAJORITY
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         currentSeats.submit(
             mapOf(
                 lib to (0 to 6),
-                ndp to (0 to 1)
-            )
+                ndp to (0 to 1),
+            ),
         )
         seatDiff.submit(
             mapOf(
                 lib to (0 to -1),
-                ndp to (0 to +1)
-            )
+                ndp to (0 to +1),
+            ),
         )
         seatHeader.submit("7 OF 338 RIDINGS REPORTING")
         compareRendering("SeatViewPanel", "Dual-2", panel)
@@ -1003,7 +1003,7 @@ class SeatViewPanelTest {
                 LIBERAL: 0/6 (±0/-1)
                 NEW DEMOCRATIC PARTY: 0/1 (±0/+1)
                 170 SEATS FOR MAJORITY
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         currentSeats.submit(
@@ -1011,16 +1011,16 @@ class SeatViewPanelTest {
                 lib to (6 to 26),
                 ndp to (1 to 1),
                 con to (0 to 4),
-                grn to (0 to 1)
-            )
+                grn to (0 to 1),
+            ),
         )
         seatDiff.submit(
             mapOf(
                 lib to (-1 to -6),
                 ndp to (+1 to +1),
                 con to (0 to +4),
-                grn to (0 to +1)
-            )
+                grn to (0 to +1),
+            ),
         )
         seatHeader.submit("32 OF 338 RIDINGS REPORTING")
         compareRendering("SeatViewPanel", "Dual-3", panel)
@@ -1035,7 +1035,7 @@ class SeatViewPanelTest {
                 NEW DEMOCRATIC PARTY: 1/1 (+1/+1)
                 GREEN: 0/1 (±0/+1)
                 170 SEATS FOR MAJORITY
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         currentSeats.submit(
@@ -1044,8 +1044,8 @@ class SeatViewPanelTest {
                 ndp to (1 to 13),
                 con to (4 to 104),
                 bq to (0 to 32),
-                grn to (1 to 1)
-            )
+                grn to (1 to 1),
+            ),
         )
         seatDiff.submit(
             mapOf(
@@ -1053,8 +1053,8 @@ class SeatViewPanelTest {
                 ndp to (+1 to -17),
                 con to (+4 to +15),
                 bq to (0 to +22),
-                grn to (+1 to +1)
-            )
+                grn to (+1 to +1),
+            ),
         )
         seatHeader.submit("295 OF 338 RIDINGS REPORTING")
         compareRendering("SeatViewPanel", "Dual-4", panel)
@@ -1070,7 +1070,7 @@ class SeatViewPanelTest {
                 NEW DEMOCRATIC PARTY: 1/13 (+1/-17)
                 GREEN: 1/1 (+1/+1)
                 170 SEATS FOR MAJORITY
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         currentSeats.submit(
@@ -1080,8 +1080,8 @@ class SeatViewPanelTest {
                 con to (104 to 121),
                 bq to (32 to 32),
                 grn to (1 to 3),
-                ind to (0 to 1)
-            )
+                ind to (0 to 1),
+            ),
         )
         seatDiff.submit(
             mapOf(
@@ -1090,8 +1090,8 @@ class SeatViewPanelTest {
                 con to (+15 to +22),
                 bq to (+22 to +22),
                 grn to (+1 to +2),
-                ind to (0 to +1)
-            )
+                ind to (0 to +1),
+            ),
         )
         seatHeader.submit("338 OF 338 RIDINGS REPORTING")
         compareRendering("SeatViewPanel", "Dual-5", panel)
@@ -1108,7 +1108,7 @@ class SeatViewPanelTest {
                 GREEN: 1/3 (+1/+2)
                 INDEPENDENT: 0/1 (±0/+1)
                 170 SEATS FOR MAJORITY
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         currentSeats.submit(
@@ -1118,8 +1118,8 @@ class SeatViewPanelTest {
                 con to (121 to 121),
                 bq to (32 to 32),
                 grn to (3 to 3),
-                ind to (1 to 1)
-            )
+                ind to (1 to 1),
+            ),
         )
         seatDiff.submit(
             mapOf(
@@ -1128,8 +1128,8 @@ class SeatViewPanelTest {
                 con to (+22 to +22),
                 bq to (+22 to +22),
                 grn to (+2 to +2),
-                ind to (+1 to +1)
-            )
+                ind to (+1 to +1),
+            ),
         )
         seatHeader.submit("338 OF 338 RIDINGS REPORTING")
         compareRendering("SeatViewPanel", "Dual-6", panel)
@@ -1146,7 +1146,7 @@ class SeatViewPanelTest {
                 GREEN: 3/3 (+2/+2)
                 INDEPENDENT: 1/1 (+1/+1)
                 170 SEATS FOR MAJORITY
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -1169,7 +1169,7 @@ class SeatViewPanelTest {
         val panel = partyRangeSeats(
             currentSeats,
             seatHeader,
-            seatSubhead
+            seatSubhead,
         )
             .withPrev(previousSeats, changeHeader)
             .withTotal(totalSeats)
@@ -1184,7 +1184,7 @@ class SeatViewPanelTest {
                 
                 SENATE SEATS (CHANGE SINCE 2013)
                 39 SEATS FOR MAJORITY
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         currentSeats.submit(
@@ -1193,16 +1193,16 @@ class SeatViewPanelTest {
                 alp to 4..4,
                 grn to 0..1,
                 onp to 0..1,
-                oth to 0..2
-            )
+                oth to 0..2,
+            ),
         )
         previousSeats.submit(
             mapOf(
                 lnp to 6,
                 alp to 4,
                 grn to 1,
-                oth to 1
-            )
+                oth to 1,
+            ),
         )
         compareRendering("SeatViewPanel", "Range-2", panel)
         assertPublishes(
@@ -1217,7 +1217,7 @@ class SeatViewPanelTest {
                 ONE NATION PARTY: 0-1 ((±0)-(+1))
                 OTHERS: 0-2 ((-1)-(+1))
                 39 SEATS FOR MAJORITY
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         currentSeats.submit(
@@ -1227,16 +1227,16 @@ class SeatViewPanelTest {
                 grn to 0..2,
                 onp to 1..2,
                 nxt to 0..1,
-                oth to 0..4
-            )
+                oth to 0..4,
+            ),
         )
         previousSeats.submit(
             mapOf(
                 lnp to 12,
                 alp to 8,
                 grn to 2,
-                oth to 2
-            )
+                oth to 2,
+            ),
         )
         compareRendering("SeatViewPanel", "Range-3", panel)
         assertPublishes(
@@ -1252,7 +1252,7 @@ class SeatViewPanelTest {
                 NICK XENOPHON TEAM: 0-1 ((±0)-(+1))
                 OTHERS: 0-4 ((-2)-(+2))
                 39 SEATS FOR MAJORITY
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         currentSeats.submit(
@@ -1262,8 +1262,8 @@ class SeatViewPanelTest {
                 grn to 5..9,
                 onp to 1..4,
                 nxt to 3..3,
-                oth to 1..8
-            )
+                oth to 1..8,
+            ),
         )
         previousSeats.submit(
             mapOf(
@@ -1271,8 +1271,8 @@ class SeatViewPanelTest {
                 alp to 25,
                 grn to 10,
                 nxt to 1,
-                oth to 7
-            )
+                oth to 7,
+            ),
         )
         compareRendering("SeatViewPanel", "Range-4", panel)
         assertPublishes(
@@ -1288,7 +1288,7 @@ class SeatViewPanelTest {
                 ONE NATION PARTY: 1-4 ((+1)-(+4))
                 OTHERS: 1-8 ((-6)-(+1))
                 39 SEATS FOR MAJORITY
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -1311,7 +1311,7 @@ class SeatViewPanelTest {
         val panel = partyRangeSeats(
             currentSeats,
             seatHeader,
-            seatSubhead
+            seatSubhead,
         )
             .withDiff(seatDiff, changeHeader)
             .withTotal(totalSeats)
@@ -1326,7 +1326,7 @@ class SeatViewPanelTest {
                 
                 SENATE SEATS (CHANGE SINCE 2013)
                 39 SEATS FOR MAJORITY
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         currentSeats.submit(
@@ -1335,8 +1335,8 @@ class SeatViewPanelTest {
                 alp to 4..4,
                 grn to 0..1,
                 onp to 0..1,
-                oth to 0..2
-            )
+                oth to 0..2,
+            ),
         )
         seatDiff.submit(
             mapOf(
@@ -1344,8 +1344,8 @@ class SeatViewPanelTest {
                 alp to 0..0,
                 grn to -1..0,
                 onp to 0..+1,
-                oth to -1..+1
-            )
+                oth to -1..+1,
+            ),
         )
         compareRendering("SeatViewPanel", "Range-2", panel)
         assertPublishes(
@@ -1360,7 +1360,7 @@ class SeatViewPanelTest {
                 ONE NATION PARTY: 0-1 ((±0)-(+1))
                 OTHERS: 0-2 ((-1)-(+1))
                 39 SEATS FOR MAJORITY
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         currentSeats.submit(
@@ -1370,8 +1370,8 @@ class SeatViewPanelTest {
                 grn to 0..2,
                 onp to 1..2,
                 nxt to 0..1,
-                oth to 0..4
-            )
+                oth to 0..4,
+            ),
         )
         seatDiff.submit(
             mapOf(
@@ -1380,8 +1380,8 @@ class SeatViewPanelTest {
                 grn to -2..0,
                 onp to +1..+2,
                 nxt to 0..+1,
-                oth to -2..+2
-            )
+                oth to -2..+2,
+            ),
         )
         compareRendering("SeatViewPanel", "Range-3", panel)
         assertPublishes(
@@ -1397,7 +1397,7 @@ class SeatViewPanelTest {
                 NICK XENOPHON TEAM: 0-1 ((±0)-(+1))
                 OTHERS: 0-4 ((-2)-(+2))
                 39 SEATS FOR MAJORITY
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         currentSeats.submit(
@@ -1407,8 +1407,8 @@ class SeatViewPanelTest {
                 grn to 5..9,
                 onp to 1..4,
                 nxt to 3..3,
-                oth to 1..8
-            )
+                oth to 1..8,
+            ),
         )
         seatDiff.submit(
             mapOf(
@@ -1417,8 +1417,8 @@ class SeatViewPanelTest {
                 grn to -5..-1,
                 onp to +1..+4,
                 nxt to +2..+2,
-                oth to -6..+1
-            )
+                oth to -6..+1,
+            ),
         )
         compareRendering("SeatViewPanel", "Range-4", panel)
         assertPublishes(
@@ -1434,7 +1434,7 @@ class SeatViewPanelTest {
                 ONE NATION PARTY: 1-4 ((+1)-(+4))
                 OTHERS: 1-8 ((-6)-(+1))
                 39 SEATS FOR MAJORITY
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -1454,7 +1454,7 @@ class SeatViewPanelTest {
         val panel = candidateSeats(
             currentSeats,
             seatHeader,
-            seatSubhead
+            seatSubhead,
         )
             .withWinner(winner)
             .withPrev(previousSeats, changeHeader)
@@ -1475,7 +1475,7 @@ class SeatViewPanelTest {
                 DONALD TRUMP (GOP): 306 (+100) WINNER
                 HILLARY CLINTON (DEM): 232 (-100)
                 270 ELECTORAL VOTES TO WIN
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         winner.submit(null)
@@ -1489,7 +1489,7 @@ class SeatViewPanelTest {
                 DONALD TRUMP (GOP): 306 (+100)
                 HILLARY CLINTON (DEM): 232 (-100)
                 270 ELECTORAL VOTES TO WIN
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -1507,7 +1507,7 @@ class SeatViewPanelTest {
         val panel = candidateDualSeats(
             currentSeats,
             seatHeader,
-            seatSubhead
+            seatSubhead,
         )
             .withWinner(winner)
             .withPrev(previousSeats, changeHeader)
@@ -1530,7 +1530,7 @@ class SeatViewPanelTest {
                 DONALD TRUMP (GOP): 276/306 (+84/+100) WINNER
                 HILLARY CLINTON (DEM): 218/232 (-84/-100)
                 270 ELECTORAL VOTES TO WIN
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -1551,7 +1551,7 @@ class SeatViewPanelTest {
         val panel = candidateRangeSeats(
             currentSeats,
             seatHeader,
-            seatSubhead
+            seatSubhead,
         )
             .withPrev(previousSeats, changeHeader)
             .withTotal(totalSeats)
@@ -1568,7 +1568,7 @@ class SeatViewPanelTest {
                 HILLARY CLINTON (DEM): 238-368 ((-94)-(+36))
                 DONALD TRUMP (GOP): 170-300 ((-36)-(+94))
                 270 ELECTORAL VOTES TO WIN
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -1586,7 +1586,7 @@ class SeatViewPanelTest {
         val panel = partySeats(
             currentSeats,
             seatHeader,
-            seatSubhead
+            seatSubhead,
         )
             .withPrev(previousSeats, changeHeader)
             .withWinner(winner)
@@ -1609,7 +1609,7 @@ class SeatViewPanelTest {
                 DEMOCRAT: 235 (+41) WINNER
                 REPUBLICAN: 200 (-41)
                 218 SEATS FOR MAJORITY
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -1627,7 +1627,7 @@ class SeatViewPanelTest {
         val panel = partyDualSeats(
             currentSeats,
             seatHeader,
-            seatSubhead
+            seatSubhead,
         )
             .withWinner(winner)
             .withPrev(previousSeats, changeHeader)
@@ -1650,7 +1650,7 @@ class SeatViewPanelTest {
                 DEMOCRAT: 224/235 (+31/+41) WINNER
                 REPUBLICAN: 192/200 (-31/-41)
                 218 SEATS FOR MAJORITY
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -1679,7 +1679,7 @@ class SeatViewPanelTest {
         val panel = partySeats(
             currentSeats,
             seatHeader,
-            seatSubhead
+            seatSubhead,
         )
             .withPrev(previousSeats, changeHeader, changeSubhead)
             .withSwing(currentVotes, previousVotes, compareBy { swingPartyOrder.indexOf(it) }, swingHeader)
@@ -1688,7 +1688,7 @@ class SeatViewPanelTest {
                 winnerByDistrict,
                 focus,
                 additionalHighlight,
-                mapHeader
+                mapHeader,
             )
             .withTotal(7.asOneTimePublisher())
             .build(header)
@@ -1702,7 +1702,7 @@ class SeatViewPanelTest {
                 0 OF 7 RIDINGS REPORTING (CHANGE SINCE 2015)
                 
                 SWING SINCE 2015: NOT AVAILABLE
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -1744,7 +1744,7 @@ class SeatViewPanelTest {
         val panel = partySeats(
             currentSeats,
             seatHeader,
-            seatSubhead
+            seatSubhead,
         )
             .withPrev(previousSeats, changeHeader)
             .withTotal(totalSeats)
@@ -1753,7 +1753,7 @@ class SeatViewPanelTest {
                 currentVotes,
                 previousVotes,
                 compareBy { listOf(nationalists, others, unionists).indexOf(it) },
-                "FIRST PREFERENCE SWING SINCE 2016".asOneTimePublisher()
+                "FIRST PREFERENCE SWING SINCE 2016".asOneTimePublisher(),
             )
             .build(header)
         panel.setSize(1024, 512)
@@ -1768,7 +1768,7 @@ class SeatViewPanelTest {
                 BY DESIGNATION
                 
                 FIRST PREFERENCE SWING SINCE 2016: NOT AVAILABLE
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         currentSeats.submit(
@@ -1781,8 +1781,8 @@ class SeatViewPanelTest {
                 grn to 2,
                 tuv to 1,
                 pbp to 1,
-                indU to 1
-            )
+                indU to 1,
+            ),
         )
         previousSeats.submit(
             mapOf(
@@ -1793,8 +1793,8 @@ class SeatViewPanelTest {
                 apni to 8,
                 grn to 2,
                 tuv to 1,
-                pbp to 1
-            )
+                pbp to 1,
+            ),
         )
         currentVotes.submit(
             mapOf(
@@ -1814,8 +1814,8 @@ class SeatViewPanelTest {
                 wp to 1261,
                 indU to 4918,
                 indN to 1639,
-                indO to 7850
-            )
+                indO to 7850,
+            ),
         )
         previousVotes.submit(
             mapOf(
@@ -1835,8 +1835,8 @@ class SeatViewPanelTest {
                 wp to 1565,
                 indU to 351 + 3270,
                 indN to 0,
-                indO to 224 + 124 + 32 + 19380
-            )
+                indO to 224 + 124 + 32 + 19380,
+            ),
         )
         compareRendering("SeatViewPanel", "PartyClassifications-2", panel)
         assertPublishes(
@@ -1861,7 +1861,7 @@ class SeatViewPanelTest {
                 OTHERS: 11
                 
                 FIRST PREFERENCE SWING SINCE 2016: 4.4% SWING UNIONISTS TO NATIONALISTS
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -1888,8 +1888,8 @@ class SeatViewPanelTest {
                 dpp to 11,
                 reiwa to 3,
                 sdp to 1,
-                ind to 12
-            )
+                ind to 12,
+            ),
         )
         val prev = Publisher(
             mapOf(
@@ -1900,8 +1900,8 @@ class SeatViewPanelTest {
                 jcp to 12,
                 nippon to 11,
                 sdp to 2,
-                ind to 22
-            )
+                ind to 22,
+            ),
         )
         val seatsHeader = Publisher("HOUSE OF REPRESENTATIVES")
         val changeHeader = Publisher("2017 RESULT")
@@ -1943,7 +1943,7 @@ class SeatViewPanelTest {
                 NIPPON: 11
                 SDP: 2
                 233 FOR MAJORITY
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         curr.submit(
@@ -1954,8 +1954,8 @@ class SeatViewPanelTest {
                 komeito to 9,
                 jcp to 1,
                 dpp to 6,
-                sdp to 1
-            )
+                sdp to 1,
+            ),
         )
         prev.submit(
             mapOf(
@@ -1965,8 +1965,8 @@ class SeatViewPanelTest {
                 komeito to 8,
                 jcp to 1,
                 nippon to 3,
-                sdp to 1
-            )
+                sdp to 1,
+            ),
         )
         seatsHeader.submit("CONSTITUENCY SEATS")
         total.submit(289)
@@ -1994,7 +1994,7 @@ class SeatViewPanelTest {
                 NIPPON: 3
                 JCP: 1
                 SDP: 1
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         showPrevRaw.submit(false)
@@ -2014,7 +2014,7 @@ class SeatViewPanelTest {
                 JAPANESE COMMUNIST PARTY: 1 (±0)
                 SOCIAL DEMOCRATIC PARTY: 1 (±0)
                 KIBŌ NO TŌ: 0 (-18)
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         curr.submit(
@@ -2027,8 +2027,8 @@ class SeatViewPanelTest {
                 dpp to 11,
                 reiwa to 3,
                 sdp to 1,
-                ind to 12
-            )
+                ind to 12,
+            ),
         )
         prev.submit(
             mapOf(
@@ -2039,8 +2039,8 @@ class SeatViewPanelTest {
                 jcp to 12,
                 nippon to 11,
                 sdp to 2,
-                ind to 22
-            )
+                ind to 22,
+            ),
         )
         seatsHeader.submit("HOUSE OF REPRESENTATIVES")
         showMajority.submit(true)
@@ -2063,7 +2063,7 @@ class SeatViewPanelTest {
                 SOCIAL DEMOCRATIC PARTY: 1 (-1)
                 KIBŌ NO TŌ: 0 (-50)
                 233 FOR MAJORITY
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         showPrevRaw.submit(true)
@@ -2096,7 +2096,7 @@ class SeatViewPanelTest {
                 NIPPON: 11
                 SDP: 2
                 233 FOR MAJORITY
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -2123,8 +2123,8 @@ class SeatViewPanelTest {
                 dpp to (6 to 11),
                 reiwa to (0 to 3),
                 sdp to (1 to 1),
-                ind to (12 to 12)
-            )
+                ind to (12 to 12),
+            ),
         )
         val prev = Publisher(
             mapOf(
@@ -2135,8 +2135,8 @@ class SeatViewPanelTest {
                 jcp to (1 to 12),
                 nippon to (3 to 11),
                 sdp to (1 to 2),
-                ind to (22 to 22)
-            )
+                ind to (22 to 22),
+            ),
         )
         val seatsHeader = Publisher("HOUSE OF REPRESENTATIVES")
         val seatsSubhead = Publisher("CONSTITUENCIES / TOTAL SEATS")
@@ -2179,7 +2179,7 @@ class SeatViewPanelTest {
                 NIPPON: 3/11
                 SDP: 1/2
                 233 FOR MAJORITY
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         showPrevRaw.submit(false)
@@ -2202,7 +2202,7 @@ class SeatViewPanelTest {
                 SOCIAL DEMOCRATIC PARTY: 1/1 (±0/-1)
                 KIBŌ NO TŌ: 0/0 (-18/-50)
                 233 FOR MAJORITY
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -2229,8 +2229,8 @@ class SeatViewPanelTest {
                 dpp to 5..12,
                 reiwa to 3..3,
                 sdp to 2..2,
-                ind to 4..9
-            )
+                ind to 4..9,
+            ),
         )
         val prev = Publisher(
             mapOf(
@@ -2241,8 +2241,8 @@ class SeatViewPanelTest {
                 jcp to 12,
                 nippon to 11,
                 sdp to 2,
-                ind to 22
-            )
+                ind to 22,
+            ),
         )
         val seatsHeader = Publisher("ASAHI SHIMBUN SEAT PROJECTION")
         val seatsSubhead = Publisher("FIELDWORK: 23-24 OCTOBER 2021")
@@ -2285,7 +2285,7 @@ class SeatViewPanelTest {
                 NIPPON: 11
                 SDP: 2
                 233 FOR MAJORITY
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         showPrevRaw.submit(false)
@@ -2308,7 +2308,7 @@ class SeatViewPanelTest {
                 SOCIAL DEMOCRATIC PARTY: 2-2 ((±0)-(±0))
                 KIBŌ NO TŌ: 0-0 ((-50)-(-50))
                 233 FOR MAJORITY
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -2327,7 +2327,7 @@ class SeatViewPanelTest {
         val panel = partySeats(
             currentSeats,
             seatHeader,
-            seatSubhead
+            seatSubhead,
         )
             .withPrev(previousSeats, changeHeader)
             .withTotal(totalSeats)
@@ -2343,7 +2343,7 @@ class SeatViewPanelTest {
                 
                 SEATS DECLARED [0/650], PROJECTION: TOO EARLY TO CALL (CHANGE SINCE 2017)
                 326 SEATS FOR MAJORITY
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         currentSeats.submit(mapOf(lab to 1))
@@ -2358,7 +2358,7 @@ class SeatViewPanelTest {
                 SEATS DECLARED [1/650], PROJECTION: TOO EARLY TO CALL (CHANGE SINCE 2017)
                 LABOUR: 1 (±0)
                 326 SEATS FOR MAJORITY
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -2374,13 +2374,13 @@ class SeatViewPanelTest {
                 lib to (0 to 5),
                 yp to (0 to 8),
                 ndp to (0 to 2),
-                tie to (0 to 4)
+                tie to (0 to 4),
             ).asOneTimePublisher(),
             "SEATS ELECTED/LEADING".asOneTimePublisher(),
-            "".asOneTimePublisher()
+            "".asOneTimePublisher(),
         ).withPrev(
             mapOf(lib to (0 to 11), yp to (0 to 6), ndp to (0 to 2)).asOneTimePublisher(),
-            "CHANGE SINCE 2016".asOneTimePublisher()
+            "CHANGE SINCE 2016".asOneTimePublisher(),
         ).withTotal(19.asOneTimePublisher())
             .withMajorityLine(true.asOneTimePublisher()) { "$it FOR MAJORITY" }
             .build("YUKON".asOneTimePublisher())
@@ -2397,7 +2397,7 @@ class SeatViewPanelTest {
                 NEW DEMOCRATIC PARTY: 0/2 (±0/±0)
                 TIE: 0/4 (±0/+4)
                 10 FOR MAJORITY
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -2417,21 +2417,21 @@ class SeatViewPanelTest {
             con to 99,
             bq to 54,
             ndp to 19,
-            ind to 1
+            ind to 1,
         )
         val prevSeats = mapOf(
             lib to 172,
             ca to 66,
             bq to 38,
             ndp to 13,
-            pc to 12
+            pc to 12,
         )
         val currVotes = mapOf(
             lib to 4982220,
             con to 4019498,
             bq to 1680109,
             ndp to 2127403,
-            oth to 755472
+            oth to 755472,
         )
         val prevVotes = mapOf(
             lib to 5252031,
@@ -2439,7 +2439,7 @@ class SeatViewPanelTest {
             bq to 1377727,
             ndp to 1093868,
             pc to 1566998,
-            oth to 290220
+            oth to 290220,
         )
         val showPrev = Publisher(false)
         val swingOrder = Comparator.comparing { p: Party -> listOf(ndp, lib, ind, oth, pc, bq, con, ca).indexOf(p) }
@@ -2451,14 +2451,14 @@ class SeatViewPanelTest {
                     prevSeats.asOneTimePublisher(),
                     showPrev.map { if (it) "2000 RESULT" else "CHANGE SINCE 2000" },
                     showPrevRaw = showPrev,
-                    partyChanges = partyChanges
+                    partyChanges = partyChanges,
                 )
                 .withSwing(
                     currVotes.asOneTimePublisher(),
                     prevVotes.asOneTimePublisher(),
                     swingOrder,
                     "SWING SINCE 2000".asOneTimePublisher(),
-                    partyChanges = partyChanges
+                    partyChanges = partyChanges,
                 )
                 .withTotal(308.asOneTimePublisher())
                 .withMajorityLine(true.asOneTimePublisher()) { "$it FOR MAJORITY" }
@@ -2479,7 +2479,7 @@ class SeatViewPanelTest {
                 155 FOR MAJORITY
                 
                 SWING SINCE 2000: 2.0% SWING CON TO LIB
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         showPrev.submit(true)
@@ -2506,7 +2506,7 @@ class SeatViewPanelTest {
                 151 FOR MAJORITY
                 
                 SWING SINCE 2000: 2.0% SWING CON TO LIB
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -2526,21 +2526,21 @@ class SeatViewPanelTest {
             con to (7 to 99),
             bq to (0 to 54),
             ndp to (3 to 19),
-            ind to (0 to 1)
+            ind to (0 to 1),
         )
         val prevSeats = mapOf(
             lib to (19 to 172),
             ca to (0 to 66),
             bq to (0 to 38),
             ndp to (4 to 13),
-            pc to (9 to 12)
+            pc to (9 to 12),
         )
         val currVotes = mapOf(
             lib to 4982220,
             con to 4019498,
             bq to 1680109,
             ndp to 2127403,
-            oth to 755472
+            oth to 755472,
         )
         val prevVotes = mapOf(
             lib to 5252031,
@@ -2548,7 +2548,7 @@ class SeatViewPanelTest {
             bq to 1377727,
             ndp to 1093868,
             pc to 1566998,
-            oth to 290220
+            oth to 290220,
         )
         val showPrev = Publisher(false)
         val swingOrder = Comparator.comparing { p: Party -> listOf(ndp, lib, ind, oth, pc, bq, con, ca).indexOf(p) }
@@ -2560,14 +2560,14 @@ class SeatViewPanelTest {
                     prevSeats.asOneTimePublisher(),
                     showPrev.map { if (it) "2000 RESULT" else "CHANGE SINCE 2000" },
                     showPrevRaw = showPrev,
-                    partyChanges = partyChanges
+                    partyChanges = partyChanges,
                 )
                 .withSwing(
                     currVotes.asOneTimePublisher(),
                     prevVotes.asOneTimePublisher(),
                     swingOrder,
                     "SWING SINCE 2000".asOneTimePublisher(),
-                    partyChanges = partyChanges
+                    partyChanges = partyChanges,
                 )
                 .withTotal(308.asOneTimePublisher())
                 .withMajorityLine(true.asOneTimePublisher()) { "$it FOR MAJORITY" }
@@ -2588,7 +2588,7 @@ class SeatViewPanelTest {
                 155 FOR MAJORITY
                 
                 SWING SINCE 2000: 2.0% SWING CON TO LIB
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         showPrev.submit(true)
@@ -2615,7 +2615,7 @@ class SeatViewPanelTest {
                 151 FOR MAJORITY
                 
                 SWING SINCE 2000: 2.0% SWING CON TO LIB
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -2635,21 +2635,21 @@ class SeatViewPanelTest {
             con to 99..124,
             bq to 51..54,
             ndp to 19..29,
-            ind to 1..1
+            ind to 1..1,
         )
         val prevSeats = mapOf(
             lib to 172,
             ca to 66,
             bq to 38,
             ndp to 13,
-            pc to 12
+            pc to 12,
         )
         val currVotes = mapOf(
             lib to 4982220,
             con to 4019498,
             bq to 1680109,
             ndp to 2127403,
-            oth to 755472
+            oth to 755472,
         )
         val prevVotes = mapOf(
             lib to 5252031,
@@ -2657,7 +2657,7 @@ class SeatViewPanelTest {
             bq to 1377727,
             ndp to 1093868,
             pc to 1566998,
-            oth to 290220
+            oth to 290220,
         )
         val showPrev = Publisher(false)
         val swingOrder = Comparator.comparing { p: Party -> listOf(ndp, lib, ind, oth, pc, bq, con, ca).indexOf(p) }
@@ -2666,20 +2666,20 @@ class SeatViewPanelTest {
         val panel = partyRangeSeats(
             currSeats.asOneTimePublisher(),
             "2004-2006 RESULTS".asOneTimePublisher(),
-            "".asOneTimePublisher()
+            "".asOneTimePublisher(),
         )
             .withPrev(
                 prevSeats.asOneTimePublisher(),
                 showPrev.map { if (it) "2000 RESULT" else "CHANGE SINCE 2000" },
                 showPrevRaw = showPrev,
-                partyChanges = partyChanges
+                partyChanges = partyChanges,
             )
             .withSwing(
                 currVotes.asOneTimePublisher(),
                 prevVotes.asOneTimePublisher(),
                 swingOrder,
                 "SWING SINCE 2000".asOneTimePublisher(),
-                partyChanges = partyChanges
+                partyChanges = partyChanges,
             )
             .withTotal(308.asOneTimePublisher())
             .withMajorityLine(true.asOneTimePublisher()) { "$it FOR MAJORITY" }
@@ -2700,7 +2700,7 @@ class SeatViewPanelTest {
                 155 FOR MAJORITY
                 
                 SWING SINCE 2000: 2.0% SWING CON TO LIB
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         showPrev.submit(true)
@@ -2727,7 +2727,7 @@ class SeatViewPanelTest {
                 151 FOR MAJORITY
                 
                 SWING SINCE 2000: 2.0% SWING CON TO LIB
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 

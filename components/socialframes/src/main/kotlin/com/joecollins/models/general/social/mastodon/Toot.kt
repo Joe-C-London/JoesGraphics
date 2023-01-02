@@ -21,7 +21,7 @@ data class Toot(
     private val card: Card? = null,
     @JsonProperty("media_attachments") private val mediaAttachments: List<MediaAttachment> = emptyList(),
     private val emojis: List<Emoji> = emptyList(),
-    private val poll: Poll? = null
+    private val poll: Poll? = null,
 ) : Post<Toot> {
 
     override val text: String = content

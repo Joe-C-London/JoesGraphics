@@ -44,7 +44,7 @@ class BasicResultLayout : LayoutManager {
         val seatFrameIsAlone = changeFrame == null && swingFrame == null && mapFrame == null
         mainFrame.setSize(
             width * (if (seatFrameIsAlone) 5 else 3) / 5 - 10,
-            height * (if (preferenceFrame == null) 3 else 2) / 3 - 10
+            height * (if (preferenceFrame == null) 3 else 2) / 3 - 10,
         )
         preferenceFrame?.setLocation(5, height * 2 / 3 + 5)
         preferenceFrame?.setSize(width * (if (seatFrameIsAlone) 5 else 3) / 5 - 10, height / 3 - 10)

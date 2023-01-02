@@ -19,7 +19,7 @@ import javax.swing.border.MatteBorder
 
 class SummaryWithoutLabels(
     private val headlinePublisher: Flow.Publisher<out String>,
-    private val entriesPublisher: Flow.Publisher<out List<Entry>>
+    private val entriesPublisher: Flow.Publisher<out List<Entry>>,
 ) : JPanel() {
     private val headlinePanel: HeadlinePanel = HeadlinePanel()
     private val entryPanels: MutableList<EntryPanel> = ArrayList()
@@ -138,8 +138,8 @@ class SummaryWithoutLabels(
                     invalidate()
                     revalidate()
                     repaint()
-                }
-            )
+                },
+            ),
         )
     }
 }

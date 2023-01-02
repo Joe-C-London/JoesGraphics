@@ -9,7 +9,7 @@ object SummaryEntries {
     fun createSeatEntries(seats: Map<out PartyOrCoalition, Int>, totalSeats: Int = 0, partiesToShow: Set<PartyOrCoalition> = emptySet()): List<SummaryEntry> {
         val ret = sequenceOf(
             partiesToShow.asSequence(),
-            seats.entries.asSequence().filter { it.value > 0 }.map { it.key }
+            seats.entries.asSequence().filter { it.value > 0 }.map { it.key },
         )
             .flatten()
             .distinct()
@@ -33,7 +33,7 @@ object SummaryEntries {
                 SummaryEntry(
                     it.key.color,
                     it.key.abbreviation,
-                    DecimalFormat("0.0%").format(it.value / total)
+                    DecimalFormat("0.0%").format(it.value / total),
                 )
             }
             .toMutableList()
@@ -52,7 +52,7 @@ object SummaryEntries {
                 SummaryEntry(
                     it.key.party.color,
                     if (it.key == Candidate.OTHERS) Candidate.OTHERS.party.abbreviation else labelFunc(it.key),
-                    DecimalFormat("0.0%").format(it.value / total)
+                    DecimalFormat("0.0%").format(it.value / total),
                 )
             }
             .toMutableList()

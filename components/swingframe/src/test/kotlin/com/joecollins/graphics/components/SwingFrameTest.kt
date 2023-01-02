@@ -19,7 +19,7 @@ class SwingFrameTest {
             leftColorPublisher = Color.BLUE.asOneTimePublisher(),
             rightColorPublisher = Color.RED.asOneTimePublisher(),
             bottomTextPublisher = "4.7% SWING LIB TO CON".asOneTimePublisher(),
-            bottomColorPublisher = Color.BLUE.asOneTimePublisher()
+            bottomColorPublisher = Color.BLUE.asOneTimePublisher(),
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.getRange() }, IsEqual(10))
@@ -34,7 +34,7 @@ class SwingFrameTest {
             leftColorPublisher = Color.BLUE.asOneTimePublisher(),
             rightColorPublisher = Color.RED.asOneTimePublisher(),
             bottomTextPublisher = "4.7% SWING LIB TO CON".asOneTimePublisher(),
-            bottomColorPublisher = Color.BLUE.asOneTimePublisher()
+            bottomColorPublisher = Color.BLUE.asOneTimePublisher(),
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.getValue() }, IsEqual(3))
@@ -49,7 +49,7 @@ class SwingFrameTest {
             leftColorPublisher = Color.BLUE.asOneTimePublisher(),
             rightColorPublisher = Color.RED.asOneTimePublisher(),
             bottomTextPublisher = "4.7% SWING LIB TO CON".asOneTimePublisher(),
-            bottomColorPublisher = Color.BLUE.asOneTimePublisher()
+            bottomColorPublisher = Color.BLUE.asOneTimePublisher(),
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.getLeftColor() }, IsEqual(Color.BLUE))
@@ -65,7 +65,7 @@ class SwingFrameTest {
             leftColorPublisher = Color.BLUE.asOneTimePublisher(),
             rightColorPublisher = Color.RED.asOneTimePublisher(),
             bottomTextPublisher = "4.7% SWING LIB TO CON".asOneTimePublisher(),
-            bottomColorPublisher = Color.BLUE.asOneTimePublisher()
+            bottomColorPublisher = Color.BLUE.asOneTimePublisher(),
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.getBottomColor() }, IsEqual(Color.BLUE))
@@ -81,7 +81,7 @@ class SwingFrameTest {
             leftColorPublisher = Color.BLUE.asOneTimePublisher(),
             rightColorPublisher = Color.RED.asOneTimePublisher(),
             bottomTextPublisher = "WAITING FOR RESULTS...".asOneTimePublisher(),
-            bottomColorPublisher = Color.BLACK.asOneTimePublisher()
+            bottomColorPublisher = Color.BLACK.asOneTimePublisher(),
         )
         frame.setSize(256, 128)
         compareRendering("SwingFrame", "NoSwing", frame)
@@ -96,7 +96,7 @@ class SwingFrameTest {
             leftColorPublisher = Color.BLUE.asOneTimePublisher(),
             rightColorPublisher = Color.RED.asOneTimePublisher(),
             bottomTextPublisher = "4.7% SWING LIB TO CON".asOneTimePublisher(),
-            bottomColorPublisher = Color.BLUE.asOneTimePublisher()
+            bottomColorPublisher = Color.BLUE.asOneTimePublisher(),
         )
         frame.setSize(256, 128)
         compareRendering("SwingFrame", "SwingRight", frame)
@@ -111,7 +111,7 @@ class SwingFrameTest {
             leftColorPublisher = Color.RED.asOneTimePublisher(),
             rightColorPublisher = Color.ORANGE.asOneTimePublisher(),
             bottomTextPublisher = "1.3% SWING LIB TO NDP".asOneTimePublisher(),
-            bottomColorPublisher = Color.ORANGE.asOneTimePublisher()
+            bottomColorPublisher = Color.ORANGE.asOneTimePublisher(),
         )
         frame.setSize(256, 128)
         compareRendering("SwingFrame", "SwingLeft", frame)
@@ -126,7 +126,7 @@ class SwingFrameTest {
             leftColorPublisher = Color.BLUE.asOneTimePublisher(),
             rightColorPublisher = Color.RED.asOneTimePublisher(),
             bottomTextPublisher = "19.9% SWING LIB TO CON".asOneTimePublisher(),
-            bottomColorPublisher = Color.BLUE.asOneTimePublisher()
+            bottomColorPublisher = Color.BLUE.asOneTimePublisher(),
         )
         frame.setSize(256, 128)
         compareRendering("SwingFrame", "MaxSwingRight", frame)
@@ -141,7 +141,7 @@ class SwingFrameTest {
             leftColorPublisher = Color.RED.asOneTimePublisher(),
             rightColorPublisher = Color.GREEN.asOneTimePublisher(),
             bottomTextPublisher = "21.6% SWING LIB TO GRN".asOneTimePublisher(),
-            bottomColorPublisher = Color.GREEN.asOneTimePublisher()
+            bottomColorPublisher = Color.GREEN.asOneTimePublisher(),
         )
         frame.setSize(256, 128)
         compareRendering("SwingFrame", "MaxSwingLeft", frame)
@@ -156,7 +156,7 @@ class SwingFrameTest {
             leftColorPublisher = Color.BLUE.asOneTimePublisher(),
             rightColorPublisher = Color.RED.asOneTimePublisher(),
             bottomTextPublisher = "VOIX PAS R\u00c9\u00c7US".asOneTimePublisher(),
-            bottomColorPublisher = Color.BLACK.asOneTimePublisher()
+            bottomColorPublisher = Color.BLACK.asOneTimePublisher(),
         )
         frame.setSize(256, 128)
         compareRendering("SwingFrame", "Accents", frame)

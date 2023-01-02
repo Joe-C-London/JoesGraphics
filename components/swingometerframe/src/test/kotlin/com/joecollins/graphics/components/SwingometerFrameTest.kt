@@ -23,7 +23,7 @@ class SwingometerFrameTest {
             leftColorPublisher = Color.BLUE.asOneTimePublisher(),
             rightColorPublisher = Color.RED.asOneTimePublisher(),
             numBucketsPerSidePublisher = 20.asOneTimePublisher(),
-            dotsPublisher = emptyList<SwingometerFrame.Dot>().asOneTimePublisher()
+            dotsPublisher = emptyList<SwingometerFrame.Dot>().asOneTimePublisher(),
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.leftColor }, IsEqual(Color.BLUE))
@@ -40,7 +40,7 @@ class SwingometerFrameTest {
             leftColorPublisher = Color.BLUE.asOneTimePublisher(),
             rightColorPublisher = Color.RED.asOneTimePublisher(),
             numBucketsPerSidePublisher = 20.asOneTimePublisher(),
-            dotsPublisher = emptyList<SwingometerFrame.Dot>().asOneTimePublisher()
+            dotsPublisher = emptyList<SwingometerFrame.Dot>().asOneTimePublisher(),
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.value }, IsEqual(3))
@@ -55,7 +55,7 @@ class SwingometerFrameTest {
             leftColorPublisher = Color.BLUE.asOneTimePublisher(),
             rightColorPublisher = Color.RED.asOneTimePublisher(),
             numBucketsPerSidePublisher = 20.asOneTimePublisher(),
-            dotsPublisher = emptyList<SwingometerFrame.Dot>().asOneTimePublisher()
+            dotsPublisher = emptyList<SwingometerFrame.Dot>().asOneTimePublisher(),
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.range }, IsEqual(10))
@@ -72,7 +72,7 @@ class SwingometerFrameTest {
             rightColorPublisher = Color.RED.asOneTimePublisher(),
             numBucketsPerSidePublisher = 20.asOneTimePublisher(),
             dotsPublisher = emptyList<SwingometerFrame.Dot>().asOneTimePublisher(),
-            ticksPublisher = ticks.map { SwingometerFrame.Tick(it, abs(it).toString()) }.asOneTimePublisher()
+            ticksPublisher = ticks.map { SwingometerFrame.Tick(it, abs(it).toString()) }.asOneTimePublisher(),
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numTicks }, IsEqual(21))
@@ -99,7 +99,7 @@ class SwingometerFrameTest {
             leftToWinPublisher = 3.0.asOneTimePublisher(),
             rightToWinPublisher = (-2.0).asOneTimePublisher(),
             numBucketsPerSidePublisher = 20.asOneTimePublisher(),
-            dotsPublisher = emptyList<SwingometerFrame.Dot>().asOneTimePublisher()
+            dotsPublisher = emptyList<SwingometerFrame.Dot>().asOneTimePublisher(),
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.leftToWin }, IsEqual(3.0))
@@ -112,7 +112,7 @@ class SwingometerFrameTest {
             listOf(
                 Triple(0.0, "50", Color.BLACK),
                 Triple(5.0, "75", Color.RED),
-                Triple(-5.0, "60", Color.BLUE)
+                Triple(-5.0, "60", Color.BLUE),
             )
                 .asOneTimePublisher()
         val frame = SwingometerFrame(
@@ -123,7 +123,7 @@ class SwingometerFrameTest {
             rightColorPublisher = Color.RED.asOneTimePublisher(),
             numBucketsPerSidePublisher = 20.asOneTimePublisher(),
             dotsPublisher = emptyList<SwingometerFrame.Dot>().asOneTimePublisher(),
-            outerLabelsPublisher = labels.mapElements { SwingometerFrame.OuterLabel(it.first, it.second, it.third) }
+            outerLabelsPublisher = labels.mapElements { SwingometerFrame.OuterLabel(it.first, it.second, it.third) },
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numOuterLabels }, IsEqual(3))
@@ -138,8 +138,8 @@ class SwingometerFrameTest {
             listOf(
                 Pair(0.3, Color.BLUE),
                 Pair(-0.7, Color.RED),
-                Pair(2.4, Color.BLACK)
-            )
+                Pair(2.4, Color.BLACK),
+            ),
         )
         val frame = SwingometerFrame(
             headerPublisher = (null as String?).asOneTimePublisher(),
@@ -148,7 +148,7 @@ class SwingometerFrameTest {
             leftColorPublisher = Color.BLUE.asOneTimePublisher(),
             rightColorPublisher = Color.RED.asOneTimePublisher(),
             numBucketsPerSidePublisher = 20.asOneTimePublisher(),
-            dotsPublisher = dots.mapElements { SwingometerFrame.Dot(it.first, it.second) }
+            dotsPublisher = dots.mapElements { SwingometerFrame.Dot(it.first, it.second) },
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numBucketsPerSide }, IsEqual(20))
@@ -163,8 +163,8 @@ class SwingometerFrameTest {
             listOf(
                 Triple(0.3, Color.BLUE, "A"),
                 Triple(-0.7, Color.RED, "B"),
-                Triple(2.4, Color.BLACK, "C")
-            )
+                Triple(2.4, Color.BLACK, "C"),
+            ),
         )
         val frame = SwingometerFrame(
             headerPublisher = (null as String?).asOneTimePublisher(),
@@ -173,7 +173,7 @@ class SwingometerFrameTest {
             leftColorPublisher = Color.BLUE.asOneTimePublisher(),
             rightColorPublisher = Color.RED.asOneTimePublisher(),
             numBucketsPerSidePublisher = 20.asOneTimePublisher(),
-            dotsPublisher = dots.mapElements { SwingometerFrame.Dot(it.first, it.second, it.third) }
+            dotsPublisher = dots.mapElements { SwingometerFrame.Dot(it.first, it.second, it.third) },
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numDots }, IsEqual(3))
@@ -190,8 +190,8 @@ class SwingometerFrameTest {
             listOf(
                 Triple(0.3, Color.BLUE, true),
                 Triple(-0.7, Color.RED, false),
-                Triple(2.4, Color.BLACK, true)
-            )
+                Triple(2.4, Color.BLACK, true),
+            ),
         )
         val frame = SwingometerFrame(
             headerPublisher = (null as String?).asOneTimePublisher(),
@@ -200,7 +200,7 @@ class SwingometerFrameTest {
             leftColorPublisher = Color.BLUE.asOneTimePublisher(),
             rightColorPublisher = Color.RED.asOneTimePublisher(),
             numBucketsPerSidePublisher = 20.asOneTimePublisher(),
-            dotsPublisher = dots.mapElements { SwingometerFrame.Dot(it.first, it.second, solid = it.third) }
+            dotsPublisher = dots.mapElements { SwingometerFrame.Dot(it.first, it.second, solid = it.third) },
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numDots }, IsEqual(3))
@@ -223,8 +223,8 @@ class SwingometerFrameTest {
                 Triple(-8.3, 54, Color.BLUE),
                 Triple(2.85, 55, Color.RED),
                 Triple(4.55, 60, Color.RED),
-                Triple(9.75, 65, Color.RED)
-            )
+                Triple(9.75, 65, Color.RED),
+            ),
         )
         val dots = createSwingometerDotsWithoutLabels()
         val frame = SwingometerFrame(
@@ -240,7 +240,7 @@ class SwingometerFrameTest {
             ticksPublisher = ticks.map { SwingometerFrame.Tick(it, it.toString()) }.asOneTimePublisher(),
             outerLabelsPublisher = outerLabels.mapElements {
                 SwingometerFrame.OuterLabel(it.first, it.second.toString(), it.third)
-            }
+            },
         )
         frame.setSize(1024, 512)
         compareRendering("SwingometerFrame", "Unlabelled", frame)
@@ -257,8 +257,8 @@ class SwingometerFrameTest {
                 Triple(-8.3, 54, Color.BLUE),
                 Triple(2.85, 55, Color.RED),
                 Triple(4.55, 60, Color.RED),
-                Triple(9.75, 65, Color.RED)
-            )
+                Triple(9.75, 65, Color.RED),
+            ),
         )
         val dots = createSwingometerDotsWithoutLabels()
         val frame = SwingometerFrame(
@@ -274,7 +274,7 @@ class SwingometerFrameTest {
             ticksPublisher = ticks.map { SwingometerFrame.Tick(it, it.toString()) }.asOneTimePublisher(),
             outerLabelsPublisher = outerLabels.mapElements {
                 SwingometerFrame.OuterLabel(it.first, it.second.toString(), it.third)
-            }
+            },
         )
         frame.setSize(1024, 512)
         compareRendering("SwingometerFrame", "Unlabelled-TinyDots", frame)
@@ -317,8 +317,8 @@ class SwingometerFrameTest {
                 Triple("MN", +17.30, Color.BLUE),
                 Triple("DE", +18.70, Color.BLUE),
                 Triple("NY", +22.30, Color.BLUE),
-                Triple("VT", +23.05, Color.BLUE)
-            )
+                Triple("VT", +23.05, Color.BLUE),
+            ),
         )
     }
 
@@ -333,8 +333,8 @@ class SwingometerFrameTest {
                 Triple(-7.895, 450, Color.BLUE),
                 Triple(2.68, 270, Color.RED),
                 Triple(5.075, 350, Color.RED),
-                Triple(8.665, 400, Color.RED)
-            )
+                Triple(8.665, 400, Color.RED),
+            ),
         )
         val dots = createSwingometerDotsWithLabels()
         val frame = SwingometerFrame(
@@ -352,7 +352,7 @@ class SwingometerFrameTest {
             ticksPublisher = ticks.map { SwingometerFrame.Tick(it, it.toString()) }.asOneTimePublisher(),
             outerLabelsPublisher = outerLabels.mapElements {
                 SwingometerFrame.OuterLabel(it.first, it.second.toString(), it.third)
-            }
+            },
         )
         frame.setSize(1024, 512)
         compareRendering("SwingometerFrame", "Labels", frame)
@@ -369,8 +369,8 @@ class SwingometerFrameTest {
                 Triple(-7.895, 450, Color.BLUE),
                 Triple(2.68, 270, Color.RED),
                 Triple(5.075, 350, Color.RED),
-                Triple(8.665, 400, Color.RED)
-            )
+                Triple(8.665, 400, Color.RED),
+            ),
         )
         val dots = createSwingometerDotsWithLabels()
         val frame = SwingometerFrame(
@@ -387,13 +387,13 @@ class SwingometerFrameTest {
                     it.second,
                     it.third,
                     label = it.first.second.toString(),
-                    solid = it.second > -5 && it.second < 0
+                    solid = it.second > -5 && it.second < 0,
                 )
             },
             ticksPublisher = ticks.map { SwingometerFrame.Tick(it, it.toString()) }.asOneTimePublisher(),
             outerLabelsPublisher = outerLabels.mapElements {
                 SwingometerFrame.OuterLabel(it.first, it.second.toString(), it.third)
-            }
+            },
         )
         frame.setSize(1024, 512)
         compareRendering("SwingometerFrame", "EmptyDots", frame)
@@ -409,8 +409,8 @@ class SwingometerFrameTest {
                 Triple(-7.895, 450, Color.BLUE),
                 Triple(2.68, 270, Color.RED),
                 Triple(5.075, 350, Color.RED),
-                Triple(8.665, 400, Color.RED)
-            )
+                Triple(8.665, 400, Color.RED),
+            ),
         )
         val dots = Publisher(emptyList<SwingometerFrame.Dot>())
         val range = Publisher(10)
@@ -435,7 +435,7 @@ class SwingometerFrameTest {
             ticksPublisher = ticks.mapElements { SwingometerFrame.Tick(it, it.toString()) },
             outerLabelsPublisher = outerLabels.mapElements {
                 SwingometerFrame.OuterLabel(it.first, it.second.toString(), it.third)
-            }
+            },
         )
         frame.setSize(1024, 512)
         compareRendering("SwingometerFrame", "BeyondBoundary-1", frame)
@@ -451,8 +451,8 @@ class SwingometerFrameTest {
                 Triple(7.895, 450, Color.BLUE),
                 Triple(-2.68, 270, Color.RED),
                 Triple(-5.075, 350, Color.RED),
-                Triple(-8.665, 400, Color.RED)
-            )
+                Triple(-8.665, 400, Color.RED),
+            ),
         )
         leftToWin.submit(2.68)
         rightToWin.submit(-2.68)
@@ -523,8 +523,8 @@ class SwingometerFrameTest {
                 Triple(Pair("NY", 29), +14.09, Color.BLUE),
                 Triple(Pair("VT", 3), +17.80, Color.BLUE),
                 Triple(Pair("HI", 4), +21.355, Color.BLUE),
-                Triple(Pair("DC", 3), +46.815, Color.BLUE)
-            )
+                Triple(Pair("DC", 3), +46.815, Color.BLUE),
+            ),
         )
     }
 
@@ -539,8 +539,8 @@ class SwingometerFrameTest {
                 Triple(-7.895, 450, Color.BLUE),
                 Triple(2.68, 270, Color.RED),
                 Triple(5.075, 350, Color.RED),
-                Triple(8.665, 400, Color.RED)
-            )
+                Triple(8.665, 400, Color.RED),
+            ),
         )
         val dots = createSwingometerDotsWithLabels()
         val frame = SwingometerFrame(
@@ -560,13 +560,13 @@ class SwingometerFrameTest {
                         it.first.first.replace("-".toRegex(), "\n-")
                     } else {
                         "${it.first.first}\n(${it.first.second})"
-                    }
+                    },
                 )
             },
             ticksPublisher = ticks.map { SwingometerFrame.Tick(it, it.toString()) }.asOneTimePublisher(),
             outerLabelsPublisher = outerLabels.mapElements {
                 SwingometerFrame.OuterLabel(it.first, it.second.toString(), it.third)
-            }
+            },
         )
         frame.setSize(1024, 512)
         compareRendering("SwingometerFrame", "MultiLineLabels", frame)

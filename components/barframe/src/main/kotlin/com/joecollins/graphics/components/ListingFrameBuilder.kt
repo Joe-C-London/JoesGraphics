@@ -34,7 +34,7 @@ class ListingFrameBuilder {
             headerPublisher = headerPublisher ?: (null as String?).asOneTimePublisher(),
             subheadTextPublisher = subheadTextPublisher,
             notesPublisher = notesPublisher,
-            barsPublisher = barsPublisher ?: emptyList<BarFrame.Bar>().asOneTimePublisher()
+            barsPublisher = barsPublisher ?: emptyList<BarFrame.Bar>().asOneTimePublisher(),
         )
     }
 
@@ -44,7 +44,7 @@ class ListingFrameBuilder {
             list: Flow.Publisher<out List<T>>,
             leftTextFunc: (T) -> String,
             rightTextFunc: (T) -> String,
-            colorFunc: (T) -> Color
+            colorFunc: (T) -> Color,
         ): ListingFrameBuilder {
             val builder = ListingFrameBuilder()
             builder.barsPublisher = list.map { l ->
@@ -59,7 +59,7 @@ class ListingFrameBuilder {
             list: List<T>,
             leftTextFunc: (T) -> Flow.Publisher<out String>,
             rightTextFunc: (T) -> Flow.Publisher<out String>,
-            colorFunc: (T) -> Flow.Publisher<out Color>
+            colorFunc: (T) -> Flow.Publisher<out Color>,
         ): ListingFrameBuilder {
             val builder = ListingFrameBuilder()
             builder.barsPublisher =

@@ -21,19 +21,19 @@ class RegionSummaryFrameTest {
                     listOf(
                         Pair(Color.BLUE, "306"),
                         Pair(Color.BLUE, "<< 74"),
-                        Pair(Color.RED, "232")
-                    )
+                        Pair(Color.RED, "232"),
+                    ),
                 ),
                 RegionSummaryFrame.Section(
                     "POPULAR VOTE",
                     listOf(
                         Pair(Color.BLUE, "51.1%"),
                         Pair(Color.BLUE, "<< 1.0%"),
-                        Pair(Color.RED, "47.2%")
-                    )
-                )
+                        Pair(Color.RED, "47.2%"),
+                    ),
+                ),
             )
-                .asOneTimePublisher()
+                .asOneTimePublisher(),
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.getNumSections() }, IsEqual(2))
@@ -51,9 +51,9 @@ class RegionSummaryFrameTest {
             sectionsPublisher =
             listOf(
                 RegionSummaryFrame.SectionWithoutColor("ELECTORAL VOTES", listOf("306", "+74")),
-                RegionSummaryFrame.SectionWithoutColor("POPULAR VOTE", listOf("51.1%", "+1.0%"))
+                RegionSummaryFrame.SectionWithoutColor("POPULAR VOTE", listOf("51.1%", "+1.0%")),
             )
-                .asOneTimePublisher()
+                .asOneTimePublisher(),
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.getNumSections() }, IsEqual(2))
@@ -74,19 +74,19 @@ class RegionSummaryFrameTest {
                     listOf(
                         Pair(Color.BLUE, "306"),
                         Pair(Color.BLUE, "<< 74"),
-                        Pair(Color.RED, "232")
-                    )
+                        Pair(Color.RED, "232"),
+                    ),
                 ),
                 RegionSummaryFrame.Section(
                     "POPULAR VOTE",
                     listOf(
                         Pair(Color.BLUE, "51.1%"),
                         Pair(Color.BLUE, "<< 1.0%"),
-                        Pair(Color.RED, "47.2%")
-                    )
-                )
+                        Pair(Color.RED, "47.2%"),
+                    ),
+                ),
             )
-                .asOneTimePublisher()
+                .asOneTimePublisher(),
         )
         frame.setSize(500, 500)
         compareRendering("RegionSummaryFrame", "DifferentColors", frame)
@@ -100,9 +100,9 @@ class RegionSummaryFrameTest {
             sectionsPublisher =
             listOf(
                 RegionSummaryFrame.SectionWithoutColor("ELECTORAL VOTES", listOf("306", "+74")),
-                RegionSummaryFrame.SectionWithoutColor("POPULAR VOTE", listOf("51.1%", "+1.0%"))
+                RegionSummaryFrame.SectionWithoutColor("POPULAR VOTE", listOf("51.1%", "+1.0%")),
             )
-                .asOneTimePublisher()
+                .asOneTimePublisher(),
         )
         frame.setSize(125, 125)
         compareRendering("RegionSummaryFrame", "SameColor", frame)
@@ -115,9 +115,9 @@ class RegionSummaryFrameTest {
             summaryColorPublisher = Color.RED.asOneTimePublisher(),
             sectionsPublisher =
             listOf(
-                RegionSummaryFrame.SectionWithoutColor("SEATS", listOf("157", "-20"))
+                RegionSummaryFrame.SectionWithoutColor("SEATS", listOf("157", "-20")),
             )
-                .asOneTimePublisher()
+                .asOneTimePublisher(),
         )
         frame.setSize(125, 125)
         compareRendering("RegionSummaryFrame", "SingleEntry", frame)

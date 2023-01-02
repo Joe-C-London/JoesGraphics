@@ -20,14 +20,14 @@ class CountdownFrameTest {
         val frame = CountdownFrame(
             headerPublisher = "".asOneTimePublisher(),
             timePublisher = ZonedDateTime.of(2020, 7, 5, 19, 0, 0, 0, ZoneId.of("US/Eastern")).asOneTimePublisher(),
-            labelFunc = { CountdownFrame.formatDDHHMMSS(it) }
+            labelFunc = { CountdownFrame.formatDDHHMMSS(it) },
         )
         frame.clock = Clock.fixed(Instant.parse("2020-07-04T12:34:56Z"), ZoneId.of("UTC"))
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.getTimeRemaining().toDays() }, IsEqual(1L))
         Assertions.assertEquals(
             Duration.ofDays(1).plusHours(10).plusMinutes(25).plusSeconds(4),
-            frame.getTimeRemaining()
+            frame.getTimeRemaining(),
         )
     }
 
@@ -36,7 +36,7 @@ class CountdownFrameTest {
         val frame = CountdownFrame(
             headerPublisher = "".asOneTimePublisher(),
             timePublisher = ZonedDateTime.of(2020, 7, 5, 19, 0, 0, 0, ZoneId.of("US/Eastern")).asOneTimePublisher(),
-            labelFunc = { CountdownFrame.formatMMSS(it) }
+            labelFunc = { CountdownFrame.formatMMSS(it) },
         )
         frame.clock = Clock.fixed(Instant.parse("2020-07-04T12:34:56Z"), ZoneId.of("UTC"))
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
@@ -48,7 +48,7 @@ class CountdownFrameTest {
         val frame = CountdownFrame(
             headerPublisher = "".asOneTimePublisher(),
             timePublisher = ZonedDateTime.of(2020, 7, 5, 19, 0, 0, 0, ZoneId.of("US/Eastern")).asOneTimePublisher(),
-            labelFunc = { CountdownFrame.formatDDHHMMSS(it) }
+            labelFunc = { CountdownFrame.formatDDHHMMSS(it) },
         )
         frame.clock = Clock.fixed(Instant.parse("2020-07-04T12:34:56Z"), ZoneId.of("UTC"))
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
@@ -66,7 +66,7 @@ class CountdownFrameTest {
             headerPublisher = "".asOneTimePublisher(),
             timePublisher = ZonedDateTime.of(2020, 7, 5, 19, 0, 0, 0, ZoneId.of("US/Eastern")).asOneTimePublisher(),
             labelFunc = { CountdownFrame.formatDDHHMMSS(it) },
-            additionalInfoPublisher = "ADDITIONAL INFO".asOneTimePublisher()
+            additionalInfoPublisher = "ADDITIONAL INFO".asOneTimePublisher(),
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.getAdditionalInfo() }, IsEqual("ADDITIONAL INFO"))
@@ -78,7 +78,7 @@ class CountdownFrameTest {
             headerPublisher = "".asOneTimePublisher(),
             timePublisher = ZonedDateTime.of(2020, 7, 5, 19, 0, 0, 0, ZoneId.of("US/Eastern")).asOneTimePublisher(),
             labelFunc = { CountdownFrame.formatDDHHMMSS(it) },
-            countdownColorPublisher = Color.RED.asOneTimePublisher()
+            countdownColorPublisher = Color.RED.asOneTimePublisher(),
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.getCountdownColor() }, IsEqual(Color.RED))
@@ -91,7 +91,7 @@ class CountdownFrameTest {
             timePublisher = ZonedDateTime.of(2021, 1, 20, 12, 0, 0, 0, ZoneId.of("US/Eastern")).asOneTimePublisher(),
             labelFunc = { CountdownFrame.formatDDHHMMSS(it) },
             borderColorPublisher = Color.RED.asOneTimePublisher(),
-            countdownColorPublisher = Color.RED.asOneTimePublisher()
+            countdownColorPublisher = Color.RED.asOneTimePublisher(),
         )
         frame.clock = Clock.fixed(Instant.parse("2020-07-04T19:41:10Z"), ZoneId.of("UTC"))
         frame.setSize(200, 100)
@@ -104,7 +104,7 @@ class CountdownFrameTest {
             headerPublisher = "1ST POLLS CLOSE".asOneTimePublisher(),
             timePublisher = ZonedDateTime.of(2020, 11, 3, 23, 0, 0, 0, ZoneId.of("UTC")).asOneTimePublisher(),
             labelFunc = { CountdownFrame.formatDDHHMMSS(it) },
-            additionalInfoPublisher = "IN/KY".asOneTimePublisher()
+            additionalInfoPublisher = "IN/KY".asOneTimePublisher(),
         )
         frame.clock = Clock.fixed(Instant.parse("2020-07-04T19:41:10Z"), ZoneId.of("UTC"))
         frame.setSize(200, 100)

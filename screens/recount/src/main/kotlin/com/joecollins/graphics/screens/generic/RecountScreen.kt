@@ -21,7 +21,7 @@ class RecountScreen private constructor(headerLabel: Flow.Publisher<out String?>
             candidateVotes: Flow.Publisher<out Map<T, Map<Candidate, Int>>>,
             rowHeaderFunc: (T) -> String,
             voteThreshold: Int,
-            header: Flow.Publisher<out String>
+            header: Flow.Publisher<out String>,
         ): Builder<T> {
             return Builder(header, candidateVotes, rowHeaderFunc, voteThreshold = voteThreshold)
         }
@@ -30,7 +30,7 @@ class RecountScreen private constructor(headerLabel: Flow.Publisher<out String?>
             candidateVotes: Flow.Publisher<out Map<T, Map<Candidate, Int>>>,
             rowHeaderFunc: (T) -> String,
             pctThreshold: Double,
-            header: Flow.Publisher<out String>
+            header: Flow.Publisher<out String>,
         ): Builder<T> {
             return Builder(header, candidateVotes, rowHeaderFunc, pctThreshold = pctThreshold)
         }
@@ -62,7 +62,7 @@ class RecountScreen private constructor(headerLabel: Flow.Publisher<out String?>
                             it.value,
                             pctReporting?.get(it.key) ?: 1.0,
                             voteThreshold,
-                            pctThreshold
+                            pctThreshold,
                         )
                     }
                     .filter { it.votes.values.sum() > 0 }
@@ -79,7 +79,7 @@ class RecountScreen private constructor(headerLabel: Flow.Publisher<out String?>
         val votes: Map<Candidate, Int>,
         val pctReporting: Double?,
         voteThreshold: Int?,
-        val pctThreshold: Double?
+        val pctThreshold: Double?,
     ) {
         val topCandidates: List<Map.Entry<Candidate, Int>> = votes.entries
             .sortedByDescending { it.value }
@@ -102,7 +102,7 @@ class RecountScreen private constructor(headerLabel: Flow.Publisher<out String?>
         private val candidateVotes: Flow.Publisher<out Map<T, Map<Candidate, Int>>>,
         private val rowHeaderFunc: (T) -> String,
         private val voteThreshold: Int? = null,
-        private val pctThreshold: Double? = null
+        private val pctThreshold: Double? = null,
     ) {
 
         private var pctReporting: Flow.Publisher<out Map<T, Double>>? = null
@@ -139,7 +139,7 @@ class RecountScreen private constructor(headerLabel: Flow.Publisher<out String?>
                     voteThreshold != null -> "Automatic recount triggered if the margin is $voteThreshold votes or fewer"
                     pctThreshold != null -> "Automatic recount triggered if the margin is ${pctFormatter.format(pctThreshold)} or less"
                     else -> null
-                }.asOneTimePublisher()
+                }.asOneTimePublisher(),
             )
         }
     }

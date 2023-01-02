@@ -20,32 +20,32 @@ class RegionSummaryFrame private constructor(
     headerPublisher: Flow.Publisher<out String>,
     sectionsPublisher: Flow.Publisher<out List<Section>>,
     summaryColorPublisher: Flow.Publisher<out Color>,
-    borderColorPublisher: Flow.Publisher<out Color>? = null
+    borderColorPublisher: Flow.Publisher<out Color>? = null,
 ) : GraphicsFrame(
     headerPublisher = headerPublisher,
-    borderColorPublisher = borderColorPublisher
+    borderColorPublisher = borderColorPublisher,
 ) {
     constructor(
         headerPublisher: Flow.Publisher<out String>,
         sectionsPublisher: Flow.Publisher<out List<SectionWithoutColor>>,
-        summaryColorPublisher: Flow.Publisher<out Color>
+        summaryColorPublisher: Flow.Publisher<out Color>,
     ) : this(
         headerPublisher,
         sectionsPublisher.merge(summaryColorPublisher) { sections, color ->
             sections.map { s -> Section(s.header, s.value.map { Pair(color, it) }) }
         },
         summaryColorPublisher,
-        summaryColorPublisher
+        summaryColorPublisher,
     )
 
     constructor(
         headerPublisher: Flow.Publisher<out String>,
-        sectionsPublisher: Flow.Publisher<out List<Section>>
+        sectionsPublisher: Flow.Publisher<out List<Section>>,
     ) : this(
         headerPublisher,
         sectionsPublisher,
         Color.BLACK.asOneTimePublisher(),
-        Color.BLACK.asOneTimePublisher()
+        Color.BLACK.asOneTimePublisher(),
     )
 
     private val centralPanel: JPanel = JPanel()
@@ -121,7 +121,7 @@ class RegionSummaryFrame private constructor(
             (g as Graphics2D)
                 .setRenderingHint(
                     RenderingHints.KEY_TEXT_ANTIALIASING,
-                    RenderingHints.VALUE_TEXT_ANTIALIAS_ON
+                    RenderingHints.VALUE_TEXT_ANTIALIAS_ON,
                 )
             var valueFont: Font
             val startFontSize = 61.coerceAtMost(height * 2 / 3 - 9)
@@ -140,7 +140,7 @@ class RegionSummaryFrame private constructor(
                 g.drawString(
                     value,
                     (width / values.size - valueWidth) / 2 + width / values.size * i,
-                    height / 3 + (startFontSize + fontSize) / 2
+                    height / 3 + (startFontSize + fontSize) / 2,
                 )
                 valueFonts.add(fontSize)
             }

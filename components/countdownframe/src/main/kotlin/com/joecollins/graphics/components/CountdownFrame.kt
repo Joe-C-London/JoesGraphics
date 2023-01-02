@@ -25,10 +25,10 @@ class CountdownFrame(
     private val labelFunc: (Duration) -> String,
     borderColorPublisher: Flow.Publisher<out Color>? = null,
     additionalInfoPublisher: Flow.Publisher<out String?>? = null,
-    countdownColorPublisher: Flow.Publisher<out Color>? = null
+    countdownColorPublisher: Flow.Publisher<out Color>? = null,
 ) : GraphicsFrame(
     headerPublisher = headerPublisher,
-    borderColorPublisher = borderColorPublisher
+    borderColorPublisher = borderColorPublisher,
 ) {
 
     var clock: Clock = Clock.systemDefaultZone()
@@ -96,7 +96,7 @@ class CountdownFrame(
             { this.refresh() },
             0,
             100,
-            TimeUnit.MILLISECONDS
+            TimeUnit.MILLISECONDS,
         )
     }
 
@@ -130,7 +130,7 @@ class CountdownFrame(
                 duration.toHours() / 24,
                 duration.toHours() % 24,
                 duration.toMinutesPart(),
-                duration.toSecondsPart()
+                duration.toSecondsPart(),
             )
         }
 
@@ -139,7 +139,7 @@ class CountdownFrame(
                 "%d:%02d:%02d",
                 duration.toHours(),
                 duration.toMinutesPart(),
-                duration.toSecondsPart()
+                duration.toSecondsPart(),
             )
         }
 

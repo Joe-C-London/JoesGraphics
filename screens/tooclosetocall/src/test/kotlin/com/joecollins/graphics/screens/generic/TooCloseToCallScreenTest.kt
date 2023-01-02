@@ -28,7 +28,7 @@ class TooCloseToCallScreenTest {
             { candidateVotes.map { v -> v[it] ?: emptyMap() } },
             { partyResults.map { v -> v[it] } },
             { "DISTRICT $it".asOneTimePublisher() },
-            "TOO CLOSE TO CALL".asOneTimePublisher()
+            "TOO CLOSE TO CALL".asOneTimePublisher(),
         )
             .build("PRINCE EDWARD ISLAND".asOneTimePublisher())
         screen.setSize(1024, 512)
@@ -40,7 +40,7 @@ class TooCloseToCallScreenTest {
                 
                 TOO CLOSE TO CALL
                 (empty)
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         setupFirstAdvancePoll(candidateVotesRaw, partyResultsRaw, HashMap(), HashMap())
@@ -54,7 +54,7 @@ class TooCloseToCallScreenTest {
                 
                 TOO CLOSE TO CALL
                 DISTRICT 1: PC: 684; LIB: 467; LEAD: 217
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         setupAllAdvancePolls(candidateVotesRaw, partyResultsRaw, HashMap(), HashMap())
@@ -87,7 +87,7 @@ class TooCloseToCallScreenTest {
                 DISTRICT 2: PC: 555; GRN: 308; LEAD: 247
                 DISTRICT 10: LIB: 808; GRN: 516; LEAD: 292
                 DISTRICT 16: LIB: 983; GRN: 542; LEAD: 441
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         setupHalfOfPolls(candidateVotesRaw, partyResultsRaw, HashMap(), HashMap())
@@ -111,7 +111,7 @@ class TooCloseToCallScreenTest {
                 DISTRICT 9: PC: 807; GRN: 533; LEAD: 274
                 DISTRICT 6: PC: 995; LIB: 684; LEAD: 311
                 DISTRICT 16: LIB: 1,286; GRN: 819; LEAD: 467
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         setupFullResults(candidateVotesRaw, partyResultsRaw, HashMap(), HashMap())
@@ -125,7 +125,7 @@ class TooCloseToCallScreenTest {
                 
                 TOO CLOSE TO CALL
                 (empty)
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -142,7 +142,7 @@ class TooCloseToCallScreenTest {
             { candidateVotes.map { v -> v[it] ?: emptyMap() } },
             { partyResults.map { v -> v[it] } },
             { "DISTRICT $it".asOneTimePublisher() },
-            "TOO CLOSE TO CALL".asOneTimePublisher()
+            "TOO CLOSE TO CALL".asOneTimePublisher(),
         )
             .withPctReporting { pctReporting.map { p -> p[it] ?: 0.0 } }
             .build("PRINCE EDWARD ISLAND".asOneTimePublisher())
@@ -155,7 +155,7 @@ class TooCloseToCallScreenTest {
                 
                 TOO CLOSE TO CALL
                 (empty)
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         setupFirstAdvancePoll(candidateVotesRaw, partyResultsRaw, pctReportingRaw, HashMap())
@@ -170,7 +170,7 @@ class TooCloseToCallScreenTest {
                 
                 TOO CLOSE TO CALL
                 DISTRICT 1: PC: 684; LIB: 467; LEAD: 217; 10.0% IN
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         setupAllAdvancePolls(candidateVotesRaw, partyResultsRaw, pctReportingRaw, HashMap())
@@ -203,7 +203,7 @@ class TooCloseToCallScreenTest {
                 DISTRICT 27: LIB: 646; PC: 405; LEAD: 241; 10.0% IN
                 DISTRICT 2: PC: 555; GRN: 308; LEAD: 247; 10.0% IN
                 (...)
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         setupHalfOfPolls(candidateVotesRaw, partyResultsRaw, pctReportingRaw, HashMap())
@@ -228,7 +228,7 @@ class TooCloseToCallScreenTest {
                 DISTRICT 9: PC: 807; GRN: 533; LEAD: 274; 45.5% IN
                 DISTRICT 6: PC: 995; LIB: 684; LEAD: 311; 55.6% IN
                 DISTRICT 16: LIB: 1,286; GRN: 819; LEAD: 467; 50.0% IN
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         setupFullResults(candidateVotesRaw, partyResultsRaw, pctReportingRaw, HashMap())
@@ -243,7 +243,7 @@ class TooCloseToCallScreenTest {
                 
                 TOO CLOSE TO CALL
                 (empty)
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -260,7 +260,7 @@ class TooCloseToCallScreenTest {
             { candidateVotes.map { v -> v[it] ?: emptyMap() } },
             { partyResults.map { v -> v[it] } },
             { "DISTRICT $it".asOneTimePublisher() },
-            "TOO CLOSE TO CALL".asOneTimePublisher()
+            "TOO CLOSE TO CALL".asOneTimePublisher(),
         )
             .withPollsReporting { pollsReporting.map { p -> p[it] ?: PollsReporting(0, 0) } }
             .build("PRINCE EDWARD ISLAND".asOneTimePublisher())
@@ -273,7 +273,7 @@ class TooCloseToCallScreenTest {
                 
                 TOO CLOSE TO CALL
                 (empty)
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         setupFirstAdvancePoll(candidateVotesRaw, partyResultsRaw, HashMap(), pollsReportingRaw)
@@ -288,7 +288,7 @@ class TooCloseToCallScreenTest {
                 
                 TOO CLOSE TO CALL
                 DISTRICT 1: PC: 684; LIB: 467; LEAD: 217; 1/10
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         setupAllAdvancePolls(candidateVotesRaw, partyResultsRaw, HashMap(), pollsReportingRaw)
@@ -322,7 +322,7 @@ class TooCloseToCallScreenTest {
                 DISTRICT 2: PC: 555; GRN: 308; LEAD: 247; 1/10
                 DISTRICT 10: LIB: 808; GRN: 516; LEAD: 292; 1/10
                 DISTRICT 16: LIB: 983; GRN: 542; LEAD: 441; 1/10
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         setupHalfOfPolls(candidateVotesRaw, partyResultsRaw, HashMap(), pollsReportingRaw)
@@ -347,7 +347,7 @@ class TooCloseToCallScreenTest {
                 DISTRICT 9: PC: 807; GRN: 533; LEAD: 274; 5/11
                 DISTRICT 6: PC: 995; LIB: 684; LEAD: 311; 5/9
                 DISTRICT 16: LIB: 1,286; GRN: 819; LEAD: 467; 5/10
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         setupFullResults(candidateVotesRaw, partyResultsRaw, HashMap(), pollsReportingRaw)
@@ -362,7 +362,7 @@ class TooCloseToCallScreenTest {
                 
                 TOO CLOSE TO CALL
                 (empty)
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -379,7 +379,7 @@ class TooCloseToCallScreenTest {
             { candidateVotes.map { v -> v[it] ?: emptyMap() } },
             { partyResults.map { v -> v[it] } },
             { "DISTRICT $it".asOneTimePublisher() },
-            "TOO CLOSE TO CALL".asOneTimePublisher()
+            "TOO CLOSE TO CALL".asOneTimePublisher(),
         )
             .withPctReporting { pctReporting.map { p -> p[it] ?: 0.0 } }
             .withMaxRows(15.asOneTimePublisher())
@@ -393,7 +393,7 @@ class TooCloseToCallScreenTest {
                 
                 TOO CLOSE TO CALL
                 (empty)
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         setupFirstAdvancePoll(candidateVotesRaw, partyResultsRaw, pctReportingRaw, HashMap())
@@ -408,7 +408,7 @@ class TooCloseToCallScreenTest {
                 
                 TOO CLOSE TO CALL
                 DISTRICT 1: PC: 684; LIB: 467; LEAD: 217; 10.0% IN
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         setupAllAdvancePolls(candidateVotesRaw, partyResultsRaw, pctReportingRaw, HashMap())
@@ -437,7 +437,7 @@ class TooCloseToCallScreenTest {
                 DISTRICT 6: PC: 725; LIB: 526; LEAD: 199; 11.1% IN
                 DISTRICT 14: LIB: 699; PC: 492; LEAD: 207; 10.0% IN
                 DISTRICT 1: PC: 684; LIB: 467; LEAD: 217; 10.0% IN
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         setupHalfOfPolls(candidateVotesRaw, partyResultsRaw, pctReportingRaw, HashMap())
@@ -462,7 +462,7 @@ class TooCloseToCallScreenTest {
                 DISTRICT 9: PC: 807; GRN: 533; LEAD: 274; 45.5% IN
                 DISTRICT 6: PC: 995; LIB: 684; LEAD: 311; 55.6% IN
                 DISTRICT 16: LIB: 1,286; GRN: 819; LEAD: 467; 50.0% IN
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         setupFullResults(candidateVotesRaw, partyResultsRaw, pctReportingRaw, HashMap())
@@ -477,7 +477,7 @@ class TooCloseToCallScreenTest {
                 
                 TOO CLOSE TO CALL
                 (empty)
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -494,7 +494,7 @@ class TooCloseToCallScreenTest {
             { candidateVotes.map { v -> v[it] ?: emptyMap() } },
             { partyResults.map { v -> v[it] } },
             { "DISTRICT $it".asOneTimePublisher() },
-            "TOO CLOSE TO CALL".asOneTimePublisher()
+            "TOO CLOSE TO CALL".asOneTimePublisher(),
         )
             .withPctReporting { pctReporting.map { p -> p[it] ?: 0.0 } }
             .withNumberOfCandidates(5.asOneTimePublisher())
@@ -508,7 +508,7 @@ class TooCloseToCallScreenTest {
                 
                 TOO CLOSE TO CALL
                 (empty)
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         setupFirstAdvancePoll(candidateVotesRaw, partyResultsRaw, pctReportingRaw, HashMap())
@@ -523,7 +523,7 @@ class TooCloseToCallScreenTest {
                 
                 TOO CLOSE TO CALL
                 DISTRICT 1: PC: 684; LIB: 467; GRN: 365; LEAD: 217; 10.0% IN
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         setupAllAdvancePolls(candidateVotesRaw, partyResultsRaw, pctReportingRaw, HashMap())
@@ -551,7 +551,7 @@ class TooCloseToCallScreenTest {
                 DISTRICT 13: LIB: 717; GRN: 542; PC: 331; NDP: 75; LEAD: 175; 10.0% IN
                 DISTRICT 6: PC: 725; LIB: 526; GRN: 348; NDP: 17; LEAD: 199; 11.1% IN
                 (...)
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         setupHalfOfPolls(candidateVotesRaw, partyResultsRaw, pctReportingRaw, HashMap())
@@ -576,7 +576,7 @@ class TooCloseToCallScreenTest {
                 DISTRICT 9: PC: 807; GRN: 533; LIB: 492; NDP: 38; LEAD: 274; 45.5% IN
                 DISTRICT 6: PC: 995; LIB: 684; GRN: 578; NDP: 25; LEAD: 311; 55.6% IN
                 DISTRICT 16: LIB: 1,286; GRN: 819; NDP: 652; PC: 431; LEAD: 467; 50.0% IN
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         setupFullResults(candidateVotesRaw, partyResultsRaw, pctReportingRaw, HashMap())
@@ -591,7 +591,7 @@ class TooCloseToCallScreenTest {
                 
                 TOO CLOSE TO CALL
                 (empty)
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -606,7 +606,7 @@ class TooCloseToCallScreenTest {
             { candidateVotes.map { v -> Aggregators.adjustKey(v[it] ?: emptyMap()) { c -> c.party } } },
             { partyResults.map { v -> v[it] } },
             { "DISTRICT $it".asOneTimePublisher() },
-            "TOO CLOSE TO CALL".asOneTimePublisher()
+            "TOO CLOSE TO CALL".asOneTimePublisher(),
         )
             .build("PRINCE EDWARD ISLAND".asOneTimePublisher())
         screen.setSize(1024, 512)
@@ -618,7 +618,7 @@ class TooCloseToCallScreenTest {
                 
                 TOO CLOSE TO CALL
                 (empty)
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         setupFirstAdvancePoll(candidateVotesRaw, partyResultsRaw, HashMap(), HashMap())
@@ -632,7 +632,7 @@ class TooCloseToCallScreenTest {
                 
                 TOO CLOSE TO CALL
                 DISTRICT 1: PC: 684; LIB: 467; LEAD: 217
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         setupAllAdvancePolls(candidateVotesRaw, partyResultsRaw, HashMap(), HashMap())
@@ -665,7 +665,7 @@ class TooCloseToCallScreenTest {
                 DISTRICT 2: PC: 555; GRN: 308; LEAD: 247
                 DISTRICT 10: LIB: 808; GRN: 516; LEAD: 292
                 DISTRICT 16: LIB: 983; GRN: 542; LEAD: 441
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         setupHalfOfPolls(candidateVotesRaw, partyResultsRaw, HashMap(), HashMap())
@@ -689,7 +689,7 @@ class TooCloseToCallScreenTest {
                 DISTRICT 9: PC: 807; GRN: 533; LEAD: 274
                 DISTRICT 6: PC: 995; LIB: 684; LEAD: 311
                 DISTRICT 16: LIB: 1,286; GRN: 819; LEAD: 467
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         setupFullResults(candidateVotesRaw, partyResultsRaw, HashMap(), HashMap())
@@ -703,7 +703,7 @@ class TooCloseToCallScreenTest {
                 
                 TOO CLOSE TO CALL
                 (empty)
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -719,7 +719,7 @@ class TooCloseToCallScreenTest {
             { candidateVotes.map { v -> Aggregators.adjustKey(v[it] ?: emptyMap()) { c -> c.party } } },
             { partyResults.map { v -> v[it] } },
             { "DISTRICT $it".asOneTimePublisher() },
-            "TOO CLOSE TO CALL".asOneTimePublisher()
+            "TOO CLOSE TO CALL".asOneTimePublisher(),
         )
             .build("PRINCE EDWARD ISLAND".asOneTimePublisher())
         screen.setSize(1024, 512)
@@ -731,7 +731,7 @@ class TooCloseToCallScreenTest {
                 
                 TOO CLOSE TO CALL
                 (empty)
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         setupFirstAdvancePoll(candidateVotesRaw, partyResultsRaw, HashMap(), HashMap())
@@ -745,7 +745,7 @@ class TooCloseToCallScreenTest {
                 
                 TOO CLOSE TO CALL
                 DISTRICT 1: PC: 684; LIB: 467; LEAD: 217
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         setupAllAdvancePolls(candidateVotesRaw, partyResultsRaw, HashMap(), HashMap())
@@ -778,7 +778,7 @@ class TooCloseToCallScreenTest {
                 DISTRICT 2: PC: 555; GRN: 308; LEAD: 247
                 DISTRICT 10: LIB: 808; GRN: 516; LEAD: 292
                 DISTRICT 16: LIB: 983; GRN: 542; LEAD: 441
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         setupHalfOfPolls(candidateVotesRaw, partyResultsRaw, HashMap(), HashMap())
@@ -802,7 +802,7 @@ class TooCloseToCallScreenTest {
                 DISTRICT 9: PC: 807; GRN: 533; LEAD: 274
                 DISTRICT 6: PC: 995; LIB: 684; LEAD: 311
                 DISTRICT 16: LIB: 1,286; GRN: 819; LEAD: 467
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         setupFullResults(candidateVotesRaw, partyResultsRaw, HashMap(), HashMap())
@@ -816,7 +816,7 @@ class TooCloseToCallScreenTest {
                 
                 TOO CLOSE TO CALL
                 (empty)
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -824,12 +824,12 @@ class TooCloseToCallScreenTest {
         candidateVotes: MutableMap<Int, Map<Candidate, Int>>,
         partyResults: MutableMap<Int, R>,
         pctReporting: MutableMap<Int, Double>,
-        pollsReporting: MutableMap<Int, PollsReporting>
+        pollsReporting: MutableMap<Int, PollsReporting>,
     ) {
         candidateVotes[1] = mapOf(
             Candidate("Tommy Kickham", lib) to 467,
             Candidate("Colin Lavie", pc) to 684,
-            Candidate("Boyd Leard", grn) to 365
+            Candidate("Boyd Leard", grn) to 365,
         )
         partyResults[1] = leading(pc) as R
         pctReporting[1] = 1.0 / 10
@@ -840,12 +840,12 @@ class TooCloseToCallScreenTest {
         candidateVotes: MutableMap<Int, Map<Candidate, Int>>,
         partyResults: MutableMap<Int, R>,
         pctReporting: MutableMap<Int, Double>,
-        pollsReporting: MutableMap<Int, PollsReporting>
+        pollsReporting: MutableMap<Int, PollsReporting>,
     ) {
         candidateVotes[1] = mapOf(
             Candidate("Tommy Kickham", lib) to 467,
             Candidate("Colin Lavie", pc) to 684,
-            Candidate("Boyd Leard", grn) to 365
+            Candidate("Boyd Leard", grn) to 365,
         )
         partyResults[1] = leading(pc) as R
         pctReporting[1] = 1.0 / 10
@@ -854,7 +854,7 @@ class TooCloseToCallScreenTest {
             Candidate("Kevin Doyle", lib) to 288,
             Candidate("Susan Hartley", grn) to 308,
             Candidate("Steven Myers", pc) to 555,
-            Candidate("Edith Perry", ndp) to 23
+            Candidate("Edith Perry", ndp) to 23,
         )
         partyResults[2] = leading(pc) as R
         pctReporting[2] = 1.0 / 10
@@ -863,7 +863,7 @@ class TooCloseToCallScreenTest {
             Candidate("Billy Cann", ndp) to 78,
             Candidate("Cory Deagle", pc) to 872,
             Candidate("Daphne Griffin", lib) to 451,
-            Candidate("John Allen Maclean", grn) to 289
+            Candidate("John Allen Maclean", grn) to 289,
         )
         partyResults[3] = elected(pc) as R
         pctReporting[3] = 1.0 / 9
@@ -871,7 +871,7 @@ class TooCloseToCallScreenTest {
         candidateVotes[4] = mapOf(
             Candidate("Darlene Compton", pc) to 588,
             Candidate("Ian MacPherson", lib) to 240,
-            Candidate("James Sanders", grn) to 232
+            Candidate("James Sanders", grn) to 232,
         )
         partyResults[4] = elected(pc) as R
         pctReporting[4] = 1.0 / 10
@@ -880,7 +880,7 @@ class TooCloseToCallScreenTest {
             Candidate("Michele Beaton", grn) to 482,
             Candidate("Randy Cooper", lib) to 518,
             Candidate("Mary Ellen McInnis", pc) to 533,
-            Candidate("Lawrence Millar", ndp) to 18
+            Candidate("Lawrence Millar", ndp) to 18,
         )
         partyResults[5] = leading(pc) as R
         pctReporting[5] = 1.0 / 8
@@ -889,7 +889,7 @@ class TooCloseToCallScreenTest {
             Candidate("James Aylward", pc) to 725,
             Candidate("David Dunphy", lib) to 526,
             Candidate("Devon Strang", grn) to 348,
-            Candidate("Lynne Thiele", ndp) to 17
+            Candidate("Lynne Thiele", ndp) to 17,
         )
         partyResults[6] = leading(pc) as R
         pctReporting[6] = 1.0 / 9
@@ -898,7 +898,7 @@ class TooCloseToCallScreenTest {
             Candidate("Margaret Andrade", ndp) to 12,
             Candidate("Kyle MacDonald", grn) to 184,
             Candidate("Sidney MacEwan", pc) to 610,
-            Candidate("Susan Myers", lib) to 203
+            Candidate("Susan Myers", lib) to 203,
         )
         partyResults[7] = elected(pc) as R
         pctReporting[7] = 1.0 / 11
@@ -907,7 +907,7 @@ class TooCloseToCallScreenTest {
             Candidate("Sarah Donald", grn) to 285,
             Candidate("Wade MacLauchlan", lib) to 620,
             Candidate("Bloyce Thompson", pc) to 609,
-            Candidate("Marian White", ndp) to 22
+            Candidate("Marian White", ndp) to 22,
         )
         partyResults[8] = leading(lib) as R
         pctReporting[8] = 1.0 / 10
@@ -916,7 +916,7 @@ class TooCloseToCallScreenTest {
             Candidate("John Andrew", grn) to 363,
             Candidate("Gordon Gay", ndp) to 19,
             Candidate("Natalie Jameson", pc) to 620,
-            Candidate("Karen Lavers", lib) to 395
+            Candidate("Karen Lavers", lib) to 395,
         )
         partyResults[9] = leading(pc) as R
         pctReporting[9] = 1.0 / 11
@@ -925,7 +925,7 @@ class TooCloseToCallScreenTest {
             Candidate("Mike Gillis", pc) to 510,
             Candidate("Robert Mitchell", lib) to 808,
             Candidate("Amanda Morrison", grn) to 516,
-            Candidate("Jesse Reddin Cousins", ndp) to 27
+            Candidate("Jesse Reddin Cousins", ndp) to 27,
         )
         partyResults[10] = leading(lib) as R
         pctReporting[10] = 1.0 / 10
@@ -934,7 +934,7 @@ class TooCloseToCallScreenTest {
             Candidate("Hannah Bell", grn) to 636,
             Candidate("Ronnie Carragher", pc) to 595,
             Candidate("Roxanne Carter-Thompson", lib) to 534,
-            Candidate("Trevor Leclerc", ndp) to 36
+            Candidate("Trevor Leclerc", ndp) to 36,
         )
         partyResults[11] = leading(grn) as R
         pctReporting[11] = 1.0 / 10
@@ -943,7 +943,7 @@ class TooCloseToCallScreenTest {
             Candidate("Karla Bernard", grn) to 475,
             Candidate("Richard Brown", lib) to 478,
             Candidate("Joe Byrne", ndp) to 172,
-            Candidate("Tim Keizer", pc) to 352
+            Candidate("Tim Keizer", pc) to 352,
         )
         partyResults[12] = leading(lib) as R
         pctReporting[12] = 1.0 / 10
@@ -952,7 +952,7 @@ class TooCloseToCallScreenTest {
             Candidate("Jordan Brown", lib) to 717,
             Candidate("Ole Hammarlund", grn) to 542,
             Candidate("Donna Hurry", pc) to 331,
-            Candidate("Simone Webster", ndp) to 75
+            Candidate("Simone Webster", ndp) to 75,
         )
         partyResults[13] = leading(lib) as R
         pctReporting[13] = 1.0 / 10
@@ -962,7 +962,7 @@ class TooCloseToCallScreenTest {
             Candidate("Bush Dumville", ind) to 131,
             Candidate("Gavin Hall", grn) to 437,
             Candidate("Gord MacNeilly", lib) to 699,
-            Candidate("Janis Newman", ndp) to 34
+            Candidate("Janis Newman", ndp) to 34,
         )
         partyResults[14] = leading(lib) as R
         pctReporting[14] = 1.0 / 10
@@ -971,7 +971,7 @@ class TooCloseToCallScreenTest {
             Candidate("Greg Bradley", grn) to 287,
             Candidate("Leah-Jane Hayward", ndp) to 27,
             Candidate("Dennis King", pc) to 583,
-            Candidate("Windsor Wight", lib) to 425
+            Candidate("Windsor Wight", lib) to 425,
         )
         partyResults[15] = leading(pc) as R
         pctReporting[15] = 1.0 / 10
@@ -980,7 +980,7 @@ class TooCloseToCallScreenTest {
             Candidate("Elaine Barnes", pc) to 296,
             Candidate("Ellen Jones", grn) to 542,
             Candidate("Heath MacDonald", lib) to 983,
-            Candidate("Craig Nash", ndp) to 425
+            Candidate("Craig Nash", ndp) to 425,
         )
         partyResults[16] = leading(lib) as R
         pctReporting[16] = 1.0 / 10
@@ -989,7 +989,7 @@ class TooCloseToCallScreenTest {
             Candidate("Peter Bevan-Baker", grn) to 851,
             Candidate("Kris Currie", pc) to 512,
             Candidate("Judy MacNevin", lib) to 290,
-            Candidate("Don Wills", ind) to 7
+            Candidate("Don Wills", ind) to 7,
         )
         partyResults[17] = elected(grn) as R
         pctReporting[17] = 1.0 / 10
@@ -998,7 +998,7 @@ class TooCloseToCallScreenTest {
             Candidate("Sean Deagle", ndp) to 15,
             Candidate("Colin Jeffrey", grn) to 271,
             Candidate("Sandy MacKay", lib) to 196,
-            Candidate("Brad Trivers", pc) to 710
+            Candidate("Brad Trivers", pc) to 710,
         )
         partyResults[18] = elected(pc) as R
         pctReporting[18] = 1.0 / 10
@@ -1008,7 +1008,7 @@ class TooCloseToCallScreenTest {
             Candidate("Joan Gauvin", ndp) to 7,
             Candidate("Matthew MacFarlane", grn) to 311,
             Candidate("Fred McCardle", ind) to 18,
-            Candidate("Jamie Stride", lib) to 167
+            Candidate("Jamie Stride", lib) to 167,
         )
         partyResults[19] = elected(pc) as R
         pctReporting[19] = 1.0 / 10
@@ -1017,7 +1017,7 @@ class TooCloseToCallScreenTest {
             Candidate("Nancy Beth Guptill", lib) to 203,
             Candidate("Carole MacFarlane", ndp) to 21,
             Candidate("Matthew MacKay", pc) to 1166,
-            Candidate("Matthew J. MacKay", grn) to 342
+            Candidate("Matthew J. MacKay", grn) to 342,
         )
         partyResults[20] = elected(pc) as R
         pctReporting[20] = 1.0 / 10
@@ -1026,7 +1026,7 @@ class TooCloseToCallScreenTest {
             Candidate("Tyler Desroches", pc) to 577,
             Candidate("Paulette Halupa", ndp) to 18,
             Candidate("Lynne Lund", grn) to 617,
-            Candidate("Chris Palmer", lib) to 563
+            Candidate("Chris Palmer", lib) to 563,
         )
         partyResults[21] = leading(grn) as R
         pctReporting[21] = 1.0 / 10
@@ -1035,7 +1035,7 @@ class TooCloseToCallScreenTest {
             Candidate("Steve Howard", grn) to 602,
             Candidate("Tina Mundy", lib) to 560,
             Candidate("Garth Oatway", ndp) to 34,
-            Candidate("Paul Walsh", pc) to 335
+            Candidate("Paul Walsh", pc) to 335,
         )
         partyResults[22] = leading(grn) as R
         pctReporting[22] = 1.0 / 10
@@ -1044,7 +1044,7 @@ class TooCloseToCallScreenTest {
             Candidate("Trish Altass", grn) to 428,
             Candidate("Paula Biggar", lib) to 379,
             Candidate("Robin John Robert Ednman", ndp) to 34,
-            Candidate("Holton A MacLennan", pc) to 436
+            Candidate("Holton A MacLennan", pc) to 436,
         )
         partyResults[23] = leading(grn) as R
         pctReporting[23] = 1.0 / 10
@@ -1053,7 +1053,7 @@ class TooCloseToCallScreenTest {
             Candidate("Nick Arsenault", grn) to 197,
             Candidate("Sonny Gallant", lib) to 330,
             Candidate("Grant Gallant", ndp) to 14,
-            Candidate("Jaosn Woodbury", pc) to 144
+            Candidate("Jaosn Woodbury", pc) to 144,
         )
         partyResults[24] = leading(lib) as R
         pctReporting[24] = 1.0 / 8
@@ -1062,7 +1062,7 @@ class TooCloseToCallScreenTest {
             Candidate("Barb Broome", pc) to 177,
             Candidate("Jason Charette", grn) to 62,
             Candidate("Dr. Herb Dickieson", ndp) to 425,
-            Candidate("Robert Henderson", lib) to 454
+            Candidate("Robert Henderson", lib) to 454,
         )
         partyResults[25] = leading(lib) as R
         pctReporting[25] = 1.0 / 11
@@ -1071,7 +1071,7 @@ class TooCloseToCallScreenTest {
             Candidate("Michelle Arsenault", ndp) to 47,
             Candidate("Ernie Hudson", pc) to 700,
             Candidate("James McKenna", grn) to 122,
-            Candidate("Pat Murphy", lib) to 686
+            Candidate("Pat Murphy", lib) to 686,
         )
         partyResults[26] = leading(pc) as R
         pctReporting[26] = 1.0 / 10
@@ -1080,7 +1080,7 @@ class TooCloseToCallScreenTest {
             Candidate("Sean Doyle", grn) to 241,
             Candidate("Melissa Handrahan", pc) to 405,
             Candidate("Hal Perry", lib) to 646,
-            Candidate("Dale Ryan", ndp) to 18
+            Candidate("Dale Ryan", ndp) to 18,
         )
         partyResults[27] = leading(lib) as R
         pctReporting[27] = 1.0 / 10
@@ -1091,12 +1091,12 @@ class TooCloseToCallScreenTest {
         candidateVotes: MutableMap<Int, Map<Candidate, Int>>,
         partyResults: MutableMap<Int, R>,
         pctReporting: MutableMap<Int, Double>,
-        pollsReporting: MutableMap<Int, PollsReporting>
+        pollsReporting: MutableMap<Int, PollsReporting>,
     ) {
         candidateVotes[1] = mapOf(
             Candidate("Tommy Kickham", lib) to 619,
             Candidate("Colin Lavie", pc) to 982,
-            Candidate("Boyd Leard", grn) to 577
+            Candidate("Boyd Leard", grn) to 577,
         )
         partyResults[1] = elected(pc) as R
         pctReporting[1] = 5.0 / 10
@@ -1105,7 +1105,7 @@ class TooCloseToCallScreenTest {
             Candidate("Kevin Doyle", lib) to 438,
             Candidate("Susan Hartley", grn) to 571,
             Candidate("Steven Myers", pc) to 1164,
-            Candidate("Edith Perry", ndp) to 34
+            Candidate("Edith Perry", ndp) to 34,
         )
         partyResults[2] = elected(pc) as R
         pctReporting[2] = 5.0 / 10
@@ -1114,7 +1114,7 @@ class TooCloseToCallScreenTest {
             Candidate("Billy Cann", ndp) to 93,
             Candidate("Cory Deagle", pc) to 1115,
             Candidate("Daphne Griffin", lib) to 606,
-            Candidate("John Allen Maclean", grn) to 468
+            Candidate("John Allen Maclean", grn) to 468,
         )
         partyResults[3] = elected(pc) as R
         pctReporting[3] = 5.0 / 9
@@ -1122,7 +1122,7 @@ class TooCloseToCallScreenTest {
         candidateVotes[4] = mapOf(
             Candidate("Darlene Compton", pc) to 1028,
             Candidate("Ian MacPherson", lib) to 415,
-            Candidate("James Sanders", grn) to 498
+            Candidate("James Sanders", grn) to 498,
         )
         partyResults[4] = elected(pc) as R
         pctReporting[4] = 5.0 / 10
@@ -1131,7 +1131,7 @@ class TooCloseToCallScreenTest {
             Candidate("Michele Beaton", grn) to 871,
             Candidate("Randy Cooper", lib) to 742,
             Candidate("Mary Ellen McInnis", pc) to 743,
-            Candidate("Lawrence Millar", ndp) to 31
+            Candidate("Lawrence Millar", ndp) to 31,
         )
         partyResults[5] = leading(grn) as R
         pctReporting[5] = 5.0 / 8
@@ -1140,7 +1140,7 @@ class TooCloseToCallScreenTest {
             Candidate("James Aylward", pc) to 995,
             Candidate("David Dunphy", lib) to 684,
             Candidate("Devon Strang", grn) to 578,
-            Candidate("Lynne Thiele", ndp) to 25
+            Candidate("Lynne Thiele", ndp) to 25,
         )
         partyResults[6] = leading(pc) as R
         pctReporting[6] = 5.0 / 9
@@ -1149,7 +1149,7 @@ class TooCloseToCallScreenTest {
             Candidate("Margaret Andrade", ndp) to 22,
             Candidate("Kyle MacDonald", grn) to 369,
             Candidate("Sidney MacEwan", pc) to 1190,
-            Candidate("Susan Myers", lib) to 359
+            Candidate("Susan Myers", lib) to 359,
         )
         partyResults[7] = elected(pc) as R
         pctReporting[7] = 5.0 / 11
@@ -1158,7 +1158,7 @@ class TooCloseToCallScreenTest {
             Candidate("Sarah Donald", grn) to 490,
             Candidate("Wade MacLauchlan", lib) to 832,
             Candidate("Bloyce Thompson", pc) to 948,
-            Candidate("Marian White", ndp) to 34
+            Candidate("Marian White", ndp) to 34,
         )
         partyResults[8] = leading(pc) as R
         pctReporting[8] = 5.0 / 10
@@ -1167,7 +1167,7 @@ class TooCloseToCallScreenTest {
             Candidate("John Andrew", grn) to 533,
             Candidate("Gordon Gay", ndp) to 38,
             Candidate("Natalie Jameson", pc) to 807,
-            Candidate("Karen Lavers", lib) to 492
+            Candidate("Karen Lavers", lib) to 492,
         )
         partyResults[9] = leading(pc) as R
         pctReporting[9] = 5.0 / 11
@@ -1176,7 +1176,7 @@ class TooCloseToCallScreenTest {
             Candidate("Mike Gillis", pc) to 614,
             Candidate("Robert Mitchell", lib) to 1098,
             Candidate("Amanda Morrison", grn) to 759,
-            Candidate("Jesse Reddin Cousins", ndp) to 32
+            Candidate("Jesse Reddin Cousins", ndp) to 32,
         )
         partyResults[10] = elected(lib) as R
         pctReporting[10] = 5.0 / 10
@@ -1185,7 +1185,7 @@ class TooCloseToCallScreenTest {
             Candidate("Hannah Bell", grn) to 922,
             Candidate("Ronnie Carragher", pc) to 769,
             Candidate("Roxanne Carter-Thompson", lib) to 678,
-            Candidate("Trevor Leclerc", ndp) to 44
+            Candidate("Trevor Leclerc", ndp) to 44,
         )
         partyResults[11] = elected(grn) as R
         pctReporting[11] = 5.0 / 10
@@ -1194,7 +1194,7 @@ class TooCloseToCallScreenTest {
             Candidate("Karla Bernard", grn) to 831,
             Candidate("Richard Brown", lib) to 639,
             Candidate("Joe Byrne", ndp) to 248,
-            Candidate("Tim Keizer", pc) to 479
+            Candidate("Tim Keizer", pc) to 479,
         )
         partyResults[12] = leading(grn) as R
         pctReporting[12] = 5.0 / 10
@@ -1203,7 +1203,7 @@ class TooCloseToCallScreenTest {
             Candidate("Jordan Brown", lib) to 952,
             Candidate("Ole Hammarlund", grn) to 840,
             Candidate("Donna Hurry", pc) to 437,
-            Candidate("Simone Webster", ndp) to 92
+            Candidate("Simone Webster", ndp) to 92,
         )
         partyResults[13] = leading(lib) as R
         pctReporting[13] = 5.0 / 10
@@ -1213,7 +1213,7 @@ class TooCloseToCallScreenTest {
             Candidate("Bush Dumville", ind) to 171,
             Candidate("Gavin Hall", grn) to 660,
             Candidate("Gord MacNeilly", lib) to 874,
-            Candidate("Janis Newman", ndp) to 38
+            Candidate("Janis Newman", ndp) to 38,
         )
         partyResults[14] = leading(lib) as R
         pctReporting[14] = 5.0 / 10
@@ -1222,7 +1222,7 @@ class TooCloseToCallScreenTest {
             Candidate("Greg Bradley", grn) to 567,
             Candidate("Leah-Jane Hayward", ndp) to 45,
             Candidate("Dennis King", pc) to 909,
-            Candidate("Windsor Wight", lib) to 652
+            Candidate("Windsor Wight", lib) to 652,
         )
         partyResults[15] = leading(pc) as R
         pctReporting[15] = 5.0 / 10
@@ -1231,7 +1231,7 @@ class TooCloseToCallScreenTest {
             Candidate("Elaine Barnes", pc) to 431,
             Candidate("Ellen Jones", grn) to 819,
             Candidate("Heath MacDonald", lib) to 1286,
-            Candidate("Craig Nash", ndp) to 652
+            Candidate("Craig Nash", ndp) to 652,
         )
         partyResults[16] = leading(lib) as R
         pctReporting[16] = 5.0 / 10
@@ -1240,7 +1240,7 @@ class TooCloseToCallScreenTest {
             Candidate("Peter Bevan-Baker", grn) to 1357,
             Candidate("Kris Currie", pc) to 799,
             Candidate("Judy MacNevin", lib) to 421,
-            Candidate("Don Wills", ind) to 12
+            Candidate("Don Wills", ind) to 12,
         )
         partyResults[17] = elected(grn) as R
         pctReporting[17] = 5.0 / 10
@@ -1249,7 +1249,7 @@ class TooCloseToCallScreenTest {
             Candidate("Sean Deagle", ndp) to 22,
             Candidate("Colin Jeffrey", grn) to 551,
             Candidate("Sandy MacKay", lib) to 330,
-            Candidate("Brad Trivers", pc) to 1224
+            Candidate("Brad Trivers", pc) to 1224,
         )
         partyResults[18] = elected(pc) as R
         pctReporting[18] = 5.0 / 10
@@ -1259,7 +1259,7 @@ class TooCloseToCallScreenTest {
             Candidate("Joan Gauvin", ndp) to 12,
             Candidate("Matthew MacFarlane", grn) to 684,
             Candidate("Fred McCardle", ind) to 26,
-            Candidate("Jamie Stride", lib) to 280
+            Candidate("Jamie Stride", lib) to 280,
         )
         partyResults[19] = elected(pc) as R
         pctReporting[19] = 5.0 / 10
@@ -1268,7 +1268,7 @@ class TooCloseToCallScreenTest {
             Candidate("Nancy Beth Guptill", lib) to 277,
             Candidate("Carole MacFarlane", ndp) to 26,
             Candidate("Matthew MacKay", pc) to 1584,
-            Candidate("Matthew J. MacKay", grn) to 550
+            Candidate("Matthew J. MacKay", grn) to 550,
         )
         partyResults[20] = elected(pc) as R
         pctReporting[20] = 5.0 / 10
@@ -1277,7 +1277,7 @@ class TooCloseToCallScreenTest {
             Candidate("Tyler Desroches", pc) to 794,
             Candidate("Paulette Halupa", ndp) to 29,
             Candidate("Lynne Lund", grn) to 899,
-            Candidate("Chris Palmer", lib) to 713
+            Candidate("Chris Palmer", lib) to 713,
         )
         partyResults[21] = elected(grn) as R
         pctReporting[21] = 5.0 / 10
@@ -1286,7 +1286,7 @@ class TooCloseToCallScreenTest {
             Candidate("Steve Howard", grn) to 885,
             Candidate("Tina Mundy", lib) to 691,
             Candidate("Garth Oatway", ndp) to 46,
-            Candidate("Paul Walsh", pc) to 456
+            Candidate("Paul Walsh", pc) to 456,
         )
         partyResults[22] = elected(grn) as R
         pctReporting[22] = 5.0 / 10
@@ -1295,7 +1295,7 @@ class TooCloseToCallScreenTest {
             Candidate("Trish Altass", grn) to 737,
             Candidate("Paula Biggar", lib) to 549,
             Candidate("Robin John Robert Ednman", ndp) to 49,
-            Candidate("Holton A MacLennan", pc) to 647
+            Candidate("Holton A MacLennan", pc) to 647,
         )
         partyResults[23] = elected(grn) as R
         pctReporting[23] = 5.0 / 10
@@ -1304,7 +1304,7 @@ class TooCloseToCallScreenTest {
             Candidate("Nick Arsenault", grn) to 582,
             Candidate("Sonny Gallant", lib) to 774,
             Candidate("Grant Gallant", ndp) to 27,
-            Candidate("Jaosn Woodbury", pc) to 434
+            Candidate("Jaosn Woodbury", pc) to 434,
         )
         partyResults[24] = leading(lib) as R
         pctReporting[24] = 5.0 / 8
@@ -1313,7 +1313,7 @@ class TooCloseToCallScreenTest {
             Candidate("Barb Broome", pc) to 329,
             Candidate("Jason Charette", grn) to 189,
             Candidate("Dr. Herb Dickieson", ndp) to 614,
-            Candidate("Robert Henderson", lib) to 820
+            Candidate("Robert Henderson", lib) to 820,
         )
         partyResults[25] = elected(lib) as R
         pctReporting[25] = 5.0 / 11
@@ -1322,7 +1322,7 @@ class TooCloseToCallScreenTest {
             Candidate("Michelle Arsenault", ndp) to 60,
             Candidate("Ernie Hudson", pc) to 890,
             Candidate("James McKenna", grn) to 198,
-            Candidate("Pat Murphy", lib) to 919
+            Candidate("Pat Murphy", lib) to 919,
         )
         partyResults[26] = leading(lib) as R
         pctReporting[26] = 5.0 / 10
@@ -1331,7 +1331,7 @@ class TooCloseToCallScreenTest {
             Candidate("Sean Doyle", grn) to 360,
             Candidate("Melissa Handrahan", pc) to 530,
             Candidate("Hal Perry", lib) to 913,
-            Candidate("Dale Ryan", ndp) to 20
+            Candidate("Dale Ryan", ndp) to 20,
         )
         partyResults[27] = elected(lib) as R
         pctReporting[27] = 5.0 / 10
@@ -1342,12 +1342,12 @@ class TooCloseToCallScreenTest {
         candidateVotes: MutableMap<Int, Map<Candidate, Int>>,
         partyResults: MutableMap<Int, R>,
         pctReporting: MutableMap<Int, Double>,
-        pollsReporting: MutableMap<Int, PollsReporting>
+        pollsReporting: MutableMap<Int, PollsReporting>,
     ) {
         candidateVotes[1] = mapOf(
             Candidate("Tommy Kickham", lib) to 861,
             Candidate("Colin Lavie", pc) to 1347,
-            Candidate("Boyd Leard", grn) to 804
+            Candidate("Boyd Leard", grn) to 804,
         )
         partyResults[1] = elected(pc) as R
         pctReporting[1] = 10.0 / 10
@@ -1356,7 +1356,7 @@ class TooCloseToCallScreenTest {
             Candidate("Kevin Doyle", lib) to 663,
             Candidate("Susan Hartley", grn) to 865,
             Candidate("Steven Myers", pc) to 1493,
-            Candidate("Edith Perry", ndp) to 49
+            Candidate("Edith Perry", ndp) to 49,
         )
         partyResults[2] = elected(pc) as R
         pctReporting[2] = 10.0 / 10
@@ -1365,7 +1365,7 @@ class TooCloseToCallScreenTest {
             Candidate("Billy Cann", ndp) to 124,
             Candidate("Cory Deagle", pc) to 1373,
             Candidate("Daphne Griffin", lib) to 785,
-            Candidate("John Allen Maclean", grn) to 675
+            Candidate("John Allen Maclean", grn) to 675,
         )
         partyResults[3] = elected(pc) as R
         pctReporting[3] = 9.0 / 9
@@ -1373,7 +1373,7 @@ class TooCloseToCallScreenTest {
         candidateVotes[4] = mapOf(
             Candidate("Darlene Compton", pc) to 1545,
             Candidate("Ian MacPherson", lib) to 615,
-            Candidate("James Sanders", grn) to 781
+            Candidate("James Sanders", grn) to 781,
         )
         partyResults[4] = elected(pc) as R
         pctReporting[4] = 10.0 / 10
@@ -1382,7 +1382,7 @@ class TooCloseToCallScreenTest {
             Candidate("Michele Beaton", grn) to 1152,
             Candidate("Randy Cooper", lib) to 902,
             Candidate("Mary Ellen McInnis", pc) to 943,
-            Candidate("Lawrence Millar", ndp) to 38
+            Candidate("Lawrence Millar", ndp) to 38,
         )
         partyResults[5] = elected(grn) as R
         pctReporting[5] = 8.0 / 8
@@ -1391,7 +1391,7 @@ class TooCloseToCallScreenTest {
             Candidate("James Aylward", pc) to 1270,
             Candidate("David Dunphy", lib) to 882,
             Candidate("Devon Strang", grn) to 805,
-            Candidate("Lynne Thiele", ndp) to 31
+            Candidate("Lynne Thiele", ndp) to 31,
         )
         partyResults[6] = elected(pc) as R
         pctReporting[6] = 9.0 / 9
@@ -1400,7 +1400,7 @@ class TooCloseToCallScreenTest {
             Candidate("Margaret Andrade", ndp) to 35,
             Candidate("Kyle MacDonald", grn) to 697,
             Candidate("Sidney MacEwan", pc) to 1752,
-            Candidate("Susan Myers", lib) to 557
+            Candidate("Susan Myers", lib) to 557,
         )
         partyResults[7] = elected(pc) as R
         pctReporting[7] = 11.0 / 11
@@ -1409,7 +1409,7 @@ class TooCloseToCallScreenTest {
             Candidate("Sarah Donald", grn) to 747,
             Candidate("Wade MacLauchlan", lib) to 1196,
             Candidate("Bloyce Thompson", pc) to 1300,
-            Candidate("Marian White", ndp) to 46
+            Candidate("Marian White", ndp) to 46,
         )
         partyResults[8] = elected(pc) as R
         pctReporting[8] = 10.0 / 10
@@ -1418,7 +1418,7 @@ class TooCloseToCallScreenTest {
             Candidate("John Andrew", grn) to 709,
             Candidate("Gordon Gay", ndp) to 46,
             Candidate("Natalie Jameson", pc) to 1080,
-            Candidate("Karen Lavers", lib) to 635
+            Candidate("Karen Lavers", lib) to 635,
         )
         partyResults[9] = elected(pc) as R
         pctReporting[9] = 11.0 / 11
@@ -1427,7 +1427,7 @@ class TooCloseToCallScreenTest {
             Candidate("Mike Gillis", pc) to 865,
             Candidate("Robert Mitchell", lib) to 1420,
             Candidate("Amanda Morrison", grn) to 1058,
-            Candidate("Jesse Reddin Cousins", ndp) to 41
+            Candidate("Jesse Reddin Cousins", ndp) to 41,
         )
         partyResults[10] = elected(lib) as R
         pctReporting[10] = 10.0 / 10
@@ -1436,7 +1436,7 @@ class TooCloseToCallScreenTest {
             Candidate("Hannah Bell", grn) to 1286,
             Candidate("Ronnie Carragher", pc) to 998,
             Candidate("Roxanne Carter-Thompson", lib) to 846,
-            Candidate("Trevor Leclerc", ndp) to 55
+            Candidate("Trevor Leclerc", ndp) to 55,
         )
         partyResults[11] = elected(grn) as R
         pctReporting[11] = 10.0 / 10
@@ -1445,7 +1445,7 @@ class TooCloseToCallScreenTest {
             Candidate("Karla Bernard", grn) to 1272,
             Candidate("Richard Brown", lib) to 875,
             Candidate("Joe Byrne", ndp) to 338,
-            Candidate("Tim Keizer", pc) to 656
+            Candidate("Tim Keizer", pc) to 656,
         )
         partyResults[12] = elected(grn) as R
         pctReporting[12] = 10.0 / 10
@@ -1454,7 +1454,7 @@ class TooCloseToCallScreenTest {
             Candidate("Jordan Brown", lib) to 1223,
             Candidate("Ole Hammarlund", grn) to 1301,
             Candidate("Donna Hurry", pc) to 567,
-            Candidate("Simone Webster", ndp) to 138
+            Candidate("Simone Webster", ndp) to 138,
         )
         partyResults[13] = elected(grn) as R
         pctReporting[13] = 10.0 / 10
@@ -1464,7 +1464,7 @@ class TooCloseToCallScreenTest {
             Candidate("Bush Dumville", ind) to 202,
             Candidate("Gavin Hall", grn) to 966,
             Candidate("Gord MacNeilly", lib) to 1079,
-            Candidate("Janis Newman", ndp) to 56
+            Candidate("Janis Newman", ndp) to 56,
         )
         partyResults[14] = elected(lib) as R
         pctReporting[14] = 10.0 / 10
@@ -1473,7 +1473,7 @@ class TooCloseToCallScreenTest {
             Candidate("Greg Bradley", grn) to 879,
             Candidate("Leah-Jane Hayward", ndp) to 57,
             Candidate("Dennis King", pc) to 1315,
-            Candidate("Windsor Wight", lib) to 899
+            Candidate("Windsor Wight", lib) to 899,
         )
         partyResults[15] = elected(pc) as R
         pctReporting[15] = 10.0 / 10
@@ -1482,7 +1482,7 @@ class TooCloseToCallScreenTest {
             Candidate("Elaine Barnes", pc) to 602,
             Candidate("Ellen Jones", grn) to 1137,
             Candidate("Heath MacDonald", lib) to 1643,
-            Candidate("Craig Nash", ndp) to 899
+            Candidate("Craig Nash", ndp) to 899,
         )
         partyResults[16] = elected(lib) as R
         pctReporting[16] = 10.0 / 10
@@ -1491,7 +1491,7 @@ class TooCloseToCallScreenTest {
             Candidate("Peter Bevan-Baker", grn) to 1870,
             Candidate("Kris Currie", pc) to 1068,
             Candidate("Judy MacNevin", lib) to 515,
-            Candidate("Don Wills", ind) to 26
+            Candidate("Don Wills", ind) to 26,
         )
         partyResults[17] = elected(grn) as R
         pctReporting[17] = 10.0 / 10
@@ -1500,7 +1500,7 @@ class TooCloseToCallScreenTest {
             Candidate("Sean Deagle", ndp) to 30,
             Candidate("Colin Jeffrey", grn) to 899,
             Candidate("Sandy MacKay", lib) to 489,
-            Candidate("Brad Trivers", pc) to 1920
+            Candidate("Brad Trivers", pc) to 1920,
         )
         partyResults[18] = elected(pc) as R
         pctReporting[18] = 10.0 / 10
@@ -1510,7 +1510,7 @@ class TooCloseToCallScreenTest {
             Candidate("Joan Gauvin", ndp) to 32,
             Candidate("Matthew MacFarlane", grn) to 1041,
             Candidate("Fred McCardle", ind) to 54,
-            Candidate("Jamie Stride", lib) to 417
+            Candidate("Jamie Stride", lib) to 417,
         )
         partyResults[19] = elected(pc) as R
         pctReporting[19] = 10.0 / 10
@@ -1519,7 +1519,7 @@ class TooCloseToCallScreenTest {
             Candidate("Nancy Beth Guptill", lib) to 389,
             Candidate("Carole MacFarlane", ndp) to 31,
             Candidate("Matthew MacKay", pc) to 2008,
-            Candidate("Matthew J. MacKay", grn) to 805
+            Candidate("Matthew J. MacKay", grn) to 805,
         )
         partyResults[20] = elected(pc) as R
         pctReporting[20] = 10.0 / 10
@@ -1528,7 +1528,7 @@ class TooCloseToCallScreenTest {
             Candidate("Tyler Desroches", pc) to 1037,
             Candidate("Paulette Halupa", ndp) to 39,
             Candidate("Lynne Lund", grn) to 1258,
-            Candidate("Chris Palmer", lib) to 892
+            Candidate("Chris Palmer", lib) to 892,
         )
         partyResults[21] = elected(grn) as R
         pctReporting[21] = 10.0 / 10
@@ -1537,7 +1537,7 @@ class TooCloseToCallScreenTest {
             Candidate("Steve Howard", grn) to 1302,
             Candidate("Tina Mundy", lib) to 938,
             Candidate("Garth Oatway", ndp) to 65,
-            Candidate("Paul Walsh", pc) to 662
+            Candidate("Paul Walsh", pc) to 662,
         )
         partyResults[22] = elected(grn) as R
         pctReporting[22] = 10.0 / 10
@@ -1546,7 +1546,7 @@ class TooCloseToCallScreenTest {
             Candidate("Trish Altass", grn) to 1101,
             Candidate("Paula Biggar", lib) to 882,
             Candidate("Robin John Robert Ednman", ndp) to 81,
-            Candidate("Holton A MacLennan", pc) to 1026
+            Candidate("Holton A MacLennan", pc) to 1026,
         )
         partyResults[23] = elected(grn) as R
         pctReporting[23] = 10.0 / 10
@@ -1555,7 +1555,7 @@ class TooCloseToCallScreenTest {
             Candidate("Nick Arsenault", grn) to 761,
             Candidate("Sonny Gallant", lib) to 1100,
             Candidate("Grant Gallant", ndp) to 33,
-            Candidate("Jaosn Woodbury", pc) to 575
+            Candidate("Jaosn Woodbury", pc) to 575,
         )
         partyResults[24] = elected(lib) as R
         pctReporting[24] = 8.0 / 8
@@ -1564,7 +1564,7 @@ class TooCloseToCallScreenTest {
             Candidate("Barb Broome", pc) to 462,
             Candidate("Jason Charette", grn) to 231,
             Candidate("Dr. Herb Dickieson", ndp) to 898,
-            Candidate("Robert Henderson", lib) to 1102
+            Candidate("Robert Henderson", lib) to 1102,
         )
         partyResults[25] = elected(lib) as R
         pctReporting[25] = 11.0 / 11
@@ -1573,7 +1573,7 @@ class TooCloseToCallScreenTest {
             Candidate("Michelle Arsenault", ndp) to 99,
             Candidate("Ernie Hudson", pc) to 1312,
             Candidate("James McKenna", grn) to 317,
-            Candidate("Pat Murphy", lib) to 1153
+            Candidate("Pat Murphy", lib) to 1153,
         )
         partyResults[26] = elected(lib) as R
         pctReporting[26] = 10.0 / 10
@@ -1582,7 +1582,7 @@ class TooCloseToCallScreenTest {
             Candidate("Sean Doyle", grn) to 584,
             Candidate("Melissa Handrahan", pc) to 802,
             Candidate("Hal Perry", lib) to 1388,
-            Candidate("Dale Ryan", ndp) to 44
+            Candidate("Dale Ryan", ndp) to 44,
         )
         partyResults[27] = elected(lib) as R
         pctReporting[27] = 10.0 / 10
@@ -1600,7 +1600,7 @@ class TooCloseToCallScreenTest {
             { candidateVotes.map { v -> v[it] ?: emptyMap() } },
             { partyResults.map { v -> v[it] } },
             { "DISTRICT $it".asOneTimePublisher() },
-            "TOO CLOSE TO CALL".asOneTimePublisher()
+            "TOO CLOSE TO CALL".asOneTimePublisher(),
         )
             .sortByPcts()
             .build("PRINCE EDWARD ISLAND".asOneTimePublisher())
@@ -1613,7 +1613,7 @@ class TooCloseToCallScreenTest {
                 
                 TOO CLOSE TO CALL
                 (empty)
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         setupFirstAdvancePoll(candidateVotesRaw, partyResultsRaw, HashMap(), HashMap())
@@ -1627,7 +1627,7 @@ class TooCloseToCallScreenTest {
                 
                 TOO CLOSE TO CALL
                 DISTRICT 1: PC: 45.1%; LIB: 30.8%; LEAD: 14.3%
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         setupAllAdvancePolls(candidateVotesRaw, partyResultsRaw, HashMap(), HashMap())
@@ -1660,7 +1660,7 @@ class TooCloseToCallScreenTest {
                 DISTRICT 24: LIB: 48.2%; GRN: 28.8%; LEAD: 19.4%
                 DISTRICT 16: LIB: 43.8%; GRN: 24.1%; LEAD: 19.6%
                 (...)
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         setupHalfOfPolls(candidateVotesRaw, partyResultsRaw, HashMap(), HashMap())
@@ -1684,7 +1684,7 @@ class TooCloseToCallScreenTest {
                 DISTRICT 6: PC: 43.6%; LIB: 30.0%; LEAD: 13.6%
                 DISTRICT 16: LIB: 40.3%; GRN: 25.7%; LEAD: 14.6%
                 DISTRICT 9: PC: 43.2%; GRN: 28.5%; LEAD: 14.7%
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         setupFullResults(candidateVotesRaw, partyResultsRaw, HashMap(), HashMap())
@@ -1698,7 +1698,7 @@ class TooCloseToCallScreenTest {
                 
                 TOO CLOSE TO CALL
                 (empty)
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 

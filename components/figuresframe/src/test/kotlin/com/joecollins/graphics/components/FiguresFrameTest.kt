@@ -18,9 +18,9 @@ class FiguresFrameTest {
             listOf(
                 FiguresFrame.Entry(Color.RED, "Justin Trudeau", "Liberal Leader", "", Color.BLACK),
                 FiguresFrame.Entry(Color.BLUE, "Andrew Scheer", "Conservative Leader", "", Color.BLACK),
-                FiguresFrame.Entry(Color.ORANGE, "Jagmeet Singh", "NDP Leader", "", Color.BLACK)
+                FiguresFrame.Entry(Color.ORANGE, "Jagmeet Singh", "NDP Leader", "", Color.BLACK),
             )
-                .asOneTimePublisher()
+                .asOneTimePublisher(),
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numEntries }, IsEqual(3))
@@ -43,9 +43,9 @@ class FiguresFrameTest {
             listOf(
                 FiguresFrame.Entry(Color.RED, "Justin Trudeau", "Liberal Leader", "LEADING", Color.RED),
                 FiguresFrame.Entry(Color.BLUE, "Andrew Scheer", "Conservative Leader", "ELECTED", Color.BLUE),
-                FiguresFrame.Entry(Color.ORANGE, "Jagmeet Singh", "NDP Leader", "WAITING...", Color.LIGHT_GRAY)
+                FiguresFrame.Entry(Color.ORANGE, "Jagmeet Singh", "NDP Leader", "WAITING...", Color.LIGHT_GRAY),
             )
-                .asOneTimePublisher()
+                .asOneTimePublisher(),
         )
         Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numEntries }, IsEqual(3))
@@ -65,9 +65,9 @@ class FiguresFrameTest {
             listOf(
                 FiguresFrame.Entry(Color.RED, "JUSTIN TRUDEAU", "Liberal Leader", "LEADING", Color.RED),
                 FiguresFrame.Entry(Color.BLUE, "ANDREW SCHEER", "Conservative Leader", "ELECTED", Color.BLUE),
-                FiguresFrame.Entry(Color.ORANGE, "JAGMEET SINGH", "NDP Leader", "WAITING...", Color.LIGHT_GRAY)
+                FiguresFrame.Entry(Color.ORANGE, "JAGMEET SINGH", "NDP Leader", "WAITING...", Color.LIGHT_GRAY),
             )
-                .asOneTimePublisher()
+                .asOneTimePublisher(),
         )
         frame.setSize(512, 256)
         compareRendering("FiguresFrame", "Entries", frame)
@@ -87,9 +87,9 @@ class FiguresFrameTest {
                 FiguresFrame.Entry(Color.MAGENTA.darker(), "MAXIME BERNIER", "People's Party Leader, Beauce", "DEFEATED", Color.BLUE),
                 FiguresFrame.Entry(Color.MAGENTA, "ROD TAYLOR", "CHP Leader, Skeena-Bulkley Valley", "DEFEATED", Color.ORANGE),
                 FiguresFrame.Entry(Color.GRAY, "S\u00c9BASTIEN CORHINO", "Rhinoceros Party Leader, Qu\u00e9bec", "DEFEATED", Color.RED),
-                FiguresFrame.Entry(Color.YELLOW.darker(), "TIM MOEN", "Libertarian Leader, Fort McMurray-Athabasca", "DEFEATED", Color.BLUE)
+                FiguresFrame.Entry(Color.YELLOW.darker(), "TIM MOEN", "Libertarian Leader, Fort McMurray-Athabasca", "DEFEATED", Color.BLUE),
             )
-                .asOneTimePublisher()
+                .asOneTimePublisher(),
         )
         frame.setSize(512, 256)
         compareRendering("FiguresFrame", "Overflow", frame)
@@ -109,9 +109,9 @@ class FiguresFrameTest {
                 FiguresFrame.Entry(Color.MAGENTA.darker(), "MAXIME BERNIER", "People's Party Leader, Beauce", "DEFEATED", Color.BLUE),
                 FiguresFrame.Entry(Color.MAGENTA, "ROD TAYLOR", "CHP Leader, Skeena-Bulkley Valley", "DEFEATED", Color.ORANGE),
                 FiguresFrame.Entry(Color.GRAY, "S\u00c9BASTIEN CORHINO", "Rhinoceros Party Leader, Qu\u00e9bec", "DEFEATED", Color.RED),
-                FiguresFrame.Entry(Color.YELLOW.darker(), "TIM MOEN", "Libertarian Leader, Fort McMurray-Athabasca", "DEFEATED", Color.BLUE)
+                FiguresFrame.Entry(Color.YELLOW.darker(), "TIM MOEN", "Libertarian Leader, Fort McMurray-Athabasca", "DEFEATED", Color.BLUE),
             )
-                .asOneTimePublisher()
+                .asOneTimePublisher(),
         )
         frame.setSize(128, 256)
         compareRendering("FiguresFrame", "LongStrings", frame)

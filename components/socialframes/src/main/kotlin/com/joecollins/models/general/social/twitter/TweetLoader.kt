@@ -44,7 +44,7 @@ object TweetLoader {
                     "Error retrieving tweet",
                     javaClass.classLoader.getResource("1x1.png"),
                     false,
-                    false
+                    false,
                 ),
                 Instant.EPOCH,
                 null,
@@ -52,7 +52,7 @@ object TweetLoader {
                 emptyList(),
                 emptyList(),
                 emptyList(),
-                emptyList()
+                emptyList(),
             )
         }
         val tweet = response

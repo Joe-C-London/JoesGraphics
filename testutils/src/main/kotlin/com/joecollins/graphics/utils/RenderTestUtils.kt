@@ -20,7 +20,7 @@ object RenderTestUtils {
 
     fun compareRendering(testClass: String, testMethod: String, panel: JPanel, timeoutSeconds: Long = 1) {
         val expectedFile = File(
-            "src\\test\\resources\\com\\joecollins\\graphics\\$testClass\\$testMethod.png"
+            "src\\test\\resources\\com\\joecollins\\graphics\\$testClass\\$testMethod.png",
         )
         val actualFile = File.createTempFile("test", ".png")
         val isMatch = try {
@@ -39,8 +39,8 @@ object RenderTestUtils {
                 String.format(
                     "copy /Y %s %s",
                     actualFile.absolutePath,
-                    expectedFile.absolutePath
-                )
+                    expectedFile.absolutePath,
+                ),
             )
         }
         Assertions.assertTrue(isMatch)
