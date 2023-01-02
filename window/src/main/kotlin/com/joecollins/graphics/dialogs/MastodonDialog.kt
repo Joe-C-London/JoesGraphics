@@ -47,9 +47,9 @@ class MastodonDialog(panel: JPanel, private val server: String, private val toke
             .addBinaryBody("file", image)
             .also { if (altText != null) it.addTextBody("description", altText) }
             .build()
-        client.execute(post).use { response ->
+        return client.execute(post) { response ->
             val json = JsonMapper().readTree(response.entity.content)
-            return json["id"].asText()
+            json["id"].asText()
         }
     }
 
@@ -63,8 +63,6 @@ class MastodonDialog(panel: JPanel, private val server: String, private val toke
             params.toString().byteInputStream(Charset.defaultCharset()),
             ContentType.APPLICATION_JSON
         )
-        client.execute(post).use { response ->
-            EntityUtils.consume(response.entity)
-        }
+        client.execute(post) {}
     }
 }

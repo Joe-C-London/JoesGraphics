@@ -1,10 +1,6 @@
 buildscript {
-    ext.kotlin_version = '1.7.20'
-    repositories {
-        mavenCentral()
-    }
     dependencies {
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        parent.buildscript.dependencies
     }
 }
 plugins {
@@ -18,14 +14,16 @@ repositories {
     mavenCentral()
 }
 
+var topLevel = parent.parent
+
 dependencies {
     api parent.project('mapframe')
-    api parent.parent.project('models')
-    implementation parent.parent.project('modelutils')
-    implementation parent.parent.project('pubsub')
+    api topLevel.project('models')
+    implementation topLevel.project('modelutils')
+    implementation topLevel.project('pubsub')
 
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+    testImplementation "org.junit.jupiter:junit-jupiter-api:$topLevel.ext.junit_version"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$topLevel.ext.junit_version"
 }
 
 test {

@@ -92,10 +92,11 @@ object TwitterV2InstanceFactory {
                 BasicNameValuePair("code_verifier", challenge)
             )
         )
-        val response = client.execute(post)
-        val entity = response.entity
-        val jsonObject = JsonParser.parseReader(InputStreamReader(entity.content)).asJsonObject
-        saveTokens(jsonObject["access_token"].asString, jsonObject["refresh_token"].asString)
+        client.execute(post) { response ->
+            val entity = response.entity
+            val jsonObject = JsonParser.parseReader(InputStreamReader(entity.content)).asJsonObject
+            saveTokens(jsonObject["access_token"].asString, jsonObject["refresh_token"].asString)
+        }
     }
 
     private fun saveTokens(accessToken: String, refreshToken: String) {
