@@ -361,7 +361,6 @@ class BasicResultPanel private constructor(
             return this
         }
 
-        @JvmOverloads
         fun withDiff(
             diff: Flow.Publisher<out Map<KPT, CT>>,
             changeHeader: Flow.Publisher<out String?>,
@@ -383,7 +382,6 @@ class BasicResultPanel private constructor(
         protected abstract fun createFromDiff(curr: CT, diff: CT?): CurrDiff<CT>
         protected abstract fun createFromDiff(diff: CT): CurrDiff<CT>
 
-        @JvmOverloads
         fun withPrev(
             prev: Flow.Publisher<out Map<out KPT, PT>>,
             changeHeader: Flow.Publisher<out String?>,
@@ -982,7 +980,6 @@ class BasicResultPanel private constructor(
                 return changeSubhead
             }
 
-        @JvmOverloads
         fun withPrev(
             prev: Flow.Publisher<out Map<out KPT, PT>>,
             header: Flow.Publisher<out String?>,

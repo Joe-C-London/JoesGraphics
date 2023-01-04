@@ -68,11 +68,11 @@ class BarFrameBuilder private constructor() {
         val maxPublisher = Publisher(maxFunction(this))
     }
 
-    class BasicBar @JvmOverloads constructor(val label: String, val color: Color, val value: Number, val valueLabel: String = value.toString(), val shape: Shape? = null) {
+    class BasicBar constructor(val label: String, val color: Color, val value: Number, val valueLabel: String = value.toString(), val shape: Shape? = null) {
         constructor(label: String, color: Color, value: Number, shape: Shape?) : this(label, color, value, value.toString(), shape)
     }
 
-    class DualBar @JvmOverloads constructor(
+    class DualBar constructor(
         val label: String,
         val color: Color,
         val value1: Number,

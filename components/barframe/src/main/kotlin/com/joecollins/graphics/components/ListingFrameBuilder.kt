@@ -39,7 +39,6 @@ class ListingFrameBuilder {
     }
 
     companion object {
-        @JvmStatic
         fun <T> of(
             list: Flow.Publisher<out List<T>>,
             leftTextFunc: (T) -> String,

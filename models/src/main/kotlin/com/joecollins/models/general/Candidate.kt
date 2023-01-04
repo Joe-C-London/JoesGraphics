@@ -11,6 +11,6 @@ data class Candidate private constructor(val name: String, val party: Party, val
     fun isIncumbent() = incumbent
 
     companion object {
-        @JvmField val OTHERS = Candidate("Others", Party.OTHERS, false, -1)
+        val OTHERS = Candidate("Others", Party.OTHERS, false, -1)
     }
 }

@@ -814,7 +814,7 @@ class BarFrameTest {
         return shape
     }
 
-    private class ElectionResult @JvmOverloads constructor(private var partyName: String, private var partyColor: Color, private var numSeats: Int, private var seatEstimate: Int = numSeats) {
+    private class ElectionResult constructor(private var partyName: String, private var partyColor: Color, private var numSeats: Int, private var seatEstimate: Int = numSeats) {
 
         fun getPartyName(): String {
             return partyName
@@ -849,7 +849,7 @@ class BarFrameTest {
         }
     }
 
-    private class RidingResult @JvmOverloads constructor(
+    private class RidingResult constructor(
         private val candidateName: String,
         private val partyName: String,
         private val partyColor: Color,

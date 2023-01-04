@@ -8,7 +8,7 @@ import java.awt.Dimension
 import java.util.concurrent.Flow
 import javax.swing.JPanel
 
-class GenericPanelWithLowerThird(
+open class GenericPanelWithLowerThird(
     private val panel: JPanel,
     lowerThird: LowerThird,
 ) : JPanel(), AltTextProvider {

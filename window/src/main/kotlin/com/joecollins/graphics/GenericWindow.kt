@@ -29,7 +29,7 @@ import javax.swing.JPanel
 import javax.swing.filechooser.FileFilter
 import kotlin.math.max
 
-class GenericWindow<T : JPanel> @JvmOverloads constructor(private val panel: T, title: String? = panel.javaClass.simpleName) : JFrame() {
+class GenericWindow<T : JPanel> constructor(private val panel: T, title: String) : JFrame() {
 
     fun withControlPanel(panel: JPanel): GenericWindow<T> {
         contentPane.add(panel, "control-panel")

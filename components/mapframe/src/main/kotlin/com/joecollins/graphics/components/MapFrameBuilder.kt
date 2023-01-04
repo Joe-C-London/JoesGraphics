@@ -69,7 +69,6 @@ class MapFrameBuilder {
             return mapFrameBuilder
         }
 
-        @JvmStatic
         fun <T> from(
             itemsBinding: Flow.Publisher<out List<T>>,
             shapeFunc: (T) -> Shape,

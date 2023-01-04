@@ -114,7 +114,6 @@ class MixedMemberResultPanel private constructor(
         private var partyChangeHeader: Flow.Publisher<out String?> = (null as String?).asOneTimePublisher()
         private var mapBuilder: MapBuilder<*>? = null
 
-        @JvmOverloads
         fun withCandidateVotes(
             votes: Flow.Publisher<out Map<Candidate, Int?>>,
             header: Flow.Publisher<out String>,
