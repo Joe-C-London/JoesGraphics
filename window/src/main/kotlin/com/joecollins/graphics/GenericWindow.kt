@@ -2,6 +2,9 @@ package com.joecollins.graphics
 
 import com.joecollins.graphics.dialogs.MastodonDialog
 import com.joecollins.graphics.dialogs.TweetDialog
+import com.joecollins.graphics.utils.StandardFont
+import com.joecollins.pubsub.Subscriber
+import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
 import java.awt.Color
 import java.awt.Component
 import java.awt.Container
@@ -21,6 +24,7 @@ import java.util.Properties
 import javax.imageio.ImageIO
 import javax.swing.JFileChooser
 import javax.swing.JFrame
+import javax.swing.JLabel
 import javax.swing.JMenu
 import javax.swing.JMenuBar
 import javax.swing.JMenuItem
@@ -98,6 +102,37 @@ class GenericWindow<T : JPanel> constructor(private val panel: T, title: String)
             c.setContents(transferableImage, owner)
         }
 
+        private fun copyAltTextToClipboard(html: String) {
+            val transferableImage: Transferable = object : Transferable {
+                override fun getTransferDataFlavors(): Array<DataFlavor> {
+                    return arrayOf(DataFlavor.allHtmlFlavor, DataFlavor.stringFlavor)
+                }
+
+                override fun isDataFlavorSupported(flavor: DataFlavor): Boolean {
+                    return transferDataFlavors.contains(flavor)
+                }
+
+                override fun getTransferData(flavor: DataFlavor): Any {
+                    return when (flavor) {
+                        DataFlavor.allHtmlFlavor -> {
+                            html
+                        }
+                        DataFlavor.stringFlavor -> {
+                            html.replace("<html>", "")
+                                .replace("</html>", "")
+                                .replace("<br/>", "\n")
+                        }
+                        else -> {
+                            throw UnsupportedFlavorException(flavor)
+                        }
+                    }
+                }
+            }
+            val owner = ClipboardOwner { _: Clipboard?, _: Transferable? -> }
+            val c = Toolkit.getDefaultToolkit().systemClipboard
+            c.setContents(transferableImage, owner)
+        }
+
         internal fun generateImage(component: JPanel): BufferedImage {
             val img = BufferedImage(component.width, component.height, BufferedImage.TYPE_INT_ARGB)
             component.print(img.graphics)
@@ -113,13 +148,34 @@ class GenericWindow<T : JPanel> constructor(private val panel: T, title: String)
         contentPane.layout = GenericWindowLayout()
         contentPane.background = Color.BLACK
         contentPane.add(panel, "main")
+        val altText = JLabel()
+        altText.foreground = Color.WHITE
+        altText.font = StandardFont.readNormalFont(8)
+        if (panel is AltTextProvider) {
+            panel.altText.subscribe(
+                Subscriber(
+                    eventQueueWrapper {
+                        altText.text =
+                            if (it == null) {
+                                ""
+                            } else {
+                                "<html>${it.replace("\n", "<br/>")}</html>"
+                            }
+                    },
+                ),
+            )
+        }
+        contentPane.add(altText, "alt-text")
         val menuBar = JMenuBar()
         jMenuBar = menuBar
         val imageMenu = JMenu("Image")
         menuBar.add(imageMenu)
-        val copyItem = JMenuItem("Copy to Clipboard")
+        val copyItem = JMenuItem("Copy Image to Clipboard")
         copyItem.addActionListener { copyImageToClipboard(panel) }
         imageMenu.add(copyItem)
+        val copyText = JMenuItem("Copy AltText to Clipboard")
+        copyText.addActionListener { copyAltTextToClipboard(altText.text) }
+        imageMenu.add(copyText)
         val fileItem = JMenuItem("Save to File...")
         fileItem.addActionListener { saveImageToFile(panel) }
         imageMenu.add(fileItem)
@@ -168,11 +224,13 @@ class GenericWindow<T : JPanel> constructor(private val panel: T, title: String)
     private class GenericWindowLayout : LayoutManager {
         private var main: Component? = null
         private var controlPanel: Component? = null
+        private var altText: Component? = null
 
         override fun addLayoutComponent(name: String, comp: Component) {
             when (name) {
                 "main" -> main = comp
                 "control-panel" -> controlPanel = comp
+                "alt-text" -> altText = comp
                 else -> throw IllegalArgumentException("Invalid name $name")
             }
         }
@@ -180,6 +238,7 @@ class GenericWindow<T : JPanel> constructor(private val panel: T, title: String)
         override fun removeLayoutComponent(comp: Component) {
             if (comp == main) main = null
             if (comp == controlPanel) controlPanel = null
+            if (comp == altText) altText = null
         }
 
         override fun preferredLayoutSize(parent: Container): Dimension {
@@ -203,8 +262,10 @@ class GenericWindow<T : JPanel> constructor(private val panel: T, title: String)
         override fun layoutContainer(parent: Container) {
             val main = this.main
             val controlPanel = this.controlPanel
+            val altText = this.altText
             val mainSize = main?.preferredSize ?: Dimension(0, 0)
             val controlPanelSize = controlPanel?.preferredSize ?: Dimension(0, 0)
+            val altTextSize = altText?.preferredSize ?: Dimension(0, 0)
             if (main != null) {
                 main.location = Point(0, 0)
                 main.size = mainSize
@@ -214,6 +275,13 @@ class GenericWindow<T : JPanel> constructor(private val panel: T, title: String)
                 controlPanel.size = Dimension(
                     controlPanelSize.width.coerceAtMost(parent.width - mainSize.width),
                     controlPanelSize.height,
+                )
+            }
+            if (altText != null) {
+                altText.location = Point(0, mainSize.height)
+                altText.size = Dimension(
+                    altTextSize.width.coerceAtMost(mainSize.width),
+                    altTextSize.height.coerceAtMost(parent.height - mainSize.height),
                 )
             }
         }
