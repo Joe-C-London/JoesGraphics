@@ -1,5 +1,6 @@
 package com.joecollins.graphics.screens.generic
 
+import com.joecollins.graphics.utils.PublisherTestUtils.assertPublishes
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.graphics.utils.ShapefileReader
 import com.joecollins.models.general.Candidate
@@ -33,6 +34,17 @@ class CandidateListingScreenTest {
             .build("SOURIS-ELMIRA".asOneTimePublisher())
         screen.size = Dimension(1024, 512)
         compareRendering("CandidateListingScreen", "CandidatesOnly", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            SOURIS-ELMIRA
+            
+            CANDIDATES
+            TOMMY KICKHAM (LIB)
+            COLIN LAVIE [MLA] (PC)
+            BOYD LEARD (GRN)
+            """.trimIndent(),
+        )
     }
 
     @Test
@@ -65,6 +77,22 @@ class CandidateListingScreenTest {
             .build("SOURIS-ELMIRA".asOneTimePublisher())
         screen.size = Dimension(1024, 512)
         compareRendering("CandidateListingScreen", "CandidatesWithPrev", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            SOURIS-ELMIRA
+            
+            CANDIDATES
+            TOMMY KICKHAM (LIB)
+            COLIN LAVIE [MLA] (PC)
+            BOYD LEARD (GRN)
+            
+            2015 RESULT
+            PC: 44.4%
+            LIB: 35.8%
+            NDP: 19.9%
+            """.trimIndent(),
+        )
     }
 
     @Test
@@ -104,6 +132,22 @@ class CandidateListingScreenTest {
             .build("SOURIS-ELMIRA".asOneTimePublisher())
         screen.size = Dimension(1024, 512)
         compareRendering("CandidateListingScreen", "CandidatesWithPrevAndMap", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            SOURIS-ELMIRA
+            
+            CANDIDATES
+            TOMMY KICKHAM (LIB)
+            COLIN LAVIE [MLA] (PC)
+            BOYD LEARD (GRN)
+            
+            2015 RESULT
+            PC: 44.4%
+            LIB: 35.8%
+            NDP: 19.9%
+            """.trimIndent(),
+        )
     }
 
     @Test
@@ -146,6 +190,24 @@ class CandidateListingScreenTest {
             .build("CHARLOTTETOWN-WEST ROYALTY".asOneTimePublisher())
         screen.size = Dimension(1024, 512)
         compareRendering("CandidateListingScreen", "CandidatesWithPrevOtherAndMap", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            CHARLOTTETOWN-WEST ROYALTY
+            
+            CANDIDATES
+            ANGUS BIRT (PC)
+            BUSH DUMVILLE (IND)
+            GAVIN HALL (GRN)
+            GORD MCNEILLY (LIB)
+            JANIS NEWMAN (NDP)
+            
+            2015 RESULT
+            LIB: 34.3%
+            NDP: 30.7%
+            OTH: 35.1%
+            """.trimIndent(),
+        )
     }
 
     @Test
@@ -196,6 +258,28 @@ class CandidateListingScreenTest {
             .build("SOURIS-ELMIRA".asOneTimePublisher())
         screen.size = Dimension(1024, 512)
         compareRendering("CandidateListingScreen", "CandidatesWithSecondaryPrevAndMap", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            SOURIS-ELMIRA
+            
+            CANDIDATES
+            TOMMY KICKHAM (LIB)
+            COLIN LAVIE [MLA] (PC)
+            BOYD LEARD (GRN)
+            
+            2015 RESULT
+            PC: 44.4%
+            LIB: 35.8%
+            NDP: 19.9%
+            
+            2015 REGIONAL RESULT
+            PC: 45.0%
+            LIB: 38.2%
+            NDP: 11.4%
+            GRN: 5.4%
+            """.trimIndent(),
+        )
     }
 
     @Test
@@ -239,6 +323,28 @@ class CandidateListingScreenTest {
             .build("SOURIS-ELMIRA".asOneTimePublisher())
         screen.size = Dimension(1024, 512)
         compareRendering("CandidateListingScreen", "CandidatesWithSecondaryPrev", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            SOURIS-ELMIRA
+            
+            CANDIDATES
+            TOMMY KICKHAM (LIB)
+            COLIN LAVIE [MLA] (PC)
+            BOYD LEARD (GRN)
+            
+            2015 RESULT
+            PC: 44.4%
+            LIB: 35.8%
+            NDP: 19.9%
+            
+            2015 REGIONAL RESULT
+            PC: 45.0%
+            LIB: 38.2%
+            NDP: 11.4%
+            GRN: 5.4%
+            """.trimIndent(),
+        )
     }
 
     @Test
@@ -301,6 +407,30 @@ class CandidateListingScreenTest {
             .build(districtName)
         screen.size = Dimension(1024, 512)
         compareRendering("CandidateListingScreen", "CandidatesUpdating-1", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            GEORGETOWN-POWNAL
+            
+            CANDIDATES
+            KEVIN DOYLE (LIB)
+            SUSAN HARTLEY (GRN)
+            EDITH PERRY (NDP)
+            STEVEN MYERS [MLA] (PC)
+            
+            2015 RESULT
+            PC: 48.0%
+            LIB: 38.8%
+            NDP: 8.5%
+            GRN: 4.8%
+            
+            2015 REGIONAL RESULT
+            PC: 45.0%
+            LIB: 38.2%
+            NDP: 11.4%
+            GRN: 5.4%
+            """.trimIndent(),
+        )
 
         candidates.submit(
             listOf(
@@ -317,6 +447,30 @@ class CandidateListingScreenTest {
         districtNum.submit(8)
         focus.submit(listOf(8, 15, 16, 17, 18, 19, 20))
         compareRendering("CandidateListingScreen", "CandidatesUpdating-2", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            STANHOME-MARSFIELD
+            
+            CANDIDATES
+            SARAH DONALD (GRN)
+            WADE MACLAUCHLAN [MLA] (LIB)
+            BLOYCE THOMPSON (PC)
+            MARIAN WHITE (NDP)
+            
+            2015 RESULT
+            LIB: 47.7%
+            PC: 32.9%
+            NDP: 10.9%
+            GRN: 8.5%
+            
+            2015 REGIONAL RESULT
+            PC: 38.2%
+            LIB: 36.3%
+            GRN: 18.8%
+            NDP: 6.7%
+            """.trimIndent(),
+        )
     }
 
     @Test
@@ -345,6 +499,20 @@ class CandidateListingScreenTest {
             .build("MISSISSAUGA—LAKESHORE".asOneTimePublisher())
         screen.size = Dimension(1024, 512)
         compareRendering("CandidateListingScreen", "TwoColumns-1", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            MISSISSAUGA—LAKESHORE
+            
+            2021 GENERAL ELECTION CANDIDATES
+            MICHAEL RAS (CON)
+            ELIZABETH ROBERTSON (GRN)
+            VAHID SEYFAIE (PPC)
+            SVEN SPENGEMANN (LIB)
+            KAYLEIGH TAHK (RHINO)
+            SARAH WALJI (NDP)
+            """.trimIndent(),
+        )
 
         candidatesPublisher.submit(
             listOf(
@@ -392,6 +560,54 @@ class CandidateListingScreenTest {
         )
         header.submit("2022 BY-ELECTION CANDIDATES")
         compareRendering("CandidateListingScreen", "TwoColumns-2", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            MISSISSAUGA—LAKESHORE
+            
+            2022 BY-ELECTION CANDIDATES
+            KHALED AL-SUDANI (PPC)
+            MÉLODIE ANDERSON (IND)
+            MYRIAM BEAULIEU (IND)
+            LINE BÉLANGER (IND)
+            MYLÈNE BONNEAU (IND)
+            JEAN-DENIS PARENT BOUDREAULT (IND)
+            JEVIN DAVID CARROLL (IND)
+            SEAN CARSON (IND)
+            RON CHHINZER (CON)
+            SÉBASTIEN CORHINO (RHINO)
+            CHARLES CURRIE (IND)
+            STEPHEN DAVIS (IND)
+            MARK DEJEWSKI (IND)
+            YSACK DUPONT (IND)
+            DONOVAN ECKSTROM (IND)
+            ALEXANDRA ENGERING (IND)
+            DANIEL GAGNON (IND)
+            DONALD GAGNON (IND)
+            KERRI HILDEBRANDT (IND)
+            PETER HOUSE (IND)
+            MARTIN ACETARIA CAESAR JUBINVILLE (IND)
+            SAMUEL JUBINVILLE (IND)
+            MARY KIDNEW (GRN)
+            JULIA KOLE (NDP)
+            ALAIN LAMONTAGNE (IND)
+            MARIE-HÉLÈNE LEBEL (IND)
+            CONRAD LUKAWSKI (IND)
+            SPENCER ROCCHI (IND)
+            ELIANA ROSENBLUM (IND)
+            JULIAN SELODY (IND)
+            ROGER SHERWOOD (IND)
+            ADAM SMITH (IND)
+            CHARLES SOUSA (LIB)
+            JULIE ST-AMAND (IND)
+            PASCAL ST-AMAND (IND)
+            PATRICK STRZALKOWSKI (IND)
+            TOMAS SZUCHEWYCZ (IND)
+            BEN TEICHMAN (IND)
+            JOHN THE ENGINEER TURMEL (IND)
+            DARCY JUSTIN VANDERWATER (IND)
+            """.trimIndent(),
+        )
     }
 
     private fun peiShapesByDistrict(): Map<Int, Shape> {
