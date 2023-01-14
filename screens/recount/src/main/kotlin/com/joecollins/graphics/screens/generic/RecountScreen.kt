@@ -1,5 +1,6 @@
 package com.joecollins.graphics.screens.generic
 
+import com.joecollins.graphics.AltTextProvider
 import com.joecollins.graphics.GenericPanel
 import com.joecollins.graphics.components.MultiSummaryFrame
 import com.joecollins.models.general.Candidate
@@ -14,7 +15,11 @@ import java.awt.Color
 import java.text.DecimalFormat
 import java.util.concurrent.Flow
 
-class RecountScreen private constructor(headerLabel: Flow.Publisher<out String?>, frame: MultiSummaryFrame) : GenericPanel(pad(frame), headerLabel) {
+class RecountScreen private constructor(
+    headerLabel: Flow.Publisher<out String?>,
+    frame: MultiSummaryFrame,
+    override val altText: Flow.Publisher<String?>,
+) : GenericPanel(pad(frame), headerLabel), AltTextProvider {
 
     companion object {
         fun <T> of(
@@ -118,15 +123,13 @@ class RecountScreen private constructor(headerLabel: Flow.Publisher<out String?>
         }
 
         fun build(titlePublisher: Flow.Publisher<out String>): RecountScreen {
-            return RecountScreen(titlePublisher, buildFrame())
+            return RecountScreen(titlePublisher, buildFrame(), buildAltText(titlePublisher))
         }
 
         private fun buildFrame(): MultiSummaryFrame {
             val voteFormatter = DecimalFormat("#,##0")
             val pctFormatter = DecimalFormat("0.00%")
-            val input = Input<T>(voteThreshold, pctThreshold)
-            candidateVotes.subscribe(Subscriber { input.setVotes(it) })
-            pctReporting?.subscribe(Subscriber { input.setPctReporting(it) })
+            val input = buildInput()
             return MultiSummaryFrame(
                 headerPublisher = header,
                 rowsPublisher = input.toEntries().mapElements { e ->
@@ -135,12 +138,33 @@ class RecountScreen private constructor(headerLabel: Flow.Publisher<out String?>
                     val marginCell = Color.WHITE to "MARGIN: ${e.margin}" + (if (e.pctThreshold == null) "" else " (${pctFormatter.format(e.pctMargin)})")
                     MultiSummaryFrame.Row(rowHeaderFunc(e.key), listOf(partyCells, listOf(marginCell)).flatten())
                 },
-                notesPublisher = when {
-                    voteThreshold != null -> "Automatic recount triggered if the margin is $voteThreshold votes or fewer"
-                    pctThreshold != null -> "Automatic recount triggered if the margin is ${pctFormatter.format(pctThreshold)} or less"
-                    else -> null
-                }.asOneTimePublisher(),
+                notesPublisher = footer().asOneTimePublisher(),
             )
+        }
+
+        private fun buildInput(): Input<T> {
+            val input = Input<T>(voteThreshold, pctThreshold)
+            candidateVotes.subscribe(Subscriber { input.setVotes(it) })
+            pctReporting?.subscribe(Subscriber { input.setPctReporting(it) })
+            return input
+        }
+
+        private fun footer() = when {
+            voteThreshold != null -> "Automatic recount triggered if the margin is $voteThreshold votes or fewer"
+            pctThreshold != null -> "Automatic recount triggered if the margin is ${DecimalFormat("0.00%").format(pctThreshold)} or less"
+            else -> null
+        }
+
+        private fun buildAltText(titlePublisher: Flow.Publisher<out String>): Flow.Publisher<String?> {
+            val header = titlePublisher.merge(header) { t, h -> "$t\n\n$h" }
+            val body = buildInput().toEntries().map { entries ->
+                entries.joinToString("") { e ->
+                    "\n${rowHeaderFunc(e.key).uppercase()}: ${
+                        e.topCandidates.take(2).joinToString("") { "${it.key.party.abbreviation}: ${DecimalFormat("#,##0").format(it.value)}; " }
+                    }MARGIN: ${e.margin}${if (pctThreshold == null) "" else " (${DecimalFormat("0.00%").format(e.pctMargin)})"}"
+                }
+            }
+            return header.merge(body) { h, b -> "$h$b\n\n${footer()}" }
         }
     }
 }

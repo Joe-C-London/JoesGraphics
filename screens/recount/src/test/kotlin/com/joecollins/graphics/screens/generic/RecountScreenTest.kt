@@ -1,5 +1,6 @@
 package com.joecollins.graphics.screens.generic
 
+import com.joecollins.graphics.utils.PublisherTestUtils
 import com.joecollins.graphics.utils.RenderTestUtils
 import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.Party
@@ -33,6 +34,16 @@ class RecountScreenTest {
             .build("YUKON".asOneTimePublisher())
         screen.setSize(1024, 512)
         RenderTestUtils.compareRendering("RecountScreen", "RecountVotes-1", screen)
+        PublisherTestUtils.assertPublishes(
+            screen.altText,
+            """
+            YUKON
+            
+            AUTOMATIC RECOUNTS
+            
+            Automatic recount triggered if the margin is 10 votes or fewer
+            """.trimIndent(),
+        )
 
         candidateVotesRaw["Mountainview"] = mapOf(
             Candidate("Shaunagh Stikeman", ndp) to 62,
@@ -59,6 +70,17 @@ class RecountScreenTest {
         candidateVotes.submit(candidateVotesRaw)
         pctReporting.submit(pctReportingRaw)
         RenderTestUtils.compareRendering("RecountScreen", "RecountVotes-2", screen)
+        PublisherTestUtils.assertPublishes(
+            screen.altText,
+            """
+            YUKON
+            
+            AUTOMATIC RECOUNTS
+            VUNTUT GWITCHIN: LIB: 77; YP: 70; MARGIN: 7
+            
+            Automatic recount triggered if the margin is 10 votes or fewer
+            """.trimIndent(),
+        )
 
         candidateVotesRaw["Mountainview"] = mapOf(
             Candidate("Shaunagh Stikeman", ndp) to 432,
@@ -78,6 +100,18 @@ class RecountScreenTest {
         candidateVotes.submit(candidateVotesRaw)
         pctReporting.submit(pctReportingRaw)
         RenderTestUtils.compareRendering("RecountScreen", "RecountVotes-3", screen)
+        PublisherTestUtils.assertPublishes(
+            screen.altText,
+            """
+            YUKON
+            
+            AUTOMATIC RECOUNTS
+            MOUNTAINVIEW: LIB: 439; NDP: 432; MARGIN: 7
+            VUNTUT GWITCHIN: LIB: 77; YP: 70; MARGIN: 7
+            
+            Automatic recount triggered if the margin is 10 votes or fewer
+            """.trimIndent(),
+        )
     }
 
     @Test
@@ -101,6 +135,16 @@ class RecountScreenTest {
             .build("YUKON".asOneTimePublisher())
         screen.setSize(1024, 512)
         RenderTestUtils.compareRendering("RecountScreen", "RecountVotes-1", screen)
+        PublisherTestUtils.assertPublishes(
+            screen.altText,
+            """
+            YUKON
+            
+            AUTOMATIC RECOUNTS
+            
+            Automatic recount triggered if the margin is 10 votes or fewer
+            """.trimIndent(),
+        )
 
         candidateVotesRaw["Mountainview"] = mapOf(
             Candidate("Shaunagh Stikeman", ndp) to 62,
@@ -127,6 +171,17 @@ class RecountScreenTest {
         candidateVotes.submit(candidateVotesRaw)
         pollsReporting.submit(pollsReportingRaw)
         RenderTestUtils.compareRendering("RecountScreen", "RecountVotes-2", screen)
+        PublisherTestUtils.assertPublishes(
+            screen.altText,
+            """
+            YUKON
+            
+            AUTOMATIC RECOUNTS
+            VUNTUT GWITCHIN: LIB: 77; YP: 70; MARGIN: 7
+            
+            Automatic recount triggered if the margin is 10 votes or fewer
+            """.trimIndent(),
+        )
 
         candidateVotesRaw["Mountainview"] = mapOf(
             Candidate("Shaunagh Stikeman", ndp) to 432,
@@ -146,6 +201,18 @@ class RecountScreenTest {
         candidateVotes.submit(candidateVotesRaw)
         pollsReporting.submit(pollsReportingRaw)
         RenderTestUtils.compareRendering("RecountScreen", "RecountVotes-3", screen)
+        PublisherTestUtils.assertPublishes(
+            screen.altText,
+            """
+            YUKON
+            
+            AUTOMATIC RECOUNTS
+            MOUNTAINVIEW: LIB: 439; NDP: 432; MARGIN: 7
+            VUNTUT GWITCHIN: LIB: 77; YP: 70; MARGIN: 7
+            
+            Automatic recount triggered if the margin is 10 votes or fewer
+            """.trimIndent(),
+        )
     }
 
     @Test
@@ -168,6 +235,16 @@ class RecountScreenTest {
             .build("CANADA".asOneTimePublisher())
         screen.setSize(1024, 512)
         RenderTestUtils.compareRendering("RecountScreen", "RecountPct-1", screen)
+        PublisherTestUtils.assertPublishes(
+            screen.altText,
+            """
+            CANADA
+
+            AUTOMATIC RECOUNTS
+
+            Automatic recount triggered if the margin is 0.10% or less
+            """.trimIndent(),
+        )
 
         candidateVotesRaw["Etobicoke Centre"] = mapOf(
             Candidate("Ted Opitz", con) to 21644,
@@ -199,5 +276,18 @@ class RecountScreenTest {
 
         candidateVotes.submit(candidateVotesRaw)
         RenderTestUtils.compareRendering("RecountScreen", "RecountPct-2", screen)
+        PublisherTestUtils.assertPublishes(
+            screen.altText,
+            """
+            CANADA
+
+            AUTOMATIC RECOUNTS
+            MONTMAGNY—L'ISLET—KAMOURASKA—RIVIÈRE-DU-LOUP: NDP: 17,285; CON: 17,276; MARGIN: 9 (0.02%)
+            NIPISSING—TIMISKAMING: CON: 15,495; LIB: 15,477; MARGIN: 18 (0.04%)
+            ETOBICOKE CENTRE: CON: 21,644; LIB: 21,618; MARGIN: 26 (0.05%)
+
+            Automatic recount triggered if the margin is 0.10% or less
+            """.trimIndent(),
+        )
     }
 }
