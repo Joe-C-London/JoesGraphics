@@ -14,6 +14,7 @@ var topLevel = parent.parent
 
 dependencies {
     api parent.project('screenbase')
+    api topLevel.project('base')
     api topLevel.project('models')
     implementation topLevel.project('pubsub')
     implementation topLevel.project('components:barframe')
