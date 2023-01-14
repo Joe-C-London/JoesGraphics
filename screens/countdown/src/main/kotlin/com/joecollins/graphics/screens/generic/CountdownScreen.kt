@@ -1,9 +1,14 @@
 package com.joecollins.graphics.screens.generic
 
+import com.joecollins.graphics.AltTextProvider
 import com.joecollins.graphics.GenericPanel
 import com.joecollins.graphics.components.CountdownFrame
 import com.joecollins.graphics.components.MapFrame
+import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
+import com.joecollins.pubsub.combine
+import com.joecollins.pubsub.map
+import com.joecollins.pubsub.merge
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Dimension
@@ -11,26 +16,35 @@ import java.awt.GridLayout
 import java.awt.Shape
 import java.awt.geom.Area
 import java.time.Clock
+import java.time.Duration
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
+import java.time.temporal.ChronoUnit
+import java.util.concurrent.Executors
 import java.util.concurrent.Flow
+import java.util.concurrent.ScheduledExecutorService
+import java.util.concurrent.TimeUnit
 import javax.swing.JPanel
 import javax.swing.border.EmptyBorder
 
-class CountdownScreen private constructor(panel: JPanel, title: Flow.Publisher<String>) : GenericPanel(panel, title) {
+class CountdownScreen private constructor(
+    panel: JPanel,
+    title: Flow.Publisher<String>,
+    override val altText: Flow.Publisher<String?>,
+) : GenericPanel(panel, title), AltTextProvider {
 
-    class Builder<K>(private val date: LocalDate, private val shapes: Map<K, Shape>) {
+    class Builder<K>(private val date: LocalDate, private val shapes: Flow.Publisher<Map<K, Shape>>) {
 
-        private val timings = ArrayList<Triple<Instant, String, Collection<Shape>>>()
+        private val timings = ArrayList<Triple<Instant, String, Flow.Publisher<Collection<Shape>>>>()
         private var clock = Clock.systemDefaultZone()
         private var timesUpLabel = ""
 
         fun atTime(header: String, time: LocalTime, zone: ZoneId, predicate: (K) -> Boolean = { true }): Builder<K> {
             val instant = ZonedDateTime.of(date, time, zone).toInstant()
-            timings.add(Triple(instant, header, shapes.entries.filter { predicate(it.key) }.map { it.value }))
+            timings.add(Triple(instant, header, shapes.map { s -> s.entries.filter { predicate(it.key) }.map { it.value } }))
             return this
         }
 
@@ -66,49 +80,82 @@ class CountdownScreen private constructor(panel: JPanel, title: Flow.Publisher<S
                 else -> generateSequence { Color((0x1000000 * Math.random()).toInt()) }.take(timings.size).toList()
             }
 
-            (colors.indices).forEach {
+            (colors.indices).forEach { color ->
                 val frame = CountdownFrame(
-                    headerPublisher = timings[it].second.asOneTimePublisher(),
-                    timePublisher = timings[it].first.asOneTimePublisher(),
-                    labelFunc = {
-                        if (it.isNegative) {
-                            timesUpLabel
-                        } else if (it.toHours() == 0L) {
-                            CountdownFrame.formatMMSS(it)
-                        } else if (it.toDays() == 0L) {
-                            CountdownFrame.formatHHMMSS(it)
-                        } else {
-                            CountdownFrame.formatDDHHMMSS(it)
-                        }
-                    },
-                    borderColorPublisher = colors[it].asOneTimePublisher(),
-                    countdownColorPublisher = colors[it].asOneTimePublisher(),
+                    headerPublisher = timings[color].second.asOneTimePublisher(),
+                    timePublisher = timings[color].first.asOneTimePublisher(),
+                    labelFunc = { timeLabel(it) },
+                    borderColorPublisher = colors[color].asOneTimePublisher(),
+                    countdownColorPublisher = colors[color].asOneTimePublisher(),
                 )
                 frame.clock = clock
                 top.add(frame)
             }
 
             val map = MapFrame(
-                shapesPublisher = (colors.indices).flatMap { idx -> timings[idx].third.map { s -> s to colors[idx] } }.asOneTimePublisher(),
+                shapesPublisher = (colors.indices).map { idx ->
+                    timings[idx].third.map { shapes ->
+                        shapes.map { s -> s to colors[idx] }
+                    }
+                }.combine().map { it.flatten() },
                 headerPublisher = null.asOneTimePublisher(),
                 borderColorPublisher = Color.WHITE.asOneTimePublisher(),
             )
             outer.add(map, BorderLayout.CENTER)
 
-            return CountdownScreen(outer, title)
+            val executor = Executors.newScheduledThreadPool(1) { r: Runnable ->
+                val t = Executors.defaultThreadFactory().newThread(r)
+                t.isDaemon = true
+                t
+            }
+            val timingTexts = timings.map {
+                altTextLabel(it.second, it.first, executor)
+            }.combine().map { it.joinToString("\n") }
+            val altText: Flow.Publisher<String?> = title.merge(timingTexts) { t, tt -> "$t\n\n$tt" }
+
+            return CountdownScreen(outer, title, altText)
+        }
+
+        private fun altTextLabel(header: String, timestamp: Instant, executor: ScheduledExecutorService): Flow.Publisher<String> {
+            val ret = Publisher<String>()
+            executor.scheduleAtFixedRate({
+                ret.submit(header + ": " + timeLabel(Duration.between(clock.instant().truncatedTo(ChronoUnit.SECONDS), timestamp)))
+            }, 0, 100, TimeUnit.MILLISECONDS)
+            return ret
+        }
+
+        private fun timeLabel(it: Duration) = if (it.isNegative) {
+            timesUpLabel
+        } else if (it.toHours() == 0L) {
+            CountdownFrame.formatMMSS(it)
+        } else if (it.toDays() == 0L) {
+            CountdownFrame.formatHHMMSS(it)
+        } else {
+            CountdownFrame.formatDDHHMMSS(it)
         }
     }
 
     companion object {
         fun forDate(date: LocalDate): Builder<Unit> {
-            return Builder(date, emptyMap())
+            return Builder(date, emptyMap<Unit, Shape>().asOneTimePublisher())
         }
 
-        fun forDateWithMap(date: LocalDate, map: Collection<Shape>): Builder<Unit> {
-            return Builder(date, mapOf(Unit to (map.map { Area(it) }.reduceOrNull { a, s -> a.add(Area(s)); a } ?: Area())))
+        fun forDateWithMapSingle(date: LocalDate, map: Flow.Publisher<Collection<Shape>>): Builder<Unit> {
+            return Builder(
+                date,
+                map.map { m ->
+                    mapOf(
+                        Unit to (
+                            m.map { Area(it) }
+                                .reduceOrNull { a, s -> a.add(Area(s)); a }
+                                ?: Area()
+                            ),
+                    )
+                },
+            )
         }
 
-        fun <K> forDateWithMap(date: LocalDate, map: Map<K, Shape>): Builder<K> {
+        fun <K> forDateWithMap(date: LocalDate, map: Flow.Publisher<Map<K, Shape>>): Builder<K> {
             return Builder(date, map)
         }
     }
