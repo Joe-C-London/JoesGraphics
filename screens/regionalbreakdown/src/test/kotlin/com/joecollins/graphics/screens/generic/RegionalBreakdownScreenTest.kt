@@ -1,5 +1,6 @@
 package com.joecollins.graphics.screens.generic
 
+import com.joecollins.graphics.utils.PublisherTestUtils.assertPublishes
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.models.general.Coalition
 import com.joecollins.models.general.Party
@@ -32,15 +33,59 @@ class RegionalBreakdownScreenTest {
             .build("PRINCE EDWARD ISLAND".asOneTimePublisher())
         screen.setSize(1024, 512)
         compareRendering("RegionalBreakdownScreen", "Seats-1", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            PRINCE EDWARD ISLAND
+            SEATS BY REGION
+            
+            PRINCE EDWARD ISLAND: 0/27
+            
+            CARDIGAN: 0/7
+            MALPEQUE: 0/7
+            CHARLOTTETOWN: 0/6
+            EGMONT: 0/7
+            """.trimIndent(),
+        )
+
         peiSeats.submit(mapOf(grn to 1))
         cardiganSeats.submit(mapOf(grn to 1))
         compareRendering("RegionalBreakdownScreen", "Seats-2", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            PRINCE EDWARD ISLAND
+            SEATS BY REGION
+            
+            PRINCE EDWARD ISLAND: GRN 1, 1/27
+            
+            CARDIGAN: GRN 1, 1/7
+            MALPEQUE: GRN 0, 0/7
+            CHARLOTTETOWN: GRN 0, 0/6
+            EGMONT: GRN 0, 0/7
+            """.trimIndent(),
+        )
+
         peiSeats.submit(mapOf(pc to 13, grn to 8, lib to 6))
         cardiganSeats.submit(mapOf(pc to 6, grn to 1))
         malpequeSeats.submit(mapOf(pc to 5, grn to 1, lib to 1))
         charlottetownSeats.submit(mapOf(grn to 3, lib to 2, pc to 1))
         egmontSeats.submit(mapOf(grn to 3, lib to 3, pc to 1))
         compareRendering("RegionalBreakdownScreen", "Seats-3", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            PRINCE EDWARD ISLAND
+            SEATS BY REGION
+            
+            PRINCE EDWARD ISLAND: PC 13, GRN 8, LIB 6, 27/27
+            
+            CARDIGAN: PC 6, GRN 1, LIB 0, 7/7
+            MALPEQUE: PC 5, GRN 1, LIB 1, 7/7
+            CHARLOTTETOWN: PC 1, GRN 3, LIB 2, 6/6
+            EGMONT: PC 1, GRN 3, LIB 3, 7/7
+            """.trimIndent(),
+        )
     }
 
     @Test
@@ -70,12 +115,40 @@ class RegionalBreakdownScreenTest {
             .build("PRINCE EDWARD ISLAND".asOneTimePublisher())
         screen.setSize(1024, 512)
         compareRendering("RegionalBreakdownScreen", "SeatsWithDiff-1", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            PRINCE EDWARD ISLAND
+            SEATS BY REGION
+            
+            PRINCE EDWARD ISLAND: 0/27
+            
+            CARDIGAN: 0/7
+            MALPEQUE: 0/7
+            CHARLOTTETOWN: 0/6
+            EGMONT: 0/7
+            """.trimIndent(),
+        )
 
         peiSeats.submit(mapOf(grn to 1))
         peiDiff.submit(mapOf(grn to +1, lib to -1))
         cardiganSeats.submit(mapOf(grn to 1))
         cardiganDiff.submit(mapOf(grn to +1, lib to -1))
         compareRendering("RegionalBreakdownScreen", "SeatsWithDiff-2", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            PRINCE EDWARD ISLAND
+            SEATS BY REGION
+            
+            PRINCE EDWARD ISLAND: GRN 1 (+1), LIB 0 (-1), 1/27
+            
+            CARDIGAN: GRN 1 (+1), LIB 0 (-1), 1/7
+            MALPEQUE: GRN 0 (±0), LIB 0 (±0), 0/7
+            CHARLOTTETOWN: GRN 0 (±0), LIB 0 (±0), 0/6
+            EGMONT: GRN 0 (±0), LIB 0 (±0), 0/7
+            """.trimIndent(),
+        )
 
         peiSeats.submit(mapOf(pc to 13, grn to 8, lib to 6))
         peiDiff.submit(mapOf(pc to +5, grn to +7, lib to -12))
@@ -88,6 +161,20 @@ class RegionalBreakdownScreenTest {
         egmontSeats.submit(mapOf(grn to 3, lib to 3, pc to 1))
         egmontDiff.submit(mapOf(grn to +3, lib to -4, pc to +1))
         compareRendering("RegionalBreakdownScreen", "SeatsWithDiff-3", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            PRINCE EDWARD ISLAND
+            SEATS BY REGION
+            
+            PRINCE EDWARD ISLAND: PC 13 (+5), GRN 8 (+7), LIB 6 (-12), 27/27
+            
+            CARDIGAN: PC 6 (+1), GRN 1 (+1), LIB 0 (-2), 7/7
+            MALPEQUE: PC 5 (+2), GRN 1 (±0), LIB 1 (-1), 7/7
+            CHARLOTTETOWN: PC 1 (+1), GRN 3 (+3), LIB 2 (-5), 6/6
+            EGMONT: PC 1 (+1), GRN 3 (+3), LIB 3 (-4), 7/7
+            """.trimIndent(),
+        )
     }
 
     @Test
@@ -117,12 +204,40 @@ class RegionalBreakdownScreenTest {
             .build("PRINCE EDWARD ISLAND".asOneTimePublisher())
         screen.setSize(1024, 512)
         compareRendering("RegionalBreakdownScreen", "SeatsWithDiff-1", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            PRINCE EDWARD ISLAND
+            SEATS BY REGION
+            
+            PRINCE EDWARD ISLAND: 0/27
+            
+            CARDIGAN: 0/7
+            MALPEQUE: 0/7
+            CHARLOTTETOWN: 0/6
+            EGMONT: 0/7
+            """.trimIndent(),
+        )
 
         peiSeats.submit(mapOf(grn to 1))
         peiPrev.submit(mapOf(lib to 1))
         cardiganSeats.submit(mapOf(grn to 1))
         cardiganPrev.submit(mapOf(lib to 1))
         compareRendering("RegionalBreakdownScreen", "SeatsWithDiff-2", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            PRINCE EDWARD ISLAND
+            SEATS BY REGION
+            
+            PRINCE EDWARD ISLAND: GRN 1 (+1), LIB 0 (-1), 1/27
+            
+            CARDIGAN: GRN 1 (+1), LIB 0 (-1), 1/7
+            MALPEQUE: GRN 0 (±0), LIB 0 (±0), 0/7
+            CHARLOTTETOWN: GRN 0 (±0), LIB 0 (±0), 0/6
+            EGMONT: GRN 0 (±0), LIB 0 (±0), 0/7
+            """.trimIndent(),
+        )
 
         peiSeats.submit(mapOf(pc to 13, grn to 8, lib to 6))
         peiPrev.submit(mapOf(pc to 8, grn to 1, lib to 18))
@@ -135,6 +250,20 @@ class RegionalBreakdownScreenTest {
         egmontSeats.submit(mapOf(grn to 3, lib to 3, pc to 1))
         egmontPrev.submit(mapOf(lib to 7))
         compareRendering("RegionalBreakdownScreen", "SeatsWithDiff-3", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            PRINCE EDWARD ISLAND
+            SEATS BY REGION
+            
+            PRINCE EDWARD ISLAND: PC 13 (+5), GRN 8 (+7), LIB 6 (-12), 27/27
+            
+            CARDIGAN: PC 6 (+1), GRN 1 (+1), LIB 0 (-2), 7/7
+            MALPEQUE: PC 5 (+2), GRN 1 (±0), LIB 1 (-1), 7/7
+            CHARLOTTETOWN: PC 1 (+1), GRN 3 (+3), LIB 2 (-5), 6/6
+            EGMONT: PC 1 (+1), GRN 3 (+3), LIB 3 (-4), 7/7
+            """.trimIndent(),
+        )
     }
 
     @Test
@@ -153,17 +282,35 @@ class RegionalBreakdownScreenTest {
             "SEATS BY STATE".asOneTimePublisher(),
         )
             .withBlankRow()
-            .withRegion("NEW SOUTH WALES".asOneTimePublisher(), mapOf(coa to 22, alp to 24, oth to 1).asOneTimePublisher(), 47.asOneTimePublisher())
-            .withRegion("VICTORIA".asOneTimePublisher(), mapOf(coa to 15, alp to 21, oth to 2).asOneTimePublisher(), 38.asOneTimePublisher())
-            .withRegion("QUEENSLAND".asOneTimePublisher(), mapOf(lnp to 23, alp to 6, oth to 1).asOneTimePublisher(), 30.asOneTimePublisher(), mapOf(coa to lnp).asOneTimePublisher())
-            .withRegion("WESTERN AUSTRALIA".asOneTimePublisher(), mapOf(coa to 11, alp to 5).asOneTimePublisher(), 16.asOneTimePublisher())
-            .withRegion("SOUTH AUSTRALIA".asOneTimePublisher(), mapOf(coa to 4, alp to 5, oth to 1).asOneTimePublisher(), 10.asOneTimePublisher())
-            .withRegion("TASMANIA".asOneTimePublisher(), mapOf(coa to 2, alp to 2, oth to 1).asOneTimePublisher(), 5.asOneTimePublisher())
-            .withRegion("AUSTRALIAN CAPITAL TERRITORY".asOneTimePublisher(), mapOf(alp to 3).asOneTimePublisher(), 3.asOneTimePublisher(), mapOf(coa to lib).asOneTimePublisher())
-            .withRegion("NORTHERN TERRITORY".asOneTimePublisher(), mapOf(alp to 2).asOneTimePublisher(), 2.asOneTimePublisher(), mapOf(coa to clp).asOneTimePublisher())
+            .withRegion("NEW SOUTH WALES".asOneTimePublisher(), mapOf(coa to 22, alp to 24, oth to 1).asOneTimePublisher(), 47.asOneTimePublisher(), abbreviatedNamePublisher = "NSW".asOneTimePublisher())
+            .withRegion("VICTORIA".asOneTimePublisher(), mapOf(coa to 15, alp to 21, oth to 2).asOneTimePublisher(), 38.asOneTimePublisher(), abbreviatedNamePublisher = "VIC".asOneTimePublisher())
+            .withRegion("QUEENSLAND".asOneTimePublisher(), mapOf(lnp to 23, alp to 6, oth to 1).asOneTimePublisher(), 30.asOneTimePublisher(), mapOf(coa to lnp).asOneTimePublisher(), abbreviatedNamePublisher = "QLD".asOneTimePublisher())
+            .withRegion("WESTERN AUSTRALIA".asOneTimePublisher(), mapOf(lib to 11, alp to 5).asOneTimePublisher(), 16.asOneTimePublisher(), mapOf(coa to lib).asOneTimePublisher(), abbreviatedNamePublisher = "WA".asOneTimePublisher())
+            .withRegion("SOUTH AUSTRALIA".asOneTimePublisher(), mapOf(lib to 4, alp to 5, oth to 1).asOneTimePublisher(), 10.asOneTimePublisher(), mapOf(coa to lib).asOneTimePublisher(), abbreviatedNamePublisher = "SA".asOneTimePublisher())
+            .withRegion("TASMANIA".asOneTimePublisher(), mapOf(lib to 2, alp to 2, oth to 1).asOneTimePublisher(), 5.asOneTimePublisher(), mapOf(coa to lib).asOneTimePublisher(), abbreviatedNamePublisher = "TAS".asOneTimePublisher())
+            .withRegion("AUSTRALIAN CAPITAL TERRITORY".asOneTimePublisher(), mapOf(alp to 3).asOneTimePublisher(), 3.asOneTimePublisher(), mapOf(coa to lib).asOneTimePublisher(), abbreviatedNamePublisher = "ACT".asOneTimePublisher())
+            .withRegion("NORTHERN TERRITORY".asOneTimePublisher(), mapOf(alp to 2).asOneTimePublisher(), 2.asOneTimePublisher(), mapOf(coa to clp).asOneTimePublisher(), abbreviatedNamePublisher = "NT".asOneTimePublisher())
             .build("AUSTRALIA".asOneTimePublisher())
         screen.setSize(1024, 512)
         compareRendering("RegionalBreakdownScreen", "Seats-C", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            AUSTRALIA
+            SEATS BY STATE
+
+            AUSTRALIA: L/NP 77, ALP 68, OTH 6, 151/151
+
+            NSW: L/NP 22, ALP 24, OTH 1, 47/47
+            VIC: L/NP 15, ALP 21, OTH 2, 38/38
+            QLD: LNP 23, ALP 6, OTH 1, 30/30
+            WA: LIB 11, ALP 5, OTH 0, 16/16
+            SA: LIB 4, ALP 5, OTH 1, 10/10
+            TAS: LIB 2, ALP 2, OTH 1, 5/5
+            ACT: LIB 0, ALP 3, OTH 0, 3/3
+            NT: CLP 0, ALP 2, OTH 0, 2/2
+            """.trimIndent(),
+        )
     }
 
     @Test
@@ -183,17 +330,35 @@ class RegionalBreakdownScreenTest {
             "SEATS BY STATE".asOneTimePublisher(),
         )
             .withBlankRow()
-            .withRegion("NEW SOUTH WALES".asOneTimePublisher(), mapOf(coa to 22, alp to 24, oth to 1).asOneTimePublisher(), mapOf(coa to 23, alp to 24).asOneTimePublisher(), 47.asOneTimePublisher())
-            .withRegion("VICTORIA".asOneTimePublisher(), mapOf(coa to 15, alp to 21, oth to 2).asOneTimePublisher(), mapOf(coa to 17, alp to 18, oth to 2).asOneTimePublisher(), 38.asOneTimePublisher())
-            .withRegion("QUEENSLAND".asOneTimePublisher(), mapOf(lnp to 23, alp to 6, oth to 1).asOneTimePublisher(), mapOf(lnp to 21, alp to 8, oth to 1).asOneTimePublisher(), 30.asOneTimePublisher(), mapOf(coa to lnp).asOneTimePublisher())
-            .withRegion("WESTERN AUSTRALIA".asOneTimePublisher(), mapOf(coa to 11, alp to 5).asOneTimePublisher(), mapOf(coa to 11, alp to 5).asOneTimePublisher(), 16.asOneTimePublisher())
-            .withRegion("SOUTH AUSTRALIA".asOneTimePublisher(), mapOf(coa to 4, alp to 5, oth to 1).asOneTimePublisher(), mapOf(coa to 4, alp to 6, oth to 1).asOneTimePublisher(), 10.asOneTimePublisher())
-            .withRegion("TASMANIA".asOneTimePublisher(), mapOf(coa to 2, alp to 2, oth to 1).asOneTimePublisher(), mapOf(alp to 4, oth to 1).asOneTimePublisher(), 5.asOneTimePublisher())
-            .withRegion("AUSTRALIAN CAPITAL TERRITORY".asOneTimePublisher(), mapOf(alp to 3).asOneTimePublisher(), mapOf(alp to 2).asOneTimePublisher(), 3.asOneTimePublisher(), mapOf(coa to lib).asOneTimePublisher())
-            .withRegion("NORTHERN TERRITORY".asOneTimePublisher(), mapOf(alp to 2).asOneTimePublisher(), mapOf(alp to 2).asOneTimePublisher(), 2.asOneTimePublisher(), mapOf(coa to clp).asOneTimePublisher())
+            .withRegion("NEW SOUTH WALES".asOneTimePublisher(), mapOf(coa to 22, alp to 24, oth to 1).asOneTimePublisher(), mapOf(coa to 23, alp to 24).asOneTimePublisher(), 47.asOneTimePublisher(), abbreviatedNamePublisher = "NSW".asOneTimePublisher())
+            .withRegion("VICTORIA".asOneTimePublisher(), mapOf(coa to 15, alp to 21, oth to 2).asOneTimePublisher(), mapOf(coa to 17, alp to 18, oth to 2).asOneTimePublisher(), 38.asOneTimePublisher(), abbreviatedNamePublisher = "VIC".asOneTimePublisher())
+            .withRegion("QUEENSLAND".asOneTimePublisher(), mapOf(lnp to 23, alp to 6, oth to 1).asOneTimePublisher(), mapOf(lnp to 21, alp to 8, oth to 1).asOneTimePublisher(), 30.asOneTimePublisher(), mapOf(coa to lnp).asOneTimePublisher(), abbreviatedNamePublisher = "QLD".asOneTimePublisher())
+            .withRegion("WESTERN AUSTRALIA".asOneTimePublisher(), mapOf(lib to 11, alp to 5).asOneTimePublisher(), mapOf(lib to 11, alp to 5).asOneTimePublisher(), 16.asOneTimePublisher(), mapOf(coa to lib).asOneTimePublisher(), abbreviatedNamePublisher = "WA".asOneTimePublisher())
+            .withRegion("SOUTH AUSTRALIA".asOneTimePublisher(), mapOf(lib to 4, alp to 5, oth to 1).asOneTimePublisher(), mapOf(lib to 4, alp to 6, oth to 1).asOneTimePublisher(), 10.asOneTimePublisher(), mapOf(coa to lib).asOneTimePublisher(), abbreviatedNamePublisher = "SA".asOneTimePublisher())
+            .withRegion("TASMANIA".asOneTimePublisher(), mapOf(lib to 2, alp to 2, oth to 1).asOneTimePublisher(), mapOf(alp to 4, oth to 1).asOneTimePublisher(), 5.asOneTimePublisher(), mapOf(coa to lib).asOneTimePublisher(), abbreviatedNamePublisher = "TAS".asOneTimePublisher())
+            .withRegion("AUSTRALIAN CAPITAL TERRITORY".asOneTimePublisher(), mapOf(alp to 3).asOneTimePublisher(), mapOf(alp to 2).asOneTimePublisher(), 3.asOneTimePublisher(), mapOf(coa to lib).asOneTimePublisher(), abbreviatedNamePublisher = "ACT".asOneTimePublisher())
+            .withRegion("NORTHERN TERRITORY".asOneTimePublisher(), mapOf(alp to 2).asOneTimePublisher(), mapOf(alp to 2).asOneTimePublisher(), 2.asOneTimePublisher(), mapOf(coa to clp).asOneTimePublisher(), abbreviatedNamePublisher = "NT".asOneTimePublisher())
             .build("AUSTRALIA".asOneTimePublisher())
         screen.setSize(1024, 512)
         compareRendering("RegionalBreakdownScreen", "SeatsWithPrev-C", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            AUSTRALIA
+            SEATS BY STATE
+
+            AUSTRALIA: L/NP 77 (+1), ALP 68 (-1), OTH 6 (+1), 151/151
+
+            NSW: L/NP 22 (-1), ALP 24 (±0), OTH 1 (+1), 47/47
+            VIC: L/NP 15 (-2), ALP 21 (+3), OTH 2 (±0), 38/38
+            QLD: LNP 23 (+2), ALP 6 (-2), OTH 1 (±0), 30/30
+            WA: LIB 11 (±0), ALP 5 (±0), OTH 0 (±0), 16/16
+            SA: LIB 4 (±0), ALP 5 (-1), OTH 1 (±0), 10/10
+            TAS: LIB 2 (+2), ALP 2 (-2), OTH 1 (±0), 5/5
+            ACT: LIB 0 (±0), ALP 3 (+1), OTH 0 (±0), 3/3
+            NT: CLP 0 (±0), ALP 2 (±0), OTH 0 (±0), 2/2
+            """.trimIndent(),
+        )
     }
 
     @Test
@@ -213,17 +378,35 @@ class RegionalBreakdownScreenTest {
             "SEATS BY STATE".asOneTimePublisher(),
         )
             .withBlankRow()
-            .withRegion("NEW SOUTH WALES".asOneTimePublisher(), mapOf(coa to 22, alp to 24, oth to 1).asOneTimePublisher(), mapOf(coa to -1, oth to +1).asOneTimePublisher(), 47.asOneTimePublisher())
-            .withRegion("VICTORIA".asOneTimePublisher(), mapOf(coa to 15, alp to 21, oth to 2).asOneTimePublisher(), mapOf(coa to -2, alp to +3).asOneTimePublisher(), 38.asOneTimePublisher())
-            .withRegion("QUEENSLAND".asOneTimePublisher(), mapOf(lnp to 23, alp to 6, oth to 1).asOneTimePublisher(), mapOf(lnp to +2, alp to -2).asOneTimePublisher(), 30.asOneTimePublisher(), mapOf(coa to lnp).asOneTimePublisher())
-            .withRegion("WESTERN AUSTRALIA".asOneTimePublisher(), mapOf(coa to 11, alp to 5).asOneTimePublisher(), mapOf<Party, Int>().asOneTimePublisher(), 16.asOneTimePublisher())
-            .withRegion("SOUTH AUSTRALIA".asOneTimePublisher(), mapOf(coa to 4, alp to 5, oth to 1).asOneTimePublisher(), mapOf(alp to -1).asOneTimePublisher(), 10.asOneTimePublisher())
-            .withRegion("TASMANIA".asOneTimePublisher(), mapOf(coa to 2, alp to 2, oth to 1).asOneTimePublisher(), mapOf(coa to +2, alp to -2).asOneTimePublisher(), 5.asOneTimePublisher())
-            .withRegion("AUSTRALIAN CAPITAL TERRITORY".asOneTimePublisher(), mapOf(alp to 3).asOneTimePublisher(), mapOf(alp to +1).asOneTimePublisher(), 3.asOneTimePublisher(), mapOf(coa to lib).asOneTimePublisher())
-            .withRegion("NORTHERN TERRITORY".asOneTimePublisher(), mapOf(alp to 2).asOneTimePublisher(), mapOf(alp to 0).asOneTimePublisher(), 2.asOneTimePublisher(), mapOf(coa to clp).asOneTimePublisher())
+            .withRegion("NEW SOUTH WALES".asOneTimePublisher(), mapOf(coa to 22, alp to 24, oth to 1).asOneTimePublisher(), mapOf(coa to -1, oth to +1).asOneTimePublisher(), 47.asOneTimePublisher(), abbreviatedNamePublisher = "NSW".asOneTimePublisher())
+            .withRegion("VICTORIA".asOneTimePublisher(), mapOf(coa to 15, alp to 21, oth to 2).asOneTimePublisher(), mapOf(coa to -2, alp to +3).asOneTimePublisher(), 38.asOneTimePublisher(), abbreviatedNamePublisher = "VIC".asOneTimePublisher())
+            .withRegion("QUEENSLAND".asOneTimePublisher(), mapOf(lnp to 23, alp to 6, oth to 1).asOneTimePublisher(), mapOf(lnp to +2, alp to -2).asOneTimePublisher(), 30.asOneTimePublisher(), mapOf(coa to lnp).asOneTimePublisher(), abbreviatedNamePublisher = "QLD".asOneTimePublisher())
+            .withRegion("WESTERN AUSTRALIA".asOneTimePublisher(), mapOf(lib to 11, alp to 5).asOneTimePublisher(), mapOf<Party, Int>().asOneTimePublisher(), 16.asOneTimePublisher(), mapOf(coa to lib).asOneTimePublisher(), abbreviatedNamePublisher = "WA".asOneTimePublisher())
+            .withRegion("SOUTH AUSTRALIA".asOneTimePublisher(), mapOf(lib to 4, alp to 5, oth to 1).asOneTimePublisher(), mapOf(alp to -1).asOneTimePublisher(), 10.asOneTimePublisher(), mapOf(coa to lib).asOneTimePublisher(), abbreviatedNamePublisher = "SA".asOneTimePublisher())
+            .withRegion("TASMANIA".asOneTimePublisher(), mapOf(lib to 2, alp to 2, oth to 1).asOneTimePublisher(), mapOf(lib to +2, alp to -2).asOneTimePublisher(), 5.asOneTimePublisher(), mapOf(coa to lib).asOneTimePublisher(), abbreviatedNamePublisher = "TAS".asOneTimePublisher())
+            .withRegion("AUSTRALIAN CAPITAL TERRITORY".asOneTimePublisher(), mapOf(alp to 3).asOneTimePublisher(), mapOf(alp to +1).asOneTimePublisher(), 3.asOneTimePublisher(), mapOf(coa to lib).asOneTimePublisher(), abbreviatedNamePublisher = "ACT".asOneTimePublisher())
+            .withRegion("NORTHERN TERRITORY".asOneTimePublisher(), mapOf(alp to 2).asOneTimePublisher(), mapOf(alp to 0).asOneTimePublisher(), 2.asOneTimePublisher(), mapOf(coa to clp).asOneTimePublisher(), abbreviatedNamePublisher = "NT".asOneTimePublisher())
             .build("AUSTRALIA".asOneTimePublisher())
         screen.setSize(1024, 512)
         compareRendering("RegionalBreakdownScreen", "SeatsWithPrev-C", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            AUSTRALIA
+            SEATS BY STATE
+
+            AUSTRALIA: L/NP 77 (+1), ALP 68 (-1), OTH 6 (+1), 151/151
+
+            NSW: L/NP 22 (-1), ALP 24 (±0), OTH 1 (+1), 47/47
+            VIC: L/NP 15 (-2), ALP 21 (+3), OTH 2 (±0), 38/38
+            QLD: LNP 23 (+2), ALP 6 (-2), OTH 1 (±0), 30/30
+            WA: LIB 11 (±0), ALP 5 (±0), OTH 0 (±0), 16/16
+            SA: LIB 4 (±0), ALP 5 (-1), OTH 1 (±0), 10/10
+            TAS: LIB 2 (+2), ALP 2 (-2), OTH 1 (±0), 5/5
+            ACT: LIB 0 (±0), ALP 3 (+1), OTH 0 (±0), 3/3
+            NT: CLP 0 (±0), ALP 2 (±0), OTH 0 (±0), 2/2
+            """.trimIndent(),
+        )
     }
 
     @Test
@@ -268,6 +451,27 @@ class RegionalBreakdownScreenTest {
         val screen = builder.build("CANADA".asOneTimePublisher())
         screen.size = Dimension(1024, 512)
         compareRendering("RegionalBreakdownScreen", "SeatsWithLimitedColumns-1", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            CANADA
+            SEATS BY PROVINCE
+            
+            CANADA: 0/338
+            
+            NEWFOUNDLAND AND LABRADOR: 0/7
+            NOVA SCOTIA: 0/11
+            PRINCE EDWARD ISLAND: 0/4
+            NEW BRUNSWICK: 0/10
+            QUEBEC: 0/78
+            ONTARIO: 0/121
+            MANITOBA: 0/14
+            SASKATCHEWAN: 0/14
+            ALBERTA: 0/34
+            BRITISH COLUMBIA: 0/42
+            NORTHERN CANADA: 0/3
+            """.trimIndent(),
+        )
 
         federalSeats.also {
             it.first.submit(mapOf(lib to 6, ndp to 1))
@@ -278,6 +482,27 @@ class RegionalBreakdownScreenTest {
             it.second.submit(mapOf(lib to 7))
         }
         compareRendering("RegionalBreakdownScreen", "SeatsWithLimitedColumns-2", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            CANADA
+            SEATS BY PROVINCE
+            
+            CANADA: LIB 6 (-1), NDP 1 (+1), 7/338
+            
+            NEWFOUNDLAND AND LABRADOR: LIB 6 (-1), NDP 1 (+1), 7/7
+            NOVA SCOTIA: LIB 0 (±0), NDP 0 (±0), 0/11
+            PRINCE EDWARD ISLAND: LIB 0 (±0), NDP 0 (±0), 0/4
+            NEW BRUNSWICK: LIB 0 (±0), NDP 0 (±0), 0/10
+            QUEBEC: LIB 0 (±0), NDP 0 (±0), 0/78
+            ONTARIO: LIB 0 (±0), NDP 0 (±0), 0/121
+            MANITOBA: LIB 0 (±0), NDP 0 (±0), 0/14
+            SASKATCHEWAN: LIB 0 (±0), NDP 0 (±0), 0/14
+            ALBERTA: LIB 0 (±0), NDP 0 (±0), 0/34
+            BRITISH COLUMBIA: LIB 0 (±0), NDP 0 (±0), 0/42
+            NORTHERN CANADA: LIB 0 (±0), NDP 0 (±0), 0/3
+            """.trimIndent(),
+        )
 
         federalSeats.also {
             it.first.submit(mapOf(lib to 26, con to 4, ndp to 1, grn to 1))
@@ -296,6 +521,27 @@ class RegionalBreakdownScreenTest {
             it.second.submit(mapOf(lib to 10))
         }
         compareRendering("RegionalBreakdownScreen", "SeatsWithLimitedColumns-3", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            CANADA
+            SEATS BY PROVINCE
+            
+            CANADA: LIB 26 (-6), CON 4 (+4), NDP 1 (+1), GRN 1 (+1), 32/338
+            
+            NEWFOUNDLAND AND LABRADOR: LIB 6 (-1), CON 0 (±0), NDP 1 (+1), GRN 0 (±0), 7/7
+            NOVA SCOTIA: LIB 10 (-1), CON 1 (+1), NDP 0 (±0), GRN 0 (±0), 11/11
+            PRINCE EDWARD ISLAND: LIB 4 (±0), CON 0 (±0), NDP 0 (±0), GRN 0 (±0), 4/4
+            NEW BRUNSWICK: LIB 6 (-4), CON 3 (+3), NDP 0 (±0), GRN 1 (+1), 10/10
+            QUEBEC: LIB 0 (±0), CON 0 (±0), NDP 0 (±0), GRN 0 (±0), 0/78
+            ONTARIO: LIB 0 (±0), CON 0 (±0), NDP 0 (±0), GRN 0 (±0), 0/121
+            MANITOBA: LIB 0 (±0), CON 0 (±0), NDP 0 (±0), GRN 0 (±0), 0/14
+            SASKATCHEWAN: LIB 0 (±0), CON 0 (±0), NDP 0 (±0), GRN 0 (±0), 0/14
+            ALBERTA: LIB 0 (±0), CON 0 (±0), NDP 0 (±0), GRN 0 (±0), 0/34
+            BRITISH COLUMBIA: LIB 0 (±0), CON 0 (±0), NDP 0 (±0), GRN 0 (±0), 0/42
+            NORTHERN CANADA: LIB 0 (±0), CON 0 (±0), NDP 0 (±0), GRN 0 (±0), 0/3
+            """.trimIndent(),
+        )
 
         federalSeats.also {
             it.first.submit(mapOf(lib to 145, con to 104, ndp to 13, bq to 32, grn to 1))
@@ -326,6 +572,27 @@ class RegionalBreakdownScreenTest {
             it.second.submit(mapOf(lib to 2))
         }
         compareRendering("RegionalBreakdownScreen", "SeatsWithLimitedColumns-4", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            CANADA
+            SEATS BY PROVINCE
+            
+            CANADA: LIB 145 (-21), CON 104 (+15), BQ 32 (+22), OTH 14 (-16), 295/338
+            
+            NEWFOUNDLAND AND LABRADOR: LIB 6 (-1), CON 0 (±0), BQ 0 (±0), OTH 1 (+1), 7/7
+            NOVA SCOTIA: LIB 10 (-1), CON 1 (+1), BQ 0 (±0), OTH 0 (±0), 11/11
+            PRINCE EDWARD ISLAND: LIB 4 (±0), CON 0 (±0), BQ 0 (±0), OTH 0 (±0), 4/4
+            NEW BRUNSWICK: LIB 6 (-4), CON 3 (+3), BQ 0 (±0), OTH 1 (+1), 10/10
+            QUEBEC: LIB 35 (-5), CON 10 (-2), BQ 32 (+22), OTH 1 (-15), 78/78
+            ONTARIO: LIB 79 (-1), CON 36 (+3), BQ 0 (±0), OTH 6 (-2), 121/121
+            MANITOBA: LIB 4 (-3), CON 7 (+2), BQ 0 (±0), OTH 3 (+1), 14/14
+            SASKATCHEWAN: LIB 0 (-1), CON 14 (+4), BQ 0 (±0), OTH 0 (-3), 14/14
+            ALBERTA: LIB 0 (-4), CON 33 (+4), BQ 0 (±0), OTH 1 (±0), 34/34
+            BRITISH COLUMBIA: LIB 0 (±0), CON 0 (±0), BQ 0 (±0), OTH 0 (±0), 0/42
+            NORTHERN CANADA: LIB 1 (-1), CON 0 (±0), BQ 0 (±0), OTH 1 (+1), 2/3
+            """.trimIndent(),
+        )
 
         federalSeats.also {
             it.first.submit(mapOf(lib to 157, con to 121, ndp to 24, bq to 32, grn to 3, ind to 1))
@@ -340,6 +607,27 @@ class RegionalBreakdownScreenTest {
             it.second.submit(mapOf(lib to 3))
         }
         compareRendering("RegionalBreakdownScreen", "SeatsWithLimitedColumns-5", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            CANADA
+            SEATS BY PROVINCE
+            
+            CANADA: LIB 157 (-27), CON 121 (+22), BQ 32 (+22), OTH 28 (-17), 338/338
+            
+            NEWFOUNDLAND AND LABRADOR: LIB 6 (-1), CON 0 (±0), BQ 0 (±0), OTH 1 (+1), 7/7
+            NOVA SCOTIA: LIB 10 (-1), CON 1 (+1), BQ 0 (±0), OTH 0 (±0), 11/11
+            PRINCE EDWARD ISLAND: LIB 4 (±0), CON 0 (±0), BQ 0 (±0), OTH 0 (±0), 4/4
+            NEW BRUNSWICK: LIB 6 (-4), CON 3 (+3), BQ 0 (±0), OTH 1 (+1), 10/10
+            QUEBEC: LIB 35 (-5), CON 10 (-2), BQ 32 (+22), OTH 1 (-15), 78/78
+            ONTARIO: LIB 79 (-1), CON 36 (+3), BQ 0 (±0), OTH 6 (-2), 121/121
+            MANITOBA: LIB 4 (-3), CON 7 (+2), BQ 0 (±0), OTH 3 (+1), 14/14
+            SASKATCHEWAN: LIB 0 (-1), CON 14 (+4), BQ 0 (±0), OTH 0 (-3), 14/14
+            ALBERTA: LIB 0 (-4), CON 33 (+4), BQ 0 (±0), OTH 1 (±0), 34/34
+            BRITISH COLUMBIA: LIB 11 (-6), CON 17 (+7), BQ 0 (±0), OTH 14 (-1), 42/42
+            NORTHERN CANADA: LIB 2 (-1), CON 0 (±0), BQ 0 (±0), OTH 1 (+1), 3/3
+            """.trimIndent(),
+        )
     }
 
     @Test
@@ -368,11 +656,41 @@ class RegionalBreakdownScreenTest {
             .build("PRINCE EDWARD ISLAND".asOneTimePublisher())
         screen.setSize(1024, 512)
         compareRendering("RegionalBreakdownScreen", "Votes-1", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            PRINCE EDWARD ISLAND
+            VOTES BY REGION
+            
+            PRINCE EDWARD ISLAND: 0.0% IN
+            
+            CARDIGAN: 0.0% IN
+            MALPEQUE: 0.0% IN
+            CHARLOTTETOWN: 0.0% IN
+            EGMONT: 0.0% IN
+            """.trimIndent(),
+        )
+
         peiVotes.submit(mapOf(lib to 902, pc to 934, grn to 1152, ndp to 38))
         peiPct.submit(1.0 / 27)
         cardiganVotes.submit(mapOf(lib to 902, pc to 934, grn to 1152, ndp to 38))
         cardiganPct.submit(1.0 / 7)
         compareRendering("RegionalBreakdownScreen", "Votes-2", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            PRINCE EDWARD ISLAND
+            VOTES BY REGION
+            
+            PRINCE EDWARD ISLAND: GRN 38.1%, PC 30.9%, LIB 29.8%, NDP 1.3%, 3.7% IN
+            
+            CARDIGAN: GRN 38.1%, PC 30.9%, LIB 29.8%, NDP 1.3%, 14.3% IN
+            MALPEQUE: GRN 0.0%, PC 0.0%, LIB 0.0%, NDP 0.0%, 0.0% IN
+            CHARLOTTETOWN: GRN 0.0%, PC 0.0%, LIB 0.0%, NDP 0.0%, 0.0% IN
+            EGMONT: GRN 0.0%, PC 0.0%, LIB 0.0%, NDP 0.0%, 0.0% IN
+            """.trimIndent(),
+        )
+
         peiVotes.submit(mapOf(lib to 24346, pc to 30415, grn to 25302, ndp to 2454, ind to 282))
         peiPct.submit(1.0)
         cardiganVotes.submit(mapOf(lib to 5265, pc to 9714, grn to 5779, ndp to 277))
@@ -384,6 +702,20 @@ class RegionalBreakdownScreenTest {
         egmontVotes.submit(mapOf(lib to 7455, pc to 5876, grn to 5554, ndp to 1259))
         egmontPct.submit(1.0)
         compareRendering("RegionalBreakdownScreen", "Votes-3", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            PRINCE EDWARD ISLAND
+            VOTES BY REGION
+            
+            PRINCE EDWARD ISLAND: PC 36.7%, GRN 30.6%, LIB 29.4%, NDP 3.0%, IND 0.3%, 100.0% IN
+            
+            CARDIGAN: PC 46.2%, GRN 27.5%, LIB 25.0%, NDP 1.3%, IND 0.0%, 100.0% IN
+            MALPEQUE: PC 42.7%, GRN 31.9%, LIB 24.0%, NDP 1.1%, IND 0.3%, 100.0% IN
+            CHARLOTTETOWN: PC 26.7%, GRN 35.7%, LIB 32.9%, NDP 3.6%, IND 1.1%, 100.0% IN
+            EGMONT: PC 29.2%, GRN 27.6%, LIB 37.0%, NDP 6.2%, IND 0.0%, 100.0% IN
+            """.trimIndent(),
+        )
     }
 
     @Test
@@ -412,11 +744,41 @@ class RegionalBreakdownScreenTest {
             .build("PRINCE EDWARD ISLAND".asOneTimePublisher())
         screen.setSize(1024, 512)
         compareRendering("RegionalBreakdownScreen", "VotesPollsReporting-1", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            PRINCE EDWARD ISLAND
+            VOTES BY REGION
+            
+            PRINCE EDWARD ISLAND: 0/27
+            
+            CARDIGAN: 0/7
+            MALPEQUE: 0/7
+            CHARLOTTETOWN: 0/6
+            EGMONT: 0/7
+            """.trimIndent(),
+        )
+
         peiVotes.submit(mapOf(lib to 902, pc to 934, grn to 1152, ndp to 38))
         peiPct.submit(PollsReporting(1, 27))
         cardiganVotes.submit(mapOf(lib to 902, pc to 934, grn to 1152, ndp to 38))
         cardiganPct.submit(PollsReporting(1, 7))
         compareRendering("RegionalBreakdownScreen", "VotesPollsReporting-2", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            PRINCE EDWARD ISLAND
+            VOTES BY REGION
+            
+            PRINCE EDWARD ISLAND: GRN 38.1%, PC 30.9%, LIB 29.8%, NDP 1.3%, 1/27
+            
+            CARDIGAN: GRN 38.1%, PC 30.9%, LIB 29.8%, NDP 1.3%, 1/7
+            MALPEQUE: GRN 0.0%, PC 0.0%, LIB 0.0%, NDP 0.0%, 0/7
+            CHARLOTTETOWN: GRN 0.0%, PC 0.0%, LIB 0.0%, NDP 0.0%, 0/6
+            EGMONT: GRN 0.0%, PC 0.0%, LIB 0.0%, NDP 0.0%, 0/7
+            """.trimIndent(),
+        )
+
         peiVotes.submit(mapOf(lib to 24346, pc to 30415, grn to 25302, ndp to 2454, ind to 282))
         peiPct.submit(PollsReporting(27, 27))
         cardiganVotes.submit(mapOf(lib to 5265, pc to 9714, grn to 5779, ndp to 277))
@@ -428,6 +790,20 @@ class RegionalBreakdownScreenTest {
         egmontVotes.submit(mapOf(lib to 7455, pc to 5876, grn to 5554, ndp to 1259))
         egmontPct.submit(PollsReporting(7, 7))
         compareRendering("RegionalBreakdownScreen", "VotesPollsReporting-3", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            PRINCE EDWARD ISLAND
+            VOTES BY REGION
+            
+            PRINCE EDWARD ISLAND: PC 36.7%, GRN 30.6%, LIB 29.4%, NDP 3.0%, IND 0.3%, 27/27
+            
+            CARDIGAN: PC 46.2%, GRN 27.5%, LIB 25.0%, NDP 1.3%, IND 0.0%, 7/7
+            MALPEQUE: PC 42.7%, GRN 31.9%, LIB 24.0%, NDP 1.1%, IND 0.3%, 7/7
+            CHARLOTTETOWN: PC 26.7%, GRN 35.7%, LIB 32.9%, NDP 3.6%, IND 1.1%, 6/6
+            EGMONT: PC 29.2%, GRN 27.6%, LIB 37.0%, NDP 6.2%, IND 0.0%, 7/7
+            """.trimIndent(),
+        )
     }
 
     @Test
@@ -462,6 +838,21 @@ class RegionalBreakdownScreenTest {
             .build("PRINCE EDWARD ISLAND".asOneTimePublisher())
         screen.setSize(1024, 512)
         compareRendering("RegionalBreakdownScreen", "VotesWithPrev-1", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            PRINCE EDWARD ISLAND
+            VOTES BY REGION
+            
+            PRINCE EDWARD ISLAND: 0.0% IN
+            
+            CARDIGAN: 0.0% IN
+            MALPEQUE: 0.0% IN
+            CHARLOTTETOWN: 0.0% IN
+            EGMONT: 0.0% IN
+            """.trimIndent(),
+        )
+
         peiVotes.submit(mapOf(lib to 902, pc to 934, grn to 1152, ndp to 38))
         peiPrevVotes.submit(mapOf(lib to 1173, pc to 1173, grn to 234, ndp to 258))
         peiPct.submit(1.0 / 27)
@@ -469,6 +860,21 @@ class RegionalBreakdownScreenTest {
         cardiganPrevVotes.submit(mapOf(lib to 1173, pc to 1173, grn to 234, ndp to 258))
         cardiganPct.submit(1.0 / 7)
         compareRendering("RegionalBreakdownScreen", "VotesWithPrev-2", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            PRINCE EDWARD ISLAND
+            VOTES BY REGION
+            
+            PRINCE EDWARD ISLAND: GRN 38.1% (+29.8), PC 30.9% (-10.5), LIB 29.8% (-11.5), NDP 1.3% (-7.8), 3.7% IN
+            
+            CARDIGAN: GRN 38.1% (+29.8), PC 30.9% (-10.5), LIB 29.8% (-11.5), NDP 1.3% (-7.8), 14.3% IN
+            MALPEQUE: GRN 0.0% (±0.0), PC 0.0% (±0.0), LIB 0.0% (±0.0), NDP 0.0% (±0.0), 0.0% IN
+            CHARLOTTETOWN: GRN 0.0% (±0.0), PC 0.0% (±0.0), LIB 0.0% (±0.0), NDP 0.0% (±0.0), 0.0% IN
+            EGMONT: GRN 0.0% (±0.0), PC 0.0% (±0.0), LIB 0.0% (±0.0), NDP 0.0% (±0.0), 0.0% IN
+            """.trimIndent(),
+        )
+
         peiVotes.submit(mapOf(lib to 24346, pc to 30415, grn to 25302, ndp to 2454, ind to 282))
         peiPrevVotes.submit(mapOf(lib to 33481, pc to 30663, grn to 8857, ndp to 8997))
         peiPct.submit(1.0)
@@ -485,6 +891,20 @@ class RegionalBreakdownScreenTest {
         egmontPrevVotes.submit(mapOf(lib to 9312, pc to 6646, grn to 1138, ndp to 1902))
         egmontPct.submit(1.0)
         compareRendering("RegionalBreakdownScreen", "VotesWithPrev-3", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            PRINCE EDWARD ISLAND
+            VOTES BY REGION
+            
+            PRINCE EDWARD ISLAND: PC 36.7% (-0.7), GRN 30.6% (+19.8), LIB 29.4% (-11.4), NDP 3.0% (-8.0), IND 0.3% (+0.3), 100.0% IN
+            
+            CARDIGAN: PC 46.2% (+1.2), GRN 27.5% (+22.0), LIB 25.0% (-13.1), NDP 1.3% (-10.1), IND 0.0% (±0.0), 100.0% IN
+            MALPEQUE: PC 42.7% (+4.5), GRN 31.9% (+13.1), LIB 24.0% (-12.4), NDP 1.1% (-5.6), IND 0.3% (+0.3), 100.0% IN
+            CHARLOTTETOWN: PC 26.7% (-4.4), GRN 35.7% (+23.3), LIB 32.9% (-7.8), NDP 3.6% (-12.2), IND 1.1% (+1.1), 100.0% IN
+            EGMONT: PC 29.2% (-5.8), GRN 27.6% (+21.6), LIB 37.0% (-12.0), NDP 6.2% (-3.8), IND 0.0% (±0.0), 100.0% IN
+            """.trimIndent(),
+        )
     }
 
     @Test
@@ -519,6 +939,21 @@ class RegionalBreakdownScreenTest {
             .build("PRINCE EDWARD ISLAND".asOneTimePublisher())
         screen.setSize(1024, 512)
         compareRendering("RegionalBreakdownScreen", "VotesWithPrevPollsReporting-1", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            PRINCE EDWARD ISLAND
+            VOTES BY REGION
+            
+            PRINCE EDWARD ISLAND: 0/27
+            
+            CARDIGAN: 0/7
+            MALPEQUE: 0/7
+            CHARLOTTETOWN: 0/6
+            EGMONT: 0/7
+            """.trimIndent(),
+        )
+
         peiVotes.submit(mapOf(lib to 902, pc to 934, grn to 1152, ndp to 38))
         peiPrevVotes.submit(mapOf(lib to 1173, pc to 1173, grn to 234, ndp to 258))
         peiPct.submit(PollsReporting(1, 27))
@@ -526,6 +961,21 @@ class RegionalBreakdownScreenTest {
         cardiganPrevVotes.submit(mapOf(lib to 1173, pc to 1173, grn to 234, ndp to 258))
         cardiganPct.submit(PollsReporting(1, 7))
         compareRendering("RegionalBreakdownScreen", "VotesWithPrevPollsReporting-2", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            PRINCE EDWARD ISLAND
+            VOTES BY REGION
+            
+            PRINCE EDWARD ISLAND: GRN 38.1% (+29.8), PC 30.9% (-10.5), LIB 29.8% (-11.5), NDP 1.3% (-7.8), 1/27
+            
+            CARDIGAN: GRN 38.1% (+29.8), PC 30.9% (-10.5), LIB 29.8% (-11.5), NDP 1.3% (-7.8), 1/7
+            MALPEQUE: GRN 0.0% (±0.0), PC 0.0% (±0.0), LIB 0.0% (±0.0), NDP 0.0% (±0.0), 0/7
+            CHARLOTTETOWN: GRN 0.0% (±0.0), PC 0.0% (±0.0), LIB 0.0% (±0.0), NDP 0.0% (±0.0), 0/6
+            EGMONT: GRN 0.0% (±0.0), PC 0.0% (±0.0), LIB 0.0% (±0.0), NDP 0.0% (±0.0), 0/7
+            """.trimIndent(),
+        )
+
         peiVotes.submit(mapOf(lib to 24346, pc to 30415, grn to 25302, ndp to 2454, ind to 282))
         peiPrevVotes.submit(mapOf(lib to 33481, pc to 30663, grn to 8857, ndp to 8997))
         peiPct.submit(PollsReporting(27, 27))
@@ -542,6 +992,20 @@ class RegionalBreakdownScreenTest {
         egmontPrevVotes.submit(mapOf(lib to 9312, pc to 6646, grn to 1138, ndp to 1902))
         egmontPct.submit(PollsReporting(7, 7))
         compareRendering("RegionalBreakdownScreen", "VotesWithPrevPollsReporting-3", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            PRINCE EDWARD ISLAND
+            VOTES BY REGION
+            
+            PRINCE EDWARD ISLAND: PC 36.7% (-0.7), GRN 30.6% (+19.8), LIB 29.4% (-11.4), NDP 3.0% (-8.0), IND 0.3% (+0.3), 27/27
+            
+            CARDIGAN: PC 46.2% (+1.2), GRN 27.5% (+22.0), LIB 25.0% (-13.1), NDP 1.3% (-10.1), IND 0.0% (±0.0), 7/7
+            MALPEQUE: PC 42.7% (+4.5), GRN 31.9% (+13.1), LIB 24.0% (-12.4), NDP 1.1% (-5.6), IND 0.3% (+0.3), 7/7
+            CHARLOTTETOWN: PC 26.7% (-4.4), GRN 35.7% (+23.3), LIB 32.9% (-7.8), NDP 3.6% (-12.2), IND 1.1% (+1.1), 6/6
+            EGMONT: PC 29.2% (-5.8), GRN 27.6% (+21.6), LIB 37.0% (-12.0), NDP 6.2% (-3.8), IND 0.0% (±0.0), 7/7
+            """.trimIndent(),
+        )
     }
 
     @Test
@@ -574,48 +1038,77 @@ class RegionalBreakdownScreenTest {
                 "NEW SOUTH WALES".asOneTimePublisher(),
                 mapOf(coa to 1699323, alp to 1552684, grn to 466069, onp to 224965, uap to 183174, oth to 524725).asOneTimePublisher(),
                 0.9070.asOneTimePublisher(),
+                abbreviatedNamePublisher = "NSW".asOneTimePublisher(),
             )
             .withRegion(
                 "VICTORIA".asOneTimePublisher(),
                 mapOf(coa to 1239280, alp to 1230842, grn to 514893, onp to 143558, uap to 177745, oth to 440115).asOneTimePublisher(),
                 0.9059.asOneTimePublisher(),
+                abbreviatedNamePublisher = "VIC".asOneTimePublisher(),
             )
             .withRegion(
                 "QUEENSLAND".asOneTimePublisher(),
                 mapOf(lnp to 1172515, alp to 811069, grn to 382900, onp to 221640, uap to 149255, oth to 220647).asOneTimePublisher(),
                 0.8816.asOneTimePublisher(),
                 mapOf(coa to lnp).asOneTimePublisher(),
+                abbreviatedNamePublisher = "QLD".asOneTimePublisher(),
             )
             .withRegion(
                 "WESTERN AUSTRALIA".asOneTimePublisher(),
-                mapOf(coa to 512414, alp to 542667, grn to 184094, onp to 58226, uap to 33863, oth to 141961).asOneTimePublisher(),
+                mapOf(lib to 512414, alp to 542667, grn to 184094, onp to 58226, uap to 33863, oth to 141961).asOneTimePublisher(),
                 0.8799.asOneTimePublisher(),
+                mapOf(coa to lib).asOneTimePublisher(),
+                abbreviatedNamePublisher = "WA".asOneTimePublisher(),
             )
             .withRegion(
                 "SOUTH AUSTRALIA".asOneTimePublisher(),
-                mapOf(coa to 390195, alp to 378329, grn to 140227, onp to 53057, uap to 42688, oth to 93290).asOneTimePublisher(),
+                mapOf(lib to 390195, alp to 378329, grn to 140227, onp to 53057, uap to 42688, oth to 93290).asOneTimePublisher(),
                 0.9107.asOneTimePublisher(),
+                mapOf(coa to lib).asOneTimePublisher(),
+                abbreviatedNamePublisher = "SA".asOneTimePublisher(),
             )
             .withRegion(
                 "TASMANIA".asOneTimePublisher(),
-                mapOf(coa to 115184, alp to 95322, grn to 41972, onp to 13970, uap to 6437, oth to 76813).asOneTimePublisher(),
+                mapOf(lib to 115184, alp to 95322, grn to 41972, onp to 13970, uap to 6437, oth to 76813).asOneTimePublisher(),
                 0.9243.asOneTimePublisher(),
+                mapOf(coa to lib).asOneTimePublisher(),
+                abbreviatedNamePublisher = "TAS".asOneTimePublisher(),
             )
             .withRegion(
                 "AUSTRALIAN CAPITAL TERRITORY".asOneTimePublisher(),
                 mapOf(lib to 74759, alp to 126595, grn to 52648, onp to 6630, uap to 6864, oth to 14501).asOneTimePublisher(),
                 0.9207.asOneTimePublisher(),
                 mapOf(coa to lib).asOneTimePublisher(),
+                abbreviatedNamePublisher = "ACT".asOneTimePublisher(),
             )
             .withRegion(
                 "NORTHERN TERRITORY".asOneTimePublisher(),
                 mapOf(clp to 29664, alp to 38522, grn to 13182, onp to 5418, uap to 4510, oth to 9641).asOneTimePublisher(),
                 0.7308.asOneTimePublisher(),
                 mapOf(coa to clp).asOneTimePublisher(),
+                abbreviatedNamePublisher = "NT".asOneTimePublisher(),
             )
             .build("AUSTRALIA".asOneTimePublisher())
         screen.setSize(1024, 512)
         compareRendering("RegionalBreakdownScreen", "Votes-C", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            AUSTRALIA
+            PRIMARY VOTE BY STATE
+            
+            AUSTRALIA: L/NP 35.7%, ALP 32.6%, GRN 12.3%, ONP 5.0%, UAP 4.1%, OTH 10.4%, 89.8% IN
+          
+            NSW: L/NP 36.5%, ALP 33.4%, GRN 10.0%, ONP 4.8%, UAP 3.9%, OTH 11.3%, 90.7% IN
+            VIC: L/NP 33.1%, ALP 32.9%, GRN 13.7%, ONP 3.8%, UAP 4.7%, OTH 11.7%, 90.6% IN
+            QLD: LNP 39.6%, ALP 27.4%, GRN 12.9%, ONP 7.5%, UAP 5.0%, OTH 7.5%, 88.2% IN
+            WA: LIB 34.8%, ALP 36.8%, GRN 12.5%, ONP 4.0%, UAP 2.3%, OTH 9.6%, 88.0% IN
+            SA: LIB 35.5%, ALP 34.5%, GRN 12.8%, ONP 4.8%, UAP 3.9%, OTH 8.5%, 91.1% IN
+            TAS: LIB 32.9%, ALP 27.3%, GRN 12.0%, ONP 4.0%, UAP 1.8%, OTH 22.0%, 92.4% IN
+            ACT: LIB 26.5%, ALP 44.9%, GRN 18.7%, ONP 2.4%, UAP 2.4%, OTH 5.1%, 92.1% IN
+            NT: CLP 29.4%, ALP 38.2%, GRN 13.1%, ONP 5.4%, UAP 4.5%, OTH 9.6%, 73.1% IN
+            """.trimIndent(),
+        )
     }
 
     @Test
@@ -657,12 +1150,14 @@ class RegionalBreakdownScreenTest {
                 mapOf(coa to 1699323, alp to 1552684, grn to 466069, onp to 224965, uap to 183174, oth to 524725).asOneTimePublisher(),
                 mapOf(coa to 1930426, alp to 1568173, grn to 395238, onp to 59464, uap to 153477, oth to 430508).asOneTimePublisher(),
                 0.9070.asOneTimePublisher(),
+                abbreviatedNamePublisher = "NSW".asOneTimePublisher(),
             )
             .withRegion(
                 "VICTORIA".asOneTimePublisher(),
                 mapOf(coa to 1239280, alp to 1230842, grn to 514893, onp to 143558, uap to 177745, oth to 440115).asOneTimePublisher(),
                 mapOf(coa to 1425542, alp to 1361913, grn to 439169, onp to 35177, uap to 134581, oth to 298650).asOneTimePublisher(),
                 0.9059.asOneTimePublisher(),
+                abbreviatedNamePublisher = "VIC".asOneTimePublisher(),
             )
             .withRegion(
                 "QUEENSLAND".asOneTimePublisher(),
@@ -670,24 +1165,31 @@ class RegionalBreakdownScreenTest {
                 mapOf(lnp to 1236401, alp to 754792, grn to 292059, onp to 250779, uap to 99329, oth to 195658).asOneTimePublisher(),
                 0.8816.asOneTimePublisher(),
                 mapOf(coa to lnp).asOneTimePublisher(),
+                abbreviatedNamePublisher = "QLD".asOneTimePublisher(),
             )
             .withRegion(
                 "WESTERN AUSTRALIA".asOneTimePublisher(),
-                mapOf(coa to 512414, alp to 542667, grn to 184094, onp to 58226, uap to 33863, oth to 141961).asOneTimePublisher(),
-                mapOf(coa to 633930, alp to 417727, grn to 162876, onp to 74478, uap to 28488, oth to 84375).asOneTimePublisher(),
+                mapOf(lib to 512414, alp to 542667, grn to 184094, onp to 58226, uap to 33863, oth to 141961).asOneTimePublisher(),
+                mapOf(lib to 633930, alp to 417727, grn to 162876, onp to 74478, uap to 28488, oth to 84375).asOneTimePublisher(),
                 0.8799.asOneTimePublisher(),
+                mapOf(coa to lib).asOneTimePublisher(),
+                abbreviatedNamePublisher = "WA".asOneTimePublisher(),
             )
             .withRegion(
                 "SOUTH AUSTRALIA".asOneTimePublisher(),
-                mapOf(coa to 390195, alp to 378329, grn to 140227, onp to 53057, uap to 42688, oth to 93290).asOneTimePublisher(),
-                mapOf(coa to 438022, alp to 379495, grn to 103036, onp to 8990, uap to 46007, oth to 97101).asOneTimePublisher(),
+                mapOf(lib to 390195, alp to 378329, grn to 140227, onp to 53057, uap to 42688, oth to 93290).asOneTimePublisher(),
+                mapOf(lib to 438022, alp to 379495, grn to 103036, onp to 8990, uap to 46007, oth to 97101).asOneTimePublisher(),
                 0.9107.asOneTimePublisher(),
+                mapOf(coa to lib).asOneTimePublisher(),
+                abbreviatedNamePublisher = "SA".asOneTimePublisher(),
             )
             .withRegion(
                 "TASMANIA".asOneTimePublisher(),
-                mapOf(coa to 115184, alp to 95322, grn to 41972, onp to 13970, uap to 6437, oth to 76813).asOneTimePublisher(),
-                mapOf(coa to 120415, alp to 116955, grn to 35229, onp to 9699, uap to 16868, oth to 48826).asOneTimePublisher(),
+                mapOf(lib to 115184, alp to 95322, grn to 41972, onp to 13970, uap to 6437, oth to 76813).asOneTimePublisher(),
+                mapOf(lib to 120415, alp to 116955, grn to 35229, onp to 9699, uap to 16868, oth to 48826).asOneTimePublisher(),
                 0.9243.asOneTimePublisher(),
+                mapOf(coa to lib).asOneTimePublisher(),
+                abbreviatedNamePublisher = "TAS".asOneTimePublisher(),
             )
             .withRegion(
                 "AUSTRALIAN CAPITAL TERRITORY".asOneTimePublisher(),
@@ -695,6 +1197,7 @@ class RegionalBreakdownScreenTest {
                 mapOf(lib to 83311, alp to 109300, grn to 44804, uap to 7117, oth to 21443).asOneTimePublisher(),
                 0.9207.asOneTimePublisher(),
                 mapOf(coa to lib).asOneTimePublisher(),
+                abbreviatedNamePublisher = "ACT".asOneTimePublisher(),
             )
             .withRegion(
                 "NORTHERN TERRITORY".asOneTimePublisher(),
@@ -702,10 +1205,29 @@ class RegionalBreakdownScreenTest {
                 mapOf(clp to 38837, alp to 43755, grn to 10512, uap to 2950, oth to 7464).asOneTimePublisher(),
                 0.7308.asOneTimePublisher(),
                 mapOf(coa to clp).asOneTimePublisher(),
+                abbreviatedNamePublisher = "NT".asOneTimePublisher(),
             )
             .build("AUSTRALIA".asOneTimePublisher())
         screen.setSize(1024, 512)
         compareRendering("RegionalBreakdownScreen", "VotesWithPrev-C", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            AUSTRALIA
+            PRIMARY VOTE BY STATE
+            
+            AUSTRALIA: L/NP 35.7% (-5.7), ALP 32.6% (-0.8), GRN 12.3% (+1.8), ONP 5.0% (+1.9), UAP 4.1% (+0.7), OTH 10.4% (+2.1), 89.8% IN
+          
+            NSW: L/NP 36.5% (-6.0), ALP 33.4% (-1.2), GRN 10.0% (+1.3), ONP 4.8% (+3.5), UAP 3.9% (+0.6), OTH 11.3% (+1.8), 90.7% IN
+            VIC: L/NP 33.1% (-5.5), ALP 32.9% (-4.0), GRN 13.7% (+1.9), ONP 3.8% (+2.9), UAP 4.7% (+1.1), OTH 11.7% (+3.7), 90.6% IN
+            QLD: LNP 39.6% (-4.1), ALP 27.4% (+0.7), GRN 12.9% (+2.6), ONP 7.5% (-1.4), UAP 5.0% (+1.5), OTH 7.5% (+0.5), 88.2% IN
+            WA: LIB 34.8% (-10.4), ALP 36.8% (+7.0), GRN 12.5% (+0.9), ONP 4.0% (-1.4), UAP 2.3% (+0.3), OTH 9.6% (+3.6), 88.0% IN
+            SA: LIB 35.5% (-5.3), ALP 34.5% (-0.9), GRN 12.8% (+3.2), ONP 4.8% (+4.0), UAP 3.9% (-0.4), OTH 8.5% (-0.6), 91.1% IN
+            TAS: LIB 32.9% (-1.7), ALP 27.3% (-6.4), GRN 12.0% (+1.9), ONP 4.0% (+1.2), UAP 1.8% (-3.0), OTH 22.0% (+7.9), 92.4% IN
+            ACT: LIB 26.5% (-4.8), ALP 44.9% (+3.8), GRN 18.7% (+1.8), ONP 2.4% (+2.4), UAP 2.4% (-0.2), OTH 5.1% (-2.9), 92.1% IN
+            NT: CLP 29.4% (-8.1), ALP 38.2% (-4.1), GRN 13.1% (+2.9), ONP 5.4% (+5.4), UAP 4.5% (+1.6), OTH 9.6% (+2.3), 73.1% IN
+            """.trimIndent(),
+        )
     }
 
     @Test
@@ -761,6 +1283,27 @@ class RegionalBreakdownScreenTest {
         val screen = builder.build("CANADA".asOneTimePublisher())
         screen.size = Dimension(1024, 512)
         compareRendering("RegionalBreakdownScreen", "VotesWithLimitedColumns-1", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            CANADA
+            POPULAR VOTE BY PROVINCE
+            
+            CANADA: 0.0% IN
+            
+            NEWFOUNDLAND AND LABRADOR: 0.0% IN
+            NOVA SCOTIA: 0.0% IN
+            PRINCE EDWARD ISLAND: 0.0% IN
+            NEW BRUNSWICK: 0.0% IN
+            QUEBEC: 0.0% IN
+            ONTARIO: 0.0% IN
+            MANITOBA: 0.0% IN
+            SASKATCHEWAN: 0.0% IN
+            ALBERTA: 0.0% IN
+            BRITISH COLUMBIA: 0.0% IN
+            NORTHERN CANADA: 0.0% IN
+            """.trimIndent(),
+        )
 
         federalVotes.also {
             it.first.submit(mapOf(lib to 331, con to 343, ndp to 160, bq to 76, grn to 65, ppc to 16, oth to 2))
@@ -823,6 +1366,27 @@ class RegionalBreakdownScreenTest {
             it.third.submit(1.0)
         }
         compareRendering("RegionalBreakdownScreen", "VotesWithLimitedColumns-2", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            CANADA
+            POPULAR VOTE BY PROVINCE
+            
+            CANADA: CON 34.5% (+2.4), LIB 33.3% (-6.4), NDP 16.1% (-3.7), OTH 16.0% (+7.7), 100.0% IN
+            
+            NEWFOUNDLAND AND LABRADOR: CON 27.9% (+17.6), LIB 44.9% (-19.7), NDP 23.7% (+2.7), OTH 3.4% (-0.6), 100.0% IN
+            NOVA SCOTIA: CON 25.7% (+7.8), LIB 41.4% (-20.6), NDP 18.9% (+2.5), OTH 14.0% (+10.3), 100.0% IN
+            PRINCE EDWARD ISLAND: CON 27.3% (+7.9), LIB 43.7% (-14.8), NDP 7.6% (-8.5), OTH 21.4% (+15.4), 100.0% IN
+            NEW BRUNSWICK: CON 32.8% (+7.5), LIB 37.5% (-14.2), NDP 9.4% (-8.9), OTH 20.3% (+15.6), 100.0% IN
+            QUEBEC: CON 16.1% (-0.7), LIB 34.4% (-1.4), NDP 10.8% (-14.7), OTH 38.7% (+16.8), 100.0% IN
+            ONTARIO: CON 33.3% (-1.9), LIB 41.8% (-3.2), NDP 16.9% (+0.2), OTH 8.0% (+4.9), 100.0% IN
+            MANITOBA: CON 45.2% (+7.8), LIB 26.5% (-18.3), NDP 20.8% (+7.0), OTH 7.4% (+3.6), 100.0% IN
+            SASKATCHEWAN: CON 64.1% (+15.5), LIB 11.7% (-12.2), NDP 19.6% (-5.5), OTH 4.6% (+2.3), 100.0% IN
+            ALBERTA: CON 69.1% (+9.0), LIB 13.8% (-11.0), NDP 11.6% (-0.1), OTH 5.5% (+2.2), 100.0% IN
+            BRITISH COLUMBIA: CON 34.0% (+3.8), LIB 26.2% (-9.2), NDP 24.4% (-1.7), OTH 15.5% (+7.1), 100.0% IN
+            NORTHERN CANADA: CON 28.1% (+5.8), LIB 34.7% (-15.0), NDP 28.4% (+2.8), OTH 8.9% (+6.5), 100.0% IN
+            """.trimIndent(),
+        )
     }
 
     companion object {

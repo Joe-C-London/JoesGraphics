@@ -1,5 +1,6 @@
 package com.joecollins.graphics.screens.generic
 
+import com.joecollins.graphics.AltTextProvider
 import com.joecollins.graphics.GenericPanel
 import com.joecollins.graphics.components.MultiSummaryFrame
 import com.joecollins.models.general.Aggregators
@@ -17,10 +18,15 @@ import java.awt.Color
 import java.text.DecimalFormat
 import java.util.concurrent.Flow
 
-class RegionalBreakdownScreen private constructor(titleLabel: Flow.Publisher<out String?>, multiSummaryFrame: MultiSummaryFrame) : GenericPanel(pad(multiSummaryFrame), titleLabel) {
+class RegionalBreakdownScreen private constructor(
+    titleLabel: Flow.Publisher<out String?>,
+    multiSummaryFrame: MultiSummaryFrame,
+    override val altText: Flow.Publisher<String?>,
+) : GenericPanel(pad(multiSummaryFrame), titleLabel), AltTextProvider {
     interface Entry {
         val headerPublisher: Flow.Publisher<out String>
         val valuePublisher: Flow.Publisher<out List<Pair<Color, String>>>
+        val altTextPublisher: Flow.Publisher<String>
     }
 
     private class BlankEntry : Entry {
@@ -28,6 +34,9 @@ class RegionalBreakdownScreen private constructor(titleLabel: Flow.Publisher<out
             get() = "".asOneTimePublisher()
         override val valuePublisher: Flow.Publisher<out List<Pair<Color, String>>>
             get() = listOf<Pair<Color, String>>().asOneTimePublisher()
+
+        override val altTextPublisher: Flow.Publisher<String>
+            get() = "".asOneTimePublisher()
     }
 
     private open class SeatEntry : Entry {
@@ -41,6 +50,12 @@ class RegionalBreakdownScreen private constructor(titleLabel: Flow.Publisher<out
             set(value) {
                 field = value
                 namePublisher.submit(value)
+            }
+
+        var abbreviatedName = ""
+            set(value) {
+                field = value
+                updateValue()
             }
 
         var seats: Map<out PartyOrCoalition, Int> = emptyMap()
@@ -63,13 +78,25 @@ class RegionalBreakdownScreen private constructor(titleLabel: Flow.Publisher<out
             get() = namePublisher
 
         override val valuePublisher = Publisher<List<Pair<Color, String>>>()
-        protected fun updateValue() = synchronized(this) { valuePublisher.submit(calculateValue()) }
+
+        override val altTextPublisher = Publisher<String>()
+
+        protected fun updateValue() = synchronized(this) {
+            valuePublisher.submit(calculateValue())
+            altTextPublisher.submit(calculateAltText())
+        }
 
         private fun calculateValue(): List<Pair<Color, String>> {
             return sequenceOf(
                 this.partyOrder.asSequence().map { this.getPartyLabel(it) },
-                sequenceOf(Color.WHITE to (seats.values.sum().toString() + "/" + totalSeats)),
+                sequenceOf(Color.WHITE to ("${seats.values.sum()}/$totalSeats")),
             ).flatten().toList()
+        }
+
+        private fun calculateAltText(): String {
+            return "$abbreviatedName: ${
+                partyOrder.joinToString("") { "${it.abbreviation} ${getPartyLabel(it).second}, " }
+            }${seats.values.sum()}/$totalSeats"
         }
 
         protected open fun getPartyLabel(party: PartyOrCoalition): Pair<Color, String> {
@@ -136,6 +163,12 @@ class RegionalBreakdownScreen private constructor(titleLabel: Flow.Publisher<out
                 namePublisher.submit(value)
             }
 
+        var abbreviatedName = ""
+            set(value) {
+                field = value
+                updateValue()
+            }
+
         var votes: Map<out PartyOrCoalition, Int> = emptyMap()
             set(value) {
                 field = value
@@ -156,13 +189,25 @@ class RegionalBreakdownScreen private constructor(titleLabel: Flow.Publisher<out
             get() = namePublisher
 
         override val valuePublisher = Publisher<List<Pair<Color, String>>>()
-        protected fun updateValue() = synchronized(this) { valuePublisher.submit(calculateValue()) }
+
+        override val altTextPublisher = Publisher<String>()
+
+        protected fun updateValue() = synchronized(this) {
+            valuePublisher.submit(calculateValue())
+            altTextPublisher.submit(calculateAltText())
+        }
 
         private fun calculateValue(): List<Pair<Color, String>> {
             return sequenceOf(
                 this.partyOrder.asSequence().map { this.getPartyLabel(it) },
                 sequenceOf(Color.WHITE to reporting),
             ).flatten().toList()
+        }
+
+        private fun calculateAltText(): String {
+            return "$abbreviatedName: ${
+                this.partyOrder.joinToString("") { "${it.abbreviation} ${getPartyLabel(it).second}, " }
+            }$reporting"
         }
 
         protected open fun getPartyLabel(party: PartyOrCoalition): Pair<Color, String> {
@@ -207,7 +252,7 @@ class RegionalBreakdownScreen private constructor(titleLabel: Flow.Publisher<out
         protected var partyOrder: Flow.Publisher<out List<PartyOrCoalition>>? = null
 
         fun build(titlePublisher: Flow.Publisher<out String?>): RegionalBreakdownScreen {
-            return RegionalBreakdownScreen(titlePublisher, createFrame())
+            return RegionalBreakdownScreen(titlePublisher, createFrame(), createAltText(titlePublisher))
         }
 
         private fun createFrame(): MultiSummaryFrame {
@@ -219,6 +264,12 @@ class RegionalBreakdownScreen private constructor(titleLabel: Flow.Publisher<out
                 }
                     .combine(),
             )
+        }
+
+        private fun createAltText(titlePublisher: Flow.Publisher<out String?>): Flow.Publisher<String?> {
+            val header = titlePublisher.merge(title) { a, b -> sequenceOf(a, b).filterNotNull().joinToString("\n") }
+            val rows = entries.map { it.altTextPublisher }.combine().map { it.joinToString("\n") }
+            return header.merge(rows) { h, v -> "$h\n\n$v" }
         }
     }
 
@@ -240,10 +291,12 @@ class RegionalBreakdownScreen private constructor(titleLabel: Flow.Publisher<out
             seatsPublisher: Flow.Publisher<out Map<out PartyOrCoalition, Int>>,
             numSeatsPublisher: Flow.Publisher<out Int>,
             partyMapPublisher: Flow.Publisher<out Map<Coalition, Party>> = emptyMap<Coalition, Party>().asOneTimePublisher(),
+            abbreviatedNamePublisher: Flow.Publisher<out String> = namePublisher,
         ): SeatBuilder {
             val newEntry = SeatEntry()
             transformPartyOrder(partyOrder!!, partyMapPublisher).subscribe(Subscriber { newEntry.partyOrder = it })
             namePublisher.subscribe(Subscriber { newEntry.name = it })
+            abbreviatedNamePublisher.subscribe(Subscriber { newEntry.abbreviatedName = it })
             seatsPublisher.subscribe(Subscriber { newEntry.seats = it })
             numSeatsPublisher.subscribe(Subscriber { newEntry.totalSeats = it })
             entries.add(newEntry)
@@ -256,6 +309,7 @@ class RegionalBreakdownScreen private constructor(titleLabel: Flow.Publisher<out
             val topEntry = SeatEntry()
             partyOrder!!.subscribe(Subscriber { topEntry.partyOrder = it })
             totalHeaderPublisher.subscribe(Subscriber { topEntry.name = it })
+            totalHeaderPublisher.subscribe(Subscriber { topEntry.abbreviatedName = it })
             totalSeatsPublisher.subscribe(Subscriber { topEntry.seats = it })
             numTotalSeatsPublisher.subscribe(Subscriber { topEntry.totalSeats = it })
             entries.add(topEntry)
@@ -281,10 +335,12 @@ class RegionalBreakdownScreen private constructor(titleLabel: Flow.Publisher<out
             diffPublisher: Flow.Publisher<out Map<out PartyOrCoalition, Int>>,
             numSeatsPublisher: Flow.Publisher<out Int>,
             partyMapPublisher: Flow.Publisher<out Map<Coalition, Party>> = emptyMap<Coalition, Party>().asOneTimePublisher(),
+            abbreviatedNamePublisher: Flow.Publisher<out String> = namePublisher,
         ): SeatDiffBuilder {
             val newEntry = SeatDiffEntry()
             transformPartyOrder(partyOrder!!, partyMapPublisher).subscribe(Subscriber { newEntry.partyOrder = it })
             namePublisher.subscribe(Subscriber { newEntry.name = it })
+            abbreviatedNamePublisher.subscribe(Subscriber { newEntry.abbreviatedName = it })
             seatsPublisher.subscribe(Subscriber { newEntry.seats = it })
             diffPublisher.subscribe(Subscriber { newEntry.diff = it })
             numSeatsPublisher.subscribe(Subscriber { newEntry.totalSeats = it })
@@ -300,6 +356,7 @@ class RegionalBreakdownScreen private constructor(titleLabel: Flow.Publisher<out
             val topEntry = SeatDiffEntry()
             partyOrder!!.subscribe(Subscriber { topEntry.partyOrder = it })
             totalHeaderPublisher.subscribe(Subscriber { topEntry.name = it })
+            totalHeaderPublisher.subscribe(Subscriber { topEntry.abbreviatedName = it })
             totalSeatsPublisher.subscribe(Subscriber { topEntry.seats = it })
             seatDiffPublisher.subscribe(Subscriber { topEntry.diff = it })
             numTotalSeatsPublisher.subscribe(Subscriber { topEntry.totalSeats = it })
@@ -327,10 +384,12 @@ class RegionalBreakdownScreen private constructor(titleLabel: Flow.Publisher<out
             prevPublisher: Flow.Publisher<out Map<out PartyOrCoalition, Int>>,
             numSeatsPublisher: Flow.Publisher<out Int>,
             partyMapPublisher: Flow.Publisher<out Map<Coalition, Party>> = emptyMap<Coalition, Party>().asOneTimePublisher(),
+            abbreviatedNamePublisher: Flow.Publisher<out String> = namePublisher,
         ): SeatPrevBuilder {
             val newEntry = SeatPrevEntry()
             transformPartyOrder(partyOrder!!, partyMapPublisher).subscribe(Subscriber { newEntry.partyOrder = it })
             namePublisher.subscribe(Subscriber { newEntry.name = it })
+            abbreviatedNamePublisher.subscribe(Subscriber { newEntry.abbreviatedName = it })
             seatsPublisher.subscribe(Subscriber { newEntry.seats = it })
             prevPublisher.subscribe(Subscriber { newEntry.prev = it })
             numSeatsPublisher.subscribe(Subscriber { newEntry.totalSeats = it })
@@ -348,6 +407,7 @@ class RegionalBreakdownScreen private constructor(titleLabel: Flow.Publisher<out
             val topEntry = SeatPrevEntry()
             partyOrder!!.subscribe(Subscriber { topEntry.partyOrder = it })
             totalHeaderPublisher.subscribe(Subscriber { topEntry.name = it })
+            totalHeaderPublisher.subscribe(Subscriber { topEntry.abbreviatedName = it })
             totalSeatsPublisher.subscribe(Subscriber { topEntry.seats = it })
             prevSeatPublisher.subscribe(Subscriber { topEntry.prev = it })
             numTotalSeatsPublisher.subscribe(Subscriber { topEntry.totalSeats = it })
@@ -374,10 +434,12 @@ class RegionalBreakdownScreen private constructor(titleLabel: Flow.Publisher<out
             votesPublisher: Flow.Publisher<out Map<out PartyOrCoalition, Int>>,
             pctReportingPublisher: Flow.Publisher<out R>,
             partyMapPublisher: Flow.Publisher<out Map<Coalition, Party>> = emptyMap<Coalition, Party>().asOneTimePublisher(),
+            abbreviatedNamePublisher: Flow.Publisher<out String> = namePublisher,
         ): VoteBuilder<R> {
             val newEntry = VoteEntry()
             transformPartyOrder(partyOrder!!, partyMapPublisher).subscribe(Subscriber { newEntry.partyOrder = it })
             namePublisher.subscribe(Subscriber { newEntry.name = it })
+            abbreviatedNamePublisher.subscribe(Subscriber { newEntry.abbreviatedName = it })
             votesPublisher.subscribe(Subscriber { newEntry.votes = it })
             pctReportingPublisher.subscribe(Subscriber { newEntry.reporting = reportingFunc(it) })
             entries.add(newEntry)
@@ -390,6 +452,7 @@ class RegionalBreakdownScreen private constructor(titleLabel: Flow.Publisher<out
             val topEntry = VoteEntry()
             partyOrder!!.subscribe(Subscriber { topEntry.partyOrder = it })
             totalHeaderPublisher.subscribe(Subscriber { topEntry.name = it })
+            totalHeaderPublisher.subscribe(Subscriber { topEntry.abbreviatedName = it })
             totalVotesPublisher.subscribe(Subscriber { topEntry.votes = it })
             reportingPublisher.subscribe(Subscriber { topEntry.reporting = reportingFunc(it) })
             entries.add(topEntry)
@@ -417,10 +480,12 @@ class RegionalBreakdownScreen private constructor(titleLabel: Flow.Publisher<out
             prevVotesPublisher: Flow.Publisher<out Map<out PartyOrCoalition, Int>>,
             reportingPublisher: Flow.Publisher<out R>,
             partyMapPublisher: Flow.Publisher<out Map<Coalition, Party>> = emptyMap<Coalition, Party>().asOneTimePublisher(),
+            abbreviatedNamePublisher: Flow.Publisher<out String> = namePublisher,
         ): VotePrevBuilder<R> {
             val newEntry = VotePrevEntry()
             transformPartyOrder(partyOrder!!, partyMapPublisher).subscribe(Subscriber { newEntry.partyOrder = it })
             namePublisher.subscribe(Subscriber { newEntry.name = it })
+            abbreviatedNamePublisher.subscribe(Subscriber { newEntry.abbreviatedName = it })
             votesPublisher.subscribe(Subscriber { newEntry.votes = it })
             prevVotesPublisher.subscribe(Subscriber { newEntry.prev = it })
             reportingPublisher.subscribe(Subscriber { newEntry.reporting = reportingFunc(it) })
@@ -438,6 +503,7 @@ class RegionalBreakdownScreen private constructor(titleLabel: Flow.Publisher<out
             val topEntry = VotePrevEntry()
             partyOrder!!.subscribe(Subscriber { topEntry.partyOrder = it })
             totalHeaderPublisher.subscribe(Subscriber { topEntry.name = it })
+            totalHeaderPublisher.subscribe(Subscriber { topEntry.abbreviatedName = it })
             totalVotesPublisher.subscribe(Subscriber { topEntry.votes = it })
             prevVotesPublisher.subscribe(Subscriber { topEntry.prev = it })
             reportingPublisher.subscribe(Subscriber { topEntry.reporting = reportingFunc(it) })
