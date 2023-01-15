@@ -3,7 +3,7 @@ package com.joecollins.models.general.social.twitter
 import com.twitter.clientlib.api.TwitterApi
 import com.twitter.clientlib.model.TweetReferencedTweets
 import java.time.Instant
-import java.util.*
+import java.util.Properties
 
 object TweetLoader {
 
