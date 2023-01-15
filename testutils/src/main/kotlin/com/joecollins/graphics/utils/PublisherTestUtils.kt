@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit
 object PublisherTestUtils {
 
     fun <T> assertPublishes(
-        publisher: Flow.Publisher<T>,
+        publisher: Flow.Publisher<out T>,
         expected: T,
         timeoutSeconds: Long = 1,
     ) {

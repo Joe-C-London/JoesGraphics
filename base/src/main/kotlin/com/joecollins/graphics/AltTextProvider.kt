@@ -7,5 +7,5 @@ interface AltTextProvider {
         const val ALT_TEXT_MAX_LENGTH = 1000
     }
 
-    val altText: Flow.Publisher<String?>
+    val altText: Flow.Publisher<out String?>
 }

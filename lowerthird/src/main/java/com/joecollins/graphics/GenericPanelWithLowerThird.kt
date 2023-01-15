@@ -21,7 +21,7 @@ open class GenericPanelWithLowerThird(
         add(lowerThird, BorderLayout.SOUTH)
     }
 
-    override val altText: Flow.Publisher<String?> =
+    override val altText: Flow.Publisher<out String?> =
         if (panel is AltTextProvider) {
             panel.altText
         } else {
