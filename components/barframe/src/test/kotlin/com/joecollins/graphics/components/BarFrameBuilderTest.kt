@@ -9,6 +9,7 @@ import com.joecollins.graphics.utils.ColorUtils
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.map
+import org.awaitility.Awaitility
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import java.awt.Color
@@ -40,7 +41,7 @@ class BarFrameBuilderTest {
                 Pair("SANDERS", Color.GREEN) to 1865,
             ),
         )
-        org.awaitility.Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numBars }, org.hamcrest.core.IsEqual(2))
         Assertions.assertEquals("CLINTON", frame.getLeftText(0))
         Assertions.assertEquals("SANDERS", frame.getLeftText(1))
@@ -75,7 +76,7 @@ class BarFrameBuilderTest {
                 Pair("SANDERS", Color.GREEN) to Wrapper(1865),
             ),
         )
-        org.awaitility.Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numBars }, org.hamcrest.core.IsEqual(2))
         Assertions.assertEquals("CLINTON", frame.getLeftText(0))
         Assertions.assertEquals("SANDERS", frame.getLeftText(1))
@@ -104,9 +105,9 @@ class BarFrameBuilderTest {
         )
             .withMax(max)
             .build()
-        org.awaitility.Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.min.toInt() }, org.hamcrest.core.IsEqual(0))
-        org.awaitility.Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.max.toInt() }, org.hamcrest.core.IsEqual(2500))
         result.submit(
             mapOf(
@@ -114,9 +115,9 @@ class BarFrameBuilderTest {
                 Pair("SANDERS", Color.GREEN) to 1846,
             ),
         )
-        org.awaitility.Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.min.toInt() }, org.hamcrest.core.IsEqual(0))
-        org.awaitility.Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.max.toInt() }, org.hamcrest.core.IsEqual(2500))
         result.submit(
             mapOf(
@@ -124,19 +125,19 @@ class BarFrameBuilderTest {
                 Pair("SANDERS", Color.GREEN) to 1865,
             ),
         )
-        org.awaitility.Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.min.toInt() }, org.hamcrest.core.IsEqual(0))
-        org.awaitility.Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.max.toInt() }, org.hamcrest.core.IsEqual(2842))
         max.submit(3000)
-        org.awaitility.Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.min.toInt() }, org.hamcrest.core.IsEqual(0))
-        org.awaitility.Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.max.toInt() }, org.hamcrest.core.IsEqual(3000))
         max.submit(2500)
-        org.awaitility.Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.min.toInt() }, org.hamcrest.core.IsEqual(0))
-        org.awaitility.Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.max.toInt() }, org.hamcrest.core.IsEqual(2842))
     }
 
@@ -163,26 +164,26 @@ class BarFrameBuilderTest {
             .withBorder(borderColor)
             .withSubheadColor(subheadColor)
             .build()
-        org.awaitility.Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.header }, org.hamcrest.core.IsEqual("HEADER"))
         Assertions.assertEquals("SUBHEAD", frame.subheadText)
         Assertions.assertEquals("NOTES", frame.notes)
         Assertions.assertEquals(Color.BLACK, frame.borderColor)
         Assertions.assertEquals(Color.GRAY, frame.subheadColor)
         header.submit("DEMOCRATIC PRIMARY")
-        org.awaitility.Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.header }, org.hamcrest.core.IsEqual("DEMOCRATIC PRIMARY"))
         subhead.submit("PLEDGED DELEGATES")
-        org.awaitility.Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.subheadText }, org.hamcrest.core.IsEqual("PLEDGED DELEGATES"))
         notes.submit("SOURCE: DNC")
-        org.awaitility.Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.notes }, org.hamcrest.core.IsEqual("SOURCE: DNC"))
         borderColor.submit(Color.BLUE)
-        org.awaitility.Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.borderColor }, org.hamcrest.core.IsEqual(Color.BLUE))
         subheadColor.submit(Color.BLUE)
-        org.awaitility.Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.subheadColor }, org.hamcrest.core.IsEqual(Color.BLUE))
     }
 
@@ -201,7 +202,7 @@ class BarFrameBuilderTest {
         )
             .withTarget(target) { THOUSANDS.format(it) + " TO WIN" }
             .build()
-        org.awaitility.Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numLines }, org.hamcrest.core.IsEqual(1))
         Assertions.assertEquals(2382, frame.getLineLevel(0))
         Assertions.assertEquals("2,382 TO WIN", frame.getLineLabel(0))
@@ -224,7 +225,7 @@ class BarFrameBuilderTest {
             .build()
         Assertions.assertEquals(0, frame.numLines.toLong())
         lines.submit(listOf(1, 2, 3, 4, 5))
-        org.awaitility.Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numLines }, org.hamcrest.core.IsEqual(5))
         Assertions.assertEquals(1, frame.getLineLevel(0))
         Assertions.assertEquals(2, frame.getLineLevel(1))
@@ -260,7 +261,7 @@ class BarFrameBuilderTest {
                 Pair("and here", 2),
             ),
         )
-        org.awaitility.Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numLines }, org.hamcrest.core.IsEqual(2))
         Assertions.assertEquals(1, frame.getLineLevel(0))
         Assertions.assertEquals(2, frame.getLineLevel(1))
@@ -285,7 +286,7 @@ class BarFrameBuilderTest {
             .build()
         Assertions.assertEquals(0, frame.numLines.toLong())
         lines.submit(listOf(1, 2, 3, 4, 5))
-        org.awaitility.Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numLines }, org.hamcrest.core.IsEqual(5))
         Assertions.assertEquals(1, frame.getLineLevel(0))
         Assertions.assertEquals(2, frame.getLineLevel(1))
@@ -321,7 +322,7 @@ class BarFrameBuilderTest {
                 Pair("SANDERS", Color.GREEN) to Pair(1865, false),
             ),
         )
-        org.awaitility.Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numBars }, org.hamcrest.core.IsEqual(2))
         Assertions.assertEquals("CLINTON", frame.getLeftText(0))
         Assertions.assertEquals("SANDERS", frame.getLeftText(1))
@@ -360,7 +361,7 @@ class BarFrameBuilderTest {
                 Pair("IND", Color.GRAY) to Pair(1, +1),
             ),
         )
-        org.awaitility.Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numBars }, org.hamcrest.core.IsEqual(6))
         Assertions.assertEquals("LIB", frame.getLeftText(0))
         Assertions.assertEquals("CON", frame.getLeftText(1))
@@ -386,9 +387,9 @@ class BarFrameBuilderTest {
         Assertions.assertEquals(-20, frame.getSeries(3)[0].second)
         Assertions.assertEquals(+2, frame.getSeries(4)[0].second)
         Assertions.assertEquals(+1, frame.getSeries(5)[0].second)
-        org.awaitility.Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.min.toInt() }, org.hamcrest.core.IsEqual(-27))
-        org.awaitility.Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.max.toInt() }, org.hamcrest.core.IsEqual(22))
     }
 
@@ -407,9 +408,9 @@ class BarFrameBuilderTest {
         )
             .withWingspan(range)
             .build()
-        org.awaitility.Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.max.toDouble() }, org.hamcrest.core.IsEqual(10.0))
-        org.awaitility.Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.min.toDouble() }, org.hamcrest.core.IsEqual(-10.0))
         result.submit(
             mapOf(
@@ -421,9 +422,9 @@ class BarFrameBuilderTest {
                 Pair("IND", Color.GRAY) to Pair(1, +1),
             ),
         )
-        org.awaitility.Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.max.toDouble() }, org.hamcrest.core.IsEqual(27.0))
-        org.awaitility.Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.min.toDouble() }, org.hamcrest.core.IsEqual(-27.0))
     }
 
@@ -452,7 +453,7 @@ class BarFrameBuilderTest {
                 Pair("INDEPENDENT", Color.GRAY) to Pair(0, 1),
             ),
         )
-        org.awaitility.Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numBars }, org.hamcrest.core.IsEqual(6))
         Assertions.assertEquals("LIBERAL", frame.getLeftText(0))
         Assertions.assertEquals("CONSERVATIVE", frame.getLeftText(1))
@@ -525,7 +526,7 @@ class BarFrameBuilderTest {
                 Pair("INDEPENDENT", Color.GRAY) to Pair(0, 1),
             ),
         )
-        org.awaitility.Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numBars }, org.hamcrest.core.IsEqual(6))
         Assertions.assertEquals("LIBERAL", frame.getLeftText(0))
         Assertions.assertEquals("CONSERVATIVE", frame.getLeftText(1))
@@ -598,7 +599,7 @@ class BarFrameBuilderTest {
                 Pair("IND", Color.GRAY) to Triple(0, +1, 1),
             ),
         )
-        org.awaitility.Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numBars }, org.hamcrest.core.IsEqual(6))
         Assertions.assertEquals("LIB", frame.getLeftText(0))
         Assertions.assertEquals("CON", frame.getLeftText(1))
@@ -677,7 +678,7 @@ class BarFrameBuilderTest {
                 Pair("IND", Color.GRAY) to Triple(0, +1, 1),
             ),
         )
-        org.awaitility.Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numBars }, org.hamcrest.core.IsEqual(6))
         Assertions.assertEquals("LIB", frame.getLeftText(0))
         Assertions.assertEquals("CON", frame.getLeftText(1))
@@ -736,7 +737,7 @@ class BarFrameBuilderTest {
             BasicBar("Northern Ireland", Color.BLACK, 3),
         )
         val frame = basic(regions.asOneTimePublisher()).build()
-        org.awaitility.Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numBars }, org.hamcrest.core.IsEqual(12))
         Assertions.assertEquals("East Midlands", frame.getLeftText(0))
         Assertions.assertEquals("South East England", frame.getLeftText(5))
@@ -766,7 +767,7 @@ class BarFrameBuilderTest {
             DualBar("Northern Ireland", Color.BLACK, 16, 18, "18 > 16"),
         )
         val frame = dual(regions.asOneTimePublisher()).build()
-        org.awaitility.Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numBars }, org.hamcrest.core.IsEqual(12))
         Assertions.assertEquals("East Midlands", frame.getLeftText(0))
         Assertions.assertEquals("South East England", frame.getLeftText(5))
@@ -792,23 +793,23 @@ class BarFrameBuilderTest {
         Assertions.assertEquals(2.0, frame.getSeries(0)[2].second.toDouble(), 0.0)
         Assertions.assertEquals(1.0, frame.getSeries(5)[2].second.toDouble(), 0.0)
         Assertions.assertEquals(2.0, frame.getSeries(11)[2].second.toDouble(), 0.0)
-        org.awaitility.Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.max.toDouble() }, org.hamcrest.core.IsEqual(84.0))
-        org.awaitility.Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.min.toDouble() }, org.hamcrest.core.IsEqual(0.0))
     }
 
     @Test
     fun testDualVariousCombos() {
         val doAssert = { exp: Pair<Color, Number>, act: Pair<Color, Number> ->
-            org.awaitility.Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
                 .until({ act.first }, org.hamcrest.core.IsEqual(exp.first))
-            org.awaitility.Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+            Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
                 .until({ act.second.toDouble() }, org.hamcrest.core.IsEqual(exp.second.toDouble()))
         }
         val regions = Publisher(listOf(DualBar("", Color.BLACK, 0.0, 0.0, "")))
         val frame = dual(regions).build()
-        org.awaitility.Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ frame.numBars }, org.hamcrest.core.IsEqual(1))
         doAssert(Pair(Color.BLACK, 0.0), frame.getSeries(0)[0])
         doAssert(Pair(Color.BLACK, 0.0), frame.getSeries(0)[1])
@@ -868,19 +869,19 @@ class BarFrameBuilderTest {
                 BasicBar("DONALD TRUMP", Color.RED, 232),
             ),
         )
-        org.awaitility.Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ barFrame.numBars }, org.hamcrest.core.IsEqual(2))
 
         minBars.submit(3)
-        org.awaitility.Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ barFrame.numBars }, org.hamcrest.core.IsEqual(3))
 
         minBars.submit(1)
-        org.awaitility.Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ barFrame.numBars }, org.hamcrest.core.IsEqual(2))
 
         bars.submit(emptyList())
-        org.awaitility.Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
+        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
             .until({ barFrame.numBars }, org.hamcrest.core.IsEqual(1))
     }
 
