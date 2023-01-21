@@ -13,7 +13,6 @@ version '1.0-SNAPSHOT'
 var topLevel = parent.parent
 
 dependencies {
-    implementation topLevel.project('base')
     api topLevel.project('models')
     implementation topLevel.project('modelutils')
     implementation topLevel.project('pubsub')

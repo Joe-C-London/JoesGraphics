@@ -10,13 +10,11 @@ plugins {
 group 'com.joecollins'
 version '1.0-SNAPSHOT'
 
+repositories {
+    mavenCentral()
+}
+
 dependencies {
-    api parent.project('alttext')
-    implementation parent.project('base')
-    implementation parent.project('pubsub')
-
-    testImplementation parent.project('testutils')
-
     testImplementation "org.junit.jupiter:junit-jupiter-api:$parent.ext.junit_version"
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$parent.ext.junit_version"
 }

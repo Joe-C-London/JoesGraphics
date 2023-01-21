@@ -17,6 +17,7 @@ repositories {
 var topLevel = parent.parent
 
 dependencies {
+    api topLevel.project('alttext')
     implementation topLevel.project('base')
     implementation topLevel.project('pubsub')
 

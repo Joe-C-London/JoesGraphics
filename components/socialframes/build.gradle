@@ -17,7 +17,6 @@ repositories {
 var topLevel = parent.parent
 
 dependencies {
-    implementation topLevel.project('base')
     implementation topLevel.project('shapes')
     implementation topLevel.project('pubsub')
     implementation topLevel.project('social')

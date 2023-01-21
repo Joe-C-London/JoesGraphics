@@ -15,6 +15,7 @@ repositories {
 }
 
 dependencies {
+    implementation parent.project('alttext')
     implementation parent.project('base')
     implementation parent.project('pubsub')
     implementation parent.project('social')
