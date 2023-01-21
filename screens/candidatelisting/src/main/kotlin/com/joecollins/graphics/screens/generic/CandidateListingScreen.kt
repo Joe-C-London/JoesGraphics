@@ -49,6 +49,9 @@ class CandidateListingScreen private constructor(
         if (mapPanel != null) {
             panel.add(mapPanel, RightStackLayout.EAST)
         }
+        if (setOf(prevPanel, secondaryPrevPanel, mapPanel).count { it != null } == 1) {
+            panel.add(JPanel().also { it.background = Color.WHITE }, RightStackLayout.EAST)
+        }
     }
 
     companion object {
