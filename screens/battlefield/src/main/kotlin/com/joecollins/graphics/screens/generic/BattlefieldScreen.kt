@@ -1,6 +1,6 @@
 package com.joecollins.graphics.screens.generic
 
-import ResultColorUtils.color
+import ResultColorUtils.getColor
 import com.joecollins.graphics.GenericPanel
 import com.joecollins.graphics.components.BattlefieldFrame
 import com.joecollins.models.general.Party
@@ -80,7 +80,7 @@ class BattlefieldScreen private constructor(header: Flow.Publisher<out String?>,
                             -(pctByParty[parties.left] ?: 0.0),
                             -(pctByParty[parties.right] ?: 0.0),
                             -(pctByParty[parties.bottom] ?: 0.0),
-                        ) to (curr[key].color)
+                        ) to (curr[key].getColor(default = Color.LIGHT_GRAY))
                     }
                 }
 

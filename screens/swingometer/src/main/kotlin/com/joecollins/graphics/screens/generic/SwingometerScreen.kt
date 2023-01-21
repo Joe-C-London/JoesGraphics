@@ -1,6 +1,6 @@
 package com.joecollins.graphics.screens.generic
 
-import ResultColorUtils.color
+import ResultColorUtils.getColor
 import com.joecollins.graphics.GenericPanel
 import com.joecollins.graphics.components.SwingometerFrame
 import com.joecollins.graphics.components.SwingometerFrameBuilder
@@ -214,7 +214,7 @@ class SwingometerScreen private constructor(title: Flow.Publisher<out String?>, 
                         val right = e.first.value[parties.second] ?: 0
                         Dot(
                             0.5 * (left - right) / total,
-                            e.second.color,
+                            e.second.getColor(default = Color.LIGHT_GRAY),
                             e.third,
                             weights?.let { f -> f(e.first.key).toString() },
                         )

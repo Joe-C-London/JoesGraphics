@@ -1,6 +1,6 @@
 package com.joecollins.graphics.screens.generic
 
-import ResultColorUtils.color
+import ResultColorUtils.getColor
 import com.joecollins.graphics.AltTextProvider
 import com.joecollins.graphics.GenericPanel
 import com.joecollins.graphics.ImageGenerator
@@ -134,7 +134,7 @@ class MultiResultScreen private constructor(
                     .map {
                         when {
                             it.key == selected -> {
-                                Pair(it.value, leader.map { it.color })
+                                Pair(it.value, leader.map { it.getColor(default = Party.OTHERS.color) })
                             }
                             focus.isNullOrEmpty() || focus.contains(it.key) -> {
                                 Pair(

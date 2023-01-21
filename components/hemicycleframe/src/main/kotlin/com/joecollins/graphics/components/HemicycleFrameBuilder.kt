@@ -1,6 +1,6 @@
 package com.joecollins.graphics.components
 
-import ResultColorUtils.color
+import ResultColorUtils.getColor
 import com.google.common.annotations.Beta
 import com.joecollins.graphics.utils.ColorUtils
 import com.joecollins.models.general.Party
@@ -364,7 +364,7 @@ class HemicycleFrameBuilder {
                     results[it]!!.map { result ->
                         when {
                             result == null -> Color.WHITE
-                            else -> result.color
+                            else -> result.getColor(default = Color.LIGHT_GRAY)
                         }
                     }
                 },

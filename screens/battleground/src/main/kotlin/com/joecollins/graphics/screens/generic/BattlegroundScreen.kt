@@ -317,7 +317,7 @@ class BattlegroundScreen private constructor(
                     val resultColor: Color
                     val fill: Boolean
                     if (partyResult == null) {
-                        resultColor = Color.BLACK
+                        resultColor = Color.LIGHT_GRAY
                         fill = false
                     } else {
                         resultColor = partyResult.party.color

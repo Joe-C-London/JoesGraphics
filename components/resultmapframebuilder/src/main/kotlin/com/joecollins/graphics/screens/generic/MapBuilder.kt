@@ -1,8 +1,9 @@
 package com.joecollins.graphics.screens.generic
 
-import ResultColorUtils.color
+import ResultColorUtils.getColor
 import com.joecollins.graphics.components.MapFrame
 import com.joecollins.graphics.components.MapFrameBuilder
+import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
 import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.merge
@@ -85,7 +86,7 @@ class MapBuilder<T> {
                     .map {
                         val color =
                             if (it.key == ldr.first) {
-                                ldr.second.color
+                                ldr.second.getColor(default = Party.OTHERS.color)
                             } else {
                                 Color.LIGHT_GRAY
                             }
@@ -149,8 +150,8 @@ class MapBuilder<T> {
 
     companion object {
         private fun extractColor(focus: List<Shape>?, shape: Shape, winner: PartyResult?): Color {
-            val isInFocus = focus == null || focus.isEmpty() || focus.contains(shape)
-            return winner?.color?.takeIf { isInFocus }
+            val isInFocus = focus.isNullOrEmpty() || focus.contains(shape)
+            return winner?.getColor(default = Party.OTHERS.color)?.takeIf { isInFocus }
                 ?: (
                     if (isInFocus) {
                         Color.LIGHT_GRAY
