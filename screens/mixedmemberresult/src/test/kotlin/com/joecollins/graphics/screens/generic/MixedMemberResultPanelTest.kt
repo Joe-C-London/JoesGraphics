@@ -1,5 +1,6 @@
 package com.joecollins.graphics.screens.generic
 
+import com.joecollins.graphics.utils.PublisherTestUtils.assertPublishes
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.graphics.utils.ShapefileReader
 import com.joecollins.models.general.Aggregators
@@ -83,6 +84,24 @@ class MixedMemberResultPanelTest {
             ),
         )
         compareRendering("MixedMemberResultPanel", "Basic", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            CHARLOTTETOWN-WINSLOE
+            
+            CANDIDATE VOTES (CANDIDATE CHANGE SINCE 2015)
+            ROBERT MITCHELL (LIB): 1,420 (42.0%, -3.8%)
+            AMANDA MORRISON (GRN): 1,057 (31.2%, +21.8%)
+            MIKE GILLIS (PC): 865 (25.6%, -7.6%)
+            JESSE REDDIN COUSINS (NDP): 41 (1.2%, -10.4%)
+            
+            PARTY VOTES (PARTY CHANGE SINCE 2015)
+            GREEN: 1,098 (36.1%, +23.6%)
+            LIBERAL: 1,013 (33.3%, -7.5%)
+            PROGRESSIVE CONSERVATIVE: 822 (27.0%, -4.0%)
+            NEW DEMOCRATIC PARTY: 112 (3.7%, -12.2%)
+            """.trimIndent(),
+        )
     }
 
     @Test
@@ -162,6 +181,24 @@ class MixedMemberResultPanelTest {
         partyPctReporting.submit(0.1)
         selectedResult.submit(PartyResult.leading(lib))
         compareRendering("MixedMemberResultPanel", "PctReporting", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            CHARLOTTETOWN-WINSLOE
+            
+            CANDIDATE VOTES (CANDIDATE CHANGE SINCE 2015)
+            ROBERT MITCHELL (LIB): 284 (42.0%, -3.8%) WINNER
+            AMANDA MORRISON (GRN): 211 (31.2%, +21.7%)
+            MIKE GILLIS (PC): 173 (25.6%, -7.5%)
+            JESSE REDDIN COUSINS (NDP): 8 (1.2%, -10.4%)
+            
+            PARTY VOTES (PARTY CHANGE SINCE 2015)
+            GREEN: 110 (36.2%, +23.8%)
+            LIBERAL: 101 (33.2%, -7.5%)
+            PROGRESSIVE CONSERVATIVE: 82 (27.0%, -4.0%)
+            NEW DEMOCRATIC PARTY: 11 (3.6%, -12.2%)
+            """.trimIndent(),
+        )
     }
 
     @Test
@@ -247,6 +284,24 @@ class MixedMemberResultPanelTest {
         partyProgress.submit("10% IN")
         selectedResult.submit(PartyResult.leading(lib))
         compareRendering("MixedMemberResultPanel", "ProgressLabels", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            CHARLOTTETOWN-WINSLOE
+            
+            CANDIDATE VOTES (CANDIDATE CHANGE SINCE 2015) [20% IN]
+            ROBERT MITCHELL (LIB): 284 (42.0%, -3.8%) WINNER
+            AMANDA MORRISON (GRN): 211 (31.2%, +21.7%)
+            MIKE GILLIS (PC): 173 (25.6%, -7.5%)
+            JESSE REDDIN COUSINS (NDP): 8 (1.2%, -10.4%)
+            
+            PARTY VOTES (PARTY CHANGE SINCE 2015) [10% IN]
+            GREEN: 110 (36.2%, +23.8%)
+            LIBERAL: 101 (33.2%, -7.5%)
+            PROGRESSIVE CONSERVATIVE: 82 (27.0%, -4.0%)
+            NEW DEMOCRATIC PARTY: 11 (3.6%, -12.2%)
+            """.trimIndent(),
+        )
     }
 
     @Test
@@ -322,6 +377,24 @@ class MixedMemberResultPanelTest {
         candidatePctReporting.submit(0.0)
         partyPctReporting.submit(0.0)
         compareRendering("MixedMemberResultPanel", "Waiting", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            CHARLOTTETOWN-WINSLOE
+            
+            CANDIDATE VOTES (CANDIDATE CHANGE SINCE 2015)
+            JESSE REDDIN COUSINS (NDP): WAITING...
+            MIKE GILLIS (PC): WAITING...
+            ROBERT MITCHELL (LIB): WAITING...
+            AMANDA MORRISON (GRN): WAITING...
+            
+            PARTY VOTES (PARTY CHANGE SINCE 2015)
+            GREEN: WAITING...
+            LIBERAL: WAITING...
+            NEW DEMOCRATIC PARTY: WAITING...
+            PROGRESSIVE CONSERVATIVE: WAITING...
+            """.trimIndent(),
+        )
     }
 
     @Test
@@ -397,6 +470,24 @@ class MixedMemberResultPanelTest {
         candidatePctReporting.submit(0.01)
         partyPctReporting.submit(0.01)
         compareRendering("MixedMemberResultPanel", "ZeroVotes", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            CHARLOTTETOWN-WINSLOE
+            
+            CANDIDATE VOTES (CANDIDATE CHANGE SINCE 2015)
+            ROBERT MITCHELL (LIB): 14 (42.4%, -3.4%)
+            AMANDA MORRISON (GRN): 11 (33.3%, +23.9%)
+            MIKE GILLIS (PC): 8 (24.2%, -8.9%)
+            JESSE REDDIN COUSINS (NDP): 0 (0.0%, -11.6%)
+            
+            PARTY VOTES (PARTY CHANGE SINCE 2015)
+            LIBERAL: 14 (42.4%, +1.7%)
+            GREEN: 11 (33.3%, +20.9%)
+            PROGRESSIVE CONSERVATIVE: 8 (24.2%, -6.7%)
+            NEW DEMOCRATIC PARTY: 0 (0.0%, -15.9%)
+            """.trimIndent(),
+        )
     }
 
     @Test
@@ -462,6 +553,22 @@ class MixedMemberResultPanelTest {
             ),
         )
         compareRendering("MixedMemberResultPanel", "Other", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            CHARLOTTETOWN-WINSLOE
+            
+            CANDIDATE VOTES (CANDIDATE CHANGE SINCE 2015)
+            ROBERT MITCHELL (LIB): 1,420 (39.6%, -6.2%)
+            AMANDA MORRISON (GRN): 1,057 (29.5%, +20.0%)
+            OTHERS: 1,106 (30.9%, -13.8%)
+            
+            PARTY VOTES (PARTY CHANGE SINCE 2015)
+            PROGRESSIVE CONSERVATIVE: 1,098 (34.7%, +4.9%)
+            LIBERAL: 1,013 (32.0%, -7.2%)
+            OTHERS: 1,050 (33.2%, +2.3%)
+            """.trimIndent(),
+        )
     }
 
     @Test
@@ -535,6 +642,24 @@ class MixedMemberResultPanelTest {
             ),
         )
         compareRendering("MixedMemberResultPanel", "MapAdditionalHighlight", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            CHARLOTTETOWN-WINSLOE
+            
+            CANDIDATE VOTES (CANDIDATE CHANGE SINCE 2015)
+            ROBERT MITCHELL (MLA) (LIB): 1,420 (42.0%, -3.8%)
+            AMANDA MORRISON (GRN): 1,057 (31.2%, +21.8%)
+            MIKE GILLIS (PC): 865 (25.6%, -7.6%)
+            JESSE REDDIN COUSINS (NDP): 41 (1.2%, -10.4%)
+            
+            PARTY VOTES (PARTY CHANGE SINCE 2015)
+            GREEN: 1,098 (36.1%, +23.6%)
+            LIBERAL: 1,013 (33.3%, -7.5%)
+            PROGRESSIVE CONSERVATIVE: 822 (27.0%, -4.0%)
+            NEW DEMOCRATIC PARTY: 112 (3.7%, -12.2%)
+            """.trimIndent(),
+        )
     }
 
     @Test
@@ -584,6 +709,24 @@ class MixedMemberResultPanelTest {
             ),
         )
         compareRendering("MixedMemberResultPanel", "NoPrev", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            CHARLOTTETOWN-WINSLOE
+            
+            CANDIDATE VOTES
+            ROBERT MITCHELL (MLA) (LIB): 1,420 (42.0%)
+            AMANDA MORRISON (GRN): 1,057 (31.2%)
+            MIKE GILLIS (PC): 865 (25.6%)
+            JESSE REDDIN COUSINS (NDP): 41 (1.2%)
+            
+            PARTY VOTES
+            GREEN: 1,098 (36.1%)
+            LIBERAL: 1,013 (33.3%)
+            PROGRESSIVE CONSERVATIVE: 822 (27.0%)
+            NEW DEMOCRATIC PARTY: 112 (3.7%)
+            """.trimIndent(),
+        )
     }
 
     @Test
@@ -638,6 +781,24 @@ class MixedMemberResultPanelTest {
             ),
         )
         compareRendering("MixedMemberResultPanel", "NoPrevSubhead", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            CHARLOTTETOWN-WINSLOE
+            
+            CANDIDATE VOTES, LIB WIN IN 2015
+            ROBERT MITCHELL (MLA) (LIB): 1,420 (42.0%)
+            AMANDA MORRISON (GRN): 1,057 (31.2%)
+            MIKE GILLIS (PC): 865 (25.6%)
+            JESSE REDDIN COUSINS (NDP): 41 (1.2%)
+            
+            PARTY VOTES
+            GREEN: 1,098 (36.1%)
+            LIBERAL: 1,013 (33.3%)
+            PROGRESSIVE CONSERVATIVE: 822 (27.0%)
+            NEW DEMOCRATIC PARTY: 112 (3.7%)
+            """.trimIndent(),
+        )
     }
 
     @Test
@@ -690,6 +851,24 @@ class MixedMemberResultPanelTest {
             ),
         )
         compareRendering("MixedMemberResultPanel", "NoPrevTick", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            CHARLOTTETOWN-WINSLOE
+            
+            CANDIDATE VOTES
+            ROBERT MITCHELL (MLA) (LIB): 1,420 (42.0%) WINNER
+            AMANDA MORRISON (GRN): 1,057 (31.2%)
+            MIKE GILLIS (PC): 865 (25.6%)
+            JESSE REDDIN COUSINS (NDP): 41 (1.2%)
+            
+            PARTY VOTES
+            GREEN: 1,098 (36.1%)
+            LIBERAL: 1,013 (33.3%)
+            PROGRESSIVE CONSERVATIVE: 822 (27.0%)
+            NEW DEMOCRATIC PARTY: 112 (3.7%)
+            """.trimIndent(),
+        )
     }
 
     @Test
@@ -742,6 +921,24 @@ class MixedMemberResultPanelTest {
             ),
         )
         compareRendering("MixedMemberResultPanel", "PartyOnlyForCandidateVotes", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            CHARLOTTETOWN-WINSLOE
+            
+            CANDIDATE VOTES
+            LIBERAL: 1,420 (42.0%) WINNER
+            GREEN: 1,057 (31.2%)
+            PROGRESSIVE CONSERVATIVE: 865 (25.6%)
+            NEW DEMOCRATIC PARTY: 41 (1.2%)
+            
+            PARTY VOTES
+            GREEN: 1,098 (36.1%)
+            LIBERAL: 1,013 (33.3%)
+            PROGRESSIVE CONSERVATIVE: 822 (27.0%)
+            NEW DEMOCRATIC PARTY: 112 (3.7%)
+            """.trimIndent(),
+        )
     }
 
     @Test
@@ -750,7 +947,7 @@ class MixedMemberResultPanelTest {
         val grn = Party("Green", "GRN", Color.GREEN.darker())
         val con = Party("Conservative", "CON", Color.BLUE)
         val ld = Party("Liberal Democrats", "LD", Color.ORANGE)
-        val ukip = Party("UK Independency Party", "UKIP", Color.MAGENTA.darker())
+        val ukip = Party("UK Independence Party", "UKIP", Color.MAGENTA.darker())
         val resp = Party("Respect", "RESP", Color.RED.darker())
         val wep = Party("Women's Equality Party", "WEP", Color.CYAN.darker())
         val bnp = Party("British National Party", "BNP", Color.BLUE.darker())
@@ -841,48 +1038,291 @@ class MixedMemberResultPanelTest {
             ),
         )
         compareRendering("MixedMemberResultPanel", "Declaration-1", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            CITY & EAST
+            
+            CONSTITUENCY VOTES (CONSTITUENCY CHANGE SINCE 2012)
+            ELAINE SHEILA BAGSHAW (LD): WAITING...
+            CHRISTOPHER JAMES CHAPMAN (CON): WAITING...
+            RACHEL COLLINSON (GRN): WAITING...
+            UNMESH DESAI (LAB): WAITING...
+            AARON ANTHONY JOSE HASAN D'SOUZA (APP): WAITING...
+            AMINA MAY KAY GICHINGA (CITY): WAITING...
+            PETER JAMES HARRIS (UKIP): WAITING...
+            RAYNE MICKAIL (RESP): WAITING...
+            
+            AT-LARGE VOTES (AT-LARGE CHANGE SINCE 2012)
+            CONSERVATIVE: WAITING...
+            GREEN: WAITING...
+            LABOUR: WAITING...
+            LIBERAL DEMOCRATS: WAITING...
+            OTHERS: WAITING...
+            """.trimIndent(),
+        )
+
         currCandVotes[Candidate("Elaine Sheila Bagshaw", ld)] = 10714
         currentCandidateVotes.submit(currCandVotes)
         compareRendering("MixedMemberResultPanel", "Declaration-2", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            CITY & EAST
+            
+            CONSTITUENCY VOTES (CONSTITUENCY CHANGE SINCE 2012)
+            ELAINE SHEILA BAGSHAW (LD): 10,714
+            CHRISTOPHER JAMES CHAPMAN (CON): WAITING...
+            RACHEL COLLINSON (GRN): WAITING...
+            UNMESH DESAI (LAB): WAITING...
+            AARON ANTHONY JOSE HASAN D'SOUZA (APP): WAITING...
+            AMINA MAY KAY GICHINGA (CITY): WAITING...
+            PETER JAMES HARRIS (UKIP): WAITING...
+            RAYNE MICKAIL (RESP): WAITING...
+            
+            AT-LARGE VOTES (AT-LARGE CHANGE SINCE 2012)
+            CONSERVATIVE: WAITING...
+            GREEN: WAITING...
+            LABOUR: WAITING...
+            LIBERAL DEMOCRATS: WAITING...
+            OTHERS: WAITING...
+            """.trimIndent(),
+        )
+
         currCandVotes[Candidate("Christopher James Chapman", con)] = 32546
         currCandVotes[Candidate("Rachel Collinson", grn)] = 18766
         currCandVotes[Candidate("Unmesh Desai", lab)] = 122175
         currentCandidateVotes.submit(currCandVotes)
         compareRendering("MixedMemberResultPanel", "Declaration-3", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            CITY & EAST
+            
+            CONSTITUENCY VOTES (CONSTITUENCY CHANGE SINCE 2012)
+            UNMESH DESAI (LAB): 122,175
+            CHRISTOPHER JAMES CHAPMAN (CON): 32,546
+            RACHEL COLLINSON (GRN): 18,766
+            ELAINE SHEILA BAGSHAW (LD): 10,714
+            AARON ANTHONY JOSE HASAN D'SOUZA (APP): WAITING...
+            AMINA MAY KAY GICHINGA (CITY): WAITING...
+            PETER JAMES HARRIS (UKIP): WAITING...
+            RAYNE MICKAIL (RESP): WAITING...
+            
+            AT-LARGE VOTES (AT-LARGE CHANGE SINCE 2012)
+            CONSERVATIVE: WAITING...
+            GREEN: WAITING...
+            LABOUR: WAITING...
+            LIBERAL DEMOCRATS: WAITING...
+            OTHERS: WAITING...
+            """.trimIndent(),
+        )
+
         currCandVotes[Candidate("Aaron Anthony Jose Hasan D'Souza", app)] = 1009
         currCandVotes[Candidate("Amina May Kay Gichinga", city)] = 1368
         currCandVotes[Candidate("Peter James Harris", ukip)] = 18071
         currCandVotes[Candidate("Rayne Mickail", resp)] = 6772
         currentCandidateVotes.submit(currCandVotes)
         compareRendering("MixedMemberResultPanel", "Declaration-4", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            CITY & EAST
+            
+            CONSTITUENCY VOTES (CONSTITUENCY CHANGE SINCE 2012)
+            UNMESH DESAI (LAB): 122,175 (57.8%, -5.2%)
+            CHRISTOPHER JAMES CHAPMAN (CON): 32,546 (15.4%, +0.8%)
+            RACHEL COLLINSON (GRN): 18,766 (8.9%, +2.5%)
+            PETER JAMES HARRIS (UKIP): 18,071 (8.5%, +8.5%)
+            ELAINE SHEILA BAGSHAW (LD): 10,714 (5.1%, +0.8%)
+            RAYNE MICKAIL (RESP): 6,772 (3.2%, +3.2%)
+            AMINA MAY KAY GICHINGA (CITY): 1,368 (0.6%, +0.6%)
+            AARON ANTHONY JOSE HASAN D'SOUZA (APP): 1,009 (0.5%, +0.5%)
+            OTHERS: - (-11.8%)
+            
+            AT-LARGE VOTES (AT-LARGE CHANGE SINCE 2012)
+            CONSERVATIVE: WAITING...
+            GREEN: WAITING...
+            LABOUR: WAITING...
+            LIBERAL DEMOCRATS: WAITING...
+            OTHERS: WAITING...
+            """.trimIndent(),
+        )
+
         currPartyVotes[awp] = 1738
         currentPartyVotes.submit(currPartyVotes)
         topPartiesWaiting.submit(arrayOf(con, lab, ld))
         compareRendering("MixedMemberResultPanel", "Declaration-5", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            CITY & EAST
+            
+            CONSTITUENCY VOTES (CONSTITUENCY CHANGE SINCE 2012)
+            UNMESH DESAI (LAB): 122,175 (57.8%, -5.2%)
+            CHRISTOPHER JAMES CHAPMAN (CON): 32,546 (15.4%, +0.8%)
+            RACHEL COLLINSON (GRN): 18,766 (8.9%, +2.5%)
+            PETER JAMES HARRIS (UKIP): 18,071 (8.5%, +8.5%)
+            ELAINE SHEILA BAGSHAW (LD): 10,714 (5.1%, +0.8%)
+            RAYNE MICKAIL (RESP): 6,772 (3.2%, +3.2%)
+            AMINA MAY KAY GICHINGA (CITY): 1,368 (0.6%, +0.6%)
+            AARON ANTHONY JOSE HASAN D'SOUZA (APP): 1,009 (0.5%, +0.5%)
+            OTHERS: - (-11.8%)
+            
+            AT-LARGE VOTES (AT-LARGE CHANGE SINCE 2012)
+            ANIMAL WELFARE PARTY: 1,738
+            CONSERVATIVE: WAITING...
+            LABOUR: WAITING...
+            LIBERAL DEMOCRATS: WAITING...
+            OTHERS: WAITING...
+            """.trimIndent(),
+        )
+
         currPartyVotes[bf] = 3591
         currPartyVotes[bnp] = 1828
         currPartyVotes[ld] = 7799
         currentPartyVotes.submit(currPartyVotes)
         topPartiesWaiting.submit(emptyArray())
         compareRendering("MixedMemberResultPanel", "Declaration-6", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            CITY & EAST
+            
+            CONSTITUENCY VOTES (CONSTITUENCY CHANGE SINCE 2012)
+            UNMESH DESAI (LAB): 122,175 (57.8%, -5.2%)
+            CHRISTOPHER JAMES CHAPMAN (CON): 32,546 (15.4%, +0.8%)
+            RACHEL COLLINSON (GRN): 18,766 (8.9%, +2.5%)
+            PETER JAMES HARRIS (UKIP): 18,071 (8.5%, +8.5%)
+            ELAINE SHEILA BAGSHAW (LD): 10,714 (5.1%, +0.8%)
+            RAYNE MICKAIL (RESP): 6,772 (3.2%, +3.2%)
+            AMINA MAY KAY GICHINGA (CITY): 1,368 (0.6%, +0.6%)
+            AARON ANTHONY JOSE HASAN D'SOUZA (APP): 1,009 (0.5%, +0.5%)
+            OTHERS: - (-11.8%)
+            
+            AT-LARGE VOTES (AT-LARGE CHANGE SINCE 2012)
+            LIBERAL DEMOCRATS: 7,799
+            BRITAIN FIRST: 3,591
+            BRITISH NATIONAL PARTY: 1,828
+            ANIMAL WELFARE PARTY: 1,738
+            OTHERS: WAITING...
+            """.trimIndent(),
+        )
+
         currPartyVotes[cpa] = 2660
         currPartyVotes[con] = 30424
         currentPartyVotes.submit(currPartyVotes)
         compareRendering("MixedMemberResultPanel", "Declaration-7", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            CITY & EAST
+            
+            CONSTITUENCY VOTES (CONSTITUENCY CHANGE SINCE 2012)
+            UNMESH DESAI (LAB): 122,175 (57.8%, -5.2%)
+            CHRISTOPHER JAMES CHAPMAN (CON): 32,546 (15.4%, +0.8%)
+            RACHEL COLLINSON (GRN): 18,766 (8.9%, +2.5%)
+            PETER JAMES HARRIS (UKIP): 18,071 (8.5%, +8.5%)
+            ELAINE SHEILA BAGSHAW (LD): 10,714 (5.1%, +0.8%)
+            RAYNE MICKAIL (RESP): 6,772 (3.2%, +3.2%)
+            AMINA MAY KAY GICHINGA (CITY): 1,368 (0.6%, +0.6%)
+            AARON ANTHONY JOSE HASAN D'SOUZA (APP): 1,009 (0.5%, +0.5%)
+            OTHERS: - (-11.8%)
+            
+            AT-LARGE VOTES (AT-LARGE CHANGE SINCE 2012)
+            CONSERVATIVE: 30,424
+            LIBERAL DEMOCRATS: 7,799
+            BRITAIN FIRST: 3,591
+            CHRISTIAN PEOPLE'S ALLIANCE: 2,660
+            OTHERS: WAITING...
+            """.trimIndent(),
+        )
+
         currPartyVotes[grn] = 14151
         currPartyVotes[lab] = 121871
         currentPartyVotes.submit(currPartyVotes)
         compareRendering("MixedMemberResultPanel", "Declaration-8", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            CITY & EAST
+            
+            CONSTITUENCY VOTES (CONSTITUENCY CHANGE SINCE 2012)
+            UNMESH DESAI (LAB): 122,175 (57.8%, -5.2%)
+            CHRISTOPHER JAMES CHAPMAN (CON): 32,546 (15.4%, +0.8%)
+            RACHEL COLLINSON (GRN): 18,766 (8.9%, +2.5%)
+            PETER JAMES HARRIS (UKIP): 18,071 (8.5%, +8.5%)
+            ELAINE SHEILA BAGSHAW (LD): 10,714 (5.1%, +0.8%)
+            RAYNE MICKAIL (RESP): 6,772 (3.2%, +3.2%)
+            AMINA MAY KAY GICHINGA (CITY): 1,368 (0.6%, +0.6%)
+            AARON ANTHONY JOSE HASAN D'SOUZA (APP): 1,009 (0.5%, +0.5%)
+            OTHERS: - (-11.8%)
+            
+            AT-LARGE VOTES (AT-LARGE CHANGE SINCE 2012)
+            LABOUR: 121,871
+            CONSERVATIVE: 30,424
+            GREEN: 14,151
+            LIBERAL DEMOCRATS: 7,799
+            OTHERS: WAITING...
+            """.trimIndent(),
+        )
+
         currPartyVotes[resp] = 6784
         currPartyVotes[house] = 858
         currPartyVotes[ukip] = 14123
         currPartyVotes[wep] = 5718
         currentPartyVotes.submit(currPartyVotes)
         compareRendering("MixedMemberResultPanel", "Declaration-9", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            CITY & EAST
+            
+            CONSTITUENCY VOTES (CONSTITUENCY CHANGE SINCE 2012)
+            UNMESH DESAI (LAB): 122,175 (57.8%, -5.2%)
+            CHRISTOPHER JAMES CHAPMAN (CON): 32,546 (15.4%, +0.8%)
+            RACHEL COLLINSON (GRN): 18,766 (8.9%, +2.5%)
+            PETER JAMES HARRIS (UKIP): 18,071 (8.5%, +8.5%)
+            ELAINE SHEILA BAGSHAW (LD): 10,714 (5.1%, +0.8%)
+            RAYNE MICKAIL (RESP): 6,772 (3.2%, +3.2%)
+            AMINA MAY KAY GICHINGA (CITY): 1,368 (0.6%, +0.6%)
+            AARON ANTHONY JOSE HASAN D'SOUZA (APP): 1,009 (0.5%, +0.5%)
+            OTHERS: - (-11.8%)
+            
+            AT-LARGE VOTES (AT-LARGE CHANGE SINCE 2012)
+            LABOUR: 121,871 (57.6%, -5.6%)
+            CONSERVATIVE: 30,424 (14.4%, -0.3%)
+            GREEN: 14,151 (6.7%, +0.2%)
+            UK INDEPENDENCE PARTY: 14,123 (6.7%, +3.2%)
+            OTHERS: 30,976 (14.6%, +2.4%)
+            """.trimIndent(),
+        )
+
         currentCandidateVotes.submit(
             Aggregators.topAndOthers(currCandVotes, 6, Candidate.OTHERS),
         )
         compareRendering("MixedMemberResultPanel", "Declaration-10", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            CITY & EAST
+            
+            CONSTITUENCY VOTES (CONSTITUENCY CHANGE SINCE 2012)
+            UNMESH DESAI (LAB): 122,175 (57.8%, -5.2%)
+            CHRISTOPHER JAMES CHAPMAN (CON): 32,546 (15.4%, +0.8%)
+            RACHEL COLLINSON (GRN): 18,766 (8.9%, +2.5%)
+            PETER JAMES HARRIS (UKIP): 18,071 (8.5%, +8.5%)
+            ELAINE SHEILA BAGSHAW (LD): 10,714 (5.1%, +0.8%)
+            OTHERS: 9,149 (4.3%, -7.5%)
+            
+            AT-LARGE VOTES (AT-LARGE CHANGE SINCE 2012)
+            LABOUR: 121,871 (57.6%, -5.6%)
+            CONSERVATIVE: 30,424 (14.4%, -0.3%)
+            GREEN: 14,151 (6.7%, +0.2%)
+            UK INDEPENDENCE PARTY: 14,123 (6.7%, +3.2%)
+            OTHERS: 30,976 (14.6%, +2.4%)
+            """.trimIndent(),
+        )
     }
 
     @Test
@@ -933,12 +1373,40 @@ class MixedMemberResultPanelTest {
         }
         val panel = MixedMemberResultPanel.builder()
             .withCandidateVotes(candidateVotes.asOneTimePublisher(), "CANDIDATE VOTES".asOneTimePublisher(), "LAB GAIN FROM NAT".asOneTimePublisher())
-            .withPartyVotes(partyVotes.asOneTimePublisher(), "CHANGE SINCE 2017".asOneTimePublisher())
+            .withPartyVotes(partyVotes.asOneTimePublisher(), "PARTY VOTES".asOneTimePublisher())
             .withIncumbentMarker("[INC]")
             .withWinner(Candidate("Willow-Jean Prime", lab).asOneTimePublisher())
             .build("NORTHLAND".asOneTimePublisher())
         panel.setSize(1024, 512)
         compareRendering("MixedMemberResultPanel", "ManyCandidates", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            NORTHLAND
+            
+            CANDIDATE VOTES, LAB GAIN FROM NAT
+            WILLOW-JEAN PRIME (LAB): 17,066 (38.1%) WINNER
+            MATT KING [INC] (NAT): 16,903 (37.7%)
+            SHANE JONES (NZF): 5,119 (11.4%)
+            DARLEEN TANA HOFF-NELSON (GRN): 1,749 (3.9%)
+            MARK CAMERON (ACT): 1,279 (2.9%)
+            NATHAN MITCHELL (ADV): 847 (1.9%)
+            TREVOR BARFOOTE (CON): 686 (1.5%)
+            MIKE SHAW (IND): 480 (1.1%)
+            HELEN JEREMIAH (TOP): 326 (0.7%)
+            MICHELE MITCALFE (OUT): 219 (0.5%)
+            BRAD FLUTEY (SC): 82 (0.2%)
+            SOPHIA XIAO-COLLEY (HN): 28 (0.1%)
+            
+            PARTY VOTES
+            LABOUR: 19,997 (44.1%)
+            NATIONAL: 12,496 (27.6%)
+            ACT: 4,326 (9.5%)
+            GREEN: 2,772 (6.1%)
+            NZ FIRST: 2,651 (5.8%)
+            OTHERS: 3,091 (6.8%)
+            """.trimIndent(),
+        )
     }
 
     private fun peiShapesByDistrict(): Map<Int, Shape> {

@@ -31,6 +31,7 @@ class MixedMemberResultPanel private constructor(
     private val partyFrame: BarFrame,
     private val partyChangeFrame: BarFrame?,
     private val mapFrame: MapFrame?,
+    override val altText: Flow.Publisher<out String?>,
 ) : GenericPanel(
     run {
         val panel = JPanel()
@@ -213,6 +214,7 @@ class MixedMemberResultPanel private constructor(
                 createPartyVotes(),
                 createPartyChange(),
                 createMapFrame(),
+                createAltText(header),
             )
         }
 
@@ -470,6 +472,105 @@ class MixedMemberResultPanel private constructor(
 
         private fun createMapFrame(): MapFrame? {
             return mapBuilder?.createMapFrame()
+        }
+
+        private fun createAltText(header: Flow.Publisher<out String?>): Flow.Publisher<String?> {
+            val candidatesEntries = candidateVotes.merge(winner) { votes, winner -> votes to winner }.merge(candidatePrev ?: null.asOneTimePublisher()) { (curr, winner), prev ->
+                val partialDeclaration = curr.values.any { it == null }
+                val currTotal = curr.values.sumOf { it ?: 0 }.toDouble()
+                val prevTotal = prev?.values?.sum()?.toDouble()
+                val others = run {
+                    val currParties = curr.keys.map { it.party }
+                    prev?.filterKeys { !currParties.contains(it) }?.values?.sum() ?: 0
+                }
+                val entries = curr.entries
+                    .sortedByDescending { it.key.party.overrideSortOrder ?: it.value ?: 0 }
+                    .joinToString("\n") {
+                        val incumbentMarker = if (it.key.incumbent && incumbentMarker.isNotBlank() && it.key.name.isNotBlank()) {
+                            incumbentMarker
+                        } else {
+                            ""
+                        }
+                        val partyLabel = if (it.key == Candidate.OTHERS || it.key.name.isBlank()) {
+                            ""
+                        } else {
+                            " (${it.key.party.abbreviation})"
+                        }
+                        val candidateLabel =
+                            it.key.name.ifBlank { it.key.party.name }.uppercase() +
+                                incumbentMarker +
+                                partyLabel
+
+                        val votesLabel = if (it.value == null || currTotal == 0.0) {
+                            "WAITING..."
+                        } else {
+                            DecimalFormat("#,##0").format(it.value) + (
+                                if (partialDeclaration) {
+                                    ""
+                                } else {
+                                    val currPct = (it.value ?: 0) / currTotal
+                                    val diffLabel = if (prev == null) {
+                                        ""
+                                    } else {
+                                        val prevVotes = (prev[it.key.party] ?: 0) + (if (it.key == Candidate.OTHERS) others else 0)
+                                        val prevPct = prevVotes / (prevTotal ?: 0.0)
+                                        val diff = currPct - prevPct
+                                        ", ${DecimalFormat("+0.0%;-0.0%").format(diff)}"
+                                    }
+                                    val currLabel = DecimalFormat("0.0%").format(currPct)
+                                    " ($currLabel$diffLabel)"
+                                }
+                                )
+                        }
+                        val winnerLabel = if (winner == it.key) " WINNER" else ""
+                        "$candidateLabel: $votesLabel$winnerLabel"
+                    }
+                entries + (if (others > 0 && !partialDeclaration && !curr.containsKey(Candidate.OTHERS)) "\nOTHERS: - (-${DecimalFormat("0.0%").format(others / (prevTotal ?: 0.0))})" else "")
+            }
+            val candidates = candidateVoteHeader.merge(candidateVoteSubheader) { head, subhead -> head + (if (subhead.isNullOrEmpty()) "" else ", $subhead") }
+                .merge(candidateChangeHeader) { vote, change -> vote + (if (change.isNullOrEmpty()) "" else " ($change)") }
+                .merge(candidateProgressLabel) { head, prog -> head + (if (prog.isNullOrEmpty()) "" else " [$prog]") }
+                .merge(candidatesEntries) { head, entries -> "$head\n$entries" }
+
+            val partyEntries = partyVotes.merge(partyPrev ?: null.asOneTimePublisher()) { curr, prev ->
+                val partialDeclaration = curr.values.any { it == null }
+                val currTotal = curr.values.sumOf { it ?: 0 }.toDouble()
+                val prevTotal = prev?.values?.sum()?.toDouble()
+                val others = run {
+                    val currParties = curr.keys
+                    prev?.filterKeys { !currParties.contains(it) }?.values?.sum() ?: 0
+                }
+                curr.entries
+                    .sortedByDescending { it.key.overrideSortOrder ?: it.value ?: 0 }
+                    .joinToString("\n") {
+                        val votesLabel = if (it.value == null || currTotal == 0.0) {
+                            "WAITING..."
+                        } else {
+                            DecimalFormat("#,##0").format(it.value) + (
+                                if (partialDeclaration) {
+                                    ""
+                                } else {
+                                    val currPct = (it.value ?: 0) / currTotal
+                                    val diffLabel = if (prev == null) {
+                                        ""
+                                    } else {
+                                        val prevVotes = (prev[it.key] ?: 0) + (if (it.key == Party.OTHERS) others else 0)
+                                        val prevPct = prevVotes / (prevTotal ?: 0.0)
+                                        ", ${DecimalFormat("+0.0%;-0.0%").format(currPct - prevPct)}"
+                                    }
+                                    val currLabel = DecimalFormat("0.0%").format(currPct)
+                                    " ($currLabel$diffLabel)"
+                                }
+                                )
+                        }
+                        "${it.key.name.uppercase()}: " + votesLabel
+                    }
+            }
+            val parties = partyVoteHeader.merge(partyChangeHeader) { vote, change -> vote + (if (change.isNullOrEmpty()) "" else " ($change)") }
+                .merge(partyProgressLabel) { head, prog -> head + (if (prog.isNullOrEmpty()) "" else " [$prog]") }
+                .merge(partyEntries) { head, entries -> "$head\n$entries" }
+
+            return header.merge(candidates) { h, c -> "$h\n\n$c" }.merge(parties) { h, p -> "$h\n\n$p" }
         }
     }
 
