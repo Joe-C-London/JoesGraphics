@@ -885,6 +885,62 @@ class MixedMemberResultPanelTest {
         compareRendering("MixedMemberResultPanel", "Declaration-10", panel)
     }
 
+    @Test
+    fun testManyCandidatesGoSingleLine() {
+        val lab = Party("Labour", "LAB", Color.RED)
+        val nat = Party("National", "NAT", Color.BLUE)
+        val nzf = Party("NZ First", "NZF", Color.BLACK)
+        val grn = Party("Green", "GRN", Color.GREEN.darker())
+        val act = Party("ACT", "ACT", Color.YELLOW)
+        val adv = Party("Advance NZ", "ADV", Color.CYAN.darker())
+        val con = Party("New Conservative", "CON", Color.BLUE.brighter())
+        val top = Party("Opportunities", "TOP", Color.CYAN)
+        val out = Party("Outdoors", "OUT", Color.GREEN.darker().darker())
+        val sc = Party("Social Credit", "SC", Color.GREEN)
+        val hn = Party("Harmony Network", "HN", Color.GRAY)
+        val ind = Party("Independent", "IND", Party.OTHERS.color)
+
+        val candidateVotes = mapOf(
+            Candidate("Trevor Barfoote", con) to 686,
+            Candidate("Mark Cameron", act) to 1279,
+            Candidate("Brad Flutey", sc) to 82,
+            Candidate("Darleen Tana Hoff-Nelson", grn) to 1749,
+            Candidate("Helen Jeremiah", top) to 326,
+            Candidate("Willow-Jean Prime", lab) to 17066,
+            Candidate("Shane Jones", nzf) to 5119,
+            Candidate("Matt King", nat, true) to 16903,
+            Candidate("Michele Mitcalfe", out) to 219,
+            Candidate("Nathan Mitchell", adv) to 847,
+            Candidate("Mike Shaw", ind) to 480,
+            Candidate("Sophia Xiao-Colley", hn) to 28,
+        )
+        val partyVotes = mapOf(
+            lab to 19997,
+            nat to 12496,
+            nzf to 2651,
+            grn to 2772,
+            act to 4326,
+            adv to 949,
+            con to 842,
+            top to 326,
+            out to 106,
+            sc to 69,
+            Party.OTHERS to (294 + 248 + 181 + 37 + 30 + 6 + 3),
+        ).let { votes ->
+            val total = votes.values.sum()
+            votes.entries.groupingBy { if (it.value >= total * 0.05) it.key else Party.OTHERS }
+                .fold(0) { a, e -> a + e.value }
+        }
+        val panel = MixedMemberResultPanel.builder()
+            .withCandidateVotes(candidateVotes.asOneTimePublisher(), "CANDIDATE VOTES".asOneTimePublisher(), "LAB GAIN FROM NAT".asOneTimePublisher())
+            .withPartyVotes(partyVotes.asOneTimePublisher(), "CHANGE SINCE 2017".asOneTimePublisher())
+            .withIncumbentMarker("[INC]")
+            .withWinner(Candidate("Willow-Jean Prime", lab).asOneTimePublisher())
+            .build("NORTHLAND".asOneTimePublisher())
+        panel.setSize(1024, 512)
+        compareRendering("MixedMemberResultPanel", "ManyCandidates", panel)
+    }
+
     private fun peiShapesByDistrict(): Map<Int, Shape> {
         val peiMap = MixedMemberResultPanelTest::class.java
             .classLoader

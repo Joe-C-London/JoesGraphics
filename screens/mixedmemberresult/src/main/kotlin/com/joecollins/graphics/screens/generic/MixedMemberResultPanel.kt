@@ -234,49 +234,60 @@ class MixedMemberResultPanel private constructor(
         }
 
         private fun createCandidateVotes(): BarFrame {
-            val showBothLines = candidatePrev == null
-            val shape = if (showBothLines) ImageGenerator.createHalfTickShape() else ImageGenerator.createTickShape()
+            class CandidateBarTemplate(
+                val shape: Shape,
+                val leftLabel: (Candidate) -> String,
+                val rightLabel: (Int, Double) -> String,
+            )
+            val doubleLine = candidateVotes.map { it.size < 10 && candidatePrev == null }
+            val namedCandidateTemplate = doubleLine.map {
+                if (it) {
+                    CandidateBarTemplate(
+                        ImageGenerator.createHalfTickShape(),
+                        { candidate -> "${candidate.name.uppercase()}${if (candidate.isIncumbent()) incumbentMarker else ""}\n${candidate.party.name.uppercase()}" },
+                        { numVotes, pct -> "${THOUSANDS_FORMAT.format(numVotes.toLong())}\n${PCT_FORMAT.format(pct)}" },
+                    )
+                } else {
+                    CandidateBarTemplate(
+                        ImageGenerator.createTickShape(),
+                        { candidate -> "${candidate.name.uppercase()}${if (candidate.isIncumbent()) incumbentMarker else ""} (${candidate.party.abbreviation.uppercase()})" },
+                        { numVotes, pct -> "${THOUSANDS_FORMAT.format(numVotes.toLong())} (${PCT_FORMAT.format(pct)})" },
+                    )
+                }
+            }
+            val blankCandidateNameTemplate = CandidateBarTemplate(
+                ImageGenerator.createTickShape(),
+                { candidate -> candidate.party.name.uppercase() },
+                { numVotes, pct -> "${THOUSANDS_FORMAT.format(numVotes.toLong())} (${PCT_FORMAT.format(pct)})" },
+            )
             val result = Result()
             candidateVotes.subscribe(Subscriber { result.votes = it })
             winner.subscribe(Subscriber { result.winner = it })
-            val bars = result.votesPublisher.merge(result.winnerPublisher) { votes, winner ->
-                val total = votes.values.filterNotNull().sum()
-                val partialDeclaration = votes.values.any { it == null }
-                votes.entries
-                    .sortedByDescending {
-                        it.key.overrideSortOrder ?: it.value ?: 0
-                    }
-                    .map {
-                        val candidate = it.key
-                        val numVotes = it.value ?: 0
-                        val pct = it.value?.toDouble()?.div(total) ?: Double.NaN
-                        val leftLabel: String
-                        var rightLabel: String
-                        if (candidate.name.isBlank()) {
-                            leftLabel = candidate.party.name.uppercase()
-                            rightLabel = ("${THOUSANDS_FORMAT.format(numVotes.toLong())} (${PCT_FORMAT.format(pct)})")
-                        } else if (showBothLines) {
-                            leftLabel =
-                                ("${candidate.name.uppercase()}${if (candidate.isIncumbent()) incumbentMarker else ""}\n${candidate.party.name.uppercase()}")
-                            rightLabel = "${THOUSANDS_FORMAT.format(numVotes.toLong())}\n${PCT_FORMAT.format(pct)}"
-                        } else {
-                            leftLabel =
-                                ("${candidate.name.uppercase()}${if (candidate.isIncumbent()) incumbentMarker else ""} (${candidate.party.abbreviation.uppercase()})")
-                            rightLabel = ("${THOUSANDS_FORMAT.format(numVotes.toLong())} (${PCT_FORMAT.format(pct)})")
+            val bars = result.votesPublisher.merge(result.winnerPublisher) { votes, winner -> votes to winner }
+                .merge(namedCandidateTemplate) { (votes, winner), template ->
+                    val total = votes.values.filterNotNull().sum()
+                    val partialDeclaration = votes.values.any { it == null }
+                    votes.entries
+                        .sortedByDescending {
+                            it.key.overrideSortOrder ?: it.value ?: 0
                         }
-                        if (partialDeclaration) {
-                            rightLabel = THOUSANDS_FORMAT.format(numVotes.toLong())
+                        .map {
+                            val candidate = it.key
+                            val numVotes = it.value ?: 0
+                            val pct = it.value?.toDouble()?.div(total) ?: Double.NaN
+                            val rowTemplate = if (candidate.name.isBlank()) blankCandidateNameTemplate else template
+                            val leftLabel: String = rowTemplate.leftLabel(candidate)
+                            val rightLabel: String = if (partialDeclaration) THOUSANDS_FORMAT.format(numVotes.toLong()) else rowTemplate.rightLabel(numVotes, pct)
+                            BarFrameBuilder.BasicBar(
+                                if (candidate === Candidate.OTHERS) "OTHERS" else leftLabel,
+                                candidate.party.color,
+                                if (pct.isNaN()) 0 else pct,
+                                (if (pct.isNaN()) "WAITING..." else rightLabel),
+                                if (candidate == winner) (if (candidate.name.isBlank()) ImageGenerator.createTickShape() else rowTemplate.shape) else null,
+                            )
                         }
-                        BarFrameBuilder.BasicBar(
-                            if (candidate === Candidate.OTHERS) "OTHERS" else leftLabel,
-                            candidate.party.color,
-                            if (pct.isNaN()) 0 else pct,
-                            (if (pct.isNaN()) "WAITING..." else rightLabel),
-                            if (candidate == winner) (if (candidate.name.isBlank()) ImageGenerator.createTickShape() else shape) else null,
-                        )
-                    }
-                    .toList()
-            }
+                        .toList()
+                }
             return BarFrameBuilder.basic(bars)
                 .withHeader(candidateVoteHeader, rightLabelPublisher = candidateProgressLabel)
                 .withSubhead(candidateVoteSubheader)
