@@ -6,6 +6,7 @@ import com.joecollins.models.general.PartyOrCoalition
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
+import com.joecollins.pubsub.combine
 import com.joecollins.pubsub.map
 import com.joecollins.pubsub.merge
 import java.awt.Color
@@ -23,6 +24,7 @@ class PartySummaryScreen private constructor(
     mainFrame: RegionSummaryFrame,
     otherFrames: List<RegionSummaryFrame>,
     numRows: Int,
+    altText: Flow.Publisher<out String?>,
 ) : GenericPanel(
     run {
         val center = JPanel()
@@ -33,6 +35,7 @@ class PartySummaryScreen private constructor(
         center
     },
     partyPublisher.map { it.name.uppercase() + " SUMMARY" },
+    altText,
 ) {
 
     init {
@@ -158,16 +161,12 @@ class PartySummaryScreen private constructor(
                 createFrame(mainRegion, partyPublisher),
                 regions.map { createFrame(it, partyPublisher) },
                 numRows,
+                createAltText(partyPublisher),
             )
         }
 
         private fun createFrame(region: T, party: Flow.Publisher<out PartyOrCoalition>): RegionSummaryFrame {
-            val input = SinglePartyInput()
-            seatFunc?.invoke(region)?.subscribe(Subscriber { input.seats = it })
-            seatDiffFunc?.invoke(region)?.subscribe(Subscriber { input.seatDiff = it })
-            votePctFunc?.invoke(region)?.subscribe(Subscriber { input.votePct = it })
-            votePctDiffFunc?.invoke(region)?.subscribe(Subscriber { input.votePctDiff = it })
-            party.subscribe(Subscriber { input.party = it })
+            val input = createInput(region, party)
             val seatPublisher = input.seatPublisher
             val votePublisher = input.votePublisher
             val (headers, values) = when {
@@ -182,6 +181,38 @@ class PartySummaryScreen private constructor(
                     value.zip(headers) { v, h -> RegionSummaryFrame.SectionWithoutColor(h, v) }
                 },
             )
+        }
+
+        private fun createInput(
+            region: T,
+            party: Flow.Publisher<out PartyOrCoalition>,
+        ): SinglePartyInput {
+            val input = SinglePartyInput()
+            seatFunc?.invoke(region)?.subscribe(Subscriber { input.seats = it })
+            seatDiffFunc?.invoke(region)?.subscribe(Subscriber { input.seatDiff = it })
+            votePctFunc?.invoke(region)?.subscribe(Subscriber { input.votePct = it })
+            votePctDiffFunc?.invoke(region)?.subscribe(Subscriber { input.votePctDiff = it })
+            party.subscribe(Subscriber { input.party = it })
+            return input
+        }
+
+        private fun createAltText(partyPublisher: Flow.Publisher<out PartyOrCoalition>): Flow.Publisher<String> {
+            val entries = regions.map { createAltTextLine(it, partyPublisher) }
+                .combine()
+                .map { it.joinToString("\n") }
+            return partyPublisher.map { "${it.name.uppercase()} SUMMARY" }
+                .merge(createAltTextLine(mainRegion, partyPublisher)) { h, m -> "$h\n\n$m" }
+                .merge(entries) { h, e -> "$h\n\n$e" }
+        }
+
+        private fun createAltTextLine(region: T, party: Flow.Publisher<out PartyOrCoalition>): Flow.Publisher<String> {
+            val input = createInput(region, party)
+            val seatPublisher = input.seatPublisher
+            val votePublisher = input.votePublisher
+            val seatsText = seatPublisher.map { (seats, diff) -> if (seatFunc == null) null else "$seatsHeader: $seats ($diff)" }
+            val votesText = votePublisher.map { (pct, diff) -> if (votePctFunc == null) null else "$voteHeader: $pct ($diff)" }
+            return seatsText.merge(votesText) { seats, votes -> sequenceOf(seats, votes).filterNotNull().joinToString("; ") }
+                .merge(titleFunc(region)) { text, title -> "$title: $text" }
         }
     }
 

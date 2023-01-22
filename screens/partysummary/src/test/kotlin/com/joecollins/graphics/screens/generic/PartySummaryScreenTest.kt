@@ -1,5 +1,6 @@
 package com.joecollins.graphics.screens.generic
 
+import com.joecollins.graphics.utils.PublisherTestUtils.assertPublishes
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.models.general.Party
 import com.joecollins.pubsub.Publisher
@@ -43,6 +44,21 @@ class PartySummaryScreenTest {
             .build(partySelected)
         screen.setSize(1024, 512)
         compareRendering("PartySummaryScreen", "SingleParty-1", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            LIBERAL SUMMARY
+            
+            CANADA: SEATS: 0 (±0); POPULAR VOTE: 0.0% (±0.0%)
+            
+            BRITISH COLUMBIA: SEATS: 0 (±0); POPULAR VOTE: 0.0% (±0.0%)
+            PRAIRIES: SEATS: 0 (±0); POPULAR VOTE: 0.0% (±0.0%)
+            ONTARIO: SEATS: 0 (±0); POPULAR VOTE: 0.0% (±0.0%)
+            QUÉBEC: SEATS: 0 (±0); POPULAR VOTE: 0.0% (±0.0%)
+            ATLANTIC: SEATS: 0 (±0); POPULAR VOTE: 0.0% (±0.0%)
+            NORTH: SEATS: 0 (±0); POPULAR VOTE: 0.0% (±0.0%)
+            """.trimIndent(),
+        )
 
         atlantic.seats = mapOf(lib to 26, con to 4, ndp to 1, grn to 1)
         atlantic.seatDiff = mapOf(lib to -6, con to +4, ndp to +1, grn to +1)
@@ -53,6 +69,21 @@ class PartySummaryScreenTest {
         canada.votePct = mapOf(lib to 0.4089, con to 0.2863, ndp to 0.1583, grn to 0.1227, oth to 0.0238)
         canada.votePctDiff = mapOf(lib to -0.1784, con to +0.0960, ndp to -0.0209, grn to +0.0874, oth to +0.0159)
         compareRendering("PartySummaryScreen", "SingleParty-2", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            LIBERAL SUMMARY
+            
+            CANADA: SEATS: 26 (-6); POPULAR VOTE: 40.9% (-17.8%)
+            
+            BRITISH COLUMBIA: SEATS: 0 (±0); POPULAR VOTE: 0.0% (±0.0%)
+            PRAIRIES: SEATS: 0 (±0); POPULAR VOTE: 0.0% (±0.0%)
+            ONTARIO: SEATS: 0 (±0); POPULAR VOTE: 0.0% (±0.0%)
+            QUÉBEC: SEATS: 0 (±0); POPULAR VOTE: 0.0% (±0.0%)
+            ATLANTIC: SEATS: 26 (-6); POPULAR VOTE: 40.9% (-17.8%)
+            NORTH: SEATS: 0 (±0); POPULAR VOTE: 0.0% (±0.0%)
+            """.trimIndent(),
+        )
 
         quebec.seats = mapOf(lib to 35, con to 10, ndp to 1, bq to 32)
         quebec.seatDiff = mapOf(lib to -5, con to -2, ndp to -15, bq to +22)
@@ -75,9 +106,39 @@ class PartySummaryScreenTest {
         canada.votePct = mapOf(lib to 0.3418, con to 0.3439, ndp to 0.1469, grn to 0.0564, bq to 0.0880, oth to 0.0230)
         canada.votePctDiff = mapOf(lib to -0.0595, con to 0.0216, ndp to -0.0405, grn to 0.0296, bq to +0.0340, oth to +0.0148)
         compareRendering("PartySummaryScreen", "SingleParty-3", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            LIBERAL SUMMARY
+            
+            CANADA: SEATS: 145 (-21); POPULAR VOTE: 34.2% (-5.9%)
+            
+            BRITISH COLUMBIA: SEATS: 0 (±0); POPULAR VOTE: 0.0% (±0.0%)
+            PRAIRIES: SEATS: 4 (-8); POPULAR VOTE: 15.7% (-12.6%)
+            ONTARIO: SEATS: 79 (-1); POPULAR VOTE: 41.5% (-3.2%)
+            QUÉBEC: SEATS: 35 (-5); POPULAR VOTE: 34.3% (-1.5%)
+            ATLANTIC: SEATS: 26 (-6); POPULAR VOTE: 40.9% (-17.8%)
+            NORTH: SEATS: 1 (-1); POPULAR VOTE: 36.4% (-11.4%)
+            """.trimIndent(),
+        )
 
         partySelected.submit(con)
         compareRendering("PartySummaryScreen", "SingleParty-4", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            CONSERVATIVE SUMMARY
+            
+            CANADA: SEATS: 104 (+15); POPULAR VOTE: 34.4% (+2.2%)
+            
+            BRITISH COLUMBIA: SEATS: 0 (±0); POPULAR VOTE: 0.0% (±0.0%)
+            PRAIRIES: SEATS: 54 (+10); POPULAR VOTE: 63.8% (+10.5%)
+            ONTARIO: SEATS: 36 (+3); POPULAR VOTE: 33.1% (-2.0%)
+            QUÉBEC: SEATS: 10 (-2); POPULAR VOTE: 16.0% (-0.7%)
+            ATLANTIC: SEATS: 4 (+4); POPULAR VOTE: 28.6% (+9.6%)
+            NORTH: SEATS: 0 (±0); POPULAR VOTE: 25.7% (+4.9%)
+            """.trimIndent(),
+        )
 
         north.seats = mapOf(lib to 2, ndp to 1)
         north.seatDiff = mapOf(lib to -1, ndp to +1)
@@ -92,6 +153,21 @@ class PartySummaryScreenTest {
         canada.votePct = mapOf(lib to 0.3312, con to 0.3434, ndp to 0.1598, grn to 0.0655, bq to 0.0763, oth to 0.0238)
         canada.votePctDiff = mapOf(lib to -0.0634, con to +0.0243, ndp to -0.0374, grn to +0.0312, bq to +0.0297, oth to +0.0158)
         compareRendering("PartySummaryScreen", "SingleParty-5", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            CONSERVATIVE SUMMARY
+            
+            CANADA: SEATS: 121 (+22); POPULAR VOTE: 34.3% (+2.4%)
+            
+            BRITISH COLUMBIA: SEATS: 17 (+7); POPULAR VOTE: 34.0% (+4.0%)
+            PRAIRIES: SEATS: 54 (+10); POPULAR VOTE: 63.8% (+10.5%)
+            ONTARIO: SEATS: 36 (+3); POPULAR VOTE: 33.1% (-2.0%)
+            QUÉBEC: SEATS: 10 (-2); POPULAR VOTE: 16.0% (-0.7%)
+            ATLANTIC: SEATS: 4 (+4); POPULAR VOTE: 28.6% (+9.6%)
+            NORTH: SEATS: 0 (±0); POPULAR VOTE: 28.9% (+6.7%)
+            """.trimIndent(),
+        )
     }
 
     @Test
@@ -122,6 +198,21 @@ class PartySummaryScreenTest {
             .build(partySelected)
         screen.setSize(1024, 512)
         compareRendering("PartySummaryScreen", "SingleParty-1", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            LIBERAL SUMMARY
+            
+            CANADA: SEATS: 0 (±0); POPULAR VOTE: 0.0% (±0.0%)
+            
+            BRITISH COLUMBIA: SEATS: 0 (±0); POPULAR VOTE: 0.0% (±0.0%)
+            PRAIRIES: SEATS: 0 (±0); POPULAR VOTE: 0.0% (±0.0%)
+            ONTARIO: SEATS: 0 (±0); POPULAR VOTE: 0.0% (±0.0%)
+            QUÉBEC: SEATS: 0 (±0); POPULAR VOTE: 0.0% (±0.0%)
+            ATLANTIC: SEATS: 0 (±0); POPULAR VOTE: 0.0% (±0.0%)
+            NORTH: SEATS: 0 (±0); POPULAR VOTE: 0.0% (±0.0%)
+            """.trimIndent(),
+        )
 
         atlantic.seats = mapOf(lib to 26, con to 4, ndp to 1, grn to 1)
         atlantic.seatDiff = mapOf(lib to -6, con to +4, ndp to +1, grn to +1)
@@ -132,6 +223,21 @@ class PartySummaryScreenTest {
         canada.votePct = mapOf(lib to 0.4089, con to 0.2863, ndp to 0.1583, grn to 0.1227, oth to 0.0238)
         canada.votePctDiff = mapOf(lib to -0.1784, con to +0.0960, ndp to -0.0209, grn to +0.0874, oth to +0.0159)
         compareRendering("PartySummaryScreen", "SingleParty-2", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            LIBERAL SUMMARY
+            
+            CANADA: SEATS: 26 (-6); POPULAR VOTE: 40.9% (-17.8%)
+            
+            BRITISH COLUMBIA: SEATS: 0 (±0); POPULAR VOTE: 0.0% (±0.0%)
+            PRAIRIES: SEATS: 0 (±0); POPULAR VOTE: 0.0% (±0.0%)
+            ONTARIO: SEATS: 0 (±0); POPULAR VOTE: 0.0% (±0.0%)
+            QUÉBEC: SEATS: 0 (±0); POPULAR VOTE: 0.0% (±0.0%)
+            ATLANTIC: SEATS: 26 (-6); POPULAR VOTE: 40.9% (-17.8%)
+            NORTH: SEATS: 0 (±0); POPULAR VOTE: 0.0% (±0.0%)
+            """.trimIndent(),
+        )
 
         quebec.seats = mapOf(lib to 35, con to 10, ndp to 1, bq to 32)
         quebec.seatDiff = mapOf(lib to -5, con to -2, ndp to -15, bq to +22)
@@ -154,9 +260,39 @@ class PartySummaryScreenTest {
         canada.votePct = mapOf(lib to 0.3418, con to 0.3439, ndp to 0.1469, grn to 0.0564, bq to 0.0880, oth to 0.0230)
         canada.votePctDiff = mapOf(lib to -0.0595, con to 0.0216, ndp to -0.0405, grn to 0.0296, bq to +0.0340, oth to +0.0148)
         compareRendering("PartySummaryScreen", "SingleParty-3", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            LIBERAL SUMMARY
+            
+            CANADA: SEATS: 145 (-21); POPULAR VOTE: 34.2% (-5.9%)
+            
+            BRITISH COLUMBIA: SEATS: 0 (±0); POPULAR VOTE: 0.0% (±0.0%)
+            PRAIRIES: SEATS: 4 (-8); POPULAR VOTE: 15.7% (-12.6%)
+            ONTARIO: SEATS: 79 (-1); POPULAR VOTE: 41.5% (-3.2%)
+            QUÉBEC: SEATS: 35 (-5); POPULAR VOTE: 34.3% (-1.5%)
+            ATLANTIC: SEATS: 26 (-6); POPULAR VOTE: 40.9% (-17.8%)
+            NORTH: SEATS: 1 (-1); POPULAR VOTE: 36.4% (-11.4%)
+            """.trimIndent(),
+        )
 
         partySelected.submit(con)
         compareRendering("PartySummaryScreen", "SingleParty-4", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            CONSERVATIVE SUMMARY
+            
+            CANADA: SEATS: 104 (+15); POPULAR VOTE: 34.4% (+2.2%)
+            
+            BRITISH COLUMBIA: SEATS: 0 (±0); POPULAR VOTE: 0.0% (±0.0%)
+            PRAIRIES: SEATS: 54 (+10); POPULAR VOTE: 63.8% (+10.5%)
+            ONTARIO: SEATS: 36 (+3); POPULAR VOTE: 33.1% (-2.0%)
+            QUÉBEC: SEATS: 10 (-2); POPULAR VOTE: 16.0% (-0.7%)
+            ATLANTIC: SEATS: 4 (+4); POPULAR VOTE: 28.6% (+9.6%)
+            NORTH: SEATS: 0 (±0); POPULAR VOTE: 25.7% (+4.9%)
+            """.trimIndent(),
+        )
 
         north.seats = mapOf(lib to 2, ndp to 1)
         north.seatDiff = mapOf(lib to -1, ndp to +1)
@@ -171,6 +307,21 @@ class PartySummaryScreenTest {
         canada.votePct = mapOf(lib to 0.3312, con to 0.3434, ndp to 0.1598, grn to 0.0655, bq to 0.0763, oth to 0.0238)
         canada.votePctDiff = mapOf(lib to -0.0634, con to +0.0243, ndp to -0.0374, grn to +0.0312, bq to +0.0297, oth to +0.0158)
         compareRendering("PartySummaryScreen", "SingleParty-5", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            CONSERVATIVE SUMMARY
+            
+            CANADA: SEATS: 121 (+22); POPULAR VOTE: 34.3% (+2.4%)
+            
+            BRITISH COLUMBIA: SEATS: 17 (+7); POPULAR VOTE: 34.0% (+4.0%)
+            PRAIRIES: SEATS: 54 (+10); POPULAR VOTE: 63.8% (+10.5%)
+            ONTARIO: SEATS: 36 (+3); POPULAR VOTE: 33.1% (-2.0%)
+            QUÉBEC: SEATS: 10 (-2); POPULAR VOTE: 16.0% (-0.7%)
+            ATLANTIC: SEATS: 4 (+4); POPULAR VOTE: 28.6% (+9.6%)
+            NORTH: SEATS: 0 (±0); POPULAR VOTE: 28.9% (+6.7%)
+            """.trimIndent(),
+        )
     }
 
     @Test
@@ -202,6 +353,21 @@ class PartySummaryScreenTest {
             .build(partySelected)
         screen.setSize(1024, 512)
         compareRendering("PartySummaryScreen", "SinglePartySeatsOnly-1", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            LIBERAL SUMMARY
+            
+            CANADA: SEAT PROJECTION: 0 (±0)
+            
+            BRITISH COLUMBIA: SEAT PROJECTION: 0 (±0)
+            PRAIRIES: SEAT PROJECTION: 0 (±0)
+            ONTARIO: SEAT PROJECTION: 0 (±0)
+            QUÉBEC: SEAT PROJECTION: 0 (±0)
+            ATLANTIC: SEAT PROJECTION: 0 (±0)
+            NORTH: SEAT PROJECTION: 0 (±0)
+            """.trimIndent(),
+        )
 
         atlantic.seats = mapOf(lib to 26, con to 4, ndp to 1, grn to 1)
         atlantic.seatDiff = mapOf(lib to -6, con to +4, ndp to +1, grn to +1)
@@ -212,6 +378,21 @@ class PartySummaryScreenTest {
         canada.votePct = mapOf(lib to 0.4089, con to 0.2863, ndp to 0.1583, grn to 0.1227, oth to 0.0238)
         canada.votePctDiff = mapOf(lib to -0.1784, con to +0.0960, ndp to -0.0209, grn to +0.0874, oth to +0.0159)
         compareRendering("PartySummaryScreen", "SinglePartySeatsOnly-2", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            LIBERAL SUMMARY
+            
+            CANADA: SEAT PROJECTION: 26 (-6)
+            
+            BRITISH COLUMBIA: SEAT PROJECTION: 0 (±0)
+            PRAIRIES: SEAT PROJECTION: 0 (±0)
+            ONTARIO: SEAT PROJECTION: 0 (±0)
+            QUÉBEC: SEAT PROJECTION: 0 (±0)
+            ATLANTIC: SEAT PROJECTION: 26 (-6)
+            NORTH: SEAT PROJECTION: 0 (±0)
+            """.trimIndent(),
+        )
 
         quebec.seats = mapOf(lib to 35, con to 10, ndp to 1, bq to 32)
         quebec.seatDiff = mapOf(lib to -5, con to -2, ndp to -15, bq to +22)
@@ -234,9 +415,39 @@ class PartySummaryScreenTest {
         canada.votePct = mapOf(lib to 0.3418, con to 0.3439, ndp to 0.1469, grn to 0.0564, bq to 0.0880, oth to 0.0230)
         canada.votePctDiff = mapOf(lib to -0.0595, con to 0.0216, ndp to -0.0405, grn to 0.0296, bq to +0.0340, oth to +0.0148)
         compareRendering("PartySummaryScreen", "SinglePartySeatsOnly-3", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            LIBERAL SUMMARY
+            
+            CANADA: SEAT PROJECTION: 145 (-21)
+            
+            BRITISH COLUMBIA: SEAT PROJECTION: 0 (±0)
+            PRAIRIES: SEAT PROJECTION: 4 (-8)
+            ONTARIO: SEAT PROJECTION: 79 (-1)
+            QUÉBEC: SEAT PROJECTION: 35 (-5)
+            ATLANTIC: SEAT PROJECTION: 26 (-6)
+            NORTH: SEAT PROJECTION: 1 (-1)
+            """.trimIndent(),
+        )
 
         partySelected.submit(con)
         compareRendering("PartySummaryScreen", "SinglePartySeatsOnly-4", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            CONSERVATIVE SUMMARY
+            
+            CANADA: SEAT PROJECTION: 104 (+15)
+            
+            BRITISH COLUMBIA: SEAT PROJECTION: 0 (±0)
+            PRAIRIES: SEAT PROJECTION: 54 (+10)
+            ONTARIO: SEAT PROJECTION: 36 (+3)
+            QUÉBEC: SEAT PROJECTION: 10 (-2)
+            ATLANTIC: SEAT PROJECTION: 4 (+4)
+            NORTH: SEAT PROJECTION: 0 (±0)
+            """.trimIndent(),
+        )
 
         north.seats = mapOf(lib to 2, ndp to 1)
         north.seatDiff = mapOf(lib to -1, ndp to +1)
@@ -251,6 +462,21 @@ class PartySummaryScreenTest {
         canada.votePct = mapOf(lib to 0.3312, con to 0.3434, ndp to 0.1598, grn to 0.0655, bq to 0.0763, oth to 0.0238)
         canada.votePctDiff = mapOf(lib to -0.0634, con to +0.0243, ndp to -0.0374, grn to +0.0312, bq to +0.0297, oth to +0.0158)
         compareRendering("PartySummaryScreen", "SinglePartySeatsOnly-5", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            CONSERVATIVE SUMMARY
+            
+            CANADA: SEAT PROJECTION: 121 (+22)
+            
+            BRITISH COLUMBIA: SEAT PROJECTION: 17 (+7)
+            PRAIRIES: SEAT PROJECTION: 54 (+10)
+            ONTARIO: SEAT PROJECTION: 36 (+3)
+            QUÉBEC: SEAT PROJECTION: 10 (-2)
+            ATLANTIC: SEAT PROJECTION: 4 (+4)
+            NORTH: SEAT PROJECTION: 0 (±0)
+            """.trimIndent(),
+        )
     }
 
     @Test
@@ -282,6 +508,21 @@ class PartySummaryScreenTest {
             .build(partySelected)
         screen.setSize(1024, 512)
         compareRendering("PartySummaryScreen", "SinglePartyVotesOnly-1", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            LIBERAL SUMMARY
+            
+            CANADA: CENTRAL VOTE FORECAST: 0.0% (±0.0%)
+            
+            BRITISH COLUMBIA: CENTRAL VOTE FORECAST: 0.0% (±0.0%)
+            PRAIRIES: CENTRAL VOTE FORECAST: 0.0% (±0.0%)
+            ONTARIO: CENTRAL VOTE FORECAST: 0.0% (±0.0%)
+            QUÉBEC: CENTRAL VOTE FORECAST: 0.0% (±0.0%)
+            ATLANTIC: CENTRAL VOTE FORECAST: 0.0% (±0.0%)
+            NORTH: CENTRAL VOTE FORECAST: 0.0% (±0.0%)
+            """.trimIndent(),
+        )
 
         atlantic.seats = mapOf(lib to 26, con to 4, ndp to 1, grn to 1)
         atlantic.seatDiff = mapOf(lib to -6, con to +4, ndp to +1, grn to +1)
@@ -292,6 +533,21 @@ class PartySummaryScreenTest {
         canada.votePct = mapOf(lib to 0.4089, con to 0.2863, ndp to 0.1583, grn to 0.1227, oth to 0.0238)
         canada.votePctDiff = mapOf(lib to -0.1784, con to +0.0960, ndp to -0.0209, grn to +0.0874, oth to +0.0159)
         compareRendering("PartySummaryScreen", "SinglePartyVotesOnly-2", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            LIBERAL SUMMARY
+            
+            CANADA: CENTRAL VOTE FORECAST: 40.9% (-17.8%)
+            
+            BRITISH COLUMBIA: CENTRAL VOTE FORECAST: 0.0% (±0.0%)
+            PRAIRIES: CENTRAL VOTE FORECAST: 0.0% (±0.0%)
+            ONTARIO: CENTRAL VOTE FORECAST: 0.0% (±0.0%)
+            QUÉBEC: CENTRAL VOTE FORECAST: 0.0% (±0.0%)
+            ATLANTIC: CENTRAL VOTE FORECAST: 40.9% (-17.8%)
+            NORTH: CENTRAL VOTE FORECAST: 0.0% (±0.0%)
+            """.trimIndent(),
+        )
 
         quebec.seats = mapOf(lib to 35, con to 10, ndp to 1, bq to 32)
         quebec.seatDiff = mapOf(lib to -5, con to -2, ndp to -15, bq to +22)
@@ -314,9 +570,39 @@ class PartySummaryScreenTest {
         canada.votePct = mapOf(lib to 0.3418, con to 0.3439, ndp to 0.1469, grn to 0.0564, bq to 0.0880, oth to 0.0230)
         canada.votePctDiff = mapOf(lib to -0.0595, con to 0.0216, ndp to -0.0405, grn to 0.0296, bq to +0.0340, oth to +0.0148)
         compareRendering("PartySummaryScreen", "SinglePartyVotesOnly-3", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            LIBERAL SUMMARY
+            
+            CANADA: CENTRAL VOTE FORECAST: 34.2% (-5.9%)
+            
+            BRITISH COLUMBIA: CENTRAL VOTE FORECAST: 0.0% (±0.0%)
+            PRAIRIES: CENTRAL VOTE FORECAST: 15.7% (-12.6%)
+            ONTARIO: CENTRAL VOTE FORECAST: 41.5% (-3.2%)
+            QUÉBEC: CENTRAL VOTE FORECAST: 34.3% (-1.5%)
+            ATLANTIC: CENTRAL VOTE FORECAST: 40.9% (-17.8%)
+            NORTH: CENTRAL VOTE FORECAST: 36.4% (-11.4%)
+            """.trimIndent(),
+        )
 
         partySelected.submit(con)
         compareRendering("PartySummaryScreen", "SinglePartyVotesOnly-4", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            CONSERVATIVE SUMMARY
+            
+            CANADA: CENTRAL VOTE FORECAST: 34.4% (+2.2%)
+            
+            BRITISH COLUMBIA: CENTRAL VOTE FORECAST: 0.0% (±0.0%)
+            PRAIRIES: CENTRAL VOTE FORECAST: 63.8% (+10.5%)
+            ONTARIO: CENTRAL VOTE FORECAST: 33.1% (-2.0%)
+            QUÉBEC: CENTRAL VOTE FORECAST: 16.0% (-0.7%)
+            ATLANTIC: CENTRAL VOTE FORECAST: 28.6% (+9.6%)
+            NORTH: CENTRAL VOTE FORECAST: 25.7% (+4.9%)
+            """.trimIndent(),
+        )
 
         north.seats = mapOf(lib to 2, ndp to 1)
         north.seatDiff = mapOf(lib to -1, ndp to +1)
@@ -331,6 +617,21 @@ class PartySummaryScreenTest {
         canada.votePct = mapOf(lib to 0.3312, con to 0.3434, ndp to 0.1598, grn to 0.0655, bq to 0.0763, oth to 0.0238)
         canada.votePctDiff = mapOf(lib to -0.0634, con to +0.0243, ndp to -0.0374, grn to +0.0312, bq to +0.0297, oth to +0.0158)
         compareRendering("PartySummaryScreen", "SinglePartyVotesOnly-5", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            CONSERVATIVE SUMMARY
+            
+            CANADA: CENTRAL VOTE FORECAST: 34.3% (+2.4%)
+            
+            BRITISH COLUMBIA: CENTRAL VOTE FORECAST: 34.0% (+4.0%)
+            PRAIRIES: CENTRAL VOTE FORECAST: 63.8% (+10.5%)
+            ONTARIO: CENTRAL VOTE FORECAST: 33.1% (-2.0%)
+            QUÉBEC: CENTRAL VOTE FORECAST: 16.0% (-0.7%)
+            ATLANTIC: CENTRAL VOTE FORECAST: 28.6% (+9.6%)
+            NORTH: CENTRAL VOTE FORECAST: 28.9% (+6.7%)
+            """.trimIndent(),
+        )
     }
 
     private class Region constructor(val name: String) {
