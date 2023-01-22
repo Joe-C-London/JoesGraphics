@@ -1,5 +1,6 @@
 package com.joecollins.graphics.screens.generic
 
+import com.joecollins.graphics.utils.PublisherTestUtils.assertPublishes
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
@@ -37,10 +38,51 @@ class SwingometerScreenTest {
             .build("NEW BRUNSWICK".asOneTimePublisher())
         panel.setSize(1024, 512)
         compareRendering("SwingometerScreen", "Basic-TwoParty-1", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            NEW BRUNSWICK
+            SWINGOMETER
+
+            5.5% SWING LIB TO PCP
+            PCP WOULD HAVE 26 ON UNIFORM SWING
+            
+            LIB NEEDS 1.8% SWING FROM PCP TO GAIN MAJORITY
+            PCP NEEDS 1.7% SWING FROM LIB TO GAIN MAJORITY
+            """.trimIndent(),
+        )
+
         parties.submit(Pair(grn, pc))
         compareRendering("SwingometerScreen", "Basic-TwoParty-2", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            NEW BRUNSWICK
+            SWINGOMETER
+
+            2.0% SWING GRN TO PCP
+            PCP WOULD HAVE 22 ON UNIFORM SWING
+            
+            GRN NEEDS 25.7% SWING FROM PCP TO GAIN MAJORITY
+            PCP NEEDS 21.3% SWING FROM GRN TO GAIN MAJORITY
+            """.trimIndent(),
+        )
+
         parties.submit(Pair(pa, pc))
         compareRendering("SwingometerScreen", "Basic-TwoParty-3", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            NEW BRUNSWICK
+            SWINGOMETER
+
+            5.4% SWING PA TO PCP
+            PCP WOULD HAVE 23 ON UNIFORM SWING
+            
+            PA NEEDS 26.6% SWING FROM PCP TO GAIN MAJORITY
+            PCP NEEDS 16.3% SWING FROM PA TO GAIN MAJORITY
+            """.trimIndent(),
+        )
     }
 
     @Test
@@ -61,9 +103,36 @@ class SwingometerScreenTest {
             .build("NEW BRUNSWICK".asOneTimePublisher())
         panel.setSize(1024, 512)
         compareRendering("SwingometerScreen", "Basic-Updates-1", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            NEW BRUNSWICK
+            SWINGOMETER
+
+            NO SWING BETWEEN LIB AND PCP
+            PCP WOULD HAVE 22 ON UNIFORM SWING
+            
+            LIB NEEDS 1.8% SWING FROM PCP TO GAIN MAJORITY
+            PCP NEEDS 1.7% SWING FROM LIB TO GAIN MAJORITY
+            """.trimIndent(),
+        )
+
         currResult.submit(nbCurrResult())
         swing.submit(mapOf(pc to +0.0745, lib to -0.0345, grn to +0.0336, pa to -0.0339, ndp to -0.0335, ind to -0.0062))
         compareRendering("SwingometerScreen", "Basic-Updates-2", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            NEW BRUNSWICK
+            SWINGOMETER
+
+            5.5% SWING LIB TO PCP
+            PCP WOULD HAVE 26 ON UNIFORM SWING
+            
+            LIB NEEDS 1.8% SWING FROM PCP TO GAIN MAJORITY
+            PCP NEEDS 1.7% SWING FROM LIB TO GAIN MAJORITY
+            """.trimIndent(),
+        )
     }
 
     @Test
@@ -105,10 +174,51 @@ class SwingometerScreenTest {
             .build("NEW BRUNSWICK".asOneTimePublisher())
         panel.setSize(1024, 512)
         compareRendering("SwingometerScreen", "Filtered-TwoParty-1", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            NEW BRUNSWICK
+            SWINGOMETER
+
+            5.5% SWING LIB TO PCP
+            PCP WOULD HAVE 26 ON UNIFORM SWING
+            
+            LIB NEEDS 1.8% SWING FROM PCP TO GAIN MAJORITY
+            PCP NEEDS 1.7% SWING FROM LIB TO GAIN MAJORITY
+            """.trimIndent(),
+        )
+
         seatsFiltered.submit(emptySet())
         compareRendering("SwingometerScreen", "Filtered-TwoParty-2", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            NEW BRUNSWICK
+            SWINGOMETER
+
+            5.5% SWING LIB TO PCP
+            PCP WOULD HAVE 26 ON UNIFORM SWING
+            
+            LIB NEEDS 1.8% SWING FROM PCP TO GAIN MAJORITY
+            PCP NEEDS 1.7% SWING FROM LIB TO GAIN MAJORITY
+            """.trimIndent(),
+        )
+
         seatsFiltered.submit(null)
         compareRendering("SwingometerScreen", "Filtered-TwoParty-3", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            NEW BRUNSWICK
+            SWINGOMETER
+
+            5.5% SWING LIB TO PCP
+            PCP WOULD HAVE 26 ON UNIFORM SWING
+            
+            LIB NEEDS 1.8% SWING FROM PCP TO GAIN MAJORITY
+            PCP NEEDS 1.7% SWING FROM LIB TO GAIN MAJORITY
+            """.trimIndent(),
+        )
     }
 
     @Test
@@ -138,6 +248,19 @@ class SwingometerScreenTest {
             .build("NEW BRUNSWICK".asOneTimePublisher())
         panel.setSize(1024, 512)
         compareRendering("SwingometerScreen", "Basic-ProgressLabel", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            NEW BRUNSWICK
+            SWINGOMETER [100% IN]
+
+            5.5% SWING LIB TO PCP
+            PCP WOULD HAVE 26 ON UNIFORM SWING
+            
+            LIB NEEDS 1.8% SWING FROM PCP TO GAIN MAJORITY
+            PCP NEEDS 1.7% SWING FROM LIB TO GAIN MAJORITY
+            """.trimIndent(),
+        )
     }
 
     @Test
@@ -159,10 +282,51 @@ class SwingometerScreenTest {
             .build("NEW BRUNSWICK".asOneTimePublisher())
         panel.setSize(1024, 512)
         compareRendering("SwingometerScreen", "Basic-TwoPartyVotes-1", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            NEW BRUNSWICK
+            SWINGOMETER
+
+            5.5% SWING LIB TO PCP
+            PCP WOULD HAVE 26 ON UNIFORM SWING
+            
+            LIB NEEDS 1.8% SWING FROM PCP TO GAIN MAJORITY
+            PCP NEEDS 1.7% SWING FROM LIB TO GAIN MAJORITY
+            """.trimIndent(),
+        )
+
         parties.submit(Pair(grn, pc))
         compareRendering("SwingometerScreen", "Basic-TwoPartyVotes-2", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            NEW BRUNSWICK
+            SWINGOMETER
+
+            2.0% SWING GRN TO PCP
+            PCP WOULD HAVE 22 ON UNIFORM SWING
+            
+            GRN NEEDS 25.7% SWING FROM PCP TO GAIN MAJORITY
+            PCP NEEDS 21.3% SWING FROM GRN TO GAIN MAJORITY
+            """.trimIndent(),
+        )
+
         parties.submit(Pair(pa, pc))
         compareRendering("SwingometerScreen", "Basic-TwoPartyVotes-3", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            NEW BRUNSWICK
+            SWINGOMETER
+
+            5.4% SWING PA TO PCP
+            PCP WOULD HAVE 23 ON UNIFORM SWING
+            
+            PA NEEDS 26.6% SWING FROM PCP TO GAIN MAJORITY
+            PCP NEEDS 16.3% SWING FROM PA TO GAIN MAJORITY
+            """.trimIndent(),
+        )
     }
 
     @Test
@@ -220,8 +384,35 @@ class SwingometerScreenTest {
             .build("US SENATE".asOneTimePublisher())
         panel.setSize(1024, 512)
         compareRendering("SwingometerScreen", "Carryovers-1", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            US SENATE
+            SWINGOMETER
+
+            NO SWING BETWEEN DEM AND GOP
+            GOP WOULD HAVE 52 ON UNIFORM SWING
+            
+            DEM NEEDS 1.7% SWING FROM GOP TO GAIN MAJORITY
+            GOP NEEDS TO AVOID 1.6% SWING TO DEM TO HOLD MAJORITY
+            """.trimIndent(),
+        )
+
         parties.submit(gop to dem)
         compareRendering("SwingometerScreen", "Carryovers-2", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            US SENATE
+            SWINGOMETER
+
+            NO SWING BETWEEN GOP AND DEM
+            GOP WOULD HAVE 52 ON UNIFORM SWING
+            
+            GOP NEEDS TO AVOID 1.6% SWING TO DEM TO HOLD MAJORITY
+            DEM NEEDS 1.7% SWING FROM GOP TO GAIN MAJORITY
+            """.trimIndent(),
+        )
     }
 
     @Test
@@ -279,8 +470,35 @@ class SwingometerScreenTest {
             .build("US SENATE".asOneTimePublisher())
         panel.setSize(1024, 512)
         compareRendering("SwingometerScreen", "Carryovers-1", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            US SENATE
+            SWINGOMETER
+
+            NO SWING BETWEEN DEM AND GOP
+            GOP WOULD HAVE 52 ON UNIFORM SWING
+            
+            DEM NEEDS 1.7% SWING FROM GOP TO GAIN MAJORITY
+            GOP NEEDS TO AVOID 1.6% SWING TO DEM TO HOLD MAJORITY
+            """.trimIndent(),
+        )
+
         parties.submit(gop to dem)
         compareRendering("SwingometerScreen", "Carryovers-2", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            US SENATE
+            SWINGOMETER
+
+            NO SWING BETWEEN GOP AND DEM
+            GOP WOULD HAVE 52 ON UNIFORM SWING
+            
+            GOP NEEDS TO AVOID 1.6% SWING TO DEM TO HOLD MAJORITY
+            DEM NEEDS 1.7% SWING FROM GOP TO GAIN MAJORITY
+            """.trimIndent(),
+        )
     }
 
     @Test
@@ -360,8 +578,35 @@ class SwingometerScreenTest {
             .build("US PRESIDENT".asOneTimePublisher())
         panel.setSize(1024, 512)
         compareRendering("SwingometerScreen", "Weights-1", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            US PRESIDENT
+            SWINGOMETER
+
+            NO SWING BETWEEN DEM AND GOP
+            GOP WOULD HAVE 306 ON UNIFORM SWING
+            
+            DEM NEEDS 0.4% SWING FROM GOP TO GAIN MAJORITY
+            GOP NEEDS TO AVOID 0.4% SWING TO DEM TO HOLD MAJORITY
+            """.trimIndent(),
+        )
+
         parties.submit(gop to dem)
         compareRendering("SwingometerScreen", "Weights-2", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            US PRESIDENT
+            SWINGOMETER
+
+            NO SWING BETWEEN GOP AND DEM
+            GOP WOULD HAVE 306 ON UNIFORM SWING
+            
+            GOP NEEDS TO AVOID 0.4% SWING TO DEM TO HOLD MAJORITY
+            DEM NEEDS 0.4% SWING FROM GOP TO GAIN MAJORITY
+            """.trimIndent(),
+        )
     }
 
     companion object {

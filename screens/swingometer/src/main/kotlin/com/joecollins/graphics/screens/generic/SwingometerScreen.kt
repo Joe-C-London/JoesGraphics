@@ -10,13 +10,16 @@ import com.joecollins.models.general.PartyResult
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.asOneTimePublisher
+import com.joecollins.pubsub.map
 import com.joecollins.pubsub.merge
 import java.awt.Color
+import java.text.DecimalFormat
 import java.util.concurrent.Flow
+import kotlin.math.absoluteValue
 import kotlin.math.ceil
 import kotlin.math.roundToInt
 
-class SwingometerScreen private constructor(title: Flow.Publisher<out String?>, frame: SwingometerFrame) : GenericPanel(pad(frame), title) {
+class SwingometerScreen private constructor(title: Flow.Publisher<out String?>, frame: SwingometerFrame, altText: Flow.Publisher<String?>) : GenericPanel(pad(frame), title, altText) {
     class Builder<T> internal constructor(
         prevVotesPublisher: Flow.Publisher<out Map<T, Map<out PartyOrCoalition, Int>>>,
         resultsPublisher: Flow.Publisher<out Map<T, PartyResult?>>,
@@ -32,6 +35,7 @@ class SwingometerScreen private constructor(title: Flow.Publisher<out String?>, 
                         updateLeftAndRightToWin()
                         updateOuterLabels()
                         updateDots()
+                        updateSeats()
                     }
                 }
 
@@ -55,11 +59,12 @@ class SwingometerScreen private constructor(title: Flow.Publisher<out String?>, 
                 set(value) {
                     synchronized(this) {
                         field = value
-                        updateColors()
+                        updateParties()
                         updateValue()
                         updateLeftAndRightToWin()
                         updateOuterLabels()
                         updateDots()
+                        updateSeats()
                     }
                 }
 
@@ -68,6 +73,7 @@ class SwingometerScreen private constructor(title: Flow.Publisher<out String?>, 
                     synchronized(this) {
                         field = value
                         updateValue()
+                        updateSeats()
                     }
                 }
 
@@ -94,6 +100,7 @@ class SwingometerScreen private constructor(title: Flow.Publisher<out String?>, 
                         updateLeftAndRightToWin()
                         updateOuterLabels()
                         updateDots()
+                        updateSeats()
                     }
                 }
 
@@ -104,13 +111,15 @@ class SwingometerScreen private constructor(title: Flow.Publisher<out String?>, 
                         updateLeftAndRightToWin()
                         updateOuterLabels()
                         updateDots()
+                        updateSeats()
                     }
                 }
 
-            val colorsPublisher = Publisher<Pair<Color, Color>>()
-            private fun updateColors() = colorsPublisher.submit(calculateColors())
-            private fun calculateColors() =
-                Pair(parties.first.color, parties.second.color)
+            val partiesPublisher = Publisher<Pair<PartyOrCoalition, PartyOrCoalition>>()
+            val colorsPublisher = partiesPublisher.map {
+                it.first.color to it.second.color
+            }
+            private fun updateParties() = partiesPublisher.submit(parties)
 
             val valuePublisher = Publisher<Double>()
             private fun updateValue() {
@@ -220,6 +229,36 @@ class SwingometerScreen private constructor(title: Flow.Publisher<out String?>, 
                         )
                     }
                     .toList()
+
+            val seatsPublisher = Publisher<Pair<PartyOrCoalition?, Int>>()
+            private fun updateSeats() {
+                seatsPublisher.submit(calculateSeats())
+            }
+
+            private fun calculateSeats(): Pair<PartyOrCoalition?, Int> {
+                val leftSwingList = createSwingList(
+                    prevVotes,
+                    parties.first,
+                    parties.second,
+                    carryovers,
+                )
+                val rightSwingList = createSwingList(
+                    prevVotes,
+                    parties.second,
+                    parties.first,
+                    carryovers,
+                )
+                val value = calculateValue()
+                val leftSeats = leftSwingList.count { it < -value }
+                val rightSeats = rightSwingList.count { it < value }
+                return if (leftSeats == rightSeats) {
+                    null to leftSeats
+                } else if (leftSeats < rightSeats) {
+                    parties.second to rightSeats
+                } else {
+                    parties.first to leftSeats
+                }
+            }
         }
 
         private val inputs = Inputs()
@@ -257,32 +296,63 @@ class SwingometerScreen private constructor(title: Flow.Publisher<out String?>, 
         }
 
         fun build(title: Flow.Publisher<out String?>): SwingometerScreen {
-            return SwingometerScreen(title, createSwingometer())
+            return SwingometerScreen(title, createSwingometer(), createAltText(title))
         }
 
         private fun createSwingometer(): SwingometerFrame {
-            val dotsList = createDotsForSwingometer()
-            val colorsPublisher = inputs.colorsPublisher
-            val valuePublisher = inputs.valuePublisher
-            val rangePublisher = inputs.rangePublisher
-            val leftToWinPublisher = inputs.leftToWinPublisher
-            val rightToWinPublisher = inputs.rightToWinPublisher
-            return SwingometerFrameBuilder.basic(colorsPublisher, valuePublisher)
-                .withDots(dotsList, { it.position }, { it.color }, { it.label ?: "" }) { it.visible }
+            return SwingometerFrameBuilder.basic(inputs.colorsPublisher, inputs.valuePublisher)
+                .withDots(inputs.dotsPublisher, { it.position }, { it.color }, { it.label ?: "" }) { it.visible }
                 .withHeader(header, rightLabel = progressLabel)
-                .withRange(rangePublisher)
+                .withRange(inputs.rangePublisher)
                 .withTickInterval(0.01.asOneTimePublisher()) { (it.toDouble() * 100).roundToInt().toString() }
-                .withLeftNeedingToWin(leftToWinPublisher)
-                .withRightNeedingToWin(rightToWinPublisher)
+                .withLeftNeedingToWin(inputs.leftToWinPublisher)
+                .withRightNeedingToWin(inputs.rightToWinPublisher)
                 .withBucketSize(0.005.asOneTimePublisher())
-                .withOuterLabels(outerLabels, { obj -> obj.first }, { obj -> obj.third }) { obj -> obj.second }
+                .withOuterLabels(inputs.outerLabelsPublisher, { obj -> obj.first }, { obj -> obj.third }) { obj -> obj.second }
                 .build()
         }
 
-        private val outerLabels: Flow.Publisher<List<Triple<Double, Color, String>>>
-            get() {
-                return inputs.outerLabelsPublisher
+        private fun createAltText(title: Flow.Publisher<out String?>): Flow.Publisher<String?> {
+            val header: Flow.Publisher<String?> = title.merge(header) { t, h -> "$t\n$h" }
+                .merge(progressLabel) { t, p -> t + (if (p.isNullOrBlank()) "" else " [$p]") }
+            val swing = inputs.valuePublisher.merge(inputs.partiesPublisher) { value, (left, right) ->
+                if (value == 0.0) return@merge "NO SWING BETWEEN ${left.abbreviation} AND ${right.abbreviation}"
+                val from = if (value < 0) right else left
+                val to = if (value < 0) left else right
+                DecimalFormat("0.0%").format(value.absoluteValue) + " SWING ${from.abbreviation} TO ${to.abbreviation}"
             }
+            val seats = inputs.seatsPublisher.map { (party, seats) ->
+                "${party?.abbreviation ?: "EACH"} WOULD HAVE $seats ON UNIFORM SWING"
+            }
+            val leftToWin = inputs.leftToWinPublisher.merge(inputs.partiesPublisher) { toWin, (left, right) ->
+                if (toWin.isInfinite()) {
+                    null
+                } else if (toWin > 0) {
+                    "${left.abbreviation} NEEDS ${DecimalFormat("0.0%").format(toWin)} SWING FROM ${right.abbreviation} TO GAIN MAJORITY"
+                } else {
+                    "${left.abbreviation} NEEDS TO AVOID ${DecimalFormat("0.0%").format(-toWin)} SWING TO ${right.abbreviation} TO HOLD MAJORITY"
+                }
+            }
+            val rightToWin = inputs.rightToWinPublisher.merge(inputs.partiesPublisher) { toWin, (left, right) ->
+                if (toWin.isInfinite()) {
+                    null
+                } else if (toWin > 0) {
+                    "${right.abbreviation} NEEDS ${DecimalFormat("0.0%").format(toWin)} SWING FROM ${left.abbreviation} TO GAIN MAJORITY"
+                } else {
+                    "${right.abbreviation} NEEDS TO AVOID ${DecimalFormat("0.0%").format(-toWin)} SWING TO ${left.abbreviation} TO HOLD MAJORITY"
+                }
+            }
+            val toWin = leftToWin.merge(rightToWin) { l, r ->
+                if (l == null && r == null) {
+                    null
+                } else {
+                    sequenceOf(l, r).filterNotNull().joinToString("\n")
+                }
+            }
+            return header.merge(swing) { h, s -> "$h\n\n$s" }
+                .merge(seats) { h, s -> "$h\n$s" }
+                .merge(toWin) { h, w -> h + (if (w == null) "" else "\n\n$w") }
+        }
 
         private fun incrementLabels(
             leftSwingList: List<Double>,
@@ -447,10 +517,6 @@ class SwingometerScreen private constructor(title: Flow.Publisher<out String?>, 
         }
 
         private data class Dot(val position: Double, val color: Color, val visible: Boolean, val label: String?)
-
-        private fun createDotsForSwingometer(): Flow.Publisher<List<Dot>> {
-            return inputs.dotsPublisher
-        }
 
         init {
             prevVotesPublisher.subscribe(Subscriber { inputs.prevVotes = it })
