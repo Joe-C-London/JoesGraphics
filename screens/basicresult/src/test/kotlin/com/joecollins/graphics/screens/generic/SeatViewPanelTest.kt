@@ -20,6 +20,7 @@ import org.junit.jupiter.api.Test
 import java.awt.Color
 import java.awt.Dimension
 import java.awt.Shape
+import java.awt.geom.Area
 import java.util.IdentityHashMap
 
 class SeatViewPanelTest {
@@ -2729,6 +2730,80 @@ class SeatViewPanelTest {
                 SWING SINCE 2000: 2.0% SWING CON TO LIB
             """.trimIndent(),
         )
+    }
+
+    @Test
+    fun testDualMap() {
+        val lib = Party("Liberal", "LIB", Color.RED)
+        val grn = Party("Green", "GRN", Color.GREEN.darker())
+        val pc = Party("Progressive Conservative", "PC", Color.BLUE)
+        val panel = partySeats(
+            mapOf(pc to 12, grn to 8, lib to 6).asOneTimePublisher(),
+            "SEATS DECLARED".asOneTimePublisher(),
+            "".asOneTimePublisher(),
+        )
+            .withPrev(
+                mapOf(lib to 17, pc to 8, grn to 1).asOneTimePublisher(),
+                "CHANGE SINCE 2015".asOneTimePublisher(),
+            )
+            .withResultMap(
+                peiShapesByDistrict().asOneTimePublisher(),
+                mapOf(
+                    pc to setOf(4, 2, 3, 7, 1, 6, 19, 15, 20, 18, 8, 26),
+                    grn to setOf(5, 17, 11, 13, 12, 21, 22, 23),
+                    lib to setOf(16, 14, 10, 24, 25, 27),
+                ).entries.flatMap { e -> e.value.map { it to PartyResult.elected(e.key) } }
+                    .toMap().asOneTimePublisher(),
+                null.asOneTimePublisher(),
+                "DISTRICTS".asOneTimePublisher(),
+            )
+            .withSecondResultMap(
+                peiShapesByRegion().asOneTimePublisher(),
+                mapOf(
+                    "Cardigan" to PartyResult.elected(pc),
+                    "Malpeque" to PartyResult.elected(pc),
+                    "Charlottetown" to PartyResult.leading(grn),
+                    "Egmont" to PartyResult.elected(lib),
+                ).asOneTimePublisher(),
+                null.asOneTimePublisher(),
+                "REGIONS".asOneTimePublisher(),
+            )
+            .withTotal(27.asOneTimePublisher())
+            .withMajorityLine(true.asOneTimePublisher()) { "$it FOR MAJORITY" }
+            .withProgressLabel("26/27".asOneTimePublisher())
+            .build("PRINCE EDWARD ISLAND".asOneTimePublisher())
+        panel.setSize(1024, 512)
+        compareRendering("SeatViewPanel", "DualMap", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            PRINCE EDWARD ISLAND
+            
+            SEATS DECLARED [26/27] (CHANGE SINCE 2015)
+            PROGRESSIVE CONSERVATIVE: 12 (+4)
+            GREEN: 8 (+7)
+            LIBERAL: 6 (-11)
+            14 FOR MAJORITY
+            """.trimIndent(),
+        )
+    }
+
+    private fun peiShapesByRegion(): Map<String, Shape> {
+        val keys = mapOf(
+            "Cardigan" to setOf(4, 2, 5, 3, 7, 1, 6),
+            "Malpeque" to setOf(19, 15, 16, 20, 17, 18, 8),
+            "Charlottetown" to setOf(11, 13, 9, 12, 14, 10),
+            "Egmont" to setOf(26, 24, 25, 22, 21, 27, 23),
+        )
+        val shapesByDistrict = peiShapesByDistrict()
+        return keys.mapValues { e ->
+            e.value.map { shapesByDistrict[it]!! }
+                .reduce { acc, shape ->
+                    val ret = Area(acc)
+                    ret.add(Area(shape))
+                    ret
+                }
+        }
     }
 
     private fun peiShapesByDistrict(): Map<Int, Shape> {

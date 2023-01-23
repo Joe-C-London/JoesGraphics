@@ -20,6 +20,8 @@ import org.junit.jupiter.api.Test
 import java.awt.Color
 import java.awt.Dimension
 import java.awt.Shape
+import java.awt.geom.Area
+import java.text.DecimalFormat
 import java.util.IdentityHashMap
 
 class SimpleVoteViewPanelTest {
@@ -2913,10 +2915,97 @@ class SimpleVoteViewPanelTest {
         )
     }
 
+    @Test
+    fun testDualMap() {
+        val ndp = Party("New Democratic Party", "NDP", Color.ORANGE)
+        val pc = Party("Progressive Conservative", "PC", Color.BLUE)
+        val lib = Party("Liberal", "LIB", Color.RED)
+        val grn = Party("Green", "GRN", Color.GREEN.darker())
+        val ind = Party("Independent", "IND", Color.DARK_GRAY)
+        val panel = partyVotes(
+            mapOf(
+                pc to 29335,
+                grn to 24593,
+                lib to 23711,
+                ndp to 2408,
+                ind to 282,
+            ).asOneTimePublisher(),
+            "VOTES COUNTED".asOneTimePublisher(),
+            "".asOneTimePublisher(),
+        )
+            .withPrev(
+                mapOf(
+                    lib to 32127,
+                    pc to 29837,
+                    grn to 8620,
+                    ndp to 8448,
+                ).asOneTimePublisher(),
+                "CHANGE SINCE 2015".asOneTimePublisher(),
+            )
+            .withResultMap(
+                peiShapesByDistrict().asOneTimePublisher(),
+                mapOf(
+                    pc to setOf(4, 2, 3, 7, 1, 6, 19, 15, 20, 18, 8, 26),
+                    grn to setOf(5, 17, 11, 13, 12, 21, 22, 23),
+                    lib to setOf(16, 14, 10, 24, 25, 27),
+                ).entries.flatMap { e -> e.value.map { it to PartyResult.elected(e.key) } }
+                    .toMap().asOneTimePublisher(),
+                null.asOneTimePublisher(),
+                "DISTRICTS".asOneTimePublisher(),
+            )
+            .withSecondResultMap(
+                peiShapesByRegion().asOneTimePublisher(),
+                mapOf(
+                    "Cardigan" to PartyResult.elected(pc),
+                    "Malpeque" to PartyResult.elected(pc),
+                    "Charlottetown" to PartyResult.leading(grn),
+                    "Egmont" to PartyResult.elected(lib),
+                ).asOneTimePublisher(),
+                null.asOneTimePublisher(),
+                "REGIONS".asOneTimePublisher(),
+            )
+            .withPctReporting((26.0 / 27).asOneTimePublisher())
+            .withProgressLabel((DecimalFormat("0.0%").format(26.0 / 27) + " IN").asOneTimePublisher())
+            .build("PRINCE EDWARD ISLAND".asOneTimePublisher())
+        panel.setSize(1024, 512)
+        compareRendering("SimpleVoteViewPanel", "DualMap", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            PRINCE EDWARD ISLAND
+            
+            VOTES COUNTED [96.3% IN] (CHANGE SINCE 2015)
+            PROGRESSIVE CONSERVATIVE: 36.5% (-1.2%)
+            GREEN: 30.6% (+19.7%)
+            LIBERAL: 29.5% (-11.1%)
+            NEW DEMOCRATIC PARTY: 3.0% (-7.7%)
+            INDEPENDENT: 0.4% (+0.4%)
+            """.trimIndent(),
+        )
+    }
+
     private fun peiShapesByDistrict(): Map<Int, Shape> {
         val peiMap = SimpleVoteViewPanelTest::class.java
             .classLoader
             .getResource("com/joecollins/graphics/shapefiles/pei-districts.shp")
         return readShapes(peiMap, "DIST_NO", Int::class.java)
+    }
+
+    private fun peiShapesByRegion(): Map<String, Shape> {
+        val keys = mapOf(
+            "Cardigan" to setOf(4, 2, 5, 3, 7, 1, 6),
+            "Malpeque" to setOf(19, 15, 16, 20, 17, 18, 8),
+            "Charlottetown" to setOf(11, 13, 9, 12, 14, 10),
+            "Egmont" to setOf(26, 24, 25, 22, 21, 27, 23),
+        )
+        val shapesByDistrict = peiShapesByDistrict()
+        return keys.mapValues { e ->
+            e.value.map { shapesByDistrict[it]!! }
+                .reduce { acc, shape ->
+                    val ret = Area(acc)
+                    ret.add(Area(shape))
+                    ret
+                }
+        }
     }
 }

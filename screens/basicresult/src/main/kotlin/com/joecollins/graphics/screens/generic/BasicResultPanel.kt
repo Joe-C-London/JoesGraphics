@@ -34,11 +34,11 @@ import kotlin.math.sign
 
 class BasicResultPanel private constructor(
     label: Flow.Publisher<out String?>,
-    private val seatFrame: BarFrame,
-    private val preferenceFrame: BarFrame?,
-    private val changeFrame: BarFrame?,
-    private val swingFrame: SwingFrame?,
-    private val mapFrame: MapFrame?,
+    private val seatFrame: JPanel,
+    private val secondarySeatFrame: JPanel?,
+    private val changeFrame: JPanel?,
+    private val leftSupplementaryFrame: JPanel?,
+    private val rightSupplementaryFrame: JPanel?,
     altText: Flow.Publisher<String?>,
 ) : GenericPanel(
     run {
@@ -46,10 +46,10 @@ class BasicResultPanel private constructor(
         panel.layout = BasicResultLayout()
         panel.background = Color.WHITE
         panel.add(seatFrame, BasicResultLayout.MAIN)
-        if (preferenceFrame != null) panel.add(preferenceFrame, BasicResultLayout.PREF)
+        if (secondarySeatFrame != null) panel.add(secondarySeatFrame, BasicResultLayout.PREF)
         if (changeFrame != null) panel.add(changeFrame, BasicResultLayout.DIFF)
-        if (swingFrame != null) panel.add(swingFrame, BasicResultLayout.SWING)
-        if (mapFrame != null) panel.add(mapFrame, BasicResultLayout.MAP)
+        if (leftSupplementaryFrame != null) panel.add(leftSupplementaryFrame, BasicResultLayout.SWING)
+        if (rightSupplementaryFrame != null) panel.add(rightSupplementaryFrame, BasicResultLayout.MAP)
         panel
     },
     label,
@@ -341,6 +341,7 @@ class BasicResultPanel private constructor(
         protected var classificationHeader: Flow.Publisher<out String?>? = null
         protected var progressLabel: Flow.Publisher<out String?> = null.asOneTimePublisher()
         private var mapBuilder: MapBuilder<*>? = null
+        private var secondMapBuilder: MapBuilder<*>? = null
 
         fun withTotal(totalSeats: Flow.Publisher<out Int>): SeatScreenBuilder<KT, KPT, CT, PT, BAR> {
             total = totalSeats
@@ -457,6 +458,27 @@ class BasicResultPanel private constructor(
             return this
         }
 
+        fun <T> withSecondResultMap(
+            shapes: Flow.Publisher<out Map<T, Shape>>,
+            winners: Flow.Publisher<out Map<T, PartyResult?>>,
+            focus: Flow.Publisher<out List<T>?>,
+            headerPublisher: Flow.Publisher<out String?>,
+        ): SeatScreenBuilder<KT, KPT, CT, PT, BAR> {
+            secondMapBuilder = MapBuilder(shapes, winners, focus, headerPublisher)
+            return this
+        }
+
+        fun <T> withSecondResultMap(
+            shapes: Flow.Publisher<out Map<T, Shape>>,
+            winners: Flow.Publisher<out Map<T, PartyResult?>>,
+            focus: Flow.Publisher<out List<T>?>,
+            additionalHighlight: Flow.Publisher<out List<T>?>,
+            headerPublisher: Flow.Publisher<out String?>,
+        ): SeatScreenBuilder<KT, KPT, CT, PT, BAR> {
+            secondMapBuilder = MapBuilder(shapes, winners, Pair(focus, additionalHighlight), headerPublisher)
+            return this
+        }
+
         fun withNotes(notes: Flow.Publisher<out String?>): SeatScreenBuilder<KT, KPT, CT, PT, BAR> {
             this.notes = notes
             return this
@@ -487,8 +509,8 @@ class BasicResultPanel private constructor(
                 createFrame(),
                 createClassificationFrame(),
                 createDiffFrame(),
-                createSwingFrame(),
-                createMapFrame(),
+                if (secondMapBuilder == null) createSwingFrame() else createMapFrame(),
+                if (secondMapBuilder == null) createMapFrame() else createSecondMapFrame(),
                 createAltText(textHeader),
             )
         }
@@ -629,6 +651,10 @@ class BasicResultPanel private constructor(
 
         private fun createMapFrame(): MapFrame? {
             return mapBuilder?.createMapFrame()
+        }
+
+        private fun createSecondMapFrame(): MapFrame? {
+            return secondMapBuilder?.createMapFrame()
         }
 
         protected abstract fun doubleLineBarLimit(): Int
@@ -907,6 +933,7 @@ class BasicResultPanel private constructor(
         protected var classificationFunc: ((KPT) -> KPT)? = null
         protected var classificationHeader: Flow.Publisher<out String?>? = null
         private var mapBuilder: MapBuilder<*>? = null
+        private var secondMapBuilder: MapBuilder<*>? = null
         protected var runoffSubhead: Flow.Publisher<String>? = null
         protected var winnerNotRunningAgain: Flow.Publisher<String>? = null
         protected var progressLabel: Flow.Publisher<out String?> = null.asOneTimePublisher()
@@ -1110,6 +1137,26 @@ class BasicResultPanel private constructor(
             return this
         }
 
+        fun <T> withSecondResultMap(
+            shapes: Flow.Publisher<out Map<T, Shape>>,
+            winners: Flow.Publisher<out Map<T, PartyResult?>>,
+            focus: Flow.Publisher<out List<T>?>,
+            headerPublisher: Flow.Publisher<out String?>,
+        ): VoteScreenBuilder<KT, KPT, CT, CPT, PT> {
+            secondMapBuilder = MapBuilder(shapes, winners, focus, headerPublisher)
+            return this
+        }
+
+        fun <T> withSecondResultMap(
+            shapes: Flow.Publisher<out Map<T, Shape>>,
+            winners: Flow.Publisher<out Map<T, PartyResult?>>,
+            focus: Pair<Flow.Publisher<out List<T>?>, Flow.Publisher<out List<T>?>>,
+            headerPublisher: Flow.Publisher<out String?>,
+        ): VoteScreenBuilder<KT, KPT, CT, CPT, PT> {
+            secondMapBuilder = MapBuilder(shapes, winners, focus, headerPublisher)
+            return this
+        }
+
         fun withMajorityLine(
             showMajority: Flow.Publisher<out Boolean>,
             majorityLabel: String,
@@ -1166,8 +1213,8 @@ class BasicResultPanel private constructor(
                 createFrame(),
                 if (classificationHeader == null) createPreferenceFrame() else createClassificationFrame(),
                 createDiffFrame(),
-                createSwingFrame(),
-                createMapFrame(),
+                if (secondMapBuilder == null) createSwingFrame() else createMapFrame(),
+                if (secondMapBuilder == null) createMapFrame() else createSecondMapFrame(),
                 createAltText(textHeader),
             )
         }
@@ -1180,6 +1227,10 @@ class BasicResultPanel private constructor(
 
         private fun createMapFrame(): MapFrame? {
             return mapBuilder?.createMapFrame()
+        }
+
+        private fun createSecondMapFrame(): MapFrame? {
+            return secondMapBuilder?.createMapFrame()
         }
 
         protected abstract fun createAltText(textHeader: Flow.Publisher<out String?>): Flow.Publisher<String?>
