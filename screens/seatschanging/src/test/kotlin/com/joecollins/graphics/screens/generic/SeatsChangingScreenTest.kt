@@ -1,5 +1,6 @@
 package com.joecollins.graphics.screens.generic
 
+import com.joecollins.graphics.utils.PublisherTestUtils.assertPublishes
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
@@ -27,6 +28,16 @@ class SeatsChangingScreenTest {
             .build(title)
         panel.setSize(1024, 512)
         compareRendering("SeatsChangingScreen", "Basic-1", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            BRITISH COLUMBIA
+
+            SEATS CHANGING
+            (empty)
+            """.trimIndent(),
+        )
+
         currResult.submit(
             mapOf(
                 "Coquitlam-Burke Mountain" to leading(ndp),
@@ -35,6 +46,16 @@ class SeatsChangingScreenTest {
             ),
         )
         compareRendering("SeatsChangingScreen", "Basic-2", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            BRITISH COLUMBIA
+            
+            SEATS CHANGING
+            NDP GAINS FROM LIB: 0/3
+            """.trimIndent(),
+        )
+
         currResult.submit(
             mapOf(
                 "Coquitlam-Burke Mountain" to elected(ndp),
@@ -44,8 +65,28 @@ class SeatsChangingScreenTest {
             ),
         )
         compareRendering("SeatsChangingScreen", "Basic-3", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            BRITISH COLUMBIA
+            
+            SEATS CHANGING
+            NDP GAINS FROM LIB: 1/3
+            """.trimIndent(),
+        )
+
         currResult.submit(bcCurrResult())
         compareRendering("SeatsChangingScreen", "Basic-4", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            BRITISH COLUMBIA
+            
+            SEATS CHANGING
+            NDP GAINS FROM LIB: 4/15
+            NDP GAINS FROM GRN: 1/1
+            """.trimIndent(),
+        )
     }
 
     @Test
@@ -70,6 +111,16 @@ class SeatsChangingScreenTest {
             .build(title)
         panel.setSize(1024, 512)
         compareRendering("SeatsChangingScreen", "Filtered-1", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            VANCOUVER
+
+            SEATS CHANGING
+            (empty)
+            """.trimIndent(),
+        )
+
         currResult.submit(
             mapOf(
                 "Coquitlam-Burke Mountain" to leading(ndp),
@@ -78,6 +129,16 @@ class SeatsChangingScreenTest {
             ),
         )
         compareRendering("SeatsChangingScreen", "Filtered-2", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            VANCOUVER
+
+            SEATS CHANGING
+            NDP GAINS FROM LIB: 0/1
+            """.trimIndent(),
+        )
+
         currResult.submit(
             mapOf(
                 "Coquitlam-Burke Mountain" to elected(ndp),
@@ -87,8 +148,27 @@ class SeatsChangingScreenTest {
             ),
         )
         compareRendering("SeatsChangingScreen", "Filtered-3", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            VANCOUVER
+
+            SEATS CHANGING
+            NDP GAINS FROM LIB: 0/1
+            """.trimIndent(),
+        )
+
         currResult.submit(bcCurrResult())
         compareRendering("SeatsChangingScreen", "Filtered-4", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            VANCOUVER
+
+            SEATS CHANGING
+            NDP GAINS FROM LIB: 0/1
+            """.trimIndent(),
+        )
     }
 
     @Test
@@ -108,8 +188,28 @@ class SeatsChangingScreenTest {
             .build(title)
         panel.setSize(1024, 512)
         compareRendering("SeatsChangingScreen", "Basic-1", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            BRITISH COLUMBIA
+
+            SEATS CHANGING
+            (empty)
+            """.trimIndent(),
+        )
+
         currResult.submit(bcCurrResult())
         compareRendering("SeatsChangingScreen", "Basic-4", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            BRITISH COLUMBIA
+            
+            SEATS CHANGING
+            NDP GAINS FROM LIB: 4/15
+            NDP GAINS FROM GRN: 1/1
+            """.trimIndent(),
+        )
     }
 
     @Test
@@ -129,6 +229,16 @@ class SeatsChangingScreenTest {
             .build(title)
         panel.setSize(1024, 512)
         compareRendering("SeatsChangingScreen", "PartyChanges-1", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            BRITISH COLUMBIA
+
+            SEATS CHANGING
+            (empty)
+            """.trimIndent(),
+        )
+
         currResult.submit(
             mapOf(
                 "Coquitlam-Burke Mountain" to leading(ndp),
@@ -137,6 +247,16 @@ class SeatsChangingScreenTest {
             ),
         )
         compareRendering("SeatsChangingScreen", "PartyChanges-2", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            BRITISH COLUMBIA
+
+            SEATS CHANGING
+            NDP GAINS FROM LIB: 0/3
+            """.trimIndent(),
+        )
+
         currResult.submit(
             mapOf(
                 "Coquitlam-Burke Mountain" to elected(ndp),
@@ -146,6 +266,16 @@ class SeatsChangingScreenTest {
             ),
         )
         compareRendering("SeatsChangingScreen", "PartyChanges-3", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            BRITISH COLUMBIA
+
+            SEATS CHANGING
+            NDP GAINS FROM LIB: 1/3
+            """.trimIndent(),
+        )
+
         currResult.submit(
             bcCurrResult().mapValues {
                 if (it.value?.party == lib) {
@@ -156,6 +286,16 @@ class SeatsChangingScreenTest {
             },
         )
         compareRendering("SeatsChangingScreen", "PartyChanges-4", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            BRITISH COLUMBIA
+
+            SEATS CHANGING
+            NDP GAINS FROM LIB: 4/15
+            NDP GAINS FROM GRN: 1/1
+            """.trimIndent(),
+        )
     }
 
     companion object {
