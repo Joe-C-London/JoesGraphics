@@ -7,12 +7,14 @@ import com.joecollins.models.general.PartyResult
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.asOneTimePublisher
+import com.joecollins.pubsub.map
 import com.joecollins.pubsub.mapElements
+import com.joecollins.pubsub.merge
 import org.apache.commons.lang3.StringUtils
 import java.awt.Color
 import java.util.concurrent.Flow
 
-class AllSeatsScreen private constructor(title: Flow.Publisher<out String?>, frame: ResultListingFrame) : GenericPanel(pad(frame), title) {
+class AllSeatsScreen private constructor(title: Flow.Publisher<out String?>, frame: ResultListingFrame, altText: Flow.Publisher<String>) : GenericPanel(pad(frame), title, altText) {
     class Builder<T>(
         prevResultPublisher: Flow.Publisher<out Map<T, Map<Party, Int>>>,
         currResultPublisher: Flow.Publisher<out Map<T, PartyResult?>>,
@@ -24,6 +26,7 @@ class AllSeatsScreen private constructor(title: Flow.Publisher<out String?>, fra
         private val header: Flow.Publisher<out String?> = headerPublisher
         private var numRows: Flow.Publisher<out Int> = 20.asOneTimePublisher()
         private var seatFilter: Flow.Publisher<out Set<T>?> = (null as Set<T>?).asOneTimePublisher()
+        private var partyChanges: Flow.Publisher<Map<Party, Party>> = Publisher(emptyMap())
 
         fun withNumRows(numRowsPublisher: Flow.Publisher<out Int>): Builder<T> {
             numRows = numRowsPublisher
@@ -35,11 +38,17 @@ class AllSeatsScreen private constructor(title: Flow.Publisher<out String?>, fra
             return this
         }
 
+        fun withPartyChanges(changes: Flow.Publisher<Map<Party, Party>>): Builder<T> {
+            partyChanges = changes
+            return this
+        }
+
         fun build(titlePublisher: Flow.Publisher<out String?>): AllSeatsScreen {
             val inputs = Input(nameFunc)
             prevResults.subscribe(Subscriber { inputs.setPrevResults(it) })
             currResults.subscribe(Subscriber { inputs.setCurrResults(it) })
             seatFilter.subscribe(Subscriber { inputs.setSeatFilter(it) })
+            partyChanges.subscribe(Subscriber { inputs.setPartyChanges(it) })
             val frame = ResultListingFrame(
                 headerPublisher = header,
                 numRowsPublisher = numRows,
@@ -52,7 +61,37 @@ class AllSeatsScreen private constructor(title: Flow.Publisher<out String?>, fra
                     )
                 },
             )
-            return AllSeatsScreen(titlePublisher, frame)
+            val altText = run {
+                val head = titlePublisher.merge(header) { t, h -> "$t\n\n$h" }
+                val entries = inputs.resultPublisher.map { results ->
+                    if (results.isEmpty()) return@map "(empty)"
+                    val allElected = results.all { it.currResult?.isElected ?: true }
+                    results
+                        .groupBy { it.prevWinner to it.currResult?.party }
+                        .entries
+                        .sortedByDescending { group -> group.value.size }
+                        .joinToString("\n") { group ->
+                            val label = group.key.let { (from, to) ->
+                                when (to) {
+                                    null -> "PENDING ${from.abbreviation}"
+                                    from -> "${to.abbreviation} HOLD"
+                                    inputs.changedParty(from) -> "${to.abbreviation} HOLD (${from.abbreviation})"
+                                    else -> "${to.abbreviation} GAIN FROM ${from.abbreviation}"
+                                }
+                            }
+                            val count = group.value.size
+                            val value = if (allElected || group.key.second == null) {
+                                "$count"
+                            } else {
+                                val elected = group.value.count { it.currResult?.elected ?: false }
+                                "$elected/$count"
+                            }
+                            "$label: $value"
+                        }
+                }
+                head.merge(entries) { h, e -> "$h\n$e" }
+            }
+            return AllSeatsScreen(titlePublisher, frame, altText)
         }
     }
 
@@ -60,6 +99,9 @@ class AllSeatsScreen private constructor(title: Flow.Publisher<out String?>, fra
         private var prevResults: List<Pair<T, Party>> = emptyList()
         private var currResults: Map<T, PartyResult?> = emptyMap()
         private var seatFilter: Set<T>? = null
+        private var partyChanges: Map<Party, Party> = emptyMap()
+
+        fun changedParty(party: Party): Party = partyChanges[party] ?: party
 
         fun setPrevResults(prevResults: Map<T, Map<Party, Int>>) {
             this.prevResults = prevResults.entries
@@ -96,6 +138,11 @@ class AllSeatsScreen private constructor(title: Flow.Publisher<out String?>, fra
             publishResults()
         }
 
+        fun setPartyChanges(changes: Map<Party, Party>) {
+            this.partyChanges = changes
+            publishResults()
+        }
+
         private fun publishResults() {
             (resultPublisher as Publisher<List<Entry<T>>>).submit(toEntries())
         }
@@ -116,15 +163,20 @@ class AllSeatsScreen private constructor(title: Flow.Publisher<out String?>, fra
                 val result = it.third
                 Entry(
                     it.first,
-                    it.second.color,
-                    result?.party?.color ?: Color.LIGHT_GRAY,
-                    result?.isElected ?: false,
+                    it.second,
+                    result,
                 )
             }
             .toList()
     }
 
-    private class Entry<T>(val key: T, val prevColor: Color, val resultColor: Color, val fill: Boolean)
+    private class Entry<T>(val key: T, val prevWinner: Party, val currResult: PartyResult?) {
+
+        val prevColor = prevWinner.color
+
+        val resultColor: Color = currResult?.party?.color ?: Color.LIGHT_GRAY
+        val fill = currResult?.isElected ?: false
+    }
     companion object {
         fun <T> of(
             prevResultPublisher: Flow.Publisher<out Map<T, Map<Party, Int>>>,

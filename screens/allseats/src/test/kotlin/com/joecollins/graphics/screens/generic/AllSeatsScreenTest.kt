@@ -1,5 +1,6 @@
 package com.joecollins.graphics.screens.generic
 
+import com.joecollins.graphics.utils.PublisherTestUtils.assertPublishes
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
@@ -21,12 +22,23 @@ class AllSeatsScreenTest {
             prevResult,
             currResult,
             { it.uppercase() },
-            "SEATS CHANGING".asOneTimePublisher(),
+            "ALL SEATS".asOneTimePublisher(),
         )
             .withNumRows(numRows)
             .build(title)
         panel.setSize(1024, 512)
         compareRendering("AllSeatsScreen", "Basic-1", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            BRITISH COLUMBIA
+
+            ALL SEATS
+            PENDING LIB: 43
+            PENDING NDP: 41
+            PENDING GRN: 3
+            """.trimIndent(),
+        )
 
         currResult.submit(
             mapOf(
@@ -36,6 +48,18 @@ class AllSeatsScreenTest {
             ),
         )
         compareRendering("AllSeatsScreen", "Basic-2", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            BRITISH COLUMBIA
+
+            ALL SEATS
+            PENDING NDP: 41
+            PENDING LIB: 40
+            NDP GAIN FROM LIB: 0/3
+            PENDING GRN: 3
+            """.trimIndent(),
+        )
 
         currResult.submit(
             mapOf(
@@ -46,9 +70,35 @@ class AllSeatsScreenTest {
             ),
         )
         compareRendering("AllSeatsScreen", "Basic-3", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            BRITISH COLUMBIA
+
+            ALL SEATS
+            PENDING NDP: 41
+            PENDING LIB: 39
+            NDP GAIN FROM LIB: 1/3
+            PENDING GRN: 3
+            LIB HOLD: 0/1
+            """.trimIndent(),
+        )
 
         currResult.submit(bcCurrResult())
         compareRendering("AllSeatsScreen", "Basic-4", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            BRITISH COLUMBIA
+
+            ALL SEATS
+            NDP HOLD: 39/41
+            LIB HOLD: 16/28
+            NDP GAIN FROM LIB: 4/15
+            GRN HOLD: 1/2
+            NDP GAIN FROM GRN: 1/1
+            """.trimIndent(),
+        )
     }
 
     @Test
@@ -66,13 +116,23 @@ class AllSeatsScreenTest {
             prevResult,
             currResult,
             { it.uppercase() },
-            "SEATS CHANGING".asOneTimePublisher(),
+            "ALL SEATS".asOneTimePublisher(),
         )
             .withNumRows(numRows)
             .withSeatFilter(filteredSeats)
             .build(title)
         panel.setSize(1024, 512)
         compareRendering("AllSeatsScreen", "Filtered-1", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            VANCOUVER
+
+            ALL SEATS
+            PENDING NDP: 8
+            PENDING LIB: 3
+            """.trimIndent(),
+        )
 
         currResult.submit(
             mapOf(
@@ -82,6 +142,17 @@ class AllSeatsScreenTest {
             ),
         )
         compareRendering("AllSeatsScreen", "Filtered-2", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            VANCOUVER
+
+            ALL SEATS
+            PENDING NDP: 8
+            PENDING LIB: 2
+            NDP GAIN FROM LIB: 0/1
+            """.trimIndent(),
+        )
 
         currResult.submit(
             mapOf(
@@ -92,9 +163,31 @@ class AllSeatsScreenTest {
             ),
         )
         compareRendering("AllSeatsScreen", "Filtered-3", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            VANCOUVER
+
+            ALL SEATS
+            PENDING NDP: 8
+            PENDING LIB: 2
+            NDP GAIN FROM LIB: 0/1
+            """.trimIndent(),
+        )
 
         currResult.submit(bcCurrResult())
         compareRendering("AllSeatsScreen", "Filtered-4", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            VANCOUVER
+
+            ALL SEATS
+            NDP HOLD: 8/8
+            LIB HOLD: 1/2
+            NDP GAIN FROM LIB: 0/1
+            """.trimIndent(),
+        )
     }
 
     @Test
@@ -107,15 +200,94 @@ class AllSeatsScreenTest {
             prevResult,
             currResult,
             { it.uppercase() },
-            "SEATS CHANGING".asOneTimePublisher(),
+            "ALL SEATS".asOneTimePublisher(),
         )
             .withNumRows(numRows)
             .build(title)
         panel.setSize(1024, 512)
         compareRendering("AllSeatsScreen", "Basic-1", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            BRITISH COLUMBIA
+
+            ALL SEATS
+            PENDING LIB: 43
+            PENDING NDP: 41
+            PENDING GRN: 3
+            """.trimIndent(),
+        )
 
         currResult.submit(bcCurrResult())
         compareRendering("AllSeatsScreen", "Basic-4", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            BRITISH COLUMBIA
+
+            ALL SEATS
+            NDP HOLD: 39/41
+            LIB HOLD: 16/28
+            NDP GAIN FROM LIB: 4/15
+            GRN HOLD: 1/2
+            NDP GAIN FROM GRN: 1/1
+            """.trimIndent(),
+        )
+    }
+
+    @Test
+    fun testAllSeatsWithPartyChange() {
+        val bcu = Party("BC United", "BCU", lib.color)
+        val prevResult = Publisher(bcPrevResult())
+        val currResult = Publisher<Map<String, PartyResult?>>(bcCurrResult().mapValues { null })
+        val numRows = Publisher(15)
+        val title = Publisher("BRITISH COLUMBIA")
+        val panel = AllSeatsScreen.of(
+            prevResult,
+            currResult,
+            { it.uppercase() },
+            "ALL SEATS".asOneTimePublisher(),
+        )
+            .withNumRows(numRows)
+            .withPartyChanges(mapOf(lib to bcu).asOneTimePublisher())
+            .build(title)
+        panel.setSize(1024, 512)
+        compareRendering("AllSeatsScreen", "Basic-1", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            BRITISH COLUMBIA
+
+            ALL SEATS
+            PENDING LIB: 43
+            PENDING NDP: 41
+            PENDING GRN: 3
+            """.trimIndent(),
+        )
+
+        currResult.submit(
+            bcCurrResult().mapValues {
+                if (it.value.party == lib) {
+                    PartyResult(bcu, it.value.isElected)
+                } else {
+                    it.value
+                }
+            },
+        )
+        compareRendering("AllSeatsScreen", "Basic-4", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            BRITISH COLUMBIA
+
+            ALL SEATS
+            NDP HOLD: 39/41
+            BCU HOLD (LIB): 16/28
+            NDP GAIN FROM LIB: 4/15
+            GRN HOLD: 1/2
+            NDP GAIN FROM GRN: 1/1
+            """.trimIndent(),
+        )
     }
 
     companion object {
