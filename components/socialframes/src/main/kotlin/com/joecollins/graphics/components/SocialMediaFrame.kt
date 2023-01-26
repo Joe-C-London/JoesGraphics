@@ -19,6 +19,7 @@ import java.awt.Graphics2D
 import java.awt.GridLayout
 import java.awt.Image
 import java.awt.RenderingHints
+import java.awt.Shape
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
 import java.awt.geom.AffineTransform
@@ -45,6 +46,7 @@ abstract class SocialMediaFrame<P : Post<P>>(post: Flow.Publisher<out Post<P>>, 
     abstract val color: Color
     abstract val emojiVersion: String
     abstract val protectedUserText: String
+    abstract val logo: Shape
 
     init {
         border = MatteBorder(1, 1, 1, 1, color)
@@ -296,6 +298,13 @@ abstract class SocialMediaFrame<P : Post<P>>(post: Flow.Publisher<out Post<P>>, 
                 val tick = transform.createTransformedShape(ImageGenerator.createTickShape())
                 g.fill(tick)
             }
+
+            val logoShape = logo
+            val resizeFactor = (height - 20.0) / logoShape.bounds.height
+            val resizedLogo = AffineTransform.getScaleInstance(resizeFactor, resizeFactor).createTransformedShape(logoShape)
+            val translateFactor = (width - 10.0 - resizedLogo.bounds.width)
+            val finalLogo = AffineTransform.getTranslateInstance(translateFactor, 10.0).createTransformedShape(resizedLogo)
+            g.fill(finalLogo)
         }
     }
 

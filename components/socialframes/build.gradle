@@ -28,6 +28,7 @@ dependencies {
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.14.1'
     implementation 'com.vdurmont:emoji-java:5.1.1'
     implementation group: 'io.webfolder', name: 'cdp4j', version: '3.0.15'
+    implementation group: 'org.apache.xmlgraphics', name: 'batik-parser', version: '1.14'
 
     testImplementation parent.parent.project('testutils')
     testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.11.0'
