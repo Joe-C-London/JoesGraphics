@@ -741,7 +741,7 @@ class BasicResultPanel private constructor(
                     }
                 } ?: null.asOneTimePublisher()
             return mainText.merge(changeText) { main, change -> main + (if (change == null) "" else " ($change)") }
-                .merge(textHeader) { second, head -> "$head\n\n$second" }
+                .merge(textHeader) { second, head -> if (head == null) second else "$head\n\n$second" }
                 .merge(barsText) { first, next -> first + next }
                 .merge(majorityText) { text, maj -> text + (maj?.let { "\n$it" } ?: "") }
                 .merge(classificationText) { text, cl -> text + (cl?.let { "\n\n$it" } ?: "") }
@@ -2272,7 +2272,7 @@ class BasicResultPanel private constructor(
                     }
                 }
             return mainText.merge(changeText) { main, change -> main + (if (change == null) "" else " ($change)") }
-                .merge(textHeader) { second, head -> "$head\n\n$second" }
+                .merge(textHeader) { second, head -> if (head == null) second else "$head\n\n$second" }
                 .merge(barsText) { first, next -> first + next }
                 .merge(prevText) { text, prev -> text + (prev?.let { "\n\n$it" } ?: "") }
                 .merge(preferenceText) { text, pref -> text + (pref?.let { "\n\n$it" } ?: "") }
