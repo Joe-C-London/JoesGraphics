@@ -95,12 +95,16 @@ class RegionalBreakdownScreen private constructor(
 
         private fun calculateAltText(): String {
             return "$abbreviatedName: ${
-                partyOrder.joinToString("") { "${it.abbreviation} ${getPartyLabel(it).second}, " }
+                partyOrder.joinToString("") { if (includeInAltText(it)) "${it.abbreviation} ${getPartyLabel(it).second}, " else "" }
             }${seats.values.sum()}/$totalSeats"
         }
 
         protected open fun getPartyLabel(party: PartyOrCoalition): Pair<Color, String> {
             return Pair(party.color, (filteredSeats[party] ?: 0).toString())
+        }
+
+        protected open fun includeInAltText(party: PartyOrCoalition): Boolean {
+            return (filteredSeats[party] ?: 0) != 0
         }
     }
 
@@ -120,6 +124,10 @@ class RegionalBreakdownScreen private constructor(
                 party.color,
                 seats.toString() + " (" + (if (diff == 0) "\u00b10" else DIFF_FORMAT.format(diff.toLong())) + ")",
             )
+        }
+
+        override fun includeInAltText(party: PartyOrCoalition): Boolean {
+            return (filteredSeats[party] ?: 0) != 0 || (filteredDiff[party] ?: 0) != 0
         }
 
         companion object {
@@ -143,6 +151,10 @@ class RegionalBreakdownScreen private constructor(
                 party.color,
                 seats.toString() + " (" + (if (diff == 0) "\u00b10" else DIFF_FORMAT.format(diff.toLong())) + ")",
             )
+        }
+
+        override fun includeInAltText(party: PartyOrCoalition): Boolean {
+            return (filteredSeats[party] ?: 0) != 0 || (filteredPrev[party] ?: 0) != 0
         }
 
         companion object {

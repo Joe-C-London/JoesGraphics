@@ -60,9 +60,9 @@ class RegionalBreakdownScreenTest {
             PRINCE EDWARD ISLAND: GRN 1, 1/27
             
             CARDIGAN: GRN 1, 1/7
-            MALPEQUE: GRN 0, 0/7
-            CHARLOTTETOWN: GRN 0, 0/6
-            EGMONT: GRN 0, 0/7
+            MALPEQUE: 0/7
+            CHARLOTTETOWN: 0/6
+            EGMONT: 0/7
             """.trimIndent(),
         )
 
@@ -80,7 +80,7 @@ class RegionalBreakdownScreenTest {
             
             PRINCE EDWARD ISLAND: PC 13, GRN 8, LIB 6, 27/27
             
-            CARDIGAN: PC 6, GRN 1, LIB 0, 7/7
+            CARDIGAN: PC 6, GRN 1, 7/7
             MALPEQUE: PC 5, GRN 1, LIB 1, 7/7
             CHARLOTTETOWN: PC 1, GRN 3, LIB 2, 6/6
             EGMONT: PC 1, GRN 3, LIB 3, 7/7
@@ -144,9 +144,9 @@ class RegionalBreakdownScreenTest {
             PRINCE EDWARD ISLAND: GRN 1 (+1), LIB 0 (-1), 1/27
             
             CARDIGAN: GRN 1 (+1), LIB 0 (-1), 1/7
-            MALPEQUE: GRN 0 (±0), LIB 0 (±0), 0/7
-            CHARLOTTETOWN: GRN 0 (±0), LIB 0 (±0), 0/6
-            EGMONT: GRN 0 (±0), LIB 0 (±0), 0/7
+            MALPEQUE: 0/7
+            CHARLOTTETOWN: 0/6
+            EGMONT: 0/7
             """.trimIndent(),
         )
 
@@ -233,9 +233,9 @@ class RegionalBreakdownScreenTest {
             PRINCE EDWARD ISLAND: GRN 1 (+1), LIB 0 (-1), 1/27
             
             CARDIGAN: GRN 1 (+1), LIB 0 (-1), 1/7
-            MALPEQUE: GRN 0 (±0), LIB 0 (±0), 0/7
-            CHARLOTTETOWN: GRN 0 (±0), LIB 0 (±0), 0/6
-            EGMONT: GRN 0 (±0), LIB 0 (±0), 0/7
+            MALPEQUE: 0/7
+            CHARLOTTETOWN: 0/6
+            EGMONT: 0/7
             """.trimIndent(),
         )
 
@@ -304,11 +304,11 @@ class RegionalBreakdownScreenTest {
             NSW: L/NP 22, ALP 24, OTH 1, 47/47
             VIC: L/NP 15, ALP 21, OTH 2, 38/38
             QLD: LNP 23, ALP 6, OTH 1, 30/30
-            WA: LIB 11, ALP 5, OTH 0, 16/16
+            WA: LIB 11, ALP 5, 16/16
             SA: LIB 4, ALP 5, OTH 1, 10/10
             TAS: LIB 2, ALP 2, OTH 1, 5/5
-            ACT: LIB 0, ALP 3, OTH 0, 3/3
-            NT: CLP 0, ALP 2, OTH 0, 2/2
+            ACT: ALP 3, 3/3
+            NT: ALP 2, 2/2
             """.trimIndent(),
         )
     }
@@ -352,11 +352,11 @@ class RegionalBreakdownScreenTest {
             NSW: L/NP 22 (-1), ALP 24 (±0), OTH 1 (+1), 47/47
             VIC: L/NP 15 (-2), ALP 21 (+3), OTH 2 (±0), 38/38
             QLD: LNP 23 (+2), ALP 6 (-2), OTH 1 (±0), 30/30
-            WA: LIB 11 (±0), ALP 5 (±0), OTH 0 (±0), 16/16
+            WA: LIB 11 (±0), ALP 5 (±0), 16/16
             SA: LIB 4 (±0), ALP 5 (-1), OTH 1 (±0), 10/10
             TAS: LIB 2 (+2), ALP 2 (-2), OTH 1 (±0), 5/5
-            ACT: LIB 0 (±0), ALP 3 (+1), OTH 0 (±0), 3/3
-            NT: CLP 0 (±0), ALP 2 (±0), OTH 0 (±0), 2/2
+            ACT: ALP 3 (+1), 3/3
+            NT: ALP 2 (±0), 2/2
             """.trimIndent(),
         )
     }
@@ -400,11 +400,11 @@ class RegionalBreakdownScreenTest {
             NSW: L/NP 22 (-1), ALP 24 (±0), OTH 1 (+1), 47/47
             VIC: L/NP 15 (-2), ALP 21 (+3), OTH 2 (±0), 38/38
             QLD: LNP 23 (+2), ALP 6 (-2), OTH 1 (±0), 30/30
-            WA: LIB 11 (±0), ALP 5 (±0), OTH 0 (±0), 16/16
+            WA: LIB 11 (±0), ALP 5 (±0), 16/16
             SA: LIB 4 (±0), ALP 5 (-1), OTH 1 (±0), 10/10
             TAS: LIB 2 (+2), ALP 2 (-2), OTH 1 (±0), 5/5
-            ACT: LIB 0 (±0), ALP 3 (+1), OTH 0 (±0), 3/3
-            NT: CLP 0 (±0), ALP 2 (±0), OTH 0 (±0), 2/2
+            ACT: ALP 3 (+1), 3/3
+            NT: ALP 2 (±0), 2/2
             """.trimIndent(),
         )
     }
@@ -491,16 +491,16 @@ class RegionalBreakdownScreenTest {
             CANADA: LIB 6 (-1), NDP 1 (+1), 7/338
             
             NEWFOUNDLAND AND LABRADOR: LIB 6 (-1), NDP 1 (+1), 7/7
-            NOVA SCOTIA: LIB 0 (±0), NDP 0 (±0), 0/11
-            PRINCE EDWARD ISLAND: LIB 0 (±0), NDP 0 (±0), 0/4
-            NEW BRUNSWICK: LIB 0 (±0), NDP 0 (±0), 0/10
-            QUEBEC: LIB 0 (±0), NDP 0 (±0), 0/78
-            ONTARIO: LIB 0 (±0), NDP 0 (±0), 0/121
-            MANITOBA: LIB 0 (±0), NDP 0 (±0), 0/14
-            SASKATCHEWAN: LIB 0 (±0), NDP 0 (±0), 0/14
-            ALBERTA: LIB 0 (±0), NDP 0 (±0), 0/34
-            BRITISH COLUMBIA: LIB 0 (±0), NDP 0 (±0), 0/42
-            NORTHERN CANADA: LIB 0 (±0), NDP 0 (±0), 0/3
+            NOVA SCOTIA: 0/11
+            PRINCE EDWARD ISLAND: 0/4
+            NEW BRUNSWICK: 0/10
+            QUEBEC: 0/78
+            ONTARIO: 0/121
+            MANITOBA: 0/14
+            SASKATCHEWAN: 0/14
+            ALBERTA: 0/34
+            BRITISH COLUMBIA: 0/42
+            NORTHERN CANADA: 0/3
             """.trimIndent(),
         )
 
@@ -529,17 +529,17 @@ class RegionalBreakdownScreenTest {
             
             CANADA: LIB 26 (-6), CON 4 (+4), NDP 1 (+1), GRN 1 (+1), 32/338
             
-            NEWFOUNDLAND AND LABRADOR: LIB 6 (-1), CON 0 (±0), NDP 1 (+1), GRN 0 (±0), 7/7
-            NOVA SCOTIA: LIB 10 (-1), CON 1 (+1), NDP 0 (±0), GRN 0 (±0), 11/11
-            PRINCE EDWARD ISLAND: LIB 4 (±0), CON 0 (±0), NDP 0 (±0), GRN 0 (±0), 4/4
-            NEW BRUNSWICK: LIB 6 (-4), CON 3 (+3), NDP 0 (±0), GRN 1 (+1), 10/10
-            QUEBEC: LIB 0 (±0), CON 0 (±0), NDP 0 (±0), GRN 0 (±0), 0/78
-            ONTARIO: LIB 0 (±0), CON 0 (±0), NDP 0 (±0), GRN 0 (±0), 0/121
-            MANITOBA: LIB 0 (±0), CON 0 (±0), NDP 0 (±0), GRN 0 (±0), 0/14
-            SASKATCHEWAN: LIB 0 (±0), CON 0 (±0), NDP 0 (±0), GRN 0 (±0), 0/14
-            ALBERTA: LIB 0 (±0), CON 0 (±0), NDP 0 (±0), GRN 0 (±0), 0/34
-            BRITISH COLUMBIA: LIB 0 (±0), CON 0 (±0), NDP 0 (±0), GRN 0 (±0), 0/42
-            NORTHERN CANADA: LIB 0 (±0), CON 0 (±0), NDP 0 (±0), GRN 0 (±0), 0/3
+            NEWFOUNDLAND AND LABRADOR: LIB 6 (-1), NDP 1 (+1), 7/7
+            NOVA SCOTIA: LIB 10 (-1), CON 1 (+1), 11/11
+            PRINCE EDWARD ISLAND: LIB 4 (±0), 4/4
+            NEW BRUNSWICK: LIB 6 (-4), CON 3 (+3), GRN 1 (+1), 10/10
+            QUEBEC: 0/78
+            ONTARIO: 0/121
+            MANITOBA: 0/14
+            SASKATCHEWAN: 0/14
+            ALBERTA: 0/34
+            BRITISH COLUMBIA: 0/42
+            NORTHERN CANADA: 0/3
             """.trimIndent(),
         )
 
@@ -580,17 +580,17 @@ class RegionalBreakdownScreenTest {
             
             CANADA: LIB 145 (-21), CON 104 (+15), BQ 32 (+22), OTH 14 (-16), 295/338
             
-            NEWFOUNDLAND AND LABRADOR: LIB 6 (-1), CON 0 (±0), BQ 0 (±0), OTH 1 (+1), 7/7
-            NOVA SCOTIA: LIB 10 (-1), CON 1 (+1), BQ 0 (±0), OTH 0 (±0), 11/11
-            PRINCE EDWARD ISLAND: LIB 4 (±0), CON 0 (±0), BQ 0 (±0), OTH 0 (±0), 4/4
-            NEW BRUNSWICK: LIB 6 (-4), CON 3 (+3), BQ 0 (±0), OTH 1 (+1), 10/10
+            NEWFOUNDLAND AND LABRADOR: LIB 6 (-1), OTH 1 (+1), 7/7
+            NOVA SCOTIA: LIB 10 (-1), CON 1 (+1), 11/11
+            PRINCE EDWARD ISLAND: LIB 4 (±0), 4/4
+            NEW BRUNSWICK: LIB 6 (-4), CON 3 (+3), OTH 1 (+1), 10/10
             QUEBEC: LIB 35 (-5), CON 10 (-2), BQ 32 (+22), OTH 1 (-15), 78/78
-            ONTARIO: LIB 79 (-1), CON 36 (+3), BQ 0 (±0), OTH 6 (-2), 121/121
-            MANITOBA: LIB 4 (-3), CON 7 (+2), BQ 0 (±0), OTH 3 (+1), 14/14
-            SASKATCHEWAN: LIB 0 (-1), CON 14 (+4), BQ 0 (±0), OTH 0 (-3), 14/14
-            ALBERTA: LIB 0 (-4), CON 33 (+4), BQ 0 (±0), OTH 1 (±0), 34/34
-            BRITISH COLUMBIA: LIB 0 (±0), CON 0 (±0), BQ 0 (±0), OTH 0 (±0), 0/42
-            NORTHERN CANADA: LIB 1 (-1), CON 0 (±0), BQ 0 (±0), OTH 1 (+1), 2/3
+            ONTARIO: LIB 79 (-1), CON 36 (+3), OTH 6 (-2), 121/121
+            MANITOBA: LIB 4 (-3), CON 7 (+2), OTH 3 (+1), 14/14
+            SASKATCHEWAN: LIB 0 (-1), CON 14 (+4), OTH 0 (-3), 14/14
+            ALBERTA: LIB 0 (-4), CON 33 (+4), OTH 1 (±0), 34/34
+            BRITISH COLUMBIA: 0/42
+            NORTHERN CANADA: LIB 1 (-1), OTH 1 (+1), 2/3
             """.trimIndent(),
         )
 
@@ -615,17 +615,17 @@ class RegionalBreakdownScreenTest {
             
             CANADA: LIB 157 (-27), CON 121 (+22), BQ 32 (+22), OTH 28 (-17), 338/338
             
-            NEWFOUNDLAND AND LABRADOR: LIB 6 (-1), CON 0 (±0), BQ 0 (±0), OTH 1 (+1), 7/7
-            NOVA SCOTIA: LIB 10 (-1), CON 1 (+1), BQ 0 (±0), OTH 0 (±0), 11/11
-            PRINCE EDWARD ISLAND: LIB 4 (±0), CON 0 (±0), BQ 0 (±0), OTH 0 (±0), 4/4
-            NEW BRUNSWICK: LIB 6 (-4), CON 3 (+3), BQ 0 (±0), OTH 1 (+1), 10/10
+            NEWFOUNDLAND AND LABRADOR: LIB 6 (-1), OTH 1 (+1), 7/7
+            NOVA SCOTIA: LIB 10 (-1), CON 1 (+1), 11/11
+            PRINCE EDWARD ISLAND: LIB 4 (±0), 4/4
+            NEW BRUNSWICK: LIB 6 (-4), CON 3 (+3), OTH 1 (+1), 10/10
             QUEBEC: LIB 35 (-5), CON 10 (-2), BQ 32 (+22), OTH 1 (-15), 78/78
-            ONTARIO: LIB 79 (-1), CON 36 (+3), BQ 0 (±0), OTH 6 (-2), 121/121
-            MANITOBA: LIB 4 (-3), CON 7 (+2), BQ 0 (±0), OTH 3 (+1), 14/14
-            SASKATCHEWAN: LIB 0 (-1), CON 14 (+4), BQ 0 (±0), OTH 0 (-3), 14/14
-            ALBERTA: LIB 0 (-4), CON 33 (+4), BQ 0 (±0), OTH 1 (±0), 34/34
-            BRITISH COLUMBIA: LIB 11 (-6), CON 17 (+7), BQ 0 (±0), OTH 14 (-1), 42/42
-            NORTHERN CANADA: LIB 2 (-1), CON 0 (±0), BQ 0 (±0), OTH 1 (+1), 3/3
+            ONTARIO: LIB 79 (-1), CON 36 (+3), OTH 6 (-2), 121/121
+            MANITOBA: LIB 4 (-3), CON 7 (+2), OTH 3 (+1), 14/14
+            SASKATCHEWAN: LIB 0 (-1), CON 14 (+4), OTH 0 (-3), 14/14
+            ALBERTA: LIB 0 (-4), CON 33 (+4), OTH 1 (±0), 34/34
+            BRITISH COLUMBIA: LIB 11 (-6), CON 17 (+7), OTH 14 (-1), 42/42
+            NORTHERN CANADA: LIB 2 (-1), OTH 1 (+1), 3/3
             """.trimIndent(),
         )
     }
