@@ -7,9 +7,13 @@ interface Link {
     val shortURL: URL
     val expandedURL: URL
     val displayURL: String
-    val image: Image?
-    val title: String
-    val domain: String
+    val preview: Preview?
 
     val isFromSocialNetwork: Boolean
+
+    interface Preview {
+        val image: Image?
+        val title: String
+        val domain: String
+    }
 }

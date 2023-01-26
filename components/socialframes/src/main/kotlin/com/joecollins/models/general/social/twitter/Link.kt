@@ -9,10 +9,18 @@ class Link(
     override val shortURL: URL,
     override val expandedURL: URL,
     override val displayURL: String,
-    override val image: Image?,
-    override val title: String,
-    override val domain: String,
+    image: Image?,
+    title: String,
+    domain: String,
 ) : com.joecollins.models.general.social.generic.Link {
+
+    class Preview(
+        override val image: Image?,
+        override val title: String,
+        override val domain: String,
+    ) : com.joecollins.models.general.social.generic.Link.Preview
+
+    override val preview = Preview(image, title, domain)
 
     override val isFromSocialNetwork: Boolean = expandedURL.toString().startsWith("https://twitter.com/")
 

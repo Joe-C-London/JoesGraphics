@@ -10,17 +10,28 @@ import javax.imageio.ImageIO
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class Card(
     val url: URL,
-    override val title: String,
+    val title: String,
     val description: String,
     @JsonProperty("image") private val imageURL: URL,
     @JsonProperty("provider_name") val providerName: String,
     val type: String,
 ) : Link {
 
-    override val image: Image = ImageIO.read(imageURL)
+    class Preview(
+        override val image: Image,
+        override val title: String,
+        override val domain: String,
+    ) : Link.Preview
+
     override val shortURL: URL = url
     override val expandedURL: URL = url
     override val displayURL: String = url.toString()
-    override val domain: String = providerName
+
+    override val preview: Link.Preview = Preview(
+        ImageIO.read(imageURL),
+        title,
+        providerName,
+    )
+
     override val isFromSocialNetwork: Boolean = false
 }

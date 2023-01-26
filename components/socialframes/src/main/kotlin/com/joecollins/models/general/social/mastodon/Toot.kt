@@ -20,7 +20,7 @@ data class Toot(
     private val tags: List<Tag> = emptyList(),
     private val card: Card? = null,
     @JsonProperty("media_attachments") private val mediaAttachments: List<MediaAttachment> = emptyList(),
-    private val emojis: List<Emoji> = emptyList(),
+    override val emojis: List<Emoji> = emptyList(),
     private val poll: Poll? = null,
 ) : Post<Toot> {
 
@@ -31,21 +31,30 @@ data class Toot(
         .replace(Regex("<span [^>]*>"), "")
         .replace("<span>", "")
         .replace("</span>", "")
-        .replace(Regex("<a [^>]*>"), "<span style='color:#6364ff'>")
-        .replace("</a>", "</span>")
-        .let { text ->
-            var t = text
-            for (emoji in emojis) {
-                t = t.replace(":${emoji.shortcode}:", "<img src='${emoji.staticUrl}' height='16' width='16'>")
-            }
-            t
-        }
+        .replace(Regex("<a [^>]*>"), "")
+        .replace("</a>", "")
 
     override val user: User = account
 
     override val quoted: Toot? = null
 
-    override val links: List<Link> = if (card == null || card.type != "link") emptyList() else listOf(card)
+    private val urls = Regex("<a [^>]*>(.*)</a>").findAll(content)
+        .mapNotNull { it.groups.filterNotNull().firstOrNull { g -> !g.value.contains("<a") } }
+        .map {
+            it.value
+                .replace(Regex("<span [^>]*>"), "")
+                .replace("<span>", "")
+                .replace("</span>", "")
+        }
+        .map { LinkWithoutCard(it) }
+        .toList()
+
+    override val links: List<Link> =
+        if (card == null || card.type != "link") {
+            urls
+        } else {
+            listOf(listOf(card), urls).flatten()
+        }
 
     override val mediaEntities: List<Media> = mediaAttachments
 

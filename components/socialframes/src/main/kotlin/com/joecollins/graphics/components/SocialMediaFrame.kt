@@ -99,7 +99,7 @@ abstract class SocialMediaFrame<P : Post<P>>(post: Flow.Publisher<out Post<P>>, 
                     urlPanel.isVisible = urls.isNotEmpty()
                     urlPanel.removeAll()
                     urlPanel.add(Box.createHorizontalGlue())
-                    urls.filter { !status.user.isProtected }.filter { it.expandedURL.toString() != quotedURL }.forEach {
+                    urls.filter { !status.user.isProtected }.filter { it.expandedURL.toString() != quotedURL }.mapNotNull { it.preview }.forEach {
                         urlPanel.add(UrlPanel(it))
                     }
                     urlPanel.add(Box.createHorizontalGlue())
@@ -228,6 +228,9 @@ abstract class SocialMediaFrame<P : Post<P>>(post: Flow.Publisher<out Post<P>>, 
         status.mediaEntities.filter { !status.user.isProtected }.filter { it.displayURL != null }.forEach {
             htmlText = htmlText.replace(it.displayURL!!, "")
         }
+        status.emojis.filter { !status.user.isProtected }.forEach {
+            htmlText = htmlText.replace(it.text, "<img src='${it.url}' height='16' width='16'")
+        }
         return "<html><body width=${postLabel.width}>$htmlText<br/>&nbsp;</body></html>"
     }
 
@@ -296,7 +299,7 @@ abstract class SocialMediaFrame<P : Post<P>>(post: Flow.Publisher<out Post<P>>, 
         }
     }
 
-    private inner class UrlPanel(link: Link) : JPanel() {
+    private inner class UrlPanel(link: Link.Preview) : JPanel() {
         var image: Image? = link.image
         var title: String = link.title
         var domain: String = link.domain
