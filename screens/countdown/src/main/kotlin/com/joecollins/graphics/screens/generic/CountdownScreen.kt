@@ -36,7 +36,7 @@ class CountdownScreen private constructor(
     override val altText: Flow.Publisher<String?>,
 ) : GenericPanel(panel, title), AltTextProvider {
 
-    class Builder<K>(private val date: LocalDate, private val shapes: Flow.Publisher<Map<K, Shape>>) {
+    class Builder<K>(private val date: LocalDate, private val shapes: Flow.Publisher<out Map<K, Shape>>) {
 
         private val timings = ArrayList<Triple<Instant, String, Flow.Publisher<Collection<Shape>>>>()
         private var clock = Clock.systemDefaultZone()
@@ -155,7 +155,7 @@ class CountdownScreen private constructor(
             )
         }
 
-        fun <K> forDateWithMap(date: LocalDate, map: Flow.Publisher<Map<K, Shape>>): Builder<K> {
+        fun <K> forDateWithMap(date: LocalDate, map: Flow.Publisher<out Map<K, Shape>>): Builder<K> {
             return Builder(date, map)
         }
     }
