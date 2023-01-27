@@ -1,5 +1,6 @@
 package com.joecollins.graphics.screens.generic
 
+import com.joecollins.graphics.utils.PublisherTestUtils.assertPublishes
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.Party
@@ -155,6 +156,23 @@ class FiguresScreenTest {
             .build("PROMINENT FIGURES".asOneTimePublisher())
         screen.setSize(1024, 512)
         compareRendering("FiguresScreen", "Figures-1", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            PROMINENT FIGURES
+            
+            CABINET
+            DEFEATED: WADE MACLAUCHLAN, PAULA BIGGAR, CHRIS PALMER, TINA MUNDY, JORDAN BROWN, RICHARD BROWN
+            ELECTED: HEATH MACDONALD, ROBERT MITCHELL, ROBERT HENDERSON, SONNY GALLANT
+            
+            SHADOW CABINET
+            ELECTED: DENNIS KING, DARLENE COMPTON, JAMES AYLWARD, STEVEN MYERS, JAMIE FOX, MATTHEW MACKAY, BRAD TRIVERS, ERNIE HUDSON, BLOYCE THOMPSON, NATALIE JAMESON
+            
+            OTHER FIGURES
+            DEFEATED: JOE BYRNE
+            ELECTED: PETER BEVAN-BAKER
+            """.trimIndent(),
+        )
     }
 
     companion object {
