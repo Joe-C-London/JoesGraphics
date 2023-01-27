@@ -10,6 +10,7 @@ import java.awt.Color
 import java.awt.Component
 import java.awt.Container
 import java.awt.Dimension
+import java.awt.EventQueue
 import java.awt.Graphics
 import java.awt.Graphics2D
 import java.awt.LayoutManager
@@ -49,12 +50,12 @@ class HeatMapFrame(
     private inner class Layout : LayoutManager {
         override fun addLayoutComponent(name: String, comp: Component) {}
         override fun removeLayoutComponent(comp: Component) {}
-        override fun preferredLayoutSize(parent: Container): Dimension? {
-            return null
+        override fun preferredLayoutSize(parent: Container): Dimension {
+            return Dimension(1024, 512)
         }
 
-        override fun minimumLayoutSize(parent: Container): Dimension? {
-            return null
+        override fun minimumLayoutSize(parent: Container): Dimension {
+            return Dimension(100, 50)
         }
 
         override fun layoutContainer(parent: Container) {
@@ -122,6 +123,13 @@ class HeatMapFrame(
             set(value) {
                 field = value
                 repaint()
+                EventQueue.invokeLater {
+                    this@HeatMapFrame.mainPanel.let {
+                        it.invalidate()
+                        it.revalidate()
+                        it.repaint()
+                    }
+                }
             }
 
         var seatBarLabel: String = ""
@@ -134,6 +142,13 @@ class HeatMapFrame(
             set(value) {
                 field = value
                 repaint()
+                EventQueue.invokeLater {
+                    this@HeatMapFrame.mainPanel.let {
+                        it.invalidate()
+                        it.revalidate()
+                        it.repaint()
+                    }
+                }
             }
 
         var changeBarLabel: String = ""
@@ -258,7 +273,7 @@ class HeatMapFrame(
         }
 
         private fun getSize(seats: Int): Int {
-            return (1.0 * width * seats / numSquares).roundToInt()
+            return (1.0 * width * seats / numSquares.coerceAtLeast(1)).roundToInt()
         }
 
         init {
@@ -395,12 +410,13 @@ class HeatMapFrame(
 
     class Square(val borderColor: Color? = null, val fillColor: Color = Color.WHITE, val label: String? = null)
 
+    private val mainPanel: JPanel = JPanel()
+
     init {
-        val panel = JPanel()
-        add(panel, BorderLayout.CENTER)
-        panel.layout = Layout()
-        panel.add(barsPanel)
-        panel.add(squaresPanel)
+        add(mainPanel, BorderLayout.CENTER)
+        mainPanel.layout = Layout()
+        mainPanel.add(barsPanel)
+        mainPanel.add(squaresPanel)
 
         val onNumRowsUpdate: (Int) -> Unit = { numRows -> squaresPanel.numRows = numRows }
         numRowsPublisher.subscribe(Subscriber(eventQueueWrapper(onNumRowsUpdate)))
