@@ -1,5 +1,6 @@
 package com.joecollins.graphics.screens.generic
 
+import com.joecollins.graphics.utils.PublisherTestUtils.assertPublishes
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
@@ -96,5 +97,18 @@ class BattlefieldScreenTest {
             .build("PRINCE EDWARD ISLAND".asOneTimePublisher())
         screen.setSize(1024, 512)
         compareRendering("BattlefieldScreen", "Result", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            PRINCE EDWARD ISLAND
+            BATTLEFIELD PEI: ADVANCING TO A MAJORITY
+            
+            GRN ADVANCES 15.6% INTO LIB TERRITORY
+            GRN ADVANCES 10.2% INTO PC TERRITORY
+            PC ADVANCES 5.4% INTO LIB TERRITORY
+            
+            PC WOULD HAVE MAJORITY ON UNIFORM ADVANCES
+            """.trimIndent(),
+        )
     }
 }

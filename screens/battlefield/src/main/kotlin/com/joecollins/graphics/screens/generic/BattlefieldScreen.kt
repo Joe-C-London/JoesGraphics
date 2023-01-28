@@ -8,9 +8,10 @@ import com.joecollins.models.general.PartyResult
 import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.merge
 import java.awt.Color
+import java.text.DecimalFormat
 import java.util.concurrent.Flow
 
-class BattlefieldScreen private constructor(header: Flow.Publisher<out String?>, frame: BattlefieldFrame) : GenericPanel(pad(frame), header) {
+class BattlefieldScreen private constructor(header: Flow.Publisher<out String?>, frame: BattlefieldFrame, altText: Flow.Publisher<String>) : GenericPanel(pad(frame), header, altText) {
 
     companion object {
         fun <T> build(
@@ -64,8 +65,7 @@ class BattlefieldScreen private constructor(header: Flow.Publisher<out String?>,
         }
 
         fun build(title: Flow.Publisher<out String?>): BattlefieldScreen {
-            val swingometer = createBattlefield()
-            return BattlefieldScreen(title, swingometer)
+            return BattlefieldScreen(title, createBattlefield(), createAltText(title))
         }
 
         private fun createBattlefield(): BattlefieldFrame {
@@ -174,6 +174,40 @@ class BattlefieldScreen private constructor(header: Flow.Publisher<out String?>,
                 }.sorted()[-stage2Needed - 1] * -1
             }
             return pctNeeded
+        }
+
+        private fun createAltText(title: Flow.Publisher<out String?>): Flow.Publisher<String> {
+            val topText = title.merge(headerPublisher) { t, h -> sequenceOf(t, h).filterNotNull().joinToString("\n") }
+            val swingsText = partySwingsPublisher.merge(allParties) { swings, parties ->
+                if (swings == null) return@merge null
+                val relevantChanges = sequenceOf(parties.left, parties.right, parties.bottom)
+                    .associateWith { party -> swings[party] ?: 0.0 }
+                    .entries
+                    .sortedBy { it.value }
+                sequenceOf(
+                    relevantChanges[0] to relevantChanges[2],
+                    relevantChanges[0] to relevantChanges[1],
+                    relevantChanges[1] to relevantChanges[2],
+                )
+                    .map { (from, to) -> Triple(from.key, to.key, (to.value - from.value) / 2) }
+                    .sortedByDescending { (_, _, swing) -> swing }
+                    .joinToString("\n") { (from, to, swing) ->
+                        "${to.abbreviation} ADVANCES ${DecimalFormat("0.0%").format(swing)} INTO ${from.abbreviation} TERRITORY"
+                    }
+            }
+            val majorityText = partySwingsPublisher.merge(prevVotesPublisher) { swings, prevVotes ->
+                val adjSeats = prevVotes.values.groupingBy { votes ->
+                    val total = votes.values.sum().toDouble()
+                    val pcts = votes.mapValues { it.value / total + (swings?.get(it.key) ?: 0.0) }
+                    pcts.maxBy { it.value }.key
+                }.eachCount()
+                val majority = prevVotes.size / 2 + 1
+                val winner = adjSeats.filterValues { it >= majority }.keys.firstOrNull()
+                (winner?.abbreviation ?: "NO PARTY") +
+                    (if (swings == null) " CURRENTLY HAS MAJORITY" else " WOULD HAVE MAJORITY ON UNIFORM ADVANCES")
+            }
+            return topText.merge(swingsText) { t, s -> sequenceOf(t, s).filterNotNull().joinToString("\n\n") }
+                .merge(majorityText) { t, m -> "$t\n\n$m" }
         }
     }
 }
