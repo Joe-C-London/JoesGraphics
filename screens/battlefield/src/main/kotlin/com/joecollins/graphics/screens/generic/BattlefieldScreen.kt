@@ -3,9 +3,11 @@ package com.joecollins.graphics.screens.generic
 import ResultColorUtils.getColor
 import com.joecollins.graphics.GenericPanel
 import com.joecollins.graphics.components.BattlefieldFrame
+import com.joecollins.graphics.utils.ColorUtils
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
 import com.joecollins.pubsub.asOneTimePublisher
+import com.joecollins.pubsub.map
 import com.joecollins.pubsub.merge
 import java.awt.Color
 import java.text.DecimalFormat
@@ -112,6 +114,13 @@ class BattlefieldScreen private constructor(header: Flow.Publisher<out String?>,
                             swings[parties.bottom] ?: 0,
                         )
                     }
+                },
+                territoriesPublisher = allParties.map { parties ->
+                    BattlefieldFrame.Territories(
+                        ColorUtils.lighten(ColorUtils.lighten(ColorUtils.lighten(parties.left.color))),
+                        ColorUtils.lighten(ColorUtils.lighten(ColorUtils.lighten(parties.right.color))),
+                        ColorUtils.lighten(ColorUtils.lighten(ColorUtils.lighten(parties.bottom.color))),
+                    )
                 },
             )
         }

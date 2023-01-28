@@ -21,6 +21,7 @@ class BattlefieldFrame(
     dotsPublisher: Flow.Publisher<out List<Pair<Dot, Color>>> = emptyList<Pair<Dot, Color>>().asOneTimePublisher(),
     linesPublisher: Flow.Publisher<out List<Pair<Line, Color>>> = emptyList<Pair<Line, Color>>().asOneTimePublisher(),
     swingPublisher: Flow.Publisher<out Dot?> = null.asOneTimePublisher(),
+    territoriesPublisher: Flow.Publisher<out Territories?> = null.asOneTimePublisher(),
 ) : GraphicsFrame(
     headerPublisher = headerPublisher,
 ) {
@@ -36,11 +37,14 @@ class BattlefieldFrame(
         dotsPublisher.subscribe(Subscriber(eventQueueWrapper { panel.dots = it }))
         linesPublisher.subscribe(Subscriber(eventQueueWrapper { panel.lines = it }))
         swingPublisher.subscribe(Subscriber(eventQueueWrapper { panel.swing = it }))
+        territoriesPublisher.subscribe(Subscriber(eventQueueWrapper { panel.territories = it }))
     }
 
     data class Dot(val left: Number, val right: Number, val bottom: Number)
 
     data class Line(val dots: List<Dot>)
+
+    data class Territories(val left: Color, val right: Color, val bottom: Color)
 
     private inner class BattlefieldPanel : JPanel() {
 
@@ -69,6 +73,12 @@ class BattlefieldFrame(
             }
 
         var swing: Dot? = null
+            set(value) {
+                field = value
+                repaint()
+            }
+
+        var territories: Territories? = null
             set(value) {
                 field = value
                 repaint()
@@ -104,6 +114,8 @@ class BattlefieldFrame(
                     RenderingHints.VALUE_TEXT_ANTIALIAS_ON,
                 )
 
+            territories?.also { drawTerritories(g, it) }
+
             g.color = Color(224, 224, 224)
             run {
                 var index = 0.0
@@ -134,6 +146,49 @@ class BattlefieldFrame(
                     g.drawLine(p1.x, p1.y, p2.x, p2.y)
                 }
             }
+        }
+
+        private fun drawTerritories(g: Graphics2D, territories: Territories) {
+            val swing = swing ?: Dot(0.0, 0.0, 0.0)
+
+            g.color = territories.left
+            val leftPolygon = listOf(
+                getCoordinates(swing),
+                getCoordinates(Dot(swing.left, swing.right, 5 * limit)),
+                getCoordinates(Dot(swing.left, 5 * limit, 5 * limit)),
+                getCoordinates(Dot(swing.left, 5 * limit, swing.bottom)),
+            )
+            g.fillPolygon(
+                leftPolygon.map { it.x }.toIntArray(),
+                leftPolygon.map { it.y }.toIntArray(),
+                leftPolygon.size,
+            )
+
+            g.color = territories.right
+            val rightPolygon = listOf(
+                getCoordinates(swing),
+                getCoordinates(Dot(swing.left, swing.right, 5 * limit)),
+                getCoordinates(Dot(5 * limit, swing.right, 5 * limit)),
+                getCoordinates(Dot(5 * limit, swing.right, swing.bottom)),
+            )
+            g.fillPolygon(
+                rightPolygon.map { it.x }.toIntArray(),
+                rightPolygon.map { it.y }.toIntArray(),
+                rightPolygon.size,
+            )
+
+            g.color = territories.bottom
+            val bottomPolygon = listOf(
+                getCoordinates(swing),
+                getCoordinates(Dot(swing.left, 5 * limit, swing.bottom)),
+                getCoordinates(Dot(5 * limit, 5 * limit, swing.bottom)),
+                getCoordinates(Dot(5 * limit, swing.right, swing.bottom)),
+            )
+            g.fillPolygon(
+                bottomPolygon.map { it.x }.toIntArray(),
+                bottomPolygon.map { it.y }.toIntArray(),
+                bottomPolygon.size,
+            )
         }
 
         private fun drawSwing(g: Graphics2D, swing: Dot) {
