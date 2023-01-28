@@ -1,6 +1,7 @@
 package com.joecollins.graphics.screens.generic
 
-import com.joecollins.graphics.utils.RenderTestUtils
+import com.joecollins.graphics.utils.PublisherTestUtils.assertPublishes
+import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
 import com.joecollins.pubsub.Publisher
@@ -36,24 +37,88 @@ class PartyHeatMapScreenTest {
             .withNumRows(rows)
             .build("PARTY HEAT MAPS".asOneTimePublisher())
         panel.setSize(1024, 512)
-        RenderTestUtils.compareRendering("PartyHeatMapScreen", "Elected-1", panel)
+        compareRendering("PartyHeatMapScreen", "Elected-1", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            PARTY HEAT MAPS
+            
+            LIBERAL
+            0 (44 FOR MAJORITY)
+            ±0 (+1 FOR MAJORITY)
+            BALANCE: 44
+            
+            NEW DEMOCRATIC PARTY
+            0 (44 FOR MAJORITY)
+            ±0 (+3 FOR MAJORITY)
+            BALANCE: 44
+            """.trimIndent(),
+        )
 
         currResults.submit(
             mapOf(
                 "Coquitlam-Burke Mountain" to ndp,
             ),
         )
-        RenderTestUtils.compareRendering("PartyHeatMapScreen", "Elected-2", panel)
+        compareRendering("PartyHeatMapScreen", "Elected-2", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            PARTY HEAT MAPS
+            
+            LIBERAL
+            0 (44 FOR MAJORITY)
+            -1 (+1 FOR MAJORITY)
+            BALANCE: 21
+            
+            NEW DEMOCRATIC PARTY
+            1 (44 FOR MAJORITY)
+            +1 (+3 FOR MAJORITY)
+            BALANCE: 65
+            """.trimIndent(),
+        )
 
         currResults.submit(
             bcCurrResult().mapValues { r -> r.value?.let { if (it.elected) it.party else null } },
         )
-        RenderTestUtils.compareRendering("PartyHeatMapScreen", "Elected-3", panel)
+        compareRendering("PartyHeatMapScreen", "Elected-3", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            PARTY HEAT MAPS
+            
+            LIBERAL
+            16 (44 FOR MAJORITY)
+            -4 (+1 FOR MAJORITY)
+            BALANCE: 36
+            
+            NEW DEMOCRATIC PARTY
+            44 (44 FOR MAJORITY)
+            +5 (+3 FOR MAJORITY)
+            BALANCE: 52
+            """.trimIndent(),
+        )
 
         currResults.submit(
             bcCurrResult().mapValues { r -> r.value?.party },
         )
-        RenderTestUtils.compareRendering("PartyHeatMapScreen", "Elected-4", panel)
+        compareRendering("PartyHeatMapScreen", "Elected-4", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            PARTY HEAT MAPS
+            
+            LIBERAL
+            28 (44 FOR MAJORITY)
+            -15 (+1 FOR MAJORITY)
+            BALANCE: 28
+            
+            NEW DEMOCRATIC PARTY
+            57 (44 FOR MAJORITY)
+            +16 (+3 FOR MAJORITY)
+            BALANCE: 57
+            """.trimIndent(),
+        )
     }
 
     @Test
@@ -81,7 +146,23 @@ class PartyHeatMapScreenTest {
             .withNumRows(rows)
             .build("PARTY HEAT MAPS".asOneTimePublisher())
         panel.setSize(1024, 512)
-        RenderTestUtils.compareRendering("PartyHeatMapScreen", "ElectedLeading-1", panel)
+        compareRendering("PartyHeatMapScreen", "ElectedLeading-1", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            PARTY HEAT MAPS
+            
+            LIBERAL
+            0/0 (44 FOR MAJORITY)
+            ±0/±0 (+1 FOR MAJORITY)
+            BALANCE: 44
+            
+            NEW DEMOCRATIC PARTY
+            0/0 (44 FOR MAJORITY)
+            ±0/±0 (+3 FOR MAJORITY)
+            BALANCE: 44
+            """.trimIndent(),
+        )
 
         currResults.submit(
             mapOf(
@@ -91,14 +172,67 @@ class PartyHeatMapScreenTest {
                 "Vancouver-False Creek" to PartyResult.leading(ndp),
             ),
         )
-        RenderTestUtils.compareRendering("PartyHeatMapScreen", "ElectedLeading-2", panel)
+        compareRendering("PartyHeatMapScreen", "ElectedLeading-2", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            PARTY HEAT MAPS
+            
+            LIBERAL
+            0/1 (44 FOR MAJORITY)
+            -1/-3 (+1 FOR MAJORITY)
+            BALANCE: 40
+            
+            NEW DEMOCRATIC PARTY
+            1/3 (44 FOR MAJORITY)
+            +1/+3 (+3 FOR MAJORITY)
+            BALANCE: 44
+            """.trimIndent(),
+        )
 
         currResults.submit(bcCurrResult())
-        RenderTestUtils.compareRendering("PartyHeatMapScreen", "ElectedLeading-3", panel)
+        compareRendering("PartyHeatMapScreen", "ElectedLeading-3", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            PARTY HEAT MAPS
+            
+            LIBERAL
+            16/28 (44 FOR MAJORITY)
+            -4/-15 (+1 FOR MAJORITY)
+            BALANCE: 28
+            
+            NEW DEMOCRATIC PARTY
+            44/57 (44 FOR MAJORITY)
+            +5/+16 (+3 FOR MAJORITY)
+            BALANCE: 57
+            """.trimIndent(),
+        )
 
         parties.submit(listOf(lib, ndp, grn))
         rows.submit(2)
-        RenderTestUtils.compareRendering("PartyHeatMapScreen", "ElectedLeading-4", panel)
+        compareRendering("PartyHeatMapScreen", "ElectedLeading-4", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            PARTY HEAT MAPS
+            
+            LIBERAL
+            16/28 (44 FOR MAJORITY)
+            -4/-15 (+1 FOR MAJORITY)
+            BALANCE: 28
+            
+            NEW DEMOCRATIC PARTY
+            44/57 (44 FOR MAJORITY)
+            +5/+16 (+3 FOR MAJORITY)
+            BALANCE: 57
+            
+            GREEN
+            1/2 (44 FOR MAJORITY)
+            -1/-1 (+41 FOR MAJORITY)
+            BALANCE: 3
+            """.trimIndent(),
+        )
     }
 
     @Test
@@ -127,7 +261,23 @@ class PartyHeatMapScreenTest {
             .withPartyChanges(mapOf(lib to bcu).asOneTimePublisher())
             .build("PARTY HEAT MAPS".asOneTimePublisher())
         panel.setSize(1024, 512)
-        RenderTestUtils.compareRendering("PartyHeatMapScreen", "PartyChanges-1", panel)
+        compareRendering("PartyHeatMapScreen", "PartyChanges-1", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            PARTY HEAT MAPS
+            
+            BC UNITED
+            0/0 (44 FOR MAJORITY)
+            ±0/±0 (+1 FOR MAJORITY)
+            BALANCE: 44
+            
+            NEW DEMOCRATIC PARTY
+            0/0 (44 FOR MAJORITY)
+            ±0/±0 (+3 FOR MAJORITY)
+            BALANCE: 44
+            """.trimIndent(),
+        )
 
         currResults.submit(
             mapOf(
@@ -137,7 +287,23 @@ class PartyHeatMapScreenTest {
                 "Vancouver-False Creek" to PartyResult.leading(ndp),
             ),
         )
-        RenderTestUtils.compareRendering("PartyHeatMapScreen", "PartyChanges-2", panel)
+        compareRendering("PartyHeatMapScreen", "PartyChanges-2", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            PARTY HEAT MAPS
+            
+            BC UNITED
+            0/1 (44 FOR MAJORITY)
+            -1/-3 (+1 FOR MAJORITY)
+            BALANCE: 40
+            
+            NEW DEMOCRATIC PARTY
+            1/3 (44 FOR MAJORITY)
+            +1/+3 (+3 FOR MAJORITY)
+            BALANCE: 44
+            """.trimIndent(),
+        )
 
         currResults.submit(
             bcCurrResult().mapValues {
@@ -148,11 +314,48 @@ class PartyHeatMapScreenTest {
                 }
             },
         )
-        RenderTestUtils.compareRendering("PartyHeatMapScreen", "PartyChanges-3", panel)
+        compareRendering("PartyHeatMapScreen", "PartyChanges-3", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            PARTY HEAT MAPS
+            
+            BC UNITED
+            16/28 (44 FOR MAJORITY)
+            -4/-15 (+1 FOR MAJORITY)
+            BALANCE: 28
+            
+            NEW DEMOCRATIC PARTY
+            44/57 (44 FOR MAJORITY)
+            +5/+16 (+3 FOR MAJORITY)
+            BALANCE: 57
+            """.trimIndent(),
+        )
 
         parties.submit(listOf(bcu, ndp, grn))
         rows.submit(2)
-        RenderTestUtils.compareRendering("PartyHeatMapScreen", "PartyChanges-4", panel)
+        compareRendering("PartyHeatMapScreen", "PartyChanges-4", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            PARTY HEAT MAPS
+            
+            BC UNITED
+            16/28 (44 FOR MAJORITY)
+            -4/-15 (+1 FOR MAJORITY)
+            BALANCE: 28
+            
+            NEW DEMOCRATIC PARTY
+            44/57 (44 FOR MAJORITY)
+            +5/+16 (+3 FOR MAJORITY)
+            BALANCE: 57
+            
+            GREEN
+            1/2 (44 FOR MAJORITY)
+            -1/-1 (+41 FOR MAJORITY)
+            BALANCE: 3
+            """.trimIndent(),
+        )
     }
 
     companion object {

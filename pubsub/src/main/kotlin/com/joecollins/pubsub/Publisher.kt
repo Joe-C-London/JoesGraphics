@@ -182,7 +182,7 @@ fun <T, R> List<Flow.Publisher<out T>>.mapReduce(identity: R, onValueAdd: (R, T)
     return publisher
 }
 
-fun <T> List<Flow.Publisher<T>>.combine(): Flow.Publisher<List<T>> {
+fun <T> List<Flow.Publisher<out T>>.combine(): Flow.Publisher<List<T>> {
     data class Wrapper(val item: T)
     val publisher = Publisher<List<T>>()
     val list: MutableList<Wrapper?> = this.map { null }.toMutableList()
