@@ -21,7 +21,7 @@ class SingleTransferrableResultScreen private constructor(
     private val partyFrame: JPanel?,
     private val prevFrame: JPanel?,
     private val mapFrame: JPanel?,
-    override val altText: Flow.Publisher<String?>,
+    altText: Flow.Publisher<String>,
 ) : GenericPanel(
     run {
         val panel = JPanel()
@@ -34,6 +34,7 @@ class SingleTransferrableResultScreen private constructor(
         panel
     },
     label,
+    altText,
 ),
     AltTextProvider {
 
@@ -124,7 +125,7 @@ class SingleTransferrableResultScreen private constructor(
             )
         }
 
-        private fun createAltText(title: Flow.Publisher<out String>): Flow.Publisher<String?> {
+        private fun createAltText(title: Flow.Publisher<out String>): Flow.Publisher<String> {
             val candidateTop = candidateHeader.merge(candidateSubhead) { h, s ->
                 if (h.isNullOrEmpty()) {
                     s

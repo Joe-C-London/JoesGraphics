@@ -31,7 +31,7 @@ class MixedMemberResultPanel private constructor(
     private val partyFrame: BarFrame,
     private val partyChangeFrame: BarFrame?,
     private val mapFrame: MapFrame?,
-    override val altText: Flow.Publisher<out String?>,
+    altText: Flow.Publisher<out String>,
 ) : GenericPanel(
     run {
         val panel = JPanel()
@@ -45,6 +45,7 @@ class MixedMemberResultPanel private constructor(
         panel
     },
     label,
+    altText,
 ) {
 
     private class ScreenLayout : LayoutManager {
@@ -474,7 +475,7 @@ class MixedMemberResultPanel private constructor(
             return mapBuilder?.createMapFrame()
         }
 
-        private fun createAltText(header: Flow.Publisher<out String?>): Flow.Publisher<String?> {
+        private fun createAltText(header: Flow.Publisher<out String?>): Flow.Publisher<String> {
             val candidatesEntries = candidateVotes.merge(winner) { votes, winner -> votes to winner }.merge(candidatePrev ?: null.asOneTimePublisher()) { (curr, winner), prev ->
                 val partialDeclaration = curr.values.any { it == null }
                 val currTotal = curr.values.sumOf { it ?: 0 }.toDouble()

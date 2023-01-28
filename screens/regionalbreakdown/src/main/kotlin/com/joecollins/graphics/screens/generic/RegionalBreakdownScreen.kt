@@ -21,8 +21,8 @@ import java.util.concurrent.Flow
 class RegionalBreakdownScreen private constructor(
     titleLabel: Flow.Publisher<out String?>,
     multiSummaryFrame: MultiSummaryFrame,
-    override val altText: Flow.Publisher<String?>,
-) : GenericPanel(pad(multiSummaryFrame), titleLabel), AltTextProvider {
+    altText: Flow.Publisher<String>,
+) : GenericPanel(pad(multiSummaryFrame), titleLabel, altText), AltTextProvider {
     interface Entry {
         val headerPublisher: Flow.Publisher<out String>
         val valuePublisher: Flow.Publisher<out List<Pair<Color, String>>>
@@ -278,7 +278,7 @@ class RegionalBreakdownScreen private constructor(
             )
         }
 
-        private fun createAltText(titlePublisher: Flow.Publisher<out String?>): Flow.Publisher<String?> {
+        private fun createAltText(titlePublisher: Flow.Publisher<out String?>): Flow.Publisher<String> {
             val header = titlePublisher.merge(title) { a, b -> sequenceOf(a, b).filterNotNull().joinToString("\n") }
             val rows = entries.map { it.altTextPublisher }.combine().map { it.joinToString("\n") }
             return header.merge(rows) { h, v -> "$h\n\n$v" }

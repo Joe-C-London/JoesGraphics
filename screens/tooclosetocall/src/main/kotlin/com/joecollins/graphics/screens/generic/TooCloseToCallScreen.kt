@@ -21,8 +21,8 @@ import java.util.concurrent.Flow
 class TooCloseToCallScreen private constructor(
     titleLabel: Flow.Publisher<out String?>,
     multiSummaryFrame: MultiSummaryFrame,
-    override val altText: Flow.Publisher<String?>,
-) : GenericPanel(pad(multiSummaryFrame), titleLabel), AltTextProvider {
+    altText: Flow.Publisher<String?>,
+) : GenericPanel(pad(multiSummaryFrame), titleLabel, altText), AltTextProvider {
     private class Input<T> {
         var votes: Map<T, Map<Candidate, Int>> = HashMap()
             set(value) {

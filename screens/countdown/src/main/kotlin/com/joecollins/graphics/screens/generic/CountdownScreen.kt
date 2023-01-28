@@ -33,8 +33,8 @@ import javax.swing.border.EmptyBorder
 class CountdownScreen private constructor(
     panel: JPanel,
     title: Flow.Publisher<String>,
-    override val altText: Flow.Publisher<String?>,
-) : GenericPanel(panel, title), AltTextProvider {
+    altText: Flow.Publisher<String>,
+) : GenericPanel(panel, title, altText), AltTextProvider {
 
     class Builder<K>(private val date: LocalDate, private val shapes: Flow.Publisher<out Map<K, Shape>>) {
 
@@ -111,7 +111,7 @@ class CountdownScreen private constructor(
             val timingTexts = timings.map {
                 altTextLabel(it.second, it.first, executor)
             }.combine().map { it.joinToString("\n") }
-            val altText: Flow.Publisher<String?> = title.merge(timingTexts) { t, tt -> "$t\n\n$tt" }
+            val altText = title.merge(timingTexts) { t, tt -> "$t\n\n$tt" }
 
             return CountdownScreen(outer, title, altText)
         }

@@ -40,8 +40,8 @@ import javax.swing.border.EmptyBorder
 class MultiResultScreen private constructor(
     header: Flow.Publisher<out String?>,
     screen: JPanel,
-    override val altText: Flow.Publisher<String?>,
-) : GenericPanel(screen, header), AltTextProvider {
+    altText: Flow.Publisher<String>,
+) : GenericPanel(screen, header, altText), AltTextProvider {
     private val panels: MutableList<ResultPanel> = ArrayList()
 
     class Builder<T>(
@@ -161,7 +161,7 @@ class MultiResultScreen private constructor(
 
         fun build(textHeader: Flow.Publisher<out String?>): MultiResultScreen {
             val center = JPanel()
-            val altText: Flow.Publisher<String?> = this.listPublisher.map { list ->
+            val altText = this.listPublisher.map { list ->
                 list.filterNotNull().map { e ->
                     val headerPub = headerFunc(e).merge(subheadFunc(e)) { head, sub ->
                         if (sub.isNullOrEmpty()) {

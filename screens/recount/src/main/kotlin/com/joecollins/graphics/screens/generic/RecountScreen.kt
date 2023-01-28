@@ -18,8 +18,8 @@ import java.util.concurrent.Flow
 class RecountScreen private constructor(
     headerLabel: Flow.Publisher<out String?>,
     frame: MultiSummaryFrame,
-    override val altText: Flow.Publisher<String?>,
-) : GenericPanel(pad(frame), headerLabel), AltTextProvider {
+    altText: Flow.Publisher<String>,
+) : GenericPanel(pad(frame), headerLabel, altText), AltTextProvider {
 
     companion object {
         fun <T> of(
@@ -155,7 +155,7 @@ class RecountScreen private constructor(
             else -> null
         }
 
-        private fun buildAltText(titlePublisher: Flow.Publisher<out String>): Flow.Publisher<String?> {
+        private fun buildAltText(titlePublisher: Flow.Publisher<out String>): Flow.Publisher<String> {
             val header = titlePublisher.merge(header) { t, h -> "$t\n\n$h" }
             val body = buildInput().toEntries().map { entries ->
                 entries.joinToString("") { e ->
