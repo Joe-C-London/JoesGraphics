@@ -18,6 +18,7 @@ class BattlegroundScreenTest {
     @Test
     fun testSinglePartyBattleground() {
         val prevResult = Publisher(bcPrevResult())
+        val prevWinners = Publisher(bcPrevWinners())
         val currResult = Publisher<Map<String, PartyResult>>(emptyMap())
         val party = Publisher(ndp)
         val targetSeats = Publisher(30)
@@ -26,6 +27,7 @@ class BattlegroundScreenTest {
         val title = Publisher("NDP BATTLEGROUND")
         val panel = BattlegroundScreen.singleParty(
             prevResult,
+            prevWinners,
             currResult,
             { it.uppercase() },
             party,
@@ -139,6 +141,7 @@ class BattlegroundScreenTest {
     @Test
     fun testSinglePartyFilteredBattleground() {
         val prevResult = Publisher(bcPrevResult())
+        val prevWinners = Publisher(bcPrevWinners())
         val currResult = Publisher<Map<String, PartyResult?>>(emptyMap())
         val party = Publisher(ndp)
         val targetSeats = Publisher(30)
@@ -152,6 +155,7 @@ class BattlegroundScreenTest {
         val title = Publisher("NDP BATTLEGROUND")
         val panel = BattlegroundScreen.singleParty(
             prevResult,
+            prevWinners,
             currResult,
             { it.uppercase() },
             party,
@@ -219,6 +223,7 @@ class BattlegroundScreenTest {
     @Test
     fun testDoublePartyBattleground() {
         val prevResult = Publisher(bcPrevResult())
+        val prevWinners = Publisher(bcPrevWinners())
         val currResult = Publisher<Map<String, PartyResult>>(emptyMap())
         val parties = Publisher(ndp to lib)
         val rightSeats = Publisher(30)
@@ -227,6 +232,7 @@ class BattlegroundScreenTest {
         val title = Publisher("BATTLEGROUND")
         val panel = BattlegroundScreen.doubleParty(
             prevResult,
+            prevWinners,
             currResult,
             { it.uppercase() },
             parties,
@@ -336,6 +342,7 @@ class BattlegroundScreenTest {
     fun testDoubleCoalitionBattleground() {
         val coa = Coalition("Governing Coalition", "NDP/GRN", ndp, grn)
         val prevResult = Publisher(bcPrevResult())
+        val prevWinners = Publisher(bcPrevWinners())
         val currResult = Publisher<Map<String, PartyResult>>(emptyMap())
         val rightSeats = Publisher(30)
         val leftSeats = Publisher(30)
@@ -343,6 +350,7 @@ class BattlegroundScreenTest {
         val title = Publisher("BATTLEGROUND")
         val panel = BattlegroundScreen.doubleParty(
             prevResult,
+            prevWinners,
             currResult,
             { it.uppercase() },
             (coa to lib).asOneTimePublisher(),
@@ -371,6 +379,7 @@ class BattlegroundScreenTest {
     @Test
     fun testSinglePartyBattlegroundWithPartyChange() {
         val prevResult = Publisher(bcPrevResult())
+        val prevWinners = Publisher(bcPrevWinners())
         val currResult = Publisher<Map<String, PartyResult>>(emptyMap())
         val party = Publisher(ndp)
         val targetSeats = Publisher(30)
@@ -379,6 +388,7 @@ class BattlegroundScreenTest {
         val title = Publisher("NDP BATTLEGROUND")
         val panel = BattlegroundScreen.singleParty(
             prevResult,
+            prevWinners,
             currResult,
             { it.uppercase() },
             party,
@@ -526,6 +536,7 @@ class BattlegroundScreenTest {
         )
         val panel = BattlegroundScreen.doubleParty(
             prevResults.associateWith { it.second }.asOneTimePublisher(),
+            prevResults.associateWith { it.second.maxBy { e -> e.value }.key }.asOneTimePublisher(),
             emptyMap<Pair<String, Map<Party, Int>>, PartyResult?>().asOneTimePublisher(),
             { e ->
                 val votes = e.second.values.toList()
@@ -563,6 +574,7 @@ class BattlegroundScreenTest {
         private val grn = Party("Green", "GRN", Color.GREEN.darker())
         private val ind = Party("Independent", "IND", Color.GRAY)
         private val oth = Party.OTHERS
+
         private fun bcPrevResult(): Map<String, Map<Party, Int>> {
             return mapOf(
                 "Nechako Lakes" to mapOf(lib to 5307, ndp to 2909, grn to 878, oth to 438 + 226),
@@ -653,6 +665,10 @@ class BattlegroundScreenTest {
                 "Victoria-Beacon Hill" to mapOf(lib to 4689, ndp to 16057, grn to 9194, oth to 190 + 102 + 35),
                 "Victoria-Swan Lake" to mapOf(lib to 4005, ndp to 13531, grn to 7491, oth to 207),
             )
+        }
+
+        private fun bcPrevWinners(): Map<String, Party> {
+            return bcPrevResult().mapValues { v -> v.value.maxBy { it.value }.key }
         }
 
         private fun bcCurrResult(): Map<String, PartyResult> {

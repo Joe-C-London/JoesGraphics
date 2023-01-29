@@ -15,11 +15,13 @@ class SeatsChangingScreenTest {
     @Test
     fun testSeatsChanging() {
         val prevResult = Publisher(bcPrevResult())
+        val prevWinners = Publisher(bcPrevWinners())
         val currResult = Publisher<Map<String, PartyResult?>>(emptyMap())
         val numRows = Publisher(15)
         val title = Publisher("BRITISH COLUMBIA")
         val panel = SeatsChangingScreen.of(
             prevResult,
+            prevWinners,
             currResult,
             { it.uppercase() },
             "SEATS CHANGING".asOneTimePublisher(),
@@ -92,6 +94,7 @@ class SeatsChangingScreenTest {
     @Test
     fun testFilteredSeatsChanging() {
         val prevResult = Publisher(bcPrevResult())
+        val prevWinners = Publisher(bcPrevWinners())
         val currResult = Publisher<Map<String, PartyResult?>>(emptyMap())
         val numRows = Publisher(15)
         val title = Publisher("VANCOUVER")
@@ -102,6 +105,7 @@ class SeatsChangingScreenTest {
         )
         val panel = SeatsChangingScreen.of(
             prevResult,
+            prevWinners,
             currResult,
             { it.uppercase() },
             "SEATS CHANGING".asOneTimePublisher(),
@@ -174,12 +178,14 @@ class SeatsChangingScreenTest {
     @Test
     fun testSeatsChangingNullResults() {
         val prevResult = Publisher(bcPrevResult())
+        val prevWinners = Publisher(bcPrevWinners())
         val results = bcCurrResult().mapValues { null }
         val currResult = Publisher<Map<String, PartyResult?>>(results)
         val numRows = Publisher(15)
         val title = Publisher("BRITISH COLUMBIA")
         val panel = SeatsChangingScreen.of(
             prevResult,
+            prevWinners,
             currResult,
             { it.uppercase() },
             "SEATS CHANGING".asOneTimePublisher(),
@@ -215,11 +221,13 @@ class SeatsChangingScreenTest {
     @Test
     fun testSeatsChangingWithPartyChanges() {
         val prevResult = Publisher(bcPrevResult())
+        val prevWinners = Publisher(bcPrevWinners())
         val currResult = Publisher<Map<String, PartyResult?>>(emptyMap())
         val numRows = Publisher(15)
         val title = Publisher("BRITISH COLUMBIA")
         val panel = SeatsChangingScreen.of(
             prevResult,
+            prevWinners,
             currResult,
             { it.uppercase() },
             "SEATS CHANGING".asOneTimePublisher(),
@@ -395,6 +403,12 @@ class SeatsChangingScreenTest {
                 "Victoria-Beacon Hill" to mapOf(lib to 4689, ndp to 16057, grn to 9194, oth to 190 + 102 + 35),
                 "Victoria-Swan Lake" to mapOf(lib to 4005, ndp to 13531, grn to 7491, oth to 207),
             )
+        }
+
+        private fun bcPrevWinners(): Map<String, Party> {
+            return bcPrevResult().mapValues { e ->
+                e.value.maxBy { it.value }.key
+            }
         }
 
         private fun bcCurrResult(): Map<String, PartyResult?> {

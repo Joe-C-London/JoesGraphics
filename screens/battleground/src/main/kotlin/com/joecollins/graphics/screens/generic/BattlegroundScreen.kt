@@ -56,6 +56,7 @@ class BattlegroundScreen private constructor(
 
     class SinglePartyBuilder<T>(
         private val prevResults: Flow.Publisher<out Map<T, Map<Party, Int>>>,
+        private val prevWinners: Flow.Publisher<out Map<T, Party>>,
         private val currResults: Flow.Publisher<out Map<T, PartyResult?>>,
         private val nameFunc: (T) -> String,
         private val party: Flow.Publisher<out Party>,
@@ -93,6 +94,7 @@ class BattlegroundScreen private constructor(
         fun build(title: Flow.Publisher<out String?>): BattlegroundScreen {
             val defenseInput = DefenseBattlegroundInput<T>()
             prevResults.subscribe(Subscriber { defenseInput.prev = it })
+            prevWinners.subscribe(Subscriber { defenseInput.prevWinners = it })
             currResults.subscribe(Subscriber { defenseInput.curr = it })
             defenseSeatCount.subscribe(Subscriber { defenseInput.count = it })
             party.subscribe(Subscriber { defenseInput.party = it })
@@ -117,6 +119,7 @@ class BattlegroundScreen private constructor(
 
             val targetInput = TargetBattlegroundInput<T>()
             prevResults.subscribe(Subscriber { targetInput.prev = it })
+            prevWinners.subscribe(Subscriber { targetInput.prevWinners = it })
             currResults.subscribe(Subscriber { targetInput.curr = it })
             targetSeatCount.subscribe(Subscriber { targetInput.count = it })
             party.subscribe(Subscriber { targetInput.party = it })
@@ -200,6 +203,7 @@ class BattlegroundScreen private constructor(
 
     class DoublePartyBuilder<T>(
         private val prevResults: Flow.Publisher<out Map<T, Map<Party, Int>>>,
+        private val prevWinners: Flow.Publisher<out Map<T, Party>>,
         private val currResults: Flow.Publisher<out Map<T, PartyResult?>>,
         private val nameFunc: (T) -> String,
         private val parties: Flow.Publisher<out Pair<PartyOrCoalition, PartyOrCoalition>>,
@@ -243,6 +247,7 @@ class BattlegroundScreen private constructor(
         fun build(title: Flow.Publisher<out String?>): BattlegroundScreen {
             val leftInput = DoubleBattlegroundInput<T>()
             prevResults.subscribe(Subscriber { leftInput.prev = it })
+            prevWinners.subscribe(Subscriber { leftInput.prevWinners = it })
             currResults.subscribe(Subscriber { leftInput.curr = it })
             leftSeatCount.subscribe(Subscriber { leftInput.count = it })
             parties.subscribe(Subscriber { leftInput.party = it })
@@ -267,6 +272,7 @@ class BattlegroundScreen private constructor(
 
             val rightInput = DoubleBattlegroundInput<T>()
             prevResults.subscribe(Subscriber { rightInput.prev = it })
+            prevWinners.subscribe(Subscriber { rightInput.prevWinners = it })
             currResults.subscribe(Subscriber { rightInput.curr = it })
             rightSeatCount.subscribe(Subscriber { rightInput.count = it })
             parties.subscribe(Subscriber { rightInput.party = it.reverse() })
@@ -355,6 +361,12 @@ class BattlegroundScreen private constructor(
                 submit()
             }
 
+        var prevWinners: Map<T, Party> = HashMap()
+            set(value) {
+                field = value
+                submit()
+            }
+
         var curr: Map<T, PartyResult?> = HashMap()
             set(value) {
                 field = value
@@ -394,11 +406,11 @@ class BattlegroundScreen private constructor(
         val items: Flow.Publisher<List<Entry<T>>> = Publisher(getItemsList())
 
         private fun getItemsList(): List<Entry<T>> {
-            return prev.entries.asSequence()
+            return prevWinners.entries.asSequence()
                 .mapNotNull { e ->
-                    val votes = e.value
-                    val prevWinner = votes.maxBy { it.value }.key
-                    val margin: Double? = getSortKey(votes)
+                    val votes = prev[e.key] ?: emptyMap()
+                    val prevWinner = e.value
+                    val margin: Double? = getSortKey(votes, prevWinner)
                     if (margin == null) {
                         null
                     } else {
@@ -418,13 +430,12 @@ class BattlegroundScreen private constructor(
                 .toList()
         }
 
-        protected abstract fun getSortKey(votes: Map<Party, Int>): Double?
+        protected abstract fun getSortKey(votes: Map<Party, Int>, prevWinner: Party): Double?
     }
 
     private class DefenseBattlegroundInput<T> : BattlegroundInput<T, Party>() {
-        override fun getSortKey(votes: Map<Party, Int>): Double? {
-            val prevWinner = votes.entries.maxBy { it.value }
-            if (prevWinner.let { partyChanges[it.key] ?: it.key } != party) {
+        override fun getSortKey(votes: Map<Party, Int>, prevWinner: Party): Double? {
+            if (prevWinner.let { partyChanges[it] ?: it } != party) {
                 return null
             }
             val adjustedVotes = Aggregators.adjustKey(votes) { partyChanges[it] ?: it }
@@ -439,17 +450,13 @@ class BattlegroundScreen private constructor(
     }
 
     private class TargetBattlegroundInput<T> : BattlegroundInput<T, Party>() {
-        override fun getSortKey(votes: Map<Party, Int>): Double? {
-            val prevWinner = votes.entries.maxBy { it.value }
-            if (prevWinner.let { partyChanges[it.key] ?: it.key } == party) {
+        override fun getSortKey(votes: Map<Party, Int>, prevWinner: Party): Double? {
+            if (prevWinner.let { partyChanges[it] ?: it } == party) {
                 return null
             }
             val adjustedVotes = Aggregators.adjustKey(votes) { partyChanges[it] ?: it }
             val partyPrevVotes = adjustedVotes[party] ?: 0
-            val prevWinnerVotes = adjustedVotes
-                .filter { it.key != party }
-                .maxOfOrNull { it.value }
-                ?: 0
+            val prevWinnerVotes = adjustedVotes[partyChanges[prevWinner] ?: prevWinner] ?: 0
             val total = votes.values.sum()
             return (prevWinnerVotes - partyPrevVotes) / total.toDouble()
         }
@@ -463,9 +470,8 @@ class BattlegroundScreen private constructor(
                 submit()
             }
 
-        override fun getSortKey(votes: Map<Party, Int>): Double? {
+        override fun getSortKey(votes: Map<Party, Int>, prevWinner: Party): Double? {
             val total = votes.values.sum()
-            val prevWinner = votes.entries.maxBy { it.value }.key
             if (!sequenceOf(party?.first)
                     .filterNotNull()
                     .flatMap { it.constituentParties }
@@ -567,20 +573,22 @@ class BattlegroundScreen private constructor(
     companion object {
         fun <T> singleParty(
             prevResultsPublisher: Flow.Publisher<out Map<T, Map<Party, Int>>>,
+            prevWinnersPublisher: Flow.Publisher<out Map<T, Party>>,
             currResultsPublisher: Flow.Publisher<out Map<T, PartyResult?>>,
             nameFunc: (T) -> String,
             partyPublisher: Flow.Publisher<out Party>,
         ): SinglePartyBuilder<T> {
-            return SinglePartyBuilder(prevResultsPublisher, currResultsPublisher, nameFunc, partyPublisher)
+            return SinglePartyBuilder(prevResultsPublisher, prevWinnersPublisher, currResultsPublisher, nameFunc, partyPublisher)
         }
 
         fun <T> doubleParty(
             prevResultsPublisher: Flow.Publisher<out Map<T, Map<Party, Int>>>,
+            prevWinnersPublisher: Flow.Publisher<out Map<T, Party>>,
             currResultsPublisher: Flow.Publisher<out Map<T, PartyResult?>>,
             nameFunc: (T) -> String,
             partyPublisher: Flow.Publisher<out Pair<PartyOrCoalition, PartyOrCoalition>>,
         ): DoublePartyBuilder<T> {
-            return DoublePartyBuilder(prevResultsPublisher, currResultsPublisher, nameFunc, partyPublisher)
+            return DoublePartyBuilder(prevResultsPublisher, prevWinnersPublisher, currResultsPublisher, nameFunc, partyPublisher)
         }
     }
 }

@@ -16,12 +16,12 @@ import java.util.concurrent.Flow
 
 class AllSeatsScreen private constructor(title: Flow.Publisher<out String?>, frame: ResultListingFrame, altText: Flow.Publisher<String>) : GenericPanel(pad(frame), title, altText) {
     class Builder<T>(
-        prevResultPublisher: Flow.Publisher<out Map<T, Map<Party, Int>>>,
+        prevWinnerPublisher: Flow.Publisher<out Map<T, Party>>,
         currResultPublisher: Flow.Publisher<out Map<T, PartyResult?>>,
         private val nameFunc: (T) -> String,
         headerPublisher: Flow.Publisher<out String?>,
     ) {
-        private val prevResults: Flow.Publisher<out Map<T, Map<Party, Int>>> = prevResultPublisher
+        private val prevWinner: Flow.Publisher<out Map<T, Party>> = prevWinnerPublisher
         private val currResults: Flow.Publisher<out Map<T, PartyResult?>> = currResultPublisher
         private val header: Flow.Publisher<out String?> = headerPublisher
         private var numRows: Flow.Publisher<out Int> = 20.asOneTimePublisher()
@@ -45,7 +45,7 @@ class AllSeatsScreen private constructor(title: Flow.Publisher<out String?>, fra
 
         fun build(titlePublisher: Flow.Publisher<out String?>): AllSeatsScreen {
             val inputs = Input(nameFunc)
-            prevResults.subscribe(Subscriber { inputs.setPrevResults(it) })
+            prevWinner.subscribe(Subscriber { inputs.setPrevWinners(it) })
             currResults.subscribe(Subscriber { inputs.setCurrResults(it) })
             seatFilter.subscribe(Subscriber { inputs.setSeatFilter(it) })
             partyChanges.subscribe(Subscriber { inputs.setPartyChanges(it) })
@@ -96,32 +96,21 @@ class AllSeatsScreen private constructor(title: Flow.Publisher<out String?>, fra
     }
 
     private class Input<T>(private val nameFunc: (T) -> String) {
-        private var prevResults: List<Pair<T, Party>> = emptyList()
+        private var prevWinners: List<Pair<T, Party>> = emptyList()
         private var currResults: Map<T, PartyResult?> = emptyMap()
         private var seatFilter: Set<T>? = null
         private var partyChanges: Map<Party, Party> = emptyMap()
 
         fun changedParty(party: Party): Party = partyChanges[party] ?: party
 
-        fun setPrevResults(prevResults: Map<T, Map<Party, Int>>) {
-            this.prevResults = prevResults.entries
+        fun setPrevWinners(prevWinners: Map<T, Party>) {
+            this.prevWinners = prevWinners.entries
                 .asSequence()
-                .map { e ->
-                    val votes = e.value
-                    val total = votes.values.sum()
-                    val topTwo = votes.values
-                        .sortedDescending()
-                        .take(2)
-                        .toList()
-                    Pair(e, 1.0 * (topTwo[0] - topTwo[1]) / total)
-                }
-                .sortedBy { e -> StringUtils.stripAccents(nameFunc(e.first.key)).uppercase() }
-                .map { it.first }
+                .sortedBy { e -> StringUtils.stripAccents(nameFunc(e.key)).uppercase() }
                 .map { e ->
                     Pair(
                         e.key,
-                        e.value.entries
-                            .maxByOrNull { it.value }!!.key,
+                        e.value,
                     )
                 }
                 .toList()
@@ -149,7 +138,7 @@ class AllSeatsScreen private constructor(title: Flow.Publisher<out String?>, fra
 
         val resultPublisher: Flow.Publisher<List<Entry<T>>> = Publisher(toEntries())
 
-        private fun toEntries() = this.prevResults
+        private fun toEntries() = this.prevWinners
             .asSequence()
             .filter { this.seatFilter?.contains(it.first) ?: true }
             .map {
@@ -179,12 +168,12 @@ class AllSeatsScreen private constructor(title: Flow.Publisher<out String?>, fra
     }
     companion object {
         fun <T> of(
-            prevResultPublisher: Flow.Publisher<out Map<T, Map<Party, Int>>>,
+            prevWinnerPublisher: Flow.Publisher<out Map<T, Party>>,
             currResultPublisher: Flow.Publisher<out Map<T, PartyResult?>>,
             nameFunc: (T) -> String,
             headerPublisher: Flow.Publisher<out String?>,
         ): Builder<T> {
-            return Builder(prevResultPublisher, currResultPublisher, nameFunc, headerPublisher)
+            return Builder(prevWinnerPublisher, currResultPublisher, nameFunc, headerPublisher)
         }
     }
 }
