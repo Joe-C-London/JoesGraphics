@@ -161,6 +161,12 @@ class GenericWindow<T : JPanel> constructor(private val panel: T, title: String)
                             } else {
                                 "<html>${it.replace("\n", "<br/>")}</html>"
                             }
+                        altText.foreground =
+                            if (it == null || it.length <= AltTextProvider.ALT_TEXT_MAX_LENGTH) {
+                                Color.WHITE
+                            } else {
+                                Color.RED
+                            }
                     },
                 ),
             )
