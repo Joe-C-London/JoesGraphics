@@ -31,7 +31,8 @@ class BattlegroundScreen private constructor(
     private val rightPanel: ResultListingFrame,
     private val leftColumns: Flow.Publisher<Int>,
     private val rightColumns: Flow.Publisher<Int>,
-    val headerColor: Flow.Publisher<Color>? = null,
+    headerColor: Flow.Publisher<Color>? = null,
+    altText: Flow.Publisher<String>,
 ) : GenericPanel(
     run {
         val panel = JPanel()
@@ -46,6 +47,7 @@ class BattlegroundScreen private constructor(
         panel
     },
     title,
+    altText,
 ) {
 
     init {
@@ -137,6 +139,51 @@ class BattlegroundScreen private constructor(
                 reversedPublisher = false.asOneTimePublisher(),
             )
 
+            val altText = run {
+                val meta = numRows.merge(party) { rows, party -> rows to party }
+                    .merge(currResults) { (rows, party), result -> Triple(rows, party, result.all { r -> r.value?.isElected ?: true }) }
+
+                val textGenerator: (List<Entry<T>>, Int, Party, Boolean, String, String) -> String? = {
+                        items, rows, party, allDone, winLabel, loseLabel ->
+                    if (items.none { it.isIncluded }) {
+                        null
+                    } else {
+                        val groups = items.mapIndexed { index, entry -> index / rows to entry }
+                            .filter { it.second.isIncluded }
+                            .groupBy({ it.first }, { it.second })
+                        groups.entries.joinToString("\n") { (column, entries) ->
+                            val categories = entries.groupBy {
+                                when {
+                                    it.currResult == null -> "PENDING"
+                                    it.currResult.party == party -> winLabel
+                                    else -> loseLabel
+                                }
+                            }.toSortedMap()
+                            val counts = categories.entries.joinToString {
+                                val count = if (it.key == "PENDING" || allDone) {
+                                    "${it.value.size}"
+                                } else {
+                                    "${it.value.count { e -> e.currResult?.isElected ?: false }}(${it.value.size})"
+                                }
+                                "$count ${it.key}"
+                            }
+                            "COLUMN ${column + 1}: $counts"
+                        }
+                    }
+                }
+
+                val targetsText = targetInput.items.merge(meta) { items, (rows, party, allDone) ->
+                    textGenerator(items, rows, party, allDone, "GAINS", "MISSES")
+                }.merge(party) { t, p -> if (t == null) null else "${p.abbreviation} TARGET SEATS\n$t" }
+
+                val defenseText = defenseInput.items.merge(meta) { items, (rows, party, allDone) ->
+                    textGenerator(items, rows, party, allDone, "HOLDS", "LOSSES")
+                }.merge(party) { t, p -> if (t == null) null else "${p.abbreviation} DEFENSE SEATS\n$t" }
+
+                targetsText.merge(defenseText) { t, d -> listOfNotNull(t, d).takeUnless { it.isEmpty() }?.joinToString("\n\n") }
+                    .merge(title) { t, h -> sequenceOf(h, t).filterNotNull().joinToString("\n\n") }
+            }
+
             return BattlegroundScreen(
                 title,
                 defenseFrame,
@@ -146,6 +193,7 @@ class BattlegroundScreen private constructor(
                 targetSeatCount
                     .merge(numRows) { c, n -> n * ceil(1.0 * c / n).toInt() },
                 party.map { it.color },
+                altText = altText,
             )
         }
     }
@@ -241,6 +289,52 @@ class BattlegroundScreen private constructor(
                 reversedPublisher = false.asOneTimePublisher(),
             )
 
+            val altText = run {
+                val meta = numRows.merge(parties) { rows, party -> rows to party }
+                    .merge(currResults) { (rows, party), result -> Triple(rows, party, result.all { r -> r.value?.isElected ?: true }) }
+
+                val textGenerator: (List<Entry<T>>, Int, PartyOrCoalition, PartyOrCoalition, Boolean) -> String? = {
+                        items, rows, party, othParty, allDone ->
+                    if (items.none { it.isIncluded }) {
+                        null
+                    } else {
+                        val groups = items.mapIndexed { index, entry -> index / rows to entry }
+                            .filter { it.second.isIncluded }
+                            .groupBy({ it.first }, { it.second })
+                        groups.entries.joinToString("\n") { (column, entries) ->
+                            val categories = entries.groupBy {
+                                when {
+                                    it.currResult == null -> "PENDING"
+                                    it.currResult.party == party || party.constituentParties.contains(it.currResult.party) -> "HOLDS"
+                                    it.currResult.party == othParty || othParty.constituentParties.contains(it.currResult.party) -> "LOSSES TO ${othParty.abbreviation}"
+                                    else -> "OTHER LOSSES"
+                                }
+                            }.toSortedMap()
+                            val counts = categories.entries.joinToString {
+                                val count = if (it.key == "PENDING" || allDone) {
+                                    "${it.value.size}"
+                                } else {
+                                    "${it.value.count { e -> e.currResult?.isElected ?: false }}(${it.value.size})"
+                                }
+                                "$count ${it.key}"
+                            }
+                            "COLUMN ${column + 1}: $counts"
+                        }
+                    }
+                }
+
+                val targetsText = leftInput.items.merge(meta) { items, (rows, party, allDone) ->
+                    textGenerator(items, rows, party.first, party.second, allDone)
+                }.merge(parties) { t, p -> if (t == null) null else "${headerFunc(p.first)}\n$t" }
+
+                val defenseText = rightInput.items.merge(meta) { items, (rows, party, allDone) ->
+                    textGenerator(items, rows, party.second, party.first, allDone)
+                }.merge(parties) { t, p -> if (t == null) null else "${headerFunc(p.second)}\n$t" }
+
+                targetsText.merge(defenseText) { t, d -> listOfNotNull(t, d).takeUnless { it.isEmpty() }?.joinToString("\n\n") }
+                    .merge(title) { t, h -> sequenceOf(h, t).filterNotNull().joinToString("\n\n") }
+            }
+
             return BattlegroundScreen(
                 title,
                 leftFrame,
@@ -249,6 +343,7 @@ class BattlegroundScreen private constructor(
                     .merge(numRows) { c, n -> n * ceil(1.0 * c / n).toInt() },
                 rightSeatCount
                     .merge(numRows) { c, n -> n * ceil(1.0 * c / n).toInt() },
+                altText = altText,
             )
         }
     }
@@ -307,35 +402,17 @@ class BattlegroundScreen private constructor(
                     if (margin == null) {
                         null
                     } else {
-                        Triple(e.key, margin, prevWinner.color)
+                        Triple(e.key, margin, prevWinner)
                     }
                 }
                 .sortedBy { it.second }
                 .take(count)
                 .map {
-                    val partyResult = curr[it.first]
-                    val resultColor: Color
-                    val fill: Boolean
-                    if (partyResult == null) {
-                        resultColor = Color.LIGHT_GRAY
-                        fill = false
-                    } else {
-                        resultColor = partyResult.party.color
-                        fill = partyResult.isElected
-                    }
-                    val colorFunc =
-                        if (filteredSeats?.contains(it.first) != false) {
-                            { c: Color -> c }
-                        } else {
-                            { c ->
-                                ColorUtils.lighten(ColorUtils.lighten(c))
-                            }
-                        }
                     Entry(
                         it.first,
-                        colorFunc(it.third),
-                        colorFunc(resultColor),
-                        fill,
+                        it.third,
+                        curr[it.first],
+                        filteredSeats?.contains(it.first) ?: true,
                     )
                 }
                 .toList()
@@ -416,7 +493,18 @@ class BattlegroundScreen private constructor(
         }
     }
 
-    private class Entry<T>(val key: T, val prevColor: Color, val resultColor: Color, val fill: Boolean)
+    private class Entry<T>(val key: T, val prevWinner: Party, val currResult: PartyResult?, val isIncluded: Boolean) {
+        fun colorFunc(c: Color): Color {
+            return if (isIncluded) {
+                c
+            } else {
+                ColorUtils.lighten(ColorUtils.lighten(c))
+            }
+        }
+        val prevColor: Color = colorFunc(prevWinner.color)
+        val resultColor: Color = colorFunc(currResult?.party?.color ?: Color.LIGHT_GRAY)
+        val fill: Boolean = currResult?.isElected ?: false
+    }
 
     private class Layout(val parent: JPanel) : LayoutManager {
         private var leftColumn = 0

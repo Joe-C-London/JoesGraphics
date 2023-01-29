@@ -1,5 +1,6 @@
 package com.joecollins.graphics.screens.generic
 
+import com.joecollins.graphics.utils.PublisherTestUtils.assertPublishes
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.models.general.Coalition
 import com.joecollins.models.general.Party
@@ -34,28 +35,105 @@ class BattlegroundScreenTest {
             .build(title)
         panel.setSize(1024, 512)
         compareRendering("BattlegroundScreen", "Basic-SingleParty-1", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            NDP BATTLEGROUND
+
+            NDP TARGET SEATS
+            COLUMN 1: 15 PENDING
+            COLUMN 2: 15 PENDING
+
+            NDP DEFENSE SEATS
+            COLUMN 1: 15 PENDING
+            """.trimIndent(),
+        )
+
         party.submit(lib)
         targetSeats.submit(15)
         defenseSeats.submit(30)
         title.submit("LIBERAL BATTLEGROUND")
         compareRendering("BattlegroundScreen", "Basic-SingleParty-2", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            LIBERAL BATTLEGROUND
+
+            LIB TARGET SEATS
+            COLUMN 1: 15 PENDING
+
+            LIB DEFENSE SEATS
+            COLUMN 1: 15 PENDING
+            COLUMN 2: 15 PENDING
+            """.trimIndent(),
+        )
+
         currResult.submit(bcCurrResult())
         compareRendering("BattlegroundScreen", "Basic-SingleParty-3", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            LIBERAL BATTLEGROUND
+
+            LIB TARGET SEATS
+            COLUMN 1: 14(15) MISSES
+
+            LIB DEFENSE SEATS
+            COLUMN 1: 1(6) HOLDS, 4(9) LOSSES
+            COLUMN 2: 3(9) HOLDS, 0(6) LOSSES
+            """.trimIndent(),
+        )
+
         party.submit(grn)
         targetSeats.submit(30)
         defenseSeats.submit(5)
         title.submit("GREEN BATTLEGROUND")
         compareRendering("BattlegroundScreen", "Basic-SingleParty-4", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            GREEN BATTLEGROUND
+
+            GRN TARGET SEATS
+            COLUMN 1: 7(15) MISSES
+            COLUMN 2: 8(15) MISSES
+
+            GRN DEFENSE SEATS
+            COLUMN 1: 1(2) HOLDS, 1(1) LOSSES
+            """.trimIndent(),
+        )
+
         party.submit(ndp)
         targetSeats.submit(30)
         defenseSeats.submit(0)
         title.submit("NDP TARGETS")
         compareRendering("BattlegroundScreen", "Basic-SingleParty-5", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            NDP TARGETS
+
+            NDP TARGET SEATS
+            COLUMN 1: 4(9) GAINS, 2(6) MISSES
+            COLUMN 2: 0(5) GAINS, 2(10) MISSES
+            """.trimIndent(),
+        )
+
         party.submit(lib)
         targetSeats.submit(0)
         defenseSeats.submit(30)
         title.submit("LIBERAL DEFENSE")
         compareRendering("BattlegroundScreen", "Basic-SingleParty-6", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            LIBERAL DEFENSE
+
+            LIB DEFENSE SEATS
+            COLUMN 1: 1(6) HOLDS, 4(9) LOSSES
+            COLUMN 2: 3(9) HOLDS, 0(6) LOSSES
+            """.trimIndent(),
+        )
     }
 
     @Test
@@ -84,12 +162,58 @@ class BattlegroundScreenTest {
             .build(title)
         panel.setSize(1024, 512)
         compareRendering("BattlegroundScreen", "Filtered-SingleParty-1", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            NDP BATTLEGROUND
+
+            NDP TARGET SEATS
+            COLUMN 1: 2 PENDING
+
+            NDP DEFENSE SEATS
+            COLUMN 1: 1 PENDING
+            """.trimIndent(),
+        )
+
         currResult.submit(bcCurrResult())
         compareRendering("BattlegroundScreen", "Filtered-SingleParty-2", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            NDP BATTLEGROUND
+
+            NDP TARGET SEATS
+            COLUMN 1: 0(1) GAINS, 0(1) MISSES
+
+            NDP DEFENSE SEATS
+            COLUMN 1: 1(1) HOLDS
+            """.trimIndent(),
+        )
+
         filteredSeats.submit(emptySet())
         compareRendering("BattlegroundScreen", "Filtered-SingleParty-3", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            NDP BATTLEGROUND
+            """.trimIndent(),
+        )
+
         filteredSeats.submit(null)
         compareRendering("BattlegroundScreen", "Filtered-SingleParty-4", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            NDP BATTLEGROUND
+
+            NDP TARGET SEATS
+            COLUMN 1: 4(9) GAINS, 2(6) MISSES
+            COLUMN 2: 0(5) GAINS, 2(10) MISSES
+
+            NDP DEFENSE SEATS
+            COLUMN 1: 15(15) HOLDS
+            """.trimIndent(),
+        )
     }
 
     @Test
@@ -112,24 +236,100 @@ class BattlegroundScreenTest {
             .build(title)
         panel.setSize(1024, 512)
         compareRendering("BattlegroundScreen", "Basic-DoubleParty-1", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            BATTLEGROUND
+            
+            NDP PREVIOUS SEATS
+            COLUMN 1: 15 PENDING
+            
+            LIB PREVIOUS SEATS
+            COLUMN 1: 15 PENDING
+            COLUMN 2: 15 PENDING
+            """.trimIndent(),
+        )
+
         parties.submit(grn to lib)
         rightSeats.submit(30)
         leftSeats.submit(15)
         compareRendering("BattlegroundScreen", "Basic-DoubleParty-2", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            BATTLEGROUND
+            
+            GRN PREVIOUS SEATS
+            COLUMN 1: 3 PENDING
+            
+            LIB PREVIOUS SEATS
+            COLUMN 1: 15 PENDING
+            COLUMN 2: 15 PENDING
+            """.trimIndent(),
+        )
+
         currResult.submit(bcCurrResult())
         compareRendering("BattlegroundScreen", "Basic-DoubleParty-3", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            BATTLEGROUND
+            
+            GRN PREVIOUS SEATS
+            COLUMN 1: 1(2) HOLDS, 1(1) OTHER LOSSES
+            
+            LIB PREVIOUS SEATS
+            COLUMN 1: 0(6) HOLDS, 1(9) OTHER LOSSES
+            COLUMN 2: 6(9) HOLDS, 3(6) OTHER LOSSES
+            """.trimIndent(),
+        )
+
         parties.submit(ndp to grn)
         rightSeats.submit(15)
         leftSeats.submit(15)
         compareRendering("BattlegroundScreen", "Basic-DoubleParty-4", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            BATTLEGROUND
+            
+            NDP PREVIOUS SEATS
+            COLUMN 1: 13(15) HOLDS
+            
+            GRN PREVIOUS SEATS
+            COLUMN 1: 1(2) HOLDS, 1(1) LOSSES TO NDP
+            """.trimIndent(),
+        )
+
         parties.submit(ndp to lib)
         rightSeats.submit(30)
         leftSeats.submit(0)
         compareRendering("BattlegroundScreen", "Basic-DoubleParty-5", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            BATTLEGROUND
+            
+            LIB PREVIOUS SEATS
+            COLUMN 1: 1(5) HOLDS, 4(10) LOSSES TO NDP
+            COLUMN 2: 3(10) HOLDS, 0(5) LOSSES TO NDP
+            """.trimIndent(),
+        )
+
         parties.submit(ndp to lib)
         rightSeats.submit(0)
         leftSeats.submit(30)
         compareRendering("BattlegroundScreen", "Basic-DoubleParty-6", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            BATTLEGROUND
+            
+            NDP PREVIOUS SEATS
+            COLUMN 1: 15(15) HOLDS
+            COLUMN 2: 13(15) HOLDS
+            """.trimIndent(),
+        )
     }
 
     @Test
@@ -152,6 +352,20 @@ class BattlegroundScreenTest {
             .build(title)
         panel.setSize(1024, 512)
         compareRendering("BattlegroundScreen", "Basic-DoubleCoalition-1", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            BATTLEGROUND
+            
+            NDP/GRN PREVIOUS SEATS
+            COLUMN 1: 15 PENDING
+            COLUMN 2: 15 PENDING
+            
+            LIB PREVIOUS SEATS
+            COLUMN 1: 15 PENDING
+            COLUMN 2: 15 PENDING
+            """.trimIndent(),
+        )
     }
 
     @Test
@@ -175,28 +389,105 @@ class BattlegroundScreenTest {
             .build(title)
         panel.setSize(1024, 512)
         compareRendering("BattlegroundScreen", "Basic-SingleParty-1", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            NDP BATTLEGROUND
+
+            NDP TARGET SEATS
+            COLUMN 1: 15 PENDING
+            COLUMN 2: 15 PENDING
+
+            NDP DEFENSE SEATS
+            COLUMN 1: 15 PENDING
+            """.trimIndent(),
+        )
+
         party.submit(bcu)
         targetSeats.submit(15)
         defenseSeats.submit(30)
         title.submit("BC UNITED BATTLEGROUND")
         compareRendering("BattlegroundScreen", "Basic-SingleParty-PartyChange-2", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            BC UNITED BATTLEGROUND
+
+            BCU TARGET SEATS
+            COLUMN 1: 15 PENDING
+
+            BCU DEFENSE SEATS
+            COLUMN 1: 15 PENDING
+            COLUMN 2: 15 PENDING
+            """.trimIndent(),
+        )
+
         currResult.submit(bcCurrResult().mapValues { if (it.value.party == lib) PartyResult(bcu, it.value.elected) else it.value })
         compareRendering("BattlegroundScreen", "Basic-SingleParty-PartyChange-3", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            BC UNITED BATTLEGROUND
+
+            BCU TARGET SEATS
+            COLUMN 1: 14(15) MISSES
+
+            BCU DEFENSE SEATS
+            COLUMN 1: 1(6) HOLDS, 4(9) LOSSES
+            COLUMN 2: 3(9) HOLDS, 0(6) LOSSES
+            """.trimIndent(),
+        )
+
         party.submit(grn)
         targetSeats.submit(30)
         defenseSeats.submit(5)
         title.submit("GREEN BATTLEGROUND")
         compareRendering("BattlegroundScreen", "Basic-SingleParty-PartyChange-4", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            GREEN BATTLEGROUND
+
+            GRN TARGET SEATS
+            COLUMN 1: 7(15) MISSES
+            COLUMN 2: 8(15) MISSES
+
+            GRN DEFENSE SEATS
+            COLUMN 1: 1(2) HOLDS, 1(1) LOSSES
+            """.trimIndent(),
+        )
+
         party.submit(ndp)
         targetSeats.submit(30)
         defenseSeats.submit(0)
         title.submit("NDP TARGETS")
         compareRendering("BattlegroundScreen", "Basic-SingleParty-PartyChange-5", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            NDP TARGETS
+
+            NDP TARGET SEATS
+            COLUMN 1: 4(9) GAINS, 2(6) MISSES
+            COLUMN 2: 0(5) GAINS, 2(10) MISSES
+            """.trimIndent(),
+        )
+
         party.submit(bcu)
         targetSeats.submit(0)
         defenseSeats.submit(30)
         title.submit("BC UNITED DEFENSE")
         compareRendering("BattlegroundScreen", "Basic-SingleParty-PartyChange-6", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            BC UNITED DEFENSE
+
+            BCU DEFENSE SEATS
+            COLUMN 1: 1(6) HOLDS, 4(9) LOSSES
+            COLUMN 2: 3(9) HOLDS, 0(6) LOSSES
+            """.trimIndent(),
+        )
     }
 
     @Test
@@ -251,6 +542,18 @@ class BattlegroundScreenTest {
             .build("PENDULUM".asOneTimePublisher())
         panel.setSize(1024, 512)
         compareRendering("BattlegroundScreen", "Basic-DoublePartyPreferences-1", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            PENDULUM
+            
+            CLP PREVIOUS SEATS
+            COLUMN 1: 8 PENDING
+            
+            ALP PREVIOUS SEATS
+            COLUMN 1: 14 PENDING
+            """.trimIndent(),
+        )
     }
 
     companion object {
