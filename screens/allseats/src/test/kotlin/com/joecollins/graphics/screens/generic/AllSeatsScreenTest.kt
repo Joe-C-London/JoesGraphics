@@ -290,12 +290,78 @@ class AllSeatsScreenTest {
         )
     }
 
+    @Test
+    fun testAllSeatsGrouped() {
+        val prevResult = Publisher(bcPrevResult())
+        val currResult = Publisher<Map<String, PartyResult?>>(bcCurrResult().mapValues { null })
+        val numRows = Publisher(15)
+        val filteredSeats = Publisher(null as Set<String>?)
+        val title = Publisher("BRITISH COLUMBIA")
+        val panel = AllSeatsScreen.ofGrouped(
+            prevResult,
+            currResult,
+        ) { it.uppercase() }
+            .withNumRows(numRows)
+            .withSeatFilter(filteredSeats)
+            .let { builder ->
+                val regions = bcRegions()
+                BCRegion.values().fold(builder) { b, r ->
+                    b.withGroup(r.name.asOneTimePublisher()) { regions[it] == r }
+                }
+            }
+            .build(title)
+        panel.setSize(1024, 512)
+        compareRendering("AllSeatsScreen", "Grouped-1", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            BRITISH COLUMBIA
+            
+            VANCOUVER
+            PENDING NDP: 25
+            PENDING LIB: 15
+            
+            ISLAND
+            PENDING NDP: 10
+            PENDING GRN: 3
+            PENDING LIB: 1
+            
+            SOUTH
+            PENDING LIB: 16
+            PENDING NDP: 4
+            
+            NORTH
+            PENDING LIB: 11
+            PENDING NDP: 2
+            """.trimIndent(),
+        )
+
+        filteredSeats.submit(
+            bcPrevResult().keys
+                .filter { it.startsWith("Vancouver") }
+                .toSet(),
+        )
+        title.submit("CITY OF VANCOUVER")
+        compareRendering("AllSeatsScreen", "Grouped-2", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            CITY OF VANCOUVER
+            
+            VANCOUVER
+            PENDING NDP: 8
+            PENDING LIB: 3
+            """.trimIndent(),
+        )
+    }
+
     companion object {
         private val lib = Party("Liberal", "LIB", Color.RED)
         private val ndp = Party("New Democratic Party", "NDP", Color.ORANGE)
         private val grn = Party("Green", "GRN", Color.GREEN.darker())
         private val ind = Party("Independent", "IND", Color.GRAY)
         private val oth = Party.OTHERS
+
         private fun bcPrevResult(): Map<String, Party> {
             return mapOf(
                 "Nechako Lakes" to lib,
@@ -478,6 +544,99 @@ class AllSeatsScreenTest {
                 "Victoria-Beacon Hill" to elected(ndp),
                 "Victoria-Swan Lake" to elected(ndp),
             ).mapValues { it.value!! }
+        }
+
+        private enum class BCRegion { VANCOUVER, ISLAND, SOUTH, NORTH }
+        private fun bcRegions(): Map<String, BCRegion> {
+            return mapOf(
+                "Nechako Lakes" to BCRegion.NORTH,
+                "North Coast" to BCRegion.NORTH,
+                "Peace River North" to BCRegion.NORTH,
+                "Peace River South" to BCRegion.NORTH,
+                "Prince George-Mackenzie" to BCRegion.NORTH,
+                "Prince George-Valemount" to BCRegion.NORTH,
+                "Skeena" to BCRegion.NORTH,
+                "Stikine" to BCRegion.NORTH,
+                "Columbia River-Revelstoke" to BCRegion.SOUTH,
+                "Kootenay East" to BCRegion.SOUTH,
+                "Kootenay West" to BCRegion.SOUTH,
+                "Nelson-Creston" to BCRegion.SOUTH,
+                "Boundary-Similkameen" to BCRegion.SOUTH,
+                "Kelowna-Lake Country" to BCRegion.SOUTH,
+                "Kelowna-Mission" to BCRegion.SOUTH,
+                "Kelowna West" to BCRegion.SOUTH,
+                "Penticton" to BCRegion.SOUTH,
+                "Shuswap" to BCRegion.SOUTH,
+                "Vernon-Monashee" to BCRegion.SOUTH,
+                "Cariboo-Chilcotin" to BCRegion.NORTH,
+                "Cariboo North" to BCRegion.NORTH,
+                "Fraser-Nicola" to BCRegion.NORTH,
+                "Kamloops-North Thompson" to BCRegion.NORTH,
+                "Kamloops-South Thompson" to BCRegion.NORTH,
+                "Abbotsford-Mission" to BCRegion.SOUTH,
+                "Abbotsford South" to BCRegion.SOUTH,
+                "Abbotsford West" to BCRegion.SOUTH,
+                "Chilliwack" to BCRegion.SOUTH,
+                "Chilliwack-Kent" to BCRegion.SOUTH,
+                "Langley" to BCRegion.SOUTH,
+                "Langley East" to BCRegion.SOUTH,
+                "Maple Ridge-Mission" to BCRegion.SOUTH,
+                "Maple Ridge-Pitt Meadows" to BCRegion.SOUTH,
+                "Surrey-Cloverdale" to BCRegion.VANCOUVER,
+                "Surrey-Fleetwood" to BCRegion.VANCOUVER,
+                "Surrey-Green Timbers" to BCRegion.VANCOUVER,
+                "Surrey-Guildford" to BCRegion.VANCOUVER,
+                "Surrey-Newton" to BCRegion.VANCOUVER,
+                "Surrey-Panorama" to BCRegion.VANCOUVER,
+                "Surrey South" to BCRegion.VANCOUVER,
+                "Surrey-Whalley" to BCRegion.VANCOUVER,
+                "Surrey-White Rock" to BCRegion.VANCOUVER,
+                "Delta North" to BCRegion.VANCOUVER,
+                "Delta South" to BCRegion.VANCOUVER,
+                "Richmond North Centre" to BCRegion.VANCOUVER,
+                "Richmond-Queensborough" to BCRegion.VANCOUVER,
+                "Richmond South Centre" to BCRegion.VANCOUVER,
+                "Richmond-Steveston" to BCRegion.VANCOUVER,
+                "Burnaby-Deer Lake" to BCRegion.VANCOUVER,
+                "Burnaby-Edmonds" to BCRegion.VANCOUVER,
+                "Burnaby-Lougheed" to BCRegion.VANCOUVER,
+                "Burnaby North" to BCRegion.VANCOUVER,
+                "Coquitlam-Burke Mountain" to BCRegion.VANCOUVER,
+                "Coquitlam-Maillardville" to BCRegion.VANCOUVER,
+                "New Westminster" to BCRegion.VANCOUVER,
+                "Port Coquitlam" to BCRegion.VANCOUVER,
+                "Port Moody-Coquitlam" to BCRegion.VANCOUVER,
+                "Vancouver-Fairview" to BCRegion.VANCOUVER,
+                "Vancouver-False Creek" to BCRegion.VANCOUVER,
+                "Vancouver-Fraserview" to BCRegion.VANCOUVER,
+                "Vancouver-Hastings" to BCRegion.VANCOUVER,
+                "Vancouver-Kensington" to BCRegion.VANCOUVER,
+                "Vancouver-Kingsway" to BCRegion.VANCOUVER,
+                "Vancouver-Langara" to BCRegion.VANCOUVER,
+                "Vancouver-Mount Pleasant" to BCRegion.VANCOUVER,
+                "Vancouver-Point Grey" to BCRegion.VANCOUVER,
+                "Vancouver-Quilchena" to BCRegion.VANCOUVER,
+                "Vancouver-West End" to BCRegion.VANCOUVER,
+                "North Vancouver-Lonsdale" to BCRegion.VANCOUVER,
+                "North Vancouver-Seymour" to BCRegion.VANCOUVER,
+                "Powell River-Sunshine Coast" to BCRegion.VANCOUVER,
+                "West Vancouver-Capilano" to BCRegion.VANCOUVER,
+                "West Vancouver-Sea to Sky" to BCRegion.VANCOUVER,
+                "Courtenay-Comox" to BCRegion.ISLAND,
+                "Cowichan Valley" to BCRegion.ISLAND,
+                "Mid Island-Pacific Rim" to BCRegion.ISLAND,
+                "Nanaimo" to BCRegion.ISLAND,
+                "Nanaimo-North Cowichan" to BCRegion.ISLAND,
+                "North Island" to BCRegion.ISLAND,
+                "Parksville-Qualicum" to BCRegion.ISLAND,
+                "Esquimalt-Metchosin" to BCRegion.ISLAND,
+                "Langford-Juan de Fuca" to BCRegion.ISLAND,
+                "Oak Bay-Gordon Head" to BCRegion.ISLAND,
+                "Sannich North and the Islands" to BCRegion.ISLAND,
+                "Saanich South" to BCRegion.ISLAND,
+                "Victoria-Beacon Hill" to BCRegion.ISLAND,
+                "Victoria-Swan Lake" to BCRegion.ISLAND,
+            )
         }
     }
 }
