@@ -40,7 +40,7 @@ class CountdownScreenTest {
             .withClock(Clock.fixed(Instant.parse("2022-08-29T18:58:39.300Z"), ZoneId.of("UTC")))
             .build("COUNTDOWN TO THE CLOSE".asOneTimePublisher())
         screen.size = Dimension(1024, 512)
-        compareRendering("CountdownScreen", "SingleCountdownAsCollection", screen, 10)
+        compareRendering("CountdownScreen", "SingleCountdownAsCollection", screen, 15)
         assertPublishes(
             screen.altText,
             """

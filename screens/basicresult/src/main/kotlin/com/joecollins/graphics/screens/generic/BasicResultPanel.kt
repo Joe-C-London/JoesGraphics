@@ -1911,7 +1911,7 @@ class BasicResultPanel private constructor(
                                     }${
                                         if (total == 0.0 || total == null) "" else " (${PCT_FORMAT.format(it.value!! / total)})"
                                     }${
-                                        if (winner == it.key) " WINNER" else ""
+                                        if (winner == it.key && this.currPreferences.size > 1) " WINNER" else ""
                                     }"
                                 }
                     }

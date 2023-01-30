@@ -672,7 +672,7 @@ class PreferenceVoteViewPanelTest {
                 OTHERS: - (-9.3%)
                 
                 TWO CANDIDATE PREFERRED, 7 OF 7 POLLS REPORTING
-                KATE WORDEN (ALP): ELECTED WINNER
+                KATE WORDEN (ALP): ELECTED
                 
                 PREFERENCE SWING SINCE 2016: NOT AVAILABLE
             """.trimIndent(),
