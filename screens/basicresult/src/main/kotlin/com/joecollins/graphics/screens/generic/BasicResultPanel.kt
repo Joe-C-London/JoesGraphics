@@ -39,7 +39,7 @@ class BasicResultPanel private constructor(
     private val changeFrame: JPanel?,
     private val leftSupplementaryFrame: JPanel?,
     private val rightSupplementaryFrame: JPanel?,
-    altText: Flow.Publisher<String?>,
+    altText: Flow.Publisher<String>,
 ) : GenericPanel(
     run {
         val panel = JPanel()
@@ -661,7 +661,7 @@ class BasicResultPanel private constructor(
 
         protected abstract fun createBarFrameBuilder(bars: Flow.Publisher<List<BAR>>): BarFrameBuilder
 
-        private fun createAltText(textHeader: Flow.Publisher<out String?>): Flow.Publisher<String?> {
+        private fun createAltText(textHeader: Flow.Publisher<out String?>): Flow.Publisher<String> {
             val combineHeadAndSub: (String?, String?) -> String? = { h, s ->
                 if (h.isNullOrEmpty()) {
                     s
@@ -1233,7 +1233,7 @@ class BasicResultPanel private constructor(
             return secondMapBuilder?.createMapFrame()
         }
 
-        protected abstract fun createAltText(textHeader: Flow.Publisher<out String?>): Flow.Publisher<String?>
+        protected abstract fun createAltText(textHeader: Flow.Publisher<out String?>): Flow.Publisher<String>
     }
 
     private class BasicVoteScreenBuilder<KT : Any, KPT : PartyOrCoalition>(
@@ -1611,7 +1611,7 @@ class BasicResultPanel private constructor(
             return votes.entries.groupingBy { if (parties.contains(it.key)) it.key else Party.OTHERS }.fold(0) { a, e -> a + e.value }
         }
 
-        override fun createAltText(textHeader: Flow.Publisher<out String?>): Flow.Publisher<String?> {
+        override fun createAltText(textHeader: Flow.Publisher<out String?>): Flow.Publisher<String> {
             class Inputs {
 
                 var textHeader: String? = null
@@ -1934,7 +1934,7 @@ class BasicResultPanel private constructor(
                     }
                 }
 
-                val resultPublisher = Publisher<String?>()
+                val resultPublisher = Publisher<String>()
             }
             val inputs = Inputs()
             textHeader.subscribe(Subscriber { inputs.textHeader = it })
@@ -2191,7 +2191,7 @@ class BasicResultPanel private constructor(
             }
         }
 
-        override fun createAltText(textHeader: Flow.Publisher<out String?>): Flow.Publisher<String?> {
+        override fun createAltText(textHeader: Flow.Publisher<out String?>): Flow.Publisher<String> {
             val combineHeadAndSub: (String?, String?) -> String? = { h, s ->
                 if (h.isNullOrEmpty()) {
                     s
@@ -2418,7 +2418,7 @@ class BasicResultPanel private constructor(
             }
         }
 
-        private fun createAltText(textHeader: Flow.Publisher<out String?>): Flow.Publisher<String?> {
+        private fun createAltText(textHeader: Flow.Publisher<out String?>): Flow.Publisher<String> {
             val combineHeaderAndSubhead: (String?, String?) -> String? = { h, s ->
                 if (h == null) {
                     s

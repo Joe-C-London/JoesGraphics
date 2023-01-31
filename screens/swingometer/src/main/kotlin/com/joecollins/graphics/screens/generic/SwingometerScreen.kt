@@ -19,7 +19,7 @@ import kotlin.math.absoluteValue
 import kotlin.math.ceil
 import kotlin.math.roundToInt
 
-class SwingometerScreen private constructor(title: Flow.Publisher<out String?>, frame: SwingometerFrame, altText: Flow.Publisher<String?>) : GenericPanel(pad(frame), title, altText) {
+class SwingometerScreen private constructor(title: Flow.Publisher<out String?>, frame: SwingometerFrame, altText: Flow.Publisher<String>) : GenericPanel(pad(frame), title, altText) {
     class Builder<T> internal constructor(
         prevVotesPublisher: Flow.Publisher<out Map<T, Map<out PartyOrCoalition, Int>>>,
         resultsPublisher: Flow.Publisher<out Map<T, PartyResult?>>,
@@ -312,7 +312,7 @@ class SwingometerScreen private constructor(title: Flow.Publisher<out String?>, 
                 .build()
         }
 
-        private fun createAltText(title: Flow.Publisher<out String?>): Flow.Publisher<String?> {
+        private fun createAltText(title: Flow.Publisher<out String?>): Flow.Publisher<String> {
             val header: Flow.Publisher<String?> = title.merge(header) { t, h -> "$t\n$h" }
                 .merge(progressLabel) { t, p -> t + (if (p.isNullOrBlank()) "" else " [$p]") }
             val swing = inputs.valuePublisher.merge(inputs.partiesPublisher) { value, (left, right) ->

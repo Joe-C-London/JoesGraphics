@@ -18,7 +18,7 @@ class ProjectionScreen private constructor(
     imageAlignment: Flow.Publisher<out ProjectionFrame.Alignment>,
 ) : JPanel(), AltTextProvider {
 
-    override val altText: Flow.Publisher<String?> = text.map { t -> t?.let { "PROJECTION: $it" } }
+    override val altText: Flow.Publisher<String> = text.map { t -> t?.let { "PROJECTION: $it" } ?: "PROJECTION" }
 
     companion object {
         fun createScreen(

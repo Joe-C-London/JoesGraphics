@@ -21,7 +21,7 @@ import java.util.concurrent.Flow
 class TooCloseToCallScreen private constructor(
     titleLabel: Flow.Publisher<out String?>,
     multiSummaryFrame: MultiSummaryFrame,
-    altText: Flow.Publisher<String?>,
+    altText: Flow.Publisher<String>,
 ) : GenericPanel(pad(multiSummaryFrame), titleLabel, altText), AltTextProvider {
     private class Input<T> {
         var votes: Map<T, Map<Candidate, Int>> = HashMap()
@@ -154,7 +154,7 @@ class TooCloseToCallScreen private constructor(
             return TooCloseToCallScreen(titlePublisher, createFrame(input), createAltText(titlePublisher, input))
         }
 
-        private fun createAltText(titlePublisher: Flow.Publisher<out String?>, input: Input<T>): Flow.Publisher<String?> {
+        private fun createAltText(titlePublisher: Flow.Publisher<out String?>, input: Input<T>): Flow.Publisher<String> {
             val header = titlePublisher.merge(header) { title, header ->
                 if (title == null && header == null) {
                     null
@@ -186,9 +186,7 @@ class TooCloseToCallScreen private constructor(
                         "(...)"
                     }
                 }.joinToString("\n").let { it.ifEmpty { "(empty)" } }
-                if (entriesText.isEmpty()) {
-                    head
-                } else if (head.isNullOrEmpty()) {
+                if (head.isNullOrEmpty()) {
                     entriesText
                 } else {
                     "${head}\n$entriesText"

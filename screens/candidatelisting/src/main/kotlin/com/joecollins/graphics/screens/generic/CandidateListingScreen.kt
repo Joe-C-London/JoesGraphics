@@ -28,7 +28,7 @@ class CandidateListingScreen private constructor(
     prevPanel: JPanel?,
     secondaryPrevPanel: JPanel?,
     mapPanel: JPanel?,
-    override val altText: Flow.Publisher<String?>,
+    override val altText: Flow.Publisher<String>,
 ) : JPanel(), AltTextProvider {
 
     init {
@@ -212,7 +212,7 @@ class CandidateListingScreen private constructor(
                 .build()
         }
 
-        private fun createAltText(title: Flow.Publisher<out String>): Flow.Publisher<String?> {
+        private fun createAltText(title: Flow.Publisher<out String>): Flow.Publisher<String> {
             val candidatesTitle = candidateHeader.merge(candidateSubhead) { h, s ->
                 if (s.isNullOrBlank()) {
                     h
@@ -223,7 +223,7 @@ class CandidateListingScreen private constructor(
             val candidates = this.candidates.map { candidates ->
                 candidates.joinToString("\n") { "${it.name.uppercase()}${if (it.incumbent && incumbentMarker != null) " $incumbentMarker" else ""} (${it.party.abbreviation})" }
             }.merge(candidatesTitle) { cList, cTitle -> "$cTitle\n$cList" }
-            var ret: Flow.Publisher<String?> = title.merge(candidates) { t, c -> "$t\n\n$c" }
+            var ret = title.merge(candidates) { t, c -> "$t\n\n$c" }
             if (prevVotes != null) {
                 ret = ret.merge(createPrevAltText(prevVotes!!, prevVoteHeader, prevVoteSubhead)) { r, prev -> "$r\n\n$prev" }
             }
