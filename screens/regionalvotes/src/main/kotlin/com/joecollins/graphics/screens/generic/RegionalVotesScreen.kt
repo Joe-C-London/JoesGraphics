@@ -14,7 +14,6 @@ import com.joecollins.pubsub.merge
 import java.awt.Color
 import java.awt.GridLayout
 import java.text.DecimalFormat
-import java.util.LinkedList
 import java.util.concurrent.Flow
 import javax.swing.JPanel
 import kotlin.math.absoluteValue
@@ -32,22 +31,46 @@ class RegionalVotesScreen(subPanels: List<GenericPanel>) : JPanel(), AltTextProv
             .combine()
             .map { p -> p.filterNotNull().joinToString("\n\n") }
 
-    class CurrPrevBuilder(
-        private val voteHeader: Flow.Publisher<String>,
-        private val changeHeader: Flow.Publisher<String>,
-        private val voteSubhead: Flow.Publisher<out String?>,
-        private val changeSubhead: Flow.Publisher<out String?>,
+    class CurrPrevBuilder<R> internal constructor(
+        private val regions: List<R>,
+        private val title: (R) -> Flow.Publisher<String>,
+        private val currVotes: (R) -> Flow.Publisher<out Map<out PartyOrCoalition, Int>>,
+        private val prevVotes: (R) -> Flow.Publisher<out Map<out PartyOrCoalition, Int>>,
+        private val voteHeader: (R) -> Flow.Publisher<String>,
+        private val changeHeader: (R) -> Flow.Publisher<String>,
+        private val voteSubhead: (R) -> Flow.Publisher<out String?>,
+        private val changeSubhead: (R) -> Flow.Publisher<out String?>,
     ) {
-        private val panels = LinkedList<GenericPanel>()
+        private var pctReporting: (R) -> Flow.Publisher<Double> = { 1.0.asOneTimePublisher() }
+        private var progressLabel: (R) -> Flow.Publisher<out String?> = { null.asOneTimePublisher() }
 
-        fun withRegion(
-            title: Flow.Publisher<String>,
-            currVotes: Flow.Publisher<out Map<out PartyOrCoalition, Int>>,
-            prevVotes: Flow.Publisher<out Map<out PartyOrCoalition, Int>>,
-            pctReporting: Flow.Publisher<Double> = 1.0.asOneTimePublisher(),
-            progressLabel: Flow.Publisher<out String?> = null.asOneTimePublisher(),
-        ): CurrPrevBuilder {
+        fun withPctReporting(pctReporting: (R) -> Flow.Publisher<Double>): CurrPrevBuilder<R> {
+            this.pctReporting = pctReporting
+            return this
+        }
+
+        fun withProgressLabel(progressLabel: (R) -> Flow.Publisher<out String?>): CurrPrevBuilder<R> {
+            this.progressLabel = progressLabel
+            return this
+        }
+
+        fun build(): RegionalVotesScreen {
+            return RegionalVotesScreen(regions.map { buildPanel(it) })
+        }
+
+        private fun buildPanel(region: R): GenericPanel {
             data class Entry(val party: PartyOrCoalition, val pct: Double?, val prev: Double)
+
+            val title = title(region)
+            val currVotes = currVotes(region)
+            val voteHeader = voteHeader(region)
+            val voteSubhead = voteSubhead(region)
+            val prevVotes = prevVotes(region)
+            val changeHeader = changeHeader(region)
+            val changeSubhead = changeSubhead(region)
+            val pctReporting = pctReporting(region)
+            val progressLabel = progressLabel(region)
+
             val entries = currVotes.merge(prevVotes) { curr, prev ->
                 val currTotal = curr.values.sum().toDouble()
                 val prevTotal = prev.values.sum().toDouble()
@@ -139,29 +162,26 @@ class RegionalVotesScreen(subPanels: List<GenericPanel>) : JPanel(), AltTextProv
                     .merge(title) { r, t -> "$t\n$r" }
                     .merge(entriesText) { t, e -> if (e.isEmpty()) t else "$t\n$e" }
             }
-            panels.add(
-                GenericPanel(
-                    panel,
-                    title,
-                    altText,
-                ),
+            return GenericPanel(
+                panel,
+                title,
+                altText,
             )
-            return this
-        }
-
-        fun build(): RegionalVotesScreen {
-            return RegionalVotesScreen(panels)
         }
     }
 
     companion object {
-        fun ofCurrPrev(
-            voteHeader: Flow.Publisher<String>,
-            changeHeader: Flow.Publisher<String>,
-            voteSubhead: Flow.Publisher<out String?> = (null as String?).asOneTimePublisher(),
-            changeSubhead: Flow.Publisher<out String?> = (null as String?).asOneTimePublisher(),
-        ): CurrPrevBuilder {
-            return CurrPrevBuilder(voteHeader, changeHeader, voteSubhead, changeSubhead)
+        fun <R> ofCurrPrev(
+            regions: List<R>,
+            title: (R) -> Flow.Publisher<String>,
+            currVotes: (R) -> Flow.Publisher<out Map<out PartyOrCoalition, Int>>,
+            prevVotes: (R) -> Flow.Publisher<out Map<out PartyOrCoalition, Int>>,
+            voteHeader: (R) -> Flow.Publisher<String>,
+            changeHeader: (R) -> Flow.Publisher<String>,
+            voteSubhead: (R) -> Flow.Publisher<out String?> = { null.asOneTimePublisher() },
+            changeSubhead: (R) -> Flow.Publisher<out String?> = { null.asOneTimePublisher() },
+        ): CurrPrevBuilder<R> {
+            return CurrPrevBuilder(regions, title, currVotes, prevVotes, voteHeader, changeHeader, voteSubhead, changeSubhead)
         }
     }
 }

@@ -12,33 +12,36 @@ class RegionalVotesScreenTest {
 
     @Test
     fun testRegionalVotesCurrPrev() {
-        val generalCurr = Publisher(emptyMap<Party, Int>())
-        val maoriCurr = Publisher(emptyMap<Party, Int>())
-        val generalPrev = Publisher(emptyMap<Party, Int>())
-        val maoriPrev = Publisher(emptyMap<Party, Int>())
-        val generalReporting = Publisher(0.0)
-        val maoriReporting = Publisher(0.0)
-        val generalProgress = Publisher("0/65")
-        val maoriProgress = Publisher("0/7")
+        val general = "General"
+        val maori = "Maori"
+
+        val curr = mapOf(
+            general to Publisher(emptyMap<Party, Int>()),
+            maori to Publisher(emptyMap<Party, Int>()),
+        )
+        val prev = mapOf(
+            general to Publisher(emptyMap<Party, Int>()),
+            maori to Publisher(emptyMap<Party, Int>()),
+        )
+        val reporting = mapOf(
+            general to Publisher(0.0),
+            maori to Publisher(0.0),
+        )
+        val progress = mapOf(
+            general to Publisher("0/65"),
+            maori to Publisher("0/7"),
+        )
 
         val panel = RegionalVotesScreen.ofCurrPrev(
-            voteHeader = "PARTY VOTES".asOneTimePublisher(),
-            changeHeader = "CHANGE SINCE 2017".asOneTimePublisher(),
+            listOf(general, maori),
+            { "$it electorates".uppercase().asOneTimePublisher() },
+            { curr[it]!! },
+            { prev[it]!! },
+            { "PARTY VOTES".asOneTimePublisher() },
+            { "CHANGE SINCE 2017".asOneTimePublisher() },
         )
-            .withRegion(
-                title = "GENERAL ELECTORATES".asOneTimePublisher(),
-                currVotes = generalCurr,
-                prevVotes = generalPrev,
-                pctReporting = generalReporting,
-                progressLabel = generalProgress,
-            )
-            .withRegion(
-                title = "MAORI ELECTORATES".asOneTimePublisher(),
-                currVotes = maoriCurr,
-                prevVotes = maoriPrev,
-                pctReporting = maoriReporting,
-                progressLabel = maoriProgress,
-            )
+            .withPctReporting { reporting[it]!! }
+            .withProgressLabel { progress[it]!! }
             .build()
         panel.setSize(1024, 512)
         compareRendering("RegionalVotesScreen", "CurrPrev-1", panel)
@@ -61,7 +64,7 @@ class RegionalVotesScreenTest {
         val mri = Party("Maori", "MRI", Color.PINK)
         val oth = Party.OTHERS
 
-        generalCurr.submit(
+        curr[general]!!.submit(
             mapOf(
                 act to 2724,
                 grn to 6937,
@@ -71,7 +74,7 @@ class RegionalVotesScreenTest {
                 oth to 1529,
             ),
         )
-        generalPrev.submit(
+        prev[general]!!.submit(
             mapOf(
                 act to 317,
                 grn to 4170,
@@ -81,8 +84,8 @@ class RegionalVotesScreenTest {
                 oth to 1242,
             ),
         )
-        generalReporting.submit(1.0 / 65)
-        generalProgress.submit("1/65")
+        reporting[general]!!.submit(1.0 / 65)
+        progress[general]!!.submit("1/65")
         compareRendering("RegionalVotesScreen", "CurrPrev-2", panel)
         assertPublishes(
             panel.altText,
@@ -101,7 +104,7 @@ class RegionalVotesScreenTest {
             """.trimIndent(),
         )
 
-        maoriCurr.submit(
+        curr[maori]!!.submit(
             mapOf(
                 grn to 1557,
                 lab to 15884,
@@ -111,7 +114,7 @@ class RegionalVotesScreenTest {
                 oth to 2275,
             ),
         )
-        maoriPrev.submit(
+        prev[maori]!!.submit(
             mapOf(
                 grn to 1193,
                 lab to 14279,
@@ -121,8 +124,8 @@ class RegionalVotesScreenTest {
                 oth to 1177,
             ),
         )
-        maoriReporting.submit(1.0 / 7)
-        maoriProgress.submit("1/7")
+        reporting[maori]!!.submit(1.0 / 7)
+        progress[maori]!!.submit("1/7")
         compareRendering("RegionalVotesScreen", "CurrPrev-3", panel)
         assertPublishes(
             panel.altText,
@@ -147,7 +150,7 @@ class RegionalVotesScreenTest {
             """.trimIndent(),
         )
 
-        generalCurr.submit(
+        curr[general]!!.submit(
             mapOf(
                 act to 216444,
                 grn to 211876,
@@ -157,7 +160,7 @@ class RegionalVotesScreenTest {
                 oth to 145337,
             ),
         )
-        generalPrev.submit(
+        prev[general]!!.submit(
             mapOf(
                 act to 12865,
                 grn to 152638,
@@ -167,10 +170,10 @@ class RegionalVotesScreenTest {
                 oth to 92167,
             ),
         )
-        generalReporting.submit(1.0)
-        generalProgress.submit("65/65")
+        reporting[general]!!.submit(1.0)
+        progress[general]!!.submit("65/65")
 
-        maoriCurr.submit(
+        curr[maori]!!.submit(
             mapOf(
                 grn to 14881,
                 lab to 115870,
@@ -180,7 +183,7 @@ class RegionalVotesScreenTest {
                 oth to 17222,
             ),
         )
-        maoriPrev.submit(
+        prev[maori]!!.submit(
             mapOf(
                 grn to 9805,
                 lab to 97281,
@@ -190,8 +193,8 @@ class RegionalVotesScreenTest {
                 oth to 9682,
             ),
         )
-        maoriReporting.submit(1.0)
-        maoriProgress.submit("7/7")
+        reporting[maori]!!.submit(1.0)
+        progress[maori]!!.submit("7/7")
 
         compareRendering("RegionalVotesScreen", "CurrPrev-4", panel)
         assertPublishes(
