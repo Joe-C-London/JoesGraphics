@@ -17,11 +17,11 @@ class RegionalVotesScreenTest {
 
         val curr = mapOf(
             general to Publisher(emptyMap<Party, Int>()),
-            maori to Publisher(emptyMap<Party, Int>()),
+            maori to Publisher(emptyMap()),
         )
         val prev = mapOf(
             general to Publisher(emptyMap<Party, Int>()),
-            maori to Publisher(emptyMap<Party, Int>()),
+            maori to Publisher(emptyMap()),
         )
         val reporting = mapOf(
             general to Publisher(0.0),

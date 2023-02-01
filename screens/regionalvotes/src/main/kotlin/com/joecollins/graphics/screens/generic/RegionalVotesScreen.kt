@@ -138,9 +138,9 @@ class RegionalVotesScreen(subPanels: List<GenericPanel>) : JPanel(), AltTextProv
                 }
             }
             val altText = run {
-                val voteTop = voteHeader.merge(progressLabel) { h, p -> if (p == null) h else "$h [$p]" }
-                    .merge(voteSubhead) { h, s -> if (s == null) h else "$h, $s" }
-                val changeTop = changeHeader.merge(changeSubhead) { h, s -> if (s == null) h else "$h, $s" }
+                val voteTop = voteHeader.merge(progressLabel) { h, p -> if (p.isNullOrEmpty()) h else "$h [$p]" }
+                    .merge(voteSubhead) { h, s -> if (s.isNullOrEmpty()) h else "$h, $s" }
+                val changeTop = changeHeader.merge(changeSubhead) { h, s -> if (s.isNullOrEmpty()) h else "$h, $s" }
                 val entriesText = entries.map { e ->
                     e.joinToString("\n") {
                         "${it.party.name.uppercase()}: ${
