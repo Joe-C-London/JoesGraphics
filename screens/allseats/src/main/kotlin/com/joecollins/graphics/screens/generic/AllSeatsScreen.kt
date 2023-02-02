@@ -30,11 +30,11 @@ import kotlin.math.roundToInt
 class AllSeatsScreen private constructor(title: Flow.Publisher<out String?>, frame: JPanel, altText: Flow.Publisher<String>) : GenericPanel(pad(frame), title, altText) {
     @Suppress("UNCHECKED_CAST")
     abstract class AbstractBuilder<T, B : AbstractBuilder<T, B>>(
-        prevWinnerPublisher: Flow.Publisher<out Map<T, Party>>,
+        prevWinnerPublisher: Flow.Publisher<out Map<T, Party?>>,
         currResultPublisher: Flow.Publisher<out Map<T, PartyResult?>>,
         internal val nameFunc: (T) -> String,
     ) {
-        internal val prevWinner: Flow.Publisher<out Map<T, Party>> = prevWinnerPublisher
+        internal val prevWinner: Flow.Publisher<out Map<T, Party?>> = prevWinnerPublisher
         internal val currResults: Flow.Publisher<out Map<T, PartyResult?>> = currResultPublisher
         internal var numRows: Flow.Publisher<out Int> = 20.asOneTimePublisher()
         internal var seatFilter: Flow.Publisher<out Set<T>?> = (null as Set<T>?).asOneTimePublisher()
@@ -59,7 +59,7 @@ class AllSeatsScreen private constructor(title: Flow.Publisher<out String?>, fra
     }
 
     class Builder<T>(
-        prevWinnerPublisher: Flow.Publisher<out Map<T, Party>>,
+        prevWinnerPublisher: Flow.Publisher<out Map<T, Party?>>,
         currResultPublisher: Flow.Publisher<out Map<T, PartyResult?>>,
         nameFunc: (T) -> String,
         headerPublisher: Flow.Publisher<out String?>,
@@ -95,10 +95,11 @@ class AllSeatsScreen private constructor(title: Flow.Publisher<out String?>, fra
                         .sortedByDescending { group -> group.value.size }
                         .joinToString("\n") { group ->
                             val label = group.key.let { (from, to) ->
-                                when (to) {
-                                    null -> "PENDING ${from.abbreviation}"
-                                    from -> "${to.abbreviation} HOLD"
-                                    inputs.changedParty(from) -> "${to.abbreviation} HOLD (${from.abbreviation})"
+                                when {
+                                    to == null -> "PENDING ${from?.abbreviation ?: "NEW"}"
+                                    to == from -> "${to.abbreviation} HOLD"
+                                    from == null -> "${to.abbreviation} WIN (NEW)"
+                                    to == inputs.changedParty(from) -> "${to.abbreviation} HOLD (${from.abbreviation})"
                                     else -> "${to.abbreviation} GAIN FROM ${from.abbreviation}"
                                 }
                             }
@@ -119,12 +120,12 @@ class AllSeatsScreen private constructor(title: Flow.Publisher<out String?>, fra
     }
 
     class GroupedBuilder<T>(
-        prevWinnerPublisher: Flow.Publisher<out Map<T, Party>>,
+        prevWinnerPublisher: Flow.Publisher<out Map<T, Party?>>,
         currResultPublisher: Flow.Publisher<out Map<T, PartyResult?>>,
         nameFunc: (T) -> String,
     ) : AbstractBuilder<T, GroupedBuilder<T>>(prevWinnerPublisher, currResultPublisher, nameFunc) {
 
-        private data class Group<T>(val name: Flow.Publisher<String>, val prevWinners: Flow.Publisher<Map<T, Party>>)
+        private data class Group<T>(val name: Flow.Publisher<String>, val prevWinners: Flow.Publisher<Map<T, Party?>>)
         private val groups = LinkedList<Group<T>>()
 
         fun withGroup(name: Flow.Publisher<String>, predicate: (T) -> Boolean): GroupedBuilder<T> {
@@ -132,7 +133,7 @@ class AllSeatsScreen private constructor(title: Flow.Publisher<out String?>, fra
             return this
         }
 
-        override fun build(titlePublisher: Flow.Publisher<out String?>): GenericPanel {
+        override fun build(titlePublisher: Flow.Publisher<out String?>): AllSeatsScreen {
             val outerPanel = JPanel()
             outerPanel.background = Color.WHITE
             outerPanel.border = EmptyBorder(-5, -5, -5, -5)
@@ -214,14 +215,14 @@ class AllSeatsScreen private constructor(title: Flow.Publisher<out String?>, fra
     }
 
     private class Input<T>(private val nameFunc: (T) -> String) {
-        private var prevWinners: List<Pair<T, Party>> = emptyList()
+        private var prevWinners: List<Pair<T, Party?>> = emptyList()
         private var currResults: Map<T, PartyResult?> = emptyMap()
         private var seatFilter: Set<T>? = null
         private var partyChanges: Map<Party, Party> = emptyMap()
 
         fun changedParty(party: Party): Party = partyChanges[party] ?: party
 
-        fun setPrevWinners(prevWinners: Map<T, Party>) {
+        fun setPrevWinners(prevWinners: Map<T, Party?>) {
             this.prevWinners = prevWinners.entries
                 .asSequence()
                 .sortedBy { e -> StringUtils.stripAccents(nameFunc(e.key)).uppercase() }
@@ -277,9 +278,9 @@ class AllSeatsScreen private constructor(title: Flow.Publisher<out String?>, fra
             .toList()
     }
 
-    private class Entry<T>(val key: T, val prevWinner: Party, val currResult: PartyResult?) {
+    private class Entry<T>(val key: T, val prevWinner: Party?, val currResult: PartyResult?) {
 
-        val prevColor = prevWinner.color
+        val prevColor = prevWinner?.color ?: Color.WHITE
 
         val resultColor: Color = currResult?.party?.color ?: Color.LIGHT_GRAY
         val fill = currResult?.isElected ?: false
@@ -296,7 +297,7 @@ class AllSeatsScreen private constructor(title: Flow.Publisher<out String?>, fra
         }
 
         fun <T> ofGrouped(
-            prevWinnerPublisher: Flow.Publisher<out Map<T, Party>>,
+            prevWinnerPublisher: Flow.Publisher<out Map<T, Party?>>,
             currResultPublisher: Flow.Publisher<out Map<T, PartyResult?>>,
             nameFunc: (T) -> String,
         ): GroupedBuilder<T> {
