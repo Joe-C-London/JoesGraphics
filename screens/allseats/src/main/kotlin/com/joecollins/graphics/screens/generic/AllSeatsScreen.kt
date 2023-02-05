@@ -2,6 +2,7 @@ package com.joecollins.graphics.screens.generic
 
 import com.joecollins.graphics.GenericPanel
 import com.joecollins.graphics.components.ResultListingFrame
+import com.joecollins.graphics.utils.ColorUtils
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
 import com.joecollins.pubsub.Publisher
@@ -80,7 +81,7 @@ class AllSeatsScreen private constructor(title: Flow.Publisher<out String?>, fra
                         text = nameFunc(it.key),
                         border = it.prevColor,
                         background = if (it.fill) it.resultColor else Color.WHITE,
-                        foreground = if (!it.fill) it.resultColor else Color.WHITE,
+                        foreground = if (!it.fill) ColorUtils.contrastForBackground(it.resultColor) else ColorUtils.foregroundToContrast(it.resultColor),
                     )
                 },
             )
