@@ -6,9 +6,9 @@ import com.joecollins.models.general.Coalition
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyOrCoalition
 import com.joecollins.pubsub.asOneTimePublisher
+import org.junit.jupiter.api.Test
 import java.awt.Color
 import java.text.DecimalFormat
-import org.junit.jupiter.api.Test
 
 class RegionalSwingsScreenTest {
 

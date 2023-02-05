@@ -23,7 +23,7 @@ open class GenericPanel(
 
     protected val label: JLabel = FontSizeAdjustingLabel()
 
-    constructor(panel: JPanel, label: String, altText: Flow.Publisher<String?> = createAltText(panel, label.asOneTimePublisher())) : this(panel, label.asOneTimePublisher(), altText)
+    constructor(panel: JPanel, label: String, altText: Flow.Publisher<out String?> = createAltText(panel, label.asOneTimePublisher())) : this(panel, label.asOneTimePublisher(), altText)
 
     init {
         label.subscribe(
