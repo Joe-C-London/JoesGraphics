@@ -18,19 +18,19 @@ class RegionalSwingsScreen private constructor(
     altText: Flow.Publisher<String>,
 ) : GenericPanel(panel, title, altText) {
 
-    class Builder<R>(
+    class Builder<R, POC : PartyOrCoalition>(
         private val regions: List<R>,
         private val name: (R) -> Flow.Publisher<String>,
-        private val currVotes: (R) -> Flow.Publisher<out Map<out PartyOrCoalition, Int>>,
-        private val prevVotes: (R) -> Flow.Publisher<out Map<out PartyOrCoalition, Int>>,
-        private val swingOrder: Comparator<PartyOrCoalition>,
+        private val currVotes: (R) -> Flow.Publisher<out Map<out POC, Int>>,
+        private val prevVotes: (R) -> Flow.Publisher<out Map<out POC, Int>>,
+        private val swingOrder: Comparator<POC>,
         private val numRows: Int,
     ) {
         private var progressLabel: (R) -> Flow.Publisher<out String?> = { null.asOneTimePublisher() }
 
         fun withProgressLabel(
             progress: (R) -> Flow.Publisher<out String?>,
-        ): Builder<R> {
+        ): Builder<R, POC> {
             this.progressLabel = progress
             return this
         }
@@ -63,14 +63,14 @@ class RegionalSwingsScreen private constructor(
     }
 
     companion object {
-        fun <R> of(
+        fun <R, POC : PartyOrCoalition> of(
             regions: List<R>,
             name: (R) -> Flow.Publisher<String>,
-            currVotes: (R) -> Flow.Publisher<out Map<out PartyOrCoalition, Int>>,
-            prevVotes: (R) -> Flow.Publisher<out Map<out PartyOrCoalition, Int>>,
-            swingOrder: Comparator<PartyOrCoalition>,
+            currVotes: (R) -> Flow.Publisher<out Map<out POC, Int>>,
+            prevVotes: (R) -> Flow.Publisher<out Map<out POC, Int>>,
+            swingOrder: Comparator<POC>,
             numRows: Int,
-        ): Builder<R> {
+        ): Builder<R, POC> {
             return Builder(regions, name, currVotes, prevVotes, swingOrder, numRows)
         }
     }
