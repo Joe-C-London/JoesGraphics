@@ -16,6 +16,8 @@ dependencies {
     api group: 'org.geotools', name: 'gt-shapefile', version: geotoolsVersion
     api group: 'org.geotools', name: 'gt-metadata', version: geotoolsVersion
 
+    testImplementation parent.project('testutils')
+
     testImplementation "org.junit.jupiter:junit-jupiter-api:$parent.ext.junit_version"
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$parent.ext.junit_version"
 }
