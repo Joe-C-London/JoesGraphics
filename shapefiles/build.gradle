@@ -10,7 +10,7 @@ plugins {
 group 'com.joecollins'
 version '1.0-SNAPSHOT'
 
-def geotoolsVersion = '28.0'
+def geotoolsVersion = '28.2'
 
 dependencies {
     api group: 'org.geotools', name: 'gt-shapefile', version: geotoolsVersion

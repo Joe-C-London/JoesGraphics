@@ -24,14 +24,14 @@ dependencies {
     implementation parent.project('barframe')
 
     implementation 'com.fasterxml:jackson-xml-databind:0.6.2'
-    implementation 'com.fasterxml.jackson.module:jackson-module-kotlin:2.14.1'
-    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.14.1'
+    implementation 'com.fasterxml.jackson.module:jackson-module-kotlin:2.14.2'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.14.2'
     implementation 'com.vdurmont:emoji-java:5.1.1'
     implementation group: 'io.webfolder', name: 'cdp4j', version: '3.0.15'
-    implementation group: 'org.apache.xmlgraphics', name: 'batik-parser', version: '1.14'
+    implementation group: 'org.apache.xmlgraphics', name: 'batik-parser', version: '1.16'
 
     testImplementation parent.parent.project('testutils')
-    testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.11.0'
+    testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.1.1'
     testImplementation "org.junit.jupiter:junit-jupiter-api:$topLevel.ext.junit_version"
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$topLevel.ext.junit_version"
 }
