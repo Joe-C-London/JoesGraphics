@@ -48,7 +48,7 @@ dependencies {
     implementation project('modelutils')
     implementation project('pubsub')
     implementation project('screens')
-    implementation project('shapefiles')
+    implementation project('mapreaders:all')
     implementation project('shapes')
     implementation project('social')
     implementation project('window')

@@ -10,18 +10,14 @@ plugins {
 group 'com.joecollins'
 version '1.0-SNAPSHOT'
 
-var topLevel = parent.parent
+def geotoolsVersion = parent.ext.geotoolsVersion
+
+def topLevel = parent.parent
 
 dependencies {
-    api parent.project('screenbase')
-    implementation parent.project('basicresult')
-    api topLevel.project('models')
-    implementation topLevel.project('pubsub')
-    implementation topLevel.project('shapes')
-    implementation topLevel.project('components:barframe')
-    implementation topLevel.project('components:resultmapframebuilder')
+    api parent
+    api group: 'org.geotools', name: 'gt-shapefile', version: geotoolsVersion
 
-    testImplementation topLevel.project('mapreaders:shapefile')
     testImplementation topLevel.project('testutils')
 
     testImplementation "org.junit.jupiter:junit-jupiter-api:$topLevel.ext.junit_version"

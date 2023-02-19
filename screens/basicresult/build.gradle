@@ -23,7 +23,7 @@ dependencies {
     implementation topLevel.project('components:resultmapframebuilder')
     implementation topLevel.project('components:swingframe')
 
-    testImplementation topLevel.project('shapefiles')
+    testImplementation topLevel.project('mapreaders:shapefile')
     testImplementation topLevel.project('testutils')
 
     testImplementation "org.junit.jupiter:junit-jupiter-api:$topLevel.ext.junit_version"

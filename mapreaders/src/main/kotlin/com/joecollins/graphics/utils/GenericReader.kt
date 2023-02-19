@@ -12,7 +12,7 @@ import java.awt.geom.Area
 import java.net.URL
 import kotlin.reflect.cast
 
-object ShapefileReader {
+open class GenericReader {
 
     fun <T> readShapes(file: URL, keyProperty: String, keyType: Class<T>): Map<T, Shape> {
         if (keyType == Int::class.java) {

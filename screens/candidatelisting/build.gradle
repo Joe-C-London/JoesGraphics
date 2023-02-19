@@ -19,7 +19,7 @@ dependencies {
     implementation topLevel.project('components:barframe')
     implementation topLevel.project('components:resultmapframebuilder')
 
-    testImplementation topLevel.project('shapefiles')
+    testImplementation topLevel.project('mapreaders:shapefile')
     testImplementation topLevel.project('testutils')
 
     testImplementation "org.junit.jupiter:junit-jupiter-api:$topLevel.ext.junit_version"

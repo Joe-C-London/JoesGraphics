@@ -1,0 +1,25 @@
+buildscript {
+    dependencies {
+        parent.buildscript.dependencies
+    }
+}
+plugins {
+    id 'kotlin'
+}
+ext {
+    geotoolsVersion = '28.2'
+}
+
+group 'com.joecollins'
+version '1.0-SNAPSHOT'
+
+def geotoolsVersion = ext.geotoolsVersion
+
+dependencies {
+    api group: 'org.geotools', name: 'gt-main', version: geotoolsVersion
+    api group: 'org.geotools', name: 'gt-metadata', version: geotoolsVersion
+}
+
+test {
+    useJUnitPlatform()
+}
