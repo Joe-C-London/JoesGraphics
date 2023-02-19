@@ -21,7 +21,7 @@ class ShapefileReaderTest {
             "DIST_NO",
             Int::class.java,
         )
-        assertEquals(27, shapes.size)
+        assertEquals((1..27).toSet(), shapes.keys)
 
         val scaleFactor = 100.0
         val scaledShapes = shapes.mapValues { (_, shape) ->
