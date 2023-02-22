@@ -1,0 +1,30 @@
+buildscript {
+    dependencies {
+        parent.buildscript.dependencies
+    }
+}
+plugins {
+    id 'kotlin'
+}
+
+group 'com.joecollins'
+version '1.0-SNAPSHOT'
+
+def topLevel = parent.parent
+
+def jacksonVersion = '2.14.2'
+
+dependencies {
+    implementation "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
+    implementation "com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion"
+    implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion"
+
+    testImplementation topLevel.project('testutils')
+
+    testImplementation "org.junit.jupiter:junit-jupiter-api:$topLevel.ext.junit_version"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$topLevel.ext.junit_version"
+}
+
+test {
+    useJUnitPlatform()
+}
