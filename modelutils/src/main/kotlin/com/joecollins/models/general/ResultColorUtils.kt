@@ -1,6 +1,6 @@
+package com.joecollins.models.general
+
 import com.joecollins.graphics.utils.ColorUtils
-import com.joecollins.models.general.CandidateResult
-import com.joecollins.models.general.PartyResult
 import java.awt.Color
 
 @Suppress("UNUSED_PARAMETER")

@@ -1,10 +1,10 @@
 package com.joecollins.graphics.screens.generic
 
-import ResultColorUtils.getColor
 import com.joecollins.graphics.components.MapFrame
 import com.joecollins.graphics.components.MapFrameBuilder
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
+import com.joecollins.models.general.ResultColorUtils.getColor
 import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.merge
 import java.awt.Color

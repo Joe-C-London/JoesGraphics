@@ -1,12 +1,12 @@
 package com.joecollins.graphics.screens.generic
 
-import ResultColorUtils.getColor
 import com.joecollins.graphics.GenericPanel
 import com.joecollins.graphics.components.SwingometerFrame
 import com.joecollins.graphics.components.SwingometerFrameBuilder
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyOrCoalition
 import com.joecollins.models.general.PartyResult
+import com.joecollins.models.general.ResultColorUtils.getColor
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.asOneTimePublisher

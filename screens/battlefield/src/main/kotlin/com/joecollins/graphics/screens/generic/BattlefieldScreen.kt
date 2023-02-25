@@ -1,11 +1,11 @@
 package com.joecollins.graphics.screens.generic
 
-import ResultColorUtils.getColor
 import com.joecollins.graphics.GenericPanel
 import com.joecollins.graphics.components.BattlefieldFrame
 import com.joecollins.graphics.utils.ColorUtils
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
+import com.joecollins.models.general.ResultColorUtils.getColor
 import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.map
 import com.joecollins.pubsub.merge

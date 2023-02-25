@@ -2,6 +2,7 @@ package com.joecollins.graphics.screens.generic
 
 import com.joecollins.graphics.GenericPanel
 import com.joecollins.graphics.components.HeatMapFrameBuilder
+import com.joecollins.models.general.HitMissBalance
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
 import com.joecollins.pubsub.Subscriber
@@ -150,16 +151,9 @@ class PartyHeatMapScreen private constructor(panel: JPanel, title: Flow.Publishe
                             curr to prev
                         }
                         val balance = entries.map(currResult).combine().map { list ->
-                            val indexedEntries = list.mapIndexed { index, partyResult -> index to partyResult?.party }
-                            val hits = indexedEntries.asSequence()
-                                .filter { it.second == party }
-                                .map { it.first + 1 }
-                                .let { sequenceOf(it.sortedDescending(), generateSequence { 0 }).flatten() }
-                            val misses = indexedEntries.asSequence()
-                                .filter { it.second != party && it.second != null }
-                                .map { it.first + 1 }
-                                .let { sequenceOf(it.sorted(), generateSequence { entries.size + 1 }).flatten() }
-                            hits.zip(misses).first { (hit, miss) -> hit < miss }.let { (it.first + it.second) / 2 }
+                            HitMissBalance.calculateBalance(list.map { it?.party }) {
+                                if (it == null) null else (it == party)
+                            }
                         }
                         seatsAndPrev.merge(balance) { (seats, prev), bal ->
                             """

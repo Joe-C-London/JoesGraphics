@@ -1,10 +1,10 @@
 package com.joecollins.graphics.components
 
-import ResultColorUtils.getColor
 import com.google.common.annotations.Beta
 import com.joecollins.graphics.utils.ColorUtils
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
+import com.joecollins.models.general.ResultColorUtils.getColor
 import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.combine
 import com.joecollins.pubsub.map
