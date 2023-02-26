@@ -22,7 +22,7 @@ class CountdownScreenTest {
             .withClock(Clock.fixed(Instant.parse("2022-08-29T18:58:39.300Z"), ZoneId.of("UTC")))
             .build("COUNTDOWN TO THE CLOSE".asOneTimePublisher())
         screen.size = Dimension(1024, 512)
-        compareRendering("CountdownScreen", "SingleCountdown", screen, 10)
+        compareRendering("CountdownScreen", "SingleCountdown", screen)
         assertPublishes(
             screen.altText,
             """
@@ -40,7 +40,7 @@ class CountdownScreenTest {
             .withClock(Clock.fixed(Instant.parse("2022-08-29T18:58:39.300Z"), ZoneId.of("UTC")))
             .build("COUNTDOWN TO THE CLOSE".asOneTimePublisher())
         screen.size = Dimension(1024, 512)
-        compareRendering("CountdownScreen", "SingleCountdownAsCollection", screen, 15)
+        compareRendering("CountdownScreen", "SingleCountdownAsCollection", screen)
         assertPublishes(
             screen.altText,
             """
@@ -59,7 +59,7 @@ class CountdownScreenTest {
             .withClock(Clock.fixed(Instant.parse("2022-08-29T18:58:39.300Z"), ZoneId.of("UTC")))
             .build("COUNTDOWN TO THE CLOSE".asOneTimePublisher())
         screen.size = Dimension(1024, 512)
-        compareRendering("CountdownScreen", "DoubleCountdownSameTime", screen, 10)
+        compareRendering("CountdownScreen", "DoubleCountdownSameTime", screen)
         assertPublishes(
             screen.altText,
             """

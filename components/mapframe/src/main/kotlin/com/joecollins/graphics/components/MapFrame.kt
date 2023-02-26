@@ -2,6 +2,7 @@ package com.joecollins.graphics.components
 
 import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
+import com.joecollins.utils.ExecutorUtils
 import java.awt.BasicStroke
 import java.awt.BorderLayout
 import java.awt.Color
@@ -36,7 +37,7 @@ class MapFrame(
     notesPublisher = notesPublisher,
     borderColorPublisher = borderColorPublisher,
 ) {
-    private val executor = Executors.newWorkStealingPool()
+    private val executor = ExecutorUtils.createExecutor { Executors.newWorkStealingPool() }
     private var shapesToDraw: List<Pair<Shape, Color>> = ArrayList()
     private var focus: Rectangle2D? = null
     private var outlineShapes: List<Shape> = ArrayList()

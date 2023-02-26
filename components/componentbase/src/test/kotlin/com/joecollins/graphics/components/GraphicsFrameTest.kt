@@ -4,12 +4,10 @@ import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.map
-import org.awaitility.Awaitility
-import org.hamcrest.core.IsEqual
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.awt.BorderLayout
 import java.awt.Color
-import java.util.concurrent.TimeUnit
 import javax.swing.JPanel
 
 class GraphicsFrameTest {
@@ -29,8 +27,7 @@ class GraphicsFrameTest {
         val graphicsFrame = GraphicsFrame(
             headerPublisher = "HEADER".asOneTimePublisher(),
         )
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ graphicsFrame.header }, IsEqual("HEADER"))
+        assertEquals("HEADER", graphicsFrame.header)
     }
 
     @Test
@@ -38,8 +35,7 @@ class GraphicsFrameTest {
         val graphicsFrame = GraphicsFrame(
             headerPublisher = TestObject().numPollsPublisher.map { "$it POLLS REPORTING" },
         )
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ graphicsFrame.header }, IsEqual("0 POLLS REPORTING"))
+        assertEquals("0 POLLS REPORTING", graphicsFrame.header)
     }
 
     @Test
@@ -48,11 +44,10 @@ class GraphicsFrameTest {
         val graphicsFrame = GraphicsFrame(
             headerPublisher = obj.numPollsPublisher.map { "$it POLLS REPORTING" },
         )
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ graphicsFrame.header }, IsEqual("0 POLLS REPORTING"))
+        assertEquals("0 POLLS REPORTING", graphicsFrame.header)
+
         obj.numPolls = 1
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ graphicsFrame.header }, IsEqual("1 POLLS REPORTING"))
+        assertEquals("1 POLLS REPORTING", graphicsFrame.header)
     }
 
     @Test
@@ -61,8 +56,7 @@ class GraphicsFrameTest {
             headerPublisher = (null as String?).asOneTimePublisher(),
             notesPublisher = "SOURCE: BBC".asOneTimePublisher(),
         )
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ graphicsFrame.notes }, IsEqual("SOURCE: BBC"))
+        assertEquals("SOURCE: BBC", graphicsFrame.notes)
     }
 
     @Test
@@ -71,10 +65,8 @@ class GraphicsFrameTest {
             headerPublisher = (null as String?).asOneTimePublisher(),
             borderColorPublisher = Color.BLUE.asOneTimePublisher(),
         )
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ graphicsFrame.borderColor }, IsEqual(Color.BLUE))
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ graphicsFrame.headerTextColor }, IsEqual(Color.WHITE))
+        assertEquals(Color.BLUE, graphicsFrame.borderColor)
+        assertEquals(Color.WHITE, graphicsFrame.headerTextColor)
     }
 
     @Test
@@ -84,10 +76,8 @@ class GraphicsFrameTest {
             borderColorPublisher = Color.BLUE.asOneTimePublisher(),
             headerTextColorPublisher = Color.YELLOW.asOneTimePublisher(),
         )
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ graphicsFrame.borderColor }, IsEqual(Color.BLUE))
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ graphicsFrame.headerTextColor }, IsEqual(Color.YELLOW))
+        assertEquals(Color.BLUE, graphicsFrame.borderColor)
+        assertEquals(Color.YELLOW, graphicsFrame.headerTextColor)
     }
 
     @Test

@@ -5,12 +5,10 @@ import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.map
 import com.joecollins.pubsub.mapElements
-import org.awaitility.Awaitility
-import org.hamcrest.core.IsEqual
 import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.awt.Color
-import java.util.concurrent.TimeUnit
 import kotlin.math.abs
 
 class SwingometerFrameTest {
@@ -25,10 +23,8 @@ class SwingometerFrameTest {
             numBucketsPerSidePublisher = 20.asOneTimePublisher(),
             dotsPublisher = emptyList<SwingometerFrame.Dot>().asOneTimePublisher(),
         )
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ frame.leftColor }, IsEqual(Color.BLUE))
-        Assertions.assertEquals(Color.BLUE, frame.leftColor)
-        Assertions.assertEquals(Color.RED, frame.rightColor)
+        assertEquals(Color.BLUE, frame.leftColor)
+        assertEquals(Color.RED, frame.rightColor)
     }
 
     @Test
@@ -42,8 +38,7 @@ class SwingometerFrameTest {
             numBucketsPerSidePublisher = 20.asOneTimePublisher(),
             dotsPublisher = emptyList<SwingometerFrame.Dot>().asOneTimePublisher(),
         )
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ frame.value }, IsEqual(3))
+        assertEquals(3, frame.value)
     }
 
     @Test
@@ -57,8 +52,7 @@ class SwingometerFrameTest {
             numBucketsPerSidePublisher = 20.asOneTimePublisher(),
             dotsPublisher = emptyList<SwingometerFrame.Dot>().asOneTimePublisher(),
         )
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ frame.range }, IsEqual(10))
+        assertEquals(10, frame.range)
     }
 
     @Test
@@ -74,17 +68,16 @@ class SwingometerFrameTest {
             dotsPublisher = emptyList<SwingometerFrame.Dot>().asOneTimePublisher(),
             ticksPublisher = ticks.map { SwingometerFrame.Tick(it, abs(it).toString()) }.asOneTimePublisher(),
         )
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ frame.numTicks }, IsEqual(21))
+        assertEquals(21, frame.numTicks)
         for (i in 0..20) {
-            Assertions.assertEquals(i - 10, frame.getTickPosition(i), "Position at index $i")
+            assertEquals(i - 10, frame.getTickPosition(i), "Position at index $i")
         }
         for (i in 0..10) {
             val text = i.toString()
             val leftPos = 10 - i
             val rightPos = 10 + i
-            Assertions.assertEquals(text, frame.getTickText(leftPos), "Text at index $leftPos")
-            Assertions.assertEquals(text, frame.getTickText(rightPos), "Text at index $rightPos")
+            assertEquals(text, frame.getTickText(leftPos), "Text at index $leftPos")
+            assertEquals(text, frame.getTickText(rightPos), "Text at index $rightPos")
         }
     }
 
@@ -101,9 +94,8 @@ class SwingometerFrameTest {
             numBucketsPerSidePublisher = 20.asOneTimePublisher(),
             dotsPublisher = emptyList<SwingometerFrame.Dot>().asOneTimePublisher(),
         )
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ frame.leftToWin }, IsEqual(3.0))
-        Assertions.assertEquals(-2.0, frame.rightToWin)
+        assertEquals(3.0, frame.leftToWin)
+        assertEquals(-2.0, frame.rightToWin)
     }
 
     @Test
@@ -125,11 +117,10 @@ class SwingometerFrameTest {
             dotsPublisher = emptyList<SwingometerFrame.Dot>().asOneTimePublisher(),
             outerLabelsPublisher = labels.mapElements { SwingometerFrame.OuterLabel(it.first, it.second, it.third) },
         )
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ frame.numOuterLabels }, IsEqual(3))
-        Assertions.assertEquals(0.0, frame.getOuterLabelPosition(0))
-        Assertions.assertEquals("75", frame.getOuterLabelText(1))
-        Assertions.assertEquals(Color.BLUE, frame.getOuterLabelColor(2))
+        assertEquals(3, frame.numOuterLabels)
+        assertEquals(0.0, frame.getOuterLabelPosition(0))
+        assertEquals("75", frame.getOuterLabelText(1))
+        assertEquals(Color.BLUE, frame.getOuterLabelColor(2))
     }
 
     @Test
@@ -150,11 +141,10 @@ class SwingometerFrameTest {
             numBucketsPerSidePublisher = 20.asOneTimePublisher(),
             dotsPublisher = dots.mapElements { SwingometerFrame.Dot(it.first, it.second) },
         )
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ frame.numBucketsPerSide }, IsEqual(20))
-        Assertions.assertEquals(3, frame.numDots.toLong())
-        Assertions.assertEquals(0.3, frame.getDotPosition(0))
-        Assertions.assertEquals(Color.RED, frame.getDotColor(1))
+        assertEquals(20, frame.numBucketsPerSide)
+        assertEquals(3, frame.numDots.toLong())
+        assertEquals(0.3, frame.getDotPosition(0))
+        assertEquals(Color.RED, frame.getDotColor(1))
     }
 
     @Test
@@ -175,12 +165,11 @@ class SwingometerFrameTest {
             numBucketsPerSidePublisher = 20.asOneTimePublisher(),
             dotsPublisher = dots.mapElements { SwingometerFrame.Dot(it.first, it.second, it.third) },
         )
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ frame.numDots }, IsEqual(3))
-        Assertions.assertEquals(20, frame.numBucketsPerSide.toLong())
-        Assertions.assertEquals(0.3, frame.getDotPosition(0))
-        Assertions.assertEquals(Color.RED, frame.getDotColor(1))
-        Assertions.assertEquals("C", frame.getDotLabel(2))
+        assertEquals(3, frame.numDots)
+        assertEquals(20, frame.numBucketsPerSide.toLong())
+        assertEquals(0.3, frame.getDotPosition(0))
+        assertEquals(Color.RED, frame.getDotColor(1))
+        assertEquals("C", frame.getDotLabel(2))
         Assertions.assertTrue(frame.isDotSolid(2))
     }
 
@@ -202,11 +191,10 @@ class SwingometerFrameTest {
             numBucketsPerSidePublisher = 20.asOneTimePublisher(),
             dotsPublisher = dots.mapElements { SwingometerFrame.Dot(it.first, it.second, solid = it.third) },
         )
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ frame.numDots }, IsEqual(3))
-        Assertions.assertEquals(20, frame.numBucketsPerSide.toLong())
-        Assertions.assertEquals(0.3, frame.getDotPosition(0))
-        Assertions.assertEquals(Color.RED, frame.getDotColor(1))
+        assertEquals(3, frame.numDots)
+        assertEquals(20, frame.numBucketsPerSide.toLong())
+        assertEquals(0.3, frame.getDotPosition(0))
+        assertEquals(Color.RED, frame.getDotColor(1))
         Assertions.assertTrue(frame.isDotSolid(0))
         Assertions.assertFalse(frame.isDotSolid(1))
         Assertions.assertTrue(frame.isDotSolid(2))

@@ -1,15 +1,13 @@
 package com.joecollins.pubsub
 
 import com.joecollins.graphics.utils.BoundResult
-import org.awaitility.Awaitility
-import org.hamcrest.core.IsEqual
-import org.hamcrest.core.IsNull
 import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 import java.util.LinkedList
 import java.util.concurrent.Flow
 import java.util.concurrent.SubmissionPublisher
-import java.util.concurrent.TimeUnit
 
 class PubSubTests {
 
@@ -21,12 +19,10 @@ class PubSubTests {
         publisher.subscribe(subscriber)
 
         publisher.submit("TEST")
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS).pollDelay(1, TimeUnit.MILLISECONDS)
-            .until({ output }, IsEqual("TEST"))
+        assertEquals("TEST", output)
 
         publisher.submit("TEST 2")
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS).pollDelay(1, TimeUnit.MILLISECONDS)
-            .until({ output }, IsEqual("TEST 2"))
+        assertEquals("TEST 2", output)
     }
 
     @Test
@@ -37,12 +33,10 @@ class PubSubTests {
 
         publisher.submit("TEST")
         publisher.subscribe(subscriber)
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS).pollDelay(1, TimeUnit.MILLISECONDS)
-            .until({ output }, IsEqual("TEST"))
+        assertEquals("TEST", output)
 
         publisher.submit("TEST 2")
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS).pollDelay(1, TimeUnit.MILLISECONDS)
-            .until({ output }, IsEqual("TEST 2"))
+        assertEquals("TEST 2", output)
     }
 
     @Test
@@ -53,12 +47,10 @@ class PubSubTests {
         publisher.subscribe(subscriber)
 
         publisher.submit("TEST")
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS).pollDelay(1, TimeUnit.MILLISECONDS)
-            .until({ output }, IsEqual("TEST"))
+        assertEquals("TEST", output)
 
         publisher.submit(null)
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS).pollDelay(1, TimeUnit.MILLISECONDS)
-            .until({ output }, IsNull())
+        assertNull(output)
     }
 
     @Test
@@ -69,12 +61,12 @@ class PubSubTests {
         publisher.subscribe(subscriber)
 
         publisher.submit("TEST")
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS).pollDelay(1, TimeUnit.MILLISECONDS)
-            .until({ output }, IsEqual("TEST"))
+        Thread.sleep(100)
+        assertEquals("TEST", output)
 
         publisher.submit("TEST 2")
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS).pollDelay(1, TimeUnit.MILLISECONDS)
-            .until({ output }, IsEqual("TEST 2"))
+        Thread.sleep(100)
+        assertEquals("TEST 2", output)
     }
 
     @Test
@@ -105,12 +97,10 @@ class PubSubTests {
         publisher.subscribe(subscriber)
 
         publisher.submit("TEST")
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS).pollDelay(1, TimeUnit.MILLISECONDS)
-            .until({ output }, IsEqual("TEST"))
+        assertEquals("TEST", output)
 
         publisher.submit("TEST 2")
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS).pollDelay(1, TimeUnit.MILLISECONDS)
-            .until({ output }, IsEqual("TEST 2"))
+        assertEquals("TEST 2", output)
     }
 
     @Test
@@ -141,13 +131,10 @@ class PubSubTests {
         publisher.subscribe(subscriber)
 
         publisher.submit("TEST")
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS).pollDelay(1, TimeUnit.MILLISECONDS)
-            .until({ output }, IsEqual("TEST"))
+        assertEquals("TEST", output)
 
         publisher.submit("TEST 2")
-        Thread.sleep(500)
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS).pollDelay(1, TimeUnit.MILLISECONDS)
-            .until({ output }, IsEqual("TEST"))
+        assertEquals("TEST", output)
     }
 
     @Test
@@ -156,8 +143,7 @@ class PubSubTests {
         val publisher = "TEST".asOneTimePublisher()
         val subscriber = Subscriber<String> { output = it }
         publisher.subscribe(subscriber)
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS).pollDelay(1, TimeUnit.MILLISECONDS)
-            .until({ output }, IsEqual("TEST"))
+        assertEquals("TEST", output)
     }
 
     @Test
@@ -168,12 +154,12 @@ class PubSubTests {
         publisher.map { it.length }.subscribe(subscriber)
 
         publisher.submit("TEST")
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS).pollDelay(1, TimeUnit.MILLISECONDS)
-            .until({ output }, IsEqual(4))
+        Thread.sleep(100)
+        assertEquals(4, output)
 
         publisher.submit("TEST 2")
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS).pollDelay(1, TimeUnit.MILLISECONDS)
-            .until({ output }, IsEqual(6))
+        Thread.sleep(100)
+        assertEquals(6, output)
     }
 
     @Test
@@ -186,16 +172,16 @@ class PubSubTests {
 
         publisher1.submit("A")
         publisher2.submit("B")
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS).pollDelay(1, TimeUnit.MILLISECONDS)
-            .until({ output }, IsEqual("AB"))
+        Thread.sleep(100)
+        assertEquals("AB", output)
 
         publisher1.submit("1")
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS).pollDelay(1, TimeUnit.MILLISECONDS)
-            .until({ output }, IsEqual("1B"))
+        Thread.sleep(100)
+        assertEquals("1B", output)
 
         publisher2.submit("2")
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS).pollDelay(1, TimeUnit.MILLISECONDS)
-            .until({ output }, IsEqual("12"))
+        Thread.sleep(100)
+        assertEquals("12", output)
     }
 
     @Test
@@ -207,9 +193,7 @@ class PubSubTests {
 
         val limit = 1000
         (0..limit).forEach { publisher.submit(it) }
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ output.size }, IsEqual(limit + 1))
-        Assertions.assertEquals((0..limit).toList(), output)
+        assertEquals((0..limit).toList(), output)
     }
 
     @Test
@@ -237,9 +221,7 @@ class PubSubTests {
         publisher.subscribe(subscriber)
 
         (0..limit).forEach { publisher.submit(it) }
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ output.size }, IsEqual(limit + 1))
-        Assertions.assertEquals((0..limit).toList(), output)
+        assertEquals((0..limit).toList(), output)
     }
 
     @Test
@@ -248,8 +230,7 @@ class PubSubTests {
         val publisher = Publisher("TEST")
         val subscriber = Subscriber<String> { output = it }
         publisher.subscribe(subscriber)
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS).pollDelay(1, TimeUnit.MILLISECONDS)
-            .until({ output }, IsEqual("TEST"))
+        assertEquals("TEST", output)
     }
 
     @Test
@@ -260,8 +241,7 @@ class PubSubTests {
         publisher.mapElements { it.length }.subscribe(subscriber)
 
         publisher.submit(listOf("TEST", "TEST 2"))
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ output }, IsEqual(listOf(4, 6)))
+        assertEquals(listOf(4, 6), output)
     }
 
     @Test
@@ -270,9 +250,7 @@ class PubSubTests {
         val publishers = (0..10).map { Publisher(it) }
         val subscriber = Subscriber<List<Int>> { output = it }
         publishers.combine().subscribe(subscriber)
-
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ output }, IsEqual((0..10).toList()))
+        assertEquals((0..10).toList(), output)
     }
 
     @Test
@@ -281,13 +259,12 @@ class PubSubTests {
         val publishers = listOf(Publisher(1), Publisher(2), Publisher(3))
         publishers.mapReduce(0, { a, v -> a + v }, { a, v -> a - v })
             .subscribe(Subscriber { boundValue.value = it })
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ boundValue.value }, IsEqual(6))
+        assertEquals(6, boundValue.value)
+
         publishers[0].submit(4)
         publishers[1].submit(5)
         publishers[2].submit(6)
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ boundValue.value }, IsEqual(15))
+        assertEquals(15, boundValue.value)
     }
 
     @Test
@@ -296,30 +273,24 @@ class PubSubTests {
         val innerPublisher1 = Publisher(7)
         val outerPublisher = Publisher(innerPublisher1)
         outerPublisher.compose { it }.subscribe(Subscriber { output = it })
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ output }, IsEqual(7))
+        assertEquals(7, output)
 
         innerPublisher1.submit(42)
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ output }, IsEqual(42))
+        assertEquals(42, output)
 
         val innerPublisher2 = Publisher(12)
         outerPublisher.submit(innerPublisher2)
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ output }, IsEqual(12))
+        assertEquals(12, output)
 
         innerPublisher1.submit(1)
         Thread.sleep(500)
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ output }, IsEqual(12))
+        assertEquals(12, output)
 
         innerPublisher2.submit(27)
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ output }, IsEqual(27))
+        assertEquals(27, output)
 
         innerPublisher1.submit(3)
         Thread.sleep(500)
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ output }, IsEqual(27))
+        assertEquals(27, output)
     }
 }

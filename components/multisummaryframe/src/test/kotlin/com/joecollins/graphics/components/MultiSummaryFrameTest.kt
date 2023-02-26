@@ -2,12 +2,9 @@ package com.joecollins.graphics.components
 
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.pubsub.asOneTimePublisher
-import org.awaitility.Awaitility
-import org.hamcrest.core.IsEqual
-import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.awt.Color
-import java.util.concurrent.TimeUnit
 
 class MultiSummaryFrameTest {
     @Test
@@ -74,28 +71,27 @@ class MultiSummaryFrameTest {
             )
                 .asOneTimePublisher(),
         )
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ frame.numRows }, IsEqual(5))
-        Assertions.assertEquals("ATLANTIC", frame.getRowHeader(0))
-        Assertions.assertEquals("QU\u00c9BEC", frame.getRowHeader(1))
-        Assertions.assertEquals("ONTARIO", frame.getRowHeader(2))
-        Assertions.assertEquals("WESTERN CANADA", frame.getRowHeader(3))
-        Assertions.assertEquals("THE NORTH", frame.getRowHeader(4))
-        Assertions.assertEquals(6, frame.getNumValues(0).toLong())
-        Assertions.assertEquals(6, frame.getNumValues(1).toLong())
-        Assertions.assertEquals(6, frame.getNumValues(2).toLong())
-        Assertions.assertEquals(6, frame.getNumValues(3).toLong())
-        Assertions.assertEquals(6, frame.getNumValues(4).toLong())
-        Assertions.assertEquals(Color.RED, frame.getColor(0, 0))
-        Assertions.assertEquals(Color.BLUE, frame.getColor(1, 1))
-        Assertions.assertEquals(Color.ORANGE, frame.getColor(2, 2))
-        Assertions.assertEquals(Color.CYAN.darker(), frame.getColor(3, 3))
-        Assertions.assertEquals(Color.GREEN.darker(), frame.getColor(4, 4))
-        Assertions.assertEquals("26", frame.getValue(0, 0))
-        Assertions.assertEquals("10", frame.getValue(1, 1))
-        Assertions.assertEquals("6", frame.getValue(2, 2))
-        Assertions.assertEquals("0", frame.getValue(3, 3))
-        Assertions.assertEquals("0", frame.getValue(4, 4))
+        assertEquals(5, frame.numRows)
+        assertEquals("ATLANTIC", frame.getRowHeader(0))
+        assertEquals("QU\u00c9BEC", frame.getRowHeader(1))
+        assertEquals("ONTARIO", frame.getRowHeader(2))
+        assertEquals("WESTERN CANADA", frame.getRowHeader(3))
+        assertEquals("THE NORTH", frame.getRowHeader(4))
+        assertEquals(6, frame.getNumValues(0).toLong())
+        assertEquals(6, frame.getNumValues(1).toLong())
+        assertEquals(6, frame.getNumValues(2).toLong())
+        assertEquals(6, frame.getNumValues(3).toLong())
+        assertEquals(6, frame.getNumValues(4).toLong())
+        assertEquals(Color.RED, frame.getColor(0, 0))
+        assertEquals(Color.BLUE, frame.getColor(1, 1))
+        assertEquals(Color.ORANGE, frame.getColor(2, 2))
+        assertEquals(Color.CYAN.darker(), frame.getColor(3, 3))
+        assertEquals(Color.GREEN.darker(), frame.getColor(4, 4))
+        assertEquals("26", frame.getValue(0, 0))
+        assertEquals("10", frame.getValue(1, 1))
+        assertEquals("6", frame.getValue(2, 2))
+        assertEquals("0", frame.getValue(3, 3))
+        assertEquals("0", frame.getValue(4, 4))
     }
 
     @Test

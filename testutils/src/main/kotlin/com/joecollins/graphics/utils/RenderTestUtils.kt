@@ -1,8 +1,6 @@
 package com.joecollins.graphics.utils
 
 import org.apache.commons.io.FileUtils
-import org.awaitility.Awaitility
-import org.awaitility.core.ConditionTimeoutException
 import org.junit.jupiter.api.Assertions
 import java.awt.Component
 import java.awt.Container
@@ -12,25 +10,19 @@ import java.io.File
 import java.lang.reflect.InvocationTargetException
 import java.util.LinkedList
 import java.util.Queue
-import java.util.concurrent.TimeUnit
 import javax.imageio.ImageIO
 import javax.swing.JPanel
 
 object RenderTestUtils {
 
-    fun compareRendering(testClass: String, testMethod: String, panel: JPanel, timeoutSeconds: Long = 1) {
+    fun compareRendering(testClass: String, testMethod: String, panel: JPanel) {
         val expectedFile = File(
             "src\\test\\resources\\com\\joecollins\\graphics\\$testClass\\$testMethod.png",
         )
         val actualFile = File.createTempFile("test", ".png")
-        val isMatch = try {
-            Awaitility.await("$testClass/$testMethod").atMost(timeoutSeconds, TimeUnit.SECONDS)
-                .until({
-                    ImageIO.write(convertToImage(panel), "png", actualFile)
-                    FileUtils.contentEquals(expectedFile, actualFile)
-                }, { it })
-        } catch (e: ConditionTimeoutException) {
-            false
+        val isMatch = run {
+            ImageIO.write(convertToImage(panel), "png", actualFile)
+            FileUtils.contentEquals(expectedFile, actualFile)
         }
         if (!isMatch) {
             println(expectedFile.absolutePath)
@@ -48,14 +40,17 @@ object RenderTestUtils {
     }
 
     private fun convertToImage(component: JPanel): BufferedImage {
-        val components: Queue<Component> = LinkedList()
-        components.offer(component)
-        while (!components.isEmpty()) {
-            val c = components.poll()
-            c.doLayout()
-            if (c is Container) {
-                components.addAll(listOf(*c.components))
+        repeat(getChildDepth(component)) {
+            val components: Queue<Component> = LinkedList()
+            components.offer(component)
+            while (!components.isEmpty()) {
+                val c = components.poll()
+                c.doLayout()
+                if (c is Container) {
+                    components.addAll(listOf(*c.components))
+                }
             }
+            EventQueue.invokeAndWait { }
         }
         val img = BufferedImage(component.width, component.height, BufferedImage.TYPE_INT_ARGB)
         try {
@@ -67,5 +62,13 @@ object RenderTestUtils {
             throw AssertionError(e)
         }
         return img
+    }
+
+    private fun getChildDepth(component: Component): Int {
+        return if (component is Container && component.components.isNotEmpty()) {
+            component.components.maxOf { getChildDepth(it) } + 1
+        } else {
+            1
+        }
     }
 }

@@ -1,6 +1,6 @@
 package com.joecollins.pubsub
 
-import java.awt.EventQueue
+import com.joecollins.utils.ExecutorUtils
 import java.util.concurrent.Flow
 
 class Subscriber<T>(private val next: (T) -> Unit) : Flow.Subscriber<T> {
@@ -37,7 +37,7 @@ class Subscriber<T>(private val next: (T) -> Unit) : Flow.Subscriber<T> {
                     val submit = wrapper == null
                     wrapper = Wrapper(item)
                     if (submit) {
-                        EventQueue.invokeLater {
+                        ExecutorUtils.sendToEventQueue {
                             synchronized(lock) {
                                 func(wrapper!!.item)
                                 wrapper = null

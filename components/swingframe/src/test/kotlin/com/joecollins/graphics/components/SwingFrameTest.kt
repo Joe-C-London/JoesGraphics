@@ -2,12 +2,9 @@ package com.joecollins.graphics.components
 
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.pubsub.asOneTimePublisher
-import org.awaitility.Awaitility
-import org.hamcrest.core.IsEqual
-import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.awt.Color
-import java.util.concurrent.TimeUnit
 
 class SwingFrameTest {
     @Test
@@ -21,8 +18,7 @@ class SwingFrameTest {
             bottomTextPublisher = "4.7% SWING LIB TO CON".asOneTimePublisher(),
             bottomColorPublisher = Color.BLUE.asOneTimePublisher(),
         )
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ frame.getRange() }, IsEqual(10))
+        assertEquals(10, frame.getRange())
     }
 
     @Test
@@ -36,8 +32,7 @@ class SwingFrameTest {
             bottomTextPublisher = "4.7% SWING LIB TO CON".asOneTimePublisher(),
             bottomColorPublisher = Color.BLUE.asOneTimePublisher(),
         )
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ frame.getValue() }, IsEqual(3))
+        assertEquals(3, frame.getValue())
     }
 
     @Test
@@ -51,9 +46,8 @@ class SwingFrameTest {
             bottomTextPublisher = "4.7% SWING LIB TO CON".asOneTimePublisher(),
             bottomColorPublisher = Color.BLUE.asOneTimePublisher(),
         )
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ frame.getLeftColor() }, IsEqual(Color.BLUE))
-        Assertions.assertEquals(Color.RED, frame.getRightColor())
+        assertEquals(Color.BLUE, frame.getLeftColor())
+        assertEquals(Color.RED, frame.getRightColor())
     }
 
     @Test
@@ -67,9 +61,8 @@ class SwingFrameTest {
             bottomTextPublisher = "4.7% SWING LIB TO CON".asOneTimePublisher(),
             bottomColorPublisher = Color.BLUE.asOneTimePublisher(),
         )
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ frame.getBottomColor() }, IsEqual(Color.BLUE))
-        Assertions.assertEquals("4.7% SWING LIB TO CON", frame.getBottomText())
+        assertEquals(Color.BLUE, frame.getBottomColor())
+        assertEquals("4.7% SWING LIB TO CON", frame.getBottomText())
     }
 
     @Test

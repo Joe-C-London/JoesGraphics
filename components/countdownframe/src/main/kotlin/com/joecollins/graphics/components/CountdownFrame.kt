@@ -3,18 +3,16 @@ package com.joecollins.graphics.components
 import com.joecollins.graphics.utils.StandardFont
 import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
+import com.joecollins.utils.ExecutorUtils
 import org.jetbrains.annotations.TestOnly
 import java.awt.BorderLayout
 import java.awt.Color
-import java.awt.EventQueue
 import java.time.Clock
 import java.time.Duration
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 import java.time.temporal.Temporal
-import java.util.concurrent.Executors
 import java.util.concurrent.Flow
-import java.util.concurrent.TimeUnit
 import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.border.EmptyBorder
@@ -87,16 +85,9 @@ class CountdownFrame(
             onCountdownColorBinding(Color.BLACK)
         }
 
-        val executor = Executors.newScheduledThreadPool(1) { r: Runnable ->
-            val t = Executors.defaultThreadFactory().newThread(r)
-            t.isDaemon = true
-            t
-        }
-        executor.scheduleAtFixedRate(
+        ExecutorUtils.scheduleTicking(
             { this.refresh() },
-            0,
             100,
-            TimeUnit.MILLISECONDS,
         )
     }
 
@@ -105,7 +96,7 @@ class CountdownFrame(
     }
 
     private fun refresh() {
-        EventQueue.invokeLater {
+        ExecutorUtils.sendToEventQueue {
             timeRemainingLabel.text = labelFunc(getTimeRemaining())
             this.repaint()
         }

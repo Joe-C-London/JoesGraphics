@@ -540,7 +540,7 @@ class TweetFrameTest {
             TweetLoader.loadTweetV2(123L, mockTwitter).asOneTimePublisher(),
         )
         frame.size = Dimension(512, 256)
-        RenderTestUtils.compareRendering("TweetFrame", "Emoji", frame, 15)
+        RenderTestUtils.compareRendering("TweetFrame", "Emoji", frame)
     }
 
     @Test

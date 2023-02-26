@@ -2,12 +2,9 @@ package com.joecollins.graphics.components
 
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.pubsub.asOneTimePublisher
-import org.awaitility.Awaitility
-import org.hamcrest.core.IsEqual
-import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.awt.Color
-import java.util.concurrent.TimeUnit
 
 class RegionSummaryFrameTest {
     @Test
@@ -35,12 +32,11 @@ class RegionSummaryFrameTest {
             )
                 .asOneTimePublisher(),
         )
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ frame.getNumSections() }, IsEqual(2))
-        Assertions.assertEquals(Color.BLACK, frame.getSummaryColor())
-        Assertions.assertEquals("ELECTORAL VOTES", frame.getSectionHeader(0))
-        Assertions.assertEquals(Color.BLUE, frame.getValueColor(1, 0))
-        Assertions.assertEquals("<< 1.0%", frame.getValue(1, 1))
+        assertEquals(2, frame.getNumSections())
+        assertEquals(Color.BLACK, frame.getSummaryColor())
+        assertEquals("ELECTORAL VOTES", frame.getSectionHeader(0))
+        assertEquals(Color.BLUE, frame.getValueColor(1, 0))
+        assertEquals("<< 1.0%", frame.getValue(1, 1))
     }
 
     @Test
@@ -55,12 +51,11 @@ class RegionSummaryFrameTest {
             )
                 .asOneTimePublisher(),
         )
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ frame.getNumSections() }, IsEqual(2))
-        Assertions.assertEquals(Color.BLUE, frame.getSummaryColor())
-        Assertions.assertEquals("ELECTORAL VOTES", frame.getSectionHeader(0))
-        Assertions.assertEquals(Color.BLUE, frame.getValueColor(1, 0))
-        Assertions.assertEquals("+1.0%", frame.getValue(1, 1))
+        assertEquals(2, frame.getNumSections())
+        assertEquals(Color.BLUE, frame.getSummaryColor())
+        assertEquals("ELECTORAL VOTES", frame.getSectionHeader(0))
+        assertEquals(Color.BLUE, frame.getValueColor(1, 0))
+        assertEquals("+1.0%", frame.getValue(1, 1))
     }
 
     @Test

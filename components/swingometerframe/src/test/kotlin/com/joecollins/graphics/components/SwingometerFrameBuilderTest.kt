@@ -2,14 +2,12 @@ package com.joecollins.graphics.components
 
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
-import org.awaitility.Awaitility
-import org.hamcrest.core.IsEqual
 import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.awt.Color
 import java.text.DecimalFormat
 import java.util.concurrent.Flow
-import java.util.concurrent.TimeUnit
 
 class SwingometerFrameBuilderTest {
     @Test
@@ -19,11 +17,10 @@ class SwingometerFrameBuilderTest {
         val frame = SwingometerFrameBuilder.basic(colors, value)
             .withHeader("SWINGOMETER".asOneTimePublisher())
             .build()
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ frame.header }, IsEqual("SWINGOMETER"))
-        Assertions.assertEquals(Color.BLUE, frame.leftColor)
-        Assertions.assertEquals(Color.RED, frame.rightColor)
-        Assertions.assertEquals(-1.0, frame.value.toDouble(), 0.0)
+        assertEquals("SWINGOMETER", frame.header)
+        assertEquals(Color.BLUE, frame.leftColor)
+        assertEquals(Color.RED, frame.rightColor)
+        assertEquals(-1.0, frame.value.toDouble(), 0.0)
     }
 
     @Test
@@ -33,11 +30,10 @@ class SwingometerFrameBuilderTest {
         val frame = SwingometerFrameBuilder.basic(colors, value)
             .withHeader("SWINGOMETER".asOneTimePublisher())
             .build()
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ frame.header }, IsEqual("SWINGOMETER"))
-        Assertions.assertEquals(Color.BLUE, frame.leftColor)
-        Assertions.assertEquals(Color.RED, frame.rightColor)
-        Assertions.assertEquals(0.0, frame.value.toDouble(), 0.0)
+        assertEquals("SWINGOMETER", frame.header)
+        assertEquals(Color.BLUE, frame.leftColor)
+        assertEquals(Color.RED, frame.rightColor)
+        assertEquals(0.0, frame.value.toDouble(), 0.0)
     }
 
     @Test
@@ -50,30 +46,29 @@ class SwingometerFrameBuilderTest {
             .withRange(range)
             .withBucketSize(bucketSize)
             .build()
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ frame.value.toDouble() }, IsEqual(-1.0))
-        Assertions.assertEquals(10.0, frame.range.toDouble(), 0.0)
-        Assertions.assertEquals(20, frame.numBucketsPerSide.toLong())
+        assertEquals(-1.0, frame.value.toDouble(), 1e-6)
+        assertEquals(10.0, frame.range.toDouble(), 0.0)
+        assertEquals(20, frame.numBucketsPerSide.toLong())
+
         value.submit(14.8)
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ frame.value.toDouble() }, IsEqual(14.8))
-        Assertions.assertEquals(15.0, frame.range.toDouble(), 0.0)
-        Assertions.assertEquals(30, frame.numBucketsPerSide.toLong())
+        assertEquals(14.8, frame.value.toDouble(), 1e-6)
+        assertEquals(15.0, frame.range.toDouble(), 0.0)
+        assertEquals(30, frame.numBucketsPerSide.toLong())
+
         value.submit(-11.2)
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ frame.value.toDouble() }, IsEqual(-11.2))
-        Assertions.assertEquals(11.5, frame.range.toDouble(), 0.0)
-        Assertions.assertEquals(23, frame.numBucketsPerSide.toLong())
+        assertEquals(-11.2, frame.value.toDouble(), 1e-6)
+        assertEquals(11.5, frame.range.toDouble(), 0.0)
+        assertEquals(23, frame.numBucketsPerSide.toLong())
+
         value.submit(2.7)
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ frame.value.toDouble() }, IsEqual(2.7))
-        Assertions.assertEquals(10.0, frame.range.toDouble(), 0.0)
-        Assertions.assertEquals(20, frame.numBucketsPerSide.toLong())
+        assertEquals(2.7, frame.value.toDouble(), 1e-6)
+        assertEquals(10.0, frame.range.toDouble(), 0.0)
+        assertEquals(20, frame.numBucketsPerSide.toLong())
+
         value.submit(-3.4)
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ frame.value.toDouble() }, IsEqual(-3.4))
-        Assertions.assertEquals(10.0, frame.range.toDouble(), 0.0)
-        Assertions.assertEquals(20, frame.numBucketsPerSide.toLong())
+        assertEquals(-3.4, frame.value.toDouble())
+        assertEquals(10.0, frame.range.toDouble(), 0.0)
+        assertEquals(20, frame.numBucketsPerSide.toLong())
     }
 
     @Test
@@ -86,15 +81,13 @@ class SwingometerFrameBuilderTest {
             .withRange(range)
             .withTickInterval(tickInterval) { DecimalFormat("0").format(it) }
             .build()
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ frame.numTicks }, IsEqual(19))
+        assertEquals(19, frame.numTicks)
         val ticks = (0 until frame.numTicks).associate { frame.getTickPosition(it) to frame.getTickText(it) }
-        Assertions.assertEquals("9", ticks[-9.0])
-        Assertions.assertEquals("0", ticks[0.0])
-        Assertions.assertEquals("5", ticks[5.0])
+        assertEquals("9", ticks[-9.0])
+        assertEquals("0", ticks[0.0])
+        assertEquals("5", ticks[5.0])
         value.submit(11.3)
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ frame.numTicks }, IsEqual(23))
+        assertEquals(23, frame.numTicks)
     }
 
     @Test
@@ -107,9 +100,8 @@ class SwingometerFrameBuilderTest {
             .withLeftNeedingToWin(leftToWin)
             .withRightNeedingToWin(rightToWin)
             .build()
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ frame.leftToWin.toDouble() }, IsEqual(-2.0))
-        Assertions.assertEquals(4.0, frame.rightToWin.toDouble(), 0.0)
+        assertEquals(-2.0, frame.leftToWin.toDouble(), 0.0)
+        assertEquals(4.0, frame.rightToWin.toDouble(), 0.0)
     }
 
     @Test
@@ -135,12 +127,11 @@ class SwingometerFrameBuilderTest {
         val frame = SwingometerFrameBuilder.basic(colors, value)
             .withOuterLabels(labels, { it.position }, { it.label }, { it.color })
             .build()
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ frame.numOuterLabels }, IsEqual(10))
-        Assertions.assertEquals(Color.RED, frame.getOuterLabelColor(0))
-        Assertions.assertEquals("350", frame.getOuterLabelText(1))
-        Assertions.assertEquals(7.855, frame.getOuterLabelPosition(2).toDouble(), 1e-6)
-        Assertions.assertEquals(Color.BLUE, frame.getOuterLabelColor(9))
+        assertEquals(10, frame.numOuterLabels)
+        assertEquals(Color.RED, frame.getOuterLabelColor(0))
+        assertEquals("350", frame.getOuterLabelText(1))
+        assertEquals(7.855, frame.getOuterLabelPosition(2).toDouble(), 1e-6)
+        assertEquals(Color.BLUE, frame.getOuterLabelColor(9))
     }
 
     @Test
@@ -163,11 +154,10 @@ class SwingometerFrameBuilderTest {
         val frame = SwingometerFrameBuilder.basic(colors, value)
             .withDots(dots, { it.position }, { it.color })
             .build()
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ frame.numDots }, IsEqual(7))
-        Assertions.assertEquals(0.115, frame.getDotPosition(0).toDouble(), 1e-6)
-        Assertions.assertEquals(Color.RED, frame.getDotColor(1))
-        Assertions.assertEquals("", frame.getDotLabel(2))
+        assertEquals(7, frame.numDots)
+        assertEquals(0.115, frame.getDotPosition(0).toDouble(), 1e-6)
+        assertEquals(Color.RED, frame.getDotColor(1))
+        assertEquals("", frame.getDotLabel(2))
     }
 
     @Test
@@ -190,11 +180,10 @@ class SwingometerFrameBuilderTest {
         val frame = SwingometerFrameBuilder.basic(colors, value)
             .withDots(dots, { it.position }, { it.color }, { it.label })
             .build()
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ frame.numDots }, IsEqual(7))
-        Assertions.assertEquals(0.115, frame.getDotPosition(0).toDouble(), 1e-6)
-        Assertions.assertEquals(Color.RED, frame.getDotColor(1))
-        Assertions.assertEquals("10", frame.getDotLabel(2))
+        assertEquals(7, frame.numDots)
+        assertEquals(0.115, frame.getDotPosition(0).toDouble(), 1e-6)
+        assertEquals(Color.RED, frame.getDotColor(1))
+        assertEquals("10", frame.getDotLabel(2))
     }
 
     @Test
@@ -217,10 +206,9 @@ class SwingometerFrameBuilderTest {
         val frame = SwingometerFrameBuilder.basic(colors, value)
             .withDotsSolid(dots, { it.position }, { it.color }, { it.solid })
             .build()
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ frame.numDots }, IsEqual(7))
-        Assertions.assertEquals(0.115, frame.getDotPosition(0).toDouble(), 1e-6)
-        Assertions.assertEquals(Color.RED, frame.getDotColor(1))
+        assertEquals(7, frame.numDots)
+        assertEquals(0.115, frame.getDotPosition(0).toDouble(), 1e-6)
+        assertEquals(Color.RED, frame.getDotColor(1))
         Assertions.assertTrue(frame.isDotSolid(2))
         Assertions.assertFalse(frame.isDotSolid(4))
     }
@@ -253,13 +241,11 @@ class SwingometerFrameBuilderTest {
         val frame = SwingometerFrameBuilder.basic(colors, value)
             .withFixedDots(dots, { it.position }, { it.getColor() })
             .build()
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ frame.numDots }, IsEqual(7))
-        Assertions.assertEquals(0.115, frame.getDotPosition(0).toDouble(), 1e-6)
-        Assertions.assertEquals(Color.RED, frame.getDotColor(1))
-        Assertions.assertEquals("", frame.getDotLabel(2))
+        assertEquals(7, frame.numDots)
+        assertEquals(0.115, frame.getDotPosition(0).toDouble(), 1e-6)
+        assertEquals(Color.RED, frame.getDotColor(1))
+        assertEquals("", frame.getDotLabel(2))
         dots[1].setColor(Color.BLUE)
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ frame.getDotColor(1) }, IsEqual(Color.BLUE))
+        assertEquals(Color.BLUE, frame.getDotColor(1))
     }
 }

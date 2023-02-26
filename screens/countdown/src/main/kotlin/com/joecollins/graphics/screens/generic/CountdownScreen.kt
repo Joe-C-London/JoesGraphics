@@ -9,6 +9,7 @@ import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.combine
 import com.joecollins.pubsub.map
 import com.joecollins.pubsub.merge
+import com.joecollins.utils.ExecutorUtils
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Dimension
@@ -23,10 +24,7 @@ import java.time.LocalTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
-import java.util.concurrent.Executors
 import java.util.concurrent.Flow
-import java.util.concurrent.ScheduledExecutorService
-import java.util.concurrent.TimeUnit
 import javax.swing.JPanel
 import javax.swing.border.EmptyBorder
 
@@ -103,24 +101,19 @@ class CountdownScreen private constructor(
             )
             outer.add(map, BorderLayout.CENTER)
 
-            val executor = Executors.newScheduledThreadPool(1) { r: Runnable ->
-                val t = Executors.defaultThreadFactory().newThread(r)
-                t.isDaemon = true
-                t
-            }
             val timingTexts = timings.map {
-                altTextLabel(it.second, it.first, executor)
+                altTextLabel(it.second, it.first)
             }.combine().map { it.joinToString("\n") }
             val altText = title.merge(timingTexts) { t, tt -> "$t\n\n$tt" }
 
             return CountdownScreen(outer, title, altText)
         }
 
-        private fun altTextLabel(header: String, timestamp: Instant, executor: ScheduledExecutorService): Flow.Publisher<String> {
+        private fun altTextLabel(header: String, timestamp: Instant): Flow.Publisher<String> {
             val ret = Publisher<String>()
-            executor.scheduleAtFixedRate({
+            ExecutorUtils.scheduleTicking({
                 ret.submit(header + ": " + timeLabel(Duration.between(clock.instant().truncatedTo(ChronoUnit.SECONDS), timestamp)))
-            }, 0, 100, TimeUnit.MILLISECONDS)
+            }, 100)
             return ret
         }
 

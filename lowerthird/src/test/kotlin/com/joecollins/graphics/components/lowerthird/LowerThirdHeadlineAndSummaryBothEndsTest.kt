@@ -4,17 +4,13 @@ import com.joecollins.graphics.components.lowerthird.LowerThird.Companion.create
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
-import org.awaitility.Awaitility
-import org.hamcrest.core.IsEqual
-import org.hamcrest.core.IsNot
-import org.hamcrest.core.IsNull
-import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
 import java.awt.Color
 import java.time.Clock
 import java.time.Instant
 import java.time.ZoneId
-import java.util.concurrent.TimeUnit
 
 class LowerThirdHeadlineAndSummaryBothEndsTest {
     @Test
@@ -29,8 +25,7 @@ class LowerThirdHeadlineAndSummaryBothEndsTest {
             summaryLeftPublisher = SummaryFromBothEnds.Entry(Color.BLUE, "CLINTON", 232).asOneTimePublisher(),
             summaryRightPublisher = SummaryFromBothEnds.Entry(Color.RED, "TRUMP", 306).asOneTimePublisher(),
         )
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ lowerThird.headline }, IsEqual("POLLS CLOSE ACROSS CENTRAL CANADA"))
+        assertEquals("POLLS CLOSE ACROSS CENTRAL CANADA", lowerThird.headline)
     }
 
     @Test
@@ -45,8 +40,7 @@ class LowerThirdHeadlineAndSummaryBothEndsTest {
             summaryLeftPublisher = SummaryFromBothEnds.Entry(Color.BLUE, "CLINTON", 232).asOneTimePublisher(),
             summaryRightPublisher = SummaryFromBothEnds.Entry(Color.RED, "TRUMP", 306).asOneTimePublisher(),
         )
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ lowerThird.subhead }, IsEqual("Polls open for 30 minutes on west coast"))
+        assertEquals("Polls open for 30 minutes on west coast", lowerThird.subhead)
     }
 
     @Test
@@ -61,9 +55,8 @@ class LowerThirdHeadlineAndSummaryBothEndsTest {
             summaryLeftPublisher = SummaryFromBothEnds.Entry(Color.BLUE, "CLINTON", 232).asOneTimePublisher(),
             summaryRightPublisher = SummaryFromBothEnds.Entry(Color.RED, "TRUMP", 306).asOneTimePublisher(),
         )
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ lowerThird.summaryHeader }, IsEqual("270 TO WIN"))
-        Assertions.assertEquals(538, lowerThird.total.toLong())
+        assertEquals("270 TO WIN", lowerThird.summaryHeader)
+        assertEquals(538, lowerThird.total.toLong())
     }
 
     @Test
@@ -78,14 +71,13 @@ class LowerThirdHeadlineAndSummaryBothEndsTest {
             summaryLeftPublisher = SummaryFromBothEnds.Entry(Color.BLUE, "CLINTON", 232).asOneTimePublisher(),
             summaryRightPublisher = SummaryFromBothEnds.Entry(Color.RED, "TRUMP", 306).asOneTimePublisher(),
         )
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ lowerThird.left }, IsNot(IsNull()))
-        Assertions.assertEquals(Color.BLUE, lowerThird.left!!.color)
-        Assertions.assertEquals("CLINTON", lowerThird.left!!.label)
-        Assertions.assertEquals(232, lowerThird.left!!.value.toLong())
-        Assertions.assertEquals(Color.RED, lowerThird.right!!.color)
-        Assertions.assertEquals("TRUMP", lowerThird.right!!.label)
-        Assertions.assertEquals(306, lowerThird.right!!.value.toLong())
+        assertNotNull(lowerThird.left)
+        assertEquals(Color.BLUE, lowerThird.left!!.color)
+        assertEquals("CLINTON", lowerThird.left!!.label)
+        assertEquals(232, lowerThird.left!!.value.toLong())
+        assertEquals(Color.RED, lowerThird.right!!.color)
+        assertEquals("TRUMP", lowerThird.right!!.label)
+        assertEquals(306, lowerThird.right!!.value.toLong())
     }
 
     @Test
@@ -101,17 +93,16 @@ class LowerThirdHeadlineAndSummaryBothEndsTest {
             summaryRightPublisher = SummaryFromBothEnds.Entry(Color.RED, "NIXON", 301).asOneTimePublisher(),
             summaryMiddlePublisher = SummaryFromBothEnds.Entry(Color.GRAY, "WALLACE", 46).asOneTimePublisher(),
         )
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ lowerThird.left }, IsNot(IsNull()))
-        Assertions.assertEquals(Color.BLUE, lowerThird.left!!.color)
-        Assertions.assertEquals("HUMPHREY", lowerThird.left!!.label)
-        Assertions.assertEquals(191, lowerThird.left!!.value.toLong())
-        Assertions.assertEquals(Color.RED, lowerThird.right!!.color)
-        Assertions.assertEquals("NIXON", lowerThird.right!!.label)
-        Assertions.assertEquals(301, lowerThird.right!!.value.toLong())
-        Assertions.assertEquals(Color.GRAY, lowerThird.middle!!.color)
-        Assertions.assertEquals("WALLACE", lowerThird.middle!!.label)
-        Assertions.assertEquals(46, lowerThird.middle!!.value.toLong())
+        assertNotNull(lowerThird.left)
+        assertEquals(Color.BLUE, lowerThird.left!!.color)
+        assertEquals("HUMPHREY", lowerThird.left!!.label)
+        assertEquals(191, lowerThird.left!!.value.toLong())
+        assertEquals(Color.RED, lowerThird.right!!.color)
+        assertEquals("NIXON", lowerThird.right!!.label)
+        assertEquals(301, lowerThird.right!!.value.toLong())
+        assertEquals(Color.GRAY, lowerThird.middle!!.color)
+        assertEquals("WALLACE", lowerThird.middle!!.label)
+        assertEquals(46, lowerThird.middle!!.value.toLong())
     }
 
     @Test

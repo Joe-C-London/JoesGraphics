@@ -16,6 +16,7 @@ dependencies {
     implementation topLevel.project('components:countdownframe')
     implementation topLevel.project('components:mapframe')
     implementation topLevel.project('pubsub')
+    implementation topLevel.project('threading')
     api parent.project('screenbase')
 
     testImplementation topLevel.project('mapreaders:shapefile')

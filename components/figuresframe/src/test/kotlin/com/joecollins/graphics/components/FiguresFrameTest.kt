@@ -2,12 +2,9 @@ package com.joecollins.graphics.components
 
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.pubsub.asOneTimePublisher
-import org.awaitility.Awaitility
-import org.hamcrest.core.IsEqual
-import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.awt.Color
-import java.util.concurrent.TimeUnit
 
 class FiguresFrameTest {
     @Test
@@ -22,17 +19,16 @@ class FiguresFrameTest {
             )
                 .asOneTimePublisher(),
         )
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ frame.numEntries }, IsEqual(3))
-        Assertions.assertEquals("Justin Trudeau", frame.getName(0))
-        Assertions.assertEquals("Andrew Scheer", frame.getName(1))
-        Assertions.assertEquals("Jagmeet Singh", frame.getName(2))
-        Assertions.assertEquals("Liberal Leader", frame.getDescription(0))
-        Assertions.assertEquals("Conservative Leader", frame.getDescription(1))
-        Assertions.assertEquals("NDP Leader", frame.getDescription(2))
-        Assertions.assertEquals(Color.RED, frame.getColor(0))
-        Assertions.assertEquals(Color.BLUE, frame.getColor(1))
-        Assertions.assertEquals(Color.ORANGE, frame.getColor(2))
+        assertEquals(3, frame.numEntries)
+        assertEquals("Justin Trudeau", frame.getName(0))
+        assertEquals("Andrew Scheer", frame.getName(1))
+        assertEquals("Jagmeet Singh", frame.getName(2))
+        assertEquals("Liberal Leader", frame.getDescription(0))
+        assertEquals("Conservative Leader", frame.getDescription(1))
+        assertEquals("NDP Leader", frame.getDescription(2))
+        assertEquals(Color.RED, frame.getColor(0))
+        assertEquals(Color.BLUE, frame.getColor(1))
+        assertEquals(Color.ORANGE, frame.getColor(2))
     }
 
     @Test
@@ -47,14 +43,13 @@ class FiguresFrameTest {
             )
                 .asOneTimePublisher(),
         )
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ frame.numEntries }, IsEqual(3))
-        Assertions.assertEquals("LEADING", frame.getResult(0))
-        Assertions.assertEquals("ELECTED", frame.getResult(1))
-        Assertions.assertEquals("WAITING...", frame.getResult(2))
-        Assertions.assertEquals(Color.RED, frame.getResultColor(0))
-        Assertions.assertEquals(Color.BLUE, frame.getResultColor(1))
-        Assertions.assertEquals(Color.LIGHT_GRAY, frame.getResultColor(2))
+        assertEquals(3, frame.numEntries)
+        assertEquals("LEADING", frame.getResult(0))
+        assertEquals("ELECTED", frame.getResult(1))
+        assertEquals("WAITING...", frame.getResult(2))
+        assertEquals(Color.RED, frame.getResultColor(0))
+        assertEquals(Color.BLUE, frame.getResultColor(1))
+        assertEquals(Color.LIGHT_GRAY, frame.getResultColor(2))
     }
 
     @Test

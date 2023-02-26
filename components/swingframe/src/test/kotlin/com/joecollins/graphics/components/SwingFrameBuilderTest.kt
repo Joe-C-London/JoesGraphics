@@ -6,12 +6,9 @@ import com.joecollins.graphics.components.SwingFrameBuilder.Companion.prevCurrNo
 import com.joecollins.models.general.Party
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
-import org.awaitility.Awaitility
-import org.hamcrest.core.IsEqual
-import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.awt.Color
-import java.util.concurrent.TimeUnit
 
 class SwingFrameBuilderTest {
     private class SwingProperties(val leftColor: Color, val rightColor: Color, val value: Number, val text: String)
@@ -29,21 +26,20 @@ class SwingFrameBuilderTest {
             .withRange(0.10.asOneTimePublisher())
             .withHeader("SWING".asOneTimePublisher())
             .build()
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ frame.getLeftColor() }, IsEqual(Color.RED))
-        Assertions.assertEquals(Color.BLUE, frame.getRightColor())
-        Assertions.assertEquals(Color.RED, frame.getBottomColor())
-        Assertions.assertEquals(0.02, frame.getValue().toDouble(), 1e-6)
-        Assertions.assertEquals("2% SWING", frame.getBottomText())
-        Assertions.assertEquals(0.10, frame.getRange())
-        Assertions.assertEquals("SWING", frame.header)
+        assertEquals(Color.RED, frame.getLeftColor())
+        assertEquals(Color.BLUE, frame.getRightColor())
+        assertEquals(Color.RED, frame.getBottomColor())
+        assertEquals(0.02, frame.getValue().toDouble(), 1e-6)
+        assertEquals("2% SWING", frame.getBottomText())
+        assertEquals(0.10, frame.getRange())
+        assertEquals("SWING", frame.header)
+
         swingProps.submit(SwingProperties(Color.GREEN, Color.ORANGE, -0.05, "5% SWING"))
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ frame.getLeftColor() }, IsEqual(Color.GREEN))
-        Assertions.assertEquals(Color.ORANGE, frame.getRightColor())
-        Assertions.assertEquals(Color.ORANGE, frame.getBottomColor())
-        Assertions.assertEquals(-0.05, frame.getValue().toDouble(), 1e-6)
-        Assertions.assertEquals("5% SWING", frame.getBottomText())
+        assertEquals(Color.GREEN, frame.getLeftColor())
+        assertEquals(Color.ORANGE, frame.getRightColor())
+        assertEquals(Color.ORANGE, frame.getBottomColor())
+        assertEquals(-0.05, frame.getValue().toDouble(), 1e-6)
+        assertEquals("5% SWING", frame.getBottomText())
     }
 
     @Test
@@ -60,20 +56,19 @@ class SwingFrameBuilderTest {
             .withRange(0.10.asOneTimePublisher())
             .withNeutralColor(neutralColor)
             .build()
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ frame.getBottomColor() }, IsEqual(Color.RED))
+        assertEquals(Color.RED, frame.getBottomColor())
+
         swingProps.submit(SwingProperties(Color.GREEN, Color.ORANGE, -0.05, "5% SWING"))
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ frame.getBottomColor() }, IsEqual(Color.ORANGE))
+        assertEquals(Color.ORANGE, frame.getBottomColor())
+
         neutralColor.submit(Color.LIGHT_GRAY)
-        Awaitility.await().atMost(600, TimeUnit.MILLISECONDS).pollDelay(500, TimeUnit.MILLISECONDS)
-            .until({ frame.getBottomColor() }, IsEqual(Color.ORANGE))
+        assertEquals(Color.ORANGE, frame.getBottomColor())
+
         swingProps.submit(SwingProperties(Color.GREEN, Color.ORANGE, 0.00, "NO SWING"))
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ frame.getBottomColor() }, IsEqual(Color.LIGHT_GRAY))
+        assertEquals(Color.LIGHT_GRAY, frame.getBottomColor())
+
         neutralColor.submit(Color.BLACK)
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ frame.getBottomColor() }, IsEqual(Color.BLACK))
+        assertEquals(Color.BLACK, frame.getBottomColor())
     }
 
     @Test
@@ -93,13 +88,12 @@ class SwingFrameBuilderTest {
             compareBy { partyOrder.indexOf(it) },
         )
             .build()
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ swingFrame.getLeftColor() }, IsEqual(Color.BLUE))
-        Assertions.assertEquals(Color.RED, swingFrame.getRightColor())
-        Assertions.assertEquals(Color.BLUE, swingFrame.getBottomColor())
-        Assertions.assertEquals(0.0625, swingFrame.getValue().toDouble(), 1e-6)
-        Assertions.assertEquals(0.1, swingFrame.getRange().toDouble(), 1e-6)
-        Assertions.assertEquals("6.2% SWING LIB TO CON", swingFrame.getBottomText())
+        assertEquals(Color.BLUE, swingFrame.getLeftColor())
+        assertEquals(Color.RED, swingFrame.getRightColor())
+        assertEquals(Color.BLUE, swingFrame.getBottomColor())
+        assertEquals(0.0625, swingFrame.getValue().toDouble(), 1e-6)
+        assertEquals(0.1, swingFrame.getRange().toDouble(), 1e-6)
+        assertEquals("6.2% SWING LIB TO CON", swingFrame.getBottomText())
     }
 
     @Test
@@ -114,13 +108,12 @@ class SwingFrameBuilderTest {
         // NDP: 20.00 -> 10.00 (-10.00)
         val partyOrder = listOf(ndp, lib, con)
         val swingFrame = prevCurr(prevBinding, currBinding, compareBy { partyOrder.indexOf(it) }).build()
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ swingFrame.getLeftColor() }, IsEqual(Color.BLUE))
-        Assertions.assertEquals(Color.RED, swingFrame.getRightColor())
-        Assertions.assertEquals(Color.RED, swingFrame.getBottomColor())
-        Assertions.assertEquals(-0.1, swingFrame.getValue().toDouble(), 1e-6)
-        Assertions.assertEquals(0.1, swingFrame.getRange().toDouble(), 1e-6)
-        Assertions.assertEquals("10.0% SWING CON TO LIB", swingFrame.getBottomText())
+        assertEquals(Color.BLUE, swingFrame.getLeftColor())
+        assertEquals(Color.RED, swingFrame.getRightColor())
+        assertEquals(Color.RED, swingFrame.getBottomColor())
+        assertEquals(-0.1, swingFrame.getValue().toDouble(), 1e-6)
+        assertEquals(0.1, swingFrame.getRange().toDouble(), 1e-6)
+        assertEquals("10.0% SWING CON TO LIB", swingFrame.getBottomText())
     }
 
     @Test
@@ -140,17 +133,16 @@ class SwingFrameBuilderTest {
             compareBy { partyOrder.indexOf(it) },
         )
             .build()
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ swingFrame.getBottomText() }, IsEqual("10.0% SWING CON TO LIB"))
-        Assertions.assertEquals(
+        assertEquals("10.0% SWING CON TO LIB", swingFrame.getBottomText())
+        assertEquals(
             setOf(Color.BLUE, Color.RED),
             setOf(swingFrame.getLeftColor(), swingFrame.getRightColor()),
         )
         //    assertEquals(Color.RED, swingFrame.getBottomColor());
         //    assertEquals(0.1 * (swingFrame.getLeftColor().equals(Color.BLUE) ? -1 : 1),
         // swingFrame.getValue().doubleValue(), 1e-6);
-        Assertions.assertEquals(0.1, swingFrame.getRange().toDouble(), 1e-6)
-        Assertions.assertEquals("10.0% SWING CON TO LIB", swingFrame.getBottomText())
+        assertEquals(0.1, swingFrame.getRange().toDouble(), 1e-6)
+        assertEquals("10.0% SWING CON TO LIB", swingFrame.getBottomText())
     }
 
     @Test
@@ -165,13 +157,12 @@ class SwingFrameBuilderTest {
         // NDP: 20.00 -> 60.00 (+40.00)
         val partyOrder = listOf(ndp, lib, con)
         val swingFrame = prevCurr(prevBinding, currBinding, compareBy { partyOrder.indexOf(it) }).build()
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ swingFrame.getLeftColor() }, IsEqual(Color.BLUE))
-        Assertions.assertEquals(Color.ORANGE, swingFrame.getRightColor())
-        Assertions.assertEquals(Color.ORANGE, swingFrame.getBottomColor())
-        Assertions.assertEquals(-0.325, swingFrame.getValue().toDouble(), 1e-6)
-        Assertions.assertEquals(0.1, swingFrame.getRange().toDouble(), 1e-6)
-        Assertions.assertEquals("32.5% SWING CON TO NDP", swingFrame.getBottomText())
+        assertEquals(Color.BLUE, swingFrame.getLeftColor())
+        assertEquals(Color.ORANGE, swingFrame.getRightColor())
+        assertEquals(Color.ORANGE, swingFrame.getBottomColor())
+        assertEquals(-0.325, swingFrame.getValue().toDouble(), 1e-6)
+        assertEquals(0.1, swingFrame.getRange().toDouble(), 1e-6)
+        assertEquals("32.5% SWING CON TO NDP", swingFrame.getBottomText())
     }
 
     @Test
@@ -183,13 +174,12 @@ class SwingFrameBuilderTest {
         val currBinding = mapOf(lib to 15, con to 25, ndp to 10).asOneTimePublisher()
         val partyOrder = listOf(ndp, lib, con)
         val swingFrame = prevCurr(prevBinding, currBinding, Comparator.comparing { partyOrder.indexOf(it) }).build()
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ swingFrame.getLeftColor() }, IsEqual(Color.BLUE))
-        Assertions.assertEquals(Color.RED, swingFrame.getRightColor())
-        Assertions.assertEquals(Color.LIGHT_GRAY, swingFrame.getBottomColor())
-        Assertions.assertEquals(0.0, swingFrame.getValue().toDouble(), 1e-6)
-        Assertions.assertEquals(0.1, swingFrame.getRange().toDouble(), 1e-6)
-        Assertions.assertEquals("NO SWING", swingFrame.getBottomText())
+        assertEquals(Color.BLUE, swingFrame.getLeftColor())
+        assertEquals(Color.RED, swingFrame.getRightColor())
+        assertEquals(Color.LIGHT_GRAY, swingFrame.getBottomColor())
+        assertEquals(0.0, swingFrame.getValue().toDouble(), 1e-6)
+        assertEquals(0.1, swingFrame.getRange().toDouble(), 1e-6)
+        assertEquals("NO SWING", swingFrame.getBottomText())
     }
 
     @Test
@@ -201,13 +191,12 @@ class SwingFrameBuilderTest {
         val currBinding = emptyMap<Party, Int>().asOneTimePublisher()
         val partyOrder = listOf(ndp, lib, con)
         val swingFrame = prevCurr(prevBinding, currBinding, Comparator.comparing { partyOrder.indexOf(it) }).build()
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ swingFrame.getLeftColor() }, IsEqual(Color.LIGHT_GRAY))
-        Assertions.assertEquals(Color.LIGHT_GRAY, swingFrame.getRightColor())
-        Assertions.assertEquals(Color.LIGHT_GRAY, swingFrame.getBottomColor())
-        Assertions.assertEquals(0.0, swingFrame.getValue().toDouble(), 1e-6)
-        Assertions.assertEquals(0.1, swingFrame.getRange().toDouble(), 1e-6)
-        Assertions.assertEquals("NOT AVAILABLE", swingFrame.getBottomText())
+        assertEquals(Color.LIGHT_GRAY, swingFrame.getLeftColor())
+        assertEquals(Color.LIGHT_GRAY, swingFrame.getRightColor())
+        assertEquals(Color.LIGHT_GRAY, swingFrame.getBottomColor())
+        assertEquals(0.0, swingFrame.getValue().toDouble(), 1e-6)
+        assertEquals(0.1, swingFrame.getRange().toDouble(), 1e-6)
+        assertEquals("NOT AVAILABLE", swingFrame.getBottomText())
     }
 
     @Test
@@ -222,12 +211,11 @@ class SwingFrameBuilderTest {
         // NDP: 20.00 -> 18.00 (- 2.00)
         val partyOrder = listOf(ndp, lib, con)
         val swingFrame = prevCurrNormalised(prevBinding, currBinding, Comparator.comparing { partyOrder.indexOf(it) }).build()
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ swingFrame.getLeftColor() }, IsEqual(Color.BLUE))
-        Assertions.assertEquals(Color.RED, swingFrame.getRightColor())
-        Assertions.assertEquals(Color.BLUE, swingFrame.getBottomColor())
-        Assertions.assertEquals(0.035, swingFrame.getValue().toDouble(), 1e-6)
-        Assertions.assertEquals(0.1, swingFrame.getRange().toDouble(), 1e-6)
-        Assertions.assertEquals("3.5% SWING LIB TO CON", swingFrame.getBottomText())
+        assertEquals(Color.BLUE, swingFrame.getLeftColor())
+        assertEquals(Color.RED, swingFrame.getRightColor())
+        assertEquals(Color.BLUE, swingFrame.getBottomColor())
+        assertEquals(0.035, swingFrame.getValue().toDouble(), 1e-6)
+        assertEquals(0.1, swingFrame.getRange().toDouble(), 1e-6)
+        assertEquals("3.5% SWING LIB TO CON", swingFrame.getBottomText())
     }
 }

@@ -97,7 +97,7 @@ class MultiResultScreenTest {
             )
             .build("PARTY LEADERS".asOneTimePublisher())
         panel.setSize(1024, 512)
-        compareRendering("MultiResultPanel", "Basic-1", panel, 2)
+        compareRendering("MultiResultPanel", "Basic-1", panel)
         assertPublishes(
             panel.altText,
             """

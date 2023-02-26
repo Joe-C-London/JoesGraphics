@@ -4,12 +4,9 @@ import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.mapElements
-import org.awaitility.Awaitility
-import org.hamcrest.core.IsEqual
-import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.awt.Color
-import java.util.concurrent.TimeUnit
 
 class ResultListingFrameTest {
     @Test
@@ -19,8 +16,7 @@ class ResultListingFrameTest {
             numRowsPublisher = 20.asOneTimePublisher(),
             itemsPublisher = emptyList<ResultListingFrame.Item>().asOneTimePublisher(),
         )
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ frame.getNumRows() }, IsEqual(20))
+        assertEquals(20, frame.getNumRows())
     }
 
     @Test
@@ -48,21 +44,18 @@ class ResultListingFrameTest {
                 )
             },
         )
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ frame.getNumItems() }, IsEqual(8))
-        Assertions.assertEquals("BELFAST-MURRAY RIVER", frame.getText(0))
-        Assertions.assertEquals(Color.WHITE, frame.getBackground(1))
-        Assertions.assertEquals(Color.BLACK, frame.getForeground(2))
-        Assertions.assertEquals(Color.BLUE, frame.getBorder(3))
+        assertEquals(8, frame.getNumItems())
+        assertEquals("BELFAST-MURRAY RIVER", frame.getText(0))
+        assertEquals(Color.WHITE, frame.getBackground(1))
+        assertEquals(Color.BLACK, frame.getForeground(2))
+        assertEquals(Color.BLUE, frame.getBorder(3))
 
         rawItems[4].foreground = Color.WHITE
         rawItems[4].background = Color.BLUE
         items.submit(rawItems)
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ frame.getBackground(4) }, IsEqual(Color.BLUE))
-        Assertions.assertEquals(Color.BLUE, frame.getBackground(4))
-        Assertions.assertEquals(Color.WHITE, frame.getForeground(4))
-        Assertions.assertEquals(Color.BLUE, frame.getBorder(4))
+        assertEquals(Color.BLUE, frame.getBackground(4))
+        assertEquals(Color.WHITE, frame.getForeground(4))
+        assertEquals(Color.BLUE, frame.getBorder(4))
     }
 
     @Test

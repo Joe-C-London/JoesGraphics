@@ -3,14 +3,12 @@ package com.joecollins.graphics.components.lowerthird
 import com.joecollins.graphics.components.lowerthird.LowerThird.Companion.createImage
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.pubsub.asOneTimePublisher
-import org.awaitility.Awaitility
-import org.hamcrest.core.IsEqual
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.awt.Color
 import java.time.Clock
 import java.time.Instant
 import java.time.ZoneId
-import java.util.concurrent.TimeUnit
 
 class LowerThirdHeadlineOnlyTest {
     @Test
@@ -21,8 +19,7 @@ class LowerThirdHeadlineOnlyTest {
             headlinePublisher = "POLLS CLOSE ACROSS CENTRAL CANADA".asOneTimePublisher(),
             subheadPublisher = "Polls open for 30 minutes on west coast".asOneTimePublisher(),
         )
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ lowerThird.headline }, IsEqual("POLLS CLOSE ACROSS CENTRAL CANADA"))
+        assertEquals("POLLS CLOSE ACROSS CENTRAL CANADA", lowerThird.headline)
     }
 
     @Test
@@ -33,8 +30,7 @@ class LowerThirdHeadlineOnlyTest {
             headlinePublisher = "POLLS CLOSE ACROSS CENTRAL CANADA".asOneTimePublisher(),
             subheadPublisher = "Polls open for 30 minutes on west coast".asOneTimePublisher(),
         )
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ lowerThird.subhead }, IsEqual("Polls open for 30 minutes on west coast"))
+        assertEquals("Polls open for 30 minutes on west coast", lowerThird.subhead)
     }
 
     @Test

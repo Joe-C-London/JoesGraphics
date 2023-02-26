@@ -1,16 +1,13 @@
 package com.joecollins.graphics.utils
 
-import org.awaitility.Awaitility
-import org.hamcrest.Matchers
+import org.junit.jupiter.api.Assertions.assertEquals
 import java.util.concurrent.Flow
-import java.util.concurrent.TimeUnit
 
 object PublisherTestUtils {
 
     fun <T> assertPublishes(
         publisher: Flow.Publisher<out T>,
         expected: T,
-        timeoutSeconds: Long = 1,
     ) {
         data class Wrapper<T>(val item: T)
         var result: Wrapper<T>? = null
@@ -34,8 +31,6 @@ object PublisherTestUtils {
                 this.subscription.request(1)
             }
         })
-        Awaitility.await().atMost(timeoutSeconds, TimeUnit.SECONDS)
-            .ignoreException(NullPointerException::class.java)
-            .until({ result!!.item }, Matchers.equalTo(expected))
+        assertEquals(expected, result!!.item)
     }
 }

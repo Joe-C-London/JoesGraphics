@@ -3,15 +3,12 @@ package com.joecollins.graphics.components.lowerthird
 import com.joecollins.graphics.components.lowerthird.LowerThird.Companion.createImage
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.pubsub.asOneTimePublisher
-import org.awaitility.Awaitility
-import org.hamcrest.core.IsEqual
-import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.awt.Color
 import java.time.Clock
 import java.time.Instant
 import java.time.ZoneId
-import java.util.concurrent.TimeUnit
 
 class LowerThirdHeadlineAndSummaryHeaderAndLabelsTest {
     @Test
@@ -29,8 +26,7 @@ class LowerThirdHeadlineAndSummaryHeaderAndLabelsTest {
             )
                 .asOneTimePublisher(),
         )
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ lowerThird.headline }, IsEqual("POLLS CLOSE ACROSS CENTRAL CANADA"))
+        assertEquals("POLLS CLOSE ACROSS CENTRAL CANADA", lowerThird.headline)
     }
 
     @Test
@@ -48,8 +44,7 @@ class LowerThirdHeadlineAndSummaryHeaderAndLabelsTest {
             )
                 .asOneTimePublisher(),
         )
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ lowerThird.subhead }, IsEqual("Polls open for 30 minutes on west coast"))
+        assertEquals("Polls open for 30 minutes on west coast", lowerThird.subhead)
     }
 
     @Test
@@ -67,15 +62,14 @@ class LowerThirdHeadlineAndSummaryHeaderAndLabelsTest {
             )
                 .asOneTimePublisher(),
         )
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ lowerThird.numSummaryEntries }, IsEqual(2))
-        Assertions.assertEquals(Color.RED, lowerThird.getEntryColor(0))
-        Assertions.assertEquals(Color.BLUE, lowerThird.getEntryColor(1))
-        Assertions.assertEquals("LIB", lowerThird.getEntryLabel(0))
-        Assertions.assertEquals("CON", lowerThird.getEntryLabel(1))
-        Assertions.assertEquals("2", lowerThird.getEntryValue(0))
-        Assertions.assertEquals("1", lowerThird.getEntryValue(1))
-        Assertions.assertEquals("170 SEATS FOR MAJORITY", lowerThird.summaryHeader)
+        assertEquals(2, lowerThird.numSummaryEntries)
+        assertEquals(Color.RED, lowerThird.getEntryColor(0))
+        assertEquals(Color.BLUE, lowerThird.getEntryColor(1))
+        assertEquals("LIB", lowerThird.getEntryLabel(0))
+        assertEquals("CON", lowerThird.getEntryLabel(1))
+        assertEquals("2", lowerThird.getEntryValue(0))
+        assertEquals("1", lowerThird.getEntryValue(1))
+        assertEquals("170 SEATS FOR MAJORITY", lowerThird.summaryHeader)
     }
 
     @Test

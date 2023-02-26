@@ -4,15 +4,12 @@ import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.graphics.utils.ShapefileReader
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
-import org.awaitility.Awaitility
-import org.hamcrest.core.IsEqual
-import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.awt.Color
 import java.awt.Shape
 import java.awt.geom.Area
 import java.awt.geom.Rectangle2D
-import java.util.concurrent.TimeUnit
 
 class MapFrameTest {
     @Test
@@ -22,10 +19,9 @@ class MapFrameTest {
             headerPublisher = (null as String?).asOneTimePublisher(),
             shapesPublisher = shapes.map { Pair(it.shape, it.color) }.asOneTimePublisher(),
         )
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ mapFrame.numShapes }, IsEqual(27))
-        Assertions.assertEquals(shapes[0].shape, mapFrame.getShape(0))
-        Assertions.assertEquals(shapes[0].color, mapFrame.getColor(0))
+        assertEquals(27, mapFrame.numShapes)
+        assertEquals(shapes[0].shape, mapFrame.getShape(0))
+        assertEquals(shapes[0].color, mapFrame.getColor(0))
     }
 
     @Test
@@ -43,7 +39,7 @@ class MapFrameTest {
                 ret
             }
             .bounds2D
-        Assertions.assertEquals(bindingBox, mapFrame.focusBox)
+        assertEquals(bindingBox, mapFrame.focusBox)
     }
 
     @Test
@@ -55,8 +51,7 @@ class MapFrameTest {
             shapesPublisher = shapes.map { Pair(it.shape, it.color) }.asOneTimePublisher(),
             focusBoxPublisher = cityBox.asOneTimePublisher(),
         )
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ mapFrame.focusBox }, IsEqual(cityBox))
+        assertEquals(cityBox, mapFrame.focusBox)
     }
 
     @Test
@@ -67,9 +62,8 @@ class MapFrameTest {
             shapesPublisher = regions.map { Pair(it, Color.BLACK) }.asOneTimePublisher(),
             outlineShapesPublisher = regions.asOneTimePublisher(),
         )
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ mapFrame.numOutlineShapes }, IsEqual(4))
-        Assertions.assertEquals(regions[0], mapFrame.getOutlineShape(0))
+        assertEquals(4, mapFrame.numOutlineShapes)
+        assertEquals(regions[0], mapFrame.getOutlineShape(0))
     }
 
     @Test

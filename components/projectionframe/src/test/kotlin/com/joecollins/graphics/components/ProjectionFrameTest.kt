@@ -2,13 +2,10 @@ package com.joecollins.graphics.components
 
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.pubsub.asOneTimePublisher
-import org.awaitility.Awaitility
-import org.hamcrest.core.IsEqual
-import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.awt.Color
 import java.awt.Image
-import java.util.concurrent.TimeUnit
 import javax.imageio.ImageIO
 
 class ProjectionFrameTest {
@@ -22,8 +19,7 @@ class ProjectionFrameTest {
             backColorPublisher = Color.GRAY.asOneTimePublisher(),
             footerTextPublisher = "MINORITY LEGISLATURE".asOneTimePublisher(),
         )
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ frame.getImage() }, IsEqual(image))
+        assertEquals(image, frame.getImage())
     }
 
     @Test
@@ -35,8 +31,7 @@ class ProjectionFrameTest {
             backColorPublisher = Color.GRAY.asOneTimePublisher(),
             footerTextPublisher = "MINORITY LEGISLATURE".asOneTimePublisher(),
         )
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ frame.getBackColor() }, IsEqual(Color.GRAY))
+        assertEquals(Color.GRAY, frame.getBackColor())
     }
 
     @Test
@@ -48,8 +43,7 @@ class ProjectionFrameTest {
             backColorPublisher = Color.GRAY.asOneTimePublisher(),
             footerTextPublisher = "MINORITY LEGISLATURE".asOneTimePublisher(),
         )
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ frame.getFooterText() }, IsEqual("MINORITY LEGISLATURE"))
+        assertEquals("MINORITY LEGISLATURE", frame.getFooterText())
     }
 
     @Test
@@ -62,8 +56,7 @@ class ProjectionFrameTest {
             footerTextPublisher = "MINORITY LEGISLATURE".asOneTimePublisher(),
             imageAlignmentPublisher = ProjectionFrame.Alignment.MIDDLE.asOneTimePublisher(),
         )
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ frame.getImageAlignment() }, IsEqual(ProjectionFrame.Alignment.MIDDLE))
+        assertEquals(ProjectionFrame.Alignment.MIDDLE, frame.getImageAlignment())
     }
 
     @Test
@@ -75,7 +68,7 @@ class ProjectionFrameTest {
             backColorPublisher = Color.GRAY.asOneTimePublisher(),
             footerTextPublisher = "MINORITY LEGISLATURE".asOneTimePublisher(),
         )
-        Assertions.assertEquals(ProjectionFrame.Alignment.BOTTOM, frame.getImageAlignment())
+        assertEquals(ProjectionFrame.Alignment.BOTTOM, frame.getImageAlignment())
     }
 
     @Test

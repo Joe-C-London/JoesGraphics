@@ -4,6 +4,7 @@ import com.joecollins.graphics.components.FontSizeAdjustingLabel
 import com.joecollins.graphics.utils.StandardFont
 import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
+import com.joecollins.utils.ExecutorUtils
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Dimension
@@ -22,9 +23,7 @@ import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.util.Locale
-import java.util.concurrent.Executors
 import java.util.concurrent.Flow
-import java.util.concurrent.TimeUnit
 import javax.imageio.ImageIO
 import javax.swing.JLabel
 import javax.swing.JPanel
@@ -85,12 +84,6 @@ open class LowerThird internal constructor(
     private inner class PlaceAndTimePanel : JPanel() {
         private val formatter = DateTimeFormatter.ofPattern("HH:mm")
         private val tzFormatter = DateTimeFormatter.ofPattern("zzz", Locale.ENGLISH)
-        private val executor = Executors.newSingleThreadScheduledExecutor { r: Runnable ->
-            val t = Thread(r)
-            t.name = "LowerThird-Timer-" + this.hashCode()
-            t.isDaemon = true
-            t
-        }
 
         private val placeLabel: JLabel = FontSizeAdjustingLabel("UTC")
         private val timeLabel: JLabel
@@ -200,7 +193,7 @@ open class LowerThird internal constructor(
                     },
                 )
             }
-            executor.scheduleAtFixedRate({ updateTime() }, 0, 100, TimeUnit.MILLISECONDS)
+            ExecutorUtils.scheduleTicking({ updateTime() }, 100)
         }
     }
 

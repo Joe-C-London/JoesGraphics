@@ -2,9 +2,7 @@ package com.joecollins.graphics.components
 
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.pubsub.asOneTimePublisher
-import org.awaitility.Awaitility
-import org.hamcrest.core.IsEqual
-import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.awt.Color
 import java.time.Clock
@@ -12,7 +10,6 @@ import java.time.Duration
 import java.time.Instant
 import java.time.ZoneId
 import java.time.ZonedDateTime
-import java.util.concurrent.TimeUnit
 
 class CountdownFrameTest {
     @Test
@@ -23,9 +20,7 @@ class CountdownFrameTest {
             labelFunc = { CountdownFrame.formatDDHHMMSS(it) },
         )
         frame.clock = Clock.fixed(Instant.parse("2020-07-04T12:34:56Z"), ZoneId.of("UTC"))
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ frame.getTimeRemaining().toDays() }, IsEqual(1L))
-        Assertions.assertEquals(
+        assertEquals(
             Duration.ofDays(1).plusHours(10).plusMinutes(25).plusSeconds(4),
             frame.getTimeRemaining(),
         )
@@ -39,8 +34,7 @@ class CountdownFrameTest {
             labelFunc = { CountdownFrame.formatMMSS(it) },
         )
         frame.clock = Clock.fixed(Instant.parse("2020-07-04T12:34:56Z"), ZoneId.of("UTC"))
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ frame.getTimeRemainingString() }, IsEqual("2065:04"))
+        assertEquals("2065:04", frame.getTimeRemainingString())
     }
 
     @Test
@@ -51,13 +45,10 @@ class CountdownFrameTest {
             labelFunc = { CountdownFrame.formatDDHHMMSS(it) },
         )
         frame.clock = Clock.fixed(Instant.parse("2020-07-04T12:34:56Z"), ZoneId.of("UTC"))
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ frame.getTimeRemainingString() }, IsEqual("1:10:25:04"))
-        Assertions.assertEquals("1:10:25:04", frame.getTimeRemainingString())
+        assertEquals("1:10:25:04", frame.getTimeRemainingString())
+
         frame.clock = Clock.fixed(Instant.parse("2020-07-04T12:34:57Z"), ZoneId.of("UTC"))
-        Thread.sleep(200)
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ frame.getTimeRemainingString() }, IsEqual("1:10:25:03"))
+        assertEquals("1:10:25:03", frame.getTimeRemainingString())
     }
 
     @Test
@@ -68,8 +59,7 @@ class CountdownFrameTest {
             labelFunc = { CountdownFrame.formatDDHHMMSS(it) },
             additionalInfoPublisher = "ADDITIONAL INFO".asOneTimePublisher(),
         )
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ frame.getAdditionalInfo() }, IsEqual("ADDITIONAL INFO"))
+        assertEquals("ADDITIONAL INFO", frame.getAdditionalInfo())
     }
 
     @Test
@@ -80,8 +70,7 @@ class CountdownFrameTest {
             labelFunc = { CountdownFrame.formatDDHHMMSS(it) },
             countdownColorPublisher = Color.RED.asOneTimePublisher(),
         )
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ frame.getCountdownColor() }, IsEqual(Color.RED))
+        assertEquals(Color.RED, frame.getCountdownColor())
     }
 
     @Test

@@ -3,15 +3,12 @@ package com.joecollins.graphics.components.lowerthird
 import com.joecollins.graphics.components.lowerthird.LowerThird.Companion.createImage
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.pubsub.asOneTimePublisher
-import org.awaitility.Awaitility
-import org.hamcrest.core.IsEqual
-import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.awt.Color
 import java.time.Clock
 import java.time.Instant
 import java.time.ZoneId
-import java.util.concurrent.TimeUnit
 
 class LowerThirdTest {
     @Test
@@ -21,8 +18,7 @@ class LowerThirdTest {
             leftImagePublisher = image.asOneTimePublisher(),
             placePublisher = ("OTTAWA" to ZoneId.of("Canada/Eastern")).asOneTimePublisher(),
         )
-        Awaitility.await().atMost(500, TimeUnit.MILLISECONDS)
-            .until({ lowerThird.leftImage }, IsEqual(image))
+        assertEquals(image, lowerThird.leftImage)
     }
 
     @Test
@@ -33,8 +29,8 @@ class LowerThirdTest {
             clock = Clock.fixed(Instant.parse("2019-10-22T01:30:00Z"), ZoneId.systemDefault()),
         )
         Thread.sleep(100)
-        Assertions.assertEquals("OTTAWA", lowerThird.place)
-        Assertions.assertEquals("21:30", lowerThird.time)
+        assertEquals("OTTAWA", lowerThird.place)
+        assertEquals("21:30", lowerThird.time)
     }
 
     @Test

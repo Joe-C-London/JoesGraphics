@@ -15,9 +15,11 @@ var topLevel = parent.parent
 dependencies {
     api parent.project('componentbase')
     implementation topLevel.project('pubsub')
+    implementation topLevel.project('threading')
 
     testImplementation topLevel.project('mapreaders:shapefile')
     testImplementation topLevel.project('testutils')
+
     testImplementation "org.junit.jupiter:junit-jupiter-api:$topLevel.ext.junit_version"
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$topLevel.ext.junit_version"
 }

@@ -13,6 +13,8 @@ version '1.0-SNAPSHOT'
 dependencies {
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
 
+    implementation parent.project('threading')
+
     testImplementation parent.project('testutils')
 
     testImplementation "org.junit.jupiter:junit-jupiter-api:$parent.ext.junit_version"

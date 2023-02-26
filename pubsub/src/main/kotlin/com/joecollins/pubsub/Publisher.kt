@@ -1,13 +1,15 @@
 package com.joecollins.pubsub
 
+import com.joecollins.utils.ExecutorUtils
 import org.apache.commons.lang3.tuple.MutablePair
 import java.util.concurrent.CompletableFuture
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Flow
 import java.util.concurrent.LinkedBlockingQueue
 
 class Publisher<T>() : Flow.Publisher<T>, AutoCloseable {
 
-    private val subscriptions = HashSet<Subscription>()
+    private val subscriptions = ConcurrentHashMap.newKeySet<Subscription>()
     private var value: Wrapper<T>? = null
 
     constructor(firstPublication: T) : this() {
@@ -71,13 +73,13 @@ class Publisher<T>() : Flow.Publisher<T>, AutoCloseable {
         private fun process() {
             while (waitingFor > 0 && !queue.isEmpty()) {
                 val next = queue.take().item
-                future = future.thenRunAsync {
+                future = future.thenRunAsync({
                     try {
                         subscriber.onNext(next)
                     } catch (e: Exception) {
                         subscriber.onError(e)
                     }
-                }
+                }, ExecutorUtils.defaultExecutor)
                 waitingFor--
             }
         }
