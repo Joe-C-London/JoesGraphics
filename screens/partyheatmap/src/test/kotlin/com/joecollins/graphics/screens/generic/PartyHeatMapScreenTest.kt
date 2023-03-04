@@ -46,12 +46,12 @@ class PartyHeatMapScreenTest {
             LIBERAL
             0 (44 FOR MAJORITY)
             ±0 (+1 FOR MAJORITY)
-            BALANCE: 44
+            BALANCE: 0-87
             
             NEW DEMOCRATIC PARTY
             0 (44 FOR MAJORITY)
             ±0 (+3 FOR MAJORITY)
-            BALANCE: 44
+            BALANCE: 0-87
             """.trimIndent(),
         )
 
@@ -69,12 +69,12 @@ class PartyHeatMapScreenTest {
             LIBERAL
             0 (44 FOR MAJORITY)
             -1 (+1 FOR MAJORITY)
-            BALANCE: 21
+            BALANCE: 0-42
             
             NEW DEMOCRATIC PARTY
             1 (44 FOR MAJORITY)
             +1 (+3 FOR MAJORITY)
-            BALANCE: 65
+            BALANCE: 42-87
             """.trimIndent(),
         )
 
@@ -90,12 +90,12 @@ class PartyHeatMapScreenTest {
             LIBERAL
             16 (44 FOR MAJORITY)
             -4 (+1 FOR MAJORITY)
-            BALANCE: 36
+            BALANCE: 36-36
             
             NEW DEMOCRATIC PARTY
             44 (44 FOR MAJORITY)
             +5 (+3 FOR MAJORITY)
-            BALANCE: 52
+            BALANCE: 49-54
             """.trimIndent(),
         )
 
@@ -111,12 +111,12 @@ class PartyHeatMapScreenTest {
             LIBERAL
             28 (44 FOR MAJORITY)
             -15 (+1 FOR MAJORITY)
-            BALANCE: 28
+            BALANCE: 26-30
             
             NEW DEMOCRATIC PARTY
             57 (44 FOR MAJORITY)
             +16 (+3 FOR MAJORITY)
-            BALANCE: 57
+            BALANCE: 56-58
             """.trimIndent(),
         )
     }
@@ -155,12 +155,12 @@ class PartyHeatMapScreenTest {
             LIBERAL
             0/0 (44 FOR MAJORITY)
             ±0/±0 (+1 FOR MAJORITY)
-            BALANCE: 44
+            BALANCE: 0-87
             
             NEW DEMOCRATIC PARTY
             0/0 (44 FOR MAJORITY)
             ±0/±0 (+3 FOR MAJORITY)
-            BALANCE: 44
+            BALANCE: 0-87
             """.trimIndent(),
         )
 
@@ -181,12 +181,12 @@ class PartyHeatMapScreenTest {
             LIBERAL
             0/1 (44 FOR MAJORITY)
             -1/-3 (+1 FOR MAJORITY)
-            BALANCE: 40
+            BALANCE: 40-40
             
             NEW DEMOCRATIC PARTY
             1/3 (44 FOR MAJORITY)
             +1/+3 (+3 FOR MAJORITY)
-            BALANCE: 44
+            BALANCE: 44-44
             """.trimIndent(),
         )
 
@@ -200,12 +200,12 @@ class PartyHeatMapScreenTest {
             LIBERAL
             16/28 (44 FOR MAJORITY)
             -4/-15 (+1 FOR MAJORITY)
-            BALANCE: 28
+            BALANCE: 26-30
             
             NEW DEMOCRATIC PARTY
             44/57 (44 FOR MAJORITY)
             +5/+16 (+3 FOR MAJORITY)
-            BALANCE: 57
+            BALANCE: 56-58
             """.trimIndent(),
         )
 
@@ -220,17 +220,17 @@ class PartyHeatMapScreenTest {
             LIBERAL
             16/28 (44 FOR MAJORITY)
             -4/-15 (+1 FOR MAJORITY)
-            BALANCE: 28
+            BALANCE: 26-30
             
             NEW DEMOCRATIC PARTY
             44/57 (44 FOR MAJORITY)
             +5/+16 (+3 FOR MAJORITY)
-            BALANCE: 57
+            BALANCE: 56-58
             
             GREEN
             1/2 (44 FOR MAJORITY)
             -1/-1 (+41 FOR MAJORITY)
-            BALANCE: 3
+            BALANCE: 2-3
             """.trimIndent(),
         )
     }
@@ -270,12 +270,12 @@ class PartyHeatMapScreenTest {
             BC UNITED
             0/0 (44 FOR MAJORITY)
             ±0/±0 (+1 FOR MAJORITY)
-            BALANCE: 44
+            BALANCE: 0-87
             
             NEW DEMOCRATIC PARTY
             0/0 (44 FOR MAJORITY)
             ±0/±0 (+3 FOR MAJORITY)
-            BALANCE: 44
+            BALANCE: 0-87
             """.trimIndent(),
         )
 
@@ -296,12 +296,12 @@ class PartyHeatMapScreenTest {
             BC UNITED
             0/1 (44 FOR MAJORITY)
             -1/-3 (+1 FOR MAJORITY)
-            BALANCE: 40
+            BALANCE: 40-40
             
             NEW DEMOCRATIC PARTY
             1/3 (44 FOR MAJORITY)
             +1/+3 (+3 FOR MAJORITY)
-            BALANCE: 44
+            BALANCE: 44-44
             """.trimIndent(),
         )
 
@@ -323,12 +323,12 @@ class PartyHeatMapScreenTest {
             BC UNITED
             16/28 (44 FOR MAJORITY)
             -4/-15 (+1 FOR MAJORITY)
-            BALANCE: 28
+            BALANCE: 26-30
             
             NEW DEMOCRATIC PARTY
             44/57 (44 FOR MAJORITY)
             +5/+16 (+3 FOR MAJORITY)
-            BALANCE: 57
+            BALANCE: 56-58
             """.trimIndent(),
         )
 
@@ -343,17 +343,17 @@ class PartyHeatMapScreenTest {
             BC UNITED
             16/28 (44 FOR MAJORITY)
             -4/-15 (+1 FOR MAJORITY)
-            BALANCE: 28
+            BALANCE: 26-30
             
             NEW DEMOCRATIC PARTY
             44/57 (44 FOR MAJORITY)
             +5/+16 (+3 FOR MAJORITY)
-            BALANCE: 57
+            BALANCE: 56-58
             
             GREEN
             1/2 (44 FOR MAJORITY)
             -1/-1 (+41 FOR MAJORITY)
-            BALANCE: 3
+            BALANCE: 2-3
             """.trimIndent(),
         )
     }

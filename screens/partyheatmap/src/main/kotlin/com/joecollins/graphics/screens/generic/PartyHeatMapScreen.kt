@@ -160,7 +160,7 @@ class PartyHeatMapScreen private constructor(panel: JPanel, title: Flow.Publishe
                                 ${party.name.uppercase()}
                                 ${seatsText(seats)} ($numForMajority FOR MAJORITY)
                                 ${diffText(seats, prev)} (${diffFormat(numForMajority - prevTotal)} FOR MAJORITY)
-                                BALANCE: $bal
+                                BALANCE: ${bal.first}-${bal.last}
                             """.trimIndent()
                         }
                     }.combine().map { it.joinToString("\n\n") }
