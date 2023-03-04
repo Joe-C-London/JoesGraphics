@@ -4,7 +4,9 @@ import com.joecollins.utils.ExecutorUtils
 import org.apache.commons.lang3.tuple.MutablePair
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.ExecutorService
 import java.util.concurrent.Flow
+import java.util.concurrent.Future
 import java.util.concurrent.LinkedBlockingQueue
 
 class Publisher<T>() : Flow.Publisher<T>, AutoCloseable {
@@ -122,6 +124,24 @@ fun <T, R> Flow.Publisher<T>.map(func: (T) -> R): Flow.Publisher<R> {
                 publisher.submit(func(it))
             } catch (e: Exception) {
                 e.printStackTrace()
+            }
+        },
+    )
+    return publisher
+}
+
+fun <T, R> Flow.Publisher<T>.map(func: (T) -> R, executor: ExecutorService): Flow.Publisher<R> {
+    val publisher = Publisher<R>()
+    var future: Future<*>? = null
+    subscribe(
+        Subscriber {
+            future?.cancel(false)
+            future = executor.submit {
+                try {
+                    publisher.submit(func(it))
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
             }
         },
     )
