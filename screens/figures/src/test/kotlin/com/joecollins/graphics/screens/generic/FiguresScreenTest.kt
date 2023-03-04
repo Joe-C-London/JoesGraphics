@@ -71,8 +71,8 @@ class FiguresScreenTest {
                     .withCandidate(
                         Candidate("Richard Brown", lib),
                         "Environment Minister, Charlottetown-Victoria Park",
-                        grn.asOneTimePublisher(),
-                        "DEFEATED".asOneTimePublisher(),
+                        null.asOneTimePublisher(),
+                        "WAITING...".asOneTimePublisher(),
                     ),
             )
             .withSection(
@@ -162,8 +162,9 @@ class FiguresScreenTest {
             PROMINENT FIGURES
             
             CABINET
-            DEFEATED: WADE MACLAUCHLAN, PAULA BIGGAR, CHRIS PALMER, TINA MUNDY, JORDAN BROWN, RICHARD BROWN
+            DEFEATED: WADE MACLAUCHLAN, PAULA BIGGAR, CHRIS PALMER, TINA MUNDY, JORDAN BROWN
             ELECTED: HEATH MACDONALD, ROBERT MITCHELL, ROBERT HENDERSON, SONNY GALLANT
+            WAITING...: RICHARD BROWN
             
             SHADOW CABINET
             ELECTED: DENNIS KING, DARLENE COMPTON, JAMES AYLWARD, STEVEN MYERS, JAMIE FOX, MATTHEW MACKAY, BRAD TRIVERS, ERNIE HUDSON, BLOYCE THOMPSON, NATALIE JAMESON

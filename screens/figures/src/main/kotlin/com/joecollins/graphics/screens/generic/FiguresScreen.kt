@@ -87,7 +87,7 @@ class FiguresScreen private constructor(headerLabel: Flow.Publisher<out String?>
         var leader: Party? = null
             set(value) {
                 field = value
-                colorPublisher.submit((leader ?: Party.OTHERS).color)
+                colorPublisher.submit(leader?.color ?: Color.LIGHT_GRAY)
             }
 
         var status: String = ""
