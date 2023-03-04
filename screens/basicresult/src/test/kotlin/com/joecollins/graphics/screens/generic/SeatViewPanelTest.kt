@@ -7,6 +7,7 @@ import com.joecollins.graphics.screens.generic.BasicResultPanel.Companion.partyD
 import com.joecollins.graphics.screens.generic.BasicResultPanel.Companion.partyDualSeatsReversed
 import com.joecollins.graphics.screens.generic.BasicResultPanel.Companion.partyRangeSeats
 import com.joecollins.graphics.screens.generic.BasicResultPanel.Companion.partySeats
+import com.joecollins.graphics.utils.ColorUtils
 import com.joecollins.graphics.utils.PublisherTestUtils.assertPublishes
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.graphics.utils.ShapefileReader.readShapes
@@ -2804,6 +2805,87 @@ class SeatViewPanelTest {
                     ret
                 }
         }
+    }
+
+    @Test
+    fun testPartiesConsolidatedInDiffIfTooMany() {
+        val ens = Party("Ensemble", "ENS", Color.YELLOW)
+        val nupes = Party("New Ecological and Social People's Union", "NUPES", Color.RED)
+        val rn = Party("National Rally", "RN", Color.BLUE.darker())
+        val udc = Party("Union of the Right and Centre", "UDC", Color.CYAN)
+        val dvg = Party("Miscellaneous Left", "DVG", ColorUtils.lighten(Color.RED))
+        val eco = Party("Ecologists", "ECO", Color.GREEN)
+        val dvd = Party("Miscellaneous right", "DVD", ColorUtils.lighten(Color.BLUE))
+        val reg = Party("Regionalists", "REG", Color.YELLOW.darker())
+        val dvc = Party("Miscellaneous centre", "DVC", ColorUtils.lighten(Color.ORANGE))
+        val dsv = Party("Sovereignist right", "DSV", Color.BLUE)
+        val div = Party("Miscellaneous", "DIV", Color.GRAY)
+        val prg = Party("Radical Party of the Left", "PRG", Color.ORANGE)
+        val dxd = Party("Miscellaneous far-right", "DXD", Color.BLUE.darker())
+
+        val curr = mapOf(
+            ens to 245,
+            nupes to 131,
+            rn to 89,
+            udc to 64,
+            dvg to 21,
+            dvd to 10,
+            reg to 10,
+            dvc to 4,
+            dsv to 1,
+            div to 1,
+            prg to 1,
+        )
+        val prev = mapOf(
+            ens to 350,
+            nupes to 52,
+            rn to 8,
+            udc to 130,
+            dvg to 12,
+            eco to 1,
+            dvd to 6,
+            reg to 5,
+            dsv to 1,
+            div to 3,
+            prg to 3,
+            dxd to 1,
+        )
+        val panel = partySeats(
+            curr.asOneTimePublisher(),
+            "2022 RESULT".asOneTimePublisher(),
+            "".asOneTimePublisher(),
+        )
+            .withPrev(
+                prev.asOneTimePublisher(),
+                "CHANGE SINCE 2017".asOneTimePublisher(),
+            )
+            .withTotal(577.asOneTimePublisher())
+            .withMajorityLine(true.asOneTimePublisher()) { "$it FOR MAJORITY" }
+            .build("FRANCE".asOneTimePublisher())
+        panel.setSize(1024, 512)
+        compareRendering("SeatViewPanel", "PartiesConsolidatedInDiffIfTooMany", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            FRANCE
+            
+            2022 RESULT (CHANGE SINCE 2017)
+            ENSEMBLE: 245 (-105)
+            NEW ECOLOGICAL AND SOCIAL PEOPLE'S UNION: 131 (+79)
+            NATIONAL RALLY: 89 (+81)
+            UNION OF THE RIGHT AND CENTRE: 64 (-66)
+            MISCELLANEOUS LEFT: 21 (+9)
+            MISCELLANEOUS RIGHT: 10 (+4)
+            REGIONALISTS: 10 (+5)
+            MISCELLANEOUS CENTRE: 4 (+4)
+            SOVEREIGNIST RIGHT: 1 (±0)
+            MISCELLANEOUS: 1 (-2)
+            RADICAL PARTY OF THE LEFT: 1 (-2)
+            ECOLOGISTS: 0 (-1)
+            MISCELLANEOUS FAR-RIGHT: 0 (-1)
+            289 FOR MAJORITY
+            """.trimIndent(),
+        )
     }
 
     private fun peiShapesByDistrict(): Map<Int, Shape> {

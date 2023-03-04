@@ -276,7 +276,7 @@ class BasicResultPanel private constructor(
         override fun prevLabelText(value: Int): String = value.toString()
 
         override fun combine(value1: IntRange, value2: IntRange): IntRange {
-            throw UnsupportedOperationException("Combining ranges is unsupported")
+            return (value1.first + value2.first)..(value1.last + value2.last)
         }
 
         override fun prevCombine(value1: Int, value2: Int): Int {
@@ -573,7 +573,26 @@ class BasicResultPanel private constructor(
         }
         private fun createDiffFrame(): BarFrame? {
             val diffBars = diff?.map { map ->
-                map.entries.asSequence()
+                val topParties = map.entries
+                    .sortedByDescending { it.key.overrideSortOrder ?: seatTemplate.sortOrder(it.value.curr) }
+                    .map { it.key }
+                    .let {
+                        if (it.size <= 10) {
+                            it
+                        } else {
+                            it.take(9)
+                        }
+                    }
+                Aggregators.adjustKey(
+                    map,
+                    { if (topParties.contains(it)) it else Party.OTHERS },
+                    { a, b ->
+                        CurrDiff(
+                            seatTemplate.combine(a.curr, b.curr),
+                            seatTemplate.combine(a.diff, b.diff),
+                        )
+                    },
+                ).entries.asSequence()
                     .sortedByDescending { it.key.overrideSortOrder ?: seatTemplate.sortOrder(it.value.curr) }
                     .map {
                         seatTemplate.createDiffBar(
@@ -1412,7 +1431,13 @@ class BasicResultPanel private constructor(
                         .filter { !prevHasOther || pVotes.containsKey(keyTemplate.toParty(it.key)) }
                         .sortedByDescending { it.value!! }
                         .map { keyTemplate.toParty(it.key) },
-                ).flatten().filterNotNull().distinct().take(10).toSet()
+                ).flatten().filterNotNull().distinct().toList().let {
+                    if (it.size <= 10) {
+                        it
+                    } else {
+                        it.take(9)
+                    }
+                }
                 val currTotal = cVotes.values.filterNotNull().sum()
                 val prevTotal = pVotes.values.sum()
                 if (showPrevRaw) {
@@ -1607,7 +1632,7 @@ class BasicResultPanel private constructor(
                 .fold(0) { a, e -> a + (e.value ?: 0) }
         }
 
-        private fun consolidate(votes: Map<KPT, Int>, parties: Set<KPT>): Map<PartyOrCoalition, Int> {
+        private fun consolidate(votes: Map<KPT, Int>, parties: Collection<KPT>): Map<PartyOrCoalition, Int> {
             return votes.entries.groupingBy { if (parties.contains(it.key)) it.key else Party.OTHERS }.fold(0) { a, e -> a + e.value }
         }
 
