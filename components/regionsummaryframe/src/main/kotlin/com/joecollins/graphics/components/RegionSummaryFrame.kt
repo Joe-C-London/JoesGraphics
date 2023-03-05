@@ -124,7 +124,7 @@ class RegionSummaryFrame private constructor(
                     RenderingHints.VALUE_TEXT_ANTIALIAS_ON,
                 )
             var valueFont: Font
-            val startFontSize = 61.coerceAtMost(height * 2 / 3 - 9)
+            val startFontSize = 61.coerceAtMost(height * 2 / 3 - 5)
             val valueFonts = ArrayList<Int>()
             for (i in values.indices) {
                 g.setColor(ColorUtils.contrastForBackground(values[i].first))
@@ -145,7 +145,7 @@ class RegionSummaryFrame private constructor(
                 valueFonts.add(fontSize)
             }
             g.setColor(ColorUtils.contrastForBackground(summaryColor))
-            var headerFontSize = 30.coerceAtMost(height / 3 - 5).coerceAtMost((valueFonts.maxOrNull() ?: Int.MAX_VALUE) / 2)
+            var headerFontSize = 24.coerceAtMost(height / 3 - 2).coerceAtMost((valueFonts.maxOrNull() ?: Int.MAX_VALUE))
             var headerFont: Font
             var headerWidth: Int
             do {
@@ -154,7 +154,7 @@ class RegionSummaryFrame private constructor(
                 headerWidth = g.getFontMetrics(headerFont).stringWidth(header)
                 headerFontSize--
             } while (headerWidth > width - 20)
-            g.drawString(header, (width - headerWidth) / 2, height / 3 - 5)
+            g.drawString(header, (width - headerWidth) / 2, height / 3 - 2)
         }
 
         init {

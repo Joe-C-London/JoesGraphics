@@ -104,6 +104,38 @@ class RegionSummaryFrameTest {
     }
 
     @Test
+    fun testRenderSameColorLarger() {
+        val frame = RegionSummaryFrame(
+            headerPublisher = "USA".asOneTimePublisher(),
+            summaryColorPublisher = Color.BLUE.asOneTimePublisher(),
+            sectionsPublisher =
+            listOf(
+                RegionSummaryFrame.SectionWithoutColor("ELECTORAL VOTES", listOf("306", "+74")),
+                RegionSummaryFrame.SectionWithoutColor("POPULAR VOTE", listOf("51.1%", "+1.0%")),
+            )
+                .asOneTimePublisher(),
+        )
+        frame.setSize(500, 500)
+        compareRendering("RegionSummaryFrame", "SameColorLarger", frame)
+    }
+
+    @Test
+    fun testRenderSameColorSmaller() {
+        val frame = RegionSummaryFrame(
+            headerPublisher = "USA".asOneTimePublisher(),
+            summaryColorPublisher = Color.BLUE.asOneTimePublisher(),
+            sectionsPublisher =
+            listOf(
+                RegionSummaryFrame.SectionWithoutColor("ELECTORAL VOTES", listOf("306", "+74")),
+                RegionSummaryFrame.SectionWithoutColor("POPULAR VOTE", listOf("51.1%", "+1.0%")),
+            )
+                .asOneTimePublisher(),
+        )
+        frame.setSize(100, 100)
+        compareRendering("RegionSummaryFrame", "SameColorSmaller", frame)
+    }
+
+    @Test
     fun testRenderSingleLevel() {
         val frame = RegionSummaryFrame(
             headerPublisher = "CANADA".asOneTimePublisher(),
