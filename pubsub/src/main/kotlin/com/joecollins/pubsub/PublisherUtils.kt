@@ -1,10 +1,10 @@
 package com.joecollins.pubsub
 
+import org.apache.commons.lang3.tuple.MutablePair
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Flow
 import java.util.concurrent.Future
-import org.apache.commons.lang3.tuple.MutablePair
 
 fun <T> T.asOneTimePublisher(): Flow.Publisher<T> {
     val publisher = Publisher<T>()

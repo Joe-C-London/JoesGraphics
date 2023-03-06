@@ -1,15 +1,12 @@
 package com.joecollins.pubsub
 
 import com.joecollins.utils.ExecutorUtils
-import org.apache.commons.lang3.tuple.MutablePair
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.ExecutorService
 import java.util.concurrent.Flow
-import java.util.concurrent.Future
 import java.util.concurrent.LinkedBlockingQueue
 
-class Publisher<T>() : Flow.Publisher<T>, AutoCloseable {
+class Publisher<T>() : Flow.Publisher<T> {
 
     private val subscriptions = ConcurrentHashMap.newKeySet<Subscription>()
     private var value: Wrapper<T>? = null
@@ -32,15 +29,6 @@ class Publisher<T>() : Flow.Publisher<T>, AutoCloseable {
         synchronized(this) {
             value = Wrapper(item)
             subscriptions.forEach { it.send(item) }
-        }
-    }
-
-    override fun close() {
-        synchronized(this) {
-            subscriptions.forEach {
-                it.cancel()
-                it.subscriber.onComplete()
-            }
         }
     }
 
