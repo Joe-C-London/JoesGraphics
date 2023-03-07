@@ -16,6 +16,8 @@ import javax.swing.JPanel
 
 class MastodonDialog(panel: JPanel, private val server: String, private val token: String) : GenericSocialDialog(panel) {
 
+    class MastodonException(message: String) : RuntimeException(message)
+
     override val siteColor: Color
         get() = Color(99, 100, 255)
 
@@ -47,6 +49,9 @@ class MastodonDialog(panel: JPanel, private val server: String, private val toke
             .also { if (altText != null) it.addTextBody("description", altText) }
             .build()
         return client.execute(post) { response ->
+            if (!(200..299).contains(response.code)) {
+                throw MastodonException("HTTP ${response.code}: ${response.entity.content.bufferedReader().readText()}")
+            }
             val json = JsonMapper().readTree(response.entity.content)
             json["id"].asText()
         }
@@ -62,6 +67,10 @@ class MastodonDialog(panel: JPanel, private val server: String, private val toke
             params.toString().byteInputStream(Charset.defaultCharset()),
             ContentType.APPLICATION_JSON,
         )
-        client.execute(post) {}
+        client.execute(post) { response ->
+            if (!(200..299).contains(response.code)) {
+                throw MastodonException("HTTP ${response.code}: ${response.entity.content.bufferedReader().readText()}")
+            }
+        }
     }
 }
