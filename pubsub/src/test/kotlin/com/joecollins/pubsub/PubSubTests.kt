@@ -293,4 +293,259 @@ class PubSubTests {
         Thread.sleep(500)
         assertEquals(27, output)
     }
+
+    @Test
+    fun testUnsubscribeRemovesSubscription() {
+        val publisher = Publisher(5)
+        var value = 0
+        val subscriber = Subscriber<Int> { value = it }
+        publisher.subscribe(subscriber)
+        assertEquals(1, publisher.numSubscriptions)
+        assertEquals(5, value)
+
+        publisher.submit(6)
+        assertEquals(1, publisher.numSubscriptions)
+        assertEquals(6, value)
+
+        subscriber.unsubscribe()
+        publisher.submit(7)
+        assertEquals(0, publisher.numSubscriptions)
+        assertEquals(6, value)
+    }
+
+    @Test
+    fun testUnsubscribeFromMappedPublisher() {
+        val mainPublisher = Publisher(5)
+        val mappedPublisher = mainPublisher.map { "A".repeat(it) }
+        assertEquals(0, mainPublisher.numSubscriptions)
+
+        var value1 = ""
+        val subscriber1 = Subscriber<String> { value1 = it }
+        mappedPublisher.subscribe(subscriber1)
+        assertEquals(1, mainPublisher.numSubscriptions)
+        assertEquals("AAAAA", value1)
+
+        var value2 = ""
+        val subscriber2 = Subscriber<String> { value2 = it }
+        mappedPublisher.subscribe(subscriber2)
+        assertEquals(1, mainPublisher.numSubscriptions)
+        assertEquals("AAAAA", value2)
+
+        subscriber1.unsubscribe()
+        mainPublisher.submit(3)
+        assertEquals(1, mainPublisher.numSubscriptions)
+        assertEquals("AAAAA", value1)
+        assertEquals("AAA", value2)
+
+        subscriber2.unsubscribe()
+        mainPublisher.submit(1)
+        assertEquals(0, mainPublisher.numSubscriptions)
+        assertEquals("AAAAA", value1)
+        assertEquals("AAA", value2)
+
+        var value3 = ""
+        val subscriber3 = Subscriber<String> { value3 = it }
+        mappedPublisher.subscribe(subscriber3)
+        assertEquals(1, mainPublisher.numSubscriptions)
+        assertEquals("AAAAA", value1)
+        assertEquals("AAA", value2)
+        assertEquals("A", value3)
+
+        subscriber3.unsubscribe()
+        mainPublisher.submit(2)
+        assertEquals(0, mainPublisher.numSubscriptions)
+        assertEquals("AAAAA", value1)
+        assertEquals("AAA", value2)
+        assertEquals("A", value3)
+    }
+
+    @Test
+    fun testUnsubscribeMergedPublisher() {
+        val mainPublisher1 = Publisher("A")
+        val mainPublisher2 = Publisher("B")
+        val mergedPublisher = mainPublisher1.merge(mainPublisher2) { a, b -> a + b }
+        assertEquals(0, mainPublisher1.numSubscriptions)
+        assertEquals(0, mainPublisher2.numSubscriptions)
+
+        var value1 = ""
+        val subscriber1 = Subscriber<String> { value1 = it }
+        mergedPublisher.subscribe(subscriber1)
+        assertEquals(1, mainPublisher1.numSubscriptions)
+        assertEquals(1, mainPublisher2.numSubscriptions)
+        assertEquals("AB", value1)
+
+        var value2 = ""
+        val subscriber2 = Subscriber<String> { value2 = it }
+        mergedPublisher.subscribe(subscriber2)
+        assertEquals(1, mainPublisher1.numSubscriptions)
+        assertEquals(1, mainPublisher2.numSubscriptions)
+        assertEquals("AB", value2)
+
+        subscriber1.unsubscribe()
+        mainPublisher1.submit("AA")
+        assertEquals(1, mainPublisher1.numSubscriptions)
+        assertEquals(1, mainPublisher2.numSubscriptions)
+        assertEquals("AB", value1)
+        assertEquals("AAB", value2)
+
+        subscriber2.unsubscribe()
+        mainPublisher2.submit("BB")
+        assertEquals(0, mainPublisher1.numSubscriptions)
+        assertEquals(0, mainPublisher2.numSubscriptions)
+        assertEquals("AB", value1)
+        assertEquals("AAB", value2)
+
+        var value3 = ""
+        val subscriber3 = Subscriber<String> { value3 = it }
+        mergedPublisher.subscribe(subscriber3)
+        assertEquals(1, mainPublisher1.numSubscriptions)
+        assertEquals(1, mainPublisher2.numSubscriptions)
+        assertEquals("AB", value1)
+        assertEquals("AAB", value2)
+        assertEquals("AABB", value3)
+    }
+
+    @Test
+    fun testUnsubscribeMapReducePublisher() {
+        val mainPublishers = listOf(
+            Publisher("A"),
+            Publisher("B"),
+            Publisher("C"),
+            Publisher("D"),
+            Publisher("E"),
+        )
+        val mergedPublisher = mainPublishers.mapReduce(
+            0,
+            { a, b -> a + b.length },
+            { a, b -> a - b.length },
+        )
+        assertEquals(0, mainPublishers.sumOf { it.numSubscriptions })
+
+        var value1 = 0
+        val subscriber1 = Subscriber<Int> { value1 = it }
+        mergedPublisher.subscribe(subscriber1)
+        assertEquals(5, mainPublishers.sumOf { it.numSubscriptions })
+        assertEquals(5, value1)
+
+        var value2 = 0
+        val subscriber2 = Subscriber<Int> { value2 = it }
+        mergedPublisher.subscribe(subscriber2)
+        assertEquals(5, mainPublishers.sumOf { it.numSubscriptions })
+        assertEquals(5, value2)
+
+        subscriber1.unsubscribe()
+        mainPublishers[0].submit("AA")
+        assertEquals(5, mainPublishers.sumOf { it.numSubscriptions })
+        assertEquals(5, value1)
+        assertEquals(6, value2)
+
+        subscriber2.unsubscribe()
+        mainPublishers[1].submit("BB")
+        assertEquals(0, mainPublishers.sumOf { it.numSubscriptions })
+        assertEquals(5, value1)
+        assertEquals(6, value2)
+
+        var value3 = 0
+        val subscriber3 = Subscriber<Int> { value3 = it }
+        mergedPublisher.subscribe(subscriber3)
+        assertEquals(5, mainPublishers.sumOf { it.numSubscriptions })
+        assertEquals(5, value1)
+        assertEquals(6, value2)
+        assertEquals(7, value3)
+    }
+
+    @Test
+    fun testUnsubscribeCombinePublisher() {
+        val mainPublishers = listOf(
+            Publisher("A"),
+            Publisher("B"),
+            Publisher("C"),
+            Publisher("D"),
+            Publisher("E"),
+        )
+        val mergedPublisher = mainPublishers.combine()
+        assertEquals(0, mainPublishers.sumOf { it.numSubscriptions })
+
+        var value1 = emptyList<String>()
+        val subscriber1 = Subscriber<List<String>> { value1 = it }
+        mergedPublisher.subscribe(subscriber1)
+        assertEquals(5, mainPublishers.sumOf { it.numSubscriptions })
+        assertEquals(listOf("A", "B", "C", "D", "E"), value1)
+
+        var value2 = emptyList<String>()
+        val subscriber2 = Subscriber<List<String>> { value2 = it }
+        mergedPublisher.subscribe(subscriber2)
+        assertEquals(5, mainPublishers.sumOf { it.numSubscriptions })
+        assertEquals(listOf("A", "B", "C", "D", "E"), value2)
+
+        subscriber1.unsubscribe()
+        mainPublishers[0].submit("AA")
+        assertEquals(5, mainPublishers.sumOf { it.numSubscriptions })
+        assertEquals(listOf("A", "B", "C", "D", "E"), value1)
+        assertEquals(listOf("AA", "B", "C", "D", "E"), value2)
+
+        subscriber2.unsubscribe()
+        mainPublishers[1].submit("BB")
+        assertEquals(0, mainPublishers.sumOf { it.numSubscriptions })
+        assertEquals(listOf("A", "B", "C", "D", "E"), value1)
+        assertEquals(listOf("AA", "B", "C", "D", "E"), value2)
+
+        var value3 = emptyList<String>()
+        val subscriber3 = Subscriber<List<String>> { value3 = it }
+        mergedPublisher.subscribe(subscriber3)
+        assertEquals(5, mainPublishers.sumOf { it.numSubscriptions })
+        assertEquals(listOf("A", "B", "C", "D", "E"), value1)
+        assertEquals(listOf("AA", "B", "C", "D", "E"), value2)
+        assertEquals(listOf("AA", "BB", "C", "D", "E"), value3)
+    }
+
+    @Test
+    fun testUnsubscribeCompose() {
+        val subPublishers = listOf(
+            Publisher("A"),
+            Publisher("B"),
+            Publisher("C"),
+        )
+        val mainPublisher = Publisher(0)
+        val composedPublisher = mainPublisher.compose { subPublishers[it] }
+        assertEquals(0, mainPublisher.numSubscriptions)
+        assertEquals(listOf(0, 0, 0), subPublishers.map { it.numSubscriptions })
+
+        var value1 = ""
+        val subscriber1 = Subscriber<String> { value1 = it }
+        composedPublisher.subscribe(subscriber1)
+        assertEquals("A", value1)
+        assertEquals(1, mainPublisher.numSubscriptions)
+        assertEquals(listOf(1, 0, 0), subPublishers.map { it.numSubscriptions })
+
+        subPublishers[0].submit("AA")
+        var value2 = ""
+        val subscriber2 = Subscriber<String> { value2 = it }
+        composedPublisher.subscribe(subscriber2)
+        assertEquals("AA", value1)
+        assertEquals("AA", value2)
+        assertEquals(1, mainPublisher.numSubscriptions)
+        assertEquals(listOf(1, 0, 0), subPublishers.map { it.numSubscriptions })
+
+        subscriber1.unsubscribe()
+        mainPublisher.submit(1)
+        assertEquals("AA", value1)
+        assertEquals("B", value2)
+        assertEquals(1, mainPublisher.numSubscriptions)
+        assertEquals(listOf(0, 1, 0), subPublishers.map { it.numSubscriptions })
+
+        subscriber2.unsubscribe()
+        mainPublisher.submit(2)
+        assertEquals("AA", value1)
+        assertEquals("B", value2)
+        assertEquals(0, mainPublisher.numSubscriptions)
+        assertEquals(listOf(0, 0, 0), subPublishers.map { it.numSubscriptions })
+
+        var value3 = ""
+        val subscriber3 = Subscriber<String> { value3 = it }
+        composedPublisher.subscribe(subscriber3)
+        assertEquals("C", value3)
+        assertEquals(1, mainPublisher.numSubscriptions)
+        assertEquals(listOf(0, 0, 1), subPublishers.map { it.numSubscriptions })
+    }
 }

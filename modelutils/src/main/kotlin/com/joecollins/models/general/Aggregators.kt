@@ -1,7 +1,5 @@
 package com.joecollins.models.general
 
-import com.joecollins.pubsub.Publisher
-import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.combine
 import com.joecollins.pubsub.map
@@ -138,23 +136,10 @@ object Aggregators {
     fun <K, V> toMap(keys: Collection<K>, func: (K) -> Flow.Publisher<V>) = toMap(keys, { it }, func)
 
     fun <T, K, V> toMap(entries: Collection<T>, keyFunc: (T) -> K, func: (T) -> Flow.Publisher<V>): Flow.Publisher<Map<K, V>> {
-        val ret = Publisher<Map<K, V>>()
-        val map = HashMap<K, V>()
-        val publishersMap = HashMap<K, Flow.Publisher<V>>()
-        entries.forEach { e ->
-            val key = keyFunc(e)
-            val publisher = func(e)
-            publishersMap[key] = publisher
-            publisher.subscribe(
-                Subscriber {
-                    synchronized(map) {
-                        map[key] = it
-                        if (map.size == entries.size) ret.submit(map)
-                    }
-                },
-            )
-        }
-        return ret
+        return entries.map { e ->
+            val k = keyFunc(e)
+            func(e).map { v -> k to v }
+        }.combine().map { it.toMap() }
     }
 
     fun <P : PartyOrCoalition> partyChanges(result: Flow.Publisher<out Map<out P, Int>>, partyChanges: Flow.Publisher<out Map<out P, P>>): Flow.Publisher<Map<P, Int>> {
