@@ -15,6 +15,7 @@ internal class MapReducePublisher<T, R>(
 
     private lateinit var value: Wrapper<R>
     private lateinit var list: MutableList<Wrapper<T>?>
+    private val publishersCompleted = publishers.map { false }.toMutableList()
 
     override fun afterSubscribe() {
         val me = this
@@ -22,17 +23,30 @@ internal class MapReducePublisher<T, R>(
             value = Wrapper(identity)
             list = publishers.map { null }.toMutableList()
             subscribers = publishers.mapIndexed { index, publisher ->
-                val subscriber = Subscriber<T> { newVal ->
+                val subscriber = Subscriber<T> ({ newVal ->
                     synchronized(me) {
                         val oldVal = list[index]?.value
                         if (oldVal != newVal) {
-                            oldVal?.let { value.value = onValueRemoved(value.value, it) }
-                            list[index] = Wrapper(newVal)
-                            newVal?.let { value.value = onValueAdded(value.value, it) }
-                            submit(value.value)
+                            try {
+                                oldVal?.let { value.value = onValueRemoved(value.value, it) }
+                                list[index] = Wrapper(newVal)
+                                newVal?.let { value.value = onValueAdded(value.value, it) }
+                                me.submit(value.value)
+                            } catch (e: Exception) {
+                                error(e)
+                            }
                         }
                     }
-                }
+                }, {
+                    synchronized(me) {
+                        publishersCompleted[index] = true
+                        if (publishersCompleted.all { it }) {
+                            me.complete()
+                        }
+                    }
+                }, {
+                    error(it)
+                })
                 publisher.subscribe(subscriber)
                 subscriber
             }

@@ -16,21 +16,42 @@ internal class MergedPublisher<T, U, R>(
     private var leftValue: Wrapper<T>? = null
     private var rightValue: Wrapper<U>? = null
 
+    private var leftCompleted = false
+    private var rightCompleted = false
+
     override fun afterSubscribe() {
         val me = this
         if (numSubscriptions == 1) {
-            leftSubscriber = Subscriber {
+            leftSubscriber = Subscriber({
                 synchronized(me) {
                     leftValue = Wrapper(it)
                     onUpdate()
                 }
-            }
-            rightSubscriber = Subscriber {
+            }, {
+                synchronized(me) {
+                    leftCompleted = true
+                    if (rightCompleted) {
+                        complete()
+                    }
+                }
+            }, {
+                error(it)
+            })
+            rightSubscriber = Subscriber({
                 synchronized(me) {
                     rightValue = Wrapper(it)
                     onUpdate()
                 }
-            }
+            }, {
+                synchronized(me) {
+                    rightCompleted = true
+                    if (leftCompleted) {
+                        complete()
+                    }
+                }
+            }, {
+                error(it)
+            })
             left.subscribe(leftSubscriber)
             right.subscribe(rightSubscriber)
         }
@@ -40,7 +61,11 @@ internal class MergedPublisher<T, U, R>(
         val l = leftValue
         val r = rightValue
         if (l != null && r != null) {
-            submit(func(l.value, r.value))
+            try {
+                submit(func(l.value, r.value))
+            } catch (e: Exception) {
+                error(e)
+            }
         }
     }
 

@@ -7,20 +7,29 @@ import java.util.concurrent.Flow
 fun <T> T.asOneTimePublisher(): Flow.Publisher<T> {
     val publisher = Publisher<T>()
     publisher.submit(this)
+    publisher.complete()
     return publisher
 }
 
 fun <T> CompletableFuture<T>.asPublisher(): Flow.Publisher<T> {
     val publisher = Publisher<T>()
-    this.exceptionally { it.printStackTrace(); throw it; }
-        .thenAccept { publisher.submit(it) }
+    this.thenApply {
+        publisher.submit(it)
+        publisher.complete()
+    }.exceptionally {
+        publisher.error(it)
+    }
     return publisher
 }
 
 fun <T> CompletableFuture<T>.asPublisher(init: T): Flow.Publisher<T> {
     val publisher = Publisher(init)
-    this.exceptionally { it.printStackTrace(); throw it; }
-        .thenAccept { publisher.submit(it) }
+    this.thenApply {
+        publisher.submit(it)
+        publisher.complete()
+    }.exceptionally {
+        publisher.error(it)
+    }
     return publisher
 }
 

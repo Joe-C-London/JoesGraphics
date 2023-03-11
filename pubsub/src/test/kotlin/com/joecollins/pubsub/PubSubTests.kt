@@ -3,8 +3,12 @@ package com.joecollins.pubsub
 import com.joecollins.graphics.utils.BoundResult
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Assertions.assertThrows
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import java.lang.IllegalStateException
 import java.util.LinkedList
 import java.util.concurrent.Flow
 import java.util.concurrent.SubmissionPublisher
@@ -140,10 +144,12 @@ class PubSubTests {
     @Test
     fun testFixedPublisher() {
         var output: String? = null
+        var completed = false
         val publisher = "TEST".asOneTimePublisher()
-        val subscriber = Subscriber<String> { output = it }
+        val subscriber = Subscriber<String> ({ output = it }, { completed = true })
         publisher.subscribe(subscriber)
         assertEquals("TEST", output)
+        assertTrue(completed)
     }
 
     @Test
@@ -547,5 +553,241 @@ class PubSubTests {
         assertEquals("C", value3)
         assertEquals(1, mainPublisher.numSubscriptions)
         assertEquals(listOf(0, 0, 1), subPublishers.map { it.numSubscriptions })
+    }
+
+    @Test
+    fun testCompletedPublisher() {
+        val publisher = Publisher("A")
+        var value = ""
+        var completed = false
+        publisher.subscribe(
+            Subscriber({
+                value = it
+            }, {
+                completed = true
+            }),
+        )
+        assertEquals("A", value)
+        assertFalse(completed)
+        assertEquals(1, publisher.numSubscriptions)
+
+        publisher.submit("B")
+        assertEquals("B", value)
+        assertFalse(completed)
+        assertEquals(1, publisher.numSubscriptions)
+
+        publisher.complete()
+        assertEquals("B", value)
+        assertTrue(completed)
+        assertEquals(0, publisher.numSubscriptions)
+
+        var value2 = ""
+        var completed2 = false
+        publisher.subscribe(
+            Subscriber({
+                value2 = it
+            }, {
+                completed2 = true
+            }),
+        )
+        assertEquals("B", value2)
+        assertTrue(completed2)
+        assertEquals(0, publisher.numSubscriptions)
+
+        assertThrows(IllegalStateException::class.java) { publisher.submit("C") }
+    }
+
+    @Test
+    fun testCompletedCombinedPublisher() {
+        val publishers = listOf(
+            Publisher("A"),
+            Publisher("B"),
+            Publisher("C"),
+        )
+        val combinedPublisher = publishers.combine() as AbstractPublisher<List<String>>
+
+        var value = emptyList<String>()
+        var completed = false
+        combinedPublisher.subscribe(
+            Subscriber({
+                value = it
+            }, {
+                completed = true
+            }),
+        )
+        assertEquals(listOf("A", "B", "C"), value)
+        assertFalse(completed)
+        assertEquals(1, combinedPublisher.numSubscriptions)
+
+        publishers[0].complete()
+        assertFalse(completed)
+        assertEquals(1, combinedPublisher.numSubscriptions)
+
+        publishers[2].complete()
+        assertFalse(completed)
+        assertEquals(1, combinedPublisher.numSubscriptions)
+
+        publishers[1].complete()
+        assertTrue(completed)
+        assertEquals(0, combinedPublisher.numSubscriptions)
+    }
+
+    @Test
+    fun testCompletedComposedPublisher() {
+        val publishers = listOf(
+            Publisher("A"),
+            Publisher("B"),
+            Publisher("C"),
+        )
+        val topPublisher = Publisher(0)
+        val composedPublisher = topPublisher.compose { publishers[it] } as AbstractPublisher<String>
+
+        var value = ""
+        var completed = false
+        composedPublisher.subscribe(
+            Subscriber({
+                value = it
+            }, {
+                completed = true
+            }),
+        )
+        assertEquals("A", value)
+        assertFalse(completed)
+        assertEquals(1, composedPublisher.numSubscriptions)
+
+        publishers[0].complete()
+        assertFalse(completed)
+        assertEquals(1, composedPublisher.numSubscriptions)
+
+        topPublisher.submit(1)
+        assertEquals("B", value)
+        assertFalse(completed)
+        assertEquals(1, composedPublisher.numSubscriptions)
+
+        publishers[1].submit("BB")
+        assertEquals("BB", value)
+        assertFalse(completed)
+        assertEquals(1, composedPublisher.numSubscriptions)
+
+        topPublisher.complete()
+        assertFalse(completed)
+        assertEquals(1, composedPublisher.numSubscriptions)
+
+        publishers[1].submit("BBB")
+        assertEquals("BBB", value)
+        assertFalse(completed)
+        assertEquals(1, composedPublisher.numSubscriptions)
+
+        publishers[1].complete()
+        assertTrue(completed)
+        assertEquals(0, composedPublisher.numSubscriptions)
+    }
+
+    @Test
+    fun testCompletedMappingPublisher() {
+        val publisher = Publisher("A")
+        val mappedPublisher = publisher.map { it.length } as AbstractPublisher<Int>
+
+        var value = 0
+        var completed = false
+        mappedPublisher.subscribe(
+            Subscriber({
+                value = it
+            }, {
+                completed = true
+            }),
+        )
+        assertEquals(1, value)
+        assertFalse(completed)
+        assertEquals(1, mappedPublisher.numSubscriptions)
+
+        publisher.complete()
+        assertTrue(completed)
+        assertEquals(0, mappedPublisher.numSubscriptions)
+    }
+
+    @Test
+    fun testCompletedMapReducePublisher() {
+        val publishers = listOf(
+            Publisher("A"),
+            Publisher("B"),
+            Publisher("C"),
+        )
+        val mapReducePublisher = publishers.mapReduce(
+            0,
+            { a, e -> a + e.length },
+            { a, e -> a - e.length },
+        ) as AbstractPublisher<Int>
+
+        var value = 0
+        var completed = false
+        mapReducePublisher.subscribe(
+            Subscriber({
+                value = it
+            }, {
+                completed = true
+            }),
+        )
+        assertEquals(3, value)
+        assertFalse(completed)
+        assertEquals(1, mapReducePublisher.numSubscriptions)
+
+        publishers[0].complete()
+        assertFalse(completed)
+        assertEquals(1, mapReducePublisher.numSubscriptions)
+
+        publishers[2].complete()
+        assertFalse(completed)
+        assertEquals(1, mapReducePublisher.numSubscriptions)
+
+        publishers[1].complete()
+        assertTrue(completed)
+        assertEquals(0, mapReducePublisher.numSubscriptions)
+    }
+
+    @Test
+    fun testCompletedMergedPublisher() {
+        val left = Publisher("A")
+        val right = Publisher("B")
+        val merged1 = left.merge(right) { a, b -> a + b } as AbstractPublisher<String>
+        val merged2 = right.merge(left) { a, b -> a + b } as AbstractPublisher<String>
+
+        var value1 = ""
+        var completed1 = false
+        merged1.subscribe(
+            Subscriber({
+                value1 = it
+            }, {
+                completed1 = true
+            }),
+        )
+        assertEquals("AB", value1)
+        assertFalse(completed1)
+        assertEquals(1, merged1.numSubscriptions)
+
+        var value2 = ""
+        var completed2 = false
+        merged2.subscribe(
+            Subscriber({
+                value2 = it
+            }, {
+                completed2 = true
+            }),
+        )
+        assertEquals("BA", value2)
+        assertFalse(completed2)
+        assertEquals(1, merged2.numSubscriptions)
+
+        left.complete()
+        assertFalse(completed1)
+        assertEquals(1, merged1.numSubscriptions)
+        assertFalse(completed2)
+        assertEquals(1, merged2.numSubscriptions)
+
+        right.complete()
+        assertTrue(completed1)
+        assertEquals(0, merged1.numSubscriptions)
+        assertTrue(completed2)
+        assertEquals(0, merged2.numSubscriptions)
     }
 }

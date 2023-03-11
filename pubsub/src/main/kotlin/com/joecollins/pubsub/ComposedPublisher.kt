@@ -10,20 +10,63 @@ internal class ComposedPublisher<T, R>(
     private lateinit var mainSubscriber: Subscriber<T>
     private var subSubscriber: Subscriber<R>? = null
 
+    private var topCompleted = false
+    private var subCompleted = false
+
     override fun afterSubscribe() {
-        val me = this
         if (numSubscriptions == 1) {
-            mainSubscriber = Subscriber { t ->
-                val subPublisher = func(t)
-                synchronized(me) {
-                    subSubscriber?.unsubscribe()
-                    subSubscriber = Subscriber { r ->
-                        submit(r)
-                    }
-                    subPublisher.subscribe(subSubscriber)
-                }
-            }
+            mainSubscriber = Subscriber({ t ->
+                onTopUpdated(t)
+            }, {
+                onTopCompleted()
+            }, {
+                error(it)
+            })
             publisher.subscribe(mainSubscriber)
+        }
+    }
+
+    private fun onTopUpdated(t: T) {
+        try {
+            val subPublisher = func(t)
+            synchronized(this) {
+                subSubscriber?.unsubscribe()
+                subCompleted = false
+                subSubscriber = Subscriber({ r ->
+                    onSubUpdated(r)
+                }, {
+                    onSubCompleted()
+                }, {
+                    error(it)
+                })
+                subPublisher.subscribe(subSubscriber)
+            }
+        } catch (e: Exception) {
+            error(e)
+        }
+    }
+
+    private fun onTopCompleted() {
+        synchronized(this) {
+            topCompleted = true
+            if (subCompleted) {
+                complete()
+            }
+        }
+    }
+
+    private fun onSubUpdated(r: R) {
+        synchronized(this) {
+            submit(r)
+        }
+    }
+
+    private fun onSubCompleted() {
+        synchronized(this) {
+            subCompleted = true
+            if (topCompleted) {
+                complete()
+            }
         }
     }
 

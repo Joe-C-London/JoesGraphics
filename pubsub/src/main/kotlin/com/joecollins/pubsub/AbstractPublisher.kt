@@ -8,7 +8,8 @@ import java.util.concurrent.LinkedBlockingQueue
 
 abstract class AbstractPublisher<T> : Flow.Publisher<T> {
     private val subscriptions = ConcurrentHashMap.newKeySet<Subscription<T>>()
-    private var value: Wrapper<T>? = null
+    private var value: ItemWrapper<T>? = null
+    private var completed = false
 
     override fun subscribe(subscriber: Flow.Subscriber<in T>) {
         synchronized(this) {
@@ -16,15 +17,40 @@ abstract class AbstractPublisher<T> : Flow.Publisher<T> {
             subscriber.onSubscribe(subscription)
             subscriptions.add(subscription)
             @Suppress("UNCHECKED_CAST")
-            value?.let { subscription.send(it.item) }
-            afterSubscribe()
+            value?.let { subscription.send(it) }
+            if (completed) {
+                subscription.send(CompleteWrapper())
+                subscriptions.remove(subscription)
+            } else {
+                afterSubscribe()
+            }
         }
     }
 
     internal open fun submit(item: T) {
         synchronized(this) {
-            value = Wrapper(item)
-            subscriptions.forEach { it.send(item) }
+            if (completed) {
+                throw IllegalStateException("Cannot submit another value after completion")
+            }
+            val wrappedItem = ItemWrapper(item)
+            value = wrappedItem
+            subscriptions.forEach { it.send(wrappedItem) }
+        }
+    }
+
+    internal open fun complete() {
+        synchronized(this) {
+            subscriptions.forEach { it.send(CompleteWrapper()) }
+            subscriptions.clear()
+            completed = true
+        }
+    }
+
+    internal fun error(throwable: Throwable) {
+        synchronized(this) {
+            subscriptions.forEach { it.send(ErrorWrapper(throwable)) }
+            subscriptions.clear()
+            completed = true
         }
     }
 
@@ -40,7 +66,35 @@ abstract class AbstractPublisher<T> : Flow.Publisher<T> {
     internal abstract fun afterSubscribe()
     internal abstract fun afterUnsubscribe()
 
-    private data class Wrapper<T>(val item: T)
+    protected fun finalize() {
+        try {
+            complete()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    private interface Wrapper<T> {
+        fun handle(subscriber: Flow.Subscriber<in T>)
+    }
+
+    private data class ItemWrapper<T>(private val item: T) : Wrapper<T> {
+        override fun handle(subscriber: Flow.Subscriber<in T>) {
+            subscriber.onNext(item)
+        }
+    }
+
+    private class CompleteWrapper<T> : Wrapper<T> {
+        override fun handle(subscriber: Flow.Subscriber<in T>) {
+            subscriber.onComplete()
+        }
+    }
+
+    private data class ErrorWrapper<T>(private val throwable: Throwable) : Wrapper<T> {
+        override fun handle(subscriber: Flow.Subscriber<in T>) {
+            subscriber.onError(throwable)
+        }
+    }
 
     private class Subscription<T>(val publisher: AbstractPublisher<T>, val subscriber: Flow.Subscriber<in T>) : Flow.Subscription {
 
@@ -49,10 +103,10 @@ abstract class AbstractPublisher<T> : Flow.Publisher<T> {
         private val queue = LinkedBlockingQueue<Wrapper<T>>()
         private var future = CompletableFuture.completedFuture<Void>(null)
 
-        fun send(item: T) {
+        fun send(item: Wrapper<T>) {
             synchronized(this) {
                 if (!cancelled) {
-                    queue.offer(Wrapper(item))
+                    queue.offer(item)
                     process()
                 }
             }
@@ -70,10 +124,10 @@ abstract class AbstractPublisher<T> : Flow.Publisher<T> {
 
         private fun process() {
             while (waitingFor > 0 && !queue.isEmpty()) {
-                val next = queue.take().item
+                val next = queue.take()
                 future = future.thenRunAsync({
                     try {
-                        subscriber.onNext(next)
+                        next.handle(subscriber)
                     } catch (e: Exception) {
                         subscriber.onError(e)
                     }

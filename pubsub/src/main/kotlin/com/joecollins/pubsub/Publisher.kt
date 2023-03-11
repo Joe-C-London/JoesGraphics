@@ -10,6 +10,10 @@ class Publisher<T>() : AbstractPublisher<T>() {
         super.submit(item)
     }
 
+    public override fun complete() {
+        super.complete()
+    }
+
     override fun afterSubscribe() {
     }
 

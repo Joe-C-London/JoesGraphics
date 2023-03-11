@@ -11,13 +11,17 @@ internal class MappingPublisher<T, R>(
 
     override fun afterSubscribe() {
         if (numSubscriptions == 1) {
-            subscriber = Subscriber {
+            subscriber = Subscriber({
                 try {
                     submit(func(it))
                 } catch (e: Exception) {
-                    e.printStackTrace()
+                    error(e)
                 }
-            }
+            }, {
+                complete()
+            }, {
+                error(it)
+            })
             publisher.subscribe(subscriber)
         }
     }

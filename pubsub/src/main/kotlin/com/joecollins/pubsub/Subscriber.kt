@@ -3,7 +3,14 @@ package com.joecollins.pubsub
 import com.joecollins.utils.ExecutorUtils
 import java.util.concurrent.Flow
 
-class Subscriber<T>(private val next: (T) -> Unit) : Flow.Subscriber<T> {
+class Subscriber<T>(
+    private val next: (T) -> Unit,
+    private val completed: () -> Unit = {},
+    private val error: (Throwable) -> Unit = { it.printStackTrace() },
+) : Flow.Subscriber<T> {
+
+    constructor(next: (T) -> Unit) : this(next, {})
+
     private lateinit var subscription: Flow.Subscription
 
     override fun onSubscribe(subscription: Flow.Subscription) {
@@ -17,10 +24,11 @@ class Subscriber<T>(private val next: (T) -> Unit) : Flow.Subscriber<T> {
     }
 
     override fun onError(throwable: Throwable) {
-        throwable.printStackTrace()
+        error(throwable)
     }
 
     override fun onComplete() {
+        completed()
     }
 
     fun unsubscribe() {

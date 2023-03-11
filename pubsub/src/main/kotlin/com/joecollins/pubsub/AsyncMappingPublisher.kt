@@ -1,8 +1,8 @@
 package com.joecollins.pubsub
 
+import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Flow
-import java.util.concurrent.Future
 
 internal class AsyncMappingPublisher<T, R>(
     private val publisher: Flow.Publisher<T>,
@@ -11,20 +11,20 @@ internal class AsyncMappingPublisher<T, R>(
 ) : AbstractPublisher<R>() {
 
     private lateinit var subscriber: Subscriber<T>
-    private var future: Future<*>? = null
+    private var future: CompletableFuture<*>? = null
 
     override fun afterSubscribe() {
         if (numSubscriptions == 1) {
-            subscriber = Subscriber {
+            subscriber = Subscriber({
                 future?.cancel(false)
-                future = executor.submit {
-                    try {
-                        submit(func(it))
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
-                }
-            }
+                future = CompletableFuture.supplyAsync({
+                    submit(func(it))
+                }, executor).exceptionally { error(it) }
+            }, {
+                future?.thenRun { complete() } ?: complete()
+            }, {
+                error(it)
+            })
             publisher.subscribe(subscriber)
         }
     }
