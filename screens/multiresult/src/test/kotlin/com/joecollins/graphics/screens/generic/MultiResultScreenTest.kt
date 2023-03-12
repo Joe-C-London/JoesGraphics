@@ -2230,9 +2230,6 @@ class MultiResultScreenTest {
                 .mapValues { e -> e.value.sumOf { it.value } }
 
         private val leaderHasWonPublisher = Publisher(leaderHasWon)
-        fun getLeaderHasWon(): Flow.Publisher<Boolean> {
-            return leaderHasWonPublisher
-        }
 
         val winner = Publisher(calculateWinner())
         private fun calculateWinner() = if (leaderHasWon) votes.entries.maxByOrNull { it.value }!!.key else null

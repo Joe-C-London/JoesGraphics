@@ -7,11 +7,11 @@ import java.awt.LayoutManager
 
 class BasicResultLayout : LayoutManager {
     companion object {
-        val MAIN = "MAIN"
-        val DIFF = "DIFF"
-        val SWING = "SWING"
-        val MAP = "MAP"
-        val PREF = "PREF"
+        const val MAIN = "MAIN"
+        const val DIFF = "DIFF"
+        const val SWING = "SWING"
+        const val MAP = "MAP"
+        const val PREF = "PREF"
     }
 
     private val components = HashMap<String, Component>()

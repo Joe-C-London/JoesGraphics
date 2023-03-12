@@ -130,8 +130,6 @@ class MixedMemberAllSeatsScreen private constructor(
         }
         private val regionalPanels = LinkedList<RegionalPanel>()
 
-        private val constituencyRows = regionalPanels
-
         private val allDeclared = currConstituencies.merge(currRegionLists) { c, r ->
             c.values.filterNotNull().all { it.isElected } && r.values.flatten().all { it.isElected }
         }

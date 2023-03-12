@@ -5,7 +5,6 @@ import com.joecollins.graphics.utils.StandardFont
 import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
 import com.joecollins.pubsub.map
-import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Component
 import java.awt.Container
@@ -149,16 +148,6 @@ class BarFrame(
                 repaint()
             }
 
-        val totalPositive: Number
-            get() = series
-                .map { it.second.toDouble() }
-                .filter { it > 0 }
-                .sum()
-        val totalNegative: Number
-            get() = series
-                .map { it.second.toDouble() }
-                .filter { it < 0 }
-                .sum()
         val numLines: Int
             get() {
                 val leftLines = leftText.split("\n").toTypedArray().size
@@ -451,7 +440,7 @@ class BarFrame(
                 layout = BarFrameLayout()
             }
         }
-        add(centralPanel, BorderLayout.CENTER)
+        addCenter(centralPanel)
         centralPanel.add(subheadLabel)
 
         val onSubheadTextUpdate: (String?) -> Unit = {

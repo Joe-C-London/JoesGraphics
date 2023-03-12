@@ -5,7 +5,6 @@ import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
 import com.joecollins.pubsub.map
 import java.awt.BasicStroke
-import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Component
 import java.awt.Container
@@ -518,7 +517,7 @@ class HemicycleFrame(
 
     init {
         val panel = JPanel()
-        add(panel, BorderLayout.CENTER)
+        addCenter(panel)
         panel.layout = Layout()
         panel.add(barsPanel)
         panel.add(dotsPanel)

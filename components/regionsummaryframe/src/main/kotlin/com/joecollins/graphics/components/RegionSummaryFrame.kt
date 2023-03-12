@@ -6,7 +6,6 @@ import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
 import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.merge
-import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Font
 import java.awt.Graphics
@@ -59,7 +58,7 @@ class RegionSummaryFrame private constructor(
     init {
         centralPanel.background = Color.WHITE
         centralPanel.layout = GridLayout(0, 1)
-        add(centralPanel, BorderLayout.CENTER)
+        addCenter(centralPanel)
 
         val onSummaryColorUpdate: (Color) -> Unit = { color ->
             summaryColor = color

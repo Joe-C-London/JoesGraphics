@@ -4,7 +4,6 @@ import com.joecollins.graphics.utils.ColorUtils
 import com.joecollins.graphics.utils.StandardFont
 import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
-import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Component
 import java.awt.Container
@@ -134,7 +133,7 @@ class MultiSummaryFrame(
                 layout = FrameLayout()
             }
         }
-        add(centralPanel, BorderLayout.CENTER)
+        addCenter(centralPanel)
 
         val onRowsUpdate: (List<Row>) -> Unit = { r ->
             while (entries.size < r.size) {

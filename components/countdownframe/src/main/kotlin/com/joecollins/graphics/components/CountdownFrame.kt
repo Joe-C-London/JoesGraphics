@@ -57,7 +57,7 @@ class CountdownFrame(
         panel.layout = BorderLayout()
         panel.add(timeRemainingLabel, BorderLayout.CENTER)
         panel.add(additionalInfoLabel, BorderLayout.SOUTH)
-        add(panel, BorderLayout.CENTER)
+        addCenter(panel)
 
         val onTimeUpdate: (Temporal) -> Unit = {
             time = it

@@ -9,8 +9,8 @@ import javax.swing.JPanel
 
 class RightStackLayout : LayoutManager {
     companion object {
-        val WEST = "WEST"
-        val EAST = "EAST"
+        const val WEST = "WEST"
+        const val EAST = "EAST"
     }
 
     private var west = JPanel() as Component

@@ -1,9 +1,7 @@
 package com.joecollins.models.general.social.twitter
 
-import com.github.scribejava.core.model.OAuth2AccessToken
 import com.github.scribejava.core.model.OAuth2AccessTokenErrorResponse
 import com.google.gson.JsonParser
-import com.twitter.clientlib.ApiClientCallback
 import com.twitter.clientlib.ApiException
 import com.twitter.clientlib.TwitterCredentialsOAuth2
 import com.twitter.clientlib.api.TwitterApi
@@ -34,6 +32,7 @@ object TwitterV2InstanceFactory {
         instance = createInstance(false)
     }
 
+    @Suppress("BlockingMethodInNonBlockingContext")
     private fun createInstance(isRetry: Boolean): TwitterApi {
         synchronized(this) {
             if (!tokensFile.exists()) {
@@ -51,11 +50,9 @@ object TwitterV2InstanceFactory {
                     true,
                 ),
             )
-            instance.addCallback(object : ApiClientCallback {
-                override fun onAfterRefreshToken(accessToken: OAuth2AccessToken) {
-                    saveTokens(accessToken.accessToken, accessToken.refreshToken)
-                }
-            })
+            instance.addCallback { accessToken ->
+                saveTokens(accessToken.accessToken, accessToken.refreshToken)
+            }
             try {
                 println("Logged in as ${instance.users().findMyUser().execute().data?.username}")
             } catch (e: ApiException) {

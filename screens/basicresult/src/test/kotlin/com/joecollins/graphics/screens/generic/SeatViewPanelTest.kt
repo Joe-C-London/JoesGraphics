@@ -1676,7 +1676,7 @@ class SeatViewPanelTest {
         val swingPartyOrder = listOf(ndp, grn, lib, pc)
         val shapesByDistrict = peiShapesByDistrict()
         val focus = Publisher(shapesByDistrict.keys.filter { it <= 7 })
-        val additionalHighlight = Publisher<List<Int>>(shapesByDistrict.keys.toList())
+        val additionalHighlight = Publisher(shapesByDistrict.keys.toList())
         val winnerByDistrict = Publisher(mapOf<Int, PartyResult>())
         val panel = partySeats(
             currentSeats,

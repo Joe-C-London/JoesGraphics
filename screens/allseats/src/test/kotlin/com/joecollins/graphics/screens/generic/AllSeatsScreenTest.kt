@@ -359,8 +359,6 @@ class AllSeatsScreenTest {
         private val lib = Party("Liberal", "LIB", Color.RED)
         private val ndp = Party("New Democratic Party", "NDP", Color.ORANGE)
         private val grn = Party("Green", "GRN", Color.GREEN.darker())
-        private val ind = Party("Independent", "IND", Color.GRAY)
-        private val oth = Party.OTHERS
 
         private fun bcPrevResult(): Map<String, Party> {
             return mapOf(

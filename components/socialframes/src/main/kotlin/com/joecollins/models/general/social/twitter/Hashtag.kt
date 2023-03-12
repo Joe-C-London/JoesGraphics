@@ -1,7 +1,5 @@
 package com.joecollins.models.general.social.twitter
 
-import twitter4j.HashtagEntity
-
 class Hashtag(override val text: String) : com.joecollins.models.general.social.generic.Hashtag {
 
     companion object {

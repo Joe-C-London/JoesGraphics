@@ -5,7 +5,6 @@ import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
 import org.jetbrains.annotations.TestOnly
 import java.awt.BasicStroke
-import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Component
 import java.awt.Container
@@ -413,7 +412,7 @@ class HeatMapFrame(
     private val mainPanel: JPanel = JPanel()
 
     init {
-        add(mainPanel, BorderLayout.CENTER)
+        addCenter(mainPanel)
         mainPanel.layout = Layout()
         mainPanel.add(barsPanel)
         mainPanel.add(squaresPanel)

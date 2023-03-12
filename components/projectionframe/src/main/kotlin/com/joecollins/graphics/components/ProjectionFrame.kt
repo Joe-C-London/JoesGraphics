@@ -35,7 +35,7 @@ class ProjectionFrame(
 
     init {
         val centre = JPanel()
-        add(centre, BorderLayout.CENTER)
+        addCenter(centre)
 
         centre.layout = BorderLayout()
         centre.add(imagePanel, BorderLayout.CENTER)

@@ -13,6 +13,7 @@ import com.joecollins.pubsub.map
 import com.vdurmont.emoji.EmojiParser
 import java.awt.BorderLayout
 import java.awt.Color
+import java.awt.Component
 import java.awt.Dimension
 import java.awt.Graphics
 import java.awt.Graphics2D
@@ -41,9 +42,12 @@ import kotlin.math.min
 import kotlin.math.roundToInt
 import kotlin.math.sqrt
 
-abstract class SocialMediaFrame<P : Post<P>>(post: Flow.Publisher<out Post<P>>, private val timezone: ZoneId = ZoneId.systemDefault()) : JPanel() {
+abstract class SocialMediaFrame<P : Post<P>>(
+    post: Flow.Publisher<out Post<P>>,
+    private val color: Color,
+    private val timezone: ZoneId = ZoneId.systemDefault(),
+) : JPanel() {
 
-    abstract val color: Color
     abstract val emojiVersion: String
     abstract val protectedUserText: String
     abstract val logo: Shape
@@ -485,5 +489,9 @@ abstract class SocialMediaFrame<P : Post<P>>(post: Flow.Publisher<out Post<P>>, 
                 g.drawString(user.screenName, x, 18)
             }
         }
+    }
+
+    final override fun add(comp: Component, constraints: Any) {
+        super.add(comp, constraints)
     }
 }

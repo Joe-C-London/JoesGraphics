@@ -8,8 +8,8 @@ buildscript {
     }
 }
 plugins {
-    id "com.github.ben-manes.versions" version "0.45.0"
-    id "com.diffplug.spotless" version "6.15.0"
+    id "com.github.ben-manes.versions" version "0.46.0"
+    id "com.diffplug.spotless" version "6.16.0"
     id "jacoco"
 }
 ext {
@@ -39,21 +39,6 @@ allprojects {
 }
 
 dependencies {
-    implementation project('base')
-    implementation project('components')
-    implementation project('fileutils')
-    implementation project('lowerthird')
-    implementation project('lowerthird:lowerthirdutils')
-    implementation project('models')
-    implementation project('modelutils')
-    implementation project('pubsub')
-    implementation project('screens')
-    implementation project('mapreaders:all')
-    implementation project('shapes')
-    implementation project('social')
-    implementation project('window')
-    testImplementation project('testutils')
-
     api "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
 }
 

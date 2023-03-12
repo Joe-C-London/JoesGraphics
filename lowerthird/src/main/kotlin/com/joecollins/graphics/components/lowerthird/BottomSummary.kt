@@ -7,11 +7,8 @@ import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
 import java.awt.BorderLayout
 import java.awt.Color
-import java.awt.Component
-import java.awt.Container
 import java.awt.Dimension
 import java.awt.GridLayout
-import java.awt.LayoutManager
 import java.util.concurrent.Flow
 import javax.swing.JLabel
 import javax.swing.JPanel
@@ -96,32 +93,6 @@ class BottomSummary(
         init {
             add(bottomHeaderLabel)
             add(bottomValueLabel)
-        }
-    }
-
-    private inner class SummaryLayout : LayoutManager {
-        override fun addLayoutComponent(name: String, comp: Component) {}
-        override fun removeLayoutComponent(comp: Component) {}
-        override fun preferredLayoutSize(parent: Container): Dimension {
-            return Dimension(512, 50)
-        }
-
-        override fun minimumLayoutSize(parent: Container): Dimension {
-            return Dimension(50, 50)
-        }
-
-        override fun layoutContainer(parent: Container) {
-            val width = parent.width - 2
-            val height = parent.height - 2
-            val mid = height * 2 / 5
-            headerPanel.setLocation(1, 1)
-            headerPanel.setSize(width, mid)
-            for (i in entryPanels.indices) {
-                val left = width * i / entryPanels.size
-                val right = width * (i + 1) / entryPanels.size
-                entryPanels[i].setLocation(left + 1, mid + 1)
-                entryPanels[i].setSize(right - left, height - mid)
-            }
         }
     }
 

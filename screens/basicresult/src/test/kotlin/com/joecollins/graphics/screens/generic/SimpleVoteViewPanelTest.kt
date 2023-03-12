@@ -809,7 +809,7 @@ class SimpleVoteViewPanelTest {
         val swingPartyOrder = listOf(ndp.party, grn.party, lib.party, pc.party)
         val shapesByDistrict = peiShapesByDistrict()
         val focus = Publisher(shapesByDistrict.keys.filter { it <= 7 })
-        val additionalHighlight = Publisher<List<Int>>(shapesByDistrict.keys.toList())
+        val additionalHighlight = Publisher(shapesByDistrict.keys.toList())
         val selectedDistrict = Publisher(3)
         val panel = candidateVotes(
             currentVotes,
@@ -2948,7 +2948,7 @@ class SimpleVoteViewPanelTest {
                     pc to setOf(4, 2, 3, 7, 1, 6, 19, 15, 20, 18, 8, 26),
                     grn to setOf(5, 17, 11, 13, 12, 21, 22, 23),
                     lib to setOf(16, 14, 10, 24, 25, 27),
-                ).entries.flatMap { e -> e.value.map { it to PartyResult.elected(e.key) } }
+                ).entries.flatMap { e -> e.value.map { it to elected(e.key) } }
                     .toMap().asOneTimePublisher(),
                 null.asOneTimePublisher(),
                 "DISTRICTS".asOneTimePublisher(),
@@ -2956,10 +2956,10 @@ class SimpleVoteViewPanelTest {
             .withSecondResultMap(
                 peiShapesByRegion().asOneTimePublisher(),
                 mapOf(
-                    "Cardigan" to PartyResult.elected(pc),
-                    "Malpeque" to PartyResult.elected(pc),
-                    "Charlottetown" to PartyResult.leading(grn),
-                    "Egmont" to PartyResult.elected(lib),
+                    "Cardigan" to elected(pc),
+                    "Malpeque" to elected(pc),
+                    "Charlottetown" to leading(grn),
+                    "Egmont" to elected(lib),
                 ).asOneTimePublisher(),
                 null.asOneTimePublisher(),
                 "REGIONS".asOneTimePublisher(),

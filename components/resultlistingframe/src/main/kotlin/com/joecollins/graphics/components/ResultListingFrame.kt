@@ -3,7 +3,6 @@ package com.joecollins.graphics.components
 import com.joecollins.graphics.utils.StandardFont
 import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
-import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Component
 import java.awt.Container
@@ -39,7 +38,7 @@ class ResultListingFrame(
     init {
         centralPanel.background = Color.WHITE
         centralPanel.layout = layout
-        add(centralPanel, BorderLayout.CENTER)
+        addCenter(centralPanel)
 
         val onNumRowsUpdate: (Int) -> Unit = { layout.numRows = it }
         numRowsPublisher.subscribe(Subscriber(eventQueueWrapper(onNumRowsUpdate)))
@@ -75,10 +74,6 @@ class ResultListingFrame(
 
     internal fun getNumRows(): Int {
         return layout.numRows
-    }
-
-    internal fun isReversed(): Boolean {
-        return layout.reversed
     }
 
     internal fun getNumItems(): Int {

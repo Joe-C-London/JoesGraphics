@@ -9,6 +9,7 @@ import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.merge
 import java.awt.BorderLayout
 import java.awt.Color
+import java.awt.Component
 import java.awt.Dimension
 import java.util.concurrent.Flow
 import javax.swing.JLabel
@@ -42,6 +43,10 @@ open class GenericPanel(
         preferredSize = Dimension(1024, 512)
         add(this.label, BorderLayout.NORTH)
         add(panel, BorderLayout.CENTER)
+    }
+
+    final override fun add(comp: Component, constraints: Any) {
+        super.add(comp, constraints)
     }
 
     companion object {

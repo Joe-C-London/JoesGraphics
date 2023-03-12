@@ -4,7 +4,6 @@ import com.joecollins.graphics.utils.ColorUtils
 import com.joecollins.graphics.utils.StandardFont
 import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
-import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Component
 import java.awt.Container
@@ -146,7 +145,7 @@ class FiguresFrame(
     init {
         centralPanel.background = Color.WHITE
         centralPanel.layout = FrameLayout()
-        add(centralPanel, BorderLayout.CENTER)
+        addCenter(centralPanel)
 
         val onEntriesUpdate: (List<Entry>) -> Unit = { e ->
             while (entries.size < e.size) {

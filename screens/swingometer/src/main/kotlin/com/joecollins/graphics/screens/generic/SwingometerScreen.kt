@@ -500,11 +500,10 @@ class SwingometerScreen private constructor(title: Flow.Publisher<out String?>, 
                     val total = m.value.values.sum()
                     val focus = m.value[focusParty] ?: 0
                     val comp = m.value[compParty] ?: 0
-                    val position: Double
-                    if (total == 0) {
-                        position = if (m.value.containsKey(focusParty)) Double.NEGATIVE_INFINITY else Double.POSITIVE_INFINITY
+                    val position = if (total == 0) {
+                        if (m.value.containsKey(focusParty)) Double.NEGATIVE_INFINITY else Double.POSITIVE_INFINITY
                     } else {
-                        position = 0.5 * (comp - focus) / total
+                        0.5 * (comp - focus) / total
                     }
                     val count = inputs.weights?.let { f -> f(m.key) } ?: 1
                     generateSequence { position }.take(count)

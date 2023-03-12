@@ -16,6 +16,7 @@ import java.awt.GridLayout
 import java.awt.LayoutManager
 import java.awt.Point
 import java.util.concurrent.Flow
+import javax.swing.JComponent
 import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.border.EmptyBorder
@@ -166,7 +167,7 @@ open class GraphicsFrame(
         )
     }
 
-    protected fun addCenter(panel: JPanel) {
+    protected fun addCenter(panel: JComponent) {
         add(panel, BorderLayout.CENTER)
     }
 

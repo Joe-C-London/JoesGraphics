@@ -499,7 +499,7 @@ class BattlegroundScreen private constructor(
         }
     }
 
-    private class Entry<T>(val key: T, val prevWinner: Party, val currResult: PartyResult?, val isIncluded: Boolean) {
+    private class Entry<T>(val key: T, prevWinner: Party, val currResult: PartyResult?, val isIncluded: Boolean) {
         fun colorFunc(c: Color): Color {
             return if (isIncluded) {
                 c
@@ -520,8 +520,8 @@ class BattlegroundScreen private constructor(
         private var rightPanel: Component = JPanel()
 
         companion object {
-            val WEST = "WEST"
-            val EAST = "EAST"
+            const val WEST = "WEST"
+            const val EAST = "EAST"
         }
 
         fun setLeft(left: Int) {

@@ -15,25 +15,6 @@ repositories {
 }
 
 dependencies {
-    implementation project('barframe')
-    implementation project('battlefieldframe')
-    implementation project('countdownframe')
-    implementation project('descriptionframe')
-    implementation project('figuresframe')
-    implementation project('heatmapframe')
-    implementation project('heatmapframeresultbuilder')
-    implementation project('hemicycleframe')
-    implementation project('mapframe')
-    implementation project('multisummaryframe')
-    implementation project('parliamentvoteframe')
-    implementation project('projectionframe')
-    implementation project('regionsummaryframe')
-    implementation project('resultlistingframe')
-    implementation project('resultmapframebuilder')
-    implementation project('socialframes')
-    implementation project('swingframe')
-    implementation project('swingometerframe')
-
     testImplementation "org.junit.jupiter:junit-jupiter-api:$parent.ext.junit_version"
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$parent.ext.junit_version"
 }

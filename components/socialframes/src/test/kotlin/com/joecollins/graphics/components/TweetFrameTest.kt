@@ -7,11 +7,9 @@ import com.twitter.clientlib.api.TweetsApi
 import com.twitter.clientlib.api.TweetsApi.APIfindTweetByIdRequest
 import com.twitter.clientlib.api.TwitterApi
 import com.twitter.clientlib.api.UsersApi
-import com.twitter.clientlib.api.UsersApi.APIfindUserByIdRequest
 import com.twitter.clientlib.model.Expansions
 import com.twitter.clientlib.model.FullTextEntities
 import com.twitter.clientlib.model.Get2TweetsIdResponse
-import com.twitter.clientlib.model.Get2UsersIdResponse
 import com.twitter.clientlib.model.HashtagEntity
 import com.twitter.clientlib.model.Media
 import com.twitter.clientlib.model.MentionEntity
@@ -82,22 +80,6 @@ class TweetFrameTest {
         Mockito.`when`(mockTweetResponse.data).thenAnswer { tweetBuilder.tweet }
         Mockito.`when`(mockTweetResponse.includes).thenAnswer { tweetBuilder.includes }
         return tweetBuilder
-    }
-
-    private fun setupUserBuilder(userId: String): UserBuilder {
-        val userBuilder = UserBuilder(userId)
-        val mockUserRequest =
-            Mockito.mock(APIfindUserByIdRequest::class.java)
-        val mockUserResponse = Mockito.mock(Get2UsersIdResponse::class.java)
-        Mockito.`when`(mockUsersApi.findUserById(userId)).thenReturn(mockUserRequest)
-        Mockito.`when`(mockUserRequest.userFields(Mockito.anySet())).thenAnswer { inv ->
-            @Suppress("UNCHECKED_CAST")
-            userBuilder.fields = inv.arguments[0] as Set<String>
-            inv.mock
-        }
-        Mockito.`when`(mockUserRequest.execute()).thenReturn(mockUserResponse)
-        Mockito.`when`(mockUserResponse.data).thenAnswer { userBuilder.user }
-        return userBuilder
     }
 
     private class TweetBuilder(private val id: String, private val authorId: String) {
@@ -224,7 +206,7 @@ class TweetFrameTest {
         var verified = false
     }
 
-    private class MediaBuilder() {
+    private class MediaBuilder {
         private val possibleFields = "alt_text,duration_ms,height,media_key,non_public_metrics,organic_metrics,preview_image_url,promoted_metrics,public_metrics,type,url,variants,width"
             .split(",").toSet()
 

@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.lang.IllegalStateException
 import java.util.LinkedList
+import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Flow
 import java.util.concurrent.SubmissionPublisher
 
@@ -61,15 +62,21 @@ class PubSubTests {
     fun testSubscriberInterop() {
         var output: String? = null
         val publisher = SubmissionPublisher<String>()
-        val subscriber = Subscriber<String> { output = it }
+        var latch = CountDownLatch(1)
+        val subscriber = Subscriber<String> {
+            output = it
+            latch.countDown()
+        }
         publisher.subscribe(subscriber)
 
+        latch = CountDownLatch(1)
         publisher.submit("TEST")
-        Thread.sleep(100)
+        latch.await()
         assertEquals("TEST", output)
 
+        latch = CountDownLatch(1)
         publisher.submit("TEST 2")
-        Thread.sleep(100)
+        latch.await()
         assertEquals("TEST 2", output)
     }
 

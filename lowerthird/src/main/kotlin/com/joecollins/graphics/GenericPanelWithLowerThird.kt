@@ -4,12 +4,13 @@ import com.joecollins.graphics.components.lowerthird.LowerThird
 import com.joecollins.pubsub.asOneTimePublisher
 import java.awt.BorderLayout
 import java.awt.Color
+import java.awt.Component
 import java.awt.Dimension
 import java.util.concurrent.Flow
 import javax.swing.JPanel
 
 open class GenericPanelWithLowerThird(
-    private val panel: JPanel,
+    panel: JPanel,
     lowerThird: LowerThird,
 ) : JPanel(), AltTextProvider {
 
@@ -27,4 +28,8 @@ open class GenericPanelWithLowerThird(
         } else {
             (null as String?).asOneTimePublisher()
         }
+
+    final override fun add(comp: Component, constraints: Any?) {
+        super.add(comp, constraints)
+    }
 }

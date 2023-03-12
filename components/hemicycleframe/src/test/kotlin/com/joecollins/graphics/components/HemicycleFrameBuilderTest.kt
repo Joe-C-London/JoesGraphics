@@ -92,7 +92,7 @@ class HemicycleFrameBuilderTest {
         val yp = Party("Yukon Party", "YP", Color.BLUE)
         val ndp = Party("New Democratic Party", "NDP", Color.ORANGE)
 
-        class Riding(val name: String, val leader: Party, val hasWon: Boolean, val prev: Party)
+        class Riding(@Suppress("unused") val name: String, val leader: Party, val hasWon: Boolean, val prev: Party)
 
         val ridings = listOf(
             Riding("Vuntut Gwitchin", lib, false, lib),
@@ -331,7 +331,7 @@ class HemicycleFrameBuilderTest {
         val gop = Party("Republican", "GOP", Color.RED)
 
         class Result(var leader: Party?, var hasWon: Boolean, val prev: Party, val numSeats: Int) {
-            val publisher = Publisher<PartyResult?>(leader?.let { PartyResult(it, hasWon) })
+            val publisher = Publisher(leader?.let { PartyResult(it, hasWon) })
 
             fun setResult(leader: Party?, hasWon: Boolean) {
                 this.leader = leader

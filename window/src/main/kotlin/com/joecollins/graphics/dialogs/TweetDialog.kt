@@ -5,8 +5,6 @@ import com.twitter.clientlib.model.TweetCreateRequest
 import com.twitter.clientlib.model.TweetCreateRequestMedia
 import twitter4j.HttpClientFactory
 import twitter4j.HttpParameter
-import twitter4j.HttpResponseEvent
-import twitter4j.HttpResponseListener
 import twitter4j.JSONObject
 import twitter4j.StatusUpdate
 import twitter4j.TwitterFactory
@@ -85,12 +83,9 @@ class TweetDialog(panel: JPanel) : GenericSocialDialog(panel) {
                 HttpParameter(params),
             ),
             auth,
-            object : HttpResponseListener {
-                override fun httpResponseReceived(event: HttpResponseEvent) {
-                    // no-op
-                }
-            },
-        )
+        ) {
+            // no-op
+        }
     }
 
     private fun sendTweetV1(tweet: String, image: File) {

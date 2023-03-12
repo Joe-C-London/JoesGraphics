@@ -848,7 +848,7 @@ class BarFrameBuilderTest {
     companion object {
         private val THOUSANDS = DecimalFormat("#,##0")
         private val DIFF = DecimalFormat("+0;-0")
-        private val PCT = DecimalFormat("0.0%")
+
         private fun lighten(color: Color): Color {
             return Color(
                 128 + color.red / 2,

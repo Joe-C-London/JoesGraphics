@@ -2,6 +2,7 @@ package com.joecollins.models.general
 
 import java.awt.Color
 
+@Suppress("DataClassPrivateConstructor")
 data class Party private constructor(override val name: String, override val abbreviation: String, override val color: Color, override val overrideSortOrder: Int?) : PartyOrCoalition() {
 
     constructor(name: String, abbreviation: String, color: Color) : this(name, abbreviation, color, null)

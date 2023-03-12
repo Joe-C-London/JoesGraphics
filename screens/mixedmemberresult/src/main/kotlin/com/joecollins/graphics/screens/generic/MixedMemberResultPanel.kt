@@ -51,11 +51,11 @@ class MixedMemberResultPanel private constructor(
     private class ScreenLayout : LayoutManager {
 
         companion object {
-            val CANDIDATE = "CANDIDATE"
-            val CANDIDATE_DIFF = "CANDIDATE_DIFF"
-            val PARTY = "PARTY"
-            val PARTY_DIFF = "PARTY_DIFF"
-            val MAP = "MAP"
+            const val CANDIDATE = "CANDIDATE"
+            const val CANDIDATE_DIFF = "CANDIDATE_DIFF"
+            const val PARTY = "PARTY"
+            const val PARTY_DIFF = "PARTY_DIFF"
+            const val MAP = "MAP"
         }
 
         private val components = HashMap<String, Component>()

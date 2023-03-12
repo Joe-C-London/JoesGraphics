@@ -281,7 +281,7 @@ class AllSeatsScreen private constructor(title: Flow.Publisher<out String?>, fra
 
     private class Entry<T>(val key: T, val prevWinner: Party?, val currResult: PartyResult?) {
 
-        val prevColor = prevWinner?.color ?: Color.WHITE
+        val prevColor: Color = prevWinner?.color ?: Color.WHITE
 
         val resultColor: Color = currResult?.party?.color ?: Color.LIGHT_GRAY
         val fill = currResult?.isElected ?: false

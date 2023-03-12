@@ -316,30 +316,30 @@ class BasicResultPanel private constructor(
     }
 
     abstract class SeatScreenBuilder<KT : Any, KPT : PartyOrCoalition, CT : Any, PT : Any, BAR> internal constructor(
-        protected var current: Flow.Publisher<out Map<out KT, CT>>,
-        protected var header: Flow.Publisher<out String?>,
-        protected var subhead: Flow.Publisher<out String?>,
-        protected val keyTemplate: KeyTemplate<KT, KPT>,
+        private var current: Flow.Publisher<out Map<out KT, CT>>,
+        private var header: Flow.Publisher<out String?>,
+        private var subhead: Flow.Publisher<out String?>,
+        private val keyTemplate: KeyTemplate<KT, KPT>,
         private val seatTemplate: SeatTemplate<CT, PT, BAR>,
     ) {
-        protected var total: Flow.Publisher<out Int>? = null
-        protected var showMajority: Flow.Publisher<out Boolean>? = null
-        protected var majorityFunction: ((Int) -> String)? = null
-        protected var winner: Flow.Publisher<out KT?>? = null
-        protected var notes: Flow.Publisher<out String?>? = null
-        protected var changeNotes: Flow.Publisher<out String?>? = null
-        protected var prev: Flow.Publisher<out Map<out KPT, PT>>? = null
-        protected var diff: Flow.Publisher<out Map<KPT, CurrDiff<CT>>>? = null
-        protected var showPrevRaw: Flow.Publisher<Boolean>? = null
-        protected var changeHeader: Flow.Publisher<out String?>? = null
-        protected var changeSubhead: Flow.Publisher<out String?>? = null
+        private var total: Flow.Publisher<out Int>? = null
+        private var showMajority: Flow.Publisher<out Boolean>? = null
+        private var majorityFunction: ((Int) -> String)? = null
+        private var winner: Flow.Publisher<out KT?>? = null
+        private var notes: Flow.Publisher<out String?>? = null
+        private var changeNotes: Flow.Publisher<out String?>? = null
+        private var prev: Flow.Publisher<out Map<out KPT, PT>>? = null
+        private var diff: Flow.Publisher<out Map<KPT, CurrDiff<CT>>>? = null
+        private var showPrevRaw: Flow.Publisher<Boolean>? = null
+        private var changeHeader: Flow.Publisher<out String?>? = null
+        private var changeSubhead: Flow.Publisher<out String?>? = null
         private var currVotes: Flow.Publisher<out Map<out KPT, Int>>? = null
         private var prevVotes: Flow.Publisher<out Map<out KPT, Int>>? = null
         private var swingHeader: Flow.Publisher<out String?>? = null
         private var swingComparator: Comparator<KPT>? = null
-        protected var classificationFunc: ((KPT) -> KPT)? = null
-        protected var classificationHeader: Flow.Publisher<out String?>? = null
-        protected var progressLabel: Flow.Publisher<out String?> = null.asOneTimePublisher()
+        private var classificationFunc: ((KPT) -> KPT)? = null
+        private var classificationHeader: Flow.Publisher<out String?>? = null
+        private var progressLabel: Flow.Publisher<out String?> = null.asOneTimePublisher()
         private var mapBuilder: MapBuilder<*>? = null
         private var secondMapBuilder: MapBuilder<*>? = null
 
@@ -960,8 +960,7 @@ class BasicResultPanel private constructor(
 
         protected val filteredPrev: Flow.Publisher<out Map<out KPT, PT>>?
             get() {
-                val prev = this.prev
-                if (prev == null) return prev
+                val prev = this.prev ?: return null
                 if (runoffSubhead != null) {
                     return current.merge(prev) { c, p ->
                         if (c.keys.map { keyTemplate.toParty(it) }.toSet() == p.keys) {
@@ -1742,7 +1741,7 @@ class BasicResultPanel private constructor(
                             .toList().toTypedArray() as Array<KT>
 
                         val filteredCurr = Aggregators.topAndOthers(current, limit, others, *mandatory)
-                        val filteredPrev = (if (this.usePrev && !this.showPrevRaw) this.prev else null) ?: emptyMap<KPT, Int>()
+                        val filteredPrev = (if (this.usePrev && !this.showPrevRaw) this.prev else null) ?: emptyMap()
 
                         val shapes: Map<KT, String> = if (this.winner != null) {
                             mapOf(this.winner!! to "WINNER")
@@ -2243,7 +2242,7 @@ class BasicResultPanel private constructor(
             val barsText = current.merge(filteredPrev?.merge(showPrevRaw) { p, b -> if (b) emptyMap() else p } ?: emptyMap<KPT, Int>().asOneTimePublisher()) { c, p ->
                 val prevTotal = p.values.sum().toDouble()
                 c.keys
-                    .sortedByDescending { keyTemplate.toParty(it).overrideSortOrder?.toDouble() ?: c[it]?.let { it.start + it.endInclusive } ?: 0.0 }
+                    .sortedByDescending { candidate -> keyTemplate.toParty(candidate).overrideSortOrder?.toDouble() ?: c[candidate]?.let { it.start + it.endInclusive } ?: 0.0 }
                     .joinToString("") { candidate ->
                         val party = keyTemplate.toParty(candidate)
                         val prevPct = (p[party] ?: 0) / prevTotal

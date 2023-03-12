@@ -79,7 +79,7 @@ class HeatMapFrameBuilderTest {
         val yp = Party("Yukon Party", "YP", Color.BLUE)
         val ndp = Party("New Democratic Party", "NDP", Color.ORANGE)
 
-        class Riding(val name: String, val leader: Party, val hasWon: Boolean, val prev: Party)
+        class Riding(@Suppress("unused") val name: String, val leader: Party, val hasWon: Boolean, val prev: Party)
 
         val ridings = listOf(
             Riding("Vuntut Gwitchin", lib, false, lib),
@@ -139,7 +139,7 @@ class HeatMapFrameBuilderTest {
         val yp = Party("Yukon Party", "YP", Color.BLUE)
         val ndp = Party("New Democratic Party", "NDP", Color.ORANGE)
 
-        class Riding(val name: String, val leader: Party, val hasWon: Boolean, val prev: Party, val isWhitehorse: Boolean)
+        class Riding(@Suppress("unused") val name: String, val leader: Party, val hasWon: Boolean, val prev: Party, val isWhitehorse: Boolean)
 
         val ridings = listOf(
             Riding("Vuntut Gwitchin", lib, false, lib, false),

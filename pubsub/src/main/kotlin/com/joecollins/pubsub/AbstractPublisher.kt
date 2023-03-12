@@ -16,7 +16,6 @@ abstract class AbstractPublisher<T> : Flow.Publisher<T> {
             val subscription = Subscription(this, subscriber)
             subscriber.onSubscribe(subscription)
             subscriptions.add(subscription)
-            @Suppress("UNCHECKED_CAST")
             value?.let { subscription.send(it) }
             if (completed) {
                 subscription.send(CompleteWrapper())

@@ -181,6 +181,5 @@ class FiguresScreenTest {
         private val pc = Party("Progressive Conservative", "PC", Color.BLUE)
         private val lib = Party("Liberal", "LIB", Color.RED)
         private val grn = Party("Green", "GRN", Color.GREEN.darker())
-        private val ind = Party("Independent", "IND", Color.GRAY)
     }
 }

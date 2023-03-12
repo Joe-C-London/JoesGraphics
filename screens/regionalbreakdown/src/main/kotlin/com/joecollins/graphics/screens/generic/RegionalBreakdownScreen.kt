@@ -72,7 +72,6 @@ class RegionalBreakdownScreen private constructor(
 
         val filteredSeats get() = Aggregators.adjustKey(seats) { p -> if (partyOrder.contains(p)) p else Party.OTHERS }
 
-        val partyOrderPublisher = Publisher(partyOrder)
         private val namePublisher = Publisher(name)
         override val headerPublisher: Flow.Publisher<out String>
             get() = namePublisher
@@ -195,7 +194,6 @@ class RegionalBreakdownScreen private constructor(
 
         val filteredVotes get() = Aggregators.adjustKey(votes) { p -> if (partyOrder.contains(p)) p else Party.OTHERS }
 
-        val partyOrderPublisher = Publisher(partyOrder)
         private val namePublisher = Publisher(name)
         override val headerPublisher: Flow.Publisher<out String>
             get() = namePublisher
@@ -257,9 +255,8 @@ class RegionalBreakdownScreen private constructor(
 
     open class MultiPartyResultBuilder protected constructor(
         titlePublisher: Flow.Publisher<out String>,
-        protected val maxColumnsPublisher: Flow.Publisher<Int?>,
     ) {
-        protected val title: Flow.Publisher<out String> = titlePublisher
+        private val title: Flow.Publisher<out String> = titlePublisher
         protected val entries: MutableList<Entry> = ArrayList()
         protected var partyOrder: Flow.Publisher<out List<PartyOrCoalition>>? = null
 
@@ -291,7 +288,7 @@ class RegionalBreakdownScreen private constructor(
         numTotalSeatsPublisher: Flow.Publisher<out Int>,
         titlePublisher: Flow.Publisher<out String>,
         maxColumnsPublisher: Flow.Publisher<Int?>,
-    ) : MultiPartyResultBuilder(titlePublisher, maxColumnsPublisher) {
+    ) : MultiPartyResultBuilder(titlePublisher) {
 
         fun withBlankRow(): SeatBuilder {
             entries.add(BlankEntry())
@@ -335,7 +332,7 @@ class RegionalBreakdownScreen private constructor(
         numTotalSeatsPublisher: Flow.Publisher<out Int>,
         titlePublisher: Flow.Publisher<out String>,
         maxColumnsPublisher: Flow.Publisher<Int?>,
-    ) : MultiPartyResultBuilder(titlePublisher, maxColumnsPublisher) {
+    ) : MultiPartyResultBuilder(titlePublisher) {
         fun withBlankRow(): SeatDiffBuilder {
             entries.add(BlankEntry())
             return this
@@ -383,7 +380,7 @@ class RegionalBreakdownScreen private constructor(
         numTotalSeatsPublisher: Flow.Publisher<out Int>,
         titlePublisher: Flow.Publisher<out String>,
         maxColumnsPublisher: Flow.Publisher<Int?>,
-    ) : MultiPartyResultBuilder(titlePublisher, maxColumnsPublisher) {
+    ) : MultiPartyResultBuilder(titlePublisher) {
 
         fun withBlankRow(): SeatPrevBuilder {
             entries.add(BlankEntry())
@@ -434,7 +431,7 @@ class RegionalBreakdownScreen private constructor(
         titlePublisher: Flow.Publisher<out String>,
         maxColumnsPublisher: Flow.Publisher<Int?>,
         private val reportingFunc: (R) -> String,
-    ) : MultiPartyResultBuilder(titlePublisher, maxColumnsPublisher) {
+    ) : MultiPartyResultBuilder(titlePublisher) {
 
         fun withBlankRow(): VoteBuilder<R> {
             entries.add(BlankEntry())
@@ -479,7 +476,7 @@ class RegionalBreakdownScreen private constructor(
         titlePublisher: Flow.Publisher<out String>,
         maxColumnsPublisher: Flow.Publisher<Int?>,
         private val reportingFunc: (R) -> String,
-    ) : MultiPartyResultBuilder(titlePublisher, maxColumnsPublisher) {
+    ) : MultiPartyResultBuilder(titlePublisher) {
 
         fun withBlankRow(): VotePrevBuilder<R> {
             entries.add(BlankEntry())
@@ -676,7 +673,7 @@ class RegionalBreakdownScreen private constructor(
             partyMapping: Flow.Publisher<out Map<Coalition, Party>>,
         ): Flow.Publisher<out List<PartyOrCoalition>> =
             partyOrder.merge(partyMapping) { po, pm ->
-                pm.forEach { coalition, party ->
+                pm.forEach { (coalition, party) ->
                     if (!coalition.constituentParties.contains(party)) {
                         throw IllegalArgumentException("$party is not a constituent party of $coalition")
                     }

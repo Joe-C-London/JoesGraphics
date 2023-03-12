@@ -59,7 +59,7 @@ open class GenericReader {
                     continue
                 }
                 val key = keyFunc(feature)
-                val geom = feature.getAttribute("the_geom") as org.locationtech.jts.geom.Geometry
+                val geom = feature.getAttribute("the_geom") as Geometry
                 shapes.merge(
                     key,
                     toShape(geom),

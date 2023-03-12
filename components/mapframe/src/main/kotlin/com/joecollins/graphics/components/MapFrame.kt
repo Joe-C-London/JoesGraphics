@@ -4,7 +4,6 @@ import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
 import com.joecollins.utils.ExecutorUtils
 import java.awt.BasicStroke
-import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Graphics
 import java.awt.Graphics2D
@@ -235,7 +234,7 @@ class MapFrame(
                 )
             }
         }
-        add(panel, BorderLayout.CENTER)
+        addCenter(panel)
 
         val onShapesUpdate: (List<Pair<Shape, Color>>) -> Unit = { s ->
             if (this.shapesToDraw != s) {

@@ -10,9 +10,10 @@ import java.awt.Shape
 import java.time.ZoneId
 import java.util.concurrent.Flow
 
-class TweetFrame internal constructor(tweet: Flow.Publisher<out Tweet>, timezone: ZoneId = ZoneId.systemDefault()) : SocialMediaFrame<Tweet>(tweet, timezone) {
-    override val color
-        get() = Color(0x00acee)
+class TweetFrame internal constructor(
+    tweet: Flow.Publisher<out Tweet>,
+    timezone: ZoneId = ZoneId.systemDefault(),
+) : SocialMediaFrame<Tweet>(tweet, Color(0x00acee), timezone) {
 
     override val emojiVersion: String
         get() = "twitter/v14.0"

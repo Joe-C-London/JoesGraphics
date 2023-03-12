@@ -39,7 +39,7 @@ class ParliamentVoteFrame(
         val outerPanel = JPanel()
         outerPanel.background = Color.WHITE
         outerPanel.layout = BorderLayout()
-        add(outerPanel, BorderLayout.CENTER)
+        addCenter(outerPanel)
 
         val subtitleLabel = FontSizeAdjustingLabel()
         subtitleLabel.font = StandardFont.readNormalFont(16)

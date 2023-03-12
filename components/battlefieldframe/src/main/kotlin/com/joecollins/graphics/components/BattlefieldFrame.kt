@@ -3,7 +3,6 @@ package com.joecollins.graphics.components
 import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
 import com.joecollins.pubsub.asOneTimePublisher
-import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Graphics
 import java.awt.Graphics2D
@@ -31,7 +30,7 @@ class BattlefieldFrame(
     private val panel = BattlefieldPanel()
 
     init {
-        add(panel, BorderLayout.CENTER)
+        addCenter(panel)
         limitPublisher.subscribe(Subscriber(eventQueueWrapper { panel.limit = it.toDouble() }))
         incrementPublisher.subscribe(Subscriber(eventQueueWrapper { panel.increment = it.toDouble() }))
         dotsPublisher.subscribe(Subscriber(eventQueueWrapper { panel.dots = it }))

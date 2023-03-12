@@ -366,7 +366,7 @@ class SwingometerFrame(
         centerPanel.background = Color.WHITE
         centerPanel.layout = BorderLayout()
         centerPanel.add(swingPanel, BorderLayout.CENTER)
-        add(centerPanel, BorderLayout.CENTER)
+        addCenter(centerPanel)
 
         val onValueUpdate: (Number) -> Unit = { value -> swingPanel.value = value }
         valuePublisher.subscribe(Subscriber(eventQueueWrapper(onValueUpdate)))

@@ -799,16 +799,8 @@ class BarFrameTest {
             return partyName
         }
 
-        fun setPartyName(partyName: String) {
-            this.partyName = partyName
-        }
-
         fun getPartyColor(): Color {
             return partyColor
-        }
-
-        fun setPartyColor(partyColor: Color) {
-            this.partyColor = partyColor
         }
 
         fun getNumSeats(): Int {

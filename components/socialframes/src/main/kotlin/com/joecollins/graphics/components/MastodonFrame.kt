@@ -18,10 +18,11 @@ import java.time.Instant
 import java.time.ZoneId
 import java.util.concurrent.Flow
 
-class MastodonFrame(toot: Flow.Publisher<out Toot>, timezone: ZoneId = ZoneId.systemDefault()) : SocialMediaFrame<Toot>(toot, timezone) {
+class MastodonFrame(
+    toot: Flow.Publisher<out Toot>,
+    timezone: ZoneId = ZoneId.systemDefault(),
+) : SocialMediaFrame<Toot>(toot, Color(99, 100, 255), timezone) {
 
-    override val color: Color
-        get() = Color(99, 100, 255)
     override val emojiVersion: String
         get() = "google/noto-emoji/v2.034"
     override val protectedUserText: String

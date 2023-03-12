@@ -177,7 +177,6 @@ class SwingometerFrameBuilder {
         return withDots(dots, positionFunc, colorFunc, { "" }, solidFunc)
     }
 
-    @Suppress("MemberVisibilityCanBePrivate", "MemberVisibilityCanBePrivate", "MemberVisibilityCanBePrivate")
     fun <T> withDots(
         dots: Flow.Publisher<out List<T>>,
         positionFunc: (T) -> Number,

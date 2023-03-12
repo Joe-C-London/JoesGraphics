@@ -5,11 +5,9 @@ import com.joecollins.graphics.GenericPanel
 import com.joecollins.graphics.ImageGenerator
 import com.joecollins.graphics.components.BarFrame
 import com.joecollins.graphics.components.BarFrameBuilder
-import com.joecollins.graphics.components.FontSizeAdjustingLabel
 import com.joecollins.graphics.components.MapFrame
 import com.joecollins.graphics.components.SwingFrame
 import com.joecollins.graphics.components.SwingFrameBuilder
-import com.joecollins.graphics.utils.StandardFont
 import com.joecollins.models.general.Aggregators
 import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.Party
@@ -17,7 +15,6 @@ import com.joecollins.models.general.PartyResult
 import com.joecollins.models.general.ResultColorUtils.getColor
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.Subscriber
-import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
 import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.combine
 import com.joecollins.pubsub.compose
@@ -33,9 +30,7 @@ import java.awt.LayoutManager
 import java.awt.Shape
 import java.text.DecimalFormat
 import java.util.concurrent.Flow
-import javax.swing.JLabel
 import javax.swing.JPanel
-import javax.swing.border.EmptyBorder
 
 class MultiResultScreen private constructor(
     header: Flow.Publisher<out String?>,
@@ -131,25 +126,25 @@ class MultiResultScreen private constructor(
                 val additionalHighlight = additionalHighlightsFunc(t)
                 val leader = leadingPartyFunc(t)
                 shapesFunc(t).entries.asSequence()
-                    .map {
+                    .map { (id, shape) ->
                         when {
-                            it.key == selected -> {
-                                Pair(it.value, leader.map { it.getColor(default = Party.OTHERS.color) })
+                            id == selected -> {
+                                Pair(shape, leader.map { it.getColor(default = Party.OTHERS.color) })
                             }
-                            focus.isNullOrEmpty() || focus.contains(it.key) -> {
+                            focus.isNullOrEmpty() || focus.contains(id) -> {
                                 Pair(
-                                    it.value,
+                                    shape,
                                     Color.LIGHT_GRAY.asOneTimePublisher(),
                                 )
                             }
-                            additionalHighlight != null && additionalHighlight.contains(it.key) -> {
+                            additionalHighlight != null && additionalHighlight.contains(id) -> {
                                 Pair(
-                                    it.value,
+                                    shape,
                                     Color.LIGHT_GRAY.asOneTimePublisher(),
                                 )
                             }
                             else -> Pair(
-                                it.value,
+                                shape,
                                 Color(220, 220, 220).asOneTimePublisher(),
                             )
                         }
@@ -239,7 +234,6 @@ class MultiResultScreen private constructor(
                             this.swingPartyOrder,
                             mapHeaderFunc != null,
                             this.partiesOnly,
-                            idx,
                         )
                         newPanel.setVotesPublisher(
                             itemPublisher.compose {
@@ -363,7 +357,7 @@ class MultiResultScreen private constructor(
         }
     }
 
-    private class Result(private val index: Int, private val partiesOnly: Boolean, private val incumbentMarker: String) {
+    private class Result(private val partiesOnly: Boolean, private val incumbentMarker: String) {
         var votes: Map<Candidate, Int> = emptyMap()
             set(value) {
                 field = value
@@ -453,12 +447,11 @@ class MultiResultScreen private constructor(
         }
     }
 
-    private class ResultPanel constructor(
+    private class ResultPanel(
         incumbentMarker: String,
         swingPartyOrder: Comparator<Party>?,
         hasMap: Boolean,
         partiesOnly: Boolean,
-        index: Int,
     ) : JPanel() {
         private val barFrame: BarFrame
         private var swingFrame: SwingFrame? = null
@@ -575,7 +568,7 @@ class MultiResultScreen private constructor(
         init {
             background = Color.WHITE
             layout = ResultPanelLayout()
-            val result = Result(index, partiesOnly, incumbentMarker)
+            val result = Result(partiesOnly, incumbentMarker)
             votes.selfCompose().subscribe(Subscriber { result.votes = it })
             winner.selfCompose().subscribe(Subscriber { result.winner = it })
             runoff.selfCompose().subscribe(Subscriber { result.runoff = it ?: emptySet() })
@@ -616,14 +609,6 @@ class MultiResultScreen private constructor(
     }
 
     companion object {
-        private fun createHeaderLabel(textPublisher: Flow.Publisher<out String?>): JLabel {
-            val headerLabel = FontSizeAdjustingLabel()
-            headerLabel.font = StandardFont.readBoldFont(32)
-            headerLabel.horizontalAlignment = JLabel.CENTER
-            headerLabel.border = EmptyBorder(5, 0, -5, 0)
-            textPublisher.subscribe(Subscriber(eventQueueWrapper { headerLabel.text = it }))
-            return headerLabel
-        }
 
         fun <T> of(
             list: Flow.Publisher<out List<T>>,

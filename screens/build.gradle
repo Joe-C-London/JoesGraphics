@@ -15,27 +15,6 @@ repositories {
 }
 
 dependencies {
-    implementation project('screenbase')
-
-    implementation project('allseats')
-    implementation project('basicresult')
-    implementation project('battlefield')
-    implementation project('battleground')
-    implementation project('candidatelisting')
-    implementation project('countdown')
-    implementation project('figures')
-    implementation project('mixedmemberresult')
-    implementation project('multiresult')
-    implementation project('partyheatmap')
-    implementation project('partysummary')
-    implementation project('projection')
-    implementation project('recount')
-    implementation project('regionalbreakdown')
-    implementation project('seatschanging')
-    implementation project('singletransferrableresult')
-    implementation project('swingometer')
-    implementation project('tooclosetocall')
-
     testImplementation "org.junit.jupiter:junit-jupiter-api:$parent.ext.junit_version"
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$parent.ext.junit_version"
 }

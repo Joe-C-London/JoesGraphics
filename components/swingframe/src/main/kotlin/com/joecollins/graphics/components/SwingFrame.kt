@@ -41,7 +41,7 @@ class SwingFrame(
         centerPanel.layout = BorderLayout()
         centerPanel.add(swingPanel, BorderLayout.CENTER)
         centerPanel.add(bottomLabel, BorderLayout.SOUTH)
-        add(centerPanel, BorderLayout.CENTER)
+        addCenter(centerPanel)
 
         valuePublisher.subscribe(Subscriber(eventQueueWrapper { swingPanel.value = it }))
         rangePublisher.subscribe(Subscriber(eventQueueWrapper { swingPanel.range = it }))

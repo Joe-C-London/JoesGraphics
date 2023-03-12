@@ -68,7 +68,6 @@ class TooCloseToCallScreen private constructor(
         private fun calculateEntries() = votes.entries.asSequence()
             .map {
                 Entry(
-                    it.key,
                     headers[it.key] ?: "",
                     it.value,
                     results[it.key],
@@ -83,8 +82,7 @@ class TooCloseToCallScreen private constructor(
             .toList()
     }
 
-    private class Entry<T> constructor(
-        val key: T,
+    private class Entry(
         val header: String,
         val votes: Map<Candidate, Int>,
         val result: PartyResult?,

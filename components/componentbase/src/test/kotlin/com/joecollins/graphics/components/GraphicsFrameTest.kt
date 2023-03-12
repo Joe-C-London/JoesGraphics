@@ -6,7 +6,6 @@ import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.map
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import java.awt.BorderLayout
 import java.awt.Color
 import javax.swing.JPanel
 
@@ -88,7 +87,7 @@ class GraphicsFrameTest {
             init {
                 val panel = JPanel()
                 panel.background = Color.YELLOW
-                add(panel, BorderLayout.CENTER)
+                addCenter(panel)
             }
         }
         graphicsFrame.setSize(256, 128)
@@ -104,7 +103,7 @@ class GraphicsFrameTest {
             init {
                 val panel = JPanel()
                 panel.background = Color.YELLOW
-                add(panel, BorderLayout.CENTER)
+                addCenter(panel)
             }
         }
         graphicsFrame.setSize(256, 128)
@@ -119,7 +118,7 @@ class GraphicsFrameTest {
             init {
                 val panel = JPanel()
                 panel.background = Color.YELLOW
-                add(panel, BorderLayout.CENTER)
+                addCenter(panel)
             }
         }
         graphicsFrame.setSize(256, 128)
@@ -136,7 +135,7 @@ class GraphicsFrameTest {
             init {
                 val panel = JPanel()
                 panel.background = Color.YELLOW
-                add(panel, BorderLayout.CENTER)
+                addCenter(panel)
             }
         }
         graphicsFrame.setSize(256, 128)
@@ -154,7 +153,7 @@ class GraphicsFrameTest {
             init {
                 val panel = JPanel()
                 panel.background = Color.YELLOW
-                add(panel, BorderLayout.CENTER)
+                addCenter(panel)
             }
         }
         graphicsFrame.setSize(256, 128)
@@ -174,7 +173,7 @@ class GraphicsFrameTest {
             init {
                 val panel = JPanel()
                 panel.background = Color.YELLOW
-                add(panel, BorderLayout.CENTER)
+                addCenter(panel)
             }
         }
         graphicsFrame.setSize(256, 128)
@@ -190,7 +189,7 @@ class GraphicsFrameTest {
             init {
                 val panel = JPanel()
                 panel.background = Color.YELLOW
-                add(panel, BorderLayout.CENTER)
+                addCenter(panel)
             }
         }
         graphicsFrame.setSize(256, 128)
@@ -223,7 +222,7 @@ class GraphicsFrameTest {
             init {
                 val panel = JPanel()
                 panel.background = Color.YELLOW
-                add(panel, BorderLayout.CENTER)
+                addCenter(panel)
             }
         }
         graphicsFrame.setSize(256, 128)
@@ -258,7 +257,7 @@ class GraphicsFrameTest {
             init {
                 val panel = JPanel()
                 panel.background = Color.YELLOW
-                add(panel, BorderLayout.CENTER)
+                addCenter(panel)
             }
         }
         graphicsFrame.setSize(256, 128)
@@ -312,7 +311,7 @@ class GraphicsFrameTest {
             init {
                 val panel = JPanel()
                 panel.background = Color.YELLOW
-                add(panel, BorderLayout.CENTER)
+                addCenter(panel)
             }
         }
         graphicsFrame.setSize(256, 128)

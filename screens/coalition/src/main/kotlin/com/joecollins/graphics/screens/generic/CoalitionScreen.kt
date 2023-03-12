@@ -4,7 +4,6 @@ import com.joecollins.graphics.GenericPanel
 import com.joecollins.graphics.components.BarFrame
 import com.joecollins.graphics.components.GraphicsFrame
 import com.joecollins.models.general.PartyOrCoalition
-import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.map
 import com.joecollins.pubsub.merge

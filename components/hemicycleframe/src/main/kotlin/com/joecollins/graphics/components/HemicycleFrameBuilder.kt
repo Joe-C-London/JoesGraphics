@@ -362,10 +362,7 @@ class HemicycleFrameBuilder {
                 seatsFunc,
                 {
                     results[it]!!.map { result ->
-                        when {
-                            result == null -> Color.WHITE
-                            else -> result.getColor(default = Color.LIGHT_GRAY)
-                        }
+                        result?.getColor(default = Color.LIGHT_GRAY) ?: Color.WHITE
                     }
                 },
                 { prevResultFunc(it).color.asOneTimePublisher() },
