@@ -428,7 +428,7 @@ class BasicResultPanel private constructor(
             focus: Flow.Publisher<out List<T>?>,
             headerPublisher: Flow.Publisher<out String?>,
         ): SeatScreenBuilder<KT, KPT, CT, PT, BAR> {
-            mapBuilder = MapBuilder(
+            mapBuilder = MapBuilder.multiResult(
                 shapes,
                 winners.map { m -> partyMapToResultMap(m) },
                 focus,
@@ -443,7 +443,7 @@ class BasicResultPanel private constructor(
             focus: Flow.Publisher<out List<T>?>,
             headerPublisher: Flow.Publisher<out String?>,
         ): SeatScreenBuilder<KT, KPT, CT, PT, BAR> {
-            mapBuilder = MapBuilder(shapes, winners, focus, headerPublisher)
+            mapBuilder = MapBuilder.multiResult(shapes, winners, focus, headerPublisher)
             return this
         }
 
@@ -454,7 +454,7 @@ class BasicResultPanel private constructor(
             additionalHighlight: Flow.Publisher<out List<T>?>,
             headerPublisher: Flow.Publisher<out String?>,
         ): SeatScreenBuilder<KT, KPT, CT, PT, BAR> {
-            mapBuilder = MapBuilder(shapes, winners, Pair(focus, additionalHighlight), headerPublisher)
+            mapBuilder = MapBuilder.multiResult(shapes, winners, focus, additionalHighlight, headerPublisher)
             return this
         }
 
@@ -464,7 +464,7 @@ class BasicResultPanel private constructor(
             focus: Flow.Publisher<out List<T>?>,
             headerPublisher: Flow.Publisher<out String?>,
         ): SeatScreenBuilder<KT, KPT, CT, PT, BAR> {
-            secondMapBuilder = MapBuilder(shapes, winners, focus, headerPublisher)
+            secondMapBuilder = MapBuilder.multiResult(shapes, winners, focus, headerPublisher)
             return this
         }
 
@@ -475,7 +475,7 @@ class BasicResultPanel private constructor(
             additionalHighlight: Flow.Publisher<out List<T>?>,
             headerPublisher: Flow.Publisher<out String?>,
         ): SeatScreenBuilder<KT, KPT, CT, PT, BAR> {
-            secondMapBuilder = MapBuilder(shapes, winners, Pair(focus, additionalHighlight), headerPublisher)
+            secondMapBuilder = MapBuilder.multiResult(shapes, winners, focus, additionalHighlight, headerPublisher)
             return this
         }
 
@@ -1097,7 +1097,7 @@ class BasicResultPanel private constructor(
             focus: Flow.Publisher<out List<T>?>,
             headerPublisher: Flow.Publisher<out String?>,
         ): VoteScreenBuilder<KT, KPT, CT, CPT, PT> {
-            mapBuilder = MapBuilder(shapes, winners.map { m -> partyMapToResultMap(m) }, focus, headerPublisher)
+            mapBuilder = MapBuilder.multiResult(shapes, winners.map { m -> partyMapToResultMap(m) }, focus, headerPublisher)
             return this
         }
 
@@ -1108,7 +1108,7 @@ class BasicResultPanel private constructor(
             focus: Flow.Publisher<out List<T>?>,
             header: Flow.Publisher<out String?>,
         ): VoteScreenBuilder<KT, KPT, CT, CPT, PT> {
-            mapBuilder = MapBuilder(shapes, selectedShape, leadingParty.map { party -> PartyResult.elected(party) }, focus, header)
+            mapBuilder = MapBuilder.singleResult(shapes, selectedShape, leadingParty.map { party -> PartyResult.elected(party) }, focus, header)
             return this
         }
 
@@ -1118,7 +1118,7 @@ class BasicResultPanel private constructor(
             focus: Flow.Publisher<out List<T>?>,
             headerPublisher: Flow.Publisher<out String?>,
         ): VoteScreenBuilder<KT, KPT, CT, CPT, PT> {
-            mapBuilder = MapBuilder(shapes, winners, focus, headerPublisher)
+            mapBuilder = MapBuilder.multiResult(shapes, winners, focus, headerPublisher)
             return this
         }
 
@@ -1128,7 +1128,7 @@ class BasicResultPanel private constructor(
             focus: Pair<Flow.Publisher<out List<T>?>, Flow.Publisher<out List<T>?>>,
             headerPublisher: Flow.Publisher<out String?>,
         ): VoteScreenBuilder<KT, KPT, CT, CPT, PT> {
-            mapBuilder = MapBuilder(shapes, winners, focus, headerPublisher)
+            mapBuilder = MapBuilder.multiResult(shapes, winners, focus.first, focus.second, headerPublisher)
             return this
         }
 
@@ -1139,7 +1139,7 @@ class BasicResultPanel private constructor(
             focus: Flow.Publisher<out List<T>?>,
             header: Flow.Publisher<out String?>,
         ): VoteScreenBuilder<KT, KPT, CT, CPT, PT> {
-            mapBuilder = MapBuilder(shapes, selectedShape, leadingParty, focus, header)
+            mapBuilder = MapBuilder.singleResult(shapes, selectedShape, leadingParty, focus, header)
             return this
         }
 
@@ -1151,7 +1151,7 @@ class BasicResultPanel private constructor(
             additionalHighlight: Flow.Publisher<out List<T>?>,
             header: Flow.Publisher<out String?>,
         ): VoteScreenBuilder<KT, KPT, CT, CPT, PT> {
-            mapBuilder = MapBuilder(shapes, selectedShape, leadingParty, focus, additionalHighlight, header)
+            mapBuilder = MapBuilder.singleResult(shapes, selectedShape, leadingParty, focus, additionalHighlight, header)
             return this
         }
 
@@ -1161,7 +1161,7 @@ class BasicResultPanel private constructor(
             focus: Flow.Publisher<out List<T>?>,
             headerPublisher: Flow.Publisher<out String?>,
         ): VoteScreenBuilder<KT, KPT, CT, CPT, PT> {
-            secondMapBuilder = MapBuilder(shapes, winners, focus, headerPublisher)
+            secondMapBuilder = MapBuilder.multiResult(shapes, winners, focus, headerPublisher)
             return this
         }
 
@@ -1171,7 +1171,7 @@ class BasicResultPanel private constructor(
             focus: Pair<Flow.Publisher<out List<T>?>, Flow.Publisher<out List<T>?>>,
             headerPublisher: Flow.Publisher<out String?>,
         ): VoteScreenBuilder<KT, KPT, CT, CPT, PT> {
-            secondMapBuilder = MapBuilder(shapes, winners, focus, headerPublisher)
+            secondMapBuilder = MapBuilder.multiResult(shapes, winners, focus.first, focus.second, headerPublisher)
             return this
         }
 
@@ -2355,7 +2355,7 @@ class BasicResultPanel private constructor(
             focus: Flow.Publisher<out List<T>?>,
             header: Flow.Publisher<out String?>,
         ): PartyQuotaScreenBuilder<P> {
-            mapBuilder = MapBuilder(shapes, selectedShape, leadingParty.map { PartyResult.elected(it?.toParty()) }, focus, header)
+            mapBuilder = MapBuilder.singleResult(shapes, selectedShape, leadingParty.map { PartyResult.elected(it?.toParty()) }, focus, header)
             return this
         }
 

@@ -6,6 +6,7 @@ import com.joecollins.graphics.ImageGenerator
 import com.joecollins.graphics.components.BarFrameBuilder
 import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.Party
+import com.joecollins.models.general.PartyResult
 import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.map
 import com.joecollins.pubsub.merge
@@ -104,10 +105,10 @@ class SingleTransferrableResultScreen private constructor(
             focus: Flow.Publisher<out List<T>?>,
             header: Flow.Publisher<out String?>,
         ): Builder {
-            mapBuilder = MapBuilder(
+            mapBuilder = MapBuilder.singleResult(
                 shapes,
                 selectedShape,
-                leadingParty.map { com.joecollins.models.general.PartyResult.elected(it) },
+                leadingParty.map { PartyResult.elected(it) },
                 focus,
                 header,
             )

@@ -11,123 +11,13 @@ import java.awt.Color
 import java.awt.Shape
 import java.util.concurrent.Flow
 
-class MapBuilder<T> {
-    private val winners: Flow.Publisher<out List<Pair<Shape, Color>>>
-    private val mapFocus: Flow.Publisher<out List<Shape>?>
-    private val mapHeader: Flow.Publisher<out String?>
+class MapBuilder<T> private constructor(
+    private val colours: Flow.Publisher<out List<Pair<Shape, Color>>>,
+    private val mapFocus: Flow.Publisher<out List<Shape>?>,
+    private val mapHeader: Flow.Publisher<out String?>,
+) {
     private var outlines: Flow.Publisher<out List<Shape>>? = null
     private var notes: Flow.Publisher<out String?>? = null
-
-    constructor(
-        shapes: Flow.Publisher<out Map<T, Shape>>,
-        winners: Flow.Publisher<out Map<T, PartyResult?>>,
-        focus: Flow.Publisher<out List<T>?>,
-        headerPublisher: Flow.Publisher<out String?>,
-    ) : this(shapes, winners, Pair(focus, (null as List<T>?).asOneTimePublisher()), headerPublisher)
-
-    constructor(
-        shapes: Flow.Publisher<out Map<T, Shape>>,
-        winners: Flow.Publisher<out Map<T, PartyResult?>>,
-        focus: Pair<Flow.Publisher<out List<T>?>, Flow.Publisher<out List<T>?>>,
-        headerPublisher: Flow.Publisher<out String?>,
-    ) {
-        val shapesToParties = shapes
-            .merge(winners) { s, w ->
-                s.entries
-                    .map {
-                        val winnerParty = w[it.key]
-                        Pair(it.value, winnerParty)
-                    }
-                    .toList()
-            }
-        mapFocus = shapes.merge(focus.first) { shp, foc -> createFocusShapes(shp, foc) }
-        val additionalFocus =
-            shapes.merge(focus.second) { shp, foc -> createFocusShapes(shp, foc) }
-        val allFocusShapes = mapFocus.merge(additionalFocus) { a, b ->
-            when {
-                a == null -> b
-                b == null -> a
-                else -> listOf(a, b).flatten()
-            }
-        }
-        this.winners =
-            shapesToParties.merge(allFocusShapes) { r, f ->
-                r.map { Pair(it.first, extractColor(f, it.first, it.second)) }
-                    .toList()
-            }
-        mapHeader = headerPublisher
-    }
-
-    constructor(
-        shapes: Flow.Publisher<out Map<T, Shape>>,
-        selectedShape: Flow.Publisher<out T>,
-        leadingParty: Flow.Publisher<out PartyResult?>,
-        focus: Flow.Publisher<out List<T>?>,
-        header: Flow.Publisher<out String?>,
-    ) : this(shapes, selectedShape, leadingParty, focus, (null as List<T>?).asOneTimePublisher(), header)
-
-    constructor(
-        shapes: Flow.Publisher<out Map<T, Shape>>,
-        selectedShape: Flow.Publisher<out T>,
-        leadingParty: Flow.Publisher<out PartyResult?>,
-        focus: Flow.Publisher<out List<T>?>,
-        additionalHighlight: Flow.Publisher<out List<T>?>,
-        header: Flow.Publisher<out String?>,
-    ) {
-        val leaderWithShape =
-            selectedShape.merge(leadingParty) { left, right -> Pair(left, right) }
-        mapFocus = shapes.merge(focus) { shp, foc -> createFocusShapes(shp, foc) }
-        val additionalFocusShapes =
-            shapes.merge(additionalHighlight) { shp, foc -> createFocusShapes(shp, foc) }
-        mapHeader = header
-        val shapeWinners = shapes
-            .merge(leaderWithShape) { shp, ldr ->
-                shp.entries
-                    .map {
-                        val color =
-                            if (it.key == ldr.first) {
-                                ldr.second.getColor(default = Party.OTHERS.color)
-                            } else {
-                                Color.LIGHT_GRAY
-                            }
-                        Pair(it.value, color)
-                    }
-                    .toList()
-            }
-        val allFocusShapes = mapFocus
-            .merge(
-                additionalFocusShapes,
-            ) { l1: List<Shape>?, l2: List<Shape>? ->
-                when {
-                    l1 == null -> l2
-                    l2 == null -> l1
-                    else -> listOf(l1, l2).flatten().distinct()
-                }
-            }
-        val focusedShapeWinners =
-            shapeWinners.merge(allFocusShapes) { sw, f ->
-                if (f == null) {
-                    sw
-                } else {
-                    sw.map {
-                        if (f.contains(it.first)) {
-                            it
-                        } else {
-                            Pair(it.first, Color(220, 220, 220))
-                        }
-                    }
-                        .toList()
-                }
-            }
-        winners = focusedShapeWinners
-    }
-
-    private fun <T> createFocusShapes(shapes: Map<T, Shape>, focus: List<T>?): List<Shape>? {
-        return focus
-            ?.filter { shapes.containsKey(it) }
-            ?.map { shapes[it]!! }
-            ?.toList()
-    }
 
     fun withNotes(notes: Flow.Publisher<out String?>): MapBuilder<T> {
         this.notes = notes
@@ -140,7 +30,7 @@ class MapBuilder<T> {
     }
 
     fun createMapFrame(): MapFrame {
-        return MapFrameBuilder.from(winners)
+        return MapFrameBuilder.from(colours)
             .withFocus(mapFocus)
             .withHeader(mapHeader)
             .let { map -> notes?.let { n -> map.withNotes(n) } ?: map }
@@ -149,6 +39,124 @@ class MapBuilder<T> {
     }
 
     companion object {
+        fun <T> multiResult(
+            shapes: Flow.Publisher<out Map<T, Shape>>,
+            winners: Flow.Publisher<out Map<T, PartyResult?>>,
+            focus: Flow.Publisher<out List<T>?>,
+            headerPublisher: Flow.Publisher<out String?>,
+        ) = multiResult(shapes, winners, focus, (null as List<T>?).asOneTimePublisher(), headerPublisher)
+
+        fun <T> multiResult(
+            shapes: Flow.Publisher<out Map<T, Shape>>,
+            winners: Flow.Publisher<out Map<T, PartyResult?>>,
+            focus: Flow.Publisher<out List<T>?>,
+            additionalHighlight: Flow.Publisher<out List<T>?>,
+            headerPublisher: Flow.Publisher<out String?>,
+        ): MapBuilder<T> {
+            val shapesToParties = shapes
+                .merge(winners) { s, w ->
+                    s.entries
+                        .map {
+                            val winnerParty = w[it.key]
+                            Pair(it.value, winnerParty)
+                        }
+                        .toList()
+                }
+            val mapFocus = shapes.merge(focus) { shp, foc -> createFocusShapes(shp, foc) }
+            val mapAdditionalFocus =
+                shapes.merge(additionalHighlight) { shp, foc -> createFocusShapes(shp, foc) }
+            val allFocusShapes = mapFocus.merge(mapAdditionalFocus) { a, b ->
+                when {
+                    a == null -> b
+                    b == null -> a
+                    else -> listOf(a, b).flatten()
+                }
+            }
+            val colours = shapesToParties.merge(allFocusShapes) { r, f ->
+                r.map { Pair(it.first, extractColor(f, it.first, it.second)) }
+                    .toList()
+            }
+            return MapBuilder(
+                colours,
+                mapFocus,
+                headerPublisher,
+            )
+        }
+
+        fun <T> singleResult(
+            shapes: Flow.Publisher<out Map<T, Shape>>,
+            selectedShape: Flow.Publisher<out T>,
+            leadingParty: Flow.Publisher<out PartyResult?>,
+            focus: Flow.Publisher<out List<T>?>,
+            header: Flow.Publisher<out String?>,
+        ) = singleResult(shapes, selectedShape, leadingParty, focus, (null as List<T>?).asOneTimePublisher(), header)
+
+        fun <T> singleResult(
+            shapes: Flow.Publisher<out Map<T, Shape>>,
+            selectedShape: Flow.Publisher<out T>,
+            leadingParty: Flow.Publisher<out PartyResult?>,
+            focus: Flow.Publisher<out List<T>?>,
+            additionalHighlight: Flow.Publisher<out List<T>?>,
+            header: Flow.Publisher<out String?>,
+        ): MapBuilder<T> {
+            val leaderWithShape =
+                selectedShape.merge(leadingParty) { left, right -> Pair(left, right) }
+            val mapFocus = shapes.merge(focus) { shp, foc -> createFocusShapes(shp, foc) }
+            val additionalFocusShapes =
+                shapes.merge(additionalHighlight) { shp, foc -> createFocusShapes(shp, foc) }
+            val shapeWinners = shapes
+                .merge(leaderWithShape) { shp, ldr ->
+                    shp.entries
+                        .map {
+                            val color =
+                                if (it.key == ldr.first) {
+                                    ldr.second.getColor(default = Party.OTHERS.color)
+                                } else {
+                                    Color.LIGHT_GRAY
+                                }
+                            Pair(it.value, color)
+                        }
+                        .toList()
+                }
+            val allFocusShapes = mapFocus
+                .merge(
+                    additionalFocusShapes,
+                ) { l1: List<Shape>?, l2: List<Shape>? ->
+                    when {
+                        l1 == null -> l2
+                        l2 == null -> l1
+                        else -> listOf(l1, l2).flatten().distinct()
+                    }
+                }
+            val focusedShapeWinners =
+                shapeWinners.merge(allFocusShapes) { sw, f ->
+                    if (f == null) {
+                        sw
+                    } else {
+                        sw.map {
+                            if (f.contains(it.first)) {
+                                it
+                            } else {
+                                Pair(it.first, Color(220, 220, 220))
+                            }
+                        }
+                            .toList()
+                    }
+                }
+            return MapBuilder(
+                focusedShapeWinners,
+                mapFocus,
+                header,
+            )
+        }
+
+        private fun <T> createFocusShapes(shapes: Map<T, Shape>, focus: List<T>?): List<Shape>? {
+            return focus
+                ?.filter { shapes.containsKey(it) }
+                ?.map { shapes[it]!! }
+                ?.toList()
+        }
+
         private fun extractColor(focus: List<Shape>?, shape: Shape, winner: PartyResult?): Color {
             val isInFocus = focus.isNullOrEmpty() || focus.contains(shape)
             return winner?.getColor(default = Party.OTHERS.color)?.takeIf { isInFocus }

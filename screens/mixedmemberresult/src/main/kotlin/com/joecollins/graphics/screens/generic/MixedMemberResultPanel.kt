@@ -191,7 +191,7 @@ class MixedMemberResultPanel private constructor(
             focus: Flow.Publisher<out List<T>?>,
             header: Flow.Publisher<out String>,
         ): Builder {
-            mapBuilder = MapBuilder(shapes, selectedShape, leadingParty, focus, header)
+            mapBuilder = MapBuilder.singleResult(shapes, selectedShape, leadingParty, focus, header)
             return this
         }
 
@@ -203,7 +203,7 @@ class MixedMemberResultPanel private constructor(
             additionalHighlight: Flow.Publisher<out List<T>?>,
             header: Flow.Publisher<out String>,
         ): Builder {
-            mapBuilder = MapBuilder(shapes, selectedShape, leadingParty, focus, additionalHighlight, header)
+            mapBuilder = MapBuilder.singleResult(shapes, selectedShape, leadingParty, focus, additionalHighlight, header)
             return this
         }
 
