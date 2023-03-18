@@ -7,4 +7,4 @@ data class NonPartisanCandidate(
     val description: String? = null,
     val surname: String = fullName.split(" ").last(),
     val color: Color = Party.OTHERS.color,
-)
+) : CanOverrideSortOrder()

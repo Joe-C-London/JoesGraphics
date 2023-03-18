@@ -5,7 +5,9 @@ import com.joecollins.graphics.components.BarFrame
 import com.joecollins.graphics.components.BarFrameBuilder
 import com.joecollins.graphics.components.FontSizeAdjustingLabel
 import com.joecollins.graphics.utils.StandardFont
+import com.joecollins.models.general.CanOverrideSortOrder
 import com.joecollins.models.general.Candidate
+import com.joecollins.models.general.NonPartisanCandidate
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
 import com.joecollins.pubsub.Subscriber
@@ -55,54 +57,83 @@ class CandidateListingScreen private constructor(
     }
 
     companion object {
-        fun of(candidates: Flow.Publisher<out List<Candidate>>, header: Flow.Publisher<out String?>, subhead: Flow.Publisher<out String?>, incumbentMarker: String? = null): Builder {
-            return Builder(candidates, header, subhead, incumbentMarker)
+        fun of(candidates: Flow.Publisher<out List<Candidate>>, header: Flow.Publisher<out String?>, subhead: Flow.Publisher<out String?>, incumbentMarker: String? = null): Builder<Candidate, Party> {
+            return Builder(
+                candidates,
+                header,
+                subhead,
+                { it.name.uppercase() + (if (incumbentMarker != null && it.incumbent) " $incumbentMarker" else "") },
+                { it.party.name.uppercase() },
+                { it.name.uppercase() + (if (incumbentMarker != null && it.incumbent) " $incumbentMarker" else "") + " (${it.party.abbreviation})" },
+                { it.party.color },
+                { it.abbreviation },
+                { it.color },
+            )
+        }
+
+        fun ofNonPartisan(candidates: Flow.Publisher<out List<NonPartisanCandidate>>, header: Flow.Publisher<out String?>, subhead: Flow.Publisher<out String?>): Builder<NonPartisanCandidate, NonPartisanCandidate> {
+            return Builder(
+                candidates,
+                header,
+                subhead,
+                { it.fullName.uppercase() },
+                { it.description?.uppercase() ?: "" },
+                { it.fullName.uppercase() + (if (it.description == null) "" else " (${it.description!!.uppercase()})") },
+                { it.color },
+                { it.surname.uppercase() },
+                { it.color },
+            )
         }
     }
 
-    class Builder internal constructor(
-        private val candidates: Flow.Publisher<out List<Candidate>>,
+    class Builder<CT, PT : CanOverrideSortOrder> internal constructor(
+        private val candidates: Flow.Publisher<out List<CT>>,
         private val candidateHeader: Flow.Publisher<out String?>,
         private val candidateSubhead: Flow.Publisher<out String?> = "".asOneTimePublisher(),
-        private val incumbentMarker: String?,
+        private val leftLabelFunc: (CT) -> String,
+        private val rightLabelFunc: (CT) -> String,
+        private val combinedLabelFunc: (CT) -> String,
+        private val colorFunc: (CT) -> Color,
+        private val prevLabelFunc: (PT) -> String,
+        private val prevColorFunc: (PT) -> Color,
     ) {
 
         private var showTwoColumns: Flow.Publisher<Boolean>? = null
 
-        private var prevVotes: Flow.Publisher<out Map<Party, Int>>? = null
+        private var prevVotes: Flow.Publisher<out Map<PT, Int>>? = null
         private var prevVoteHeader: Flow.Publisher<out String?> = (null as String?).asOneTimePublisher()
         private var prevVoteSubhead: Flow.Publisher<out String?> = (null as String?).asOneTimePublisher()
 
-        private var secondaryPrevVotes: Flow.Publisher<out Map<Party, Int>>? = null
+        private var secondaryPrevVotes: Flow.Publisher<out Map<PT, Int>>? = null
         private var secondaryPrevVoteHeader: Flow.Publisher<out String?> = (null as String?).asOneTimePublisher()
         private var secondaryPrevVoteSubhead: Flow.Publisher<out String?> = (null as String?).asOneTimePublisher()
 
         private var mapPanel: JPanel? = null
 
-        fun withPrev(prevVotes: Flow.Publisher<out Map<Party, Int>>, header: Flow.Publisher<out String?>, subhead: Flow.Publisher<out String?> = (null as String?).asOneTimePublisher()): Builder {
+        fun withPrev(prevVotes: Flow.Publisher<out Map<PT, Int>>, header: Flow.Publisher<out String?>, subhead: Flow.Publisher<out String?> = (null as String?).asOneTimePublisher()): Builder<CT, PT> {
             this.prevVotes = prevVotes
             this.prevVoteHeader = header
             this.prevVoteSubhead = subhead
             return this
         }
 
-        fun withSecondaryPrev(prevVotes: Flow.Publisher<out Map<Party, Int>>, header: Flow.Publisher<out String?>, subhead: Flow.Publisher<out String?> = (null as String?).asOneTimePublisher()): Builder {
+        fun withSecondaryPrev(prevVotes: Flow.Publisher<out Map<PT, Int>>, header: Flow.Publisher<out String?>, subhead: Flow.Publisher<out String?> = (null as String?).asOneTimePublisher()): Builder<CT, PT> {
             this.secondaryPrevVotes = prevVotes
             this.secondaryPrevVoteHeader = header
             this.secondaryPrevVoteSubhead = subhead
             return this
         }
 
-        private fun createVoteBars(votes: Map<Party, Int>): List<BarFrameBuilder.BasicBar> {
-            val total = votes.values.sum()
+        private fun createVoteBars(votes: Map<PT, Int>): List<BarFrameBuilder.BasicBar> {
+            val total = votes.values.sum().toDouble().coerceAtLeast(1e-6)
             return votes.asSequence()
                 .sortedByDescending { it.key.overrideSortOrder ?: it.value }
                 .map {
                     BarFrameBuilder.BasicBar(
-                        it.key.abbreviation.uppercase(),
-                        it.key.color,
-                        it.value.toDouble() / total,
-                        DecimalFormat("0.0%").format(it.value.toDouble() / total),
+                        prevLabelFunc(it.key),
+                        prevColorFunc(it.key),
+                        it.value / total,
+                        if (votes.size == 1) "UNCONTESTED" else DecimalFormat("0.0%").format(it.value / total),
                     )
                 }
                 .toList()
@@ -113,7 +144,7 @@ class CandidateListingScreen private constructor(
             selectedShape: Flow.Publisher<out K>,
             focus: Flow.Publisher<out List<K>?>,
             header: Flow.Publisher<out String>,
-        ): Builder {
+        ): Builder<CT, PT> {
             mapPanel = MapBuilder.singleResult(
                 shapes,
                 selectedShape,
@@ -130,7 +161,7 @@ class CandidateListingScreen private constructor(
             focus: Flow.Publisher<out List<K>?>,
             additionalHighlight: Flow.Publisher<out List<K>?>,
             header: Flow.Publisher<out String>,
-        ): Builder {
+        ): Builder<CT, PT> {
             mapPanel = MapBuilder.singleResult(
                 shapes,
                 selectedShape,
@@ -142,7 +173,7 @@ class CandidateListingScreen private constructor(
             return this
         }
 
-        fun withTwoColumns(showTwoColumns: Flow.Publisher<Boolean>): Builder {
+        fun withTwoColumns(showTwoColumns: Flow.Publisher<Boolean>): Builder<CT, PT> {
             this.showTwoColumns = showTwoColumns
             return this
         }
@@ -177,23 +208,23 @@ class CandidateListingScreen private constructor(
                         (0 until mid).map { idx ->
                             val left = first[idx]
                             val right = if (idx == last.size) null else last[idx]
-                            val func = { c: Candidate -> c.name.uppercase() + (if (!c.incumbent || incumbentMarker == null) "" else (" $incumbentMarker")) + " (${c.party}) " }
+                            val func = { c: CT -> combinedLabelFunc(c) + " " }
                             BarFrame.Bar(
                                 func(left),
                                 right?.let(func) ?: "",
                                 listOf(
-                                    left.party.color to 0.49,
+                                    colorFunc(left) to 0.49,
                                     Color.WHITE to 0.02,
-                                    (right?.party?.color ?: Color.WHITE) to 0.49,
+                                    (right?.let(colorFunc) ?: Color.WHITE) to 0.49,
                                 ),
                             )
                         }
                     } else {
                         cList.map {
                             BarFrame.Bar(
-                                it.name.uppercase() + (if (!it.incumbent || incumbentMarker == null) "" else (" $incumbentMarker")),
-                                it.party.name.uppercase(),
-                                listOf(it.party.color to 1.0),
+                                leftLabelFunc(it),
+                                rightLabelFunc(it),
+                                listOf(colorFunc(it) to 1.0),
                             )
                         }
                     }
@@ -204,7 +235,7 @@ class CandidateListingScreen private constructor(
             )
         }
 
-        private fun createPrevPanel(prevVotes: Flow.Publisher<out Map<Party, Int>>, header: Flow.Publisher<out String?>, subhead: Flow.Publisher<out String?>): JPanel {
+        private fun createPrevPanel(prevVotes: Flow.Publisher<out Map<PT, Int>>, header: Flow.Publisher<out String?>, subhead: Flow.Publisher<out String?>): JPanel {
             return BarFrameBuilder.basic(prevVotes.map { v -> createVoteBars(v) })
                 .withMax((2.0 / 3).asOneTimePublisher())
                 .withHeader(header)
@@ -221,7 +252,7 @@ class CandidateListingScreen private constructor(
                 }
             }
             val candidates = this.candidates.map { candidates ->
-                candidates.joinToString("\n") { "${it.name.uppercase()}${if (it.incumbent && incumbentMarker != null) " $incumbentMarker" else ""} (${it.party.abbreviation})" }
+                candidates.joinToString("\n") { combinedLabelFunc(it) }
             }.merge(candidatesTitle) { cList, cTitle -> "$cTitle\n$cList" }
             var ret = title.merge(candidates) { t, c -> "$t\n\n$c" }
             if (prevVotes != null) {
@@ -233,7 +264,7 @@ class CandidateListingScreen private constructor(
             return ret
         }
 
-        private fun createPrevAltText(prevVotes: Flow.Publisher<out Map<Party, Int>>, header: Flow.Publisher<out String?>, subhead: Flow.Publisher<out String?>): Flow.Publisher<String> {
+        private fun createPrevAltText(prevVotes: Flow.Publisher<out Map<PT, Int>>, header: Flow.Publisher<out String?>, subhead: Flow.Publisher<out String?>): Flow.Publisher<String> {
             val title = header.merge(subhead) { h, s ->
                 if (s.isNullOrBlank()) {
                     h
@@ -244,7 +275,7 @@ class CandidateListingScreen private constructor(
             return prevVotes.map { votes ->
                 val total = votes.values.sum().toDouble()
                 votes.entries.sortedByDescending { it.key.overrideSortOrder ?: it.value }
-                    .joinToString("\n") { "${it.key.abbreviation}: ${DecimalFormat("0.0%").format(it.value / total)}" }
+                    .joinToString("\n") { "${prevLabelFunc(it.key)}: ${if (votes.size == 1) "UNCONTESTED" else DecimalFormat("0.0%").format(it.value / total)}" }
             }.merge(title) { v, t -> "$t\n$v" }
         }
     }

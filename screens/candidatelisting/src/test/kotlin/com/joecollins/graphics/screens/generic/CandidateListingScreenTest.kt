@@ -4,6 +4,7 @@ import com.joecollins.graphics.utils.PublisherTestUtils.assertPublishes
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.graphics.utils.ShapefileReader
 import com.joecollins.models.general.Candidate
+import com.joecollins.models.general.NonPartisanCandidate
 import com.joecollins.models.general.Party
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
@@ -606,6 +607,82 @@ class CandidateListingScreenTest {
             BEN TEICHMAN (IND)
             JOHN THE ENGINEER TURMEL (IND)
             DARCY JUSTIN VANDERWATER (IND)
+            """.trimIndent(),
+        )
+    }
+
+    @Test
+    fun testNonPartisanCandidatesList() {
+        val title = Publisher("IQALUIT-TASILUK")
+        val candidates = Publisher(
+            listOf(
+                NonPartisanCandidate("James T. Arreak"),
+                NonPartisanCandidate("George Hicks", description = "Incumbent MLA"),
+                NonPartisanCandidate("Jonathan Chul-Hee Min Park"),
+                NonPartisanCandidate("Michael Salomonie"),
+            ),
+        )
+        val prev = Publisher(
+            mapOf(
+                NonPartisanCandidate("George Hicks") to 449,
+                NonPartisanCandidate("Jacopoosie Peter") to 121,
+            ),
+        )
+        val screen = CandidateListingScreen.ofNonPartisan(
+            candidates,
+            "2021 CANDIDATES".asOneTimePublisher(),
+            "".asOneTimePublisher(),
+        ).withPrev(
+            prev,
+            "2017 RESULT".asOneTimePublisher(),
+        ).build(title)
+        screen.size = Dimension(1024, 512)
+        compareRendering("CandidateListingScreen", "NonPartisan-1", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            IQALUIT-TASILUK
+
+            2021 CANDIDATES
+            JAMES T. ARREAK
+            GEORGE HICKS (INCUMBENT MLA)
+            JONATHAN CHUL-HEE MIN PARK
+            MICHAEL SALOMONIE
+            
+            2017 RESULT
+            HICKS: 78.8%
+            PETER: 21.2%
+            """.trimIndent(),
+        )
+
+        title.submit("KUGLUKTUK")
+        candidates.submit(
+            listOf(
+                NonPartisanCandidate("Bobby Anavilok"),
+                NonPartisanCandidate("Angele Kuliktana"),
+                NonPartisanCandidate("Genevieve Nivingalok"),
+                NonPartisanCandidate("Calvin Aivgak Pedersen", description = "Incumbent MLA"),
+            ),
+        )
+        prev.submit(
+            mapOf(
+                NonPartisanCandidate("Mila Adjukak Kamingoak") to 0,
+            ),
+        )
+        compareRendering("CandidateListingScreen", "NonPartisan-2", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            KUGLUKTUK
+
+            2021 CANDIDATES
+            BOBBY ANAVILOK
+            ANGELE KULIKTANA
+            GENEVIEVE NIVINGALOK
+            CALVIN AIVGAK PEDERSEN (INCUMBENT MLA)
+            
+            2017 RESULT
+            KAMINGOAK: UNCONTESTED
             """.trimIndent(),
         )
     }

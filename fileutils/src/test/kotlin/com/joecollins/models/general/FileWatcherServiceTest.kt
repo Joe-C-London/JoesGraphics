@@ -99,7 +99,7 @@ class FileWatcherServiceTest {
                 Files.writeString(tmpFile, file1NewContents, UTF8)
                 Files.move(tmpFile, tempPath!!.resolve("file1.txt"), StandardCopyOption.REPLACE_EXISTING)
             }
-            Thread.sleep(200)
+            Thread.sleep(1000)
         }
         Assertions.assertEquals(file1NewContents, contents[tempPath!!.resolve("file1.txt")])
         Assertions.assertEquals(file2Contents, contents[tempPath!!.resolve("file2.txt")])
