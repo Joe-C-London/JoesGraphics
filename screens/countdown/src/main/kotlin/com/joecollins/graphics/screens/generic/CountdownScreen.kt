@@ -15,12 +15,12 @@ import java.awt.Color
 import java.awt.Dimension
 import java.awt.GridLayout
 import java.awt.Shape
-import java.awt.geom.Area
 import java.time.Clock
 import java.time.Duration
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalTime
+import java.time.Period
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
@@ -42,6 +42,12 @@ class CountdownScreen private constructor(
 
         fun atTime(header: String, time: LocalTime, zone: ZoneId, predicate: (K) -> Boolean = { true }): Builder<K> {
             val instant = ZonedDateTime.of(date, time, zone).toInstant()
+            timings.add(Triple(instant, header, shapes.map { s -> s.entries.filter { predicate(it.key) }.map { it.value } }))
+            return this
+        }
+
+        fun atTimeAndFutureDate(header: String, futureDate: Period, time: LocalTime, zone: ZoneId, predicate: (K) -> Boolean = { true }): Builder<K> {
+            val instant = ZonedDateTime.of(date.plus(futureDate), time, zone).toInstant()
             timings.add(Triple(instant, header, shapes.map { s -> s.entries.filter { predicate(it.key) }.map { it.value } }))
             return this
         }
@@ -133,17 +139,11 @@ class CountdownScreen private constructor(
             return Builder(date, emptyMap<Unit, Shape>().asOneTimePublisher())
         }
 
-        fun forDateWithMapSingle(date: LocalDate, map: Flow.Publisher<Collection<Shape>>): Builder<Unit> {
+        fun forDateWithMapSingle(date: LocalDate, map: Flow.Publisher<Collection<Shape>>): Builder<*> {
             return Builder(
                 date,
                 map.map { m ->
-                    mapOf(
-                        Unit to (
-                            m.map { Area(it) }
-                                .reduceOrNull { a, s -> a.add(Area(s)); a }
-                                ?: Area()
-                            ),
-                    )
+                    m.associateWith { it }
                 },
             )
         }
