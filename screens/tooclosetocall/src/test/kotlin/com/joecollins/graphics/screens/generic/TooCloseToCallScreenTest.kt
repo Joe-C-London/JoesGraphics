@@ -4,6 +4,8 @@ import com.joecollins.graphics.utils.PublisherTestUtils.assertPublishes
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.models.general.Aggregators
 import com.joecollins.models.general.Candidate
+import com.joecollins.models.general.NonPartisanCandidate
+import com.joecollins.models.general.NonPartisanCandidateResult
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
 import com.joecollins.models.general.PartyResult.Companion.elected
@@ -1696,6 +1698,183 @@ class TooCloseToCallScreenTest {
             """
                 PRINCE EDWARD ISLAND
                 
+                TOO CLOSE TO CALL
+                (empty)
+            """.trimIndent(),
+        )
+    }
+
+    @Test
+    fun testNonPartisan() {
+        val names = listOf(
+            "Iqaluit-Manirajak",
+            "Iqaluit-Niaqunnguu",
+            "Iqaluit-Sinaa",
+            "Iqaluit-Tasiluk",
+        )
+        val votes = listOf(
+            Publisher(
+                mapOf(
+                    "Joanasie Akumalik" to 0,
+                    "Adam Lightstone" to 0,
+                ),
+            ),
+            Publisher(
+                mapOf(
+                    "P.J. Akeeagok" to 0,
+                    "Noah Papatsie" to 0,
+                    "Dinos Tikivik" to 0,
+                ),
+            ),
+            Publisher(
+                mapOf(
+                    "Christa Kunuk" to 0,
+                    "Jeff Ungalaq Maurice" to 0,
+                    "Janet Pitsiulaaq Brewster" to 0,
+                ),
+            ),
+            Publisher(
+                mapOf(
+                    "James T. Arreak" to 0,
+                    "George Hickes" to 0,
+                    "Jonathan Chul-Hee Min Park" to 0,
+                    "Michael Salomonie" to 0,
+                ),
+            ),
+        )
+        val results = listOf(
+            Publisher(null as NonPartisanCandidateResult?),
+            Publisher(null as NonPartisanCandidateResult?),
+            Publisher(null as NonPartisanCandidateResult?),
+            Publisher(null as NonPartisanCandidateResult?),
+        )
+        val reporting = listOf(
+            Publisher(PollsReporting(0, 3)),
+            Publisher(PollsReporting(0, 3)),
+            Publisher(PollsReporting(0, 3)),
+            Publisher(PollsReporting(0, 3)),
+        )
+        val screen = TooCloseToCallScreen.ofNonPartisan(
+            (0 until 4).toSet().asOneTimePublisher(),
+            { votes[it].map { v -> v.mapKeys { name -> NonPartisanCandidate(name.key) } } },
+            { results[it] },
+            { names[it].uppercase().asOneTimePublisher() },
+            "TOO CLOSE TO CALL".asOneTimePublisher(),
+        )
+            .withPollsReporting { reporting[it] }
+            .build("NUNAVUT".asOneTimePublisher())
+        screen.setSize(1024, 512)
+        compareRendering("TooCloseToCallScreen", "NonPartisan-1", screen)
+        assertPublishes(
+            screen.altText,
+            """
+                NUNAVUT
+                
+                TOO CLOSE TO CALL
+                (empty)
+            """.trimIndent(),
+        )
+
+        votes[0].submit(
+            mapOf(
+                "Joanasie Akumalik" to 45,
+                "Adam Lightstone" to 109,
+            ),
+        )
+        results[0].submit(NonPartisanCandidateResult.leading(NonPartisanCandidate("Adam Lightstone")))
+        reporting[0].submit(PollsReporting(1, 3))
+
+        votes[1].submit(
+            mapOf(
+                "P.J. Akeeagok" to 137,
+                "Noah Papatsie" to 8,
+                "Dinos Tikivik" to 17,
+            ),
+        )
+        results[1].submit(NonPartisanCandidateResult.leading(NonPartisanCandidate("P.J. Akeeagok")))
+        reporting[1].submit(PollsReporting(1, 3))
+
+        votes[2].submit(
+            mapOf(
+                "Christa Kunuk" to 22,
+                "Jeff Ungalaq Maurice" to 31,
+                "Janet Pitsiulaaq Brewster" to 29,
+            ),
+        )
+        results[2].submit(NonPartisanCandidateResult.leading(NonPartisanCandidate("Jeff Ungalaq Maurice")))
+        reporting[2].submit(PollsReporting(1, 3))
+
+        votes[3].submit(
+            mapOf(
+                "James T. Arreak" to 41,
+                "George Hickes" to 112,
+                "Jonathan Chul-Hee Min Park" to 10,
+                "Michael Salomonie" to 20,
+            ),
+        )
+        results[3].submit(NonPartisanCandidateResult.leading(NonPartisanCandidate("George Hickes")))
+        reporting[3].submit(PollsReporting(1, 3))
+
+        compareRendering("TooCloseToCallScreen", "NonPartisan-2", screen)
+        assertPublishes(
+            screen.altText,
+            """
+                NUNAVUT
+
+                TOO CLOSE TO CALL
+                IQALUIT-SINAA: MAURICE: 31; BREWSTER: 29; LEAD: 2; 1/3
+                IQALUIT-MANIRAJAK: LIGHTSTONE: 109; AKUMALIK: 45; LEAD: 64; 1/3
+                IQALUIT-TASILUK: HICKES: 112; ARREAK: 41; LEAD: 71; 1/3
+                IQALUIT-NIAQUNNGUU: AKEEAGOK: 137; TIKIVIK: 17; LEAD: 120; 1/3
+            """.trimIndent(),
+        )
+
+        votes[0].submit(
+            mapOf(
+                "Joanasie Akumalik" to 162,
+                "Adam Lightstone" to 306,
+            ),
+        )
+        results[0].submit(NonPartisanCandidateResult.elected(NonPartisanCandidate("Adam Lightstone")))
+        reporting[0].submit(PollsReporting(3, 3))
+
+        votes[1].submit(
+            mapOf(
+                "P.J. Akeeagok" to 404,
+                "Noah Papatsie" to 21,
+                "Dinos Tikivik" to 54,
+            ),
+        )
+        results[1].submit(NonPartisanCandidateResult.elected(NonPartisanCandidate("P.J. Akeeagok")))
+        reporting[1].submit(PollsReporting(3, 3))
+
+        votes[2].submit(
+            mapOf(
+                "Christa Kunuk" to 75,
+                "Jeff Ungalaq Maurice" to 90,
+                "Janet Pitsiulaaq Brewster" to 97,
+            ),
+        )
+        results[2].submit(NonPartisanCandidateResult.elected(NonPartisanCandidate("Janet Pitsiulaaq Brewster")))
+        reporting[2].submit(PollsReporting(3, 3))
+
+        votes[3].submit(
+            mapOf(
+                "James T. Arreak" to 133,
+                "George Hickes" to 265,
+                "Jonathan Chul-Hee Min Park" to 41,
+                "Michael Salomonie" to 81,
+            ),
+        )
+        results[3].submit(NonPartisanCandidateResult.elected(NonPartisanCandidate("George Hickes")))
+        reporting[3].submit(PollsReporting(3, 3))
+
+        compareRendering("TooCloseToCallScreen", "NonPartisan-1", screen)
+        assertPublishes(
+            screen.altText,
+            """
+                NUNAVUT
+
                 TOO CLOSE TO CALL
                 (empty)
             """.trimIndent(),

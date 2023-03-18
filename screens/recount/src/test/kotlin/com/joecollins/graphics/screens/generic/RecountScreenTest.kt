@@ -2,11 +2,14 @@ package com.joecollins.graphics.screens.generic
 
 import com.joecollins.graphics.utils.PublisherTestUtils
 import com.joecollins.graphics.utils.RenderTestUtils
+import com.joecollins.models.general.Aggregators
 import com.joecollins.models.general.Candidate
+import com.joecollins.models.general.NonPartisanCandidate
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PollsReporting
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
+import com.joecollins.pubsub.map
 import org.junit.jupiter.api.Test
 import java.awt.Color
 import java.util.TreeMap
@@ -287,6 +290,72 @@ class RecountScreenTest {
             ETOBICOKE CENTRE: CON: 21,644; LIB: 21,618; MARGIN: 26 (0.05%)
 
             Automatic recount triggered if the margin is 0.10% or less
+            """.trimIndent(),
+        )
+    }
+
+    @Test
+    fun testNonPartisan() {
+        val votes = mapOf(
+            "Baker Lake" to Publisher(
+                mapOf(
+                    "Elijah Amarook" to 0,
+                    "Daniel Piryuaq" to 0,
+                    "Craig Atangalaaq Simailak" to 0,
+                ),
+            ),
+            "Cambridge Bay" to Publisher(
+                mapOf(
+                    "Jeannie Hakongak Ehaloak" to 0,
+                    "Pamela Hakongak Gross" to 0,
+                    "Peter Ohokak" to 0,
+                ),
+            ),
+        )
+        val screen = RecountScreen.ofNonPartisan(
+            Aggregators.toMap(votes.keys) { votes[it]!!.map { v -> v.mapKeys { name -> NonPartisanCandidate(name.key) } } },
+            { it.uppercase() },
+            0.02,
+            "AUTOMATIC RECOUNTS".asOneTimePublisher(),
+        )
+            .build("NUNAVUT".asOneTimePublisher())
+        screen.setSize(1024, 512)
+        RenderTestUtils.compareRendering("RecountScreen", "NonPartisan-1", screen)
+        PublisherTestUtils.assertPublishes(
+            screen.altText,
+            """
+            NUNAVUT
+
+            AUTOMATIC RECOUNTS
+
+            Automatic recount triggered if the margin is 2.00% or less
+            """.trimIndent(),
+        )
+
+        votes["Baker Lake"]!!.submit(
+            mapOf(
+                "Elijah Amarook" to 71,
+                "Daniel Piryuaq" to 48,
+                "Craig Atangalaaq Simailak" to 327,
+            ),
+        )
+        votes["Cambridge Bay"]!!.submit(
+            mapOf(
+                "Jeannie Hakongak Ehaloak" to 215,
+                "Pamela Hakongak Gross" to 224,
+                "Peter Ohokak" to 209,
+            ),
+        )
+        RenderTestUtils.compareRendering("RecountScreen", "NonPartisan-2", screen)
+        PublisherTestUtils.assertPublishes(
+            screen.altText,
+            """
+            NUNAVUT
+
+            AUTOMATIC RECOUNTS
+            CAMBRIDGE BAY: GROSS: 224; EHALOAK: 215; MARGIN: 9 (1.39%)
+
+            Automatic recount triggered if the margin is 2.00% or less
             """.trimIndent(),
         )
     }

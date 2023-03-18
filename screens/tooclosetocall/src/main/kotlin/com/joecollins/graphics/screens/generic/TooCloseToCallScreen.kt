@@ -5,6 +5,8 @@ import com.joecollins.graphics.GenericPanel
 import com.joecollins.graphics.components.MultiSummaryFrame
 import com.joecollins.models.general.Aggregators
 import com.joecollins.models.general.Candidate
+import com.joecollins.models.general.NonPartisanCandidate
+import com.joecollins.models.general.NonPartisanCandidateResult
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
 import com.joecollins.models.general.PollsReporting
@@ -23,13 +25,13 @@ class TooCloseToCallScreen private constructor(
     multiSummaryFrame: MultiSummaryFrame,
     altText: Flow.Publisher<String>,
 ) : GenericPanel(pad(multiSummaryFrame), titleLabel, altText), AltTextProvider {
-    private class Input<T> {
-        var votes: Map<T, Map<Candidate, Int>> = HashMap()
+    private class Input<T, CT> {
+        var votes: Map<T, Map<CT, Int>> = HashMap()
             set(value) {
                 field = value
                 update()
             }
-        var results: Map<T, PartyResult?> = HashMap()
+        var results: Map<T, Boolean?> = HashMap()
             set(value) {
                 field = value
                 update()
@@ -76,20 +78,20 @@ class TooCloseToCallScreen private constructor(
                 )
             }
             .filter { it.votes.values.sum() > 0 }
-            .filter { it.result == null || !it.result.isElected }
+            .filter { it.declared != true }
             .sortedBy { if (showPcts) it.pctLead else it.lead.toDouble() }
             .take(maxRows)
             .toList()
     }
 
-    private class Entry(
+    private class Entry<CT>(
         val header: String,
-        val votes: Map<Candidate, Int>,
-        val result: PartyResult?,
+        val votes: Map<CT, Int>,
+        val declared: Boolean?,
         val reporting: String,
         val numCandidates: Int,
     ) {
-        val topCandidates: List<Map.Entry<Candidate, Int>> = votes.entries
+        val topCandidates: List<Map.Entry<CT, Int>> = votes.entries
             .sortedByDescending { it.value }
             .toList()
         val lead = when (topCandidates.size) {
@@ -100,48 +102,50 @@ class TooCloseToCallScreen private constructor(
         val pctLead = lead / votes.values.sum().toDouble()
     }
 
-    class Builder<T> internal constructor(
+    class Builder<T, CT> internal constructor(
         private val header: Flow.Publisher<out String?>,
         private val entries: Flow.Publisher<out Set<T>>,
-        votesFunc: (T) -> Flow.Publisher<out Map<Candidate, Int>>,
-        resultsFunc: (T) -> Flow.Publisher<out PartyResult?>,
+        votesFunc: (T) -> Flow.Publisher<out Map<CT, Int>>,
+        declaredFunc: (T) -> Flow.Publisher<out Boolean?>,
         rowHeaderFunc: (T) -> Flow.Publisher<String>,
+        private val labelFunc: (CT) -> String,
+        private val colorFunc: (CT) -> Color,
     ) {
         private val votes = entries.compose { set -> Aggregators.toMap(set) { votesFunc(it) } }
-        private val results = entries.compose { set -> Aggregators.toMap(set) { resultsFunc(it) } }
+        private val results = entries.compose { set -> Aggregators.toMap(set) { declaredFunc(it) } }
         private val rowHeaders = entries.compose { set -> Aggregators.toMap(set) { rowHeaderFunc(it) } }
         private var reporting: Flow.Publisher<out Map<T, String>>? = null
         private var rowsLimit: Flow.Publisher<out Int>? = null
         private var numCandidates: Flow.Publisher<out Int>? = null
         private var showPcts: Boolean = false
 
-        fun withPctReporting(pctReportingFunc: (T) -> Flow.Publisher<Double>): Builder<T> {
+        fun withPctReporting(pctReportingFunc: (T) -> Flow.Publisher<Double>): Builder<T, CT> {
             reporting = entries.compose { set -> Aggregators.toMap(set) { pctReportingFunc(it).map { pct -> DecimalFormat("0.0%").format(pct) + " IN" } } }
             return this
         }
 
-        fun withPollsReporting(pollsReportingFunc: (T) -> Flow.Publisher<PollsReporting>): Builder<T> {
+        fun withPollsReporting(pollsReportingFunc: (T) -> Flow.Publisher<PollsReporting>): Builder<T, CT> {
             reporting = entries.compose { set -> Aggregators.toMap(set) { pollsReportingFunc(it).map { (reporting, total) -> "$reporting/$total" } } }
             return this
         }
 
-        fun withMaxRows(rowsLimitPublisher: Flow.Publisher<out Int>): Builder<T> {
+        fun withMaxRows(rowsLimitPublisher: Flow.Publisher<out Int>): Builder<T, CT> {
             rowsLimit = rowsLimitPublisher
             return this
         }
 
-        fun withNumberOfCandidates(numCandidatesPublisher: Flow.Publisher<out Int>): Builder<T> {
+        fun withNumberOfCandidates(numCandidatesPublisher: Flow.Publisher<out Int>): Builder<T, CT> {
             numCandidates = numCandidatesPublisher
             return this
         }
 
-        fun sortByPcts(): Builder<T> {
+        fun sortByPcts(): Builder<T, CT> {
             showPcts = true
             return this
         }
 
         fun build(titlePublisher: Flow.Publisher<out String?>): TooCloseToCallScreen {
-            val input = Input<T>()
+            val input = Input<T, CT>()
             votes.subscribe(Subscriber { input.votes = it })
             results.subscribe(Subscriber { input.results = it })
             rowHeaders.subscribe(Subscriber { input.headers = it })
@@ -152,7 +156,7 @@ class TooCloseToCallScreen private constructor(
             return TooCloseToCallScreen(titlePublisher, createFrame(input), createAltText(titlePublisher, input))
         }
 
-        private fun createAltText(titlePublisher: Flow.Publisher<out String?>, input: Input<T>): Flow.Publisher<String> {
+        private fun createAltText(titlePublisher: Flow.Publisher<out String?>, input: Input<T, CT>): Flow.Publisher<String> {
             val header = titlePublisher.merge(header) { title, header ->
                 if (title == null && header == null) {
                     null
@@ -170,7 +174,7 @@ class TooCloseToCallScreen private constructor(
                 val entriesText = entries.mapNotNull { e ->
                     val total = e.votes.values.sum().toDouble()
                     val entry = "${e.header}: ${
-                        e.topCandidates.take(e.numCandidates).joinToString("; ") { c -> "${c.key.party.abbreviation}: ${if (input.showPcts) DecimalFormat("0.0%").format(c.value / total) else DecimalFormat("#,##0").format(c.value)}" }
+                        e.topCandidates.take(e.numCandidates).joinToString("; ") { c -> "${labelFunc(c.key)}: ${if (input.showPcts) DecimalFormat("0.0%").format(c.value / total) else DecimalFormat("#,##0").format(c.value)}" }
                     }; LEAD: ${if (input.showPcts) DecimalFormat("0.0%").format(e.pctLead) else DecimalFormat("#,##0").format(e.lead)}${
                         if (e.reporting.isEmpty()) "" else "; ${e.reporting}"
                     }"
@@ -192,7 +196,7 @@ class TooCloseToCallScreen private constructor(
             }
         }
 
-        private fun createFrame(input: Input<T>): MultiSummaryFrame {
+        private fun createFrame(input: Input<T, CT>): MultiSummaryFrame {
             val entries = input.toEntries()
             val thousandsFormatter = DecimalFormat("#,##0")
             val pctFormatter = DecimalFormat("0.0%")
@@ -207,8 +211,8 @@ class TooCloseToCallScreen private constructor(
                                 entry.topCandidates.asSequence()
                                     .map { e ->
                                         Pair(
-                                            e.key.party.color,
-                                            e.key.party.abbreviation.uppercase() +
+                                            colorFunc(e.key),
+                                            labelFunc(e.key) +
                                                 ": " +
                                                 (
                                                     if (input.showPcts) {
@@ -242,8 +246,16 @@ class TooCloseToCallScreen private constructor(
             resultPublisher: (T) -> Flow.Publisher<out PartyResult?>,
             labelFunc: (T) -> Flow.Publisher<String>,
             headerPublisher: Flow.Publisher<out String?>,
-        ): Builder<T> {
-            return Builder(headerPublisher, entries, votesPublisher, resultPublisher, labelFunc)
+        ): Builder<T, Candidate> {
+            return Builder(
+                headerPublisher,
+                entries,
+                votesPublisher,
+                { r -> resultPublisher(r).map { it?.isElected } },
+                labelFunc,
+                { c -> c.party.abbreviation.uppercase() },
+                { c -> c.party.color },
+            )
         }
 
         fun <T> ofParty(
@@ -252,13 +264,33 @@ class TooCloseToCallScreen private constructor(
             resultPublisher: (T) -> Flow.Publisher<out PartyResult?>,
             labelFunc: (T) -> Flow.Publisher<String>,
             headerPublisher: Flow.Publisher<out String?>,
-        ): Builder<T> {
+        ): Builder<T, Party> {
             return Builder(
                 headerPublisher,
                 entries,
-                { t: T -> votesPublisher(t).map { v -> Aggregators.adjustKey(v) { p -> Candidate("", p) } } },
-                resultPublisher,
+                votesPublisher,
+                { r -> resultPublisher(r).map { it?.isElected } },
                 labelFunc,
+                { c -> c.abbreviation.uppercase() },
+                { c -> c.color },
+            )
+        }
+
+        fun <T> ofNonPartisan(
+            entries: Flow.Publisher<Set<T>>,
+            votesPublisher: (T) -> Flow.Publisher<out Map<NonPartisanCandidate, Int>>,
+            resultPublisher: (T) -> Flow.Publisher<out NonPartisanCandidateResult?>,
+            labelFunc: (T) -> Flow.Publisher<String>,
+            headerPublisher: Flow.Publisher<out String?>,
+        ): Builder<T, NonPartisanCandidate> {
+            return Builder(
+                headerPublisher,
+                entries,
+                votesPublisher,
+                { r -> resultPublisher(r).map { it?.isElected } },
+                labelFunc,
+                { c -> c.surname.uppercase() },
+                { c -> c.color },
             )
         }
     }
