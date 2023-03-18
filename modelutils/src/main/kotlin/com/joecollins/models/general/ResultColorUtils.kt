@@ -21,4 +21,12 @@ object ResultColorUtils {
             else -> ColorUtils.lighten(party.color)
         }
     }
+
+    fun NonPartisanCandidateResult?.getColor(toForceNamedParams: Unit = Unit, default: Color): Color {
+        return when {
+            this == null -> default
+            this.elected -> candidate.color
+            else -> ColorUtils.lighten(candidate.color)
+        }
+    }
 }

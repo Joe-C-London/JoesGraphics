@@ -2,10 +2,12 @@ package com.joecollins.graphics.screens.generic
 
 import com.joecollins.graphics.components.MapFrame
 import com.joecollins.graphics.components.MapFrameBuilder
+import com.joecollins.models.general.NonPartisanCandidateResult
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
 import com.joecollins.models.general.ResultColorUtils.getColor
 import com.joecollins.pubsub.asOneTimePublisher
+import com.joecollins.pubsub.map
 import com.joecollins.pubsub.merge
 import java.awt.Color
 import java.awt.Shape
@@ -99,22 +101,60 @@ class MapBuilder<T> private constructor(
             additionalHighlight: Flow.Publisher<out List<T>?>,
             header: Flow.Publisher<out String?>,
         ): MapBuilder<T> {
+            return singleResultColored(
+                shapes,
+                selectedShape,
+                leadingParty.map { it.getColor(default = Party.OTHERS.color) },
+                focus,
+                additionalHighlight,
+                header,
+            )
+        }
+
+        fun <T> singleNonPartisanResult(
+            shapes: Flow.Publisher<out Map<T, Shape>>,
+            selectedShape: Flow.Publisher<out T>,
+            leadingCandidate: Flow.Publisher<out NonPartisanCandidateResult?>,
+            focus: Flow.Publisher<out List<T>?>,
+            header: Flow.Publisher<out String?>,
+        ) = singleNonPartisanResult(shapes, selectedShape, leadingCandidate, focus, (null as List<T>?).asOneTimePublisher(), header)
+
+        fun <T> singleNonPartisanResult(
+            shapes: Flow.Publisher<out Map<T, Shape>>,
+            selectedShape: Flow.Publisher<out T>,
+            leadingCandidate: Flow.Publisher<out NonPartisanCandidateResult?>,
+            focus: Flow.Publisher<out List<T>?>,
+            additionalHighlight: Flow.Publisher<out List<T>?>,
+            header: Flow.Publisher<out String?>,
+        ): MapBuilder<T> {
+            return singleResultColored(
+                shapes,
+                selectedShape,
+                leadingCandidate.map { it.getColor(default = Party.OTHERS.color) },
+                focus,
+                additionalHighlight,
+                header,
+            )
+        }
+
+        private fun <T> singleResultColored(
+            shapes: Flow.Publisher<out Map<T, Shape>>,
+            selectedShape: Flow.Publisher<out T>,
+            color: Flow.Publisher<out Color>,
+            focus: Flow.Publisher<out List<T>?>,
+            additionalHighlight: Flow.Publisher<out List<T>?>,
+            header: Flow.Publisher<out String?>,
+        ): MapBuilder<T> {
             val leaderWithShape =
-                selectedShape.merge(leadingParty) { left, right -> Pair(left, right) }
+                selectedShape.merge(color) { left, right -> Pair(left, right) }
             val mapFocus = shapes.merge(focus) { shp, foc -> createFocusShapes(shp, foc) }
             val additionalFocusShapes =
                 shapes.merge(additionalHighlight) { shp, foc -> createFocusShapes(shp, foc) }
             val shapeWinners = shapes
                 .merge(leaderWithShape) { shp, ldr ->
                     shp.entries
-                        .map {
-                            val color =
-                                if (it.key == ldr.first) {
-                                    ldr.second.getColor(default = Party.OTHERS.color)
-                                } else {
-                                    Color.LIGHT_GRAY
-                                }
-                            Pair(it.value, color)
+                        .map { (t, shape) ->
+                            Pair(shape, ldr.takeIf { t == it.first }?.second ?: Color.LIGHT_GRAY)
                         }
                         .toList()
                 }

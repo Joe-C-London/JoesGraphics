@@ -13,6 +13,8 @@ import com.joecollins.graphics.components.SwingFrameBuilder
 import com.joecollins.models.general.Aggregators
 import com.joecollins.models.general.CanOverrideSortOrder
 import com.joecollins.models.general.Candidate
+import com.joecollins.models.general.NonPartisanCandidate
+import com.joecollins.models.general.NonPartisanCandidateResult
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyOrCoalition
 import com.joecollins.models.general.PartyResult
@@ -20,6 +22,7 @@ import com.joecollins.models.general.toParty
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.asOneTimePublisher
+import com.joecollins.pubsub.combine
 import com.joecollins.pubsub.compose
 import com.joecollins.pubsub.map
 import com.joecollins.pubsub.merge
@@ -2309,6 +2312,174 @@ class BasicResultPanel private constructor(
         }
     }
 
+    class NonPartisanVoteBuilder(
+        private val votes: Flow.Publisher<out Map<NonPartisanCandidate, Int?>>,
+        private val header: Flow.Publisher<out String?>,
+        private val subhead: Flow.Publisher<out String?>,
+    ) {
+        private var prevVotes: Flow.Publisher<out Map<NonPartisanCandidate, Int>>? = null
+        private var prevHeader: Flow.Publisher<out String?>? = null
+        private var prevSubhead: Flow.Publisher<out String?>? = null
+        private var pctReporting: Flow.Publisher<Double> = 1.0.asOneTimePublisher()
+        private var progressLabel: Flow.Publisher<out String?> = null.asOneTimePublisher()
+        private var winner: Flow.Publisher<out NonPartisanCandidate?> = null.asOneTimePublisher()
+
+        private var mapBuilder: MapBuilder<*>? = null
+
+        fun withPrev(
+            prevVotes: Flow.Publisher<out Map<NonPartisanCandidate, Int>>,
+            prevHeader: Flow.Publisher<out String?>,
+            prevSubhead: Flow.Publisher<out String?> = null.asOneTimePublisher(),
+        ): NonPartisanVoteBuilder {
+            this.prevVotes = prevVotes
+            this.prevHeader = prevHeader
+            this.prevSubhead = prevSubhead
+            return this
+        }
+
+        fun withWinner(
+            winner: Flow.Publisher<out NonPartisanCandidate?>,
+        ): NonPartisanVoteBuilder {
+            this.winner = winner
+            return this
+        }
+
+        fun withPctReporting(
+            pctReporting: Flow.Publisher<Double>,
+        ): NonPartisanVoteBuilder {
+            this.pctReporting = pctReporting
+            return this
+        }
+
+        fun withProgressLabel(progressLabel: Flow.Publisher<out String?>): NonPartisanVoteBuilder {
+            this.progressLabel = progressLabel
+            return this
+        }
+
+        fun <T> withResultMap(
+            shapes: Flow.Publisher<out Map<T, Shape>>,
+            selectedShape: Flow.Publisher<out T>,
+            leadingCandidate: Flow.Publisher<out NonPartisanCandidateResult?>,
+            focus: Flow.Publisher<out List<T>?>,
+            header: Flow.Publisher<out String?>,
+        ): NonPartisanVoteBuilder {
+            mapBuilder = MapBuilder.singleNonPartisanResult(shapes, selectedShape, leadingCandidate, focus, header)
+            return this
+        }
+
+        fun <T> withResultMap(
+            shapes: Flow.Publisher<out Map<T, Shape>>,
+            selectedShape: Flow.Publisher<out T>,
+            leadingCandidate: Flow.Publisher<out NonPartisanCandidateResult?>,
+            focus: Flow.Publisher<out List<T>?>,
+            additionalHighlight: Flow.Publisher<out List<T>?>,
+            header: Flow.Publisher<out String?>,
+        ): NonPartisanVoteBuilder {
+            mapBuilder = MapBuilder.singleNonPartisanResult(shapes, selectedShape, leadingCandidate, focus, additionalHighlight, header)
+            return this
+        }
+
+        fun build(title: Flow.Publisher<out String?>): BasicResultPanel {
+            return BasicResultPanel(
+                title,
+                createResultFrame(),
+                null,
+                createPrevFrame(),
+                null,
+                mapBuilder?.createMapFrame(),
+                createAltText(title),
+            )
+        }
+
+        private fun createResultFrame(): JPanel {
+            val bars = votes.merge(winner) { r, w ->
+                val total = if (r.values.any { it == null }) {
+                    null
+                } else {
+                    r.values.sumOf { it!! }.toDouble()
+                }
+                r.entries.sortedByDescending { it.value ?: 0 }
+                    .map { (c, v) ->
+                        BasicBar(
+                            "${c.fullName.uppercase()}\n${c.description?.uppercase() ?: ""}",
+                            c.color,
+                            v ?: 0,
+                            when {
+                                r.size == 1 -> "UNCONTESTED"
+                                v == null || total == 0.0 -> "WAITING..."
+                                total == null -> DecimalFormat("#,##0").format(v)
+                                else -> "${DecimalFormat("#,##0").format(v)}\n${DecimalFormat("0.0%").format(v / total)}"
+                            },
+                            if (c == w) ImageGenerator.createHalfTickShape() else null,
+                        )
+                    }
+            }
+            return BarFrameBuilder.basic(bars)
+                .withHeader(header, rightLabelPublisher = progressLabel)
+                .withSubhead(subhead)
+                .withMax(
+                    votes.map { r -> r.values.sumOf { it ?: 0 } * 2 / 3 }
+                        .merge(pctReporting) { v, p -> v / p.coerceAtLeast(1e-6) },
+                )
+                .build()
+        }
+
+        private fun createPrevFrame(): JPanel? {
+            val prevVotes = this.prevVotes ?: return null
+            val bars = prevVotes.map { r ->
+                val total = r.values.sumOf { it }.toDouble()
+                r.entries.sortedByDescending { it.value }
+                    .map { (c, v) ->
+                        BasicBar(
+                            c.surname.uppercase(),
+                            c.color,
+                            v,
+                            if (r.size == 1) "UNCONTESTED" else DecimalFormat("0.0%").format(v / total),
+                        )
+                    }
+            }
+            return BarFrameBuilder.basic(bars)
+                .withHeader(prevHeader!!)
+                .withSubhead(prevSubhead!!)
+                .withMax(prevVotes.map { r -> r.values.sumOf { it } * 2 / 3 })
+                .build()
+        }
+
+        private fun createAltText(title: Flow.Publisher<out String?>): Flow.Publisher<String> {
+            val votes = header.merge(progressLabel) { h, p -> if (p == null) h else listOfNotNull(h, "[$p]").joinToString(" ") }
+                .merge(subhead) { h, s -> listOfNotNull(h, s).filter { it.isNotEmpty() }.takeIf { it.isNotEmpty() }?.joinToString(", ") }
+                .merge(votes.merge(winner) { r, w -> r to w }) { h, (r, w) ->
+                    val total = if (r.values.any { it == null }) null else r.values.sumOf { it!! }.toDouble()
+                    (if (h == null) "" else "$h\n") + r.entries.sortedByDescending { it.value ?: 0 }
+                        .joinToString("\n") { (c, v) ->
+                            c.fullName.uppercase() +
+                                (if (c.description.isNullOrEmpty()) "" else " (${c.description!!.uppercase()})") + ": " +
+                                when {
+                                    r.size == 1 -> "UNCONTESTED"
+                                    v == null || total == 0.0 -> "WAITING..."
+                                    total == null -> DecimalFormat("#,##0").format(v)
+                                    else -> "${DecimalFormat("#,##0").format(v)} (${DecimalFormat("0.0%").format(v / total)})"
+                                } +
+                                if (c == w) " WINNER" else ""
+                        }
+                }
+            val prev = if (prevVotes == null) {
+                null.asOneTimePublisher()
+            } else {
+                prevHeader!!.merge(prevSubhead!!) { h, s -> listOfNotNull(h, s).filter { it.isNotEmpty() }.takeIf { it.isNotEmpty() }?.joinToString(", ") }
+                    .merge(prevVotes!!) { h, r ->
+                        val total = r.values.sum().toDouble()
+                        (if (h == null) "" else "$h\n") + r.entries.sortedByDescending { it.value }
+                            .joinToString("\n") { (c, v) ->
+                                c.surname.uppercase() + ": " +
+                                    (if (r.size == 1) "UNCONTESTED" else DecimalFormat("0.0%").format(v / total))
+                            }
+                    }
+            }
+            return listOf<Flow.Publisher<out String?>>(title, votes, prev).combine().map { it.filterNotNull().joinToString("\n\n") }
+        }
+    }
+
     class PartyQuotaScreenBuilder<P : PartyOrCoalition>(
         private val quotas: Flow.Publisher<out Map<out P, Double>>,
         private val totalSeats: Flow.Publisher<out Int>,
@@ -2712,6 +2883,14 @@ class BasicResultPanel private constructor(
                 VotePctOnlyTemplate(),
                 Party.OTHERS as P,
             )
+        }
+
+        fun nonPartisanVotes(
+            votes: Flow.Publisher<out Map<NonPartisanCandidate, Int?>>,
+            header: Flow.Publisher<out String?>,
+            subhead: Flow.Publisher<out String?>,
+        ): NonPartisanVoteBuilder {
+            return NonPartisanVoteBuilder(votes, header, subhead)
         }
 
         fun <P : PartyOrCoalition> partyQuotas(
