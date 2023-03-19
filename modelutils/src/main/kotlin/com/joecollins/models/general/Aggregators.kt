@@ -133,6 +133,8 @@ object Aggregators {
         return ret
     }
 
+    fun <K, V> toMap(map: Map<K, Flow.Publisher<V>>) = toMap(map.entries, { it.key }, { it.value })
+
     fun <K, V> toMap(keys: Collection<K>, func: (K) -> Flow.Publisher<V>) = toMap(keys, { it }, func)
 
     fun <T, K, V> toMap(entries: Collection<T>, keyFunc: (T) -> K, func: (T) -> Flow.Publisher<V>): Flow.Publisher<Map<K, V>> {

@@ -309,7 +309,7 @@ class AggregatorsTest {
     fun testToMap() {
         val inputs = mapOf("ABC" to Publisher(1), "DEF" to Publisher(2))
         val output: BoundResult<Map<String, Int>> = BoundResult()
-        Aggregators.toMap(inputs.keys) { inputs[it]!! }.subscribe(Subscriber { output.value = it })
+        Aggregators.toMap(inputs).subscribe(Subscriber { output.value = it })
         assertEquals(mapOf("ABC" to 1, "DEF" to 2), output.value)
 
         inputs["ABC"]!!.submit(7)
