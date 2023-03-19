@@ -67,7 +67,7 @@ class MixedMemberResultPanel private constructor(
             components.entries.firstOrNull { it.value == comp }?.let { components.remove(it.key) }
         }
         override fun preferredLayoutSize(parent: Container): Dimension {
-            return Dimension(1024, 512)
+            return DEFAULT_SIZE
         }
 
         override fun minimumLayoutSize(parent: Container): Dimension {

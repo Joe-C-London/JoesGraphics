@@ -168,11 +168,11 @@ class AllSeatsScreen private constructor(title: Flow.Publisher<out String?>, fra
                 }
 
                 override fun preferredLayoutSize(parent: Container): Dimension {
-                    return Dimension(1024, 512)
+                    return DEFAULT_SIZE
                 }
 
                 override fun minimumLayoutSize(parent: Container): Dimension {
-                    return Dimension(1024, 512)
+                    return DEFAULT_SIZE
                 }
 
                 override fun layoutContainer(parent: Container) {

@@ -15,6 +15,7 @@ import java.util.concurrent.Flow
 import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.border.EmptyBorder
+import kotlin.math.roundToInt
 
 open class GenericPanel(
     panel: JPanel,
@@ -40,7 +41,7 @@ open class GenericPanel(
         this.label.font = StandardFont.readBoldFont(32)
         background = Color.WHITE
         layout = BorderLayout()
-        preferredSize = Dimension(1024, 512)
+        preferredSize = DEFAULT_SIZE
         add(this.label, BorderLayout.NORTH)
         add(panel, BorderLayout.CENTER)
     }
@@ -50,6 +51,12 @@ open class GenericPanel(
     }
 
     companion object {
+        val DEFAULT_SIZE = Dimension(1024, 1024 / 16 * 9)
+
+        fun Dimension.scale(factor: Double): Dimension {
+            return Dimension((width * factor).roundToInt(), (height * factor).roundToInt())
+        }
+
         fun pad(panel: JPanel): JPanel {
             return panel.pad()
         }

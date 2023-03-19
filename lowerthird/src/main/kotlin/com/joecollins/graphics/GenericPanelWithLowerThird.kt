@@ -5,7 +5,6 @@ import com.joecollins.pubsub.asOneTimePublisher
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Component
-import java.awt.Dimension
 import java.util.concurrent.Flow
 import javax.swing.JPanel
 
@@ -17,7 +16,7 @@ open class GenericPanelWithLowerThird(
     init {
         background = Color.WHITE
         layout = BorderLayout()
-        preferredSize = Dimension(1024, 512)
+        preferredSize = GenericPanel.DEFAULT_SIZE
         add(panel, BorderLayout.CENTER)
         add(lowerThird, BorderLayout.SOUTH)
     }

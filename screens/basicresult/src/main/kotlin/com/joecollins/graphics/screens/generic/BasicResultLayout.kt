@@ -1,5 +1,6 @@
 package com.joecollins.graphics.screens.generic
 
+import com.joecollins.graphics.GenericPanel
 import java.awt.Component
 import java.awt.Container
 import java.awt.Dimension
@@ -25,7 +26,7 @@ class BasicResultLayout : LayoutManager {
     }
 
     override fun preferredLayoutSize(parent: Container): Dimension {
-        return Dimension(1024, 512)
+        return GenericPanel.DEFAULT_SIZE
     }
 
     override fun minimumLayoutSize(parent: Container): Dimension {

@@ -15,6 +15,7 @@ dependencies {
     implementation parent.project('base')
     implementation parent.project('pubsub')
     implementation parent.project('threading')
+    implementation parent.project('screens:screenbase')
 
     testImplementation parent.project('testutils')
 

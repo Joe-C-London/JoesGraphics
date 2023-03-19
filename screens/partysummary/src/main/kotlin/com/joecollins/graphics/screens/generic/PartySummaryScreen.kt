@@ -56,7 +56,7 @@ class PartySummaryScreen private constructor(
         }
 
         override fun preferredLayoutSize(parent: Container): Dimension {
-            return Dimension(1024, 512)
+            return DEFAULT_SIZE
         }
 
         override fun minimumLayoutSize(parent: Container): Dimension {
