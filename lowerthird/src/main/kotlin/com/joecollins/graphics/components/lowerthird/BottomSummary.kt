@@ -5,14 +5,18 @@ import com.joecollins.graphics.utils.ColorUtils
 import com.joecollins.graphics.utils.StandardFont
 import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
-import java.awt.BorderLayout
 import java.awt.Color
+import java.awt.Component
+import java.awt.Container
 import java.awt.Dimension
 import java.awt.GridLayout
+import java.awt.LayoutManager
+import java.awt.Point
 import java.util.concurrent.Flow
 import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.border.EmptyBorder
+import kotlin.math.roundToInt
 
 class BottomSummary(
     private val headerPublisher: Flow.Publisher<out String>,
@@ -98,21 +102,52 @@ class BottomSummary(
 
     init {
         background = Color.WHITE
-        layout = BorderLayout()
+        layout = object : LayoutManager {
+            override fun addLayoutComponent(name: String, comp: Component) {
+            }
+
+            override fun removeLayoutComponent(comp: Component) {
+            }
+
+            override fun preferredLayoutSize(parent: Container): Dimension {
+                return Dimension(1024, 20)
+            }
+
+            override fun minimumLayoutSize(parent: Container): Dimension {
+                return Dimension(1024, 20)
+            }
+
+            override fun layoutContainer(parent: Container) {
+                val width = parent.width
+                val height = parent.height
+
+                val headerSize = 200
+                headerPanel.location = Point(0, 0)
+                headerPanel.size = Dimension(headerSize, height)
+
+                val footerSize = 100
+                footerPanel.location = Point(width - footerSize, 0)
+                footerPanel.size = Dimension(footerSize, height)
+
+                val centerSize = width - headerSize - footerSize
+                val panelWidth = centerSize.toDouble() / entryPanels.size.coerceAtLeast(1)
+                entryPanels.forEachIndexed { index, entryPanel ->
+                    val left = (panelWidth * index).roundToInt()
+                    val right = (panelWidth * (index + 1)).roundToInt()
+                    entryPanel.location = Point(left + headerSize, 0)
+                    entryPanel.size = Dimension(right - left, height)
+                }
+            }
+        }
         preferredSize = Dimension(1024, 20)
 
         headerPanel.textAlign = JLabel.RIGHT
         headerPanel.preferredSize = Dimension(200, 20)
-        add(headerPanel, BorderLayout.WEST)
+        add(headerPanel)
 
         footerPanel.textAlign = JLabel.LEFT
         footerPanel.preferredSize = Dimension(100, 20)
-        add(footerPanel, BorderLayout.EAST)
-
-        val centralPanel = JPanel()
-        centralPanel.layout = GridLayout(1, 0)
-        centralPanel.background = Color.BLACK
-        add(centralPanel, BorderLayout.CENTER)
+        add(footerPanel)
 
         this.headerPublisher.subscribe(Subscriber(eventQueueWrapper { text -> headerPanel.text = text }))
         this.footerPublisher.subscribe(Subscriber(eventQueueWrapper { text -> footerPanel.text = text }))
@@ -121,11 +156,11 @@ class BottomSummary(
                 eventQueueWrapper { entries ->
                     while (entryPanels.size < entries.size) {
                         val newPanel = EntryPanel()
-                        centralPanel.add(newPanel)
+                        add(newPanel)
                         entryPanels.add(newPanel)
                     }
                     while (entryPanels.size > entries.size) {
-                        centralPanel.remove(entryPanels.removeAt(entries.size))
+                        remove(entryPanels.removeAt(entries.size))
                     }
                     entries.forEachIndexed { idx, entry ->
                         entryPanels[idx].background = entry.color
