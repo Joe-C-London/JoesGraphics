@@ -63,15 +63,17 @@ abstract class GenericSocialDialog(panel: JPanel) : JDialog() {
         bottomPanel.layout = BorderLayout()
         contentPane.add(bottomPanel, BorderLayout.SOUTH)
 
+        var charLabelText = {
+            "${textArea.text.length}/$maxLength & ${altTextArea.text.length}/${AltTextProvider.ALT_TEXT_MAX_LENGTH} & ${panel.size.width}x${panel.size.height}"
+        }
         val charLabel =
-            JLabel("${textArea.text.length}/$maxLength & ${altTextArea.text.length}/${AltTextProvider.ALT_TEXT_MAX_LENGTH}")
+            JLabel(charLabelText())
         charLabel.foreground = Color.WHITE
         bottomPanel.add(charLabel, BorderLayout.WEST)
         textArea.addKeyListener(
             object : KeyAdapter() {
                 override fun keyReleased(e: KeyEvent) {
-                    charLabel.text =
-                        "${textArea.text.length}/$maxLength & ${altTextArea.text.length}/${AltTextProvider.ALT_TEXT_MAX_LENGTH}"
+                    charLabel.text = charLabelText()
                 }
             },
         )
@@ -81,8 +83,7 @@ abstract class GenericSocialDialog(panel: JPanel) : JDialog() {
                 Subscriber.eventQueueWrapper {
                     val text = it?.takeIf { t -> t.length <= AltTextProvider.ALT_TEXT_MAX_LENGTH }
                     altTextArea.text = text ?: ""
-                    charLabel.text =
-                        "${textArea.text.length}/$maxLength & ${(text ?: "").length}/${AltTextProvider.ALT_TEXT_MAX_LENGTH}"
+                    charLabel.text = charLabelText()
                 },
             )
             panel.altText.subscribe(subscriber)

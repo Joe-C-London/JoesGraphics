@@ -46,6 +46,7 @@ abstract class AbstractPublisher<T> : Flow.Publisher<T> {
     }
 
     internal fun error(throwable: Throwable) {
+        throwable.printStackTrace()
         synchronized(this) {
             subscriptions.forEach { it.send(ErrorWrapper(throwable)) }
             subscriptions.clear()
