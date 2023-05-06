@@ -303,6 +303,9 @@ class AggregatorsTest {
 
         winner.submit("DEF")
         assertEquals(mapOf("DEF" to 7, "GHI" to 6, "OTHERS" to 9), output.value)
+
+        votes.submit(mapOf("ABC" to 5, "GHI" to 6, "JKL" to 4, "MNO" to 3))
+        assertEquals(mapOf("ABC" to 5, "GHI" to 6, "OTHERS" to 7), output.value)
     }
 
     @Test

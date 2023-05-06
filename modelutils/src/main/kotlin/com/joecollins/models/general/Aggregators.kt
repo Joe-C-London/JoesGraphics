@@ -118,7 +118,7 @@ object Aggregators {
             .filter { !mustIncludeSet.contains(it.key) }
             .filter { it.key != others }
             .sortedByDescending { it.value ?: -1 }
-            .take(max(0, limit - 1 - mustIncludeSet.size))
+            .take(max(0, limit - 1 - mustIncludeSet.intersect(result.keys).size))
             .toSet()
         val topOrRequired: (Map.Entry<K, Int?>) -> Boolean = { top.contains(it) || mustIncludeSet.contains(it.key) }
         val ret: Map<K, T> = result.entries
