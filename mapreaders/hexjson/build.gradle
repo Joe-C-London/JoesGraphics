@@ -12,7 +12,7 @@ version '1.0-SNAPSHOT'
 
 def topLevel = parent.parent
 
-def jacksonVersion = '2.14.2'
+def jacksonVersion = '2.15.0'
 
 dependencies {
     implementation "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
