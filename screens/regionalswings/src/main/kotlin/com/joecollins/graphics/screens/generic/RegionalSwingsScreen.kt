@@ -27,11 +27,19 @@ class RegionalSwingsScreen private constructor(
         private val numRows: Int,
     ) {
         private var progressLabel: (R) -> Flow.Publisher<out String?> = { null.asOneTimePublisher() }
+        private var swingRange: Flow.Publisher<Double> = 0.10.asOneTimePublisher()
 
         fun withProgressLabel(
             progress: (R) -> Flow.Publisher<out String?>,
         ): Builder<R, POC> {
             this.progressLabel = progress
+            return this
+        }
+
+        fun withRange(
+            swingRange: Flow.Publisher<Double>,
+        ): Builder<R, POC> {
+            this.swingRange = swingRange
             return this
         }
 
@@ -43,6 +51,7 @@ class RegionalSwingsScreen private constructor(
                     swingOrder,
                 )
                     .withHeader(name(it), progressPublisher = progressLabel(it))
+                    .withRange(swingRange)
             }
             return RegionalSwingsScreen(
                 JPanel().also { panel ->
