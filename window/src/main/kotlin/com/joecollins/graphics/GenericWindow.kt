@@ -3,6 +3,7 @@ package com.joecollins.graphics
 import com.joecollins.graphics.dialogs.MastodonDialog
 import com.joecollins.graphics.dialogs.TweetDialog
 import com.joecollins.graphics.utils.StandardFont
+import com.joecollins.models.general.social.twitter.TwitterV2InstanceFactory
 import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
 import java.awt.Color
@@ -185,6 +186,9 @@ class GenericWindow<T : JPanel> constructor(private val panel: T, title: String)
         val fileItem = JMenuItem("Save to File...")
         fileItem.addActionListener { saveImageToFile(panel) }
         imageMenu.add(fileItem)
+        if (logIntoTwitterOnStartup) {
+            TwitterV2InstanceFactory.instance
+        }
         if (isTweetingEnabled) {
             val tweetItem = JMenuItem("Tweet...")
             tweetItem.addActionListener {
@@ -208,6 +212,14 @@ class GenericWindow<T : JPanel> constructor(private val panel: T, title: String)
             val properties = Properties()
             properties.load(twitterPropertiesFile)
             return properties.getProperty("enabled")?.toBoolean() ?: true
+        }
+
+    private val logIntoTwitterOnStartup: Boolean
+        get() {
+            val twitterPropertiesFile = this::class.java.classLoader.getResourceAsStream("twitter.properties") ?: return false
+            val properties = Properties()
+            properties.load(twitterPropertiesFile)
+            return properties.getProperty("loginOnStartup")?.toBoolean() ?: false
         }
 
     private val mastodonInstances: List<Pair<String, String>>
