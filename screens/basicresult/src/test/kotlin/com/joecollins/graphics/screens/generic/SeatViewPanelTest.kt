@@ -2888,6 +2888,75 @@ class SeatViewPanelTest {
         )
     }
 
+    @Test
+    fun testSwingRange() {
+        val currentSeats = Publisher(emptyMap<Party, Int>())
+        val previousSeats = Publisher(emptyMap<Party, Int>())
+        val currentVotes = Publisher(emptyMap<Party, Int>())
+        val previousVotes = Publisher(emptyMap<Party, Int>())
+        val totalSeats = Publisher(650)
+        val showMajority = Publisher(true)
+        val header = Publisher("UNITED KINGDOM")
+        val seatHeader = Publisher("0 OF 650 CONSTITUENCIES DECLARED")
+        val seatSubhead = Publisher("PROJECTION: TOO EARLY TO CALL")
+        val changeHeader = Publisher("CHANGE SINCE 2017")
+        val swingHeader = Publisher("SWING SINCE 2017")
+        val con = Party("Conservative", "CON", Color.BLUE)
+        val lab = Party("Labour", "LAB", Color.RED)
+        val ld = Party("Liberal Democrat", "LD", Color.ORANGE)
+        val snp = Party("Scottish National Party", "SNP", Color.YELLOW)
+        val pc = Party("Plaid Cymru", "PC", Color.GREEN.darker())
+        val grn = Party("Green", "GRN", Color.GREEN)
+        val oth = Party.OTHERS
+        val partyOrder = listOf(snp, lab, pc, grn, ld, oth, con)
+        val panel = partySeats(
+            currentSeats,
+            seatHeader,
+            seatSubhead,
+        )
+            .withPrev(previousSeats, changeHeader)
+            .withTotal(totalSeats)
+            .withMajorityLine(showMajority) { "$it SEATS FOR MAJORITY" }
+            .withSwing(currentVotes, previousVotes, compareBy { partyOrder.indexOf(it) }, swingHeader, swingRange = 0.05.asOneTimePublisher())
+            .build(header)
+        panel.setSize(1024, 512)
+
+        currentSeats.submit(mapOf(lab to 1))
+        previousSeats.submit(mapOf(lab to 1))
+        currentVotes.submit(
+            mapOf(
+                lab to 21568,
+                con to 9290,
+                ld to 2709,
+                grn to 1365,
+                oth to 2542,
+            ),
+        )
+        previousVotes.submit(
+            mapOf(
+                lab to 24071,
+                con to 9134,
+                ld to 1812,
+                grn to 595,
+                oth to 1482,
+            ),
+        )
+        seatHeader.submit("1 OF 650 SEATS DECLARED")
+        compareRendering("SeatViewPanel", "SwingRange", panel)
+        assertPublishes(
+            panel.altText,
+            """
+                UNITED KINGDOM
+                
+                1 OF 650 SEATS DECLARED, PROJECTION: TOO EARLY TO CALL (CHANGE SINCE 2017)
+                LABOUR: 1 (±0)
+                326 SEATS FOR MAJORITY
+                
+                SWING SINCE 2017: 3.8% SWING LAB TO CON
+            """.trimIndent(),
+        )
+    }
+
     private fun peiShapesByDistrict(): Map<Int, Shape> {
         val peiMap = SeatViewPanelTest::class.java
             .classLoader

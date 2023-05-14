@@ -340,6 +340,7 @@ class BasicResultPanel private constructor(
         private var prevVotes: Flow.Publisher<out Map<out KPT, Int>>? = null
         private var swingHeader: Flow.Publisher<out String?>? = null
         private var swingComparator: Comparator<KPT>? = null
+        private var swingRange: Flow.Publisher<Double>? = null
         private var classificationFunc: ((KPT) -> KPT)? = null
         private var classificationHeader: Flow.Publisher<out String?>? = null
         private var progressLabel: Flow.Publisher<out String?> = null.asOneTimePublisher()
@@ -417,11 +418,13 @@ class BasicResultPanel private constructor(
             comparator: Comparator<KPT>,
             header: Flow.Publisher<out String?>,
             partyChanges: Flow.Publisher<Map<KPT, KPT>> = emptyMap<KPT, KPT>().asOneTimePublisher(),
+            swingRange: Flow.Publisher<Double> = 0.1.asOneTimePublisher(),
         ): SeatScreenBuilder<KT, KPT, CT, PT, BAR> {
             swingHeader = header
             this.currVotes = currVotes
             this.prevVotes = Aggregators.partyChanges(prevVotes, partyChanges)
             swingComparator = comparator
+            this.swingRange = swingRange
             return this
         }
 
@@ -667,6 +670,7 @@ class BasicResultPanel private constructor(
                     swingComparator!!,
                 )
                     .withHeader(header)
+                    .withRange(swingRange!!)
                     .build()
             }
         }
@@ -952,6 +956,7 @@ class BasicResultPanel private constructor(
         protected var preferencePctReporting: Flow.Publisher<out Double>? = null
         protected var swingHeader: Flow.Publisher<out String?>? = null
         protected var swingComparator: Comparator<KPT>? = null
+        protected var swingRange: Flow.Publisher<Double>? = null
         protected var classificationFunc: ((KPT) -> KPT)? = null
         protected var classificationHeader: Flow.Publisher<out String?>? = null
         private var mapBuilder: MapBuilder<*>? = null
@@ -1088,9 +1093,11 @@ class BasicResultPanel private constructor(
         fun withSwing(
             comparator: Comparator<KPT>?,
             header: Flow.Publisher<out String?>,
+            swingRange: Flow.Publisher<Double> = 0.1.asOneTimePublisher(),
         ): VoteScreenBuilder<KT, KPT, CT, CPT, PT> {
             swingComparator = comparator
             swingHeader = header
+            this.swingRange = swingRange
             return this
         }
 
@@ -1621,6 +1628,7 @@ class BasicResultPanel private constructor(
                     swingComparator!!,
                 )
                     .withHeader(swingHeader)
+                    .withRange(swingRange!!)
                     .build()
             }
         }
@@ -2214,6 +2222,7 @@ class BasicResultPanel private constructor(
                     }
                 return SwingFrameBuilder.prevCurr(filteredPrev!!, curr, swingComparator!!)
                     .withHeader(swingHeader)
+                    .withRange(swingRange!!)
                     .build()
             }
         }
@@ -2494,6 +2503,7 @@ class BasicResultPanel private constructor(
         private var swingPrevVotes: Flow.Publisher<out Map<out P, Int>>? = null
         private var swingComparator: Comparator<P>? = null
         private var swingHeader: Flow.Publisher<out String?>? = null
+        private var swingRange: Flow.Publisher<Double>? = null
 
         private var mapBuilder: MapBuilder<*>? = null
 
@@ -2511,11 +2521,13 @@ class BasicResultPanel private constructor(
             prevVotes: Flow.Publisher<out Map<out P, Int>>,
             comparator: Comparator<P>,
             header: Flow.Publisher<out String?>,
+            swingRange: Flow.Publisher<Double> = 0.1.asOneTimePublisher(),
         ): PartyQuotaScreenBuilder<P> {
             this.swingCurrVotes = currVotes
             this.swingPrevVotes = prevVotes
             this.swingComparator = comparator
             this.swingHeader = header
+            this.swingRange = swingRange
             return this
         }
 
@@ -2609,6 +2621,7 @@ class BasicResultPanel private constructor(
                     swingComparator!!,
                 )
                     .withHeader(header)
+                    .withRange(swingRange!!)
                     .build()
             }
         }

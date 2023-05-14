@@ -479,6 +479,110 @@ class PartyQuotasPanelTest {
         )
     }
 
+    @Test
+    fun testSwingRange() {
+        val apni = Party("Alliance", "APNI", Color.ORANGE)
+        val uup = Party("Ulster Unionist Party", "UUP", Color.BLUE)
+        val dup = Party("Democratic Unionist Party", "DUP", Color.ORANGE.darker())
+        val pup = Party("Progressive Unionist Party", "PUP", Color.BLUE.darker())
+        val grn = Party("Green", "GRN", Color.GREEN)
+        val sf = Party("Sinn F\u00e9in", "SF", Color.GREEN.darker().darker())
+        val tuv = Party("Traditional Unionist Voice", "TUV", Color.BLUE.darker().darker())
+        val labalt = Party("Labour Alternative", "LAB-ALT", Color.RED.darker())
+        val con = Party("NI Conservatives", "CON", Color.CYAN.darker())
+        val sdlp = Party("Social Democratic and Labour Party", "SDLP", Color.GREEN.darker())
+        val ind = Party("Independent", "IND", Party.OTHERS.color)
+
+        val prevVotes = mapOf(
+            dup to 5538 + 4230 + 3875,
+            apni to 5428 + 2805 + 2372,
+            uup to 3047 + 1095,
+            grn to 2183,
+            pup to 1772,
+            ind to 1099,
+            tuv to 887,
+            sf to 946,
+            Party.OTHERS to 631 + 78,
+            labalt to 517,
+            con to 477,
+            sdlp to 141,
+        )
+        val currQuota = Publisher(1)
+        val prevQuota = 5311.0
+        val currRound = Publisher(emptyMap<Party, Double>())
+        val prevRound = Publisher(prevVotes.mapValues { it.value / prevQuota })
+        val currVotes = Publisher(emptyMap<Party, Int>())
+        val currWinner = Publisher<Party?>(null)
+        val round = Publisher(0)
+
+        val panel = BasicResultPanel.partyQuotas(
+            currRound.merge(currQuota) { votes, quota -> votes.mapValues { it.value / quota } },
+            5.asOneTimePublisher(),
+            "PARTY SUMMARY".asOneTimePublisher(),
+            round.map { if (it == 0) "WAITING..." else "COUNT $it" },
+        ).withPrev(
+            prevRound,
+            round.map { if (it <= 1) "CHANGE SINCE 2016" else "CHANGE FROM COUNT ${it - 1}" },
+        ).withSwing(
+            currVotes,
+            prevVotes.asOneTimePublisher(),
+            Comparator.comparing { listOf(sf, apni, dup).indexOf(it) },
+            "FIRST PREF SWING".asOneTimePublisher(),
+            swingRange = 0.02.asOneTimePublisher(),
+        ).withPartyMap(
+            niShapesByConstituency().asOneTimePublisher(),
+            9.asOneTimePublisher(),
+            currWinner,
+            listOf(9, 10, 12, 15).asOneTimePublisher(),
+            "BELFAST".asOneTimePublisher(),
+        ).build(
+            "BELFAST EAST".asOneTimePublisher(),
+        )
+        panel.setSize(1024, 512)
+
+        val round1 = mapOf(
+            apni to 7610 + 5059,
+            uup to 5275,
+            dup to 6007 + 4729 + 4431,
+            pup to 2658,
+            grn to 1447,
+            sf to 1173,
+            tuv to 917,
+            labalt to 442,
+            con to 275,
+            sdlp to 250,
+            ind to 84,
+        )
+        currVotes.submit(round1)
+        val quota = 6727.0
+        currRound.submit(round1.mapValues { it.value / quota })
+        round.submit(1)
+        currWinner.submit(dup)
+        compareRendering("PartyQuotasPanel", "SwingRange", panel)
+        assertPublishes(
+            panel.altText,
+            """
+                BELFAST EAST
+                
+                PARTY SUMMARY, COUNT 1 (CHANGE SINCE 2016)
+                DEMOCRATIC UNIONIST PARTY: 2.25 QUOTAS (-0.31)
+                ALLIANCE: 1.88 QUOTAS (-0.11)
+                ULSTER UNIONIST PARTY: 0.78 QUOTAS (+0.00)
+                PROGRESSIVE UNIONIST PARTY: 0.40 QUOTAS (+0.06)
+                GREEN: 0.22 QUOTAS (-0.20)
+                SINN FÉIN: 0.17 QUOTAS (-0.00)
+                TRADITIONAL UNIONIST VOICE: 0.14 QUOTAS (-0.03)
+                LABOUR ALTERNATIVE: 0.07 QUOTAS (-0.03)
+                NI CONSERVATIVES: 0.04 QUOTAS (-0.05)
+                SOCIAL DEMOCRATIC AND LABOUR PARTY: 0.04 QUOTAS (+0.01)
+                INDEPENDENT: 0.01 QUOTAS (-0.19)
+                OTHERS: - (-0.13)
+                
+                FIRST PREF SWING: 1.0% SWING DUP TO APNI
+            """.trimIndent(),
+        )
+    }
+
     private fun niShapesByConstituency(): Map<Int, Shape> {
         val niMap = PartyQuotasPanelTest::class.java
             .classLoader

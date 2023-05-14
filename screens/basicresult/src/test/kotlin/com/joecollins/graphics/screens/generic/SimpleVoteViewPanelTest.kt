@@ -3333,6 +3333,66 @@ class SimpleVoteViewPanelTest {
         )
     }
 
+    @Test
+    fun testSwingRange() {
+        val ndp = Candidate("Billy Cann", Party("New Democratic Party", "NDP", Color.ORANGE))
+        val pc = Candidate("Cory Deagle", Party("Progressive Conservative", "PC", Color.BLUE))
+        val lib = Candidate("Daphne Griffin", Party("Liberal", "LIB", Color.RED))
+        val grn = Candidate("John Allen MacLean", Party("Green", "GRN", Color.GREEN.darker()))
+        val currentVotes = Publisher(
+            mapOf(
+                ndp to 124,
+                pc to 1373,
+                lib to 785,
+                grn to 674,
+            ),
+        )
+        val previousVotes = Publisher(
+            mapOf(
+                ndp.party to 585,
+                pc.party to 785,
+                lib.party to 1060,
+                grn.party to 106,
+            ),
+        )
+        val header = Publisher("MONTAGUE-KILMUIR")
+        val voteHeader = Publisher("9 OF 9 POLLS REPORTING")
+        val voteSubhead = Publisher("PROJECTION: PC GAIN FROM LIB")
+        val changeHeader = Publisher("CHANGE SINCE 2015")
+        val swingHeader = Publisher("SWING SINCE 2015")
+        val mapHeader = Publisher("CARDIGAN")
+        val leader = Publisher(pc.party)
+        val swingPartyOrder = listOf(ndp.party, grn.party, lib.party, pc.party)
+        val shapesByDistrict = peiShapesByDistrict()
+        val focus = Publisher(shapesByDistrict.keys.filter { it <= 7 })
+        val selectedDistrict = Publisher(3)
+        val panel = candidateVotes(
+            currentVotes,
+            voteHeader,
+            voteSubhead,
+        )
+            .withPrev(previousVotes, changeHeader)
+            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader, swingRange = 0.2.asOneTimePublisher())
+            .withPartyMap(shapesByDistrict.asOneTimePublisher(), selectedDistrict, leader, focus, mapHeader)
+            .build(header)
+        panel.setSize(1024, 512)
+        compareRendering("SimpleVoteViewPanel", "SwingRange", panel)
+        assertPublishes(
+            panel.altText,
+            """
+                MONTAGUE-KILMUIR
+                
+                9 OF 9 POLLS REPORTING, PROJECTION: PC GAIN FROM LIB (CHANGE SINCE 2015)
+                CORY DEAGLE (PC): 1,373 (46.4%, +15.5%)
+                DAPHNE GRIFFIN (LIB): 785 (26.6%, -15.2%)
+                JOHN ALLEN MACLEAN (GRN): 674 (22.8%, +18.6%)
+                BILLY CANN (NDP): 124 (4.2%, -18.9%)
+                
+                SWING SINCE 2015: 15.4% SWING LIB TO PC
+            """.trimIndent(),
+        )
+    }
+
     private fun peiShapesByDistrict(): Map<Int, Shape> {
         val peiMap = SimpleVoteViewPanelTest::class.java
             .classLoader
