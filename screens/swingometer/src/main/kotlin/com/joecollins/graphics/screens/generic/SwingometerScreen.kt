@@ -82,6 +82,7 @@ class SwingometerScreen private constructor(title: Flow.Publisher<out String?>, 
                     synchronized(this) {
                         field = value
                         rangePublisher.submit(range)
+                        updateOuterLabels()
                     }
                 }
 
@@ -193,7 +194,7 @@ class SwingometerScreen private constructor(title: Flow.Publisher<out String?>, 
                         carryovers,
                     ).asSequence(),
                 ).flatten()
-                    .let { filterNearbyLabels(it) }
+                    .let { filterNearbyLabels(it, 0.05 * range.toDouble()) }
                     .toList()
             }
 
@@ -386,13 +387,13 @@ class SwingometerScreen private constructor(title: Flow.Publisher<out String?>, 
             return ret
         }
 
-        private fun filterNearbyLabels(ret: Sequence<Triple<Double, Color, String>>): Sequence<Triple<Double, Color, String>> {
+        private fun filterNearbyLabels(ret: Sequence<Triple<Double, Color, String>>, margin: Double): Sequence<Triple<Double, Color, String>> {
             val ranges: MutableSet<ClosedRange<Double>> = HashSet()
             return ret.filter { item ->
                 if (ranges.any { range -> range.contains(item.first) }) {
                     false
                 } else {
-                    ranges.add((item.first - 0.005).rangeTo(item.first + 0.005))
+                    ranges.add((item.first - margin).rangeTo(item.first + margin))
                     true
                 }
             }
