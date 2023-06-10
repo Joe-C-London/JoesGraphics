@@ -26,7 +26,7 @@ class PartyHeatMapScreen private constructor(panel: JPanel, title: Flow.Publishe
             parties: Flow.Publisher<out List<Party>>,
             prevResult: (T) -> Party,
             currResult: (T) -> Flow.Publisher<Party?>,
-            sortOrder: (T, Party) -> Number,
+            sortOrder: (Party) -> Comparator<T>,
         ): Builder<T> {
             return Builder(
                 items,
@@ -45,9 +45,16 @@ class PartyHeatMapScreen private constructor(panel: JPanel, title: Flow.Publishe
             parties: Flow.Publisher<out List<Party>>,
             prevResult: (T) -> Party,
             currResult: (T) -> Flow.Publisher<out PartyResult?>,
-            sortOrder: (T, Party) -> Number,
+            sortOrder: (Party) -> Comparator<T>,
         ): Builder<T> {
-            return Builder(items, parties, prevResult, currResult, sortOrder, true)
+            return Builder(
+                items,
+                parties,
+                prevResult,
+                currResult,
+                sortOrder,
+                true,
+            )
         }
     }
 
@@ -56,7 +63,7 @@ class PartyHeatMapScreen private constructor(panel: JPanel, title: Flow.Publishe
         private val parties: Flow.Publisher<out List<Party>>,
         private val prevResult: (T) -> Party,
         private val currResult: (T) -> Flow.Publisher<out PartyResult?>,
-        private val sortOrder: (T, Party) -> Number,
+        private val sortOrder: (Party) -> Comparator<T>,
         private val withLeading: Boolean,
     ) {
         private var numRows = 5.asOneTimePublisher()
@@ -173,9 +180,7 @@ class PartyHeatMapScreen private constructor(panel: JPanel, title: Flow.Publishe
 
         private fun createOrderedList(items: Collection<T>, party: Party): List<T> {
             return items.asSequence()
-                .map { it to sortOrder(it, party) }
-                .sortedBy { it.second.toDouble() }
-                .map { it.first }
+                .sortedWith(sortOrder(party))
                 .toList()
         }
     }

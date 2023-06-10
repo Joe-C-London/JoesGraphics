@@ -27,12 +27,14 @@ class PartyHeatMapScreenTest {
             { riding ->
                 currResults.map { r -> r[riding] }
             },
-        ) { riding, party ->
-            val result = prevResults[riding]!!
-            val me = result[party] ?: 0
-            val oth = result.filter { it.key != party }.maxOf { it.value }
-            val total = result.values.sum().toDouble()
-            (oth - me) / total
+        ) { party ->
+            Comparator.comparing { riding ->
+                val result = prevResults[riding]!!
+                val me = result[party] ?: 0
+                val oth = result.filter { it.key != party }.maxOf { it.value }
+                val total = result.values.sum().toDouble()
+                (oth - me) / total
+            }
         }
             .withNumRows(rows)
             .build("PARTY HEAT MAPS".asOneTimePublisher())
@@ -136,12 +138,14 @@ class PartyHeatMapScreenTest {
             { riding ->
                 currResults.map { r -> r[riding] }
             },
-        ) { riding, party ->
-            val result = prevResults[riding]!!
-            val me = result[party] ?: 0
-            val oth = result.filter { it.key != party }.maxOf { it.value }
-            val total = result.values.sum().toDouble()
-            (oth - me) / total
+        ) { party ->
+            Comparator.comparing { riding ->
+                val result = prevResults[riding]!!
+                val me = result[party] ?: 0
+                val oth = result.filter { it.key != party }.maxOf { it.value }
+                val total = result.values.sum().toDouble()
+                (oth - me) / total
+            }
         }
             .withNumRows(rows)
             .build("PARTY HEAT MAPS".asOneTimePublisher())
@@ -250,12 +254,14 @@ class PartyHeatMapScreenTest {
             { riding ->
                 currResults.map { r -> r[riding] }
             },
-        ) { riding, party ->
-            val result = prevResults[riding]!!
-            val me = result[if (party == bcu) lib else party] ?: 0
-            val oth = result.filter { it.key != (if (party == bcu) lib else party) }.maxOf { it.value }
-            val total = result.values.sum().toDouble()
-            (oth - me) / total
+        ) { party ->
+            Comparator.comparing { riding ->
+                val result = prevResults[riding]!!
+                val me = result[if (party == bcu) lib else party] ?: 0
+                val oth = result.filter { it.key != (if (party == bcu) lib else party) }.maxOf { it.value }
+                val total = result.values.sum().toDouble()
+                (oth - me) / total
+            }
         }
             .withNumRows(rows)
             .withPartyChanges(mapOf(lib to bcu).asOneTimePublisher())
