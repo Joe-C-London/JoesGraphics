@@ -1573,7 +1573,7 @@ class BasicResultPanel private constructor(
                     .withLimits(
                         showPrevRaw.merge(pctReporting ?: 1.0.asOneTimePublisher()) { showRaw, pct ->
                             if (showRaw) {
-                                BarFrameBuilder.Limit(max = 2.0 / 3 / pct.coerceAtLeast(1e-6))
+                                BarFrameBuilder.Limit(max = 2.0 / 3)
                             } else {
                                 BarFrameBuilder.Limit(wingspan = 0.1 / pct.coerceAtLeast(1e-6))
                             }
@@ -2158,7 +2158,7 @@ class BasicResultPanel private constructor(
                     .withLimits(
                         showPrevRaw.merge(pctReporting ?: 1.0.asOneTimePublisher()) { showRaw, pct ->
                             if (showRaw) {
-                                BarFrameBuilder.Limit(max = 2.0 / 3 / pct.coerceAtLeast(1e-6))
+                                BarFrameBuilder.Limit(max = 2.0 / 3)
                             } else {
                                 BarFrameBuilder.Limit(wingspan = 0.1 / pct.coerceAtLeast(1e-6))
                             }

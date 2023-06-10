@@ -2232,9 +2232,11 @@ class SimpleVoteViewPanelTest {
         val voteHeader = Publisher("PROPORTIONAL VOTES")
         val changeHeader = Publisher("2017 RESULT")
         val showPrevRaw = Publisher(true)
+        val showPctReporting = Publisher(1.0)
 
         val panel = partyVotes(curr, voteHeader, "".asOneTimePublisher())
             .withPrev(prev, changeHeader, showPrevRaw = showPrevRaw)
+            .withPctReporting(showPctReporting)
             .build("JAPAN".asOneTimePublisher())
         panel.size = Dimension(1024, 512)
         compareRendering("SimpleVoteViewPanel", "PrevVotes-0", panel)
@@ -2431,6 +2433,37 @@ class SimpleVoteViewPanelTest {
                 JAPAN
                 
                 PROPORTIONAL VOTES
+                LIBERAL DEMOCRATIC PARTY: 34.7%
+                CONSTITUTIONAL DEMOCRATIC PARTY: 20.0%
+                NIPPON ISHIN NO KAI: 14.0%
+                KOMEITO: 12.4%
+                JAPANESE COMMUNIST PARTY: 7.2%
+                DEMOCRATIC PARTY FOR THE PEOPLE: 4.5%
+                REIWA SHINSENGUMI: 3.9%
+                SOCIAL DEMOCRATIC PARTY: 1.8%
+                OTHERS: 1.6%
+                
+                2017 RESULT
+                LDP: 33.3%
+                CDP: 19.9%
+                KIBŌ: 17.4%
+                KOMEITO: 12.5%
+                JCP: 7.9%
+                NIPPON: 6.1%
+                SDP: 1.7%
+                OTH: 1.3%
+            """.trimIndent(),
+        )
+
+        showPctReporting.submit(0.1)
+        voteHeader.submit("PROPORTIONAL VOTES (10% IN)")
+        compareRendering("SimpleVoteViewPanel", "PrevVotes-1b", panel)
+        assertPublishes(
+            panel.altText,
+            """
+                JAPAN
+                
+                PROPORTIONAL VOTES (10% IN)
                 LIBERAL DEMOCRATIC PARTY: 34.7%
                 CONSTITUTIONAL DEMOCRATIC PARTY: 20.0%
                 NIPPON ISHIN NO KAI: 14.0%
