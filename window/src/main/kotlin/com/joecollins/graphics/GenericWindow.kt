@@ -187,7 +187,11 @@ class GenericWindow<T : JPanel> constructor(private val panel: T, title: String)
         fileItem.addActionListener { saveImageToFile(panel) }
         imageMenu.add(fileItem)
         if (logIntoTwitterOnStartup) {
-            TwitterV2InstanceFactory.instance
+            try {
+                TwitterV2InstanceFactory.instance
+            } catch (e: Exception) {
+                println("Cannot log into Twitter: ${e.message}")
+            }
         }
         if (isTweetingEnabled) {
             val tweetItem = JMenuItem("Tweet...")

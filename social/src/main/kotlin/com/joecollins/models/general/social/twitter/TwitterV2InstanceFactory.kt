@@ -26,11 +26,17 @@ object TwitterV2InstanceFactory {
     private val twitterPropertiesFile = this::class.java.classLoader.getResourceAsStream("twitter.properties")
         ?: throw IllegalStateException("Unable to find twitter.properties")
 
-    val instance: TwitterApi
+    private var singletonInstance: TwitterApi? = null
 
-    init {
-        instance = createInstance(false)
-    }
+    val instance: TwitterApi
+        get() {
+            synchronized(this) {
+                if (singletonInstance == null) {
+                    singletonInstance = createInstance(false)
+                }
+                return singletonInstance!!
+            }
+        }
 
     @Suppress("BlockingMethodInNonBlockingContext")
     private fun createInstance(isRetry: Boolean): TwitterApi {
