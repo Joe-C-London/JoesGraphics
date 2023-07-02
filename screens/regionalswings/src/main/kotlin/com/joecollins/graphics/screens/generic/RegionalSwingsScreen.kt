@@ -28,6 +28,7 @@ class RegionalSwingsScreen private constructor(
     ) {
         private var progressLabel: (R) -> Flow.Publisher<out String?> = { null.asOneTimePublisher() }
         private var swingRange: Flow.Publisher<Double> = 0.10.asOneTimePublisher()
+        private var partyFilter: Flow.Publisher<out Collection<POC>>? = null
 
         fun withProgressLabel(
             progress: (R) -> Flow.Publisher<out String?>,
@@ -43,12 +44,20 @@ class RegionalSwingsScreen private constructor(
             return this
         }
 
+        fun withPartyFilter(
+            partyFilter: Flow.Publisher<out Collection<POC>>,
+        ): Builder<R, POC> {
+            this.partyFilter = partyFilter
+            return this
+        }
+
         fun build(title: Flow.Publisher<String>): RegionalSwingsScreen {
             val swings = regions.map {
                 it to SwingFrameBuilder.prevCurr(
                     prevVotes(it),
                     currVotes(it),
                     swingOrder,
+                    partyFilter,
                 )
                     .withHeader(name(it), progressPublisher = progressLabel(it))
                     .withRange(swingRange)

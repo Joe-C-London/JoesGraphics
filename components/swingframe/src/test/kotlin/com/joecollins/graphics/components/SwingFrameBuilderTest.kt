@@ -166,6 +166,27 @@ class SwingFrameBuilderTest {
     }
 
     @Test
+    fun testSwingPrevCurrPartiesSwingSpecifyParties() {
+        val lib = Party("LIBERAL", "LIB", Color.RED)
+        val con = Party("CONSERVATIVE", "CON", Color.BLUE)
+        val ndp = Party("NEW DEMOCRATIC PARTY", "NDP", Color.ORANGE)
+        val prevBinding = mapOf(lib to 15, con to 25, ndp to 10).asOneTimePublisher()
+        val currBinding = mapOf(lib to 6, con to 10, ndp to 24).asOneTimePublisher()
+        // LIB: 30.00 -> 15.00 (-15.00)
+        // CON: 50.00 -> 25.00 (-25.00)
+        // NDP: 20.00 -> 60.00 (+40.00)
+        val partyOrder = listOf(ndp, lib, con)
+        val swingFrame = prevCurr(prevBinding, currBinding, compareBy { partyOrder.indexOf(it) }, setOf(lib, con).asOneTimePublisher())
+            .build()
+        assertEquals(Color.BLUE, swingFrame.getLeftColor())
+        assertEquals(Color.RED, swingFrame.getRightColor())
+        assertEquals(Color.RED, swingFrame.getBottomColor())
+        assertEquals(-0.05, swingFrame.getValue().toDouble(), 1e-6)
+        assertEquals(0.1, swingFrame.getRange().toDouble(), 1e-6)
+        assertEquals("5.0% SWING CON TO LIB", swingFrame.getBottomText())
+    }
+
+    @Test
     fun testNoSwingBetweenParties() {
         val lib = Party("LIBERAL", "LIB", Color.RED)
         val con = Party("CONSERVATIVE", "CON", Color.BLUE)

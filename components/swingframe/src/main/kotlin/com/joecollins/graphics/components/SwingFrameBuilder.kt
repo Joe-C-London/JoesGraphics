@@ -104,6 +104,7 @@ class SwingFrameBuilder {
         var fromParty: POC? = null
         var toParty: POC? = null
         var swing = 0.0
+        private var partyFilter: Collection<POC>? = null
 
         fun setPrevPct(prevPct: Map<out POC, Double>) {
             this.prevPct = prevPct
@@ -115,15 +116,22 @@ class SwingFrameBuilder {
             setProperties()
         }
 
+        fun setPartyFilter(partyFilter: Collection<POC>) {
+            this.partyFilter = partyFilter
+            setProperties()
+        }
+
         val publisher = Publisher(this)
 
         fun setProperties() {
             synchronized(this) {
                 fromParty = prevPct.entries
+                    .filter { e -> partyFilter?.contains(e.key) ?: true }
                     .filter { e -> !e.value.isNaN() }
                     .maxByOrNull { it.value }
                     ?.key
                 toParty = currPct.entries
+                    .filter { e -> partyFilter?.contains(e.key) ?: true }
                     .filter { e -> e.key != fromParty }
                     .filter { e -> !e.value.isNaN() }
                     .maxByOrNull { it.value }
@@ -149,8 +157,9 @@ class SwingFrameBuilder {
             prevPublisher: Flow.Publisher<out Map<out POC, Number>>,
             currPublisher: Flow.Publisher<out Map<out POC, Number>>,
             partyOrder: Comparator<POC>,
+            selectedParties: Flow.Publisher<out Collection<POC>>? = null,
         ): SwingFrameBuilder {
-            return prevCurr(prevPublisher, currPublisher, partyOrder, false)
+            return prevCurr(prevPublisher, currPublisher, partyOrder, false, selectedParties)
         }
 
         private fun <POC : PartyOrCoalition, C : Map<out POC, Number>, P : Map<out POC, Number>> prevCurr(
@@ -158,6 +167,7 @@ class SwingFrameBuilder {
             currPublisher: Flow.Publisher<out C>,
             partyOrder: Comparator<POC>,
             normalised: Boolean,
+            selectedParties: Flow.Publisher<out Collection<POC>>?,
         ): SwingFrameBuilder {
             val prevCurr = SelfPublishingPrevCurrPct<POC>()
             val toPctFunc = { votes: Map<out POC, Number> ->
@@ -166,6 +176,7 @@ class SwingFrameBuilder {
             }
             prevPublisher.subscribe(Subscriber { prevCurr.setPrevPct(toPctFunc(it)) })
             currPublisher.subscribe(Subscriber { prevCurr.setCurrPct(toPctFunc(it)) })
+            selectedParties?.subscribe(Subscriber { prevCurr.setPartyFilter(it) })
             val ret = basic(
                 prevCurr.publisher,
                 {
@@ -235,7 +246,7 @@ class SwingFrameBuilder {
             currPublisher: Flow.Publisher<out Map<out POC, Double>>,
             partyOrder: Comparator<POC>,
         ): SwingFrameBuilder {
-            return prevCurr(prevPublisher, currPublisher, partyOrder, true)
+            return prevCurr(prevPublisher, currPublisher, partyOrder, true, null)
         }
 
         fun <T> basic(

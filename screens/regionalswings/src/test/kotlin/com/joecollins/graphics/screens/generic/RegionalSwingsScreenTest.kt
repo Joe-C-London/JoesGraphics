@@ -104,4 +104,178 @@ class RegionalSwingsScreenTest {
             """.trimIndent(),
         )
     }
+
+    @Test
+    fun testRegionalSwingsSelectedParties() {
+        data class Region(
+            val name: String,
+            val curr: Map<PartyOrCoalition, Int>,
+            val prev: Map<PartyOrCoalition, Int>,
+        )
+        val con = Party("Conservative", "CON", Color.BLUE)
+        val lab = Party("Labour", "LAB", Color.RED)
+        val ld = Party("Liberal Democrat", "LD", Color.ORANGE)
+        val grn = Party("Green", "GRN", Color.GREEN.darker())
+        val brex = Party("Brexit", "BREX", Color.CYAN.darker())
+        val ukip = Party("UK Independence Party", "UKIP", Color.MAGENTA.darker())
+        val snp = Party("Scottish National Party", "SNP", Color.YELLOW)
+        val pc = Party("Plaid Cymru", "PC", Color.GREEN.darker().darker())
+        val oth = Party.OTHERS
+        val regions = listOf(
+            Region(
+                "England",
+                mapOf(
+                    con to 12710995,
+                    lab to 9123203,
+                    ld to 3335992,
+                    grn to 819759,
+                    brex to 545160,
+                    ukip to 17831,
+                    oth to 349855,
+                ),
+                mapOf(
+                    con to 12376530,
+                    lab to 11381899,
+                    ld to 2119310,
+                    grn to 505165,
+                    ukip to 556174,
+                    oth to 162229,
+                ),
+            ),
+            Region(
+                "Scotland",
+                mapOf(
+                    snp to 1242380,
+                    con to 692939,
+                    lab to 511838,
+                    ld to 263417,
+                    grn to 28122,
+                    brex to 13243,
+                    ukip to 3303,
+                    oth to 3819,
+                ),
+                mapOf(
+                    snp to 977569,
+                    con to 757949,
+                    lab to 717007,
+                    ld to 179061,
+                    grn to 5886,
+                    ukip to 5302,
+                    oth to 6921,
+                ),
+            ),
+            Region(
+                "Wales",
+                mapOf(
+                    lab to 632035,
+                    con to 557234,
+                    pc to 153265,
+                    ld to 92171,
+                    brex to 83908,
+                    grn to 15828,
+                    oth to 9916,
+                ),
+                mapOf(
+                    lab to 771354,
+                    con to 528839,
+                    pc to 164466,
+                    ld to 71039,
+                    ukip to 31376,
+                    grn to 5128,
+                    oth to 3612,
+                ),
+            ),
+            Region(
+                "North England",
+                mapOf(
+                    con to 2896774,
+                    lab to 3160167,
+                    ld to 567673,
+                    grn to 173909,
+                    brex to 385736,
+                    ukip to 5052,
+                    oth to 129259,
+                ),
+                mapOf(
+                    con to 2796274,
+                    lab to 3958320,
+                    ld to 381243,
+                    grn to 87992,
+                    ukip to 186095,
+                    oth to 49843,
+                ),
+            ),
+            Region(
+                "Midlands",
+                mapOf(
+                    con to 2729983,
+                    lab to 1659098,
+                    ld to 396568,
+                    grn to 140623,
+                    brex to 71990,
+                    ukip to 2576,
+                    oth to 49538,
+                ),
+                mapOf(
+                    con to 2551451,
+                    lab to 2127370,
+                    ld to 223899,
+                    grn to 79563,
+                    ukip to 106464,
+                    oth to 26483,
+                ),
+            ),
+            Region(
+                "South England",
+                mapOf(
+                    con to 7084238,
+                    lab to 4303938,
+                    ld to 2371751,
+                    grn to 505227,
+                    brex to 87434,
+                    ukip to 10203,
+                    oth to 171058,
+                ),
+                mapOf(
+                    con to 7028805,
+                    lab to 5296209,
+                    ld to 1514168,
+                    grn to 337610,
+                    ukip to 263615,
+                    oth to 85903,
+                ),
+            ),
+        )
+        val screen = RegionalSwingsScreen.of(
+            regions,
+            { it.name.uppercase().asOneTimePublisher() },
+            { it.curr.asOneTimePublisher() },
+            { it.prev.asOneTimePublisher() },
+            Comparator.comparing {
+                when (it) {
+                    lab -> -1
+                    con -> 1
+                    else -> 0
+                }
+            },
+            2,
+        )
+            .withPartyFilter(setOf(con, lab).asOneTimePublisher())
+            .build("UNITED KINGDOM".asOneTimePublisher())
+        screen.setSize(1024, 512)
+        compareRendering("RegionalSwingsScreen", "PartiesSelected", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            UNITED KINGDOM
+
+            ENGLAND: 4.8% SWING LAB TO CON
+            SCOTLAND: 2.5% SWING LAB TO CON
+            WALES: 5.3% SWING LAB TO CON
+            NORTH ENGLAND: 6.0% SWING LAB TO CON
+            MIDLANDS: 6.5% SWING LAB TO CON
+            SOUTH ENGLAND: 3.6% SWING LAB TO CON
+            """.trimIndent(),
+        )
+    }
 }
