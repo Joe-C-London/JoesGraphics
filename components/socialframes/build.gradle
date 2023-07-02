@@ -16,7 +16,7 @@ repositories {
 
 var topLevel = parent.parent
 
-def jacksonVersion = '2.15.0'
+def jacksonVersion = '2.15.2'
 
 dependencies {
     implementation topLevel.project('shapes')
@@ -33,7 +33,7 @@ dependencies {
     implementation group: 'org.apache.xmlgraphics', name: 'batik-parser', version: '1.16'
 
     testImplementation parent.parent.project('testutils')
-    testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.3.1'
+    testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.4.0'
     testImplementation "org.junit.jupiter:junit-jupiter-api:$topLevel.ext.junit_version"
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$topLevel.ext.junit_version"
 }
