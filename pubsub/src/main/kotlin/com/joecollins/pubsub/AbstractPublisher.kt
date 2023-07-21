@@ -138,7 +138,10 @@ abstract class AbstractPublisher<T> : Flow.Publisher<T> {
 
         override fun cancel() {
             synchronized(this) {
+                cancelled = true
+                queue.clear()
                 queue.offer(CancelWrapper())
+                waitingFor = 1L
                 process()
             }
         }
@@ -146,9 +149,6 @@ abstract class AbstractPublisher<T> : Flow.Publisher<T> {
         private inner class CancelWrapper<T> : Wrapper<T> {
             override fun handle(subscriber: Flow.Subscriber<in T>) {
                 synchronized(this@Subscription) {
-                    cancelled = true
-                    queue.clear()
-                    waitingFor = 0L
                     publisher.unsubscribe(this@Subscription)
                 }
             }
