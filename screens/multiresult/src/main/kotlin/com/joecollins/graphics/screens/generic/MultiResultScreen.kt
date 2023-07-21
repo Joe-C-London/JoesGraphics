@@ -457,19 +457,19 @@ class MultiResultScreen private constructor(
         private var swingFrame: SwingFrame? = null
         private var mapFrame: MapFrame? = null
         var displayBothRows = true
-        private val votes: Publisher<Flow.Publisher<out Map<Candidate, Int>>> = Publisher(Publisher(emptyMap()))
-        private val header: Publisher<Flow.Publisher<out String>> = Publisher(Publisher(""))
-        private val subhead: Publisher<Flow.Publisher<out String?>> = Publisher(Publisher(null))
-        private val pctReporting: Publisher<Flow.Publisher<out Double>> = Publisher(Publisher(1.0))
-        private val progressLabel: Publisher<Flow.Publisher<out String?>> = Publisher(Publisher(null))
-        private val winner: Publisher<Flow.Publisher<out Candidate?>> = Publisher(Publisher(null))
-        private val runoff: Publisher<Flow.Publisher<out Set<Candidate>?>> = Publisher(Publisher(emptySet()))
-        private val prevVotes: Publisher<Flow.Publisher<out Map<Party, Int>>> = Publisher(Publisher(emptyMap()))
-        private val maxBars: Publisher<Flow.Publisher<out Int>> = Publisher(Publisher(5))
-        private val swingHeader: Publisher<Flow.Publisher<out String?>> = Publisher(Publisher(null))
-        private val mapShape: Publisher<Flow.Publisher<out List<Pair<Shape, Color>>>> = Publisher(Publisher(emptyList()))
-        private val mapFocus: Publisher<Flow.Publisher<out List<Shape>>> = Publisher(Publisher(emptyList()))
-        private val mapHeader: Publisher<Flow.Publisher<out String>> = Publisher(Publisher(""))
+        private val votes: Publisher<Flow.Publisher<out Map<Candidate, Int>>> = Publisher(Publisher())
+        private val header: Publisher<Flow.Publisher<out String>> = Publisher(Publisher())
+        private val subhead: Publisher<Flow.Publisher<out String?>> = Publisher(Publisher())
+        private val pctReporting: Publisher<Flow.Publisher<out Double>> = Publisher(Publisher())
+        private val progressLabel: Publisher<Flow.Publisher<out String?>> = Publisher(Publisher())
+        private val winner: Publisher<Flow.Publisher<out Candidate?>> = Publisher(Publisher())
+        private val runoff: Publisher<Flow.Publisher<out Set<Candidate>?>> = Publisher(Publisher())
+        private val prevVotes: Publisher<Flow.Publisher<out Map<Party, Int>>> = Publisher(Publisher())
+        private val maxBars: Publisher<Flow.Publisher<out Int>> = Publisher(Publisher())
+        private val swingHeader: Publisher<Flow.Publisher<out String?>> = Publisher(Publisher())
+        private val mapShape: Publisher<Flow.Publisher<out List<Pair<Shape, Color>>>> = Publisher(Publisher())
+        private val mapFocus: Publisher<Flow.Publisher<out List<Shape>>> = Publisher(Publisher())
+        private val mapHeader: Publisher<Flow.Publisher<out String>> = Publisher(Publisher())
 
         fun setVotesPublisher(votes: Flow.Publisher<out Map<Candidate, Int>>) {
             this.votes.submit(votes)
