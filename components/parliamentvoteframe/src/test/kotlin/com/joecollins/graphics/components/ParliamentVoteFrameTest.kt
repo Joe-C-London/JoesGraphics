@@ -1,5 +1,6 @@
 package com.joecollins.graphics.components
 
+import com.joecollins.graphics.utils.PublisherTestUtils
 import com.joecollins.graphics.utils.RenderTestUtils
 import com.joecollins.models.general.Party
 import com.joecollins.pubsub.Publisher
@@ -26,9 +27,25 @@ class ParliamentVoteFrameTest {
         )
         frame.setSize(500, 250)
         RenderTestUtils.compareRendering("ParliamentVoteFrame", "ukHouse-1", frame)
+        PublisherTestUtils.assertPublishes(
+            frame.altText,
+            """
+            NATIONALITY AND BORDERS BILL: THIRD READING
+            AYES: ...
+            NOES: ...
+            """.trimIndent(),
+        )
 
         divisionResult.submit(intArrayOf(297, 229))
         RenderTestUtils.compareRendering("ParliamentVoteFrame", "ukHouse-2", frame)
+        PublisherTestUtils.assertPublishes(
+            frame.altText,
+            """
+            NATIONALITY AND BORDERS BILL: THIRD READING
+            AYES: 297
+            NOES: 229
+            """.trimIndent(),
+        )
 
         val con = Party("Conservative", "CON", Color.BLUE)
         val lab = Party("Labour", "LAB", Color.RED)
@@ -73,6 +90,14 @@ class ParliamentVoteFrameTest {
             ),
         )
         RenderTestUtils.compareRendering("ParliamentVoteFrame", "ukHouse-3", frame)
+        PublisherTestUtils.assertPublishes(
+            frame.altText,
+            """
+            NATIONALITY AND BORDERS BILL: THIRD READING
+            AYES: 297 (291 CON, 5 DUP, 1 IND)
+            NOES: 229 (166 LAB, 39 SNP, 11 LD, 3 PC, 2 ALBA, 2 SDLP, 1 GRN, 1 APNI, 4 IND)
+            """.trimIndent(),
+        )
     }
 
     @Test
@@ -92,9 +117,24 @@ class ParliamentVoteFrameTest {
         )
         frame.setSize(500, 250)
         RenderTestUtils.compareRendering("ParliamentVoteFrame", "ukHouseNoDivision-1", frame)
+        PublisherTestUtils.assertPublishes(
+            frame.altText,
+            """
+            EXITING THE EUROPEAN UNION (FINANCIAL SERVICES): TO APPROVE DRAFT INSOLVENCY 2 (GROUP SUPERVISION) (AMENDMENT) REGULATIONS 2021
+            AYES: ...
+            NOES: ...
+            """.trimIndent(),
+        )
 
         resultText.submit("AYE (NO DIVISION)")
         RenderTestUtils.compareRendering("ParliamentVoteFrame", "ukHouseNoDivision-2", frame)
+        PublisherTestUtils.assertPublishes(
+            frame.altText,
+            """
+            EXITING THE EUROPEAN UNION (FINANCIAL SERVICES): TO APPROVE DRAFT INSOLVENCY 2 (GROUP SUPERVISION) (AMENDMENT) REGULATIONS 2021
+            AYE (NO DIVISION)
+            """.trimIndent(),
+        )
     }
 
     @Test
@@ -114,6 +154,14 @@ class ParliamentVoteFrameTest {
         )
         frame.setSize(500, 250)
         RenderTestUtils.compareRendering("ParliamentVoteFrame", "usSenate-1", frame)
+        PublisherTestUtils.assertPublishes(
+            frame.altText,
+            """
+            IMPEACHMENT ARTICLE I: INCITEMENT OF INSURRECTION
+            GUILTY: ...
+            NOT GUILTY: ...
+            """.trimIndent(),
+        )
 
         divisionResult.submit(intArrayOf(57, 43))
 
@@ -136,5 +184,13 @@ class ParliamentVoteFrameTest {
             ),
         )
         RenderTestUtils.compareRendering("ParliamentVoteFrame", "usSenate-2", frame)
+        PublisherTestUtils.assertPublishes(
+            frame.altText,
+            """
+            IMPEACHMENT ARTICLE I: INCITEMENT OF INSURRECTION
+            GUILTY: 57 (48 DEM, 7 GOP, 2 IND)
+            NOT GUILTY: 43 (43 GOP)
+            """.trimIndent(),
+        )
     }
 }

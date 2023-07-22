@@ -20,7 +20,7 @@ import kotlin.math.roundToInt
 open class GenericPanel(
     panel: JPanel,
     label: Flow.Publisher<out String?>,
-    override val altText: Flow.Publisher<out String?> = null.asOneTimePublisher(),
+    override val altText: Flow.Publisher<out String?> = createAltText(panel, label),
 ) : JPanel(), AltTextProvider {
 
     protected val label: JLabel = FontSizeAdjustingLabel()
