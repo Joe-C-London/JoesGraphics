@@ -612,7 +612,7 @@ class BasicResultPanel private constructor(
 
             val prevBars = prev?.map { map ->
                 map.entries.asSequence()
-                    .sortedByDescending { seatTemplate.prevSortOrder(it.value) }
+                    .sortedByDescending { it.key.overrideSortOrder ?: seatTemplate.prevSortOrder(it.value) }
                     .map {
                         seatTemplate.createPrevBar(
                             it.key.abbreviation.uppercase(),
@@ -1316,11 +1316,7 @@ class BasicResultPanel private constructor(
                 val partialDeclaration = votes.values.any { it == null }
                 return aggregatedResult.entries.asSequence()
                     .sortedByDescending {
-                        if (it.key === others) {
-                            Int.MIN_VALUE
-                        } else {
-                            (it.value ?: -1)
-                        }
+                        keyTemplate.toParty(it.key).overrideSortOrder ?: it.value ?: -1
                     }
                     .map {
                         val pct = it.value?.toDouble()?.div(total) ?: Double.NaN
@@ -1438,7 +1434,7 @@ class BasicResultPanel private constructor(
                     cVotes.entries
                         .asSequence()
                         .filter { !prevHasOther || pVotes.containsKey(keyTemplate.toParty(it.key)) }
-                        .sortedByDescending { it.value!! }
+                        .sortedByDescending { keyTemplate.toParty(it.key).overrideSortOrder ?: it.value!! }
                         .map { keyTemplate.toParty(it.key) },
                 ).flatten().filterNotNull().distinct().toList().let {
                     if (it.size <= 10) {
@@ -1533,7 +1529,7 @@ class BasicResultPanel private constructor(
                     .map { votes ->
                         val total = votes.values.sum()
                         votes.entries.asSequence()
-                            .sortedByDescending { it.value }
+                            .sortedByDescending { it.key.overrideSortOrder ?: it.value }
                             .map {
                                 BasicBar(
                                     it.key.name.uppercase(),
@@ -1765,7 +1761,7 @@ class BasicResultPanel private constructor(
                         val allDeclared = filteredCurr.values.all { it != null }
                         val currGroupedByParty: Map<PartyOrCoalition, List<KT>> =
                             filteredCurr.entries.groupBy { keyTemplate.toParty(it.key) }
-                                .mapValues { v -> v.value.sortedByDescending { it.value ?: 0 }.map { it.key } }
+                                .mapValues { v -> v.value.sortedByDescending { keyTemplate.toParty(it.key).overrideSortOrder ?: it.value ?: 0 }.map { it.key } }
                         val currTotalByParty: Map<PartyOrCoalition, Int> = Aggregators.adjustKey(
                             filteredCurr.filterValues { it != null }
                                 .mapValues { it.value!! },
@@ -1780,7 +1776,7 @@ class BasicResultPanel private constructor(
                                 cVotes.entries
                                     .asSequence()
                                     .filter { !prevHasOther || pVotes.containsKey(it.key) }
-                                    .sortedByDescending { it.value }
+                                    .sortedByDescending { it.key.overrideSortOrder ?: it.value }
                                     .map { it.key },
                             ).flatten().filterNotNull().distinct().toSet()
                             Aggregators.adjustKey(cVotes) { if (partiesToShow.contains(it)) it else Party.OTHERS }
@@ -2031,7 +2027,7 @@ class BasicResultPanel private constructor(
         override fun createFrame(): BarFrame {
             val bars = current.map { curr ->
                 curr.entries.asSequence()
-                    .sortedByDescending { if (it.key === others) Double.MIN_VALUE else (it.value.start + it.value.endInclusive) }
+                    .sortedByDescending { keyTemplate.toParty(it.key).overrideSortOrder?.toDouble() ?: (it.value.start + it.value.endInclusive) }
                     .map {
                         val valueLabel = (
                             DECIMAL_FORMAT.format(100 * it.value.start) +
@@ -2182,7 +2178,7 @@ class BasicResultPanel private constructor(
             return currPreferences?.let { currPreferences ->
                 val bars = currPreferences.map { r ->
                     r.entries.asSequence()
-                        .sortedByDescending { if (it.key === others) Double.MIN_VALUE else (it.value.start + it.value.endInclusive) }
+                        .sortedByDescending { keyTemplate.toParty(it.key).overrideSortOrder?.toDouble() ?: (it.value.start + it.value.endInclusive) }
                         .map {
                             val valueLabel = (
                                 DECIMAL_FORMAT.format(100 * it.value.start) +
@@ -2273,7 +2269,7 @@ class BasicResultPanel private constructor(
                     .merge(changeTitle) { p, t ->
                         val total = p.values.sum().toDouble()
                         t + p.entries
-                            .sortedByDescending { it.value }
+                            .sortedByDescending { it.key.overrideSortOrder ?: it.value }
                             .joinToString("") { "\n${it.key.abbreviation}: ${PCT_FORMAT.format(it.value / total)}" }
                     }.merge(showPrevRaw) { t, b -> if (b) t else null }
             val preferenceText = preferenceHeader?.merge(preferenceSubhead ?: null.asOneTimePublisher(), combineHeadAndSub)
@@ -2407,7 +2403,7 @@ class BasicResultPanel private constructor(
                 } else {
                     r.values.sumOf { it!! }.toDouble()
                 }
-                r.entries.sortedByDescending { it.value ?: 0 }
+                r.entries.sortedByDescending { it.key.overrideSortOrder ?: it.value ?: 0 }
                     .map { (c, v) ->
                         BasicBar(
                             "${c.fullName.uppercase()}\n${c.description?.uppercase() ?: ""}",
@@ -2437,7 +2433,7 @@ class BasicResultPanel private constructor(
             val prevVotes = this.prevVotes ?: return null
             val bars = prevVotes.map { r ->
                 val total = r.values.sumOf { it }.toDouble()
-                r.entries.sortedByDescending { it.value }
+                r.entries.sortedByDescending { it.key.overrideSortOrder ?: it.value }
                     .map { (c, v) ->
                         BasicBar(
                             c.surname.uppercase(),
@@ -2459,7 +2455,7 @@ class BasicResultPanel private constructor(
                 .merge(subhead) { h, s -> listOfNotNull(h, s).filter { it.isNotEmpty() }.takeIf { it.isNotEmpty() }?.joinToString(", ") }
                 .merge(votes.merge(winner) { r, w -> r to w }) { h, (r, w) ->
                     val total = if (r.values.any { it == null }) null else r.values.sumOf { it!! }.toDouble()
-                    (if (h == null) "" else "$h\n") + r.entries.sortedByDescending { it.value ?: 0 }
+                    (if (h == null) "" else "$h\n") + r.entries.sortedByDescending { it.key.overrideSortOrder ?: it.value ?: 0 }
                         .joinToString("\n") { (c, v) ->
                             c.fullName.uppercase() +
                                 (if (c.description.isNullOrEmpty()) "" else " (${c.description!!.uppercase()})") + ": " +
@@ -2478,7 +2474,7 @@ class BasicResultPanel private constructor(
                 prevHeader!!.merge(prevSubhead!!) { h, s -> listOfNotNull(h, s).filter { it.isNotEmpty() }.takeIf { it.isNotEmpty() }?.joinToString(", ") }
                     .merge(prevVotes!!) { h, r ->
                         val total = r.values.sum().toDouble()
-                        (if (h == null) "" else "$h\n") + r.entries.sortedByDescending { it.value }
+                        (if (h == null) "" else "$h\n") + r.entries.sortedByDescending { it.key.overrideSortOrder ?: it.value }
                             .joinToString("\n") { (c, v) ->
                                 c.surname.uppercase() + ": " +
                                     (if (r.size == 1) "UNCONTESTED" else DecimalFormat("0.0%").format(v / total))
@@ -2659,7 +2655,7 @@ class BasicResultPanel private constructor(
                     }
                 val others = prev?.filterKeys { curr.isNotEmpty() && !curr.containsKey(it) }
                     ?.entries
-                    ?.sortedByDescending { it.value }
+                    ?.sortedByDescending { it.key.overrideSortOrder?.toDouble() ?: it.value }
                     ?.joinToString("") { "\n${it.key.name.uppercase()}: - (-${DecimalFormat("0.00").format(it.value)})" }
                     ?: ""
                 entries + others
