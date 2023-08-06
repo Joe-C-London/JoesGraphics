@@ -303,7 +303,10 @@ abstract class SocialMediaFrame<P : Post<P>>(
                 g.fill(tick)
             }
 
-            val logoShape = logo
+            val logoShape = logo.let { s ->
+                val transform = AffineTransform.getTranslateInstance(-s.bounds.minX, -s.bounds.minY)
+                transform.createTransformedShape(s)
+            }
             val resizeFactor = (height - 20.0) / logoShape.bounds.height
             val resizedLogo = AffineTransform.getScaleInstance(resizeFactor, resizeFactor).createTransformedShape(logoShape)
             val translateFactor = (width - 10.0 - resizedLogo.bounds.width)
