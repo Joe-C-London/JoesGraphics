@@ -1,10 +1,10 @@
 package com.joecollins.graphics.screens.generic
 
-import com.joecollins.graphics.screens.generic.BasicResultPanel.Companion.candidateVotes
-import com.joecollins.graphics.screens.generic.BasicResultPanel.Companion.candidateVotesPctOnly
-import com.joecollins.graphics.screens.generic.BasicResultPanel.Companion.nonPartisanVotes
-import com.joecollins.graphics.screens.generic.BasicResultPanel.Companion.partyRangeVotes
-import com.joecollins.graphics.screens.generic.BasicResultPanel.Companion.partyVotes
+import com.joecollins.graphics.screens.generic.BasicResultPanel.candidateVotes
+import com.joecollins.graphics.screens.generic.BasicResultPanel.candidateVotesPctOnly
+import com.joecollins.graphics.screens.generic.BasicResultPanel.nonPartisanVotes
+import com.joecollins.graphics.screens.generic.BasicResultPanel.partyRangeVotes
+import com.joecollins.graphics.screens.generic.BasicResultPanel.partyVotes
 import com.joecollins.graphics.utils.PublisherTestUtils.assertPublishes
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.graphics.utils.ShapefileReader.readShapes
