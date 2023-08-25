@@ -1,7 +1,7 @@
 package com.joecollins.graphics.screens.generic
 
-import com.joecollins.graphics.screens.generic.BasicResultPanel.candidateVotes
-import com.joecollins.graphics.screens.generic.BasicResultPanel.partyRangeVotes
+import com.joecollins.graphics.screens.generic.SimpleVoteViewPanel.Companion.candidateVotes
+import com.joecollins.graphics.screens.generic.SimpleVoteViewPanel.Companion.partyRangeVotes
 import com.joecollins.graphics.utils.PublisherTestUtils.assertPublishes
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.models.general.Candidate

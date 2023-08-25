@@ -41,6 +41,22 @@ class PartyQuotasPanel private constructor(
     altText,
 ) {
 
+    companion object {
+        fun <P : PartyOrCoalition> partyQuotas(
+            quotas: Flow.Publisher<out Map<out P, Double>>,
+            totalSeats: Flow.Publisher<out Int>,
+            header: Flow.Publisher<out String?>,
+            subhead: Flow.Publisher<out String?>,
+        ): PartyQuotasPanel.PartyQuotaScreenBuilder<P> {
+            return PartyQuotasPanel.PartyQuotaScreenBuilder(
+                quotas,
+                totalSeats,
+                header,
+                subhead,
+            )
+        }
+    }
+
     class PartyQuotaScreenBuilder<P : PartyOrCoalition>(
         private val quotas: Flow.Publisher<out Map<out P, Double>>,
         private val totalSeats: Flow.Publisher<out Int>,

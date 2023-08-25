@@ -1,12 +1,12 @@
 package com.joecollins.graphics.screens.generic
 
-import com.joecollins.graphics.screens.generic.BasicResultPanel.candidateDualSeats
-import com.joecollins.graphics.screens.generic.BasicResultPanel.candidateRangeSeats
-import com.joecollins.graphics.screens.generic.BasicResultPanel.candidateSeats
-import com.joecollins.graphics.screens.generic.BasicResultPanel.partyDualSeats
-import com.joecollins.graphics.screens.generic.BasicResultPanel.partyDualSeatsReversed
-import com.joecollins.graphics.screens.generic.BasicResultPanel.partyRangeSeats
-import com.joecollins.graphics.screens.generic.BasicResultPanel.partySeats
+import com.joecollins.graphics.screens.generic.SeatViewPanel.Companion.candidateDualSeats
+import com.joecollins.graphics.screens.generic.SeatViewPanel.Companion.candidateRangeSeats
+import com.joecollins.graphics.screens.generic.SeatViewPanel.Companion.candidateSeats
+import com.joecollins.graphics.screens.generic.SeatViewPanel.Companion.partyDualSeats
+import com.joecollins.graphics.screens.generic.SeatViewPanel.Companion.partyDualSeatsReversed
+import com.joecollins.graphics.screens.generic.SeatViewPanel.Companion.partyRangeSeats
+import com.joecollins.graphics.screens.generic.SeatViewPanel.Companion.partySeats
 import com.joecollins.graphics.utils.ColorUtils
 import com.joecollins.graphics.utils.PublisherTestUtils.assertPublishes
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering

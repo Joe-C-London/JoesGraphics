@@ -50,7 +50,7 @@ class PartyQuotasPanelTest {
         val currWinner = Publisher<Party?>(null)
         val round = Publisher(0)
 
-        val panel = BasicResultPanel.partyQuotas(
+        val panel = PartyQuotasPanel.partyQuotas(
             currRound.merge(currQuota) { votes, quota -> votes.mapValues { it.value / quota } },
             5.asOneTimePublisher(),
             "PARTY SUMMARY".asOneTimePublisher(),
@@ -452,7 +452,7 @@ class PartyQuotasPanelTest {
         val currRound = Publisher(currVotes.mapValues { it.value / currQuota })
         val prevRound = Publisher(prevVotes.mapValues { it.value / prevQuota })
 
-        val panel = BasicResultPanel.partyQuotas(
+        val panel = PartyQuotasPanel.partyQuotas(
             currRound,
             6.asOneTimePublisher(),
             "PARTY SUMMARY".asOneTimePublisher(),
@@ -515,7 +515,7 @@ class PartyQuotasPanelTest {
         val currWinner = Publisher<Party?>(null)
         val round = Publisher(0)
 
-        val panel = BasicResultPanel.partyQuotas(
+        val panel = PartyQuotasPanel.partyQuotas(
             currRound.merge(currQuota) { votes, quota -> votes.mapValues { it.value / quota } },
             5.asOneTimePublisher(),
             "PARTY SUMMARY".asOneTimePublisher(),

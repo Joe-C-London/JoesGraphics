@@ -9,6 +9,7 @@ import com.joecollins.graphics.components.SwingFrame
 import com.joecollins.graphics.components.SwingFrameBuilder
 import com.joecollins.models.general.Aggregators
 import com.joecollins.models.general.CanOverrideSortOrder
+import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.NonPartisanCandidate
 import com.joecollins.models.general.NonPartisanCandidateResult
 import com.joecollins.models.general.Party
@@ -56,6 +57,108 @@ class SimpleVoteViewPanel private constructor(
         private val PCT_FORMAT = DecimalFormat("0.0%")
         private val PCT_DIFF_FORMAT = DecimalFormat("+0.0%;-0.0%")
         private val THOUSANDS_FORMAT = DecimalFormat("#,##0")
+
+        fun <P : PartyOrCoalition> partyVotes(
+            votes: Flow.Publisher<out Map<out P, Int?>>,
+            header: Flow.Publisher<out String?>,
+            subhead: Flow.Publisher<out String?>,
+        ): VoteScreenBuilder<P, P, Int?, Double, Int> {
+            @Suppress("UNCHECKED_CAST")
+            return BasicVoteScreenBuilder(
+                votes,
+                header,
+                subhead,
+                BasicResultPanel.PartyTemplate(),
+                VotePctOnlyTemplate(),
+                Party.OTHERS as P,
+            )
+        }
+
+        fun candidateVotes(
+            votes: Flow.Publisher<out Map<Candidate, Int?>>,
+            header: Flow.Publisher<out String?>,
+            subhead: Flow.Publisher<out String?>,
+        ): VoteScreenBuilder<Candidate, Party, Int?, Double, Int> {
+            return BasicVoteScreenBuilder(
+                votes,
+                header,
+                subhead,
+                BasicResultPanel.CandidateTemplate(),
+                VotePctTemplate(),
+                Candidate.OTHERS,
+            )
+        }
+
+        fun candidateVotesPctOnly(
+            votes: Flow.Publisher<out Map<Candidate, Int?>>,
+            header: Flow.Publisher<out String?>,
+            subhead: Flow.Publisher<out String?>,
+        ): VoteScreenBuilder<Candidate, Party, Int?, Double, Int> {
+            return BasicVoteScreenBuilder(
+                votes,
+                header,
+                subhead,
+                BasicResultPanel.CandidateTemplate(),
+                VotePctOnlyTemplate(),
+                Candidate.OTHERS,
+            )
+        }
+
+        fun candidateVotes(
+            votes: Flow.Publisher<out Map<Candidate, Int?>>,
+            header: Flow.Publisher<out String?>,
+            subhead: Flow.Publisher<out String?>,
+            incumbentMarker: String,
+        ): VoteScreenBuilder<Candidate, Party, Int?, Double, Int> {
+            return BasicVoteScreenBuilder(
+                votes,
+                header,
+                subhead,
+                BasicResultPanel.CandidateTemplate(incumbentMarker),
+                VotePctTemplate(),
+                Candidate.OTHERS,
+            )
+        }
+
+        fun candidateVotesPctOnly(
+            votes: Flow.Publisher<out Map<Candidate, Int?>>,
+            header: Flow.Publisher<out String?>,
+            subhead: Flow.Publisher<out String?>,
+            incumbentMarker: String,
+        ): VoteScreenBuilder<Candidate, Party, Int?, Double, Int> {
+            return BasicVoteScreenBuilder(
+                votes,
+                header,
+                subhead,
+                BasicResultPanel.CandidateTemplate(incumbentMarker),
+                VotePctOnlyTemplate(),
+                Candidate.OTHERS,
+            )
+        }
+
+        fun <P : PartyOrCoalition> partyRangeVotes(
+            votes: Flow.Publisher<out Map<P, ClosedRange<Double>>>,
+            header: Flow.Publisher<out String?>,
+            subhead: Flow.Publisher<out String?>,
+        ): VoteScreenBuilder<P, P, ClosedRange<Double>, Double, Int> {
+            @Suppress("UNCHECKED_CAST")
+            return RangeVoteScreenBuilder(
+                votes,
+                header,
+                subhead,
+                BasicResultPanel.PartyTemplate(),
+                VotePctOnlyTemplate(),
+                Party.OTHERS as P,
+            )
+        }
+
+        fun nonPartisanVotes(
+            votes: Flow.Publisher<out Map<NonPartisanCandidate, Int?>>,
+            header: Flow.Publisher<out String?>,
+            subhead: Flow.Publisher<out String?>,
+        ): NonPartisanVoteBuilder {
+            return NonPartisanVoteBuilder(votes, header, subhead)
+        }
     }
 
     interface VoteTemplate {
@@ -64,7 +167,7 @@ class SimpleVoteViewPanel private constructor(
         fun toAltTextString(votes: Int, pct: Double, diffPct: Double?, symbols: String): String
     }
 
-    internal class VotePctTemplate : VoteTemplate {
+    private class VotePctTemplate : VoteTemplate {
         override fun toBarString(votes: Int, pct: Double, forceSingleLine: Boolean): String {
             return (
                 THOUSANDS_FORMAT.format(votes.toLong()) +
@@ -85,7 +188,7 @@ class SimpleVoteViewPanel private constructor(
         }
     }
 
-    internal class VotePctOnlyTemplate : VoteTemplate {
+    private class VotePctOnlyTemplate : VoteTemplate {
         override fun toBarString(votes: Int, pct: Double, forceSingleLine: Boolean): String {
             return PCT_FORMAT.format(pct)
         }
@@ -438,7 +541,7 @@ class SimpleVoteViewPanel private constructor(
         protected abstract fun createAltText(textHeader: Flow.Publisher<out String?>): Flow.Publisher<String>
     }
 
-    internal class BasicVoteScreenBuilder<KT : Any, KPT : PartyOrCoalition>(
+    private class BasicVoteScreenBuilder<KT : Any, KPT : PartyOrCoalition>(
         current: Flow.Publisher<out Map<out KT, Int?>>,
         header: Flow.Publisher<out String?>,
         subhead: Flow.Publisher<out String?>,
@@ -1193,7 +1296,7 @@ class SimpleVoteViewPanel private constructor(
         }
     }
 
-    internal class RangeVoteScreenBuilder<KT : Any, KPT : PartyOrCoalition>(
+    private class RangeVoteScreenBuilder<KT : Any, KPT : PartyOrCoalition>(
         current: Flow.Publisher<out Map<KT, ClosedRange<Double>>>,
         header: Flow.Publisher<out String?>,
         subhead: Flow.Publisher<out String?>,

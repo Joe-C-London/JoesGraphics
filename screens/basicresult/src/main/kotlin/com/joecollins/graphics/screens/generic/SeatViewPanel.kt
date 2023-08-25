@@ -8,6 +8,7 @@ import com.joecollins.graphics.components.SwingFrame
 import com.joecollins.graphics.components.SwingFrameBuilder
 import com.joecollins.models.general.Aggregators
 import com.joecollins.models.general.CanOverrideSortOrder
+import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyOrCoalition
 import com.joecollins.models.general.PartyResult
@@ -46,6 +47,102 @@ class SeatViewPanel private constructor(
     label,
     altText,
 ) {
+
+    companion object {
+        fun <P : PartyOrCoalition> partySeats(
+            seats: Flow.Publisher<out Map<out P, Int>>,
+            header: Flow.Publisher<out String?>,
+            subhead: Flow.Publisher<out String?>,
+        ): SeatScreenBuilder<P, P, Int, Int, *> {
+            return BasicSeatScreenBuilder(
+                seats,
+                header,
+                subhead,
+                BasicResultPanel.PartyTemplate(),
+            )
+        }
+
+        fun candidateSeats(
+            seats: Flow.Publisher<out Map<Candidate, Int>>,
+            header: Flow.Publisher<out String?>,
+            subhead: Flow.Publisher<out String?>,
+        ): SeatScreenBuilder<Candidate, Party, Int, Int, *> {
+            return BasicSeatScreenBuilder(
+                seats,
+                header,
+                subhead,
+                BasicResultPanel.CandidateTemplate(),
+            )
+        }
+
+        fun <P : PartyOrCoalition> partyDualSeats(
+            seats: Flow.Publisher<out Map<out P, Pair<Int, Int>>>,
+            header: Flow.Publisher<out String?>,
+            subhead: Flow.Publisher<out String?>,
+        ): SeatScreenBuilder<P, P, Pair<Int, Int>, Pair<Int, Int>, *> {
+            return DualSeatScreenBuilder(
+                seats,
+                header,
+                subhead,
+                BasicResultPanel.PartyTemplate(),
+                DualSeatScreenBuilder.FocusLocation.FIRST,
+            )
+        }
+
+        fun <P : PartyOrCoalition> partyDualSeatsReversed(
+            seats: Flow.Publisher<out Map<P, Pair<Int, Int>>>,
+            header: Flow.Publisher<out String?>,
+            subhead: Flow.Publisher<out String?>,
+        ): SeatScreenBuilder<P, P, Pair<Int, Int>, Pair<Int, Int>, *> {
+            return DualSeatScreenBuilder(
+                seats,
+                header,
+                subhead,
+                BasicResultPanel.PartyTemplate(),
+                DualSeatScreenBuilder.FocusLocation.LAST,
+            )
+        }
+
+        fun candidateDualSeats(
+            seats: Flow.Publisher<out Map<Candidate, Pair<Int, Int>>>,
+            header: Flow.Publisher<out String?>,
+            subhead: Flow.Publisher<out String?>,
+        ): SeatScreenBuilder<Candidate, Party, Pair<Int, Int>, Pair<Int, Int>, *> {
+            return DualSeatScreenBuilder(
+                seats,
+                header,
+                subhead,
+                BasicResultPanel.CandidateTemplate(),
+                DualSeatScreenBuilder.FocusLocation.FIRST,
+            )
+        }
+
+        fun <P : PartyOrCoalition> partyRangeSeats(
+            seats: Flow.Publisher<out Map<P, IntRange>>,
+            header: Flow.Publisher<out String?>,
+            subhead: Flow.Publisher<out String?>,
+        ): SeatScreenBuilder<P, P, IntRange, Int, *> {
+            return RangeSeatScreenBuilder(
+                seats,
+                header,
+                subhead,
+                BasicResultPanel.PartyTemplate(),
+            )
+        }
+
+        fun candidateRangeSeats(
+            seats: Flow.Publisher<out Map<Candidate, IntRange>>,
+            header: Flow.Publisher<out String?>,
+            subhead: Flow.Publisher<out String?>,
+        ): SeatScreenBuilder<Candidate, Party, IntRange, Int, *> {
+            return RangeSeatScreenBuilder(
+                seats,
+                header,
+                subhead,
+                BasicResultPanel.CandidateTemplate(),
+            )
+        }
+    }
 
     interface SeatTemplate<CT, PT, BAR> {
         fun sortOrder(value: CT?): Int?
@@ -706,7 +803,7 @@ class SeatViewPanel private constructor(
         }
     }
 
-    internal class BasicSeatScreenBuilder<KT : CanOverrideSortOrder, KPT : PartyOrCoalition>(
+    private class BasicSeatScreenBuilder<KT : CanOverrideSortOrder, KPT : PartyOrCoalition>(
         current: Flow.Publisher<out Map<out KT, Int>>,
         header: Flow.Publisher<out String?>,
         subhead: Flow.Publisher<out String?>,
@@ -744,7 +841,7 @@ class SeatViewPanel private constructor(
         }
     }
 
-    internal class DualSeatScreenBuilder<KT : CanOverrideSortOrder, KPT : PartyOrCoalition>(
+    private class DualSeatScreenBuilder<KT : CanOverrideSortOrder, KPT : PartyOrCoalition>(
         current: Flow.Publisher<out Map<out KT, Pair<Int, Int>>>,
         header: Flow.Publisher<out String?>,
         subhead: Flow.Publisher<out String?>,
@@ -798,7 +895,7 @@ class SeatViewPanel private constructor(
         }
     }
 
-    internal class RangeSeatScreenBuilder<KT : CanOverrideSortOrder, KPT : PartyOrCoalition>(
+    private class RangeSeatScreenBuilder<KT : CanOverrideSortOrder, KPT : PartyOrCoalition>(
         current: Flow.Publisher<out Map<KT, IntRange>>,
         header: Flow.Publisher<out String?>,
         subhead: Flow.Publisher<out String?>,
