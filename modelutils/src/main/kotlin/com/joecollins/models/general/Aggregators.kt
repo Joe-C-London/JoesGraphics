@@ -101,9 +101,9 @@ object Aggregators {
     }
 
     @Suppress("UNCHECKED_CAST")
-    fun <K, T : Int?> topAndOthers(result: Flow.Publisher<Map<K, T>>, limit: Int, others: K) = topAndOthers(result, limit, others, (Array<Any?>(0) { null } as Array<K>).asOneTimePublisher())
+    fun <K, T : Int?> topAndOthers(result: Flow.Publisher<Map<K, T>>, limit: Int, others: K) = topAndOthers(result, limit, others, (List<Any?>(0) { null } as Collection<K>).asOneTimePublisher())
 
-    fun <K, T : Int?> topAndOthers(result: Flow.Publisher<out Map<K, T>>, limit: Int, others: K, mustInclude: Flow.Publisher<out Array<K>>) = result.merge(mustInclude) { m, w -> topAndOthers(m, limit, others, *w) }
+    fun <K, T : Int?> topAndOthers(result: Flow.Publisher<out Map<K, T>>, limit: Int, others: K, mustInclude: Flow.Publisher<out Collection<K>>) = result.merge(mustInclude) { m, w -> topAndOthers(m, limit, others, w) }
 
     fun <K, T : Int?> topAndOthers(result: Map<out K, T>, limit: Int, others: K, vararg mustInclude: K): Map<K, T> {
         return topAndOthers(result, limit, others, mustInclude.toList())

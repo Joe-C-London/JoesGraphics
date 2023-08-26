@@ -289,7 +289,7 @@ class AggregatorsTest {
             votes,
             3,
             "OTHERS",
-            winner.map { if (it == null) emptyArray() else arrayOf(it) },
+            winner.map { if (it == null) emptyList() else listOf(it) },
         )
             .subscribe(Subscriber { output.value = it })
         assertEquals(mapOf("ABC" to 5, "JKL" to 4, "OTHERS" to 5), output.value)

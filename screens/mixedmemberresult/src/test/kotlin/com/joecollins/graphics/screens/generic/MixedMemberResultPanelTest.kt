@@ -972,7 +972,7 @@ class MixedMemberResultPanelTest {
         val candidateChangeHeader = Publisher("CONSTITUENCY CHANGE SINCE 2012")
         val partyHeader = Publisher("AT-LARGE VOTES")
         val partyChangeHeader = Publisher("AT-LARGE CHANGE SINCE 2012")
-        val topPartiesWaiting = Publisher(arrayOf(con, lab, ld, grn))
+        val topPartiesWaiting = Publisher(listOf(con, lab, ld, grn))
         val panel = MixedMemberResultPanel.builder()
             .withCandidateVotes(currentCandidateVotes, candidateHeader)
             .withPrevCandidateVotes(previousCandidateVotes, candidateChangeHeader)
@@ -1151,7 +1151,7 @@ class MixedMemberResultPanelTest {
 
         currPartyVotes[awp] = 1738
         currentPartyVotes.submit(currPartyVotes)
-        topPartiesWaiting.submit(arrayOf(con, lab, ld))
+        topPartiesWaiting.submit(listOf(con, lab, ld))
         compareRendering("MixedMemberResultPanel", "Declaration-5", panel)
         assertPublishes(
             panel.altText,
@@ -1182,7 +1182,7 @@ class MixedMemberResultPanelTest {
         currPartyVotes[bnp] = 1828
         currPartyVotes[ld] = 7799
         currentPartyVotes.submit(currPartyVotes)
-        topPartiesWaiting.submit(emptyArray())
+        topPartiesWaiting.submit(emptyList())
         compareRendering("MixedMemberResultPanel", "Declaration-6", panel)
         assertPublishes(
             panel.altText,
