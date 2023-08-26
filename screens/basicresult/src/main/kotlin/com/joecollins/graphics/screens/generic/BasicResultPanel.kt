@@ -17,7 +17,7 @@ object BasicResultPanel {
         fun runoffShape(forceSingleLine: Boolean): Shape
     }
 
-    internal class PartyTemplate<P : PartyOrCoalition> : KeyTemplate<P, P> {
+    class PartyTemplate<P : PartyOrCoalition> : KeyTemplate<P, P> {
         override fun toParty(key: P): P {
             return key
         }
@@ -35,7 +35,7 @@ object BasicResultPanel {
         }
     }
 
-    internal class CandidateTemplate : KeyTemplate<Candidate, Party> {
+    class CandidateTemplate : KeyTemplate<Candidate, Party> {
         private val incumbentMarker: String
 
         constructor() {
@@ -70,7 +70,7 @@ object BasicResultPanel {
 
     class CurrDiff<CT>(val curr: CT, val diff: CT)
 
-    internal fun <T> partyMapToResultMap(m: Map<T, PartyOrCoalition?>): Map<T, PartyResult?> {
+    fun <T> partyMapToResultMap(m: Map<T, PartyOrCoalition?>): Map<T, PartyResult?> {
         return m.mapValues { e -> e.value?.let { PartyResult.elected(it.toParty()) } }
     }
 }

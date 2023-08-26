@@ -1,0 +1,33 @@
+buildscript {
+    dependencies {
+        parent.buildscript.dependencies
+    }
+}
+plugins {
+    id 'kotlin'
+}
+
+group 'com.joecollins'
+version '1.0-SNAPSHOT'
+
+var topLevel = parent.parent
+
+dependencies {
+    implementation topLevel.project('modelutils')
+    implementation topLevel.project('pubsub')
+
+    implementation topLevel.project('screens:basicresult')
+    implementation topLevel.project('components:barframe')
+    implementation topLevel.project('components:resultmapframebuilder')
+    implementation topLevel.project('components:swingframe')
+
+    testImplementation topLevel.project('mapreaders:shapefile')
+    testImplementation topLevel.project('testutils')
+
+    testImplementation "org.junit.jupiter:junit-jupiter-api:$topLevel.ext.junit_version"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$topLevel.ext.junit_version"
+}
+
+test {
+    useJUnitPlatform()
+}
