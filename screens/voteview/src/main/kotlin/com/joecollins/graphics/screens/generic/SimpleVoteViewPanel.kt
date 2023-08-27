@@ -1411,10 +1411,10 @@ class SimpleVoteViewPanel private constructor(
                             cpctMin - ppct,
                             cpctMax - ppct,
                             "(" +
-                                    CHANGE_DECIMAL_FORMAT.format(100.0 * (cpctMin - ppct)) +
-                                    ")-(" +
-                                    CHANGE_DECIMAL_FORMAT.format(100.0 * (cpctMax - ppct)) +
-                                    ")%",
+                                CHANGE_DECIMAL_FORMAT.format(100.0 * (cpctMin - ppct)) +
+                                ")-(" +
+                                CHANGE_DECIMAL_FORMAT.format(100.0 * (cpctMax - ppct)) +
+                                ")%",
                         )
                     }
                     .toList()
