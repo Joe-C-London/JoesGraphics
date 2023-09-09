@@ -231,19 +231,19 @@ class SimpleVoteViewPanel private constructor(
         protected var subhead: Flow.Publisher<out String?>,
         protected val keyTemplate: BasicResultPanel.KeyTemplate<KT, KPT>,
         protected val voteTemplate: VoteTemplate,
-        protected val valueTemplate: ValueTemplate<CT>,
+        private val valueTemplate: ValueTemplate<CT>,
         protected val others: KT,
     ) {
         protected var showMajority: Flow.Publisher<out Boolean>? = null
         protected var majorityLabel: String? = null
-        protected var winner: Flow.Publisher<out KT?>? = null
-        protected var runoff: Flow.Publisher<out Set<KT>?>? = null
-        protected var pctReporting: Flow.Publisher<Double>? = null
-        protected var notes: Flow.Publisher<out String?>? = null
-        protected var limit = Int.MAX_VALUE
-        protected var mandatoryParties: Set<KPT> = emptySet()
+        private var winner: Flow.Publisher<out KT?>? = null
+        private var runoff: Flow.Publisher<out Set<KT>?>? = null
+        private var pctReporting: Flow.Publisher<Double>? = null
+        private var notes: Flow.Publisher<out String?>? = null
+        private var limit = Int.MAX_VALUE
+        private var mandatoryParties: Set<KPT> = emptySet()
         protected var prev: Flow.Publisher<out Map<out KPT, PT>>? = null
-        protected var prevRaw: Flow.Publisher<out Map<out KPT, PT>>? = null
+        private var prevRaw: Flow.Publisher<out Map<out KPT, PT>>? = null
         protected var showPrevRaw: Flow.Publisher<Boolean>? = null
         protected var changeHeader: Flow.Publisher<out String?>? = null
         protected var changeSubhead: Flow.Publisher<out String?>? = null
@@ -251,10 +251,10 @@ class SimpleVoteViewPanel private constructor(
         protected var prevPreferences: Flow.Publisher<out Map<out KPT, PT>>? = null
         protected var preferenceHeader: Flow.Publisher<out String?>? = null
         protected var preferenceSubhead: Flow.Publisher<out String?>? = null
-        protected var preferencePctReporting: Flow.Publisher<out Double>? = null
-        protected var swingHeader: Flow.Publisher<out String?>? = null
+        private var preferencePctReporting: Flow.Publisher<out Double>? = null
+        private var swingHeader: Flow.Publisher<out String?>? = null
         protected var swingComparator: Comparator<KPT>? = null
-        protected var swingRange: Flow.Publisher<Double>? = null
+        private var swingRange: Flow.Publisher<Double>? = null
         protected var classificationFunc: ((KPT) -> KPT)? = null
         protected var classificationHeader: Flow.Publisher<out String?>? = null
         private var mapBuilder: MapBuilder<*>? = null
@@ -267,10 +267,10 @@ class SimpleVoteViewPanel private constructor(
         protected abstract val diff: Flow.Publisher<out Map<out KPT, DT>>?
 
         protected val filteredPrev: Flow.Publisher<out Map<out KPT, PT>>?
-            get() {
-                val prev = this.prev ?: return null
+            by lazy {
+                val prev = this.prev ?: return@lazy null
                 if (runoffSubhead != null) {
-                    return current.merge(prev) { c, p ->
+                    return@lazy current.merge(prev) { c, p ->
                         if (c.keys.map { keyTemplate.toParty(it) }.toSet() == p.keys) {
                             p
                         } else {
@@ -279,7 +279,7 @@ class SimpleVoteViewPanel private constructor(
                     }
                 }
                 if (winnerNotRunningAgain != null) {
-                    return current.merge(prev) { c, p ->
+                    return@lazy current.merge(prev) { c, p ->
                         val winner = p.entries.maxByOrNull { it.value.toDouble() } ?: return@merge p
                         if (c.keys.map { keyTemplate.toParty(it) }.contains(winner.key)) {
                             p
@@ -288,17 +288,17 @@ class SimpleVoteViewPanel private constructor(
                         }
                     }
                 }
-                return prev
+                return@lazy prev
             }
-        protected val filteredChangeSubhead: Flow.Publisher<out String?>?
-            get() {
+        private val filteredChangeSubhead: Flow.Publisher<out String?>?
+            by lazy {
                 val runoffSubhead = this.runoffSubhead
                 val winnerNotRunningAgain = this.winnerNotRunningAgain
                 val changeSubhead = this.changeSubhead
                 val prev = this.prev
-                if (prev == null || changeSubhead == null) return changeSubhead
+                if (prev == null || changeSubhead == null) return@lazy changeSubhead
                 if (runoffSubhead != null) {
-                    return current.merge(prev) { c, p ->
+                    return@lazy current.merge(prev) { c, p ->
                         c.keys.map { keyTemplate.toParty(it) }.toSet() == p.keys
                     }.merge(runoffSubhead) { sameParties, subhead -> if (sameParties) null else subhead }
                         .let { subhead ->
@@ -314,7 +314,7 @@ class SimpleVoteViewPanel private constructor(
                         }
                 }
                 if (winnerNotRunningAgain != null) {
-                    return current.merge(prev) { c, p ->
+                    return@lazy current.merge(prev) { c, p ->
                         val winner = p.entries.maxByOrNull { it.value.toDouble() } ?: return@merge true
                         c.keys.map { keyTemplate.toParty(it) }.contains(winner.key)
                     }.merge(winnerNotRunningAgain) { winnerRunningAgain, subhead -> if (winnerRunningAgain) null else subhead }
@@ -330,7 +330,7 @@ class SimpleVoteViewPanel private constructor(
                             }
                         }
                 }
-                return changeSubhead
+                return@lazy changeSubhead
             }
 
         fun withPrev(
@@ -547,8 +547,11 @@ class SimpleVoteViewPanel private constructor(
             )
         }
 
-        private val results get() = (winner ?: null.asOneTimePublisher())
-            .merge(runoff ?: null.asOneTimePublisher()) { w, r -> w to r }
+        private val results: Flow.Publisher<Pair<KT?, Set<KT>?>>
+            by lazy {
+                (winner ?: null.asOneTimePublisher())
+                    .merge(runoff ?: null.asOneTimePublisher()) { w, r -> w to r }
+            }
 
         protected enum class Result {
             WINNER, RUNOFF
@@ -556,19 +559,25 @@ class SimpleVoteViewPanel private constructor(
 
         protected data class Entry<K, V>(val key: K, val value: V, val result: Result?)
 
-        private val mandatoryKeys get() = current.merge(results) { c, r ->
-            sequenceOf(
-                c.keys.filter { mandatoryParties.contains(keyTemplate.toParty(it)) },
-                r.first?.let { setOf(it) },
-                r.second,
-            ).filterNotNull().flatten().toSet()
-        }
+        private val mandatoryKeys: Flow.Publisher<Set<KT>>
+            by lazy {
+                current.merge(results) { c, r ->
+                    sequenceOf(
+                        c.keys.filter { mandatoryParties.contains(keyTemplate.toParty(it)) },
+                        r.first?.let { setOf(it) },
+                        r.second,
+                    ).filterNotNull().flatten().toSet()
+                }
+            }
 
-        protected val filteredCurr get() = current.merge(mandatoryKeys) { c, k -> valueTemplate.combine(c, limit, others, k) }
+        protected val filteredCurr: Flow.Publisher<Map<out KT, CT>>
+            by lazy {
+                current.merge(mandatoryKeys) { c, k -> valueTemplate.combine(c, limit, others, k) }
+            }
 
         protected val currEntries: Flow.Publisher<List<Entry<KT, CT>>>
-            get() {
-                return filteredCurr.merge(results) { c, r ->
+            by lazy {
+                filteredCurr.merge(results) { c, r ->
                     c.entries
                         .sortedByDescending { (k, v) -> keyTemplate.toParty(k).overrideSortOrder?.toDouble() ?: valueTemplate.sortOrder(v) }
                         .map { (k, v) ->
@@ -614,18 +623,21 @@ class SimpleVoteViewPanel private constructor(
             return builder.build()
         }
 
-        protected val currPreferencesEntries get() = currPreferences?.merge(results) { c, r ->
-            c.entries
-                .sortedByDescending { (k, v) -> keyTemplate.toParty(k).overrideSortOrder?.toDouble() ?: valueTemplate.sortOrder(v) }
-                .map { (k, v) ->
-                    val result = when {
-                        r.first == k -> Result.WINNER
-                        (r.second ?: emptySet()).contains(k) -> Result.RUNOFF
-                        else -> null
-                    }
-                    Entry(k, v, result)
+        protected val currPreferencesEntries: Flow.Publisher<List<Entry<KT, CT>>>?
+            by lazy {
+                currPreferences?.merge(results) { c, r ->
+                    c.entries
+                        .sortedByDescending { (k, v) -> keyTemplate.toParty(k).overrideSortOrder?.toDouble() ?: valueTemplate.sortOrder(v) }
+                        .map { (k, v) ->
+                            val result = when {
+                                r.first == k -> Result.WINNER
+                                (r.second ?: emptySet()).contains(k) -> Result.RUNOFF
+                                else -> null
+                            }
+                            Entry(k, v, result)
+                        }
                 }
-        }
+            }
 
         abstract fun createPreferenceResultFrameBuilder(): BarFrameBuilder?
 
@@ -640,16 +652,19 @@ class SimpleVoteViewPanel private constructor(
             return builder.build()
         }
 
-        protected val currClassificationEntries get() = classificationFunc?.let { func ->
-            current.map { c ->
-                c.entries
-                    .groupBy({ func(keyTemplate.toParty(it.key)) }, { it.value })
-                    .mapValues { it.value.reduce { a, b -> combineValuesForClassification(a, b) } }
-                    .entries
-                    .sortedByDescending { it.key.overrideSortOrder?.toDouble() ?: valueTemplate.sortOrder(it.value) }
-                    .map { Entry(it.key, it.value, null) }
+        protected val currClassificationEntries: Flow.Publisher<List<Entry<KPT, CT>>>?
+            by lazy {
+                classificationFunc?.let { func ->
+                    current.map { c ->
+                        c.entries
+                            .groupBy({ func(keyTemplate.toParty(it.key)) }, { it.value })
+                            .mapValues { it.value.reduce { a, b -> combineValuesForClassification(a, b) } }
+                            .entries
+                            .sortedByDescending { it.key.overrideSortOrder?.toDouble() ?: valueTemplate.sortOrder(it.value) }
+                            .map { Entry(it.key, it.value, null) }
+                    }
+                }
             }
-        }
 
         protected abstract fun createClassificationFrameBuilder(): BarFrameBuilder?
 
@@ -667,37 +682,43 @@ class SimpleVoteViewPanel private constructor(
 
         protected data class CurrDiffEntry<K, P, C, D>(val key: K?, val party: P, val curr: C?, val diff: D?, val result: Result?)
 
-        protected val diffEntries get() = diff?.merge(currEntries) { diff, curr ->
-            val partiesSeen = HashSet<KPT>()
-            val entries1 = curr.map { e ->
-                val party = keyTemplate.toParty(e.key)
-                CurrDiffEntry(
-                    e.key,
-                    party,
-                    e.value,
-                    if (partiesSeen.add(party)) diff[party] else null,
-                    e.result,
-                )
-            }
-            val entries2 = diff.entries
-                .filter { e -> !partiesSeen.contains(e.key) }
-                .map { e ->
-                    CurrDiffEntry(
-                        null,
-                        e.key,
-                        null,
-                        e.value,
-                        null,
-                    )
+        protected val diffEntries: Flow.Publisher<List<CurrDiffEntry<out KT, KPT, out CT, DT>>>?
+            by lazy {
+                diff?.merge(currEntries) { diff, curr ->
+                    val partiesSeen = HashSet<KPT>()
+                    val entries1 = curr.map { e ->
+                        val party = keyTemplate.toParty(e.key)
+                        CurrDiffEntry(
+                            e.key,
+                            party,
+                            e.value,
+                            if (partiesSeen.add(party)) diff[party] else null,
+                            e.result,
+                        )
+                    }
+                    val entries2 = diff.entries
+                        .filter { e -> !partiesSeen.contains(e.key) }
+                        .map { e ->
+                            CurrDiffEntry(
+                                null,
+                                e.key,
+                                null,
+                                e.value,
+                                null,
+                            )
+                        }
+                    entries1 + entries2
                 }
-            entries1 + entries2
-        }
+            }
 
-        protected val prevEntries get() = prevRaw?.map { prev ->
-            prev.entries
-                .sortedByDescending { it.key.overrideSortOrder?.toDouble() ?: it.value.toDouble() }
-                .map { Entry(it.key, it.value, null) }
-        }
+        protected val prevEntries: Flow.Publisher<List<Entry<KPT, PT>>>?
+            by lazy {
+                prevRaw?.map { prev ->
+                    prev.entries
+                        .sortedByDescending { it.key.overrideSortOrder?.toDouble() ?: it.value.toDouble() }
+                        .map { Entry(it.key, it.value, null) }
+                }
+            }
 
         private fun createDiffFrame(): BarFrame? {
             return (createDiffFrameBuilder() ?: return null)
@@ -797,18 +818,20 @@ class SimpleVoteViewPanel private constructor(
     ) : VoteScreenBuilder<KT, KPT, Int?, Double, Int, Double>(current, header, subhead, keyTemplate, voteTemplate, VoteValueTemplate, others) {
 
         override val diff: Flow.Publisher<out Map<out KPT, Double>>?
-            get() = filteredPrev?.merge(filteredCurr) { prev, curr ->
-                val prevHasOthers = prev.containsKey(keyTemplate.toParty(others))
-                val currByParty = curr.entries
-                    .groupBy({ keyTemplate.toParty(it.key).let { p -> if (prevHasOthers && !prev.containsKey(p)) keyTemplate.toParty(others) else p } }, { it.value })
-                    .mapValues { list -> list.value.sumOf { it ?: return@merge emptyMap() } }
-                val prevByParty = Aggregators.adjustKey(prev, { if (currByParty.containsKey(it)) it else keyTemplate.toParty(others) }, { a, b -> prevCombine(a, b) })
-                val allParties = sequenceOf(currByParty.keys, prevByParty.keys).flatten().toSet()
-                val currTotal = currByParty.values.sum()
-                val prevTotal = prev.values.sum()
-                if (currTotal == 0 || prevTotal == 0 || curr.any { it.value == null }) return@merge emptyMap()
-                allParties.associateWith {
-                    (currByParty[it] ?: 0).toDouble() / currTotal - (prevByParty[it] ?: 0).toDouble() / prevTotal
+            by lazy {
+                filteredPrev?.merge(filteredCurr) { prev, curr ->
+                    val prevHasOthers = prev.containsKey(keyTemplate.toParty(others))
+                    val currByParty = curr.entries
+                        .groupBy({ keyTemplate.toParty(it.key).let { p -> if (prevHasOthers && !prev.containsKey(p)) keyTemplate.toParty(others) else p } }, { it.value })
+                        .mapValues { list -> list.value.sumOf { it ?: return@merge emptyMap() } }
+                    val prevByParty = Aggregators.adjustKey(prev, { if (currByParty.containsKey(it)) it else keyTemplate.toParty(others) }, { a, b -> prevCombine(a, b) })
+                    val allParties = sequenceOf(currByParty.keys, prevByParty.keys).flatten().toSet()
+                    val currTotal = currByParty.values.sum()
+                    val prevTotal = prev.values.sum()
+                    if (currTotal == 0 || prevTotal == 0 || curr.any { it.value == null }) return@merge emptyMap()
+                    allParties.associateWith {
+                        (currByParty[it] ?: 0).toDouble() / currTotal - (prevByParty[it] ?: 0).toDouble() / prevTotal
+                    }
                 }
             }
 
@@ -1166,15 +1189,17 @@ class SimpleVoteViewPanel private constructor(
     ) : VoteScreenBuilder<KT, KPT, ClosedRange<Double>, Double, Int, ClosedRange<Double>>(current, header, subhead, keyTemplate, voteTemplate, RangeValueTemplate, others) {
 
         override val diff: Flow.Publisher<out Map<out KPT, ClosedRange<Double>>>?
-            get() = filteredPrev?.merge(filteredCurr) { prev, curr ->
-                val prevTotal = prev.values.sum()
-                if (prevTotal == 0) return@merge emptyMap()
-                val currByParty = Aggregators.adjustKey(curr, { keyTemplate.toParty(it) }, { a, b -> (a.start + b.start)..(a.endInclusive + b.endInclusive) })
-                val prevByParty = Aggregators.adjustKey(prev, { if (currByParty.containsKey(it)) it else keyTemplate.toParty(others) }, { a, b -> prevCombine(a, b) })
-                val allParties = sequenceOf(prevByParty.keys, currByParty.keys).flatten().toSet()
-                allParties.associateWith {
-                    val prevPct = (prevByParty[it] ?: 0).toDouble() / prevTotal
-                    (currByParty[it] ?: 0.0..0.0).let { curr -> (curr.start - prevPct)..(curr.endInclusive - prevPct) }
+            by lazy {
+                filteredPrev?.merge(filteredCurr) { prev, curr ->
+                    val prevTotal = prev.values.sum()
+                    if (prevTotal == 0) return@merge emptyMap()
+                    val currByParty = Aggregators.adjustKey(curr, { keyTemplate.toParty(it) }, { a, b -> (a.start + b.start)..(a.endInclusive + b.endInclusive) })
+                    val prevByParty = Aggregators.adjustKey(prev, { if (currByParty.containsKey(it)) it else keyTemplate.toParty(others) }, { a, b -> prevCombine(a, b) })
+                    val allParties = sequenceOf(prevByParty.keys, currByParty.keys).flatten().toSet()
+                    allParties.associateWith {
+                        val prevPct = (prevByParty[it] ?: 0).toDouble() / prevTotal
+                        (currByParty[it] ?: 0.0..0.0).let { curr -> (curr.start - prevPct)..(curr.endInclusive - prevPct) }
+                    }
                 }
             }
 
