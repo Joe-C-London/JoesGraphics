@@ -548,13 +548,75 @@ class SeatViewPanel private constructor(
             )
         }
 
+        protected enum class Result {
+            WINNER,
+        }
+
+        protected data class Entry<K, V>(val key: K, val value: V, val result: Result?)
+
+        private val currEntries: Flow.Publisher<List<Entry<KT, CT>>>
+            by lazy {
+                current.merge(winner ?: null.asOneTimePublisher()) { c, w ->
+                    c.entries
+                        .sortedByDescending { keyTemplate.toParty(it.key).overrideSortOrder ?: seatTemplate.sortOrder(it.value) ?: 0 }
+                        .map { Entry(it.key, it.value, if (it.key == w) Result.WINNER else null) }
+                }
+            }
+
+        protected data class CurrDiffEntry<K, P, C>(val key: K?, val party: P, val curr: C?, val diff: C?, val result: Result?)
+
+        private val diffEntries: Flow.Publisher<List<CurrDiffEntry<KT, KPT, CT>>>?
+            by lazy {
+                diff?.merge(currEntries) { diff, curr ->
+                    val partiesSeen = HashSet<KPT>()
+                    val entries1 = curr.map { e ->
+                        val party = keyTemplate.toParty(e.key)
+                        CurrDiffEntry<KT, KPT, CT>(
+                            e.key,
+                            party,
+                            e.value,
+                            if (partiesSeen.add(party)) diff[party]?.diff else null,
+                            e.result,
+                        )
+                    }
+                    val entries2 = diff.entries
+                        .filter { e -> !partiesSeen.contains(e.key) }
+                        .map { e ->
+                            CurrDiffEntry<KT, KPT, CT>(null, e.key, null, e.value.diff, null)
+                        }
+                    entries1 + entries2
+                }
+            }
+
+        private val classificationEntries: Flow.Publisher<List<Entry<KPT, CT>>>?
+            by lazy {
+                val classificationFunc = classificationFunc ?: return@lazy null
+                Aggregators.adjustKey(current, { classificationFunc(keyTemplate.toParty(it)) }, { v1, v2 -> seatTemplate.combine(v1, v2) })
+                    .map { c ->
+                        c.entries
+                            .sortedByDescending { it.key.overrideSortOrder ?: seatTemplate.sortOrder(it.value) ?: 0 }
+                            .map { Entry(it.key, it.value, null) }
+                    }
+            }
+
+        private val prevEntries: Flow.Publisher<List<Entry<KPT, PT>>>?
+            by lazy {
+                prev?.map { prev ->
+                    prev.entries
+                        .sortedByDescending { it.key.overrideSortOrder ?: seatTemplate.prevSortOrder(it.value) ?: 0 }
+                        .map { Entry(it.key, it.value, null) }
+                }
+            }
+
+        private val prevTotal: Flow.Publisher<Int>?
+            by lazy {
+                prev?.map { it.values.sumOf { v -> seatTemplate.prevSortOrder(v) ?: 0 } } ?: 0.asOneTimePublisher()
+            }
+
         private fun createFrame(): BarFrame {
             val forceSingleLine = current.map { it.size > doubleLineBarLimit() }
-            val shapes = (winner ?: null.asOneTimePublisher()).merge(forceSingleLine) { win, sl -> if (win == null) emptyMap() else mapOf(win to keyTemplate.winnerShape(sl)) }
-            val bars = current.merge(forceSingleLine) { c, sl -> c to sl }.merge(shapes) { (c, sl), sh ->
-                c.keys
-                    .sortedByDescending { keyTemplate.toParty(it).overrideSortOrder ?: seatTemplate.sortOrder(c[it]) ?: 0 }
-                    .map { seatTemplate.createBar(keyTemplate.toMainBarHeader(it, sl), keyTemplate.toParty(it).color, c[it] ?: seatTemplate.default, sh[it]) }
+            val bars = currEntries.merge(forceSingleLine) { c, sl ->
+                c.map { seatTemplate.createBar(keyTemplate.toMainBarHeader(it.key, sl), keyTemplate.toParty(it.key).color, it.value, if (it.result == Result.WINNER) keyTemplate.winnerShape(sl) else null) }
             }
             return createBarFrameBuilder(bars)
                 .withHeader(header, rightLabelPublisher = progressLabel)
@@ -579,11 +641,8 @@ class SeatViewPanel private constructor(
 
         private fun createClassificationFrame(): BarFrame? {
             return classificationHeader?.let { classificationHeader ->
-                val adjustedCurr = Aggregators.adjustKey(current, { classificationFunc!!(keyTemplate.toParty(it)) }, { v1, v2 -> seatTemplate.combine(v1, v2) })
-                val bars = adjustedCurr.map { c ->
-                    c.keys
-                        .sortedByDescending { it.overrideSortOrder ?: seatTemplate.sortOrder(c[it]) ?: 0 }
-                        .map { seatTemplate.createBar(it.name.uppercase(), it.color, c[it] ?: seatTemplate.default, null) }
+                val bars = (classificationEntries ?: return@let null).map { c ->
+                    c.map { seatTemplate.createBar(it.key.name.uppercase(), it.key.color, it.value, null) }
                 }
                 return createBarFrameBuilder(bars)
                     .withHeader(classificationHeader)
@@ -605,9 +664,8 @@ class SeatViewPanel private constructor(
             }
         }
         private fun createDiffFrame(): BarFrame? {
-            val diffBars = diff?.map { map ->
-                val topParties = map.entries
-                    .sortedByDescending { it.key.overrideSortOrder ?: seatTemplate.sortOrder(it.value.curr) }
+            val diffBars = diffEntries?.map { entries -> entries.filter { it.diff != null } }?.map { entries ->
+                val topParties = entries
                     .map { it.key }
                     .let {
                         if (it.size <= 10) {
@@ -616,30 +674,26 @@ class SeatViewPanel private constructor(
                             it.take(9)
                         }
                     }
-                Aggregators.adjustKey(
-                    map,
-                    { if (topParties.contains(it)) it else Party.OTHERS },
-                    { a, b ->
-                        BasicResultPanel.CurrDiff(
-                            seatTemplate.combine(a.curr, b.curr),
-                            seatTemplate.combine(a.diff, b.diff),
-                        )
-                    },
-                ).entries.asSequence()
-                    .sortedByDescending { it.key.overrideSortOrder ?: seatTemplate.sortOrder(it.value.curr) }
+                val topEntries = entries.filter { topParties.contains(it.key) }
+                val othEntries = entries.filter { !topParties.contains(it.key) }
+                    .takeUnless { it.isEmpty() }
+                    ?.map { it.diff!! }
+                    ?.reduce { a, b -> seatTemplate.combine(a, b) }
+                    ?.let { listOf(CurrDiffEntry<KT, PartyOrCoalition, CT>(null, Party.OTHERS, null, it, null)) }
+                    ?: emptyList()
+                (topEntries + othEntries).asSequence()
                     .map {
                         seatTemplate.createDiffBar(
-                            it.key.abbreviation.uppercase(),
-                            it.key.color,
-                            it.value.diff,
+                            it.party.abbreviation.uppercase(),
+                            it.party.color,
+                            it.diff!!,
                         )
                     }
                     .toList()
             }
 
-            val prevBars = prev?.map { map ->
-                map.entries.asSequence()
-                    .sortedByDescending { it.key.overrideSortOrder ?: seatTemplate.prevSortOrder(it.value) }
+            val prevBars = prevEntries?.map { entries ->
+                entries.asSequence()
                     .map {
                         seatTemplate.createPrevBar(
                             it.key.abbreviation.uppercase(),
@@ -670,7 +724,7 @@ class SeatViewPanel private constructor(
                     }
                     .also { b ->
                         showMajority?.merge(showPrevRaw) { sm, sr -> sm && sr }?.let { s ->
-                            val t = prev?.map { it.values.sumOf { v -> seatTemplate.prevSortOrder(v) ?: 0 } } ?: 0.asOneTimePublisher()
+                            val t = prevTotal ?: 0.asOneTimePublisher()
                             val lines = s.merge(t) { show, total ->
                                 if (show) {
                                     listOf(total / 2 + 1)
@@ -687,19 +741,22 @@ class SeatViewPanel private constructor(
         }
 
         private fun createSwingFrame(): SwingFrame? {
-            return swingHeader?.let { header ->
-                val prev = prevVotes!!
-                val curr = currVotes!!
-                val func = classificationFunc
-                SwingFrameBuilder.prevCurr(
-                    (if (func == null) prev else Aggregators.adjustKey(prev, func)),
-                    (if (func == null) curr else Aggregators.adjustKey(curr, func)),
-                    swingComparator!!,
-                )
-                    .withHeader(header)
-                    .withRange(swingRange!!)
-                    .build()
-            }
+            return (createSwingFrameBuilder() ?: return null)
+                .withHeader(swingHeader!!)
+                .withRange(swingRange!!)
+                .build()
+        }
+
+        private fun createSwingFrameBuilder(): SwingFrameBuilder? {
+            if (swingComparator == null) return null
+            val prev = prevVotes!!
+            val curr = currVotes!!
+            val func = classificationFunc
+            return SwingFrameBuilder.prevCurr(
+                (if (func == null) prev else Aggregators.adjustKey(prev, func)),
+                (if (func == null) curr else Aggregators.adjustKey(curr, func)),
+                swingComparator!!,
+            )
         }
 
         private fun createMapFrame(): MapFrame? {
@@ -730,19 +787,20 @@ class SeatViewPanel private constructor(
             val mainText = header.merge(progressLabel) { h, p -> h + (p?.let { " [$it]" } ?: "") }.merge(subhead, combineHeadAndSub)
             val changeText = (changeHeader ?: null.asOneTimePublisher()).merge((changeSubhead ?: null.asOneTimePublisher()), combineHeadAndSub)
                 .merge(showPrevRaw ?: false.asOneTimePublisher()) { text, raw -> if (raw) null else text }
-            val prevRaw = (changeHeader ?: null.asOneTimePublisher()).merge((changeSubhead ?: null.asOneTimePublisher()), combineHeadAndSub)
+            val prevRawHeader = (changeHeader ?: null.asOneTimePublisher()).merge((changeSubhead ?: null.asOneTimePublisher()), combineHeadAndSub)
                 .merge(showPrevRaw ?: false.asOneTimePublisher()) { text, raw -> if (raw) text else null }
-            val shapes = (winner ?: null.asOneTimePublisher()).map { if (it == null) emptyMap() else mapOf(it to "WINNER") }
-            val barsText = current.merge(diff?.merge(showPrevRaw ?: false.asOneTimePublisher()) { d, raw -> if (raw) emptyMap() else d } ?: emptyMap<KPT, BasicResultPanel.CurrDiff<CT>>().asOneTimePublisher()) { c, d -> c to d }.merge(shapes) { (c, d), s ->
-                val currText = c.keys
-                    .sortedByDescending { keyTemplate.toParty(it).overrideSortOrder ?: seatTemplate.sortOrder(c[it]) ?: 0 }
-                    .joinToString("") { "\n${barEntryLine(keyTemplate.toMainBarHeader(it, true), c[it] ?: seatTemplate.default, d[keyTemplate.toParty(it)]?.diff)}" + (s[it]?.let { c -> " $c" } ?: "") }
-                val currPrevKeys = c.keys.map { keyTemplate.toParty(it) }
-                val prevText = d.entries
-                    .filter { !currPrevKeys.contains(it.key) }
-                    .joinToString("") { "\n${barEntryLine(it.key.name.uppercase(), seatTemplate.default, it.value.diff)}" }
-                currText + prevText
+            val barsText = (showPrevRaw ?: false.asOneTimePublisher()).compose { prevRaw ->
+                if (prevRaw || diffEntries == null) {
+                    currEntries.map { entries ->
+                        entries.joinToString("") { "\n${barEntryLine(keyTemplate.toMainBarHeader(it.key, true), it.value, null)}" + (it.result?.let { c -> " $c" } ?: "") }
+                    }
+                } else {
+                    diffEntries!!.map { entries ->
+                        entries.joinToString("") { "\n${barEntryLine(if (it.key == null) it.party.name.uppercase() else keyTemplate.toMainBarHeader(it.key, true), it.curr ?: seatTemplate.default, it.diff)}" + (it.result?.let { c -> " $c" } ?: "") }
+                    }
+                }
             }
+
             val majorityText: Flow.Publisher<String?> = showMajority
                 ?.compose { maj ->
                     val majorityFunction = this.majorityFunction
@@ -755,44 +813,30 @@ class SeatViewPanel private constructor(
                 }
                 ?: null.asOneTimePublisher()
             val swingText: Flow.Publisher<out String?> =
-                if (currVotes == null || prevVotes == null) {
-                    null.asOneTimePublisher()
-                } else {
-                    val classificationFunc = this.classificationFunc
-                    SwingFrameBuilder.prevCurr(
-                        (if (classificationFunc == null) prevVotes!! else Aggregators.adjustKey(prevVotes!!, classificationFunc)),
-                        (if (classificationFunc == null) currVotes!! else Aggregators.adjustKey(currVotes!!, classificationFunc)),
-                        swingComparator!!,
-                    ).buildBottomText() ?: null.asOneTimePublisher()
-                }.merge(this.swingHeader ?: null.asOneTimePublisher()) { text, head ->
-                    if (text == null && head == null) {
-                        null
-                    } else if (text == null) {
-                        head
-                    } else if (head == null) {
+                createSwingFrameBuilder()?.buildBottomText()?.merge(this.swingHeader!!) { text, head ->
+                    if (head == null) {
                         text
                     } else {
                         "$head: $text"
                     }
-                }
-            val classificationText: Flow.Publisher<out String?> = classificationHeader?.merge(current) { h, c ->
-                val cg: Map<KPT, CT> = Aggregators.adjustKey(c, { classificationFunc!!(keyTemplate.toParty(it)) }, { v1, v2 -> seatTemplate.combine(v1, v2) })
-                (h ?: "") + cg.entries
-                    .sortedByDescending { it.key.overrideSortOrder ?: seatTemplate.sortOrder(it.value) }
-                    .joinToString("") { "\n${it.key.name.uppercase()}: ${it.value}" }
-            } ?: null.asOneTimePublisher()
-            val prevRawText: Flow.Publisher<out String?> = prev?.merge(showPrevRaw ?: false.asOneTimePublisher()) { p, raw -> if (raw) p else null }
-                ?.merge(showMajority ?: false.asOneTimePublisher()) { p, m -> p to m }
-                ?.merge(prevRaw) { (p, m), t ->
-                    if (p == null) {
-                        null
-                    } else {
-                        t + p.entries
-                            .sortedByDescending { it.key.overrideSortOrder ?: seatTemplate.prevSortOrder(it.value) }
-                            .joinToString("") { "\n${it.key.abbreviation}: ${seatTemplate.prevLabelText(it.value)}" } +
-                            if (m && majorityFunction != null) ("\n${majorityFunction!!(p.values.sumOf { seatTemplate.prevSortOrder(it)!! } / 2 + 1)}") else ""
-                    }
                 } ?: null.asOneTimePublisher()
+            val classificationText: Flow.Publisher<out String?> = classificationEntries?.merge(classificationHeader ?: null.asOneTimePublisher()) { e, h ->
+                (h ?: "") + e.joinToString("") { "\n${it.key.name.uppercase()}: ${it.value}" }
+            } ?: null.asOneTimePublisher()
+            val prevRawText: Flow.Publisher<out String?> = if (showPrevRaw == null) {
+                null.asOneTimePublisher()
+            } else
+                showPrevRaw!!.compose { showPrevRaw ->
+                    if (!showPrevRaw) return@compose null.asOneTimePublisher()
+                    val prevLines = prevEntries!!.map { entries ->
+                        entries.joinToString("") { "\n${it.key.abbreviation}: ${seatTemplate.prevLabelText(it.value)}" }
+                    }
+                    if (showMajority == null || prevTotal == null) return@compose prevLines
+                    val majorityLines = showMajority!!.merge(prevTotal!!) { majority, total ->
+                        if (majority && majorityFunction != null) ("\n${majorityFunction!!(total / 2 + 1)}") else ""
+                    }
+                    prevLines.merge(majorityLines) { p, m -> p + m }
+                }.merge(prevRawHeader) { text, head -> if (text == null) null else (head + text) }
             return mainText.merge(changeText) { main, change -> main + (if (change == null) "" else " ($change)") }
                 .merge(textHeader) { second, head -> if (head == null) second else "$head\n\n$second" }
                 .merge(barsText) { first, next -> first + next }
