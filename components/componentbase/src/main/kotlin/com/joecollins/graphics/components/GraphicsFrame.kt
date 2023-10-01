@@ -4,7 +4,6 @@ import com.joecollins.graphics.utils.ColorUtils
 import com.joecollins.graphics.utils.StandardFont
 import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
-import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.map
 import org.jetbrains.annotations.TestOnly
 import java.awt.BorderLayout
@@ -34,7 +33,7 @@ open class GraphicsFrame(
     headerLabelsPublisher: Flow.Publisher<out Map<HeaderLabelLocation, String?>>? = null,
 ) : JPanel() {
 
-    enum class Alignment(val jlabelAlignment: Int) {
+    enum class Alignment(internal val jlabelAlignment: Int) {
         LEFT(JLabel.LEFT),
         CENTER(JLabel.CENTER),
         RIGHT(JLabel.RIGHT),
@@ -45,15 +44,17 @@ open class GraphicsFrame(
         RIGHT,
     }
 
-    private val headerFont = StandardFont.readNormalFont(24)
-    private val additionalHeaderFont = StandardFont.readNormalFont(20)
-    private val additionalHeaderBorder = { c: Color -> MatteBorder(2, 2, 2, 2, c) }
+    companion object {
+        private val HEADER_FONT = StandardFont.readNormalFont(24)
+        private val ADDITIONAL_HEADER_FONT = StandardFont.readNormalFont(20)
+        private val ADDITIONAL_HEADER_BORDER = { c: Color -> MatteBorder(2, 2, 2, 2, c) }
+    }
 
-    private val headerPanel = JPanel()
-    private val headerLabel = FontSizeAdjustingLabel()
-    private val notesLabel = FontSizeAdjustingLabel()
-    private val additionalHeaderPanels = HeaderLabelLocation.values().associateWith { JPanel() }
-    private val additionalHeaderLabels = HeaderLabelLocation.values().associateWith { FontSizeAdjustingLabel() }
+    private val headerPanel: JPanel
+    private val headerLabel: JLabel
+    private val notesLabel: JLabel
+    private val additionalHeaderPanels: Map<HeaderLabelLocation, JPanel>
+    private val additionalHeaderLabels: Map<HeaderLabelLocation, JLabel>
 
     init {
         layout = BorderLayout()
@@ -63,34 +64,45 @@ open class GraphicsFrame(
         preferredSize = Dimension(1024, 1024)
         minimumSize = Dimension(1, 1)
 
-        headerPanel.layout = HeaderLayout()
-        headerPanel.background = Color.BLACK
+        headerPanel = JPanel().apply {
+            layout = HeaderLayout()
+            background = Color.BLACK
+        }
         add(headerPanel, BorderLayout.NORTH)
 
-        headerLabel.foreground = Color.WHITE
-        headerLabel.horizontalAlignment = JLabel.CENTER
-        headerLabel.font = headerFont
-        headerLabel.border = EmptyBorder(3, 0, -3, 0)
+        headerLabel = FontSizeAdjustingLabel().apply {
+            foreground = Color.WHITE
+            horizontalAlignment = JLabel.CENTER
+            font = HEADER_FONT
+            border = EmptyBorder(3, 0, -3, 0)
+        }
         headerPanel.add(headerLabel)
 
-        notesLabel.foreground = Color.BLACK
-        notesLabel.horizontalAlignment = JLabel.RIGHT
-        notesLabel.font = StandardFont.readNormalFont(12)
-        notesLabel.border = EmptyBorder(2, 0, -2, 0)
+        notesLabel = FontSizeAdjustingLabel().apply {
+            foreground = Color.BLACK
+            horizontalAlignment = JLabel.RIGHT
+            font = StandardFont.readNormalFont(12)
+            border = EmptyBorder(2, 0, -2, 0)
+        }
         add(notesLabel, BorderLayout.SOUTH)
 
-        HeaderLabelLocation.values().forEach { loc ->
-            val panel = additionalHeaderPanels[loc]!!
-            val label = additionalHeaderLabels[loc]!!
-            panel.layout = GridLayout(1, 1)
-            panel.background = Color.WHITE
-            panel.border = additionalHeaderBorder(Color.BLACK)
-            panel.isVisible = false
-            label.font = additionalHeaderFont
-            label.horizontalAlignment = JLabel.CENTER
-            label.border = EmptyBorder(3, 0, -3, 0)
-            panel.add(label)
-            headerPanel.add(panel)
+        additionalHeaderLabels = HeaderLabelLocation.values().associateWith {
+            FontSizeAdjustingLabel().apply {
+                font = ADDITIONAL_HEADER_FONT
+                horizontalAlignment = JLabel.CENTER
+                border = EmptyBorder(3, 0, -3, 0)
+                foreground = Color.BLACK
+            }
+        }
+
+        additionalHeaderPanels = HeaderLabelLocation.values().associateWith {
+            JPanel().apply {
+                layout = GridLayout(1, 1)
+                background = Color.WHITE
+                border = ADDITIONAL_HEADER_BORDER(Color.BLACK)
+                isVisible = false
+                add(additionalHeaderLabels[it]!!)
+            }.also { panel -> headerPanel.add(panel) }
         }
 
         headerPublisher.subscribe(
@@ -105,7 +117,7 @@ open class GraphicsFrame(
             ),
         )
 
-        (headerAlignmentPublisher ?: Alignment.CENTER.asOneTimePublisher()).subscribe(
+        headerAlignmentPublisher?.subscribe(
             Subscriber(
                 eventQueueWrapper {
                     headerLabel.horizontalAlignment = it.jlabelAlignment
@@ -116,7 +128,7 @@ open class GraphicsFrame(
             ),
         )
 
-        (notesPublisher ?: null.asOneTimePublisher()).subscribe(
+        notesPublisher?.subscribe(
             Subscriber(
                 eventQueueWrapper {
                     notesLabel.isVisible = (it != null)
@@ -125,14 +137,13 @@ open class GraphicsFrame(
             ),
         )
 
-        val borderColor = borderColorPublisher ?: Color.BLACK.asOneTimePublisher()
-        borderColor.subscribe(
+        borderColorPublisher?.subscribe(
             Subscriber(
                 eventQueueWrapper {
                     border = MatteBorder(1, 1, 1, 1, it)
                     headerPanel.background = it
                     notesLabel.foreground = it
-                    additionalHeaderPanels.values.forEach { label -> label.border = additionalHeaderBorder(it) }
+                    additionalHeaderPanels.values.forEach { label -> label.border = ADDITIONAL_HEADER_BORDER(it) }
                     additionalHeaderLabels.values.forEach { label -> label.foreground = it }
                 },
             ),
@@ -140,9 +151,8 @@ open class GraphicsFrame(
 
         val headerTextColor = headerTextColorPublisher
             ?: borderColorPublisher?.map { ColorUtils.foregroundToContrast(it) }
-            ?: Color.WHITE.asOneTimePublisher()
         headerTextColor
-            .subscribe(
+            ?.subscribe(
                 Subscriber(
                     eventQueueWrapper {
                         headerLabel.foreground = it
