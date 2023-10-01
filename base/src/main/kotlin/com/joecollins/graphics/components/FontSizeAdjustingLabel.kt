@@ -15,11 +15,10 @@ class FontSizeAdjustingLabel() : JLabel() {
     override fun paintComponent(g: Graphics) {
         val font = super.getFont()
         if (font != null) {
-            var newFont = font
-            for (size in font.size downTo 2) {
-                newFont = font.deriveFont(size.toFloat())
-                if (getStringWidth(newFont) <= width - 6) break
-            }
+            val minSize = 2
+            val newFont = (font.size downTo minSize).asSequence()
+                .map { font.deriveFont(it.toFloat()) }
+                .first { it.size == minSize || getStringWidth(it) <= width - 6 }
             g.font = newFont
         }
         super.paintComponent(g)
