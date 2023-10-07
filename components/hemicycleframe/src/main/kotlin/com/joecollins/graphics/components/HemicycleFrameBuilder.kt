@@ -1,6 +1,5 @@
 package com.joecollins.graphics.components
 
-import com.google.common.annotations.Beta
 import com.joecollins.graphics.utils.ColorUtils
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
@@ -16,151 +15,16 @@ import java.awt.Point
 import java.util.concurrent.Flow
 import kotlin.math.abs
 
-class HemicycleFrameBuilder {
-    private var headerPublisher: Flow.Publisher<out String?>? = null
-    private var leftSeatBarPublisher: Flow.Publisher<out List<HemicycleFrame.Bar>>? = null
-    private var leftSeatBarLabelPublisher: Flow.Publisher<out String>? = null
-    private var rightSeatBarPublisher: Flow.Publisher<out List<HemicycleFrame.Bar>>? = null
-    private var rightSeatBarLabelPublisher: Flow.Publisher<out String>? = null
-    private var middleSeatBarPublisher: Flow.Publisher<out List<HemicycleFrame.Bar>>? = null
-    private var middleSeatBarLabelPublisher: Flow.Publisher<out String>? = null
-    private var leftChangeBarPublisher: Flow.Publisher<out List<HemicycleFrame.Bar>>? = null
-    private var leftChangeBarStartPublisher: Flow.Publisher<out Int>? = null
-    private var leftChangeBarLabelPublisher: Flow.Publisher<out String>? = null
-    private var rightChangeBarPublisher: Flow.Publisher<out List<HemicycleFrame.Bar>>? = null
-    private var rightChangeBarStartPublisher: Flow.Publisher<out Int>? = null
-    private var rightChangeBarLabelPublisher: Flow.Publisher<out String>? = null
-    private var rowsPublisher: Flow.Publisher<out List<Int>>? = null
-    private var dotsPublisher: Flow.Publisher<out List<HemicycleFrame.Dot>>? = null
+object HemicycleFrameBuilder {
+    class Dots<T> {
+        lateinit var rows: List<Int>
+        lateinit var entries: List<T>
+        var seatsFunc: T.() -> Int = { 1 }
+        lateinit var colorFunc: T.() -> Flow.Publisher<out Color>
+        var borderFunc: T.() -> Flow.Publisher<out Color> = { colorFunc() }
+        lateinit var tiebreaker: Tiebreaker
 
-    enum class Tiebreaker {
-        FRONT_ROW_FROM_LEFT, FRONT_ROW_FROM_RIGHT
-    }
-
-    fun withHeader(headerPublisher: Flow.Publisher<out String?>): HemicycleFrameBuilder {
-        this.headerPublisher = headerPublisher
-        return this
-    }
-
-    fun <T> withLeftSeatBars(
-        bars: Flow.Publisher<out List<T>>,
-        colorFunc: (T) -> Color,
-        seatFunc: (T) -> Int,
-        labelPublisher: Flow.Publisher<out String>,
-    ): HemicycleFrameBuilder {
-        this.leftSeatBarPublisher = bars.mapElements { HemicycleFrame.Bar(color = colorFunc(it), size = seatFunc(it)) }
-        this.leftSeatBarLabelPublisher = labelPublisher
-        return this
-    }
-
-    fun <T> withRightSeatBars(
-        bars: Flow.Publisher<out List<T>>,
-        colorFunc: (T) -> Color,
-        seatFunc: (T) -> Int,
-        labelPublisher: Flow.Publisher<out String>,
-    ): HemicycleFrameBuilder {
-        this.rightSeatBarPublisher = bars.mapElements { HemicycleFrame.Bar(color = colorFunc(it), size = seatFunc(it)) }
-        this.rightSeatBarLabelPublisher = labelPublisher
-        return this
-    }
-
-    fun <T> withMiddleSeatBars(
-        bars: Flow.Publisher<out List<T>>,
-        colorFunc: (T) -> Color,
-        seatFunc: (T) -> Int,
-        labelPublisher: Flow.Publisher<out String>,
-    ): HemicycleFrameBuilder {
-        this.middleSeatBarPublisher = bars.mapElements { HemicycleFrame.Bar(color = colorFunc(it), size = seatFunc(it)) }
-        this.middleSeatBarLabelPublisher = labelPublisher
-        return this
-    }
-
-    fun <T> withLeftChangeBars(
-        bars: Flow.Publisher<out List<T>>,
-        colorFunc: (T) -> Color,
-        seatFunc: (T) -> Int,
-        startPublisher: Flow.Publisher<out Int>,
-        labelPublisher: Flow.Publisher<out String>,
-    ): HemicycleFrameBuilder {
-        this.leftChangeBarPublisher = bars.mapElements { HemicycleFrame.Bar(color = colorFunc(it), size = seatFunc(it)) }
-        this.leftChangeBarStartPublisher = startPublisher
-        this.leftChangeBarLabelPublisher = labelPublisher
-        return this
-    }
-
-    fun <T> withRightChangeBars(
-        bars: Flow.Publisher<out List<T>>,
-        colorFunc: (T) -> Color,
-        seatFunc: (T) -> Int,
-        startPublisher: Flow.Publisher<out Int>,
-        labelPublisher: Flow.Publisher<out String>,
-    ): HemicycleFrameBuilder {
-        this.rightChangeBarPublisher = bars.mapElements { HemicycleFrame.Bar(color = colorFunc(it), size = seatFunc(it)) }
-        this.rightChangeBarStartPublisher = startPublisher
-        this.rightChangeBarLabelPublisher = labelPublisher
-        return this
-    }
-
-    fun build(): HemicycleFrame {
-        return HemicycleFrame(
-            headerPublisher = headerPublisher ?: (null as String?).asOneTimePublisher(),
-            rowsPublisher = rowsPublisher,
-            dotsPublisher = dotsPublisher ?: emptyList<HemicycleFrame.Dot>().asOneTimePublisher(),
-            leftSeatBarPublisher = leftSeatBarPublisher,
-            leftSeatBarLabelPublisher = leftSeatBarLabelPublisher,
-            rightSeatBarPublisher = rightSeatBarPublisher,
-            rightSeatBarLabelPublisher = rightSeatBarLabelPublisher,
-            middleSeatBarPublisher = middleSeatBarPublisher,
-            middleSeatBarLabelPublisher = middleSeatBarLabelPublisher,
-            leftChangeBarPublisher = leftChangeBarPublisher,
-            leftChangeBarStartPublisher = leftChangeBarStartPublisher,
-            leftChangeBarLabelPublisher = leftChangeBarLabelPublisher,
-            rightChangeBarPublisher = rightChangeBarPublisher,
-            rightChangeBarStartPublisher = rightChangeBarStartPublisher,
-            rightChangeBarLabelPublisher = rightChangeBarLabelPublisher,
-        )
-    }
-
-    companion object {
-        fun <T> of(
-            rows: List<Int>,
-            entries: List<T>,
-            colorFunc: (T) -> Flow.Publisher<out Color>,
-            tiebreaker: Tiebreaker,
-        ): HemicycleFrameBuilder {
-            return of(rows, entries, colorFunc, colorFunc, tiebreaker)
-        }
-
-        fun <T> of(
-            rows: List<Int>,
-            entries: List<T>,
-            colorFunc: (T) -> Flow.Publisher<out Color>,
-            borderFunc: (T) -> Flow.Publisher<out Color>,
-            tiebreaker: Tiebreaker,
-        ): HemicycleFrameBuilder {
-            return ofClustered(rows, entries, { 1 }, colorFunc, borderFunc, tiebreaker)
-        }
-
-        @Beta
-        fun <T> ofClustered(
-            rows: List<Int>,
-            entries: List<T>,
-            seatsFunc: (T) -> Int,
-            colorFunc: (T) -> Flow.Publisher<out Color>,
-            tiebreaker: Tiebreaker,
-        ): HemicycleFrameBuilder {
-            return ofClustered(rows, entries, seatsFunc, colorFunc, colorFunc, tiebreaker)
-        }
-
-        @Beta
-        fun <T> ofClustered(
-            rows: List<Int>,
-            entries: List<T>,
-            seatsFunc: (T) -> Int,
-            colorFunc: (T) -> Flow.Publisher<out Color>,
-            borderFunc: (T) -> Flow.Publisher<out Color>,
-            tiebreaker: Tiebreaker,
-        ): HemicycleFrameBuilder {
+        val dots by lazy {
             val points = rows.indices
                 .flatMap { row -> (0 until rows[row]).map { idx -> Point(row, idx) } }
                 .sortedWith(
@@ -197,8 +61,6 @@ class HemicycleFrameBuilder {
                     i++
                 }
             }
-            val builder = HemicycleFrameBuilder()
-            builder.rowsPublisher = rows.asOneTimePublisher()
             val dots: List<T> = points
                 .sortedWith(
                     Comparator.comparingInt { p: Pair<Point, T?> -> p.first.x }
@@ -206,270 +68,298 @@ class HemicycleFrameBuilder {
                 )
                 .map { it.second!! }
                 .toList()
-            builder.dotsPublisher =
-                dots.map {
-                    colorFunc(it).merge(borderFunc(it)) {
-                            color, border ->
-                        HemicycleFrame.Dot(color = color, border = border)
-                    }
+            dots.map {
+                colorFunc(it).merge(borderFunc(it)) {
+                        color, border ->
+                    HemicycleFrame.Dot(color = color, border = border)
                 }
-                    .combine()
-            return builder
+            }
+                .combine()
         }
+    }
 
-        private fun pointsAreBesideEachOther(a: Point, b: Point, rows: List<Int>): Boolean {
-            if (a.x == b.x) {
-                return abs(a.y - b.y) <= 1
-            }
-            if (abs(a.x - b.x) > 1) {
-                return false
-            }
-            val aY: Double
-            val bY: Double
-            if (a.x > b.x) {
-                aY = 1.0 * a.y
-                bY = 1.0 * b.y / rows[b.x] * rows[a.x]
-            } else {
-                aY = 1.0 * a.y / rows[a.x] * rows[b.x]
-                bY = 1.0 * b.y
-            }
-            return abs(aY - bY) <= 0.5
+    class SeatBar<T> {
+        lateinit var bars: Flow.Publisher<out List<T>>
+        lateinit var colorFunc: T.() -> Color
+        lateinit var seatFunc: T.() -> Int
+        lateinit var labelPublisher: Flow.Publisher<out String>
+
+        val barsPublisher by lazy {
+            bars.mapElements { HemicycleFrame.Bar(color = it.colorFunc(), size = it.seatFunc()) }
         }
+    }
 
-        fun <T> ofElectedLeading(
-            rows: List<Int>,
-            entries: List<T>,
-            resultFunc: (T) -> Flow.Publisher<out PartyResult?>,
-            prevResultFunc: (T) -> Party,
-            leftParty: Party,
-            rightParty: Party,
-            leftLabel: (Int, Int) -> String,
-            rightLabel: (Int, Int) -> String,
-            otherLabel: (Int, Int) -> String,
-            showChange: (Int, Int) -> Boolean,
-            changeLabel: (Int, Int) -> String,
-            tiebreaker: Tiebreaker,
-            header: Flow.Publisher<out String?>,
-        ): HemicycleFrame {
-            return ofElectedLeading(
-                rows,
-                entries,
-                { 1 },
-                resultFunc,
-                prevResultFunc,
-                leftParty,
-                rightParty,
-                leftLabel,
-                rightLabel,
-                otherLabel,
-                showChange,
-                changeLabel,
-                tiebreaker,
-                header,
+    class ChangeBar<T> {
+        lateinit var bars: Flow.Publisher<out List<T>>
+        lateinit var colorFunc: T.() -> Color
+        lateinit var seatFunc: T.() -> Int
+        lateinit var startPublisher: Flow.Publisher<out Int>
+        lateinit var labelPublisher: Flow.Publisher<out String>
+
+        val barsPublisher by lazy {
+            bars.mapElements { HemicycleFrame.Bar(color = colorFunc(it), size = seatFunc(it)) }
+        }
+    }
+
+    enum class Tiebreaker {
+        FRONT_ROW_FROM_LEFT, FRONT_ROW_FROM_RIGHT
+    }
+
+    fun <DOT, SB, CB> build(
+        dots: Dots<DOT>.() -> Unit,
+        leftSeats: (SeatBar<SB>.() -> Unit)? = null,
+        rightSeats: (SeatBar<SB>.() -> Unit)? = null,
+        middleSeats: (SeatBar<SB>.() -> Unit)? = null,
+        leftChange: (ChangeBar<CB>.() -> Unit)? = null,
+        rightChange: (ChangeBar<CB>.() -> Unit)? = null,
+        header: Flow.Publisher<out String?>,
+    ): HemicycleFrame {
+        val dotsBuilder = Dots<DOT>().apply(dots)
+        val leftSeatBar = leftSeats?.let { SeatBar<SB>().apply(it) }
+        val rightSeatBar = rightSeats?.let { SeatBar<SB>().apply(it) }
+        val middleSeatBar = middleSeats?.let { SeatBar<SB>().apply(it) }
+        val leftChangeBar = leftChange?.let { ChangeBar<CB>().apply(it) }
+        val rightChangeBar = rightChange?.let { ChangeBar<CB>().apply(it) }
+        return HemicycleFrame(
+            headerPublisher = header,
+            rowsPublisher = dotsBuilder.rows.asOneTimePublisher(),
+            dotsPublisher = dotsBuilder.dots,
+            leftSeatBarPublisher = leftSeatBar?.barsPublisher,
+            leftSeatBarLabelPublisher = leftSeatBar?.labelPublisher,
+            rightSeatBarPublisher = rightSeatBar?.barsPublisher,
+            rightSeatBarLabelPublisher = rightSeatBar?.labelPublisher,
+            middleSeatBarPublisher = middleSeatBar?.barsPublisher,
+            middleSeatBarLabelPublisher = middleSeatBar?.labelPublisher,
+            leftChangeBarPublisher = leftChangeBar?.barsPublisher,
+            leftChangeBarStartPublisher = leftChangeBar?.startPublisher,
+            leftChangeBarLabelPublisher = leftChangeBar?.labelPublisher,
+            rightChangeBarPublisher = rightChangeBar?.barsPublisher,
+            rightChangeBarStartPublisher = rightChangeBar?.startPublisher,
+            rightChangeBarLabelPublisher = rightChangeBar?.labelPublisher,
+        )
+    }
+
+    private fun pointsAreBesideEachOther(a: Point, b: Point, rows: List<Int>): Boolean {
+        if (a.x == b.x) {
+            return abs(a.y - b.y) <= 1
+        }
+        if (abs(a.x - b.x) > 1) {
+            return false
+        }
+        val aY: Double
+        val bY: Double
+        if (a.x > b.x) {
+            aY = 1.0 * a.y
+            bY = 1.0 * b.y / rows[b.x] * rows[a.x]
+        } else {
+            aY = 1.0 * a.y / rows[a.x] * rows[b.x]
+            bY = 1.0 * b.y
+        }
+        return abs(aY - bY) <= 0.5
+    }
+
+    data class ElectedLeading(val elected: Int, val total: Int)
+
+    fun <T> buildElectedLeading(
+        rows: List<Int>,
+        entries: List<T>,
+        seatsFunc: T.() -> Int = { 1 },
+        resultFunc: T.() -> Flow.Publisher<out PartyResult?>,
+        prevResultFunc: T.() -> Party,
+        leftParty: Party,
+        rightParty: Party,
+        leftLabel: ElectedLeading.() -> String,
+        rightLabel: ElectedLeading.() -> String,
+        otherLabel: ElectedLeading.() -> String,
+        showChange: ElectedLeading.() -> Boolean,
+        changeLabel: ElectedLeading.() -> String,
+        tiebreaker: Tiebreaker,
+        header: Flow.Publisher<out String?>,
+    ): HemicycleFrame {
+        if (entries.sumOf(seatsFunc) != rows.sum()) {
+            throw IllegalArgumentException("Hemicycle Mismatch: ${entries.sumOf(seatsFunc)}/${rows.sum()}")
+        }
+        val results: Map<T, Flow.Publisher<out PartyResult?>> = entries
+            .distinct()
+            .associateWith { resultFunc(it) }
+        val prev = entries.distinct().associateWith(prevResultFunc)
+        val resultPublishers = entries
+            .map { t ->
+                results[t]!!.map { Pair(it, seatsFunc(t)) }
+            }
+            .toList()
+        val resultWithPrevPublishers: List<Flow.Publisher<Triple<PartyResult?, Party, Int>>> = entries
+            .map {
+                results[it]!!.map { result -> Triple(result, prev[it]!!, seatsFunc(it)) }
+            }
+            .toList()
+        val leftSeats = createSeatBarPublisher(resultPublishers) { it == leftParty }
+        val leftList = leftSeats.map {
+            listOf(
+                Pair(leftParty.color, it.elected),
+                Pair(ColorUtils.lighten(leftParty.color), it.total - it.elected),
             )
         }
-
-        @Beta
-        fun <T> ofElectedLeading(
-            rows: List<Int>,
-            entries: List<T>,
-            seatsFunc: (T) -> Int,
-            resultFunc: (T) -> Flow.Publisher<out PartyResult?>,
-            prevResultFunc: (T) -> Party,
-            leftParty: Party,
-            rightParty: Party,
-            leftLabel: (Int, Int) -> String,
-            rightLabel: (Int, Int) -> String,
-            otherLabel: (Int, Int) -> String,
-            showChange: (Int, Int) -> Boolean,
-            changeLabel: (Int, Int) -> String,
-            tiebreaker: Tiebreaker,
-            header: Flow.Publisher<out String?>,
-        ): HemicycleFrame {
-            if (entries.sumOf(seatsFunc) != rows.sum()) {
-                throw IllegalArgumentException("Hemicycle Mismatch: ${entries.sumOf(seatsFunc)}/${rows.sum()}")
-            }
-            val results: Map<T, Flow.Publisher<out PartyResult?>> = entries
-                .distinct()
-                .associateWith { resultFunc(it) }
-            val prev = entries.distinct().associateWith(prevResultFunc)
-            val resultPublishers = entries
-                .map { t ->
-                    results[t]!!.map { Pair(it, seatsFunc(t)) }
-                }
-                .toList()
-            val resultWithPrevPublishers: List<Flow.Publisher<Triple<PartyResult?, Party, Int>>> = entries
-                .map {
-                    results[it]!!.map { result -> Triple(result, prev[it]!!, seatsFunc(it)) }
-                }
-                .toList()
-            val leftSeats = createSeatBarPublisher(resultPublishers) { it == leftParty }
-            val leftList = leftSeats.map {
+        val rightSeats = createSeatBarPublisher(resultPublishers) { it == rightParty }
+        val rightList = rightSeats.map {
+            listOf(
+                Pair(rightParty.color, it.elected),
+                Pair(ColorUtils.lighten(rightParty.color), it.total - it.elected),
+            )
+        }
+        val middleSeats = createSeatBarPublisher(
+            resultPublishers,
+        ) { party -> party != null && party != leftParty && party != rightParty }
+        val middleList = middleSeats.map {
+            listOf(
+                Pair(Party.OTHERS.color, it.elected),
+                Pair(ColorUtils.lighten(Party.OTHERS.color), it.total - it.elected),
+            )
+        }
+        val leftChange = createChangeBarPublisher(
+            resultWithPrevPublishers,
+        ) { it == leftParty }
+        val leftChangeList = leftChange.map {
+            if (it.showChange()) {
                 listOf(
-                    Pair(leftParty.color, it.first),
-                    Pair(ColorUtils.lighten(leftParty.color), it.second - it.first),
+                    Pair(leftParty.color, it.elected),
+                    Pair(ColorUtils.lighten(leftParty.color), it.total - it.elected),
                 )
+            } else {
+                emptyList()
             }
-            val rightSeats = createSeatBarPublisher(resultPublishers) { it == rightParty }
-            val rightList = rightSeats.map {
+        }
+        val rightChange = createChangeBarPublisher(
+            resultWithPrevPublishers,
+        ) { it == rightParty }
+        val rightChangeList = rightChange.map {
+            if (it.showChange()) {
                 listOf(
-                    Pair(rightParty.color, it.first),
-                    Pair(ColorUtils.lighten(rightParty.color), it.second - it.first),
+                    Pair(rightParty.color, it.elected),
+                    Pair(ColorUtils.lighten(rightParty.color), it.total - it.elected),
                 )
+            } else {
+                emptyList()
             }
-            val middleSeats = createSeatBarPublisher(
-                resultPublishers,
-            ) { party -> party != null && party != leftParty && party != rightParty }
-            val middleList = middleSeats.map {
-                listOf(
-                    Pair(Party.OTHERS.color, it.first),
-                    Pair(ColorUtils.lighten(Party.OTHERS.color), it.second - it.first),
-                )
-            }
-            val leftChange = createChangeBarPublisher(
-                resultWithPrevPublishers,
-            ) { it == leftParty }
-            val leftChangeList = leftChange.map {
-                if (showChange(it.first, it.second)) {
-                    listOf(
-                        Pair(leftParty.color, it.first),
-                        Pair(ColorUtils.lighten(leftParty.color), it.second - it.first),
-                    )
-                } else {
-                    emptyList()
-                }
-            }
-            val rightChange = createChangeBarPublisher(
-                resultWithPrevPublishers,
-            ) { it == rightParty }
-            val rightChangeList = rightChange.map {
-                if (showChange(it.first, it.second)) {
-                    listOf(
-                        Pair(rightParty.color, it.first),
-                        Pair(ColorUtils.lighten(rightParty.color), it.second - it.first),
-                    )
-                } else {
-                    emptyList()
-                }
-            }
-            val changeLabelFunc = { p: Pair<Int, Int> -> if (showChange(p.first, p.second)) changeLabel(p.first, p.second) else "" }
-            val allPrevs: List<Pair<Party, Int>> = entries
-                .map { Pair(prev[it]!!, seatsFunc(it)) }
-                .toList()
-            return ofClustered(
-                rows,
-                entries,
-                seatsFunc,
-                {
-                    results[it]!!.map { result ->
+        }
+        val changeLabelFunc = { p: ElectedLeading -> if (p.showChange()) p.changeLabel() else "" }
+        val allPrevs: List<Pair<Party, Int>> = entries
+            .map { Pair(prev[it]!!, seatsFunc(it)) }
+            .toList()
+        return build<T, Pair<Color, Int>, Pair<Color, Int>>(
+            dots = {
+                this.rows = rows
+                this.entries = entries
+                this.seatsFunc = seatsFunc
+                colorFunc = {
+                    results[this]!!.map { result ->
                         result?.getColor(default = Color.LIGHT_GRAY) ?: Color.WHITE
                     }
-                },
-                { prevResultFunc(it).color.asOneTimePublisher() },
-                tiebreaker,
-            )
-                .withLeftSeatBars(
-                    leftList,
-                    { it.first },
-                    { it.second },
-                    leftSeats.map { leftLabel(it.first, it.second) },
-                )
-                .withRightSeatBars(
-                    rightList,
-                    { it.first },
-                    { it.second },
-                    rightSeats.map { rightLabel(it.first, it.second) },
-                )
-                .withMiddleSeatBars(
-                    middleList,
-                    { it.first },
-                    { it.second },
-                    middleSeats.map { otherLabel(it.first, it.second) },
-                )
-                .withLeftChangeBars(
-                    leftChangeList,
-                    { it.first },
-                    { it.second },
-                    calcPrevForParty(allPrevs, leftParty).asOneTimePublisher(),
-                    leftChange.map(changeLabelFunc),
-                )
-                .withRightChangeBars(
-                    rightChangeList,
-                    { it.first },
-                    { it.second },
-                    calcPrevForParty(allPrevs, rightParty).asOneTimePublisher(),
-                    rightChange.map(changeLabelFunc),
-                )
-                .withHeader(header)
-                .build()
-        }
+                }
+                borderFunc = { prevResultFunc().color.asOneTimePublisher() }
+                this.tiebreaker = tiebreaker
+            },
+            leftSeats = {
+                bars = leftList
+                colorFunc = { first }
+                seatFunc = { second }
+                labelPublisher = leftSeats.map { it.leftLabel() }
+            },
+            rightSeats = {
+                bars = rightList
+                colorFunc = { first }
+                seatFunc = { second }
+                labelPublisher = rightSeats.map { it.rightLabel() }
+            },
+            middleSeats = {
+                bars = middleList
+                colorFunc = { first }
+                seatFunc = { second }
+                labelPublisher = middleSeats.map { it.otherLabel() }
+            },
+            leftChange = {
+                bars = leftChangeList
+                colorFunc = { first }
+                seatFunc = { second }
+                startPublisher = calcPrevForParty(allPrevs, leftParty).asOneTimePublisher()
+                labelPublisher = leftChange.map(changeLabelFunc)
+            },
+            rightChange = {
+                bars = rightChangeList
+                colorFunc = { first }
+                seatFunc = { second }
+                startPublisher = calcPrevForParty(allPrevs, rightParty).asOneTimePublisher()
+                labelPublisher = rightChange.map(changeLabelFunc)
+            },
+            header = header,
+        )
+    }
 
-        private fun calcPrevForParty(prev: List<Pair<Party, Int>>, party: Party): Int {
-            return prev.filter { party == it.first }.sumOf { it.second }
-        }
+    private fun calcPrevForParty(prev: List<Pair<Party, Int>>, party: Party): Int {
+        return prev.filter { party == it.first }.sumOf { it.second }
+    }
 
-        private fun createSeatBarPublisher(
-            results: List<Flow.Publisher<Pair<PartyResult?, Int>>>,
-            partyFilter: (Party?) -> Boolean,
-        ): Flow.Publisher<Pair<Int, Int>> {
-            return results.mapReduce(
-                Pair(0, 0),
-                { p, r ->
-                    val result = r.first
-                    if (result == null || !partyFilter(result.party)) {
-                        p
-                    } else {
-                        Pair(p.first + if (result.elected) r.second else 0, p.second + r.second)
-                    }
-                },
-                { p, r ->
-                    val result = r.first
-                    if (result == null || !partyFilter(result.party)) {
-                        p
-                    } else {
-                        Pair(p.first - if (result.elected) r.second else 0, p.second - r.second)
-                    }
-                },
-            )
-        }
+    private fun createSeatBarPublisher(
+        results: List<Flow.Publisher<Pair<PartyResult?, Int>>>,
+        partyFilter: (Party?) -> Boolean,
+    ): Flow.Publisher<ElectedLeading> {
+        return results.mapReduce(
+            ElectedLeading(0, 0),
+            { p, r ->
+                val result = r.first
+                if (result == null || !partyFilter(result.party)) {
+                    p
+                } else {
+                    ElectedLeading(p.elected + if (result.elected) r.second else 0, p.total + r.second)
+                }
+            },
+            { p, r ->
+                val result = r.first
+                if (result == null || !partyFilter(result.party)) {
+                    p
+                } else {
+                    ElectedLeading(p.elected - if (result.elected) r.second else 0, p.total - r.second)
+                }
+            },
+        )
+    }
 
-        private fun createChangeBarPublisher(
-            resultWithPrev: List<Flow.Publisher<Triple<PartyResult?, Party, Int>>>,
-            partyFilter: (Party?) -> Boolean,
-        ): Flow.Publisher<Pair<Int, Int>> {
-            return resultWithPrev.mapReduce(
-                Pair(0, 0),
-                { p, r ->
-                    var ret = p
-                    val result = r.first
-                    if (result == null) {
-                        ret
-                    } else {
-                        if (partyFilter(result.party)) {
-                            ret = Pair(ret.first + if (result.elected) r.third else 0, ret.second + r.third)
-                        }
-                        if (partyFilter(r.second)) {
-                            ret = Pair(ret.first - if (result.elected) r.third else 0, ret.second - r.third)
-                        }
-                        ret
+    private fun createChangeBarPublisher(
+        resultWithPrev: List<Flow.Publisher<Triple<PartyResult?, Party, Int>>>,
+        partyFilter: (Party?) -> Boolean,
+    ): Flow.Publisher<ElectedLeading> {
+        return resultWithPrev.mapReduce(
+            ElectedLeading(0, 0),
+            { p, r ->
+                var ret = p
+                val result = r.first
+                if (result == null) {
+                    ret
+                } else {
+                    if (partyFilter(result.party)) {
+                        ret = ElectedLeading(ret.elected + if (result.elected) r.third else 0, ret.total + r.third)
                     }
-                },
-                { p, r ->
-                    var ret = p
-                    val result = r.first
-                    if (result == null) {
-                        ret
-                    } else {
-                        if (partyFilter(result.party)) {
-                            ret = Pair(ret.first - if (result.elected) r.third else 0, ret.second - r.third)
-                        }
-                        if (partyFilter(r.second)) {
-                            ret = Pair(ret.first + if (result.elected) r.third else 0, ret.second + r.third)
-                        }
-                        ret
+                    if (partyFilter(r.second)) {
+                        ret = ElectedLeading(ret.elected - if (result.elected) r.third else 0, ret.total - r.third)
                     }
-                },
-            )
-        }
+                    ret
+                }
+            },
+            { p, r ->
+                var ret = p
+                val result = r.first
+                if (result == null) {
+                    ret
+                } else {
+                    if (partyFilter(result.party)) {
+                        ret = ElectedLeading(ret.elected - if (result.elected) r.third else 0, ret.total - r.third)
+                    }
+                    if (partyFilter(r.second)) {
+                        ret = ElectedLeading(ret.elected + if (result.elected) r.third else 0, ret.total + r.third)
+                    }
+                    ret
+                }
+            },
+        )
     }
 }

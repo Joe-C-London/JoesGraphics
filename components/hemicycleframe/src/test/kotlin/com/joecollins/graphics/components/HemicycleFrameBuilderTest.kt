@@ -28,20 +28,48 @@ class HemicycleFrameBuilderTest {
         val middleSeatBars = Publisher(listOf(Pair(Color.RED, 6)))
         val leftChangeBars = Publisher(listOf(Pair(Color.GREEN, +7)))
         val rightChangeBars = Publisher(listOf(Pair(Color.BLUE, +5)))
-        val frame = HemicycleFrameBuilder.of(
-            rows,
-            dots,
-            { it.first.asOneTimePublisher() },
-            { it.second.asOneTimePublisher() },
-            Tiebreaker.FRONT_ROW_FROM_RIGHT,
+        val frame = HemicycleFrameBuilder.build<Pair<Color, Color>, Pair<Color, Int>, Pair<Color, Int>>(
+            dots = {
+                this.rows = rows
+                this.entries = dots
+                this.colorFunc = { first.asOneTimePublisher() }
+                this.borderFunc = { second.asOneTimePublisher() }
+                this.tiebreaker = Tiebreaker.FRONT_ROW_FROM_RIGHT
+            },
+            leftSeats = {
+                bars = leftSeatBars
+                colorFunc = { first }
+                seatFunc = { second }
+                labelPublisher = "GREEN: 8".asOneTimePublisher()
+            },
+            rightSeats = {
+                bars = rightSeatBars
+                colorFunc = { first }
+                seatFunc = { second }
+                labelPublisher = "PROGRESSIVE CONSERVATIVE: 13".asOneTimePublisher()
+            },
+            middleSeats = {
+                bars = middleSeatBars
+                colorFunc = { first }
+                seatFunc = { second }
+                labelPublisher = "LIBERAL: 6".asOneTimePublisher()
+            },
+            leftChange = {
+                bars = leftChangeBars
+                colorFunc = { first }
+                seatFunc = { second }
+                startPublisher = 1.asOneTimePublisher()
+                labelPublisher = "GRN: +7".asOneTimePublisher()
+            },
+            rightChange = {
+                bars = rightChangeBars
+                colorFunc = { first }
+                seatFunc = { second }
+                startPublisher = 8.asOneTimePublisher()
+                labelPublisher = "PC: +5".asOneTimePublisher()
+            },
+            header = "PEI".asOneTimePublisher(),
         )
-            .withLeftSeatBars(leftSeatBars, { it.first }, { it.second }, "GREEN: 8".asOneTimePublisher())
-            .withRightSeatBars(rightSeatBars, { it.first }, { it.second }, "PROGRESSIVE CONSERVATIVE: 13".asOneTimePublisher())
-            .withMiddleSeatBars(middleSeatBars, { it.first }, { it.second }, "LIBERAL: 6".asOneTimePublisher())
-            .withLeftChangeBars(leftChangeBars, { it.first }, { it.second }, 1.asOneTimePublisher(), "GRN: +7".asOneTimePublisher())
-            .withRightChangeBars(rightChangeBars, { it.first }, { it.second }, 8.asOneTimePublisher(), "PC: +5".asOneTimePublisher())
-            .withHeader("PEI".asOneTimePublisher())
-            .build()
         assertEquals(3, frame.numRows)
         assertEquals(7, frame.getRowCount(0).toLong())
         assertEquals(9, frame.getRowCount(1).toLong())
@@ -115,20 +143,20 @@ class HemicycleFrameBuilderTest {
             Riding("Lake Laberge", yp, true, yp),
             Riding("Whitehorse West", lib, false, yp),
         )
-        val frame = HemicycleFrameBuilder.ofElectedLeading(
-            listOf(ridings.size),
-            ridings,
-            { PartyResult(it.leader, it.hasWon).asOneTimePublisher() },
-            { it.prev },
-            lib,
-            yp,
-            { e, l -> "LIB: $e/$l" },
-            { e, l -> "YP: $e/$l" },
-            { e, l -> "OTH: $e/$l" },
-            { e, l -> l > 0 },
-            { e, l -> DecimalFormat("+0;-0").format(e) + "/" + DecimalFormat("+0;-0").format(l) },
-            Tiebreaker.FRONT_ROW_FROM_LEFT,
-            "YUKON".asOneTimePublisher(),
+        val frame = HemicycleFrameBuilder.buildElectedLeading(
+            rows = listOf(ridings.size),
+            entries = ridings,
+            resultFunc = { PartyResult(leader, hasWon).asOneTimePublisher() },
+            prevResultFunc = { prev },
+            leftParty = lib,
+            rightParty = yp,
+            leftLabel = { "LIB: $elected/$total" },
+            rightLabel = { "YP: $elected/$total" },
+            otherLabel = { "OTH: $elected/$total" },
+            showChange = { total > 0 },
+            changeLabel = { DecimalFormat("+0;-0").format(elected) + "/" + DecimalFormat("+0;-0").format(total) },
+            tiebreaker = Tiebreaker.FRONT_ROW_FROM_LEFT,
+            header = "YUKON".asOneTimePublisher(),
         )
         assertEquals(19, frame.numDots.toLong())
         assertEquals(Color.RED, frame.getDotBorder(0))
@@ -181,20 +209,20 @@ class HemicycleFrameBuilderTest {
 
         val result = Result(null, false, gop)
         val results = generateSequence { result }.take(30).toList()
-        val frame = HemicycleFrameBuilder.ofElectedLeading(
-            listOf(results.size),
-            results,
-            { it.publisher },
-            { it.prev },
-            dem,
-            gop,
-            { e, l -> "DEM: $e/$l" },
-            { e, l -> "GOP: $e/$l" },
-            { e, l -> "OTH: $e/$l" },
-            { e, l -> l > 0 },
-            { e, l -> DecimalFormat("+0;-0").format(e) + "/" + DecimalFormat("+0;-0").format(l) },
-            Tiebreaker.FRONT_ROW_FROM_LEFT,
-            "TEST".asOneTimePublisher(),
+        val frame = HemicycleFrameBuilder.buildElectedLeading(
+            rows = listOf(results.size),
+            entries = results,
+            resultFunc = { publisher },
+            prevResultFunc = { prev },
+            leftParty = dem,
+            rightParty = gop,
+            leftLabel = { "DEM: $elected/$total" },
+            rightLabel = { "GOP: $elected/$total" },
+            otherLabel = { "OTH: $elected/$total" },
+            showChange = { total > 0 },
+            changeLabel = { DecimalFormat("+0;-0").format(elected) + "/" + DecimalFormat("+0;-0").format(total) },
+            tiebreaker = Tiebreaker.FRONT_ROW_FROM_LEFT,
+            header = "TEST".asOneTimePublisher(),
         )
         assertEquals(30, frame.numDots.toLong())
         assertEquals(Color.RED, frame.getDotBorder(0))
@@ -247,21 +275,21 @@ class HemicycleFrameBuilderTest {
 
         val result = Result(null, false, gop, 30)
         val results = listOf(result)
-        val frame = HemicycleFrameBuilder.ofElectedLeading(
-            listOf(results.sumOf { it.numSeats }),
-            results,
-            { it.numSeats },
-            { it.publisher },
-            { it.prev },
-            dem,
-            gop,
-            { e, l -> "DEM: $e/$l" },
-            { e, l -> "GOP: $e/$l" },
-            { e, l -> "OTH: $e/$l" },
-            { e, l -> true },
-            { e, l -> DecimalFormat("+0;-0").format(e) + "/" + DecimalFormat("+0;-0").format(l) },
-            Tiebreaker.FRONT_ROW_FROM_LEFT,
-            "TEST".asOneTimePublisher(),
+        val frame = HemicycleFrameBuilder.buildElectedLeading(
+            rows = listOf(results.sumOf { it.numSeats }),
+            entries = results,
+            seatsFunc = { numSeats },
+            resultFunc = { publisher },
+            prevResultFunc = { prev },
+            leftParty = dem,
+            rightParty = gop,
+            leftLabel = { "DEM: $elected/$total" },
+            rightLabel = { "GOP: $elected/$total" },
+            otherLabel = { "OTH: $elected/$total" },
+            showChange = { true },
+            changeLabel = { DecimalFormat("+0;-0").format(elected) + "/" + DecimalFormat("+0;-0").format(total) },
+            tiebreaker = Tiebreaker.FRONT_ROW_FROM_LEFT,
+            header = "TEST".asOneTimePublisher(),
         )
         assertEquals(30, frame.numDots)
         assertEquals(Color.RED, frame.getDotBorder(0))
@@ -342,21 +370,21 @@ class HemicycleFrameBuilderTest {
 
         val result = Result(null, false, gop, 30)
         val results = listOf(result)
-        val frame = HemicycleFrameBuilder.ofElectedLeading(
-            listOf(results.sumOf { it.numSeats }),
-            results,
-            { it.numSeats },
-            { it.publisher },
-            { it.prev },
-            dem,
-            gop,
-            { e, l -> "DEM: $e/$l" },
-            { e, l -> "GOP: $e/$l" },
-            { e, l -> "OTH: $e/$l" },
-            { e, l -> true },
-            { e, l -> DecimalFormat("+0;-0").format(e) + "/" + DecimalFormat("+0;-0").format(l) },
-            Tiebreaker.FRONT_ROW_FROM_LEFT,
-            "TEST".asOneTimePublisher(),
+        val frame = HemicycleFrameBuilder.buildElectedLeading(
+            rows = listOf(results.sumOf { it.numSeats }),
+            entries = results,
+            seatsFunc = { numSeats },
+            resultFunc = { publisher },
+            prevResultFunc = { prev },
+            leftParty = dem,
+            rightParty = gop,
+            leftLabel = { "DEM: $elected/$total" },
+            rightLabel = { "GOP: $elected/$total" },
+            otherLabel = { "OTH: $elected/$total" },
+            showChange = { true },
+            changeLabel = { DecimalFormat("+0;-0").format(elected) + "/" + DecimalFormat("+0;-0").format(total) },
+            tiebreaker = Tiebreaker.FRONT_ROW_FROM_LEFT,
+            header = "TEST".asOneTimePublisher(),
         )
         assertEquals(30, frame.numDots)
         assertEquals(Color.RED, frame.getDotBorder(0))
