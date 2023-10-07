@@ -961,16 +961,26 @@ class SeatViewPanel private constructor(
             lines: Flow.Publisher<List<Int>>?,
         ): BarFrame {
             return if (focusLocation == FocusLocation.FIRST) {
-                BarFrameBuilder.dual(bars)
+                BarFrameBuilder.dual(
+                    barsPublisher = bars,
+                    headerPublisher = header,
+                    rightHeaderLabelPublisher = progress,
+                    subheadPublisher = subhead,
+                    notesPublisher = notes,
+                    limitsPublisher = limits,
+                    linesPublisher = lines?.let { BarFrameBuilder.Lines.of(it, majorityFunction ?: Int::toString) },
+                )
             } else {
-                BarFrameBuilder.dualReversed(bars)
+                BarFrameBuilder.dualReversed(
+                    barsPublisher = bars,
+                    headerPublisher = header,
+                    rightHeaderLabelPublisher = progress,
+                    subheadPublisher = subhead,
+                    notesPublisher = notes,
+                    limitsPublisher = limits,
+                    linesPublisher = lines?.let { BarFrameBuilder.Lines.of(it, majorityFunction ?: Int::toString) },
+                )
             }
-                .withHeader(header, rightLabelPublisher = progress ?: null.asOneTimePublisher())
-                .apply { subhead?.let { withSubhead(it) } }
-                .apply { notes?.let { withNotes(it) } }
-                .apply { limits?.let { withLimits(it) } }
-                .apply { lines?.let { withLines(it, majorityFunction!!) } }
-                .build()
         }
     }
 
@@ -1015,13 +1025,15 @@ class SeatViewPanel private constructor(
             limits: Flow.Publisher<BarFrameBuilder.Limit>?,
             lines: Flow.Publisher<List<Int>>?,
         ): BarFrame {
-            return BarFrameBuilder.dual(bars)
-                .withHeader(header, rightLabelPublisher = progress ?: null.asOneTimePublisher())
-                .apply { subhead?.let { withSubhead(it) } }
-                .apply { notes?.let { withNotes(it) } }
-                .apply { limits?.let { withLimits(it) } }
-                .apply { lines?.let { withLines(it, majorityFunction!!) } }
-                .build()
+            return BarFrameBuilder.dual(
+                barsPublisher = bars,
+                headerPublisher = header,
+                rightHeaderLabelPublisher = progress,
+                subheadPublisher = subhead,
+                notesPublisher = notes,
+                limitsPublisher = limits,
+                linesPublisher = lines?.let { BarFrameBuilder.Lines.of(it, majorityFunction ?: Int::toString) },
+            )
         }
     }
 }

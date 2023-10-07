@@ -1,10 +1,10 @@
 package com.joecollins.graphics.components
 
 import com.joecollins.graphics.components.BarFrameBuilder.BasicBar
-import com.joecollins.graphics.components.BarFrameBuilder.Companion.basic
-import com.joecollins.graphics.components.BarFrameBuilder.Companion.dual
-import com.joecollins.graphics.components.BarFrameBuilder.Companion.dualReversed
 import com.joecollins.graphics.components.BarFrameBuilder.DualBar
+import com.joecollins.graphics.components.BarFrameBuilder.basic
+import com.joecollins.graphics.components.BarFrameBuilder.dual
+import com.joecollins.graphics.components.BarFrameBuilder.dualReversed
 import com.joecollins.graphics.utils.ColorUtils
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
@@ -396,7 +396,7 @@ class BarFrameBuilderTest {
     fun testDualValueBars() {
         val result = Publisher<Map<Pair<String, Color>, Pair<Int, Int>>>(emptyMap())
         val frame = dual(
-            result
+            barsPublisher = result
                 .map { map ->
                     map.entries.asSequence()
                         .sortedByDescending { it.value.second }
@@ -404,7 +404,6 @@ class BarFrameBuilderTest {
                         .toList()
                 },
         )
-            .build()
         assertEquals(0, frame.numBars.toLong())
         assertEquals(0, frame.numLines.toLong())
         result.submit(
@@ -468,7 +467,7 @@ class BarFrameBuilderTest {
     fun testDualReversedValueBars() {
         val result = Publisher<Map<Pair<String, Color>, Pair<Int, Int>>>(emptyMap())
         val frame = dualReversed(
-            result
+            barsPublisher = result
                 .map { map ->
                     map.entries.asSequence()
                         .sortedByDescending { it.value.second }
@@ -476,7 +475,6 @@ class BarFrameBuilderTest {
                         .toList()
                 },
         )
-            .build()
         assertEquals(0, frame.numBars.toLong())
         assertEquals(0, frame.numLines.toLong())
         result.submit(
@@ -540,7 +538,7 @@ class BarFrameBuilderTest {
     fun testDualChangeBars() {
         val result = Publisher<Map<Pair<String, Color>, Triple<Int, Int, Int>>>(emptyMap())
         val frame = dual(
-            result
+            barsPublisher = result
                 .map { map ->
                     map.entries.asSequence()
                         .sortedByDescending { it.value.third }
@@ -548,7 +546,6 @@ class BarFrameBuilderTest {
                         .toList()
                 },
         )
-            .build()
         assertEquals(0, frame.numBars.toLong())
         assertEquals(0, frame.numLines.toLong())
         result.submit(
@@ -618,7 +615,7 @@ class BarFrameBuilderTest {
     fun testDualChangeRangeBars() {
         val result = Publisher<Map<Pair<String, Color>, Triple<Int, Int, Int>>>(emptyMap())
         val frame = dual(
-            result
+            barsPublisher = result
                 .map { map ->
                     map.entries.asSequence()
                         .sortedByDescending { it.value.third }
@@ -626,7 +623,6 @@ class BarFrameBuilderTest {
                         .toList()
                 },
         )
-            .build()
         assertEquals(0, frame.numBars.toLong())
         assertEquals(0, frame.numLines.toLong())
         result.submit(
@@ -725,7 +721,7 @@ class BarFrameBuilderTest {
             DualBar("Wales", Color.BLACK, 30, 40, "40 > 30"),
             DualBar("Northern Ireland", Color.BLACK, 16, 18, "18 > 16"),
         )
-        val frame = dual(regions.asOneTimePublisher()).build()
+        val frame = dual(barsPublisher = regions.asOneTimePublisher())
         assertEquals(12, frame.numBars)
         assertEquals("East Midlands", frame.getLeftText(0))
         assertEquals("South East England", frame.getLeftText(5))
@@ -762,7 +758,7 @@ class BarFrameBuilderTest {
             assertEquals(exp.second.toDouble(), act.second.toDouble(), 1e-6)
         }
         val regions = Publisher(listOf(DualBar("", Color.BLACK, 0.0, 0.0, "")))
-        val frame = dual(regions).build()
+        val frame = dual(barsPublisher = regions)
         assertEquals(1, frame.numBars)
         doAssert(Pair(Color.BLACK, 0.0), frame.getSeries(0)[0])
         doAssert(Pair(Color.BLACK, 0.0), frame.getSeries(0)[1])

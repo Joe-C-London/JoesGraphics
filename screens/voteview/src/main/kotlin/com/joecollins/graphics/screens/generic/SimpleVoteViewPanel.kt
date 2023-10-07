@@ -1270,17 +1270,18 @@ class SimpleVoteViewPanel private constructor(
             max: Flow.Publisher<out Double?>,
             lines: Flow.Publisher<List<Double>>?,
         ): BarFrame {
-            return currEntries.map { entries ->
+            val bars = currEntries.map { entries ->
                 createBars(entries)
-            }.run {
-                BarFrameBuilder.dual(this)
-                    .withHeader(header, rightLabelPublisher = progress ?: null.asOneTimePublisher())
-                    .withSubhead(subhead)
-                    .apply { notes?.let { withNotes(it) } }
-                    .withMax(max)
-                    .apply { lines?.let { withLines(it) { majorityLabel!! } } }
-                    .build()
             }
+            return BarFrameBuilder.dual(
+                barsPublisher = bars,
+                headerPublisher = header,
+                rightHeaderLabelPublisher = progress,
+                subheadPublisher = subhead,
+                notesPublisher = notes,
+                maxPublisher = max,
+                linesPublisher = lines?.let { BarFrameBuilder.Lines.of(it) { majorityLabel ?: "50%" } },
+            )
         }
 
         override fun createPreferenceResultFrame(
@@ -1293,12 +1294,14 @@ class SimpleVoteViewPanel private constructor(
             val bars = currPreferencesEntries?.map { entries ->
                 createBars(entries)
             } ?: return null
-            return BarFrameBuilder.dual(bars)
-                .withHeader(header, rightLabelPublisher = progress ?: null.asOneTimePublisher())
-                .withSubhead(subhead ?: null.asOneTimePublisher())
-                .withMax(max)
-                .withLines(lines) { "50%" }
-                .build()
+            return BarFrameBuilder.dual(
+                barsPublisher = bars,
+                headerPublisher = header,
+                rightHeaderLabelPublisher = progress,
+                subheadPublisher = subhead,
+                maxPublisher = max,
+                linesPublisher = BarFrameBuilder.Lines.of(lines) { "50%" },
+            )
         }
 
         override fun createClassificationFrame(
@@ -1368,11 +1371,12 @@ class SimpleVoteViewPanel private constructor(
                 }
             }
             val bars = (this.showPrevRaw ?: return null).compose { if (it) prevBars!! else diffBars!! }
-            return BarFrameBuilder.dual(bars)
-                .withHeader(header)
-                .withSubhead(subhead ?: null.asOneTimePublisher())
-                .withLimits(limits)
-                .build()
+            return BarFrameBuilder.dual(
+                barsPublisher = bars,
+                headerPublisher = header,
+                subheadPublisher = subhead,
+                limitsPublisher = limits,
+            )
         }
 
         override fun prevCombine(value1: Int, value2: Int): Int {
