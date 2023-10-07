@@ -93,24 +93,24 @@ class PartyHeatMapScreen private constructor(panel: JPanel, title: Flow.Publishe
             val changeLabel: (Int) -> String = { if (it == 0) "\u00b10" else DecimalFormat("+0;-0").format(it) }
             items.merge(parties) { items, parties ->
                 parties.map { party ->
-                    HeatMapFrameBuilder.ofElectedLeading(
+                    HeatMapFrameBuilder.buildElectedLeading(
                         rows = numRows,
                         entries = createOrderedList(items, party),
-                        resultFunc = currResult,
-                        prevResultFunc = prevResult,
+                        result = currResult,
+                        prevResult = prevResult,
                         party = party,
-                        seatLabel = { e, l -> if (withLeading) "$e/$l" else e.toString() },
-                        showChange = { _, _ -> true },
-                        changeLabel = { e, l ->
+                        seatLabel = { if (withLeading) "$elected/$total" else elected.toString() },
+                        showChange = { true },
+                        changeLabel = {
                             if (withLeading) {
-                                "${changeLabel(e)}/${changeLabel(l)}"
+                                "${changeLabel(elected)}/${changeLabel(total)}"
                             } else {
-                                changeLabel(e)
+                                changeLabel(elected)
                             }
                         },
                         header = party.name.uppercase().asOneTimePublisher(),
-                        labelFunc = { it.toString().asOneTimePublisher() },
-                        filterFunc = filter,
+                        label = { toString().asOneTimePublisher() },
+                        filter = filter,
                         partyChanges = partyChanges,
                     )
                 }

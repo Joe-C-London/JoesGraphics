@@ -22,24 +22,29 @@ class HeatMapFrameBuilderTest {
         ).flatten().toList()
         val seatBars = Publisher(listOf(Pair(Color.GREEN, 8)))
         val changeBars = Publisher(listOf(Pair(Color.GREEN, +7)))
-        val frame = HeatMapFrameBuilder.of(
-            3.asOneTimePublisher(),
-            dots,
-            { it.first.asOneTimePublisher() },
-            { it.second.asOneTimePublisher() },
-            { null.asOneTimePublisher() },
+        val frame = HeatMapFrameBuilder.build<Pair<Color, Color>, Pair<Color, Int>, Pair<Color, Int>>(
+            squares = {
+                numRows = 3.asOneTimePublisher()
+                entries = dots
+                fill = { first.asOneTimePublisher() }
+                border = { second.asOneTimePublisher() }
+            },
+            seatBars = {
+                bars = seatBars
+                colorFunc = { it.first }
+                seatFunc = { it.second }
+                labelPublisher = "GREEN: 8".asOneTimePublisher()
+            },
+            changeBars = {
+                bars = changeBars
+                colorFunc = { it.first }
+                seatFunc = { it.second }
+                startPublisher = 1.asOneTimePublisher()
+                labelPublisher = "GRN: +7".asOneTimePublisher()
+            },
+            header = "PEI".asOneTimePublisher(),
+            borderColor = Color.GREEN.asOneTimePublisher(),
         )
-            .withSeatBars(seatBars, { it.first }, { it.second }, "GREEN: 8".asOneTimePublisher())
-            .withChangeBars(
-                changeBars,
-                { it.first },
-                { it.second },
-                1.asOneTimePublisher(),
-                "GRN: +7".asOneTimePublisher(),
-            )
-            .withHeader("PEI".asOneTimePublisher())
-            .withBorder(Color.GREEN.asOneTimePublisher())
-            .build()
         assertEquals(3, frame.numRows)
         assertEquals(27, frame.numSquares.toLong())
         val expectedFills = sequenceOf(
@@ -102,15 +107,15 @@ class HeatMapFrameBuilderTest {
             Riding("Lake Laberge", yp, true, yp),
             Riding("Whitehorse West", lib, false, yp),
         )
-        val frame = HeatMapFrameBuilder.ofElectedLeading(
+        val frame = HeatMapFrameBuilder.buildElectedLeading(
             3.asOneTimePublisher(),
             ridings,
-            { PartyResult(it.leader, it.hasWon).asOneTimePublisher() },
-            { it.prev },
+            { PartyResult(leader, hasWon).asOneTimePublisher() },
+            { prev },
             lib,
-            { e, l -> "LIB: $e/$l" },
-            { _, l -> l > 0 },
-            { e, l -> DecimalFormat("+0;-0").format(e) + "/" + DecimalFormat("+0;-0").format(l) },
+            { "LIB: $elected/$total" },
+            { total > 0 },
+            { DecimalFormat("+0;-0").format(elected) + "/" + DecimalFormat("+0;-0").format(total) },
             "YUKON".asOneTimePublisher(),
         )
         assertEquals(19, frame.numSquares)
@@ -163,17 +168,17 @@ class HeatMapFrameBuilderTest {
             Riding("Whitehorse West", lib, false, yp, true),
         )
         val filter = Publisher<(Riding) -> Boolean> { true }
-        val frame = HeatMapFrameBuilder.ofElectedLeading(
+        val frame = HeatMapFrameBuilder.buildElectedLeading(
             3.asOneTimePublisher(),
             ridings,
-            { PartyResult(it.leader, it.hasWon).asOneTimePublisher() },
-            { it.prev },
+            { PartyResult(leader, hasWon).asOneTimePublisher() },
+            { prev },
             lib,
-            { e, l -> "LIB: $e/$l" },
-            { _, l -> l > 0 },
-            { e, l -> DecimalFormat("+0;-0").format(e) + "/" + DecimalFormat("+0;-0").format(l) },
+            { "LIB: $elected/$total" },
+            { total > 0 },
+            { DecimalFormat("+0;-0").format(elected) + "/" + DecimalFormat("+0;-0").format(total) },
             "YUKON".asOneTimePublisher(),
-            filterFunc = filter,
+            filter = filter,
         )
 
         assertEquals(19, frame.numSquares)
@@ -236,15 +241,15 @@ class HeatMapFrameBuilderTest {
 
         val result = Result(null, false, gop)
         val results = generateSequence { result }.take(30).toList()
-        val frame = HeatMapFrameBuilder.ofElectedLeading(
+        val frame = HeatMapFrameBuilder.buildElectedLeading(
             results.size.asOneTimePublisher(),
             results,
-            { it.publisher },
-            { it.prev },
+            { publisher },
+            { prev },
             dem,
-            { e, l -> "DEM: $e/$l" },
-            { _, l -> l > 0 },
-            { e, l -> DecimalFormat("+0;-0").format(e) + "/" + DecimalFormat("+0;-0").format(l) },
+            { "DEM: $elected/$total" },
+            { total > 0 },
+            { DecimalFormat("+0;-0").format(elected) + "/" + DecimalFormat("+0;-0").format(total) },
             "TEST".asOneTimePublisher(),
         )
         assertEquals(30, frame.numSquares)
@@ -283,17 +288,17 @@ class HeatMapFrameBuilderTest {
 
         val result = Result(null, false, gop, 30)
         val results = listOf(result)
-        val frame = HeatMapFrameBuilder.ofElectedLeading(
+        val frame = HeatMapFrameBuilder.buildElectedLeading(
             results.sumOf { it.numSeats }.asOneTimePublisher(),
             results,
-            { it.publisher },
-            { it.prev },
+            { publisher },
+            { prev },
             dem,
-            { e, l -> "DEM: $e/$l" },
-            { _, _ -> true },
-            { e, l -> DecimalFormat("+0;-0").format(e) + "/" + DecimalFormat("+0;-0").format(l) },
+            { "DEM: $elected/$total" },
+            { true },
+            { DecimalFormat("+0;-0").format(elected) + "/" + DecimalFormat("+0;-0").format(total) },
             "TEST".asOneTimePublisher(),
-            seatsFunc = { it.numSeats },
+            seats = { numSeats },
         )
         assertEquals(30, frame.numSquares)
         assertEquals(Color.RED, frame.getSquareBorder(0))
@@ -345,17 +350,17 @@ class HeatMapFrameBuilderTest {
 
         val result = Result(null, false, gop, 30)
         val results = listOf(result)
-        val frame = HeatMapFrameBuilder.ofElectedLeading(
+        val frame = HeatMapFrameBuilder.buildElectedLeading(
             results.sumOf { it.numSeats }.asOneTimePublisher(),
             results,
-            { it.publisher },
-            { it.prev },
+            { publisher },
+            { prev },
             dem,
-            { e, l -> "DEM: $e/$l" },
-            { _, _ -> true },
-            { e, l -> DecimalFormat("+0;-0").format(e) + "/" + DecimalFormat("+0;-0").format(l) },
+            { "DEM: $elected/$total" },
+            { true },
+            { DecimalFormat("+0;-0").format(elected) + "/" + DecimalFormat("+0;-0").format(total) },
             "TEST".asOneTimePublisher(),
-            seatsFunc = { it.numSeats },
+            seats = { numSeats },
         )
         assertEquals(30, frame.numSquares)
         assertEquals(Color.RED, frame.getSquareBorder(0))

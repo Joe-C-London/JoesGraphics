@@ -12,278 +12,245 @@ import com.joecollins.pubsub.merge
 import java.awt.Color
 import java.util.concurrent.Flow
 
-class HeatMapFrameBuilder {
-    private var seatBarsPublisher: Flow.Publisher<out List<HeatMapFrame.Bar>>? = null
-    private var seatBarLabelPublisher: Flow.Publisher<out String>? = null
-    private var changeBarsPublisher: Flow.Publisher<out List<HeatMapFrame.Bar>>? = null
-    private var changeBarStartPublisher: Flow.Publisher<out Int>? = null
-    private var changeBarLabelPublisher: Flow.Publisher<out String>? = null
-    private var headerPublisher: Flow.Publisher<out String?>? = null
-    private var borderColorPublisher: Flow.Publisher<out Color>? = null
-    private var numRowsPublisher: Flow.Publisher<out Int>? = null
-    private var squaresPublisher: Flow.Publisher<out List<HeatMapFrame.Square>>? = null
+object HeatMapFrameBuilder {
+    class Squares<T> internal constructor() {
+        lateinit var numRows: Flow.Publisher<out Int>
+        lateinit var entries: List<T>
+        var seats: T.() -> Int = { 1 }
+        lateinit var fill: T.() -> Flow.Publisher<out Color>
+        var border: T.() -> Flow.Publisher<out Color> = { fill() }
+        var label: T.() -> Flow.Publisher<out String?> = { null.asOneTimePublisher() }
 
-    fun <T> withSeatBars(
-        bars: Flow.Publisher<out List<T>>,
-        colorFunc: (T) -> Color,
-        seatFunc: (T) -> Int,
-        labelPublisher: Flow.Publisher<out String>,
-    ): HeatMapFrameBuilder {
-        this.seatBarsPublisher = bars.mapElements { HeatMapFrame.Bar(colorFunc(it), seatFunc(it)) }
-        this.seatBarLabelPublisher = labelPublisher
-        return this
+        val numRowsPublisher: Flow.Publisher<out Int> by lazy {
+            numRows
+        }
+        val squaresPublisher: Flow.Publisher<out List<HeatMapFrame.Square>> by lazy {
+            entries
+                .flatMap { generateSequence { it }.take(it.seats()) }
+                .map {
+                    it.fill().merge(it.border()) { fill, border -> fill to border }
+                        .merge(it.label()) { (fill, border), label ->
+                            HeatMapFrame.Square(fillColor = fill, borderColor = border, label = label)
+                        }
+                }
+                .combine()
+        }
     }
 
-    fun <T> withChangeBars(
-        bars: Flow.Publisher<out List<T>>,
-        colorFunc: (T) -> Color,
-        seatFunc: (T) -> Int,
-        startPublisher: Flow.Publisher<out Int>,
-        labelPublisher: Flow.Publisher<out String>,
-    ): HeatMapFrameBuilder {
-        this.changeBarsPublisher = bars.mapElements { HeatMapFrame.Bar(colorFunc(it), seatFunc(it)) }
-        this.changeBarStartPublisher = startPublisher
-        this.changeBarLabelPublisher = labelPublisher
-        return this
+    class SeatBars<T> internal constructor() {
+        lateinit var bars: Flow.Publisher<out List<T>>
+        lateinit var colorFunc: (T) -> Color
+        lateinit var seatFunc: (T) -> Int
+        lateinit var labelPublisher: Flow.Publisher<out String>
+
+        val barsPublisher by lazy {
+            bars.mapElements { HeatMapFrame.Bar(colorFunc(it), seatFunc(it)) }
+        }
     }
 
-    fun withHeader(headerPublisher: Flow.Publisher<out String?>): HeatMapFrameBuilder {
-        this.headerPublisher = headerPublisher
-        return this
+    class ChangeBars<T> internal constructor() {
+        lateinit var bars: Flow.Publisher<out List<T>>
+        lateinit var colorFunc: (T) -> Color
+        lateinit var seatFunc: (T) -> Int
+        lateinit var startPublisher: Flow.Publisher<out Int>
+        lateinit var labelPublisher: Flow.Publisher<out String>
+
+        val barsPublisher by lazy {
+            bars.mapElements { HeatMapFrame.Bar(colorFunc(it), seatFunc(it)) }
+        }
     }
 
-    fun withBorder(colorPublisher: Flow.Publisher<out Color>): HeatMapFrameBuilder {
-        this.borderColorPublisher = colorPublisher
-        return this
-    }
-
-    fun build(): HeatMapFrame {
+    fun <SQ, SB, CB> build(
+        squares: Squares<SQ>.() -> Unit,
+        seatBars: (SeatBars<SB>.() -> Unit)? = null,
+        changeBars: (ChangeBars<CB>.() -> Unit)? = null,
+        header: Flow.Publisher<out String?>? = null,
+        borderColor: Flow.Publisher<out Color>? = null,
+    ): HeatMapFrame {
+        val squaresBuilder = Squares<SQ>().apply(squares)
+        val seatBarsBuilder = seatBars?.let { SeatBars<SB>().apply(it) }
+        val changeBarsBuilder = changeBars?.let { ChangeBars<CB>().apply(it) }
         return HeatMapFrame(
-            headerPublisher = headerPublisher ?: (null as String?).asOneTimePublisher(),
-            borderColorPublisher = borderColorPublisher,
-            numRowsPublisher = numRowsPublisher ?: 1.asOneTimePublisher(),
-            squaresPublisher = squaresPublisher ?: emptyList<HeatMapFrame.Square>().asOneTimePublisher(),
-            seatBarsPublisher = seatBarsPublisher,
-            seatBarLabelPublisher = seatBarLabelPublisher,
-            changeBarsPublisher = changeBarsPublisher,
-            changeBarStartPublisher = changeBarStartPublisher,
-            changeBarLabelPublisher = changeBarLabelPublisher,
+            headerPublisher = header ?: (null as String?).asOneTimePublisher(),
+            borderColorPublisher = borderColor,
+            numRowsPublisher = squaresBuilder.numRowsPublisher,
+            squaresPublisher = squaresBuilder.squaresPublisher,
+            seatBarsPublisher = seatBarsBuilder?.barsPublisher,
+            seatBarLabelPublisher = seatBarsBuilder?.labelPublisher,
+            changeBarsPublisher = changeBarsBuilder?.barsPublisher,
+            changeBarStartPublisher = changeBarsBuilder?.startPublisher,
+            changeBarLabelPublisher = changeBarsBuilder?.labelPublisher,
         )
     }
 
-    companion object {
-        fun <T> of(
-            numRows: Flow.Publisher<out Int>,
-            entries: List<T>,
-            colorFunc: (T) -> Flow.Publisher<out Color>,
-            labelFunc: (T) -> Flow.Publisher<out String?> = { (null as String?).asOneTimePublisher() },
-        ): HeatMapFrameBuilder {
-            return of(numRows, entries, colorFunc, colorFunc, labelFunc)
-        }
+    data class ElectedLeading(val elected: Int, val total: Int)
 
-        fun <T> of(
-            numRows: Flow.Publisher<out Int>,
-            entries: List<T>,
-            fillFunc: (T) -> Flow.Publisher<out Color>,
-            borderFunc: (T) -> Flow.Publisher<out Color>,
-            labelFunc: (T) -> Flow.Publisher<out String?> = { (null as String?).asOneTimePublisher() },
-        ): HeatMapFrameBuilder {
-            val builder = HeatMapFrameBuilder()
-            builder.numRowsPublisher = numRows
-            builder.squaresPublisher =
-                entries.map {
-                    fillFunc(it).merge(borderFunc(it)) {
-                            fill, border ->
-                        fill to border
-                    }.merge(labelFunc(it)) {
-                            (fill, border), label ->
-                        HeatMapFrame.Square(fillColor = fill, borderColor = border, label = label)
-                    }
-                }
-                    .combine()
-            return builder
-        }
-
-        fun <T> ofClustered(
-            numRows: Flow.Publisher<out Int>,
-            entries: List<T>,
-            seatFunc: (T) -> Int,
-            fillFunc: (T) -> Flow.Publisher<out Color>,
-            borderFunc: (T) -> Flow.Publisher<out Color>,
-            labelFunc: (T) -> Flow.Publisher<out String?> = { (null as String?).asOneTimePublisher() },
-        ): HeatMapFrameBuilder {
-            val allEntries = entries
-                .flatMap { generateSequence { it }.take(seatFunc(it)) }
-                .toList()
-            return of(numRows, allEntries, fillFunc, borderFunc, labelFunc)
-        }
-
-        fun <T> ofElectedLeading(
-            rows: Flow.Publisher<out Int>,
-            entries: List<T>,
-            resultFunc: (T) -> Flow.Publisher<out PartyResult?>,
-            prevResultFunc: (T) -> Party,
-            party: Party,
-            seatLabel: (Int, Int) -> String,
-            showChange: (Int, Int) -> Boolean,
-            changeLabel: (Int, Int) -> String,
-            header: Flow.Publisher<out String?>,
-            labelFunc: (T) -> Flow.Publisher<out String?> = { (null as String?).asOneTimePublisher() },
-            seatsFunc: (T) -> Int = { 1 },
-            filterFunc: Flow.Publisher<(T) -> Boolean> = { _: T -> true }.asOneTimePublisher(),
-            partyChanges: Flow.Publisher<Map<Party, Party>> = emptyMap<Party, Party>().asOneTimePublisher(),
-        ): HeatMapFrame {
-            val results: Map<T, Flow.Publisher<out PartyResult?>> = entries
-                .distinct()
-                .associateWith { resultFunc(it) }
-            val prev = entries.distinct().associateWith(prevResultFunc)
-            val resultPublishers = entries
-                .map { t ->
-                    results[t]!!.map { Pair(it, seatsFunc(t)) }
-                }
-                .toList()
-            val resultWithPrevPublishers: List<Flow.Publisher<Triple<PartyResult?, Party, Int>>> = entries
-                .map { t ->
-                    results[t]!!.merge(partyChanges) { res, changes -> Triple(res, prev[t]!!.let { changes[it] ?: it }, seatsFunc(t)) }
-                }
-                .toList()
-            val seats = createSeatBarPublisher(resultPublishers) { party == it }
-            val seatList = seats.map {
-                listOf(
-                    Pair(party.color, it.first),
-                    Pair(ColorUtils.lighten(party.color), it.second - it.first),
-                )
+    fun <T> buildElectedLeading(
+        rows: Flow.Publisher<out Int>,
+        entries: List<T>,
+        result: T.() -> Flow.Publisher<out PartyResult?>,
+        prevResult: T.() -> Party,
+        party: Party,
+        seatLabel: ElectedLeading.() -> String,
+        showChange: ElectedLeading.() -> Boolean,
+        changeLabel: ElectedLeading.() -> String,
+        header: Flow.Publisher<out String?>,
+        label: T.() -> Flow.Publisher<out String?> = { (null as String?).asOneTimePublisher() },
+        seats: T.() -> Int = { 1 },
+        filter: Flow.Publisher<T.() -> Boolean> = { _: T -> true }.asOneTimePublisher(),
+        partyChanges: Flow.Publisher<Map<Party, Party>> = emptyMap<Party, Party>().asOneTimePublisher(),
+    ): HeatMapFrame {
+        val results: Map<T, Flow.Publisher<out PartyResult?>> = entries
+            .distinct()
+            .associateWith { it.result() }
+        val prev = entries.distinct().associateWith(prevResult)
+        val resultPublishers = entries
+            .map { t ->
+                results[t]!!.map { Pair(it, t.seats()) }
             }
+            .toList()
+        val resultWithPrevPublishers: List<Flow.Publisher<Triple<PartyResult?, Party, Int>>> = entries
+            .map { t ->
+                results[t]!!.merge(partyChanges) { res, changes -> Triple(res, prev[t]!!.let { changes[it] ?: it }, t.seats()) }
+            }
+            .toList()
+        val seatsPublisher = createSeatBarPublisher(resultPublishers) { party == it }
+        val seatList = seatsPublisher.map {
+            listOf(
+                Pair(party.color, it.elected),
+                Pair(ColorUtils.lighten(party.color), it.total - it.elected),
+            )
+        }
 
-            val change = createChangeBarPublisher(resultWithPrevPublishers) { party == it }
-            val changeLabelFunc = { p: Pair<Int, Int> -> if (showChange(p.first, p.second)) changeLabel(p.first, p.second) else "" }
-            val changeList = change
-                .map {
-                    if (showChange(it.first, it.second)) {
-                        listOf(
-                            Pair(party.color, it.first),
-                            Pair(ColorUtils.lighten(party.color), it.second - it.first),
-                        )
-                    } else {
-                        emptyList()
-                    }
+        val change = createChangeBarPublisher(resultWithPrevPublishers) { party == it }
+        val changeLabelFunc = { p: ElectedLeading -> if (p.showChange()) p.changeLabel() else "" }
+        val changeList = change
+            .map {
+                if (it.showChange()) {
+                    listOf(
+                        Pair(party.color, it.elected),
+                        Pair(ColorUtils.lighten(party.color), it.total - it.elected),
+                    )
+                } else {
+                    emptyList()
                 }
-            val allPrevs = entries
-                .map { Pair(prev[it]!!, seatsFunc(it)) }
-                .toList()
-            return ofClustered(
-                rows,
-                entries,
-                seatsFunc,
-                { t ->
-                    results[t]!!.merge(filterFunc) { result, filter ->
+            }
+        val allPrevs = entries
+            .map { Pair(prev[it]!!, it.seats()) }
+            .toList()
+        return build<T, Pair<Color, Int>, Pair<Color, Int>>(
+            squares = {
+                numRows = rows
+                this.entries = entries
+                this.seats = seats
+                fill = {
+                    results[this]!!.merge(filter) { result, filter ->
                         when {
-                            !filter(t) -> Color.WHITE
+                            !filter() -> Color.WHITE
                             result?.party == null -> Color.WHITE
                             result.isElected -> result.party.color
                             else -> ColorUtils.lighten(result.party.color)
                         }
                     }
-                },
-                { t -> filterFunc.map { filter -> if (filter(t)) prevResultFunc(t).color else Color.WHITE } },
-                labelFunc,
-            )
-                .withSeatBars(
-                    seatList,
-                    { it.first },
-                    { it.second },
-                    seats.map { seatLabel(it.first, it.second) },
-                )
-                .withChangeBars(
-                    changeList,
-                    { it.first },
-                    { it.second },
-                    partyChanges.map { calcPrevForParty(allPrevs, party, it) },
-                    change.map(changeLabelFunc),
-                )
-                .withHeader(header)
-                .withBorder(party.color.asOneTimePublisher())
-                .build()
-        }
+                }
+                border = { filter.map { filter -> if (filter()) prevResult().color else Color.WHITE } }
+                this.label = label
+            },
+            seatBars = {
+                bars = seatList
+                colorFunc = { it.first }
+                seatFunc = { it.second }
+                labelPublisher = seatsPublisher.map { it.seatLabel() }
+            },
+            changeBars = {
+                bars = changeList
+                colorFunc = { it.first }
+                seatFunc = { it.second }
+                startPublisher = partyChanges.map { calcPrevForParty(allPrevs, party, it) }
+                labelPublisher = change.map(changeLabelFunc)
+            },
+            header = header,
+            borderColor = party.color.asOneTimePublisher(),
+        )
+    }
 
-        private fun calcPrevForParty(prev: List<Pair<Party, Int>>, party: Party, changes: Map<Party, Party>): Int {
-            return prev.filter { party == it.first || party == changes[it.first] }.sumOf { it.second }
-        }
+    private fun calcPrevForParty(prev: List<Pair<Party, Int>>, party: Party, changes: Map<Party, Party>): Int {
+        return prev.filter { party == it.first || party == changes[it.first] }.sumOf { it.second }
+    }
 
-        private fun createSeatBarPublisher(
-            results: List<Flow.Publisher<Pair<PartyResult?, Int>>>,
-            partyFilter: (Party?) -> Boolean,
-        ): Flow.Publisher<Pair<Int, Int>> {
-            return results.mapReduce(
-                Pair(0, 0),
-                { p, r ->
-                    val left = r.first
-                    if (left == null || !partyFilter(left.party)) {
-                        p
-                    } else {
-                        Pair(p.first + if (left.isElected) r.second else 0, p.second + r.second)
-                    }
-                },
-                { p, r ->
-                    val left = r.first
-                    if (left == null || !partyFilter(left.party)) {
-                        p
-                    } else {
-                        Pair(p.first - if (left.isElected) r.second else 0, p.second - r.second)
-                    }
-                },
-            )
-        }
+    private fun createSeatBarPublisher(
+        results: List<Flow.Publisher<Pair<PartyResult?, Int>>>,
+        partyFilter: (Party?) -> Boolean,
+    ): Flow.Publisher<ElectedLeading> {
+        return results.mapReduce(
+            ElectedLeading(0, 0),
+            { p, r ->
+                val left = r.first
+                if (left == null || !partyFilter(left.party)) {
+                    p
+                } else {
+                    ElectedLeading(p.elected + if (left.isElected) r.second else 0, p.total + r.second)
+                }
+            },
+            { p, r ->
+                val left = r.first
+                if (left == null || !partyFilter(left.party)) {
+                    p
+                } else {
+                    ElectedLeading(p.elected - if (left.isElected) r.second else 0, p.total - r.second)
+                }
+            },
+        )
+    }
 
-        private fun createChangeBarPublisher(
-            resultWithPrev: List<Flow.Publisher<Triple<PartyResult?, Party, Int>>>,
-            partyFilter: (Party?) -> Boolean,
-        ): Flow.Publisher<Pair<Int, Int>> {
-            return resultWithPrev.mapReduce(
-                Pair(0, 0),
-                { p, r ->
-                    val left = r.first
-                    if (left?.party == null) {
-                        p
-                    } else {
-                        var ret = p
-                        if (partyFilter(left.party)) {
-                            ret = Pair(
-                                ret.first + if (left.isElected) r.third else 0,
-                                ret.second + r.third,
-                            )
-                        }
-                        if (partyFilter(r.second)) {
-                            ret = Pair(
-                                ret.first - if (left.isElected) r.third else 0,
-                                ret.second - r.third,
-                            )
-                        }
-                        ret
+    private fun createChangeBarPublisher(
+        resultWithPrev: List<Flow.Publisher<Triple<PartyResult?, Party, Int>>>,
+        partyFilter: (Party?) -> Boolean,
+    ): Flow.Publisher<ElectedLeading> {
+        return resultWithPrev.mapReduce(
+            ElectedLeading(0, 0),
+            { p, r ->
+                val left = r.first
+                if (left?.party == null) {
+                    p
+                } else {
+                    var ret = p
+                    if (partyFilter(left.party)) {
+                        ret = ElectedLeading(
+                            ret.elected + if (left.isElected) r.third else 0,
+                            ret.total + r.third,
+                        )
                     }
-                },
-                { p, r ->
-                    val left = r.first
-                    if (left?.party == null) {
-                        p
-                    } else {
-                        var ret = p
-                        if (partyFilter(left.party)) {
-                            ret = Pair(
-                                ret.first - if (left.isElected) r.third else 0,
-                                ret.second - r.third,
-                            )
-                        }
-                        if (partyFilter(r.second)) {
-                            ret = Pair(
-                                ret.first + if (left.isElected) r.third else 0,
-                                ret.second + r.third,
-                            )
-                        }
-                        ret
+                    if (partyFilter(r.second)) {
+                        ret = ElectedLeading(
+                            ret.elected - if (left.isElected) r.third else 0,
+                            ret.total - r.third,
+                        )
                     }
-                },
-            )
-        }
+                    ret
+                }
+            },
+            { p, r ->
+                val left = r.first
+                if (left?.party == null) {
+                    p
+                } else {
+                    var ret = p
+                    if (partyFilter(left.party)) {
+                        ret = ElectedLeading(
+                            ret.elected - if (left.isElected) r.third else 0,
+                            ret.total - r.third,
+                        )
+                    }
+                    if (partyFilter(r.second)) {
+                        ret = ElectedLeading(
+                            ret.elected + if (left.isElected) r.third else 0,
+                            ret.total + r.third,
+                        )
+                    }
+                    ret
+                }
+            },
+        )
     }
 }
