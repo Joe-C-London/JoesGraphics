@@ -1,7 +1,5 @@
 package com.joecollins.graphics.components
 
-import com.joecollins.graphics.components.ListingFrameBuilder.Companion.of
-import com.joecollins.graphics.components.ListingFrameBuilder.Companion.ofFixedList
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -15,10 +13,14 @@ class ListingFrameBuilderTest {
             Triple("JUSTIN TRUDEAU", Color.RED, "LIBERAL"),
             Triple("ANDREW SCHEER", Color.BLUE, "CONSERVATIVE"),
         )
-        val frame: BarFrame = of(list.asOneTimePublisher(), { it.first }, { it.third }) { it.second }
-            .withHeader("HEADER".asOneTimePublisher())
-            .withSubhead("SUBHEAD".asOneTimePublisher())
-            .build()
+        val frame: BarFrame = ListingFrameBuilder.of(
+            list.asOneTimePublisher(),
+            { it.first },
+            { it.third },
+            { it.second },
+            header = "HEADER".asOneTimePublisher(),
+            subhead = "SUBHEAD".asOneTimePublisher(),
+        )
         assertEquals(0, frame.numLines.toLong())
         assertEquals(2, frame.numBars)
         assertEquals(1.0, frame.max.toDouble())
@@ -51,10 +53,14 @@ class ListingFrameBuilderTest {
                 Publisher("CONSERVATIVE"),
             ),
         )
-        val frame = ofFixedList(list, { it.first }, { it.third }) { it.second }
-            .withHeader("HEADER".asOneTimePublisher())
-            .withSubhead("SUBHEAD".asOneTimePublisher())
-            .build()
+        val frame = ListingFrameBuilder.of(
+            list,
+            { it.first },
+            { it.third },
+            { it.second },
+            header = "HEADER".asOneTimePublisher(),
+            subhead = "SUBHEAD".asOneTimePublisher(),
+        )
         assertEquals(0, frame.numLines.toLong())
         assertEquals(2, frame.numBars)
         assertEquals(0.0, frame.min.toDouble(), 1e-6)
