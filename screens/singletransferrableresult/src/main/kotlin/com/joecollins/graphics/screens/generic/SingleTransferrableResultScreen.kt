@@ -218,49 +218,49 @@ class SingleTransferrableResultScreen private constructor(
         private fun createCandidatesPanel(): JPanel {
             val votesQuota = candidateVotes.merge(quota) { v, q -> v to q }
             val inOut = elected.merge(excluded) { el, ex -> el to ex }
+            val bars = votesQuota.merge(inOut) { (votes, quota), (elected, excluded) ->
+                val electedCandidates = elected.map { it.first }
+                val alreadyElectedSequence = elected.asSequence()
+                    .filter { !votes.containsKey(it.first) }
+                    .map {
+                        BarFrameBuilder.BasicBar(
+                            label = it.first.name.uppercase() + (if (it.first.incumbent) " $incumbentMarker" else "") + " (${it.first.party.abbreviation.uppercase()})",
+                            valueLabel = "ELECTED IN ${it.second}",
+                            shape = ImageGenerator.createTickShape(),
+                            value = 0,
+                            color = it.first.party.color,
+                        )
+                    }
+                val thisRoundSequence = votes.entries.asSequence()
+                    .sortedByDescending { it.value?.toDouble() ?: -1.0 }
+                    .map {
+                        BarFrameBuilder.BasicBar(
+                            label = it.key.name.uppercase() + (if (it.key.incumbent) " $incumbentMarker" else "") + " (${it.key.party.abbreviation.uppercase()})",
+                            valueLabel = if (it.value == null) {
+                                "WAITING..."
+                            } else {
+                                (formatString(it.value!!) + (if (quota == null) "" else (" (" + formatString(it.value!!.toDouble() / quota.toDouble()) + ")")))
+                            },
+                            color = it.key.party.color,
+                            value = (it.value ?: 0),
+                            shape = when {
+                                electedCandidates.contains(it.key) -> ImageGenerator.createTickShape()
+                                excluded.contains(it.key) -> ImageGenerator.createCrossShape()
+                                else -> null
+                            },
+                        )
+                    }
+                sequenceOf(alreadyElectedSequence, thisRoundSequence)
+                    .flatten()
+                    .toList()
+            }
             return BarFrameBuilder.basic(
-                votesQuota.merge(inOut) { (votes, quota), (elected, excluded) ->
-                    val electedCandidates = elected.map { it.first }
-                    val alreadyElectedSequence = elected.asSequence()
-                        .filter { !votes.containsKey(it.first) }
-                        .map {
-                            BarFrameBuilder.BasicBar(
-                                label = it.first.name.uppercase() + (if (it.first.incumbent) " $incumbentMarker" else "") + " (${it.first.party.abbreviation.uppercase()})",
-                                valueLabel = "ELECTED IN ${it.second}",
-                                shape = ImageGenerator.createTickShape(),
-                                value = 0,
-                                color = it.first.party.color,
-                            )
-                        }
-                    val thisRoundSequence = votes.entries.asSequence()
-                        .sortedByDescending { it.value?.toDouble() ?: -1.0 }
-                        .map {
-                            BarFrameBuilder.BasicBar(
-                                label = it.key.name.uppercase() + (if (it.key.incumbent) " $incumbentMarker" else "") + " (${it.key.party.abbreviation.uppercase()})",
-                                valueLabel = if (it.value == null) {
-                                    "WAITING..."
-                                } else {
-                                    (formatString(it.value!!) + (if (quota == null) "" else (" (" + formatString(it.value!!.toDouble() / quota.toDouble()) + ")")))
-                                },
-                                color = it.key.party.color,
-                                value = (it.value ?: 0),
-                                shape = when {
-                                    electedCandidates.contains(it.key) -> ImageGenerator.createTickShape()
-                                    excluded.contains(it.key) -> ImageGenerator.createCrossShape()
-                                    else -> null
-                                },
-                            )
-                        }
-                    sequenceOf(alreadyElectedSequence, thisRoundSequence)
-                        .flatten()
-                        .toList()
-                },
+                barsPublisher = bars,
+                headerPublisher = candidateHeader,
+                subheadPublisher = candidateSubhead,
+                maxPublisher = quota.map { (it?.toDouble() ?: 1.0) * 2 },
+                linesPublisher = BarFrameBuilder.Lines.of(quota.map { if (it == null) emptyList() else listOf(it) }) { "QUOTA: " + formatString(it) },
             )
-                .withHeader(candidateHeader)
-                .withSubhead(candidateSubhead)
-                .withMax(quota.map { (it?.toDouble() ?: 1.0) * 2 })
-                .withLines(quota.map { if (it == null) emptyList() else listOf(it) }) { "QUOTA: " + formatString(it) }
-                .build()
         }
 
         private fun createPartiesPanel(): JPanel? {
@@ -268,35 +268,35 @@ class SingleTransferrableResultScreen private constructor(
                 return null
             }
             val quotaAndElected = quota.merge(elected.map { e -> e.map { it.first } }) { q, e -> q to e }
+            val bars = candidateVotes.merge(quotaAndElected) { votes, (quota, elected) ->
+                val electedEarlier = elected.filter { !votes.containsKey(it) }
+                    .groupingBy { it.party }
+                    .eachCount()
+                val quotasThisRound = votes.entries
+                    .filter { it.value != null }
+                    .groupBy({ it.key.party }, { it.value })
+                    .mapValues { e -> e.value.filterNotNull().sumOf { it.toDouble() } / (quota ?: 1.0).toDouble() }
+                sequenceOf(electedEarlier.keys, quotasThisRound.keys)
+                    .flatten()
+                    .distinct()
+                    .associateWith { (electedEarlier[it] ?: 0) + (quotasThisRound[it] ?: 0.0) }
+                    .entries
+                    .sortedByDescending { it.value }
+                    .map {
+                        BarFrameBuilder.BasicBar(
+                            label = it.key.name.uppercase(),
+                            color = it.key.color,
+                            value = it.value,
+                            valueLabel = formatString(it.value),
+                        )
+                    }
+            }
             return BarFrameBuilder.basic(
-                candidateVotes.merge(quotaAndElected) { votes, (quota, elected) ->
-                    val electedEarlier = elected.filter { !votes.containsKey(it) }
-                        .groupingBy { it.party }
-                        .eachCount()
-                    val quotasThisRound = votes.entries
-                        .filter { it.value != null }
-                        .groupBy({ it.key.party }, { it.value })
-                        .mapValues { e -> e.value.filterNotNull().sumOf { it.toDouble() } / (quota ?: 1.0).toDouble() }
-                    sequenceOf(electedEarlier.keys, quotasThisRound.keys)
-                        .flatten()
-                        .distinct()
-                        .associateWith { (electedEarlier[it] ?: 0) + (quotasThisRound[it] ?: 0.0) }
-                        .entries
-                        .sortedByDescending { it.value }
-                        .map {
-                            BarFrameBuilder.BasicBar(
-                                label = it.key.name.uppercase(),
-                                color = it.key.color,
-                                value = it.value,
-                                valueLabel = formatString(it.value),
-                            )
-                        }
-                },
+                barsPublisher = bars,
+                headerPublisher = partyHeader!!,
+                maxPublisher = totalSeats!!,
+                linesPublisher = BarFrameBuilder.Lines.of(totalSeats!!.map { (1 until it).toList() }) { i -> "$i QUOTA${if (i == 1) "" else "S"}" },
             )
-                .withHeader(partyHeader!!)
-                .withMax(totalSeats!!)
-                .withLines(totalSeats!!.map { (1 until it).toList() }) { i -> "$i QUOTA${if (i == 1) "" else "S"}" }
-                .build()
         }
 
         private fun createPrevPanel(): JPanel? {
@@ -304,7 +304,7 @@ class SingleTransferrableResultScreen private constructor(
                 return null
             }
             return BarFrameBuilder.basic(
-                prevSeats!!.map { prev ->
+                barsPublisher = prevSeats!!.map { prev ->
                     prev.entries
                         .sortedByDescending { it.value }
                         .map {
@@ -315,10 +315,9 @@ class SingleTransferrableResultScreen private constructor(
                             )
                         }
                 },
+                maxPublisher = prevSeats!!.map { prev -> prev.values.sum() / 2 },
+                headerPublisher = prevHeader!!,
             )
-                .withMax(prevSeats!!.map { prev -> prev.values.sum() / 2 })
-                .withHeader(prevHeader!!)
-                .build()
         }
 
         private fun formatString(value: Number): String {

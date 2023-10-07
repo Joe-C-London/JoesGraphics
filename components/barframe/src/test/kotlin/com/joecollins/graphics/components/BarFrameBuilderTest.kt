@@ -23,7 +23,7 @@ class BarFrameBuilderTest {
     fun testSimpleBars() {
         val result = Publisher<Map<Pair<String, Color>, Int>>(emptyMap())
         val frame = basic(
-            result
+            barsPublisher = result
                 .map { map ->
                     map.entries.asSequence()
                         .sortedByDescending { it.value }
@@ -31,7 +31,6 @@ class BarFrameBuilderTest {
                         .toList()
                 },
         )
-            .build()
         assertEquals(0, frame.numBars.toLong())
         assertEquals(0, frame.numLines.toLong())
         result.submit(
@@ -57,7 +56,7 @@ class BarFrameBuilderTest {
     fun testSimpleBarsWithValueObject() {
         val result = Publisher<Map<Pair<String, Color>, Wrapper<Int>>>(emptyMap())
         val frame = basic(
-            result
+            barsPublisher = result
                 .map { map ->
                     map.entries.asSequence()
                         .sortedByDescending { it.value.value }
@@ -65,7 +64,6 @@ class BarFrameBuilderTest {
                         .toList()
                 },
         )
-            .build()
         assertEquals(0, frame.numBars.toLong())
         assertEquals(0, frame.numLines.toLong())
         result.submit(
@@ -92,16 +90,15 @@ class BarFrameBuilderTest {
         val result = Publisher<Map<Pair<String, Color>, Int>>(emptyMap())
         val max = Publisher(2500)
         val frame = basic(
-            result
+            barsPublisher = result
                 .map { map ->
                     map.entries.asSequence()
                         .sortedByDescending { it.value }
                         .map { BasicBar(it.key.first, it.key.second, it.value, THOUSANDS.format(it.value)) }
                         .toList()
                 },
+            maxPublisher = max,
         )
-            .withMax(max)
-            .build()
         assertEquals(0, frame.min.toInt())
         assertEquals(2500, frame.max.toInt())
         result.submit(
@@ -137,20 +134,19 @@ class BarFrameBuilderTest {
         val borderColor = Publisher(Color.BLACK)
         val subheadColor = Publisher(Color.GRAY)
         val frame = basic(
-            result
+            barsPublisher = result
                 .map { map ->
                     map.entries.asSequence()
                         .sortedByDescending { it.value }
                         .map { BasicBar(it.key.first, it.key.second, it.value, THOUSANDS.format(it.value)) }
                         .toList()
                 },
+            headerPublisher = header,
+            subheadPublisher = subhead,
+            notesPublisher = notes,
+            borderColorPublisher = borderColor,
+            subheadColorPublisher = subheadColor,
         )
-            .withHeader(header)
-            .withSubhead(subhead)
-            .withNotes(notes)
-            .withBorder(borderColor)
-            .withSubheadColor(subheadColor)
-            .build()
         assertEquals("HEADER", frame.header)
         assertEquals("SUBHEAD", frame.subheadText)
         assertEquals("NOTES", frame.notes)
@@ -178,16 +174,15 @@ class BarFrameBuilderTest {
         val result = Publisher<Map<Pair<String, Color>, Int>>(emptyMap())
         val target = Publisher(2382)
         val frame = basic(
-            result
+            barsPublisher = result
                 .map { map ->
                     map.entries.asSequence()
                         .sortedByDescending { it.value }
                         .map { BasicBar(it.key.first, it.key.second, it.value, THOUSANDS.format(it.value)) }
                         .toList()
                 },
+            targetPublisher = BarFrameBuilder.Target(target) { THOUSANDS.format(it) + " TO WIN" },
         )
-            .withTarget(target) { THOUSANDS.format(it) + " TO WIN" }
-            .build()
         assertEquals(1, frame.numLines)
         assertEquals(2382, frame.getLineLevel(0))
         assertEquals("2,382 TO WIN", frame.getLineLabel(0))
@@ -198,16 +193,15 @@ class BarFrameBuilderTest {
         val result = Publisher<Map<Pair<String, Color>, Int>>(emptyMap())
         val lines = Publisher<List<Int>>(emptyList())
         val frame = basic(
-            result
+            barsPublisher = result
                 .map { map ->
                     map.entries.asSequence()
                         .sortedByDescending { it.value }
                         .map { BasicBar(it.key.first, it.key.second, it.value, THOUSANDS.format(it.value)) }
                         .toList()
                 },
+            linesPublisher = BarFrameBuilder.Lines.of(lines) { it.toString() + " QUOTA" + (if (it == 1) "" else "S") },
         )
-            .withLines(lines) { it.toString() + " QUOTA" + (if (it == 1) "" else "S") }
-            .build()
         assertEquals(0, frame.numLines.toLong())
         lines.submit(listOf(1, 2, 3, 4, 5))
         assertEquals(5, frame.numLines)
@@ -228,16 +222,15 @@ class BarFrameBuilderTest {
         val result = Publisher<Map<Pair<String, Color>, Int>>(emptyMap())
         val lines = Publisher<List<Pair<String, Int>>>(emptyList())
         val frame = basic(
-            result
+            barsPublisher = result
                 .map { map ->
                     map.entries.asSequence()
                         .sortedByDescending { it.value }
                         .map { BasicBar(it.key.first, it.key.second, it.value, THOUSANDS.format(it.value)) }
                         .toList()
                 },
+            linesPublisher = BarFrameBuilder.Lines.of(lines, { it.first }) { it.second },
         )
-            .withLines(lines, { it.first }) { it.second }
-            .build()
         assertEquals(0, frame.numLines.toLong())
         lines.submit(
             listOf(
@@ -257,16 +250,15 @@ class BarFrameBuilderTest {
         val result = Publisher<Map<Pair<String, Color>, Int>>(emptyMap())
         val lines = Publisher(listOf<Int>())
         val frame = basic(
-            result
+            barsPublisher = result
                 .map { map ->
                     map.entries.asSequence()
                         .sortedByDescending { it.value }
                         .map { BasicBar(it.key.first, it.key.second, it.value, THOUSANDS.format(it.value)) }
                         .toList()
                 },
+            linesPublisher = BarFrameBuilder.Lines.of(lines) { it.toString() + " QUOTA" + (if (it == 1) "" else "S") },
         )
-            .withLines(lines) { it.toString() + " QUOTA" + (if (it == 1) "" else "S") }
-            .build()
         assertEquals(0, frame.numLines.toLong())
         lines.submit(listOf(1, 2, 3, 4, 5))
         assertEquals(5, frame.numLines)
@@ -287,7 +279,7 @@ class BarFrameBuilderTest {
         val result = Publisher<Map<Pair<String, Color>, Pair<Int, Boolean>>>(emptyMap())
         val shape = Rectangle2D.Double(0.0, 0.0, 1.0, 1.0)
         val frame = basic(
-            result
+            barsPublisher = result
                 .map { map ->
                     map.entries.asSequence()
                         .sortedByDescending { it.value.first }
@@ -295,7 +287,6 @@ class BarFrameBuilderTest {
                         .toList()
                 },
         )
-            .build()
         assertEquals(0, frame.numBars.toLong())
         assertEquals(0, frame.numLines.toLong())
         result.submit(
@@ -321,7 +312,7 @@ class BarFrameBuilderTest {
     fun testSimpleDiffBars() {
         val result = Publisher<Map<Pair<String, Color>, Pair<Int, Int>>>(emptyMap())
         val frame = basic(
-            result
+            barsPublisher = result
                 .map { map ->
                     map.entries.asSequence()
                         .sortedByDescending { it.value.first }
@@ -329,7 +320,6 @@ class BarFrameBuilderTest {
                         .toList()
                 },
         )
-            .build()
         assertEquals(0, frame.numBars.toLong())
         assertEquals(0, frame.numLines.toLong())
         result.submit(
@@ -376,16 +366,15 @@ class BarFrameBuilderTest {
         val result = Publisher<Map<Pair<String, Color>, Pair<Int, Int>>>(emptyMap())
         val range = Publisher(10)
         val frame = basic(
-            result
+            barsPublisher = result
                 .map { map ->
                     map.entries.asSequence()
                         .sortedByDescending { it.value.first }
                         .map { BasicBar(it.key.first, it.key.second, it.value.second, DIFF.format(it.value.second)) }
                         .toList()
                 },
+            wingspanPublisher = range,
         )
-            .withWingspan(range)
-            .build()
         assertEquals(10.0, frame.max.toDouble(), 1e-6)
         assertEquals(-10.0, frame.min.toDouble(), 1e-6)
 
@@ -707,7 +696,7 @@ class BarFrameBuilderTest {
             BasicBar("Wales", Color.BLACK, 4),
             BasicBar("Northern Ireland", Color.BLACK, 3),
         )
-        val frame = basic(regions.asOneTimePublisher()).build()
+        val frame = basic(barsPublisher = regions.asOneTimePublisher())
         assertEquals(12, frame.numBars)
         assertEquals("East Midlands", frame.getLeftText(0))
         assertEquals("South East England", frame.getLeftText(5))
@@ -824,7 +813,10 @@ class BarFrameBuilderTest {
     fun expandBarSpace() {
         val bars = Publisher<List<BasicBar>>(listOf())
         val minBars = Publisher(0)
-        val barFrame = basic(bars).withMinBarCount(minBars).build()
+        val barFrame = basic(
+            barsPublisher = bars,
+            minBarCountPublisher = minBars,
+        )
         assertEquals(0, barFrame.numBars)
 
         bars.submit(

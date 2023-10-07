@@ -574,11 +574,13 @@ class MultiResultScreen private constructor(
             runoff.selfCompose().subscribe(Subscriber { result.runoff = it ?: emptySet() })
             maxBars.selfCompose().subscribe(Subscriber { result.maxBars = it })
             val bars = result.toBars
-            barFrame = BarFrameBuilder.basic(bars)
-                .withMax(pctReporting.selfCompose().map { 0.5 / it.coerceAtLeast(1e-6) })
-                .withHeader(header.selfCompose(), rightLabelPublisher = progressLabel.selfCompose())
-                .withSubhead(subhead.selfCompose())
-                .build()
+            barFrame = BarFrameBuilder.basic(
+                barsPublisher = bars,
+                maxPublisher = pctReporting.selfCompose().map { 0.5 / it.coerceAtLeast(1e-6) },
+                headerPublisher = header.selfCompose(),
+                rightHeaderLabelPublisher = progressLabel.selfCompose(),
+                subheadPublisher = subhead.selfCompose(),
+            )
             add(barFrame)
             if (swingPartyOrder != null) {
                 swingFrame = SwingFrameBuilder.prevCurr(

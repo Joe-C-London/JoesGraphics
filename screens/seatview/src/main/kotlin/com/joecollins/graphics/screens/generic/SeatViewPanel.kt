@@ -354,7 +354,7 @@ class SeatViewPanel private constructor(
     ) {
         private var total: Flow.Publisher<out Int>? = null
         private var showMajority: Flow.Publisher<out Boolean>? = null
-        private var majorityFunction: ((Int) -> String)? = null
+        protected var majorityFunction: ((Int) -> String)? = null
         private var winner: Flow.Publisher<out KT?>? = null
         private var notes: Flow.Publisher<out String?>? = null
         private var changeNotes: Flow.Publisher<out String?>? = null
@@ -618,25 +618,26 @@ class SeatViewPanel private constructor(
             val bars = currEntries.merge(forceSingleLine) { c, sl ->
                 c.map { seatTemplate.createBar(keyTemplate.toMainBarHeader(it.key, sl), keyTemplate.toParty(it.key).color, it.value, if (it.result == Result.WINNER) keyTemplate.winnerShape(sl) else null) }
             }
-            return createBarFrameBuilder(bars)
-                .withHeader(header, rightLabelPublisher = progressLabel)
-                .withSubhead(subhead)
-                .withNotes(notes ?: (null as String?).asOneTimePublisher())
-                .also { b -> total?.let { t -> b.withMax(t.map { it * 2 / 3 }) } }
-                .also { b ->
-                    showMajority?.let { s ->
-                        val t = total ?: throw IllegalArgumentException("Cannot show majority line without total")
-                        val lines = s.merge(t) { show, total ->
-                            if (show) {
-                                listOf(total / 2 + 1)
-                            } else {
-                                emptyList()
-                            }
-                        }
-                        b.withLines(lines) { majorityFunction!!(it) }
+            val max = total?.let { t -> t.map { it * 2 / 3 } }
+            val lines = showMajority?.let { s ->
+                val t = total ?: throw IllegalArgumentException("Cannot show majority line without total")
+                s.merge(t) { show, total ->
+                    if (show) {
+                        listOf(total / 2 + 1)
+                    } else {
+                        emptyList()
                     }
                 }
-                .build()
+            }
+            return createBarFrame(
+                bars = bars,
+                header = header,
+                progress = progressLabel,
+                subhead = subhead,
+                notes = notes,
+                limits = max?.map { BarFrameBuilder.Limit(max = it) },
+                lines = lines,
+            )
         }
 
         private fun createClassificationFrame(): BarFrame? {
@@ -644,23 +645,23 @@ class SeatViewPanel private constructor(
                 val bars = (classificationEntries ?: return@let null).map { c ->
                     c.map { seatTemplate.createBar(it.key.name.uppercase(), it.key.color, it.value, null) }
                 }
-                return createBarFrameBuilder(bars)
-                    .withHeader(classificationHeader)
-                    .also { b -> total?.let { t -> b.withMax(t.map { it * 2 / 3 }) } }
-                    .also { b ->
-                        showMajority?.let { s ->
-                            val t = total ?: throw IllegalArgumentException("Cannot show majority line without total")
-                            val lines = s.merge(t) { show, total ->
-                                if (show) {
-                                    listOf(total / 2 + 1)
-                                } else {
-                                    emptyList()
-                                }
-                            }
-                            b.withLines(lines) { majorityFunction!!(it) }
+                val max = total?.let { t -> t.map { it * 2 / 3 } }
+                val lines = showMajority?.let { s ->
+                    val t = total ?: throw IllegalArgumentException("Cannot show majority line without total")
+                    s.merge(t) { show, total ->
+                        if (show) {
+                            listOf(total / 2 + 1)
+                        } else {
+                            emptyList()
                         }
                     }
-                    .build()
+                }
+                return createBarFrame(
+                    bars = bars,
+                    header = classificationHeader,
+                    limits = max?.map { BarFrameBuilder.Limit(max = it) },
+                    lines = lines,
+                )
             }
         }
         private fun createDiffFrame(): BarFrame? {
@@ -704,39 +705,35 @@ class SeatViewPanel private constructor(
                     .toList()
             }
             val showPrevRaw = showPrevRaw ?: false.asOneTimePublisher()
+            val limit = total?.let { t ->
+                t.merge(showPrevRaw) { total, raw ->
+                    if (raw) {
+                        BarFrameBuilder.Limit(max = total * 2 / 3)
+                    } else {
+                        BarFrameBuilder.Limit(wingspan = (total / 20).coerceAtLeast(1))
+                    }
+                }
+            }
+            val lines = showMajority?.merge(showPrevRaw) { sm, sr -> sm && sr }?.let { s ->
+                val t = prevTotal ?: 0.asOneTimePublisher()
+                s.merge(t) { show, total ->
+                    if (show) {
+                        listOf(total / 2 + 1)
+                    } else {
+                        emptyList()
+                    }
+                }
+            }
             return changeHeader?.let { changeHeader ->
                 val bars = showPrevRaw.compose { showRaw -> if (showRaw) prevBars!! else diffBars!! }
-                return createBarFrameBuilder(bars)
-                    .withHeader(changeHeader)
-                    .withSubhead(changeSubhead ?: (null as String?).asOneTimePublisher())
-                    .also { b ->
-                        total?.let { t ->
-                            b.withLimits(
-                                t.merge(showPrevRaw) { total, raw ->
-                                    if (raw) {
-                                        BarFrameBuilder.Limit(max = total * 2 / 3)
-                                    } else {
-                                        BarFrameBuilder.Limit(wingspan = (total / 20).coerceAtLeast(1))
-                                    }
-                                },
-                            )
-                        }
-                    }
-                    .also { b ->
-                        showMajority?.merge(showPrevRaw) { sm, sr -> sm && sr }?.let { s ->
-                            val t = prevTotal ?: 0.asOneTimePublisher()
-                            val lines = s.merge(t) { show, total ->
-                                if (show) {
-                                    listOf(total / 2 + 1)
-                                } else {
-                                    emptyList()
-                                }
-                            }
-                            b.withLines(lines) { majorityFunction!!(it) }
-                        }
-                    }
-                    .also { b -> changeNotes?.let { cn -> b.withNotes(cn) } }
-                    .build()
+                return createBarFrame(
+                    bars = bars,
+                    header = changeHeader,
+                    subhead = changeSubhead,
+                    notes = changeNotes,
+                    limits = limit,
+                    lines = lines,
+                )
             }
         }
 
@@ -769,7 +766,15 @@ class SeatViewPanel private constructor(
 
         protected abstract fun doubleLineBarLimit(): Int
 
-        protected abstract fun createBarFrameBuilder(bars: Flow.Publisher<List<BAR>>): BarFrameBuilder
+        protected abstract fun createBarFrame(
+            bars: Flow.Publisher<List<BAR>>,
+            header: Flow.Publisher<out String?>,
+            progress: Flow.Publisher<out String?>? = null,
+            subhead: Flow.Publisher<out String?>? = null,
+            notes: Flow.Publisher<out String?>? = null,
+            limits: Flow.Publisher<BarFrameBuilder.Limit>?,
+            lines: Flow.Publisher<List<Int>>?,
+        ): BarFrame
 
         private fun createAltText(textHeader: Flow.Publisher<out String?>): Flow.Publisher<String> {
             val combineHeadAndSub: (String?, String?) -> String? = { h, s ->
@@ -880,8 +885,24 @@ class SeatViewPanel private constructor(
             return 10
         }
 
-        override fun createBarFrameBuilder(bars: Flow.Publisher<List<BarFrameBuilder.BasicBar>>): BarFrameBuilder {
-            return BarFrameBuilder.basic(bars)
+        override fun createBarFrame(
+            bars: Flow.Publisher<List<BarFrameBuilder.BasicBar>>,
+            header: Flow.Publisher<out String?>,
+            progress: Flow.Publisher<out String?>?,
+            subhead: Flow.Publisher<out String?>?,
+            notes: Flow.Publisher<out String?>?,
+            limits: Flow.Publisher<BarFrameBuilder.Limit>?,
+            lines: Flow.Publisher<List<Int>>?,
+        ): BarFrame {
+            return BarFrameBuilder.basic(
+                barsPublisher = bars,
+                headerPublisher = header,
+                rightHeaderLabelPublisher = progress,
+                subheadPublisher = subhead,
+                notesPublisher = notes,
+                limitsPublisher = limits,
+                linesPublisher = lines?.let { BarFrameBuilder.Lines.of(it, majorityFunction ?: Number::toString) },
+            )
         }
     }
 
@@ -930,12 +951,26 @@ class SeatViewPanel private constructor(
             return 10
         }
 
-        override fun createBarFrameBuilder(bars: Flow.Publisher<List<BarFrameBuilder.DualBar>>): BarFrameBuilder {
+        override fun createBarFrame(
+            bars: Flow.Publisher<List<BarFrameBuilder.DualBar>>,
+            header: Flow.Publisher<out String?>,
+            progress: Flow.Publisher<out String?>?,
+            subhead: Flow.Publisher<out String?>?,
+            notes: Flow.Publisher<out String?>?,
+            limits: Flow.Publisher<BarFrameBuilder.Limit>?,
+            lines: Flow.Publisher<List<Int>>?,
+        ): BarFrame {
             return if (focusLocation == FocusLocation.FIRST) {
                 BarFrameBuilder.dual(bars)
             } else {
                 BarFrameBuilder.dualReversed(bars)
             }
+                .withHeader(header, rightLabelPublisher = progress ?: null.asOneTimePublisher())
+                .apply { subhead?.let { withSubhead(it) } }
+                .apply { notes?.let { withNotes(it) } }
+                .apply { limits?.let { withLimits(it) } }
+                .apply { lines?.let { withLines(it, majorityFunction!!) } }
+                .build()
         }
     }
 
@@ -971,8 +1006,22 @@ class SeatViewPanel private constructor(
             return 10
         }
 
-        override fun createBarFrameBuilder(bars: Flow.Publisher<List<BarFrameBuilder.DualBar>>): BarFrameBuilder {
+        override fun createBarFrame(
+            bars: Flow.Publisher<List<BarFrameBuilder.DualBar>>,
+            header: Flow.Publisher<out String?>,
+            progress: Flow.Publisher<out String?>?,
+            subhead: Flow.Publisher<out String?>?,
+            notes: Flow.Publisher<out String?>?,
+            limits: Flow.Publisher<BarFrameBuilder.Limit>?,
+            lines: Flow.Publisher<List<Int>>?,
+        ): BarFrame {
             return BarFrameBuilder.dual(bars)
+                .withHeader(header, rightLabelPublisher = progress ?: null.asOneTimePublisher())
+                .apply { subhead?.let { withSubhead(it) } }
+                .apply { notes?.let { withNotes(it) } }
+                .apply { limits?.let { withLimits(it) } }
+                .apply { lines?.let { withLines(it, majorityFunction!!) } }
+                .build()
         }
     }
 }

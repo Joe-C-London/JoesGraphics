@@ -68,11 +68,11 @@ class BarFrameBuilder private constructor() {
         val maxPublisher = Publisher(maxFunction(this))
     }
 
-    class BasicBar constructor(val label: String, val color: Color, val value: Number, val valueLabel: String = value.toString(), val shape: Shape? = null) {
+    class BasicBar(val label: String, val color: Color, val value: Number, val valueLabel: String = value.toString(), val shape: Shape? = null) {
         constructor(label: String, color: Color, value: Number, shape: Shape?) : this(label, color, value, value.toString(), shape)
     }
 
-    class DualBar constructor(
+    class DualBar(
         val label: String,
         val color: Color,
         val value1: Number,
@@ -214,30 +214,106 @@ class BarFrameBuilder private constructor() {
         )
     }
 
-    companion object {
-        fun basic(publisher: Flow.Publisher<out List<BasicBar>>): BarFrameBuilder {
-            val builder = BarFrameBuilder()
-            val rangeFinder = builder.rangeFinder
-            builder.barsPublisher = publisher.map { bars ->
-                bars.map {
-                    BarFrame.Bar(it.label, it.valueLabel, it.shape, listOf(Pair(it.color, it.value)))
-                }
+    data class Target<T : Number>(val publisher: Flow.Publisher<T>, val labelFunc: (T) -> String) {
+        val lines = publisher.map { target ->
+            listOf(BarFrame.Line(target, labelFunc(target)))
+        }
+    }
+
+    data class Lines<T> private constructor(val publisher: Flow.Publisher<List<T>>, val labelFunc: (T) -> String, val valueFunc: (T) -> Number) {
+        val lines = publisher.map { values ->
+            values.map { BarFrame.Line(valueFunc(it), labelFunc(it)) }
+        }
+
+        companion object {
+            fun <T : Number> of(publisher: Flow.Publisher<List<T>>, labelFunc: (T) -> String): Lines<T> {
+                return Lines(publisher, labelFunc) { it }
             }
-            builder.minPublisher = rangeFinder.minPublisher
-            builder.maxPublisher = rangeFinder.maxPublisher
-            publisher.subscribe(
+
+            fun <T> of(publisher: Flow.Publisher<List<T>>, labelFunc: (T) -> String, valueFunc: (T) -> Number): Lines<T> {
+                return Lines(publisher, labelFunc, valueFunc)
+            }
+        }
+    }
+
+    companion object {
+        fun basic(
+            barsPublisher: Flow.Publisher<out List<BasicBar>>,
+            headerPublisher: Flow.Publisher<out String?> = null.asOneTimePublisher(),
+            rightHeaderLabelPublisher: Flow.Publisher<out String?>? = null,
+            subheadPublisher: Flow.Publisher<out String?>? = null,
+            notesPublisher: Flow.Publisher<out String?>? = null,
+            borderColorPublisher: Flow.Publisher<out Color>? = null,
+            subheadColorPublisher: Flow.Publisher<out Color>? = null,
+            maxPublisher: Flow.Publisher<out Number>? = null,
+            wingspanPublisher: Flow.Publisher<out Number>? = null,
+            limitsPublisher: Flow.Publisher<Limit>? =
+                maxPublisher?.let { max -> max.map { Limit(max = it) } }
+                    ?: wingspanPublisher?.let { wingspan -> wingspan.map { Limit(wingspan = it) } },
+            targetPublisher: Target<*>? = null,
+            linesPublisher: Lines<*>? = null,
+            minBarCountPublisher: Flow.Publisher<out Int>? = null,
+        ): BarFrame {
+            val rangeFinder = RangeFinder()
+            barsPublisher.subscribe(
                 Subscriber { bars ->
-                    rangeFinder.highest = bars
-                        .map { it.value }
-                        .map { it.toDouble() }
-                        .fold(0.0) { a, b -> max(a, b) }
-                    rangeFinder.lowest = bars
-                        .map { it.value }
-                        .map { it.toDouble() }
-                        .fold(0.0) { a, b -> min(a, b) }
+                    val values = bars.map { it.value.toDouble() }
+                    rangeFinder.highest = values.fold(0.0, ::max)
+                    rangeFinder.lowest = values.fold(0.0, ::min)
                 },
             )
-            return builder
+            limitsPublisher?.subscribe(
+                Subscriber { limits ->
+                    if (limits.max != null) {
+                        rangeFinder.minFunction = { 0 }
+                        rangeFinder.maxFunction = { max(limits.max.toDouble(), it.highest.toDouble()) }
+                    } else if (limits.wingspan != null) {
+                        val f = { rf: RangeFinder ->
+                            max(
+                                limits.wingspan.toDouble(),
+                                max(abs(rf.lowest.toDouble()), abs(rf.highest.toDouble())),
+                            )
+                        }
+                        rangeFinder.minFunction = { -f(it) }
+                        rangeFinder.maxFunction = { +f(it) }
+                    } else {
+                        rangeFinder.minFunction = { it.lowest }
+                        rangeFinder.maxFunction = { it.highest }
+                    }
+                },
+            )
+            return BarFrame(
+                barsPublisher = barsPublisher.map { bars ->
+                    bars.map {
+                        BarFrame.Bar(it.label, it.valueLabel, it.shape, listOf(Pair(it.color, it.value)))
+                    }
+                }.run {
+                    if (minBarCountPublisher == null) {
+                        this
+                    } else
+                        this.merge(minBarCountPublisher, BarFrameBuilder::createMinBars)
+                },
+                headerPublisher = headerPublisher,
+                headerLabelsPublisher = rightHeaderLabelPublisher?.map { mapOf(GraphicsFrame.HeaderLabelLocation.RIGHT to it) },
+                subheadTextPublisher = subheadPublisher,
+                notesPublisher = notesPublisher,
+                borderColorPublisher = borderColorPublisher,
+                subheadColorPublisher = subheadColorPublisher,
+                minPublisher = rangeFinder.minPublisher,
+                maxPublisher = rangeFinder.maxPublisher,
+                linesPublisher = linesPublisher?.lines ?: targetPublisher?.lines,
+            )
+        }
+
+        private fun createMinBars(
+            bars: List<BarFrame.Bar>,
+            min: Int,
+        ) = if (bars.size >= min) {
+            bars
+        } else {
+            sequenceOf(bars, MutableList(min - bars.size) { BarFrame.Bar("", "", emptyList()) })
+                .flatten()
+                .toList()
         }
 
         fun dual(bars: Flow.Publisher<out List<DualBar>>): BarFrameBuilder {

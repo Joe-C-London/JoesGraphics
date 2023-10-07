@@ -86,7 +86,7 @@ class RegionalVotesScreen(subPanels: List<GenericPanel>) : JPanel(), AltTextProv
 
             val panel = run {
                 val curr = BarFrameBuilder.basic(
-                    entries.map { e ->
+                    barsPublisher = entries.map { e ->
                         e.filter { it.pct != null }
                             .map {
                                 BarFrameBuilder.BasicBar(
@@ -97,18 +97,16 @@ class RegionalVotesScreen(subPanels: List<GenericPanel>) : JPanel(), AltTextProv
                                 )
                             }
                     },
+                    headerPublisher = voteHeader,
+                    rightHeaderLabelPublisher = progressLabel,
+                    subheadPublisher = voteSubhead,
+                    maxPublisher = entries.merge(pctReporting) { e, p ->
+                        (0.5 / p.coerceAtLeast(1e-6))
+                            .coerceAtLeast(e.maxOfOrNull { it.pct ?: 0.0 } ?: 0.0)
+                    },
                 )
-                    .withHeader(voteHeader, rightLabelPublisher = progressLabel)
-                    .withSubhead(voteSubhead)
-                    .withMax(
-                        entries.merge(pctReporting) { e, p ->
-                            (0.5 / p.coerceAtLeast(1e-6))
-                                .coerceAtLeast(e.maxOfOrNull { it.pct ?: 0.0 } ?: 0.0)
-                        },
-                    )
-                    .build()
                 val change = BarFrameBuilder.basic(
-                    entries.map { e ->
+                    barsPublisher = entries.map { e ->
                         e.map {
                             val change = (it.pct ?: 0.0) - it.prev
                             BarFrameBuilder.BasicBar(
@@ -119,16 +117,13 @@ class RegionalVotesScreen(subPanels: List<GenericPanel>) : JPanel(), AltTextProv
                             )
                         }
                     },
+                    headerPublisher = changeHeader,
+                    subheadPublisher = changeSubhead,
+                    wingspanPublisher = entries.merge(pctReporting) { e, p ->
+                        (0.05 / p.coerceAtLeast(1e-6))
+                            .coerceAtLeast(e.maxOfOrNull { ((it.pct ?: 0.0) - it.prev).absoluteValue } ?: 0.0)
+                    },
                 )
-                    .withHeader(changeHeader)
-                    .withSubhead(changeSubhead)
-                    .withWingspan(
-                        entries.merge(pctReporting) { e, p ->
-                            (0.05 / p.coerceAtLeast(1e-6))
-                                .coerceAtLeast(e.maxOfOrNull { ((it.pct ?: 0.0) - it.prev).absoluteValue } ?: 0.0)
-                        },
-                    )
-                    .build()
                 JPanel().let { panel ->
                     panel.background = Color.WHITE
                     panel.layout = GridLayout(2, 1, 5, 5)

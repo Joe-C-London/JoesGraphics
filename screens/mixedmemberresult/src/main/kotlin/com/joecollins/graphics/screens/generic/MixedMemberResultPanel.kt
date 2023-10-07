@@ -291,14 +291,14 @@ class MixedMemberResultPanel private constructor(
                         }
                         .toList()
                 }
-            return BarFrameBuilder.basic(bars)
-                .withHeader(candidateVoteHeader, rightLabelPublisher = candidateProgressLabel)
-                .withSubhead(candidateVoteSubheader)
-                .withMax(
-                    candidatePctReporting?.map { 2.0 / 3 / it.coerceAtLeast(1e-6) }
-                        ?: (2.0 / 3).asOneTimePublisher(),
-                )
-                .build()
+            return BarFrameBuilder.basic(
+                barsPublisher = bars,
+                headerPublisher = candidateVoteHeader,
+                rightHeaderLabelPublisher = candidateProgressLabel,
+                subheadPublisher = candidateVoteSubheader,
+                maxPublisher = candidatePctReporting?.map { 2.0 / 3 / it.coerceAtLeast(1e-6) }
+                    ?: (2.0 / 3).asOneTimePublisher(),
+            )
         }
 
         private class Change<C> {
@@ -376,40 +376,42 @@ class MixedMemberResultPanel private constructor(
                 }
                 sequenceOf(matchingBars, nonMatchingBars).flatten().toList()
             }
-            return BarFrameBuilder.basic(bars)
-                .withHeader(candidateChangeHeader)
-                .withWingspan(candidatePctReporting?.map { 0.05 / it.coerceAtLeast(1e-6) } ?: 0.05.asOneTimePublisher())
-                .build()
+            return BarFrameBuilder.basic(
+                barsPublisher = bars,
+                headerPublisher = candidateChangeHeader,
+                wingspanPublisher = candidatePctReporting?.map { 0.05 / it.coerceAtLeast(1e-6) } ?: 0.05.asOneTimePublisher(),
+            )
         }
 
         private fun createPartyVotes(): BarFrame {
+            val bars = partyVotes.map { votes ->
+                val total = votes.values.filterNotNull().sum()
+                val partialDeclaration = votes.values.any { it == null }
+                votes.entries
+                    .sortedByDescending { it.key.overrideSortOrder ?: (it.value ?: 0) }
+                    .map {
+                        val value = it.value
+                        val pct = if (value == null) Double.NaN else 1.0 * value / total
+                        BarFrameBuilder.BasicBar(
+                            it.key.name.uppercase(),
+                            it.key.color,
+                            if (pct.isNaN()) 0 else pct,
+                            if (pct.isNaN()) {
+                                "WAITING..."
+                            } else {
+                                THOUSANDS_FORMAT.format(it.value) +
+                                    if (partialDeclaration) "" else " (" + PCT_FORMAT.format(pct) + ")"
+                            },
+                        )
+                    }
+                    .toList()
+            }
             return BarFrameBuilder.basic(
-                partyVotes.map { votes ->
-                    val total = votes.values.filterNotNull().sum()
-                    val partialDeclaration = votes.values.any { it == null }
-                    votes.entries
-                        .sortedByDescending { it.key.overrideSortOrder ?: (it.value ?: 0) }
-                        .map {
-                            val value = it.value
-                            val pct = if (value == null) Double.NaN else 1.0 * value / total
-                            BarFrameBuilder.BasicBar(
-                                it.key.name.uppercase(),
-                                it.key.color,
-                                if (pct.isNaN()) 0 else pct,
-                                if (pct.isNaN()) {
-                                    "WAITING..."
-                                } else {
-                                    THOUSANDS_FORMAT.format(it.value) +
-                                        if (partialDeclaration) "" else " (" + PCT_FORMAT.format(pct) + ")"
-                                },
-                            )
-                        }
-                        .toList()
-                },
+                barsPublisher = bars,
+                headerPublisher = partyVoteHeader,
+                rightHeaderLabelPublisher = partyProgressLabel,
+                maxPublisher = partyPctReporting?.map { 2.0 / 3 / it.coerceAtLeast(1e-6) } ?: (2.0 / 3).asOneTimePublisher(),
             )
-                .withHeader(partyVoteHeader, rightLabelPublisher = partyProgressLabel)
-                .withMax(partyPctReporting?.map { 2.0 / 3 / it.coerceAtLeast(1e-6) } ?: (2.0 / 3).asOneTimePublisher())
-                .build()
         }
 
         private fun createPartyChange(): BarFrame? {
@@ -465,10 +467,11 @@ class MixedMemberResultPanel private constructor(
                 }
                 sequenceOf(presentBars, absentBars).flatten().toList()
             }
-            return BarFrameBuilder.basic(bars)
-                .withHeader(partyChangeHeader)
-                .withWingspan(partyPctReporting?.map { 0.05 / it.coerceAtLeast(1e-6) } ?: 0.05.asOneTimePublisher())
-                .build()
+            return BarFrameBuilder.basic(
+                barsPublisher = bars,
+                headerPublisher = partyChangeHeader,
+                wingspanPublisher = partyPctReporting?.map { 0.05 / it.coerceAtLeast(1e-6) } ?: 0.05.asOneTimePublisher(),
+            )
         }
 
         private fun createMapFrame(): MapFrame? {

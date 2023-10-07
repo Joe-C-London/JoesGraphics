@@ -153,7 +153,7 @@ abstract class SocialMediaFrame<P : Post<P>>(
         )
 
         val pollPanel = BarFrameBuilder.basic(
-            post.map { p ->
+            barsPublisher = post.map { p ->
                 val polls = p.polls
                 if (polls.isNotEmpty()) {
                     val options = polls[0].options
@@ -170,7 +170,7 @@ abstract class SocialMediaFrame<P : Post<P>>(
                     emptyList()
                 }
             },
-        ).build().pad().also { it.isVisible = false }
+        ).pad().apply { isVisible = false }
         post.subscribe(
             Subscriber(
                 eventQueueWrapper {

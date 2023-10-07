@@ -251,7 +251,7 @@ class SimpleVoteViewPanel private constructor(
         protected var prevPreferences: Flow.Publisher<out Map<out KPT, PT>>? = null
         protected var preferenceHeader: Flow.Publisher<out String?>? = null
         protected var preferenceSubhead: Flow.Publisher<out String?>? = null
-        private var preferencePctReporting: Flow.Publisher<out Double>? = null
+        private var preferencePctReporting: Flow.Publisher<Double>? = null
         private var swingHeader: Flow.Publisher<out String?>? = null
         protected var swingComparator: Comparator<KPT>? = null
         private var swingRange: Flow.Publisher<Double>? = null
@@ -261,7 +261,7 @@ class SimpleVoteViewPanel private constructor(
         private var secondMapBuilder: MapBuilder<*>? = null
         protected var runoffSubhead: Flow.Publisher<String>? = null
         protected var winnerNotRunningAgain: Flow.Publisher<String>? = null
-        protected var progressLabel: Flow.Publisher<out String?> = null.asOneTimePublisher()
+        protected var progressLabel: Flow.Publisher<out String?>? = null
         protected var preferenceProgressLabel: Flow.Publisher<out String?> = null.asOneTimePublisher()
 
         protected abstract val diff: Flow.Publisher<out Map<out KPT, DT>>?
@@ -384,7 +384,7 @@ class SimpleVoteViewPanel private constructor(
         }
 
         fun withPreferencePctReporting(
-            preferencePctReporting: Flow.Publisher<out Double>,
+            preferencePctReporting: Flow.Publisher<Double>,
         ): VoteScreenBuilder<KT, KPT, CT, CPT, PT, DT> {
             this.preferencePctReporting = preferencePctReporting
             return this
@@ -591,36 +591,36 @@ class SimpleVoteViewPanel private constructor(
                 }
             }
 
-        abstract fun createResultFrameBuilder(): BarFrameBuilder
+        abstract fun createResultFrame(
+            header: Flow.Publisher<out String?>,
+            progress: Flow.Publisher<out String?>?,
+            subhead: Flow.Publisher<out String?>,
+            notes: Flow.Publisher<out String?>?,
+            max: Flow.Publisher<out Double?>,
+            lines: Flow.Publisher<List<Double>>?,
+        ): BarFrame
 
-        private fun applyMajorityLine(builder: BarFrameBuilder) {
-            val showMajority = this.showMajority
-            val pctReporting = this.pctReporting
-            if (showMajority != null) {
-                val lines = showMajority.merge(
-                    pctReporting ?: 1.0.asOneTimePublisher(),
-                ) {
-                        show, pct ->
-                    if (show) {
-                        listOf(0.5 / pct.coerceAtLeast(1e-6))
-                    } else {
-                        emptyList()
-                    }
+        private val linesPublisher by lazy {
+            showMajority?.merge(
+                pctReporting ?: 1.0.asOneTimePublisher(),
+            ) { show, pct ->
+                if (show) {
+                    listOf(0.5 / pct.coerceAtLeast(1e-6))
+                } else {
+                    emptyList()
                 }
-                builder.withLines(lines) { majorityLabel!! }
             }
         }
 
         private fun createFrame(): BarFrame {
-            val builder = createResultFrameBuilder()
-                .withHeader(header, rightLabelPublisher = progressLabel)
-                .withSubhead(subhead)
-                .withNotes(this.notes ?: (null as String?).asOneTimePublisher())
-                .withMax(
-                    this.pctReporting?.map { 2.0 / 3 / it.coerceAtLeast(1e-6) } ?: (2.0 / 3).asOneTimePublisher(),
-                )
-            applyMajorityLine(builder)
-            return builder.build()
+            return createResultFrame(
+                header = header,
+                progress = progressLabel,
+                subhead = subhead,
+                notes = notes,
+                max = pctReporting?.map { 2.0 / 3 / it.coerceAtLeast(1e-6) } ?: (2.0 / 3).asOneTimePublisher(),
+                lines = linesPublisher,
+            )
         }
 
         protected val currPreferencesEntries: Flow.Publisher<List<Entry<KT, CT>>>?
@@ -639,17 +639,22 @@ class SimpleVoteViewPanel private constructor(
                 }
             }
 
-        abstract fun createPreferenceResultFrameBuilder(): BarFrameBuilder?
+        abstract fun createPreferenceResultFrame(
+            header: Flow.Publisher<out String?>,
+            progress: Flow.Publisher<out String?>?,
+            subhead: Flow.Publisher<out String?>?,
+            max: Flow.Publisher<Double>,
+            lines: Flow.Publisher<List<Double>>,
+        ): BarFrame?
 
         private fun createPreferenceFrame(): BarFrame? {
-            val builder = (createPreferenceResultFrameBuilder() ?: return null)
-                .withHeader(preferenceHeader!!, rightLabelPublisher = preferenceProgressLabel)
-                .withSubhead(preferenceSubhead!!)
-                .withMax(
-                    this.preferencePctReporting?.map { 2.0 / 3 / it.coerceAtLeast(1e-6) } ?: (2.0 / 3).asOneTimePublisher(),
-                )
-                .withLines(this.preferencePctReporting?.map { listOf(0.5 / it.coerceAtLeast(1e-6)) } ?: listOf(0.5).asOneTimePublisher()) { "50%" }
-            return builder.build()
+            return createPreferenceResultFrame(
+                header = preferenceHeader ?: return null,
+                progress = preferenceProgressLabel,
+                subhead = preferenceSubhead,
+                max = preferencePctReporting?.map { 2.0 / 3 / it.coerceAtLeast(1e-6) } ?: (2.0 / 3).asOneTimePublisher(),
+                lines = preferencePctReporting?.map { listOf(0.5 / it.coerceAtLeast(1e-6)) } ?: listOf(0.5).asOneTimePublisher(),
+            )
         }
 
         protected val currClassificationEntries: Flow.Publisher<List<Entry<KPT, CT>>>?
@@ -666,18 +671,21 @@ class SimpleVoteViewPanel private constructor(
                 }
             }
 
-        protected abstract fun createClassificationFrameBuilder(): BarFrameBuilder?
+        protected abstract fun createClassificationFrame(
+            header: Flow.Publisher<out String?>,
+            max: Flow.Publisher<Double>,
+            lines: Flow.Publisher<List<Double>>?,
+        ): BarFrame?
 
         protected abstract fun combineValuesForClassification(a: CT, b: CT): CT
 
         private fun createClassificationFrame(): BarFrame? {
-            val builder = (createClassificationFrameBuilder() ?: return null)
-                .withHeader(classificationHeader!!)
-                .withMax(
-                    pctReporting?.map { 2.0 / 3 / it.coerceAtLeast(1e-6) } ?: (2.0 / 3).asOneTimePublisher(),
-                )
-            applyMajorityLine(builder)
-            return builder.build()
+            if (classificationHeader == null) return null
+            return createClassificationFrame(
+                classificationHeader!!,
+                pctReporting?.map { 2.0 / 3 / it.coerceAtLeast(1e-6) } ?: (2.0 / 3).asOneTimePublisher(),
+                linesPublisher,
+            )
         }
 
         protected data class CurrDiffEntry<K, P, C, D>(val key: K?, val party: P, val curr: C?, val diff: D?, val result: Result?)
@@ -721,22 +729,28 @@ class SimpleVoteViewPanel private constructor(
             }
 
         private fun createDiffFrame(): BarFrame? {
-            return (createDiffFrameBuilder() ?: return null)
-                .withLimits(
-                    (showPrevRaw ?: false.asOneTimePublisher()).merge(pctReporting ?: 1.0.asOneTimePublisher()) { showRaw, pct ->
-                        if (showRaw) {
-                            BarFrameBuilder.Limit(max = 2.0 / 3)
-                        } else {
-                            BarFrameBuilder.Limit(wingspan = 0.1 / pct.coerceAtLeast(1e-6))
-                        }
-                    },
-                )
-                .withHeader(changeHeader!!)
-                .withSubhead(filteredChangeSubhead ?: (null as String?).asOneTimePublisher())
-                .build()
+            if (changeHeader == null) return null
+            val limits = (showPrevRaw ?: false.asOneTimePublisher()).merge(
+                pctReporting ?: 1.0.asOneTimePublisher(),
+            ) { showRaw, pct ->
+                if (showRaw) {
+                    BarFrameBuilder.Limit(max = 2.0 / 3)
+                } else {
+                    BarFrameBuilder.Limit(wingspan = 0.1 / pct.coerceAtLeast(1e-6))
+                }
+            }
+            return createDiffFrameBuilder(
+                changeHeader!!,
+                filteredChangeSubhead,
+                limits,
+            )
         }
 
-        protected abstract fun createDiffFrameBuilder(): BarFrameBuilder?
+        protected abstract fun createDiffFrameBuilder(
+            header: Flow.Publisher<out String?>,
+            subhead: Flow.Publisher<out String?>?,
+            limits: Flow.Publisher<BarFrameBuilder.Limit>,
+        ): BarFrame?
 
         private fun createSwingFrame(): SwingFrame? {
             return (createSwingFrameBuilder() ?: return null)
@@ -839,20 +853,51 @@ class SimpleVoteViewPanel private constructor(
             return if (currPreferences == null) 10 else 0
         }
 
-        override fun createResultFrameBuilder(): BarFrameBuilder {
-            return currEntries.map { entries ->
-                createBars(entries, "UNCONTESTED")
-            }.let { BarFrameBuilder.basic(it) }
+        override fun createResultFrame(
+            header: Flow.Publisher<out String?>,
+            progress: Flow.Publisher<out String?>?,
+            subhead: Flow.Publisher<out String?>,
+            notes: Flow.Publisher<out String?>?,
+            max: Flow.Publisher<out Double?>,
+            lines: Flow.Publisher<List<Double>>?,
+        ): BarFrame {
+            return BarFrameBuilder.basic(
+                barsPublisher = currEntries.map { createBars(it, "UNCONTESTED") },
+                headerPublisher = header,
+                rightHeaderLabelPublisher = progress,
+                subheadPublisher = subhead,
+                notesPublisher = notes,
+                maxPublisher = max,
+                linesPublisher = lines?.let { BarFrameBuilder.Lines.of(it) { majorityLabel ?: "" } },
+            )
         }
 
-        override fun createPreferenceResultFrameBuilder(): BarFrameBuilder? {
-            return currPreferencesEntries?.map { entries ->
+        override fun createPreferenceResultFrame(
+            header: Flow.Publisher<out String?>,
+            progress: Flow.Publisher<out String?>?,
+            subhead: Flow.Publisher<out String?>?,
+            max: Flow.Publisher<Double>,
+            lines: Flow.Publisher<List<Double>>,
+        ): BarFrame? {
+            val bars = currPreferencesEntries?.map { entries ->
                 createBars(entries, "ELECTED")
-            }?.let { BarFrameBuilder.basic(it) }
+            } ?: return null
+            return BarFrameBuilder.basic(
+                barsPublisher = bars,
+                headerPublisher = header,
+                rightHeaderLabelPublisher = progress,
+                subheadPublisher = subhead,
+                maxPublisher = max,
+                linesPublisher = BarFrameBuilder.Lines.of(lines) { "50%" },
+            )
         }
 
-        override fun createClassificationFrameBuilder(): BarFrameBuilder? {
-            return currClassificationEntries?.map { entries ->
+        override fun createClassificationFrame(
+            header: Flow.Publisher<out String?>,
+            max: Flow.Publisher<Double>,
+            lines: Flow.Publisher<List<Double>>?,
+        ): BarFrame? {
+            val bars = currClassificationEntries?.map { entries ->
                 val total = entries.sumOf { it.value ?: 0 }
                 entries.map {
                     BarFrameBuilder.BasicBar(
@@ -868,7 +913,13 @@ class SimpleVoteViewPanel private constructor(
                         ),
                     )
                 }
-            }?.let { BarFrameBuilder.basic(it) }
+            } ?: return null
+            return BarFrameBuilder.basic(
+                barsPublisher = bars,
+                headerPublisher = header,
+                maxPublisher = max,
+                linesPublisher = lines?.let { BarFrameBuilder.Lines.of(it) { majorityLabel ?: "50%" } },
+            )
         }
 
         private fun createBars(entries: List<Entry<KT, Int?>>, singleEntryLabel: String): List<BarFrameBuilder.BasicBar> {
@@ -921,7 +972,11 @@ class SimpleVoteViewPanel private constructor(
             return value1 + value2
         }
 
-        override fun createDiffFrameBuilder(): BarFrameBuilder? {
+        override fun createDiffFrameBuilder(
+            header: Flow.Publisher<out String?>,
+            subhead: Flow.Publisher<out String?>?,
+            limits: Flow.Publisher<BarFrameBuilder.Limit>,
+        ): BarFrame? {
             val prevBars = prevEntries?.map { entries ->
                 val total = entries.sumOf { it.value }
                 entries.map {
@@ -954,9 +1009,13 @@ class SimpleVoteViewPanel private constructor(
                         )
                     }
             }
-            return (showPrevRaw ?: return null)
-                .compose { if (it) prevBars!! else diffBars!! }
-                .let { BarFrameBuilder.basic(it) }
+            val bars = (showPrevRaw ?: return null).compose { if (it) prevBars!! else diffBars!! }
+            return BarFrameBuilder.basic(
+                barsPublisher = bars,
+                headerPublisher = header,
+                subheadPublisher = subhead,
+                limitsPublisher = limits,
+            )
         }
 
         override fun createSwingFrameBuilder(): SwingFrameBuilder? {
@@ -1203,19 +1262,50 @@ class SimpleVoteViewPanel private constructor(
                 }
             }
 
-        override fun createResultFrameBuilder(): BarFrameBuilder {
+        override fun createResultFrame(
+            header: Flow.Publisher<out String?>,
+            progress: Flow.Publisher<out String?>?,
+            subhead: Flow.Publisher<out String?>,
+            notes: Flow.Publisher<out String?>?,
+            max: Flow.Publisher<out Double?>,
+            lines: Flow.Publisher<List<Double>>?,
+        ): BarFrame {
             return currEntries.map { entries ->
                 createBars(entries)
-            }.let { BarFrameBuilder.dual(it) }
+            }.run {
+                BarFrameBuilder.dual(this)
+                    .withHeader(header, rightLabelPublisher = progress ?: null.asOneTimePublisher())
+                    .withSubhead(subhead)
+                    .apply { notes?.let { withNotes(it) } }
+                    .withMax(max)
+                    .apply { lines?.let { withLines(it) { majorityLabel!! } } }
+                    .build()
+            }
         }
 
-        override fun createPreferenceResultFrameBuilder(): BarFrameBuilder? {
-            return currPreferencesEntries?.map { entries ->
+        override fun createPreferenceResultFrame(
+            header: Flow.Publisher<out String?>,
+            progress: Flow.Publisher<out String?>?,
+            subhead: Flow.Publisher<out String?>?,
+            max: Flow.Publisher<Double>,
+            lines: Flow.Publisher<List<Double>>,
+        ): BarFrame? {
+            val bars = currPreferencesEntries?.map { entries ->
                 createBars(entries)
-            }?.let { BarFrameBuilder.dual(it) }
+            } ?: return null
+            return BarFrameBuilder.dual(bars)
+                .withHeader(header, rightLabelPublisher = progress ?: null.asOneTimePublisher())
+                .withSubhead(subhead ?: null.asOneTimePublisher())
+                .withMax(max)
+                .withLines(lines) { "50%" }
+                .build()
         }
 
-        override fun createClassificationFrameBuilder(): BarFrameBuilder? {
+        override fun createClassificationFrame(
+            header: Flow.Publisher<out String?>,
+            max: Flow.Publisher<Double>,
+            lines: Flow.Publisher<List<Double>>?,
+        ): BarFrame? {
             return classificationFunc?.let { throw UnsupportedOperationException("Classifications not supported on ranges") }
         }
 
@@ -1244,7 +1334,11 @@ class SimpleVoteViewPanel private constructor(
             throw UnsupportedOperationException("Classifications not supported on ranges")
         }
 
-        override fun createDiffFrameBuilder(): BarFrameBuilder? {
+        override fun createDiffFrameBuilder(
+            header: Flow.Publisher<out String?>,
+            subhead: Flow.Publisher<out String?>?,
+            limits: Flow.Publisher<BarFrameBuilder.Limit>,
+        ): BarFrame? {
             val prevBars = prevEntries?.map { entries ->
                 val total = entries.sumOf { it.value }
                 entries.map {
@@ -1273,9 +1367,12 @@ class SimpleVoteViewPanel private constructor(
                     )
                 }
             }
-            return (this.showPrevRaw ?: return null)
-                .compose { if (it) prevBars!! else diffBars!! }
-                .let { BarFrameBuilder.dual(it) }
+            val bars = (this.showPrevRaw ?: return null).compose { if (it) prevBars!! else diffBars!! }
+            return BarFrameBuilder.dual(bars)
+                .withHeader(header)
+                .withSubhead(subhead ?: null.asOneTimePublisher())
+                .withLimits(limits)
+                .build()
         }
 
         override fun prevCombine(value1: Int, value2: Int): Int {
@@ -1461,14 +1558,14 @@ class SimpleVoteViewPanel private constructor(
                         )
                     }
             }
-            return BarFrameBuilder.basic(bars)
-                .withHeader(header, rightLabelPublisher = progressLabel)
-                .withSubhead(subhead)
-                .withMax(
-                    votes.map { r -> r.values.sumOf { it ?: 0 } * 2 / 3 }
-                        .merge(pctReporting) { v, p -> v / p.coerceAtLeast(1e-6) },
-                )
-                .build()
+            return BarFrameBuilder.basic(
+                barsPublisher = bars,
+                headerPublisher = header,
+                rightHeaderLabelPublisher = progressLabel,
+                subheadPublisher = subhead,
+                maxPublisher = votes.map { r -> r.values.sumOf { it ?: 0 } * 2 / 3 }
+                    .merge(pctReporting) { v, p -> v / p.coerceAtLeast(1e-6) },
+            )
         }
 
         private fun createPrevFrame(): JPanel? {
@@ -1485,11 +1582,12 @@ class SimpleVoteViewPanel private constructor(
                         )
                     }
             }
-            return BarFrameBuilder.basic(bars)
-                .withHeader(prevHeader!!)
-                .withSubhead(prevSubhead!!)
-                .withMax(prevVotes.map { r -> r.values.sumOf { it } * 2 / 3 })
-                .build()
+            return BarFrameBuilder.basic(
+                barsPublisher = bars,
+                headerPublisher = prevHeader!!,
+                subheadPublisher = prevSubhead!!,
+                maxPublisher = prevVotes.map { r -> r.values.sumOf { it } * 2 / 3 },
+            )
         }
 
         private fun createAltText(title: Flow.Publisher<out String?>): Flow.Publisher<String> {

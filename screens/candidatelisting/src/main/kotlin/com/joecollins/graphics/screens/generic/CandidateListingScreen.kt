@@ -236,11 +236,12 @@ class CandidateListingScreen private constructor(
         }
 
         private fun createPrevPanel(prevVotes: Flow.Publisher<out Map<PT, Int>>, header: Flow.Publisher<out String?>, subhead: Flow.Publisher<out String?>): JPanel {
-            return BarFrameBuilder.basic(prevVotes.map { v -> createVoteBars(v) })
-                .withMax((2.0 / 3).asOneTimePublisher())
-                .withHeader(header)
-                .withSubhead(subhead)
-                .build()
+            return BarFrameBuilder.basic(
+                barsPublisher = prevVotes.map { v -> createVoteBars(v) },
+                maxPublisher = (2.0 / 3).asOneTimePublisher(),
+                headerPublisher = header,
+                subheadPublisher = subhead,
+            )
         }
 
         private fun createAltText(title: Flow.Publisher<out String>): Flow.Publisher<String> {

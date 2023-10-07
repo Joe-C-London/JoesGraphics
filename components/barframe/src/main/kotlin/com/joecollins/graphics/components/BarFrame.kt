@@ -47,9 +47,10 @@ class BarFrame(
     private val subheadLabel: FontSizeAdjustingLabel = FontSizeAdjustingLabel()
     private val bars: MutableList<BarPanel> = ArrayList()
     private val lines: MutableList<LinePanel> = ArrayList()
-    var min: Number = 0.0
+
+    internal var min: Number = 0.0
         private set
-    var max: Number = 0.0
+    internal var max: Number = 0.0
         private set
 
     class Bar constructor(
@@ -308,22 +309,20 @@ class BarFrame(
     private inner class LinePanel {
         var level: Number = 0
 
-        val jLabel: JLabel = object : JLabel("") {
-            init {
-                foreground = Color.BLACK
-                preferredSize = Dimension(1024, 15)
-                font = StandardFont.readNormalFont(10)
-                isVisible = true
-                horizontalAlignment = LEFT
-                verticalAlignment = BOTTOM
-                addComponentListener(
-                    object : ComponentAdapter() {
-                        override fun componentResized(e: ComponentEvent) {
-                            font = StandardFont.readNormalFont(height * 2 / 3)
-                        }
-                    },
-                )
-            }
+        val jLabel: JLabel = JLabel("").apply {
+            foreground = Color.BLACK
+            preferredSize = Dimension(1024, 15)
+            font = StandardFont.readNormalFont(10)
+            isVisible = true
+            horizontalAlignment = JLabel.LEFT
+            verticalAlignment = JLabel.BOTTOM
+            addComponentListener(
+                object : ComponentAdapter() {
+                    override fun componentResized(e: ComponentEvent) {
+                        font = StandardFont.readNormalFont(height * 2 / 3)
+                    }
+                },
+            )
         }
 
         var label: String
@@ -345,23 +344,21 @@ class BarFrame(
         }
 
         private fun getLayoutSize(func: (JComponent) -> Dimension): Dimension {
-            var width = 0
-            var height = 0
-            if (subheadLabel.isVisible) {
-                val subheadSize = func(subheadLabel)
-                width = subheadSize.width
-                height = subheadSize.height
-            }
-            var barHeight = 0
-            for (bar in bars) {
-                val barSize = func(bar)
-                width = max(width, barSize.width)
-                barHeight = max(barHeight, barSize.height)
-            }
-            height += bars.size * barHeight
-            if (lines.isNotEmpty()) {
-                height += lines[0].jLabel.preferredSize.height
-            }
+            val subheadSize = if (subheadLabel.isVisible) func(subheadLabel) else Dimension(0, 0)
+            val barsSize = bars.asSequence()
+                .map(func)
+                .fold(Dimension(0, 0)) { acc, dim ->
+                    Dimension(
+                        max(acc.width, dim.width),
+                        max(acc.height, dim.height),
+                    )
+                }.run { Dimension(width, bars.size * height) }
+            val width = max(subheadSize.width, barsSize.width)
+            val height = sequenceOf(
+                subheadSize.height,
+                barsSize.height,
+                if (lines.isNotEmpty()) lines[0].jLabel.preferredSize.height else 0,
+            ).sum()
             return Dimension(width, height)
         }
 
