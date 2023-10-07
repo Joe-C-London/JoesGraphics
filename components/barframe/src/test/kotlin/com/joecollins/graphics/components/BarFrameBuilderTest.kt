@@ -181,7 +181,7 @@ class BarFrameBuilderTest {
                         .map { BasicBar(it.key.first, it.key.second, it.value, THOUSANDS.format(it.value)) }
                         .toList()
                 },
-            targetPublisher = BarFrameBuilder.Target(target) { THOUSANDS.format(it) + " TO WIN" },
+            targetPublisher = BarFrameBuilder.Target(target) { THOUSANDS.format(this) + " TO WIN" },
         )
         assertEquals(1, frame.numLines)
         assertEquals(2382, frame.getLineLevel(0))
@@ -200,7 +200,7 @@ class BarFrameBuilderTest {
                         .map { BasicBar(it.key.first, it.key.second, it.value, THOUSANDS.format(it.value)) }
                         .toList()
                 },
-            linesPublisher = BarFrameBuilder.Lines.of(lines) { it.toString() + " QUOTA" + (if (it == 1) "" else "S") },
+            linesPublisher = BarFrameBuilder.Lines.of(lines) { toString() + " QUOTA" + (if (this == 1) "" else "S") },
         )
         assertEquals(0, frame.numLines.toLong())
         lines.submit(listOf(1, 2, 3, 4, 5))
@@ -229,7 +229,7 @@ class BarFrameBuilderTest {
                         .map { BasicBar(it.key.first, it.key.second, it.value, THOUSANDS.format(it.value)) }
                         .toList()
                 },
-            linesPublisher = BarFrameBuilder.Lines.of(lines, { it.first }) { it.second },
+            linesPublisher = BarFrameBuilder.Lines.of(lines, { first }) { second },
         )
         assertEquals(0, frame.numLines.toLong())
         lines.submit(
@@ -257,7 +257,7 @@ class BarFrameBuilderTest {
                         .map { BasicBar(it.key.first, it.key.second, it.value, THOUSANDS.format(it.value)) }
                         .toList()
                 },
-            linesPublisher = BarFrameBuilder.Lines.of(lines) { it.toString() + " QUOTA" + (if (it == 1) "" else "S") },
+            linesPublisher = BarFrameBuilder.Lines.of(lines) { toString() + " QUOTA" + (if (this == 1) "" else "S") },
         )
         assertEquals(0, frame.numLines.toLong())
         lines.submit(listOf(1, 2, 3, 4, 5))

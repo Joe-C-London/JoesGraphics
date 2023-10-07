@@ -259,7 +259,7 @@ class SingleTransferrableResultScreen private constructor(
                 headerPublisher = candidateHeader,
                 subheadPublisher = candidateSubhead,
                 maxPublisher = quota.map { (it?.toDouble() ?: 1.0) * 2 },
-                linesPublisher = BarFrameBuilder.Lines.of(quota.map { if (it == null) emptyList() else listOf(it) }) { "QUOTA: " + formatString(it) },
+                linesPublisher = BarFrameBuilder.Lines.of(quota.map { if (it == null) emptyList() else listOf(it) }) { "QUOTA: " + formatString(this) },
             )
         }
 
@@ -295,7 +295,7 @@ class SingleTransferrableResultScreen private constructor(
                 barsPublisher = bars,
                 headerPublisher = partyHeader!!,
                 maxPublisher = totalSeats!!,
-                linesPublisher = BarFrameBuilder.Lines.of(totalSeats!!.map { (1 until it).toList() }) { i -> "$i QUOTA${if (i == 1) "" else "S"}" },
+                linesPublisher = BarFrameBuilder.Lines.of(totalSeats!!.map { (1 until it).toList() }) { "$this QUOTA${if (this == 1) "" else "S"}" },
             )
         }
 

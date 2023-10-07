@@ -15,9 +15,9 @@ class ListingFrameBuilderTest {
         )
         val frame: BarFrame = ListingFrameBuilder.of(
             list.asOneTimePublisher(),
-            { it.first },
-            { it.third },
-            { it.second },
+            { first },
+            { third },
+            { second },
             header = "HEADER".asOneTimePublisher(),
             subhead = "SUBHEAD".asOneTimePublisher(),
         )
@@ -55,9 +55,9 @@ class ListingFrameBuilderTest {
         )
         val frame = ListingFrameBuilder.of(
             list,
-            { it.first },
-            { it.third },
-            { it.second },
+            { first },
+            { third },
+            { second },
             header = "HEADER".asOneTimePublisher(),
             subhead = "SUBHEAD".asOneTimePublisher(),
         )

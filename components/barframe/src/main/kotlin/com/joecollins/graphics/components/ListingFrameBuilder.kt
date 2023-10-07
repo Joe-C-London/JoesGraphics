@@ -10,9 +10,9 @@ object ListingFrameBuilder {
 
     fun <T> of(
         list: Flow.Publisher<out List<T>>,
-        leftTextFunc: (T) -> String,
-        rightTextFunc: (T) -> String,
-        colorFunc: (T) -> Color,
+        leftText: T.() -> String,
+        rightText: T.() -> String,
+        color: T.() -> Color,
         header: Flow.Publisher<out String?>,
         subhead: Flow.Publisher<out String?>? = null,
         notes: Flow.Publisher<out String?>? = null,
@@ -20,7 +20,7 @@ object ListingFrameBuilder {
         return BarFrame(
             barsPublisher = list.map { l ->
                 l.map {
-                    BarFrame.Bar(leftTextFunc(it), rightTextFunc(it), null, listOf(Pair(colorFunc(it), 1)))
+                    BarFrame.Bar(it.leftText(), it.rightText(), null, listOf(Pair(it.color(), 1)))
                 }
             },
             headerPublisher = header,
@@ -31,9 +31,9 @@ object ListingFrameBuilder {
 
     fun <T> of(
         list: List<T>,
-        leftTextFunc: (T) -> Flow.Publisher<out String>,
-        rightTextFunc: (T) -> Flow.Publisher<out String>,
-        colorFunc: (T) -> Flow.Publisher<out Color>,
+        leftText: T.() -> Flow.Publisher<out String>,
+        rightText: T.() -> Flow.Publisher<out String>,
+        color: T.() -> Flow.Publisher<out Color>,
         header: Flow.Publisher<out String?>,
         subhead: Flow.Publisher<out String?>? = null,
         notes: Flow.Publisher<out String?>? = null,
@@ -41,8 +41,8 @@ object ListingFrameBuilder {
         return BarFrame(
             barsPublisher =
             list.map {
-                leftTextFunc(it).merge(rightTextFunc(it)) { left, right -> Pair(left, right) }
-                    .merge(colorFunc(it)) {
+                it.leftText().merge(it.rightText()) { left, right -> Pair(left, right) }
+                    .merge(it.color()) {
                             (left, right), color ->
                         BarFrame.Bar(left, right, listOf(Pair(color, 1)))
                     }

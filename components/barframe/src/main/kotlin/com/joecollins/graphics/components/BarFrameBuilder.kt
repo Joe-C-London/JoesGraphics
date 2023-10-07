@@ -75,23 +75,23 @@ object BarFrameBuilder {
         }
     }
 
-    data class Target<T : Number>(val publisher: Flow.Publisher<T>, val labelFunc: (T) -> String) {
+    data class Target<T : Number>(val publisher: Flow.Publisher<T>, val label: T.() -> String) {
         val lines = publisher.map { target ->
-            listOf(BarFrame.Line(target, labelFunc(target)))
+            listOf(BarFrame.Line(target, target.label()))
         }
     }
 
-    data class Lines<T> private constructor(val publisher: Flow.Publisher<List<T>>, val labelFunc: (T) -> String, val valueFunc: (T) -> Number) {
+    data class Lines<T> private constructor(val publisher: Flow.Publisher<List<T>>, val label: T.() -> String, val value: T.() -> Number) {
         val lines = publisher.map { values ->
-            values.map { BarFrame.Line(valueFunc(it), labelFunc(it)) }
+            values.map { BarFrame.Line(it.value(), it.label()) }
         }
 
         companion object {
-            fun <T : Number> of(publisher: Flow.Publisher<List<T>>, labelFunc: (T) -> String): Lines<T> {
-                return Lines(publisher, labelFunc) { it }
+            fun <T : Number> of(publisher: Flow.Publisher<List<T>>, labelFunc: T.() -> String): Lines<T> {
+                return Lines(publisher, labelFunc) { this }
             }
 
-            fun <T> of(publisher: Flow.Publisher<List<T>>, labelFunc: (T) -> String, valueFunc: (T) -> Number): Lines<T> {
+            fun <T> of(publisher: Flow.Publisher<List<T>>, labelFunc: T.() -> String, valueFunc: T.() -> Number): Lines<T> {
                 return Lines(publisher, labelFunc, valueFunc)
             }
         }
