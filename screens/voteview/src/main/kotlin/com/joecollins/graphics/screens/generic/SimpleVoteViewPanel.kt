@@ -252,9 +252,9 @@ class SimpleVoteViewPanel private constructor(
         protected var preferenceHeader: Flow.Publisher<out String?>? = null
         protected var preferenceSubhead: Flow.Publisher<out String?>? = null
         private var preferencePctReporting: Flow.Publisher<Double>? = null
-        private var swingHeader: Flow.Publisher<out String?>? = null
+        protected var swingHeader: Flow.Publisher<out String?>? = null
         protected var swingComparator: Comparator<KPT>? = null
-        private var swingRange: Flow.Publisher<Double>? = null
+        protected var swingRange: Flow.Publisher<Double>? = null
         protected var classificationFunc: ((KPT) -> KPT)? = null
         protected var classificationHeader: Flow.Publisher<out String?>? = null
         private var mapBuilder: MapFrame? = null
@@ -798,14 +798,7 @@ class SimpleVoteViewPanel private constructor(
             limits: Flow.Publisher<BarFrameBuilder.Limit>,
         ): BarFrame?
 
-        private fun createSwingFrame(): SwingFrame? {
-            return (createSwingFrameBuilder() ?: return null)
-                .withHeader(swingHeader!!)
-                .withRange(swingRange!!)
-                .build()
-        }
-
-        protected abstract fun createSwingFrameBuilder(): SwingFrameBuilder?
+        protected abstract fun createSwingFrame(): SwingFrame?
 
         private fun createMapFrame(): MapFrame? {
             return mapBuilder
@@ -847,7 +840,7 @@ class SimpleVoteViewPanel private constructor(
         protected abstract fun createPrevBarAltTexts(entries: List<Entry<KPT, PT>>): List<String>
 
         private fun createSwingAltText(): Flow.Publisher<String?> {
-            return createSwingFrameBuilder()?.buildBottomText()?.merge(swingHeader ?: null.asOneTimePublisher()) { bottom, header ->
+            return createSwingFrame()?.altText?.merge(swingHeader ?: null.asOneTimePublisher()) { bottom, header ->
                 "${header?.let { "$it: " }}$bottom"
             } ?: null.asOneTimePublisher()
         }
@@ -1064,7 +1057,7 @@ class SimpleVoteViewPanel private constructor(
             )
         }
 
-        override fun createSwingFrameBuilder(): SwingFrameBuilder? {
+        override fun createSwingFrame(): SwingFrame? {
             if (swingComparator == null) return null
             val curr: Flow.Publisher<out Map<out KPT, Int>>
             val prev: Flow.Publisher<out Map<out KPT, Int>>
@@ -1102,9 +1095,11 @@ class SimpleVoteViewPanel private constructor(
             }
             val classificationFunc = classificationFunc
             return SwingFrameBuilder.prevCurr(
-                (if (classificationFunc == null) prev else Aggregators.adjustKey(prev, classificationFunc)),
-                (if (classificationFunc == null) curr else Aggregators.adjustKey(curr, classificationFunc)),
-                swingComparator!!,
+                prev = (if (classificationFunc == null) prev else Aggregators.adjustKey(prev, classificationFunc)),
+                curr = (if (classificationFunc == null) curr else Aggregators.adjustKey(curr, classificationFunc)),
+                partyOrder = swingComparator!!,
+                range = swingRange!!,
+                header = swingHeader!!,
             )
         }
 
@@ -1429,7 +1424,7 @@ class SimpleVoteViewPanel private constructor(
             return value1 + value2
         }
 
-        override fun createSwingFrameBuilder(): SwingFrameBuilder? {
+        override fun createSwingFrame(): SwingFrame? {
             if (swingComparator == null) return null
             val curr = current
                 .map { m ->
@@ -1439,7 +1434,13 @@ class SimpleVoteViewPanel private constructor(
                 .map { m ->
                     m.mapValues { e -> e.value.let { r -> (1000000 * (r.start + r.endInclusive) / 2).roundToInt() } }
                 }
-            return SwingFrameBuilder.prevCurr(filteredPrev!!, curr, swingComparator!!)
+            return SwingFrameBuilder.prevCurr(
+                prev = filteredPrev!!,
+                curr = curr,
+                partyOrder = swingComparator!!,
+                range = swingRange!!,
+                header = swingHeader!!,
+            )
         }
 
         private val barEntryLine: (String, ClosedRange<Double>?, ClosedRange<Double>?) -> String = { h, p, d ->

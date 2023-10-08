@@ -54,13 +54,14 @@ class RegionalSwingsScreen private constructor(
         fun build(title: Flow.Publisher<String>): RegionalSwingsScreen {
             val swings = regions.map {
                 it to SwingFrameBuilder.prevCurr(
-                    prevVotes(it),
-                    currVotes(it),
-                    swingOrder,
-                    partyFilter,
+                    prev = prevVotes(it),
+                    curr = currVotes(it),
+                    partyOrder = swingOrder,
+                    selectedParties = partyFilter,
+                    range = swingRange,
+                    header = name(it),
+                    progress = progressLabel(it),
                 )
-                    .withHeader(name(it), progressPublisher = progressLabel(it))
-                    .withRange(swingRange)
             }
             return RegionalSwingsScreen(
                 JPanel().also { panel ->
@@ -68,13 +69,13 @@ class RegionalSwingsScreen private constructor(
                     panel.layout = GridLayout(numRows, 0, 5, 5)
                     panel.border = EmptyBorder(5, 5, 5, 5)
                     swings.forEach { (_, swingFrame) ->
-                        panel.add(swingFrame.build())
+                        panel.add(swingFrame)
                     }
                 },
                 title,
                 swings.map { (region, swingFrame) ->
                     name(region).merge(progressLabel(region)) { n, p -> if (p == null) n else "$n [$p]" }
-                        .merge(swingFrame.buildBottomText()!!) { t, b -> "$t: $b" }
+                        .merge(swingFrame.altText) { t, b -> "$t: $b" }
                 }.combine().merge(title) { text, top -> "$top\n\n${text.joinToString("\n")}" },
             )
         }

@@ -760,21 +760,16 @@ class SeatViewPanel private constructor(
         }
 
         private fun createSwingFrame(): SwingFrame? {
-            return (createSwingFrameBuilder() ?: return null)
-                .withHeader(swingHeader!!)
-                .withRange(swingRange!!)
-                .build()
-        }
-
-        private fun createSwingFrameBuilder(): SwingFrameBuilder? {
             if (swingComparator == null) return null
             val prev = prevVotes!!
             val curr = currVotes!!
             val func = classificationFunc
             return SwingFrameBuilder.prevCurr(
-                (if (func == null) prev else Aggregators.adjustKey(prev, func)),
-                (if (func == null) curr else Aggregators.adjustKey(curr, func)),
-                swingComparator!!,
+                prev = (if (func == null) prev else Aggregators.adjustKey(prev, func)),
+                curr = (if (func == null) curr else Aggregators.adjustKey(curr, func)),
+                partyOrder = swingComparator!!,
+                range = swingRange!!,
+                header = swingHeader!!,
             )
         }
 
@@ -840,7 +835,7 @@ class SeatViewPanel private constructor(
                 }
                 ?: null.asOneTimePublisher()
             val swingText: Flow.Publisher<out String?> =
-                createSwingFrameBuilder()?.buildBottomText()?.merge(this.swingHeader!!) { text, head ->
+                createSwingFrame()?.altText?.merge(this.swingHeader!!) { text, head ->
                     if (head == null) {
                         text
                     } else {

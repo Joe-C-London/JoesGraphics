@@ -584,15 +584,14 @@ class MultiResultScreen private constructor(
             add(barFrame)
             if (swingPartyOrder != null) {
                 swingFrame = SwingFrameBuilder.prevCurr(
-                    prevVotes.selfCompose(),
-                    votes.selfCompose()
+                    prev = prevVotes.selfCompose(),
+                    curr = votes.selfCompose()
                         .map { m ->
                             m.entries.groupingBy { it.key.party }.fold(0) { a, e -> a + e.value }
                         },
-                    swingPartyOrder,
+                    partyOrder = swingPartyOrder,
+                    header = swingHeader.selfCompose(),
                 )
-                    .withHeader(swingHeader.selfCompose())
-                    .build()
                 add(swingFrame)
             }
             if (hasMap) {

@@ -1,5 +1,6 @@
 package com.joecollins.graphics.components
 
+import com.joecollins.graphics.AltTextProvider
 import com.joecollins.graphics.utils.ColorUtils
 import com.joecollins.graphics.utils.StandardFont
 import com.joecollins.pubsub.Subscriber
@@ -28,9 +29,12 @@ class SwingFrame(
 ) : GraphicsFrame(
     headerPublisher = headerPublisher,
     headerLabelsPublisher = progressPublisher?.map { p -> mapOf(HeaderLabelLocation.RIGHT to p) },
-) {
+),
+    AltTextProvider {
     private val swingPanel = SwingPanel()
     private val bottomLabel: JLabel = FontSizeAdjustingLabel()
+
+    override val altText: Flow.Publisher<out String?> = bottomTextPublisher
 
     init {
         bottomLabel.horizontalAlignment = JLabel.CENTER

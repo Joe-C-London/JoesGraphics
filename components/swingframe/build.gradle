@@ -18,6 +18,7 @@ var topLevel = parent.parent
 
 dependencies {
     api parent.project('componentbase')
+    api topLevel.project('alttext')
     api topLevel.project('models')
     implementation topLevel.project('pubsub')
 

@@ -191,13 +191,12 @@ class PartyQuotasPanel private constructor(
                 val prev = swingPrevVotes!!
                 val curr = swingCurrVotes!!
                 SwingFrameBuilder.prevCurr(
-                    prev,
-                    curr,
-                    swingComparator!!,
+                    prev = prev,
+                    curr = curr,
+                    partyOrder = swingComparator!!,
+                    range = swingRange!!,
+                    header = header,
                 )
-                    .withHeader(header)
-                    .withRange(swingRange!!)
-                    .build()
             }
         }
 
@@ -249,21 +248,14 @@ class PartyQuotasPanel private constructor(
             val swingText = if (swingPrevVotes == null || swingCurrVotes == null) {
                 null
             } else {
-                run {
-                    val prev = swingPrevVotes!!
-                    val curr = swingCurrVotes!!
-                    SwingFrameBuilder.prevCurr(
-                        prev,
-                        curr,
-                        swingComparator!!,
-                    ).buildBottomText()
-                }?.merge(swingHeader ?: null.asOneTimePublisher()) { t, h ->
-                    if (h == null) {
-                        t
-                    } else {
-                        "$h: $t"
+                createSwingFrame()?.altText
+                    ?.merge(swingHeader ?: null.asOneTimePublisher()) { t, h ->
+                        if (h == null) {
+                            t
+                        } else {
+                            "$h: $t"
+                        }
                     }
-                }
             }
             return textHeader.merge(mainText) { h, m -> "$h\n\n$m" }
                 .merge(swingText ?: null.asOneTimePublisher()) { h, s ->
