@@ -114,7 +114,7 @@ class MixedMemberResultPanel private constructor(
         private var candidateChangeHeader: Flow.Publisher<out String?> = (null as String?).asOneTimePublisher()
         private var partyVoteHeader: Flow.Publisher<out String?> = (null as String?).asOneTimePublisher()
         private var partyChangeHeader: Flow.Publisher<out String?> = (null as String?).asOneTimePublisher()
-        private var mapBuilder: MapBuilder<*>? = null
+        private var mapBuilder: MapFrame? = null
 
         fun withCandidateVotes(
             votes: Flow.Publisher<out Map<Candidate, Int?>>,
@@ -191,7 +191,13 @@ class MixedMemberResultPanel private constructor(
             focus: Flow.Publisher<out List<T>?>,
             header: Flow.Publisher<out String>,
         ): Builder {
-            mapBuilder = MapBuilder.singleResult(shapes, selectedShape, leadingParty, focus, header)
+            mapBuilder = MapBuilder.singleResult(
+                shapes = shapes,
+                selectedShape = selectedShape,
+                leadingParty = leadingParty,
+                focus = focus,
+                header = header,
+            )
             return this
         }
 
@@ -203,7 +209,14 @@ class MixedMemberResultPanel private constructor(
             additionalHighlight: Flow.Publisher<out List<T>?>,
             header: Flow.Publisher<out String>,
         ): Builder {
-            mapBuilder = MapBuilder.singleResult(shapes, selectedShape, leadingParty, focus, additionalHighlight, header)
+            mapBuilder = MapBuilder.singleResult(
+                shapes = shapes,
+                selectedShape = selectedShape,
+                leadingParty = leadingParty,
+                focus = focus,
+                additionalHighlight = additionalHighlight,
+                header = header,
+            )
             return this
         }
 
@@ -475,7 +488,7 @@ class MixedMemberResultPanel private constructor(
         }
 
         private fun createMapFrame(): MapFrame? {
-            return mapBuilder?.createMapFrame()
+            return mapBuilder
         }
 
         private fun createAltText(header: Flow.Publisher<out String?>): Flow.Publisher<String> {

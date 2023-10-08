@@ -3,6 +3,7 @@ package com.joecollins.graphics.screens.generic
 import com.joecollins.graphics.GenericPanel
 import com.joecollins.graphics.components.BarFrame
 import com.joecollins.graphics.components.GraphicsFrame
+import com.joecollins.graphics.components.MapFrame
 import com.joecollins.graphics.components.SwingFrame
 import com.joecollins.graphics.components.SwingFrameBuilder
 import com.joecollins.models.general.PartyOrCoalition
@@ -73,7 +74,7 @@ class PartyQuotasPanel private constructor(
         private var swingHeader: Flow.Publisher<out String?>? = null
         private var swingRange: Flow.Publisher<Double>? = null
 
-        private var mapBuilder: MapBuilder<*>? = null
+        private var mapBuilder: MapFrame? = null
 
         fun withPrev(
             prevQuotas: Flow.Publisher<out Map<out P, Double>>,
@@ -106,7 +107,13 @@ class PartyQuotasPanel private constructor(
             focus: Flow.Publisher<out List<T>?>,
             header: Flow.Publisher<out String?>,
         ): PartyQuotaScreenBuilder<P> {
-            mapBuilder = MapBuilder.singleResult(shapes, selectedShape, leadingParty.map { PartyResult.elected(it?.toParty()) }, focus, header)
+            mapBuilder = MapBuilder.singleResult(
+                shapes = shapes,
+                selectedShape = selectedShape,
+                leadingParty = leadingParty.map { PartyResult.elected(it?.toParty()) },
+                focus = focus,
+                header = header,
+            )
             return this
         }
 
@@ -122,7 +129,7 @@ class PartyQuotasPanel private constructor(
                 null,
                 createDiffFrame(),
                 createSwingFrame(),
-                mapBuilder?.createMapFrame(),
+                mapBuilder,
                 createAltText(textHeader),
             )
         }

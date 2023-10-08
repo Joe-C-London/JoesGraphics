@@ -257,8 +257,8 @@ class SimpleVoteViewPanel private constructor(
         private var swingRange: Flow.Publisher<Double>? = null
         protected var classificationFunc: ((KPT) -> KPT)? = null
         protected var classificationHeader: Flow.Publisher<out String?>? = null
-        private var mapBuilder: MapBuilder<*>? = null
-        private var secondMapBuilder: MapBuilder<*>? = null
+        private var mapBuilder: MapFrame? = null
+        private var secondMapBuilder: MapFrame? = null
         protected var runoffSubhead: Flow.Publisher<String>? = null
         protected var winnerNotRunningAgain: Flow.Publisher<String>? = null
         protected var progressLabel: Flow.Publisher<out String?>? = null
@@ -407,7 +407,12 @@ class SimpleVoteViewPanel private constructor(
             focus: Flow.Publisher<out List<T>?>,
             headerPublisher: Flow.Publisher<out String?>,
         ): VoteScreenBuilder<KT, KPT, CT, CPT, PT, DT> {
-            mapBuilder = MapBuilder.multiResult(shapes, winners.map { m -> BasicResultPanel.partyMapToResultMap(m) }, focus, headerPublisher)
+            mapBuilder = MapBuilder.multiResult(
+                shapes = shapes,
+                winners = winners.map { m -> BasicResultPanel.partyMapToResultMap(m) },
+                focus = focus,
+                header = headerPublisher,
+            )
             return this
         }
 
@@ -418,7 +423,13 @@ class SimpleVoteViewPanel private constructor(
             focus: Flow.Publisher<out List<T>?>,
             header: Flow.Publisher<out String?>,
         ): VoteScreenBuilder<KT, KPT, CT, CPT, PT, DT> {
-            mapBuilder = MapBuilder.singleResult(shapes, selectedShape, leadingParty.map { party -> PartyResult.elected(party) }, focus, header)
+            mapBuilder = MapBuilder.singleResult(
+                shapes = shapes,
+                selectedShape = selectedShape,
+                leadingParty = leadingParty.map { party -> PartyResult.elected(party) },
+                focus = focus,
+                header = header,
+            )
             return this
         }
 
@@ -428,7 +439,12 @@ class SimpleVoteViewPanel private constructor(
             focus: Flow.Publisher<out List<T>?>,
             headerPublisher: Flow.Publisher<out String?>,
         ): VoteScreenBuilder<KT, KPT, CT, CPT, PT, DT> {
-            mapBuilder = MapBuilder.multiResult(shapes, winners, focus, headerPublisher)
+            mapBuilder = MapBuilder.multiResult(
+                shapes = shapes,
+                winners = winners,
+                focus = focus,
+                header = headerPublisher,
+            )
             return this
         }
 
@@ -438,7 +454,13 @@ class SimpleVoteViewPanel private constructor(
             focus: Pair<Flow.Publisher<out List<T>?>, Flow.Publisher<out List<T>?>>,
             headerPublisher: Flow.Publisher<out String?>,
         ): VoteScreenBuilder<KT, KPT, CT, CPT, PT, DT> {
-            mapBuilder = MapBuilder.multiResult(shapes, winners, focus.first, focus.second, headerPublisher)
+            mapBuilder = MapBuilder.multiResult(
+                shapes = shapes,
+                winners = winners,
+                focus = focus.first,
+                additionalHighlight = focus.second,
+                header = headerPublisher,
+            )
             return this
         }
 
@@ -449,7 +471,13 @@ class SimpleVoteViewPanel private constructor(
             focus: Flow.Publisher<out List<T>?>,
             header: Flow.Publisher<out String?>,
         ): VoteScreenBuilder<KT, KPT, CT, CPT, PT, DT> {
-            mapBuilder = MapBuilder.singleResult(shapes, selectedShape, leadingParty, focus, header)
+            mapBuilder = MapBuilder.singleResult(
+                shapes = shapes,
+                selectedShape = selectedShape,
+                leadingParty = leadingParty,
+                focus = focus,
+                header = header,
+            )
             return this
         }
 
@@ -461,7 +489,14 @@ class SimpleVoteViewPanel private constructor(
             additionalHighlight: Flow.Publisher<out List<T>?>,
             header: Flow.Publisher<out String?>,
         ): VoteScreenBuilder<KT, KPT, CT, CPT, PT, DT> {
-            mapBuilder = MapBuilder.singleResult(shapes, selectedShape, leadingParty, focus, additionalHighlight, header)
+            mapBuilder = MapBuilder.singleResult(
+                shapes = shapes,
+                selectedShape = selectedShape,
+                leadingParty = leadingParty,
+                focus = focus,
+                additionalHighlight = additionalHighlight,
+                header = header,
+            )
             return this
         }
 
@@ -471,7 +506,12 @@ class SimpleVoteViewPanel private constructor(
             focus: Flow.Publisher<out List<T>?>,
             headerPublisher: Flow.Publisher<out String?>,
         ): VoteScreenBuilder<KT, KPT, CT, CPT, PT, DT> {
-            secondMapBuilder = MapBuilder.multiResult(shapes, winners, focus, headerPublisher)
+            secondMapBuilder = MapBuilder.multiResult(
+                shapes = shapes,
+                winners = winners,
+                focus = focus,
+                header = headerPublisher,
+            )
             return this
         }
 
@@ -481,7 +521,13 @@ class SimpleVoteViewPanel private constructor(
             focus: Pair<Flow.Publisher<out List<T>?>, Flow.Publisher<out List<T>?>>,
             headerPublisher: Flow.Publisher<out String?>,
         ): VoteScreenBuilder<KT, KPT, CT, CPT, PT, DT> {
-            secondMapBuilder = MapBuilder.multiResult(shapes, winners, focus.first, focus.second, headerPublisher)
+            secondMapBuilder = MapBuilder.multiResult(
+                shapes = shapes,
+                winners = winners,
+                focus = focus.first,
+                additionalHighlight = focus.second,
+                header = headerPublisher,
+            )
             return this
         }
 
@@ -762,11 +808,11 @@ class SimpleVoteViewPanel private constructor(
         protected abstract fun createSwingFrameBuilder(): SwingFrameBuilder?
 
         private fun createMapFrame(): MapFrame? {
-            return mapBuilder?.createMapFrame()
+            return mapBuilder
         }
 
         private fun createSecondMapFrame(): MapFrame? {
-            return secondMapBuilder?.createMapFrame()
+            return secondMapBuilder
         }
 
         private fun createAltText(textHeader: Flow.Publisher<out String?>): Flow.Publisher<String> {
@@ -1472,7 +1518,7 @@ class SimpleVoteViewPanel private constructor(
         private var progressLabel: Flow.Publisher<out String?> = null.asOneTimePublisher()
         private var winner: Flow.Publisher<out NonPartisanCandidate?> = null.asOneTimePublisher()
 
-        private var mapBuilder: MapBuilder<*>? = null
+        private var mapBuilder: MapFrame? = null
 
         fun withPrev(
             prevVotes: Flow.Publisher<out Map<NonPartisanCandidate, Int>>,
@@ -1511,7 +1557,13 @@ class SimpleVoteViewPanel private constructor(
             focus: Flow.Publisher<out List<T>?>,
             header: Flow.Publisher<out String?>,
         ): NonPartisanVoteBuilder {
-            mapBuilder = MapBuilder.singleNonPartisanResult(shapes, selectedShape, leadingCandidate, focus, header)
+            mapBuilder = MapBuilder.singleNonPartisanResult(
+                shapes = shapes,
+                selectedShape = selectedShape,
+                leadingCandidate = leadingCandidate,
+                focus = focus,
+                header = header,
+            )
             return this
         }
 
@@ -1523,7 +1575,14 @@ class SimpleVoteViewPanel private constructor(
             additionalHighlight: Flow.Publisher<out List<T>?>,
             header: Flow.Publisher<out String?>,
         ): NonPartisanVoteBuilder {
-            mapBuilder = MapBuilder.singleNonPartisanResult(shapes, selectedShape, leadingCandidate, focus, additionalHighlight, header)
+            mapBuilder = MapBuilder.singleNonPartisanResult(
+                shapes = shapes,
+                selectedShape = selectedShape,
+                leadingCandidate = leadingCandidate,
+                focus = focus,
+                additionalHighlight = additionalHighlight,
+                header = header,
+            )
             return this
         }
 
@@ -1534,7 +1593,7 @@ class SimpleVoteViewPanel private constructor(
                 null,
                 createPrevFrame(),
                 null,
-                mapBuilder?.createMapFrame(),
+                mapBuilder,
                 createAltText(title),
             )
         }

@@ -4,6 +4,7 @@ import com.joecollins.graphics.AltTextProvider
 import com.joecollins.graphics.GenericPanel
 import com.joecollins.graphics.ImageGenerator
 import com.joecollins.graphics.components.BarFrameBuilder
+import com.joecollins.graphics.components.MapFrame
 import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
@@ -78,7 +79,7 @@ class SingleTransferrableResultScreen private constructor(
         private var prevSeats: Flow.Publisher<out Map<Party, Int>>? = null
         private var prevHeader: Flow.Publisher<out String?>? = null
 
-        private var mapBuilder: MapBuilder<*>? = null
+        private var mapBuilder: MapFrame? = null
 
         fun withPartyTotals(
             totalSeats: Flow.Publisher<out Int>,
@@ -106,11 +107,11 @@ class SingleTransferrableResultScreen private constructor(
             header: Flow.Publisher<out String?>,
         ): Builder {
             mapBuilder = MapBuilder.singleResult(
-                shapes,
-                selectedShape,
-                leadingParty.map { PartyResult.elected(it) },
-                focus,
-                header,
+                shapes = shapes,
+                selectedShape = selectedShape,
+                leadingParty = leadingParty.map { PartyResult.elected(it) },
+                focus = focus,
+                header = header,
             )
             return this
         }
@@ -121,7 +122,7 @@ class SingleTransferrableResultScreen private constructor(
                 createCandidatesPanel(),
                 createPartiesPanel(),
                 createPrevPanel(),
-                mapBuilder?.createMapFrame(),
+                mapBuilder,
                 createAltText(title),
             )
         }

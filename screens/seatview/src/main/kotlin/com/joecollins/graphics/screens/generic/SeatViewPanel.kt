@@ -371,8 +371,8 @@ class SeatViewPanel private constructor(
         private var classificationFunc: ((KPT) -> KPT)? = null
         private var classificationHeader: Flow.Publisher<out String?>? = null
         private var progressLabel: Flow.Publisher<out String?> = null.asOneTimePublisher()
-        private var mapBuilder: MapBuilder<*>? = null
-        private var secondMapBuilder: MapBuilder<*>? = null
+        private var mapBuilder: MapFrame? = null
+        private var secondMapBuilder: MapFrame? = null
 
         fun withTotal(totalSeats: Flow.Publisher<out Int>): SeatScreenBuilder<KT, KPT, CT, PT, BAR> {
             total = totalSeats
@@ -462,10 +462,10 @@ class SeatViewPanel private constructor(
             headerPublisher: Flow.Publisher<out String?>,
         ): SeatScreenBuilder<KT, KPT, CT, PT, BAR> {
             mapBuilder = MapBuilder.multiResult(
-                shapes,
-                winners.map { m -> BasicResultPanel.partyMapToResultMap(m) },
-                focus,
-                headerPublisher,
+                shapes = shapes,
+                winners = winners.map { m -> BasicResultPanel.partyMapToResultMap(m) },
+                focus = focus,
+                header = headerPublisher,
             )
             return this
         }
@@ -476,7 +476,12 @@ class SeatViewPanel private constructor(
             focus: Flow.Publisher<out List<T>?>,
             headerPublisher: Flow.Publisher<out String?>,
         ): SeatScreenBuilder<KT, KPT, CT, PT, BAR> {
-            mapBuilder = MapBuilder.multiResult(shapes, winners, focus, headerPublisher)
+            mapBuilder = MapBuilder.multiResult(
+                shapes = shapes,
+                winners = winners,
+                focus = focus,
+                header = headerPublisher,
+            )
             return this
         }
 
@@ -487,7 +492,13 @@ class SeatViewPanel private constructor(
             additionalHighlight: Flow.Publisher<out List<T>?>,
             headerPublisher: Flow.Publisher<out String?>,
         ): SeatScreenBuilder<KT, KPT, CT, PT, BAR> {
-            mapBuilder = MapBuilder.multiResult(shapes, winners, focus, additionalHighlight, headerPublisher)
+            mapBuilder = MapBuilder.multiResult(
+                shapes = shapes,
+                winners = winners,
+                focus = focus,
+                additionalHighlight = additionalHighlight,
+                header = headerPublisher,
+            )
             return this
         }
 
@@ -497,7 +508,12 @@ class SeatViewPanel private constructor(
             focus: Flow.Publisher<out List<T>?>,
             headerPublisher: Flow.Publisher<out String?>,
         ): SeatScreenBuilder<KT, KPT, CT, PT, BAR> {
-            secondMapBuilder = MapBuilder.multiResult(shapes, winners, focus, headerPublisher)
+            secondMapBuilder = MapBuilder.multiResult(
+                shapes = shapes,
+                winners = winners,
+                focus = focus,
+                header = headerPublisher,
+            )
             return this
         }
 
@@ -508,7 +524,13 @@ class SeatViewPanel private constructor(
             additionalHighlight: Flow.Publisher<out List<T>?>,
             headerPublisher: Flow.Publisher<out String?>,
         ): SeatScreenBuilder<KT, KPT, CT, PT, BAR> {
-            secondMapBuilder = MapBuilder.multiResult(shapes, winners, focus, additionalHighlight, headerPublisher)
+            secondMapBuilder = MapBuilder.multiResult(
+                shapes = shapes,
+                winners = winners,
+                focus = focus,
+                additionalHighlight = additionalHighlight,
+                header = headerPublisher,
+            )
             return this
         }
 
@@ -757,11 +779,11 @@ class SeatViewPanel private constructor(
         }
 
         private fun createMapFrame(): MapFrame? {
-            return mapBuilder?.createMapFrame()
+            return mapBuilder
         }
 
         private fun createSecondMapFrame(): MapFrame? {
-            return secondMapBuilder?.createMapFrame()
+            return secondMapBuilder
         }
 
         protected abstract fun doubleLineBarLimit(): Int
