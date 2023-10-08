@@ -26,15 +26,14 @@ class MultiSummaryFrameBuilderTest {
             Riding("Watson Lake"), // 7
         )
         val frame = MultiSummaryFrameBuilder.dynamicallyFiltered(
-            ridings,
-            { it.isTooClose },
-            { it.margin },
-            { it.name.uppercase().asOneTimePublisher() },
-            { it.boxes },
-            2,
+            items = ridings,
+            display = { isTooClose },
+            orderBy = { margin },
+            rowHeader = { name.uppercase().asOneTimePublisher() },
+            rowLabels = { boxes },
+            limit = 2,
+            header = "TOO CLOSE TO CALL".asOneTimePublisher(),
         )
-            .withHeader("TOO CLOSE TO CALL".asOneTimePublisher())
-            .build()
         assertEquals("TOO CLOSE TO CALL", frame.header)
         assertEquals(0, frame.numRows.toLong())
 
