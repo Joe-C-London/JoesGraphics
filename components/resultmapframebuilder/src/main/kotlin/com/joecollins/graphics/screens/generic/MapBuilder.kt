@@ -32,12 +32,13 @@ class MapBuilder<T> private constructor(
     }
 
     fun createMapFrame(): MapFrame {
-        return MapFrameBuilder.from(colours)
-            .withFocus(mapFocus)
-            .withHeader(mapHeader)
-            .let { map -> notes?.let { n -> map.withNotes(n) } ?: map }
-            .let { map -> outlines?.let { n -> map.withOutline(n) } ?: map }
-            .build()
+        return MapFrameBuilder.from(
+            shapes = colours,
+            header = mapHeader,
+            focus = mapFocus,
+            notes = notes,
+            outline = outlines,
+        )
     }
 
     companion object {

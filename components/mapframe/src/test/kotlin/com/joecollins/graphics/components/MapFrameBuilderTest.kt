@@ -20,7 +20,10 @@ class MapFrameBuilderTest {
                 Pair(Rectangle2D.Double(5.0, 5.0, 2.0, 2.0), Color.BLUE),
             ),
         )
-        val frame = MapFrameBuilder.from(shapes).withHeader("MAP".asOneTimePublisher()).build()
+        val frame = MapFrameBuilder.from(
+            shapes = shapes,
+            header = "MAP".asOneTimePublisher(),
+        )
         assertEquals(2, frame.numShapes)
         assertEquals(Ellipse2D.Double::class.java, frame.getShape(0).javaClass)
         assertEquals(Color.RED, frame.getColor(0))
@@ -36,7 +39,10 @@ class MapFrameBuilderTest {
             Pair(Ellipse2D.Double(2.0, 2.0, 1.0, 1.0), Color.RED),
             Pair(Rectangle2D.Double(5.0, 5.0, 2.0, 2.0), Color.BLUE),
         )
-        val frame: MapFrame = MapFrameBuilder.from(shapes.asOneTimePublisher()).withHeader("MAP".asOneTimePublisher()).build()
+        val frame: MapFrame = MapFrameBuilder.from(
+            shapes = shapes.asOneTimePublisher(),
+            header = "MAP".asOneTimePublisher(),
+        )
         assertEquals(2, frame.numShapes)
         assertEquals(Ellipse2D.Double::class.java, frame.getShape(0).javaClass)
         assertEquals(Color.RED, frame.getColor(0))
@@ -54,9 +60,12 @@ class MapFrameBuilderTest {
             ConstituencyPair(Ellipse2D.Double(2.0, 2.0, 1.0, 1.0), Color.RED),
             ConstituencyPair(Rectangle2D.Double(5.0, 5.0, 2.0, 2.0), Color.BLUE),
         )
-        val frame = MapFrameBuilder.from(shapes.asOneTimePublisher(), { it.shape }, { it.color.asOneTimePublisher() })
-            .withHeader("MAP".asOneTimePublisher())
-            .build()
+        val frame = MapFrameBuilder.from(
+            items = shapes.asOneTimePublisher(),
+            shape = { shape },
+            color = { color.asOneTimePublisher() },
+            header = "MAP".asOneTimePublisher(),
+        )
         assertEquals(2, frame.numShapes)
         assertEquals(Ellipse2D.Double::class.java, frame.getShape(0).javaClass)
         assertEquals(Color.RED, frame.getColor(0))
@@ -72,9 +81,12 @@ class MapFrameBuilderTest {
             Pair(Ellipse2D.Double(2.0, 2.0, 1.0, 1.0), Publisher(Color.RED)),
             Pair(Rectangle2D.Double(5.0, 5.0, 2.0, 2.0), Publisher(Color.BLUE)),
         )
-        val frame = MapFrameBuilder.from(shapes.asOneTimePublisher(), { it.first }, { it.second })
-            .withHeader("MAP".asOneTimePublisher())
-            .build()
+        val frame = MapFrameBuilder.from(
+            items = shapes.asOneTimePublisher(),
+            shape = { first },
+            color = { second },
+            header = "MAP".asOneTimePublisher(),
+        )
         assertEquals(2, frame.numShapes)
         assertEquals(Ellipse2D.Double::class.java, frame.getShape(0).javaClass)
         assertEquals(Color.RED, frame.getColor(0))
@@ -98,11 +110,13 @@ class MapFrameBuilderTest {
                 Pair(Rectangle2D.Double(5.0, 5.0, 2.0, 2.0), Color.BLUE),
             ),
         )
-        val binding = shapes.map { s -> listOf(s[0].first) }
-        val frame = MapFrameBuilder.from(shapes)
-            .withHeader("MAP".asOneTimePublisher())
-            .withFocus(binding)
-            .build()
+        val focus = shapes.map { s -> listOf(s[0].first) }
+        val frame = MapFrameBuilder.from(
+            shapes = shapes,
+            header = "MAP".asOneTimePublisher(),
+            focus = focus,
+        )
+
         assertEquals(Rectangle2D.Double(2.0, 2.0, 1.0, 1.0), frame.focusBox)
     }
 
@@ -114,11 +128,12 @@ class MapFrameBuilderTest {
                 Pair(Rectangle2D.Double(5.0, 5.0, 2.0, 2.0), Color.BLUE),
             ),
         )
-        val binding = shapes.mapElements { it.first }
-        val frame = MapFrameBuilder.from(shapes)
-            .withHeader("MAP".asOneTimePublisher())
-            .withFocus(binding)
-            .build()
+        val focus = shapes.mapElements { it.first }
+        val frame = MapFrameBuilder.from(
+            shapes = shapes,
+            header = "MAP".asOneTimePublisher(),
+            focus = focus,
+        )
         assertEquals(Rectangle2D.Double(2.0, 2.0, 5.0, 5.0), frame.focusBox)
     }
 
@@ -130,10 +145,11 @@ class MapFrameBuilderTest {
                 Pair(Rectangle2D.Double(5.0, 5.0, 2.0, 2.0), Color.BLUE),
             ),
         )
-        val frame = MapFrameBuilder.from(shapes)
-            .withHeader("MAP".asOneTimePublisher())
-            .withNotes("A note".asOneTimePublisher())
-            .build()
+        val frame = MapFrameBuilder.from(
+            shapes = shapes,
+            header = "MAP".asOneTimePublisher(),
+            notes = "A note".asOneTimePublisher(),
+        )
         assertEquals("A note", frame.notes)
     }
 
@@ -145,10 +161,11 @@ class MapFrameBuilderTest {
                 Pair(Rectangle2D.Double(5.0, 5.0, 2.0, 2.0), Color.BLUE),
             ),
         )
-        val frame = MapFrameBuilder.from(shapes)
-            .withHeader("MAP".asOneTimePublisher())
-            .withBorderColor(Color.GRAY.asOneTimePublisher())
-            .build()
+        val frame = MapFrameBuilder.from(
+            shapes = shapes,
+            header = "MAP".asOneTimePublisher(),
+            borderColor = Color.GRAY.asOneTimePublisher(),
+        )
         assertEquals(Color.GRAY, frame.borderColor)
     }
 }
