@@ -3,6 +3,9 @@ package com.joecollins.graphics.screens.generic
 import com.joecollins.graphics.GenericPanel
 import com.joecollins.graphics.components.SwingometerFrame
 import com.joecollins.graphics.components.SwingometerFrameBuilder
+import com.joecollins.graphics.components.SwingometerFrameBuilder.dots
+import com.joecollins.graphics.components.SwingometerFrameBuilder.every
+import com.joecollins.graphics.components.SwingometerFrameBuilder.labels
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyOrCoalition
 import com.joecollins.models.general.PartyResult
@@ -301,16 +304,30 @@ class SwingometerScreen private constructor(title: Flow.Publisher<out String?>, 
         }
 
         private fun createSwingometer(): SwingometerFrame {
-            return SwingometerFrameBuilder.basic(inputs.colorsPublisher, inputs.valuePublisher)
-                .withDots(inputs.dotsPublisher, { it.position }, { it.color }, { it.label ?: "" }) { it.visible }
-                .withHeader(header, rightLabel = progressLabel)
-                .withRange(inputs.rangePublisher)
-                .withTickInterval(0.01.asOneTimePublisher()) { (it.toDouble() * 100).roundToInt().toString() }
-                .withLeftNeedingToWin(inputs.leftToWinPublisher)
-                .withRightNeedingToWin(inputs.rightToWinPublisher)
-                .withBucketSize(0.005.asOneTimePublisher())
-                .withOuterLabels(inputs.outerLabelsPublisher, { obj -> obj.first }, { obj -> obj.third }) { obj -> obj.second }
-                .build()
+            return SwingometerFrameBuilder.build(
+                colors = inputs.colorsPublisher,
+                value = inputs.valuePublisher,
+                range = inputs.rangePublisher,
+                bucketSize = 0.005.asOneTimePublisher(),
+                tickInterval = every(0.01.asOneTimePublisher()) { (it.toDouble() * 100).roundToInt().toString() },
+                leftToWin = inputs.leftToWinPublisher,
+                rightToWin = inputs.rightToWinPublisher,
+                outerLabels = labels(
+                    labels = inputs.outerLabelsPublisher,
+                    position = { first },
+                    label = { third },
+                    color = { second },
+                ),
+                dots = dots(
+                    dots = inputs.dotsPublisher,
+                    position = { position },
+                    color = { color },
+                    label = { label ?: "" },
+                    solid = { visible },
+                ),
+                header = header,
+                rightHeaderLabel = progressLabel,
+            )
         }
 
         private fun createAltText(title: Flow.Publisher<out String?>): Flow.Publisher<String> {

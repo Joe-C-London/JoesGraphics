@@ -1,5 +1,8 @@
 package com.joecollins.graphics.components
 
+import com.joecollins.graphics.components.SwingometerFrameBuilder.dots
+import com.joecollins.graphics.components.SwingometerFrameBuilder.every
+import com.joecollins.graphics.components.SwingometerFrameBuilder.labels
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
 import org.junit.jupiter.api.Assertions
@@ -14,9 +17,11 @@ class SwingometerFrameBuilderTest {
     fun testBasic() {
         val colors = Publisher(Pair(Color.BLUE, Color.RED))
         val value = Publisher(-1.0)
-        val frame = SwingometerFrameBuilder.basic(colors, value)
-            .withHeader("SWINGOMETER".asOneTimePublisher())
-            .build()
+        val frame = SwingometerFrameBuilder.build(
+            colors = colors,
+            value = value,
+            header = "SWINGOMETER".asOneTimePublisher(),
+        )
         assertEquals("SWINGOMETER", frame.header)
         assertEquals(Color.BLUE, frame.leftColor)
         assertEquals(Color.RED, frame.rightColor)
@@ -27,9 +32,11 @@ class SwingometerFrameBuilderTest {
     fun testNaNIsZero() {
         val colors = Publisher(Pair(Color.BLUE, Color.RED))
         val value = Publisher(Double.NaN)
-        val frame = SwingometerFrameBuilder.basic(colors, value)
-            .withHeader("SWINGOMETER".asOneTimePublisher())
-            .build()
+        val frame = SwingometerFrameBuilder.build(
+            colors = colors,
+            value = value,
+            header = "SWINGOMETER".asOneTimePublisher(),
+        )
         assertEquals("SWINGOMETER", frame.header)
         assertEquals(Color.BLUE, frame.leftColor)
         assertEquals(Color.RED, frame.rightColor)
@@ -42,10 +49,13 @@ class SwingometerFrameBuilderTest {
         val value = Publisher(-1.0)
         val range = Publisher(10.0)
         val bucketSize = Publisher(0.5)
-        val frame = SwingometerFrameBuilder.basic(colors, value)
-            .withRange(range)
-            .withBucketSize(bucketSize)
-            .build()
+        val frame = SwingometerFrameBuilder.build(
+            colors = colors,
+            value = value,
+            range = range,
+            bucketSize = bucketSize,
+            header = null.asOneTimePublisher(),
+        )
         assertEquals(-1.0, frame.value.toDouble(), 1e-6)
         assertEquals(10.0, frame.range.toDouble(), 0.0)
         assertEquals(20, frame.numBucketsPerSide.toLong())
@@ -77,10 +87,13 @@ class SwingometerFrameBuilderTest {
         val value = Publisher(-1.0)
         val range = Publisher(10.0)
         val tickInterval = Publisher(1.0)
-        val frame = SwingometerFrameBuilder.basic(colors, value)
-            .withRange(range)
-            .withTickInterval(tickInterval) { DecimalFormat("0").format(it) }
-            .build()
+        val frame = SwingometerFrameBuilder.build(
+            colors = colors,
+            value = value,
+            range = range,
+            tickInterval = every(tickInterval) { DecimalFormat("0").format(it) },
+            header = null.asOneTimePublisher(),
+        )
         assertEquals(19, frame.numTicks)
         val ticks = (0 until frame.numTicks).associate { frame.getTickPosition(it) to frame.getTickText(it) }
         assertEquals("9", ticks[-9.0])
@@ -96,10 +109,13 @@ class SwingometerFrameBuilderTest {
         val value = Publisher(-1.0)
         val leftToWin = Publisher(-2.0)
         val rightToWin = Publisher(4.0)
-        val frame = SwingometerFrameBuilder.basic(colors, value)
-            .withLeftNeedingToWin(leftToWin)
-            .withRightNeedingToWin(rightToWin)
-            .build()
+        val frame = SwingometerFrameBuilder.build(
+            colors = colors,
+            value = value,
+            leftToWin = leftToWin,
+            rightToWin = rightToWin,
+            header = null.asOneTimePublisher(),
+        )
         assertEquals(-2.0, frame.leftToWin.toDouble(), 0.0)
         assertEquals(4.0, frame.rightToWin.toDouble(), 0.0)
     }
@@ -124,9 +140,17 @@ class SwingometerFrameBuilderTest {
                 .asOneTimePublisher()
         val colors = Publisher(Pair(Color.BLUE, Color.RED))
         val value = Publisher(-1.0)
-        val frame = SwingometerFrameBuilder.basic(colors, value)
-            .withOuterLabels(labels, { it.position }, { it.label }, { it.color })
-            .build()
+        val frame = SwingometerFrameBuilder.build(
+            colors = colors,
+            value = value,
+            outerLabels = labels(
+                labels = labels,
+                position = { position },
+                label = { label },
+                color = { color },
+            ),
+            header = null.asOneTimePublisher(),
+        )
         assertEquals(10, frame.numOuterLabels)
         assertEquals(Color.RED, frame.getOuterLabelColor(0))
         assertEquals("350", frame.getOuterLabelText(1))
@@ -151,9 +175,16 @@ class SwingometerFrameBuilderTest {
                 .asOneTimePublisher()
         val colors = Publisher(Pair(Color.BLUE, Color.RED))
         val value = Publisher(-1.0)
-        val frame = SwingometerFrameBuilder.basic(colors, value)
-            .withDots(dots, { it.position }, { it.color })
-            .build()
+        val frame = SwingometerFrameBuilder.build(
+            colors = colors,
+            value = value,
+            dots = dots(
+                dots = dots,
+                position = { position },
+                color = { color },
+            ),
+            header = null.asOneTimePublisher(),
+        )
         assertEquals(7, frame.numDots)
         assertEquals(0.115, frame.getDotPosition(0).toDouble(), 1e-6)
         assertEquals(Color.RED, frame.getDotColor(1))
@@ -177,9 +208,17 @@ class SwingometerFrameBuilderTest {
                 .asOneTimePublisher()
         val colors = Publisher(Pair(Color.BLUE, Color.RED))
         val value = Publisher(-1.0)
-        val frame = SwingometerFrameBuilder.basic(colors, value)
-            .withDots(dots, { it.position }, { it.color }, { it.label })
-            .build()
+        val frame = SwingometerFrameBuilder.build(
+            colors = colors,
+            value = value,
+            dots = dots(
+                dots = dots,
+                position = { position },
+                color = { color },
+                label = { label },
+            ),
+            header = null.asOneTimePublisher(),
+        )
         assertEquals(7, frame.numDots)
         assertEquals(0.115, frame.getDotPosition(0).toDouble(), 1e-6)
         assertEquals(Color.RED, frame.getDotColor(1))
@@ -203,9 +242,17 @@ class SwingometerFrameBuilderTest {
                 .asOneTimePublisher()
         val colors = Publisher(Pair(Color.BLUE, Color.RED))
         val value = Publisher(-1.0)
-        val frame = SwingometerFrameBuilder.basic(colors, value)
-            .withDotsSolid(dots, { it.position }, { it.color }, { it.solid })
-            .build()
+        val frame = SwingometerFrameBuilder.build(
+            colors = colors,
+            value = value,
+            dots = dots(
+                dots = dots,
+                position = { position },
+                color = { color },
+                solid = { solid },
+            ),
+            header = null.asOneTimePublisher(),
+        )
         assertEquals(7, frame.numDots)
         assertEquals(0.115, frame.getDotPosition(0).toDouble(), 1e-6)
         assertEquals(Color.RED, frame.getDotColor(1))
@@ -238,9 +285,16 @@ class SwingometerFrameBuilderTest {
         )
         val colors = Publisher(Pair(Color.BLUE, Color.RED))
         val value = Publisher(-1.0)
-        val frame = SwingometerFrameBuilder.basic(colors, value)
-            .withFixedDots(dots, { it.position }, { it.getColor() })
-            .build()
+        val frame = SwingometerFrameBuilder.build(
+            colors = colors,
+            value = value,
+            dots = dots(
+                dots = dots,
+                position = { position },
+                color = { getColor() },
+            ),
+            header = null.asOneTimePublisher(),
+        )
         assertEquals(7, frame.numDots)
         assertEquals(0.115, frame.getDotPosition(0).toDouble(), 1e-6)
         assertEquals(Color.RED, frame.getDotColor(1))
