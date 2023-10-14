@@ -64,6 +64,28 @@ class RegionalVotesScreenTest {
         val mri = Party("Maori", "MRI", Color.PINK)
         val oth = Party.OTHERS
 
+        prev[general]!!.submit(
+            mapOf(
+                act to 317,
+                grn to 4170,
+                lab to 11340,
+                nat to 11773,
+                nzf to 1165,
+                oth to 1242,
+            ),
+        )
+        compareRendering("RegionalVotesScreen", "CurrPrev-1", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            GENERAL ELECTORATES
+            PARTY VOTES [0/65] (CHANGE SINCE 2017)
+            
+            MAORI ELECTORATES
+            PARTY VOTES [0/7] (CHANGE SINCE 2017)
+            """.trimIndent(),
+        )
+
         curr[general]!!.submit(
             mapOf(
                 act to 2724,

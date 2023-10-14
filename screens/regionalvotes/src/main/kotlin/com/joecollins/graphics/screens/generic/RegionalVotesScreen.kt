@@ -73,6 +73,7 @@ class RegionalVotesScreen(subPanels: List<GenericPanel>) : JPanel(), AltTextProv
 
             val entries = currVotes.merge(prevVotes) { curr, prev ->
                 val currTotal = curr.values.sum().toDouble()
+                if (currTotal == 0.0) return@merge emptyList()
                 val prevTotal = prev.values.sum().toDouble()
                 val adjPrev = Aggregators.adjustKey(prev) { if (curr.containsKey(it)) it else Party.OTHERS }
                 val entries = curr.entries.map { e ->
