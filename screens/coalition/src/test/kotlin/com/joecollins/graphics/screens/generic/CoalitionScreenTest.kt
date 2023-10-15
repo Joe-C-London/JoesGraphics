@@ -1,5 +1,6 @@
 package com.joecollins.graphics.screens.generic
 
+import com.joecollins.graphics.screens.generic.CoalitionScreen.Companion.coalition
 import com.joecollins.graphics.utils.PublisherTestUtils.assertPublishes
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.models.general.Party
@@ -35,16 +36,24 @@ class CoalitionScreenTest {
         )
         val total = seats.map { it.values.sum() }
 
-        val panel = CoalitionScreen.of(seats, total, year.map { "RESULTS ($it)" }, "".asOneTimePublisher()) { "$it FOR MAJORITY" }
-            .withCoalition("Grand Coalition", setOf(spd, union))
-            .withCoalition("Black-Yellow", setOf(union, fdp)) { (it[fdp] ?: 0) > 0 }
-            .withCoalition("Red-Green", setOf(spd, grn))
-            .withCoalition("Jamaica", setOf(union, fdp, grn)) { (it[fdp] ?: 0) > 0 }
-            .withCoalition("Red-Green-Red", setOf(spd, grn, linke))
-            .withCoalition("Traffic Light", setOf(spd, fdp, grn)) { (it[fdp] ?: 0) > 0 }
-            .withCoalition("Kenya", setOf(union, spd, grn))
-            .withCoalition("German Flag", setOf(union, spd, fdp)) { (it[fdp] ?: 0) > 0 }
-            .build("COALITION BUILDER".asOneTimePublisher())
+        val panel = CoalitionScreen.of(
+            seats = seats,
+            totalSeats = total,
+            header = year.map { "RESULTS ($it)" },
+            subhead = "".asOneTimePublisher(),
+            majorityLabel = { "$it FOR MAJORITY" },
+            coalitions = listOf(
+                coalition("Grand Coalition", setOf(spd, union)),
+                coalition("Black-Yellow", setOf(union, fdp)) { (it[fdp] ?: 0) > 0 },
+                coalition("Red-Green", setOf(spd, grn)),
+                coalition("Jamaica", setOf(union, fdp, grn)) { (it[fdp] ?: 0) > 0 },
+                coalition("Red-Green-Red", setOf(spd, grn, linke)),
+                coalition("Traffic Light", setOf(spd, fdp, grn)) { (it[fdp] ?: 0) > 0 },
+                coalition("Kenya", setOf(union, spd, grn)),
+                coalition("German Flag", setOf(union, spd, fdp)) { (it[fdp] ?: 0) > 0 },
+            ),
+            title = "COALITION BUILDER".asOneTimePublisher(),
+        )
         panel.setSize(1024, 512)
         compareRendering("CoalitionScreen", "Screen-1", panel)
         assertPublishes(
