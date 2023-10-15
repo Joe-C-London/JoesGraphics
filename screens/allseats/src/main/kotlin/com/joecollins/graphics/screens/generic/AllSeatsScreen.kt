@@ -21,7 +21,6 @@ import java.awt.Dimension
 import java.awt.EventQueue
 import java.awt.LayoutManager
 import java.awt.Point
-import java.util.LinkedList
 import java.util.concurrent.Flow
 import javax.swing.JPanel
 import javax.swing.border.EmptyBorder
@@ -29,193 +28,8 @@ import kotlin.math.ceil
 import kotlin.math.roundToInt
 
 class AllSeatsScreen private constructor(title: Flow.Publisher<out String?>, frame: JPanel, altText: Flow.Publisher<String>) : GenericPanel(pad(frame), title, altText) {
-    @Suppress("UNCHECKED_CAST")
-    abstract class AbstractBuilder<T, B : AbstractBuilder<T, B>>(
-        prevWinnerPublisher: Flow.Publisher<out Map<T, Party?>>,
-        currResultPublisher: Flow.Publisher<out Map<T, PartyResult?>>,
-        internal val nameFunc: (T) -> String,
-    ) {
-        internal val prevWinner: Flow.Publisher<out Map<T, Party?>> = prevWinnerPublisher
-        internal val currResults: Flow.Publisher<out Map<T, PartyResult?>> = currResultPublisher
-        internal var numRows: Flow.Publisher<out Int> = 20.asOneTimePublisher()
-        internal var seatFilter: Flow.Publisher<out Set<T>?> = (null as Set<T>?).asOneTimePublisher()
-        internal var partyChanges: Flow.Publisher<Map<Party, Party>> = Publisher(emptyMap())
 
-        fun withNumRows(numRowsPublisher: Flow.Publisher<out Int>): B {
-            numRows = numRowsPublisher
-            return this as B
-        }
-
-        fun withSeatFilter(seatFilterPublisher: Flow.Publisher<out Set<T>?>): B {
-            seatFilter = seatFilterPublisher
-            return this as B
-        }
-
-        fun withPartyChanges(changes: Flow.Publisher<Map<Party, Party>>): B {
-            partyChanges = changes
-            return this as B
-        }
-
-        abstract fun build(titlePublisher: Flow.Publisher<out String?>): GenericPanel
-    }
-
-    class Builder<T>(
-        prevWinnerPublisher: Flow.Publisher<out Map<T, Party?>>,
-        currResultPublisher: Flow.Publisher<out Map<T, PartyResult?>>,
-        nameFunc: (T) -> String,
-        headerPublisher: Flow.Publisher<out String?>,
-    ) : AbstractBuilder<T, Builder<T>>(prevWinnerPublisher, currResultPublisher, nameFunc) {
-        private val header: Flow.Publisher<out String?> = headerPublisher
-
-        override fun build(titlePublisher: Flow.Publisher<out String?>): AllSeatsScreen {
-            val inputs = Input(nameFunc)
-            prevWinner.subscribe(Subscriber { inputs.setPrevWinners(it) })
-            currResults.subscribe(Subscriber { inputs.setCurrResults(it) })
-            seatFilter.subscribe(Subscriber { inputs.setSeatFilter(it) })
-            partyChanges.subscribe(Subscriber { inputs.setPartyChanges(it) })
-            val frame = ResultListingFrame(
-                headerPublisher = header,
-                numRowsPublisher = numRows,
-                itemsPublisher = inputs.resultPublisher.mapElements {
-                    ResultListingFrame.Item(
-                        text = nameFunc(it.key),
-                        border = it.prevColor,
-                        background = if (it.fill) it.resultColor else Color.WHITE,
-                        foreground = if (!it.fill) ColorUtils.contrastForBackground(it.resultColor) else ColorUtils.foregroundToContrast(it.resultColor),
-                    )
-                },
-            )
-            val altText = run {
-                val head = titlePublisher.merge(header) { t, h -> listOfNotNull(t, h).joinToString("\n\n") }
-                val entries = inputs.resultPublisher.map { results ->
-                    if (results.isEmpty()) return@map "(empty)"
-                    val allElected = results.all { it.currResult?.isElected ?: true }
-                    results
-                        .groupBy { it.prevWinner to it.currResult?.party }
-                        .entries
-                        .sortedByDescending { group -> group.value.size }
-                        .joinToString("\n") { group ->
-                            val label = group.key.let { (from, to) ->
-                                when {
-                                    to == null -> "PENDING ${from?.abbreviation ?: "NEW"}"
-                                    to == from -> "${to.abbreviation} HOLD"
-                                    from == null -> "${to.abbreviation} WIN (NEW)"
-                                    to == inputs.changedParty(from) -> "${to.abbreviation} HOLD (${from.abbreviation})"
-                                    else -> "${to.abbreviation} GAIN FROM ${from.abbreviation}"
-                                }
-                            }
-                            val count = group.value.size
-                            val value = if (allElected || group.key.second == null) {
-                                "$count"
-                            } else {
-                                val elected = group.value.count { it.currResult?.elected ?: false }
-                                "$elected/$count"
-                            }
-                            "$label: $value"
-                        }
-                }
-                head.merge(entries) { h, e -> "$h\n$e" }
-            }
-            return AllSeatsScreen(titlePublisher, frame, altText)
-        }
-    }
-
-    class GroupedBuilder<T>(
-        prevWinnerPublisher: Flow.Publisher<out Map<T, Party?>>,
-        currResultPublisher: Flow.Publisher<out Map<T, PartyResult?>>,
-        nameFunc: (T) -> String,
-    ) : AbstractBuilder<T, GroupedBuilder<T>>(prevWinnerPublisher, currResultPublisher, nameFunc) {
-
-        private data class Group<T>(val name: Flow.Publisher<String>, val prevWinners: Flow.Publisher<Map<T, Party?>>)
-        private val groups = LinkedList<Group<T>>()
-
-        fun withGroup(name: Flow.Publisher<String>, predicate: (T) -> Boolean): GroupedBuilder<T> {
-            groups.add(Group(name, super.prevWinner.map { w -> w.filterKeys(predicate) }))
-            return this
-        }
-
-        override fun build(titlePublisher: Flow.Publisher<out String?>): AllSeatsScreen {
-            val outerPanel = JPanel()
-            outerPanel.background = Color.WHITE
-            outerPanel.border = EmptyBorder(-5, -5, -5, -5)
-            val innerPanels = groups.map { (name, groupPrevWinners) ->
-                Builder(
-                    groupPrevWinners,
-                    currResults,
-                    nameFunc,
-                    name,
-                )
-                    .withNumRows(numRows)
-                    .withSeatFilter(seatFilter)
-                    .withPartyChanges(partyChanges)
-                    .build(null.asOneTimePublisher())
-            }
-
-            val columnsPerPanel = groups.map { (_, groupPrevWinners) ->
-                groupPrevWinners.merge(seatFilter) { w, f ->
-                    w.filterKeys { f == null || f.contains(it) }
-                }.merge(numRows) { w, r ->
-                    ceil(w.size.toDouble() / r).toInt()
-                }
-            }.combine()
-            val layout = object : LayoutManager {
-                var columnWidths = groups.map { 0 }
-
-                override fun addLayoutComponent(name: String, comp: Component) {
-                }
-
-                override fun removeLayoutComponent(comp: Component) {
-                }
-
-                override fun preferredLayoutSize(parent: Container): Dimension {
-                    return DEFAULT_SIZE
-                }
-
-                override fun minimumLayoutSize(parent: Container): Dimension {
-                    return DEFAULT_SIZE
-                }
-
-                override fun layoutContainer(parent: Container) {
-                    val totalColumns = columnWidths.sum().coerceAtLeast(1)
-                    var columnsSoFar = 0
-                    val width = parent.width.toDouble() + 10
-                    val height = parent.height + 10
-                    innerPanels.forEachIndexed { index, panel ->
-                        val columns = columnWidths[index]
-                        val left = (width * columnsSoFar / totalColumns).roundToInt()
-                        val right = (width * (columnsSoFar + columns) / totalColumns).roundToInt()
-                        panel.location = Point(left - 5, -5)
-                        panel.size = Dimension(right - left, height)
-                        columnsSoFar += columns
-                    }
-                }
-            }
-            outerPanel.layout = layout
-            columnsPerPanel.subscribe(
-                Subscriber(
-                    eventQueueWrapper {
-                        layout.columnWidths = it
-                        EventQueue.invokeLater {
-                            outerPanel.invalidate()
-                            outerPanel.revalidate()
-                            outerPanel.repaint()
-                        }
-                    },
-                ),
-            )
-
-            innerPanels.forEach { outerPanel.add(it) }
-            val altText = innerPanels.zip(groups).map { (panel, group) ->
-                group.prevWinners.merge(seatFilter) { w, f -> w.filterKeys { f == null || f.contains(it) } }
-                    .merge(panel.altText) { w, t -> t.takeIf { w.isNotEmpty() } }
-            }
-                .combine()
-                .merge(titlePublisher) { p, t -> listOfNotNull(t, p.filterNotNull().joinToString("\n\n")).joinToString("\n\n") }
-            return AllSeatsScreen(titlePublisher, outerPanel, altText)
-        }
-    }
-
-    private class Input<T>(private val nameFunc: (T) -> String) {
+    private class Input<T>(private val nameFunc: T.() -> String) {
         private var prevWinners: List<Pair<T, Party?>> = emptyList()
         private var currResults: Map<T, PartyResult?> = emptyMap()
         private var seatFilter: Set<T>? = null
@@ -288,21 +102,180 @@ class AllSeatsScreen private constructor(title: Flow.Publisher<out String?>, fra
     }
 
     companion object {
+        private const val DEFAULT_ROWS = 20
+
         fun <T> of(
-            prevWinnerPublisher: Flow.Publisher<out Map<T, Party>>,
-            currResultPublisher: Flow.Publisher<out Map<T, PartyResult?>>,
-            nameFunc: (T) -> String,
-            headerPublisher: Flow.Publisher<out String?>,
-        ): Builder<T> {
-            return Builder(prevWinnerPublisher, currResultPublisher, nameFunc, headerPublisher)
+            prevWinner: Flow.Publisher<out Map<T, Party?>>,
+            currResult: Flow.Publisher<out Map<T, PartyResult?>>,
+            nameFunc: T.() -> String,
+            header: Flow.Publisher<out String?>,
+            numRows: Flow.Publisher<out Int>? = null,
+            seatFilter: Flow.Publisher<out Set<T>?>? = null,
+            partyChanges: Flow.Publisher<Map<Party, Party>>? = null,
+            title: Flow.Publisher<out String?>,
+        ): AllSeatsScreen {
+            val inputs = Input(nameFunc)
+            prevWinner.subscribe(Subscriber { inputs.setPrevWinners(it) })
+            currResult.subscribe(Subscriber { inputs.setCurrResults(it) })
+            seatFilter?.subscribe(Subscriber { inputs.setSeatFilter(it) })
+            partyChanges?.subscribe(Subscriber { inputs.setPartyChanges(it) })
+            val frame = ResultListingFrame(
+                headerPublisher = header,
+                numRowsPublisher = numRows ?: DEFAULT_ROWS.asOneTimePublisher(),
+                itemsPublisher = inputs.resultPublisher.mapElements {
+                    ResultListingFrame.Item(
+                        text = nameFunc(it.key),
+                        border = it.prevColor,
+                        background = if (it.fill) it.resultColor else Color.WHITE,
+                        foreground = if (!it.fill) ColorUtils.contrastForBackground(it.resultColor) else ColorUtils.foregroundToContrast(it.resultColor),
+                    )
+                },
+            )
+            val altText = run {
+                val head = title.merge(header) { t, h -> listOfNotNull(t, h).joinToString("\n\n") }
+                val entries = inputs.resultPublisher.map { results ->
+                    if (results.isEmpty()) return@map "(empty)"
+                    val allElected = results.all { it.currResult?.isElected ?: true }
+                    results
+                        .groupBy { it.prevWinner to it.currResult?.party }
+                        .entries
+                        .sortedByDescending { group -> group.value.size }
+                        .joinToString("\n") { group ->
+                            val label = group.key.let { (from, to) ->
+                                when {
+                                    to == null -> "PENDING ${from?.abbreviation ?: "NEW"}"
+                                    to == from -> "${to.abbreviation} HOLD"
+                                    from == null -> "${to.abbreviation} WIN (NEW)"
+                                    to == inputs.changedParty(from) -> "${to.abbreviation} HOLD (${from.abbreviation})"
+                                    else -> "${to.abbreviation} GAIN FROM ${from.abbreviation}"
+                                }
+                            }
+                            val count = group.value.size
+                            val value = if (allElected || group.key.second == null) {
+                                "$count"
+                            } else {
+                                val elected = group.value.count { it.currResult?.elected ?: false }
+                                "$elected/$count"
+                            }
+                            "$label: $value"
+                        }
+                }
+                head.merge(entries) { h, e -> "$h\n$e" }
+            }
+            return AllSeatsScreen(title, frame, altText)
         }
 
+        data class Group<T> internal constructor(val name: Flow.Publisher<String>, val predicate: T.() -> Boolean)
+
+        fun <T> group(name: Flow.Publisher<String>, predicate: T.() -> Boolean) = Group(name, predicate)
+
         fun <T> ofGrouped(
-            prevWinnerPublisher: Flow.Publisher<out Map<T, Party?>>,
-            currResultPublisher: Flow.Publisher<out Map<T, PartyResult?>>,
-            nameFunc: (T) -> String,
-        ): GroupedBuilder<T> {
-            return GroupedBuilder(prevWinnerPublisher, currResultPublisher, nameFunc)
+            prevWinner: Flow.Publisher<out Map<T, Party?>>,
+            currResult: Flow.Publisher<out Map<T, PartyResult?>>,
+            nameFunc: T.() -> String,
+            numRows: Flow.Publisher<out Int>? = null,
+            seatFilter: Flow.Publisher<out Set<T>?>? = null,
+            partyChanges: Flow.Publisher<Map<Party, Party>>? = null,
+            groups: List<Group<T>>,
+            title: Flow.Publisher<out String?>,
+        ): AllSeatsScreen {
+            val outerPanel = JPanel()
+            outerPanel.background = Color.WHITE
+            outerPanel.border = EmptyBorder(-5, -5, -5, -5)
+            val groupWinners = groups.map { (name, predicate) ->
+                name to prevWinner.map { w -> w.filterKeys(predicate) }
+            }
+            val innerPanels = groupWinners.map { (name, groupPrevWinners) ->
+                of(
+                    prevWinner = groupPrevWinners,
+                    currResult = currResult,
+                    nameFunc = nameFunc,
+                    header = name,
+                    numRows = numRows,
+                    seatFilter = seatFilter,
+                    partyChanges = partyChanges,
+                    title = null.asOneTimePublisher(),
+                )
+            }
+
+            val columnsPerPanel = groupWinners.map { (_, groupPrevWinners) ->
+                groupPrevWinners.run {
+                    if (seatFilter == null) {
+                        this
+                    } else {
+                        merge(seatFilter) { w, f ->
+                            w.filterKeys { f == null || f.contains(it) }
+                        }
+                    }
+                }.run {
+                    if (numRows == null) {
+                        map { w -> ceil(w.size.toDouble() / DEFAULT_ROWS).toInt() }
+                    } else {
+                        merge(numRows) { w, r ->
+                            ceil(w.size.toDouble() / r).toInt()
+                        }
+                    }
+                }
+            }.combine()
+            val layout = object : LayoutManager {
+                var columnWidths = groups.map { 0 }
+
+                override fun addLayoutComponent(name: String, comp: Component) {
+                }
+
+                override fun removeLayoutComponent(comp: Component) {
+                }
+
+                override fun preferredLayoutSize(parent: Container): Dimension {
+                    return DEFAULT_SIZE
+                }
+
+                override fun minimumLayoutSize(parent: Container): Dimension {
+                    return DEFAULT_SIZE
+                }
+
+                override fun layoutContainer(parent: Container) {
+                    val totalColumns = columnWidths.sum().coerceAtLeast(1)
+                    var columnsSoFar = 0
+                    val width = parent.width.toDouble() + 10
+                    val height = parent.height + 10
+                    innerPanels.forEachIndexed { index, panel ->
+                        val columns = columnWidths[index]
+                        val left = (width * columnsSoFar / totalColumns).roundToInt()
+                        val right = (width * (columnsSoFar + columns) / totalColumns).roundToInt()
+                        panel.location = Point(left - 5, -5)
+                        panel.size = Dimension(right - left, height)
+                        columnsSoFar += columns
+                    }
+                }
+            }
+            outerPanel.layout = layout
+            columnsPerPanel.subscribe(
+                Subscriber(
+                    eventQueueWrapper {
+                        layout.columnWidths = it
+                        EventQueue.invokeLater {
+                            outerPanel.invalidate()
+                            outerPanel.revalidate()
+                            outerPanel.repaint()
+                        }
+                    },
+                ),
+            )
+
+            innerPanels.forEach { outerPanel.add(it) }
+            val altText = innerPanels.zip(groupWinners).map { (panel, group) ->
+                group.second.run {
+                    if (seatFilter == null) {
+                        this
+                    } else {
+                        merge(seatFilter) { w, f -> w.filterKeys { f == null || f.contains(it) } }
+                    }
+                }.merge(panel.altText) { w, t -> t.takeIf { w.isNotEmpty() } }
+            }
+                .combine()
+                .merge(title) { p, t -> listOfNotNull(t, p.filterNotNull().joinToString("\n\n")).joinToString("\n\n") }
+            return AllSeatsScreen(title, outerPanel, altText)
         }
     }
 }

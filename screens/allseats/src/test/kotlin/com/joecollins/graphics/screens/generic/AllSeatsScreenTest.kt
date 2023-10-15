@@ -1,5 +1,6 @@
 package com.joecollins.graphics.screens.generic
 
+import com.joecollins.graphics.screens.generic.AllSeatsScreen.Companion.group
 import com.joecollins.graphics.utils.PublisherTestUtils.assertPublishes
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.models.general.Party
@@ -19,13 +20,13 @@ class AllSeatsScreenTest {
         val numRows = Publisher(15)
         val title = Publisher("BRITISH COLUMBIA")
         val panel = AllSeatsScreen.of(
-            prevResult,
-            currResult,
-            { it.uppercase() },
-            "ALL SEATS".asOneTimePublisher(),
+            prevWinner = prevResult,
+            currResult = currResult,
+            nameFunc = { uppercase() },
+            header = "ALL SEATS".asOneTimePublisher(),
+            numRows = numRows,
+            title = title,
         )
-            .withNumRows(numRows)
-            .build(title)
         panel.setSize(1024, 512)
         compareRendering("AllSeatsScreen", "Basic-1", panel)
         assertPublishes(
@@ -113,14 +114,14 @@ class AllSeatsScreenTest {
                 .toSet(),
         )
         val panel = AllSeatsScreen.of(
-            prevResult,
-            currResult,
-            { it.uppercase() },
-            "ALL SEATS".asOneTimePublisher(),
+            prevWinner = prevResult,
+            currResult = currResult,
+            nameFunc = { uppercase() },
+            header = "ALL SEATS".asOneTimePublisher(),
+            numRows = numRows,
+            seatFilter = filteredSeats,
+            title = title,
         )
-            .withNumRows(numRows)
-            .withSeatFilter(filteredSeats)
-            .build(title)
         panel.setSize(1024, 512)
         compareRendering("AllSeatsScreen", "Filtered-1", panel)
         assertPublishes(
@@ -197,13 +198,13 @@ class AllSeatsScreenTest {
         val numRows = Publisher(15)
         val title = Publisher("BRITISH COLUMBIA")
         val panel = AllSeatsScreen.of(
-            prevResult,
-            currResult,
-            { it.uppercase() },
-            "ALL SEATS".asOneTimePublisher(),
+            prevWinner = prevResult,
+            currResult = currResult,
+            nameFunc = { uppercase() },
+            header = "ALL SEATS".asOneTimePublisher(),
+            numRows = numRows,
+            title = title,
         )
-            .withNumRows(numRows)
-            .build(title)
         panel.setSize(1024, 512)
         compareRendering("AllSeatsScreen", "Basic-1", panel)
         assertPublishes(
@@ -243,14 +244,14 @@ class AllSeatsScreenTest {
         val numRows = Publisher(15)
         val title = Publisher("BRITISH COLUMBIA")
         val panel = AllSeatsScreen.of(
-            prevResult,
-            currResult,
-            { it.uppercase() },
-            "ALL SEATS".asOneTimePublisher(),
+            prevWinner = prevResult,
+            currResult = currResult,
+            nameFunc = { uppercase() },
+            header = "ALL SEATS".asOneTimePublisher(),
+            numRows = numRows,
+            partyChanges = mapOf(lib to bcu).asOneTimePublisher(),
+            title = title,
         )
-            .withNumRows(numRows)
-            .withPartyChanges(mapOf(lib to bcu).asOneTimePublisher())
-            .build(title)
         panel.setSize(1024, 512)
         compareRendering("AllSeatsScreen", "Basic-1", panel)
         assertPublishes(
@@ -298,18 +299,14 @@ class AllSeatsScreenTest {
         val filteredSeats = Publisher(null as Set<String>?)
         val title = Publisher("BRITISH COLUMBIA")
         val panel = AllSeatsScreen.ofGrouped(
-            prevResult,
-            currResult,
-        ) { it.uppercase() }
-            .withNumRows(numRows)
-            .withSeatFilter(filteredSeats)
-            .let { builder ->
-                val regions = bcRegions()
-                BCRegion.values().fold(builder) { b, r ->
-                    b.withGroup(r.name.asOneTimePublisher()) { regions[it] == r }
-                }
-            }
-            .build(title)
+            prevWinner = prevResult,
+            currResult = currResult,
+            nameFunc = { uppercase() },
+            numRows = numRows,
+            seatFilter = filteredSeats,
+            groups = BCRegion.values().map { region -> group(region.name.asOneTimePublisher()) { bcRegions[this] == region } },
+            title = title,
+        )
         panel.setSize(1024, 512)
         compareRendering("AllSeatsScreen", "Grouped-1", panel)
         assertPublishes(
@@ -545,8 +542,8 @@ class AllSeatsScreenTest {
         }
 
         private enum class BCRegion { VANCOUVER, ISLAND, SOUTH, NORTH }
-        private fun bcRegions(): Map<String, BCRegion> {
-            return mapOf(
+        private val bcRegions: Map<String, BCRegion> =
+            mapOf(
                 "Nechako Lakes" to BCRegion.NORTH,
                 "North Coast" to BCRegion.NORTH,
                 "Peace River North" to BCRegion.NORTH,
@@ -635,6 +632,5 @@ class AllSeatsScreenTest {
                 "Victoria-Beacon Hill" to BCRegion.ISLAND,
                 "Victoria-Swan Lake" to BCRegion.ISLAND,
             )
-        }
     }
 }
