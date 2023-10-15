@@ -85,16 +85,16 @@ class BattlefieldScreenTest {
         }
 
         val screen = BattlefieldScreen.build(
-            prevResults.asOneTimePublisher(),
-            currResults.asOneTimePublisher(),
-            pc.asOneTimePublisher(),
-            lib.asOneTimePublisher(),
-            grn.asOneTimePublisher(),
-            "BATTLEFIELD PEI: ADVANCING TO A MAJORITY".asOneTimePublisher(),
+            prevVotes = prevResults.asOneTimePublisher(),
+            results = currResults.asOneTimePublisher(),
+            leftParty = pc.asOneTimePublisher(),
+            rightParty = lib.asOneTimePublisher(),
+            bottomParty = grn.asOneTimePublisher(),
+            header = "BATTLEFIELD PEI: ADVANCING TO A MAJORITY".asOneTimePublisher(),
+            partySwings = swings.asOneTimePublisher(),
+            majorityLines = true.asOneTimePublisher(),
+            title = "PRINCE EDWARD ISLAND".asOneTimePublisher(),
         )
-            .withPartySwings(swings.asOneTimePublisher())
-            .withLines(true.asOneTimePublisher())
-            .build("PRINCE EDWARD ISLAND".asOneTimePublisher())
         screen.setSize(1024, 512)
         compareRendering("BattlefieldScreen", "Result", screen)
         assertPublishes(

@@ -16,62 +16,52 @@ import java.util.concurrent.Flow
 class BattlefieldScreen private constructor(header: Flow.Publisher<out String?>, frame: BattlefieldFrame, altText: Flow.Publisher<String>) : GenericPanel(pad(frame), header, altText) {
 
     companion object {
-        fun <T> build(
-            prevVotesPublisher: Flow.Publisher<out Map<T, Map<Party, Int>>>,
-            resultsPublisher: Flow.Publisher<out Map<T, PartyResult?>>,
-            leftPartyPublisher: Flow.Publisher<Party>,
-            rightPartyPublisher: Flow.Publisher<Party>,
-            bottomPartyPublisher: Flow.Publisher<Party>,
-            headerPublisher: Flow.Publisher<out String?>,
-        ) = Builder(prevVotesPublisher, resultsPublisher, leftPartyPublisher, rightPartyPublisher, bottomPartyPublisher, headerPublisher)
-    }
+        private const val DEFAULT_LIMIT = 0.80
 
-    class Builder<T>(
-        private val prevVotesPublisher: Flow.Publisher<out Map<T, Map<Party, Int>>>,
-        private val resultsPublisher: Flow.Publisher<out Map<T, PartyResult?>>,
-        leftPartyPublisher: Flow.Publisher<Party>,
-        rightPartyPublisher: Flow.Publisher<Party>,
-        bottomPartyPublisher: Flow.Publisher<Party>,
-        private val headerPublisher: Flow.Publisher<out String?>,
-    ) {
+        fun <T> build(
+            prevVotes: Flow.Publisher<out Map<T, Map<Party, Int>>>,
+            results: Flow.Publisher<out Map<T, PartyResult?>>,
+            leftParty: Flow.Publisher<Party>,
+            rightParty: Flow.Publisher<Party>,
+            bottomParty: Flow.Publisher<Party>,
+            header: Flow.Publisher<out String?>,
+            limit: Flow.Publisher<out Number>? = null,
+            increment: Flow.Publisher<out Number>? = null,
+            partySwings: Flow.Publisher<out Map<Party, Double>?>? = null,
+            majorityLines: Flow.Publisher<Boolean>? = null,
+            title: Flow.Publisher<out String?>,
+        ): BattlefieldScreen {
+            val allParties = leftParty.merge(rightParty) { l, r -> l to r }
+                .merge(bottomParty) { (l, r), b -> Parties(l, r, b) }
+            val frame = createBattlefield(
+                prevVotes,
+                results,
+                allParties,
+                majorityLines,
+                header,
+                limit,
+                increment,
+                partySwings,
+            )
+            val altText = createAltText(title, header, partySwings, allParties, prevVotes)
+            return BattlefieldScreen(title, frame, altText)
+        }
+
         private data class Parties(val left: Party, val right: Party, val bottom: Party) {
             fun asSequence() = sequenceOf(left, right, bottom)
         }
 
-        private val allParties = leftPartyPublisher.merge(rightPartyPublisher) { l, r -> l to r }
-            .merge(bottomPartyPublisher) { (l, r), b -> Parties(l, r, b) }
-
-        private var limitPublisher: Flow.Publisher<out Number> = 0.80.asOneTimePublisher()
-        private var incrementPublisher: Flow.Publisher<out Number> = 0.10.asOneTimePublisher()
-        private var partySwingsPublisher: Flow.Publisher<out Map<Party, Double>?> = null.asOneTimePublisher()
-        private var linesPublisher: Flow.Publisher<Boolean> = false.asOneTimePublisher()
-
-        fun withLimit(limitPublisher: Flow.Publisher<out Number>): Builder<T> {
-            this.limitPublisher = limitPublisher
-            return this
-        }
-
-        fun withIncrement(incrementPublisher: Flow.Publisher<out Number>): Builder<T> {
-            this.incrementPublisher = incrementPublisher
-            return this
-        }
-
-        fun withPartySwings(partySwingsPublisher: Flow.Publisher<out Map<Party, Double>?>): Builder<T> {
-            this.partySwingsPublisher = partySwingsPublisher
-            return this
-        }
-
-        fun withLines(linesPublisher: Flow.Publisher<Boolean>): Builder<T> {
-            this.linesPublisher = linesPublisher
-            return this
-        }
-
-        fun build(title: Flow.Publisher<out String?>): BattlefieldScreen {
-            return BattlefieldScreen(title, createBattlefield(), createAltText(title))
-        }
-
-        private fun createBattlefield(): BattlefieldFrame {
-            val dotsPublisher = prevVotesPublisher.merge(resultsPublisher) { prev, curr -> prev to curr }
+        private fun <T> createBattlefield(
+            prevVotes: Flow.Publisher<out Map<T, Map<Party, Int>>>,
+            results: Flow.Publisher<out Map<T, PartyResult?>>,
+            allParties: Flow.Publisher<Parties>,
+            majorityLines: Flow.Publisher<Boolean>?,
+            header: Flow.Publisher<out String?>,
+            limit: Flow.Publisher<out Number>?,
+            increment: Flow.Publisher<out Number>?,
+            partySwings: Flow.Publisher<out Map<Party, Double>?>?,
+        ): BattlefieldFrame {
+            val dotsPublisher = prevVotes.merge(results) { prev, curr -> prev to curr }
                 .merge(allParties) { (prev, curr), parties ->
                     prev.entries.mapNotNull { (key, votes) ->
                         val winner = votes.entries.maxByOrNull { it.value }?.key
@@ -86,25 +76,38 @@ class BattlefieldScreen private constructor(header: Flow.Publisher<out String?>,
                     }
                 }
 
-            val linesPublisher = prevVotesPublisher.merge(linesPublisher) { prev, show -> prev to show }
-                .merge(allParties.merge(limitPublisher) { parties, limit -> parties to limit }) { (prev, show), (parties, limit) ->
-                    if (!show) return@merge emptyList<Pair<BattlefieldFrame.Line, Color>>()
+            val linesPublisher = if (majorityLines == null) {
+                null
+            } else
+                prevVotes.merge(majorityLines) { prev, show -> prev to show }
+                    .merge(
+                        allParties.run {
+                            if (limit == null) {
+                                map { parties -> parties to DEFAULT_LIMIT }
+                            } else {
+                                merge(limit) { parties, limit -> parties to limit }
+                            }
+                        },
+                    ) { (prev, show), (parties, limit) ->
+                        if (!show) return@merge emptyList<Pair<BattlefieldFrame.Line, Color>>()
 
-                    val prevPcts = prev.mapValues { e ->
-                        val total = e.value.values.sum().toDouble()
-                        e.value.mapValues { it.value / total }
+                        val prevPcts = prev.mapValues { e ->
+                            val total = e.value.values.sum().toDouble()
+                            e.value.mapValues { it.value / total }
+                        }
+
+                        parties.asSequence().mapNotNull { calculateLine(it, parties, prevPcts, limit.toDouble()) }
+                            .toList()
                     }
 
-                    parties.asSequence().mapNotNull { calculateLine(it, parties, prevPcts, limit.toDouble()) }.toList()
-                }
-
             return BattlefieldFrame(
-                headerPublisher = headerPublisher,
-                limitPublisher = limitPublisher,
-                incrementPublisher = incrementPublisher,
+                headerPublisher = header,
+                limitPublisher = limit ?: DEFAULT_LIMIT.asOneTimePublisher(),
+                incrementPublisher = increment ?: 0.10.asOneTimePublisher(),
                 dotsPublisher = dotsPublisher,
-                linesPublisher = linesPublisher,
-                swingPublisher = partySwingsPublisher.merge(allParties) { swings, parties ->
+                linesPublisher = linesPublisher
+                    ?: emptyList<Pair<BattlefieldFrame.Line, Color>>().asOneTimePublisher(),
+                swingPublisher = partySwings?.merge(allParties) { swings, parties ->
                     if (swings == null) {
                         null
                     } else {
@@ -114,7 +117,7 @@ class BattlefieldScreen private constructor(header: Flow.Publisher<out String?>,
                             swings[parties.bottom] ?: 0,
                         )
                     }
-                },
+                } ?: null.asOneTimePublisher(),
                 territoriesPublisher = allParties.map { parties ->
                     BattlefieldFrame.Territories(
                         ColorUtils.lighten(ColorUtils.lighten(ColorUtils.lighten(parties.left.color))),
@@ -125,7 +128,12 @@ class BattlefieldScreen private constructor(header: Flow.Publisher<out String?>,
             )
         }
 
-        private fun calculateLine(party: Party, allParties: Parties, prevPcts: Map<T, Map<Party, Double>>, limit: Double): Pair<BattlefieldFrame.Line, Color>? {
+        private fun <T> calculateLine(
+            party: Party,
+            allParties: Parties,
+            prevPcts: Map<T, Map<Party, Double>>,
+            limit: Double,
+        ): Pair<BattlefieldFrame.Line, Color>? {
             val otherParties = when (party) {
                 allParties.left -> allParties.right to allParties.bottom
                 allParties.right -> allParties.left to allParties.bottom
@@ -137,7 +145,14 @@ class BattlefieldScreen private constructor(header: Flow.Publisher<out String?>,
             val numIncrements = (limit / incrementSize).toInt()
 
             val swings = (-numIncrements..numIncrements).asSequence().map { incrementSize * it }
-                .map { otherSwing -> calculateSwing(party, otherParties, prevPcts, otherSwing).let { otherSwing to it } }
+                .map { otherSwing ->
+                    calculateSwing(
+                        party,
+                        otherParties,
+                        prevPcts,
+                        otherSwing,
+                    ).let { otherSwing to it }
+                }
                 .map { (otherSwing, partySwing) ->
                     when (party) {
                         allParties.left -> BattlefieldFrame.Dot(partySwing, -otherSwing, otherSwing)
@@ -151,7 +166,12 @@ class BattlefieldScreen private constructor(header: Flow.Publisher<out String?>,
             return BattlefieldFrame.Line(swings) to party.color
         }
 
-        private fun calculateSwing(party: Party, otherParties: Pair<Party, Party>, prevPcts: Map<T, Map<Party, Double>>, swing: Double): Double {
+        private fun <T> calculateSwing(
+            party: Party,
+            otherParties: Pair<Party, Party>,
+            prevPcts: Map<T, Map<Party, Double>>,
+            swing: Double,
+        ): Double {
             val majority = prevPcts.size / 2 + 1
             val stage1Pcts = prevPcts.mapValues { (_, pcts) ->
                 pcts.mapValues {
@@ -185,9 +205,15 @@ class BattlefieldScreen private constructor(header: Flow.Publisher<out String?>,
             return pctNeeded
         }
 
-        private fun createAltText(title: Flow.Publisher<out String?>): Flow.Publisher<String> {
-            val topText = title.merge(headerPublisher) { t, h -> sequenceOf(t, h).filterNotNull().joinToString("\n") }
-            val swingsText = partySwingsPublisher.merge(allParties) { swings, parties ->
+        private fun <T> createAltText(
+            title: Flow.Publisher<out String?>,
+            header: Flow.Publisher<out String?>,
+            partySwings: Flow.Publisher<out Map<Party, Double>?>?,
+            allParties: Flow.Publisher<Parties>,
+            prevVotes: Flow.Publisher<out Map<T, Map<Party, Int>>>,
+        ): Flow.Publisher<String> {
+            val topText = title.merge(header) { t, h -> sequenceOf(t, h).filterNotNull().joinToString("\n") }
+            val swingsText = partySwings?.merge(allParties) { swings, parties ->
                 if (swings == null) return@merge null
                 val relevantChanges = sequenceOf(parties.left, parties.right, parties.bottom)
                     .associateWith { party -> swings[party] ?: 0.0 }
@@ -204,18 +230,24 @@ class BattlefieldScreen private constructor(header: Flow.Publisher<out String?>,
                         "${to.abbreviation} ADVANCES ${DecimalFormat("0.0%").format(swing)} INTO ${from.abbreviation} TERRITORY"
                     }
             }
-            val majorityText = partySwingsPublisher.merge(prevVotesPublisher) { swings, prevVotes ->
-                val adjSeats = prevVotes.values.groupingBy { votes ->
+            val majorityText = (partySwings ?: null.asOneTimePublisher()).merge(prevVotes) { swings, prev ->
+                val adjSeats = prev.values.groupingBy { votes ->
                     val total = votes.values.sum().toDouble()
                     val pcts = votes.mapValues { it.value / total + (swings?.get(it.key) ?: 0.0) }
                     pcts.maxBy { it.value }.key
                 }.eachCount()
-                val majority = prevVotes.size / 2 + 1
+                val majority = prev.size / 2 + 1
                 val winner = adjSeats.filterValues { it >= majority }.keys.firstOrNull()
                 (winner?.abbreviation ?: "NO PARTY") +
                     (if (swings == null) " CURRENTLY HAS MAJORITY" else " WOULD HAVE MAJORITY ON UNIFORM ADVANCES")
             }
-            return topText.merge(swingsText) { t, s -> sequenceOf(t, s).filterNotNull().joinToString("\n\n") }
+            return topText.run {
+                if (swingsText == null) {
+                    this
+                } else {
+                    merge(swingsText) { t, s -> sequenceOf(t, s).filterNotNull().joinToString("\n\n") }
+                }
+            }
                 .merge(majorityText) { t, m -> "$t\n\n$m" }
         }
     }
