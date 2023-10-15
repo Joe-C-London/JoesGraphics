@@ -1,5 +1,8 @@
 package com.joecollins.graphics.components
 
+import com.joecollins.graphics.components.HeatMapFrameBuilder.changeBars
+import com.joecollins.graphics.components.HeatMapFrameBuilder.seatBars
+import com.joecollins.graphics.components.HeatMapFrameBuilder.squares
 import com.joecollins.graphics.utils.ColorUtils.lighten
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
@@ -22,20 +25,20 @@ class HeatMapFrameBuilderTest {
         ).flatten().toList()
         val seatBars = Publisher(listOf(Pair(Color.GREEN, 8)))
         val changeBars = Publisher(listOf(Pair(Color.GREEN, +7)))
-        val frame = HeatMapFrameBuilder.build<Pair<Color, Color>, Pair<Color, Int>, Pair<Color, Int>>(
-            squares = {
+        val frame = HeatMapFrameBuilder.build(
+            squares = squares<Pair<Color, Color>> {
                 numRows = 3.asOneTimePublisher()
                 entries = dots
                 fill = { first.asOneTimePublisher() }
                 border = { second.asOneTimePublisher() }
             },
-            seatBars = {
+            seatBars = seatBars<Pair<Color, Int>> {
                 bars = seatBars
                 colorFunc = { it.first }
                 seatFunc = { it.second }
                 labelPublisher = "GREEN: 8".asOneTimePublisher()
             },
-            changeBars = {
+            changeBars = changeBars<Pair<Color, Int>> {
                 bars = changeBars
                 colorFunc = { it.first }
                 seatFunc = { it.second }

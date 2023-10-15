@@ -60,26 +60,29 @@ object HeatMapFrameBuilder {
         }
     }
 
-    fun <SQ, SB, CB> build(
-        squares: Squares<SQ>.() -> Unit,
-        seatBars: (SeatBars<SB>.() -> Unit)? = null,
-        changeBars: (ChangeBars<CB>.() -> Unit)? = null,
+    fun <SQ> squares(squares: Squares<SQ>.() -> Unit) = Squares<SQ>().apply(squares)
+
+    fun <SB> seatBars(seatBars: SeatBars<SB>.() -> Unit) = SeatBars<SB>().apply(seatBars)
+
+    fun <CB> changeBars(changeBars: ChangeBars<CB>.() -> Unit) = ChangeBars<CB>().apply(changeBars)
+
+    fun build(
+        squares: Squares<*>,
+        seatBars: SeatBars<*>? = null,
+        changeBars: ChangeBars<*>? = null,
         header: Flow.Publisher<out String?>? = null,
         borderColor: Flow.Publisher<out Color>? = null,
     ): HeatMapFrame {
-        val squaresBuilder = Squares<SQ>().apply(squares)
-        val seatBarsBuilder = seatBars?.let { SeatBars<SB>().apply(it) }
-        val changeBarsBuilder = changeBars?.let { ChangeBars<CB>().apply(it) }
         return HeatMapFrame(
             headerPublisher = header ?: (null as String?).asOneTimePublisher(),
             borderColorPublisher = borderColor,
-            numRowsPublisher = squaresBuilder.numRowsPublisher,
-            squaresPublisher = squaresBuilder.squaresPublisher,
-            seatBarsPublisher = seatBarsBuilder?.barsPublisher,
-            seatBarLabelPublisher = seatBarsBuilder?.labelPublisher,
-            changeBarsPublisher = changeBarsBuilder?.barsPublisher,
-            changeBarStartPublisher = changeBarsBuilder?.startPublisher,
-            changeBarLabelPublisher = changeBarsBuilder?.labelPublisher,
+            numRowsPublisher = squares.numRowsPublisher,
+            squaresPublisher = squares.squaresPublisher,
+            seatBarsPublisher = seatBars?.barsPublisher,
+            seatBarLabelPublisher = seatBars?.labelPublisher,
+            changeBarsPublisher = changeBars?.barsPublisher,
+            changeBarStartPublisher = changeBars?.startPublisher,
+            changeBarLabelPublisher = changeBars?.labelPublisher,
         )
     }
 
@@ -138,8 +141,8 @@ object HeatMapFrameBuilder {
         val allPrevs = entries
             .map { Pair(prev[it]!!, it.seats()) }
             .toList()
-        return build<T, Pair<Color, Int>, Pair<Color, Int>>(
-            squares = {
+        return build(
+            squares = squares<T> {
                 numRows = rows
                 this.entries = entries
                 this.seats = seats
@@ -156,13 +159,13 @@ object HeatMapFrameBuilder {
                 border = { filter.map { filter -> if (filter()) prevResult().color else Color.WHITE } }
                 this.label = label
             },
-            seatBars = {
+            seatBars = seatBars<Pair<Color, Int>> {
                 bars = seatList
                 colorFunc = { it.first }
                 seatFunc = { it.second }
                 labelPublisher = seatsPublisher.map { it.seatLabel() }
             },
-            changeBars = {
+            changeBars = changeBars<Pair<Color, Int>> {
                 bars = changeList
                 colorFunc = { it.first }
                 seatFunc = { it.second }
