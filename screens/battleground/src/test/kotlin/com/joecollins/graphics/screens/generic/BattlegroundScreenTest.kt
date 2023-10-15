@@ -26,15 +26,18 @@ class BattlegroundScreenTest {
         val numRows = Publisher(15)
         val title = Publisher("NDP BATTLEGROUND")
         val panel = BattlegroundScreen.singleParty(
-            prevResult,
-            prevWinners,
-            currResult,
-            { it.uppercase() },
-            party,
+            prevResults = prevResult,
+            prevWinners = prevWinners,
+            currResults = currResult,
+            name = { uppercase() },
+            party = party,
+            seatsToShow = {
+                defense = defenseSeats
+                target = targetSeats
+            },
+            numRows = numRows,
+            title = title,
         )
-            .withSeatsToShow(defenseSeats, targetSeats)
-            .withNumRows(numRows)
-            .build(title)
         panel.setSize(1024, 512)
         compareRendering("BattlegroundScreen", "Basic-SingleParty-1", panel)
         assertPublishes(
@@ -154,16 +157,19 @@ class BattlegroundScreenTest {
         )
         val title = Publisher("NDP BATTLEGROUND")
         val panel = BattlegroundScreen.singleParty(
-            prevResult,
-            prevWinners,
-            currResult,
-            { it.uppercase() },
-            party,
+            prevResults = prevResult,
+            prevWinners = prevWinners,
+            currResults = currResult,
+            name = { uppercase() },
+            party = party,
+            seatsToShow = {
+                defense = defenseSeats
+                target = targetSeats
+            },
+            numRows = numRows,
+            seatFilter = filteredSeats,
+            title = title,
         )
-            .withSeatsToShow(defenseSeats, targetSeats)
-            .withNumRows(numRows)
-            .withSeatFilter(filteredSeats)
-            .build(title)
         panel.setSize(1024, 512)
         compareRendering("BattlegroundScreen", "Filtered-SingleParty-1", panel)
         assertPublishes(
@@ -231,15 +237,18 @@ class BattlegroundScreenTest {
         val numRows = Publisher(15)
         val title = Publisher("BATTLEGROUND")
         val panel = BattlegroundScreen.doubleParty(
-            prevResult,
-            prevWinners,
-            currResult,
-            { it.uppercase() },
-            parties,
+            prevResults = prevResult,
+            prevWinners = prevWinners,
+            currResults = currResult,
+            name = { uppercase() },
+            parties = parties,
+            seatsToShow = {
+                left = leftSeats
+                right = rightSeats
+            },
+            numRows = numRows,
+            title = title,
         )
-            .withSeatsToShow(leftSeats, rightSeats)
-            .withNumRows(numRows)
-            .build(title)
         panel.setSize(1024, 512)
         compareRendering("BattlegroundScreen", "Basic-DoubleParty-1", panel)
         assertPublishes(
@@ -349,15 +358,18 @@ class BattlegroundScreenTest {
         val numRows = Publisher(15)
         val title = Publisher("BATTLEGROUND")
         val panel = BattlegroundScreen.doubleParty(
-            prevResult,
-            prevWinners,
-            currResult,
-            { it.uppercase() },
-            (coa to lib).asOneTimePublisher(),
+            prevResults = prevResult,
+            prevWinners = prevWinners,
+            currResults = currResult,
+            name = { uppercase() },
+            parties = (coa to lib).asOneTimePublisher(),
+            seatsToShow = {
+                left = leftSeats
+                right = rightSeats
+            },
+            numRows = numRows,
+            title = title,
         )
-            .withSeatsToShow(leftSeats, rightSeats)
-            .withNumRows(numRows)
-            .build(title)
         panel.setSize(1024, 512)
         compareRendering("BattlegroundScreen", "Basic-DoubleCoalition-1", panel)
         assertPublishes(
@@ -387,16 +399,19 @@ class BattlegroundScreenTest {
         val numRows = Publisher(15)
         val title = Publisher("NDP BATTLEGROUND")
         val panel = BattlegroundScreen.singleParty(
-            prevResult,
-            prevWinners,
-            currResult,
-            { it.uppercase() },
-            party,
+            prevResults = prevResult,
+            prevWinners = prevWinners,
+            currResults = currResult,
+            name = { uppercase() },
+            party = party,
+            seatsToShow = {
+                defense = defenseSeats
+                target = targetSeats
+            },
+            numRows = numRows,
+            partyChanges = mapOf(lib to bcu).asOneTimePublisher(),
+            title = title,
         )
-            .withSeatsToShow(defenseSeats, targetSeats)
-            .withNumRows(numRows)
-            .withPartyChanges(mapOf(lib to bcu).asOneTimePublisher())
-            .build(title)
         panel.setSize(1024, 512)
         compareRendering("BattlegroundScreen", "Basic-SingleParty-1", panel)
         assertPublishes(
@@ -535,22 +550,25 @@ class BattlegroundScreenTest {
             "Wanguri" to mapOf(alp to 3349, clp to 1627),
         )
         val panel = BattlegroundScreen.doubleParty(
-            prevResults.associateWith { it.second }.asOneTimePublisher(),
-            prevResults.associateWith { it.second.maxBy { e -> e.value }.key }.asOneTimePublisher(),
-            emptyMap<Pair<String, Map<Party, Int>>, PartyResult?>().asOneTimePublisher(),
-            { e ->
-                val votes = e.second.values.toList()
+            prevResults = prevResults.associateWith { it.second }.asOneTimePublisher(),
+            prevWinners = prevResults.associateWith { it.second.maxBy { e -> e.value }.key }.asOneTimePublisher(),
+            currResults = emptyMap<Pair<String, Map<Party, Int>>, PartyResult?>().asOneTimePublisher(),
+            name = {
+                val votes = second.values.toList()
                 val pct = abs(votes[0] - votes[1]) / votes.sum().toDouble()
                 DecimalFormat("0.0").format(50 * pct) +
-                    " " + e.first.uppercase() + " " +
-                    (e.second.keys.filter { !setOf(alp, clp).contains(it) }.takeUnless { it.isEmpty() }?.toString() ?: "")
+                    " " + first.uppercase() + " " +
+                    (second.keys.filter { !setOf(alp, clp).contains(it) }.takeUnless { it.isEmpty() }?.toString() ?: "")
             },
-            (clp to alp).asOneTimePublisher(),
+            parties = (clp to alp).asOneTimePublisher(),
+            seatsToShow = {
+                left = 15.asOneTimePublisher()
+                right = 15.asOneTimePublisher()
+            },
+            numRows = 15.asOneTimePublisher(),
+            preferencesMode = true,
+            title = "PENDULUM".asOneTimePublisher(),
         )
-            .withSeatsToShow(15.asOneTimePublisher(), 15.asOneTimePublisher())
-            .withNumRows(15.asOneTimePublisher())
-            .withPreferences()
-            .build("PENDULUM".asOneTimePublisher())
         panel.setSize(1024, 512)
         compareRendering("BattlegroundScreen", "Basic-DoublePartyPreferences-1", panel)
         assertPublishes(

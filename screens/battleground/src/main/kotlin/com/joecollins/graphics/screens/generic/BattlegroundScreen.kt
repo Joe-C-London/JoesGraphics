@@ -54,304 +54,14 @@ class BattlegroundScreen private constructor(
         headerColor?.subscribe(Subscriber(eventQueueWrapper { super.label.foreground = it }))
     }
 
-    class SinglePartyBuilder<T>(
-        private val prevResults: Flow.Publisher<out Map<T, Map<Party, Int>>>,
-        private val prevWinners: Flow.Publisher<out Map<T, Party>>,
-        private val currResults: Flow.Publisher<out Map<T, PartyResult?>>,
-        private val nameFunc: (T) -> String,
-        private val party: Flow.Publisher<out Party>,
-    ) {
-        private var defenseSeatCount: Flow.Publisher<out Int> = 100.asOneTimePublisher()
-        private var targetSeatCount: Flow.Publisher<out Int> = 100.asOneTimePublisher()
-        private var numRows: Flow.Publisher<out Int> = 20.asOneTimePublisher()
-        private var seatFilter: Flow.Publisher<out Set<T>?> = (null as Set<T>?).asOneTimePublisher()
-        private var partyChanges: Flow.Publisher<Map<Party, Party>> = emptyMap<Party, Party>().asOneTimePublisher()
-
-        fun withSeatsToShow(
-            defenseSeatCountPublisher: Flow.Publisher<out Int>,
-            targetSeatCountPublisher: Flow.Publisher<out Int>,
-        ): SinglePartyBuilder<T> {
-            defenseSeatCount = defenseSeatCountPublisher
-            targetSeatCount = targetSeatCountPublisher
-            return this
-        }
-
-        fun withNumRows(numRowsPublisher: Flow.Publisher<out Int>): SinglePartyBuilder<T> {
-            numRows = numRowsPublisher
-            return this
-        }
-
-        fun withSeatFilter(seatFilterPublisher: Flow.Publisher<out Set<T>?>): SinglePartyBuilder<T> {
-            seatFilter = seatFilterPublisher
-            return this
-        }
-
-        fun withPartyChanges(changes: Flow.Publisher<Map<Party, Party>>): SinglePartyBuilder<T> {
-            partyChanges = changes
-            return this
-        }
-
-        fun build(title: Flow.Publisher<out String?>): BattlegroundScreen {
-            val defenseInput = DefenseBattlegroundInput<T>()
-            prevResults.subscribe(Subscriber { defenseInput.prev = it })
-            prevWinners.subscribe(Subscriber { defenseInput.prevWinners = it })
-            currResults.subscribe(Subscriber { defenseInput.curr = it })
-            defenseSeatCount.subscribe(Subscriber { defenseInput.count = it })
-            party.subscribe(Subscriber { defenseInput.party = it })
-            seatFilter.subscribe(Subscriber { defenseInput.filteredSeats = it })
-            partyChanges.subscribe(Subscriber { defenseInput.partyChanges = it })
-            val defenseItems = defenseInput.items
-            val defenseFrame = ResultListingFrame(
-                headerPublisher = party.map { "$it DEFENSE SEATS" },
-                borderColorPublisher = party.map(Party::color),
-                headerAlignmentPublisher = GraphicsFrame.Alignment.RIGHT.asOneTimePublisher(),
-                numRowsPublisher = numRows,
-                itemsPublisher = defenseItems.mapElements {
-                    ResultListingFrame.Item(
-                        text = nameFunc(it.key),
-                        border = it.prevColor,
-                        background = (if (it.fill) it.resultColor else Color.WHITE),
-                        foreground = (if (!it.fill) it.resultColor else Color.WHITE),
-                    )
-                },
-                reversedPublisher = true.asOneTimePublisher(),
-            )
-
-            val targetInput = TargetBattlegroundInput<T>()
-            prevResults.subscribe(Subscriber { targetInput.prev = it })
-            prevWinners.subscribe(Subscriber { targetInput.prevWinners = it })
-            currResults.subscribe(Subscriber { targetInput.curr = it })
-            targetSeatCount.subscribe(Subscriber { targetInput.count = it })
-            party.subscribe(Subscriber { targetInput.party = it })
-            seatFilter.subscribe(Subscriber { targetInput.filteredSeats = it })
-            partyChanges.subscribe(Subscriber { targetInput.partyChanges = it })
-            val targetItems = targetInput.items
-            val targetFrame = ResultListingFrame(
-                headerPublisher = party.map { "$it TARGET SEATS" },
-                borderColorPublisher = party.map(Party::color),
-                headerAlignmentPublisher = GraphicsFrame.Alignment.LEFT.asOneTimePublisher(),
-                numRowsPublisher = numRows,
-                itemsPublisher = targetItems.mapElements {
-                    ResultListingFrame.Item(
-                        text = nameFunc(it.key),
-                        border = it.prevColor,
-                        background = (if (it.fill) it.resultColor else Color.WHITE),
-                        foreground = (if (!it.fill) it.resultColor else Color.WHITE),
-                    )
-                },
-                reversedPublisher = false.asOneTimePublisher(),
-            )
-
-            val altText = run {
-                val meta = numRows.merge(party) { rows, party -> rows to party }
-                    .merge(currResults) { (rows, party), result -> Triple(rows, party, result.all { r -> r.value?.isElected ?: true }) }
-
-                val textGenerator: (List<Entry<T>>, Int, Party, Boolean, String, String) -> String? = {
-                        items, rows, party, allDone, winLabel, loseLabel ->
-                    if (items.none { it.isIncluded }) {
-                        null
-                    } else {
-                        val groups = items.mapIndexed { index, entry -> index / rows to entry }
-                            .filter { it.second.isIncluded }
-                            .groupBy({ it.first }, { it.second })
-                        groups.entries.joinToString("\n") { (column, entries) ->
-                            val categories = entries.groupBy {
-                                when {
-                                    it.currResult == null -> "PENDING"
-                                    it.currResult.party == party -> winLabel
-                                    else -> loseLabel
-                                }
-                            }.toSortedMap()
-                            val counts = categories.entries.joinToString {
-                                val count = if (it.key == "PENDING" || allDone) {
-                                    "${it.value.size}"
-                                } else {
-                                    "${it.value.count { e -> e.currResult?.isElected ?: false }}(${it.value.size})"
-                                }
-                                "$count ${it.key}"
-                            }
-                            "COLUMN ${column + 1}: $counts"
-                        }
-                    }
-                }
-
-                val targetsText = targetInput.items.merge(meta) { items, (rows, party, allDone) ->
-                    textGenerator(items, rows, party, allDone, "GAINS", "MISSES")
-                }.merge(party) { t, p -> if (t == null) null else "${p.abbreviation} TARGET SEATS\n$t" }
-
-                val defenseText = defenseInput.items.merge(meta) { items, (rows, party, allDone) ->
-                    textGenerator(items, rows, party, allDone, "HOLDS", "LOSSES")
-                }.merge(party) { t, p -> if (t == null) null else "${p.abbreviation} DEFENSE SEATS\n$t" }
-
-                targetsText.merge(defenseText) { t, d -> listOfNotNull(t, d).takeUnless { it.isEmpty() }?.joinToString("\n\n") }
-                    .merge(title) { t, h -> sequenceOf(h, t).filterNotNull().joinToString("\n\n") }
-            }
-
-            return BattlegroundScreen(
-                title,
-                defenseFrame,
-                targetFrame,
-                defenseSeatCount
-                    .merge(numRows) { c, n -> n * ceil(1.0 * c / n).toInt() },
-                targetSeatCount
-                    .merge(numRows) { c, n -> n * ceil(1.0 * c / n).toInt() },
-                party.map { it.color },
-                altText = altText,
-            )
-        }
+    class SingleSeatsToShow internal constructor() {
+        lateinit var defense: Flow.Publisher<Int>
+        lateinit var target: Flow.Publisher<Int>
     }
 
-    class DoublePartyBuilder<T>(
-        private val prevResults: Flow.Publisher<out Map<T, Map<Party, Int>>>,
-        private val prevWinners: Flow.Publisher<out Map<T, Party>>,
-        private val currResults: Flow.Publisher<out Map<T, PartyResult?>>,
-        private val nameFunc: (T) -> String,
-        private val parties: Flow.Publisher<out Pair<PartyOrCoalition, PartyOrCoalition>>,
-    ) {
-        private var leftSeatCount: Flow.Publisher<out Int> = 100.asOneTimePublisher()
-        private var rightSeatCount: Flow.Publisher<out Int> = 100.asOneTimePublisher()
-        private var numRows: Flow.Publisher<out Int> = 20.asOneTimePublisher()
-        private var seatFilter: Flow.Publisher<out Set<T>?> = (null as Set<T>?).asOneTimePublisher()
-        private var headerFunc: (PartyOrCoalition) -> String = { "$it PREVIOUS SEATS" }
-        private var preferences = false
-
-        fun withSeatsToShow(
-            leftSeatCountPublisher: Flow.Publisher<out Int>,
-            rightSeatCountPublisher: Flow.Publisher<out Int>,
-        ): DoublePartyBuilder<T> {
-            leftSeatCount = leftSeatCountPublisher
-            rightSeatCount = rightSeatCountPublisher
-            return this
-        }
-
-        fun withNumRows(numRowsPublisher: Flow.Publisher<out Int>): DoublePartyBuilder<T> {
-            numRows = numRowsPublisher
-            return this
-        }
-
-        fun withSeatFilter(seatFilterPublisher: Flow.Publisher<out Set<T>?>): DoublePartyBuilder<T> {
-            seatFilter = seatFilterPublisher
-            return this
-        }
-
-        fun withHeaderFunc(headerFunc: (PartyOrCoalition) -> String): DoublePartyBuilder<T> {
-            this.headerFunc = headerFunc
-            return this
-        }
-
-        fun withPreferences(): DoublePartyBuilder<T> {
-            this.preferences = true
-            return this
-        }
-
-        fun build(title: Flow.Publisher<out String?>): BattlegroundScreen {
-            val leftInput = DoubleBattlegroundInput<T>()
-            prevResults.subscribe(Subscriber { leftInput.prev = it })
-            prevWinners.subscribe(Subscriber { leftInput.prevWinners = it })
-            currResults.subscribe(Subscriber { leftInput.curr = it })
-            leftSeatCount.subscribe(Subscriber { leftInput.count = it })
-            parties.subscribe(Subscriber { leftInput.party = it })
-            seatFilter.subscribe(Subscriber { leftInput.filteredSeats = it })
-            leftInput.preferences = preferences
-            val leftItems = leftInput.items
-            val leftFrame = ResultListingFrame(
-                headerPublisher = parties.map { headerFunc(it.first) },
-                borderColorPublisher = parties.map { it.first.color },
-                headerAlignmentPublisher = GraphicsFrame.Alignment.RIGHT.asOneTimePublisher(),
-                numRowsPublisher = numRows,
-                itemsPublisher = leftItems.mapElements {
-                    ResultListingFrame.Item(
-                        text = nameFunc(it.key),
-                        border = it.prevColor,
-                        background = (if (it.fill) it.resultColor else Color.WHITE),
-                        foreground = (if (!it.fill) it.resultColor else Color.WHITE),
-                    )
-                },
-                reversedPublisher = true.asOneTimePublisher(),
-            )
-
-            val rightInput = DoubleBattlegroundInput<T>()
-            prevResults.subscribe(Subscriber { rightInput.prev = it })
-            prevWinners.subscribe(Subscriber { rightInput.prevWinners = it })
-            currResults.subscribe(Subscriber { rightInput.curr = it })
-            rightSeatCount.subscribe(Subscriber { rightInput.count = it })
-            parties.subscribe(Subscriber { rightInput.party = it.reverse() })
-            seatFilter.subscribe(Subscriber { rightInput.filteredSeats = it })
-            rightInput.preferences = preferences
-            val rightItems = rightInput.items
-            val rightFrame = ResultListingFrame(
-                headerPublisher = parties.map { headerFunc(it.second) },
-                borderColorPublisher = parties.map { it.second.color },
-                headerAlignmentPublisher = GraphicsFrame.Alignment.LEFT.asOneTimePublisher(),
-                numRowsPublisher = numRows,
-                itemsPublisher = rightItems.mapElements {
-                    ResultListingFrame.Item(
-                        text = nameFunc(it.key),
-                        border = it.prevColor,
-                        background = (if (it.fill) it.resultColor else Color.WHITE),
-                        foreground = (if (!it.fill) it.resultColor else Color.WHITE),
-                    )
-                },
-                reversedPublisher = false.asOneTimePublisher(),
-            )
-
-            val altText = run {
-                val meta = numRows.merge(parties) { rows, party -> rows to party }
-                    .merge(currResults) { (rows, party), result -> Triple(rows, party, result.all { r -> r.value?.isElected ?: true }) }
-
-                val textGenerator: (List<Entry<T>>, Int, PartyOrCoalition, PartyOrCoalition, Boolean) -> String? = {
-                        items, rows, party, othParty, allDone ->
-                    if (items.none { it.isIncluded }) {
-                        null
-                    } else {
-                        val groups = items.mapIndexed { index, entry -> index / rows to entry }
-                            .filter { it.second.isIncluded }
-                            .groupBy({ it.first }, { it.second })
-                        groups.entries.joinToString("\n") { (column, entries) ->
-                            val categories = entries.groupBy {
-                                when {
-                                    it.currResult == null -> "PENDING"
-                                    it.currResult.party == party || party.constituentParties.contains(it.currResult.party) -> "HOLDS"
-                                    it.currResult.party == othParty || othParty.constituentParties.contains(it.currResult.party) -> "LOSSES TO ${othParty.abbreviation}"
-                                    else -> "OTHER LOSSES"
-                                }
-                            }.toSortedMap()
-                            val counts = categories.entries.joinToString {
-                                val count = if (it.key == "PENDING" || allDone) {
-                                    "${it.value.size}"
-                                } else {
-                                    "${it.value.count { e -> e.currResult?.isElected ?: false }}(${it.value.size})"
-                                }
-                                "$count ${it.key}"
-                            }
-                            "COLUMN ${column + 1}: $counts"
-                        }
-                    }
-                }
-
-                val targetsText = leftInput.items.merge(meta) { items, (rows, party, allDone) ->
-                    textGenerator(items, rows, party.first, party.second, allDone)
-                }.merge(parties) { t, p -> if (t == null) null else "${headerFunc(p.first)}\n$t" }
-
-                val defenseText = rightInput.items.merge(meta) { items, (rows, party, allDone) ->
-                    textGenerator(items, rows, party.second, party.first, allDone)
-                }.merge(parties) { t, p -> if (t == null) null else "${headerFunc(p.second)}\n$t" }
-
-                targetsText.merge(defenseText) { t, d -> listOfNotNull(t, d).takeUnless { it.isEmpty() }?.joinToString("\n\n") }
-                    .merge(title) { t, h -> sequenceOf(h, t).filterNotNull().joinToString("\n\n") }
-            }
-
-            return BattlegroundScreen(
-                title,
-                leftFrame,
-                rightFrame,
-                leftSeatCount
-                    .merge(numRows) { c, n -> n * ceil(1.0 * c / n).toInt() },
-                rightSeatCount
-                    .merge(numRows) { c, n -> n * ceil(1.0 * c / n).toInt() },
-                altText = altText,
-            )
-        }
+    class DoubleSeatsToShow internal constructor() {
+        lateinit var left: Flow.Publisher<Int>
+        lateinit var right: Flow.Publisher<Int>
     }
 
     private abstract class BattlegroundInput<T, P> {
@@ -373,7 +83,7 @@ class BattlegroundScreen private constructor(
                 submit()
             }
 
-        var count = 0
+        var count = DEFAULT_COUNT
             set(value) {
                 field = value
                 submit()
@@ -500,15 +210,15 @@ class BattlegroundScreen private constructor(
     }
 
     private class Entry<T>(val key: T, prevWinner: Party, val currResult: PartyResult?, val isIncluded: Boolean) {
-        fun colorFunc(c: Color): Color {
+        fun Color.adjust(): Color {
             return if (isIncluded) {
-                c
+                this
             } else {
-                ColorUtils.lighten(ColorUtils.lighten(c))
+                ColorUtils.lighten(ColorUtils.lighten(this))
             }
         }
-        val prevColor: Color = colorFunc(prevWinner.color)
-        val resultColor: Color = colorFunc(currResult?.party?.color ?: Color.LIGHT_GRAY)
+        val prevColor: Color = prevWinner.color.adjust()
+        val resultColor: Color = (currResult?.party?.color ?: Color.LIGHT_GRAY).adjust()
         val fill: Boolean = currResult?.isElected ?: false
     }
 
@@ -571,24 +281,270 @@ class BattlegroundScreen private constructor(
     }
 
     companion object {
+        private const val DEFAULT_COUNT = 100
+        private const val DEFAULT_ROWS = 20
+
         fun <T> singleParty(
-            prevResultsPublisher: Flow.Publisher<out Map<T, Map<Party, Int>>>,
-            prevWinnersPublisher: Flow.Publisher<out Map<T, Party>>,
-            currResultsPublisher: Flow.Publisher<out Map<T, PartyResult?>>,
-            nameFunc: (T) -> String,
-            partyPublisher: Flow.Publisher<out Party>,
-        ): SinglePartyBuilder<T> {
-            return SinglePartyBuilder(prevResultsPublisher, prevWinnersPublisher, currResultsPublisher, nameFunc, partyPublisher)
+            prevResults: Flow.Publisher<out Map<T, Map<Party, Int>>>,
+            prevWinners: Flow.Publisher<out Map<T, Party>>,
+            currResults: Flow.Publisher<out Map<T, PartyResult?>>,
+            name: T.() -> String,
+            party: Flow.Publisher<out Party>,
+            seatsToShow: (SingleSeatsToShow.() -> Unit)? = null,
+            numRows: Flow.Publisher<out Int>? = null,
+            seatFilter: Flow.Publisher<out Set<T>?>? = null,
+            partyChanges: Flow.Publisher<Map<Party, Party>>? = null,
+            title: Flow.Publisher<out String?>,
+        ): BattlegroundScreen {
+            val seatCounts = if (seatsToShow == null) null else SingleSeatsToShow().apply(seatsToShow)
+
+            val defenseInput = DefenseBattlegroundInput<T>()
+            prevResults.subscribe(Subscriber { defenseInput.prev = it })
+            prevWinners.subscribe(Subscriber { defenseInput.prevWinners = it })
+            currResults.subscribe(Subscriber { defenseInput.curr = it })
+            seatCounts?.defense?.subscribe(Subscriber { defenseInput.count = it })
+            party.subscribe(Subscriber { defenseInput.party = it })
+            seatFilter?.subscribe(Subscriber { defenseInput.filteredSeats = it })
+            partyChanges?.subscribe(Subscriber { defenseInput.partyChanges = it })
+            val defenseItems = defenseInput.items
+            val defenseFrame = ResultListingFrame(
+                headerPublisher = party.map { "$it DEFENSE SEATS" },
+                borderColorPublisher = party.map(Party::color),
+                headerAlignmentPublisher = GraphicsFrame.Alignment.RIGHT.asOneTimePublisher(),
+                numRowsPublisher = numRows ?: DEFAULT_ROWS.asOneTimePublisher(),
+                itemsPublisher = defenseItems.mapElements {
+                    ResultListingFrame.Item(
+                        text = it.key.name(),
+                        border = it.prevColor,
+                        background = (if (it.fill) it.resultColor else Color.WHITE),
+                        foreground = (if (!it.fill) it.resultColor else Color.WHITE),
+                    )
+                },
+                reversedPublisher = true.asOneTimePublisher(),
+            )
+
+            val targetInput = TargetBattlegroundInput<T>()
+            prevResults.subscribe(Subscriber { targetInput.prev = it })
+            prevWinners.subscribe(Subscriber { targetInput.prevWinners = it })
+            currResults.subscribe(Subscriber { targetInput.curr = it })
+            seatCounts?.target?.subscribe(Subscriber { targetInput.count = it })
+            party.subscribe(Subscriber { targetInput.party = it })
+            seatFilter?.subscribe(Subscriber { targetInput.filteredSeats = it })
+            partyChanges?.subscribe(Subscriber { targetInput.partyChanges = it })
+            val targetItems = targetInput.items
+            val targetFrame = ResultListingFrame(
+                headerPublisher = party.map { "$it TARGET SEATS" },
+                borderColorPublisher = party.map(Party::color),
+                headerAlignmentPublisher = GraphicsFrame.Alignment.LEFT.asOneTimePublisher(),
+                numRowsPublisher = numRows ?: DEFAULT_ROWS.asOneTimePublisher(),
+                itemsPublisher = targetItems.mapElements {
+                    ResultListingFrame.Item(
+                        text = it.key.name(),
+                        border = it.prevColor,
+                        background = (if (it.fill) it.resultColor else Color.WHITE),
+                        foreground = (if (!it.fill) it.resultColor else Color.WHITE),
+                    )
+                },
+                reversedPublisher = false.asOneTimePublisher(),
+            )
+
+            val altText = run {
+                val meta = party.run {
+                    if (numRows == null) {
+                        map { party -> DEFAULT_ROWS to party }
+                    } else {
+                        merge(numRows) { party, rows -> rows to party }
+                    }
+                }
+                    .merge(currResults) { (rows, party), result -> Triple(rows, party, result.all { r -> r.value?.isElected ?: true }) }
+
+                val textGenerator: (List<Entry<T>>, Int, Party, Boolean, String, String) -> String? = {
+                        items, rows, party, allDone, winLabel, loseLabel ->
+                    if (items.none { it.isIncluded }) {
+                        null
+                    } else {
+                        val groups = items.mapIndexed { index, entry -> index / rows to entry }
+                            .filter { it.second.isIncluded }
+                            .groupBy({ it.first }, { it.second })
+                        groups.entries.joinToString("\n") { (column, entries) ->
+                            val categories = entries.groupBy {
+                                when {
+                                    it.currResult == null -> "PENDING"
+                                    it.currResult.party == party -> winLabel
+                                    else -> loseLabel
+                                }
+                            }.toSortedMap()
+                            val counts = categories.entries.joinToString {
+                                val count = if (it.key == "PENDING" || allDone) {
+                                    "${it.value.size}"
+                                } else {
+                                    "${it.value.count { e -> e.currResult?.isElected ?: false }}(${it.value.size})"
+                                }
+                                "$count ${it.key}"
+                            }
+                            "COLUMN ${column + 1}: $counts"
+                        }
+                    }
+                }
+
+                val targetsText = targetInput.items.merge(meta) { items, (rows, party, allDone) ->
+                    textGenerator(items, rows, party, allDone, "GAINS", "MISSES")
+                }.merge(party) { t, p -> if (t == null) null else "${p.abbreviation} TARGET SEATS\n$t" }
+
+                val defenseText = defenseInput.items.merge(meta) { items, (rows, party, allDone) ->
+                    textGenerator(items, rows, party, allDone, "HOLDS", "LOSSES")
+                }.merge(party) { t, p -> if (t == null) null else "${p.abbreviation} DEFENSE SEATS\n$t" }
+
+                targetsText.merge(defenseText) { t, d -> listOfNotNull(t, d).takeUnless { it.isEmpty() }?.joinToString("\n\n") }
+                    .merge(title) { t, h -> sequenceOf(h, t).filterNotNull().joinToString("\n\n") }
+            }
+
+            return BattlegroundScreen(
+                title,
+                defenseFrame,
+                targetFrame,
+                columns(seatCounts?.defense, numRows),
+                columns(seatCounts?.target, numRows),
+                party.map { it.color },
+                altText = altText,
+            )
         }
 
         fun <T> doubleParty(
-            prevResultsPublisher: Flow.Publisher<out Map<T, Map<Party, Int>>>,
-            prevWinnersPublisher: Flow.Publisher<out Map<T, Party>>,
-            currResultsPublisher: Flow.Publisher<out Map<T, PartyResult?>>,
-            nameFunc: (T) -> String,
-            partyPublisher: Flow.Publisher<out Pair<PartyOrCoalition, PartyOrCoalition>>,
-        ): DoublePartyBuilder<T> {
-            return DoublePartyBuilder(prevResultsPublisher, prevWinnersPublisher, currResultsPublisher, nameFunc, partyPublisher)
+            prevResults: Flow.Publisher<out Map<T, Map<Party, Int>>>,
+            prevWinners: Flow.Publisher<out Map<T, Party>>,
+            currResults: Flow.Publisher<out Map<T, PartyResult?>>,
+            name: T.() -> String,
+            parties: Flow.Publisher<out Pair<PartyOrCoalition, PartyOrCoalition>>,
+            seatsToShow: (DoubleSeatsToShow.() -> Unit)? = null,
+            numRows: Flow.Publisher<out Int>? = null,
+            seatFilter: Flow.Publisher<out Set<T>?>? = null,
+            headers: PartyOrCoalition.() -> String = { "$this PREVIOUS SEATS" },
+            preferencesMode: Boolean = false,
+            title: Flow.Publisher<out String?>,
+        ): BattlegroundScreen {
+            val seatCounts = if (seatsToShow == null) null else DoubleSeatsToShow().apply(seatsToShow)
+
+            val leftInput = DoubleBattlegroundInput<T>()
+            prevResults.subscribe(Subscriber { leftInput.prev = it })
+            prevWinners.subscribe(Subscriber { leftInput.prevWinners = it })
+            currResults.subscribe(Subscriber { leftInput.curr = it })
+            seatCounts?.left?.subscribe(Subscriber { leftInput.count = it })
+            parties.subscribe(Subscriber { leftInput.party = it })
+            seatFilter?.subscribe(Subscriber { leftInput.filteredSeats = it })
+            leftInput.preferences = preferencesMode
+            val leftItems = leftInput.items
+            val leftFrame = ResultListingFrame(
+                headerPublisher = parties.map { it.first.headers() },
+                borderColorPublisher = parties.map { it.first.color },
+                headerAlignmentPublisher = GraphicsFrame.Alignment.RIGHT.asOneTimePublisher(),
+                numRowsPublisher = numRows ?: DEFAULT_ROWS.asOneTimePublisher(),
+                itemsPublisher = leftItems.mapElements {
+                    ResultListingFrame.Item(
+                        text = it.key.name(),
+                        border = it.prevColor,
+                        background = (if (it.fill) it.resultColor else Color.WHITE),
+                        foreground = (if (!it.fill) it.resultColor else Color.WHITE),
+                    )
+                },
+                reversedPublisher = true.asOneTimePublisher(),
+            )
+
+            val rightInput = DoubleBattlegroundInput<T>()
+            prevResults.subscribe(Subscriber { rightInput.prev = it })
+            prevWinners.subscribe(Subscriber { rightInput.prevWinners = it })
+            currResults.subscribe(Subscriber { rightInput.curr = it })
+            seatCounts?.right?.subscribe(Subscriber { rightInput.count = it })
+            parties.subscribe(Subscriber { rightInput.party = it.reverse() })
+            seatFilter?.subscribe(Subscriber { rightInput.filteredSeats = it })
+            rightInput.preferences = preferencesMode
+            val rightItems = rightInput.items
+            val rightFrame = ResultListingFrame(
+                headerPublisher = parties.map { it.second.headers() },
+                borderColorPublisher = parties.map { it.second.color },
+                headerAlignmentPublisher = GraphicsFrame.Alignment.LEFT.asOneTimePublisher(),
+                numRowsPublisher = numRows ?: DEFAULT_ROWS.asOneTimePublisher(),
+                itemsPublisher = rightItems.mapElements {
+                    ResultListingFrame.Item(
+                        text = it.key.name(),
+                        border = it.prevColor,
+                        background = (if (it.fill) it.resultColor else Color.WHITE),
+                        foreground = (if (!it.fill) it.resultColor else Color.WHITE),
+                    )
+                },
+                reversedPublisher = false.asOneTimePublisher(),
+            )
+
+            val altText = run {
+                val meta = parties.run {
+                    if (numRows == null) {
+                        map { party -> DEFAULT_ROWS to party }
+                    } else {
+                        merge(numRows) { party, rows -> rows to party }
+                    }
+                }
+                    .merge(currResults) { (rows, party), result -> Triple(rows, party, result.all { r -> r.value?.isElected ?: true }) }
+
+                val textGenerator: (List<Entry<T>>, Int, PartyOrCoalition, PartyOrCoalition, Boolean) -> String? = {
+                        items, rows, party, othParty, allDone ->
+                    if (items.none { it.isIncluded }) {
+                        null
+                    } else {
+                        val groups = items.mapIndexed { index, entry -> index / rows to entry }
+                            .filter { it.second.isIncluded }
+                            .groupBy({ it.first }, { it.second })
+                        groups.entries.joinToString("\n") { (column, entries) ->
+                            val categories = entries.groupBy {
+                                when {
+                                    it.currResult == null -> "PENDING"
+                                    it.currResult.party == party || party.constituentParties.contains(it.currResult.party) -> "HOLDS"
+                                    it.currResult.party == othParty || othParty.constituentParties.contains(it.currResult.party) -> "LOSSES TO ${othParty.abbreviation}"
+                                    else -> "OTHER LOSSES"
+                                }
+                            }.toSortedMap()
+                            val counts = categories.entries.joinToString {
+                                val count = if (it.key == "PENDING" || allDone) {
+                                    "${it.value.size}"
+                                } else {
+                                    "${it.value.count { e -> e.currResult?.isElected ?: false }}(${it.value.size})"
+                                }
+                                "$count ${it.key}"
+                            }
+                            "COLUMN ${column + 1}: $counts"
+                        }
+                    }
+                }
+
+                val targetsText = leftInput.items.merge(meta) { items, (rows, party, allDone) ->
+                    textGenerator(items, rows, party.first, party.second, allDone)
+                }.merge(parties) { t, p -> if (t == null) null else "${p.first.headers()}\n$t" }
+
+                val defenseText = rightInput.items.merge(meta) { items, (rows, party, allDone) ->
+                    textGenerator(items, rows, party.second, party.first, allDone)
+                }.merge(parties) { t, p -> if (t == null) null else "${p.second.headers()}\n$t" }
+
+                targetsText.merge(defenseText) { t, d -> listOfNotNull(t, d).takeUnless { it.isEmpty() }?.joinToString("\n\n") }
+                    .merge(title) { t, h -> sequenceOf(h, t).filterNotNull().joinToString("\n\n") }
+            }
+
+            return BattlegroundScreen(
+                title,
+                leftFrame,
+                rightFrame,
+                columns(seatCounts?.left, numRows),
+                columns(seatCounts?.right, numRows),
+                altText = altText,
+            )
+        }
+
+        private fun columns(count: Flow.Publisher<out Int>?, rows: Flow.Publisher<out Int>?): Flow.Publisher<Int> {
+            return if (count != null && rows != null) {
+                count.merge(rows) { c, n -> n * ceil(1.0 * c / n).toInt() }
+            } else count?.map { c -> DEFAULT_ROWS * ceil(1.0 * c / DEFAULT_ROWS).toInt() }
+                ?: (
+                    rows?.map { n -> n * ceil(1.0 * DEFAULT_COUNT / n).toInt() }
+                        ?: (DEFAULT_ROWS * ceil(1.0 * DEFAULT_COUNT / DEFAULT_ROWS).toInt()).asOneTimePublisher()
+                    )
         }
     }
 }
