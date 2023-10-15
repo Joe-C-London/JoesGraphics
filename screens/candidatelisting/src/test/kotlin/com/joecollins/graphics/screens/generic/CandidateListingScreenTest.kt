@@ -1,5 +1,6 @@
 package com.joecollins.graphics.screens.generic
 
+import com.joecollins.graphics.screens.generic.CandidateListingScreen.Companion.createMap
 import com.joecollins.graphics.utils.PublisherTestUtils.assertPublishes
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.graphics.utils.ShapefileReader
@@ -27,12 +28,14 @@ class CandidateListingScreenTest {
             Candidate("Boyd Leard", grn),
         )
         val screen = CandidateListingScreen.of(
-            candidates.asOneTimePublisher(),
-            "CANDIDATES".asOneTimePublisher(),
-            "".asOneTimePublisher(),
-            "[MLA]",
+            candidates = {
+                list = candidates.asOneTimePublisher()
+                header = "CANDIDATES".asOneTimePublisher()
+                subhead = "".asOneTimePublisher()
+            },
+            incumbentMarker = "[MLA]",
+            title = "SOURIS-ELMIRA".asOneTimePublisher(),
         )
-            .build("SOURIS-ELMIRA".asOneTimePublisher())
         screen.size = Dimension(1024, 512)
         compareRendering("CandidateListingScreen", "CandidatesOnly", screen)
         assertPublishes(
@@ -65,17 +68,19 @@ class CandidateListingScreenTest {
             ndp to 528,
         )
         val screen = CandidateListingScreen.of(
-            candidates.asOneTimePublisher(),
-            "CANDIDATES".asOneTimePublisher(),
-            "".asOneTimePublisher(),
-            "[MLA]",
+            candidates = {
+                list = candidates.asOneTimePublisher()
+                header = "CANDIDATES".asOneTimePublisher()
+                subhead = "".asOneTimePublisher()
+            },
+            prev = {
+                votes = prev.asOneTimePublisher()
+                header = "2015 RESULT".asOneTimePublisher()
+                subhead = null.asOneTimePublisher()
+            },
+            incumbentMarker = "[MLA]",
+            title = "SOURIS-ELMIRA".asOneTimePublisher(),
         )
-            .withPrev(
-                prev.asOneTimePublisher(),
-                "2015 RESULT".asOneTimePublisher(),
-                null.asOneTimePublisher(),
-            )
-            .build("SOURIS-ELMIRA".asOneTimePublisher())
         screen.size = Dimension(1024, 512)
         compareRendering("CandidateListingScreen", "CandidatesWithPrev", screen)
         assertPublishes(
@@ -114,23 +119,25 @@ class CandidateListingScreenTest {
         )
         val shapes = peiShapesByDistrict()
         val screen = CandidateListingScreen.of(
-            candidates.asOneTimePublisher(),
-            "CANDIDATES".asOneTimePublisher(),
-            "".asOneTimePublisher(),
-            "[MLA]",
+            candidates = {
+                list = candidates.asOneTimePublisher()
+                header = "CANDIDATES".asOneTimePublisher()
+                subhead = "".asOneTimePublisher()
+            },
+            prev = {
+                votes = prev.asOneTimePublisher()
+                header = "2015 RESULT".asOneTimePublisher()
+            },
+            map = createMap {
+                this.shapes = shapes.asOneTimePublisher()
+                selectedShape = 1.asOneTimePublisher()
+                focus = listOf(1, 2, 3, 4, 5, 6, 7).asOneTimePublisher()
+                additionalHighlight = null
+                header = "CARDIGAN".asOneTimePublisher()
+            },
+            incumbentMarker = "[MLA]",
+            title = "SOURIS-ELMIRA".asOneTimePublisher(),
         )
-            .withMap(
-                shapes.asOneTimePublisher(),
-                1.asOneTimePublisher(),
-                listOf(1, 2, 3, 4, 5, 6, 7).asOneTimePublisher(),
-                "CARDIGAN".asOneTimePublisher(),
-            )
-            .withPrev(
-                prev.asOneTimePublisher(),
-                "2015 RESULT".asOneTimePublisher(),
-                null.asOneTimePublisher(),
-            )
-            .build("SOURIS-ELMIRA".asOneTimePublisher())
         screen.size = Dimension(1024, 512)
         compareRendering("CandidateListingScreen", "CandidatesWithPrevAndMap", screen)
         assertPublishes(
@@ -172,23 +179,24 @@ class CandidateListingScreenTest {
         )
         val shapes = peiShapesByDistrict()
         val screen = CandidateListingScreen.of(
-            candidates.asOneTimePublisher(),
-            "CANDIDATES".asOneTimePublisher(),
-            "".asOneTimePublisher(),
-            "[MLA]",
+            candidates = {
+                list = candidates.asOneTimePublisher()
+                header = "CANDIDATES".asOneTimePublisher()
+                subhead = "".asOneTimePublisher()
+            },
+            prev = {
+                votes = prev.asOneTimePublisher()
+                header = "2015 RESULT".asOneTimePublisher()
+            },
+            map = createMap {
+                this.shapes = shapes.asOneTimePublisher()
+                selectedShape = 14.asOneTimePublisher()
+                focus = listOf(9, 10, 11, 12, 13, 14).asOneTimePublisher()
+                header = "CHARLOTTETOWN".asOneTimePublisher()
+            },
+            incumbentMarker = "[MLA]",
+            title = "CHARLOTTETOWN-WEST ROYALTY".asOneTimePublisher(),
         )
-            .withMap(
-                shapes.asOneTimePublisher(),
-                14.asOneTimePublisher(),
-                listOf(9, 10, 11, 12, 13, 14).asOneTimePublisher(),
-                "CHARLOTTETOWN".asOneTimePublisher(),
-            )
-            .withPrev(
-                prev.asOneTimePublisher(),
-                "2015 RESULT".asOneTimePublisher(),
-                null.asOneTimePublisher(),
-            )
-            .build("CHARLOTTETOWN-WEST ROYALTY".asOneTimePublisher())
         screen.size = Dimension(1024, 512)
         compareRendering("CandidateListingScreen", "CandidatesWithPrevOtherAndMap", screen)
         assertPublishes(
@@ -235,28 +243,28 @@ class CandidateListingScreenTest {
         )
         val shapes = peiShapesByDistrict()
         val screen = CandidateListingScreen.of(
-            candidates.asOneTimePublisher(),
-            "CANDIDATES".asOneTimePublisher(),
-            "".asOneTimePublisher(),
-            "[MLA]",
+            candidates = {
+                list = candidates.asOneTimePublisher()
+                header = "CANDIDATES".asOneTimePublisher()
+                subhead = "".asOneTimePublisher()
+            },
+            prev = {
+                votes = prev.asOneTimePublisher()
+                header = "2015 RESULT".asOneTimePublisher()
+            },
+            secondaryPrev = {
+                votes = secondaryPrev.asOneTimePublisher()
+                header = "2015 REGIONAL RESULT".asOneTimePublisher()
+            },
+            map = createMap {
+                this.shapes = shapes.asOneTimePublisher()
+                selectedShape = 1.asOneTimePublisher()
+                focus = listOf(1, 2, 3, 4, 5, 6, 7).asOneTimePublisher()
+                header = "CARDIGAN".asOneTimePublisher()
+            },
+            incumbentMarker = "[MLA]",
+            title = "SOURIS-ELMIRA".asOneTimePublisher(),
         )
-            .withMap(
-                shapes.asOneTimePublisher(),
-                1.asOneTimePublisher(),
-                listOf(1, 2, 3, 4, 5, 6, 7).asOneTimePublisher(),
-                "CARDIGAN".asOneTimePublisher(),
-            )
-            .withPrev(
-                prev.asOneTimePublisher(),
-                "2015 RESULT".asOneTimePublisher(),
-                null.asOneTimePublisher(),
-            )
-            .withSecondaryPrev(
-                secondaryPrev.asOneTimePublisher(),
-                "2015 REGIONAL RESULT".asOneTimePublisher(),
-                null.asOneTimePublisher(),
-            )
-            .build("SOURIS-ELMIRA".asOneTimePublisher())
         screen.size = Dimension(1024, 512)
         compareRendering("CandidateListingScreen", "CandidatesWithSecondaryPrevAndMap", screen)
         assertPublishes(
@@ -306,22 +314,22 @@ class CandidateListingScreenTest {
             ndp to 2404,
         )
         val screen = CandidateListingScreen.of(
-            candidates.asOneTimePublisher(),
-            "CANDIDATES".asOneTimePublisher(),
-            "".asOneTimePublisher(),
-            "[MLA]",
+            candidates = {
+                list = candidates.asOneTimePublisher()
+                header = "CANDIDATES".asOneTimePublisher()
+                subhead = "".asOneTimePublisher()
+            },
+            prev = {
+                votes = prev.asOneTimePublisher()
+                header = "2015 RESULT".asOneTimePublisher()
+            },
+            secondaryPrev = {
+                votes = secondaryPrev.asOneTimePublisher()
+                header = "2015 REGIONAL RESULT".asOneTimePublisher()
+            },
+            incumbentMarker = "[MLA]",
+            title = "SOURIS-ELMIRA".asOneTimePublisher(),
         )
-            .withPrev(
-                prev.asOneTimePublisher(),
-                "2015 RESULT".asOneTimePublisher(),
-                null.asOneTimePublisher(),
-            )
-            .withSecondaryPrev(
-                secondaryPrev.asOneTimePublisher(),
-                "2015 REGIONAL RESULT".asOneTimePublisher(),
-                null.asOneTimePublisher(),
-            )
-            .build("SOURIS-ELMIRA".asOneTimePublisher())
         screen.size = Dimension(1024, 512)
         compareRendering("CandidateListingScreen", "CandidatesWithSecondaryPrev", screen)
         assertPublishes(
@@ -384,28 +392,28 @@ class CandidateListingScreenTest {
         val focus = Publisher(listOf(1, 2, 3, 4, 5, 6, 7))
         val shapes = peiShapesByDistrict()
         val screen = CandidateListingScreen.of(
-            candidates,
-            "CANDIDATES".asOneTimePublisher(),
-            "".asOneTimePublisher(),
-            "[MLA]",
+            candidates = {
+                list = candidates
+                header = "CANDIDATES".asOneTimePublisher()
+                subhead = "".asOneTimePublisher()
+            },
+            prev = {
+                votes = prev
+                header = "2015 RESULT".asOneTimePublisher()
+            },
+            secondaryPrev = {
+                votes = secondaryPrev
+                header = "2015 REGIONAL RESULT".asOneTimePublisher()
+            },
+            map = createMap {
+                this.shapes = shapes.asOneTimePublisher()
+                selectedShape = districtNum
+                this.focus = focus
+                header = region
+            },
+            incumbentMarker = "[MLA]",
+            title = districtName,
         )
-            .withMap(
-                shapes.asOneTimePublisher(),
-                districtNum,
-                focus,
-                region,
-            )
-            .withPrev(
-                prev,
-                "2015 RESULT".asOneTimePublisher(),
-                null.asOneTimePublisher(),
-            )
-            .withSecondaryPrev(
-                secondaryPrev,
-                "2015 REGIONAL RESULT".asOneTimePublisher(),
-                null.asOneTimePublisher(),
-            )
-            .build(districtName)
         screen.size = Dimension(1024, 512)
         compareRendering("CandidateListingScreen", "CandidatesUpdating-1", screen)
         assertPublishes(
@@ -494,10 +502,16 @@ class CandidateListingScreenTest {
                 Candidate("Sarah Walji", ndp),
             ),
         )
-        val header = Publisher("2021 GENERAL ELECTION CANDIDATES")
-        val screen = CandidateListingScreen.of(candidatesPublisher, header, "".asOneTimePublisher())
-            .withTwoColumns(candidatesPublisher.map { it.size > 20 })
-            .build("MISSISSAUGA—LAKESHORE".asOneTimePublisher())
+        val headerPublisher = Publisher("2021 GENERAL ELECTION CANDIDATES")
+        val screen = CandidateListingScreen.of(
+            candidates = {
+                list = candidatesPublisher
+                header = headerPublisher
+                subhead = "".asOneTimePublisher()
+            },
+            showTwoColumns = candidatesPublisher.map { it.size > 20 },
+            title = "MISSISSAUGA—LAKESHORE".asOneTimePublisher(),
+        )
         screen.size = Dimension(1024, 512)
         compareRendering("CandidateListingScreen", "TwoColumns-1", screen)
         assertPublishes(
@@ -559,7 +573,7 @@ class CandidateListingScreenTest {
                 Candidate("Darcy Justin Vanderwater", ind),
             ),
         )
-        header.submit("2022 BY-ELECTION CANDIDATES")
+        headerPublisher.submit("2022 BY-ELECTION CANDIDATES")
         compareRendering("CandidateListingScreen", "TwoColumns-2", screen)
         assertPublishes(
             screen.altText,
@@ -629,13 +643,17 @@ class CandidateListingScreenTest {
             ),
         )
         val screen = CandidateListingScreen.ofNonPartisan(
-            candidates,
-            "2021 CANDIDATES".asOneTimePublisher(),
-            "".asOneTimePublisher(),
-        ).withPrev(
-            prev,
-            "2017 RESULT".asOneTimePublisher(),
-        ).build(title)
+            candidates = {
+                list = candidates
+                header = "2021 CANDIDATES".asOneTimePublisher()
+                subhead = "".asOneTimePublisher()
+            },
+            prev = {
+                votes = prev
+                header = "2017 RESULT".asOneTimePublisher()
+            },
+            title = title,
+        )
         screen.size = Dimension(1024, 512)
         compareRendering("CandidateListingScreen", "NonPartisan-1", screen)
         assertPublishes(
