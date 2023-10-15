@@ -25,15 +25,13 @@ class SingleTransferrableResultScreen private constructor(
     private val mapFrame: JPanel?,
     altText: Flow.Publisher<String>,
 ) : GenericPanel(
-    run {
-        val panel = JPanel()
-        panel.layout = BasicResultLayout()
-        panel.background = Color.WHITE
-        panel.add(candidateFrame, BasicResultLayout.MAIN)
-        if (partyFrame != null) panel.add(partyFrame, BasicResultLayout.DIFF)
-        if (prevFrame != null) panel.add(prevFrame, BasicResultLayout.SWING)
-        if (mapFrame != null) panel.add(mapFrame, BasicResultLayout.MAP)
-        panel
+    {
+        layout = BasicResultLayout()
+        background = Color.WHITE
+        add(candidateFrame, BasicResultLayout.MAIN)
+        if (partyFrame != null) add(partyFrame, BasicResultLayout.DIFF)
+        if (prevFrame != null) add(prevFrame, BasicResultLayout.SWING)
+        if (mapFrame != null) add(mapFrame, BasicResultLayout.MAP)
     },
     label,
     altText,

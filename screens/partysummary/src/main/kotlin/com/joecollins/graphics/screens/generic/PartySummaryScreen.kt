@@ -26,13 +26,11 @@ class PartySummaryScreen private constructor(
     numRows: Int,
     altText: Flow.Publisher<out String?>,
 ) : GenericPanel(
-    run {
-        val center = JPanel()
-        center.background = Color.WHITE
-        center.layout = Layout(numRows)
-        center.add(mainFrame, "main")
-        otherFrames.forEach { center.add(it, "other") }
-        center
+    {
+        background = Color.WHITE
+        layout = Layout(numRows)
+        add(mainFrame, "main")
+        otherFrames.forEach { add(it, "other") }
     },
     partyPublisher.map { it.name.uppercase() + " SUMMARY" },
     altText,

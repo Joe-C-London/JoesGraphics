@@ -10,8 +10,12 @@ object PanelUtils {
         val ret = JPanel()
         ret.background = Color.WHITE
         ret.layout = GridLayout(1, 1, 0, 0)
-        ret.border = EmptyBorder(5, 5, 5, 5)
+        ret.addPaddingBorder()
         ret.add(this)
         return ret
+    }
+
+    fun JPanel.addPaddingBorder() {
+        border = EmptyBorder(5, 5, 5, 5)
     }
 }

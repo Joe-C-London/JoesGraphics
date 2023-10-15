@@ -23,9 +23,25 @@ open class GenericPanel(
     override val altText: Flow.Publisher<out String?> = createAltText(panel, label),
 ) : JPanel(), AltTextProvider {
 
-    protected val label: JLabel = FontSizeAdjustingLabel()
+    constructor(
+        panel: JPanel.() -> Unit,
+        label: Flow.Publisher<out String?>,
+        altText: Flow.Publisher<out String?> = null.asOneTimePublisher(),
+    ) : this(JPanel().apply(panel), label, altText)
 
-    constructor(panel: JPanel, label: String, altText: Flow.Publisher<out String?> = createAltText(panel, label.asOneTimePublisher())) : this(panel, label.asOneTimePublisher(), altText)
+    constructor(
+        panel: JPanel,
+        label: Flow.Publisher<out String?>,
+        altText: () -> Flow.Publisher<out String?>,
+    ) : this(panel, label, altText())
+
+    constructor(
+        panel: JPanel.() -> Unit,
+        label: Flow.Publisher<out String?>,
+        altText: () -> Flow.Publisher<out String?>,
+    ) : this(JPanel().apply(panel), label, altText())
+
+    protected val label: JLabel = FontSizeAdjustingLabel()
 
     init {
         label.subscribe(

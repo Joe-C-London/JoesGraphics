@@ -22,7 +22,6 @@ import java.awt.LayoutManager
 import java.awt.Shape
 import java.text.DecimalFormat
 import java.util.concurrent.Flow
-import javax.swing.JPanel
 
 class MixedMemberResultPanel private constructor(
     label: Flow.Publisher<out String?>,
@@ -33,16 +32,14 @@ class MixedMemberResultPanel private constructor(
     private val mapFrame: MapFrame?,
     altText: Flow.Publisher<out String>,
 ) : GenericPanel(
-    run {
-        val panel = JPanel()
-        panel.layout = ScreenLayout()
-        panel.background = Color.WHITE
-        panel.add(candidateFrame, ScreenLayout.CANDIDATE)
-        candidateChangeFrame?.also { panel.add(it, ScreenLayout.CANDIDATE_DIFF) }
-        panel.add(partyFrame, ScreenLayout.PARTY)
-        partyChangeFrame?.also { panel.add(it, ScreenLayout.PARTY_DIFF) }
-        mapFrame?.also { panel.add(it, ScreenLayout.MAP) }
-        panel
+    {
+        layout = ScreenLayout()
+        background = Color.WHITE
+        add(candidateFrame, ScreenLayout.CANDIDATE)
+        candidateChangeFrame?.also { add(it, ScreenLayout.CANDIDATE_DIFF) }
+        add(partyFrame, ScreenLayout.PARTY)
+        partyChangeFrame?.also { add(it, ScreenLayout.PARTY_DIFF) }
+        mapFrame?.also { add(it, ScreenLayout.MAP) }
     },
     label,
     altText,

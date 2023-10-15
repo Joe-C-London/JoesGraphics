@@ -14,20 +14,17 @@ import java.awt.Color
 import java.awt.GridLayout
 import java.util.LinkedList
 import java.util.concurrent.Flow
-import javax.swing.JPanel
 import javax.swing.border.EmptyBorder
 
 class FiguresScreen private constructor(headerLabel: Flow.Publisher<out String?>, frames: Array<FiguresFrame>, altText: Flow.Publisher<String>) :
     GenericPanel(
-        run {
-            val panel = JPanel()
-            panel.background = Color.WHITE
-            panel.layout = GridLayout(1, 0, 5, 5)
-            panel.border = EmptyBorder(5, 5, 5, 5)
+        {
+            background = Color.WHITE
+            layout = GridLayout(1, 0, 5, 5)
+            border = EmptyBorder(5, 5, 5, 5)
             for (frame in frames) {
-                panel.add(frame)
+                add(frame)
             }
-            panel
         },
         headerLabel,
         altText,

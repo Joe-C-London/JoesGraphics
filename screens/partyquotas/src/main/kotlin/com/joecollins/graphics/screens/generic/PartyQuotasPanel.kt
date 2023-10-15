@@ -27,16 +27,14 @@ class PartyQuotasPanel private constructor(
     private val rightSupplementaryFrame: JPanel?,
     altText: Flow.Publisher<String>,
 ) : GenericPanel(
-    run {
-        val panel = JPanel()
-        panel.layout = BasicResultLayout()
-        panel.background = Color.WHITE
-        panel.add(seatFrame, BasicResultLayout.MAIN)
-        if (secondarySeatFrame != null) panel.add(secondarySeatFrame, BasicResultLayout.PREF)
-        if (changeFrame != null) panel.add(changeFrame, BasicResultLayout.DIFF)
-        if (leftSupplementaryFrame != null) panel.add(leftSupplementaryFrame, BasicResultLayout.SWING)
-        if (rightSupplementaryFrame != null) panel.add(rightSupplementaryFrame, BasicResultLayout.MAP)
-        panel
+    {
+        layout = BasicResultLayout()
+        background = Color.WHITE
+        add(seatFrame, BasicResultLayout.MAIN)
+        if (secondarySeatFrame != null) add(secondarySeatFrame, BasicResultLayout.PREF)
+        if (changeFrame != null) add(changeFrame, BasicResultLayout.DIFF)
+        if (leftSupplementaryFrame != null) add(leftSupplementaryFrame, BasicResultLayout.SWING)
+        if (rightSupplementaryFrame != null) add(rightSupplementaryFrame, BasicResultLayout.MAP)
     },
     label,
     altText,

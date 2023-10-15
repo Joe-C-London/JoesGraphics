@@ -26,24 +26,22 @@ class CandidateListingScreen private constructor(
     mapPanel: JPanel?,
     altText: Flow.Publisher<String>,
 ) : GenericPanel(
-    run {
-        val panel = JPanel()
-        panel.layout = RightStackLayout()
-        panel.background = Color.WHITE
-        panel.add(candidatesPanel, RightStackLayout.WEST)
+    {
+        layout = RightStackLayout()
+        background = Color.WHITE
+        add(candidatesPanel, RightStackLayout.WEST)
         if (prevPanel != null) {
-            panel.add(prevPanel, RightStackLayout.EAST)
+            add(prevPanel, RightStackLayout.EAST)
         }
         if (secondaryPrevPanel != null) {
-            panel.add(secondaryPrevPanel, RightStackLayout.EAST)
+            add(secondaryPrevPanel, RightStackLayout.EAST)
         }
         if (mapPanel != null) {
-            panel.add(mapPanel, RightStackLayout.EAST)
+            add(mapPanel, RightStackLayout.EAST)
         }
         if (setOf(prevPanel, secondaryPrevPanel, mapPanel).count { it != null } == 1) {
-            panel.add(JPanel().also { it.background = Color.WHITE }, RightStackLayout.EAST)
+            add(JPanel().also { it.background = Color.WHITE }, RightStackLayout.EAST)
         }
-        panel
     },
     header,
     altText,
