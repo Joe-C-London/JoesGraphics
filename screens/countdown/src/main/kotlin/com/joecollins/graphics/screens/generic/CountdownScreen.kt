@@ -34,35 +34,156 @@ class CountdownScreen private constructor(
     altText: Flow.Publisher<String>,
 ) : GenericPanel(panel, title, altText), AltTextProvider {
 
-    class Builder<K>(private val date: LocalDate, private val shapes: Flow.Publisher<out Map<K, Shape>>) {
+    sealed class TimePanel<K> {
+        internal abstract val header: String
+        internal abstract fun instant(date: LocalDate): Instant
+        internal abstract fun filteredShapes(shapes: Flow.Publisher<out Map<K, Shape>>): Flow.Publisher<out Collection<Shape>>
+    }
 
-        private val timings = ArrayList<Triple<Instant, String, Flow.Publisher<Collection<Shape>>>>()
-        private var clock = Clock.systemDefaultZone()
-        private var timesUpLabel = ""
+    class TimeWithFilterPanel<K> internal constructor() : TimePanel<K>() {
+        public override lateinit var header: String
+        var futureDate: Period = Period.ofDays(0)
+        lateinit var time: LocalTime
+        lateinit var zone: ZoneId
+        var filter: K.() -> Boolean = { true }
 
-        fun atTime(header: String, time: LocalTime, zone: ZoneId, predicate: (K) -> Boolean = { true }): Builder<K> {
-            val instant = ZonedDateTime.of(date, time, zone).toInstant()
-            timings.add(Triple(instant, header, shapes.map { s -> s.entries.filter { predicate(it.key) }.map { it.value } }))
-            return this
+        override fun instant(date: LocalDate) = ZonedDateTime.of(date.plus(futureDate), time, zone).toInstant()
+        override fun filteredShapes(shapes: Flow.Publisher<out Map<K, Shape>>) = shapes.map { s -> s.entries.filter { it.key.filter() }.map { it.value } }
+    }
+
+    class TimeWithoutFilterPanel internal constructor() : TimePanel<Unit>() {
+        override lateinit var header: String
+        var futureDate: Period = Period.ofDays(0)
+        lateinit var time: LocalTime
+        lateinit var zone: ZoneId
+
+        override fun instant(date: LocalDate) = ZonedDateTime.of(date.plus(futureDate), time, zone).toInstant()
+        override fun filteredShapes(shapes: Flow.Publisher<out Map<Unit, Shape>>) = emptyList<Shape>().asOneTimePublisher()
+    }
+
+    companion object {
+        fun <K> timeWithMapFilter(time: TimeWithFilterPanel<K>.() -> Unit) = TimeWithFilterPanel<K>().apply(time)
+        fun timeWithoutMapFilter(time: TimeWithoutFilterPanel.() -> Unit) = TimeWithoutFilterPanel().apply(time)
+
+        fun forDate(
+            date: LocalDate,
+            times: List<TimeWithoutFilterPanel>,
+            timesUpLabel: String,
+            title: Flow.Publisher<String>,
+        ): CountdownScreen {
+            return forDate(
+                date = date,
+                times = times,
+                timesUpLabel = timesUpLabel,
+                title = title,
+                clock = Clock.systemDefaultZone(),
+            )
         }
 
-        fun atTimeAndFutureDate(header: String, futureDate: Period, time: LocalTime, zone: ZoneId, predicate: (K) -> Boolean = { true }): Builder<K> {
-            val instant = ZonedDateTime.of(date.plus(futureDate), time, zone).toInstant()
-            timings.add(Triple(instant, header, shapes.map { s -> s.entries.filter { predicate(it.key) }.map { it.value } }))
-            return this
+        internal fun forDate(
+            date: LocalDate,
+            times: List<TimeWithoutFilterPanel>,
+            timesUpLabel: String,
+            title: Flow.Publisher<String>,
+            clock: Clock,
+        ): CountdownScreen {
+            return createPanel(
+                date = date,
+                timings = times,
+                shapes = emptyMap<Unit, Shape>().asOneTimePublisher(),
+                timesUpLabel = timesUpLabel,
+                title = title,
+                clock = clock,
+            )
         }
 
-        fun withTimesUpLabel(label: String): Builder<K> {
-            this.timesUpLabel = label
-            return this
+        fun forDateWithMapSingle(
+            timestamp: ZonedDateTime,
+            header: String,
+            map: Flow.Publisher<Collection<Shape>>,
+            timesUpLabel: String,
+            title: Flow.Publisher<String>,
+        ): CountdownScreen {
+            return forDateWithMapSingle(
+                timestamp = timestamp,
+                header = header,
+                map = map,
+                timesUpLabel = timesUpLabel,
+                title = title,
+                clock = Clock.systemDefaultZone(),
+            )
         }
 
-        internal fun withClock(clock: Clock): Builder<K> {
-            this.clock = clock
-            return this
+        internal fun forDateWithMapSingle(
+            timestamp: ZonedDateTime,
+            header: String,
+            map: Flow.Publisher<Collection<Shape>>,
+            timesUpLabel: String,
+            title: Flow.Publisher<String>,
+            clock: Clock,
+        ): CountdownScreen {
+            return createPanel(
+                date = timestamp.toLocalDate(),
+                timings = listOf(
+                    timeWithMapFilter {
+                        this.time = timestamp.toLocalTime()
+                        this.zone = timestamp.zone
+                        this.header = header
+                        this.filter = { true }
+                    },
+                ),
+                shapes = map.map { m ->
+                    m.associateWith { it }
+                },
+                timesUpLabel = timesUpLabel,
+                title = title,
+                clock = clock,
+            )
         }
 
-        fun build(title: Flow.Publisher<String>): CountdownScreen {
+        fun <K> forDateWithMap(
+            date: LocalDate,
+            times: List<TimeWithFilterPanel<K>>,
+            map: Flow.Publisher<out Map<K, Shape>>,
+            timesUpLabel: String,
+            title: Flow.Publisher<String>,
+        ): CountdownScreen {
+            return forDateWithMap(
+                date = date,
+                times = times,
+                map = map,
+                timesUpLabel = timesUpLabel,
+                title = title,
+                clock = Clock.systemDefaultZone(),
+            )
+        }
+
+        internal fun <K> forDateWithMap(
+            date: LocalDate,
+            times: List<TimeWithFilterPanel<K>>,
+            map: Flow.Publisher<out Map<K, Shape>>,
+            timesUpLabel: String,
+            title: Flow.Publisher<String>,
+            clock: Clock,
+        ): CountdownScreen {
+            return createPanel(
+                date = date,
+                timings = times,
+                shapes = map,
+                timesUpLabel = timesUpLabel,
+                title = title,
+                clock = clock,
+            )
+        }
+
+        private fun <K> createPanel(
+            date: LocalDate,
+            shapes: Flow.Publisher<out Map<K, Shape>>,
+            timings: List<TimePanel<K>>,
+            timesUpLabel: String,
+            title: Flow.Publisher<String>,
+            clock: Clock,
+        ): CountdownScreen {
             val outer = JPanel()
             outer.background = Color.WHITE
             outer.layout = BorderLayout()
@@ -86,9 +207,9 @@ class CountdownScreen private constructor(
 
             (colors.indices).forEach { color ->
                 val frame = CountdownFrame(
-                    headerPublisher = timings[color].second.asOneTimePublisher(),
-                    timePublisher = timings[color].first.asOneTimePublisher(),
-                    labelFunc = { timeLabel(it) },
+                    headerPublisher = timings[color].header.asOneTimePublisher(),
+                    timePublisher = timings[color].instant(date).asOneTimePublisher(),
+                    labelFunc = { timeLabel(it, timesUpLabel) },
                     borderColorPublisher = colors[color].asOneTimePublisher(),
                     countdownColorPublisher = colors[color].asOneTimePublisher(),
                 )
@@ -98,7 +219,7 @@ class CountdownScreen private constructor(
 
             val map = MapFrame(
                 shapesPublisher = (colors.indices).map { idx ->
-                    timings[idx].third.map { shapes ->
+                    timings[idx].filteredShapes(shapes).map { shapes ->
                         shapes.map { s -> s to colors[idx] }
                     }
                 }.combine().map { it.flatten() },
@@ -108,22 +229,22 @@ class CountdownScreen private constructor(
             outer.add(map, BorderLayout.CENTER)
 
             val timingTexts = timings.map {
-                altTextLabel(it.second, it.first)
+                altTextLabel(it.header, it.instant(date), clock, timesUpLabel)
             }.combine().map { it.joinToString("\n") }
             val altText = title.merge(timingTexts) { t, tt -> "$t\n\n$tt" }
 
             return CountdownScreen(outer, title, altText)
         }
 
-        private fun altTextLabel(header: String, timestamp: Instant): Flow.Publisher<String> {
+        private fun altTextLabel(header: String, timestamp: Instant, clock: Clock, timesUpLabel: String): Flow.Publisher<String> {
             val ret = Publisher<String>()
             ExecutorUtils.scheduleTicking({
-                ret.submit(header + ": " + timeLabel(Duration.between(clock.instant().truncatedTo(ChronoUnit.SECONDS), timestamp)))
+                ret.submit(header + ": " + timeLabel(Duration.between(clock.instant().truncatedTo(ChronoUnit.SECONDS), timestamp), timesUpLabel))
             }, 100)
             return ret
         }
 
-        private fun timeLabel(it: Duration) = if (it.isNegative) {
+        private fun timeLabel(it: Duration, timesUpLabel: String) = if (it.isNegative) {
             timesUpLabel
         } else if (it.toHours() == 0L) {
             CountdownFrame.formatMMSS(it)
@@ -131,25 +252,6 @@ class CountdownScreen private constructor(
             CountdownFrame.formatHHMMSS(it)
         } else {
             CountdownFrame.formatDDHHMMSS(it)
-        }
-    }
-
-    companion object {
-        fun forDate(date: LocalDate): Builder<Unit> {
-            return Builder(date, emptyMap<Unit, Shape>().asOneTimePublisher())
-        }
-
-        fun forDateWithMapSingle(date: LocalDate, map: Flow.Publisher<Collection<Shape>>): Builder<*> {
-            return Builder(
-                date,
-                map.map { m ->
-                    m.associateWith { it }
-                },
-            )
-        }
-
-        fun <K> forDateWithMap(date: LocalDate, map: Flow.Publisher<out Map<K, Shape>>): Builder<K> {
-            return Builder(date, map)
         }
     }
 }
