@@ -14,9 +14,10 @@ import java.awt.Color
 import java.awt.GridLayout
 import java.util.LinkedList
 import java.util.concurrent.Flow
+import javax.swing.JPanel
 import javax.swing.border.EmptyBorder
 
-class FiguresScreen private constructor(headerLabel: Flow.Publisher<out String?>, frames: Array<FiguresFrame>, altText: Flow.Publisher<String>) :
+class FiguresScreen private constructor(headerLabel: Flow.Publisher<out String?>, frames: Array<JPanel>, altText: Flow.Publisher<String>) :
     GenericPanel(
         {
             background = Color.WHITE
@@ -30,10 +31,42 @@ class FiguresScreen private constructor(headerLabel: Flow.Publisher<out String?>
         altText,
     ) {
 
-    class Section(private val name: String) {
+    class Sections internal constructor(private val title: Flow.Publisher<out String?>) {
+        private val sections = LinkedList<AbstractSection>()
+
+        fun addSection(name: String, candidates: Section.() -> Unit) {
+            sections.add(Section(name).apply(candidates))
+        }
+
+        fun addBlankSection() {
+            sections.add(BlankSection)
+        }
+
+        internal fun build(): FiguresScreen {
+            val frames: Array<JPanel> = sections.map { it.createFrame() }.toTypedArray()
+            val altText = sections.mapNotNull { it.createAltText() }.combine()
+                .merge(title) { s, t -> t + s.joinToString("") { "\n\n$it" } }
+            return FiguresScreen(title, frames, altText)
+        }
+    }
+
+    sealed class AbstractSection {
+        internal abstract fun createFrame(): JPanel
+        internal abstract fun createAltText(): Flow.Publisher<String>?
+    }
+
+    internal object BlankSection : AbstractSection() {
+        override fun createFrame() = JPanel().apply {
+            background = Color.WHITE
+        }
+
+        override fun createAltText(): Flow.Publisher<String>? = null
+    }
+
+    class Section internal constructor(private val name: String) : AbstractSection() {
         private val entries: MutableList<Entry> = ArrayList()
 
-        fun withCandidate(
+        fun addCandidate(
             candidate: Candidate,
             description: String,
             leader: Flow.Publisher<out Party?>,
@@ -46,7 +79,7 @@ class FiguresScreen private constructor(headerLabel: Flow.Publisher<out String?>
             return this
         }
 
-        fun createFrame(): FiguresFrame {
+        override fun createFrame(): FiguresFrame {
             val frame = FiguresFrame(
                 headerPublisher = name.asOneTimePublisher(),
                 entriesPublisher =
@@ -66,7 +99,7 @@ class FiguresScreen private constructor(headerLabel: Flow.Publisher<out String?>
             return frame
         }
 
-        fun createAltText(): Flow.Publisher<String> {
+        override fun createAltText(): Flow.Publisher<String> {
             return this.entries.map { e -> e.statusPublisher.map { it to e } }
                 .combine()
                 .map { e ->
@@ -97,29 +130,9 @@ class FiguresScreen private constructor(headerLabel: Flow.Publisher<out String?>
         val statusPublisher = Publisher(status)
     }
 
-    class Builder {
-        private val sections: MutableList<Section> = LinkedList()
-
-        fun build(titlePublisher: Flow.Publisher<out String?>): FiguresScreen {
-            val frames: Array<FiguresFrame> = sections.map { it.createFrame() }.toTypedArray()
-            val altText = sections.map { it.createAltText() }.combine()
-                .merge(titlePublisher) { s, t -> t + s.joinToString("") { "\n\n$it" } }
-            return FiguresScreen(titlePublisher, frames, altText)
-        }
-
-        fun withSection(section: Section): Builder {
-            sections.add(section)
-            return this
-        }
-    }
-
     companion object {
-        fun of(): Builder {
-            return Builder()
-        }
-
-        fun section(sectionHeader: String): Section {
-            return Section(sectionHeader)
+        fun create(title: Flow.Publisher<out String?>, sections: Sections.() -> Unit): FiguresScreen {
+            return Sections(title).apply(sections).build()
         }
     }
 }
