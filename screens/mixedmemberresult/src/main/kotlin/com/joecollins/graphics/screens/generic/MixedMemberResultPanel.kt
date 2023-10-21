@@ -95,175 +95,104 @@ class MixedMemberResultPanel private constructor(
         }
     }
 
-    class Builder {
-        private var candidateVotes: Flow.Publisher<out Map<Candidate, Int?>> = emptyMap<Candidate, Int?>().asOneTimePublisher()
-        private var candidatePrev: Flow.Publisher<out Map<out PartyOrCoalition, Int>>? = null
-        private var candidatePctReporting: Flow.Publisher<out Double>? = null
-        private var candidateProgressLabel: Flow.Publisher<out String?> = null.asOneTimePublisher()
-        private var winner: Flow.Publisher<out Candidate?> = (null as Candidate?).asOneTimePublisher()
-        private var partyVotes: Flow.Publisher<out Map<out PartyOrCoalition, Int?>> = emptyMap<PartyOrCoalition, Int?>().asOneTimePublisher()
-        private var partyPrev: Flow.Publisher<out Map<out PartyOrCoalition, Int>>? = null
-        private var partyPctReporting: Flow.Publisher<out Double>? = null
-        private var partyProgressLabel: Flow.Publisher<out String?> = null.asOneTimePublisher()
-        private var incumbentMarker = ""
-        private var candidateVoteHeader: Flow.Publisher<out String?> = (null as String?).asOneTimePublisher()
-        private var candidateVoteSubheader: Flow.Publisher<out String?> = (null as String?).asOneTimePublisher()
-        private var candidateChangeHeader: Flow.Publisher<out String?> = (null as String?).asOneTimePublisher()
-        private var partyVoteHeader: Flow.Publisher<out String?> = (null as String?).asOneTimePublisher()
-        private var partyChangeHeader: Flow.Publisher<out String?> = (null as String?).asOneTimePublisher()
-        private var mapBuilder: MapFrame? = null
+    class CandidateVotes internal constructor() {
+        lateinit var votes: Flow.Publisher<out Map<Candidate, Int?>>
+        lateinit var header: Flow.Publisher<out String?>
+        var subhead: Flow.Publisher<out String?>? = null
+        var incumbentMarker: String? = null
+        var winner: Flow.Publisher<Candidate?>? = null
+        var pctReporting: Flow.Publisher<Double>? = null
+        var progressLabel: Flow.Publisher<out String?>? = null
 
-        fun withCandidateVotes(
-            votes: Flow.Publisher<out Map<Candidate, Int?>>,
-            header: Flow.Publisher<out String>,
-            subheader: Flow.Publisher<out String?> = (null as String?).asOneTimePublisher(),
-        ): Builder {
-            candidateVotes = votes
-            candidateVoteHeader = header
-            candidateVoteSubheader = subheader
-            return this
-        }
+        internal val incumbentMarkerPadded by lazy { if (incumbentMarker == null) "" else " $incumbentMarker" }
+    }
 
-        fun withIncumbentMarker(incumbentMarker: String): Builder {
-            this.incumbentMarker = " $incumbentMarker"
-            return this
-        }
+    class CandidateChange internal constructor() {
+        lateinit var prevVotes: Flow.Publisher<out Map<out PartyOrCoalition, Int>>
+        lateinit var header: Flow.Publisher<out String?>
+    }
 
-        fun withWinner(winner: Flow.Publisher<out Candidate?>): Builder {
-            this.winner = winner
-            return this
-        }
+    class PartyVotes internal constructor() {
+        lateinit var votes: Flow.Publisher<out Map<out PartyOrCoalition, Int?>>
+        lateinit var header: Flow.Publisher<out String?>
+        var pctReporting: Flow.Publisher<Double>? = null
+        var progressLabel: Flow.Publisher<out String?>? = null
+    }
 
-        fun withPrevCandidateVotes(
-            votes: Flow.Publisher<out Map<out PartyOrCoalition, Int>>,
-            header: Flow.Publisher<out String>,
-        ): Builder {
-            candidatePrev = votes
-            candidateChangeHeader = header
-            return this
-        }
+    class PartyChange internal constructor() {
+        lateinit var prevVotes: Flow.Publisher<out Map<out PartyOrCoalition, Int>>
+        lateinit var header: Flow.Publisher<out String?>
+    }
 
-        fun withPartyVotes(
-            votes: Flow.Publisher<out Map<out PartyOrCoalition, Int?>>,
-            header: Flow.Publisher<out String>,
-        ): Builder {
-            partyVotes = votes
-            partyVoteHeader = header
-            return this
-        }
+    class MapPanel<T> internal constructor() {
+        lateinit var shapes: Flow.Publisher<out Map<T, Shape>>
+        lateinit var selectedShape: Flow.Publisher<out T>
+        lateinit var leadingParty: Flow.Publisher<out PartyResult?>
+        lateinit var focus: Flow.Publisher<out List<T>?>
+        var additionalHighlight: Flow.Publisher<out List<T>?>? = null
+        lateinit var header: Flow.Publisher<out String>
 
-        fun withPrevPartyVotes(
-            votes: Flow.Publisher<out Map<out PartyOrCoalition, Int>>,
-            header: Flow.Publisher<out String>,
-        ): Builder {
-            partyPrev = votes
-            partyChangeHeader = header
-            return this
-        }
+        internal fun createPanel() = MapBuilder.singleResult(
+            shapes = shapes,
+            selectedShape = selectedShape,
+            leadingParty = leadingParty,
+            focus = focus,
+            additionalHighlight = additionalHighlight ?: null.asOneTimePublisher(),
+            header = header,
+        )
+    }
 
-        fun withCandidatePctReporting(pctReporting: Flow.Publisher<out Double>): Builder {
-            candidatePctReporting = pctReporting
-            return this
-        }
+    companion object {
+        private val PCT_FORMAT = DecimalFormat("0.0%")
+        private val PCT_DIFF_FORMAT = DecimalFormat("+0.0%;-0.0%")
+        private val THOUSANDS_FORMAT = DecimalFormat("#,##0")
 
-        fun withCandidateProgressLabel(progressLabel: Flow.Publisher<out String?>): Builder {
-            candidateProgressLabel = progressLabel
-            return this
-        }
+        fun <K> createMap(func: MapPanel<K>.() -> Unit) = MapPanel<K>().apply(func)
 
-        fun withPartyPctReporting(pctReporting: Flow.Publisher<out Double>): Builder {
-            partyPctReporting = pctReporting
-            return this
-        }
-
-        fun withPartyProgressLabel(progressLabel: Flow.Publisher<out String?>): Builder {
-            partyProgressLabel = progressLabel
-            return this
-        }
-
-        fun <T> withResultMap(
-            shapes: Flow.Publisher<out Map<T, Shape>>,
-            selectedShape: Flow.Publisher<out T>,
-            leadingParty: Flow.Publisher<out PartyResult?>,
-            focus: Flow.Publisher<out List<T>?>,
-            header: Flow.Publisher<out String>,
-        ): Builder {
-            mapBuilder = MapBuilder.singleResult(
-                shapes = shapes,
-                selectedShape = selectedShape,
-                leadingParty = leadingParty,
-                focus = focus,
-                header = header,
-            )
-            return this
-        }
-
-        fun <T> withResultMap(
-            shapes: Flow.Publisher<out Map<T, Shape>>,
-            selectedShape: Flow.Publisher<out T>,
-            leadingParty: Flow.Publisher<out PartyResult?>,
-            focus: Flow.Publisher<out List<T>?>,
-            additionalHighlight: Flow.Publisher<out List<T>?>,
-            header: Flow.Publisher<out String>,
-        ): Builder {
-            mapBuilder = MapBuilder.singleResult(
-                shapes = shapes,
-                selectedShape = selectedShape,
-                leadingParty = leadingParty,
-                focus = focus,
-                additionalHighlight = additionalHighlight,
-                header = header,
-            )
-            return this
-        }
-
-        fun build(header: Flow.Publisher<out String>): MixedMemberResultPanel {
+        fun of(
+            candidateVotes: CandidateVotes.() -> Unit,
+            candidateChange: (CandidateChange.() -> Unit)? = null,
+            partyVotes: PartyVotes.() -> Unit,
+            partyChange: (PartyChange.() -> Unit)? = null,
+            map: MapPanel<*>? = null,
+            title: Flow.Publisher<out String?>,
+        ): MixedMemberResultPanel {
+            val cv = CandidateVotes().apply(candidateVotes)
+            val cc = candidateChange?.let { CandidateChange().apply(it) }
+            val pv = PartyVotes().apply(partyVotes)
+            val pc = partyChange?.let { PartyChange().apply(it) }
             return MixedMemberResultPanel(
-                header,
-                createCandidateVotes(),
-                createCandidateChange(),
-                createPartyVotes(),
-                createPartyChange(),
-                createMapFrame(),
-                createAltText(header),
+                title,
+                createCandidateVotes(cv, cc),
+                createCandidateChange(cv, cc),
+                createPartyVotes(pv),
+                createPartyChange(pv, pc),
+                map?.createPanel(),
+                createAltText(cv, cc, pv, pc, title),
             )
         }
 
-        private class Result {
-            var votes: Map<Candidate, Int?> = emptyMap()
-                set(value) {
-                    field = value
-                    votesPublisher.submit(value)
-                }
-
-            var winner: Candidate? = null
-                set(value) {
-                    field = value
-                    winnerPublisher.submit(value)
-                }
-
-            var votesPublisher = Publisher(votes)
-            var winnerPublisher = Publisher(winner)
-        }
-
-        private fun createCandidateVotes(): BarFrame {
+        private fun createCandidateVotes(
+            candidateVotes: CandidateVotes,
+            candidateChange: CandidateChange?,
+        ): BarFrame {
             class CandidateBarTemplate(
                 val shape: Shape,
                 val leftLabel: (Candidate) -> String,
                 val rightLabel: (Int, Double) -> String,
             )
-            val doubleLine = candidateVotes.map { it.size < 10 && candidatePrev == null }
+            val doubleLine = candidateVotes.votes.map { it.size < 10 && candidateChange == null }
             val namedCandidateTemplate = doubleLine.map {
                 if (it) {
                     CandidateBarTemplate(
                         ImageGenerator.createHalfTickShape(),
-                        { candidate -> "${candidate.name.uppercase()}${if (candidate.isIncumbent()) incumbentMarker else ""}\n${candidate.party.name.uppercase()}" },
+                        { candidate -> "${candidate.name.uppercase()}${if (candidate.isIncumbent()) candidateVotes.incumbentMarkerPadded else ""}\n${candidate.party.name.uppercase()}" },
                         { numVotes, pct -> "${THOUSANDS_FORMAT.format(numVotes.toLong())}\n${PCT_FORMAT.format(pct)}" },
                     )
                 } else {
                     CandidateBarTemplate(
                         ImageGenerator.createTickShape(),
-                        { candidate -> "${candidate.name.uppercase()}${if (candidate.isIncumbent()) incumbentMarker else ""} (${candidate.party.abbreviation.uppercase()})" },
+                        { candidate -> "${candidate.name.uppercase()}${if (candidate.isIncumbent()) candidateVotes.incumbentMarkerPadded else ""} (${candidate.party.abbreviation.uppercase()})" },
                         { numVotes, pct -> "${THOUSANDS_FORMAT.format(numVotes.toLong())} (${PCT_FORMAT.format(pct)})" },
                     )
                 }
@@ -274,8 +203,8 @@ class MixedMemberResultPanel private constructor(
                 { numVotes, pct -> "${THOUSANDS_FORMAT.format(numVotes.toLong())} (${PCT_FORMAT.format(pct)})" },
             )
             val result = Result()
-            candidateVotes.subscribe(Subscriber { result.votes = it })
-            winner.subscribe(Subscriber { result.winner = it })
+            candidateVotes.votes.subscribe(Subscriber { result.votes = it })
+            candidateVotes.winner?.subscribe(Subscriber { result.winner = it })
             val bars = result.votesPublisher.merge(result.winnerPublisher) { votes, winner -> votes to winner }
                 .merge(namedCandidateTemplate) { (votes, winner), template ->
                     val total = votes.values.filterNotNull().sum()
@@ -303,38 +232,24 @@ class MixedMemberResultPanel private constructor(
                 }
             return BarFrameBuilder.basic(
                 barsPublisher = bars,
-                headerPublisher = candidateVoteHeader,
-                rightHeaderLabelPublisher = candidateProgressLabel,
-                subheadPublisher = candidateVoteSubheader,
-                maxPublisher = candidatePctReporting?.map { 2.0 / 3 / it.coerceAtLeast(1e-6) }
+                headerPublisher = candidateVotes.header,
+                rightHeaderLabelPublisher = candidateVotes.progressLabel,
+                subheadPublisher = candidateVotes.subhead,
+                maxPublisher = candidateVotes.pctReporting?.map { 2.0 / 3 / it.coerceAtLeast(1e-6) }
                     ?: (2.0 / 3).asOneTimePublisher(),
             )
         }
 
-        private class Change<C> {
-            var curr: Map<out C, Int?> = emptyMap()
-                set(value) {
-                    field = value
-                    currPublisher.submit(value)
-                }
-
-            var prev: Map<out PartyOrCoalition, Int> = emptyMap()
-                set(value) {
-                    field = value
-                    prevPublisher.submit(value)
-                }
-
-            val currPublisher = Publisher(curr)
-            val prevPublisher = Publisher(prev)
-        }
-
-        private fun createCandidateChange(): BarFrame? {
-            if (candidatePrev == null) {
+        private fun createCandidateChange(
+            candidateVotes: CandidateVotes,
+            candidateChange: CandidateChange?,
+        ): BarFrame? {
+            if (candidateChange == null) {
                 return null
             }
             val change = Change<Candidate>()
-            candidateVotes.subscribe(Subscriber { change.curr = it })
-            candidatePrev!!.subscribe(Subscriber { change.prev = it })
+            candidateVotes.votes.subscribe(Subscriber { change.curr = it })
+            candidateChange.prevVotes.subscribe(Subscriber { change.prev = it })
             val bars = change.currPublisher.merge(change.prevPublisher) { currRaw, prev ->
                 val currTotal = currRaw.values.filterNotNull().sum()
                 if (currTotal == 0) {
@@ -388,13 +303,13 @@ class MixedMemberResultPanel private constructor(
             }
             return BarFrameBuilder.basic(
                 barsPublisher = bars,
-                headerPublisher = candidateChangeHeader,
-                wingspanPublisher = candidatePctReporting?.map { 0.05 / it.coerceAtLeast(1e-6) } ?: 0.05.asOneTimePublisher(),
+                headerPublisher = candidateChange.header,
+                wingspanPublisher = candidateVotes.pctReporting?.map { 0.05 / it.coerceAtLeast(1e-6) } ?: 0.05.asOneTimePublisher(),
             )
         }
 
-        private fun createPartyVotes(): BarFrame {
-            val bars = partyVotes.map { votes ->
+        private fun createPartyVotes(partyVotes: PartyVotes): BarFrame {
+            val bars = partyVotes.votes.map { votes ->
                 val total = votes.values.filterNotNull().sum()
                 val partialDeclaration = votes.values.any { it == null }
                 votes.entries
@@ -418,19 +333,19 @@ class MixedMemberResultPanel private constructor(
             }
             return BarFrameBuilder.basic(
                 barsPublisher = bars,
-                headerPublisher = partyVoteHeader,
-                rightHeaderLabelPublisher = partyProgressLabel,
-                maxPublisher = partyPctReporting?.map { 2.0 / 3 / it.coerceAtLeast(1e-6) } ?: (2.0 / 3).asOneTimePublisher(),
+                headerPublisher = partyVotes.header,
+                rightHeaderLabelPublisher = partyVotes.progressLabel,
+                maxPublisher = partyVotes.pctReporting?.map { 2.0 / 3 / it.coerceAtLeast(1e-6) } ?: (2.0 / 3).asOneTimePublisher(),
             )
         }
 
-        private fun createPartyChange(): BarFrame? {
-            if (partyPrev == null) {
+        private fun createPartyChange(partyVotes: PartyVotes, partyChange: PartyChange?): BarFrame? {
+            if (partyChange == null) {
                 return null
             }
             val change = Change<PartyOrCoalition>()
-            partyVotes.subscribe(Subscriber { change.curr = it })
-            partyPrev!!.subscribe(Subscriber { change.prev = it })
+            partyVotes.votes.subscribe(Subscriber { change.curr = it })
+            partyChange.prevVotes.subscribe(Subscriber { change.prev = it })
             val bars = change.currPublisher.merge(change.prevPublisher) { currRaw, prev ->
                 val currTotal = currRaw.values.filterNotNull().sum()
                 if (currTotal == 0) {
@@ -479,74 +394,79 @@ class MixedMemberResultPanel private constructor(
             }
             return BarFrameBuilder.basic(
                 barsPublisher = bars,
-                headerPublisher = partyChangeHeader,
-                wingspanPublisher = partyPctReporting?.map { 0.05 / it.coerceAtLeast(1e-6) } ?: 0.05.asOneTimePublisher(),
+                headerPublisher = partyChange.header,
+                wingspanPublisher = partyVotes.pctReporting?.map { 0.05 / it.coerceAtLeast(1e-6) } ?: 0.05.asOneTimePublisher(),
             )
         }
 
-        private fun createMapFrame(): MapFrame? {
-            return mapBuilder
-        }
+        private fun createAltText(
+            candidateVotes: CandidateVotes,
+            candidateChange: CandidateChange?,
+            partyVotes: PartyVotes,
+            partyChange: PartyChange?,
+            header: Flow.Publisher<out String?>,
+        ): Flow.Publisher<String> {
+            val candidatesEntries = candidateVotes.votes
+                .run { if (candidateVotes.winner == null) map { votes -> votes to null } else merge(candidateVotes.winner!!) { votes, winner -> votes to winner } }
+                .merge(candidateChange?.prevVotes ?: null.asOneTimePublisher()) { (curr, winner), prev ->
+                    val partialDeclaration = curr.values.any { it == null }
+                    val currTotal = curr.values.sumOf { it ?: 0 }.toDouble()
+                    val prevTotal = prev?.values?.sum()?.toDouble()
+                    val others = run {
+                        val currParties = curr.keys.map { it.party }
+                        prev?.filterKeys { !currParties.contains(it) }?.values?.sum() ?: 0
+                    }
+                    val entries = curr.entries
+                        .sortedByDescending { it.key.party.overrideSortOrder ?: it.value ?: 0 }
+                        .joinToString("\n") {
+                            val incumbentMarker = if (it.key.incumbent && candidateVotes.incumbentMarker != null && it.key.name.isNotBlank()) {
+                                candidateVotes.incumbentMarkerPadded
+                            } else {
+                                ""
+                            }
+                            val partyLabel = if (it.key == Candidate.OTHERS || it.key.name.isBlank()) {
+                                ""
+                            } else {
+                                " (${it.key.party.abbreviation})"
+                            }
+                            val candidateLabel =
+                                it.key.name.ifBlank { it.key.party.name }.uppercase() +
+                                    incumbentMarker +
+                                    partyLabel
 
-        private fun createAltText(header: Flow.Publisher<out String?>): Flow.Publisher<String> {
-            val candidatesEntries = candidateVotes.merge(winner) { votes, winner -> votes to winner }.merge(candidatePrev ?: null.asOneTimePublisher()) { (curr, winner), prev ->
-                val partialDeclaration = curr.values.any { it == null }
-                val currTotal = curr.values.sumOf { it ?: 0 }.toDouble()
-                val prevTotal = prev?.values?.sum()?.toDouble()
-                val others = run {
-                    val currParties = curr.keys.map { it.party }
-                    prev?.filterKeys { !currParties.contains(it) }?.values?.sum() ?: 0
-                }
-                val entries = curr.entries
-                    .sortedByDescending { it.key.party.overrideSortOrder ?: it.value ?: 0 }
-                    .joinToString("\n") {
-                        val incumbentMarker = if (it.key.incumbent && incumbentMarker.isNotBlank() && it.key.name.isNotBlank()) {
-                            incumbentMarker
-                        } else {
-                            ""
-                        }
-                        val partyLabel = if (it.key == Candidate.OTHERS || it.key.name.isBlank()) {
-                            ""
-                        } else {
-                            " (${it.key.party.abbreviation})"
-                        }
-                        val candidateLabel =
-                            it.key.name.ifBlank { it.key.party.name }.uppercase() +
-                                incumbentMarker +
-                                partyLabel
-
-                        val votesLabel = if (it.value == null || currTotal == 0.0) {
-                            "WAITING..."
-                        } else {
-                            DecimalFormat("#,##0").format(it.value) + (
-                                if (partialDeclaration) {
-                                    ""
-                                } else {
-                                    val currPct = (it.value ?: 0) / currTotal
-                                    val diffLabel = if (prev == null) {
+                            val votesLabel = if (it.value == null || currTotal == 0.0) {
+                                "WAITING..."
+                            } else {
+                                DecimalFormat("#,##0").format(it.value) + (
+                                    if (partialDeclaration) {
                                         ""
                                     } else {
-                                        val prevVotes = (prev[it.key.party] ?: 0) + (if (it.key == Candidate.OTHERS) others else 0)
-                                        val prevPct = prevVotes / (prevTotal ?: 0.0)
-                                        val diff = currPct - prevPct
-                                        ", ${DecimalFormat("+0.0%;-0.0%").format(diff)}"
+                                        val currPct = (it.value ?: 0) / currTotal
+                                        val diffLabel = if (prev == null) {
+                                            ""
+                                        } else {
+                                            val prevVotes = (prev[it.key.party] ?: 0) + (if (it.key == Candidate.OTHERS) others else 0)
+                                            val prevPct = prevVotes / (prevTotal ?: 0.0)
+                                            val diff = currPct - prevPct
+                                            ", ${DecimalFormat("+0.0%;-0.0%").format(diff)}"
+                                        }
+                                        val currLabel = DecimalFormat("0.0%").format(currPct)
+                                        " ($currLabel$diffLabel)"
                                     }
-                                    val currLabel = DecimalFormat("0.0%").format(currPct)
-                                    " ($currLabel$diffLabel)"
-                                }
-                                )
+                                    )
+                            }
+                            val winnerLabel = if (winner == it.key) " WINNER" else ""
+                            "$candidateLabel: $votesLabel$winnerLabel"
                         }
-                        val winnerLabel = if (winner == it.key) " WINNER" else ""
-                        "$candidateLabel: $votesLabel$winnerLabel"
-                    }
-                entries + (if (others > 0 && !partialDeclaration && !curr.containsKey(Candidate.OTHERS)) "\nOTHERS: - (-${DecimalFormat("0.0%").format(others / (prevTotal ?: 0.0))})" else "")
-            }
-            val candidates = candidateVoteHeader.merge(candidateVoteSubheader) { head, subhead -> head + (if (subhead.isNullOrEmpty()) "" else ", $subhead") }
-                .merge(candidateChangeHeader) { vote, change -> vote + (if (change.isNullOrEmpty()) "" else " ($change)") }
-                .merge(candidateProgressLabel) { head, prog -> head + (if (prog.isNullOrEmpty()) "" else " [$prog]") }
+                    entries + (if (others > 0 && !partialDeclaration && !curr.containsKey(Candidate.OTHERS)) "\nOTHERS: - (-${DecimalFormat("0.0%").format(others / (prevTotal ?: 0.0))})" else "")
+                }
+            val candidates = candidateVotes.header
+                .run { if (candidateVotes.subhead == null) this else merge(candidateVotes.subhead!!) { head, subhead -> head + (if (subhead.isNullOrEmpty()) "" else ", $subhead") } }
+                .run { if (candidateChange == null) this else merge(candidateChange.header) { vote, change -> vote + (if (change.isNullOrEmpty()) "" else " ($change)") } }
+                .run { if (candidateVotes.progressLabel == null) this else merge(candidateVotes.progressLabel!!) { head, prog -> head + (if (prog.isNullOrEmpty()) "" else " [$prog]") } }
                 .merge(candidatesEntries) { head, entries -> "$head\n$entries" }
 
-            val partyEntries = partyVotes.merge(partyPrev ?: null.asOneTimePublisher()) { curr, prev ->
+            val partyEntries = partyVotes.votes.merge(partyChange?.prevVotes ?: null.asOneTimePublisher()) { curr, prev ->
                 val partialDeclaration = curr.values.any { it == null }
                 val currTotal = curr.values.sumOf { it ?: 0 }.toDouble()
                 val prevTotal = prev?.values?.sum()?.toDouble()
@@ -580,21 +500,46 @@ class MixedMemberResultPanel private constructor(
                         "${it.key.name.uppercase()}: " + votesLabel
                     }
             }
-            val parties = partyVoteHeader.merge(partyChangeHeader) { vote, change -> vote + (if (change.isNullOrEmpty()) "" else " ($change)") }
-                .merge(partyProgressLabel) { head, prog -> head + (if (prog.isNullOrEmpty()) "" else " [$prog]") }
+            val parties = partyVotes.header
+                .run { if (partyChange == null) this else merge(partyChange.header) { vote, change -> vote + (if (change.isNullOrEmpty()) "" else " ($change)") } }
+                .run { if (partyVotes.progressLabel == null) this else merge(partyVotes.progressLabel!!) { head, prog -> head + (if (prog.isNullOrEmpty()) "" else " [$prog]") } }
                 .merge(partyEntries) { head, entries -> "$head\n$entries" }
 
             return header.merge(candidates) { h, c -> "$h\n\n$c" }.merge(parties) { h, p -> "$h\n\n$p" }
         }
-    }
 
-    companion object {
-        private val PCT_FORMAT = DecimalFormat("0.0%")
-        private val PCT_DIFF_FORMAT = DecimalFormat("+0.0%;-0.0%")
-        private val THOUSANDS_FORMAT = DecimalFormat("#,##0")
+        private class Result {
+            var votes: Map<Candidate, Int?> = emptyMap()
+                set(value) {
+                    field = value
+                    votesPublisher.submit(value)
+                }
 
-        fun builder(): Builder {
-            return Builder()
+            var winner: Candidate? = null
+                set(value) {
+                    field = value
+                    winnerPublisher.submit(value)
+                }
+
+            var votesPublisher = Publisher(votes)
+            var winnerPublisher = Publisher(winner)
+        }
+
+        private class Change<C> {
+            var curr: Map<out C, Int?> = emptyMap()
+                set(value) {
+                    field = value
+                    currPublisher.submit(value)
+                }
+
+            var prev: Map<out PartyOrCoalition, Int> = emptyMap()
+                set(value) {
+                    field = value
+                    prevPublisher.submit(value)
+                }
+
+            val currPublisher = Publisher(curr)
+            val prevPublisher = Publisher(prev)
         }
     }
 }
