@@ -293,6 +293,7 @@ class HeatMapFrame(
             set(value) {
                 field = value
                 repaint()
+                barsPanel.repaint()
             }
 
         var label: String? = null

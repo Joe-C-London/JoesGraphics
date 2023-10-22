@@ -24,78 +24,75 @@ class PartyHeatMapScreen private constructor(panel: JPanel, title: Flow.Publishe
         fun <T> ofElected(
             items: Flow.Publisher<out Collection<T>>,
             parties: Flow.Publisher<out List<Party>>,
-            prevResult: (T) -> Party,
-            currResult: (T) -> Flow.Publisher<Party?>,
+            prevResult: T.() -> Party,
+            currResult: T.() -> Flow.Publisher<Party?>,
             sortOrder: (Party) -> Comparator<T>,
-        ): Builder<T> {
-            return Builder(
+            numRows: Flow.Publisher<Int>,
+            filter: (Flow.Publisher<T.() -> Boolean>) = { _: T -> true }.asOneTimePublisher(),
+            partyChanges: Flow.Publisher<Map<Party, Party>> = emptyMap<Party, Party>().asOneTimePublisher(),
+            title: Flow.Publisher<String>,
+        ): PartyHeatMapScreen {
+            return build(
                 items,
                 parties,
                 prevResult,
-                { t ->
-                    currResult(t).map { p -> p?.let { PartyResult.elected(it) } }
-                },
+                { currResult().map { PartyResult.elected(it) } },
                 sortOrder,
                 false,
+                numRows,
+                filter,
+                partyChanges,
+                title,
             )
         }
 
         fun <T> ofElectedLeading(
             items: Flow.Publisher<out Collection<T>>,
             parties: Flow.Publisher<out List<Party>>,
-            prevResult: (T) -> Party,
-            currResult: (T) -> Flow.Publisher<out PartyResult?>,
+            prevResult: T.() -> Party,
+            currResult: T.() -> Flow.Publisher<out PartyResult?>,
             sortOrder: (Party) -> Comparator<T>,
-        ): Builder<T> {
-            return Builder(
+            numRows: Flow.Publisher<Int>,
+            filter: (Flow.Publisher<T.() -> Boolean>) = { _: T -> true }.asOneTimePublisher(),
+            partyChanges: Flow.Publisher<Map<Party, Party>> = emptyMap<Party, Party>().asOneTimePublisher(),
+            title: Flow.Publisher<String>,
+        ): PartyHeatMapScreen {
+            return build(
                 items,
                 parties,
                 prevResult,
                 currResult,
                 sortOrder,
                 true,
+                numRows,
+                filter,
+                partyChanges,
+                title,
             )
         }
-    }
 
-    class Builder<T> internal constructor(
-        private val items: Flow.Publisher<out Collection<T>>,
-        private val parties: Flow.Publisher<out List<Party>>,
-        private val prevResult: (T) -> Party,
-        private val currResult: (T) -> Flow.Publisher<out PartyResult?>,
-        private val sortOrder: (Party) -> Comparator<T>,
-        private val withLeading: Boolean,
-    ) {
-        private var numRows = 5.asOneTimePublisher()
-        private var filter: Flow.Publisher<(T) -> Boolean> = { _: T -> true }.asOneTimePublisher()
-        private var partyChanges: Flow.Publisher<Map<Party, Party>> = emptyMap<Party, Party>().asOneTimePublisher()
-
-        fun withNumRows(numRows: Flow.Publisher<Int>): Builder<T> {
-            this.numRows = numRows
-            return this
-        }
-
-        fun withFilter(filter: Flow.Publisher<(T) -> Boolean>): Builder<T> {
-            this.filter = filter
-            return this
-        }
-
-        fun withPartyChanges(changes: Flow.Publisher<Map<Party, Party>>): Builder<T> {
-            this.partyChanges = changes
-            return this
-        }
-
-        fun build(title: Flow.Publisher<String>): PartyHeatMapScreen {
+        private fun <T> build(
+            itemsPublisher: Flow.Publisher<out Collection<T>>,
+            partiesPublisher: Flow.Publisher<out List<Party>>,
+            prevResult: T.() -> Party,
+            currResult: T.() -> Flow.Publisher<out PartyResult?>,
+            sortOrder: (Party) -> Comparator<T>,
+            withLeading: Boolean,
+            numRows: Flow.Publisher<Int>,
+            filter: (Flow.Publisher<T.() -> Boolean>),
+            partyChanges: Flow.Publisher<Map<Party, Party>>,
+            title: Flow.Publisher<String>,
+        ): PartyHeatMapScreen {
             val panel = JPanel()
             panel.background = Color.WHITE
             panel.layout = GridLayout(0, 1, 5, 5)
 
             val changeLabel: (Int) -> String = { if (it == 0) "\u00b10" else DecimalFormat("+0;-0").format(it) }
-            items.merge(parties) { items, parties ->
+            itemsPublisher.merge(partiesPublisher) { items, parties ->
                 parties.map { party ->
                     HeatMapFrameBuilder.buildElectedLeading(
                         rows = numRows,
-                        entries = createOrderedList(items, party),
+                        entries = createOrderedList(items, party, sortOrder),
                         result = currResult,
                         prevResult = prevResult,
                         party = party,
@@ -139,17 +136,17 @@ class PartyHeatMapScreen private constructor(panel: JPanel, title: Flow.Publishe
                         diffFormat((curr[true] ?: 0) - (prev[true] ?: 0))
                     }
                 }
-                val partyTexts = items.merge(parties.merge(partyChanges) { p, c -> p to c }) { items, (parties, changes) ->
+                val partyTexts = itemsPublisher.merge(partiesPublisher.merge(partyChanges) { p, c -> p to c }) { items, (parties, changes) ->
                     val numForMajority = items.size / 2 + 1
                     parties.map { party ->
                         val prevTotal = items.map(prevResult).count { (changes[it] ?: it) == party }
-                        val entries = createOrderedList(items, party)
+                        val entries = createOrderedList(items, party, sortOrder)
                         val seatsAndPrev = entries.map { e ->
-                            currResult(e).map { r ->
+                            e.currResult().map { r ->
                                 if (r == null) {
                                     null
                                 } else {
-                                    r to prevResult(e)
+                                    r to e.prevResult()
                                 }
                             }
                         }.combine().map { list -> list.filterNotNull() }.map { list ->
@@ -178,7 +175,7 @@ class PartyHeatMapScreen private constructor(panel: JPanel, title: Flow.Publishe
             return PartyHeatMapScreen(pad(panel), title, altText)
         }
 
-        private fun createOrderedList(items: Collection<T>, party: Party): List<T> {
+        private fun <T> createOrderedList(items: Collection<T>, party: Party, sortOrder: (Party) -> Comparator<T>): List<T> {
             return items.asSequence()
                 .sortedWith(sortOrder(party))
                 .toList()

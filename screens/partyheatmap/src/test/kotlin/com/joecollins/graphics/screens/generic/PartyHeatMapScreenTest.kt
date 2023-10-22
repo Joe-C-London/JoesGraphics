@@ -19,25 +19,26 @@ class PartyHeatMapScreenTest {
         val parties = Publisher(listOf(lib, ndp))
         val rows = Publisher(4)
         val panel = PartyHeatMapScreen.ofElected(
-            prevResults.keys.asOneTimePublisher(),
-            parties,
-            { riding ->
-                prevResults[riding]!!.maxBy { it.value }.key
+            items = prevResults.keys.asOneTimePublisher(),
+            parties = parties,
+            prevResult = {
+                prevResults[this]!!.maxBy { it.value }.key
             },
-            { riding ->
-                currResults.map { r -> r[riding] }
+            currResult = {
+                currResults.map { r -> r[this] }
             },
-        ) { party ->
-            Comparator.comparing { riding ->
-                val result = prevResults[riding]!!
-                val me = result[party] ?: 0
-                val oth = result.filter { it.key != party }.maxOf { it.value }
-                val total = result.values.sum().toDouble()
-                (oth - me) / total
-            }
-        }
-            .withNumRows(rows)
-            .build("PARTY HEAT MAPS".asOneTimePublisher())
+            sortOrder = { party ->
+                Comparator.comparing { riding ->
+                    val result = prevResults[riding]!!
+                    val me = result[party] ?: 0
+                    val oth = result.filter { it.key != party }.maxOf { it.value }
+                    val total = result.values.sum().toDouble()
+                    (oth - me) / total
+                }
+            },
+            numRows = rows,
+            title = "PARTY HEAT MAPS".asOneTimePublisher(),
+        )
         panel.setSize(1024, 512)
         compareRendering("PartyHeatMapScreen", "Elected-1", panel)
         assertPublishes(
@@ -130,25 +131,26 @@ class PartyHeatMapScreenTest {
         val parties = Publisher(listOf(lib, ndp))
         val rows = Publisher(4)
         val panel = PartyHeatMapScreen.ofElectedLeading(
-            prevResults.keys.asOneTimePublisher(),
-            parties,
-            { riding ->
-                prevResults[riding]!!.maxBy { it.value }.key
+            items = prevResults.keys.asOneTimePublisher(),
+            parties = parties,
+            prevResult = {
+                prevResults[this]!!.maxBy { it.value }.key
             },
-            { riding ->
-                currResults.map { r -> r[riding] }
+            currResult = {
+                currResults.map { r -> r[this] }
             },
-        ) { party ->
-            Comparator.comparing { riding ->
-                val result = prevResults[riding]!!
-                val me = result[party] ?: 0
-                val oth = result.filter { it.key != party }.maxOf { it.value }
-                val total = result.values.sum().toDouble()
-                (oth - me) / total
-            }
-        }
-            .withNumRows(rows)
-            .build("PARTY HEAT MAPS".asOneTimePublisher())
+            sortOrder = { party ->
+                Comparator.comparing { riding ->
+                    val result = prevResults[riding]!!
+                    val me = result[party] ?: 0
+                    val oth = result.filter { it.key != party }.maxOf { it.value }
+                    val total = result.values.sum().toDouble()
+                    (oth - me) / total
+                }
+            },
+            numRows = rows,
+            title = "PARTY HEAT MAPS".asOneTimePublisher(),
+        )
         panel.setSize(1024, 512)
         compareRendering("PartyHeatMapScreen", "ElectedLeading-1", panel)
         assertPublishes(
@@ -246,26 +248,27 @@ class PartyHeatMapScreenTest {
         val parties = Publisher(listOf(bcu, ndp))
         val rows = Publisher(4)
         val panel = PartyHeatMapScreen.ofElectedLeading(
-            prevResults.keys.asOneTimePublisher(),
-            parties,
-            { riding ->
-                prevResults[riding]!!.maxBy { it.value }.key
+            items = prevResults.keys.asOneTimePublisher(),
+            parties = parties,
+            prevResult = {
+                prevResults[this]!!.maxBy { it.value }.key
             },
-            { riding ->
-                currResults.map { r -> r[riding] }
+            currResult = {
+                currResults.map { r -> r[this] }
             },
-        ) { party ->
-            Comparator.comparing { riding ->
-                val result = prevResults[riding]!!
-                val me = result[if (party == bcu) lib else party] ?: 0
-                val oth = result.filter { it.key != (if (party == bcu) lib else party) }.maxOf { it.value }
-                val total = result.values.sum().toDouble()
-                (oth - me) / total
-            }
-        }
-            .withNumRows(rows)
-            .withPartyChanges(mapOf(lib to bcu).asOneTimePublisher())
-            .build("PARTY HEAT MAPS".asOneTimePublisher())
+            sortOrder = { party ->
+                Comparator.comparing { riding ->
+                    val result = prevResults[riding]!!
+                    val me = result[if (party == bcu) lib else party] ?: 0
+                    val oth = result.filter { it.key != (if (party == bcu) lib else party) }.maxOf { it.value }
+                    val total = result.values.sum().toDouble()
+                    (oth - me) / total
+                }
+            },
+            numRows = rows,
+            partyChanges = mapOf(lib to bcu).asOneTimePublisher(),
+            title = "PARTY HEAT MAPS".asOneTimePublisher(),
+        )
         panel.setSize(1024, 512)
         compareRendering("PartyHeatMapScreen", "PartyChanges-1", panel)
         assertPublishes(
