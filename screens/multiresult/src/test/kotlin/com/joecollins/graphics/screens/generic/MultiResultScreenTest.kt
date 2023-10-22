@@ -1,5 +1,6 @@
 package com.joecollins.graphics.screens.generic
 
+import com.joecollins.graphics.screens.generic.MultiResultScreen.Companion.createMap
 import com.joecollins.graphics.utils.PublisherTestUtils.assertPublishes
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.graphics.utils.ShapefileReader
@@ -73,29 +74,33 @@ class MultiResultScreenTest {
         val shapesByDistrict = peiShapesByDistrict()
         val swingometerOrder = listOf(ndp, grn, lib, ind, pc)
         val panel = MultiResultScreen.of(
-            districts.asOneTimePublisher(),
-            { it.votes.asOneTimePublisher() },
-            { ("DISTRICT " + it.districtNum).asOneTimePublisher() },
-            { it.name.uppercase().asOneTimePublisher() },
-        )
-            .withIncumbentMarker("(MLA)")
-            .withWinner { (if (it.leaderHasWon) it.votes.entries.maxByOrNull { e -> e.value }!!.key else null).asOneTimePublisher() }
-            .withPrev(
-                { it.prevVotes.asOneTimePublisher() },
-                { "SWING SINCE 2015".asOneTimePublisher() },
-                compareBy { swingometerOrder.indexOf(it) },
-            )
-            .withMap(
-                { shapesByDistrict },
-                { it.districtNum },
-                { d ->
-                    d.votes.entries.maxByOrNull { e -> e.value }?.key?.party?.let { PartyResult(it, d.leaderHasWon) }
+            list = districts.asOneTimePublisher(),
+            curr = {
+                votes = { votes.asOneTimePublisher() }
+                header = { ("DISTRICT $districtNum").asOneTimePublisher() }
+                subhead = { name.uppercase().asOneTimePublisher() }
+                incumbentMarker = "(MLA)"
+                winner = { (if (leaderHasWon) votes.entries.maxByOrNull { e -> e.value }!!.key else null).asOneTimePublisher() }
+            },
+            prev = {
+                votes = { prevVotes.asOneTimePublisher() }
+                swing = {
+                    header = { "SWING SINCE 2015".asOneTimePublisher() }
+                    partyOrder = compareBy { swingometerOrder.indexOf(it) }
+                }
+            },
+            map = createMap {
+                shapes = { shapesByDistrict }
+                selectedShape = { districtNum }
+                leadingParty = {
+                    votes.entries.maxByOrNull { e -> e.value }?.key?.party?.let { PartyResult(it, leaderHasWon) }
                         .asOneTimePublisher()
-                },
-                { if (it.districtNum < 10) listOf(1, 2, 3, 4, 5, 6, 7, 8) else listOf(15, 16, 17, 18, 19, 20) },
-                { (if (it.districtNum < 10) "CARDIGAN" else "MALPEQUE").asOneTimePublisher() },
-            )
-            .build("PARTY LEADERS".asOneTimePublisher())
+                }
+                focus = { if (districtNum < 10) listOf(1, 2, 3, 4, 5, 6, 7, 8) else listOf(15, 16, 17, 18, 19, 20) }
+                header = { (if (districtNum < 10) "CARDIGAN" else "MALPEQUE").asOneTimePublisher() }
+            },
+            title = "PARTY LEADERS".asOneTimePublisher(),
+        )
         panel.setSize(1024, 512)
         compareRendering("MultiResultPanel", "Basic-1", panel)
         assertPublishes(
@@ -188,35 +193,39 @@ class MultiResultScreenTest {
         val swingometerOrder = listOf(ndp, grn, lib, ind, pc)
         val title = Publisher("MAJOR PARTY LEADERS")
         val panel = MultiResultScreen.of(
-            districts,
-            { it.getVotes() },
-            { it.name.uppercase().asOneTimePublisher() },
-            { it.getStatus() },
-        )
-            .withIncumbentMarker("(MLA)")
-            .withPctReporting { it.getPctReporting() }
-            .withWinner { it.winner }
-            .withPrev(
-                { it.prevVotes.asOneTimePublisher() },
-                { "SWING SINCE 2015".asOneTimePublisher() },
-                compareBy { swingometerOrder.indexOf(it) },
-            )
-            .withMap(
-                { shapesByDistrict },
-                { it.districtNum },
-                {
-                    it.leader.map { e ->
+            list = districts,
+            curr = {
+                votes = { getVotes() }
+                header = { name.uppercase().asOneTimePublisher() }
+                subhead = { getStatus() }
+                incumbentMarker = "(MLA)"
+                winner = { winner }
+                pctReporting = { getPctReporting() }
+            },
+            prev = {
+                votes = { prevVotes.asOneTimePublisher() }
+                swing = {
+                    header = { "SWING SINCE 2015".asOneTimePublisher() }
+                    partyOrder = compareBy { swingometerOrder.indexOf(it) }
+                }
+            },
+            map = createMap {
+                shapes = { shapesByDistrict }
+                selectedShape = { districtNum }
+                leadingParty = {
+                    leader.map { e ->
                         if (e == null) {
                             null
                         } else {
                             PartyResult(e.first.party, e.second)
                         }
                     }
-                },
-                { if (it.districtNum < 10) listOf(1, 2, 3, 4, 5, 6, 7, 8) else listOf(15, 16, 17, 18, 19, 20) },
-                { (if (it.districtNum < 10) "CARDIGAN" else "MALPEQUE").asOneTimePublisher() },
-            )
-            .build(title)
+                }
+                focus = { if (districtNum < 10) listOf(1, 2, 3, 4, 5, 6, 7, 8) else listOf(15, 16, 17, 18, 19, 20) }
+                header = { (if (districtNum < 10) "CARDIGAN" else "MALPEQUE").asOneTimePublisher() }
+            },
+            title = title,
+        )
         panel.setSize(1024, 512)
         compareRendering("MultiResultPanel", "Update-1", panel)
         assertPublishes(
@@ -583,36 +592,40 @@ class MultiResultScreenTest {
         val swingometerOrder = listOf(ndp, grn, lib, ind, pc)
         val title = Publisher("MAJOR PARTY LEADERS")
         val panel = MultiResultScreen.of(
-            districts,
-            { it.getVotes() },
-            { it.name.uppercase().asOneTimePublisher() },
-            { null.asOneTimePublisher() },
-        )
-            .withIncumbentMarker("(MLA)")
-            .withPctReporting { it.getPctReporting() }
-            .withProgressLabel { it.getStatus() }
-            .withWinner { it.winner }
-            .withPrev(
-                { it.prevVotes.asOneTimePublisher() },
-                { "SWING SINCE 2015".asOneTimePublisher() },
-                compareBy { swingometerOrder.indexOf(it) },
-            )
-            .withMap(
-                { shapesByDistrict },
-                { it.districtNum },
-                {
-                    it.leader.map { e ->
+            list = districts,
+            curr = {
+                votes = { getVotes() }
+                header = { name.uppercase().asOneTimePublisher() }
+                subhead = { null.asOneTimePublisher() }
+                incumbentMarker = "(MLA)"
+                winner = { winner }
+                pctReporting = { getPctReporting() }
+                progressLabel = { getStatus() }
+            },
+            prev = {
+                votes = { prevVotes.asOneTimePublisher() }
+                swing = {
+                    header = { "SWING SINCE 2015".asOneTimePublisher() }
+                    partyOrder = compareBy { swingometerOrder.indexOf(it) }
+                }
+            },
+            map = createMap {
+                shapes = { shapesByDistrict }
+                selectedShape = { districtNum }
+                leadingParty = {
+                    leader.map { e ->
                         if (e == null) {
                             null
                         } else {
                             PartyResult(e.first.party, e.second)
                         }
                     }
-                },
-                { if (it.districtNum < 10) listOf(1, 2, 3, 4, 5, 6, 7, 8) else listOf(15, 16, 17, 18, 19, 20) },
-                { (if (it.districtNum < 10) "CARDIGAN" else "MALPEQUE").asOneTimePublisher() },
-            )
-            .build(title)
+                }
+                focus = { if (districtNum < 10) listOf(1, 2, 3, 4, 5, 6, 7, 8) else listOf(15, 16, 17, 18, 19, 20) }
+                header = { (if (districtNum < 10) "CARDIGAN" else "MALPEQUE").asOneTimePublisher() }
+            },
+            title = title,
+        )
         panel.setSize(1024, 512)
         compareRendering("MultiResultPanel", "ProgressLabels-1", panel)
         assertPublishes(
@@ -980,27 +993,31 @@ class MultiResultScreenTest {
         )
         val swingometerOrder = listOf(ndp, grn, lib, ind, pc, pa)
         val panel = MultiResultScreen.of(
-            districts.asOneTimePublisher(),
-            { it.votes.asOneTimePublisher() },
-            { ("DISTRICT " + it.districtNum).asOneTimePublisher() },
-            { it.name.uppercase().asOneTimePublisher() },
+            list = districts.asOneTimePublisher(),
+            curr = {
+                votes = { votes.asOneTimePublisher() }
+                header = { ("DISTRICT $districtNum").asOneTimePublisher() }
+                subhead = { name.uppercase().asOneTimePublisher() }
+                incumbentMarker = "(MLA)"
+                winner = {
+                    (
+                        if (leaderHasWon) {
+                            votes.entries.maxByOrNull { it.value }!!.key
+                        } else {
+                            null
+                        }
+                        ).asOneTimePublisher()
+                }
+            },
+            prev = {
+                votes = { prevVotes.asOneTimePublisher() }
+                swing = {
+                    header = { "SWING SINCE 2018".asOneTimePublisher() }
+                    partyOrder = compareBy { swingometerOrder.indexOf(it) }
+                }
+            },
+            title = "SAINT JOHN".asOneTimePublisher(),
         )
-            .withIncumbentMarker("(MLA)")
-            .withWinner { d ->
-                (
-                    if (d.leaderHasWon) {
-                        d.votes.entries.maxByOrNull { it.value }!!.key
-                    } else {
-                        null
-                    }
-                    ).asOneTimePublisher()
-            }
-            .withPrev(
-                { it.prevVotes.asOneTimePublisher() },
-                { "SWING SINCE 2018".asOneTimePublisher() },
-                compareBy { swingometerOrder.indexOf(it) },
-            )
-            .build("SAINT JOHN".asOneTimePublisher())
         panel.setSize(1024, 512)
         compareRendering("MultiResultPanel", "Others-1", panel)
         assertPublishes(
@@ -1152,17 +1169,21 @@ class MultiResultScreenTest {
         )
         val swingometerOrder = listOf(ndp, grn, lib, ind, pc, pa)
         val panel = MultiResultScreen.ofParties(
-            districts.asOneTimePublisher(),
-            { it.votes.mapKeys { e -> e.key.party }.asOneTimePublisher() },
-            { ("DISTRICT " + it.districtNum).asOneTimePublisher() },
-            { it.name.uppercase().asOneTimePublisher() },
+            list = districts.asOneTimePublisher(),
+            curr = {
+                votes = { votes.mapKeys { e -> e.key.party }.asOneTimePublisher() }
+                header = { ("DISTRICT $districtNum").asOneTimePublisher() }
+                subhead = { name.uppercase().asOneTimePublisher() }
+            },
+            prev = {
+                votes = { prevVotes.asOneTimePublisher() }
+                swing = {
+                    header = { "SWING SINCE 2018".asOneTimePublisher() }
+                    partyOrder = compareBy { swingometerOrder.indexOf(it) }
+                }
+            },
+            title = "SAINT JOHN".asOneTimePublisher(),
         )
-            .withPrev(
-                { it.prevVotes.asOneTimePublisher() },
-                { "SWING SINCE 2018".asOneTimePublisher() },
-                compareBy { swingometerOrder.indexOf(it) },
-            )
-            .build("SAINT JOHN".asOneTimePublisher())
         panel.setSize(1024, 512)
         compareRendering("MultiResultPanel", "OthersParty-1", panel)
         assertPublishes(
@@ -1300,27 +1321,31 @@ class MultiResultScreenTest {
         val swingometerOrder = listOf(ndp, grn, lib, ind, pc, pa)
         val districtsPublisher = Publisher(districts)
         val panel = MultiResultScreen.of(
-            districtsPublisher,
-            { it.votes.asOneTimePublisher() },
-            { ("DISTRICT " + it.districtNum).asOneTimePublisher() },
-            { it.name.uppercase().asOneTimePublisher() },
+            list = districtsPublisher,
+            curr = {
+                votes = { votes.asOneTimePublisher() }
+                header = { ("DISTRICT $districtNum").asOneTimePublisher() }
+                subhead = { name.uppercase().asOneTimePublisher() }
+                incumbentMarker = "(MLA)"
+                winner = {
+                    (
+                        if (leaderHasWon) {
+                            votes.entries.maxByOrNull { it.value }!!.key
+                        } else {
+                            null
+                        }
+                        ).asOneTimePublisher()
+                }
+            },
+            prev = {
+                votes = { prevVotes.asOneTimePublisher() }
+                swing = {
+                    header = { "SWING SINCE 2018".asOneTimePublisher() }
+                    partyOrder = compareBy { swingometerOrder.indexOf(it) }
+                }
+            },
+            title = "ELECTION 2020: NEW BRUNSWICK DECIDES".asOneTimePublisher(),
         )
-            .withIncumbentMarker("(MLA)")
-            .withWinner { d ->
-                (
-                    if (d.leaderHasWon) {
-                        d.votes.entries.maxByOrNull { it.value }!!.key
-                    } else {
-                        null
-                    }
-                    ).asOneTimePublisher()
-            }
-            .withPrev(
-                { it.prevVotes.asOneTimePublisher() },
-                { "SWING SINCE 2018".asOneTimePublisher() },
-                compareBy { swingometerOrder.indexOf(it) },
-            )
-            .build("ELECTION 2020: NEW BRUNSWICK DECIDES".asOneTimePublisher())
         panel.setSize(1024, 512)
         compareRendering("MultiResultPanel", "MultipleRows-1", panel)
         assertPublishes(
@@ -1558,28 +1583,32 @@ class MultiResultScreenTest {
         val swingometerOrder = listOf(ndp, grn, lib, ind, pc, pa)
         val districtsPublisher = Publisher(districts)
         val panel = MultiResultScreen.of(
-            districtsPublisher,
-            { it.votes.asOneTimePublisher() },
-            { ("DISTRICT " + it.districtNum).asOneTimePublisher() },
-            { it.name.uppercase().asOneTimePublisher() },
+            list = districtsPublisher,
+            curr = {
+                votes = { votes.asOneTimePublisher() }
+                header = { ("DISTRICT $districtNum").asOneTimePublisher() }
+                subhead = { name.uppercase().asOneTimePublisher() }
+                incumbentMarker = "(MLA)"
+                winner = {
+                    (
+                        if (leaderHasWon) {
+                            votes.entries.maxByOrNull { it.value }!!.key
+                        } else {
+                            null
+                        }
+                        ).asOneTimePublisher()
+                }
+                progressLabel = { "100% IN".asOneTimePublisher() }
+            },
+            prev = {
+                votes = { prevVotes.asOneTimePublisher() }
+                swing = {
+                    header = { "SWING SINCE 2018".asOneTimePublisher() }
+                    partyOrder = compareBy { swingometerOrder.indexOf(it) }
+                }
+            },
+            title = "ELECTION 2020: NEW BRUNSWICK DECIDES".asOneTimePublisher(),
         )
-            .withIncumbentMarker("(MLA)")
-            .withProgressLabel { "100% IN".asOneTimePublisher() }
-            .withWinner { d ->
-                (
-                    if (d.leaderHasWon) {
-                        d.votes.entries.maxByOrNull { it.value }!!.key
-                    } else {
-                        null
-                    }
-                    ).asOneTimePublisher()
-            }
-            .withPrev(
-                { it.prevVotes.asOneTimePublisher() },
-                { "SWING SINCE 2018".asOneTimePublisher() },
-                compareBy { swingometerOrder.indexOf(it) },
-            )
-            .build("ELECTION 2020: NEW BRUNSWICK DECIDES".asOneTimePublisher())
         panel.setSize(1024, 512)
         compareRendering("MultiResultPanel", "MultipleRowsProgressLabels-1", panel)
         assertPublishes(
@@ -1761,13 +1790,15 @@ class MultiResultScreenTest {
             ),
         )
         val panel = MultiResultScreen.of(
-            districts.asOneTimePublisher(),
-            { it.votes.asOneTimePublisher() },
-            { it.name.uppercase().asOneTimePublisher() },
-            { ("CLASS " + it.districtNum).asOneTimePublisher() },
+            list = districts.asOneTimePublisher(),
+            curr = {
+                votes = { votes.asOneTimePublisher() }
+                header = { name.uppercase().asOneTimePublisher() }
+                subhead = { ("CLASS $districtNum").asOneTimePublisher() }
+                runoff = { runoff }
+            },
+            title = "GEORGIA SENATE".asOneTimePublisher(),
         )
-            .withRunoff { it.runoff }
-            .build("GEORGIA SENATE".asOneTimePublisher())
         panel.setSize(1024, 512)
         compareRendering("MultiResultPanel", "Runoff-1", panel)
         assertPublishes(
@@ -1869,43 +1900,41 @@ class MultiResultScreenTest {
         val shapesByDistrict = peiShapesByDistrict()
         val swingometerOrder = listOf(ndp, grn, lib, ind, pc)
         val panel = MultiResultScreen.of(
-            districts.asOneTimePublisher(),
-            { it.votes.asOneTimePublisher() },
-            { ("DISTRICT " + it.districtNum).asOneTimePublisher() },
-            { it.name.uppercase().asOneTimePublisher() },
+            list = districts.asOneTimePublisher(),
+            curr = {
+                votes = { votes.asOneTimePublisher() }
+                header = { ("DISTRICT $districtNum").asOneTimePublisher() }
+                subhead = { name.uppercase().asOneTimePublisher() }
+                incumbentMarker = "(MLA)"
+                winner = {
+                    (
+                        if (leaderHasWon) {
+                            votes.entries.maxByOrNull { it.value }!!.key
+                        } else {
+                            null
+                        }
+                        ).asOneTimePublisher()
+                }
+            },
+            prev = {
+                votes = { prevVotes.asOneTimePublisher() }
+                swing = {
+                    header = { "SWING SINCE 2015".asOneTimePublisher() }
+                    partyOrder = compareBy { swingometerOrder.indexOf(it) }
+                }
+            },
+            map = createMap {
+                shapes = { shapesByDistrict }
+                selectedShape = { districtNum }
+                leadingParty = {
+                    votes.entries.maxByOrNull { it.value }?.key?.party?.let { PartyResult(it, leaderHasWon) }.asOneTimePublisher()
+                }
+                focus = { listOf(10, 11, 12, 13, 14) }
+                additionalHighlights = { listOf(9, 10, 11, 12, 13, 14) }
+                header = { "CHARLOTTETOWN".asOneTimePublisher() }
+            },
+            title = "CABINET MEMBERS IN CHARLOTTETOWN".asOneTimePublisher(),
         )
-            .withIncumbentMarker("(MLA)")
-            .withWinner { d ->
-                (
-                    if (d.leaderHasWon) {
-                        d.votes.entries.maxByOrNull { it.value }!!.key
-                    } else {
-                        null
-                    }
-                    ).asOneTimePublisher()
-            }
-            .withPrev(
-                { it.prevVotes.asOneTimePublisher() },
-                { "SWING SINCE 2015".asOneTimePublisher() },
-                compareBy { swingometerOrder.indexOf(it) },
-            )
-            .withMap(
-                { shapesByDistrict },
-                { it.districtNum },
-                { d ->
-                    d.votes.entries.maxByOrNull { it.value }?.key?.party?.let {
-                        PartyResult(
-                            it,
-                            d.leaderHasWon,
-                        )
-                    }
-                        .asOneTimePublisher()
-                },
-                { listOf(10, 11, 12, 13, 14) },
-                { listOf(9, 10, 11, 12, 13, 14) },
-                { "CHARLOTTETOWN".asOneTimePublisher() },
-            )
-            .build("CABINET MEMBERS IN CHARLOTTETOWN".asOneTimePublisher())
         panel.setSize(1024, 512)
         compareRendering("MultiResultPanel", "MapAdditionalHighlights-1", panel)
         assertPublishes(
@@ -2019,17 +2048,21 @@ class MultiResultScreenTest {
         val swingometerOrder = listOf(ndp, grn, lib, ind, pc, pa)
         val districtPublisher = Publisher(districts)
         val panel = MultiResultScreen.ofParties(
-            districtPublisher,
-            { it.partyVotes },
-            { ("DISTRICT " + it.districtNum).asOneTimePublisher() },
-            { it.name.uppercase().asOneTimePublisher() },
+            list = districtPublisher,
+            curr = {
+                votes = { partyVotes }
+                header = { ("DISTRICT $districtNum").asOneTimePublisher() }
+                subhead = { name.uppercase().asOneTimePublisher() }
+            },
+            prev = {
+                votes = { prevVotes.asOneTimePublisher() }
+                swing = {
+                    header = { "SWING SINCE 2018".asOneTimePublisher() }
+                    partyOrder = compareBy { swingometerOrder.indexOf(it) }
+                }
+            },
+            title = "ELECTION 2020: NEW BRUNSWICK DECIDES".asOneTimePublisher(),
         )
-            .withPrev(
-                { it.prevVotes.asOneTimePublisher() },
-                { "SWING SINCE 2018".asOneTimePublisher() },
-                compareBy { swingometerOrder.indexOf(it) },
-            )
-            .build("ELECTION 2020: NEW BRUNSWICK DECIDES".asOneTimePublisher())
         panel.setSize(1024, 512)
         compareRendering("MultiResultPanel", "PartiesOnly-1", panel)
         assertPublishes(

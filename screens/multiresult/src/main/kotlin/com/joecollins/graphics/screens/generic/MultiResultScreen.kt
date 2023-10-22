@@ -39,321 +39,84 @@ class MultiResultScreen private constructor(
 ) : GenericPanel(screen, header, altText), AltTextProvider {
     private val panels: MutableList<ResultPanel> = ArrayList()
 
-    class Builder<T>(
-        private val listPublisher: Flow.Publisher<out List<T>>,
-        private val votesFunc: (T) -> Flow.Publisher<out Map<Candidate, Int>>,
-        private val headerFunc: (T) -> Flow.Publisher<out String>,
-        private val subheadFunc: (T) -> Flow.Publisher<out String?>,
-        private val partiesOnly: Boolean,
-    ) {
-        private val itemPublishers: MutableList<Flow.Publisher<out T?>> = ArrayList()
+    class CurrVotes<T> internal constructor() {
+        lateinit var votes: T.() -> Flow.Publisher<out Map<Candidate, Int>>
+        lateinit var header: T.() -> Flow.Publisher<out String>
+        lateinit var subhead: T.() -> Flow.Publisher<out String?>
+        var incumbentMarker: String = ""
+        var winner: (T.() -> Flow.Publisher<out Candidate?>)? = null
+        var runoff: (T.() -> Flow.Publisher<out Set<Candidate>?>)? = null
+        var pctReporting: (T.() -> Flow.Publisher<out Double>)? = null
+        var progressLabel: (T.() -> Flow.Publisher<out String?>)? = null
+    }
 
-        private var pctReportingFunc: (T) -> Flow.Publisher<out Double> = { 1.0.asOneTimePublisher() }
-        private var progressLabelFunc: (T) -> Flow.Publisher<out String?> = { null.asOneTimePublisher() }
-        private var winnerFunc: (T) -> Flow.Publisher<out Candidate?> = { (null as Candidate?).asOneTimePublisher() }
-        private var runoffFunc: (T) -> Flow.Publisher<out Set<Candidate>?> = { setOf<Candidate>().asOneTimePublisher() }
-        private var incumbentMarker = ""
-        private var prevFunc: ((T) -> Flow.Publisher<out Map<Party, Int>>)? = null
-        private var swingHeaderFunc: ((T) -> Flow.Publisher<out String>)? = null
-        private var swingPartyOrder: Comparator<Party>? = null
-        private var mapShapeFunc: ((T) -> List<Pair<Shape, Flow.Publisher<out Color>>>)? = null
-        private var mapFocusFunc: ((T) -> List<Shape>?)? = null
-        private var mapHeaderFunc: ((T) -> Flow.Publisher<out String>)? = null
+    class CurrPartyVotes<T> internal constructor() {
+        lateinit var votes: T.() -> Flow.Publisher<out Map<Party, Int>>
+        lateinit var header: T.() -> Flow.Publisher<out String>
+        lateinit var subhead: T.() -> Flow.Publisher<out String?>
+        var pctReporting: (T.() -> Flow.Publisher<out Double>)? = null
+        var progressLabel: (T.() -> Flow.Publisher<out String?>)? = null
+    }
 
-        fun withIncumbentMarker(incumbentMarker: String): Builder<T> {
-            this.incumbentMarker = incumbentMarker
-            return this
+    class PrevPartyVotes<T> internal constructor() {
+        lateinit var votes: T.() -> Flow.Publisher<out Map<Party, Int>>
+        lateinit var swing: Swing<T>.() -> Unit
+
+        val swingProps by lazy { Swing<T>().apply(swing) }
+    }
+
+    class Swing<T> internal constructor() {
+        lateinit var header: (T.() -> Flow.Publisher<out String>)
+        lateinit var partyOrder: Comparator<Party>
+    }
+
+    class MapPanel<T, K> internal constructor() {
+        lateinit var shapes: T.() -> Map<K, Shape>
+        lateinit var selectedShape: T.() -> K
+        lateinit var leadingParty: T.() -> Flow.Publisher<out PartyResult?>
+        lateinit var focus: T.() -> List<K>?
+        var additionalHighlights: (T.() -> List<K>?)? = null
+        lateinit var header: T.() -> Flow.Publisher<out String>
+
+        internal val additionalHighlightsOrDefault: T.() -> List<K>? by lazy { additionalHighlights ?: focus }
+
+        internal val focusShapes: T.() -> List<Shape> = {
+            focus()?.let { focusKeys ->
+                val shapesMap = shapes()
+                focusKeys.mapNotNull { shapesMap[it] }
+            } ?: emptyList()
         }
 
-        fun withWinner(winnerFunc: (T) -> Flow.Publisher<out Candidate?>): Builder<T> {
-            this.winnerFunc = winnerFunc
-            return this
-        }
-
-        fun withRunoff(runoffFunc: (T) -> Flow.Publisher<out Set<Candidate>?>): Builder<T> {
-            this.runoffFunc = runoffFunc
-            return this
-        }
-
-        fun withPctReporting(pctReportingFunc: (T) -> Flow.Publisher<out Double>): Builder<T> {
-            this.pctReportingFunc = pctReportingFunc
-            return this
-        }
-
-        fun withProgressLabel(progressLabelFunc: (T) -> Flow.Publisher<out String?>): Builder<T> {
-            this.progressLabelFunc = progressLabelFunc
-            return this
-        }
-
-        fun withPrev(
-            prevFunc: (T) -> Flow.Publisher<out Map<Party, Int>>,
-            swingHeaderFunc: (T) -> Flow.Publisher<out String>,
-            swingPartyOrder: Comparator<Party>,
-        ): Builder<T> {
-            this.prevFunc = prevFunc
-            this.swingHeaderFunc = swingHeaderFunc
-            this.swingPartyOrder = swingPartyOrder
-            return this
-        }
-
-        fun <K> withMap(
-            shapesFunc: (T) -> Map<K, Shape>,
-            selectedShapeFunc: (T) -> K,
-            leadingPartyFunc: (T) -> Flow.Publisher<out PartyResult?>,
-            focusFunc: (T) -> List<K>?,
-            mapHeaderFunc: (T) -> Flow.Publisher<out String>,
-        ): Builder<T> {
-            return withMap(shapesFunc, selectedShapeFunc, leadingPartyFunc, focusFunc, focusFunc, mapHeaderFunc)
-        }
-
-        fun <K> withMap(
-            shapesFunc: (T) -> Map<K, Shape>,
-            selectedShapeFunc: (T) -> K,
-            leadingPartyFunc: (T) -> Flow.Publisher<out PartyResult?>,
-            focusFunc: (T) -> List<K>?,
-            additionalHighlightsFunc: (T) -> List<K>?,
-            mapHeaderFunc: (T) -> Flow.Publisher<out String>,
-        ): Builder<T> {
-            this.mapHeaderFunc = mapHeaderFunc
-            mapFocusFunc = mapFocusFunc@{ t: T ->
-                val focus = focusFunc(t) ?: return@mapFocusFunc emptyList()
-                val shapes = shapesFunc(t)
-                focus.mapNotNull { shapes[it] }
-            }
-            mapShapeFunc = { t: T ->
-                val selected = selectedShapeFunc(t)
-                val focus = focusFunc(t)
-                val additionalHighlight = additionalHighlightsFunc(t)
-                val leader = leadingPartyFunc(t)
-                shapesFunc(t).entries.asSequence()
-                    .map { (id, shape) ->
-                        when {
-                            id == selected -> {
-                                Pair(shape, leader.map { it.getColor(default = Party.OTHERS.color) })
-                            }
-                            focus.isNullOrEmpty() || focus.contains(id) -> {
-                                Pair(
-                                    shape,
-                                    Color.LIGHT_GRAY.asOneTimePublisher(),
-                                )
-                            }
-                            additionalHighlight != null && additionalHighlight.contains(id) -> {
-                                Pair(
-                                    shape,
-                                    Color.LIGHT_GRAY.asOneTimePublisher(),
-                                )
-                            }
-                            else -> Pair(
+        internal val shapeColors: T.() -> List<Pair<Shape, Flow.Publisher<out Color>>> = {
+            val selected = selectedShape()
+            val focusKeys = focus()
+            val additionalHighlight = additionalHighlightsOrDefault()
+            val leader = leadingParty()
+            shapes().entries.asSequence()
+                .map { (id, shape) ->
+                    when {
+                        id == selected -> {
+                            Pair(shape, leader.map { it.getColor(default = Party.OTHERS.color) })
+                        }
+                        focusKeys.isNullOrEmpty() || focusKeys.contains(id) -> {
+                            Pair(
                                 shape,
-                                Color(220, 220, 220).asOneTimePublisher(),
+                                Color.LIGHT_GRAY.asOneTimePublisher(),
                             )
                         }
-                    }
-                    .toList()
-            }
-            return this
-        }
-
-        fun build(textHeader: Flow.Publisher<out String?>): MultiResultScreen {
-            val center = JPanel()
-            val altText = this.listPublisher.map { list ->
-                list.filterNotNull().map { e ->
-                    val headerPub = headerFunc(e).merge(subheadFunc(e)) { head, sub ->
-                        if (sub.isNullOrEmpty()) {
-                            head
-                        } else if (head.isEmpty()) {
-                            sub
-                        } else {
-                            "$head, $sub"
+                        additionalHighlight != null && additionalHighlight.contains(id) -> {
+                            Pair(
+                                shape,
+                                Color.LIGHT_GRAY.asOneTimePublisher(),
+                            )
                         }
-                    }.merge(progressLabelFunc(e)) { head, prog ->
-                        head + (prog?.let { " [$it]" } ?: "")
+                        else -> Pair(
+                            shape,
+                            Color(220, 220, 220).asOneTimePublisher(),
+                        )
                     }
-                    val entriesPub = votesFunc(e).merge(winnerFunc(e).merge(runoffFunc(e)) { w, r -> w to r }) { votes, (winner, runoff) ->
-                        val total = votes.values.sum().toDouble()
-                        Aggregators.topAndOthers(votes, (if (list.size > 4) 4 else 5) * (if (partiesOnly) 2 else 1), Candidate.OTHERS).entries
-                            .sortedByDescending { if (it.key == Candidate.OTHERS) -1 else it.value }
-                            .joinToString("\n") { (c, v) ->
-                                "${
-                                    if (c == Candidate.OTHERS) {
-                                        "OTHERS"
-                                    } else if (partiesOnly) {
-                                        c.party.name.uppercase()
-                                    } else {
-                                        "${c.name.uppercase()}${
-                                            if (incumbentMarker.isNotEmpty() && c.isIncumbent()) " $incumbentMarker" else ""
-                                        } (${c.party.abbreviation})"
-                                    }
-                                }: ${
-                                    if (total == 0.0) {
-                                        "WAITING..."
-                                    } else if (partiesOnly) {
-                                        DecimalFormat("0.0%").format(v / total)
-                                    } else {
-                                        "${DecimalFormat("#,##0").format(v)} (${DecimalFormat("0.0%").format(v / total)})"
-                                    }
-                                }${
-                                    if (c == winner) {
-                                        " WINNER"
-                                    } else if (runoff?.contains(c) == true) {
-                                        " RUNOFF"
-                                    } else {
-                                        ""
-                                    }
-                                }"
-                            }
-                    }
-                    headerPub.merge(entriesPub) { h, s -> "$h\n$s" }
-                }.combine().map { it.joinToString("\n\n") }
-            }.selfCompose().merge(textHeader) { items, head ->
-                if (head == null) {
-                    items
-                } else {
-                    "$head\n\n$items"
                 }
-            }
-            val screen = MultiResultScreen(textHeader, center, altText)
-            center.layout = GridLayout(1, 0)
-            center.background = Color.WHITE
-            this.listPublisher.subscribe(
-                Subscriber { list ->
-                    val size = list.size
-                    while (screen.panels.size < size) {
-                        val idx = screen.panels.size
-                        val itemPublisher =
-                            this.listPublisher.map {
-                                if (idx < it.size) {
-                                    it[idx]
-                                } else {
-                                    null
-                                }
-                            }
-                        itemPublishers.add(itemPublisher)
-                        val newPanel = ResultPanel(
-                            this.incumbentMarker,
-                            this.swingPartyOrder,
-                            mapHeaderFunc != null,
-                            this.partiesOnly,
-                        )
-                        newPanel.setVotesPublisher(
-                            itemPublisher.compose {
-                                it?.let(votesFunc)
-                                    ?: emptyMap<Candidate, Int>().asOneTimePublisher()
-                            },
-                        )
-                        newPanel.setWinnerPublisher(
-                            itemPublisher.compose {
-                                it?.let(winnerFunc)
-                                    ?: (null as Candidate?).asOneTimePublisher()
-                            },
-                        )
-                        newPanel.setRunoffPublisher(
-                            itemPublisher.compose {
-                                it?.let(runoffFunc)
-                                    ?: (null as Set<Candidate>?).asOneTimePublisher()
-                            },
-                        )
-                        newPanel.setPctReportingPublisher(
-                            itemPublisher.compose {
-                                it?.let(pctReportingFunc) ?: 0.0.asOneTimePublisher()
-                            },
-                        )
-                        newPanel.setProgressLabelPublisher(
-                            itemPublisher.compose {
-                                it?.let(progressLabelFunc) ?: null.asOneTimePublisher()
-                            },
-                        )
-                        newPanel.setHeaderPublisher(
-                            itemPublisher.compose {
-                                it?.let(headerFunc) ?: "".asOneTimePublisher()
-                            },
-                        )
-                        newPanel.setSubheadPublisher(
-                            itemPublisher.compose {
-                                it?.let(subheadFunc) ?: "".asOneTimePublisher()
-                            },
-                        )
-                        if (swingPartyOrder != null) {
-                            prevFunc?.let { f ->
-                                newPanel.setPrevPublisher(
-                                    itemPublisher.compose {
-                                        it?.let(f)
-                                            ?: emptyMap<Party, Int>().asOneTimePublisher()
-                                    },
-                                )
-                            }
-                            swingHeaderFunc?.let { f ->
-                                newPanel.setSwingHeaderPublisher(
-                                    itemPublisher.compose {
-                                        it?.let(
-                                            f,
-                                        ) ?: "".asOneTimePublisher()
-                                    },
-                                )
-                            }
-                        }
-                        if (mapHeaderFunc != null) {
-                            mapShapeFunc?.let { f ->
-                                newPanel.setMapShapePublisher(
-                                    itemPublisher.compose {
-                                        (
-                                            (it?.let(f) ?: emptyList()).map { e ->
-                                                e.second.map { c ->
-                                                    Pair(
-                                                        e.first,
-                                                        c,
-                                                    )
-                                                }
-                                            }
-                                            ).combine()
-                                    },
-                                )
-                            }
-                            mapFocusFunc?.let { f ->
-                                newPanel.setMapFocusPublisher(
-                                    itemPublisher.map {
-                                        it?.let(f) ?: emptyList()
-                                    },
-                                )
-                            }
-                            mapHeaderFunc?.let { f ->
-                                newPanel.setMapHeaderPublisher(
-                                    itemPublisher.compose {
-                                        it?.let(f) ?: "".asOneTimePublisher()
-                                    },
-                                )
-                            }
-                        }
-                        center.add(newPanel)
-                        screen.panels.add(newPanel)
-                    }
-                    while (screen.panels.size > size) {
-                        val panel = screen.panels.removeAt(size)
-                        panel.unbindAll()
-                        center.remove(panel)
-                        itemPublishers.removeAt(size)
-                    }
-                    val numRows = if (size > 4) 2 else 1
-                    center.layout = GridLayout(numRows, 0)
-                    screen.panels.forEach {
-                        it.displayBothRows = numRows == 1
-                        it.setMaxBarsPublisher(
-                            (
-                                (if (numRows == 2) 4 else 5) * if (this.partiesOnly) 2 else 1
-                                ).asOneTimePublisher(),
-                        )
-                    }
-                    EventQueue.invokeLater {
-                        screen.panels.forEach { p ->
-                            p.invalidate()
-                            p.revalidate()
-                        }
-                        screen.repaint()
-                    }
-                },
-            )
-
-            return screen
+                .toList()
         }
     }
 
@@ -460,7 +223,7 @@ class MultiResultScreen private constructor(
         private val votes: Publisher<Flow.Publisher<out Map<Candidate, Int>>> = Publisher(Publisher())
         private val header: Publisher<Flow.Publisher<out String>> = Publisher(Publisher())
         private val subhead: Publisher<Flow.Publisher<out String?>> = Publisher(Publisher())
-        private val pctReporting: Publisher<Flow.Publisher<out Double>> = Publisher(Publisher())
+        private val pctReporting: Publisher<Flow.Publisher<out Double>> = Publisher(Publisher(1.0))
         private val progressLabel: Publisher<Flow.Publisher<out String?>> = Publisher(Publisher())
         private val winner: Publisher<Flow.Publisher<out Candidate?>> = Publisher(Publisher())
         private val runoff: Publisher<Flow.Publisher<out Set<Candidate>?>> = Publisher(Publisher())
@@ -475,36 +238,36 @@ class MultiResultScreen private constructor(
             this.votes.submit(votes)
         }
 
-        fun setHeaderPublisher(headerPublisher: Flow.Publisher<out String>) {
-            this.header.submit(headerPublisher)
+        fun setHeaderPublisher(header: Flow.Publisher<out String>) {
+            this.header.submit(header)
         }
 
-        fun setSubheadPublisher(subheadPublisher: Flow.Publisher<out String?>) {
-            this.subhead.submit(subheadPublisher)
+        fun setSubheadPublisher(subhead: Flow.Publisher<out String?>) {
+            this.subhead.submit(subhead)
         }
 
-        fun setWinnerPublisher(winnerPublisher: Flow.Publisher<out Candidate?>) {
-            winner.submit(winnerPublisher)
+        fun setWinnerPublisher(winner: Flow.Publisher<out Candidate?>) {
+            this.winner.submit(winner)
         }
 
-        fun setRunoffPublisher(runoffPublisher: Flow.Publisher<out Set<Candidate>?>) {
-            runoff.submit(runoffPublisher)
+        fun setRunoffPublisher(runoff: Flow.Publisher<out Set<Candidate>?>) {
+            this.runoff.submit(runoff)
         }
 
-        fun setPctReportingPublisher(pctReportingPublisher: Flow.Publisher<out Double>) {
-            pctReporting.submit(pctReportingPublisher)
+        fun setPctReportingPublisher(pctReporting: Flow.Publisher<out Double>) {
+            this.pctReporting.submit(pctReporting)
         }
 
-        fun setProgressLabelPublisher(progressLabelPublisher: Flow.Publisher<out String?>) {
-            progressLabel.submit(progressLabelPublisher)
+        fun setProgressLabelPublisher(progressLabel: Flow.Publisher<out String?>) {
+            this.progressLabel.submit(progressLabel)
         }
 
-        fun setPrevPublisher(prevPublisher: Flow.Publisher<out Map<Party, Int>>) {
-            prevVotes.submit(prevPublisher)
+        fun setPrevPublisher(prev: Flow.Publisher<out Map<Party, Int>>) {
+            prevVotes.submit(prev)
         }
 
-        fun setSwingHeaderPublisher(swingLabelPublisher: Flow.Publisher<out String?>) {
-            swingHeader.submit(swingLabelPublisher)
+        fun setSwingHeaderPublisher(swingHeader: Flow.Publisher<out String?>) {
+            this.swingHeader.submit(swingHeader)
         }
 
         fun setMapShapePublisher(shapes: Flow.Publisher<out List<Pair<Shape, Color>>>) {
@@ -515,12 +278,12 @@ class MultiResultScreen private constructor(
             mapFocus.submit(shapes)
         }
 
-        fun setMapHeaderPublisher(mapLabelPublisher: Flow.Publisher<out String>) {
-            mapHeader.submit(mapLabelPublisher)
+        fun setMapHeaderPublisher(mapHeader: Flow.Publisher<out String>) {
+            this.mapHeader.submit(mapHeader)
         }
 
-        fun setMaxBarsPublisher(maxBarsPublisher: Flow.Publisher<out Int>) {
-            maxBars.submit(maxBarsPublisher)
+        fun setMaxBarsPublisher(maxBars: Flow.Publisher<out Int>) {
+            this.maxBars.submit(maxBars)
         }
 
         fun unbindAll() {
@@ -611,33 +374,272 @@ class MultiResultScreen private constructor(
 
     companion object {
 
+        fun <T, K> createMap(map: MapPanel<T, K>.() -> Unit) = MapPanel<T, K>().apply(map)
+
         fun <T> of(
             list: Flow.Publisher<out List<T>>,
-            votesFunc: (T) -> Flow.Publisher<out Map<Candidate, Int>>,
-            headerFunc: (T) -> Flow.Publisher<out String>,
-            subheadFunc: (T) -> Flow.Publisher<out String?>,
-        ): Builder<T> {
-            return Builder(list, votesFunc, headerFunc, subheadFunc, false)
+            curr: CurrVotes<T>.() -> Unit,
+            prev: (PrevPartyVotes<T>.() -> Unit)? = null,
+            map: MapPanel<T, *>? = null,
+            title: Flow.Publisher<out String?>,
+        ): MultiResultScreen {
+            return build(
+                list,
+                CurrVotes<T>().apply(curr),
+                prev?.let { PrevPartyVotes<T>().apply(it) },
+                map,
+                false,
+                title,
+            )
         }
 
         fun <T> ofParties(
             list: Flow.Publisher<out List<T>>,
-            votesFunc: (T) -> Flow.Publisher<out Map<Party, Int>>,
-            headerFunc: (T) -> Flow.Publisher<out String>,
-            subheadFunc: (T) -> Flow.Publisher<out String>,
-        ): Builder<T> {
-            val adjustedVoteFunc = { t: T ->
-                votesFunc(t).map { m: Map<Party, Int> ->
-                    Aggregators.adjustKey(m) { k: Party ->
-                        if (k == Party.OTHERS) {
-                            Candidate.OTHERS
-                        } else {
-                            Candidate("", k)
+            curr: CurrPartyVotes<T>.() -> Unit,
+            prev: (PrevPartyVotes<T>.() -> Unit)? = null,
+            map: MapPanel<T, *>? = null,
+            title: Flow.Publisher<out String?>,
+        ): MultiResultScreen {
+            val currVotes = CurrPartyVotes<T>().apply(curr)
+            val candidateVotes = CurrVotes<T>().apply {
+                this.votes = {
+                    currVotes.votes(this).map { m: Map<Party, Int> ->
+                        Aggregators.adjustKey(m) { k: Party ->
+                            if (k == Party.OTHERS) {
+                                Candidate.OTHERS
+                            } else {
+                                Candidate("", k)
+                            }
                         }
                     }
                 }
+                this.header = currVotes.header
+                this.subhead = currVotes.subhead
+                this.pctReporting = currVotes.pctReporting
+                this.progressLabel = currVotes.progressLabel
             }
-            return Builder(list, adjustedVoteFunc, headerFunc, subheadFunc, true)
+            return build(
+                list,
+                candidateVotes,
+                prev?.let { PrevPartyVotes<T>().apply(it) },
+                map,
+                true,
+                title,
+            )
+        }
+
+        private fun <T> build(
+            listPublisher: Flow.Publisher<out List<T>>,
+            curr: CurrVotes<T>,
+            prev: PrevPartyVotes<T>?,
+            map: MapPanel<T, *>?,
+            partiesOnly: Boolean,
+            title: Flow.Publisher<out String?>,
+        ): MultiResultScreen {
+            val itemPublishers: MutableList<Flow.Publisher<out T?>> = ArrayList()
+            val center = JPanel()
+            val altText = listPublisher.map { list ->
+                list.filterNotNull().map { e ->
+                    val headerPub = curr.header(e).merge(curr.subhead(e)) { head, sub ->
+                        if (sub.isNullOrEmpty()) {
+                            head
+                        } else if (head.isEmpty()) {
+                            sub
+                        } else {
+                            "$head, $sub"
+                        }
+                    }.run {
+                        if (curr.progressLabel == null) {
+                            this
+                        } else {
+                            merge(curr.progressLabel!!(e)) { head, prog ->
+                                head + (prog?.let { " [$it]" } ?: "")
+                            }
+                        }
+                    }
+                    val winnerAndRunoff = when {
+                        curr.winner != null && curr.runoff != null -> curr.winner!!(e).merge(curr.runoff!!(e)) { w, r -> w to r }
+                        curr.winner != null -> curr.winner!!(e).map { w -> w to null }
+                        curr.runoff != null -> curr.runoff!!(e).map { r -> null to r }
+                        else -> (null to null).asOneTimePublisher()
+                    }
+                    val entriesPub = curr.votes(e).merge(winnerAndRunoff) { votes, (winner, runoff) ->
+                        val total = votes.values.sum().toDouble()
+                        Aggregators.topAndOthers(votes, (if (list.size > 4) 4 else 5) * (if (partiesOnly) 2 else 1), Candidate.OTHERS).entries
+                            .sortedByDescending { if (it.key == Candidate.OTHERS) -1 else it.value }
+                            .joinToString("\n") { (c, v) ->
+                                "${
+                                    if (c == Candidate.OTHERS) {
+                                        "OTHERS"
+                                    } else if (partiesOnly) {
+                                        c.party.name.uppercase()
+                                    } else {
+                                        "${c.name.uppercase()}${
+                                            if (curr.incumbentMarker.isNotEmpty() && c.isIncumbent()) " ${curr.incumbentMarker}" else ""
+                                        } (${c.party.abbreviation})"
+                                    }
+                                }: ${
+                                    if (total == 0.0) {
+                                        "WAITING..."
+                                    } else if (partiesOnly) {
+                                        DecimalFormat("0.0%").format(v / total)
+                                    } else {
+                                        "${DecimalFormat("#,##0").format(v)} (${DecimalFormat("0.0%").format(v / total)})"
+                                    }
+                                }${
+                                    if (c == winner) {
+                                        " WINNER"
+                                    } else if (runoff?.contains(c) == true) {
+                                        " RUNOFF"
+                                    } else {
+                                        ""
+                                    }
+                                }"
+                            }
+                    }
+                    headerPub.merge(entriesPub) { h, s -> "$h\n$s" }
+                }.combine().map { it.joinToString("\n\n") }
+            }.selfCompose().merge(title) { items, head ->
+                if (head == null) {
+                    items
+                } else {
+                    "$head\n\n$items"
+                }
+            }
+            val screen = MultiResultScreen(title, center, altText)
+            center.layout = GridLayout(1, 0)
+            center.background = Color.WHITE
+            listPublisher.subscribe(
+                Subscriber { list ->
+                    val size = list.size
+                    while (screen.panels.size < size) {
+                        val idx = screen.panels.size
+                        val itemPublisher =
+                            listPublisher.map {
+                                if (idx < it.size) {
+                                    it[idx]
+                                } else {
+                                    null
+                                }
+                            }
+                        itemPublishers.add(itemPublisher)
+                        val newPanel = ResultPanel(
+                            curr.incumbentMarker,
+                            prev?.swingProps?.partyOrder,
+                            map != null,
+                            partiesOnly,
+                        )
+                        newPanel.setVotesPublisher(
+                            itemPublisher.compose {
+                                it?.let(curr.votes)
+                                    ?: emptyMap<Candidate, Int>().asOneTimePublisher()
+                            },
+                        )
+                        if (curr.winner != null) {
+                            newPanel.setWinnerPublisher(
+                                itemPublisher.compose {
+                                    it?.let(curr.winner!!)
+                                        ?: (null as Candidate?).asOneTimePublisher()
+                                },
+                            )
+                        }
+                        if (curr.runoff != null) {
+                            newPanel.setRunoffPublisher(
+                                itemPublisher.compose {
+                                    it?.let(curr.runoff!!)
+                                        ?: (null as Set<Candidate>?).asOneTimePublisher()
+                                },
+                            )
+                        }
+                        if (curr.pctReporting != null) {
+                            newPanel.setPctReportingPublisher(
+                                itemPublisher.compose {
+                                    it?.let(curr.pctReporting!!) ?: 0.0.asOneTimePublisher()
+                                },
+                            )
+                        }
+                        if (curr.progressLabel != null) {
+                            newPanel.setProgressLabelPublisher(
+                                itemPublisher.compose {
+                                    it?.let(curr.progressLabel!!) ?: null.asOneTimePublisher()
+                                },
+                            )
+                        }
+                        newPanel.setHeaderPublisher(
+                            itemPublisher.compose {
+                                it?.let(curr.header) ?: "".asOneTimePublisher()
+                            },
+                        )
+                        newPanel.setSubheadPublisher(
+                            itemPublisher.compose {
+                                it?.let(curr.subhead) ?: "".asOneTimePublisher()
+                            },
+                        )
+                        if (prev != null) {
+                            prev.votes.let { f ->
+                                newPanel.setPrevPublisher(
+                                    itemPublisher.compose {
+                                        it?.let(f)
+                                            ?: emptyMap<Party, Int>().asOneTimePublisher()
+                                    },
+                                )
+                            }
+                            newPanel.setSwingHeaderPublisher(
+                                itemPublisher.compose {
+                                    it?.let(prev.swingProps.header) ?: "".asOneTimePublisher()
+                                },
+                            )
+                        }
+                        if (map != null) {
+                            newPanel.setMapShapePublisher(
+                                itemPublisher.compose {
+                                    (
+                                        (it?.let(map.shapeColors) ?: emptyList())
+                                            .map { e -> e.second.map { c -> e.first to c } }
+                                        ).combine()
+                                },
+                            )
+                            newPanel.setMapFocusPublisher(
+                                itemPublisher.map {
+                                    it?.let(map.focusShapes) ?: emptyList()
+                                },
+                            )
+                            newPanel.setMapHeaderPublisher(
+                                itemPublisher.compose {
+                                    it?.let(map.header) ?: "".asOneTimePublisher()
+                                },
+                            )
+                        }
+                        center.add(newPanel)
+                        screen.panels.add(newPanel)
+                    }
+                    while (screen.panels.size > size) {
+                        val panel = screen.panels.removeAt(size)
+                        panel.unbindAll()
+                        center.remove(panel)
+                        itemPublishers.removeAt(size)
+                    }
+                    val numRows = if (size > 4) 2 else 1
+                    center.layout = GridLayout(numRows, 0)
+                    screen.panels.forEach {
+                        it.displayBothRows = numRows == 1
+                        it.setMaxBarsPublisher(
+                            (
+                                (if (numRows == 2) 4 else 5) * if (partiesOnly) 2 else 1
+                                ).asOneTimePublisher(),
+                        )
+                    }
+                    EventQueue.invokeLater {
+                        screen.panels.forEach { p ->
+                            p.invalidate()
+                            p.revalidate()
+                        }
+                        screen.repaint()
+                    }
+                },
+            )
+
+            return screen
         }
     }
 }
