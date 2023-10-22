@@ -1395,11 +1395,12 @@ class SimpleVoteViewPanel private constructor(
                 }
             }
             val diffBars = diffEntries?.map { entries ->
-                entries.map {
+                entries.mapNotNull {
+                    if (it.diff == null) return@mapNotNull null
                     BarFrameBuilder.DualBar(
                         it.party.abbreviation.uppercase(),
                         it.party.color,
-                        it.diff!!.start,
+                        it.diff.start,
                         it.diff.endInclusive,
                         "(" +
                             CHANGE_DECIMAL_FORMAT.format(100.0 * (it.diff.start)) +
