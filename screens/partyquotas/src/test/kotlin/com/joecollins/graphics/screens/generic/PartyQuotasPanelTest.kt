@@ -1,5 +1,6 @@
 package com.joecollins.graphics.screens.generic
 
+import com.joecollins.graphics.screens.generic.PartyQuotasPanel.Companion.createMap
 import com.joecollins.graphics.utils.PublisherTestUtils.assertPublishes
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.graphics.utils.ShapefileReader
@@ -50,27 +51,31 @@ class PartyQuotasPanelTest {
         val currWinner = Publisher<Party?>(null)
         val round = Publisher(0)
 
-        val panel = PartyQuotasPanel.partyQuotas(
-            currRound.merge(currQuota) { votes, quota -> votes.mapValues { it.value / quota } },
-            5.asOneTimePublisher(),
-            "PARTY SUMMARY".asOneTimePublisher(),
-            round.map { if (it == 0) "WAITING..." else "COUNT $it" },
-        ).withPrev(
-            prevRound,
-            round.map { if (it <= 1) "CHANGE SINCE 2016" else "CHANGE FROM COUNT ${it - 1}" },
-        ).withSwing(
-            currVotes,
-            prevVotes.asOneTimePublisher(),
-            Comparator.comparing { listOf(sf, apni, dup).indexOf(it) },
-            "FIRST PREF SWING".asOneTimePublisher(),
-        ).withPartyMap(
-            niShapesByConstituency().asOneTimePublisher(),
-            9.asOneTimePublisher(),
-            currWinner,
-            listOf(9, 10, 12, 15).asOneTimePublisher(),
-            "BELFAST".asOneTimePublisher(),
-        ).build(
-            "BELFAST EAST".asOneTimePublisher(),
+        val panel = PartyQuotasPanel.partyQuotas<Party>(
+            curr = {
+                quotas = currRound.merge(currQuota) { votes, quota -> votes.mapValues { it.value / quota } }
+                totalSeats = 5.asOneTimePublisher()
+                header = "PARTY SUMMARY".asOneTimePublisher()
+                subhead = round.map { if (it == 0) "WAITING..." else "COUNT $it" }
+            },
+            change = {
+                prevQuotas = prevRound
+                header = round.map { if (it <= 1) "CHANGE SINCE 2016" else "CHANGE FROM COUNT ${it - 1}" }
+            },
+            swing = {
+                this.currVotes = currVotes
+                this.prevVotes = prevVotes.asOneTimePublisher()
+                order = Comparator.comparing { listOf(sf, apni, dup).indexOf(it) }
+                header = "FIRST PREF SWING".asOneTimePublisher()
+            },
+            map = createMap {
+                shapes = niShapesByConstituency().asOneTimePublisher()
+                selectedShape = 9.asOneTimePublisher()
+                leadingParty = currWinner
+                focus = listOf(9, 10, 12, 15).asOneTimePublisher()
+                header = "BELFAST".asOneTimePublisher()
+            },
+            title = "BELFAST EAST".asOneTimePublisher(),
         )
         panel.setSize(1024, 512)
         compareRendering("PartyQuotasPanel", "Quotas-0", panel)
@@ -452,16 +457,18 @@ class PartyQuotasPanelTest {
         val currRound = Publisher(currVotes.mapValues { it.value / currQuota })
         val prevRound = Publisher(prevVotes.mapValues { it.value / prevQuota })
 
-        val panel = PartyQuotasPanel.partyQuotas(
-            currRound,
-            6.asOneTimePublisher(),
-            "PARTY SUMMARY".asOneTimePublisher(),
-            "FIRST PREFERENCES".asOneTimePublisher(),
-        ).withPrev(
-            prevRound,
-            "CHANGE SINCE 2016".asOneTimePublisher(),
-        ).build(
-            "SOUTH AUSTRALIA".asOneTimePublisher(),
+        val panel = PartyQuotasPanel.partyQuotas<Party>(
+            curr = {
+                quotas = currRound
+                totalSeats = 6.asOneTimePublisher()
+                header = "PARTY SUMMARY".asOneTimePublisher()
+                subhead = "FIRST PREFERENCES".asOneTimePublisher()
+            },
+            change = {
+                prevQuotas = prevRound
+                header = "CHANGE SINCE 2016".asOneTimePublisher()
+            },
+            title = "SOUTH AUSTRALIA".asOneTimePublisher(),
         )
         panel.setSize(1024, 512)
         compareRendering("PartyQuotasPanel", "Quotas-Oth", panel)
@@ -515,28 +522,32 @@ class PartyQuotasPanelTest {
         val currWinner = Publisher<Party?>(null)
         val round = Publisher(0)
 
-        val panel = PartyQuotasPanel.partyQuotas(
-            currRound.merge(currQuota) { votes, quota -> votes.mapValues { it.value / quota } },
-            5.asOneTimePublisher(),
-            "PARTY SUMMARY".asOneTimePublisher(),
-            round.map { if (it == 0) "WAITING..." else "COUNT $it" },
-        ).withPrev(
-            prevRound,
-            round.map { if (it <= 1) "CHANGE SINCE 2016" else "CHANGE FROM COUNT ${it - 1}" },
-        ).withSwing(
-            currVotes,
-            prevVotes.asOneTimePublisher(),
-            Comparator.comparing { listOf(sf, apni, dup).indexOf(it) },
-            "FIRST PREF SWING".asOneTimePublisher(),
-            swingRange = 0.02.asOneTimePublisher(),
-        ).withPartyMap(
-            niShapesByConstituency().asOneTimePublisher(),
-            9.asOneTimePublisher(),
-            currWinner,
-            listOf(9, 10, 12, 15).asOneTimePublisher(),
-            "BELFAST".asOneTimePublisher(),
-        ).build(
-            "BELFAST EAST".asOneTimePublisher(),
+        val panel = PartyQuotasPanel.partyQuotas<Party>(
+            curr = {
+                quotas = currRound.merge(currQuota) { votes, quota -> votes.mapValues { it.value / quota } }
+                totalSeats = 5.asOneTimePublisher()
+                header = "PARTY SUMMARY".asOneTimePublisher()
+                subhead = round.map { if (it == 0) "WAITING..." else "COUNT $it" }
+            },
+            change = {
+                prevQuotas = prevRound
+                header = round.map { if (it <= 1) "CHANGE SINCE 2016" else "CHANGE FROM COUNT ${it - 1}" }
+            },
+            swing = {
+                this.currVotes = currVotes
+                this.prevVotes = prevVotes.asOneTimePublisher()
+                order = Comparator.comparing { listOf(sf, apni, dup).indexOf(it) }
+                header = "FIRST PREF SWING".asOneTimePublisher()
+                range = 0.02.asOneTimePublisher()
+            },
+            map = createMap {
+                shapes = niShapesByConstituency().asOneTimePublisher()
+                selectedShape = 9.asOneTimePublisher()
+                leadingParty = currWinner
+                focus = listOf(9, 10, 12, 15).asOneTimePublisher()
+                header = "BELFAST".asOneTimePublisher()
+            },
+            title = "BELFAST EAST".asOneTimePublisher(),
         )
         panel.setSize(1024, 512)
 

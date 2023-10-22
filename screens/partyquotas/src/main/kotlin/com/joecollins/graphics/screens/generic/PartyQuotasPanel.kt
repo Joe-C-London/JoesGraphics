@@ -3,7 +3,6 @@ package com.joecollins.graphics.screens.generic
 import com.joecollins.graphics.GenericPanel
 import com.joecollins.graphics.components.BarFrame
 import com.joecollins.graphics.components.GraphicsFrame
-import com.joecollins.graphics.components.MapFrame
 import com.joecollins.graphics.components.SwingFrame
 import com.joecollins.graphics.components.SwingFrameBuilder
 import com.joecollins.models.general.PartyOrCoalition
@@ -42,99 +41,31 @@ class PartyQuotasPanel private constructor(
 
     companion object {
         fun <P : PartyOrCoalition> partyQuotas(
-            quotas: Flow.Publisher<out Map<out P, Double>>,
-            totalSeats: Flow.Publisher<out Int>,
-            header: Flow.Publisher<out String?>,
-            subhead: Flow.Publisher<out String?>,
-        ): PartyQuotasPanel.PartyQuotaScreenBuilder<P> {
-            return PartyQuotasPanel.PartyQuotaScreenBuilder(
-                quotas,
-                totalSeats,
-                header,
-                subhead,
-            )
-        }
-    }
-
-    class PartyQuotaScreenBuilder<P : PartyOrCoalition>(
-        private val quotas: Flow.Publisher<out Map<out P, Double>>,
-        private val totalSeats: Flow.Publisher<out Int>,
-        private val header: Flow.Publisher<out String?>,
-        private val subhead: Flow.Publisher<out String?>,
-    ) {
-        private var prevQuotas: Flow.Publisher<out Map<out P, Double>>? = null
-        private var changeHeader: Flow.Publisher<out String>? = null
-        private var progressLabel: Flow.Publisher<out String?>? = null
-
-        private var swingCurrVotes: Flow.Publisher<out Map<out P, Int>>? = null
-        private var swingPrevVotes: Flow.Publisher<out Map<out P, Int>>? = null
-        private var swingComparator: Comparator<P>? = null
-        private var swingHeader: Flow.Publisher<out String?>? = null
-        private var swingRange: Flow.Publisher<Double>? = null
-
-        private var mapBuilder: MapFrame? = null
-
-        fun withPrev(
-            prevQuotas: Flow.Publisher<out Map<out P, Double>>,
-            changeHeader: Flow.Publisher<out String>,
-        ): PartyQuotaScreenBuilder<P> {
-            this.prevQuotas = prevQuotas
-            this.changeHeader = changeHeader
-            return this
-        }
-
-        fun withSwing(
-            currVotes: Flow.Publisher<out Map<out P, Int>>,
-            prevVotes: Flow.Publisher<out Map<out P, Int>>,
-            comparator: Comparator<P>,
-            header: Flow.Publisher<out String?>,
-            swingRange: Flow.Publisher<Double> = 0.1.asOneTimePublisher(),
-        ): PartyQuotaScreenBuilder<P> {
-            this.swingCurrVotes = currVotes
-            this.swingPrevVotes = prevVotes
-            this.swingComparator = comparator
-            this.swingHeader = header
-            this.swingRange = swingRange
-            return this
-        }
-
-        fun <T> withPartyMap(
-            shapes: Flow.Publisher<out Map<T, Shape>>,
-            selectedShape: Flow.Publisher<out T>,
-            leadingParty: Flow.Publisher<out P?>,
-            focus: Flow.Publisher<out List<T>?>,
-            header: Flow.Publisher<out String?>,
-        ): PartyQuotaScreenBuilder<P> {
-            mapBuilder = MapBuilder.singleResult(
-                shapes = shapes,
-                selectedShape = selectedShape,
-                leadingParty = leadingParty.map { PartyResult.elected(it?.toParty()) },
-                focus = focus,
-                header = header,
-            )
-            return this
-        }
-
-        fun withProgressLabel(progressLabel: Flow.Publisher<out String?>): PartyQuotaScreenBuilder<P> {
-            this.progressLabel = progressLabel
-            return this
-        }
-
-        fun build(textHeader: Flow.Publisher<out String>): PartyQuotasPanel {
+            curr: Curr<P>.() -> Unit,
+            change: (Change<P>.() -> Unit)? = null,
+            swing: (Swing<P>.() -> Unit)? = null,
+            map: MapPanel<*, P>? = null,
+            title: Flow.Publisher<out String>,
+        ): PartyQuotasPanel {
+            val currProps = Curr<P>().apply(curr)
+            val changeProps = change?.let { Change<P>().apply(it) }
+            val swingProps = swing?.let { Swing<P>().apply(it) }
             return PartyQuotasPanel(
-                textHeader,
-                createFrame(),
+                title,
+                createFrame(currProps),
                 null,
-                createDiffFrame(),
-                createSwingFrame(),
-                mapBuilder,
-                createAltText(textHeader),
+                createDiffFrame(currProps, changeProps),
+                createSwingFrame(swingProps),
+                map?.frame,
+                createAltText(currProps, changeProps, swingProps, title),
             )
         }
 
-        private fun createFrame(): BarFrame {
+        fun <T, P : PartyOrCoalition> createMap(map: MapPanel<T, P>.() -> Unit) = MapPanel<T, P>().apply(map)
+
+        private fun <P : PartyOrCoalition> createFrame(curr: Curr<P>): BarFrame {
             return BarFrame(
-                barsPublisher = quotas.map { q ->
+                barsPublisher = curr.quotas.map { q ->
                     q.entries.asSequence()
                         .sortedByDescending { it.key.overrideSortOrder?.toDouble() ?: it.value }
                         .map {
@@ -146,29 +77,29 @@ class PartyQuotasPanel private constructor(
                         }
                         .toList()
                 },
-                headerPublisher = header,
-                subheadTextPublisher = subhead,
-                maxPublisher = totalSeats,
-                linesPublisher = totalSeats.map { lines -> (1 until lines).map { BarFrame.Line(it, "$it QUOTA${if (it == 1) "" else "S"}") } },
-                headerLabelsPublisher = progressLabel?.map { mapOf(GraphicsFrame.HeaderLabelLocation.RIGHT to it) },
+                headerPublisher = curr.header,
+                subheadTextPublisher = curr.subhead,
+                maxPublisher = curr.totalSeats,
+                linesPublisher = curr.totalSeats.map { lines -> (1 until lines).map { BarFrame.Line(it, "$it QUOTA${if (it == 1) "" else "S"}") } },
+                headerLabelsPublisher = curr.progressLabel?.map { mapOf(GraphicsFrame.HeaderLabelLocation.RIGHT to it) },
             )
         }
 
-        private fun createDiffFrame(): BarFrame? {
-            if (prevQuotas == null) return null
+        private fun <P : PartyOrCoalition> createDiffFrame(curr: Curr<P>, change: Change<P>?): BarFrame? {
+            if (change == null) return null
             return BarFrame(
-                barsPublisher = quotas.merge(prevQuotas!!) { curr, prev ->
-                    if (curr.isEmpty()) {
+                barsPublisher = curr.quotas.merge(change.prevQuotas) { currQuotas, prevQuotas ->
+                    if (currQuotas.isEmpty()) {
                         emptyList()
                     } else {
                         sequenceOf(
-                            curr.asSequence().sortedByDescending { it.key.overrideSortOrder?.toDouble() ?: it.value }.map { it.key },
-                            prev.keys.asSequence().filter { !curr.containsKey(it) }.sortedByDescending { it.overrideSortOrder ?: 0 },
+                            currQuotas.asSequence().sortedByDescending { it.key.overrideSortOrder?.toDouble() ?: it.value }.map { it.key },
+                            prevQuotas.keys.asSequence().filter { !currQuotas.containsKey(it) }.sortedByDescending { it.overrideSortOrder ?: 0 },
                         )
                             .flatten()
                             .distinct()
                             .map { party ->
-                                val diff = (curr[party] ?: 0.0) - (prev[party] ?: 0.0)
+                                val diff = (currQuotas[party] ?: 0.0) - (prevQuotas[party] ?: 0.0)
                                 BarFrame.Bar(
                                     leftText = party.abbreviation.uppercase(),
                                     rightText = DecimalFormat("+0.00;-0.00").format(diff),
@@ -178,27 +109,30 @@ class PartyQuotasPanel private constructor(
                             .toList()
                     }
                 },
-                headerPublisher = changeHeader ?: (null as String?).asOneTimePublisher(),
+                headerPublisher = change.header,
                 maxPublisher = 1.asOneTimePublisher(),
                 minPublisher = (-1).asOneTimePublisher(),
             )
         }
 
-        private fun createSwingFrame(): SwingFrame? {
-            return swingHeader?.let { header ->
-                val prev = swingPrevVotes!!
-                val curr = swingCurrVotes!!
+        private fun <P : PartyOrCoalition> createSwingFrame(swing: Swing<P>?): SwingFrame? {
+            return swing?.run {
                 SwingFrameBuilder.prevCurr(
-                    prev = prev,
-                    curr = curr,
-                    partyOrder = swingComparator!!,
-                    range = swingRange!!,
+                    prev = prevVotes,
+                    curr = currVotes,
+                    partyOrder = order,
+                    range = range,
                     header = header,
                 )
             }
         }
 
-        private fun createAltText(textHeader: Flow.Publisher<out String?>): Flow.Publisher<String> {
+        private fun <P : PartyOrCoalition> createAltText(
+            curr: Curr<P>,
+            change: Change<P>?,
+            swing: Swing<P>?,
+            title: Flow.Publisher<out String?>,
+        ): Flow.Publisher<String> {
             val combineHeaderAndSubhead: (String?, String?) -> String? = { h, s ->
                 if (h == null) {
                     s
@@ -208,28 +142,40 @@ class PartyQuotasPanel private constructor(
                     "$h, $s"
                 }
             }
-            val mainHeader = header.merge(subhead, combineHeaderAndSubhead)
-                .merge(changeHeader ?: null.asOneTimePublisher()) { h, c ->
-                    if (c == null) {
-                        h
+            val mainHeader = curr.header.merge(curr.subhead, combineHeaderAndSubhead)
+                .run {
+                    if (change == null) {
+                        this
                     } else {
-                        "${h ?: ""} ($c)"
+                        merge(change.header) { h, c ->
+                            if (c == null) {
+                                h
+                            } else {
+                                "${h ?: ""} ($c)"
+                            }
+                        }
                     }
-                }.merge(progressLabel ?: null.asOneTimePublisher()) { h, p ->
-                    if (p == null) {
-                        h
+                }.run {
+                    if (curr.progressLabel == null) {
+                        this
                     } else {
-                        "${h ?: ""} [$p]"
+                        merge(curr.progressLabel!!) { h, p ->
+                            if (p == null) {
+                                h
+                            } else {
+                                "${h ?: ""} [$p]"
+                            }
+                        }
                     }
                 }
-            val mainEntries = quotas.merge(prevQuotas ?: null.asOneTimePublisher()) { curr, prev ->
-                val entries = curr.entries
+            val mainEntries = curr.quotas.merge(change?.prevQuotas ?: null.asOneTimePublisher()) { currQuotas, prevQuotas ->
+                val entries = currQuotas.entries
                     .sortedByDescending { it.key.overrideSortOrder?.toDouble() ?: it.value }
                     .joinToString("") { e ->
                         "\n${e.key.name.uppercase()}: ${DecimalFormat("0.00").format(e.value)} QUOTAS" +
-                            (if (prev == null) "" else " (${DecimalFormat("+0.00;-0.00").format(e.value - (prev[e.key] ?: 0.0))})")
+                            (if (prevQuotas == null) "" else " (${DecimalFormat("+0.00;-0.00").format(e.value - (prevQuotas[e.key] ?: 0.0))})")
                     }
-                val others = prev?.filterKeys { curr.isNotEmpty() && !curr.containsKey(it) }
+                val others = prevQuotas?.filterKeys { currQuotas.isNotEmpty() && !currQuotas.containsKey(it) }
                     ?.entries
                     ?.sortedByDescending { it.key.overrideSortOrder?.toDouble() ?: it.value }
                     ?.joinToString("") { "\n${it.key.name.uppercase()}: - (-${DecimalFormat("0.00").format(it.value)})" }
@@ -243,11 +189,11 @@ class PartyQuotasPanel private constructor(
                     ("$h$e")
                 }
             }
-            val swingText = if (swingPrevVotes == null || swingCurrVotes == null) {
+            val swingText = if (swing == null) {
                 null
             } else {
-                createSwingFrame()?.altText
-                    ?.merge(swingHeader ?: null.asOneTimePublisher()) { t, h ->
+                createSwingFrame(swing)?.altText
+                    ?.merge(swing.header) { t, h ->
                         if (h == null) {
                             t
                         } else {
@@ -255,7 +201,7 @@ class PartyQuotasPanel private constructor(
                         }
                     }
             }
-            return textHeader.merge(mainText) { h, m -> "$h\n\n$m" }
+            return title.merge(mainText) { h, m -> "$h\n\n$m" }
                 .merge(swingText ?: null.asOneTimePublisher()) { h, s ->
                     if (s == null) {
                         h
@@ -263,6 +209,45 @@ class PartyQuotasPanel private constructor(
                         "$h\n\n$s"
                     }
                 }
+        }
+    }
+
+    class Curr<P : PartyOrCoalition> internal constructor() {
+        lateinit var quotas: Flow.Publisher<out Map<out P, Double>>
+        lateinit var totalSeats: Flow.Publisher<out Int>
+        lateinit var header: Flow.Publisher<out String?>
+        lateinit var subhead: Flow.Publisher<out String?>
+        var progressLabel: Flow.Publisher<out String?>? = null
+    }
+
+    class Change<P : PartyOrCoalition> internal constructor() {
+        lateinit var prevQuotas: Flow.Publisher<out Map<out P, Double>>
+        lateinit var header: Flow.Publisher<out String?>
+    }
+
+    class Swing<P : PartyOrCoalition> internal constructor() {
+        lateinit var currVotes: Flow.Publisher<out Map<out P, Int>>
+        lateinit var prevVotes: Flow.Publisher<out Map<out P, Int>>
+        lateinit var order: Comparator<P>
+        lateinit var header: Flow.Publisher<out String?>
+        var range: Flow.Publisher<Double>? = null
+    }
+
+    class MapPanel<T, P : PartyOrCoalition> internal constructor() {
+        lateinit var shapes: Flow.Publisher<out Map<T, Shape>>
+        lateinit var selectedShape: Flow.Publisher<out T>
+        lateinit var leadingParty: Flow.Publisher<out P?>
+        lateinit var focus: Flow.Publisher<out List<T>?>
+        lateinit var header: Flow.Publisher<out String?>
+
+        internal val frame by lazy {
+            MapBuilder.singleResult(
+                shapes = shapes,
+                selectedShape = selectedShape,
+                leadingParty = leadingParty.map { PartyResult.elected(it?.toParty()) },
+                focus = focus,
+                header = header,
+            )
         }
     }
 }
