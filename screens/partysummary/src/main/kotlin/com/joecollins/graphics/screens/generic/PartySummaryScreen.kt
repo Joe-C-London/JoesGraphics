@@ -6,6 +6,7 @@ import com.joecollins.models.general.PartyOrCoalition
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
+import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.combine
 import com.joecollins.pubsub.map
 import com.joecollins.pubsub.merge
@@ -78,139 +79,37 @@ class PartySummaryScreen private constructor(
         }
     }
 
-    class Builder<T>(
-        private val mainRegion: T,
-        private val titleFunc: (T) -> Flow.Publisher<out String>,
-        private val numRows: Int,
-    ) {
-        private var seatFunc: ((T) -> Flow.Publisher<out Map<out PartyOrCoalition, Int>>)? = null
-        private var seatDiffFunc: ((T) -> Flow.Publisher<out Map<out PartyOrCoalition, Int>>)? = null
-        private var seatsHeader = "SEATS"
-        private var votePctFunc: ((T) -> Flow.Publisher<out Map<out PartyOrCoalition, Double>>)? = null
-        private var votePctDiffFunc: ((T) -> Flow.Publisher<out Map<out PartyOrCoalition, Double>>)? = null
-        private var voteHeader = "POPULAR VOTE"
+    class Seats<T> internal constructor() {
+        lateinit var curr: (T.() -> Flow.Publisher<out Map<out PartyOrCoalition, Int>>)
+        var diff: (T.() -> Flow.Publisher<out Map<out PartyOrCoalition, Int>>)? = null
+        var prev: (T.() -> Flow.Publisher<out Map<out PartyOrCoalition, Int>>)? = null
+        var header: String = "SEATS"
 
-        private val regions: MutableList<T> = ArrayList()
-
-        fun withSeatAndDiff(
-            seatFunc: ((T) -> Flow.Publisher<out Map<out PartyOrCoalition, Int>>),
-            seatDiffFunc: ((T) -> Flow.Publisher<out Map<out PartyOrCoalition, Int>>),
-            seatsHeader: String = "SEATS",
-        ): Builder<T> {
-            this.seatFunc = seatFunc
-            this.seatDiffFunc = seatDiffFunc
-            this.seatsHeader = seatsHeader
-            return this
-        }
-
-        fun withSeatAndPrev(
-            seatFunc: ((T) -> Flow.Publisher<out Map<out PartyOrCoalition, Int>>),
-            seatPrevFunc: ((T) -> Flow.Publisher<out Map<out PartyOrCoalition, Int>>),
-            seatsHeader: String = "SEATS",
-        ): Builder<T> {
-            val seatDiffFunc = { t: T ->
-                val curr = seatFunc(t)
-                val prev = seatPrevFunc(t)
-                curr.merge(prev) { c, p ->
+        val calculatedDiff: T.() -> Flow.Publisher<out Map<out PartyOrCoalition, Int>> by lazy {
+            diff ?: {
+                curr().merge(prev!!()) { c, p ->
                     sequenceOf(c.keys.asSequence(), p.keys.asSequence()).flatten()
                         .distinct()
                         .associateWith { (c[it] ?: 0) - (p[it] ?: 0) }
                 }
             }
-            return withSeatAndDiff(seatFunc, seatDiffFunc, seatsHeader)
         }
+    }
 
-        fun withVotePctAndDiff(
-            votePctFunc: ((T) -> Flow.Publisher<out Map<out PartyOrCoalition, Double>>),
-            votePctDiffFunc: ((T) -> Flow.Publisher<out Map<out PartyOrCoalition, Double>>),
-            voteHeader: String = "POPULAR VOTE",
-        ): Builder<T> {
-            this.votePctFunc = votePctFunc
-            this.votePctDiffFunc = votePctDiffFunc
-            this.voteHeader = voteHeader
-            return this
-        }
+    class Votes<T> internal constructor() {
+        lateinit var currPct: (T.() -> Flow.Publisher<out Map<out PartyOrCoalition, Double>>)
+        var diffPct: (T.() -> Flow.Publisher<out Map<out PartyOrCoalition, Double>>)? = null
+        var prevPct: (T.() -> Flow.Publisher<out Map<out PartyOrCoalition, Double>>)? = null
+        var header: String = "POPULAR VOTE"
 
-        fun withVotePctAndPrev(
-            votePctFunc: ((T) -> Flow.Publisher<out Map<out PartyOrCoalition, Double>>),
-            votePctPrevFunc: ((T) -> Flow.Publisher<out Map<out PartyOrCoalition, Double>>),
-            voteHeader: String = "POPULAR VOTE",
-        ): Builder<T> {
-            val votePctDiffFunc = { t: T ->
-                val curr = votePctFunc(t)
-                val prev = votePctPrevFunc(t)
-                curr.merge(prev) { c, p ->
+        val calculatedDiff: T.() -> Flow.Publisher<out Map<out PartyOrCoalition, Double>> by lazy {
+            diffPct ?: {
+                currPct().merge(prevPct!!()) { c, p ->
                     sequenceOf(c.keys.asSequence(), p.keys.asSequence()).flatten()
                         .distinct()
                         .associateWith { (c[it] ?: 0.0) - (p[it] ?: 0.0) }
                 }
             }
-            return withVotePctAndDiff(votePctFunc, votePctDiffFunc, voteHeader)
-        }
-
-        fun withRegion(region: T): Builder<T> {
-            regions.add(region)
-            return this
-        }
-
-        fun build(partyPublisher: Flow.Publisher<out PartyOrCoalition>): PartySummaryScreen {
-            return PartySummaryScreen(
-                partyPublisher,
-                createFrame(mainRegion, partyPublisher),
-                regions.map { createFrame(it, partyPublisher) },
-                numRows,
-                createAltText(partyPublisher),
-            )
-        }
-
-        private fun createFrame(region: T, party: Flow.Publisher<out PartyOrCoalition>): RegionSummaryFrame {
-            val input = createInput(region, party)
-            val seatPublisher = input.seatPublisher
-            val votePublisher = input.votePublisher
-            val (headers, values) = when {
-                seatFunc == null -> listOf(voteHeader) to votePublisher.map { listOf(it) }
-                votePctFunc == null -> listOf(seatsHeader) to seatPublisher.map { listOf(it) }
-                else -> listOf(seatsHeader, voteHeader) to seatPublisher.merge(votePublisher) { s, v -> listOf(s, v) }
-            }
-            return RegionSummaryFrame(
-                headerPublisher = titleFunc(region),
-                summaryColorPublisher = party.map { it.color },
-                sectionsPublisher = values.map { value ->
-                    value.zip(headers) { v, h -> RegionSummaryFrame.SectionWithoutColor(h, v) }
-                },
-            )
-        }
-
-        private fun createInput(
-            region: T,
-            party: Flow.Publisher<out PartyOrCoalition>,
-        ): SinglePartyInput {
-            val input = SinglePartyInput()
-            seatFunc?.invoke(region)?.subscribe(Subscriber { input.seats = it })
-            seatDiffFunc?.invoke(region)?.subscribe(Subscriber { input.seatDiff = it })
-            votePctFunc?.invoke(region)?.subscribe(Subscriber { input.votePct = it })
-            votePctDiffFunc?.invoke(region)?.subscribe(Subscriber { input.votePctDiff = it })
-            party.subscribe(Subscriber { input.party = it })
-            return input
-        }
-
-        private fun createAltText(partyPublisher: Flow.Publisher<out PartyOrCoalition>): Flow.Publisher<String> {
-            val entries = regions.map { createAltTextLine(it, partyPublisher) }
-                .combine()
-                .map { it.joinToString("\n") }
-            return partyPublisher.map { "${it.name.uppercase()} SUMMARY" }
-                .merge(createAltTextLine(mainRegion, partyPublisher)) { h, m -> "$h\n\n$m" }
-                .merge(entries) { h, e -> "$h\n\n$e" }
-        }
-
-        private fun createAltTextLine(region: T, party: Flow.Publisher<out PartyOrCoalition>): Flow.Publisher<String> {
-            val input = createInput(region, party)
-            val seatPublisher = input.seatPublisher
-            val votePublisher = input.votePublisher
-            val seatsText = seatPublisher.map { (seats, diff) -> if (seatFunc == null) null else "$seatsHeader: $seats ($diff)" }
-            val votesText = votePublisher.map { (pct, diff) -> if (votePctFunc == null) null else "$voteHeader: $pct ($diff)" }
-            return seatsText.merge(votesText) { seats, votes -> sequenceOf(seats, votes).filterNotNull().joinToString("; ") }
-                .merge(titleFunc(region)) { text, title -> "$title: $text" }
         }
     }
 
@@ -272,38 +171,116 @@ class PartySummaryScreen private constructor(
     companion object {
         fun <T> of(
             mainRegion: T,
-            titleFunc: (T) -> Flow.Publisher<out String>,
+            header: T.() -> Flow.Publisher<out String>,
             numRows: Int,
-        ): Builder<T> {
-            return Builder(mainRegion, titleFunc, numRows)
+            seats: (Seats<T>.() -> Unit)? = null,
+            votes: (Votes<T>.() -> Unit)? = null,
+            regions: List<T>,
+            party: Flow.Publisher<out PartyOrCoalition>,
+        ): PartySummaryScreen {
+            return build(
+                mainRegion,
+                header,
+                numRows,
+                seats?.let { Seats<T>().apply(it) },
+                votes?.let { Votes<T>().apply(it) },
+                regions,
+                party,
+            )
         }
 
-        fun <T> ofDiff(
+        private fun <T> build(
             mainRegion: T,
-            titleFunc: (T) -> Flow.Publisher<out String>,
-            seatFunc: (T) -> Flow.Publisher<out Map<out PartyOrCoalition, Int>>,
-            seatDiffFunc: (T) -> Flow.Publisher<out Map<out PartyOrCoalition, Int>>,
-            votePctFunc: (T) -> Flow.Publisher<out Map<out PartyOrCoalition, Double>>,
-            votePctDiffFunc: (T) -> Flow.Publisher<out Map<out PartyOrCoalition, Double>>,
+            header: T.() -> Flow.Publisher<out String>,
             numRows: Int,
-        ): Builder<T> {
-            return Builder(mainRegion, titleFunc, numRows)
-                .withSeatAndDiff(seatFunc, seatDiffFunc)
-                .withVotePctAndDiff(votePctFunc, votePctDiffFunc)
+            seats: Seats<T>?,
+            votes: Votes<T>?,
+            regions: List<T>,
+            party: Flow.Publisher<out PartyOrCoalition>,
+        ): PartySummaryScreen {
+            return PartySummaryScreen(
+                party,
+                createFrame(mainRegion, header, party, seats, votes),
+                regions.map { createFrame(it, header, party, seats, votes) },
+                numRows,
+                createAltText(party, header, mainRegion, regions, seats, votes),
+            )
         }
 
-        fun <T> ofPrev(
+        private fun <T> createFrame(
+            region: T,
+            header: T.() -> Flow.Publisher<out String>,
+            party: Flow.Publisher<out PartyOrCoalition>,
+            seats: Seats<T>?,
+            votes: Votes<T>?,
+        ): RegionSummaryFrame {
+            val input = createInput(region, party, seats, votes)
+            val seatPublisher = input.seatPublisher
+            val votePublisher = input.votePublisher
+            val (headers, values) = when {
+                seats != null && votes != null -> listOf(seats.header, votes.header) to seatPublisher.merge(votePublisher) { s, v -> listOf(s, v) }
+                votes != null -> listOf(votes.header) to votePublisher.map { listOf(it) }
+                seats != null -> listOf(seats.header) to seatPublisher.map { listOf(it) }
+                else -> listOf<String>() to listOf<List<String>>().asOneTimePublisher()
+            }
+            return RegionSummaryFrame(
+                headerPublisher = region.header(),
+                summaryColorPublisher = party.map { it.color },
+                sectionsPublisher = values.map { value ->
+                    value.zip(headers) { v, h -> RegionSummaryFrame.SectionWithoutColor(h, v) }
+                },
+            )
+        }
+
+        private fun <T> createInput(
+            region: T,
+            party: Flow.Publisher<out PartyOrCoalition>,
+            seats: Seats<T>?,
+            votes: Votes<T>?,
+        ): SinglePartyInput {
+            val input = SinglePartyInput()
+            seats?.apply {
+                region.curr().subscribe(Subscriber { input.seats = it })
+                region.calculatedDiff().subscribe(Subscriber { input.seatDiff = it })
+            }
+            votes?.apply {
+                region.currPct().subscribe(Subscriber { input.votePct = it })
+                region.calculatedDiff().subscribe(Subscriber { input.votePctDiff = it })
+            }
+            party.subscribe(Subscriber { input.party = it })
+            return input
+        }
+
+        private fun <T> createAltText(
+            partyPublisher: Flow.Publisher<out PartyOrCoalition>,
+            header: T.() -> Flow.Publisher<out String>,
             mainRegion: T,
-            titleFunc: (T) -> Flow.Publisher<out String>,
-            seatFunc: (T) -> Flow.Publisher<out Map<out PartyOrCoalition, Int>>,
-            seatPrevFunc: (T) -> Flow.Publisher<out Map<out PartyOrCoalition, Int>>,
-            votePctFunc: (T) -> Flow.Publisher<out Map<out PartyOrCoalition, Double>>,
-            votePctPrevFunc: (T) -> Flow.Publisher<out Map<out PartyOrCoalition, Double>>,
-            numRows: Int,
-        ): Builder<T> {
-            return Builder(mainRegion, titleFunc, numRows)
-                .withSeatAndPrev(seatFunc, seatPrevFunc)
-                .withVotePctAndPrev(votePctFunc, votePctPrevFunc)
+            regions: List<T>,
+            seats: Seats<T>?,
+            votes: Votes<T>?,
+        ): Flow.Publisher<String> {
+            val entries = regions.map { createAltTextLine(it, header, partyPublisher, seats, votes) }
+                .combine()
+                .map { it.joinToString("\n") }
+            return partyPublisher.map { "${it.name.uppercase()} SUMMARY" }
+                .merge(createAltTextLine(mainRegion, header, partyPublisher, seats, votes)) { h, m -> "$h\n\n$m" }
+                .merge(entries) { h, e -> "$h\n\n$e" }
+        }
+
+        private fun <T> createAltTextLine(
+            region: T,
+            header: T.() -> Flow.Publisher<out String>,
+            party: Flow.Publisher<out PartyOrCoalition>,
+            seats: Seats<T>?,
+            votes: Votes<T>?,
+        ): Flow.Publisher<String> {
+            val input = createInput(region, party, seats, votes)
+            val seatPublisher = input.seatPublisher
+            val votePublisher = input.votePublisher
+            val seatsText = seatPublisher.map { (curr, diff) -> if (seats == null) null else "${seats.header}: $curr ($diff)" }
+            val votesText = votePublisher.map { (curr, diff) -> if (votes == null) null else "${votes.header}: $curr ($diff)" }
+            return seatsText.merge(votesText) { seatText, voteText -> sequenceOf(seatText, voteText).filterNotNull().joinToString("; ") }
+                .merge(header(region)) { text, title -> "$title: $text" }
         }
     }
 }

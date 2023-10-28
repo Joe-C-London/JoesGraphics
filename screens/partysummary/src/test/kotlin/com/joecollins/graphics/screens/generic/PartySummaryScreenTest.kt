@@ -26,22 +26,21 @@ class PartySummaryScreenTest {
         val atlantic = Region("Atlantic")
         val north = Region("North")
         val partySelected = Publisher(lib)
-        val screen = PartySummaryScreen.ofDiff(
-            canada,
-            { r -> r.name.uppercase().asOneTimePublisher() },
-            { r -> r.seatsPublisher },
-            { r -> r.seatDiffPublisher },
-            { r -> r.votePublisher },
-            { r -> r.voteDiffPublisher },
-            3,
+        val screen = PartySummaryScreen.of(
+            mainRegion = canada,
+            header = { name.uppercase().asOneTimePublisher() },
+            seats = {
+                curr = { seatsPublisher }
+                diff = { seatDiffPublisher }
+            },
+            votes = {
+                currPct = { votePublisher }
+                diffPct = { voteDiffPublisher }
+            },
+            numRows = 3,
+            regions = listOf(bc, prairies, ontario, quebec, atlantic, north),
+            party = partySelected,
         )
-            .withRegion(bc)
-            .withRegion(prairies)
-            .withRegion(ontario)
-            .withRegion(quebec)
-            .withRegion(atlantic)
-            .withRegion(north)
-            .build(partySelected)
         screen.setSize(1024, 512)
         compareRendering("PartySummaryScreen", "SingleParty-1", screen)
         assertPublishes(
@@ -180,22 +179,21 @@ class PartySummaryScreenTest {
         val atlantic = Region("Atlantic")
         val north = Region("North")
         val partySelected = Publisher(lib)
-        val screen = PartySummaryScreen.ofPrev(
-            canada,
-            { r -> r.name.uppercase().asOneTimePublisher() },
-            { r -> r.seatsPublisher },
-            { r -> r.prevSeatPublisher },
-            { r -> r.votePublisher },
-            { r -> r.prevVotePublisher },
-            3,
+        val screen = PartySummaryScreen.of(
+            mainRegion = canada,
+            header = { name.uppercase().asOneTimePublisher() },
+            seats = {
+                curr = { seatsPublisher }
+                prev = { prevSeatPublisher }
+            },
+            votes = {
+                currPct = { votePublisher }
+                prevPct = { prevVotePublisher }
+            },
+            numRows = 3,
+            regions = listOf(bc, prairies, ontario, quebec, atlantic, north),
+            party = partySelected,
         )
-            .withRegion(bc)
-            .withRegion(prairies)
-            .withRegion(ontario)
-            .withRegion(quebec)
-            .withRegion(atlantic)
-            .withRegion(north)
-            .build(partySelected)
         screen.setSize(1024, 512)
         compareRendering("PartySummaryScreen", "SingleParty-1", screen)
         assertPublishes(
@@ -335,22 +333,17 @@ class PartySummaryScreenTest {
         val north = Region("North")
         val partySelected = Publisher(lib)
         val screen = PartySummaryScreen.of(
-            canada,
-            { r -> r.name.uppercase().asOneTimePublisher() },
-            3,
+            mainRegion = canada,
+            header = { name.uppercase().asOneTimePublisher() },
+            numRows = 3,
+            seats = {
+                curr = { seatsPublisher }
+                diff = { seatDiffPublisher }
+                header = "SEAT PROJECTION"
+            },
+            regions = listOf(bc, prairies, ontario, quebec, atlantic, north),
+            party = partySelected,
         )
-            .withSeatAndDiff(
-                { r -> r.seatsPublisher },
-                { r -> r.seatDiffPublisher },
-                "SEAT PROJECTION",
-            )
-            .withRegion(bc)
-            .withRegion(prairies)
-            .withRegion(ontario)
-            .withRegion(quebec)
-            .withRegion(atlantic)
-            .withRegion(north)
-            .build(partySelected)
         screen.setSize(1024, 512)
         compareRendering("PartySummaryScreen", "SinglePartySeatsOnly-1", screen)
         assertPublishes(
@@ -490,22 +483,17 @@ class PartySummaryScreenTest {
         val north = Region("North")
         val partySelected = Publisher(lib)
         val screen = PartySummaryScreen.of(
-            canada,
-            { r -> r.name.uppercase().asOneTimePublisher() },
-            3,
+            mainRegion = canada,
+            header = { name.uppercase().asOneTimePublisher() },
+            numRows = 3,
+            votes = {
+                currPct = { votePublisher }
+                diffPct = { voteDiffPublisher }
+                header = "CENTRAL VOTE FORECAST"
+            },
+            regions = listOf(bc, prairies, ontario, quebec, atlantic, north),
+            party = partySelected,
         )
-            .withVotePctAndDiff(
-                { r -> r.votePublisher },
-                { r -> r.voteDiffPublisher },
-                "CENTRAL VOTE FORECAST",
-            )
-            .withRegion(bc)
-            .withRegion(prairies)
-            .withRegion(ontario)
-            .withRegion(quebec)
-            .withRegion(atlantic)
-            .withRegion(north)
-            .build(partySelected)
         screen.setSize(1024, 512)
         compareRendering("PartySummaryScreen", "SinglePartyVotesOnly-1", screen)
         assertPublishes(
