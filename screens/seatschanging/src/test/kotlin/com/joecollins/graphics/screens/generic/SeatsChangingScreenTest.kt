@@ -20,14 +20,14 @@ class SeatsChangingScreenTest {
         val numRows = Publisher(15)
         val title = Publisher("BRITISH COLUMBIA")
         val panel = SeatsChangingScreen.of(
-            prevResult,
-            prevWinners,
-            currResult,
-            { it.uppercase() },
-            "SEATS CHANGING".asOneTimePublisher(),
+            prevResult = prevResult,
+            prevWinner = prevWinners,
+            currResult = currResult,
+            name = { uppercase() },
+            header = "SEATS CHANGING".asOneTimePublisher(),
+            numRows = numRows,
+            title = title,
         )
-            .withNumRows(numRows)
-            .build(title)
         panel.setSize(1024, 512)
         compareRendering("SeatsChangingScreen", "Basic-1", panel)
         assertPublishes(
@@ -104,15 +104,15 @@ class SeatsChangingScreenTest {
                 .toSet(),
         )
         val panel = SeatsChangingScreen.of(
-            prevResult,
-            prevWinners,
-            currResult,
-            { it.uppercase() },
-            "SEATS CHANGING".asOneTimePublisher(),
+            prevResult = prevResult,
+            prevWinner = prevWinners,
+            currResult = currResult,
+            name = { uppercase() },
+            header = "SEATS CHANGING".asOneTimePublisher(),
+            numRows = numRows,
+            seatFilter = filteredSeats,
+            title = title,
         )
-            .withNumRows(numRows)
-            .withSeatFilter(filteredSeats)
-            .build(title)
         panel.setSize(1024, 512)
         compareRendering("SeatsChangingScreen", "Filtered-1", panel)
         assertPublishes(
@@ -184,14 +184,14 @@ class SeatsChangingScreenTest {
         val numRows = Publisher(15)
         val title = Publisher("BRITISH COLUMBIA")
         val panel = SeatsChangingScreen.of(
-            prevResult,
-            prevWinners,
-            currResult,
-            { it.uppercase() },
-            "SEATS CHANGING".asOneTimePublisher(),
+            prevResult = prevResult,
+            prevWinner = prevWinners,
+            currResult = currResult,
+            name = { uppercase() },
+            header = "SEATS CHANGING".asOneTimePublisher(),
+            numRows = numRows,
+            title = title,
         )
-            .withNumRows(numRows)
-            .build(title)
         panel.setSize(1024, 512)
         compareRendering("SeatsChangingScreen", "Basic-1", panel)
         assertPublishes(
@@ -226,15 +226,15 @@ class SeatsChangingScreenTest {
         val numRows = Publisher(15)
         val title = Publisher("BRITISH COLUMBIA")
         val panel = SeatsChangingScreen.of(
-            prevResult,
-            prevWinners,
-            currResult,
-            { it.uppercase() },
-            "SEATS CHANGING".asOneTimePublisher(),
+            prevResult = prevResult,
+            prevWinner = prevWinners,
+            currResult = currResult,
+            name = { uppercase() },
+            header = "SEATS CHANGING".asOneTimePublisher(),
+            numRows = numRows,
+            partyChanges = mapOf(lib to bcu).asOneTimePublisher(),
+            title = title,
         )
-            .withNumRows(numRows)
-            .withPartyChanges(mapOf(lib to bcu).asOneTimePublisher())
-            .build(title)
         panel.setSize(1024, 512)
         compareRendering("SeatsChangingScreen", "PartyChanges-1", panel)
         assertPublishes(
