@@ -77,15 +77,15 @@ class RegionalSwingsScreenTest {
             ),
         )
         val screen = RegionalSwingsScreen.of(
-            states,
-            { it.name.uppercase().asOneTimePublisher() },
-            { it.curr.asOneTimePublisher() },
-            { it.prev.asOneTimePublisher() },
-            Comparator.comparing { if (it == alp) 0 else 1 },
-            2,
+            regions = states,
+            name = { name.uppercase().asOneTimePublisher() },
+            currVotes = { curr.asOneTimePublisher() },
+            prevVotes = { prev.asOneTimePublisher() },
+            swingOrder = Comparator.comparing { if (it == alp) 0 else 1 },
+            numRows = 2,
+            progressLabel = { (DecimalFormat("0.0%").format(reporting) + " IN").asOneTimePublisher() },
+            title = "AUSTRALIA".asOneTimePublisher(),
         )
-            .withProgressLabel { (DecimalFormat("0.0%").format(it.reporting) + " IN").asOneTimePublisher() }
-            .build("AUSTRALIA".asOneTimePublisher())
         screen.setSize(1024, 512)
         compareRendering("RegionalSwingsScreen", "Basic", screen)
         assertPublishes(
@@ -247,21 +247,21 @@ class RegionalSwingsScreenTest {
             ),
         )
         val screen = RegionalSwingsScreen.of(
-            regions,
-            { it.name.uppercase().asOneTimePublisher() },
-            { it.curr.asOneTimePublisher() },
-            { it.prev.asOneTimePublisher() },
-            Comparator.comparing {
+            regions = regions,
+            name = { name.uppercase().asOneTimePublisher() },
+            currVotes = { curr.asOneTimePublisher() },
+            prevVotes = { prev.asOneTimePublisher() },
+            swingOrder = Comparator.comparing {
                 when (it) {
                     lab -> -1
                     con -> 1
                     else -> 0
                 }
             },
-            2,
+            numRows = 2,
+            partyFilter = setOf(con, lab).asOneTimePublisher(),
+            title = "UNITED KINGDOM".asOneTimePublisher(),
         )
-            .withPartyFilter(setOf(con, lab).asOneTimePublisher())
-            .build("UNITED KINGDOM".asOneTimePublisher())
         screen.setSize(1024, 512)
         compareRendering("RegionalSwingsScreen", "PartiesSelected", screen)
         assertPublishes(

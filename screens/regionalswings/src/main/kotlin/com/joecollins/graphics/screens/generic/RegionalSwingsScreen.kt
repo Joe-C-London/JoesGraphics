@@ -3,7 +3,6 @@ package com.joecollins.graphics.screens.generic
 import com.joecollins.graphics.GenericPanel
 import com.joecollins.graphics.components.SwingFrameBuilder
 import com.joecollins.models.general.PartyOrCoalition
-import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.combine
 import com.joecollins.pubsub.merge
 import java.awt.Color
@@ -18,49 +17,28 @@ class RegionalSwingsScreen private constructor(
     altText: Flow.Publisher<String>,
 ) : GenericPanel(panel, title, altText) {
 
-    class Builder<R, POC : PartyOrCoalition>(
-        private val regions: List<R>,
-        private val name: (R) -> Flow.Publisher<String>,
-        private val currVotes: (R) -> Flow.Publisher<out Map<out POC, Int>>,
-        private val prevVotes: (R) -> Flow.Publisher<out Map<out POC, Int>>,
-        private val swingOrder: Comparator<POC>,
-        private val numRows: Int,
-    ) {
-        private var progressLabel: (R) -> Flow.Publisher<out String?> = { null.asOneTimePublisher() }
-        private var swingRange: Flow.Publisher<Double> = 0.10.asOneTimePublisher()
-        private var partyFilter: Flow.Publisher<out Collection<POC>>? = null
-
-        fun withProgressLabel(
-            progress: (R) -> Flow.Publisher<out String?>,
-        ): Builder<R, POC> {
-            this.progressLabel = progress
-            return this
-        }
-
-        fun withRange(
-            swingRange: Flow.Publisher<Double>,
-        ): Builder<R, POC> {
-            this.swingRange = swingRange
-            return this
-        }
-
-        fun withPartyFilter(
-            partyFilter: Flow.Publisher<out Collection<POC>>,
-        ): Builder<R, POC> {
-            this.partyFilter = partyFilter
-            return this
-        }
-
-        fun build(title: Flow.Publisher<String>): RegionalSwingsScreen {
+    companion object {
+        fun <R, POC : PartyOrCoalition> of(
+            regions: List<R>,
+            name: R.() -> Flow.Publisher<String>,
+            currVotes: R.() -> Flow.Publisher<out Map<out POC, Int>>,
+            prevVotes: R.() -> Flow.Publisher<out Map<out POC, Int>>,
+            swingOrder: Comparator<POC>,
+            numRows: Int,
+            progressLabel: (R.() -> Flow.Publisher<out String?>)? = null,
+            swingRange: Flow.Publisher<Double>? = null,
+            partyFilter: Flow.Publisher<out Collection<POC>>? = null,
+            title: Flow.Publisher<String>,
+        ): RegionalSwingsScreen {
             val swings = regions.map {
                 it to SwingFrameBuilder.prevCurr(
-                    prev = prevVotes(it),
-                    curr = currVotes(it),
+                    prev = it.prevVotes(),
+                    curr = it.currVotes(),
                     partyOrder = swingOrder,
                     selectedParties = partyFilter,
                     range = swingRange,
-                    header = name(it),
-                    progress = progressLabel(it),
+                    header = it.name(),
+                    progress = progressLabel?.invoke(it),
                 )
             }
             return RegionalSwingsScreen(
@@ -74,23 +52,16 @@ class RegionalSwingsScreen private constructor(
                 },
                 title,
                 swings.map { (region, swingFrame) ->
-                    name(region).merge(progressLabel(region)) { n, p -> if (p == null) n else "$n [$p]" }
+                    name(region).run {
+                        if (progressLabel == null) {
+                            this
+                        } else {
+                            merge(progressLabel(region)) { n, p -> if (p == null) n else "$n [$p]" }
+                        }
+                    }
                         .merge(swingFrame.altText) { t, b -> "$t: $b" }
                 }.combine().merge(title) { text, top -> "$top\n\n${text.joinToString("\n")}" },
             )
-        }
-    }
-
-    companion object {
-        fun <R, POC : PartyOrCoalition> of(
-            regions: List<R>,
-            name: (R) -> Flow.Publisher<String>,
-            currVotes: (R) -> Flow.Publisher<out Map<out POC, Int>>,
-            prevVotes: (R) -> Flow.Publisher<out Map<out POC, Int>>,
-            swingOrder: Comparator<POC>,
-            numRows: Int,
-        ): Builder<R, POC> {
-            return Builder(regions, name, currVotes, prevVotes, swingOrder, numRows)
         }
     }
 }
