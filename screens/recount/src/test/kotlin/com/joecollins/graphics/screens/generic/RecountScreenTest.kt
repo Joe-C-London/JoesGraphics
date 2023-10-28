@@ -1,5 +1,8 @@
 package com.joecollins.graphics.screens.generic
 
+import com.joecollins.graphics.screens.generic.RecountScreen.Companion.pct
+import com.joecollins.graphics.screens.generic.RecountScreen.Companion.polls
+import com.joecollins.graphics.screens.generic.RecountScreen.Companion.votes
 import com.joecollins.graphics.utils.PublisherTestUtils
 import com.joecollins.graphics.utils.RenderTestUtils
 import com.joecollins.models.general.Aggregators
@@ -28,13 +31,13 @@ class RecountScreenTest {
         val candidateVotes = Publisher<Map<String, Map<Candidate, Int>>>(candidateVotesRaw)
         val pctReporting = Publisher<Map<String, Double>>(pctReportingRaw)
         val screen = RecountScreen.of(
-            candidateVotes,
-            { it.uppercase() },
-            10,
-            "AUTOMATIC RECOUNTS".asOneTimePublisher(),
+            candidateVotes = candidateVotes,
+            rowHeader = { uppercase() },
+            threshold = votes(10),
+            header = "AUTOMATIC RECOUNTS".asOneTimePublisher(),
+            reporting = pct(pctReporting),
+            title = "YUKON".asOneTimePublisher(),
         )
-            .withPctReporting(pctReporting)
-            .build("YUKON".asOneTimePublisher())
         screen.setSize(1024, 512)
         RenderTestUtils.compareRendering("RecountScreen", "RecountVotes-1", screen)
         PublisherTestUtils.assertPublishes(
@@ -129,13 +132,13 @@ class RecountScreenTest {
         val candidateVotes = Publisher<Map<String, Map<Candidate, Int>>>(candidateVotesRaw)
         val pollsReporting = Publisher<Map<String, PollsReporting>>(pollsReportingRaw)
         val screen = RecountScreen.of(
-            candidateVotes,
-            { it.uppercase() },
-            10,
-            "AUTOMATIC RECOUNTS".asOneTimePublisher(),
+            candidateVotes = candidateVotes,
+            rowHeader = { uppercase() },
+            threshold = votes(10),
+            header = "AUTOMATIC RECOUNTS".asOneTimePublisher(),
+            reporting = polls(pollsReporting),
+            title = "YUKON".asOneTimePublisher(),
         )
-            .withPollsReporting(pollsReporting)
-            .build("YUKON".asOneTimePublisher())
         screen.setSize(1024, 512)
         RenderTestUtils.compareRendering("RecountScreen", "RecountVotes-1", screen)
         PublisherTestUtils.assertPublishes(
@@ -230,12 +233,12 @@ class RecountScreenTest {
         val candidateVotesRaw: MutableMap<String, Map<Candidate, Int>> = TreeMap()
         val candidateVotes = Publisher<Map<String, Map<Candidate, Int>>>(candidateVotesRaw)
         val screen = RecountScreen.of(
-            candidateVotes,
-            { it.uppercase() },
-            0.001,
-            "AUTOMATIC RECOUNTS".asOneTimePublisher(),
+            candidateVotes = candidateVotes,
+            rowHeader = { uppercase() },
+            threshold = pct(0.001),
+            header = "AUTOMATIC RECOUNTS".asOneTimePublisher(),
+            title = "CANADA".asOneTimePublisher(),
         )
-            .build("CANADA".asOneTimePublisher())
         screen.setSize(1024, 512)
         RenderTestUtils.compareRendering("RecountScreen", "RecountPct-1", screen)
         PublisherTestUtils.assertPublishes(
@@ -313,12 +316,12 @@ class RecountScreenTest {
             ),
         )
         val screen = RecountScreen.ofNonPartisan(
-            Aggregators.toMap(votes.keys) { votes[it]!!.map { v -> v.mapKeys { name -> NonPartisanCandidate(name.key) } } },
-            { it.uppercase() },
-            0.02,
-            "AUTOMATIC RECOUNTS".asOneTimePublisher(),
+            candidateVotes = Aggregators.toMap(votes.keys) { votes[it]!!.map { v -> v.mapKeys { name -> NonPartisanCandidate(name.key) } } },
+            rowHeader = { uppercase() },
+            threshold = pct(0.02),
+            header = "AUTOMATIC RECOUNTS".asOneTimePublisher(),
+            title = "NUNAVUT".asOneTimePublisher(),
         )
-            .build("NUNAVUT".asOneTimePublisher())
         screen.setSize(1024, 512)
         RenderTestUtils.compareRendering("RecountScreen", "NonPartisan-1", screen)
         PublisherTestUtils.assertPublishes(

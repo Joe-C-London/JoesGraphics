@@ -23,115 +23,174 @@ class RecountScreen private constructor(
 ) : GenericPanel(pad(frame), headerLabel, altText), AltTextProvider {
 
     companion object {
-        fun <T> of(
-            candidateVotes: Flow.Publisher<out Map<T, Map<Candidate, Int>>>,
-            rowHeaderFunc: (T) -> String,
-            voteThreshold: Int,
-            header: Flow.Publisher<out String>,
-        ): Builder<T, Candidate> {
-            return Builder(
-                header,
-                candidateVotes,
-                rowHeaderFunc,
-                { it.party.abbreviation.uppercase() },
-                { it.party.color },
-                voteThreshold = voteThreshold,
-            )
-        }
+        fun votes(votes: Int) = VoteThreshold(votes)
+        fun pct(pct: Double) = PctThreshold(pct)
+
+        fun <T> pct(pctReporting: Flow.Publisher<out Map<T, Double>>) = PctReportingFilter(pctReporting)
+        fun <T> polls(pollsReporting: Flow.Publisher<out Map<T, PollsReporting>>) = PollsReportingFilter(pollsReporting)
 
         fun <T> of(
             candidateVotes: Flow.Publisher<out Map<T, Map<Candidate, Int>>>,
-            rowHeaderFunc: (T) -> String,
-            pctThreshold: Double,
+            rowHeader: T.() -> String,
+            threshold: Threshold,
             header: Flow.Publisher<out String>,
-        ): Builder<T, Candidate> {
-            return Builder(
+            reporting: ReportingFilter<T>? = null,
+            title: Flow.Publisher<out String>,
+        ): RecountScreen {
+            return build(
                 header,
                 candidateVotes,
-                rowHeaderFunc,
-                { it.party.abbreviation.uppercase() },
-                { it.party.color },
-                pctThreshold = pctThreshold,
+                rowHeader,
+                { party.abbreviation.uppercase() },
+                { party.color },
+                threshold,
+                reporting,
+                title,
             )
         }
 
         fun <T> ofNonPartisan(
             candidateVotes: Flow.Publisher<out Map<T, Map<NonPartisanCandidate, Int>>>,
-            rowHeaderFunc: (T) -> String,
-            voteThreshold: Int,
+            rowHeader: T.() -> String,
+            threshold: Threshold,
             header: Flow.Publisher<out String>,
-        ): Builder<T, NonPartisanCandidate> {
-            return Builder(
+            reporting: ReportingFilter<T>? = null,
+            title: Flow.Publisher<out String>,
+        ): RecountScreen {
+            return build(
                 header,
                 candidateVotes,
-                rowHeaderFunc,
-                { it.surname.uppercase() },
-                { it.color },
-                voteThreshold = voteThreshold,
+                rowHeader,
+                { surname.uppercase() },
+                { color },
+                threshold,
+                reporting,
+                title,
             )
         }
 
-        fun <T> ofNonPartisan(
-            candidateVotes: Flow.Publisher<out Map<T, Map<NonPartisanCandidate, Int>>>,
-            rowHeaderFunc: (T) -> String,
-            pctThreshold: Double,
+        private fun <T, CT> build(
             header: Flow.Publisher<out String>,
-        ): Builder<T, NonPartisanCandidate> {
-            return Builder(
-                header,
-                candidateVotes,
-                rowHeaderFunc,
-                { it.surname.uppercase() },
-                { it.color },
-                pctThreshold = pctThreshold,
+            candidateVotes: Flow.Publisher<out Map<T, Map<CT, Int>>>,
+            rowHeader: T.() -> String,
+            label: CT.() -> String,
+            color: CT.() -> Color,
+            threshold: Threshold,
+            reporting: ReportingFilter<T>?,
+            title: Flow.Publisher<out String>,
+        ): RecountScreen {
+            return RecountScreen(
+                title,
+                buildFrame(header, candidateVotes, rowHeader, label, color, threshold, reporting),
+                buildAltText(header, candidateVotes, rowHeader, label, threshold, reporting, title),
             )
+        }
+
+        private fun <T, CT> buildFrame(
+            header: Flow.Publisher<out String>,
+            candidateVotes: Flow.Publisher<out Map<T, Map<CT, Int>>>,
+            rowHeader: T.() -> String,
+            label: CT.() -> String,
+            color: CT.() -> Color,
+            threshold: Threshold,
+            reporting: ReportingFilter<T>?,
+        ): MultiSummaryFrame {
+            val voteFormatter = DecimalFormat("#,##0")
+            val pctFormatter = DecimalFormat("0.00%")
+            val input = buildInput(candidateVotes, threshold, reporting)
+            return MultiSummaryFrame(
+                headerPublisher = header,
+                rowsPublisher = input.toEntries().mapElements { e ->
+                    val partyCells = e.topCandidates.take(2)
+                        .map { it.key.color() to "${it.key.label()}: ${voteFormatter.format(it.value)}" }
+                    val marginCell = Color.WHITE to "MARGIN: ${e.margin}" + (if (e.threshold is VoteThreshold) "" else " (${pctFormatter.format(e.pctMargin)})")
+                    MultiSummaryFrame.Row(e.key.rowHeader(), listOf(partyCells, listOf(marginCell)).flatten())
+                },
+                notesPublisher = footer(threshold).asOneTimePublisher(),
+            )
+        }
+
+        private fun <T, CT> buildInput(
+            candidateVotes: Flow.Publisher<out Map<T, Map<CT, Int>>>,
+            threshold: Threshold,
+            reporting: ReportingFilter<T>?,
+        ): Input<T, CT> {
+            val input = Input<T, CT>(threshold)
+            candidateVotes.subscribe(Subscriber { input.setVotes(it) })
+            reporting?.complete?.subscribe(Subscriber { input.setComplete(it) })
+            return input
+        }
+
+        private fun footer(
+            threshold: Threshold,
+        ) = when (threshold) {
+            is VoteThreshold -> "Automatic recount triggered if the margin is ${threshold.votes} votes or fewer"
+            is PctThreshold -> "Automatic recount triggered if the margin is ${DecimalFormat("0.00%").format(threshold.pct)} or less"
+        }
+
+        private fun <T, CT> buildAltText(
+            header: Flow.Publisher<out String>,
+            candidateVotes: Flow.Publisher<out Map<T, Map<CT, Int>>>,
+            rowHeader: T.() -> String,
+            label: CT.() -> String,
+            threshold: Threshold,
+            reporting: ReportingFilter<T>?,
+            title: Flow.Publisher<out String>,
+        ): Flow.Publisher<String> {
+            val headerText = title.merge(header) { t, h -> "$t\n\n$h" }
+            val body = buildInput(candidateVotes, threshold, reporting).toEntries().map { entries ->
+                entries.joinToString("") { e ->
+                    "\n${e.key.rowHeader().uppercase()}: ${
+                        e.topCandidates.take(2).joinToString("") { "${it.key.label()}: ${DecimalFormat("#,##0").format(it.value)}; " }
+                    }MARGIN: ${e.margin}${if (threshold is VoteThreshold) "" else " (${DecimalFormat("0.00%").format(e.pctMargin)})"}"
+                }
+            }
+            return headerText.merge(body) { h, b -> "$h$b\n\n${footer(threshold)}" }
         }
     }
 
-    private class Input<T, CT>(val voteThreshold: Int?, val pctThreshold: Double?) {
+    private class Input<T, CT>(val threshold: Threshold) {
         private var votes: Map<T, Map<CT, Int>> = HashMap()
-        private var pctReporting: Map<T, Double>? = null
+        private var complete: Map<T, Boolean>? = null
 
         fun setVotes(votes: Map<T, Map<CT, Int>>) {
             this.votes = votes
             votesPublisher.submit(votes)
         }
 
-        fun setPctReporting(pctReporting: Map<T, Double>) {
-            this.pctReporting = pctReporting
-            pctReportingPublisher.submit(pctReporting)
+        fun setComplete(complete: Map<T, Boolean>) {
+            this.complete = complete
+            completePublisher.submit(complete)
         }
 
         private val votesPublisher = Publisher(votes)
-        private val pctReportingPublisher = Publisher(pctReporting)
+        private val completePublisher = Publisher(complete)
 
         fun toEntries(): Flow.Publisher<out List<Entry<T, CT>>> {
-            return votesPublisher.merge(pctReportingPublisher) { votes, pctReporting ->
+            return votesPublisher.merge(completePublisher) { votes, complete ->
                 votes.entries.asSequence()
                     .map {
                         Entry(
                             it.key,
                             it.value,
-                            pctReporting?.get(it.key) ?: 1.0,
-                            voteThreshold,
-                            pctThreshold,
+                            complete?.get(it.key) ?: true,
+                            threshold,
                         )
                     }
                     .filter { it.votes.values.sum() > 0 }
-                    .filter { it.pctReporting == null || it.pctReporting >= 1.0 - 1e-6 }
+                    .filter { it.complete }
                     .filter { it.isTooClose }
-                    .sortedBy { if (it.pctThreshold == null) it.margin.toDouble() else it.pctMargin }
+                    .sortedBy { if (it.threshold is VoteThreshold) it.margin.toDouble() else it.pctMargin }
                     .toList()
             }
         }
     }
 
-    private class Entry<T, CT> constructor(
+    private class Entry<T, CT>(
         val key: T,
         val votes: Map<CT, Int>,
-        val pctReporting: Double?,
-        voteThreshold: Int?,
-        val pctThreshold: Double?,
+        val complete: Boolean,
+        val threshold: Threshold,
     ) {
         val topCandidates: List<Map.Entry<CT, Int>> = votes.entries
             .sortedByDescending { it.value }
@@ -142,78 +201,31 @@ class RecountScreen private constructor(
             else -> topCandidates[0].value - topCandidates[1].value
         }
         val pctMargin = margin.toDouble() / votes.values.sum()
-        val isTooClose = when {
-            voteThreshold != null -> margin <= voteThreshold
-            pctThreshold != null -> pctMargin <= pctThreshold
-            else -> false
+        val isTooClose = when (threshold) {
+            is VoteThreshold -> margin <= threshold.votes
+            is PctThreshold -> pctMargin <= threshold.pct
         }
     }
 
-    class Builder<T, CT>(
-        private val header: Flow.Publisher<out String>,
-        private val candidateVotes: Flow.Publisher<out Map<T, Map<CT, Int>>>,
-        private val rowHeaderFunc: (T) -> String,
-        private val labelFunc: (CT) -> String,
-        private val colorFunc: (CT) -> Color,
-        private val voteThreshold: Int? = null,
-        private val pctThreshold: Double? = null,
-    ) {
+    sealed interface Threshold
 
-        private var pctReporting: Flow.Publisher<out Map<T, Double>>? = null
+    class VoteThreshold(val votes: Int) : Threshold
 
-        fun withPctReporting(pctReporting: Flow.Publisher<out Map<T, Double>>): Builder<T, CT> {
-            this.pctReporting = pctReporting
-            return this
+    class PctThreshold(val pct: Double) : Threshold
+
+    sealed class ReportingFilter<T> {
+        internal abstract val complete: Flow.Publisher<out Map<T, Boolean>>
+    }
+
+    class PctReportingFilter<T>(pctReporting: Flow.Publisher<out Map<T, Double>>) : ReportingFilter<T>() {
+        override val complete: Flow.Publisher<out Map<T, Boolean>> = pctReporting.map {
+            it.mapValues { (_, pct) -> pct >= 1.0 }
         }
+    }
 
-        fun withPollsReporting(pollsReporting: Flow.Publisher<out Map<T, PollsReporting>>): Builder<T, CT> {
-            this.pctReporting = pollsReporting.map { m -> m.mapValues { e -> e.value.toPct() } }
-            return this
-        }
-
-        fun build(titlePublisher: Flow.Publisher<out String>): RecountScreen {
-            return RecountScreen(titlePublisher, buildFrame(), buildAltText(titlePublisher))
-        }
-
-        private fun buildFrame(): MultiSummaryFrame {
-            val voteFormatter = DecimalFormat("#,##0")
-            val pctFormatter = DecimalFormat("0.00%")
-            val input = buildInput()
-            return MultiSummaryFrame(
-                headerPublisher = header,
-                rowsPublisher = input.toEntries().mapElements { e ->
-                    val partyCells = e.topCandidates.take(2)
-                        .map { colorFunc(it.key) to "${labelFunc(it.key)}: ${voteFormatter.format(it.value)}" }
-                    val marginCell = Color.WHITE to "MARGIN: ${e.margin}" + (if (e.pctThreshold == null) "" else " (${pctFormatter.format(e.pctMargin)})")
-                    MultiSummaryFrame.Row(rowHeaderFunc(e.key), listOf(partyCells, listOf(marginCell)).flatten())
-                },
-                notesPublisher = footer().asOneTimePublisher(),
-            )
-        }
-
-        private fun buildInput(): Input<T, CT> {
-            val input = Input<T, CT>(voteThreshold, pctThreshold)
-            candidateVotes.subscribe(Subscriber { input.setVotes(it) })
-            pctReporting?.subscribe(Subscriber { input.setPctReporting(it) })
-            return input
-        }
-
-        private fun footer() = when {
-            voteThreshold != null -> "Automatic recount triggered if the margin is $voteThreshold votes or fewer"
-            pctThreshold != null -> "Automatic recount triggered if the margin is ${DecimalFormat("0.00%").format(pctThreshold)} or less"
-            else -> null
-        }
-
-        private fun buildAltText(titlePublisher: Flow.Publisher<out String>): Flow.Publisher<String> {
-            val header = titlePublisher.merge(header) { t, h -> "$t\n\n$h" }
-            val body = buildInput().toEntries().map { entries ->
-                entries.joinToString("") { e ->
-                    "\n${rowHeaderFunc(e.key).uppercase()}: ${
-                        e.topCandidates.take(2).joinToString("") { "${labelFunc(it.key)}: ${DecimalFormat("#,##0").format(it.value)}; " }
-                    }MARGIN: ${e.margin}${if (pctThreshold == null) "" else " (${DecimalFormat("0.00%").format(e.pctMargin)})"}"
-                }
-            }
-            return header.merge(body) { h, b -> "$h$b\n\n${footer()}" }
+    class PollsReportingFilter<T>(pollsReporting: Flow.Publisher<out Map<T, PollsReporting>>) : ReportingFilter<T>() {
+        override val complete: Flow.Publisher<out Map<T, Boolean>> = pollsReporting.map {
+            it.mapValues { (_, polls) -> polls.reporting >= polls.total }
         }
     }
 }
