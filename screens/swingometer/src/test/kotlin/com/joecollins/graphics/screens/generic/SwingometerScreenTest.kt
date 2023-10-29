@@ -1,5 +1,6 @@
 package com.joecollins.graphics.screens.generic
 
+import com.joecollins.graphics.screens.generic.SwingometerScreen.Companion.calculateSwing
 import com.joecollins.graphics.utils.PublisherTestUtils.assertPublishes
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.models.general.Party
@@ -28,14 +29,14 @@ class SwingometerScreenTest {
             ),
         )
         val panel = SwingometerScreen.of(
-            prevResult,
-            currResult,
-            swing,
-            parties,
-            "SWINGOMETER".asOneTimePublisher(),
+            prevVotes = prevResult,
+            results = currResult,
+            swing = swing,
+            parties = parties,
+            seatLabelIncrement = 3.asOneTimePublisher(),
+            header = "SWINGOMETER".asOneTimePublisher(),
+            title = "NEW BRUNSWICK".asOneTimePublisher(),
         )
-            .withSeatLabelIncrements(3.asOneTimePublisher())
-            .build("NEW BRUNSWICK".asOneTimePublisher())
         panel.setSize(1024, 512)
         compareRendering("SwingometerScreen", "Basic-TwoParty-1", panel)
         assertPublishes(
@@ -93,14 +94,14 @@ class SwingometerScreenTest {
         val parties = Publisher(Pair(lib, pc))
         val swing = Publisher<Map<Party, Double>>(emptyMap())
         val panel = SwingometerScreen.of(
-            prevResult,
-            currResult,
-            swing,
-            parties,
-            "SWINGOMETER".asOneTimePublisher(),
+            prevVotes = prevResult,
+            results = currResult,
+            swing = swing,
+            parties = parties,
+            seatLabelIncrement = 3.asOneTimePublisher(),
+            header = "SWINGOMETER".asOneTimePublisher(),
+            title = "NEW BRUNSWICK".asOneTimePublisher(),
         )
-            .withSeatLabelIncrements(3.asOneTimePublisher())
-            .build("NEW BRUNSWICK".asOneTimePublisher())
         panel.setSize(1024, 512)
         compareRendering("SwingometerScreen", "Basic-Updates-1", panel)
         assertPublishes(
@@ -163,15 +164,15 @@ class SwingometerScreenTest {
             ),
         )
         val panel = SwingometerScreen.of(
-            prevResult,
-            currResult,
-            swing,
-            parties,
-            "SWINGOMETER".asOneTimePublisher(),
+            prevVotes = prevResult,
+            results = currResult,
+            swing = swing,
+            parties = parties,
+            seatLabelIncrement = 3.asOneTimePublisher(),
+            seatFilter = seatsFiltered,
+            header = "SWINGOMETER".asOneTimePublisher(),
+            title = "NEW BRUNSWICK".asOneTimePublisher(),
         )
-            .withSeatLabelIncrements(3.asOneTimePublisher())
-            .withSeatFilter(seatsFiltered)
-            .build("NEW BRUNSWICK".asOneTimePublisher())
         panel.setSize(1024, 512)
         compareRendering("SwingometerScreen", "Filtered-TwoParty-1", panel)
         assertPublishes(
@@ -237,15 +238,15 @@ class SwingometerScreenTest {
             ),
         )
         val panel = SwingometerScreen.of(
-            prevResult,
-            currResult,
-            swing,
-            parties,
-            "SWINGOMETER".asOneTimePublisher(),
+            prevVotes = prevResult,
+            results = currResult,
+            swing = swing,
+            parties = parties,
+            seatLabelIncrement = 3.asOneTimePublisher(),
+            header = "SWINGOMETER".asOneTimePublisher(),
+            progressLabel = "100% IN".asOneTimePublisher(),
+            title = "NEW BRUNSWICK".asOneTimePublisher(),
         )
-            .withSeatLabelIncrements(3.asOneTimePublisher())
-            .withProgressLabel("100% IN".asOneTimePublisher())
-            .build("NEW BRUNSWICK".asOneTimePublisher())
         panel.setSize(1024, 512)
         compareRendering("SwingometerScreen", "Basic-ProgressLabel", panel)
         assertPublishes(
@@ -271,15 +272,17 @@ class SwingometerScreenTest {
         val curr = Publisher(mapOf(pc to 147790, lib to 129025, grn to 57252, pa to 34526, ndp to 6220, ind to 824))
         val prev = Publisher(mapOf(pc to 121300, lib to 143791, grn to 45186, pa to 47860, ndp to 19039, ind to 3187))
         val panel = SwingometerScreen.of(
-            prevResult,
-            currResult,
-            curr,
-            prev,
-            parties,
-            "SWINGOMETER".asOneTimePublisher(),
+            prevVotes = prevResult,
+            results = currResult,
+            swing = calculateSwing(
+                currTotal = curr,
+                prevTotal = prev,
+            ),
+            parties = parties,
+            seatLabelIncrement = 3.asOneTimePublisher(),
+            header = "SWINGOMETER".asOneTimePublisher(),
+            title = "NEW BRUNSWICK".asOneTimePublisher(),
         )
-            .withSeatLabelIncrements(3.asOneTimePublisher())
-            .build("NEW BRUNSWICK".asOneTimePublisher())
         panel.setSize(1024, 512)
         compareRendering("SwingometerScreen", "Basic-TwoPartyVotes-1", panel)
         assertPublishes(
@@ -373,15 +376,15 @@ class SwingometerScreenTest {
         ).asOneTimePublisher()
         val parties = Publisher(dem to gop)
         val panel = SwingometerScreen.of(
-            prevResult,
-            emptyMap<String, PartyResult?>().asOneTimePublisher(),
-            emptyMap<Party, Double>().asOneTimePublisher(),
-            parties,
-            "SWINGOMETER".asOneTimePublisher(),
+            prevVotes = prevResult,
+            results = emptyMap<String, PartyResult?>().asOneTimePublisher(),
+            swing = emptyMap<Party, Double>().asOneTimePublisher(),
+            parties = parties,
+            seatLabelIncrement = 5.asOneTimePublisher(),
+            header = "SWINGOMETER".asOneTimePublisher(),
+            carryovers = mapOf(dem to 36, gop to 30).asOneTimePublisher(),
+            title = "US SENATE".asOneTimePublisher(),
         )
-            .withSeatLabelIncrements(5.asOneTimePublisher())
-            .withCarryovers(mapOf(dem to 36, gop to 30).asOneTimePublisher())
-            .build("US SENATE".asOneTimePublisher())
         panel.setSize(1024, 512)
         compareRendering("SwingometerScreen", "Carryovers-1", panel)
         assertPublishes(
@@ -459,15 +462,15 @@ class SwingometerScreenTest {
         ).asOneTimePublisher()
         val parties = Publisher(dem to gop)
         val panel = SwingometerScreen.of(
-            prevResult,
-            emptyMap<String, PartyResult?>().asOneTimePublisher(),
-            emptyMap<Party, Double>().asOneTimePublisher(),
-            parties,
-            "SWINGOMETER".asOneTimePublisher(),
+            prevVotes = prevResult,
+            results = emptyMap<String, PartyResult?>().asOneTimePublisher(),
+            swing = emptyMap<Party, Double>().asOneTimePublisher(),
+            parties = parties,
+            seatLabelIncrement = 5.asOneTimePublisher(),
+            header = "SWINGOMETER".asOneTimePublisher(),
+            carryovers = mapOf(dem to 36, gop to 30).asOneTimePublisher(),
+            title = "US SENATE".asOneTimePublisher(),
         )
-            .withSeatLabelIncrements(5.asOneTimePublisher())
-            .withCarryovers(mapOf(dem to 36, gop to 30).asOneTimePublisher())
-            .build("US SENATE".asOneTimePublisher())
         panel.setSize(1024, 512)
         compareRendering("SwingometerScreen", "Carryovers-1", panel)
         assertPublishes(
@@ -567,15 +570,15 @@ class SwingometerScreenTest {
         ).asOneTimePublisher()
         val parties = Publisher(dem to gop)
         val panel = SwingometerScreen.of(
-            prevResult,
-            emptyMap<Pair<String, Int>, PartyResult?>().asOneTimePublisher(),
-            emptyMap<Party, Double>().asOneTimePublisher(),
-            parties,
-            "SWINGOMETER".asOneTimePublisher(),
+            prevVotes = prevResult,
+            results = emptyMap<Pair<String, Int>, PartyResult?>().asOneTimePublisher(),
+            swing = emptyMap<Party, Double>().asOneTimePublisher(),
+            parties = parties,
+            weights = { second },
+            seatLabelIncrement = 50.asOneTimePublisher(),
+            header = "SWINGOMETER".asOneTimePublisher(),
+            title = "US PRESIDENT".asOneTimePublisher(),
         )
-            .withSeatLabelIncrements(50.asOneTimePublisher())
-            .withWeights { it.second }
-            .build("US PRESIDENT".asOneTimePublisher())
         panel.setSize(1024, 512)
         compareRendering("SwingometerScreen", "Weights-1", panel)
         assertPublishes(
