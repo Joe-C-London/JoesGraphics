@@ -1,5 +1,6 @@
 package com.joecollins.graphics.screens.generic
 
+import com.joecollins.graphics.screens.generic.SingleTransferrableResultScreen.Companion.createMap
 import com.joecollins.graphics.utils.PublisherTestUtils.assertPublishes
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.graphics.utils.ShapefileReader
@@ -68,31 +69,33 @@ class SingleTransferrableResultScreenTest {
         val candidateSubhead = Publisher("0 OF 5 SEATS ELECTED")
         val currWinner = Publisher<Party?>(null)
 
-        val panel = SingleTransferrableResultScreen.withCandidates(
-            candidateVotes,
-            quota,
-            elected,
-            excluded,
-            candidateHeader,
-            candidateSubhead,
-            "[MLA]",
+        val panel = SingleTransferrableResultScreen.of(
+            candidateResults = {
+                this.votes = candidateVotes
+                this.quota = quota
+                this.elected = elected
+                this.excluded = excluded
+                this.header = candidateHeader
+                this.subhead = candidateSubhead
+                this.incumbentMarker = "[MLA]"
+            },
+            partyTotals = {
+                totalSeats = 5.asOneTimePublisher()
+                header = "TOTAL QUOTAS BY PARTY".asOneTimePublisher()
+            },
+            prevResults = {
+                seats = mapOf(dup to 3, apni to 2, uup to 1).asOneTimePublisher()
+                header = "SEATS IN 2016".asOneTimePublisher()
+            },
+            map = createMap {
+                shapes = niShapesByConstituency().asOneTimePublisher()
+                selectedShape = 9.asOneTimePublisher()
+                leadingParty = currWinner
+                focus = listOf(9, 10, 12, 15).asOneTimePublisher()
+                header = "BELFAST".asOneTimePublisher()
+            },
+            title = "BELFAST EAST".asOneTimePublisher(),
         )
-            .withPartyTotals(
-                5.asOneTimePublisher(),
-                "TOTAL QUOTAS BY PARTY".asOneTimePublisher(),
-            )
-            .withPrevSeats(
-                mapOf(dup to 3, apni to 2, uup to 1).asOneTimePublisher(),
-                "SEATS IN 2016".asOneTimePublisher(),
-            )
-            .withPartyMap(
-                niShapesByConstituency().asOneTimePublisher(),
-                9.asOneTimePublisher(),
-                currWinner,
-                listOf(9, 10, 12, 15).asOneTimePublisher(),
-                "BELFAST".asOneTimePublisher(),
-            )
-            .build("BELFAST EAST".asOneTimePublisher())
         panel.size = Dimension(1024, 512)
         compareRendering("SingleTransferrableResultScreen", "Candidates-0", panel)
         assertPublishes(
