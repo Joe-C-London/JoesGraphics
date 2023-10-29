@@ -97,8 +97,8 @@ class AllSeatsScreen private constructor(title: Flow.Publisher<out String?>, fra
 
         val prevColor: Color = prevWinner?.color ?: Color.WHITE
 
-        val resultColor: Color = currResult?.party?.color ?: Color.LIGHT_GRAY
-        val fill = currResult?.isElected ?: false
+        val resultColor: Color = currResult?.leader?.color ?: Color.LIGHT_GRAY
+        val fill = currResult?.elected ?: false
     }
 
     companion object {
@@ -135,9 +135,9 @@ class AllSeatsScreen private constructor(title: Flow.Publisher<out String?>, fra
                 val head = title.merge(header) { t, h -> listOfNotNull(t, h).joinToString("\n\n") }
                 val entries = inputs.resultPublisher.map { results ->
                     if (results.isEmpty()) return@map "(empty)"
-                    val allElected = results.all { it.currResult?.isElected ?: true }
+                    val allElected = results.all { it.currResult?.elected ?: true }
                     results
-                        .groupBy { it.prevWinner to it.currResult?.party }
+                        .groupBy { it.prevWinner to it.currResult?.leader }
                         .entries
                         .sortedByDescending { group -> group.value.size }
                         .joinToString("\n") { group ->

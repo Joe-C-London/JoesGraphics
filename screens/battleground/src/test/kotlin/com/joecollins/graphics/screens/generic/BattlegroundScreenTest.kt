@@ -447,7 +447,7 @@ class BattlegroundScreenTest {
             """.trimIndent(),
         )
 
-        currResult.submit(bcCurrResult().mapValues { if (it.value.party == lib) PartyResult(bcu, it.value.elected) else it.value })
+        currResult.submit(bcCurrResult().mapValues { if (it.value.leader == lib) PartyResult(bcu, it.value.elected) else it.value })
         compareRendering("BattlegroundScreen", "Basic-SingleParty-PartyChange-3", panel)
         assertPublishes(
             panel.altText,

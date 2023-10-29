@@ -70,7 +70,7 @@ class SeatsChangingScreen private constructor(title: Flow.Publisher<out String?>
                 )
             }
             .filter { it.third != null }
-            .filter { (partyChanges[it.second] ?: it.second) != it.third!!.party }
+            .filter { (partyChanges[it.second] ?: it.second) != it.third!!.leader }
             .map {
                 val seatFilter = seatFilter
                 Entry(
@@ -87,7 +87,7 @@ class SeatsChangingScreen private constructor(title: Flow.Publisher<out String?>
 
         val prevColor = prevWinner.color.fadeIfNotSelected()
 
-        val resultColor = currResult.party.color.fadeIfNotSelected()
+        val resultColor = currResult.leader.color.fadeIfNotSelected()
 
         val fill = currResult.elected
 
@@ -133,9 +133,9 @@ class SeatsChangingScreen private constructor(title: Flow.Publisher<out String?>
                 val entries = inputs.resultPublisher.map { results ->
                     val filteredResults = results.filter { it.filterIncludes }
                     if (filteredResults.isEmpty()) return@map "(empty)"
-                    val allElected = results.all { it.currResult.isElected }
+                    val allElected = results.all { it.currResult.elected }
                     filteredResults
-                        .groupBy { it.prevWinner to it.currResult.party }
+                        .groupBy { it.prevWinner to it.currResult.leader }
                         .entries
                         .sortedByDescending { group -> group.value.size }
                         .joinToString("\n") { group ->

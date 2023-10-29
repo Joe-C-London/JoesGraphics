@@ -52,8 +52,8 @@ class MixedMemberAllSeatsScreen private constructor(
                 while (currLeft.isNotEmpty()) {
                     val c = currLeft.removeAt(0)
                     val p = when {
-                        prevLeft.contains(c.party) -> c.party
-                        else -> prevLeft.firstOrNull { p -> currLeft.count { it.party == p } < prevLeft.count { it == p } }
+                        prevLeft.contains(c.leader) -> c.leader
+                        else -> prevLeft.firstOrNull { p -> currLeft.count { it.leader == p } < prevLeft.count { it == p } }
                     }
                     if (p != null) prevLeft.removeAt(prevLeft.indexOf(p))
                     items.add(c to p)
@@ -70,8 +70,8 @@ class MixedMemberAllSeatsScreen private constructor(
                     ResultListingFrame.Item(
                         text = name,
                         border = prev?.color ?: Color.WHITE,
-                        background = if (curr?.elected == true) curr.party.color else Color.WHITE,
-                        foreground = if (curr == null) Color.LIGHT_GRAY else if (!curr.elected) ColorUtils.contrastForBackground(curr.party.color) else ColorUtils.foregroundToContrast(curr.party.color),
+                        background = if (curr?.elected == true) curr.leader.color else Color.WHITE,
+                        foreground = if (curr == null) Color.LIGHT_GRAY else if (!curr.elected) ColorUtils.contrastForBackground(curr.leader.color) else ColorUtils.foregroundToContrast(curr.leader.color),
                     )
                 }
                 val constituencyItems = constituencyItems.mapElements { (c, curr, prev) ->
@@ -100,8 +100,8 @@ class MixedMemberAllSeatsScreen private constructor(
             }
 
             fun createAltText(): Flow.Publisher<String> {
-                val constituencyGroups = constituencyItems.map { c -> c.groupBy({ it.second?.party to it.third }, { it.second }) }
-                val listGroups = listItems.map { c -> c.groupBy({ it.first?.party to it.second }, { it.first }) }
+                val constituencyGroups = constituencyItems.map { c -> c.groupBy({ it.second?.leader to it.third }, { it.second }) }
+                val listGroups = listItems.map { c -> c.groupBy({ it.first?.leader to it.second }, { it.first }) }
                 val allGroups = constituencyGroups.merge(listGroups) { c, l -> c to l }.merge(allDeclared) { (cg, lg), all ->
                     sequenceOf(cg.keys, lg.keys)
                         .flatten()
@@ -131,7 +131,7 @@ class MixedMemberAllSeatsScreen private constructor(
         private val regionalPanels = LinkedList<RegionalPanel>()
 
         private val allDeclared = currConstituencies.merge(currRegionLists) { c, r ->
-            c.values.filterNotNull().all { it.isElected } && r.values.flatten().all { it.isElected }
+            c.values.filterNotNull().all { it.elected } && r.values.flatten().all { it.elected }
         }
 
         fun withRegion(header: Flow.Publisher<String>, region: R): MultiRegionBuilder<C, R> {

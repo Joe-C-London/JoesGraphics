@@ -1,10 +1,6 @@
 package com.joecollins.models.general
 
-data class NonPartisanCandidateResult(val candidate: NonPartisanCandidate, val elected: Boolean) {
-
-    val isElected = elected
-
-    val winner = candidate.takeIf { elected }
+data class NonPartisanCandidateResult(override val leader: NonPartisanCandidate, override val elected: Boolean) : ElectionResult<NonPartisanCandidate> {
 
     companion object {
 

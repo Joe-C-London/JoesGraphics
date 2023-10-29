@@ -216,8 +216,8 @@ class BattlegroundScreen private constructor(
             }
         }
         val prevColor: Color = prevWinner.color.adjust()
-        val resultColor: Color = (currResult?.party?.color ?: Color.LIGHT_GRAY).adjust()
-        val fill: Boolean = currResult?.isElected ?: false
+        val resultColor: Color = (currResult?.leader?.color ?: Color.LIGHT_GRAY).adjust()
+        val fill: Boolean = currResult?.elected ?: false
     }
 
     private class Layout(val parent: JPanel) : LayoutManager {
@@ -354,7 +354,7 @@ class BattlegroundScreen private constructor(
                         merge(numRows) { party, rows -> rows to party }
                     }
                 }
-                    .merge(currResults) { (rows, party), result -> Triple(rows, party, result.all { r -> r.value?.isElected ?: true }) }
+                    .merge(currResults) { (rows, party), result -> Triple(rows, party, result.all { r -> r.value?.elected ?: true }) }
 
                 val textGenerator: (List<Entry<T>>, Int, Party, Boolean, String, String) -> String? = {
                         items, rows, party, allDone, winLabel, loseLabel ->
@@ -368,7 +368,7 @@ class BattlegroundScreen private constructor(
                             val categories = entries.groupBy {
                                 when {
                                     it.currResult == null -> "PENDING"
-                                    it.currResult.party == party -> winLabel
+                                    it.currResult.leader == party -> winLabel
                                     else -> loseLabel
                                 }
                             }.toSortedMap()
@@ -376,7 +376,7 @@ class BattlegroundScreen private constructor(
                                 val count = if (it.key == "PENDING" || allDone) {
                                     "${it.value.size}"
                                 } else {
-                                    "${it.value.count { e -> e.currResult?.isElected ?: false }}(${it.value.size})"
+                                    "${it.value.count { e -> e.currResult?.elected ?: false }}(${it.value.size})"
                                 }
                                 "$count ${it.key}"
                             }
@@ -481,7 +481,7 @@ class BattlegroundScreen private constructor(
                         merge(numRows) { party, rows -> rows to party }
                     }
                 }
-                    .merge(currResults) { (rows, party), result -> Triple(rows, party, result.all { r -> r.value?.isElected ?: true }) }
+                    .merge(currResults) { (rows, party), result -> Triple(rows, party, result.all { r -> r.value?.elected ?: true }) }
 
                 val textGenerator: (List<Entry<T>>, Int, PartyOrCoalition, PartyOrCoalition, Boolean) -> String? = {
                         items, rows, party, othParty, allDone ->
@@ -495,8 +495,8 @@ class BattlegroundScreen private constructor(
                             val categories = entries.groupBy {
                                 when {
                                     it.currResult == null -> "PENDING"
-                                    it.currResult.party == party || party.constituentParties.contains(it.currResult.party) -> "HOLDS"
-                                    it.currResult.party == othParty || othParty.constituentParties.contains(it.currResult.party) -> "LOSSES TO ${othParty.abbreviation}"
+                                    it.currResult.leader == party || party.constituentParties.contains(it.currResult.leader) -> "HOLDS"
+                                    it.currResult.leader == othParty || othParty.constituentParties.contains(it.currResult.leader) -> "LOSSES TO ${othParty.abbreviation}"
                                     else -> "OTHER LOSSES"
                                 }
                             }.toSortedMap()
@@ -504,7 +504,7 @@ class BattlegroundScreen private constructor(
                                 val count = if (it.key == "PENDING" || allDone) {
                                     "${it.value.size}"
                                 } else {
-                                    "${it.value.count { e -> e.currResult?.isElected ?: false }}(${it.value.size})"
+                                    "${it.value.count { e -> e.currResult?.elected ?: false }}(${it.value.size})"
                                 }
                                 "$count ${it.key}"
                             }

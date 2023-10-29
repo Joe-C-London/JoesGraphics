@@ -150,12 +150,12 @@ class PartyHeatMapScreen private constructor(panel: JPanel, title: Flow.Publishe
                                 }
                             }
                         }.combine().map { list -> list.filterNotNull() }.map { list ->
-                            val curr = list.filter { it.first.party == party }.groupingBy { it.first.isElected }.eachCount()
-                            val prev = list.filter { it.second.let { p -> changes[p] ?: p } == party }.groupingBy { it.first.isElected }.eachCount()
+                            val curr = list.filter { it.first.leader == party }.groupingBy { it.first.elected }.eachCount()
+                            val prev = list.filter { it.second.let { p -> changes[p] ?: p } == party }.groupingBy { it.first.elected }.eachCount()
                             curr to prev
                         }
                         val balance = entries.map(currResult).combine().map { list ->
-                            HitMissBalance.calculateBalance(list.map { it?.party }) {
+                            HitMissBalance.calculateBalance(list.map { it?.leader }) {
                                 if (it == null) null else (it == party)
                             }
                         }

@@ -1,5 +1,11 @@
 package com.joecollins.graphics.screens.generic
 
+import com.joecollins.graphics.screens.generic.TooCloseToCallScreen.Companion.PCT
+import com.joecollins.graphics.screens.generic.TooCloseToCallScreen.Companion.candidateVotes
+import com.joecollins.graphics.screens.generic.TooCloseToCallScreen.Companion.nonPartisanVotes
+import com.joecollins.graphics.screens.generic.TooCloseToCallScreen.Companion.partyVotes
+import com.joecollins.graphics.screens.generic.TooCloseToCallScreen.Companion.pct
+import com.joecollins.graphics.screens.generic.TooCloseToCallScreen.Companion.polls
 import com.joecollins.graphics.utils.PublisherTestUtils.assertPublishes
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.models.general.Aggregators
@@ -26,13 +32,13 @@ class TooCloseToCallScreenTest {
         val candidateVotes = Publisher<Map<Int, Map<Candidate, Int>>>(candidateVotesRaw)
         val partyResults = Publisher<Map<Int, PartyResult>>(partyResultsRaw)
         val screen = TooCloseToCallScreen.of(
-            (1..27).toSet().asOneTimePublisher(),
-            { candidateVotes.map { v -> v[it] ?: emptyMap() } },
-            { partyResults.map { v -> v[it] } },
-            { "DISTRICT $it".asOneTimePublisher() },
-            "TOO CLOSE TO CALL".asOneTimePublisher(),
+            entries = (1..27).toSet().asOneTimePublisher(),
+            votes = candidateVotes { candidateVotes.map { v -> v[this] ?: emptyMap() } },
+            result = { partyResults.map { v -> v[this] } },
+            label = { "DISTRICT $this".asOneTimePublisher() },
+            header = "TOO CLOSE TO CALL".asOneTimePublisher(),
+            title = "PRINCE EDWARD ISLAND".asOneTimePublisher(),
         )
-            .build("PRINCE EDWARD ISLAND".asOneTimePublisher())
         screen.setSize(1024, 512)
         compareRendering("TooCloseToCallScreen", "Basic-1", screen)
         assertPublishes(
@@ -140,14 +146,14 @@ class TooCloseToCallScreenTest {
         val partyResults = Publisher<Map<Int, PartyResult>>(partyResultsRaw)
         val pctReporting = Publisher<Map<Int, Double>>(pctReportingRaw)
         val screen = TooCloseToCallScreen.of(
-            (1..27).toSet().asOneTimePublisher(),
-            { candidateVotes.map { v -> v[it] ?: emptyMap() } },
-            { partyResults.map { v -> v[it] } },
-            { "DISTRICT $it".asOneTimePublisher() },
-            "TOO CLOSE TO CALL".asOneTimePublisher(),
+            entries = (1..27).toSet().asOneTimePublisher(),
+            votes = candidateVotes { candidateVotes.map { v -> v[this] ?: emptyMap() } },
+            result = { partyResults.map { v -> v[this] } },
+            reporting = pct { pctReporting.map { p -> p[this] ?: 0.0 } },
+            label = { "DISTRICT $this".asOneTimePublisher() },
+            header = "TOO CLOSE TO CALL".asOneTimePublisher(),
+            title = "PRINCE EDWARD ISLAND".asOneTimePublisher(),
         )
-            .withPctReporting { pctReporting.map { p -> p[it] ?: 0.0 } }
-            .build("PRINCE EDWARD ISLAND".asOneTimePublisher())
         screen.setSize(1024, 512)
         compareRendering("TooCloseToCallScreen", "PctReporting-1", screen)
         assertPublishes(
@@ -258,14 +264,14 @@ class TooCloseToCallScreenTest {
         val partyResults = Publisher<Map<Int, PartyResult>>(partyResultsRaw)
         val pollsReporting = Publisher<Map<Int, PollsReporting>>(pollsReportingRaw)
         val screen = TooCloseToCallScreen.of(
-            (1..27).toSet().asOneTimePublisher(),
-            { candidateVotes.map { v -> v[it] ?: emptyMap() } },
-            { partyResults.map { v -> v[it] } },
-            { "DISTRICT $it".asOneTimePublisher() },
-            "TOO CLOSE TO CALL".asOneTimePublisher(),
+            entries = (1..27).toSet().asOneTimePublisher(),
+            votes = candidateVotes { candidateVotes.map { v -> v[this] ?: emptyMap() } },
+            result = { partyResults.map { v -> v[this] } },
+            reporting = polls { pollsReporting.map { p -> p[this] ?: PollsReporting(0, 0) } },
+            label = { "DISTRICT $this".asOneTimePublisher() },
+            header = "TOO CLOSE TO CALL".asOneTimePublisher(),
+            title = "PRINCE EDWARD ISLAND".asOneTimePublisher(),
         )
-            .withPollsReporting { pollsReporting.map { p -> p[it] ?: PollsReporting(0, 0) } }
-            .build("PRINCE EDWARD ISLAND".asOneTimePublisher())
         screen.setSize(1024, 512)
         compareRendering("TooCloseToCallScreen", "PollsReporting-1", screen)
         assertPublishes(
@@ -377,15 +383,15 @@ class TooCloseToCallScreenTest {
         val partyResults = Publisher<Map<Int, PartyResult>>(partyResultsRaw)
         val pctReporting = Publisher<Map<Int, Double>>(pctReportingRaw)
         val screen = TooCloseToCallScreen.of(
-            (1..27).toSet().asOneTimePublisher(),
-            { candidateVotes.map { v -> v[it] ?: emptyMap() } },
-            { partyResults.map { v -> v[it] } },
-            { "DISTRICT $it".asOneTimePublisher() },
-            "TOO CLOSE TO CALL".asOneTimePublisher(),
+            entries = (1..27).toSet().asOneTimePublisher(),
+            votes = candidateVotes { candidateVotes.map { v -> v[this] ?: emptyMap() } },
+            result = { partyResults.map { v -> v[this] } },
+            reporting = pct { pctReporting.map { p -> p[this] ?: 0.0 } },
+            label = { "DISTRICT $this".asOneTimePublisher() },
+            header = "TOO CLOSE TO CALL".asOneTimePublisher(),
+            maxRows = 15.asOneTimePublisher(),
+            title = "PRINCE EDWARD ISLAND".asOneTimePublisher(),
         )
-            .withPctReporting { pctReporting.map { p -> p[it] ?: 0.0 } }
-            .withMaxRows(15.asOneTimePublisher())
-            .build("PRINCE EDWARD ISLAND".asOneTimePublisher())
         screen.setSize(1024, 512)
         compareRendering("TooCloseToCallScreen", "LimitRows-1", screen)
         assertPublishes(
@@ -492,15 +498,15 @@ class TooCloseToCallScreenTest {
         val partyResults = Publisher<Map<Int, PartyResult>>(partyResultsRaw)
         val pctReporting = Publisher<Map<Int, Double>>(pctReportingRaw)
         val screen = TooCloseToCallScreen.of(
-            (1..27).toSet().asOneTimePublisher(),
-            { candidateVotes.map { v -> v[it] ?: emptyMap() } },
-            { partyResults.map { v -> v[it] } },
-            { "DISTRICT $it".asOneTimePublisher() },
-            "TOO CLOSE TO CALL".asOneTimePublisher(),
+            entries = (1..27).toSet().asOneTimePublisher(),
+            votes = candidateVotes { candidateVotes.map { v -> v[this] ?: emptyMap() } },
+            result = { partyResults.map { v -> v[this] } },
+            reporting = pct { pctReporting.map { p -> p[this] ?: 0.0 } },
+            label = { "DISTRICT $this".asOneTimePublisher() },
+            header = "TOO CLOSE TO CALL".asOneTimePublisher(),
+            numCandidates = 5.asOneTimePublisher(),
+            title = "PRINCE EDWARD ISLAND".asOneTimePublisher(),
         )
-            .withPctReporting { pctReporting.map { p -> p[it] ?: 0.0 } }
-            .withNumberOfCandidates(5.asOneTimePublisher())
-            .build("PRINCE EDWARD ISLAND".asOneTimePublisher())
         screen.setSize(1024, 512)
         compareRendering("TooCloseToCallScreen", "NumCandidates-1", screen)
         assertPublishes(
@@ -603,14 +609,14 @@ class TooCloseToCallScreenTest {
         val partyResultsRaw: MutableMap<Int, PartyResult> = HashMap()
         val candidateVotes = Publisher<Map<Int, Map<Candidate, Int>>>(candidateVotesRaw)
         val partyResults = Publisher<Map<Int, PartyResult>>(partyResultsRaw)
-        val screen = TooCloseToCallScreen.ofParty(
-            (1..27).toSet().asOneTimePublisher(),
-            { candidateVotes.map { v -> Aggregators.adjustKey(v[it] ?: emptyMap()) { c -> c.party } } },
-            { partyResults.map { v -> v[it] } },
-            { "DISTRICT $it".asOneTimePublisher() },
-            "TOO CLOSE TO CALL".asOneTimePublisher(),
+        val screen = TooCloseToCallScreen.of(
+            entries = (1..27).toSet().asOneTimePublisher(),
+            votes = partyVotes { candidateVotes.map { v -> Aggregators.adjustKey(v[this] ?: emptyMap()) { c -> c.party } } },
+            result = { partyResults.map { v -> v[this] } },
+            label = { "DISTRICT $this".asOneTimePublisher() },
+            header = "TOO CLOSE TO CALL".asOneTimePublisher(),
+            title = "PRINCE EDWARD ISLAND".asOneTimePublisher(),
         )
-            .build("PRINCE EDWARD ISLAND".asOneTimePublisher())
         screen.setSize(1024, 512)
         compareRendering("TooCloseToCallScreen", "Basic-1", screen)
         assertPublishes(
@@ -716,14 +722,14 @@ class TooCloseToCallScreenTest {
         val partyResultsRaw: MutableMap<Int, PartyResult?> = (1..27).associateWith { null }.toMutableMap()
         val candidateVotes = Publisher<Map<Int, Map<Candidate, Int>>>(candidateVotesRaw)
         val partyResults = Publisher<Map<Int, PartyResult?>>(partyResultsRaw)
-        val screen = TooCloseToCallScreen.ofParty(
-            (1..27).toSet().asOneTimePublisher(),
-            { candidateVotes.map { v -> Aggregators.adjustKey(v[it] ?: emptyMap()) { c -> c.party } } },
-            { partyResults.map { v -> v[it] } },
-            { "DISTRICT $it".asOneTimePublisher() },
-            "TOO CLOSE TO CALL".asOneTimePublisher(),
+        val screen = TooCloseToCallScreen.of(
+            entries = (1..27).toSet().asOneTimePublisher(),
+            votes = partyVotes { candidateVotes.map { v -> Aggregators.adjustKey(v[this] ?: emptyMap()) { c -> c.party } } },
+            result = { partyResults.map { v -> v[this] } },
+            label = { "DISTRICT $this".asOneTimePublisher() },
+            header = "TOO CLOSE TO CALL".asOneTimePublisher(),
+            title = "PRINCE EDWARD ISLAND".asOneTimePublisher(),
         )
-            .build("PRINCE EDWARD ISLAND".asOneTimePublisher())
         screen.setSize(1024, 512)
         compareRendering("TooCloseToCallScreen", "Basic-1", screen)
         assertPublishes(
@@ -1598,14 +1604,14 @@ class TooCloseToCallScreenTest {
         val candidateVotes = Publisher<Map<Int, Map<Candidate, Int>>>(candidateVotesRaw)
         val partyResults = Publisher<Map<Int, PartyResult>>(partyResultsRaw)
         val screen = TooCloseToCallScreen.of(
-            (1..27).toSet().asOneTimePublisher(),
-            { candidateVotes.map { v -> v[it] ?: emptyMap() } },
-            { partyResults.map { v -> v[it] } },
-            { "DISTRICT $it".asOneTimePublisher() },
-            "TOO CLOSE TO CALL".asOneTimePublisher(),
+            entries = (1..27).toSet().asOneTimePublisher(),
+            votes = candidateVotes { candidateVotes.map { v -> v[this] ?: emptyMap() } },
+            result = { partyResults.map { v -> v[this] } },
+            label = { "DISTRICT $this".asOneTimePublisher() },
+            header = "TOO CLOSE TO CALL".asOneTimePublisher(),
+            sortOrder = PCT,
+            title = "PRINCE EDWARD ISLAND".asOneTimePublisher(),
         )
-            .sortByPcts()
-            .build("PRINCE EDWARD ISLAND".asOneTimePublisher())
         screen.setSize(1024, 512)
         compareRendering("TooCloseToCallScreen", "Pct-1", screen)
         assertPublishes(
@@ -1754,15 +1760,15 @@ class TooCloseToCallScreenTest {
             Publisher(PollsReporting(0, 3)),
             Publisher(PollsReporting(0, 3)),
         )
-        val screen = TooCloseToCallScreen.ofNonPartisan(
-            (0 until 4).toSet().asOneTimePublisher(),
-            { votes[it].map { v -> v.mapKeys { name -> NonPartisanCandidate(name.key) } } },
-            { results[it] },
-            { names[it].uppercase().asOneTimePublisher() },
-            "TOO CLOSE TO CALL".asOneTimePublisher(),
+        val screen = TooCloseToCallScreen.of(
+            entries = (0 until 4).toSet().asOneTimePublisher(),
+            votes = nonPartisanVotes { votes[this].map { v -> v.mapKeys { name -> NonPartisanCandidate(name.key) } } },
+            result = { results[this] },
+            reporting = polls { reporting[this] },
+            label = { names[this].uppercase().asOneTimePublisher() },
+            header = "TOO CLOSE TO CALL".asOneTimePublisher(),
+            title = "NUNAVUT".asOneTimePublisher(),
         )
-            .withPollsReporting { reporting[it] }
-            .build("NUNAVUT".asOneTimePublisher())
         screen.setSize(1024, 512)
         compareRendering("TooCloseToCallScreen", "NonPartisan-1", screen)
         assertPublishes(

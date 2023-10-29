@@ -82,7 +82,7 @@ class PartyHeatMapScreenTest {
         )
 
         currResults.submit(
-            bcCurrResult().mapValues { r -> r.value?.let { if (it.elected) it.party else null } },
+            bcCurrResult().mapValues { r -> r.value?.let { if (it.elected) it.leader else null } },
         )
         compareRendering("PartyHeatMapScreen", "Elected-3", panel)
         assertPublishes(
@@ -103,7 +103,7 @@ class PartyHeatMapScreenTest {
         )
 
         currResults.submit(
-            bcCurrResult().mapValues { r -> r.value?.party },
+            bcCurrResult().mapValues { r -> r.value?.leader },
         )
         compareRendering("PartyHeatMapScreen", "Elected-4", panel)
         assertPublishes(
@@ -316,7 +316,7 @@ class PartyHeatMapScreenTest {
 
         currResults.submit(
             bcCurrResult().mapValues {
-                if (it.value?.party == lib) {
+                if (it.value?.leader == lib) {
                     PartyResult(bcu, it.value!!.elected)
                 } else {
                     it.value

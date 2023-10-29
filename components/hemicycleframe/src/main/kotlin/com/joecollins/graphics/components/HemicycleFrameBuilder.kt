@@ -307,7 +307,7 @@ object HemicycleFrameBuilder {
             ElectedLeading(0, 0),
             { p, r ->
                 val result = r.first
-                if (result == null || !partyFilter(result.party)) {
+                if (result == null || !partyFilter(result.leader)) {
                     p
                 } else {
                     ElectedLeading(p.elected + if (result.elected) r.second else 0, p.total + r.second)
@@ -315,7 +315,7 @@ object HemicycleFrameBuilder {
             },
             { p, r ->
                 val result = r.first
-                if (result == null || !partyFilter(result.party)) {
+                if (result == null || !partyFilter(result.leader)) {
                     p
                 } else {
                     ElectedLeading(p.elected - if (result.elected) r.second else 0, p.total - r.second)
@@ -336,7 +336,7 @@ object HemicycleFrameBuilder {
                 if (result == null) {
                     ret
                 } else {
-                    if (partyFilter(result.party)) {
+                    if (partyFilter(result.leader)) {
                         ret = ElectedLeading(ret.elected + if (result.elected) r.third else 0, ret.total + r.third)
                     }
                     if (partyFilter(r.second)) {
@@ -351,7 +351,7 @@ object HemicycleFrameBuilder {
                 if (result == null) {
                     ret
                 } else {
-                    if (partyFilter(result.party)) {
+                    if (partyFilter(result.leader)) {
                         ret = ElectedLeading(ret.elected - if (result.elected) r.third else 0, ret.total - r.third)
                     }
                     if (partyFilter(r.second)) {

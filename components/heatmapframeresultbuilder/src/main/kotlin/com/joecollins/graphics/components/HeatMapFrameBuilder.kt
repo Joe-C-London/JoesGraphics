@@ -150,9 +150,9 @@ object HeatMapFrameBuilder {
                     results[this]!!.merge(filter) { result, filter ->
                         when {
                             !filter() -> Color.WHITE
-                            result?.party == null -> Color.WHITE
-                            result.isElected -> result.party.color
-                            else -> ColorUtils.lighten(result.party.color)
+                            result?.leader == null -> Color.WHITE
+                            result.elected -> result.leader.color
+                            else -> ColorUtils.lighten(result.leader.color)
                         }
                     }
                 }
@@ -189,18 +189,18 @@ object HeatMapFrameBuilder {
             ElectedLeading(0, 0),
             { p, r ->
                 val left = r.first
-                if (left == null || !partyFilter(left.party)) {
+                if (left == null || !partyFilter(left.leader)) {
                     p
                 } else {
-                    ElectedLeading(p.elected + if (left.isElected) r.second else 0, p.total + r.second)
+                    ElectedLeading(p.elected + if (left.elected) r.second else 0, p.total + r.second)
                 }
             },
             { p, r ->
                 val left = r.first
-                if (left == null || !partyFilter(left.party)) {
+                if (left == null || !partyFilter(left.leader)) {
                     p
                 } else {
-                    ElectedLeading(p.elected - if (left.isElected) r.second else 0, p.total - r.second)
+                    ElectedLeading(p.elected - if (left.elected) r.second else 0, p.total - r.second)
                 }
             },
         )
@@ -214,19 +214,19 @@ object HeatMapFrameBuilder {
             ElectedLeading(0, 0),
             { p, r ->
                 val left = r.first
-                if (left?.party == null) {
+                if (left?.leader == null) {
                     p
                 } else {
                     var ret = p
-                    if (partyFilter(left.party)) {
+                    if (partyFilter(left.leader)) {
                         ret = ElectedLeading(
-                            ret.elected + if (left.isElected) r.third else 0,
+                            ret.elected + if (left.elected) r.third else 0,
                             ret.total + r.third,
                         )
                     }
                     if (partyFilter(r.second)) {
                         ret = ElectedLeading(
-                            ret.elected - if (left.isElected) r.third else 0,
+                            ret.elected - if (left.elected) r.third else 0,
                             ret.total - r.third,
                         )
                     }
@@ -235,19 +235,19 @@ object HeatMapFrameBuilder {
             },
             { p, r ->
                 val left = r.first
-                if (left?.party == null) {
+                if (left?.leader == null) {
                     p
                 } else {
                     var ret = p
-                    if (partyFilter(left.party)) {
+                    if (partyFilter(left.leader)) {
                         ret = ElectedLeading(
-                            ret.elected - if (left.isElected) r.third else 0,
+                            ret.elected - if (left.elected) r.third else 0,
                             ret.total - r.third,
                         )
                     }
                     if (partyFilter(r.second)) {
                         ret = ElectedLeading(
-                            ret.elected + if (left.isElected) r.third else 0,
+                            ret.elected + if (left.elected) r.third else 0,
                             ret.total + r.third,
                         )
                     }

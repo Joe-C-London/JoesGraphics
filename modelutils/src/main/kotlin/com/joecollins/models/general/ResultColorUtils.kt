@@ -9,24 +9,24 @@ object ResultColorUtils {
     fun CandidateResult?.getColor(toForceNamedParams: Unit = Unit, default: Color): Color {
         return when {
             this == null -> default
-            elected -> candidate.party.color
-            else -> ColorUtils.lighten(candidate.party.color)
+            elected -> leader.party.color
+            else -> ColorUtils.lighten(leader.party.color)
         }
     }
 
     fun PartyResult?.getColor(toForceNamedParams: Unit = Unit, default: Color): Color {
         return when {
             this == null -> default
-            this.elected -> party.color
-            else -> ColorUtils.lighten(party.color)
+            this.elected -> leader.color
+            else -> ColorUtils.lighten(leader.color)
         }
     }
 
     fun NonPartisanCandidateResult?.getColor(toForceNamedParams: Unit = Unit, default: Color): Color {
         return when {
             this == null -> default
-            this.elected -> candidate.color
-            else -> ColorUtils.lighten(candidate.color)
+            this.elected -> leader.color
+            else -> ColorUtils.lighten(leader.color)
         }
     }
 }

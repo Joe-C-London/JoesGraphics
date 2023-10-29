@@ -268,8 +268,8 @@ class AllSeatsScreenTest {
 
         currResult.submit(
             bcCurrResult().mapValues {
-                if (it.value.party == lib) {
-                    PartyResult(bcu, it.value.isElected)
+                if (it.value.leader == lib) {
+                    PartyResult(bcu, it.value.elected)
                 } else {
                     it.value
                 }

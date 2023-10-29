@@ -286,7 +286,7 @@ class SeatsChangingScreenTest {
 
         currResult.submit(
             bcCurrResult().mapValues {
-                if (it.value?.party == lib) {
+                if (it.value?.leader == lib) {
                     PartyResult(bcu, it.value!!.elected)
                 } else {
                     it.value

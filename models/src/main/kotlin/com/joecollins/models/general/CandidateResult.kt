@@ -1,13 +1,9 @@
 package com.joecollins.models.general
 
-data class CandidateResult(val candidate: Candidate, val elected: Boolean) {
-
-    val isElected = elected
-
-    val winner = candidate.takeIf { elected }
+data class CandidateResult(override val leader: Candidate, override val elected: Boolean) : ElectionResult<Candidate> {
 
     fun toPartyResult(): PartyResult {
-        return PartyResult(candidate.party, elected)
+        return PartyResult(leader.party, elected)
     }
 
     companion object {
