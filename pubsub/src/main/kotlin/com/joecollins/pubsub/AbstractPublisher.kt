@@ -148,9 +148,7 @@ abstract class AbstractPublisher<T> : Flow.Publisher<T> {
 
         private inner class CancelWrapper<T> : Wrapper<T> {
             override fun handle(subscriber: Flow.Subscriber<in T>) {
-                synchronized(this@Subscription) {
-                    publisher.unsubscribe(this@Subscription)
-                }
+                publisher.unsubscribe(this@Subscription)
             }
         }
     }
