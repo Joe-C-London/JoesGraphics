@@ -1,9 +1,14 @@
 package com.joecollins.graphics.screens.generic
 
+import com.joecollins.graphics.screens.generic.RegionalBreakdownScreen.Companion.pct
+import com.joecollins.graphics.screens.generic.RegionalBreakdownScreen.Companion.polls
+import com.joecollins.graphics.screens.generic.RegionalBreakdownScreen.Companion.seats
+import com.joecollins.graphics.screens.generic.RegionalBreakdownScreen.Companion.votes
 import com.joecollins.graphics.utils.PublisherTestUtils.assertPublishes
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.models.general.Coalition
 import com.joecollins.models.general.Party
+import com.joecollins.models.general.PartyOrCoalition
 import com.joecollins.models.general.PollsReporting
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
@@ -19,18 +24,27 @@ class RegionalBreakdownScreenTest {
         val malpequeSeats = Publisher<Map<Party, Int>>(emptyMap())
         val charlottetownSeats = Publisher<Map<Party, Int>>(emptyMap())
         val egmontSeats = Publisher<Map<Party, Int>>(emptyMap())
-        val screen = RegionalBreakdownScreen.seats(
-            "PRINCE EDWARD ISLAND".asOneTimePublisher(),
-            peiSeats,
-            27.asOneTimePublisher(),
-            "SEATS BY REGION".asOneTimePublisher(),
+        val screen = RegionalBreakdownScreen.of(
+            entries = seats(
+                topRowHeader = "PRINCE EDWARD ISLAND".asOneTimePublisher(),
+                topRowSeats = peiSeats,
+                topRowTotal = 27.asOneTimePublisher(),
+            ) {
+                section(
+                    items = listOf(
+                        Triple("CARDIGAN", cardiganSeats, 7),
+                        Triple("MALPEQUE", malpequeSeats, 7),
+                        Triple("CHARLOTTETOWN", charlottetownSeats, 6),
+                        Triple("EGMONT", egmontSeats, 7),
+                    ),
+                    header = { first.asOneTimePublisher() },
+                    seats = { second },
+                    total = { third.asOneTimePublisher() },
+                )
+            },
+            header = "SEATS BY REGION".asOneTimePublisher(),
+            title = "PRINCE EDWARD ISLAND".asOneTimePublisher(),
         )
-            .withBlankRow()
-            .withRegion("CARDIGAN".asOneTimePublisher(), cardiganSeats, 7.asOneTimePublisher())
-            .withRegion("MALPEQUE".asOneTimePublisher(), malpequeSeats, 7.asOneTimePublisher())
-            .withRegion("CHARLOTTETOWN".asOneTimePublisher(), charlottetownSeats, 6.asOneTimePublisher())
-            .withRegion("EGMONT".asOneTimePublisher(), egmontSeats, 7.asOneTimePublisher())
-            .build("PRINCE EDWARD ISLAND".asOneTimePublisher())
         screen.setSize(1024, 512)
         compareRendering("RegionalBreakdownScreen", "Seats-1", screen)
         assertPublishes(
@@ -100,19 +114,36 @@ class RegionalBreakdownScreenTest {
         val malpequeDiff = Publisher<Map<Party, Int>>(emptyMap())
         val charlottetownDiff = Publisher<Map<Party, Int>>(emptyMap())
         val egmontDiff = Publisher<Map<Party, Int>>(emptyMap())
-        val screen = RegionalBreakdownScreen.seatsWithDiff(
-            "PRINCE EDWARD ISLAND".asOneTimePublisher(),
-            peiSeats,
-            peiDiff,
-            27.asOneTimePublisher(),
-            "SEATS BY REGION".asOneTimePublisher(),
+
+        data class Region(
+            val name: String,
+            val seats: Publisher<Map<Party, Int>>,
+            val diff: Publisher<Map<Party, Int>>,
+            val totalSeats: Int,
         )
-            .withBlankRow()
-            .withRegion("CARDIGAN".asOneTimePublisher(), cardiganSeats, cardiganDiff, 7.asOneTimePublisher())
-            .withRegion("MALPEQUE".asOneTimePublisher(), malpequeSeats, malpequeDiff, 7.asOneTimePublisher())
-            .withRegion("CHARLOTTETOWN".asOneTimePublisher(), charlottetownSeats, charlottetownDiff, 6.asOneTimePublisher())
-            .withRegion("EGMONT".asOneTimePublisher(), egmontSeats, egmontDiff, 7.asOneTimePublisher())
-            .build("PRINCE EDWARD ISLAND".asOneTimePublisher())
+        val screen = RegionalBreakdownScreen.of(
+            entries = seats(
+                topRowHeader = "PRINCE EDWARD ISLAND".asOneTimePublisher(),
+                topRowSeats = peiSeats,
+                topRowDiff = peiDiff,
+                topRowTotal = 27.asOneTimePublisher(),
+            ) {
+                section(
+                    items = listOf(
+                        Region("CARDIGAN", cardiganSeats, cardiganDiff, 7),
+                        Region("MALPEQUE", malpequeSeats, malpequeDiff, 7),
+                        Region("CHARLOTTETOWN", charlottetownSeats, charlottetownDiff, 6),
+                        Region("EGMONT", egmontSeats, egmontDiff, 7),
+                    ),
+                    header = { name.asOneTimePublisher() },
+                    seats = { seats },
+                    diff = { diff },
+                    total = { totalSeats.asOneTimePublisher() },
+                )
+            },
+            header = "SEATS BY REGION".asOneTimePublisher(),
+            title = "PRINCE EDWARD ISLAND".asOneTimePublisher(),
+        )
         screen.setSize(1024, 512)
         compareRendering("RegionalBreakdownScreen", "SeatsWithDiff-1", screen)
         assertPublishes(
@@ -189,19 +220,36 @@ class RegionalBreakdownScreenTest {
         val malpequePrev = Publisher<Map<Party, Int>>(emptyMap())
         val charlottetownPrev = Publisher<Map<Party, Int>>(emptyMap())
         val egmontPrev = Publisher<Map<Party, Int>>(emptyMap())
-        val screen = RegionalBreakdownScreen.seatsWithPrev(
-            "PRINCE EDWARD ISLAND".asOneTimePublisher(),
-            peiSeats,
-            peiPrev,
-            27.asOneTimePublisher(),
-            "SEATS BY REGION".asOneTimePublisher(),
+
+        data class Region(
+            val name: String,
+            val seats: Publisher<Map<Party, Int>>,
+            val prev: Publisher<Map<Party, Int>>,
+            val totalSeats: Int,
         )
-            .withBlankRow()
-            .withRegion("CARDIGAN".asOneTimePublisher(), cardiganSeats, cardiganPrev, 7.asOneTimePublisher())
-            .withRegion("MALPEQUE".asOneTimePublisher(), malpequeSeats, malpequePrev, 7.asOneTimePublisher())
-            .withRegion("CHARLOTTETOWN".asOneTimePublisher(), charlottetownSeats, charlottetownPrev, 6.asOneTimePublisher())
-            .withRegion("EGMONT".asOneTimePublisher(), egmontSeats, egmontPrev, 7.asOneTimePublisher())
-            .build("PRINCE EDWARD ISLAND".asOneTimePublisher())
+        val screen = RegionalBreakdownScreen.of(
+            entries = seats(
+                topRowHeader = "PRINCE EDWARD ISLAND".asOneTimePublisher(),
+                topRowSeats = peiSeats,
+                topRowPrev = peiPrev,
+                topRowTotal = 27.asOneTimePublisher(),
+            ) {
+                section(
+                    items = listOf(
+                        Region("CARDIGAN", cardiganSeats, cardiganPrev, 7),
+                        Region("MALPEQUE", malpequeSeats, malpequePrev, 7),
+                        Region("CHARLOTTETOWN", charlottetownSeats, charlottetownPrev, 6),
+                        Region("EGMONT", egmontSeats, egmontPrev, 7),
+                    ),
+                    header = { name.asOneTimePublisher() },
+                    seats = { seats },
+                    prev = { prev },
+                    total = { totalSeats.asOneTimePublisher() },
+                )
+            },
+            header = "SEATS BY REGION".asOneTimePublisher(),
+            title = "PRINCE EDWARD ISLAND".asOneTimePublisher(),
+        )
         screen.setSize(1024, 512)
         compareRendering("RegionalBreakdownScreen", "SeatsWithDiff-1", screen)
         assertPublishes(
@@ -275,22 +323,40 @@ class RegionalBreakdownScreenTest {
         val alp = Party("Labor", "ALP", Color.RED)
         val oth = Party.OTHERS
 
-        val screen = RegionalBreakdownScreen.seats(
-            "AUSTRALIA".asOneTimePublisher(),
-            mapOf(alp to 68, coa to 77, oth to 6).asOneTimePublisher(),
-            151.asOneTimePublisher(),
-            "SEATS BY STATE".asOneTimePublisher(),
+        data class State(
+            val name: String,
+            val seats: Map<PartyOrCoalition, Int>,
+            val coalitionParty: Party?,
+            val abbreviation: String,
         )
-            .withBlankRow()
-            .withRegion("NEW SOUTH WALES".asOneTimePublisher(), mapOf(coa to 22, alp to 24, oth to 1).asOneTimePublisher(), 47.asOneTimePublisher(), abbreviatedNamePublisher = "NSW".asOneTimePublisher())
-            .withRegion("VICTORIA".asOneTimePublisher(), mapOf(coa to 15, alp to 21, oth to 2).asOneTimePublisher(), 38.asOneTimePublisher(), abbreviatedNamePublisher = "VIC".asOneTimePublisher())
-            .withRegion("QUEENSLAND".asOneTimePublisher(), mapOf(lnp to 23, alp to 6, oth to 1).asOneTimePublisher(), 30.asOneTimePublisher(), mapOf(coa to lnp).asOneTimePublisher(), abbreviatedNamePublisher = "QLD".asOneTimePublisher())
-            .withRegion("WESTERN AUSTRALIA".asOneTimePublisher(), mapOf(lib to 11, alp to 5).asOneTimePublisher(), 16.asOneTimePublisher(), mapOf(coa to lib).asOneTimePublisher(), abbreviatedNamePublisher = "WA".asOneTimePublisher())
-            .withRegion("SOUTH AUSTRALIA".asOneTimePublisher(), mapOf(lib to 4, alp to 5, oth to 1).asOneTimePublisher(), 10.asOneTimePublisher(), mapOf(coa to lib).asOneTimePublisher(), abbreviatedNamePublisher = "SA".asOneTimePublisher())
-            .withRegion("TASMANIA".asOneTimePublisher(), mapOf(lib to 2, alp to 2, oth to 1).asOneTimePublisher(), 5.asOneTimePublisher(), mapOf(coa to lib).asOneTimePublisher(), abbreviatedNamePublisher = "TAS".asOneTimePublisher())
-            .withRegion("AUSTRALIAN CAPITAL TERRITORY".asOneTimePublisher(), mapOf(alp to 3).asOneTimePublisher(), 3.asOneTimePublisher(), mapOf(coa to lib).asOneTimePublisher(), abbreviatedNamePublisher = "ACT".asOneTimePublisher())
-            .withRegion("NORTHERN TERRITORY".asOneTimePublisher(), mapOf(alp to 2).asOneTimePublisher(), 2.asOneTimePublisher(), mapOf(coa to clp).asOneTimePublisher(), abbreviatedNamePublisher = "NT".asOneTimePublisher())
-            .build("AUSTRALIA".asOneTimePublisher())
+        val screen = RegionalBreakdownScreen.of(
+            entries = seats(
+                topRowHeader = "AUSTRALIA".asOneTimePublisher(),
+                topRowSeats = mapOf(alp to 68, coa to 77, oth to 6).asOneTimePublisher(),
+                topRowTotal = 151.asOneTimePublisher(),
+            ) {
+                section(
+                    items = listOf(
+                        State("New South Wales", mapOf(coa to 22, alp to 24, oth to 1), null, "NSW"),
+                        State("Victoria", mapOf(coa to 15, alp to 21, oth to 2), null, "VIC"),
+                        State("Queensland", mapOf(lnp to 23, alp to 6, oth to 1), lnp, "QLD"),
+                        State("Western Australia", mapOf(lib to 11, alp to 5), lib, "WA"),
+                        State("South Australia", mapOf(lib to 4, alp to 5, oth to 1), lib, "SA"),
+                        State("Tasmania", mapOf(lib to 2, alp to 2, oth to 1), lib, "TAS"),
+                        State("Australian Capital Territory", mapOf(alp to 3), lib, "ACT"),
+                        State("Northern Territory", mapOf(alp to 2), clp, "NT"),
+                    ),
+                    header = { name.uppercase().asOneTimePublisher() },
+                    seats = { seats.asOneTimePublisher() },
+                    total = { seats.values.sum().asOneTimePublisher() },
+                    abbreviatedHeader = { abbreviation.asOneTimePublisher() },
+                    coalitionMap = { if (coalitionParty == null) null else mapOf(coa to coalitionParty).asOneTimePublisher() },
+                )
+            },
+            header = "SEATS BY STATE".asOneTimePublisher(),
+            title = "AUSTRALIA".asOneTimePublisher(),
+        )
+
         screen.setSize(1024, 512)
         compareRendering("RegionalBreakdownScreen", "Seats-C", screen)
         assertPublishes(
@@ -322,23 +388,42 @@ class RegionalBreakdownScreenTest {
         val alp = Party("Labor", "ALP", Color.RED)
         val oth = Party.OTHERS
 
-        val screen = RegionalBreakdownScreen.seatsWithPrev(
-            "AUSTRALIA".asOneTimePublisher(),
-            mapOf(alp to 68, coa to 77, oth to 6).asOneTimePublisher(),
-            mapOf(alp to 69, coa to 76, oth to 5).asOneTimePublisher(),
-            151.asOneTimePublisher(),
-            "SEATS BY STATE".asOneTimePublisher(),
+        data class State(
+            val name: String,
+            val seats: Map<PartyOrCoalition, Int>,
+            val prev: Map<PartyOrCoalition, Int>,
+            val coalitionParty: Party?,
+            val abbreviation: String,
         )
-            .withBlankRow()
-            .withRegion("NEW SOUTH WALES".asOneTimePublisher(), mapOf(coa to 22, alp to 24, oth to 1).asOneTimePublisher(), mapOf(coa to 23, alp to 24).asOneTimePublisher(), 47.asOneTimePublisher(), abbreviatedNamePublisher = "NSW".asOneTimePublisher())
-            .withRegion("VICTORIA".asOneTimePublisher(), mapOf(coa to 15, alp to 21, oth to 2).asOneTimePublisher(), mapOf(coa to 17, alp to 18, oth to 2).asOneTimePublisher(), 38.asOneTimePublisher(), abbreviatedNamePublisher = "VIC".asOneTimePublisher())
-            .withRegion("QUEENSLAND".asOneTimePublisher(), mapOf(lnp to 23, alp to 6, oth to 1).asOneTimePublisher(), mapOf(lnp to 21, alp to 8, oth to 1).asOneTimePublisher(), 30.asOneTimePublisher(), mapOf(coa to lnp).asOneTimePublisher(), abbreviatedNamePublisher = "QLD".asOneTimePublisher())
-            .withRegion("WESTERN AUSTRALIA".asOneTimePublisher(), mapOf(lib to 11, alp to 5).asOneTimePublisher(), mapOf(lib to 11, alp to 5).asOneTimePublisher(), 16.asOneTimePublisher(), mapOf(coa to lib).asOneTimePublisher(), abbreviatedNamePublisher = "WA".asOneTimePublisher())
-            .withRegion("SOUTH AUSTRALIA".asOneTimePublisher(), mapOf(lib to 4, alp to 5, oth to 1).asOneTimePublisher(), mapOf(lib to 4, alp to 6, oth to 1).asOneTimePublisher(), 10.asOneTimePublisher(), mapOf(coa to lib).asOneTimePublisher(), abbreviatedNamePublisher = "SA".asOneTimePublisher())
-            .withRegion("TASMANIA".asOneTimePublisher(), mapOf(lib to 2, alp to 2, oth to 1).asOneTimePublisher(), mapOf(alp to 4, oth to 1).asOneTimePublisher(), 5.asOneTimePublisher(), mapOf(coa to lib).asOneTimePublisher(), abbreviatedNamePublisher = "TAS".asOneTimePublisher())
-            .withRegion("AUSTRALIAN CAPITAL TERRITORY".asOneTimePublisher(), mapOf(alp to 3).asOneTimePublisher(), mapOf(alp to 2).asOneTimePublisher(), 3.asOneTimePublisher(), mapOf(coa to lib).asOneTimePublisher(), abbreviatedNamePublisher = "ACT".asOneTimePublisher())
-            .withRegion("NORTHERN TERRITORY".asOneTimePublisher(), mapOf(alp to 2).asOneTimePublisher(), mapOf(alp to 2).asOneTimePublisher(), 2.asOneTimePublisher(), mapOf(coa to clp).asOneTimePublisher(), abbreviatedNamePublisher = "NT".asOneTimePublisher())
-            .build("AUSTRALIA".asOneTimePublisher())
+        val screen = RegionalBreakdownScreen.of(
+            entries = seats(
+                topRowHeader = "AUSTRALIA".asOneTimePublisher(),
+                topRowSeats = mapOf(alp to 68, coa to 77, oth to 6).asOneTimePublisher(),
+                topRowPrev = mapOf(alp to 69, coa to 76, oth to 5).asOneTimePublisher(),
+                topRowTotal = 151.asOneTimePublisher(),
+            ) {
+                section(
+                    items = listOf(
+                        State("New South Wales", mapOf(coa to 22, alp to 24, oth to 1), mapOf(coa to 23, alp to 24), null, "NSW"),
+                        State("Victoria", mapOf(coa to 15, alp to 21, oth to 2), mapOf(coa to 17, alp to 18, oth to 2), null, "VIC"),
+                        State("Queensland", mapOf(lnp to 23, alp to 6, oth to 1), mapOf(lnp to 21, alp to 8, oth to 1), lnp, "QLD"),
+                        State("Western Australia", mapOf(lib to 11, alp to 5), mapOf(lib to 11, alp to 5), lib, "WA"),
+                        State("South Australia", mapOf(lib to 4, alp to 5, oth to 1), mapOf(lib to 4, alp to 6, oth to 1), lib, "SA"),
+                        State("Tasmania", mapOf(lib to 2, alp to 2, oth to 1), mapOf(alp to 4, oth to 1), lib, "TAS"),
+                        State("Australian Capital Territory", mapOf(alp to 3), mapOf(alp to 2), lib, "ACT"),
+                        State("Northern Territory", mapOf(alp to 2), mapOf(alp to 2), clp, "NT"),
+                    ),
+                    header = { name.uppercase().asOneTimePublisher() },
+                    seats = { seats.asOneTimePublisher() },
+                    prev = { prev.asOneTimePublisher() },
+                    total = { seats.values.sum().asOneTimePublisher() },
+                    abbreviatedHeader = { abbreviation.asOneTimePublisher() },
+                    coalitionMap = { if (coalitionParty == null) null else mapOf(coa to coalitionParty).asOneTimePublisher() },
+                )
+            },
+            header = "SEATS BY STATE".asOneTimePublisher(),
+            title = "AUSTRALIA".asOneTimePublisher(),
+        )
         screen.setSize(1024, 512)
         compareRendering("RegionalBreakdownScreen", "SeatsWithPrev-C", screen)
         assertPublishes(
@@ -370,23 +455,42 @@ class RegionalBreakdownScreenTest {
         val alp = Party("Labor", "ALP", Color.RED)
         val oth = Party.OTHERS
 
-        val screen = RegionalBreakdownScreen.seatsWithDiff(
-            "AUSTRALIA".asOneTimePublisher(),
-            mapOf(alp to 68, coa to 77, oth to 6).asOneTimePublisher(),
-            mapOf(alp to -1, coa to +1, oth to +1).asOneTimePublisher(),
-            151.asOneTimePublisher(),
-            "SEATS BY STATE".asOneTimePublisher(),
+        data class State(
+            val name: String,
+            val seats: Map<PartyOrCoalition, Int>,
+            val diff: Map<PartyOrCoalition, Int>,
+            val coalitionParty: Party?,
+            val abbreviation: String,
         )
-            .withBlankRow()
-            .withRegion("NEW SOUTH WALES".asOneTimePublisher(), mapOf(coa to 22, alp to 24, oth to 1).asOneTimePublisher(), mapOf(coa to -1, oth to +1).asOneTimePublisher(), 47.asOneTimePublisher(), abbreviatedNamePublisher = "NSW".asOneTimePublisher())
-            .withRegion("VICTORIA".asOneTimePublisher(), mapOf(coa to 15, alp to 21, oth to 2).asOneTimePublisher(), mapOf(coa to -2, alp to +3).asOneTimePublisher(), 38.asOneTimePublisher(), abbreviatedNamePublisher = "VIC".asOneTimePublisher())
-            .withRegion("QUEENSLAND".asOneTimePublisher(), mapOf(lnp to 23, alp to 6, oth to 1).asOneTimePublisher(), mapOf(lnp to +2, alp to -2).asOneTimePublisher(), 30.asOneTimePublisher(), mapOf(coa to lnp).asOneTimePublisher(), abbreviatedNamePublisher = "QLD".asOneTimePublisher())
-            .withRegion("WESTERN AUSTRALIA".asOneTimePublisher(), mapOf(lib to 11, alp to 5).asOneTimePublisher(), mapOf<Party, Int>().asOneTimePublisher(), 16.asOneTimePublisher(), mapOf(coa to lib).asOneTimePublisher(), abbreviatedNamePublisher = "WA".asOneTimePublisher())
-            .withRegion("SOUTH AUSTRALIA".asOneTimePublisher(), mapOf(lib to 4, alp to 5, oth to 1).asOneTimePublisher(), mapOf(alp to -1).asOneTimePublisher(), 10.asOneTimePublisher(), mapOf(coa to lib).asOneTimePublisher(), abbreviatedNamePublisher = "SA".asOneTimePublisher())
-            .withRegion("TASMANIA".asOneTimePublisher(), mapOf(lib to 2, alp to 2, oth to 1).asOneTimePublisher(), mapOf(lib to +2, alp to -2).asOneTimePublisher(), 5.asOneTimePublisher(), mapOf(coa to lib).asOneTimePublisher(), abbreviatedNamePublisher = "TAS".asOneTimePublisher())
-            .withRegion("AUSTRALIAN CAPITAL TERRITORY".asOneTimePublisher(), mapOf(alp to 3).asOneTimePublisher(), mapOf(alp to +1).asOneTimePublisher(), 3.asOneTimePublisher(), mapOf(coa to lib).asOneTimePublisher(), abbreviatedNamePublisher = "ACT".asOneTimePublisher())
-            .withRegion("NORTHERN TERRITORY".asOneTimePublisher(), mapOf(alp to 2).asOneTimePublisher(), mapOf(alp to 0).asOneTimePublisher(), 2.asOneTimePublisher(), mapOf(coa to clp).asOneTimePublisher(), abbreviatedNamePublisher = "NT".asOneTimePublisher())
-            .build("AUSTRALIA".asOneTimePublisher())
+        val screen = RegionalBreakdownScreen.of(
+            entries = seats(
+                topRowHeader = "AUSTRALIA".asOneTimePublisher(),
+                topRowSeats = mapOf(alp to 68, coa to 77, oth to 6).asOneTimePublisher(),
+                topRowDiff = mapOf(alp to -1, coa to +1, oth to +1).asOneTimePublisher(),
+                topRowTotal = 151.asOneTimePublisher(),
+            ) {
+                section(
+                    items = listOf(
+                        State("New South Wales", mapOf(coa to 22, alp to 24, oth to 1), mapOf(coa to -1, oth to +1), null, "NSW"),
+                        State("Victoria", mapOf(coa to 15, alp to 21, oth to 2), mapOf(coa to -2, alp to +3), null, "VIC"),
+                        State("Queensland", mapOf(lnp to 23, alp to 6, oth to 1), mapOf(lnp to +2, alp to -2), lnp, "QLD"),
+                        State("Western Australia", mapOf(lib to 11, alp to 5), emptyMap(), lib, "WA"),
+                        State("South Australia", mapOf(lib to 4, alp to 5, oth to 1), mapOf(alp to -1), lib, "SA"),
+                        State("Tasmania", mapOf(lib to 2, alp to 2, oth to 1), mapOf(lib to +2, alp to -2), lib, "TAS"),
+                        State("Australian Capital Territory", mapOf(alp to 3), mapOf(alp to +1), lib, "ACT"),
+                        State("Northern Territory", mapOf(alp to 2), mapOf(alp to 0), clp, "NT"),
+                    ),
+                    header = { name.uppercase().asOneTimePublisher() },
+                    seats = { seats.asOneTimePublisher() },
+                    diff = { diff.asOneTimePublisher() },
+                    total = { seats.values.sum().asOneTimePublisher() },
+                    abbreviatedHeader = { abbreviation.asOneTimePublisher() },
+                    coalitionMap = { if (coalitionParty == null) null else mapOf(coa to coalitionParty).asOneTimePublisher() },
+                )
+            },
+            header = "SEATS BY STATE".asOneTimePublisher(),
+            title = "AUSTRALIA".asOneTimePublisher(),
+        )
         screen.setSize(1024, 512)
         compareRendering("RegionalBreakdownScreen", "SeatsWithPrev-C", screen)
         assertPublishes(
@@ -432,23 +536,26 @@ class RegionalBreakdownScreenTest {
             "British Columbia" to 42,
             "Northern Canada" to 3,
         ).associateWith { Publisher(emptyMap<Party, Int>()) to Publisher(emptyMap<Party, Int>()) }
-        val builder = RegionalBreakdownScreen.seatsWithPrev(
-            "CANADA".asOneTimePublisher(),
-            federalSeats.first,
-            federalSeats.second,
-            338.asOneTimePublisher(),
-            "SEATS BY PROVINCE".asOneTimePublisher(),
-            maxColumnsPublisher = 4.asOneTimePublisher(),
-        ).withBlankRow()
-        provincialSeats.forEach { (name, seats), (curr, prev) ->
-            builder.withRegion(
-                name.uppercase().asOneTimePublisher(),
-                curr,
-                prev,
-                seats.asOneTimePublisher(),
-            )
-        }
-        val screen = builder.build("CANADA".asOneTimePublisher())
+
+        val screen = RegionalBreakdownScreen.of(
+            entries = seats(
+                topRowHeader = "CANADA".asOneTimePublisher(),
+                topRowSeats = federalSeats.first,
+                topRowPrev = federalSeats.second,
+                topRowTotal = 338.asOneTimePublisher(),
+                maxColumns = 4.asOneTimePublisher(),
+            ) {
+                section(
+                    items = provincialSeats.entries,
+                    header = { key.first.uppercase().asOneTimePublisher() },
+                    seats = { value.first },
+                    prev = { value.second },
+                    total = { key.second.asOneTimePublisher() },
+                )
+            },
+            header = "SEATS BY PROVINCE".asOneTimePublisher(),
+            title = "CANADA".asOneTimePublisher(),
+        )
         screen.size = Dimension(1024, 512)
         compareRendering("RegionalBreakdownScreen", "SeatsWithLimitedColumns-1", screen)
         assertPublishes(
@@ -642,18 +749,28 @@ class RegionalBreakdownScreenTest {
         val malpequePct = Publisher(0.0)
         val charlottetownPct = Publisher(0.0)
         val egmontPct = Publisher(0.0)
-        val screen = RegionalBreakdownScreen.votes(
-            "PRINCE EDWARD ISLAND".asOneTimePublisher(),
-            peiVotes,
-            peiPct,
-            "VOTES BY REGION".asOneTimePublisher(),
+
+        val screen = RegionalBreakdownScreen.of(
+            entries = votes(
+                topRowHeader = "PRINCE EDWARD ISLAND".asOneTimePublisher(),
+                topRowVotes = peiVotes,
+                topRowReporting = pct(peiPct),
+            ) {
+                section(
+                    items = listOf(
+                        Triple("CARDIGAN", cardiganVotes, cardiganPct),
+                        Triple("MALPEQUE", malpequeVotes, malpequePct),
+                        Triple("CHARLOTTETOWN", charlottetownVotes, charlottetownPct),
+                        Triple("EGMONT", egmontVotes, egmontPct),
+                    ),
+                    header = { first.asOneTimePublisher() },
+                    votes = { second },
+                    reporting = { pct(third) },
+                )
+            },
+            header = "VOTES BY REGION".asOneTimePublisher(),
+            title = "PRINCE EDWARD ISLAND".asOneTimePublisher(),
         )
-            .withBlankRow()
-            .withRegion("CARDIGAN".asOneTimePublisher(), cardiganVotes, cardiganPct)
-            .withRegion("MALPEQUE".asOneTimePublisher(), malpequeVotes, malpequePct)
-            .withRegion("CHARLOTTETOWN".asOneTimePublisher(), charlottetownVotes, charlottetownPct)
-            .withRegion("EGMONT".asOneTimePublisher(), egmontVotes, egmontPct)
-            .build("PRINCE EDWARD ISLAND".asOneTimePublisher())
         screen.setSize(1024, 512)
         compareRendering("RegionalBreakdownScreen", "Votes-1", screen)
         assertPublishes(
@@ -730,18 +847,28 @@ class RegionalBreakdownScreenTest {
         val malpequePct = Publisher(PollsReporting(0, 7))
         val charlottetownPct = Publisher(PollsReporting(0, 6))
         val egmontPct = Publisher(PollsReporting(0, 7))
-        val screen = RegionalBreakdownScreen.votesPollsReporting(
-            "PRINCE EDWARD ISLAND".asOneTimePublisher(),
-            peiVotes,
-            peiPct,
-            "VOTES BY REGION".asOneTimePublisher(),
+
+        val screen = RegionalBreakdownScreen.of(
+            entries = votes(
+                topRowHeader = "PRINCE EDWARD ISLAND".asOneTimePublisher(),
+                topRowVotes = peiVotes,
+                topRowReporting = polls(peiPct),
+            ) {
+                section(
+                    items = listOf(
+                        Triple("CARDIGAN", cardiganVotes, cardiganPct),
+                        Triple("MALPEQUE", malpequeVotes, malpequePct),
+                        Triple("CHARLOTTETOWN", charlottetownVotes, charlottetownPct),
+                        Triple("EGMONT", egmontVotes, egmontPct),
+                    ),
+                    header = { first.asOneTimePublisher() },
+                    votes = { second },
+                    reporting = { polls(third) },
+                )
+            },
+            header = "VOTES BY REGION".asOneTimePublisher(),
+            title = "PRINCE EDWARD ISLAND".asOneTimePublisher(),
         )
-            .withBlankRow()
-            .withRegion("CARDIGAN".asOneTimePublisher(), cardiganVotes, cardiganPct)
-            .withRegion("MALPEQUE".asOneTimePublisher(), malpequeVotes, malpequePct)
-            .withRegion("CHARLOTTETOWN".asOneTimePublisher(), charlottetownVotes, charlottetownPct)
-            .withRegion("EGMONT".asOneTimePublisher(), egmontVotes, egmontPct)
-            .build("PRINCE EDWARD ISLAND".asOneTimePublisher())
         screen.setSize(1024, 512)
         compareRendering("RegionalBreakdownScreen", "VotesPollsReporting-1", screen)
         assertPublishes(
@@ -823,19 +950,36 @@ class RegionalBreakdownScreenTest {
         val malpequePct = Publisher(0.0)
         val charlottetownPct = Publisher(0.0)
         val egmontPct = Publisher(0.0)
-        val screen = RegionalBreakdownScreen.votesWithPrev(
-            "PRINCE EDWARD ISLAND".asOneTimePublisher(),
-            peiVotes,
-            peiPrevVotes,
-            peiPct,
-            "VOTES BY REGION".asOneTimePublisher(),
+
+        data class Region(
+            val name: String,
+            val votes: Publisher<Map<Party, Int>>,
+            val prev: Publisher<Map<Party, Int>>,
+            val pct: Publisher<Double>,
         )
-            .withBlankRow()
-            .withRegion("CARDIGAN".asOneTimePublisher(), cardiganVotes, cardiganPrevVotes, cardiganPct)
-            .withRegion("MALPEQUE".asOneTimePublisher(), malpequeVotes, malpequePrevVotes, malpequePct)
-            .withRegion("CHARLOTTETOWN".asOneTimePublisher(), charlottetownVotes, charlottetownPrevVotes, charlottetownPct)
-            .withRegion("EGMONT".asOneTimePublisher(), egmontVotes, egmontPrevVotes, egmontPct)
-            .build("PRINCE EDWARD ISLAND".asOneTimePublisher())
+        val screen = RegionalBreakdownScreen.of(
+            entries = votes(
+                topRowHeader = "PRINCE EDWARD ISLAND".asOneTimePublisher(),
+                topRowVotes = peiVotes,
+                topRowPrev = peiPrevVotes,
+                topRowReporting = pct(peiPct),
+            ) {
+                section(
+                    items = listOf(
+                        Region("CARDIGAN", cardiganVotes, cardiganPrevVotes, cardiganPct),
+                        Region("MALPEQUE", malpequeVotes, malpequePrevVotes, malpequePct),
+                        Region("CHARLOTTETOWN", charlottetownVotes, charlottetownPrevVotes, charlottetownPct),
+                        Region("EGMONT", egmontVotes, egmontPrevVotes, egmontPct),
+                    ),
+                    header = { name.asOneTimePublisher() },
+                    votes = { votes },
+                    prev = { prev },
+                    reporting = { pct(pct) },
+                )
+            },
+            header = "VOTES BY REGION".asOneTimePublisher(),
+            title = "PRINCE EDWARD ISLAND".asOneTimePublisher(),
+        )
         screen.setSize(1024, 512)
         compareRendering("RegionalBreakdownScreen", "VotesWithPrev-1", screen)
         assertPublishes(
@@ -924,19 +1068,36 @@ class RegionalBreakdownScreenTest {
         val malpequePct = Publisher(PollsReporting(0, 7))
         val charlottetownPct = Publisher(PollsReporting(0, 6))
         val egmontPct = Publisher(PollsReporting(0, 7))
-        val screen = RegionalBreakdownScreen.votesWithPrevPollsReporting(
-            "PRINCE EDWARD ISLAND".asOneTimePublisher(),
-            peiVotes,
-            peiPrevVotes,
-            peiPct,
-            "VOTES BY REGION".asOneTimePublisher(),
+
+        data class Region(
+            val name: String,
+            val votes: Publisher<Map<Party, Int>>,
+            val prev: Publisher<Map<Party, Int>>,
+            val pct: Publisher<PollsReporting>,
         )
-            .withBlankRow()
-            .withRegion("CARDIGAN".asOneTimePublisher(), cardiganVotes, cardiganPrevVotes, cardiganPct)
-            .withRegion("MALPEQUE".asOneTimePublisher(), malpequeVotes, malpequePrevVotes, malpequePct)
-            .withRegion("CHARLOTTETOWN".asOneTimePublisher(), charlottetownVotes, charlottetownPrevVotes, charlottetownPct)
-            .withRegion("EGMONT".asOneTimePublisher(), egmontVotes, egmontPrevVotes, egmontPct)
-            .build("PRINCE EDWARD ISLAND".asOneTimePublisher())
+        val screen = RegionalBreakdownScreen.of(
+            entries = votes(
+                topRowHeader = "PRINCE EDWARD ISLAND".asOneTimePublisher(),
+                topRowVotes = peiVotes,
+                topRowPrev = peiPrevVotes,
+                topRowReporting = polls(peiPct),
+            ) {
+                section(
+                    items = listOf(
+                        Region("CARDIGAN", cardiganVotes, cardiganPrevVotes, cardiganPct),
+                        Region("MALPEQUE", malpequeVotes, malpequePrevVotes, malpequePct),
+                        Region("CHARLOTTETOWN", charlottetownVotes, charlottetownPrevVotes, charlottetownPct),
+                        Region("EGMONT", egmontVotes, egmontPrevVotes, egmontPct),
+                    ),
+                    header = { name.asOneTimePublisher() },
+                    votes = { votes },
+                    prev = { prev },
+                    reporting = { polls(pct) },
+                )
+            },
+            header = "VOTES BY REGION".asOneTimePublisher(),
+            title = "PRINCE EDWARD ISLAND".asOneTimePublisher(),
+        )
         screen.setSize(1024, 512)
         compareRendering("RegionalBreakdownScreen", "VotesWithPrevPollsReporting-1", screen)
         assertPublishes(
@@ -1020,75 +1181,47 @@ class RegionalBreakdownScreenTest {
         val uap = Party("United Australia", "UAP", Color.YELLOW)
         val oth = Party.OTHERS
 
-        val screen = RegionalBreakdownScreen.votes(
-            "AUSTRALIA".asOneTimePublisher(),
-            mapOf(
-                alp to 4776030,
-                coa to 5233334,
-                grn to 1795985,
-                onp to 727464,
-                uap to 604536,
-                oth to 1521693,
-            ).asOneTimePublisher(),
-            0.8982.asOneTimePublisher(),
-            "PRIMARY VOTE BY STATE".asOneTimePublisher(),
+        data class State(
+            val name: String,
+            val abbreviatedName: String,
+            val votes: Map<PartyOrCoalition, Int>,
+            val reporting: Double,
+            val coalitionParty: Party?,
         )
-            .withBlankRow()
-            .withRegion(
-                "NEW SOUTH WALES".asOneTimePublisher(),
-                mapOf(coa to 1699323, alp to 1552684, grn to 466069, onp to 224965, uap to 183174, oth to 524725).asOneTimePublisher(),
-                0.9070.asOneTimePublisher(),
-                abbreviatedNamePublisher = "NSW".asOneTimePublisher(),
-            )
-            .withRegion(
-                "VICTORIA".asOneTimePublisher(),
-                mapOf(coa to 1239280, alp to 1230842, grn to 514893, onp to 143558, uap to 177745, oth to 440115).asOneTimePublisher(),
-                0.9059.asOneTimePublisher(),
-                abbreviatedNamePublisher = "VIC".asOneTimePublisher(),
-            )
-            .withRegion(
-                "QUEENSLAND".asOneTimePublisher(),
-                mapOf(lnp to 1172515, alp to 811069, grn to 382900, onp to 221640, uap to 149255, oth to 220647).asOneTimePublisher(),
-                0.8816.asOneTimePublisher(),
-                mapOf(coa to lnp).asOneTimePublisher(),
-                abbreviatedNamePublisher = "QLD".asOneTimePublisher(),
-            )
-            .withRegion(
-                "WESTERN AUSTRALIA".asOneTimePublisher(),
-                mapOf(lib to 512414, alp to 542667, grn to 184094, onp to 58226, uap to 33863, oth to 141961).asOneTimePublisher(),
-                0.8799.asOneTimePublisher(),
-                mapOf(coa to lib).asOneTimePublisher(),
-                abbreviatedNamePublisher = "WA".asOneTimePublisher(),
-            )
-            .withRegion(
-                "SOUTH AUSTRALIA".asOneTimePublisher(),
-                mapOf(lib to 390195, alp to 378329, grn to 140227, onp to 53057, uap to 42688, oth to 93290).asOneTimePublisher(),
-                0.9107.asOneTimePublisher(),
-                mapOf(coa to lib).asOneTimePublisher(),
-                abbreviatedNamePublisher = "SA".asOneTimePublisher(),
-            )
-            .withRegion(
-                "TASMANIA".asOneTimePublisher(),
-                mapOf(lib to 115184, alp to 95322, grn to 41972, onp to 13970, uap to 6437, oth to 76813).asOneTimePublisher(),
-                0.9243.asOneTimePublisher(),
-                mapOf(coa to lib).asOneTimePublisher(),
-                abbreviatedNamePublisher = "TAS".asOneTimePublisher(),
-            )
-            .withRegion(
-                "AUSTRALIAN CAPITAL TERRITORY".asOneTimePublisher(),
-                mapOf(lib to 74759, alp to 126595, grn to 52648, onp to 6630, uap to 6864, oth to 14501).asOneTimePublisher(),
-                0.9207.asOneTimePublisher(),
-                mapOf(coa to lib).asOneTimePublisher(),
-                abbreviatedNamePublisher = "ACT".asOneTimePublisher(),
-            )
-            .withRegion(
-                "NORTHERN TERRITORY".asOneTimePublisher(),
-                mapOf(clp to 29664, alp to 38522, grn to 13182, onp to 5418, uap to 4510, oth to 9641).asOneTimePublisher(),
-                0.7308.asOneTimePublisher(),
-                mapOf(coa to clp).asOneTimePublisher(),
-                abbreviatedNamePublisher = "NT".asOneTimePublisher(),
-            )
-            .build("AUSTRALIA".asOneTimePublisher())
+        val screen = RegionalBreakdownScreen.of(
+            entries = votes(
+                topRowHeader = "AUSTRALIA".asOneTimePublisher(),
+                topRowVotes = mapOf(
+                    alp to 4776030,
+                    coa to 5233334,
+                    grn to 1795985,
+                    onp to 727464,
+                    uap to 604536,
+                    oth to 1521693,
+                ).asOneTimePublisher(),
+                topRowReporting = pct(0.8982.asOneTimePublisher()),
+            ) {
+                section(
+                    items = listOf(
+                        State("New South Wales", "NSW", mapOf(coa to 1699323, alp to 1552684, grn to 466069, onp to 224965, uap to 183174, oth to 524725), 0.9070, null),
+                        State("Victoria", "VIC", mapOf(coa to 1239280, alp to 1230842, grn to 514893, onp to 143558, uap to 177745, oth to 440115), 0.9059, null),
+                        State("Queensland", "QLD", mapOf(lnp to 1172515, alp to 811069, grn to 382900, onp to 221640, uap to 149255, oth to 220647), 0.8816, lnp),
+                        State("Western Australia", "WA", mapOf(lib to 512414, alp to 542667, grn to 184094, onp to 58226, uap to 33863, oth to 141961), 0.8799, lib),
+                        State("South Australia", "SA", mapOf(lib to 390195, alp to 378329, grn to 140227, onp to 53057, uap to 42688, oth to 93290), 0.9107, lib),
+                        State("Tasmania", "TAS", mapOf(lib to 115184, alp to 95322, grn to 41972, onp to 13970, uap to 6437, oth to 76813), 0.9243, lib),
+                        State("Australian Capital Territory", "ACT", mapOf(lib to 74759, alp to 126595, grn to 52648, onp to 6630, uap to 6864, oth to 14501), 0.9207, lib),
+                        State("Northern Territory", "NT", mapOf(clp to 29664, alp to 38522, grn to 13182, onp to 5418, uap to 4510, oth to 9641), 0.7308, clp),
+                    ),
+                    header = { name.uppercase().asOneTimePublisher() },
+                    abbreviatedHeader = { abbreviatedName.asOneTimePublisher() },
+                    votes = { votes.asOneTimePublisher() },
+                    reporting = { pct(reporting.asOneTimePublisher()) },
+                    coalitionMap = { if (coalitionParty == null) null else mapOf(coa to coalitionParty).asOneTimePublisher() },
+                )
+            },
+            header = "PRIMARY VOTE BY STATE".asOneTimePublisher(),
+            title = "AUSTRALIA".asOneTimePublisher(),
+        )
         screen.setSize(1024, 512)
         compareRendering("RegionalBreakdownScreen", "Votes-C", screen)
         assertPublishes(
@@ -1123,91 +1256,113 @@ class RegionalBreakdownScreenTest {
         val uap = Party("United Australia", "UAP", Color.YELLOW)
         val oth = Party.OTHERS
 
-        val screen = RegionalBreakdownScreen.votesWithPrev(
-            "AUSTRALIA".asOneTimePublisher(),
-            mapOf(
-                alp to 4776030,
-                coa to 5233334,
-                grn to 1795985,
-                onp to 727464,
-                uap to 604536,
-                oth to 1521693,
-            ).asOneTimePublisher(),
-            mapOf(
-                alp to 4752110,
-                coa to 5906884,
-                grn to 1482923,
-                onp to 438587,
-                uap to 488817,
-                oth to 1184031,
-            ).asOneTimePublisher(),
-            0.8982.asOneTimePublisher(),
-            "PRIMARY VOTE BY STATE".asOneTimePublisher(),
+        data class State(
+            val name: String,
+            val abbreviatedName: String,
+            val votes: Map<PartyOrCoalition, Int>,
+            val prev: Map<PartyOrCoalition, Int>,
+            val reporting: Double,
+            val coalitionParty: Party?,
         )
-            .withBlankRow()
-            .withRegion(
-                "NEW SOUTH WALES".asOneTimePublisher(),
-                mapOf(coa to 1699323, alp to 1552684, grn to 466069, onp to 224965, uap to 183174, oth to 524725).asOneTimePublisher(),
-                mapOf(coa to 1930426, alp to 1568173, grn to 395238, onp to 59464, uap to 153477, oth to 430508).asOneTimePublisher(),
-                0.9070.asOneTimePublisher(),
-                abbreviatedNamePublisher = "NSW".asOneTimePublisher(),
-            )
-            .withRegion(
-                "VICTORIA".asOneTimePublisher(),
-                mapOf(coa to 1239280, alp to 1230842, grn to 514893, onp to 143558, uap to 177745, oth to 440115).asOneTimePublisher(),
-                mapOf(coa to 1425542, alp to 1361913, grn to 439169, onp to 35177, uap to 134581, oth to 298650).asOneTimePublisher(),
-                0.9059.asOneTimePublisher(),
-                abbreviatedNamePublisher = "VIC".asOneTimePublisher(),
-            )
-            .withRegion(
-                "QUEENSLAND".asOneTimePublisher(),
-                mapOf(lnp to 1172515, alp to 811069, grn to 382900, onp to 221640, uap to 149255, oth to 220647).asOneTimePublisher(),
-                mapOf(lnp to 1236401, alp to 754792, grn to 292059, onp to 250779, uap to 99329, oth to 195658).asOneTimePublisher(),
-                0.8816.asOneTimePublisher(),
-                mapOf(coa to lnp).asOneTimePublisher(),
-                abbreviatedNamePublisher = "QLD".asOneTimePublisher(),
-            )
-            .withRegion(
-                "WESTERN AUSTRALIA".asOneTimePublisher(),
-                mapOf(lib to 512414, alp to 542667, grn to 184094, onp to 58226, uap to 33863, oth to 141961).asOneTimePublisher(),
-                mapOf(lib to 633930, alp to 417727, grn to 162876, onp to 74478, uap to 28488, oth to 84375).asOneTimePublisher(),
-                0.8799.asOneTimePublisher(),
-                mapOf(coa to lib).asOneTimePublisher(),
-                abbreviatedNamePublisher = "WA".asOneTimePublisher(),
-            )
-            .withRegion(
-                "SOUTH AUSTRALIA".asOneTimePublisher(),
-                mapOf(lib to 390195, alp to 378329, grn to 140227, onp to 53057, uap to 42688, oth to 93290).asOneTimePublisher(),
-                mapOf(lib to 438022, alp to 379495, grn to 103036, onp to 8990, uap to 46007, oth to 97101).asOneTimePublisher(),
-                0.9107.asOneTimePublisher(),
-                mapOf(coa to lib).asOneTimePublisher(),
-                abbreviatedNamePublisher = "SA".asOneTimePublisher(),
-            )
-            .withRegion(
-                "TASMANIA".asOneTimePublisher(),
-                mapOf(lib to 115184, alp to 95322, grn to 41972, onp to 13970, uap to 6437, oth to 76813).asOneTimePublisher(),
-                mapOf(lib to 120415, alp to 116955, grn to 35229, onp to 9699, uap to 16868, oth to 48826).asOneTimePublisher(),
-                0.9243.asOneTimePublisher(),
-                mapOf(coa to lib).asOneTimePublisher(),
-                abbreviatedNamePublisher = "TAS".asOneTimePublisher(),
-            )
-            .withRegion(
-                "AUSTRALIAN CAPITAL TERRITORY".asOneTimePublisher(),
-                mapOf(lib to 74759, alp to 126595, grn to 52648, onp to 6630, uap to 6864, oth to 14501).asOneTimePublisher(),
-                mapOf(lib to 83311, alp to 109300, grn to 44804, uap to 7117, oth to 21443).asOneTimePublisher(),
-                0.9207.asOneTimePublisher(),
-                mapOf(coa to lib).asOneTimePublisher(),
-                abbreviatedNamePublisher = "ACT".asOneTimePublisher(),
-            )
-            .withRegion(
-                "NORTHERN TERRITORY".asOneTimePublisher(),
-                mapOf(clp to 29664, alp to 38522, grn to 13182, onp to 5418, uap to 4510, oth to 9641).asOneTimePublisher(),
-                mapOf(clp to 38837, alp to 43755, grn to 10512, uap to 2950, oth to 7464).asOneTimePublisher(),
-                0.7308.asOneTimePublisher(),
-                mapOf(coa to clp).asOneTimePublisher(),
-                abbreviatedNamePublisher = "NT".asOneTimePublisher(),
-            )
-            .build("AUSTRALIA".asOneTimePublisher())
+        val screen = RegionalBreakdownScreen.of(
+            entries = votes(
+                topRowHeader = "AUSTRALIA".asOneTimePublisher(),
+                topRowVotes = mapOf(
+                    alp to 4776030,
+                    coa to 5233334,
+                    grn to 1795985,
+                    onp to 727464,
+                    uap to 604536,
+                    oth to 1521693,
+                ).asOneTimePublisher(),
+                topRowPrev = mapOf(
+                    alp to 4752110,
+                    coa to 5906884,
+                    grn to 1482923,
+                    onp to 438587,
+                    uap to 488817,
+                    oth to 1184031,
+                ).asOneTimePublisher(),
+                topRowReporting = pct(0.8982.asOneTimePublisher()),
+            ) {
+                section(
+                    items = listOf(
+                        State(
+                            "New South Wales",
+                            "NSW",
+                            mapOf(coa to 1699323, alp to 1552684, grn to 466069, onp to 224965, uap to 183174, oth to 524725),
+                            mapOf(coa to 1930426, alp to 1568173, grn to 395238, onp to 59464, uap to 153477, oth to 430508),
+                            0.9070,
+                            null,
+                        ),
+                        State(
+                            "Victoria",
+                            "VIC",
+                            mapOf(coa to 1239280, alp to 1230842, grn to 514893, onp to 143558, uap to 177745, oth to 440115),
+                            mapOf(coa to 1425542, alp to 1361913, grn to 439169, onp to 35177, uap to 134581, oth to 298650),
+                            0.9059,
+                            null,
+                        ),
+                        State(
+                            "Queensland",
+                            "QLD",
+                            mapOf(lnp to 1172515, alp to 811069, grn to 382900, onp to 221640, uap to 149255, oth to 220647),
+                            mapOf(lnp to 1236401, alp to 754792, grn to 292059, onp to 250779, uap to 99329, oth to 195658),
+                            0.8816,
+                            lnp,
+                        ),
+                        State(
+                            "Western Australia",
+                            "WA",
+                            mapOf(lib to 512414, alp to 542667, grn to 184094, onp to 58226, uap to 33863, oth to 141961),
+                            mapOf(lib to 633930, alp to 417727, grn to 162876, onp to 74478, uap to 28488, oth to 84375),
+                            0.8799,
+                            lib,
+                        ),
+                        State(
+                            "South Australia",
+                            "SA",
+                            mapOf(lib to 390195, alp to 378329, grn to 140227, onp to 53057, uap to 42688, oth to 93290),
+                            mapOf(lib to 438022, alp to 379495, grn to 103036, onp to 8990, uap to 46007, oth to 97101),
+                            0.9107,
+                            lib,
+                        ),
+                        State(
+                            "Tasmania",
+                            "TAS",
+                            mapOf(lib to 115184, alp to 95322, grn to 41972, onp to 13970, uap to 6437, oth to 76813),
+                            mapOf(lib to 120415, alp to 116955, grn to 35229, onp to 9699, uap to 16868, oth to 48826),
+                            0.9243,
+                            lib,
+                        ),
+                        State(
+                            "Australian Capital Territory",
+                            "ACT",
+                            mapOf(lib to 74759, alp to 126595, grn to 52648, onp to 6630, uap to 6864, oth to 14501),
+                            mapOf(lib to 83311, alp to 109300, grn to 44804, uap to 7117, oth to 21443),
+                            0.9207,
+                            lib,
+                        ),
+                        State(
+                            "Northern Territory",
+                            "NT",
+                            mapOf(clp to 29664, alp to 38522, grn to 13182, onp to 5418, uap to 4510, oth to 9641),
+                            mapOf(clp to 38837, alp to 43755, grn to 10512, uap to 2950, oth to 7464),
+                            0.7308,
+                            clp,
+                        ),
+                    ),
+                    header = { name.uppercase().asOneTimePublisher() },
+                    abbreviatedHeader = { abbreviatedName.asOneTimePublisher() },
+                    votes = { votes.asOneTimePublisher() },
+                    prev = { prev.asOneTimePublisher() },
+                    reporting = { pct(reporting.asOneTimePublisher()) },
+                    coalitionMap = { if (coalitionParty == null) null else mapOf(coa to coalitionParty).asOneTimePublisher() },
+                )
+            },
+            header = "PRIMARY VOTE BY STATE".asOneTimePublisher(),
+            title = "AUSTRALIA".asOneTimePublisher(),
+        )
         screen.setSize(1024, 512)
         compareRendering("RegionalBreakdownScreen", "VotesWithPrev-C", screen)
         assertPublishes(
@@ -1264,23 +1419,26 @@ class RegionalBreakdownScreenTest {
                 Publisher(0.0),
             )
         }
-        val builder = RegionalBreakdownScreen.votesWithPrev(
-            "CANADA".asOneTimePublisher(),
-            federalVotes.first,
-            federalVotes.second,
-            federalVotes.third,
-            "POPULAR VOTE BY PROVINCE".asOneTimePublisher(),
-            maxColumnsPublisher = 4.asOneTimePublisher(),
-        ).withBlankRow()
-        provincialVotes.forEach { name, (curr, prev, pct) ->
-            builder.withRegion(
-                name.uppercase().asOneTimePublisher(),
-                curr,
-                prev,
-                pct,
-            )
-        }
-        val screen = builder.build("CANADA".asOneTimePublisher())
+
+        val screen = RegionalBreakdownScreen.of(
+            entries = votes(
+                topRowHeader = "CANADA".asOneTimePublisher(),
+                topRowVotes = federalVotes.first,
+                topRowPrev = federalVotes.second,
+                topRowReporting = pct(federalVotes.third),
+                maxColumns = 4.asOneTimePublisher(),
+            ) {
+                section(
+                    items = provincialVotes.entries,
+                    header = { key.uppercase().asOneTimePublisher() },
+                    votes = { value.first },
+                    prev = { value.second },
+                    reporting = { pct(value.third) },
+                )
+            },
+            header = "POPULAR VOTE BY PROVINCE".asOneTimePublisher(),
+            title = "CANADA".asOneTimePublisher(),
+        )
         screen.size = Dimension(1024, 512)
         compareRendering("RegionalBreakdownScreen", "VotesWithLimitedColumns-1", screen)
         assertPublishes(
