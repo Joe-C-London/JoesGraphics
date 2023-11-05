@@ -23,29 +23,78 @@ class MixedMemberAllSeatsScreen private constructor(
     altText: Flow.Publisher<String>,
 ) : GenericPanel(panel, title, altText) {
 
-    class MultiRegionBuilder<C, R>(
-        private val prevConstituencies: Flow.Publisher<out Map<C, Party?>>,
-        private val currConstituencies: Flow.Publisher<out Map<C, PartyResult?>>,
-        private val constituencyNames: (C) -> String,
-        private val prevRegionLists: Flow.Publisher<out Map<R, List<Party>>>,
-        private val currRegionLists: Flow.Publisher<out Map<R, List<PartyResult>>>,
-        private val regionNames: (R) -> String,
-        private val regionConstituencies: (R) -> List<C>,
-    ) {
-        private inner class RegionalPanel(val header: Flow.Publisher<String>, val region: R) {
-            val constituencyRows = regionConstituencies(region).size.asOneTimePublisher()
-            val listRows = prevRegionLists.merge(currRegionLists) { p, c ->
-                maxOf(p[region]?.size ?: 0, c[region]?.size ?: 0)
+    companion object {
+        fun <C, R> multiRegion(
+            regions: Iterable<R>,
+            prevWinners: Flow.Publisher<out Map<C, Party?>>,
+            currWinners: Flow.Publisher<out Map<C, PartyResult?>>,
+            constituencyName: C.() -> String,
+            prevRegionLists: Flow.Publisher<out Map<R, List<Party>>>,
+            currRegionLists: Flow.Publisher<out Map<R, List<PartyResult>>>,
+            regionName: R.() -> String,
+            regionConstituencies: R.() -> List<C>,
+            regionHeader: R.() -> Flow.Publisher<String>,
+            title: Flow.Publisher<String?>,
+        ): MixedMemberAllSeatsScreen {
+            val regionalPanels = regions.map { region ->
+                RegionalPanel(
+                    region.regionHeader(),
+                    region.regionName(),
+                    region.regionConstituencies(),
+                    constituencyName,
+                    prevWinners,
+                    currWinners,
+                    prevRegionLists.map { it[region] ?: emptyList() },
+                    currRegionLists.map { it[region] ?: emptyList() },
+                )
+            }
+            val allDeclared = currWinners.merge(currRegionLists) { c, r ->
+                c.values.filterNotNull().all { it.elected } && r.values.flatten().all { it.elected }
+            }
+            return MixedMemberAllSeatsScreen(
+                JPanel().also { panel ->
+                    panel.background = Color.WHITE
+                    panel.layout = GridLayout(1, 0, 5, 5)
+                    panel.border = EmptyBorder(5, 5, 5, 5)
+                    regionalPanels.forEach {
+                        panel.add(
+                            it.createPanel(
+                                regionalPanels.map { it.constituencyRows }.combine().map { it.max() + 1 },
+                                regionalPanels.map { it.totalRows }.combine().map { it.max() },
+                            ),
+                        )
+                    }
+                },
+                title,
+                regionalPanels.map { it.createAltText(allDeclared) }.combine().merge(title) { p, t ->
+                    t + p.joinToString("") { "\n\n$it" }
+                },
+            )
+        }
+
+        private class RegionalPanel<C>(
+            val header: Flow.Publisher<String>,
+            val name: String,
+            constituencies: List<C>,
+            val constituencyName: C.() -> String,
+            val prevWinners: Flow.Publisher<out Map<C, Party?>>,
+            val currWinners: Flow.Publisher<out Map<C, PartyResult?>>,
+            prevRegionList: Flow.Publisher<List<Party>>,
+            currRegionList: Flow.Publisher<List<PartyResult>>,
+        ) {
+            val constituencyRows = constituencies.size.asOneTimePublisher()
+            val listRows = prevRegionList.merge(currRegionList) { p, c ->
+                maxOf(p.size, c.size)
             }
             val totalRows = constituencyRows.merge(listRows) { c, l -> c + l + 1 }
 
-            val constituencyItems = regionConstituencies(region).map { c ->
-                currConstituencies.map { it[c] }.merge(prevConstituencies.map { it[c] }) { curr, prev ->
+            val constituencyItems = constituencies.map { c ->
+                currWinners.map { it[c] }.merge(prevWinners.map { it[c] }) { curr, prev ->
                     Triple(c, curr, prev)
                 }
             }.combine()
 
-            val listItems = currRegionLists.map { it[region] ?: emptyList() }.merge(prevRegionLists.map { it[region] ?: emptyList() }) { curr, prev ->
+            val listItems = currRegionList.merge(prevRegionList) { curr, prev ->
                 val currLeft = curr.toMutableList()
                 val prevLeft = prev.toMutableList()
                 val items = LinkedList<Pair<PartyResult?, Party?>>()
@@ -65,7 +114,7 @@ class MixedMemberAllSeatsScreen private constructor(
                 items
             }
 
-            fun createPanel(): JPanel {
+            fun createPanel(maxConstituenciesPerRegion: Flow.Publisher<Int>, maxRowsPerRegion: Flow.Publisher<Int>): JPanel {
                 val itemFunc: (Party?, PartyResult?, String) -> ResultListingFrame.Item = { prev, curr, name ->
                     ResultListingFrame.Item(
                         text = name,
@@ -75,9 +124,9 @@ class MixedMemberAllSeatsScreen private constructor(
                     )
                 }
                 val constituencyItems = constituencyItems.mapElements { (c, curr, prev) ->
-                    itemFunc(prev, curr, constituencyNames(c))
+                    itemFunc(prev, curr, c.constituencyName())
                 }
-                val blankItems = regionalPanels.map { it.constituencyRows }.combine().map { it.max() + 1 }
+                val blankItems = maxConstituenciesPerRegion
                     .merge(constituencyItems) { t, c ->
                         generateSequence {
                             ResultListingFrame.Item(
@@ -89,17 +138,17 @@ class MixedMemberAllSeatsScreen private constructor(
                         }.take(t - c.size).toList()
                     }
                 val listItems = listItems.mapElements { (curr, prev) ->
-                    itemFunc(prev, curr, regionNames(region))
+                    itemFunc(prev, curr, name)
                 }
                 return ResultListingFrame(
                     headerPublisher = header,
-                    numRowsPublisher = regionalPanels.map { it.totalRows }.combine().map { it.max() },
+                    numRowsPublisher = maxRowsPerRegion,
                     itemsPublisher = constituencyItems.merge(blankItems) { c, b -> listOf(c, b).flatten() }
                         .merge(listItems) { c, l -> listOf(c, l).flatten() },
                 )
             }
 
-            fun createAltText(): Flow.Publisher<String> {
+            fun createAltText(allDeclared: Flow.Publisher<Boolean>): Flow.Publisher<String> {
                 val constituencyGroups = constituencyItems.map { c -> c.groupBy({ it.second?.leader to it.third }, { it.second }) }
                 val listGroups = listItems.map { c -> c.groupBy({ it.first?.leader to it.second }, { it.first }) }
                 val allGroups = constituencyGroups.merge(listGroups) { c, l -> c to l }.merge(allDeclared) { (cg, lg), all ->
@@ -127,53 +176,6 @@ class MixedMemberAllSeatsScreen private constructor(
                 }
                 return header.merge(allGroups) { h, a -> "$h\n$a" }
             }
-        }
-        private val regionalPanels = LinkedList<RegionalPanel>()
-
-        private val allDeclared = currConstituencies.merge(currRegionLists) { c, r ->
-            c.values.filterNotNull().all { it.elected } && r.values.flatten().all { it.elected }
-        }
-
-        fun withRegion(header: Flow.Publisher<String>, region: R): MultiRegionBuilder<C, R> {
-            regionalPanels.add(RegionalPanel(header, region))
-            return this
-        }
-
-        fun build(title: Flow.Publisher<String?>): MixedMemberAllSeatsScreen {
-            return MixedMemberAllSeatsScreen(
-                JPanel().also { panel ->
-                    panel.background = Color.WHITE
-                    panel.layout = GridLayout(1, 0, 5, 5)
-                    panel.border = EmptyBorder(5, 5, 5, 5)
-                    regionalPanels.forEach { panel.add(it.createPanel()) }
-                },
-                title,
-                regionalPanels.map { it.createAltText() }.combine().merge(title) { p, t ->
-                    t + p.joinToString("") { "\n\n$it" }
-                },
-            )
-        }
-    }
-
-    companion object {
-        fun <C, R> multiRegion(
-            prevConstituencies: Flow.Publisher<out Map<C, Party?>>,
-            currConstituencies: Flow.Publisher<out Map<C, PartyResult?>>,
-            constituencyNames: (C) -> String,
-            prevRegionLists: Flow.Publisher<out Map<R, List<Party>>>,
-            currRegionLists: Flow.Publisher<out Map<R, List<PartyResult>>>,
-            regionNames: (R) -> String,
-            regionConstituencies: (R) -> List<C>,
-        ): MultiRegionBuilder<C, R> {
-            return MultiRegionBuilder(
-                prevConstituencies,
-                currConstituencies,
-                constituencyNames,
-                prevRegionLists,
-                currRegionLists,
-                regionNames,
-                regionConstituencies,
-            )
         }
     }
 }

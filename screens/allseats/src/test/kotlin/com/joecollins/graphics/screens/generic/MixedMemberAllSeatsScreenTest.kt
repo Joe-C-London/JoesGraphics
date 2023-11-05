@@ -17,20 +17,17 @@ class MixedMemberAllSeatsScreenTest {
         val currRegions = Publisher(walesRegion.associateWith { emptyList<PartyResult>() })
 
         val screen = MixedMemberAllSeatsScreen.multiRegion(
-            walesConstituencies.associateWith { it.prevWinner }.asOneTimePublisher(),
-            currConstituencies,
-            { c -> c.name.uppercase() },
-            walesRegion.associateWith { it.prevListSeats }.asOneTimePublisher(),
-            currRegions,
-            { r -> "LIST: ${r.name.uppercase()}" },
-            { r -> walesConstituencies.filter { c -> c.region == r } },
+            regions = listOf(midWestWales, northWales, southCentralWales, southEastWales, southWestWales),
+            prevWinners = walesConstituencies.associateWith { it.prevWinner }.asOneTimePublisher(),
+            currWinners = currConstituencies,
+            constituencyName = { name.uppercase() },
+            prevRegionLists = walesRegion.associateWith { it.prevListSeats }.asOneTimePublisher(),
+            currRegionLists = currRegions,
+            regionName = { "LIST: ${name.uppercase()}" },
+            regionConstituencies = { walesConstituencies.filter { c -> c.region == this } },
+            regionHeader = { name.uppercase().replace(" WALES", "").asOneTimePublisher() },
+            title = "WALES: ALL SEATS".asOneTimePublisher(),
         )
-            .withRegion("MID AND WEST".asOneTimePublisher(), midWestWales)
-            .withRegion("NORTH".asOneTimePublisher(), northWales)
-            .withRegion("SOUTH CENTRAL".asOneTimePublisher(), southCentralWales)
-            .withRegion("SOUTH EAST".asOneTimePublisher(), southEastWales)
-            .withRegion("SOUTH WEST".asOneTimePublisher(), southWestWales)
-            .build("WALES: ALL SEATS".asOneTimePublisher())
         screen.setSize(1024, 512)
         compareRendering("MixedMemberAllSeatsScreen", "MultiRegion-1", screen)
         assertPublishes(
