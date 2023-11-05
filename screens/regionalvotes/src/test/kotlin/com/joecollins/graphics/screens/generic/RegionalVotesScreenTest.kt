@@ -33,16 +33,15 @@ class RegionalVotesScreenTest {
         )
 
         val panel = RegionalVotesScreen.ofCurrPrev(
-            listOf(general, maori),
-            { "$it electorates".uppercase().asOneTimePublisher() },
-            { curr[it]!! },
-            { prev[it]!! },
-            { "PARTY VOTES".asOneTimePublisher() },
-            { "CHANGE SINCE 2017".asOneTimePublisher() },
+            regions = listOf(general, maori),
+            title = { "$this electorates".uppercase().asOneTimePublisher() },
+            currVotes = { curr[this]!! },
+            prevVotes = { prev[this]!! },
+            voteHeader = { "PARTY VOTES".asOneTimePublisher() },
+            changeHeader = { "CHANGE SINCE 2017".asOneTimePublisher() },
+            pctReporting = { reporting[this]!! },
+            progressLabel = { progress[this]!! },
         )
-            .withPctReporting { reporting[it]!! }
-            .withProgressLabel { progress[it]!! }
-            .build()
         panel.setSize(1024, 512)
         compareRendering("RegionalVotesScreen", "CurrPrev-1", panel)
         assertPublishes(

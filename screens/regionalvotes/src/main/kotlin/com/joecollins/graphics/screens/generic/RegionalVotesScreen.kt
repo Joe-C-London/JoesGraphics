@@ -18,7 +18,7 @@ import java.util.concurrent.Flow
 import javax.swing.JPanel
 import kotlin.math.absoluteValue
 
-class RegionalVotesScreen(subPanels: List<GenericPanel>) : JPanel(), AltTextProvider {
+class RegionalVotesScreen private constructor(subPanels: List<GenericPanel>) : JPanel(), AltTextProvider {
 
     init {
         background = Color.WHITE
@@ -31,45 +31,48 @@ class RegionalVotesScreen(subPanels: List<GenericPanel>) : JPanel(), AltTextProv
             .combine()
             .map { p -> p.filterNotNull().joinToString("\n\n") }
 
-    class CurrPrevBuilder<R> internal constructor(
-        private val regions: List<R>,
-        private val title: (R) -> Flow.Publisher<String>,
-        private val currVotes: (R) -> Flow.Publisher<out Map<out PartyOrCoalition, Int>>,
-        private val prevVotes: (R) -> Flow.Publisher<out Map<out PartyOrCoalition, Int>>,
-        private val voteHeader: (R) -> Flow.Publisher<String>,
-        private val changeHeader: (R) -> Flow.Publisher<String>,
-        private val voteSubhead: (R) -> Flow.Publisher<out String?>,
-        private val changeSubhead: (R) -> Flow.Publisher<out String?>,
-    ) {
-        private var pctReporting: (R) -> Flow.Publisher<Double> = { 1.0.asOneTimePublisher() }
-        private var progressLabel: (R) -> Flow.Publisher<out String?> = { null.asOneTimePublisher() }
-
-        fun withPctReporting(pctReporting: (R) -> Flow.Publisher<Double>): CurrPrevBuilder<R> {
-            this.pctReporting = pctReporting
-            return this
+    companion object {
+        fun <R> ofCurrPrev(
+            regions: List<R>,
+            title: R.() -> Flow.Publisher<String>,
+            currVotes: R.() -> Flow.Publisher<out Map<out PartyOrCoalition, Int>>,
+            prevVotes: R.() -> Flow.Publisher<out Map<out PartyOrCoalition, Int>>,
+            voteHeader: R.() -> Flow.Publisher<String>,
+            changeHeader: R.() -> Flow.Publisher<String>,
+            voteSubhead: R.() -> Flow.Publisher<out String?> = { null.asOneTimePublisher() },
+            changeSubhead: R.() -> Flow.Publisher<out String?> = { null.asOneTimePublisher() },
+            pctReporting: (R.() -> Flow.Publisher<Double>)? = null,
+            progressLabel: (R.() -> Flow.Publisher<out String?>)? = null,
+        ): RegionalVotesScreen {
+            return RegionalVotesScreen(
+                regions.map {
+                    buildPanel(
+                        it.title(),
+                        it.currVotes(),
+                        it.prevVotes(),
+                        it.voteHeader(),
+                        it.changeHeader(),
+                        it.voteSubhead(),
+                        it.changeSubhead(),
+                        pctReporting?.invoke(it),
+                        progressLabel?.invoke(it),
+                    )
+                },
+            )
         }
 
-        fun withProgressLabel(progressLabel: (R) -> Flow.Publisher<out String?>): CurrPrevBuilder<R> {
-            this.progressLabel = progressLabel
-            return this
-        }
-
-        fun build(): RegionalVotesScreen {
-            return RegionalVotesScreen(regions.map { buildPanel(it) })
-        }
-
-        private fun buildPanel(region: R): GenericPanel {
+        private fun buildPanel(
+            title: Flow.Publisher<String>,
+            currVotes: Flow.Publisher<out Map<out PartyOrCoalition, Int>>,
+            prevVotes: Flow.Publisher<out Map<out PartyOrCoalition, Int>>,
+            voteHeader: Flow.Publisher<String>,
+            changeHeader: Flow.Publisher<String>,
+            voteSubhead: Flow.Publisher<out String?>,
+            changeSubhead: Flow.Publisher<out String?>,
+            pctReporting: (Flow.Publisher<Double>)?,
+            progressLabel: (Flow.Publisher<out String?>)?,
+        ): GenericPanel {
             data class Entry(val party: PartyOrCoalition, val pct: Double?, val prev: Double)
-
-            val title = title(region)
-            val currVotes = currVotes(region)
-            val voteHeader = voteHeader(region)
-            val voteSubhead = voteSubhead(region)
-            val prevVotes = prevVotes(region)
-            val changeHeader = changeHeader(region)
-            val changeSubhead = changeSubhead(region)
-            val pctReporting = pctReporting(region)
-            val progressLabel = progressLabel(region)
 
             val entries = currVotes.merge(prevVotes) { curr, prev ->
                 val currTotal = curr.values.sum().toDouble()
@@ -101,10 +104,17 @@ class RegionalVotesScreen(subPanels: List<GenericPanel>) : JPanel(), AltTextProv
                     headerPublisher = voteHeader,
                     rightHeaderLabelPublisher = progressLabel,
                     subheadPublisher = voteSubhead,
-                    maxPublisher = entries.merge(pctReporting) { e, p ->
-                        (0.5 / p.coerceAtLeast(1e-6))
-                            .coerceAtLeast(e.maxOfOrNull { it.pct ?: 0.0 } ?: 0.0)
-                    },
+                    maxPublisher = entries.run {
+                        if (pctReporting == null) {
+                            map { e -> e to 1.0 }
+                        } else {
+                            merge(pctReporting) { e, p -> e to p }
+                        }
+                    }
+                        .map { (e, p) ->
+                            (0.5 / p.coerceAtLeast(1e-6))
+                                .coerceAtLeast(e.maxOfOrNull { it.pct ?: 0.0 } ?: 0.0)
+                        },
                 )
                 val change = BarFrameBuilder.basic(
                     barsPublisher = entries.map { e ->
@@ -120,10 +130,17 @@ class RegionalVotesScreen(subPanels: List<GenericPanel>) : JPanel(), AltTextProv
                     },
                     headerPublisher = changeHeader,
                     subheadPublisher = changeSubhead,
-                    wingspanPublisher = entries.merge(pctReporting) { e, p ->
-                        (0.05 / p.coerceAtLeast(1e-6))
-                            .coerceAtLeast(e.maxOfOrNull { ((it.pct ?: 0.0) - it.prev).absoluteValue } ?: 0.0)
-                    },
+                    wingspanPublisher = entries.run {
+                        if (pctReporting == null) {
+                            map { e -> e to 1.0 }
+                        } else {
+                            merge(pctReporting) { e, p -> e to p }
+                        }
+                    }
+                        .map { (e, p) ->
+                            (0.05 / p.coerceAtLeast(1e-6))
+                                .coerceAtLeast(e.maxOfOrNull { ((it.pct ?: 0.0) - it.prev).absoluteValue } ?: 0.0)
+                        },
                 )
                 JPanel().let { panel ->
                     panel.background = Color.WHITE
@@ -134,7 +151,13 @@ class RegionalVotesScreen(subPanels: List<GenericPanel>) : JPanel(), AltTextProv
                 }
             }
             val altText = run {
-                val voteTop = voteHeader.merge(progressLabel) { h, p -> if (p.isNullOrEmpty()) h else "$h [$p]" }
+                val voteTop = voteHeader.run {
+                    if (progressLabel == null) {
+                        this
+                    } else {
+                        merge(progressLabel) { h, p -> if (p.isNullOrEmpty()) h else "$h [$p]" }
+                    }
+                }
                     .merge(voteSubhead) { h, s -> if (s.isNullOrEmpty()) h else "$h, $s" }
                 val changeTop = changeHeader.merge(changeSubhead) { h, s -> if (s.isNullOrEmpty()) h else "$h, $s" }
                 val entriesText = entries.map { e ->
@@ -163,21 +186,6 @@ class RegionalVotesScreen(subPanels: List<GenericPanel>) : JPanel(), AltTextProv
                 title,
                 altText,
             )
-        }
-    }
-
-    companion object {
-        fun <R> ofCurrPrev(
-            regions: List<R>,
-            title: (R) -> Flow.Publisher<String>,
-            currVotes: (R) -> Flow.Publisher<out Map<out PartyOrCoalition, Int>>,
-            prevVotes: (R) -> Flow.Publisher<out Map<out PartyOrCoalition, Int>>,
-            voteHeader: (R) -> Flow.Publisher<String>,
-            changeHeader: (R) -> Flow.Publisher<String>,
-            voteSubhead: (R) -> Flow.Publisher<out String?> = { null.asOneTimePublisher() },
-            changeSubhead: (R) -> Flow.Publisher<out String?> = { null.asOneTimePublisher() },
-        ): CurrPrevBuilder<R> {
-            return CurrPrevBuilder(regions, title, currVotes, prevVotes, voteHeader, changeHeader, voteSubhead, changeSubhead)
         }
     }
 }
