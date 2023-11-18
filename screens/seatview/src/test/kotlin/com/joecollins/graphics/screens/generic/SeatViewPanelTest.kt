@@ -3,6 +3,8 @@ package com.joecollins.graphics.screens.generic
 import com.joecollins.graphics.screens.generic.SeatViewPanel.Companion.candidateDualSeats
 import com.joecollins.graphics.screens.generic.SeatViewPanel.Companion.candidateRangeSeats
 import com.joecollins.graphics.screens.generic.SeatViewPanel.Companion.candidateSeats
+import com.joecollins.graphics.screens.generic.SeatViewPanel.Companion.createPartyMap
+import com.joecollins.graphics.screens.generic.SeatViewPanel.Companion.createResultMap
 import com.joecollins.graphics.screens.generic.SeatViewPanel.Companion.partyDualSeats
 import com.joecollins.graphics.screens.generic.SeatViewPanel.Companion.partyDualSeatsReversed
 import com.joecollins.graphics.screens.generic.SeatViewPanel.Companion.partyRangeSeats
@@ -31,22 +33,31 @@ class SeatViewPanelTest {
         val previousSeats = Publisher(emptyMap<Party, Int>())
         val totalSeats = Publisher(650)
         val showMajority = Publisher(true)
-        val header = Publisher("UNITED KINGDOM")
+        val title = Publisher("UNITED KINGDOM")
         val seatHeader = Publisher("0 OF 650 CONSTITUENCIES DECLARED")
         val seatSubhead = Publisher("PROJECTION: TOO EARLY TO CALL")
         val changeHeader = Publisher("CHANGE SINCE 2017")
         val changeSubhead = Publisher<String?>("CON NEED +9 FOR MAJORITY")
         val con = Party("Conservative", "CON", Color.BLUE)
         val lab = Party("Labour", "LAB", Color.RED)
-        val panel = partySeats(
-            currentSeats,
-            seatHeader,
-            seatSubhead,
+        val panel = partySeats<Party>(
+            current = {
+                seats = currentSeats
+                header = seatHeader
+                subhead = seatSubhead
+                this.totalSeats = totalSeats
+            },
+            prev = {
+                seats = previousSeats
+                header = changeHeader
+                subhead = changeSubhead
+            },
+            majorityLine = {
+                show = showMajority
+                display = { "$it SEATS FOR MAJORITY" }
+            },
+            title = title,
         )
-            .withTotal(totalSeats)
-            .withMajorityLine(showMajority) { "$it SEATS FOR MAJORITY" }
-            .withPrev(previousSeats, changeHeader, changeSubhead)
-            .build(header)
         panel.setSize(1024, 512)
         compareRendering("SeatViewPanel", "Basic-1", panel)
         assertPublishes(
@@ -138,7 +149,7 @@ class SeatViewPanelTest {
             """.trimIndent(),
         )
 
-        header.submit("SCOTLAND")
+        title.submit("SCOTLAND")
         seatHeader.submit("59 OF 59 SEATS DECLARED")
         seatSubhead.submit("")
         changeSubhead.submit(null)
@@ -167,22 +178,31 @@ class SeatViewPanelTest {
         val seatDiff = Publisher(emptyMap<Party, Int>())
         val totalSeats = Publisher(650)
         val showMajority = Publisher(true)
-        val header = Publisher("UNITED KINGDOM")
+        val title = Publisher("UNITED KINGDOM")
         val seatHeader = Publisher("0 OF 650 CONSTITUENCIES DECLARED")
         val seatSubhead = Publisher("PROJECTION: TOO EARLY TO CALL")
         val changeHeader = Publisher("CHANGE SINCE 2017")
         val changeSubhead = Publisher<String?>("CON NEED +9 FOR MAJORITY")
         val con = Party("Conservative", "CON", Color.BLUE)
         val lab = Party("Labour", "LAB", Color.RED)
-        val panel = partySeats(
-            currentSeats,
-            seatHeader,
-            seatSubhead,
+        val panel = partySeats<Party>(
+            current = {
+                seats = currentSeats
+                header = seatHeader
+                subhead = seatSubhead
+                this.totalSeats = totalSeats
+            },
+            diff = {
+                seats = seatDiff
+                header = changeHeader
+                subhead = changeSubhead
+            },
+            majorityLine = {
+                show = showMajority
+                display = { "$it SEATS FOR MAJORITY" }
+            },
+            title = title,
         )
-            .withTotal(totalSeats)
-            .withMajorityLine(showMajority) { "$it SEATS FOR MAJORITY" }
-            .withDiff(seatDiff, changeHeader, changeSubhead)
-            .build(header)
         panel.setSize(1024, 512)
         compareRendering("SeatViewPanel", "Basic-1", panel)
         assertPublishes(
@@ -273,7 +293,7 @@ class SeatViewPanelTest {
             """.trimIndent(),
         )
 
-        header.submit("SCOTLAND")
+        title.submit("SCOTLAND")
         seatHeader.submit("59 OF 59 SEATS DECLARED")
         seatSubhead.submit("")
         changeSubhead.submit(null)
@@ -304,7 +324,7 @@ class SeatViewPanelTest {
         val previousVotes = Publisher(emptyMap<Party, Int>())
         val totalSeats = Publisher(650)
         val showMajority = Publisher(true)
-        val header = Publisher("UNITED KINGDOM")
+        val title = Publisher("UNITED KINGDOM")
         val seatHeader = Publisher("0 OF 650 CONSTITUENCIES DECLARED")
         val seatSubhead = Publisher("PROJECTION: TOO EARLY TO CALL")
         val changeHeader = Publisher("CHANGE SINCE 2017")
@@ -317,16 +337,29 @@ class SeatViewPanelTest {
         val grn = Party("Green", "GRN", Color.GREEN)
         val oth = Party.OTHERS
         val partyOrder = listOf(snp, lab, pc, grn, ld, oth, con)
-        val panel = partySeats(
-            currentSeats,
-            seatHeader,
-            seatSubhead,
+        val panel = partySeats<Party>(
+            current = {
+                seats = currentSeats
+                header = seatHeader
+                subhead = seatSubhead
+                this.totalSeats = totalSeats
+            },
+            prev = {
+                seats = previousSeats
+                header = changeHeader
+            },
+            swing = {
+                currVotes = currentVotes
+                prevVotes = previousVotes
+                this.partyOrder = compareBy { partyOrder.indexOf(it) }
+                header = swingHeader
+            },
+            majorityLine = {
+                show = showMajority
+                display = { "$it SEATS FOR MAJORITY" }
+            },
+            title = title,
         )
-            .withPrev(previousSeats, changeHeader)
-            .withTotal(totalSeats)
-            .withMajorityLine(showMajority) { "$it SEATS FOR MAJORITY" }
-            .withSwing(currentVotes, previousVotes, compareBy { partyOrder.indexOf(it) }, swingHeader)
-            .build(header)
         panel.setSize(1024, 512)
         compareRendering("SeatViewPanel", "Swing-1", panel)
         assertPublishes(
@@ -385,7 +418,7 @@ class SeatViewPanelTest {
         val previousVotes = Publisher(emptyMap<Party, Int>())
         val totalSeats = Publisher(27)
         val showMajority = Publisher(true)
-        val header = Publisher("PRINCE EDWARD ISLAND")
+        val title = Publisher("PRINCE EDWARD ISLAND")
         val seatHeader = Publisher("0 OF 27 DISTRICTS DECLARED")
         val seatSubhead = Publisher("PROJECTION: TOO EARLY TO CALL")
         val changeHeader = Publisher("CHANGE SINCE 2015")
@@ -400,17 +433,35 @@ class SeatViewPanelTest {
         val ndp = Party("New Democratic Party", "NDP", Color.ORANGE)
         val oth = Party.OTHERS
         val partyOrder = listOf(ndp, grn, lib, oth, pc)
-        val panel = partySeats(
-            currentSeats,
-            seatHeader,
-            seatSubhead,
+        val panel = partySeats<Party>(
+            current = {
+                seats = currentSeats
+                header = seatHeader
+                subhead = seatSubhead
+                this.totalSeats = totalSeats
+            },
+            prev = {
+                seats = previousSeats
+                header = changeHeader
+            },
+            swing = {
+                currVotes = currentVotes
+                prevVotes = previousVotes
+                this.partyOrder = compareBy { partyOrder.indexOf(it) }
+                header = swingHeader
+            },
+            majorityLine = {
+                show = showMajority
+                display = { "$it SEATS FOR MAJORITY" }
+            },
+            map = createPartyMap {
+                shapes = shapesByDistrict.asOneTimePublisher()
+                winners = winnersByDistrict
+                this.focus = focus
+                header = mapHeader
+            },
+            title = title,
         )
-            .withPrev(previousSeats, changeHeader)
-            .withTotal(totalSeats)
-            .withMajorityLine(showMajority) { "$it SEATS FOR MAJORITY" }
-            .withSwing(currentVotes, previousVotes, compareBy { partyOrder.indexOf(it) }, swingHeader)
-            .withPartyMap(shapesByDistrict.asOneTimePublisher(), winnersByDistrict, focus, mapHeader)
-            .build(header)
         panel.setSize(1024, 512)
         compareRendering("SeatViewPanel", "Map-1", panel)
         assertPublishes(
@@ -448,7 +499,7 @@ class SeatViewPanelTest {
         )
 
         focus.submit(shapesByDistrict.keys.filter { it <= 7 })
-        header.submit("CARDIGAN")
+        title.submit("CARDIGAN")
         seatHeader.submit("1 OF 7 DISTRICTS DECLARED")
         seatSubhead.submit("")
         totalSeats.submit(7)
@@ -504,7 +555,7 @@ class SeatViewPanelTest {
         )
 
         focus.submit(null)
-        header.submit("PRINCE EDWARD ISLAND")
+        title.submit("PRINCE EDWARD ISLAND")
         seatHeader.submit("3 OF 27 DISTRICTS DECLARED")
         seatSubhead.submit("PROJECTION: TOO EARLY TO CALL")
         currentSeats.submit(mapOf(pc to 3))
@@ -551,7 +602,7 @@ class SeatViewPanelTest {
         val previousSeats = Publisher(emptyMap<Party, Pair<Int, Int>>())
         val totalSeats = Publisher(338)
         val showMajority = Publisher(true)
-        val header = Publisher("CANADA")
+        val title = Publisher("CANADA")
         val seatHeader = Publisher("0 OF 338 RIDINGS REPORTING")
         val seatSubhead = Publisher("")
         val changeHeader = Publisher("CHANGE SINCE 2015")
@@ -561,15 +612,23 @@ class SeatViewPanelTest {
         val bq = Party("Bloc Qu\u00e9b\u00e9cois", "BQ", Color.CYAN.darker())
         val grn = Party("Green", "GRN", Color.GREEN.darker())
         val ind = Party("Independent", "IND", Color.GRAY)
-        val panel = partyDualSeats(
-            currentSeats,
-            seatHeader,
-            seatSubhead,
+        val panel = partyDualSeats<Party>(
+            current = {
+                seats = currentSeats
+                header = seatHeader
+                subhead = seatSubhead
+                this.totalSeats = totalSeats
+            },
+            prev = {
+                seats = previousSeats
+                header = changeHeader
+            },
+            majorityLine = {
+                show = showMajority
+                display = { "$it SEATS FOR MAJORITY" }
+            },
+            title = title,
         )
-            .withPrev(previousSeats, changeHeader)
-            .withTotal(totalSeats)
-            .withMajorityLine(showMajority) { "$it SEATS FOR MAJORITY" }
-            .build(header)
         panel.setSize(1024, 512)
         compareRendering("SeatViewPanel", "Dual-1", panel)
         assertPublishes(
@@ -751,7 +810,7 @@ class SeatViewPanelTest {
         val previousSeats = Publisher(emptyMap<Party, Pair<Int, Int>>())
         val totalSeats = Publisher(338)
         val showMajority = Publisher(true)
-        val header = Publisher("CANADA")
+        val title = Publisher("CANADA")
         val seatHeader = Publisher("0 OF 338 RIDINGS REPORTING")
         val seatSubhead = Publisher("")
         val changeHeader = Publisher("CHANGE SINCE 2015")
@@ -761,15 +820,23 @@ class SeatViewPanelTest {
         val bq = Party("Bloc Qu\u00e9b\u00e9cois", "BQ", Color.CYAN.darker())
         val grn = Party("Green", "GRN", Color.GREEN.darker())
         val ind = Party("Independent", "IND", Color.GRAY)
-        val panel = partyDualSeatsReversed(
-            currentSeats,
-            seatHeader,
-            seatSubhead,
+        val panel = partyDualSeatsReversed<Party>(
+            current = {
+                seats = currentSeats
+                header = seatHeader
+                subhead = seatSubhead
+                this.totalSeats = totalSeats
+            },
+            prev = {
+                seats = previousSeats
+                header = changeHeader
+            },
+            majorityLine = {
+                show = showMajority
+                display = { "$it SEATS FOR MAJORITY" }
+            },
+            title = title,
         )
-            .withPrev(previousSeats, changeHeader)
-            .withTotal(totalSeats)
-            .withMajorityLine(showMajority) { "$it SEATS FOR MAJORITY" }
-            .build(header)
         panel.setSize(1024, 512)
         compareRendering("SeatViewPanel", "DualReversed-1", panel)
         assertPublishes(
@@ -951,7 +1018,7 @@ class SeatViewPanelTest {
         val seatDiff = Publisher(emptyMap<Party, Pair<Int, Int>>())
         val totalSeats = Publisher(338)
         val showMajority = Publisher(true)
-        val header = Publisher("CANADA")
+        val title = Publisher("CANADA")
         val seatHeader = Publisher("0 OF 338 RIDINGS REPORTING")
         val seatSubhead = Publisher("")
         val changeHeader = Publisher("CHANGE SINCE 2015")
@@ -961,15 +1028,23 @@ class SeatViewPanelTest {
         val bq = Party("Bloc Qu\u00e9b\u00e9cois", "BQ", Color.CYAN.darker())
         val grn = Party("Green", "GRN", Color.GREEN.darker())
         val ind = Party("Independent", "IND", Color.GRAY)
-        val panel = partyDualSeats(
-            currentSeats,
-            seatHeader,
-            seatSubhead,
+        val panel = partyDualSeats<Party>(
+            current = {
+                seats = currentSeats
+                header = seatHeader
+                subhead = seatSubhead
+                this.totalSeats = totalSeats
+            },
+            diff = {
+                seats = seatDiff
+                header = changeHeader
+            },
+            majorityLine = {
+                show = showMajority
+                display = { "$it SEATS FOR MAJORITY" }
+            },
+            title = title,
         )
-            .withDiff(seatDiff, changeHeader)
-            .withTotal(totalSeats)
-            .withMajorityLine(showMajority) { "$it SEATS FOR MAJORITY" }
-            .build(header)
         panel.setSize(1024, 512)
         compareRendering("SeatViewPanel", "Dual-1", panel)
         assertPublishes(
@@ -1158,7 +1233,7 @@ class SeatViewPanelTest {
         val previousSeats = Publisher(emptyMap<Party, Int>())
         val totalSeats = Publisher(76)
         val showMajority = Publisher(true)
-        val header = Publisher("AUSTRALIA")
+        val title = Publisher("AUSTRALIA")
         val seatHeader = Publisher("SENATE SEATS")
         val seatSubhead = Publisher("")
         val changeHeader = Publisher("CHANGE SINCE 2013")
@@ -1168,15 +1243,23 @@ class SeatViewPanelTest {
         val onp = Party("One Nation Party", "ONP", Color.ORANGE)
         val nxt = Party("Nick Xenophon Team", "NXT", Color.ORANGE)
         val oth = Party.OTHERS
-        val panel = partyRangeSeats(
-            currentSeats,
-            seatHeader,
-            seatSubhead,
+        val panel = partyRangeSeats<Party>(
+            current = {
+                seats = currentSeats
+                header = seatHeader
+                subhead = seatSubhead
+                this.totalSeats = totalSeats
+            },
+            prev = {
+                seats = previousSeats
+                header = changeHeader
+            },
+            majorityLine = {
+                show = showMajority
+                display = { "$it SEATS FOR MAJORITY" }
+            },
+            title = title,
         )
-            .withPrev(previousSeats, changeHeader)
-            .withTotal(totalSeats)
-            .withMajorityLine(showMajority) { "$it SEATS FOR MAJORITY" }
-            .build(header)
         panel.setSize(1024, 512)
         compareRendering("SeatViewPanel", "Range-1", panel)
         assertPublishes(
@@ -1300,7 +1383,7 @@ class SeatViewPanelTest {
         val seatDiff = Publisher(emptyMap<Party, IntRange>())
         val totalSeats = Publisher(76)
         val showMajority = Publisher(true)
-        val header = Publisher("AUSTRALIA")
+        val title = Publisher("AUSTRALIA")
         val seatHeader = Publisher("SENATE SEATS")
         val seatSubhead = Publisher("")
         val changeHeader = Publisher("CHANGE SINCE 2013")
@@ -1310,15 +1393,23 @@ class SeatViewPanelTest {
         val onp = Party("One Nation Party", "ONP", Color.ORANGE)
         val nxt = Party("Nick Xenophon Team", "NXT", Color.ORANGE)
         val oth = Party.OTHERS
-        val panel = partyRangeSeats(
-            currentSeats,
-            seatHeader,
-            seatSubhead,
+        val panel = partyRangeSeats<Party>(
+            current = {
+                seats = currentSeats
+                header = seatHeader
+                subhead = seatSubhead
+                this.totalSeats = totalSeats
+            },
+            diff = {
+                seats = seatDiff
+                header = changeHeader
+            },
+            majorityLine = {
+                show = showMajority
+                display = { "$it SEATS FOR MAJORITY" }
+            },
+            title = title,
         )
-            .withDiff(seatDiff, changeHeader)
-            .withTotal(totalSeats)
-            .withMajorityLine(showMajority) { "$it SEATS FOR MAJORITY" }
-            .build(header)
         panel.setSize(1024, 512)
         compareRendering("SeatViewPanel", "Range-1", panel)
         assertPublishes(
@@ -1446,7 +1537,7 @@ class SeatViewPanelTest {
         val previousSeats = Publisher(emptyMap<Party, Int>())
         val totalSeats = Publisher(538)
         val showMajority = Publisher(true)
-        val header = Publisher("UNITED STATES")
+        val title = Publisher("UNITED STATES")
         val seatHeader = Publisher("PRESIDENT")
         val seatSubhead = Publisher("")
         val changeHeader = Publisher("CHANGE SINCE 2012")
@@ -1454,15 +1545,23 @@ class SeatViewPanelTest {
         val clinton = Candidate("Hillary Clinton", Party("Democrat", "DEM", Color.BLUE))
         val trump = Candidate("Donald Trump", Party("Republican", "GOP", Color.RED))
         val panel = candidateSeats(
-            currentSeats,
-            seatHeader,
-            seatSubhead,
+            current = {
+                seats = currentSeats
+                header = seatHeader
+                subhead = seatSubhead
+                this.totalSeats = totalSeats
+                this.winner = winner
+            },
+            prev = {
+                seats = previousSeats
+                header = changeHeader
+            },
+            majorityLine = {
+                show = showMajority
+                display = { "$it ELECTORAL VOTES TO WIN" }
+            },
+            title = title,
         )
-            .withWinner(winner)
-            .withPrev(previousSeats, changeHeader)
-            .withTotal(totalSeats)
-            .withMajorityLine(showMajority) { "$it ELECTORAL VOTES TO WIN" }
-            .build(header)
         panel.setSize(1024, 512)
         currentSeats.submit(mapOf(clinton to 232, trump to 306))
         previousSeats.submit(mapOf(clinton.party to 332, trump.party to 206))
@@ -1501,21 +1600,29 @@ class SeatViewPanelTest {
         val previousSeats = Publisher(emptyMap<Party, Pair<Int, Int>>())
         val totalSeats = Publisher(538)
         val showMajority = Publisher(true)
-        val header = Publisher("UNITED STATES")
+        val title = Publisher("UNITED STATES")
         val seatHeader = Publisher("PRESIDENT")
         val seatSubhead = Publisher("")
         val changeHeader = Publisher("CHANGE SINCE 2012")
         val winner = Publisher<Candidate?>(null)
         val panel = candidateDualSeats(
-            currentSeats,
-            seatHeader,
-            seatSubhead,
+            current = {
+                seats = currentSeats
+                header = seatHeader
+                subhead = seatSubhead
+                this.totalSeats = totalSeats
+                this.winner = winner
+            },
+            prev = {
+                seats = previousSeats
+                header = changeHeader
+            },
+            majorityLine = {
+                show = showMajority
+                display = { "$it ELECTORAL VOTES TO WIN" }
+            },
+            title = title,
         )
-            .withWinner(winner)
-            .withPrev(previousSeats, changeHeader)
-            .withTotal(totalSeats)
-            .withMajorityLine(showMajority) { "$it ELECTORAL VOTES TO WIN" }
-            .build(header)
         panel.setSize(1024, 512)
         val clinton = Candidate("Hillary Clinton", Party("Democrat", "DEM", Color.BLUE))
         val trump = Candidate("Donald Trump", Party("Republican", "GOP", Color.RED))
@@ -1542,7 +1649,7 @@ class SeatViewPanelTest {
         val previousSeats = Publisher(emptyMap<Party, Int>())
         val totalSeats = Publisher(538)
         val showMajority = Publisher(true)
-        val header = Publisher("UNITED STATES")
+        val title = Publisher("UNITED STATES")
         val seatHeader = Publisher("PRESIDENT")
         val seatSubhead = Publisher("")
         val changeHeader = Publisher("CHANGE SINCE 2012")
@@ -1551,14 +1658,22 @@ class SeatViewPanelTest {
         currentSeats.submit(mapOf(clinton to 238..368, trump to 170..300))
         previousSeats.submit(mapOf(clinton.party to 332, trump.party to 206))
         val panel = candidateRangeSeats(
-            currentSeats,
-            seatHeader,
-            seatSubhead,
+            current = {
+                seats = currentSeats
+                header = seatHeader
+                subhead = seatSubhead
+                this.totalSeats = totalSeats
+            },
+            prev = {
+                seats = previousSeats
+                header = changeHeader
+            },
+            majorityLine = {
+                show = showMajority
+                display = { "$it ELECTORAL VOTES TO WIN" }
+            },
+            title = title,
         )
-            .withPrev(previousSeats, changeHeader)
-            .withTotal(totalSeats)
-            .withMajorityLine(showMajority) { "$it ELECTORAL VOTES TO WIN" }
-            .build(header)
         panel.setSize(1024, 512)
         compareRendering("SeatViewPanel", "Candidate-3", panel)
         assertPublishes(
@@ -1580,21 +1695,29 @@ class SeatViewPanelTest {
         val previousSeats = Publisher(emptyMap<Party, Int>())
         val totalSeats = Publisher(435)
         val showMajority = Publisher(true)
-        val header = Publisher("UNITED STATES")
+        val title = Publisher("UNITED STATES")
         val seatHeader = Publisher("HOUSE OF REPRESENTATIVES")
         val seatSubhead = Publisher("")
         val changeHeader = Publisher("CHANGE SINCE 2016")
         val winner = Publisher<Party?>(null)
-        val panel = partySeats(
-            currentSeats,
-            seatHeader,
-            seatSubhead,
+        val panel = partySeats<Party>(
+            current = {
+                seats = currentSeats
+                header = seatHeader
+                subhead = seatSubhead
+                this.totalSeats = totalSeats
+                this.winner = winner
+            },
+            prev = {
+                seats = previousSeats
+                header = changeHeader
+            },
+            majorityLine = {
+                show = showMajority
+                display = { "$it SEATS FOR MAJORITY" }
+            },
+            title = title,
         )
-            .withPrev(previousSeats, changeHeader)
-            .withWinner(winner)
-            .withTotal(totalSeats)
-            .withMajorityLine(showMajority) { "$it SEATS FOR MAJORITY" }
-            .build(header)
         panel.setSize(1024, 512)
         val dem = Party("Democrat", "DEM", Color.BLUE)
         val gop = Party("Republican", "GOP", Color.RED)
@@ -1621,21 +1744,29 @@ class SeatViewPanelTest {
         val previousSeats = Publisher(emptyMap<Party, Pair<Int, Int>>())
         val totalSeats = Publisher(435)
         val showMajority = Publisher(true)
-        val header = Publisher("UNITED STATES")
+        val title = Publisher("UNITED STATES")
         val seatHeader = Publisher("HOUSE OF REPRESENTATIVES")
         val seatSubhead = Publisher("")
         val changeHeader = Publisher("CHANGE SINCE 2016")
         val winner = Publisher<Party?>(null)
-        val panel = partyDualSeats(
-            currentSeats,
-            seatHeader,
-            seatSubhead,
+        val panel = partyDualSeats<Party>(
+            current = {
+                seats = currentSeats
+                header = seatHeader
+                subhead = seatSubhead
+                this.totalSeats = totalSeats
+                this.winner = winner
+            },
+            prev = {
+                seats = previousSeats
+                header = changeHeader
+            },
+            majorityLine = {
+                show = showMajority
+                display = { "$it SEATS FOR MAJORITY" }
+            },
+            title = title,
         )
-            .withWinner(winner)
-            .withPrev(previousSeats, changeHeader)
-            .withTotal(totalSeats)
-            .withMajorityLine(showMajority) { "$it SEATS FOR MAJORITY" }
-            .build(header)
         panel.setSize(1024, 512)
         val dem = Party("Democrat", "DEM", Color.BLUE)
         val gop = Party("Republican", "GOP", Color.RED)
@@ -1666,7 +1797,7 @@ class SeatViewPanelTest {
         val previousSeats = Publisher(mapOf<Party, Int>())
         val currentVotes = Publisher(mapOf<Party, Int>())
         val previousVotes = Publisher(mapOf<Party, Int>())
-        val header = Publisher("CARDIGAN")
+        val title = Publisher("CARDIGAN")
         val seatHeader = Publisher("0 OF 7 RIDINGS REPORTING")
         val seatSubhead = Publisher("")
         val changeHeader = Publisher("CHANGE SINCE 2015")
@@ -1678,22 +1809,33 @@ class SeatViewPanelTest {
         val focus = Publisher(shapesByDistrict.keys.filter { it <= 7 })
         val additionalHighlight = Publisher(shapesByDistrict.keys.toList())
         val winnerByDistrict = Publisher(mapOf<Int, PartyResult>())
-        val panel = partySeats(
-            currentSeats,
-            seatHeader,
-            seatSubhead,
+        val panel = partySeats<Party>(
+            current = {
+                seats = currentSeats
+                header = seatHeader
+                subhead = seatSubhead
+                totalSeats = 7.asOneTimePublisher()
+            },
+            prev = {
+                seats = previousSeats
+                header = changeHeader
+                subhead = changeSubhead
+            },
+            swing = {
+                currVotes = currentVotes
+                prevVotes = previousVotes
+                partyOrder = compareBy { swingPartyOrder.indexOf(it) }
+                header = swingHeader
+            },
+            map = createResultMap {
+                shapes = shapesByDistrict.asOneTimePublisher()
+                winners = winnerByDistrict
+                this.focus = focus
+                this.additionalHighlight = additionalHighlight
+                header = mapHeader
+            },
+            title = title,
         )
-            .withPrev(previousSeats, changeHeader, changeSubhead)
-            .withSwing(currentVotes, previousVotes, compareBy { swingPartyOrder.indexOf(it) }, swingHeader)
-            .withResultMap(
-                shapesByDistrict.asOneTimePublisher(),
-                winnerByDistrict,
-                focus,
-                additionalHighlight,
-                mapHeader,
-            )
-            .withTotal(7.asOneTimePublisher())
-            .build(header)
         panel.setSize(1024, 512)
         compareRendering("SeatViewPanel", "AdditionalHighlightMap-1", panel)
         assertPublishes(
@@ -1739,25 +1881,33 @@ class SeatViewPanelTest {
         val currentVotes = Publisher(emptyMap<Party, Int>())
         val previousVotes = Publisher(emptyMap<Party, Int>())
         val totalSeats = Publisher(90)
-        val header = Publisher("NORTHERN IRELAND")
+        val title = Publisher("NORTHERN IRELAND")
         val seatHeader = Publisher("2017 RESULTS")
         val seatSubhead = Publisher<String?>(null)
         val changeHeader = Publisher("NOTIONAL CHANGE SINCE 2016")
-        val panel = partySeats(
-            currentSeats,
-            seatHeader,
-            seatSubhead,
+        val panel = partySeats<Party>(
+            current = {
+                seats = currentSeats
+                header = seatHeader
+                subhead = seatSubhead
+                this.totalSeats = totalSeats
+            },
+            prev = {
+                seats = previousSeats
+                header = changeHeader
+            },
+            swing = {
+                currVotes = currentVotes
+                prevVotes = previousVotes
+                partyOrder = compareBy { listOf(nationalists, others, unionists).indexOf(it) }
+                header = "FIRST PREFERENCE SWING SINCE 2016".asOneTimePublisher()
+            },
+            partyClassification = {
+                classification = { mapping.getOrDefault(it, others) }
+                header = "BY DESIGNATION".asOneTimePublisher()
+            },
+            title = title,
         )
-            .withPrev(previousSeats, changeHeader)
-            .withTotal(totalSeats)
-            .withClassification({ mapping.getOrDefault(it, others) }, "BY DESIGNATION".asOneTimePublisher())
-            .withSwing(
-                currentVotes,
-                previousVotes,
-                compareBy { listOf(nationalists, others, unionists).indexOf(it) },
-                "FIRST PREFERENCE SWING SINCE 2016".asOneTimePublisher(),
-            )
-            .build(header)
         panel.setSize(1024, 512)
         compareRendering("SeatViewPanel", "PartyClassifications-1", panel)
         assertPublishes(
@@ -1911,11 +2061,24 @@ class SeatViewPanelTest {
         val showMajority = Publisher(true)
         val showPrevRaw = Publisher(true)
 
-        val panel = partySeats(curr, seatsHeader, "".asOneTimePublisher())
-            .withPrev(prev, changeHeader, showPrevRaw = showPrevRaw)
-            .withTotal(total)
-            .withMajorityLine(showMajority) { "$it FOR MAJORITY" }
-            .build("JAPAN".asOneTimePublisher())
+        val panel = partySeats<Party>(
+            current = {
+                seats = curr
+                header = seatsHeader
+                subhead = "".asOneTimePublisher()
+                totalSeats = total
+            },
+            prev = {
+                seats = prev
+                header = changeHeader
+                showRaw = showPrevRaw
+            },
+            majorityLine = {
+                show = showMajority
+                display = { "$it FOR MAJORITY" }
+            },
+            title = "JAPAN".asOneTimePublisher(),
+        )
         panel.size = Dimension(1024, 512)
         compareRendering("SeatViewPanel", "PrevSeats-1", panel)
         assertPublishes(
@@ -2147,11 +2310,24 @@ class SeatViewPanelTest {
         val showMajority = Publisher(true)
         val showPrevRaw = Publisher(true)
 
-        val panel = partyDualSeats(curr, seatsHeader, seatsSubhead)
-            .withPrev(prev, changeHeader, showPrevRaw = showPrevRaw)
-            .withTotal(total)
-            .withMajorityLine(showMajority) { "$it FOR MAJORITY" }
-            .build("JAPAN".asOneTimePublisher())
+        val panel = partyDualSeats<Party>(
+            current = {
+                seats = curr
+                header = seatsHeader
+                subhead = seatsSubhead
+                totalSeats = total
+            },
+            prev = {
+                seats = prev
+                header = changeHeader
+                showRaw = showPrevRaw
+            },
+            majorityLine = {
+                show = showMajority
+                display = { "$it FOR MAJORITY" }
+            },
+            title = "JAPAN".asOneTimePublisher(),
+        )
         panel.size = Dimension(1024, 512)
         compareRendering("SeatViewPanel", "PrevDualSeats-1", panel)
         assertPublishes(
@@ -2253,11 +2429,24 @@ class SeatViewPanelTest {
         val showMajority = Publisher(true)
         val showPrevRaw = Publisher(true)
 
-        val panel = partyRangeSeats(curr, seatsHeader, seatsSubhead)
-            .withPrev(prev, changeHeader, showPrevRaw = showPrevRaw)
-            .withTotal(total)
-            .withMajorityLine(showMajority) { "$it FOR MAJORITY" }
-            .build("JAPAN".asOneTimePublisher())
+        val panel = partyRangeSeats<Party>(
+            current = {
+                seats = curr
+                header = seatsHeader
+                subhead = seatsSubhead
+                totalSeats = total
+            },
+            prev = {
+                seats = prev
+                header = changeHeader
+                showRaw = showPrevRaw
+            },
+            majorityLine = {
+                show = showMajority
+                display = { "$it FOR MAJORITY" }
+            },
+            title = "JAPAN".asOneTimePublisher(),
+        )
         panel.size = Dimension(1024, 512)
         compareRendering("SeatViewPanel", "PrevRangeSeats-1", panel)
         assertPublishes(
@@ -2320,22 +2509,30 @@ class SeatViewPanelTest {
         val previousSeats = Publisher(emptyMap<Party, Int>())
         val totalSeats = Publisher(650)
         val showMajority = Publisher(true)
-        val header = Publisher("UNITED KINGDOM")
+        val title = Publisher("UNITED KINGDOM")
         val seatHeader = Publisher("SEATS DECLARED")
         val progressLabel = Publisher("0/650")
         val seatSubhead = Publisher("PROJECTION: TOO EARLY TO CALL")
         val changeHeader = Publisher("CHANGE SINCE 2017")
         val lab = Party("Labour", "LAB", Color.RED)
-        val panel = partySeats(
-            currentSeats,
-            seatHeader,
-            seatSubhead,
+        val panel = partySeats<Party>(
+            current = {
+                seats = currentSeats
+                header = seatHeader
+                subhead = seatSubhead
+                this.totalSeats = totalSeats
+                this.progressLabel = progressLabel
+            },
+            prev = {
+                seats = previousSeats
+                header = changeHeader
+            },
+            majorityLine = {
+                show = showMajority
+                display = { "$it SEATS FOR MAJORITY" }
+            },
+            title = title,
         )
-            .withPrev(previousSeats, changeHeader)
-            .withTotal(totalSeats)
-            .withMajorityLine(showMajority) { "$it SEATS FOR MAJORITY" }
-            .withProgressLabel(progressLabel)
-            .build(header)
         panel.setSize(1024, 512)
         compareRendering("SeatViewPanel", "ProgressLabel-1", panel)
         assertPublishes(
@@ -2371,21 +2568,27 @@ class SeatViewPanelTest {
         val ndp = Party("New Democratic Party", "NDP", Color.ORANGE)
         val tie = Party.TIE
 
-        val panel = partyDualSeats(
-            mapOf(
-                lib to (0 to 5),
-                yp to (0 to 8),
-                ndp to (0 to 2),
-                tie to (0 to 4),
-            ).asOneTimePublisher(),
-            "SEATS ELECTED/LEADING".asOneTimePublisher(),
-            "".asOneTimePublisher(),
-        ).withPrev(
-            mapOf(lib to (0 to 11), yp to (0 to 6), ndp to (0 to 2)).asOneTimePublisher(),
-            "CHANGE SINCE 2016".asOneTimePublisher(),
-        ).withTotal(19.asOneTimePublisher())
-            .withMajorityLine(true.asOneTimePublisher()) { "$it FOR MAJORITY" }
-            .build("YUKON".asOneTimePublisher())
+        val panel = partyDualSeats<Party>(
+            current = {
+                seats = mapOf(
+                    lib to (0 to 5),
+                    yp to (0 to 8),
+                    ndp to (0 to 2),
+                    tie to (0 to 4),
+                ).asOneTimePublisher()
+                header = "SEATS ELECTED/LEADING".asOneTimePublisher()
+                subhead = "".asOneTimePublisher()
+                totalSeats = 19.asOneTimePublisher()
+            },
+            prev = {
+                seats = mapOf(lib to (0 to 11), yp to (0 to 6), ndp to (0 to 2)).asOneTimePublisher()
+                header = "CHANGE SINCE 2016".asOneTimePublisher()
+            },
+            majorityLine = {
+                display = { "$it FOR MAJORITY" }
+            },
+            title = "YUKON".asOneTimePublisher(),
+        )
         panel.setSize(1024, 512)
         compareRendering("SeatViewPanel", "Tie", panel)
         assertPublishes(
@@ -2448,23 +2651,31 @@ class SeatViewPanelTest {
         val partyChanges = mapOf(ca to con, pc to con).asOneTimePublisher()
 
         val panel =
-            partySeats(currSeats.asOneTimePublisher(), "2004 RESULT".asOneTimePublisher(), "".asOneTimePublisher())
-                .withPrev(
-                    prevSeats.asOneTimePublisher(),
-                    showPrev.map { if (it) "2000 RESULT" else "CHANGE SINCE 2000" },
-                    showPrevRaw = showPrev,
-                    partyChanges = partyChanges,
-                )
-                .withSwing(
-                    currVotes.asOneTimePublisher(),
-                    prevVotes.asOneTimePublisher(),
-                    swingOrder,
-                    "SWING SINCE 2000".asOneTimePublisher(),
-                    partyChanges = partyChanges,
-                )
-                .withTotal(308.asOneTimePublisher())
-                .withMajorityLine(true.asOneTimePublisher()) { "$it FOR MAJORITY" }
-                .build("CANADA".asOneTimePublisher())
+            partySeats<Party>(
+                current = {
+                    seats = currSeats.asOneTimePublisher()
+                    header = "2004 RESULT".asOneTimePublisher()
+                    subhead = "".asOneTimePublisher()
+                    totalSeats = 308.asOneTimePublisher()
+                },
+                prev = {
+                    seats = prevSeats.asOneTimePublisher()
+                    header = showPrev.map { if (it) "2000 RESULT" else "CHANGE SINCE 2000" }
+                    showRaw = showPrev
+                    this.partyChanges = partyChanges
+                },
+                swing = {
+                    this.currVotes = currVotes.asOneTimePublisher()
+                    this.prevVotes = prevVotes.asOneTimePublisher()
+                    partyOrder = swingOrder
+                    header = "SWING SINCE 2000".asOneTimePublisher()
+                    this.partyChanges = partyChanges
+                },
+                majorityLine = {
+                    display = { "$it FOR MAJORITY" }
+                },
+                title = "CANADA".asOneTimePublisher(),
+            )
         panel.setSize(1024, 512)
         compareRendering("SeatViewPanel", "PartyMerge-1", panel)
         assertPublishes(
@@ -2557,23 +2768,31 @@ class SeatViewPanelTest {
         val partyChanges = mapOf(ca to con, pc to con).asOneTimePublisher()
 
         val panel =
-            partyDualSeats(currSeats.asOneTimePublisher(), "2004 RESULT".asOneTimePublisher(), "".asOneTimePublisher())
-                .withPrev(
-                    prevSeats.asOneTimePublisher(),
-                    showPrev.map { if (it) "2000 RESULT" else "CHANGE SINCE 2000" },
-                    showPrevRaw = showPrev,
-                    partyChanges = partyChanges,
-                )
-                .withSwing(
-                    currVotes.asOneTimePublisher(),
-                    prevVotes.asOneTimePublisher(),
-                    swingOrder,
-                    "SWING SINCE 2000".asOneTimePublisher(),
-                    partyChanges = partyChanges,
-                )
-                .withTotal(308.asOneTimePublisher())
-                .withMajorityLine(true.asOneTimePublisher()) { "$it FOR MAJORITY" }
-                .build("CANADA".asOneTimePublisher())
+            partyDualSeats<Party>(
+                current = {
+                    seats = currSeats.asOneTimePublisher()
+                    header = "2004 RESULT".asOneTimePublisher()
+                    subhead = "".asOneTimePublisher()
+                    totalSeats = 308.asOneTimePublisher()
+                },
+                prev = {
+                    seats = prevSeats.asOneTimePublisher()
+                    header = showPrev.map { if (it) "2000 RESULT" else "CHANGE SINCE 2000" }
+                    showRaw = showPrev
+                    this.partyChanges = partyChanges
+                },
+                swing = {
+                    this.currVotes = currVotes.asOneTimePublisher()
+                    this.prevVotes = prevVotes.asOneTimePublisher()
+                    this.partyOrder = swingOrder
+                    this.header = "SWING SINCE 2000".asOneTimePublisher()
+                    this.partyChanges = partyChanges
+                },
+                majorityLine = {
+                    display = { "$it FOR MAJORITY" }
+                },
+                title = "CANADA".asOneTimePublisher(),
+            )
         panel.setSize(1024, 512)
         compareRendering("SeatViewPanel", "PartyMergeDual-1", panel)
         assertPublishes(
@@ -2665,27 +2884,31 @@ class SeatViewPanelTest {
         val swingOrder = Comparator.comparing { p: Party -> listOf(ndp, lib, ind, oth, pc, bq, con, ca).indexOf(p) }
         val partyChanges = mapOf(ca to con, pc to con).asOneTimePublisher()
 
-        val panel = partyRangeSeats(
-            currSeats.asOneTimePublisher(),
-            "2004-2006 RESULTS".asOneTimePublisher(),
-            "".asOneTimePublisher(),
+        val panel = partyRangeSeats<Party>(
+            current = {
+                seats = currSeats.asOneTimePublisher()
+                header = "2004-2006 RESULTS".asOneTimePublisher()
+                subhead = "".asOneTimePublisher()
+                totalSeats = 308.asOneTimePublisher()
+            },
+            prev = {
+                seats = prevSeats.asOneTimePublisher()
+                header = showPrev.map { if (it) "2000 RESULT" else "CHANGE SINCE 2000" }
+                showRaw = showPrev
+                this.partyChanges = partyChanges
+            },
+            swing = {
+                this.currVotes = currVotes.asOneTimePublisher()
+                this.prevVotes = prevVotes.asOneTimePublisher()
+                this.partyOrder = swingOrder
+                this.header = "SWING SINCE 2000".asOneTimePublisher()
+                this.partyChanges = partyChanges
+            },
+            majorityLine = {
+                display = { "$it FOR MAJORITY" }
+            },
+            title = "CANADA".asOneTimePublisher(),
         )
-            .withPrev(
-                prevSeats.asOneTimePublisher(),
-                showPrev.map { if (it) "2000 RESULT" else "CHANGE SINCE 2000" },
-                showPrevRaw = showPrev,
-                partyChanges = partyChanges,
-            )
-            .withSwing(
-                currVotes.asOneTimePublisher(),
-                prevVotes.asOneTimePublisher(),
-                swingOrder,
-                "SWING SINCE 2000".asOneTimePublisher(),
-                partyChanges = partyChanges,
-            )
-            .withTotal(308.asOneTimePublisher())
-            .withMajorityLine(true.asOneTimePublisher()) { "$it FOR MAJORITY" }
-            .build("CANADA".asOneTimePublisher())
         panel.setSize(1024, 512)
         compareRendering("SeatViewPanel", "PartyMergeRange-1", panel)
         assertPublishes(
@@ -2738,41 +2961,45 @@ class SeatViewPanelTest {
         val lib = Party("Liberal", "LIB", Color.RED)
         val grn = Party("Green", "GRN", Color.GREEN.darker())
         val pc = Party("Progressive Conservative", "PC", Color.BLUE)
-        val panel = partySeats(
-            mapOf(pc to 12, grn to 8, lib to 6).asOneTimePublisher(),
-            "SEATS DECLARED".asOneTimePublisher(),
-            "".asOneTimePublisher(),
-        )
-            .withPrev(
-                mapOf(lib to 17, pc to 8, grn to 1).asOneTimePublisher(),
-                "CHANGE SINCE 2015".asOneTimePublisher(),
-            )
-            .withResultMap(
-                peiShapesByDistrict().asOneTimePublisher(),
-                mapOf(
+        val panel = partySeats<Party>(
+            current = {
+                seats = mapOf(pc to 12, grn to 8, lib to 6).asOneTimePublisher()
+                header = "SEATS DECLARED".asOneTimePublisher()
+                subhead = "".asOneTimePublisher()
+                totalSeats = 27.asOneTimePublisher()
+                progressLabel = "26/27".asOneTimePublisher()
+            },
+            prev = {
+                seats = mapOf(lib to 17, pc to 8, grn to 1).asOneTimePublisher()
+                header = "CHANGE SINCE 2015".asOneTimePublisher()
+            },
+            majorityLine = {
+                display = { "$it FOR MAJORITY" }
+            },
+            map = createResultMap<Int> {
+                shapes = peiShapesByDistrict().asOneTimePublisher()
+                winners = mapOf(
                     pc to setOf(4, 2, 3, 7, 1, 6, 19, 15, 20, 18, 8, 26),
                     grn to setOf(5, 17, 11, 13, 12, 21, 22, 23),
                     lib to setOf(16, 14, 10, 24, 25, 27),
                 ).entries.flatMap { e -> e.value.map { it to PartyResult.elected(e.key) } }
-                    .toMap().asOneTimePublisher(),
-                null.asOneTimePublisher(),
-                "DISTRICTS".asOneTimePublisher(),
-            )
-            .withSecondResultMap(
-                peiShapesByRegion().asOneTimePublisher(),
-                mapOf(
+                    .toMap().asOneTimePublisher()
+                focus = null.asOneTimePublisher()
+                header = "DISTRICTS".asOneTimePublisher()
+            },
+            secondMap = createResultMap<String> {
+                shapes = peiShapesByRegion().asOneTimePublisher()
+                winners = mapOf(
                     "Cardigan" to PartyResult.elected(pc),
                     "Malpeque" to PartyResult.elected(pc),
                     "Charlottetown" to PartyResult.leading(grn),
                     "Egmont" to PartyResult.elected(lib),
-                ).asOneTimePublisher(),
-                null.asOneTimePublisher(),
-                "REGIONS".asOneTimePublisher(),
-            )
-            .withTotal(27.asOneTimePublisher())
-            .withMajorityLine(true.asOneTimePublisher()) { "$it FOR MAJORITY" }
-            .withProgressLabel("26/27".asOneTimePublisher())
-            .build("PRINCE EDWARD ISLAND".asOneTimePublisher())
+                ).asOneTimePublisher()
+                focus = null.asOneTimePublisher()
+                header = "REGIONS".asOneTimePublisher()
+            },
+            title = "PRINCE EDWARD ISLAND".asOneTimePublisher(),
+        )
         panel.setSize(1024, 512)
         compareRendering("SeatViewPanel", "DualMap", panel)
         assertPublishes(
@@ -2850,18 +3077,22 @@ class SeatViewPanelTest {
             prg to 3,
             dxd to 1,
         )
-        val panel = partySeats(
-            curr.asOneTimePublisher(),
-            "2022 RESULT".asOneTimePublisher(),
-            "".asOneTimePublisher(),
+        val panel = partySeats<Party>(
+            current = {
+                seats = curr.asOneTimePublisher()
+                header = "2022 RESULT".asOneTimePublisher()
+                subhead = "".asOneTimePublisher()
+                totalSeats = 577.asOneTimePublisher()
+            },
+            prev = {
+                seats = prev.asOneTimePublisher()
+                header = "CHANGE SINCE 2017".asOneTimePublisher()
+            },
+            majorityLine = {
+                display = { "$it FOR MAJORITY" }
+            },
+            title = "FRANCE".asOneTimePublisher(),
         )
-            .withPrev(
-                prev.asOneTimePublisher(),
-                "CHANGE SINCE 2017".asOneTimePublisher(),
-            )
-            .withTotal(577.asOneTimePublisher())
-            .withMajorityLine(true.asOneTimePublisher()) { "$it FOR MAJORITY" }
-            .build("FRANCE".asOneTimePublisher())
         panel.setSize(1024, 512)
         compareRendering("SeatViewPanel", "PartiesConsolidatedInDiffIfTooMany", panel)
         assertPublishes(
@@ -2896,7 +3127,7 @@ class SeatViewPanelTest {
         val previousVotes = Publisher(emptyMap<Party, Int>())
         val totalSeats = Publisher(650)
         val showMajority = Publisher(true)
-        val header = Publisher("UNITED KINGDOM")
+        val title = Publisher("UNITED KINGDOM")
         val seatHeader = Publisher("0 OF 650 CONSTITUENCIES DECLARED")
         val seatSubhead = Publisher("PROJECTION: TOO EARLY TO CALL")
         val changeHeader = Publisher("CHANGE SINCE 2017")
@@ -2909,16 +3140,30 @@ class SeatViewPanelTest {
         val grn = Party("Green", "GRN", Color.GREEN)
         val oth = Party.OTHERS
         val partyOrder = listOf(snp, lab, pc, grn, ld, oth, con)
-        val panel = partySeats(
-            currentSeats,
-            seatHeader,
-            seatSubhead,
+        val panel = partySeats<Party>(
+            current = {
+                seats = currentSeats
+                header = seatHeader
+                subhead = seatSubhead
+                this.totalSeats = totalSeats
+            },
+            prev = {
+                seats = previousSeats
+                header = changeHeader
+            },
+            swing = {
+                currVotes = currentVotes
+                prevVotes = previousVotes
+                this.partyOrder = compareBy { partyOrder.indexOf(it) }
+                header = swingHeader
+                range = 0.05.asOneTimePublisher()
+            },
+            majorityLine = {
+                show = showMajority
+                display = { "$it SEATS FOR MAJORITY" }
+            },
+            title = title,
         )
-            .withPrev(previousSeats, changeHeader)
-            .withTotal(totalSeats)
-            .withMajorityLine(showMajority) { "$it SEATS FOR MAJORITY" }
-            .withSwing(currentVotes, previousVotes, compareBy { partyOrder.indexOf(it) }, swingHeader, swingRange = 0.05.asOneTimePublisher())
-            .build(header)
         panel.setSize(1024, 512)
 
         currentSeats.submit(mapOf(lab to 1))
