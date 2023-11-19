@@ -79,7 +79,8 @@ class SeatViewPanel private constructor(
                         linesPublisher = lines,
                     )
                 },
-            ).build(textHeader = title)
+                textHeader = title,
+            ).build()
         }
 
         fun <P : PartyOrCoalition> partySeats(
@@ -115,7 +116,8 @@ class SeatViewPanel private constructor(
                         linesPublisher = lines,
                     )
                 },
-            ).build(textHeader = title)
+                textHeader = title,
+            ).build()
         }
 
         fun candidateSeats(
@@ -151,7 +153,8 @@ class SeatViewPanel private constructor(
                         linesPublisher = lines,
                     )
                 },
-            ).build(textHeader = title)
+                textHeader = title,
+            ).build()
         }
 
         fun <P : PartyOrCoalition> partyDualSeats(
@@ -187,7 +190,8 @@ class SeatViewPanel private constructor(
                         linesPublisher = lines,
                     )
                 },
-            ).build(textHeader = title)
+                textHeader = title,
+            ).build()
         }
 
         fun <P : PartyOrCoalition> partyDualSeatsReversed(
@@ -223,7 +227,8 @@ class SeatViewPanel private constructor(
                         linesPublisher = lines,
                     )
                 },
-            ).build(textHeader = title)
+                textHeader = title,
+            ).build()
         }
 
         fun candidateDualSeats(
@@ -259,7 +264,8 @@ class SeatViewPanel private constructor(
                         linesPublisher = lines,
                     )
                 },
-            ).build(textHeader = title)
+                textHeader = title,
+            ).build()
         }
 
         fun <P : PartyOrCoalition> partyRangeSeats(
@@ -294,7 +300,8 @@ class SeatViewPanel private constructor(
                         linesPublisher = lines,
                     )
                 },
-            ).build(textHeader = title)
+                textHeader = title,
+            ).build()
         }
 
         fun <P : PartyOrCoalition> partyRangeSeats(
@@ -329,7 +336,8 @@ class SeatViewPanel private constructor(
                         linesPublisher = lines,
                     )
                 },
-            ).build(textHeader = title)
+                textHeader = title,
+            ).build()
         }
 
         fun candidateRangeSeats(
@@ -364,7 +372,8 @@ class SeatViewPanel private constructor(
                         linesPublisher = lines,
                     )
                 },
-            ).build(textHeader = title)
+                textHeader = title,
+            ).build()
         }
 
         fun <T> createPartyMap(builder: PartyMap<T>.() -> Unit) = PartyMap<T>().apply(builder)
@@ -842,6 +851,7 @@ class SeatViewPanel private constructor(
         private val seatTemplate: SeatTemplate<CT, PT, BAR>,
         private val currDiffFactory: CurrDiffFactory<CT, PT>,
         private val createBarFrame: BarFrameArgs<BAR>.() -> BarFrame,
+        private val textHeader: Flow.Publisher<out String?>,
     ) {
         private val currDiff: Flow.Publisher<Map<KPT, BasicResultPanel.CurrDiff<CT>>>? =
             diff?.currDiff(
@@ -858,7 +868,7 @@ class SeatViewPanel private constructor(
 
         private val change: Change? = diff ?: prev
 
-        fun build(textHeader: Flow.Publisher<out String?>): SeatViewPanel {
+        fun build(): SeatViewPanel {
             return SeatViewPanel(
                 textHeader,
                 createFrame(),
@@ -866,7 +876,7 @@ class SeatViewPanel private constructor(
                 createDiffFrame(),
                 if (secondMap == null) createSwingFrame() else map?.mapFrame,
                 secondMap?.mapFrame ?: map?.mapFrame,
-                createAltText(textHeader),
+                createAltText(),
             )
         }
 
@@ -1053,7 +1063,7 @@ class SeatViewPanel private constructor(
             val lines: BarFrameBuilder.Lines<*>?,
         )
 
-        private fun createAltText(textHeader: Flow.Publisher<out String?>): Flow.Publisher<String> {
+        private fun createAltText(): Flow.Publisher<String> {
             val combineHeadAndSub: (String?, String?) -> String? = { h, s ->
                 if (h.isNullOrEmpty()) {
                     s
