@@ -1,7 +1,11 @@
 package com.joecollins.graphics.screens.generic
 
 import com.joecollins.graphics.screens.generic.SimpleVoteViewPanel.Companion.candidateVotes
-import com.joecollins.graphics.screens.generic.SimpleVoteViewPanel.Companion.candidateVotesPctOnly
+import com.joecollins.graphics.screens.generic.SimpleVoteViewPanel.Companion.createPartyMap
+import com.joecollins.graphics.screens.generic.SimpleVoteViewPanel.Companion.createResultMap
+import com.joecollins.graphics.screens.generic.SimpleVoteViewPanel.Companion.createSingleNonPartisanResultMap
+import com.joecollins.graphics.screens.generic.SimpleVoteViewPanel.Companion.createSinglePartyMap
+import com.joecollins.graphics.screens.generic.SimpleVoteViewPanel.Companion.createSingleResultMap
 import com.joecollins.graphics.screens.generic.SimpleVoteViewPanel.Companion.nonPartisanVotes
 import com.joecollins.graphics.screens.generic.SimpleVoteViewPanel.Companion.partyRangeVotes
 import com.joecollins.graphics.screens.generic.SimpleVoteViewPanel.Companion.partyVotes
@@ -50,7 +54,7 @@ class SimpleVoteViewPanelTest {
                 grn.party to 106,
             ),
         )
-        val header = Publisher("MONTAGUE-KILMUIR")
+        val title = Publisher("MONTAGUE-KILMUIR")
         val voteHeader = Publisher("9 OF 9 POLLS REPORTING")
         val voteSubhead = Publisher("PROJECTION: PC GAIN FROM LIB")
         val changeHeader = Publisher("CHANGE SINCE 2015")
@@ -62,14 +66,28 @@ class SimpleVoteViewPanelTest {
         val focus = Publisher(shapesByDistrict.keys.filter { it <= 7 })
         val selectedDistrict = Publisher(3)
         val panel = candidateVotes(
-            currentVotes,
-            voteHeader,
-            voteSubhead,
+            current = {
+                votes = currentVotes
+                header = voteHeader
+                subhead = voteSubhead
+            },
+            prev = {
+                votes = previousVotes
+                header = changeHeader
+                swing = {
+                    partyOrder = compareBy { swingPartyOrder.indexOf(it) }
+                    header = swingHeader
+                }
+            },
+            map = createSinglePartyMap {
+                shapes = shapesByDistrict.asOneTimePublisher()
+                selectedShape = selectedDistrict
+                leadingParty = leader
+                this.focus = focus
+                header = mapHeader
+            },
+            title = title,
         )
-            .withPrev(previousVotes, changeHeader)
-            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader)
-            .withPartyMap(shapesByDistrict.asOneTimePublisher(), selectedDistrict, leader, focus, mapHeader)
-            .build(header)
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "Basic-1", panel)
         assertPublishes(
@@ -124,21 +142,29 @@ class SimpleVoteViewPanelTest {
                 bq.party to 9164,
             ),
         )
-        val header = Publisher("LASALLE\u2014\u00c9MARD\u2014VERDUN")
+        val title = Publisher("LASALLE\u2014\u00c9MARD\u2014VERDUN")
         val voteHeader = Publisher("100% OF POLLS REPORTING")
         val voteSubhead = Publisher("PROJECTION: LIB HOLD")
         val changeHeader = Publisher("CHANGE SINCE 2015")
         val swingHeader = Publisher("SWING SINCE 2015")
         val swingPartyOrder = listOf(ndp.party, grn.party, lib.party, bq.party, con.party)
         val panel = candidateVotes(
-            currentVotes,
-            voteHeader,
-            voteSubhead,
-            "(MP)",
+            current = {
+                votes = currentVotes
+                header = voteHeader
+                subhead = voteSubhead
+                incumbentMarker = "(MP)"
+            },
+            prev = {
+                votes = previousVotes
+                header = changeHeader
+                swing = {
+                    partyOrder = compareBy { swingPartyOrder.indexOf(it) }
+                    header = swingHeader
+                }
+            },
+            title = title,
         )
-            .withPrev(previousVotes, changeHeader)
-            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader)
-            .build(header)
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "Basic-2", panel)
         assertPublishes(
@@ -184,7 +210,7 @@ class SimpleVoteViewPanelTest {
                 grn.party to 106,
             ),
         )
-        val header = Publisher("MONTAGUE-KILMUIR")
+        val title = Publisher("MONTAGUE-KILMUIR")
         val voteHeader = Publisher("9 OF 9 POLLS REPORTING")
         val voteSubhead = Publisher("PROJECTION: PC GAIN FROM LIB")
         val changeHeader = Publisher("CHANGE SINCE 2015")
@@ -195,16 +221,31 @@ class SimpleVoteViewPanelTest {
         val shapesByDistrict = peiShapesByDistrict()
         val focus = Publisher(shapesByDistrict.keys.filter { it <= 7 })
         val selectedDistrict = Publisher(3)
-        val panel = candidateVotesPctOnly(
-            currentVotes,
-            voteHeader,
-            voteSubhead,
+        val panel = candidateVotes(
+            current = {
+                votes = currentVotes
+                header = voteHeader
+                subhead = voteSubhead
+                display = SimpleVoteViewPanel.Display.PCT_ONLY
+                notes = "SOURCE: Elections PEI".asOneTimePublisher()
+            },
+            prev = {
+                votes = previousVotes
+                header = changeHeader
+                swing = {
+                    partyOrder = compareBy { swingPartyOrder.indexOf(it) }
+                    header = swingHeader
+                }
+            },
+            map = createSinglePartyMap {
+                shapes = shapesByDistrict.asOneTimePublisher()
+                selectedShape = selectedDistrict
+                leadingParty = leader
+                this.focus = focus
+                header = mapHeader
+            },
+            title = title,
         )
-            .withPrev(previousVotes, changeHeader)
-            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader)
-            .withPartyMap(shapesByDistrict.asOneTimePublisher(), selectedDistrict, leader, focus, mapHeader)
-            .withNotes("SOURCE: Elections PEI".asOneTimePublisher())
-            .build(header)
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "PctOnly-1", panel)
         assertPublishes(
@@ -239,7 +280,7 @@ class SimpleVoteViewPanelTest {
             ),
         )
         val pctReporting = Publisher(0.0)
-        val header = Publisher("MONTAGUE-KILMUIR")
+        val title = Publisher("MONTAGUE-KILMUIR")
         val voteHeader = Publisher("0 OF 9 POLLS REPORTING")
         val voteSubhead = Publisher("WAITING FOR RESULTS...")
         val changeHeader = Publisher("CHANGE SINCE 2015")
@@ -252,16 +293,30 @@ class SimpleVoteViewPanelTest {
         val focus = Publisher(shapesByDistrict.keys.filter { it <= 7 })
         val selectedDistrict = Publisher(3)
         val panel = candidateVotes(
-            currentVotes,
-            voteHeader,
-            voteSubhead,
+            current = {
+                votes = currentVotes
+                header = voteHeader
+                subhead = voteSubhead
+                this.winner = winner
+                this.pctReporting = pctReporting
+            },
+            prev = {
+                votes = previousVotes
+                header = changeHeader
+                swing = {
+                    partyOrder = compareBy { swingPartyOrder.indexOf(it) }
+                    header = swingHeader
+                }
+            },
+            map = createSingleResultMap {
+                shapes = shapesByDistrict.asOneTimePublisher()
+                selectedShape = selectedDistrict
+                leadingParty = leader
+                this.focus = focus
+                header = mapHeader
+            },
+            title = title,
         )
-            .withPrev(previousVotes, changeHeader)
-            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader)
-            .withResultMap(shapesByDistrict.asOneTimePublisher(), selectedDistrict, leader, focus, mapHeader)
-            .withWinner(winner)
-            .withPctReporting(pctReporting)
-            .build(header)
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "Update-1", panel)
         assertPublishes(
@@ -433,7 +488,7 @@ class SimpleVoteViewPanelTest {
             ),
         )
         val pctReporting = Publisher(1.0 / 9)
-        val header = Publisher("MONTAGUE-KILMUIR")
+        val title = Publisher("MONTAGUE-KILMUIR")
         val voteHeader = Publisher("1 OF 9 POLLS REPORTING")
         val voteSubhead = Publisher("WAITING FOR RESULTS...")
         val changeHeader = Publisher("CHANGE SINCE 2015")
@@ -446,16 +501,30 @@ class SimpleVoteViewPanelTest {
         val focus = Publisher(shapesByDistrict.keys.filter { it <= 7 })
         val selectedDistrict = Publisher(3)
         val panel = candidateVotes(
-            currentVotes,
-            voteHeader,
-            voteSubhead,
+            current = {
+                votes = currentVotes
+                header = voteHeader
+                subhead = voteSubhead
+                this.winner = winner
+                this.pctReporting = pctReporting
+            },
+            prev = {
+                votes = previousVotes
+                header = changeHeader
+                swing = {
+                    partyOrder = compareBy { swingPartyOrder.indexOf(it) }
+                    header = swingHeader
+                }
+            },
+            map = createSingleResultMap {
+                shapes = shapesByDistrict.asOneTimePublisher()
+                selectedShape = selectedDistrict
+                leadingParty = leader
+                this.focus = focus
+                header = mapHeader
+            },
+            title = title,
         )
-            .withPrev(previousVotes, changeHeader)
-            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader)
-            .withResultMap(shapesByDistrict.asOneTimePublisher(), selectedDistrict, leader, focus, mapHeader)
-            .withWinner(winner)
-            .withPctReporting(pctReporting)
-            .build(header)
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "ZeroVotes-1", panel)
         assertPublishes(
@@ -483,7 +552,7 @@ class SimpleVoteViewPanelTest {
         val currentVotes = Publisher(emptyMap<Party, Int>())
         val previousVotes = Publisher(emptyMap<Party, Int>())
         val pctReporting = Publisher(0.0)
-        val header = Publisher("PRINCE EDWARD ISLAND")
+        val title = Publisher("PRINCE EDWARD ISLAND")
         val voteHeader = Publisher("0 OF 27 DISTRICTS DECLARED")
         val voteSubhead = Publisher("WAITING FOR RESULTS...")
         val changeHeader = Publisher("CHANGE SINCE 2015")
@@ -493,16 +562,29 @@ class SimpleVoteViewPanelTest {
         val shapesByDistrict = peiShapesByDistrict()
         val focus = Publisher<List<Int>?>(null)
         val winnersByDistrict = Publisher<Map<Int, Party?>>(HashMap())
-        val panel = partyVotes(
-            currentVotes,
-            voteHeader,
-            voteSubhead,
+        val panel = partyVotes<Party>(
+            current = {
+                votes = currentVotes
+                header = voteHeader
+                subhead = voteSubhead
+                this.pctReporting = pctReporting
+            },
+            prev = {
+                votes = previousVotes
+                header = changeHeader
+                swing = {
+                    partyOrder = compareBy { swingPartyOrder.indexOf(it) }
+                    header = swingHeader
+                }
+            },
+            map = createPartyMap {
+                shapes = shapesByDistrict.asOneTimePublisher()
+                winners = winnersByDistrict
+                this.focus = focus
+                header = mapHeader
+            },
+            title = title,
         )
-            .withPrev(previousVotes, changeHeader)
-            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader)
-            .withPctReporting(pctReporting)
-            .withPartyMap(shapesByDistrict.asOneTimePublisher(), winnersByDistrict, focus, mapHeader)
-            .build(header)
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "PopularVote-1", panel)
         assertPublishes(
@@ -556,7 +638,7 @@ class SimpleVoteViewPanelTest {
 
         focus.submit(shapesByDistrict.keys.filter { it <= 7 })
         mapHeader.submit("CARDIGAN")
-        header.submit("CARDIGAN")
+        title.submit("CARDIGAN")
         pctReporting.submit(1.0 / 7)
         voteHeader.submit("1 OF 7 DISTRICTS DECLARED")
         compareRendering("SimpleVoteViewPanel", "PopularVote-3", panel)
@@ -595,23 +677,31 @@ class SimpleVoteViewPanelTest {
             ),
         )
         val pctReporting = Publisher(1.0)
-        val header = Publisher("UNITED STATES")
+        val title = Publisher("UNITED STATES")
         val voteHeader = Publisher("HOUSE OF REPRESENTATIVES")
         val voteSubhead = Publisher("")
         val changeHeader = Publisher("CHANGE SINCE 2016")
         val swingHeader = Publisher("SWING SINCE 2016")
         val winner = Publisher(dem)
         val swingPartyOrder = listOf(dem, gop)
-        val panel = partyVotes(
-            currentVotes,
-            voteHeader,
-            voteSubhead,
+        val panel = partyVotes<Party>(
+            current = {
+                votes = currentVotes
+                header = voteHeader
+                subhead = voteSubhead
+                this.winner = winner
+                this.pctReporting = pctReporting
+            },
+            prev = {
+                votes = previousVotes
+                header = changeHeader
+                swing = {
+                    partyOrder = compareBy { swingPartyOrder.indexOf(it) }
+                    header = swingHeader
+                }
+            },
+            title = title,
         )
-            .withPrev(previousVotes, changeHeader)
-            .withWinner(winner)
-            .withPctReporting(pctReporting)
-            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader)
-            .build(header)
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "PartyTick-1", panel)
         assertPublishes(
@@ -654,7 +744,7 @@ class SimpleVoteViewPanelTest {
                 gop to 142251,
             ),
         )
-        val header = Publisher("TEXAS DISTRICT 27")
+        val title = Publisher("TEXAS DISTRICT 27")
         val voteHeader = Publisher("OFFICIAL RESULT")
         val voteSubhead = Publisher("GOP HOLD")
         val changeHeader = Publisher("CHANGE SINCE 2016")
@@ -662,14 +752,22 @@ class SimpleVoteViewPanelTest {
         val winner = Publisher(Candidate("Michael Cloud", gop))
         val swingPartyOrder = listOf(dem, gop)
         val panel = candidateVotes(
-            currentVotes,
-            voteHeader,
-            voteSubhead,
+            current = {
+                votes = currentVotes
+                header = voteHeader
+                subhead = voteSubhead
+                this.winner = winner
+            },
+            prev = {
+                votes = previousVotes
+                header = changeHeader
+                swing = {
+                    partyOrder = compareBy { swingPartyOrder.indexOf(it) }
+                    header = swingHeader
+                }
+            },
+            title = title,
         )
-            .withPrev(previousVotes, changeHeader)
-            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader)
-            .withWinner(winner)
-            .build(header)
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "SameParty-1", panel)
         assertPublishes(
@@ -704,21 +802,26 @@ class SimpleVoteViewPanelTest {
                 Candidate("Marine Le Pen", fn) to 10638475,
             ),
         )
-        val header = Publisher("FRANCE PRESIDENT: ROUND 2")
+        val title = Publisher("FRANCE PRESIDENT: ROUND 2")
         val voteHeader = Publisher("OFFICIAL RESULT")
         val voteSubhead = Publisher("MACRON WIN")
         val showMajority = Publisher(true)
         val pctReporting = Publisher(1.0)
         val winner = Publisher<Candidate?>(Candidate("Emmanuel Macron", lrem))
         val panel = candidateVotes(
-            currentVotes,
-            voteHeader,
-            voteSubhead,
+            current = {
+                votes = currentVotes
+                header = voteHeader
+                subhead = voteSubhead
+                this.winner = winner
+                this.pctReporting = pctReporting
+            },
+            majority = {
+                show = showMajority
+                display = "50% TO WIN"
+            },
+            title = title,
         )
-            .withWinner(winner)
-            .withMajorityLine(showMajority, "50% TO WIN")
-            .withPctReporting(pctReporting)
-            .build(header)
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "MajorityLine-1", panel)
         assertPublishes(
@@ -801,7 +904,7 @@ class SimpleVoteViewPanelTest {
                 grn.party to 106,
             ),
         )
-        val header = Publisher("MONTAGUE-KILMUIR")
+        val title = Publisher("MONTAGUE-KILMUIR")
         val voteHeader = Publisher("9 OF 9 POLLS REPORTING")
         val voteSubhead = Publisher("PROJECTION: PC GAIN FROM LIB")
         val changeHeader = Publisher("CHANGE SINCE 2015")
@@ -815,21 +918,30 @@ class SimpleVoteViewPanelTest {
         val additionalHighlight = Publisher(shapesByDistrict.keys.toList())
         val selectedDistrict = Publisher(3)
         val panel = candidateVotes(
-            currentVotes,
-            voteHeader,
-            voteSubhead,
+            current = {
+                votes = currentVotes
+                header = voteHeader
+                subhead = voteSubhead
+            },
+            prev = {
+                votes = previousVotes
+                header = changeHeader
+                subhead = changeSubhead
+                swing = {
+                    partyOrder = compareBy { swingPartyOrder.indexOf(it) }
+                    header = swingHeader
+                }
+            },
+            map = createSingleResultMap {
+                shapes = shapesByDistrict.asOneTimePublisher()
+                selectedShape = selectedDistrict
+                leadingParty = leader.map { elected(it) }
+                this.focus = focus
+                this.additionalHighlight = additionalHighlight
+                header = mapHeader
+            },
+            title = title,
         )
-            .withPrev(previousVotes, changeHeader, changeSubhead)
-            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader)
-            .withResultMap(
-                shapesByDistrict.asOneTimePublisher(),
-                selectedDistrict,
-                leader.map { elected(it) },
-                focus,
-                additionalHighlight,
-                mapHeader,
-            )
-            .build(header)
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "AdditionalHighlightMap-1", panel)
         assertPublishes(
@@ -859,20 +971,28 @@ class SimpleVoteViewPanelTest {
                 gop to 113055,
             ),
         )
-        val header = Publisher("MASSACHUSETTS DISTRICT 4")
+        val title = Publisher("MASSACHUSETTS DISTRICT 4")
         val voteHeader = Publisher("0.0% OF POLLS REPORTING")
         val voteSubhead = Publisher("")
         val changeHeader = Publisher("CHANGE SINCE 2016")
         val swingHeader = Publisher("SWING SINCE 2016")
         val swingPartyOrder: List<Party> = listOf(dem.party, gop)
         val panel = candidateVotes(
-            currentVotes,
-            voteHeader,
-            voteSubhead,
+            current = {
+                votes = currentVotes
+                header = voteHeader
+                subhead = voteSubhead
+            },
+            prev = {
+                votes = previousVotes
+                header = changeHeader
+                swing = {
+                    partyOrder = compareBy { swingPartyOrder.indexOf(it) }
+                    header = swingHeader
+                }
+            },
+            title = title,
         )
-            .withPrev(previousVotes, changeHeader)
-            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader)
-            .build(header)
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "Uncontested-1", panel)
         assertPublishes(
@@ -899,13 +1019,19 @@ class SimpleVoteViewPanelTest {
                 Candidate("Mark Keir", Party("Green", "GRN", Color.GREEN.darker())) to 884,
             ),
         )
-        val header = Publisher("UXBRIDGE AND SOUTH RUISLIP")
+        val title = Publisher("UXBRIDGE AND SOUTH RUISLIP")
         val voteHeader = Publisher("2017 RESULT")
         val voteSubhead = Publisher("")
         val winner = Publisher(Candidate("Boris Johnson", Party("Conservative", "CON", Color.BLUE)))
-        val panel = candidateVotes(currentVotes, voteHeader, voteSubhead)
-            .withWinner(winner)
-            .build(header)
+        val panel = candidateVotes(
+            current = {
+                votes = currentVotes
+                header = voteHeader
+                subhead = voteSubhead
+                this.winner = winner
+            },
+            title = title,
+        )
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "LotsOfCandidates-1", panel)
         assertPublishes(
@@ -1003,7 +1129,7 @@ class SimpleVoteViewPanelTest {
             ),
         )
         val pctReporting = Publisher(0.0)
-        val header = Publisher("MONTAGUE-KILMUIR")
+        val title = Publisher("MONTAGUE-KILMUIR")
         val voteHeader = Publisher("0 OF 9 POLLS REPORTING")
         val voteSubhead = Publisher("WAITING FOR RESULTS...")
         val changeHeader = Publisher("CHANGE SINCE 2015")
@@ -1016,17 +1142,33 @@ class SimpleVoteViewPanelTest {
         val focus = Publisher(shapesByDistrict.keys.filter { it <= 7 })
         val selectedDistrict = Publisher(3)
         val panel = candidateVotes(
-            currentVotes,
-            voteHeader,
-            voteSubhead,
+            current = {
+                votes = currentVotes
+                header = voteHeader
+                subhead = voteSubhead
+                this.winner = winner
+                this.pctReporting = pctReporting
+            },
+            prev = {
+                votes = previousVotes
+                header = changeHeader
+                swing = {
+                    partyOrder = compareBy { swingPartyOrder.indexOf(it) }
+                    header = swingHeader
+                }
+            },
+            displayLimit = {
+                limit = 3
+            },
+            map = createSingleResultMap {
+                shapes = shapesByDistrict.asOneTimePublisher()
+                selectedShape = selectedDistrict
+                leadingParty = leader
+                this.focus = focus
+                header = mapHeader
+            },
+            title = title,
         )
-            .withPrev(previousVotes, changeHeader)
-            .withLimit(3)
-            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader)
-            .withResultMap(shapesByDistrict.asOneTimePublisher(), selectedDistrict, leader, focus, mapHeader)
-            .withWinner(winner)
-            .withPctReporting(pctReporting)
-            .build(header)
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "CandidateOthers-1", panel)
         assertPublishes(
@@ -1104,7 +1246,7 @@ class SimpleVoteViewPanelTest {
             ),
         )
         val pctReporting = Publisher(0.0)
-        val header = Publisher("MONTAGUE-KILMUIR")
+        val title = Publisher("MONTAGUE-KILMUIR")
         val voteHeader = Publisher("0 OF 9 POLLS REPORTING")
         val voteSubhead = Publisher("WAITING FOR RESULTS...")
         val changeHeader = Publisher("CHANGE SINCE 2015")
@@ -1117,17 +1259,34 @@ class SimpleVoteViewPanelTest {
         val focus = Publisher(shapesByDistrict.keys.filter { it <= 7 })
         val selectedDistrict = Publisher(3)
         val panel = candidateVotes(
-            currentVotes,
-            voteHeader,
-            voteSubhead,
+            current = {
+                votes = currentVotes
+                header = voteHeader
+                subhead = voteSubhead
+                this.winner = winner
+                this.pctReporting = pctReporting
+            },
+            prev = {
+                votes = previousVotes
+                header = changeHeader
+                swing = {
+                    partyOrder = compareBy { swingPartyOrder.indexOf(it) }
+                    header = swingHeader
+                }
+            },
+            displayLimit = {
+                limit = 3
+                mandatoryParties = setOf(pc.party, lib.party)
+            },
+            map = createSingleResultMap {
+                shapes = shapesByDistrict.asOneTimePublisher()
+                selectedShape = selectedDistrict
+                leadingParty = leader
+                this.focus = focus
+                header = mapHeader
+            },
+            title = title,
         )
-            .withPrev(previousVotes, changeHeader)
-            .withLimit(3, pc.party, lib.party)
-            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader)
-            .withResultMap(shapesByDistrict.asOneTimePublisher(), selectedDistrict, leader, focus, mapHeader)
-            .withWinner(winner)
-            .withPctReporting(pctReporting)
-            .build(header)
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "CandidateOthersMandatory-1", panel)
         assertPublishes(
@@ -1209,7 +1368,7 @@ class SimpleVoteViewPanelTest {
                 lib.party to 3949,
             ),
         )
-        val header = Publisher("SHIPPAGAN-LAM\u00c8QUE-MISCOU")
+        val title = Publisher("SHIPPAGAN-LAM\u00c8QUE-MISCOU")
         val voteHeader = Publisher("OFFICIAL RESULT")
         val voteSubhead = Publisher("")
         val changeHeader = Publisher("CHANGE SINCE 2018")
@@ -1217,14 +1376,22 @@ class SimpleVoteViewPanelTest {
         val winner = Publisher(lib)
         val swingPartyOrder = listOf(ndp, grn.party, lib.party, pc.party)
         val panel = candidateVotes(
-            currentVotes,
-            voteHeader,
-            voteSubhead,
+            current = {
+                votes = currentVotes
+                header = voteHeader
+                subhead = voteSubhead
+                this.winner = winner
+            },
+            prev = {
+                votes = previousVotes
+                header = changeHeader
+                swing = {
+                    partyOrder = compareBy { swingPartyOrder.indexOf(it) }
+                    header = swingHeader
+                }
+            },
+            title = title,
         )
-            .withPrev(previousVotes, changeHeader)
-            .withWinner(winner)
-            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader)
-            .build(header)
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "PartiesNotRunningAgain-1", panel)
         assertPublishes(
@@ -1265,7 +1432,7 @@ class SimpleVoteViewPanelTest {
                 grn.party to 0,
             ),
         )
-        val header = Publisher("SHIPPAGAN-LAM\u00c8QUE-MISCOU")
+        val title = Publisher("SHIPPAGAN-LAM\u00c8QUE-MISCOU")
         val voteHeader = Publisher("OFFICIAL RESULT")
         val voteSubhead = Publisher("")
         val changeHeader = Publisher("CHANGE SINCE 2018")
@@ -1273,14 +1440,22 @@ class SimpleVoteViewPanelTest {
         val winner = Publisher(lib)
         val swingPartyOrder = listOf(grn.party, lib.party, pc.party)
         val panel = candidateVotes(
-            currentVotes,
-            voteHeader,
-            voteSubhead,
+            current = {
+                votes = currentVotes
+                header = voteHeader
+                subhead = voteSubhead
+                this.winner = winner
+            },
+            prev = {
+                votes = previousVotes
+                header = changeHeader
+                swing = {
+                    partyOrder = compareBy { swingPartyOrder.indexOf(it) }
+                    header = swingHeader
+                }
+            },
+            title = title,
         )
-            .withPrev(previousVotes, changeHeader)
-            .withWinner(winner)
-            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader)
-            .build(header)
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "PartiesNotRunningAgain-1", panel)
         assertPublishes(
@@ -1319,7 +1494,7 @@ class SimpleVoteViewPanelTest {
                 lib.party to 3949,
             ),
         )
-        val header = Publisher("SHIPPAGAN-LAM\u00c8QUE-MISCOU")
+        val title = Publisher("SHIPPAGAN-LAM\u00c8QUE-MISCOU")
         val voteHeader = Publisher("OFFICIAL RESULT")
         val voteSubhead = Publisher("")
         val changeHeader = Publisher("CHANGE SINCE 2018")
@@ -1327,14 +1502,22 @@ class SimpleVoteViewPanelTest {
         val winner = Publisher(lib)
         val swingPartyOrder = listOf(ndp, oth.party, lib.party, pc.party)
         val panel = candidateVotes(
-            currentVotes,
-            voteHeader,
-            voteSubhead,
+            current = {
+                votes = currentVotes
+                header = voteHeader
+                subhead = voteSubhead
+                this.winner = winner
+            },
+            prev = {
+                votes = previousVotes
+                header = changeHeader
+                swing = {
+                    partyOrder = compareBy { swingPartyOrder.indexOf(it) }
+                    header = swingHeader
+                }
+            },
+            title = title,
         )
-            .withPrev(previousVotes, changeHeader)
-            .withWinner(winner)
-            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader)
-            .build(header)
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "PartiesNotRunningAgainOthers-1", panel)
         assertPublishes(
@@ -1373,7 +1556,7 @@ class SimpleVoteViewPanelTest {
                 lib.party to 3949,
             ),
         )
-        val header = Publisher("SHIPPAGAN-LAM\u00c8QUE-MISCOU")
+        val title = Publisher("SHIPPAGAN-LAM\u00c8QUE-MISCOU")
         val voteHeader = Publisher("OFFICIAL RESULT")
         val voteSubhead = Publisher("")
         val changeHeader = Publisher("CHANGE SINCE 2018")
@@ -1381,14 +1564,22 @@ class SimpleVoteViewPanelTest {
         val winner = Publisher(lib)
         val swingPartyOrder = listOf(ndp, oth.party, lib.party, pc.party)
         val panel = candidateVotes(
-            currentVotes,
-            voteHeader,
-            voteSubhead,
+            current = {
+                votes = currentVotes
+                header = voteHeader
+                subhead = voteSubhead
+                this.winner = winner
+            },
+            prev = {
+                votes = previousVotes
+                header = changeHeader
+                swing = {
+                    partyOrder = compareBy { swingPartyOrder.indexOf(it) }
+                    header = swingHeader
+                }
+            },
+            title = title,
         )
-            .withPrev(previousVotes, changeHeader)
-            .withWinner(winner)
-            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader)
-            .build(header)
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "PartiesNotRunningAgainOthers-1", panel)
         assertPublishes(
@@ -1419,7 +1610,7 @@ class SimpleVoteViewPanelTest {
         val ukip = Party("UK Independence Party", "UKIP", Color.MAGENTA.darker())
         val currentVotes = Publisher(mapOf(con to 37035, ld to 16624, lab to 7638, bxp to 1286, ind to 681, ed to 194))
         val previousVotes = Publisher(mapOf(spkr to 34299, grn to 8574, ind.party to 5638, ukip to 4168))
-        val header = Publisher("BUCKINGHAM")
+        val title = Publisher("BUCKINGHAM")
         val voteHeader = Publisher("OFFICIAL RESULT")
         val voteSubhead = Publisher("")
         val changeHeader = Publisher("CHANGE SINCE 2017")
@@ -1427,12 +1618,27 @@ class SimpleVoteViewPanelTest {
         val swingHeader = Publisher("SWING SINCE 2017")
         val winner = Publisher(con)
         val swingPartyOrder = listOf(lab.party, ld.party, con.party, bxp.party)
-        val panel = candidateVotes(currentVotes, voteHeader, voteSubhead)
-            .withPrev(previousVotes, changeHeader, changeSubhead)
-            .withWinner(winner)
-            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader)
-            .whenWinnerNotRunningAgain("NOT APPLICABLE: PREVIOUSLY SPEAKER'S SEAT".asOneTimePublisher())
-            .build(header)
+        val panel = candidateVotes(
+            current = {
+                votes = currentVotes
+                header = voteHeader
+                subhead = voteSubhead
+                this.winner = winner
+            },
+            prev = {
+                votes = previousVotes
+                header = changeHeader
+                subhead = changeSubhead
+                swing = {
+                    partyOrder = compareBy { swingPartyOrder.indexOf(it) }
+                    header = swingHeader
+                }
+                winnerNotRunningAgain = {
+                    subhead = "NOT APPLICABLE: PREVIOUSLY SPEAKER'S SEAT".asOneTimePublisher()
+                }
+            },
+            title = title,
+        )
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "WinningPartyNotRunningAgain-1", panel)
         assertPublishes(
@@ -1490,18 +1696,24 @@ class SimpleVoteViewPanelTest {
         val constituency = Publisher("AISNE 1st CONSTITUENCY")
 
         val panel = candidateVotes(
-            curr,
-            "SECOND ROUND RESULT".asOneTimePublisher(),
-            "100.0% REPORTING".asOneTimePublisher(),
+            current = {
+                votes = curr
+                header = "SECOND ROUND RESULT".asOneTimePublisher()
+                subhead = "100.0% REPORTING".asOneTimePublisher()
+            },
+            prev = {
+                votes = prev
+                header = "CHANGE SINCE 2018".asOneTimePublisher()
+                swing = {
+                    partyOrder = compareBy { swingPartyOrder.indexOf(it) }
+                    header = "SWING SINCE 2018".asOneTimePublisher()
+                }
+                runoff = {
+                    subhead = "NOT APPLICABLE: DIFFERENT PARTIES IN RUNOFF".asOneTimePublisher()
+                }
+            },
+            title = constituency,
         )
-            .withPrev(
-                prev,
-                "CHANGE SINCE 2018".asOneTimePublisher(),
-                null.asOneTimePublisher(),
-            )
-            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, "SWING SINCE 2018".asOneTimePublisher())
-            .inRunoffMode("NOT APPLICABLE: DIFFERENT PARTIES IN RUNOFF".asOneTimePublisher())
-            .build(constituency)
         panel.size = Dimension(1024, 512)
         compareRendering("SimpleVoteViewPanel", "RunoffMode-1", panel)
         assertPublishes(
@@ -1566,14 +1778,22 @@ class SimpleVoteViewPanelTest {
                 cheminade to 65586,
             ),
         )
-        val header = Publisher("ELECTION 2017: FRANCE DECIDES")
+        val title = Publisher("ELECTION 2017: FRANCE DECIDES")
         val voteHeader = Publisher("FIRST ROUND RESULT")
         val voteSubhead = Publisher("")
         val runoff = Publisher<Set<Candidate>?>(null)
-        val panel = candidateVotes(currentVotes, voteHeader, voteSubhead)
-            .withRunoff(runoff)
-            .withMajorityLine(true.asOneTimePublisher(), "50% TO WIN")
-            .build(header)
+        val panel = candidateVotes(
+            current = {
+                votes = currentVotes
+                header = voteHeader
+                subhead = voteSubhead
+                this.runoff = runoff
+            },
+            majority = {
+                display = "50% TO WIN"
+            },
+            title = title,
+        )
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "CandidateRunoffSingleLine-1", panel)
         assertPublishes(
@@ -1656,14 +1876,22 @@ class SimpleVoteViewPanelTest {
                 Candidate.OTHERS,
             ),
         )
-        val header = Publisher("ELECTION 2017: FRANCE DECIDES")
+        val title = Publisher("ELECTION 2017: FRANCE DECIDES")
         val voteHeader = Publisher("FIRST ROUND RESULT")
         val voteSubhead = Publisher("")
         val runoff = Publisher<Set<Candidate>?>(null)
-        val panel = candidateVotes(currentVotes, voteHeader, voteSubhead)
-            .withRunoff(runoff)
-            .withMajorityLine(true.asOneTimePublisher(), "50% TO WIN")
-            .build(header)
+        val panel = candidateVotes(
+            current = {
+                votes = currentVotes
+                header = voteHeader
+                subhead = voteSubhead
+                this.runoff = runoff
+            },
+            majority = {
+                display = "50% TO WIN"
+            },
+            title = title,
+        )
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "CandidateRunoffDualLine-1", panel)
         assertPublishes(
@@ -1723,7 +1951,7 @@ class SimpleVoteViewPanelTest {
                 grn to 8857,
             ),
         )
-        val header = Publisher("PRINCE EDWARD ISLAND")
+        val title = Publisher("PRINCE EDWARD ISLAND")
         val voteHeader = Publisher("OPINION POLL RANGE")
         val voteSubhead = Publisher("SINCE ELECTION CALL")
         val changeHeader = Publisher("CHANGE SINCE 2015")
@@ -1732,16 +1960,28 @@ class SimpleVoteViewPanelTest {
         val swingPartyOrder = listOf(ndp, grn, lib, pc)
         val shapesByDistrict = peiShapesByDistrict()
         val winners: Map<Int, Party> = HashMap()
-        val panel = partyRangeVotes(currentVotes, voteHeader, voteSubhead)
-            .withPrev(previousVotes, changeHeader)
-            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader)
-            .withPartyMap(
-                shapesByDistrict.asOneTimePublisher(),
-                winners.asOneTimePublisher(),
-                null.asOneTimePublisher(),
-                mapHeader,
-            )
-            .build(header)
+        val panel = partyRangeVotes<Party>(
+            current = {
+                votes = currentVotes
+                header = voteHeader
+                subhead = voteSubhead
+            },
+            prev = {
+                votes = previousVotes
+                header = changeHeader
+                swing = {
+                    partyOrder = compareBy { swingPartyOrder.indexOf(it) }
+                    header = swingHeader
+                }
+            },
+            map = createPartyMap {
+                shapes = shapesByDistrict.asOneTimePublisher()
+                this.winners = winners.asOneTimePublisher()
+                focus = null.asOneTimePublisher()
+                header = mapHeader
+            },
+            title = title,
+        )
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "Range-1", panel)
         assertPublishes(
@@ -1776,7 +2016,7 @@ class SimpleVoteViewPanelTest {
                 grn.party to 106,
             ),
         )
-        val header = Publisher("MONTAGUE-KILMUIR")
+        val title = Publisher("MONTAGUE-KILMUIR")
         val voteHeader = Publisher("OFFICIAL RESULT")
         val voteSubhead = Publisher("")
         val changeHeader = Publisher("CHANGE SINCE 2015")
@@ -1787,11 +2027,29 @@ class SimpleVoteViewPanelTest {
         val shapesByDistrict = peiShapesByDistrict()
         val focus = Publisher(shapesByDistrict.keys.filter { it <= 7 })
         val selectedDistrict = Publisher(3)
-        val panel = candidateVotes(currentVotes, voteHeader, voteSubhead)
-            .withPrev(previousVotes, changeHeader)
-            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader)
-            .withPartyMap(shapesByDistrict.asOneTimePublisher(), selectedDistrict, leader, focus, mapHeader)
-            .build(header)
+        val panel = candidateVotes(
+            current = {
+                votes = currentVotes
+                header = voteHeader
+                subhead = voteSubhead
+            },
+            prev = {
+                votes = previousVotes
+                header = changeHeader
+                swing = {
+                    partyOrder = compareBy { swingPartyOrder.indexOf(it) }
+                    header = swingHeader
+                }
+            },
+            map = createSinglePartyMap {
+                shapes = shapesByDistrict.asOneTimePublisher()
+                selectedShape = selectedDistrict
+                leadingParty = leader
+                this.focus = focus
+                header = mapHeader
+            },
+            title = title,
+        )
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "MidDeclaration-1", panel)
         assertPublishes(
@@ -1935,18 +2193,30 @@ class SimpleVoteViewPanelTest {
         sequenceOf(apni, grn, pbp, lab, indO).forEach { mapping[it] = others }
         val currentVotes = Publisher(emptyMap<Party, Int>())
         val previousVotes = Publisher(emptyMap<Party, Int>())
-        val header = Publisher("NORTHERN IRELAND")
+        val title = Publisher("NORTHERN IRELAND")
         val seatHeader = Publisher("2017 RESULTS")
         val seatSubhead = Publisher<String?>(null)
         val changeHeader = Publisher("NOTIONAL CHANGE SINCE 2016")
-        val panel = partyVotes(currentVotes, seatHeader, seatSubhead)
-            .withPrev(previousVotes, changeHeader)
-            .withClassification({ mapping.getOrDefault(it, others) }, "BY DESIGNATION".asOneTimePublisher())
-            .withSwing(
-                compareBy { listOf(nationalists, others, unionists).indexOf(it) },
-                "FIRST PREFERENCE SWING SINCE 2016".asOneTimePublisher(),
-            )
-            .build(header)
+        val panel = partyVotes<Party>(
+            current = {
+                votes = currentVotes
+                header = seatHeader
+                subhead = seatSubhead
+            },
+            prev = {
+                votes = previousVotes
+                header = changeHeader
+                swing = {
+                    partyOrder = compareBy { listOf(nationalists, others, unionists).indexOf(it) }
+                    header = "FIRST PREFERENCE SWING SINCE 2016".asOneTimePublisher()
+                }
+            },
+            partyClassification = {
+                classification = { mapping.getOrDefault(it, others) }
+                header = "BY DESIGNATION".asOneTimePublisher()
+            },
+            title = title,
+        )
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "PartyClassifications-1", panel)
         assertPublishes(
@@ -2085,9 +2355,18 @@ class SimpleVoteViewPanelTest {
             GREEN to 692,
         )
         val panel =
-            candidateVotes(curr.asOneTimePublisher(), "DECLARED RESULT".asOneTimePublisher(), "".asOneTimePublisher())
-                .withPrev(prev.asOneTimePublisher(), "CHANGE SINCE 2019".asOneTimePublisher())
-                .build("BATLEY AND SPEN".asOneTimePublisher())
+            candidateVotes(
+                current = {
+                    votes = curr.asOneTimePublisher()
+                    header = "DECLARED RESULT".asOneTimePublisher()
+                    subhead = "".asOneTimePublisher()
+                },
+                prev = {
+                    votes = prev.asOneTimePublisher()
+                    header = "CHANGE SINCE 2019".asOneTimePublisher()
+                },
+                title = "BATLEY AND SPEN".asOneTimePublisher(),
+            )
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "ConsolidateInDiffIfTooMany-1", panel)
         assertPublishes(
@@ -2153,29 +2432,42 @@ class SimpleVoteViewPanelTest {
             alp to 31547,
         )
         val panel = candidateVotes(
-            curr.asOneTimePublisher(),
-            "PRIMARY VOTE".asOneTimePublisher(),
-            "100% REPORTING".asOneTimePublisher(),
-        )
-            .withPrev(prev.asOneTimePublisher(), "CHANGE SINCE 2016".asOneTimePublisher())
-            .withPreferences(
-                curr2CP.asOneTimePublisher(),
-                "TWO CANDIDATE PREFERRED".asOneTimePublisher(),
-                "100% REPORTING".asOneTimePublisher(),
-            )
-            .withPrevPreferences(prev2CP.asOneTimePublisher())
-            .withSwing(
-                Comparator.comparing {
-                    when (it) {
-                        lib -> 1; alp -> -1; else -> 0
+            current = {
+                votes = curr.asOneTimePublisher()
+                header = "PRIMARY VOTE".asOneTimePublisher()
+                subhead = "100% REPORTING".asOneTimePublisher()
+                winner = Candidate("Julian Leeser", lib, true).asOneTimePublisher()
+            },
+            prev = {
+                votes = prev.asOneTimePublisher()
+                header = "CHANGE SINCE 2016".asOneTimePublisher()
+            },
+            preferences = {
+                current = {
+                    votes = curr2CP.asOneTimePublisher()
+                    header = "TWO CANDIDATE PREFERRED".asOneTimePublisher()
+                    subhead = "100% REPORTING".asOneTimePublisher()
+                }
+                this.prev = {
+                    votes = prev2CP.asOneTimePublisher()
+                    swing = {
+                        partyOrder = Comparator.comparing {
+                            when (it) {
+                                lib -> 1
+                                alp -> -1
+                                else -> 0
+                            }
+                        }
+                        header = "SWING SINCE 2016".asOneTimePublisher()
                     }
-                },
-                "SWING SINCE 2016".asOneTimePublisher(),
-            )
-            .withWinner(Candidate("Julian Leeser", lib, true).asOneTimePublisher())
-            .build("BEROWRA".asOneTimePublisher())
-        panel.setSize(1024, 512)
-        compareRendering("SimpleVoteViewPanel", "NewPartiesCandidatesMergedWithPrevOthers", panel)
+                }
+            },
+            title = "BEROWRA".asOneTimePublisher(),
+        )
+            .also {
+                it.setSize(1024, 512)
+                compareRendering("SimpleVoteViewPanel", "NewPartiesCandidatesMergedWithPrevOthers", it)
+            }
         assertPublishes(
             panel.altText,
             """
@@ -2234,10 +2526,20 @@ class SimpleVoteViewPanelTest {
         val showPrevRaw = Publisher(true)
         val showPctReporting = Publisher(1.0)
 
-        val panel = partyVotes(curr, voteHeader, "".asOneTimePublisher())
-            .withPrev(prev, changeHeader, showPrevRaw = showPrevRaw)
-            .withPctReporting(showPctReporting)
-            .build("JAPAN".asOneTimePublisher())
+        val panel = partyVotes<Party>(
+            current = {
+                votes = curr
+                header = voteHeader
+                subhead = "".asOneTimePublisher()
+                pctReporting = showPctReporting
+            },
+            prev = {
+                votes = prev
+                header = changeHeader
+                showRaw = showPrevRaw
+            },
+            title = "JAPAN".asOneTimePublisher(),
+        )
         panel.size = Dimension(1024, 512)
         compareRendering("SimpleVoteViewPanel", "PrevVotes-0", panel)
         assertPublishes(
@@ -2517,9 +2819,19 @@ class SimpleVoteViewPanelTest {
         val changeHeader = Publisher("2017 RESULT")
         val showPrevRaw = Publisher(true)
 
-        val panel = partyRangeVotes(curr, voteHeader, "".asOneTimePublisher())
-            .withPrev(prev, changeHeader, showPrevRaw = showPrevRaw)
-            .build("JAPAN".asOneTimePublisher())
+        val panel = partyRangeVotes<Party>(
+            current = {
+                votes = curr
+                header = voteHeader
+                subhead = "".asOneTimePublisher()
+            },
+            prev = {
+                votes = prev
+                header = changeHeader
+                showRaw = showPrevRaw
+            },
+            title = "JAPAN".asOneTimePublisher(),
+        )
         panel.size = Dimension(1024, 512)
         compareRendering("SimpleVoteViewPanel", "PrevVotes-0", panel)
         assertPublishes(
@@ -2597,10 +2909,11 @@ class SimpleVoteViewPanelTest {
                 NIPPON ISHIN NO KAI: 4.0-12.3% ((-2.1)-(+6.2)%)
                 KOMEITO: 7.0-8.4% ((-5.5)-(-4.1)%)
                 JAPANESE COMMUNIST PARTY: 5.0-7.6% ((-2.9)-(-0.3)%)
-                DEMOCRATIC PARTY FOR THE PEOPLE: 2.0-2.4% ((+2.0)-(+2.4)%)
-                REIWA SHINSENGUMI: 1.0-1.6% ((+1.0)-(+1.6)%)
+                DEMOCRATIC PARTY FOR THE PEOPLE: 2.0-2.4% (*)
+                REIWA SHINSENGUMI: 1.0-1.6% (*)
                 SOCIAL DEMOCRATIC PARTY: 1.0-1.4% ((-0.7)-(-0.3)%)
-                OTHERS: 1.7-3.0% ((-17.0)-(-15.7)%)
+                OTHERS: 1.7-3.0% ((-14.0)-(-11.7)%)
+                * CHANGE INCLUDED IN OTHERS
             """.trimIndent(),
         )
     }
@@ -2621,7 +2934,7 @@ class SimpleVoteViewPanelTest {
             ),
         )
         val pctReporting = Publisher(0.0)
-        val header = Publisher("MONTAGUE-KILMUIR")
+        val title = Publisher("MONTAGUE-KILMUIR")
         val voteHeader = Publisher("PROVISIONAL RESULTS")
         val progressLabel = Publisher("0/9")
         val voteSubhead = Publisher("WAITING FOR RESULTS...")
@@ -2635,17 +2948,31 @@ class SimpleVoteViewPanelTest {
         val focus = Publisher(shapesByDistrict.keys.filter { it <= 7 })
         val selectedDistrict = Publisher(3)
         val panel = candidateVotes(
-            currentVotes,
-            voteHeader,
-            voteSubhead,
+            current = {
+                votes = currentVotes
+                header = voteHeader
+                subhead = voteSubhead
+                this.winner = winner
+                this.pctReporting = pctReporting
+                this.progressLabel = progressLabel
+            },
+            prev = {
+                votes = previousVotes
+                header = changeHeader
+                swing = {
+                    partyOrder = compareBy { swingPartyOrder.indexOf(it) }
+                    header = swingHeader
+                }
+            },
+            map = createSingleResultMap {
+                shapes = shapesByDistrict.asOneTimePublisher()
+                selectedShape = selectedDistrict
+                leadingParty = leader
+                this.focus = focus
+                header = mapHeader
+            },
+            title = title,
         )
-            .withPrev(previousVotes, changeHeader)
-            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader)
-            .withResultMap(shapesByDistrict.asOneTimePublisher(), selectedDistrict, leader, focus, mapHeader)
-            .withWinner(winner)
-            .withPctReporting(pctReporting)
-            .withProgressLabel(progressLabel)
-            .build(header)
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "ProgressLabel-1", panel)
         assertPublishes(
@@ -2806,19 +3133,24 @@ class SimpleVoteViewPanelTest {
         val swingOrder = Comparator.comparing { p: Party -> listOf(ndp, lib, oth, pc, bq, con, ca).indexOf(p) }
         val partyChanges = mapOf(ca to con, pc to con).asOneTimePublisher()
 
-        val panel = partyVotes(
-            currVotes.asOneTimePublisher(),
-            "2004 VOTE SHARE".asOneTimePublisher(),
-            "".asOneTimePublisher(),
+        val panel = partyVotes<Party>(
+            current = {
+                votes = currVotes.asOneTimePublisher()
+                header = "2004 VOTE SHARE".asOneTimePublisher()
+                subhead = "".asOneTimePublisher()
+            },
+            prev = {
+                votes = prevVotes.asOneTimePublisher()
+                header = showPrev.map { if (it) "2000 VOTE SHARE" else "CHANGE SINCE 2000" }
+                showRaw = showPrev
+                this.partyChanges = partyChanges
+                swing = {
+                    partyOrder = swingOrder
+                    header = "SWING SINCE 2000".asOneTimePublisher()
+                }
+            },
+            title = "CANADA".asOneTimePublisher(),
         )
-            .withPrev(
-                prevVotes.asOneTimePublisher(),
-                showPrev.map { if (it) "2000 VOTE SHARE" else "CHANGE SINCE 2000" },
-                showPrevRaw = showPrev,
-                partyChanges = partyChanges,
-            )
-            .withSwing(swingOrder, "SWING SINCE 2000".asOneTimePublisher())
-            .build("CANADA".asOneTimePublisher())
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "PartyMerge-1", panel)
         assertPublishes(
@@ -2893,19 +3225,24 @@ class SimpleVoteViewPanelTest {
         val swingOrder = Comparator.comparing { p: Party -> listOf(ndp, lib, oth, pc, bq, con, ca).indexOf(p) }
         val partyChanges = mapOf(ca to con, pc to con).asOneTimePublisher()
 
-        val panel = partyRangeVotes(
-            currVotes.asOneTimePublisher(),
-            "2004 POLLING RANGE".asOneTimePublisher(),
-            "".asOneTimePublisher(),
+        val panel = partyRangeVotes<Party>(
+            current = {
+                votes = currVotes.asOneTimePublisher()
+                header = "2004 POLLING RANGE".asOneTimePublisher()
+                subhead = "".asOneTimePublisher()
+            },
+            prev = {
+                votes = prevVotes.asOneTimePublisher()
+                header = showPrev.map { if (it) "2000 VOTE SHARE" else "CHANGE SINCE 2000" }
+                showRaw = showPrev
+                this.partyChanges = partyChanges
+                swing = {
+                    partyOrder = swingOrder
+                    header = "SWING SINCE 2000".asOneTimePublisher()
+                }
+            },
+            title = "CANADA".asOneTimePublisher(),
         )
-            .withPrev(
-                prevVotes.asOneTimePublisher(),
-                showPrev.map { if (it) "2000 VOTE SHARE" else "CHANGE SINCE 2000" },
-                showPrevRaw = showPrev,
-                partyChanges = partyChanges,
-            )
-            .withSwing(swingOrder, "SWING SINCE 2000".asOneTimePublisher())
-            .build("CANADA".asOneTimePublisher())
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "PartyMergeRange-1", panel)
         assertPublishes(
@@ -2958,51 +3295,53 @@ class SimpleVoteViewPanelTest {
         val lib = Party("Liberal", "LIB", Color.RED)
         val grn = Party("Green", "GRN", Color.GREEN.darker())
         val ind = Party("Independent", "IND", Color.DARK_GRAY)
-        val panel = partyVotes(
-            mapOf(
-                pc to 29335,
-                grn to 24593,
-                lib to 23711,
-                ndp to 2408,
-                ind to 282,
-            ).asOneTimePublisher(),
-            "VOTES COUNTED".asOneTimePublisher(),
-            "".asOneTimePublisher(),
-        )
-            .withPrev(
-                mapOf(
+        val panel = partyVotes<Party>(
+            current = {
+                votes = mapOf(
+                    pc to 29335,
+                    grn to 24593,
+                    lib to 23711,
+                    ndp to 2408,
+                    ind to 282,
+                ).asOneTimePublisher()
+                header = "VOTES COUNTED".asOneTimePublisher()
+                subhead = "".asOneTimePublisher()
+                pctReporting = (26.0 / 27).asOneTimePublisher()
+                progressLabel = (DecimalFormat("0.0%").format(26.0 / 27) + " IN").asOneTimePublisher()
+            },
+            prev = {
+                votes = mapOf(
                     lib to 32127,
                     pc to 29837,
                     grn to 8620,
                     ndp to 8448,
-                ).asOneTimePublisher(),
-                "CHANGE SINCE 2015".asOneTimePublisher(),
-            )
-            .withResultMap(
-                peiShapesByDistrict().asOneTimePublisher(),
-                mapOf(
+                ).asOneTimePublisher()
+                header = "CHANGE SINCE 2015".asOneTimePublisher()
+            },
+            map = createResultMap<Int> {
+                shapes = peiShapesByDistrict().asOneTimePublisher()
+                winners = mapOf(
                     pc to setOf(4, 2, 3, 7, 1, 6, 19, 15, 20, 18, 8, 26),
                     grn to setOf(5, 17, 11, 13, 12, 21, 22, 23),
                     lib to setOf(16, 14, 10, 24, 25, 27),
                 ).entries.flatMap { e -> e.value.map { it to elected(e.key) } }
-                    .toMap().asOneTimePublisher(),
-                null.asOneTimePublisher(),
-                "DISTRICTS".asOneTimePublisher(),
-            )
-            .withSecondResultMap(
-                peiShapesByRegion().asOneTimePublisher(),
-                mapOf(
+                    .toMap().asOneTimePublisher()
+                focus = null.asOneTimePublisher()
+                header = "DISTRICTS".asOneTimePublisher()
+            },
+            secondMap = createResultMap<String> {
+                shapes = peiShapesByRegion().asOneTimePublisher()
+                winners = mapOf(
                     "Cardigan" to elected(pc),
                     "Malpeque" to elected(pc),
                     "Charlottetown" to leading(grn),
                     "Egmont" to elected(lib),
-                ).asOneTimePublisher(),
-                null.asOneTimePublisher(),
-                "REGIONS".asOneTimePublisher(),
-            )
-            .withPctReporting((26.0 / 27).asOneTimePublisher())
-            .withProgressLabel((DecimalFormat("0.0%").format(26.0 / 27) + " IN").asOneTimePublisher())
-            .build("PRINCE EDWARD ISLAND".asOneTimePublisher())
+                ).asOneTimePublisher()
+                focus = null.asOneTimePublisher()
+                header = "REGIONS".asOneTimePublisher()
+            },
+            title = "PRINCE EDWARD ISLAND".asOneTimePublisher(),
+        )
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "DualMap", panel)
         assertPublishes(
@@ -3036,7 +3375,7 @@ class SimpleVoteViewPanelTest {
             ),
         )
         val pctReporting = Publisher(0.0)
-        val header = Publisher("MONTAGUE-KILMUIR")
+        val title = Publisher("MONTAGUE-KILMUIR")
         val voteHeader = Publisher("2019 RESULT")
         val voteSubhead = Publisher("WAITING FOR RESULTS...")
         val progress = Publisher("0/9 POLLS")
@@ -3048,16 +3387,27 @@ class SimpleVoteViewPanelTest {
         val focus = Publisher(shapesByDistrict.keys.filter { it <= 7 })
         val selectedDistrict = Publisher(3)
         val panel = nonPartisanVotes(
-            currentVotes,
-            voteHeader,
-            voteSubhead,
+            current = {
+                votes = currentVotes
+                header = voteHeader
+                subhead = voteSubhead
+                this.winner = winner
+                this.pctReporting = pctReporting
+                progressLabel = progress
+            },
+            prev = {
+                votes = previousVotes
+                header = changeHeader
+            },
+            map = createSingleNonPartisanResultMap {
+                shapes = shapesByDistrict.asOneTimePublisher()
+                selectedShape = selectedDistrict
+                leadingCandidate = leader
+                this.focus = focus
+                header = mapHeader
+            },
+            title = title,
         )
-            .withPrev(previousVotes, changeHeader)
-            .withResultMap(shapesByDistrict.asOneTimePublisher(), selectedDistrict, leader, focus, mapHeader)
-            .withWinner(winner)
-            .withPctReporting(pctReporting)
-            .withProgressLabel(progress)
-            .build(header)
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "NonPartisan-1", panel)
         assertPublishes(
@@ -3233,7 +3583,7 @@ class SimpleVoteViewPanelTest {
     @Test
     fun nonPartisanVoteMisc() {
         val title = Publisher("IQALUIT-TASILUK")
-        val votes = Publisher(
+        val curr = Publisher(
             mapOf(
                 NonPartisanCandidate("James T. Arreak") to 133,
                 NonPartisanCandidate("George Hicks", description = "Incumbent MLA") to 265,
@@ -3248,13 +3598,17 @@ class SimpleVoteViewPanelTest {
             ),
         )
         val panel = nonPartisanVotes(
-            votes,
-            "2021 RESULT".asOneTimePublisher(),
-            "".asOneTimePublisher(),
-        ).withPrev(
-            prev,
-            "2017 RESULT".asOneTimePublisher(),
-        ).build(title)
+            current = {
+                votes = curr
+                header = "2021 RESULT".asOneTimePublisher()
+                subhead = "".asOneTimePublisher()
+            },
+            prev = {
+                votes = prev
+                header = "2017 RESULT".asOneTimePublisher()
+            },
+            title = title,
+        )
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "NonPartisanMisc-1", panel)
         assertPublishes(
@@ -3275,7 +3629,7 @@ class SimpleVoteViewPanelTest {
         )
 
         title.submit("IQALUIT-NIAQUNNGUU")
-        votes.submit(
+        curr.submit(
             mapOf(
                 NonPartisanCandidate("P.J. Akeeagok") to 404,
                 NonPartisanCandidate("Noah Papatsie") to 54,
@@ -3308,7 +3662,7 @@ class SimpleVoteViewPanelTest {
         )
 
         title.submit("ARVIAT SOUTH")
-        votes.submit(
+        curr.submit(
             mapOf(
                 NonPartisanCandidate("Joe Savikataaq", description = "Incumbent MLA") to 0,
             ),
@@ -3335,7 +3689,7 @@ class SimpleVoteViewPanelTest {
         )
 
         title.submit("KUGLUKTUK")
-        votes.submit(
+        curr.submit(
             mapOf(
                 NonPartisanCandidate("Bobby Anavilok") to 170,
                 NonPartisanCandidate("Angele Kuliktana") to 77,
@@ -3388,7 +3742,7 @@ class SimpleVoteViewPanelTest {
                 grn.party to 106,
             ),
         )
-        val header = Publisher("MONTAGUE-KILMUIR")
+        val title = Publisher("MONTAGUE-KILMUIR")
         val voteHeader = Publisher("9 OF 9 POLLS REPORTING")
         val voteSubhead = Publisher("PROJECTION: PC GAIN FROM LIB")
         val changeHeader = Publisher("CHANGE SINCE 2015")
@@ -3400,14 +3754,29 @@ class SimpleVoteViewPanelTest {
         val focus = Publisher(shapesByDistrict.keys.filter { it <= 7 })
         val selectedDistrict = Publisher(3)
         val panel = candidateVotes(
-            currentVotes,
-            voteHeader,
-            voteSubhead,
+            current = {
+                votes = currentVotes
+                header = voteHeader
+                subhead = voteSubhead
+            },
+            prev = {
+                votes = previousVotes
+                header = changeHeader
+                swing = {
+                    partyOrder = compareBy { swingPartyOrder.indexOf(it) }
+                    header = swingHeader
+                    range = 0.2.asOneTimePublisher()
+                }
+            },
+            map = createSinglePartyMap {
+                shapes = shapesByDistrict.asOneTimePublisher()
+                selectedShape = selectedDistrict
+                leadingParty = leader
+                this.focus = focus
+                header = mapHeader
+            },
+            title = title,
         )
-            .withPrev(previousVotes, changeHeader)
-            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader, swingRange = 0.2.asOneTimePublisher())
-            .withPartyMap(shapesByDistrict.asOneTimePublisher(), selectedDistrict, leader, focus, mapHeader)
-            .build(header)
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "SwingRange", panel)
         assertPublishes(

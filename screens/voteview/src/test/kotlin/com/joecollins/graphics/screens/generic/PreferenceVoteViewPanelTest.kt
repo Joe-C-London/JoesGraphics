@@ -46,7 +46,7 @@ class PreferenceVoteViewPanelTest {
                 clp.party to 1588,
             ),
         )
-        val header = Publisher("FONG LIM")
+        val title = Publisher("FONG LIM")
         val voteHeader = Publisher("PRIMARY VOTE")
         val voteSubhead = Publisher("9 OF 9 POLLS REPORTING")
         val preferenceHeader = Publisher("TWO CANDIDATE PREFERRED")
@@ -56,16 +56,32 @@ class PreferenceVoteViewPanelTest {
         val leader = Publisher(alp)
         val swingPartyOrder = listOf(alp.party, ta.party, clp.party)
         val panel = candidateVotes(
-            currentPrimaryVotes,
-            voteHeader,
-            voteSubhead,
+            current = {
+                votes = currentPrimaryVotes
+                header = voteHeader
+                subhead = voteSubhead
+                winner = leader
+            },
+            prev = {
+                votes = previousPrimaryVotes
+                header = changeHeader
+            },
+            preferences = {
+                current = {
+                    votes = current2CPVotes
+                    header = preferenceHeader
+                    subhead = preferenceSubhead
+                }
+                prev = {
+                    votes = previous2PPVotes
+                    swing = {
+                        partyOrder = compareBy { swingPartyOrder.indexOf(it) }
+                        header = swingHeader
+                    }
+                }
+            },
+            title = title,
         )
-            .withPrev(previousPrimaryVotes, changeHeader)
-            .withPreferences(current2CPVotes, preferenceHeader, preferenceSubhead)
-            .withPrevPreferences(previous2PPVotes)
-            .withWinner(leader)
-            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader)
-            .build(header)
         panel.setSize(1024, 512)
         compareRendering("PreferenceVoteViewPanel", "Basic-1", panel)
         assertPublishes(
@@ -112,7 +128,7 @@ class PreferenceVoteViewPanelTest {
         )
         val pctReporting = Publisher(0.0)
         val preferencePctReporting = Publisher(0.0)
-        val header = Publisher("FONG LIM")
+        val title = Publisher("FONG LIM")
         val voteHeader = Publisher("PRIMARY VOTE")
         val voteSubhead = Publisher("0 OF 9 POLLS REPORTING")
         val preferenceHeader = Publisher("TWO CANDIDATE PREFERRED")
@@ -122,18 +138,34 @@ class PreferenceVoteViewPanelTest {
         val leader = Publisher<Candidate?>(null)
         val swingPartyOrder = listOf(alp.party, ta.party, clp.party)
         val panel = candidateVotes(
-            currentPrimaryVotes,
-            voteHeader,
-            voteSubhead,
+            current = {
+                votes = currentPrimaryVotes
+                header = voteHeader
+                subhead = voteSubhead
+                winner = leader
+                this.pctReporting = pctReporting
+            },
+            prev = {
+                votes = previousPrimaryVotes
+                header = changeHeader
+            },
+            preferences = {
+                current = {
+                    votes = current2CPVotes
+                    header = preferenceHeader
+                    subhead = preferenceSubhead
+                    this.pctReporting = preferencePctReporting
+                }
+                prev = {
+                    votes = previous2PPVotes
+                    swing = {
+                        partyOrder = compareBy { swingPartyOrder.indexOf(it) }
+                        header = swingHeader
+                    }
+                }
+            },
+            title = title,
         )
-            .withPrev(previousPrimaryVotes, changeHeader)
-            .withPctReporting(pctReporting)
-            .withPreferences(current2CPVotes, preferenceHeader, preferenceSubhead)
-            .withPrevPreferences(previous2PPVotes)
-            .withPreferencePctReporting(preferencePctReporting)
-            .withWinner(leader)
-            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader)
-            .build(header)
         panel.setSize(1024, 512)
         compareRendering("PreferenceVoteViewPanel", "Update-1", panel)
         assertPublishes(
@@ -314,7 +346,7 @@ class PreferenceVoteViewPanelTest {
         )
         val pctReporting = Publisher(0.0)
         val preferencePctReporting = Publisher(0.0)
-        val header = Publisher("FONG LIM")
+        val title = Publisher("FONG LIM")
         val voteHeader = Publisher("PRIMARY VOTE")
         val voteSubhead = Publisher("")
         val voteProgress = Publisher("0/9")
@@ -326,20 +358,36 @@ class PreferenceVoteViewPanelTest {
         val leader = Publisher<Candidate?>(null)
         val swingPartyOrder = listOf(alp.party, ta.party, clp.party)
         val panel = candidateVotes(
-            currentPrimaryVotes,
-            voteHeader,
-            voteSubhead,
+            current = {
+                votes = currentPrimaryVotes
+                header = voteHeader
+                subhead = voteSubhead
+                winner = leader
+                this.pctReporting = pctReporting
+                progressLabel = voteProgress
+            },
+            prev = {
+                votes = previousPrimaryVotes
+                header = changeHeader
+            },
+            preferences = {
+                current = {
+                    votes = current2CPVotes
+                    header = preferenceHeader
+                    subhead = preferenceSubhead
+                    this.pctReporting = preferencePctReporting
+                    progressLabel = preferenceProgress
+                }
+                prev = {
+                    votes = previous2PPVotes
+                    swing = {
+                        partyOrder = compareBy { swingPartyOrder.indexOf(it) }
+                        header = swingHeader
+                    }
+                }
+            },
+            title = title,
         )
-            .withPrev(previousPrimaryVotes, changeHeader)
-            .withPctReporting(pctReporting)
-            .withProgressLabel(voteProgress)
-            .withPreferences(current2CPVotes, preferenceHeader, preferenceSubhead)
-            .withPrevPreferences(previous2PPVotes)
-            .withPreferencePctReporting(preferencePctReporting)
-            .withPreferenceProgressLabel(preferenceProgress)
-            .withWinner(leader)
-            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader)
-            .build(header)
         panel.setSize(1024, 512)
         compareRendering("PreferenceVoteViewPanel", "ProgressLabels-1", panel)
         assertPublishes(
@@ -519,7 +567,7 @@ class PreferenceVoteViewPanelTest {
             ),
         )
         val previous2PPVotes = Publisher(mapOf(alp to 2171, clp to 1588))
-        val header = Publisher("FONG LIM")
+        val title = Publisher("FONG LIM")
         val voteHeader = Publisher("PRIMARY VOTE")
         val voteSubhead = Publisher("9 OF 9 POLLS REPORTING")
         val preferenceHeader = Publisher("TWO CANDIDATE PREFERRED")
@@ -529,17 +577,33 @@ class PreferenceVoteViewPanelTest {
         val leader = Publisher<Candidate?>(null)
         val swingPartyOrder = listOf(alp, ta, clp)
         val panel = candidateVotes(
-            currentPrimaryVotes,
-            voteHeader,
-            voteSubhead,
-            "(MP)",
+            current = {
+                votes = currentPrimaryVotes
+                header = voteHeader
+                subhead = voteSubhead
+                incumbentMarker = "(MP)"
+                winner = leader
+            },
+            prev = {
+                votes = previousPrimaryVotes
+                header = changeHeader
+            },
+            preferences = {
+                current = {
+                    votes = current2CPVotes
+                    header = preferenceHeader
+                    subhead = preferenceSubhead
+                }
+                prev = {
+                    votes = previous2PPVotes
+                    swing = {
+                        partyOrder = compareBy { swingPartyOrder.indexOf(it) }
+                        header = swingHeader
+                    }
+                }
+            },
+            title = title,
         )
-            .withPrev(previousPrimaryVotes, changeHeader)
-            .withPreferences(current2CPVotes, preferenceHeader, preferenceSubhead)
-            .withPrevPreferences(previous2PPVotes)
-            .withWinner(leader)
-            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader)
-            .build(header)
         panel.setSize(1024, 512)
         compareRendering("PreferenceVoteViewPanel", "LotsOfCandidates-1", panel)
         assertPublishes(
@@ -561,7 +625,7 @@ class PreferenceVoteViewPanelTest {
             """.trimIndent(),
         )
 
-        header.submit("GOYDER")
+        title.submit("GOYDER")
         voteSubhead.submit("12 OF 12 POLLS REPORTING")
         preferenceSubhead.submit("12 OF 12 POLLS REPORTING")
         currentPrimaryVotes.submit(
@@ -638,7 +702,7 @@ class PreferenceVoteViewPanelTest {
                 clp.party to 1680,
             ),
         )
-        val header = Publisher("SANDERSON")
+        val title = Publisher("SANDERSON")
         val voteHeader = Publisher("PRIMARY VOTE")
         val voteSubhead = Publisher("7 OF 7 POLLS REPORTING")
         val preferenceHeader = Publisher("TWO CANDIDATE PREFERRED")
@@ -648,16 +712,32 @@ class PreferenceVoteViewPanelTest {
         val leader = Publisher(alp)
         val swingPartyOrder = listOf(alp.party, ta.party, clp.party)
         val panel = candidateVotes(
-            currentPrimaryVotes,
-            voteHeader,
-            voteSubhead,
+            current = {
+                votes = currentPrimaryVotes
+                header = voteHeader
+                subhead = voteSubhead
+                winner = leader
+            },
+            prev = {
+                votes = previousPrimaryVotes
+                header = changeHeader
+            },
+            preferences = {
+                current = {
+                    votes = current2CPVotes
+                    header = preferenceHeader
+                    subhead = preferenceSubhead
+                }
+                prev = {
+                    votes = previous2PPVotes
+                    swing = {
+                        partyOrder = compareBy { swingPartyOrder.indexOf(it) }
+                        header = swingHeader
+                    }
+                }
+            },
+            title = title,
         )
-            .withPrev(previousPrimaryVotes, changeHeader)
-            .withPreferences(current2CPVotes, preferenceHeader, preferenceSubhead)
-            .withPrevPreferences(previous2PPVotes)
-            .withWinner(leader)
-            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader)
-            .build(header)
         panel.setSize(1024, 512)
         compareRendering("PreferenceVoteViewPanel", "SinglePreference-1", panel)
         assertPublishes(
@@ -708,7 +788,7 @@ class PreferenceVoteViewPanelTest {
             ),
         )
         val previous2PPVotes = Publisher(emptyMap<Party, Int>())
-        val header = Publisher("ARNHEM")
+        val title = Publisher("ARNHEM")
         val voteHeader = Publisher("PRIMARY VOTE")
         val voteSubhead = Publisher("7 OF 7 POLLS REPORTING")
         val preferenceHeader = Publisher("TWO CANDIDATE PREFERRED")
@@ -718,16 +798,32 @@ class PreferenceVoteViewPanelTest {
         val leader = Publisher(alp)
         val swingPartyOrder = listOf(alp.party, clp.party)
         val panel = candidateVotes(
-            currentPrimaryVotes,
-            voteHeader,
-            voteSubhead,
+            current = {
+                votes = currentPrimaryVotes
+                header = voteHeader
+                subhead = voteSubhead
+                winner = leader
+            },
+            prev = {
+                votes = previousPrimaryVotes
+                header = changeHeader
+            },
+            preferences = {
+                current = {
+                    votes = current2CPVotes
+                    header = preferenceHeader
+                    subhead = preferenceSubhead
+                }
+                prev = {
+                    votes = previous2PPVotes
+                    swing = {
+                        partyOrder = compareBy { swingPartyOrder.indexOf(it) }
+                        header = swingHeader
+                    }
+                }
+            },
+            title = title,
         )
-            .withPrev(previousPrimaryVotes, changeHeader)
-            .withPreferences(current2CPVotes, preferenceHeader, preferenceSubhead)
-            .withPrevPreferences(previous2PPVotes)
-            .withWinner(leader)
-            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader)
-            .build(header)
         panel.setSize(1024, 512)
         compareRendering("PreferenceVoteViewPanel", "NoPrevPreference-1", panel)
         assertPublishes(
@@ -785,7 +881,7 @@ class PreferenceVoteViewPanelTest {
                 alp.party to 37819,
             ),
         )
-        val header = Publisher("MELBOURNE")
+        val title = Publisher("MELBOURNE")
         val voteHeader = Publisher("PRIMARY VOTE")
         val voteSubhead = Publisher("2016 RESULTS")
         val preferenceHeader = Publisher("TWO CANDIDATE PREFERRED")
@@ -795,17 +891,33 @@ class PreferenceVoteViewPanelTest {
         val leader = Publisher(grn)
         val swingPartyOrder = listOf(alp.party, grn.party, lib.party)
         val panel = candidateVotes(
-            currentPrimaryVotes,
-            voteHeader,
-            voteSubhead,
-            "(MP)",
+            current = {
+                votes = currentPrimaryVotes
+                header = voteHeader
+                subhead = voteSubhead
+                incumbentMarker = "(MP)"
+                winner = leader
+            },
+            prev = {
+                votes = previousPrimaryVotes
+                header = changeHeader
+            },
+            preferences = {
+                current = {
+                    votes = current2CPVotes
+                    header = preferenceHeader
+                    subhead = preferenceSubhead
+                }
+                prev = {
+                    votes = previous2PPVotes
+                    swing = {
+                        partyOrder = compareBy { swingPartyOrder.indexOf(it) }
+                        header = swingHeader
+                    }
+                }
+            },
+            title = title,
         )
-            .withPrev(previousPrimaryVotes, changeHeader)
-            .withPreferences(current2CPVotes, preferenceHeader, preferenceSubhead)
-            .withPrevPreferences(previous2PPVotes)
-            .withWinner(leader)
-            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader)
-            .build(header)
         panel.setSize(1024, 512)
         compareRendering("PreferenceVoteViewPanel", "ChangeInPreference-1", panel)
         assertPublishes(
@@ -835,44 +947,50 @@ class PreferenceVoteViewPanelTest {
         val grn = Party("Greens", "GRN", Color.GREEN.darker())
         val onp = Party("One Nation", "ONP", Color.ORANGE)
         val oth = Party.OTHERS
-        val panel = partyRangeVotes(
-            mapOf(
-                alp to (0.34).rangeTo(0.36),
-                coa to (0.42).rangeTo(0.43),
-                grn to (0.11).rangeTo(0.12),
-                onp to (0.02).rangeTo(0.04),
-                oth to (0.08).rangeTo(0.08),
-            )
-                .asOneTimePublisher(),
-            "POLLING RANGE".asOneTimePublisher(),
-            "NOVEMBER 2020".asOneTimePublisher(),
-        )
-            .withPrev(
-                mapOf(
+        val panel = partyRangeVotes<Party>(
+            current = {
+                votes = mapOf(
+                    alp to (0.34).rangeTo(0.36),
+                    coa to (0.42).rangeTo(0.43),
+                    grn to (0.11).rangeTo(0.12),
+                    onp to (0.02).rangeTo(0.04),
+                    oth to (0.08).rangeTo(0.08),
+                )
+                    .asOneTimePublisher()
+                header = "POLLING RANGE".asOneTimePublisher()
+                subhead = "NOVEMBER 2020".asOneTimePublisher()
+            },
+            prev = {
+                votes = mapOf(
                     alp to 4752160,
                     coa to 5906875,
                     grn to 1482923,
                     onp to 438587,
                     oth to 488817 + 69736 + 46931 + 479836 + 587528,
                 )
-                    .asOneTimePublisher(),
-                "CHANGE SINCE 2019".asOneTimePublisher(),
-            )
-            .withPreferences(
-                mapOf(
-                    alp to (0.49).rangeTo(0.495),
-                    coa to (0.505).rangeTo(0.51),
-                )
-                    .asOneTimePublisher(),
-                "TWO PARTY PREFERRED".asOneTimePublisher(),
-                "".asOneTimePublisher(),
-            )
-            .withPrevPreferences(mapOf(alp to 6908580, coa to 7344813).asOneTimePublisher())
-            .withSwing(
-                compareBy { listOf(alp, coa).indexOf(it) },
-                "SWING SINCE 2019".asOneTimePublisher(),
-            )
-            .build("AUSTRALIA".asOneTimePublisher())
+                    .asOneTimePublisher()
+                header = "CHANGE SINCE 2019".asOneTimePublisher()
+            },
+            preferences = {
+                current = {
+                    votes = mapOf(
+                        alp to (0.49).rangeTo(0.495),
+                        coa to (0.505).rangeTo(0.51),
+                    )
+                        .asOneTimePublisher()
+                    header = "TWO PARTY PREFERRED".asOneTimePublisher()
+                    subhead = "".asOneTimePublisher()
+                }
+                prev = {
+                    votes = mapOf(alp to 6908580, coa to 7344813).asOneTimePublisher()
+                    swing = {
+                        partyOrder = compareBy { listOf(alp, coa).indexOf(it) }
+                        header = "SWING SINCE 2019".asOneTimePublisher()
+                    }
+                }
+            },
+            title = "AUSTRALIA".asOneTimePublisher(),
+        )
         panel.setSize(1024, 512)
         compareRendering("PreferenceVoteViewPanel", "Ranges-1", panel)
         assertPublishes(
@@ -891,7 +1009,7 @@ class PreferenceVoteViewPanelTest {
                 COALITION: 50.5-51.0%
                 LABOR: 49.0-49.5%
                 
-                SWING SINCE 2019: 0.3% SWING L/NP TO ALP
+                SWING SINCE 2019: 0.8% SWING L/NP TO ALP
             """.trimIndent(),
         )
     }
@@ -934,7 +1052,7 @@ class PreferenceVoteViewPanelTest {
                 con.party to 1054811,
             ),
         )
-        val header = Publisher("MAYOR OF LONDON")
+        val title = Publisher("MAYOR OF LONDON")
         val voteHeader = Publisher("FIRST CHOICE VOTES")
         val voteSubhead = Publisher("2016 RESULTS")
         val preferenceHeader = Publisher("SECOND CHOICE VOTES")
@@ -944,16 +1062,32 @@ class PreferenceVoteViewPanelTest {
         val leader = Publisher<Candidate?>(null)
         val swingPartyOrder = listOf(lab.party, grn.party, ld.party, con.party)
         val panel = candidateVotes(
-            currentPrimaryVotes,
-            voteHeader,
-            voteSubhead,
+            current = {
+                votes = currentPrimaryVotes
+                header = voteHeader
+                subhead = voteSubhead
+                winner = leader
+            },
+            prev = {
+                votes = previousPrimaryVotes
+                header = changeHeader
+            },
+            preferences = {
+                current = {
+                    votes = current2CPVotes
+                    header = preferenceHeader
+                    subhead = preferenceSubhead
+                }
+                prev = {
+                    votes = previous2PPVotes
+                    swing = {
+                        partyOrder = compareBy { swingPartyOrder.indexOf(it) }
+                        header = swingHeader
+                    }
+                }
+            },
+            title = title,
         )
-            .withPrev(previousPrimaryVotes, changeHeader)
-            .withPreferences(current2CPVotes, preferenceHeader, preferenceSubhead)
-            .withPrevPreferences(previous2PPVotes)
-            .withWinner(leader)
-            .withSwing(compareBy { swingPartyOrder.indexOf(it) }, swingHeader)
-            .build(header)
         panel.setSize(1024, 512)
         compareRendering("PreferenceVoteViewPanel", "Declaration-1", panel)
         assertPublishes(

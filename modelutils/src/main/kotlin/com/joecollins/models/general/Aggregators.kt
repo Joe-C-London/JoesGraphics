@@ -110,6 +110,20 @@ object Aggregators {
     }
 
     fun <K, T : Int?> topAndOthers(result: Map<out K, T>, limit: Int, others: K, mustInclude: Collection<K>): Map<K, T> {
+        return topAndOthers(
+            result,
+            limit,
+            others,
+            mustInclude,
+            sortOrder = { it?.toDouble() ?: -1.0 },
+            sum = { a, b ->
+                @Suppress("UNCHECKED_CAST")
+                (if (a == null || b == null) null else a + b) as T
+            },
+        )
+    }
+
+    fun <K, T> topAndOthers(result: Map<out K, T>, limit: Int, others: K, mustInclude: Collection<K>, sortOrder: (T) -> Double, sum: (T, T) -> T): Map<K, T> {
         if (result.size <= limit) {
             return result.mapKeys { it.key }
         }
@@ -117,18 +131,15 @@ object Aggregators {
         val top = result.entries.asSequence()
             .filter { !mustIncludeSet.contains(it.key) }
             .filter { it.key != others }
-            .sortedByDescending { it.value ?: -1 }
+            .sortedByDescending { sortOrder(it.value) }
             .take(max(0, limit - 1 - mustIncludeSet.intersect(result.keys).size))
             .toSet()
-        val topOrRequired: (Map.Entry<K, Int?>) -> Boolean = { top.contains(it) || mustIncludeSet.contains(it.key) }
+        val topOrRequired: (Map.Entry<K, T?>) -> Boolean = { top.contains(it) || mustIncludeSet.contains(it.key) }
         val ret: Map<K, T> = result.entries
             .map { e -> (if (topOrRequired(e)) e.key else others) to e.value }
             .groupBy({ it.first }, { it.second })
             .mapValues {
-                it.value.reduce { x, y ->
-                    @Suppress("UNCHECKED_CAST")
-                    (if (x == null || y == null) null else (x + y)) as T
-                }
+                it.value.reduce(sum)
             }
         return ret
     }
