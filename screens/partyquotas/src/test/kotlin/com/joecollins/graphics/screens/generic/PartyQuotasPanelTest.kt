@@ -65,7 +65,7 @@ class PartyQuotasPanelTest {
             swing = {
                 this.currVotes = currVotes
                 this.prevVotes = prevVotes.asOneTimePublisher()
-                order = Comparator.comparing { listOf(sf, apni, dup).indexOf(it) }
+                order = listOf(sf, apni, dup)
                 header = "FIRST PREF SWING".asOneTimePublisher()
             },
             map = createMap {
@@ -536,7 +536,7 @@ class PartyQuotasPanelTest {
             swing = {
                 this.currVotes = currVotes
                 this.prevVotes = prevVotes.asOneTimePublisher()
-                order = Comparator.comparing { listOf(sf, apni, dup).indexOf(it) }
+                order = listOf(sf, apni, dup)
                 header = "FIRST PREF SWING".asOneTimePublisher()
                 range = 0.02.asOneTimePublisher()
             },

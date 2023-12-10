@@ -59,29 +59,28 @@ class SimpleVoteViewPanel private constructor(
         private val PCT_DIFF_FORMAT = DecimalFormat("+0.0%;-0.0%")
         private val THOUSANDS_FORMAT = DecimalFormat("#,##0")
 
-        fun <P : PartyOrCoalition> partyVotes(
-            current: CurrentVotes<P, Int?>.() -> Unit,
-            prev: (PrevVotes<P>.() -> Unit)? = null,
+        fun partyVotes(
+            current: CurrentVotes<PartyOrCoalition, Int?>.() -> Unit,
+            prev: (PrevVotes<PartyOrCoalition>.() -> Unit)? = null,
             majority: (MajorityLine.() -> Unit)? = null,
-            displayLimit: (DisplayLimit<P>.() -> Unit)? = null,
-            partyClassification: (PartyClassification<P>.() -> Unit)? = null,
+            displayLimit: (DisplayLimit<PartyOrCoalition>.() -> Unit)? = null,
+            partyClassification: (PartyClassification<PartyOrCoalition>.() -> Unit)? = null,
             map: AbstractMap<*>? = null,
             title: Flow.Publisher<out String?>,
         ): SimpleVoteViewPanel {
-            @Suppress("UNCHECKED_CAST")
-            return VoteScreenBuilder<P, P, Int?, Double, Double, BarFrameBuilder.BasicBar>(
-                current = CurrentVotes<P, Int?>().apply(current),
-                prev = prev?.let { PrevVotes<P>().apply(it) },
+            return VoteScreenBuilder<PartyOrCoalition, PartyOrCoalition, Int?, Double, Double, BarFrameBuilder.BasicBar>(
+                current = CurrentVotes<PartyOrCoalition, Int?>().apply(current),
+                prev = prev?.let { PrevVotes<PartyOrCoalition>().apply(it) },
                 majority = majority?.let { MajorityLine().apply(it) },
-                displayLimit = displayLimit?.let { DisplayLimit<P>().apply(it) },
-                partyClassification = partyClassification?.let { PartyClassification<P>().apply(it) },
+                displayLimit = displayLimit?.let { DisplayLimit<PartyOrCoalition>().apply(it) },
+                partyClassification = partyClassification?.let { PartyClassification<PartyOrCoalition>().apply(it) },
                 preferences = null,
                 map = map?.mapFrame,
                 secondMap = null,
                 keyTemplate = BasicResultPanel.PartyTemplate(),
                 voteTemplate = VotePctOnlyTemplate,
                 valueTemplate = VoteValueTemplate(VotePctOnlyTemplate),
-                others = Party.OTHERS as P,
+                others = Party.OTHERS,
                 title = title,
                 createBarFrame = {
                     BarFrameBuilder.basic(
@@ -97,30 +96,29 @@ class SimpleVoteViewPanel private constructor(
             ).build()
         }
 
-        fun <P : PartyOrCoalition> partyVotes(
-            current: CurrentVotes<P, Int?>.() -> Unit,
-            prev: (PrevVotesNoSwing<P>.() -> Unit)? = null,
+        fun partyVotes(
+            current: CurrentVotes<PartyOrCoalition, Int?>.() -> Unit,
+            prev: (PrevVotesNoSwing<PartyOrCoalition>.() -> Unit)? = null,
             majority: (MajorityLine.() -> Unit)? = null,
-            displayLimit: (DisplayLimit<P>.() -> Unit)? = null,
-            partyClassification: (PartyClassification<P>.() -> Unit)? = null,
+            displayLimit: (DisplayLimit<PartyOrCoalition>.() -> Unit)? = null,
+            partyClassification: (PartyClassification<PartyOrCoalition>.() -> Unit)? = null,
             map: AbstractMap<*>,
             secondMap: AbstractMap<*>,
             title: Flow.Publisher<out String?>,
         ): SimpleVoteViewPanel {
-            @Suppress("UNCHECKED_CAST")
-            return VoteScreenBuilder<P, P, Int?, Double, Double, BarFrameBuilder.BasicBar>(
-                current = CurrentVotes<P, Int?>().apply(current),
-                prev = prev?.let { PrevVotes<P>().apply(it) },
+            return VoteScreenBuilder<PartyOrCoalition, PartyOrCoalition, Int?, Double, Double, BarFrameBuilder.BasicBar>(
+                current = CurrentVotes<PartyOrCoalition, Int?>().apply(current),
+                prev = prev?.let { PrevVotes<PartyOrCoalition>().apply(it) },
                 majority = majority?.let { MajorityLine().apply(it) },
-                displayLimit = displayLimit?.let { DisplayLimit<P>().apply(it) },
-                partyClassification = partyClassification?.let { PartyClassification<P>().apply(it) },
+                displayLimit = displayLimit?.let { DisplayLimit<PartyOrCoalition>().apply(it) },
+                partyClassification = partyClassification?.let { PartyClassification<PartyOrCoalition>().apply(it) },
                 preferences = null,
                 map = map.mapFrame,
                 secondMap = secondMap.mapFrame,
                 keyTemplate = BasicResultPanel.PartyTemplate(),
                 voteTemplate = VotePctOnlyTemplate,
                 valueTemplate = VoteValueTemplate(VotePctOnlyTemplate),
-                others = Party.OTHERS as P,
+                others = Party.OTHERS,
                 title = title,
                 createBarFrame = {
                     BarFrameBuilder.basic(
@@ -136,29 +134,28 @@ class SimpleVoteViewPanel private constructor(
             ).build()
         }
 
-        fun <P : PartyOrCoalition> partyVotes(
-            current: CurrentVotes<P, Int?>.() -> Unit,
-            prev: (PrevVotesNoSwing<P>.() -> Unit)? = null,
+        fun partyVotes(
+            current: CurrentVotes<PartyOrCoalition, Int?>.() -> Unit,
+            prev: (PrevVotesNoSwing<PartyOrCoalition>.() -> Unit)? = null,
             majority: (MajorityLine.() -> Unit)? = null,
-            displayLimit: (DisplayLimit<P>.() -> Unit)? = null,
+            displayLimit: (DisplayLimit<PartyOrCoalition>.() -> Unit)? = null,
             map: AbstractMap<*>? = null,
-            preferences: (Preferences<P, P, Int?, Int>.() -> Unit),
+            preferences: (Preferences<PartyOrCoalition, PartyOrCoalition, Int?, Int>.() -> Unit),
             title: Flow.Publisher<out String?>,
         ): SimpleVoteViewPanel {
-            @Suppress("UNCHECKED_CAST")
-            return VoteScreenBuilder<P, P, Int?, Double, Double, BarFrameBuilder.BasicBar>(
-                current = CurrentVotes<P, Int?>().apply(current),
-                prev = prev?.let { PrevVotes<P>().apply(it) },
+            return VoteScreenBuilder<PartyOrCoalition, PartyOrCoalition, Int?, Double, Double, BarFrameBuilder.BasicBar>(
+                current = CurrentVotes<PartyOrCoalition, Int?>().apply(current),
+                prev = prev?.let { PrevVotes<PartyOrCoalition>().apply(it) },
                 majority = majority?.let { MajorityLine().apply(it) },
-                displayLimit = displayLimit?.let { DisplayLimit<P>().apply(it) },
+                displayLimit = displayLimit?.let { DisplayLimit<PartyOrCoalition>().apply(it) },
                 partyClassification = null,
-                preferences = Preferences<P, P, Int?, Int>().apply(preferences),
+                preferences = Preferences<PartyOrCoalition, PartyOrCoalition, Int?, Int>().apply(preferences),
                 map = map?.mapFrame,
                 secondMap = null,
                 keyTemplate = BasicResultPanel.PartyTemplate(),
                 voteTemplate = VotePctOnlyTemplate,
                 valueTemplate = VoteValueTemplate(VotePctOnlyTemplate),
-                others = Party.OTHERS as P,
+                others = Party.OTHERS,
                 title = title,
                 createBarFrame = {
                     BarFrameBuilder.basic(
@@ -249,17 +246,16 @@ class SimpleVoteViewPanel private constructor(
             ).build()
         }
 
-        fun <P : PartyOrCoalition> partyRangeVotes(
-            current: CurrentVotes<P, ClosedRange<Double>>.() -> Unit,
-            prev: (PrevVotes<P>.() -> Unit)? = null,
+        fun partyRangeVotes(
+            current: CurrentVotes<PartyOrCoalition, ClosedRange<Double>>.() -> Unit,
+            prev: (PrevVotes<PartyOrCoalition>.() -> Unit)? = null,
             majority: (MajorityLine.() -> Unit)? = null,
             map: AbstractMap<*>? = null,
             title: Flow.Publisher<out String?>,
         ): SimpleVoteViewPanel {
-            @Suppress("UNCHECKED_CAST")
-            return VoteScreenBuilder<P, P, ClosedRange<Double>, ClosedRange<Double>, ClosedRange<Double>, BarFrameBuilder.DualBar>(
-                current = CurrentVotes<P, ClosedRange<Double>>().apply(current),
-                prev = prev?.let { PrevVotes<P>().apply(it) },
+            return VoteScreenBuilder<PartyOrCoalition, PartyOrCoalition, ClosedRange<Double>, ClosedRange<Double>, ClosedRange<Double>, BarFrameBuilder.DualBar>(
+                current = CurrentVotes<PartyOrCoalition, ClosedRange<Double>>().apply(current),
+                prev = prev?.let { PrevVotes<PartyOrCoalition>().apply(it) },
                 majority = majority?.let { MajorityLine().apply(it) },
                 displayLimit = null,
                 partyClassification = null,
@@ -269,7 +265,7 @@ class SimpleVoteViewPanel private constructor(
                 keyTemplate = BasicResultPanel.PartyTemplate(),
                 voteTemplate = VotePctOnlyTemplate,
                 valueTemplate = RangeValueTemplate,
-                others = Party.OTHERS as P,
+                others = Party.OTHERS,
                 title = title,
                 createBarFrame = {
                     BarFrameBuilder.dual(
@@ -285,18 +281,17 @@ class SimpleVoteViewPanel private constructor(
             ).build()
         }
 
-        fun <P : PartyOrCoalition> partyRangeVotes(
-            current: CurrentVotes<P, ClosedRange<Double>>.() -> Unit,
-            prev: (PrevVotesNoSwing<P>.() -> Unit)? = null,
+        fun partyRangeVotes(
+            current: CurrentVotes<PartyOrCoalition, ClosedRange<Double>>.() -> Unit,
+            prev: (PrevVotesNoSwing<PartyOrCoalition>.() -> Unit)? = null,
             majority: (MajorityLine.() -> Unit)? = null,
             map: AbstractMap<*>,
             secondMap: AbstractMap<*>,
             title: Flow.Publisher<out String?>,
         ): SimpleVoteViewPanel {
-            @Suppress("UNCHECKED_CAST")
-            return VoteScreenBuilder<P, P, ClosedRange<Double>, ClosedRange<Double>, ClosedRange<Double>, BarFrameBuilder.DualBar>(
-                current = CurrentVotes<P, ClosedRange<Double>>().apply(current),
-                prev = prev?.let { PrevVotes<P>().apply(it) },
+            return VoteScreenBuilder<PartyOrCoalition, PartyOrCoalition, ClosedRange<Double>, ClosedRange<Double>, ClosedRange<Double>, BarFrameBuilder.DualBar>(
+                current = CurrentVotes<PartyOrCoalition, ClosedRange<Double>>().apply(current),
+                prev = prev?.let { PrevVotes<PartyOrCoalition>().apply(it) },
                 majority = majority?.let { MajorityLine().apply(it) },
                 displayLimit = null,
                 partyClassification = null,
@@ -306,7 +301,7 @@ class SimpleVoteViewPanel private constructor(
                 keyTemplate = BasicResultPanel.PartyTemplate(),
                 voteTemplate = VotePctOnlyTemplate,
                 valueTemplate = RangeValueTemplate,
-                others = Party.OTHERS as P,
+                others = Party.OTHERS,
                 title = title,
                 createBarFrame = {
                     BarFrameBuilder.dual(
@@ -322,28 +317,27 @@ class SimpleVoteViewPanel private constructor(
             ).build()
         }
 
-        fun <P : PartyOrCoalition> partyRangeVotes(
-            current: CurrentVotes<P, ClosedRange<Double>>.() -> Unit,
-            prev: (PrevVotesNoSwing<P>.() -> Unit)? = null,
+        fun partyRangeVotes(
+            current: CurrentVotes<PartyOrCoalition, ClosedRange<Double>>.() -> Unit,
+            prev: (PrevVotesNoSwing<PartyOrCoalition>.() -> Unit)? = null,
             majority: (MajorityLine.() -> Unit)? = null,
-            preferences: (Preferences<P, P, ClosedRange<Double>, Int>.() -> Unit),
+            preferences: (Preferences<PartyOrCoalition, PartyOrCoalition, ClosedRange<Double>, Int>.() -> Unit),
             map: AbstractMap<*>? = null,
             title: Flow.Publisher<out String?>,
         ): SimpleVoteViewPanel {
-            @Suppress("UNCHECKED_CAST")
-            return VoteScreenBuilder<P, P, ClosedRange<Double>, ClosedRange<Double>, ClosedRange<Double>, BarFrameBuilder.DualBar>(
-                current = CurrentVotes<P, ClosedRange<Double>>().apply(current),
-                prev = prev?.let { PrevVotes<P>().apply(it) },
+            return VoteScreenBuilder<PartyOrCoalition, PartyOrCoalition, ClosedRange<Double>, ClosedRange<Double>, ClosedRange<Double>, BarFrameBuilder.DualBar>(
+                current = CurrentVotes<PartyOrCoalition, ClosedRange<Double>>().apply(current),
+                prev = prev?.let { PrevVotes<PartyOrCoalition>().apply(it) },
                 majority = majority?.let { MajorityLine().apply(it) },
                 displayLimit = null,
                 partyClassification = null,
-                preferences = Preferences<P, P, ClosedRange<Double>, Int>().apply(preferences),
+                preferences = Preferences<PartyOrCoalition, PartyOrCoalition, ClosedRange<Double>, Int>().apply(preferences),
                 map = map?.mapFrame,
                 secondMap = null,
                 keyTemplate = BasicResultPanel.PartyTemplate(),
                 voteTemplate = VotePctOnlyTemplate,
                 valueTemplate = RangeValueTemplate,
-                others = Party.OTHERS as P,
+                others = Party.OTHERS,
                 title = title,
                 createBarFrame = {
                     BarFrameBuilder.dual(
@@ -910,7 +904,7 @@ class SimpleVoteViewPanel private constructor(
 
     class Swing<KPT : PartyOrCoalition> internal constructor() {
         lateinit var header: Flow.Publisher<out String?>
-        lateinit var partyOrder: Comparator<KPT>
+        lateinit var partyOrder: List<KPT>
         var range: Flow.Publisher<Double>? = null
     }
 

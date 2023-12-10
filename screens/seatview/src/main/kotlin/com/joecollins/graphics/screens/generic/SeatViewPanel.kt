@@ -46,23 +46,23 @@ class SeatViewPanel private constructor(
 ) {
 
     companion object {
-        fun <P : PartyOrCoalition> partySeats(
-            current: CurrentSeats<P, Int>.() -> Unit,
-            diff: (SeatDiff<P, Int>.() -> Unit)? = null,
-            prev: (PrevSeats<P, Int>.() -> Unit)? = null,
-            swing: (Swing<P>.() -> Unit)? = null,
+        fun partySeats(
+            current: CurrentSeats<PartyOrCoalition, Int>.() -> Unit,
+            diff: (SeatDiff<PartyOrCoalition, Int>.() -> Unit)? = null,
+            prev: (PrevSeats<PartyOrCoalition, Int>.() -> Unit)? = null,
+            swing: (Swing<PartyOrCoalition>.() -> Unit)? = null,
             majorityLine: (MajorityLine.() -> Unit)? = null,
-            partyClassification: (PartyClassification<P>.() -> Unit)? = null,
+            partyClassification: (PartyClassification<PartyOrCoalition>.() -> Unit)? = null,
             map: AbstractMap<*>? = null,
             title: Flow.Publisher<out String?>,
         ): SeatViewPanel {
             return SeatScreenBuilder(
-                current = CurrentSeats<P, Int>().apply(current),
-                diff = diff?.let { SeatDiff<P, Int>().apply(it) },
-                prev = prev?.let { PrevSeats<P, Int>().apply(it) },
-                swing = swing?.let { Swing<P>().apply(it) },
+                current = CurrentSeats<PartyOrCoalition, Int>().apply(current),
+                diff = diff?.let { SeatDiff<PartyOrCoalition, Int>().apply(it) },
+                prev = prev?.let { PrevSeats<PartyOrCoalition, Int>().apply(it) },
+                swing = swing?.let { Swing<PartyOrCoalition>().apply(it) },
                 majority = majorityLine?.let { MajorityLine().apply(it) },
-                partyClassification = partyClassification?.let { PartyClassification<P>().apply(it) },
+                partyClassification = partyClassification?.let { PartyClassification<PartyOrCoalition>().apply(it) },
                 map = map,
                 secondMap = null,
                 keyTemplate = BasicResultPanel.PartyTemplate(),
@@ -83,23 +83,23 @@ class SeatViewPanel private constructor(
             ).build()
         }
 
-        fun <P : PartyOrCoalition> partySeats(
-            current: CurrentSeats<P, Int>.() -> Unit,
-            diff: (SeatDiff<P, Int>.() -> Unit)? = null,
-            prev: (PrevSeats<P, Int>.() -> Unit)? = null,
+        fun partySeats(
+            current: CurrentSeats<PartyOrCoalition, Int>.() -> Unit,
+            diff: (SeatDiff<PartyOrCoalition, Int>.() -> Unit)? = null,
+            prev: (PrevSeats<PartyOrCoalition, Int>.() -> Unit)? = null,
             majorityLine: (MajorityLine.() -> Unit)? = null,
-            partyClassification: (PartyClassification<P>.() -> Unit)? = null,
+            partyClassification: (PartyClassification<PartyOrCoalition>.() -> Unit)? = null,
             map: AbstractMap<*>,
             secondMap: AbstractMap<*>,
             title: Flow.Publisher<out String?>,
         ): SeatViewPanel {
             return SeatScreenBuilder(
-                current = CurrentSeats<P, Int>().apply(current),
-                diff = diff?.let { SeatDiff<P, Int>().apply(it) },
-                prev = prev?.let { PrevSeats<P, Int>().apply(it) },
+                current = CurrentSeats<PartyOrCoalition, Int>().apply(current),
+                diff = diff?.let { SeatDiff<PartyOrCoalition, Int>().apply(it) },
+                prev = prev?.let { PrevSeats<PartyOrCoalition, Int>().apply(it) },
                 swing = null,
                 majority = majorityLine?.let { MajorityLine().apply(it) },
-                partyClassification = partyClassification?.let { PartyClassification<P>().apply(it) },
+                partyClassification = partyClassification?.let { PartyClassification<PartyOrCoalition>().apply(it) },
                 map = map,
                 secondMap = secondMap,
                 keyTemplate = BasicResultPanel.PartyTemplate(),
@@ -157,23 +157,23 @@ class SeatViewPanel private constructor(
             ).build()
         }
 
-        fun <P : PartyOrCoalition> partyDualSeats(
-            current: CurrentSeats<P, Pair<Int, Int>>.() -> Unit,
-            diff: (SeatDiff<P, Pair<Int, Int>>.() -> Unit)? = null,
-            prev: (PrevSeats<P, Pair<Int, Int>>.() -> Unit)? = null,
-            swing: (Swing<P>.() -> Unit)? = null,
+        fun partyDualSeats(
+            current: CurrentSeats<PartyOrCoalition, Pair<Int, Int>>.() -> Unit,
+            diff: (SeatDiff<PartyOrCoalition, Pair<Int, Int>>.() -> Unit)? = null,
+            prev: (PrevSeats<PartyOrCoalition, Pair<Int, Int>>.() -> Unit)? = null,
+            swing: (Swing<PartyOrCoalition>.() -> Unit)? = null,
             majorityLine: (MajorityLine.() -> Unit)? = null,
-            partyClassification: (PartyClassification<P>.() -> Unit)? = null,
+            partyClassification: (PartyClassification<PartyOrCoalition>.() -> Unit)? = null,
             map: AbstractMap<*>? = null,
             title: Flow.Publisher<out String?>,
         ): SeatViewPanel {
             return SeatScreenBuilder(
-                current = CurrentSeats<P, Pair<Int, Int>>().apply(current),
-                diff = diff?.let { SeatDiff<P, Pair<Int, Int>>().apply(it) },
-                prev = prev?.let { PrevSeats<P, Pair<Int, Int>>().apply(it) },
-                swing = swing?.let { Swing<P>().apply(it) },
+                current = CurrentSeats<PartyOrCoalition, Pair<Int, Int>>().apply(current),
+                diff = diff?.let { SeatDiff<PartyOrCoalition, Pair<Int, Int>>().apply(it) },
+                prev = prev?.let { PrevSeats<PartyOrCoalition, Pair<Int, Int>>().apply(it) },
+                swing = swing?.let { Swing<PartyOrCoalition>().apply(it) },
                 majority = majorityLine?.let { MajorityLine().apply(it) },
-                partyClassification = partyClassification?.let { PartyClassification<P>().apply(it) },
+                partyClassification = partyClassification?.let { PartyClassification<PartyOrCoalition>().apply(it) },
                 map = map,
                 secondMap = null,
                 keyTemplate = BasicResultPanel.PartyTemplate(),
@@ -194,23 +194,23 @@ class SeatViewPanel private constructor(
             ).build()
         }
 
-        fun <P : PartyOrCoalition> partyDualSeatsReversed(
-            current: CurrentSeats<P, Pair<Int, Int>>.() -> Unit,
-            diff: (SeatDiff<P, Pair<Int, Int>>.() -> Unit)? = null,
-            prev: (PrevSeats<P, Pair<Int, Int>>.() -> Unit)? = null,
-            swing: (Swing<P>.() -> Unit)? = null,
+        fun partyDualSeatsReversed(
+            current: CurrentSeats<PartyOrCoalition, Pair<Int, Int>>.() -> Unit,
+            diff: (SeatDiff<PartyOrCoalition, Pair<Int, Int>>.() -> Unit)? = null,
+            prev: (PrevSeats<PartyOrCoalition, Pair<Int, Int>>.() -> Unit)? = null,
+            swing: (Swing<PartyOrCoalition>.() -> Unit)? = null,
             majorityLine: (MajorityLine.() -> Unit)? = null,
-            partyClassification: (PartyClassification<P>.() -> Unit)? = null,
+            partyClassification: (PartyClassification<PartyOrCoalition>.() -> Unit)? = null,
             map: AbstractMap<*>? = null,
             title: Flow.Publisher<out String?>,
         ): SeatViewPanel {
             return SeatScreenBuilder(
-                current = CurrentSeats<P, Pair<Int, Int>>().apply(current),
-                diff = diff?.let { SeatDiff<P, Pair<Int, Int>>().apply(it) },
-                prev = prev?.let { PrevSeats<P, Pair<Int, Int>>().apply(it) },
-                swing = swing?.let { Swing<P>().apply(it) },
+                current = CurrentSeats<PartyOrCoalition, Pair<Int, Int>>().apply(current),
+                diff = diff?.let { SeatDiff<PartyOrCoalition, Pair<Int, Int>>().apply(it) },
+                prev = prev?.let { PrevSeats<PartyOrCoalition, Pair<Int, Int>>().apply(it) },
+                swing = swing?.let { Swing<PartyOrCoalition>().apply(it) },
                 majority = majorityLine?.let { MajorityLine().apply(it) },
-                partyClassification = partyClassification?.let { PartyClassification<P>().apply(it) },
+                partyClassification = partyClassification?.let { PartyClassification<PartyOrCoalition>().apply(it) },
                 map = map,
                 secondMap = null,
                 keyTemplate = BasicResultPanel.PartyTemplate(),
@@ -268,20 +268,20 @@ class SeatViewPanel private constructor(
             ).build()
         }
 
-        fun <P : PartyOrCoalition> partyRangeSeats(
-            current: CurrentSeats<P, IntRange>.() -> Unit,
-            diff: (SeatDiff<P, IntRange>.() -> Unit)? = null,
-            prev: (PrevSeats<P, Int>.() -> Unit)? = null,
-            swing: (Swing<P>.() -> Unit)? = null,
+        fun partyRangeSeats(
+            current: CurrentSeats<PartyOrCoalition, IntRange>.() -> Unit,
+            diff: (SeatDiff<PartyOrCoalition, IntRange>.() -> Unit)? = null,
+            prev: (PrevSeats<PartyOrCoalition, Int>.() -> Unit)? = null,
+            swing: (Swing<PartyOrCoalition>.() -> Unit)? = null,
             majorityLine: (MajorityLine.() -> Unit)? = null,
             map: AbstractMap<*>? = null,
             title: Flow.Publisher<out String?>,
         ): SeatViewPanel {
             return SeatScreenBuilder(
-                current = CurrentSeats<P, IntRange>().apply(current),
-                diff = diff?.let { SeatDiff<P, IntRange>().apply(it) },
-                prev = prev?.let { PrevSeats<P, Int>().apply(it) },
-                swing = swing?.let { Swing<P>().apply(it) },
+                current = CurrentSeats<PartyOrCoalition, IntRange>().apply(current),
+                diff = diff?.let { SeatDiff<PartyOrCoalition, IntRange>().apply(it) },
+                prev = prev?.let { PrevSeats<PartyOrCoalition, Int>().apply(it) },
+                swing = swing?.let { Swing<PartyOrCoalition>().apply(it) },
                 majority = majorityLine?.let { MajorityLine().apply(it) },
                 partyClassification = null,
                 map = map,
@@ -304,19 +304,19 @@ class SeatViewPanel private constructor(
             ).build()
         }
 
-        fun <P : PartyOrCoalition> partyRangeSeats(
-            current: CurrentSeats<P, IntRange>.() -> Unit,
-            diff: (SeatDiff<P, IntRange>.() -> Unit)? = null,
-            prev: (PrevSeats<P, Int>.() -> Unit)? = null,
+        fun partyRangeSeats(
+            current: CurrentSeats<PartyOrCoalition, IntRange>.() -> Unit,
+            diff: (SeatDiff<PartyOrCoalition, IntRange>.() -> Unit)? = null,
+            prev: (PrevSeats<PartyOrCoalition, Int>.() -> Unit)? = null,
             majorityLine: (MajorityLine.() -> Unit)? = null,
             map: AbstractMap<*>,
             secondMap: AbstractMap<*>,
             title: Flow.Publisher<out String?>,
         ): SeatViewPanel {
             return SeatScreenBuilder(
-                current = CurrentSeats<P, IntRange>().apply(current),
-                diff = diff?.let { SeatDiff<P, IntRange>().apply(it) },
-                prev = prev?.let { PrevSeats<P, Int>().apply(it) },
+                current = CurrentSeats<PartyOrCoalition, IntRange>().apply(current),
+                diff = diff?.let { SeatDiff<PartyOrCoalition, IntRange>().apply(it) },
+                prev = prev?.let { PrevSeats<PartyOrCoalition, Int>().apply(it) },
                 swing = null,
                 majority = majorityLine?.let { MajorityLine().apply(it) },
                 partyClassification = null,
@@ -700,9 +700,9 @@ class SeatViewPanel private constructor(
         lateinit var currVotes: Flow.Publisher<out Map<out KPT, Int>>
         lateinit var prevVotes: Flow.Publisher<out Map<out KPT, Int>>
         lateinit var header: Flow.Publisher<out String?>
-        lateinit var partyOrder: Comparator<KPT>
+        lateinit var partyOrder: List<KPT>
         var range: Flow.Publisher<Double>? = null
-        var partyChanges: Flow.Publisher<out Map<KPT, KPT>>? = null
+        var partyChanges: Flow.Publisher<out Map<out KPT, KPT>>? = null
 
         internal val prevVotesWithChanges by lazy {
             if (partyChanges == null) {

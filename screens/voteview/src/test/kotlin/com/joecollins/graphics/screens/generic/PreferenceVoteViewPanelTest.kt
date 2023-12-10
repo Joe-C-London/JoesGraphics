@@ -75,7 +75,7 @@ class PreferenceVoteViewPanelTest {
                 prev = {
                     votes = previous2PPVotes
                     swing = {
-                        partyOrder = compareBy { swingPartyOrder.indexOf(it) }
+                        partyOrder = swingPartyOrder
                         header = swingHeader
                     }
                 }
@@ -159,7 +159,7 @@ class PreferenceVoteViewPanelTest {
                 prev = {
                     votes = previous2PPVotes
                     swing = {
-                        partyOrder = compareBy { swingPartyOrder.indexOf(it) }
+                        partyOrder = swingPartyOrder
                         header = swingHeader
                     }
                 }
@@ -381,7 +381,7 @@ class PreferenceVoteViewPanelTest {
                 prev = {
                     votes = previous2PPVotes
                     swing = {
-                        partyOrder = compareBy { swingPartyOrder.indexOf(it) }
+                        partyOrder = swingPartyOrder
                         header = swingHeader
                     }
                 }
@@ -597,7 +597,7 @@ class PreferenceVoteViewPanelTest {
                 prev = {
                     votes = previous2PPVotes
                     swing = {
-                        partyOrder = compareBy { swingPartyOrder.indexOf(it) }
+                        partyOrder = swingPartyOrder
                         header = swingHeader
                     }
                 }
@@ -731,7 +731,7 @@ class PreferenceVoteViewPanelTest {
                 prev = {
                     votes = previous2PPVotes
                     swing = {
-                        partyOrder = compareBy { swingPartyOrder.indexOf(it) }
+                        partyOrder = swingPartyOrder
                         header = swingHeader
                     }
                 }
@@ -817,7 +817,7 @@ class PreferenceVoteViewPanelTest {
                 prev = {
                     votes = previous2PPVotes
                     swing = {
-                        partyOrder = compareBy { swingPartyOrder.indexOf(it) }
+                        partyOrder = swingPartyOrder
                         header = swingHeader
                     }
                 }
@@ -911,7 +911,7 @@ class PreferenceVoteViewPanelTest {
                 prev = {
                     votes = previous2PPVotes
                     swing = {
-                        partyOrder = compareBy { swingPartyOrder.indexOf(it) }
+                        partyOrder = swingPartyOrder
                         header = swingHeader
                     }
                 }
@@ -947,7 +947,7 @@ class PreferenceVoteViewPanelTest {
         val grn = Party("Greens", "GRN", Color.GREEN.darker())
         val onp = Party("One Nation", "ONP", Color.ORANGE)
         val oth = Party.OTHERS
-        val panel = partyRangeVotes<Party>(
+        val panel = partyRangeVotes(
             current = {
                 votes = mapOf(
                     alp to (0.34).rangeTo(0.36),
@@ -984,7 +984,7 @@ class PreferenceVoteViewPanelTest {
                 prev = {
                     votes = mapOf(alp to 6908580, coa to 7344813).asOneTimePublisher()
                     swing = {
-                        partyOrder = compareBy { listOf(alp, coa).indexOf(it) }
+                        partyOrder = listOf(alp, coa)
                         header = "SWING SINCE 2019".asOneTimePublisher()
                     }
                 }
@@ -1081,7 +1081,7 @@ class PreferenceVoteViewPanelTest {
                 prev = {
                     votes = previous2PPVotes
                     swing = {
-                        partyOrder = compareBy { swingPartyOrder.indexOf(it) }
+                        partyOrder = swingPartyOrder
                         header = swingHeader
                     }
                 }

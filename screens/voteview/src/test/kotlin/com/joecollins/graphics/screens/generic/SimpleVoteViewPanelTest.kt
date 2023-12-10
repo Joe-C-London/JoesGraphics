@@ -75,7 +75,7 @@ class SimpleVoteViewPanelTest {
                 votes = previousVotes
                 header = changeHeader
                 swing = {
-                    partyOrder = compareBy { swingPartyOrder.indexOf(it) }
+                    partyOrder = swingPartyOrder
                     header = swingHeader
                 }
             },
@@ -159,7 +159,7 @@ class SimpleVoteViewPanelTest {
                 votes = previousVotes
                 header = changeHeader
                 swing = {
-                    partyOrder = compareBy { swingPartyOrder.indexOf(it) }
+                    partyOrder = swingPartyOrder
                     header = swingHeader
                 }
             },
@@ -233,7 +233,7 @@ class SimpleVoteViewPanelTest {
                 votes = previousVotes
                 header = changeHeader
                 swing = {
-                    partyOrder = compareBy { swingPartyOrder.indexOf(it) }
+                    partyOrder = swingPartyOrder
                     header = swingHeader
                 }
             },
@@ -304,7 +304,7 @@ class SimpleVoteViewPanelTest {
                 votes = previousVotes
                 header = changeHeader
                 swing = {
-                    partyOrder = compareBy { swingPartyOrder.indexOf(it) }
+                    partyOrder = swingPartyOrder
                     header = swingHeader
                 }
             },
@@ -512,7 +512,7 @@ class SimpleVoteViewPanelTest {
                 votes = previousVotes
                 header = changeHeader
                 swing = {
-                    partyOrder = compareBy { swingPartyOrder.indexOf(it) }
+                    partyOrder = swingPartyOrder
                     header = swingHeader
                 }
             },
@@ -562,7 +562,7 @@ class SimpleVoteViewPanelTest {
         val shapesByDistrict = peiShapesByDistrict()
         val focus = Publisher<List<Int>?>(null)
         val winnersByDistrict = Publisher<Map<Int, Party?>>(HashMap())
-        val panel = partyVotes<Party>(
+        val panel = partyVotes(
             current = {
                 votes = currentVotes
                 header = voteHeader
@@ -573,7 +573,7 @@ class SimpleVoteViewPanelTest {
                 votes = previousVotes
                 header = changeHeader
                 swing = {
-                    partyOrder = compareBy { swingPartyOrder.indexOf(it) }
+                    partyOrder = swingPartyOrder
                     header = swingHeader
                 }
             },
@@ -684,7 +684,7 @@ class SimpleVoteViewPanelTest {
         val swingHeader = Publisher("SWING SINCE 2016")
         val winner = Publisher(dem)
         val swingPartyOrder = listOf(dem, gop)
-        val panel = partyVotes<Party>(
+        val panel = partyVotes(
             current = {
                 votes = currentVotes
                 header = voteHeader
@@ -696,7 +696,7 @@ class SimpleVoteViewPanelTest {
                 votes = previousVotes
                 header = changeHeader
                 swing = {
-                    partyOrder = compareBy { swingPartyOrder.indexOf(it) }
+                    partyOrder = swingPartyOrder
                     header = swingHeader
                 }
             },
@@ -762,7 +762,7 @@ class SimpleVoteViewPanelTest {
                 votes = previousVotes
                 header = changeHeader
                 swing = {
-                    partyOrder = compareBy { swingPartyOrder.indexOf(it) }
+                    partyOrder = swingPartyOrder
                     header = swingHeader
                 }
             },
@@ -928,7 +928,7 @@ class SimpleVoteViewPanelTest {
                 header = changeHeader
                 subhead = changeSubhead
                 swing = {
-                    partyOrder = compareBy { swingPartyOrder.indexOf(it) }
+                    partyOrder = swingPartyOrder
                     header = swingHeader
                 }
             },
@@ -987,7 +987,7 @@ class SimpleVoteViewPanelTest {
                 votes = previousVotes
                 header = changeHeader
                 swing = {
-                    partyOrder = compareBy { swingPartyOrder.indexOf(it) }
+                    partyOrder = swingPartyOrder
                     header = swingHeader
                 }
             },
@@ -1153,7 +1153,7 @@ class SimpleVoteViewPanelTest {
                 votes = previousVotes
                 header = changeHeader
                 swing = {
-                    partyOrder = compareBy { swingPartyOrder.indexOf(it) }
+                    partyOrder = swingPartyOrder
                     header = swingHeader
                 }
             },
@@ -1270,7 +1270,7 @@ class SimpleVoteViewPanelTest {
                 votes = previousVotes
                 header = changeHeader
                 swing = {
-                    partyOrder = compareBy { swingPartyOrder.indexOf(it) }
+                    partyOrder = swingPartyOrder
                     header = swingHeader
                 }
             },
@@ -1386,7 +1386,7 @@ class SimpleVoteViewPanelTest {
                 votes = previousVotes
                 header = changeHeader
                 swing = {
-                    partyOrder = compareBy { swingPartyOrder.indexOf(it) }
+                    partyOrder = swingPartyOrder
                     header = swingHeader
                 }
             },
@@ -1450,7 +1450,7 @@ class SimpleVoteViewPanelTest {
                 votes = previousVotes
                 header = changeHeader
                 swing = {
-                    partyOrder = compareBy { swingPartyOrder.indexOf(it) }
+                    partyOrder = swingPartyOrder
                     header = swingHeader
                 }
             },
@@ -1512,7 +1512,7 @@ class SimpleVoteViewPanelTest {
                 votes = previousVotes
                 header = changeHeader
                 swing = {
-                    partyOrder = compareBy { swingPartyOrder.indexOf(it) }
+                    partyOrder = swingPartyOrder
                     header = swingHeader
                 }
             },
@@ -1574,7 +1574,7 @@ class SimpleVoteViewPanelTest {
                 votes = previousVotes
                 header = changeHeader
                 swing = {
-                    partyOrder = compareBy { swingPartyOrder.indexOf(it) }
+                    partyOrder = swingPartyOrder
                     header = swingHeader
                 }
             },
@@ -1630,7 +1630,7 @@ class SimpleVoteViewPanelTest {
                 header = changeHeader
                 subhead = changeSubhead
                 swing = {
-                    partyOrder = compareBy { swingPartyOrder.indexOf(it) }
+                    partyOrder = swingPartyOrder
                     header = swingHeader
                 }
                 winnerNotRunningAgain = {
@@ -1705,7 +1705,7 @@ class SimpleVoteViewPanelTest {
                 votes = prev
                 header = "CHANGE SINCE 2018".asOneTimePublisher()
                 swing = {
-                    partyOrder = compareBy { swingPartyOrder.indexOf(it) }
+                    partyOrder = swingPartyOrder
                     header = "SWING SINCE 2018".asOneTimePublisher()
                 }
                 runoff = {
@@ -1960,7 +1960,7 @@ class SimpleVoteViewPanelTest {
         val swingPartyOrder = listOf(ndp, grn, lib, pc)
         val shapesByDistrict = peiShapesByDistrict()
         val winners: Map<Int, Party> = HashMap()
-        val panel = partyRangeVotes<Party>(
+        val panel = partyRangeVotes(
             current = {
                 votes = currentVotes
                 header = voteHeader
@@ -1970,7 +1970,7 @@ class SimpleVoteViewPanelTest {
                 votes = previousVotes
                 header = changeHeader
                 swing = {
-                    partyOrder = compareBy { swingPartyOrder.indexOf(it) }
+                    partyOrder = swingPartyOrder
                     header = swingHeader
                 }
             },
@@ -2037,7 +2037,7 @@ class SimpleVoteViewPanelTest {
                 votes = previousVotes
                 header = changeHeader
                 swing = {
-                    partyOrder = compareBy { swingPartyOrder.indexOf(it) }
+                    partyOrder = swingPartyOrder
                     header = swingHeader
                 }
             },
@@ -2197,7 +2197,7 @@ class SimpleVoteViewPanelTest {
         val seatHeader = Publisher("2017 RESULTS")
         val seatSubhead = Publisher<String?>(null)
         val changeHeader = Publisher("NOTIONAL CHANGE SINCE 2016")
-        val panel = partyVotes<Party>(
+        val panel = partyVotes(
             current = {
                 votes = currentVotes
                 header = seatHeader
@@ -2207,7 +2207,7 @@ class SimpleVoteViewPanelTest {
                 votes = previousVotes
                 header = changeHeader
                 swing = {
-                    partyOrder = compareBy { listOf(nationalists, others, unionists).indexOf(it) }
+                    partyOrder = listOf(nationalists, others, unionists)
                     header = "FIRST PREFERENCE SWING SINCE 2016".asOneTimePublisher()
                 }
             },
@@ -2451,13 +2451,7 @@ class SimpleVoteViewPanelTest {
                 this.prev = {
                     votes = prev2CP.asOneTimePublisher()
                     swing = {
-                        partyOrder = Comparator.comparing {
-                            when (it) {
-                                lib -> 1
-                                alp -> -1
-                                else -> 0
-                            }
-                        }
+                        partyOrder = listOf(alp, Party.OTHERS, lib)
                         header = "SWING SINCE 2016".asOneTimePublisher()
                     }
                 }
@@ -2526,7 +2520,7 @@ class SimpleVoteViewPanelTest {
         val showPrevRaw = Publisher(true)
         val showPctReporting = Publisher(1.0)
 
-        val panel = partyVotes<Party>(
+        val panel = partyVotes(
             current = {
                 votes = curr
                 header = voteHeader
@@ -2819,7 +2813,7 @@ class SimpleVoteViewPanelTest {
         val changeHeader = Publisher("2017 RESULT")
         val showPrevRaw = Publisher(true)
 
-        val panel = partyRangeVotes<Party>(
+        val panel = partyRangeVotes(
             current = {
                 votes = curr
                 header = voteHeader
@@ -2960,7 +2954,7 @@ class SimpleVoteViewPanelTest {
                 votes = previousVotes
                 header = changeHeader
                 swing = {
-                    partyOrder = compareBy { swingPartyOrder.indexOf(it) }
+                    partyOrder = swingPartyOrder
                     header = swingHeader
                 }
             },
@@ -3130,10 +3124,10 @@ class SimpleVoteViewPanelTest {
             oth to 290220,
         )
         val showPrev = Publisher(false)
-        val swingOrder = Comparator.comparing { p: Party -> listOf(ndp, lib, oth, pc, bq, con, ca).indexOf(p) }
+        val swingOrder = listOf(ndp, lib, oth, pc, bq, con, ca)
         val partyChanges = mapOf(ca to con, pc to con).asOneTimePublisher()
 
-        val panel = partyVotes<Party>(
+        val panel = partyVotes(
             current = {
                 votes = currVotes.asOneTimePublisher()
                 header = "2004 VOTE SHARE".asOneTimePublisher()
@@ -3222,10 +3216,10 @@ class SimpleVoteViewPanelTest {
             oth to 290220,
         )
         val showPrev = Publisher(false)
-        val swingOrder = Comparator.comparing { p: Party -> listOf(ndp, lib, oth, pc, bq, con, ca).indexOf(p) }
+        val swingOrder = listOf(ndp, lib, oth, pc, bq, con, ca)
         val partyChanges = mapOf(ca to con, pc to con).asOneTimePublisher()
 
-        val panel = partyRangeVotes<Party>(
+        val panel = partyRangeVotes(
             current = {
                 votes = currVotes.asOneTimePublisher()
                 header = "2004 POLLING RANGE".asOneTimePublisher()
@@ -3295,7 +3289,7 @@ class SimpleVoteViewPanelTest {
         val lib = Party("Liberal", "LIB", Color.RED)
         val grn = Party("Green", "GRN", Color.GREEN.darker())
         val ind = Party("Independent", "IND", Color.DARK_GRAY)
-        val panel = partyVotes<Party>(
+        val panel = partyVotes(
             current = {
                 votes = mapOf(
                     pc to 29335,
@@ -3763,7 +3757,7 @@ class SimpleVoteViewPanelTest {
                 votes = previousVotes
                 header = changeHeader
                 swing = {
-                    partyOrder = compareBy { swingPartyOrder.indexOf(it) }
+                    partyOrder = swingPartyOrder
                     header = swingHeader
                     range = 0.2.asOneTimePublisher()
                 }

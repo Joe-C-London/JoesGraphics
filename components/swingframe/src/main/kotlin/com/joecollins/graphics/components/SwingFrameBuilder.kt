@@ -1,5 +1,6 @@
 package com.joecollins.graphics.components
 
+import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyOrCoalition
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.Subscriber
@@ -13,29 +14,44 @@ import java.util.concurrent.Flow
 
 object SwingFrameBuilder {
 
-    private class SelfPublishingPrevCurrPct<POC : PartyOrCoalition> {
-        private var prevPct: Map<out POC, Double> = HashMap()
-        private var currPct: Map<out POC, Double> = HashMap()
-        var fromParty: POC? = null
-        var toParty: POC? = null
+    private class SelfPublishingPrevCurrPct {
+        private var prevPct: Map<out PartyOrCoalition, Double> = HashMap()
+        private var currPct: Map<out PartyOrCoalition, Double> = HashMap()
+        var fromParty: PartyOrCoalition? = null
+        var toParty: PartyOrCoalition? = null
         var swing = 0.0
-        private var partyFilter: Collection<POC>? = null
+        private var partyFilter: Collection<PartyOrCoalition>? = null
 
-        fun setPrevPct(prevPct: Map<out POC, Double>) {
+        fun leftParty(comparator: List<PartyOrCoalition>): PartyOrCoalition? {
+            return when (rightParty(comparator)) {
+                null -> null
+                fromParty -> toParty
+                else -> fromParty
+            }
+        }
+
+        fun rightParty(comparator: List<PartyOrCoalition>): PartyOrCoalition? {
+            val from = fromParty
+            val to = toParty
+            if (from == null || to == null) return null
+            return ComparatorUtils.max(from, to, comparator.comparator())
+        }
+
+        fun setPrevPct(prevPct: Map<out PartyOrCoalition, Double>) {
             synchronized(this) {
                 this.prevPct = prevPct
                 setProperties()
             }
         }
 
-        fun setCurrPct(currPct: Map<out POC, Double>) {
+        fun setCurrPct(currPct: Map<out PartyOrCoalition, Double>) {
             synchronized(this) {
                 this.currPct = currPct
                 setProperties()
             }
         }
 
-        fun setPartyFilter(partyFilter: Collection<POC>) {
+        fun setPartyFilter(partyFilter: Collection<PartyOrCoalition>) {
             synchronized(this) {
                 this.partyFilter = partyFilter
                 setProperties()
@@ -69,13 +85,17 @@ object SwingFrameBuilder {
             }
             publisher.submit(this)
         }
+
+        private fun List<PartyOrCoalition>.comparator(): Comparator<PartyOrCoalition> {
+            return Comparator.comparing { party -> indexOf(party).takeUnless { it == -1 } ?: indexOf(Party.OTHERS) }
+        }
     }
 
-    fun <POC : PartyOrCoalition> prevCurr(
-        prev: Flow.Publisher<out Map<out POC, Number>>,
-        curr: Flow.Publisher<out Map<out POC, Number>>,
-        partyOrder: Comparator<POC>,
-        selectedParties: Flow.Publisher<out Collection<POC>>? = null,
+    fun prevCurr(
+        prev: Flow.Publisher<out Map<out PartyOrCoalition, Number>>,
+        curr: Flow.Publisher<out Map<out PartyOrCoalition, Number>>,
+        partyOrder: List<PartyOrCoalition>,
+        selectedParties: Flow.Publisher<out Collection<PartyOrCoalition>>? = null,
         range: Flow.Publisher<out Number>? = null,
         header: Flow.Publisher<out String?>,
         progress: Flow.Publisher<out String?>? = null,
@@ -86,14 +106,14 @@ object SwingFrameBuilder {
     private fun <POC : PartyOrCoalition, C : Map<out POC, Number>, P : Map<out POC, Number>> prevCurr(
         prev: Flow.Publisher<out P>,
         curr: Flow.Publisher<out C>,
-        partyOrder: Comparator<POC>,
+        partyOrder: List<POC>,
         normalised: Boolean,
         selectedParties: Flow.Publisher<out Collection<POC>>?,
         range: Flow.Publisher<out Number>? = null,
         header: Flow.Publisher<out String?>,
         progress: Flow.Publisher<out String?>? = null,
     ): SwingFrame {
-        val prevCurr = SelfPublishingPrevCurrPct<POC>()
+        val prevCurr = SelfPublishingPrevCurrPct()
         val toPctFunc = { votes: Map<out POC, Number> ->
             val total: Double = if (normalised) 1.0 else votes.values.sumOf { it.toDouble() }
             votes.mapValues { e -> e.value.toDouble() / total }
@@ -104,31 +124,17 @@ object SwingFrameBuilder {
         val ret = basic(
             prevCurr.publisher,
             {
-                if (this.fromParty == null || this.toParty == null) {
-                    Color.LIGHT_GRAY
-                } else {
-                    ComparatorUtils.max(fromParty, toParty, partyOrder).color
-                }
+                rightParty(partyOrder)?.color ?: Color.LIGHT_GRAY
             },
             {
-                val fromParty = fromParty
-                val toParty = toParty
-                if (fromParty == null || toParty == null) {
-                    Color.LIGHT_GRAY
-                } else {
-                    (if (ComparatorUtils.max(fromParty, toParty, partyOrder) == fromParty) toParty else fromParty).color
-                }
+                leftParty(partyOrder)?.color ?: Color.LIGHT_GRAY
             },
             {
-                if (fromParty == null || toParty == null) {
-                    0
-                } else {
-                    if (ComparatorUtils.max(fromParty, toParty, partyOrder) == fromParty) {
-                        -1 * swing
-                    } else {
-                        swing
-                    }
-                }
+                when (rightParty(partyOrder)) {
+                    null -> 0
+                    fromParty -> -1
+                    else -> 1
+                } * swing
             },
             {
                 val fromParty = fromParty
@@ -156,10 +162,10 @@ object SwingFrameBuilder {
         return ret
     }
 
-    fun <POC : PartyOrCoalition> prevCurrNormalised(
-        prevPublisher: Flow.Publisher<out Map<out POC, Double>>,
-        currPublisher: Flow.Publisher<out Map<out POC, Double>>,
-        partyOrder: Comparator<POC>,
+    fun prevCurrNormalised(
+        prevPublisher: Flow.Publisher<out Map<out PartyOrCoalition, Double>>,
+        currPublisher: Flow.Publisher<out Map<out PartyOrCoalition, Double>>,
+        partyOrder: List<PartyOrCoalition>,
         range: Flow.Publisher<out Number>? = null,
         header: Flow.Publisher<out String?>,
         progress: Flow.Publisher<out String?>? = null,

@@ -84,7 +84,7 @@ class SwingFrameBuilderTest {
         val swingFrame = prevCurr(
             prev = prevBinding,
             curr = currBinding,
-            partyOrder = compareBy { partyOrder.indexOf(it) },
+            partyOrder = partyOrder,
             header = null.asOneTimePublisher(),
         )
         assertEquals(Color.BLUE, swingFrame.getLeftColor())
@@ -109,7 +109,7 @@ class SwingFrameBuilderTest {
         val swingFrame = prevCurr(
             prev = prevBinding,
             curr = currBinding,
-            partyOrder = compareBy { partyOrder.indexOf(it) },
+            partyOrder = partyOrder,
             header = null.asOneTimePublisher(),
         )
         assertEquals(Color.BLUE, swingFrame.getLeftColor())
@@ -134,7 +134,7 @@ class SwingFrameBuilderTest {
         val swingFrame = prevCurr(
             prev = prevBinding,
             curr = currBinding,
-            partyOrder = compareBy { partyOrder.indexOf(it) },
+            partyOrder = partyOrder,
             header = null.asOneTimePublisher(),
         )
         assertEquals("10.0% SWING CON TO LIB", swingFrame.getBottomText())
@@ -163,7 +163,7 @@ class SwingFrameBuilderTest {
         val swingFrame = prevCurr(
             prev = prevBinding,
             curr = currBinding,
-            partyOrder = compareBy { partyOrder.indexOf(it) },
+            partyOrder = partyOrder,
             header = null.asOneTimePublisher(),
         )
         assertEquals(Color.BLUE, swingFrame.getLeftColor())
@@ -188,7 +188,7 @@ class SwingFrameBuilderTest {
         val swingFrame = prevCurr(
             prev = prevBinding,
             curr = currBinding,
-            partyOrder = compareBy { partyOrder.indexOf(it) },
+            partyOrder = partyOrder,
             selectedParties = setOf(lib, con).asOneTimePublisher(),
             header = null.asOneTimePublisher(),
         )
@@ -211,7 +211,7 @@ class SwingFrameBuilderTest {
         val swingFrame = prevCurr(
             prev = prevBinding,
             curr = currBinding,
-            partyOrder = Comparator.comparing { partyOrder.indexOf(it) },
+            partyOrder = partyOrder,
             header = null.asOneTimePublisher(),
         )
         assertEquals(Color.BLUE, swingFrame.getLeftColor())
@@ -233,7 +233,7 @@ class SwingFrameBuilderTest {
         val swingFrame = prevCurr(
             prev = prevBinding,
             curr = currBinding,
-            partyOrder = Comparator.comparing { partyOrder.indexOf(it) },
+            partyOrder = partyOrder,
             header = null.asOneTimePublisher(),
         )
         assertEquals(Color.LIGHT_GRAY, swingFrame.getLeftColor())
@@ -258,7 +258,7 @@ class SwingFrameBuilderTest {
         val swingFrame = prevCurrNormalised(
             prevPublisher = prevBinding,
             currPublisher = currBinding,
-            partyOrder = Comparator.comparing { partyOrder.indexOf(it) },
+            partyOrder = partyOrder,
             header = null.asOneTimePublisher(),
         )
         assertEquals(Color.BLUE, swingFrame.getLeftColor())

@@ -18,16 +18,16 @@ class RegionalSwingsScreen private constructor(
 ) : GenericPanel(panel, title, altText) {
 
     companion object {
-        fun <R, POC : PartyOrCoalition> of(
+        fun <R> of(
             regions: List<R>,
             name: R.() -> Flow.Publisher<String>,
-            currVotes: R.() -> Flow.Publisher<out Map<out POC, Int>>,
-            prevVotes: R.() -> Flow.Publisher<out Map<out POC, Int>>,
-            swingOrder: Comparator<POC>,
+            currVotes: R.() -> Flow.Publisher<out Map<out PartyOrCoalition, Int>>,
+            prevVotes: R.() -> Flow.Publisher<out Map<out PartyOrCoalition, Int>>,
+            swingOrder: List<PartyOrCoalition>,
             numRows: Int,
             progressLabel: (R.() -> Flow.Publisher<out String?>)? = null,
             swingRange: Flow.Publisher<Double>? = null,
-            partyFilter: Flow.Publisher<out Collection<POC>>? = null,
+            partyFilter: Flow.Publisher<out Collection<PartyOrCoalition>>? = null,
             title: Flow.Publisher<String>,
         ): RegionalSwingsScreen {
             val swings = regions.map {

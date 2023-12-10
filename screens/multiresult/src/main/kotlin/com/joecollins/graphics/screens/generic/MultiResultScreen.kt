@@ -67,7 +67,7 @@ class MultiResultScreen private constructor(
 
     class Swing<T> internal constructor() {
         lateinit var header: (T.() -> Flow.Publisher<out String>)
-        lateinit var partyOrder: Comparator<Party>
+        lateinit var partyOrder: List<Party>
     }
 
     class MapPanel<T, K> internal constructor() {
@@ -212,7 +212,7 @@ class MultiResultScreen private constructor(
 
     private class ResultPanel(
         incumbentMarker: String,
-        swingPartyOrder: Comparator<Party>?,
+        swingPartyOrder: List<Party>?,
         hasMap: Boolean,
         partiesOnly: Boolean,
     ) : JPanel() {

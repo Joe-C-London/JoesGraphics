@@ -41,15 +41,15 @@ class PartyQuotasPanel private constructor(
 
     companion object {
         fun <P : PartyOrCoalition> partyQuotas(
-            curr: Curr<P>.() -> Unit,
-            change: (Change<P>.() -> Unit)? = null,
-            swing: (Swing<P>.() -> Unit)? = null,
-            map: MapPanel<*, P>? = null,
+            curr: Curr.() -> Unit,
+            change: (Change.() -> Unit)? = null,
+            swing: (Swing.() -> Unit)? = null,
+            map: MapPanel<*>? = null,
             title: Flow.Publisher<out String>,
         ): PartyQuotasPanel {
-            val currProps = Curr<P>().apply(curr)
-            val changeProps = change?.let { Change<P>().apply(it) }
-            val swingProps = swing?.let { Swing<P>().apply(it) }
+            val currProps = Curr().apply(curr)
+            val changeProps = change?.let { Change().apply(it) }
+            val swingProps = swing?.let { Swing().apply(it) }
             return PartyQuotasPanel(
                 title,
                 createFrame(currProps),
@@ -61,9 +61,9 @@ class PartyQuotasPanel private constructor(
             )
         }
 
-        fun <T, P : PartyOrCoalition> createMap(map: MapPanel<T, P>.() -> Unit) = MapPanel<T, P>().apply(map)
+        fun <T> createMap(map: MapPanel<T>.() -> Unit) = MapPanel<T>().apply(map)
 
-        private fun <P : PartyOrCoalition> createFrame(curr: Curr<P>): BarFrame {
+        private fun createFrame(curr: Curr): BarFrame {
             return BarFrame(
                 barsPublisher = curr.quotas.map { q ->
                     q.entries.asSequence()
@@ -85,7 +85,7 @@ class PartyQuotasPanel private constructor(
             )
         }
 
-        private fun <P : PartyOrCoalition> createDiffFrame(curr: Curr<P>, change: Change<P>?): BarFrame? {
+        private fun createDiffFrame(curr: Curr, change: Change?): BarFrame? {
             if (change == null) return null
             return BarFrame(
                 barsPublisher = curr.quotas.merge(change.prevQuotas) { currQuotas, prevQuotas ->
@@ -115,7 +115,7 @@ class PartyQuotasPanel private constructor(
             )
         }
 
-        private fun <P : PartyOrCoalition> createSwingFrame(swing: Swing<P>?): SwingFrame? {
+        private fun createSwingFrame(swing: Swing?): SwingFrame? {
             return swing?.run {
                 SwingFrameBuilder.prevCurr(
                     prev = prevVotes,
@@ -127,10 +127,10 @@ class PartyQuotasPanel private constructor(
             }
         }
 
-        private fun <P : PartyOrCoalition> createAltText(
-            curr: Curr<P>,
-            change: Change<P>?,
-            swing: Swing<P>?,
+        private fun createAltText(
+            curr: Curr,
+            change: Change?,
+            swing: Swing?,
             title: Flow.Publisher<out String?>,
         ): Flow.Publisher<String> {
             val combineHeaderAndSubhead: (String?, String?) -> String? = { h, s ->
@@ -212,31 +212,31 @@ class PartyQuotasPanel private constructor(
         }
     }
 
-    class Curr<P : PartyOrCoalition> internal constructor() {
-        lateinit var quotas: Flow.Publisher<out Map<out P, Double>>
+    class Curr internal constructor() {
+        lateinit var quotas: Flow.Publisher<out Map<out PartyOrCoalition, Double>>
         lateinit var totalSeats: Flow.Publisher<out Int>
         lateinit var header: Flow.Publisher<out String?>
         lateinit var subhead: Flow.Publisher<out String?>
         var progressLabel: Flow.Publisher<out String?>? = null
     }
 
-    class Change<P : PartyOrCoalition> internal constructor() {
-        lateinit var prevQuotas: Flow.Publisher<out Map<out P, Double>>
+    class Change internal constructor() {
+        lateinit var prevQuotas: Flow.Publisher<out Map<out PartyOrCoalition, Double>>
         lateinit var header: Flow.Publisher<out String?>
     }
 
-    class Swing<P : PartyOrCoalition> internal constructor() {
-        lateinit var currVotes: Flow.Publisher<out Map<out P, Int>>
-        lateinit var prevVotes: Flow.Publisher<out Map<out P, Int>>
-        lateinit var order: Comparator<P>
+    class Swing internal constructor() {
+        lateinit var currVotes: Flow.Publisher<out Map<out PartyOrCoalition, Int>>
+        lateinit var prevVotes: Flow.Publisher<out Map<out PartyOrCoalition, Int>>
+        lateinit var order: List<PartyOrCoalition>
         lateinit var header: Flow.Publisher<out String?>
         var range: Flow.Publisher<Double>? = null
     }
 
-    class MapPanel<T, P : PartyOrCoalition> internal constructor() {
+    class MapPanel<T> internal constructor() {
         lateinit var shapes: Flow.Publisher<out Map<T, Shape>>
         lateinit var selectedShape: Flow.Publisher<out T>
-        lateinit var leadingParty: Flow.Publisher<out P?>
+        lateinit var leadingParty: Flow.Publisher<out PartyOrCoalition?>
         lateinit var focus: Flow.Publisher<out List<T>?>
         lateinit var header: Flow.Publisher<out String?>
 

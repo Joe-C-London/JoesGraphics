@@ -81,7 +81,7 @@ class RegionalSwingsScreenTest {
             name = { name.uppercase().asOneTimePublisher() },
             currVotes = { curr.asOneTimePublisher() },
             prevVotes = { prev.asOneTimePublisher() },
-            swingOrder = Comparator.comparing { if (it == alp) 0 else 1 },
+            swingOrder = listOf(alp, Party.OTHERS),
             numRows = 2,
             progressLabel = { (DecimalFormat("0.0%").format(reporting) + " IN").asOneTimePublisher() },
             title = "AUSTRALIA".asOneTimePublisher(),
@@ -251,13 +251,7 @@ class RegionalSwingsScreenTest {
             name = { name.uppercase().asOneTimePublisher() },
             currVotes = { curr.asOneTimePublisher() },
             prevVotes = { prev.asOneTimePublisher() },
-            swingOrder = Comparator.comparing {
-                when (it) {
-                    lab -> -1
-                    con -> 1
-                    else -> 0
-                }
-            },
+            swingOrder = listOf(lab, oth, con),
             numRows = 2,
             partyFilter = setOf(con, lab).asOneTimePublisher(),
             title = "UNITED KINGDOM".asOneTimePublisher(),

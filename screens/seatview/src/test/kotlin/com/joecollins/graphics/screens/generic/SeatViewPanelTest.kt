@@ -40,7 +40,7 @@ class SeatViewPanelTest {
         val changeSubhead = Publisher<String?>("CON NEED +9 FOR MAJORITY")
         val con = Party("Conservative", "CON", Color.BLUE)
         val lab = Party("Labour", "LAB", Color.RED)
-        val panel = partySeats<Party>(
+        val panel = partySeats(
             current = {
                 seats = currentSeats
                 header = seatHeader
@@ -185,7 +185,7 @@ class SeatViewPanelTest {
         val changeSubhead = Publisher<String?>("CON NEED +9 FOR MAJORITY")
         val con = Party("Conservative", "CON", Color.BLUE)
         val lab = Party("Labour", "LAB", Color.RED)
-        val panel = partySeats<Party>(
+        val panel = partySeats(
             current = {
                 seats = currentSeats
                 header = seatHeader
@@ -337,7 +337,7 @@ class SeatViewPanelTest {
         val grn = Party("Green", "GRN", Color.GREEN)
         val oth = Party.OTHERS
         val partyOrder = listOf(snp, lab, pc, grn, ld, oth, con)
-        val panel = partySeats<Party>(
+        val panel = partySeats(
             current = {
                 seats = currentSeats
                 header = seatHeader
@@ -351,7 +351,7 @@ class SeatViewPanelTest {
             swing = {
                 currVotes = currentVotes
                 prevVotes = previousVotes
-                this.partyOrder = compareBy { partyOrder.indexOf(it) }
+                this.partyOrder = partyOrder
                 header = swingHeader
             },
             majorityLine = {
@@ -433,7 +433,7 @@ class SeatViewPanelTest {
         val ndp = Party("New Democratic Party", "NDP", Color.ORANGE)
         val oth = Party.OTHERS
         val partyOrder = listOf(ndp, grn, lib, oth, pc)
-        val panel = partySeats<Party>(
+        val panel = partySeats(
             current = {
                 seats = currentSeats
                 header = seatHeader
@@ -447,7 +447,7 @@ class SeatViewPanelTest {
             swing = {
                 currVotes = currentVotes
                 prevVotes = previousVotes
-                this.partyOrder = compareBy { partyOrder.indexOf(it) }
+                this.partyOrder = partyOrder
                 header = swingHeader
             },
             majorityLine = {
@@ -612,7 +612,7 @@ class SeatViewPanelTest {
         val bq = Party("Bloc Qu\u00e9b\u00e9cois", "BQ", Color.CYAN.darker())
         val grn = Party("Green", "GRN", Color.GREEN.darker())
         val ind = Party("Independent", "IND", Color.GRAY)
-        val panel = partyDualSeats<Party>(
+        val panel = partyDualSeats(
             current = {
                 seats = currentSeats
                 header = seatHeader
@@ -820,7 +820,7 @@ class SeatViewPanelTest {
         val bq = Party("Bloc Qu\u00e9b\u00e9cois", "BQ", Color.CYAN.darker())
         val grn = Party("Green", "GRN", Color.GREEN.darker())
         val ind = Party("Independent", "IND", Color.GRAY)
-        val panel = partyDualSeatsReversed<Party>(
+        val panel = partyDualSeatsReversed(
             current = {
                 seats = currentSeats
                 header = seatHeader
@@ -1028,7 +1028,7 @@ class SeatViewPanelTest {
         val bq = Party("Bloc Qu\u00e9b\u00e9cois", "BQ", Color.CYAN.darker())
         val grn = Party("Green", "GRN", Color.GREEN.darker())
         val ind = Party("Independent", "IND", Color.GRAY)
-        val panel = partyDualSeats<Party>(
+        val panel = partyDualSeats(
             current = {
                 seats = currentSeats
                 header = seatHeader
@@ -1243,7 +1243,7 @@ class SeatViewPanelTest {
         val onp = Party("One Nation Party", "ONP", Color.ORANGE)
         val nxt = Party("Nick Xenophon Team", "NXT", Color.ORANGE)
         val oth = Party.OTHERS
-        val panel = partyRangeSeats<Party>(
+        val panel = partyRangeSeats(
             current = {
                 seats = currentSeats
                 header = seatHeader
@@ -1393,7 +1393,7 @@ class SeatViewPanelTest {
         val onp = Party("One Nation Party", "ONP", Color.ORANGE)
         val nxt = Party("Nick Xenophon Team", "NXT", Color.ORANGE)
         val oth = Party.OTHERS
-        val panel = partyRangeSeats<Party>(
+        val panel = partyRangeSeats(
             current = {
                 seats = currentSeats
                 header = seatHeader
@@ -1700,7 +1700,7 @@ class SeatViewPanelTest {
         val seatSubhead = Publisher("")
         val changeHeader = Publisher("CHANGE SINCE 2016")
         val winner = Publisher<Party?>(null)
-        val panel = partySeats<Party>(
+        val panel = partySeats(
             current = {
                 seats = currentSeats
                 header = seatHeader
@@ -1749,7 +1749,7 @@ class SeatViewPanelTest {
         val seatSubhead = Publisher("")
         val changeHeader = Publisher("CHANGE SINCE 2016")
         val winner = Publisher<Party?>(null)
-        val panel = partyDualSeats<Party>(
+        val panel = partyDualSeats(
             current = {
                 seats = currentSeats
                 header = seatHeader
@@ -1809,7 +1809,7 @@ class SeatViewPanelTest {
         val focus = Publisher(shapesByDistrict.keys.filter { it <= 7 })
         val additionalHighlight = Publisher(shapesByDistrict.keys.toList())
         val winnerByDistrict = Publisher(mapOf<Int, PartyResult>())
-        val panel = partySeats<Party>(
+        val panel = partySeats(
             current = {
                 seats = currentSeats
                 header = seatHeader
@@ -1824,7 +1824,7 @@ class SeatViewPanelTest {
             swing = {
                 currVotes = currentVotes
                 prevVotes = previousVotes
-                partyOrder = compareBy { swingPartyOrder.indexOf(it) }
+                partyOrder = swingPartyOrder
                 header = swingHeader
             },
             map = createResultMap {
@@ -1885,7 +1885,7 @@ class SeatViewPanelTest {
         val seatHeader = Publisher("2017 RESULTS")
         val seatSubhead = Publisher<String?>(null)
         val changeHeader = Publisher("NOTIONAL CHANGE SINCE 2016")
-        val panel = partySeats<Party>(
+        val panel = partySeats(
             current = {
                 seats = currentSeats
                 header = seatHeader
@@ -1899,7 +1899,7 @@ class SeatViewPanelTest {
             swing = {
                 currVotes = currentVotes
                 prevVotes = previousVotes
-                partyOrder = compareBy { listOf(nationalists, others, unionists).indexOf(it) }
+                partyOrder = listOf(nationalists, others, unionists)
                 header = "FIRST PREFERENCE SWING SINCE 2016".asOneTimePublisher()
             },
             partyClassification = {
@@ -2061,7 +2061,7 @@ class SeatViewPanelTest {
         val showMajority = Publisher(true)
         val showPrevRaw = Publisher(true)
 
-        val panel = partySeats<Party>(
+        val panel = partySeats(
             current = {
                 seats = curr
                 header = seatsHeader
@@ -2310,7 +2310,7 @@ class SeatViewPanelTest {
         val showMajority = Publisher(true)
         val showPrevRaw = Publisher(true)
 
-        val panel = partyDualSeats<Party>(
+        val panel = partyDualSeats(
             current = {
                 seats = curr
                 header = seatsHeader
@@ -2429,7 +2429,7 @@ class SeatViewPanelTest {
         val showMajority = Publisher(true)
         val showPrevRaw = Publisher(true)
 
-        val panel = partyRangeSeats<Party>(
+        val panel = partyRangeSeats(
             current = {
                 seats = curr
                 header = seatsHeader
@@ -2515,7 +2515,7 @@ class SeatViewPanelTest {
         val seatSubhead = Publisher("PROJECTION: TOO EARLY TO CALL")
         val changeHeader = Publisher("CHANGE SINCE 2017")
         val lab = Party("Labour", "LAB", Color.RED)
-        val panel = partySeats<Party>(
+        val panel = partySeats(
             current = {
                 seats = currentSeats
                 header = seatHeader
@@ -2568,7 +2568,7 @@ class SeatViewPanelTest {
         val ndp = Party("New Democratic Party", "NDP", Color.ORANGE)
         val tie = Party.TIE
 
-        val panel = partyDualSeats<Party>(
+        val panel = partyDualSeats(
             current = {
                 seats = mapOf(
                     lib to (0 to 5),
@@ -2647,11 +2647,11 @@ class SeatViewPanelTest {
             oth to 290220,
         )
         val showPrev = Publisher(false)
-        val swingOrder = Comparator.comparing { p: Party -> listOf(ndp, lib, ind, oth, pc, bq, con, ca).indexOf(p) }
+        val swingOrder = listOf(ndp, lib, ind, oth, pc, bq, con, ca)
         val partyChanges = mapOf(ca to con, pc to con).asOneTimePublisher()
 
         val panel =
-            partySeats<Party>(
+            partySeats(
                 current = {
                     seats = currSeats.asOneTimePublisher()
                     header = "2004 RESULT".asOneTimePublisher()
@@ -2764,11 +2764,11 @@ class SeatViewPanelTest {
             oth to 290220,
         )
         val showPrev = Publisher(false)
-        val swingOrder = Comparator.comparing { p: Party -> listOf(ndp, lib, ind, oth, pc, bq, con, ca).indexOf(p) }
+        val swingOrder = listOf(ndp, lib, ind, oth, pc, bq, con, ca)
         val partyChanges = mapOf(ca to con, pc to con).asOneTimePublisher()
 
         val panel =
-            partyDualSeats<Party>(
+            partyDualSeats(
                 current = {
                     seats = currSeats.asOneTimePublisher()
                     header = "2004 RESULT".asOneTimePublisher()
@@ -2881,10 +2881,10 @@ class SeatViewPanelTest {
             oth to 290220,
         )
         val showPrev = Publisher(false)
-        val swingOrder = Comparator.comparing { p: Party -> listOf(ndp, lib, ind, oth, pc, bq, con, ca).indexOf(p) }
+        val swingOrder = listOf(ndp, lib, ind, oth, pc, bq, con, ca)
         val partyChanges = mapOf(ca to con, pc to con).asOneTimePublisher()
 
-        val panel = partyRangeSeats<Party>(
+        val panel = partyRangeSeats(
             current = {
                 seats = currSeats.asOneTimePublisher()
                 header = "2004-2006 RESULTS".asOneTimePublisher()
@@ -2961,7 +2961,7 @@ class SeatViewPanelTest {
         val lib = Party("Liberal", "LIB", Color.RED)
         val grn = Party("Green", "GRN", Color.GREEN.darker())
         val pc = Party("Progressive Conservative", "PC", Color.BLUE)
-        val panel = partySeats<Party>(
+        val panel = partySeats(
             current = {
                 seats = mapOf(pc to 12, grn to 8, lib to 6).asOneTimePublisher()
                 header = "SEATS DECLARED".asOneTimePublisher()
@@ -3077,7 +3077,7 @@ class SeatViewPanelTest {
             prg to 3,
             dxd to 1,
         )
-        val panel = partySeats<Party>(
+        val panel = partySeats(
             current = {
                 seats = curr.asOneTimePublisher()
                 header = "2022 RESULT".asOneTimePublisher()
@@ -3140,7 +3140,7 @@ class SeatViewPanelTest {
         val grn = Party("Green", "GRN", Color.GREEN)
         val oth = Party.OTHERS
         val partyOrder = listOf(snp, lab, pc, grn, ld, oth, con)
-        val panel = partySeats<Party>(
+        val panel = partySeats(
             current = {
                 seats = currentSeats
                 header = seatHeader
@@ -3154,7 +3154,7 @@ class SeatViewPanelTest {
             swing = {
                 currVotes = currentVotes
                 prevVotes = previousVotes
-                this.partyOrder = compareBy { partyOrder.indexOf(it) }
+                this.partyOrder = partyOrder
                 header = swingHeader
                 range = 0.05.asOneTimePublisher()
             },

@@ -86,7 +86,7 @@ class MultiResultScreenTest {
                 votes = { prevVotes.asOneTimePublisher() }
                 swing = {
                     header = { "SWING SINCE 2015".asOneTimePublisher() }
-                    partyOrder = compareBy { swingometerOrder.indexOf(it) }
+                    partyOrder = swingometerOrder
                 }
             },
             map = createMap {
@@ -206,7 +206,7 @@ class MultiResultScreenTest {
                 votes = { prevVotes.asOneTimePublisher() }
                 swing = {
                     header = { "SWING SINCE 2015".asOneTimePublisher() }
-                    partyOrder = compareBy { swingometerOrder.indexOf(it) }
+                    partyOrder = swingometerOrder
                 }
             },
             map = createMap {
@@ -606,7 +606,7 @@ class MultiResultScreenTest {
                 votes = { prevVotes.asOneTimePublisher() }
                 swing = {
                     header = { "SWING SINCE 2015".asOneTimePublisher() }
-                    partyOrder = compareBy { swingometerOrder.indexOf(it) }
+                    partyOrder = swingometerOrder
                 }
             },
             map = createMap {
@@ -1013,7 +1013,7 @@ class MultiResultScreenTest {
                 votes = { prevVotes.asOneTimePublisher() }
                 swing = {
                     header = { "SWING SINCE 2018".asOneTimePublisher() }
-                    partyOrder = compareBy { swingometerOrder.indexOf(it) }
+                    partyOrder = swingometerOrder
                 }
             },
             title = "SAINT JOHN".asOneTimePublisher(),
@@ -1179,7 +1179,7 @@ class MultiResultScreenTest {
                 votes = { prevVotes.asOneTimePublisher() }
                 swing = {
                     header = { "SWING SINCE 2018".asOneTimePublisher() }
-                    partyOrder = compareBy { swingometerOrder.indexOf(it) }
+                    partyOrder = swingometerOrder
                 }
             },
             title = "SAINT JOHN".asOneTimePublisher(),
@@ -1341,7 +1341,7 @@ class MultiResultScreenTest {
                 votes = { prevVotes.asOneTimePublisher() }
                 swing = {
                     header = { "SWING SINCE 2018".asOneTimePublisher() }
-                    partyOrder = compareBy { swingometerOrder.indexOf(it) }
+                    partyOrder = swingometerOrder
                 }
             },
             title = "ELECTION 2020: NEW BRUNSWICK DECIDES".asOneTimePublisher(),
@@ -1604,7 +1604,7 @@ class MultiResultScreenTest {
                 votes = { prevVotes.asOneTimePublisher() }
                 swing = {
                     header = { "SWING SINCE 2018".asOneTimePublisher() }
-                    partyOrder = compareBy { swingometerOrder.indexOf(it) }
+                    partyOrder = swingometerOrder
                 }
             },
             title = "ELECTION 2020: NEW BRUNSWICK DECIDES".asOneTimePublisher(),
@@ -1920,7 +1920,7 @@ class MultiResultScreenTest {
                 votes = { prevVotes.asOneTimePublisher() }
                 swing = {
                     header = { "SWING SINCE 2015".asOneTimePublisher() }
-                    partyOrder = compareBy { swingometerOrder.indexOf(it) }
+                    partyOrder = swingometerOrder
                 }
             },
             map = createMap {
@@ -2058,7 +2058,7 @@ class MultiResultScreenTest {
                 votes = { prevVotes.asOneTimePublisher() }
                 swing = {
                     header = { "SWING SINCE 2018".asOneTimePublisher() }
-                    partyOrder = compareBy { swingometerOrder.indexOf(it) }
+                    partyOrder = swingometerOrder
                 }
             },
             title = "ELECTION 2020: NEW BRUNSWICK DECIDES".asOneTimePublisher(),
