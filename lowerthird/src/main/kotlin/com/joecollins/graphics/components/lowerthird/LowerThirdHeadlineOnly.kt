@@ -3,13 +3,14 @@ package com.joecollins.graphics.components.lowerthird
 import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
 import java.awt.BorderLayout
-import java.awt.Image
+import java.awt.Dimension
+import java.awt.Graphics2D
 import java.time.Clock
 import java.time.ZoneId
 import java.util.concurrent.Flow
 
 class LowerThirdHeadlineOnly internal constructor(
-    leftImagePublisher: Flow.Publisher<out Image>,
+    leftImagePublisher: Flow.Publisher<(Graphics2D) -> Dimension>,
     placePublisher: Flow.Publisher<out Pair<String, ZoneId>>,
     private val headlinePublisher: Flow.Publisher<out String?>,
     private val subheadPublisher: Flow.Publisher<out String?>,
@@ -18,7 +19,7 @@ class LowerThirdHeadlineOnly internal constructor(
 ) : LowerThird(leftImagePublisher, placePublisher, clock, showTimeZone) {
 
     constructor(
-        leftImagePublisher: Flow.Publisher<out Image>,
+        leftImagePublisher: Flow.Publisher<(Graphics2D) -> Dimension>,
         placePublisher: Flow.Publisher<out Pair<String, ZoneId>>,
         headlinePublisher: Flow.Publisher<out String?>,
         subheadPublisher: Flow.Publisher<out String?>,

@@ -5,15 +5,16 @@ import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
 import org.jetbrains.annotations.TestOnly
 import java.awt.BorderLayout
 import java.awt.Color
+import java.awt.Dimension
+import java.awt.Graphics2D
 import java.awt.GridLayout
-import java.awt.Image
 import java.time.Clock
 import java.time.ZoneId
 import java.util.concurrent.Flow
 import javax.swing.JPanel
 
 class LowerThirdHeadlineAndSummary @TestOnly constructor(
-    leftImagePublisher: Flow.Publisher<out Image>,
+    leftImagePublisher: Flow.Publisher<(Graphics2D) -> Dimension>,
     placePublisher: Flow.Publisher<out Pair<String, ZoneId>>,
     private val headlineBinding: Flow.Publisher<out String?>,
     private val subheadBinding: Flow.Publisher<out String?>,
@@ -23,7 +24,7 @@ class LowerThirdHeadlineAndSummary @TestOnly constructor(
 ) : LowerThird(leftImagePublisher, placePublisher, clock, showTimeZone) {
 
     constructor(
-        leftImagePublisher: Flow.Publisher<out Image>,
+        leftImagePublisher: Flow.Publisher<(Graphics2D) -> Dimension>,
         placePublisher: Flow.Publisher<out Pair<String, ZoneId>>,
         headlinePublisher: Flow.Publisher<out String?>,
         subheadPublisher: Flow.Publisher<out String?>,

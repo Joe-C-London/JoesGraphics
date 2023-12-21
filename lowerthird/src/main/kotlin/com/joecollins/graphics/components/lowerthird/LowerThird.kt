@@ -13,9 +13,7 @@ import java.awt.Graphics
 import java.awt.Graphics2D
 import java.awt.GridBagConstraints
 import java.awt.GridBagLayout
-import java.awt.Image
 import java.awt.RenderingHints
-import java.awt.geom.Rectangle2D
 import java.awt.image.BufferedImage
 import java.net.URL
 import java.time.Clock
@@ -32,14 +30,14 @@ import kotlin.math.max
 
 @Suppress("LeakingThis")
 open class LowerThird internal constructor(
-    private val leftImagePublisher: Flow.Publisher<out Image>,
+    private val leftImagePublisher: Flow.Publisher<(Graphics2D) -> Dimension>,
     private val placePublisher: Flow.Publisher<out Pair<String, ZoneId>>,
     private val clock: Clock,
     private val showTimeZone: Boolean = false,
 ) : JPanel() {
 
     constructor(
-        leftImagePublisher: Flow.Publisher<out Image>,
+        leftImagePublisher: Flow.Publisher<(Graphics2D) -> Dimension>,
         placePublisher: Flow.Publisher<out Pair<String, ZoneId>>,
         showTimeZone: Boolean = false,
     ) : this(leftImagePublisher, placePublisher, Clock.systemDefaultZone(), showTimeZone)
@@ -51,8 +49,8 @@ open class LowerThird internal constructor(
         add(panel, BorderLayout.CENTER)
     }
 
-    internal val leftImage: Image
-        get() { return leftPanel.leftImage }
+    internal val leftImage: (Graphics2D) -> Dimension
+        get() = leftPanel.leftImage
 
     internal val place: String
         get() = rightPanel.place
@@ -61,11 +59,11 @@ open class LowerThird internal constructor(
         get() = rightPanel.time
 
     private inner class ImagePanel : JPanel() {
-        var leftImage: Image = BufferedImage(1, 1, BufferedImage.TYPE_4BYTE_ABGR)
+        var leftImage: (Graphics2D) -> Dimension = { Dimension(1, 1) }
 
-        fun setImage(image: Image) {
+        fun setImage(image: (Graphics2D) -> Dimension) {
             leftImage = image
-            this.preferredSize = Dimension(50 * image.getWidth(null) / image.getHeight(null), 50)
+            this.preferredSize = image(DEFAULT_IMAGE.graphics as Graphics2D)
             this@LowerThird.revalidate()
             repaint()
         }
@@ -73,11 +71,11 @@ open class LowerThird internal constructor(
         override fun paintComponent(g: Graphics) {
             (g as Graphics2D)
                 .setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY)
-            g.drawImage(leftImage, 0, 0, null)
+            leftImage(g)
         }
 
         init {
-            setImage(DEFAULT_IMAGE)
+            setImage { Dimension(200, 50) }
         }
     }
 
@@ -199,60 +197,56 @@ open class LowerThird internal constructor(
 
     companion object {
         private val DEFAULT_IMAGE = BufferedImage(200, 50, BufferedImage.TYPE_4BYTE_ABGR)
-        fun createImage(url: URL): Image {
-            return ImageIO.read(url)
+        fun createImage(url: URL): (Graphics2D) -> Dimension {
+            val image = ImageIO.read(url)
+            return { g ->
+                g.drawImage(image, 0, 0, null)
+                Dimension(image.width, image.height)
+            }
         }
 
-        fun createImage(text: String, foreground: Color, background: Color): Image {
+        fun createImage(text: String, foreground: Color, background: Color): (Graphics2D) -> Dimension {
             val font = StandardFont.readBoldFont(24)
-            var bounds: Rectangle2D
-            run {
-                val g = BufferedImage(200, 50, BufferedImage.TYPE_4BYTE_ABGR).graphics
-                bounds = g.getFontMetrics(font).getStringBounds(text, g)
-                g.dispose()
-            }
-            val img = BufferedImage(
-                max(200, bounds.width.toInt() + 10),
-                50,
-                BufferedImage.TYPE_4BYTE_ABGR,
-            )
-            val g = img.graphics
-            (g as Graphics2D)
-                .setRenderingHint(
+            return { g ->
+                g.setRenderingHint(
                     RenderingHints.KEY_TEXT_ANTIALIASING,
                     RenderingHints.VALUE_TEXT_ANTIALIAS_ON,
                 )
-            g.setColor(background)
-            g.fillRect(0, 0, img.width, 50)
-            g.setColor(foreground)
-            g.setFont(font)
-            g.drawString(text, (img.width - bounds.width).toInt() / 2, 35)
-            return img
+
+                val bounds = g.getFontMetrics(font).getStringBounds(text, g)
+                val width = max(200, bounds.width.toInt() + 10)
+
+                g.color = background
+                g.fillRect(0, 0, width, 50)
+                g.color = foreground
+                g.font = font
+                g.drawString(text, (width - bounds.width).toInt() / 2, 35)
+                Dimension(width, 50)
+            }
         }
 
         fun createImage(paint: (Graphics2D, Dimension) -> Unit) = createImage(200, paint)
 
-        fun createImage(width: Int, paint: (Graphics2D, Dimension) -> Unit): Image {
+        fun createImage(width: Int, paint: (Graphics2D, Dimension) -> Unit): (Graphics2D) -> Dimension {
             val height = 50
-            val image = BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR)
-            val graphics = image.createGraphics().apply {
-                setRenderingHint(
-                    RenderingHints.KEY_ANTIALIASING,
-                    RenderingHints.VALUE_ANTIALIAS_ON,
-                )
-                setRenderingHint(
-                    RenderingHints.KEY_TEXT_ANTIALIASING,
-                    RenderingHints.VALUE_TEXT_ANTIALIAS_ON,
-                )
-                setRenderingHint(
-                    RenderingHints.KEY_RENDERING,
-                    RenderingHints.VALUE_RENDER_QUALITY,
-                )
+            return { g ->
+                g.apply {
+                    setRenderingHint(
+                        RenderingHints.KEY_ANTIALIASING,
+                        RenderingHints.VALUE_ANTIALIAS_ON,
+                    )
+                    setRenderingHint(
+                        RenderingHints.KEY_TEXT_ANTIALIASING,
+                        RenderingHints.VALUE_TEXT_ANTIALIAS_ON,
+                    )
+                    setRenderingHint(
+                        RenderingHints.KEY_RENDERING,
+                        RenderingHints.VALUE_RENDER_QUALITY,
+                    )
+                }
+                paint(g, Dimension(width, height))
+                Dimension(width, height)
             }
-
-            paint(graphics, Dimension(width, height))
-
-            return image
         }
     }
 
