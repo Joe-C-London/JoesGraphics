@@ -12,7 +12,7 @@ version '1.0-SNAPSHOT'
 
 dependencies {
     api parent.project('alttext')
-    implementation parent.project('base')
+    api parent.project('base')
     implementation parent.project('pubsub')
     implementation parent.project('threading')
     implementation parent.project('screens:screenbase')

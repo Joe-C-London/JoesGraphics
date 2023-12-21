@@ -229,6 +229,31 @@ open class LowerThird internal constructor(
             g.drawString(text, (img.width - bounds.width).toInt() / 2, 35)
             return img
         }
+
+        fun createImage(paint: (Graphics2D, Dimension) -> Unit) = createImage(200, paint)
+
+        fun createImage(width: Int, paint: (Graphics2D, Dimension) -> Unit): Image {
+            val height = 50
+            val image = BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR)
+            val graphics = image.createGraphics().apply {
+                setRenderingHint(
+                    RenderingHints.KEY_ANTIALIASING,
+                    RenderingHints.VALUE_ANTIALIAS_ON,
+                )
+                setRenderingHint(
+                    RenderingHints.KEY_TEXT_ANTIALIASING,
+                    RenderingHints.VALUE_TEXT_ANTIALIAS_ON,
+                )
+                setRenderingHint(
+                    RenderingHints.KEY_RENDERING,
+                    RenderingHints.VALUE_RENDER_QUALITY,
+                )
+            }
+
+            paint(graphics, Dimension(width, height))
+
+            return image
+        }
     }
 
     init {
