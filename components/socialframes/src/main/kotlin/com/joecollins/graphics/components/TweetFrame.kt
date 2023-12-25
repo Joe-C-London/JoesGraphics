@@ -1,10 +1,9 @@
 package com.joecollins.graphics.components
 
+import com.joecollins.graphics.SVGUtils
 import com.joecollins.models.general.social.twitter.Tweet
 import com.joecollins.models.general.social.twitter.TweetLoader
 import com.joecollins.pubsub.map
-import org.apache.batik.parser.AWTPathProducer
-import org.apache.batik.parser.PathParser
 import java.awt.Color
 import java.awt.Shape
 import java.time.ZoneId
@@ -23,11 +22,7 @@ class TweetFrame internal constructor(
 
     override val logo: Shape = run {
         // Path Source: https://upload.wikimedia.org/wikipedia/commons/c/ce/X_logo_2023.svg
-        val parser = PathParser()
-        val handler = AWTPathProducer()
-        parser.pathHandler = handler
-        parser.parse("M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z")
-        handler.shape
+        SVGUtils.createShape("M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z")
     }
 
     companion object {

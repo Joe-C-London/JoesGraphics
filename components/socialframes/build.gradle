@@ -20,6 +20,7 @@ def jacksonVersion = '2.15.2'
 
 dependencies {
     implementation topLevel.project('shapes')
+    implementation topLevel.project('svg')
     implementation topLevel.project('pubsub')
     implementation topLevel.project('social')
 
@@ -30,7 +31,6 @@ dependencies {
     implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion"
     implementation 'com.vdurmont:emoji-java:5.1.1'
     implementation group: 'io.webfolder', name: 'cdp4j', version: '3.0.15'
-    implementation group: 'org.apache.xmlgraphics', name: 'batik-parser', version: '1.16'
 
     testImplementation parent.parent.project('testutils')
     testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.4.0'

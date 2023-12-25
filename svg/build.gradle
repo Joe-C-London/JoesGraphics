@@ -1,0 +1,33 @@
+buildscript {
+    dependencies {
+        parent.buildscript.dependencies
+    }
+}
+plugins {
+    id 'kotlin'
+}
+
+group 'com.joecollins'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+def batikVersion = '1.17'
+
+dependencies {
+    implementation group: 'org.apache.xmlgraphics', name: 'batik-anim', version: batikVersion
+    implementation group: 'org.apache.xmlgraphics', name: 'batik-bridge', version: batikVersion
+    api group: 'org.apache.xmlgraphics', name: 'batik-gvt', version: batikVersion
+    implementation group: 'org.apache.xmlgraphics', name: 'batik-parser', version: batikVersion
+
+    testImplementation parent.project('testutils')
+
+    testImplementation "org.junit.jupiter:junit-jupiter-api:$parent.ext.junit_version"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$parent.ext.junit_version"
+}
+
+test {
+    useJUnitPlatform()
+}
