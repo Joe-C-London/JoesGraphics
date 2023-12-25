@@ -5,5 +5,7 @@ class BoundResult<T : Any> {
 
     var value: T
         get() = _value!!
-        set(value) { _value = value }
+        set(value) {
+            _value = value
+        }
 }

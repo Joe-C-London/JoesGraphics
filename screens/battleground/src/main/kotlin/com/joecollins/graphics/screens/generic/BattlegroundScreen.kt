@@ -538,11 +538,13 @@ class BattlegroundScreen private constructor(
         private fun columns(count: Flow.Publisher<out Int>?, rows: Flow.Publisher<out Int>?): Flow.Publisher<Int> {
             return if (count != null && rows != null) {
                 count.merge(rows) { c, n -> n * ceil(1.0 * c / n).toInt() }
-            } else count?.map { c -> DEFAULT_ROWS * ceil(1.0 * c / DEFAULT_ROWS).toInt() }
-                ?: (
-                    rows?.map { n -> n * ceil(1.0 * DEFAULT_COUNT / n).toInt() }
-                        ?: (DEFAULT_ROWS * ceil(1.0 * DEFAULT_COUNT / DEFAULT_ROWS).toInt()).asOneTimePublisher()
-                    )
+            } else {
+                count?.map { c -> DEFAULT_ROWS * ceil(1.0 * c / DEFAULT_ROWS).toInt() }
+                    ?: (
+                        rows?.map { n -> n * ceil(1.0 * DEFAULT_COUNT / n).toInt() }
+                            ?: (DEFAULT_ROWS * ceil(1.0 * DEFAULT_COUNT / DEFAULT_ROWS).toInt()).asOneTimePublisher()
+                        )
+            }
         }
     }
 }

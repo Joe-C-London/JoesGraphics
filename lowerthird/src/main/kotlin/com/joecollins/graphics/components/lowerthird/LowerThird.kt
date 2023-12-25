@@ -88,7 +88,9 @@ open class LowerThird internal constructor(
         private val timezoneLabel: JLabel
 
         var place: String
-            get() { return placeLabel.text }
+            get() {
+                return placeLabel.text
+            }
             set(place) {
                 placeLabel.text = place
                 repaint()
@@ -101,7 +103,9 @@ open class LowerThird internal constructor(
             }
 
         val time: String
-            get() { return timeLabel.text }
+            get() {
+                return timeLabel.text
+            }
 
         init {
             placeLabel.font = StandardFont.readBoldFont(12)

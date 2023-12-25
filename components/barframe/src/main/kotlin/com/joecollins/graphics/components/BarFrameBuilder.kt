@@ -129,8 +129,9 @@ object BarFrameBuilder {
             }.run {
                 if (minBarCountPublisher == null) {
                     this
-                } else
+                } else {
                     this.merge(minBarCountPublisher, BarFrameBuilder::createMinBars)
+                }
             },
             headerPublisher = headerPublisher,
             headerLabelsPublisher = rightHeaderLabelPublisher?.map { mapOf(GraphicsFrame.HeaderLabelLocation.RIGHT to it) },
@@ -242,8 +243,9 @@ object BarFrameBuilder {
             }.run {
                 if (minBarCountPublisher == null) {
                     this
-                } else
+                } else {
                     this.merge(minBarCountPublisher, BarFrameBuilder::createMinBars)
+                }
             },
             headerPublisher = headerPublisher,
             headerLabelsPublisher = rightHeaderLabelPublisher?.map { mapOf(GraphicsFrame.HeaderLabelLocation.RIGHT to it) },
@@ -311,8 +313,9 @@ object BarFrameBuilder {
             }.run {
                 if (minBarCountPublisher == null) {
                     this
-                } else
+                } else {
                     this.merge(minBarCountPublisher, BarFrameBuilder::createMinBars)
+                }
             },
             headerPublisher = headerPublisher,
             headerLabelsPublisher = rightHeaderLabelPublisher?.map { mapOf(GraphicsFrame.HeaderLabelLocation.RIGHT to it) },

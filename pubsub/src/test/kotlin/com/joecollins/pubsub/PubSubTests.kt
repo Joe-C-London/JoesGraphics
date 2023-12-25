@@ -153,7 +153,7 @@ class PubSubTests {
         var output: String? = null
         var completed = false
         val publisher = "TEST".asOneTimePublisher()
-        val subscriber = Subscriber<String> ({ output = it }, { completed = true })
+        val subscriber = Subscriber<String>({ output = it }, { completed = true })
         publisher.subscribe(subscriber)
         assertEquals("TEST", output)
         assertTrue(completed)

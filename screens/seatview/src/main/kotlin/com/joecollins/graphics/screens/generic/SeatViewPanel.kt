@@ -1110,7 +1110,7 @@ class SeatViewPanel private constructor(
             } ?: null.asOneTimePublisher()
             val prevRawText: Flow.Publisher<out String?> = if (prev?.showRaw == null) {
                 null.asOneTimePublisher()
-            } else
+            } else {
                 prev.showRaw!!.compose { showPrevRaw ->
                     if (!showPrevRaw) return@compose null.asOneTimePublisher()
                     val prevLines = prevEntries!!.map { entries ->
@@ -1120,6 +1120,7 @@ class SeatViewPanel private constructor(
                     val majorityLines = majority.altText(prevTotal)
                     prevLines.merge(majorityLines) { p, m -> p + (if (m == null) "" else "\n$m") }
                 }.merge(prevRawHeader) { text, head -> if (text == null) null else (head + text) }
+            }
             return mainText.merge(changeText) { main, change -> main + (if (change == null) "" else " ($change)") }
                 .merge(textHeader) { second, head -> if (head == null) second else "$head\n\n$second" }
                 .merge(barsText) { first, next -> first + next }

@@ -47,13 +47,14 @@ class ParliamentVoteFrame(
                 }${
                     if (party.size <= index) {
                         ""
-                    } else
+                    } else {
                         party[index]
                             .filter { it.second > 0 }
                             .takeIf { it.isNotEmpty() }
                             ?.joinToString(", ") { "${it.second} ${it.first.abbreviation}" }
                             ?.let { " ($it)" }
                             ?: ""
+                    }
                 }"
             }
                 .joinToString("\n")

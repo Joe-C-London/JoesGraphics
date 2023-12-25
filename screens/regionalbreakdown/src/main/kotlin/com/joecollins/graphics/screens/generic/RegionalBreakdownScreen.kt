@@ -125,8 +125,10 @@ class RegionalBreakdownScreen private constructor(
 
             private val filteredDiff = if (diff == null) {
                 null
-            } else transformedPartyOrder.compose { po ->
-                Aggregators.adjustKey(diff) { party -> if (po.contains(party)) party else Party.OTHERS }
+            } else {
+                transformedPartyOrder.compose { po ->
+                    Aggregators.adjustKey(diff) { party -> if (po.contains(party)) party else Party.OTHERS }
+                }
             }
 
             private val seatsWithDiff = filteredSeats.run {
@@ -226,11 +228,12 @@ class RegionalBreakdownScreen private constructor(
                 .map { Aggregators.toPct(it) }
             private val prevPct = if (prev == null) {
                 null
-            } else
+            } else {
                 transformedPartyOrder.compose { po ->
                     Aggregators.adjustKey(prev) { if (po.contains(it)) it else Party.OTHERS }
                 }
                     .map { Aggregators.toPct(it) }
+            }
 
             private val pctWithDiff = pct.run {
                 if (prevPct == null) {
@@ -396,7 +399,7 @@ class RegionalBreakdownScreen private constructor(
         ): Flow.Publisher<out List<PartyOrCoalition>> =
             if (partyMapping == null) {
                 partyOrder
-            } else
+            } else {
                 partyOrder.merge(partyMapping) { po, pm ->
                     pm.forEach { (coalition, party) ->
                         if (!coalition.constituentParties.contains(party)) {
@@ -405,5 +408,6 @@ class RegionalBreakdownScreen private constructor(
                     }
                     po.map { pm[it] ?: it }
                 }
+            }
     }
 }

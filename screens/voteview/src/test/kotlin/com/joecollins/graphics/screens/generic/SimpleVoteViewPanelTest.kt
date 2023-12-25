@@ -2307,52 +2307,51 @@ class SimpleVoteViewPanelTest {
         )
     }
 
-    @Suppress("LocalVariableName")
     @Test
     fun testPartiesConsolidatedInDiffIfTooMany() {
-        val CPA = Party("Christian Peoples Alliance", "CPA", Color(148, 0, 170))
-        val GREEN_SOC = Party("Alliance for Green Socialism", "AGS", Color(0, 137, 91))
-        val INDEPENDENT = Party("Independent", "IND", Party.OTHERS.color)
-        val WORKERS = Party("Workers Party", "WP", Color(215, 13, 13))
-        val LIBDEM = Party("Liberal Democrats", "LD", Color(0xfaa01a))
-        val ENGLISH_DEM = Party("English Democrats", "ED", Color(140, 15, 15))
-        val MRLP = Party("Monster Raving Loony Party", "MRLP", Color(255, 240, 0))
-        val HERITAGE = Party("Heritage Party", "HERITAGE", Color(13, 0, 173))
-        val LABOUR = Party("Labour", "LAB", Color(0xe4003b))
-        val SDP = Party("Social Democratic Party", "SDP", Color(0, 65, 118))
-        val YORKSHIRE = Party("Yorkshire Party", "YP", Color(0, 124, 178))
-        val REJOIN = Party("Rejoin EU", "REJOIN", Color(0, 51, 153))
-        val CONSERVATIVE = Party("Conservative", "CON", Color(0x00aeef))
-        val UKIP = Party("UK Independence Party", "UKIP", Color(0x6d3177))
-        val FREE_ALL = Party("Freedom Alliance", "FREE-ALL", Color(200, 24, 125))
-        val FOR_BRITAIN = Party("For Britain", "FOR", Color(0, 0, 128))
-        val REFORM = Party("Reform UK", "REF", Color(0x00c0d5))
-        val GREEN = Party("Green", "GRN", Color(0x6ab023))
+        val cpa = Party("Christian Peoples Alliance", "CPA", Color(148, 0, 170))
+        val greenSoc = Party("Alliance for Green Socialism", "AGS", Color(0, 137, 91))
+        val independent = Party("Independent", "IND", Party.OTHERS.color)
+        val workers = Party("Workers Party", "WP", Color(215, 13, 13))
+        val libdem = Party("Liberal Democrats", "LD", Color(0xfaa01a))
+        val englishDem = Party("English Democrats", "ED", Color(140, 15, 15))
+        val mrlp = Party("Monster Raving Loony Party", "MRLP", Color(255, 240, 0))
+        val heritage = Party("Heritage Party", "HERITAGE", Color(13, 0, 173))
+        val labour = Party("Labour", "LAB", Color(0xe4003b))
+        val sdp = Party("Social Democratic Party", "SDP", Color(0, 65, 118))
+        val yorkshire = Party("Yorkshire Party", "YP", Color(0, 124, 178))
+        val rejoin = Party("Rejoin EU", "REJOIN", Color(0, 51, 153))
+        val conservative = Party("Conservative", "CON", Color(0x00aeef))
+        val ukip = Party("UK Independence Party", "UKIP", Color(0x6d3177))
+        val freeAll = Party("Freedom Alliance", "FREE-ALL", Color(200, 24, 125))
+        val forBritain = Party("For Britain", "FOR", Color(0, 0, 128))
+        val reform = Party("Reform UK", "REF", Color(0x00c0d5))
+        val green = Party("Green", "GRN", Color(0x6ab023))
         val curr = mapOf(
-            Candidate("Paul Bickerdike", CPA) to 102,
-            Candidate("Mike Davies", GREEN_SOC) to 104,
-            Candidate("Jayda Fransen", INDEPENDENT) to 50,
-            Candidate("George Galloway", WORKERS) to 8264,
-            Candidate("Tom Gordon", LIBDEM) to 1254,
-            Candidate("Th\u00e9r\u00e8se Hirst", ENGLISH_DEM) to 207,
-            Candidate("Howling Laud Hope", MRLP) to 107,
-            Candidate("Susan Laird", HERITAGE) to 33,
-            Candidate("Kim Leadbeater", LABOUR) to 13296,
-            Candidate("Ollie Purser", SDP) to 66,
-            Candidate("Corey Robinson", YORKSHIRE) to 816,
-            Candidate("Andrew Smith", REJOIN) to 75,
-            Candidate("Ryan Stephenson", CONSERVATIVE) to 12973,
-            Candidate("Jack Thomson", UKIP) to 151,
-            Candidate("Jonathon Tilt", FREE_ALL) to 100,
-            Candidate("Anne Marie Waters", FOR_BRITAIN) to 97,
+            Candidate("Paul Bickerdike", cpa) to 102,
+            Candidate("Mike Davies", greenSoc) to 104,
+            Candidate("Jayda Fransen", independent) to 50,
+            Candidate("George Galloway", workers) to 8264,
+            Candidate("Tom Gordon", libdem) to 1254,
+            Candidate("Th\u00e9r\u00e8se Hirst", englishDem) to 207,
+            Candidate("Howling Laud Hope", mrlp) to 107,
+            Candidate("Susan Laird", heritage) to 33,
+            Candidate("Kim Leadbeater", labour) to 13296,
+            Candidate("Ollie Purser", sdp) to 66,
+            Candidate("Corey Robinson", yorkshire) to 816,
+            Candidate("Andrew Smith", rejoin) to 75,
+            Candidate("Ryan Stephenson", conservative) to 12973,
+            Candidate("Jack Thomson", ukip) to 151,
+            Candidate("Jonathon Tilt", freeAll) to 100,
+            Candidate("Anne Marie Waters", forBritain) to 97,
         )
         val prev = mapOf(
-            LABOUR to 22594,
-            CONSERVATIVE to 19069,
-            INDEPENDENT to 6432,
-            LIBDEM to 2462,
-            REFORM to 1678,
-            GREEN to 692,
+            labour to 22594,
+            conservative to 19069,
+            independent to 6432,
+            libdem to 2462,
+            reform to 1678,
+            green to 692,
         )
         val panel =
             candidateVotes(

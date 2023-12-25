@@ -8,12 +8,12 @@ buildscript {
     }
 }
 plugins {
-    id "com.github.ben-manes.versions" version "0.47.0"
-    id "com.diffplug.spotless" version "6.19.0"
+    id "com.github.ben-manes.versions" version "0.50.0"
+    id "com.diffplug.spotless" version "6.23.3"
     id "jacoco"
 }
 ext {
-    junit_version = "5.9.3"
+    junit_version = "5.10.1"
 }
 
 apply plugin: 'kotlin'
@@ -34,6 +34,9 @@ allprojects {
     spotless {
         kotlin {
             ktlint()
+                .editorConfigOverride([
+                    "max_line_length" : 2147483647,
+                ])
         }
     }
 }

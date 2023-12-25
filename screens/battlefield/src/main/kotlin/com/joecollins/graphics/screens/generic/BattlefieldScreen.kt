@@ -78,7 +78,7 @@ class BattlefieldScreen private constructor(header: Flow.Publisher<out String?>,
 
             val linesPublisher = if (majorityLines == null) {
                 null
-            } else
+            } else {
                 prevVotes.merge(majorityLines) { prev, show -> prev to show }
                     .merge(
                         allParties.run {
@@ -99,6 +99,7 @@ class BattlefieldScreen private constructor(header: Flow.Publisher<out String?>,
                         parties.asSequence().mapNotNull { calculateLine(it, parties, prevPcts, limit.toDouble()) }
                             .toList()
                     }
+            }
 
             return BattlefieldFrame(
                 headerPublisher = header,

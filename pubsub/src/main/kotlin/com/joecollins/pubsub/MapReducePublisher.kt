@@ -23,7 +23,7 @@ internal class MapReducePublisher<T, R>(
             value = Wrapper(identity)
             list = publishers.map { null }.toMutableList()
             subscribers = publishers.mapIndexed { index, publisher ->
-                val subscriber = Subscriber<T> ({ newVal ->
+                val subscriber = Subscriber<T>({ newVal ->
                     synchronized(me) {
                         val oldVal = list[index]?.value
                         if (oldVal != newVal) {

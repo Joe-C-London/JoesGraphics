@@ -183,7 +183,10 @@ class MapFrame(
                                     val ret = it
                                         .sortedBy { s -> s.bounds.width * s.bounds.height }
                                         .map { Area(it) }
-                                        .reduceOrNull { a, s -> a.add(s); a }
+                                        .reduceOrNull { a, s ->
+                                            a.add(s)
+                                            a
+                                        }
                                         ?: Area()
                                     repaint()
                                     ret

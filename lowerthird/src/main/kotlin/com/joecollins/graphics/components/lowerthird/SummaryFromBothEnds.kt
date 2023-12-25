@@ -63,7 +63,9 @@ class SummaryFromBothEnds(
         }
 
         var top: String
-            get() { return topLabel.text }
+            get() {
+                return topLabel.text
+            }
             set(top) {
                 topLabel.text = top
             }

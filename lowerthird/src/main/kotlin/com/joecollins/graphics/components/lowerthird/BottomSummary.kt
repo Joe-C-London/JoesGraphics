@@ -62,12 +62,20 @@ class BottomSummary(
         }
 
         var text: String
-            get() { return label.text }
-            set(top) { label.text = top }
+            get() {
+                return label.text
+            }
+            set(top) {
+                label.text = top
+            }
 
         var textAlign: Int
-            get() { return label.horizontalAlignment }
-            set(align) { label.horizontalAlignment = align }
+            get() {
+                return label.horizontalAlignment
+            }
+            set(align) {
+                label.horizontalAlignment = align
+            }
 
         init {
             background = Color.BLACK

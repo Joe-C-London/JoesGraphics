@@ -326,7 +326,9 @@ class BarFrame(
         }
 
         var label: String
-            get() { return jLabel.text }
+            get() {
+                return jLabel.text
+            }
             set(label) {
                 jLabel.text = label
             }

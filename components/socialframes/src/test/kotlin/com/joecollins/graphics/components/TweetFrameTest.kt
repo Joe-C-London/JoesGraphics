@@ -563,8 +563,16 @@ class TweetFrameTest {
         tweetBuilder.createdAt = Instant.parse("2021-04-15T21:34:17Z")
         tweetBuilder.poll = Poll().also { poll ->
             poll.options = listOf(
-                PollOption().also { it.label = "Yes"; it.votes = 100; it.position = 1 },
-                PollOption().also { it.label = "No"; it.votes = 150; it.position = 2 },
+                PollOption().also {
+                    it.label = "Yes"
+                    it.votes = 100
+                    it.position = 1
+                },
+                PollOption().also {
+                    it.label = "No"
+                    it.votes = 150
+                    it.position = 2
+                },
             )
         }
 

@@ -16,14 +16,14 @@ class MultiSummaryFrameBuilderTest {
         val grn = Party("Green", "GRN", Color.GREEN)
         val ind = Party("Independent", "IND", Color.GRAY)
         val ridings = listOf(
-            Riding("Klondike"), // 0
-            Riding("Kluane"), // 1
-            Riding("Lake Laberge"), // 2
-            Riding("Mayo-Tatchun"), // 3
-            Riding("Mount Lorne-Southern Lakes"), // 4
-            Riding("Pelly-Nisutlin"), // 5
-            Riding("Vuntut Gwitchin"), // 6
-            Riding("Watson Lake"), // 7
+            Riding("Klondike"),
+            Riding("Kluane"),
+            Riding("Lake Laberge"),
+            Riding("Mayo-Tatchun"),
+            Riding("Mount Lorne-Southern Lakes"),
+            Riding("Pelly-Nisutlin"),
+            Riding("Vuntut Gwitchin"),
+            Riding("Watson Lake"),
         )
         val frame = MultiSummaryFrameBuilder.dynamicallyFiltered(
             items = ridings,

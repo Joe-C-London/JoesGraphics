@@ -24,8 +24,9 @@ class BattlefieldFrame(
 ) : GraphicsFrame(
     headerPublisher = headerPublisher,
 ) {
-    @Suppress("PrivatePropertyName")
-    private val SQRT_3 = sqrt(3.0)
+    companion object {
+        private val SQRT_3 = sqrt(3.0)
+    }
 
     private val panel = BattlefieldPanel()
 

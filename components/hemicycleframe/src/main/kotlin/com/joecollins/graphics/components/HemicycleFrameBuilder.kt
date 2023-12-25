@@ -102,7 +102,8 @@ object HemicycleFrameBuilder {
     }
 
     enum class Tiebreaker {
-        FRONT_ROW_FROM_LEFT, FRONT_ROW_FROM_RIGHT
+        FRONT_ROW_FROM_LEFT,
+        FRONT_ROW_FROM_RIGHT,
     }
 
     fun <DOT, SB, CB> build(

@@ -173,7 +173,7 @@ class CandidateListingScreen private constructor(
                             listOf(it.color() to 1.0),
                         )
                     }
-                } else
+                } else {
                     candidates.list.merge(showToColumns) { cList, show ->
                         if (show) {
                             val mid = cList.size / 2
@@ -202,7 +202,8 @@ class CandidateListingScreen private constructor(
                                 )
                             }
                         }
-                    },
+                    }
+                },
                 headerPublisher = candidates.header,
                 subheadTextPublisher = candidates.subhead,
                 maxPublisher = 1.0.asOneTimePublisher(),

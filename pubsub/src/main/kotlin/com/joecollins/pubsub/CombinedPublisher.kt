@@ -18,7 +18,7 @@ internal class CombinedPublisher<T>(
         if (numSubscriptions == 1) {
             list = publishers.map { null }.toMutableList()
             subscribers = publishers.mapIndexed { index, publisher ->
-                val subscriber = Subscriber<T> ({ newVal ->
+                val subscriber = Subscriber<T>({ newVal ->
                     synchronized(me) {
                         list[index] = Wrapper(newVal)
                         if (list.none { it == null }) {

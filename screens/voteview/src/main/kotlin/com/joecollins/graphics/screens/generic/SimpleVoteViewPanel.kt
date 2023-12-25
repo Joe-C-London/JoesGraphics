@@ -1177,7 +1177,8 @@ class SimpleVoteViewPanel private constructor(
         private val results: Flow.Publisher<out ElectionResult<out KT>> = current.result
 
         private enum class CandidateResult {
-            WINNER, RUNOFF
+            WINNER,
+            RUNOFF,
         }
 
         private data class Entry<K, V>(val key: K, val value: V, val result: CandidateResult?)

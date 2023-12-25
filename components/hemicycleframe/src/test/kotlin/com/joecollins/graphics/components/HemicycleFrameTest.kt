@@ -29,11 +29,11 @@ class HemicycleFrameTest {
     @Test
     fun testDotColors() {
         val dotColors = listOf(
-            Color.GREEN, Color.GREEN, Color.BLUE, Color.BLUE, Color.BLUE, //
-            Color.GREEN, Color.GREEN, Color.RED, Color.BLUE, Color.BLUE, Color.BLUE, //
-            Color.GREEN, Color.GREEN, Color.RED, Color.RED, Color.BLUE, Color.BLUE, Color.BLUE, //
-            Color.GREEN, Color.GREEN, Color.RED, Color.RED, Color.RED, Color.BLUE, Color.BLUE, Color.BLUE, Color.BLUE,
-        )
+            listOf(Color.GREEN, Color.GREEN, Color.BLUE, Color.BLUE, Color.BLUE),
+            listOf(Color.GREEN, Color.GREEN, Color.RED, Color.BLUE, Color.BLUE, Color.BLUE),
+            listOf(Color.GREEN, Color.GREEN, Color.RED, Color.RED, Color.BLUE, Color.BLUE, Color.BLUE),
+            listOf(Color.GREEN, Color.GREEN, Color.RED, Color.RED, Color.RED, Color.BLUE, Color.BLUE, Color.BLUE, Color.BLUE),
+        ).flatten()
         val frame = HemicycleFrame(
             headerPublisher = (null as String?).asOneTimePublisher(),
             dotsPublisher = dotColors.map { HemicycleFrame.Dot(color = it, border = null) }.asOneTimePublisher(),
@@ -47,11 +47,11 @@ class HemicycleFrameTest {
     @Test
     fun testDotBorders() {
         val dotColors = listOf(
-            Color.RED, Color.RED, Color.RED, Color.BLUE, Color.BLUE, //
-            Color.RED, Color.RED, Color.RED, Color.RED, Color.BLUE, Color.BLUE, //
-            Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.BLUE, Color.BLUE, //
-            Color.GREEN, Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.BLUE, Color.BLUE,
-        )
+            listOf(Color.RED, Color.RED, Color.RED, Color.BLUE, Color.BLUE),
+            listOf(Color.RED, Color.RED, Color.RED, Color.RED, Color.BLUE, Color.BLUE),
+            listOf(Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.BLUE, Color.BLUE),
+            listOf(Color.GREEN, Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.BLUE, Color.BLUE),
+        ).flatten()
         val frame = HemicycleFrame(
             headerPublisher = (null as String?).asOneTimePublisher(),
             dotsPublisher = dotColors.map { HemicycleFrame.Dot(color = Color.WHITE, border = it) }.asOneTimePublisher(),
@@ -165,15 +165,15 @@ class HemicycleFrameTest {
     fun testRenderDotsOnly() {
         val rowCounts = listOf(7, 9, 11)
         val dotColors = listOf(
-            Color.GREEN, Color.GREEN, Color.RED, Color.BLUE, Color.BLUE, Color.BLUE, Color.BLUE, //
-            Color.GREEN, Color.GREEN, Color.GREEN, Color.RED, Color.RED, Color.BLUE, Color.BLUE, Color.BLUE, Color.BLUE, //
-            Color.GREEN, Color.GREEN, Color.GREEN, Color.RED, Color.RED, Color.RED, Color.BLUE, Color.BLUE, Color.BLUE, Color.BLUE, Color.BLUE,
-        )
+            listOf(Color.GREEN, Color.GREEN, Color.RED, Color.BLUE, Color.BLUE, Color.BLUE, Color.BLUE),
+            listOf(Color.GREEN, Color.GREEN, Color.GREEN, Color.RED, Color.RED, Color.BLUE, Color.BLUE, Color.BLUE, Color.BLUE),
+            listOf(Color.GREEN, Color.GREEN, Color.GREEN, Color.RED, Color.RED, Color.RED, Color.BLUE, Color.BLUE, Color.BLUE, Color.BLUE, Color.BLUE),
+        ).flatten()
         val dotBorders = listOf(
-            Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.BLUE, Color.BLUE, //
-            Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.BLUE, Color.BLUE, Color.BLUE, //
-            Color.GREEN, Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.BLUE, Color.BLUE, Color.BLUE,
-        )
+            listOf(Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.BLUE, Color.BLUE),
+            listOf(Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.BLUE, Color.BLUE, Color.BLUE),
+            listOf(Color.GREEN, Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.BLUE, Color.BLUE, Color.BLUE),
+        ).flatten()
         val frame = HemicycleFrame(
             headerPublisher = "PEI HEMICYCLE".asOneTimePublisher(),
             rowsPublisher = rowCounts.asOneTimePublisher(),
@@ -188,10 +188,10 @@ class HemicycleFrameTest {
         val rowCounts = listOf(7, 9, 11)
         val dotColors = Publisher(generateSequence { Color.WHITE }.take(27).toList())
         val dotBorders = listOf(
-            Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.BLUE, Color.BLUE, //
-            Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.BLUE, Color.BLUE, Color.BLUE, //
-            Color.GREEN, Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.BLUE, Color.BLUE, Color.BLUE,
-        )
+            listOf(Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.BLUE, Color.BLUE),
+            listOf(Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.BLUE, Color.BLUE, Color.BLUE),
+            listOf(Color.GREEN, Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.BLUE, Color.BLUE, Color.BLUE),
+        ).flatten()
         val leftSeats = Publisher(listOf(0, 0))
         val middleSeats = Publisher(listOf(0, 0))
         val rightSeats = Publisher(listOf(0, 0))
@@ -222,10 +222,10 @@ class HemicycleFrameTest {
         rightLabel.submit("PROGRESSIVE CONSERVATIVE: 0/8")
         dotColors.submit(
             listOf(
-                lGreen, Color.WHITE, Color.WHITE, lRed, Color.WHITE, lBlue, lBlue, //
-                Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE, lRed, Color.WHITE, lBlue, lBlue, lBlue, //
-                Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE, lBlue, lBlue, lBlue,
-            ),
+                listOf(lGreen, Color.WHITE, Color.WHITE, lRed, Color.WHITE, lBlue, lBlue),
+                listOf(Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE, lRed, Color.WHITE, lBlue, lBlue, lBlue),
+                listOf(Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE, lBlue, lBlue, lBlue),
+            ).flatten(),
         )
         compareRendering("HemicycleFrame", "SeatsBar-2", frame)
         leftSeats.submit(listOf(1, 7))
@@ -236,10 +236,10 @@ class HemicycleFrameTest {
         rightLabel.submit("PROGRESSIVE CONSERVATIVE: 8/13")
         dotColors.submit(
             listOf(
-                Color.GREEN, lGreen, Color.RED, lBlue, lBlue, Color.BLUE, Color.BLUE, //
-                lGreen, lGreen, lGreen, lRed, Color.RED, lBlue, Color.BLUE, Color.BLUE, Color.BLUE, //
-                lGreen, lGreen, lGreen, lRed, lRed, lRed, lBlue, lBlue, Color.BLUE, Color.BLUE, Color.BLUE,
-            ),
+                listOf(Color.GREEN, lGreen, Color.RED, lBlue, lBlue, Color.BLUE, Color.BLUE),
+                listOf(lGreen, lGreen, lGreen, lRed, Color.RED, lBlue, Color.BLUE, Color.BLUE, Color.BLUE),
+                listOf(lGreen, lGreen, lGreen, lRed, lRed, lRed, lBlue, lBlue, Color.BLUE, Color.BLUE, Color.BLUE),
+            ).flatten(),
         )
         compareRendering("HemicycleFrame", "SeatsBar-3", frame)
         leftSeats.submit(listOf(8, 5))
@@ -256,10 +256,10 @@ class HemicycleFrameTest {
         val rowCounts = listOf(7, 9, 11)
         val dotColors = Publisher(generateSequence { Color.WHITE }.take(27).toList())
         val dotBorders = listOf(
-            Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.BLUE, Color.BLUE, //
-            Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.BLUE, Color.BLUE, Color.BLUE, //
-            Color.GREEN, Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.BLUE, Color.BLUE, Color.BLUE,
-        )
+            listOf(Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.BLUE, Color.BLUE),
+            listOf(Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.BLUE, Color.BLUE, Color.BLUE),
+            listOf(Color.GREEN, Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.RED, Color.BLUE, Color.BLUE, Color.BLUE),
+        ).flatten()
         val leftSeats = Publisher(listOf(0, 0))
         val middleSeats = Publisher(listOf(0, 0))
         val rightSeats = Publisher(listOf(0, 0))
@@ -304,10 +304,10 @@ class HemicycleFrameTest {
         rightChangeLabel.submit("PC: +0/+3")
         dotColors.submit(
             listOf(
-                lGreen, Color.WHITE, Color.WHITE, lRed, Color.WHITE, lBlue, lBlue, //
-                Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE, lRed, Color.WHITE, lBlue, lBlue, lBlue, //
-                Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE, lBlue, lBlue, lBlue,
-            ),
+                listOf(lGreen, Color.WHITE, Color.WHITE, lRed, Color.WHITE, lBlue, lBlue),
+                listOf(Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE, lRed, Color.WHITE, lBlue, lBlue, lBlue),
+                listOf(Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE, lBlue, lBlue, lBlue),
+            ).flatten(),
         )
         compareRendering("HemicycleFrame", "ChangeBar-2", frame)
         leftSeats.submit(listOf(1, 7))
@@ -322,10 +322,10 @@ class HemicycleFrameTest {
         rightChangeLabel.submit("PC: +3/+5")
         dotColors.submit(
             listOf(
-                Color.GREEN, lGreen, Color.RED, lBlue, lBlue, Color.BLUE, Color.BLUE, //
-                lGreen, lGreen, lGreen, lRed, Color.RED, lBlue, Color.BLUE, Color.BLUE, Color.BLUE, //
-                lGreen, lGreen, lGreen, lRed, lRed, lRed, lBlue, lBlue, Color.BLUE, Color.BLUE, Color.BLUE,
-            ),
+                listOf(Color.GREEN, lGreen, Color.RED, lBlue, lBlue, Color.BLUE, Color.BLUE),
+                listOf(lGreen, lGreen, lGreen, lRed, Color.RED, lBlue, Color.BLUE, Color.BLUE, Color.BLUE),
+                listOf(lGreen, lGreen, lGreen, lRed, lRed, lRed, lBlue, lBlue, Color.BLUE, Color.BLUE, Color.BLUE),
+            ).flatten(),
         )
         compareRendering("HemicycleFrame", "ChangeBar-3", frame)
     }
