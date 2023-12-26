@@ -1,9 +1,12 @@
 package com.joecollins.graphics.components
 
 import com.joecollins.graphics.utils.StandardFont
+import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
-import com.joecollins.utils.ExecutorUtils
+import com.joecollins.pubsub.TimePublisher
+import com.joecollins.pubsub.compose
+import com.joecollins.pubsub.merge
 import org.jetbrains.annotations.TestOnly
 import java.awt.BorderLayout
 import java.awt.Color
@@ -33,10 +36,12 @@ class CountdownFrame(
         @TestOnly
         set(value) {
             field = value
-            refresh()
+            now.submit(TimePublisher.forClock(value))
         }
 
+    private val now = Publisher(TimePublisher.forClock(clock))
     private var time: Temporal = Instant.now()
+    private val timeRemaining: Flow.Publisher<Duration>
 
     private val timeRemainingLabel: JLabel = FontSizeAdjustingLabel()
     private val additionalInfoLabel: JLabel = JLabel()
@@ -59,11 +64,17 @@ class CountdownFrame(
         panel.add(additionalInfoLabel, BorderLayout.SOUTH)
         addCenter(panel)
 
-        val onTimeUpdate: (Temporal) -> Unit = {
-            time = it
-            refresh()
+        timeRemaining = now.compose { it }.merge(timePublisher) { now, later ->
+            Duration.between(now.truncatedTo(ChronoUnit.SECONDS), later)
         }
-        timePublisher.subscribe(Subscriber(onTimeUpdate))
+        timeRemaining.subscribe(
+            Subscriber(
+                eventQueueWrapper {
+                    timeRemainingLabel.text = labelFunc(it)
+                    repaint()
+                },
+            ),
+        )
 
         val onAdditionalInfoUpdate: (String?) -> Unit = {
             additionalInfoLabel.text = it ?: ""
@@ -84,22 +95,13 @@ class CountdownFrame(
         } else {
             onCountdownColorBinding(Color.BLACK)
         }
-
-        ExecutorUtils.scheduleTicking(
-            { this.refresh() },
-            100,
-        )
     }
 
+    @TestOnly
     internal fun getTimeRemaining(): Duration {
-        return Duration.between(clock.instant().truncatedTo(ChronoUnit.SECONDS), time)
-    }
-
-    private fun refresh() {
-        ExecutorUtils.sendToEventQueue {
-            timeRemainingLabel.text = labelFunc(getTimeRemaining())
-            this.repaint()
-        }
+        var duration: Duration? = null
+        timeRemaining.subscribe(Subscriber { duration = it })
+        return duration!!
     }
 
     internal fun getTimeRemainingString(): String {

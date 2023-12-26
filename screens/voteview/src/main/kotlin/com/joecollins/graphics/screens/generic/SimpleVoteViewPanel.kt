@@ -1774,6 +1774,7 @@ class SimpleVoteViewPanel private constructor(
                 subheadPublisher = current.subhead,
                 maxPublisher = current.votes.map { r -> r.values.sumOf { it ?: 0 } * 2 / 3 }
                     .merge(current.pctReporting ?: 1.0.asOneTimePublisher()) { v, p -> v / p.coerceAtLeast(1e-6) },
+                notesPublisher = current.notes,
             )
         }
 

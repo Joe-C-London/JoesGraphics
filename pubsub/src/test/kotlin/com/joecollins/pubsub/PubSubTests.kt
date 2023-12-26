@@ -9,6 +9,9 @@ import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.lang.IllegalStateException
+import java.time.Clock
+import java.time.Instant
+import java.time.ZoneId
 import java.util.LinkedList
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Flow
@@ -796,5 +799,14 @@ class PubSubTests {
         assertEquals(0, merged1.numSubscriptions)
         assertTrue(completed2)
         assertEquals(0, merged2.numSubscriptions)
+    }
+
+    @Test
+    fun testTimePublisher() {
+        val instant = Instant.now()
+        val publisher = TimePublisher.forClock(Clock.fixed(instant, ZoneId.systemDefault()))
+        var output: Instant? = null
+        publisher.subscribe(Subscriber { output = it })
+        assertEquals(instant, output)
     }
 }

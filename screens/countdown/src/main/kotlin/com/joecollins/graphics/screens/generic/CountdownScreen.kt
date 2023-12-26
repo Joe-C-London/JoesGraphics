@@ -5,11 +5,11 @@ import com.joecollins.graphics.GenericPanel
 import com.joecollins.graphics.components.CountdownFrame
 import com.joecollins.graphics.components.MapFrame
 import com.joecollins.pubsub.Publisher
+import com.joecollins.pubsub.TimePublisher
 import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.combine
 import com.joecollins.pubsub.map
 import com.joecollins.pubsub.merge
-import com.joecollins.utils.ExecutorUtils
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Dimension
@@ -236,21 +236,20 @@ class CountdownScreen private constructor(
         }
 
         private fun altTextLabel(header: String, timestamp: Instant, clock: Clock, timesUpLabel: String): Flow.Publisher<String> {
-            val ret = Publisher<String>()
-            ExecutorUtils.scheduleTicking({
-                ret.submit(header + ": " + timeLabel(Duration.between(clock.instant().truncatedTo(ChronoUnit.SECONDS), timestamp), timesUpLabel))
-            }, 100)
-            return ret
+            return TimePublisher.forClock(clock).map { now ->
+                header + ": " + timeLabel(Duration.between(now.truncatedTo(ChronoUnit.SECONDS), timestamp), timesUpLabel)
+            }
         }
 
-        private fun timeLabel(it: Duration, timesUpLabel: String) = if (it.isNegative) {
-            timesUpLabel
-        } else if (it.toHours() == 0L) {
-            CountdownFrame.formatMMSS(it)
-        } else if (it.toDays() == 0L) {
-            CountdownFrame.formatHHMMSS(it)
-        } else {
-            CountdownFrame.formatDDHHMMSS(it)
-        }
+        private fun timeLabel(it: Duration, timesUpLabel: String) =
+            if (it.isNegative || it.isZero) {
+                timesUpLabel
+            } else if (it.toHours() == 0L) {
+                CountdownFrame.formatMMSS(it)
+            } else if (it.toDays() == 0L) {
+                CountdownFrame.formatHHMMSS(it)
+            } else {
+                CountdownFrame.formatDDHHMMSS(it)
+            }
     }
 }

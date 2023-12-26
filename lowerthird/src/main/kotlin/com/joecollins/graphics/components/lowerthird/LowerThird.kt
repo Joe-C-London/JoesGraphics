@@ -4,7 +4,7 @@ import com.joecollins.graphics.components.FontSizeAdjustingLabel
 import com.joecollins.graphics.utils.StandardFont
 import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
-import com.joecollins.utils.ExecutorUtils
+import com.joecollins.pubsub.TimePublisher
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Dimension
@@ -17,6 +17,7 @@ import java.awt.RenderingHints
 import java.awt.image.BufferedImage
 import java.net.URL
 import java.time.Clock
+import java.time.Instant
 import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
@@ -44,6 +45,8 @@ open class LowerThird internal constructor(
 
     private val leftPanel: ImagePanel = ImagePanel()
     private val rightPanel = PlaceAndTimePanel()
+
+    private val now = TimePublisher.forClock(clock)
 
     protected fun addHeadlinePanel(panel: JPanel) {
         add(panel, BorderLayout.CENTER)
@@ -96,6 +99,12 @@ open class LowerThird internal constructor(
                 repaint()
             }
 
+        var currentTime: Instant = Instant.now()
+            set(value) {
+                field = value
+                updateTime()
+            }
+
         var timezone: ZoneId = ZoneOffset.UTC
             set(value) {
                 field = value
@@ -131,7 +140,7 @@ open class LowerThird internal constructor(
 
         fun updateTime() {
             try {
-                val now = clock.instant().atZone(timezone)
+                val now = currentTime.atZone(timezone)
                 val newTime = formatter.format(now)
                 val newTz = tzFormatter.format(now)
                 if (newTime != timeLabel.text) {
@@ -195,7 +204,6 @@ open class LowerThird internal constructor(
                     },
                 )
             }
-            ExecutorUtils.scheduleTicking({ updateTime() }, 100)
         }
     }
 
@@ -268,5 +276,6 @@ open class LowerThird internal constructor(
                 },
             ),
         )
+        this.now.subscribe(Subscriber(eventQueueWrapper { rightPanel.currentTime = it }))
     }
 }
