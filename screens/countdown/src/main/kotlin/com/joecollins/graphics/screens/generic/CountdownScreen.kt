@@ -201,8 +201,7 @@ class CountdownScreen private constructor(
                 3 -> listOf(Color.RED, Color.GREEN.darker(), Color.BLUE)
                 4 -> listOf(Color.RED, Color.GREEN.darker(), Color.BLUE, Color.MAGENTA)
                 5 -> listOf(Color.RED, Color.ORANGE, Color.GREEN.darker(), Color.BLUE, Color.MAGENTA)
-                6 -> listOf(Color.RED, Color.ORANGE, Color.GREEN.darker(), Color.CYAN.darker(), Color.BLUE, Color.MAGENTA)
-                else -> generateSequence { Color((0x1000000 * Math.random()).toInt()) }.take(timings.size).toList()
+                else -> generateSequence { listOf(Color.RED, Color.ORANGE, Color.GREEN.darker(), Color.CYAN.darker(), Color.BLUE, Color.MAGENTA) }.flatten().take(timings.size).toList()
             }
 
             (colors.indices).forEach { color ->
