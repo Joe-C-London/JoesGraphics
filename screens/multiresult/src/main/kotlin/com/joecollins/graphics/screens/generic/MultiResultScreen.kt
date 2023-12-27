@@ -74,14 +74,15 @@ class MultiResultScreen private constructor(
         lateinit var shapes: T.() -> Map<K, Shape>
         lateinit var selectedShape: T.() -> K
         lateinit var leadingParty: T.() -> Flow.Publisher<out PartyResult?>
-        lateinit var focus: T.() -> List<K>?
+        var focus: (T.() -> List<K>?)? = null
         var additionalHighlights: (T.() -> List<K>?)? = null
         lateinit var header: T.() -> Flow.Publisher<out String>
 
-        internal val additionalHighlightsOrDefault: T.() -> List<K>? by lazy { additionalHighlights ?: focus }
+        internal val focusOrDefault: T.() -> List<K>? by lazy { focus ?: { null } }
+        internal val additionalHighlightsOrDefault: T.() -> List<K>? by lazy { additionalHighlights ?: focusOrDefault }
 
         internal val focusShapes: T.() -> List<Shape> = {
-            focus()?.let { focusKeys ->
+            focusOrDefault()?.let { focusKeys ->
                 val shapesMap = shapes()
                 focusKeys.mapNotNull { shapesMap[it] }
             } ?: emptyList()
@@ -89,7 +90,7 @@ class MultiResultScreen private constructor(
 
         internal val shapeColors: T.() -> List<Pair<Shape, Flow.Publisher<out Color>>> = {
             val selected = selectedShape()
-            val focusKeys = focus()
+            val focusKeys = focusOrDefault()
             val additionalHighlight = additionalHighlightsOrDefault()
             val leader = leadingParty()
             shapes().entries.asSequence()

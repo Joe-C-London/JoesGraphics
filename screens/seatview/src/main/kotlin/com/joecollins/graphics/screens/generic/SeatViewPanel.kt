@@ -755,7 +755,7 @@ class SeatViewPanel private constructor(
 
     sealed class AbstractMap<T> {
         lateinit var shapes: Flow.Publisher<out Map<T, Shape>>
-        lateinit var focus: Flow.Publisher<out List<T>?>
+        var focus: Flow.Publisher<out List<T>?>? = null
         var additionalHighlight: Flow.Publisher<out List<T>?>? = null
         lateinit var header: Flow.Publisher<out String?>
 

@@ -298,7 +298,7 @@ class SingleTransferrableResultScreen private constructor(
         lateinit var shapes: Flow.Publisher<out Map<T, Shape>>
         lateinit var selectedShape: Flow.Publisher<out T>
         lateinit var leadingParty: Flow.Publisher<out Party?>
-        lateinit var focus: Flow.Publisher<out List<T>?>
+        var focus: Flow.Publisher<out List<T>?>? = null
         lateinit var header: Flow.Publisher<out String?>
 
         internal val frame by lazy {

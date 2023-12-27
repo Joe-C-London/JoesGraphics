@@ -18,8 +18,8 @@ object MapBuilder {
     fun <T> multiResult(
         shapes: Flow.Publisher<out Map<T, Shape>>,
         winners: Flow.Publisher<out Map<T, PartyResult?>>,
-        focus: Flow.Publisher<out List<T>?>,
-        additionalHighlight: Flow.Publisher<out List<T>?> = null.asOneTimePublisher(),
+        focus: Flow.Publisher<out List<T>?>? = null,
+        additionalHighlight: Flow.Publisher<out List<T>?>? = null,
         header: Flow.Publisher<out String?>,
         notes: Flow.Publisher<out String?>? = null,
         outlines: Flow.Publisher<out List<Shape>>? = null,
@@ -33,15 +33,14 @@ object MapBuilder {
                     }
                     .toList()
             }
-        val mapFocus = shapes.merge(focus) { shp, foc -> createFocusShapes(shp, foc) }
+        val mapFocus = focus?.merge(shapes) { foc, shp -> createFocusShapes(shp, foc) }
         val mapAdditionalFocus =
-            shapes.merge(additionalHighlight) { shp, foc -> createFocusShapes(shp, foc) }
-        val allFocusShapes = mapFocus.merge(mapAdditionalFocus) { a, b ->
-            when {
-                a == null -> b
-                b == null -> a
-                else -> listOf(a, b).flatten()
-            }
+            additionalHighlight?.merge(shapes) { foc, shp -> createFocusShapes(shp, foc) }
+        val allFocusShapes = when {
+            mapFocus != null && mapAdditionalFocus != null -> mapFocus.merge(mapAdditionalFocus) { a, b -> listOfNotNull(a, b).takeIf { it.isNotEmpty() }?.flatten() }
+            mapFocus != null -> mapFocus
+            mapAdditionalFocus != null -> mapAdditionalFocus
+            else -> null.asOneTimePublisher()
         }
         val colours = shapesToParties.merge(allFocusShapes) { r, f ->
             r.map { Pair(it.first, extractColor(f, it.first, it.second)) }
@@ -60,8 +59,8 @@ object MapBuilder {
         shapes: Flow.Publisher<out Map<T, Shape>>,
         selectedShape: Flow.Publisher<out T>,
         leadingParty: Flow.Publisher<out PartyResult?>,
-        focus: Flow.Publisher<out List<T>?>,
-        additionalHighlight: Flow.Publisher<out List<T>?> = null.asOneTimePublisher(),
+        focus: Flow.Publisher<out List<T>?>? = null,
+        additionalHighlight: Flow.Publisher<out List<T>?>? = null,
         header: Flow.Publisher<out String?>,
         notes: Flow.Publisher<out String?>? = null,
         outlines: Flow.Publisher<out List<Shape>>? = null,
@@ -82,8 +81,8 @@ object MapBuilder {
         shapes: Flow.Publisher<out Map<T, Shape>>,
         selectedShape: Flow.Publisher<out T>,
         leadingCandidate: Flow.Publisher<out NonPartisanCandidateResult?>,
-        focus: Flow.Publisher<out List<T>?>,
-        additionalHighlight: Flow.Publisher<out List<T>?> = null.asOneTimePublisher(),
+        focus: Flow.Publisher<out List<T>?>? = null,
+        additionalHighlight: Flow.Publisher<out List<T>?>? = null,
         header: Flow.Publisher<out String?>,
         notes: Flow.Publisher<out String?>? = null,
         outlines: Flow.Publisher<out List<Shape>>? = null,
@@ -104,17 +103,17 @@ object MapBuilder {
         shapes: Flow.Publisher<out Map<T, Shape>>,
         selectedShape: Flow.Publisher<out T>,
         color: Flow.Publisher<out Color>,
-        focus: Flow.Publisher<out List<T>?>,
-        additionalHighlight: Flow.Publisher<out List<T>?>,
+        focus: Flow.Publisher<out List<T>?>?,
+        additionalHighlight: Flow.Publisher<out List<T>?>?,
         header: Flow.Publisher<out String?>,
         notes: Flow.Publisher<out String?>? = null,
         outlines: Flow.Publisher<out List<Shape>>? = null,
     ): MapFrame {
         val leaderWithShape =
             selectedShape.merge(color) { left, right -> Pair(left, right) }
-        val mapFocus = shapes.merge(focus) { shp, foc -> createFocusShapes(shp, foc) }
+        val mapFocus = focus?.merge(shapes) { foc, shp -> createFocusShapes(shp, foc) }
         val additionalFocusShapes =
-            shapes.merge(additionalHighlight) { shp, foc -> createFocusShapes(shp, foc) }
+            additionalHighlight?.merge(shapes) { foc, shp -> createFocusShapes(shp, foc) }
         val shapeWinners = shapes
             .merge(leaderWithShape) { shp, ldr ->
                 shp.entries
@@ -123,16 +122,12 @@ object MapBuilder {
                     }
                     .toList()
             }
-        val allFocusShapes = mapFocus
-            .merge(
-                additionalFocusShapes,
-            ) { l1: List<Shape>?, l2: List<Shape>? ->
-                when {
-                    l1 == null -> l2
-                    l2 == null -> l1
-                    else -> listOf(l1, l2).flatten().distinct()
-                }
-            }
+        val allFocusShapes = when {
+            mapFocus != null && additionalFocusShapes != null -> mapFocus.merge(additionalFocusShapes) { a, b -> listOfNotNull(a, b).takeIf { it.isNotEmpty() }?.flatten() }
+            mapFocus != null -> mapFocus
+            additionalFocusShapes != null -> additionalFocusShapes
+            else -> null.asOneTimePublisher()
+        }
         val focusedShapeWinners =
             shapeWinners.merge(allFocusShapes) { sw, f ->
                 if (f == null) {

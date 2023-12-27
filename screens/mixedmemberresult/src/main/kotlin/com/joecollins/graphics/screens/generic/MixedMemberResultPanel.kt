@@ -128,7 +128,7 @@ class MixedMemberResultPanel private constructor(
         lateinit var shapes: Flow.Publisher<out Map<T, Shape>>
         lateinit var selectedShape: Flow.Publisher<out T>
         lateinit var leadingParty: Flow.Publisher<out PartyResult?>
-        lateinit var focus: Flow.Publisher<out List<T>?>
+        var focus: Flow.Publisher<out List<T>?>? = null
         var additionalHighlight: Flow.Publisher<out List<T>?>? = null
         lateinit var header: Flow.Publisher<out String>
 
@@ -137,7 +137,7 @@ class MixedMemberResultPanel private constructor(
             selectedShape = selectedShape,
             leadingParty = leadingParty,
             focus = focus,
-            additionalHighlight = additionalHighlight ?: null.asOneTimePublisher(),
+            additionalHighlight = additionalHighlight,
             header = header,
         )
     }

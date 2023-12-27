@@ -316,7 +316,7 @@ class CandidateListingScreen private constructor(
     class MapPanel<K> internal constructor() {
         lateinit var shapes: Flow.Publisher<out Map<K, Shape>>
         lateinit var selectedShape: Flow.Publisher<out K>
-        lateinit var focus: Flow.Publisher<out List<K>?>
+        var focus: Flow.Publisher<out List<K>?>? = null
         var additionalHighlight: Flow.Publisher<out List<K>?>? = null
         lateinit var header: Flow.Publisher<out String>
 
@@ -325,7 +325,7 @@ class CandidateListingScreen private constructor(
             selectedShape = selectedShape,
             leadingParty = (null as PartyResult?).asOneTimePublisher(),
             focus = focus,
-            additionalHighlight = additionalHighlight ?: null.asOneTimePublisher(),
+            additionalHighlight = additionalHighlight,
             header = header,
         )
     }
