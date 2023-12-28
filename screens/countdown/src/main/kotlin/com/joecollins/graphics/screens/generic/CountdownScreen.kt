@@ -52,7 +52,7 @@ class CountdownScreen private constructor(
     }
 
     class TimeWithoutFilterPanel internal constructor() : TimePanel<Unit>() {
-        override lateinit var header: String
+        public override lateinit var header: String
         var futureDate: Period = Period.ofDays(0)
         lateinit var time: LocalTime
         lateinit var zone: ZoneId
