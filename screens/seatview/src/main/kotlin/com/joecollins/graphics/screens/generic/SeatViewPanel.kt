@@ -662,10 +662,11 @@ class SeatViewPanel private constructor(
             current: Flow.Publisher<out Map<out KT, CT>>,
             keyTemplate: BasicResultPanel.KeyTemplate<KT, KPT>,
             createFromDiff: (CT?, CT?) -> BasicResultPanel.CurrDiff<CT>,
+            mergeFunc: (CT, CT) -> CT,
         ): Flow.Publisher<Map<KPT, BasicResultPanel.CurrDiff<CT>>> {
-            return current.merge(seats) { c, d ->
+            return Aggregators.adjustKey(current, keyTemplate::toParty, mergeFunc).merge(seats) { c, d ->
                 val ret = LinkedHashMap<KPT, BasicResultPanel.CurrDiff<CT>>()
-                c.forEach { (k, v) -> ret[keyTemplate.toParty(k)] = createFromDiff(v, d[keyTemplate.toParty(k)]) }
+                c.forEach { (k, v) -> ret[k] = createFromDiff(v, d[k]) }
                 d.forEach { (k, v) -> ret.putIfAbsent(k, createFromDiff(null, v)) }
                 ret
             }
@@ -685,11 +686,12 @@ class SeatViewPanel private constructor(
             keyTemplate: BasicResultPanel.KeyTemplate<KT, KPT>,
             seatTemplate: SeatTemplate<CT, PT, *>,
             createFromPrev: (CT?, PT?) -> BasicResultPanel.CurrDiff<CT>,
+            mergeFunc: (CT, CT) -> CT,
         ): Flow.Publisher<Map<KPT, BasicResultPanel.CurrDiff<CT>>> {
             val prev = if (partyChanges == null) seats else Aggregators.partyChanges(seats, partyChanges!!) { a, b -> seatTemplate.prevCombine(a, b) }
-            return current.merge(prev) { c, p ->
+            return Aggregators.adjustKey(current, keyTemplate::toParty, mergeFunc).merge(prev) { c, p ->
                 val ret = LinkedHashMap<KPT, BasicResultPanel.CurrDiff<CT>>()
-                c.forEach { (k, v) -> ret[keyTemplate.toParty(k)] = createFromPrev(v, p[keyTemplate.toParty(k)]) }
+                c.forEach { (k, v) -> ret[k] = createFromPrev(v, p[k]) }
                 p.forEach { (k, v) -> ret.putIfAbsent(k, createFromPrev(null, v)) }
                 ret
             }
@@ -858,12 +860,14 @@ class SeatViewPanel private constructor(
                 current.seats,
                 keyTemplate,
                 currDiffFactory::createFromDiff,
+                seatTemplate::combine,
             )
                 ?: prev?.currDiff(
                     current.seats,
                     keyTemplate,
                     seatTemplate,
                     currDiffFactory::createFromPrev,
+                    seatTemplate::combine,
                 )
 
         private val change: Change? = diff ?: prev
@@ -1073,8 +1077,13 @@ class SeatViewPanel private constructor(
                     ("$h, $s")
                 }
             }
-            val barEntryLine: (String, CT, CT?) -> String = { h, c, d ->
-                "$h: ${seatTemplate.labelText(c)}" + (d?.let { seatTemplate.diffLabelText(it) }?.let { " ($it)" } ?: "")
+            val barEntryLine: (String, CT, CT?, String?) -> String = { head, curr, diff, diffSymbol ->
+                "$head: ${seatTemplate.labelText(curr)}" + when {
+                    diff != null && diffSymbol != null -> " (${seatTemplate.diffLabelText(diff)}$diffSymbol)"
+                    diff != null -> " (${seatTemplate.diffLabelText(diff)})"
+                    diffSymbol != null -> " ($diffSymbol)"
+                    else -> ""
+                }
             }
             val mainText = current.header.run {
                 if (current.progressLabel == null) this else merge(current.progressLabel!!) { h, p -> h + (p?.let { " [$it]" } ?: "") }
@@ -1086,11 +1095,31 @@ class SeatViewPanel private constructor(
             val barsText = (prev?.showRaw ?: false.asOneTimePublisher()).compose { prevRaw ->
                 if (prevRaw || diffEntries == null) {
                     currEntries.map { entries ->
-                        entries.joinToString("") { "\n${barEntryLine(keyTemplate.toMainBarHeader(it.key, true), it.value, null)}" + (it.result?.let { c -> " $c" } ?: "") }
+                        entries.joinToString("") {
+                            "\n${
+                                barEntryLine(
+                                    keyTemplate.toMainBarHeader(it.key, true),
+                                    it.value,
+                                    null,
+                                    null,
+                                )
+                            }" + (it.result?.let { c -> " $c" } ?: "")
+                        }
                     }
                 } else {
                     diffEntries.map { entries ->
-                        entries.joinToString("") { "\n${barEntryLine(if (it.key == null) it.party.name.uppercase() else keyTemplate.toMainBarHeader(it.key, true), it.curr ?: seatTemplate.default, it.diff)}" + (it.result?.let { c -> " $c" } ?: "") }
+                        val countByParty = entries.groupingBy { it.key?.let(keyTemplate::toParty) ?: it.party }.eachCount()
+                        entries.joinToString("") {
+                            "\n${
+                                barEntryLine(
+                                    if (it.key == null) it.party.name.uppercase() else keyTemplate.toMainBarHeader(it.key, true),
+                                    it.curr ?: seatTemplate.default,
+                                    it.diff,
+                                    if ((countByParty[it.key?.let(keyTemplate::toParty) ?: it.party] ?: 0) > 1) "^" else null,
+                                )
+                            }" + (it.result?.let { c -> " $c" } ?: "")
+                        } +
+                            if (countByParty.values.any { it > 1 }) "\n^ AGGREGATED ACROSS CANDIDATES IN PARTY" else ""
                     }
                 }
             }

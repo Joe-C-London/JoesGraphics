@@ -3202,6 +3202,65 @@ class SeatViewPanelTest {
         )
     }
 
+    @Test
+    fun testMultipleCandidatesSameParty() {
+        val dem = Party("Democratic", "DEM", Color.BLUE)
+        val gop = Party("Republican", "GOP", Color.RED)
+        val lbt = Party("Libertarian", "LBT", Color.ORANGE)
+        val ind = Party("Independent", "IND", Color.DARK_GRAY)
+
+        val curr = mapOf(
+            Candidate("Donald Trump", gop) to 304,
+            Candidate("Hillary Clinton", dem) to 227,
+            Candidate("Bernie Sanders", ind) to 1,
+            Candidate("John Kasich", gop) to 1,
+            Candidate("Ron Paul", lbt) to 1,
+            Candidate("Colin Powell", gop) to 3,
+            Candidate("Faith Spotted Eagle", dem) to 1,
+        )
+
+        val prev = mapOf(
+            dem to 332,
+            gop to 206,
+        )
+
+        val panel = candidateSeats(
+            current = {
+                seats = curr.asOneTimePublisher()
+                header = "ELECTORAL VOTES".asOneTimePublisher()
+                subhead = "".asOneTimePublisher()
+                totalSeats = 538.asOneTimePublisher()
+            },
+            prev = {
+                seats = prev.asOneTimePublisher()
+                header = "CHANGE SINCE 2012".asOneTimePublisher()
+            },
+            majorityLine = {
+                display = { "$it TO WIN" }
+            },
+            title = "PRESIDENT".asOneTimePublisher(),
+        )
+        panel.setSize(1024, 512)
+        compareRendering("SeatViewPanel", "MultipleCandidatesSameParty", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            PRESIDENT
+            
+            ELECTORAL VOTES (CHANGE SINCE 2012)
+            DONALD TRUMP (GOP): 304 (+102^)
+            HILLARY CLINTON (DEM): 227 (-104^)
+            COLIN POWELL (GOP): 3 (^)
+            BERNIE SANDERS (IND): 1 (+1)
+            JOHN KASICH (GOP): 1 (^)
+            RON PAUL (LBT): 1 (+1)
+            FAITH SPOTTED EAGLE (DEM): 1 (^)
+            ^ AGGREGATED ACROSS CANDIDATES IN PARTY
+            270 TO WIN
+            """.trimIndent(),
+        )
+    }
+
     private fun peiShapesByDistrict(): Map<Int, Shape> {
         val peiMap = SeatViewPanelTest::class.java
             .classLoader
