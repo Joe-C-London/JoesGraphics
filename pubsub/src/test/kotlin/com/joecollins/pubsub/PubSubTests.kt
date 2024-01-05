@@ -809,4 +809,24 @@ class PubSubTests {
         publisher.subscribe(Subscriber { output = it })
         assertEquals(instant, output)
     }
+
+    @Test
+    fun testIntPublisher() {
+        val publisher = IntPublisher(0)
+        var output: Int? = null
+        publisher.subscribe(Subscriber { output = it })
+        assertEquals(0, output)
+
+        publisher.increment(10)
+        assertEquals(10, output)
+
+        publisher.increment(15)
+        assertEquals(25, output)
+
+        publisher.set(-5)
+        assertEquals(-5, output)
+
+        publisher.increment(5)
+        assertEquals(0, output)
+    }
 }
