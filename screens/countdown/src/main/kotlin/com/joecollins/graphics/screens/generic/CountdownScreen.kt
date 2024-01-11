@@ -3,6 +3,7 @@ package com.joecollins.graphics.screens.generic
 import com.joecollins.graphics.AltTextProvider
 import com.joecollins.graphics.GenericPanel
 import com.joecollins.graphics.components.CountdownFrame
+import com.joecollins.graphics.components.GraphicsFrame.Companion.equaliseHeaderFonts
 import com.joecollins.graphics.components.MapFrame
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.TimePublisher
@@ -204,17 +205,19 @@ class CountdownScreen private constructor(
                 else -> generateSequence { listOf(Color.RED, Color.ORANGE, Color.GREEN.darker(), Color.CYAN.darker(), Color.BLUE, Color.MAGENTA) }.flatten().take(timings.size).toList()
             }
 
-            (colors.indices).forEach { color ->
-                val frame = CountdownFrame(
+            val topFrames = (colors.indices).map { color ->
+                CountdownFrame(
                     headerPublisher = timings[color].header.asOneTimePublisher(),
                     timePublisher = timings[color].instant(date).asOneTimePublisher(),
                     labelFunc = { timeLabel(it, timesUpLabel) },
                     borderColorPublisher = colors[color].asOneTimePublisher(),
                     countdownColorPublisher = colors[color].asOneTimePublisher(),
-                )
-                frame.clock = clock
-                top.add(frame)
+                ).also { frame ->
+                    frame.clock = clock
+                }
             }
+            topFrames.equaliseHeaderFonts()
+            topFrames.forEach { frame -> top.add(frame) }
 
             val map = MapFrame(
                 shapesPublisher = (colors.indices).map { idx ->

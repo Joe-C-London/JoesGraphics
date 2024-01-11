@@ -1,5 +1,6 @@
 package com.joecollins.graphics.components
 
+import com.joecollins.graphics.components.FontSizeAdjustingLabel.Companion.equaliseFonts
 import com.joecollins.graphics.utils.ColorUtils
 import com.joecollins.graphics.utils.StandardFont
 import com.joecollins.pubsub.Subscriber
@@ -48,13 +49,17 @@ open class GraphicsFrame(
         private val HEADER_FONT = StandardFont.readNormalFont(24)
         private val ADDITIONAL_HEADER_FONT = StandardFont.readNormalFont(20)
         private val ADDITIONAL_HEADER_BORDER = { c: Color -> MatteBorder(2, 2, 2, 2, c) }
+
+        fun Collection<GraphicsFrame>.equaliseHeaderFonts() {
+            map { it.headerLabel }.equaliseFonts()
+        }
     }
 
     private val headerPanel: JPanel
-    private val headerLabel: JLabel
+    private val headerLabel: FontSizeAdjustingLabel
     private val notesLabel: JLabel
     private val additionalHeaderPanels: Map<HeaderLabelLocation, JPanel>
-    private val additionalHeaderLabels: Map<HeaderLabelLocation, JLabel>
+    private val additionalHeaderLabels: Map<HeaderLabelLocation, FontSizeAdjustingLabel>
 
     init {
         layout = BorderLayout()

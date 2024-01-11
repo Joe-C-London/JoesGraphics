@@ -1,5 +1,6 @@
 package com.joecollins.graphics.components
 
+import com.joecollins.graphics.components.GraphicsFrame.Companion.equaliseHeaderFonts
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
@@ -7,6 +8,7 @@ import com.joecollins.pubsub.map
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.awt.Color
+import java.awt.GridLayout
 import javax.swing.JPanel
 
 class GraphicsFrameTest {
@@ -351,5 +353,51 @@ class GraphicsFrameTest {
             "LeftHandLabel-R2",
             graphicsFrame,
         )
+    }
+
+    @Test
+    fun testEqualHeaderSizes() {
+        val header1 = Publisher("LABEL 1")
+        val header2 = Publisher("LABEL 2")
+        val panel = JPanel().apply {
+            layout = GridLayout(1, 0)
+            val red = object : GraphicsFrame(
+                headerPublisher = header1,
+            ) {
+                init {
+                    val panel = JPanel()
+                    panel.background = Color.RED
+                    addCenter(panel)
+                }
+            }.also { add(it) }
+            val green = object : GraphicsFrame(
+                headerPublisher = header2,
+            ) {
+                init {
+                    val panel = JPanel()
+                    panel.background = Color.GREEN
+                    addCenter(panel)
+                }
+            }.also { add(it) }
+            listOf(red, green).equaliseHeaderFonts()
+        }
+        panel.setSize(256, 128)
+        compareRendering("GraphicsFrame", "EqualHeaderSize-1", panel)
+
+        header1.submit("A LONG HEADER")
+        compareRendering("GraphicsFrame", "EqualHeaderSize-2", panel)
+
+        header2.submit("A VERY, VERY LONG HEADER")
+        compareRendering("GraphicsFrame", "EqualHeaderSize-3", panel)
+
+        panel.setSize(512, 128)
+        compareRendering("GraphicsFrame", "EqualHeaderSize-4", panel)
+
+        header1.submit("LABEL 1")
+        header2.submit("LABEL 2")
+        compareRendering("GraphicsFrame", "EqualHeaderSize-5", panel)
+
+        panel.setSize(256, 128)
+        compareRendering("GraphicsFrame", "EqualHeaderSize-1", panel)
     }
 }
