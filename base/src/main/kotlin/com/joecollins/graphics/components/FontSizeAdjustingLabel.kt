@@ -50,6 +50,7 @@ class FontSizeAdjustingLabel() : JLabel() {
                 .first { it.size == minSize || getStringWidth(it, text) <= width - 6 }
             renderedFont = newFont
         }
+        repaint()
     }
 
     private fun getStringWidth(font: Font, text: String): Double {
