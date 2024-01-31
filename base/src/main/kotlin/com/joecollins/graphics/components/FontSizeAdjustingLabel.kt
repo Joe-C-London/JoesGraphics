@@ -1,6 +1,7 @@
 package com.joecollins.graphics.components
 
 import com.joecollins.utils.ExecutorUtils
+import java.awt.EventQueue
 import java.awt.Font
 import java.awt.Graphics
 import java.awt.event.ComponentAdapter
@@ -73,9 +74,14 @@ class FontSizeAdjustingLabel() : JLabel() {
 
         private fun Collection<FontSizeAdjustingLabel>.equaliseFontsNow() {
             forEach { it.determineRenderedFont(it.font, it.width, it.text) }
-            ExecutorUtils.sendToEventQueue {
+            val action = {
                 val font = map { it.renderedFont }.minBy { it.size }
                 forEach { it.renderedFont = font }
+            }
+            if (EventQueue.isDispatchThread()) {
+                action()
+            } else {
+                ExecutorUtils.sendToEventQueue(action)
             }
         }
     }
