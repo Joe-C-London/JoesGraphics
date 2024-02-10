@@ -16,32 +16,32 @@ abstract class GenericReader {
         if (keyType == Int::class.java) {
             return readShapes(file) { feature ->
                 @Suppress("UNCHECKED_CAST")
-                Integer::class.cast(feature.getAttribute(keyProperty)).toInt() as T
+                Integer::class.cast(feature[keyProperty]).toInt() as T
             }
         }
         if (keyType == Long::class.java) {
             return readShapes(file) { feature ->
                 @Suppress("UNCHECKED_CAST")
-                Long::class.cast(feature.getAttribute(keyProperty)).toLong() as T
+                Long::class.cast(feature[keyProperty]).toLong() as T
             }
         }
         if (keyType == Double::class.java) {
             return readShapes(file) { feature ->
                 @Suppress("UNCHECKED_CAST")
-                Double::class.cast(feature.getAttribute(keyProperty)).toDouble() as T
+                Double::class.cast(feature[keyProperty]).toDouble() as T
             }
         }
-        return readShapes(file) { feature -> keyType.cast(feature.getAttribute(keyProperty)) }
+        return readShapes(file) { feature -> keyType.cast(feature[keyProperty]) }
     }
 
-    fun <T> readShapes(file: URL, keyFunc: (SimpleFeature) -> T): Map<T, Shape> {
+    fun <T> readShapes(file: URL, keyFunc: (Map<String, Any>) -> T): Map<T, Shape> {
         return readShapes(file, keyFunc) { true }
     }
 
     fun <T> readShapes(
         file: URL,
-        keyFunc: (SimpleFeature) -> T,
-        filter: (SimpleFeature) -> Boolean,
+        keyFunc: (Map<String, Any>) -> T,
+        filter: (Map<String, Any>) -> Boolean,
     ): Map<T, Shape> {
         val shapes: MutableMap<T, Shape> = HashMap()
         var features: SimpleFeatureIterator? = null
@@ -49,10 +49,11 @@ abstract class GenericReader {
             features = getFeatureIterator(file)
             while (features.hasNext()) {
                 val feature = features.next()
-                if (!filter(feature)) {
+                val map = WrappedMap(feature)
+                if (!filter(map)) {
                     continue
                 }
-                val key = keyFunc(feature)
+                val key = keyFunc(map)
                 val geom = feature.getAttribute(geometryKey) as Geometry
                 shapes.merge(
                     key,
@@ -77,5 +78,37 @@ abstract class GenericReader {
         val shapeWriter = ShapeWriter()
         val transform = AffineTransform.getScaleInstance(1.0, -1.0)
         return transform.createTransformedShape(shapeWriter.toShape(geom))
+    }
+
+    private class WrappedMap(private val feature: SimpleFeature) : Map<String, Any> {
+        override val entries: Set<Map.Entry<String, Any>>
+            get() = keys.map {
+                object : Map.Entry<String, Any> {
+                    override val key: String = it
+                    override val value: Any = get(it)!!
+                }
+            }.toSet()
+        override val keys: Set<String>
+            get() = feature.attributes.map { it.toString() }.toSet()
+        override val size: Int
+            get() = feature.attributes.size
+        override val values: Collection<Any>
+            get() = keys.map { feature.getAttribute(it) }
+
+        override fun isEmpty(): Boolean {
+            return feature.attributes.isEmpty()
+        }
+
+        override fun get(key: String): Any? {
+            return feature.getAttribute(key)
+        }
+
+        override fun containsValue(value: Any): Boolean {
+            return values.contains(value)
+        }
+
+        override fun containsKey(key: String): Boolean {
+            return keys.contains(key)
+        }
     }
 }
