@@ -14,7 +14,7 @@ def topLevel = parent.parent
 
 dependencies {
     api parent
-    implementation group: 'org.geotools', name: 'gt-geojsondatastore', version: '26.7'
+    implementation group: 'org.geotools', name: 'gt-geojson-core', version: geotoolsVersion
 
     testImplementation topLevel.project('testutils')
 

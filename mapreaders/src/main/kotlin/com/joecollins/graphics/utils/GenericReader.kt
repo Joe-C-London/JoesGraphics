@@ -1,9 +1,7 @@
 package com.joecollins.graphics.utils
 
-import org.geotools.data.FileDataStore
-import org.geotools.data.FileDataStoreFinder
+import org.geotools.api.feature.simple.SimpleFeature
 import org.geotools.data.simple.SimpleFeatureIterator
-import org.geotools.data.simple.SimpleFeatureSource
 import org.locationtech.jts.awt.ShapeWriter
 import org.locationtech.jts.geom.Geometry
 import java.awt.Shape
@@ -12,7 +10,7 @@ import java.awt.geom.Area
 import java.net.URL
 import kotlin.reflect.cast
 
-open class GenericReader {
+abstract class GenericReader {
 
     fun <T> readShapes(file: URL, keyProperty: String, keyType: Class<T>): Map<T, Shape> {
         if (keyType == Int::class.java) {
@@ -36,30 +34,26 @@ open class GenericReader {
         return readShapes(file) { feature -> keyType.cast(feature.getAttribute(keyProperty)) }
     }
 
-    fun <T> readShapes(file: URL, keyFunc: (org.opengis.feature.simple.SimpleFeature) -> T): Map<T, Shape> {
+    fun <T> readShapes(file: URL, keyFunc: (SimpleFeature) -> T): Map<T, Shape> {
         return readShapes(file, keyFunc) { true }
     }
 
     fun <T> readShapes(
         file: URL,
-        keyFunc: (org.opengis.feature.simple.SimpleFeature) -> T,
-        filter: (org.opengis.feature.simple.SimpleFeature) -> Boolean,
+        keyFunc: (SimpleFeature) -> T,
+        filter: (SimpleFeature) -> Boolean,
     ): Map<T, Shape> {
         val shapes: MutableMap<T, Shape> = HashMap()
-        var store: FileDataStore? = null
-        val featureSource: SimpleFeatureSource
         var features: SimpleFeatureIterator? = null
         return try {
-            store = FileDataStoreFinder.getDataStore(file)
-            featureSource = store.featureSource
-            features = featureSource.features.features()
+            features = getFeatureIterator(file)
             while (features.hasNext()) {
                 val feature = features.next()
                 if (!filter(feature)) {
                     continue
                 }
                 val key = keyFunc(feature)
-                val geom = feature.getAttribute("the_geom") as Geometry
+                val geom = feature.getAttribute(geometryKey) as Geometry
                 shapes.merge(
                     key,
                     toShape(geom),
@@ -72,9 +66,12 @@ open class GenericReader {
             shapes
         } finally {
             features?.close()
-            store?.dispose()
         }
     }
+
+    protected abstract fun getFeatureIterator(file: URL): SimpleFeatureIterator
+
+    protected abstract val geometryKey: String
 
     private fun toShape(geom: Geometry): Shape {
         val shapeWriter = ShapeWriter()

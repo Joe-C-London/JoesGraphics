@@ -1554,7 +1554,13 @@ class SimpleVoteViewPanel private constructor(
                                     header
                                 } else {
                                     val sub = subhead?.merge(filteredChangeSubhead) { s, f ->
-                                        if (f == null) null else if (s.isNullOrEmpty()) " $f" else ", $f"
+                                        if (f == null) {
+                                            null
+                                        } else if (s.isNullOrEmpty()) {
+                                            " $f"
+                                        } else {
+                                            ", $f"
+                                        }
                                     } ?: filteredChangeSubhead.map { if (it == null) null else " $it" }
                                     header.merge(sub) { h, s -> listOfNotNull(h, s).joinToString("") }
                                 }

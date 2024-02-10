@@ -120,7 +120,13 @@ class MixedMemberAllSeatsScreen private constructor(
                         text = name,
                         border = prev?.color ?: Color.WHITE,
                         background = if (curr?.elected == true) curr.leader.color else Color.WHITE,
-                        foreground = if (curr == null) Color.LIGHT_GRAY else if (!curr.elected) ColorUtils.contrastForBackground(curr.leader.color) else ColorUtils.foregroundToContrast(curr.leader.color),
+                        foreground = if (curr == null) {
+                            Color.LIGHT_GRAY
+                        } else if (!curr.elected) {
+                            ColorUtils.contrastForBackground(curr.leader.color)
+                        } else {
+                            ColorUtils.foregroundToContrast(curr.leader.color)
+                        },
                     )
                 }
                 val constituencyItems = constituencyItems.mapElements { (c, curr, prev) ->

@@ -216,7 +216,13 @@ class SingleTransferrableResultScreen private constructor(
                                     })"
                                 }}"
                             }
-                        }${if (el.any { it.first == c }) " ELECTED" else if (ex.contains(c)) " EXCLUDED" else ""}"
+                        }${if (el.any { it.first == c }) {
+                            " ELECTED"
+                        } else if (ex.contains(c)) {
+                            " EXCLUDED"
+                        } else {
+                            ""
+                        }}"
                     } +
                     (q?.let { "\nQUOTA: ${if (it is Int) DecimalFormat("#,##0").format(it.toInt()) else DecimalFormat("#,##0.00").format(it.toDouble())}" } ?: "")
                 if (prevElected.isEmpty()) {
