@@ -24,7 +24,7 @@ class FontSizeAdjustingLabel() : JLabel() {
         determineRenderedFont(font, width, text)
     }
 
-    override fun setText(text: String) {
+    override fun setText(text: String?) {
         super.setText(text)
         determineRenderedFont(font, width, text)
     }
@@ -43,7 +43,7 @@ class FontSizeAdjustingLabel() : JLabel() {
         super.paintComponent(g)
     }
 
-    private fun determineRenderedFont(font: Font?, width: Int, text: String) {
+    private fun determineRenderedFont(font: Font?, width: Int, text: String?) {
         if (font != null) {
             val minSize = 2
             val newFont = (font.size downTo minSize).asSequence()
@@ -54,9 +54,9 @@ class FontSizeAdjustingLabel() : JLabel() {
         repaint()
     }
 
-    private fun getStringWidth(font: Font, text: String): Double {
+    private fun getStringWidth(font: Font, text: String?): Double {
         val frc = FontRenderContext(AffineTransform(), true, true)
-        return font.getStringBounds(text, frc).width
+        return font.getStringBounds(text ?: "", frc).width
     }
 
     companion object {
