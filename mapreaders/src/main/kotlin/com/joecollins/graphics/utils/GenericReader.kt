@@ -43,7 +43,7 @@ abstract class GenericReader {
         keyFunc: (Map<String, Any>) -> T,
         filter: (Map<String, Any>) -> Boolean,
     ): Map<T, Shape> {
-        val shapes: MutableMap<T, Shape> = HashMap()
+        val shapes: MutableMap<T, Collection<Shape>> = HashMap()
         var features: SimpleFeatureIterator? = null
         return try {
             features = getFeatureIterator(file)
@@ -57,14 +57,17 @@ abstract class GenericReader {
                 val geom = feature.getAttribute(geometryKey) as Geometry
                 shapes.merge(
                     key,
-                    toShape(geom),
+                    listOf(toShape(geom)),
                 ) { s1, s2 ->
-                    val s = Area(s1)
-                    s.add(Area(s2))
-                    s
+                    s1 + s2
                 }
             }
-            shapes
+            shapes.mapValues { (_, s) ->
+                s.sortedBy { it.bounds2D.run { width * height } }
+                    .reduce { s1, s2 ->
+                        Area(s1).apply { add(Area(s2)) }
+                    }
+            }
         } finally {
             features?.close()
         }
