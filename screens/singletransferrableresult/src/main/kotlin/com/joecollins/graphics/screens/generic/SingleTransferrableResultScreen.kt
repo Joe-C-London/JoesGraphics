@@ -71,7 +71,7 @@ class SingleTransferrableResultScreen private constructor(
                     .map {
                         BarFrameBuilder.BasicBar(
                             label = it.first.name.uppercase() + (if (it.first.incumbent) " ${candidateResults.incumbentMarker}" else "") + " (${it.first.party.abbreviation.uppercase()})",
-                            valueLabel = "ELECTED IN ${it.second}",
+                            valueLabel = it.second,
                             shape = ImageGenerator.createTickShape(),
                             value = 0,
                             color = it.first.party.color,
@@ -103,6 +103,7 @@ class SingleTransferrableResultScreen private constructor(
             return BarFrameBuilder.basic(
                 barsPublisher = bars,
                 headerPublisher = candidateResults.header,
+                rightHeaderLabelPublisher = candidateResults.progress,
                 subheadPublisher = candidateResults.subhead,
                 maxPublisher = candidateResults.quota.map { (it?.toDouble() ?: 1.0) * 2 },
                 linesPublisher = BarFrameBuilder.Lines.of(candidateResults.quota.map { if (it == null) emptyList() else listOf(it) }) { "QUOTA: " + formatString(this) },
@@ -183,7 +184,13 @@ class SingleTransferrableResultScreen private constructor(
             partyTotals: PartyTotals?,
             prevResults: PrevResults?,
         ): Flow.Publisher<String> {
-            val candidateTop = candidateResults.header.merge(candidateResults.subhead) { h, s ->
+            val candidateTop = candidateResults.header.run {
+                if (candidateResults.progress == null) {
+                    this
+                } else {
+                    merge(candidateResults.progress!!) { h, p -> "$h [$p]" }
+                }
+            }.merge(candidateResults.subhead) { h, s ->
                 if (h.isNullOrEmpty()) {
                     s
                 } else if (s.isNullOrEmpty()) {
@@ -196,7 +203,7 @@ class SingleTransferrableResultScreen private constructor(
             val candidateEntries = candidateResults.votes.merge(candidateResults.quota) { v, q -> v to q }.merge(status) { (votes, q), (el, ex) ->
                 val candidateFunc: (Candidate) -> String = { c -> "${c.name.uppercase()}${if (c.incumbent) " ${candidateResults.incumbentMarker}" else ""} (${c.party.abbreviation})" }
                 val prevElected = el.filter { !votes.containsKey(it.first) }
-                    .joinToString("\n") { (c, r) -> "${candidateFunc(c)}: ELECTED IN $r" }
+                    .joinToString("\n") { (c, r) -> "${candidateFunc(c)}: $r" }
                 val currRound = votes.entries
                     .sortedByDescending { it.value?.toDouble() ?: 0.0 }
                     .joinToString("\n") { (c, v) ->
@@ -283,10 +290,11 @@ class SingleTransferrableResultScreen private constructor(
     class CandidateResults internal constructor() {
         lateinit var votes: Flow.Publisher<out Map<Candidate, Number?>>
         lateinit var quota: Flow.Publisher<out Number?>
-        lateinit var elected: Flow.Publisher<out List<Pair<Candidate, Int>>>
+        lateinit var elected: Flow.Publisher<out List<Pair<Candidate, String>>>
         lateinit var excluded: Flow.Publisher<out List<Candidate>>
         lateinit var header: Flow.Publisher<out String?>
         lateinit var subhead: Flow.Publisher<out String?>
+        var progress: Flow.Publisher<String>? = null
         var incumbentMarker: String? = null
     }
 
