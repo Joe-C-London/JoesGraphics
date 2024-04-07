@@ -16,7 +16,7 @@ repositories {
 
 dependencies {
     api parent.project('pubsub')
-    implementation group: 'commons-io', name: 'commons-io', version: '2.15.1'
+    implementation group: 'commons-io', name: 'commons-io', version: '2.16.0'
     implementation "org.junit.jupiter:junit-jupiter-api:$parent.ext.junit_version"
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$parent.ext.junit_version"
 }
