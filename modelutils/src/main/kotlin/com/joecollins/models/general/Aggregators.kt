@@ -3,7 +3,6 @@ package com.joecollins.models.general
 import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.combine
 import com.joecollins.pubsub.map
-import com.joecollins.pubsub.mapReduce
 import com.joecollins.pubsub.merge
 import java.util.concurrent.Flow
 import kotlin.math.max
@@ -17,19 +16,13 @@ object Aggregators {
             return identity.asOneTimePublisher()
         }
         val seededKeys = identity.keys
-        return items.map(result).mapReduce(
-            identity,
-            { a, r ->
-                val ret = LinkedHashMap(a)
-                r.forEach { (k, v) -> ret.merge(k, v) { a, b -> a + b } }
-                ret
-            },
-            { a, r ->
-                val ret = LinkedHashMap(a)
-                r.forEach { (k, v) -> ret.merge(k, -v) { a, b -> a + b } }
-                ret.filter { seededKeys.contains(it.key) || it.value != 0 || !r.containsKey(it.key) }
-            },
-        )
+        return items.map(result).combine()
+            .map { results ->
+                sequenceOf(results, listOf(seededKeys.associateWith { 0 })).flatten()
+                    .flatMap { it.entries }
+                    .groupingBy { it.key }
+                    .fold(0) { a, e -> a + e.value }
+            }
     }
 
     fun <T, K> combineDual(items: Collection<T>, result: (T) -> Flow.Publisher<Map<K, Pair<Int, Int>>>) = combineDual(items, result, HashMap())
@@ -38,23 +31,17 @@ object Aggregators {
         val seededKeys = identity.keys
         val sum: (Pair<Int, Int>, Pair<Int, Int>) -> Pair<Int, Int> =
             { a, b -> Pair(a.first + b.first, a.second + b.second) }
-        return items.map(result).mapReduce(
-            identity,
-            { a, r ->
-                val ret = LinkedHashMap(a)
-                r.forEach { (k, v) -> ret.merge(k, v, sum) }
-                ret
-            },
-            { a, r ->
-                val ret = LinkedHashMap(a)
-                r.forEach { (k, v) -> ret.merge(k, Pair(-v.first, -v.second), sum) }
-                ret.filter { e -> seededKeys.contains(e.key) || e.value.first != 0 || e.value.second != 0 || !r.containsKey(e.key) }
-            },
-        )
+        return items.map(result).combine()
+            .map { results ->
+                sequenceOf(results, listOf(seededKeys.associateWith { 0 to 0 })).flatten()
+                    .flatMap { it.entries }
+                    .groupingBy { it.key }
+                    .fold(0 to 0) { a, e -> sum(a, e.value) }
+            }
     }
 
     fun <T> sum(items: Collection<T>, value: (T) -> Flow.Publisher<Int>): Flow.Publisher<Int> {
-        return items.map(value).mapReduce(0, { t, v -> t + v }, { t, v -> t - v })
+        return items.map(value).combine().map { it.sum() }
     }
 
     fun <T> count(items: Collection<T>, value: (T) -> Flow.Publisher<Boolean>): Flow.Publisher<Int> {

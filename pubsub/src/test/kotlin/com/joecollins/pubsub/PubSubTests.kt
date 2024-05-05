@@ -1,6 +1,5 @@
 package com.joecollins.pubsub
 
-import com.joecollins.graphics.utils.BoundResult
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
@@ -270,20 +269,6 @@ class PubSubTests {
     }
 
     @Test
-    fun testMapReducePublisher() {
-        val boundValue: BoundResult<Int> = BoundResult()
-        val publishers = listOf(Publisher(1), Publisher(2), Publisher(3))
-        publishers.mapReduce(0, { a, v -> a + v }, { a, v -> a - v })
-            .subscribe(Subscriber { boundValue.value = it })
-        assertEquals(6, boundValue.value)
-
-        publishers[0].submit(4)
-        publishers[1].submit(5)
-        publishers[2].submit(6)
-        assertEquals(15, boundValue.value)
-    }
-
-    @Test
     fun testComposePublisher() {
         var output: Int? = null
         val innerPublisher1 = Publisher(7)
@@ -419,55 +404,6 @@ class PubSubTests {
         assertEquals("AB", value1)
         assertEquals("AAB", value2)
         assertEquals("AABB", value3)
-    }
-
-    @Test
-    fun testUnsubscribeMapReducePublisher() {
-        val mainPublishers = listOf(
-            Publisher("A"),
-            Publisher("B"),
-            Publisher("C"),
-            Publisher("D"),
-            Publisher("E"),
-        )
-        val mergedPublisher = mainPublishers.mapReduce(
-            0,
-            { a, b -> a + b.length },
-            { a, b -> a - b.length },
-        )
-        assertEquals(0, mainPublishers.sumOf { it.numSubscriptions })
-
-        var value1 = 0
-        val subscriber1 = Subscriber<Int> { value1 = it }
-        mergedPublisher.subscribe(subscriber1)
-        assertEquals(5, mainPublishers.sumOf { it.numSubscriptions })
-        assertEquals(5, value1)
-
-        var value2 = 0
-        val subscriber2 = Subscriber<Int> { value2 = it }
-        mergedPublisher.subscribe(subscriber2)
-        assertEquals(5, mainPublishers.sumOf { it.numSubscriptions })
-        assertEquals(5, value2)
-
-        subscriber1.unsubscribe()
-        mainPublishers[0].submit("AA")
-        assertEquals(5, mainPublishers.sumOf { it.numSubscriptions })
-        assertEquals(5, value1)
-        assertEquals(6, value2)
-
-        subscriber2.unsubscribe()
-        mainPublishers[1].submit("BB")
-        assertEquals(0, mainPublishers.sumOf { it.numSubscriptions })
-        assertEquals(5, value1)
-        assertEquals(6, value2)
-
-        var value3 = 0
-        val subscriber3 = Subscriber<Int> { value3 = it }
-        mergedPublisher.subscribe(subscriber3)
-        assertEquals(5, mainPublishers.sumOf { it.numSubscriptions })
-        assertEquals(5, value1)
-        assertEquals(6, value2)
-        assertEquals(7, value3)
     }
 
     @Test
@@ -714,45 +650,6 @@ class PubSubTests {
         publisher.complete()
         assertTrue(completed)
         assertEquals(0, mappedPublisher.numSubscriptions)
-    }
-
-    @Test
-    fun testCompletedMapReducePublisher() {
-        val publishers = listOf(
-            Publisher("A"),
-            Publisher("B"),
-            Publisher("C"),
-        )
-        val mapReducePublisher = publishers.mapReduce(
-            0,
-            { a, e -> a + e.length },
-            { a, e -> a - e.length },
-        ) as AbstractPublisher<Int>
-
-        var value = 0
-        var completed = false
-        mapReducePublisher.subscribe(
-            Subscriber({
-                value = it
-            }, {
-                completed = true
-            }),
-        )
-        assertEquals(3, value)
-        assertFalse(completed)
-        assertEquals(1, mapReducePublisher.numSubscriptions)
-
-        publishers[0].complete()
-        assertFalse(completed)
-        assertEquals(1, mapReducePublisher.numSubscriptions)
-
-        publishers[2].complete()
-        assertFalse(completed)
-        assertEquals(1, mapReducePublisher.numSubscriptions)
-
-        publishers[1].complete()
-        assertTrue(completed)
-        assertEquals(0, mapReducePublisher.numSubscriptions)
     }
 
     @Test

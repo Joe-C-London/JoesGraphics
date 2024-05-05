@@ -49,10 +49,6 @@ fun <T, U, R> Flow.Publisher<T>.merge(other: Flow.Publisher<out U>, func: (T, U)
     return MergedPublisher(this, other, func)
 }
 
-fun <T, R> List<Flow.Publisher<out T>>.mapReduce(identity: R, onValueAdd: (R, T) -> R, onValueRemove: (R, T) -> R): Flow.Publisher<R> {
-    return MapReducePublisher(this, identity, onValueAdd, onValueRemove)
-}
-
 fun <T> List<Flow.Publisher<out T>>.combine(): Flow.Publisher<List<T>> {
     return CombinedPublisher(this)
 }

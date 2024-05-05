@@ -8,7 +8,6 @@ import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.combine
 import com.joecollins.pubsub.map
 import com.joecollins.pubsub.mapElements
-import com.joecollins.pubsub.mapReduce
 import com.joecollins.pubsub.merge
 import java.awt.Color
 import java.awt.Point
@@ -304,63 +303,30 @@ object HemicycleFrameBuilder {
         results: List<Flow.Publisher<Pair<PartyResult?, Int>>>,
         partyFilter: (Party?) -> Boolean,
     ): Flow.Publisher<ElectedLeading> {
-        return results.mapReduce(
-            ElectedLeading(0, 0),
-            { p, r ->
-                val result = r.first
-                if (result == null || !partyFilter(result.leader)) {
-                    p
-                } else {
-                    ElectedLeading(p.elected + if (result.elected) r.second else 0, p.total + r.second)
-                }
-            },
-            { p, r ->
-                val result = r.first
-                if (result == null || !partyFilter(result.leader)) {
-                    p
-                } else {
-                    ElectedLeading(p.elected - if (result.elected) r.second else 0, p.total - r.second)
-                }
-            },
-        )
+        return results.combine().map { res ->
+            res.filter { (pr, _) -> pr != null && partyFilter(pr.leader) }
+                .map { (pr, seats) -> ElectedLeading(if (pr!!.elected) seats else 0, seats) }
+                .fold(ElectedLeading(0, 0)) { a, e -> ElectedLeading(a.elected + e.elected, a.total + e.total) }
+        }
     }
 
     private fun createChangeBarPublisher(
         resultWithPrev: List<Flow.Publisher<Triple<PartyResult?, Party, Int>>>,
         partyFilter: (Party?) -> Boolean,
     ): Flow.Publisher<ElectedLeading> {
-        return resultWithPrev.mapReduce(
-            ElectedLeading(0, 0),
-            { p, r ->
-                var ret = p
-                val result = r.first
-                if (result == null) {
-                    ret
-                } else {
-                    if (partyFilter(result.leader)) {
-                        ret = ElectedLeading(ret.elected + if (result.elected) r.third else 0, ret.total + r.third)
+        return resultWithPrev.combine().map { res ->
+            res.filter { (pr, _) -> pr?.leader != null }
+                .flatMap { (pr, p, seats) ->
+                    val ret = ArrayList<ElectedLeading>()
+                    if (partyFilter(pr!!.leader)) {
+                        ret.add(ElectedLeading(if (pr.elected) seats else 0, seats))
                     }
-                    if (partyFilter(r.second)) {
-                        ret = ElectedLeading(ret.elected - if (result.elected) r.third else 0, ret.total - r.third)
+                    if (partyFilter(p)) {
+                        ret.add(ElectedLeading(if (pr.elected) -seats else 0, -seats))
                     }
                     ret
                 }
-            },
-            { p, r ->
-                var ret = p
-                val result = r.first
-                if (result == null) {
-                    ret
-                } else {
-                    if (partyFilter(result.leader)) {
-                        ret = ElectedLeading(ret.elected - if (result.elected) r.third else 0, ret.total - r.third)
-                    }
-                    if (partyFilter(r.second)) {
-                        ret = ElectedLeading(ret.elected + if (result.elected) r.third else 0, ret.total + r.third)
-                    }
-                    ret
-                }
-            },
-        )
+                .fold(ElectedLeading(0, 0)) { a, e -> ElectedLeading(a.elected + e.elected, a.total + e.total) }
+        }
     }
 }
