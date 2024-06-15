@@ -16,31 +16,20 @@ class ProjectionScreen private constructor(
     color: Flow.Publisher<out Color>,
     image: Flow.Publisher<out Image?>,
     imageAlignment: Flow.Publisher<out ProjectionFrame.Alignment>,
+    header: String,
+    override val altText: Flow.Publisher<out String?>,
 ) : JPanel(), AltTextProvider {
-
-    override val altText: Flow.Publisher<String> = text.map { t -> t?.let { "PROJECTION: $it" } ?: "PROJECTION" }
 
     companion object {
         fun createScreen(
             text: Flow.Publisher<out String?>,
             color: Flow.Publisher<out Color>,
             image: Flow.Publisher<out Image?>,
+            imageAlignment: Flow.Publisher<out ProjectionFrame.Alignment> = ProjectionFrame.Alignment.BOTTOM.asOneTimePublisher(),
+            header: String = "PROJECTION",
+            altText: Flow.Publisher<out String?> = text.map { t -> t?.let { "$header: $it" } ?: header },
         ): ProjectionScreen {
-            return ProjectionScreen(
-                text,
-                color,
-                image,
-                ProjectionFrame.Alignment.BOTTOM.asOneTimePublisher(),
-            )
-        }
-
-        fun createScreen(
-            text: Flow.Publisher<out String?>,
-            color: Flow.Publisher<out Color>,
-            image: Flow.Publisher<out Image?>,
-            imageAlignment: Flow.Publisher<out ProjectionFrame.Alignment>,
-        ): ProjectionScreen {
-            return ProjectionScreen(text, color, image, imageAlignment)
+            return ProjectionScreen(text, color, image, imageAlignment, header, altText)
         }
     }
 
@@ -49,7 +38,7 @@ class ProjectionScreen private constructor(
         background = Color.WHITE
         border = EmptyBorder(5, 5, 5, 5)
         val frame = ProjectionFrame(
-            headerPublisher = "PROJECTION".asOneTimePublisher(),
+            headerPublisher = header.asOneTimePublisher(),
             borderColorPublisher = color,
             imagePublisher = image,
             backColorPublisher = color,
