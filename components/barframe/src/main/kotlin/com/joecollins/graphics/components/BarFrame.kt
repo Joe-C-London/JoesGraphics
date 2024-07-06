@@ -25,6 +25,7 @@ import javax.swing.JPanel
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.math.roundToInt
 
 class BarFrame(
     headerPublisher: Flow.Publisher<out String?>,
@@ -67,7 +68,7 @@ class BarFrame(
     private fun drawLines(g: Graphics, top: Int, bottom: Int) {
         g.color = Color.BLACK
         for (line in lines) {
-            val level = getPixelOfValue(line.level).toInt()
+            val level = getPixelOfValue(line.level).roundToInt()
             g.drawLine(level, top, level, bottom)
         }
     }
@@ -100,7 +101,7 @@ class BarFrame(
     private fun getPixelOfValue(value: Number): Double {
         val range = max.toDouble() - min.toDouble()
         val progress = value.toDouble() - min.toDouble()
-        return (((centralPanel.width - 2 * BAR_MARGIN) * progress / range).toInt() + BAR_MARGIN).toDouble()
+        return (((centralPanel.width - 2 * BAR_MARGIN) * progress / range.coerceAtLeast(1e-6)).roundToInt() + BAR_MARGIN).toDouble()
     }
 
     private val maxLines: Int
@@ -169,12 +170,12 @@ class BarFrame(
             val mainColor = if (series.isEmpty()) Color.BLACK else series[0].first
             g.setColor(ColorUtils.contrastForBackground(mainColor))
             drawText(g, font)
-            val zero = getPixelOfValue(0.0).toInt()
+            val zero = getPixelOfValue(0.0).roundToInt()
             var posLeft = zero
             var negRight = zero
             for (seriesItem in series) {
                 g.setColor(seriesItem.first)
-                val width = getPixelOfValue(seriesItem.second).toInt() - zero
+                val width = getPixelOfValue(seriesItem.second).roundToInt() - zero
                 if (width > 0) {
                     g.fillRect(posLeft, BAR_MARGIN, width, barHeight)
                     posLeft += width
@@ -213,7 +214,7 @@ class BarFrame(
             val leftIconWidth: Int = if (leftIcon != null) {
                 val leftIconBounds = leftIcon!!.bounds
                 val leftIconScale = (barHeight - 2 * BAR_MARGIN) / leftIconBounds.getHeight()
-                (leftIconScale * leftIconBounds.getWidth()).toInt()
+                (leftIconScale * leftIconBounds.getWidth()).roundToInt()
             } else {
                 0
             }
@@ -249,10 +250,10 @@ class BarFrame(
                 val textHeight = lineFont.size
                 val textBase = (i + 1) * (barHeight + textHeight) / (leftText.size + 1)
                 leftMax = if (isNetPositive) {
-                    g.drawString(leftText[i], zero.toInt(), textBase)
+                    g.drawString(leftText[i], zero.roundToInt(), textBase)
                     max(leftMax, leftWidth + zero)
                 } else {
-                    g.drawString(leftText[i], zero.toInt() - leftWidth, textBase)
+                    g.drawString(leftText[i], zero.roundToInt() - leftWidth, textBase)
                     min(leftMax, zero - leftWidth)
                 }
             }
@@ -388,7 +389,7 @@ class BarFrame(
                 top += barHeight
             }
             for (line in lines) {
-                val left = getPixelOfValue(line.level).toInt() + BAR_MARGIN
+                val left = getPixelOfValue(line.level).roundToInt() + BAR_MARGIN
                 val labelHeight = min(line.jLabel.preferredSize.height, actualHeight - top)
                 line.jLabel.setLocation(left, actualHeight - labelHeight)
                 line.jLabel.setSize(width - left, labelHeight)

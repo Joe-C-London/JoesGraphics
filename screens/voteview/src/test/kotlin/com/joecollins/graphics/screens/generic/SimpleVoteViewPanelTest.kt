@@ -3574,7 +3574,7 @@ class SimpleVoteViewPanelTest {
     }
 
     @Test
-    fun nonPartisanVoteMisc() {
+    fun testNonPartisanVoteMisc() {
         val title = Publisher("IQALUIT-TASILUK")
         val curr = Publisher(
             mapOf(
