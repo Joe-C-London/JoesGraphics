@@ -2,6 +2,7 @@ package com.joecollins.graphics.screens.generic
 
 import com.joecollins.graphics.utils.PublisherTestUtils.assertPublishes
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
+import com.joecollins.models.general.Aggregators
 import com.joecollins.models.general.Party
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
@@ -9,12 +10,12 @@ import org.junit.jupiter.api.Test
 import java.awt.Color
 
 class PartySummaryScreenTest {
-    private var lib = Party("Liberal", "LIB", Color.RED)
-    private var con = Party("Conservative", "CON", Color.BLUE)
-    private var ndp = Party("New Democratic Party", "NDP", Color.ORANGE)
-    private var bq = Party("Bloc Qu\u00e9b\u00e9cois", "BQ", Color.CYAN.darker())
-    private var grn = Party("Green", "GRN", Color.GREEN.darker())
-    private var oth = Party.OTHERS
+    private val lib = Party("Liberal", "LIB", Color.RED)
+    private val con = Party("Conservative", "CON", Color.BLUE)
+    private val ndp = Party("New Democratic Party", "NDP", Color.ORANGE)
+    private val bq = Party("Bloc Qu\u00e9b\u00e9cois", "BQ", Color.CYAN.darker())
+    private val grn = Party("Green", "GRN", Color.GREEN.darker())
+    private val oth = Party.OTHERS
 
     @Test
     fun testBasicPartySummaryWithDiff() {
@@ -622,6 +623,163 @@ class PartySummaryScreenTest {
         )
     }
 
+    @Test
+    fun testBasicPartySummaryWithPartyChange() {
+        val pc = Party("Progressive Conservative", "PC", Color.BLUE)
+        val ca = Party("Canadian Alliance", "CA", Color.CYAN)
+
+        val canada = RegionWithPrev("Canada")
+        val bc = RegionWithPrev("British Columbia")
+        val prairies = RegionWithPrev("Prairies")
+        val ontario = RegionWithPrev("Ontario")
+        val quebec = RegionWithPrev("Qu\u00e9bec")
+        val atlantic = RegionWithPrev("Atlantic")
+        val north = RegionWithPrev("North")
+        val partySelected = Publisher(lib)
+        val screen = PartySummaryScreen.of(
+            mainRegion = canada,
+            header = { name.uppercase().asOneTimePublisher() },
+            seats = {
+                curr = { seatsPublisher }
+                prev = { prevSeatPublisher }
+            },
+            votes = {
+                currPct = { Aggregators.toPct(votePublisher) }
+                prevPct = { Aggregators.toPct(prevVotePublisher) }
+            },
+            numRows = 3,
+            regions = listOf(bc, prairies, ontario, quebec, atlantic, north),
+            party = partySelected,
+            partyChanges = mapOf(pc to con, ca to con).asOneTimePublisher(),
+        )
+        screen.setSize(1024, 512)
+        compareRendering("PartySummaryScreen", "PartyChange-1", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            LIBERAL SUMMARY
+            
+            CANADA: SEATS: 0 (±0); POPULAR VOTE: 0.0% (±0.0%)
+            
+            BRITISH COLUMBIA: SEATS: 0 (±0); POPULAR VOTE: 0.0% (±0.0%)
+            PRAIRIES: SEATS: 0 (±0); POPULAR VOTE: 0.0% (±0.0%)
+            ONTARIO: SEATS: 0 (±0); POPULAR VOTE: 0.0% (±0.0%)
+            QUÉBEC: SEATS: 0 (±0); POPULAR VOTE: 0.0% (±0.0%)
+            ATLANTIC: SEATS: 0 (±0); POPULAR VOTE: 0.0% (±0.0%)
+            NORTH: SEATS: 0 (±0); POPULAR VOTE: 0.0% (±0.0%)
+            """.trimIndent(),
+        )
+
+        atlantic.seats = mapOf(lib to 22, con to 7, ndp to 3)
+        atlantic.prevSeats = mapOf(lib to 19, pc to 9, ndp to 4)
+        atlantic.votes = mapOf(lib to 474247, con to 325272, ndp to 244871, grn to 32943, oth to 5581)
+        atlantic.prevVotes = mapOf(lib to 456797, pc to 351328, ca to 114583, ndp to 185762, grn to 968, oth to 12824)
+        canada.seats = mapOf(lib to 22, con to 7, ndp to 3)
+        canada.prevSeats = mapOf(lib to 19, pc to 9, ndp to 4)
+        canada.votes = mapOf(lib to 474247, con to 325272, ndp to 244871, grn to 32943, oth to 5581)
+        canada.prevVotes = mapOf(lib to 456797, pc to 351328, ca to 114583, ndp to 185762, grn to 968, oth to 12824)
+        compareRendering("PartySummaryScreen", "PartyChange-2", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            LIBERAL SUMMARY
+            
+            CANADA: SEATS: 22 (+3); POPULAR VOTE: 43.8% (+3.1%)
+
+            BRITISH COLUMBIA: SEATS: 0 (±0); POPULAR VOTE: 0.0% (±0.0%)
+            PRAIRIES: SEATS: 0 (±0); POPULAR VOTE: 0.0% (±0.0%)
+            ONTARIO: SEATS: 0 (±0); POPULAR VOTE: 0.0% (±0.0%)
+            QUÉBEC: SEATS: 0 (±0); POPULAR VOTE: 0.0% (±0.0%)
+            ATLANTIC: SEATS: 22 (+3); POPULAR VOTE: 43.8% (+3.1%)
+            NORTH: SEATS: 0 (±0); POPULAR VOTE: 0.0% (±0.0%)
+            """.trimIndent(),
+        )
+
+        quebec.seats = mapOf(lib to 21, bq to 54)
+        quebec.prevSeats = mapOf(lib to 36, pc to 1, bq to 38)
+        quebec.votes = mapOf(lib to 1165645, con to 301539, ndp to 158427, grn to 108660, bq to 1680109, oth to 23875)
+        quebec.prevVotes = mapOf(lib to 1529642, pc to 192153, ca to 212874, ndp to 63611, grn to 19846, bq to 1377727, oth to 61045)
+        ontario.seats = mapOf(lib to 75, con to 24, ndp to 7)
+        ontario.prevSeats = mapOf(lib to 100, ca to 2, ndp to 1)
+        ontario.votes = mapOf(lib to 2278875, con to 1607337, ndp to 921240, grn to 226812, oth to 66215)
+        ontario.prevVotes = mapOf(lib to 2292069, pc to 642438, ca to 1051209, ndp to 368709, grn to 39737, oth to 58437)
+        prairies.seats = mapOf(lib to 6, con to 46, ndp to 4)
+        prairies.prevSeats = mapOf(lib to 9, pc to 2, ca to 37, ndp to 6)
+        prairies.votes = mapOf(lib to 553602, con to 1150344, ndp to 332821, grn to 102569, oth to 36910)
+        prairies.prevVotes = mapOf(lib to 511418, pc to 260583, ca to 1094811, ndp to 283730, grn to 9205, oth to 17781)
+        north.seats = mapOf(lib to 2)
+        north.prevSeats = mapOf(lib to 2)
+        north.votes = mapOf(lib to 9135, con to 3389, ndp to 6393, grn to 831, oth to 1172)
+        north.prevVotes = mapOf(lib to 11182, pc to 1915, ca to 2273, ndp to 4840, grn to 349)
+        canada.seats = mapOf(lib to 126, con to 77, ndp to 14, bq to 54)
+        canada.prevSeats = mapOf(lib to 166, pc to 12, ca to 39, ndp to 11, bq to 38)
+        canada.votes = mapOf(lib to 4481504, con to 3387881, ndp to 1663752, grn to 471815, bq to 1680109, oth to 133753)
+        canada.prevVotes = mapOf(lib to 4801108, pc to 1448417, ca to 2475750, ndp to 906652, grn to 70105, bq to 1377727, oth to 150087)
+        compareRendering("PartySummaryScreen", "PartyChange-3", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            LIBERAL SUMMARY
+
+            CANADA: SEATS: 126 (-40); POPULAR VOTE: 37.9% (-4.8%)
+
+            BRITISH COLUMBIA: SEATS: 0 (±0); POPULAR VOTE: 0.0% (±0.0%)
+            PRAIRIES: SEATS: 6 (-3); POPULAR VOTE: 25.4% (+2.0%)
+            ONTARIO: SEATS: 75 (-25); POPULAR VOTE: 44.7% (-6.8%)
+            QUÉBEC: SEATS: 21 (-15); POPULAR VOTE: 33.9% (-10.3%)
+            ATLANTIC: SEATS: 22 (+3); POPULAR VOTE: 43.8% (+3.1%)
+            NORTH: SEATS: 2 (±0); POPULAR VOTE: 43.7% (-10.7%)
+            """.trimIndent(),
+        )
+
+        partySelected.submit(con)
+        compareRendering("PartySummaryScreen", "PartyChange-4", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            CONSERVATIVE SUMMARY
+
+            CANADA: SEATS: 77 (+26); POPULAR VOTE: 28.7% (-6.3%)
+
+            BRITISH COLUMBIA: SEATS: 0 (±0); POPULAR VOTE: 0.0% (±0.0%)
+            PRAIRIES: SEATS: 46 (+7); POPULAR VOTE: 52.9% (-9.4%)
+            ONTARIO: SEATS: 24 (+22); POPULAR VOTE: 31.5% (-6.5%)
+            QUÉBEC: SEATS: 0 (-1); POPULAR VOTE: 8.8% (-2.9%)
+            ATLANTIC: SEATS: 7 (-2); POPULAR VOTE: 30.0% (-11.5%)
+            NORTH: SEATS: 0 (±0); POPULAR VOTE: 16.2% (-4.2%)
+            """.trimIndent(),
+        )
+
+        north.seats = mapOf(lib to 3)
+        north.prevSeats = mapOf(lib to 3)
+        north.votes = mapOf(lib to 14859, con to 6007, ndp to 9609, grn to 1402, oth to 1571)
+        north.prevVotes = mapOf(lib to 15475, pc to 2906, ca to 5932, ndp to 9063, grn to 349, oth to 53)
+        bc.seats = mapOf(lib to 8, con to 22, ndp to 5, oth to 1)
+        bc.prevSeats = mapOf(lib to 5, ca to 27, ndp to 2)
+        bc.votes = mapOf(lib to 494992, con to 628999, ndp to 460435, grn to 109861, oth to 39073)
+        bc.prevVotes = mapOf(lib to 446574, pc to 117614, ca to 797519, ndp to 182993, grn to 34294, oth to 35678)
+        canada.seats = mapOf(lib to 135, con to 99, ndp to 19, bq to 54, oth to 1)
+        canada.prevSeats = mapOf(lib to 172, pc to 12, ca to 66, ndp to 13, bq to 38)
+        canada.votes = mapOf(lib to 4982220, con to 4019498, ndp to 2127403, grn to 582247, bq to 1680109, oth to 173225)
+        canada.prevVotes = mapOf(lib to 5251975, pc to 1567022, ca to 3276928, ndp to 1093868, grn to 104399, bq to 1377727, oth to 185818)
+        compareRendering("PartySummaryScreen", "PartyChange-5", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            CONSERVATIVE SUMMARY
+
+            CANADA: SEATS: 99 (+21); POPULAR VOTE: 29.6% (-8.0%)
+
+            BRITISH COLUMBIA: SEATS: 22 (-5); POPULAR VOTE: 36.3% (-20.4%)
+            PRAIRIES: SEATS: 46 (+7); POPULAR VOTE: 52.9% (-9.4%)
+            ONTARIO: SEATS: 24 (+22); POPULAR VOTE: 31.5% (-6.5%)
+            QUÉBEC: SEATS: 0 (-1); POPULAR VOTE: 8.8% (-2.9%)
+            ATLANTIC: SEATS: 7 (-2); POPULAR VOTE: 30.0% (-11.5%)
+            NORTH: SEATS: 0 (±0); POPULAR VOTE: 18.0% (-8.2%)
+            """.trimIndent(),
+        )
+    }
+
     private class Region constructor(val name: String) {
         var seats: Map<Party, Int> = emptyMap()
             set(value) {
@@ -668,5 +826,35 @@ class PartySummaryScreenTest {
                 .distinct()
                 .associateWith { (votePct[it] ?: 0.0) - (votePctDiff[it] ?: 0.0) }
         val prevVotePublisher = Publisher(prevVotePct)
+    }
+
+    private class RegionWithPrev constructor(val name: String) {
+        var seats: Map<Party, Int> = emptyMap()
+            set(value) {
+                field = value
+                seatsPublisher.submit(value)
+            }
+        val seatsPublisher = Publisher(seats)
+
+        var votes: Map<Party, Int> = emptyMap()
+            set(value) {
+                field = value
+                votePublisher.submit(value)
+            }
+        val votePublisher = Publisher(votes)
+
+        var prevSeats: Map<Party, Int> = emptyMap()
+            set(value) {
+                field = value
+                prevSeatPublisher.submit(value)
+            }
+        val prevSeatPublisher = Publisher(prevSeats)
+
+        var prevVotes: Map<Party, Int> = emptyMap()
+            set(value) {
+                field = value
+                prevVotePublisher.submit(value)
+            }
+        val prevVotePublisher = Publisher(prevVotes)
     }
 }

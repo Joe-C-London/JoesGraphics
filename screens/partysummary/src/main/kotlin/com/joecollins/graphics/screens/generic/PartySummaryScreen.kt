@@ -2,6 +2,8 @@ package com.joecollins.graphics.screens.generic
 
 import com.joecollins.graphics.GenericPanel
 import com.joecollins.graphics.components.RegionSummaryFrame
+import com.joecollins.models.general.Aggregators
+import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyOrCoalition
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.Subscriber
@@ -79,7 +81,7 @@ class PartySummaryScreen private constructor(
         }
     }
 
-    class Seats<T> internal constructor() {
+    class Seats<T> internal constructor(private val partyChanges: Flow.Publisher<out Map<out PartyOrCoalition, PartyOrCoalition>>?) {
         lateinit var curr: (T.() -> Flow.Publisher<out Map<out PartyOrCoalition, Int>>)
         var diff: (T.() -> Flow.Publisher<out Map<out PartyOrCoalition, Int>>)? = null
         var prev: (T.() -> Flow.Publisher<out Map<out PartyOrCoalition, Int>>)? = null
@@ -87,7 +89,7 @@ class PartySummaryScreen private constructor(
 
         val calculatedDiff: T.() -> Flow.Publisher<out Map<out PartyOrCoalition, Int>> by lazy {
             diff ?: {
-                curr().merge(prev!!()) { c, p ->
+                curr().merge(if (partyChanges == null) prev!!() else Aggregators.partyChanges(prev!!(), partyChanges, Int::plus)) { c, p ->
                     sequenceOf(c.keys.asSequence(), p.keys.asSequence()).flatten()
                         .distinct()
                         .associateWith { (c[it] ?: 0) - (p[it] ?: 0) }
@@ -96,7 +98,7 @@ class PartySummaryScreen private constructor(
         }
     }
 
-    class Votes<T> internal constructor() {
+    class Votes<T> internal constructor(private val partyChanges: Flow.Publisher<Map<Party, Party>>?) {
         lateinit var currPct: (T.() -> Flow.Publisher<out Map<out PartyOrCoalition, Double>>)
         var diffPct: (T.() -> Flow.Publisher<out Map<out PartyOrCoalition, Double>>)? = null
         var prevPct: (T.() -> Flow.Publisher<out Map<out PartyOrCoalition, Double>>)? = null
@@ -104,7 +106,7 @@ class PartySummaryScreen private constructor(
 
         val calculatedDiff: T.() -> Flow.Publisher<out Map<out PartyOrCoalition, Double>> by lazy {
             diffPct ?: {
-                currPct().merge(prevPct!!()) { c, p ->
+                currPct().merge(if (partyChanges == null) prevPct!!() else Aggregators.partyChanges(prevPct!!(), partyChanges, Double::plus)) { c, p ->
                     sequenceOf(c.keys.asSequence(), p.keys.asSequence()).flatten()
                         .distinct()
                         .associateWith { (c[it] ?: 0.0) - (p[it] ?: 0.0) }
@@ -177,13 +179,14 @@ class PartySummaryScreen private constructor(
             votes: (Votes<T>.() -> Unit)? = null,
             regions: List<T>,
             party: Flow.Publisher<out PartyOrCoalition>,
+            partyChanges: Flow.Publisher<Map<Party, Party>>? = null,
         ): PartySummaryScreen {
             return build(
                 mainRegion,
                 header,
                 numRows,
-                seats?.let { Seats<T>().apply(it) },
-                votes?.let { Votes<T>().apply(it) },
+                seats?.let { Seats<T>(partyChanges).apply(it) },
+                votes?.let { Votes<T>(partyChanges).apply(it) },
                 regions,
                 party,
             )
