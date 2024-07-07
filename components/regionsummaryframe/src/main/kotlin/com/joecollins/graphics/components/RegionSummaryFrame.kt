@@ -20,14 +20,17 @@ class RegionSummaryFrame private constructor(
     sectionsPublisher: Flow.Publisher<out List<Section>>,
     summaryColorPublisher: Flow.Publisher<out Color>,
     borderColorPublisher: Flow.Publisher<out Color>? = null,
+    notesPublisher: Flow.Publisher<out String>? = null,
 ) : GraphicsFrame(
     headerPublisher = headerPublisher,
     borderColorPublisher = borderColorPublisher,
+    notesPublisher = notesPublisher,
 ) {
     constructor(
         headerPublisher: Flow.Publisher<out String>,
         sectionsPublisher: Flow.Publisher<out List<SectionWithoutColor>>,
         summaryColorPublisher: Flow.Publisher<out Color>,
+        notesPublisher: Flow.Publisher<out String>? = null,
     ) : this(
         headerPublisher,
         sectionsPublisher.merge(summaryColorPublisher) { sections, color ->
@@ -35,16 +38,19 @@ class RegionSummaryFrame private constructor(
         },
         summaryColorPublisher,
         summaryColorPublisher,
+        notesPublisher,
     )
 
     constructor(
         headerPublisher: Flow.Publisher<out String>,
         sectionsPublisher: Flow.Publisher<out List<Section>>,
+        notesPublisher: Flow.Publisher<out String>? = null,
     ) : this(
         headerPublisher,
         sectionsPublisher,
         Color.BLACK.asOneTimePublisher(),
         Color.BLACK.asOneTimePublisher(),
+        notesPublisher,
     )
 
     private val centralPanel: JPanel = JPanel()
