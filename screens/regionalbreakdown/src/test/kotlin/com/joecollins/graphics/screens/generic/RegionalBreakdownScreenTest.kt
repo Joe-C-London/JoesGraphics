@@ -738,6 +738,56 @@ class RegionalBreakdownScreenTest {
     }
 
     @Test
+    fun testSeatsNoProgress() {
+        val peiSeats = Publisher<Map<Party, Int>>(emptyMap())
+        val cardiganSeats = Publisher<Map<Party, Int>>(emptyMap())
+        val malpequeSeats = Publisher<Map<Party, Int>>(emptyMap())
+        val charlottetownSeats = Publisher<Map<Party, Int>>(emptyMap())
+        val egmontSeats = Publisher<Map<Party, Int>>(emptyMap())
+        val screen = RegionalBreakdownScreen.of(
+            entries = seats(
+                topRowHeader = "PRINCE EDWARD ISLAND".asOneTimePublisher(),
+                topRowSeats = peiSeats,
+            ) {
+                section(
+                    items = listOf(
+                        Pair("CARDIGAN", cardiganSeats),
+                        Pair("MALPEQUE", malpequeSeats),
+                        Pair("CHARLOTTETOWN", charlottetownSeats),
+                        Pair("EGMONT", egmontSeats),
+                    ),
+                    header = { first.asOneTimePublisher() },
+                    seats = { second },
+                )
+            },
+            header = "SEATS BY REGION".asOneTimePublisher(),
+            title = "PRINCE EDWARD ISLAND".asOneTimePublisher(),
+        )
+        screen.setSize(1024, 512)
+
+        peiSeats.submit(mapOf(pc to 13, grn to 8, lib to 6))
+        cardiganSeats.submit(mapOf(pc to 6, grn to 1))
+        malpequeSeats.submit(mapOf(pc to 5, grn to 1, lib to 1))
+        charlottetownSeats.submit(mapOf(grn to 3, lib to 2, pc to 1))
+        egmontSeats.submit(mapOf(grn to 3, lib to 3, pc to 1))
+        compareRendering("RegionalBreakdownScreen", "Seats-NoProgress", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            PRINCE EDWARD ISLAND
+            SEATS BY REGION
+            
+            PRINCE EDWARD ISLAND: PC 13, GRN 8, LIB 6
+            
+            CARDIGAN: PC 6, GRN 1
+            MALPEQUE: PC 5, GRN 1, LIB 1
+            CHARLOTTETOWN: PC 1, GRN 3, LIB 2
+            EGMONT: PC 1, GRN 3, LIB 3
+            """.trimIndent(),
+        )
+    }
+
+    @Test
     fun testVotes() {
         val peiVotes = Publisher<Map<Party, Int>>(emptyMap())
         val cardiganVotes = Publisher<Map<Party, Int>>(emptyMap())
@@ -1543,6 +1593,57 @@ class RegionalBreakdownScreenTest {
             ALBERTA: CON 69.1% (+9.0), LIB 13.8% (-11.0), NDP 11.6% (-0.1), OTH 5.5% (+2.2), 100.0% IN
             BRITISH COLUMBIA: CON 34.0% (+3.8), LIB 26.2% (-9.2), NDP 24.4% (-1.7), OTH 15.5% (+7.1), 100.0% IN
             NORTHERN CANADA: CON 28.1% (+5.8), LIB 34.7% (-15.0), NDP 28.4% (+2.8), OTH 8.9% (+6.5), 100.0% IN
+            """.trimIndent(),
+        )
+    }
+
+    @Test
+    fun testVotesNoProgress() {
+        val peiVotes = Publisher<Map<Party, Int>>(emptyMap())
+        val cardiganVotes = Publisher<Map<Party, Int>>(emptyMap())
+        val malpequeVotes = Publisher<Map<Party, Int>>(emptyMap())
+        val charlottetownVotes = Publisher<Map<Party, Int>>(emptyMap())
+        val egmontVotes = Publisher<Map<Party, Int>>(emptyMap())
+
+        val screen = RegionalBreakdownScreen.of(
+            entries = votes(
+                topRowHeader = "PRINCE EDWARD ISLAND".asOneTimePublisher(),
+                topRowVotes = peiVotes,
+            ) {
+                section(
+                    items = listOf(
+                        Pair("CARDIGAN", cardiganVotes),
+                        Pair("MALPEQUE", malpequeVotes),
+                        Pair("CHARLOTTETOWN", charlottetownVotes),
+                        Pair("EGMONT", egmontVotes),
+                    ),
+                    header = { first.asOneTimePublisher() },
+                    votes = { second },
+                )
+            },
+            header = "VOTES BY REGION".asOneTimePublisher(),
+            title = "PRINCE EDWARD ISLAND".asOneTimePublisher(),
+        )
+        screen.setSize(1024, 512)
+
+        peiVotes.submit(mapOf(lib to 24346, pc to 30415, grn to 25302, ndp to 2454, ind to 282))
+        cardiganVotes.submit(mapOf(lib to 5265, pc to 9714, grn to 5779, ndp to 277))
+        malpequeVotes.submit(mapOf(lib to 5548, pc to 9893, grn to 7378, ndp to 244, ind to 80))
+        charlottetownVotes.submit(mapOf(lib to 6078, pc to 4932, grn to 6591, ndp to 674, ind to 202))
+        egmontVotes.submit(mapOf(lib to 7455, pc to 5876, grn to 5554, ndp to 1259))
+        compareRendering("RegionalBreakdownScreen", "Votes-NoProgress", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            PRINCE EDWARD ISLAND
+            VOTES BY REGION
+            
+            PRINCE EDWARD ISLAND: PC 36.7%, GRN 30.6%, LIB 29.4%, NDP 3.0%, IND 0.3%
+            
+            CARDIGAN: PC 46.2%, GRN 27.5%, LIB 25.0%, NDP 1.3%, IND 0.0%
+            MALPEQUE: PC 42.7%, GRN 31.9%, LIB 24.0%, NDP 1.1%, IND 0.3%
+            CHARLOTTETOWN: PC 26.7%, GRN 35.7%, LIB 32.9%, NDP 3.6%, IND 1.1%
+            EGMONT: PC 29.2%, GRN 27.6%, LIB 37.0%, NDP 6.2%, IND 0.0%
             """.trimIndent(),
         )
     }

@@ -46,7 +46,7 @@ class RegionalBreakdownScreen private constructor(
         seats: Flow.Publisher<out Map<out PartyOrCoalition, Int>>,
         prev: Flow.Publisher<out Map<out PartyOrCoalition, Int>>?,
         diff: Flow.Publisher<out Map<out PartyOrCoalition, Int>>?,
-        total: Flow.Publisher<Int>,
+        total: Flow.Publisher<Int>? = null,
         private val maxColumns: Flow.Publisher<Int>?,
     ) {
         private val consolidatedDiff = diff ?: toDiff(seats, prev)
@@ -90,7 +90,7 @@ class RegionalBreakdownScreen private constructor(
             seats: T.() -> Flow.Publisher<out Map<out PartyOrCoalition, Int>>,
             prev: (T.() -> Flow.Publisher<out Map<out PartyOrCoalition, Int>>)? = null,
             diff: (T.() -> Flow.Publisher<out Map<out PartyOrCoalition, Int>>)? = null,
-            total: T.() -> Flow.Publisher<Int>,
+            total: (T.() -> Flow.Publisher<Int>)? = null,
             coalitionMap: (T.() -> Flow.Publisher<Map<Coalition, Party>>?)? = null,
         ) {
             val consolidatedDiff = diff ?: prev?.let { p -> { toDiff(seats(), p()) } }
@@ -102,7 +102,7 @@ class RegionalBreakdownScreen private constructor(
                         abbreviatedHeader = it.abbreviatedHeader(),
                         seats = it.seats(),
                         diff = consolidatedDiff?.invoke(it),
-                        total = it.total(),
+                        total = total?.invoke(it),
                         coalitionMap = coalitionMap?.invoke(it),
                     )
                 },
@@ -114,7 +114,7 @@ class RegionalBreakdownScreen private constructor(
             private val abbreviatedHeader: Flow.Publisher<String>,
             seats: Flow.Publisher<out Map<out PartyOrCoalition, Int>>,
             diff: Flow.Publisher<out Map<out PartyOrCoalition, Int>>?,
-            total: Flow.Publisher<Int>,
+            total: Flow.Publisher<Int>? = null,
             coalitionMap: Flow.Publisher<Map<Coalition, Party>>?,
         ) : Entry {
             private val transformedPartyOrder = transformPartyOrder(partyOrder, coalitionMap)
@@ -143,8 +143,12 @@ class RegionalBreakdownScreen private constructor(
                 val seatItems = seatsWithDiff.merge(transformedPartyOrder) { (s, d), po ->
                     po.map { party -> party.color to seatDiffString(s[party] ?: 0, if (d == null) null else (d[party] ?: 0)) }
                 }
-                val totalItem = filteredSeats.merge(total) { s, t ->
-                    listOf(Color.WHITE to "${s.values.sum()}/$t")
+                val totalItem = if (total == null) {
+                    emptyList<Pair<Color, String>>().asOneTimePublisher()
+                } else {
+                    filteredSeats.merge(total) { s, t ->
+                        listOf(Color.WHITE to "${s.values.sum()}/$t")
+                    }
                 }
                 seatItems.merge(totalItem) { a, b -> a + b }
             }
@@ -158,8 +162,12 @@ class RegionalBreakdownScreen private constructor(
                     po.filter { party -> s.contains(party) || (d?.contains(party) ?: false) }
                         .map { party -> party.abbreviation + " " + seatDiffString(s[party] ?: 0, if (d == null) null else (d[party] ?: 0)) }
                 }
-                val totalItem = filteredSeats.merge(total) { s, t ->
-                    listOf("${s.values.sum()}/$t")
+                val totalItem = if (total == null) {
+                    emptyList<String>().asOneTimePublisher()
+                } else {
+                    filteredSeats.merge(total) { s, t ->
+                        listOf("${s.values.sum()}/$t")
+                    }
                 }
                 seatItems.merge(totalItem) { a, b -> a + b }
                     .merge(abbreviatedHeader) { i, h -> h + ": " + i.joinToString(", ") }
@@ -172,7 +180,7 @@ class RegionalBreakdownScreen private constructor(
         abbreviatedHeader: Flow.Publisher<String> = header,
         votes: Flow.Publisher<out Map<out PartyOrCoalition, Int>>,
         prev: Flow.Publisher<out Map<out PartyOrCoalition, Int>>?,
-        reporting: ReportingString,
+        reporting: ReportingString? = null,
         private val maxColumns: Flow.Publisher<Int>?,
     ) {
         private val partyOrder = votes.map(::extractPartyOrder)
@@ -194,7 +202,7 @@ class RegionalBreakdownScreen private constructor(
             abbreviatedHeader: T.() -> Flow.Publisher<String> = header,
             votes: T.() -> Flow.Publisher<out Map<out PartyOrCoalition, Int>>,
             prev: (T.() -> Flow.Publisher<out Map<out PartyOrCoalition, Int>>)? = null,
-            reporting: T.() -> ReportingString,
+            reporting: (T.() -> ReportingString)? = null,
             coalitionMap: (T.() -> Flow.Publisher<Map<Coalition, Party>>?)? = null,
         ) {
             entries.add(BlankEntry)
@@ -205,7 +213,7 @@ class RegionalBreakdownScreen private constructor(
                         it.abbreviatedHeader(),
                         it.votes(),
                         prev?.invoke(it),
-                        it.reporting(),
+                        reporting?.invoke(it),
                         coalitionMap?.invoke(it),
                     )
                 },
@@ -217,7 +225,7 @@ class RegionalBreakdownScreen private constructor(
             private val abbreviatedHeader: Flow.Publisher<String>,
             votes: Flow.Publisher<out Map<out PartyOrCoalition, Int>>,
             prev: Flow.Publisher<out Map<out PartyOrCoalition, Int>>?,
-            reporting: ReportingString,
+            reporting: ReportingString? = null,
             coalitionMap: Flow.Publisher<Map<Coalition, Party>>?,
         ) : Entry {
             private val transformedPartyOrder = transformPartyOrder(partyOrder, coalitionMap)
@@ -253,7 +261,7 @@ class RegionalBreakdownScreen private constructor(
                 val pctEntries = pctWithDiff.merge(transformedPartyOrder) { (p, d), po ->
                     po.map { party -> party.color to pctDiffString(p[party] ?: 0.0, if (d == null) null else (d[party] ?: 0.0)) }
                 }
-                val reportingEntries = reporting.reporting().map { listOf(Color.WHITE to it) }
+                val reportingEntries = reporting?.reporting()?.map { listOf(Color.WHITE to it) } ?: emptyList<Pair<Color, String>>().asOneTimePublisher()
                 pctEntries.merge(reportingEntries) { a, b -> a + b }
             }
 
@@ -261,7 +269,7 @@ class RegionalBreakdownScreen private constructor(
                 val pctEntries = pctWithDiff.merge(transformedPartyOrder) { (p, d), po ->
                     po.map { party -> party.abbreviation + " " + pctDiffString(p[party] ?: 0.0, if (d == null) null else (d[party] ?: 0.0)) }
                 }
-                val reportingEntries = reporting.reporting().map { listOf(it) }
+                val reportingEntries = reporting?.reporting()?.map { listOf(it) } ?: emptyList<String>().asOneTimePublisher()
                 pctEntries.merge(reportingEntries) { a, b -> a + b }
                     .merge(abbreviatedHeader) { i, h -> "$h: ${i.joinToString(", ")}" }
             }
@@ -307,7 +315,7 @@ class RegionalBreakdownScreen private constructor(
             topRowSeats: Flow.Publisher<out Map<out PartyOrCoalition, Int>>,
             topRowPrev: Flow.Publisher<out Map<out PartyOrCoalition, Int>>? = null,
             topRowDiff: Flow.Publisher<out Map<out PartyOrCoalition, Int>>? = null,
-            topRowTotal: Flow.Publisher<Int>,
+            topRowTotal: Flow.Publisher<Int>? = null,
             maxColumns: Flow.Publisher<Int>? = null,
             builder: SeatEntries.() -> Unit,
         ): List<Entry> {
@@ -327,7 +335,7 @@ class RegionalBreakdownScreen private constructor(
             topRowAbbreviatedHeader: Flow.Publisher<String> = topRowHeader,
             topRowVotes: Flow.Publisher<out Map<out PartyOrCoalition, Int>>,
             topRowPrev: Flow.Publisher<out Map<out PartyOrCoalition, Int>>? = null,
-            topRowReporting: ReportingString,
+            topRowReporting: ReportingString? = null,
             maxColumns: Flow.Publisher<Int>? = null,
             builder: VoteEntries.() -> Unit,
         ): List<Entry> {
