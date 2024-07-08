@@ -272,4 +272,78 @@ class RegionalSwingsScreenTest {
             """.trimIndent(),
         )
     }
+
+    @Test
+    fun testRegionalSwingsPartyChange() {
+        data class Region(
+            val name: String,
+            val curr: Map<PartyOrCoalition, Int>,
+            val prev: Map<PartyOrCoalition, Int>,
+        )
+        val lib = Party("Liberal", "LIB", Color.RED)
+        val pc = Party("Progressive Conservative", "PC", Color.BLUE)
+        val ca = Party("Canadian Alliance", "CA", Color.CYAN)
+        val con = Party("Conservative", "CON", Color.BLUE)
+        val ndp = Party("New Democratic Party", "NDP", Color.ORANGE)
+        val bq = Party("Bloc Qu\u00e9b\u00e9cois", "BQ", Color.CYAN.darker())
+        val grn = Party("Green", "GRN", Color.GREEN.darker())
+        val oth = Party.OTHERS
+        val regions = listOf(
+            Region(
+                "Atlantic",
+                mapOf(lib to 474247, con to 325272, ndp to 244871, grn to 32943, oth to 5581),
+                mapOf(lib to 456797, pc to 351328, ca to 114583, ndp to 185762, grn to 968, oth to 12824),
+            ),
+            Region(
+                "Québec",
+                mapOf(lib to 1165645, con to 301539, ndp to 158427, grn to 108660, bq to 1680109, oth to 23875),
+                mapOf(lib to 1529642, pc to 192153, ca to 212874, ndp to 63611, grn to 19846, bq to 1377727, oth to 61045),
+            ),
+            Region(
+                "Ontario",
+                mapOf(lib to 2278875, con to 1607337, ndp to 921240, grn to 226812, oth to 66215),
+                mapOf(lib to 2292069, pc to 642438, ca to 1051209, ndp to 368709, grn to 39737, oth to 58437),
+            ),
+            Region(
+                "Prairies",
+                mapOf(lib to 553602, con to 1150344, ndp to 332821, grn to 102569, oth to 36910),
+                mapOf(lib to 511418, pc to 260583, ca to 1094811, ndp to 283730, grn to 9205, oth to 17781),
+            ),
+            Region(
+                "British Columbia",
+                mapOf(lib to 494992, con to 628999, ndp to 460435, grn to 109861, oth to 39073),
+                mapOf(lib to 446574, pc to 117614, ca to 797519, ndp to 182993, grn to 34294, oth to 35678),
+            ),
+            Region(
+                "North",
+                mapOf(lib to 14859, con to 6007, ndp to 9609, grn to 1402, oth to 1571),
+                mapOf(lib to 15475, pc to 2906, ca to 5932, ndp to 9063, grn to 349, oth to 53),
+            ),
+        )
+        val screen = RegionalSwingsScreen.of(
+            regions = regions,
+            name = { name.uppercase().asOneTimePublisher() },
+            currVotes = { curr.asOneTimePublisher() },
+            prevVotes = { prev.asOneTimePublisher() },
+            swingOrder = listOf(ndp, grn, lib, oth, pc, bq, con, ca),
+            numRows = 2,
+            title = "CANADA".asOneTimePublisher(),
+            partyChanges = mapOf(pc to con, ca to con).asOneTimePublisher(),
+        )
+        screen.setSize(1024, 512)
+        compareRendering("RegionalSwingsScreen", "PartyChange", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            CANADA
+
+            ATLANTIC: 7.3% SWING CON TO LIB
+            QUÉBEC: 9.7% SWING LIB TO BQ
+            ONTARIO: 0.1% SWING LIB TO CON
+            PRAIRIES: 5.7% SWING CON TO LIB
+            BRITISH COLUMBIA: 10.6% SWING CON TO LIB
+            NORTH: 1.6% SWING LIB TO NDP
+            """.trimIndent(),
+        )
+    }
 }

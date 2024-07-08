@@ -2,6 +2,7 @@ package com.joecollins.graphics.screens.generic
 
 import com.joecollins.graphics.GenericPanel
 import com.joecollins.graphics.components.SwingFrameBuilder
+import com.joecollins.models.general.Aggregators
 import com.joecollins.models.general.PartyOrCoalition
 import com.joecollins.pubsub.combine
 import com.joecollins.pubsub.merge
@@ -28,11 +29,12 @@ class RegionalSwingsScreen private constructor(
             progressLabel: (R.() -> Flow.Publisher<out String?>)? = null,
             swingRange: Flow.Publisher<Double>? = null,
             partyFilter: Flow.Publisher<out Collection<PartyOrCoalition>>? = null,
+            partyChanges: Flow.Publisher<out Map<out PartyOrCoalition, PartyOrCoalition>>? = null,
             title: Flow.Publisher<String>,
         ): RegionalSwingsScreen {
             val swings = regions.map {
                 it to SwingFrameBuilder.prevCurr(
-                    prev = it.prevVotes(),
+                    prev = if (partyChanges == null) it.prevVotes() else Aggregators.partyChanges(it.prevVotes(), partyChanges),
                     curr = it.currVotes(),
                     partyOrder = swingOrder,
                     selectedParties = partyFilter,
