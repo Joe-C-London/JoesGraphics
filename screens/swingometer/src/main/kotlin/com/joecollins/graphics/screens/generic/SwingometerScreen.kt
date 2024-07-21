@@ -7,6 +7,9 @@ import com.joecollins.graphics.components.SwingometerFrameBuilder.dots
 import com.joecollins.graphics.components.SwingometerFrameBuilder.every
 import com.joecollins.graphics.components.SwingometerFrameBuilder.labels
 import com.joecollins.models.general.Party
+import com.joecollins.models.general.PartyOrCandidate
+import com.joecollins.models.general.PartyOrCandidate.Companion.convertToParty
+import com.joecollins.models.general.PartyOrCandidate.Companion.convertToPartyOrCandidate
 import com.joecollins.models.general.PartyOrCoalition
 import com.joecollins.models.general.PartyResult
 import com.joecollins.models.general.ResultColorUtils.getColor
@@ -25,8 +28,11 @@ import kotlin.math.roundToInt
 class SwingometerScreen private constructor(title: Flow.Publisher<out String?>, frame: SwingometerFrame, altText: Flow.Publisher<String>) : GenericPanel(pad(frame), title, altText) {
 
     companion object {
+        fun <T> Flow.Publisher<out Map<T, Map<out Party, Int>>>.convertToPartyOrCandidateForSwingometer() =
+            map { it.mapValues { e -> e.value.convertToPartyOrCandidate() } }
+
         fun <T> of(
-            prevVotes: Flow.Publisher<out Map<T, Map<out PartyOrCoalition, Int>>>,
+            prevVotes: Flow.Publisher<out Map<T, Map<out PartyOrCandidate, Int>>>,
             results: Flow.Publisher<out Map<T, PartyResult?>>,
             swing: Flow.Publisher<out Map<out PartyOrCoalition, Double>>,
             parties: Flow.Publisher<out Pair<PartyOrCoalition, PartyOrCoalition>>,
@@ -155,7 +161,7 @@ class SwingometerScreen private constructor(title: Flow.Publisher<out String?>, 
     }
 
     private class Inputs<T> {
-        var prevVotes: Map<T, Map<out PartyOrCoalition, Int>> = emptyMap()
+        var prevVotes: Map<T, Map<out PartyOrCandidate, Int>> = emptyMap()
             set(value) {
                 synchronized(this) {
                     field = value
@@ -345,12 +351,13 @@ class SwingometerScreen private constructor(title: Flow.Publisher<out String?>, 
                     val winner = e.first.value.entries
                         .maxByOrNull { it.value }!!
                         .key
-                    winner == parties.first || winner == parties.second
+                        .party
+                    parties.toList().flatMap { it.constituentParties }.contains(winner)
                 }
                 .map { e ->
                     val total = e.first.value.values.sum()
-                    val left = e.first.value[parties.first] ?: 0
-                    val right = e.first.value[parties.second] ?: 0
+                    val left = parties.first.constituentParties.sumOf { e.first.value.convertToParty()[it] ?: 0 }
+                    val right = parties.second.constituentParties.sumOf { e.first.value.convertToParty()[it] ?: 0 }
                     Dot(
                         0.5 * (left - right) / total,
                         e.second.getColor(default = Color.LIGHT_GRAY),
@@ -391,9 +398,9 @@ class SwingometerScreen private constructor(title: Flow.Publisher<out String?>, 
         }
 
         private fun getSwingNeededForMajority(
-            votes: Map<T, Map<out PartyOrCoalition, Int>>,
-            focusParty: PartyOrCoalition?,
-            compParty: PartyOrCoalition?,
+            votes: Map<T, Map<out PartyOrCandidate, Int>>,
+            focusParty: PartyOrCoalition,
+            compParty: PartyOrCoalition,
             carryovers: Map<Party, Int>,
         ): Double {
             val majority = (votes.keys.sumOf { weightsAbsolute(it) } + carryovers.values.sum()) / 2 + 1
@@ -404,22 +411,22 @@ class SwingometerScreen private constructor(title: Flow.Publisher<out String?>, 
         }
 
         private fun createSwingList(
-            results: Map<T, Map<out PartyOrCoalition, Int>>,
-            focusParty: PartyOrCoalition?,
-            compParty: PartyOrCoalition?,
+            results: Map<T, Map<out PartyOrCandidate, Int>>,
+            focusParty: PartyOrCoalition,
+            compParty: PartyOrCoalition,
             carryovers: Map<Party, Int>,
         ): List<Double> {
             val contestedSeats = results.asSequence()
                 .filter { m ->
-                    val winner = m.value.entries.maxByOrNull { it.value }!!.key
-                    winner == focusParty || winner == compParty
+                    val winner = m.value.entries.maxByOrNull { it.value }!!.key.party
+                    focusParty.constituentParties.contains(winner) || compParty.constituentParties.contains(winner)
                 }
                 .flatMap { m ->
                     val total = m.value.values.sum()
-                    val focus = m.value[focusParty] ?: 0
-                    val comp = m.value[compParty] ?: 0
+                    val focus = focusParty.constituentParties.sumOf { m.value.convertToParty()[it] ?: 0 }
+                    val comp = compParty.constituentParties.sumOf { m.value.convertToParty()[it] ?: 0 }
                     val position = if (total == 0) {
-                        if (m.value.containsKey(focusParty)) Double.NEGATIVE_INFINITY else Double.POSITIVE_INFINITY
+                        if (m.value.convertToParty().containsKey(focusParty)) Double.NEGATIVE_INFINITY else Double.POSITIVE_INFINITY
                     } else {
                         0.5 * (comp - focus) / total
                     }
@@ -524,7 +531,7 @@ class SwingometerScreen private constructor(title: Flow.Publisher<out String?>, 
             rightSwingList: List<Double>,
             leftSeats: Int,
             rightSeats: Int,
-            prevVotes: Map<T, Map<out PartyOrCoalition, Int>>,
+            prevVotes: Map<T, Map<out PartyOrCandidate, Int>>,
             seatLabelIncrement: Int,
             parties: Pair<PartyOrCoalition, PartyOrCoalition>,
             carryovers: Map<out PartyOrCoalition, Int>,

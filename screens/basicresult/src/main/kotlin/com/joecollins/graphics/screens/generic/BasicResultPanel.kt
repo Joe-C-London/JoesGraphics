@@ -5,7 +5,6 @@ import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyOrCoalition
 import com.joecollins.models.general.PartyResult
-import com.joecollins.models.general.toParty
 import java.awt.Shape
 
 object BasicResultPanel {

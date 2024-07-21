@@ -7,7 +7,6 @@ import com.joecollins.graphics.components.SwingFrame
 import com.joecollins.graphics.components.SwingFrameBuilder
 import com.joecollins.models.general.PartyOrCoalition
 import com.joecollins.models.general.PartyResult
-import com.joecollins.models.general.toParty
 import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.map
 import com.joecollins.pubsub.merge

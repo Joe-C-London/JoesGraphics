@@ -1,9 +1,13 @@
 package com.joecollins.graphics.screens.generic
 
 import com.joecollins.graphics.screens.generic.SwingometerScreen.Companion.calculateSwing
+import com.joecollins.graphics.screens.generic.SwingometerScreen.Companion.convertToPartyOrCandidateForSwingometer
 import com.joecollins.graphics.utils.PublisherTestUtils.assertPublishes
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
+import com.joecollins.models.general.Coalition
 import com.joecollins.models.general.Party
+import com.joecollins.models.general.PartyOrCandidate
+import com.joecollins.models.general.PartyOrCoalition
 import com.joecollins.models.general.PartyResult
 import com.joecollins.models.general.PartyResult.Companion.elected
 import com.joecollins.pubsub.Publisher
@@ -29,7 +33,7 @@ class SwingometerScreenTest {
             ),
         )
         val panel = SwingometerScreen.of(
-            prevVotes = prevResult,
+            prevVotes = prevResult.convertToPartyOrCandidateForSwingometer(),
             results = currResult,
             swing = swing,
             parties = parties,
@@ -94,7 +98,7 @@ class SwingometerScreenTest {
         val parties = Publisher(Pair(lib, pc))
         val swing = Publisher<Map<Party, Double>>(emptyMap())
         val panel = SwingometerScreen.of(
-            prevVotes = prevResult,
+            prevVotes = prevResult.convertToPartyOrCandidateForSwingometer(),
             results = currResult,
             swing = swing,
             parties = parties,
@@ -164,7 +168,7 @@ class SwingometerScreenTest {
             ),
         )
         val panel = SwingometerScreen.of(
-            prevVotes = prevResult,
+            prevVotes = prevResult.convertToPartyOrCandidateForSwingometer(),
             results = currResult,
             swing = swing,
             parties = parties,
@@ -238,7 +242,7 @@ class SwingometerScreenTest {
             ),
         )
         val panel = SwingometerScreen.of(
-            prevVotes = prevResult,
+            prevVotes = prevResult.convertToPartyOrCandidateForSwingometer(),
             results = currResult,
             swing = swing,
             parties = parties,
@@ -272,7 +276,7 @@ class SwingometerScreenTest {
         val curr = Publisher(mapOf(pc to 147790, lib to 129025, grn to 57252, pa to 34526, ndp to 6220, ind to 824))
         val prev = Publisher(mapOf(pc to 121300, lib to 143791, grn to 45186, pa to 47860, ndp to 19039, ind to 3187))
         val panel = SwingometerScreen.of(
-            prevVotes = prevResult,
+            prevVotes = prevResult.convertToPartyOrCandidateForSwingometer(),
             results = currResult,
             swing = calculateSwing(
                 currTotal = curr,
@@ -376,7 +380,7 @@ class SwingometerScreenTest {
         ).asOneTimePublisher()
         val parties = Publisher(dem to gop)
         val panel = SwingometerScreen.of(
-            prevVotes = prevResult,
+            prevVotes = prevResult.convertToPartyOrCandidateForSwingometer(),
             results = emptyMap<String, PartyResult?>().asOneTimePublisher(),
             swing = emptyMap<Party, Double>().asOneTimePublisher(),
             parties = parties,
@@ -462,7 +466,7 @@ class SwingometerScreenTest {
         ).asOneTimePublisher()
         val parties = Publisher(dem to gop)
         val panel = SwingometerScreen.of(
-            prevVotes = prevResult,
+            prevVotes = prevResult.convertToPartyOrCandidateForSwingometer(),
             results = emptyMap<String, PartyResult?>().asOneTimePublisher(),
             swing = emptyMap<Party, Double>().asOneTimePublisher(),
             parties = parties,
@@ -570,7 +574,7 @@ class SwingometerScreenTest {
         ).asOneTimePublisher()
         val parties = Publisher(dem to gop)
         val panel = SwingometerScreen.of(
-            prevVotes = prevResult,
+            prevVotes = prevResult.convertToPartyOrCandidateForSwingometer(),
             results = emptyMap<Pair<String, Int>, PartyResult?>().asOneTimePublisher(),
             swing = emptyMap<Party, Double>().asOneTimePublisher(),
             parties = parties,
@@ -608,6 +612,227 @@ class SwingometerScreenTest {
             
             GOP NEEDS TO AVOID 0.4% SWING TO DEM TO HOLD MAJORITY
             DEM NEEDS 0.4% SWING FROM GOP TO GAIN MAJORITY
+            """.trimIndent(),
+        )
+    }
+
+    @Test
+    fun testCoalitions() {
+        val alp = Party("Labor", "ALP", Color.RED)
+        val lib = Party("Liberal", "LIB", Color.BLUE)
+        val nat = Party("National", "NAT", Color.GREEN.darker().darker())
+        val coa = Coalition("Liberal/National Coalition", "L/NP", Color.BLUE, lib, nat)
+        val grn = Party("Greens", "GRN", Color.GREEN)
+        val sff = Party("Shooters, Fishers, Farmers", "SFF", Color.RED.darker())
+        val ind = Party("Independent", "IND", Party.OTHERS.color)
+
+        val prev2CPVotes = mapOf(
+            "Albury" to mapOf(lib to 28258, alp to 14752),
+            "Auburn" to mapOf(alp to 24419, lib to 16876),
+            "Ballina" to mapOf(grn to 24645, nat to 19824),
+            "Balmain" to mapOf(grn to 24074, alp to 16037),
+            "Bankstown" to mapOf(alp to 25735, lib to 14590),
+            "Barwon" to mapOf(sff to 19901, nat to 15258),
+            "Bathurst" to mapOf(nat to 30130, alp to 14242),
+            "Baulkham Hills" to mapOf(lib to 31658, alp to 14434),
+            "Bega" to mapOf(lib to 26210, alp to 19830),
+            "Blacktown" to mapOf(alp to 28020, lib to 13348),
+            "Blue Mountains" to mapOf(alp to 28834, lib to 15620),
+            "Cabramatta" to mapOf(alp to 25089, ind to 14818),
+            "Camden" to mapOf(lib to 29556, alp to 21796),
+            "Campbelltown" to mapOf(alp to 27026, lib to 13305),
+            "Canterbury" to mapOf(alp to 28358, lib to 16634),
+            "Castle Hill" to mapOf(lib to 37043, alp to 12561),
+            "Cessnock" to mapOf(alp to 30229, nat to 13364),
+            "Charlestown" to mapOf(alp to 28270, lib to 17069),
+            "Clarence" to mapOf(nat to 25985, alp to 14322),
+            "Coffs Harbour" to mapOf(nat to 22375, ind to 14730),
+            "Coogee" to mapOf(alp to 21510, lib to 20141),
+            "Cootamundra" to mapOf(nat to 32504, alp to 9673),
+            "Cronulla" to mapOf(lib to 33349, alp to 14556),
+            "Davidson" to mapOf(lib to 33440, grn to 11004),
+            "Drummonye" to mapOf(lib to 28878, alp to 15552),
+            "Dubbo" to mapOf(nat to 19920, ind to 18370),
+            "East Hills" to mapOf(lib to 21646, alp to 21217),
+            "Epping" to mapOf(lib to 28584, alp to 17238),
+            "Fairfield" to mapOf(alp to 26848, lib to 12675),
+            "Gosford" to mapOf(alp to 25048, lib to 18691),
+            "Goulburn" to mapOf(lib to 22539, alp to 19398),
+            "Granville" to mapOf(alp to 23629, lib to 17365),
+            "Hawkesbury" to mapOf(lib to 26935, alp to 12982),
+            "Heathcote" to mapOf(lib to 26174, alp to 21450),
+            "Heffron" to mapOf(alp to 28874, lib to 15462),
+            "Holsworthy" to mapOf(lib to 22861, alp to 20042),
+            "Hornsby" to mapOf(lib to 28700, alp to 14585),
+            "Keira" to mapOf(alp to 33744, lib to 14635),
+            "Kiama" to mapOf(lib to 28016, alp to 17167),
+            "Kogarah" to mapOf(alp to 21544, lib to 20073),
+            "Ku-ring-gai" to mapOf(lib to 31027, alp to 12969),
+            "Lake Macquarie" to mapOf(ind to 31164, alp to 12053),
+            "Lakemba" to mapOf(alp to 29245, lib to 11136),
+            "Lane Cove" to mapOf(lib to 29042, alp to 16092),
+            "Lismore" to mapOf(alp to 21856, nat to 20710),
+            "Liverpool" to mapOf(alp to 27951, lib to 13945),
+            "Londonderry" to mapOf(alp to 27442, lib to 21163),
+            "Macquarie Fields" to mapOf(alp to 29944, lib to 16301),
+            "Maitland" to mapOf(alp to 27211, lib to 15835),
+            "Manly" to mapOf(lib to 26628, grn to 15706),
+            "Maroubra" to mapOf(alp to 24026, lib to 17069),
+            "Miranda" to mapOf(lib to 28414, alp to 15593),
+            "Monaro" to mapOf(nat to 27723, alp to 17276),
+            "Mount Druitt" to mapOf(alp to 28505, lib to 14410),
+            "Mulgoa" to mapOf(lib to 29910, alp to 18858),
+            "Murray" to mapOf(sff to 20765, nat to 18020),
+            "Myall Lakes" to mapOf(nat to 25990, alp to 17916),
+            "Newcastle" to mapOf(alp to 29843, lib to 14236),
+            "Newtown" to mapOf(grn to 24849, alp to 14078),
+            "North Shore" to mapOf(lib to 23917, ind to 15209),
+            "Northern Tablelands" to mapOf(nat to 37727, alp to 7814),
+            "Oatley" to mapOf(lib to 27321, alp to 17802),
+            "Orange" to mapOf(sff to 27746, nat to 14821),
+            "Oxley" to mapOf(nat to 27111, alp to 14672),
+            "Parramatta" to mapOf(lib to 27330, alp to 17733),
+            "Penrith" to mapOf(lib to 21204, alp to 20096),
+            "Pittwater" to mapOf(lib to 29696, grn to 12225),
+            "Port Macquarie" to mapOf(nat to 34725, alp to 14690),
+            "Port Stephens" to mapOf(alp to 25766, lib to 20448),
+            "Prospect" to mapOf(alp to 26008, lib to 16867),
+            "Riverstone" to mapOf(lib to 29337, alp to 22735),
+            "Rockdale" to mapOf(alp to 25077, lib to 17037),
+            "Ryde" to mapOf(lib to 26032, alp to 18123),
+            "Seven Hills" to mapOf(lib to 24518, alp to 18988),
+            "Shellharbour" to mapOf(alp to 34435, lib to 16005),
+            "South Coast" to mapOf(lib to 27902, alp to 18178),
+            "Strathfield" to mapOf(alp to 23519, lib to 19245),
+            "Summer Hill" to mapOf(alp to 32023, lib to 12271),
+            "Swansea" to mapOf(alp to 26792, lib to 17449),
+            "Sydney" to mapOf(ind to 22841, lib to 14134),
+            "Tamworth" to mapOf(nat to 30522, ind to 12403),
+            "Terrigal" to mapOf(lib to 27802, alp to 16794),
+            "The Entrance" to mapOf(alp to 23661, lib to 19189),
+            "Tweed" to mapOf(nat to 23243, alp to 19040),
+            "Upper Hunter" to mapOf(nat to 19341, alp to 17456),
+            "Vaucluse" to mapOf(lib to 28260, grn to 12506),
+            "Wagga Wagga" to mapOf(ind to 26869, nat to 14169),
+            "Wakehurst" to mapOf(lib to 30182, alp to 12326),
+            "Wallsend" to mapOf(alp to 35605, lib to 11591),
+            "Willoughby" to mapOf(lib to 29142, alp to 11885),
+            "Wollondilly" to mapOf(lib to 22925, alp to 12988),
+            "Wollongong" to mapOf(alp to 31357, lib to 12580),
+            "Wyong" to mapOf(alp to 27296, lib to 16415),
+        )
+
+        val panel = SwingometerScreen.of(
+            prevVotes = prev2CPVotes.asOneTimePublisher().convertToPartyOrCandidateForSwingometer(),
+            results = prev2CPVotes.mapValues { it.value.entries.maxBy { e -> e.value }.key.let { w -> elected(w) } }.asOneTimePublisher(),
+            swing = emptyMap<PartyOrCoalition, Double>().asOneTimePublisher(),
+            parties = (alp to coa).asOneTimePublisher(),
+            seatLabelIncrement = 5.asOneTimePublisher(),
+            header = "SWINGOMETER".asOneTimePublisher(),
+            title = "NEW SOUTH WALES".asOneTimePublisher(),
+        )
+        panel.setSize(1024, 512)
+        compareRendering("SwingometerScreen", "Basic-Coalition-1", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            NEW SOUTH WALES
+            SWINGOMETER
+            
+            NO SWING BETWEEN ALP AND L/NP
+            L/NP WOULD HAVE 48 ON UNIFORM SWING
+            
+            ALP NEEDS 7.6% SWING FROM L/NP TO GAIN MAJORITY
+            L/NP NEEDS TO AVOID 1.3% SWING TO ALP TO HOLD MAJORITY
+            """.trimIndent(),
+        )
+    }
+
+    @Test
+    fun testMultipleIndependents() {
+        val lib = PartyOrCandidate(Party("Liberal", "LIB", Color.RED))
+        val pc = PartyOrCandidate(Party("Progressive Conservative", "PC", Color.BLUE))
+        val grn = PartyOrCandidate("Green")
+        val pa = PartyOrCandidate("People's Alliance")
+        val ndp = PartyOrCandidate(Party("New Democratic Party", "NDP", Color.ORANGE))
+        val kiss = PartyOrCandidate("KISS")
+        val ind = PartyOrCandidate("Independent")
+
+        val prevVotes = mapOf(
+            "Albert" to mapOf(pc to 5040, lib to 921, grn to 1056, pa to 977, ind to 90),
+            "Bathurst East-Nepisiguit-Saint-Isidore" to mapOf(pc to 1568, lib to 4163, grn to 798),
+            "Bathurst West-Beresford" to mapOf(pc to 1985, lib to 3730, grn to 965),
+            "Campbellton-Dalhousie" to mapOf(pc to 1369, lib to 4540, grn to 1054),
+            "Caraquet" to mapOf(pc to 985, lib to 5928, grn to 1290),
+            "Carleton" to mapOf(pc to 3536, lib to 1239, grn to 581, pa to 1909, ndp to 80, kiss to 41),
+            "Carleton-Victoria" to mapOf(pc to 3330, lib to 2939, grn to 372, pa to 610, ndp to 113),
+            "Carleton-York" to mapOf(pc to 4750, lib to 940, grn to 890, pa to 1524, ndp to 110),
+            "Dieppe" to mapOf(pc to 1680, lib to 4564, grn to 1142, ndp to 200),
+            "Edmundston-Madawaska Centre" to mapOf(pc to 1380, lib to 5236, grn to 415),
+            "Fredericton North" to mapOf(pc to 3227, lib to 1464, grn to 2464, pa to 591, ndp to 100),
+            "Fredericton South" to mapOf(pc to 2342, lib to 895, grn to 4213, pa to 234, ndp to 117),
+            "Fredericton West-Hanwell" to mapOf(pc to 4726, lib to 1510, grn to 1745, pa to 825, ndp to 131),
+            "Fredericton-Grand Lake" to mapOf(pc to 2479, lib to 749, grn to 1005, pa to 3759, ndp to 87, kiss to 18),
+            "Fredericton-York" to mapOf(pc to 3730, lib to 872, grn to 2110, pa to 1991, ndp to 68, kiss to 24),
+            "Fundy-The Isles-Saint John West" to mapOf(pc to 4740, lib to 726, grn to 686, pa to 688, ndp to 291),
+            "Gagetown-Petitcodiac" to mapOf(pc to 4773, lib to 867, grn to 1003, pa to 1303, ndp to 131),
+            "Hampton" to mapOf(pc to 4351, lib to 1084, grn to 816, pa to 687, ndp to 251),
+            "Kent North" to mapOf(pc to 1363, lib to 2933, grn to 4021, ind to 154),
+            "Kent South" to mapOf(pc to 2817, lib to 5148, grn to 996, pa to 243, ndp to 118),
+            "Kings Centre" to mapOf(pc to 4583, lib to 911, grn to 1006, pa to 693, ndp to 254),
+            "Madawaska Les Lacs-Edmundston" to mapOf(pc to 1763, lib to 4583, grn to 542),
+            "Memramcook-Tantramar" to mapOf(pc to 1678, lib to 2902, grn to 3425, pa to 192, ind to 34),
+            "Miramichi" to mapOf(pc to 1508, lib to 2239, grn to 398, pa to 3527, ndp to 92, ind to 54),
+            "Miramichi Bay-Neguac" to mapOf(pc to 2751, lib to 3561, grn to 825, pa to 898, ndp to 139),
+            "Moncton Centre" to mapOf(pc to 1642, lib to 2448, grn to 1725, pa to 308, ndp to 168),
+            "Moncton East" to mapOf(pc to 3525, lib to 2759, grn to 989, pa to 378, ndp to 153),
+            "Moncton Northwest" to mapOf(pc to 4111, lib to 2448, grn to 702, pa to 493, ndp to 229),
+            "Moncton South" to mapOf(pc to 2734, lib to 1966, grn to 1245, pa to 331, ndp to 220),
+            "Moncton Southwest" to mapOf(pc to 3679, lib to 1561, grn to 927, pa to 667, ndp to 224),
+            "New Maryland-Sunbury" to mapOf(pc to 5342, lib to 1048, grn to 1463, pa to 1254, ndp to 141),
+            "Oromocto-Lincoln-Fredericton" to mapOf(pc to 3374, lib to 2072, grn to 1306, pa to 745, ndp to 127),
+            "Portland-Simonds" to mapOf(pc to 3170, lib to 1654, grn to 483, pa to 282, ndp to 164),
+            "Quispamsis" to mapOf(pc to 5697, lib to 1225, grn to 528, pa to 414, ndp to 501),
+            "Restigouche West" to mapOf(pc to 1247, lib to 5022, grn to 1755, kiss to 56),
+            "Restigouche-Chaleur" to mapOf(pc to 1149, lib to 3823, grn to 1896),
+            "Riverview" to mapOf(pc to 4695, lib to 1281, grn to 800, pa to 778, ndp to 261),
+            "Rothesay" to mapOf(pc to 4265, lib to 1463, grn to 719, pa to 413, ind to 100),
+            "Saint Croix" to mapOf(pc to 3570, lib to 401, grn to 1238, pa to 2546, ndp to 147),
+            "Saint John East" to mapOf(pc to 3507, lib to 1639, grn to 394, pa to 434, ndp to 248),
+            "Saint John Harbour" to mapOf(pc to 2181, lib to 1207, grn to 1224, pa to 186, ndp to 309),
+            "Saint John Lancaster" to mapOf(pc to 3560, lib to 1471, grn to 938, pa to 394, ndp to 201),
+            "Shediac Bay-Dieppe" to mapOf(pc to 2971, lib to 5839, pa to 371, ndp to 528),
+            "Shediac-Beaubassin-Cap-Pelé" to mapOf(pc to 1820, lib to 4949, grn to 2453),
+            "Shippagan-Lamèque-Miscou" to mapOf(pc to 714, lib to 6834, grn to 609),
+            "Southwest Miramichi-Bay du Vin" to mapOf(pc to 3887, lib to 1760, pa to 2268, ndp to 188),
+            "Sussex-Fundy-St. Martins" to mapOf(pc to 4366, lib to 971, grn to 969, pc to 1321, ndp to 129),
+            "Tracadie-Sheila" to mapOf(pc to 2059, lib to 6175, grn to 645),
+            "Victoria-La Vallée" to mapOf(pc to 2071, lib to 4365, grn to 426, pa to 292, ind to 92),
+        )
+
+        val panel = SwingometerScreen.of(
+            prevVotes = prevVotes.asOneTimePublisher(),
+            results = prevVotes.mapValues { it.value.entries.maxBy { e -> e.value }.key.let { w -> elected(w.party) } }.asOneTimePublisher(),
+            swing = emptyMap<PartyOrCoalition, Double>().asOneTimePublisher(),
+            parties = (lib.party to pc.party).asOneTimePublisher(),
+            seatLabelIncrement = 3.asOneTimePublisher(),
+            range = 0.2.asOneTimePublisher(),
+            header = "SWINGOMETER".asOneTimePublisher(),
+            title = "NEW BRUNSWICK".asOneTimePublisher(),
+        )
+        panel.setSize(1024, 512)
+        compareRendering("SwingometerScreen", "Basic-MultipleIndependents-1", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            NEW BRUNSWICK
+            SWINGOMETER
+            
+            NO SWING BETWEEN LIB AND PC
+            PC WOULD HAVE 27 ON UNIFORM SWING
+            
+            LIB NEEDS 11.2% SWING FROM PC TO GAIN MAJORITY
+            PC NEEDS TO AVOID 5.2% SWING TO LIB TO HOLD MAJORITY
             """.trimIndent(),
         )
     }
