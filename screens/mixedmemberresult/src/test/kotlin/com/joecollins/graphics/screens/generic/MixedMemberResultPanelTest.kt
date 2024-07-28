@@ -1,5 +1,6 @@
 package com.joecollins.graphics.screens.generic
 
+import com.joecollins.graphics.screens.generic.MixedMemberResultPanel.Companion.convertToPartyOrCandidateForMixedMember
 import com.joecollins.graphics.screens.generic.MixedMemberResultPanel.Companion.createMap
 import com.joecollins.graphics.utils.PublisherTestUtils.assertPublishes
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
@@ -7,6 +8,7 @@ import com.joecollins.graphics.utils.ShapefileReader
 import com.joecollins.models.general.Aggregators
 import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.Party
+import com.joecollins.models.general.PartyOrCandidate
 import com.joecollins.models.general.PartyResult
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
@@ -46,7 +48,7 @@ class MixedMemberResultPanelTest {
                 header = candidateChangeHeader
             },
             partyVotes = {
-                votes = currentPartyVotes
+                votes = currentPartyVotes.convertToPartyOrCandidateForMixedMember()
                 header = partyHeader
             },
             partyChange = {
@@ -153,7 +155,7 @@ class MixedMemberResultPanelTest {
                 header = candidateChangeHeader
             },
             partyVotes = {
-                votes = currentPartyVotes
+                votes = currentPartyVotes.convertToPartyOrCandidateForMixedMember()
                 header = partyHeader
                 pctReporting = partyPctReporting
             },
@@ -266,7 +268,7 @@ class MixedMemberResultPanelTest {
                 header = candidateChangeHeader
             },
             partyVotes = {
-                votes = currentPartyVotes
+                votes = currentPartyVotes.convertToPartyOrCandidateForMixedMember()
                 header = partyHeader
                 pctReporting = partyPctReporting
                 progressLabel = partyProgress
@@ -377,7 +379,7 @@ class MixedMemberResultPanelTest {
                 header = candidateChangeHeader
             },
             partyVotes = {
-                votes = currentPartyVotes
+                votes = currentPartyVotes.convertToPartyOrCandidateForMixedMember()
                 header = partyHeader
                 pctReporting = partyPctReporting
             },
@@ -483,7 +485,7 @@ class MixedMemberResultPanelTest {
                 header = candidateChangeHeader
             },
             partyVotes = {
-                votes = currentPartyVotes
+                votes = currentPartyVotes.convertToPartyOrCandidateForMixedMember()
                 header = partyHeader
                 pctReporting = partyPctReporting
             },
@@ -586,7 +588,7 @@ class MixedMemberResultPanelTest {
                 header = candidateChangeHeader
             },
             partyVotes = {
-                votes = currentPartyVotes
+                votes = currentPartyVotes.convertToPartyOrCandidateForMixedMember()
                 header = partyHeader
             },
             partyChange = {
@@ -683,7 +685,7 @@ class MixedMemberResultPanelTest {
                 header = candidateChangeHeader
             },
             partyVotes = {
-                votes = currentPartyVotes
+                votes = currentPartyVotes.convertToPartyOrCandidateForMixedMember()
                 header = partyHeader
             },
             partyChange = {
@@ -778,7 +780,7 @@ class MixedMemberResultPanelTest {
                 incumbentMarker = "(MLA)"
             },
             partyVotes = {
-                votes = currentPartyVotes
+                votes = currentPartyVotes.convertToPartyOrCandidateForMixedMember()
                 header = partyHeader
             },
             map = createMap {
@@ -854,7 +856,7 @@ class MixedMemberResultPanelTest {
                 incumbentMarker = "(MLA)"
             },
             partyVotes = {
-                votes = currentPartyVotes
+                votes = currentPartyVotes.convertToPartyOrCandidateForMixedMember()
                 header = partyHeader
             },
             map = createMap {
@@ -930,7 +932,7 @@ class MixedMemberResultPanelTest {
                 winner = candidateWinner
             },
             partyVotes = {
-                votes = currentPartyVotes
+                votes = currentPartyVotes.convertToPartyOrCandidateForMixedMember()
                 header = partyHeader
             },
             map = createMap {
@@ -1007,7 +1009,7 @@ class MixedMemberResultPanelTest {
                 winner = candidateWinner
             },
             partyVotes = {
-                votes = currentPartyVotes
+                votes = currentPartyVotes.convertToPartyOrCandidateForMixedMember()
                 header = partyHeader
             },
             map = createMap {
@@ -1100,7 +1102,7 @@ class MixedMemberResultPanelTest {
                 header = candidateChangeHeader
             },
             partyVotes = {
-                votes = Aggregators.topAndOthers(currentPartyVotes, 5, Party.OTHERS, topPartiesWaiting)
+                votes = Aggregators.topAndOthers(currentPartyVotes, 5, Party.OTHERS, topPartiesWaiting).convertToPartyOrCandidateForMixedMember()
                 header = partyHeader
             },
             partyChange = {
@@ -1507,7 +1509,7 @@ class MixedMemberResultPanelTest {
                 winner = Candidate("Willow-Jean Prime", lab).asOneTimePublisher()
             },
             partyVotes = {
-                votes = partyVotes.asOneTimePublisher()
+                votes = partyVotes.asOneTimePublisher().convertToPartyOrCandidateForMixedMember()
                 header = "PARTY VOTES".asOneTimePublisher()
             },
             title = "NORTHLAND".asOneTimePublisher(),
@@ -1540,6 +1542,119 @@ class MixedMemberResultPanelTest {
             GREEN: 2,772 (6.1%)
             NZ FIRST: 2,651 (5.8%)
             OTHERS: 3,091 (6.8%)
+            """.trimIndent(),
+        )
+    }
+
+    @Test
+    fun testCandidatesAsList() {
+        val currentCandidateVotes = Publisher(emptyMap<Candidate, Int>())
+        val previousCandidateVotes = Publisher(emptyMap<Party, Int>())
+        val currentPartyVotes = Publisher(emptyMap<PartyOrCandidate, Int>())
+        val previousPartyVotes = Publisher(emptyMap<Party, Int>())
+        val title = Publisher("CITY AND EAST")
+        val candidateHeader = Publisher("CANDIDATE VOTES")
+        val candidateChangeHeader = Publisher("CANDIDATE CHANGE SINCE 2021")
+        val partyHeader = Publisher("PARTY VOTES")
+        val partyChangeHeader = Publisher("PARTY CHANGE SINCE 2021")
+        val lab = Party("Labour", "LAB", Color.RED)
+        val grn = Party("Green", "GRN", Color.GREEN.darker())
+        val con = Party("Conservative", "CON", Color.BLUE)
+        val ld = Party("Liberal Democrats", "LD", Color.ORANGE)
+        val ref = Party("Reform UK", "REF", Color.CYAN.darker())
+        val ind = Party("Independent", "IND", Party.OTHERS.color)
+        val panel = MixedMemberResultPanel.of(
+            candidateVotes = {
+                votes = currentCandidateVotes
+                header = candidateHeader
+            },
+            candidateChange = {
+                prevVotes = previousCandidateVotes
+                header = candidateChangeHeader
+            },
+            partyVotes = {
+                votes = Aggregators.topAndOthers(currentPartyVotes, 8, PartyOrCandidate.OTHERS)
+                header = partyHeader
+            },
+            partyChange = {
+                prevVotes = previousPartyVotes
+                header = partyChangeHeader
+            },
+            title = title,
+        )
+        panel.setSize(1024, 512)
+        currentCandidateVotes.submit(
+            mapOf(
+                Candidate("Unmesh Desai", lab, true) to 99570,
+                Candidate("Freddie Downing", con) to 29083,
+                Candidate("Joe Hudson-Small", grn) to 29073,
+                Candidate("David Sandground", ref) to 14535,
+                Candidate("Pat Stillman", ld) to 11416,
+                Candidate("Ak Goodman", ind) to 5310,
+                Candidate("Lois Austin", Party("Trade Unionist and Socialist Coalition", "TUSC", Color.RED.darker())) to 4710,
+            ),
+        )
+        previousCandidateVotes.submit(
+            mapOf(
+                lab to 125025,
+                con to 46718,
+                grn to 25596,
+                ld to 14136,
+                ref to 9060,
+            ),
+        )
+        currentPartyVotes.submit(
+            mapOf(
+                PartyOrCandidate(lab) to 97432,
+                PartyOrCandidate(con) to 28344,
+                PartyOrCandidate(grn) to 24912,
+                PartyOrCandidate(ref) to 10899,
+                PartyOrCandidate(ld) to 9620,
+                PartyOrCandidate(Party("Rejoin EU", "REJOIN", Color.BLUE.darker())) to 5384,
+                PartyOrCandidate("Farah London") to 3490,
+                PartyOrCandidate(Party("Animal Welfare Party", "AWP", Color.RED.darker())) to 3423,
+                PartyOrCandidate(Party("Britain First", "BF", Color.BLUE.darker())) to 3104,
+                PartyOrCandidate(Party("Christian Peoples Alliance", "CPA", Color.MAGENTA.darker())) to 2666,
+                PartyOrCandidate(Party("Social Democratic Party", "SDP", Color.BLUE.darker())) to 2000,
+                PartyOrCandidate(Party("Communist", "COM", Color.RED)) to 1063,
+                PartyOrCandidate("Laurence Fox") to 1006,
+                PartyOrCandidate("Gabe Romualdo") to 372,
+                PartyOrCandidate(Party("Heritage", "HERITAGE", Color.BLUE)) to 366,
+            ),
+        )
+        previousPartyVotes.submit(
+            mapOf(
+                lab to 116148,
+                con to 44957,
+                grn to 20106,
+                ld to 9001,
+                Party.OTHERS to 28550,
+            ),
+        )
+        compareRendering("MixedMemberResultPanel", "IndependentList", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            CITY AND EAST
+
+            CANDIDATE VOTES (CANDIDATE CHANGE SINCE 2021)
+            UNMESH DESAI (LAB): 99,570 (51.4%, -5.3%)
+            FREDDIE DOWNING (CON): 29,083 (15.0%, -6.2%)
+            JOE HUDSON-SMALL (GRN): 29,073 (15.0%, +3.4%)
+            DAVID SANDGROUND (REF): 14,535 (7.5%, +3.4%)
+            PAT STILLMAN (LD): 11,416 (5.9%, -0.5%)
+            AK GOODMAN (IND): 5,310 (2.7%, +2.7%)
+            LOIS AUSTIN (TUSC): 4,710 (2.4%, +2.4%)
+            
+            PARTY VOTES (PARTY CHANGE SINCE 2021)
+            LABOUR: 97,432 (50.2%, -2.9%)
+            CONSERVATIVE: 28,344 (14.6%, -5.9%)
+            GREEN: 24,912 (12.8%, +3.6%)
+            REFORM UK: 10,899 (5.6%, +5.6%)
+            LIBERAL DEMOCRATS: 9,620 (5.0%, +0.8%)
+            REJOIN EU: 5,384 (2.8%, +2.8%)
+            FARAH LONDON: 3,490 (1.8%, +1.8%)
+            OTHERS: 14,000 (7.2%, -5.8%)
             """.trimIndent(),
         )
     }

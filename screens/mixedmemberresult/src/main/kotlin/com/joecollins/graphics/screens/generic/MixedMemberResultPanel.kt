@@ -7,6 +7,7 @@ import com.joecollins.graphics.components.BarFrameBuilder
 import com.joecollins.graphics.components.MapFrame
 import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.Party
+import com.joecollins.models.general.PartyOrCandidate
 import com.joecollins.models.general.PartyOrCoalition
 import com.joecollins.models.general.PartyResult
 import com.joecollins.pubsub.Publisher
@@ -113,7 +114,7 @@ class MixedMemberResultPanel private constructor(
     }
 
     class PartyVotes internal constructor() {
-        lateinit var votes: Flow.Publisher<out Map<out PartyOrCoalition, Int?>>
+        lateinit var votes: Flow.Publisher<out Map<out PartyOrCandidate, Int?>>
         lateinit var header: Flow.Publisher<out String?>
         var pctReporting: Flow.Publisher<Double>? = null
         var progressLabel: Flow.Publisher<out String?>? = null
@@ -146,6 +147,9 @@ class MixedMemberResultPanel private constructor(
         private val PCT_FORMAT = DecimalFormat("0.0%")
         private val PCT_DIFF_FORMAT = DecimalFormat("+0.0%;-0.0%")
         private val THOUSANDS_FORMAT = DecimalFormat("#,##0")
+
+        fun Flow.Publisher<out Map<out Party, Int?>>.convertToPartyOrCandidateForMixedMember() =
+            map { v -> v.mapKeys { PartyOrCandidate(it.key) } }
 
         fun <K> createMap(func: MapPanel<K>.() -> Unit) = MapPanel<K>().apply(func)
 
@@ -221,7 +225,7 @@ class MixedMemberResultPanel private constructor(
                             val leftLabel: String = rowTemplate.leftLabel(candidate)
                             val rightLabel: String = if (partialDeclaration) THOUSANDS_FORMAT.format(numVotes.toLong()) else rowTemplate.rightLabel(numVotes, pct)
                             BarFrameBuilder.BasicBar(
-                                if (candidate === Candidate.OTHERS) "OTHERS" else leftLabel,
+                                if (candidate == Candidate.OTHERS) "OTHERS" else leftLabel,
                                 candidate.party.color,
                                 if (pct.isNaN()) 0 else pct,
                                 (if (pct.isNaN()) "WAITING..." else rightLabel),
@@ -280,11 +284,11 @@ class MixedMemberResultPanel private constructor(
                     }
                 val othersPct = (
                     curr.entries.asSequence()
-                        .filter { it.key.party === Party.OTHERS }
+                        .filter { it.key.party == Party.OTHERS }
                         .map { 1.0 * it.value / currTotal }
                         .sum() +
                         prev.entries
-                            .filter { it.key === Party.OTHERS || !currParties.contains(it.key) }
+                            .filter { it.key == Party.OTHERS || !currParties.contains(it.key) }
                             .sumOf { -1.0 * it.value / prevTotal }
                     )
                 val nonMatchingBars = if (othersPct == 0.0) {
@@ -343,7 +347,7 @@ class MixedMemberResultPanel private constructor(
             if (partyChange == null) {
                 return null
             }
-            val change = Change<PartyOrCoalition>()
+            val change = Change<PartyOrCandidate>()
             partyVotes.votes.subscribe(Subscriber { change.curr = it })
             partyChange.prevVotes.subscribe(Subscriber { change.prev = it })
             val bars = change.currPublisher.merge(change.prevPublisher) { currRaw, prev ->
@@ -354,18 +358,18 @@ class MixedMemberResultPanel private constructor(
                 if (currRaw.values.any { it == null }) {
                     return@merge listOf()
                 }
-                val curr: Map<out PartyOrCoalition, Int> = currRaw.mapValues { it.value!! }
+                val curr: Map<out PartyOrCandidate, Int> = currRaw.mapValues { it.value!! }
                 val prevTotal = prev.values.sum()
                 val presentBars = curr.entries.asSequence()
-                    .filter { it.key !== Party.OTHERS }
+                    .filter { it.key.party !== Party.OTHERS }
                     .sortedByDescending { it.value }
                     .map {
                         val pct = (
                             1.0 * it.value / currTotal -
-                                1.0 * (prev[it.key] ?: 0) / prevTotal
+                                1.0 * (prev[it.key.party] ?: 0) / prevTotal
                             )
                         BarFrameBuilder.BasicBar(
-                            it.key.abbreviation.uppercase(),
+                            it.key.party.abbreviation.uppercase(),
                             it.key.color,
                             pct,
                             PCT_DIFF_FORMAT.format(pct),
@@ -373,9 +377,9 @@ class MixedMemberResultPanel private constructor(
                     }
                 val otherTotal = (
                     curr.entries
-                        .filter { it.key === Party.OTHERS }.sumOf { 1.0 * it.value / currTotal } +
+                        .filter { it.key.party == Party.OTHERS }.sumOf { 1.0 * it.value / currTotal } +
                         prev.entries
-                            .filter { it.key === Party.OTHERS || !curr.containsKey(it.key) }
+                            .filter { it.key == Party.OTHERS || !curr.keys.any { k -> k.party == it.key } }
                             .sumOf { -1.0 * it.value / prevTotal }
                     )
                 val absentBars = if (otherTotal == 0.0) {
@@ -471,7 +475,7 @@ class MixedMemberResultPanel private constructor(
                 val currTotal = curr.values.sumOf { it ?: 0 }.toDouble()
                 val prevTotal = prev?.values?.sum()?.toDouble()
                 val others = run {
-                    val currParties = curr.keys
+                    val currParties = curr.keys.map { it.party }
                     prev?.filterKeys { !currParties.contains(it) }?.values?.sum() ?: 0
                 }
                 curr.entries
@@ -488,7 +492,7 @@ class MixedMemberResultPanel private constructor(
                                     val diffLabel = if (prev == null) {
                                         ""
                                     } else {
-                                        val prevVotes = (prev[it.key] ?: 0) + (if (it.key == Party.OTHERS) others else 0)
+                                        val prevVotes = (prev[it.key.party] ?: 0) + (if (it.key.party == Party.OTHERS) others else 0)
                                         val prevPct = prevVotes / (prevTotal ?: 0.0)
                                         ", ${DecimalFormat("+0.0%;-0.0%").format(currPct - prevPct)}"
                                     }

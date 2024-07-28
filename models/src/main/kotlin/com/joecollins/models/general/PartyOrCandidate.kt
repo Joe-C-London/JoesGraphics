@@ -21,6 +21,8 @@ data class PartyOrCandidate private constructor(private val _party: Party?, priv
     companion object {
         private val INDEPENDENT = Party("Independent", "IND", Party.OTHERS.color)
 
+        val OTHERS = PartyOrCandidate(Party.OTHERS)
+
         fun Map<out Party, Int>.convertToPartyOrCandidate(): Map<PartyOrCandidate, Int> = mapKeys { PartyOrCandidate(it.key) }
 
         fun Map<out PartyOrCandidate, Int>.convertToParty(): Map<Party, Int> = entries.groupingBy { it.key.party }.fold(0) { a, e -> a + e.value }
