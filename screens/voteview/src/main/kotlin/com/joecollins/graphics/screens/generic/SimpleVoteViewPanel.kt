@@ -12,6 +12,7 @@ import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.NonPartisanCandidate
 import com.joecollins.models.general.NonPartisanCandidateResult
 import com.joecollins.models.general.Party
+import com.joecollins.models.general.PartyOrCandidate
 import com.joecollins.models.general.PartyOrCoalition
 import com.joecollins.models.general.PartyResult
 import com.joecollins.pubsub.asOneTimePublisher
@@ -231,6 +232,43 @@ class SimpleVoteViewPanel private constructor(
                 valueTemplate = VoteValueTemplate(currentVotes.display.template),
                 voteTemplate = currentVotes.display.template,
                 others = Candidate.OTHERS,
+                title = title,
+                createBarFrame = {
+                    BarFrameBuilder.basic(
+                        barsPublisher = bars,
+                        headerPublisher = header,
+                        rightHeaderLabelPublisher = progress,
+                        subheadPublisher = subhead,
+                        notesPublisher = notes,
+                        limitsPublisher = limits,
+                        linesPublisher = lines,
+                    )
+                },
+            ).build()
+        }
+
+        fun partyOrCandidateVotes(
+            current: CurrentVotes<PartyOrCandidate, Int?>.() -> Unit,
+            prev: (PrevVotes<Party>.() -> Unit)? = null,
+            majority: (MajorityLine.() -> Unit)? = null,
+            displayLimit: (DisplayLimit<Party>.() -> Unit)? = null,
+            map: AbstractMap<*>? = null,
+            title: Flow.Publisher<out String?>,
+        ): SimpleVoteViewPanel {
+            val currentVotes = CurrentVotes<PartyOrCandidate, Int?>().apply(current)
+            return VoteScreenBuilder<PartyOrCandidate, Party, Int?, Double, Double, BarFrameBuilder.BasicBar>(
+                current = currentVotes,
+                prev = prev?.let { PrevVotes<Party>().apply(it) },
+                majority = majority?.let { MajorityLine().apply(it) },
+                displayLimit = displayLimit?.let { DisplayLimit<Party>().apply(it) },
+                partyClassification = null,
+                preferences = null,
+                map = map?.mapFrame,
+                secondMap = null,
+                keyTemplate = BasicResultPanel.PartyOrCandidateTemplate(),
+                voteTemplate = VotePctOnlyTemplate,
+                valueTemplate = VoteValueTemplate(VotePctOnlyTemplate),
+                others = PartyOrCandidate(Party.OTHERS),
                 title = title,
                 createBarFrame = {
                     BarFrameBuilder.basic(

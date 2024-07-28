@@ -3,6 +3,7 @@ package com.joecollins.graphics.screens.generic
 import com.joecollins.graphics.ImageGenerator
 import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.Party
+import com.joecollins.models.general.PartyOrCandidate
 import com.joecollins.models.general.PartyOrCoalition
 import com.joecollins.models.general.PartyResult
 import java.awt.Shape
@@ -22,6 +23,24 @@ object BasicResultPanel {
         }
 
         override fun toMainBarHeader(key: P, forceSingleLine: Boolean): String {
+            return key.name.uppercase()
+        }
+
+        override fun winnerShape(forceSingleLine: Boolean): Shape {
+            return ImageGenerator.createTickShape()
+        }
+
+        override fun runoffShape(forceSingleLine: Boolean): Shape {
+            return ImageGenerator.createRunoffShape()
+        }
+    }
+
+    class PartyOrCandidateTemplate : KeyTemplate<PartyOrCandidate, Party> {
+        override fun toParty(key: PartyOrCandidate): Party {
+            return key.party
+        }
+
+        override fun toMainBarHeader(key: PartyOrCandidate, forceSingleLine: Boolean): String {
             return key.name.uppercase()
         }
 

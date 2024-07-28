@@ -7,6 +7,7 @@ import com.joecollins.graphics.screens.generic.SimpleVoteViewPanel.Companion.cre
 import com.joecollins.graphics.screens.generic.SimpleVoteViewPanel.Companion.createSinglePartyMap
 import com.joecollins.graphics.screens.generic.SimpleVoteViewPanel.Companion.createSingleResultMap
 import com.joecollins.graphics.screens.generic.SimpleVoteViewPanel.Companion.nonPartisanVotes
+import com.joecollins.graphics.screens.generic.SimpleVoteViewPanel.Companion.partyOrCandidateVotes
 import com.joecollins.graphics.screens.generic.SimpleVoteViewPanel.Companion.partyRangeVotes
 import com.joecollins.graphics.screens.generic.SimpleVoteViewPanel.Companion.partyVotes
 import com.joecollins.graphics.utils.PublisherTestUtils.assertPublishes
@@ -17,6 +18,7 @@ import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.NonPartisanCandidate
 import com.joecollins.models.general.NonPartisanCandidateResult
 import com.joecollins.models.general.Party
+import com.joecollins.models.general.PartyOrCandidate
 import com.joecollins.models.general.PartyResult
 import com.joecollins.models.general.PartyResult.Companion.elected
 import com.joecollins.models.general.PartyResult.Companion.leading
@@ -3784,6 +3786,100 @@ class SimpleVoteViewPanelTest {
                 BILLY CANN (NDP): 124 (4.2%, -18.9%)
                 
                 SWING SINCE 2015: 15.4% SWING LIB TO PC
+            """.trimIndent(),
+        )
+    }
+
+    @Test
+    fun testPartiesAndIndependentCandidates() {
+        val snp = Party("Scottish National Party", "SNP", Color.YELLOW)
+        val lab = Party("Labour", "LAB", Color.RED)
+        val con = Party("Conservative", "CON", Color.BLUE)
+        val ld = Party("Liberal Democrats", "LD", Color.ORANGE)
+        val grn = Party("Green", "GRN", Color.GREEN.darker())
+
+        val currentVotes = Publisher(
+            mapOf(
+                PartyOrCandidate(Party("Abolish the Scottish Parliament", "ABOL-SP", Color(29, 141, 255))) to 686,
+                PartyOrCandidate(Party("Alba", "ALBA", Color.BLUE.darker())) to 3828,
+                PartyOrCandidate(Party("All for Unity", "UNITY", Color(251, 5, 5))) to 1540,
+                PartyOrCandidate(Party("Freedom Alliance", "FA", Color(200, 24, 125))) to 671,
+                PartyOrCandidate(Party("Reform UK", "REF", Color.CYAN.darker())) to 547,
+                PartyOrCandidate(Party("Restore Scotland", "RESTORE", Color.BLACK)) to 437,
+                PartyOrCandidate(con) to 60779,
+                PartyOrCandidate(Party("Scottish Family Party", "SFP", Color(68, 67, 152))) to 1976,
+                PartyOrCandidate(grn) to 17729,
+                PartyOrCandidate(lab) to 22713,
+                PartyOrCandidate(ld) to 26771,
+                PartyOrCandidate(Party("Libertarian", "LBT", Color(250, 188, 24))) to 488,
+                PartyOrCandidate(snp) to 96433,
+                PartyOrCandidate(Party("Trade Unionist and Socialist Coalition", "TUSC", Color(217, 38, 34))) to 280,
+                PartyOrCandidate(Party("UK Independent Party", "UKIP", Color.MAGENTA.darker())) to 457,
+                PartyOrCandidate("Hazel Mansfield") to 219,
+                PartyOrCandidate("Andy Wightman") to 3367,
+            ),
+        )
+        val previousVotes = Publisher(
+            mapOf(
+                con to 44693,
+                lab to 22894,
+                ld to 27223,
+                snp to 81600,
+                grn to 14781,
+                Party.OTHERS to 14122,
+            ),
+        )
+        val title = Publisher("HIGHLANDS AND ISLANDS")
+        val voteHeader = Publisher("REGIONAL VOTES")
+        val voteSubhead = Publisher("")
+        val changeHeader = Publisher("CHANGE SINCE 2016")
+        val swingHeader = Publisher("SWING SINCE 2016")
+        val swingPartyOrder = listOf(grn, snp, lab, ld, con)
+        val panel = partyOrCandidateVotes(
+            current = {
+                votes = currentVotes
+                header = voteHeader
+                subhead = voteSubhead
+            },
+            prev = {
+                votes = previousVotes
+                header = changeHeader
+                swing = {
+                    partyOrder = swingPartyOrder
+                    header = swingHeader
+                }
+            },
+            title = title,
+        )
+        panel.setSize(1024, 512)
+        compareRendering("SimpleVoteViewPanel", "PartyOrCandidates", panel)
+        assertPublishes(
+            panel.altText,
+            """
+                HIGHLANDS AND ISLANDS
+
+                REGIONAL VOTES (CHANGE SINCE 2016)
+                SCOTTISH NATIONAL PARTY: 40.4% (+0.6%)
+                CONSERVATIVE: 25.4% (+3.7%)
+                LIBERAL DEMOCRATS: 11.2% (-2.1%)
+                LABOUR: 9.5% (-1.6%)
+                GREEN: 7.4% (+0.2%)
+                ALBA: 1.6% (*)
+                ANDY WIGHTMAN: 1.4% (*)
+                SCOTTISH FAMILY PARTY: 0.8% (*)
+                ALL FOR UNITY: 0.6% (*)
+                ABOLISH THE SCOTTISH PARLIAMENT: 0.3% (*)
+                FREEDOM ALLIANCE: 0.3% (*)
+                REFORM UK: 0.2% (*)
+                LIBERTARIAN: 0.2% (*)
+                UK INDEPENDENT PARTY: 0.2% (*)
+                RESTORE SCOTLAND: 0.2% (*)
+                TRADE UNIONIST AND SOCIALIST COALITION: 0.1% (*)
+                HAZEL MANSFIELD: 0.1% (*)
+                OTHERS: - (-0.8%)
+                * CHANGE INCLUDED IN OTHERS
+                
+                SWING SINCE 2016: 1.5% SWING SNP TO CON
             """.trimIndent(),
         )
     }
