@@ -4,6 +4,8 @@ import com.joecollins.graphics.GenericPanel
 import com.joecollins.graphics.components.BattlefieldFrame
 import com.joecollins.graphics.utils.ColorUtils
 import com.joecollins.models.general.Party
+import com.joecollins.models.general.PartyOrCandidate
+import com.joecollins.models.general.PartyOrCandidate.Companion.convertToPartyOrCandidate
 import com.joecollins.models.general.PartyResult
 import com.joecollins.models.general.ResultColorUtils.getColor
 import com.joecollins.pubsub.asOneTimePublisher
@@ -18,8 +20,11 @@ class BattlefieldScreen private constructor(header: Flow.Publisher<out String?>,
     companion object {
         private const val DEFAULT_LIMIT = 0.80
 
+        fun <T> Flow.Publisher<out Map<T, Map<out Party, Int>>>.convertToPartyOrCandidateForBattlefield() =
+            map { it.mapValues { e -> e.value.convertToPartyOrCandidate() } }
+
         fun <T> build(
-            prevVotes: Flow.Publisher<out Map<T, Map<Party, Int>>>,
+            prevVotes: Flow.Publisher<out Map<T, Map<PartyOrCandidate, Int>>>,
             results: Flow.Publisher<out Map<T, PartyResult?>>,
             leftParty: Flow.Publisher<Party>,
             rightParty: Flow.Publisher<Party>,
@@ -52,7 +57,7 @@ class BattlefieldScreen private constructor(header: Flow.Publisher<out String?>,
         }
 
         private fun <T> createBattlefield(
-            prevVotes: Flow.Publisher<out Map<T, Map<Party, Int>>>,
+            prevVotes: Flow.Publisher<out Map<T, Map<PartyOrCandidate, Int>>>,
             results: Flow.Publisher<out Map<T, PartyResult?>>,
             allParties: Flow.Publisher<Parties>,
             majorityLines: Flow.Publisher<Boolean>?,
@@ -65,9 +70,9 @@ class BattlefieldScreen private constructor(header: Flow.Publisher<out String?>,
                 .merge(allParties) { (prev, curr), parties ->
                     prev.entries.mapNotNull { (key, votes) ->
                         val winner = votes.entries.maxByOrNull { it.value }?.key
-                        if (!parties.asSequence().contains(winner)) return@mapNotNull null
+                        if (!parties.asSequence().contains(winner?.party)) return@mapNotNull null
                         val totalVotes = votes.values.sum().toDouble()
-                        val pctByParty = parties.asSequence().associateWith { (votes[it] ?: 0) / totalVotes }
+                        val pctByParty = parties.asSequence().associateWith { party -> (votes.entries.firstOrNull { it.key.party == party }?.value ?: 0) / totalVotes }
                         BattlefieldFrame.Dot(
                             -(pctByParty[parties.left] ?: 0.0),
                             -(pctByParty[parties.right] ?: 0.0),
@@ -132,7 +137,7 @@ class BattlefieldScreen private constructor(header: Flow.Publisher<out String?>,
         private fun <T> calculateLine(
             party: Party,
             allParties: Parties,
-            prevPcts: Map<T, Map<Party, Double>>,
+            prevPcts: Map<T, Map<PartyOrCandidate, Double>>,
             limit: Double,
         ): Pair<BattlefieldFrame.Line, Color>? {
             val otherParties = when (party) {
@@ -170,36 +175,36 @@ class BattlefieldScreen private constructor(header: Flow.Publisher<out String?>,
         private fun <T> calculateSwing(
             party: Party,
             otherParties: Pair<Party, Party>,
-            prevPcts: Map<T, Map<Party, Double>>,
+            prevPcts: Map<T, Map<PartyOrCandidate, Double>>,
             swing: Double,
         ): Double {
             val majority = prevPcts.size / 2 + 1
             val stage1Pcts = prevPcts.mapValues { (_, pcts) ->
                 pcts.mapValues {
-                    it.value + when (it.key) {
+                    it.value + when (it.key.party) {
                         otherParties.first -> -swing
                         otherParties.second -> swing
                         else -> 0.0
                     }
                 }
             }
-            val stage1Wins = stage1Pcts.values.count { pct -> pct.entries.maxByOrNull { it.value }?.key == party }
+            val stage1Wins = stage1Pcts.values.count { pct -> pct.entries.maxByOrNull { it.value }?.key?.party == party }
             val stage2Needed = majority - stage1Wins - (if (stage1Wins < majority) 0 else 1)
 
             val pctNeeded = if (stage2Needed > 0) {
                 stage1Pcts.values.mapNotNull { pct ->
                     val winner = pct.entries.maxByOrNull { it.value }!!
-                    if (winner.key == party) return@mapNotNull null
-                    val partyPct = (pct[party] ?: 0.0)
-                    val requiresAdjustment = winner.key != otherParties.first && winner.key != otherParties.second
+                    if (winner.key.party == party) return@mapNotNull null
+                    val partyPct = pct.entries.firstOrNull { it.key.party == party }?.value ?: 0.0
+                    val requiresAdjustment = winner.key.party != otherParties.first && winner.key.party != otherParties.second
                     (winner.value - partyPct) * (if (requiresAdjustment) 1.5 else 1.0)
                 }.sorted()[stage2Needed - 1]
             } else {
                 stage1Pcts.values.mapNotNull { pct ->
                     val winner = pct.entries.maxByOrNull { it.value }!!
-                    if (winner.key != party) return@mapNotNull null
-                    val second = pct.entries.filter { it.key != party }.maxByOrNull { it.value }!!
-                    val requiresAdjustment = second.key != otherParties.first && second.key != otherParties.second
+                    if (winner.key.party != party) return@mapNotNull null
+                    val second = pct.entries.filter { it.key.party != party }.maxByOrNull { it.value }!!
+                    val requiresAdjustment = second.key.party != otherParties.first && second.key.party != otherParties.second
                     (winner.value - second.value) * (if (requiresAdjustment) 1.5 else 1.0)
                 }.sorted()[-stage2Needed - 1] * -1
             }
@@ -211,7 +216,7 @@ class BattlefieldScreen private constructor(header: Flow.Publisher<out String?>,
             header: Flow.Publisher<out String?>,
             partySwings: Flow.Publisher<out Map<Party, Double>?>?,
             allParties: Flow.Publisher<Parties>,
-            prevVotes: Flow.Publisher<out Map<T, Map<Party, Int>>>,
+            prevVotes: Flow.Publisher<out Map<T, Map<PartyOrCandidate, Int>>>,
         ): Flow.Publisher<String> {
             val topText = title.merge(header) { t, h -> sequenceOf(t, h).filterNotNull().joinToString("\n") }
             val swingsText = partySwings?.merge(allParties) { swings, parties ->
@@ -234,8 +239,8 @@ class BattlefieldScreen private constructor(header: Flow.Publisher<out String?>,
             val majorityText = (partySwings ?: null.asOneTimePublisher()).merge(prevVotes) { swings, prev ->
                 val adjSeats = prev.values.groupingBy { votes ->
                     val total = votes.values.sum().toDouble()
-                    val pcts = votes.mapValues { it.value / total + (swings?.get(it.key) ?: 0.0) }
-                    pcts.maxBy { it.value }.key
+                    val pcts = votes.mapValues { it.value / total + (swings?.get(it.key.party) ?: 0.0) }
+                    pcts.maxBy { it.value }.key.party
                 }.eachCount()
                 val majority = prev.size / 2 + 1
                 val winner = adjSeats.filterValues { it >= majority }.keys.firstOrNull()
