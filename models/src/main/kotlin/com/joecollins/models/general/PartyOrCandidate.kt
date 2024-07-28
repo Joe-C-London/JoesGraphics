@@ -1,6 +1,6 @@
 package com.joecollins.models.general
 
-class PartyOrCandidate private constructor(private val _party: Party?, private val _candidate: Candidate?) : CanOverrideSortOrder() {
+data class PartyOrCandidate private constructor(private val _party: Party?, private val _candidate: Candidate?) : CanOverrideSortOrder() {
 
     constructor(party: Party) : this(party, null)
 
@@ -13,6 +13,10 @@ class PartyOrCandidate private constructor(private val _party: Party?, private v
     val name = _party?.name ?: _candidate!!.name
 
     val color = party.color
+
+    override fun toString(): String {
+        return _party?.toString() ?: _candidate!!.toString()
+    }
 
     companion object {
         private val INDEPENDENT = Party("Independent", "IND", Party.OTHERS.color)
