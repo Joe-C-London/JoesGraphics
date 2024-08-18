@@ -51,7 +51,7 @@ object SummaryEntries {
             .map {
                 SummaryEntry(
                     it.key.party.color,
-                    if (it.key == Candidate.OTHERS) Candidate.OTHERS.party.abbreviation else labelFunc(it.key),
+                    labelFunc(it.key),
                     DecimalFormat("0.0%").format(it.value / total),
                 )
             }
