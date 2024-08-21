@@ -25,7 +25,7 @@ object ImageGenerator {
 
     private fun createHalfShape(s: Shape): Area {
         val shape = Area(s)
-        shape.add(Area(Rectangle2D.Double(200.0, 200.0, 1e-6, 1e-6)))
+        shape.add(Area(Rectangle2D.Double(s.bounds2D.minX, 2 * s.bounds2D.maxY - s.bounds2D.minY, 1e-6, 1e-6)))
         return shape
     }
 
