@@ -1,6 +1,7 @@
 package com.joecollins.graphics.screens.generic
 
 import com.joecollins.graphics.GenericPanel
+import com.joecollins.graphics.components.GraphicsFrame.Companion.equaliseHeaderFonts
 import com.joecollins.graphics.components.RegionSummaryFrame
 import com.joecollins.models.general.Aggregators
 import com.joecollins.models.general.Party
@@ -34,6 +35,7 @@ class PartySummaryScreen private constructor(
         layout = Layout(numRows)
         add(mainFrame, "main")
         otherFrames.forEach { add(it, "other") }
+        otherFrames.equaliseHeaderFonts()
     },
     partyPublisher.map { it.name.uppercase() + " SUMMARY" },
     altText,
