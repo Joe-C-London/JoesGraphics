@@ -105,7 +105,7 @@ class MixedMemberResultPanel private constructor(
         var pctReporting: Flow.Publisher<Double>? = null
         var progressLabel: Flow.Publisher<out String?>? = null
 
-        internal val incumbentMarkerPadded by lazy { if (incumbentMarker == null) "" else " $incumbentMarker" }
+        internal val incumbentMarkerPadded by lazy { if (incumbentMarker == null) "" else " [$incumbentMarker]" }
     }
 
     class CandidateChange internal constructor() {

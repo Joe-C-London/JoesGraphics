@@ -61,7 +61,7 @@ object BasicResultPanel {
         }
 
         constructor(incumbentMarker: String?) {
-            this.incumbentMarker = if (incumbentMarker == null) "" else " $incumbentMarker"
+            this.incumbentMarker = if (incumbentMarker == null) "" else " [$incumbentMarker]"
         }
 
         override fun toParty(key: Candidate): Party {

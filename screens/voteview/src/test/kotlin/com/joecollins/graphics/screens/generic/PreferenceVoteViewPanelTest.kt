@@ -581,7 +581,7 @@ class PreferenceVoteViewPanelTest {
                 votes = currentPrimaryVotes
                 header = voteHeader
                 subhead = voteSubhead
-                incumbentMarker = "(MP)"
+                incumbentMarker = "MP"
                 winner = leader
             },
             prev = {
@@ -614,7 +614,7 @@ class PreferenceVoteViewPanelTest {
                 PRIMARY VOTE, 9 OF 9 POLLS REPORTING (PRIMARY CHANGE SINCE 2016)
                 MARK MONAGHAN (ALP): 1,756 (42.1%, -3.2%)
                 KYLIE BONANNI (CLP): 1,488 (35.6%, -0.5%)
-                JEFF COLLINS (MP) (TA): 497 (11.9%, +3.0%)
+                JEFF COLLINS [MP] (TA): 497 (11.9%, +3.0%)
                 AMYE UN (IND): 434 (10.4%, +0.7%)
                 
                 TWO CANDIDATE PREFERRED, 9 OF 9 POLLS REPORTING
@@ -655,7 +655,7 @@ class PreferenceVoteViewPanelTest {
                 GOYDER
                 
                 PRIMARY VOTE, 12 OF 12 POLLS REPORTING (PRIMARY CHANGE SINCE 2016)
-                KEZIA PURICK (MP) (IND): 1,459 (31.1%, -12.9%^)
+                KEZIA PURICK [MP] (IND): 1,459 (31.1%, -12.9%^)
                 PHIL BATTYE (CLP): 1,289 (27.5%, +7.2%)
                 RACHEL WRIGHT (TA): 614 (13.1%, +13.1%)
                 MICK TAYLOR (ALP): 590 (12.6%, -6.4%)
@@ -666,7 +666,7 @@ class PreferenceVoteViewPanelTest {
                 ^ AGGREGATED ACROSS CANDIDATES IN PARTY
                 
                 TWO CANDIDATE PREFERRED, 12 OF 12 POLLS REPORTING
-                KEZIA PURICK (MP) (IND): 2,665 (56.8%)
+                KEZIA PURICK [MP] (IND): 2,665 (56.8%)
                 PHIL BATTYE (CLP): 2,030 (43.2%)
                 
                 PREFERENCE SWING SINCE 2016: 18.5% SWING IND TO CLP
@@ -895,7 +895,7 @@ class PreferenceVoteViewPanelTest {
                 votes = currentPrimaryVotes
                 header = voteHeader
                 subhead = voteSubhead
-                incumbentMarker = "(MP)"
+                incumbentMarker = "MP"
                 winner = leader
             },
             prev = {
@@ -926,13 +926,13 @@ class PreferenceVoteViewPanelTest {
                 MELBOURNE
                 
                 PRIMARY VOTE, 2016 RESULTS (PRIMARY CHANGE SINCE 2013)
-                ADAM BANDT (MP) (GRN): 41,377 (43.7%, +1.1%) WINNER
+                ADAM BANDT [MP] (GRN): 41,377 (43.7%, +1.1%) WINNER
                 LE LIU (LIB): 23,878 (25.2%, +2.4%)
                 SOPHIE ISMAIL (ALP): 23,130 (24.5%, -2.1%)
                 OTHERS (IND): 6,194 (6.5%, -1.4%)
                 
                 TWO CANDIDATE PREFERRED, 2016 RESULTS
-                ADAM BANDT (MP) (GRN): 64,771 (68.5%) WINNER
+                ADAM BANDT [MP] (GRN): 64,771 (68.5%) WINNER
                 LE LIU (LIB): 29,808 (31.5%)
                 
                 PREFERENCE SWING SINCE 2013: NOT AVAILABLE

@@ -33,7 +33,7 @@ class CandidateListingScreenTest {
                 header = "CANDIDATES".asOneTimePublisher()
                 subhead = "".asOneTimePublisher()
             },
-            incumbentMarker = "[MLA]",
+            incumbentMarker = "MLA",
             title = "SOURIS-ELMIRA".asOneTimePublisher(),
         )
         screen.size = Dimension(1024, 512)
@@ -78,7 +78,7 @@ class CandidateListingScreenTest {
                 header = "2015 RESULT".asOneTimePublisher()
                 subhead = null.asOneTimePublisher()
             },
-            incumbentMarker = "[MLA]",
+            incumbentMarker = "MLA",
             title = "SOURIS-ELMIRA".asOneTimePublisher(),
         )
         screen.size = Dimension(1024, 512)
@@ -135,7 +135,7 @@ class CandidateListingScreenTest {
                 additionalHighlight = null
                 header = "CARDIGAN".asOneTimePublisher()
             },
-            incumbentMarker = "[MLA]",
+            incumbentMarker = "MLA",
             title = "SOURIS-ELMIRA".asOneTimePublisher(),
         )
         screen.size = Dimension(1024, 512)
@@ -194,7 +194,7 @@ class CandidateListingScreenTest {
                 focus = listOf(9, 10, 11, 12, 13, 14).asOneTimePublisher()
                 header = "CHARLOTTETOWN".asOneTimePublisher()
             },
-            incumbentMarker = "[MLA]",
+            incumbentMarker = "MLA",
             title = "CHARLOTTETOWN-WEST ROYALTY".asOneTimePublisher(),
         )
         screen.size = Dimension(1024, 512)
@@ -262,7 +262,7 @@ class CandidateListingScreenTest {
                 focus = listOf(1, 2, 3, 4, 5, 6, 7).asOneTimePublisher()
                 header = "CARDIGAN".asOneTimePublisher()
             },
-            incumbentMarker = "[MLA]",
+            incumbentMarker = "MLA",
             title = "SOURIS-ELMIRA".asOneTimePublisher(),
         )
         screen.size = Dimension(1024, 512)
@@ -327,7 +327,7 @@ class CandidateListingScreenTest {
                 votes = secondaryPrev.asOneTimePublisher()
                 header = "2015 REGIONAL RESULT".asOneTimePublisher()
             },
-            incumbentMarker = "[MLA]",
+            incumbentMarker = "MLA",
             title = "SOURIS-ELMIRA".asOneTimePublisher(),
         )
         screen.size = Dimension(1024, 512)
@@ -411,7 +411,7 @@ class CandidateListingScreenTest {
                 this.focus = focus
                 header = region
             },
-            incumbentMarker = "[MLA]",
+            incumbentMarker = "MLA",
             title = districtName,
         )
         screen.size = Dimension(1024, 512)

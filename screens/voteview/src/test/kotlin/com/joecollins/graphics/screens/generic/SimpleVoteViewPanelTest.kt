@@ -155,7 +155,7 @@ class SimpleVoteViewPanelTest {
                 votes = currentVotes
                 header = voteHeader
                 subhead = voteSubhead
-                incumbentMarker = "(MP)"
+                incumbentMarker = "MP"
             },
             prev = {
                 votes = previousVotes
@@ -175,7 +175,7 @@ class SimpleVoteViewPanelTest {
                 LASALLE—ÉMARD—VERDUN
                 
                 100% OF POLLS REPORTING, PROJECTION: LIB HOLD (CHANGE SINCE 2015)
-                DAVID LAMETTI (MP) (LIB): 22,803 (43.5%, -0.4%)
+                DAVID LAMETTI [MP] (LIB): 22,803 (43.5%, -0.4%)
                 ISABEL DION (BQ): 12,619 (24.1%, +7.0%)
                 STEVEN SCOTT (NDP): 8,628 (16.5%, -12.5%)
                 CLAUDIO ROCCHI (CON): 3,690 (7.0%, +0.1%)

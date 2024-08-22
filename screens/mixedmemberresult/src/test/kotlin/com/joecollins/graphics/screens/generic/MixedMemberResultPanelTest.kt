@@ -678,7 +678,7 @@ class MixedMemberResultPanelTest {
             candidateVotes = {
                 votes = currentCandidateVotes
                 header = candidateHeader
-                incumbentMarker = "(MLA)"
+                incumbentMarker = "MLA"
             },
             candidateChange = {
                 prevVotes = previousCandidateVotes
@@ -742,7 +742,7 @@ class MixedMemberResultPanelTest {
             CHARLOTTETOWN-WINSLOE
             
             CANDIDATE VOTES (CANDIDATE CHANGE SINCE 2015)
-            ROBERT MITCHELL (MLA) (LIB): 1,420 (42.0%, -3.8%)
+            ROBERT MITCHELL [MLA] (LIB): 1,420 (42.0%, -3.8%)
             AMANDA MORRISON (GRN): 1,057 (31.2%, +21.8%)
             MIKE GILLIS (PC): 865 (25.6%, -7.6%)
             JESSE REDDIN COUSINS (NDP): 41 (1.2%, -10.4%)
@@ -777,7 +777,7 @@ class MixedMemberResultPanelTest {
             candidateVotes = {
                 votes = currentCandidateVotes
                 header = candidateHeader
-                incumbentMarker = "(MLA)"
+                incumbentMarker = "MLA"
             },
             partyVotes = {
                 votes = currentPartyVotes.convertToPartyOrCandidateForMixedMember()
@@ -816,7 +816,7 @@ class MixedMemberResultPanelTest {
             CHARLOTTETOWN-WINSLOE
             
             CANDIDATE VOTES
-            ROBERT MITCHELL (MLA) (LIB): 1,420 (42.0%)
+            ROBERT MITCHELL [MLA] (LIB): 1,420 (42.0%)
             AMANDA MORRISON (GRN): 1,057 (31.2%)
             MIKE GILLIS (PC): 865 (25.6%)
             JESSE REDDIN COUSINS (NDP): 41 (1.2%)
@@ -853,7 +853,7 @@ class MixedMemberResultPanelTest {
                 votes = currentCandidateVotes
                 header = candidateHeader
                 subhead = candidateSubhead
-                incumbentMarker = "(MLA)"
+                incumbentMarker = "MLA"
             },
             partyVotes = {
                 votes = currentPartyVotes.convertToPartyOrCandidateForMixedMember()
@@ -892,7 +892,7 @@ class MixedMemberResultPanelTest {
             CHARLOTTETOWN-WINSLOE
             
             CANDIDATE VOTES, LIB WIN IN 2015
-            ROBERT MITCHELL (MLA) (LIB): 1,420 (42.0%)
+            ROBERT MITCHELL [MLA] (LIB): 1,420 (42.0%)
             AMANDA MORRISON (GRN): 1,057 (31.2%)
             MIKE GILLIS (PC): 865 (25.6%)
             JESSE REDDIN COUSINS (NDP): 41 (1.2%)
@@ -928,7 +928,7 @@ class MixedMemberResultPanelTest {
             candidateVotes = {
                 votes = currentCandidateVotes
                 header = candidateHeader
-                incumbentMarker = "(MLA)"
+                incumbentMarker = "MLA"
                 winner = candidateWinner
             },
             partyVotes = {
@@ -969,7 +969,7 @@ class MixedMemberResultPanelTest {
             CHARLOTTETOWN-WINSLOE
             
             CANDIDATE VOTES
-            ROBERT MITCHELL (MLA) (LIB): 1,420 (42.0%) WINNER
+            ROBERT MITCHELL [MLA] (LIB): 1,420 (42.0%) WINNER
             AMANDA MORRISON (GRN): 1,057 (31.2%)
             MIKE GILLIS (PC): 865 (25.6%)
             JESSE REDDIN COUSINS (NDP): 41 (1.2%)
@@ -1005,7 +1005,7 @@ class MixedMemberResultPanelTest {
             candidateVotes = {
                 votes = currentCandidateVotes
                 header = candidateHeader
-                incumbentMarker = "(MLA)"
+                incumbentMarker = "MLA"
                 winner = candidateWinner
             },
             partyVotes = {
@@ -1505,7 +1505,7 @@ class MixedMemberResultPanelTest {
                 votes = candidateVotes.asOneTimePublisher()
                 header = "CANDIDATE VOTES".asOneTimePublisher()
                 subhead = "LAB GAIN FROM NAT".asOneTimePublisher()
-                incumbentMarker = "[INC]"
+                incumbentMarker = "INC"
                 winner = Candidate("Willow-Jean Prime", lab).asOneTimePublisher()
             },
             partyVotes = {

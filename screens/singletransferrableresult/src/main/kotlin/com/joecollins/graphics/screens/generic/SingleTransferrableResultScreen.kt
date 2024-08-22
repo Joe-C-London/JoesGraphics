@@ -70,7 +70,7 @@ class SingleTransferrableResultScreen private constructor(
                     .filter { !votes.containsKey(it.first) }
                     .map {
                         BarFrameBuilder.BasicBar(
-                            label = it.first.name.uppercase() + (if (it.first.incumbent) " ${candidateResults.incumbentMarker}" else "") + " (${it.first.party.abbreviation.uppercase()})",
+                            label = it.first.name.uppercase() + (if (it.first.incumbent) " [${candidateResults.incumbentMarker}]" else "") + " (${it.first.party.abbreviation.uppercase()})",
                             valueLabel = it.second,
                             shape = ImageGenerator.createTickShape(),
                             value = 0,
@@ -81,7 +81,7 @@ class SingleTransferrableResultScreen private constructor(
                     .sortedByDescending { it.value?.toDouble() ?: -1.0 }
                     .map {
                         BarFrameBuilder.BasicBar(
-                            label = it.key.name.uppercase() + (if (it.key.incumbent) " ${candidateResults.incumbentMarker}" else "") + " (${it.key.party.abbreviation.uppercase()})",
+                            label = it.key.name.uppercase() + (if (it.key.incumbent) " [${candidateResults.incumbentMarker}]" else "") + " (${it.key.party.abbreviation.uppercase()})",
                             valueLabel = if (it.value == null) {
                                 "WAITING..."
                             } else {
@@ -201,7 +201,7 @@ class SingleTransferrableResultScreen private constructor(
             }
             val status = candidateResults.elected.merge(candidateResults.excluded) { el, ex -> el to ex }
             val candidateEntries = candidateResults.votes.merge(candidateResults.quota) { v, q -> v to q }.merge(status) { (votes, q), (el, ex) ->
-                val candidateFunc: (Candidate) -> String = { c -> "${c.name.uppercase()}${if (c.incumbent) " ${candidateResults.incumbentMarker}" else ""} (${c.party.abbreviation})" }
+                val candidateFunc: (Candidate) -> String = { c -> "${c.name.uppercase()}${if (c.incumbent) " [${candidateResults.incumbentMarker}]" else ""} (${c.party.abbreviation})" }
                 val prevElected = el.filter { !votes.containsKey(it.first) }
                     .joinToString("\n") { (c, r) -> "${candidateFunc(c)}: $r" }
                 val currRound = votes.entries

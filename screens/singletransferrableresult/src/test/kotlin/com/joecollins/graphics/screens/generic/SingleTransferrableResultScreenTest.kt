@@ -77,7 +77,7 @@ class SingleTransferrableResultScreenTest {
                 this.excluded = excluded
                 this.header = candidateHeader
                 this.subhead = candidateSubhead
-                this.incumbentMarker = "[MLA]"
+                this.incumbentMarker = "MLA"
             },
             partyTotals = {
                 totalSeats = 5.asOneTimePublisher()
@@ -732,7 +732,7 @@ class SingleTransferrableResultScreenTest {
                 this.header = candidateHeader
                 this.subhead = candidateSubhead
                 this.progress = candidateProgress
-                this.incumbentMarker = "[MLA]"
+                this.incumbentMarker = "MLA"
             },
             partyTotals = {
                 totalSeats = 5.asOneTimePublisher()

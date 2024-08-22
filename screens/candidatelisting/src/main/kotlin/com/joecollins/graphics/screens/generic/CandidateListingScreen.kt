@@ -63,13 +63,13 @@ class CandidateListingScreen private constructor(
             val candidatesPanel = CandidatesPanel<Candidate>().apply(candidates)
             val prevPanel = prev?.let { PrevPanel<Party>().apply(it) }
             val secondaryPrevPanel = secondaryPrev?.let { PrevPanel<Party>().apply(it) }
-            val combinedFunc: Candidate.() -> String = { name.uppercase() + (if (incumbentMarker != null && incumbent) " $incumbentMarker" else "") + " (${party.abbreviation})" }
+            val combinedFunc: Candidate.() -> String = { name.uppercase() + (if (incumbentMarker != null && incumbent) " [$incumbentMarker]" else "") + " (${party.abbreviation})" }
             return CandidateListingScreen(
                 title,
                 createCandidatesPanel(
                     candidatesPanel,
                     showTwoColumns,
-                    { name.uppercase() + (if (incumbentMarker != null && incumbent) " $incumbentMarker" else "") },
+                    { name.uppercase() + (if (incumbentMarker != null && incumbent) " [$incumbentMarker]" else "") },
                     { party.name.uppercase() },
                     { party.color },
                     combinedFunc,

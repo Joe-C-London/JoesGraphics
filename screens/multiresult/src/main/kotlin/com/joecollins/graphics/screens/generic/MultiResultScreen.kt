@@ -176,7 +176,7 @@ class MultiResultScreen private constructor(
                             "OTHERS"
                         }
                         else -> {
-                            "${candidate.name.uppercase()}\n${candidate.party.abbreviation}${if (candidate.isIncumbent()) " $incumbentMarker" else ""}"
+                            "${candidate.name.uppercase()}\n${candidate.party.abbreviation}${if (candidate.isIncumbent()) " [$incumbentMarker]" else ""}"
                         }
                     }
                     val rightLabel: String = when {
@@ -476,7 +476,7 @@ class MultiResultScreen private constructor(
                                         c.party.name.uppercase()
                                     } else {
                                         "${c.name.uppercase()}${
-                                            if (curr.incumbentMarker.isNotEmpty() && c.isIncumbent()) " ${curr.incumbentMarker}" else ""
+                                            if (curr.incumbentMarker.isNotEmpty() && c.isIncumbent()) " [${curr.incumbentMarker}]" else ""
                                         } (${c.party.abbreviation})"
                                     }
                                 }: ${

@@ -79,7 +79,7 @@ class MultiResultScreenTest {
                 votes = { votes.asOneTimePublisher() }
                 header = { ("DISTRICT $districtNum").asOneTimePublisher() }
                 subhead = { name.uppercase().asOneTimePublisher() }
-                incumbentMarker = "(MLA)"
+                incumbentMarker = "MLA"
                 winner = { (if (leaderHasWon) votes.entries.maxByOrNull { e -> e.value }!!.key else null).asOneTimePublisher() }
             },
             prev = {
@@ -110,18 +110,18 @@ class MultiResultScreenTest {
                 
                 DISTRICT 8, STANHOPE-MARSHFIELD
                 BLOYCE THOMPSON (PCP): 1,300 (39.5%)
-                WADE MACLAUCHLAN (MLA) (LIB): 1,196 (36.4%)
+                WADE MACLAUCHLAN [MLA] (LIB): 1,196 (36.4%)
                 SARAH DONALD (GRN): 747 (22.7%)
                 MARIAN WHITE (NDP): 46 (1.4%)
                 
                 DISTRICT 15, BRACKLEY-HUNTER RIVER
-                DENNIS KING (MLA) (PCP): 1,315 (41.7%) WINNER
+                DENNIS KING [MLA] (PCP): 1,315 (41.7%) WINNER
                 WINDSOR WIGHT (LIB): 899 (28.5%)
                 GREG BRADLEY (GRN): 879 (27.9%)
                 LEAH-JANE HAYWARD (NDP): 57 (1.8%)
                 
                 DISTRICT 17, NEW HAVEN-ROCKY POINT
-                PETER BEVAN-BAKER (MLA) (GRN): 1,870 (53.8%) WINNER
+                PETER BEVAN-BAKER [MLA] (GRN): 1,870 (53.8%) WINNER
                 KRIS CURRIE (PCP): 1,068 (30.7%)
                 JUDY MACNEVIN (LIB): 515 (14.8%)
                 DON WILLS (IND): 26 (0.7%)
@@ -198,7 +198,7 @@ class MultiResultScreenTest {
                 votes = { getVotes() }
                 header = { name.uppercase().asOneTimePublisher() }
                 subhead = { getStatus() }
-                incumbentMarker = "(MLA)"
+                incumbentMarker = "MLA"
                 winner = { winner }
                 pctReporting = { getPctReporting() }
             },
@@ -236,11 +236,11 @@ class MultiResultScreenTest {
                 BRACKLEY-HUNTER RIVER, 0 OF 10 POLLS REPORTING
                 GREG BRADLEY (GRN): WAITING...
                 LEAH-JANE HAYWARD (NDP): WAITING...
-                DENNIS KING (MLA) (PCP): WAITING...
+                DENNIS KING [MLA] (PCP): WAITING...
                 WINDSOR WIGHT (LIB): WAITING...
                 
                 NEW HAVEN-ROCKY POINT, 0 OF 10 POLLS REPORTING
-                PETER BEVAN-BAKER (MLA) (GRN): WAITING...
+                PETER BEVAN-BAKER [MLA] (GRN): WAITING...
                 KRIS CURRIE (PCP): WAITING...
                 JUDY MACNEVIN (LIB): WAITING...
                 DON WILLS (IND): WAITING...
@@ -266,11 +266,11 @@ class MultiResultScreenTest {
                 BRACKLEY-HUNTER RIVER, 0 OF 10 POLLS REPORTING
                 GREG BRADLEY (GRN): WAITING...
                 LEAH-JANE HAYWARD (NDP): WAITING...
-                DENNIS KING (MLA) (PCP): WAITING...
+                DENNIS KING [MLA] (PCP): WAITING...
                 WINDSOR WIGHT (LIB): WAITING...
                 
                 NEW HAVEN-ROCKY POINT, 1 OF 10 POLLS REPORTING
-                PETER BEVAN-BAKER (MLA) (GRN): 851 (51.3%)
+                PETER BEVAN-BAKER [MLA] (GRN): 851 (51.3%)
                 KRIS CURRIE (PCP): 512 (30.8%)
                 JUDY MACNEVIN (LIB): 290 (17.5%)
                 DON WILLS (IND): 7 (0.4%)
@@ -287,18 +287,18 @@ class MultiResultScreenTest {
                 
                 STANHOPE-MARSHFIELD, 0 OF 10 POLLS REPORTING
                 SARAH DONALD (GRN): WAITING...
-                WADE MACLAUCHLAN (MLA) (LIB): WAITING...
+                WADE MACLAUCHLAN [MLA] (LIB): WAITING...
                 BLOYCE THOMPSON (PCP): WAITING...
                 MARIAN WHITE (NDP): WAITING...
                 
                 BRACKLEY-HUNTER RIVER, 0 OF 10 POLLS REPORTING
                 GREG BRADLEY (GRN): WAITING...
                 LEAH-JANE HAYWARD (NDP): WAITING...
-                DENNIS KING (MLA) (PCP): WAITING...
+                DENNIS KING [MLA] (PCP): WAITING...
                 WINDSOR WIGHT (LIB): WAITING...
                 
                 NEW HAVEN-ROCKY POINT, 1 OF 10 POLLS REPORTING
-                PETER BEVAN-BAKER (MLA) (GRN): 851 (51.3%)
+                PETER BEVAN-BAKER [MLA] (GRN): 851 (51.3%)
                 KRIS CURRIE (PCP): 512 (30.8%)
                 JUDY MACNEVIN (LIB): 290 (17.5%)
                 DON WILLS (IND): 7 (0.4%)
@@ -323,18 +323,18 @@ class MultiResultScreenTest {
                 
                 STANHOPE-MARSHFIELD, 0 OF 10 POLLS REPORTING
                 SARAH DONALD (GRN): WAITING...
-                WADE MACLAUCHLAN (MLA) (LIB): WAITING...
+                WADE MACLAUCHLAN [MLA] (LIB): WAITING...
                 BLOYCE THOMPSON (PCP): WAITING...
                 MARIAN WHITE (NDP): WAITING...
                 
                 BRACKLEY-HUNTER RIVER, 1 OF 10 POLLS REPORTING
-                DENNIS KING (MLA) (PCP): 583 (44.1%)
+                DENNIS KING [MLA] (PCP): 583 (44.1%)
                 WINDSOR WIGHT (LIB): 425 (32.1%)
                 GREG BRADLEY (GRN): 287 (21.7%)
                 LEAH-JANE HAYWARD (NDP): 27 (2.0%)
                 
                 NEW HAVEN-ROCKY POINT, 1 OF 10 POLLS REPORTING
-                PETER BEVAN-BAKER (MLA) (GRN): 851 (51.3%)
+                PETER BEVAN-BAKER [MLA] (GRN): 851 (51.3%)
                 KRIS CURRIE (PCP): 512 (30.8%)
                 JUDY MACNEVIN (LIB): 290 (17.5%)
                 DON WILLS (IND): 7 (0.4%)
@@ -358,19 +358,19 @@ class MultiResultScreenTest {
                 PARTY LEADERS
                 
                 STANHOPE-MARSHFIELD, 1 OF 10 POLLS REPORTING
-                WADE MACLAUCHLAN (MLA) (LIB): 620 (40.4%)
+                WADE MACLAUCHLAN [MLA] (LIB): 620 (40.4%)
                 BLOYCE THOMPSON (PCP): 609 (39.6%)
                 SARAH DONALD (GRN): 285 (18.6%)
                 MARIAN WHITE (NDP): 22 (1.4%)
                 
                 BRACKLEY-HUNTER RIVER, 1 OF 10 POLLS REPORTING
-                DENNIS KING (MLA) (PCP): 583 (44.1%)
+                DENNIS KING [MLA] (PCP): 583 (44.1%)
                 WINDSOR WIGHT (LIB): 425 (32.1%)
                 GREG BRADLEY (GRN): 287 (21.7%)
                 LEAH-JANE HAYWARD (NDP): 27 (2.0%)
                 
                 NEW HAVEN-ROCKY POINT, 1 OF 10 POLLS REPORTING
-                PETER BEVAN-BAKER (MLA) (GRN): 851 (51.3%)
+                PETER BEVAN-BAKER [MLA] (GRN): 851 (51.3%)
                 KRIS CURRIE (PCP): 512 (30.8%)
                 JUDY MACNEVIN (LIB): 290 (17.5%)
                 DON WILLS (IND): 7 (0.4%)
@@ -395,19 +395,19 @@ class MultiResultScreenTest {
                 PARTY LEADERS
                 
                 STANHOPE-MARSHFIELD, 1 OF 10 POLLS REPORTING
-                WADE MACLAUCHLAN (MLA) (LIB): 620 (40.4%)
+                WADE MACLAUCHLAN [MLA] (LIB): 620 (40.4%)
                 BLOYCE THOMPSON (PCP): 609 (39.6%)
                 SARAH DONALD (GRN): 285 (18.6%)
                 MARIAN WHITE (NDP): 22 (1.4%)
                 
                 BRACKLEY-HUNTER RIVER, 5 OF 10 POLLS REPORTING
-                DENNIS KING (MLA) (PCP): 909 (41.8%) WINNER
+                DENNIS KING [MLA] (PCP): 909 (41.8%) WINNER
                 WINDSOR WIGHT (LIB): 652 (30.0%)
                 GREG BRADLEY (GRN): 567 (26.1%)
                 LEAH-JANE HAYWARD (NDP): 45 (2.1%)
                 
                 NEW HAVEN-ROCKY POINT, 1 OF 10 POLLS REPORTING
-                PETER BEVAN-BAKER (MLA) (GRN): 851 (51.3%)
+                PETER BEVAN-BAKER [MLA] (GRN): 851 (51.3%)
                 KRIS CURRIE (PCP): 512 (30.8%)
                 JUDY MACNEVIN (LIB): 290 (17.5%)
                 DON WILLS (IND): 7 (0.4%)
@@ -423,13 +423,13 @@ class MultiResultScreenTest {
                 PARTY LEADERS IN DOUBT
                 
                 STANHOPE-MARSHFIELD, 1 OF 10 POLLS REPORTING
-                WADE MACLAUCHLAN (MLA) (LIB): 620 (40.4%)
+                WADE MACLAUCHLAN [MLA] (LIB): 620 (40.4%)
                 BLOYCE THOMPSON (PCP): 609 (39.6%)
                 SARAH DONALD (GRN): 285 (18.6%)
                 MARIAN WHITE (NDP): 22 (1.4%)
                 
                 NEW HAVEN-ROCKY POINT, 1 OF 10 POLLS REPORTING
-                PETER BEVAN-BAKER (MLA) (GRN): 851 (51.3%)
+                PETER BEVAN-BAKER [MLA] (GRN): 851 (51.3%)
                 KRIS CURRIE (PCP): 512 (30.8%)
                 JUDY MACNEVIN (LIB): 290 (17.5%)
                 DON WILLS (IND): 7 (0.4%)
@@ -454,13 +454,13 @@ class MultiResultScreenTest {
                 PARTY LEADERS IN DOUBT
                 
                 STANHOPE-MARSHFIELD, 1 OF 10 POLLS REPORTING
-                WADE MACLAUCHLAN (MLA) (LIB): 620 (40.4%)
+                WADE MACLAUCHLAN [MLA] (LIB): 620 (40.4%)
                 BLOYCE THOMPSON (PCP): 609 (39.6%)
                 SARAH DONALD (GRN): 285 (18.6%)
                 MARIAN WHITE (NDP): 22 (1.4%)
                 
                 NEW HAVEN-ROCKY POINT, 1 OF 10 POLLS REPORTING
-                PETER BEVAN-BAKER (MLA) (GRN): 851 (51.3%)
+                PETER BEVAN-BAKER [MLA] (GRN): 851 (51.3%)
                 KRIS CURRIE (PCP): 512 (30.8%)
                 JUDY MACNEVIN (LIB): 290 (17.5%)
                 DON WILLS (IND): 7 (0.4%)
@@ -484,13 +484,13 @@ class MultiResultScreenTest {
                 PARTY LEADERS IN DOUBT
                 
                 STANHOPE-MARSHFIELD, 1 OF 10 POLLS REPORTING
-                WADE MACLAUCHLAN (MLA) (LIB): 620 (40.4%)
+                WADE MACLAUCHLAN [MLA] (LIB): 620 (40.4%)
                 BLOYCE THOMPSON (PCP): 609 (39.6%)
                 SARAH DONALD (GRN): 285 (18.6%)
                 MARIAN WHITE (NDP): 22 (1.4%)
                 
                 NEW HAVEN-ROCKY POINT, 2 OF 10 POLLS REPORTING
-                PETER BEVAN-BAKER (MLA) (GRN): 968 (51.0%)
+                PETER BEVAN-BAKER [MLA] (GRN): 968 (51.0%)
                 KRIS CURRIE (PCP): 602 (31.7%)
                 JUDY MACNEVIN (LIB): 318 (16.7%)
                 DON WILLS (IND): 11 (0.6%)
@@ -515,12 +515,12 @@ class MultiResultScreenTest {
                 
                 STANHOPE-MARSHFIELD, 2 OF 10 POLLS REPORTING
                 BLOYCE THOMPSON (PCP): 721 (40.7%)
-                WADE MACLAUCHLAN (MLA) (LIB): 688 (38.8%)
+                WADE MACLAUCHLAN [MLA] (LIB): 688 (38.8%)
                 SARAH DONALD (GRN): 335 (18.9%)
                 MARIAN WHITE (NDP): 29 (1.6%)
                 
                 NEW HAVEN-ROCKY POINT, 2 OF 10 POLLS REPORTING
-                PETER BEVAN-BAKER (MLA) (GRN): 968 (51.0%)
+                PETER BEVAN-BAKER [MLA] (GRN): 968 (51.0%)
                 KRIS CURRIE (PCP): 602 (31.7%)
                 JUDY MACNEVIN (LIB): 318 (16.7%)
                 DON WILLS (IND): 11 (0.6%)
@@ -597,7 +597,7 @@ class MultiResultScreenTest {
                 votes = { getVotes() }
                 header = { name.uppercase().asOneTimePublisher() }
                 subhead = { null.asOneTimePublisher() }
-                incumbentMarker = "(MLA)"
+                incumbentMarker = "MLA"
                 winner = { winner }
                 pctReporting = { getPctReporting() }
                 progressLabel = { getStatus() }
@@ -636,11 +636,11 @@ class MultiResultScreenTest {
                 BRACKLEY-HUNTER RIVER [0/10]
                 GREG BRADLEY (GRN): WAITING...
                 LEAH-JANE HAYWARD (NDP): WAITING...
-                DENNIS KING (MLA) (PCP): WAITING...
+                DENNIS KING [MLA] (PCP): WAITING...
                 WINDSOR WIGHT (LIB): WAITING...
                 
                 NEW HAVEN-ROCKY POINT [0/10]
-                PETER BEVAN-BAKER (MLA) (GRN): WAITING...
+                PETER BEVAN-BAKER [MLA] (GRN): WAITING...
                 KRIS CURRIE (PCP): WAITING...
                 JUDY MACNEVIN (LIB): WAITING...
                 DON WILLS (IND): WAITING...
@@ -666,11 +666,11 @@ class MultiResultScreenTest {
                 BRACKLEY-HUNTER RIVER [0/10]
                 GREG BRADLEY (GRN): WAITING...
                 LEAH-JANE HAYWARD (NDP): WAITING...
-                DENNIS KING (MLA) (PCP): WAITING...
+                DENNIS KING [MLA] (PCP): WAITING...
                 WINDSOR WIGHT (LIB): WAITING...
                 
                 NEW HAVEN-ROCKY POINT [1/10]
-                PETER BEVAN-BAKER (MLA) (GRN): 851 (51.3%)
+                PETER BEVAN-BAKER [MLA] (GRN): 851 (51.3%)
                 KRIS CURRIE (PCP): 512 (30.8%)
                 JUDY MACNEVIN (LIB): 290 (17.5%)
                 DON WILLS (IND): 7 (0.4%)
@@ -687,18 +687,18 @@ class MultiResultScreenTest {
                 
                 STANHOPE-MARSHFIELD [0/10]
                 SARAH DONALD (GRN): WAITING...
-                WADE MACLAUCHLAN (MLA) (LIB): WAITING...
+                WADE MACLAUCHLAN [MLA] (LIB): WAITING...
                 BLOYCE THOMPSON (PCP): WAITING...
                 MARIAN WHITE (NDP): WAITING...
                 
                 BRACKLEY-HUNTER RIVER [0/10]
                 GREG BRADLEY (GRN): WAITING...
                 LEAH-JANE HAYWARD (NDP): WAITING...
-                DENNIS KING (MLA) (PCP): WAITING...
+                DENNIS KING [MLA] (PCP): WAITING...
                 WINDSOR WIGHT (LIB): WAITING...
                 
                 NEW HAVEN-ROCKY POINT [1/10]
-                PETER BEVAN-BAKER (MLA) (GRN): 851 (51.3%)
+                PETER BEVAN-BAKER [MLA] (GRN): 851 (51.3%)
                 KRIS CURRIE (PCP): 512 (30.8%)
                 JUDY MACNEVIN (LIB): 290 (17.5%)
                 DON WILLS (IND): 7 (0.4%)
@@ -723,18 +723,18 @@ class MultiResultScreenTest {
                 
                 STANHOPE-MARSHFIELD [0/10]
                 SARAH DONALD (GRN): WAITING...
-                WADE MACLAUCHLAN (MLA) (LIB): WAITING...
+                WADE MACLAUCHLAN [MLA] (LIB): WAITING...
                 BLOYCE THOMPSON (PCP): WAITING...
                 MARIAN WHITE (NDP): WAITING...
                 
                 BRACKLEY-HUNTER RIVER [1/10]
-                DENNIS KING (MLA) (PCP): 583 (44.1%)
+                DENNIS KING [MLA] (PCP): 583 (44.1%)
                 WINDSOR WIGHT (LIB): 425 (32.1%)
                 GREG BRADLEY (GRN): 287 (21.7%)
                 LEAH-JANE HAYWARD (NDP): 27 (2.0%)
                 
                 NEW HAVEN-ROCKY POINT [1/10]
-                PETER BEVAN-BAKER (MLA) (GRN): 851 (51.3%)
+                PETER BEVAN-BAKER [MLA] (GRN): 851 (51.3%)
                 KRIS CURRIE (PCP): 512 (30.8%)
                 JUDY MACNEVIN (LIB): 290 (17.5%)
                 DON WILLS (IND): 7 (0.4%)
@@ -758,19 +758,19 @@ class MultiResultScreenTest {
                 PARTY LEADERS
                 
                 STANHOPE-MARSHFIELD [1/10]
-                WADE MACLAUCHLAN (MLA) (LIB): 620 (40.4%)
+                WADE MACLAUCHLAN [MLA] (LIB): 620 (40.4%)
                 BLOYCE THOMPSON (PCP): 609 (39.6%)
                 SARAH DONALD (GRN): 285 (18.6%)
                 MARIAN WHITE (NDP): 22 (1.4%)
                 
                 BRACKLEY-HUNTER RIVER [1/10]
-                DENNIS KING (MLA) (PCP): 583 (44.1%)
+                DENNIS KING [MLA] (PCP): 583 (44.1%)
                 WINDSOR WIGHT (LIB): 425 (32.1%)
                 GREG BRADLEY (GRN): 287 (21.7%)
                 LEAH-JANE HAYWARD (NDP): 27 (2.0%)
                 
                 NEW HAVEN-ROCKY POINT [1/10]
-                PETER BEVAN-BAKER (MLA) (GRN): 851 (51.3%)
+                PETER BEVAN-BAKER [MLA] (GRN): 851 (51.3%)
                 KRIS CURRIE (PCP): 512 (30.8%)
                 JUDY MACNEVIN (LIB): 290 (17.5%)
                 DON WILLS (IND): 7 (0.4%)
@@ -795,19 +795,19 @@ class MultiResultScreenTest {
                 PARTY LEADERS
                 
                 STANHOPE-MARSHFIELD [1/10]
-                WADE MACLAUCHLAN (MLA) (LIB): 620 (40.4%)
+                WADE MACLAUCHLAN [MLA] (LIB): 620 (40.4%)
                 BLOYCE THOMPSON (PCP): 609 (39.6%)
                 SARAH DONALD (GRN): 285 (18.6%)
                 MARIAN WHITE (NDP): 22 (1.4%)
                 
                 BRACKLEY-HUNTER RIVER [5/10]
-                DENNIS KING (MLA) (PCP): 909 (41.8%) WINNER
+                DENNIS KING [MLA] (PCP): 909 (41.8%) WINNER
                 WINDSOR WIGHT (LIB): 652 (30.0%)
                 GREG BRADLEY (GRN): 567 (26.1%)
                 LEAH-JANE HAYWARD (NDP): 45 (2.1%)
                 
                 NEW HAVEN-ROCKY POINT [1/10]
-                PETER BEVAN-BAKER (MLA) (GRN): 851 (51.3%)
+                PETER BEVAN-BAKER [MLA] (GRN): 851 (51.3%)
                 KRIS CURRIE (PCP): 512 (30.8%)
                 JUDY MACNEVIN (LIB): 290 (17.5%)
                 DON WILLS (IND): 7 (0.4%)
@@ -823,13 +823,13 @@ class MultiResultScreenTest {
                 PARTY LEADERS IN DOUBT
                 
                 STANHOPE-MARSHFIELD [1/10]
-                WADE MACLAUCHLAN (MLA) (LIB): 620 (40.4%)
+                WADE MACLAUCHLAN [MLA] (LIB): 620 (40.4%)
                 BLOYCE THOMPSON (PCP): 609 (39.6%)
                 SARAH DONALD (GRN): 285 (18.6%)
                 MARIAN WHITE (NDP): 22 (1.4%)
                 
                 NEW HAVEN-ROCKY POINT [1/10]
-                PETER BEVAN-BAKER (MLA) (GRN): 851 (51.3%)
+                PETER BEVAN-BAKER [MLA] (GRN): 851 (51.3%)
                 KRIS CURRIE (PCP): 512 (30.8%)
                 JUDY MACNEVIN (LIB): 290 (17.5%)
                 DON WILLS (IND): 7 (0.4%)
@@ -854,13 +854,13 @@ class MultiResultScreenTest {
                 PARTY LEADERS IN DOUBT
                 
                 STANHOPE-MARSHFIELD [1/10]
-                WADE MACLAUCHLAN (MLA) (LIB): 620 (40.4%)
+                WADE MACLAUCHLAN [MLA] (LIB): 620 (40.4%)
                 BLOYCE THOMPSON (PCP): 609 (39.6%)
                 SARAH DONALD (GRN): 285 (18.6%)
                 MARIAN WHITE (NDP): 22 (1.4%)
                 
                 NEW HAVEN-ROCKY POINT [1/10]
-                PETER BEVAN-BAKER (MLA) (GRN): 851 (51.3%)
+                PETER BEVAN-BAKER [MLA] (GRN): 851 (51.3%)
                 KRIS CURRIE (PCP): 512 (30.8%)
                 JUDY MACNEVIN (LIB): 290 (17.5%)
                 DON WILLS (IND): 7 (0.4%)
@@ -884,13 +884,13 @@ class MultiResultScreenTest {
                 PARTY LEADERS IN DOUBT
                 
                 STANHOPE-MARSHFIELD [1/10]
-                WADE MACLAUCHLAN (MLA) (LIB): 620 (40.4%)
+                WADE MACLAUCHLAN [MLA] (LIB): 620 (40.4%)
                 BLOYCE THOMPSON (PCP): 609 (39.6%)
                 SARAH DONALD (GRN): 285 (18.6%)
                 MARIAN WHITE (NDP): 22 (1.4%)
                 
                 NEW HAVEN-ROCKY POINT [2/10]
-                PETER BEVAN-BAKER (MLA) (GRN): 968 (51.0%)
+                PETER BEVAN-BAKER [MLA] (GRN): 968 (51.0%)
                 KRIS CURRIE (PCP): 602 (31.7%)
                 JUDY MACNEVIN (LIB): 318 (16.7%)
                 DON WILLS (IND): 11 (0.6%)
@@ -915,12 +915,12 @@ class MultiResultScreenTest {
                 
                 STANHOPE-MARSHFIELD [2/10]
                 BLOYCE THOMPSON (PCP): 721 (40.7%)
-                WADE MACLAUCHLAN (MLA) (LIB): 688 (38.8%)
+                WADE MACLAUCHLAN [MLA] (LIB): 688 (38.8%)
                 SARAH DONALD (GRN): 335 (18.9%)
                 MARIAN WHITE (NDP): 29 (1.6%)
                 
                 NEW HAVEN-ROCKY POINT [2/10]
-                PETER BEVAN-BAKER (MLA) (GRN): 968 (51.0%)
+                PETER BEVAN-BAKER [MLA] (GRN): 968 (51.0%)
                 KRIS CURRIE (PCP): 602 (31.7%)
                 JUDY MACNEVIN (LIB): 318 (16.7%)
                 DON WILLS (IND): 11 (0.6%)
@@ -998,7 +998,7 @@ class MultiResultScreenTest {
                 votes = { votes.asOneTimePublisher() }
                 header = { ("DISTRICT $districtNum").asOneTimePublisher() }
                 subhead = { name.uppercase().asOneTimePublisher() }
-                incumbentMarker = "(MLA)"
+                incumbentMarker = "MLA"
                 winner = {
                     (
                         if (leaderHasWon) {
@@ -1026,7 +1026,7 @@ class MultiResultScreenTest {
                 SAINT JOHN
                 
                 DISTRICT 30, SAINT JOHN EAST
-                GLEN SAVOIE (MLA) (PCP): 3,507 (56.4%) WINNER
+                GLEN SAVOIE [MLA] (PCP): 3,507 (56.4%) WINNER
                 PHIL COMEAU (LIB): 1,639 (26.3%)
                 PATRICK KEMP (PA): 434 (7.0%)
                 GERALD IRISH (GRN): 394 (6.3%)
@@ -1040,7 +1040,7 @@ class MultiResultScreenTest {
                 OTHERS: 347 (6.6%)
                 
                 DISTRICT 33, SAINT JOHN LANCASTER
-                DOROTHY SHEPHARD (MLA) (PCP): 3,560 (54.2%) WINNER
+                DOROTHY SHEPHARD [MLA] (PCP): 3,560 (54.2%) WINNER
                 SHARON TEARE (LIB): 1,471 (22.4%)
                 JOANNA KILLEN (GRN): 938 (14.3%)
                 PAUL SEELYE (PA): 394 (6.0%)
@@ -1326,7 +1326,7 @@ class MultiResultScreenTest {
                 votes = { votes.asOneTimePublisher() }
                 header = { ("DISTRICT $districtNum").asOneTimePublisher() }
                 subhead = { name.uppercase().asOneTimePublisher() }
-                incumbentMarker = "(MLA)"
+                incumbentMarker = "MLA"
                 winner = {
                     (
                         if (leaderHasWon) {
@@ -1354,14 +1354,14 @@ class MultiResultScreenTest {
                 ELECTION 2020: NEW BRUNSWICK DECIDES
                 
                 DISTRICT 30, SAINT JOHN EAST
-                GLEN SAVOIE (MLA) (PCP): 3,507 (56.4%) WINNER
+                GLEN SAVOIE [MLA] (PCP): 3,507 (56.4%) WINNER
                 PHIL COMEAU (LIB): 1,639 (26.3%)
                 PATRICK KEMP (PA): 434 (7.0%)
                 GERALD IRISH (GRN): 394 (6.3%)
                 JOSH FLOYD (NDP): 248 (4.0%)
                 
                 DISTRICT 31, PORTLAND-SIMONDS
-                TREVOR HOLDER (MLA) (PCP): 3,170 (55.1%) WINNER
+                TREVOR HOLDER [MLA] (PCP): 3,170 (55.1%) WINNER
                 TIM JONES (LIB): 1,654 (28.8%)
                 STEFAN WARNER (GRN): 483 (8.4%)
                 DARELLA JACKSON (PA): 282 (4.9%)
@@ -1375,7 +1375,7 @@ class MultiResultScreenTest {
                 OTHERS: 347 (6.6%)
                 
                 DISTRICT 33, SAINT JOHN LANCASTER
-                DOROTHY SHEPHARD (MLA) (PCP): 3,560 (54.2%) WINNER
+                DOROTHY SHEPHARD [MLA] (PCP): 3,560 (54.2%) WINNER
                 SHARON TEARE (LIB): 1,471 (22.4%)
                 JOANNA KILLEN (GRN): 938 (14.3%)
                 PAUL SEELYE (PA): 394 (6.0%)
@@ -1433,13 +1433,13 @@ class MultiResultScreenTest {
                 ELECTION 2020: NEW BRUNSWICK DECIDES
                 
                 DISTRICT 30, SAINT JOHN EAST
-                GLEN SAVOIE (MLA) (PCP): 3,507 (56.4%) WINNER
+                GLEN SAVOIE [MLA] (PCP): 3,507 (56.4%) WINNER
                 PHIL COMEAU (LIB): 1,639 (26.3%)
                 PATRICK KEMP (PA): 434 (7.0%)
                 OTHERS: 642 (10.3%)
                 
                 DISTRICT 31, PORTLAND-SIMONDS
-                TREVOR HOLDER (MLA) (PCP): 3,170 (55.1%) WINNER
+                TREVOR HOLDER [MLA] (PCP): 3,170 (55.1%) WINNER
                 TIM JONES (LIB): 1,654 (28.8%)
                 STEFAN WARNER (GRN): 483 (8.4%)
                 OTHERS: 446 (7.8%)
@@ -1451,19 +1451,19 @@ class MultiResultScreenTest {
                 OTHERS: 656 (12.5%)
                 
                 DISTRICT 33, SAINT JOHN LANCASTER
-                DOROTHY SHEPHARD (MLA) (PCP): 3,560 (54.2%) WINNER
+                DOROTHY SHEPHARD [MLA] (PCP): 3,560 (54.2%) WINNER
                 SHARON TEARE (LIB): 1,471 (22.4%)
                 JOANNA KILLEN (GRN): 938 (14.3%)
                 OTHERS: 595 (9.1%)
                 
                 DISTRICT 34, KINGS CENTRE
-                BILL OLIVER (MLA) (PCP): 4,583 (61.5%) WINNER
+                BILL OLIVER [MLA] (PCP): 4,583 (61.5%) WINNER
                 BRUCE BRYER (GRN): 1,006 (13.5%)
                 PAUL ADAMS (LIB): 911 (12.2%)
                 OTHERS: 947 (12.7%)
                 
                 DISTRICT 35, FUNDY-THE ISLES-SAINT JOHN WEST
-                ANDREA ANDERSON-MASON (MLA) (PCP): 4,740 (66.5%) WINNER
+                ANDREA ANDERSON-MASON [MLA] (PCP): 4,740 (66.5%) WINNER
                 TONY MANN (LIB): 726 (10.2%)
                 VINCENT EDGETT (PA): 688 (9.6%)
                 OTHERS: 977 (13.7%)
@@ -1482,14 +1482,14 @@ class MultiResultScreenTest {
                 ELECTION 2020: NEW BRUNSWICK DECIDES
                 
                 DISTRICT 34, KINGS CENTRE
-                BILL OLIVER (MLA) (PCP): 4,583 (61.5%) WINNER
+                BILL OLIVER [MLA] (PCP): 4,583 (61.5%) WINNER
                 BRUCE BRYER (GRN): 1,006 (13.5%)
                 PAUL ADAMS (LIB): 911 (12.2%)
                 WILLIAM EDGETT (PA): 693 (9.3%)
                 MARGARET ANDERSON KILFOIL (NDP): 254 (3.4%)
                 
                 DISTRICT 35, FUNDY-THE ISLES-SAINT JOHN WEST
-                ANDREA ANDERSON-MASON (MLA) (PCP): 4,740 (66.5%) WINNER
+                ANDREA ANDERSON-MASON [MLA] (PCP): 4,740 (66.5%) WINNER
                 TONY MANN (LIB): 726 (10.2%)
                 VINCENT EDGETT (PA): 688 (9.6%)
                 LOIS MITCHELL (GRN): 686 (9.6%)
@@ -1588,7 +1588,7 @@ class MultiResultScreenTest {
                 votes = { votes.asOneTimePublisher() }
                 header = { ("DISTRICT $districtNum").asOneTimePublisher() }
                 subhead = { name.uppercase().asOneTimePublisher() }
-                incumbentMarker = "(MLA)"
+                incumbentMarker = "MLA"
                 winner = {
                     (
                         if (leaderHasWon) {
@@ -1617,14 +1617,14 @@ class MultiResultScreenTest {
                 ELECTION 2020: NEW BRUNSWICK DECIDES
                 
                 DISTRICT 30, SAINT JOHN EAST [100% IN]
-                GLEN SAVOIE (MLA) (PCP): 3,507 (56.4%) WINNER
+                GLEN SAVOIE [MLA] (PCP): 3,507 (56.4%) WINNER
                 PHIL COMEAU (LIB): 1,639 (26.3%)
                 PATRICK KEMP (PA): 434 (7.0%)
                 GERALD IRISH (GRN): 394 (6.3%)
                 JOSH FLOYD (NDP): 248 (4.0%)
                 
                 DISTRICT 31, PORTLAND-SIMONDS [100% IN]
-                TREVOR HOLDER (MLA) (PCP): 3,170 (55.1%) WINNER
+                TREVOR HOLDER [MLA] (PCP): 3,170 (55.1%) WINNER
                 TIM JONES (LIB): 1,654 (28.8%)
                 STEFAN WARNER (GRN): 483 (8.4%)
                 DARELLA JACKSON (PA): 282 (4.9%)
@@ -1638,7 +1638,7 @@ class MultiResultScreenTest {
                 OTHERS: 347 (6.6%)
                 
                 DISTRICT 33, SAINT JOHN LANCASTER [100% IN]
-                DOROTHY SHEPHARD (MLA) (PCP): 3,560 (54.2%) WINNER
+                DOROTHY SHEPHARD [MLA] (PCP): 3,560 (54.2%) WINNER
                 SHARON TEARE (LIB): 1,471 (22.4%)
                 JOANNA KILLEN (GRN): 938 (14.3%)
                 PAUL SEELYE (PA): 394 (6.0%)
@@ -1696,13 +1696,13 @@ class MultiResultScreenTest {
                 ELECTION 2020: NEW BRUNSWICK DECIDES
                 
                 DISTRICT 30, SAINT JOHN EAST [100% IN]
-                GLEN SAVOIE (MLA) (PCP): 3,507 (56.4%) WINNER
+                GLEN SAVOIE [MLA] (PCP): 3,507 (56.4%) WINNER
                 PHIL COMEAU (LIB): 1,639 (26.3%)
                 PATRICK KEMP (PA): 434 (7.0%)
                 OTHERS: 642 (10.3%)
                 
                 DISTRICT 31, PORTLAND-SIMONDS [100% IN]
-                TREVOR HOLDER (MLA) (PCP): 3,170 (55.1%) WINNER
+                TREVOR HOLDER [MLA] (PCP): 3,170 (55.1%) WINNER
                 TIM JONES (LIB): 1,654 (28.8%)
                 STEFAN WARNER (GRN): 483 (8.4%)
                 OTHERS: 446 (7.8%)
@@ -1714,19 +1714,19 @@ class MultiResultScreenTest {
                 OTHERS: 656 (12.5%)
                 
                 DISTRICT 33, SAINT JOHN LANCASTER [100% IN]
-                DOROTHY SHEPHARD (MLA) (PCP): 3,560 (54.2%) WINNER
+                DOROTHY SHEPHARD [MLA] (PCP): 3,560 (54.2%) WINNER
                 SHARON TEARE (LIB): 1,471 (22.4%)
                 JOANNA KILLEN (GRN): 938 (14.3%)
                 OTHERS: 595 (9.1%)
                 
                 DISTRICT 34, KINGS CENTRE [100% IN]
-                BILL OLIVER (MLA) (PCP): 4,583 (61.5%) WINNER
+                BILL OLIVER [MLA] (PCP): 4,583 (61.5%) WINNER
                 BRUCE BRYER (GRN): 1,006 (13.5%)
                 PAUL ADAMS (LIB): 911 (12.2%)
                 OTHERS: 947 (12.7%)
                 
                 DISTRICT 35, FUNDY-THE ISLES-SAINT JOHN WEST [100% IN]
-                ANDREA ANDERSON-MASON (MLA) (PCP): 4,740 (66.5%) WINNER
+                ANDREA ANDERSON-MASON [MLA] (PCP): 4,740 (66.5%) WINNER
                 TONY MANN (LIB): 726 (10.2%)
                 VINCENT EDGETT (PA): 688 (9.6%)
                 OTHERS: 977 (13.7%)
@@ -1745,14 +1745,14 @@ class MultiResultScreenTest {
                 ELECTION 2020: NEW BRUNSWICK DECIDES
                 
                 DISTRICT 34, KINGS CENTRE [100% IN]
-                BILL OLIVER (MLA) (PCP): 4,583 (61.5%) WINNER
+                BILL OLIVER [MLA] (PCP): 4,583 (61.5%) WINNER
                 BRUCE BRYER (GRN): 1,006 (13.5%)
                 PAUL ADAMS (LIB): 911 (12.2%)
                 WILLIAM EDGETT (PA): 693 (9.3%)
                 MARGARET ANDERSON KILFOIL (NDP): 254 (3.4%)
                 
                 DISTRICT 35, FUNDY-THE ISLES-SAINT JOHN WEST [100% IN]
-                ANDREA ANDERSON-MASON (MLA) (PCP): 4,740 (66.5%) WINNER
+                ANDREA ANDERSON-MASON [MLA] (PCP): 4,740 (66.5%) WINNER
                 TONY MANN (LIB): 726 (10.2%)
                 VINCENT EDGETT (PA): 688 (9.6%)
                 LOIS MITCHELL (GRN): 686 (9.6%)
@@ -1905,7 +1905,7 @@ class MultiResultScreenTest {
                 votes = { votes.asOneTimePublisher() }
                 header = { ("DISTRICT $districtNum").asOneTimePublisher() }
                 subhead = { name.uppercase().asOneTimePublisher() }
-                incumbentMarker = "(MLA)"
+                incumbentMarker = "MLA"
                 winner = {
                     (
                         if (leaderHasWon) {
@@ -1944,18 +1944,18 @@ class MultiResultScreenTest {
                 
                 DISTRICT 13, CHARLOTTETOWN-BRIGHTON
                 OLE HAMMARLUND (GRN): 1,301 (40.3%)
-                JORDAN BROWN (MLA) (LIB): 1,223 (37.9%)
+                JORDAN BROWN [MLA] (LIB): 1,223 (37.9%)
                 DONNA HURRY (PCP): 567 (17.6%)
                 SIMONE WEBSTER (NDP): 138 (4.3%)
                 
                 DISTRICT 12, CHARLOTTETOWN-VICTORIA PARK
                 KARLA BERNARD (GRN): 1,272 (40.5%)
-                RICHARD BROWN (MLA) (LIB): 875 (27.9%)
+                RICHARD BROWN [MLA] (LIB): 875 (27.9%)
                 TIM KEIZER (PCP): 656 (20.9%)
                 JOE BYRNE (NDP): 338 (10.8%)
                 
                 DISTRICT 10, CHARLOTTETOWN-WINSLOE
-                ROBERT MITCHELL (MLA) (LIB): 1,420 (42.0%)
+                ROBERT MITCHELL [MLA] (LIB): 1,420 (42.0%)
                 AMANDA MORRISON (GRN): 1,057 (31.2%)
                 MIKE GILLIS (PCP): 865 (25.6%)
                 JESSE REDDIN COUSINS (NDP): 41 (1.2%)
