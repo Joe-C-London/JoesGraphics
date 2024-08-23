@@ -12,6 +12,9 @@ import java.awt.Graphics
 import java.awt.Graphics2D
 import java.awt.GridLayout
 import java.awt.RenderingHints
+import java.awt.event.ComponentAdapter
+import java.awt.event.ComponentEvent
+import java.awt.image.BufferedImage
 import java.util.concurrent.Flow
 import javax.swing.JPanel
 
@@ -84,6 +87,8 @@ class RegionSummaryFrame private constructor(
                 sections[idx].header = section.header
                 sections[idx].values = section.valueColor
             }
+            valueFontSize = sections.minOf { it.maxValueFontSize() }
+            headerFontSize = sections.minOf { it.maxHeaderFontSize() }
         }
         sectionsPublisher.subscribe(Subscriber(eventQueueWrapper(onSectionsUpdate)))
     }
@@ -108,18 +113,77 @@ class RegionSummaryFrame private constructor(
         return sections[sectionIdx].values[valueIdx].second
     }
 
+    var valueFontSize = 0
+    var headerFontSize = 0
+
     private inner class SectionPanel : JPanel() {
+        init {
+            addComponentListener(object : ComponentAdapter() {
+                override fun componentResized(e: ComponentEvent) {
+                    super.componentResized(e)
+                    valueFontSize = sections.minOf { it.maxValueFontSize() }
+                    headerFontSize = sections.minOf { it.maxHeaderFontSize() }
+                    repaint()
+                }
+            })
+        }
+
         var header: String = ""
             set(value) {
                 field = value
+                headerFontSize = sections.minOf { it.maxHeaderFontSize() }
                 repaint()
             }
 
         var values: List<Pair<Color, String>> = emptyList()
             set(value) {
                 field = value
+                valueFontSize = sections.minOf { it.maxValueFontSize() }
+                headerFontSize = sections.minOf { it.maxHeaderFontSize() }
                 repaint()
             }
+
+        fun maxValueFontSize(): Int {
+            val g = BufferedImage(width.coerceAtLeast(1), height.coerceAtLeast(1), BufferedImage.TYPE_INT_ARGB).graphics
+            try {
+                var valueFont: Font
+                val startFontSize = 61.coerceAtMost(height * 2 / 3 - 5)
+                val valueFonts = ArrayList<Int>()
+                for (i in values.indices) {
+                    g.setColor(ColorUtils.contrastForBackground(values[i].first))
+                    val value = values[i].second
+                    var valueWidth: Int
+                    var fontSize = startFontSize
+                    do {
+                        fontSize--
+                        valueFont = StandardFont.readBoldFont(fontSize)
+                        valueWidth = g.getFontMetrics(valueFont).stringWidth(value)
+                    } while (valueWidth > width / values.size - 20 && fontSize > 0)
+                    valueFonts.add(fontSize)
+                }
+                return valueFonts.minOrNull() ?: 0
+            } finally {
+                g.dispose()
+            }
+        }
+
+        fun maxHeaderFontSize(): Int {
+            val g = BufferedImage(width.coerceAtLeast(1), height.coerceAtLeast(1), BufferedImage.TYPE_INT_ARGB).graphics
+            try {
+                var headerFontSize = 24.coerceAtMost(height / 3 - 2).coerceAtMost(valueFontSize)
+                var headerFont: Font
+                var headerWidth: Int
+                do {
+                    headerFont = StandardFont.readBoldFont(headerFontSize)
+                    g.setFont(headerFont)
+                    headerWidth = g.getFontMetrics(headerFont).stringWidth(header)
+                    headerFontSize--
+                } while (headerWidth > width - 20 && headerFontSize > 0)
+                return headerFontSize
+            } finally {
+                g.dispose()
+            }
+        }
 
         override fun paintComponent(g: Graphics) {
             super.paintComponent(g)
@@ -128,37 +192,23 @@ class RegionSummaryFrame private constructor(
                     RenderingHints.KEY_TEXT_ANTIALIASING,
                     RenderingHints.VALUE_TEXT_ANTIALIAS_ON,
                 )
-            var valueFont: Font
             val startFontSize = 61.coerceAtMost(height * 2 / 3 - 5)
-            val valueFonts = ArrayList<Int>()
+            val valueFont = StandardFont.readBoldFont(valueFontSize)
             for (i in values.indices) {
                 g.setColor(ColorUtils.contrastForBackground(values[i].first))
                 val value = values[i].second
-                var valueWidth: Int
-                var fontSize = startFontSize
-                do {
-                    fontSize--
-                    valueFont = StandardFont.readBoldFont(fontSize)
-                    valueWidth = g.getFontMetrics(valueFont).stringWidth(value)
-                } while (valueWidth > width / values.size - 20)
-                g.setFont(valueFont)
+                val valueWidth = g.getFontMetrics(valueFont).stringWidth(value)
+                g.setFont(StandardFont.readBoldFont(valueFontSize))
                 g.drawString(
                     value,
                     (width / values.size - valueWidth) / 2 + width / values.size * i,
-                    height / 3 + (startFontSize + fontSize) / 2,
+                    height / 3 + (startFontSize + valueFontSize) / 2,
                 )
-                valueFonts.add(fontSize)
             }
             g.setColor(ColorUtils.contrastForBackground(summaryColor))
-            var headerFontSize = 24.coerceAtMost(height / 3 - 2).coerceAtMost((valueFonts.maxOrNull() ?: Int.MAX_VALUE))
-            var headerFont: Font
-            var headerWidth: Int
-            do {
-                headerFont = StandardFont.readBoldFont(headerFontSize)
-                g.setFont(headerFont)
-                headerWidth = g.getFontMetrics(headerFont).stringWidth(header)
-                headerFontSize--
-            } while (headerWidth > width - 20)
+            val headerFont = StandardFont.readBoldFont(headerFontSize)
+            val headerWidth = g.getFontMetrics(headerFont).stringWidth(header)
+            g.font = headerFont
             g.drawString(header, (width - headerWidth) / 2, height / 3 - 2)
         }
 
