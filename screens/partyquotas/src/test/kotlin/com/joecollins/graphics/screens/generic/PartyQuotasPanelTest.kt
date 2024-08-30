@@ -1,6 +1,6 @@
 package com.joecollins.graphics.screens.generic
 
-import com.joecollins.graphics.screens.generic.PartyQuotasPanel.Companion.createMap
+import com.joecollins.graphics.screens.generic.SinglePartyMap.Companion.createSinglePartyMap
 import com.joecollins.graphics.utils.PublisherTestUtils.assertPublishes
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.graphics.utils.ShapefileReader
@@ -68,10 +68,10 @@ class PartyQuotasPanelTest {
                 order = listOf(sf, apni, dup)
                 header = "FIRST PREF SWING".asOneTimePublisher()
             },
-            map = createMap {
+            map = createSinglePartyMap {
                 shapes = niShapesByConstituency().asOneTimePublisher()
                 selectedShape = 9.asOneTimePublisher()
-                leadingParty = currWinner
+                leader = currWinner
                 focus = listOf(9, 10, 12, 15).asOneTimePublisher()
                 header = "BELFAST".asOneTimePublisher()
             },
@@ -540,10 +540,10 @@ class PartyQuotasPanelTest {
                 header = "FIRST PREF SWING".asOneTimePublisher()
                 range = 0.02.asOneTimePublisher()
             },
-            map = createMap {
+            map = createSinglePartyMap {
                 shapes = niShapesByConstituency().asOneTimePublisher()
                 selectedShape = 9.asOneTimePublisher()
-                leadingParty = currWinner
+                leader = currWinner
                 focus = listOf(9, 10, 12, 15).asOneTimePublisher()
                 header = "BELFAST".asOneTimePublisher()
             },

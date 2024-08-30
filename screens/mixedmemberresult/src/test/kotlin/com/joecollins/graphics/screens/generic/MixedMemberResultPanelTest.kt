@@ -1,7 +1,7 @@
 package com.joecollins.graphics.screens.generic
 
 import com.joecollins.graphics.screens.generic.MixedMemberResultPanel.Companion.convertToPartyOrCandidateForMixedMember
-import com.joecollins.graphics.screens.generic.MixedMemberResultPanel.Companion.createMap
+import com.joecollins.graphics.screens.generic.SingleResultMap.Companion.createSingleResultMap
 import com.joecollins.graphics.utils.PublisherTestUtils.assertPublishes
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.graphics.utils.ShapefileReader
@@ -55,10 +55,10 @@ class MixedMemberResultPanelTest {
                 prevVotes = previousPartyVotes
                 header = partyChangeHeader
             },
-            map = createMap {
+            map = createSingleResultMap {
                 this.shapes = shapesByDistrict.asOneTimePublisher()
                 this.selectedShape = selectedShape
-                this.leadingParty = selectedResult
+                this.leader = selectedResult
                 this.focus = focus
                 this.header = mapHeader
             },
@@ -163,10 +163,10 @@ class MixedMemberResultPanelTest {
                 prevVotes = previousPartyVotes
                 header = partyChangeHeader
             },
-            map = createMap {
+            map = createSingleResultMap {
                 this.shapes = shapesByDistrict.asOneTimePublisher()
                 this.selectedShape = selectedShape
-                this.leadingParty = selectedResult
+                this.leader = selectedResult
                 this.focus = focus
                 this.header = mapHeader
             },
@@ -277,10 +277,10 @@ class MixedMemberResultPanelTest {
                 prevVotes = previousPartyVotes
                 header = partyChangeHeader
             },
-            map = createMap {
+            map = createSingleResultMap {
                 this.shapes = shapesByDistrict.asOneTimePublisher()
                 this.selectedShape = selectedShape
-                this.leadingParty = selectedResult
+                this.leader = selectedResult
                 this.focus = focus
                 this.header = mapHeader
             },
@@ -387,10 +387,10 @@ class MixedMemberResultPanelTest {
                 prevVotes = previousPartyVotes
                 header = partyChangeHeader
             },
-            map = createMap {
+            map = createSingleResultMap {
                 this.shapes = shapesByDistrict.asOneTimePublisher()
                 this.selectedShape = selectedShape
-                this.leadingParty = selectedResult
+                this.leader = selectedResult
                 this.focus = focus
                 this.header = mapHeader
             },
@@ -493,10 +493,10 @@ class MixedMemberResultPanelTest {
                 prevVotes = previousPartyVotes
                 header = partyChangeHeader
             },
-            map = createMap {
+            map = createSingleResultMap {
                 this.shapes = shapesByDistrict.asOneTimePublisher()
                 this.selectedShape = selectedShape
-                this.leadingParty = selectedResult
+                this.leader = selectedResult
                 this.focus = focus
                 this.header = mapHeader
             },
@@ -595,10 +595,10 @@ class MixedMemberResultPanelTest {
                 prevVotes = previousPartyVotes
                 header = partyChangeHeader
             },
-            map = createMap {
+            map = createSingleResultMap {
                 this.shapes = shapesByDistrict.asOneTimePublisher()
                 this.selectedShape = selectedShape
-                this.leadingParty = selectedResult
+                this.leader = selectedResult
                 this.focus = focus
                 this.header = mapHeader
             },
@@ -692,10 +692,10 @@ class MixedMemberResultPanelTest {
                 prevVotes = previousPartyVotes
                 header = partyChangeHeader
             },
-            map = createMap {
+            map = createSingleResultMap {
                 this.shapes = shapesByDistrict.asOneTimePublisher()
                 this.selectedShape = selectedShape
-                this.leadingParty = selectedResult
+                this.leader = selectedResult
                 this.focus = focus
                 this.additionalHighlight = additionalHighlight
                 this.header = mapHeader
@@ -783,10 +783,10 @@ class MixedMemberResultPanelTest {
                 votes = currentPartyVotes.convertToPartyOrCandidateForMixedMember()
                 header = partyHeader
             },
-            map = createMap {
+            map = createSingleResultMap {
                 this.shapes = shapesByDistrict.asOneTimePublisher()
                 this.selectedShape = selectedShape
-                this.leadingParty = selectedResult
+                this.leader = selectedResult
                 this.focus = focus
                 this.header = mapHeader
             },
@@ -859,10 +859,10 @@ class MixedMemberResultPanelTest {
                 votes = currentPartyVotes.convertToPartyOrCandidateForMixedMember()
                 header = partyHeader
             },
-            map = createMap {
+            map = createSingleResultMap {
                 this.shapes = shapesByDistrict.asOneTimePublisher()
                 this.selectedShape = selectedShape
-                this.leadingParty = selectedResult
+                this.leader = selectedResult
                 this.focus = focus
                 this.header = mapHeader
             },
@@ -935,10 +935,10 @@ class MixedMemberResultPanelTest {
                 votes = currentPartyVotes.convertToPartyOrCandidateForMixedMember()
                 header = partyHeader
             },
-            map = createMap {
+            map = createSingleResultMap {
                 this.shapes = shapesByDistrict.asOneTimePublisher()
                 this.selectedShape = selectedShape
-                this.leadingParty = selectedResult
+                this.leader = selectedResult
                 this.focus = focus
                 this.header = mapHeader
             },
@@ -1012,10 +1012,10 @@ class MixedMemberResultPanelTest {
                 votes = currentPartyVotes.convertToPartyOrCandidateForMixedMember()
                 header = partyHeader
             },
-            map = createMap {
+            map = createSingleResultMap {
                 this.shapes = shapesByDistrict.asOneTimePublisher()
                 this.selectedShape = selectedShape
-                this.leadingParty = selectedResult
+                this.leader = selectedResult
                 this.focus = focus
                 this.header = mapHeader
             },

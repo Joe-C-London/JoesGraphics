@@ -2,12 +2,7 @@ package com.joecollins.graphics.screens.generic
 
 import com.joecollins.graphics.components.MapFrame
 import com.joecollins.graphics.components.MapFrameBuilder
-import com.joecollins.models.general.NonPartisanCandidateResult
-import com.joecollins.models.general.Party
-import com.joecollins.models.general.PartyResult
-import com.joecollins.models.general.ResultColorUtils.getColor
 import com.joecollins.pubsub.asOneTimePublisher
-import com.joecollins.pubsub.map
 import com.joecollins.pubsub.merge
 import java.awt.Color
 import java.awt.Shape
@@ -17,7 +12,7 @@ object MapBuilder {
 
     fun <T> multiResult(
         shapes: Flow.Publisher<out Map<T, Shape>>,
-        winners: Flow.Publisher<out Map<T, PartyResult?>>,
+        winners: Flow.Publisher<out Map<T, Color?>>,
         focus: Flow.Publisher<out List<T>?>? = null,
         additionalHighlight: Flow.Publisher<out List<T>?>? = null,
         header: Flow.Publisher<out String?>,
@@ -56,51 +51,7 @@ object MapBuilder {
     }
 
     fun <T> singleResult(
-        shapes: Flow.Publisher<out Map<T, Shape>>,
-        selectedShape: Flow.Publisher<out T>,
-        leadingParty: Flow.Publisher<out PartyResult?>,
-        focus: Flow.Publisher<out List<T>?>? = null,
-        additionalHighlight: Flow.Publisher<out List<T>?>? = null,
-        header: Flow.Publisher<out String?>,
-        notes: Flow.Publisher<out String?>? = null,
-        outlines: Flow.Publisher<out List<Shape>>? = null,
-    ): MapFrame {
-        return singleResultColored(
-            shapes,
-            selectedShape,
-            leadingParty.map { it.getColor(default = Party.OTHERS.color) },
-            focus,
-            additionalHighlight,
-            header,
-            notes,
-            outlines,
-        )
-    }
-
-    fun <T> singleNonPartisanResult(
-        shapes: Flow.Publisher<out Map<T, Shape>>,
-        selectedShape: Flow.Publisher<out T>,
-        leadingCandidate: Flow.Publisher<out NonPartisanCandidateResult?>,
-        focus: Flow.Publisher<out List<T>?>? = null,
-        additionalHighlight: Flow.Publisher<out List<T>?>? = null,
-        header: Flow.Publisher<out String?>,
-        notes: Flow.Publisher<out String?>? = null,
-        outlines: Flow.Publisher<out List<Shape>>? = null,
-    ): MapFrame {
-        return singleResultColored(
-            shapes,
-            selectedShape,
-            leadingCandidate.map { it.getColor(default = Party.OTHERS.color) },
-            focus,
-            additionalHighlight,
-            header,
-            notes,
-            outlines,
-        )
-    }
-
-    private fun <T> singleResultColored(
-        shapes: Flow.Publisher<out Map<T, Shape>>,
+        shapes: Flow.Publisher<out Map<out T, Shape>>,
         selectedShape: Flow.Publisher<out T>,
         color: Flow.Publisher<out Color>,
         focus: Flow.Publisher<out List<T>?>?,
@@ -152,16 +103,16 @@ object MapBuilder {
         )
     }
 
-    private fun <T> createFocusShapes(shapes: Map<T, Shape>, focus: List<T>?): List<Shape>? {
+    private fun <T> createFocusShapes(shapes: Map<out T, Shape>, focus: List<T>?): List<Shape>? {
         return focus
             ?.filter { shapes.containsKey(it) }
             ?.map { shapes[it]!! }
             ?.toList()
     }
 
-    private fun extractColor(focus: List<Shape>?, shape: Shape, winner: PartyResult?): Color {
+    private fun extractColor(focus: List<Shape>?, shape: Shape, winner: Color?): Color {
         val isInFocus = focus.isNullOrEmpty() || focus.contains(shape)
-        return winner?.getColor(default = Party.OTHERS.color)?.takeIf { isInFocus }
+        return winner?.takeIf { isInFocus }
             ?: (
                 if (isInFocus) {
                     Color.LIGHT_GRAY

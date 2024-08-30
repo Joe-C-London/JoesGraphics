@@ -9,7 +9,6 @@ import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyOrCandidate
 import com.joecollins.models.general.PartyOrCoalition
-import com.joecollins.models.general.PartyResult
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.asOneTimePublisher
@@ -125,24 +124,6 @@ class MixedMemberResultPanel private constructor(
         lateinit var header: Flow.Publisher<out String?>
     }
 
-    class MapPanel<T> internal constructor() {
-        lateinit var shapes: Flow.Publisher<out Map<T, Shape>>
-        lateinit var selectedShape: Flow.Publisher<out T>
-        lateinit var leadingParty: Flow.Publisher<out PartyResult?>
-        var focus: Flow.Publisher<out List<T>?>? = null
-        var additionalHighlight: Flow.Publisher<out List<T>?>? = null
-        lateinit var header: Flow.Publisher<out String>
-
-        internal fun createPanel() = MapBuilder.singleResult(
-            shapes = shapes,
-            selectedShape = selectedShape,
-            leadingParty = leadingParty,
-            focus = focus,
-            additionalHighlight = additionalHighlight,
-            header = header,
-        )
-    }
-
     companion object {
         private val PCT_FORMAT = DecimalFormat("0.0%")
         private val PCT_DIFF_FORMAT = DecimalFormat("+0.0%;-0.0%")
@@ -151,14 +132,12 @@ class MixedMemberResultPanel private constructor(
         fun Flow.Publisher<out Map<out Party, Int?>>.convertToPartyOrCandidateForMixedMember() =
             map { v -> v.mapKeys { PartyOrCandidate(it.key) } }
 
-        fun <K> createMap(func: MapPanel<K>.() -> Unit) = MapPanel<K>().apply(func)
-
         fun of(
             candidateVotes: CandidateVotes.() -> Unit,
             candidateChange: (CandidateChange.() -> Unit)? = null,
             partyVotes: PartyVotes.() -> Unit,
             partyChange: (PartyChange.() -> Unit)? = null,
-            map: MapPanel<*>? = null,
+            map: AbstractMap<*>? = null,
             title: Flow.Publisher<out String?>,
         ): MixedMemberResultPanel {
             val cv = CandidateVotes().apply(candidateVotes)
@@ -171,7 +150,7 @@ class MixedMemberResultPanel private constructor(
                 createCandidateChange(cv, cc),
                 createPartyVotes(pv),
                 createPartyChange(pv, pc),
-                map?.createPanel(),
+                map?.mapFrame,
                 createAltText(cv, cc, pv, pc, title),
             )
         }

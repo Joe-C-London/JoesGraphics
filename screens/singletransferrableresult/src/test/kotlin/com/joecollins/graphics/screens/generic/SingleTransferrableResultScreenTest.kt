@@ -1,6 +1,6 @@
 package com.joecollins.graphics.screens.generic
 
-import com.joecollins.graphics.screens.generic.SingleTransferrableResultScreen.Companion.createMap
+import com.joecollins.graphics.screens.generic.SinglePartyMap.Companion.createSinglePartyMap
 import com.joecollins.graphics.utils.PublisherTestUtils.assertPublishes
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.graphics.utils.ShapefileReader
@@ -87,10 +87,10 @@ class SingleTransferrableResultScreenTest {
                 seats = mapOf(dup to 3, apni to 2, uup to 1).asOneTimePublisher()
                 header = "SEATS IN 2016".asOneTimePublisher()
             },
-            map = createMap {
+            map = createSinglePartyMap {
                 shapes = niShapesByConstituency().asOneTimePublisher()
                 selectedShape = 9.asOneTimePublisher()
-                leadingParty = currWinner
+                leader = currWinner
                 focus = listOf(9, 10, 12, 15).asOneTimePublisher()
                 header = "BELFAST".asOneTimePublisher()
             },
@@ -742,10 +742,10 @@ class SingleTransferrableResultScreenTest {
                 seats = mapOf(dup to 3, apni to 2, uup to 1).asOneTimePublisher()
                 header = "SEATS IN 2016".asOneTimePublisher()
             },
-            map = createMap {
+            map = createSinglePartyMap {
                 shapes = niShapesByConstituency().asOneTimePublisher()
                 selectedShape = 9.asOneTimePublisher()
-                leadingParty = currWinner
+                leader = currWinner
                 focus = listOf(9, 10, 12, 15).asOneTimePublisher()
                 header = "BELFAST".asOneTimePublisher()
             },

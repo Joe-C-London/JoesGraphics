@@ -7,13 +7,11 @@ import com.joecollins.models.general.CanOverrideSortOrder
 import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.NonPartisanCandidate
 import com.joecollins.models.general.Party
-import com.joecollins.models.general.PartyResult
 import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.map
 import com.joecollins.pubsub.mapElements
 import com.joecollins.pubsub.merge
 import java.awt.Color
-import java.awt.Shape
 import java.text.DecimalFormat
 import java.util.concurrent.Flow
 import javax.swing.JPanel
@@ -49,13 +47,11 @@ class CandidateListingScreen private constructor(
 
     companion object {
 
-        fun <K> createMap(func: MapPanel<K>.() -> Unit) = MapPanel<K>().apply(func)
-
         fun of(
             candidates: CandidatesPanel<Candidate>.() -> Unit,
             prev: (PrevPanel<Party>.() -> Unit)? = null,
             secondaryPrev: (PrevPanel<Party>.() -> Unit)? = null,
-            map: MapPanel<*>? = null,
+            map: SingleNoResultMap<*>? = null,
             incumbentMarker: String? = null,
             showTwoColumns: Flow.Publisher<Boolean>? = null,
             title: Flow.Publisher<out String?>,
@@ -92,7 +88,7 @@ class CandidateListingScreen private constructor(
                         { color },
                     )
                 },
-                map?.createPanel(),
+                map?.mapFrame,
                 createAltText(
                     title,
                     candidatesPanel,
@@ -108,7 +104,7 @@ class CandidateListingScreen private constructor(
             candidates: CandidatesPanel<NonPartisanCandidate>.() -> Unit,
             prev: (PrevPanel<NonPartisanCandidate>.() -> Unit)? = null,
             secondaryPrev: (PrevPanel<NonPartisanCandidate>.() -> Unit)? = null,
-            map: MapPanel<*>? = null,
+            map: SingleNoResultMap<*>? = null,
             showTwoColumns: Flow.Publisher<Boolean>? = null,
             title: Flow.Publisher<out String?>,
         ): CandidateListingScreen {
@@ -144,7 +140,7 @@ class CandidateListingScreen private constructor(
                         prevColor = { color },
                     )
                 },
-                map?.createPanel(),
+                map?.mapFrame,
                 createAltText(
                     title,
                     candidatesPanel,
@@ -311,22 +307,5 @@ class CandidateListingScreen private constructor(
         var subhead: Flow.Publisher<out String?>? = null
 
         internal val subheadOrDefault by lazy { subhead ?: null.asOneTimePublisher() }
-    }
-
-    class MapPanel<K> internal constructor() {
-        lateinit var shapes: Flow.Publisher<out Map<K, Shape>>
-        lateinit var selectedShape: Flow.Publisher<out K>
-        var focus: Flow.Publisher<out List<K>?>? = null
-        var additionalHighlight: Flow.Publisher<out List<K>?>? = null
-        lateinit var header: Flow.Publisher<out String>
-
-        internal fun createPanel() = MapBuilder.singleResult(
-            shapes = shapes,
-            selectedShape = selectedShape,
-            leadingParty = (null as PartyResult?).asOneTimePublisher(),
-            focus = focus,
-            additionalHighlight = additionalHighlight,
-            header = header,
-        )
     }
 }

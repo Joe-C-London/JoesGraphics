@@ -3,14 +3,12 @@ package com.joecollins.graphics.screens.generic
 import com.joecollins.graphics.GenericPanel
 import com.joecollins.graphics.components.BarFrame
 import com.joecollins.graphics.components.BarFrameBuilder
-import com.joecollins.graphics.components.MapFrame
 import com.joecollins.graphics.components.SwingFrame
 import com.joecollins.graphics.components.SwingFrameBuilder
 import com.joecollins.models.general.Aggregators
 import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyOrCoalition
-import com.joecollins.models.general.PartyResult
 import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.compose
 import com.joecollins.pubsub.map
@@ -375,9 +373,6 @@ class SeatViewPanel private constructor(
                 textHeader = title,
             ).build()
         }
-
-        fun <T> createPartyMap(builder: PartyMap<T>.() -> Unit) = PartyMap<T>().apply(builder)
-        fun <T> createResultMap(builder: ResultMap<T>.() -> Unit) = ResultMap<T>().apply(builder)
     }
 
     interface SeatTemplate<CT, PT, BAR> {
@@ -753,45 +748,6 @@ class SeatViewPanel private constructor(
     class PartyClassification<KPT : PartyOrCoalition> internal constructor() {
         lateinit var classification: (KPT) -> KPT
         lateinit var header: Flow.Publisher<out String?>
-    }
-
-    sealed class AbstractMap<T> {
-        lateinit var shapes: Flow.Publisher<out Map<T, Shape>>
-        var focus: Flow.Publisher<out List<T>?>? = null
-        var additionalHighlight: Flow.Publisher<out List<T>?>? = null
-        lateinit var header: Flow.Publisher<out String?>
-
-        internal val additionalHighlightOrFocus by lazy { additionalHighlight ?: focus }
-
-        internal abstract val mapFrame: MapFrame
-    }
-
-    class PartyMap<T> internal constructor() : AbstractMap<T>() {
-        lateinit var winners: Flow.Publisher<out Map<T, PartyOrCoalition?>>
-
-        override val mapFrame by lazy {
-            MapBuilder.multiResult(
-                shapes = shapes,
-                winners = winners.map { m -> BasicResultPanel.partyMapToResultMap(m) },
-                focus = focus,
-                additionalHighlight = additionalHighlightOrFocus,
-                header = header,
-            )
-        }
-    }
-
-    class ResultMap<T> internal constructor() : AbstractMap<T>() {
-        lateinit var winners: Flow.Publisher<out Map<T, PartyResult?>>
-
-        override val mapFrame: MapFrame by lazy {
-            MapBuilder.multiResult(
-                shapes = shapes,
-                winners = winners,
-                focus = focus,
-                additionalHighlight = additionalHighlightOrFocus,
-                header = header,
-            )
-        }
     }
 
     private data class CurrDiffEntry<K, P, C>(val key: K?, val party: P, val curr: C?, val diff: C?, val result: SeatScreenBuilder.Result?)

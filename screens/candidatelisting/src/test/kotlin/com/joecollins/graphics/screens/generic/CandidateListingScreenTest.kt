@@ -1,6 +1,6 @@
 package com.joecollins.graphics.screens.generic
 
-import com.joecollins.graphics.screens.generic.CandidateListingScreen.Companion.createMap
+import com.joecollins.graphics.screens.generic.SingleNoResultMap.Companion.createSingleNoResultMap
 import com.joecollins.graphics.utils.PublisherTestUtils.assertPublishes
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.graphics.utils.ShapefileReader
@@ -128,7 +128,7 @@ class CandidateListingScreenTest {
                 votes = prev.asOneTimePublisher()
                 header = "2015 RESULT".asOneTimePublisher()
             },
-            map = createMap {
+            map = createSingleNoResultMap {
                 this.shapes = shapes.asOneTimePublisher()
                 selectedShape = 1.asOneTimePublisher()
                 focus = listOf(1, 2, 3, 4, 5, 6, 7).asOneTimePublisher()
@@ -188,7 +188,7 @@ class CandidateListingScreenTest {
                 votes = prev.asOneTimePublisher()
                 header = "2015 RESULT".asOneTimePublisher()
             },
-            map = createMap {
+            map = createSingleNoResultMap {
                 this.shapes = shapes.asOneTimePublisher()
                 selectedShape = 14.asOneTimePublisher()
                 focus = listOf(9, 10, 11, 12, 13, 14).asOneTimePublisher()
@@ -256,7 +256,7 @@ class CandidateListingScreenTest {
                 votes = secondaryPrev.asOneTimePublisher()
                 header = "2015 REGIONAL RESULT".asOneTimePublisher()
             },
-            map = createMap {
+            map = createSingleNoResultMap {
                 this.shapes = shapes.asOneTimePublisher()
                 selectedShape = 1.asOneTimePublisher()
                 focus = listOf(1, 2, 3, 4, 5, 6, 7).asOneTimePublisher()
@@ -405,7 +405,7 @@ class CandidateListingScreenTest {
                 votes = secondaryPrev
                 header = "2015 REGIONAL RESULT".asOneTimePublisher()
             },
-            map = createMap {
+            map = createSingleNoResultMap {
                 this.shapes = shapes.asOneTimePublisher()
                 selectedShape = districtNum
                 this.focus = focus

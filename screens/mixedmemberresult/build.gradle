@@ -13,14 +13,14 @@ version '1.0-SNAPSHOT'
 var topLevel = parent.parent
 
 dependencies {
+    api parent.project('mapcommon')
     api parent.project('screenbase')
+    implementation topLevel.project('modelutils')
     implementation topLevel.project('pubsub')
     implementation topLevel.project('shapes')
     implementation topLevel.project('components:barframe')
-    implementation topLevel.project('components:resultmapframebuilder')
 
     testImplementation topLevel.project('testutils')
-    testImplementation topLevel.project('modelutils')
     testImplementation topLevel.project('mapreaders:shapefile')
 
     testImplementation "org.junit.jupiter:junit-jupiter-api:$topLevel.ext.junit_version"

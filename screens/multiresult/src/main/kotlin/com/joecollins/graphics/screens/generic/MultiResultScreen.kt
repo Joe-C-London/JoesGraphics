@@ -8,11 +8,10 @@ import com.joecollins.graphics.components.BarFrameBuilder
 import com.joecollins.graphics.components.MapFrame
 import com.joecollins.graphics.components.SwingFrame
 import com.joecollins.graphics.components.SwingFrameBuilder
+import com.joecollins.graphics.screens.generic.SingleResultMap.Companion.createSingleResultMap
 import com.joecollins.models.general.Aggregators
 import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.Party
-import com.joecollins.models.general.PartyResult
-import com.joecollins.models.general.ResultColorUtils.getColor
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.asOneTimePublisher
@@ -68,57 +67,6 @@ class MultiResultScreen private constructor(
     class Swing<T> internal constructor() {
         lateinit var header: (T.() -> Flow.Publisher<out String>)
         lateinit var partyOrder: List<Party>
-    }
-
-    class MapPanel<T, K> internal constructor() {
-        lateinit var shapes: T.() -> Map<K, Shape>
-        lateinit var selectedShape: T.() -> K
-        lateinit var leadingParty: T.() -> Flow.Publisher<out PartyResult?>
-        var focus: (T.() -> List<K>?)? = null
-        var additionalHighlights: (T.() -> List<K>?)? = null
-        lateinit var header: T.() -> Flow.Publisher<out String>
-
-        internal val focusOrDefault: T.() -> List<K>? by lazy { focus ?: { null } }
-        internal val additionalHighlightsOrDefault: T.() -> List<K>? by lazy { additionalHighlights ?: focusOrDefault }
-
-        internal val focusShapes: T.() -> List<Shape> = {
-            focusOrDefault()?.let { focusKeys ->
-                val shapesMap = shapes()
-                focusKeys.mapNotNull { shapesMap[it] }
-            } ?: emptyList()
-        }
-
-        internal val shapeColors: T.() -> List<Pair<Shape, Flow.Publisher<out Color>>> = {
-            val selected = selectedShape()
-            val focusKeys = focusOrDefault()
-            val additionalHighlight = additionalHighlightsOrDefault()
-            val leader = leadingParty()
-            shapes().entries.asSequence()
-                .map { (id, shape) ->
-                    when {
-                        id == selected -> {
-                            Pair(shape, leader.map { it.getColor(default = Party.OTHERS.color) })
-                        }
-                        focusKeys.isNullOrEmpty() || focusKeys.contains(id) -> {
-                            Pair(
-                                shape,
-                                Color.LIGHT_GRAY.asOneTimePublisher(),
-                            )
-                        }
-                        additionalHighlight != null && additionalHighlight.contains(id) -> {
-                            Pair(
-                                shape,
-                                Color.LIGHT_GRAY.asOneTimePublisher(),
-                            )
-                        }
-                        else -> Pair(
-                            shape,
-                            Color(220, 220, 220).asOneTimePublisher(),
-                        )
-                    }
-                }
-                .toList()
-        }
     }
 
     private class Result(private val partiesOnly: Boolean, private val incumbentMarker: String) {
@@ -231,9 +179,7 @@ class MultiResultScreen private constructor(
         private val prevVotes: Publisher<Flow.Publisher<out Map<Party, Int>>> = Publisher(Publisher())
         private val maxBars: Publisher<Flow.Publisher<out Int>> = Publisher(Publisher())
         private val swingHeader: Publisher<Flow.Publisher<out String?>> = Publisher(Publisher())
-        private val mapShape: Publisher<Flow.Publisher<out List<Pair<Shape, Color>>>> = Publisher(Publisher())
-        private val mapFocus: Publisher<Flow.Publisher<out List<Shape>>> = Publisher(Publisher())
-        private val mapHeader: Publisher<Flow.Publisher<out String>> = Publisher(Publisher())
+        private val map: Publisher<Flow.Publisher<out AbstractSingleResultMap<*, *>>> = Publisher(Publisher())
 
         fun setVotesPublisher(votes: Flow.Publisher<out Map<Candidate, Int>>) {
             this.votes.submit(votes)
@@ -271,16 +217,8 @@ class MultiResultScreen private constructor(
             this.swingHeader.submit(swingHeader)
         }
 
-        fun setMapShapePublisher(shapes: Flow.Publisher<out List<Pair<Shape, Color>>>) {
-            mapShape.submit(shapes)
-        }
-
-        fun setMapFocusPublisher(shapes: Flow.Publisher<out List<Shape>>) {
-            mapFocus.submit(shapes)
-        }
-
-        fun setMapHeaderPublisher(mapHeader: Flow.Publisher<out String>) {
-            this.mapHeader.submit(mapHeader)
+        fun setMapPublisher(map: Flow.Publisher<out AbstractSingleResultMap<*, *>>) {
+            this.map.submit(map)
         }
 
         fun setMaxBarsPublisher(maxBars: Flow.Publisher<out Int>) {
@@ -297,9 +235,7 @@ class MultiResultScreen private constructor(
             setProgressLabelPublisher(null.asOneTimePublisher())
             setPrevPublisher(emptyMap<Party, Int>().asOneTimePublisher())
             setSwingHeaderPublisher("".asOneTimePublisher())
-            setMapShapePublisher(emptyList<Pair<Shape, Color>>().asOneTimePublisher())
-            setMapFocusPublisher(emptyList<Shape>().asOneTimePublisher())
-            setMapHeaderPublisher("".asOneTimePublisher())
+            setMapPublisher(NULL_MAP.asOneTimePublisher())
             setMaxBarsPublisher(5.asOneTimePublisher())
         }
 
@@ -359,15 +295,7 @@ class MultiResultScreen private constructor(
                 add(swingFrame)
             }
             if (hasMap) {
-                mapFrame = MapFrame(
-                    headerPublisher = mapHeader.selfCompose(),
-                    shapesPublisher = mapShape.selfCompose(),
-                    focusBoxPublisher = mapFocus.selfCompose().map { shapes ->
-                        shapes.asSequence()
-                            .map { it.bounds2D }
-                            .reduceOrNull { agg, r -> agg.createUnion(r) }
-                    },
-                )
+                mapFrame = AbstractSingleResultMap.createMapFrame(map.selfCompose())
                 add(mapFrame)
             }
         }
@@ -375,13 +303,11 @@ class MultiResultScreen private constructor(
 
     companion object {
 
-        fun <T, K> createMap(map: MapPanel<T, K>.() -> Unit) = MapPanel<T, K>().apply(map)
-
         fun <T> of(
             list: Flow.Publisher<out List<T>>,
             curr: CurrVotes<T>.() -> Unit,
             prev: (PrevPartyVotes<T>.() -> Unit)? = null,
-            map: MapPanel<T, *>? = null,
+            map: ((T) -> AbstractSingleResultMap<*, *>)? = null,
             title: Flow.Publisher<out String?>,
         ): MultiResultScreen {
             return build(
@@ -398,7 +324,7 @@ class MultiResultScreen private constructor(
             list: Flow.Publisher<out List<T>>,
             curr: CurrPartyVotes<T>.() -> Unit,
             prev: (PrevPartyVotes<T>.() -> Unit)? = null,
-            map: MapPanel<T, *>? = null,
+            map: ((T) -> AbstractSingleResultMap<*, *>)? = null,
             title: Flow.Publisher<out String?>,
         ): MultiResultScreen {
             val currVotes = CurrPartyVotes<T>().apply(curr)
@@ -433,7 +359,7 @@ class MultiResultScreen private constructor(
             listPublisher: Flow.Publisher<out List<T>>,
             curr: CurrVotes<T>,
             prev: PrevPartyVotes<T>?,
-            map: MapPanel<T, *>?,
+            map: ((T) -> AbstractSingleResultMap<*, *>)?,
             partiesOnly: Boolean,
             title: Flow.Publisher<out String?>,
         ): MultiResultScreen {
@@ -592,23 +518,8 @@ class MultiResultScreen private constructor(
                             )
                         }
                         if (map != null) {
-                            newPanel.setMapShapePublisher(
-                                itemPublisher.compose {
-                                    (
-                                        (it?.let(map.shapeColors) ?: emptyList())
-                                            .map { e -> e.second.map { c -> e.first to c } }
-                                        ).combine()
-                                },
-                            )
-                            newPanel.setMapFocusPublisher(
-                                itemPublisher.map {
-                                    it?.let(map.focusShapes) ?: emptyList()
-                                },
-                            )
-                            newPanel.setMapHeaderPublisher(
-                                itemPublisher.compose {
-                                    it?.let(map.header) ?: "".asOneTimePublisher()
-                                },
+                            newPanel.setMapPublisher(
+                                itemPublisher.map { it?.let(map) ?: NULL_MAP },
                             )
                         }
                         center.add(newPanel)
@@ -641,6 +552,13 @@ class MultiResultScreen private constructor(
             )
 
             return screen
+        }
+
+        private val NULL_MAP: AbstractSingleResultMap<*, *> = createSingleResultMap {
+            shapes = emptyMap<Nothing?, Shape>().asOneTimePublisher()
+            leader = null.asOneTimePublisher()
+            selectedShape = null.asOneTimePublisher()
+            header = null.asOneTimePublisher()
         }
     }
 }

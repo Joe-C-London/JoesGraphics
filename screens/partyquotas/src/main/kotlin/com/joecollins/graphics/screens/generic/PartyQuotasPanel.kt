@@ -6,12 +6,10 @@ import com.joecollins.graphics.components.GraphicsFrame
 import com.joecollins.graphics.components.SwingFrame
 import com.joecollins.graphics.components.SwingFrameBuilder
 import com.joecollins.models.general.PartyOrCoalition
-import com.joecollins.models.general.PartyResult
 import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.map
 import com.joecollins.pubsub.merge
 import java.awt.Color
-import java.awt.Shape
 import java.text.DecimalFormat
 import java.util.concurrent.Flow
 import javax.swing.JPanel
@@ -43,7 +41,7 @@ class PartyQuotasPanel private constructor(
             curr: Curr.() -> Unit,
             change: (Change.() -> Unit)? = null,
             swing: (Swing.() -> Unit)? = null,
-            map: MapPanel<*>? = null,
+            map: AbstractMap<*>? = null,
             title: Flow.Publisher<out String>,
         ): PartyQuotasPanel {
             val currProps = Curr().apply(curr)
@@ -55,12 +53,10 @@ class PartyQuotasPanel private constructor(
                 null,
                 createDiffFrame(currProps, changeProps),
                 createSwingFrame(swingProps),
-                map?.frame,
+                map?.mapFrame,
                 createAltText(currProps, changeProps, swingProps, title),
             )
         }
-
-        fun <T> createMap(map: MapPanel<T>.() -> Unit) = MapPanel<T>().apply(map)
 
         private fun createFrame(curr: Curr): BarFrame {
             return BarFrame(
@@ -230,23 +226,5 @@ class PartyQuotasPanel private constructor(
         lateinit var order: List<PartyOrCoalition>
         lateinit var header: Flow.Publisher<out String?>
         var range: Flow.Publisher<Double>? = null
-    }
-
-    class MapPanel<T> internal constructor() {
-        lateinit var shapes: Flow.Publisher<out Map<T, Shape>>
-        lateinit var selectedShape: Flow.Publisher<out T>
-        lateinit var leadingParty: Flow.Publisher<out PartyOrCoalition?>
-        var focus: Flow.Publisher<out List<T>?>? = null
-        lateinit var header: Flow.Publisher<out String?>
-
-        internal val frame by lazy {
-            MapBuilder.singleResult(
-                shapes = shapes,
-                selectedShape = selectedShape,
-                leadingParty = leadingParty.map { PartyResult.elected(it?.toParty()) },
-                focus = focus,
-                header = header,
-            )
-        }
     }
 }

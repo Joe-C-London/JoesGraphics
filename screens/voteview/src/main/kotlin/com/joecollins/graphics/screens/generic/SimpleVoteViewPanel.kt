@@ -10,11 +10,9 @@ import com.joecollins.graphics.components.SwingFrameBuilder
 import com.joecollins.models.general.Aggregators
 import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.NonPartisanCandidate
-import com.joecollins.models.general.NonPartisanCandidateResult
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyOrCandidate
 import com.joecollins.models.general.PartyOrCoalition
-import com.joecollins.models.general.PartyResult
 import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.combine
 import com.joecollins.pubsub.compose
@@ -404,13 +402,6 @@ class SimpleVoteViewPanel private constructor(
                 title,
             ).build()
         }
-
-        fun <T> createPartyMap(builder: PartyMap<T>.() -> Unit) = PartyMap<T>().apply(builder)
-        fun <T> createResultMap(builder: ResultMap<T>.() -> Unit) = ResultMap<T>().apply(builder)
-
-        fun <T> createSinglePartyMap(builder: SinglePartyMap<T>.() -> Unit) = SinglePartyMap<T>().apply(builder)
-        fun <T> createSingleResultMap(builder: SingleResultMap<T>.() -> Unit) = SingleResultMap<T>().apply(builder)
-        fun <T> createSingleNonPartisanResultMap(builder: SingleNonPartisanResultMap<T>.() -> Unit) = SingleNonPartisanResultMap<T>().apply(builder)
     }
 
     interface ValueTemplate<CT, DT, BAR> {
@@ -1021,99 +1012,6 @@ class SimpleVoteViewPanel private constructor(
 
         internal val currentProps by lazy { Current<KT, CT>().apply(current) }
         internal val prevProps by lazy { prev?.let { Prev<KPT, PT>().apply(it) } }
-    }
-
-    sealed class AbstractMap<T> {
-        lateinit var shapes: Flow.Publisher<out Map<T, Shape>>
-        var focus: Flow.Publisher<out List<T>?>? = null
-        var additionalHighlight: Flow.Publisher<out List<T>?>? = null
-        lateinit var header: Flow.Publisher<out String?>
-
-        internal val additionalHighlightOrFocus by lazy { additionalHighlight ?: focus }
-
-        internal abstract val mapFrame: MapFrame
-    }
-
-    class PartyMap<T> internal constructor() : AbstractMap<T>() {
-        lateinit var winners: Flow.Publisher<out Map<T, PartyOrCoalition?>>
-
-        override val mapFrame by lazy {
-            MapBuilder.multiResult(
-                shapes = shapes,
-                winners = winners.map { m -> BasicResultPanel.partyMapToResultMap(m) },
-                focus = focus,
-                additionalHighlight = additionalHighlightOrFocus,
-                header = header,
-            )
-        }
-    }
-
-    class ResultMap<T> internal constructor() : AbstractMap<T>() {
-        lateinit var winners: Flow.Publisher<out Map<T, PartyResult?>>
-
-        override val mapFrame: MapFrame by lazy {
-            MapBuilder.multiResult(
-                shapes = shapes,
-                winners = winners,
-                focus = focus,
-                additionalHighlight = additionalHighlightOrFocus,
-                header = header,
-            )
-        }
-    }
-
-    class SinglePartyMap<T> internal constructor() : AbstractMap<T>() {
-        lateinit var selectedShape: Flow.Publisher<out T>
-        lateinit var leadingParty: Flow.Publisher<out Party?>
-
-        override val mapFrame by lazy {
-            MapBuilder.singleResult(
-                shapes = shapes,
-                selectedShape = selectedShape,
-                leadingParty = leadingParty.map { PartyResult.elected(it) },
-                focus = focus,
-                additionalHighlight = additionalHighlightOrFocus,
-                header = header,
-            )
-        }
-    }
-
-    class SingleResultMap<T> internal constructor() : AbstractMap<T>() {
-        lateinit var selectedShape: Flow.Publisher<out T>
-        lateinit var leadingParty: Flow.Publisher<out PartyResult?>
-
-        override val mapFrame: MapFrame by lazy {
-            MapBuilder.singleResult(
-                shapes = shapes,
-                selectedShape = selectedShape,
-                leadingParty = leadingParty,
-                focus = focus,
-                additionalHighlight = additionalHighlightOrFocus,
-                header = header,
-            )
-        }
-    }
-
-    class SingleNonPartisanResultMap<T> internal constructor() {
-        lateinit var shapes: Flow.Publisher<out Map<T, Shape>>
-        var focus: Flow.Publisher<out List<T>?>? = null
-        var additionalHighlight: Flow.Publisher<out List<T>?>? = null
-        lateinit var header: Flow.Publisher<out String?>
-        lateinit var selectedShape: Flow.Publisher<out T>
-        lateinit var leadingCandidate: Flow.Publisher<out NonPartisanCandidateResult?>
-
-        private val additionalHighlightOrFocus by lazy { additionalHighlight ?: focus }
-
-        internal val mapFrame: MapFrame by lazy {
-            MapBuilder.singleNonPartisanResult(
-                shapes = shapes,
-                selectedShape = selectedShape,
-                leadingCandidate = leadingCandidate,
-                focus = focus,
-                additionalHighlight = additionalHighlightOrFocus,
-                header = header,
-            )
-        }
     }
 
     private class VoteScreenBuilder<KT : Any, KPT : PartyOrCoalition, CT, CPT : Any, DT : Any, BAR>(

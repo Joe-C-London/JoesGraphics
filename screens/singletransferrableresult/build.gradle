@@ -15,11 +15,11 @@ var topLevel = parent.parent
 dependencies {
     api parent.project('screenbase')
     implementation parent.project('basicresult')
+    api parent.project('mapcommon')
     api topLevel.project('models')
     implementation topLevel.project('pubsub')
     implementation topLevel.project('shapes')
     implementation topLevel.project('components:barframe')
-    implementation topLevel.project('components:resultmapframebuilder')
 
     testImplementation topLevel.project('mapreaders:shapefile')
     testImplementation topLevel.project('testutils')

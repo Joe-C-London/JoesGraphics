@@ -1,15 +1,15 @@
 package com.joecollins.graphics.screens.generic
 
+import com.joecollins.graphics.screens.generic.PartyMap.Companion.createPartyMap
+import com.joecollins.graphics.screens.generic.ResultMap.Companion.createResultMap
 import com.joecollins.graphics.screens.generic.SimpleVoteViewPanel.Companion.candidateVotes
-import com.joecollins.graphics.screens.generic.SimpleVoteViewPanel.Companion.createPartyMap
-import com.joecollins.graphics.screens.generic.SimpleVoteViewPanel.Companion.createResultMap
-import com.joecollins.graphics.screens.generic.SimpleVoteViewPanel.Companion.createSingleNonPartisanResultMap
-import com.joecollins.graphics.screens.generic.SimpleVoteViewPanel.Companion.createSinglePartyMap
-import com.joecollins.graphics.screens.generic.SimpleVoteViewPanel.Companion.createSingleResultMap
 import com.joecollins.graphics.screens.generic.SimpleVoteViewPanel.Companion.nonPartisanVotes
 import com.joecollins.graphics.screens.generic.SimpleVoteViewPanel.Companion.partyOrCandidateVotes
 import com.joecollins.graphics.screens.generic.SimpleVoteViewPanel.Companion.partyRangeVotes
 import com.joecollins.graphics.screens.generic.SimpleVoteViewPanel.Companion.partyVotes
+import com.joecollins.graphics.screens.generic.SingleNonPartisanResultMap.Companion.createSingleNonPartisanResultMap
+import com.joecollins.graphics.screens.generic.SinglePartyMap.Companion.createSinglePartyMap
+import com.joecollins.graphics.screens.generic.SingleResultMap.Companion.createSingleResultMap
 import com.joecollins.graphics.utils.PublisherTestUtils.assertPublishes
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.graphics.utils.ShapefileReader.readShapes
@@ -84,7 +84,7 @@ class SimpleVoteViewPanelTest {
             map = createSinglePartyMap {
                 shapes = shapesByDistrict.asOneTimePublisher()
                 selectedShape = selectedDistrict
-                leadingParty = leader
+                this.leader = leader
                 this.focus = focus
                 header = mapHeader
             },
@@ -242,7 +242,7 @@ class SimpleVoteViewPanelTest {
             map = createSinglePartyMap {
                 shapes = shapesByDistrict.asOneTimePublisher()
                 selectedShape = selectedDistrict
-                leadingParty = leader
+                this.leader = leader
                 this.focus = focus
                 header = mapHeader
             },
@@ -313,7 +313,7 @@ class SimpleVoteViewPanelTest {
             map = createSingleResultMap {
                 shapes = shapesByDistrict.asOneTimePublisher()
                 selectedShape = selectedDistrict
-                leadingParty = leader
+                this.leader = leader
                 this.focus = focus
                 header = mapHeader
             },
@@ -521,7 +521,7 @@ class SimpleVoteViewPanelTest {
             map = createSingleResultMap {
                 shapes = shapesByDistrict.asOneTimePublisher()
                 selectedShape = selectedDistrict
-                leadingParty = leader
+                this.leader = leader
                 this.focus = focus
                 header = mapHeader
             },
@@ -937,7 +937,7 @@ class SimpleVoteViewPanelTest {
             map = createSingleResultMap {
                 shapes = shapesByDistrict.asOneTimePublisher()
                 selectedShape = selectedDistrict
-                leadingParty = leader.map { elected(it) }
+                this.leader = leader.map { elected(it) }
                 this.focus = focus
                 this.additionalHighlight = additionalHighlight
                 header = mapHeader
@@ -1165,7 +1165,7 @@ class SimpleVoteViewPanelTest {
             map = createSingleResultMap {
                 shapes = shapesByDistrict.asOneTimePublisher()
                 selectedShape = selectedDistrict
-                leadingParty = leader
+                this.leader = leader
                 this.focus = focus
                 header = mapHeader
             },
@@ -1283,7 +1283,7 @@ class SimpleVoteViewPanelTest {
             map = createSingleResultMap {
                 shapes = shapesByDistrict.asOneTimePublisher()
                 selectedShape = selectedDistrict
-                leadingParty = leader
+                this.leader = leader
                 this.focus = focus
                 header = mapHeader
             },
@@ -2046,7 +2046,7 @@ class SimpleVoteViewPanelTest {
             map = createSinglePartyMap {
                 shapes = shapesByDistrict.asOneTimePublisher()
                 selectedShape = selectedDistrict
-                leadingParty = leader
+                this.leader = leader
                 this.focus = focus
                 header = mapHeader
             },
@@ -2962,7 +2962,7 @@ class SimpleVoteViewPanelTest {
             map = createSingleResultMap {
                 shapes = shapesByDistrict.asOneTimePublisher()
                 selectedShape = selectedDistrict
-                leadingParty = leader
+                this.leader = leader
                 this.focus = focus
                 header = mapHeader
             },
@@ -3397,7 +3397,7 @@ class SimpleVoteViewPanelTest {
             map = createSingleNonPartisanResultMap {
                 shapes = shapesByDistrict.asOneTimePublisher()
                 selectedShape = selectedDistrict
-                leadingCandidate = leader
+                this.leader = leader
                 this.focus = focus
                 header = mapHeader
             },
@@ -3766,7 +3766,7 @@ class SimpleVoteViewPanelTest {
             map = createSinglePartyMap {
                 shapes = shapesByDistrict.asOneTimePublisher()
                 selectedShape = selectedDistrict
-                leadingParty = leader
+                this.leader = leader
                 this.focus = focus
                 header = mapHeader
             },

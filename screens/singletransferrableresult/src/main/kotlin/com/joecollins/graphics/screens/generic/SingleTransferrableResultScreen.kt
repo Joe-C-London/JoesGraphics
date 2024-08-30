@@ -6,12 +6,10 @@ import com.joecollins.graphics.ImageGenerator
 import com.joecollins.graphics.components.BarFrameBuilder
 import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.Party
-import com.joecollins.models.general.PartyResult
 import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.map
 import com.joecollins.pubsub.merge
 import java.awt.Color
-import java.awt.Shape
 import java.text.DecimalFormat
 import java.util.concurrent.Flow
 import javax.swing.JPanel
@@ -43,7 +41,7 @@ class SingleTransferrableResultScreen private constructor(
             candidateResults: CandidateResults.() -> Unit,
             partyTotals: (PartyTotals.() -> Unit)? = null,
             prevResults: (PrevResults.() -> Unit)? = null,
-            map: MapPanel<*>? = null,
+            map: AbstractMap<*>? = null,
             title: Flow.Publisher<out String>,
         ): SingleTransferrableResultScreen {
             val candidate = CandidateResults().apply(candidateResults)
@@ -54,12 +52,10 @@ class SingleTransferrableResultScreen private constructor(
                 createCandidatesPanel(candidate),
                 createPartiesPanel(candidate, party),
                 createPrevPanel(prev),
-                map?.frame,
+                map?.mapFrame,
                 createAltText(title, candidate, party, prev),
             )
         }
-
-        fun <T> createMap(map: MapPanel<T>.() -> Unit) = MapPanel<T>().apply(map)
 
         private fun createCandidatesPanel(candidateResults: CandidateResults): JPanel {
             val votesQuota = candidateResults.votes.merge(candidateResults.quota) { v, q -> v to q }
@@ -306,23 +302,5 @@ class SingleTransferrableResultScreen private constructor(
     class PrevResults internal constructor() {
         lateinit var seats: Flow.Publisher<out Map<Party, Int>>
         lateinit var header: Flow.Publisher<out String?>
-    }
-
-    class MapPanel<T> internal constructor() {
-        lateinit var shapes: Flow.Publisher<out Map<T, Shape>>
-        lateinit var selectedShape: Flow.Publisher<out T>
-        lateinit var leadingParty: Flow.Publisher<out Party?>
-        var focus: Flow.Publisher<out List<T>?>? = null
-        lateinit var header: Flow.Publisher<out String?>
-
-        internal val frame by lazy {
-            MapBuilder.singleResult(
-                shapes = shapes,
-                selectedShape = selectedShape,
-                leadingParty = leadingParty.map { PartyResult.elected(it) },
-                focus = focus,
-                header = header,
-            )
-        }
     }
 }

@@ -1,10 +1,10 @@
 package com.joecollins.graphics.screens.generic
 
+import com.joecollins.graphics.screens.generic.PartyMap.Companion.createPartyMap
+import com.joecollins.graphics.screens.generic.ResultMap.Companion.createResultMap
 import com.joecollins.graphics.screens.generic.SeatViewPanel.Companion.candidateDualSeats
 import com.joecollins.graphics.screens.generic.SeatViewPanel.Companion.candidateRangeSeats
 import com.joecollins.graphics.screens.generic.SeatViewPanel.Companion.candidateSeats
-import com.joecollins.graphics.screens.generic.SeatViewPanel.Companion.createPartyMap
-import com.joecollins.graphics.screens.generic.SeatViewPanel.Companion.createResultMap
 import com.joecollins.graphics.screens.generic.SeatViewPanel.Companion.partyDualSeats
 import com.joecollins.graphics.screens.generic.SeatViewPanel.Companion.partyDualSeatsReversed
 import com.joecollins.graphics.screens.generic.SeatViewPanel.Companion.partyRangeSeats

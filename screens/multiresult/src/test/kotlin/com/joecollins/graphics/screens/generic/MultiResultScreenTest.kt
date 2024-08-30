@@ -1,6 +1,6 @@
 package com.joecollins.graphics.screens.generic
 
-import com.joecollins.graphics.screens.generic.MultiResultScreen.Companion.createMap
+import com.joecollins.graphics.screens.generic.SingleResultMap.Companion.createSingleResultMap
 import com.joecollins.graphics.utils.PublisherTestUtils.assertPublishes
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.graphics.utils.ShapefileReader
@@ -89,15 +89,16 @@ class MultiResultScreenTest {
                     partyOrder = swingometerOrder
                 }
             },
-            map = createMap {
-                shapes = { shapesByDistrict }
-                selectedShape = { districtNum }
-                leadingParty = {
-                    votes.entries.maxByOrNull { e -> e.value }?.key?.party?.let { PartyResult(it, leaderHasWon) }
+            map = { d: District ->
+                createSingleResultMap {
+                    shapes = shapesByDistrict.asOneTimePublisher()
+                    selectedShape = d.districtNum.asOneTimePublisher()
+                    leader = d.votes.entries
+                        .maxByOrNull { e -> e.value }?.key?.party?.let { PartyResult(it, d.leaderHasWon) }
                         .asOneTimePublisher()
+                    focus = (if (d.districtNum < 10) listOf(1, 2, 3, 4, 5, 6, 7, 8) else listOf(15, 16, 17, 18, 19, 20)).asOneTimePublisher()
+                    header = (if (d.districtNum < 10) "CARDIGAN" else "MALPEQUE").asOneTimePublisher()
                 }
-                focus = { if (districtNum < 10) listOf(1, 2, 3, 4, 5, 6, 7, 8) else listOf(15, 16, 17, 18, 19, 20) }
-                header = { (if (districtNum < 10) "CARDIGAN" else "MALPEQUE").asOneTimePublisher() }
             },
             title = "PARTY LEADERS".asOneTimePublisher(),
         )
@@ -209,20 +210,14 @@ class MultiResultScreenTest {
                     partyOrder = swingometerOrder
                 }
             },
-            map = createMap {
-                shapes = { shapesByDistrict }
-                selectedShape = { districtNum }
-                leadingParty = {
-                    leader.map { e ->
-                        if (e == null) {
-                            null
-                        } else {
-                            PartyResult(e.first.party, e.second)
-                        }
-                    }
+            map = { d: District ->
+                createSingleResultMap {
+                    shapes = shapesByDistrict.asOneTimePublisher()
+                    selectedShape = d.districtNum.asOneTimePublisher()
+                    leader = d.leader.map { e -> e?.let { (c, w) -> PartyResult(c.party, w) } }
+                    focus = (if (d.districtNum < 10) listOf(1, 2, 3, 4, 5, 6, 7, 8) else listOf(15, 16, 17, 18, 19, 20)).asOneTimePublisher()
+                    header = (if (d.districtNum < 10) "CARDIGAN" else "MALPEQUE").asOneTimePublisher()
                 }
-                focus = { if (districtNum < 10) listOf(1, 2, 3, 4, 5, 6, 7, 8) else listOf(15, 16, 17, 18, 19, 20) }
-                header = { (if (districtNum < 10) "CARDIGAN" else "MALPEQUE").asOneTimePublisher() }
             },
             title = title,
         )
@@ -609,20 +604,14 @@ class MultiResultScreenTest {
                     partyOrder = swingometerOrder
                 }
             },
-            map = createMap {
-                shapes = { shapesByDistrict }
-                selectedShape = { districtNum }
-                leadingParty = {
-                    leader.map { e ->
-                        if (e == null) {
-                            null
-                        } else {
-                            PartyResult(e.first.party, e.second)
-                        }
-                    }
+            map = { d: District ->
+                createSingleResultMap {
+                    shapes = shapesByDistrict.asOneTimePublisher()
+                    selectedShape = d.districtNum.asOneTimePublisher()
+                    leader = d.leader.map { e -> e?.let { (c, w) -> PartyResult(c.party, w) } }
+                    focus = (if (d.districtNum < 10) listOf(1, 2, 3, 4, 5, 6, 7, 8) else listOf(15, 16, 17, 18, 19, 20)).asOneTimePublisher()
+                    header = (if (d.districtNum < 10) "CARDIGAN" else "MALPEQUE").asOneTimePublisher()
                 }
-                focus = { if (districtNum < 10) listOf(1, 2, 3, 4, 5, 6, 7, 8) else listOf(15, 16, 17, 18, 19, 20) }
-                header = { (if (districtNum < 10) "CARDIGAN" else "MALPEQUE").asOneTimePublisher() }
             },
             title = title,
         )
@@ -1923,15 +1912,15 @@ class MultiResultScreenTest {
                     partyOrder = swingometerOrder
                 }
             },
-            map = createMap {
-                shapes = { shapesByDistrict }
-                selectedShape = { districtNum }
-                leadingParty = {
-                    votes.entries.maxByOrNull { it.value }?.key?.party?.let { PartyResult(it, leaderHasWon) }.asOneTimePublisher()
+            map = { d: District ->
+                createSingleResultMap {
+                    shapes = shapesByDistrict.asOneTimePublisher()
+                    selectedShape = d.districtNum.asOneTimePublisher()
+                    leader = d.votes.entries.maxByOrNull { it.value }?.key?.party?.let { PartyResult(it, d.leaderHasWon) }.asOneTimePublisher()
+                    focus = listOf(10, 11, 12, 13, 14).asOneTimePublisher()
+                    additionalHighlight = listOf(9, 10, 11, 12, 13, 14).asOneTimePublisher()
+                    header = "CHARLOTTETOWN".asOneTimePublisher()
                 }
-                focus = { listOf(10, 11, 12, 13, 14) }
-                additionalHighlights = { listOf(9, 10, 11, 12, 13, 14) }
-                header = { "CHARLOTTETOWN".asOneTimePublisher() }
             },
             title = "CABINET MEMBERS IN CHARLOTTETOWN".asOneTimePublisher(),
         )
