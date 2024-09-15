@@ -3267,4 +3267,56 @@ class SeatViewPanelTest {
             .getResource("com/joecollins/graphics/shapefiles/pei-districts.shp")
         return readShapes(peiMap, "DIST_NO", Int::class.java)
     }
+
+    @Test
+    fun testFadedMap() {
+        val lib = Party("Liberal", "LIB", Color.RED)
+        val grn = Party("Green", "GRN", Color.GREEN.darker())
+        val pc = Party("Progressive Conservative", "PC", Color.BLUE)
+        val ndp = Party("New Democratic Party", "NDP", Color.ORANGE)
+        val oth = Party.OTHERS
+        val partyOrder = listOf(ndp, grn, lib, oth, pc)
+        val panel = partySeats(
+            current = {
+                seats = mapOf(pc to 4, grn to 1, lib to 1).asOneTimePublisher()
+                header = "SEATS DECLARED".asOneTimePublisher()
+                subhead = "".asOneTimePublisher()
+                progressLabel = "6/6".asOneTimePublisher()
+                this.totalSeats = 6.asOneTimePublisher()
+            },
+            prev = {
+                seats = mapOf(grn to 3, lib to 2, pc to 1).asOneTimePublisher()
+                header = "CHANGE SINCE 2019".asOneTimePublisher()
+            },
+            swing = {
+                currVotes = mapOf(pc to 8130, grn to 3932, lib to 3439, ndp to 751, oth to 183).asOneTimePublisher()
+                prevVotes = mapOf(lib to 6078, pc to 4932, grn to 6591, ndp to 674, oth to 202).asOneTimePublisher()
+                this.partyOrder = partyOrder
+                header = "SWING SINCE 2019".asOneTimePublisher()
+            },
+            map = createPartyMap {
+                shapes = peiShapesByDistrict().asOneTimePublisher()
+                winners = mapOf(11 to grn, 12 to grn, 13 to grn, 9 to pc, 10 to lib, 14 to lib).asOneTimePublisher()
+                focus = listOf(9, 10, 11, 12, 13, 14).asOneTimePublisher()
+                faded = listOf(1, 2, 3, 4, 5, 6, 7, 8, 21, 22, 23, 24, 25, 26, 27).asOneTimePublisher()
+                header = "CHARLOTTETOWN".asOneTimePublisher()
+            },
+            title = "CHARLOTTETOWN".asOneTimePublisher(),
+        )
+        panel.setSize(1024, 512)
+        compareRendering("SeatViewPanel", "FadedMap-1", panel)
+        assertPublishes(
+            panel.altText,
+            """
+                CHARLOTTETOWN
+                
+                SEATS DECLARED [6/6] (CHANGE SINCE 2019)
+                PROGRESSIVE CONSERVATIVE: 4 (+3)
+                GREEN: 1 (-2)
+                LIBERAL: 1 (-1)
+                
+                SWING SINCE 2019: 17.3% SWING GRN TO PC
+            """.trimIndent(),
+        )
+    }
 }

@@ -3884,6 +3884,86 @@ class SimpleVoteViewPanelTest {
         )
     }
 
+    @Test
+    fun testFadedMap() {
+        val ndp = Candidate("Campbell Webster", Party("New Democratic Party", "NDP", Color.ORANGE))
+        val pc = Candidate("Zack Bell", Party("Progressive Conservative", "PC", Color.BLUE), incumbent = true)
+        val lib = Candidate("Judy Hughes", Party("Liberal", "LIB", Color.RED))
+        val grn = Candidate("Charles Sanderson", Party("Green", "GRN", Color.GREEN.darker()))
+        val ind = Candidate("Georgina Bassett", Party("Independent", "IND", Party.OTHERS.color))
+        val currentVotes = Publisher(
+            mapOf(
+                pc to 1861,
+                grn to 553,
+                lib to 540,
+                ndp to 78,
+                ind to 41,
+            ),
+        )
+        val previousVotes = Publisher(
+            mapOf(
+                lib.party to 1420,
+                grn.party to 1057,
+                pc.party to 865,
+                ndp.party to 41,
+            ),
+        )
+        val title = Publisher("CHARLOTTETOWN-WINSLOE")
+        val voteHeader = Publisher("9 OF 9 POLLS REPORTING")
+        val voteSubhead = Publisher("PROJECTION: PC GAIN FROM LIB")
+        val changeHeader = Publisher("CHANGE SINCE 2019")
+        val swingHeader = Publisher("SWING SINCE 2019")
+        val mapHeader = Publisher("CHARLOTTETOWN")
+        val leader = Publisher(pc.party)
+        val swingPartyOrder = listOf(ndp.party, grn.party, lib.party, pc.party)
+        val shapesByDistrict = peiShapesByDistrict()
+        val focus = Publisher(shapesByDistrict.keys.filter { (9..14).contains(it) })
+        val faded = Publisher(shapesByDistrict.keys.filter { it <= 8 || it >= 21 })
+        val selectedDistrict = Publisher(3)
+        val panel = candidateVotes(
+            current = {
+                votes = currentVotes
+                header = voteHeader
+                subhead = voteSubhead
+                incumbentMarker = "MLA"
+            },
+            prev = {
+                votes = previousVotes
+                header = changeHeader
+                swing = {
+                    partyOrder = swingPartyOrder
+                    header = swingHeader
+                }
+            },
+            map = createSinglePartyMap {
+                shapes = shapesByDistrict.asOneTimePublisher()
+                selectedShape = selectedDistrict
+                this.leader = leader
+                this.focus = focus
+                this.faded = faded
+                header = mapHeader
+            },
+            title = title,
+        )
+        panel.setSize(1024, 512)
+        compareRendering("SimpleVoteViewPanel", "FadedMap-1", panel)
+        assertPublishes(
+            panel.altText,
+            """
+                CHARLOTTETOWN-WINSLOE
+
+                9 OF 9 POLLS REPORTING, PROJECTION: PC GAIN FROM LIB (CHANGE SINCE 2019)
+                ZACK BELL [MLA] (PC): 1,861 (60.6%, +35.0%)
+                CHARLES SANDERSON (GRN): 553 (18.0%, -13.2%)
+                JUDY HUGHES (LIB): 540 (17.6%, -24.4%)
+                CAMPBELL WEBSTER (NDP): 78 (2.5%, +1.3%)
+                GEORGINA BASSETT (IND): 41 (1.3%, +1.3%)
+                
+                SWING SINCE 2019: 29.7% SWING LIB TO PC
+            """.trimIndent(),
+        )
+    }
+
     private fun peiShapesByDistrict(): Map<Int, Shape> {
         val peiMap = SimpleVoteViewPanelTest::class.java
             .classLoader

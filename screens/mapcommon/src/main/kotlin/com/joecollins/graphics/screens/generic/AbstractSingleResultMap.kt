@@ -19,7 +19,7 @@ abstract class AbstractSingleResultMap<T, R> internal constructor(private val co
     }
 
     final override val mapFrame by lazy {
-        createFrame(shapes, selectedShape, color, focus, additionalHighlightOrFocus, header)
+        createFrame(shapes, selectedShape, color, focus, additionalHighlightOrFocus, faded, header)
     }
 
     companion object {
@@ -30,6 +30,7 @@ abstract class AbstractSingleResultMap<T, R> internal constructor(private val co
                 item.compose { b -> b.color },
                 item.compose { b -> b.focus ?: null.asOneTimePublisher() },
                 item.compose { b -> b.additionalHighlightOrFocus ?: null.asOneTimePublisher() },
+                item.compose { b -> b.faded ?: null.asOneTimePublisher() },
                 item.compose { b -> b.header },
             )
         }
@@ -40,13 +41,14 @@ abstract class AbstractSingleResultMap<T, R> internal constructor(private val co
             color: Flow.Publisher<out Color>,
             focus: Flow.Publisher<out List<T>?>?,
             additionalHighlight: Flow.Publisher<out List<T>?>?,
+            faded: Flow.Publisher<out List<T>?>?,
             header: Flow.Publisher<out String?>,
         ): MapFrame {
             val leaderWithShape =
                 selectedShape.merge(color) { left, right -> Pair(left, right) }
-            val mapFocus = focus?.merge(shapes) { foc, shp -> createFocusShapes(shp, foc) }
+            val mapFocus = focus?.merge(shapes) { foc, shp -> listShapes(shp, foc) }
             val additionalFocusShapes =
-                additionalHighlight?.merge(shapes) { foc, shp -> createFocusShapes(shp, foc) }
+                additionalHighlight?.merge(shapes) { foc, shp -> listShapes(shp, foc) }
             val shapeWinners = shapes
                 .merge(leaderWithShape) { shp, ldr ->
                     shp.entries.map { (t, shape) ->
@@ -61,14 +63,14 @@ abstract class AbstractSingleResultMap<T, R> internal constructor(private val co
                 additionalFocusShapes != null -> additionalFocusShapes
                 else -> null.asOneTimePublisher()
             }
+            val allFadedShapes = when {
+                faded != null -> faded.merge(shapes) { fad, shp -> listShapes(shp, fad) }
+                else -> null.asOneTimePublisher()
+            }
             val focusedShapeWinners =
-                shapeWinners.merge(allFocusShapes) { sw, f ->
-                    if (f == null) {
-                        sw
-                    } else {
-                        sw.map {
-                            if (f.contains(it.first)) it else Pair(it.first, BACKGROUND_GREY)
-                        }
+                shapeWinners.merge(allFocusShapes.merge(allFadedShapes) { foc, fad -> foc to fad }) { sw, (foc, fad) ->
+                    sw.map {
+                        it.first to extractColor(foc, fad, it.first, it.second)
                     }
                 }
             return MapFrameBuilder.from(
