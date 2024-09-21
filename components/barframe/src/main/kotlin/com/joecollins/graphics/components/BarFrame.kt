@@ -164,6 +164,10 @@ class BarFrame(
                     RenderingHints.KEY_TEXT_ANTIALIASING,
                     RenderingHints.VALUE_TEXT_ANTIALIAS_ON,
                 )
+            g.setRenderingHint(
+                RenderingHints.KEY_ANTIALIASING,
+                RenderingHints.VALUE_ANTIALIAS_ON,
+            )
             drawLines(g, 0, height)
             val font = StandardFont.readBoldFont(barHeight * 3 / 4 / maxLines)
             g.setFont(font)

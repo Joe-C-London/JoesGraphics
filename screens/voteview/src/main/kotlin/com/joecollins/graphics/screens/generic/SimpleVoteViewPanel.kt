@@ -2,6 +2,7 @@ package com.joecollins.graphics.screens.generic
 
 import com.joecollins.graphics.GenericPanel
 import com.joecollins.graphics.ImageGenerator
+import com.joecollins.graphics.ImageGenerator.combineHorizontal
 import com.joecollins.graphics.components.BarFrame
 import com.joecollins.graphics.components.BarFrameBuilder
 import com.joecollins.graphics.components.MapFrame
@@ -1192,11 +1193,13 @@ class SimpleVoteViewPanel private constructor(
                                 forcedTotal,
                                 it.size,
                                 forceSingleLine,
-                                when (e.result) {
-                                    CandidateResult.WINNER -> keyTemplate.winnerShape(it.size > doubleLineBarLimit)
-                                    CandidateResult.RUNOFF -> keyTemplate.runoffShape(it.size > doubleLineBarLimit)
-                                    null -> null
-                                },
+                                keyTemplate.incumbentShape(e.key, forceSingleLine).combineHorizontal(
+                                    when (e.result) {
+                                        CandidateResult.WINNER -> keyTemplate.winnerShape(it.size > doubleLineBarLimit)
+                                        CandidateResult.RUNOFF -> keyTemplate.runoffShape(it.size > doubleLineBarLimit)
+                                        null -> null
+                                    },
+                                ),
                             )
                         }
                     },
@@ -1249,11 +1252,13 @@ class SimpleVoteViewPanel private constructor(
                                 total,
                                 forcedTotal,
                                 it.size,
-                                when (e.result) {
-                                    CandidateResult.WINNER -> keyTemplate.winnerShape(true)
-                                    CandidateResult.RUNOFF -> keyTemplate.runoffShape(true)
-                                    null -> null
-                                },
+                                keyTemplate.incumbentShape(e.key, true).combineHorizontal(
+                                    when (e.result) {
+                                        CandidateResult.WINNER -> keyTemplate.winnerShape(true)
+                                        CandidateResult.RUNOFF -> keyTemplate.runoffShape(true)
+                                        null -> null
+                                    },
+                                ),
                             )
                         }
                     },
@@ -1533,7 +1538,7 @@ class SimpleVoteViewPanel private constructor(
                     } ?: valueTemplate.zero
                     val countByParty = entries.mapNotNull { it.key }.groupingBy { keyTemplate.toParty(it) }.eachCount()
                     entries.takeUnless { it.isEmpty() }?.joinToString("\n") { entry ->
-                        val keyHead = entry.run { if (key == null) party.name.uppercase() else keyTemplate.toMainBarHeader(key, true) }
+                        val keyHead = entry.run { if (key == null) party.name.uppercase() else keyTemplate.toMainAltTextHeader(key) }
                         valueTemplate.createAltTextBar(
                             keyHead,
                             entry.curr,
@@ -1608,7 +1613,7 @@ class SimpleVoteViewPanel private constructor(
                 val total = entries.map { (_, votes) -> votes }.reduceOrNull(valueTemplate::voteCombine) ?: valueTemplate.zero
                 head + entries.joinToString("") {
                     "\n" + valueTemplate.createPreferenceAltTextBar(
-                        keyTemplate.toMainBarHeader(it.key, true),
+                        keyTemplate.toMainAltTextHeader(it.key),
                         it.value,
                         total,
                         null,

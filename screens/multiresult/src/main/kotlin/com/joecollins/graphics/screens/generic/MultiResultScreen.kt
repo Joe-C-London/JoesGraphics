@@ -3,6 +3,7 @@ package com.joecollins.graphics.screens.generic
 import com.joecollins.graphics.AltTextProvider
 import com.joecollins.graphics.GenericPanel
 import com.joecollins.graphics.ImageGenerator
+import com.joecollins.graphics.ImageGenerator.combineVertical
 import com.joecollins.graphics.components.BarFrame
 import com.joecollins.graphics.components.BarFrameBuilder
 import com.joecollins.graphics.components.MapFrame
@@ -42,7 +43,7 @@ class MultiResultScreen private constructor(
         lateinit var votes: T.() -> Flow.Publisher<out Map<Candidate, Int>>
         lateinit var header: T.() -> Flow.Publisher<out String>
         lateinit var subhead: T.() -> Flow.Publisher<out String?>
-        var incumbentMarker: String = ""
+        var incumbentMarker: String? = null
         var winner: (T.() -> Flow.Publisher<out Candidate?>)? = null
         var runoff: (T.() -> Flow.Publisher<out Set<Candidate>?>)? = null
         var pctReporting: (T.() -> Flow.Publisher<out Double>)? = null
@@ -69,7 +70,7 @@ class MultiResultScreen private constructor(
         lateinit var partyOrder: List<Party>
     }
 
-    private class Result(private val partiesOnly: Boolean, private val incumbentMarker: String) {
+    private class Result(private val partiesOnly: Boolean, private val incumbentMarker: String?) {
         var votes: Map<Candidate, Int> = emptyMap()
             set(value) {
                 field = value
@@ -111,11 +112,24 @@ class MultiResultScreen private constructor(
                     val candidate = e.key
                     val votes = e.value
                     val pct = 1.0 * votes / total
-                    val shape: Shape? = when {
-                        candidate == winner -> ImageGenerator.createHalfTickShape()
-                        runoff.contains(candidate) -> ImageGenerator.createHalfRunoffShape()
-                        else -> null
-                    }
+                    val useIncumbentMarker = (incumbentMarker != null && candidate.incumbent)
+                    val isWinner = candidate == winner
+                    val isRunoff = runoff.contains(candidate)
+                    val shape: Shape? = (
+                        when {
+                            isWinner -> if (useIncumbentMarker) ImageGenerator.createTickShape() else ImageGenerator.createHalfTickShape()
+                            isRunoff -> if (useIncumbentMarker) ImageGenerator.createRunoffShape() else ImageGenerator.createHalfRunoffShape()
+                            else -> null
+                        }
+                        ).combineVertical(
+                        if (!useIncumbentMarker) {
+                            null
+                        } else if (isWinner || isRunoff) {
+                            ImageGenerator.createBoxedTextShape(incumbentMarker!!)
+                        } else {
+                            ImageGenerator.createHalfBoxedTextShape(incumbentMarker!!)
+                        },
+                    )
                     val leftLabel: String = when {
                         partiesOnly -> {
                             candidate.party.name.uppercase()
@@ -124,7 +138,7 @@ class MultiResultScreen private constructor(
                             "OTHERS"
                         }
                         else -> {
-                            "${candidate.name.uppercase()}\n${candidate.party.abbreviation}${if (candidate.isIncumbent()) " [$incumbentMarker]" else ""}"
+                            "${candidate.name.uppercase()}\n${candidate.party.abbreviation}"
                         }
                     }
                     val rightLabel: String = when {
@@ -160,7 +174,7 @@ class MultiResultScreen private constructor(
     }
 
     private class ResultPanel(
-        incumbentMarker: String,
+        incumbentMarker: String?,
         swingPartyOrder: List<Party>?,
         hasMap: Boolean,
         partiesOnly: Boolean,
@@ -402,7 +416,7 @@ class MultiResultScreen private constructor(
                                         c.party.name.uppercase()
                                     } else {
                                         "${c.name.uppercase()}${
-                                            if (curr.incumbentMarker.isNotEmpty() && c.isIncumbent()) " [${curr.incumbentMarker}]" else ""
+                                            if (curr.incumbentMarker != null && c.isIncumbent()) " [${curr.incumbentMarker}]" else ""
                                         } (${c.party.abbreviation})"
                                     }
                                 }: ${

@@ -2,6 +2,7 @@ package com.joecollins.graphics.screens.generic
 
 import com.joecollins.graphics.GenericPanel
 import com.joecollins.graphics.ImageGenerator
+import com.joecollins.graphics.ImageGenerator.combineHorizontal
 import com.joecollins.graphics.components.BarFrame
 import com.joecollins.graphics.components.BarFrameBuilder
 import com.joecollins.graphics.components.MapFrame
@@ -163,20 +164,23 @@ class MixedMemberResultPanel private constructor(
                 val shape: Shape,
                 val leftLabel: (Candidate) -> String,
                 val rightLabel: (Int, Double) -> String,
+                val incumbentLabel: (Candidate) -> Shape?,
             )
             val doubleLine = candidateVotes.votes.map { it.size < 10 && candidateChange == null }
             val namedCandidateTemplate = doubleLine.map {
                 if (it) {
                     CandidateBarTemplate(
                         ImageGenerator.createHalfTickShape(),
-                        { candidate -> "${candidate.name.uppercase()}${if (candidate.isIncumbent()) candidateVotes.incumbentMarkerPadded else ""}\n${candidate.party.name.uppercase()}" },
+                        { candidate -> "${candidate.name.uppercase()}\n${candidate.party.name.uppercase()}" },
                         { numVotes, pct -> "${THOUSANDS_FORMAT.format(numVotes.toLong())}\n${PCT_FORMAT.format(pct)}" },
+                        { candidate -> candidateVotes.incumbentMarker.takeIf { candidate.incumbent }?.let { ImageGenerator.createHalfBoxedTextShape(it) } },
                     )
                 } else {
                     CandidateBarTemplate(
                         ImageGenerator.createTickShape(),
-                        { candidate -> "${candidate.name.uppercase()}${if (candidate.isIncumbent()) candidateVotes.incumbentMarkerPadded else ""} (${candidate.party.abbreviation.uppercase()})" },
+                        { candidate -> "${candidate.name.uppercase()} (${candidate.party.abbreviation.uppercase()})" },
                         { numVotes, pct -> "${THOUSANDS_FORMAT.format(numVotes.toLong())} (${PCT_FORMAT.format(pct)})" },
+                        { candidate -> candidateVotes.incumbentMarker.takeIf { candidate.incumbent }?.let { ImageGenerator.createBoxedTextShape(it) } },
                     )
                 }
             }
@@ -184,6 +188,7 @@ class MixedMemberResultPanel private constructor(
                 ImageGenerator.createTickShape(),
                 { candidate -> candidate.party.name.uppercase() },
                 { numVotes, pct -> "${THOUSANDS_FORMAT.format(numVotes.toLong())} (${PCT_FORMAT.format(pct)})" },
+                { null },
             )
             val result = Result()
             candidateVotes.votes.subscribe(Subscriber { result.votes = it })
@@ -208,7 +213,7 @@ class MixedMemberResultPanel private constructor(
                                 candidate.party.color,
                                 if (pct.isNaN()) 0 else pct,
                                 (if (pct.isNaN()) "WAITING..." else rightLabel),
-                                if (candidate == winner) (if (candidate.name.isBlank()) ImageGenerator.createTickShape() else rowTemplate.shape) else null,
+                                rowTemplate.incumbentLabel(candidate).combineHorizontal(if (candidate == winner) (if (candidate.name.isBlank()) ImageGenerator.createTickShape() else rowTemplate.shape) else null),
                             )
                         }
                         .toList()

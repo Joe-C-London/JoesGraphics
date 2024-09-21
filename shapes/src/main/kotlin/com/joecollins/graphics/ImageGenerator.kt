@@ -1,11 +1,14 @@
 package com.joecollins.graphics
 
+import com.joecollins.graphics.utils.StandardFont
 import java.awt.Polygon
 import java.awt.Rectangle
 import java.awt.Shape
+import java.awt.font.FontRenderContext
 import java.awt.geom.AffineTransform
 import java.awt.geom.Area
 import java.awt.geom.Rectangle2D
+import kotlin.math.roundToInt
 
 object ImageGenerator {
 
@@ -21,12 +24,6 @@ object ImageGenerator {
 
     fun createHalfTickShape(): Shape {
         return createHalfShape(createTickShape())
-    }
-
-    private fun createHalfShape(s: Shape): Area {
-        val shape = Area(s)
-        shape.add(Area(Rectangle2D.Double(s.bounds2D.minX, 2 * s.bounds2D.maxY - s.bounds2D.minY, 1e-6, 1e-6)))
-        return shape
     }
 
     fun createMidTickShape(): Shape {
@@ -67,5 +64,41 @@ object ImageGenerator {
 
     fun createHalfRunoffShape(): Shape {
         return createHalfShape(createRunoffShape())
+    }
+
+    fun createBoxedTextShape(text: String): Shape {
+        val font = StandardFont.readBoldFont(60)
+        val textShape = font.createGlyphVector(FontRenderContext(AffineTransform(), true, true), text).outline
+        val area = Area(Rectangle(0, 10, 25 + textShape.bounds2D.width.roundToInt(), 80))
+        area.subtract(Area(Rectangle(5, 15, 15 + textShape.bounds2D.width.roundToInt(), 70)))
+        area.add(Area(AffineTransform.getTranslateInstance(10.0, 70.0).createTransformedShape(textShape)))
+        area.add(Area(Rectangle2D.Double(0.0, 100.0, 1e-6, 1e-6)))
+        return area
+    }
+
+    fun createHalfBoxedTextShape(text: String): Shape {
+        return createHalfShape(createBoxedTextShape(text))
+    }
+
+    private fun createHalfShape(s: Shape): Area {
+        val shape = Area(s)
+        shape.add(Area(Rectangle2D.Double(s.bounds2D.minX, 2 * s.bounds2D.maxY - s.bounds2D.minY, 1e-6, 1e-6)))
+        return shape
+    }
+
+    fun Shape?.combineHorizontal(s: Shape?): Shape? {
+        if (s == null) return this
+        if (this == null) return s
+        val area = Area(this)
+        area.add(Area(AffineTransform.getTranslateInstance(bounds2D.width + 20, 0.0).createTransformedShape(s)))
+        return area
+    }
+
+    fun Shape?.combineVertical(s: Shape?): Shape? {
+        if (s == null) return this
+        if (this == null) return s
+        val area = Area(this)
+        area.add(Area(AffineTransform.getTranslateInstance(0.0, bounds2D.height + 20).createTransformedShape(s)))
+        return area
     }
 }

@@ -1,6 +1,7 @@
 package com.joecollins.graphics.screens.generic
 
 import com.joecollins.graphics.GenericPanel
+import com.joecollins.graphics.ImageGenerator
 import com.joecollins.graphics.components.BarFrame
 import com.joecollins.graphics.components.BarFrameBuilder
 import com.joecollins.models.general.CanOverrideSortOrder
@@ -12,6 +13,7 @@ import com.joecollins.pubsub.map
 import com.joecollins.pubsub.mapElements
 import com.joecollins.pubsub.merge
 import java.awt.Color
+import java.awt.Shape
 import java.text.DecimalFormat
 import java.util.concurrent.Flow
 import javax.swing.JPanel
@@ -65,10 +67,11 @@ class CandidateListingScreen private constructor(
                 createCandidatesPanel(
                     candidatesPanel,
                     showTwoColumns,
-                    { name.uppercase() + (if (incumbentMarker != null && incumbent) " [$incumbentMarker]" else "") },
+                    { name.uppercase() },
                     { party.name.uppercase() },
                     { party.color },
                     combinedFunc,
+                    { if (incumbentMarker != null && incumbent) ImageGenerator.createBoxedTextShape(incumbentMarker) else null },
                 ),
                 prevPanel?.run {
                     createPrevPanel(
@@ -121,6 +124,7 @@ class CandidateListingScreen private constructor(
                     { description?.uppercase() ?: "" },
                     { color },
                     combinedFunc,
+                    { null },
                 ),
                 prevPanel?.run {
                     createPrevPanel(
@@ -159,6 +163,7 @@ class CandidateListingScreen private constructor(
             rightLabel: CT.() -> String,
             color: CT.() -> Color,
             combinedLabel: CT.() -> String,
+            shape: CT.() -> Shape?,
         ): BarFrame {
             return BarFrame(
                 barsPublisher = if (showToColumns == null) {
@@ -166,6 +171,7 @@ class CandidateListingScreen private constructor(
                         BarFrame.Bar(
                             it.leftLabel(),
                             it.rightLabel(),
+                            it.shape(),
                             listOf(it.color() to 1.0),
                         )
                     }

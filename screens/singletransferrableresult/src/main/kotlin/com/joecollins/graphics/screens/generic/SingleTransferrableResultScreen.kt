@@ -3,6 +3,7 @@ package com.joecollins.graphics.screens.generic
 import com.joecollins.graphics.AltTextProvider
 import com.joecollins.graphics.GenericPanel
 import com.joecollins.graphics.ImageGenerator
+import com.joecollins.graphics.ImageGenerator.combineHorizontal
 import com.joecollins.graphics.components.BarFrameBuilder
 import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.Party
@@ -66,9 +67,15 @@ class SingleTransferrableResultScreen private constructor(
                     .filter { !votes.containsKey(it.first) }
                     .map {
                         BarFrameBuilder.BasicBar(
-                            label = it.first.name.uppercase() + (if (it.first.incumbent) " [${candidateResults.incumbentMarker}]" else "") + " (${it.first.party.abbreviation.uppercase()})",
+                            label = it.first.name.uppercase() + " (${it.first.party.abbreviation.uppercase()})",
                             valueLabel = it.second,
-                            shape = ImageGenerator.createTickShape(),
+                            shape = (
+                                if (it.first.incumbent) {
+                                    candidateResults.incumbentMarker?.let { inc -> ImageGenerator.createBoxedTextShape(inc) }
+                                } else {
+                                    null
+                                }
+                                ).combineHorizontal(ImageGenerator.createTickShape()),
                             value = 0,
                             color = it.first.party.color,
                         )
@@ -77,7 +84,7 @@ class SingleTransferrableResultScreen private constructor(
                     .sortedByDescending { it.value?.toDouble() ?: -1.0 }
                     .map {
                         BarFrameBuilder.BasicBar(
-                            label = it.key.name.uppercase() + (if (it.key.incumbent) " [${candidateResults.incumbentMarker}]" else "") + " (${it.key.party.abbreviation.uppercase()})",
+                            label = it.key.name.uppercase() + " (${it.key.party.abbreviation.uppercase()})",
                             valueLabel = if (it.value == null) {
                                 "WAITING..."
                             } else {
@@ -85,11 +92,19 @@ class SingleTransferrableResultScreen private constructor(
                             },
                             color = it.key.party.color,
                             value = (it.value ?: 0),
-                            shape = when {
-                                electedCandidates.contains(it.key) -> ImageGenerator.createTickShape()
-                                excluded.contains(it.key) -> ImageGenerator.createCrossShape()
-                                else -> null
-                            },
+                            shape = (
+                                if (it.key.incumbent) {
+                                    candidateResults.incumbentMarker?.let { inc -> ImageGenerator.createBoxedTextShape(inc) }
+                                } else {
+                                    null
+                                }
+                                ).combineHorizontal(
+                                when {
+                                    electedCandidates.contains(it.key) -> ImageGenerator.createTickShape()
+                                    excluded.contains(it.key) -> ImageGenerator.createCrossShape()
+                                    else -> null
+                                },
+                            ),
                         )
                     }
                 sequenceOf(alreadyElectedSequence, thisRoundSequence)

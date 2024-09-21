@@ -13,6 +13,8 @@ object BasicResultPanel {
     interface KeyTemplate<KT, KPT : PartyOrCoalition> {
         fun toParty(key: KT): KPT
         fun toMainBarHeader(key: KT, forceSingleLine: Boolean): String
+        fun toMainAltTextHeader(key: KT): String
+        fun incumbentShape(key: KT, forceSingleLine: Boolean): Shape?
         fun winnerShape(forceSingleLine: Boolean): Shape
         fun runoffShape(forceSingleLine: Boolean): Shape
     }
@@ -24,6 +26,14 @@ object BasicResultPanel {
 
         override fun toMainBarHeader(key: P, forceSingleLine: Boolean): String {
             return key.name.uppercase()
+        }
+
+        override fun toMainAltTextHeader(key: P): String {
+            return key.name.uppercase()
+        }
+
+        override fun incumbentShape(key: P, forceSingleLine: Boolean): Shape? {
+            return null
         }
 
         override fun winnerShape(forceSingleLine: Boolean): Shape {
@@ -44,6 +54,14 @@ object BasicResultPanel {
             return key.name.uppercase()
         }
 
+        override fun toMainAltTextHeader(key: PartyOrCandidate): String {
+            return key.name.uppercase()
+        }
+
+        override fun incumbentShape(key: PartyOrCandidate, forceSingleLine: Boolean): Shape? {
+            return null
+        }
+
         override fun winnerShape(forceSingleLine: Boolean): Shape {
             return ImageGenerator.createTickShape()
         }
@@ -54,14 +72,14 @@ object BasicResultPanel {
     }
 
     class CandidateTemplate : KeyTemplate<Candidate, Party> {
-        private val incumbentMarker: String
+        private val incumbentMarker: String?
 
         constructor() {
-            incumbentMarker = ""
+            incumbentMarker = null
         }
 
         constructor(incumbentMarker: String?) {
-            this.incumbentMarker = if (incumbentMarker == null) "" else " [$incumbentMarker]"
+            this.incumbentMarker = incumbentMarker
         }
 
         override fun toParty(key: Candidate): Party {
@@ -72,8 +90,27 @@ object BasicResultPanel {
             return if (key === Candidate.OTHERS) {
                 key.party.name.uppercase()
             } else {
-                ("${key.name}${if (key.isIncumbent()) incumbentMarker else ""}${if (forceSingleLine) (" (" + key.party.abbreviation + ")") else ("\n" + key.party.name)}")
+                ("${key.name}${if (forceSingleLine) (" (" + key.party.abbreviation + ")") else ("\n" + key.party.name)}")
                     .uppercase()
+            }
+        }
+
+        override fun toMainAltTextHeader(key: Candidate): String {
+            return if (key === Candidate.OTHERS) {
+                key.party.name.uppercase()
+            } else {
+                ("${key.name}${if (incumbentMarker != null && key.incumbent) " [$incumbentMarker]" else ""} (${key.party.abbreviation})")
+                    .uppercase()
+            }
+        }
+
+        override fun incumbentShape(key: Candidate, forceSingleLine: Boolean): Shape? {
+            return if (incumbentMarker == null || !key.incumbent) {
+                null
+            } else if (forceSingleLine) {
+                ImageGenerator.createBoxedTextShape(incumbentMarker)
+            } else {
+                ImageGenerator.createHalfBoxedTextShape(incumbentMarker)
             }
         }
 

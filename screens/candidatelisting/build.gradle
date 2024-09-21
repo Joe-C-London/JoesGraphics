@@ -16,6 +16,7 @@ dependencies {
     api parent.project('mapcommon')
     api parent.project('screenbase')
     api topLevel.project('models')
+    api topLevel.project('shapes')
     implementation topLevel.project('pubsub')
     implementation topLevel.project('components:barframe')
 
