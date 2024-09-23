@@ -2212,6 +2212,121 @@ class MultiResultScreenTest {
         )
     }
 
+    @Test
+    fun testSwingRange() {
+        val districts = listOf(
+            District(
+                8,
+                "Stanhope-Marshfield",
+                mapOf(
+                    Candidate("Wade MacLauchlan", lib, true) to 1196,
+                    Candidate("Bloyce Thompson", pc) to 1300,
+                    Candidate("Sarah Donald", grn) to 747,
+                    Candidate("Marian White", ndp) to 46,
+                ),
+                false,
+                mapOf(
+                    lib to 1938,
+                    pc to 1338,
+                    grn to 347,
+                    ndp to 443,
+                ),
+            ),
+            District(
+                15,
+                "Brackley-Hunter River",
+                mapOf(
+                    Candidate("Windsor Wight", lib) to 899,
+                    Candidate("Dennis King", pc, true) to 1315,
+                    Candidate("Greg Bradley", grn) to 879,
+                    Candidate("Leah-Jane Hayward", ndp) to 57,
+                ),
+                true,
+                mapOf(
+                    lib to 1389,
+                    pc to 1330,
+                    grn to 462,
+                    ndp to 516,
+                ),
+            ),
+            District(
+                17,
+                "New Haven-Rocky Point",
+                mapOf(
+                    Candidate("Judy MacNevin", lib) to 515,
+                    Candidate("Kris Currie", pc) to 1068,
+                    Candidate("Peter Bevan-Baker", grn, true) to 1870,
+                    Candidate("Don Wills", ind) to 26,
+                ),
+                true,
+                mapOf(
+                    lib to 1046,
+                    pc to 609,
+                    grn to 2077,
+                    ndp to 58,
+                ),
+            ),
+        )
+        val shapesByDistrict = peiShapesByDistrict()
+        val swingometerOrder = listOf(ndp, grn, lib, ind, pc)
+        val panel = MultiResultScreen.of(
+            list = districts.asOneTimePublisher(),
+            curr = {
+                votes = { votes.asOneTimePublisher() }
+                header = { ("DISTRICT $districtNum").asOneTimePublisher() }
+                subhead = { name.uppercase().asOneTimePublisher() }
+                incumbentMarker = "MLA"
+                winner = { (if (leaderHasWon) votes.entries.maxByOrNull { e -> e.value }!!.key else null).asOneTimePublisher() }
+            },
+            prev = {
+                votes = { prevVotes.asOneTimePublisher() }
+                swing = {
+                    header = { "SWING SINCE 2015".asOneTimePublisher() }
+                    partyOrder = swingometerOrder
+                    range = 0.20.asOneTimePublisher()
+                }
+            },
+            map = { d: District ->
+                createSingleResultMap {
+                    shapes = shapesByDistrict.asOneTimePublisher()
+                    selectedShape = d.districtNum.asOneTimePublisher()
+                    leader = d.votes.entries
+                        .maxByOrNull { e -> e.value }?.key?.party?.let { PartyResult(it, d.leaderHasWon) }
+                        .asOneTimePublisher()
+                    focus = (if (d.districtNum < 10) listOf(1, 2, 3, 4, 5, 6, 7, 8) else listOf(15, 16, 17, 18, 19, 20)).asOneTimePublisher()
+                    header = (if (d.districtNum < 10) "CARDIGAN" else "MALPEQUE").asOneTimePublisher()
+                }
+            },
+            title = "PARTY LEADERS".asOneTimePublisher(),
+        )
+        panel.setSize(1024, 512)
+        compareRendering("MultiResultPanel", "SwingRange-1", panel)
+        assertPublishes(
+            panel.altText,
+            """
+                PARTY LEADERS
+                
+                DISTRICT 8, STANHOPE-MARSHFIELD
+                BLOYCE THOMPSON (PCP): 1,300 (39.5%)
+                WADE MACLAUCHLAN [MLA] (LIB): 1,196 (36.4%)
+                SARAH DONALD (GRN): 747 (22.7%)
+                MARIAN WHITE (NDP): 46 (1.4%)
+                
+                DISTRICT 15, BRACKLEY-HUNTER RIVER
+                DENNIS KING [MLA] (PCP): 1,315 (41.7%) WINNER
+                WINDSOR WIGHT (LIB): 899 (28.5%)
+                GREG BRADLEY (GRN): 879 (27.9%)
+                LEAH-JANE HAYWARD (NDP): 57 (1.8%)
+                
+                DISTRICT 17, NEW HAVEN-ROCKY POINT
+                PETER BEVAN-BAKER [MLA] (GRN): 1,870 (53.8%) WINNER
+                KRIS CURRIE (PCP): 1,068 (30.7%)
+                JUDY MACNEVIN (LIB): 515 (14.8%)
+                DON WILLS (IND): 26 (0.7%)
+            """.trimIndent(),
+        )
+    }
+
     private fun peiShapesByDistrict(): Map<Int, Shape> {
         val peiMap = MultiResultScreenTest::class.java
             .classLoader

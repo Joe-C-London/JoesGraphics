@@ -68,6 +68,9 @@ class MultiResultScreen private constructor(
     class Swing<T> internal constructor() {
         lateinit var header: (T.() -> Flow.Publisher<out String>)
         lateinit var partyOrder: List<Party>
+        var range: Flow.Publisher<Double>? = null
+
+        internal val rangeOrDefault by lazy { range ?: 0.10.asOneTimePublisher() }
     }
 
     private class Result(private val partiesOnly: Boolean, private val incumbentMarker: String?) {
@@ -193,6 +196,7 @@ class MultiResultScreen private constructor(
         private val prevVotes: Publisher<Flow.Publisher<out Map<Party, Int>>> = Publisher(Publisher())
         private val maxBars: Publisher<Flow.Publisher<out Int>> = Publisher(Publisher())
         private val swingHeader: Publisher<Flow.Publisher<out String?>> = Publisher(Publisher())
+        private val swingRange: Publisher<Flow.Publisher<out Double>> = Publisher(Publisher())
         private val map: Publisher<Flow.Publisher<out AbstractSingleResultMap<*, *>>> = Publisher(Publisher())
 
         fun setVotesPublisher(votes: Flow.Publisher<out Map<Candidate, Int>>) {
@@ -231,6 +235,10 @@ class MultiResultScreen private constructor(
             this.swingHeader.submit(swingHeader)
         }
 
+        fun setSwingRangePublisher(swingRange: Flow.Publisher<out Double>) {
+            this.swingRange.submit(swingRange)
+        }
+
         fun setMapPublisher(map: Flow.Publisher<out AbstractSingleResultMap<*, *>>) {
             this.map.submit(map)
         }
@@ -249,6 +257,7 @@ class MultiResultScreen private constructor(
             setProgressLabelPublisher(null.asOneTimePublisher())
             setPrevPublisher(emptyMap<Party, Int>().asOneTimePublisher())
             setSwingHeaderPublisher("".asOneTimePublisher())
+            setSwingRangePublisher(0.10.asOneTimePublisher())
             setMapPublisher(NULL_MAP.asOneTimePublisher())
             setMaxBarsPublisher(5.asOneTimePublisher())
         }
@@ -305,6 +314,7 @@ class MultiResultScreen private constructor(
                         },
                     partyOrder = swingPartyOrder,
                     header = swingHeader.selfCompose(),
+                    range = swingRange.selfCompose(),
                 )
                 add(swingFrame)
             }
@@ -530,6 +540,7 @@ class MultiResultScreen private constructor(
                                     it?.let(prev.swingProps.header) ?: "".asOneTimePublisher()
                                 },
                             )
+                            newPanel.setSwingRangePublisher(prev.swingProps.rangeOrDefault)
                         }
                         if (map != null) {
                             newPanel.setMapPublisher(
