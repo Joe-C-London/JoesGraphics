@@ -2662,15 +2662,14 @@ class SeatViewPanelTest {
                     seats = prevSeats.asOneTimePublisher()
                     header = showPrev.map { if (it) "2000 RESULT" else "CHANGE SINCE 2000" }
                     showRaw = showPrev
-                    this.partyChanges = partyChanges
                 },
                 swing = {
                     this.currVotes = currVotes.asOneTimePublisher()
                     this.prevVotes = prevVotes.asOneTimePublisher()
                     partyOrder = swingOrder
                     header = "SWING SINCE 2000".asOneTimePublisher()
-                    this.partyChanges = partyChanges
                 },
+                partyChanges = partyChanges,
                 majorityLine = {
                     display = { "$it FOR MAJORITY" }
                 },
@@ -2779,15 +2778,14 @@ class SeatViewPanelTest {
                     seats = prevSeats.asOneTimePublisher()
                     header = showPrev.map { if (it) "2000 RESULT" else "CHANGE SINCE 2000" }
                     showRaw = showPrev
-                    this.partyChanges = partyChanges
                 },
                 swing = {
                     this.currVotes = currVotes.asOneTimePublisher()
                     this.prevVotes = prevVotes.asOneTimePublisher()
                     this.partyOrder = swingOrder
                     this.header = "SWING SINCE 2000".asOneTimePublisher()
-                    this.partyChanges = partyChanges
                 },
+                partyChanges = partyChanges,
                 majorityLine = {
                     display = { "$it FOR MAJORITY" }
                 },
@@ -2895,15 +2893,14 @@ class SeatViewPanelTest {
                 seats = prevSeats.asOneTimePublisher()
                 header = showPrev.map { if (it) "2000 RESULT" else "CHANGE SINCE 2000" }
                 showRaw = showPrev
-                this.partyChanges = partyChanges
             },
             swing = {
                 this.currVotes = currVotes.asOneTimePublisher()
                 this.prevVotes = prevVotes.asOneTimePublisher()
                 this.partyOrder = swingOrder
                 this.header = "SWING SINCE 2000".asOneTimePublisher()
-                this.partyChanges = partyChanges
             },
+            partyChanges = partyChanges,
             majorityLine = {
                 display = { "$it FOR MAJORITY" }
             },
