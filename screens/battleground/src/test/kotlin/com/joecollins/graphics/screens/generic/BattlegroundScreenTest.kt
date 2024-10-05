@@ -508,6 +508,312 @@ class BattlegroundScreenTest {
     }
 
     @Test
+    fun testSinglePartyBattlegroundWithPartyMerge() {
+        val pc = Party("Progressive Conservative", "PC", Color.BLUE)
+        val wra = Party("Wildrose", "WRA", Color.GREEN.darker().darker().darker())
+        val ndp = Party("New Democratic Party", "NDP", Color.ORANGE)
+        val lib = Party("Liberal", "LIB", Color.RED)
+        val ap = Party("Alberta Party", "AP", Color.CYAN)
+        val grn = Party("Green", "GRN", Color.GREEN)
+        val scp = Party("Social Credit", "SCP", Color.CYAN.darker())
+        val com = Party("Communist", "COM", Color.RED.darker())
+        val af = Party("Alberta First", "AFP", Color.YELLOW)
+        val ind = Party("Independent", "IND", Party.OTHERS.color)
+        val ucp = Party("United Conservative", "UCP", Color.BLUE.darker())
+
+        val prevResult = Publisher(
+            mapOf(
+                "Athabasca-Sturgeon-Redwater" to mapOf(pc to 5016, wra to 4973, ndp to 6797),
+                "Barrhead-Morinville-Westlock" to mapOf(pc to 4876, wra to 7206, ndp to 6232),
+                "Bonnyville-Cold Lake" to mapOf(pc to 3594, wra to 5452, ndp to 2136, ap to 628),
+                "Dunvegan-Central Peace-Notley" to mapOf(pc to 2766, wra to 3147, ndp to 3692),
+                "Fort McMurray-Conklin" to mapOf(pc to 1502, wra to 2950, lib to 204, ndp to 2071),
+                "Fort McMurray-Wood Buffalo" to mapOf(pc to 2486, wra to 3835, lib to 345, ndp to 2915),
+                "Grande Prairie-Smoky" to mapOf(pc to 4968, wra to 5343, lib to 787, ndp to 5009),
+                "Grande Prairie-Wapiti" to mapOf(pc to 6229, wra to 4175, ndp to 5062, ap to 2048),
+                "Lac La Biche-St. Paul-Two Hills" to mapOf(pc to 3004, wra to 4763, ndp to 4214, grn to 339),
+                "Lesser Slave Lake" to mapOf(pc to 1944, wra to 3198, ndp to 3915),
+                "Peace River" to mapOf(pc to 3529, wra to 1979, ndp to 3821, ap to 376),
+                "Edmonton-Beverly-Clareview" to mapOf(pc to 2524, wra to 1248, lib to 359, ndp to 12049, ap to 147),
+                "Edmonton-Calder" to mapOf(pc to 3222, wra to 1565, lib to 527, ndp to 12837),
+                "Edmonton-Centre" to mapOf(pc to 2228, wra to 772, lib to 4199, ndp to 8983, ind to 295 + 40),
+                "Edmonton-Glenora" to mapOf(pc to 3145, wra to 1394, lib to 553, ndp to 12473, ap to 463, grn to 195),
+                "Edmonton-Gold Bar" to mapOf(pc to 4147, wra to 1422, lib to 702, ndp to 15349, ap to 662),
+                "Edmonton-Highlands-Norwood" to mapOf(pc to 1778, wra to 967, lib to 494, ndp to 11555),
+                "Edmonton-Mill Creek" to mapOf(pc to 3848, wra to 1365, lib to 1896, ndp to 9025),
+                "Edmonton-Mill Woods" to mapOf(pc to 2920, wra to 1437, lib to 850, ndp to 9930, ind to 129, com to 44),
+                "Edmonton-Riverview" to mapOf(pc to 3732, wra to 1350, lib to 1416, ndp to 12108, ap to 487, grn to 135, ind to 59),
+                "Edmonton-Rutherford" to mapOf(pc to 3940, wra to 1644, lib to 741, ndp to 11214),
+                "Edmonton-Strathcona" to mapOf(pc to 2242, lib to 658, ndp to 13592),
+                "Edmonton-Castle Downs" to mapOf(pc to 4182, wra to 1383, lib to 880, ndp to 11689),
+                "Edmonton-Decore" to mapOf(pc to 2847, wra to 1289, lib to 691, ndp to 10531, grn to 150),
+                "Edmonton-Ellerslie" to mapOf(pc to 3549, wra to 2499, lib to 839, ndp to 11034),
+                "Edmonton-Manning" to mapOf(pc to 2599, wra to 1475, lib to 776, ndp to 12376),
+                "Edmonton-McClung" to mapOf(pc to 4408, wra to 2373, ndp to 9412, ap to 808),
+                "Edmonton-Meadowlark" to mapOf(pc to 3924, wra to 1972, lib to 1507, ndp to 9796),
+                "Edmonton-South West" to mapOf(pc to 6316, wra to 2290, lib to 1199, ndp to 12352, ap to 543),
+                "Edmonton-Whitemud" to mapOf(pc to 7177, wra to 1423, lib to 629, ndp to 12805, grn to 182, ind to 73),
+                "Sherwood Park" to mapOf(pc to 5655, wra to 4815, ndp to 11365),
+                "St. Albert" to mapOf(pc to 6340, wra to 2858, lib to 778, ndp to 12220, ap to 493),
+                "Drayton Valley-Devon" to mapOf(pc to 5182, wra to 6284, ndp to 4816, ap to 416, grn to 276),
+                "Innisfail-Sylvan Lake" to mapOf(pc to 5136, wra to 7829, ndp to 4244, ap to 1135),
+                "Olds-Didsbury-Three Hills" to mapOf(pc to 5274, wra to 10692, ndp to 3366, ap to 685),
+                "Red Deer-North" to mapOf(pc to 3836, wra to 4173, lib to 3262, ndp to 4969, ap to 683),
+                "Red Deer-South" to mapOf(pc to 5414, wra to 4812, lib to 738, ndp to 7024, ap to 1035, grn to 274, ind to 232 + 60),
+                "Rimbey-Rocky Mountain House-Sundre" to mapOf(pc to 5296, wra to 6670, ndp to 2791, ind to 1871),
+                "Spruce Grove-St. Albert" to mapOf(pc to 6362, wra to 4631, lib to 916, ndp to 11546, ap to 1081, grn to 269),
+                "Stony Plain" to mapOf(pc to 4944, wra to 5586, lib to 657, ndp to 7268, ap to 538, grn to 220),
+                "West Yellowhead" to mapOf(pc to 3433, wra to 3055, ndp to 4135),
+                "Whitecourt-Ste. Anne" to mapOf(pc to 4721, wra to 4996, ndp to 5442),
+                "Battle River-Wainwright" to mapOf(pc to 5057, wra to 6862, lib to 500, ndp to 3807),
+                "Drumheller-Stettler" to mapOf(pc to 5388, wra to 7570, ndp to 2927),
+                "Fort Saskatchewan-Vegreville" to mapOf(pc to 5527, wra to 3959, lib to 475, ndp to 8983, ap to 324, grn to 285),
+                "Lacombe-Ponoka" to mapOf(pc to 5018, wra to 6502, ndp to 5481, ap to 1206),
+                "Leduc-Beaumont" to mapOf(pc to 6225, wra to 6543, ndp to 8321, ap to 612, grn to 301),
+                "Strathcona-Sherwood Park" to mapOf(pc to 6623, wra to 5286, ndp to 9376, ap to 721),
+                "Vermilion-Lloydminster" to mapOf(pc to 5935, wra to 4171, ndp to 2428),
+                "Wetaskiwin-Camrose" to mapOf(pc to 5951, wra to 3685, ndp to 7531),
+                "Calgary-Acadia" to mapOf(pc to 4602, wra to 4985, lib to 765, ndp to 5506),
+                "Calgary-Buffalo" to mapOf(pc to 3738, wra to 1351, lib to 3282, ndp to 4671, grn to 263),
+                "Calgary-Cross" to mapOf(pc to 4501, wra to 2060, lib to 1194, ndp to 4602, grn to 236, ind to 143),
+                "Calgary-Currie" to mapOf(pc to 4577, wra to 3769, lib to 1441, ndp to 7387, ap to 1006, grn to 373),
+                "Calgary-East" to mapOf(pc to 3971, wra to 3663, lib to 806, ndp to 5506, com to 138),
+                "Calgary-Elbow" to mapOf(pc to 6254, wra to 1786, lib to 565, ndp to 3256, ap to 8707, scp to 67),
+                "Calgary-Fish Creek" to mapOf(pc to 6198, wra to 5568, ndp to 6069, ap to 850, scp to 148),
+                "Calgary-Fort" to mapOf(pc to 3204, wra to 3003, lib to 476, ndp to 7027, ap to 410),
+                "Calgary-Glenmore" to mapOf(pc to 7015, wra to 5058, lib to 1345, ndp to 7021, ap to 719),
+                "Calgary-Klein" to mapOf(pc to 4878, wra to 4206, lib to 1104, ndp to 8098, grn to 0),
+                "Calgary-Mountain View" to mapOf(pc to 4699, wra to 2070, lib to 7204, ndp to 5673),
+                "Calgary-Varsity" to mapOf(pc to 5700, wra to 2598, lib to 1862, ndp to 8297, grn to 424),
+                "Calgary-Bow" to mapOf(pc to 5419, wra to 3752, lib to 682, ndp to 5669, ap to 459, grn to 448),
+                "Calgary-Foothills" to mapOf(pc to 7163, wra to 3216, lib to 1271, ndp to 5748, grn to 363),
+                "Calgary-Greenway" to mapOf(pc to 5337, wra to 2627, ndp to 4513),
+                "Calgary-Hawkwood" to mapOf(pc to 6378, wra to 4448, lib to 736, ndp to 7443, ap to 925, grn to 455, scp to 90),
+                "Calgary-Hays" to mapOf(pc to 6671, wra to 4562, lib to 722, ndp to 5138, grn to 250, scp to 93),
+                "Calgary-Lougheed" to mapOf(pc to 5939, wra to 4781, lib to 817, ndp to 5437),
+                "Calgary-Mackay-Nose Hill" to mapOf(pc to 4587, wra to 4914, lib to 768, ndp to 6177, grn to 316),
+                "Calgary-McCall" to mapOf(pc to 2317, wra to 3367, lib to 2224, ndp to 3812, ind to 1010),
+                "Calgary-North West" to mapOf(pc to 6320, wra to 5163, lib to 935, ndp to 5724, ap to 1176),
+                "Calgary-Northern Hills" to mapOf(pc to 5343, wra to 4392, lib to 1000, ndp to 6641),
+                "Calgary-Shaw" to mapOf(pc to 5348, wra to 5301, lib to 668, ndp to 5449, ap to 661),
+                "Calgary-South East" to mapOf(pc to 7663, wra to 6892, lib to 1304, ndp to 7358, grn to 374),
+                "Calgary-West" to mapOf(pc to 8312, wra to 4512, ndp to 4940),
+                "Chestermere-Rocky View" to mapOf(pc to 7454, wra to 7676, ndp to 3706, ind to 1093 + 391, grn to 405),
+                "Airdrie" to mapOf(pc to 6181, wra to 7499, ndp to 6388, ap to 912, ind to 399),
+                "Banff-Cochrane" to mapOf(pc to 5555, wra to 5692, ndp to 8426),
+                "Cardston-Taber-Warner" to mapOf(pc to 4356, wra to 5126, ndp to 2407, ap to 378),
+                "Cypress-Medicine Hat" to mapOf(pc to 3389, wra to 8544, lib to 528, ndp to 3201),
+                "Highwood" to mapOf(pc to 6827, wra to 8504, ndp to 3937, ap to 892, grn to 390, scp to 187),
+                "Lethbridge-East" to mapOf(pc to 4743, wra to 3918, lib to 1201, ndp to 8918),
+                "Lethbridge-West" to mapOf(pc to 3938, wra to 3063, lib to 634, ndp to 11144),
+                "Little Bow" to mapOf(pc to 4793, wra to 4803, lib to 377, ndp to 3364, scp to 249),
+                "Livingstone-Macleod" to mapOf(pc to 6404, wra to 7362, lib to 464, ndp to 4338),
+                "Medicine Hat" to mapOf(pc to 3427, wra to 5790, ndp to 6160, ap to 731, ind to 137),
+                "Strathmore-Brooks" to mapOf(pc to 4452, wra to 8652, lib to 200, ndp to 2463, ap to 304, grn to 322, af to 72),
+            ),
+        )
+        val currResult = Publisher<Map<String, PartyResult>>(emptyMap())
+        val party = Publisher(ndp)
+        val targetSeats = Publisher(30)
+        val defenseSeats = Publisher(30)
+        val numRows = Publisher(15)
+        val title = Publisher("NDP BATTLEGROUND")
+        val panel = BattlegroundScreen.singleParty(
+            prevResults = prevResult.convertToPartyOrCandidateForBattleground(),
+            currResults = currResult,
+            name = { uppercase() },
+            party = party,
+            seatsToShow = {
+                defense = defenseSeats
+                target = targetSeats
+            },
+            numRows = numRows,
+            partyChanges = mapOf(pc to ucp, wra to ucp).asOneTimePublisher(),
+            title = title,
+        )
+        panel.setSize(1024, 512)
+        compareRendering("BattlegroundScreen", "Basic-PartyMerge-1", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            NDP BATTLEGROUND
+
+            NDP TARGET SEATS
+            COLUMN 1: 15 PENDING
+            COLUMN 2: 15 PENDING
+
+            NDP DEFENSE SEATS
+            COLUMN 1: 15 PENDING
+            COLUMN 2: 15 PENDING
+            """.trimIndent(),
+        )
+
+        party.submit(ucp)
+        title.submit("UCP BATTLEGROUND")
+        compareRendering("BattlegroundScreen", "Basic-PartyMerge-2", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            UCP BATTLEGROUND
+
+            UCP TARGET SEATS
+            COLUMN 1: 15 PENDING
+            COLUMN 2: 15 PENDING
+
+            UCP DEFENSE SEATS
+            COLUMN 1: 15 PENDING
+            COLUMN 2: 15 PENDING
+            """.trimIndent(),
+        )
+
+        currResult.submit(
+            mapOf(
+                "Athabasca-Sturgeon-Redwater" to ucp,
+                "Barrhead-Morinville-Westlock" to ucp,
+                "Bonnyville-Cold Lake" to ucp,
+                "Dunvegan-Central Peace-Notley" to ucp,
+                "Fort McMurray-Conklin" to ucp,
+                "Fort McMurray-Wood Buffalo" to ucp,
+                "Grande Prairie-Smoky" to ucp,
+                "Grande Prairie-Wapiti" to ucp,
+                "Lac La Biche-St. Paul-Two Hills" to ucp,
+                "Lesser Slave Lake" to ucp,
+                "Peace River" to ucp,
+                "Edmonton-Beverly-Clareview" to ndp,
+                "Edmonton-Calder" to ndp,
+                "Edmonton-Centre" to ndp,
+                "Edmonton-Glenora" to ndp,
+                "Edmonton-Gold Bar" to ndp,
+                "Edmonton-Highlands-Norwood" to ndp,
+                "Edmonton-Mill Creek" to ndp,
+                "Edmonton-Mill Woods" to ndp,
+                "Edmonton-Riverview" to ndp,
+                "Edmonton-Rutherford" to ndp,
+                "Edmonton-Strathcona" to ndp,
+                "Edmonton-Castle Downs" to ndp,
+                "Edmonton-Decore" to ndp,
+                "Edmonton-Ellerslie" to ndp,
+                "Edmonton-Manning" to ndp,
+                "Edmonton-McClung" to ndp,
+                "Edmonton-Meadowlark" to ndp,
+                "Edmonton-South West" to ucp,
+                "Edmonton-Whitemud" to ndp,
+                "Sherwood Park" to ndp,
+                "St. Albert" to ndp,
+                "Drayton Valley-Devon" to ucp,
+                "Innisfail-Sylvan Lake" to ucp,
+                "Olds-Didsbury-Three Hills" to ucp,
+                "Red Deer-North" to ucp,
+                "Red Deer-South" to ucp,
+                "Rimbey-Rocky Mountain House-Sundre" to ucp,
+                "Spruce Grove-St. Albert" to ndp,
+                "Stony Plain" to ucp,
+                "West Yellowhead" to ucp,
+                "Whitecourt-Ste. Anne" to ucp,
+                "Battle River-Wainwright" to ucp,
+                "Drumheller-Stettler" to ucp,
+                "Fort Saskatchewan-Vegreville" to ucp,
+                "Lacombe-Ponoka" to ucp,
+                "Leduc-Beaumont" to ucp,
+                "Strathcona-Sherwood Park" to ucp,
+                "Vermilion-Lloydminster" to ucp,
+                "Wetaskiwin-Camrose" to ucp,
+                "Calgary-Acadia" to ucp,
+                "Calgary-Buffalo" to ndp,
+                "Calgary-Cross" to ucp,
+                "Calgary-Currie" to ucp,
+                "Calgary-East" to ucp,
+                "Calgary-Elbow" to ucp,
+                "Calgary-Fish Creek" to ucp,
+                "Calgary-Fort" to ucp,
+                "Calgary-Glenmore" to ucp,
+                "Calgary-Klein" to ucp,
+                "Calgary-Mountain View" to ndp,
+                "Calgary-Varsity" to ucp,
+                "Calgary-Bow" to ucp,
+                "Calgary-Foothills" to ucp,
+                "Calgary-Greenway" to ucp,
+                "Calgary-Hawkwood" to ucp,
+                "Calgary-Hays" to ucp,
+                "Calgary-Lougheed" to ucp,
+                "Calgary-Mackay-Nose Hill" to ucp,
+                "Calgary-McCall" to ndp,
+                "Calgary-North West" to ucp,
+                "Calgary-Northern Hills" to ucp,
+                "Calgary-Shaw" to ucp,
+                "Calgary-South East" to ucp,
+                "Calgary-West" to ucp,
+                "Chestermere-Rocky View" to ucp,
+                "Airdrie" to ucp,
+                "Banff-Cochrane" to ucp,
+                "Cardston-Taber-Warner" to ucp,
+                "Cypress-Medicine Hat" to ucp,
+                "Highwood" to ucp,
+                "Lethbridge-East" to ucp,
+                "Lethbridge-West" to ndp,
+                "Little Bow" to ucp,
+                "Livingstone-Macleod" to ucp,
+                "Medicine Hat" to ucp,
+                "Strathmore-Brooks" to ucp,
+            ).mapValues { (_, v) -> PartyResult.elected(v) },
+        )
+        compareRendering("BattlegroundScreen", "Basic-PartyMerge-3", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            UCP BATTLEGROUND
+
+            UCP TARGET SEATS
+            COLUMN 1: 15 GAINS
+            COLUMN 2: 13 GAINS, 2 MISSES
+
+            UCP DEFENSE SEATS
+            COLUMN 1: 15 HOLDS
+            COLUMN 2: 15 HOLDS
+            """.trimIndent(),
+        )
+
+        party.submit(ap)
+        targetSeats.submit(30)
+        defenseSeats.submit(5)
+        title.submit("ALBERTA PARTY BATTLEGROUND")
+        compareRendering("BattlegroundScreen", "Basic-PartyMerge-4", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            ALBERTA PARTY BATTLEGROUND
+
+            AP TARGET SEATS
+            COLUMN 1: 15 MISSES
+            COLUMN 2: 15 MISSES
+
+            AP DEFENSE SEATS
+            COLUMN 1: 1 LOSSES
+            """.trimIndent(),
+        )
+
+        party.submit(ndp)
+        targetSeats.submit(30)
+        defenseSeats.submit(30)
+        title.submit("NDP BATTLEGROUND")
+        compareRendering("BattlegroundScreen", "Basic-PartyMerge-5", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            NDP BATTLEGROUND
+            
+            NDP TARGET SEATS
+            COLUMN 1: 1 GAINS, 14 MISSES
+            COLUMN 2: 15 MISSES
+            
+            NDP DEFENSE SEATS
+            COLUMN 1: 15 LOSSES
+            COLUMN 2: 2 HOLDS, 13 LOSSES
+            """.trimIndent(),
+        )
+    }
+
+    @Test
     fun testDoublePartyBattlegroundPreferences() {
         val alp = Party("Labor", "ALP", Color.RED)
         val clp = Party("Country Liberal", "CLP", Color.ORANGE)

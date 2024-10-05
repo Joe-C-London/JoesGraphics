@@ -162,7 +162,7 @@ class BattlegroundScreen private constructor(
             }
             val adjustedVotes = Aggregators.adjustKey(votes) { partyChanges[it.party]?.let { p -> PartyOrCandidate(p) } ?: it }
             val partyPrevVotes = adjustedVotes.entries.firstOrNull { it.key.party == party }?.value ?: 0
-            val prevWinnerVotes = adjustedVotes.entries.first { it.key == (partyChanges[prevWinner.party]?.let { p -> PartyOrCandidate(p) } ?: prevWinner) }.value
+            val prevWinnerVotes = adjustedVotes.entries.filter { it.key.party != party }.maxOf { it.value }
             val total = votes.values.sum()
             return (prevWinnerVotes - partyPrevVotes) / total.toDouble()
         }
