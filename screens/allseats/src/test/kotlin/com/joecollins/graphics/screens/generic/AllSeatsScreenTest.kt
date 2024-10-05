@@ -538,7 +538,7 @@ class AllSeatsScreenTest {
                 "Saanich South" to elected(ndp),
                 "Victoria-Beacon Hill" to elected(ndp),
                 "Victoria-Swan Lake" to elected(ndp),
-            ).mapValues { it.value!! }
+            )
         }
 
         private enum class BCRegion { VANCOUVER, ISLAND, SOUTH, NORTH }
