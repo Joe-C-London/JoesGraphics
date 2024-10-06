@@ -145,7 +145,10 @@ class BattlefieldScreen private constructor(header: Flow.Publisher<out String?>,
 
                         val prevPcts = prev.mapValues { e ->
                             val total = e.value.values.sum().toDouble()
-                            e.value.mapValues { it.value / total }
+                            sequenceOf(parties.asSequence().map { PartyOrCandidate(it) }, e.value.keys.asSequence())
+                                .flatten()
+                                .distinct()
+                                .associateWith { (e.value[it] ?: 0) / total }
                         }
 
                         parties.asSequence().mapNotNull { calculateLine(it, parties, prevPcts, limit.toDouble()) }
@@ -286,13 +289,17 @@ class BattlefieldScreen private constructor(header: Flow.Publisher<out String?>,
             val majorityText = (partySwings ?: null.asOneTimePublisher()).merge(prevVotes) { swings, prev ->
                 val adjSeats = prev.values.groupingBy { votes ->
                     val total = votes.values.sum().toDouble()
-                    val pcts = votes.mapValues { it.value / total + (swings?.get(it.key.party) ?: 0.0) }
+                    val pcts = sequenceOf(swings?.keys?.map { PartyOrCandidate(it) }, votes.keys)
+                        .filterNotNull()
+                        .flatten()
+                        .distinct()
+                        .associateWith { (votes[it] ?: 0) / total + (swings?.get(it.party) ?: 0.0) }
                     pcts.maxBy { it.value }.key.party
                 }.eachCount()
                 val majority = prev.size / 2 + 1
                 val winner = adjSeats.filterValues { it >= majority }.keys.firstOrNull()
                 (winner?.abbreviation ?: "NO PARTY") +
-                    (if (swings == null) " CURRENTLY HAS MAJORITY" else " WOULD HAVE MAJORITY ON UNIFORM ADVANCES")
+                    (if (swings == null) " WOULD HAVE MAJORITY ON NO ADVANCES" else " WOULD HAVE MAJORITY ON UNIFORM ADVANCES")
             }
             return topText.run {
                 if (swingsText == null) {

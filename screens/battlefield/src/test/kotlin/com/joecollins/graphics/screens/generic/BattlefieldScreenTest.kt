@@ -196,7 +196,7 @@ class BattlefieldScreenTest {
             NEW BRUNSWICK
             BATTLEFIELD NEW BRUNSWICK: ADVANCING TO A MAJORITY
             
-            PC CURRENTLY HAS MAJORITY
+            PC WOULD HAVE MAJORITY ON NO ADVANCES
             """.trimIndent(),
         )
     }
