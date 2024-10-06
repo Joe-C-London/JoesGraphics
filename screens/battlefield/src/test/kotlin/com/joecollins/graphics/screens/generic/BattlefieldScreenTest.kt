@@ -79,21 +79,20 @@ class BattlefieldScreenTest {
 
         val prevTotal = mapOf(lib to 33481, pc to 30663, grn to 8857, ndp to 8997)
         val currTotal = mapOf(pc to 30415, grn to 25302, lib to 24346, ndp to 2454, Party.OTHERS to 282)
-        val swings = run {
-            val prevSum = prevTotal.values.sum().toDouble()
-            val currSum = currTotal.values.sum().toDouble()
-            val parties = sequenceOf(prevTotal.keys, currTotal.keys).flatten().toSet()
-            parties.associateWith { (currTotal[it] ?: 0) / currSum - (prevTotal[it] ?: 0) / prevSum }
-        }
 
         val screen = BattlefieldScreen.build(
             prevVotes = prevResults.asOneTimePublisher().convertToPartyOrCandidateForBattlefield(),
             results = currResults.asOneTimePublisher(),
-            leftParty = pc.asOneTimePublisher(),
-            rightParty = lib.asOneTimePublisher(),
-            bottomParty = grn.asOneTimePublisher(),
+            parties = {
+                left = pc.asOneTimePublisher()
+                right = lib.asOneTimePublisher()
+                bottom = grn.asOneTimePublisher()
+            },
             header = "BATTLEFIELD PEI: ADVANCING TO A MAJORITY".asOneTimePublisher(),
-            partySwings = swings.asOneTimePublisher(),
+            totalVotes = {
+                prev = prevTotal.asOneTimePublisher()
+                curr = currTotal.asOneTimePublisher()
+            },
             majorityLines = true.asOneTimePublisher(),
             title = "PRINCE EDWARD ISLAND".asOneTimePublisher(),
         )
@@ -176,16 +175,16 @@ class BattlefieldScreenTest {
             "Victoria-La Vallée" to mapOf(pc to 2071, lib to 4365, grn to 426, pa to 292, ind to 92),
         )
         val currResults = emptyMap<String, PartyResult?>()
-        val swings = emptyMap<Party, Double>()
 
         val screen = BattlefieldScreen.build(
             prevVotes = prevResults.asOneTimePublisher(),
             results = currResults.asOneTimePublisher(),
-            leftParty = pc.party.asOneTimePublisher(),
-            rightParty = lib.party.asOneTimePublisher(),
-            bottomParty = ndp.party.asOneTimePublisher(),
+            parties = {
+                left = pc.party.asOneTimePublisher()
+                right = lib.party.asOneTimePublisher()
+                bottom = ndp.party.asOneTimePublisher()
+            },
             header = "BATTLEFIELD NEW BRUNSWICK: ADVANCING TO A MAJORITY".asOneTimePublisher(),
-            partySwings = swings.asOneTimePublisher(),
             majorityLines = true.asOneTimePublisher(),
             title = "NEW BRUNSWICK".asOneTimePublisher(),
         )
@@ -197,11 +196,7 @@ class BattlefieldScreenTest {
             NEW BRUNSWICK
             BATTLEFIELD NEW BRUNSWICK: ADVANCING TO A MAJORITY
             
-            NDP ADVANCES 0.0% INTO PC TERRITORY
-            LIB ADVANCES 0.0% INTO PC TERRITORY
-            NDP ADVANCES 0.0% INTO LIB TERRITORY
-            
-            PC WOULD HAVE MAJORITY ON UNIFORM ADVANCES
+            PC CURRENTLY HAS MAJORITY
             """.trimIndent(),
         )
     }
