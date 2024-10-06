@@ -3,6 +3,7 @@ package com.joecollins.graphics.screens.generic
 import com.joecollins.graphics.GenericPanel
 import com.joecollins.graphics.components.BattlefieldFrame
 import com.joecollins.graphics.utils.ColorUtils
+import com.joecollins.models.general.Aggregators
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyOrCandidate
 import com.joecollins.models.general.PartyOrCandidate.Companion.convertToPartyOrCandidate
@@ -34,17 +35,26 @@ class BattlefieldScreen private constructor(header: Flow.Publisher<out String?>,
             }
         }
 
-        class TotalVotes internal constructor() {
+        class TotalVotes internal constructor(private val partyChanges: Flow.Publisher<out Map<Party, Party>>?) {
             lateinit var prev: Flow.Publisher<Map<Party, Int>>
             lateinit var curr: Flow.Publisher<Map<Party, Int>>
 
             internal val swings: Flow.Publisher<Map<Party, Double>> by lazy {
-                prev.merge(curr) { prevTotal, currTotal ->
-                    val prevSum = prevTotal.values.sum().toDouble()
-                    val currSum = currTotal.values.sum().toDouble()
-                    val parties = sequenceOf(prevTotal.keys, currTotal.keys).flatten().toSet()
-                    parties.associateWith { (currTotal[it] ?: 0) / currSum - (prevTotal[it] ?: 0) / prevSum }
+                prev.run {
+                    if (partyChanges == null) {
+                        this
+                    } else {
+                        merge(partyChanges) { prevTotal, changes ->
+                            Aggregators.adjustKey(prevTotal) { changes[it] ?: it }
+                        }
+                    }
                 }
+                    .merge(curr) { prevTotal, currTotal ->
+                        val prevSum = prevTotal.values.sum().toDouble()
+                        val currSum = currTotal.values.sum().toDouble()
+                        val parties = sequenceOf(prevTotal.keys, currTotal.keys).flatten().toSet()
+                        parties.associateWith { (currTotal[it] ?: 0) / currSum - (prevTotal[it] ?: 0) / prevSum }
+                    }
             }
         }
 
@@ -57,12 +67,26 @@ class BattlefieldScreen private constructor(header: Flow.Publisher<out String?>,
             increment: Flow.Publisher<out Number>? = null,
             totalVotes: (TotalVotes.() -> Unit)? = null,
             majorityLines: Flow.Publisher<Boolean>? = null,
+            partyChanges: Flow.Publisher<out Map<Party, Party>>? = null,
             title: Flow.Publisher<out String?>,
         ): BattlefieldScreen {
             val allParties = Parties().apply(parties).all
-            val partySwings = totalVotes?.let { TotalVotes().apply(it).swings }
+            val partySwings = totalVotes?.let { TotalVotes(partyChanges).apply(it).swings }
+            val prev = prevVotes.run {
+                if (partyChanges == null) {
+                    this
+                } else {
+                    merge(partyChanges) { votes, changes ->
+                        votes.mapValues { (_, v) ->
+                            Aggregators.adjustKey(v) {
+                                changes[it.party]?.let { p -> PartyOrCandidate(p) } ?: it
+                            }
+                        }
+                    }
+                }
+            }
             val frame = createBattlefield(
-                prevVotes,
+                prev,
                 results,
                 allParties,
                 majorityLines,
@@ -71,7 +95,7 @@ class BattlefieldScreen private constructor(header: Flow.Publisher<out String?>,
                 increment,
                 partySwings,
             )
-            val altText = createAltText(title, header, partySwings, allParties, prevVotes)
+            val altText = createAltText(title, header, partySwings, allParties, prev)
             return BattlefieldScreen(title, frame, altText)
         }
 
