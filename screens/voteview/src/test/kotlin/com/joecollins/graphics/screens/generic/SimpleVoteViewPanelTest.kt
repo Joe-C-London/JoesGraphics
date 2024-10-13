@@ -5,6 +5,7 @@ import com.joecollins.graphics.screens.generic.ResultMap.Companion.createResultM
 import com.joecollins.graphics.screens.generic.SimpleVoteViewPanel.Companion.candidateVotes
 import com.joecollins.graphics.screens.generic.SimpleVoteViewPanel.Companion.nonPartisanVotes
 import com.joecollins.graphics.screens.generic.SimpleVoteViewPanel.Companion.partyOrCandidateVotes
+import com.joecollins.graphics.screens.generic.SimpleVoteViewPanel.Companion.partyPct
 import com.joecollins.graphics.screens.generic.SimpleVoteViewPanel.Companion.partyRangeVotes
 import com.joecollins.graphics.screens.generic.SimpleVoteViewPanel.Companion.partyVotes
 import com.joecollins.graphics.screens.generic.SingleNonPartisanResultMap.Companion.createSingleNonPartisanResultMap
@@ -3960,6 +3961,73 @@ class SimpleVoteViewPanelTest {
                 GEORGINA BASSETT (IND): 41 (1.3%, +1.3%)
                 
                 SWING SINCE 2019: 29.7% SWING LIB TO PC
+            """.trimIndent(),
+        )
+    }
+
+    @Test
+    fun testCurrPct() {
+        val fpo = Party("Freedom Party", "FPÖ", Color.BLUE)
+        val ovp = Party("People's Party", "ÖVP", Color.CYAN)
+        val spo = Party("Social Democratic Party", "SPÖ", Color.RED)
+        val neos = Party("New Austria and Liberal Forum", "NEOS", Color.MAGENTA)
+        val grune = Party("Green", "GRÜNE", Color.GREEN)
+        val kpo = Party("Communist", "KPÖ", Color.RED.darker())
+        val bier = Party("Bier Party", "BIER", Color.YELLOW)
+        val oth = Party.OTHERS
+
+        val panel = partyPct(
+            current = {
+                votes = mapOf(
+                    fpo to 0.291,
+                    ovp to 0.262,
+                    spo to 0.204,
+                    neos to 0.088,
+                    grune to 0.086,
+                    kpo to 0.029,
+                    bier to 0.021,
+                    oth to 0.017,
+                ).asOneTimePublisher()
+                header = "EXIT POLL".asOneTimePublisher()
+                subhead = "".asOneTimePublisher()
+            },
+            prev = {
+                votes = mapOf(
+                    ovp to 1789417,
+                    spo to 1011868,
+                    fpo to 772666,
+                    grune to 664055,
+                    neos to 387124,
+                    kpo to 32736,
+                    bier to 4946,
+                    oth to 114434,
+                ).asOneTimePublisher()
+                header = "CHANGE SINCE 2019".asOneTimePublisher()
+                swing = {
+                    partyOrder = listOf(spo, oth, ovp, fpo)
+                    header = "SWING SINCE 2019".asOneTimePublisher()
+                }
+            },
+            title = "AUSTRIA".asOneTimePublisher(),
+        )
+        panel.setSize(1024, 512)
+        compareRendering("SimpleVoteViewPanel", "PartyPct-1", panel)
+        assertPublishes(
+            panel.altText,
+            """
+                AUSTRIA
+
+                EXIT POLL (CHANGE SINCE 2019)
+                FREEDOM PARTY: 29.1% (+12.9%)
+                PEOPLE'S PARTY: 26.2% (-11.3%)
+                SOCIAL DEMOCRATIC PARTY: 20.4% (-0.8%)
+                NEW AUSTRIA AND LIBERAL FORUM: 8.8% (+0.7%)
+                GREEN: 8.6% (-5.3%)
+                COMMUNIST: 2.9% (+2.2%)
+                BIER PARTY: 2.1% (+2.0%)
+                OTHERS: 1.7% (-0.7%)
+                
+                SWING SINCE 2019: 12.1% SWING ÖVP TO FPÖ
             """.trimIndent(),
         )
     }

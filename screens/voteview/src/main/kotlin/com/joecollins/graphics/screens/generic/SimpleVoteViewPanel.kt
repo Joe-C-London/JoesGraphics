@@ -171,6 +171,43 @@ class SimpleVoteViewPanel private constructor(
             ).build()
         }
 
+        fun partyPct(
+            current: CurrentVotes<PartyOrCoalition, Double>.() -> Unit,
+            prev: (PrevVotes<PartyOrCoalition>.() -> Unit)? = null,
+            majority: (MajorityLine.() -> Unit)? = null,
+            displayLimit: (DisplayLimit<PartyOrCoalition>.() -> Unit)? = null,
+            partyClassification: (PartyClassification<PartyOrCoalition>.() -> Unit)? = null,
+            map: AbstractMap<*>? = null,
+            title: Flow.Publisher<out String?>,
+        ): SimpleVoteViewPanel {
+            return VoteScreenBuilder<PartyOrCoalition, PartyOrCoalition, Double, Double, Double, BarFrameBuilder.BasicBar>(
+                current = CurrentVotes<PartyOrCoalition, Double>().apply(current),
+                prev = prev?.let { PrevVotes<PartyOrCoalition>().apply(it) },
+                majority = majority?.let { MajorityLine().apply(it) },
+                displayLimit = displayLimit?.let { DisplayLimit<PartyOrCoalition>().apply(it) },
+                partyClassification = partyClassification?.let { PartyClassification<PartyOrCoalition>().apply(it) },
+                preferences = null,
+                map = map?.mapFrame,
+                secondMap = null,
+                keyTemplate = BasicResultPanel.PartyTemplate(),
+                voteTemplate = VotePctOnlyTemplate,
+                valueTemplate = PctTemplate,
+                others = Party.OTHERS,
+                title = title,
+                createBarFrame = {
+                    BarFrameBuilder.basic(
+                        barsPublisher = bars,
+                        headerPublisher = header,
+                        rightHeaderLabelPublisher = progress,
+                        subheadPublisher = subhead,
+                        notesPublisher = notes,
+                        limitsPublisher = limits,
+                        linesPublisher = lines,
+                    )
+                },
+            ).build()
+        }
+
         fun candidateVotes(
             current: CandidateCurrentVotes<Int?>.() -> Unit,
             prev: (PrevVotesNoSwing<Party>.() -> Unit)? = null,
@@ -796,6 +833,162 @@ class SimpleVoteViewPanel private constructor(
                         (" (" + PCT_DIFF_FORMAT.format(diffPct) + symbols + ")")
                     }
                     )
+        }
+    }
+
+    private object PctTemplate : ValueTemplate<Double, Double, BarFrameBuilder.BasicBar> {
+        override fun sortOrder(value: Double): Double = value
+
+        override fun <KT, KPT> toPct(votes: Map<out KT, Double>, party: (KT) -> KPT): Map<KPT, Double> {
+            return votes.entries.groupingBy { party(it.key) }.fold(0.0) { a, e -> a + e.value }
+        }
+
+        override fun <KT, KPT> toVotesForSwing(votes: Map<out KT, Double>, party: (KT) -> KPT): Map<KPT, Int> {
+            return votes.entries.groupingBy { party(it.key) }.fold(0) { a, e -> a + (e.value * 1000).roundToInt() }
+        }
+
+        override fun toDiff(curr: Double, prev: Double): Double {
+            return curr - prev
+        }
+
+        override fun voteCombine(a: Double, b: Double): Double {
+            return a + b
+        }
+
+        override fun pctCombine(a: Double, b: Double): Double {
+            return a + b
+        }
+
+        override val zero: Double = 0.0
+
+        override val zeroPct: Double = 0.0
+
+        override fun createBar(
+            keyLabel: String,
+            baseColor: Color,
+            value: Double,
+            total: Double,
+            forcedTotal: Double,
+            numBars: Int,
+            forceSingleLine: Boolean,
+            shape: Shape?,
+        ): BarFrameBuilder.BasicBar {
+            return createBar(
+                keyLabel,
+                baseColor,
+                value,
+                numBars,
+                forceSingleLine,
+                shape,
+                "UNCONTESTED",
+            )
+        }
+
+        override fun createPreferencesBar(
+            keyLabel: String,
+            baseColor: Color,
+            value: Double,
+            total: Double,
+            forcedTotal: Double,
+            numBars: Int,
+            shape: Shape?,
+        ): BarFrameBuilder.BasicBar {
+            return createBar(
+                keyLabel,
+                baseColor,
+                value,
+                numBars,
+                true,
+                shape,
+                "ELECTED",
+            )
+        }
+
+        private fun createBar(
+            keyLabel: String,
+            baseColor: Color,
+            value: Double,
+            numBars: Int,
+            forceSingleLine: Boolean,
+            shape: Shape?,
+            singleBarLabel: String,
+        ): BarFrameBuilder.BasicBar {
+            return BarFrameBuilder.BasicBar(
+                label = keyLabel,
+                color = baseColor,
+                value = value.takeUnless { it.isNaN() } ?: 0.0,
+                valueLabel = when {
+                    numBars == 1 -> singleBarLabel
+                    else -> VotePctOnlyTemplate.toBarString(
+                        votes = 0,
+                        pct = value,
+                        forceSingleLine = forceSingleLine,
+                    )
+                },
+                shape = shape,
+            )
+        }
+
+        override fun createDiffBar(keyLabel: String, baseColor: Color, value: Double): BarFrameBuilder.BasicBar {
+            return BarFrameBuilder.BasicBar(
+                keyLabel,
+                baseColor,
+                value,
+                DecimalFormat("+0.0%;-0.0%").format(value),
+            )
+        }
+
+        override fun createPrevBar(keyLabel: String, baseColor: Color, value: Double): BarFrameBuilder.BasicBar {
+            return BarFrameBuilder.BasicBar(
+                keyLabel,
+                baseColor,
+                value,
+                DecimalFormat("0.0%").format(value),
+            )
+        }
+
+        override fun createAltTextBar(
+            keyLabel: String,
+            value: Double?,
+            total: Double,
+            diff: Double?,
+            numBars: Int,
+            symbol: String?,
+            result: String?,
+        ): String {
+            return "$keyLabel: " + when {
+                numBars == 1 -> "UNCONTESTED"
+                value == null && diff != null -> "- (" + DecimalFormat("0.0%").format(diff) + ")"
+                value == null -> "WAITING..."
+                else -> VotePctOnlyTemplate.toAltTextString(
+                    votes = 0,
+                    pct = value,
+                    diffPct = diff,
+                    symbols = symbol ?: "",
+                )
+            } + (if (result == null) "" else " $result")
+        }
+
+        override fun createPreferenceAltTextBar(
+            keyLabel: String,
+            value: Double?,
+            total: Double,
+            diff: Double?,
+            numBars: Int,
+            symbol: String?,
+            result: String?,
+        ): String {
+            return "$keyLabel: " + when {
+                numBars == 1 -> "ELECTED"
+                value == null && diff != null -> "- (" + DecimalFormat("0.0%").format(diff) + ")"
+                value == null -> "WAITING..."
+                else -> VotePctOnlyTemplate.toAltTextString(
+                    votes = 0,
+                    pct = value,
+                    diffPct = diff,
+                    symbols = symbol ?: "",
+                )
+            } + (if (result == null || numBars == 1) "" else " $result")
         }
     }
 
