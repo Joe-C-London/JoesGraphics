@@ -72,7 +72,7 @@ object ImageGenerator {
         val area = Area(Rectangle(0, 10, 25 + textShape.bounds2D.width.roundToInt(), 80))
         area.subtract(Area(Rectangle(5, 15, 15 + textShape.bounds2D.width.roundToInt(), 70)))
         area.add(Area(AffineTransform.getTranslateInstance(10.0, 70.0).createTransformedShape(textShape)))
-        area.add(Area(Rectangle2D.Double(0.0, 100.0, 1e-6, 1e-6)))
+        area.add(Area(Rectangle2D.Double(0.0, 100.0 - 1e-6, 1e-6, 1e-6)))
         area.add(Area(Rectangle2D.Double(0.0, 0.0, 1e-6, 1e-6)))
         return area
     }

@@ -13,11 +13,13 @@ import java.awt.Font
 import java.awt.Graphics
 import java.awt.Graphics2D
 import java.awt.LayoutManager
+import java.awt.Rectangle
 import java.awt.RenderingHints
 import java.awt.Shape
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
 import java.awt.geom.AffineTransform
+import java.awt.geom.Area
 import java.util.concurrent.Flow
 import javax.swing.JComponent
 import javax.swing.JLabel
@@ -232,7 +234,7 @@ class BarFrame(
                 shrinkLeft = false
                 shrinkRight = false
             }
-            var leftMax = zero
+            val stringBoundsByLine = ArrayList<Double>()
             for (i in leftText.indices) {
                 var lineFont = font
                 if (shrinkLeft) {
@@ -253,13 +255,15 @@ class BarFrame(
                 val leftWidth = g.getFontMetrics(lineFont).stringWidth(leftText[i])
                 val textHeight = lineFont.size
                 val textBase = (i + 1) * (barHeight + textHeight) / (leftText.size + 1)
-                leftMax = if (isNetPositive) {
-                    g.drawString(leftText[i], zero.roundToInt(), textBase)
-                    max(leftMax, leftWidth + zero)
-                } else {
-                    g.drawString(leftText[i], zero.roundToInt() - leftWidth, textBase)
-                    min(leftMax, zero - leftWidth)
-                }
+                stringBoundsByLine.add(
+                    if (isNetPositive) {
+                        g.drawString(leftText[i], zero.roundToInt(), textBase)
+                        leftWidth + zero
+                    } else {
+                        g.drawString(leftText[i], zero.roundToInt() - leftWidth, textBase)
+                        zero - leftWidth
+                    },
+                )
             }
             for (i in rightText.indices) {
                 var lineFont = font
@@ -291,11 +295,28 @@ class BarFrame(
                 val leftIconScale = (barHeight - 2 * BAR_MARGIN) / leftIconBounds.getHeight()
                 val transform = AffineTransform()
                 val spaceWidth = g.getFontMetrics(font).stringWidth(" ")
+                val leftIconPieces = stringBoundsByLine.indices.map { idx ->
+                    val start = leftIconBounds.height * idx / stringBoundsByLine.size + leftIconBounds.y
+                    val end = leftIconBounds.height * (idx + 1) / stringBoundsByLine.size + leftIconBounds.y
+                    val area = Area(leftIcon)
+                    area.intersect(Area(Rectangle(leftIconBounds.x, start, leftIconBounds.width, end - start)))
+                    area
+                }
                 if (isNetPositive) {
-                    transform.translate(leftMax + spaceWidth, (2 * BAR_MARGIN).toDouble())
+                    val endOfStrings = (
+                        stringBoundsByLine
+                            .filterIndexed { index, _ -> leftIconPieces[index].bounds2D.let { it.width > 1 && it.height > 1 } }
+                            .maxOrNull() ?: zero
+                        ).coerceAtLeast(zero)
+                    transform.translate(endOfStrings + spaceWidth, (2 * BAR_MARGIN).toDouble())
                 } else {
+                    val endOfStrings = (
+                        stringBoundsByLine
+                            .filterIndexed { index, _ -> leftIconPieces[index].bounds2D.let { it.width > 1 && it.height > 1 } }
+                            .minOrNull() ?: zero
+                        ).coerceAtMost(zero)
                     transform.translate(
-                        leftMax - spaceWidth - leftIconScale * leftIconBounds.getWidth(),
+                        endOfStrings - spaceWidth - leftIconScale * leftIconBounds.getWidth(),
                         (2 * BAR_MARGIN).toDouble(),
                     )
                 }
