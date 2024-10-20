@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 buildscript {
     ext.kotlin_version = '1.8.22'
     repositories {
@@ -30,6 +32,10 @@ allprojects {
     }
 
     apply plugin: "com.diffplug.spotless"
+
+    tasks.withType(KotlinCompile).configureEach {
+        kotlinOptions.allWarningsAsErrors = true
+    }
 
     spotless {
         kotlin {
