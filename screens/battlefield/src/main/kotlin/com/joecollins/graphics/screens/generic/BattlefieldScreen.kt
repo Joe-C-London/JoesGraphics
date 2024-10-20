@@ -39,7 +39,7 @@ class BattlefieldScreen private constructor(header: Flow.Publisher<out String?>,
             lateinit var prev: Flow.Publisher<Map<Party, Int>>
             lateinit var curr: Flow.Publisher<Map<Party, Int>>
 
-            internal val swings: Flow.Publisher<Map<Party, Double>> by lazy {
+            internal val swings: Flow.Publisher<Map<Party, Double>?> by lazy {
                 prev.run {
                     if (partyChanges == null) {
                         this
@@ -52,6 +52,7 @@ class BattlefieldScreen private constructor(header: Flow.Publisher<out String?>,
                     .merge(curr) { prevTotal, currTotal ->
                         val prevSum = prevTotal.values.sum().toDouble()
                         val currSum = currTotal.values.sum().toDouble()
+                        if (currSum == 0.0 || prevSum == 0.0) return@merge null
                         val parties = sequenceOf(prevTotal.keys, currTotal.keys).flatten().toSet()
                         parties.associateWith { (currTotal[it] ?: 0) / currSum - (prevTotal[it] ?: 0) / prevSum }
                     }
