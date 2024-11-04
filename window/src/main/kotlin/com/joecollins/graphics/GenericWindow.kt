@@ -22,6 +22,7 @@ import java.awt.image.BufferedImage
 import java.io.File
 import java.io.IOException
 import java.util.Properties
+import java.util.concurrent.CompletableFuture
 import javax.imageio.ImageIO
 import javax.swing.JFileChooser
 import javax.swing.JFrame
@@ -187,10 +188,12 @@ class GenericWindow<T : JPanel> constructor(private val panel: T, title: String)
         fileItem.addActionListener { saveImageToFile(panel) }
         imageMenu.add(fileItem)
         if (logIntoTwitterOnStartup) {
-            try {
-                TwitterV2InstanceFactory.instance
-            } catch (e: Exception) {
-                println("Cannot log into Twitter: ${e.message}")
+            CompletableFuture.runAsync {
+                try {
+                    TwitterV2InstanceFactory.instance
+                } catch (e: Exception) {
+                    println("Cannot log into Twitter: ${e.message}")
+                }
             }
         }
         if (isTweetingEnabled) {
