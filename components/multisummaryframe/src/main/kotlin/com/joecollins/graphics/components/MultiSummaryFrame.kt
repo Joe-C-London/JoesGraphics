@@ -4,6 +4,7 @@ import com.joecollins.graphics.utils.ColorUtils
 import com.joecollins.graphics.utils.StandardFont
 import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
+import com.joecollins.pubsub.map
 import java.awt.Color
 import java.awt.Component
 import java.awt.Container
@@ -23,9 +24,11 @@ class MultiSummaryFrame(
     headerPublisher: Flow.Publisher<out String?>,
     rowsPublisher: Flow.Publisher<out List<Row>>,
     notesPublisher: Flow.Publisher<out String?>? = null,
+    progressLabel: Flow.Publisher<String?>? = null,
 ) : GraphicsFrame(
     headerPublisher = headerPublisher,
     notesPublisher = notesPublisher,
+    headerLabelsPublisher = progressLabel?.map { mapOf(HeaderLabelLocation.RIGHT to it) },
 ) {
     private val centralPanel: JPanel
     private val entries: MutableList<EntryPanel> = ArrayList()

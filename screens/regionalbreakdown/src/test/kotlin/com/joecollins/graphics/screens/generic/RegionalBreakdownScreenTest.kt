@@ -788,6 +788,57 @@ class RegionalBreakdownScreenTest {
     }
 
     @Test
+    fun testSeatsProgressInHeader() {
+        val peiSeats = Publisher<Map<Party, Int>>(emptyMap())
+        val cardiganSeats = Publisher<Map<Party, Int>>(emptyMap())
+        val malpequeSeats = Publisher<Map<Party, Int>>(emptyMap())
+        val charlottetownSeats = Publisher<Map<Party, Int>>(emptyMap())
+        val egmontSeats = Publisher<Map<Party, Int>>(emptyMap())
+        val screen = RegionalBreakdownScreen.of(
+            entries = seats(
+                topRowHeader = "PRINCE EDWARD ISLAND".asOneTimePublisher(),
+                topRowSeats = peiSeats,
+            ) {
+                section(
+                    items = listOf(
+                        Pair("CARDIGAN", cardiganSeats),
+                        Pair("MALPEQUE", malpequeSeats),
+                        Pair("CHARLOTTETOWN", charlottetownSeats),
+                        Pair("EGMONT", egmontSeats),
+                    ),
+                    header = { first.asOneTimePublisher() },
+                    seats = { second },
+                )
+            },
+            header = "SEATS BY REGION".asOneTimePublisher(),
+            progressLabel = "27/27".asOneTimePublisher(),
+            title = "PRINCE EDWARD ISLAND".asOneTimePublisher(),
+        )
+        screen.setSize(1024, 512)
+
+        peiSeats.submit(mapOf(pc to 13, grn to 8, lib to 6))
+        cardiganSeats.submit(mapOf(pc to 6, grn to 1))
+        malpequeSeats.submit(mapOf(pc to 5, grn to 1, lib to 1))
+        charlottetownSeats.submit(mapOf(grn to 3, lib to 2, pc to 1))
+        egmontSeats.submit(mapOf(grn to 3, lib to 3, pc to 1))
+        compareRendering("RegionalBreakdownScreen", "Seats-ProgressInHeader", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            PRINCE EDWARD ISLAND
+            SEATS BY REGION [27/27]
+            
+            PRINCE EDWARD ISLAND: PC 13, GRN 8, LIB 6
+            
+            CARDIGAN: PC 6, GRN 1
+            MALPEQUE: PC 5, GRN 1, LIB 1
+            CHARLOTTETOWN: PC 1, GRN 3, LIB 2
+            EGMONT: PC 1, GRN 3, LIB 3
+            """.trimIndent(),
+        )
+    }
+
+    @Test
     fun testVotes() {
         val peiVotes = Publisher<Map<Party, Int>>(emptyMap())
         val cardiganVotes = Publisher<Map<Party, Int>>(emptyMap())

@@ -301,11 +301,12 @@ class RegionalBreakdownScreen private constructor(
             entries: List<Entry>,
             header: Flow.Publisher<String>,
             title: Flow.Publisher<String?>,
+            progressLabel: Flow.Publisher<String?>? = null,
         ): RegionalBreakdownScreen {
             return RegionalBreakdownScreen(
                 title,
-                createFrame(entries, header),
-                createAltText(entries, header, title),
+                createFrame(entries, header, progressLabel),
+                createAltText(entries, header, progressLabel, title),
             )
         }
 
@@ -355,9 +356,11 @@ class RegionalBreakdownScreen private constructor(
         private fun createFrame(
             entries: List<Entry>,
             header: Flow.Publisher<out String>,
+            progressLabel: Flow.Publisher<String?>?,
         ): MultiSummaryFrame {
             return MultiSummaryFrame(
                 headerPublisher = header,
+                progressLabel = progressLabel,
                 rowsPublisher =
                 entries.map {
                     it.header.merge(it.values) { h, v -> MultiSummaryFrame.Row(h, v) }
@@ -369,9 +372,11 @@ class RegionalBreakdownScreen private constructor(
         private fun createAltText(
             entries: List<Entry>,
             header: Flow.Publisher<out String>,
+            progressLabel: Flow.Publisher<String?>?,
             title: Flow.Publisher<out String?>,
         ): Flow.Publisher<String> {
-            val headerLine = title.merge(header) { a, b -> sequenceOf(a, b).filterNotNull().joinToString("\n") }
+            val headerLine = (if (progressLabel == null) header else header.merge(progressLabel) { h, p -> if (p == null) h else "$h [$p]" })
+                .merge(title) { h, t -> sequenceOf(t, h).filterNotNull().joinToString("\n") }
             val rows = entries.map { it.altText }.combine().map { it.joinToString("\n") }
             return headerLine.merge(rows) { h, v -> "$h\n\n$v" }
         }
