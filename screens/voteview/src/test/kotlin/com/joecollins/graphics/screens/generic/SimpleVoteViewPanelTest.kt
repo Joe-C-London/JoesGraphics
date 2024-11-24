@@ -4032,6 +4032,83 @@ class SimpleVoteViewPanelTest {
         )
     }
 
+    @Test
+    fun testMultiWinners() {
+        val lab = Party("Labour", "LAB", Color.RED)
+        val con = Party("Conservative", "CON", Color.BLUE)
+        val ld = Party("Liberal Democrats", "LD", Color.ORANGE)
+        val grn = Party("Green", "GRN", Color.GREEN.darker())
+        val ukip = Party("UK Independence Party", "UKIP", Color.MAGENTA.darker())
+
+        val curr = mapOf(
+            Candidate("Ruth Hayes", lab) to 1352,
+            Candidate("Ben Mackmurdie", lab, true) to 1209,
+            Candidate("Matt Nathan", lab, true) to 1199,
+            Candidate("Bronwen James", grn) to 473,
+            Candidate("George Allen", ld) to 458,
+            Candidate("Janet Gormley", grn) to 453,
+            Candidate("Helen Redesdale", ld) to 416,
+            Candidate("Alexander Baker", con) to 406,
+            Candidate("Jason Vickers", ld) to 405,
+            Candidate("Lewis Cox", con) to 404,
+            Candidate("Mags Joseph", con) to 379,
+            Candidate("Cecilie Hestbaek", grn) to 340,
+        )
+        val prev = mapOf(
+            lab to (1568 + 1487 + 1471),
+            ld to (479 + 409 + 355),
+            con to (376 + 372 + 356),
+            grn to (358 + 310 + 267),
+            ukip to 81,
+        )
+        val winners = curr.entries.sortedByDescending { it.value }.take(3).map { it.key }.toSet()
+
+        val panel = candidateVotes(
+            current = {
+                votes = curr.asOneTimePublisher()
+                header = "2022 RESULT".asOneTimePublisher()
+                subhead = "".asOneTimePublisher()
+                this.winners = winners.asOneTimePublisher()
+                incumbentMarker = "INC"
+            },
+            prev = {
+                votes = prev.asOneTimePublisher()
+                header = "CHANGE SINCE 2018".asOneTimePublisher()
+                swing = {
+                    partyOrder = listOf(grn, lab, ld, con, ukip)
+                    header = "SWING SINCE 2018".asOneTimePublisher()
+                }
+            },
+            title = "CLERKENWELL".asOneTimePublisher(),
+        )
+        panel.setSize(1024, 512)
+        compareRendering("SimpleVoteViewPanel", "MultiWinners-1", panel)
+        assertPublishes(
+            panel.altText,
+            """
+                CLERKENWELL
+
+                2022 RESULT (CHANGE SINCE 2018)
+                RUTH HAYES (LAB): 1,352 (18.0%, -7.2%^) WINNER
+                BEN MACKMURDIE [INC] (LAB): 1,209 (16.1%, ^) WINNER
+                MATT NATHAN [INC] (LAB): 1,199 (16.0%, ^) WINNER
+                BRONWEN JAMES (GRN): 473 (6.3%, +5.0%^)
+                GEORGE ALLEN (LD): 458 (6.1%, +1.3%^)
+                JANET GORMLEY (GRN): 453 (6.0%, ^)
+                HELEN REDESDALE (LD): 416 (5.6%, ^)
+                ALEXANDER BAKER (CON): 406 (5.4%, +1.9%^)
+                JASON VICKERS (LD): 405 (5.4%, ^)
+                LEWIS COX (CON): 404 (5.4%, ^)
+                MAGS JOSEPH (CON): 379 (5.1%, ^)
+                CECILIE HESTBAEK (GRN): 340 (4.5%, ^)
+                OTHERS: - (-1.0%)
+                ^ AGGREGATED ACROSS CANDIDATES IN PARTY
+                
+                SWING SINCE 2018: 4.3% SWING LAB TO LD
+            """.trimIndent(),
+        )
+    }
+
     private fun peiShapesByDistrict(): Map<Int, Shape> {
         val peiMap = SimpleVoteViewPanelTest::class.java
             .classLoader

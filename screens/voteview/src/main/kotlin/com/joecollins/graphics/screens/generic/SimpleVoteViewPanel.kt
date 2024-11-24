@@ -996,7 +996,7 @@ class SimpleVoteViewPanel private constructor(
         lateinit var votes: Flow.Publisher<out Map<out KT, CT>>
         lateinit var header: Flow.Publisher<out String?>
         lateinit var subhead: Flow.Publisher<out String?>
-        var winner: Flow.Publisher<out KT?>? = null
+        open var winner: Flow.Publisher<out KT?>? = null
         var pctReporting: Flow.Publisher<Double>? = null
         var progressLabel: Flow.Publisher<out String?>? = null
         var notes: Flow.Publisher<out String?>? = null
@@ -1006,7 +1006,7 @@ class SimpleVoteViewPanel private constructor(
                 return if (winner == null) {
                     ElectionResult<KT>().asOneTimePublisher()
                 } else {
-                    winner!!.map { ElectionResult(winner = it) }
+                    winner!!.map { ElectionResult(winners = if (it == null) emptySet() else setOf(it)) }
                 }
             }
 
@@ -1081,21 +1081,30 @@ class SimpleVoteViewPanel private constructor(
     class CandidateCurrentVotes<CT> internal constructor() : AbstractCurrentVotes<Candidate, CT>() {
         var incumbentMarker: String? = null
         var display: Display = Display.VOTES_AND_PCT
+        var winners: Flow.Publisher<out Set<Candidate>?>? = null
         var runoff: Flow.Publisher<out Set<Candidate>?>? = null
+
+        override var winner: Flow.Publisher<out Candidate?>?
+            get() {
+                throw IllegalStateException("This property is write-only")
+            }
+            set(value) {
+                winners = value?.map { w -> if (w == null) null else setOf(w) }
+            }
 
         override val result: Flow.Publisher<ElectionResult<Candidate>>
             get() {
                 return if (runoff == null) {
-                    super.result
-                } else if (winner == null) {
+                    winners?.map { ElectionResult(winners = it) } ?: ElectionResult<Candidate>().asOneTimePublisher()
+                } else if (winners == null) {
                     runoff!!.map { ElectionResult(runoff = it) }
                 } else {
-                    winner!!.merge(runoff!!) { w, r -> ElectionResult(winner = w, runoff = r) }
+                    winners!!.merge(runoff!!) { w, r -> ElectionResult(winners = w, runoff = r) }
                 }
             }
     }
 
-    internal data class ElectionResult<KT>(val winner: KT? = null, val runoff: Set<KT>? = null)
+    internal data class ElectionResult<KT>(val winners: Set<KT>? = null, val runoff: Set<KT>? = null)
 
     sealed class PrevVotesNoSwing<KPT : PartyOrCoalition> {
         lateinit var votes: Flow.Publisher<out Map<out KPT, Int>>
@@ -1318,7 +1327,7 @@ class SimpleVoteViewPanel private constructor(
             current.votes.merge(results) { c, r ->
                 sequenceOf(
                     c.keys.filter { displayLimit?.mandatoryParties?.contains(keyTemplate.toParty(it)) ?: true },
-                    r.winner?.let { setOf(it) },
+                    r.winners,
                     r.runoff,
                 ).filterNotNull().flatten().toSet()
             }
@@ -1338,7 +1347,7 @@ class SimpleVoteViewPanel private constructor(
                     .sortedByDescending { (k, v) -> keyTemplate.toParty(k).overrideSortOrder?.toDouble() ?: valueTemplate.sortOrder(v) }
                     .map { (k, v) ->
                         val result = when {
-                            r.winner == k -> CandidateResult.WINNER
+                            (r.winners ?: emptySet()).contains(k) -> CandidateResult.WINNER
                             (r.runoff ?: emptySet()).contains(k) -> CandidateResult.RUNOFF
                             else -> null
                         }
@@ -1424,7 +1433,7 @@ class SimpleVoteViewPanel private constructor(
                     .sortedByDescending { (k, v) -> keyTemplate.toParty(k).overrideSortOrder?.toDouble() ?: valueTemplate.sortOrder(v) }
                     .map { (k, v) ->
                         val result = when {
-                            r.winner == k -> CandidateResult.WINNER
+                            (r.winners ?: emptySet()).contains(k) -> CandidateResult.WINNER
                             (r.runoff ?: emptySet()).contains(k) -> CandidateResult.RUNOFF
                             else -> null
                         }
