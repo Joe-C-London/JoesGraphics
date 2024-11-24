@@ -16,7 +16,7 @@ repositories {
 
 var topLevel = parent.parent
 
-def jacksonVersion = '2.18.0'
+def jacksonVersion = '2.18.1'
 
 dependencies {
     implementation topLevel.project('shapes')
@@ -33,7 +33,7 @@ dependencies {
     implementation group: 'io.webfolder', name: 'cdp4j', version: '3.0.15'
 
     testImplementation parent.parent.project('testutils')
-    testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.14.1'
+    testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.14.2'
     testImplementation "org.junit.jupiter:junit-jupiter-api:$topLevel.ext.junit_version"
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$topLevel.ext.junit_version"
 }
