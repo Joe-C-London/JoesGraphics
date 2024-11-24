@@ -1121,6 +1121,7 @@ class SimpleVoteViewPanel private constructor(
 
     class PrevVotes<KPT : PartyOrCoalition> internal constructor() : PrevVotesNoSwing<KPT>() {
         var swing: (Swing<KPT>.() -> Unit)? = null
+        var notes: Flow.Publisher<out String?>? = null
 
         internal val swingProps by lazy { swing?.let { Swing<KPT>().apply(it) } }
     }
@@ -1608,6 +1609,7 @@ class SimpleVoteViewPanel private constructor(
                     header = header,
                     subhead = subhead,
                     limits = limits,
+                    notes = prev.notes,
                 ),
             )
         }
