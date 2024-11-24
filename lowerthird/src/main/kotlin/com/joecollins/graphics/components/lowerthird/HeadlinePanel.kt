@@ -42,8 +42,8 @@ class HeadlinePanel : JPanel() {
         override fun layoutContainer(parent: Container) {
             val width = parent.width
             val height = parent.height
-            val headlineHeight = height * 11 / 20
-            val subheadHeight = height * 9 / 20
+            val headlineHeight = height * 12 / 20
+            val subheadHeight = height * 8 / 20
             headlineLabel.setLocation(0, 0)
             headlineLabel.setSize(width, if (subheadLabel.isVisible) headlineHeight else height)
             subheadLabel.setLocation(0, headlineHeight)
@@ -70,7 +70,7 @@ class HeadlinePanel : JPanel() {
         subheadLabel.verticalAlignment = JLabel.CENTER
         subheadLabel.font = StandardFont.readNormalFont(16)
         subheadLabel.foreground = Color.BLACK
-        subheadLabel.border = EmptyBorder(2, 5, -2, 5)
+        subheadLabel.border = EmptyBorder(3, 5, -3, 5)
         add(subheadLabel)
     }
 }
