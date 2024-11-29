@@ -193,7 +193,7 @@ class ParliamentVoteFrame(
                             g.fillRect(0, 0, width, height)
 
                             val labelFontSize = (height / 4).coerceAtMost(12)
-                            val voteFontSize = (height * 2 / 3).coerceAtMost(30)
+                            val voteFontSize = (height * 2 / 3).coerceAtMost(width * 3 / 5).coerceAtMost(30)
                             val padding = height - labelFontSize - voteFontSize
 
                             g.color = ColorUtils.foregroundToContrast(party.color)
