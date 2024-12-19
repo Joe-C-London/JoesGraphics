@@ -63,6 +63,7 @@ class SingleTransferrableResultScreen private constructor(
             val inOut = candidateResults.elected.merge(candidateResults.excluded) { el, ex -> el to ex }
             val bars = votesQuota.merge(inOut) { (votes, quota), (elected, excluded) ->
                 val electedCandidates = elected.map { it.first }
+                val excludedCandidates = excluded.map { it.first }
                 val alreadyElectedSequence = elected.asSequence()
                     .filter { !votes.containsKey(it.first) }
                     .map {
@@ -101,13 +102,31 @@ class SingleTransferrableResultScreen private constructor(
                                 ).combineHorizontal(
                                 when {
                                     electedCandidates.contains(it.key) -> ImageGenerator.createTickShape()
-                                    excluded.contains(it.key) -> ImageGenerator.createCrossShape()
+                                    excludedCandidates.contains(it.key) -> ImageGenerator.createCrossShape()
                                     else -> null
                                 },
                             ),
                         )
                     }
-                sequenceOf(alreadyElectedSequence, thisRoundSequence)
+                val alreadyExcludedSequence = excluded.reversed().asSequence()
+                    .filter { !votes.containsKey(it.first) }
+                    .filter { candidateResults.showExcludedCandidates(it.first) }
+                    .map {
+                        BarFrameBuilder.BasicBar(
+                            label = it.first.name.uppercase() + " (${it.first.party.abbreviation.uppercase()})",
+                            valueLabel = it.second,
+                            shape = (
+                                if (it.first.incumbent) {
+                                    candidateResults.incumbentMarker?.let { inc -> ImageGenerator.createBoxedTextShape(inc) }
+                                } else {
+                                    null
+                                }
+                                ).combineHorizontal(ImageGenerator.createCrossShape()),
+                            value = 0,
+                            color = it.first.party.color,
+                        )
+                    }
+                sequenceOf(alreadyElectedSequence, thisRoundSequence, alreadyExcludedSequence)
                     .flatten()
                     .toList()
             }
@@ -236,20 +255,18 @@ class SingleTransferrableResultScreen private constructor(
                             }
                         }${if (el.any { it.first == c }) {
                             " ELECTED"
-                        } else if (ex.contains(c)) {
+                        } else if (ex.any { it.first == c }) {
                             " EXCLUDED"
                         } else {
                             ""
                         }}"
-                    } +
-                    (q?.let { "\nQUOTA: ${if (it is Int) DecimalFormat("#,##0").format(it.toInt()) else DecimalFormat("#,##0.00").format(it.toDouble())}" } ?: "")
-                if (prevElected.isEmpty()) {
-                    currRound
-                } else if (currRound.isEmpty()) {
-                    prevElected
-                } else {
-                    "$prevElected\n$currRound"
-                }
+                    }
+                val quota = (q?.let { "QUOTA: ${if (it is Int) DecimalFormat("#,##0").format(it.toInt()) else DecimalFormat("#,##0.00").format(it.toDouble())}" } ?: "")
+                val prevExcluded = ex.reversed().filter { !votes.containsKey(it.first) }.filter { candidateResults.showExcludedCandidates(it.first) }
+                    .joinToString("\n") { (c, r) -> "${candidateFunc(c)}: $r" }
+                listOf(prevElected, currRound, prevExcluded, quota)
+                    .filter { it.isNotEmpty() }
+                    .joinToString("\n")
             }
             val candidate = candidateTop.merge(candidateEntries) { t, e ->
                 if (t == null) {
@@ -302,11 +319,12 @@ class SingleTransferrableResultScreen private constructor(
         lateinit var votes: Flow.Publisher<out Map<Candidate, Number?>>
         lateinit var quota: Flow.Publisher<out Number?>
         lateinit var elected: Flow.Publisher<out List<Pair<Candidate, String>>>
-        lateinit var excluded: Flow.Publisher<out List<Candidate>>
+        lateinit var excluded: Flow.Publisher<out List<Pair<Candidate, String>>>
         lateinit var header: Flow.Publisher<out String?>
         lateinit var subhead: Flow.Publisher<out String?>
         var progress: Flow.Publisher<String>? = null
         var incumbentMarker: String? = null
+        var showExcludedCandidates: Candidate.() -> Boolean = { false }
     }
 
     class PartyTotals internal constructor() {
