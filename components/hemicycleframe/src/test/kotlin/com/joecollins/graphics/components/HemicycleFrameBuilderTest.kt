@@ -2,10 +2,12 @@ package com.joecollins.graphics.components
 
 import com.joecollins.graphics.components.HemicycleFrameBuilder.Tiebreaker
 import com.joecollins.graphics.utils.ColorUtils.lighten
+import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
+import com.joecollins.pubsub.merge
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.awt.Color
@@ -412,5 +414,59 @@ class HemicycleFrameBuilderTest {
         assertEquals(0, frame.getLeftChangeBarSize(1).toLong())
         assertEquals(0, frame.getRightChangeBarSize(0).toLong())
         assertEquals(0, frame.getRightChangeBarSize(1).toLong())
+    }
+
+    @Test
+    fun testRenderMiddleSeatsNoOtherChange() {
+        val lib = Party("Liberal", "LIB", Color.RED)
+        val yp = Party("Yukon Party", "YP", Color.BLUE)
+        val ndp = Party("New Democratic Party", "NDP", Color.ORANGE)
+
+        class Riding(@Suppress("unused") val name: String, val prev: Party, val leader: Publisher<Party?> = Publisher(null), val hasWon: Publisher<Boolean> = Publisher(false))
+
+        val ridings = listOf(
+            Riding("Vuntut Gwitchin", lib),
+            Riding("Klondike", lib),
+            Riding("Takhini-Copper King", ndp),
+            Riding("Whitehorse Centre", ndp),
+            Riding("Mayo-Tatchun", ndp),
+            Riding("Mount Lorne-Southern Lakes", ndp),
+            Riding("Riverdale South", ndp),
+            Riding("Copperbelt South", ndp),
+            Riding("Porter Creek South", yp),
+            Riding("Watson Lake", yp),
+            Riding("Porter Creek Centre", yp),
+            Riding("Riverdale North", yp),
+            Riding("Kluane", yp),
+            Riding("Mountainview", yp),
+            Riding("Copperbelt North", yp),
+            Riding("Pelly-Nisutlin", yp),
+            Riding("Porter Creek North", yp),
+            Riding("Lake Laberge", yp),
+            Riding("Whitehorse West", yp),
+        )
+        val frame = HemicycleFrameBuilder.buildElectedLeading(
+            rows = listOf(ridings.size),
+            entries = ridings,
+            resultFunc = { leader.merge(hasWon) { leader, hasWon -> if (leader == null) null else PartyResult(leader, hasWon) } },
+            prevResultFunc = { prev },
+            leftParty = lib,
+            rightParty = yp,
+            leftLabel = { "LIB: $elected/$total" },
+            rightLabel = { "YP: $elected/$total" },
+            otherLabel = { "OTH: $elected/$total" },
+            showChange = { total > 0 },
+            changeLabel = { DecimalFormat("+0;-0").format(elected) + "/" + DecimalFormat("+0;-0").format(total) },
+            tiebreaker = Tiebreaker.FRONT_ROW_FROM_LEFT,
+            header = "YUKON".asOneTimePublisher(),
+        )
+        frame.setSize(1024, 512)
+        compareRendering("HemicycleFrameBuilder", "MiddleNoChange-0", frame)
+
+        ridings.last().leader.submit(lib)
+        compareRendering("HemicycleFrameBuilder", "MiddleNoChange-1", frame)
+
+        ridings.last().leader.submit(ndp)
+        compareRendering("HemicycleFrameBuilder", "MiddleNoChange-2", frame)
     }
 }

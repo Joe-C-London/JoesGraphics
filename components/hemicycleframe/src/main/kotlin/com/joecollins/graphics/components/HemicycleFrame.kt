@@ -92,14 +92,14 @@ class HemicycleFrame(
     }
 
     internal val leftSeatBarCount: Int
-        get() = barsPanel.leftSeatBars.size
+        get() = barsPanel.leftSeatBars.let { it ?: emptyList() }.size
 
     internal fun getLeftSeatBarColor(idx: Int): Color {
-        return barsPanel.leftSeatBars[idx].color
+        return barsPanel.leftSeatBars.let { it ?: emptyList() }[idx].color
     }
 
     internal fun getLeftSeatBarSize(idx: Int): Int {
-        return barsPanel.leftSeatBars[idx].size
+        return barsPanel.leftSeatBars.let { it ?: emptyList() }[idx].size
     }
 
     internal fun getLeftSeatBarLabel(): String {
@@ -107,14 +107,14 @@ class HemicycleFrame(
     }
 
     internal val rightSeatBarCount: Int
-        get() = barsPanel.rightSeatBars.size
+        get() = barsPanel.rightSeatBars.let { it ?: emptyList() }.size
 
     internal fun getRightSeatBarColor(idx: Int): Color {
-        return barsPanel.rightSeatBars[idx].color
+        return barsPanel.rightSeatBars.let { it ?: emptyList() }[idx].color
     }
 
     internal fun getRightSeatBarSize(idx: Int): Int {
-        return barsPanel.rightSeatBars[idx].size
+        return barsPanel.rightSeatBars.let { it ?: emptyList() }[idx].size
     }
 
     internal fun getRightSeatBarLabel(): String {
@@ -122,14 +122,14 @@ class HemicycleFrame(
     }
 
     internal val middleSeatBarCount: Int
-        get() = barsPanel.middleSeatBars.size
+        get() = barsPanel.middleSeatBars.let { it ?: emptyList() }.size
 
     internal fun getMiddleSeatBarColor(idx: Int): Color {
-        return barsPanel.middleSeatBars[idx].color
+        return barsPanel.middleSeatBars.let { it ?: emptyList() }[idx].color
     }
 
     internal fun getMiddleSeatBarSize(idx: Int): Int {
-        return barsPanel.middleSeatBars[idx].size
+        return barsPanel.middleSeatBars.let { it ?: emptyList() }[idx].size
     }
 
     internal fun getMiddleSeatBarLabel(): String {
@@ -137,14 +137,14 @@ class HemicycleFrame(
     }
 
     internal val leftChangeBarCount: Int
-        get() = barsPanel.leftChangeBars.size
+        get() = barsPanel.leftChangeBars.let { it ?: emptyList() }.size
 
     internal fun getLeftChangeBarColor(idx: Int): Color {
-        return barsPanel.leftChangeBars[idx].color
+        return barsPanel.leftChangeBars.let { it ?: emptyList() }[idx].color
     }
 
     internal fun getLeftChangeBarSize(idx: Int): Int {
-        return barsPanel.leftChangeBars[idx].size
+        return barsPanel.leftChangeBars.let { it ?: emptyList() }[idx].size
     }
 
     internal fun getLeftChangeBarStart(): Int {
@@ -156,14 +156,14 @@ class HemicycleFrame(
     }
 
     internal val rightChangeBarCount: Int
-        get() = barsPanel.rightChangeBars.size
+        get() = barsPanel.rightChangeBars.let { it ?: emptyList() }.size
 
     internal fun getRightChangeBarColor(idx: Int): Color {
-        return barsPanel.rightChangeBars[idx].color
+        return barsPanel.rightChangeBars.let { it ?: emptyList() }[idx].color
     }
 
     internal fun getRightChangeBarSize(idx: Int): Int {
-        return barsPanel.rightChangeBars[idx].size
+        return barsPanel.rightChangeBars.let { it ?: emptyList() }[idx].size
     }
 
     internal fun getRightChangeBarStart(): Int {
@@ -177,24 +177,24 @@ class HemicycleFrame(
     class Bar(val color: Color, val size: Int)
 
     private inner class BarPanel : JPanel() {
-        var leftSeatBars: List<Bar> = ArrayList()
+        var leftSeatBars: List<Bar>? = null
         var leftSeatBarLabel = ""
-        var rightSeatBars: List<Bar> = ArrayList()
+        var rightSeatBars: List<Bar>? = null
         var rightSeatBarLabel = ""
-        var middleSeatBars: List<Bar> = ArrayList()
+        var middleSeatBars: List<Bar>? = null
         var middleSeatBarLabel = ""
-        var leftChangeBars: List<Bar> = ArrayList()
+        var leftChangeBars: List<Bar>? = null
         var leftChangeBarLabel = ""
         var leftChangeBarStart = 0
-        var rightChangeBars: List<Bar> = ArrayList()
+        var rightChangeBars: List<Bar>? = null
         var rightChangeBarLabel = ""
         var rightChangeBarStart = 0
 
         fun hasSeats(): Boolean {
             return (
-                leftSeatBars.isNotEmpty() ||
-                    middleSeatBars.isNotEmpty() ||
-                    rightSeatBars.isNotEmpty() ||
+                leftSeatBars != null ||
+                    middleSeatBars != null ||
+                    rightSeatBars != null ||
                     leftSeatBarLabel.isNotEmpty() ||
                     middleSeatBarLabel.isNotEmpty() ||
                     rightSeatBarLabel.isNotEmpty()
@@ -203,8 +203,8 @@ class HemicycleFrame(
 
         fun hasChange(): Boolean {
             return (
-                leftChangeBars.isNotEmpty() ||
-                    rightChangeBars.isNotEmpty() ||
+                leftChangeBars != null ||
+                    rightChangeBars != null ||
                     leftChangeBarLabel.isNotEmpty() ||
                     rightChangeBarLabel.isNotEmpty()
                 )
@@ -233,20 +233,20 @@ class HemicycleFrame(
         private fun paintSeatBars(g: Graphics) {
             val height = height / if (hasChange()) 2 else 1
             val seatBaseline = height * 4 / 5
-            g.color = if (leftSeatBars.isEmpty()) Color.BLACK else leftSeatBars[0].color
+            g.color = if (leftSeatBars.isNullOrEmpty()) Color.BLACK else leftSeatBars!![0].color
             g.drawString(leftSeatBarLabel, 5, seatBaseline)
-            g.color = if (rightSeatBars.isEmpty()) Color.BLACK else rightSeatBars[0].color
+            g.color = if (rightSeatBars.isNullOrEmpty()) Color.BLACK else rightSeatBars!![0].color
             val rightWidth = g.fontMetrics.stringWidth(rightSeatBarLabel)
             val rightLeft = width - rightWidth - 5
             g.drawString(rightSeatBarLabel, rightLeft, seatBaseline)
-            g.color = if (middleSeatBars.isEmpty()) Color.BLACK else middleSeatBars[0].color
+            g.color = if (middleSeatBars.isNullOrEmpty()) Color.BLACK else middleSeatBars!![0].color
             val middleWidth = g.fontMetrics.stringWidth(middleSeatBarLabel)
             val middleLeft = getMiddleStartPosition(0) - middleWidth / 2
             g.drawString(middleSeatBarLabel, middleLeft, seatBaseline)
             val seatBarTop = height / 10
             val seatBarHeight = height * 4 / 5
             var leftSoFar = 0
-            for (bar in leftSeatBars) {
+            for (bar in (leftSeatBars ?: emptyList())) {
                 val start = getLeftPosition(leftSoFar)
                 val end = getLeftPosition(leftSoFar + bar.size)
                 g.color = bar.color
@@ -255,7 +255,7 @@ class HemicycleFrame(
             }
             val leftClip: Shape = Rectangle(0, seatBarTop, getLeftPosition(leftSoFar), seatBarHeight)
             var rightSoFar = 0
-            for (bar in rightSeatBars) {
+            for (bar in (rightSeatBars ?: emptyList())) {
                 val start = getRightPosition(rightSoFar + bar.size)
                 val end = getRightPosition(rightSoFar)
                 g.color = bar.color
@@ -269,7 +269,7 @@ class HemicycleFrame(
                 seatBarHeight,
             )
             var middleSoFar = 0
-            for (bar in middleSeatBars) {
+            for (bar in (middleSeatBars ?: emptyList())) {
                 g.color = bar.color
                 val startL = getMiddleStartPosition(middleSoFar + bar.size)
                 val endL = getMiddleStartPosition(middleSoFar)
@@ -301,10 +301,10 @@ class HemicycleFrame(
         private fun paintChangeBars(g: Graphics) {
             val height = height / if (hasChange()) 2 else 1
             val seatBaseline = height * 4 / 5 + height
-            g.color = if (leftChangeBars.isEmpty()) Color.BLACK else leftChangeBars[0].color
+            g.color = if (leftChangeBars.isNullOrEmpty()) Color.BLACK else leftChangeBars!![0].color
             val leftLeft = getLeftPosition(leftChangeBarStart) + 5
             g.drawString(leftChangeBarLabel, leftLeft, seatBaseline)
-            g.color = if (rightChangeBars.isEmpty()) Color.BLACK else rightChangeBars[0].color
+            g.color = if (rightChangeBars.isNullOrEmpty()) Color.BLACK else rightChangeBars!![0].color
             val rightWidth = g.fontMetrics.stringWidth(rightChangeBarLabel)
             val rightLeft = getRightPosition(rightChangeBarStart) - rightWidth - 5
             g.drawString(rightChangeBarLabel, rightLeft, seatBaseline)
@@ -321,7 +321,7 @@ class HemicycleFrame(
             }
             var leftSoFar = leftChangeBarStart
             val leftBase = getLeftPosition(leftChangeBarStart)
-            for (bar in leftChangeBars) {
+            for (bar in (leftChangeBars ?: emptyList())) {
                 val start = getLeftPosition(leftSoFar)
                 val end = getLeftPosition(leftSoFar + bar.size)
                 val startSide = sideFunc(leftBase, start)
@@ -357,7 +357,7 @@ class HemicycleFrame(
             )
             var rightSoFar = rightChangeBarStart
             val rightBase = getRightPosition(rightChangeBarStart)
-            for (bar in rightChangeBars) {
+            for (bar in (rightChangeBars ?: emptyList())) {
                 val start = getRightPosition(rightSoFar)
                 val end = getRightPosition(rightSoFar + bar.size)
                 val startSide = sideFunc(rightBase, start)
@@ -411,9 +411,9 @@ class HemicycleFrame(
         }
 
         private fun getMiddleStartPosition(seats: Int): Int {
-            val midSize = getSize(middleSeatBars.sumOf { it.size })
-            val leftSize = getSize(leftSeatBars.sumOf { it.size })
-            val rightSize = getSize(rightSeatBars.sumOf { it.size })
+            val midSize = getSize(middleSeatBars?.sumOf { it.size } ?: 0)
+            val leftSize = getSize(leftSeatBars?.sumOf { it.size } ?: 0)
+            val rightSize = getSize(rightSeatBars?.sumOf { it.size } ?: 0)
             val midPoint: Int = when {
                 leftSize + midSize / 2 > width / 2 -> {
                     leftSize + midSize / 2
@@ -540,8 +540,6 @@ class HemicycleFrame(
         }
         if (leftSeatBarPublisher != null) {
             leftSeatBarPublisher.subscribe(Subscriber(eventQueueWrapper(onLeftSeatBarUpdate)))
-        } else {
-            onLeftSeatBarUpdate(emptyList())
         }
 
         val onLeftSeatBarLabelUpdate: (String) -> Unit = { label ->
@@ -560,8 +558,6 @@ class HemicycleFrame(
         }
         if (rightSeatBarPublisher != null) {
             rightSeatBarPublisher.subscribe(Subscriber(eventQueueWrapper(onRightSeatBarUpdate)))
-        } else {
-            onRightSeatBarUpdate(emptyList())
         }
 
         val onRightSeatBarLabelUpdate: (String) -> Unit = { label ->
@@ -580,8 +576,6 @@ class HemicycleFrame(
         }
         if (middleSeatBarPublisher != null) {
             middleSeatBarPublisher.subscribe(Subscriber(eventQueueWrapper(onMiddleSeatBarUpdate)))
-        } else {
-            onMiddleSeatBarUpdate(emptyList())
         }
 
         val onMiddleSeatBarLabelUpdate: (String) -> Unit = { label ->
@@ -600,8 +594,6 @@ class HemicycleFrame(
         }
         if (leftChangeBarPublisher != null) {
             leftChangeBarPublisher.subscribe(Subscriber(eventQueueWrapper(onLeftChangeBarUpdate)))
-        } else {
-            onLeftChangeBarUpdate(emptyList())
         }
 
         val onLeftChangeBarStartUpdate: (Int) -> Unit = { start ->
@@ -630,8 +622,6 @@ class HemicycleFrame(
         }
         if (rightChangeBarPublisher != null) {
             rightChangeBarPublisher.subscribe(Subscriber(eventQueueWrapper(onRightChangeBarUpdate)))
-        } else {
-            onRightChangeBarUpdate(emptyList())
         }
 
         val onRightChangeBarStartUpdate: (Int) -> Unit = { start ->
