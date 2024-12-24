@@ -1,0 +1,34 @@
+buildscript {
+    dependencies {
+        parent.buildscript.dependencies
+    }
+}
+plugins {
+    id 'kotlin'
+}
+
+group 'com.joecollins'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+var topLevel = parent.parent
+
+dependencies {
+    implementation topLevel.project('components:barframe')
+    implementation topLevel.project('models')
+    implementation topLevel.project('modelutils')
+    implementation topLevel.project('pubsub')
+    api parent.project('screenbase')
+
+    testImplementation topLevel.project('testutils')
+
+    testImplementation "org.junit.jupiter:junit-jupiter-api:$topLevel.ext.junit_version"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$topLevel.ext.junit_version"
+}
+
+test {
+    useJUnitPlatform()
+}
