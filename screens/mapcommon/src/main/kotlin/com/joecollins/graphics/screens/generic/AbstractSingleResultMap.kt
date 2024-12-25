@@ -39,9 +39,9 @@ abstract class AbstractSingleResultMap<T, R> internal constructor(private val co
             shapes: Flow.Publisher<out Map<out T, Shape>>,
             selectedShape: Flow.Publisher<out T>,
             color: Flow.Publisher<out Color>,
-            focus: Flow.Publisher<out List<T>?>?,
-            additionalHighlight: Flow.Publisher<out List<T>?>?,
-            faded: Flow.Publisher<out List<T>?>?,
+            focus: Flow.Publisher<out Collection<T>?>?,
+            additionalHighlight: Flow.Publisher<out Collection<T>?>?,
+            faded: Flow.Publisher<out Collection<T>?>?,
             header: Flow.Publisher<out String?>,
         ): MapFrame {
             val leaderWithShape =

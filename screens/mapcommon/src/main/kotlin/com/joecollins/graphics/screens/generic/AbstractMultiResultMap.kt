@@ -24,9 +24,9 @@ abstract class AbstractMultiResultMap<T, R> internal constructor(color: R.() -> 
         private fun <T> createFrame(
             shapes: Flow.Publisher<out Map<T, Shape>>,
             winners: Flow.Publisher<out Map<T, Color?>>,
-            focus: Flow.Publisher<out List<T>?>? = null,
+            focus: Flow.Publisher<out Collection<T>?>? = null,
             additionalHighlight: Flow.Publisher<out List<T>?>? = null,
-            faded: Flow.Publisher<out List<T>?>? = null,
+            faded: Flow.Publisher<out Collection<T>?>? = null,
             header: Flow.Publisher<out String?>,
         ): MapFrame {
             val shapesToParties = shapes.merge(winners) { s, w ->
