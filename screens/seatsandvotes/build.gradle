@@ -1,0 +1,31 @@
+buildscript {
+    dependencies {
+        parent.buildscript.dependencies
+    }
+}
+plugins {
+    id 'kotlin'
+}
+
+group 'com.joecollins'
+version '1.0-SNAPSHOT'
+
+var topLevel = parent.parent
+
+dependencies {
+    api parent.project('screenbase')
+
+    api topLevel.project('models')
+    implementation topLevel.project('pubsub')
+    implementation topLevel.project('screens:seatview')
+    implementation topLevel.project('screens:voteview')
+
+    testImplementation topLevel.project('testutils')
+
+    testImplementation "org.junit.jupiter:junit-jupiter-api:$topLevel.ext.junit_version"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$topLevel.ext.junit_version"
+}
+
+test {
+    useJUnitPlatform()
+}
