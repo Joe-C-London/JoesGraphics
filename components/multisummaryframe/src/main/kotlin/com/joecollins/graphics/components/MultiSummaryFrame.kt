@@ -24,7 +24,7 @@ class MultiSummaryFrame(
     headerPublisher: Flow.Publisher<out String?>,
     rowsPublisher: Flow.Publisher<out List<Row>>,
     notesPublisher: Flow.Publisher<out String?>? = null,
-    progressLabel: Flow.Publisher<String?>? = null,
+    progressLabel: Flow.Publisher<out String?>? = null,
 ) : GraphicsFrame(
     headerPublisher = headerPublisher,
     notesPublisher = notesPublisher,
