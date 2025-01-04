@@ -1147,28 +1147,50 @@ class SimpleVoteViewPanel private constructor(
         private var show: Flow.Publisher<out Boolean>? = null
         private val lines = LinkedList<Line>()
 
-        inner class Line internal constructor(val pct: Flow.Publisher<Double>?, val votes: Flow.Publisher<Int>?) {
-            lateinit var display: String
+        data class LineLevel internal constructor(val pct: Double?, val votes: Int?)
 
-            internal fun add(display: () -> String) {
-                this.display = display()
+        inner class Line internal constructor(val pct: Flow.Publisher<Double>?, val votes: Flow.Publisher<Int>?) {
+            lateinit var display: Flow.Publisher<String>
+
+            operator fun invoke(display: LineLevel.() -> String) {
+                this.display = when {
+                    pct != null && votes != null -> pct.merge(votes) { p, v -> display(LineLevel(p, v)) }
+                    pct != null -> pct.map { display(LineLevel(it, null)) }
+                    votes != null -> votes.map { display(LineLevel(null, it)) }
+                    else -> display(LineLevel(null, null)).asOneTimePublisher()
+                }
                 lines.add(this)
             }
 
             internal fun line(pctReporting: Flow.Publisher<Double>?, totalVotes: Flow.Publisher<Int?>?): Flow.Publisher<Pair<Double, String>> {
+                val votesPct = if (totalVotes == null) {
+                    0.5.asOneTimePublisher()
+                } else {
+                    this.votes?.merge(totalVotes) { v, t -> if (t == null || t == 0) 0.5 else v.toDouble() / t } ?: 0.5.asOneTimePublisher()
+                }
                 val pct = when {
+                    this.pct != null && this.votes != null -> pct.merge(votesPct) { a, b -> max(a, b) }
                     this.pct != null -> pct
-                    this.votes != null -> {
-                        if (totalVotes == null) {
-                            0.5.asOneTimePublisher()
-                        } else {
-                            this.votes.merge(totalVotes) { v, t -> if (t == null || t == 0) 0.5 else v.toDouble() / t }
-                        }
-                    }
+                    this.votes != null -> votesPct
                     else -> 0.5.asOneTimePublisher()
                 }
                 return (pctReporting?.merge(pct) { reporting, level -> level / reporting.coerceAtLeast(1e-6) } ?: pct)
-                    .map { it to display }
+                    .merge(display) { l, d -> l to d }
+            }
+
+            infix fun and(other: Line): Line {
+                return Line(
+                    when {
+                        this.pct == null -> other.pct
+                        other.pct == null -> this.pct
+                        else -> this.pct.merge(other.pct) { a, b -> max(a, b) }
+                    },
+                    when {
+                        this.votes == null -> other.votes
+                        other.votes == null -> this.votes
+                        else -> this.votes.merge(other.votes) { a, b -> max(a, b) }
+                    },
+                )
             }
         }
 
@@ -1180,16 +1202,16 @@ class SimpleVoteViewPanel private constructor(
             return percentage(0.5.asOneTimePublisher())
         }
 
-        fun majority(display: () -> String) {
-            majority.add(display)
+        fun majority(display: LineLevel.() -> String) {
+            majority.invoke(display)
         }
 
         fun percentage(pct: Flow.Publisher<Double>): Line {
             return Line(pct, null)
         }
 
-        fun percentage(pct: Flow.Publisher<Double>, display: () -> String) {
-            percentage(pct).add(display)
+        fun percentage(pct: Flow.Publisher<Double>, display: LineLevel.() -> String) {
+            percentage(pct).invoke(display)
         }
 
         internal fun lines(pctReporting: Flow.Publisher<Double>?, totalVotes: Flow.Publisher<Int?>?): BarFrameBuilder.Lines<*> {
@@ -1213,14 +1235,14 @@ class SimpleVoteViewPanel private constructor(
                     }
                 }
 
-        internal fun altText(): Flow.Publisher<String?> {
-            val display = lines.joinToString("\n") { it.display }
+        internal fun altText(): Flow.Publisher<out String?> {
+            val display = lines.map { it.display }.combine().map { it.joinToString("\n") }
             return if (show == null) {
-                display.asOneTimePublisher()
+                display
             } else {
-                show!!.map { maj ->
+                show!!.merge(display) { maj, disp ->
                     if (maj) {
-                        display
+                        disp
                     } else {
                         null
                     }
@@ -1236,8 +1258,8 @@ class SimpleVoteViewPanel private constructor(
             return Line(null, votes)
         }
 
-        fun votes(votes: Flow.Publisher<Int>, display: () -> String) {
-            votes(votes).add(display)
+        fun votes(votes: Flow.Publisher<Int>, display: LineLevel.() -> String) {
+            votes(votes).invoke(display)
         }
     }
 

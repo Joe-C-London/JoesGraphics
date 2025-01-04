@@ -33,6 +33,7 @@ import java.awt.Shape
 import java.awt.geom.Area
 import java.text.DecimalFormat
 import java.util.IdentityHashMap
+import kotlin.math.ceil
 
 class SimpleVoteViewPanelTest {
     @Test
@@ -4271,6 +4272,98 @@ class SimpleVoteViewPanelTest {
                 YES (TO REDUCE VOTING AGE TO 18): 564,710 (53.0%)
                 NO (TO KEEP VOTING AGE AT 20): 501,642 (47.0%)
                 9,619,696 NEEDED TO PASS
+            """.trimIndent(),
+        )
+    }
+
+    @Test
+    fun testCombinedWinningLine() {
+        val rn = Party("National Rally", "RN", Color.BLUE)
+        val nfp = Party("New Popular Front", "NFP", Color.RED)
+        val ens = Party("Together", "ENS", Color.YELLOW)
+
+        val curr = Publisher(
+            mapOf(
+                Candidate("Marine Le Pen", rn) to 21219,
+                Candidate("Marine Tondelier", nfp) to 9214,
+                Candidate("Alexandrine Pintus", ens) to 4846,
+                Candidate.OTHERS to 4045,
+            ),
+        )
+        val year = Publisher(2022)
+        val electorate = Publisher(86843)
+
+        val panel = candidateVotes(
+            current = {
+                this.votes = curr
+                header = year.map { "$it RESULT" }
+                subhead = "".asOneTimePublisher()
+            },
+            winningLine = {
+                (majority and votes(electorate.map { ceil(it.toDouble() * 0.25).toInt() })) { "50% AND ${DecimalFormat("#,##0").format(votes)} VOTES TO WIN" }
+            },
+            title = "PAS DE CALAIS 11".asOneTimePublisher(),
+        )
+        panel.setSize(1024, 512)
+        compareRendering("SimpleVoteViewPanel", "CombinedWinningLine-1", panel)
+        assertPublishes(
+            panel.altText,
+            """
+                PAS DE CALAIS 11
+
+                2022 RESULT
+                MARINE LE PEN (RN): 21,219 (54.0%)
+                MARINE TONDELIER (NFP): 9,214 (23.4%)
+                ALEXANDRINE PINTUS (ENS): 4,846 (12.3%)
+                OTHERS: 4,045 (10.3%)
+                50% AND 21,711 VOTES TO WIN
+            """.trimIndent(),
+        )
+    }
+
+    @Test
+    fun testMultiWinningLine() {
+        val rn = Party("National Rally", "RN", Color.BLUE)
+        val nfp = Party("New Popular Front", "NFP", Color.RED)
+        val ens = Party("Together", "ENS", Color.YELLOW)
+
+        val curr = Publisher(
+            mapOf(
+                Candidate("Marine Le Pen", rn) to 21219,
+                Candidate("Marine Tondelier", nfp) to 9214,
+                Candidate("Alexandrine Pintus", ens) to 4846,
+                Candidate.OTHERS to 4045,
+            ),
+        )
+        val year = Publisher(2022)
+        val electorate = Publisher(86843)
+
+        val panel = candidateVotes(
+            current = {
+                this.votes = curr
+                header = year.map { "$it RESULT" }
+                subhead = "".asOneTimePublisher()
+            },
+            winningLine = {
+                majority { "50%" }
+                votes(electorate.map { ceil(it.toDouble() * 0.25).toInt() }) { DecimalFormat("#,##0").format(votes) }
+            },
+            title = "PAS DE CALAIS 11".asOneTimePublisher(),
+        )
+        panel.setSize(1024, 512)
+        compareRendering("SimpleVoteViewPanel", "MultiWinningLine-1", panel)
+        assertPublishes(
+            panel.altText,
+            """
+                PAS DE CALAIS 11
+
+                2022 RESULT
+                MARINE LE PEN (RN): 21,219 (54.0%)
+                MARINE TONDELIER (NFP): 9,214 (23.4%)
+                ALEXANDRINE PINTUS (ENS): 4,846 (12.3%)
+                OTHERS: 4,045 (10.3%)
+                50%
+                21,711
             """.trimIndent(),
         )
     }
