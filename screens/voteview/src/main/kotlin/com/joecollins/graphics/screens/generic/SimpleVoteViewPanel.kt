@@ -23,8 +23,10 @@ import com.joecollins.pubsub.merge
 import java.awt.Color
 import java.awt.Shape
 import java.text.DecimalFormat
+import java.util.LinkedList
 import java.util.concurrent.Flow
 import javax.swing.JPanel
+import kotlin.math.max
 import kotlin.math.roundToInt
 
 class SimpleVoteViewPanel private constructor(
@@ -62,7 +64,7 @@ class SimpleVoteViewPanel private constructor(
         fun partyVotes(
             current: CurrentVotes<PartyOrCoalition, Int?>.() -> Unit,
             prev: (PrevVotes<PartyOrCoalition>.() -> Unit)? = null,
-            majority: (MajorityLine.() -> Unit)? = null,
+            winningLine: (VoteBasedWinningLine.() -> Unit)? = null,
             displayLimit: (DisplayLimit<PartyOrCoalition>.() -> Unit)? = null,
             partyClassification: (PartyClassification<PartyOrCoalition>.() -> Unit)? = null,
             map: AbstractMap<*>? = null,
@@ -71,7 +73,7 @@ class SimpleVoteViewPanel private constructor(
             return VoteScreenBuilder<PartyOrCoalition, PartyOrCoalition, Int?, Double, Double, BarFrameBuilder.BasicBar>(
                 current = CurrentVotes<PartyOrCoalition, Int?>().apply(current),
                 prev = prev?.let { PrevVotes<PartyOrCoalition>().apply(it) },
-                majority = majority?.let { MajorityLine().apply(it) },
+                winningLine = winningLine?.let { VoteBasedWinningLine().apply(it) },
                 displayLimit = displayLimit?.let { DisplayLimit<PartyOrCoalition>().apply(it) },
                 partyClassification = partyClassification?.let { PartyClassification<PartyOrCoalition>().apply(it) },
                 preferences = null,
@@ -99,7 +101,7 @@ class SimpleVoteViewPanel private constructor(
         fun partyVotes(
             current: CurrentVotes<PartyOrCoalition, Int?>.() -> Unit,
             prev: (PrevVotesNoSwing<PartyOrCoalition>.() -> Unit)? = null,
-            majority: (MajorityLine.() -> Unit)? = null,
+            winningLine: (VoteBasedWinningLine.() -> Unit)? = null,
             displayLimit: (DisplayLimit<PartyOrCoalition>.() -> Unit)? = null,
             partyClassification: (PartyClassification<PartyOrCoalition>.() -> Unit)? = null,
             map: AbstractMap<*>,
@@ -109,7 +111,7 @@ class SimpleVoteViewPanel private constructor(
             return VoteScreenBuilder<PartyOrCoalition, PartyOrCoalition, Int?, Double, Double, BarFrameBuilder.BasicBar>(
                 current = CurrentVotes<PartyOrCoalition, Int?>().apply(current),
                 prev = prev?.let { PrevVotes<PartyOrCoalition>().apply(it) },
-                majority = majority?.let { MajorityLine().apply(it) },
+                winningLine = winningLine?.let { VoteBasedWinningLine().apply(it) },
                 displayLimit = displayLimit?.let { DisplayLimit<PartyOrCoalition>().apply(it) },
                 partyClassification = partyClassification?.let { PartyClassification<PartyOrCoalition>().apply(it) },
                 preferences = null,
@@ -137,7 +139,7 @@ class SimpleVoteViewPanel private constructor(
         fun partyVotes(
             current: CurrentVotes<PartyOrCoalition, Int?>.() -> Unit,
             prev: (PrevVotesNoSwing<PartyOrCoalition>.() -> Unit)? = null,
-            majority: (MajorityLine.() -> Unit)? = null,
+            winningLine: (VoteBasedWinningLine.() -> Unit)? = null,
             displayLimit: (DisplayLimit<PartyOrCoalition>.() -> Unit)? = null,
             map: AbstractMap<*>? = null,
             preferences: (Preferences<PartyOrCoalition, PartyOrCoalition, Int?, Int>.() -> Unit),
@@ -146,7 +148,7 @@ class SimpleVoteViewPanel private constructor(
             return VoteScreenBuilder<PartyOrCoalition, PartyOrCoalition, Int?, Double, Double, BarFrameBuilder.BasicBar>(
                 current = CurrentVotes<PartyOrCoalition, Int?>().apply(current),
                 prev = prev?.let { PrevVotes<PartyOrCoalition>().apply(it) },
-                majority = majority?.let { MajorityLine().apply(it) },
+                winningLine = winningLine?.let { VoteBasedWinningLine().apply(it) },
                 displayLimit = displayLimit?.let { DisplayLimit<PartyOrCoalition>().apply(it) },
                 partyClassification = null,
                 preferences = Preferences<PartyOrCoalition, PartyOrCoalition, Int?, Int>().apply(preferences),
@@ -174,7 +176,7 @@ class SimpleVoteViewPanel private constructor(
         fun partyPct(
             current: CurrentVotes<PartyOrCoalition, Double>.() -> Unit,
             prev: (PrevVotes<PartyOrCoalition>.() -> Unit)? = null,
-            majority: (MajorityLine.() -> Unit)? = null,
+            winningLine: (PctBasedWinningLine.() -> Unit)? = null,
             displayLimit: (DisplayLimit<PartyOrCoalition>.() -> Unit)? = null,
             partyClassification: (PartyClassification<PartyOrCoalition>.() -> Unit)? = null,
             map: AbstractMap<*>? = null,
@@ -183,7 +185,7 @@ class SimpleVoteViewPanel private constructor(
             return VoteScreenBuilder<PartyOrCoalition, PartyOrCoalition, Double, Double, Double, BarFrameBuilder.BasicBar>(
                 current = CurrentVotes<PartyOrCoalition, Double>().apply(current),
                 prev = prev?.let { PrevVotes<PartyOrCoalition>().apply(it) },
-                majority = majority?.let { MajorityLine().apply(it) },
+                winningLine = winningLine?.let { PctBasedWinningLine().apply(it) },
                 displayLimit = displayLimit?.let { DisplayLimit<PartyOrCoalition>().apply(it) },
                 partyClassification = partyClassification?.let { PartyClassification<PartyOrCoalition>().apply(it) },
                 preferences = null,
@@ -211,7 +213,7 @@ class SimpleVoteViewPanel private constructor(
         fun candidateVotes(
             current: CandidateCurrentVotes<Int?>.() -> Unit,
             prev: (PrevVotesNoSwing<Party>.() -> Unit)? = null,
-            majority: (MajorityLine.() -> Unit)? = null,
+            winningLine: (VoteBasedWinningLine.() -> Unit)? = null,
             displayLimit: (DisplayLimit<Party>.() -> Unit)? = null,
             preferences: (Preferences<Candidate, Party, Int?, Int>.() -> Unit),
             map: AbstractMap<*>? = null,
@@ -221,7 +223,7 @@ class SimpleVoteViewPanel private constructor(
             return VoteScreenBuilder<Candidate, Party, Int?, Double, Double, BarFrameBuilder.BasicBar>(
                 current = currentVotes,
                 prev = prev?.let { PrevVotes<Party>().apply(it) },
-                majority = majority?.let { MajorityLine().apply(it) },
+                winningLine = winningLine?.let { VoteBasedWinningLine().apply(it) },
                 displayLimit = displayLimit?.let { DisplayLimit<Party>().apply(it) },
                 partyClassification = null,
                 preferences = Preferences<Candidate, Party, Int?, Int>().apply(preferences),
@@ -249,7 +251,7 @@ class SimpleVoteViewPanel private constructor(
         fun candidateVotes(
             current: CandidateCurrentVotes<Int?>.() -> Unit,
             prev: (PrevVotes<Party>.() -> Unit)? = null,
-            majority: (MajorityLine.() -> Unit)? = null,
+            winningLine: (VoteBasedWinningLine.() -> Unit)? = null,
             displayLimit: (DisplayLimit<Party>.() -> Unit)? = null,
             map: AbstractMap<*>? = null,
             title: Flow.Publisher<out String?>,
@@ -258,7 +260,7 @@ class SimpleVoteViewPanel private constructor(
             return VoteScreenBuilder<Candidate, Party, Int?, Double, Double, BarFrameBuilder.BasicBar>(
                 current = currentVotes,
                 prev = prev?.let { PrevVotes<Party>().apply(it) },
-                majority = majority?.let { MajorityLine().apply(it) },
+                winningLine = winningLine?.let { VoteBasedWinningLine().apply(it) },
                 displayLimit = displayLimit?.let { DisplayLimit<Party>().apply(it) },
                 partyClassification = null,
                 preferences = null,
@@ -286,7 +288,7 @@ class SimpleVoteViewPanel private constructor(
         fun partyOrCandidateVotes(
             current: CurrentVotes<PartyOrCandidate, Int?>.() -> Unit,
             prev: (PrevVotes<Party>.() -> Unit)? = null,
-            majority: (MajorityLine.() -> Unit)? = null,
+            winningLine: (VoteBasedWinningLine.() -> Unit)? = null,
             displayLimit: (DisplayLimit<Party>.() -> Unit)? = null,
             map: AbstractMap<*>? = null,
             title: Flow.Publisher<out String?>,
@@ -295,7 +297,7 @@ class SimpleVoteViewPanel private constructor(
             return VoteScreenBuilder<PartyOrCandidate, Party, Int?, Double, Double, BarFrameBuilder.BasicBar>(
                 current = currentVotes,
                 prev = prev?.let { PrevVotes<Party>().apply(it) },
-                majority = majority?.let { MajorityLine().apply(it) },
+                winningLine = winningLine?.let { VoteBasedWinningLine().apply(it) },
                 displayLimit = displayLimit?.let { DisplayLimit<Party>().apply(it) },
                 partyClassification = null,
                 preferences = null,
@@ -323,14 +325,14 @@ class SimpleVoteViewPanel private constructor(
         fun partyRangeVotes(
             current: CurrentVotes<PartyOrCoalition, ClosedRange<Double>>.() -> Unit,
             prev: (PrevVotes<PartyOrCoalition>.() -> Unit)? = null,
-            majority: (MajorityLine.() -> Unit)? = null,
+            winningLine: (PctBasedWinningLine.() -> Unit)? = null,
             map: AbstractMap<*>? = null,
             title: Flow.Publisher<out String?>,
         ): SimpleVoteViewPanel {
             return VoteScreenBuilder<PartyOrCoalition, PartyOrCoalition, ClosedRange<Double>, ClosedRange<Double>, ClosedRange<Double>, BarFrameBuilder.DualBar>(
                 current = CurrentVotes<PartyOrCoalition, ClosedRange<Double>>().apply(current),
                 prev = prev?.let { PrevVotes<PartyOrCoalition>().apply(it) },
-                majority = majority?.let { MajorityLine().apply(it) },
+                winningLine = winningLine?.let { PctBasedWinningLine().apply(it) },
                 displayLimit = null,
                 partyClassification = null,
                 preferences = null,
@@ -358,7 +360,7 @@ class SimpleVoteViewPanel private constructor(
         fun partyRangeVotes(
             current: CurrentVotes<PartyOrCoalition, ClosedRange<Double>>.() -> Unit,
             prev: (PrevVotesNoSwing<PartyOrCoalition>.() -> Unit)? = null,
-            majority: (MajorityLine.() -> Unit)? = null,
+            winningLine: (PctBasedWinningLine.() -> Unit)? = null,
             map: AbstractMap<*>,
             secondMap: AbstractMap<*>,
             title: Flow.Publisher<out String?>,
@@ -366,7 +368,7 @@ class SimpleVoteViewPanel private constructor(
             return VoteScreenBuilder<PartyOrCoalition, PartyOrCoalition, ClosedRange<Double>, ClosedRange<Double>, ClosedRange<Double>, BarFrameBuilder.DualBar>(
                 current = CurrentVotes<PartyOrCoalition, ClosedRange<Double>>().apply(current),
                 prev = prev?.let { PrevVotes<PartyOrCoalition>().apply(it) },
-                majority = majority?.let { MajorityLine().apply(it) },
+                winningLine = winningLine?.let { PctBasedWinningLine().apply(it) },
                 displayLimit = null,
                 partyClassification = null,
                 preferences = null,
@@ -394,7 +396,7 @@ class SimpleVoteViewPanel private constructor(
         fun partyRangeVotes(
             current: CurrentVotes<PartyOrCoalition, ClosedRange<Double>>.() -> Unit,
             prev: (PrevVotesNoSwing<PartyOrCoalition>.() -> Unit)? = null,
-            majority: (MajorityLine.() -> Unit)? = null,
+            winningLine: (PctBasedWinningLine.() -> Unit)? = null,
             preferences: (Preferences<PartyOrCoalition, PartyOrCoalition, ClosedRange<Double>, Int>.() -> Unit),
             map: AbstractMap<*>? = null,
             title: Flow.Publisher<out String?>,
@@ -402,7 +404,7 @@ class SimpleVoteViewPanel private constructor(
             return VoteScreenBuilder<PartyOrCoalition, PartyOrCoalition, ClosedRange<Double>, ClosedRange<Double>, ClosedRange<Double>, BarFrameBuilder.DualBar>(
                 current = CurrentVotes<PartyOrCoalition, ClosedRange<Double>>().apply(current),
                 prev = prev?.let { PrevVotes<PartyOrCoalition>().apply(it) },
-                majority = majority?.let { MajorityLine().apply(it) },
+                winningLine = winningLine?.let { PctBasedWinningLine().apply(it) },
                 displayLimit = null,
                 partyClassification = null,
                 preferences = Preferences<PartyOrCoalition, PartyOrCoalition, ClosedRange<Double>, Int>().apply(preferences),
@@ -1141,33 +1143,78 @@ class SimpleVoteViewPanel private constructor(
         var range: Flow.Publisher<Double>? = null
     }
 
-    class MajorityLine internal constructor() {
-        var show: Flow.Publisher<out Boolean>? = null
-        var display: String = "50%"
+    sealed class WinningLine {
+        private var show: Flow.Publisher<out Boolean>? = null
+        private val lines = LinkedList<Line>()
 
-        internal fun lines(pctReporting: Flow.Publisher<Double>?): BarFrameBuilder.Lines<Double> {
-            val lines: Flow.Publisher<List<Double>> = when {
-                show != null && pctReporting != null -> show!!.merge(pctReporting) { show, pct ->
-                    if (show) {
-                        listOf(0.5 / pct.coerceAtLeast(1e-6))
-                    } else {
-                        emptyList()
-                    }
-                }
-                show != null -> show!!.map { show ->
-                    if (show) {
-                        listOf(0.5)
-                    } else {
-                        emptyList()
-                    }
-                }
-                pctReporting != null -> pctReporting.map { pct -> listOf(0.5 / pct.coerceAtLeast(1e-6)) }
-                else -> listOf(0.5).asOneTimePublisher()
+        inner class Line internal constructor(val pct: Flow.Publisher<Double>?, val votes: Flow.Publisher<Int>?) {
+            lateinit var display: String
+
+            internal fun add(display: () -> String) {
+                this.display = display()
+                lines.add(this)
             }
-            return BarFrameBuilder.Lines.of(lines) { display }
+
+            internal fun line(pctReporting: Flow.Publisher<Double>?, totalVotes: Flow.Publisher<Int?>?): Flow.Publisher<Pair<Double, String>> {
+                val pct = when {
+                    this.pct != null -> pct
+                    this.votes != null -> {
+                        if (totalVotes == null) {
+                            0.5.asOneTimePublisher()
+                        } else {
+                            this.votes.merge(totalVotes) { v, t -> if (t == null || t == 0) 0.5 else v.toDouble() / t }
+                        }
+                    }
+                    else -> 0.5.asOneTimePublisher()
+                }
+                return (pctReporting?.merge(pct) { reporting, level -> level / reporting.coerceAtLeast(1e-6) } ?: pct)
+                    .map { it to display }
+            }
         }
 
+        fun show(show: Flow.Publisher<out Boolean>?) {
+            this.show = show
+        }
+
+        val majority: Line get() {
+            return percentage(0.5.asOneTimePublisher())
+        }
+
+        fun majority(display: () -> String) {
+            majority.add(display)
+        }
+
+        fun percentage(pct: Flow.Publisher<Double>): Line {
+            return Line(pct, null)
+        }
+
+        fun percentage(pct: Flow.Publisher<Double>, display: () -> String) {
+            percentage(pct).add(display)
+        }
+
+        internal fun lines(pctReporting: Flow.Publisher<Double>?, totalVotes: Flow.Publisher<Int?>?): BarFrameBuilder.Lines<*> {
+            return BarFrameBuilder.Lines.of(linesRaw(pctReporting, totalVotes), { second }, { first })
+        }
+
+        internal fun maxPct(pctReporting: Flow.Publisher<Double>?, totalVotes: Flow.Publisher<Int?>?): Flow.Publisher<Double?> {
+            return linesRaw(pctReporting, totalVotes).map { l -> l.maxOfOrNull { it.first } }
+        }
+
+        private fun linesRaw(
+            pctReporting: Flow.Publisher<Double>?,
+            totalVotes: Flow.Publisher<Int?>?,
+        ) =
+            this.lines.map { it.line(pctReporting, totalVotes) }.combine()
+                .run {
+                    if (show == null) {
+                        this
+                    } else {
+                        merge(show!!) { l, s -> l.filter { s } }
+                    }
+                }
+
         internal fun altText(): Flow.Publisher<String?> {
+            val display = lines.joinToString("\n") { it.display }
             return if (show == null) {
                 display.asOneTimePublisher()
             } else {
@@ -1179,6 +1226,18 @@ class SimpleVoteViewPanel private constructor(
                     }
                 }
             }
+        }
+    }
+
+    class PctBasedWinningLine internal constructor() : WinningLine()
+
+    class VoteBasedWinningLine internal constructor() : WinningLine() {
+        fun votes(votes: Flow.Publisher<Int>): Line {
+            return Line(null, votes)
+        }
+
+        fun votes(votes: Flow.Publisher<Int>, display: () -> String) {
+            votes(votes).add(display)
         }
     }
 
@@ -1221,7 +1280,7 @@ class SimpleVoteViewPanel private constructor(
     private class VoteScreenBuilder<KT : Any, KPT : PartyOrCoalition, CT, CPT : Any, DT : Any, BAR>(
         private val current: AbstractCurrentVotes<out KT, CT>,
         private val prev: PrevVotes<KPT>?,
-        private val majority: MajorityLine?,
+        private val winningLine: WinningLine?,
         private val displayLimit: DisplayLimit<KPT>?,
         private val partyClassification: PartyClassification<KPT>?,
         private val preferences: Preferences<KT, KPT, CT, Int>?,
@@ -1378,7 +1437,7 @@ class SimpleVoteViewPanel private constructor(
             subhead: Flow.Publisher<out String?>,
             notes: Flow.Publisher<out String?>?,
             max: Flow.Publisher<out Double?>,
-            lines: BarFrameBuilder.Lines<Double>?,
+            lines: BarFrameBuilder.Lines<*>?,
         ): BarFrame {
             val doubleLineBarLimit = if (preferences == null) 10 else 0
             return createBarFrame(
@@ -1417,13 +1476,24 @@ class SimpleVoteViewPanel private constructor(
         }
 
         private fun createFrame(): BarFrame {
+            val totalVotes: Flow.Publisher<Int?> = current.votes.map { v ->
+                v.values.fold(valueTemplate.zero, valueTemplate::voteCombine).let { if (it is Int) it else null }
+            }
+            val max: Flow.Publisher<out Double> =
+                current.pctReporting?.map { 2.0 / 3 / it.coerceAtLeast(1e-6) } ?: (2.0 / 3).asOneTimePublisher()
             return createResultFrame(
                 header = current.header,
                 progress = current.progressLabel,
                 subhead = current.subhead,
                 notes = current.notes,
-                max = current.pctReporting?.map { 2.0 / 3 / it.coerceAtLeast(1e-6) } ?: (2.0 / 3).asOneTimePublisher(),
-                lines = majority?.lines(current.pctReporting),
+                max = max.let { m ->
+                    if (winningLine == null) {
+                        m
+                    } else {
+                        m.merge(winningLine.maxPct(current.pctReporting, totalVotes)) { a, b -> if (b == null) a else max(a, b * 1.2) }
+                    }
+                },
+                lines = winningLine?.lines(current.pctReporting, totalVotes),
             )
         }
 
@@ -1508,7 +1578,7 @@ class SimpleVoteViewPanel private constructor(
                     bars = bars,
                     header = partyClassification!!.header,
                     limits = (current.pctReporting?.map { 2.0 / 3 / it.coerceAtLeast(1e-6) } ?: (2.0 / 3).asOneTimePublisher()).map { BarFrameBuilder.Limit(max = it) },
-                    lines = majority?.lines(current.pctReporting),
+                    lines = winningLine?.lines(current.pctReporting, null),
                 ),
             )
         }
@@ -1780,10 +1850,10 @@ class SimpleVoteViewPanel private constructor(
                         },
                     )
                 }.run {
-                    if (majority == null) {
+                    if (winningLine == null) {
                         this
                     } else {
-                        merge(majority.altText()) { h, t -> listOfNotNull(h, t).joinToString("\n") }
+                        merge(winningLine.altText()) { h, t -> listOfNotNull(h, t).joinToString("\n") }
                     }
                 }
             return listOf(header, barEntries).combine().map { it.filterNotNull().joinToString("\n") }

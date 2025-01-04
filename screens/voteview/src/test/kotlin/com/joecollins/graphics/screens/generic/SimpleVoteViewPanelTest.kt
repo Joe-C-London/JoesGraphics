@@ -819,9 +819,9 @@ class SimpleVoteViewPanelTest {
                 this.winner = winner
                 this.pctReporting = pctReporting
             },
-            majority = {
-                show = showMajority
-                display = "50% TO WIN"
+            winningLine = {
+                show(showMajority)
+                majority { "50% TO WIN" }
             },
             title = title,
         )
@@ -1792,8 +1792,8 @@ class SimpleVoteViewPanelTest {
                 subhead = voteSubhead
                 this.runoff = runoff
             },
-            majority = {
-                display = "50% TO WIN"
+            winningLine = {
+                majority { "50% TO WIN" }
             },
             title = title,
         )
@@ -1890,8 +1890,8 @@ class SimpleVoteViewPanelTest {
                 subhead = voteSubhead
                 this.runoff = runoff
             },
-            majority = {
-                display = "50% TO WIN"
+            winningLine = {
+                majority { "50% TO WIN" }
             },
             title = title,
         )
@@ -4105,6 +4105,172 @@ class SimpleVoteViewPanelTest {
                 ^ AGGREGATED ACROSS CANDIDATES IN PARTY
                 
                 SWING SINCE 2018: 4.3% SWING LAB TO LD
+            """.trimIndent(),
+        )
+    }
+
+    @Test
+    fun testPercentageBasedWinningLine() {
+        val spd = Party("Social Democratic Party", "SPD", Color.RED)
+        val union = Party("Christian Democratic Union/Christian Social Union", "CDU/CSU", Color.BLACK)
+        val grune = Party("Grüne", "GRÜNE", Color.GREEN.darker())
+        val fdp = Party("Free Democratic Party", "FDP", Color.YELLOW)
+        val afd = Party("Alternative for Germany", "AfD", Color.CYAN.darker())
+        val linke = Party("The Left", "LINKE", Color.RED.darker())
+        val oth = Party.OTHERS
+
+        val currVotes = Publisher(emptyMap<Party, Int>())
+        val prevVotes = Publisher(emptyMap<Party, Int>())
+        val pctReporting = Publisher(0.0)
+        val reporting = Publisher("0/299")
+        val swingOrder = listOf(linke, spd, grune, oth, fdp, union, afd)
+
+        val panel = partyVotes(
+            current = {
+                votes = currVotes
+                header = "SECOND VOTE".asOneTimePublisher()
+                subhead = "".asOneTimePublisher()
+                this.progressLabel = reporting
+                this.pctReporting = pctReporting
+            },
+            prev = {
+                votes = prevVotes
+                header = "CHANGE SINCE 2017".asOneTimePublisher()
+                this.swing = {
+                    partyOrder = swingOrder
+                    header = "SWING SINCE 2017".asOneTimePublisher()
+                }
+            },
+            winningLine = {
+                percentage(0.05.asOneTimePublisher()) { "5% TO ENTER BUNDESTAG" }
+            },
+            title = "GERMANY".asOneTimePublisher(),
+        )
+        panel.setSize(1024, 512)
+        compareRendering("SimpleVoteViewPanel", "PctWinningLine-1", panel)
+        assertPublishes(
+            panel.altText,
+            """
+                GERMANY
+
+                SECOND VOTE [0/299] (CHANGE SINCE 2017)
+                5% TO ENTER BUNDESTAG
+
+                SWING SINCE 2017: NOT AVAILABLE
+            """.trimIndent(),
+        )
+
+        currVotes.submit(mapOf(spd to 494055, union to 388399, grune to 322763, fdp to 220039, afd to 119566, linke to 64238, oth to 153694))
+        pctReporting.submit(11.0 / 299)
+        reporting.submit("11/299")
+        prevVotes.submit(mapOf(union to 583135, spd to 399505, fdp to 216844, grune to 205471, afd to 140362, linke to 124678, oth to 45646))
+        compareRendering("SimpleVoteViewPanel", "PctWinningLine-2", panel)
+        assertPublishes(
+            panel.altText,
+            """
+                GERMANY
+                
+                SECOND VOTE [11/299] (CHANGE SINCE 2017)
+                SOCIAL DEMOCRATIC PARTY: 28.0% (+4.7%)
+                CHRISTIAN DEMOCRATIC UNION/CHRISTIAN SOCIAL UNION: 22.0% (-12.0%)
+                GRÜNE: 18.3% (+6.3%)
+                FREE DEMOCRATIC PARTY: 12.5% (-0.2%)
+                ALTERNATIVE FOR GERMANY: 6.8% (-1.4%)
+                THE LEFT: 3.6% (-3.6%)
+                OTHERS: 8.7% (+6.1%)
+                5% TO ENTER BUNDESTAG
+                
+                SWING SINCE 2017: 8.3% SWING CDU/CSU TO SPD
+            """.trimIndent(),
+        )
+
+        currVotes.submit(mapOf(spd to 12184094, union to 13233971, grune to 6435360, fdp to 4019562, afd to 4699917, linke to 2286070, oth to 3359844))
+        pctReporting.submit(1.0)
+        reporting.submit("299/299")
+        prevVotes.submit(mapOf(union to 15317344, spd to 9539381, afd to 5878115, fdp to 4999449, linke to 4297270, grune to 4158400, oth to 2325533))
+        compareRendering("SimpleVoteViewPanel", "PctWinningLine-3", panel)
+        assertPublishes(
+            panel.altText,
+            """
+                GERMANY
+
+                SECOND VOTE [299/299] (CHANGE SINCE 2017)
+                CHRISTIAN DEMOCRATIC UNION/CHRISTIAN SOCIAL UNION: 28.6% (-4.3%)
+                SOCIAL DEMOCRATIC PARTY: 26.4% (+5.9%)
+                GRÜNE: 13.9% (+5.0%)
+                ALTERNATIVE FOR GERMANY: 10.2% (-2.5%)
+                FREE DEMOCRATIC PARTY: 8.7% (-2.1%)
+                THE LEFT: 4.9% (-4.3%)
+                OTHERS: 7.3% (+2.3%)
+                5% TO ENTER BUNDESTAG
+                
+                SWING SINCE 2017: 5.1% SWING CDU/CSU TO SPD
+            """.trimIndent(),
+        )
+    }
+
+    @Test
+    fun testVoteBasedWinningLine() {
+        val yes = Candidate("Yes", Party("to reduce voting age to 18", "to reduce voting age to 18", Color.CYAN.darker()))
+        val no = Candidate("No", Party("to keep voting age at 20", "to keep voting age at 20", Color.YELLOW.darker()))
+
+        val votes = Publisher(mapOf(yes to 0, no to 0))
+        val pctReporting = Publisher(0.0)
+
+        val panel = candidateVotes(
+            current = {
+                this.votes = votes
+                header = "REFERENDUM RESULT".asOneTimePublisher()
+                subhead = "".asOneTimePublisher()
+                this.progressLabel = pctReporting.map { "${DecimalFormat("0.0%").format(it)} IN" }
+                this.pctReporting = pctReporting
+            },
+            winningLine = {
+                votes(9619696.asOneTimePublisher()) { "9,619,696 NEEDED TO PASS" }
+            },
+            title = "TAIWAN".asOneTimePublisher(),
+        )
+        panel.setSize(1024, 512)
+        compareRendering("SimpleVoteViewPanel", "VoteWinningLine-1", panel)
+        assertPublishes(
+            panel.altText,
+            """
+                TAIWAN
+
+                REFERENDUM RESULT [0.0% IN]
+                YES (TO REDUCE VOTING AGE TO 18): WAITING...
+                NO (TO KEEP VOTING AGE AT 20): WAITING...
+                9,619,696 NEEDED TO PASS
+            """.trimIndent(),
+        )
+
+        votes.submit(mapOf(yes to 5647102, no to 5016427))
+        pctReporting.submit(1.0)
+        compareRendering("SimpleVoteViewPanel", "VoteWinningLine-2", panel)
+        assertPublishes(
+            panel.altText,
+            """
+                TAIWAN
+
+                REFERENDUM RESULT [100.0% IN]
+                YES (TO REDUCE VOTING AGE TO 18): 5,647,102 (53.0%)
+                NO (TO KEEP VOTING AGE AT 20): 5,016,427 (47.0%)
+                9,619,696 NEEDED TO PASS
+            """.trimIndent(),
+        )
+
+        votes.submit(mapOf(yes to 564710, no to 501642))
+        pctReporting.submit(0.1)
+        compareRendering("SimpleVoteViewPanel", "VoteWinningLine-3", panel)
+        assertPublishes(
+            panel.altText,
+            """
+                TAIWAN
+
+                REFERENDUM RESULT [10.0% IN]
+                YES (TO REDUCE VOTING AGE TO 18): 564,710 (53.0%)
+                NO (TO KEEP VOTING AGE AT 20): 501,642 (47.0%)
+                9,619,696 NEEDED TO PASS
             """.trimIndent(),
         )
     }
