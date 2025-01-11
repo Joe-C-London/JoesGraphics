@@ -28,7 +28,7 @@ class HeatMapFrameBuilderTest {
         val frame = HeatMapFrameBuilder.build(
             squares = squares<Pair<Color, Color>> {
                 numRows = 3.asOneTimePublisher()
-                entries = dots
+                entries = dots.asOneTimePublisher()
                 fill = { first.asOneTimePublisher() }
                 border = { second.asOneTimePublisher() }
             },
@@ -112,7 +112,7 @@ class HeatMapFrameBuilderTest {
         )
         val frame = HeatMapFrameBuilder.buildElectedLeading(
             3.asOneTimePublisher(),
-            ridings,
+            ridings.asOneTimePublisher(),
             { PartyResult(leader, hasWon).asOneTimePublisher() },
             { prev },
             lib,
@@ -173,7 +173,7 @@ class HeatMapFrameBuilderTest {
         val filter = Publisher<(Riding) -> Boolean> { true }
         val frame = HeatMapFrameBuilder.buildElectedLeading(
             3.asOneTimePublisher(),
-            ridings,
+            ridings.asOneTimePublisher(),
             { PartyResult(leader, hasWon).asOneTimePublisher() },
             { prev },
             lib,
@@ -246,7 +246,7 @@ class HeatMapFrameBuilderTest {
         val results = generateSequence { result }.take(30).toList()
         val frame = HeatMapFrameBuilder.buildElectedLeading(
             results.size.asOneTimePublisher(),
-            results,
+            results.asOneTimePublisher(),
             { publisher },
             { prev },
             dem,
@@ -293,7 +293,7 @@ class HeatMapFrameBuilderTest {
         val results = listOf(result)
         val frame = HeatMapFrameBuilder.buildElectedLeading(
             results.sumOf { it.numSeats }.asOneTimePublisher(),
-            results,
+            results.asOneTimePublisher(),
             { publisher },
             { prev },
             dem,
@@ -355,7 +355,7 @@ class HeatMapFrameBuilderTest {
         val results = listOf(result)
         val frame = HeatMapFrameBuilder.buildElectedLeading(
             results.sumOf { it.numSeats }.asOneTimePublisher(),
-            results,
+            results.asOneTimePublisher(),
             { publisher },
             { prev },
             dem,

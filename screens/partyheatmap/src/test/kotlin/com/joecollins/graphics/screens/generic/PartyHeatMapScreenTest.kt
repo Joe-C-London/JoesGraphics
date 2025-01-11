@@ -1,5 +1,6 @@
 package com.joecollins.graphics.screens.generic
 
+import com.joecollins.graphics.screens.generic.PartyHeatMapScreen.Companion.sortByPrevResult
 import com.joecollins.graphics.utils.PublisherTestUtils.assertPublishes
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.models.general.Party
@@ -27,15 +28,7 @@ class PartyHeatMapScreenTest {
             currResult = {
                 currResults.map { r -> r[this] }
             },
-            sortOrder = { party ->
-                Comparator.comparing { riding ->
-                    val result = prevResults[riding]!!
-                    val me = result[party] ?: 0
-                    val oth = result.filter { it.key != party }.maxOf { it.value }
-                    val total = result.values.sum().toDouble()
-                    (oth - me) / total
-                }
-            },
+            sortByPrevResult { prevResults[it]!! },
             numRows = rows,
             title = "PARTY HEAT MAPS".asOneTimePublisher(),
         )
@@ -139,15 +132,7 @@ class PartyHeatMapScreenTest {
             currResult = {
                 currResults.map { r -> r[this] }
             },
-            sortOrder = { party ->
-                Comparator.comparing { riding ->
-                    val result = prevResults[riding]!!
-                    val me = result[party] ?: 0
-                    val oth = result.filter { it.key != party }.maxOf { it.value }
-                    val total = result.values.sum().toDouble()
-                    (oth - me) / total
-                }
-            },
+            sortOrder = sortByPrevResult { prevResults[it]!! },
             numRows = rows,
             title = "PARTY HEAT MAPS".asOneTimePublisher(),
         )
@@ -256,15 +241,7 @@ class PartyHeatMapScreenTest {
             currResult = {
                 currResults.map { r -> r[this] }
             },
-            sortOrder = { party ->
-                Comparator.comparing { riding ->
-                    val result = prevResults[riding]!!
-                    val me = result[if (party == bcu) lib else party] ?: 0
-                    val oth = result.filter { it.key != (if (party == bcu) lib else party) }.maxOf { it.value }
-                    val total = result.values.sum().toDouble()
-                    (oth - me) / total
-                }
-            },
+            sortOrder = sortByPrevResult { prevResults[it]!!.mapKeys { (p, _) -> if (p == lib) bcu else p } },
             numRows = rows,
             partyChanges = mapOf(lib to bcu).asOneTimePublisher(),
             title = "PARTY HEAT MAPS".asOneTimePublisher(),

@@ -1,10 +1,12 @@
 package com.joecollins.graphics.components
 
 import com.joecollins.graphics.utils.ColorUtils
+import com.joecollins.models.general.Aggregators
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
 import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.combine
+import com.joecollins.pubsub.compose
 import com.joecollins.pubsub.map
 import com.joecollins.pubsub.mapElements
 import com.joecollins.pubsub.merge
@@ -14,7 +16,7 @@ import java.util.concurrent.Flow
 object HeatMapFrameBuilder {
     class Squares<T> internal constructor() {
         lateinit var numRows: Flow.Publisher<out Int>
-        lateinit var entries: List<T>
+        lateinit var entries: Flow.Publisher<List<T>>
         var seats: T.() -> Int = { 1 }
         lateinit var fill: T.() -> Flow.Publisher<out Color>
         var border: T.() -> Flow.Publisher<out Color> = { fill() }
@@ -24,15 +26,16 @@ object HeatMapFrameBuilder {
             numRows
         }
         val squaresPublisher: Flow.Publisher<out List<HeatMapFrame.Square>> by lazy {
-            entries
-                .flatMap { generateSequence { it }.take(it.seats()) }
-                .map {
-                    it.fill().merge(it.border()) { fill, border -> fill to border }
-                        .merge(it.label()) { (fill, border), label ->
-                            HeatMapFrame.Square(fillColor = fill, borderColor = border, label = label)
-                        }
-                }
-                .combine()
+            entries.compose { e ->
+                e.flatMap { generateSequence { it }.take(it.seats()) }
+                    .map {
+                        it.fill().merge(it.border()) { fill, border -> fill to border }
+                            .merge(it.label()) { (fill, border), label ->
+                                HeatMapFrame.Square(fillColor = fill, borderColor = border, label = label)
+                            }
+                    }
+                    .combine()
+            }
         }
     }
 
@@ -89,7 +92,7 @@ object HeatMapFrameBuilder {
 
     fun <T> buildElectedLeading(
         rows: Flow.Publisher<out Int>,
-        entries: List<T>,
+        entries: Flow.Publisher<List<T>>,
         result: T.() -> Flow.Publisher<out PartyResult?>,
         prevResult: T.() -> Party,
         party: Party,
@@ -102,20 +105,18 @@ object HeatMapFrameBuilder {
         filter: Flow.Publisher<T.() -> Boolean> = { _: T -> true }.asOneTimePublisher(),
         partyChanges: Flow.Publisher<Map<Party, Party>> = emptyMap<Party, Party>().asOneTimePublisher(),
     ): HeatMapFrame {
-        val results: Map<T, Flow.Publisher<out PartyResult?>> = entries
-            .distinct()
-            .associateWith { it.result() }
-        val prev = entries.distinct().associateWith(prevResult)
+        val results: Flow.Publisher<out Map<T, PartyResult?>> =
+            entries.compose { e -> Aggregators.toMap(e) { it.result() } }
+        val prev = entries.map { it.associateWith(prevResult) }
+            .merge(partyChanges) { pr, pc -> pr.mapValues { (_, p) -> pc[p] ?: p } }
         val resultPublishers = entries
-            .map { t ->
-                results[t]!!.map { Pair(it, t.seats()) }
-            }
-            .toList()
-        val resultWithPrevPublishers: List<Flow.Publisher<Triple<PartyResult?, Party, Int>>> = entries
-            .map { t ->
-                results[t]!!.merge(partyChanges) { res, changes -> Triple(res, prev[t]!!.let { changes[it] ?: it }, t.seats()) }
-            }
-            .toList()
+            .mapElements { t ->
+                results.map { it[t] to t.seats() }
+            }.compose { it.combine() }
+        val resultWithPrevPublishers: Flow.Publisher<List<Triple<PartyResult?, Party, Int>>> =
+            entries.mapElements { t ->
+                results.merge(prev) { res, prev -> Triple(res[t], prev[t]!!, t.seats()) }
+            }.compose { it.combine() }
         val seatsPublisher = createSeatBarPublisher(resultPublishers) { party == it }
         val seatList = seatsPublisher.map {
             listOf(
@@ -137,21 +138,22 @@ object HeatMapFrameBuilder {
                     emptyList()
                 }
             }
-        val allPrevs = entries
-            .map { Pair(prev[it]!!, it.seats()) }
-            .toList()
+        val allPrevs = entries.merge(prev) { list, p ->
+            list.map { e -> Pair(p[e]!!, e.seats()) }
+        }
         return build(
             squares = squares<T> {
                 numRows = rows
                 this.entries = entries
                 this.seats = seats
                 fill = {
-                    results[this]!!.merge(filter) { result, filter ->
+                    results.merge(filter) { result, filter ->
+                        val thisResult = result[this]
                         when {
                             !filter() -> Color.WHITE
-                            result?.leader == null -> Color.WHITE
-                            result.elected -> result.leader.color
-                            else -> ColorUtils.lighten(result.leader.color)
+                            thisResult?.leader == null -> Color.WHITE
+                            thisResult.elected -> thisResult.leader.color
+                            else -> ColorUtils.lighten(thisResult.leader.color)
                         }
                     }
                 }
@@ -168,7 +170,7 @@ object HeatMapFrameBuilder {
                 bars = changeList
                 colorFunc = { it.first }
                 seatFunc = { it.second }
-                startPublisher = partyChanges.map { calcPrevForParty(allPrevs, party, it) }
+                startPublisher = partyChanges.compose { calcPrevForParty(allPrevs, party, it) }
                 labelPublisher = change.map(changeLabelFunc)
             },
             header = header,
@@ -176,15 +178,15 @@ object HeatMapFrameBuilder {
         )
     }
 
-    private fun calcPrevForParty(prev: List<Pair<Party, Int>>, party: Party, changes: Map<Party, Party>): Int {
-        return prev.filter { party == it.first || party == changes[it.first] }.sumOf { it.second }
+    private fun calcPrevForParty(prev: Flow.Publisher<List<Pair<Party, Int>>>, party: Party, changes: Map<Party, Party>): Flow.Publisher<Int> {
+        return prev.map { p -> p.filter { party == it.first || party == changes[it.first] }.sumOf { it.second } }
     }
 
     private fun createSeatBarPublisher(
-        results: List<Flow.Publisher<Pair<PartyResult?, Int>>>,
+        results: Flow.Publisher<List<Pair<PartyResult?, Int>>>,
         partyFilter: (Party?) -> Boolean,
     ): Flow.Publisher<ElectedLeading> {
-        return results.combine()
+        return results
             .map { res ->
                 res.filter { (pr, _) -> pr != null && partyFilter(pr.leader) }
                     .map { (pr, seats) ->
@@ -195,10 +197,10 @@ object HeatMapFrameBuilder {
     }
 
     private fun createChangeBarPublisher(
-        resultWithPrev: List<Flow.Publisher<Triple<PartyResult?, Party, Int>>>,
+        resultWithPrev: Flow.Publisher<List<Triple<PartyResult?, Party, Int>>>,
         partyFilter: (Party?) -> Boolean,
     ): Flow.Publisher<ElectedLeading> {
-        return resultWithPrev.combine()
+        return resultWithPrev
             .map { res ->
                 res.filter { (pr, _) -> pr?.leader != null }
                     .flatMap { (pr, p, seats) ->

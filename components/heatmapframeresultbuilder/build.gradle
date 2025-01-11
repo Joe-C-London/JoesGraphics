@@ -22,6 +22,7 @@ var topLevel = parent.parent
 dependencies {
     api parent.project('heatmapframe')
     api topLevel.project('models')
+    api topLevel.project('modelutils')
     implementation topLevel.project('pubsub')
 
     testImplementation topLevel.project('testutils')

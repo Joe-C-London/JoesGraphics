@@ -11,6 +11,7 @@ import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.combine
 import com.joecollins.pubsub.compose
 import com.joecollins.pubsub.map
+import com.joecollins.pubsub.mapElements
 import com.joecollins.pubsub.merge
 import java.awt.Color
 import java.awt.GridLayout
@@ -21,12 +22,22 @@ import javax.swing.JPanel
 class PartyHeatMapScreen private constructor(panel: JPanel, title: Flow.Publisher<String>, altText: Flow.Publisher<String>) : GenericPanel(panel, title, altText) {
 
     companion object {
-        fun <T> ofElected(
+        fun <T> sortByPrevResult(prevResult: (T) -> Map<Party, Int>): (Party, T) -> Flow.Publisher<Double> {
+            return { party, riding ->
+                val result = prevResult(riding)
+                val me = result[party] ?: 0
+                val oth = result.filter { it.key != party }.maxOf { it.value }
+                val total = result.values.sum().toDouble()
+                ((oth - me) / total).asOneTimePublisher()
+            }
+        }
+
+        fun <T, C: Comparable<C>> ofElected(
             items: Flow.Publisher<out Collection<T>>,
             parties: Flow.Publisher<out List<Party>>,
             prevResult: T.() -> Party,
             currResult: T.() -> Flow.Publisher<Party?>,
-            sortOrder: (Party) -> Comparator<T>,
+            sortOrder: (Party, T) -> Flow.Publisher<C>,
             numRows: Flow.Publisher<Int>,
             filter: (Flow.Publisher<T.() -> Boolean>) = { _: T -> true }.asOneTimePublisher(),
             partyChanges: Flow.Publisher<Map<Party, Party>> = emptyMap<Party, Party>().asOneTimePublisher(),
@@ -46,12 +57,12 @@ class PartyHeatMapScreen private constructor(panel: JPanel, title: Flow.Publishe
             )
         }
 
-        fun <T> ofElectedLeading(
+        fun <T, C: Comparable<C>> ofElectedLeading(
             items: Flow.Publisher<out Collection<T>>,
             parties: Flow.Publisher<out List<Party>>,
             prevResult: T.() -> Party,
             currResult: T.() -> Flow.Publisher<out PartyResult?>,
-            sortOrder: (Party) -> Comparator<T>,
+            sortOrder: (Party, T) -> Flow.Publisher<C>,
             numRows: Flow.Publisher<Int>,
             filter: (Flow.Publisher<T.() -> Boolean>) = { _: T -> true }.asOneTimePublisher(),
             partyChanges: Flow.Publisher<Map<Party, Party>> = emptyMap<Party, Party>().asOneTimePublisher(),
@@ -71,12 +82,12 @@ class PartyHeatMapScreen private constructor(panel: JPanel, title: Flow.Publishe
             )
         }
 
-        private fun <T> build(
+        private fun <T, C: Comparable<C>> build(
             itemsPublisher: Flow.Publisher<out Collection<T>>,
             partiesPublisher: Flow.Publisher<out List<Party>>,
             prevResult: T.() -> Party,
             currResult: T.() -> Flow.Publisher<out PartyResult?>,
-            sortOrder: (Party) -> Comparator<T>,
+            sortOrder: (Party, T) -> Flow.Publisher<C>,
             withLeading: Boolean,
             numRows: Flow.Publisher<Int>,
             filter: (Flow.Publisher<T.() -> Boolean>),
@@ -141,7 +152,7 @@ class PartyHeatMapScreen private constructor(panel: JPanel, title: Flow.Publishe
                     parties.map { party ->
                         val prevTotal = items.map(prevResult).count { (changes[it] ?: it) == party }
                         val entries = createOrderedList(items, party, sortOrder)
-                        val seatsAndPrev = entries.map { e ->
+                        val seatsAndPrev = entries.mapElements { e ->
                             e.currResult().map { r ->
                                 if (r == null) {
                                     null
@@ -149,12 +160,12 @@ class PartyHeatMapScreen private constructor(panel: JPanel, title: Flow.Publishe
                                     r to e.prevResult()
                                 }
                             }
-                        }.combine().map { list -> list.filterNotNull() }.map { list ->
+                        }.compose { it.combine() }.map { list -> list.filterNotNull() }.map { list ->
                             val curr = list.filter { it.first.leader == party }.groupingBy { it.first.elected }.eachCount()
                             val prev = list.filter { it.second.let { p -> changes[p] ?: p } == party }.groupingBy { it.first.elected }.eachCount()
                             curr to prev
                         }
-                        val balance = entries.map(currResult).combine().map { list ->
+                        val balance = entries.mapElements(currResult).compose { it.combine() }.map { list ->
                             HitMissBalance.calculateBalance(list.map { it?.leader }) {
                                 if (it == null) null else (it == party)
                             }
@@ -175,10 +186,11 @@ class PartyHeatMapScreen private constructor(panel: JPanel, title: Flow.Publishe
             return PartyHeatMapScreen(pad(panel), title, altText)
         }
 
-        private fun <T> createOrderedList(items: Collection<T>, party: Party, sortOrder: (Party) -> Comparator<T>): List<T> {
-            return items.asSequence()
-                .sortedWith(sortOrder(party))
-                .toList()
+        private fun <T, C: Comparable<C>> createOrderedList(items: Collection<T>, party: Party, sortOrder: (Party, T) -> Flow.Publisher<C>): Flow.Publisher<List<T>> {
+            return items
+                .map { e -> sortOrder(party, e).map { so -> e to so } }
+                .combine()
+                .map { list -> list.sortedBy { it.second }.map { it.first } }
         }
     }
 }
