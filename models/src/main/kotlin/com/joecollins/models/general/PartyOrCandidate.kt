@@ -14,9 +14,7 @@ data class PartyOrCandidate private constructor(private val _party: Party?, priv
 
     val color = party.color
 
-    override fun toString(): String {
-        return _party?.toString() ?: _candidate!!.toString()
-    }
+    override fun toString(): String = _party?.toString() ?: _candidate!!.toString()
 
     companion object {
         private val INDEPENDENT = Party("Independent", "IND", Party.OTHERS.color)

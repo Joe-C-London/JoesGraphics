@@ -87,13 +87,9 @@ object BarFrameBuilder {
         }
 
         companion object {
-            fun <T : Number> of(publisher: Flow.Publisher<List<T>>, labelFunc: T.() -> String): Lines<T> {
-                return Lines(publisher, labelFunc) { this }
-            }
+            fun <T : Number> of(publisher: Flow.Publisher<List<T>>, labelFunc: T.() -> String): Lines<T> = Lines(publisher, labelFunc) { this }
 
-            fun <T> of(publisher: Flow.Publisher<List<T>>, labelFunc: T.() -> String, valueFunc: T.() -> Number): Lines<T> {
-                return Lines(publisher, labelFunc, valueFunc)
-            }
+            fun <T> of(publisher: Flow.Publisher<List<T>>, labelFunc: T.() -> String, valueFunc: T.() -> Number): Lines<T> = Lines(publisher, labelFunc, valueFunc)
         }
     }
 

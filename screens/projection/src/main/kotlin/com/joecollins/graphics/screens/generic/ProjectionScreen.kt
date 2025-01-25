@@ -18,7 +18,8 @@ class ProjectionScreen private constructor(
     imageAlignment: Flow.Publisher<out ProjectionFrame.Alignment>,
     header: String,
     override val altText: Flow.Publisher<out String?>,
-) : JPanel(), AltTextProvider {
+) : JPanel(),
+    AltTextProvider {
 
     companion object {
         fun createScreen(
@@ -28,9 +29,7 @@ class ProjectionScreen private constructor(
             imageAlignment: Flow.Publisher<out ProjectionFrame.Alignment> = ProjectionFrame.Alignment.BOTTOM.asOneTimePublisher(),
             header: String = "PROJECTION",
             altText: Flow.Publisher<out String?> = text.map { t -> t?.let { "$header: $it" } ?: header },
-        ): ProjectionScreen {
-            return ProjectionScreen(text, color, image, imageAlignment, header, altText)
-        }
+        ): ProjectionScreen = ProjectionScreen(text, color, image, imageAlignment, header, altText)
     }
 
     init {

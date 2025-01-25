@@ -30,13 +30,9 @@ class RightStackLayout : LayoutManager {
         }
     }
 
-    override fun preferredLayoutSize(parent: Container?): Dimension {
-        return GenericPanel.DEFAULT_SIZE
-    }
+    override fun preferredLayoutSize(parent: Container?): Dimension = GenericPanel.DEFAULT_SIZE
 
-    override fun minimumLayoutSize(parent: Container?): Dimension {
-        return Dimension(100, 50)
-    }
+    override fun minimumLayoutSize(parent: Container?): Dimension = Dimension(100, 50)
 
     override fun layoutContainer(parent: Container) {
         val width = parent.width

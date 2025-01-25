@@ -49,13 +49,9 @@ class HeatMapFrame(
     private inner class Layout : LayoutManager {
         override fun addLayoutComponent(name: String, comp: Component) {}
         override fun removeLayoutComponent(comp: Component) {}
-        override fun preferredLayoutSize(parent: Container): Dimension {
-            return Dimension(1024, 512)
-        }
+        override fun preferredLayoutSize(parent: Container): Dimension = Dimension(1024, 512)
 
-        override fun minimumLayoutSize(parent: Container): Dimension {
-            return Dimension(100, 50)
-        }
+        override fun minimumLayoutSize(parent: Container): Dimension = Dimension(100, 50)
 
         override fun layoutContainer(parent: Container) {
             var mid = 0
@@ -78,24 +74,16 @@ class HeatMapFrame(
     val numSquares: Int
         @TestOnly get() = squaresPanel.squares.size
 
-    @TestOnly fun getSquareBorder(index: Int): Color? {
-        return squaresPanel.squares[index].borderColor
-    }
+    @TestOnly fun getSquareBorder(index: Int): Color? = squaresPanel.squares[index].borderColor
 
-    @TestOnly fun getSquareFill(index: Int): Color {
-        return squaresPanel.squares[index].fillColor
-    }
+    @TestOnly fun getSquareFill(index: Int): Color = squaresPanel.squares[index].fillColor
 
     val seatBarCount: Int
         @TestOnly get() = barsPanel.seatBars.size
 
-    @TestOnly fun getSeatBarColor(index: Int): Color {
-        return barsPanel.seatBars[index].color
-    }
+    @TestOnly fun getSeatBarColor(index: Int): Color = barsPanel.seatBars[index].color
 
-    @TestOnly fun getSeatBarSize(index: Int): Int {
-        return barsPanel.seatBars[index].size
-    }
+    @TestOnly fun getSeatBarSize(index: Int): Int = barsPanel.seatBars[index].size
 
     val seatBarLabel: String
         @TestOnly get() = barsPanel.seatBarLabel
@@ -103,13 +91,9 @@ class HeatMapFrame(
     val changeBarCount: Int
         @TestOnly get() = barsPanel.changeBars.size
 
-    @TestOnly fun getChangeBarColor(index: Int): Color {
-        return barsPanel.changeBars[index].color
-    }
+    @TestOnly fun getChangeBarColor(index: Int): Color = barsPanel.changeBars[index].color
 
-    @TestOnly fun getChangeBarSize(index: Int): Int {
-        return barsPanel.changeBars[index].size
-    }
+    @TestOnly fun getChangeBarSize(index: Int): Int = barsPanel.changeBars[index].size
 
     val changeBarLabel: String
         @TestOnly get() = barsPanel.changeBarLabel
@@ -162,13 +146,9 @@ class HeatMapFrame(
                 repaint()
             }
 
-        fun hasSeats(): Boolean {
-            return seatBars.isNotEmpty()
-        }
+        fun hasSeats(): Boolean = seatBars.isNotEmpty()
 
-        fun hasChange(): Boolean {
-            return changeBars.isNotEmpty()
-        }
+        fun hasChange(): Boolean = changeBars.isNotEmpty()
 
         override fun paintComponent(g: Graphics) {
             super.paintComponent(g)
@@ -267,13 +247,9 @@ class HeatMapFrame(
             g.clip = oldClip
         }
 
-        private fun getLeftPosition(seats: Int): Int {
-            return getSize(seats)
-        }
+        private fun getLeftPosition(seats: Int): Int = getSize(seats)
 
-        private fun getSize(seats: Int): Int {
-            return (1.0 * width * seats / numSquares.coerceAtLeast(1)).roundToInt()
-        }
+        private fun getSize(seats: Int): Int = (1.0 * width * seats / numSquares.coerceAtLeast(1)).roundToInt()
 
         init {
             background = Color.WHITE

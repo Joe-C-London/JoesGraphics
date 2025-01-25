@@ -2346,25 +2346,18 @@ class MultiResultScreenTest {
         private var topTwoToRunoff = false
 
         private val statusPublisher = Publisher(status)
-        fun getStatus(): Flow.Publisher<String> {
-            return statusPublisher
-        }
+        fun getStatus(): Flow.Publisher<String> = statusPublisher
 
         private val pctReportingPublisher = Publisher(pctReporting)
-        fun getPctReporting(): Flow.Publisher<Double> {
-            return pctReportingPublisher
-        }
+        fun getPctReporting(): Flow.Publisher<Double> = pctReportingPublisher
 
         private val votesPublisher = Publisher(votes)
-        fun getVotes(): Flow.Publisher<Map<Candidate, Int>> {
-            return votesPublisher
-        }
+        fun getVotes(): Flow.Publisher<Map<Candidate, Int>> = votesPublisher
 
         val partyVotes = Publisher(calculatePartyVotes())
-        private fun calculatePartyVotes() =
-            votes.entries
-                .groupBy { it.key.party }
-                .mapValues { e -> e.value.sumOf { it.value } }
+        private fun calculatePartyVotes() = votes.entries
+            .groupBy { it.key.party }
+            .mapValues { e -> e.value.sumOf { it.value } }
 
         private val leaderHasWonPublisher = Publisher(leaderHasWon)
 
@@ -2372,15 +2365,14 @@ class MultiResultScreenTest {
         private fun calculateWinner() = if (leaderHasWon) votes.entries.maxByOrNull { it.value }!!.key else null
 
         val runoff = Publisher(calculateRunoff())
-        private fun calculateRunoff() =
-            if (!topTwoToRunoff) {
-                null
-            } else {
-                votes.entries.asSequence().sortedByDescending { it.value }
-                    .take(2)
-                    .map { it.key }
-                    .toSet()
-            }
+        private fun calculateRunoff() = if (!topTwoToRunoff) {
+            null
+        } else {
+            votes.entries.asSequence().sortedByDescending { it.value }
+                .take(2)
+                .map { it.key }
+                .toSet()
+        }
 
         val leader = Publisher(calculateLeader())
         private fun calculateLeader() = if (votes.values.all { it == 0 }) {

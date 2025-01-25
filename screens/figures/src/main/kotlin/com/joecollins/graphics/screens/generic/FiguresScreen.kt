@@ -99,18 +99,16 @@ class FiguresScreen private constructor(headerLabel: Flow.Publisher<out String?>
             return frame
         }
 
-        override fun createAltText(): Flow.Publisher<String> {
-            return this.entries.map { e -> e.statusPublisher.map { it to e } }
-                .combine()
-                .map { e ->
-                    e.groupBy({ it.first }, { it.second })
-                        .mapValues { it.value.joinToString { c -> c.candidate.name.uppercase() } }
-                        .entries
-                        .sortedBy { it.key }
-                        .joinToString("\n") { "${it.key}: ${it.value}" }
-                }
-                .map { "$name\n$it" }
-        }
+        override fun createAltText(): Flow.Publisher<String> = this.entries.map { e -> e.statusPublisher.map { it to e } }
+            .combine()
+            .map { e ->
+                e.groupBy({ it.first }, { it.second })
+                    .mapValues { it.value.joinToString { c -> c.candidate.name.uppercase() } }
+                    .entries
+                    .sortedBy { it.key }
+                    .joinToString("\n") { "${it.key}: ${it.value}" }
+            }
+            .map { "$name\n$it" }
     }
 
     private class Entry(val candidate: Candidate, val description: String) {
@@ -131,8 +129,6 @@ class FiguresScreen private constructor(headerLabel: Flow.Publisher<out String?>
     }
 
     companion object {
-        fun create(title: Flow.Publisher<out String?>, sections: Sections.() -> Unit): FiguresScreen {
-            return Sections(title).apply(sections).build()
-        }
+        fun create(title: Flow.Publisher<out String?>, sections: Sections.() -> Unit): FiguresScreen = Sections(title).apply(sections).build()
     }
 }

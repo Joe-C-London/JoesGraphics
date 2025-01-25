@@ -54,18 +54,14 @@ object SwingometerFrameBuilder {
             }
         }
 
-        fun getMax(): Double {
-            return max(
-                max.toDouble(),
-                bucketSize.toDouble() *
-                    ceil(abs(value.toDouble() / bucketSize.toDouble())),
-            )
-        }
+        fun getMax(): Double = max(
+            max.toDouble(),
+            bucketSize.toDouble() *
+                ceil(abs(value.toDouble() / bucketSize.toDouble())),
+        )
         val maxPublisher = Publisher(getMax())
 
-        fun getNumBucketsPerSide(): Int {
-            return (getMax() / bucketSize.toDouble()).roundToInt()
-        }
+        fun getNumBucketsPerSide(): Int = (getMax() / bucketSize.toDouble()).roundToInt()
         val numBucketsPerSidePublisher = Publisher(getNumBucketsPerSide())
 
         private fun getTicks(): List<Tick> {

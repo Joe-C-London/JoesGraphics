@@ -59,15 +59,13 @@ class TopThreePlacesScreen private constructor(
             progressLabel: Flow.Publisher<out String?>? = null,
             notes: Flow.Publisher<out String?>? = null,
             title: Flow.Publisher<out String?>,
-        ): TopThreePlacesScreen {
-            return TopThreePlacesScreen(
-                convertToPlaces(votes) { it },
-                header,
-                progressLabel,
-                notes,
-                title,
-            )
-        }
+        ): TopThreePlacesScreen = TopThreePlacesScreen(
+            convertToPlaces(votes) { it },
+            header,
+            progressLabel,
+            notes,
+            title,
+        )
 
         fun ofCandidates(
             votes: Flow.Publisher<out Collection<Map<Candidate, Int>>>,
@@ -75,32 +73,29 @@ class TopThreePlacesScreen private constructor(
             progressLabel: Flow.Publisher<out String?>? = null,
             notes: Flow.Publisher<out String?>? = null,
             title: Flow.Publisher<out String?>,
-        ): TopThreePlacesScreen {
-            return TopThreePlacesScreen(
-                convertToPlaces(votes) { it.party },
-                header,
-                progressLabel,
-                notes,
-                title,
-            )
-        }
+        ): TopThreePlacesScreen = TopThreePlacesScreen(
+            convertToPlaces(votes) { it.party },
+            header,
+            progressLabel,
+            notes,
+            title,
+        )
 
-        private fun <K> convertToPlaces(votes: Flow.Publisher<out Collection<Map<K, Int>>>, toParty: (K) -> Party) =
-            votes.map { list ->
-                list.flatMap { v ->
-                    v.entries.sortedByDescending { it.value }
-                        .mapIndexed { index, entry -> index to entry }
-                        .take(3)
-                        .map { (place, entry) ->
-                            toParty(entry.key) to when (place) {
-                                0 -> Places(first = 1)
-                                1 -> Places(second = 1)
-                                2 -> Places(third = 1)
-                                else -> Places()
-                            }
+        private fun <K> convertToPlaces(votes: Flow.Publisher<out Collection<Map<K, Int>>>, toParty: (K) -> Party) = votes.map { list ->
+            list.flatMap { v ->
+                v.entries.sortedByDescending { it.value }
+                    .mapIndexed { index, entry -> index to entry }
+                    .take(3)
+                    .map { (place, entry) ->
+                        toParty(entry.key) to when (place) {
+                            0 -> Places(first = 1)
+                            1 -> Places(second = 1)
+                            2 -> Places(third = 1)
+                            else -> Places()
                         }
-                }.groupingBy { it.first }
-                    .fold(Places()) { a, e -> a.merge(e.second) }
-            }
+                    }
+            }.groupingBy { it.first }
+                .fold(Places()) { a, e -> a.merge(e.second) }
+        }
     }
 }

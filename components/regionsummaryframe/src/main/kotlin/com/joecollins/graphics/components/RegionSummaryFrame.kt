@@ -93,25 +93,15 @@ class RegionSummaryFrame private constructor(
         sectionsPublisher.subscribe(Subscriber(eventQueueWrapper(onSectionsUpdate)))
     }
 
-    internal fun getNumSections(): Int {
-        return sections.size
-    }
+    internal fun getNumSections(): Int = sections.size
 
-    internal fun getSummaryColor(): Color {
-        return summaryColor
-    }
+    internal fun getSummaryColor(): Color = summaryColor
 
-    internal fun getSectionHeader(idx: Int): String {
-        return sections[idx].header
-    }
+    internal fun getSectionHeader(idx: Int): String = sections[idx].header
 
-    internal fun getValueColor(sectionIdx: Int, valueIdx: Int): Color {
-        return sections[sectionIdx].values[valueIdx].first
-    }
+    internal fun getValueColor(sectionIdx: Int, valueIdx: Int): Color = sections[sectionIdx].values[valueIdx].first
 
-    internal fun getValue(sectionIdx: Int, valueIdx: Int): String {
-        return sections[sectionIdx].values[valueIdx].second
-    }
+    internal fun getValue(sectionIdx: Int, valueIdx: Int): String = sections[sectionIdx].values[valueIdx].second
 
     var valueFontSize = 0
     var headerFontSize = 0

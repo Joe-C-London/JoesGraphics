@@ -21,8 +21,7 @@ class BattlefieldScreen private constructor(header: Flow.Publisher<out String?>,
     companion object {
         private const val DEFAULT_LIMIT = 0.80
 
-        fun <T> Flow.Publisher<out Map<T, Map<out Party, Int>>>.convertToPartyOrCandidateForBattlefield() =
-            map { it.mapValues { e -> e.value.convertToPartyOrCandidate() } }
+        fun <T> Flow.Publisher<out Map<T, Map<out Party, Int>>>.convertToPartyOrCandidateForBattlefield() = map { it.mapValues { e -> e.value.convertToPartyOrCandidate() } }
 
         class Parties internal constructor() {
             lateinit var left: Flow.Publisher<Party>

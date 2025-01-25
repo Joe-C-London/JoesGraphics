@@ -36,7 +36,8 @@ class MultiResultScreen private constructor(
     header: Flow.Publisher<out String?>,
     screen: JPanel,
     altText: Flow.Publisher<String>,
-) : GenericPanel(screen, header, altText), AltTextProvider {
+) : GenericPanel(screen, header, altText),
+    AltTextProvider {
     private val panels: MutableList<ResultPanel> = ArrayList()
 
     class CurrVotes<T> internal constructor() {
@@ -265,13 +266,9 @@ class MultiResultScreen private constructor(
         private inner class ResultPanelLayout : LayoutManager {
             override fun addLayoutComponent(name: String, comp: Component) {}
             override fun removeLayoutComponent(comp: Component) {}
-            override fun preferredLayoutSize(parent: Container): Dimension? {
-                return null
-            }
+            override fun preferredLayoutSize(parent: Container): Dimension? = null
 
-            override fun minimumLayoutSize(parent: Container): Dimension? {
-                return null
-            }
+            override fun minimumLayoutSize(parent: Container): Dimension? = null
 
             override fun layoutContainer(parent: Container) {
                 val width = parent.width
@@ -333,16 +330,14 @@ class MultiResultScreen private constructor(
             prev: (PrevPartyVotes<T>.() -> Unit)? = null,
             map: ((T) -> AbstractSingleResultMap<*, *>)? = null,
             title: Flow.Publisher<out String?>,
-        ): MultiResultScreen {
-            return build(
-                list,
-                CurrVotes<T>().apply(curr),
-                prev?.let { PrevPartyVotes<T>().apply(it) },
-                map,
-                false,
-                title,
-            )
-        }
+        ): MultiResultScreen = build(
+            list,
+            CurrVotes<T>().apply(curr),
+            prev?.let { PrevPartyVotes<T>().apply(it) },
+            map,
+            false,
+            title,
+        )
 
         fun <T> ofParties(
             list: Flow.Publisher<out List<T>>,

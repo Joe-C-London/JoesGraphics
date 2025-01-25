@@ -22,12 +22,10 @@ object SwingFrameBuilder {
         var swing = 0.0
         private var partyFilter: Collection<PartyOrCoalition>? = null
 
-        fun leftParty(comparator: List<PartyOrCoalition>): PartyOrCoalition? {
-            return when (rightParty(comparator)) {
-                null -> null
-                fromParty -> toParty
-                else -> fromParty
-            }
+        fun leftParty(comparator: List<PartyOrCoalition>): PartyOrCoalition? = when (rightParty(comparator)) {
+            null -> null
+            fromParty -> toParty
+            else -> fromParty
         }
 
         fun rightParty(comparator: List<PartyOrCoalition>): PartyOrCoalition? {
@@ -86,9 +84,7 @@ object SwingFrameBuilder {
             publisher.submit(this)
         }
 
-        private fun List<PartyOrCoalition>.comparator(): Comparator<PartyOrCoalition> {
-            return Comparator.comparing { party -> indexOf(party).takeUnless { it == -1 } ?: indexOf(Party.OTHERS) }
-        }
+        private fun List<PartyOrCoalition>.comparator(): Comparator<PartyOrCoalition> = Comparator.comparing { party -> indexOf(party).takeUnless { it == -1 } ?: indexOf(Party.OTHERS) }
     }
 
     fun prevCurr(
@@ -99,9 +95,7 @@ object SwingFrameBuilder {
         range: Flow.Publisher<out Number>? = null,
         header: Flow.Publisher<out String?>,
         progress: Flow.Publisher<out String?>? = null,
-    ): SwingFrame {
-        return prevCurr(prev, curr, partyOrder, false, selectedParties, range, header, progress)
-    }
+    ): SwingFrame = prevCurr(prev, curr, partyOrder, false, selectedParties, range, header, progress)
 
     private fun <POC : PartyOrCoalition, C : Map<out POC, Number>, P : Map<out POC, Number>> prevCurr(
         prev: Flow.Publisher<out P>,
@@ -169,9 +163,7 @@ object SwingFrameBuilder {
         range: Flow.Publisher<out Number>? = null,
         header: Flow.Publisher<out String?>,
         progress: Flow.Publisher<out String?>? = null,
-    ): SwingFrame {
-        return prevCurr(prevPublisher, currPublisher, partyOrder, true, null, range, header, progress)
-    }
+    ): SwingFrame = prevCurr(prevPublisher, currPublisher, partyOrder, true, null, range, header, progress)
 
     fun <T> basic(
         item: Flow.Publisher<out T>,
@@ -183,23 +175,21 @@ object SwingFrameBuilder {
         range: Flow.Publisher<out Number>? = null,
         header: Flow.Publisher<out String?>,
         progress: Flow.Publisher<out String?>? = null,
-    ): SwingFrame {
-        return SwingFrame(
-            leftColorPublisher = item.map(leftColor),
-            rightColorPublisher = item.map(rightColor),
-            valuePublisher = item.map(value),
-            bottomTextPublisher = item.map(text),
-            bottomColorPublisher = item.merge(neutralColor) { it, neutral ->
-                val v = it.value()
-                when {
-                    v.toDouble() > 0 -> it.leftColor()
-                    v.toDouble() < 0 -> it.rightColor()
-                    else -> neutral
-                }
-            },
-            rangePublisher = range ?: 1.asOneTimePublisher(),
-            headerPublisher = header,
-            progressPublisher = progress,
-        )
-    }
+    ): SwingFrame = SwingFrame(
+        leftColorPublisher = item.map(leftColor),
+        rightColorPublisher = item.map(rightColor),
+        valuePublisher = item.map(value),
+        bottomTextPublisher = item.map(text),
+        bottomColorPublisher = item.merge(neutralColor) { it, neutral ->
+            val v = it.value()
+            when {
+                v.toDouble() > 0 -> it.leftColor()
+                v.toDouble() < 0 -> it.rightColor()
+                else -> neutral
+            }
+        },
+        rangePublisher = range ?: 1.asOneTimePublisher(),
+        headerPublisher = header,
+        progressPublisher = progress,
+    )
 }

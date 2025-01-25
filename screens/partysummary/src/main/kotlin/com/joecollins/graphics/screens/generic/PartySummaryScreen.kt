@@ -58,13 +58,9 @@ class PartySummaryScreen private constructor(
             others.remove(comp)
         }
 
-        override fun preferredLayoutSize(parent: Container): Dimension {
-            return DEFAULT_SIZE
-        }
+        override fun preferredLayoutSize(parent: Container): Dimension = DEFAULT_SIZE
 
-        override fun minimumLayoutSize(parent: Container): Dimension {
-            return Dimension(128, 64)
-        }
+        override fun minimumLayoutSize(parent: Container): Dimension = Dimension(128, 64)
 
         override fun layoutContainer(parent: Container) {
             val numOtherCols = ceil(1.0 * others.size / numRows).toInt()
@@ -182,17 +178,15 @@ class PartySummaryScreen private constructor(
             regions: List<T>,
             party: Flow.Publisher<out PartyOrCoalition>,
             partyChanges: Flow.Publisher<Map<Party, Party>>? = null,
-        ): PartySummaryScreen {
-            return build(
-                mainRegion,
-                header,
-                numRows,
-                seats?.let { Seats<T>(partyChanges).apply(it) },
-                votes?.let { Votes<T>(partyChanges).apply(it) },
-                regions,
-                party,
-            )
-        }
+        ): PartySummaryScreen = build(
+            mainRegion,
+            header,
+            numRows,
+            seats?.let { Seats<T>(partyChanges).apply(it) },
+            votes?.let { Votes<T>(partyChanges).apply(it) },
+            regions,
+            party,
+        )
 
         private fun <T> build(
             mainRegion: T,
@@ -202,15 +196,13 @@ class PartySummaryScreen private constructor(
             votes: Votes<T>?,
             regions: List<T>,
             party: Flow.Publisher<out PartyOrCoalition>,
-        ): PartySummaryScreen {
-            return PartySummaryScreen(
-                party,
-                createFrame(mainRegion, header, party, seats, votes),
-                regions.map { createFrame(it, header, party, seats, votes) },
-                numRows,
-                createAltText(party, header, mainRegion, regions, seats, votes),
-            )
-        }
+        ): PartySummaryScreen = PartySummaryScreen(
+            party,
+            createFrame(mainRegion, header, party, seats, votes),
+            regions.map { createFrame(it, header, party, seats, votes) },
+            numRows,
+            createAltText(party, header, mainRegion, regions, seats, votes),
+        )
 
         private fun <T> createFrame(
             region: T,

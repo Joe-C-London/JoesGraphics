@@ -50,13 +50,9 @@ class HemicycleFrame(
     private inner class Layout : LayoutManager {
         override fun addLayoutComponent(name: String, comp: Component) {}
         override fun removeLayoutComponent(comp: Component) {}
-        override fun preferredLayoutSize(parent: Container): Dimension? {
-            return null
-        }
+        override fun preferredLayoutSize(parent: Container): Dimension? = null
 
-        override fun minimumLayoutSize(parent: Container): Dimension? {
-            return null
-        }
+        override fun minimumLayoutSize(parent: Container): Dimension? = null
 
         override fun layoutContainer(parent: Container) {
             var mid = 0
@@ -76,103 +72,63 @@ class HemicycleFrame(
     internal val numRows: Int
         get() = dotsPanel.rows.size
 
-    internal fun getRowCount(rowNum: Int): Int {
-        return dotsPanel.rows[rowNum]
-    }
+    internal fun getRowCount(rowNum: Int): Int = dotsPanel.rows[rowNum]
 
     internal val numDots: Int
         get() = dotsPanel.dots.size
 
-    internal fun getDotColor(dotNum: Int): Color {
-        return dotsPanel.dots[dotNum].color
-    }
+    internal fun getDotColor(dotNum: Int): Color = dotsPanel.dots[dotNum].color
 
-    internal fun getDotBorder(dotNum: Int): Color? {
-        return dotsPanel.dots[dotNum].border
-    }
+    internal fun getDotBorder(dotNum: Int): Color? = dotsPanel.dots[dotNum].border
 
     internal val leftSeatBarCount: Int
         get() = barsPanel.leftSeatBars.let { it ?: emptyList() }.size
 
-    internal fun getLeftSeatBarColor(idx: Int): Color {
-        return barsPanel.leftSeatBars.let { it ?: emptyList() }[idx].color
-    }
+    internal fun getLeftSeatBarColor(idx: Int): Color = barsPanel.leftSeatBars.let { it ?: emptyList() }[idx].color
 
-    internal fun getLeftSeatBarSize(idx: Int): Int {
-        return barsPanel.leftSeatBars.let { it ?: emptyList() }[idx].size
-    }
+    internal fun getLeftSeatBarSize(idx: Int): Int = barsPanel.leftSeatBars.let { it ?: emptyList() }[idx].size
 
-    internal fun getLeftSeatBarLabel(): String {
-        return barsPanel.leftSeatBarLabel
-    }
+    internal fun getLeftSeatBarLabel(): String = barsPanel.leftSeatBarLabel
 
     internal val rightSeatBarCount: Int
         get() = barsPanel.rightSeatBars.let { it ?: emptyList() }.size
 
-    internal fun getRightSeatBarColor(idx: Int): Color {
-        return barsPanel.rightSeatBars.let { it ?: emptyList() }[idx].color
-    }
+    internal fun getRightSeatBarColor(idx: Int): Color = barsPanel.rightSeatBars.let { it ?: emptyList() }[idx].color
 
-    internal fun getRightSeatBarSize(idx: Int): Int {
-        return barsPanel.rightSeatBars.let { it ?: emptyList() }[idx].size
-    }
+    internal fun getRightSeatBarSize(idx: Int): Int = barsPanel.rightSeatBars.let { it ?: emptyList() }[idx].size
 
-    internal fun getRightSeatBarLabel(): String {
-        return barsPanel.rightSeatBarLabel
-    }
+    internal fun getRightSeatBarLabel(): String = barsPanel.rightSeatBarLabel
 
     internal val middleSeatBarCount: Int
         get() = barsPanel.middleSeatBars.let { it ?: emptyList() }.size
 
-    internal fun getMiddleSeatBarColor(idx: Int): Color {
-        return barsPanel.middleSeatBars.let { it ?: emptyList() }[idx].color
-    }
+    internal fun getMiddleSeatBarColor(idx: Int): Color = barsPanel.middleSeatBars.let { it ?: emptyList() }[idx].color
 
-    internal fun getMiddleSeatBarSize(idx: Int): Int {
-        return barsPanel.middleSeatBars.let { it ?: emptyList() }[idx].size
-    }
+    internal fun getMiddleSeatBarSize(idx: Int): Int = barsPanel.middleSeatBars.let { it ?: emptyList() }[idx].size
 
-    internal fun getMiddleSeatBarLabel(): String {
-        return barsPanel.middleSeatBarLabel
-    }
+    internal fun getMiddleSeatBarLabel(): String = barsPanel.middleSeatBarLabel
 
     internal val leftChangeBarCount: Int
         get() = barsPanel.leftChangeBars.let { it ?: emptyList() }.size
 
-    internal fun getLeftChangeBarColor(idx: Int): Color {
-        return barsPanel.leftChangeBars.let { it ?: emptyList() }[idx].color
-    }
+    internal fun getLeftChangeBarColor(idx: Int): Color = barsPanel.leftChangeBars.let { it ?: emptyList() }[idx].color
 
-    internal fun getLeftChangeBarSize(idx: Int): Int {
-        return barsPanel.leftChangeBars.let { it ?: emptyList() }[idx].size
-    }
+    internal fun getLeftChangeBarSize(idx: Int): Int = barsPanel.leftChangeBars.let { it ?: emptyList() }[idx].size
 
-    internal fun getLeftChangeBarStart(): Int {
-        return barsPanel.leftChangeBarStart
-    }
+    internal fun getLeftChangeBarStart(): Int = barsPanel.leftChangeBarStart
 
-    internal fun getLeftChangeBarLabel(): String {
-        return barsPanel.leftChangeBarLabel
-    }
+    internal fun getLeftChangeBarLabel(): String = barsPanel.leftChangeBarLabel
 
     internal val rightChangeBarCount: Int
         get() = barsPanel.rightChangeBars.let { it ?: emptyList() }.size
 
-    internal fun getRightChangeBarColor(idx: Int): Color {
-        return barsPanel.rightChangeBars.let { it ?: emptyList() }[idx].color
-    }
+    internal fun getRightChangeBarColor(idx: Int): Color = barsPanel.rightChangeBars.let { it ?: emptyList() }[idx].color
 
-    internal fun getRightChangeBarSize(idx: Int): Int {
-        return barsPanel.rightChangeBars.let { it ?: emptyList() }[idx].size
-    }
+    internal fun getRightChangeBarSize(idx: Int): Int = barsPanel.rightChangeBars.let { it ?: emptyList() }[idx].size
 
-    internal fun getRightChangeBarStart(): Int {
-        return barsPanel.rightChangeBarStart
-    }
+    internal fun getRightChangeBarStart(): Int = barsPanel.rightChangeBarStart
 
-    internal fun getRightChangeBarLabel(): String {
-        return barsPanel.rightChangeBarLabel
-    }
+    internal fun getRightChangeBarLabel(): String = barsPanel.rightChangeBarLabel
 
     class Bar(val color: Color, val size: Int)
 
@@ -190,25 +146,21 @@ class HemicycleFrame(
         var rightChangeBarLabel = ""
         var rightChangeBarStart = 0
 
-        fun hasSeats(): Boolean {
-            return (
-                leftSeatBars != null ||
-                    middleSeatBars != null ||
-                    rightSeatBars != null ||
-                    leftSeatBarLabel.isNotEmpty() ||
-                    middleSeatBarLabel.isNotEmpty() ||
-                    rightSeatBarLabel.isNotEmpty()
-                )
-        }
+        fun hasSeats(): Boolean = (
+            leftSeatBars != null ||
+                middleSeatBars != null ||
+                rightSeatBars != null ||
+                leftSeatBarLabel.isNotEmpty() ||
+                middleSeatBarLabel.isNotEmpty() ||
+                rightSeatBarLabel.isNotEmpty()
+            )
 
-        fun hasChange(): Boolean {
-            return (
-                leftChangeBars != null ||
-                    rightChangeBars != null ||
-                    leftChangeBarLabel.isNotEmpty() ||
-                    rightChangeBarLabel.isNotEmpty()
-                )
-        }
+        fun hasChange(): Boolean = (
+            leftChangeBars != null ||
+                rightChangeBars != null ||
+                leftChangeBarLabel.isNotEmpty() ||
+                rightChangeBarLabel.isNotEmpty()
+            )
 
         override fun paintComponent(g: Graphics) {
             super.paintComponent(g)
@@ -402,13 +354,9 @@ class HemicycleFrame(
             g.clip = oldClip
         }
 
-        private fun getLeftPosition(seats: Int): Int {
-            return getSize(seats)
-        }
+        private fun getLeftPosition(seats: Int): Int = getSize(seats)
 
-        private fun getRightPosition(seats: Int): Int {
-            return width - getSize(seats)
-        }
+        private fun getRightPosition(seats: Int): Int = width - getSize(seats)
 
         private fun getMiddleStartPosition(seats: Int): Int {
             val midSize = getSize(middleSeatBars?.sumOf { it.size } ?: 0)
@@ -428,13 +376,9 @@ class HemicycleFrame(
             return midPoint - getSize(seats) / 2
         }
 
-        private fun getMiddleEndPosition(seats: Int): Int {
-            return getMiddleStartPosition(seats) + getSize(seats)
-        }
+        private fun getMiddleEndPosition(seats: Int): Int = getMiddleStartPosition(seats) + getSize(seats)
 
-        private fun getSize(seats: Int): Int {
-            return (1.0 * width * seats / numDots).roundToInt()
-        }
+        private fun getSize(seats: Int): Int = (1.0 * width * seats / numDots).roundToInt()
 
         init {
             background = Color.WHITE

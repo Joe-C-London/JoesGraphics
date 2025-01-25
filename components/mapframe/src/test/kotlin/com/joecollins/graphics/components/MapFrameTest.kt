@@ -148,26 +148,22 @@ class MapFrameTest {
         }.toList()
     }
 
-    private fun getDistrictColor(district: Int): Color {
-        return when (district) {
-            4, 2, 3, 7, 1, 6, 19, 15, 20, 18, 8, 9, 26 -> Color.BLUE
-            16, 14, 10, 24, 25, 27 -> Color.RED
-            5, 17, 11, 13, 12, 22, 21, 23 -> Color.GREEN
-            else -> Color.BLACK
-        }
+    private fun getDistrictColor(district: Int): Color = when (district) {
+        4, 2, 3, 7, 1, 6, 19, 15, 20, 18, 8, 9, 26 -> Color.BLUE
+        16, 14, 10, 24, 25, 27 -> Color.RED
+        5, 17, 11, 13, 12, 22, 21, 23 -> Color.GREEN
+        else -> Color.BLACK
     }
 
-    private fun loadCityBox(): Rectangle2D {
-        return shapesByDistrict().entries.asSequence()
-            .filter { it.key in 10..14 }
-            .map { Area(it.value) }
-            .reduce { acc, area ->
-                val ret = Area(acc)
-                ret.add(area)
-                ret
-            }
-            .bounds2D
-    }
+    private fun loadCityBox(): Rectangle2D = shapesByDistrict().entries.asSequence()
+        .filter { it.key in 10..14 }
+        .map { Area(it.value) }
+        .reduce { acc, area ->
+            val ret = Area(acc)
+            ret.add(area)
+            ret
+        }
+        .bounds2D
 
     private fun shapesByDistrict(): Map<Int, Shape> {
         val peiMap = MapFrameTest::class.java

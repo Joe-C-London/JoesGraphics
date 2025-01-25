@@ -38,32 +38,20 @@ class MultiSummaryFrame(
     internal val numRows: Int
         get() = entries.size
 
-    internal fun getRowHeader(index: Int): String {
-        return entries[index].headerLabel.text
-    }
+    internal fun getRowHeader(index: Int): String = entries[index].headerLabel.text
 
-    internal fun getNumValues(index: Int): Int {
-        return entries[index].panels.size
-    }
+    internal fun getNumValues(index: Int): Int = entries[index].panels.size
 
-    internal fun getColor(row: Int, col: Int): Color {
-        return entries[row].panels[col].background
-    }
+    internal fun getColor(row: Int, col: Int): Color = entries[row].panels[col].background
 
-    internal fun getValue(row: Int, col: Int): String {
-        return entries[row].labels[col].text
-    }
+    internal fun getValue(row: Int, col: Int): String = entries[row].labels[col].text
 
     private inner class FrameLayout : LayoutManager {
         override fun addLayoutComponent(name: String, comp: Component) {}
         override fun removeLayoutComponent(comp: Component) {}
-        override fun preferredLayoutSize(parent: Container): Dimension {
-            return Dimension(1024, 24 * entries.size)
-        }
+        override fun preferredLayoutSize(parent: Container): Dimension = Dimension(1024, 24 * entries.size)
 
-        override fun minimumLayoutSize(parent: Container): Dimension {
-            return Dimension(50, 10 * entries.size)
-        }
+        override fun minimumLayoutSize(parent: Container): Dimension = Dimension(50, 10 * entries.size)
 
         override fun layoutContainer(parent: Container) {
             val entryHeight = (parent.height / entries.size.coerceAtLeast(1)).coerceAtMost(24)
@@ -82,13 +70,9 @@ class MultiSummaryFrame(
         private inner class EntryLayout : LayoutManager {
             override fun addLayoutComponent(name: String, comp: Component) {}
             override fun removeLayoutComponent(comp: Component) {}
-            override fun preferredLayoutSize(parent: Container): Dimension {
-                return Dimension(1024, 24)
-            }
+            override fun preferredLayoutSize(parent: Container): Dimension = Dimension(1024, 24)
 
-            override fun minimumLayoutSize(parent: Container): Dimension {
-                return Dimension(50, 10)
-            }
+            override fun minimumLayoutSize(parent: Container): Dimension = Dimension(50, 10)
 
             override fun layoutContainer(parent: Container) {
                 val width = parent.width

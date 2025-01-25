@@ -111,11 +111,9 @@ class ProjectionFrameTest {
         compareRendering("ProjectionFrame", "Center", frame)
     }
 
-    private fun peiLeg(): Image {
-        return ImageIO.read(
-            ProjectionFrameTest::class.java
-                .classLoader
-                .getResource("com/joecollins/graphics/pei-leg.png"),
-        )
-    }
+    private fun peiLeg(): Image = ImageIO.read(
+        ProjectionFrameTest::class.java
+            .classLoader
+            .getResource("com/joecollins/graphics/pei-leg.png"),
+    )
 }

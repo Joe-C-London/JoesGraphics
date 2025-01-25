@@ -18,7 +18,9 @@ import java.util.concurrent.Flow
 import javax.swing.JPanel
 import kotlin.math.absoluteValue
 
-class RegionalVotesScreen private constructor(subPanels: List<GenericPanel>) : JPanel(), AltTextProvider {
+class RegionalVotesScreen private constructor(subPanels: List<GenericPanel>) :
+    JPanel(),
+    AltTextProvider {
 
     init {
         background = Color.WHITE
@@ -43,23 +45,21 @@ class RegionalVotesScreen private constructor(subPanels: List<GenericPanel>) : J
             changeSubhead: R.() -> Flow.Publisher<out String?> = { null.asOneTimePublisher() },
             pctReporting: (R.() -> Flow.Publisher<Double>)? = null,
             progressLabel: (R.() -> Flow.Publisher<out String?>)? = null,
-        ): RegionalVotesScreen {
-            return RegionalVotesScreen(
-                regions.map {
-                    buildPanel(
-                        it.title(),
-                        it.currVotes(),
-                        it.prevVotes(),
-                        it.voteHeader(),
-                        it.changeHeader(),
-                        it.voteSubhead(),
-                        it.changeSubhead(),
-                        pctReporting?.invoke(it),
-                        progressLabel?.invoke(it),
-                    )
-                },
-            )
-        }
+        ): RegionalVotesScreen = RegionalVotesScreen(
+            regions.map {
+                buildPanel(
+                    it.title(),
+                    it.currVotes(),
+                    it.prevVotes(),
+                    it.voteHeader(),
+                    it.changeHeader(),
+                    it.voteSubhead(),
+                    it.changeSubhead(),
+                    pctReporting?.invoke(it),
+                    progressLabel?.invoke(it),
+                )
+            },
+        )
 
         private fun buildPanel(
             title: Flow.Publisher<String>,

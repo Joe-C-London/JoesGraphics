@@ -20,12 +20,8 @@ object StandardFont {
     private val normalFont = { size: Int -> KLAVIKA_REGULAR.deriveFont(Font.PLAIN, size.toFloat()) }
 
     @Synchronized
-    fun readBoldFont(size: Int): Font {
-        return boldFontCache.computeIfAbsent(size, boldFont)
-    }
+    fun readBoldFont(size: Int): Font = boldFontCache.computeIfAbsent(size, boldFont)
 
     @Synchronized
-    fun readNormalFont(size: Int): Font {
-        return normalFontCache.computeIfAbsent(size, normalFont)
-    }
+    fun readNormalFont(size: Int): Font = normalFontCache.computeIfAbsent(size, normalFont)
 }

@@ -64,11 +64,9 @@ object RenderTestUtils {
         return img
     }
 
-    private fun getChildDepth(component: Component): Int {
-        return if (component is Container && component.components.isNotEmpty()) {
-            component.components.maxOf { getChildDepth(it) } + 1
-        } else {
-            1
-        }
+    private fun getChildDepth(component: Component): Int = if (component is Container && component.components.isNotEmpty()) {
+        component.components.maxOf { getChildDepth(it) } + 1
+    } else {
+        1
     }
 }

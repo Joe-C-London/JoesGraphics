@@ -60,13 +60,9 @@ class SwingometerFrame(
     internal val numTicks: Int
         get() = swingPanel.ticks.size
 
-    internal fun getTickPosition(index: Int): Number {
-        return swingPanel.ticks[index].position
-    }
+    internal fun getTickPosition(index: Int): Number = swingPanel.ticks[index].position
 
-    internal fun getTickText(index: Int): String {
-        return swingPanel.ticks[index].text
-    }
+    internal fun getTickText(index: Int): String = swingPanel.ticks[index].text
 
     internal val leftToWin: Number
         get() = swingPanel.leftToWin
@@ -77,17 +73,11 @@ class SwingometerFrame(
     internal val numOuterLabels: Int
         get() = swingPanel.outerLabels.size
 
-    internal fun getOuterLabelPosition(index: Int): Number {
-        return swingPanel.outerLabels[index].position
-    }
+    internal fun getOuterLabelPosition(index: Int): Number = swingPanel.outerLabels[index].position
 
-    internal fun getOuterLabelText(index: Int): String {
-        return swingPanel.outerLabels[index].text
-    }
+    internal fun getOuterLabelText(index: Int): String = swingPanel.outerLabels[index].text
 
-    internal fun getOuterLabelColor(index: Int): Color {
-        return swingPanel.outerLabels[index].color
-    }
+    internal fun getOuterLabelColor(index: Int): Color = swingPanel.outerLabels[index].color
 
     internal val numBucketsPerSide: Int
         get() = swingPanel.numBucketsPerSide
@@ -95,21 +85,13 @@ class SwingometerFrame(
     internal val numDots: Int
         get() = swingPanel.dots.size
 
-    internal fun getDotPosition(index: Int): Number {
-        return swingPanel.dots[index].position
-    }
+    internal fun getDotPosition(index: Int): Number = swingPanel.dots[index].position
 
-    internal fun getDotColor(index: Int): Color {
-        return swingPanel.dots[index].color
-    }
+    internal fun getDotColor(index: Int): Color = swingPanel.dots[index].color
 
-    internal fun getDotLabel(index: Int): String {
-        return swingPanel.dots[index].label
-    }
+    internal fun getDotLabel(index: Int): String = swingPanel.dots[index].label
 
-    internal fun isDotSolid(index: Int): Boolean {
-        return swingPanel.dots[index].solid
-    }
+    internal fun isDotSolid(index: Int): Boolean = swingPanel.dots[index].solid
 
     class Dot(val position: Number, val color: Color, val label: String = "", val solid: Boolean = true)
 

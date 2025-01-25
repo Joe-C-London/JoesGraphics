@@ -10,19 +10,20 @@ import java.awt.GridLayout
 import java.util.concurrent.Flow
 import javax.swing.JPanel
 
-class SeatsVotesScreen private constructor(seats: SeatViewPanel, votes: SimpleVoteViewPanel, title: Flow.Publisher<out String?>) : GenericPanel(
-    JPanel().apply {
-        background = Color.WHITE
-        layout = GridLayout(1, 2)
+class SeatsVotesScreen private constructor(seats: SeatViewPanel, votes: SimpleVoteViewPanel, title: Flow.Publisher<out String?>) :
+    GenericPanel(
+        JPanel().apply {
+            background = Color.WHITE
+            layout = GridLayout(1, 2)
 
-        add(seats)
-        add(votes)
-    },
-    title,
-    title
-        .merge(seats.altText) { h, s -> "$h\n\n$s" }
-        .merge(votes.altText) { h, v -> "$h\n\n$v" },
-) {
+            add(seats)
+            add(votes)
+        },
+        title,
+        title
+            .merge(seats.altText) { h, s -> "$h\n\n$s" }
+            .merge(votes.altText) { h, v -> "$h\n\n$v" },
+    ) {
 
     class Seats internal constructor() {
         lateinit var header: Flow.Publisher<out String?>
@@ -264,60 +265,50 @@ class SeatsVotesScreen private constructor(seats: SeatViewPanel, votes: SimpleVo
             seats: Seats.() -> Unit,
             votes: Votes.() -> Unit,
             title: Flow.Publisher<out String?>,
-        ): SeatsVotesScreen {
-            return SeatsVotesScreen(
-                Seats().apply(seats).buildFrame(),
-                Votes().apply(votes).buildFrame(),
-                title,
-            )
-        }
+        ): SeatsVotesScreen = SeatsVotesScreen(
+            Seats().apply(seats).buildFrame(),
+            Votes().apply(votes).buildFrame(),
+            title,
+        )
 
         fun ofElectedLeading(
             seats: DualSeats.() -> Unit,
             votes: Votes.() -> Unit,
             title: Flow.Publisher<out String?>,
-        ): SeatsVotesScreen {
-            return SeatsVotesScreen(
-                DualSeats().apply(seats).buildFrame(),
-                Votes().apply(votes).buildFrame(),
-                title,
-            )
-        }
+        ): SeatsVotesScreen = SeatsVotesScreen(
+            DualSeats().apply(seats).buildFrame(),
+            Votes().apply(votes).buildFrame(),
+            title,
+        )
 
         fun ofRange(
             seats: SeatRange.() -> Unit,
             votes: VotesRange.() -> Unit,
             title: Flow.Publisher<out String?>,
-        ): SeatsVotesScreen {
-            return SeatsVotesScreen(
-                SeatRange().apply(seats).buildFrame(),
-                VotesRange().apply(votes).buildFrame(),
-                title,
-            )
-        }
+        ): SeatsVotesScreen = SeatsVotesScreen(
+            SeatRange().apply(seats).buildFrame(),
+            VotesRange().apply(votes).buildFrame(),
+            title,
+        )
 
         fun ofCandidates(
             seats: CandidateSeats.() -> Unit,
             votes: CandidateVotes.() -> Unit,
             title: Flow.Publisher<out String?>,
-        ): SeatsVotesScreen {
-            return SeatsVotesScreen(
-                CandidateSeats().apply(seats).buildFrame(),
-                CandidateVotes().apply(votes).buildFrame(),
-                title,
-            )
-        }
+        ): SeatsVotesScreen = SeatsVotesScreen(
+            CandidateSeats().apply(seats).buildFrame(),
+            CandidateVotes().apply(votes).buildFrame(),
+            title,
+        )
 
         fun ofCandidatesElectedLeading(
             seats: CandidateDualSeats.() -> Unit,
             votes: CandidateVotes.() -> Unit,
             title: Flow.Publisher<out String?>,
-        ): SeatsVotesScreen {
-            return SeatsVotesScreen(
-                CandidateDualSeats().apply(seats).buildFrame(),
-                CandidateVotes().apply(votes).buildFrame(),
-                title,
-            )
-        }
+        ): SeatsVotesScreen = SeatsVotesScreen(
+            CandidateDualSeats().apply(seats).buildFrame(),
+            CandidateVotes().apply(votes).buildFrame(),
+            title,
+        )
     }
 }

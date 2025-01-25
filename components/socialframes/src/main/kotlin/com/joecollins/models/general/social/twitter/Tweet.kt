@@ -24,20 +24,18 @@ class Tweet(
     override val url: URL = URL("https://twitter.com/${user.screenName}/status/$id")
 
     companion object {
-        fun fromV1(status: twitter4j.Status): Tweet {
-            return Tweet(
-                status.id,
-                status.text,
-                User.fromV1(status.user),
-                status.createdAt.toInstant(),
-                status.quotedStatus?.let { fromV1(it) },
-                status.urlEntities.map { Link.fromV1(it) },
-                status.mediaEntities.map { Media.fromV1(it) },
-                status.hashtagEntities.map { Hashtag.fromV1(it) },
-                status.userMentionEntities.map { UserMention.fromV1(it) },
-                emptyList(),
-            )
-        }
+        fun fromV1(status: twitter4j.Status): Tweet = Tweet(
+            status.id,
+            status.text,
+            User.fromV1(status.user),
+            status.createdAt.toInstant(),
+            status.quotedStatus?.let { fromV1(it) },
+            status.urlEntities.map { Link.fromV1(it) },
+            status.mediaEntities.map { Media.fromV1(it) },
+            status.hashtagEntities.map { Hashtag.fromV1(it) },
+            status.userMentionEntities.map { UserMention.fromV1(it) },
+            emptyList(),
+        )
 
         fun fromV2(tweet: com.twitter.clientlib.model.Tweet, expansions: com.twitter.clientlib.model.Expansions, quotedTweet: Tweet?): Tweet {
             val user = expansions.users

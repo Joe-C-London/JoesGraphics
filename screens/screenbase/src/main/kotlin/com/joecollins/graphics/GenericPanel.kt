@@ -21,7 +21,8 @@ open class GenericPanel(
     panel: JPanel,
     label: Flow.Publisher<out String?>,
     override val altText: Flow.Publisher<out String?> = createAltText(panel, label),
-) : JPanel(), AltTextProvider {
+) : JPanel(),
+    AltTextProvider {
 
     constructor(
         panel: JPanel.() -> Unit,
@@ -69,20 +70,14 @@ open class GenericPanel(
     companion object {
         val DEFAULT_SIZE = Dimension(1024, 1024 / 16 * 9)
 
-        fun Dimension.scale(factor: Double): Dimension {
-            return Dimension((width * factor).roundToInt(), (height * factor).roundToInt())
-        }
+        fun Dimension.scale(factor: Double): Dimension = Dimension((width * factor).roundToInt(), (height * factor).roundToInt())
 
-        fun pad(panel: JPanel): JPanel {
-            return panel.pad()
-        }
+        fun pad(panel: JPanel): JPanel = panel.pad()
 
-        private fun createAltText(panel: JPanel, label: Flow.Publisher<out String?>): Flow.Publisher<String?> {
-            return if (panel is AltTextProvider) {
-                panel.altText.merge(label) { alt, lab -> if (alt == null) null else ((lab?.let { "$it\n" } ?: "") + alt) }
-            } else {
-                null.asOneTimePublisher()
-            }
+        private fun createAltText(panel: JPanel, label: Flow.Publisher<out String?>): Flow.Publisher<String?> = if (panel is AltTextProvider) {
+            panel.altText.merge(label) { alt, lab -> if (alt == null) null else ((lab?.let { "$it\n" } ?: "") + alt) }
+        } else {
+            null.asOneTimePublisher()
         }
     }
 }

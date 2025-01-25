@@ -57,9 +57,7 @@ class GenericWindow<T : JPanel> constructor(private val panel: T, title: String)
                     return name.endsWith(".png")
                 }
 
-                override fun getDescription(): String {
-                    return "PNG file (*.png)"
-                }
+                override fun getDescription(): String = "PNG file (*.png)"
             }
             if (fileChooser.showSaveDialog(panel) == JFileChooser.APPROVE_OPTION) {
                 var file = fileChooser.selectedFile
@@ -84,20 +82,14 @@ class GenericWindow<T : JPanel> constructor(private val panel: T, title: String)
         private fun copyImageToClipboard(panel: JPanel) {
             val img = generateImage(panel)
             val transferableImage: Transferable = object : Transferable {
-                override fun getTransferDataFlavors(): Array<DataFlavor> {
-                    return arrayOf(DataFlavor.imageFlavor)
-                }
+                override fun getTransferDataFlavors(): Array<DataFlavor> = arrayOf(DataFlavor.imageFlavor)
 
-                override fun isDataFlavorSupported(flavor: DataFlavor): Boolean {
-                    return DataFlavor.imageFlavor.equals(flavor)
-                }
+                override fun isDataFlavorSupported(flavor: DataFlavor): Boolean = DataFlavor.imageFlavor.equals(flavor)
 
-                override fun getTransferData(flavor: DataFlavor): Any {
-                    return if (DataFlavor.imageFlavor.equals(flavor)) {
-                        img
-                    } else {
-                        throw UnsupportedFlavorException(flavor)
-                    }
+                override fun getTransferData(flavor: DataFlavor): Any = if (DataFlavor.imageFlavor.equals(flavor)) {
+                    img
+                } else {
+                    throw UnsupportedFlavorException(flavor)
                 }
             }
             val owner = ClipboardOwner { _: Clipboard?, _: Transferable? -> }
@@ -107,27 +99,21 @@ class GenericWindow<T : JPanel> constructor(private val panel: T, title: String)
 
         private fun copyAltTextToClipboard(html: String) {
             val transferableImage: Transferable = object : Transferable {
-                override fun getTransferDataFlavors(): Array<DataFlavor> {
-                    return arrayOf(DataFlavor.allHtmlFlavor, DataFlavor.stringFlavor)
-                }
+                override fun getTransferDataFlavors(): Array<DataFlavor> = arrayOf(DataFlavor.allHtmlFlavor, DataFlavor.stringFlavor)
 
-                override fun isDataFlavorSupported(flavor: DataFlavor): Boolean {
-                    return transferDataFlavors.contains(flavor)
-                }
+                override fun isDataFlavorSupported(flavor: DataFlavor): Boolean = transferDataFlavors.contains(flavor)
 
-                override fun getTransferData(flavor: DataFlavor): Any {
-                    return when (flavor) {
-                        DataFlavor.allHtmlFlavor -> {
-                            html
-                        }
-                        DataFlavor.stringFlavor -> {
-                            html.replace("<html>", "")
-                                .replace("</html>", "")
-                                .replace("<br/>", "\n")
-                        }
-                        else -> {
-                            throw UnsupportedFlavorException(flavor)
-                        }
+                override fun getTransferData(flavor: DataFlavor): Any = when (flavor) {
+                    DataFlavor.allHtmlFlavor -> {
+                        html
+                    }
+                    DataFlavor.stringFlavor -> {
+                        html.replace("<html>", "")
+                            .replace("</html>", "")
+                            .replace("<br/>", "\n")
+                    }
+                    else -> {
+                        throw UnsupportedFlavorException(flavor)
                     }
                 }
             }

@@ -152,15 +152,14 @@ class MultiSummaryFrameBuilderTest {
 
         val boxes = Publisher(calculateBoxes())
         private fun updateBoxes() = boxes.submit(calculateBoxes())
-        private fun calculateBoxes() =
-            results.entries.asSequence()
-                .sortedByDescending { it.value }
-                .map {
-                    Pair(
-                        it.key.color,
-                        it.key.abbreviation + ": " + it.value,
-                    )
-                }
-                .toList()
+        private fun calculateBoxes() = results.entries.asSequence()
+            .sortedByDescending { it.value }
+            .map {
+                Pair(
+                    it.key.color,
+                    it.key.abbreviation + ": " + it.value,
+                )
+            }
+            .toList()
     }
 }

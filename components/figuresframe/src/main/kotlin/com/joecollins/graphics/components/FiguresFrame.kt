@@ -37,25 +37,15 @@ class FiguresFrame(
     internal val numEntries: Int
         get() = entries.size
 
-    internal fun getColor(index: Int): Color {
-        return entries[index].foreground
-    }
+    internal fun getColor(index: Int): Color = entries[index].foreground
 
-    internal fun getName(index: Int): String {
-        return entries[index].nameLabel.text
-    }
+    internal fun getName(index: Int): String = entries[index].nameLabel.text
 
-    internal fun getDescription(index: Int): String {
-        return entries[index].descriptionLabel.text
-    }
+    internal fun getDescription(index: Int): String = entries[index].descriptionLabel.text
 
-    internal fun getResult(index: Int): String {
-        return entries[index].resultLabel.text
-    }
+    internal fun getResult(index: Int): String = entries[index].resultLabel.text
 
-    internal fun getResultColor(index: Int): Color {
-        return entries[index].resultPanel.background
-    }
+    internal fun getResultColor(index: Int): Color = entries[index].resultPanel.background
 
     private inner class EntryPanel : JPanel() {
         val nameLabel: FontSizeAdjustingLabel
@@ -98,13 +88,9 @@ class FiguresFrame(
         private inner class EntryLayout : LayoutManager {
             override fun addLayoutComponent(name: String, comp: Component) {}
             override fun removeLayoutComponent(comp: Component) {}
-            override fun preferredLayoutSize(parent: Container): Dimension {
-                return Dimension(1024, 30)
-            }
+            override fun preferredLayoutSize(parent: Container): Dimension = Dimension(1024, 30)
 
-            override fun minimumLayoutSize(parent: Container): Dimension {
-                return Dimension(50, 15)
-            }
+            override fun minimumLayoutSize(parent: Container): Dimension = Dimension(50, 15)
 
             override fun layoutContainer(parent: Container) {
                 val width = parent.width
@@ -125,13 +111,9 @@ class FiguresFrame(
     private inner class FrameLayout : LayoutManager {
         override fun addLayoutComponent(name: String, comp: Component) {}
         override fun removeLayoutComponent(comp: Component) {}
-        override fun preferredLayoutSize(parent: Container): Dimension {
-            return Dimension(1024, 30 * entries.size)
-        }
+        override fun preferredLayoutSize(parent: Container): Dimension = Dimension(1024, 30 * entries.size)
 
-        override fun minimumLayoutSize(parent: Container): Dimension {
-            return Dimension(50, 15 * entries.size)
-        }
+        override fun minimumLayoutSize(parent: Container): Dimension = Dimension(50, 15 * entries.size)
 
         override fun layoutContainer(parent: Container) {
             val entryHeight = (parent.height / entries.size.coerceAtLeast(1)).coerceAtMost(30)

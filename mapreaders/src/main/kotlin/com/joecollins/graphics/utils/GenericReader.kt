@@ -34,9 +34,7 @@ abstract class GenericReader {
         return readShapes(file) { feature -> keyType.cast(feature[keyProperty]) }
     }
 
-    fun <T> readShapes(file: URL, keyFunc: (Map<String, Any>) -> T): Map<T, Shape> {
-        return readShapes(file, keyFunc) { true }
-    }
+    fun <T> readShapes(file: URL, keyFunc: (Map<String, Any>) -> T): Map<T, Shape> = readShapes(file, keyFunc) { true }
 
     fun <T> readShapes(
         file: URL,
@@ -98,20 +96,12 @@ abstract class GenericReader {
         override val values: Collection<Any>
             get() = keys.map { feature.getAttribute(it) }
 
-        override fun isEmpty(): Boolean {
-            return feature.attributes.isEmpty()
-        }
+        override fun isEmpty(): Boolean = feature.attributes.isEmpty()
 
-        override fun get(key: String): Any? {
-            return feature.getAttribute(key)
-        }
+        override fun get(key: String): Any? = feature.getAttribute(key)
 
-        override fun containsValue(value: Any): Boolean {
-            return values.contains(value)
-        }
+        override fun containsValue(value: Any): Boolean = values.contains(value)
 
-        override fun containsKey(key: String): Boolean {
-            return keys.contains(key)
-        }
+        override fun containsKey(key: String): Boolean = keys.contains(key)
     }
 }

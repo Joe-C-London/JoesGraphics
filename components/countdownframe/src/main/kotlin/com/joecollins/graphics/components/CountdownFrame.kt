@@ -104,40 +104,28 @@ class CountdownFrame(
         return duration!!
     }
 
-    internal fun getTimeRemainingString(): String {
-        return timeRemainingLabel.text
-    }
+    internal fun getTimeRemainingString(): String = timeRemainingLabel.text
 
-    internal fun getAdditionalInfo(): String? {
-        return if (additionalInfoLabel.isVisible) additionalInfoLabel.text else null
-    }
+    internal fun getAdditionalInfo(): String? = if (additionalInfoLabel.isVisible) additionalInfoLabel.text else null
 
-    internal fun getCountdownColor(): Color {
-        return timeRemainingLabel.foreground
-    }
+    internal fun getCountdownColor(): Color = timeRemainingLabel.foreground
 
     companion object {
-        fun formatDDHHMMSS(duration: Duration): String {
-            return String.format(
-                "%d:%02d:%02d:%02d",
-                duration.toHours() / 24,
-                duration.toHours() % 24,
-                duration.toMinutesPart(),
-                duration.toSecondsPart(),
-            )
-        }
+        fun formatDDHHMMSS(duration: Duration): String = String.format(
+            "%d:%02d:%02d:%02d",
+            duration.toHours() / 24,
+            duration.toHours() % 24,
+            duration.toMinutesPart(),
+            duration.toSecondsPart(),
+        )
 
-        fun formatHHMMSS(duration: Duration): String {
-            return String.format(
-                "%d:%02d:%02d",
-                duration.toHours(),
-                duration.toMinutesPart(),
-                duration.toSecondsPart(),
-            )
-        }
+        fun formatHHMMSS(duration: Duration): String = String.format(
+            "%d:%02d:%02d",
+            duration.toHours(),
+            duration.toMinutesPart(),
+            duration.toSecondsPart(),
+        )
 
-        fun formatMMSS(duration: Duration): String {
-            return String.format("%d:%02d", duration.toMinutes(), duration.toSecondsPart())
-        }
+        fun formatMMSS(duration: Duration): String = String.format("%d:%02d", duration.toMinutes(), duration.toSecondsPart())
     }
 }

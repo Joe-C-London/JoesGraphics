@@ -17,16 +17,14 @@ object MapFrameBuilder {
         notes: Flow.Publisher<out String?>? = null,
         borderColor: Flow.Publisher<out Color>? = null,
         outline: Flow.Publisher<out List<Shape>>? = null,
-    ): MapFrame {
-        return MapFrame(
-            headerPublisher = header,
-            shapesPublisher = shapes,
-            focusBoxPublisher = focus?.map(this::generateBounds),
-            notesPublisher = notes,
-            borderColorPublisher = borderColor,
-            outlineShapesPublisher = outline,
-        )
-    }
+    ): MapFrame = MapFrame(
+        headerPublisher = header,
+        shapesPublisher = shapes,
+        focusBoxPublisher = focus?.map(this::generateBounds),
+        notesPublisher = notes,
+        borderColorPublisher = borderColor,
+        outlineShapesPublisher = outline,
+    )
 
     fun <T> from(
         items: Flow.Publisher<out List<T>>,
@@ -37,18 +35,16 @@ object MapFrameBuilder {
         notes: Flow.Publisher<out String?>? = null,
         borderColor: Flow.Publisher<out Color>? = null,
         outline: Flow.Publisher<out List<Shape>>? = null,
-    ): MapFrame {
-        return from(
-            shapes = items.compose { list ->
-                list.map { it.color().map { c -> Pair(it.shape(), c) } }.combine()
-            },
-            header = header,
-            focus = focus?.map { list -> list?.map(shape) },
-            notes = notes,
-            borderColor = borderColor,
-            outline = outline,
-        )
-    }
+    ): MapFrame = from(
+        shapes = items.compose { list ->
+            list.map { it.color().map { c -> Pair(it.shape(), c) } }.combine()
+        },
+        header = header,
+        focus = focus?.map { list -> list?.map(shape) },
+        notes = notes,
+        borderColor = borderColor,
+        outline = outline,
+    )
 
     private fun generateBounds(shapes: List<Shape>?) = shapes
         ?.asSequence()

@@ -66,21 +66,13 @@ class ProjectionFrame(
         }
     }
 
-    internal fun getImage(): Image? {
-        return imagePanel.image
-    }
+    internal fun getImage(): Image? = imagePanel.image
 
-    internal fun getBackColor(): Color {
-        return footerPanel.background
-    }
+    internal fun getBackColor(): Color = footerPanel.background
 
-    internal fun getFooterText(): String? {
-        return if (footerLabel.isVisible) footerLabel.text else null
-    }
+    internal fun getFooterText(): String? = if (footerLabel.isVisible) footerLabel.text else null
 
-    internal fun getImageAlignment(): Alignment {
-        return imagePanel.alignment
-    }
+    internal fun getImageAlignment(): Alignment = imagePanel.alignment
 
     private inner class ImagePanel : JPanel() {
         var image: Image? = null

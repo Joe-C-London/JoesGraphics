@@ -15,13 +15,9 @@ object GeoJsonReader : GenericReader() {
                 reader.close()
             }
 
-            override fun hasNext(): Boolean {
-                return iterator.hasNext()
-            }
+            override fun hasNext(): Boolean = iterator.hasNext()
 
-            override fun next(): SimpleFeature {
-                return iterator.next()
-            }
+            override fun next(): SimpleFeature = iterator.next()
         }
     }
 

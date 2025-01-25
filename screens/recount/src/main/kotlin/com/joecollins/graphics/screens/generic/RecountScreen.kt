@@ -20,7 +20,8 @@ class RecountScreen private constructor(
     headerLabel: Flow.Publisher<out String?>,
     frame: MultiSummaryFrame,
     altText: Flow.Publisher<String>,
-) : GenericPanel(pad(frame), headerLabel, altText), AltTextProvider {
+) : GenericPanel(pad(frame), headerLabel, altText),
+    AltTextProvider {
 
     companion object {
         fun votes(votes: Int) = VoteThreshold(votes)
@@ -36,18 +37,16 @@ class RecountScreen private constructor(
             header: Flow.Publisher<out String>,
             reporting: ReportingFilter<T>? = null,
             title: Flow.Publisher<out String>,
-        ): RecountScreen {
-            return build(
-                header,
-                candidateVotes,
-                rowHeader,
-                { party.abbreviation.uppercase() },
-                { party.color },
-                threshold,
-                reporting,
-                title,
-            )
-        }
+        ): RecountScreen = build(
+            header,
+            candidateVotes,
+            rowHeader,
+            { party.abbreviation.uppercase() },
+            { party.color },
+            threshold,
+            reporting,
+            title,
+        )
 
         fun <T> ofNonPartisan(
             candidateVotes: Flow.Publisher<out Map<T, Map<NonPartisanCandidate, Int>>>,
@@ -56,18 +55,16 @@ class RecountScreen private constructor(
             header: Flow.Publisher<out String>,
             reporting: ReportingFilter<T>? = null,
             title: Flow.Publisher<out String>,
-        ): RecountScreen {
-            return build(
-                header,
-                candidateVotes,
-                rowHeader,
-                { surname.uppercase() },
-                { color },
-                threshold,
-                reporting,
-                title,
-            )
-        }
+        ): RecountScreen = build(
+            header,
+            candidateVotes,
+            rowHeader,
+            { surname.uppercase() },
+            { color },
+            threshold,
+            reporting,
+            title,
+        )
 
         private fun <T, CT> build(
             header: Flow.Publisher<out String>,
@@ -78,13 +75,11 @@ class RecountScreen private constructor(
             threshold: Threshold,
             reporting: ReportingFilter<T>?,
             title: Flow.Publisher<out String>,
-        ): RecountScreen {
-            return RecountScreen(
-                title,
-                buildFrame(header, candidateVotes, rowHeader, label, color, threshold, reporting),
-                buildAltText(header, candidateVotes, rowHeader, label, threshold, reporting, title),
-            )
-        }
+        ): RecountScreen = RecountScreen(
+            title,
+            buildFrame(header, candidateVotes, rowHeader, label, color, threshold, reporting),
+            buildAltText(header, candidateVotes, rowHeader, label, threshold, reporting, title),
+        )
 
         private fun <T, CT> buildFrame(
             header: Flow.Publisher<out String>,
@@ -166,23 +161,21 @@ class RecountScreen private constructor(
         private val votesPublisher = Publisher(votes)
         private val completePublisher = Publisher(complete)
 
-        fun toEntries(): Flow.Publisher<out List<Entry<T, CT>>> {
-            return votesPublisher.merge(completePublisher) { votes, complete ->
-                votes.entries.asSequence()
-                    .map {
-                        Entry(
-                            it.key,
-                            it.value,
-                            complete?.get(it.key) ?: true,
-                            threshold,
-                        )
-                    }
-                    .filter { it.votes.values.sum() > 0 }
-                    .filter { it.complete }
-                    .filter { it.isTooClose }
-                    .sortedBy { if (it.threshold is VoteThreshold) it.margin.toDouble() else it.pctMargin }
-                    .toList()
-            }
+        fun toEntries(): Flow.Publisher<out List<Entry<T, CT>>> = votesPublisher.merge(completePublisher) { votes, complete ->
+            votes.entries.asSequence()
+                .map {
+                    Entry(
+                        it.key,
+                        it.value,
+                        complete?.get(it.key) ?: true,
+                        threshold,
+                    )
+                }
+                .filter { it.votes.values.sum() > 0 }
+                .filter { it.complete }
+                .filter { it.isTooClose }
+                .sortedBy { if (it.threshold is VoteThreshold) it.margin.toDouble() else it.pctMargin }
+                .toList()
         }
     }
 

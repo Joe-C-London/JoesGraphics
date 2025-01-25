@@ -226,13 +226,9 @@ class AllSeatsScreen private constructor(title: Flow.Publisher<out String?>, fra
                 override fun removeLayoutComponent(comp: Component) {
                 }
 
-                override fun preferredLayoutSize(parent: Container): Dimension {
-                    return DEFAULT_SIZE
-                }
+                override fun preferredLayoutSize(parent: Container): Dimension = DEFAULT_SIZE
 
-                override fun minimumLayoutSize(parent: Container): Dimension {
-                    return DEFAULT_SIZE
-                }
+                override fun minimumLayoutSize(parent: Container): Dimension = DEFAULT_SIZE
 
                 override fun layoutContainer(parent: Container) {
                     val totalColumns = columnWidths.sum().coerceAtLeast(1)

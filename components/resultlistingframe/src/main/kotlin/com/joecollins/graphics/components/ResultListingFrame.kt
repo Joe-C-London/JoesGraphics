@@ -72,29 +72,17 @@ class ResultListingFrame(
         itemsPublisher.subscribe(Subscriber(eventQueueWrapper(onItemsUpdate)))
     }
 
-    internal fun getNumRows(): Int {
-        return layout.numRows
-    }
+    internal fun getNumRows(): Int = layout.numRows
 
-    internal fun getNumItems(): Int {
-        return items.size
-    }
+    internal fun getNumItems(): Int = items.size
 
-    internal fun getText(index: Int): String {
-        return items[index].text
-    }
+    internal fun getText(index: Int): String = items[index].text
 
-    internal fun getForeground(index: Int): Color {
-        return items[index].foreground
-    }
+    internal fun getForeground(index: Int): Color = items[index].foreground
 
-    internal fun getBackground(index: Int): Color {
-        return items[index].background
-    }
+    internal fun getBackground(index: Int): Color = items[index].background
 
-    internal fun getBorder(index: Int): Color {
-        return items[index].borderColor
-    }
+    internal fun getBorder(index: Int): Color = items[index].borderColor
 
     private inner class ItemPanel : JPanel() {
         init {
@@ -150,13 +138,9 @@ class ResultListingFrame(
 
         override fun addLayoutComponent(name: String, comp: Component) {}
         override fun removeLayoutComponent(comp: Component) {}
-        override fun preferredLayoutSize(parent: Container): Dimension? {
-            return null
-        }
+        override fun preferredLayoutSize(parent: Container): Dimension? = null
 
-        override fun minimumLayoutSize(parent: Container): Dimension? {
-            return null
-        }
+        override fun minimumLayoutSize(parent: Container): Dimension? = null
 
         override fun layoutContainer(parent: Container) {
             val totalHeight = parent.height

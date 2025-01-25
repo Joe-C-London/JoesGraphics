@@ -25,17 +25,11 @@ class SummaryWithLabels(
     internal val numEntries: Int
         get() = entryPanels.size
 
-    internal fun getEntryColor(index: Int): Color {
-        return entryPanels[index].bottomPanel.background
-    }
+    internal fun getEntryColor(index: Int): Color = entryPanels[index].bottomPanel.background
 
-    internal fun getEntryLabel(index: Int): String {
-        return entryPanels[index].topLabel.text
-    }
+    internal fun getEntryLabel(index: Int): String = entryPanels[index].topLabel.text
 
-    internal fun getEntryValue(index: Int): String {
-        return entryPanels[index].bottomLabel.text
-    }
+    internal fun getEntryValue(index: Int): String = entryPanels[index].bottomLabel.text
 
     private inner class EntryPanel : JPanel() {
         private val topPanel: JPanel = object : JPanel() {
@@ -66,13 +60,9 @@ class SummaryWithLabels(
         private inner class EntryLayout : LayoutManager {
             override fun addLayoutComponent(name: String, comp: Component) {}
             override fun removeLayoutComponent(comp: Component) {}
-            override fun preferredLayoutSize(parent: Container): Dimension {
-                return Dimension(50, 50)
-            }
+            override fun preferredLayoutSize(parent: Container): Dimension = Dimension(50, 50)
 
-            override fun minimumLayoutSize(parent: Container): Dimension {
-                return Dimension(10, 50)
-            }
+            override fun minimumLayoutSize(parent: Container): Dimension = Dimension(10, 50)
 
             override fun layoutContainer(parent: Container) {
                 val width = parent.width
@@ -97,13 +87,9 @@ class SummaryWithLabels(
     private inner class SummaryLayout : LayoutManager {
         override fun addLayoutComponent(name: String, comp: Component) {}
         override fun removeLayoutComponent(comp: Component) {}
-        override fun preferredLayoutSize(parent: Container): Dimension {
-            return Dimension(512, 50)
-        }
+        override fun preferredLayoutSize(parent: Container): Dimension = Dimension(512, 50)
 
-        override fun minimumLayoutSize(parent: Container): Dimension {
-            return Dimension(50, 50)
-        }
+        override fun minimumLayoutSize(parent: Container): Dimension = Dimension(50, 50)
 
         override fun layoutContainer(parent: Container) {
             val width = parent.width - 2

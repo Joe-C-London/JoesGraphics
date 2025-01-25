@@ -64,13 +64,9 @@ class MixedMemberResultPanel private constructor(
         override fun removeLayoutComponent(comp: Component) {
             components.entries.firstOrNull { it.value == comp }?.let { components.remove(it.key) }
         }
-        override fun preferredLayoutSize(parent: Container): Dimension {
-            return DEFAULT_SIZE
-        }
+        override fun preferredLayoutSize(parent: Container): Dimension = DEFAULT_SIZE
 
-        override fun minimumLayoutSize(parent: Container): Dimension {
-            return Dimension(0, 0)
-        }
+        override fun minimumLayoutSize(parent: Container): Dimension = Dimension(0, 0)
 
         override fun layoutContainer(parent: Container) {
             val width = parent.width
@@ -130,8 +126,7 @@ class MixedMemberResultPanel private constructor(
         private val PCT_DIFF_FORMAT = DecimalFormat("+0.0%;-0.0%")
         private val THOUSANDS_FORMAT = DecimalFormat("#,##0")
 
-        fun Flow.Publisher<out Map<out Party, Int?>>.convertToPartyOrCandidateForMixedMember() =
-            map { v -> v.mapKeys { PartyOrCandidate(it.key) } }
+        fun Flow.Publisher<out Map<out Party, Int?>>.convertToPartyOrCandidateForMixedMember() = map { v -> v.mapKeys { PartyOrCandidate(it.key) } }
 
         fun of(
             candidateVotes: CandidateVotes.() -> Unit,

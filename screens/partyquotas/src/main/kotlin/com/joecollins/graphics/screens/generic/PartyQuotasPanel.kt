@@ -58,27 +58,25 @@ class PartyQuotasPanel private constructor(
             )
         }
 
-        private fun createFrame(curr: Curr): BarFrame {
-            return BarFrame(
-                barsPublisher = curr.quotas.map { q ->
-                    q.entries.asSequence()
-                        .sortedByDescending { it.key.overrideSortOrder?.toDouble() ?: it.value }
-                        .map {
-                            BarFrame.Bar(
-                                leftText = it.key.name.uppercase(),
-                                rightText = DecimalFormat("0.00").format(it.value) + " QUOTAS",
-                                series = listOf(it.key.color to it.value),
-                            )
-                        }
-                        .toList()
-                },
-                headerPublisher = curr.header,
-                subheadTextPublisher = curr.subhead,
-                maxPublisher = curr.totalSeats,
-                linesPublisher = curr.totalSeats.map { lines -> (1 until lines).map { BarFrame.Line(it, "$it QUOTA${if (it == 1) "" else "S"}") } },
-                headerLabelsPublisher = curr.progressLabel?.map { mapOf(GraphicsFrame.HeaderLabelLocation.RIGHT to it) },
-            )
-        }
+        private fun createFrame(curr: Curr): BarFrame = BarFrame(
+            barsPublisher = curr.quotas.map { q ->
+                q.entries.asSequence()
+                    .sortedByDescending { it.key.overrideSortOrder?.toDouble() ?: it.value }
+                    .map {
+                        BarFrame.Bar(
+                            leftText = it.key.name.uppercase(),
+                            rightText = DecimalFormat("0.00").format(it.value) + " QUOTAS",
+                            series = listOf(it.key.color to it.value),
+                        )
+                    }
+                    .toList()
+            },
+            headerPublisher = curr.header,
+            subheadTextPublisher = curr.subhead,
+            maxPublisher = curr.totalSeats,
+            linesPublisher = curr.totalSeats.map { lines -> (1 until lines).map { BarFrame.Line(it, "$it QUOTA${if (it == 1) "" else "S"}") } },
+            headerLabelsPublisher = curr.progressLabel?.map { mapOf(GraphicsFrame.HeaderLabelLocation.RIGHT to it) },
+        )
 
         private fun createDiffFrame(curr: Curr, change: Change?): BarFrame? {
             if (change == null) return null
@@ -110,16 +108,14 @@ class PartyQuotasPanel private constructor(
             )
         }
 
-        private fun createSwingFrame(swing: Swing?): SwingFrame? {
-            return swing?.run {
-                SwingFrameBuilder.prevCurr(
-                    prev = prevVotes,
-                    curr = currVotes,
-                    partyOrder = order,
-                    range = range,
-                    header = header,
-                )
-            }
+        private fun createSwingFrame(swing: Swing?): SwingFrame? = swing?.run {
+            SwingFrameBuilder.prevCurr(
+                prev = prevVotes,
+                curr = currVotes,
+                partyOrder = order,
+                range = range,
+                header = header,
+            )
         }
 
         private fun createAltText(

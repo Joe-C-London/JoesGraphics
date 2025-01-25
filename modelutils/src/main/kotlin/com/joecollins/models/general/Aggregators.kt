@@ -40,20 +40,14 @@ object Aggregators {
             }
     }
 
-    fun <T> sum(items: Collection<T>, value: (T) -> Flow.Publisher<Int>): Flow.Publisher<Int> {
-        return items.map(value).combine().map { it.sum() }
-    }
+    fun <T> sum(items: Collection<T>, value: (T) -> Flow.Publisher<Int>): Flow.Publisher<Int> = items.map(value).combine().map { it.sum() }
 
-    fun <T> count(items: Collection<T>, value: (T) -> Flow.Publisher<Boolean>): Flow.Publisher<Int> {
-        return sum(items) { t -> value(t).map { if (it) 1 else 0 } }
-    }
+    fun <T> count(items: Collection<T>, value: (T) -> Flow.Publisher<Boolean>): Flow.Publisher<Int> = sum(items) { t -> value(t).map { if (it) 1 else 0 } }
 
-    fun <K> adjustForPctReporting(result: Flow.Publisher<Map<K, Int>>, pctReporting: Flow.Publisher<Double>): Flow.Publisher<Map<K, Int>> {
-        return result.merge(pctReporting) { r, p ->
-            val ret: LinkedHashMap<K, Int> = LinkedHashMap()
-            r.forEach { (k, v) -> ret[k] = (v * p).toInt() }
-            ret
-        }
+    fun <K> adjustForPctReporting(result: Flow.Publisher<Map<K, Int>>, pctReporting: Flow.Publisher<Double>): Flow.Publisher<Map<K, Int>> = result.merge(pctReporting) { r, p ->
+        val ret: LinkedHashMap<K, Int> = LinkedHashMap()
+        r.forEach { (k, v) -> ret[k] = (v * p).toInt() }
+        ret
     }
 
     fun <T> combinePctReporting(items: Collection<T>, pctReportingFunc: (T) -> Flow.Publisher<Double>) = combinePctReporting(items, pctReportingFunc) { 1.0.asOneTimePublisher() }
@@ -68,9 +62,7 @@ object Aggregators {
 
     fun <K1, K2> adjustKey(result: Flow.Publisher<out Map<out K1, Int>>, func: (K1) -> K2) = result.map { adjustKey(it, func) }
 
-    fun <K1, K2> adjustKey(result: Map<K1, Int>, func: (K1) -> K2): Map<K2, Int> {
-        return adjustKey(result, func) { a, b -> a + b }
-    }
+    fun <K1, K2> adjustKey(result: Map<K1, Int>, func: (K1) -> K2): Map<K2, Int> = adjustKey(result, func) { a, b -> a + b }
 
     fun <K1, K2, V : Any> adjustKey(result: Flow.Publisher<out Map<out K1, V>>, keyFunc: (K1) -> K2, valueMergeFunc: (V, V) -> V): Flow.Publisher<Map<K2, V>> = result.map { adjustKey(it, keyFunc, valueMergeFunc) }
 
@@ -92,23 +84,19 @@ object Aggregators {
 
     fun <K, T : Int?> topAndOthers(result: Flow.Publisher<out Map<K, T>>, limit: Int, others: K, mustInclude: Flow.Publisher<out Collection<K>>) = result.merge(mustInclude) { m, w -> topAndOthers(m, limit, others, w) }
 
-    fun <K, T : Int?> topAndOthers(result: Map<out K, T>, limit: Int, others: K, vararg mustInclude: K): Map<K, T> {
-        return topAndOthers(result, limit, others, mustInclude.toList())
-    }
+    fun <K, T : Int?> topAndOthers(result: Map<out K, T>, limit: Int, others: K, vararg mustInclude: K): Map<K, T> = topAndOthers(result, limit, others, mustInclude.toList())
 
-    fun <K, T : Int?> topAndOthers(result: Map<out K, T>, limit: Int, others: K, mustInclude: Collection<K>): Map<K, T> {
-        return topAndOthers(
-            result,
-            limit,
-            others,
-            mustInclude,
-            sortOrder = { it?.toDouble() ?: -1.0 },
-            sum = { a, b ->
-                @Suppress("UNCHECKED_CAST")
-                (if (a == null || b == null) null else a + b) as T
-            },
-        )
-    }
+    fun <K, T : Int?> topAndOthers(result: Map<out K, T>, limit: Int, others: K, mustInclude: Collection<K>): Map<K, T> = topAndOthers(
+        result,
+        limit,
+        others,
+        mustInclude,
+        sortOrder = { it?.toDouble() ?: -1.0 },
+        sum = { a, b ->
+            @Suppress("UNCHECKED_CAST")
+            (if (a == null || b == null) null else a + b) as T
+        },
+    )
 
     fun <K, T> topAndOthers(result: Map<out K, T>, limit: Int, others: K, mustInclude: Collection<K>, sortOrder: (T) -> Double, sum: (T, T) -> T): Map<K, T> {
         if (result.size <= limit) {
@@ -135,20 +123,14 @@ object Aggregators {
 
     fun <K, V> toMap(keys: Collection<K>, func: (K) -> Flow.Publisher<V>) = toMap(keys, { it }, func)
 
-    fun <T, K, V> toMap(entries: Collection<T>, keyFunc: (T) -> K, func: (T) -> Flow.Publisher<V>): Flow.Publisher<Map<K, V>> {
-        return entries.map { e ->
-            val k = keyFunc(e)
-            func(e).map { v -> k to v }
-        }.combine().map { it.toMap() }
-    }
+    fun <T, K, V> toMap(entries: Collection<T>, keyFunc: (T) -> K, func: (T) -> Flow.Publisher<V>): Flow.Publisher<Map<K, V>> = entries.map { e ->
+        val k = keyFunc(e)
+        func(e).map { v -> k to v }
+    }.combine().map { it.toMap() }
 
-    fun <P : PartyOrCoalition> partyChanges(result: Flow.Publisher<out Map<out P, Int>>, partyChanges: Flow.Publisher<out Map<out P, P>>): Flow.Publisher<Map<P, Int>> {
-        return partyChanges(result, partyChanges) { a, b -> a + b }
-    }
+    fun <P : PartyOrCoalition> partyChanges(result: Flow.Publisher<out Map<out P, Int>>, partyChanges: Flow.Publisher<out Map<out P, P>>): Flow.Publisher<Map<P, Int>> = partyChanges(result, partyChanges) { a, b -> a + b }
 
-    fun <P : PartyOrCoalition, V : Any> partyChanges(result: Flow.Publisher<out Map<out P, V>>, partyChanges: Flow.Publisher<out Map<out P, P>>, mergeFunc: (V, V) -> V): Flow.Publisher<Map<P, V>> {
-        return result.merge(partyChanges) { r, c ->
-            adjustKey(r, { c[it] ?: it }, mergeFunc)
-        }
+    fun <P : PartyOrCoalition, V : Any> partyChanges(result: Flow.Publisher<out Map<out P, V>>, partyChanges: Flow.Publisher<out Map<out P, P>>, mergeFunc: (V, V) -> V): Flow.Publisher<Map<P, V>> = result.merge(partyChanges) { r, c ->
+        adjustKey(r, { c[it] ?: it }, mergeFunc)
     }
 }

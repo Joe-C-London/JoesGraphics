@@ -12,10 +12,8 @@ class TimePublisher private constructor(tickFrequency: Duration = 100.millisecon
     companion object {
         private val byClock = HashMap<Clock, TimePublisher>()
 
-        fun forClock(clock: Clock = Clock.systemDefaultZone()): TimePublisher {
-            return byClock.computeIfAbsent(clock) {
-                TimePublisher(clock = clock)
-            }
+        fun forClock(clock: Clock = Clock.systemDefaultZone()): TimePublisher = byClock.computeIfAbsent(clock) {
+            TimePublisher(clock = clock)
         }
     }
 

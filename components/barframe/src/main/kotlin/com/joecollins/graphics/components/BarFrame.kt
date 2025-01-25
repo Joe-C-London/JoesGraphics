@@ -84,21 +84,13 @@ class BarFrame(
     internal val numBars: Int
         get() = bars.size
 
-    internal fun getLeftText(barNum: Int): String {
-        return bars[barNum].leftText
-    }
+    internal fun getLeftText(barNum: Int): String = bars[barNum].leftText
 
-    internal fun getRightText(barNum: Int): String {
-        return bars[barNum].rightText
-    }
+    internal fun getRightText(barNum: Int): String = bars[barNum].rightText
 
-    internal fun getSeries(barNum: Int): List<Pair<Color, Number>> {
-        return bars[barNum].series
-    }
+    internal fun getSeries(barNum: Int): List<Pair<Color, Number>> = bars[barNum].series
 
-    internal fun getLeftIcon(barNum: Int): Shape? {
-        return bars[barNum].leftIcon
-    }
+    internal fun getLeftIcon(barNum: Int): Shape? = bars[barNum].leftIcon
 
     private fun getPixelOfValue(value: Number): Double {
         val range = max.toDouble() - min.toDouble()
@@ -112,13 +104,9 @@ class BarFrame(
     internal val numLines: Int
         get() = lines.size
 
-    internal fun getLineLevel(index: Int): Number {
-        return lines[index].level
-    }
+    internal fun getLineLevel(index: Int): Number = lines[index].level
 
-    internal fun getLineLabel(index: Int): String {
-        return lines[index].label
-    }
+    internal fun getLineLabel(index: Int): String = lines[index].label
 
     private inner class BarPanel : JPanel() {
 
@@ -363,13 +351,9 @@ class BarFrame(
     private inner class BarFrameLayout : LayoutManager {
         override fun addLayoutComponent(name: String, comp: Component) {}
         override fun removeLayoutComponent(comp: Component) {}
-        override fun preferredLayoutSize(parent: Container): Dimension {
-            return getLayoutSize { it.preferredSize }
-        }
+        override fun preferredLayoutSize(parent: Container): Dimension = getLayoutSize { it.preferredSize }
 
-        override fun minimumLayoutSize(parent: Container): Dimension {
-            return getLayoutSize { it.minimumSize }
-        }
+        override fun minimumLayoutSize(parent: Container): Dimension = getLayoutSize { it.minimumSize }
 
         private fun getLayoutSize(func: (JComponent) -> Dimension): Dimension {
             val subheadSize = if (subheadLabel.isVisible) func(subheadLabel) else Dimension(0, 0)

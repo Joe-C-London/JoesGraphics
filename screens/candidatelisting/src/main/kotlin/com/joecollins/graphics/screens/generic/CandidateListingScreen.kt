@@ -164,53 +164,51 @@ class CandidateListingScreen private constructor(
             color: CT.() -> Color,
             combinedLabel: CT.() -> String,
             shape: CT.() -> Shape?,
-        ): BarFrame {
-            return BarFrame(
-                barsPublisher = if (showToColumns == null) {
-                    candidates.list.mapElements {
-                        BarFrame.Bar(
-                            it.leftLabel(),
-                            it.rightLabel(),
-                            it.shape(),
-                            listOf(it.color() to 1.0),
-                        )
-                    }
-                } else {
-                    candidates.list.merge(showToColumns) { cList, show ->
-                        if (show) {
-                            val mid = cList.size / 2
-                            val first = cList.take(mid)
-                            val last = cList.drop(mid)
-                            (0 until mid).map { idx ->
-                                val left = first[idx]
-                                val right = if (idx == last.size) null else last[idx]
-                                val func = { c: CT -> c.combinedLabel() + " " }
-                                BarFrame.Bar(
-                                    func(left),
-                                    right?.let(func) ?: "",
-                                    listOf(
-                                        left.color() to 0.49,
-                                        Color.WHITE to 0.02,
-                                        (right?.color() ?: Color.WHITE) to 0.49,
-                                    ),
-                                )
-                            }
-                        } else {
-                            cList.map {
-                                BarFrame.Bar(
-                                    it.leftLabel(),
-                                    it.rightLabel(),
-                                    listOf(it.color() to 1.0),
-                                )
-                            }
+        ): BarFrame = BarFrame(
+            barsPublisher = if (showToColumns == null) {
+                candidates.list.mapElements {
+                    BarFrame.Bar(
+                        it.leftLabel(),
+                        it.rightLabel(),
+                        it.shape(),
+                        listOf(it.color() to 1.0),
+                    )
+                }
+            } else {
+                candidates.list.merge(showToColumns) { cList, show ->
+                    if (show) {
+                        val mid = cList.size / 2
+                        val first = cList.take(mid)
+                        val last = cList.drop(mid)
+                        (0 until mid).map { idx ->
+                            val left = first[idx]
+                            val right = if (idx == last.size) null else last[idx]
+                            val func = { c: CT -> c.combinedLabel() + " " }
+                            BarFrame.Bar(
+                                func(left),
+                                right?.let(func) ?: "",
+                                listOf(
+                                    left.color() to 0.49,
+                                    Color.WHITE to 0.02,
+                                    (right?.color() ?: Color.WHITE) to 0.49,
+                                ),
+                            )
+                        }
+                    } else {
+                        cList.map {
+                            BarFrame.Bar(
+                                it.leftLabel(),
+                                it.rightLabel(),
+                                listOf(it.color() to 1.0),
+                            )
                         }
                     }
-                },
-                headerPublisher = candidates.header,
-                subheadTextPublisher = candidates.subhead,
-                maxPublisher = 1.0.asOneTimePublisher(),
-            )
-        }
+                }
+            },
+            headerPublisher = candidates.header,
+            subheadTextPublisher = candidates.subhead,
+            maxPublisher = 1.0.asOneTimePublisher(),
+        )
 
         private fun <PT : CanOverrideSortOrder> createPrevPanel(
             prevVotes: Flow.Publisher<out Map<PT, Int>>,
@@ -218,14 +216,12 @@ class CandidateListingScreen private constructor(
             subhead: Flow.Publisher<out String?>,
             prevLabel: PT.() -> String,
             prevColor: PT.() -> Color,
-        ): JPanel {
-            return BarFrameBuilder.basic(
-                barsPublisher = prevVotes.map { v -> createVoteBars(v, prevLabel, prevColor) },
-                maxPublisher = (2.0 / 3).asOneTimePublisher(),
-                headerPublisher = header,
-                subheadPublisher = subhead,
-            )
-        }
+        ): JPanel = BarFrameBuilder.basic(
+            barsPublisher = prevVotes.map { v -> createVoteBars(v, prevLabel, prevColor) },
+            maxPublisher = (2.0 / 3).asOneTimePublisher(),
+            headerPublisher = header,
+            subheadPublisher = subhead,
+        )
         private fun <PT : CanOverrideSortOrder> createVoteBars(
             votes: Map<PT, Int>,
             prevLabel: PT.() -> String,

@@ -97,13 +97,9 @@ class MapFrame(
     internal val numShapes: Int
         get() = shapesToDraw.size
 
-    internal fun getShape(idx: Int): Shape {
-        return shapesToDraw[idx].first
-    }
+    internal fun getShape(idx: Int): Shape = shapesToDraw[idx].first
 
-    internal fun getColor(idx: Int): Color {
-        return shapesToDraw[idx].second
-    }
+    internal fun getColor(idx: Int): Color = shapesToDraw[idx].second
 
     internal val focusBox: Rectangle2D?
         get() {
@@ -124,9 +120,7 @@ class MapFrame(
     internal val numOutlineShapes: Int
         get() = outlineShapes.size
 
-    internal fun getOutlineShape(idx: Int): Shape {
-        return outlineShapes[idx]
-    }
+    internal fun getOutlineShape(idx: Int): Shape = outlineShapes[idx]
 
     init {
         val panel: JPanel = object : JPanel() {

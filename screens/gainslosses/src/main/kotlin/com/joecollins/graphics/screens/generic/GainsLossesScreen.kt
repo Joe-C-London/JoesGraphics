@@ -135,22 +135,21 @@ class GainsLossesScreen private constructor(
             currWinner: Flow.Publisher<out Map<T, R?>>,
             seatFilter: Flow.Publisher<out Set<T>?>?,
             partyChanges: Flow.Publisher<Map<Party, Party>>?,
-        ) =
-            currWinner.merge(prevWinner) { curr, prev -> curr to prev }
-                .run {
-                    if (seatFilter == null) {
-                        map { (curr, prev) -> Triple(curr, prev, null) }
-                    } else {
-                        merge(seatFilter) { (curr, prev), filter -> Triple(curr, prev, filter) }
-                    }
+        ) = currWinner.merge(prevWinner) { curr, prev -> curr to prev }
+            .run {
+                if (seatFilter == null) {
+                    map { (curr, prev) -> Triple(curr, prev, null) }
+                } else {
+                    merge(seatFilter) { (curr, prev), filter -> Triple(curr, prev, filter) }
                 }
-                .run {
-                    if (partyChanges == null) {
-                        this
-                    } else {
-                        merge(partyChanges) { (curr, prev, filter), changes -> Triple(curr, prev.mapValues { changes[it.value] ?: it.value }, filter) }
-                    }
+            }
+            .run {
+                if (partyChanges == null) {
+                    this
+                } else {
+                    merge(partyChanges) { (curr, prev, filter), changes -> Triple(curr, prev.mapValues { changes[it.value] ?: it.value }, filter) }
                 }
+            }
 
         private fun <T, R> extractChanges(
             prev: Map<T, Party>,

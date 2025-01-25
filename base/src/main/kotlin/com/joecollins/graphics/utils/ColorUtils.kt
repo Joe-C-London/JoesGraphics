@@ -5,13 +5,11 @@ import kotlin.math.pow
 import kotlin.math.roundToInt
 
 object ColorUtils {
-    fun lighten(color: Color): Color {
-        return Color(
-            128 + color.red / 2,
-            128 + color.green / 2,
-            128 + color.blue / 2,
-        )
-    }
+    fun lighten(color: Color): Color = Color(
+        128 + color.red / 2,
+        128 + color.green / 2,
+        128 + color.blue / 2,
+    )
 
     fun foregroundToContrast(color: Color): Color {
         val l = calcLum(color)

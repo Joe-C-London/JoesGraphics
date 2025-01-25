@@ -4,9 +4,7 @@ import kotlin.contracts.contract
 
 data class CandidateResult(override val leader: Candidate, override val elected: Boolean) : ElectionResult<Candidate> {
 
-    fun toPartyResult(): PartyResult {
-        return PartyResult(leader.party, elected)
-    }
+    fun toPartyResult(): PartyResult = PartyResult(leader.party, elected)
 
     companion object {
 

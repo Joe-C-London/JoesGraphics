@@ -3,9 +3,10 @@ package com.joecollins.graphics.screens.generic
 import com.joecollins.models.general.Party
 import com.joecollins.pubsub.asOneTimePublisher
 
-class SingleNoResultMap<T> internal constructor() : AbstractSingleResultMap<T, Nothing>({
-    Party.OTHERS.color
-}) {
+class SingleNoResultMap<T> internal constructor() :
+    AbstractSingleResultMap<T, Nothing>({
+        Party.OTHERS.color
+    }) {
     init {
         leader = null.asOneTimePublisher()
     }

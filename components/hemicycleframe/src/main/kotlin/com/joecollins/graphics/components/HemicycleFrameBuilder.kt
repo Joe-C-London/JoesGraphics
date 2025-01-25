@@ -68,8 +68,7 @@ object HemicycleFrameBuilder {
                 .map { it.second!! }
                 .toList()
             dots.map {
-                colorFunc(it).merge(borderFunc(it)) {
-                        color, border ->
+                colorFunc(it).merge(borderFunc(it)) { color, border ->
                     HemicycleFrame.Dot(color = color, border = border)
                 }
             }
@@ -295,38 +294,32 @@ object HemicycleFrameBuilder {
         )
     }
 
-    private fun calcPrevForParty(prev: List<Pair<Party, Int>>, party: Party): Int {
-        return prev.filter { party == it.first }.sumOf { it.second }
-    }
+    private fun calcPrevForParty(prev: List<Pair<Party, Int>>, party: Party): Int = prev.filter { party == it.first }.sumOf { it.second }
 
     private fun createSeatBarPublisher(
         results: List<Flow.Publisher<Pair<PartyResult?, Int>>>,
         partyFilter: (Party?) -> Boolean,
-    ): Flow.Publisher<ElectedLeading> {
-        return results.combine().map { res ->
-            res.filter { (pr, _) -> pr != null && partyFilter(pr.leader) }
-                .map { (pr, seats) -> ElectedLeading(if (pr!!.elected) seats else 0, seats) }
-                .fold(ElectedLeading(0, 0)) { a, e -> ElectedLeading(a.elected + e.elected, a.total + e.total) }
-        }
+    ): Flow.Publisher<ElectedLeading> = results.combine().map { res ->
+        res.filter { (pr, _) -> pr != null && partyFilter(pr.leader) }
+            .map { (pr, seats) -> ElectedLeading(if (pr!!.elected) seats else 0, seats) }
+            .fold(ElectedLeading(0, 0)) { a, e -> ElectedLeading(a.elected + e.elected, a.total + e.total) }
     }
 
     private fun createChangeBarPublisher(
         resultWithPrev: List<Flow.Publisher<Triple<PartyResult?, Party, Int>>>,
         partyFilter: (Party?) -> Boolean,
-    ): Flow.Publisher<ElectedLeading> {
-        return resultWithPrev.combine().map { res ->
-            res.filter { (pr, _) -> pr?.leader != null }
-                .flatMap { (pr, p, seats) ->
-                    val ret = ArrayList<ElectedLeading>()
-                    if (partyFilter(pr!!.leader)) {
-                        ret.add(ElectedLeading(if (pr.elected) seats else 0, seats))
-                    }
-                    if (partyFilter(p)) {
-                        ret.add(ElectedLeading(if (pr.elected) -seats else 0, -seats))
-                    }
-                    ret
+    ): Flow.Publisher<ElectedLeading> = resultWithPrev.combine().map { res ->
+        res.filter { (pr, _) -> pr?.leader != null }
+            .flatMap { (pr, p, seats) ->
+                val ret = ArrayList<ElectedLeading>()
+                if (partyFilter(pr!!.leader)) {
+                    ret.add(ElectedLeading(if (pr.elected) seats else 0, seats))
                 }
-                .fold(ElectedLeading(0, 0)) { a, e -> ElectedLeading(a.elected + e.elected, a.total + e.total) }
-        }
+                if (partyFilter(p)) {
+                    ret.add(ElectedLeading(if (pr.elected) -seats else 0, -seats))
+                }
+                ret
+            }
+            .fold(ElectedLeading(0, 0)) { a, e -> ElectedLeading(a.elected + e.elected, a.total + e.total) }
     }
 }

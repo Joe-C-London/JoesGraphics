@@ -795,25 +795,17 @@ class BarFrameTest {
 
     private class ElectionResult constructor(private var partyName: String, private var partyColor: Color, private var numSeats: Int, private var seatEstimate: Int = numSeats) {
 
-        fun getPartyName(): String {
-            return partyName
-        }
+        fun getPartyName(): String = partyName
 
-        fun getPartyColor(): Color {
-            return partyColor
-        }
+        fun getPartyColor(): Color = partyColor
 
-        fun getNumSeats(): Int {
-            return numSeats
-        }
+        fun getNumSeats(): Int = numSeats
 
         fun setNumSeats(numSeats: Int) {
             this.numSeats = numSeats
         }
 
-        fun getSeatEstimate(): Int {
-            return seatEstimate
-        }
+        fun getSeatEstimate(): Int = seatEstimate
 
         fun setSeatEstimate(seatEstimate: Int) {
             this.seatEstimate = seatEstimate
@@ -828,41 +820,27 @@ class BarFrameTest {
         private val votePct: Double,
         private val elected: Boolean = false,
     ) {
-        fun getCandidateName(): String {
-            return candidateName
-        }
+        fun getCandidateName(): String = candidateName
 
-        fun getPartyName(): String {
-            return partyName
-        }
+        fun getPartyName(): String = partyName
 
-        fun getPartyColor(): Color {
-            return partyColor
-        }
+        fun getPartyColor(): Color = partyColor
 
-        fun getNumVotes(): Int {
-            return numVotes
-        }
+        fun getNumVotes(): Int = numVotes
 
-        fun getVotePct(): Double {
-            return votePct
-        }
+        fun getVotePct(): Double = votePct
 
-        fun isElected(): Boolean {
-            return elected
-        }
+        fun isElected(): Boolean = elected
     }
 
     companion object {
         private val CHANGE_FORMAT = DecimalFormat("+0;-0")
         private val THOUSANDS_FORMAT = DecimalFormat("#,##0")
         private val PERCENT_FORMAT = DecimalFormat("0.0%")
-        private fun lighten(color: Color?): Color {
-            return Color(
-                (color!!.red + 255) / 2,
-                (color.green + 255) / 2,
-                (color.blue + 255) / 2,
-            )
-        }
+        private fun lighten(color: Color?): Color = Color(
+            (color!!.red + 255) / 2,
+            (color.green + 255) / 2,
+            (color.blue + 255) / 2,
+        )
     }
 }

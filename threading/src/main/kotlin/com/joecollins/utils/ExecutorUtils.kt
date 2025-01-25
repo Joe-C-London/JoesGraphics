@@ -19,12 +19,10 @@ object ExecutorUtils {
         t
     }
 
-    fun createExecutor(factory: () -> Executor): Executor {
-        return if (isJunit) {
-            Executor { r: Runnable -> r.run() }
-        } else {
-            factory()
-        }
+    fun createExecutor(factory: () -> Executor): Executor = if (isJunit) {
+        Executor { r: Runnable -> r.run() }
+    } else {
+        factory()
     }
 
     fun sendToEventQueue(action: () -> Unit) {

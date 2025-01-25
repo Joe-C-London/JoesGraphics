@@ -31,13 +31,9 @@ class HeadlinePanel : JPanel() {
     private inner class HeadlinePanelLayout : LayoutManager {
         override fun addLayoutComponent(name: String, comp: Component) {}
         override fun removeLayoutComponent(comp: Component) {}
-        override fun preferredLayoutSize(parent: Container): Dimension {
-            return Dimension(1024, 50)
-        }
+        override fun preferredLayoutSize(parent: Container): Dimension = Dimension(1024, 50)
 
-        override fun minimumLayoutSize(parent: Container): Dimension {
-            return Dimension(50, 50)
-        }
+        override fun minimumLayoutSize(parent: Container): Dimension = Dimension(50, 50)
 
         override fun layoutContainer(parent: Container) {
             val width = parent.width

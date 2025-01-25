@@ -11,24 +11,20 @@ class User(
 ) : com.joecollins.models.general.social.generic.User {
 
     companion object {
-        fun fromV1(user: twitter4j.User): User {
-            return User(
-                "@${user.screenName}",
-                user.name,
-                URL(user.profileImageURL),
-                user.isVerified,
-                user.isProtected,
-            )
-        }
+        fun fromV1(user: twitter4j.User): User = User(
+            "@${user.screenName}",
+            user.name,
+            URL(user.profileImageURL),
+            user.isVerified,
+            user.isProtected,
+        )
 
-        fun fromV2(user: com.twitter.clientlib.model.User): User {
-            return User(
-                "@${user.username}",
-                user.name,
-                user.profileImageUrl!!,
-                user.verified!!,
-                user.protected!!,
-            )
-        }
+        fun fromV2(user: com.twitter.clientlib.model.User): User = User(
+            "@${user.username}",
+            user.name,
+            user.profileImageUrl!!,
+            user.verified!!,
+            user.protected!!,
+        )
     }
 }

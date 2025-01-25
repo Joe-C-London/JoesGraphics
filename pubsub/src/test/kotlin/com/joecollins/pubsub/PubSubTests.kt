@@ -99,9 +99,7 @@ class PubSubTests {
                 this.subscription!!.request(1)
             }
 
-            override fun onError(throwable: Throwable) {
-                throw throwable
-            }
+            override fun onError(throwable: Throwable): Unit = throw throwable
 
             override fun onComplete() {
                 Assertions.fail<Unit>()
@@ -133,9 +131,7 @@ class PubSubTests {
                 this.subscription!!.cancel()
             }
 
-            override fun onError(throwable: Throwable) {
-                throw throwable
-            }
+            override fun onError(throwable: Throwable): Unit = throw throwable
 
             override fun onComplete() {
                 Assertions.fail<Unit>()
@@ -225,9 +221,7 @@ class PubSubTests {
                 output.add(item)
             }
 
-            override fun onError(throwable: Throwable) {
-                throw throwable
-            }
+            override fun onError(throwable: Throwable): Unit = throw throwable
 
             override fun onComplete() {
                 Assertions.fail<Unit>("Shouldn't be completing")

@@ -264,9 +264,7 @@ class SwingometerFrameBuilderTest {
     fun testFixedDots() {
         class Dot(val position: Double, private var color: Color) {
             private val colorPublisher = Publisher(color)
-            fun getColor(): Flow.Publisher<Color> {
-                return colorPublisher
-            }
+            fun getColor(): Flow.Publisher<Color> = colorPublisher
 
             fun setColor(color: Color) {
                 this.color = color

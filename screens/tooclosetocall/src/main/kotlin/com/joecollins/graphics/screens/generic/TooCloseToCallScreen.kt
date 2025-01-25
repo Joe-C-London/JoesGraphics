@@ -23,7 +23,8 @@ class TooCloseToCallScreen private constructor(
     titleLabel: Flow.Publisher<out String?>,
     multiSummaryFrame: MultiSummaryFrame,
     altText: Flow.Publisher<String>,
-) : GenericPanel(pad(multiSummaryFrame), titleLabel, altText), AltTextProvider {
+) : GenericPanel(pad(multiSummaryFrame), titleLabel, altText),
+    AltTextProvider {
     private class Input<T, CT> {
         var votes: Map<T, Map<CT, Int>> = HashMap()
             set(value) {
@@ -249,15 +250,11 @@ class TooCloseToCallScreen private constructor(
     }
 
     class PctReportingString<T>(private val pctReporting: T.() -> Flow.Publisher<Double>) : ReportingString<T>() {
-        override fun reporting(entries: Flow.Publisher<out Set<T>>): Flow.Publisher<out Map<T, String>> {
-            return entries.compose { e -> Aggregators.toMap(e) { it.pctReporting().map { pct -> DecimalFormat("0.0%").format(pct) + " IN" } } }
-        }
+        override fun reporting(entries: Flow.Publisher<out Set<T>>): Flow.Publisher<out Map<T, String>> = entries.compose { e -> Aggregators.toMap(e) { it.pctReporting().map { pct -> DecimalFormat("0.0%").format(pct) + " IN" } } }
     }
 
     class PollsReportingString<T>(private val pollsReporting: T.() -> Flow.Publisher<PollsReporting>) : ReportingString<T>() {
-        override fun reporting(entries: Flow.Publisher<out Set<T>>): Flow.Publisher<out Map<T, String>> {
-            return entries.compose { e -> Aggregators.toMap(e) { it.pollsReporting().map { (reporting, total) -> "$reporting/$total" } } }
-        }
+        override fun reporting(entries: Flow.Publisher<out Set<T>>): Flow.Publisher<out Map<T, String>> = entries.compose { e -> Aggregators.toMap(e) { it.pollsReporting().map { (reporting, total) -> "$reporting/$total" } } }
     }
 
     enum class SortOrder(

@@ -16,7 +16,9 @@ import java.text.DecimalFormat
 import java.util.concurrent.Flow
 import javax.swing.JPanel
 
-class RegionalSeatsScreen private constructor(subPanels: List<GenericPanel>) : JPanel(), AltTextProvider {
+class RegionalSeatsScreen private constructor(subPanels: List<GenericPanel>) :
+    JPanel(),
+    AltTextProvider {
 
     init {
         background = Color.WHITE
@@ -41,23 +43,21 @@ class RegionalSeatsScreen private constructor(subPanels: List<GenericPanel>) : J
             seatSubhead: R.() -> Flow.Publisher<out String?> = { null.asOneTimePublisher() },
             changeSubhead: R.() -> Flow.Publisher<out String?> = { null.asOneTimePublisher() },
             progressLabel: (R.() -> Flow.Publisher<out String?>)? = null,
-        ): RegionalSeatsScreen {
-            return RegionalSeatsScreen(
-                regions.map {
-                    buildPanel(
-                        it.title(),
-                        it.currSeats(),
-                        it.prevSeats(),
-                        it.seatHeader(),
-                        it.changeHeader(),
-                        it.seatSubhead(),
-                        it.changeSubhead(),
-                        it.totalSeats(),
-                        progressLabel?.invoke(it),
-                    )
-                },
-            )
-        }
+        ): RegionalSeatsScreen = RegionalSeatsScreen(
+            regions.map {
+                buildPanel(
+                    it.title(),
+                    it.currSeats(),
+                    it.prevSeats(),
+                    it.seatHeader(),
+                    it.changeHeader(),
+                    it.seatSubhead(),
+                    it.changeSubhead(),
+                    it.totalSeats(),
+                    progressLabel?.invoke(it),
+                )
+            },
+        )
 
         private fun buildPanel(
             title: Flow.Publisher<String>,

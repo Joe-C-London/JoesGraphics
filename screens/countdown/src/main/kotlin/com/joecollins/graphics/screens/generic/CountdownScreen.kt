@@ -33,7 +33,8 @@ class CountdownScreen private constructor(
     panel: JPanel,
     title: Flow.Publisher<String>,
     altText: Flow.Publisher<String>,
-) : GenericPanel(panel, title, altText), AltTextProvider {
+) : GenericPanel(panel, title, altText),
+    AltTextProvider {
 
     sealed class TimePanel<K> {
         internal abstract val header: String
@@ -71,15 +72,13 @@ class CountdownScreen private constructor(
             times: List<TimeWithoutFilterPanel>,
             timesUpLabel: String,
             title: Flow.Publisher<String>,
-        ): CountdownScreen {
-            return forDate(
-                date = date,
-                times = times,
-                timesUpLabel = timesUpLabel,
-                title = title,
-                clock = Clock.systemDefaultZone(),
-            )
-        }
+        ): CountdownScreen = forDate(
+            date = date,
+            times = times,
+            timesUpLabel = timesUpLabel,
+            title = title,
+            clock = Clock.systemDefaultZone(),
+        )
 
         internal fun forDate(
             date: LocalDate,
@@ -87,16 +86,14 @@ class CountdownScreen private constructor(
             timesUpLabel: String,
             title: Flow.Publisher<String>,
             clock: Clock,
-        ): CountdownScreen {
-            return createPanel(
-                date = date,
-                timings = times,
-                shapes = emptyMap<Unit, Shape>().asOneTimePublisher(),
-                timesUpLabel = timesUpLabel,
-                title = title,
-                clock = clock,
-            )
-        }
+        ): CountdownScreen = createPanel(
+            date = date,
+            timings = times,
+            shapes = emptyMap<Unit, Shape>().asOneTimePublisher(),
+            timesUpLabel = timesUpLabel,
+            title = title,
+            clock = clock,
+        )
 
         fun forDateWithMapSingle(
             timestamp: ZonedDateTime,
@@ -104,16 +101,14 @@ class CountdownScreen private constructor(
             map: Flow.Publisher<Collection<Shape>>,
             timesUpLabel: String,
             title: Flow.Publisher<String>,
-        ): CountdownScreen {
-            return forDateWithMapSingle(
-                timestamp = timestamp,
-                header = header,
-                map = map,
-                timesUpLabel = timesUpLabel,
-                title = title,
-                clock = Clock.systemDefaultZone(),
-            )
-        }
+        ): CountdownScreen = forDateWithMapSingle(
+            timestamp = timestamp,
+            header = header,
+            map = map,
+            timesUpLabel = timesUpLabel,
+            title = title,
+            clock = Clock.systemDefaultZone(),
+        )
 
         internal fun forDateWithMapSingle(
             timestamp: ZonedDateTime,
@@ -122,25 +117,23 @@ class CountdownScreen private constructor(
             timesUpLabel: String,
             title: Flow.Publisher<String>,
             clock: Clock,
-        ): CountdownScreen {
-            return createPanel(
-                date = timestamp.toLocalDate(),
-                timings = listOf(
-                    timeWithMapFilter {
-                        this.time = timestamp.toLocalTime()
-                        this.zone = timestamp.zone
-                        this.header = header
-                        this.filter = { true }
-                    },
-                ),
-                shapes = map.map { m ->
-                    m.associateWith { it }
+        ): CountdownScreen = createPanel(
+            date = timestamp.toLocalDate(),
+            timings = listOf(
+                timeWithMapFilter {
+                    this.time = timestamp.toLocalTime()
+                    this.zone = timestamp.zone
+                    this.header = header
+                    this.filter = { true }
                 },
-                timesUpLabel = timesUpLabel,
-                title = title,
-                clock = clock,
-            )
-        }
+            ),
+            shapes = map.map { m ->
+                m.associateWith { it }
+            },
+            timesUpLabel = timesUpLabel,
+            title = title,
+            clock = clock,
+        )
 
         fun <K> forDateWithMap(
             date: LocalDate,
@@ -148,16 +141,14 @@ class CountdownScreen private constructor(
             map: Flow.Publisher<out Map<K, Shape>>,
             timesUpLabel: String,
             title: Flow.Publisher<String>,
-        ): CountdownScreen {
-            return forDateWithMap(
-                date = date,
-                times = times,
-                map = map,
-                timesUpLabel = timesUpLabel,
-                title = title,
-                clock = Clock.systemDefaultZone(),
-            )
-        }
+        ): CountdownScreen = forDateWithMap(
+            date = date,
+            times = times,
+            map = map,
+            timesUpLabel = timesUpLabel,
+            title = title,
+            clock = Clock.systemDefaultZone(),
+        )
 
         internal fun <K> forDateWithMap(
             date: LocalDate,
@@ -166,16 +157,14 @@ class CountdownScreen private constructor(
             timesUpLabel: String,
             title: Flow.Publisher<String>,
             clock: Clock,
-        ): CountdownScreen {
-            return createPanel(
-                date = date,
-                timings = times,
-                shapes = map,
-                timesUpLabel = timesUpLabel,
-                title = title,
-                clock = clock,
-            )
-        }
+        ): CountdownScreen = createPanel(
+            date = date,
+            timings = times,
+            shapes = map,
+            timesUpLabel = timesUpLabel,
+            title = title,
+            clock = clock,
+        )
 
         private fun <K> createPanel(
             date: LocalDate,
@@ -238,21 +227,18 @@ class CountdownScreen private constructor(
             return CountdownScreen(outer, title, altText)
         }
 
-        private fun altTextLabel(header: String, timestamp: Instant, clock: Clock, timesUpLabel: String): Flow.Publisher<String> {
-            return TimePublisher.forClock(clock).map { now ->
-                header + ": " + timeLabel(Duration.between(now.truncatedTo(ChronoUnit.SECONDS), timestamp), timesUpLabel)
-            }
+        private fun altTextLabel(header: String, timestamp: Instant, clock: Clock, timesUpLabel: String): Flow.Publisher<String> = TimePublisher.forClock(clock).map { now ->
+            header + ": " + timeLabel(Duration.between(now.truncatedTo(ChronoUnit.SECONDS), timestamp), timesUpLabel)
         }
 
-        private fun timeLabel(it: Duration, timesUpLabel: String) =
-            if (it.isNegative || it.isZero) {
-                timesUpLabel
-            } else if (it.toHours() == 0L) {
-                CountdownFrame.formatMMSS(it)
-            } else if (it.toDays() == 0L) {
-                CountdownFrame.formatHHMMSS(it)
-            } else {
-                CountdownFrame.formatDDHHMMSS(it)
-            }
+        private fun timeLabel(it: Duration, timesUpLabel: String) = if (it.isNegative || it.isZero) {
+            timesUpLabel
+        } else if (it.toHours() == 0L) {
+            CountdownFrame.formatMMSS(it)
+        } else if (it.toDays() == 0L) {
+            CountdownFrame.formatHHMMSS(it)
+        } else {
+            CountdownFrame.formatDDHHMMSS(it)
+        }
     }
 }

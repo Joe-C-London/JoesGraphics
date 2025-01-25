@@ -28,8 +28,7 @@ import kotlin.math.roundToInt
 class SwingometerScreen private constructor(title: Flow.Publisher<out String?>, frame: SwingometerFrame, altText: Flow.Publisher<String>) : GenericPanel(pad(frame), title, altText) {
 
     companion object {
-        fun <T> Flow.Publisher<out Map<T, Map<out Party, Int>>>.convertToPartyOrCandidateForSwingometer() =
-            map { it.mapValues { e -> e.value.convertToPartyOrCandidate() } }
+        fun <T> Flow.Publisher<out Map<T, Map<out Party, Int>>>.convertToPartyOrCandidateForSwingometer() = map { it.mapValues { e -> e.value.convertToPartyOrCandidate() } }
 
         fun <T> of(
             prevVotes: Flow.Publisher<out Map<T, Map<out PartyOrCandidate, Int>>>,
@@ -65,47 +64,44 @@ class SwingometerScreen private constructor(title: Flow.Publisher<out String?>, 
         fun calculateSwing(
             currTotal: Flow.Publisher<out Map<out PartyOrCoalition, Int>>,
             prevTotal: Flow.Publisher<out Map<out PartyOrCoalition, Int>>,
-        ) =
-            currTotal.merge(prevTotal) { curr, prev ->
-                val ct = curr.values.sum().toDouble()
-                val pt = prev.values.sum().toDouble()
-                if (ct == 0.0 || pt == 0.0) return@merge emptyMap()
-                val allParties: Set<PartyOrCoalition> = sequenceOf(curr.keys.asSequence(), prev.keys.asSequence()).flatten().toSet()
-                allParties.associateWith { p: PartyOrCoalition? ->
-                    (curr[p] ?: 0) / ct - (prev[p] ?: 0) / pt
-                }
+        ) = currTotal.merge(prevTotal) { curr, prev ->
+            val ct = curr.values.sum().toDouble()
+            val pt = prev.values.sum().toDouble()
+            if (ct == 0.0 || pt == 0.0) return@merge emptyMap()
+            val allParties: Set<PartyOrCoalition> = sequenceOf(curr.keys.asSequence(), prev.keys.asSequence()).flatten().toSet()
+            allParties.associateWith { p: PartyOrCoalition? ->
+                (curr[p] ?: 0) / ct - (prev[p] ?: 0) / pt
             }
+        }
 
         private fun createSwingometer(
             inputs: Inputs<*>,
             header: Flow.Publisher<out String?>,
             progressLabel: Flow.Publisher<out String?>?,
-        ): SwingometerFrame {
-            return SwingometerFrameBuilder.build(
-                colors = inputs.colorsPublisher,
-                value = inputs.valuePublisher,
-                range = inputs.rangePublisher,
-                bucketSize = 0.005.asOneTimePublisher(),
-                tickInterval = every(0.01.asOneTimePublisher()) { (it.toDouble() * 100).roundToInt().toString() },
-                leftToWin = inputs.leftToWinPublisher,
-                rightToWin = inputs.rightToWinPublisher,
-                outerLabels = labels(
-                    labels = inputs.outerLabelsPublisher,
-                    position = { first },
-                    label = { third },
-                    color = { second },
-                ),
-                dots = dots(
-                    dots = inputs.dotsPublisher,
-                    position = { position },
-                    color = { color },
-                    label = { label ?: "" },
-                    solid = { visible },
-                ),
-                header = header,
-                rightHeaderLabel = progressLabel,
-            )
-        }
+        ): SwingometerFrame = SwingometerFrameBuilder.build(
+            colors = inputs.colorsPublisher,
+            value = inputs.valuePublisher,
+            range = inputs.rangePublisher,
+            bucketSize = 0.005.asOneTimePublisher(),
+            tickInterval = every(0.01.asOneTimePublisher()) { (it.toDouble() * 100).roundToInt().toString() },
+            leftToWin = inputs.leftToWinPublisher,
+            rightToWin = inputs.rightToWinPublisher,
+            outerLabels = labels(
+                labels = inputs.outerLabelsPublisher,
+                position = { first },
+                label = { third },
+                color = { second },
+            ),
+            dots = dots(
+                dots = inputs.dotsPublisher,
+                position = { position },
+                color = { color },
+                label = { label ?: "" },
+                solid = { visible },
+            ),
+            header = header,
+            rightHeaderLabel = progressLabel,
+        )
 
         private fun createAltText(
             inputs: Inputs<*>,
@@ -272,22 +268,20 @@ class SwingometerScreen private constructor(title: Flow.Publisher<out String?>, 
         val rangePublisher = Publisher(range)
 
         val leftToWinPublisher = Publisher<Double>()
-        private fun calculateLeftToWin() =
-            getSwingNeededForMajority(
-                prevVotes,
-                parties.first,
-                parties.second,
-                carryovers,
-            )
+        private fun calculateLeftToWin() = getSwingNeededForMajority(
+            prevVotes,
+            parties.first,
+            parties.second,
+            carryovers,
+        )
 
         val rightToWinPublisher = Publisher<Double>()
-        private fun calculateRightToWin() =
-            getSwingNeededForMajority(
-                prevVotes,
-                parties.second,
-                parties.first,
-                carryovers,
-            )
+        private fun calculateRightToWin() = getSwingNeededForMajority(
+            prevVotes,
+            parties.second,
+            parties.first,
+            carryovers,
+        )
 
         private fun updateLeftAndRightToWin() {
             leftToWinPublisher.submit(calculateLeftToWin())
@@ -339,34 +333,33 @@ class SwingometerScreen private constructor(title: Flow.Publisher<out String?>, 
             dotsPublisher.submit(calculateDots())
         }
 
-        private fun calculateDots(): List<Dot> =
-            prevVotes.entries.asSequence()
-                .map { e ->
-                    Triple(
-                        e,
-                        results[e.key],
-                        seatFilter?.contains(e.key) ?: true,
-                    )
-                }
-                .filter { e ->
-                    val winner = e.first.value.entries
-                        .maxByOrNull { it.value }!!
-                        .key
-                        .party
-                    parties.toList().flatMap { it.constituentParties }.contains(winner)
-                }
-                .map { e ->
-                    val total = e.first.value.values.sum()
-                    val left = parties.first.constituentParties.sumOf { e.first.value.convertToParty()[it] ?: 0 }
-                    val right = parties.second.constituentParties.sumOf { e.first.value.convertToParty()[it] ?: 0 }
-                    Dot(
-                        0.5 * (left - right) / total,
-                        e.second.getColor(default = Color.LIGHT_GRAY),
-                        e.third,
-                        if (weights == null) null else e.first.key.weightsAbsolute().toString(),
-                    )
-                }
-                .toList()
+        private fun calculateDots(): List<Dot> = prevVotes.entries.asSequence()
+            .map { e ->
+                Triple(
+                    e,
+                    results[e.key],
+                    seatFilter?.contains(e.key) ?: true,
+                )
+            }
+            .filter { e ->
+                val winner = e.first.value.entries
+                    .maxByOrNull { it.value }!!
+                    .key
+                    .party
+                parties.toList().flatMap { it.constituentParties }.contains(winner)
+            }
+            .map { e ->
+                val total = e.first.value.values.sum()
+                val left = parties.first.constituentParties.sumOf { e.first.value.convertToParty()[it] ?: 0 }
+                val right = parties.second.constituentParties.sumOf { e.first.value.convertToParty()[it] ?: 0 }
+                Dot(
+                    0.5 * (left - right) / total,
+                    e.second.getColor(default = Color.LIGHT_GRAY),
+                    e.third,
+                    if (weights == null) null else e.first.key.weightsAbsolute().toString(),
+                )
+            }
+            .toList()
 
         val seatsPublisher = Publisher<Pair<PartyOrCoalition?, Int>>()
         private fun updateSeats() {
@@ -523,9 +516,7 @@ class SwingometerScreen private constructor(title: Flow.Publisher<out String?>, 
             else -> Triple(0.0, Color.BLACK, rightSeats.toString())
         }
 
-        private fun getNumSeats(swings: List<Double>): Int {
-            return swings.count { it < 0 }
-        }
+        private fun getNumSeats(swings: List<Double>): Int = swings.count { it < 0 }
 
         private fun incrementLabels(
             leftSwingList: List<Double>,

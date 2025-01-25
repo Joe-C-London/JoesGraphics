@@ -23,17 +23,15 @@ abstract class AbstractSingleResultMap<T, R> internal constructor(private val co
     }
 
     companion object {
-        fun <T> createMapFrame(item: Flow.Publisher<out AbstractSingleResultMap<out T, *>>): MapFrame {
-            return createFrame(
-                item.compose { b -> b.shapes },
-                item.compose { b -> b.selectedShape },
-                item.compose { b -> b.color },
-                item.compose { b -> b.focus ?: null.asOneTimePublisher() },
-                item.compose { b -> b.additionalHighlightOrFocus ?: null.asOneTimePublisher() },
-                item.compose { b -> b.faded ?: null.asOneTimePublisher() },
-                item.compose { b -> b.header },
-            )
-        }
+        fun <T> createMapFrame(item: Flow.Publisher<out AbstractSingleResultMap<out T, *>>): MapFrame = createFrame(
+            item.compose { b -> b.shapes },
+            item.compose { b -> b.selectedShape },
+            item.compose { b -> b.color },
+            item.compose { b -> b.focus ?: null.asOneTimePublisher() },
+            item.compose { b -> b.additionalHighlightOrFocus ?: null.asOneTimePublisher() },
+            item.compose { b -> b.faded ?: null.asOneTimePublisher() },
+            item.compose { b -> b.header },
+        )
 
         private fun <T> createFrame(
             shapes: Flow.Publisher<out Map<out T, Shape>>,

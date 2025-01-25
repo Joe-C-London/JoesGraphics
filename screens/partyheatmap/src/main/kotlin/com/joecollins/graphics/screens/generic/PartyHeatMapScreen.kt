@@ -22,14 +22,12 @@ import javax.swing.JPanel
 class PartyHeatMapScreen private constructor(panel: JPanel, title: Flow.Publisher<String>, altText: Flow.Publisher<String>) : GenericPanel(panel, title, altText) {
 
     companion object {
-        fun <T> sortByPrevResult(prevResult: (T) -> Map<Party, Int>): (Party, T) -> Flow.Publisher<Double> {
-            return { party, riding ->
-                val result = prevResult(riding)
-                val me = result[party] ?: 0
-                val oth = result.filter { it.key != party }.maxOf { it.value }
-                val total = result.values.sum().toDouble()
-                ((oth - me) / total).asOneTimePublisher()
-            }
+        fun <T> sortByPrevResult(prevResult: (T) -> Map<Party, Int>): (Party, T) -> Flow.Publisher<Double> = { party, riding ->
+            val result = prevResult(riding)
+            val me = result[party] ?: 0
+            val oth = result.filter { it.key != party }.maxOf { it.value }
+            val total = result.values.sum().toDouble()
+            ((oth - me) / total).asOneTimePublisher()
         }
 
         fun <T, C : Comparable<C>> ofElected(
@@ -42,20 +40,18 @@ class PartyHeatMapScreen private constructor(panel: JPanel, title: Flow.Publishe
             filter: (Flow.Publisher<T.() -> Boolean>) = { _: T -> true }.asOneTimePublisher(),
             partyChanges: Flow.Publisher<Map<Party, Party>> = emptyMap<Party, Party>().asOneTimePublisher(),
             title: Flow.Publisher<String>,
-        ): PartyHeatMapScreen {
-            return build(
-                items,
-                parties,
-                prevResult,
-                { currResult().map { PartyResult.elected(it) } },
-                sortOrder,
-                false,
-                numRows,
-                filter,
-                partyChanges,
-                title,
-            )
-        }
+        ): PartyHeatMapScreen = build(
+            items,
+            parties,
+            prevResult,
+            { currResult().map { PartyResult.elected(it) } },
+            sortOrder,
+            false,
+            numRows,
+            filter,
+            partyChanges,
+            title,
+        )
 
         fun <T, C : Comparable<C>> ofElectedLeading(
             items: Flow.Publisher<out Collection<T>>,
@@ -67,20 +63,18 @@ class PartyHeatMapScreen private constructor(panel: JPanel, title: Flow.Publishe
             filter: (Flow.Publisher<T.() -> Boolean>) = { _: T -> true }.asOneTimePublisher(),
             partyChanges: Flow.Publisher<Map<Party, Party>> = emptyMap<Party, Party>().asOneTimePublisher(),
             title: Flow.Publisher<String>,
-        ): PartyHeatMapScreen {
-            return build(
-                items,
-                parties,
-                prevResult,
-                currResult,
-                sortOrder,
-                true,
-                numRows,
-                filter,
-                partyChanges,
-                title,
-            )
-        }
+        ): PartyHeatMapScreen = build(
+            items,
+            parties,
+            prevResult,
+            currResult,
+            sortOrder,
+            true,
+            numRows,
+            filter,
+            partyChanges,
+            title,
+        )
 
         private fun <T, C : Comparable<C>> build(
             itemsPublisher: Flow.Publisher<out Collection<T>>,
@@ -186,11 +180,9 @@ class PartyHeatMapScreen private constructor(panel: JPanel, title: Flow.Publishe
             return PartyHeatMapScreen(pad(panel), title, altText)
         }
 
-        private fun <T, C : Comparable<C>> createOrderedList(items: Collection<T>, party: Party, sortOrder: (Party, T) -> Flow.Publisher<C>): Flow.Publisher<List<T>> {
-            return items
-                .map { e -> sortOrder(party, e).map { so -> e to so } }
-                .combine()
-                .map { list -> list.sortedBy { it.second }.map { it.first } }
-        }
+        private fun <T, C : Comparable<C>> createOrderedList(items: Collection<T>, party: Party, sortOrder: (Party, T) -> Flow.Publisher<C>): Flow.Publisher<List<T>> = items
+            .map { e -> sortOrder(party, e).map { so -> e to so } }
+            .combine()
+            .map { list -> list.sortedBy { it.second }.map { it.first } }
     }
 }

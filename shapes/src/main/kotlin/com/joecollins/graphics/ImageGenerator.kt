@@ -22,9 +22,7 @@ object ImageGenerator {
         return shape
     }
 
-    fun createHalfTickShape(): Shape {
-        return createHalfShape(createTickShape())
-    }
+    fun createHalfTickShape(): Shape = createHalfShape(createTickShape())
 
     fun createMidTickShape(): Shape {
         val transform = AffineTransform.getTranslateInstance(0.0, 50.0)
@@ -62,9 +60,7 @@ object ImageGenerator {
         return shape
     }
 
-    fun createHalfRunoffShape(): Shape {
-        return createHalfShape(createRunoffShape())
-    }
+    fun createHalfRunoffShape(): Shape = createHalfShape(createRunoffShape())
 
     fun createBoxedTextShape(text: String): Shape {
         val font = StandardFont.readBoldFont(60)
@@ -77,9 +73,7 @@ object ImageGenerator {
         return area
     }
 
-    fun createHalfBoxedTextShape(text: String): Shape {
-        return createHalfShape(createBoxedTextShape(text))
-    }
+    fun createHalfBoxedTextShape(text: String): Shape = createHalfShape(createBoxedTextShape(text))
 
     private fun createHalfShape(s: Shape): Area {
         val shape = Area(s)

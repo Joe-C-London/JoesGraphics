@@ -91,12 +91,10 @@ class SeatsChangingScreen private constructor(title: Flow.Publisher<out String?>
 
         val fill = currResult.elected
 
-        private fun Color.fadeIfNotSelected(): Color {
-            return if (filterIncludes) {
-                this
-            } else {
-                ColorUtils.lighten(ColorUtils.lighten(this))
-            }
+        private fun Color.fadeIfNotSelected(): Color = if (filterIncludes) {
+            this
+        } else {
+            ColorUtils.lighten(ColorUtils.lighten(this))
         }
     }
     companion object {

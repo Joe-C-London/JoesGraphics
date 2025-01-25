@@ -36,17 +36,11 @@ class BottomSummary(
     internal val numEntries: Int
         get() = entryPanels.size
 
-    internal fun getEntryColor(index: Int): Color {
-        return entryPanels[index].background
-    }
+    internal fun getEntryColor(index: Int): Color = entryPanels[index].background
 
-    internal fun getEntryLabel(index: Int): String {
-        return entryPanels[index].bottomHeaderLabel.text
-    }
+    internal fun getEntryLabel(index: Int): String = entryPanels[index].bottomHeaderLabel.text
 
-    internal fun getEntryValue(index: Int): String {
-        return entryPanels[index].bottomValueLabel.text
-    }
+    internal fun getEntryValue(index: Int): String = entryPanels[index].bottomValueLabel.text
 
     private inner class LabelWithBackground : JPanel() {
         init {
@@ -117,13 +111,9 @@ class BottomSummary(
             override fun removeLayoutComponent(comp: Component) {
             }
 
-            override fun preferredLayoutSize(parent: Container): Dimension {
-                return Dimension(1024, 20)
-            }
+            override fun preferredLayoutSize(parent: Container): Dimension = Dimension(1024, 20)
 
-            override fun minimumLayoutSize(parent: Container): Dimension {
-                return Dimension(1024, 20)
-            }
+            override fun minimumLayoutSize(parent: Container): Dimension = Dimension(1024, 20)
 
             override fun layoutContainer(parent: Container) {
                 val width = parent.width

@@ -109,30 +109,28 @@ class BattlegroundScreen private constructor(
 
         val items: Flow.Publisher<List<Entry<T>>> = Publisher(getItemsList())
 
-        private fun getItemsList(): List<Entry<T>> {
-            return prev.entries.asSequence()
-                .mapNotNull { e ->
-                    val votes = e.value
-                    val prevWinner = votes.maxBy { it.value }.key.party
-                    val margin: Double? = getSortKey(votes)
-                    if (margin == null) {
-                        null
-                    } else {
-                        Triple(e.key, margin, prevWinner)
-                    }
+        private fun getItemsList(): List<Entry<T>> = prev.entries.asSequence()
+            .mapNotNull { e ->
+                val votes = e.value
+                val prevWinner = votes.maxBy { it.value }.key.party
+                val margin: Double? = getSortKey(votes)
+                if (margin == null) {
+                    null
+                } else {
+                    Triple(e.key, margin, prevWinner)
                 }
-                .sortedBy { it.second }
-                .take(count)
-                .map {
-                    Entry(
-                        it.first,
-                        it.third,
-                        curr[it.first],
-                        filteredSeats?.contains(it.first) ?: true,
-                    )
-                }
-                .toList()
-        }
+            }
+            .sortedBy { it.second }
+            .take(count)
+            .map {
+                Entry(
+                    it.first,
+                    it.third,
+                    curr[it.first],
+                    filteredSeats?.contains(it.first) ?: true,
+                )
+            }
+            .toList()
 
         protected abstract fun getSortKey(votes: Map<PartyOrCandidate, Int>): Double?
     }
@@ -207,12 +205,10 @@ class BattlegroundScreen private constructor(
     }
 
     private class Entry<T>(val key: T, prevWinner: Party, val currResult: PartyResult?, val isIncluded: Boolean) {
-        fun Color.adjust(): Color {
-            return if (isIncluded) {
-                this
-            } else {
-                ColorUtils.lighten(ColorUtils.lighten(this))
-            }
+        fun Color.adjust(): Color = if (isIncluded) {
+            this
+        } else {
+            ColorUtils.lighten(ColorUtils.lighten(this))
         }
         val prevColor: Color = prevWinner.color.adjust()
         val resultColor: Color = (currResult?.leader?.color ?: Color.LIGHT_GRAY).adjust()
@@ -252,13 +248,9 @@ class BattlegroundScreen private constructor(
             if (name == EAST) rightPanel = comp
         }
         override fun removeLayoutComponent(comp: Component) {}
-        override fun preferredLayoutSize(parent: Container): Dimension? {
-            return null
-        }
+        override fun preferredLayoutSize(parent: Container): Dimension? = null
 
-        override fun minimumLayoutSize(parent: Container): Dimension? {
-            return null
-        }
+        override fun minimumLayoutSize(parent: Container): Dimension? = null
 
         override fun layoutContainer(parent: Container) {
             leftPanel.isVisible = leftColumn > 0
@@ -281,8 +273,7 @@ class BattlegroundScreen private constructor(
         private const val DEFAULT_COUNT = 100
         private const val DEFAULT_ROWS = 20
 
-        fun <T> Flow.Publisher<out Map<T, Map<out Party, Int>>>.convertToPartyOrCandidateForBattleground() =
-            map { it.mapValues { e -> e.value.convertToPartyOrCandidate() } }
+        fun <T> Flow.Publisher<out Map<T, Map<out Party, Int>>>.convertToPartyOrCandidateForBattleground() = map { it.mapValues { e -> e.value.convertToPartyOrCandidate() } }
 
         fun <T> singleParty(
             prevResults: Flow.Publisher<out Map<T, Map<PartyOrCandidate, Int>>>,
@@ -355,8 +346,7 @@ class BattlegroundScreen private constructor(
                 }
                     .merge(currResults) { (rows, party), result -> Triple(rows, party, result.all { r -> r.value?.elected ?: true }) }
 
-                val textGenerator: (List<Entry<T>>, Int, Party, Boolean, String, String) -> String? = {
-                        items, rows, party, allDone, winLabel, loseLabel ->
+                val textGenerator: (List<Entry<T>>, Int, Party, Boolean, String, String) -> String? = { items, rows, party, allDone, winLabel, loseLabel ->
                     if (items.none { it.isIncluded }) {
                         null
                     } else {
@@ -479,8 +469,7 @@ class BattlegroundScreen private constructor(
                 }
                     .merge(currResults) { (rows, party), result -> Triple(rows, party, result.all { r -> r.value?.elected ?: true }) }
 
-                val textGenerator: (List<Entry<T>>, Int, PartyOrCoalition, PartyOrCoalition, Boolean) -> String? = {
-                        items, rows, party, othParty, allDone ->
+                val textGenerator: (List<Entry<T>>, Int, PartyOrCoalition, PartyOrCoalition, Boolean) -> String? = { items, rows, party, othParty, allDone ->
                     if (items.none { it.isIncluded }) {
                         null
                     } else {
@@ -531,20 +520,16 @@ class BattlegroundScreen private constructor(
             )
         }
 
-        private fun columns(count: Flow.Publisher<out Int>?, rows: Flow.Publisher<out Int>?): Flow.Publisher<Int> {
-            return if (count != null && rows != null) {
-                count.merge(rows) { c, n -> n * ceil(1.0 * c / n).toInt() }
-            } else {
-                count?.map { c -> DEFAULT_ROWS * ceil(1.0 * c / DEFAULT_ROWS).toInt() }
-                    ?: (
-                        rows?.map { n -> n * ceil(1.0 * DEFAULT_COUNT / n).toInt() }
-                            ?: (DEFAULT_ROWS * ceil(1.0 * DEFAULT_COUNT / DEFAULT_ROWS).toInt()).asOneTimePublisher()
-                        )
-            }
+        private fun columns(count: Flow.Publisher<out Int>?, rows: Flow.Publisher<out Int>?): Flow.Publisher<Int> = if (count != null && rows != null) {
+            count.merge(rows) { c, n -> n * ceil(1.0 * c / n).toInt() }
+        } else {
+            count?.map { c -> DEFAULT_ROWS * ceil(1.0 * c / DEFAULT_ROWS).toInt() }
+                ?: (
+                    rows?.map { n -> n * ceil(1.0 * DEFAULT_COUNT / n).toInt() }
+                        ?: (DEFAULT_ROWS * ceil(1.0 * DEFAULT_COUNT / DEFAULT_ROWS).toInt()).asOneTimePublisher()
+                    )
         }
     }
 }
 
-internal fun <L, R> Pair<L, R>.reverse(): Pair<R, L> {
-    return second to first
-}
+internal fun <L, R> Pair<L, R>.reverse(): Pair<R, L> = second to first

@@ -58,17 +58,11 @@ class LowerThirdHeadlineAndSummaryHeaderAndLabels @TestOnly constructor(
     internal val numSummaryEntries: Int
         get() = partySummary.numEntries
 
-    internal fun getEntryColor(index: Int): Color {
-        return partySummary.getEntryColor(index)
-    }
+    internal fun getEntryColor(index: Int): Color = partySummary.getEntryColor(index)
 
-    internal fun getEntryLabel(index: Int): String {
-        return partySummary.getEntryLabel(index)
-    }
+    internal fun getEntryLabel(index: Int): String = partySummary.getEntryLabel(index)
 
-    internal fun getEntryValue(index: Int): String {
-        return partySummary.getEntryValue(index)
-    }
+    internal fun getEntryValue(index: Int): String = partySummary.getEntryValue(index)
 
     init {
         val center = JPanel()

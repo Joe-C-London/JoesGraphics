@@ -26,8 +26,6 @@ class TweetFrame internal constructor(
     }
 
     companion object {
-        fun createTweetFrame(tweetId: Flow.Publisher<out Long>, timezone: ZoneId = ZoneId.systemDefault()): TweetFrame {
-            return TweetFrame(tweetId.map { TweetLoader.loadTweetV2(it) }, timezone)
-        }
+        fun createTweetFrame(tweetId: Flow.Publisher<out Long>, timezone: ZoneId = ZoneId.systemDefault()): TweetFrame = TweetFrame(tweetId.map { TweetLoader.loadTweetV2(it) }, timezone)
     }
 }

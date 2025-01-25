@@ -11,7 +11,8 @@ import javax.swing.JPanel
 open class GenericPanelWithLowerThird(
     panel: JPanel,
     lowerThird: LowerThird,
-) : JPanel(), AltTextProvider {
+) : JPanel(),
+    AltTextProvider {
 
     init {
         background = Color.WHITE

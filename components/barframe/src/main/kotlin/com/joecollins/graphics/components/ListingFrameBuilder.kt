@@ -16,18 +16,16 @@ object ListingFrameBuilder {
         header: Flow.Publisher<out String?>,
         subhead: Flow.Publisher<out String?>? = null,
         notes: Flow.Publisher<out String?>? = null,
-    ): BarFrame {
-        return BarFrame(
-            barsPublisher = list.map { l ->
-                l.map {
-                    BarFrame.Bar(it.leftText(), it.rightText(), null, listOf(Pair(it.color(), 1)))
-                }
-            },
-            headerPublisher = header,
-            subheadTextPublisher = subhead,
-            notesPublisher = notes,
-        )
-    }
+    ): BarFrame = BarFrame(
+        barsPublisher = list.map { l ->
+            l.map {
+                BarFrame.Bar(it.leftText(), it.rightText(), null, listOf(Pair(it.color(), 1)))
+            }
+        },
+        headerPublisher = header,
+        subheadTextPublisher = subhead,
+        notesPublisher = notes,
+    )
 
     fun <T> of(
         list: List<T>,
@@ -37,20 +35,17 @@ object ListingFrameBuilder {
         header: Flow.Publisher<out String?>,
         subhead: Flow.Publisher<out String?>? = null,
         notes: Flow.Publisher<out String?>? = null,
-    ): BarFrame {
-        return BarFrame(
-            barsPublisher =
-            list.map {
-                it.leftText().merge(it.rightText()) { left, right -> Pair(left, right) }
-                    .merge(it.color()) {
-                            (left, right), color ->
-                        BarFrame.Bar(left, right, listOf(Pair(color, 1)))
-                    }
-            }
-                .combine(),
-            headerPublisher = header,
-            subheadTextPublisher = subhead,
-            notesPublisher = notes,
-        )
-    }
+    ): BarFrame = BarFrame(
+        barsPublisher =
+        list.map {
+            it.leftText().merge(it.rightText()) { left, right -> Pair(left, right) }
+                .merge(it.color()) { (left, right), color ->
+                    BarFrame.Bar(left, right, listOf(Pair(color, 1)))
+                }
+        }
+            .combine(),
+        headerPublisher = header,
+        subheadTextPublisher = subhead,
+        notesPublisher = notes,
+    )
 }

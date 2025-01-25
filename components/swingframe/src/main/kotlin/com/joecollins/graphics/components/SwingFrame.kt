@@ -62,29 +62,17 @@ class SwingFrame(
         bottomColorPublisher.subscribe(Subscriber(eventQueueWrapper { bottomLabel.foreground = ColorUtils.contrastForBackground(it) }))
     }
 
-    internal fun getRange(): Number {
-        return swingPanel.range
-    }
+    internal fun getRange(): Number = swingPanel.range
 
-    internal fun getValue(): Number {
-        return swingPanel.value
-    }
+    internal fun getValue(): Number = swingPanel.value
 
-    internal fun getLeftColor(): Color {
-        return swingPanel.leftColor
-    }
+    internal fun getLeftColor(): Color = swingPanel.leftColor
 
-    internal fun getRightColor(): Color {
-        return swingPanel.rightColor
-    }
+    internal fun getRightColor(): Color = swingPanel.rightColor
 
-    internal fun getBottomText(): String? {
-        return if (bottomLabel.isVisible) bottomLabel.text else null
-    }
+    internal fun getBottomText(): String? = if (bottomLabel.isVisible) bottomLabel.text else null
 
-    internal fun getBottomColor(): Color {
-        return bottomLabel.foreground
-    }
+    internal fun getBottomColor(): Color = bottomLabel.foreground
 
     private inner class SwingPanel : JPanel() {
         var range: Number = 1

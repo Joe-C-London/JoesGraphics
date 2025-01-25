@@ -17,13 +17,9 @@ object ShapefileReader : GenericReader() {
                 store.dispose()
             }
 
-            override fun hasNext(): Boolean {
-                return features.hasNext()
-            }
+            override fun hasNext(): Boolean = features.hasNext()
 
-            override fun next(): SimpleFeature {
-                return features.next()
-            }
+            override fun next(): SimpleFeature = features.next()
         }
     }
 

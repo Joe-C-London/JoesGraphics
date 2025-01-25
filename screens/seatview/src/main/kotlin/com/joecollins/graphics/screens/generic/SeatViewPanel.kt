@@ -54,33 +54,31 @@ class SeatViewPanel private constructor(
             partyClassification: (PartyClassification<PartyOrCoalition>.() -> Unit)? = null,
             map: AbstractMap<*>? = null,
             title: Flow.Publisher<out String?>,
-        ): SeatViewPanel {
-            return SeatScreenBuilder(
-                current = CurrentSeats<PartyOrCoalition, Int>().apply(current),
-                diff = diff?.let { SeatDiff<PartyOrCoalition, Int>().apply(it) },
-                prev = prev?.let { PrevSeats<PartyOrCoalition, Int>(partyChanges).apply(it) },
-                swing = swing?.let { Swing<PartyOrCoalition>(partyChanges).apply(it) },
-                majority = majorityLine?.let { MajorityLine().apply(it) },
-                partyClassification = partyClassification?.let { PartyClassification<PartyOrCoalition>().apply(it) },
-                map = map,
-                secondMap = null,
-                keyTemplate = BasicResultPanel.PartyTemplate(),
-                seatTemplate = SingleSeatTemplate,
-                currDiffFactory = SingleCurrDiffFactory,
-                createBarFrame = {
-                    BarFrameBuilder.basic(
-                        barsPublisher = bars,
-                        headerPublisher = header,
-                        rightHeaderLabelPublisher = progress,
-                        subheadPublisher = subhead,
-                        notesPublisher = notes,
-                        limitsPublisher = limits,
-                        linesPublisher = lines,
-                    )
-                },
-                textHeader = title,
-            ).build()
-        }
+        ): SeatViewPanel = SeatScreenBuilder(
+            current = CurrentSeats<PartyOrCoalition, Int>().apply(current),
+            diff = diff?.let { SeatDiff<PartyOrCoalition, Int>().apply(it) },
+            prev = prev?.let { PrevSeats<PartyOrCoalition, Int>(partyChanges).apply(it) },
+            swing = swing?.let { Swing<PartyOrCoalition>(partyChanges).apply(it) },
+            majority = majorityLine?.let { MajorityLine().apply(it) },
+            partyClassification = partyClassification?.let { PartyClassification<PartyOrCoalition>().apply(it) },
+            map = map,
+            secondMap = null,
+            keyTemplate = BasicResultPanel.PartyTemplate(),
+            seatTemplate = SingleSeatTemplate,
+            currDiffFactory = SingleCurrDiffFactory,
+            createBarFrame = {
+                BarFrameBuilder.basic(
+                    barsPublisher = bars,
+                    headerPublisher = header,
+                    rightHeaderLabelPublisher = progress,
+                    subheadPublisher = subhead,
+                    notesPublisher = notes,
+                    limitsPublisher = limits,
+                    linesPublisher = lines,
+                )
+            },
+            textHeader = title,
+        ).build()
 
         fun partySeats(
             current: CurrentSeats<PartyOrCoalition, Int>.() -> Unit,
@@ -92,33 +90,31 @@ class SeatViewPanel private constructor(
             map: AbstractMap<*>,
             secondMap: AbstractMap<*>,
             title: Flow.Publisher<out String?>,
-        ): SeatViewPanel {
-            return SeatScreenBuilder(
-                current = CurrentSeats<PartyOrCoalition, Int>().apply(current),
-                diff = diff?.let { SeatDiff<PartyOrCoalition, Int>().apply(it) },
-                prev = prev?.let { PrevSeats<PartyOrCoalition, Int>(partyChanges).apply(it) },
-                swing = null,
-                majority = majorityLine?.let { MajorityLine().apply(it) },
-                partyClassification = partyClassification?.let { PartyClassification<PartyOrCoalition>().apply(it) },
-                map = map,
-                secondMap = secondMap,
-                keyTemplate = BasicResultPanel.PartyTemplate(),
-                seatTemplate = SingleSeatTemplate,
-                currDiffFactory = SingleCurrDiffFactory,
-                createBarFrame = {
-                    BarFrameBuilder.basic(
-                        barsPublisher = bars,
-                        headerPublisher = header,
-                        rightHeaderLabelPublisher = progress,
-                        subheadPublisher = subhead,
-                        notesPublisher = notes,
-                        limitsPublisher = limits,
-                        linesPublisher = lines,
-                    )
-                },
-                textHeader = title,
-            ).build()
-        }
+        ): SeatViewPanel = SeatScreenBuilder(
+            current = CurrentSeats<PartyOrCoalition, Int>().apply(current),
+            diff = diff?.let { SeatDiff<PartyOrCoalition, Int>().apply(it) },
+            prev = prev?.let { PrevSeats<PartyOrCoalition, Int>(partyChanges).apply(it) },
+            swing = null,
+            majority = majorityLine?.let { MajorityLine().apply(it) },
+            partyClassification = partyClassification?.let { PartyClassification<PartyOrCoalition>().apply(it) },
+            map = map,
+            secondMap = secondMap,
+            keyTemplate = BasicResultPanel.PartyTemplate(),
+            seatTemplate = SingleSeatTemplate,
+            currDiffFactory = SingleCurrDiffFactory,
+            createBarFrame = {
+                BarFrameBuilder.basic(
+                    barsPublisher = bars,
+                    headerPublisher = header,
+                    rightHeaderLabelPublisher = progress,
+                    subheadPublisher = subhead,
+                    notesPublisher = notes,
+                    limitsPublisher = limits,
+                    linesPublisher = lines,
+                )
+            },
+            textHeader = title,
+        ).build()
 
         fun candidateSeats(
             current: CurrentSeats<Candidate, Int>.() -> Unit,
@@ -130,33 +126,31 @@ class SeatViewPanel private constructor(
             partyClassification: (PartyClassification<Party>.() -> Unit)? = null,
             map: AbstractMap<*>? = null,
             title: Flow.Publisher<out String?>,
-        ): SeatViewPanel {
-            return SeatScreenBuilder(
-                current = CurrentSeats<Candidate, Int>().apply(current),
-                diff = diff?.let { SeatDiff<Party, Int>().apply(it) },
-                prev = prev?.let { PrevSeats<Party, Int>(partyChanges).apply(it) },
-                swing = swing?.let { Swing<Party>(partyChanges).apply(it) },
-                majority = majorityLine?.let { MajorityLine().apply(it) },
-                partyClassification = partyClassification?.let { PartyClassification<Party>().apply(it) },
-                map = map,
-                secondMap = null,
-                keyTemplate = BasicResultPanel.CandidateTemplate(),
-                seatTemplate = SingleSeatTemplate,
-                currDiffFactory = SingleCurrDiffFactory,
-                createBarFrame = {
-                    BarFrameBuilder.basic(
-                        barsPublisher = bars,
-                        headerPublisher = header,
-                        rightHeaderLabelPublisher = progress,
-                        subheadPublisher = subhead,
-                        notesPublisher = notes,
-                        limitsPublisher = limits,
-                        linesPublisher = lines,
-                    )
-                },
-                textHeader = title,
-            ).build()
-        }
+        ): SeatViewPanel = SeatScreenBuilder(
+            current = CurrentSeats<Candidate, Int>().apply(current),
+            diff = diff?.let { SeatDiff<Party, Int>().apply(it) },
+            prev = prev?.let { PrevSeats<Party, Int>(partyChanges).apply(it) },
+            swing = swing?.let { Swing<Party>(partyChanges).apply(it) },
+            majority = majorityLine?.let { MajorityLine().apply(it) },
+            partyClassification = partyClassification?.let { PartyClassification<Party>().apply(it) },
+            map = map,
+            secondMap = null,
+            keyTemplate = BasicResultPanel.CandidateTemplate(),
+            seatTemplate = SingleSeatTemplate,
+            currDiffFactory = SingleCurrDiffFactory,
+            createBarFrame = {
+                BarFrameBuilder.basic(
+                    barsPublisher = bars,
+                    headerPublisher = header,
+                    rightHeaderLabelPublisher = progress,
+                    subheadPublisher = subhead,
+                    notesPublisher = notes,
+                    limitsPublisher = limits,
+                    linesPublisher = lines,
+                )
+            },
+            textHeader = title,
+        ).build()
 
         fun partyDualSeats(
             current: CurrentSeats<PartyOrCoalition, Pair<Int, Int>>.() -> Unit,
@@ -168,33 +162,31 @@ class SeatViewPanel private constructor(
             partyClassification: (PartyClassification<PartyOrCoalition>.() -> Unit)? = null,
             map: AbstractMap<*>? = null,
             title: Flow.Publisher<out String?>,
-        ): SeatViewPanel {
-            return SeatScreenBuilder(
-                current = CurrentSeats<PartyOrCoalition, Pair<Int, Int>>().apply(current),
-                diff = diff?.let { SeatDiff<PartyOrCoalition, Pair<Int, Int>>().apply(it) },
-                prev = prev?.let { PrevSeats<PartyOrCoalition, Pair<Int, Int>>(partyChanges).apply(it) },
-                swing = swing?.let { Swing<PartyOrCoalition>(partyChanges).apply(it) },
-                majority = majorityLine?.let { MajorityLine().apply(it) },
-                partyClassification = partyClassification?.let { PartyClassification<PartyOrCoalition>().apply(it) },
-                map = map,
-                secondMap = null,
-                keyTemplate = BasicResultPanel.PartyTemplate(),
-                seatTemplate = DualSeatTemplate,
-                currDiffFactory = DualCurrDiffFactory,
-                createBarFrame = {
-                    BarFrameBuilder.dual(
-                        barsPublisher = bars,
-                        headerPublisher = header,
-                        rightHeaderLabelPublisher = progress,
-                        subheadPublisher = subhead,
-                        notesPublisher = notes,
-                        limitsPublisher = limits,
-                        linesPublisher = lines,
-                    )
-                },
-                textHeader = title,
-            ).build()
-        }
+        ): SeatViewPanel = SeatScreenBuilder(
+            current = CurrentSeats<PartyOrCoalition, Pair<Int, Int>>().apply(current),
+            diff = diff?.let { SeatDiff<PartyOrCoalition, Pair<Int, Int>>().apply(it) },
+            prev = prev?.let { PrevSeats<PartyOrCoalition, Pair<Int, Int>>(partyChanges).apply(it) },
+            swing = swing?.let { Swing<PartyOrCoalition>(partyChanges).apply(it) },
+            majority = majorityLine?.let { MajorityLine().apply(it) },
+            partyClassification = partyClassification?.let { PartyClassification<PartyOrCoalition>().apply(it) },
+            map = map,
+            secondMap = null,
+            keyTemplate = BasicResultPanel.PartyTemplate(),
+            seatTemplate = DualSeatTemplate,
+            currDiffFactory = DualCurrDiffFactory,
+            createBarFrame = {
+                BarFrameBuilder.dual(
+                    barsPublisher = bars,
+                    headerPublisher = header,
+                    rightHeaderLabelPublisher = progress,
+                    subheadPublisher = subhead,
+                    notesPublisher = notes,
+                    limitsPublisher = limits,
+                    linesPublisher = lines,
+                )
+            },
+            textHeader = title,
+        ).build()
 
         fun partyDualSeatsReversed(
             current: CurrentSeats<PartyOrCoalition, Pair<Int, Int>>.() -> Unit,
@@ -206,33 +198,31 @@ class SeatViewPanel private constructor(
             partyClassification: (PartyClassification<PartyOrCoalition>.() -> Unit)? = null,
             map: AbstractMap<*>? = null,
             title: Flow.Publisher<out String?>,
-        ): SeatViewPanel {
-            return SeatScreenBuilder(
-                current = CurrentSeats<PartyOrCoalition, Pair<Int, Int>>().apply(current),
-                diff = diff?.let { SeatDiff<PartyOrCoalition, Pair<Int, Int>>().apply(it) },
-                prev = prev?.let { PrevSeats<PartyOrCoalition, Pair<Int, Int>>(partyChanges).apply(it) },
-                swing = swing?.let { Swing<PartyOrCoalition>(partyChanges).apply(it) },
-                majority = majorityLine?.let { MajorityLine().apply(it) },
-                partyClassification = partyClassification?.let { PartyClassification<PartyOrCoalition>().apply(it) },
-                map = map,
-                secondMap = null,
-                keyTemplate = BasicResultPanel.PartyTemplate(),
-                seatTemplate = ReversedDualSeatTemplate,
-                currDiffFactory = DualCurrDiffFactory,
-                createBarFrame = {
-                    BarFrameBuilder.dualReversed(
-                        barsPublisher = bars,
-                        headerPublisher = header,
-                        rightHeaderLabelPublisher = progress,
-                        subheadPublisher = subhead,
-                        notesPublisher = notes,
-                        limitsPublisher = limits,
-                        linesPublisher = lines,
-                    )
-                },
-                textHeader = title,
-            ).build()
-        }
+        ): SeatViewPanel = SeatScreenBuilder(
+            current = CurrentSeats<PartyOrCoalition, Pair<Int, Int>>().apply(current),
+            diff = diff?.let { SeatDiff<PartyOrCoalition, Pair<Int, Int>>().apply(it) },
+            prev = prev?.let { PrevSeats<PartyOrCoalition, Pair<Int, Int>>(partyChanges).apply(it) },
+            swing = swing?.let { Swing<PartyOrCoalition>(partyChanges).apply(it) },
+            majority = majorityLine?.let { MajorityLine().apply(it) },
+            partyClassification = partyClassification?.let { PartyClassification<PartyOrCoalition>().apply(it) },
+            map = map,
+            secondMap = null,
+            keyTemplate = BasicResultPanel.PartyTemplate(),
+            seatTemplate = ReversedDualSeatTemplate,
+            currDiffFactory = DualCurrDiffFactory,
+            createBarFrame = {
+                BarFrameBuilder.dualReversed(
+                    barsPublisher = bars,
+                    headerPublisher = header,
+                    rightHeaderLabelPublisher = progress,
+                    subheadPublisher = subhead,
+                    notesPublisher = notes,
+                    limitsPublisher = limits,
+                    linesPublisher = lines,
+                )
+            },
+            textHeader = title,
+        ).build()
 
         fun candidateDualSeats(
             current: CurrentSeats<Candidate, Pair<Int, Int>>.() -> Unit,
@@ -244,33 +234,31 @@ class SeatViewPanel private constructor(
             partyClassification: (PartyClassification<Party>.() -> Unit)? = null,
             map: AbstractMap<*>? = null,
             title: Flow.Publisher<out String?>,
-        ): SeatViewPanel {
-            return SeatScreenBuilder(
-                current = CurrentSeats<Candidate, Pair<Int, Int>>().apply(current),
-                diff = diff?.let { SeatDiff<Party, Pair<Int, Int>>().apply(it) },
-                prev = prev?.let { PrevSeats<Party, Pair<Int, Int>>(partyChanges).apply(it) },
-                swing = swing?.let { Swing<Party>(partyChanges).apply(it) },
-                majority = majorityLine?.let { MajorityLine().apply(it) },
-                partyClassification = partyClassification?.let { PartyClassification<Party>().apply(it) },
-                map = map,
-                secondMap = null,
-                keyTemplate = BasicResultPanel.CandidateTemplate(),
-                seatTemplate = DualSeatTemplate,
-                currDiffFactory = DualCurrDiffFactory,
-                createBarFrame = {
-                    BarFrameBuilder.dual(
-                        barsPublisher = bars,
-                        headerPublisher = header,
-                        rightHeaderLabelPublisher = progress,
-                        subheadPublisher = subhead,
-                        notesPublisher = notes,
-                        limitsPublisher = limits,
-                        linesPublisher = lines,
-                    )
-                },
-                textHeader = title,
-            ).build()
-        }
+        ): SeatViewPanel = SeatScreenBuilder(
+            current = CurrentSeats<Candidate, Pair<Int, Int>>().apply(current),
+            diff = diff?.let { SeatDiff<Party, Pair<Int, Int>>().apply(it) },
+            prev = prev?.let { PrevSeats<Party, Pair<Int, Int>>(partyChanges).apply(it) },
+            swing = swing?.let { Swing<Party>(partyChanges).apply(it) },
+            majority = majorityLine?.let { MajorityLine().apply(it) },
+            partyClassification = partyClassification?.let { PartyClassification<Party>().apply(it) },
+            map = map,
+            secondMap = null,
+            keyTemplate = BasicResultPanel.CandidateTemplate(),
+            seatTemplate = DualSeatTemplate,
+            currDiffFactory = DualCurrDiffFactory,
+            createBarFrame = {
+                BarFrameBuilder.dual(
+                    barsPublisher = bars,
+                    headerPublisher = header,
+                    rightHeaderLabelPublisher = progress,
+                    subheadPublisher = subhead,
+                    notesPublisher = notes,
+                    limitsPublisher = limits,
+                    linesPublisher = lines,
+                )
+            },
+            textHeader = title,
+        ).build()
 
         fun partyRangeSeats(
             current: CurrentSeats<PartyOrCoalition, IntRange>.() -> Unit,
@@ -281,33 +269,31 @@ class SeatViewPanel private constructor(
             majorityLine: (MajorityLine.() -> Unit)? = null,
             map: AbstractMap<*>? = null,
             title: Flow.Publisher<out String?>,
-        ): SeatViewPanel {
-            return SeatScreenBuilder(
-                current = CurrentSeats<PartyOrCoalition, IntRange>().apply(current),
-                diff = diff?.let { SeatDiff<PartyOrCoalition, IntRange>().apply(it) },
-                prev = prev?.let { PrevSeats<PartyOrCoalition, Int>(partyChanges).apply(it) },
-                swing = swing?.let { Swing<PartyOrCoalition>(partyChanges).apply(it) },
-                majority = majorityLine?.let { MajorityLine().apply(it) },
-                partyClassification = null,
-                map = map,
-                secondMap = null,
-                keyTemplate = BasicResultPanel.PartyTemplate(),
-                seatTemplate = RangeSeatTemplate,
-                currDiffFactory = RangeCurrDiffFactory,
-                createBarFrame = {
-                    BarFrameBuilder.dual(
-                        barsPublisher = bars,
-                        headerPublisher = header,
-                        rightHeaderLabelPublisher = progress,
-                        subheadPublisher = subhead,
-                        notesPublisher = notes,
-                        limitsPublisher = limits,
-                        linesPublisher = lines,
-                    )
-                },
-                textHeader = title,
-            ).build()
-        }
+        ): SeatViewPanel = SeatScreenBuilder(
+            current = CurrentSeats<PartyOrCoalition, IntRange>().apply(current),
+            diff = diff?.let { SeatDiff<PartyOrCoalition, IntRange>().apply(it) },
+            prev = prev?.let { PrevSeats<PartyOrCoalition, Int>(partyChanges).apply(it) },
+            swing = swing?.let { Swing<PartyOrCoalition>(partyChanges).apply(it) },
+            majority = majorityLine?.let { MajorityLine().apply(it) },
+            partyClassification = null,
+            map = map,
+            secondMap = null,
+            keyTemplate = BasicResultPanel.PartyTemplate(),
+            seatTemplate = RangeSeatTemplate,
+            currDiffFactory = RangeCurrDiffFactory,
+            createBarFrame = {
+                BarFrameBuilder.dual(
+                    barsPublisher = bars,
+                    headerPublisher = header,
+                    rightHeaderLabelPublisher = progress,
+                    subheadPublisher = subhead,
+                    notesPublisher = notes,
+                    limitsPublisher = limits,
+                    linesPublisher = lines,
+                )
+            },
+            textHeader = title,
+        ).build()
 
         fun partyRangeSeats(
             current: CurrentSeats<PartyOrCoalition, IntRange>.() -> Unit,
@@ -318,33 +304,31 @@ class SeatViewPanel private constructor(
             map: AbstractMap<*>,
             secondMap: AbstractMap<*>,
             title: Flow.Publisher<out String?>,
-        ): SeatViewPanel {
-            return SeatScreenBuilder(
-                current = CurrentSeats<PartyOrCoalition, IntRange>().apply(current),
-                diff = diff?.let { SeatDiff<PartyOrCoalition, IntRange>().apply(it) },
-                prev = prev?.let { PrevSeats<PartyOrCoalition, Int>(partyChanges).apply(it) },
-                swing = null,
-                majority = majorityLine?.let { MajorityLine().apply(it) },
-                partyClassification = null,
-                map = map,
-                secondMap = secondMap,
-                keyTemplate = BasicResultPanel.PartyTemplate(),
-                seatTemplate = RangeSeatTemplate,
-                currDiffFactory = RangeCurrDiffFactory,
-                createBarFrame = {
-                    BarFrameBuilder.dual(
-                        barsPublisher = bars,
-                        headerPublisher = header,
-                        rightHeaderLabelPublisher = progress,
-                        subheadPublisher = subhead,
-                        notesPublisher = notes,
-                        limitsPublisher = limits,
-                        linesPublisher = lines,
-                    )
-                },
-                textHeader = title,
-            ).build()
-        }
+        ): SeatViewPanel = SeatScreenBuilder(
+            current = CurrentSeats<PartyOrCoalition, IntRange>().apply(current),
+            diff = diff?.let { SeatDiff<PartyOrCoalition, IntRange>().apply(it) },
+            prev = prev?.let { PrevSeats<PartyOrCoalition, Int>(partyChanges).apply(it) },
+            swing = null,
+            majority = majorityLine?.let { MajorityLine().apply(it) },
+            partyClassification = null,
+            map = map,
+            secondMap = secondMap,
+            keyTemplate = BasicResultPanel.PartyTemplate(),
+            seatTemplate = RangeSeatTemplate,
+            currDiffFactory = RangeCurrDiffFactory,
+            createBarFrame = {
+                BarFrameBuilder.dual(
+                    barsPublisher = bars,
+                    headerPublisher = header,
+                    rightHeaderLabelPublisher = progress,
+                    subheadPublisher = subhead,
+                    notesPublisher = notes,
+                    limitsPublisher = limits,
+                    linesPublisher = lines,
+                )
+            },
+            textHeader = title,
+        ).build()
 
         fun candidateRangeSeats(
             current: CurrentSeats<Candidate, IntRange>.() -> Unit,
@@ -355,33 +339,31 @@ class SeatViewPanel private constructor(
             majorityLine: (MajorityLine.() -> Unit)? = null,
             map: AbstractMap<*>? = null,
             title: Flow.Publisher<out String?>,
-        ): SeatViewPanel {
-            return SeatScreenBuilder(
-                current = CurrentSeats<Candidate, IntRange>().apply(current),
-                diff = diff?.let { SeatDiff<Party, IntRange>().apply(it) },
-                prev = prev?.let { PrevSeats<Party, Int>(partyChanges).apply(it) },
-                swing = swing?.let { Swing<Party>(partyChanges).apply(it) },
-                majority = majorityLine?.let { MajorityLine().apply(it) },
-                partyClassification = null,
-                map = map,
-                secondMap = null,
-                keyTemplate = BasicResultPanel.CandidateTemplate(),
-                seatTemplate = RangeSeatTemplate,
-                currDiffFactory = RangeCurrDiffFactory,
-                createBarFrame = {
-                    BarFrameBuilder.dual(
-                        barsPublisher = bars,
-                        headerPublisher = header,
-                        rightHeaderLabelPublisher = progress,
-                        subheadPublisher = subhead,
-                        notesPublisher = notes,
-                        limitsPublisher = limits,
-                        linesPublisher = lines,
-                    )
-                },
-                textHeader = title,
-            ).build()
-        }
+        ): SeatViewPanel = SeatScreenBuilder(
+            current = CurrentSeats<Candidate, IntRange>().apply(current),
+            diff = diff?.let { SeatDiff<Party, IntRange>().apply(it) },
+            prev = prev?.let { PrevSeats<Party, Int>(partyChanges).apply(it) },
+            swing = swing?.let { Swing<Party>(partyChanges).apply(it) },
+            majority = majorityLine?.let { MajorityLine().apply(it) },
+            partyClassification = null,
+            map = map,
+            secondMap = null,
+            keyTemplate = BasicResultPanel.CandidateTemplate(),
+            seatTemplate = RangeSeatTemplate,
+            currDiffFactory = RangeCurrDiffFactory,
+            createBarFrame = {
+                BarFrameBuilder.dual(
+                    barsPublisher = bars,
+                    headerPublisher = header,
+                    rightHeaderLabelPublisher = progress,
+                    subheadPublisher = subhead,
+                    notesPublisher = notes,
+                    limitsPublisher = limits,
+                    linesPublisher = lines,
+                )
+            },
+            textHeader = title,
+        ).build()
     }
 
     interface SeatTemplate<CT, PT, BAR> {
@@ -416,51 +398,39 @@ class SeatViewPanel private constructor(
 
         override fun labelText(value: Int): String = value.toString()
 
-        override fun diffLabelText(value: Int): String {
-            return if (value == 0) {
-                "±0"
-            } else {
-                DecimalFormat("+0;-0").format(value)
-            }
+        override fun diffLabelText(value: Int): String = if (value == 0) {
+            "±0"
+        } else {
+            DecimalFormat("+0;-0").format(value)
         }
 
         override fun prevLabelText(value: Int): String = value.toString()
 
-        override fun combine(value1: Int, value2: Int): Int {
-            return value1 + value2
-        }
+        override fun combine(value1: Int, value2: Int): Int = value1 + value2
 
-        override fun prevCombine(value1: Int, value2: Int): Int {
-            return value1 + value2
-        }
+        override fun prevCombine(value1: Int, value2: Int): Int = value1 + value2
 
-        override fun createBar(keyLabel: String, baseColor: Color, value: Int, shape: Shape?): BarFrameBuilder.BasicBar {
-            return BarFrameBuilder.BasicBar(
-                keyLabel,
-                baseColor,
-                value,
-                labelText(value),
-                shape,
-            )
-        }
+        override fun createBar(keyLabel: String, baseColor: Color, value: Int, shape: Shape?): BarFrameBuilder.BasicBar = BarFrameBuilder.BasicBar(
+            keyLabel,
+            baseColor,
+            value,
+            labelText(value),
+            shape,
+        )
 
-        override fun createPrevBar(keyLabel: String, baseColor: Color, value: Int): BarFrameBuilder.BasicBar {
-            return BarFrameBuilder.BasicBar(
-                keyLabel,
-                baseColor,
-                value,
-                prevLabelText(value),
-            )
-        }
+        override fun createPrevBar(keyLabel: String, baseColor: Color, value: Int): BarFrameBuilder.BasicBar = BarFrameBuilder.BasicBar(
+            keyLabel,
+            baseColor,
+            value,
+            prevLabelText(value),
+        )
 
-        override fun createDiffBar(keyLabel: String, baseColor: Color, diff: Int): BarFrameBuilder.BasicBar {
-            return BarFrameBuilder.BasicBar(
-                keyLabel,
-                baseColor,
-                diff,
-                diffLabelText(diff),
-            )
-        }
+        override fun createDiffBar(keyLabel: String, baseColor: Color, diff: Int): BarFrameBuilder.BasicBar = BarFrameBuilder.BasicBar(
+            keyLabel,
+            baseColor,
+            diff,
+            diffLabelText(diff),
+        )
     }
 
     private object DualSeatTemplate :
@@ -472,52 +442,40 @@ class SeatViewPanel private constructor(
 
         override fun labelText(value: Pair<Int, Int>): String = "${value.first}/${value.second}"
 
-        override fun diffLabelText(value: Pair<Int, Int>): String {
-            return sequenceOf(value.first, value.second).map {
-                if (it == 0) "±0" else DecimalFormat("+0;-0").format(it)
-            }.joinToString("/")
-        }
+        override fun diffLabelText(value: Pair<Int, Int>): String = sequenceOf(value.first, value.second).map {
+            if (it == 0) "±0" else DecimalFormat("+0;-0").format(it)
+        }.joinToString("/")
 
         override fun prevLabelText(value: Pair<Int, Int>): String = labelText(value)
 
-        override fun combine(value1: Pair<Int, Int>, value2: Pair<Int, Int>): Pair<Int, Int> {
-            return (value1.first + value2.first) to (value1.second + value2.second)
-        }
+        override fun combine(value1: Pair<Int, Int>, value2: Pair<Int, Int>): Pair<Int, Int> = (value1.first + value2.first) to (value1.second + value2.second)
 
-        override fun prevCombine(value1: Pair<Int, Int>, value2: Pair<Int, Int>): Pair<Int, Int> {
-            return (value1.first + value2.first) to (value1.second + value2.second)
-        }
+        override fun prevCombine(value1: Pair<Int, Int>, value2: Pair<Int, Int>): Pair<Int, Int> = (value1.first + value2.first) to (value1.second + value2.second)
 
-        override fun createBar(keyLabel: String, baseColor: Color, value: Pair<Int, Int>, shape: Shape?): BarFrameBuilder.DualBar {
-            return BarFrameBuilder.DualBar(
-                keyLabel,
-                baseColor,
-                value.first,
-                value.second,
-                labelText(value),
-                shape,
-            )
-        }
+        override fun createBar(keyLabel: String, baseColor: Color, value: Pair<Int, Int>, shape: Shape?): BarFrameBuilder.DualBar = BarFrameBuilder.DualBar(
+            keyLabel,
+            baseColor,
+            value.first,
+            value.second,
+            labelText(value),
+            shape,
+        )
 
-        override fun createPrevBar(keyLabel: String, baseColor: Color, value: Pair<Int, Int>): BarFrameBuilder.DualBar {
-            return BarFrameBuilder.DualBar(
-                keyLabel,
-                baseColor,
-                value.first,
-                value.second,
-                prevLabelText(value),
-            )
-        }
+        override fun createPrevBar(keyLabel: String, baseColor: Color, value: Pair<Int, Int>): BarFrameBuilder.DualBar = BarFrameBuilder.DualBar(
+            keyLabel,
+            baseColor,
+            value.first,
+            value.second,
+            prevLabelText(value),
+        )
 
-        override fun createDiffBar(keyLabel: String, baseColor: Color, diff: Pair<Int, Int>): BarFrameBuilder.DualBar {
-            return BarFrameBuilder.DualBar(
-                keyLabel,
-                baseColor,
-                diff.first,
-                diff.second,
-                diffLabelText(diff),
-            )
-        }
+        override fun createDiffBar(keyLabel: String, baseColor: Color, diff: Pair<Int, Int>): BarFrameBuilder.DualBar = BarFrameBuilder.DualBar(
+            keyLabel,
+            baseColor,
+            diff.first,
+            diff.second,
+            diffLabelText(diff),
+        )
     }
 
     private object ReversedDualSeatTemplate :
@@ -529,58 +487,46 @@ class SeatViewPanel private constructor(
 
         override fun labelText(value: Pair<Int, Int>): String = "${value.first}/${value.second}"
 
-        override fun diffLabelText(value: Pair<Int, Int>): String {
-            return sequenceOf(value.first, value.second).map {
-                if (it == 0) "±0" else DecimalFormat("+0;-0").format(it)
-            }.joinToString("/")
-        }
+        override fun diffLabelText(value: Pair<Int, Int>): String = sequenceOf(value.first, value.second).map {
+            if (it == 0) "±0" else DecimalFormat("+0;-0").format(it)
+        }.joinToString("/")
 
         override fun prevLabelText(value: Pair<Int, Int>): String = labelText(value)
 
-        override fun combine(value1: Pair<Int, Int>, value2: Pair<Int, Int>): Pair<Int, Int> {
-            return (value1.first + value2.first) to (value1.second + value2.second)
-        }
+        override fun combine(value1: Pair<Int, Int>, value2: Pair<Int, Int>): Pair<Int, Int> = (value1.first + value2.first) to (value1.second + value2.second)
 
-        override fun prevCombine(value1: Pair<Int, Int>, value2: Pair<Int, Int>): Pair<Int, Int> {
-            return (value1.first + value2.first) to (value1.second + value2.second)
-        }
+        override fun prevCombine(value1: Pair<Int, Int>, value2: Pair<Int, Int>): Pair<Int, Int> = (value1.first + value2.first) to (value1.second + value2.second)
 
-        override fun createBar(keyLabel: String, baseColor: Color, value: Pair<Int, Int>, shape: Shape?): BarFrameBuilder.DualBar {
-            return BarFrameBuilder.DualBar(
-                keyLabel,
-                baseColor,
-                value.second - value.first,
-                value.second,
-                labelText(value),
-                shape,
-            )
-        }
+        override fun createBar(keyLabel: String, baseColor: Color, value: Pair<Int, Int>, shape: Shape?): BarFrameBuilder.DualBar = BarFrameBuilder.DualBar(
+            keyLabel,
+            baseColor,
+            value.second - value.first,
+            value.second,
+            labelText(value),
+            shape,
+        )
 
-        override fun createPrevBar(keyLabel: String, baseColor: Color, value: Pair<Int, Int>): BarFrameBuilder.DualBar {
-            return BarFrameBuilder.DualBar(
-                keyLabel,
-                baseColor,
-                value.second - value.first,
-                value.second,
-                prevLabelText(value),
-            )
-        }
+        override fun createPrevBar(keyLabel: String, baseColor: Color, value: Pair<Int, Int>): BarFrameBuilder.DualBar = BarFrameBuilder.DualBar(
+            keyLabel,
+            baseColor,
+            value.second - value.first,
+            value.second,
+            prevLabelText(value),
+        )
 
-        override fun createDiffBar(keyLabel: String, baseColor: Color, diff: Pair<Int, Int>): BarFrameBuilder.DualBar {
-            return BarFrameBuilder.DualBar(
-                keyLabel,
-                baseColor,
-                if (
-                    (diff.first != 0 && sign(diff.first.toDouble()) != sign(diff.second.toDouble())) || abs(diff.first.toDouble()) > abs(diff.second.toDouble())
-                ) {
-                    diff.first
-                } else {
-                    (diff.second - diff.first)
-                },
-                diff.second,
-                diffLabelText(diff),
-            )
-        }
+        override fun createDiffBar(keyLabel: String, baseColor: Color, diff: Pair<Int, Int>): BarFrameBuilder.DualBar = BarFrameBuilder.DualBar(
+            keyLabel,
+            baseColor,
+            if (
+                (diff.first != 0 && sign(diff.first.toDouble()) != sign(diff.second.toDouble())) || abs(diff.first.toDouble()) > abs(diff.second.toDouble())
+            ) {
+                diff.first
+            } else {
+                (diff.second - diff.first)
+            },
+            diff.second,
+            diffLabelText(diff),
+        )
     }
 
     private object RangeSeatTemplate : SeatTemplate<IntRange, Int, BarFrameBuilder.DualBar> {
@@ -592,52 +538,40 @@ class SeatViewPanel private constructor(
 
         override fun labelText(value: IntRange): String = "${value.first}-${value.last}"
 
-        override fun diffLabelText(value: IntRange): String {
-            return sequenceOf(value.first, value.last).map {
-                "(" + (if (it == 0) "±0" else DecimalFormat("+0;-0").format(it)) + ")"
-            }.joinToString("-")
-        }
+        override fun diffLabelText(value: IntRange): String = sequenceOf(value.first, value.last).map {
+            "(" + (if (it == 0) "±0" else DecimalFormat("+0;-0").format(it)) + ")"
+        }.joinToString("-")
 
         override fun prevLabelText(value: Int): String = value.toString()
 
-        override fun combine(value1: IntRange, value2: IntRange): IntRange {
-            return (value1.first + value2.first)..(value1.last + value2.last)
-        }
+        override fun combine(value1: IntRange, value2: IntRange): IntRange = (value1.first + value2.first)..(value1.last + value2.last)
 
-        override fun prevCombine(value1: Int, value2: Int): Int {
-            return value1 + value2
-        }
+        override fun prevCombine(value1: Int, value2: Int): Int = value1 + value2
 
-        override fun createBar(keyLabel: String, baseColor: Color, value: IntRange, shape: Shape?): BarFrameBuilder.DualBar {
-            return BarFrameBuilder.DualBar(
-                keyLabel,
-                baseColor,
-                value.first,
-                value.last,
-                labelText(value),
-                shape,
-            )
-        }
+        override fun createBar(keyLabel: String, baseColor: Color, value: IntRange, shape: Shape?): BarFrameBuilder.DualBar = BarFrameBuilder.DualBar(
+            keyLabel,
+            baseColor,
+            value.first,
+            value.last,
+            labelText(value),
+            shape,
+        )
 
-        override fun createPrevBar(keyLabel: String, baseColor: Color, value: Int): BarFrameBuilder.DualBar {
-            return BarFrameBuilder.DualBar(
-                keyLabel,
-                baseColor,
-                value,
-                value,
-                prevLabelText(value),
-            )
-        }
+        override fun createPrevBar(keyLabel: String, baseColor: Color, value: Int): BarFrameBuilder.DualBar = BarFrameBuilder.DualBar(
+            keyLabel,
+            baseColor,
+            value,
+            value,
+            prevLabelText(value),
+        )
 
-        override fun createDiffBar(keyLabel: String, baseColor: Color, diff: IntRange): BarFrameBuilder.DualBar {
-            return BarFrameBuilder.DualBar(
-                keyLabel,
-                baseColor,
-                diff.first,
-                diff.last,
-                diffLabelText(diff),
-            )
-        }
+        override fun createDiffBar(keyLabel: String, baseColor: Color, diff: IntRange): BarFrameBuilder.DualBar = BarFrameBuilder.DualBar(
+            keyLabel,
+            baseColor,
+            diff.first,
+            diff.last,
+            diffLabelText(diff),
+        )
     }
 
     class CurrentSeats<KT : Any, CT : Any> internal constructor() {
@@ -667,13 +601,11 @@ class SeatViewPanel private constructor(
             keyTemplate: BasicResultPanel.KeyTemplate<KT, KPT>,
             createFromDiff: (CT?, CT?) -> BasicResultPanel.CurrDiff<CT>,
             mergeFunc: (CT, CT) -> CT,
-        ): Flow.Publisher<Map<KPT, BasicResultPanel.CurrDiff<CT>>> {
-            return Aggregators.adjustKey(current, keyTemplate::toParty, mergeFunc).merge(seats) { c, d ->
-                val ret = LinkedHashMap<KPT, BasicResultPanel.CurrDiff<CT>>()
-                c.forEach { (k, v) -> ret[k] = createFromDiff(v, d[k]) }
-                d.forEach { (k, v) -> ret.putIfAbsent(k, createFromDiff(null, v)) }
-                ret
-            }
+        ): Flow.Publisher<Map<KPT, BasicResultPanel.CurrDiff<CT>>> = Aggregators.adjustKey(current, keyTemplate::toParty, mergeFunc).merge(seats) { c, d ->
+            val ret = LinkedHashMap<KPT, BasicResultPanel.CurrDiff<CT>>()
+            c.forEach { (k, v) -> ret[k] = createFromDiff(v, d[k]) }
+            d.forEach { (k, v) -> ret.putIfAbsent(k, createFromDiff(null, v)) }
+            ret
         }
     }
 
@@ -737,16 +669,14 @@ class SeatViewPanel private constructor(
             return BarFrameBuilder.Lines.of(lines, display)
         }
 
-        internal fun altText(total: Flow.Publisher<Int>): Flow.Publisher<String?> {
-            return if (show == null) {
-                total.map { display(it / 2 + 1) }
-            } else {
-                show!!.compose { maj ->
-                    if (maj) {
-                        total.map { display(it / 2 + 1) }
-                    } else {
-                        null.asOneTimePublisher()
-                    }
+        internal fun altText(total: Flow.Publisher<Int>): Flow.Publisher<String?> = if (show == null) {
+            total.map { display(it / 2 + 1) }
+        } else {
+            show!!.compose { maj ->
+                if (maj) {
+                    total.map { display(it / 2 + 1) }
+                } else {
+                    null.asOneTimePublisher()
                 }
             }
         }
@@ -765,42 +695,30 @@ class SeatViewPanel private constructor(
     }
 
     private object SingleCurrDiffFactory : CurrDiffFactory<Int, Int> {
-        override fun createFromDiff(curr: Int?, diff: Int?): BasicResultPanel.CurrDiff<Int> {
-            return BasicResultPanel.CurrDiff(curr ?: 0, diff ?: 0)
-        }
+        override fun createFromDiff(curr: Int?, diff: Int?): BasicResultPanel.CurrDiff<Int> = BasicResultPanel.CurrDiff(curr ?: 0, diff ?: 0)
 
-        override fun createFromPrev(curr: Int?, prev: Int?): BasicResultPanel.CurrDiff<Int> {
-            return BasicResultPanel.CurrDiff(curr ?: 0, (curr ?: 0) - (prev ?: 0))
-        }
+        override fun createFromPrev(curr: Int?, prev: Int?): BasicResultPanel.CurrDiff<Int> = BasicResultPanel.CurrDiff(curr ?: 0, (curr ?: 0) - (prev ?: 0))
     }
 
     private object DualCurrDiffFactory : CurrDiffFactory<Pair<Int, Int>, Pair<Int, Int>> {
         override fun createFromDiff(
             curr: Pair<Int, Int>?,
             diff: Pair<Int, Int>?,
-        ): BasicResultPanel.CurrDiff<Pair<Int, Int>> {
-            return BasicResultPanel.CurrDiff((curr ?: Pair(0, 0)), diff ?: Pair(0, 0))
-        }
+        ): BasicResultPanel.CurrDiff<Pair<Int, Int>> = BasicResultPanel.CurrDiff((curr ?: Pair(0, 0)), diff ?: Pair(0, 0))
 
         override fun createFromPrev(
             curr: Pair<Int, Int>?,
             prev: Pair<Int, Int>?,
-        ): BasicResultPanel.CurrDiff<Pair<Int, Int>> {
-            return BasicResultPanel.CurrDiff(
-                curr ?: Pair(0, 0),
-                Pair((curr?.first ?: 0) - (prev?.first ?: 0), (curr?.second ?: 0) - (prev?.second ?: 0)),
-            )
-        }
+        ): BasicResultPanel.CurrDiff<Pair<Int, Int>> = BasicResultPanel.CurrDiff(
+            curr ?: Pair(0, 0),
+            Pair((curr?.first ?: 0) - (prev?.first ?: 0), (curr?.second ?: 0) - (prev?.second ?: 0)),
+        )
     }
 
     private object RangeCurrDiffFactory : CurrDiffFactory<IntRange, Int> {
-        override fun createFromDiff(curr: IntRange?, diff: IntRange?): BasicResultPanel.CurrDiff<IntRange> {
-            return BasicResultPanel.CurrDiff(curr ?: IntRange(0, 0), diff ?: IntRange(0, 0))
-        }
+        override fun createFromDiff(curr: IntRange?, diff: IntRange?): BasicResultPanel.CurrDiff<IntRange> = BasicResultPanel.CurrDiff(curr ?: IntRange(0, 0), diff ?: IntRange(0, 0))
 
-        override fun createFromPrev(curr: IntRange?, prev: Int?): BasicResultPanel.CurrDiff<IntRange> {
-            return BasicResultPanel.CurrDiff(curr ?: IntRange(0, 0), IntRange((curr?.first ?: 0) - (prev ?: 0), (curr?.last ?: 0) - (prev ?: 0)))
-        }
+        override fun createFromPrev(curr: IntRange?, prev: Int?): BasicResultPanel.CurrDiff<IntRange> = BasicResultPanel.CurrDiff(curr ?: IntRange(0, 0), IntRange((curr?.first ?: 0) - (prev ?: 0), (curr?.last ?: 0) - (prev ?: 0)))
     }
 
     private class SeatScreenBuilder<KT : Any, KPT : PartyOrCoalition, CT : Any, PT : Any, BAR> constructor(
@@ -835,17 +753,15 @@ class SeatViewPanel private constructor(
 
         private val change: Change? = diff ?: prev
 
-        fun build(): SeatViewPanel {
-            return SeatViewPanel(
-                textHeader,
-                createFrame(),
-                createClassificationFrame(),
-                createDiffFrame(),
-                if (secondMap == null) createSwingFrame() else map?.mapFrame,
-                secondMap?.mapFrame ?: map?.mapFrame,
-                createAltText(),
-            )
-        }
+        fun build(): SeatViewPanel = SeatViewPanel(
+            textHeader,
+            createFrame(),
+            createClassificationFrame(),
+            createDiffFrame(),
+            if (secondMap == null) createSwingFrame() else map?.mapFrame,
+            secondMap?.mapFrame ?: map?.mapFrame,
+            createAltText(),
+        )
 
         enum class Result {
             WINNER,

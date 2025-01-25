@@ -23,7 +23,8 @@ class RegionalBreakdownScreen private constructor(
     titleLabel: Flow.Publisher<out String?>,
     multiSummaryFrame: MultiSummaryFrame,
     altText: Flow.Publisher<String>,
-) : GenericPanel(pad(multiSummaryFrame), titleLabel, altText), AltTextProvider {
+) : GenericPanel(pad(multiSummaryFrame), titleLabel, altText),
+    AltTextProvider {
     sealed interface Entry {
         val header: Flow.Publisher<out String>
         val values: Flow.Publisher<out List<Pair<Color, String>>>
@@ -153,9 +154,7 @@ class RegionalBreakdownScreen private constructor(
                 seatItems.merge(totalItem) { a, b -> a + b }
             }
 
-            private fun seatDiffString(seats: Int, diff: Int?): String {
-                return "$seats" + (if (diff == null) "" else " (${diff.let { if (it == 0) "±0" else DecimalFormat("+0;-0").format(it) }})")
-            }
+            private fun seatDiffString(seats: Int, diff: Int?): String = "$seats" + (if (diff == null) "" else " (${diff.let { if (it == 0) "±0" else DecimalFormat("+0;-0").format(it) }})")
 
             override val altText: Flow.Publisher<String> = run {
                 val seatItems = seatsWithDiff.merge(transformedPartyOrder) { (s, d), po ->
@@ -274,9 +273,7 @@ class RegionalBreakdownScreen private constructor(
                     .merge(abbreviatedHeader) { i, h -> "$h: ${i.joinToString(", ")}" }
             }
 
-            private fun pctDiffString(pct: Double, diff: Double?): String {
-                return DecimalFormat("0.0%").format(pct) + (if (diff == null) "" else " (${diff.let { if (it == 0.0) "±0.0" else DecimalFormat("+0.0;-0.0").format(it * 100) }})")
-            }
+            private fun pctDiffString(pct: Double, diff: Double?): String = DecimalFormat("0.0%").format(pct) + (if (diff == null) "" else " (${diff.let { if (it == 0.0) "±0.0" else DecimalFormat("+0.0;-0.0").format(it * 100) }})")
         }
     }
 
@@ -285,15 +282,11 @@ class RegionalBreakdownScreen private constructor(
     }
 
     class PctReportingString(private val pctReporting: Flow.Publisher<Double>) : ReportingString() {
-        override fun reporting(): Flow.Publisher<String> {
-            return pctReporting.map { pct -> DecimalFormat("0.0%").format(pct) + " IN" }
-        }
+        override fun reporting(): Flow.Publisher<String> = pctReporting.map { pct -> DecimalFormat("0.0%").format(pct) + " IN" }
     }
 
     class PollsReportingString(private val pollsReporting: Flow.Publisher<PollsReporting>) : ReportingString() {
-        override fun reporting(): Flow.Publisher<String> {
-            return pollsReporting.map { (reporting, total) -> "$reporting/$total" }
-        }
+        override fun reporting(): Flow.Publisher<String> = pollsReporting.map { (reporting, total) -> "$reporting/$total" }
     }
 
     companion object {
@@ -302,13 +295,11 @@ class RegionalBreakdownScreen private constructor(
             header: Flow.Publisher<String>,
             title: Flow.Publisher<String?>,
             progressLabel: Flow.Publisher<String?>? = null,
-        ): RegionalBreakdownScreen {
-            return RegionalBreakdownScreen(
-                title,
-                createFrame(entries, header, progressLabel),
-                createAltText(entries, header, progressLabel, title),
-            )
-        }
+        ): RegionalBreakdownScreen = RegionalBreakdownScreen(
+            title,
+            createFrame(entries, header, progressLabel),
+            createAltText(entries, header, progressLabel, title),
+        )
 
         fun seats(
             topRowHeader: Flow.Publisher<String>,
@@ -319,17 +310,15 @@ class RegionalBreakdownScreen private constructor(
             topRowTotal: Flow.Publisher<Int>? = null,
             maxColumns: Flow.Publisher<Int>? = null,
             builder: SeatEntries.() -> Unit,
-        ): List<Entry> {
-            return SeatEntries(
-                topRowHeader,
-                topRowAbbreviatedHeader,
-                topRowSeats,
-                topRowPrev,
-                topRowDiff,
-                topRowTotal,
-                maxColumns,
-            ).apply(builder).entries
-        }
+        ): List<Entry> = SeatEntries(
+            topRowHeader,
+            topRowAbbreviatedHeader,
+            topRowSeats,
+            topRowPrev,
+            topRowDiff,
+            topRowTotal,
+            maxColumns,
+        ).apply(builder).entries
 
         fun votes(
             topRowHeader: Flow.Publisher<String>,
@@ -339,16 +328,14 @@ class RegionalBreakdownScreen private constructor(
             topRowReporting: ReportingString? = null,
             maxColumns: Flow.Publisher<Int>? = null,
             builder: VoteEntries.() -> Unit,
-        ): List<Entry> {
-            return VoteEntries(
-                topRowHeader,
-                topRowAbbreviatedHeader,
-                topRowVotes,
-                topRowPrev,
-                topRowReporting,
-                maxColumns,
-            ).apply(builder).entries
-        }
+        ): List<Entry> = VoteEntries(
+            topRowHeader,
+            topRowAbbreviatedHeader,
+            topRowVotes,
+            topRowPrev,
+            topRowReporting,
+            maxColumns,
+        ).apply(builder).entries
 
         fun pct(pctReporting: Flow.Publisher<Double>) = PctReportingString(pctReporting)
         fun polls(pollsReporting: Flow.Publisher<PollsReporting>) = PollsReportingString(pollsReporting)
@@ -357,17 +344,15 @@ class RegionalBreakdownScreen private constructor(
             entries: List<Entry>,
             header: Flow.Publisher<out String>,
             progressLabel: Flow.Publisher<String?>?,
-        ): MultiSummaryFrame {
-            return MultiSummaryFrame(
-                headerPublisher = header,
-                progressLabel = progressLabel,
-                rowsPublisher =
-                entries.map {
-                    it.header.merge(it.values) { h, v -> MultiSummaryFrame.Row(h, v) }
-                }
-                    .combine(),
-            )
-        }
+        ): MultiSummaryFrame = MultiSummaryFrame(
+            headerPublisher = header,
+            progressLabel = progressLabel,
+            rowsPublisher =
+            entries.map {
+                it.header.merge(it.values) { h, v -> MultiSummaryFrame.Row(h, v) }
+            }
+                .combine(),
+        )
 
         private fun createAltText(
             entries: List<Entry>,
@@ -381,46 +366,39 @@ class RegionalBreakdownScreen private constructor(
             return headerLine.merge(rows) { h, v -> "$h\n\n$v" }
         }
 
-        private fun extractPartyOrder(result: Map<out PartyOrCoalition, Int>): List<PartyOrCoalition> {
-            return extractPartyOrder(result, null)
-        }
+        private fun extractPartyOrder(result: Map<out PartyOrCoalition, Int>): List<PartyOrCoalition> = extractPartyOrder(result, null)
 
         private fun extractPartyOrder(
             result: Map<out PartyOrCoalition, Int>,
             diff: Map<out PartyOrCoalition, Int>?,
-        ): List<PartyOrCoalition> {
-            return sequenceOf(result.keys.asSequence(), diff?.keys?.asSequence())
-                .filterNotNull()
-                .flatten()
-                .distinct()
-                .filter { party -> (result[party] ?: 0) > 0 || (diff != null && (diff[party] ?: 0) != 0) }
-                .sortedByDescending { party -> party.overrideSortOrder ?: (result[party] ?: 0) }
-                .toList()
-        }
+        ): List<PartyOrCoalition> = sequenceOf(result.keys.asSequence(), diff?.keys?.asSequence())
+            .filterNotNull()
+            .flatten()
+            .distinct()
+            .filter { party -> (result[party] ?: 0) > 0 || (diff != null && (diff[party] ?: 0) != 0) }
+            .sortedByDescending { party -> party.overrideSortOrder ?: (result[party] ?: 0) }
+            .toList()
 
-        private fun takeTopParties(parties: List<PartyOrCoalition>, max: Int?): List<PartyOrCoalition> {
-            return if (max == null || parties.size <= max) {
-                parties
-            } else {
-                listOf(parties.take(max - 1), listOf(Party.OTHERS)).flatten()
-            }
+        private fun takeTopParties(parties: List<PartyOrCoalition>, max: Int?): List<PartyOrCoalition> = if (max == null || parties.size <= max) {
+            parties
+        } else {
+            listOf(parties.take(max - 1), listOf(Party.OTHERS)).flatten()
         }
 
         private fun transformPartyOrder(
             partyOrder: Flow.Publisher<out List<PartyOrCoalition>>,
             partyMapping: Flow.Publisher<out Map<Coalition, Party>>?,
-        ): Flow.Publisher<out List<PartyOrCoalition>> =
-            if (partyMapping == null) {
-                partyOrder
-            } else {
-                partyOrder.merge(partyMapping) { po, pm ->
-                    pm.forEach { (coalition, party) ->
-                        if (!coalition.constituentParties.contains(party)) {
-                            throw IllegalArgumentException("$party is not a constituent party of $coalition")
-                        }
+        ): Flow.Publisher<out List<PartyOrCoalition>> = if (partyMapping == null) {
+            partyOrder
+        } else {
+            partyOrder.merge(partyMapping) { po, pm ->
+                pm.forEach { (coalition, party) ->
+                    if (!coalition.constituentParties.contains(party)) {
+                        throw IllegalArgumentException("$party is not a constituent party of $coalition")
                     }
-                    po.map { pm[it] ?: it }
                 }
+                po.map { pm[it] ?: it }
             }
+        }
     }
 }
