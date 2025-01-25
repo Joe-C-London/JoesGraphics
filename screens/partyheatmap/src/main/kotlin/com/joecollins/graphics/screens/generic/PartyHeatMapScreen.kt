@@ -32,7 +32,7 @@ class PartyHeatMapScreen private constructor(panel: JPanel, title: Flow.Publishe
             }
         }
 
-        fun <T, C: Comparable<C>> ofElected(
+        fun <T, C : Comparable<C>> ofElected(
             items: Flow.Publisher<out Collection<T>>,
             parties: Flow.Publisher<out List<Party>>,
             prevResult: T.() -> Party,
@@ -57,7 +57,7 @@ class PartyHeatMapScreen private constructor(panel: JPanel, title: Flow.Publishe
             )
         }
 
-        fun <T, C: Comparable<C>> ofElectedLeading(
+        fun <T, C : Comparable<C>> ofElectedLeading(
             items: Flow.Publisher<out Collection<T>>,
             parties: Flow.Publisher<out List<Party>>,
             prevResult: T.() -> Party,
@@ -82,7 +82,7 @@ class PartyHeatMapScreen private constructor(panel: JPanel, title: Flow.Publishe
             )
         }
 
-        private fun <T, C: Comparable<C>> build(
+        private fun <T, C : Comparable<C>> build(
             itemsPublisher: Flow.Publisher<out Collection<T>>,
             partiesPublisher: Flow.Publisher<out List<Party>>,
             prevResult: T.() -> Party,
@@ -186,7 +186,7 @@ class PartyHeatMapScreen private constructor(panel: JPanel, title: Flow.Publishe
             return PartyHeatMapScreen(pad(panel), title, altText)
         }
 
-        private fun <T, C: Comparable<C>> createOrderedList(items: Collection<T>, party: Party, sortOrder: (Party, T) -> Flow.Publisher<C>): Flow.Publisher<List<T>> {
+        private fun <T, C : Comparable<C>> createOrderedList(items: Collection<T>, party: Party, sortOrder: (Party, T) -> Flow.Publisher<C>): Flow.Publisher<List<T>> {
             return items
                 .map { e -> sortOrder(party, e).map { so -> e to so } }
                 .combine()
