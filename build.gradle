@@ -15,7 +15,7 @@ plugins {
     id "jacoco"
 }
 ext {
-    junit_version = "5.11.3"
+    junit_version = "5.11.4"
 }
 
 apply plugin: 'kotlin'
