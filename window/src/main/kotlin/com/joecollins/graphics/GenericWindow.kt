@@ -1,5 +1,6 @@
 package com.joecollins.graphics
 
+import com.joecollins.graphics.dialogs.BlueSkyDialog
 import com.joecollins.graphics.dialogs.MastodonDialog
 import com.joecollins.graphics.dialogs.TweetDialog
 import com.joecollins.graphics.utils.StandardFont
@@ -210,6 +211,13 @@ class GenericWindow<T : JPanel> constructor(private val panel: T, title: String)
             }
             imageMenu.add(mastodonItem)
         }
+        if (isBlueSkyEnabled) {
+            val tweetItem = JMenuItem("BlueSky...")
+            tweetItem.addActionListener {
+                BlueSkyDialog(panel).isVisible = true
+            }
+            imageMenu.add(tweetItem)
+        }
         requestFocus()
     }
 
@@ -218,6 +226,14 @@ class GenericWindow<T : JPanel> constructor(private val panel: T, title: String)
             val twitterPropertiesFile = this::class.java.classLoader.getResourceAsStream("twitter.properties") ?: return false
             val properties = Properties()
             properties.load(twitterPropertiesFile)
+            return properties.getProperty("enabled")?.toBoolean() ?: true
+        }
+
+    private val isBlueSkyEnabled: Boolean
+        get() {
+            val blueskyPropertiesFile = this::class.java.classLoader.getResourceAsStream("bluesky.properties") ?: return false
+            val properties = Properties()
+            properties.load(blueskyPropertiesFile)
             return properties.getProperty("enabled")?.toBoolean() ?: true
         }
 

@@ -19,6 +19,7 @@ dependencies {
     implementation parent.project('base')
     implementation parent.project('pubsub')
     implementation parent.project('social')
+    implementation group: 'commons-io', name: 'commons-io', version: '2.18.0'
 
     testImplementation "org.junit.jupiter:junit-jupiter-api:$parent.ext.junit_version"
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$parent.ext.junit_version"
