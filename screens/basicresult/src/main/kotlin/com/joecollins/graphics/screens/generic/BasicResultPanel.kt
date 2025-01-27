@@ -60,14 +60,14 @@ object BasicResultPanel {
 
         override fun toParty(key: Candidate): Party = key.party
 
-        override fun toMainBarHeader(key: Candidate, forceSingleLine: Boolean): String = if (key === Candidate.OTHERS) {
+        override fun toMainBarHeader(key: Candidate, forceSingleLine: Boolean): String = if (key.name.isBlank()) {
             key.party.name.uppercase()
         } else {
             ("${key.name}${if (forceSingleLine) (" (" + key.party.abbreviation + ")") else ("\n" + key.party.name)}")
                 .uppercase()
         }
 
-        override fun toMainAltTextHeader(key: Candidate): String = if (key === Candidate.OTHERS) {
+        override fun toMainAltTextHeader(key: Candidate): String = if (key.name.isBlank()) {
             key.party.name.uppercase()
         } else {
             ("${key.name}${if (incumbentMarker != null && key.incumbent) " [$incumbentMarker]" else ""} (${key.party.abbreviation})")

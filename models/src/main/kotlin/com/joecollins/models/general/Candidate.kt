@@ -1,7 +1,7 @@
 package com.joecollins.models.general
 
 @Suppress("DataClassPrivateConstructor")
-data class Candidate private constructor(val name: String, val party: Party, val incumbent: Boolean, override val overrideSortOrder: Int?) : CanOverrideSortOrder() {
+data class Candidate private constructor(val name: String, val party: Party, val incumbent: Boolean, override val overrideSortOrder: Int? = party.overrideSortOrder) : CanOverrideSortOrder() {
 
     constructor(name: String, party: Party, incumbent: Boolean = false) : this(name, party, incumbent, null)
 
@@ -10,6 +10,6 @@ data class Candidate private constructor(val name: String, val party: Party, val
     fun isIncumbent() = incumbent
 
     companion object {
-        val OTHERS = Candidate("Others", Party.OTHERS, false, -1)
+        val OTHERS = Candidate("", Party.OTHERS, false, -1)
     }
 }

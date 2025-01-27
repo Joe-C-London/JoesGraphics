@@ -412,7 +412,7 @@ class MultiResultScreen private constructor(
                     val entriesPub = curr.votes(e).merge(winnerAndRunoff) { votes, (winner, runoff) ->
                         val total = votes.values.sum().toDouble()
                         Aggregators.topAndOthers(votes, (if (list.size > 4) 4 else 5) * (if (partiesOnly) 2 else 1), Candidate.OTHERS).entries
-                            .sortedByDescending { if (it.key == Candidate.OTHERS) -1 else it.value }
+                            .sortedByDescending { it.key.overrideSortOrder ?: it.value }
                             .joinToString("\n") { (c, v) ->
                                 "${
                                     if (c == Candidate.OTHERS) {

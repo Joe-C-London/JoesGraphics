@@ -204,7 +204,7 @@ class MixedMemberResultPanel private constructor(
                             val leftLabel: String = rowTemplate.leftLabel(candidate)
                             val rightLabel: String = if (partialDeclaration) THOUSANDS_FORMAT.format(numVotes.toLong()) else rowTemplate.rightLabel(numVotes, pct)
                             BarFrameBuilder.BasicBar(
-                                if (candidate == Candidate.OTHERS) "OTHERS" else leftLabel,
+                                if (candidate.name.isBlank()) candidate.party.name.uppercase() else leftLabel,
                                 candidate.party.color,
                                 if (pct.isNaN()) 0 else pct,
                                 (if (pct.isNaN()) "WAITING..." else rightLabel),
@@ -400,14 +400,14 @@ class MixedMemberResultPanel private constructor(
                         prev?.filterKeys { !currParties.contains(it) }?.values?.sum() ?: 0
                     }
                     val entries = curr.entries
-                        .sortedByDescending { it.key.party.overrideSortOrder ?: it.value ?: 0 }
+                        .sortedByDescending { it.key.overrideSortOrder ?: it.value ?: 0 }
                         .joinToString("\n") {
                             val incumbentMarker = if (it.key.incumbent && candidateVotes.incumbentMarker != null && it.key.name.isNotBlank()) {
                                 candidateVotes.incumbentMarkerPadded
                             } else {
                                 ""
                             }
-                            val partyLabel = if (it.key == Candidate.OTHERS || it.key.name.isBlank()) {
+                            val partyLabel = if (it.key.name.isBlank()) {
                                 ""
                             } else {
                                 " (${it.key.party.abbreviation})"

@@ -9,6 +9,7 @@ import com.joecollins.graphics.components.MapFrame
 import com.joecollins.graphics.components.SwingFrame
 import com.joecollins.graphics.components.SwingFrameBuilder
 import com.joecollins.models.general.Aggregators
+import com.joecollins.models.general.CanOverrideSortOrder
 import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.NonPartisanCandidate
 import com.joecollins.models.general.Party
@@ -1194,7 +1195,7 @@ class SimpleVoteViewPanel private constructor(
         internal val prevProps by lazy { prev?.let { Prev<KPT, PT>().apply(it) } }
     }
 
-    private class VoteScreenBuilder<KT : Any, KPT : PartyOrCoalition, CT, CPT : Any, DT : Any, BAR>(
+    private class VoteScreenBuilder<KT : CanOverrideSortOrder, KPT : PartyOrCoalition, CT, CPT : Any, DT : Any, BAR>(
         private val current: AbstractCurrentVotes<out KT, CT>,
         private val prev: PrevVotes<KPT>?,
         private val winningLine: WinningLine?,
@@ -1318,7 +1319,7 @@ class SimpleVoteViewPanel private constructor(
         private val currEntries: Flow.Publisher<List<Entry<KT, CT>>> =
             filteredCurr.merge(results) { c, r ->
                 c.entries
-                    .sortedByDescending { (k, v) -> keyTemplate.toParty(k).overrideSortOrder?.toDouble() ?: valueTemplate.sortOrder(v) }
+                    .sortedByDescending { (k, v) -> k.overrideSortOrder?.toDouble() ?: valueTemplate.sortOrder(v) }
                     .map { (k, v) ->
                         val result = when {
                             (r.winners ?: emptySet()).contains(k) -> CandidateResult.WINNER
@@ -1415,7 +1416,7 @@ class SimpleVoteViewPanel private constructor(
         private val currPreferencesEntries: Flow.Publisher<List<Entry<KT, CT>>>? =
             preferences?.currentProps?.votes?.merge(results) { c, r ->
                 c.entries
-                    .sortedByDescending { (k, v) -> keyTemplate.toParty(k).overrideSortOrder?.toDouble() ?: valueTemplate.sortOrder(v) }
+                    .sortedByDescending { (k, v) -> k.overrideSortOrder?.toDouble() ?: valueTemplate.sortOrder(v) }
                     .map { (k, v) ->
                         val result = when {
                             (r.winners ?: emptySet()).contains(k) -> CandidateResult.WINNER
