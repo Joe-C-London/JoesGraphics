@@ -90,8 +90,8 @@ class ProjectionFrame(
         override fun paintComponent(g: Graphics) {
             super.paintComponent(g)
             val img = image ?: return
-            val xRatio = 1.0 * width / img.getWidth(null)
-            val yRatio = 1.0 * height / img.getHeight(null)
+            val xRatio = 1.0 * (width - 10) / img.getWidth(null)
+            val yRatio = 1.0 * (height - 10) / img.getHeight(null)
             val ratio = 1.0.coerceAtMost(xRatio.coerceAtMost(yRatio))
             val newWidth = (ratio * img.getWidth(null)).toInt()
             val newHeight = (ratio * img.getHeight(null)).toInt()
