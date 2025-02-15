@@ -4,7 +4,7 @@ import java.awt.Image
 import java.net.URL
 
 interface Link {
-    val shortURL: URL
+    val shortURL: String
     val expandedURL: URL
     val displayURL: String
     val preview: Preview?

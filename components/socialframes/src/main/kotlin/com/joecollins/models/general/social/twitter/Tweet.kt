@@ -17,7 +17,7 @@ class Tweet(
     override val hashtagEntities: List<Hashtag>,
     override val userMentionEntities: List<UserMention>,
     override val polls: List<Poll>,
-) : Post<Tweet> {
+) : Post {
 
     override val emojis: List<Emoji> = emptyList()
 

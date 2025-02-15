@@ -23,7 +23,7 @@ data class Card(
         override val domain: String,
     ) : Link.Preview
 
-    override val shortURL: URL = url
+    override val shortURL: String = url.toString()
     override val expandedURL: URL = url
     override val displayURL: String = url.toString()
 

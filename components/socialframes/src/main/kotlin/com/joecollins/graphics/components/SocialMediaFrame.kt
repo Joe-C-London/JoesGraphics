@@ -42,8 +42,8 @@ import kotlin.math.min
 import kotlin.math.roundToInt
 import kotlin.math.sqrt
 
-abstract class SocialMediaFrame<P : Post<P>>(
-    post: Flow.Publisher<out Post<P>>,
+abstract class SocialMediaFrame<P : Post>(
+    post: Flow.Publisher<out Post>,
     private val color: Color,
     private val timezone: ZoneId = ZoneId.systemDefault(),
 ) : JPanel() {
@@ -203,7 +203,7 @@ abstract class SocialMediaFrame<P : Post<P>>(
         add(timeLabel, BorderLayout.SOUTH)
     }
 
-    private fun formatText(status: Post<P>, isQuoted: Boolean, postLabel: JLabel): String {
+    private fun formatText(status: Post, isQuoted: Boolean, postLabel: JLabel): String {
         val colorHex = (color.rgb.and(0xffffff)).toString(16)
         val quotedURL = status.quoted?.url?.toString()
         if (status.user.isProtected) {
@@ -226,10 +226,10 @@ abstract class SocialMediaFrame<P : Post<P>>(
             htmlText = htmlText.replace(it.text, "<span style='color:#$colorHex'>${it.display}</span>")
         }
         status.links.filter { !status.user.isProtected }.filter { isQuoted || !it.isFromSocialNetwork }.forEach {
-            htmlText = htmlText.replace(it.shortURL.toString(), if (!isQuoted && it.expandedURL.toString() == quotedURL) "" else "<span style='color:#$colorHex'>${it.displayURL}${if (it.displayURL == it.shortURL.toString()) "" else "(${it.shortURL})"}</span>")
+            htmlText = htmlText.replace(it.shortURL, if (!isQuoted && it.expandedURL.toString() == quotedURL) "" else "<span style='color:#$colorHex'>${it.displayURL}${if (it.displayURL == it.shortURL || it.shortURL.endsWith("...") || it.displayURL == "https://" + it.shortURL) "" else "(${it.shortURL})"}</span>")
         }
         status.links.filter { !status.user.isProtected }.filter { !isQuoted && it.isFromSocialNetwork }.forEach {
-            htmlText = htmlText.replace(it.shortURL.toString(), "")
+            htmlText = htmlText.replace(it.shortURL, "")
         }
         status.mediaEntities.filter { !status.user.isProtected }.filter { it.displayURL != null }.forEach {
             htmlText = htmlText.replace(it.displayURL!!, "")
@@ -397,7 +397,7 @@ abstract class SocialMediaFrame<P : Post<P>>(
         }
     }
 
-    private inner class QuotedPanel(quotedStatus: Post<P>) : JPanel() {
+    private inner class QuotedPanel(quotedStatus: Post) : JPanel() {
         init {
             border = MatteBorder(1, 1, 1, 1, color)
             background = Color.WHITE

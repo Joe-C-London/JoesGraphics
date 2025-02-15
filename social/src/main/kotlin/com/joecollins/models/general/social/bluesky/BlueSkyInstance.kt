@@ -44,8 +44,12 @@ object BlueSkyInstance {
         return ret
     }
 
+    fun execute(request: () -> HttpUriRequestBase) {
+        execute(request) { }
+    }
+
     @OptIn(ExperimentalContracts::class)
-    fun execute(request: () -> HttpUriRequestBase, response: (JsonElement) -> Unit = {}) {
+    fun <T> execute(request: () -> HttpUriRequestBase, response: (JsonElement) -> T): T {
         contract {
             callsInPlace(request, InvocationKind.AT_LEAST_ONCE)
             callsInPlace(response, InvocationKind.AT_MOST_ONCE)
@@ -55,25 +59,27 @@ object BlueSkyInstance {
             login()
         }
 
+        data class Wrapper<T>(val item: T)
+
         val accessToken = Properties().apply { load(FileReader(tokensFile)) }.getProperty("accessJwt")
         val client = HttpClients.createDefault()
 
         val req = request().apply { addHeader("Authorization", "Bearer $accessToken") }
-        val newToken = client.execute(req) { res ->
+        val (newToken, returnValue) = client.execute(req) { res ->
             val jsonString = String(res.entity.content.readAllBytes())
             val json = JsonParser.parseString(jsonString).asJsonObject
             if (res.code == 400 && json.asJsonObject["error"].asString == "ExpiredToken") {
-                refreshToken()
+                refreshToken() to null
             } else if (res.code != 200) {
                 throw ClientProtocolException(json.toString())
             } else {
-                response(json)
-                null
+                null to Wrapper(response(json))
             }
-        } ?: return
+        }
+        if (returnValue != null) return returnValue.item
 
         val retried = request().apply { addHeader("Authorization", "Bearer $newToken") }
-        client.execute(retried) { res ->
+        return client.execute(retried) { res ->
             val jsonString = String(res.entity.content.readAllBytes())
             val json = JsonParser.parseString(jsonString).asJsonObject
             if (res.code != 200) {
@@ -81,7 +87,6 @@ object BlueSkyInstance {
             }
 
             response(json)
-            null
         }
     }
 

@@ -6,7 +6,7 @@ import java.net.URL
 import javax.imageio.ImageIO
 
 class Link(
-    override val shortURL: URL,
+    override val shortURL: String,
     override val expandedURL: URL,
     override val displayURL: String,
     image: Image?,
@@ -43,7 +43,7 @@ class Link(
                 }
             }
             return Link(
-                URL(urlEntity.url),
+                urlEntity.url,
                 URL(urlEntity.expandedURL),
                 urlEntity.displayURL,
                 image,
@@ -56,7 +56,7 @@ class Link(
             if (urlEntity.mediaKey != null) return null
             val fullUrl = urlEntity.unwoundUrl ?: urlEntity.expandedUrl ?: urlEntity.url
             return Link(
-                urlEntity.url,
+                urlEntity.url.toString(),
                 fullUrl,
                 urlEntity.displayUrl!!,
                 urlEntity.images?.takeIf { it.isNotEmpty() }?.let { it[0].url }?.let { ImageIO.read(it) },

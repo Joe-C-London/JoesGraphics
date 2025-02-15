@@ -22,7 +22,7 @@ data class Toot(
     @JsonProperty("media_attachments") private val mediaAttachments: List<MediaAttachment> = emptyList(),
     override val emojis: List<Emoji> = emptyList(),
     private val poll: Poll? = null,
-) : Post<Toot> {
+) : Post {
 
     override val text: String = content
         .replace("</p><p>", "\n\n")
