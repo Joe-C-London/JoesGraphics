@@ -6,14 +6,18 @@ import org.apache.hc.client5.http.ClientProtocolException
 import org.apache.hc.client5.http.classic.methods.HttpGet
 import org.apache.hc.client5.http.classic.methods.HttpPost
 import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase
+import org.apache.hc.client5.http.config.RequestConfig
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder
 import org.apache.hc.client5.http.impl.classic.HttpClients
 import org.apache.hc.core5.http.ContentType
 import org.apache.hc.core5.http.io.entity.StringEntity
+import org.apache.hc.core5.util.Timeout
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileReader
 import java.io.PrintWriter
 import java.util.Properties
+import java.util.concurrent.TimeUnit
 import javax.swing.JOptionPane
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
@@ -62,7 +66,15 @@ object BlueSkyInstance {
         data class Wrapper<T>(val item: T)
 
         val accessToken = Properties().apply { load(FileReader(tokensFile)) }.getProperty("accessJwt")
-        val client = HttpClients.createDefault()
+        val timeout = 30L
+        val client = HttpClientBuilder.create()
+            .setDefaultRequestConfig(
+                RequestConfig.custom()
+                    .setConnectionRequestTimeout(Timeout.of(timeout, TimeUnit.SECONDS))
+                    .setResponseTimeout(Timeout.of(timeout, TimeUnit.SECONDS))
+                    .build(),
+            )
+            .build()
 
         val req = request().apply { addHeader("Authorization", "Bearer $accessToken") }
         val (newToken, returnValue) = client.execute(req) { res ->

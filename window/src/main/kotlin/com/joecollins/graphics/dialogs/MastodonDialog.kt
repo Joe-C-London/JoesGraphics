@@ -2,16 +2,19 @@ package com.joecollins.graphics.dialogs
 
 import com.fasterxml.jackson.databind.json.JsonMapper
 import org.apache.hc.client5.http.classic.methods.HttpPost
+import org.apache.hc.client5.http.config.RequestConfig
 import org.apache.hc.client5.http.entity.mime.MultipartEntityBuilder
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient
-import org.apache.hc.client5.http.impl.classic.HttpClients
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder
 import org.apache.hc.core5.http.ContentType
 import org.apache.hc.core5.http.io.entity.BasicHttpEntity
+import org.apache.hc.core5.util.Timeout
 import org.json.JSONArray
 import org.json.JSONObject
 import java.awt.Color
 import java.io.File
 import java.nio.charset.Charset
+import java.util.concurrent.TimeUnit
 import javax.swing.JPanel
 
 class MastodonDialog(panel: JPanel, private val server: String, private val token: String) : GenericSocialDialog(panel) {
@@ -35,10 +38,19 @@ class MastodonDialog(panel: JPanel, private val server: String, private val toke
     }
 
     override fun send(post: String, image: File, altText: String?) {
-        HttpClients.createDefault().use { client: CloseableHttpClient ->
-            val imageId = uploadImage(client, server, token, image, altText)
-            sendPost(client, server, token, post, imageId)
-        }
+        val timeout = 30L
+        HttpClientBuilder.create()
+            .setDefaultRequestConfig(
+                RequestConfig.custom()
+                    .setConnectionRequestTimeout(Timeout.of(timeout, TimeUnit.SECONDS))
+                    .setResponseTimeout(Timeout.of(timeout, TimeUnit.SECONDS))
+                    .build(),
+            )
+            .build()
+            .use { client: CloseableHttpClient ->
+                val imageId = uploadImage(client, server, token, image, altText)
+                sendPost(client, server, token, post, imageId)
+            }
     }
 
     private fun uploadImage(client: CloseableHttpClient, server: String, token: String, image: File, altText: String?): String {
