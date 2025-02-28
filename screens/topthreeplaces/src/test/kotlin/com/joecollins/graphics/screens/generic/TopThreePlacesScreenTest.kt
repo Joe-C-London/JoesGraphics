@@ -69,4 +69,61 @@ class TopThreePlacesScreenTest {
             """.trimIndent(),
         )
     }
+
+    @Test
+    fun testWithZeroes() {
+        val pc = Party("Progressive Conservative", "PC", Color.BLUE)
+        val grn = Party("Green", "GRN", Color.GREEN.darker())
+        val lib = Party("Liberal", "LIB", Color.RED)
+        val ndp = Party("New Democratic Party", "NDP", Color.ORANGE)
+        val island = Party("Island", "IP", Color.RED.darker())
+        val ind = Party("Independent", "IND", Party.OTHERS.color)
+
+        val results = listOf(
+            mapOf(pc to 0, grn to 0, lib to 0, ndp to 0),
+            mapOf(pc to 0, grn to 0, lib to 0, ndp to 0, island to 0),
+            mapOf(pc to 0, grn to 0, lib to 0, ndp to 0),
+            mapOf(pc to 0, grn to 0, lib to 0, ndp to 0, island to 0, ind to 0),
+            mapOf(pc to 0, grn to 0, lib to 0, ndp to 0, island to 0),
+            mapOf(pc to 0, grn to 0, lib to 0, ndp to 0, island to 0),
+            mapOf(pc to 0, ndp to 0),
+            mapOf(pc to 0, grn to 0, lib to 0, ndp to 0),
+            mapOf(pc to 0, grn to 0, ndp to 0, island to 0),
+            mapOf(pc to 0, grn to 0, lib to 0, ndp to 0),
+            mapOf(pc to 0, grn to 0, lib to 0, ndp to 0),
+            mapOf(pc to 0, grn to 0, lib to 0, ndp to 0),
+            mapOf(pc to 0, grn to 0, lib to 0, ndp to 0, island to 0),
+            mapOf(pc to 0, grn to 0, lib to 0, ndp to 0),
+            mapOf(pc to 0, grn to 0, lib to 0, ndp to 0, island to 0),
+            mapOf(pc to 0, grn to 0, lib to 0, ndp to 0),
+            mapOf(pc to 0, grn to 0, lib to 0, ndp to 0, island to 0),
+            mapOf(pc to 0, grn to 0, lib to 0, ndp to 0, island to 0),
+            mapOf(pc to 0, grn to 0, lib to 0, ndp to 0, island to 0, ind to 0),
+            mapOf(pc to 0, grn to 0, lib to 0, ndp to 0, ind to 0),
+            mapOf(pc to 0, grn to 0, lib to 0, ndp to 0),
+            mapOf(pc to 0, grn to 0, lib to 0, ndp to 0),
+            mapOf(pc to 0, grn to 0, lib to 0, ndp to 0),
+            mapOf(pc to 0, grn to 0, lib to 0, ndp to 0),
+            mapOf(pc to 0, grn to 0, lib to 0, ndp to 0, island to 0),
+            mapOf(pc to 0, lib to 0, ndp to 0),
+            mapOf(pc to 0, grn to 0, lib to 0, ndp to 0, ind to 0),
+        )
+
+        val screen = TopThreePlacesScreen.of(
+            votes = results.asOneTimePublisher(),
+            header = "TOP THREE PLACES".asOneTimePublisher(),
+            progressLabel = "0% REPORTING".asOneTimePublisher(),
+            title = "PRINCE EDWARD ISLAND".asOneTimePublisher(),
+        )
+        screen.setSize(1024, 512)
+        compareRendering("TopThreePlacesScreen", "Zeroes-1", screen)
+        assertPublishes(
+            screen.altText,
+            """
+                PRINCE EDWARD ISLAND
+                
+                TOP THREE PLACES [0% REPORTING]
+            """.trimIndent(),
+        )
+    }
 }

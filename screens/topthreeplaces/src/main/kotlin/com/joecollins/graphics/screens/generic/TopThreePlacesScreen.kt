@@ -83,7 +83,9 @@ class TopThreePlacesScreen private constructor(
 
         private fun <K> convertToPlaces(votes: Flow.Publisher<out Collection<Map<K, Int>>>, toParty: (K) -> Party) = votes.map { list ->
             list.flatMap { v ->
-                v.entries.sortedByDescending { it.value }
+                v.entries.asSequence()
+                    .filter { it.value > 0 }
+                    .sortedByDescending { it.value }
                     .mapIndexed { index, entry -> index to entry }
                     .take(3)
                     .map { (place, entry) ->
@@ -94,6 +96,7 @@ class TopThreePlacesScreen private constructor(
                             else -> Places()
                         }
                     }
+                    .toList()
             }.groupingBy { it.first }
                 .fold(Places()) { a, e -> a.merge(e.second) }
         }
