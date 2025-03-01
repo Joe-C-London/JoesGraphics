@@ -372,7 +372,7 @@ class SeatViewPanel private constructor(
         fun prevSortOrder(value: PT?): Int?
 
         val default: CT
-        fun labelText(value: CT): String
+        fun labelText(value: CT): List<String>
 
         fun diffLabelText(value: CT): String
 
@@ -382,7 +382,7 @@ class SeatViewPanel private constructor(
 
         fun prevCombine(value1: PT, value2: PT): PT
 
-        fun createBar(keyLabel: String, baseColor: Color, value: CT, shape: Shape?): BAR
+        fun createBar(keyLabel: List<String>, baseColor: Color, value: CT, shape: Shape?): BAR
 
         fun createPrevBar(keyLabel: String, baseColor: Color, value: PT): BAR
 
@@ -396,7 +396,7 @@ class SeatViewPanel private constructor(
 
         override val default: Int = 0
 
-        override fun labelText(value: Int): String = value.toString()
+        override fun labelText(value: Int): List<String> = listOf(value.toString())
 
         override fun diffLabelText(value: Int): String = if (value == 0) {
             "±0"
@@ -410,7 +410,7 @@ class SeatViewPanel private constructor(
 
         override fun prevCombine(value1: Int, value2: Int): Int = value1 + value2
 
-        override fun createBar(keyLabel: String, baseColor: Color, value: Int, shape: Shape?): BarFrameBuilder.BasicBar = BarFrameBuilder.BasicBar(
+        override fun createBar(keyLabel: List<String>, baseColor: Color, value: Int, shape: Shape?): BarFrameBuilder.BasicBar = BarFrameBuilder.BasicBar(
             keyLabel,
             baseColor,
             value,
@@ -440,19 +440,19 @@ class SeatViewPanel private constructor(
 
         override val default = 0 to 0
 
-        override fun labelText(value: Pair<Int, Int>): String = "${value.first}/${value.second}"
+        override fun labelText(value: Pair<Int, Int>): List<String> = listOf("${value.first}/${value.second}")
 
         override fun diffLabelText(value: Pair<Int, Int>): String = sequenceOf(value.first, value.second).map {
             if (it == 0) "±0" else DecimalFormat("+0;-0").format(it)
         }.joinToString("/")
 
-        override fun prevLabelText(value: Pair<Int, Int>): String = labelText(value)
+        override fun prevLabelText(value: Pair<Int, Int>): String = labelText(value).first()
 
         override fun combine(value1: Pair<Int, Int>, value2: Pair<Int, Int>): Pair<Int, Int> = (value1.first + value2.first) to (value1.second + value2.second)
 
         override fun prevCombine(value1: Pair<Int, Int>, value2: Pair<Int, Int>): Pair<Int, Int> = (value1.first + value2.first) to (value1.second + value2.second)
 
-        override fun createBar(keyLabel: String, baseColor: Color, value: Pair<Int, Int>, shape: Shape?): BarFrameBuilder.DualBar = BarFrameBuilder.DualBar(
+        override fun createBar(keyLabel: List<String>, baseColor: Color, value: Pair<Int, Int>, shape: Shape?): BarFrameBuilder.DualBar = BarFrameBuilder.DualBar(
             keyLabel,
             baseColor,
             value.first,
@@ -485,19 +485,19 @@ class SeatViewPanel private constructor(
 
         override val default = 0 to 0
 
-        override fun labelText(value: Pair<Int, Int>): String = "${value.first}/${value.second}"
+        override fun labelText(value: Pair<Int, Int>): List<String> = listOf("${value.first}/${value.second}")
 
         override fun diffLabelText(value: Pair<Int, Int>): String = sequenceOf(value.first, value.second).map {
             if (it == 0) "±0" else DecimalFormat("+0;-0").format(it)
         }.joinToString("/")
 
-        override fun prevLabelText(value: Pair<Int, Int>): String = labelText(value)
+        override fun prevLabelText(value: Pair<Int, Int>): String = labelText(value).first()
 
         override fun combine(value1: Pair<Int, Int>, value2: Pair<Int, Int>): Pair<Int, Int> = (value1.first + value2.first) to (value1.second + value2.second)
 
         override fun prevCombine(value1: Pair<Int, Int>, value2: Pair<Int, Int>): Pair<Int, Int> = (value1.first + value2.first) to (value1.second + value2.second)
 
-        override fun createBar(keyLabel: String, baseColor: Color, value: Pair<Int, Int>, shape: Shape?): BarFrameBuilder.DualBar = BarFrameBuilder.DualBar(
+        override fun createBar(keyLabel: List<String>, baseColor: Color, value: Pair<Int, Int>, shape: Shape?): BarFrameBuilder.DualBar = BarFrameBuilder.DualBar(
             keyLabel,
             baseColor,
             value.second - value.first,
@@ -536,7 +536,7 @@ class SeatViewPanel private constructor(
 
         override val default = 0..0
 
-        override fun labelText(value: IntRange): String = "${value.first}-${value.last}"
+        override fun labelText(value: IntRange): List<String> = listOf("${value.first}-${value.last}")
 
         override fun diffLabelText(value: IntRange): String = sequenceOf(value.first, value.last).map {
             "(" + (if (it == 0) "±0" else DecimalFormat("+0;-0").format(it)) + ")"
@@ -548,7 +548,7 @@ class SeatViewPanel private constructor(
 
         override fun prevCombine(value1: Int, value2: Int): Int = value1 + value2
 
-        override fun createBar(keyLabel: String, baseColor: Color, value: IntRange, shape: Shape?): BarFrameBuilder.DualBar = BarFrameBuilder.DualBar(
+        override fun createBar(keyLabel: List<String>, baseColor: Color, value: IntRange, shape: Shape?): BarFrameBuilder.DualBar = BarFrameBuilder.DualBar(
             keyLabel,
             baseColor,
             value.first,
@@ -838,7 +838,7 @@ class SeatViewPanel private constructor(
         private fun createClassificationFrame(): BarFrame? {
             return partyClassification?.header?.let { classificationHeader ->
                 val bars = (classificationEntries ?: return@let null).map { c ->
-                    c.map { seatTemplate.createBar(it.key.name.uppercase(), it.key.color, it.value, null) }
+                    c.map { seatTemplate.createBar(listOf(it.key.name.uppercase()), it.key.color, it.value, null) }
                 }
                 val max = current.totalSeats?.let { t -> t.map { it * 2 / 3 } }
                 return createBarFrame(
@@ -957,7 +957,7 @@ class SeatViewPanel private constructor(
                 }
             }
             val barEntryLine: (String, CT, CT?, String?) -> String = { head, curr, diff, diffSymbol ->
-                "$head: ${seatTemplate.labelText(curr)}" + when {
+                "$head: ${seatTemplate.labelText(curr).first()}" + when {
                     diff != null && diffSymbol != null -> " (${seatTemplate.diffLabelText(diff)}$diffSymbol)"
                     diff != null -> " (${seatTemplate.diffLabelText(diff)})"
                     diffSymbol != null -> " ($diffSymbol)"
@@ -977,7 +977,7 @@ class SeatViewPanel private constructor(
                         entries.joinToString("") {
                             "\n${
                                 barEntryLine(
-                                    keyTemplate.toMainBarHeader(it.key, true),
+                                    keyTemplate.toMainBarHeader(it.key, true).first(),
                                     it.value,
                                     null,
                                     null,
@@ -991,7 +991,7 @@ class SeatViewPanel private constructor(
                         entries.joinToString("") {
                             "\n${
                                 barEntryLine(
-                                    if (it.key == null) it.party.name.uppercase() else keyTemplate.toMainBarHeader(it.key, true),
+                                    if (it.key == null) it.party.name.uppercase() else keyTemplate.toMainBarHeader(it.key, true).first(),
                                     it.curr ?: seatTemplate.default,
                                     it.diff,
                                     if ((countByParty[it.key?.let(keyTemplate::toParty) ?: it.party] ?: 0) > 1) "^" else null,

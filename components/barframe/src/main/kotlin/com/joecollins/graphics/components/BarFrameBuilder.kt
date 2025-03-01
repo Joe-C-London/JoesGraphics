@@ -54,18 +54,22 @@ object BarFrameBuilder {
         val maxPublisher = Publisher(maxFunction(this))
     }
 
-    class BasicBar(val label: String, val color: Color, val value: Number, val valueLabel: String = value.toString(), val shape: Shape? = null) {
-        constructor(label: String, color: Color, value: Number, shape: Shape?) : this(label, color, value, value.toString(), shape)
+    class BasicBar(val label: List<String>, val color: Color, val value: Number, val valueLabel: List<String> = listOf(value.toString()), val shape: Shape? = null) {
+        constructor(label: List<String>, color: Color, value: Number, shape: Shape? = null) : this(label, color, value, listOf(value.toString()), shape)
+        constructor(label: String, color: Color, value: Number, shape: Shape? = null) : this(label, color, value, value.toString(), shape)
+        constructor(label: String, color: Color, value: Number, valueLabel: String, shape: Shape? = null) : this(listOf(label), color, value, listOf(valueLabel), shape)
     }
 
     class DualBar(
-        val label: String,
+        val label: List<String>,
         val color: Color,
         val value1: Number,
         val value2: Number,
-        val valueLabel: String,
+        val valueLabel: List<String>,
         val shape: Shape? = null,
-    )
+    ) {
+        constructor(label: String, color: Color, value1: Number, value2: Number, valueLabel: String, shape: Shape? = null) : this(listOf(label), color, value1, value2, listOf(valueLabel), shape)
+    }
 
     data class Limit(val max: Number? = null, val wingspan: Number? = null) {
         init {
@@ -180,7 +184,7 @@ object BarFrameBuilder {
     ) = if (bars.size >= min) {
         bars
     } else {
-        sequenceOf(bars, MutableList(min - bars.size) { BarFrame.Bar("", "", emptyList()) })
+        sequenceOf(bars, MutableList(min - bars.size) { BarFrame.Bar(emptyList(), emptyList(), emptyList()) })
             .flatten()
             .toList()
     }

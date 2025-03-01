@@ -157,8 +157,8 @@ class MixedMemberResultPanel private constructor(
         ): BarFrame {
             class CandidateBarTemplate(
                 val shape: Shape,
-                val leftLabel: (Candidate) -> String,
-                val rightLabel: (Int, Double) -> String,
+                val leftLabel: (Candidate) -> List<String>,
+                val rightLabel: (Int, Double) -> List<String>,
                 val incumbentLabel: (Candidate) -> Shape?,
             )
             val doubleLine = candidateVotes.votes.map { it.size < 10 && candidateChange == null }
@@ -166,23 +166,23 @@ class MixedMemberResultPanel private constructor(
                 if (it) {
                     CandidateBarTemplate(
                         ImageGenerator.createHalfTickShape(),
-                        { candidate -> "${candidate.name.uppercase()}\n${candidate.party.name.uppercase()}" },
-                        { numVotes, pct -> "${THOUSANDS_FORMAT.format(numVotes.toLong())}\n${PCT_FORMAT.format(pct)}" },
+                        { candidate -> listOf(candidate.name.uppercase(), candidate.party.name.uppercase()) },
+                        { numVotes, pct -> listOf(THOUSANDS_FORMAT.format(numVotes.toLong()), PCT_FORMAT.format(pct)) },
                         { candidate -> candidateVotes.incumbentMarker.takeIf { candidate.incumbent }?.let { ImageGenerator.createHalfBoxedTextShape(it) } },
                     )
                 } else {
                     CandidateBarTemplate(
                         ImageGenerator.createTickShape(),
-                        { candidate -> "${candidate.name.uppercase()} (${candidate.party.abbreviation.uppercase()})" },
-                        { numVotes, pct -> "${THOUSANDS_FORMAT.format(numVotes.toLong())} (${PCT_FORMAT.format(pct)})" },
+                        { candidate -> listOf("${candidate.name.uppercase()} (${candidate.party.abbreviation.uppercase()})") },
+                        { numVotes, pct -> listOf("${THOUSANDS_FORMAT.format(numVotes.toLong())} (${PCT_FORMAT.format(pct)})") },
                         { candidate -> candidateVotes.incumbentMarker.takeIf { candidate.incumbent }?.let { ImageGenerator.createBoxedTextShape(it) } },
                     )
                 }
             }
             val blankCandidateNameTemplate = CandidateBarTemplate(
                 ImageGenerator.createTickShape(),
-                { candidate -> candidate.party.name.uppercase() },
-                { numVotes, pct -> "${THOUSANDS_FORMAT.format(numVotes.toLong())} (${PCT_FORMAT.format(pct)})" },
+                { candidate -> listOf(candidate.party.name.uppercase()) },
+                { numVotes, pct -> listOf("${THOUSANDS_FORMAT.format(numVotes.toLong())} (${PCT_FORMAT.format(pct)})") },
                 { null },
             )
             val result = Result()
@@ -201,13 +201,13 @@ class MixedMemberResultPanel private constructor(
                             val numVotes = it.value ?: 0
                             val pct = it.value?.toDouble()?.div(total) ?: Double.NaN
                             val rowTemplate = if (candidate.name.isBlank()) blankCandidateNameTemplate else template
-                            val leftLabel: String = rowTemplate.leftLabel(candidate)
-                            val rightLabel: String = if (partialDeclaration) THOUSANDS_FORMAT.format(numVotes.toLong()) else rowTemplate.rightLabel(numVotes, pct)
+                            val leftLabel: List<String> = rowTemplate.leftLabel(candidate)
+                            val rightLabel: List<String> = if (partialDeclaration) listOf(THOUSANDS_FORMAT.format(numVotes.toLong())) else rowTemplate.rightLabel(numVotes, pct)
                             BarFrameBuilder.BasicBar(
-                                if (candidate.name.isBlank()) candidate.party.name.uppercase() else leftLabel,
+                                if (candidate.name.isBlank()) listOf(candidate.party.name.uppercase()) else leftLabel,
                                 candidate.party.color,
                                 if (pct.isNaN()) 0 else pct,
-                                (if (pct.isNaN()) "WAITING..." else rightLabel),
+                                (if (pct.isNaN()) listOf("WAITING...") else rightLabel),
                                 rowTemplate.incumbentLabel(candidate).combineHorizontal(if (candidate == winner) (if (candidate.name.isBlank()) ImageGenerator.createTickShape() else rowTemplate.shape) else null),
                             )
                         }

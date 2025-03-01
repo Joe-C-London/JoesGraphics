@@ -134,26 +134,26 @@ class MultiResultScreen private constructor(
                             ImageGenerator.createHalfBoxedTextShape(incumbentMarker!!)
                         },
                     )
-                    val leftLabel: String = when {
+                    val leftLabel: List<String> = when {
                         partiesOnly -> {
-                            candidate.party.name.uppercase()
+                            listOf(candidate.party.name.uppercase())
                         }
                         candidate === Candidate.OTHERS -> {
-                            "OTHERS"
+                            listOf("OTHERS")
                         }
                         else -> {
-                            "${candidate.name.uppercase()}\n${candidate.party.abbreviation}"
+                            listOf(candidate.name.uppercase(), candidate.party.abbreviation)
                         }
                     }
-                    val rightLabel: String = when {
+                    val rightLabel: List<String> = when {
                         pct.isNaN() -> {
-                            "WAITING..."
+                            listOf("WAITING...")
                         }
                         partiesOnly -> {
-                            DecimalFormat("0.0%").format(pct)
+                            listOf(DecimalFormat("0.0%").format(pct))
                         }
                         else -> {
-                            "${DecimalFormat("#,##0").format(votes.toLong())}\n${DecimalFormat("0.0%").format(pct)}"
+                            listOf(DecimalFormat("#,##0").format(votes.toLong()), DecimalFormat("0.0%").format(pct))
                         }
                     }
                     BarFrameBuilder.BasicBar(

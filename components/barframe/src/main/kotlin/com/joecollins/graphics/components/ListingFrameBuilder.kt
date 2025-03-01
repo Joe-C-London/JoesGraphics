@@ -19,7 +19,7 @@ object ListingFrameBuilder {
     ): BarFrame = BarFrame(
         barsPublisher = list.map { l ->
             l.map {
-                BarFrame.Bar(it.leftText(), it.rightText(), null, listOf(Pair(it.color(), 1)))
+                BarFrame.Bar(it.leftText().split("\n"), it.rightText().split("\n"), null, listOf(Pair(it.color(), 1)))
             }
         },
         headerPublisher = header,
@@ -40,7 +40,7 @@ object ListingFrameBuilder {
         list.map {
             it.leftText().merge(it.rightText()) { left, right -> Pair(left, right) }
                 .merge(it.color()) { (left, right), color ->
-                    BarFrame.Bar(left, right, listOf(Pair(color, 1)))
+                    BarFrame.Bar(left.split("\n"), right.split("\n"), listOf(Pair(color, 1)))
                 }
         }
             .combine(),

@@ -57,12 +57,16 @@ class BarFrame(
         private set
 
     class Bar constructor(
-        val leftText: String,
-        val rightText: String,
+        val leftText: List<String>,
+        val rightText: List<String>,
         val leftIcon: Shape? = null,
         val series: List<Pair<Color, Number>>,
     ) {
-        constructor(leftText: String, rightText: String, series: List<Pair<Color, Number>>) : this(leftText, rightText, null, series)
+        constructor(leftText: List<String>, rightText: List<String>, series: List<Pair<Color, Number>>) : this(leftText, rightText, null, series)
+
+        constructor(leftText: String, rightText: String, leftIcon: Shape?, series: List<Pair<Color, Number>>) : this(listOf(leftText), listOf(rightText), leftIcon, series)
+
+        constructor(leftText: String, rightText: String, series: List<Pair<Color, Number>>) : this(listOf(leftText), listOf(rightText), series)
     }
 
     class Line(val level: Number, val label: String)
@@ -84,9 +88,9 @@ class BarFrame(
     internal val numBars: Int
         get() = bars.size
 
-    internal fun getLeftText(barNum: Int): String = bars[barNum].leftText
+    internal fun getLeftText(barNum: Int): List<String> = bars[barNum].leftText
 
-    internal fun getRightText(barNum: Int): String = bars[barNum].rightText
+    internal fun getRightText(barNum: Int): List<String> = bars[barNum].rightText
 
     internal fun getSeries(barNum: Int): List<Pair<Color, Number>> = bars[barNum].series
 
@@ -114,14 +118,14 @@ class BarFrame(
             preferredSize = Dimension(1024, 30 * numLines)
         }
 
-        var leftText: String = ""
+        var leftText: List<String> = emptyList()
             set(value) {
                 field = value
                 resetPreferredSize()
                 repaint()
             }
 
-        var rightText: String = ""
+        var rightText: List<String> = emptyList()
             set(value) {
                 field = value
                 resetPreferredSize()
@@ -142,8 +146,8 @@ class BarFrame(
 
         val numLines: Int
             get() {
-                val leftLines = leftText.split("\n").toTypedArray().size
-                val rightLines = rightText.split("\n").toTypedArray().size
+                val leftLines = leftText.toTypedArray().size
+                val rightLines = rightText.toTypedArray().size
                 return max(leftLines, rightLines)
             }
 
@@ -199,8 +203,8 @@ class BarFrame(
                 .mapValues { e -> e.value.sumOf { abs(it) } }
             val isNetPositive = (sumsPosNeg[true] ?: 0).toDouble() >= (sumsPosNeg[false] ?: 0).toDouble()
             val zero = getPixelOfValue(0.0)
-            val leftText = leftText.split("\n").toTypedArray()
-            val rightText = rightText.split("\n").toTypedArray()
+            val leftText = leftText.toTypedArray()
+            val rightText = rightText.toTypedArray()
             val maxLeftWidth =
                 leftText.maxOfOrNull { str -> g.getFontMetrics(font).stringWidth(str) } ?: 0
             val maxRightWidth =

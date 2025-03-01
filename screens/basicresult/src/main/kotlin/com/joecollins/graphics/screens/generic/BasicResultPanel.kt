@@ -12,7 +12,7 @@ object BasicResultPanel {
 
     interface KeyTemplate<KT, KPT : PartyOrCoalition> {
         fun toParty(key: KT): KPT
-        fun toMainBarHeader(key: KT, forceSingleLine: Boolean): String
+        fun toMainBarHeader(key: KT, forceSingleLine: Boolean): List<String>
         fun toMainAltTextHeader(key: KT): String
         fun incumbentShape(key: KT, forceSingleLine: Boolean): Shape?
         fun winnerShape(forceSingleLine: Boolean): Shape
@@ -22,7 +22,7 @@ object BasicResultPanel {
     class PartyTemplate<P : PartyOrCoalition> : KeyTemplate<P, P> {
         override fun toParty(key: P): P = key
 
-        override fun toMainBarHeader(key: P, forceSingleLine: Boolean): String = key.name.uppercase()
+        override fun toMainBarHeader(key: P, forceSingleLine: Boolean): List<String> = listOf(key.name.uppercase())
 
         override fun toMainAltTextHeader(key: P): String = key.name.uppercase()
 
@@ -36,7 +36,7 @@ object BasicResultPanel {
     class PartyOrCandidateTemplate : KeyTemplate<PartyOrCandidate, Party> {
         override fun toParty(key: PartyOrCandidate): Party = key.party
 
-        override fun toMainBarHeader(key: PartyOrCandidate, forceSingleLine: Boolean): String = key.name.uppercase()
+        override fun toMainBarHeader(key: PartyOrCandidate, forceSingleLine: Boolean): List<String> = listOf(key.name.uppercase())
 
         override fun toMainAltTextHeader(key: PartyOrCandidate): String = key.name.uppercase()
 
@@ -60,11 +60,12 @@ object BasicResultPanel {
 
         override fun toParty(key: Candidate): Party = key.party
 
-        override fun toMainBarHeader(key: Candidate, forceSingleLine: Boolean): String = if (key.name.isBlank()) {
-            key.party.name.uppercase()
+        override fun toMainBarHeader(key: Candidate, forceSingleLine: Boolean): List<String> = if (key.name.isBlank()) {
+            listOf(key.party.name.uppercase())
+        } else if (forceSingleLine) {
+            listOf(("${key.name} (" + key.party.abbreviation + ")").uppercase())
         } else {
-            ("${key.name}${if (forceSingleLine) (" (" + key.party.abbreviation + ")") else ("\n" + key.party.name)}")
-                .uppercase()
+            listOf(key.name.uppercase(), key.party.name.uppercase())
         }
 
         override fun toMainAltTextHeader(key: Candidate): String = if (key.name.isBlank()) {

@@ -446,8 +446,8 @@ class SimpleVoteViewPanel private constructor(
 
         val zeroPct: DT
 
-        fun createBar(keyLabel: String, baseColor: Color, value: CT, total: CT, forcedTotal: CT, numBars: Int, forceSingleLine: Boolean, shape: Shape?): BAR
-        fun createPreferencesBar(keyLabel: String, baseColor: Color, value: CT, total: CT, forcedTotal: CT, numBars: Int, shape: Shape?): BAR
+        fun createBar(keyLabel: List<String>, baseColor: Color, value: CT, total: CT, forcedTotal: CT, numBars: Int, forceSingleLine: Boolean, shape: Shape?): BAR
+        fun createPreferencesBar(keyLabel: List<String>, baseColor: Color, value: CT, total: CT, forcedTotal: CT, numBars: Int, shape: Shape?): BAR
         fun createDiffBar(keyLabel: String, baseColor: Color, value: DT): BAR
         fun createPrevBar(keyLabel: String, baseColor: Color, value: Double): BAR
 
@@ -489,7 +489,7 @@ class SimpleVoteViewPanel private constructor(
         override val zeroPct: Double = 0.0
 
         override fun createBar(
-            keyLabel: String,
+            keyLabel: List<String>,
             baseColor: Color,
             value: Int?,
             total: Int?,
@@ -510,7 +510,7 @@ class SimpleVoteViewPanel private constructor(
         )
 
         override fun createPreferencesBar(
-            keyLabel: String,
+            keyLabel: List<String>,
             baseColor: Color,
             value: Int?,
             total: Int?,
@@ -530,7 +530,7 @@ class SimpleVoteViewPanel private constructor(
         )
 
         private fun createBar(
-            keyLabel: String,
+            keyLabel: List<String>,
             baseColor: Color,
             value: Int?,
             forcedTotal: Int?,
@@ -544,10 +544,10 @@ class SimpleVoteViewPanel private constructor(
             color = baseColor,
             value = ((value ?: 0).toDouble() / (forcedTotal ?: 0)).takeUnless { it.isNaN() } ?: 0.0,
             valueLabel = when {
-                numBars == 1 -> singleBarLabel
-                value == null -> "WAITING..."
-                forcedTotal == 0 -> "WAITING..."
-                total == null || total == 0 -> DecimalFormat("#,##0").format(value)
+                numBars == 1 -> listOf(singleBarLabel)
+                value == null -> listOf("WAITING...")
+                forcedTotal == 0 -> listOf("WAITING...")
+                total == null || total == 0 -> listOf(DecimalFormat("#,##0").format(value))
                 else -> voteTemplate.toBarString(
                     votes = value,
                     pct = value.toDouble() / total,
@@ -637,7 +637,7 @@ class SimpleVoteViewPanel private constructor(
         override val zeroPct: ClosedRange<Double> = zero
 
         override fun createBar(
-            keyLabel: String,
+            keyLabel: List<String>,
             baseColor: Color,
             value: ClosedRange<Double>,
             total: ClosedRange<Double>,
@@ -650,15 +650,17 @@ class SimpleVoteViewPanel private constructor(
             baseColor,
             value.start,
             value.endInclusive,
-            DecimalFormat("0.0").format(100 * value.start) +
-                "-" +
-                DecimalFormat("0.0").format(100 * value.endInclusive) +
-                "%",
+            listOf(
+                DecimalFormat("0.0").format(100 * value.start) +
+                    "-" +
+                    DecimalFormat("0.0").format(100 * value.endInclusive) +
+                    "%",
+            ),
             shape,
         )
 
         override fun createPreferencesBar(
-            keyLabel: String,
+            keyLabel: List<String>,
             baseColor: Color,
             value: ClosedRange<Double>,
             total: ClosedRange<Double>,
@@ -736,18 +738,17 @@ class SimpleVoteViewPanel private constructor(
     }
 
     interface VoteTemplate {
-        fun toBarString(votes: Int, pct: Double, forceSingleLine: Boolean): String
+        fun toBarString(votes: Int, pct: Double, forceSingleLine: Boolean): List<String>
 
         fun toAltTextString(votes: Int, pct: Double, diffPct: Double?, symbols: String): String
     }
 
     private object VotePctTemplate : VoteTemplate {
-        override fun toBarString(votes: Int, pct: Double, forceSingleLine: Boolean): String = (
-            THOUSANDS_FORMAT.format(votes.toLong()) +
-                (if (forceSingleLine) " (" else "\n") +
-                PCT_FORMAT.format(pct) +
-                (if (forceSingleLine) ")" else "")
-            )
+        override fun toBarString(votes: Int, pct: Double, forceSingleLine: Boolean): List<String> = if (forceSingleLine) {
+            listOf("${THOUSANDS_FORMAT.format(votes.toLong())} (${PCT_FORMAT.format(pct)})")
+        } else {
+            listOf(THOUSANDS_FORMAT.format(votes.toLong()), PCT_FORMAT.format(pct))
+        }
 
         override fun toAltTextString(votes: Int, pct: Double, diffPct: Double?, symbols: String): String = (
             THOUSANDS_FORMAT.format(votes.toLong()) +
@@ -759,7 +760,7 @@ class SimpleVoteViewPanel private constructor(
     }
 
     private object VotePctOnlyTemplate : VoteTemplate {
-        override fun toBarString(votes: Int, pct: Double, forceSingleLine: Boolean): String = PCT_FORMAT.format(pct)
+        override fun toBarString(votes: Int, pct: Double, forceSingleLine: Boolean): List<String> = listOf(PCT_FORMAT.format(pct))
 
         override fun toAltTextString(votes: Int, pct: Double, diffPct: Double?, symbols: String): String = PCT_FORMAT.format(pct) +
             (
@@ -789,7 +790,7 @@ class SimpleVoteViewPanel private constructor(
         override val zeroPct: Double = 0.0
 
         override fun createBar(
-            keyLabel: String,
+            keyLabel: List<String>,
             baseColor: Color,
             value: Double,
             total: Double,
@@ -808,7 +809,7 @@ class SimpleVoteViewPanel private constructor(
         )
 
         override fun createPreferencesBar(
-            keyLabel: String,
+            keyLabel: List<String>,
             baseColor: Color,
             value: Double,
             total: Double,
@@ -826,7 +827,7 @@ class SimpleVoteViewPanel private constructor(
         )
 
         private fun createBar(
-            keyLabel: String,
+            keyLabel: List<String>,
             baseColor: Color,
             value: Double,
             numBars: Int,
@@ -838,7 +839,7 @@ class SimpleVoteViewPanel private constructor(
             color = baseColor,
             value = value.takeUnless { it.isNaN() } ?: 0.0,
             valueLabel = when {
-                numBars == 1 -> singleBarLabel
+                numBars == 1 -> listOf(singleBarLabel)
                 else -> VotePctOnlyTemplate.toBarString(
                     votes = 0,
                     pct = value,
@@ -1478,7 +1479,7 @@ class SimpleVoteViewPanel private constructor(
                 val forcedTotal = entries.map { it.value ?: valueTemplate.zero }.reduceOrNull(valueTemplate::voteCombine) ?: valueTemplate.zero
                 entries.map {
                     valueTemplate.createBar(
-                        it.key.name.uppercase(),
+                        listOf(it.key.name.uppercase()),
                         it.key.color,
                         it.value,
                         total,
@@ -1885,14 +1886,14 @@ class SimpleVoteViewPanel private constructor(
                 r.entries.sortedByDescending { it.key.overrideSortOrder ?: it.value ?: 0 }
                     .map { (c, v) ->
                         BarFrameBuilder.BasicBar(
-                            "${c.fullName.uppercase()}\n${c.description?.uppercase() ?: ""}",
+                            listOf(c.fullName.uppercase(), c.description?.uppercase() ?: ""),
                             c.color,
                             v ?: 0,
                             when {
-                                r.size == 1 -> "UNCONTESTED"
-                                v == null || total == 0.0 -> "WAITING..."
-                                total == null -> DecimalFormat("#,##0").format(v)
-                                else -> "${DecimalFormat("#,##0").format(v)}\n${DecimalFormat("0.0%").format(v / total)}"
+                                r.size == 1 -> listOf("UNCONTESTED")
+                                v == null || total == 0.0 -> listOf("WAITING...")
+                                total == null -> listOf(DecimalFormat("#,##0").format(v))
+                                else -> listOf(DecimalFormat("#,##0").format(v), DecimalFormat("0.0%").format(v / total))
                             },
                             if (c == w) ImageGenerator.createHalfTickShape() else null,
                         )

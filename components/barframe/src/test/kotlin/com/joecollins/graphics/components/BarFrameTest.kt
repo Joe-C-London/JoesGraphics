@@ -90,12 +90,12 @@ class BarFrameTest {
             barsPublisher = results.mapElements { BarFrame.Bar(it.getPartyName(), "", null, listOf()) },
         )
         assertEquals(6, frame.numBars)
-        assertEquals("LIBERAL", frame.getLeftText(0))
-        assertEquals("CONSERVATIVE", frame.getLeftText(1))
-        assertEquals("BLOC QUEBECOIS", frame.getLeftText(2))
-        assertEquals("NEW DEMOCRATIC PARTY", frame.getLeftText(3))
-        assertEquals("GREEN", frame.getLeftText(4))
-        assertEquals("INDEPENDENT", frame.getLeftText(5))
+        assertEquals(listOf("LIBERAL"), frame.getLeftText(0))
+        assertEquals(listOf("CONSERVATIVE"), frame.getLeftText(1))
+        assertEquals(listOf("BLOC QUEBECOIS"), frame.getLeftText(2))
+        assertEquals(listOf("NEW DEMOCRATIC PARTY"), frame.getLeftText(3))
+        assertEquals(listOf("GREEN"), frame.getLeftText(4))
+        assertEquals(listOf("INDEPENDENT"), frame.getLeftText(5))
     }
 
     @Test
@@ -122,12 +122,12 @@ class BarFrameTest {
             },
         )
         assertEquals(6, frame.numBars)
-        assertEquals("157", frame.getRightText(0))
-        assertEquals("121", frame.getRightText(1))
-        assertEquals("32", frame.getRightText(2))
-        assertEquals("24", frame.getRightText(3))
-        assertEquals("3", frame.getRightText(4))
-        assertEquals("1", frame.getRightText(5))
+        assertEquals(listOf("157"), frame.getRightText(0))
+        assertEquals(listOf("121"), frame.getRightText(1))
+        assertEquals(listOf("32"), frame.getRightText(2))
+        assertEquals(listOf("24"), frame.getRightText(3))
+        assertEquals(listOf("3"), frame.getRightText(4))
+        assertEquals(listOf("1"), frame.getRightText(5))
     }
 
     @Test
@@ -348,9 +348,9 @@ class BarFrameTest {
             ),
         )
         assertEquals(3, frame.numBars)
-        assertEquals("LIBERALS", frame.getLeftText(0))
-        assertEquals("CONSERVATIVES", frame.getLeftText(1))
-        assertEquals("NDP", frame.getLeftText(2))
+        assertEquals(listOf("LIBERALS"), frame.getLeftText(0))
+        assertEquals(listOf("CONSERVATIVES"), frame.getLeftText(1))
+        assertEquals(listOf("NDP"), frame.getLeftText(2))
 
         results.submit(
             listOf(
@@ -360,8 +360,8 @@ class BarFrameTest {
         )
         assertEquals(2, frame.numBars)
         assertEquals(2, frame.numBars.toLong())
-        assertEquals("LIBERALS", frame.getLeftText(0))
-        assertEquals("CONSERVATIVES", frame.getLeftText(1))
+        assertEquals(listOf("LIBERALS"), frame.getLeftText(0))
+        assertEquals(listOf("CONSERVATIVES"), frame.getLeftText(1))
     }
 
     @Test
@@ -592,8 +592,8 @@ class BarFrameTest {
             subheadColorPublisher = Color.RED.asOneTimePublisher(),
             barsPublisher = results.mapElements {
                 BarFrame.Bar(
-                    "${it.getCandidateName()}\n${it.getPartyName()}",
-                    "${THOUSANDS_FORMAT.format(it.getNumVotes().toLong())}\n${PERCENT_FORMAT.format(it.getVotePct())}",
+                    listOf(it.getCandidateName(), it.getPartyName()),
+                    listOf(THOUSANDS_FORMAT.format(it.getNumVotes().toLong()), PERCENT_FORMAT.format(it.getVotePct())),
                     listOf(Pair(it.getPartyColor(), it.getNumVotes())),
                 )
             },
@@ -621,8 +621,8 @@ class BarFrameTest {
             subheadColorPublisher = Color.RED.asOneTimePublisher(),
             barsPublisher = results.mapElements {
                 BarFrame.Bar(
-                    "${it.getCandidateName()}\n${it.getPartyName()}",
-                    "${THOUSANDS_FORMAT.format(it.getNumVotes().toLong())}\n${PERCENT_FORMAT.format(it.getVotePct())}",
+                    listOf(it.getCandidateName(), it.getPartyName()),
+                    listOf(THOUSANDS_FORMAT.format(it.getNumVotes().toLong()), PERCENT_FORMAT.format(it.getVotePct())),
                     if (it.isElected()) shape else null,
                     listOf(Pair(it.getPartyColor(), it.getNumVotes())),
                 )
@@ -731,10 +731,10 @@ class BarFrameTest {
     fun testRenderMultiLineAccents() {
         val results: Publisher<List<ElectionResult>> = Publisher(
             listOf(
-                ElectionResult("COALITION AVENIR QU\u00c9BEC\nFRAN\u00c7OIS LEGAULT", Color.BLUE, 74),
-                ElectionResult("LIB\u00c9RAL\nPHILIPPE COUILLARD", Color.RED, 31),
-                ElectionResult("PARTI QU\u00c9BECOIS\nJEAN-FRAN\u00c7OIS LIS\u00c9E", Color.CYAN, 10),
-                ElectionResult("QU\u00c9BEC SOLIDAIRE\nMANON MASS\u00c9", Color.ORANGE, 10),
+                ElectionResult("COALITION AVENIR QU\u00c9BEC", "FRAN\u00c7OIS LEGAULT", Color.BLUE, 74),
+                ElectionResult("LIB\u00c9RAL", "PHILIPPE COUILLARD", Color.RED, 31),
+                ElectionResult("PARTI QU\u00c9BECOIS", "JEAN-FRAN\u00c7OIS LIS\u00c9E", Color.CYAN, 10),
+                ElectionResult("QU\u00c9BEC SOLIDAIRE", "MANON MASS\u00c9", Color.ORANGE, 10),
             ),
         )
         val barFrame = BarFrame(
@@ -742,8 +742,8 @@ class BarFrameTest {
             subheadTextPublisher = "MAJORIT\u00c9: 63".asOneTimePublisher(),
             barsPublisher = results.mapElements {
                 BarFrame.Bar(
-                    it.getPartyName(),
-                    "${it.getNumSeats()}",
+                    listOf(it.getPartyName(), it.getLeader()),
+                    listOf("${it.getNumSeats()}"),
                     listOf(
                         Pair(it.getPartyColor(), it.getNumSeats()),
                     ),
@@ -758,7 +758,7 @@ class BarFrameTest {
 
     @Test
     fun testBarFrameOverlaps() {
-        val lines = Publisher(listOf(Triple("THIS IS A VERY VERY LONG\nLEFT HAND SIDE", "RIGHT\nSIDE", false)))
+        val lines = Publisher(listOf(Triple(listOf("THIS IS A VERY VERY LONG", "LEFT HAND SIDE"), listOf("RIGHT", "SIDE"), false)))
         val barFrame = BarFrame(
             headerPublisher = "BAR FRAME".asOneTimePublisher(),
             subheadTextPublisher = "".asOneTimePublisher(),
@@ -775,15 +775,15 @@ class BarFrameTest {
         )
         barFrame.setSize(256, 128)
         compareRendering("BarFrame", "FrameOverlap-1", barFrame)
-        lines.submit(listOf(Triple("LEFT\nSIDE", "THIS IS A VERY VERY LONG\nRIGHT HAND SIDE", false)))
+        lines.submit(listOf(Triple(listOf("LEFT", "SIDE"), listOf("THIS IS A VERY VERY LONG", "RIGHT HAND SIDE"), false)))
         compareRendering("BarFrame", "FrameOverlap-2", barFrame)
-        lines.submit(listOf(Triple("THIS IS A VERY VERY LONG\nLEFT HAND SIDE", "THIS IS A VERY VERY LONG\nRIGHT HAND SIDE", false)))
+        lines.submit(listOf(Triple(listOf("THIS IS A VERY VERY LONG", "LEFT HAND SIDE"), listOf("THIS IS A VERY VERY LONG", "RIGHT HAND SIDE"), false)))
         compareRendering("BarFrame", "FrameOverlap-3", barFrame)
-        lines.submit(listOf(Triple("THIS IS A VERY VERY LONG\nLEFT HAND SIDE", "RIGHT\nSIDE", true)))
+        lines.submit(listOf(Triple(listOf("THIS IS A VERY VERY LONG", "LEFT HAND SIDE"), listOf("RIGHT", "SIDE"), true)))
         compareRendering("BarFrame", "FrameOverlap-4", barFrame)
-        lines.submit(listOf(Triple("LEFT\nSIDE", "THIS IS A VERY VERY LONG\nRIGHT HAND SIDE", true)))
+        lines.submit(listOf(Triple(listOf("LEFT", "SIDE"), listOf("THIS IS A VERY VERY LONG", "RIGHT HAND SIDE"), true)))
         compareRendering("BarFrame", "FrameOverlap-5", barFrame)
-        lines.submit(listOf(Triple("THIS IS A VERY VERY LONG\nLEFT HAND SIDE", "THIS IS A VERY VERY LONG\nRIGHT HAND SIDE", true)))
+        lines.submit(listOf(Triple(listOf("THIS IS A VERY VERY LONG", "LEFT HAND SIDE"), listOf("THIS IS A VERY VERY LONG", "RIGHT HAND SIDE"), true)))
         compareRendering("BarFrame", "FrameOverlap-6", barFrame)
     }
 
@@ -793,9 +793,14 @@ class BarFrameTest {
         return shape
     }
 
-    private class ElectionResult constructor(private var partyName: String, private var partyColor: Color, private var numSeats: Int, private var seatEstimate: Int = numSeats) {
+    private class ElectionResult constructor(private var partyName: String, private var leader: String, private var partyColor: Color, private var numSeats: Int, private var seatEstimate: Int = numSeats) {
+
+        constructor(partyName: String, partyColor: Color, numSeats: Int, seatEstimate: Int = numSeats) :
+            this(partyName, "", partyColor, numSeats, seatEstimate)
 
         fun getPartyName(): String = partyName
+
+        fun getLeader(): String = leader
 
         fun getPartyColor(): Color = partyColor
 
