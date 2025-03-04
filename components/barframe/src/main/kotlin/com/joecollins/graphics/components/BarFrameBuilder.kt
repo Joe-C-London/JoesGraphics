@@ -124,7 +124,7 @@ object BarFrameBuilder {
         return BarFrame(
             barsPublisher = barsPublisher.map { bars ->
                 bars.map {
-                    BarFrame.Bar(it.label, it.valueLabel, it.shape, listOf(Pair(it.color, it.value)))
+                    BarFrame.Bar.of(it.label, it.valueLabel, it.shape, listOf(Pair(it.color, it.value)))
                 }
             }.run {
                 if (minBarCountPublisher == null) {
@@ -184,7 +184,7 @@ object BarFrameBuilder {
     ) = if (bars.size >= min) {
         bars
     } else {
-        sequenceOf(bars, MutableList(min - bars.size) { BarFrame.Bar(emptyList(), emptyList(), emptyList()) })
+        sequenceOf(bars, MutableList(min - bars.size) { BarFrame.Bar.of(emptyList(), emptyList(), emptyList()) })
             .flatten()
             .toList()
     }
@@ -226,7 +226,7 @@ object BarFrameBuilder {
         return BarFrame(
             barsPublisher = barsPublisher.map { b ->
                 b.map {
-                    BarFrame.Bar(
+                    BarFrame.Bar.of(
                         it.label,
                         it.valueLabel,
                         it.shape,
@@ -296,7 +296,7 @@ object BarFrameBuilder {
         return BarFrame(
             barsPublisher = barsPublisher.map { b ->
                 b.map {
-                    BarFrame.Bar(
+                    BarFrame.Bar.of(
                         it.label,
                         it.valueLabel,
                         it.shape,

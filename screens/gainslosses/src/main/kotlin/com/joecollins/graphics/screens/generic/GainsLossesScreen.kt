@@ -86,9 +86,9 @@ class GainsLossesScreen private constructor(
                         val gains = changes.count { it.second == party }
                         object : Entry {
                             override val lossBar: BarFrame.Bar =
-                                BarFrame.Bar(party.name.uppercase(), "$losses", listOf(party.color to -losses - 1e-12))
+                                BarFrame.Bar.of(party.name.uppercase(), "$losses", listOf(party.color to -losses - 1e-12))
                             override val gainBar: BarFrame.Bar =
-                                BarFrame.Bar(party.name.uppercase(), "$gains", listOf(party.color to gains + 1e-12))
+                                BarFrame.Bar.of(party.name.uppercase(), "$gains", listOf(party.color to gains + 1e-12))
                             override val altText: String = "${party.name.uppercase()}: $gains GAIN${if (gains == 1) "" else "S"}, $losses LOSS${if (losses == 1) "" else "ES"}"
                             override val totalSize: Int = max(gains, losses)
                         }
@@ -119,9 +119,9 @@ class GainsLossesScreen private constructor(
                             .eachCount()
                         object : Entry {
                             override val lossBar: BarFrame.Bar =
-                                BarFrame.Bar(party.name.uppercase(), "${losses[true] ?: 0}/${losses.values.sum()}", listOf(party.color to -(losses[true] ?: 0) - 1e-12, ColorUtils.lighten(party.color) to -(losses[false] ?: 0)))
+                                BarFrame.Bar.of(party.name.uppercase(), "${losses[true] ?: 0}/${losses.values.sum()}", listOf(party.color to -(losses[true] ?: 0) - 1e-12, ColorUtils.lighten(party.color) to -(losses[false] ?: 0)))
                             override val gainBar: BarFrame.Bar =
-                                BarFrame.Bar(party.name.uppercase(), "${gains[true] ?: 0}/${gains.values.sum()}", listOf(party.color to (gains[true] ?: 0) + 1e-12, ColorUtils.lighten(party.color) to (gains[false] ?: 0)))
+                                BarFrame.Bar.of(party.name.uppercase(), "${gains[true] ?: 0}/${gains.values.sum()}", listOf(party.color to (gains[true] ?: 0) + 1e-12, ColorUtils.lighten(party.color) to (gains[false] ?: 0)))
                             override val altText: String = "${party.name.uppercase()}: ${gains[true] ?: 0}/${gains.values.sum()} GAIN${if (gains.values.sum() == 1) "" else "S"}, ${losses[true] ?: 0}/${losses.values.sum()} LOSS${if (losses.values.sum() == 1) "" else "ES"}"
                             override val totalSize: Int = max(gains.values.sum(), losses.values.sum())
                         }

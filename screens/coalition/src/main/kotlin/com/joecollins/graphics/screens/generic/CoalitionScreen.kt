@@ -47,7 +47,7 @@ class CoalitionScreen private constructor(
             return CoalitionScreen(
                 BarFrame(
                     barsPublisher = rows.mapElements { row ->
-                        BarFrame.Bar(
+                        BarFrame.Bar.of(
                             leftText = row.name,
                             rightText = row.total.toString(),
                             series = row.parts.map { it.first.color to it.second },

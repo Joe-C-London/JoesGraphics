@@ -167,7 +167,7 @@ class CandidateListingScreen private constructor(
         ): BarFrame = BarFrame(
             barsPublisher = if (showToColumns == null) {
                 candidates.list.mapElements {
-                    BarFrame.Bar(
+                    BarFrame.Bar.of(
                         it.leftLabel(),
                         it.rightLabel(),
                         it.shape(),
@@ -184,7 +184,7 @@ class CandidateListingScreen private constructor(
                             val left = first[idx]
                             val right = if (idx == last.size) null else last[idx]
                             val func = { c: CT -> c.combinedLabel() + " " }
-                            BarFrame.Bar(
+                            BarFrame.Bar.of(
                                 func(left),
                                 right?.let(func) ?: "",
                                 listOf(
@@ -196,7 +196,7 @@ class CandidateListingScreen private constructor(
                         }
                     } else {
                         cList.map {
-                            BarFrame.Bar(
+                            BarFrame.Bar.of(
                                 it.leftLabel(),
                                 it.rightLabel(),
                                 listOf(it.color() to 1.0),

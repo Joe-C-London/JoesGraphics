@@ -56,17 +56,39 @@ class BarFrame(
     internal var max: Number = 0.0
         private set
 
-    class Bar constructor(
+    class Bar private constructor(
         val leftText: List<String>,
         val rightText: List<String>,
         val leftIcon: Shape? = null,
         val series: List<Pair<Color, Number>>,
     ) {
-        constructor(leftText: List<String>, rightText: List<String>, series: List<Pair<Color, Number>>) : this(leftText, rightText, null, series)
+        companion object {
+            fun of(
+                leftText: List<String>,
+                rightText: List<String>,
+                leftIcon: Shape? = null,
+                series: List<Pair<Color, Number>>,
+            ) = Bar(leftText, rightText, leftIcon, series)
 
-        constructor(leftText: String, rightText: String, leftIcon: Shape?, series: List<Pair<Color, Number>>) : this(listOf(leftText), listOf(rightText), leftIcon, series)
+            fun of(
+                leftText: List<String>,
+                rightText: List<String>,
+                series: List<Pair<Color, Number>>,
+            ) = Bar(leftText, rightText, null, series)
 
-        constructor(leftText: String, rightText: String, series: List<Pair<Color, Number>>) : this(listOf(leftText), listOf(rightText), series)
+            fun of(
+                leftText: String,
+                rightText: String,
+                leftIcon: Shape?,
+                series: List<Pair<Color, Number>>,
+            ) = Bar(listOf(leftText), listOf(rightText), leftIcon, series)
+
+            fun of(
+                leftText: String,
+                rightText: String,
+                series: List<Pair<Color, Number>>,
+            ) = Bar(listOf(leftText), listOf(rightText), null, series)
+        }
     }
 
     class Line(val level: Number, val label: String)

@@ -63,7 +63,7 @@ class PartyQuotasPanel private constructor(
                 q.entries.asSequence()
                     .sortedByDescending { it.key.overrideSortOrder?.toDouble() ?: it.value }
                     .map {
-                        BarFrame.Bar(
+                        BarFrame.Bar.of(
                             leftText = it.key.name.uppercase(),
                             rightText = DecimalFormat("0.00").format(it.value) + " QUOTAS",
                             series = listOf(it.key.color to it.value),
@@ -93,7 +93,7 @@ class PartyQuotasPanel private constructor(
                             .distinct()
                             .map { party ->
                                 val diff = (currQuotas[party] ?: 0.0) - (prevQuotas[party] ?: 0.0)
-                                BarFrame.Bar(
+                                BarFrame.Bar.of(
                                     leftText = party.abbreviation.uppercase(),
                                     rightText = DecimalFormat("+0.00;-0.00").format(diff),
                                     series = listOf(party.color to diff),

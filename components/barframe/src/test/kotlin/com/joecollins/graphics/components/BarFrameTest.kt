@@ -33,7 +33,7 @@ class BarFrameTest {
         )
         val frame = BarFrame(
             headerPublisher = (null as String?).asOneTimePublisher(),
-            barsPublisher = results.mapElements { BarFrame.Bar("", "", null, listOf()) },
+            barsPublisher = results.mapElements { BarFrame.Bar.of("", "", null, listOf()) },
         )
         assertEquals(6, frame.numBars)
     }
@@ -44,7 +44,7 @@ class BarFrameTest {
         val results = Publisher(list)
         val frame = BarFrame(
             headerPublisher = (null as String?).asOneTimePublisher(),
-            barsPublisher = results.mapElements { BarFrame.Bar("", "", null, listOf()) },
+            barsPublisher = results.mapElements { BarFrame.Bar.of("", "", null, listOf()) },
         )
         assertEquals(0, frame.numBars.toLong())
         list.add(ElectionResult("LIBERAL", Color.RED, 1))
@@ -87,7 +87,7 @@ class BarFrameTest {
         )
         val frame = BarFrame(
             headerPublisher = (null as String?).asOneTimePublisher(),
-            barsPublisher = results.mapElements { BarFrame.Bar(it.getPartyName(), "", null, listOf()) },
+            barsPublisher = results.mapElements { BarFrame.Bar.of(it.getPartyName(), "", null, listOf()) },
         )
         assertEquals(6, frame.numBars)
         assertEquals(listOf("LIBERAL"), frame.getLeftText(0))
@@ -113,7 +113,7 @@ class BarFrameTest {
         val frame = BarFrame(
             headerPublisher = (null as String?).asOneTimePublisher(),
             barsPublisher = results.mapElements {
-                BarFrame.Bar(
+                BarFrame.Bar.of(
                     it.getPartyName(),
                     "${it.getNumSeats()}",
                     null,
@@ -144,7 +144,7 @@ class BarFrameTest {
         val frame = BarFrame(
             headerPublisher = (null as String?).asOneTimePublisher(),
             barsPublisher = results.mapElements {
-                BarFrame.Bar(
+                BarFrame.Bar.of(
                     it.getPartyName(),
                     "${it.getNumSeats()}",
                     null,
@@ -195,7 +195,7 @@ class BarFrameTest {
         val frame = BarFrame(
             headerPublisher = (null as String?).asOneTimePublisher(),
             barsPublisher = results.mapElements {
-                BarFrame.Bar(
+                BarFrame.Bar.of(
                     "",
                     "",
                     if (it.getNumSeats() > 150) shape else null,
@@ -226,7 +226,7 @@ class BarFrameTest {
         val frame = BarFrame(
             headerPublisher = (null as String?).asOneTimePublisher(),
             barsPublisher = results.mapElements {
-                BarFrame.Bar(
+                BarFrame.Bar.of(
                     "",
                     "",
                     null,
@@ -264,7 +264,7 @@ class BarFrameTest {
         val frame = BarFrame(
             headerPublisher = (null as String?).asOneTimePublisher(),
             barsPublisher = results.mapElements {
-                BarFrame.Bar(
+                BarFrame.Bar.of(
                     "",
                     "",
                     null,
@@ -337,7 +337,7 @@ class BarFrameTest {
         val results = Publisher<List<Triple<String, Color, Int>>>(listOf())
         val frame = BarFrame(
             headerPublisher = (null as String?).asOneTimePublisher(),
-            barsPublisher = results.mapElements { BarFrame.Bar(it.first, "", null, listOf()) },
+            barsPublisher = results.mapElements { BarFrame.Bar.of(it.first, "", null, listOf()) },
         )
         assertEquals(0, frame.numBars.toLong())
         results.submit(
@@ -379,7 +379,7 @@ class BarFrameTest {
         val barFrame = BarFrame(
             headerPublisher = "2019 CANADIAN ELECTION RESULT".asOneTimePublisher(),
             barsPublisher = results.mapElements {
-                BarFrame.Bar(
+                BarFrame.Bar.of(
                     it.getPartyName(),
                     "${it.getNumSeats()}",
                     null,
@@ -411,7 +411,7 @@ class BarFrameTest {
             subheadTextPublisher = "PROJECTION: LIB MINORITY".asOneTimePublisher(),
             subheadColorPublisher = Color.RED.asOneTimePublisher(),
             barsPublisher = results.mapElements {
-                BarFrame.Bar(
+                BarFrame.Bar.of(
                     it.getPartyName(),
                     "${it.getNumSeats()}",
                     null,
@@ -445,7 +445,7 @@ class BarFrameTest {
             subheadTextPublisher = "170 FOR MAJORITY".asOneTimePublisher(),
             subheadColorPublisher = Color.RED.asOneTimePublisher(),
             barsPublisher = results.mapElements {
-                BarFrame.Bar(
+                BarFrame.Bar.of(
                     it.getPartyName(),
                     "${it.getNumSeats()}",
                     null,
@@ -474,7 +474,7 @@ class BarFrameTest {
         val barFrame = BarFrame(
             headerPublisher = "2019 CANADIAN ELECTION RESULT".asOneTimePublisher(),
             barsPublisher = results.mapElements {
-                BarFrame.Bar(
+                BarFrame.Bar.of(
                     it.getPartyName(),
                     it.getNumSeats().toString() + "/" + it.getSeatEstimate(),
                     null,
@@ -505,7 +505,7 @@ class BarFrameTest {
         val barFrame = BarFrame(
             headerPublisher = "RESULT CHANGE SINCE 2015".asOneTimePublisher(),
             barsPublisher = results.mapElements {
-                BarFrame.Bar(
+                BarFrame.Bar.of(
                     it.getPartyName(),
                     DecimalFormat("+0;-0").format(it.getNumSeats().toLong()),
                     null,
@@ -540,7 +540,7 @@ class BarFrameTest {
         val barFrame = BarFrame(
             headerPublisher = "RESULT CHANGE SINCE 2015".asOneTimePublisher(),
             barsPublisher = results.mapElements {
-                BarFrame.Bar(
+                BarFrame.Bar.of(
                     it.getPartyName(),
                     "${CHANGE_FORMAT.format(it.getNumSeats().toLong())}/${
                         CHANGE_FORMAT.format(
@@ -591,7 +591,7 @@ class BarFrameTest {
             subheadTextPublisher = "LIB HOLD".asOneTimePublisher(),
             subheadColorPublisher = Color.RED.asOneTimePublisher(),
             barsPublisher = results.mapElements {
-                BarFrame.Bar(
+                BarFrame.Bar.of(
                     listOf(it.getCandidateName(), it.getPartyName()),
                     listOf(THOUSANDS_FORMAT.format(it.getNumVotes().toLong()), PERCENT_FORMAT.format(it.getVotePct())),
                     listOf(Pair(it.getPartyColor(), it.getNumVotes())),
@@ -620,7 +620,7 @@ class BarFrameTest {
             subheadTextPublisher = "LIB HOLD".asOneTimePublisher(),
             subheadColorPublisher = Color.RED.asOneTimePublisher(),
             barsPublisher = results.mapElements {
-                BarFrame.Bar(
+                BarFrame.Bar.of(
                     listOf(it.getCandidateName(), it.getPartyName()),
                     listOf(THOUSANDS_FORMAT.format(it.getNumVotes().toLong()), PERCENT_FORMAT.format(it.getVotePct())),
                     if (it.isElected()) shape else null,
@@ -648,7 +648,7 @@ class BarFrameTest {
         val barFrame = BarFrame(
             headerPublisher = "WATERLOO".asOneTimePublisher(),
             barsPublisher = results.mapElements {
-                BarFrame.Bar(
+                BarFrame.Bar.of(
                     it.getPartyName(),
                     PERCENT_FORMAT.format(it.getVotePct()),
                     if (it.isElected()) shape else null,
@@ -683,7 +683,7 @@ class BarFrameTest {
             subheadTextPublisher = "170 FOR MAJORITY".asOneTimePublisher(),
             subheadColorPublisher = Color.RED.asOneTimePublisher(),
             barsPublisher = results.mapElements {
-                BarFrame.Bar(
+                BarFrame.Bar.of(
                     it.getPartyName(),
                     "${it.getNumSeats()}",
                     listOf(
@@ -712,7 +712,7 @@ class BarFrameTest {
             headerPublisher = "\u00c9LECTION 2018".asOneTimePublisher(),
             subheadTextPublisher = "MAJORIT\u00c9: 63".asOneTimePublisher(),
             barsPublisher = results.mapElements {
-                BarFrame.Bar(
+                BarFrame.Bar.of(
                     it.getPartyName(),
                     "${it.getNumSeats()}",
                     listOf(
@@ -741,7 +741,7 @@ class BarFrameTest {
             headerPublisher = "\u00c9LECTION 2018".asOneTimePublisher(),
             subheadTextPublisher = "MAJORIT\u00c9: 63".asOneTimePublisher(),
             barsPublisher = results.mapElements {
-                BarFrame.Bar(
+                BarFrame.Bar.of(
                     listOf(it.getPartyName(), it.getLeader()),
                     listOf("${it.getNumSeats()}"),
                     listOf(
@@ -763,7 +763,7 @@ class BarFrameTest {
             headerPublisher = "BAR FRAME".asOneTimePublisher(),
             subheadTextPublisher = "".asOneTimePublisher(),
             barsPublisher = lines.mapElements {
-                BarFrame.Bar(
+                BarFrame.Bar.of(
                     it.first,
                     it.second,
                     if (it.third) createHalfTickShape() else null,
