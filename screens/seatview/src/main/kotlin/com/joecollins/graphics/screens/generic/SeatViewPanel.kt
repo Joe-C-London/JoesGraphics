@@ -410,22 +410,21 @@ class SeatViewPanel private constructor(
 
         override fun prevCombine(value1: Int, value2: Int): Int = value1 + value2
 
-        override fun createBar(keyLabel: List<String>, baseColor: Color, value: Int, shape: Shape?): BarFrameBuilder.BasicBar = BarFrameBuilder.BasicBar(
-            keyLabel,
+        override fun createBar(keyLabel: List<String>, baseColor: Color, value: Int, shape: Shape?): BarFrameBuilder.BasicBar = BarFrameBuilder.BasicBar.of(
+            keyLabel.mapIndexed { index, s -> s to (if (index == 0) shape else null) },
             baseColor,
             value,
             labelText(value),
-            shape,
         )
 
-        override fun createPrevBar(keyLabel: String, baseColor: Color, value: Int): BarFrameBuilder.BasicBar = BarFrameBuilder.BasicBar(
+        override fun createPrevBar(keyLabel: String, baseColor: Color, value: Int): BarFrameBuilder.BasicBar = BarFrameBuilder.BasicBar.of(
             keyLabel,
             baseColor,
             value,
             prevLabelText(value),
         )
 
-        override fun createDiffBar(keyLabel: String, baseColor: Color, diff: Int): BarFrameBuilder.BasicBar = BarFrameBuilder.BasicBar(
+        override fun createDiffBar(keyLabel: String, baseColor: Color, diff: Int): BarFrameBuilder.BasicBar = BarFrameBuilder.BasicBar.of(
             keyLabel,
             baseColor,
             diff,
@@ -452,16 +451,15 @@ class SeatViewPanel private constructor(
 
         override fun prevCombine(value1: Pair<Int, Int>, value2: Pair<Int, Int>): Pair<Int, Int> = (value1.first + value2.first) to (value1.second + value2.second)
 
-        override fun createBar(keyLabel: List<String>, baseColor: Color, value: Pair<Int, Int>, shape: Shape?): BarFrameBuilder.DualBar = BarFrameBuilder.DualBar(
-            keyLabel,
+        override fun createBar(keyLabel: List<String>, baseColor: Color, value: Pair<Int, Int>, shape: Shape?): BarFrameBuilder.DualBar = BarFrameBuilder.DualBar.of(
+            keyLabel.mapIndexed { index, s -> s to (if (index == 0) shape else null) },
             baseColor,
             value.first,
             value.second,
             labelText(value),
-            shape,
         )
 
-        override fun createPrevBar(keyLabel: String, baseColor: Color, value: Pair<Int, Int>): BarFrameBuilder.DualBar = BarFrameBuilder.DualBar(
+        override fun createPrevBar(keyLabel: String, baseColor: Color, value: Pair<Int, Int>): BarFrameBuilder.DualBar = BarFrameBuilder.DualBar.of(
             keyLabel,
             baseColor,
             value.first,
@@ -469,7 +467,7 @@ class SeatViewPanel private constructor(
             prevLabelText(value),
         )
 
-        override fun createDiffBar(keyLabel: String, baseColor: Color, diff: Pair<Int, Int>): BarFrameBuilder.DualBar = BarFrameBuilder.DualBar(
+        override fun createDiffBar(keyLabel: String, baseColor: Color, diff: Pair<Int, Int>): BarFrameBuilder.DualBar = BarFrameBuilder.DualBar.of(
             keyLabel,
             baseColor,
             diff.first,
@@ -497,16 +495,15 @@ class SeatViewPanel private constructor(
 
         override fun prevCombine(value1: Pair<Int, Int>, value2: Pair<Int, Int>): Pair<Int, Int> = (value1.first + value2.first) to (value1.second + value2.second)
 
-        override fun createBar(keyLabel: List<String>, baseColor: Color, value: Pair<Int, Int>, shape: Shape?): BarFrameBuilder.DualBar = BarFrameBuilder.DualBar(
-            keyLabel,
+        override fun createBar(keyLabel: List<String>, baseColor: Color, value: Pair<Int, Int>, shape: Shape?): BarFrameBuilder.DualBar = BarFrameBuilder.DualBar.of(
+            keyLabel.mapIndexed { index, s -> s to (if (index == 0) shape else null) },
             baseColor,
             value.second - value.first,
             value.second,
             labelText(value),
-            shape,
         )
 
-        override fun createPrevBar(keyLabel: String, baseColor: Color, value: Pair<Int, Int>): BarFrameBuilder.DualBar = BarFrameBuilder.DualBar(
+        override fun createPrevBar(keyLabel: String, baseColor: Color, value: Pair<Int, Int>): BarFrameBuilder.DualBar = BarFrameBuilder.DualBar.of(
             keyLabel,
             baseColor,
             value.second - value.first,
@@ -514,7 +511,7 @@ class SeatViewPanel private constructor(
             prevLabelText(value),
         )
 
-        override fun createDiffBar(keyLabel: String, baseColor: Color, diff: Pair<Int, Int>): BarFrameBuilder.DualBar = BarFrameBuilder.DualBar(
+        override fun createDiffBar(keyLabel: String, baseColor: Color, diff: Pair<Int, Int>): BarFrameBuilder.DualBar = BarFrameBuilder.DualBar.of(
             keyLabel,
             baseColor,
             if (
@@ -548,16 +545,15 @@ class SeatViewPanel private constructor(
 
         override fun prevCombine(value1: Int, value2: Int): Int = value1 + value2
 
-        override fun createBar(keyLabel: List<String>, baseColor: Color, value: IntRange, shape: Shape?): BarFrameBuilder.DualBar = BarFrameBuilder.DualBar(
-            keyLabel,
+        override fun createBar(keyLabel: List<String>, baseColor: Color, value: IntRange, shape: Shape?): BarFrameBuilder.DualBar = BarFrameBuilder.DualBar.of(
+            keyLabel.mapIndexed { index, s -> s to (if (index == 0) shape else null) },
             baseColor,
             value.first,
             value.last,
             labelText(value),
-            shape,
         )
 
-        override fun createPrevBar(keyLabel: String, baseColor: Color, value: Int): BarFrameBuilder.DualBar = BarFrameBuilder.DualBar(
+        override fun createPrevBar(keyLabel: String, baseColor: Color, value: Int): BarFrameBuilder.DualBar = BarFrameBuilder.DualBar.of(
             keyLabel,
             baseColor,
             value,
@@ -565,7 +561,7 @@ class SeatViewPanel private constructor(
             prevLabelText(value),
         )
 
-        override fun createDiffBar(keyLabel: String, baseColor: Color, diff: IntRange): BarFrameBuilder.DualBar = BarFrameBuilder.DualBar(
+        override fun createDiffBar(keyLabel: String, baseColor: Color, diff: IntRange): BarFrameBuilder.DualBar = BarFrameBuilder.DualBar.of(
             keyLabel,
             baseColor,
             diff.first,

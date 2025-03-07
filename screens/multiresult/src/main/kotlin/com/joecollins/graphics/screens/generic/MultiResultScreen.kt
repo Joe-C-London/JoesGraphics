@@ -3,7 +3,6 @@ package com.joecollins.graphics.screens.generic
 import com.joecollins.graphics.AltTextProvider
 import com.joecollins.graphics.GenericPanel
 import com.joecollins.graphics.ImageGenerator
-import com.joecollins.graphics.ImageGenerator.combineVertical
 import com.joecollins.graphics.components.BarFrame
 import com.joecollins.graphics.components.BarFrameBuilder
 import com.joecollins.graphics.components.MapFrame
@@ -119,19 +118,16 @@ class MultiResultScreen private constructor(
                     val useIncumbentMarker = (incumbentMarker != null && candidate.incumbent)
                     val isWinner = candidate == winner
                     val isRunoff = runoff.contains(candidate)
-                    val shape: Shape? = (
+                    val shape: List<Shape> = listOfNotNull(
                         when {
-                            isWinner -> if (useIncumbentMarker) ImageGenerator.createTickShape() else ImageGenerator.createHalfTickShape()
-                            isRunoff -> if (useIncumbentMarker) ImageGenerator.createRunoffShape() else ImageGenerator.createHalfRunoffShape()
+                            isWinner -> ImageGenerator.createTickShape()
+                            isRunoff -> ImageGenerator.createRunoffShape()
                             else -> null
-                        }
-                        ).combineVertical(
+                        },
                         if (!useIncumbentMarker) {
                             null
-                        } else if (isWinner || isRunoff) {
-                            ImageGenerator.createBoxedTextShape(incumbentMarker!!)
                         } else {
-                            ImageGenerator.createHalfBoxedTextShape(incumbentMarker!!)
+                            ImageGenerator.createBoxedTextShape(incumbentMarker!!)
                         },
                     )
                     val leftLabel: List<String> = when {
@@ -156,19 +152,18 @@ class MultiResultScreen private constructor(
                             listOf(DecimalFormat("#,##0").format(votes.toLong()), DecimalFormat("0.0%").format(pct))
                         }
                     }
-                    BarFrameBuilder.BasicBar(
-                        leftLabel,
+                    BarFrameBuilder.BasicBar.of(
+                        leftLabel.zip(shape + listOf(null, null)),
                         candidate.party.color,
                         if (pct.isNaN()) 0 else pct,
                         rightLabel,
-                        shape,
                     )
                 }
                 .toList()
             return sequenceOf(
                 bars.asSequence(),
                 generateSequence {
-                    BarFrameBuilder.BasicBar("", Color.WHITE, 0, "")
+                    BarFrameBuilder.BasicBar.of("", Color.WHITE, 0, "")
                 },
             )
                 .flatten()

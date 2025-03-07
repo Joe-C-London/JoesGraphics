@@ -67,7 +67,7 @@ class SingleTransferrableResultScreen private constructor(
                 val alreadyElectedSequence = elected.asSequence()
                     .filter { !votes.containsKey(it.first) }
                     .map {
-                        BarFrameBuilder.BasicBar(
+                        BarFrameBuilder.BasicBar.of(
                             label = it.first.name.uppercase() + " (${it.first.party.abbreviation.uppercase()})",
                             valueLabel = it.second,
                             shape = (
@@ -84,7 +84,7 @@ class SingleTransferrableResultScreen private constructor(
                 val thisRoundSequence = votes.entries.asSequence()
                     .sortedByDescending { it.value?.toDouble() ?: -1.0 }
                     .map {
-                        BarFrameBuilder.BasicBar(
+                        BarFrameBuilder.BasicBar.of(
                             label = it.key.name.uppercase() + " (${it.key.party.abbreviation.uppercase()})",
                             valueLabel = if (it.value == null) {
                                 "WAITING..."
@@ -112,7 +112,7 @@ class SingleTransferrableResultScreen private constructor(
                     .filter { !votes.containsKey(it.first) }
                     .filter { candidateResults.showExcludedCandidates(it.first) }
                     .map {
-                        BarFrameBuilder.BasicBar(
+                        BarFrameBuilder.BasicBar.of(
                             label = it.first.name.uppercase() + " (${it.first.party.abbreviation.uppercase()})",
                             valueLabel = it.second,
                             shape = (
@@ -163,7 +163,7 @@ class SingleTransferrableResultScreen private constructor(
                     .entries
                     .sortedByDescending { it.value }
                     .map {
-                        BarFrameBuilder.BasicBar(
+                        BarFrameBuilder.BasicBar.of(
                             label = it.key.name.uppercase(),
                             color = it.key.color,
                             value = it.value,
@@ -188,7 +188,7 @@ class SingleTransferrableResultScreen private constructor(
                     prev.entries
                         .sortedByDescending { it.value }
                         .map {
-                            BarFrameBuilder.BasicBar(
+                            BarFrameBuilder.BasicBar.of(
                                 label = it.key.abbreviation.uppercase(),
                                 color = it.key.color,
                                 value = it.value,

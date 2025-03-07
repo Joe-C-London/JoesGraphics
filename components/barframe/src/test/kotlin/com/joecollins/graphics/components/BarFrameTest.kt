@@ -1,12 +1,12 @@
 package com.joecollins.graphics.components
 
-import com.joecollins.graphics.ImageGenerator.createHalfTickShape
+import com.joecollins.graphics.components.BarFrame.Bar.Companion.withIcon
+import com.joecollins.graphics.components.BarFrame.Bar.Companion.withNoIcon
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.map
 import com.joecollins.pubsub.mapElements
-import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.awt.Color
@@ -33,7 +33,7 @@ class BarFrameTest {
         )
         val frame = BarFrame(
             headerPublisher = (null as String?).asOneTimePublisher(),
-            barsPublisher = results.mapElements { BarFrame.Bar.of("", "", null, listOf()) },
+            barsPublisher = results.mapElements { BarFrame.Bar.of("", "", listOf()) },
         )
         assertEquals(6, frame.numBars)
     }
@@ -44,7 +44,7 @@ class BarFrameTest {
         val results = Publisher(list)
         val frame = BarFrame(
             headerPublisher = (null as String?).asOneTimePublisher(),
-            barsPublisher = results.mapElements { BarFrame.Bar.of("", "", null, listOf()) },
+            barsPublisher = results.mapElements { BarFrame.Bar.of("", "", listOf()) },
         )
         assertEquals(0, frame.numBars.toLong())
         list.add(ElectionResult("LIBERAL", Color.RED, 1))
@@ -87,15 +87,15 @@ class BarFrameTest {
         )
         val frame = BarFrame(
             headerPublisher = (null as String?).asOneTimePublisher(),
-            barsPublisher = results.mapElements { BarFrame.Bar.of(it.getPartyName(), "", null, listOf()) },
+            barsPublisher = results.mapElements { BarFrame.Bar.of(it.getPartyName(), "", listOf()) },
         )
         assertEquals(6, frame.numBars)
-        assertEquals(listOf("LIBERAL"), frame.getLeftText(0))
-        assertEquals(listOf("CONSERVATIVE"), frame.getLeftText(1))
-        assertEquals(listOf("BLOC QUEBECOIS"), frame.getLeftText(2))
-        assertEquals(listOf("NEW DEMOCRATIC PARTY"), frame.getLeftText(3))
-        assertEquals(listOf("GREEN"), frame.getLeftText(4))
-        assertEquals(listOf("INDEPENDENT"), frame.getLeftText(5))
+        assertEquals(listOf("LIBERAL".withNoIcon()), frame.getLeftText(0))
+        assertEquals(listOf("CONSERVATIVE".withNoIcon()), frame.getLeftText(1))
+        assertEquals(listOf("BLOC QUEBECOIS".withNoIcon()), frame.getLeftText(2))
+        assertEquals(listOf("NEW DEMOCRATIC PARTY".withNoIcon()), frame.getLeftText(3))
+        assertEquals(listOf("GREEN".withNoIcon()), frame.getLeftText(4))
+        assertEquals(listOf("INDEPENDENT".withNoIcon()), frame.getLeftText(5))
     }
 
     @Test
@@ -116,7 +116,6 @@ class BarFrameTest {
                 BarFrame.Bar.of(
                     it.getPartyName(),
                     "${it.getNumSeats()}",
-                    null,
                     listOf(),
                 )
             },
@@ -147,7 +146,6 @@ class BarFrameTest {
                 BarFrame.Bar.of(
                     it.getPartyName(),
                     "${it.getNumSeats()}",
-                    null,
                     listOf(
                         Pair(it.getPartyColor(), it.getNumSeats()),
                         Pair(lighten(it.getPartyColor()), it.getSeatEstimate() - it.getNumSeats()),
@@ -196,20 +194,19 @@ class BarFrameTest {
             headerPublisher = (null as String?).asOneTimePublisher(),
             barsPublisher = results.mapElements {
                 BarFrame.Bar.of(
+                    "".withIcon(if (it.getNumSeats() > 150) shape else null),
                     "",
-                    "",
-                    if (it.getNumSeats() > 150) shape else null,
                     listOf(),
                 )
             },
         )
         assertEquals(6, frame.numBars)
-        assertEquals(shape, frame.getLeftIcon(0))
-        Assertions.assertNull(frame.getLeftIcon(1))
-        Assertions.assertNull(frame.getLeftIcon(2))
-        Assertions.assertNull(frame.getLeftIcon(3))
-        Assertions.assertNull(frame.getLeftIcon(4))
-        Assertions.assertNull(frame.getLeftIcon(5))
+        assertEquals(listOf("".withIcon(shape)), frame.getLeftText(0))
+        assertEquals(listOf("".withNoIcon()), frame.getLeftText(1))
+        assertEquals(listOf("".withNoIcon()), frame.getLeftText(2))
+        assertEquals(listOf("".withNoIcon()), frame.getLeftText(3))
+        assertEquals(listOf("".withNoIcon()), frame.getLeftText(4))
+        assertEquals(listOf("".withNoIcon()), frame.getLeftText(5))
     }
 
     @Test
@@ -229,7 +226,6 @@ class BarFrameTest {
                 BarFrame.Bar.of(
                     "",
                     "",
-                    null,
                     listOf(
                         Pair(it.getPartyColor(), it.getNumSeats()),
                     ),
@@ -267,7 +263,6 @@ class BarFrameTest {
                 BarFrame.Bar.of(
                     "",
                     "",
-                    null,
                     listOf(
                         Pair(it.getPartyColor(), it.getNumSeats()),
                     ),
@@ -337,7 +332,7 @@ class BarFrameTest {
         val results = Publisher<List<Triple<String, Color, Int>>>(listOf())
         val frame = BarFrame(
             headerPublisher = (null as String?).asOneTimePublisher(),
-            barsPublisher = results.mapElements { BarFrame.Bar.of(it.first, "", null, listOf()) },
+            barsPublisher = results.mapElements { BarFrame.Bar.of(it.first, "", listOf()) },
         )
         assertEquals(0, frame.numBars.toLong())
         results.submit(
@@ -348,9 +343,9 @@ class BarFrameTest {
             ),
         )
         assertEquals(3, frame.numBars)
-        assertEquals(listOf("LIBERALS"), frame.getLeftText(0))
-        assertEquals(listOf("CONSERVATIVES"), frame.getLeftText(1))
-        assertEquals(listOf("NDP"), frame.getLeftText(2))
+        assertEquals(listOf("LIBERALS".withNoIcon()), frame.getLeftText(0))
+        assertEquals(listOf("CONSERVATIVES".withNoIcon()), frame.getLeftText(1))
+        assertEquals(listOf("NDP".withNoIcon()), frame.getLeftText(2))
 
         results.submit(
             listOf(
@@ -360,8 +355,8 @@ class BarFrameTest {
         )
         assertEquals(2, frame.numBars)
         assertEquals(2, frame.numBars.toLong())
-        assertEquals(listOf("LIBERALS"), frame.getLeftText(0))
-        assertEquals(listOf("CONSERVATIVES"), frame.getLeftText(1))
+        assertEquals(listOf("LIBERALS".withNoIcon()), frame.getLeftText(0))
+        assertEquals(listOf("CONSERVATIVES".withNoIcon()), frame.getLeftText(1))
     }
 
     @Test
@@ -382,7 +377,6 @@ class BarFrameTest {
                 BarFrame.Bar.of(
                     it.getPartyName(),
                     "${it.getNumSeats()}",
-                    null,
                     listOf(
                         Pair(it.getPartyColor(), it.getNumSeats()),
                     ),
@@ -414,7 +408,6 @@ class BarFrameTest {
                 BarFrame.Bar.of(
                     it.getPartyName(),
                     "${it.getNumSeats()}",
-                    null,
                     listOf(
                         Pair(it.getPartyColor(), it.getNumSeats()),
                     ),
@@ -448,7 +441,6 @@ class BarFrameTest {
                 BarFrame.Bar.of(
                     it.getPartyName(),
                     "${it.getNumSeats()}",
-                    null,
                     listOf(
                         Pair(it.getPartyColor(), it.getNumSeats()),
                     ),
@@ -477,7 +469,6 @@ class BarFrameTest {
                 BarFrame.Bar.of(
                     it.getPartyName(),
                     it.getNumSeats().toString() + "/" + it.getSeatEstimate(),
-                    null,
                     listOf(
                         Pair(it.getPartyColor(), it.getNumSeats()),
                         Pair(lighten(it.getPartyColor()), it.getSeatEstimate() - it.getNumSeats()),
@@ -508,7 +499,6 @@ class BarFrameTest {
                 BarFrame.Bar.of(
                     it.getPartyName(),
                     DecimalFormat("+0;-0").format(it.getNumSeats().toLong()),
-                    null,
                     listOf(
                         Pair(it.getPartyColor(), it.getNumSeats()),
                     ),
@@ -547,7 +537,6 @@ class BarFrameTest {
                             it.getSeatEstimate().toLong(),
                         )
                     }",
-                    null,
                     listOf(
                         Pair(it.getPartyColor(), it.getNumSeats()),
                         Pair(
@@ -621,9 +610,8 @@ class BarFrameTest {
             subheadColorPublisher = Color.RED.asOneTimePublisher(),
             barsPublisher = results.mapElements {
                 BarFrame.Bar.of(
-                    listOf(it.getCandidateName(), it.getPartyName()),
+                    listOf(it.getCandidateName().withIcon(if (it.isElected()) shape else null), it.getPartyName().withNoIcon()),
                     listOf(THOUSANDS_FORMAT.format(it.getNumVotes().toLong()), PERCENT_FORMAT.format(it.getVotePct())),
-                    if (it.isElected()) shape else null,
                     listOf(Pair(it.getPartyColor(), it.getNumVotes())),
                 )
             },
@@ -649,9 +637,8 @@ class BarFrameTest {
             headerPublisher = "WATERLOO".asOneTimePublisher(),
             barsPublisher = results.mapElements {
                 BarFrame.Bar.of(
-                    it.getPartyName(),
+                    it.getPartyName().withIcon(if (it.isElected()) shape else null),
                     PERCENT_FORMAT.format(it.getVotePct()),
-                    if (it.isElected()) shape else null,
                     listOf(Pair(it.getPartyColor(), it.getVotePct())),
                 )
             },
@@ -764,9 +751,8 @@ class BarFrameTest {
             subheadTextPublisher = "".asOneTimePublisher(),
             barsPublisher = lines.mapElements {
                 BarFrame.Bar.of(
-                    it.first,
+                    it.first.mapIndexed { index, s -> if (index == 0 && it.third) s.withIcon(createTickShape()) else s.withNoIcon() },
                     it.second,
-                    if (it.third) createHalfTickShape() else null,
                     listOf(Pair(Color.RED, 1)),
                 )
             },
@@ -785,6 +771,30 @@ class BarFrameTest {
         compareRendering("BarFrame", "FrameOverlap-5", barFrame)
         lines.submit(listOf(Triple(listOf("THIS IS A VERY VERY LONG", "LEFT HAND SIDE"), listOf("THIS IS A VERY VERY LONG", "RIGHT HAND SIDE"), true)))
         compareRendering("BarFrame", "FrameOverlap-6", barFrame)
+    }
+
+    @Test
+    fun testRenderUnequalNumberOfLinesOnBars() {
+        val barFrame = BarFrame(
+            headerPublisher = "2016 EU REFERENDUM".asOneTimePublisher(),
+            subheadTextPublisher = "".asOneTimePublisher(),
+            barsPublisher = listOf(
+                BarFrame.Bar.of(
+                    listOf("LEAVE".withIcon(createTickShape())),
+                    listOf("17,410,742", "51.9%"),
+                    listOf(Color.RED to 0.519 * 1.5),
+                ),
+                BarFrame.Bar.of(
+                    listOf("REMAIN".withNoIcon()),
+                    listOf("16,141,241", "48.1%"),
+                    listOf(Color.BLUE to 0.481 * 1.5),
+                ),
+            ).asOneTimePublisher(),
+            linesPublisher = listOf(BarFrame.Line(0.5, "")).asOneTimePublisher(),
+            maxPublisher = 1.asOneTimePublisher(),
+        )
+        barFrame.setSize(512, 256)
+        compareRendering("BarFrame", "UnequalLinesOnBars-1", barFrame)
     }
 
     private fun createTickShape(): Shape {

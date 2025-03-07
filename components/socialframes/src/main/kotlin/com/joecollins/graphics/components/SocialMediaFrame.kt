@@ -159,7 +159,7 @@ abstract class SocialMediaFrame<P : Post>(
                     val options = polls[0].options
                     val total = options.values.sum().toDouble().coerceAtLeast(1e-6)
                     options.entries.map {
-                        BarFrameBuilder.BasicBar(
+                        BarFrameBuilder.BasicBar.of(
                             it.key,
                             color,
                             it.value,

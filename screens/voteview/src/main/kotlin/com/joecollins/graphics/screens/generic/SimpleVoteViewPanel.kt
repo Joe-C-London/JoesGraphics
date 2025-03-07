@@ -539,8 +539,8 @@ class SimpleVoteViewPanel private constructor(
             forceSingleLine: Boolean,
             shape: Shape?,
             singleBarLabel: String,
-        ): BarFrameBuilder.BasicBar = BarFrameBuilder.BasicBar(
-            label = keyLabel,
+        ): BarFrameBuilder.BasicBar = BarFrameBuilder.BasicBar.of(
+            label = keyLabel.mapIndexed { index, s -> s to (if (index == 0) shape else null) },
             color = baseColor,
             value = ((value ?: 0).toDouble() / (forcedTotal ?: 0)).takeUnless { it.isNaN() } ?: 0.0,
             valueLabel = when {
@@ -554,17 +554,16 @@ class SimpleVoteViewPanel private constructor(
                     forceSingleLine = forceSingleLine,
                 )
             },
-            shape = shape,
         )
 
-        override fun createDiffBar(keyLabel: String, baseColor: Color, value: Double): BarFrameBuilder.BasicBar = BarFrameBuilder.BasicBar(
+        override fun createDiffBar(keyLabel: String, baseColor: Color, value: Double): BarFrameBuilder.BasicBar = BarFrameBuilder.BasicBar.of(
             keyLabel,
             baseColor,
             value,
             DecimalFormat("+0.0%;-0.0%").format(value),
         )
 
-        override fun createPrevBar(keyLabel: String, baseColor: Color, value: Double): BarFrameBuilder.BasicBar = BarFrameBuilder.BasicBar(
+        override fun createPrevBar(keyLabel: String, baseColor: Color, value: Double): BarFrameBuilder.BasicBar = BarFrameBuilder.BasicBar.of(
             keyLabel,
             baseColor,
             value,
@@ -645,8 +644,8 @@ class SimpleVoteViewPanel private constructor(
             numBars: Int,
             forceSingleLine: Boolean,
             shape: Shape?,
-        ): BarFrameBuilder.DualBar = BarFrameBuilder.DualBar(
-            keyLabel,
+        ): BarFrameBuilder.DualBar = BarFrameBuilder.DualBar.of(
+            keyLabel.mapIndexed { index, s -> s to (if (index == 0) shape else null) },
             baseColor,
             value.start,
             value.endInclusive,
@@ -656,7 +655,6 @@ class SimpleVoteViewPanel private constructor(
                     DecimalFormat("0.0").format(100 * value.endInclusive) +
                     "%",
             ),
-            shape,
         )
 
         override fun createPreferencesBar(
@@ -682,7 +680,7 @@ class SimpleVoteViewPanel private constructor(
             keyLabel: String,
             baseColor: Color,
             value: ClosedRange<Double>,
-        ): BarFrameBuilder.DualBar = BarFrameBuilder.DualBar(
+        ): BarFrameBuilder.DualBar = BarFrameBuilder.DualBar.of(
             keyLabel,
             baseColor,
             value.start,
@@ -694,7 +692,7 @@ class SimpleVoteViewPanel private constructor(
                 ")%",
         )
 
-        override fun createPrevBar(keyLabel: String, baseColor: Color, value: Double): BarFrameBuilder.DualBar = BarFrameBuilder.DualBar(
+        override fun createPrevBar(keyLabel: String, baseColor: Color, value: Double): BarFrameBuilder.DualBar = BarFrameBuilder.DualBar.of(
             keyLabel,
             baseColor,
             value,
@@ -834,8 +832,8 @@ class SimpleVoteViewPanel private constructor(
             forceSingleLine: Boolean,
             shape: Shape?,
             singleBarLabel: String,
-        ): BarFrameBuilder.BasicBar = BarFrameBuilder.BasicBar(
-            label = keyLabel,
+        ): BarFrameBuilder.BasicBar = BarFrameBuilder.BasicBar.of(
+            label = keyLabel.mapIndexed { index, s -> s to (if (index == 0) shape else null) },
             color = baseColor,
             value = value.takeUnless { it.isNaN() } ?: 0.0,
             valueLabel = when {
@@ -846,17 +844,16 @@ class SimpleVoteViewPanel private constructor(
                     forceSingleLine = forceSingleLine,
                 )
             },
-            shape = shape,
         )
 
-        override fun createDiffBar(keyLabel: String, baseColor: Color, value: Double): BarFrameBuilder.BasicBar = BarFrameBuilder.BasicBar(
+        override fun createDiffBar(keyLabel: String, baseColor: Color, value: Double): BarFrameBuilder.BasicBar = BarFrameBuilder.BasicBar.of(
             keyLabel,
             baseColor,
             value,
             DecimalFormat("+0.0%;-0.0%").format(value),
         )
 
-        override fun createPrevBar(keyLabel: String, baseColor: Color, value: Double): BarFrameBuilder.BasicBar = BarFrameBuilder.BasicBar(
+        override fun createPrevBar(keyLabel: String, baseColor: Color, value: Double): BarFrameBuilder.BasicBar = BarFrameBuilder.BasicBar.of(
             keyLabel,
             baseColor,
             value,
@@ -1885,8 +1882,11 @@ class SimpleVoteViewPanel private constructor(
                 }
                 r.entries.sortedByDescending { it.key.overrideSortOrder ?: it.value ?: 0 }
                     .map { (c, v) ->
-                        BarFrameBuilder.BasicBar(
-                            listOf(c.fullName.uppercase(), c.description?.uppercase() ?: ""),
+                        BarFrameBuilder.BasicBar.of(
+                            listOf(
+                                c.fullName.uppercase() to (if (c == w) ImageGenerator.createTickShape() else null),
+                                (c.description?.uppercase() ?: "") to null,
+                            ),
                             c.color,
                             v ?: 0,
                             when {
@@ -1895,7 +1895,6 @@ class SimpleVoteViewPanel private constructor(
                                 total == null -> listOf(DecimalFormat("#,##0").format(v))
                                 else -> listOf(DecimalFormat("#,##0").format(v), DecimalFormat("0.0%").format(v / total))
                             },
-                            if (c == w) ImageGenerator.createHalfTickShape() else null,
                         )
                     }
             }
@@ -1916,7 +1915,7 @@ class SimpleVoteViewPanel private constructor(
                 val total = r.values.sumOf { it }.toDouble()
                 r.entries.sortedByDescending { it.key.overrideSortOrder ?: it.value }
                     .map { (c, v) ->
-                        BarFrameBuilder.BasicBar(
+                        BarFrameBuilder.BasicBar.of(
                             c.surname.uppercase(),
                             c.color,
                             v,

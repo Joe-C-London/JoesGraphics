@@ -19,7 +19,7 @@ object ListingFrameBuilder {
     ): BarFrame = BarFrame(
         barsPublisher = list.map { l ->
             l.map {
-                BarFrame.Bar.of(it.leftText().split("\n"), it.rightText().split("\n"), null, listOf(Pair(it.color(), 1)))
+                BarFrame.Bar.of(listOf(it.leftText()), listOf(it.rightText()), listOf(Pair(it.color(), 1)))
             }
         },
         headerPublisher = header,

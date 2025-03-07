@@ -3,6 +3,7 @@ package com.joecollins.graphics.screens.generic
 import com.joecollins.graphics.GenericPanel
 import com.joecollins.graphics.ImageGenerator
 import com.joecollins.graphics.components.BarFrame
+import com.joecollins.graphics.components.BarFrame.Bar.Companion.withIcon
 import com.joecollins.graphics.components.BarFrameBuilder
 import com.joecollins.models.general.CanOverrideSortOrder
 import com.joecollins.models.general.Candidate
@@ -168,9 +169,8 @@ class CandidateListingScreen private constructor(
             barsPublisher = if (showToColumns == null) {
                 candidates.list.mapElements {
                     BarFrame.Bar.of(
-                        it.leftLabel(),
+                        it.leftLabel().withIcon(it.shape()),
                         it.rightLabel(),
-                        it.shape(),
                         listOf(it.color() to 1.0),
                     )
                 }
@@ -231,7 +231,7 @@ class CandidateListingScreen private constructor(
             return votes.asSequence()
                 .sortedByDescending { it.key.overrideSortOrder ?: it.value }
                 .map {
-                    BarFrameBuilder.BasicBar(
+                    BarFrameBuilder.BasicBar.of(
                         it.key.prevLabel(),
                         it.key.prevColor(),
                         it.value / total,

@@ -93,7 +93,7 @@ class RegionalVotesScreen private constructor(subPanels: List<GenericPanel>) :
                     barsPublisher = entries.map { e ->
                         e.filter { it.pct != null }
                             .map {
-                                BarFrameBuilder.BasicBar(
+                                BarFrameBuilder.BasicBar.of(
                                     it.party.name.uppercase(),
                                     it.party.color,
                                     it.pct!!,
@@ -120,7 +120,7 @@ class RegionalVotesScreen private constructor(subPanels: List<GenericPanel>) :
                     barsPublisher = entries.map { e ->
                         e.map {
                             val change = (it.pct ?: 0.0) - it.prev
-                            BarFrameBuilder.BasicBar(
+                            BarFrameBuilder.BasicBar.of(
                                 it.party.abbreviation.uppercase(),
                                 it.party.color,
                                 change,

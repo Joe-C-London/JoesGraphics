@@ -165,10 +165,10 @@ class MixedMemberResultPanel private constructor(
             val namedCandidateTemplate = doubleLine.map {
                 if (it) {
                     CandidateBarTemplate(
-                        ImageGenerator.createHalfTickShape(),
+                        ImageGenerator.createTickShape(),
                         { candidate -> listOf(candidate.name.uppercase(), candidate.party.name.uppercase()) },
                         { numVotes, pct -> listOf(THOUSANDS_FORMAT.format(numVotes.toLong()), PCT_FORMAT.format(pct)) },
-                        { candidate -> candidateVotes.incumbentMarker.takeIf { candidate.incumbent }?.let { ImageGenerator.createHalfBoxedTextShape(it) } },
+                        { candidate -> candidateVotes.incumbentMarker.takeIf { candidate.incumbent }?.let { ImageGenerator.createBoxedTextShape(it) } },
                     )
                 } else {
                     CandidateBarTemplate(
@@ -202,13 +202,26 @@ class MixedMemberResultPanel private constructor(
                             val pct = it.value?.toDouble()?.div(total) ?: Double.NaN
                             val rowTemplate = if (candidate.name.isBlank()) blankCandidateNameTemplate else template
                             val leftLabel: List<String> = rowTemplate.leftLabel(candidate)
+                            val incumbentIcon = rowTemplate.incumbentLabel(candidate)
                             val rightLabel: List<String> = if (partialDeclaration) listOf(THOUSANDS_FORMAT.format(numVotes.toLong())) else rowTemplate.rightLabel(numVotes, pct)
-                            BarFrameBuilder.BasicBar(
-                                if (candidate.name.isBlank()) listOf(candidate.party.name.uppercase()) else leftLabel,
+                            BarFrameBuilder.BasicBar.of(
+                                if (candidate.name.isBlank()) {
+                                    listOf(
+                                        candidate.party.name.uppercase() to
+                                            incumbentIcon.combineHorizontal(if (candidate == winner) ImageGenerator.createTickShape() else null),
+                                    )
+                                } else {
+                                    leftLabel.mapIndexed { index, s ->
+                                        if (index == 0) {
+                                            s to incumbentIcon.combineHorizontal(if (candidate == winner) rowTemplate.shape else null)
+                                        } else {
+                                            s to null
+                                        }
+                                    }
+                                },
                                 candidate.party.color,
                                 if (pct.isNaN()) 0 else pct,
                                 (if (pct.isNaN()) listOf("WAITING...") else rightLabel),
-                                rowTemplate.incumbentLabel(candidate).combineHorizontal(if (candidate == winner) (if (candidate.name.isBlank()) ImageGenerator.createTickShape() else rowTemplate.shape) else null),
                             )
                         }
                         .toList()
@@ -254,7 +267,7 @@ class MixedMemberResultPanel private constructor(
                                 (prev[it.key.party] ?: 0) /
                                 prevTotal
                             )
-                        BarFrameBuilder.BasicBar(
+                        BarFrameBuilder.BasicBar.of(
                             it.key.party.abbreviation.uppercase(),
                             it.key.party.color,
                             pct,
@@ -274,7 +287,7 @@ class MixedMemberResultPanel private constructor(
                     emptySequence()
                 } else {
                     sequenceOf(
-                        BarFrameBuilder.BasicBar(
+                        BarFrameBuilder.BasicBar.of(
                             Party.OTHERS.abbreviation.uppercase(),
                             Party.OTHERS.color,
                             othersPct,
@@ -300,7 +313,7 @@ class MixedMemberResultPanel private constructor(
                     .map {
                         val value = it.value
                         val pct = if (value == null) Double.NaN else 1.0 * value / total
-                        BarFrameBuilder.BasicBar(
+                        BarFrameBuilder.BasicBar.of(
                             it.key.name.uppercase(),
                             it.key.color,
                             if (pct.isNaN()) 0 else pct,
@@ -347,7 +360,7 @@ class MixedMemberResultPanel private constructor(
                             1.0 * it.value / currTotal -
                                 1.0 * (prev[it.key.party] ?: 0) / prevTotal
                             )
-                        BarFrameBuilder.BasicBar(
+                        BarFrameBuilder.BasicBar.of(
                             it.key.party.abbreviation.uppercase(),
                             it.key.color,
                             pct,
@@ -365,7 +378,7 @@ class MixedMemberResultPanel private constructor(
                     emptySequence()
                 } else {
                     sequenceOf(
-                        BarFrameBuilder.BasicBar(
+                        BarFrameBuilder.BasicBar.of(
                             Party.OTHERS.abbreviation.uppercase(),
                             Party.OTHERS.color,
                             otherTotal,

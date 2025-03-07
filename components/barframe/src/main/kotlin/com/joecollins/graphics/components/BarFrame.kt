@@ -57,37 +57,41 @@ class BarFrame(
         private set
 
     class Bar private constructor(
-        val leftText: List<String>,
+        val leftText: List<TextLine>,
         val rightText: List<String>,
-        val leftIcon: Shape? = null,
+        val leftIcon: Shape?,
         val series: List<Pair<Color, Number>>,
     ) {
-        companion object {
-            fun of(
-                leftText: List<String>,
-                rightText: List<String>,
-                leftIcon: Shape? = null,
-                series: List<Pair<Color, Number>>,
-            ) = Bar(leftText, rightText, leftIcon, series)
+        data class TextLine internal constructor(internal val text: String, internal val icon: Shape?)
 
+        companion object {
+            fun String.withIcon(icon: Shape?) = TextLine(this, icon)
+            fun String.withNoIcon() = TextLine(this, null)
+
+            @JvmName("ofTextLine")
             fun of(
-                leftText: List<String>,
+                leftText: List<TextLine>,
                 rightText: List<String>,
                 series: List<Pair<Color, Number>>,
             ) = Bar(leftText, rightText, null, series)
 
             fun of(
-                leftText: String,
-                rightText: String,
-                leftIcon: Shape?,
+                leftText: List<String>,
+                rightText: List<String>,
                 series: List<Pair<Color, Number>>,
-            ) = Bar(listOf(leftText), listOf(rightText), leftIcon, series)
+            ) = Bar(leftText.map { it.withNoIcon() }, rightText, null, series)
+
+            fun of(
+                leftText: TextLine,
+                rightText: String,
+                series: List<Pair<Color, Number>>,
+            ) = Bar(listOf(leftText), listOf(rightText), null, series)
 
             fun of(
                 leftText: String,
                 rightText: String,
                 series: List<Pair<Color, Number>>,
-            ) = Bar(listOf(leftText), listOf(rightText), null, series)
+            ) = Bar(listOf(leftText.withNoIcon()), listOf(rightText), null, series)
         }
     }
 
@@ -110,7 +114,7 @@ class BarFrame(
     internal val numBars: Int
         get() = bars.size
 
-    internal fun getLeftText(barNum: Int): List<String> = bars[barNum].leftText
+    internal fun getLeftText(barNum: Int): List<Bar.TextLine> = bars[barNum].leftText
 
     internal fun getRightText(barNum: Int): List<String> = bars[barNum].rightText
 
@@ -140,7 +144,7 @@ class BarFrame(
             preferredSize = Dimension(1024, 30 * numLines)
         }
 
-        var leftText: List<String> = emptyList()
+        var leftText: List<Bar.TextLine> = emptyList()
             set(value) {
                 field = value
                 resetPreferredSize()
@@ -228,7 +232,16 @@ class BarFrame(
             val leftText = leftText.toTypedArray()
             val rightText = rightText.toTypedArray()
             val maxLeftWidth =
-                leftText.maxOfOrNull { str -> g.getFontMetrics(font).stringWidth(str) } ?: 0
+                leftText.maxOfOrNull { str ->
+                    g.getFontMetrics(font).stringWidth(str.text) +
+                        (
+                            str.icon?.run {
+                                val leftIconBounds = bounds
+                                val leftIconScale = (barHeight / leftText.size - 2 * BAR_MARGIN) / leftIconBounds.getHeight()
+                                leftIconBounds.width * leftIconScale
+                            }?.roundToInt() ?: 0
+                            )
+                } ?: 0
             val maxRightWidth =
                 rightText.maxOfOrNull { str -> g.getFontMetrics(font).stringWidth(str) } ?: 0
             val leftIconWidth: Int = if (leftIcon != null) {
@@ -249,33 +262,49 @@ class BarFrame(
                 shrinkRight = false
             }
             val stringBoundsByLine = ArrayList<Double>()
-            for (i in leftText.indices) {
+            for (i in leftText.withIndex()) {
                 var lineFont = font
+                val lineString = i.value.text
+                val lineIcon = i.value.icon?.run {
+                    val leftIconBounds = bounds
+                    val leftIconScale = (barHeight / max(leftText.size, rightText.size) - 2 * BAR_MARGIN) / leftIconBounds.getHeight()
+                    val transform = AffineTransform.getScaleInstance(leftIconScale, leftIconScale)
+                    transform.createTransformedShape(this)
+                }
                 if (shrinkLeft) {
                     val maxWidth = (
-                        width -
+                        width - (lineIcon?.bounds?.width ?: 0) -
                             (if (shrinkRight) (width + minSpaceBetween) / 2 else maxRightWidth + minSpaceBetween) -
                             leftIconWidth
                         )
                     for (fontSize in font.size downTo 2) {
                         lineFont = font.deriveFont(fontSize.toFloat())
-                        val width = g.getFontMetrics(lineFont).stringWidth(leftText[i])
+                        val width = g.getFontMetrics(lineFont).stringWidth(lineString + (if (lineIcon == null) "" else " "))
                         if (width < maxWidth) {
                             break
                         }
                     }
                 }
                 g.font = lineFont
-                val leftWidth = g.getFontMetrics(lineFont).stringWidth(leftText[i])
+                val lineLeftTextWidth = g.getFontMetrics(lineFont).stringWidth(lineString)
+                val spaceWidth = g.getFontMetrics(lineFont).stringWidth(" ")
+                val lineLeftIconWidth = lineIcon?.bounds?.width
                 val textHeight = lineFont.size
-                val textBase = (i + 1) * (barHeight + textHeight) / (leftText.size + 1)
+                val textBase = (i.index + 1) * (barHeight + textHeight) / (leftText.size + 1)
+                val iconTop = (i.index + 1) * (barHeight + (lineIcon?.bounds?.height ?: 0)) / (leftText.size + 1) - (lineIcon?.bounds?.height ?: 0) + BAR_MARGIN.toDouble()
                 stringBoundsByLine.add(
                     if (isNetPositive) {
-                        g.drawString(leftText[i], zero.roundToInt(), textBase)
-                        leftWidth + zero
+                        g.drawString(lineString, zero.roundToInt(), textBase)
+                        if (lineIcon != null) {
+                            (g as Graphics2D).fill(AffineTransform.getTranslateInstance(zero.roundToInt() + lineLeftTextWidth + spaceWidth.toDouble(), iconTop).createTransformedShape(lineIcon))
+                        }
+                        lineLeftTextWidth + (lineLeftIconWidth?.let { it + spaceWidth } ?: 0) + zero
                     } else {
-                        g.drawString(leftText[i], zero.roundToInt() - leftWidth, textBase)
-                        zero - leftWidth
+                        g.drawString(lineString, zero.roundToInt() - lineLeftTextWidth, textBase)
+                        if (lineIcon != null) {
+                            (g as Graphics2D).fill(AffineTransform.getTranslateInstance(zero.roundToInt() - lineLeftTextWidth - spaceWidth.toDouble() - lineLeftIconWidth!!, iconTop).createTransformedShape(lineIcon))
+                        }
+                        zero - lineLeftTextWidth - (lineLeftIconWidth?.let { it + spaceWidth } ?: 0)
                     },
                 )
             }

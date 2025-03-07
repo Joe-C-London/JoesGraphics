@@ -1,5 +1,6 @@
 package com.joecollins.graphics.components
 
+import com.joecollins.graphics.components.BarFrame.Bar.Companion.withIcon
 import com.joecollins.graphics.utils.ColorUtils
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.Subscriber
@@ -54,21 +55,69 @@ object BarFrameBuilder {
         val maxPublisher = Publisher(maxFunction(this))
     }
 
-    class BasicBar(val label: List<String>, val color: Color, val value: Number, val valueLabel: List<String> = listOf(value.toString()), val shape: Shape? = null) {
-        constructor(label: List<String>, color: Color, value: Number, shape: Shape? = null) : this(label, color, value, listOf(value.toString()), shape)
-        constructor(label: String, color: Color, value: Number, shape: Shape? = null) : this(label, color, value, value.toString(), shape)
-        constructor(label: String, color: Color, value: Number, valueLabel: String, shape: Shape? = null) : this(listOf(label), color, value, listOf(valueLabel), shape)
+    class BasicBar private constructor(val label: List<Pair<String, Shape?>>, val color: Color, val value: Number, val valueLabel: List<String>) {
+
+        companion object {
+            @JvmName("ofPair")
+            fun of(
+                label: List<Pair<String, Shape?>>,
+                color: Color,
+                value: Number,
+                valueLabel: List<String> = listOf(value.toString()),
+            ) = BasicBar(label, color, value, valueLabel)
+
+            fun of(
+                label: List<String>,
+                color: Color,
+                value: Number,
+                valueLabel: List<String> = listOf(value.toString()),
+            ) = BasicBar(label.map { it to null }, color, value, valueLabel)
+
+            fun of(label: List<String>, color: Color, value: Number) = BasicBar(label.map { it to null }, color, value, listOf(value.toString()))
+
+            @JvmName("ofPair")
+            fun of(label: List<Pair<String, Shape?>>, color: Color, value: Number) = BasicBar(label, color, value, listOf(value.toString()))
+
+            fun of(label: String, color: Color, value: Number, shape: Shape? = null) = BasicBar(listOf(label to shape), color, value, listOf(value.toString()))
+
+            fun of(label: String, color: Color, value: Number, valueLabel: String, shape: Shape? = null) = BasicBar(listOf(label to shape), color, value, listOf(valueLabel))
+        }
     }
 
-    class DualBar(
-        val label: List<String>,
+    class DualBar private constructor(
+        val label: List<Pair<String, Shape?>>,
         val color: Color,
         val value1: Number,
         val value2: Number,
         val valueLabel: List<String>,
-        val shape: Shape? = null,
     ) {
-        constructor(label: String, color: Color, value1: Number, value2: Number, valueLabel: String, shape: Shape? = null) : this(listOf(label), color, value1, value2, listOf(valueLabel), shape)
+        companion object {
+            @JvmName("ofPair")
+            fun of(
+                label: List<Pair<String, Shape?>>,
+                color: Color,
+                value1: Number,
+                value2: Number,
+                valueLabel: List<String>,
+            ) = DualBar(label, color, value1, value2, valueLabel)
+
+            fun of(
+                label: List<String>,
+                color: Color,
+                value1: Number,
+                value2: Number,
+                valueLabel: List<String>,
+            ) = DualBar(label.map { it to null }, color, value1, value2, valueLabel)
+
+            fun of(
+                label: String,
+                color: Color,
+                value1: Number,
+                value2: Number,
+                valueLabel: String,
+                shape: Shape? = null,
+            ) = DualBar(listOf(label to shape), color, value1, value2, listOf(valueLabel))
+        }
     }
 
     data class Limit(val max: Number? = null, val wingspan: Number? = null) {
@@ -124,7 +173,7 @@ object BarFrameBuilder {
         return BarFrame(
             barsPublisher = barsPublisher.map { bars ->
                 bars.map {
-                    BarFrame.Bar.of(it.label, it.valueLabel, it.shape, listOf(Pair(it.color, it.value)))
+                    BarFrame.Bar.of(it.label.map { (t, s) -> t.withIcon(s) }, it.valueLabel, listOf(Pair(it.color, it.value)))
                 }
             }.run {
                 if (minBarCountPublisher == null) {
@@ -181,10 +230,10 @@ object BarFrameBuilder {
     private fun createMinBars(
         bars: List<BarFrame.Bar>,
         min: Int,
-    ) = if (bars.size >= min) {
+    ): List<BarFrame.Bar> = if (bars.size >= min) {
         bars
     } else {
-        sequenceOf(bars, MutableList(min - bars.size) { BarFrame.Bar.of(emptyList(), emptyList(), emptyList()) })
+        sequenceOf(bars, MutableList(min - bars.size) { BarFrame.Bar.of(emptyList<String>(), emptyList(), emptyList()) })
             .flatten()
             .toList()
     }
@@ -227,9 +276,8 @@ object BarFrameBuilder {
             barsPublisher = barsPublisher.map { b ->
                 b.map {
                     BarFrame.Bar.of(
-                        it.label,
+                        it.label.map { (t, s) -> t.withIcon(s) },
                         it.valueLabel,
-                        it.shape,
                         listOf(
                             Pair(it.color, 0),
                             Pair(if (differentDirections(it)) ColorUtils.lighten(it.color) else it.color, first(it)),
@@ -297,9 +345,8 @@ object BarFrameBuilder {
             barsPublisher = barsPublisher.map { b ->
                 b.map {
                     BarFrame.Bar.of(
-                        it.label,
+                        it.label.map { (t, s) -> t.withIcon(s) },
                         it.valueLabel,
-                        it.shape,
                         listOf(
                             Pair(it.color, 0),
                             Pair(ColorUtils.lighten(it.color), first(it)),

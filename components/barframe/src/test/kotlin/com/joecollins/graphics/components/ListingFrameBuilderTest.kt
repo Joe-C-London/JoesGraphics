@@ -1,5 +1,6 @@
 package com.joecollins.graphics.components
 
+import com.joecollins.graphics.components.BarFrame.Bar.Companion.withNoIcon
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -27,12 +28,12 @@ class ListingFrameBuilderTest {
         assertEquals(0.0, frame.min.toDouble())
         assertEquals("HEADER", frame.header)
         assertEquals("SUBHEAD", frame.subheadText)
-        assertEquals(listOf("JUSTIN TRUDEAU"), frame.getLeftText(0))
+        assertEquals(listOf("JUSTIN TRUDEAU".withNoIcon()), frame.getLeftText(0))
         assertEquals(listOf("LIBERAL"), frame.getRightText(0))
         assertEquals(1, frame.getSeries(0).size.toLong())
         assertEquals(Color.RED, frame.getSeries(0)[0].first)
         assertEquals(1.0, frame.getSeries(0)[0].second.toDouble(), 1e-6)
-        assertEquals(listOf("ANDREW SCHEER"), frame.getLeftText(1))
+        assertEquals(listOf("ANDREW SCHEER".withNoIcon()), frame.getLeftText(1))
         assertEquals(listOf("CONSERVATIVE"), frame.getRightText(1))
         assertEquals(1, frame.getSeries(1).size.toLong())
         assertEquals(Color.BLUE, frame.getSeries(1)[0].first)
@@ -67,12 +68,12 @@ class ListingFrameBuilderTest {
         assertEquals(1.0, frame.max.toDouble(), 1e-6)
         assertEquals("HEADER", frame.header)
         assertEquals("SUBHEAD", frame.subheadText)
-        assertEquals(listOf("JUSTIN TRUDEAU"), frame.getLeftText(0))
+        assertEquals(listOf("JUSTIN TRUDEAU".withNoIcon()), frame.getLeftText(0))
         assertEquals(listOf("LIBERAL"), frame.getRightText(0))
         assertEquals(1, frame.getSeries(0).size.toLong())
         assertEquals(Color.RED, frame.getSeries(0)[0].first)
         assertEquals(1.0, frame.getSeries(0)[0].second.toDouble(), 1e-6)
-        assertEquals(listOf("ANDREW SCHEER"), frame.getLeftText(1))
+        assertEquals(listOf("ANDREW SCHEER".withNoIcon()), frame.getLeftText(1))
         assertEquals(listOf("CONSERVATIVE"), frame.getRightText(1))
         assertEquals(1, frame.getSeries(1).size.toLong())
         assertEquals(Color.BLUE, frame.getSeries(1)[0].first)

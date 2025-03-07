@@ -1,5 +1,7 @@
 package com.joecollins.graphics.components
 
+import com.joecollins.graphics.components.BarFrame.Bar.Companion.withIcon
+import com.joecollins.graphics.components.BarFrame.Bar.Companion.withNoIcon
 import com.joecollins.graphics.components.BarFrameBuilder.BasicBar
 import com.joecollins.graphics.components.BarFrameBuilder.DualBar
 import com.joecollins.graphics.components.BarFrameBuilder.basic
@@ -9,8 +11,8 @@ import com.joecollins.graphics.utils.ColorUtils
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.map
-import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 import java.awt.Color
 import java.awt.geom.Rectangle2D
@@ -27,7 +29,7 @@ class BarFrameBuilderTest {
                 .map { map ->
                     map.entries.asSequence()
                         .sortedByDescending { it.value }
-                        .map { BasicBar(it.key.first, it.key.second, it.value, THOUSANDS.format(it.value)) }
+                        .map { BasicBar.of(it.key.first, it.key.second, it.value, THOUSANDS.format(it.value)) }
                         .toList()
                 },
         )
@@ -40,8 +42,8 @@ class BarFrameBuilderTest {
             ),
         )
         assertEquals(2, frame.numBars)
-        assertEquals(listOf("CLINTON"), frame.getLeftText(0))
-        assertEquals(listOf("SANDERS"), frame.getLeftText(1))
+        assertEquals(listOf("CLINTON".withNoIcon()), frame.getLeftText(0))
+        assertEquals(listOf("SANDERS".withNoIcon()), frame.getLeftText(1))
         assertEquals(listOf("2,842"), frame.getRightText(0))
         assertEquals(listOf("1,865"), frame.getRightText(1))
         assertEquals(Color.ORANGE, frame.getSeries(0)[0].first)
@@ -60,7 +62,7 @@ class BarFrameBuilderTest {
                 .map { map ->
                     map.entries.asSequence()
                         .sortedByDescending { it.value.value }
-                        .map { BasicBar(it.key.first, it.key.second, it.value.value, THOUSANDS.format(it.value.value)) }
+                        .map { BasicBar.of(it.key.first, it.key.second, it.value.value, THOUSANDS.format(it.value.value)) }
                         .toList()
                 },
         )
@@ -73,8 +75,8 @@ class BarFrameBuilderTest {
             ),
         )
         assertEquals(2, frame.numBars)
-        assertEquals(listOf("CLINTON"), frame.getLeftText(0))
-        assertEquals(listOf("SANDERS"), frame.getLeftText(1))
+        assertEquals(listOf("CLINTON".withNoIcon()), frame.getLeftText(0))
+        assertEquals(listOf("SANDERS".withNoIcon()), frame.getLeftText(1))
         assertEquals(listOf("2,842"), frame.getRightText(0))
         assertEquals(listOf("1,865"), frame.getRightText(1))
         assertEquals(Color.ORANGE, frame.getSeries(0)[0].first)
@@ -94,7 +96,7 @@ class BarFrameBuilderTest {
                 .map { map ->
                     map.entries.asSequence()
                         .sortedByDescending { it.value }
-                        .map { BasicBar(it.key.first, it.key.second, it.value, THOUSANDS.format(it.value)) }
+                        .map { BasicBar.of(it.key.first, it.key.second, it.value, THOUSANDS.format(it.value)) }
                         .toList()
                 },
             maxPublisher = max,
@@ -138,7 +140,7 @@ class BarFrameBuilderTest {
                 .map { map ->
                     map.entries.asSequence()
                         .sortedByDescending { it.value }
-                        .map { BasicBar(it.key.first, it.key.second, it.value, THOUSANDS.format(it.value)) }
+                        .map { BasicBar.of(it.key.first, it.key.second, it.value, THOUSANDS.format(it.value)) }
                         .toList()
                 },
             headerPublisher = header,
@@ -178,7 +180,7 @@ class BarFrameBuilderTest {
                 .map { map ->
                     map.entries.asSequence()
                         .sortedByDescending { it.value }
-                        .map { BasicBar(it.key.first, it.key.second, it.value, THOUSANDS.format(it.value)) }
+                        .map { BasicBar.of(it.key.first, it.key.second, it.value, THOUSANDS.format(it.value)) }
                         .toList()
                 },
             targetPublisher = BarFrameBuilder.Target(target) { THOUSANDS.format(this) + " TO WIN" },
@@ -197,7 +199,7 @@ class BarFrameBuilderTest {
                 .map { map ->
                     map.entries.asSequence()
                         .sortedByDescending { it.value }
-                        .map { BasicBar(it.key.first, it.key.second, it.value, THOUSANDS.format(it.value)) }
+                        .map { BasicBar.of(it.key.first, it.key.second, it.value, THOUSANDS.format(it.value)) }
                         .toList()
                 },
             linesPublisher = BarFrameBuilder.Lines.of(lines) { toString() + " QUOTA" + (if (this == 1) "" else "S") },
@@ -226,7 +228,7 @@ class BarFrameBuilderTest {
                 .map { map ->
                     map.entries.asSequence()
                         .sortedByDescending { it.value }
-                        .map { BasicBar(it.key.first, it.key.second, it.value, THOUSANDS.format(it.value)) }
+                        .map { BasicBar.of(it.key.first, it.key.second, it.value, THOUSANDS.format(it.value)) }
                         .toList()
                 },
             linesPublisher = BarFrameBuilder.Lines.of(lines, { first }) { second },
@@ -254,7 +256,7 @@ class BarFrameBuilderTest {
                 .map { map ->
                     map.entries.asSequence()
                         .sortedByDescending { it.value }
-                        .map { BasicBar(it.key.first, it.key.second, it.value, THOUSANDS.format(it.value)) }
+                        .map { BasicBar.of(it.key.first, it.key.second, it.value, THOUSANDS.format(it.value)) }
                         .toList()
                 },
             linesPublisher = BarFrameBuilder.Lines.of(lines) { toString() + " QUOTA" + (if (this == 1) "" else "S") },
@@ -283,7 +285,7 @@ class BarFrameBuilderTest {
                 .map { map ->
                     map.entries.asSequence()
                         .sortedByDescending { it.value.first }
-                        .map { BasicBar(it.key.first, it.key.second, it.value.first, THOUSANDS.format(it.value.first), if (it.value.second) shape else null) }
+                        .map { BasicBar.of(it.key.first, it.key.second, it.value.first, THOUSANDS.format(it.value.first), if (it.value.second) shape else null) }
                         .toList()
                 },
         )
@@ -296,16 +298,16 @@ class BarFrameBuilderTest {
             ),
         )
         assertEquals(2, frame.numBars)
-        assertEquals(listOf("CLINTON"), frame.getLeftText(0))
-        assertEquals(listOf("SANDERS"), frame.getLeftText(1))
+        assertEquals(listOf("CLINTON".withIcon(shape)), frame.getLeftText(0))
+        assertEquals(listOf("SANDERS".withNoIcon()), frame.getLeftText(1))
         assertEquals(listOf("2,842"), frame.getRightText(0))
         assertEquals(listOf("1,865"), frame.getRightText(1))
         assertEquals(Color.ORANGE, frame.getSeries(0)[0].first)
         assertEquals(Color.GREEN, frame.getSeries(1)[0].first)
         assertEquals(2842, frame.getSeries(0)[0].second)
         assertEquals(1865, frame.getSeries(1)[0].second)
-        assertEquals(shape, frame.getLeftIcon(0))
-        Assertions.assertNull(frame.getLeftIcon(1))
+        assertNull(frame.getLeftIcon(0))
+        assertNull(frame.getLeftIcon(1))
     }
 
     @Test
@@ -316,7 +318,7 @@ class BarFrameBuilderTest {
                 .map { map ->
                     map.entries.asSequence()
                         .sortedByDescending { it.value.first }
-                        .map { BasicBar(it.key.first, it.key.second, it.value.second, DIFF.format(it.value.second)) }
+                        .map { BasicBar.of(it.key.first, it.key.second, it.value.second, DIFF.format(it.value.second)) }
                         .toList()
                 },
         )
@@ -333,12 +335,12 @@ class BarFrameBuilderTest {
             ),
         )
         assertEquals(6, frame.numBars)
-        assertEquals(listOf("LIB"), frame.getLeftText(0))
-        assertEquals(listOf("CON"), frame.getLeftText(1))
-        assertEquals(listOf("BQ"), frame.getLeftText(2))
-        assertEquals(listOf("NDP"), frame.getLeftText(3))
-        assertEquals(listOf("GRN"), frame.getLeftText(4))
-        assertEquals(listOf("IND"), frame.getLeftText(5))
+        assertEquals(listOf("LIB".withNoIcon()), frame.getLeftText(0))
+        assertEquals(listOf("CON".withNoIcon()), frame.getLeftText(1))
+        assertEquals(listOf("BQ".withNoIcon()), frame.getLeftText(2))
+        assertEquals(listOf("NDP".withNoIcon()), frame.getLeftText(3))
+        assertEquals(listOf("GRN".withNoIcon()), frame.getLeftText(4))
+        assertEquals(listOf("IND".withNoIcon()), frame.getLeftText(5))
         assertEquals(listOf("-27"), frame.getRightText(0))
         assertEquals(listOf("+22"), frame.getRightText(1))
         assertEquals(listOf("+22"), frame.getRightText(2))
@@ -370,7 +372,7 @@ class BarFrameBuilderTest {
                 .map { map ->
                     map.entries.asSequence()
                         .sortedByDescending { it.value.first }
-                        .map { BasicBar(it.key.first, it.key.second, it.value.second, DIFF.format(it.value.second)) }
+                        .map { BasicBar.of(it.key.first, it.key.second, it.value.second, DIFF.format(it.value.second)) }
                         .toList()
                 },
             wingspanPublisher = range,
@@ -400,7 +402,7 @@ class BarFrameBuilderTest {
                 .map { map ->
                     map.entries.asSequence()
                         .sortedByDescending { it.value.second }
-                        .map { DualBar(it.key.first, it.key.second, it.value.first, it.value.second, it.value.first.toString() + "/" + it.value.second) }
+                        .map { DualBar.of(it.key.first, it.key.second, it.value.first, it.value.second, it.value.first.toString() + "/" + it.value.second) }
                         .toList()
                 },
         )
@@ -417,12 +419,12 @@ class BarFrameBuilderTest {
             ),
         )
         assertEquals(6, frame.numBars)
-        assertEquals(listOf("LIBERAL"), frame.getLeftText(0))
-        assertEquals(listOf("CONSERVATIVE"), frame.getLeftText(1))
-        assertEquals(listOf("BLOC QU\u00c9B\u00c9COIS"), frame.getLeftText(2))
-        assertEquals(listOf("NEW DEMOCRATIC PARTY"), frame.getLeftText(3))
-        assertEquals(listOf("GREEN"), frame.getLeftText(4))
-        assertEquals(listOf("INDEPENDENT"), frame.getLeftText(5))
+        assertEquals(listOf("LIBERAL".withNoIcon()), frame.getLeftText(0))
+        assertEquals(listOf("CONSERVATIVE".withNoIcon()), frame.getLeftText(1))
+        assertEquals(listOf("BLOC QU\u00c9B\u00c9COIS".withNoIcon()), frame.getLeftText(2))
+        assertEquals(listOf("NEW DEMOCRATIC PARTY".withNoIcon()), frame.getLeftText(3))
+        assertEquals(listOf("GREEN".withNoIcon()), frame.getLeftText(4))
+        assertEquals(listOf("INDEPENDENT".withNoIcon()), frame.getLeftText(5))
         assertEquals(listOf("26/157"), frame.getRightText(0))
         assertEquals(listOf("4/121"), frame.getRightText(1))
         assertEquals(listOf("0/32"), frame.getRightText(2))
@@ -471,7 +473,7 @@ class BarFrameBuilderTest {
                 .map { map ->
                     map.entries.asSequence()
                         .sortedByDescending { it.value.second }
-                        .map { DualBar(it.key.first, it.key.second, it.value.first, it.value.second, it.value.first.toString() + "/" + it.value.second) }
+                        .map { DualBar.of(it.key.first, it.key.second, it.value.first, it.value.second, it.value.first.toString() + "/" + it.value.second) }
                         .toList()
                 },
         )
@@ -488,12 +490,12 @@ class BarFrameBuilderTest {
             ),
         )
         assertEquals(6, frame.numBars)
-        assertEquals(listOf("LIBERAL"), frame.getLeftText(0))
-        assertEquals(listOf("CONSERVATIVE"), frame.getLeftText(1))
-        assertEquals(listOf("BLOC QU\u00c9B\u00c9COIS"), frame.getLeftText(2))
-        assertEquals(listOf("NEW DEMOCRATIC PARTY"), frame.getLeftText(3))
-        assertEquals(listOf("GREEN"), frame.getLeftText(4))
-        assertEquals(listOf("INDEPENDENT"), frame.getLeftText(5))
+        assertEquals(listOf("LIBERAL".withNoIcon()), frame.getLeftText(0))
+        assertEquals(listOf("CONSERVATIVE".withNoIcon()), frame.getLeftText(1))
+        assertEquals(listOf("BLOC QU\u00c9B\u00c9COIS".withNoIcon()), frame.getLeftText(2))
+        assertEquals(listOf("NEW DEMOCRATIC PARTY".withNoIcon()), frame.getLeftText(3))
+        assertEquals(listOf("GREEN".withNoIcon()), frame.getLeftText(4))
+        assertEquals(listOf("INDEPENDENT".withNoIcon()), frame.getLeftText(5))
         assertEquals(listOf("26/157"), frame.getRightText(0))
         assertEquals(listOf("4/121"), frame.getRightText(1))
         assertEquals(listOf("0/32"), frame.getRightText(2))
@@ -542,7 +544,7 @@ class BarFrameBuilderTest {
                 .map { map ->
                     map.entries.asSequence()
                         .sortedByDescending { it.value.third }
-                        .map { DualBar(it.key.first, it.key.second, it.value.first, it.value.second, """${DIFF.format(it.value.first)}/${DIFF.format(it.value.second)}""") }
+                        .map { DualBar.of(it.key.first, it.key.second, it.value.first, it.value.second, """${DIFF.format(it.value.first)}/${DIFF.format(it.value.second)}""") }
                         .toList()
                 },
         )
@@ -559,12 +561,12 @@ class BarFrameBuilderTest {
             ),
         )
         assertEquals(6, frame.numBars)
-        assertEquals(listOf("LIB"), frame.getLeftText(0))
-        assertEquals(listOf("CON"), frame.getLeftText(1))
-        assertEquals(listOf("BQ"), frame.getLeftText(2))
-        assertEquals(listOf("NDP"), frame.getLeftText(3))
-        assertEquals(listOf("GRN"), frame.getLeftText(4))
-        assertEquals(listOf("IND"), frame.getLeftText(5))
+        assertEquals(listOf("LIB".withNoIcon()), frame.getLeftText(0))
+        assertEquals(listOf("CON".withNoIcon()), frame.getLeftText(1))
+        assertEquals(listOf("BQ".withNoIcon()), frame.getLeftText(2))
+        assertEquals(listOf("NDP".withNoIcon()), frame.getLeftText(3))
+        assertEquals(listOf("GRN".withNoIcon()), frame.getLeftText(4))
+        assertEquals(listOf("IND".withNoIcon()), frame.getLeftText(5))
         assertEquals(listOf("-6/-27"), frame.getRightText(0))
         assertEquals(listOf("+4/+22"), frame.getRightText(1))
         assertEquals(listOf("+0/+22"), frame.getRightText(2))
@@ -619,7 +621,7 @@ class BarFrameBuilderTest {
                 .map { map ->
                     map.entries.asSequence()
                         .sortedByDescending { it.value.third }
-                        .map { DualBar(it.key.first, it.key.second, it.value.first, it.value.second, "(${DIFF.format(it.value.first)})-(${DIFF.format(it.value.second)})") }
+                        .map { DualBar.of(it.key.first, it.key.second, it.value.first, it.value.second, "(${DIFF.format(it.value.first)})-(${DIFF.format(it.value.second)})") }
                         .toList()
                 },
         )
@@ -636,12 +638,12 @@ class BarFrameBuilderTest {
             ),
         )
         assertEquals(6, frame.numBars)
-        assertEquals(listOf("LIB"), frame.getLeftText(0))
-        assertEquals(listOf("CON"), frame.getLeftText(1))
-        assertEquals(listOf("BQ"), frame.getLeftText(2))
-        assertEquals(listOf("NDP"), frame.getLeftText(3))
-        assertEquals(listOf("GRN"), frame.getLeftText(4))
-        assertEquals(listOf("IND"), frame.getLeftText(5))
+        assertEquals(listOf("LIB".withNoIcon()), frame.getLeftText(0))
+        assertEquals(listOf("CON".withNoIcon()), frame.getLeftText(1))
+        assertEquals(listOf("BQ".withNoIcon()), frame.getLeftText(2))
+        assertEquals(listOf("NDP".withNoIcon()), frame.getLeftText(3))
+        assertEquals(listOf("GRN".withNoIcon()), frame.getLeftText(4))
+        assertEquals(listOf("IND".withNoIcon()), frame.getLeftText(5))
         assertEquals(listOf("(-27)-(-6)"), frame.getRightText(0))
         assertEquals(listOf("(+4)-(+22)"), frame.getRightText(1))
         assertEquals(listOf("(+0)-(+22)"), frame.getRightText(2))
@@ -679,24 +681,24 @@ class BarFrameBuilderTest {
     @Test
     fun testBasicBars() {
         val regions = listOf(
-            BasicBar("East Midlands", Color.BLACK, 5),
-            BasicBar("East of England", Color.BLACK, 7),
-            BasicBar("London", Color.BLACK, 8),
-            BasicBar("North East England", Color.BLACK, 3),
-            BasicBar("North West England", Color.BLACK, 8),
-            BasicBar("South East England", Color.BLACK, 10),
-            BasicBar("South West England", Color.BLACK, 6),
-            BasicBar("West Midlands", Color.BLACK, 7),
-            BasicBar("Yorkshire and the Humber", Color.BLACK, 6),
-            BasicBar("Scotland", Color.BLACK, 6),
-            BasicBar("Wales", Color.BLACK, 4),
-            BasicBar("Northern Ireland", Color.BLACK, 3),
+            BasicBar.of("East Midlands", Color.BLACK, 5),
+            BasicBar.of("East of England", Color.BLACK, 7),
+            BasicBar.of("London", Color.BLACK, 8),
+            BasicBar.of("North East England", Color.BLACK, 3),
+            BasicBar.of("North West England", Color.BLACK, 8),
+            BasicBar.of("South East England", Color.BLACK, 10),
+            BasicBar.of("South West England", Color.BLACK, 6),
+            BasicBar.of("West Midlands", Color.BLACK, 7),
+            BasicBar.of("Yorkshire and the Humber", Color.BLACK, 6),
+            BasicBar.of("Scotland", Color.BLACK, 6),
+            BasicBar.of("Wales", Color.BLACK, 4),
+            BasicBar.of("Northern Ireland", Color.BLACK, 3),
         )
         val frame = basic(barsPublisher = regions.asOneTimePublisher())
         assertEquals(12, frame.numBars)
-        assertEquals(listOf("East Midlands"), frame.getLeftText(0))
-        assertEquals(listOf("South East England"), frame.getLeftText(5))
-        assertEquals(listOf("Northern Ireland"), frame.getLeftText(11))
+        assertEquals(listOf("East Midlands".withNoIcon()), frame.getLeftText(0))
+        assertEquals(listOf("South East England".withNoIcon()), frame.getLeftText(5))
+        assertEquals(listOf("Northern Ireland".withNoIcon()), frame.getLeftText(11))
         assertEquals(listOf("5"), frame.getRightText(0))
         assertEquals(listOf("10"), frame.getRightText(5))
         assertEquals(listOf("3"), frame.getRightText(11))
@@ -708,24 +710,24 @@ class BarFrameBuilderTest {
     @Test
     fun testDualBarsAllPositive() {
         val regions = listOf(
-            DualBar("East Midlands", Color.BLACK, 44, 46, "46 > 44"),
-            DualBar("East of England", Color.BLACK, 56, 58, "58 > 56"),
-            DualBar("London", Color.BLACK, 68, 73, "73 > 68"),
-            DualBar("North East England", Color.BLACK, 26, 29, "29 > 26"),
-            DualBar("North West England", Color.BLACK, 68, 75, "75 > 68"),
-            DualBar("South East England", Color.BLACK, 83, 84, "84 > 83"),
-            DualBar("South West England", Color.BLACK, 53, 55, "55 > 53"),
-            DualBar("West Midlands", Color.BLACK, 54, 59, "59 > 54"),
-            DualBar("Yorkshire and the Humber", Color.BLACK, 50, 54, "54 > 50"),
-            DualBar("Scotland", Color.BLACK, 52, 59, "59 > 52"),
-            DualBar("Wales", Color.BLACK, 30, 40, "40 > 30"),
-            DualBar("Northern Ireland", Color.BLACK, 16, 18, "18 > 16"),
+            DualBar.of("East Midlands", Color.BLACK, 44, 46, "46 > 44"),
+            DualBar.of("East of England", Color.BLACK, 56, 58, "58 > 56"),
+            DualBar.of("London", Color.BLACK, 68, 73, "73 > 68"),
+            DualBar.of("North East England", Color.BLACK, 26, 29, "29 > 26"),
+            DualBar.of("North West England", Color.BLACK, 68, 75, "75 > 68"),
+            DualBar.of("South East England", Color.BLACK, 83, 84, "84 > 83"),
+            DualBar.of("South West England", Color.BLACK, 53, 55, "55 > 53"),
+            DualBar.of("West Midlands", Color.BLACK, 54, 59, "59 > 54"),
+            DualBar.of("Yorkshire and the Humber", Color.BLACK, 50, 54, "54 > 50"),
+            DualBar.of("Scotland", Color.BLACK, 52, 59, "59 > 52"),
+            DualBar.of("Wales", Color.BLACK, 30, 40, "40 > 30"),
+            DualBar.of("Northern Ireland", Color.BLACK, 16, 18, "18 > 16"),
         )
         val frame = dual(barsPublisher = regions.asOneTimePublisher())
         assertEquals(12, frame.numBars)
-        assertEquals(listOf("East Midlands"), frame.getLeftText(0))
-        assertEquals(listOf("South East England"), frame.getLeftText(5))
-        assertEquals(listOf("Northern Ireland"), frame.getLeftText(11))
+        assertEquals(listOf("East Midlands".withNoIcon()), frame.getLeftText(0))
+        assertEquals(listOf("South East England".withNoIcon()), frame.getLeftText(5))
+        assertEquals(listOf("Northern Ireland".withNoIcon()), frame.getLeftText(11))
         assertEquals(listOf("46 > 44"), frame.getRightText(0))
         assertEquals(listOf("84 > 83"), frame.getRightText(5))
         assertEquals(listOf("18 > 16"), frame.getRightText(11))
@@ -757,49 +759,49 @@ class BarFrameBuilderTest {
             assertEquals(exp.first, act.first)
             assertEquals(exp.second.toDouble(), act.second.toDouble(), 1e-6)
         }
-        val regions = Publisher(listOf(DualBar("", Color.BLACK, 0.0, 0.0, "")))
+        val regions = Publisher(listOf(DualBar.of("", Color.BLACK, 0.0, 0.0, "")))
         val frame = dual(barsPublisher = regions)
         assertEquals(1, frame.numBars)
         doAssert(Pair(Color.BLACK, 0.0), frame.getSeries(0)[0])
         doAssert(Pair(Color.BLACK, 0.0), frame.getSeries(0)[1])
         doAssert(Pair(lighten(Color.BLACK), 0.0), frame.getSeries(0)[2])
-        regions.submit(listOf(DualBar("", Color.BLACK, 0.0, 2.0, "")))
+        regions.submit(listOf(DualBar.of("", Color.BLACK, 0.0, 2.0, "")))
         doAssert(Pair(Color.BLACK, 0.0), frame.getSeries(0)[0])
         doAssert(Pair(Color.BLACK, 0.0), frame.getSeries(0)[1])
         doAssert(Pair(lighten(Color.BLACK), 2.0), frame.getSeries(0)[2])
-        regions.submit(listOf(DualBar("", Color.BLACK, 2.0, 0.0, "")))
+        regions.submit(listOf(DualBar.of("", Color.BLACK, 2.0, 0.0, "")))
         doAssert(Pair(Color.BLACK, 0.0), frame.getSeries(0)[0])
         doAssert(Pair(Color.BLACK, 0.0), frame.getSeries(0)[1])
         doAssert(Pair(lighten(Color.BLACK), 2.0), frame.getSeries(0)[2])
-        regions.submit(listOf(DualBar("", Color.BLACK, 0.0, -2.0, "")))
+        regions.submit(listOf(DualBar.of("", Color.BLACK, 0.0, -2.0, "")))
         doAssert(Pair(Color.BLACK, 0.0), frame.getSeries(0)[0])
         doAssert(Pair(Color.BLACK, 0.0), frame.getSeries(0)[1])
         doAssert(Pair(lighten(Color.BLACK), -2.0), frame.getSeries(0)[2])
-        regions.submit(listOf(DualBar("", Color.BLACK, -2.0, 0.0, "")))
+        regions.submit(listOf(DualBar.of("", Color.BLACK, -2.0, 0.0, "")))
         doAssert(Pair(Color.BLACK, 0.0), frame.getSeries(0)[0])
         doAssert(Pair(Color.BLACK, 0.0), frame.getSeries(0)[1])
         doAssert(Pair(lighten(Color.BLACK), -2.0), frame.getSeries(0)[2])
-        regions.submit(listOf(DualBar("", Color.BLACK, 1.0, 3.0, "")))
+        regions.submit(listOf(DualBar.of("", Color.BLACK, 1.0, 3.0, "")))
         doAssert(Pair(Color.BLACK, 0.0), frame.getSeries(0)[0])
         doAssert(Pair(Color.BLACK, 1.0), frame.getSeries(0)[1])
         doAssert(Pair(lighten(Color.BLACK), 2.0), frame.getSeries(0)[2])
-        regions.submit(listOf(DualBar("", Color.BLACK, 3.0, 1.0, "")))
+        regions.submit(listOf(DualBar.of("", Color.BLACK, 3.0, 1.0, "")))
         doAssert(Pair(Color.BLACK, 0.0), frame.getSeries(0)[0])
         doAssert(Pair(Color.BLACK, 1.0), frame.getSeries(0)[1])
         doAssert(Pair(lighten(Color.BLACK), 2.0), frame.getSeries(0)[2])
-        regions.submit(listOf(DualBar("", Color.BLACK, -1.0, -3.0, "")))
+        regions.submit(listOf(DualBar.of("", Color.BLACK, -1.0, -3.0, "")))
         doAssert(Pair(Color.BLACK, 0.0), frame.getSeries(0)[0])
         doAssert(Pair(Color.BLACK, -1.0), frame.getSeries(0)[1])
         doAssert(Pair(lighten(Color.BLACK), -2.0), frame.getSeries(0)[2])
-        regions.submit(listOf(DualBar("", Color.BLACK, -3.0, -1.0, "")))
+        regions.submit(listOf(DualBar.of("", Color.BLACK, -3.0, -1.0, "")))
         doAssert(Pair(Color.BLACK, 0.0), frame.getSeries(0)[0])
         doAssert(Pair(Color.BLACK, -1.0), frame.getSeries(0)[1])
         doAssert(Pair(lighten(Color.BLACK), -2.0), frame.getSeries(0)[2])
-        regions.submit(listOf(DualBar("", Color.BLACK, -1.0, +1.0, "")))
+        regions.submit(listOf(DualBar.of("", Color.BLACK, -1.0, +1.0, "")))
         doAssert(Pair(Color.BLACK, 0.0), frame.getSeries(0)[0])
         doAssert(Pair(lighten(Color.BLACK), -1.0), frame.getSeries(0)[1])
         doAssert(Pair(lighten(Color.BLACK), +1.0), frame.getSeries(0)[2])
-        regions.submit(listOf(DualBar("", Color.BLACK, +1.0, -1.0, "")))
+        regions.submit(listOf(DualBar.of("", Color.BLACK, +1.0, -1.0, "")))
         doAssert(Pair(Color.BLACK, 0.0), frame.getSeries(0)[0])
         doAssert(Pair(lighten(Color.BLACK), +1.0), frame.getSeries(0)[1])
         doAssert(Pair(lighten(Color.BLACK), -1.0), frame.getSeries(0)[2])
@@ -817,8 +819,8 @@ class BarFrameBuilderTest {
 
         bars.submit(
             listOf(
-                BasicBar("JOE BIDEN", Color.BLUE, 306),
-                BasicBar("DONALD TRUMP", Color.RED, 232),
+                BasicBar.of("JOE BIDEN", Color.BLUE, 306),
+                BasicBar.of("DONALD TRUMP", Color.RED, 232),
             ),
         )
         assertEquals(2, barFrame.numBars)

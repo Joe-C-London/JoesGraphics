@@ -77,15 +77,13 @@ object BasicResultPanel {
 
         override fun incumbentShape(key: Candidate, forceSingleLine: Boolean): Shape? = if (incumbentMarker == null || !key.incumbent) {
             null
-        } else if (forceSingleLine) {
-            ImageGenerator.createBoxedTextShape(incumbentMarker)
         } else {
-            ImageGenerator.createHalfBoxedTextShape(incumbentMarker)
+            ImageGenerator.createBoxedTextShape(incumbentMarker)
         }
 
-        override fun winnerShape(forceSingleLine: Boolean): Shape = if (forceSingleLine) ImageGenerator.createTickShape() else ImageGenerator.createHalfTickShape()
+        override fun winnerShape(forceSingleLine: Boolean): Shape = ImageGenerator.createTickShape()
 
-        override fun runoffShape(forceSingleLine: Boolean): Shape = if (forceSingleLine) ImageGenerator.createRunoffShape() else ImageGenerator.createHalfRunoffShape()
+        override fun runoffShape(forceSingleLine: Boolean): Shape = ImageGenerator.createRunoffShape()
     }
 
     class CurrDiff<CT>(val curr: CT, val diff: CT)

@@ -90,7 +90,7 @@ class RegionalSeatsScreen private constructor(subPanels: List<GenericPanel>) :
                     barsPublisher = entries.map { e ->
                         e.filter { it.seats != null }
                             .map {
-                                BarFrameBuilder.BasicBar(
+                                BarFrameBuilder.BasicBar.of(
                                     it.party.name.uppercase(),
                                     it.party.color,
                                     it.seats!!,
@@ -107,7 +107,7 @@ class RegionalSeatsScreen private constructor(subPanels: List<GenericPanel>) :
                     barsPublisher = entries.map { e ->
                         e.map {
                             val change = (it.seats ?: 0) - it.prev
-                            BarFrameBuilder.BasicBar(
+                            BarFrameBuilder.BasicBar.of(
                                 it.party.abbreviation.uppercase(),
                                 it.party.color,
                                 change,
