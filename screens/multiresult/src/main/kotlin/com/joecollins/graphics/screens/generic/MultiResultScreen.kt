@@ -118,7 +118,7 @@ class MultiResultScreen private constructor(
                     val useIncumbentMarker = (incumbentMarker != null && candidate.incumbent)
                     val isWinner = candidate == winner
                     val isRunoff = runoff.contains(candidate)
-                    val shape: List<Shape> = listOfNotNull(
+                    val shape: List<Shape?> = listOf(
                         when {
                             isWinner -> ImageGenerator.createTickShape()
                             isRunoff -> ImageGenerator.createRunoffShape()
@@ -153,7 +153,7 @@ class MultiResultScreen private constructor(
                         }
                     }
                     BarFrameBuilder.BasicBar.of(
-                        leftLabel.zip(shape + listOf(null, null)),
+                        leftLabel.zip(shape),
                         candidate.party.color,
                         if (pct.isNaN()) 0 else pct,
                         rightLabel,
