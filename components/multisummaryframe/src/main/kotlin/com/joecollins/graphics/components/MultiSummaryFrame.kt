@@ -25,10 +25,12 @@ class MultiSummaryFrame(
     rowsPublisher: Flow.Publisher<out List<Row>>,
     notesPublisher: Flow.Publisher<out String?>? = null,
     progressLabel: Flow.Publisher<out String?>? = null,
+    borderColorPublisher: Flow.Publisher<out Color>? = null,
 ) : GraphicsFrame(
     headerPublisher = headerPublisher,
     notesPublisher = notesPublisher,
     headerLabelsPublisher = progressLabel?.map { mapOf(HeaderLabelLocation.RIGHT to it) },
+    borderColorPublisher = borderColorPublisher,
 ) {
     private val centralPanel: JPanel
     private val entries: MutableList<EntryPanel> = ArrayList()
