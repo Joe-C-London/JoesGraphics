@@ -14,8 +14,9 @@ import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
 import com.joecollins.pubsub.asOneTimePublisher
+import com.joecollins.pubsub.combine
+import com.joecollins.pubsub.compose
 import com.joecollins.pubsub.map
-import com.joecollins.pubsub.mapElements
 import com.joecollins.pubsub.merge
 import java.awt.Color
 import java.awt.Component
@@ -278,7 +279,7 @@ class BattlegroundScreen private constructor(
         fun <T> singleParty(
             prevResults: Flow.Publisher<out Map<T, Map<PartyOrCandidate, Int>>>,
             currResults: Flow.Publisher<out Map<T, PartyResult?>>,
-            name: T.() -> String,
+            name: T.() -> Flow.Publisher<String>,
             party: Flow.Publisher<out Party>,
             seatsToShow: (SingleSeatsToShow.() -> Unit)? = null,
             numRows: Flow.Publisher<out Int>? = null,
@@ -301,13 +302,17 @@ class BattlegroundScreen private constructor(
                 borderColorPublisher = party.map(Party::color),
                 headerAlignmentPublisher = GraphicsFrame.Alignment.RIGHT.asOneTimePublisher(),
                 numRowsPublisher = numRows ?: DEFAULT_ROWS.asOneTimePublisher(),
-                itemsPublisher = defenseItems.mapElements {
-                    ResultListingFrame.Item(
-                        text = it.key.name(),
-                        border = it.prevColor,
-                        background = (if (it.fill) it.resultColor else Color.WHITE),
-                        foreground = (if (!it.fill) it.resultColor else Color.WHITE),
-                    )
+                itemsPublisher = defenseItems.compose { items ->
+                    items.map {
+                        it.key.name().map { name ->
+                            ResultListingFrame.Item(
+                                text = name,
+                                border = it.prevColor,
+                                background = (if (it.fill) it.resultColor else Color.WHITE),
+                                foreground = (if (!it.fill) it.resultColor else Color.WHITE),
+                            )
+                        }
+                    }.combine()
                 },
                 reversedPublisher = true.asOneTimePublisher(),
             )
@@ -325,13 +330,17 @@ class BattlegroundScreen private constructor(
                 borderColorPublisher = party.map(Party::color),
                 headerAlignmentPublisher = GraphicsFrame.Alignment.LEFT.asOneTimePublisher(),
                 numRowsPublisher = numRows ?: DEFAULT_ROWS.asOneTimePublisher(),
-                itemsPublisher = targetItems.mapElements {
-                    ResultListingFrame.Item(
-                        text = it.key.name(),
-                        border = it.prevColor,
-                        background = (if (it.fill) it.resultColor else Color.WHITE),
-                        foreground = (if (!it.fill) it.resultColor else Color.WHITE),
-                    )
+                itemsPublisher = targetItems.compose { items ->
+                    items.map {
+                        it.key.name().map { name ->
+                            ResultListingFrame.Item(
+                                text = name,
+                                border = it.prevColor,
+                                background = (if (it.fill) it.resultColor else Color.WHITE),
+                                foreground = (if (!it.fill) it.resultColor else Color.WHITE),
+                            )
+                        }
+                    }.combine()
                 },
                 reversedPublisher = false.asOneTimePublisher(),
             )
@@ -400,7 +409,7 @@ class BattlegroundScreen private constructor(
         fun <T> doubleParty(
             prevResults: Flow.Publisher<out Map<T, Map<PartyOrCandidate, Int>>>,
             currResults: Flow.Publisher<out Map<T, PartyResult?>>,
-            name: T.() -> String,
+            name: T.() -> Flow.Publisher<String>,
             parties: Flow.Publisher<out Pair<PartyOrCoalition, PartyOrCoalition>>,
             seatsToShow: (DoubleSeatsToShow.() -> Unit)? = null,
             numRows: Flow.Publisher<out Int>? = null,
@@ -424,13 +433,17 @@ class BattlegroundScreen private constructor(
                 borderColorPublisher = parties.map { it.first.color },
                 headerAlignmentPublisher = GraphicsFrame.Alignment.RIGHT.asOneTimePublisher(),
                 numRowsPublisher = numRows ?: DEFAULT_ROWS.asOneTimePublisher(),
-                itemsPublisher = leftItems.mapElements {
-                    ResultListingFrame.Item(
-                        text = it.key.name(),
-                        border = it.prevColor,
-                        background = (if (it.fill) it.resultColor else Color.WHITE),
-                        foreground = (if (!it.fill) it.resultColor else Color.WHITE),
-                    )
+                itemsPublisher = leftItems.compose { items ->
+                    items.map {
+                        it.key.name().map { name ->
+                            ResultListingFrame.Item(
+                                text = name,
+                                border = it.prevColor,
+                                background = (if (it.fill) it.resultColor else Color.WHITE),
+                                foreground = (if (!it.fill) it.resultColor else Color.WHITE),
+                            )
+                        }
+                    }.combine()
                 },
                 reversedPublisher = true.asOneTimePublisher(),
             )
@@ -448,13 +461,17 @@ class BattlegroundScreen private constructor(
                 borderColorPublisher = parties.map { it.second.color },
                 headerAlignmentPublisher = GraphicsFrame.Alignment.LEFT.asOneTimePublisher(),
                 numRowsPublisher = numRows ?: DEFAULT_ROWS.asOneTimePublisher(),
-                itemsPublisher = rightItems.mapElements {
-                    ResultListingFrame.Item(
-                        text = it.key.name(),
-                        border = it.prevColor,
-                        background = (if (it.fill) it.resultColor else Color.WHITE),
-                        foreground = (if (!it.fill) it.resultColor else Color.WHITE),
-                    )
+                itemsPublisher = rightItems.compose { items ->
+                    items.map {
+                        it.key.name().map { name ->
+                            ResultListingFrame.Item(
+                                text = name,
+                                border = it.prevColor,
+                                background = (if (it.fill) it.resultColor else Color.WHITE),
+                                foreground = (if (!it.fill) it.resultColor else Color.WHITE),
+                            )
+                        }
+                    }.combine()
                 },
                 reversedPublisher = false.asOneTimePublisher(),
             )

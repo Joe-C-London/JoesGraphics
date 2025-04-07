@@ -29,7 +29,7 @@ class BattlegroundScreenTest {
         val panel = BattlegroundScreen.singleParty(
             prevResults = prevResult.convertToPartyOrCandidateForBattleground(),
             currResults = currResult,
-            name = { uppercase() },
+            name = { uppercase().asOneTimePublisher() },
             party = party,
             seatsToShow = {
                 defense = defenseSeats
@@ -158,7 +158,7 @@ class BattlegroundScreenTest {
         val panel = BattlegroundScreen.singleParty(
             prevResults = prevResult.convertToPartyOrCandidateForBattleground(),
             currResults = currResult,
-            name = { uppercase() },
+            name = { uppercase().asOneTimePublisher() },
             party = party,
             seatsToShow = {
                 defense = defenseSeats
@@ -236,7 +236,7 @@ class BattlegroundScreenTest {
         val panel = BattlegroundScreen.doubleParty(
             prevResults = prevResult.convertToPartyOrCandidateForBattleground(),
             currResults = currResult,
-            name = { uppercase() },
+            name = { uppercase().asOneTimePublisher() },
             parties = parties,
             seatsToShow = {
                 left = leftSeats
@@ -355,7 +355,7 @@ class BattlegroundScreenTest {
         val panel = BattlegroundScreen.doubleParty(
             prevResults = prevResult.convertToPartyOrCandidateForBattleground(),
             currResults = currResult,
-            name = { uppercase() },
+            name = { uppercase().asOneTimePublisher() },
             parties = (coa to lib).asOneTimePublisher(),
             seatsToShow = {
                 left = leftSeats
@@ -394,7 +394,7 @@ class BattlegroundScreenTest {
         val panel = BattlegroundScreen.singleParty(
             prevResults = prevResult.convertToPartyOrCandidateForBattleground(),
             currResults = currResult,
-            name = { uppercase() },
+            name = { uppercase().asOneTimePublisher() },
             party = party,
             seatsToShow = {
                 defense = defenseSeats
@@ -621,7 +621,7 @@ class BattlegroundScreenTest {
         val panel = BattlegroundScreen.singleParty(
             prevResults = prevResult.convertToPartyOrCandidateForBattleground(),
             currResults = currResult,
-            name = { uppercase() },
+            name = { uppercase().asOneTimePublisher() },
             party = party,
             seatsToShow = {
                 defense = defenseSeats
@@ -853,9 +853,11 @@ class BattlegroundScreenTest {
             name = {
                 val votes = second.values.toList()
                 val pct = abs(votes[0] - votes[1]) / votes.sum().toDouble()
-                DecimalFormat("0.0").format(50 * pct) +
-                    " " + first.uppercase() + " " +
-                    (second.keys.filter { !setOf(alp, clp).contains(it) }.takeUnless { it.isEmpty() }?.toString() ?: "")
+                (
+                    DecimalFormat("0.0").format(50 * pct) +
+                        " " + first.uppercase() + " " +
+                        (second.keys.filter { !setOf(alp, clp).contains(it) }.takeUnless { it.isEmpty() }?.toString() ?: "")
+                    ).asOneTimePublisher()
             },
             parties = (clp to alp).asOneTimePublisher(),
             seatsToShow = {
@@ -894,7 +896,7 @@ class BattlegroundScreenTest {
         val panel = BattlegroundScreen.singleParty(
             prevResults = prevResult,
             currResults = currResult,
-            name = { uppercase() },
+            name = { uppercase().asOneTimePublisher() },
             party = party,
             seatsToShow = {
                 defense = defenseSeats
@@ -954,7 +956,7 @@ class BattlegroundScreenTest {
         val panel = BattlegroundScreen.doubleParty(
             prevResults = prevResult,
             currResults = currResult,
-            name = { uppercase() },
+            name = { uppercase().asOneTimePublisher() },
             parties = parties,
             seatsToShow = {
                 left = leftSeats
