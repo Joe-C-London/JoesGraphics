@@ -144,6 +144,7 @@ class TooCloseToCallScreen private constructor(
             sortOrder: SortOrder = SortOrder.VOTES,
             header: Flow.Publisher<out String?>,
             title: Flow.Publisher<out String?>,
+            showLead: Boolean = true,
         ): TooCloseToCallScreen {
             val input = Input<T, CT>()
             entries.compose { set -> Aggregators.toMap(set) { votes.votes(it) } }.subscribe(Subscriber { input.votes = it })
@@ -155,8 +156,8 @@ class TooCloseToCallScreen private constructor(
             input.sortOrder = sortOrder
             return TooCloseToCallScreen(
                 title,
-                createFrame(header, input, votes, reporting),
-                createAltText(title, header, input, votes),
+                createFrame(header, input, votes, reporting, showLead),
+                createAltText(title, header, input, votes, showLead),
             )
         }
 
@@ -165,6 +166,7 @@ class TooCloseToCallScreen private constructor(
             input: Input<T, CT>,
             vote: Vote<T, CT>,
             reporting: ReportingString<T>?,
+            showLead: Boolean,
         ): MultiSummaryFrame {
             val entries = input.toEntries()
             val frame = MultiSummaryFrame(
@@ -188,7 +190,7 @@ class TooCloseToCallScreen private constructor(
                             )
                                 .flatten()
                                 .take(entry.numCandidates),
-                            sequenceOf(Color.WHITE to ("LEAD: " + (input.sortOrder.leadString(entry)))),
+                            if (showLead) sequenceOf(Color.WHITE to ("LEAD: " + (input.sortOrder.leadString(entry)))) else emptySequence(),
                             reporting?.let { sequenceOf(Color.WHITE to entry.reporting) } ?: emptySequence(),
                         )
                             .flatten()
@@ -204,6 +206,7 @@ class TooCloseToCallScreen private constructor(
             header: Flow.Publisher<out String?>,
             input: Input<T, CT>,
             vote: Vote<T, CT>,
+            showLead: Boolean,
         ): Flow.Publisher<String> {
             val headerText = title.merge(header) { t, h ->
                 if (t == null && h == null) {
@@ -223,9 +226,8 @@ class TooCloseToCallScreen private constructor(
                     val total = e.votes.values.sum().toDouble()
                     val entry = "${e.header}: ${
                         e.topCandidates.take(e.numCandidates).joinToString("; ") { c -> "${vote.label(c.key)}: ${input.sortOrder.candidateDisplay(c.value, total)}" }
-                    }; LEAD: ${input.sortOrder.leadString(e)}${
-                        if (e.reporting.isEmpty()) "" else "; ${e.reporting}"
-                    }"
+                    }" + (if (showLead) "; LEAD: ${input.sortOrder.leadString(e)}" else "") +
+                        (if (e.reporting.isEmpty()) "" else "; ${e.reporting}")
                     if (dotDotDot) {
                         null
                     } else if (size + entry.length < AltTextProvider.ALT_TEXT_MAX_LENGTH - 10) {

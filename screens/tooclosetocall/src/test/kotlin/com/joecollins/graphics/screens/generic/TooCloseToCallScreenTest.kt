@@ -828,6 +828,126 @@ class TooCloseToCallScreenTest {
         )
     }
 
+    @Test
+    fun testDontShowLead() {
+        val candidateVotesRaw: MutableMap<Int, Map<Candidate, Int>> = HashMap()
+        val partyResultsRaw: MutableMap<Int, PartyResult> = HashMap()
+        val pollsReportingRaw: MutableMap<Int, PollsReporting> = HashMap()
+        val candidateVotes = Publisher<Map<Int, Map<Candidate, Int>>>(candidateVotesRaw)
+        val partyResults = Publisher<Map<Int, PartyResult>>(partyResultsRaw)
+        val pollsReporting = Publisher<Map<Int, PollsReporting>>(pollsReportingRaw)
+        val screen = TooCloseToCallScreen.of(
+            entries = (1..27).toSet().asOneTimePublisher(),
+            votes = candidateVotes { candidateVotes.map { v -> v[this] ?: emptyMap() } },
+            result = { partyResults.map { v -> v[this] } },
+            reporting = polls { pollsReporting.map { p -> p[this] ?: PollsReporting(0, 0) } },
+            label = { "DISTRICT $this".asOneTimePublisher() },
+            header = "TOO CLOSE TO CALL".asOneTimePublisher(),
+            title = "PRINCE EDWARD ISLAND".asOneTimePublisher(),
+            showLead = false,
+        )
+        screen.setSize(1024, 512)
+        compareRendering("TooCloseToCallScreen", "NoLead-1", screen)
+        assertPublishes(
+            screen.altText,
+            """
+                PRINCE EDWARD ISLAND
+                
+                TOO CLOSE TO CALL
+                (empty)
+            """.trimIndent(),
+        )
+
+        setupFirstAdvancePoll(candidateVotesRaw, partyResultsRaw, HashMap(), pollsReportingRaw)
+        candidateVotes.submit(candidateVotesRaw)
+        partyResults.submit(partyResultsRaw)
+        pollsReporting.submit(pollsReportingRaw)
+        compareRendering("TooCloseToCallScreen", "NoLead-2", screen)
+        assertPublishes(
+            screen.altText,
+            """
+                PRINCE EDWARD ISLAND
+                
+                TOO CLOSE TO CALL
+                DISTRICT 1: PC: 684; LIB: 467; 1/10
+            """.trimIndent(),
+        )
+
+        setupAllAdvancePolls(candidateVotesRaw, partyResultsRaw, HashMap(), pollsReportingRaw)
+        candidateVotes.submit(candidateVotesRaw)
+        partyResults.submit(partyResultsRaw)
+        pollsReporting.submit(pollsReportingRaw)
+        compareRendering("TooCloseToCallScreen", "NoLead-3", screen)
+        assertPublishes(
+            screen.altText,
+            """
+                PRINCE EDWARD ISLAND
+                
+                TOO CLOSE TO CALL
+                DISTRICT 12: LIB: 478; GRN: 475; 1/10
+                DISTRICT 23: PC: 436; GRN: 428; 1/10
+                DISTRICT 8: LIB: 620; PC: 609; 1/10
+                DISTRICT 26: PC: 700; LIB: 686; 1/10
+                DISTRICT 5: PC: 533; LIB: 518; 1/8
+                DISTRICT 25: LIB: 454; NDP: 425; 1/11
+                DISTRICT 21: GRN: 617; PC: 577; 1/10
+                DISTRICT 11: GRN: 636; PC: 595; 1/10
+                DISTRICT 22: GRN: 602; LIB: 560; 1/10
+                DISTRICT 24: LIB: 330; GRN: 197; 1/8
+                DISTRICT 15: PC: 583; LIB: 425; 1/10
+                DISTRICT 13: LIB: 717; GRN: 542; 1/10
+                DISTRICT 6: PC: 725; LIB: 526; 1/9
+                DISTRICT 14: LIB: 699; PC: 492; 1/10
+                DISTRICT 1: PC: 684; LIB: 467; 1/10
+                DISTRICT 9: PC: 620; LIB: 395; 1/11
+                DISTRICT 27: LIB: 646; PC: 405; 1/10
+                DISTRICT 2: PC: 555; GRN: 308; 1/10
+                DISTRICT 10: LIB: 808; GRN: 516; 1/10
+                DISTRICT 16: LIB: 983; GRN: 542; 1/10
+            """.trimIndent(),
+        )
+
+        setupHalfOfPolls(candidateVotesRaw, partyResultsRaw, HashMap(), pollsReportingRaw)
+        candidateVotes.submit(candidateVotesRaw)
+        partyResults.submit(partyResultsRaw)
+        pollsReporting.submit(pollsReportingRaw)
+        compareRendering("TooCloseToCallScreen", "NoLead-4", screen)
+        assertPublishes(
+            screen.altText,
+            """
+                PRINCE EDWARD ISLAND
+                
+                TOO CLOSE TO CALL
+                DISTRICT 26: LIB: 919; PC: 890; 5/10
+                DISTRICT 13: LIB: 952; GRN: 840; 5/10
+                DISTRICT 8: PC: 948; LIB: 832; 5/10
+                DISTRICT 5: GRN: 871; PC: 743; 5/8
+                DISTRICT 12: GRN: 831; LIB: 639; 5/10
+                DISTRICT 24: LIB: 774; GRN: 582; 5/8
+                DISTRICT 14: LIB: 874; GRN: 660; 5/10
+                DISTRICT 15: PC: 909; LIB: 652; 5/10
+                DISTRICT 9: PC: 807; GRN: 533; 5/11
+                DISTRICT 6: PC: 995; LIB: 684; 5/9
+                DISTRICT 16: LIB: 1,286; GRN: 819; 5/10
+            """.trimIndent(),
+        )
+
+        setupFullResults(candidateVotesRaw, partyResultsRaw, HashMap(), pollsReportingRaw)
+        candidateVotes.submit(candidateVotesRaw)
+        partyResults.submit(partyResultsRaw)
+        pollsReporting.submit(pollsReportingRaw)
+        compareRendering("TooCloseToCallScreen", "NoLead-1", screen)
+        assertPublishes(
+            screen.altText,
+            """
+                PRINCE EDWARD ISLAND
+                
+                TOO CLOSE TO CALL
+                (empty)
+            """.trimIndent(),
+        )
+    }
+
     private fun <R : PartyResult?> setupFirstAdvancePoll(
         candidateVotes: MutableMap<Int, Map<Candidate, Int>>,
         partyResults: MutableMap<Int, R>,
