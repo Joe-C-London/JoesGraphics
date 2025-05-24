@@ -183,7 +183,7 @@ object HeatMapFrameBuilder {
         partyFilter: (Party?) -> Boolean,
     ): Flow.Publisher<ElectedLeading> = results
         .map { res ->
-            res.filter { (pr, _) -> pr != null && partyFilter(pr.leader) }
+            res.asSequence().filter { (pr, _) -> pr != null && partyFilter(pr.leader) }
                 .map { (pr, seats) ->
                     ElectedLeading(if (pr!!.elected) seats else 0, seats)
                 }
@@ -195,16 +195,17 @@ object HeatMapFrameBuilder {
         partyFilter: (Party?) -> Boolean,
     ): Flow.Publisher<ElectedLeading> = resultWithPrev
         .map { res ->
-            res.filter { (pr, _) -> pr?.leader != null }
-                .flatMap { (pr, p, seats) ->
-                    val ret = ArrayList<ElectedLeading>()
-                    if (partyFilter(pr!!.leader)) {
-                        ret.add(ElectedLeading(if (pr.elected) seats else 0, seats))
+            res.asSequence().filter { (pr, _) -> pr?.leader != null }
+                .mapNotNull { (pr, p, seats) ->
+                    val partyIsLeading = partyFilter(pr!!.leader)
+                    val partyWonPreviously = partyFilter(p)
+                    if (partyIsLeading == partyWonPreviously) {
+                        null
+                    } else if (partyIsLeading) {
+                        ElectedLeading(if (pr.elected) seats else 0, seats)
+                    } else {
+                        ElectedLeading(if (pr.elected) -seats else 0, -seats)
                     }
-                    if (partyFilter(p)) {
-                        ret.add(ElectedLeading(if (pr.elected) -seats else 0, -seats))
-                    }
-                    ret
                 }
                 .fold(ElectedLeading(0, 0)) { a, e -> ElectedLeading(a.elected + e.elected, a.total + e.total) }
         }
