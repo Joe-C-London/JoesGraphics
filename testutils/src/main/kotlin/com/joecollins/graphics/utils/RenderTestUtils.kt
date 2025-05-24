@@ -17,7 +17,7 @@ object RenderTestUtils {
 
     fun compareRendering(testClass: String, testMethod: String, panel: JPanel) {
         val expectedFile = File(
-            "src\\test\\resources\\com\\joecollins\\graphics\\$testClass\\$testMethod.png",
+            "src/test/resources/com/joecollins/graphics/$testClass/$testMethod.png",
         )
         val actualFile = File.createTempFile("test", ".png")
         val isMatch = run {
