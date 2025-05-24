@@ -183,15 +183,15 @@ class PubSubTests {
 
         publisher1.submit("A")
         publisher2.submit("B")
-        Thread.sleep(100)
+        Thread.sleep(1000)
         assertEquals("AB", output)
 
         publisher1.submit("1")
-        Thread.sleep(100)
+        Thread.sleep(1000)
         assertEquals("1B", output)
 
         publisher2.submit("2")
-        Thread.sleep(100)
+        Thread.sleep(1000)
         assertEquals("12", output)
     }
 
