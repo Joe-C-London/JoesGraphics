@@ -1,5 +1,7 @@
 package com.joecollins.pubsub
 
+import org.awaitility.Awaitility
+import org.hamcrest.Matchers
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
@@ -15,6 +17,7 @@ import java.util.LinkedList
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Flow
 import java.util.concurrent.SubmissionPublisher
+import java.util.concurrent.TimeUnit
 
 class PubSubTests {
 
@@ -183,16 +186,22 @@ class PubSubTests {
 
         publisher1.submit("A")
         publisher2.submit("B")
-        Thread.sleep(1000)
-        assertEquals("AB", output)
+        Awaitility.await().timeout(10, TimeUnit.SECONDS).until(
+            { output },
+            Matchers.equalTo("AB"),
+        )
 
         publisher1.submit("1")
-        Thread.sleep(1000)
-        assertEquals("1B", output)
+        Awaitility.await().timeout(10, TimeUnit.SECONDS).until(
+            { output },
+            Matchers.equalTo("1B"),
+        )
 
         publisher2.submit("2")
-        Thread.sleep(1000)
-        assertEquals("12", output)
+        Awaitility.await().timeout(10, TimeUnit.SECONDS).until(
+            { output },
+            Matchers.equalTo("12"),
+        )
     }
 
     @Test

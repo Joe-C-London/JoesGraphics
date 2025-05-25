@@ -16,6 +16,7 @@ plugins {
 }
 ext {
     junit_version = "5.11.4"
+    awaitility_version = "4.3.0"
 }
 
 apply plugin: 'kotlin'
