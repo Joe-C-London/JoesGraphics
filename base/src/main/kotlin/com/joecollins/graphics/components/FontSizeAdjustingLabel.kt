@@ -1,6 +1,7 @@
 package com.joecollins.graphics.components
 
 import com.joecollins.utils.ExecutorUtils
+import java.awt.Color
 import java.awt.EventQueue
 import java.awt.Font
 import java.awt.Graphics
@@ -14,6 +15,10 @@ class FontSizeAdjustingLabel() : JLabel() {
 
     constructor(text: String) : this() {
         this.text = text
+    }
+
+    init {
+        this.foreground = Color.BLACK
     }
 
     var renderedFont: Font = super.getFont()
