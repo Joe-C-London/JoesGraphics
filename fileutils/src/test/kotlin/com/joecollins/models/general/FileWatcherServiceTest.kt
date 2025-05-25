@@ -61,19 +61,19 @@ class FileWatcherServiceTest {
                 Files.writeString(tmpFile, file3Contents, UTF8)
                 Files.move(tmpFile, tempPath!!.resolve("file3.txt"), StandardCopyOption.REPLACE_EXISTING)
             }
+            Awaitility.await().timeout(10, TimeUnit.SECONDS).until(
+                { contents[tempPath!!.resolve("file1.txt")] },
+                Matchers.equalTo(file1NewContents),
+            )
+            Awaitility.await().timeout(10, TimeUnit.SECONDS).until(
+                { contents[tempPath!!.resolve("file2.txt")] },
+                Matchers.equalTo(file2Contents),
+            )
+            Awaitility.await().timeout(10, TimeUnit.SECONDS).until(
+                { contents[tempPath!!.resolve("file3.txt")] },
+                Matchers.equalTo(file3Contents),
+            )
         }
-        Awaitility.await().timeout(10, TimeUnit.SECONDS).until(
-            { file1NewContents },
-            Matchers.equalTo(contents[tempPath!!.resolve("file1.txt")]),
-        )
-        Awaitility.await().timeout(10, TimeUnit.SECONDS).until(
-            { file2Contents },
-            Matchers.equalTo(contents[tempPath!!.resolve("file2.txt")]),
-        )
-        Awaitility.await().timeout(10, TimeUnit.SECONDS).until(
-            { file3Contents },
-            Matchers.equalTo(contents[tempPath!!.resolve("file3.txt")]),
-        )
     }
 
     @Test
@@ -110,15 +110,15 @@ class FileWatcherServiceTest {
                 Files.writeString(tmpFile, file1NewContents, UTF8)
                 Files.move(tmpFile, tempPath!!.resolve("file1.txt"), StandardCopyOption.REPLACE_EXISTING)
             }
+            Awaitility.await().timeout(10, TimeUnit.SECONDS).until(
+                { contents[tempPath!!.resolve("file1.txt")] },
+                Matchers.equalTo(file1NewContents),
+            )
+            Awaitility.await().timeout(10, TimeUnit.SECONDS).until(
+                { contents[tempPath!!.resolve("file2.txt")] },
+                Matchers.equalTo(file2Contents),
+            )
         }
-        Awaitility.await().timeout(10, TimeUnit.SECONDS).until(
-            { file1NewContents },
-            Matchers.equalTo(contents[tempPath!!.resolve("file1.txt")]),
-        )
-        Awaitility.await().timeout(10, TimeUnit.SECONDS).until(
-            { file2Contents },
-            Matchers.equalTo(contents[tempPath!!.resolve("file2.txt")]),
-        )
     }
 
     @Test
@@ -146,15 +146,15 @@ class FileWatcherServiceTest {
                 Files.writeString(tmpFile, file1NewContents, UTF8)
                 Files.move(tmpFile, tempPath!!.resolve("file1.txt"), StandardCopyOption.REPLACE_EXISTING)
             }
+            Awaitility.await().timeout(10, TimeUnit.SECONDS).until(
+                { contents[tempPath!!.resolve("file1.txt")] },
+                Matchers.equalTo(file1NewContents),
+            )
+            Awaitility.await().timeout(10, TimeUnit.SECONDS).until(
+                { contents[tempPath!!.resolve("file2.txt")] },
+                Matchers.equalTo(file2Contents),
+            )
         }
-        Awaitility.await().timeout(10, TimeUnit.SECONDS).until(
-            { file1NewContents },
-            Matchers.equalTo(contents[tempPath!!.resolve("file1.txt")]),
-        )
-        Awaitility.await().timeout(10, TimeUnit.SECONDS).until(
-            { file2Contents },
-            Matchers.equalTo(contents[tempPath!!.resolve("file2.txt")]),
-        )
     }
 
     companion object {
