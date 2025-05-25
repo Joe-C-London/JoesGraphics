@@ -16,6 +16,7 @@ repositories {
 
 dependencies {
     testImplementation "org.junit.jupiter:junit-jupiter-api:$parent.ext.junit_version"
+    testImplementation 'org.awaitility:awaitility:4.3.0'
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$parent.ext.junit_version"
 }
 

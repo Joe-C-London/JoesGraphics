@@ -1,5 +1,7 @@
 package com.joecollins.models.general
 
+import org.awaitility.Awaitility
+import org.hamcrest.Matchers
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
@@ -10,6 +12,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardCopyOption
 import java.util.HashMap
+import java.util.concurrent.TimeUnit
 
 @Suppress("BlockingMethodInNonBlockingContext")
 class FileWatcherServiceTest {
@@ -58,11 +61,19 @@ class FileWatcherServiceTest {
                 Files.writeString(tmpFile, file3Contents, UTF8)
                 Files.move(tmpFile, tempPath!!.resolve("file3.txt"), StandardCopyOption.REPLACE_EXISTING)
             }
-            Thread.sleep(100)
         }
-        Assertions.assertEquals(file1NewContents, contents[tempPath!!.resolve("file1.txt")])
-        Assertions.assertEquals(file2Contents, contents[tempPath!!.resolve("file2.txt")])
-        Assertions.assertEquals(file3Contents, contents[tempPath!!.resolve("file3.txt")])
+        Awaitility.await().timeout(10, TimeUnit.SECONDS).until(
+            { file1NewContents },
+            Matchers.equalTo(contents[tempPath!!.resolve("file1.txt")]),
+        )
+        Awaitility.await().timeout(10, TimeUnit.SECONDS).until(
+            { file2Contents },
+            Matchers.equalTo(contents[tempPath!!.resolve("file2.txt")]),
+        )
+        Awaitility.await().timeout(10, TimeUnit.SECONDS).until(
+            { file3Contents },
+            Matchers.equalTo(contents[tempPath!!.resolve("file3.txt")]),
+        )
     }
 
     @Test
@@ -99,10 +110,15 @@ class FileWatcherServiceTest {
                 Files.writeString(tmpFile, file1NewContents, UTF8)
                 Files.move(tmpFile, tempPath!!.resolve("file1.txt"), StandardCopyOption.REPLACE_EXISTING)
             }
-            Thread.sleep(1000)
         }
-        Assertions.assertEquals(file1NewContents, contents[tempPath!!.resolve("file1.txt")])
-        Assertions.assertEquals(file2Contents, contents[tempPath!!.resolve("file2.txt")])
+        Awaitility.await().timeout(10, TimeUnit.SECONDS).until(
+            { file1NewContents },
+            Matchers.equalTo(contents[tempPath!!.resolve("file1.txt")]),
+        )
+        Awaitility.await().timeout(10, TimeUnit.SECONDS).until(
+            { file2Contents },
+            Matchers.equalTo(contents[tempPath!!.resolve("file2.txt")]),
+        )
     }
 
     @Test
@@ -130,10 +146,15 @@ class FileWatcherServiceTest {
                 Files.writeString(tmpFile, file1NewContents, UTF8)
                 Files.move(tmpFile, tempPath!!.resolve("file1.txt"), StandardCopyOption.REPLACE_EXISTING)
             }
-            Thread.sleep(200)
         }
-        Assertions.assertEquals(file1NewContents, contents[tempPath!!.resolve("file1.txt")])
-        Assertions.assertEquals(file2Contents, contents[tempPath!!.resolve("file2.txt")])
+        Awaitility.await().timeout(10, TimeUnit.SECONDS).until(
+            { file1NewContents },
+            Matchers.equalTo(contents[tempPath!!.resolve("file1.txt")]),
+        )
+        Awaitility.await().timeout(10, TimeUnit.SECONDS).until(
+            { file2Contents },
+            Matchers.equalTo(contents[tempPath!!.resolve("file2.txt")]),
+        )
     }
 
     companion object {
