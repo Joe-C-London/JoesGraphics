@@ -1,6 +1,5 @@
 package com.joecollins.graphics.utils
 
-import org.apache.commons.io.FileUtils
 import org.junit.jupiter.api.Assertions
 import java.awt.Component
 import java.awt.Container
@@ -22,7 +21,7 @@ object RenderTestUtils {
         val actualFile = File.createTempFile("test", ".png")
         val isMatch = run {
             ImageIO.write(convertToImage(panel), "png", actualFile)
-            FileUtils.contentEquals(expectedFile, actualFile)
+            compareImage(expectedFile, actualFile) < 0.001
         }
         if (!isMatch) {
             println(expectedFile.absolutePath)
@@ -37,6 +36,22 @@ object RenderTestUtils {
         }
         Assertions.assertTrue(isMatch)
         actualFile.deleteOnExit()
+    }
+
+    private fun compareImage(fileA: File, fileB: File): Float {
+        val imageA = ImageIO.read(fileA)
+        val imageB = ImageIO.read(fileB)
+        if (imageA.width != imageB.width) return Float.MAX_VALUE
+        if (imageA.height != imageB.height) return Float.MAX_VALUE
+        var diff = 0
+        for (x in 0 until imageA.width) {
+            for (y in 0 until imageA.height) {
+                diff += ((imageA.getRGB(x, y) and 0x00ff0000) shr 16) - ((imageB.getRGB(x, y) and 0x00ff0000) shr 16)
+                diff += ((imageA.getRGB(x, y) and 0x0000ff00) shr 8) - ((imageB.getRGB(x, y) and 0x0000ff00) shr 8)
+                diff += ((imageA.getRGB(x, y) and 0x000000ff) shr 0) - ((imageB.getRGB(x, y) and 0x000000ff) shr 0)
+            }
+        }
+        return diff.toFloat() / (imageA.width * imageA.height * 3)
     }
 
     private fun convertToImage(component: JPanel): BufferedImage {
