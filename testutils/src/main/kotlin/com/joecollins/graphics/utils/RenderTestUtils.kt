@@ -29,7 +29,7 @@ object RenderTestUtils {
             println(actualFile.absolutePath)
             println(
                 String.format(
-                    "copy /Y %s %s",
+                    if (System.getProperty("os.name").startsWith("Windows")) "copy /Y %s %s" else "cp %s %s",
                     actualFile.absolutePath,
                     expectedFile.absolutePath,
                 ),
