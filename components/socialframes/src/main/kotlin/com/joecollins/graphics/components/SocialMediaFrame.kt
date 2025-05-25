@@ -71,6 +71,7 @@ abstract class SocialMediaFrame<P : Post>(
 
         val postLabel = JLabel()
         postLabel.font = StandardFont.readNormalFont(16)
+        postLabel.foreground = Color.BLACK
         postLabel.verticalAlignment = JLabel.TOP
         postLabel.horizontalAlignment = JLabel.LEFT
         postLabel.alignmentX = LEFT_ALIGNMENT
@@ -186,6 +187,7 @@ abstract class SocialMediaFrame<P : Post>(
 
         val timeLabel = JLabel()
         timeLabel.font = StandardFont.readNormalFont(12)
+        postLabel.foreground = Color.BLACK
         timeLabel.border = EmptyBorder(2, 0, -2, 0)
         timeLabel.horizontalAlignment = JLabel.RIGHT
         post.map { if (it.user.isProtected) null else it.createdAt }.subscribe(
@@ -413,6 +415,7 @@ abstract class SocialMediaFrame<P : Post>(
 
             val postLabel = JLabel()
             postLabel.font = StandardFont.readNormalFont(16)
+            postLabel.foreground = Color.BLACK
             postLabel.text = formatText(quotedStatus, true, postLabel)
             postLabel.alignmentX = LEFT_ALIGNMENT
             postPanel.add(postLabel)
@@ -443,6 +446,7 @@ abstract class SocialMediaFrame<P : Post>(
 
             val timeLabel = JLabel()
             timeLabel.font = StandardFont.readNormalFont(12)
+            postLabel.foreground = Color.BLACK
             timeLabel.border = EmptyBorder(2, 0, -2, 0)
             timeLabel.horizontalAlignment = JLabel.RIGHT
             timeLabel.text =
