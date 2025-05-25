@@ -1,6 +1,7 @@
 package com.joecollins.graphics.utils
 
 import java.awt.Font
+import java.awt.GraphicsEnvironment
 import java.util.HashMap
 
 object StandardFont {
@@ -8,11 +9,11 @@ object StandardFont {
     private val KLAVIKA_BOLD = Font.createFont(
         Font.TRUETYPE_FONT,
         StandardFont::class.java.classLoader.getResourceAsStream("Klavika Bold.otf"),
-    )
+    ).also { GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(it) }
     private val KLAVIKA_REGULAR = Font.createFont(
         Font.TRUETYPE_FONT,
         StandardFont::class.java.classLoader.getResourceAsStream("Klavika Regular.otf"),
-    )
+    ).also { GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(it) }
 
     private val boldFontCache: MutableMap<Int, Font> = HashMap()
     private val normalFontCache: MutableMap<Int, Font> = HashMap()
