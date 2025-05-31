@@ -39,6 +39,8 @@ object RenderTestUtils {
     }
 
     private fun compareImage(fileA: File, fileB: File): Float {
+        if (!fileA.exists() || !fileB.exists()) return Float.MAX_VALUE
+
         val imageA = ImageIO.read(fileA)
         val imageB = ImageIO.read(fileB)
         if (imageA.width != imageB.width) return Float.MAX_VALUE

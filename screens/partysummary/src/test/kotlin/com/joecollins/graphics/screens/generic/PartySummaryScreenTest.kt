@@ -3,7 +3,9 @@ package com.joecollins.graphics.screens.generic
 import com.joecollins.graphics.utils.PublisherTestUtils.assertPublishes
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.models.general.Aggregators
+import com.joecollins.models.general.Coalition
 import com.joecollins.models.general.Party
+import com.joecollins.models.general.PartyOrCoalition
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
 import org.junit.jupiter.api.Test
@@ -780,8 +782,112 @@ class PartySummaryScreenTest {
         )
     }
 
+    @Test
+    fun testBasicPartySummaryWithCoalition() {
+        val lib = Party("Liberal", "LIB", Color.BLUE)
+        val nat = Party("National", "NAT", Color.GREEN.darker().darker())
+        val lnp = Party("Liberal National", "LNP", Color.BLUE.brighter())
+        val clp = Party("Country Liberal", "CLP", Color.ORANGE)
+        val coa = Coalition("Coalition", "L/NP", Color.BLUE, lib, nat, lnp, clp)
+
+        val alp = Party("Labor", "ALP", Color.RED)
+        val grn = Party("Green", "GRN", Color.GREEN)
+        val ind = Party("Independent", "IND", Color.DARK_GRAY)
+        val oth = Party.OTHERS
+
+        val aus = RegionWithPrev("Australia").apply {
+            seats = mapOf(alp to 94, coa to 44, grn to 1, ind to 9, oth to 2)
+            prevSeats = mapOf(alp to 77, coa to 59, grn to 4, ind to 8, oth to 2)
+            votes = mapOf(alp to 5354156, coa to 4929606, grn to 1890004, ind to 1126179, oth to 2190755)
+            prevVotes = mapOf(alp to 4776030, coa to 5233334, grn to 1795985, ind to 776169, oth to 2077524)
+        }
+        val nsw = RegionWithPrev("New South Wales").apply {
+            seats = mapOf(alp to 28, coa to 13, ind to 5)
+            prevSeats = mapOf(alp to 25, coa to 17, ind to 4)
+            votes = mapOf(alp to 1687010, coa to 1511308, grn to 530322, ind to 465248, oth to 599590)
+            prevVotes = mapOf(alp to 1552684, coa to 1699324, grn to 466069, ind to 351620, oth to 581243)
+        }
+        val vic = RegionWithPrev("Victoria").apply {
+            seats = mapOf(alp to 27, coa to 9, ind to 2)
+            prevSeats = mapOf(alp to 24, coa to 10, grn to 1, ind to 3)
+            votes = mapOf(alp to 1375991, coa to 1305070, grn to 550660, ind to 305284, oth to 516411)
+            prevVotes = mapOf(alp to 1230842, coa to 1239280, grn to 514893, ind to 243992, oth to 517426)
+        }
+        val qld = RegionWithPrev("Queensland").apply {
+            seats = mapOf(alp to 12, lnp to 16, grn to 1, oth to 1)
+            prevSeats = mapOf(alp to 5, lnp to 21, grn to 3, oth to 1)
+            votes = mapOf(alp to 975848, lnp to 1099623, grn to 370313, ind to 118228, oth to 585633)
+            prevVotes = mapOf(alp to 811069, lnp to 1172515, grn to 382900, ind to 61944, oth to 529598)
+        }
+        val wa = RegionWithPrev("Western Australia").apply {
+            seats = mapOf(alp to 11, lib to 4, ind to 1)
+            prevSeats = mapOf(alp to 10, lib to 5, ind to 1)
+            votes = mapOf(alp to 568885, lib to 458187, nat to 46062, grn to 191389, ind to 87987, oth to 245925)
+            prevVotes = mapOf(alp to 542667, lib to 503254, nat to 9160, grn to 184094, ind to 35968, oth to 198082)
+        }
+        val sa = RegionWithPrev("South Australia").apply {
+            seats = mapOf(alp to 7, lib to 2, oth to 1)
+            prevSeats = mapOf(alp to 6, lib to 3, oth to 1)
+            votes = mapOf(alp to 433738, lib to 316915, nat to 5181, grn to 151915, ind to 38063, oth to 186426)
+            prevVotes = mapOf(alp to 378329, lib to 387664, nat to 2531, grn to 140227, ind to 29500, oth to 159535)
+        }
+        val tas = RegionWithPrev("Tasmania").apply {
+            seats = mapOf(alp to 4, ind to 1)
+            prevSeats = mapOf(alp to 2, lib to 2, ind to 1)
+            votes = mapOf(alp to 134435, lib to 89988, grn to 40833, ind to 65907, oth to 36096)
+            prevVotes = mapOf(alp to 95322, lib to 115184, grn to 41972, ind to 38993, oth to 58227)
+        }
+        val act = RegionWithPrev("Australian Capital Territory").apply {
+            seats = mapOf(alp to 3)
+            prevSeats = mapOf(alp to 3)
+            votes = mapOf(alp to 138110, lib to 61489, grn to 43753, ind to 37307, oth to 9906)
+            prevVotes = mapOf(alp to 126595, lib to 74759, grn to 52648, ind to 12795, oth to 15200)
+        }
+        val nt = RegionWithPrev("Northern Territory").apply {
+            seats = mapOf(alp to 2)
+            prevSeats = mapOf(alp to 2)
+            votes = mapOf(alp to 40123, clp to 35785, grn to 10813, ind to 8194, oth to 10847)
+            prevVotes = mapOf(alp to 38522, clp to 29664, grn to 13182, ind to 1357, oth to 18212)
+        }
+
+        val screen = PartySummaryScreen.of(
+            mainRegion = aus,
+            header = { name.uppercase().asOneTimePublisher() },
+            seats = {
+                curr = { seatsPublisher }
+                prev = { prevSeatPublisher }
+            },
+            votes = {
+                currPct = { Aggregators.toPct(votePublisher) }
+                prevPct = { Aggregators.toPct(prevVotePublisher) }
+            },
+            numRows = 4,
+            regions = listOf(nsw, vic, qld, wa, sa, tas, act, nt),
+            party = coa.asOneTimePublisher(),
+        )
+        screen.setSize(1024, 512)
+        compareRendering("PartySummaryScreen", "Coalition-1", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            COALITION SUMMARY
+
+            AUSTRALIA: SEATS: 44 (-15); POPULAR VOTE: 31.8% (-3.9%)
+            
+            NEW SOUTH WALES: SEATS: 13 (-4); POPULAR VOTE: 31.5% (-5.0%)
+            VICTORIA: SEATS: 9 (-1); POPULAR VOTE: 32.2% (-0.9%)
+            QUEENSLAND: SEATS: 16 (-5); POPULAR VOTE: 34.9% (-4.7%)
+            WESTERN AUSTRALIA: SEATS: 4 (-1); POPULAR VOTE: 31.5% (-3.2%)
+            SOUTH AUSTRALIA: SEATS: 2 (-1); POPULAR VOTE: 28.4% (-7.1%)
+            TASMANIA: SEATS: 0 (-2); POPULAR VOTE: 24.5% (-8.4%)
+            AUSTRALIAN CAPITAL TERRITORY: SEATS: 0 (±0); POPULAR VOTE: 21.2% (-5.3%)
+            NORTHERN TERRITORY: SEATS: 0 (±0); POPULAR VOTE: 33.8% (+4.4%)
+            """.trimIndent(),
+        )
+    }
+
     private class Region constructor(val name: String) {
-        var seats: Map<Party, Int> = emptyMap()
+        var seats: Map<PartyOrCoalition, Int> = emptyMap()
             set(value) {
                 field = value
                 seatsPublisher.submit(seats)
@@ -789,7 +895,7 @@ class PartySummaryScreenTest {
             }
         val seatsPublisher = Publisher(seats)
 
-        var seatDiff: Map<Party, Int> = emptyMap()
+        var seatDiff: Map<PartyOrCoalition, Int> = emptyMap()
             set(value) {
                 field = value
                 seatDiffPublisher.submit(seatDiff)
@@ -797,7 +903,7 @@ class PartySummaryScreenTest {
             }
         val seatDiffPublisher = Publisher(seatDiff)
 
-        var votePct: Map<Party, Double> = emptyMap()
+        var votePct: Map<PartyOrCoalition, Double> = emptyMap()
             set(value) {
                 field = value
                 votePublisher.submit(votePct)
@@ -805,7 +911,7 @@ class PartySummaryScreenTest {
             }
         val votePublisher = Publisher(votePct)
 
-        var votePctDiff: Map<Party, Double> = emptyMap()
+        var votePctDiff: Map<PartyOrCoalition, Double> = emptyMap()
             set(value) {
                 field = value
                 voteDiffPublisher.submit(votePctDiff)
@@ -813,14 +919,14 @@ class PartySummaryScreenTest {
             }
         val voteDiffPublisher = Publisher(votePctDiff)
 
-        val prevSeats: Map<Party, Int>
+        val prevSeats: Map<PartyOrCoalition, Int>
             get() = sequenceOf(seats.keys, seatDiff.keys)
                 .flatten()
                 .distinct()
                 .associateWith { (seats[it] ?: 0) - (seatDiff[it] ?: 0) }
         val prevSeatPublisher = Publisher(prevSeats)
 
-        val prevVotePct: Map<Party, Double>
+        val prevVotePct: Map<PartyOrCoalition, Double>
             get() = sequenceOf(votePct.keys, votePctDiff.keys)
                 .flatten()
                 .distinct()
@@ -829,28 +935,28 @@ class PartySummaryScreenTest {
     }
 
     private class RegionWithPrev constructor(val name: String) {
-        var seats: Map<Party, Int> = emptyMap()
+        var seats: Map<PartyOrCoalition, Int> = emptyMap()
             set(value) {
                 field = value
                 seatsPublisher.submit(value)
             }
         val seatsPublisher = Publisher(seats)
 
-        var votes: Map<Party, Int> = emptyMap()
+        var votes: Map<PartyOrCoalition, Int> = emptyMap()
             set(value) {
                 field = value
                 votePublisher.submit(value)
             }
         val votePublisher = Publisher(votes)
 
-        var prevSeats: Map<Party, Int> = emptyMap()
+        var prevSeats: Map<PartyOrCoalition, Int> = emptyMap()
             set(value) {
                 field = value
                 prevSeatPublisher.submit(value)
             }
         val prevSeatPublisher = Publisher(prevSeats)
 
-        var prevVotes: Map<Party, Int> = emptyMap()
+        var prevVotes: Map<PartyOrCoalition, Int> = emptyMap()
             set(value) {
                 field = value
                 prevVotePublisher.submit(value)

@@ -4,6 +4,7 @@ import com.joecollins.graphics.GenericPanel
 import com.joecollins.graphics.components.GraphicsFrame.Companion.equaliseHeaderFonts
 import com.joecollins.graphics.components.RegionSummaryFrame
 import com.joecollins.models.general.Aggregators
+import com.joecollins.models.general.Coalition
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyOrCoalition
 import com.joecollins.pubsub.Publisher
@@ -148,8 +149,15 @@ class PartySummaryScreen private constructor(
         val seatPublisher = Publisher(calculateSeats())
         private fun updateSeats() = synchronized(this) { seatPublisher.submit(calculateSeats()) }
         private fun calculateSeats(): List<String> {
-            val seats = this.seats[this.party] ?: 0
-            val diff = this.seatDiff[this.party] ?: 0
+            val partiesToCount = this.party.let { party ->
+                if (party is Coalition) {
+                    listOf(party) + party.constituentParties
+                } else {
+                    listOf(party)
+                }
+            }
+            val seats = partiesToCount.sumOf { party -> this.seats[party] ?: 0 }
+            val diff = partiesToCount.sumOf { party -> this.seatDiff[party] ?: 0 }
             return listOf(
                 seats.toString(),
                 if (diff == 0) "\u00b10" else DecimalFormat("+0;-0").format(diff),
@@ -159,8 +167,15 @@ class PartySummaryScreen private constructor(
         val votePublisher = Publisher(calculateVotes())
         private fun updateVotes() = synchronized(this) { votePublisher.submit(calculateVotes()) }
         private fun calculateVotes(): List<String> {
-            val vote = this.votePct[this.party] ?: 0.0
-            val diff = this.votePctDiff[this.party] ?: 0.0
+            val partiesToCount = this.party.let { party ->
+                if (party is Coalition) {
+                    listOf(party) + party.constituentParties
+                } else {
+                    listOf(party)
+                }
+            }
+            val vote = partiesToCount.sumOf { party -> this.votePct[party] ?: 0.0 }
+            val diff = partiesToCount.sumOf { party -> this.votePctDiff[party] ?: 0.0 }
             return listOf(
                 DecimalFormat("0.0%").format(vote),
                 if (diff == 0.0) "\u00b10.0%" else DecimalFormat("+0.0%;-0.0%").format(diff),
