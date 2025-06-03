@@ -297,8 +297,8 @@ class SimpleVoteViewPanel private constructor(
                 map = map?.mapFrame,
                 secondMap = null,
                 keyTemplate = BasicResultPanel.PartyOrCandidateTemplate(),
-                voteTemplate = VotePctOnlyTemplate,
-                valueTemplate = VoteValueTemplate(VotePctOnlyTemplate),
+                voteTemplate = VotePctTemplate,
+                valueTemplate = VoteValueTemplate(VotePctTemplate),
                 others = PartyOrCandidate(Party.OTHERS),
                 title = title,
                 createBarFrame = {
