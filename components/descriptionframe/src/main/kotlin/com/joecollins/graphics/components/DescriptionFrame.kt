@@ -10,7 +10,8 @@ import javax.swing.JLabel
 class DescriptionFrame(header: Flow.Publisher<out String?>, text: Flow.Publisher<out String?>) : GraphicsFrame(header) {
     init {
         val centerLabel = JLabel()
-        centerLabel.font = StandardFont.readNormalFont(20)
+        val font = StandardFont.readNormalFont(15)
+        centerLabel.font = font
         centerLabel.foreground = Color.BLACK
         centerLabel.horizontalAlignment = JLabel.CENTER
         centerLabel.verticalAlignment = JLabel.TOP
@@ -18,7 +19,7 @@ class DescriptionFrame(header: Flow.Publisher<out String?>, text: Flow.Publisher
         text.subscribe(
             Subscriber(
                 eventQueueWrapper { desc: String? ->
-                    centerLabel.text = "<html><center>${desc?.replace("\n", "<br/>")}</center></html>"
+                    centerLabel.text = "<html><body style='font: ${font.size}px \"${font.name}\", ${font.family};'><center>${desc?.replace("\n", "<br/>")}</center></body></html>"
                     centerLabel.isVisible = desc != null
                 },
             ),
