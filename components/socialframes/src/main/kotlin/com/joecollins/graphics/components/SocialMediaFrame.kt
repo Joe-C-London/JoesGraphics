@@ -70,7 +70,7 @@ abstract class SocialMediaFrame<P : Post>(
         add(postPanel, BorderLayout.CENTER)
 
         val postLabel = JLabel()
-        postLabel.font = StandardFont.readNormalFont(16)
+        postLabel.font = StandardFont.readNormalFont(12)
         postLabel.foreground = Color.BLACK
         postLabel.verticalAlignment = JLabel.TOP
         postLabel.horizontalAlignment = JLabel.LEFT
@@ -86,7 +86,7 @@ abstract class SocialMediaFrame<P : Post>(
 
         postLabel.addComponentListener(object : ComponentAdapter() {
             override fun componentResized(e: ComponentEvent) {
-                postLabel.text = postLabel.text.replace(Regex("<html><body width=[0-9]+>"), "<html><body width=${postLabel.width}>")
+                postLabel.text = postLabel.text.replace(Regex("<html><body width=[0-9]+"), "<html><body width=${postLabel.width}")
                 postPanel.invalidate()
                 postPanel.revalidate()
                 postPanel.repaint()
@@ -208,8 +208,9 @@ abstract class SocialMediaFrame<P : Post>(
     private fun formatText(status: Post, isQuoted: Boolean, postLabel: JLabel): String {
         val colorHex = (color.rgb.and(0xffffff)).toString(16)
         val quotedURL = status.quoted?.url?.toString()
+        val font = postLabel.font
         if (status.user.isProtected) {
-            return "<html><body width=${postLabel.width}><span style='color:#$colorHex'>" +
+            return "<html><body width=${postLabel.width} style='font: ${font.size}px \"${font.name}\", ${font.family};'><span style='color:#$colorHex'>" +
                 protectedUserText +
                 "<br/>&nbsp;</span></body></html>"
         }
@@ -239,7 +240,7 @@ abstract class SocialMediaFrame<P : Post>(
         status.emojis.filter { !status.user.isProtected }.forEach {
             htmlText = htmlText.replace(it.text, "<img src='${it.url}' height='16' width='16'")
         }
-        return "<html><body width=${postLabel.width}>$htmlText<br/>&nbsp;</body></html>"
+        return "<html><body width=${postLabel.width} style='font: ${font.size}px \"${font.name}\", ${font.family};'>$htmlText<br/>&nbsp;</body></html>"
     }
 
     private inner class HeaderFrame(user: Flow.Publisher<out User>) : JPanel() {
@@ -414,7 +415,7 @@ abstract class SocialMediaFrame<P : Post>(
             add(postPanel, BorderLayout.CENTER)
 
             val postLabel = JLabel()
-            postLabel.font = StandardFont.readNormalFont(16)
+            postLabel.font = StandardFont.readNormalFont(12)
             postLabel.foreground = Color.BLACK
             postLabel.text = formatText(quotedStatus, true, postLabel)
             postLabel.alignmentX = LEFT_ALIGNMENT
@@ -422,7 +423,7 @@ abstract class SocialMediaFrame<P : Post>(
 
             postLabel.addComponentListener(object : ComponentAdapter() {
                 override fun componentResized(e: ComponentEvent) {
-                    postLabel.text = postLabel.text.replace(Regex("<html><body width=[0-9]+>"), "<html><body width=${postLabel.width}>")
+                    postLabel.text = postLabel.text.replace(Regex("<html><body width=[0-9]+"), "<html><body width=${postLabel.width}")
                     postPanel.invalidate()
                     postPanel.revalidate()
                     postPanel.repaint()
