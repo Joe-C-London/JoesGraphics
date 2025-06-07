@@ -165,6 +165,7 @@ class AllSeatsScreen private constructor(title: Flow.Publisher<out String?>, fra
             return AllSeatsScreen(title, frame, altText)
         }
 
+        @ConsistentCopyVisibility
         data class Group<T> internal constructor(val name: Flow.Publisher<String>, val predicate: T.() -> Boolean)
 
         fun <T> group(name: Flow.Publisher<String>, predicate: T.() -> Boolean) = Group(name, predicate)

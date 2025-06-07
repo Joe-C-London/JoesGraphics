@@ -1,5 +1,6 @@
 package com.joecollins.models.general
 
+@ConsistentCopyVisibility
 data class PartyOrCandidate private constructor(private val _party: Party?, private val _candidate: Candidate?) : CanOverrideSortOrder() {
 
     constructor(party: Party) : this(party, null)

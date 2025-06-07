@@ -62,6 +62,7 @@ class BarFrame(
         val leftIcon: Shape?,
         val series: List<Pair<Color, Number>>,
     ) {
+        @ConsistentCopyVisibility
         data class TextLine internal constructor(internal val text: String, internal val icon: Shape?)
 
         companion object {

@@ -134,6 +134,7 @@ object BarFrameBuilder {
         }
     }
 
+    @ConsistentCopyVisibility
     data class Lines<T> private constructor(val publisher: Flow.Publisher<List<T>>, val label: T.() -> String, val value: T.() -> Number) {
         val lines = publisher.map { values ->
             values.map { BarFrame.Line(it.value(), it.label()) }

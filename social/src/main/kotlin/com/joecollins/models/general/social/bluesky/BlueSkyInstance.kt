@@ -52,6 +52,7 @@ object BlueSkyInstance {
         execute(request) { }
     }
 
+    @Suppress("LEAKED_IN_PLACE_LAMBDA")
     @OptIn(ExperimentalContracts::class)
     fun <T> execute(request: () -> HttpUriRequestBase, response: (JsonElement) -> T): T {
         contract {

@@ -1052,6 +1052,7 @@ class SimpleVoteViewPanel private constructor(
         private var show: Flow.Publisher<out Boolean>? = null
         private val lines = LinkedList<Line>()
 
+        @ConsistentCopyVisibility
         data class LineLevel internal constructor(val pct: Double?, val votes: Int?)
 
         inner class Line internal constructor(val pct: Flow.Publisher<Double>?, val votes: Flow.Publisher<Int>?) {
