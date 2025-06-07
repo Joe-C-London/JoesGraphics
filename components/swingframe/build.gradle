@@ -22,7 +22,7 @@ dependencies {
     api topLevel.project('models')
     implementation topLevel.project('pubsub')
 
-    implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.4'
+    implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.5.0'
 
     testImplementation topLevel.project('testutils')
 
