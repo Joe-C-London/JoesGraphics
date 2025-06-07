@@ -25,6 +25,7 @@ dependencies {
 
     testImplementation "org.junit.jupiter:junit-jupiter-api:$topLevel.ext.junit_version"
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$topLevel.ext.junit_version"
+    testRuntimeOnly "org.junit.platform:junit-platform-launcher:$topLevel.ext.junit_platform_version"
 }
 
 test {

@@ -15,7 +15,8 @@ plugins {
     id "jacoco"
 }
 ext {
-    junit_version = "5.11.4"
+    junit_version = "5.13.1"
+    junit_platform_version = "1.13.1"
     awaitility_version = "4.3.0"
 }
 
