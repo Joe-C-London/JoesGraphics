@@ -15,6 +15,7 @@ import com.joecollins.models.general.NonPartisanCandidate
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyOrCandidate
 import com.joecollins.models.general.PartyOrCoalition
+import com.joecollins.models.general.ReferendumOption
 import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.combine
 import com.joecollins.pubsub.compose
@@ -425,6 +426,16 @@ class SimpleVoteViewPanel private constructor(
             CurrentVotes<NonPartisanCandidate, Int?>().apply(current),
             prev?.let { NonPartisanPrevVotes().apply(it) },
             map?.mapFrame,
+            title,
+        ).build()
+
+        fun <T> referendumVotes(
+            current: CurrentVotes<T, Int>.() -> Unit,
+            winningLine: (PctBasedWinningLine.() -> Unit)? = null,
+            title: Flow.Publisher<out String?>,
+        ) where T : Enum<T>, T : ReferendumOption = ReferendumVoteBuilder(
+            CurrentVotes<T, Int>().apply(current),
+            winningLine?.let { PctBasedWinningLine().apply(it) },
             title,
         ).build()
     }
@@ -1068,7 +1079,7 @@ class SimpleVoteViewPanel private constructor(
                 lines.add(this)
             }
 
-            internal fun line(pctReporting: Flow.Publisher<Double>?, totalVotes: Flow.Publisher<Int?>?): Flow.Publisher<Pair<Double, String>> {
+            internal fun line(pctReporting: Flow.Publisher<Double>?, totalVotes: Flow.Publisher<out Int?>?): Flow.Publisher<Pair<Double, String>> {
                 val votesPct = if (totalVotes == null) {
                     0.5.asOneTimePublisher()
                 } else {
@@ -1116,13 +1127,13 @@ class SimpleVoteViewPanel private constructor(
             percentage(pct).invoke(display)
         }
 
-        internal fun lines(pctReporting: Flow.Publisher<Double>?, totalVotes: Flow.Publisher<Int?>?): BarFrameBuilder.Lines<*> = BarFrameBuilder.Lines.of(linesRaw(pctReporting, totalVotes), { second }, { first })
+        internal fun lines(pctReporting: Flow.Publisher<Double>?, totalVotes: Flow.Publisher<out Int?>?): BarFrameBuilder.Lines<*> = BarFrameBuilder.Lines.of(linesRaw(pctReporting, totalVotes), { second }, { first })
 
-        internal fun maxPct(pctReporting: Flow.Publisher<Double>?, totalVotes: Flow.Publisher<Int?>?): Flow.Publisher<Double?> = linesRaw(pctReporting, totalVotes).map { l -> l.maxOfOrNull { it.first } }
+        internal fun maxPct(pctReporting: Flow.Publisher<Double>?, totalVotes: Flow.Publisher<out Int?>?): Flow.Publisher<Double?> = linesRaw(pctReporting, totalVotes).map { l -> l.maxOfOrNull { it.first } }
 
         private fun linesRaw(
             pctReporting: Flow.Publisher<Double>?,
-            totalVotes: Flow.Publisher<Int?>?,
+            totalVotes: Flow.Publisher<out Int?>?,
         ) = this.lines.map { it.line(pctReporting, totalVotes) }.combine()
             .run {
                 if (show == null) {
@@ -1964,6 +1975,90 @@ class SimpleVoteViewPanel private constructor(
                     }
             }
             return listOf<Flow.Publisher<out String?>>(title, votes, prev).combine().map { it.filterNotNull().joinToString("\n\n") }
+        }
+    }
+
+    internal class ReferendumVoteBuilder<T>(
+        private val current: CurrentVotes<T, Int>,
+        private val winningLine: WinningLine?,
+        private val title: Flow.Publisher<out String?>,
+    ) where T : Enum<T>, T : ReferendumOption {
+        fun build(): SimpleVoteViewPanel = SimpleVoteViewPanel(
+            title,
+            createResultFrame(),
+            null,
+            null,
+            null,
+            null,
+            createAltText(),
+        )
+
+        private fun createResultFrame(): JPanel {
+            val totalVotes: Flow.Publisher<Int> = current.votes.map { v ->
+                v.values.fold(0, Int::plus)
+            }
+            val bars = current.votes.merge(current.winner ?: null.asOneTimePublisher()) { r, w ->
+                val total = r.values.sum().toDouble()
+                r.entries.sortedBy { it.key.ordinal }
+                    .map { (c, v) ->
+                        BarFrameBuilder.BasicBar.of(
+                            listOf(
+                                c.description.uppercase() to (if (c == w) ImageGenerator.createTickShape() else null),
+                                "" to null,
+                            ),
+                            c.color,
+                            v / total.coerceAtLeast(1e-6),
+                            when {
+                                r.size == 1 -> listOf("UNCONTESTED")
+                                total == 0.0 -> listOf("WAITING...")
+                                else -> listOf(DecimalFormat("#,##0").format(v), DecimalFormat("0.0%").format(v / total))
+                            },
+                        )
+                    }
+            }
+            return BarFrameBuilder.basic(
+                barsPublisher = bars,
+                headerPublisher = current.header,
+                rightHeaderLabelPublisher = current.progressLabel,
+                subheadPublisher = current.subhead,
+                maxPublisher = current.votes.merge(totalVotes) { r, t -> r.values.sum() * 2 / 3 / t.toDouble().coerceAtLeast(1e-6) }
+                    .merge(current.pctReporting ?: 1.0.asOneTimePublisher()) { v, p -> v / p.coerceAtLeast(1e-6) }
+                    .let { m ->
+                        if (winningLine == null) {
+                            m
+                        } else {
+                            m.merge(winningLine.maxPct(current.pctReporting, totalVotes)) { a, b -> if (b == null) a else max(a, b * 1.2) }
+                        }
+                    },
+                linesPublisher = winningLine?.lines(current.pctReporting, totalVotes),
+                notesPublisher = current.notes,
+            )
+        }
+
+        private fun createAltText(): Flow.Publisher<String> {
+            val votes = current.header.merge(current.progressLabel ?: null.asOneTimePublisher()) { h, p -> if (p == null) h else listOfNotNull(h, "[$p]").joinToString(" ") }
+                .merge(current.subhead) { h, s -> listOfNotNull(h, s).filter { it.isNotEmpty() }.takeIf { it.isNotEmpty() }?.joinToString(", ") }
+                .merge(current.votes.merge(current.winner ?: null.asOneTimePublisher()) { r, w -> r to w }) { h, (r, w) ->
+                    val total = r.values.sum().toDouble()
+                    (if (h == null) "" else "$h\n") + r.entries.sortedBy { it.key.ordinal }
+                        .joinToString("\n") { (c, v) ->
+                            c.description.uppercase() +
+                                ": " +
+                                when {
+                                    r.size == 1 -> "UNCONTESTED"
+                                    total == 0.0 -> "WAITING..."
+                                    else -> "${DecimalFormat("#,##0").format(v)} (${DecimalFormat("0.0%").format(v / total)})"
+                                } +
+                                if (c == w) " WINNER" else ""
+                        }
+                }.run {
+                    if (winningLine == null) {
+                        this
+                    } else {
+                        merge(winningLine.altText()) { h, t -> listOfNotNull(h, t).joinToString("\n") }
+                    }
+                }
+            return listOf(title, votes).combine().map { it.joinToString("\n\n") }
         }
     }
 }
