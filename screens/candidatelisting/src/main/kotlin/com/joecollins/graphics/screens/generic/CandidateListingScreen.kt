@@ -108,6 +108,7 @@ class CandidateListingScreen private constructor(
             candidates: CandidatesPanel<NonPartisanCandidate>.() -> Unit,
             prev: (PrevPanel<NonPartisanCandidate>.() -> Unit)? = null,
             secondaryPrev: (PrevPanel<NonPartisanCandidate>.() -> Unit)? = null,
+            incumbentMarker: String? = null,
             map: SingleNoResultMap<*>? = null,
             showTwoColumns: Flow.Publisher<Boolean>? = null,
             title: Flow.Publisher<out String?>,
@@ -115,7 +116,7 @@ class CandidateListingScreen private constructor(
             val candidatesPanel = CandidatesPanel<NonPartisanCandidate>().apply(candidates)
             val prevPanel = prev?.let { PrevPanel<NonPartisanCandidate>().apply(it) }
             val secondaryPrevPanel = secondaryPrev?.let { PrevPanel<NonPartisanCandidate>().apply(it) }
-            val combinedFunc: NonPartisanCandidate.() -> String = { fullName.uppercase() + (if (description == null) "" else " (${description!!.uppercase()})") }
+            val combinedFunc: NonPartisanCandidate.() -> String = { fullName.uppercase() + (if (description == null) "" else " (${description!!.uppercase()})") + (if (incumbent && incumbentMarker != null) " [$incumbentMarker]" else "") }
             return CandidateListingScreen(
                 title,
                 createCandidatesPanel(
@@ -125,7 +126,7 @@ class CandidateListingScreen private constructor(
                     { description?.uppercase() ?: "" },
                     { color },
                     combinedFunc,
-                    { null },
+                    { if (incumbentMarker != null && incumbent) ImageGenerator.createBoxedTextShape(incumbentMarker) else null },
                 ),
                 prevPanel?.run {
                     createPrevPanel(

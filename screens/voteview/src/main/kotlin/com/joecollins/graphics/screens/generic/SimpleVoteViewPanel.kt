@@ -205,7 +205,7 @@ class SimpleVoteViewPanel private constructor(
         ).build()
 
         fun candidateVotes(
-            current: CandidateCurrentVotes<Int?>.() -> Unit,
+            current: CandidateCurrentVotes<Candidate, Int?>.() -> Unit,
             prev: (PrevVotesNoSwing<Party>.() -> Unit)? = null,
             winningLine: (VoteBasedWinningLine.() -> Unit)? = null,
             displayLimit: (DisplayLimit<Party>.() -> Unit)? = null,
@@ -213,7 +213,7 @@ class SimpleVoteViewPanel private constructor(
             map: AbstractMap<*>? = null,
             title: Flow.Publisher<out String?>,
         ): SimpleVoteViewPanel {
-            val currentVotes = CandidateCurrentVotes<Int?>().apply(current)
+            val currentVotes = CandidateCurrentVotes<Candidate, Int?>().apply(current)
             return VoteScreenBuilder<Candidate, Party, Int?, Double, Double, BarFrameBuilder.BasicBar>(
                 current = currentVotes,
                 prev = prev?.let { PrevVotes<Party>().apply(it) },
@@ -243,14 +243,14 @@ class SimpleVoteViewPanel private constructor(
         }
 
         fun candidateVotes(
-            current: CandidateCurrentVotes<Int?>.() -> Unit,
+            current: CandidateCurrentVotes<Candidate, Int?>.() -> Unit,
             prev: (PrevVotes<Party>.() -> Unit)? = null,
             winningLine: (VoteBasedWinningLine.() -> Unit)? = null,
             displayLimit: (DisplayLimit<Party>.() -> Unit)? = null,
             map: AbstractMap<*>? = null,
             title: Flow.Publisher<out String?>,
         ): SimpleVoteViewPanel {
-            val currentVotes = CandidateCurrentVotes<Int?>().apply(current)
+            val currentVotes = CandidateCurrentVotes<Candidate, Int?>().apply(current)
             return VoteScreenBuilder<Candidate, Party, Int?, Double, Double, BarFrameBuilder.BasicBar>(
                 current = currentVotes,
                 prev = prev?.let { PrevVotes<Party>().apply(it) },
@@ -418,12 +418,12 @@ class SimpleVoteViewPanel private constructor(
         ).build()
 
         fun nonPartisanVotes(
-            current: CurrentVotes<NonPartisanCandidate, Int?>.() -> Unit,
+            current: CandidateCurrentVotes<NonPartisanCandidate, Int?>.() -> Unit,
             prev: (NonPartisanPrevVotes.() -> Unit)? = null,
             map: SingleNonPartisanResultMap<*>? = null,
             title: Flow.Publisher<out String?>,
         ): SimpleVoteViewPanel = NonPartisanVoteBuilder(
-            CurrentVotes<NonPartisanCandidate, Int?>().apply(current),
+            CandidateCurrentVotes<NonPartisanCandidate, Int?>().apply(current),
             prev?.let { NonPartisanPrevVotes().apply(it) },
             map?.mapFrame,
             title,
@@ -998,13 +998,13 @@ class SimpleVoteViewPanel private constructor(
 
     class CurrentVotes<KT : Any, CT> internal constructor() : AbstractCurrentVotes<KT, CT>()
 
-    class CandidateCurrentVotes<CT> internal constructor() : AbstractCurrentVotes<Candidate, CT>() {
+    class CandidateCurrentVotes<KT : Any, CT> internal constructor() : AbstractCurrentVotes<KT, CT>() {
         var incumbentMarker: String? = null
         var display: Display = Display.VOTES_AND_PCT
-        var winners: Flow.Publisher<out Set<Candidate>?>? = null
-        var runoff: Flow.Publisher<out Set<Candidate>?>? = null
+        var winners: Flow.Publisher<out Set<KT>?>? = null
+        var runoff: Flow.Publisher<out Set<KT>?>? = null
 
-        override var winner: Flow.Publisher<out Candidate?>?
+        override var winner: Flow.Publisher<out KT?>?
             get() {
                 throw IllegalStateException("This property is write-only")
             }
@@ -1012,10 +1012,10 @@ class SimpleVoteViewPanel private constructor(
                 winners = value?.map { w -> if (w == null) null else setOf(w) }
             }
 
-        override val result: Flow.Publisher<ElectionResult<Candidate>>
+        override val result: Flow.Publisher<ElectionResult<KT>>
             get() {
                 return if (runoff == null) {
-                    winners?.map { ElectionResult(winners = it) } ?: ElectionResult<Candidate>().asOneTimePublisher()
+                    winners?.map { ElectionResult(winners = it) } ?: ElectionResult<KT>().asOneTimePublisher()
                 } else if (winners == null) {
                     runoff!!.map { ElectionResult(runoff = it) }
                 } else {
@@ -1870,7 +1870,7 @@ class SimpleVoteViewPanel private constructor(
     }
 
     internal class NonPartisanVoteBuilder(
-        private val current: CurrentVotes<NonPartisanCandidate, Int?>,
+        private val current: CandidateCurrentVotes<NonPartisanCandidate, Int?>,
         private val prev: NonPartisanPrevVotes?,
         private val map: MapFrame?,
         private val title: Flow.Publisher<out String?>,
@@ -1886,23 +1886,28 @@ class SimpleVoteViewPanel private constructor(
         )
 
         private fun createResultFrame(): JPanel {
-            val bars = current.votes.merge(current.winner ?: null.asOneTimePublisher()) { r, w ->
-                val total = if (r.values.any { it == null }) {
+            val result = (current.winners ?: null.asOneTimePublisher()).merge(current.runoff ?: null.asOneTimePublisher()) { w, r -> w to r }
+            val bars = current.votes.merge(result) { votes, (w, r) ->
+                val total = if (votes.values.any { it == null }) {
                     null
                 } else {
-                    r.values.sumOf { it!! }.toDouble()
+                    votes.values.sumOf { it!! }.toDouble()
                 }
-                r.entries.sortedByDescending { it.key.overrideSortOrder ?: it.value ?: 0 }
+                votes.entries.sortedByDescending { it.key.overrideSortOrder ?: it.value ?: 0 }
                     .map { (c, v) ->
                         BarFrameBuilder.BasicBar.of(
-                            listOf(
-                                c.fullName.uppercase() to (if (c == w) ImageGenerator.createTickShape() else null),
-                                (c.description?.uppercase() ?: "") to null,
+                            listOfNotNull(
+                                c.fullName.uppercase() to listOf(
+                                    if (c.incumbent && current.incumbentMarker != null) ImageGenerator.createBoxedTextShape(current.incumbentMarker!!) else null,
+                                    if (w?.contains(c) ?: false) ImageGenerator.createTickShape() else null,
+                                    if (r?.contains(c) ?: false) ImageGenerator.createRunoffShape() else null,
+                                ).reduce { a, b -> a.combineHorizontal(b) },
+                                c.description?.let { it.uppercase() to null },
                             ),
                             c.color,
                             v ?: 0,
                             when {
-                                r.size == 1 -> listOf("UNCONTESTED")
+                                votes.size == 1 -> listOf("UNCONTESTED")
                                 v == null || total == 0.0 -> listOf("WAITING...")
                                 total == null -> listOf(DecimalFormat("#,##0").format(v))
                                 else -> listOf(DecimalFormat("#,##0").format(v), DecimalFormat("0.0%").format(v / total))
@@ -1912,6 +1917,7 @@ class SimpleVoteViewPanel private constructor(
             }
             return BarFrameBuilder.basic(
                 barsPublisher = bars,
+                minBarLines = 2,
                 headerPublisher = current.header,
                 rightHeaderLabelPublisher = current.progressLabel,
                 subheadPublisher = current.subhead,
@@ -1944,21 +1950,32 @@ class SimpleVoteViewPanel private constructor(
         }
 
         private fun createAltText(): Flow.Publisher<String> {
+            val result = (current.winners ?: null.asOneTimePublisher()).merge(current.runoff ?: null.asOneTimePublisher()) { w, r -> w to r }
             val votes = current.header.merge(current.progressLabel ?: null.asOneTimePublisher()) { h, p -> if (p == null) h else listOfNotNull(h, "[$p]").joinToString(" ") }
                 .merge(current.subhead) { h, s -> listOfNotNull(h, s).filter { it.isNotEmpty() }.takeIf { it.isNotEmpty() }?.joinToString(", ") }
-                .merge(current.votes.merge(current.winner ?: null.asOneTimePublisher()) { r, w -> r to w }) { h, (r, w) ->
-                    val total = if (r.values.any { it == null }) null else r.values.sumOf { it!! }.toDouble()
-                    (if (h == null) "" else "$h\n") + r.entries.sortedByDescending { it.key.overrideSortOrder ?: it.value ?: 0 }
+                .merge(current.votes.merge(result) { r, w -> r to w }) { h, (votes, result) ->
+                    val (w, r) = result
+                    val total = if (votes.values.any { it == null }) null else votes.values.sumOf { it!! }.toDouble()
+                    (if (h == null) "" else "$h\n") + votes.entries.sortedByDescending { it.key.overrideSortOrder ?: it.value ?: 0 }
                         .joinToString("\n") { (c, v) ->
                             c.fullName.uppercase() +
+                                (if (c.incumbent && current.incumbentMarker != null) " [${current.incumbentMarker}]" else "") +
                                 (if (c.description.isNullOrEmpty()) "" else " (${c.description!!.uppercase()})") + ": " +
                                 when {
-                                    r.size == 1 -> "UNCONTESTED"
+                                    votes.size == 1 -> "UNCONTESTED"
                                     v == null || total == 0.0 -> "WAITING..."
                                     total == null -> DecimalFormat("#,##0").format(v)
                                     else -> "${DecimalFormat("#,##0").format(v)} (${DecimalFormat("0.0%").format(v / total)})"
                                 } +
-                                if (c == w) " WINNER" else ""
+                                (
+                                    if (w?.contains(c) ?: false) {
+                                        " WINNER"
+                                    } else if (r?.contains(c) ?: false) {
+                                        " RUNOFF"
+                                    } else {
+                                        ""
+                                    }
+                                    )
                         }
                 }
             val prev = if (prev == null) {

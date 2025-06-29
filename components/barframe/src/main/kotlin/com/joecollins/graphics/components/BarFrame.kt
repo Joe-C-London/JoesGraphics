@@ -269,7 +269,7 @@ class BarFrame(
                 val lineString = i.value.text
                 val lineIcon = i.value.icon?.run {
                     val leftIconBounds = bounds
-                    val leftIconScale = (barHeight / max(leftText.size, rightText.size) - 2 * BAR_MARGIN) / leftIconBounds.getHeight()
+                    val leftIconScale = (barHeight / numLines - 2 * BAR_MARGIN) / leftIconBounds.getHeight()
                     val transform = AffineTransform.getScaleInstance(leftIconScale, leftIconScale)
                     transform.createTransformedShape(this)
                 }

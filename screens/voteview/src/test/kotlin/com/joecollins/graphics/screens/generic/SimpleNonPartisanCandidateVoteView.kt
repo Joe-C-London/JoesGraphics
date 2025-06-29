@@ -374,4 +374,145 @@ class SimpleNonPartisanCandidateVoteView {
             """.trimIndent(),
         )
     }
+
+    @Test
+    fun testNonPartisanVoteIncumbentMarker() {
+        val title = Publisher("IQALUIT-TASILUK")
+        val curr = Publisher(
+            mapOf(
+                NonPartisanCandidate("James T. Arreak") to 133,
+                NonPartisanCandidate("George Hicks", incumbent = true) to 265,
+                NonPartisanCandidate("Jonathan Chul-Hee Min Park") to 41,
+                NonPartisanCandidate("Michael Salomonie") to 81,
+            ),
+        )
+        val prev = Publisher(
+            mapOf(
+                NonPartisanCandidate("George Hicks") to 449,
+                NonPartisanCandidate("Jacopoosie Peter") to 121,
+            ),
+        )
+        val panel = nonPartisanVotes(
+            current = {
+                votes = curr
+                header = "2021 RESULT".asOneTimePublisher()
+                subhead = "".asOneTimePublisher()
+                incumbentMarker = "MLA"
+            },
+            prev = {
+                votes = prev
+                header = "2017 RESULT".asOneTimePublisher()
+            },
+            title = title,
+        )
+        panel.setSize(1024, 512)
+        compareRendering("SimpleVoteViewPanel", "NonPartisanIncumbent-1", panel)
+        assertPublishes(
+            panel.altText,
+            """
+                IQALUIT-TASILUK
+                
+                2021 RESULT
+                GEORGE HICKS [MLA]: 265 (51.0%)
+                JAMES T. ARREAK: 133 (25.6%)
+                MICHAEL SALOMONIE: 81 (15.6%)
+                JONATHAN CHUL-HEE MIN PARK: 41 (7.9%)
+                
+                2017 RESULT
+                HICKS: 78.8%
+                PETER: 21.2%
+            """.trimIndent(),
+        )
+
+        title.submit("IQALUIT-NIAQUNNGUU")
+        curr.submit(
+            mapOf(
+                NonPartisanCandidate("P.J. Akeeagok") to 404,
+                NonPartisanCandidate("Noah Papatsie") to 54,
+                NonPartisanCandidate("Dinos Tikivik") to 21,
+            ),
+        )
+        prev.submit(
+            mapOf(
+                NonPartisanCandidate("Pat Angnakak") to 231,
+                NonPartisanCandidate("Franco Buscemi") to 196,
+                NonPartisanCandidate("Anne Crawford") to 134,
+            ),
+        )
+        compareRendering("SimpleVoteViewPanel", "NonPartisanIncumbent-2", panel)
+        assertPublishes(
+            panel.altText,
+            """
+                IQALUIT-NIAQUNNGUU
+
+                2021 RESULT
+                P.J. AKEEAGOK: 404 (84.3%)
+                NOAH PAPATSIE: 54 (11.3%)
+                DINOS TIKIVIK: 21 (4.4%)
+                
+                2017 RESULT
+                ANGNAKAK: 41.2%
+                BUSCEMI: 34.9%
+                CRAWFORD: 23.9%
+            """.trimIndent(),
+        )
+
+        title.submit("ARVIAT SOUTH")
+        curr.submit(
+            mapOf(
+                NonPartisanCandidate("Joe Savikataaq", incumbent = true) to 0,
+            ),
+        )
+        prev.submit(
+            mapOf(
+                NonPartisanCandidate("Jason Gibbons") to 234,
+                NonPartisanCandidate("Joe Savikataaq") to 280,
+            ),
+        )
+        compareRendering("SimpleVoteViewPanel", "NonPartisanIncumbent-3", panel)
+        assertPublishes(
+            panel.altText,
+            """
+                ARVIAT SOUTH
+
+                2021 RESULT
+                JOE SAVIKATAAQ [MLA]: UNCONTESTED
+                
+                2017 RESULT
+                SAVIKATAAQ: 54.5%
+                GIBBONS: 45.5%
+            """.trimIndent(),
+        )
+
+        title.submit("KUGLUKTUK")
+        curr.submit(
+            mapOf(
+                NonPartisanCandidate("Bobby Anavilok") to 170,
+                NonPartisanCandidate("Angele Kuliktana") to 77,
+                NonPartisanCandidate("Genevieve Nivingalok") to 51,
+                NonPartisanCandidate("Calvin Aivgak Pedersen", incumbent = true) to 140,
+            ),
+        )
+        prev.submit(
+            mapOf(
+                NonPartisanCandidate("Mila Adjukak Kamingoak") to 0,
+            ),
+        )
+        compareRendering("SimpleVoteViewPanel", "NonPartisanIncumbent-4", panel)
+        assertPublishes(
+            panel.altText,
+            """
+                KUGLUKTUK
+
+                2021 RESULT
+                BOBBY ANAVILOK: 170 (38.8%)
+                CALVIN AIVGAK PEDERSEN [MLA]: 140 (32.0%)
+                ANGELE KULIKTANA: 77 (17.6%)
+                GENEVIEVE NIVINGALOK: 51 (11.6%)
+                
+                2017 RESULT
+                KAMINGOAK: UNCONTESTED
+            """.trimIndent(),
+        )
+    }
 }

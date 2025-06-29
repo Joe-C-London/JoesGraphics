@@ -705,6 +705,87 @@ class CandidateListingScreenTest {
         )
     }
 
+    @Test
+    fun testNonPartisanCandidatesListIncumbents() {
+        val title = Publisher("IQALUIT-TASILUK")
+        val candidates = Publisher(
+            listOf(
+                NonPartisanCandidate("James T. Arreak"),
+                NonPartisanCandidate("George Hicks", incumbent = true),
+                NonPartisanCandidate("Jonathan Chul-Hee Min Park"),
+                NonPartisanCandidate("Michael Salomonie"),
+            ),
+        )
+        val prev = Publisher(
+            mapOf(
+                NonPartisanCandidate("George Hicks") to 449,
+                NonPartisanCandidate("Jacopoosie Peter") to 121,
+            ),
+        )
+        val screen = CandidateListingScreen.ofNonPartisan(
+            candidates = {
+                list = candidates
+                header = "2021 CANDIDATES".asOneTimePublisher()
+                subhead = "".asOneTimePublisher()
+            },
+            prev = {
+                votes = prev
+                header = "2017 RESULT".asOneTimePublisher()
+            },
+            incumbentMarker = "MLA",
+            title = title,
+        )
+        screen.size = Dimension(1024, 512)
+        compareRendering("CandidateListingScreen", "NonPartisanIncumbent-1", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            IQALUIT-TASILUK
+
+            2021 CANDIDATES
+            JAMES T. ARREAK
+            GEORGE HICKS [MLA]
+            JONATHAN CHUL-HEE MIN PARK
+            MICHAEL SALOMONIE
+            
+            2017 RESULT
+            HICKS: 78.8%
+            PETER: 21.2%
+            """.trimIndent(),
+        )
+
+        title.submit("KUGLUKTUK")
+        candidates.submit(
+            listOf(
+                NonPartisanCandidate("Bobby Anavilok"),
+                NonPartisanCandidate("Angele Kuliktana"),
+                NonPartisanCandidate("Genevieve Nivingalok"),
+                NonPartisanCandidate("Calvin Aivgak Pedersen", incumbent = true),
+            ),
+        )
+        prev.submit(
+            mapOf(
+                NonPartisanCandidate("Mila Adjukak Kamingoak") to 0,
+            ),
+        )
+        compareRendering("CandidateListingScreen", "NonPartisanIncumbent-2", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            KUGLUKTUK
+
+            2021 CANDIDATES
+            BOBBY ANAVILOK
+            ANGELE KULIKTANA
+            GENEVIEVE NIVINGALOK
+            CALVIN AIVGAK PEDERSEN [MLA]
+            
+            2017 RESULT
+            KAMINGOAK: UNCONTESTED
+            """.trimIndent(),
+        )
+    }
+
     private fun peiShapesByDistrict(): Map<Int, Shape> {
         val peiMap = CandidateListingScreenTest::class.java
             .classLoader
