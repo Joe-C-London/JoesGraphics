@@ -2004,7 +2004,6 @@ class SimpleVoteViewPanel private constructor(
                         BarFrameBuilder.BasicBar.of(
                             listOf(
                                 c.description.uppercase() to (if (c == w) ImageGenerator.createTickShape() else null),
-                                "" to null,
                             ),
                             c.color,
                             v / total.coerceAtLeast(1e-6),
@@ -2018,6 +2017,7 @@ class SimpleVoteViewPanel private constructor(
             }
             return BarFrameBuilder.basic(
                 barsPublisher = bars,
+                minBarLines = 2,
                 headerPublisher = current.header,
                 rightHeaderLabelPublisher = current.progressLabel,
                 subheadPublisher = current.subhead,

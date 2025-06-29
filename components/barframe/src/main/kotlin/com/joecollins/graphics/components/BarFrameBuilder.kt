@@ -149,6 +149,7 @@ object BarFrameBuilder {
 
     fun basic(
         barsPublisher: Flow.Publisher<out List<BasicBar>>,
+        minBarLines: Int = 0,
         headerPublisher: Flow.Publisher<out String?> = null.asOneTimePublisher(),
         rightHeaderLabelPublisher: Flow.Publisher<out String?>? = null,
         subheadPublisher: Flow.Publisher<out String?>? = null,
@@ -183,6 +184,7 @@ object BarFrameBuilder {
                     this.merge(minBarCountPublisher, BarFrameBuilder::createMinBars)
                 }
             },
+            minBarLines = minBarLines,
             headerPublisher = headerPublisher,
             headerLabelsPublisher = rightHeaderLabelPublisher?.map { mapOf(GraphicsFrame.HeaderLabelLocation.RIGHT to it) },
             subheadTextPublisher = subheadPublisher,

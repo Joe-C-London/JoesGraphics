@@ -34,6 +34,7 @@ class BarFrame(
     subheadTextPublisher: Flow.Publisher<out String?>? = null,
     subheadColorPublisher: Flow.Publisher<out Color>? = null,
     barsPublisher: Flow.Publisher<out List<Bar>>,
+    private val minBarLines: Int = 0,
     linesPublisher: Flow.Publisher<out List<Line>>? = null,
     minPublisher: Flow.Publisher<out Number>? = null,
     maxPublisher: Flow.Publisher<out Number>? = null,
@@ -175,7 +176,7 @@ class BarFrame(
             get() {
                 val leftLines = leftText.toTypedArray().size
                 val rightLines = rightText.toTypedArray().size
-                return max(leftLines, rightLines)
+                return max(leftLines, rightLines).coerceAtLeast(minBarLines)
             }
 
         override fun paintComponent(g: Graphics) {
