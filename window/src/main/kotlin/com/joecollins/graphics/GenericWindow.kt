@@ -45,6 +45,10 @@ class GenericWindow<T : JPanel> constructor(private val panel: T, title: String)
 
     companion object {
 
+        init {
+            System.setProperty("apple.laf.useScreenMenuBar", "true")
+        }
+
         private fun saveImageToFile(panel: JPanel) {
             val fileChooser = JFileChooser()
             fileChooser.currentDirectory = File(System.getProperty("user.home"), "Pictures/Joe's Politics")
