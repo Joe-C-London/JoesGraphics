@@ -11,6 +11,7 @@ import java.util.LinkedList
 import java.util.Queue
 import javax.imageio.ImageIO
 import javax.swing.JPanel
+import kotlin.math.abs
 
 object RenderTestUtils {
 
@@ -48,9 +49,9 @@ object RenderTestUtils {
         var diff = 0
         for (x in 0 until imageA.width) {
             for (y in 0 until imageA.height) {
-                diff += ((imageA.getRGB(x, y) and 0x00ff0000) shr 16) - ((imageB.getRGB(x, y) and 0x00ff0000) shr 16)
-                diff += ((imageA.getRGB(x, y) and 0x0000ff00) shr 8) - ((imageB.getRGB(x, y) and 0x0000ff00) shr 8)
-                diff += ((imageA.getRGB(x, y) and 0x000000ff) shr 0) - ((imageB.getRGB(x, y) and 0x000000ff) shr 0)
+                diff += abs(((imageA.getRGB(x, y) and 0x00ff0000) shr 16) - ((imageB.getRGB(x, y) and 0x00ff0000) shr 16))
+                diff += abs(((imageA.getRGB(x, y) and 0x0000ff00) shr 8) - ((imageB.getRGB(x, y) and 0x0000ff00) shr 8))
+                diff += abs(((imageA.getRGB(x, y) and 0x000000ff) shr 0) - ((imageB.getRGB(x, y) and 0x000000ff) shr 0))
             }
         }
         return diff.toFloat() / (imageA.width * imageA.height * 3)
