@@ -289,7 +289,7 @@ class BarFrame(
                 }
                 g.font = lineFont
                 val lineLeftTextWidth = g.getFontMetrics(lineFont).stringWidth(lineString)
-                val spaceWidth = g.getFontMetrics(lineFont).stringWidth(" ")
+                val spaceWidth = g.getFontMetrics(lineFont).stringWidth(if (lineString.isEmpty()) "" else " ")
                 val lineLeftIconWidth = lineIcon?.bounds?.width
                 val textHeight = lineFont.size
                 val textBase = (i.index + 1) * (barHeight + textHeight) / (leftText.size + 1)

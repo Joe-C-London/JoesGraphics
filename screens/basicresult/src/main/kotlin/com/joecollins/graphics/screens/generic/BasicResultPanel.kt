@@ -14,7 +14,8 @@ object BasicResultPanel {
         fun toParty(key: KT): KPT
         fun toMainBarHeader(key: KT, forceSingleLine: Boolean): List<String>
         fun toMainAltTextHeader(key: KT): String
-        fun incumbentShape(key: KT, forceSingleLine: Boolean): Shape?
+        fun partyShape(key: KT): Shape?
+        fun incumbentShape(key: KT): Shape?
         fun winnerShape(forceSingleLine: Boolean): Shape
         fun runoffShape(forceSingleLine: Boolean): Shape
     }
@@ -26,7 +27,9 @@ object BasicResultPanel {
 
         override fun toMainAltTextHeader(key: P): String = key.name.uppercase()
 
-        override fun incumbentShape(key: P, forceSingleLine: Boolean): Shape? = null
+        override fun partyShape(key: P): Shape? = null
+
+        override fun incumbentShape(key: P): Shape? = null
 
         override fun winnerShape(forceSingleLine: Boolean): Shape = ImageGenerator.createTickShape()
 
@@ -40,7 +43,9 @@ object BasicResultPanel {
 
         override fun toMainAltTextHeader(key: PartyOrCandidate): String = key.name.uppercase()
 
-        override fun incumbentShape(key: PartyOrCandidate, forceSingleLine: Boolean): Shape? = null
+        override fun partyShape(key: PartyOrCandidate): Shape? = null
+
+        override fun incumbentShape(key: PartyOrCandidate): Shape? = null
 
         override fun winnerShape(forceSingleLine: Boolean): Shape = ImageGenerator.createTickShape()
 
@@ -63,7 +68,7 @@ object BasicResultPanel {
         override fun toMainBarHeader(key: Candidate, forceSingleLine: Boolean): List<String> = if (key.name.isBlank()) {
             listOf(key.party.name.uppercase())
         } else if (forceSingleLine) {
-            listOf(("${key.name} (" + key.party.abbreviation + ")").uppercase())
+            listOf(key.name.uppercase())
         } else {
             listOf(key.name.uppercase(), key.party.name.uppercase())
         }
@@ -75,10 +80,12 @@ object BasicResultPanel {
                 .uppercase()
         }
 
-        override fun incumbentShape(key: Candidate, forceSingleLine: Boolean): Shape? = if (incumbentMarker == null || !key.incumbent) {
+        override fun partyShape(key: Candidate): Shape? = if (key == Candidate.OTHERS) null else ImageGenerator.createBoxedTextShape(key.party.name.uppercase())
+
+        override fun incumbentShape(key: Candidate): Shape? = if (incumbentMarker == null || !key.incumbent) {
             null
         } else {
-            ImageGenerator.createBoxedTextShape(incumbentMarker)
+            ImageGenerator.createFilledBoxedTextShape(incumbentMarker)
         }
 
         override fun winnerShape(forceSingleLine: Boolean): Shape = ImageGenerator.createTickShape()

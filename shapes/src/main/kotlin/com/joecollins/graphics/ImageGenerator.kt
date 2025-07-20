@@ -61,6 +61,16 @@ object ImageGenerator {
         return area
     }
 
+    fun createFilledBoxedTextShape(text: String): Shape {
+        val font = StandardFont.readBoldFont(60)
+        val textShape = font.createGlyphVector(FontRenderContext(AffineTransform(), true, true), text).outline
+        val area = Area(Rectangle(0, 10, 25 + textShape.bounds2D.width.roundToInt(), 80))
+        area.subtract(Area(AffineTransform.getTranslateInstance(10.0, 70.0).createTransformedShape(textShape)))
+        area.add(Area(Rectangle2D.Double(0.0, 100.0 - 1e-6, 1e-6, 1e-6)))
+        area.add(Area(Rectangle2D.Double(0.0, 0.0, 1e-6, 1e-6)))
+        return area
+    }
+
     fun Shape?.combineHorizontal(s: Shape?): Shape? {
         if (s == null) return this
         if (this == null) return s
@@ -68,4 +78,6 @@ object ImageGenerator {
         area.add(Area(AffineTransform.getTranslateInstance(bounds2D.width + 20, 0.0).createTransformedShape(s)))
         return area
     }
+
+    operator fun Shape?.plus(s: Shape?): Shape? = combineHorizontal(s)
 }

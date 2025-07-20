@@ -973,7 +973,7 @@ class SeatViewPanel private constructor(
                         entries.joinToString("") {
                             "\n${
                                 barEntryLine(
-                                    keyTemplate.toMainBarHeader(it.key, true).first(),
+                                    keyTemplate.toMainAltTextHeader(it.key),
                                     it.value,
                                     null,
                                     null,
@@ -987,7 +987,7 @@ class SeatViewPanel private constructor(
                         entries.joinToString("") {
                             "\n${
                                 barEntryLine(
-                                    if (it.key == null) it.party.name.uppercase() else keyTemplate.toMainBarHeader(it.key, true).first(),
+                                    if (it.key == null) it.party.name.uppercase() else keyTemplate.toMainAltTextHeader(it.key),
                                     it.curr ?: seatTemplate.default,
                                     it.diff,
                                     if ((countByParty[it.key?.let(keyTemplate::toParty) ?: it.party] ?: 0) > 1) "^" else null,

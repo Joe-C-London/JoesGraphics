@@ -3,6 +3,7 @@ package com.joecollins.graphics.screens.generic
 import com.joecollins.graphics.AltTextProvider
 import com.joecollins.graphics.GenericPanel
 import com.joecollins.graphics.ImageGenerator
+import com.joecollins.graphics.ImageGenerator.plus
 import com.joecollins.graphics.components.BarFrame
 import com.joecollins.graphics.components.BarFrameBuilder
 import com.joecollins.graphics.components.MapFrame
@@ -124,11 +125,14 @@ class MultiResultScreen private constructor(
                             isRunoff -> ImageGenerator.createRunoffShape()
                             else -> null
                         },
-                        if (!useIncumbentMarker) {
-                            null
-                        } else {
-                            ImageGenerator.createBoxedTextShape(incumbentMarker!!)
-                        },
+                        ImageGenerator.createBoxedTextShape(candidate.party.name.uppercase()) +
+                            (
+                                if (!useIncumbentMarker) {
+                                    null
+                                } else {
+                                    ImageGenerator.createFilledBoxedTextShape(incumbentMarker!!)
+                                }
+                                ),
                     )
                     val leftLabel: List<String> = when {
                         partiesOnly -> {
@@ -138,7 +142,7 @@ class MultiResultScreen private constructor(
                             listOf("OTHERS")
                         }
                         else -> {
-                            listOf(candidate.name.uppercase(), candidate.party.abbreviation)
+                            listOf(candidate.name.uppercase(), "")
                         }
                     }
                     val rightLabel: List<String> = when {

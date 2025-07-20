@@ -72,7 +72,7 @@ class CandidateListingScreen private constructor(
                     { party.name.uppercase() },
                     { party.color },
                     combinedFunc,
-                    { if (incumbentMarker != null && incumbent) ImageGenerator.createBoxedTextShape(incumbentMarker) else null },
+                    { if (incumbentMarker != null && incumbent) ImageGenerator.createFilledBoxedTextShape(incumbentMarker) else null },
                 ),
                 prevPanel?.run {
                     createPrevPanel(
@@ -126,7 +126,7 @@ class CandidateListingScreen private constructor(
                     { description?.uppercase() ?: "" },
                     { color },
                     combinedFunc,
-                    { if (incumbentMarker != null && incumbent) ImageGenerator.createBoxedTextShape(incumbentMarker) else null },
+                    { if (incumbentMarker != null && incumbent) ImageGenerator.createFilledBoxedTextShape(incumbentMarker) else null },
                 ),
                 prevPanel?.run {
                     createPrevPanel(

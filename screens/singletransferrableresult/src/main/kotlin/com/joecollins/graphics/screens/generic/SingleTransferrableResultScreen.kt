@@ -4,6 +4,7 @@ import com.joecollins.graphics.AltTextProvider
 import com.joecollins.graphics.GenericPanel
 import com.joecollins.graphics.ImageGenerator
 import com.joecollins.graphics.ImageGenerator.combineHorizontal
+import com.joecollins.graphics.ImageGenerator.plus
 import com.joecollins.graphics.components.BarFrameBuilder
 import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.Party
@@ -68,15 +69,16 @@ class SingleTransferrableResultScreen private constructor(
                     .filter { !votes.containsKey(it.first) }
                     .map {
                         BarFrameBuilder.BasicBar.of(
-                            label = it.first.name.uppercase() + " (${it.first.party.abbreviation.uppercase()})",
+                            label = it.first.name.uppercase(),
                             valueLabel = it.second,
-                            shape = (
+                            shape =
+                            ImageGenerator.createBoxedTextShape(it.first.party.name.uppercase()) + (
                                 if (it.first.incumbent) {
-                                    candidateResults.incumbentMarker?.let { inc -> ImageGenerator.createBoxedTextShape(inc) }
+                                    candidateResults.incumbentMarker?.let { inc -> ImageGenerator.createFilledBoxedTextShape(inc) }
                                 } else {
                                     null
                                 }
-                                ).combineHorizontal(ImageGenerator.createTickShape()),
+                                ) + ImageGenerator.createTickShape(),
                             value = 0,
                             color = it.first.party.color,
                         )
@@ -85,7 +87,7 @@ class SingleTransferrableResultScreen private constructor(
                     .sortedByDescending { it.value?.toDouble() ?: -1.0 }
                     .map {
                         BarFrameBuilder.BasicBar.of(
-                            label = it.key.name.uppercase() + " (${it.key.party.abbreviation.uppercase()})",
+                            label = it.key.name.uppercase(),
                             valueLabel = if (it.value == null) {
                                 "WAITING..."
                             } else {
@@ -93,9 +95,9 @@ class SingleTransferrableResultScreen private constructor(
                             },
                             color = it.key.party.color,
                             value = (it.value ?: 0),
-                            shape = (
+                            shape = ImageGenerator.createBoxedTextShape(it.key.party.name.uppercase()) + (
                                 if (it.key.incumbent) {
-                                    candidateResults.incumbentMarker?.let { inc -> ImageGenerator.createBoxedTextShape(inc) }
+                                    candidateResults.incumbentMarker?.let { inc -> ImageGenerator.createFilledBoxedTextShape(inc) }
                                 } else {
                                     null
                                 }
@@ -113,15 +115,15 @@ class SingleTransferrableResultScreen private constructor(
                     .filter { candidateResults.showExcludedCandidates(it.first) }
                     .map {
                         BarFrameBuilder.BasicBar.of(
-                            label = it.first.name.uppercase() + " (${it.first.party.abbreviation.uppercase()})",
+                            label = it.first.name.uppercase(),
                             valueLabel = it.second,
-                            shape = (
+                            shape = ImageGenerator.createBoxedTextShape(it.first.party.name.uppercase()) + (
                                 if (it.first.incumbent) {
-                                    candidateResults.incumbentMarker?.let { inc -> ImageGenerator.createBoxedTextShape(inc) }
+                                    candidateResults.incumbentMarker?.let { inc -> ImageGenerator.createFilledBoxedTextShape(inc) }
                                 } else {
                                     null
                                 }
-                                ).combineHorizontal(ImageGenerator.createCrossShape()),
+                                ) + ImageGenerator.createCrossShape(),
                             value = 0,
                             color = it.first.party.color,
                         )

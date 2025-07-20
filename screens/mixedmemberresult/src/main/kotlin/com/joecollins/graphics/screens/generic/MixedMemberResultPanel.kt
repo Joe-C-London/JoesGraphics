@@ -3,6 +3,7 @@ package com.joecollins.graphics.screens.generic
 import com.joecollins.graphics.GenericPanel
 import com.joecollins.graphics.ImageGenerator
 import com.joecollins.graphics.ImageGenerator.combineHorizontal
+import com.joecollins.graphics.ImageGenerator.plus
 import com.joecollins.graphics.components.BarFrame
 import com.joecollins.graphics.components.BarFrameBuilder
 import com.joecollins.graphics.components.MapFrame
@@ -168,14 +169,14 @@ class MixedMemberResultPanel private constructor(
                         ImageGenerator.createTickShape(),
                         { candidate -> listOf(candidate.name.uppercase(), candidate.party.name.uppercase()) },
                         { numVotes, pct -> listOf(THOUSANDS_FORMAT.format(numVotes.toLong()), PCT_FORMAT.format(pct)) },
-                        { candidate -> candidateVotes.incumbentMarker.takeIf { candidate.incumbent }?.let { ImageGenerator.createBoxedTextShape(it) } },
+                        { candidate -> candidateVotes.incumbentMarker.takeIf { candidate.incumbent }?.let { ImageGenerator.createFilledBoxedTextShape(it) } },
                     )
                 } else {
                     CandidateBarTemplate(
                         ImageGenerator.createTickShape(),
-                        { candidate -> listOf("${candidate.name.uppercase()} (${candidate.party.abbreviation.uppercase()})") },
+                        { candidate -> listOf(candidate.name.uppercase()) },
                         { numVotes, pct -> listOf("${THOUSANDS_FORMAT.format(numVotes.toLong())} (${PCT_FORMAT.format(pct)})") },
-                        { candidate -> candidateVotes.incumbentMarker.takeIf { candidate.incumbent }?.let { ImageGenerator.createBoxedTextShape(it) } },
+                        { candidate -> ImageGenerator.createBoxedTextShape(candidate.party.name.uppercase()) + candidateVotes.incumbentMarker.takeIf { candidate.incumbent }?.let { ImageGenerator.createFilledBoxedTextShape(it) } },
                     )
                 }
             }

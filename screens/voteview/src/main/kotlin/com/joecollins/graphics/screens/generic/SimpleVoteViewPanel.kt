@@ -3,6 +3,7 @@ package com.joecollins.graphics.screens.generic
 import com.joecollins.graphics.GenericPanel
 import com.joecollins.graphics.ImageGenerator
 import com.joecollins.graphics.ImageGenerator.combineHorizontal
+import com.joecollins.graphics.ImageGenerator.plus
 import com.joecollins.graphics.components.BarFrame
 import com.joecollins.graphics.components.BarFrameBuilder
 import com.joecollins.graphics.components.MapFrame
@@ -1381,13 +1382,14 @@ class SimpleVoteViewPanel private constructor(
                                 forcedTotal,
                                 it.size,
                                 forceSingleLine,
-                                keyTemplate.incumbentShape(e.key, forceSingleLine).combineHorizontal(
-                                    when (e.result) {
-                                        CandidateResult.WINNER -> keyTemplate.winnerShape(it.size > doubleLineBarLimit)
-                                        CandidateResult.RUNOFF -> keyTemplate.runoffShape(it.size > doubleLineBarLimit)
-                                        null -> null
-                                    },
-                                ),
+                                (if (forceSingleLine) keyTemplate.partyShape(e.key) else null) +
+                                    keyTemplate.incumbentShape(e.key) + (
+                                        when (e.result) {
+                                            CandidateResult.WINNER -> keyTemplate.winnerShape(it.size > doubleLineBarLimit)
+                                            CandidateResult.RUNOFF -> keyTemplate.runoffShape(it.size > doubleLineBarLimit)
+                                            null -> null
+                                        }
+                                        ),
                             )
                         }
                     },
@@ -1451,13 +1453,14 @@ class SimpleVoteViewPanel private constructor(
                                 total,
                                 forcedTotal,
                                 it.size,
-                                keyTemplate.incumbentShape(e.key, true).combineHorizontal(
-                                    when (e.result) {
-                                        CandidateResult.WINNER -> keyTemplate.winnerShape(true)
-                                        CandidateResult.RUNOFF -> keyTemplate.runoffShape(true)
-                                        null -> null
-                                    },
-                                ),
+                                keyTemplate.partyShape(e.key) +
+                                    keyTemplate.incumbentShape(e.key) + (
+                                        when (e.result) {
+                                            CandidateResult.WINNER -> keyTemplate.winnerShape(true)
+                                            CandidateResult.RUNOFF -> keyTemplate.runoffShape(true)
+                                            null -> null
+                                        }
+                                        ),
                             )
                         }
                     },
@@ -1898,7 +1901,7 @@ class SimpleVoteViewPanel private constructor(
                         BarFrameBuilder.BasicBar.of(
                             listOfNotNull(
                                 c.fullName.uppercase() to listOf(
-                                    if (c.incumbent && current.incumbentMarker != null) ImageGenerator.createBoxedTextShape(current.incumbentMarker!!) else null,
+                                    if (c.incumbent && current.incumbentMarker != null) ImageGenerator.createFilledBoxedTextShape(current.incumbentMarker!!) else null,
                                     if (w?.contains(c) ?: false) ImageGenerator.createTickShape() else null,
                                     if (r?.contains(c) ?: false) ImageGenerator.createRunoffShape() else null,
                                 ).reduce { a, b -> a.combineHorizontal(b) },
