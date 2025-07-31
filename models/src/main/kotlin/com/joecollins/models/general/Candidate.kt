@@ -1,15 +1,18 @@
 package com.joecollins.models.general
 
 @ConsistentCopyVisibility
-data class Candidate private constructor(val name: String, val party: Party, val incumbent: Boolean, override val overrideSortOrder: Int? = party.overrideSortOrder) : CanOverrideSortOrder() {
+data class Candidate private constructor(val name: String, val party: Party, val incumbencyType: IncumbencyType?, override val overrideSortOrder: Int? = party.overrideSortOrder) : CanOverrideSortOrder() {
 
-    constructor(name: String, party: Party, incumbent: Boolean = false) : this(name, party, incumbent, party.overrideSortOrder)
+    constructor(name: String, party: Party, incumbencyType: IncumbencyType? = null) : this(name, party, incumbencyType, party.overrideSortOrder)
+    constructor(name: String, party: Party, incumbent: Boolean) : this(name, party, if (incumbent) IncumbencyType.DEFAULT else null, party.overrideSortOrder)
 
     override fun toString(): String = name + " (" + party + ")" + (if (incumbent) "*" else "")
+
+    val incumbent = incumbencyType != null
 
     fun isIncumbent() = incumbent
 
     companion object {
-        val OTHERS = Candidate("", Party.OTHERS, false, -1)
+        val OTHERS = Candidate("", Party.OTHERS, null, -1)
     }
 }

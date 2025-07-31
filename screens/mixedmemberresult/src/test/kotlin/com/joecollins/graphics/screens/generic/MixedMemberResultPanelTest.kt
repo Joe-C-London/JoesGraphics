@@ -7,6 +7,7 @@ import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.graphics.utils.ShapefileReader
 import com.joecollins.models.general.Aggregators
 import com.joecollins.models.general.Candidate
+import com.joecollins.models.general.IncumbencyType
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyOrCandidate
 import com.joecollins.models.general.PartyResult
@@ -1655,6 +1656,99 @@ class MixedMemberResultPanelTest {
             REJOIN EU: 5,384 (2.8%, +2.8%)
             FARAH LONDON: 3,490 (1.8%, +1.8%)
             OTHERS: 14,000 (7.2%, -5.8%)
+            """.trimIndent(),
+        )
+    }
+
+    @Test
+    fun testCandidateVaryingIncumbentMarkers() {
+        val nat = Party("National", "NAT", Color.BLUE)
+        val lab = Party("Labour", "LAB", Color.RED)
+        val grn = Party("Green", "GRN", Color.GREEN.darker())
+        val nzf = Party("NZ First", "NZF", Color.BLACK)
+        val top = Party("Opportunities", "TOP", Color.CYAN.darker())
+        val act = Party("ACT NZ", "ACT", Color.YELLOW)
+        val nzl = Party("NZ Loyal", "NZL", Color.ORANGE)
+        val vis = Party("Vision NZ", "VNZ", Color.CYAN.darker().darker())
+
+        val panel = MixedMemberResultPanel.of(
+            candidateVotes = {
+                votes = mapOf(
+                    Candidate("Chris Bishop", nat, IncumbencyType.LIST) to 19144,
+                    Candidate("Ginny Andersen", lab, true) to 17812,
+                    Candidate("Neelu Jennings", grn) to 2492,
+                    Candidate("Lee Donoghue", nzf) to 1228,
+                    Candidate("Ben Wylie-Van Eerd", top) to 980,
+                    Candidate("Andy Parkins", act) to 556,
+                    Candidate("Jordan Blane", nzl) to 403,
+                    Candidate("Max Rangitutia", vis) to 171,
+                ).asOneTimePublisher()
+                header = "2023 CANDIDATE VOTES".asOneTimePublisher()
+                incumbentMarkerByType = { if (it == IncumbencyType.DEFAULT) "INCUMBENT MP" else "LIST MP" }
+                winner = Candidate("Chris Bishop", nat, IncumbencyType.LIST).asOneTimePublisher()
+            },
+            candidateChange = {
+                prevVotes = mapOf(
+                    lab to 22453,
+                    nat to 18676,
+                    grn to 1171,
+                    top to 590,
+                    act to 330,
+                    nzf to 316,
+                    vis to 201,
+                    Party.OTHERS to 562 + 302 + 192 + 115,
+                ).asOneTimePublisher()
+                header = "CANDIDATE CHANGE SINCE 2020".asOneTimePublisher()
+            },
+            partyVotes = {
+                votes = mapOf(
+                    nat to 14772,
+                    lab to 14087,
+                    grn to 6727,
+                    nzf to 2257,
+                    act to 2493,
+                    Party.OTHERS to 1448 + 244 + 581 + 215 + 147 + 99 + 77 + 53 + 50 + 32 + 21 + 2,
+                ).mapKeys { PartyOrCandidate(it.key) }.asOneTimePublisher()
+                header = "2023 PARTY VOTES".asOneTimePublisher()
+            },
+            partyChange = {
+                prevVotes = mapOf(
+                    lab to 25159,
+                    nat to 10033,
+                    grn to 4301,
+                    nzf to 1071,
+                    act to 2568,
+                    Party.OTHERS to 986 + 528 + 309 + 201 + 51 + 38 + 201 + 112 + 30 + 25 + 9 + 3,
+                ).asOneTimePublisher()
+                header = "PARTY CHANGE SINCE 2020".asOneTimePublisher()
+            },
+            title = "HUTT SOUTH".asOneTimePublisher(),
+        )
+        panel.setSize(1024, 512)
+        compareRendering("MixedMemberResultPanel", "VaryingIncumbentMarkers-1", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            HUTT SOUTH
+
+            2023 CANDIDATE VOTES (CANDIDATE CHANGE SINCE 2020)
+            CHRIS BISHOP [LIST MP] (NAT): 19,144 (44.7%, +3.2%) WINNER
+            GINNY ANDERSEN [INCUMBENT MP] (LAB): 17,812 (41.6%, -8.4%)
+            NEELU JENNINGS (GRN): 2,492 (5.8%, +3.2%)
+            LEE DONOGHUE (NZF): 1,228 (2.9%, +2.2%)
+            BEN WYLIE-VAN EERD (TOP): 980 (2.3%, +1.0%)
+            ANDY PARKINS (ACT): 556 (1.3%, +0.6%)
+            JORDAN BLANE (NZL): 403 (0.9%, +0.9%)
+            MAX RANGITUTIA (VNZ): 171 (0.4%, -0.0%)
+            OTHERS: - (-2.6%)
+            
+            2023 PARTY VOTES (PARTY CHANGE SINCE 2020)
+            NATIONAL: 14,772 (34.1%, +12.1%)
+            LABOUR: 14,087 (32.5%, -22.6%)
+            GREEN: 6,727 (15.5%, +6.1%)
+            ACT NZ: 2,493 (5.8%, +0.1%)
+            NZ FIRST: 2,257 (5.2%, +2.9%)
+            OTHERS: 2,969 (6.9%, +1.4%)
             """.trimIndent(),
         )
     }

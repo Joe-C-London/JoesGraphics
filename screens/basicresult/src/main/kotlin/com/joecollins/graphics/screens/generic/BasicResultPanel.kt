@@ -2,6 +2,7 @@ package com.joecollins.graphics.screens.generic
 
 import com.joecollins.graphics.ImageGenerator
 import com.joecollins.models.general.Candidate
+import com.joecollins.models.general.IncumbencyType
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyOrCandidate
 import com.joecollins.models.general.PartyOrCoalition
@@ -53,13 +54,15 @@ object BasicResultPanel {
     }
 
     class CandidateTemplate : KeyTemplate<Candidate, Party> {
-        private val incumbentMarker: String?
+        private val incumbentMarker: ((IncumbencyType) -> String)?
 
         constructor() {
             incumbentMarker = null
         }
 
-        constructor(incumbentMarker: String?) {
+        constructor(incumbentMarker: String) : this ({ incumbentMarker })
+
+        constructor(incumbentMarker: ((IncumbencyType) -> String)?) {
             this.incumbentMarker = incumbentMarker
         }
 
@@ -76,16 +79,16 @@ object BasicResultPanel {
         override fun toMainAltTextHeader(key: Candidate): String = if (key.name.isBlank()) {
             key.party.name.uppercase()
         } else {
-            ("${key.name}${if (incumbentMarker != null && key.incumbent) " [$incumbentMarker]" else ""} (${key.party.abbreviation})")
+            ("${key.name}${if (key.incumbencyType != null && incumbentMarker != null) " [${incumbentMarker(key.incumbencyType!!)}]" else ""} (${key.party.abbreviation})")
                 .uppercase()
         }
 
         override fun partyShape(key: Candidate): Shape? = if (key == Candidate.OTHERS) null else ImageGenerator.createBoxedTextShape(key.party.name.uppercase())
 
-        override fun incumbentShape(key: Candidate): Shape? = if (incumbentMarker == null || !key.incumbent) {
+        override fun incumbentShape(key: Candidate): Shape? = if (key.incumbencyType == null || incumbentMarker == null) {
             null
         } else {
-            ImageGenerator.createFilledBoxedTextShape(incumbentMarker)
+            ImageGenerator.createFilledBoxedTextShape(incumbentMarker(key.incumbencyType!!))
         }
 
         override fun winnerShape(forceSingleLine: Boolean): Shape = ImageGenerator.createTickShape()

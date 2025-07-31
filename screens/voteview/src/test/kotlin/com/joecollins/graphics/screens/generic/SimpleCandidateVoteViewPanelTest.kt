@@ -8,6 +8,7 @@ import com.joecollins.graphics.utils.PublisherTestUtils.assertPublishes
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.models.general.Aggregators.topAndOthers
 import com.joecollins.models.general.Candidate
+import com.joecollins.models.general.IncumbencyType
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
 import com.joecollins.models.general.PartyResult.Companion.elected
@@ -2662,6 +2663,66 @@ class SimpleCandidateVoteViewPanelTest {
                 JAYDA FRANSEN (IND): 50 (0.1%, -12.0%)
                 SUSAN LAIRD (HERITAGE): 33 (0.1%, +0.1%)
                 OTHERS: - (-4.5%)
+            """.trimIndent(),
+        )
+    }
+
+    @Test
+    fun testCandidateVaryingIncumbentMarkers() {
+        val snp = Party("Scottish National Party", "SNP", Color.YELLOW)
+        val lab = Party("Labour", "LAB", Color.RED)
+        val con = Party("Conservative", "CON", Color.BLUE)
+        val ld = Party("Liberal Democrats", "LD", Color.ORANGE)
+
+        val curr = Publisher(
+            mapOf(
+                Candidate("Christina McKelvie", snp, true) to 16761,
+                Candidate("Monica Lennon", lab, IncumbencyType.LIST) to 12179,
+                Candidate("Meghan Gallacher", con) to 6332,
+                Candidate("Mark McGeever", ld) to 1012,
+            ),
+        )
+        val prev = Publisher(
+            mapOf(
+                snp to 13945,
+                lab to 8508,
+                con to 5596,
+                ld to 836,
+            ),
+        )
+
+        val panel = candidateVotes(
+            current = {
+                votes = curr
+                header = "2021 RESULT".asOneTimePublisher()
+                subhead = "".asOneTimePublisher()
+                incumbentMarkerByType = { if (it == IncumbencyType.DEFAULT) "CONSTITUENCY MSP" else "REGION MSP" }
+                winner = curr.map { it.maxBy { e -> e.value }.key }
+            },
+            prev = {
+                votes = prev
+                header = "CHANGE SINCE 2016".asOneTimePublisher()
+                swing = {
+                    header = "SWINCE SINCE 2016".asOneTimePublisher()
+                    partyOrder = listOf(snp, lab, ld, con)
+                }
+            },
+            title = "HAMILTON, LARKHALL AND STONEHOUSE".asOneTimePublisher(),
+        )
+        panel.setSize(1024, 512)
+        compareRendering("SimpleVoteViewPanel", "VaryingIncumbentMarkers-1", panel)
+        assertPublishes(
+            panel.altText,
+            """
+                HAMILTON, LARKHALL AND STONEHOUSE
+
+                2021 RESULT (CHANGE SINCE 2016)
+                CHRISTINA MCKELVIE [CONSTITUENCY MSP] (SNP): 16,761 (46.2%, -2.1%) WINNER
+                MONICA LENNON [REGION MSP] (LAB): 12,179 (33.6%, +4.1%)
+                MEGHAN GALLACHER (CON): 6,332 (17.5%, -1.9%)
+                MARK MCGEEVER (LD): 1,012 (2.8%, -0.1%)
+                
+                SWINCE SINCE 2016: 3.1% SWING SNP TO LAB
             """.trimIndent(),
         )
     }

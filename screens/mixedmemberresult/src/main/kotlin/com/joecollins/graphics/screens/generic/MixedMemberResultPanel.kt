@@ -8,6 +8,7 @@ import com.joecollins.graphics.components.BarFrame
 import com.joecollins.graphics.components.BarFrameBuilder
 import com.joecollins.graphics.components.MapFrame
 import com.joecollins.models.general.Candidate
+import com.joecollins.models.general.IncumbencyType
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyOrCandidate
 import com.joecollins.models.general.PartyOrCoalition
@@ -97,12 +98,18 @@ class MixedMemberResultPanel private constructor(
         lateinit var votes: Flow.Publisher<out Map<Candidate, Int?>>
         lateinit var header: Flow.Publisher<out String?>
         var subhead: Flow.Publisher<out String?>? = null
-        var incumbentMarker: String? = null
+        var incumbentMarkerByType: ((IncumbencyType) -> String)? = null
         var winner: Flow.Publisher<Candidate?>? = null
         var pctReporting: Flow.Publisher<Double>? = null
         var progressLabel: Flow.Publisher<out String?>? = null
 
-        internal val incumbentMarkerPadded by lazy { if (incumbentMarker == null) "" else " [$incumbentMarker]" }
+        var incumbentMarker: String?
+            get() {
+                throw IllegalStateException("Private method")
+            }
+            set(value) {
+                incumbentMarkerByType = if (value == null) null else { _ -> value }
+            }
     }
 
     class CandidateChange internal constructor() {
@@ -169,14 +176,14 @@ class MixedMemberResultPanel private constructor(
                         ImageGenerator.createTickShape(),
                         { candidate -> listOf(candidate.name.uppercase(), candidate.party.name.uppercase()) },
                         { numVotes, pct -> listOf(THOUSANDS_FORMAT.format(numVotes.toLong()), PCT_FORMAT.format(pct)) },
-                        { candidate -> candidateVotes.incumbentMarker.takeIf { candidate.incumbent }?.let { ImageGenerator.createFilledBoxedTextShape(it) } },
+                        { candidate -> candidateVotes.incumbentMarkerByType.takeIf { candidate.incumbent }?.let { ImageGenerator.createFilledBoxedTextShape(it(candidate.incumbencyType!!)) } },
                     )
                 } else {
                     CandidateBarTemplate(
                         ImageGenerator.createTickShape(),
                         { candidate -> listOf(candidate.name.uppercase()) },
                         { numVotes, pct -> listOf("${THOUSANDS_FORMAT.format(numVotes.toLong())} (${PCT_FORMAT.format(pct)})") },
-                        { candidate -> ImageGenerator.createBoxedTextShape(candidate.party.name.uppercase()) + candidateVotes.incumbentMarker.takeIf { candidate.incumbent }?.let { ImageGenerator.createFilledBoxedTextShape(it) } },
+                        { candidate -> ImageGenerator.createBoxedTextShape(candidate.party.name.uppercase()) + candidateVotes.incumbentMarkerByType.takeIf { candidate.incumbent }?.let { ImageGenerator.createFilledBoxedTextShape(it(candidate.incumbencyType!!)) } },
                     )
                 }
             }
@@ -416,8 +423,8 @@ class MixedMemberResultPanel private constructor(
                     val entries = curr.entries
                         .sortedByDescending { it.key.overrideSortOrder ?: it.value ?: 0 }
                         .joinToString("\n") {
-                            val incumbentMarker = if (it.key.incumbent && candidateVotes.incumbentMarker != null && it.key.name.isNotBlank()) {
-                                candidateVotes.incumbentMarkerPadded
+                            val incumbentMarker = if (it.key.incumbent && candidateVotes.incumbentMarkerByType != null && it.key.name.isNotBlank()) {
+                                " [${candidateVotes.incumbentMarkerByType!!(it.key.incumbencyType!!)}]"
                             } else {
                                 ""
                             }

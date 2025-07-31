@@ -12,6 +12,7 @@ import com.joecollins.graphics.components.SwingFrameBuilder
 import com.joecollins.models.general.Aggregators
 import com.joecollins.models.general.CanOverrideSortOrder
 import com.joecollins.models.general.Candidate
+import com.joecollins.models.general.IncumbencyType
 import com.joecollins.models.general.NonPartisanCandidate
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyOrCandidate
@@ -224,7 +225,7 @@ class SimpleVoteViewPanel private constructor(
                 preferences = Preferences<Candidate, Party, Int?, Int>().apply(preferences),
                 map = map?.mapFrame,
                 secondMap = null,
-                keyTemplate = BasicResultPanel.CandidateTemplate(currentVotes.incumbentMarker),
+                keyTemplate = BasicResultPanel.CandidateTemplate(currentVotes.incumbentMarkerByType),
                 voteTemplate = currentVotes.display.template,
                 valueTemplate = VoteValueTemplate(currentVotes.display.template),
                 others = Candidate.OTHERS,
@@ -261,7 +262,7 @@ class SimpleVoteViewPanel private constructor(
                 preferences = null,
                 map = map?.mapFrame,
                 secondMap = null,
-                keyTemplate = BasicResultPanel.CandidateTemplate(currentVotes.incumbentMarker),
+                keyTemplate = BasicResultPanel.CandidateTemplate(currentVotes.incumbentMarkerByType),
                 valueTemplate = VoteValueTemplate(currentVotes.display.template),
                 voteTemplate = currentVotes.display.template,
                 others = Candidate.OTHERS,
@@ -1000,10 +1001,18 @@ class SimpleVoteViewPanel private constructor(
     class CurrentVotes<KT : Any, CT> internal constructor() : AbstractCurrentVotes<KT, CT>()
 
     class CandidateCurrentVotes<KT : Any, CT> internal constructor() : AbstractCurrentVotes<KT, CT>() {
-        var incumbentMarker: String? = null
+        var incumbentMarkerByType: ((IncumbencyType) -> String)? = null
         var display: Display = Display.VOTES_AND_PCT
         var winners: Flow.Publisher<out Set<KT>?>? = null
         var runoff: Flow.Publisher<out Set<KT>?>? = null
+
+        var incumbentMarker: String?
+            get() {
+                throw IllegalStateException("Private method")
+            }
+            set(value) {
+                incumbentMarkerByType = if (value == null) null else { _ -> value }
+            }
 
         override var winner: Flow.Publisher<out KT?>?
             get() {
@@ -1901,7 +1910,7 @@ class SimpleVoteViewPanel private constructor(
                         BarFrameBuilder.BasicBar.of(
                             listOfNotNull(
                                 c.fullName.uppercase() to listOf(
-                                    if (c.incumbent && current.incumbentMarker != null) ImageGenerator.createFilledBoxedTextShape(current.incumbentMarker!!) else null,
+                                    if (c.incumbent && current.incumbentMarkerByType != null) ImageGenerator.createFilledBoxedTextShape(current.incumbentMarkerByType!!.invoke(c.incumbencyType!!)) else null,
                                     if (w?.contains(c) ?: false) ImageGenerator.createTickShape() else null,
                                     if (r?.contains(c) ?: false) ImageGenerator.createRunoffShape() else null,
                                 ).reduce { a, b -> a.combineHorizontal(b) },
@@ -1962,7 +1971,7 @@ class SimpleVoteViewPanel private constructor(
                     (if (h == null) "" else "$h\n") + votes.entries.sortedByDescending { it.key.overrideSortOrder ?: it.value ?: 0 }
                         .joinToString("\n") { (c, v) ->
                             c.fullName.uppercase() +
-                                (if (c.incumbent && current.incumbentMarker != null) " [${current.incumbentMarker}]" else "") +
+                                (if (c.incumbent && current.incumbentMarkerByType != null) " [${current.incumbentMarkerByType!!.invoke(c.incumbencyType!!)}]" else "") +
                                 (if (c.description.isNullOrEmpty()) "" else " (${c.description!!.uppercase()})") + ": " +
                                 when {
                                     votes.size == 1 -> "UNCONTESTED"
