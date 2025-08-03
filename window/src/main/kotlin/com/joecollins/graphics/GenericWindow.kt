@@ -13,6 +13,7 @@ import java.awt.Container
 import java.awt.Dimension
 import java.awt.LayoutManager
 import java.awt.Point
+import java.awt.Taskbar
 import java.awt.Toolkit
 import java.awt.datatransfer.Clipboard
 import java.awt.datatransfer.ClipboardOwner
@@ -35,6 +36,7 @@ import javax.swing.JOptionPane
 import javax.swing.JPanel
 import javax.swing.filechooser.FileFilter
 import kotlin.math.max
+import kotlin.math.roundToInt
 
 class GenericWindow<T : JPanel> constructor(private val panel: T, title: String) : JFrame() {
 
@@ -160,6 +162,22 @@ class GenericWindow<T : JPanel> constructor(private val panel: T, title: String)
                             } else {
                                 Color.RED
                             }
+                    },
+                ),
+            )
+        }
+        if (panel is TaskbarProvider) {
+            panel.taskbarIcon?.subscribe(
+                Subscriber(
+                    eventQueueWrapper {
+                        Taskbar.getTaskbar().iconImage = it
+                    },
+                ),
+            )
+            panel.progress?.subscribe(
+                Subscriber(
+                    eventQueueWrapper {
+                        Taskbar.getTaskbar().setProgressValue((it * 100).roundToInt())
                     },
                 ),
             )
