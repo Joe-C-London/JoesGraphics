@@ -10,6 +10,14 @@ class Publisher<T>() : AbstractPublisher<T>() {
         super.submit(item)
     }
 
+    fun submitIfChanged(item: T) {
+        synchronized(this) {
+            if (this.isEmpty || item != this.currentValue) {
+                super.submit(item)
+            }
+        }
+    }
+
     public override fun complete() {
         super.complete()
     }

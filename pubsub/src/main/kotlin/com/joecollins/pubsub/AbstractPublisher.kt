@@ -26,6 +26,9 @@ abstract class AbstractPublisher<T> : Flow.Publisher<T> {
         }
     }
 
+    internal val isEmpty: Boolean get() = value == null
+    internal val currentValue: T get() = value!!.item
+
     internal open fun submit(item: T) {
         synchronized(this) {
             if (completed) {
@@ -78,7 +81,7 @@ abstract class AbstractPublisher<T> : Flow.Publisher<T> {
         fun handle(subscriber: Flow.Subscriber<in T>)
     }
 
-    private data class ItemWrapper<T>(private val item: T) : Wrapper<T> {
+    private data class ItemWrapper<T>(val item: T) : Wrapper<T> {
         override fun handle(subscriber: Flow.Subscriber<in T>) {
             subscriber.onNext(item)
         }

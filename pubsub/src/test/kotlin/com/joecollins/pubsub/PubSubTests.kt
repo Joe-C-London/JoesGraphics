@@ -729,4 +729,37 @@ class PubSubTests {
         publisher.increment(5)
         assertEquals(0, output)
     }
+
+    @Test
+    fun testSubmitIfChanged() {
+        val publisher = Publisher<String?>()
+        var output: String? = ""
+        var count = 0
+        publisher.subscribe(
+            Subscriber {
+                output = it
+                count++
+            },
+        )
+
+        publisher.submitIfChanged(null)
+        assertEquals(null, output)
+        assertEquals(count, 1)
+
+        publisher.submitIfChanged(null)
+        assertEquals(null, output)
+        assertEquals(count, 1)
+
+        publisher.submitIfChanged("TODO")
+        assertEquals("TODO", output)
+        assertEquals(count, 2)
+
+        publisher.submitIfChanged("TODO")
+        assertEquals("TODO", output)
+        assertEquals(count, 2)
+
+        publisher.submitIfChanged(null)
+        assertEquals(null, output)
+        assertEquals(count, 3)
+    }
 }
