@@ -127,7 +127,14 @@ class SeatsChangingScreen private constructor(title: Flow.Publisher<out String?>
                 },
             )
             val altText = run {
-                val head = title.merge(header) { t, h -> "$t\n\n$h" }
+                val head = title.merge(header) { t, h ->
+                    when {
+                        t == null && h == null -> ""
+                        t == null -> h
+                        h == null -> t
+                        else -> "$t\n\n$h"
+                    }
+                }
                 val entries = inputs.resultPublisher.map { results ->
                     val filteredResults = results.filter { it.filterIncludes }
                     if (filteredResults.isEmpty()) return@map "(empty)"
