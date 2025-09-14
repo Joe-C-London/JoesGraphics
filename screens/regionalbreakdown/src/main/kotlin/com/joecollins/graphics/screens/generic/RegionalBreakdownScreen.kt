@@ -49,6 +49,7 @@ class RegionalBreakdownScreen private constructor(
         diff: Flow.Publisher<out Map<out PartyOrCoalition, Int>>?,
         total: Flow.Publisher<Int>? = null,
         private val maxColumns: Flow.Publisher<Int>?,
+        private val showZero: Boolean,
     ) {
         private val consolidatedDiff = diff ?: toDiff(seats, prev)
 
@@ -142,7 +143,7 @@ class RegionalBreakdownScreen private constructor(
 
             override val values: Flow.Publisher<out List<Pair<Color, String>>> = run {
                 val seatItems = seatsWithDiff.merge(transformedPartyOrder) { (s, d), po ->
-                    po.map { party -> party.color to seatDiffString(s[party] ?: 0, if (d == null) null else (d[party] ?: 0)) }
+                    po.map { party -> if ((s[party] ?: 0 == 0) && !showZero) (Color.WHITE to "") else party.color to seatDiffString(s[party] ?: 0, if (d == null) null else (d[party] ?: 0)) }
                 }
                 val totalItem = if (total == null) {
                     emptyList<Pair<Color, String>>().asOneTimePublisher()
@@ -309,6 +310,7 @@ class RegionalBreakdownScreen private constructor(
             topRowDiff: Flow.Publisher<out Map<out PartyOrCoalition, Int>>? = null,
             topRowTotal: Flow.Publisher<Int>? = null,
             maxColumns: Flow.Publisher<Int>? = null,
+            showZero: Boolean = true,
             builder: SeatEntries.() -> Unit,
         ): List<Entry> = SeatEntries(
             topRowHeader,
@@ -318,6 +320,7 @@ class RegionalBreakdownScreen private constructor(
             topRowDiff,
             topRowTotal,
             maxColumns,
+            showZero,
         ).apply(builder).entries
 
         fun votes(

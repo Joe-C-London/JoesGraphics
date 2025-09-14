@@ -839,6 +839,92 @@ class RegionalBreakdownScreenTest {
     }
 
     @Test
+    fun testSeatsNoZero() {
+        val peiSeats = Publisher<Map<Party, Int>>(emptyMap())
+        val cardiganSeats = Publisher<Map<Party, Int>>(emptyMap())
+        val malpequeSeats = Publisher<Map<Party, Int>>(emptyMap())
+        val charlottetownSeats = Publisher<Map<Party, Int>>(emptyMap())
+        val egmontSeats = Publisher<Map<Party, Int>>(emptyMap())
+        val screen = RegionalBreakdownScreen.of(
+            entries = seats(
+                topRowHeader = "PRINCE EDWARD ISLAND".asOneTimePublisher(),
+                topRowSeats = peiSeats,
+                topRowTotal = 27.asOneTimePublisher(),
+                showZero = false,
+            ) {
+                section(
+                    items = listOf(
+                        Triple("CARDIGAN", cardiganSeats, 7),
+                        Triple("MALPEQUE", malpequeSeats, 7),
+                        Triple("CHARLOTTETOWN", charlottetownSeats, 6),
+                        Triple("EGMONT", egmontSeats, 7),
+                    ),
+                    header = { first.asOneTimePublisher() },
+                    seats = { second },
+                    total = { third.asOneTimePublisher() },
+                )
+            },
+            header = "SEATS BY REGION".asOneTimePublisher(),
+            title = "PRINCE EDWARD ISLAND".asOneTimePublisher(),
+        )
+        screen.setSize(1024, 512)
+        compareRendering("RegionalBreakdownScreen", "SeatsNoZero-1", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            PRINCE EDWARD ISLAND
+            SEATS BY REGION
+            
+            PRINCE EDWARD ISLAND: 0/27
+            
+            CARDIGAN: 0/7
+            MALPEQUE: 0/7
+            CHARLOTTETOWN: 0/6
+            EGMONT: 0/7
+            """.trimIndent(),
+        )
+
+        peiSeats.submit(mapOf(grn to 1))
+        cardiganSeats.submit(mapOf(grn to 1))
+        compareRendering("RegionalBreakdownScreen", "SeatsNoZero-2", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            PRINCE EDWARD ISLAND
+            SEATS BY REGION
+            
+            PRINCE EDWARD ISLAND: GRN 1, 1/27
+            
+            CARDIGAN: GRN 1, 1/7
+            MALPEQUE: 0/7
+            CHARLOTTETOWN: 0/6
+            EGMONT: 0/7
+            """.trimIndent(),
+        )
+
+        peiSeats.submit(mapOf(pc to 13, grn to 8, lib to 6))
+        cardiganSeats.submit(mapOf(pc to 6, grn to 1))
+        malpequeSeats.submit(mapOf(pc to 5, grn to 1, lib to 1))
+        charlottetownSeats.submit(mapOf(grn to 3, lib to 2, pc to 1))
+        egmontSeats.submit(mapOf(grn to 3, lib to 3, pc to 1))
+        compareRendering("RegionalBreakdownScreen", "SeatsNoZero-3", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            PRINCE EDWARD ISLAND
+            SEATS BY REGION
+            
+            PRINCE EDWARD ISLAND: PC 13, GRN 8, LIB 6, 27/27
+            
+            CARDIGAN: PC 6, GRN 1, 7/7
+            MALPEQUE: PC 5, GRN 1, LIB 1, 7/7
+            CHARLOTTETOWN: PC 1, GRN 3, LIB 2, 6/6
+            EGMONT: PC 1, GRN 3, LIB 3, 7/7
+            """.trimIndent(),
+        )
+    }
+
+    @Test
     fun testVotes() {
         val peiVotes = Publisher<Map<Party, Int>>(emptyMap())
         val cardiganVotes = Publisher<Map<Party, Int>>(emptyMap())
