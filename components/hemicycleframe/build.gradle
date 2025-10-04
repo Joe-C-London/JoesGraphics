@@ -18,7 +18,7 @@ dependencies {
     implementation topLevel.project('modelutils')
     implementation topLevel.project('pubsub')
 
-    implementation group: 'com.google.guava', name: 'guava', version: '33.4.8-jre'
+    implementation group: 'com.google.guava', name: 'guava', version: '33.5.0-jre'
 
     testImplementation topLevel.project('testutils')
 
