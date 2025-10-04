@@ -162,7 +162,7 @@ class MixedMemberAllSeatsScreen private constructor(
                         .flatten()
                         .distinct()
                         .sortedWith(
-                            Comparator.comparing<Pair<Party?, Party?>?, Int?> { -(cg[it]?.size ?: 0) }
+                            Comparator.comparing<Pair<Party?, Party?>, Int> { -(cg[it]?.size ?: 0) }
                                 .thenByDescending { lg[it]?.size ?: 0 },
                         )
                         .joinToString("\n") {
