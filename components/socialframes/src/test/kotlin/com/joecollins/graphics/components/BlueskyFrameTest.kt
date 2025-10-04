@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test
 import java.awt.Dimension
 import java.net.URL
 import java.time.Instant
+import java.time.ZoneId
 
 class BlueskyFrameTest {
 
@@ -27,7 +28,7 @@ class BlueskyFrameTest {
             ),
         )
 
-        val frame = BlueskyFrame(post.asOneTimePublisher())
+        val frame = BlueskyFrame(post.asOneTimePublisher(), timezone = ZoneId.of("Europe/London"))
         frame.size = Dimension(512, 256)
         RenderTestUtils.compareRendering("BlueskyFrame", "Basic", frame)
     }
@@ -46,7 +47,7 @@ class BlueskyFrameTest {
             ),
         )
 
-        val frame = BlueskyFrame(post.asOneTimePublisher())
+        val frame = BlueskyFrame(post.asOneTimePublisher(), timezone = ZoneId.of("Europe/London"))
         frame.size = Dimension(512, 256)
         RenderTestUtils.compareRendering("BlueskyFrame", "MultiLine", frame)
     }
@@ -72,7 +73,7 @@ class BlueskyFrameTest {
             ),
         )
 
-        val frame = BlueskyFrame(post.asOneTimePublisher())
+        val frame = BlueskyFrame(post.asOneTimePublisher(), timezone = ZoneId.of("Europe/London"))
         frame.size = Dimension(512, 256)
         RenderTestUtils.compareRendering("BlueskyFrame", "MentionsAndHashtags", frame)
     }
@@ -102,7 +103,7 @@ class BlueskyFrameTest {
             ),
         )
 
-        val frame = BlueskyFrame(post.asOneTimePublisher())
+        val frame = BlueskyFrame(post.asOneTimePublisher(), timezone = ZoneId.of("Europe/London"))
         frame.size = Dimension(512, 256)
         RenderTestUtils.compareRendering("BlueskyFrame", "Links", frame)
     }
@@ -124,7 +125,7 @@ class BlueskyFrameTest {
             ),
         )
 
-        val frame = BlueskyFrame(post.asOneTimePublisher())
+        val frame = BlueskyFrame(post.asOneTimePublisher(), timezone = ZoneId.of("Europe/London"))
         frame.size = Dimension(512, 256)
         RenderTestUtils.compareRendering("BlueskyFrame", "LinksWithoutCard", frame)
     }
@@ -152,7 +153,7 @@ class BlueskyFrameTest {
             ),
         )
 
-        val frame = BlueskyFrame(post.asOneTimePublisher())
+        val frame = BlueskyFrame(post.asOneTimePublisher(), timezone = ZoneId.of("Europe/London"))
         frame.size = Dimension(512, 256)
         RenderTestUtils.compareRendering("BlueskyFrame", "Images", frame)
     }
@@ -171,7 +172,7 @@ class BlueskyFrameTest {
             ),
         )
 
-        val frame = BlueskyFrame(post.asOneTimePublisher())
+        val frame = BlueskyFrame(post.asOneTimePublisher(), timezone = ZoneId.of("Europe/London"))
         frame.size = Dimension(512, 256)
         RenderTestUtils.compareRendering("BlueskyFrame", "Emoji", frame)
     }
@@ -213,7 +214,7 @@ class BlueskyFrameTest {
                 ),
             ),
         )
-        val frame = BlueskyFrame(post.asOneTimePublisher())
+        val frame = BlueskyFrame(post.asOneTimePublisher(), timezone = ZoneId.of("Europe/London"))
         frame.size = Dimension(512, 512)
         RenderTestUtils.compareRendering("BlueskyFrame", "QuotedPost", frame)
     }
@@ -222,7 +223,7 @@ class BlueskyFrameTest {
     fun testError() {
         val post = BlueskyFrame.fromError("Record not found")
 
-        val frame = BlueskyFrame(post.asOneTimePublisher())
+        val frame = BlueskyFrame(post.asOneTimePublisher(), timezone = ZoneId.of("Europe/London"))
         frame.size = Dimension(512, 256)
         RenderTestUtils.compareRendering("BlueskyFrame", "Errors", frame)
     }

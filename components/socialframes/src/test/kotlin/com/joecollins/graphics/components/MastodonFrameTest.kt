@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test
 import java.awt.Dimension
 import java.net.URL
 import java.time.Instant
+import java.time.ZoneId
 
 class MastodonFrameTest {
 
@@ -32,7 +33,7 @@ class MastodonFrameTest {
             url = URL("https://mastodon.world/@Joe_C_London/123"),
         )
 
-        val frame = MastodonFrame(toot.asOneTimePublisher())
+        val frame = MastodonFrame(toot.asOneTimePublisher(), timezone = ZoneId.of("Europe/London"))
         frame.size = Dimension(512, 256)
         RenderTestUtils.compareRendering("MastodonFrame", "Basic", frame)
     }
@@ -52,7 +53,7 @@ class MastodonFrameTest {
             url = URL("https://mastodon.world/@Joe_C_London/123"),
         )
 
-        val frame = MastodonFrame(toot.asOneTimePublisher())
+        val frame = MastodonFrame(toot.asOneTimePublisher(), timezone = ZoneId.of("Europe/London"))
         frame.size = Dimension(512, 256)
         RenderTestUtils.compareRendering("MastodonFrame", "Basic", frame)
     }
@@ -72,7 +73,7 @@ class MastodonFrameTest {
             url = URL("https://mastodon.world/@Joe_C_London/123"),
         )
 
-        val frame = MastodonFrame(toot.asOneTimePublisher())
+        val frame = MastodonFrame(toot.asOneTimePublisher(), timezone = ZoneId.of("Europe/London"))
         frame.size = Dimension(512, 256)
         RenderTestUtils.compareRendering("MastodonFrame", "MultiLine", frame)
     }
@@ -119,7 +120,7 @@ class MastodonFrameTest {
             ),
         )
 
-        val frame = MastodonFrame(toot.asOneTimePublisher())
+        val frame = MastodonFrame(toot.asOneTimePublisher(), timezone = ZoneId.of("Europe/London"))
         frame.size = Dimension(512, 256)
         RenderTestUtils.compareRendering("MastodonFrame", "MentionsAndHashtags", frame)
     }
@@ -147,7 +148,7 @@ class MastodonFrameTest {
             ),
         )
 
-        val frame = MastodonFrame(toot.asOneTimePublisher())
+        val frame = MastodonFrame(toot.asOneTimePublisher(), timezone = ZoneId.of("Europe/London"))
         frame.size = Dimension(512, 256)
         RenderTestUtils.compareRendering("MastodonFrame", "Links", frame)
     }
@@ -167,7 +168,7 @@ class MastodonFrameTest {
             url = URL("https://mastodon.world/@Joe_C_London/123"),
         )
 
-        val frame = MastodonFrame(toot.asOneTimePublisher())
+        val frame = MastodonFrame(toot.asOneTimePublisher(), timezone = ZoneId.of("Europe/London"))
         frame.size = Dimension(512, 256)
         RenderTestUtils.compareRendering("MastodonFrame", "LinksWithoutCard", frame)
     }
@@ -193,7 +194,7 @@ class MastodonFrameTest {
             ),
         )
 
-        val frame = MastodonFrame(toot.asOneTimePublisher())
+        val frame = MastodonFrame(toot.asOneTimePublisher(), timezone = ZoneId.of("Europe/London"))
         frame.size = Dimension(512, 256)
         RenderTestUtils.compareRendering("MastodonFrame", "Images", frame)
     }
@@ -213,7 +214,7 @@ class MastodonFrameTest {
             url = URL("https://mastodon.world/@Joe_C_London/123"),
         )
 
-        val frame = MastodonFrame(toot.asOneTimePublisher())
+        val frame = MastodonFrame(toot.asOneTimePublisher(), timezone = ZoneId.of("Europe/London"))
         frame.size = Dimension(512, 256)
         RenderTestUtils.compareRendering("MastodonFrame", "Emoji", frame)
     }
@@ -240,7 +241,7 @@ class MastodonFrameTest {
             ),
         )
 
-        val frame = MastodonFrame(toot.asOneTimePublisher())
+        val frame = MastodonFrame(toot.asOneTimePublisher(), timezone = ZoneId.of("Europe/London"))
         frame.size = Dimension(512, 256)
         RenderTestUtils.compareRendering("MastodonFrame", "Emoji", frame)
     }
@@ -249,7 +250,7 @@ class MastodonFrameTest {
     fun testError() {
         val toot = MastodonFrame.fromError("Record not found", URL("https://mastodon.world/api/v1/statuses/123"))
 
-        val frame = MastodonFrame(toot.asOneTimePublisher())
+        val frame = MastodonFrame(toot.asOneTimePublisher(), timezone = ZoneId.of("Europe/London"))
         frame.size = Dimension(512, 256)
         RenderTestUtils.compareRendering("MastodonFrame", "Errors", frame)
     }
@@ -275,7 +276,7 @@ class MastodonFrameTest {
             ),
         )
 
-        val frame = MastodonFrame(toot.asOneTimePublisher())
+        val frame = MastodonFrame(toot.asOneTimePublisher(), timezone = ZoneId.of("Europe/London"))
         frame.size = Dimension(512, 256)
         RenderTestUtils.compareRendering("MastodonFrame", "Poll", frame)
     }

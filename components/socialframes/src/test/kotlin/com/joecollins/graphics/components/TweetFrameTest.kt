@@ -253,6 +253,7 @@ class TweetFrameTest {
 
         val frame = TweetFrame(
             TweetLoader.loadTweetV2(123L, mockTwitter).asOneTimePublisher(),
+            timezone = ZoneId.of("Europe/London"),
         )
         frame.size = Dimension(512, 256)
         RenderTestUtils.compareRendering("TweetFrame", "Basic", frame)
@@ -271,6 +272,7 @@ class TweetFrameTest {
 
         val frame = TweetFrame(
             TweetLoader.loadTweetV2(123L, mockTwitter).asOneTimePublisher(),
+            timezone = ZoneId.of("Europe/London"),
         )
         frame.size = Dimension(512, 256)
         RenderTestUtils.compareRendering("TweetFrame", "MultiLine", frame)
@@ -290,6 +292,7 @@ class TweetFrameTest {
 
         val frame = TweetFrame(
             TweetLoader.loadTweetV2(123L, mockTwitter).asOneTimePublisher(),
+            timezone = ZoneId.of("Europe/London"),
         )
         frame.size = Dimension(512, 256)
         RenderTestUtils.compareRendering("TweetFrame", "Verified", frame)
@@ -309,6 +312,7 @@ class TweetFrameTest {
 
         val frame = TweetFrame(
             TweetLoader.loadTweetV2(123L, mockTwitter).asOneTimePublisher(),
+            timezone = ZoneId.of("Europe/London"),
         )
         frame.size = Dimension(512, 256)
         RenderTestUtils.compareRendering("TweetFrame", "Protected", frame)
@@ -359,6 +363,7 @@ class TweetFrameTest {
 
         val frame = TweetFrame(
             TweetLoader.loadTweetV2(123L, mockTwitter).asOneTimePublisher(),
+            timezone = ZoneId.of("Europe/London"),
         )
         frame.size = Dimension(512, 256)
         RenderTestUtils.compareRendering("TweetFrame", "MentionsAndHashtags", frame)
@@ -415,6 +420,7 @@ class TweetFrameTest {
 
         val frame = TweetFrame(
             TweetLoader.loadTweetV2(123L, mockTwitter).asOneTimePublisher(),
+            timezone = ZoneId.of("Europe/London"),
         )
         frame.size = Dimension(512, 512)
         RenderTestUtils.compareRendering("TweetFrame", "Links", frame)
@@ -446,6 +452,7 @@ class TweetFrameTest {
 
         val frame = TweetFrame(
             TweetLoader.loadTweetV2(123L, mockTwitter).asOneTimePublisher(),
+            timezone = ZoneId.of("Europe/London"),
         )
         frame.size = Dimension(512, 512)
         RenderTestUtils.compareRendering("TweetFrame", "Images", frame)
@@ -502,6 +509,7 @@ class TweetFrameTest {
 
         val frame = TweetFrame(
             TweetLoader.loadTweetV2(321L, mockTwitter).asOneTimePublisher(),
+            timezone = ZoneId.of("Europe/London"),
         )
         frame.size = Dimension(512, 512)
         RenderTestUtils.compareRendering("TweetFrame", "QuoteTweet", frame)
@@ -520,6 +528,7 @@ class TweetFrameTest {
 
         val frame = TweetFrame(
             TweetLoader.loadTweetV2(123L, mockTwitter).asOneTimePublisher(),
+            timezone = ZoneId.of("Europe/London"),
         )
         frame.size = Dimension(512, 256)
         RenderTestUtils.compareRendering("TweetFrame", "Emoji", frame)
@@ -551,6 +560,7 @@ class TweetFrameTest {
 
         val frame = TweetFrame(
             TweetLoader.loadTweetV2(123L, mockTwitter).asOneTimePublisher(),
+            timezone = ZoneId.of("Europe/London"),
         )
         frame.size = Dimension(512, 256)
         RenderTestUtils.compareRendering("TweetFrame", "Errors", frame)
@@ -583,6 +593,7 @@ class TweetFrameTest {
 
         val frame = TweetFrame(
             TweetLoader.loadTweetV2(123L, mockTwitter).asOneTimePublisher(),
+            timezone = ZoneId.of("Europe/London"),
         )
         frame.size = Dimension(512, 256)
         RenderTestUtils.compareRendering("TweetFrame", "Poll", frame)
