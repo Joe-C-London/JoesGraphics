@@ -12,6 +12,7 @@ import com.joecollins.models.general.PartyOrCoalition
 import com.joecollins.models.general.PollsReporting
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
+import com.joecollins.pubsub.map
 import org.junit.jupiter.api.Test
 import java.awt.Color
 import java.awt.Dimension
@@ -546,7 +547,7 @@ class RegionalBreakdownScreenTest {
                 maxColumns = 4.asOneTimePublisher(),
             ) {
                 section(
-                    items = provincialSeats.entries,
+                    items = provincialSeats.entries.toList(),
                     header = { key.first.uppercase().asOneTimePublisher() },
                     seats = { value.first },
                     prev = { value.second },
@@ -920,6 +921,104 @@ class RegionalBreakdownScreenTest {
             MALPEQUE: PC 5, GRN 1, LIB 1, 7/7
             CHARLOTTETOWN: PC 1, GRN 3, LIB 2, 6/6
             EGMONT: PC 1, GRN 3, LIB 3, 7/7
+            """.trimIndent(),
+        )
+    }
+
+    @Test
+    fun testSeatsChangingCategories() {
+        data class Department(val name: String, val seats: Map<Party, Int>, val prev: Map<Party, Int>)
+        data class Region(val name: String, val departments: List<Department>) {
+            val seats = departments.flatMap { it.seats.entries }.groupingBy { it.key }.fold(0) { a, e -> a + e.value }
+            val prev = departments.flatMap { it.prev.entries }.groupingBy { it.key }.fold(0) { a, e -> a + e.value }
+        }
+
+        val ens = Party("Together!", "ENS", Color.YELLOW)
+        val nfp = Party("New Popular Front", "NFP", Color.RED)
+        val lr = Party("Republicans", "LR", Color.BLUE)
+        val rn = Party("National Rally", "RN", Color.BLUE.darker())
+        val oth = Party.OTHERS
+        val region = Publisher(
+            Region(
+                "Île-de-France",
+                listOf(
+                    Department("Essonne", mapOf(ens to 2, nfp to 7, rn to 1), mapOf(ens to 5, nfp to 3, rn to 1, oth to 1)),
+                    Department("Hauts-de-Seine", mapOf(ens to 7, nfp to 3, lr to 3), mapOf(ens to 8, nfp to 4, lr to 1)),
+                    Department("Paris", mapOf(ens to 6, nfp to 12), mapOf(ens to 9, nfp to 9)),
+                    Department("Seine-et-Marne", mapOf(ens to 2, nfp to 6, lr to 1, rn to 2), mapOf(ens to 5, nfp to 3, lr to 2, rn to 1)),
+                    Department("Seine-Saint-Denis", mapOf(nfp to 12), mapOf(nfp to 12)),
+                    Department("Val-de-Marne", mapOf(ens to 3, nfp to 5, lr to 3), mapOf(ens to 4, nfp to 6, lr to 1)),
+                    Department("Val-d'Oise", mapOf(ens to 1, nfp to 8, rn to 1), mapOf(ens to 5, nfp to 4, oth to 1)),
+                    Department("Yvelines", mapOf(ens to 9, nfp to 3), mapOf(ens to 10, nfp to 2)),
+                ),
+            ),
+        )
+
+        val screen = RegionalBreakdownScreen.of(
+            entries = seats(
+                topRowHeader = region.map { it.name.uppercase() },
+                topRowSeats = region.map { it.seats },
+                topRowPrev = region.map { it.prev },
+                topRowTotal = region.map { it.seats.values.sum() },
+            ) {
+                section(
+                    items = region.map { it.departments },
+                    header = { name.uppercase().asOneTimePublisher() },
+                    seats = { seats.asOneTimePublisher() },
+                    prev = { prev.asOneTimePublisher() },
+                    total = { seats.values.sum().asOneTimePublisher() },
+                )
+            },
+            header = "SEATS BY DEPARTMENT".asOneTimePublisher(),
+            title = region.map { it.name.uppercase() },
+        )
+        screen.setSize(1024, 512)
+        compareRendering("RegionalBreakdownScreen", "SeatsChangingCategories-1", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            ÎLE-DE-FRANCE
+            SEATS BY DEPARTMENT
+            
+            ÎLE-DE-FRANCE: NFP 56 (+13), ENS 30 (-16), LR 7 (+3), RN 4 (+2), OTH 0 (-2), 97/97
+            
+            ESSONNE: NFP 7 (+4), ENS 2 (-3), RN 1 (±0), OTH 0 (-1), 10/10
+            HAUTS-DE-SEINE: NFP 3 (-1), ENS 7 (-1), LR 3 (+2), 13/13
+            PARIS: NFP 12 (+3), ENS 6 (-3), 18/18
+            SEINE-ET-MARNE: NFP 6 (+3), ENS 2 (-3), LR 1 (-1), RN 2 (+1), 11/11
+            SEINE-SAINT-DENIS: NFP 12 (±0), 12/12
+            VAL-DE-MARNE: NFP 5 (-1), ENS 3 (-1), LR 3 (+2), 11/11
+            VAL-D'OISE: NFP 8 (+4), ENS 1 (-4), RN 1 (+1), OTH 0 (-1), 10/10
+            YVELINES: NFP 3 (+1), ENS 9 (-1), 12/12
+            """.trimIndent(),
+        )
+
+        region.submit(
+            Region(
+                "Normandie",
+                listOf(
+                    Department("Calvados", mapOf(ens to 4, nfp to 1, oth to 1), mapOf(ens to 5, nfp to 1)),
+                    Department("Eure", mapOf(rn to 4, nfp to 1), mapOf(rn to 4, nfp to 1)),
+                    Department("Manche", mapOf(ens to 2, nfp to 1, lr to 1), mapOf(ens to 2, nfp to 1, lr to 1)),
+                    Department("Orne", mapOf(nfp to 1, lr to 2), mapOf(nfp to 1, lr to 2)),
+                    Department("Seine-Maritime", mapOf(ens to 3, nfp to 5, rn to 2), mapOf(ens to 5, nfp to 5)),
+                ),
+            ),
+        )
+        compareRendering("RegionalBreakdownScreen", "SeatsChangingCategories-2", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            NORMANDIE
+            SEATS BY DEPARTMENT
+            
+            NORMANDIE: ENS 9 (-3), NFP 9 (±0), RN 6 (+2), LR 3 (±0), OTH 1 (+1), 28/28
+            
+            CALVADOS: ENS 4 (-1), NFP 1 (±0), OTH 1 (+1), 6/6
+            EURE: NFP 1 (±0), RN 4 (±0), 5/5
+            MANCHE: ENS 2 (±0), NFP 1 (±0), LR 1 (±0), 4/4
+            ORNE: NFP 1 (±0), LR 2 (±0), 3/3
+            SEINE-MARITIME: ENS 3 (-2), NFP 5 (±0), RN 2 (+2), 10/10
             """.trimIndent(),
         )
     }
@@ -1616,7 +1715,7 @@ class RegionalBreakdownScreenTest {
                 maxColumns = 4.asOneTimePublisher(),
             ) {
                 section(
-                    items = provincialVotes.entries,
+                    items = provincialVotes.entries.toList(),
                     header = { key.uppercase().asOneTimePublisher() },
                     votes = { value.first },
                     prev = { value.second },
@@ -1781,6 +1880,102 @@ class RegionalBreakdownScreenTest {
             MALPEQUE: PC 42.7%, GRN 31.9%, LIB 24.0%, NDP 1.1%, IND 0.3%
             CHARLOTTETOWN: PC 26.7%, GRN 35.7%, LIB 32.9%, NDP 3.6%, IND 1.1%
             EGMONT: PC 29.2%, GRN 27.6%, LIB 37.0%, NDP 6.2%, IND 0.0%
+            """.trimIndent(),
+        )
+    }
+
+    @Test
+    fun testVotesChangingCategories() {
+        data class Department(val name: String, val votes: Map<Party, Int>, val prev: Map<Party, Int>)
+        data class Region(val name: String, val departments: List<Department>) {
+            val votes = departments.flatMap { it.votes.entries }.groupingBy { it.key }.fold(0) { a, e -> a + e.value }
+            val prev = departments.flatMap { it.prev.entries }.groupingBy { it.key }.fold(0) { a, e -> a + e.value }
+        }
+
+        val ens = Party("Together!", "ENS", Color.YELLOW)
+        val nfp = Party("New Popular Front", "NFP", Color.RED)
+        val lr = Party("Republicans", "LR", Color.BLUE)
+        val rn = Party("National Rally", "RN", Color.BLUE.darker())
+        val oth = Party.OTHERS
+        val region = Publisher(
+            Region(
+                "Île-de-France",
+                listOf(
+                    Department("Essonne", mapOf(ens to 108194, nfp to 201239, lr to 30910, rn to 133557, oth to 55723), mapOf(ens to 103333, nfp to 122455, lr to 38763, rn to 51527, oth to 60526)),
+                    Department("Hauts-de-Seine", mapOf(ens to 203502, nfp to 259685, lr to 118215, rn to 108697, oth to 30573), mapOf(ens to 182596, nfp to 147196, lr to 65832, rn to 33866, oth to 94552)),
+                    Department("Paris", mapOf(ens to 303396, nfp to 418994, lr to 73324, rn to 105602, oth to 86391), mapOf(ens to 239231, nfp to 280578, lr to 84657, rn to 28634, oth to 111262)),
+                    Department("Seine-et-Marne", mapOf(ens to 100670, nfp to 185194, lr to 55269, rn to 205665, oth to 33763), mapOf(ens to 88043, nfp to 111828, lr to 50560, rn to 85194, oth to 56326)),
+                    Department("Seine-Saint-Denis", mapOf(ens to 35389, nfp to 253604, lr to 38393, rn to 81310, oth to 76816), mapOf(ens to 50304, nfp to 139909, lr to 28142, rn to 30460, oth to 55484)),
+                    Department("Val-de-Marne", mapOf(ens to 111264, nfp to 234262, lr to 64612, rn to 100746, oth to 25381), mapOf(ens to 98220, nfp to 138274, lr to 56569, rn to 34220, oth to 47432)),
+                    Department("Val-d'Oise", mapOf(ens to 102331, nfp to 186248, lr to 36298, rn to 124352, oth to 22212), mapOf(ens to 79032, nfp to 97919, lr to 32868, rn to 48932, oth to 54439)),
+                    Department("Yvelines", mapOf(ens to 209177, nfp to 199549, lr to 70578, rn to 165282, oth to 30776), mapOf(ens to 166826, nfp to 120692, lr to 70236, rn to 57320, oth to 77652)),
+                ),
+            ),
+        )
+
+        val screen = RegionalBreakdownScreen.of(
+            entries = votes(
+                topRowHeader = region.map { it.name.uppercase() },
+                topRowVotes = region.map { it.votes },
+                topRowPrev = region.map { it.prev },
+            ) {
+                section(
+                    items = region.map { it.departments },
+                    header = { name.uppercase().asOneTimePublisher() },
+                    votes = { votes.asOneTimePublisher() },
+                    prev = { prev.asOneTimePublisher() },
+                )
+            },
+            header = "FIRST ROUND VOTES BY DEPARTMENT".asOneTimePublisher(),
+            title = region.map { it.name.uppercase() },
+        )
+        screen.setSize(1024, 512)
+        compareRendering("RegionalBreakdownScreen", "VotesChangingCategories-1", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            ÎLE-DE-FRANCE
+            FIRST ROUND VOTES BY DEPARTMENT
+            
+            ÎLE-DE-FRANCE: NFP 38.9% (+6.0), ENS 23.5% (-5.1), RN 20.6% (+10.0), LR 9.8% (-2.4), OTH 7.3% (-8.6)
+            
+            ESSONNE: NFP 38.0% (+5.5), ENS 20.4% (-7.0), RN 25.2% (+11.5), LR 5.8% (-4.5), OTH 10.5% (-5.6)
+            HAUTS-DE-SEINE: NFP 36.0% (+7.9), ENS 28.2% (-6.6), RN 15.1% (+8.6), LR 16.4% (+3.8), OTH 4.2% (-13.8)
+            PARIS: NFP 42.4% (+4.7), ENS 30.7% (-1.4), RN 10.7% (+6.8), LR 7.4% (-3.9), OTH 8.7% (-6.2)
+            SEINE-ET-MARNE: NFP 31.9% (+3.4), ENS 17.3% (-5.1), RN 35.4% (+13.7), LR 9.5% (-3.4), OTH 5.8% (-8.6)
+            SEINE-SAINT-DENIS: NFP 52.2% (+6.3), ENS 7.3% (-9.2), RN 16.7% (+6.7), LR 7.9% (-1.3), OTH 15.8% (-2.4)
+            VAL-DE-MARNE: NFP 43.7% (+6.8), ENS 20.7% (-5.5), RN 18.8% (+9.7), LR 12.0% (-3.0), OTH 4.7% (-7.9)
+            VAL-D'OISE: NFP 39.5% (+8.2), ENS 21.7% (-3.5), RN 26.4% (+10.8), LR 7.7% (-2.8), OTH 4.7% (-12.7)
+            YVELINES: NFP 29.5% (+5.1), ENS 31.0% (-2.9), RN 24.5% (+12.8), LR 10.5% (-3.8), OTH 4.6% (-11.2)
+            """.trimIndent(),
+        )
+
+        region.submit(
+            Region(
+                "Normandie",
+                listOf(
+                    Department("Calvados", mapOf(ens to 84690, nfp to 93618, lr to 53337, rn to 113340, oth to 10699), mapOf(ens to 77283, nfp to 70729, lr to 34824, rn to 47905, oth to 27774)),
+                    Department("Eure", mapOf(ens to 62400, nfp to 65973, lr to 18562, rn to 129111, oth to 9930), mapOf(ens to 53065, nfp to 44941, lr to 20702, rn to 61965, oth to 26695)),
+                    Department("Manche", mapOf(ens to 66927, nfp to 57452, lr to 36889, rn to 83725, oth to 14489), mapOf(ens to 59383, nfp to 43582, lr to 33358, rn to 33139, oth to 18752)),
+                    Department("Orne", mapOf(ens to 12718, nfp to 29588, lr to 40517, rn to 48649, oth to 4534), mapOf(ens to 16921, nfp to 19856, lr to 30040, rn to 20925, oth to 12735)),
+                    Department("Seine-Maritime", mapOf(ens to 132504, nfp to 178687, lr to 34531, rn to 214320, oth to 19905), mapOf(ens to 112486, nfp to 124935, lr to 24058, rn to 97065, oth to 62637)),
+                ),
+            ),
+        )
+        compareRendering("RegionalBreakdownScreen", "VotesChangingCategories-2", screen)
+        assertPublishes(
+            screen.altText,
+            """
+            NORMANDIE
+            FIRST ROUND VOTES BY DEPARTMENT
+            
+            NORMANDIE: RN 36.4% (+14.2), NFP 26.3% (+0.4), ENS 22.2% (-4.9), LR 11.4% (-0.8), OTH 3.7% (-9.0)
+            
+            CALVADOS: RN 31.9% (+13.3), NFP 26.3% (-1.0), ENS 23.8% (-6.1), LR 15.0% (+1.5), OTH 3.0% (-7.7)
+            EURE: RN 45.1% (+15.3), NFP 23.1% (+1.4), ENS 21.8% (-3.8), LR 6.5% (-3.5), OTH 3.5% (-9.4)
+            MANCHE: RN 32.3% (+14.7), NFP 22.1% (-1.0), ENS 25.8% (-5.8), LR 14.2% (-3.5), OTH 5.6% (-4.4)
+            ORNE: RN 35.8% (+14.9), NFP 21.8% (+2.0), ENS 9.4% (-7.5), LR 29.8% (-0.1), OTH 3.3% (-9.3)
+            SEINE-MARITIME: RN 37.0% (+13.9), NFP 30.8% (+1.1), ENS 22.8% (-3.9), LR 6.0% (+0.2), OTH 3.4% (-11.4)
             """.trimIndent(),
         )
     }

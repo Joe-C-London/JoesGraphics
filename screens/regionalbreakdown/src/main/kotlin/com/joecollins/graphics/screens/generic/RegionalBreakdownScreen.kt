@@ -13,6 +13,7 @@ import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.combine
 import com.joecollins.pubsub.compose
 import com.joecollins.pubsub.map
+import com.joecollins.pubsub.mapElements
 import com.joecollins.pubsub.merge
 import java.awt.Color
 import java.text.DecimalFormat
@@ -68,9 +69,11 @@ class RegionalBreakdownScreen private constructor(
                 }
             }
 
-        internal val entries: MutableList<Entry> = LinkedList<Entry>().apply {
-            add(SeatEntry(header, abbreviatedHeader, seats, consolidatedDiff, total, null))
+        private val entriesRaw: MutableList<Flow.Publisher<List<Entry>>> = LinkedList<Flow.Publisher<List<Entry>>>().apply {
+            add(listOf(SeatEntry(header, abbreviatedHeader, seats, consolidatedDiff, total, null)).asOneTimePublisher())
         }
+
+        internal val entries by lazy { entriesRaw.combine().map { it.flatten() } }
 
         private fun toDiff(
             seats: Flow.Publisher<out Map<out PartyOrCoalition, Int>>,
@@ -86,7 +89,29 @@ class RegionalBreakdownScreen private constructor(
         }
 
         fun <T> section(
-            items: Iterable<T>,
+            items: List<T>,
+            header: T.() -> Flow.Publisher<String>,
+            abbreviatedHeader: T.() -> Flow.Publisher<String> = header,
+            seats: T.() -> Flow.Publisher<out Map<out PartyOrCoalition, Int>>,
+            prev: (T.() -> Flow.Publisher<out Map<out PartyOrCoalition, Int>>)? = null,
+            diff: (T.() -> Flow.Publisher<out Map<out PartyOrCoalition, Int>>)? = null,
+            total: (T.() -> Flow.Publisher<Int>)? = null,
+            coalitionMap: (T.() -> Flow.Publisher<Map<Coalition, Party>>?)? = null,
+        ) {
+            section(
+                items.asOneTimePublisher(),
+                header,
+                abbreviatedHeader,
+                seats,
+                prev,
+                diff,
+                total,
+                coalitionMap,
+            )
+        }
+
+        fun <T> section(
+            items: Flow.Publisher<List<T>>,
             header: T.() -> Flow.Publisher<String>,
             abbreviatedHeader: T.() -> Flow.Publisher<String> = header,
             seats: T.() -> Flow.Publisher<out Map<out PartyOrCoalition, Int>>,
@@ -96,9 +121,8 @@ class RegionalBreakdownScreen private constructor(
             coalitionMap: (T.() -> Flow.Publisher<Map<Coalition, Party>>?)? = null,
         ) {
             val consolidatedDiff = diff ?: prev?.let { p -> { toDiff(seats(), p()) } }
-            entries.add(BlankEntry)
-            entries.addAll(
-                items.map {
+            entriesRaw.add(
+                items.mapElements {
                     SeatEntry(
                         header = it.header(),
                         abbreviatedHeader = it.abbreviatedHeader(),
@@ -107,7 +131,8 @@ class RegionalBreakdownScreen private constructor(
                         total = total?.invoke(it),
                         coalitionMap = coalitionMap?.invoke(it),
                     )
-                },
+                }
+                    .map { listOf(BlankEntry) + it },
             )
         }
 
@@ -192,12 +217,34 @@ class RegionalBreakdownScreen private constructor(
                 }
             }
 
-        internal val entries: MutableList<Entry> = LinkedList<Entry>().apply {
-            add(VoteEntry(header, abbreviatedHeader, votes, prev, reporting, null))
+        private val entriesRaw: MutableList<Flow.Publisher<List<Entry>>> = LinkedList<Flow.Publisher<List<Entry>>>().apply {
+            add(listOf(VoteEntry(header, abbreviatedHeader, votes, prev, reporting, null)).asOneTimePublisher())
+        }
+
+        internal val entries by lazy { entriesRaw.combine().map { it.flatten() } }
+
+        fun <T> section(
+            items: List<T>,
+            header: T.() -> Flow.Publisher<String>,
+            abbreviatedHeader: T.() -> Flow.Publisher<String> = header,
+            votes: T.() -> Flow.Publisher<out Map<out PartyOrCoalition, Int>>,
+            prev: (T.() -> Flow.Publisher<out Map<out PartyOrCoalition, Int>>)? = null,
+            reporting: (T.() -> RegionalBreakdownScreen.ReportingString)? = null,
+            coalitionMap: (T.() -> Flow.Publisher<Map<Coalition, Party>>?)? = null,
+        ) {
+            section(
+                items.asOneTimePublisher(),
+                header,
+                abbreviatedHeader,
+                votes,
+                prev,
+                reporting,
+                coalitionMap,
+            )
         }
 
         fun <T> section(
-            items: Iterable<T>,
+            items: Flow.Publisher<List<T>>,
             header: T.() -> Flow.Publisher<String>,
             abbreviatedHeader: T.() -> Flow.Publisher<String> = header,
             votes: T.() -> Flow.Publisher<out Map<out PartyOrCoalition, Int>>,
@@ -205,9 +252,8 @@ class RegionalBreakdownScreen private constructor(
             reporting: (T.() -> ReportingString)? = null,
             coalitionMap: (T.() -> Flow.Publisher<Map<Coalition, Party>>?)? = null,
         ) {
-            entries.add(BlankEntry)
-            entries.addAll(
-                items.map {
+            entriesRaw.add(
+                items.mapElements {
                     VoteEntry(
                         it.header(),
                         it.abbreviatedHeader(),
@@ -216,7 +262,8 @@ class RegionalBreakdownScreen private constructor(
                         reporting?.invoke(it),
                         coalitionMap?.invoke(it),
                     )
-                },
+                }
+                    .map { listOf(BlankEntry) + it },
             )
         }
 
@@ -292,7 +339,7 @@ class RegionalBreakdownScreen private constructor(
 
     companion object {
         fun of(
-            entries: List<Entry>,
+            entries: Flow.Publisher<List<Entry>>,
             header: Flow.Publisher<String>,
             title: Flow.Publisher<String?>,
             progressLabel: Flow.Publisher<String?>? = null,
@@ -312,7 +359,7 @@ class RegionalBreakdownScreen private constructor(
             maxColumns: Flow.Publisher<Int>? = null,
             showZero: Boolean = true,
             builder: SeatEntries.() -> Unit,
-        ): List<Entry> = SeatEntries(
+        ): Flow.Publisher<List<Entry>> = SeatEntries(
             topRowHeader,
             topRowAbbreviatedHeader,
             topRowSeats,
@@ -331,7 +378,7 @@ class RegionalBreakdownScreen private constructor(
             topRowReporting: ReportingString? = null,
             maxColumns: Flow.Publisher<Int>? = null,
             builder: VoteEntries.() -> Unit,
-        ): List<Entry> = VoteEntries(
+        ): Flow.Publisher<List<Entry>> = VoteEntries(
             topRowHeader,
             topRowAbbreviatedHeader,
             topRowVotes,
@@ -344,28 +391,27 @@ class RegionalBreakdownScreen private constructor(
         fun polls(pollsReporting: Flow.Publisher<PollsReporting>) = PollsReportingString(pollsReporting)
 
         private fun createFrame(
-            entries: List<Entry>,
+            entries: Flow.Publisher<List<Entry>>,
             header: Flow.Publisher<out String>,
             progressLabel: Flow.Publisher<String?>?,
         ): MultiSummaryFrame = MultiSummaryFrame(
             headerPublisher = header,
             progressLabel = progressLabel,
             rowsPublisher =
-            entries.map {
+            entries.mapElements {
                 it.header.merge(it.values) { h, v -> MultiSummaryFrame.Row(h, v) }
-            }
-                .combine(),
+            }.map { it.combine() }.compose { it },
         )
 
         private fun createAltText(
-            entries: List<Entry>,
+            entries: Flow.Publisher<List<Entry>>,
             header: Flow.Publisher<out String>,
             progressLabel: Flow.Publisher<String?>?,
             title: Flow.Publisher<out String?>,
         ): Flow.Publisher<String> {
             val headerLine = (if (progressLabel == null) header else header.merge(progressLabel) { h, p -> if (p == null) h else "$h [$p]" })
                 .merge(title) { h, t -> sequenceOf(t, h).filterNotNull().joinToString("\n") }
-            val rows = entries.map { it.altText }.combine().map { it.joinToString("\n") }
+            val rows = entries.mapElements { it.altText }.map { it.combine() }.compose { it }.map { it.joinToString("\n") }
             return headerLine.merge(rows) { h, v -> "$h\n\n$v" }
         }
 
