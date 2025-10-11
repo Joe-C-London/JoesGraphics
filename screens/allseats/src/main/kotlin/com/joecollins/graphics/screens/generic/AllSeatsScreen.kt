@@ -29,7 +29,7 @@ import kotlin.math.roundToInt
 
 class AllSeatsScreen private constructor(title: Flow.Publisher<out String?>, frame: JPanel, altText: Flow.Publisher<String>) : GenericPanel(pad(frame), title, altText) {
 
-    private class Input<T>(private val nameFunc: T.() -> String) {
+    private class Input<T>(private val sortOrder: Comparator<T>) {
         private var prevWinners: List<Pair<T, Party?>> = emptyList()
         private var currResults: Map<T, PartyResult?> = emptyMap()
         private var seatFilter: Set<T>? = null
@@ -40,7 +40,7 @@ class AllSeatsScreen private constructor(title: Flow.Publisher<out String?>, fra
         fun setPrevWinners(prevWinners: Map<T, Party?>) {
             this.prevWinners = prevWinners.entries
                 .asSequence()
-                .sortedBy { e -> StringUtils.stripAccents(nameFunc(e.key)).uppercase() }
+                .sortedWith { a, b -> sortOrder.compare(a.key, b.key) }
                 .map { e ->
                     Pair(
                         e.key,
@@ -112,9 +112,10 @@ class AllSeatsScreen private constructor(title: Flow.Publisher<out String?>, fra
             numRows: Flow.Publisher<out Int>? = null,
             seatFilter: Flow.Publisher<out Set<T>?>? = null,
             partyChanges: Flow.Publisher<Map<Party, Party>>? = null,
+            sortOrder: Comparator<T> = Comparator.comparing { StringUtils.stripAccents(nameFunc(it).uppercase()) },
             title: Flow.Publisher<out String?>,
         ): AllSeatsScreen {
-            val inputs = Input(nameFunc)
+            val inputs = Input(sortOrder)
             prevWinner.subscribe(Subscriber { inputs.setPrevWinners(it) })
             currResult.subscribe(Subscriber { inputs.setCurrResults(it) })
             seatFilter?.subscribe(Subscriber { inputs.setSeatFilter(it) })

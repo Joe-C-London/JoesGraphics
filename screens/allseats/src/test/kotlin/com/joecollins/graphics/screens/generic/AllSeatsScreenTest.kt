@@ -352,6 +352,97 @@ class AllSeatsScreenTest {
         )
     }
 
+    @Test
+    fun testAllSeatsSorted() {
+        val bcPrevResult = bcPrevResult()
+        val prevResult = Publisher(bcPrevResult)
+        val currResult = Publisher<Map<String, PartyResult?>>(emptyMap())
+        val numRows = Publisher(15)
+        val title = Publisher("BRITISH COLUMBIA")
+        val panel = AllSeatsScreen.of(
+            prevWinner = prevResult,
+            currResult = currResult,
+            nameFunc = { uppercase() },
+            sortOrder = Comparator.comparing<String, String> { bcPrevResult[it]!!.abbreviation }.thenComparing { it.uppercase() },
+            header = "ALL SEATS".asOneTimePublisher(),
+            numRows = numRows,
+            title = title,
+        )
+        panel.setSize(1024, 512)
+        compareRendering("AllSeatsScreen", "Sorted-1", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            BRITISH COLUMBIA
+
+            ALL SEATS
+            PENDING LIB: 43
+            PENDING NDP: 41
+            PENDING GRN: 3
+            """.trimIndent(),
+        )
+
+        currResult.submit(
+            mapOf(
+                "Coquitlam-Burke Mountain" to leading(ndp),
+                "Fraser-Nicola" to leading(ndp),
+                "Vancouver-False Creek" to leading(ndp),
+            ),
+        )
+        compareRendering("AllSeatsScreen", "Sorted-2", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            BRITISH COLUMBIA
+
+            ALL SEATS
+            PENDING NDP: 41
+            PENDING LIB: 40
+            PENDING GRN: 3
+            NDP GAIN FROM LIB: 0/3
+            """.trimIndent(),
+        )
+
+        currResult.submit(
+            mapOf(
+                "Coquitlam-Burke Mountain" to elected(ndp),
+                "Fraser-Nicola" to leading(lib),
+                "Richmond-Queensborough" to leading(ndp),
+                "Vancouver-False Creek" to leading(ndp),
+            ),
+        )
+        compareRendering("AllSeatsScreen", "Sorted-3", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            BRITISH COLUMBIA
+
+            ALL SEATS
+            PENDING NDP: 41
+            PENDING LIB: 39
+            PENDING GRN: 3
+            NDP GAIN FROM LIB: 1/3
+            LIB HOLD: 0/1
+            """.trimIndent(),
+        )
+
+        currResult.submit(bcCurrResult())
+        compareRendering("AllSeatsScreen", "Sorted-4", panel)
+        assertPublishes(
+            panel.altText,
+            """
+            BRITISH COLUMBIA
+
+            ALL SEATS
+            NDP HOLD: 39/41
+            LIB HOLD: 16/28
+            NDP GAIN FROM LIB: 4/15
+            GRN HOLD: 1/2
+            NDP GAIN FROM GRN: 1/1
+            """.trimIndent(),
+        )
+    }
+
     companion object {
         private val lib = Party("Liberal", "LIB", Color.RED)
         private val ndp = Party("New Democratic Party", "NDP", Color.ORANGE)
