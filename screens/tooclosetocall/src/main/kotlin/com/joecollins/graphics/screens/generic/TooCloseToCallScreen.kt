@@ -129,7 +129,7 @@ class TooCloseToCallScreen private constructor(
 
         fun <T> nonPartisanVotes(votes: T.() -> Flow.Publisher<out Map<NonPartisanCandidate, Int>>) = Vote(
             votes = votes,
-            label = { surname.uppercase() },
+            label = { shortDisplayName.uppercase() },
             color = { color },
         )
 

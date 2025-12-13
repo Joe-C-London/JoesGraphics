@@ -133,7 +133,7 @@ class CandidateListingScreen private constructor(
                         votes,
                         header,
                         subheadOrDefault,
-                        { surname.uppercase() },
+                        { shortDisplayName.uppercase() },
                         { color },
                     )
                 },
@@ -142,7 +142,7 @@ class CandidateListingScreen private constructor(
                         prevVotes = votes,
                         header = header,
                         subhead = subheadOrDefault,
-                        prevLabel = { surname.uppercase() },
+                        prevLabel = { shortDisplayName.uppercase() },
                         prevColor = { color },
                     )
                 },
@@ -152,7 +152,7 @@ class CandidateListingScreen private constructor(
                     candidatesPanel,
                     prevPanel,
                     secondaryPrevPanel,
-                    { surname.uppercase() },
+                    { shortDisplayName.uppercase() },
                     combinedFunc,
                 ),
             )

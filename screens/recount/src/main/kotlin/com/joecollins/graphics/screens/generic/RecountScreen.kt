@@ -59,7 +59,7 @@ class RecountScreen private constructor(
             header,
             candidateVotes,
             rowHeader,
-            { surname.uppercase() },
+            { shortDisplayName.uppercase() },
             { color },
             threshold,
             reporting,

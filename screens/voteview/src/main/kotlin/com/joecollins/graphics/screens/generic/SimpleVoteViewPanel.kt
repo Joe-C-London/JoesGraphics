@@ -1946,7 +1946,7 @@ class SimpleVoteViewPanel private constructor(
                 r.entries.sortedByDescending { it.key.overrideSortOrder ?: it.value }
                     .map { (c, v) ->
                         BarFrameBuilder.BasicBar.of(
-                            c.surname.uppercase(),
+                            c.shortDisplayName.uppercase(),
                             c.color,
                             v,
                             if (r.size == 1) "UNCONTESTED" else DecimalFormat("0.0%").format(v / total),
@@ -1998,7 +1998,7 @@ class SimpleVoteViewPanel private constructor(
                         val total = r.values.sum().toDouble()
                         (if (h == null) "" else "$h\n") + r.entries.sortedByDescending { it.key.overrideSortOrder ?: it.value }
                             .joinToString("\n") { (c, v) ->
-                                c.surname.uppercase() + ": " +
+                                c.shortDisplayName.uppercase() + ": " +
                                     (if (r.size == 1) "UNCONTESTED" else DecimalFormat("0.0%").format(v / total))
                             }
                     }
