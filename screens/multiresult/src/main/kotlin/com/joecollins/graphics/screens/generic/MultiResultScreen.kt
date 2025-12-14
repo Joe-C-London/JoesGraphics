@@ -11,7 +11,9 @@ import com.joecollins.graphics.components.SwingFrame
 import com.joecollins.graphics.components.SwingFrameBuilder
 import com.joecollins.graphics.screens.generic.SingleResultMap.Companion.createSingleResultMap
 import com.joecollins.models.general.Aggregators
+import com.joecollins.models.general.CanOverrideSortOrder
 import com.joecollins.models.general.Candidate
+import com.joecollins.models.general.NonPartisanCandidate
 import com.joecollins.models.general.Party
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.Subscriber
@@ -38,15 +40,15 @@ class MultiResultScreen private constructor(
     altText: Flow.Publisher<String>,
 ) : GenericPanel(screen, header, altText),
     AltTextProvider {
-    private val panels: MutableList<ResultPanel> = ArrayList()
+    private val panels: MutableList<ResultPanel<*>> = ArrayList()
 
-    class CurrVotes<T> internal constructor() {
-        lateinit var votes: T.() -> Flow.Publisher<out Map<Candidate, Int>>
+    class CurrVotes<T, K> internal constructor() {
+        lateinit var votes: T.() -> Flow.Publisher<out Map<K, Int>>
         lateinit var header: T.() -> Flow.Publisher<out String>
         lateinit var subhead: T.() -> Flow.Publisher<out String?>
         var incumbentMarker: String? = null
-        var winner: (T.() -> Flow.Publisher<out Candidate?>)? = null
-        var runoff: (T.() -> Flow.Publisher<out Set<Candidate>?>)? = null
+        var winner: (T.() -> Flow.Publisher<out K?>)? = null
+        var runoff: (T.() -> Flow.Publisher<out Set<K>?>)? = null
         var pctReporting: (T.() -> Flow.Publisher<out Double>)? = null
         var progressLabel: (T.() -> Flow.Publisher<out String?>)? = null
     }
@@ -74,20 +76,28 @@ class MultiResultScreen private constructor(
         internal val rangeOrDefault by lazy { range ?: 0.10.asOneTimePublisher() }
     }
 
-    private class Result(private val partiesOnly: Boolean, private val incumbentMarker: String?) {
-        var votes: Map<Candidate, Int> = emptyMap()
+    private class Result<K : CanOverrideSortOrder>(
+        private val incumbentMarker: String?,
+        private val others: K,
+        private val isIncumbent: (K) -> Boolean,
+        private val name: (K) -> String,
+        private val party: ((K) -> Party)?,
+        private val color: (K) -> Color,
+        private val pctOnly: Boolean,
+    ) {
+        var votes: Map<K, Int> = emptyMap()
             set(value) {
                 field = value
                 updateBars()
             }
 
-        var winner: Candidate? = null
+        var winner: K? = null
             set(value) {
                 field = value
                 updateBars()
             }
 
-        var runoff: Set<Candidate> = emptySet()
+        var runoff: Set<K> = emptySet()
             set(value) {
                 field = value
                 updateBars()
@@ -106,8 +116,8 @@ class MultiResultScreen private constructor(
             val bars = Aggregators.topAndOthers(
                 votes,
                 maxBars,
-                Candidate.OTHERS,
-                *listOfNotNull(winner).toTypedArray(),
+                others,
+                listOfNotNull(winner),
             )
                 .entries
                 .asSequence()
@@ -116,7 +126,7 @@ class MultiResultScreen private constructor(
                     val candidate = e.key
                     val votes = e.value
                     val pct = 1.0 * votes / total
-                    val useIncumbentMarker = (incumbentMarker != null && candidate.incumbent)
+                    val useIncumbentMarker = (incumbentMarker != null && isIncumbent(candidate))
                     val isWinner = candidate == winner
                     val isRunoff = runoff.contains(candidate)
                     val shape: List<Shape?> = listOf(
@@ -125,31 +135,31 @@ class MultiResultScreen private constructor(
                             isRunoff -> ImageGenerator.createRunoffShape()
                             else -> null
                         },
-                        ImageGenerator.createBoxedTextShape(candidate.party.name.uppercase()) +
+                        party?.let { ImageGenerator.createBoxedTextShape(it(candidate).name.uppercase()) } +
                             (
                                 if (!useIncumbentMarker) {
                                     null
                                 } else {
-                                    ImageGenerator.createFilledBoxedTextShape(incumbentMarker!!)
+                                    ImageGenerator.createFilledBoxedTextShape(incumbentMarker)
                                 }
                                 ),
                     )
                     val leftLabel: List<String> = when {
-                        partiesOnly -> {
-                            listOf(candidate.party.name.uppercase())
-                        }
-                        candidate === Candidate.OTHERS -> {
+                        candidate === others -> {
                             listOf("OTHERS")
                         }
                         else -> {
-                            listOf(candidate.name.uppercase(), "")
+                            listOfNotNull(
+                                name(candidate).uppercase(),
+                                if (useIncumbentMarker) "" else party?.takeUnless { it(candidate) == candidate }?.let { "" },
+                            )
                         }
                     }
                     val rightLabel: List<String> = when {
                         pct.isNaN() -> {
                             listOf("WAITING...")
                         }
-                        partiesOnly -> {
+                        pctOnly -> {
                             listOf(DecimalFormat("0.0%").format(pct))
                         }
                         else -> {
@@ -158,7 +168,7 @@ class MultiResultScreen private constructor(
                     }
                     BarFrameBuilder.BasicBar.of(
                         leftLabel.zip(shape),
-                        candidate.party.color,
+                        color(candidate),
                         if (pct.isNaN()) 0 else pct,
                         rightLabel,
                     )
@@ -176,30 +186,35 @@ class MultiResultScreen private constructor(
         }
     }
 
-    private class ResultPanel(
+    private class ResultPanel<K : CanOverrideSortOrder>(
         incumbentMarker: String?,
         swingPartyOrder: List<Party>?,
         hasMap: Boolean,
-        partiesOnly: Boolean,
+        others: K,
+        isIncumbent: (K) -> Boolean,
+        name: (K) -> String,
+        private val party: ((K) -> Party)?,
+        color: (K) -> Color,
+        pctOnly: Boolean,
     ) : JPanel() {
         private val barFrame: BarFrame
         private var swingFrame: SwingFrame? = null
         private var mapFrame: MapFrame? = null
         var displayBothRows = true
-        private val votes: Publisher<Flow.Publisher<out Map<Candidate, Int>>> = Publisher(Publisher())
+        private val votes: Publisher<Flow.Publisher<out Map<K, Int>>> = Publisher(Publisher())
         private val header: Publisher<Flow.Publisher<out String>> = Publisher(Publisher())
         private val subhead: Publisher<Flow.Publisher<out String?>> = Publisher(Publisher())
         private val pctReporting: Publisher<Flow.Publisher<out Double>> = Publisher(Publisher(1.0))
         private val progressLabel: Publisher<Flow.Publisher<out String?>> = Publisher(Publisher())
-        private val winner: Publisher<Flow.Publisher<out Candidate?>> = Publisher(Publisher())
-        private val runoff: Publisher<Flow.Publisher<out Set<Candidate>?>> = Publisher(Publisher())
+        private val winner: Publisher<Flow.Publisher<out K?>> = Publisher(Publisher())
+        private val runoff: Publisher<Flow.Publisher<out Set<K>?>> = Publisher(Publisher())
         private val prevVotes: Publisher<Flow.Publisher<out Map<Party, Int>>> = Publisher(Publisher())
         private val maxBars: Publisher<Flow.Publisher<out Int>> = Publisher(Publisher())
         private val swingHeader: Publisher<Flow.Publisher<out String?>> = Publisher(Publisher())
         private val swingRange: Publisher<Flow.Publisher<out Double>> = Publisher(Publisher())
         private val map: Publisher<Flow.Publisher<out AbstractSingleResultMap<*, *>>> = Publisher(Publisher())
 
-        fun setVotesPublisher(votes: Flow.Publisher<out Map<Candidate, Int>>) {
+        fun setVotesPublisher(votes: Flow.Publisher<out Map<K, Int>>) {
             this.votes.submit(votes)
         }
 
@@ -211,11 +226,11 @@ class MultiResultScreen private constructor(
             this.subhead.submit(subhead)
         }
 
-        fun setWinnerPublisher(winner: Flow.Publisher<out Candidate?>) {
+        fun setWinnerPublisher(winner: Flow.Publisher<out K?>) {
             this.winner.submit(winner)
         }
 
-        fun setRunoffPublisher(runoff: Flow.Publisher<out Set<Candidate>?>) {
+        fun setRunoffPublisher(runoff: Flow.Publisher<out Set<K>?>) {
             this.runoff.submit(runoff)
         }
 
@@ -248,11 +263,11 @@ class MultiResultScreen private constructor(
         }
 
         fun unbindAll() {
-            setVotesPublisher(emptyMap<Candidate, Int>().asOneTimePublisher())
+            setVotesPublisher(emptyMap<K, Int>().asOneTimePublisher())
             setHeaderPublisher("".asOneTimePublisher())
             setSubheadPublisher("".asOneTimePublisher())
             setWinnerPublisher(null.asOneTimePublisher())
-            setRunoffPublisher(emptySet<Candidate>().asOneTimePublisher())
+            setRunoffPublisher(emptySet<K>().asOneTimePublisher())
             setPctReportingPublisher(0.0.asOneTimePublisher())
             setProgressLabelPublisher(null.asOneTimePublisher())
             setPrevPublisher(emptyMap<Party, Int>().asOneTimePublisher())
@@ -287,7 +302,15 @@ class MultiResultScreen private constructor(
         init {
             background = Color.WHITE
             layout = ResultPanelLayout()
-            val result = Result(partiesOnly, incumbentMarker)
+            val result = Result(
+                incumbentMarker,
+                others,
+                isIncumbent,
+                name,
+                party,
+                color,
+                pctOnly,
+            )
             votes.selfCompose().subscribe(Subscriber { result.votes = it })
             winner.selfCompose().subscribe(Subscriber { result.winner = it })
             runoff.selfCompose().subscribe(Subscriber { result.runoff = it ?: emptySet() })
@@ -301,12 +324,12 @@ class MultiResultScreen private constructor(
                 subheadPublisher = subhead.selfCompose(),
             )
             add(barFrame)
-            if (swingPartyOrder != null) {
+            if (swingPartyOrder != null && party != null) {
                 swingFrame = SwingFrameBuilder.prevCurr(
                     prev = prevVotes.selfCompose(),
                     curr = votes.selfCompose()
                         .map { m ->
-                            m.entries.groupingBy { it.key.party }.fold(0) { a, e -> a + e.value }
+                            m.entries.groupingBy { party(it.key) }.fold(0) { a, e -> a + e.value }
                         },
                     partyOrder = swingPartyOrder,
                     header = swingHeader.selfCompose(),
@@ -325,17 +348,22 @@ class MultiResultScreen private constructor(
 
         fun <T> of(
             list: Flow.Publisher<out List<T>>,
-            curr: CurrVotes<T>.() -> Unit,
+            curr: CurrVotes<T, Candidate>.() -> Unit,
             prev: (PrevPartyVotes<T>.() -> Unit)? = null,
             map: ((T) -> AbstractSingleResultMap<*, *>)? = null,
             title: Flow.Publisher<out String?>,
         ): MultiResultScreen = build(
             list,
-            CurrVotes<T>().apply(curr),
+            CurrVotes<T, Candidate>().apply(curr),
             prev?.let { PrevPartyVotes<T>().apply(it) },
             map,
-            false,
             title,
+            Candidate.OTHERS,
+            { it.incumbent },
+            { it.name },
+            { it.party },
+            { it.party.color },
+            false,
         )
 
         fun <T> ofParties(
@@ -346,18 +374,8 @@ class MultiResultScreen private constructor(
             title: Flow.Publisher<out String?>,
         ): MultiResultScreen {
             val currVotes = CurrPartyVotes<T>().apply(curr)
-            val candidateVotes = CurrVotes<T>().apply {
-                this.votes = {
-                    currVotes.votes(this).map { m: Map<Party, Int> ->
-                        Aggregators.adjustKey(m) { k: Party ->
-                            if (k == Party.OTHERS) {
-                                Candidate.OTHERS
-                            } else {
-                                Candidate("", k)
-                            }
-                        }
-                    }
-                }
+            val candidateVotes = CurrVotes<T, Party>().apply {
+                this.votes = { currVotes.votes(this) }
                 this.header = currVotes.header
                 this.subhead = currVotes.subhead
                 this.pctReporting = currVotes.pctReporting
@@ -368,18 +386,47 @@ class MultiResultScreen private constructor(
                 candidateVotes,
                 prev?.let { PrevPartyVotes<T>().apply(it) },
                 map,
-                true,
                 title,
+                Party.OTHERS,
+                { false },
+                { it.name },
+                { it },
+                { it.color },
+                true,
             )
         }
 
-        private fun <T> build(
+        fun <T> ofNonPartisan(
+            list: Flow.Publisher<out List<T>>,
+            curr: CurrVotes<T, NonPartisanCandidate>.() -> Unit,
+            map: ((T) -> AbstractSingleResultMap<*, *>)? = null,
+            title: Flow.Publisher<out String?>,
+        ): MultiResultScreen = build(
+            list,
+            CurrVotes<T, NonPartisanCandidate>().apply(curr),
+            null,
+            map,
+            title,
+            NonPartisanCandidate.OTHERS,
+            { it.incumbent },
+            { it.fullName },
+            null,
+            { it.color },
+            false,
+        )
+
+        private fun <T, K : CanOverrideSortOrder> build(
             listPublisher: Flow.Publisher<out List<T>>,
-            curr: CurrVotes<T>,
+            curr: CurrVotes<T, K>,
             prev: PrevPartyVotes<T>?,
             map: ((T) -> AbstractSingleResultMap<*, *>)?,
-            partiesOnly: Boolean,
             title: Flow.Publisher<out String?>,
+            others: K,
+            isIncumbent: (K) -> Boolean,
+            name: (K) -> String,
+            party: ((K) -> Party)?,
+            color: (K) -> Color,
+            pctOnly: Boolean,
         ): MultiResultScreen {
             val itemPublishers: MutableList<Flow.Publisher<out T?>> = ArrayList()
             val center = JPanel()
@@ -410,23 +457,21 @@ class MultiResultScreen private constructor(
                     }
                     val entriesPub = curr.votes(e).merge(winnerAndRunoff) { votes, (winner, runoff) ->
                         val total = votes.values.sum().toDouble()
-                        Aggregators.topAndOthers(votes, (if (list.size > 4) 4 else 5) * (if (partiesOnly) 2 else 1), Candidate.OTHERS).entries
+                        Aggregators.topAndOthers(votes, (if (list.size > 4) 4 else 5) * (if (pctOnly) 2 else 1), others).entries
                             .sortedByDescending { it.key.overrideSortOrder ?: it.value }
                             .joinToString("\n") { (c, v) ->
                                 "${
-                                    if (c == Candidate.OTHERS) {
+                                    if (c == others) {
                                         "OTHERS"
-                                    } else if (partiesOnly) {
-                                        c.party.name.uppercase()
                                     } else {
-                                        "${c.name.uppercase()}${
-                                            if (curr.incumbentMarker != null && c.isIncumbent()) " [${curr.incumbentMarker}]" else ""
-                                        } (${c.party.abbreviation})"
+                                        "${name(c).uppercase()}${
+                                            if (curr.incumbentMarker != null && isIncumbent(c)) " [${curr.incumbentMarker}]" else ""
+                                        }${if (party == null || party(c) == c) "" else " (${party(c).abbreviation})"}"
                                     }
                                 }: ${
                                     if (total == 0.0) {
                                         "WAITING..."
-                                    } else if (partiesOnly) {
+                                    } else if (pctOnly) {
                                         DecimalFormat("0.0%").format(v / total)
                                     } else {
                                         "${DecimalFormat("#,##0").format(v)} (${DecimalFormat("0.0%").format(v / total)})"
@@ -472,19 +517,24 @@ class MultiResultScreen private constructor(
                             curr.incumbentMarker,
                             prev?.swingProps?.partyOrder,
                             map != null,
-                            partiesOnly,
+                            others,
+                            isIncumbent,
+                            name,
+                            party,
+                            color,
+                            pctOnly,
                         )
                         newPanel.setVotesPublisher(
                             itemPublisher.compose {
                                 it?.let(curr.votes)
-                                    ?: emptyMap<Candidate, Int>().asOneTimePublisher()
+                                    ?: emptyMap<K, Int>().asOneTimePublisher()
                             },
                         )
                         if (curr.winner != null) {
                             newPanel.setWinnerPublisher(
                                 itemPublisher.compose {
                                     it?.let(curr.winner!!)
-                                        ?: (null as Candidate?).asOneTimePublisher()
+                                        ?: (null as K?).asOneTimePublisher()
                                 },
                             )
                         }
@@ -492,7 +542,7 @@ class MultiResultScreen private constructor(
                             newPanel.setRunoffPublisher(
                                 itemPublisher.compose {
                                     it?.let(curr.runoff!!)
-                                        ?: (null as Set<Candidate>?).asOneTimePublisher()
+                                        ?: (null as Set<K>?).asOneTimePublisher()
                                 },
                             )
                         }
@@ -555,9 +605,7 @@ class MultiResultScreen private constructor(
                     screen.panels.forEach {
                         it.displayBothRows = numRows == 1
                         it.setMaxBarsPublisher(
-                            (
-                                (if (numRows == 2) 4 else 5) * if (partiesOnly) 2 else 1
-                                ).asOneTimePublisher(),
+                            ((if (numRows == 2) 4 else 5) * if (pctOnly) 2 else 1).asOneTimePublisher(),
                         )
                     }
                     EventQueue.invokeLater {

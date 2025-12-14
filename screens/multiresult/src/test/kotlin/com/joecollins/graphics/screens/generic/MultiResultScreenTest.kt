@@ -5,11 +5,13 @@ import com.joecollins.graphics.utils.PublisherTestUtils.assertPublishes
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.graphics.utils.ShapefileReader
 import com.joecollins.models.general.Candidate
+import com.joecollins.models.general.NonPartisanCandidate
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.map
+import jdk.javadoc.internal.doclets.formats.html.markup.HtmlStyle
 import org.junit.jupiter.api.Test
 import java.awt.Color
 import java.awt.Shape
@@ -2323,6 +2325,69 @@ class MultiResultScreenTest {
                 KRIS CURRIE (PCP): 1,068 (30.7%)
                 JUDY MACNEVIN (LIB): 515 (14.8%)
                 DON WILLS (IND): 26 (0.7%)
+            """.trimIndent(),
+        )
+    }
+
+    @Test
+    fun testNonPartisanPanel() {
+        data class NonPartisanDistrict(val name: String, val votes: Map<NonPartisanCandidate, Int>)
+        val districts = listOf(
+            NonPartisanDistrict(
+                "Aggu",
+                mapOf(
+                    NonPartisanCandidate("Erasmus Ivvalu") to 103,
+                    NonPartisanCandidate("Joanna Quassa", incumbent = true) to 106,
+                ),
+            ),
+            NonPartisanDistrict(
+                "Pangnirtung",
+                mapOf(
+                    NonPartisanCandidate("Nathaniel Julai Alikatuktuk") to 122,
+                    NonPartisanCandidate("Johnny Mike") to 125,
+                    NonPartisanCandidate("Andrew Nakashuk") to 91,
+                ),
+            ),
+            NonPartisanDistrict(
+                "Quttiktuq",
+                mapOf(
+                    NonPartisanCandidate("Philip Kalluk") to 109,
+                    NonPartisanCandidate("Steven Taqtu") to 113,
+                    NonPartisanCandidate("Andrew Taqtu") to 28,
+                ),
+            ),
+        )
+        val panel = MultiResultScreen.ofNonPartisan(
+            list = districts.asOneTimePublisher(),
+            curr = {
+                votes = { votes.asOneTimePublisher() }
+                header = { name.uppercase().asOneTimePublisher() }
+                subhead = { "".asOneTimePublisher() }
+                incumbentMarker = "MLA"
+                winner = { (votes.entries.maxByOrNull { e -> e.value }!!.key).asOneTimePublisher() }
+            },
+            title = "AUTOMATIC RECOUNTS".asOneTimePublisher(),
+        )
+        panel.setSize(1024, 512)
+        compareRendering("MultiResultPanel", "NonPartisan-1", panel)
+        assertPublishes(
+            panel.altText,
+            """
+                AUTOMATIC RECOUNTS
+
+                AGGU
+                JOANNA QUASSA [MLA]: 106 (50.7%) WINNER
+                ERASMUS IVVALU: 103 (49.3%)
+                
+                PANGNIRTUNG
+                JOHNNY MIKE: 125 (37.0%) WINNER
+                NATHANIEL JULAI ALIKATUKTUK: 122 (36.1%)
+                ANDREW NAKASHUK: 91 (26.9%)
+                
+                QUTTIKTUQ
+                STEVEN TAQTU: 113 (45.2%) WINNER
+                PHILIP KALLUK: 109 (43.6%)
+                ANDREW TAQTU: 28 (11.2%)
             """.trimIndent(),
         )
     }

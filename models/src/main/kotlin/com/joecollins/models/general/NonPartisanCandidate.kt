@@ -18,4 +18,8 @@ data class NonPartisanCandidate(
     ) : this(fullName, description, shortDisplayName, if (incumbent) IncumbencyType.DEFAULT else null, color)
 
     val incumbent = incumbencyType != null
+
+    companion object {
+        val OTHERS = NonPartisanCandidate("Others")
+    }
 }
