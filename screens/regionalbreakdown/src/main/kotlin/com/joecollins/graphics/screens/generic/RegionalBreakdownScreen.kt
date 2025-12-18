@@ -29,7 +29,7 @@ class RegionalBreakdownScreen private constructor(
     sealed interface Entry {
         val header: Flow.Publisher<out String>
         val values: Flow.Publisher<out List<Pair<Color, String>>>
-        val altText: Flow.Publisher<String>
+        val altText: Flow.Publisher<(Int) -> String>
     }
 
     private object BlankEntry : Entry {
@@ -38,8 +38,8 @@ class RegionalBreakdownScreen private constructor(
         override val values: Flow.Publisher<out List<Pair<Color, String>>>
             get() = listOf<Pair<Color, String>>().asOneTimePublisher()
 
-        override val altText: Flow.Publisher<String>
-            get() = "".asOneTimePublisher()
+        override val altText: Flow.Publisher<(Int) -> String>
+            get() = { _: Int -> "" }.asOneTimePublisher()
     }
 
     class SeatEntries internal constructor(
@@ -182,20 +182,43 @@ class RegionalBreakdownScreen private constructor(
 
             private fun seatDiffString(seats: Int, diff: Int?): String = "$seats" + (if (diff == null) "" else " (${diff.let { if (it == 0) "±0" else DecimalFormat("+0;-0").format(it) }})")
 
-            override val altText: Flow.Publisher<String> = run {
+            override val altText: Flow.Publisher<(Int) -> String> = run {
                 val seatItems = seatsWithDiff.merge(transformedPartyOrder) { (s, d), po ->
-                    po.filter { party -> s.contains(party) || (d?.contains(party) ?: false) }
-                        .map { party -> party.abbreviation + " " + seatDiffString(s[party] ?: 0, if (d == null) null else (d[party] ?: 0)) }
-                }
-                val totalItem = if (total == null) {
-                    emptyList<String>().asOneTimePublisher()
-                } else {
-                    filteredSeats.merge(total) { s, t ->
-                        listOf("${s.values.sum()}/$t")
+                    { maxLength: Int ->
+                        var partiesToShow = po.filter { party -> s.contains(party) || (d?.contains(party) ?: false) }
+                        var seatsToShow = s
+                        var diffToShow = d
+                        lateinit var text: List<String>
+                        while (true) {
+                            text = partiesToShow
+                                .map { party ->
+                                    party.abbreviation + " " + seatDiffString(
+                                        seatsToShow[party] ?: 0,
+                                        if (diffToShow == null) null else (diffToShow[party] ?: 0),
+                                    )
+                                }
+                            if (partiesToShow.size == 1 || text.joinToString().length < maxLength) break
+
+                            val partyToRemove = partiesToShow.last { it != Party.OTHERS }
+                            partiesToShow -= partyToRemove
+                            if (!partiesToShow.contains(Party.OTHERS)) {
+                                partiesToShow += Party.OTHERS
+                            }
+                            seatsToShow = Aggregators.adjustKey(seatsToShow) { if (partiesToShow.contains(it)) it else Party.OTHERS }
+                            diffToShow = diffToShow?.let { Aggregators.adjustKey(it) { if (partiesToShow.contains(it)) it else Party.OTHERS } }
+                        }
+                        text
                     }
                 }
-                seatItems.merge(totalItem) { a, b -> a + b }
-                    .merge(abbreviatedHeader) { i, h -> h + ": " + i.joinToString(", ") }
+                val totalItem = if (total == null) {
+                    null
+                } else {
+                    filteredSeats.merge(total) { s, t ->
+                        "${s.values.sum()}/$t"
+                    }
+                }
+                seatItems.run { if (totalItem == null) this else merge(totalItem) { a, b -> { maxLength: Int -> a(maxLength - b.length) + b } } }
+                    .merge(abbreviatedHeader) { i, h -> { maxLength: Int -> h + ": " + i(maxLength - h.length).joinToString(", ") } }
             }
         }
     }
@@ -312,13 +335,36 @@ class RegionalBreakdownScreen private constructor(
                 pctEntries.merge(reportingEntries) { a, b -> a + b }
             }
 
-            override val altText: Flow.Publisher<String> = run {
+            override val altText: Flow.Publisher<(Int) -> String> = run {
                 val pctEntries = pctWithDiff.merge(transformedPartyOrder) { (p, d), po ->
-                    po.map { party -> party.abbreviation + " " + pctDiffString(p[party] ?: 0.0, if (d == null) null else (d[party] ?: 0.0)) }
+                    { maxLength: Int ->
+                        var partiesToShow = po
+                        var votesToShow = p
+                        var diffToShow = d
+                        lateinit var text: List<String>
+                        while (true) {
+                            text = partiesToShow.map { party ->
+                                party.abbreviation + " " + pctDiffString(
+                                    votesToShow[party] ?: 0.0,
+                                    if (diffToShow == null) null else (diffToShow[party] ?: 0.0),
+                                )
+                            }
+                            if (partiesToShow.size == 1 || text.joinToString().length < maxLength) break
+
+                            val partyToRemove = partiesToShow.last { it != Party.OTHERS }
+                            partiesToShow -= partyToRemove
+                            if (!partiesToShow.contains(Party.OTHERS)) {
+                                partiesToShow += Party.OTHERS
+                            }
+                            votesToShow = Aggregators.adjustKey(votesToShow, { if (partiesToShow.contains(it)) it else Party.OTHERS }, Double::plus)
+                            diffToShow = diffToShow?.let { Aggregators.adjustKey(it, { if (partiesToShow.contains(it)) it else Party.OTHERS }, Double::plus) }
+                        }
+                        text
+                    }
                 }
-                val reportingEntries = reporting?.reporting()?.map { listOf(it) } ?: emptyList<String>().asOneTimePublisher()
-                pctEntries.merge(reportingEntries) { a, b -> a + b }
-                    .merge(abbreviatedHeader) { i, h -> "$h: ${i.joinToString(", ")}" }
+                val reportingEntries = reporting?.reporting()
+                pctEntries.run { if (reportingEntries == null) this else merge(reportingEntries) { a, b -> { maxLength: Int -> a(maxLength - b.length) + b } } }
+                    .merge(abbreviatedHeader) { i, h -> { maxLength: Int -> "$h: ${i(maxLength - h.length).joinToString(", ")}" } }
             }
 
             private fun pctDiffString(pct: Double, diff: Double?): String = DecimalFormat("0.0%").format(pct) + (if (diff == null) "" else " (${diff.let { if (it == 0.0) "±0.0" else DecimalFormat("+0.0;-0.0").format(it * 100) }})")
@@ -411,8 +457,11 @@ class RegionalBreakdownScreen private constructor(
         ): Flow.Publisher<(Int) -> String> {
             val headerLine = (if (progressLabel == null) header else header.merge(progressLabel) { h, p -> if (p == null) h else "$h [$p]" })
                 .merge(title) { h, t -> sequenceOf(t, h).filterNotNull().joinToString("\n") }
-            val rows = entries.mapElements { it.altText }.map { it.combine() }.compose { it }.map { it.joinToString("\n") }
-            return headerLine.merge(rows) { h, v -> "$h\n\n$v" }.map { text -> { text } }
+            val rows = entries.mapElements { it.altText }
+                .map { it.combine() }
+                .compose { it }
+                .map { l -> { maxLength: Int -> l.joinToString("\n") { it(maxLength / l.size) } } }
+            return headerLine.merge(rows) { h, v -> { maxLength: Int -> "$h\n\n${v(maxLength - h.length - 2)}" } }
         }
 
         private fun extractPartyOrder(result: Map<out PartyOrCoalition, Int>): List<PartyOrCoalition> = extractPartyOrder(result, null)

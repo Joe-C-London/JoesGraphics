@@ -1024,6 +1024,230 @@ class RegionalBreakdownScreenTest {
     }
 
     @Test
+    fun testSeatsWithLimitedAltText() {
+        val lib = Party("Liberal", "LIB", Color.RED)
+        val con = Party("Conservative", "CON", Color.BLUE)
+        val ndp = Party("New Democratic Party", "NDP", Color.ORANGE)
+        val bq = Party("Bloc Quebecois", "BQ", Color.CYAN.darker())
+        val grn = Party("Green", "GRN", Color.GREEN.darker())
+        val ind = Party("Independent", "IND", Party.OTHERS.color)
+
+        val federalSeats = Publisher(emptyMap<Party, Int>()) to Publisher(emptyMap<Party, Int>())
+        val provincialSeats = listOf(
+            "Newfoundland and Labrador" to 7,
+            "Nova Scotia" to 11,
+            "Prince Edward Island" to 4,
+            "New Brunswick" to 10,
+            "Quebec" to 78,
+            "Ontario" to 121,
+            "Manitoba" to 14,
+            "Saskatchewan" to 14,
+            "Alberta" to 34,
+            "British Columbia" to 42,
+            "Northern Canada" to 3,
+        ).associateWith { Publisher(emptyMap<Party, Int>()) to Publisher(emptyMap<Party, Int>()) }
+
+        val screen = RegionalBreakdownScreen.of(
+            entries = seats(
+                topRowHeader = "CANADA".asOneTimePublisher(),
+                topRowSeats = federalSeats.first,
+                topRowPrev = federalSeats.second,
+                topRowTotal = 338.asOneTimePublisher(),
+            ) {
+                section(
+                    items = provincialSeats.entries.toList(),
+                    header = { key.first.uppercase().asOneTimePublisher() },
+                    seats = { value.first },
+                    prev = { value.second },
+                    total = { key.second.asOneTimePublisher() },
+                )
+            },
+            header = "SEATS BY PROVINCE".asOneTimePublisher(),
+            title = "CANADA".asOneTimePublisher(),
+        )
+        screen.size = Dimension(1024, 512)
+        compareRendering("RegionalBreakdownScreen", "SeatsWithLimitedAltText-1", screen)
+        val maxAltTextLength = 800
+        assertPublishes(
+            screen.altText.map { it(maxAltTextLength) },
+            """
+            CANADA
+            SEATS BY PROVINCE
+            
+            CANADA: 0/338
+            
+            NEWFOUNDLAND AND LABRADOR: 0/7
+            NOVA SCOTIA: 0/11
+            PRINCE EDWARD ISLAND: 0/4
+            NEW BRUNSWICK: 0/10
+            QUEBEC: 0/78
+            ONTARIO: 0/121
+            MANITOBA: 0/14
+            SASKATCHEWAN: 0/14
+            ALBERTA: 0/34
+            BRITISH COLUMBIA: 0/42
+            NORTHERN CANADA: 0/3
+            """.trimIndent().also { if (it.length > maxAltTextLength) throw IllegalArgumentException("Invalid expectation length ${it.length}") },
+        )
+
+        federalSeats.also {
+            it.first.submit(mapOf(lib to 6, ndp to 1))
+            it.second.submit(mapOf(lib to 7))
+        }
+        provincialSeats["Newfoundland and Labrador" to 7]!!.also {
+            it.first.submit(mapOf(lib to 6, ndp to 1))
+            it.second.submit(mapOf(lib to 7))
+        }
+        compareRendering("RegionalBreakdownScreen", "SeatsWithLimitedAltText-2", screen)
+        assertPublishes(
+            screen.altText.map { it(maxAltTextLength) },
+            """
+            CANADA
+            SEATS BY PROVINCE
+            
+            CANADA: LIB 6 (-1), NDP 1 (+1), 7/338
+            
+            NEWFOUNDLAND AND LABRADOR: LIB 6 (-1), NDP 1 (+1), 7/7
+            NOVA SCOTIA: 0/11
+            PRINCE EDWARD ISLAND: 0/4
+            NEW BRUNSWICK: 0/10
+            QUEBEC: 0/78
+            ONTARIO: 0/121
+            MANITOBA: 0/14
+            SASKATCHEWAN: 0/14
+            ALBERTA: 0/34
+            BRITISH COLUMBIA: 0/42
+            NORTHERN CANADA: 0/3
+            """.trimIndent().also { if (it.length > maxAltTextLength) throw IllegalArgumentException("Invalid expectation length ${it.length}") },
+        )
+
+        federalSeats.also {
+            it.first.submit(mapOf(lib to 26, con to 4, ndp to 1, grn to 1))
+            it.second.submit(mapOf(lib to 32))
+        }
+        provincialSeats["Nova Scotia" to 11]!!.also {
+            it.first.submit(mapOf(lib to 10, con to 1))
+            it.second.submit(mapOf(lib to 11))
+        }
+        provincialSeats["Prince Edward Island" to 4]!!.also {
+            it.first.submit(mapOf(lib to 4))
+            it.second.submit(mapOf(lib to 4))
+        }
+        provincialSeats["New Brunswick" to 10]!!.also {
+            it.first.submit(mapOf(lib to 6, con to 3, grn to 1))
+            it.second.submit(mapOf(lib to 10))
+        }
+        compareRendering("RegionalBreakdownScreen", "SeatsWithLimitedAltText-3", screen)
+        assertPublishes(
+            screen.altText.map { it(maxAltTextLength) },
+            """
+            CANADA
+            SEATS BY PROVINCE
+            
+            CANADA: LIB 26 (-6), CON 4 (+4), OTH 2 (+2), 32/338
+            
+            NEWFOUNDLAND AND LABRADOR: LIB 6 (-1), NDP 1 (+1), 7/7
+            NOVA SCOTIA: LIB 10 (-1), CON 1 (+1), 11/11
+            PRINCE EDWARD ISLAND: LIB 4 (±0), 4/4
+            NEW BRUNSWICK: LIB 6 (-4), CON 3 (+3), GRN 1 (+1), 10/10
+            QUEBEC: 0/78
+            ONTARIO: 0/121
+            MANITOBA: 0/14
+            SASKATCHEWAN: 0/14
+            ALBERTA: 0/34
+            BRITISH COLUMBIA: 0/42
+            NORTHERN CANADA: 0/3
+            """.trimIndent().also { if (it.length > maxAltTextLength) throw IllegalArgumentException("Invalid expectation length ${it.length}") },
+        )
+
+        federalSeats.also {
+            it.first.submit(mapOf(lib to 145, con to 104, ndp to 13, bq to 32, grn to 1))
+            it.second.submit(mapOf(lib to 166, con to 89, ndp to 30, bq to 10))
+        }
+        provincialSeats["Quebec" to 78]!!.also {
+            it.first.submit(mapOf(lib to 35, con to 10, ndp to 1, bq to 32))
+            it.second.submit(mapOf(lib to 40, con to 12, ndp to 16, bq to 10))
+        }
+        provincialSeats["Ontario" to 121]!!.also {
+            it.first.submit(mapOf(lib to 79, con to 36, ndp to 6))
+            it.second.submit(mapOf(lib to 80, con to 33, ndp to 8))
+        }
+        provincialSeats["Manitoba" to 14]!!.also {
+            it.first.submit(mapOf(lib to 4, con to 7, ndp to 3))
+            it.second.submit(mapOf(lib to 7, con to 5, ndp to 2))
+        }
+        provincialSeats["Saskatchewan" to 14]!!.also {
+            it.first.submit(mapOf(con to 14))
+            it.second.submit(mapOf(lib to 1, con to 10, ndp to 3))
+        }
+        provincialSeats["Alberta" to 34]!!.also {
+            it.first.submit(mapOf(con to 33, ndp to 1))
+            it.second.submit(mapOf(lib to 4, con to 29, ndp to 1))
+        }
+        provincialSeats["Northern Canada" to 3]!!.also {
+            it.first.submit(mapOf(lib to 1, ndp to 1))
+            it.second.submit(mapOf(lib to 2))
+        }
+        compareRendering("RegionalBreakdownScreen", "SeatsWithLimitedAltText-4", screen)
+        assertPublishes(
+            screen.altText.map { it(maxAltTextLength) },
+            """
+            CANADA
+            SEATS BY PROVINCE
+
+            CANADA: LIB 145 (-21), CON 104 (+15), OTH 46 (+6), 295/338
+
+            NEWFOUNDLAND AND LABRADOR: LIB 6 (-1), NDP 1 (+1), 7/7
+            NOVA SCOTIA: LIB 10 (-1), CON 1 (+1), 11/11
+            PRINCE EDWARD ISLAND: LIB 4 (±0), 4/4
+            NEW BRUNSWICK: LIB 6 (-4), CON 3 (+3), GRN 1 (+1), 10/10
+            QUEBEC: LIB 35 (-5), CON 10 (-2), OTH 33 (+7), 78/78
+            ONTARIO: LIB 79 (-1), CON 36 (+3), NDP 6 (-2), 121/121
+            MANITOBA: LIB 4 (-3), CON 7 (+2), NDP 3 (+1), 14/14
+            SASKATCHEWAN: LIB 0 (-1), CON 14 (+4), NDP 0 (-3), 14/14
+            ALBERTA: LIB 0 (-4), CON 33 (+4), NDP 1 (±0), 34/34
+            BRITISH COLUMBIA: 0/42
+            NORTHERN CANADA: LIB 1 (-1), NDP 1 (+1), 2/3
+            """.trimIndent().also { if (it.length > maxAltTextLength) throw IllegalArgumentException("Invalid expectation length ${it.length}") },
+        )
+
+        federalSeats.also {
+            it.first.submit(mapOf(lib to 157, con to 121, ndp to 24, bq to 32, grn to 3, ind to 1))
+            it.second.submit(mapOf(lib to 184, con to 99, ndp to 44, bq to 10, grn to 1))
+        }
+        provincialSeats["British Columbia" to 42]!!.also {
+            it.first.submit(mapOf(lib to 11, con to 17, ndp to 11, grn to 2, ind to 1))
+            it.second.submit(mapOf(lib to 17, con to 10, ndp to 14, grn to 1))
+        }
+        provincialSeats["Northern Canada" to 3]!!.also {
+            it.first.submit(mapOf(lib to 2, ndp to 1))
+            it.second.submit(mapOf(lib to 3))
+        }
+        compareRendering("RegionalBreakdownScreen", "SeatsWithLimitedAltText-5", screen)
+        assertPublishes(
+            screen.altText.map { it(maxAltTextLength) },
+            """
+            CANADA
+            SEATS BY PROVINCE
+            
+            CANADA: LIB 157 (-27), CON 121 (+22), OTH 60 (+5), 338/338
+            
+            NEWFOUNDLAND AND LABRADOR: LIB 6 (-1), NDP 1 (+1), 7/7
+            NOVA SCOTIA: LIB 10 (-1), CON 1 (+1), 11/11
+            PRINCE EDWARD ISLAND: LIB 4 (±0), 4/4
+            NEW BRUNSWICK: LIB 6 (-4), CON 3 (+3), GRN 1 (+1), 10/10
+            QUEBEC: LIB 35 (-5), CON 10 (-2), OTH 33 (+7), 78/78
+            ONTARIO: LIB 79 (-1), CON 36 (+3), NDP 6 (-2), 121/121
+            MANITOBA: LIB 4 (-3), CON 7 (+2), NDP 3 (+1), 14/14
+            SASKATCHEWAN: LIB 0 (-1), CON 14 (+4), NDP 0 (-3), 14/14
+            ALBERTA: LIB 0 (-4), CON 33 (+4), NDP 1 (±0), 34/34
+            BRITISH COLUMBIA: LIB 11 (-6), CON 17 (+7), OTH 14 (-1), 42/42
+            NORTHERN CANADA: LIB 2 (-1), NDP 1 (+1), 3/3
+            """.trimIndent().also { if (it.length > maxAltTextLength) throw IllegalArgumentException("Invalid expectation length ${it.length}") },
+        )
+    }
+
+    @Test
     fun testVotes() {
         val peiVotes = Publisher<Map<Party, Int>>(emptyMap())
         val cardiganVotes = Publisher<Map<Party, Int>>(emptyMap())
@@ -1652,7 +1876,7 @@ class RegionalBreakdownScreenTest {
         screen.setSize(1024, 512)
         compareRendering("RegionalBreakdownScreen", "VotesWithPrev-C", screen)
         assertPublishes(
-            screen.altText.map { it(1000) },
+            screen.altText.map { it(2000) },
             """
             AUSTRALIA
             PRIMARY VOTE BY STATE
@@ -1811,7 +2035,7 @@ class RegionalBreakdownScreenTest {
         }
         compareRendering("RegionalBreakdownScreen", "VotesWithLimitedColumns-2", screen)
         assertPublishes(
-            screen.altText.map { it(1000) },
+            screen.altText.map { it(2000) },
             """
             CANADA
             POPULAR VOTE BY PROVINCE
@@ -1932,7 +2156,7 @@ class RegionalBreakdownScreenTest {
         screen.setSize(1024, 512)
         compareRendering("RegionalBreakdownScreen", "VotesChangingCategories-1", screen)
         assertPublishes(
-            screen.altText.map { it(1000) },
+            screen.altText.map { it(2000) },
             """
             ÎLE-DE-FRANCE
             FIRST ROUND VOTES BY DEPARTMENT
@@ -1977,6 +2201,169 @@ class RegionalBreakdownScreenTest {
             ORNE: RN 35.8% (+14.9), NFP 21.8% (+2.0), ENS 9.4% (-7.5), LR 29.8% (-0.1), OTH 3.3% (-9.3)
             SEINE-MARITIME: RN 37.0% (+13.9), NFP 30.8% (+1.1), ENS 22.8% (-3.9), LR 6.0% (+0.2), OTH 3.4% (-11.4)
             """.trimIndent(),
+        )
+    }
+
+    @Test
+    fun testVotesWithLimitedAltText() {
+        val lib = Party("Liberal", "LIB", Color.RED)
+        val con = Party("Conservative", "CON", Color.BLUE)
+        val ndp = Party("New Democratic Party", "NDP", Color.ORANGE)
+        val bq = Party("Bloc Quebecois", "BQ", Color.CYAN.darker())
+        val grn = Party("Green", "GRN", Color.GREEN.darker())
+        val ppc = Party("Peoples", "PPC", Color.MAGENTA.darker())
+        val oth = Party.OTHERS
+
+        val federalVotes = Triple(
+            Publisher(emptyMap<Party, Int>()),
+            Publisher(emptyMap<Party, Int>()),
+            Publisher(0.0),
+        )
+        val provincialVotes = listOf(
+            "Newfoundland and Labrador",
+            "Nova Scotia",
+            "Prince Edward Island",
+            "New Brunswick",
+            "Quebec",
+            "Ontario",
+            "Manitoba",
+            "Saskatchewan",
+            "Alberta",
+            "British Columbia",
+            "Northern Canada",
+        ).associateWith {
+            Triple(
+                Publisher(emptyMap<Party, Int>()),
+                Publisher(emptyMap<Party, Int>()),
+                Publisher(0.0),
+            )
+        }
+
+        val screen = RegionalBreakdownScreen.of(
+            entries = votes(
+                topRowHeader = "CANADA".asOneTimePublisher(),
+                topRowVotes = federalVotes.first,
+                topRowPrev = federalVotes.second,
+                topRowReporting = pct(federalVotes.third),
+                maxColumns = 4.asOneTimePublisher(),
+            ) {
+                section(
+                    items = provincialVotes.entries.toList(),
+                    header = { key.uppercase().asOneTimePublisher() },
+                    votes = { value.first },
+                    prev = { value.second },
+                    reporting = { pct(value.third) },
+                )
+            },
+            header = "POPULAR VOTE BY PROVINCE".asOneTimePublisher(),
+            title = "CANADA".asOneTimePublisher(),
+        )
+        screen.size = Dimension(1024, 512)
+        compareRendering("RegionalBreakdownScreen", "VotesWithLimitedAltText-1", screen)
+        val maxAltTextLength = 1200
+        assertPublishes(
+            screen.altText.map { it(maxAltTextLength) },
+            """
+            CANADA
+            POPULAR VOTE BY PROVINCE
+            
+            CANADA: 0.0% IN
+            
+            NEWFOUNDLAND AND LABRADOR: 0.0% IN
+            NOVA SCOTIA: 0.0% IN
+            PRINCE EDWARD ISLAND: 0.0% IN
+            NEW BRUNSWICK: 0.0% IN
+            QUEBEC: 0.0% IN
+            ONTARIO: 0.0% IN
+            MANITOBA: 0.0% IN
+            SASKATCHEWAN: 0.0% IN
+            ALBERTA: 0.0% IN
+            BRITISH COLUMBIA: 0.0% IN
+            NORTHERN CANADA: 0.0% IN
+            """.trimIndent().also { if (it.length > maxAltTextLength) throw IllegalArgumentException("Invalid expectation length ${it.length}") },
+        )
+
+        federalVotes.also {
+            it.first.submit(mapOf(lib to 331, con to 343, ndp to 160, bq to 76, grn to 65, ppc to 16, oth to 2))
+            it.second.submit(mapOf(lib to 395, con to 319, ndp to 197, bq to 47, grn to 34, oth to 2))
+            it.third.submit(1.0)
+        }
+        provincialVotes["Newfoundland and Labrador"]!!.also {
+            it.first.submit(mapOf(lib to 449, con to 279, ndp to 237, grn to 31, ppc to 1, oth to 2))
+            it.second.submit(mapOf(lib to 645, con to 103, ndp to 210, grn to 11, oth to 29))
+            it.third.submit(1.0)
+        }
+        provincialVotes["Nova Scotia"]!!.also {
+            it.first.submit(mapOf(lib to 414, con to 257, ndp to 189, grn to 110, ppc to 12, oth to 18))
+            it.second.submit(mapOf(lib to 619, con to 179, ndp to 164, grn to 34, oth to 3))
+            it.third.submit(1.0)
+        }
+        provincialVotes["Prince Edward Island"]!!.also {
+            it.first.submit(mapOf(lib to 437, con to 273, ndp to 76, grn to 209, oth to 5))
+            it.second.submit(mapOf(lib to 583, con to 193, ndp to 160, grn to 60))
+            it.third.submit(1.0)
+        }
+        provincialVotes["New Brunswick"]!!.also {
+            it.first.submit(mapOf(lib to 375, con to 328, ndp to 94, grn to 172, ppc to 20, oth to 11))
+            it.second.submit(mapOf(lib to 516, con to 253, ndp to 183, grn to 46, oth to 1))
+            it.third.submit(1.0)
+        }
+        provincialVotes["Quebec"]!!.also {
+            it.first.submit(mapOf(lib to 343, con to 160, ndp to 108, bq to 324, grn to 45, ppc to 15, oth to 1))
+            it.second.submit(mapOf(lib to 357, con to 167, ndp to 254, bq to 193, grn to 23, oth to 1))
+            it.third.submit(1.0)
+        }
+        provincialVotes["Ontario"]!!.also {
+            it.first.submit(mapOf(lib to 416, con to 331, ndp to 168, grn to 62, ppc to 16, oth to 2))
+            it.second.submit(mapOf(lib to 448, con to 350, ndp to 166, grn to 29, oth to 2))
+            it.third.submit(1.0)
+        }
+        provincialVotes["Manitoba"]!!.also {
+            it.first.submit(mapOf(lib to 265, con to 452, ndp to 208, grn to 51, ppc to 17, oth to 6))
+            it.second.submit(mapOf(lib to 446, con to 373, ndp to 138, grn to 32, oth to 6))
+            it.third.submit(1.0)
+        }
+        provincialVotes["Saskatchewan"]!!.also {
+            it.first.submit(mapOf(lib to 117, con to 640, ndp to 196, grn to 26, ppc to 18, oth to 2))
+            it.second.submit(mapOf(lib to 239, con to 485, ndp to 251, grn to 21, oth to 2))
+            it.third.submit(1.0)
+        }
+        provincialVotes["Alberta"]!!.also {
+            it.first.submit(mapOf(lib to 138, con to 690, ndp to 116, grn to 28, ppc to 22, oth to 5))
+            it.second.submit(mapOf(lib to 246, con to 595, ndp to 116, grn to 25, oth to 8))
+            it.third.submit(1.0)
+        }
+        provincialVotes["British Columbia"]!!.also {
+            it.first.submit(mapOf(lib to 262, con to 340, ndp to 244, grn to 125, ppc to 17, oth to 13))
+            it.second.submit(mapOf(lib to 352, con to 300, ndp to 259, grn to 82, oth to 1))
+            it.third.submit(1.0)
+        }
+        provincialVotes["Northern Canada"]!!.also {
+            it.first.submit(mapOf(lib to 347, con to 281, ndp to 284, grn to 78, ppc to 11))
+            it.second.submit(mapOf(lib to 497, con to 223, ndp to 256, grn to 24))
+            it.third.submit(1.0)
+        }
+        compareRendering("RegionalBreakdownScreen", "VotesWithLimitedAltText-2", screen)
+        assertPublishes(
+            screen.altText.map { it(maxAltTextLength) },
+            """
+            CANADA
+            POPULAR VOTE BY PROVINCE
+            
+            CANADA: CON 34.5% (+2.4), LIB 33.3% (-6.4), NDP 16.1% (-3.7), OTH 16.0% (+7.7), 100.0% IN
+            
+            NEWFOUNDLAND AND LABRADOR: CON 27.9% (+17.6), LIB 44.9% (-19.7), OTH 27.1% (+2.1), 100.0% IN
+            NOVA SCOTIA: CON 25.7% (+7.8), LIB 41.4% (-20.6), OTH 32.9% (+12.8), 100.0% IN
+            PRINCE EDWARD ISLAND: CON 27.3% (+7.9), LIB 43.7% (-14.8), OTH 29.0% (+6.9), 100.0% IN
+            NEW BRUNSWICK: CON 32.8% (+7.5), LIB 37.5% (-14.2), OTH 29.7% (+6.7), 100.0% IN
+            QUEBEC: CON 16.1% (-0.7), LIB 34.4% (-1.4), NDP 10.8% (-14.7), OTH 38.7% (+16.8), 100.0% IN
+            ONTARIO: CON 33.3% (-1.9), LIB 41.8% (-3.2), NDP 16.9% (+0.2), OTH 8.0% (+4.9), 100.0% IN
+            MANITOBA: CON 45.2% (+7.8), LIB 26.5% (-18.3), NDP 20.8% (+7.0), OTH 7.4% (+3.6), 100.0% IN
+            SASKATCHEWAN: CON 64.1% (+15.5), LIB 11.7% (-12.2), OTH 24.2% (-3.2), 100.0% IN
+            ALBERTA: CON 69.1% (+9.0), LIB 13.8% (-11.0), NDP 11.6% (-0.1), OTH 5.5% (+2.2), 100.0% IN
+            BRITISH COLUMBIA: CON 34.0% (+3.8), LIB 26.2% (-9.2), OTH 39.9% (+5.5), 100.0% IN
+            NORTHERN CANADA: CON 28.1% (+5.8), LIB 34.7% (-15.0), OTH 37.3% (+9.3), 100.0% IN
+            """.trimIndent().also { if (it.length > maxAltTextLength) throw IllegalArgumentException("Invalid expectation length ${it.length}") },
         )
     }
 
