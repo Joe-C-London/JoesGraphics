@@ -40,7 +40,7 @@ class SimpleVoteViewPanel private constructor(
     private val changeFrame: JPanel?,
     private val leftSupplementaryFrame: JPanel?,
     private val rightSupplementaryFrame: JPanel?,
-    altText: Flow.Publisher<String>,
+    altText: Flow.Publisher<(Int) -> String>,
 ) : GenericPanel(
     {
         layout = BasicResultLayout()
@@ -1672,7 +1672,7 @@ class SimpleVoteViewPanel private constructor(
             val lines: BarFrameBuilder.Lines<*>? = null,
         )
 
-        private fun createAltText(): Flow.Publisher<String> = listOf(
+        private fun createAltText(): Flow.Publisher<(Int) -> String> = listOf(
             title,
             createBarAltText(),
             createPrevAltText(),
@@ -1681,6 +1681,7 @@ class SimpleVoteViewPanel private constructor(
             createSwingAltText(),
         ).combine()
             .map { list -> list.filterNotNull().joinToString("\n\n") }
+            .map { text -> { text } }
 
         private fun createBarAltText(): Flow.Publisher<out String?> {
             val combineHeadAndSub = { h: String, s: String? -> listOfNotNull(h, s).filter { it.isNotBlank() }.joinToString(", ") }
@@ -1690,7 +1691,15 @@ class SimpleVoteViewPanel private constructor(
                         if (progressLabel == null) {
                             this
                         } else {
-                            merge(progressLabel!!) { h, p -> "$h [$p]" }
+                            merge(progressLabel!!) { h, p ->
+                                if (p == null) {
+                                    h
+                                } else if (h == null) {
+                                    "[$p]"
+                                } else {
+                                    "$h [$p]"
+                                }
+                            }
                         }
                     }
                     .merge(subhead, combineHeadAndSub)
@@ -1961,7 +1970,7 @@ class SimpleVoteViewPanel private constructor(
             )
         }
 
-        private fun createAltText(): Flow.Publisher<String> {
+        private fun createAltText(): Flow.Publisher<(Int) -> String> {
             val result = (current.winners ?: null.asOneTimePublisher()).merge(current.runoff ?: null.asOneTimePublisher()) { w, r -> w to r }
             val votes = current.header.merge(current.progressLabel ?: null.asOneTimePublisher()) { h, p -> if (p == null) h else listOfNotNull(h, "[$p]").joinToString(" ") }
                 .merge(current.subhead) { h, s -> listOfNotNull(h, s).filter { it.isNotEmpty() }.takeIf { it.isNotEmpty() }?.joinToString(", ") }
@@ -2004,6 +2013,7 @@ class SimpleVoteViewPanel private constructor(
                     }
             }
             return listOf<Flow.Publisher<out String?>>(title, votes, prev).combine().map { it.filterNotNull().joinToString("\n\n") }
+                .map { text -> { text } }
         }
     }
 
@@ -2064,7 +2074,7 @@ class SimpleVoteViewPanel private constructor(
             )
         }
 
-        private fun createAltText(): Flow.Publisher<String> {
+        private fun createAltText(): Flow.Publisher<(Int) -> String> {
             val votes = current.header.merge(current.progressLabel ?: null.asOneTimePublisher()) { h, p -> if (p == null) h else listOfNotNull(h, "[$p]").joinToString(" ") }
                 .merge(current.subhead) { h, s -> listOfNotNull(h, s).filter { it.isNotEmpty() }.takeIf { it.isNotEmpty() }?.joinToString(", ") }
                 .merge(current.votes.merge(current.winner ?: null.asOneTimePublisher()) { r, w -> r to w }) { h, (r, w) ->
@@ -2087,7 +2097,7 @@ class SimpleVoteViewPanel private constructor(
                         merge(winningLine.altText()) { h, t -> listOfNotNull(h, t).joinToString("\n") }
                     }
                 }
-            return listOf(title, votes).combine().map { it.joinToString("\n\n") }
+            return listOf(title, votes).combine().map { it.joinToString("\n\n") }.map { text -> { text } }
         }
     }
 }

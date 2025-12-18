@@ -43,7 +43,7 @@ class SimpleReferendumVoteViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "Referendum-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 UNITED KINGDOM
 
@@ -58,7 +58,7 @@ class SimpleReferendumVoteViewPanelTest {
         reporting.submit(PollsReporting(1, 382))
         compareRendering("SimpleVoteViewPanel", "Referendum-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 UNITED KINGDOM
 
@@ -74,7 +74,7 @@ class SimpleReferendumVoteViewPanelTest {
         title.submit("OUTSIDE ENGLAND")
         compareRendering("SimpleVoteViewPanel", "Referendum-3", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 OUTSIDE ENGLAND
 
@@ -88,7 +88,7 @@ class SimpleReferendumVoteViewPanelTest {
         reporting.submit(PollsReporting(2, 56))
         compareRendering("SimpleVoteViewPanel", "Referendum-4", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 OUTSIDE ENGLAND
 
@@ -102,7 +102,7 @@ class SimpleReferendumVoteViewPanelTest {
         reporting.submit(PollsReporting(24, 56))
         compareRendering("SimpleVoteViewPanel", "Referendum-5", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 OUTSIDE ENGLAND
 
@@ -117,7 +117,7 @@ class SimpleReferendumVoteViewPanelTest {
         title.submit("UNITED KINGDOM")
         compareRendering("SimpleVoteViewPanel", "Referendum-6", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 UNITED KINGDOM
 
@@ -132,7 +132,7 @@ class SimpleReferendumVoteViewPanelTest {
         reporting.submit(PollsReporting(56, 382))
         compareRendering("SimpleVoteViewPanel", "Referendum-7", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 UNITED KINGDOM
 
@@ -148,7 +148,7 @@ class SimpleReferendumVoteViewPanelTest {
         winner.submit(EuReferendumOption.LEAVE)
         compareRendering("SimpleVoteViewPanel", "Referendum-8", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 UNITED KINGDOM
 

@@ -9,6 +9,7 @@ import com.joecollins.models.general.NonPartisanCandidate
 import com.joecollins.models.general.NonPartisanCandidateResult
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
+import com.joecollins.pubsub.map
 import org.junit.jupiter.api.Test
 import java.awt.Color
 
@@ -66,7 +67,7 @@ class SimpleNonPartisanCandidateVoteView {
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "NonPartisan-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 MONTAGUE-KILMUIR
                 
@@ -98,7 +99,7 @@ class SimpleNonPartisanCandidateVoteView {
         leader.submit(NonPartisanCandidateResult.leading(lib))
         compareRendering("SimpleVoteViewPanel", "NonPartisan-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 MONTAGUE-KILMUIR
                 
@@ -130,7 +131,7 @@ class SimpleNonPartisanCandidateVoteView {
         leader.submit(NonPartisanCandidateResult.leading(grn))
         compareRendering("SimpleVoteViewPanel", "NonPartisan-3", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 MONTAGUE-KILMUIR
                 
@@ -162,7 +163,7 @@ class SimpleNonPartisanCandidateVoteView {
         leader.submit(NonPartisanCandidateResult.leading(pc))
         compareRendering("SimpleVoteViewPanel", "NonPartisan-4", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 MONTAGUE-KILMUIR
                 
@@ -195,7 +196,7 @@ class SimpleNonPartisanCandidateVoteView {
         winner.submit(pc)
         compareRendering("SimpleVoteViewPanel", "NonPartisan-5", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 MONTAGUE-KILMUIR
                 
@@ -216,7 +217,7 @@ class SimpleNonPartisanCandidateVoteView {
         winner.submit(null)
         compareRendering("SimpleVoteViewPanel", "NonPartisan-6", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 MONTAGUE-KILMUIR
                 
@@ -267,7 +268,7 @@ class SimpleNonPartisanCandidateVoteView {
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "NonPartisanMisc-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 IQALUIT-TASILUK
                 
@@ -300,7 +301,7 @@ class SimpleNonPartisanCandidateVoteView {
         )
         compareRendering("SimpleVoteViewPanel", "NonPartisanMisc-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 IQALUIT-NIAQUNNGUU
 
@@ -330,7 +331,7 @@ class SimpleNonPartisanCandidateVoteView {
         )
         compareRendering("SimpleVoteViewPanel", "NonPartisanMisc-3", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 ARVIAT SOUTH
 
@@ -359,7 +360,7 @@ class SimpleNonPartisanCandidateVoteView {
         )
         compareRendering("SimpleVoteViewPanel", "NonPartisanMisc-4", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 KUGLUKTUK
 
@@ -408,7 +409,7 @@ class SimpleNonPartisanCandidateVoteView {
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "NonPartisanIncumbent-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 IQALUIT-TASILUK
                 
@@ -441,7 +442,7 @@ class SimpleNonPartisanCandidateVoteView {
         )
         compareRendering("SimpleVoteViewPanel", "NonPartisanIncumbent-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 IQALUIT-NIAQUNNGUU
 
@@ -471,7 +472,7 @@ class SimpleNonPartisanCandidateVoteView {
         )
         compareRendering("SimpleVoteViewPanel", "NonPartisanIncumbent-3", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 ARVIAT SOUTH
 
@@ -500,7 +501,7 @@ class SimpleNonPartisanCandidateVoteView {
         )
         compareRendering("SimpleVoteViewPanel", "NonPartisanIncumbent-4", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 KUGLUKTUK
 

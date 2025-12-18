@@ -4,6 +4,7 @@ import com.joecollins.graphics.utils.PublisherTestUtils.assertPublishes
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.models.general.Party
 import com.joecollins.pubsub.asOneTimePublisher
+import com.joecollins.pubsub.map
 import org.junit.jupiter.api.Test
 import java.awt.Color
 
@@ -57,7 +58,7 @@ class TopThreePlacesScreenTest {
         screen.setSize(1024, 512)
         compareRendering("TopThreePlacesScreen", "Basic-1", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
                 PRINCE EDWARD ISLAND
                 
@@ -118,7 +119,7 @@ class TopThreePlacesScreenTest {
         screen.setSize(1024, 512)
         compareRendering("TopThreePlacesScreen", "Zeroes-1", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
                 PRINCE EDWARD ISLAND
                 

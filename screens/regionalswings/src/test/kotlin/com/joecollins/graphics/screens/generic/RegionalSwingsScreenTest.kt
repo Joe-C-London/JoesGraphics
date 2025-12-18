@@ -6,6 +6,7 @@ import com.joecollins.models.general.Coalition
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyOrCoalition
 import com.joecollins.pubsub.asOneTimePublisher
+import com.joecollins.pubsub.map
 import org.junit.jupiter.api.Test
 import java.awt.Color
 import java.text.DecimalFormat
@@ -89,7 +90,7 @@ class RegionalSwingsScreenTest {
         screen.setSize(1024, 512)
         compareRendering("RegionalSwingsScreen", "Basic", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             AUSTRALIA
             
@@ -259,7 +260,7 @@ class RegionalSwingsScreenTest {
         screen.setSize(1024, 512)
         compareRendering("RegionalSwingsScreen", "PartiesSelected", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             UNITED KINGDOM
 
@@ -333,7 +334,7 @@ class RegionalSwingsScreenTest {
         screen.setSize(1024, 512)
         compareRendering("RegionalSwingsScreen", "PartyChange", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             CANADA
 

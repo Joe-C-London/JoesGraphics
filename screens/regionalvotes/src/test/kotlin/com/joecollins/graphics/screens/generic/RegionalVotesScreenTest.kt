@@ -5,6 +5,7 @@ import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.models.general.Party
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
+import com.joecollins.pubsub.map
 import org.junit.jupiter.api.Test
 import java.awt.Color
 
@@ -45,7 +46,7 @@ class RegionalVotesScreenTest {
         panel.setSize(1024, 512)
         compareRendering("RegionalVotesScreen", "CurrPrev-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             GENERAL ELECTORATES
             PARTY VOTES [0/65] (CHANGE SINCE 2017)
@@ -75,7 +76,7 @@ class RegionalVotesScreenTest {
         )
         compareRendering("RegionalVotesScreen", "CurrPrev-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             GENERAL ELECTORATES
             PARTY VOTES [0/65] (CHANGE SINCE 2017)
@@ -109,7 +110,7 @@ class RegionalVotesScreenTest {
         progress[general]!!.submit("1/65")
         compareRendering("RegionalVotesScreen", "CurrPrev-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             GENERAL ELECTORATES
             PARTY VOTES [1/65] (CHANGE SINCE 2017)
@@ -149,7 +150,7 @@ class RegionalVotesScreenTest {
         progress[maori]!!.submit("1/7")
         compareRendering("RegionalVotesScreen", "CurrPrev-3", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             GENERAL ELECTORATES
             PARTY VOTES [1/65] (CHANGE SINCE 2017)
@@ -219,7 +220,7 @@ class RegionalVotesScreenTest {
 
         compareRendering("RegionalVotesScreen", "CurrPrev-4", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             GENERAL ELECTORATES
             PARTY VOTES [65/65] (CHANGE SINCE 2017)

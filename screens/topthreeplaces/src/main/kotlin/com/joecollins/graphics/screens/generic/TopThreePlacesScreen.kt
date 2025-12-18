@@ -37,7 +37,7 @@ class TopThreePlacesScreen private constructor(
         .merge(places) { h, p ->
             h + p.entries.sortedByDescending { it.value }
                 .joinToString("") { (party, places) -> "\n${party.name.uppercase()}: FIRST ${places.first}, SECOND ${places.second}, THIRD ${places.third}" }
-        },
+        }.map { text -> { text } },
 ) {
     data class Places(val first: Int = 0, val second: Int = 0, val third: Int = 0) : Comparable<Places> {
 

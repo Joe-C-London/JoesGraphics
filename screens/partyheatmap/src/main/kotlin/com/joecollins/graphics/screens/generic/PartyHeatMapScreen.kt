@@ -19,7 +19,7 @@ import java.text.DecimalFormat
 import java.util.concurrent.Flow
 import javax.swing.JPanel
 
-class PartyHeatMapScreen private constructor(panel: JPanel, title: Flow.Publisher<String>, altText: Flow.Publisher<String>) : GenericPanel(panel, title, altText) {
+class PartyHeatMapScreen private constructor(panel: JPanel, title: Flow.Publisher<String>, altText: Flow.Publisher<(Int) -> String>) : GenericPanel(panel, title, altText) {
 
     companion object {
         fun <T> sortByPrevResult(prevResult: (T) -> Map<Party, Int>): (Party, T) -> Flow.Publisher<Double> = { party, riding ->
@@ -175,6 +175,7 @@ class PartyHeatMapScreen private constructor(panel: JPanel, title: Flow.Publishe
                     }.combine().map { it.joinToString("\n\n") }
                 }.compose { it }
                 title.merge(partyTexts) { t, p -> "$t\n\n$p" }
+                    .map { text -> { _: Int -> text } }
             }
 
             return PartyHeatMapScreen(pad(panel), title, altText)

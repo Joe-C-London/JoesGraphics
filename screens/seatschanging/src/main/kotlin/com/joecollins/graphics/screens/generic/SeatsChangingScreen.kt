@@ -13,7 +13,7 @@ import com.joecollins.pubsub.merge
 import java.awt.Color
 import java.util.concurrent.Flow
 
-class SeatsChangingScreen private constructor(title: Flow.Publisher<out String?>, frame: ResultListingFrame, altText: Flow.Publisher<out String?>) : GenericPanel(pad(frame), title, altText) {
+class SeatsChangingScreen private constructor(title: Flow.Publisher<out String?>, frame: ResultListingFrame, altText: Flow.Publisher<out (Int) -> String?>) : GenericPanel(pad(frame), title, altText) {
     private class Input<T> {
         private var prevResults: List<Pair<T, Party>> = emptyList()
         private var currResults: Map<T, PartyResult?> = emptyMap()
@@ -156,7 +156,7 @@ class SeatsChangingScreen private constructor(title: Flow.Publisher<out String?>
                         }
                 }
                 head.merge(entries) { h, e -> "$h\n$e" }
-            }
+            }.map { text -> { _: Int -> text } }
             return SeatsChangingScreen(title, frame, altText)
         }
     }

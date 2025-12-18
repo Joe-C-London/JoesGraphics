@@ -7,6 +7,7 @@ import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyOrCandidate
 import com.joecollins.models.general.PartyResult
 import com.joecollins.pubsub.asOneTimePublisher
+import com.joecollins.pubsub.map
 import org.junit.jupiter.api.Test
 import java.awt.Color
 
@@ -72,7 +73,7 @@ class BattlefieldScreenTest {
         screen.setSize(1024, 512)
         compareRendering("BattlefieldScreen", "NoVotes", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             PRINCE EDWARD ISLAND
             BATTLEFIELD PEI: ADVANCING TO A MAJORITY
@@ -169,7 +170,7 @@ class BattlefieldScreenTest {
         screen.setSize(1024, 512)
         compareRendering("BattlefieldScreen", "Result", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             PRINCE EDWARD ISLAND
             BATTLEFIELD PEI: ADVANCING TO A MAJORITY
@@ -261,7 +262,7 @@ class BattlefieldScreenTest {
         screen.setSize(1024, 512)
         compareRendering("BattlefieldScreen", "ResultMultipleIndependents", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             NEW BRUNSWICK
             BATTLEFIELD NEW BRUNSWICK: ADVANCING TO A MAJORITY
@@ -488,7 +489,7 @@ class BattlefieldScreenTest {
         screen.setSize(1024, 512)
         compareRendering("BattlefieldScreen", "MergedParties", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             ALBERTA
             BATTLEFIELD ALBERTA

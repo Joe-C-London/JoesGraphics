@@ -5,6 +5,7 @@ import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.Party
 import com.joecollins.pubsub.asOneTimePublisher
+import com.joecollins.pubsub.map
 import org.junit.jupiter.api.Test
 import java.awt.Color
 
@@ -154,7 +155,7 @@ class FiguresScreenTest {
         screen.setSize(1024, 512)
         compareRendering("FiguresScreen", "Figures-1", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             PROMINENT FIGURES
             
@@ -244,7 +245,7 @@ class FiguresScreenTest {
         screen.setSize(1024, 512)
         compareRendering("FiguresScreen", "FiguresWithBlanks-1", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             PROMINENT FIGURES
             

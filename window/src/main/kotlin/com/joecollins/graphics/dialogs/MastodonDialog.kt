@@ -21,17 +21,15 @@ class MastodonDialog(panel: JPanel, private val server: String, private val toke
 
     class MastodonException(message: String) : RuntimeException(message)
 
-    override val siteColor: Color
-        get() = Color(99, 100, 255)
+    override val siteColor: Color get() = Color(99, 100, 255)
 
-    override val action: String
-        get() = "Publish!"
+    override val action: String get() = "Publish!"
 
-    override val actionInProgress: String
-        get() = "Publishing"
+    override val actionInProgress: String get() = "Publishing"
 
-    override val maxLength: Int
-        get() = 500
+    override val maxLength: Int get() = 500
+
+    override val maxAltTextLength: Int get() = 1500
 
     init {
         title = "Mastodon ($server)"

@@ -5,6 +5,7 @@ import com.joecollins.graphics.components.SwingFrameBuilder
 import com.joecollins.models.general.Aggregators
 import com.joecollins.models.general.PartyOrCoalition
 import com.joecollins.pubsub.combine
+import com.joecollins.pubsub.map
 import com.joecollins.pubsub.merge
 import java.awt.Color
 import java.awt.GridLayout
@@ -15,7 +16,7 @@ import javax.swing.border.EmptyBorder
 class RegionalSwingsScreen private constructor(
     panel: JPanel,
     title: Flow.Publisher<String>,
-    altText: Flow.Publisher<String>,
+    altText: Flow.Publisher<(Int) -> String>,
 ) : GenericPanel(panel, title, altText) {
 
     companion object {
@@ -62,7 +63,8 @@ class RegionalSwingsScreen private constructor(
                         }
                     }
                         .merge(swingFrame.altText) { t, b -> "$t: $b" }
-                }.combine().merge(title) { text, top -> "$top\n\n${text.joinToString("\n")}" },
+                }.combine().merge(title) { text, top -> "$top\n\n${text.joinToString("\n")}" }
+                    .map { text -> { text } },
             )
         }
     }

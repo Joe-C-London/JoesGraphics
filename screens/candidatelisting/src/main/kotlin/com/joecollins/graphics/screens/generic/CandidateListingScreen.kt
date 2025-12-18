@@ -25,7 +25,7 @@ class CandidateListingScreen private constructor(
     prevPanel: JPanel?,
     secondaryPrevPanel: JPanel?,
     mapPanel: JPanel?,
-    altText: Flow.Publisher<String>,
+    altText: Flow.Publisher<(Int) -> String>,
 ) : GenericPanel(
     {
         layout = RightStackLayout()
@@ -249,7 +249,7 @@ class CandidateListingScreen private constructor(
             secondaryPrev: PrevPanel<PT>?,
             prevLabel: PT.() -> String,
             combinedLabel: CT.() -> String,
-        ): Flow.Publisher<String> {
+        ): Flow.Publisher<(Int) -> String> {
             val candidatesTitle = candidates.header.merge(candidates.subhead) { h, s ->
                 if (s.isNullOrBlank()) {
                     h
@@ -274,7 +274,7 @@ class CandidateListingScreen private constructor(
                 )
                 ret = ret.merge(prevText) { r, p -> "$r\n\n$p" }
             }
-            return ret
+            return ret.map { text -> { text } }
         }
 
         private fun <PT : CanOverrideSortOrder> createPrevAltText(

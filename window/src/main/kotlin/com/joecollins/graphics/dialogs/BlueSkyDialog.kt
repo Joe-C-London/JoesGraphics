@@ -23,6 +23,8 @@ class BlueSkyDialog(panel: JPanel) : GenericSocialDialog(panel) {
 
     override val maxLength: Int get() = 300
 
+    override val maxAltTextLength: Int get() = 2000
+
     override fun send(post: String, image: File, altText: String?) {
         lateinit var blob: JsonObject
         BlueSkyInstance.execute({

@@ -3,6 +3,7 @@ package com.joecollins.graphics.dialogs
 import com.joecollins.graphics.AltTextProvider
 import com.joecollins.graphics.GenericWindow
 import com.joecollins.pubsub.Subscriber
+import com.joecollins.pubsub.map
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Dimension
@@ -27,6 +28,7 @@ abstract class GenericSocialDialog(panel: JPanel) : JDialog() {
     abstract val action: String
     abstract val actionInProgress: String
     abstract val maxLength: Int
+    abstract val maxAltTextLength: Int
 
     init {
         size = Dimension(500, 500)
@@ -64,7 +66,7 @@ abstract class GenericSocialDialog(panel: JPanel) : JDialog() {
         contentPane.add(bottomPanel, BorderLayout.SOUTH)
 
         var charLabelText = {
-            "${textArea.text.length}/$maxLength & ${altTextArea.text.length}/${AltTextProvider.ALT_TEXT_MAX_LENGTH} & ${panel.size.width}x${panel.size.height}"
+            "${textArea.text.length}/$maxLength & ${altTextArea.text.length}/$maxAltTextLength & ${panel.size.width}x${panel.size.height}"
         }
         val charLabel =
             JLabel(charLabelText())
@@ -81,12 +83,12 @@ abstract class GenericSocialDialog(panel: JPanel) : JDialog() {
         if (panel is AltTextProvider) {
             subscriber = Subscriber(
                 Subscriber.eventQueueWrapper {
-                    val text = it?.takeIf { t -> t.length <= AltTextProvider.ALT_TEXT_MAX_LENGTH }
+                    val text = it?.takeIf { t -> t.length <= maxAltTextLength }
                     altTextArea.text = text ?: ""
                     charLabel.text = charLabelText()
                 },
             )
-            panel.altText.subscribe(subscriber)
+            panel.altText.map { it(maxAltTextLength) }.subscribe(subscriber)
         }
 
         val sendButton = JButton(action)

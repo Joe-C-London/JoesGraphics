@@ -28,7 +28,7 @@ class SeatViewPanel private constructor(
     private val changeFrame: JPanel?,
     private val leftSupplementaryFrame: JPanel?,
     private val rightSupplementaryFrame: JPanel?,
-    altText: Flow.Publisher<String>,
+    altText: Flow.Publisher<(Int) -> String>,
 ) : GenericPanel(
     {
         layout = BasicResultLayout()
@@ -942,7 +942,7 @@ class SeatViewPanel private constructor(
             val lines: BarFrameBuilder.Lines<*>?,
         )
 
-        private fun createAltText(): Flow.Publisher<String> {
+        private fun createAltText(): Flow.Publisher<(Int) -> String> {
             val combineHeadAndSub: (String?, String?) -> String? = { h, s ->
                 if (h.isNullOrEmpty()) {
                     s
@@ -1032,6 +1032,7 @@ class SeatViewPanel private constructor(
                 .merge(classificationText) { text, cl -> text + (cl?.let { "\n\n$it" } ?: "") }
                 .merge(prevRawText) { text, cl -> text + (cl?.let { "\n\n$it" } ?: "") }
                 .merge(swingText) { text, swing -> text + (swing?.let { "\n\n$it" } ?: "") }
+                .map { text -> { text } }
         }
     }
 }

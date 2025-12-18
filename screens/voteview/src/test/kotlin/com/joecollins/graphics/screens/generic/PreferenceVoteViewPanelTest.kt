@@ -8,6 +8,7 @@ import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.Party
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
+import com.joecollins.pubsub.map
 import org.junit.jupiter.api.Test
 import java.awt.Color
 
@@ -85,7 +86,7 @@ class PreferenceVoteViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("PreferenceVoteViewPanel", "Basic-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 FONG LIM
                 
@@ -169,7 +170,7 @@ class PreferenceVoteViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("PreferenceVoteViewPanel", "Update-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 FONG LIM
                 
@@ -198,7 +199,7 @@ class PreferenceVoteViewPanelTest {
         voteSubhead.submit("1 OF 9 POLLS REPORTING")
         compareRendering("PreferenceVoteViewPanel", "Update-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 FONG LIM
                 
@@ -236,7 +237,7 @@ class PreferenceVoteViewPanelTest {
         preferenceSubhead.submit("1 OF 9 POLLS REPORTING")
         compareRendering("PreferenceVoteViewPanel", "Update-3", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 FONG LIM
                 
@@ -275,7 +276,7 @@ class PreferenceVoteViewPanelTest {
         leader.submit(alp)
         compareRendering("PreferenceVoteViewPanel", "Update-4", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 FONG LIM
                 
@@ -303,7 +304,7 @@ class PreferenceVoteViewPanelTest {
         preferenceSubhead.submit("9 OF 9 POLLS REPORTING")
         compareRendering("PreferenceVoteViewPanel", "Update-5", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 FONG LIM
                 
@@ -391,7 +392,7 @@ class PreferenceVoteViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("PreferenceVoteViewPanel", "ProgressLabels-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 FONG LIM
                 
@@ -420,7 +421,7 @@ class PreferenceVoteViewPanelTest {
         voteProgress.submit("1/9")
         compareRendering("PreferenceVoteViewPanel", "ProgressLabels-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 FONG LIM
                 
@@ -458,7 +459,7 @@ class PreferenceVoteViewPanelTest {
         preferenceProgress.submit("1/9")
         compareRendering("PreferenceVoteViewPanel", "ProgressLabels-3", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 FONG LIM
                 
@@ -497,7 +498,7 @@ class PreferenceVoteViewPanelTest {
         leader.submit(alp)
         compareRendering("PreferenceVoteViewPanel", "ProgressLabels-4", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 FONG LIM
                 
@@ -525,7 +526,7 @@ class PreferenceVoteViewPanelTest {
         preferenceProgress.submit("9/9")
         compareRendering("PreferenceVoteViewPanel", "ProgressLabels-5", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 FONG LIM
                 
@@ -607,7 +608,7 @@ class PreferenceVoteViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("PreferenceVoteViewPanel", "LotsOfCandidates-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 FONG LIM
                 
@@ -650,7 +651,7 @@ class PreferenceVoteViewPanelTest {
         previous2PPVotes.submit(mapOf(ind to 3109, clp to 1020))
         compareRendering("PreferenceVoteViewPanel", "LotsOfCandidates-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 GOYDER
                 
@@ -741,7 +742,7 @@ class PreferenceVoteViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("PreferenceVoteViewPanel", "SinglePreference-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 SANDERSON
                 
@@ -827,7 +828,7 @@ class PreferenceVoteViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("PreferenceVoteViewPanel", "NoPrevPreference-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 ARNHEM
                 
@@ -921,7 +922,7 @@ class PreferenceVoteViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("PreferenceVoteViewPanel", "ChangeInPreference-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 MELBOURNE
                 
@@ -994,7 +995,7 @@ class PreferenceVoteViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("PreferenceVoteViewPanel", "Ranges-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 AUSTRALIA
                 
@@ -1091,7 +1092,7 @@ class PreferenceVoteViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("PreferenceVoteViewPanel", "Declaration-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 MAYOR OF LONDON
                 
@@ -1116,7 +1117,7 @@ class PreferenceVoteViewPanelTest {
         currentPrimaryVotes.submit(currPrimary)
         compareRendering("PreferenceVoteViewPanel", "Declaration-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 MAYOR OF LONDON
                 
@@ -1141,7 +1142,7 @@ class PreferenceVoteViewPanelTest {
         currentPrimaryVotes.submit(currPrimary)
         compareRendering("PreferenceVoteViewPanel", "Declaration-3", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 MAYOR OF LONDON
                 
@@ -1166,7 +1167,7 @@ class PreferenceVoteViewPanelTest {
         currentPrimaryVotes.submit(currPrimary)
         compareRendering("PreferenceVoteViewPanel", "Declaration-4", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 MAYOR OF LONDON
                 
@@ -1190,7 +1191,7 @@ class PreferenceVoteViewPanelTest {
         current2CPVotes.submit(curr2CP)
         compareRendering("PreferenceVoteViewPanel", "Declaration-5", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 MAYOR OF LONDON
                 
@@ -1214,7 +1215,7 @@ class PreferenceVoteViewPanelTest {
         current2CPVotes.submit(curr2CP)
         compareRendering("PreferenceVoteViewPanel", "Declaration-6", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 MAYOR OF LONDON
                 

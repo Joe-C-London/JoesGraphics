@@ -20,7 +20,7 @@ import javax.swing.border.EmptyBorder
 class MixedMemberAllSeatsScreen private constructor(
     panel: JPanel,
     title: Flow.Publisher<String?>,
-    altText: Flow.Publisher<String>,
+    altText: Flow.Publisher<(Int) -> String>,
 ) : GenericPanel(panel, title, altText) {
 
     companion object {
@@ -68,7 +68,7 @@ class MixedMemberAllSeatsScreen private constructor(
                 title,
                 regionalPanels.map { it.createAltText(allDeclared) }.combine().merge(title) { p, t ->
                     t + p.joinToString("") { "\n\n$it" }
-                },
+                }.map { text -> { text } },
             )
         }
 

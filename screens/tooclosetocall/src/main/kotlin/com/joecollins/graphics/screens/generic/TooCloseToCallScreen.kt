@@ -22,7 +22,7 @@ import java.util.concurrent.Flow
 class TooCloseToCallScreen private constructor(
     titleLabel: Flow.Publisher<out String?>,
     multiSummaryFrame: MultiSummaryFrame,
-    altText: Flow.Publisher<String>,
+    altText: Flow.Publisher<(Int) -> String>,
 ) : GenericPanel(pad(multiSummaryFrame), titleLabel, altText),
     AltTextProvider {
     private class Input<T, CT> {
@@ -207,7 +207,7 @@ class TooCloseToCallScreen private constructor(
             input: Input<T, CT>,
             vote: Vote<T, CT>,
             showLead: Boolean,
-        ): Flow.Publisher<String> {
+        ): Flow.Publisher<(Int) -> String> {
             val headerText = title.merge(header) { t, h ->
                 if (t == null && h == null) {
                     null
@@ -220,28 +220,32 @@ class TooCloseToCallScreen private constructor(
                 }
             }
             return headerText.merge(input.toEntries()) { head, entries ->
-                var size = head?.length ?: -1
-                var dotDotDot = false
-                val entriesText = entries.mapNotNull { e ->
-                    val total = e.votes.values.sum().toDouble()
-                    val entry = "${e.header}: ${
-                        e.topCandidates.take(e.numCandidates).joinToString("; ") { c -> "${vote.label(c.key)}: ${input.sortOrder.candidateDisplay(c.value, total)}" }
-                    }" + (if (showLead) "; LEAD: ${input.sortOrder.leadString(e)}" else "") +
-                        (if (e.reporting.isEmpty()) "" else "; ${e.reporting}")
-                    if (dotDotDot) {
-                        null
-                    } else if (size + entry.length < AltTextProvider.ALT_TEXT_MAX_LENGTH - 10) {
-                        size += entry.length + 1
-                        entry
+                { maxLength: Int ->
+                    var size = head?.length ?: -1
+                    var dotDotDot = false
+                    val entriesText = entries.mapNotNull { e ->
+                        val total = e.votes.values.sum().toDouble()
+                        val entry = "${e.header}: ${
+                            e.topCandidates.take(e.numCandidates).joinToString("; ") { c ->
+                                "${vote.label(c.key)}: ${input.sortOrder.candidateDisplay(c.value, total) }"
+                            }
+                        }" + (if (showLead) "; LEAD: ${input.sortOrder.leadString(e)}" else "") +
+                            (if (e.reporting.isEmpty()) "" else "; ${e.reporting}")
+                        if (dotDotDot) {
+                            null
+                        } else if (size + entry.length < maxLength - 10) {
+                            size += entry.length + 1
+                            entry
+                        } else {
+                            dotDotDot = true
+                            "(...)"
+                        }
+                    }.joinToString("\n").let { it.ifEmpty { "(empty)" } }
+                    if (head.isNullOrEmpty()) {
+                        entriesText
                     } else {
-                        dotDotDot = true
-                        "(...)"
+                        "${head}\n$entriesText"
                     }
-                }.joinToString("\n").let { it.ifEmpty { "(empty)" } }
-                if (head.isNullOrEmpty()) {
-                    entriesText
-                } else {
-                    "${head}\n$entriesText"
                 }
             }
         }

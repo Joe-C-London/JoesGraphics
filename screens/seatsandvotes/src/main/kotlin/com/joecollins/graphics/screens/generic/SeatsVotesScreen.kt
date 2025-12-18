@@ -4,6 +4,7 @@ import com.joecollins.graphics.GenericPanel
 import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.Party
 import com.joecollins.pubsub.asOneTimePublisher
+import com.joecollins.pubsub.map
 import com.joecollins.pubsub.merge
 import java.awt.Color
 import java.awt.GridLayout
@@ -20,9 +21,15 @@ class SeatsVotesScreen private constructor(seats: SeatViewPanel, votes: SimpleVo
             add(votes)
         },
         title,
-        title
-            .merge(seats.altText) { h, s -> "$h\n\n$s" }
-            .merge(votes.altText) { h, v -> "$h\n\n$v" },
+        seats.altText.merge(votes.altText) { sf, vf ->
+            { maxLength: Int ->
+                "${sf(maxLength / 2)}\n\n${vf(maxLength / 2)}"
+            }
+        }.merge(title) { f, h ->
+            { maxLength: Int ->
+                "$h\n\n${f(maxLength - h.length - 2)}"
+            }
+        },
     ) {
 
     class Seats internal constructor() {

@@ -7,6 +7,7 @@ import com.joecollins.models.general.Party
 import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
 import com.joecollins.pubsub.asOneTimePublisher
+import com.joecollins.pubsub.map
 import com.joecollins.pubsub.merge
 import java.awt.BorderLayout
 import java.awt.CardLayout
@@ -38,7 +39,7 @@ class ParliamentVoteFrame(
 ),
     AltTextProvider {
 
-    override val altText: Flow.Publisher<out String?> = run {
+    override val altText: Flow.Publisher<out (Int) -> String?> = run {
         val headLine = titlePublisher.merge(subtitlePublisher) { h, s -> listOfNotNull(h, s).joinToString(": ") }
         val voteLines = votes.merge(partyVotes) { vote, party ->
             sides.mapIndexed { index, side ->
@@ -59,7 +60,7 @@ class ParliamentVoteFrame(
             }
                 .joinToString("\n")
         }.merge(resultText) { v, r -> r ?: v }
-        headLine.merge(voteLines) { h, v -> "$h\n$v" }
+        headLine.merge(voteLines) { h, v -> "$h\n$v" }.map { text -> { text } }
     }
 
     init {

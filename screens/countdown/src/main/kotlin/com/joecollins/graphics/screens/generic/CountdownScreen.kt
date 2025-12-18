@@ -32,7 +32,7 @@ import javax.swing.border.EmptyBorder
 class CountdownScreen private constructor(
     panel: JPanel,
     title: Flow.Publisher<String>,
-    altText: Flow.Publisher<String>,
+    altText: Flow.Publisher<(Int) -> String>,
 ) : GenericPanel(panel, title, altText),
     AltTextProvider {
 
@@ -223,7 +223,7 @@ class CountdownScreen private constructor(
                 altTextLabel(it.header, it.instant(date), clock, timesUpLabel)
             }.combine().map { it.joinToString("\n") }
             val altText = title.merge(timingTexts) { t, tt -> "$t\n\n$tt" }
-
+                .map { text -> { _: Int -> text } }
             return CountdownScreen(outer, title, altText)
         }
 

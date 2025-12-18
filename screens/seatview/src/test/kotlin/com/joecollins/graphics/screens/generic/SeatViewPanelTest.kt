@@ -61,7 +61,7 @@ class SeatViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("SeatViewPanel", "Basic-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 UNITED KINGDOM
                 
@@ -75,7 +75,7 @@ class SeatViewPanelTest {
         seatHeader.submit("1 OF 650 SEATS DECLARED")
         compareRendering("SeatViewPanel", "Basic-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 UNITED KINGDOM
                 
@@ -91,7 +91,7 @@ class SeatViewPanelTest {
         seatHeader.submit("3 OF 650 SEATS DECLARED")
         compareRendering("SeatViewPanel", "Basic-3", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 UNITED KINGDOM
                 
@@ -133,7 +133,7 @@ class SeatViewPanelTest {
         seatSubhead.submit("PROJECTION: CON MAJORITY")
         compareRendering("SeatViewPanel", "Basic-4", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 UNITED KINGDOM
                 
@@ -159,7 +159,7 @@ class SeatViewPanelTest {
         previousSeats.submit(mapOf(snp to 35, con to 13, lab to 7, ld to 4))
         compareRendering("SeatViewPanel", "Basic-5", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 SCOTLAND
                 
@@ -206,7 +206,7 @@ class SeatViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("SeatViewPanel", "Basic-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 UNITED KINGDOM
                 
@@ -220,7 +220,7 @@ class SeatViewPanelTest {
         seatHeader.submit("1 OF 650 SEATS DECLARED")
         compareRendering("SeatViewPanel", "Basic-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 UNITED KINGDOM
                 
@@ -235,7 +235,7 @@ class SeatViewPanelTest {
         seatHeader.submit("3 OF 650 SEATS DECLARED")
         compareRendering("SeatViewPanel", "Basic-3", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 UNITED KINGDOM
                 
@@ -277,7 +277,7 @@ class SeatViewPanelTest {
         seatSubhead.submit("PROJECTION: CON MAJORITY")
         compareRendering("SeatViewPanel", "Basic-4", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 UNITED KINGDOM
                 
@@ -303,7 +303,7 @@ class SeatViewPanelTest {
         seatDiff.submit(mapOf(snp to +13, con to -7, ld to 0, lab to -6))
         compareRendering("SeatViewPanel", "Basic-5", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 SCOTLAND
                 
@@ -363,7 +363,7 @@ class SeatViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("SeatViewPanel", "Swing-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 UNITED KINGDOM
                 
@@ -397,7 +397,7 @@ class SeatViewPanelTest {
         seatHeader.submit("1 OF 650 SEATS DECLARED")
         compareRendering("SeatViewPanel", "Swing-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 UNITED KINGDOM
                 
@@ -465,7 +465,7 @@ class SeatViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("SeatViewPanel", "Map-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 PRINCE EDWARD ISLAND
                 
@@ -486,7 +486,7 @@ class SeatViewPanelTest {
         seatHeader.submit("1 OF 27 DISTRICTS DECLARED")
         compareRendering("SeatViewPanel", "Map-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 PRINCE EDWARD ISLAND
                 
@@ -507,7 +507,7 @@ class SeatViewPanelTest {
         mapHeader.submit("CARDIGAN")
         compareRendering("SeatViewPanel", "Map-3", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 CARDIGAN
                 
@@ -522,7 +522,7 @@ class SeatViewPanelTest {
         winnersByDistrict.submit(winners)
         compareRendering("SeatViewPanel", "Map-3", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 CARDIGAN
                 
@@ -542,7 +542,7 @@ class SeatViewPanelTest {
         seatHeader.submit("2 OF 7 DISTRICTS DECLARED")
         compareRendering("SeatViewPanel", "Map-4", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 CARDIGAN
                 
@@ -565,7 +565,7 @@ class SeatViewPanelTest {
         mapHeader.submit("PEI")
         compareRendering("SeatViewPanel", "Map-5", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 PRINCE EDWARD ISLAND
                 
@@ -582,7 +582,7 @@ class SeatViewPanelTest {
         winnersByDistrict.submit(winners)
         compareRendering("SeatViewPanel", "Map-5", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 PRINCE EDWARD ISLAND
                 
@@ -632,7 +632,7 @@ class SeatViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("SeatViewPanel", "Dual-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 CANADA
                 
@@ -655,7 +655,7 @@ class SeatViewPanelTest {
         seatHeader.submit("7 OF 338 RIDINGS REPORTING")
         compareRendering("SeatViewPanel", "Dual-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 CANADA
                 
@@ -682,7 +682,7 @@ class SeatViewPanelTest {
         seatHeader.submit("32 OF 338 RIDINGS REPORTING")
         compareRendering("SeatViewPanel", "Dual-3", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 CANADA
                 
@@ -715,7 +715,7 @@ class SeatViewPanelTest {
         seatHeader.submit("295 OF 338 RIDINGS REPORTING")
         compareRendering("SeatViewPanel", "Dual-4", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 CANADA
                 
@@ -751,7 +751,7 @@ class SeatViewPanelTest {
         seatHeader.submit("338 OF 338 RIDINGS REPORTING")
         compareRendering("SeatViewPanel", "Dual-5", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 CANADA
                 
@@ -788,7 +788,7 @@ class SeatViewPanelTest {
         seatHeader.submit("338 OF 338 RIDINGS REPORTING")
         compareRendering("SeatViewPanel", "Dual-6", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 CANADA
                 
@@ -840,7 +840,7 @@ class SeatViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("SeatViewPanel", "DualReversed-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 CANADA
                 
@@ -863,7 +863,7 @@ class SeatViewPanelTest {
         seatHeader.submit("7 OF 338 RIDINGS REPORTING")
         compareRendering("SeatViewPanel", "DualReversed-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 CANADA
                 
@@ -890,7 +890,7 @@ class SeatViewPanelTest {
         seatHeader.submit("32 OF 338 RIDINGS REPORTING")
         compareRendering("SeatViewPanel", "DualReversed-3", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 CANADA
                 
@@ -923,7 +923,7 @@ class SeatViewPanelTest {
         seatHeader.submit("295 OF 338 RIDINGS REPORTING")
         compareRendering("SeatViewPanel", "DualReversed-4", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 CANADA
                 
@@ -959,7 +959,7 @@ class SeatViewPanelTest {
         seatHeader.submit("338 OF 338 RIDINGS REPORTING")
         compareRendering("SeatViewPanel", "DualReversed-5", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 CANADA
                 
@@ -996,7 +996,7 @@ class SeatViewPanelTest {
         seatHeader.submit("338 OF 338 RIDINGS REPORTING")
         compareRendering("SeatViewPanel", "DualReversed-6", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 CANADA
                 
@@ -1048,7 +1048,7 @@ class SeatViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("SeatViewPanel", "Dual-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 CANADA
                 
@@ -1072,7 +1072,7 @@ class SeatViewPanelTest {
         seatHeader.submit("7 OF 338 RIDINGS REPORTING")
         compareRendering("SeatViewPanel", "Dual-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 CANADA
                 
@@ -1102,7 +1102,7 @@ class SeatViewPanelTest {
         seatHeader.submit("32 OF 338 RIDINGS REPORTING")
         compareRendering("SeatViewPanel", "Dual-3", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 CANADA
                 
@@ -1136,7 +1136,7 @@ class SeatViewPanelTest {
         seatHeader.submit("295 OF 338 RIDINGS REPORTING")
         compareRendering("SeatViewPanel", "Dual-4", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 CANADA
                 
@@ -1173,7 +1173,7 @@ class SeatViewPanelTest {
         seatHeader.submit("338 OF 338 RIDINGS REPORTING")
         compareRendering("SeatViewPanel", "Dual-5", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 CANADA
                 
@@ -1211,7 +1211,7 @@ class SeatViewPanelTest {
         seatHeader.submit("338 OF 338 RIDINGS REPORTING")
         compareRendering("SeatViewPanel", "Dual-6", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 CANADA
                 
@@ -1263,7 +1263,7 @@ class SeatViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("SeatViewPanel", "Range-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 AUSTRALIA
                 
@@ -1291,7 +1291,7 @@ class SeatViewPanelTest {
         )
         compareRendering("SeatViewPanel", "Range-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 AUSTRALIA
                 
@@ -1325,7 +1325,7 @@ class SeatViewPanelTest {
         )
         compareRendering("SeatViewPanel", "Range-3", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 AUSTRALIA
                 
@@ -1361,7 +1361,7 @@ class SeatViewPanelTest {
         )
         compareRendering("SeatViewPanel", "Range-4", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 AUSTRALIA
                 
@@ -1413,7 +1413,7 @@ class SeatViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("SeatViewPanel", "Range-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 AUSTRALIA
                 
@@ -1442,7 +1442,7 @@ class SeatViewPanelTest {
         )
         compareRendering("SeatViewPanel", "Range-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 AUSTRALIA
                 
@@ -1478,7 +1478,7 @@ class SeatViewPanelTest {
         )
         compareRendering("SeatViewPanel", "Range-3", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 AUSTRALIA
                 
@@ -1515,7 +1515,7 @@ class SeatViewPanelTest {
         )
         compareRendering("SeatViewPanel", "Range-4", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 AUSTRALIA
                 
@@ -1568,7 +1568,7 @@ class SeatViewPanelTest {
         winner.submit(trump)
         compareRendering("SeatViewPanel", "Candidate-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 UNITED STATES
                 
@@ -1582,7 +1582,7 @@ class SeatViewPanelTest {
         winner.submit(null)
         compareRendering("SeatViewPanel", "Candidate-WinnerRemoved", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 UNITED STATES
                 
@@ -1631,7 +1631,7 @@ class SeatViewPanelTest {
         winner.submit(trump)
         compareRendering("SeatViewPanel", "Candidate-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 UNITED STATES
                 
@@ -1677,7 +1677,7 @@ class SeatViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("SeatViewPanel", "Candidate-3", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 UNITED STATES
                 
@@ -1726,7 +1726,7 @@ class SeatViewPanelTest {
         winner.submit(dem)
         compareRendering("SeatViewPanel", "PartyTick-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 UNITED STATES
                 
@@ -1775,7 +1775,7 @@ class SeatViewPanelTest {
         winner.submit(dem)
         compareRendering("SeatViewPanel", "PartyTick-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 UNITED STATES
                 
@@ -1839,7 +1839,7 @@ class SeatViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("SeatViewPanel", "AdditionalHighlightMap-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 CARDIGAN
                 
@@ -1911,7 +1911,7 @@ class SeatViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("SeatViewPanel", "PartyClassifications-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 NORTHERN IRELAND
                 
@@ -1992,7 +1992,7 @@ class SeatViewPanelTest {
         )
         compareRendering("SeatViewPanel", "PartyClassifications-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 NORTHERN IRELAND
                 
@@ -2082,7 +2082,7 @@ class SeatViewPanelTest {
         panel.size = Dimension(1024, 512)
         compareRendering("SeatViewPanel", "PrevSeats-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 JAPAN
                 
@@ -2138,7 +2138,7 @@ class SeatViewPanelTest {
         showMajority.submit(false)
         compareRendering("SeatViewPanel", "PrevSeats-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 JAPAN
                 
@@ -2166,7 +2166,7 @@ class SeatViewPanelTest {
         changeHeader.submit("CHANGE SINCE 2017")
         compareRendering("SeatViewPanel", "PrevSeats-3", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 JAPAN
                 
@@ -2212,7 +2212,7 @@ class SeatViewPanelTest {
         total.submit(465)
         compareRendering("SeatViewPanel", "PrevSeats-4", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 JAPAN
                 
@@ -2235,7 +2235,7 @@ class SeatViewPanelTest {
         changeHeader.submit("2017 RESULT")
         compareRendering("SeatViewPanel", "PrevSeats-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 JAPAN
                 
@@ -2331,7 +2331,7 @@ class SeatViewPanelTest {
         panel.size = Dimension(1024, 512)
         compareRendering("SeatViewPanel", "PrevDualSeats-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 JAPAN
                 
@@ -2364,7 +2364,7 @@ class SeatViewPanelTest {
         changeHeader.submit("CHANGE SINCE 2017")
         compareRendering("SeatViewPanel", "PrevDualSeats-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 JAPAN
                 
@@ -2450,7 +2450,7 @@ class SeatViewPanelTest {
         panel.size = Dimension(1024, 512)
         compareRendering("SeatViewPanel", "PrevRangeSeats-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 JAPAN
                 
@@ -2483,7 +2483,7 @@ class SeatViewPanelTest {
         changeHeader.submit("CHANGE SINCE 2017")
         compareRendering("SeatViewPanel", "PrevRangeSeats-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 JAPAN
                 
@@ -2536,7 +2536,7 @@ class SeatViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("SeatViewPanel", "ProgressLabel-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 UNITED KINGDOM
                 
@@ -2550,7 +2550,7 @@ class SeatViewPanelTest {
         progressLabel.submit("1/650")
         compareRendering("SeatViewPanel", "ProgressLabel-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 UNITED KINGDOM
                 
@@ -2592,7 +2592,7 @@ class SeatViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("SeatViewPanel", "Tie", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 YUKON
                 
@@ -2678,7 +2678,7 @@ class SeatViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("SeatViewPanel", "PartyMerge-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 CANADA
                 
@@ -2697,7 +2697,7 @@ class SeatViewPanelTest {
         showPrev.submit(true)
         compareRendering("SeatViewPanel", "PartyMerge-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 CANADA
                 
@@ -2794,7 +2794,7 @@ class SeatViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("SeatViewPanel", "PartyMergeDual-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 CANADA
                 
@@ -2813,7 +2813,7 @@ class SeatViewPanelTest {
         showPrev.submit(true)
         compareRendering("SeatViewPanel", "PartyMergeDual-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 CANADA
                 
@@ -2909,7 +2909,7 @@ class SeatViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("SeatViewPanel", "PartyMergeRange-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 CANADA
                 
@@ -2928,7 +2928,7 @@ class SeatViewPanelTest {
         showPrev.submit(true)
         compareRendering("SeatViewPanel", "PartyMergeRange-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 CANADA
                 
@@ -3000,7 +3000,7 @@ class SeatViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("SeatViewPanel", "DualMap", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             PRINCE EDWARD ISLAND
             
@@ -3093,7 +3093,7 @@ class SeatViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("SeatViewPanel", "PartiesConsolidatedInDiffIfTooMany", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             FRANCE
             
@@ -3186,7 +3186,7 @@ class SeatViewPanelTest {
         seatHeader.submit("1 OF 650 SEATS DECLARED")
         compareRendering("SeatViewPanel", "SwingRange", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 UNITED KINGDOM
                 
@@ -3240,7 +3240,7 @@ class SeatViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("SeatViewPanel", "MultipleCandidatesSameParty", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             PRESIDENT
             
@@ -3303,7 +3303,7 @@ class SeatViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("SeatViewPanel", "FadedMap-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 CHARLOTTETOWN
                 

@@ -13,6 +13,7 @@ import com.joecollins.models.general.PartyOrCandidate
 import com.joecollins.models.general.PartyResult
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
+import com.joecollins.pubsub.map
 import org.junit.jupiter.api.Test
 import java.awt.Color
 import java.awt.Shape
@@ -102,7 +103,7 @@ class MixedMemberResultPanelTest {
         )
         compareRendering("MixedMemberResultPanel", "Basic", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             CHARLOTTETOWN-WINSLOE
             
@@ -212,7 +213,7 @@ class MixedMemberResultPanelTest {
         selectedResult.submit(PartyResult.leading(lib))
         compareRendering("MixedMemberResultPanel", "PctReporting", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             CHARLOTTETOWN-WINSLOE
             
@@ -328,7 +329,7 @@ class MixedMemberResultPanelTest {
         selectedResult.submit(PartyResult.leading(lib))
         compareRendering("MixedMemberResultPanel", "ProgressLabels", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             CHARLOTTETOWN-WINSLOE
             
@@ -434,7 +435,7 @@ class MixedMemberResultPanelTest {
         partyPctReporting.submit(0.0)
         compareRendering("MixedMemberResultPanel", "Waiting", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             CHARLOTTETOWN-WINSLOE
             
@@ -540,7 +541,7 @@ class MixedMemberResultPanelTest {
         partyPctReporting.submit(0.01)
         compareRendering("MixedMemberResultPanel", "ZeroVotes", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             CHARLOTTETOWN-WINSLOE
             
@@ -636,7 +637,7 @@ class MixedMemberResultPanelTest {
         )
         compareRendering("MixedMemberResultPanel", "Other", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             CHARLOTTETOWN-WINSLOE
             
@@ -738,7 +739,7 @@ class MixedMemberResultPanelTest {
         )
         compareRendering("MixedMemberResultPanel", "MapAdditionalHighlight", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             CHARLOTTETOWN-WINSLOE
             
@@ -812,7 +813,7 @@ class MixedMemberResultPanelTest {
         )
         compareRendering("MixedMemberResultPanel", "NoPrev", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             CHARLOTTETOWN-WINSLOE
             
@@ -888,7 +889,7 @@ class MixedMemberResultPanelTest {
         )
         compareRendering("MixedMemberResultPanel", "NoPrevSubhead", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             CHARLOTTETOWN-WINSLOE
             
@@ -965,7 +966,7 @@ class MixedMemberResultPanelTest {
         )
         compareRendering("MixedMemberResultPanel", "NoPrevTick", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             CHARLOTTETOWN-WINSLOE
             
@@ -1042,7 +1043,7 @@ class MixedMemberResultPanelTest {
         )
         compareRendering("MixedMemberResultPanel", "PartyOnlyForCandidateVotes", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             CHARLOTTETOWN-WINSLOE
             
@@ -1169,7 +1170,7 @@ class MixedMemberResultPanelTest {
         )
         compareRendering("MixedMemberResultPanel", "Declaration-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             CITY & EAST
             
@@ -1196,7 +1197,7 @@ class MixedMemberResultPanelTest {
         currentCandidateVotes.submit(currCandVotes)
         compareRendering("MixedMemberResultPanel", "Declaration-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             CITY & EAST
             
@@ -1225,7 +1226,7 @@ class MixedMemberResultPanelTest {
         currentCandidateVotes.submit(currCandVotes)
         compareRendering("MixedMemberResultPanel", "Declaration-3", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             CITY & EAST
             
@@ -1255,7 +1256,7 @@ class MixedMemberResultPanelTest {
         currentCandidateVotes.submit(currCandVotes)
         compareRendering("MixedMemberResultPanel", "Declaration-4", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             CITY & EAST
             
@@ -1284,7 +1285,7 @@ class MixedMemberResultPanelTest {
         topPartiesWaiting.submit(listOf(con, lab, ld))
         compareRendering("MixedMemberResultPanel", "Declaration-5", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             CITY & EAST
             
@@ -1315,7 +1316,7 @@ class MixedMemberResultPanelTest {
         topPartiesWaiting.submit(emptyList())
         compareRendering("MixedMemberResultPanel", "Declaration-6", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             CITY & EAST
             
@@ -1344,7 +1345,7 @@ class MixedMemberResultPanelTest {
         currentPartyVotes.submit(currPartyVotes)
         compareRendering("MixedMemberResultPanel", "Declaration-7", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             CITY & EAST
             
@@ -1373,7 +1374,7 @@ class MixedMemberResultPanelTest {
         currentPartyVotes.submit(currPartyVotes)
         compareRendering("MixedMemberResultPanel", "Declaration-8", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             CITY & EAST
             
@@ -1404,7 +1405,7 @@ class MixedMemberResultPanelTest {
         currentPartyVotes.submit(currPartyVotes)
         compareRendering("MixedMemberResultPanel", "Declaration-9", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             CITY & EAST
             
@@ -1433,7 +1434,7 @@ class MixedMemberResultPanelTest {
         )
         compareRendering("MixedMemberResultPanel", "Declaration-10", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             CITY & EAST
             
@@ -1518,7 +1519,7 @@ class MixedMemberResultPanelTest {
         panel.setSize(1024, 512)
         compareRendering("MixedMemberResultPanel", "ManyCandidates", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             NORTHLAND
             
@@ -1634,7 +1635,7 @@ class MixedMemberResultPanelTest {
         )
         compareRendering("MixedMemberResultPanel", "IndependentList", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             CITY AND EAST
 
@@ -1727,7 +1728,7 @@ class MixedMemberResultPanelTest {
         panel.setSize(1024, 512)
         compareRendering("MixedMemberResultPanel", "VaryingIncumbentMarkers-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             HUTT SOUTH
 

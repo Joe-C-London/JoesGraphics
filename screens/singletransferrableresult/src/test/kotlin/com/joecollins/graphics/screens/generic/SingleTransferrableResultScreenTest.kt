@@ -8,6 +8,7 @@ import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.Party
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
+import com.joecollins.pubsub.map
 import org.junit.jupiter.api.Test
 import java.awt.Color
 import java.awt.Dimension
@@ -99,7 +100,7 @@ class SingleTransferrableResultScreenTest {
         panel.size = Dimension(1024, 512)
         compareRendering("SingleTransferrableResultScreen", "Candidates-0", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 BELFAST EAST
                 
@@ -153,7 +154,7 @@ class SingleTransferrableResultScreenTest {
         currWinner.submit(dup)
         compareRendering("SingleTransferrableResultScreen", "Candidates-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 BELFAST EAST
                 
@@ -215,7 +216,7 @@ class SingleTransferrableResultScreenTest {
         candidateHeader.submit("COUNT 2")
         compareRendering("SingleTransferrableResultScreen", "Candidates-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 BELFAST EAST
                 
@@ -276,7 +277,7 @@ class SingleTransferrableResultScreenTest {
         candidateHeader.submit("COUNT 3")
         compareRendering("SingleTransferrableResultScreen", "Candidates-3", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 BELFAST EAST
                 
@@ -334,7 +335,7 @@ class SingleTransferrableResultScreenTest {
         candidateHeader.submit("COUNT 4")
         compareRendering("SingleTransferrableResultScreen", "Candidates-4", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 BELFAST EAST
                 
@@ -388,7 +389,7 @@ class SingleTransferrableResultScreenTest {
         candidateHeader.submit("COUNT 5")
         compareRendering("SingleTransferrableResultScreen", "Candidates-5", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 BELFAST EAST
                 
@@ -437,7 +438,7 @@ class SingleTransferrableResultScreenTest {
         candidateHeader.submit("COUNT 6")
         compareRendering("SingleTransferrableResultScreen", "Candidates-6", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 BELFAST EAST
                 
@@ -483,7 +484,7 @@ class SingleTransferrableResultScreenTest {
         candidateHeader.submit("COUNT 7")
         compareRendering("SingleTransferrableResultScreen", "Candidates-7", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 BELFAST EAST
                 
@@ -528,7 +529,7 @@ class SingleTransferrableResultScreenTest {
         candidateHeader.submit("COUNT 8")
         compareRendering("SingleTransferrableResultScreen", "Candidates-8", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 BELFAST EAST
                 
@@ -569,7 +570,7 @@ class SingleTransferrableResultScreenTest {
         candidateHeader.submit("COUNT 9")
         compareRendering("SingleTransferrableResultScreen", "Candidates-9", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 BELFAST EAST
                 
@@ -605,7 +606,7 @@ class SingleTransferrableResultScreenTest {
         candidateHeader.submit("COUNT 10")
         compareRendering("SingleTransferrableResultScreen", "Candidates-10", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 BELFAST EAST
                 
@@ -642,7 +643,7 @@ class SingleTransferrableResultScreenTest {
         candidateHeader.submit("COUNT 11")
         compareRendering("SingleTransferrableResultScreen", "Candidates-11", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 BELFAST EAST
                 
@@ -754,7 +755,7 @@ class SingleTransferrableResultScreenTest {
         panel.size = Dimension(1024, 512)
         compareRendering("SingleTransferrableResultScreen", "CandidatesProgress-0", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 BELFAST EAST
                 
@@ -808,7 +809,7 @@ class SingleTransferrableResultScreenTest {
         currWinner.submit(dup)
         compareRendering("SingleTransferrableResultScreen", "CandidatesProgress-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 BELFAST EAST
                 
@@ -870,7 +871,7 @@ class SingleTransferrableResultScreenTest {
         candidateSubhead.submit("COUNT 2")
         compareRendering("SingleTransferrableResultScreen", "CandidatesProgress-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 BELFAST EAST
                 
@@ -931,7 +932,7 @@ class SingleTransferrableResultScreenTest {
         candidateSubhead.submit("COUNT 3")
         compareRendering("SingleTransferrableResultScreen", "CandidatesProgress-3", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 BELFAST EAST
                 
@@ -989,7 +990,7 @@ class SingleTransferrableResultScreenTest {
         candidateSubhead.submit("COUNT 4")
         compareRendering("SingleTransferrableResultScreen", "CandidatesProgress-4", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 BELFAST EAST
                 
@@ -1043,7 +1044,7 @@ class SingleTransferrableResultScreenTest {
         candidateSubhead.submit("COUNT 5")
         compareRendering("SingleTransferrableResultScreen", "CandidatesProgress-5", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 BELFAST EAST
                 
@@ -1092,7 +1093,7 @@ class SingleTransferrableResultScreenTest {
         candidateSubhead.submit("COUNT 6")
         compareRendering("SingleTransferrableResultScreen", "CandidatesProgress-6", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 BELFAST EAST
                 
@@ -1138,7 +1139,7 @@ class SingleTransferrableResultScreenTest {
         candidateSubhead.submit("COUNT 7")
         compareRendering("SingleTransferrableResultScreen", "CandidatesProgress-7", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 BELFAST EAST
                 
@@ -1183,7 +1184,7 @@ class SingleTransferrableResultScreenTest {
         candidateSubhead.submit("COUNT 8")
         compareRendering("SingleTransferrableResultScreen", "CandidatesProgress-8", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 BELFAST EAST
                 
@@ -1224,7 +1225,7 @@ class SingleTransferrableResultScreenTest {
         candidateSubhead.submit("COUNT 9")
         compareRendering("SingleTransferrableResultScreen", "CandidatesProgress-9", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 BELFAST EAST
                 
@@ -1260,7 +1261,7 @@ class SingleTransferrableResultScreenTest {
         candidateSubhead.submit("COUNT 10")
         compareRendering("SingleTransferrableResultScreen", "CandidatesProgress-10", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 BELFAST EAST
                 
@@ -1297,7 +1298,7 @@ class SingleTransferrableResultScreenTest {
         candidateSubhead.submit("COUNT 11")
         compareRendering("SingleTransferrableResultScreen", "CandidatesProgress-11", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 BELFAST EAST
                 
@@ -1410,7 +1411,7 @@ class SingleTransferrableResultScreenTest {
         panel.size = Dimension(1024, 512)
         compareRendering("SingleTransferrableResultScreen", "CandidatesWithExcluded-0", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 BELFAST EAST
                 
@@ -1464,7 +1465,7 @@ class SingleTransferrableResultScreenTest {
         currWinner.submit(dup)
         compareRendering("SingleTransferrableResultScreen", "CandidatesWithExcluded-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 BELFAST EAST
                 
@@ -1526,7 +1527,7 @@ class SingleTransferrableResultScreenTest {
         candidateSubhead.submit("COUNT 2")
         compareRendering("SingleTransferrableResultScreen", "CandidatesWithExcluded-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 BELFAST EAST
                 
@@ -1587,7 +1588,7 @@ class SingleTransferrableResultScreenTest {
         candidateSubhead.submit("COUNT 3")
         compareRendering("SingleTransferrableResultScreen", "CandidatesWithExcluded-3", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 BELFAST EAST
                 
@@ -1646,7 +1647,7 @@ class SingleTransferrableResultScreenTest {
         candidateSubhead.submit("COUNT 4")
         compareRendering("SingleTransferrableResultScreen", "CandidatesWithExcluded-4", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 BELFAST EAST
                 
@@ -1702,7 +1703,7 @@ class SingleTransferrableResultScreenTest {
         candidateSubhead.submit("COUNT 5")
         compareRendering("SingleTransferrableResultScreen", "CandidatesWithExcluded-5", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 BELFAST EAST
                 
@@ -1755,7 +1756,7 @@ class SingleTransferrableResultScreenTest {
         candidateSubhead.submit("COUNT 6")
         compareRendering("SingleTransferrableResultScreen", "CandidatesWithExcluded-6", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 BELFAST EAST
                 
@@ -1806,7 +1807,7 @@ class SingleTransferrableResultScreenTest {
         candidateSubhead.submit("COUNT 7")
         compareRendering("SingleTransferrableResultScreen", "CandidatesWithExcluded-7", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 BELFAST EAST
                 
@@ -1857,7 +1858,7 @@ class SingleTransferrableResultScreenTest {
         candidateSubhead.submit("COUNT 8")
         compareRendering("SingleTransferrableResultScreen", "CandidatesWithExcluded-8", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 BELFAST EAST
                 
@@ -1905,7 +1906,7 @@ class SingleTransferrableResultScreenTest {
         candidateSubhead.submit("COUNT 9")
         compareRendering("SingleTransferrableResultScreen", "CandidatesWithExcluded-9", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 BELFAST EAST
                 
@@ -1949,7 +1950,7 @@ class SingleTransferrableResultScreenTest {
         candidateSubhead.submit("COUNT 10")
         compareRendering("SingleTransferrableResultScreen", "CandidatesWithExcluded-10", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 BELFAST EAST
                 
@@ -1994,7 +1995,7 @@ class SingleTransferrableResultScreenTest {
         candidateSubhead.submit("COUNT 11")
         compareRendering("SingleTransferrableResultScreen", "CandidatesWithExcluded-11", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 BELFAST EAST
                 

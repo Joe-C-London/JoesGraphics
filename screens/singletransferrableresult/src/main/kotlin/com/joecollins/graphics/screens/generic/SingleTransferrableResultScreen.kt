@@ -22,7 +22,7 @@ class SingleTransferrableResultScreen private constructor(
     private val partyFrame: JPanel?,
     private val prevFrame: JPanel?,
     private val mapFrame: JPanel?,
-    altText: Flow.Publisher<String>,
+    altText: Flow.Publisher<(Int) -> String>,
 ) : GenericPanel(
     {
         layout = BasicResultLayout()
@@ -213,7 +213,7 @@ class SingleTransferrableResultScreen private constructor(
             candidateResults: CandidateResults,
             partyTotals: PartyTotals?,
             prevResults: PrevResults?,
-        ): Flow.Publisher<String> {
+        ): Flow.Publisher<(Int) -> String> {
             val candidateTop = candidateResults.header.run {
                 if (candidateResults.progress == null) {
                     this
@@ -312,6 +312,7 @@ class SingleTransferrableResultScreen private constructor(
             return title.merge(candidate) { t, c -> "$t\n\n$c" }
                 .merge(party ?: (null as String?).asOneTimePublisher()) { t, p -> if (p == null) t else "$t\n\n$p" }
                 .merge(prevSeats ?: (null as String?).asOneTimePublisher()) { t, p -> if (p == null) t else "$t\n\n$p" }
+                .map { text -> { text } }
         }
     }
 

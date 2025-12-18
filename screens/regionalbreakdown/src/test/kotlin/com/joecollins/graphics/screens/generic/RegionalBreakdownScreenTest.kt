@@ -49,7 +49,7 @@ class RegionalBreakdownScreenTest {
         screen.setSize(1024, 512)
         compareRendering("RegionalBreakdownScreen", "Seats-1", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             PRINCE EDWARD ISLAND
             SEATS BY REGION
@@ -67,7 +67,7 @@ class RegionalBreakdownScreenTest {
         cardiganSeats.submit(mapOf(grn to 1))
         compareRendering("RegionalBreakdownScreen", "Seats-2", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             PRINCE EDWARD ISLAND
             SEATS BY REGION
@@ -88,7 +88,7 @@ class RegionalBreakdownScreenTest {
         egmontSeats.submit(mapOf(grn to 3, lib to 3, pc to 1))
         compareRendering("RegionalBreakdownScreen", "Seats-3", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             PRINCE EDWARD ISLAND
             SEATS BY REGION
@@ -148,7 +148,7 @@ class RegionalBreakdownScreenTest {
         screen.setSize(1024, 512)
         compareRendering("RegionalBreakdownScreen", "SeatsWithDiff-1", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             PRINCE EDWARD ISLAND
             SEATS BY REGION
@@ -168,7 +168,7 @@ class RegionalBreakdownScreenTest {
         cardiganDiff.submit(mapOf(grn to +1, lib to -1))
         compareRendering("RegionalBreakdownScreen", "SeatsWithDiff-2", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             PRINCE EDWARD ISLAND
             SEATS BY REGION
@@ -194,7 +194,7 @@ class RegionalBreakdownScreenTest {
         egmontDiff.submit(mapOf(grn to +3, lib to -4, pc to +1))
         compareRendering("RegionalBreakdownScreen", "SeatsWithDiff-3", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             PRINCE EDWARD ISLAND
             SEATS BY REGION
@@ -254,7 +254,7 @@ class RegionalBreakdownScreenTest {
         screen.setSize(1024, 512)
         compareRendering("RegionalBreakdownScreen", "SeatsWithDiff-1", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             PRINCE EDWARD ISLAND
             SEATS BY REGION
@@ -274,7 +274,7 @@ class RegionalBreakdownScreenTest {
         cardiganPrev.submit(mapOf(lib to 1))
         compareRendering("RegionalBreakdownScreen", "SeatsWithDiff-2", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             PRINCE EDWARD ISLAND
             SEATS BY REGION
@@ -300,7 +300,7 @@ class RegionalBreakdownScreenTest {
         egmontPrev.submit(mapOf(lib to 7))
         compareRendering("RegionalBreakdownScreen", "SeatsWithDiff-3", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             PRINCE EDWARD ISLAND
             SEATS BY REGION
@@ -361,7 +361,7 @@ class RegionalBreakdownScreenTest {
         screen.setSize(1024, 512)
         compareRendering("RegionalBreakdownScreen", "Seats-C", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             AUSTRALIA
             SEATS BY STATE
@@ -428,7 +428,7 @@ class RegionalBreakdownScreenTest {
         screen.setSize(1024, 512)
         compareRendering("RegionalBreakdownScreen", "SeatsWithPrev-C", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             AUSTRALIA
             SEATS BY STATE
@@ -495,7 +495,7 @@ class RegionalBreakdownScreenTest {
         screen.setSize(1024, 512)
         compareRendering("RegionalBreakdownScreen", "SeatsWithPrev-C", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             AUSTRALIA
             SEATS BY STATE
@@ -560,7 +560,7 @@ class RegionalBreakdownScreenTest {
         screen.size = Dimension(1024, 512)
         compareRendering("RegionalBreakdownScreen", "SeatsWithLimitedColumns-1", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             CANADA
             SEATS BY PROVINCE
@@ -591,7 +591,7 @@ class RegionalBreakdownScreenTest {
         }
         compareRendering("RegionalBreakdownScreen", "SeatsWithLimitedColumns-2", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             CANADA
             SEATS BY PROVINCE
@@ -630,7 +630,7 @@ class RegionalBreakdownScreenTest {
         }
         compareRendering("RegionalBreakdownScreen", "SeatsWithLimitedColumns-3", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             CANADA
             SEATS BY PROVINCE
@@ -681,7 +681,7 @@ class RegionalBreakdownScreenTest {
         }
         compareRendering("RegionalBreakdownScreen", "SeatsWithLimitedColumns-4", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             CANADA
             SEATS BY PROVINCE
@@ -716,7 +716,7 @@ class RegionalBreakdownScreenTest {
         }
         compareRendering("RegionalBreakdownScreen", "SeatsWithLimitedColumns-5", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             CANADA
             SEATS BY PROVINCE
@@ -773,7 +773,7 @@ class RegionalBreakdownScreenTest {
         egmontSeats.submit(mapOf(grn to 3, lib to 3, pc to 1))
         compareRendering("RegionalBreakdownScreen", "Seats-NoProgress", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             PRINCE EDWARD ISLAND
             SEATS BY REGION
@@ -824,7 +824,7 @@ class RegionalBreakdownScreenTest {
         egmontSeats.submit(mapOf(grn to 3, lib to 3, pc to 1))
         compareRendering("RegionalBreakdownScreen", "Seats-ProgressInHeader", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             PRINCE EDWARD ISLAND
             SEATS BY REGION [27/27]
@@ -871,7 +871,7 @@ class RegionalBreakdownScreenTest {
         screen.setSize(1024, 512)
         compareRendering("RegionalBreakdownScreen", "SeatsNoZero-1", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             PRINCE EDWARD ISLAND
             SEATS BY REGION
@@ -889,7 +889,7 @@ class RegionalBreakdownScreenTest {
         cardiganSeats.submit(mapOf(grn to 1))
         compareRendering("RegionalBreakdownScreen", "SeatsNoZero-2", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             PRINCE EDWARD ISLAND
             SEATS BY REGION
@@ -910,7 +910,7 @@ class RegionalBreakdownScreenTest {
         egmontSeats.submit(mapOf(grn to 3, lib to 3, pc to 1))
         compareRendering("RegionalBreakdownScreen", "SeatsNoZero-3", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             PRINCE EDWARD ISLAND
             SEATS BY REGION
@@ -975,7 +975,7 @@ class RegionalBreakdownScreenTest {
         screen.setSize(1024, 512)
         compareRendering("RegionalBreakdownScreen", "SeatsChangingCategories-1", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             ÎLE-DE-FRANCE
             SEATS BY DEPARTMENT
@@ -1007,7 +1007,7 @@ class RegionalBreakdownScreenTest {
         )
         compareRendering("RegionalBreakdownScreen", "SeatsChangingCategories-2", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             NORMANDIE
             SEATS BY DEPARTMENT
@@ -1060,7 +1060,7 @@ class RegionalBreakdownScreenTest {
         screen.setSize(1024, 512)
         compareRendering("RegionalBreakdownScreen", "Votes-1", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             PRINCE EDWARD ISLAND
             VOTES BY REGION
@@ -1080,7 +1080,7 @@ class RegionalBreakdownScreenTest {
         cardiganPct.submit(1.0 / 7)
         compareRendering("RegionalBreakdownScreen", "Votes-2", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             PRINCE EDWARD ISLAND
             VOTES BY REGION
@@ -1106,7 +1106,7 @@ class RegionalBreakdownScreenTest {
         egmontPct.submit(1.0)
         compareRendering("RegionalBreakdownScreen", "Votes-3", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             PRINCE EDWARD ISLAND
             VOTES BY REGION
@@ -1158,7 +1158,7 @@ class RegionalBreakdownScreenTest {
         screen.setSize(1024, 512)
         compareRendering("RegionalBreakdownScreen", "VotesPollsReporting-1", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             PRINCE EDWARD ISLAND
             VOTES BY REGION
@@ -1178,7 +1178,7 @@ class RegionalBreakdownScreenTest {
         cardiganPct.submit(PollsReporting(1, 7))
         compareRendering("RegionalBreakdownScreen", "VotesPollsReporting-2", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             PRINCE EDWARD ISLAND
             VOTES BY REGION
@@ -1204,7 +1204,7 @@ class RegionalBreakdownScreenTest {
         egmontPct.submit(PollsReporting(7, 7))
         compareRendering("RegionalBreakdownScreen", "VotesPollsReporting-3", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             PRINCE EDWARD ISLAND
             VOTES BY REGION
@@ -1269,7 +1269,7 @@ class RegionalBreakdownScreenTest {
         screen.setSize(1024, 512)
         compareRendering("RegionalBreakdownScreen", "VotesWithPrev-1", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             PRINCE EDWARD ISLAND
             VOTES BY REGION
@@ -1291,7 +1291,7 @@ class RegionalBreakdownScreenTest {
         cardiganPct.submit(1.0 / 7)
         compareRendering("RegionalBreakdownScreen", "VotesWithPrev-2", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             PRINCE EDWARD ISLAND
             VOTES BY REGION
@@ -1322,7 +1322,7 @@ class RegionalBreakdownScreenTest {
         egmontPct.submit(1.0)
         compareRendering("RegionalBreakdownScreen", "VotesWithPrev-3", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             PRINCE EDWARD ISLAND
             VOTES BY REGION
@@ -1387,7 +1387,7 @@ class RegionalBreakdownScreenTest {
         screen.setSize(1024, 512)
         compareRendering("RegionalBreakdownScreen", "VotesWithPrevPollsReporting-1", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             PRINCE EDWARD ISLAND
             VOTES BY REGION
@@ -1409,7 +1409,7 @@ class RegionalBreakdownScreenTest {
         cardiganPct.submit(PollsReporting(1, 7))
         compareRendering("RegionalBreakdownScreen", "VotesWithPrevPollsReporting-2", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             PRINCE EDWARD ISLAND
             VOTES BY REGION
@@ -1440,7 +1440,7 @@ class RegionalBreakdownScreenTest {
         egmontPct.submit(PollsReporting(7, 7))
         compareRendering("RegionalBreakdownScreen", "VotesWithPrevPollsReporting-3", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             PRINCE EDWARD ISLAND
             VOTES BY REGION
@@ -1511,7 +1511,7 @@ class RegionalBreakdownScreenTest {
         screen.setSize(1024, 512)
         compareRendering("RegionalBreakdownScreen", "Votes-C", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             AUSTRALIA
             PRIMARY VOTE BY STATE
@@ -1652,7 +1652,7 @@ class RegionalBreakdownScreenTest {
         screen.setSize(1024, 512)
         compareRendering("RegionalBreakdownScreen", "VotesWithPrev-C", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             AUSTRALIA
             PRIMARY VOTE BY STATE
@@ -1728,7 +1728,7 @@ class RegionalBreakdownScreenTest {
         screen.size = Dimension(1024, 512)
         compareRendering("RegionalBreakdownScreen", "VotesWithLimitedColumns-1", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             CANADA
             POPULAR VOTE BY PROVINCE
@@ -1811,7 +1811,7 @@ class RegionalBreakdownScreenTest {
         }
         compareRendering("RegionalBreakdownScreen", "VotesWithLimitedColumns-2", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             CANADA
             POPULAR VOTE BY PROVINCE
@@ -1869,7 +1869,7 @@ class RegionalBreakdownScreenTest {
         egmontVotes.submit(mapOf(lib to 7455, pc to 5876, grn to 5554, ndp to 1259))
         compareRendering("RegionalBreakdownScreen", "Votes-NoProgress", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             PRINCE EDWARD ISLAND
             VOTES BY REGION
@@ -1932,7 +1932,7 @@ class RegionalBreakdownScreenTest {
         screen.setSize(1024, 512)
         compareRendering("RegionalBreakdownScreen", "VotesChangingCategories-1", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             ÎLE-DE-FRANCE
             FIRST ROUND VOTES BY DEPARTMENT
@@ -1964,7 +1964,7 @@ class RegionalBreakdownScreenTest {
         )
         compareRendering("RegionalBreakdownScreen", "VotesChangingCategories-2", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             NORMANDIE
             FIRST ROUND VOTES BY DEPARTMENT

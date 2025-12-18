@@ -5,6 +5,7 @@ import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.models.general.Party
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
+import com.joecollins.pubsub.map
 import org.junit.jupiter.api.Test
 import java.awt.Color
 
@@ -45,7 +46,7 @@ class RegionalSeatsScreenTest {
         panel.setSize(1024, 512)
         compareRendering("RegionalSeatsScreen", "CurrPrev-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             GENERAL ELECTORATES
             SEATS [0/65] (CHANGE SINCE 2017)
@@ -74,7 +75,7 @@ class RegionalSeatsScreenTest {
         progress[general]!!.submit("1/65")
         compareRendering("RegionalSeatsScreen", "CurrPrev-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             GENERAL ELECTORATES
             SEATS [1/65] (CHANGE SINCE 2017)
@@ -99,7 +100,7 @@ class RegionalSeatsScreenTest {
         progress[maori]!!.submit("1/7")
         compareRendering("RegionalSeatsScreen", "CurrPrev-3", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             GENERAL ELECTORATES
             SEATS [1/65] (CHANGE SINCE 2017)
@@ -144,7 +145,7 @@ class RegionalSeatsScreenTest {
 
         compareRendering("RegionalSeatsScreen", "CurrPrev-4", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             GENERAL ELECTORATES
             SEATS [65/65] (CHANGE SINCE 2017)

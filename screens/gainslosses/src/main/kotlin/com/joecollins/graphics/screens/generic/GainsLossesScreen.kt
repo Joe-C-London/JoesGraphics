@@ -57,7 +57,7 @@ class GainsLossesScreen private constructor(
         .merge(entries) { (t, p), e ->
             "$t\n\nGAINS AND LOSSES${if (p == null) "" else " [$p]"}" +
                 e.joinToString("") { "\n${it.altText}" }
-        },
+        }.map { text -> { text } },
 ) {
 
     interface Entry {

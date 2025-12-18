@@ -8,6 +8,7 @@ import com.joecollins.models.general.PartyResult.Companion.elected
 import com.joecollins.models.general.PartyResult.Companion.leading
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
+import com.joecollins.pubsub.map
 import org.junit.jupiter.api.Test
 import java.awt.Color
 
@@ -31,7 +32,7 @@ class SeatsChangingScreenTest {
         panel.setSize(1024, 512)
         compareRendering("SeatsChangingScreen", "Basic-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             BRITISH COLUMBIA
 
@@ -49,7 +50,7 @@ class SeatsChangingScreenTest {
         )
         compareRendering("SeatsChangingScreen", "Basic-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             BRITISH COLUMBIA
             
@@ -68,7 +69,7 @@ class SeatsChangingScreenTest {
         )
         compareRendering("SeatsChangingScreen", "Basic-3", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             BRITISH COLUMBIA
             
@@ -80,7 +81,7 @@ class SeatsChangingScreenTest {
         currResult.submit(bcCurrResult())
         compareRendering("SeatsChangingScreen", "Basic-4", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             BRITISH COLUMBIA
             
@@ -116,7 +117,7 @@ class SeatsChangingScreenTest {
         panel.setSize(1024, 512)
         compareRendering("SeatsChangingScreen", "Filtered-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             VANCOUVER
 
@@ -134,7 +135,7 @@ class SeatsChangingScreenTest {
         )
         compareRendering("SeatsChangingScreen", "Filtered-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             VANCOUVER
 
@@ -153,7 +154,7 @@ class SeatsChangingScreenTest {
         )
         compareRendering("SeatsChangingScreen", "Filtered-3", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             VANCOUVER
 
@@ -165,7 +166,7 @@ class SeatsChangingScreenTest {
         currResult.submit(bcCurrResult())
         compareRendering("SeatsChangingScreen", "Filtered-4", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             VANCOUVER
 
@@ -195,7 +196,7 @@ class SeatsChangingScreenTest {
         panel.setSize(1024, 512)
         compareRendering("SeatsChangingScreen", "Basic-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             BRITISH COLUMBIA
 
@@ -207,7 +208,7 @@ class SeatsChangingScreenTest {
         currResult.submit(bcCurrResult())
         compareRendering("SeatsChangingScreen", "Basic-4", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             BRITISH COLUMBIA
             
@@ -238,7 +239,7 @@ class SeatsChangingScreenTest {
         panel.setSize(1024, 512)
         compareRendering("SeatsChangingScreen", "PartyChanges-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             BRITISH COLUMBIA
 
@@ -256,7 +257,7 @@ class SeatsChangingScreenTest {
         )
         compareRendering("SeatsChangingScreen", "PartyChanges-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             BRITISH COLUMBIA
 
@@ -275,7 +276,7 @@ class SeatsChangingScreenTest {
         )
         compareRendering("SeatsChangingScreen", "PartyChanges-3", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             BRITISH COLUMBIA
 
@@ -295,7 +296,7 @@ class SeatsChangingScreenTest {
         )
         compareRendering("SeatsChangingScreen", "PartyChanges-4", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             BRITISH COLUMBIA
 

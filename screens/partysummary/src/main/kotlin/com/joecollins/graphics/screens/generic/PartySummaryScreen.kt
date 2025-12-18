@@ -29,7 +29,7 @@ class PartySummaryScreen private constructor(
     mainFrame: RegionSummaryFrame,
     otherFrames: List<RegionSummaryFrame>,
     numRows: Int,
-    altText: Flow.Publisher<out String?>,
+    altText: Flow.Publisher<out (Int) -> String?>,
 ) : GenericPanel(
     {
         background = Color.WHITE
@@ -270,13 +270,14 @@ class PartySummaryScreen private constructor(
             regions: List<T>,
             seats: Seats<T>?,
             votes: Votes<T>?,
-        ): Flow.Publisher<String> {
+        ): Flow.Publisher<(Int) -> String> {
             val entries = regions.map { createAltTextLine(it, header, partyPublisher, seats, votes) }
                 .combine()
                 .map { it.joinToString("\n") }
             return partyPublisher.map { "${it.name.uppercase()} SUMMARY" }
                 .merge(createAltTextLine(mainRegion, header, partyPublisher, seats, votes)) { h, m -> "$h\n\n$m" }
                 .merge(entries) { h, e -> "$h\n\n$e" }
+                .map { text -> { text } }
         }
 
         private fun <T> createAltTextLine(

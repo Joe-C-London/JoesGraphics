@@ -19,7 +19,7 @@ import java.util.concurrent.Flow
 class RecountScreen private constructor(
     headerLabel: Flow.Publisher<out String?>,
     frame: MultiSummaryFrame,
-    altText: Flow.Publisher<String>,
+    altText: Flow.Publisher<(Int) -> String>,
 ) : GenericPanel(pad(frame), headerLabel, altText),
     AltTextProvider {
 
@@ -131,7 +131,7 @@ class RecountScreen private constructor(
             threshold: Threshold,
             reporting: ReportingFilter<T>?,
             title: Flow.Publisher<out String>,
-        ): Flow.Publisher<String> {
+        ): Flow.Publisher<(Int) -> String> {
             val headerText = title.merge(header) { t, h -> "$t\n\n$h" }
             val body = buildInput(candidateVotes, threshold, reporting).toEntries().map { entries ->
                 entries.joinToString("") { e ->
@@ -141,6 +141,7 @@ class RecountScreen private constructor(
                 }
             }
             return headerText.merge(body) { h, b -> "$h$b\n\n${footer(threshold)}" }
+                .map { text -> { text } }
         }
     }
 

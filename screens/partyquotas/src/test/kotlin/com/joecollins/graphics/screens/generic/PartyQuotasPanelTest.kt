@@ -80,7 +80,7 @@ class PartyQuotasPanelTest {
         panel.setSize(1024, 512)
         compareRendering("PartyQuotasPanel", "Quotas-0", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 BELFAST EAST
                 
@@ -110,7 +110,7 @@ class PartyQuotasPanelTest {
         currWinner.submit(dup)
         compareRendering("PartyQuotasPanel", "Quotas-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 BELFAST EAST
                 
@@ -150,7 +150,7 @@ class PartyQuotasPanelTest {
         round.submit(2)
         compareRendering("PartyQuotasPanel", "Quotas-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 BELFAST EAST
                 
@@ -188,7 +188,7 @@ class PartyQuotasPanelTest {
         round.submit(3)
         compareRendering("PartyQuotasPanel", "Quotas-3", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 BELFAST EAST
                 
@@ -225,7 +225,7 @@ class PartyQuotasPanelTest {
         round.submit(4)
         compareRendering("PartyQuotasPanel", "Quotas-4", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 BELFAST EAST
                 
@@ -259,7 +259,7 @@ class PartyQuotasPanelTest {
         round.submit(5)
         compareRendering("PartyQuotasPanel", "Quotas-5", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 BELFAST EAST
                 
@@ -291,7 +291,7 @@ class PartyQuotasPanelTest {
         round.submit(6)
         compareRendering("PartyQuotasPanel", "Quotas-6", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 BELFAST EAST
                 
@@ -320,7 +320,7 @@ class PartyQuotasPanelTest {
         round.submit(7)
         compareRendering("PartyQuotasPanel", "Quotas-7", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 BELFAST EAST
                 
@@ -347,7 +347,7 @@ class PartyQuotasPanelTest {
         round.submit(8)
         compareRendering("PartyQuotasPanel", "Quotas-8", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 BELFAST EAST
                 
@@ -372,7 +372,7 @@ class PartyQuotasPanelTest {
         round.submit(9)
         compareRendering("PartyQuotasPanel", "Quotas-9", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 BELFAST EAST
                 
@@ -396,7 +396,7 @@ class PartyQuotasPanelTest {
         round.submit(10)
         compareRendering("PartyQuotasPanel", "Quotas-10", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 BELFAST EAST
                 
@@ -419,7 +419,7 @@ class PartyQuotasPanelTest {
         round.submit(11)
         compareRendering("PartyQuotasPanel", "Quotas-11", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 BELFAST EAST
                 
@@ -473,7 +473,7 @@ class PartyQuotasPanelTest {
         panel.setSize(1024, 512)
         compareRendering("PartyQuotasPanel", "Quotas-Oth", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 SOUTH AUSTRALIA
                 
@@ -571,7 +571,7 @@ class PartyQuotasPanelTest {
         currWinner.submit(dup)
         compareRendering("PartyQuotasPanel", "SwingRange", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 BELFAST EAST
                 

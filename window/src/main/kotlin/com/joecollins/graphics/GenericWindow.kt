@@ -7,6 +7,7 @@ import com.joecollins.graphics.utils.StandardFont
 import com.joecollins.models.general.social.twitter.TwitterV2InstanceFactory
 import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
+import com.joecollins.pubsub.map
 import java.awt.Color
 import java.awt.Component
 import java.awt.Container
@@ -147,7 +148,7 @@ class GenericWindow<T : JPanel> constructor(private val panel: T, title: String)
         altText.foreground = Color.WHITE
         altText.font = StandardFont.readNormalFont(8)
         if (panel is AltTextProvider) {
-            panel.altText.subscribe(
+            panel.altText.map { it(Int.MAX_VALUE) }.subscribe(
                 Subscriber(
                     eventQueueWrapper {
                         altText.text =
@@ -157,8 +158,10 @@ class GenericWindow<T : JPanel> constructor(private val panel: T, title: String)
                                 "<html>${it.replace("\n", "<br/>")}</html>"
                             }
                         altText.foreground =
-                            if (it == null || it.length <= AltTextProvider.ALT_TEXT_MAX_LENGTH) {
+                            if (it == null || it.length <= 1000) {
                                 Color.WHITE
+                            } else if (it.length <= 2000) {
+                                Color.YELLOW
                             } else {
                                 Color.RED
                             }

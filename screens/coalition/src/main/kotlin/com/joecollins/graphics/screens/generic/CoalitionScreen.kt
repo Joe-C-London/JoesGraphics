@@ -15,7 +15,7 @@ import kotlin.math.max
 class CoalitionScreen private constructor(
     panel: JPanel,
     title: Flow.Publisher<out String?>,
-    altText: () -> Flow.Publisher<String>,
+    altText: () -> Flow.Publisher<(Int) -> String>,
 ) : GenericPanel(
     panel,
     title,
@@ -85,6 +85,7 @@ class CoalitionScreen private constructor(
                     }
                     val bottom = totalSeats.map { majorityLabel(it / 2 + 1) }
                     top.merge(entries) { t, e -> "$t\n$e" }.merge(bottom) { t, b -> "$t\n$b" }
+                        .map { text -> { text } }
                 },
             )
         }

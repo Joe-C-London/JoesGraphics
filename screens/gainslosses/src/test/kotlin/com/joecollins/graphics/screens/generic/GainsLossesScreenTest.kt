@@ -88,7 +88,7 @@ class GainsLossesScreenTest {
         panel.setSize(1024, 512)
         compareRendering("GainsLossesScreen", "Basic-0", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             PRINCE EDWARD ISLAND
 
@@ -99,7 +99,7 @@ class GainsLossesScreenTest {
         curr["Belfast-Murray River"]!!.submit(pc)
         compareRendering("GainsLossesScreen", "Basic-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             PRINCE EDWARD ISLAND
 
@@ -117,7 +117,7 @@ class GainsLossesScreenTest {
         curr["Stratford-Kinlock"]!!.submit(pc)
         compareRendering("GainsLossesScreen", "Basic-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             PRINCE EDWARD ISLAND
 
@@ -156,7 +156,7 @@ class GainsLossesScreenTest {
         curr["York-Oyster Bed"]!!.submit(lib)
         compareRendering("GainsLossesScreen", "Basic-3", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             PRINCE EDWARD ISLAND
 
@@ -244,7 +244,7 @@ class GainsLossesScreenTest {
         panel.setSize(1024, 512)
         compareRendering("GainsLossesScreen", "Filtered-0", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             PRINCE EDWARD ISLAND
 
@@ -268,7 +268,7 @@ class GainsLossesScreenTest {
         title.submit("CARDIGAN")
         compareRendering("GainsLossesScreen", "Filtered-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             CARDIGAN
 
@@ -353,7 +353,7 @@ class GainsLossesScreenTest {
         panel.setSize(1024, 512)
         compareRendering("GainsLossesScreen", "Basic-0", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             PRINCE EDWARD ISLAND
 
@@ -364,7 +364,7 @@ class GainsLossesScreenTest {
         curr["Belfast-Murray River"]!!.submit(PartyResult.leading(pc))
         compareRendering("GainsLossesScreen", "Result-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             PRINCE EDWARD ISLAND
 
@@ -382,7 +382,7 @@ class GainsLossesScreenTest {
         curr["Stratford-Kinlock"]!!.submit(PartyResult.elected(pc))
         compareRendering("GainsLossesScreen", "Result-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             PRINCE EDWARD ISLAND
 
@@ -421,7 +421,7 @@ class GainsLossesScreenTest {
         curr["York-Oyster Bed"]!!.submit(PartyResult.leading(lib))
         compareRendering("GainsLossesScreen", "Result-3", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             PRINCE EDWARD ISLAND
 
@@ -509,7 +509,7 @@ class GainsLossesScreenTest {
         panel.setSize(1024, 512)
         compareRendering("GainsLossesScreen", "FilteredResult-0", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             PRINCE EDWARD ISLAND
 
@@ -533,7 +533,7 @@ class GainsLossesScreenTest {
         title.submit("CARDIGAN")
         compareRendering("GainsLossesScreen", "FilteredResult-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             CARDIGAN
 
@@ -622,7 +622,7 @@ class GainsLossesScreenTest {
         panel.setSize(1024, 512)
         compareRendering("GainsLossesScreen", "PartyChanges-0", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             PRINCE EDWARD ISLAND
 

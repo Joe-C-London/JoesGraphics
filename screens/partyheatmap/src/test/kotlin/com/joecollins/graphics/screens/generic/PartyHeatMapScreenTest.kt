@@ -35,7 +35,7 @@ class PartyHeatMapScreenTest {
         panel.setSize(1024, 512)
         compareRendering("PartyHeatMapScreen", "Elected-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             PARTY HEAT MAPS
             
@@ -58,7 +58,7 @@ class PartyHeatMapScreenTest {
         )
         compareRendering("PartyHeatMapScreen", "Elected-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             PARTY HEAT MAPS
             
@@ -79,7 +79,7 @@ class PartyHeatMapScreenTest {
         )
         compareRendering("PartyHeatMapScreen", "Elected-3", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             PARTY HEAT MAPS
             
@@ -100,7 +100,7 @@ class PartyHeatMapScreenTest {
         )
         compareRendering("PartyHeatMapScreen", "Elected-4", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             PARTY HEAT MAPS
             
@@ -139,7 +139,7 @@ class PartyHeatMapScreenTest {
         panel.setSize(1024, 512)
         compareRendering("PartyHeatMapScreen", "ElectedLeading-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             PARTY HEAT MAPS
             
@@ -165,7 +165,7 @@ class PartyHeatMapScreenTest {
         )
         compareRendering("PartyHeatMapScreen", "ElectedLeading-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             PARTY HEAT MAPS
             
@@ -184,7 +184,7 @@ class PartyHeatMapScreenTest {
         currResults.submit(bcCurrResult())
         compareRendering("PartyHeatMapScreen", "ElectedLeading-3", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             PARTY HEAT MAPS
             
@@ -204,7 +204,7 @@ class PartyHeatMapScreenTest {
         rows.submit(2)
         compareRendering("PartyHeatMapScreen", "ElectedLeading-4", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             PARTY HEAT MAPS
             
@@ -249,7 +249,7 @@ class PartyHeatMapScreenTest {
         panel.setSize(1024, 512)
         compareRendering("PartyHeatMapScreen", "PartyChanges-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             PARTY HEAT MAPS
             
@@ -275,7 +275,7 @@ class PartyHeatMapScreenTest {
         )
         compareRendering("PartyHeatMapScreen", "PartyChanges-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             PARTY HEAT MAPS
             
@@ -302,7 +302,7 @@ class PartyHeatMapScreenTest {
         )
         compareRendering("PartyHeatMapScreen", "PartyChanges-3", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             PARTY HEAT MAPS
             
@@ -322,7 +322,7 @@ class PartyHeatMapScreenTest {
         rows.submit(2)
         compareRendering("PartyHeatMapScreen", "PartyChanges-4", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             PARTY HEAT MAPS
             

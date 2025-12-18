@@ -27,7 +27,7 @@ import javax.swing.border.EmptyBorder
 import kotlin.math.ceil
 import kotlin.math.roundToInt
 
-class AllSeatsScreen private constructor(title: Flow.Publisher<out String?>, frame: JPanel, altText: Flow.Publisher<String>) : GenericPanel(pad(frame), title, altText) {
+class AllSeatsScreen private constructor(title: Flow.Publisher<out String?>, frame: JPanel, altText: Flow.Publisher<(Int) -> String>) : GenericPanel(pad(frame), title, altText) {
 
     private class Input<T>(private val sortOrder: Comparator<T>) {
         private var prevWinners: List<Pair<T, Party?>> = emptyList()
@@ -162,6 +162,7 @@ class AllSeatsScreen private constructor(title: Flow.Publisher<out String?>, fra
                         }
                 }
                 head.merge(entries) { h, e -> "$h\n$e" }
+                    .map { text -> { _: Int -> text } }
             }
             return AllSeatsScreen(title, frame, altText)
         }
@@ -262,17 +263,26 @@ class AllSeatsScreen private constructor(title: Flow.Publisher<out String?>, fra
             )
 
             innerPanels.forEach { outerPanel.add(it) }
-            val altText = innerPanels.zip(groupWinners).map { (panel, group) ->
-                group.second.run {
-                    if (seatFilter == null) {
-                        this
-                    } else {
-                        merge(seatFilter) { w, f -> w.filterKeys { f == null || f.contains(it) } }
+            val altText = run {
+                innerPanels.zip(groupWinners).map { (panel, group) ->
+                    group.second.run {
+                        if (seatFilter == null) {
+                            this
+                        } else {
+                            merge(seatFilter) { w, f -> w.filterKeys { f == null || f.contains(it) } }
+                        }
+                    }.merge(panel.altText) { w, t -> t.takeIf { w.isNotEmpty() } ?: { null } }
+                }
+                    .combine()
+                    .merge(title) { p, t ->
+                        { maxLength: Int ->
+                            listOfNotNull(
+                                t,
+                                p.mapNotNull { it((maxLength - t.length) / p.size) }.joinToString("\n\n"),
+                            ).joinToString("\n\n")
+                        }
                     }
-                }.merge(panel.altText) { w, t -> t.takeIf { w.isNotEmpty() } }
             }
-                .combine()
-                .merge(title) { p, t -> listOfNotNull(t, p.filterNotNull().joinToString("\n\n")).joinToString("\n\n") }
             return AllSeatsScreen(title, outerPanel, altText)
         }
     }

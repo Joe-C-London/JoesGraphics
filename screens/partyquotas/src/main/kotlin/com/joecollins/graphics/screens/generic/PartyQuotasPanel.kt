@@ -21,7 +21,7 @@ class PartyQuotasPanel private constructor(
     private val changeFrame: JPanel?,
     private val leftSupplementaryFrame: JPanel?,
     private val rightSupplementaryFrame: JPanel?,
-    altText: Flow.Publisher<String>,
+    altText: Flow.Publisher<(Int) -> String>,
 ) : GenericPanel(
     {
         layout = BasicResultLayout()
@@ -123,7 +123,7 @@ class PartyQuotasPanel private constructor(
             change: Change?,
             swing: Swing?,
             title: Flow.Publisher<out String?>,
-        ): Flow.Publisher<String> {
+        ): Flow.Publisher<(Int) -> String> {
             val combineHeaderAndSubhead: (String?, String?) -> String? = { h, s ->
                 if (h == null) {
                     s
@@ -200,6 +200,7 @@ class PartyQuotasPanel private constructor(
                         "$h\n\n$s"
                     }
                 }
+                .map { text -> { text } }
         }
     }
 

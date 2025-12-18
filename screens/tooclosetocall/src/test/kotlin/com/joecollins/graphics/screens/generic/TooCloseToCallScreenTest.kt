@@ -42,7 +42,7 @@ class TooCloseToCallScreenTest {
         screen.setSize(1024, 512)
         compareRendering("TooCloseToCallScreen", "Basic-1", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
                 PRINCE EDWARD ISLAND
                 
@@ -56,7 +56,7 @@ class TooCloseToCallScreenTest {
         partyResults.submit(partyResultsRaw)
         compareRendering("TooCloseToCallScreen", "Basic-2", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
                 PRINCE EDWARD ISLAND
                 
@@ -70,7 +70,7 @@ class TooCloseToCallScreenTest {
         partyResults.submit(partyResultsRaw)
         compareRendering("TooCloseToCallScreen", "Basic-3", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
                 PRINCE EDWARD ISLAND
                 
@@ -103,7 +103,7 @@ class TooCloseToCallScreenTest {
         partyResults.submit(partyResultsRaw)
         compareRendering("TooCloseToCallScreen", "Basic-4", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
                 PRINCE EDWARD ISLAND
                 
@@ -127,7 +127,7 @@ class TooCloseToCallScreenTest {
         partyResults.submit(partyResultsRaw)
         compareRendering("TooCloseToCallScreen", "Basic-1", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
                 PRINCE EDWARD ISLAND
                 
@@ -157,7 +157,7 @@ class TooCloseToCallScreenTest {
         screen.setSize(1024, 512)
         compareRendering("TooCloseToCallScreen", "PctReporting-1", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
                 PRINCE EDWARD ISLAND
                 
@@ -172,7 +172,7 @@ class TooCloseToCallScreenTest {
         pctReporting.submit(pctReportingRaw)
         compareRendering("TooCloseToCallScreen", "PctReporting-2", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
                 PRINCE EDWARD ISLAND
                 
@@ -187,7 +187,7 @@ class TooCloseToCallScreenTest {
         pctReporting.submit(pctReportingRaw)
         compareRendering("TooCloseToCallScreen", "PctReporting-3", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
                 PRINCE EDWARD ISLAND
                 
@@ -220,7 +220,7 @@ class TooCloseToCallScreenTest {
         pctReporting.submit(pctReportingRaw)
         compareRendering("TooCloseToCallScreen", "PctReporting-4", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
                 PRINCE EDWARD ISLAND
                 
@@ -245,7 +245,7 @@ class TooCloseToCallScreenTest {
         pctReporting.submit(pctReportingRaw)
         compareRendering("TooCloseToCallScreen", "PctReporting-1", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
                 PRINCE EDWARD ISLAND
                 
@@ -275,7 +275,7 @@ class TooCloseToCallScreenTest {
         screen.setSize(1024, 512)
         compareRendering("TooCloseToCallScreen", "PollsReporting-1", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
                 PRINCE EDWARD ISLAND
                 
@@ -290,7 +290,7 @@ class TooCloseToCallScreenTest {
         pollsReporting.submit(pollsReportingRaw)
         compareRendering("TooCloseToCallScreen", "PollsReporting-2", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
                 PRINCE EDWARD ISLAND
                 
@@ -305,7 +305,7 @@ class TooCloseToCallScreenTest {
         pollsReporting.submit(pollsReportingRaw)
         compareRendering("TooCloseToCallScreen", "PollsReporting-3", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
                 PRINCE EDWARD ISLAND
                 
@@ -339,7 +339,7 @@ class TooCloseToCallScreenTest {
         pollsReporting.submit(pollsReportingRaw)
         compareRendering("TooCloseToCallScreen", "PollsReporting-4", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
                 PRINCE EDWARD ISLAND
                 
@@ -364,7 +364,7 @@ class TooCloseToCallScreenTest {
         pollsReporting.submit(pollsReportingRaw)
         compareRendering("TooCloseToCallScreen", "PollsReporting-1", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
                 PRINCE EDWARD ISLAND
                 
@@ -395,7 +395,7 @@ class TooCloseToCallScreenTest {
         screen.setSize(1024, 512)
         compareRendering("TooCloseToCallScreen", "LimitRows-1", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
                 PRINCE EDWARD ISLAND
                 
@@ -410,7 +410,7 @@ class TooCloseToCallScreenTest {
         pctReporting.submit(pctReportingRaw)
         compareRendering("TooCloseToCallScreen", "LimitRows-2", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
                 PRINCE EDWARD ISLAND
                 
@@ -425,7 +425,7 @@ class TooCloseToCallScreenTest {
         pctReporting.submit(pctReportingRaw)
         compareRendering("TooCloseToCallScreen", "LimitRows-3", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
                 PRINCE EDWARD ISLAND
                 
@@ -454,7 +454,7 @@ class TooCloseToCallScreenTest {
         pctReporting.submit(pctReportingRaw)
         compareRendering("TooCloseToCallScreen", "LimitRows-4", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
                 PRINCE EDWARD ISLAND
                 
@@ -479,7 +479,7 @@ class TooCloseToCallScreenTest {
         pctReporting.submit(pctReportingRaw)
         compareRendering("TooCloseToCallScreen", "LimitRows-1", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
                 PRINCE EDWARD ISLAND
                 
@@ -510,7 +510,7 @@ class TooCloseToCallScreenTest {
         screen.setSize(1024, 512)
         compareRendering("TooCloseToCallScreen", "NumCandidates-1", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
                 PRINCE EDWARD ISLAND
                 
@@ -525,7 +525,7 @@ class TooCloseToCallScreenTest {
         pctReporting.submit(pctReportingRaw)
         compareRendering("TooCloseToCallScreen", "NumCandidates-2", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
                 PRINCE EDWARD ISLAND
                 
@@ -540,7 +540,7 @@ class TooCloseToCallScreenTest {
         pctReporting.submit(pctReportingRaw)
         compareRendering("TooCloseToCallScreen", "NumCandidates-3", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
                 PRINCE EDWARD ISLAND
                 
@@ -568,7 +568,7 @@ class TooCloseToCallScreenTest {
         pctReporting.submit(pctReportingRaw)
         compareRendering("TooCloseToCallScreen", "NumCandidates-4", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
                 PRINCE EDWARD ISLAND
                 
@@ -593,7 +593,7 @@ class TooCloseToCallScreenTest {
         pctReporting.submit(pctReportingRaw)
         compareRendering("TooCloseToCallScreen", "NumCandidates-1", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
                 PRINCE EDWARD ISLAND
                 
@@ -620,7 +620,7 @@ class TooCloseToCallScreenTest {
         screen.setSize(1024, 512)
         compareRendering("TooCloseToCallScreen", "Basic-1", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
                 PRINCE EDWARD ISLAND
                 
@@ -634,7 +634,7 @@ class TooCloseToCallScreenTest {
         partyResults.submit(partyResultsRaw)
         compareRendering("TooCloseToCallScreen", "Basic-2", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
                 PRINCE EDWARD ISLAND
                 
@@ -648,7 +648,7 @@ class TooCloseToCallScreenTest {
         partyResults.submit(partyResultsRaw)
         compareRendering("TooCloseToCallScreen", "Basic-3", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
                 PRINCE EDWARD ISLAND
                 
@@ -681,7 +681,7 @@ class TooCloseToCallScreenTest {
         partyResults.submit(partyResultsRaw)
         compareRendering("TooCloseToCallScreen", "Basic-4", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
                 PRINCE EDWARD ISLAND
                 
@@ -705,7 +705,7 @@ class TooCloseToCallScreenTest {
         partyResults.submit(partyResultsRaw)
         compareRendering("TooCloseToCallScreen", "Basic-1", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
                 PRINCE EDWARD ISLAND
                 
@@ -733,7 +733,7 @@ class TooCloseToCallScreenTest {
         screen.setSize(1024, 512)
         compareRendering("TooCloseToCallScreen", "Basic-1", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
                 PRINCE EDWARD ISLAND
                 
@@ -747,7 +747,7 @@ class TooCloseToCallScreenTest {
         partyResults.submit(partyResultsRaw)
         compareRendering("TooCloseToCallScreen", "Basic-2", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
                 PRINCE EDWARD ISLAND
                 
@@ -761,7 +761,7 @@ class TooCloseToCallScreenTest {
         partyResults.submit(partyResultsRaw)
         compareRendering("TooCloseToCallScreen", "Basic-3", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
                 PRINCE EDWARD ISLAND
                 
@@ -794,7 +794,7 @@ class TooCloseToCallScreenTest {
         partyResults.submit(partyResultsRaw)
         compareRendering("TooCloseToCallScreen", "Basic-4", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
                 PRINCE EDWARD ISLAND
                 
@@ -818,7 +818,7 @@ class TooCloseToCallScreenTest {
         partyResults.submit(partyResultsRaw)
         compareRendering("TooCloseToCallScreen", "Basic-1", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
                 PRINCE EDWARD ISLAND
                 
@@ -849,7 +849,7 @@ class TooCloseToCallScreenTest {
         screen.setSize(1024, 512)
         compareRendering("TooCloseToCallScreen", "NoLead-1", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
                 PRINCE EDWARD ISLAND
                 
@@ -864,7 +864,7 @@ class TooCloseToCallScreenTest {
         pollsReporting.submit(pollsReportingRaw)
         compareRendering("TooCloseToCallScreen", "NoLead-2", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
                 PRINCE EDWARD ISLAND
                 
@@ -879,7 +879,7 @@ class TooCloseToCallScreenTest {
         pollsReporting.submit(pollsReportingRaw)
         compareRendering("TooCloseToCallScreen", "NoLead-3", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
                 PRINCE EDWARD ISLAND
                 
@@ -913,7 +913,7 @@ class TooCloseToCallScreenTest {
         pollsReporting.submit(pollsReportingRaw)
         compareRendering("TooCloseToCallScreen", "NoLead-4", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
                 PRINCE EDWARD ISLAND
                 
@@ -938,7 +938,7 @@ class TooCloseToCallScreenTest {
         pollsReporting.submit(pollsReportingRaw)
         compareRendering("TooCloseToCallScreen", "NoLead-1", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
                 PRINCE EDWARD ISLAND
                 
@@ -1735,7 +1735,7 @@ class TooCloseToCallScreenTest {
         screen.setSize(1024, 512)
         compareRendering("TooCloseToCallScreen", "Pct-1", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
                 PRINCE EDWARD ISLAND
                 
@@ -1749,7 +1749,7 @@ class TooCloseToCallScreenTest {
         partyResults.submit(partyResultsRaw)
         compareRendering("TooCloseToCallScreen", "Pct-2", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
                 PRINCE EDWARD ISLAND
                 
@@ -1763,7 +1763,7 @@ class TooCloseToCallScreenTest {
         partyResults.submit(partyResultsRaw)
         compareRendering("TooCloseToCallScreen", "Pct-3", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
                 PRINCE EDWARD ISLAND
                 
@@ -1796,7 +1796,7 @@ class TooCloseToCallScreenTest {
         partyResults.submit(partyResultsRaw)
         compareRendering("TooCloseToCallScreen", "Pct-4", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
                 PRINCE EDWARD ISLAND
                 
@@ -1820,7 +1820,7 @@ class TooCloseToCallScreenTest {
         partyResults.submit(partyResultsRaw)
         compareRendering("TooCloseToCallScreen", "Pct-1", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
                 PRINCE EDWARD ISLAND
                 
@@ -1892,7 +1892,7 @@ class TooCloseToCallScreenTest {
         screen.setSize(1024, 512)
         compareRendering("TooCloseToCallScreen", "NonPartisan-1", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
                 NUNAVUT
                 
@@ -1943,7 +1943,7 @@ class TooCloseToCallScreenTest {
 
         compareRendering("TooCloseToCallScreen", "NonPartisan-2", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
                 NUNAVUT
 
@@ -1997,7 +1997,7 @@ class TooCloseToCallScreenTest {
 
         compareRendering("TooCloseToCallScreen", "NonPartisan-1", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
                 NUNAVUT
 

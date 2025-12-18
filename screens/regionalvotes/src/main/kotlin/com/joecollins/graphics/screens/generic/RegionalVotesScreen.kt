@@ -28,10 +28,14 @@ class RegionalVotesScreen private constructor(subPanels: List<GenericPanel>) :
         subPanels.forEach { add(it) }
     }
 
-    override val altText: Flow.Publisher<out String> =
+    override val altText: Flow.Publisher<out (Int) -> String> =
         subPanels.map { it.altText }
             .combine()
-            .map { p -> p.filterNotNull().joinToString("\n\n") }
+            .map { p ->
+                { maxLength ->
+                    p.mapNotNull { it(maxLength / p.size) }.joinToString("\n\n")
+                }
+            }
 
     companion object {
         fun <R> ofCurrPrev(
@@ -180,6 +184,7 @@ class RegionalVotesScreen private constructor(subPanels: List<GenericPanel>) :
                 voteTop.merge(changeTop) { v, c -> "$v ($c)" }
                     .merge(title) { r, t -> "$t\n$r" }
                     .merge(entriesText) { t, e -> if (e.isEmpty()) t else "$t\n$e" }
+                    .map { text -> { _: Int -> text } }
             }
             return GenericPanel(
                 panel,

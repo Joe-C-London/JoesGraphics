@@ -8,6 +8,7 @@ import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyOrCoalition
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
+import com.joecollins.pubsub.map
 import org.junit.jupiter.api.Test
 import java.awt.Color
 
@@ -47,7 +48,7 @@ class PartySummaryScreenTest {
         screen.setSize(1024, 512)
         compareRendering("PartySummaryScreen", "SingleParty-1", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             LIBERAL SUMMARY
             
@@ -72,7 +73,7 @@ class PartySummaryScreenTest {
         canada.votePctDiff = mapOf(lib to -0.1784, con to +0.0960, ndp to -0.0209, grn to +0.0874, oth to +0.0159)
         compareRendering("PartySummaryScreen", "SingleParty-2", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             LIBERAL SUMMARY
             
@@ -109,7 +110,7 @@ class PartySummaryScreenTest {
         canada.votePctDiff = mapOf(lib to -0.0595, con to 0.0216, ndp to -0.0405, grn to 0.0296, bq to +0.0340, oth to +0.0148)
         compareRendering("PartySummaryScreen", "SingleParty-3", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             LIBERAL SUMMARY
             
@@ -127,7 +128,7 @@ class PartySummaryScreenTest {
         partySelected.submit(con)
         compareRendering("PartySummaryScreen", "SingleParty-4", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             CONSERVATIVE SUMMARY
             
@@ -156,7 +157,7 @@ class PartySummaryScreenTest {
         canada.votePctDiff = mapOf(lib to -0.0634, con to +0.0243, ndp to -0.0374, grn to +0.0312, bq to +0.0297, oth to +0.0158)
         compareRendering("PartySummaryScreen", "SingleParty-5", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             CONSERVATIVE SUMMARY
             
@@ -200,7 +201,7 @@ class PartySummaryScreenTest {
         screen.setSize(1024, 512)
         compareRendering("PartySummaryScreen", "SingleParty-1", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             LIBERAL SUMMARY
             
@@ -225,7 +226,7 @@ class PartySummaryScreenTest {
         canada.votePctDiff = mapOf(lib to -0.1784, con to +0.0960, ndp to -0.0209, grn to +0.0874, oth to +0.0159)
         compareRendering("PartySummaryScreen", "SingleParty-2", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             LIBERAL SUMMARY
             
@@ -262,7 +263,7 @@ class PartySummaryScreenTest {
         canada.votePctDiff = mapOf(lib to -0.0595, con to 0.0216, ndp to -0.0405, grn to 0.0296, bq to +0.0340, oth to +0.0148)
         compareRendering("PartySummaryScreen", "SingleParty-3", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             LIBERAL SUMMARY
             
@@ -280,7 +281,7 @@ class PartySummaryScreenTest {
         partySelected.submit(con)
         compareRendering("PartySummaryScreen", "SingleParty-4", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             CONSERVATIVE SUMMARY
             
@@ -309,7 +310,7 @@ class PartySummaryScreenTest {
         canada.votePctDiff = mapOf(lib to -0.0634, con to +0.0243, ndp to -0.0374, grn to +0.0312, bq to +0.0297, oth to +0.0158)
         compareRendering("PartySummaryScreen", "SingleParty-5", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             CONSERVATIVE SUMMARY
             
@@ -350,7 +351,7 @@ class PartySummaryScreenTest {
         screen.setSize(1024, 512)
         compareRendering("PartySummaryScreen", "SinglePartySeatsOnly-1", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             LIBERAL SUMMARY
             
@@ -375,7 +376,7 @@ class PartySummaryScreenTest {
         canada.votePctDiff = mapOf(lib to -0.1784, con to +0.0960, ndp to -0.0209, grn to +0.0874, oth to +0.0159)
         compareRendering("PartySummaryScreen", "SinglePartySeatsOnly-2", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             LIBERAL SUMMARY
             
@@ -412,7 +413,7 @@ class PartySummaryScreenTest {
         canada.votePctDiff = mapOf(lib to -0.0595, con to 0.0216, ndp to -0.0405, grn to 0.0296, bq to +0.0340, oth to +0.0148)
         compareRendering("PartySummaryScreen", "SinglePartySeatsOnly-3", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             LIBERAL SUMMARY
             
@@ -430,7 +431,7 @@ class PartySummaryScreenTest {
         partySelected.submit(con)
         compareRendering("PartySummaryScreen", "SinglePartySeatsOnly-4", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             CONSERVATIVE SUMMARY
             
@@ -459,7 +460,7 @@ class PartySummaryScreenTest {
         canada.votePctDiff = mapOf(lib to -0.0634, con to +0.0243, ndp to -0.0374, grn to +0.0312, bq to +0.0297, oth to +0.0158)
         compareRendering("PartySummaryScreen", "SinglePartySeatsOnly-5", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             CONSERVATIVE SUMMARY
             
@@ -500,7 +501,7 @@ class PartySummaryScreenTest {
         screen.setSize(1024, 512)
         compareRendering("PartySummaryScreen", "SinglePartyVotesOnly-1", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             LIBERAL SUMMARY
             
@@ -525,7 +526,7 @@ class PartySummaryScreenTest {
         canada.votePctDiff = mapOf(lib to -0.1784, con to +0.0960, ndp to -0.0209, grn to +0.0874, oth to +0.0159)
         compareRendering("PartySummaryScreen", "SinglePartyVotesOnly-2", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             LIBERAL SUMMARY
             
@@ -562,7 +563,7 @@ class PartySummaryScreenTest {
         canada.votePctDiff = mapOf(lib to -0.0595, con to 0.0216, ndp to -0.0405, grn to 0.0296, bq to +0.0340, oth to +0.0148)
         compareRendering("PartySummaryScreen", "SinglePartyVotesOnly-3", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             LIBERAL SUMMARY
             
@@ -580,7 +581,7 @@ class PartySummaryScreenTest {
         partySelected.submit(con)
         compareRendering("PartySummaryScreen", "SinglePartyVotesOnly-4", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             CONSERVATIVE SUMMARY
             
@@ -609,7 +610,7 @@ class PartySummaryScreenTest {
         canada.votePctDiff = mapOf(lib to -0.0634, con to +0.0243, ndp to -0.0374, grn to +0.0312, bq to +0.0297, oth to +0.0158)
         compareRendering("PartySummaryScreen", "SinglePartyVotesOnly-5", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             CONSERVATIVE SUMMARY
             
@@ -657,7 +658,7 @@ class PartySummaryScreenTest {
         screen.setSize(1024, 512)
         compareRendering("PartySummaryScreen", "PartyChange-1", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             LIBERAL SUMMARY
             
@@ -682,7 +683,7 @@ class PartySummaryScreenTest {
         canada.prevVotes = mapOf(lib to 456797, pc to 351328, ca to 114583, ndp to 185762, grn to 968, oth to 12824)
         compareRendering("PartySummaryScreen", "PartyChange-2", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             LIBERAL SUMMARY
             
@@ -719,7 +720,7 @@ class PartySummaryScreenTest {
         canada.prevVotes = mapOf(lib to 4801108, pc to 1448417, ca to 2475750, ndp to 906652, grn to 70105, bq to 1377727, oth to 150087)
         compareRendering("PartySummaryScreen", "PartyChange-3", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             LIBERAL SUMMARY
 
@@ -737,7 +738,7 @@ class PartySummaryScreenTest {
         partySelected.submit(con)
         compareRendering("PartySummaryScreen", "PartyChange-4", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             CONSERVATIVE SUMMARY
 
@@ -766,7 +767,7 @@ class PartySummaryScreenTest {
         canada.prevVotes = mapOf(lib to 5251975, pc to 1567022, ca to 3276928, ndp to 1093868, grn to 104399, bq to 1377727, oth to 185818)
         compareRendering("PartySummaryScreen", "PartyChange-5", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             CONSERVATIVE SUMMARY
 
@@ -868,7 +869,7 @@ class PartySummaryScreenTest {
         screen.setSize(1024, 512)
         compareRendering("PartySummaryScreen", "Coalition-1", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             COALITION SUMMARY
 

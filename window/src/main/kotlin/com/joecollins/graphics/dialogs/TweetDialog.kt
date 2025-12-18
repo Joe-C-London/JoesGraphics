@@ -18,17 +18,15 @@ import javax.swing.JPanel
 
 class TweetDialog(panel: JPanel) : GenericSocialDialog(panel) {
 
-    override val siteColor: Color
-        get() = Color(0x00acee)
+    override val siteColor: Color get() = Color(0x00acee)
 
-    override val action: String
-        get() = "Tweet"
+    override val action: String get() = "Tweet"
 
-    override val actionInProgress: String
-        get() = "Tweeting"
+    override val actionInProgress: String get() = "Tweeting"
 
-    override val maxLength: Int
-        get() = 280
+    override val maxLength: Int get() = 280
+
+    override val maxAltTextLength: Int get() = 1000
 
     init {
         title = "Tweet"

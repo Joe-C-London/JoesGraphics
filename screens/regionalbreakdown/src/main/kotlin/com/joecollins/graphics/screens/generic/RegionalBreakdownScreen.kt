@@ -23,7 +23,7 @@ import java.util.concurrent.Flow
 class RegionalBreakdownScreen private constructor(
     titleLabel: Flow.Publisher<out String?>,
     multiSummaryFrame: MultiSummaryFrame,
-    altText: Flow.Publisher<String>,
+    altText: Flow.Publisher<(Int) -> String>,
 ) : GenericPanel(pad(multiSummaryFrame), titleLabel, altText),
     AltTextProvider {
     sealed interface Entry {
@@ -408,11 +408,11 @@ class RegionalBreakdownScreen private constructor(
             header: Flow.Publisher<out String>,
             progressLabel: Flow.Publisher<String?>?,
             title: Flow.Publisher<out String?>,
-        ): Flow.Publisher<String> {
+        ): Flow.Publisher<(Int) -> String> {
             val headerLine = (if (progressLabel == null) header else header.merge(progressLabel) { h, p -> if (p == null) h else "$h [$p]" })
                 .merge(title) { h, t -> sequenceOf(t, h).filterNotNull().joinToString("\n") }
             val rows = entries.mapElements { it.altText }.map { it.combine() }.compose { it }.map { it.joinToString("\n") }
-            return headerLine.merge(rows) { h, v -> "$h\n\n$v" }
+            return headerLine.merge(rows) { h, v -> "$h\n\n$v" }.map { text -> { text } }
         }
 
         private fun extractPartyOrder(result: Map<out PartyOrCoalition, Int>): List<PartyOrCoalition> = extractPartyOrder(result, null)

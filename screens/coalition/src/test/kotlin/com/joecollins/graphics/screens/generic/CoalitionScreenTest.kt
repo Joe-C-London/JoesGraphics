@@ -57,7 +57,7 @@ class CoalitionScreenTest {
         panel.setSize(1024, 512)
         compareRendering("CoalitionScreen", "Screen-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             COALITION BUILDER
             
@@ -87,7 +87,7 @@ class CoalitionScreenTest {
         )
         compareRendering("CoalitionScreen", "Screen-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             COALITION BUILDER
             
@@ -115,7 +115,7 @@ class CoalitionScreenTest {
         )
         compareRendering("CoalitionScreen", "Screen-3", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             COALITION BUILDER
             

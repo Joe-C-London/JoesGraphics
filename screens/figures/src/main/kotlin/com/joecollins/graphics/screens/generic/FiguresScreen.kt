@@ -17,7 +17,7 @@ import java.util.concurrent.Flow
 import javax.swing.JPanel
 import javax.swing.border.EmptyBorder
 
-class FiguresScreen private constructor(headerLabel: Flow.Publisher<out String?>, frames: Array<JPanel>, altText: Flow.Publisher<String>) :
+class FiguresScreen private constructor(headerLabel: Flow.Publisher<out String?>, frames: Array<JPanel>, altText: Flow.Publisher<(Int) -> String>) :
     GenericPanel(
         {
             background = Color.WHITE
@@ -46,7 +46,7 @@ class FiguresScreen private constructor(headerLabel: Flow.Publisher<out String?>
             val frames: Array<JPanel> = sections.map { it.createFrame() }.toTypedArray()
             val altText = sections.mapNotNull { it.createAltText() }.combine()
                 .merge(title) { s, t -> t + s.joinToString("") { "\n\n$it" } }
-            return FiguresScreen(title, frames, altText)
+            return FiguresScreen(title, frames, altText.map { text -> { text } })
         }
     }
 

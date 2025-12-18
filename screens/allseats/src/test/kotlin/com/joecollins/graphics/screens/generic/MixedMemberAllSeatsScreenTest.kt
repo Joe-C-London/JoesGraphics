@@ -6,6 +6,7 @@ import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyResult
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
+import com.joecollins.pubsub.map
 import org.junit.jupiter.api.Test
 import java.awt.Color
 
@@ -31,7 +32,7 @@ class MixedMemberAllSeatsScreenTest {
         screen.setSize(1024, 512)
         compareRendering("MixedMemberAllSeatsScreen", "MultiRegion-1", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             WALES: ALL SEATS
             
@@ -73,7 +74,7 @@ class MixedMemberAllSeatsScreenTest {
         )
         compareRendering("MixedMemberAllSeatsScreen", "MultiRegion-2", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             WALES: ALL SEATS
             
@@ -122,7 +123,7 @@ class MixedMemberAllSeatsScreenTest {
         )
         compareRendering("MixedMemberAllSeatsScreen", "MultiRegion-3", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             WALES: ALL SEATS
             

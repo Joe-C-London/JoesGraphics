@@ -5,6 +5,7 @@ import com.joecollins.graphics.utils.RenderTestUtils
 import com.joecollins.models.general.Party
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
+import com.joecollins.pubsub.map
 import org.junit.jupiter.api.Test
 import java.awt.Color
 
@@ -28,7 +29,7 @@ class ParliamentVoteFrameTest {
         frame.setSize(500, 250)
         RenderTestUtils.compareRendering("ParliamentVoteFrame", "ukHouse-1", frame)
         PublisherTestUtils.assertPublishes(
-            frame.altText,
+            frame.altText.map { it(1000) },
             """
             NATIONALITY AND BORDERS BILL: THIRD READING
             AYES: ...
@@ -39,7 +40,7 @@ class ParliamentVoteFrameTest {
         divisionResult.submit(intArrayOf(297, 229))
         RenderTestUtils.compareRendering("ParliamentVoteFrame", "ukHouse-2", frame)
         PublisherTestUtils.assertPublishes(
-            frame.altText,
+            frame.altText.map { it(1000) },
             """
             NATIONALITY AND BORDERS BILL: THIRD READING
             AYES: 297
@@ -91,7 +92,7 @@ class ParliamentVoteFrameTest {
         )
         RenderTestUtils.compareRendering("ParliamentVoteFrame", "ukHouse-3", frame)
         PublisherTestUtils.assertPublishes(
-            frame.altText,
+            frame.altText.map { it(1000) },
             """
             NATIONALITY AND BORDERS BILL: THIRD READING
             AYES: 297 (291 CON, 5 DUP, 1 IND)
@@ -118,7 +119,7 @@ class ParliamentVoteFrameTest {
         frame.setSize(500, 250)
         RenderTestUtils.compareRendering("ParliamentVoteFrame", "ukHouseNoDivision-1", frame)
         PublisherTestUtils.assertPublishes(
-            frame.altText,
+            frame.altText.map { it(1000) },
             """
             EXITING THE EUROPEAN UNION (FINANCIAL SERVICES): TO APPROVE DRAFT INSOLVENCY 2 (GROUP SUPERVISION) (AMENDMENT) REGULATIONS 2021
             AYES: ...
@@ -129,7 +130,7 @@ class ParliamentVoteFrameTest {
         resultText.submit("AYE (NO DIVISION)")
         RenderTestUtils.compareRendering("ParliamentVoteFrame", "ukHouseNoDivision-2", frame)
         PublisherTestUtils.assertPublishes(
-            frame.altText,
+            frame.altText.map { it(1000) },
             """
             EXITING THE EUROPEAN UNION (FINANCIAL SERVICES): TO APPROVE DRAFT INSOLVENCY 2 (GROUP SUPERVISION) (AMENDMENT) REGULATIONS 2021
             AYE (NO DIVISION)
@@ -155,7 +156,7 @@ class ParliamentVoteFrameTest {
         frame.setSize(500, 250)
         RenderTestUtils.compareRendering("ParliamentVoteFrame", "usSenate-1", frame)
         PublisherTestUtils.assertPublishes(
-            frame.altText,
+            frame.altText.map { it(1000) },
             """
             IMPEACHMENT ARTICLE I: INCITEMENT OF INSURRECTION
             GUILTY: ...
@@ -185,7 +186,7 @@ class ParliamentVoteFrameTest {
         )
         RenderTestUtils.compareRendering("ParliamentVoteFrame", "usSenate-2", frame)
         PublisherTestUtils.assertPublishes(
-            frame.altText,
+            frame.altText.map { it(1000) },
             """
             IMPEACHMENT ARTICLE I: INCITEMENT OF INSURRECTION
             GUILTY: 57 (48 DEM, 7 GOP, 2 IND)

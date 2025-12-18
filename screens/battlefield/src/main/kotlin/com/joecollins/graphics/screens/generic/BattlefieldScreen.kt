@@ -16,7 +16,7 @@ import java.awt.Color
 import java.text.DecimalFormat
 import java.util.concurrent.Flow
 
-class BattlefieldScreen private constructor(header: Flow.Publisher<out String?>, frame: BattlefieldFrame, altText: Flow.Publisher<String>) : GenericPanel(pad(frame), header, altText) {
+class BattlefieldScreen private constructor(header: Flow.Publisher<out String?>, frame: BattlefieldFrame, altText: Flow.Publisher<(Int) -> String>) : GenericPanel(pad(frame), header, altText) {
 
     companion object {
         private const val DEFAULT_LIMIT = 0.80
@@ -267,7 +267,7 @@ class BattlefieldScreen private constructor(header: Flow.Publisher<out String?>,
             partySwings: Flow.Publisher<out Map<Party, Double>?>?,
             allParties: Flow.Publisher<SelectedParties>,
             prevVotes: Flow.Publisher<out Map<T, Map<PartyOrCandidate, Int>>>,
-        ): Flow.Publisher<String> {
+        ): Flow.Publisher<(Int) -> String> {
             val topText = title.merge(header) { t, h -> sequenceOf(t, h).filterNotNull().joinToString("\n") }
             val swingsText = partySwings?.merge(allParties) { swings, parties ->
                 if (swings == null) return@merge null
@@ -309,6 +309,7 @@ class BattlefieldScreen private constructor(header: Flow.Publisher<out String?>,
                 }
             }
                 .merge(majorityText) { t, m -> "$t\n\n$m" }
+                .map { text -> { text } }
         }
     }
 }

@@ -71,7 +71,7 @@ class SimplePartyVoteViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "PopularVote-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 PRINCE EDWARD ISLAND
                 
@@ -105,7 +105,7 @@ class SimplePartyVoteViewPanelTest {
         winnersByDistrict.submit(winners)
         compareRendering("SimpleVoteViewPanel", "PopularVote-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 PRINCE EDWARD ISLAND
                 
@@ -126,7 +126,7 @@ class SimplePartyVoteViewPanelTest {
         voteHeader.submit("1 OF 7 DISTRICTS DECLARED")
         compareRendering("SimpleVoteViewPanel", "PopularVote-3", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 CARDIGAN
                 
@@ -188,7 +188,7 @@ class SimplePartyVoteViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "PartyTick-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 UNITED STATES
                 
@@ -258,7 +258,7 @@ class SimplePartyVoteViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "Range-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 PRINCE EDWARD ISLAND
                 
@@ -328,7 +328,7 @@ class SimplePartyVoteViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "PartyClassifications-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 NORTHERN IRELAND
                 
@@ -384,7 +384,7 @@ class SimplePartyVoteViewPanelTest {
         )
         compareRendering("SimpleVoteViewPanel", "PartyClassifications-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 NORTHERN IRELAND
                 
@@ -463,7 +463,7 @@ class SimplePartyVoteViewPanelTest {
         panel.size = Dimension(1024, 512)
         compareRendering("SimpleVoteViewPanel", "PrevVotes-0", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 JAPAN
                 
@@ -496,7 +496,7 @@ class SimplePartyVoteViewPanelTest {
         )
         compareRendering("SimpleVoteViewPanel", "PrevVotes-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 JAPAN
                 
@@ -551,7 +551,7 @@ class SimplePartyVoteViewPanelTest {
         voteHeader.submit("CONSTITUENCY VOTES")
         compareRendering("SimpleVoteViewPanel", "PrevVotes-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 JAPAN
                 
@@ -582,7 +582,7 @@ class SimplePartyVoteViewPanelTest {
         changeHeader.submit("CHANGE SINCE 2017")
         compareRendering("SimpleVoteViewPanel", "PrevVotes-3", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 JAPAN
                 
@@ -628,7 +628,7 @@ class SimplePartyVoteViewPanelTest {
         voteHeader.submit("PROPORTIONAL VOTES")
         compareRendering("SimpleVoteViewPanel", "PrevVotes-4", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 JAPAN
                 
@@ -650,7 +650,7 @@ class SimplePartyVoteViewPanelTest {
         changeHeader.submit("2017 RESULT")
         compareRendering("SimpleVoteViewPanel", "PrevVotes-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 JAPAN
                 
@@ -681,7 +681,7 @@ class SimplePartyVoteViewPanelTest {
         voteHeader.submit("PROPORTIONAL VOTES (10% IN)")
         compareRendering("SimpleVoteViewPanel", "PrevVotes-1b", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 JAPAN
                 
@@ -755,7 +755,7 @@ class SimplePartyVoteViewPanelTest {
         panel.size = Dimension(1024, 512)
         compareRendering("SimpleVoteViewPanel", "PrevVotes-0", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 JAPAN
                 
@@ -788,7 +788,7 @@ class SimplePartyVoteViewPanelTest {
         )
         compareRendering("SimpleVoteViewPanel", "PrevRangeVotes-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 JAPAN
                 
@@ -819,7 +819,7 @@ class SimplePartyVoteViewPanelTest {
         changeHeader.submit("CHANGE SINCE 2017")
         compareRendering("SimpleVoteViewPanel", "PrevRangeVotes-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 JAPAN
                 
@@ -888,7 +888,7 @@ class SimplePartyVoteViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "PartyMerge-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 CANADA
                 
@@ -906,7 +906,7 @@ class SimplePartyVoteViewPanelTest {
         showPrev.submit(true)
         compareRendering("SimpleVoteViewPanel", "PartyMerge-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 CANADA
                 
@@ -980,7 +980,7 @@ class SimplePartyVoteViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "PartyMergeRange-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 CANADA
                 
@@ -998,7 +998,7 @@ class SimplePartyVoteViewPanelTest {
         showPrev.submit(true)
         compareRendering("SimpleVoteViewPanel", "PartyMergeRange-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 CANADA
                 
@@ -1079,7 +1079,7 @@ class SimplePartyVoteViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "DualMap", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             PRINCE EDWARD ISLAND
             
@@ -1157,7 +1157,7 @@ class SimplePartyVoteViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "PartyOrCandidates", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 HIGHLANDS AND ISLANDS
 
@@ -1235,7 +1235,7 @@ class SimplePartyVoteViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "PartyPct-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 AUSTRIA
 
@@ -1294,7 +1294,7 @@ class SimplePartyVoteViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "PctWinningLine-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 GERMANY
 
@@ -1311,7 +1311,7 @@ class SimplePartyVoteViewPanelTest {
         prevVotes.submit(mapOf(union to 583135, spd to 399505, fdp to 216844, grune to 205471, afd to 140362, linke to 124678, oth to 45646))
         compareRendering("SimpleVoteViewPanel", "PctWinningLine-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 GERMANY
                 
@@ -1335,7 +1335,7 @@ class SimplePartyVoteViewPanelTest {
         prevVotes.submit(mapOf(union to 15317344, spd to 9539381, afd to 5878115, fdp to 4999449, linke to 4297270, grune to 4158400, oth to 2325533))
         compareRendering("SimpleVoteViewPanel", "PctWinningLine-3", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 GERMANY
 

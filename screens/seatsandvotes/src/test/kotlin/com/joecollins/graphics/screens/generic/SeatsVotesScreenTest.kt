@@ -6,6 +6,7 @@ import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.Party
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
+import com.joecollins.pubsub.map
 import org.junit.jupiter.api.Test
 import java.awt.Color
 
@@ -57,7 +58,7 @@ class SeatsVotesScreenTest {
         screen.setSize(1024, 512)
         compareRendering("SeatsVotesScreen", "Single-1", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
                 UNITED KINGDOM
                 
@@ -75,7 +76,7 @@ class SeatsVotesScreenTest {
         votesProgress.submit("1/650")
         compareRendering("SeatsVotesScreen", "Single-2", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
                 UNITED KINGDOM
 
@@ -99,7 +100,7 @@ class SeatsVotesScreenTest {
         votesProgress.submit("650/650")
         compareRendering("SeatsVotesScreen", "Single-3", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
                 UNITED KINGDOM
 
@@ -135,7 +136,7 @@ class SeatsVotesScreenTest {
         votesProgress.submit("57/57")
         compareRendering("SeatsVotesScreen", "Single-4", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
                 SCOTLAND
 
@@ -200,7 +201,7 @@ class SeatsVotesScreenTest {
         screen.setSize(1024, 512)
         compareRendering("SeatsVotesScreen", "Dual-1", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
                 PRINCE EDWARD ISLAND
 
@@ -218,7 +219,7 @@ class SeatsVotesScreenTest {
         votesProgress.submit("10/267")
         compareRendering("SeatsVotesScreen", "Dual-2", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
                 PRINCE EDWARD ISLAND
 
@@ -242,7 +243,7 @@ class SeatsVotesScreenTest {
         votesProgress.submit("267/267")
         compareRendering("SeatsVotesScreen", "Dual-3", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
                 PRINCE EDWARD ISLAND
 
@@ -270,7 +271,7 @@ class SeatsVotesScreenTest {
         title.submit("CARDIGAN")
         compareRendering("SeatsVotesScreen", "Dual-4", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
                 CARDIGAN
 
@@ -326,7 +327,7 @@ class SeatsVotesScreenTest {
         screen.setSize(1024, 512)
         compareRendering("SeatsVotesScreen", "Range-1", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
                 AUSTRALIA
 
@@ -381,7 +382,7 @@ class SeatsVotesScreenTest {
         screen.setSize(1024, 512)
         compareRendering("SeatsVotesScreen", "Candidates-1", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
                 PRESIDENT
 
@@ -433,7 +434,7 @@ class SeatsVotesScreenTest {
         screen.setSize(1024, 512)
         compareRendering("SeatsVotesScreen", "CandidatesDual-1", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
                 PRESIDENT
 

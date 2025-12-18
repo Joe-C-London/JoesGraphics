@@ -24,11 +24,11 @@ open class GenericPanelWithLowerThird(
         add(lowerThird, BorderLayout.SOUTH)
     }
 
-    override val altText: Flow.Publisher<out String?> =
+    override val altText: Flow.Publisher<out (Int) -> String?> =
         if (panel is AltTextProvider) {
             panel.altText
         } else {
-            (null as String?).asOneTimePublisher()
+            { _: Int -> null as String? }.asOneTimePublisher()
         }
 
     override val taskbarIcon: Flow.Publisher<Image>? =

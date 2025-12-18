@@ -29,12 +29,11 @@ class SwingFrame(
 ) : GraphicsFrame(
     headerPublisher = headerPublisher,
     headerLabelsPublisher = progressPublisher?.map { p -> mapOf(HeaderLabelLocation.RIGHT to p) },
-),
-    AltTextProvider {
+) {
     private val swingPanel = SwingPanel()
     private val bottomLabel: JLabel = FontSizeAdjustingLabel()
 
-    override val altText: Flow.Publisher<out String?> = bottomTextPublisher
+    val altText: Flow.Publisher<out String?> = bottomTextPublisher
 
     init {
         bottomLabel.horizontalAlignment = JLabel.CENTER

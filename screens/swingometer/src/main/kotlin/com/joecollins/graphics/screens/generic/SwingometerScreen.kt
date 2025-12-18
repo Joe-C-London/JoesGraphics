@@ -25,7 +25,7 @@ import kotlin.math.absoluteValue
 import kotlin.math.ceil
 import kotlin.math.roundToInt
 
-class SwingometerScreen private constructor(title: Flow.Publisher<out String?>, frame: SwingometerFrame, altText: Flow.Publisher<String>) : GenericPanel(pad(frame), title, altText) {
+class SwingometerScreen private constructor(title: Flow.Publisher<out String?>, frame: SwingometerFrame, altText: Flow.Publisher<(Int) -> String>) : GenericPanel(pad(frame), title, altText) {
 
     companion object {
         fun <T> Flow.Publisher<out Map<T, Map<out Party, Int>>>.convertToPartyOrCandidateForSwingometer() = map { it.mapValues { e -> e.value.convertToPartyOrCandidate() } }
@@ -108,7 +108,7 @@ class SwingometerScreen private constructor(title: Flow.Publisher<out String?>, 
             header: Flow.Publisher<out String?>,
             progressLabel: Flow.Publisher<out String?>?,
             title: Flow.Publisher<out String?>,
-        ): Flow.Publisher<String> {
+        ): Flow.Publisher<(Int) -> String> {
             val headerText: Flow.Publisher<out String?> = title.merge(header) { t, h -> "$t\n$h" }
                 .run {
                     if (progressLabel == null) {
@@ -154,6 +154,7 @@ class SwingometerScreen private constructor(title: Flow.Publisher<out String?>, 
             return headerText.merge(swing) { h, s -> "$h\n\n$s" }
                 .merge(seats) { h, s -> "$h\n$s" }
                 .merge(toWin) { h, w -> h + (if (w == null) "" else "\n\n$w") }
+                .map { text -> { text } }
         }
     }
 

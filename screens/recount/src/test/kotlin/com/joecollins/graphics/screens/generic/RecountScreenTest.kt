@@ -41,7 +41,7 @@ class RecountScreenTest {
         screen.setSize(1024, 512)
         RenderTestUtils.compareRendering("RecountScreen", "RecountVotes-1", screen)
         PublisherTestUtils.assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             YUKON
             
@@ -77,7 +77,7 @@ class RecountScreenTest {
         pctReporting.submit(pctReportingRaw)
         RenderTestUtils.compareRendering("RecountScreen", "RecountVotes-2", screen)
         PublisherTestUtils.assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             YUKON
             
@@ -107,7 +107,7 @@ class RecountScreenTest {
         pctReporting.submit(pctReportingRaw)
         RenderTestUtils.compareRendering("RecountScreen", "RecountVotes-3", screen)
         PublisherTestUtils.assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             YUKON
             
@@ -142,7 +142,7 @@ class RecountScreenTest {
         screen.setSize(1024, 512)
         RenderTestUtils.compareRendering("RecountScreen", "RecountVotes-1", screen)
         PublisherTestUtils.assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             YUKON
             
@@ -178,7 +178,7 @@ class RecountScreenTest {
         pollsReporting.submit(pollsReportingRaw)
         RenderTestUtils.compareRendering("RecountScreen", "RecountVotes-2", screen)
         PublisherTestUtils.assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             YUKON
             
@@ -208,7 +208,7 @@ class RecountScreenTest {
         pollsReporting.submit(pollsReportingRaw)
         RenderTestUtils.compareRendering("RecountScreen", "RecountVotes-3", screen)
         PublisherTestUtils.assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             YUKON
             
@@ -242,7 +242,7 @@ class RecountScreenTest {
         screen.setSize(1024, 512)
         RenderTestUtils.compareRendering("RecountScreen", "RecountPct-1", screen)
         PublisherTestUtils.assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             CANADA
 
@@ -283,7 +283,7 @@ class RecountScreenTest {
         candidateVotes.submit(candidateVotesRaw)
         RenderTestUtils.compareRendering("RecountScreen", "RecountPct-2", screen)
         PublisherTestUtils.assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             CANADA
 
@@ -325,7 +325,7 @@ class RecountScreenTest {
         screen.setSize(1024, 512)
         RenderTestUtils.compareRendering("RecountScreen", "NonPartisan-1", screen)
         PublisherTestUtils.assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             NUNAVUT
 
@@ -351,7 +351,7 @@ class RecountScreenTest {
         )
         RenderTestUtils.compareRendering("RecountScreen", "NonPartisan-2", screen)
         PublisherTestUtils.assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             NUNAVUT
 

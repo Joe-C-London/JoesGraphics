@@ -83,7 +83,7 @@ class SimpleCandidateVoteViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "Basic-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 MONTAGUE-KILMUIR
                 
@@ -160,7 +160,7 @@ class SimpleCandidateVoteViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "Basic-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 LASALLE—ÉMARD—VERDUN
                 
@@ -241,7 +241,7 @@ class SimpleCandidateVoteViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "PctOnly-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 MONTAGUE-KILMUIR
                 
@@ -312,7 +312,7 @@ class SimpleCandidateVoteViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "Update-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 MONTAGUE-KILMUIR
                 
@@ -340,7 +340,7 @@ class SimpleCandidateVoteViewPanelTest {
         leader.submit(leading(lib.party))
         compareRendering("SimpleVoteViewPanel", "Update-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 MONTAGUE-KILMUIR
                 
@@ -368,7 +368,7 @@ class SimpleCandidateVoteViewPanelTest {
         leader.submit(leading(grn.party))
         compareRendering("SimpleVoteViewPanel", "Update-3", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 MONTAGUE-KILMUIR
                 
@@ -396,7 +396,7 @@ class SimpleCandidateVoteViewPanelTest {
         leader.submit(leading(pc.party))
         compareRendering("SimpleVoteViewPanel", "Update-4", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 MONTAGUE-KILMUIR
                 
@@ -425,7 +425,7 @@ class SimpleCandidateVoteViewPanelTest {
         winner.submit(pc)
         compareRendering("SimpleVoteViewPanel", "Update-5", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 MONTAGUE-KILMUIR
                 
@@ -442,7 +442,7 @@ class SimpleCandidateVoteViewPanelTest {
         winner.submit(null)
         compareRendering("SimpleVoteViewPanel", "Update-6", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 MONTAGUE-KILMUIR
                 
@@ -520,7 +520,7 @@ class SimpleCandidateVoteViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "ZeroVotes-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 MONTAGUE-KILMUIR
                 
@@ -587,7 +587,7 @@ class SimpleCandidateVoteViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "SameParty-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 TEXAS DISTRICT 27
                 
@@ -641,7 +641,7 @@ class SimpleCandidateVoteViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "MajorityLine-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 FRANCE PRESIDENT: ROUND 2
                 
@@ -664,7 +664,7 @@ class SimpleCandidateVoteViewPanelTest {
         )
         compareRendering("SimpleVoteViewPanel", "MajorityLine-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 FRANCE PRESIDENT: ROUND 2
                 
@@ -686,7 +686,7 @@ class SimpleCandidateVoteViewPanelTest {
         voteSubhead.submit("")
         compareRendering("SimpleVoteViewPanel", "MajorityLine-3", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 FRANCE PRESIDENT: ROUND 2
                 
@@ -761,7 +761,7 @@ class SimpleCandidateVoteViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "AdditionalHighlightMap-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 MONTAGUE-KILMUIR
                 
@@ -812,7 +812,7 @@ class SimpleCandidateVoteViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "Uncontested-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 MASSACHUSETTS DISTRICT 4
                 
@@ -851,7 +851,7 @@ class SimpleCandidateVoteViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "LotsOfCandidates-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 UXBRIDGE AND SOUTH RUISLIP
                 
@@ -883,7 +883,7 @@ class SimpleCandidateVoteViewPanelTest {
         voteHeader.submit("2019 RESULT")
         compareRendering("SimpleVoteViewPanel", "LotsOfCandidates-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 UXBRIDGE AND SOUTH RUISLIP
                 
@@ -915,7 +915,7 @@ class SimpleCandidateVoteViewPanelTest {
         voteHeader.submit("2017 RESULT")
         compareRendering("SimpleVoteViewPanel", "LotsOfCandidates-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 UXBRIDGE AND SOUTH RUISLIP
                 
@@ -988,7 +988,7 @@ class SimpleCandidateVoteViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "CandidateOthers-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 MONTAGUE-KILMUIR
                 
@@ -1004,7 +1004,7 @@ class SimpleCandidateVoteViewPanelTest {
         winner.submit(lib)
         compareRendering("SimpleVoteViewPanel", "CandidateOthers-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 MONTAGUE-KILMUIR
                 
@@ -1032,7 +1032,7 @@ class SimpleCandidateVoteViewPanelTest {
         winner.submit(pc)
         compareRendering("SimpleVoteViewPanel", "CandidateOthers-3", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 MONTAGUE-KILMUIR
                 
@@ -1106,7 +1106,7 @@ class SimpleCandidateVoteViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "CandidateOthersMandatory-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 MONTAGUE-KILMUIR
                 
@@ -1122,7 +1122,7 @@ class SimpleCandidateVoteViewPanelTest {
         winner.submit(lib)
         compareRendering("SimpleVoteViewPanel", "CandidateOthersMandatory-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 MONTAGUE-KILMUIR
                 
@@ -1150,7 +1150,7 @@ class SimpleCandidateVoteViewPanelTest {
         winner.submit(pc)
         compareRendering("SimpleVoteViewPanel", "CandidateOthersMandatory-3", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 MONTAGUE-KILMUIR
                 
@@ -1211,7 +1211,7 @@ class SimpleCandidateVoteViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "PartiesNotRunningAgain-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 SHIPPAGAN-LAMÈQUE-MISCOU
                 
@@ -1275,7 +1275,7 @@ class SimpleCandidateVoteViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "PartiesNotRunningAgain-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 SHIPPAGAN-LAMÈQUE-MISCOU
                 
@@ -1337,7 +1337,7 @@ class SimpleCandidateVoteViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "PartiesNotRunningAgainOthers-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 SHIPPAGAN-LAMÈQUE-MISCOU
                 
@@ -1399,7 +1399,7 @@ class SimpleCandidateVoteViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "PartiesNotRunningAgainOthers-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 SHIPPAGAN-LAMÈQUE-MISCOU
                 
@@ -1458,7 +1458,7 @@ class SimpleCandidateVoteViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "WinningPartyNotRunningAgain-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 BUCKINGHAM
                 
@@ -1479,7 +1479,7 @@ class SimpleCandidateVoteViewPanelTest {
         swingHeader.submit("SWING SINCE 2005")
         compareRendering("SimpleVoteViewPanel", "WinningPartyNotRunningAgain-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 BUCKINGHAM
                 
@@ -1533,7 +1533,7 @@ class SimpleCandidateVoteViewPanelTest {
         panel.size = Dimension(1024, 512)
         compareRendering("SimpleVoteViewPanel", "RunoffMode-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 AISNE 1st CONSTITUENCY
                 
@@ -1550,7 +1550,7 @@ class SimpleCandidateVoteViewPanelTest {
         constituency.submit("AIN 1st CONSTITUENCY")
         compareRendering("SimpleVoteViewPanel", "RunoffMode-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 AIN 1st CONSTITUENCY
                 
@@ -1613,7 +1613,7 @@ class SimpleCandidateVoteViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "CandidateRunoffSingleLine-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 ELECTION 2017: FRANCE DECIDES
                 
@@ -1636,7 +1636,7 @@ class SimpleCandidateVoteViewPanelTest {
         runoff.submit(setOf(macron, lePen))
         compareRendering("SimpleVoteViewPanel", "CandidateRunoffSingleLine-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 ELECTION 2017: FRANCE DECIDES
                 
@@ -1711,7 +1711,7 @@ class SimpleCandidateVoteViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "CandidateRunoffDualLine-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 ELECTION 2017: FRANCE DECIDES
                 
@@ -1729,7 +1729,7 @@ class SimpleCandidateVoteViewPanelTest {
         runoff.submit(setOf(macron, lePen))
         compareRendering("SimpleVoteViewPanel", "CandidateRunoffDualLine-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 ELECTION 2017: FRANCE DECIDES
                 
@@ -1798,7 +1798,7 @@ class SimpleCandidateVoteViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "MidDeclaration-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 MONTAGUE-KILMUIR
                 
@@ -1822,7 +1822,7 @@ class SimpleCandidateVoteViewPanelTest {
         )
         compareRendering("SimpleVoteViewPanel", "MidDeclaration-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 MONTAGUE-KILMUIR
                 
@@ -1846,7 +1846,7 @@ class SimpleCandidateVoteViewPanelTest {
         )
         compareRendering("SimpleVoteViewPanel", "MidDeclaration-3", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 MONTAGUE-KILMUIR
                 
@@ -1870,7 +1870,7 @@ class SimpleCandidateVoteViewPanelTest {
         )
         compareRendering("SimpleVoteViewPanel", "MidDeclaration-4", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 MONTAGUE-KILMUIR
                 
@@ -1895,7 +1895,7 @@ class SimpleCandidateVoteViewPanelTest {
         leader.submit(pc.party)
         compareRendering("SimpleVoteViewPanel", "MidDeclaration-5", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 MONTAGUE-KILMUIR
                 
@@ -1977,7 +1977,7 @@ class SimpleCandidateVoteViewPanelTest {
                 compareRendering("SimpleVoteViewPanel", "NewPartiesCandidatesMergedWithPrevOthers", it)
             }
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 BEROWRA
                 
@@ -2061,7 +2061,7 @@ class SimpleCandidateVoteViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "ProgressLabel-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 MONTAGUE-KILMUIR
                 
@@ -2089,7 +2089,7 @@ class SimpleCandidateVoteViewPanelTest {
         leader.submit(leading(lib.party))
         compareRendering("SimpleVoteViewPanel", "ProgressLabel-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 MONTAGUE-KILMUIR
                 
@@ -2117,7 +2117,7 @@ class SimpleCandidateVoteViewPanelTest {
         leader.submit(leading(grn.party))
         compareRendering("SimpleVoteViewPanel", "ProgressLabel-3", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 MONTAGUE-KILMUIR
                 
@@ -2145,7 +2145,7 @@ class SimpleCandidateVoteViewPanelTest {
         leader.submit(leading(pc.party))
         compareRendering("SimpleVoteViewPanel", "ProgressLabel-4", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 MONTAGUE-KILMUIR
                 
@@ -2174,7 +2174,7 @@ class SimpleCandidateVoteViewPanelTest {
         winner.submit(pc)
         compareRendering("SimpleVoteViewPanel", "ProgressLabel-5", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 MONTAGUE-KILMUIR
                 
@@ -2249,7 +2249,7 @@ class SimpleCandidateVoteViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "SwingRange", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 MONTAGUE-KILMUIR
                 
@@ -2328,7 +2328,7 @@ class SimpleCandidateVoteViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "FadedMap-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 CHARLOTTETOWN-WINSLOE
 
@@ -2396,7 +2396,7 @@ class SimpleCandidateVoteViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "MultiWinners-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 CLERKENWELL
 
@@ -2445,7 +2445,7 @@ class SimpleCandidateVoteViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "VoteWinningLine-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 TAIWAN
 
@@ -2460,7 +2460,7 @@ class SimpleCandidateVoteViewPanelTest {
         pctReporting.submit(1.0)
         compareRendering("SimpleVoteViewPanel", "VoteWinningLine-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 TAIWAN
 
@@ -2475,7 +2475,7 @@ class SimpleCandidateVoteViewPanelTest {
         pctReporting.submit(0.1)
         compareRendering("SimpleVoteViewPanel", "VoteWinningLine-3", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 TAIWAN
 
@@ -2518,7 +2518,7 @@ class SimpleCandidateVoteViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "CombinedWinningLine-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 PAS DE CALAIS 11
 
@@ -2564,7 +2564,7 @@ class SimpleCandidateVoteViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "MultiWinningLine-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 PAS DE CALAIS 11
 
@@ -2641,7 +2641,7 @@ class SimpleCandidateVoteViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "ConsolidateInDiffIfTooMany-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 BATLEY AND SPEN
                 
@@ -2712,7 +2712,7 @@ class SimpleCandidateVoteViewPanelTest {
         panel.setSize(1024, 512)
         compareRendering("SimpleVoteViewPanel", "VaryingIncumbentMarkers-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 HAMILTON, LARKHALL AND STONEHOUSE
 

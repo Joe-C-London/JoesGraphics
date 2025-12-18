@@ -11,6 +11,7 @@ import com.joecollins.models.general.PartyResult.Companion.elected
 import com.joecollins.models.general.PartyResult.Companion.leading
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
+import com.joecollins.pubsub.map
 import org.junit.jupiter.api.Test
 import java.awt.Color
 import java.text.DecimalFormat
@@ -41,7 +42,7 @@ class BattlegroundScreenTest {
         panel.setSize(1024, 512)
         compareRendering("BattlegroundScreen", "Basic-SingleParty-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             NDP BATTLEGROUND
 
@@ -60,7 +61,7 @@ class BattlegroundScreenTest {
         title.submit("LIBERAL BATTLEGROUND")
         compareRendering("BattlegroundScreen", "Basic-SingleParty-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             LIBERAL BATTLEGROUND
 
@@ -76,7 +77,7 @@ class BattlegroundScreenTest {
         currResult.submit(bcCurrResult())
         compareRendering("BattlegroundScreen", "Basic-SingleParty-3", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             LIBERAL BATTLEGROUND
 
@@ -95,7 +96,7 @@ class BattlegroundScreenTest {
         title.submit("GREEN BATTLEGROUND")
         compareRendering("BattlegroundScreen", "Basic-SingleParty-4", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             GREEN BATTLEGROUND
 
@@ -114,7 +115,7 @@ class BattlegroundScreenTest {
         title.submit("NDP TARGETS")
         compareRendering("BattlegroundScreen", "Basic-SingleParty-5", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             NDP TARGETS
 
@@ -130,7 +131,7 @@ class BattlegroundScreenTest {
         title.submit("LIBERAL DEFENSE")
         compareRendering("BattlegroundScreen", "Basic-SingleParty-6", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             LIBERAL DEFENSE
 
@@ -171,7 +172,7 @@ class BattlegroundScreenTest {
         panel.setSize(1024, 512)
         compareRendering("BattlegroundScreen", "Filtered-SingleParty-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             NDP BATTLEGROUND
 
@@ -186,7 +187,7 @@ class BattlegroundScreenTest {
         currResult.submit(bcCurrResult())
         compareRendering("BattlegroundScreen", "Filtered-SingleParty-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             NDP BATTLEGROUND
 
@@ -201,7 +202,7 @@ class BattlegroundScreenTest {
         filteredSeats.submit(emptySet())
         compareRendering("BattlegroundScreen", "Filtered-SingleParty-3", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             NDP BATTLEGROUND
             """.trimIndent(),
@@ -210,7 +211,7 @@ class BattlegroundScreenTest {
         filteredSeats.submit(null)
         compareRendering("BattlegroundScreen", "Filtered-SingleParty-4", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             NDP BATTLEGROUND
 
@@ -248,7 +249,7 @@ class BattlegroundScreenTest {
         panel.setSize(1024, 512)
         compareRendering("BattlegroundScreen", "Basic-DoubleParty-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             BATTLEGROUND
             
@@ -266,7 +267,7 @@ class BattlegroundScreenTest {
         leftSeats.submit(15)
         compareRendering("BattlegroundScreen", "Basic-DoubleParty-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             BATTLEGROUND
             
@@ -282,7 +283,7 @@ class BattlegroundScreenTest {
         currResult.submit(bcCurrResult())
         compareRendering("BattlegroundScreen", "Basic-DoubleParty-3", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             BATTLEGROUND
             
@@ -300,7 +301,7 @@ class BattlegroundScreenTest {
         leftSeats.submit(15)
         compareRendering("BattlegroundScreen", "Basic-DoubleParty-4", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             BATTLEGROUND
             
@@ -317,7 +318,7 @@ class BattlegroundScreenTest {
         leftSeats.submit(0)
         compareRendering("BattlegroundScreen", "Basic-DoubleParty-5", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             BATTLEGROUND
             
@@ -332,7 +333,7 @@ class BattlegroundScreenTest {
         leftSeats.submit(30)
         compareRendering("BattlegroundScreen", "Basic-DoubleParty-6", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             BATTLEGROUND
             
@@ -367,7 +368,7 @@ class BattlegroundScreenTest {
         panel.setSize(1024, 512)
         compareRendering("BattlegroundScreen", "Basic-DoubleCoalition-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             BATTLEGROUND
             
@@ -407,7 +408,7 @@ class BattlegroundScreenTest {
         panel.setSize(1024, 512)
         compareRendering("BattlegroundScreen", "Basic-SingleParty-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             NDP BATTLEGROUND
 
@@ -426,7 +427,7 @@ class BattlegroundScreenTest {
         title.submit("BC UNITED BATTLEGROUND")
         compareRendering("BattlegroundScreen", "Basic-SingleParty-PartyChange-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             BC UNITED BATTLEGROUND
 
@@ -442,7 +443,7 @@ class BattlegroundScreenTest {
         currResult.submit(bcCurrResult().mapValues { if (it.value.leader == lib) PartyResult(bcu, it.value.elected) else it.value })
         compareRendering("BattlegroundScreen", "Basic-SingleParty-PartyChange-3", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             BC UNITED BATTLEGROUND
 
@@ -461,7 +462,7 @@ class BattlegroundScreenTest {
         title.submit("GREEN BATTLEGROUND")
         compareRendering("BattlegroundScreen", "Basic-SingleParty-PartyChange-4", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             GREEN BATTLEGROUND
 
@@ -480,7 +481,7 @@ class BattlegroundScreenTest {
         title.submit("NDP TARGETS")
         compareRendering("BattlegroundScreen", "Basic-SingleParty-PartyChange-5", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             NDP TARGETS
 
@@ -496,7 +497,7 @@ class BattlegroundScreenTest {
         title.submit("BC UNITED DEFENSE")
         compareRendering("BattlegroundScreen", "Basic-SingleParty-PartyChange-6", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             BC UNITED DEFENSE
 
@@ -634,7 +635,7 @@ class BattlegroundScreenTest {
         panel.setSize(1024, 512)
         compareRendering("BattlegroundScreen", "Basic-PartyMerge-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             NDP BATTLEGROUND
 
@@ -652,7 +653,7 @@ class BattlegroundScreenTest {
         title.submit("UCP BATTLEGROUND")
         compareRendering("BattlegroundScreen", "Basic-PartyMerge-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             UCP BATTLEGROUND
 
@@ -759,7 +760,7 @@ class BattlegroundScreenTest {
         )
         compareRendering("BattlegroundScreen", "Basic-PartyMerge-3", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             UCP BATTLEGROUND
 
@@ -779,7 +780,7 @@ class BattlegroundScreenTest {
         title.submit("ALBERTA PARTY BATTLEGROUND")
         compareRendering("BattlegroundScreen", "Basic-PartyMerge-4", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             ALBERTA PARTY BATTLEGROUND
 
@@ -798,7 +799,7 @@ class BattlegroundScreenTest {
         title.submit("NDP BATTLEGROUND")
         compareRendering("BattlegroundScreen", "Basic-PartyMerge-5", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             NDP BATTLEGROUND
             
@@ -871,7 +872,7 @@ class BattlegroundScreenTest {
         panel.setSize(1024, 512)
         compareRendering("BattlegroundScreen", "Basic-DoublePartyPreferences-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             PENDULUM
             
@@ -908,7 +909,7 @@ class BattlegroundScreenTest {
         panel.setSize(1024, 512)
         compareRendering("BattlegroundScreen", "Basic-SinglePartyIndependents-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             LIBERAL BATTLEGROUND
 
@@ -929,7 +930,7 @@ class BattlegroundScreenTest {
         title.submit("PC BATTLEGROUND")
         compareRendering("BattlegroundScreen", "Basic-SinglePartyIndependents-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             PC BATTLEGROUND
 
@@ -968,7 +969,7 @@ class BattlegroundScreenTest {
         panel.setSize(1024, 512)
         compareRendering("BattlegroundScreen", "Basic-DoublePartyIndependents-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             BATTLEGROUND
 

@@ -9,6 +9,7 @@ import com.joecollins.models.general.PartyResult.Companion.elected
 import com.joecollins.models.general.PartyResult.Companion.leading
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
+import com.joecollins.pubsub.map
 import org.junit.jupiter.api.Test
 import java.awt.Color
 
@@ -30,7 +31,7 @@ class AllSeatsScreenTest {
         panel.setSize(1024, 512)
         compareRendering("AllSeatsScreen", "Basic-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             BRITISH COLUMBIA
 
@@ -50,7 +51,7 @@ class AllSeatsScreenTest {
         )
         compareRendering("AllSeatsScreen", "Basic-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             BRITISH COLUMBIA
 
@@ -72,7 +73,7 @@ class AllSeatsScreenTest {
         )
         compareRendering("AllSeatsScreen", "Basic-3", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             BRITISH COLUMBIA
 
@@ -88,7 +89,7 @@ class AllSeatsScreenTest {
         currResult.submit(bcCurrResult())
         compareRendering("AllSeatsScreen", "Basic-4", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             BRITISH COLUMBIA
 
@@ -125,7 +126,7 @@ class AllSeatsScreenTest {
         panel.setSize(1024, 512)
         compareRendering("AllSeatsScreen", "Filtered-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             VANCOUVER
 
@@ -144,7 +145,7 @@ class AllSeatsScreenTest {
         )
         compareRendering("AllSeatsScreen", "Filtered-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             VANCOUVER
 
@@ -165,7 +166,7 @@ class AllSeatsScreenTest {
         )
         compareRendering("AllSeatsScreen", "Filtered-3", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             VANCOUVER
 
@@ -179,7 +180,7 @@ class AllSeatsScreenTest {
         currResult.submit(bcCurrResult())
         compareRendering("AllSeatsScreen", "Filtered-4", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             VANCOUVER
 
@@ -208,7 +209,7 @@ class AllSeatsScreenTest {
         panel.setSize(1024, 512)
         compareRendering("AllSeatsScreen", "Basic-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             BRITISH COLUMBIA
 
@@ -222,7 +223,7 @@ class AllSeatsScreenTest {
         currResult.submit(bcCurrResult())
         compareRendering("AllSeatsScreen", "Basic-4", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             BRITISH COLUMBIA
 
@@ -255,7 +256,7 @@ class AllSeatsScreenTest {
         panel.setSize(1024, 512)
         compareRendering("AllSeatsScreen", "Basic-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             BRITISH COLUMBIA
 
@@ -277,7 +278,7 @@ class AllSeatsScreenTest {
         )
         compareRendering("AllSeatsScreen", "Basic-4", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             BRITISH COLUMBIA
 
@@ -310,7 +311,7 @@ class AllSeatsScreenTest {
         panel.setSize(1024, 512)
         compareRendering("AllSeatsScreen", "Grouped-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             BRITISH COLUMBIA
             
@@ -341,7 +342,7 @@ class AllSeatsScreenTest {
         title.submit("CITY OF VANCOUVER")
         compareRendering("AllSeatsScreen", "Grouped-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             CITY OF VANCOUVER
             
@@ -371,7 +372,7 @@ class AllSeatsScreenTest {
         panel.setSize(1024, 512)
         compareRendering("AllSeatsScreen", "Sorted-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             BRITISH COLUMBIA
 
@@ -391,7 +392,7 @@ class AllSeatsScreenTest {
         )
         compareRendering("AllSeatsScreen", "Sorted-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             BRITISH COLUMBIA
 
@@ -413,7 +414,7 @@ class AllSeatsScreenTest {
         )
         compareRendering("AllSeatsScreen", "Sorted-3", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             BRITISH COLUMBIA
 
@@ -429,7 +430,7 @@ class AllSeatsScreenTest {
         currResult.submit(bcCurrResult())
         compareRendering("AllSeatsScreen", "Sorted-4", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             BRITISH COLUMBIA
 

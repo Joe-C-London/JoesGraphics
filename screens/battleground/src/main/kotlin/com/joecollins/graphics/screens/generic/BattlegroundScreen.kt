@@ -35,7 +35,7 @@ class BattlegroundScreen private constructor(
     private val leftColumns: Flow.Publisher<Int>,
     private val rightColumns: Flow.Publisher<Int>,
     headerColor: Flow.Publisher<Color>? = null,
-    altText: Flow.Publisher<String>,
+    altText: Flow.Publisher<(Int) -> String>,
 ) : GenericPanel(
     {
         background = Color.WHITE
@@ -393,6 +393,7 @@ class BattlegroundScreen private constructor(
 
                 targetsText.merge(defenseText) { t, d -> listOfNotNull(t, d).takeUnless { it.isEmpty() }?.joinToString("\n\n") }
                     .merge(title) { t, h -> sequenceOf(h, t).filterNotNull().joinToString("\n\n") }
+                    .map { text -> { _: Int -> text } }
             }
 
             return BattlegroundScreen(
@@ -525,6 +526,7 @@ class BattlegroundScreen private constructor(
 
                 targetsText.merge(defenseText) { t, d -> listOfNotNull(t, d).takeUnless { it.isEmpty() }?.joinToString("\n\n") }
                     .merge(title) { t, h -> sequenceOf(h, t).filterNotNull().joinToString("\n\n") }
+                    .map { text -> { _: Int -> text } }
             }
 
             return BattlegroundScreen(

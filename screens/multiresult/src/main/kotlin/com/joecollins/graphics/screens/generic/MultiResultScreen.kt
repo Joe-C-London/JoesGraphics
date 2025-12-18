@@ -37,7 +37,7 @@ import javax.swing.JPanel
 class MultiResultScreen private constructor(
     header: Flow.Publisher<out String?>,
     screen: JPanel,
-    altText: Flow.Publisher<String>,
+    altText: Flow.Publisher<(Int) -> String>,
 ) : GenericPanel(screen, header, altText),
     AltTextProvider {
     private val panels: MutableList<ResultPanel<*>> = ArrayList()
@@ -496,6 +496,7 @@ class MultiResultScreen private constructor(
                     "$head\n\n$items"
                 }
             }
+                .map { text -> { _: Int -> text } }
             val screen = MultiResultScreen(title, center, altText)
             center.layout = GridLayout(1, 0)
             center.background = Color.WHITE

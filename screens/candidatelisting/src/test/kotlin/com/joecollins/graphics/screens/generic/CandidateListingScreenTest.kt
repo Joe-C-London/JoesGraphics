@@ -39,7 +39,7 @@ class CandidateListingScreenTest {
         screen.size = Dimension(1024, 512)
         compareRendering("CandidateListingScreen", "CandidatesOnly", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             SOURIS-ELMIRA
             
@@ -84,7 +84,7 @@ class CandidateListingScreenTest {
         screen.size = Dimension(1024, 512)
         compareRendering("CandidateListingScreen", "CandidatesWithPrev", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             SOURIS-ELMIRA
             
@@ -141,7 +141,7 @@ class CandidateListingScreenTest {
         screen.size = Dimension(1024, 512)
         compareRendering("CandidateListingScreen", "CandidatesWithPrevAndMap", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             SOURIS-ELMIRA
             
@@ -200,7 +200,7 @@ class CandidateListingScreenTest {
         screen.size = Dimension(1024, 512)
         compareRendering("CandidateListingScreen", "CandidatesWithPrevOtherAndMap", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             CHARLOTTETOWN-WEST ROYALTY
             
@@ -268,7 +268,7 @@ class CandidateListingScreenTest {
         screen.size = Dimension(1024, 512)
         compareRendering("CandidateListingScreen", "CandidatesWithSecondaryPrevAndMap", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             SOURIS-ELMIRA
             
@@ -333,7 +333,7 @@ class CandidateListingScreenTest {
         screen.size = Dimension(1024, 512)
         compareRendering("CandidateListingScreen", "CandidatesWithSecondaryPrev", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             SOURIS-ELMIRA
             
@@ -417,7 +417,7 @@ class CandidateListingScreenTest {
         screen.size = Dimension(1024, 512)
         compareRendering("CandidateListingScreen", "CandidatesUpdating-1", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             GEORGETOWN-POWNAL
             
@@ -457,7 +457,7 @@ class CandidateListingScreenTest {
         focus.submit(listOf(8, 15, 16, 17, 18, 19, 20))
         compareRendering("CandidateListingScreen", "CandidatesUpdating-2", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             STANHOME-MARSFIELD
             
@@ -515,7 +515,7 @@ class CandidateListingScreenTest {
         screen.size = Dimension(1024, 512)
         compareRendering("CandidateListingScreen", "TwoColumns-1", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             MISSISSAUGA—LAKESHORE
             
@@ -576,7 +576,7 @@ class CandidateListingScreenTest {
         headerPublisher.submit("2022 BY-ELECTION CANDIDATES")
         compareRendering("CandidateListingScreen", "TwoColumns-2", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             MISSISSAUGA—LAKESHORE
             
@@ -657,7 +657,7 @@ class CandidateListingScreenTest {
         screen.size = Dimension(1024, 512)
         compareRendering("CandidateListingScreen", "NonPartisan-1", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             IQALUIT-TASILUK
 
@@ -689,7 +689,7 @@ class CandidateListingScreenTest {
         )
         compareRendering("CandidateListingScreen", "NonPartisan-2", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             KUGLUKTUK
 
@@ -738,7 +738,7 @@ class CandidateListingScreenTest {
         screen.size = Dimension(1024, 512)
         compareRendering("CandidateListingScreen", "NonPartisanIncumbent-1", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             IQALUIT-TASILUK
 
@@ -770,7 +770,7 @@ class CandidateListingScreenTest {
         )
         compareRendering("CandidateListingScreen", "NonPartisanIncumbent-2", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             KUGLUKTUK
 

@@ -12,6 +12,7 @@ import com.joecollins.models.general.PartyResult
 import com.joecollins.models.general.PartyResult.Companion.elected
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
+import com.joecollins.pubsub.map
 import org.junit.jupiter.api.Test
 import java.awt.Color
 
@@ -44,7 +45,7 @@ class SwingometerScreenTest {
         panel.setSize(1024, 512)
         compareRendering("SwingometerScreen", "Basic-TwoParty-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             NEW BRUNSWICK
             SWINGOMETER
@@ -60,7 +61,7 @@ class SwingometerScreenTest {
         parties.submit(Pair(grn, pc))
         compareRendering("SwingometerScreen", "Basic-TwoParty-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             NEW BRUNSWICK
             SWINGOMETER
@@ -76,7 +77,7 @@ class SwingometerScreenTest {
         parties.submit(Pair(pa, pc))
         compareRendering("SwingometerScreen", "Basic-TwoParty-3", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             NEW BRUNSWICK
             SWINGOMETER
@@ -109,7 +110,7 @@ class SwingometerScreenTest {
         panel.setSize(1024, 512)
         compareRendering("SwingometerScreen", "Basic-Updates-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             NEW BRUNSWICK
             SWINGOMETER
@@ -126,7 +127,7 @@ class SwingometerScreenTest {
         swing.submit(mapOf(pc to +0.0745, lib to -0.0345, grn to +0.0336, pa to -0.0339, ndp to -0.0335, ind to -0.0062))
         compareRendering("SwingometerScreen", "Basic-Updates-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             NEW BRUNSWICK
             SWINGOMETER
@@ -180,7 +181,7 @@ class SwingometerScreenTest {
         panel.setSize(1024, 512)
         compareRendering("SwingometerScreen", "Filtered-TwoParty-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             NEW BRUNSWICK
             SWINGOMETER
@@ -196,7 +197,7 @@ class SwingometerScreenTest {
         seatsFiltered.submit(emptySet())
         compareRendering("SwingometerScreen", "Filtered-TwoParty-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             NEW BRUNSWICK
             SWINGOMETER
@@ -212,7 +213,7 @@ class SwingometerScreenTest {
         seatsFiltered.submit(null)
         compareRendering("SwingometerScreen", "Filtered-TwoParty-3", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             NEW BRUNSWICK
             SWINGOMETER
@@ -254,7 +255,7 @@ class SwingometerScreenTest {
         panel.setSize(1024, 512)
         compareRendering("SwingometerScreen", "Basic-ProgressLabel", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             NEW BRUNSWICK
             SWINGOMETER [100% IN]
@@ -290,7 +291,7 @@ class SwingometerScreenTest {
         panel.setSize(1024, 512)
         compareRendering("SwingometerScreen", "Basic-TwoPartyVotes-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             NEW BRUNSWICK
             SWINGOMETER
@@ -306,7 +307,7 @@ class SwingometerScreenTest {
         parties.submit(Pair(grn, pc))
         compareRendering("SwingometerScreen", "Basic-TwoPartyVotes-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             NEW BRUNSWICK
             SWINGOMETER
@@ -322,7 +323,7 @@ class SwingometerScreenTest {
         parties.submit(Pair(pa, pc))
         compareRendering("SwingometerScreen", "Basic-TwoPartyVotes-3", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             NEW BRUNSWICK
             SWINGOMETER
@@ -392,7 +393,7 @@ class SwingometerScreenTest {
         panel.setSize(1024, 512)
         compareRendering("SwingometerScreen", "Carryovers-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             US SENATE
             SWINGOMETER
@@ -408,7 +409,7 @@ class SwingometerScreenTest {
         parties.submit(gop to dem)
         compareRendering("SwingometerScreen", "Carryovers-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             US SENATE
             SWINGOMETER
@@ -478,7 +479,7 @@ class SwingometerScreenTest {
         panel.setSize(1024, 512)
         compareRendering("SwingometerScreen", "Carryovers-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             US SENATE
             SWINGOMETER
@@ -494,7 +495,7 @@ class SwingometerScreenTest {
         parties.submit(gop to dem)
         compareRendering("SwingometerScreen", "Carryovers-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             US SENATE
             SWINGOMETER
@@ -586,7 +587,7 @@ class SwingometerScreenTest {
         panel.setSize(1024, 512)
         compareRendering("SwingometerScreen", "Weights-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             US PRESIDENT
             SWINGOMETER
@@ -602,7 +603,7 @@ class SwingometerScreenTest {
         parties.submit(gop to dem)
         compareRendering("SwingometerScreen", "Weights-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             US PRESIDENT
             SWINGOMETER
@@ -734,7 +735,7 @@ class SwingometerScreenTest {
         panel.setSize(1024, 512)
         compareRendering("SwingometerScreen", "Basic-Coalition-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             NEW SOUTH WALES
             SWINGOMETER
@@ -823,7 +824,7 @@ class SwingometerScreenTest {
         panel.setSize(1024, 512)
         compareRendering("SwingometerScreen", "Basic-MultipleIndependents-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
             NEW BRUNSWICK
             SWINGOMETER

@@ -33,7 +33,7 @@ class MixedMemberResultPanel private constructor(
     private val partyFrame: BarFrame,
     private val partyChangeFrame: BarFrame?,
     private val mapFrame: MapFrame?,
-    altText: Flow.Publisher<out String>,
+    altText: Flow.Publisher<out (Int) -> String>,
 ) : GenericPanel(
     {
         layout = ScreenLayout()
@@ -409,7 +409,7 @@ class MixedMemberResultPanel private constructor(
             partyVotes: PartyVotes,
             partyChange: PartyChange?,
             header: Flow.Publisher<out String?>,
-        ): Flow.Publisher<String> {
+        ): Flow.Publisher<(Int) -> String> {
             val candidatesEntries = candidateVotes.votes
                 .run { if (candidateVotes.winner == null) map { votes -> votes to null } else merge(candidateVotes.winner!!) { votes, winner -> votes to winner } }
                 .merge(candidateChange?.prevVotes ?: null.asOneTimePublisher()) { (curr, winner), prev ->
@@ -510,6 +510,7 @@ class MixedMemberResultPanel private constructor(
                 .merge(partyEntries) { head, entries -> "$head\n$entries" }
 
             return header.merge(candidates) { h, c -> "$h\n\n$c" }.merge(parties) { h, p -> "$h\n\n$p" }
+                .map { text -> { text } }
         }
 
         private class Result {

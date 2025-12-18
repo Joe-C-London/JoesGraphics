@@ -6,6 +6,7 @@ import com.joecollins.graphics.utils.PublisherTestUtils.assertPublishes
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.graphics.utils.ShapefileReader
 import com.joecollins.pubsub.asOneTimePublisher
+import com.joecollins.pubsub.map
 import org.junit.jupiter.api.Test
 import java.awt.Dimension
 import java.awt.Shape
@@ -38,7 +39,7 @@ class CountdownScreenTest {
         screen.size = Dimension(1024, 512)
         compareRendering("CountdownScreen", "SingleCountdown", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             COUNTDOWN TO THE CLOSE
             
@@ -64,7 +65,7 @@ class CountdownScreenTest {
         screen.size = Dimension(1024, 512)
         compareRendering("CountdownScreen", "SingleCountdownAsCollection", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             COUNTDOWN TO THE CLOSE
             
@@ -99,7 +100,7 @@ class CountdownScreenTest {
         screen.size = Dimension(1024, 512)
         compareRendering("CountdownScreen", "DoubleCountdownSameTime", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             COUNTDOWN TO THE CLOSE
             
@@ -147,7 +148,7 @@ class CountdownScreenTest {
         screen.size = Dimension(1024, 512)
         compareRendering("CountdownScreen", "QuadrupleCountdownDifferentTimes", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             COUNTDOWN TO THE CLOSE
             
@@ -202,7 +203,7 @@ class CountdownScreenTest {
         screen.size = Dimension(1024, 512)
         compareRendering("CountdownScreen", "SixWithoutMap", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             COUNTDOWN TO THE CLOSE
             
@@ -259,7 +260,7 @@ class CountdownScreenTest {
         screen.size = Dimension(1024, 512)
         compareRendering("CountdownScreen", "CompletionLabel", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             COUNTDOWN TO THE CLOSE
             
@@ -300,7 +301,7 @@ class CountdownScreenTest {
         screen.size = Dimension(1024, 512)
         compareRendering("CountdownScreen", "DoubleCountdownDifferentDates", screen)
         assertPublishes(
-            screen.altText,
+            screen.altText.map { it(1000) },
             """
             COUNTDOWN TO THE CLOSE
             

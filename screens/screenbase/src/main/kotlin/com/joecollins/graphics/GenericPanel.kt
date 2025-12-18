@@ -6,6 +6,7 @@ import com.joecollins.graphics.utils.StandardFont
 import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
 import com.joecollins.pubsub.asOneTimePublisher
+import com.joecollins.pubsub.map
 import com.joecollins.pubsub.merge
 import java.awt.BorderLayout
 import java.awt.Color
@@ -20,26 +21,26 @@ import kotlin.math.roundToInt
 open class GenericPanel(
     panel: JPanel,
     label: Flow.Publisher<out String?>,
-    override val altText: Flow.Publisher<out String?> = createAltText(panel, label),
+    override val altText: Flow.Publisher<out (Int) -> String?> = createAltText(panel, label),
 ) : JPanel(),
     AltTextProvider {
 
     constructor(
         panel: JPanel.() -> Unit,
         label: Flow.Publisher<out String?>,
-        altText: Flow.Publisher<out String?> = null.asOneTimePublisher(),
+        altText: Flow.Publisher<out (Int) -> String?> = { _: Int -> null }.asOneTimePublisher(),
     ) : this(JPanel().apply(panel), label, altText)
 
     constructor(
         panel: JPanel,
         label: Flow.Publisher<out String?>,
-        altText: () -> Flow.Publisher<out String?>,
+        altText: () -> Flow.Publisher<out (Int) -> String?>,
     ) : this(panel, label, altText())
 
     constructor(
         panel: JPanel.() -> Unit,
         label: Flow.Publisher<out String?>,
-        altText: () -> Flow.Publisher<out String?>,
+        altText: () -> Flow.Publisher<out (Int) -> String?>,
     ) : this(JPanel().apply(panel), label, altText())
 
     protected val label: JLabel = FontSizeAdjustingLabel()
@@ -74,10 +75,15 @@ open class GenericPanel(
 
         fun pad(panel: JPanel): JPanel = panel.pad()
 
-        private fun createAltText(panel: JPanel, label: Flow.Publisher<out String?>): Flow.Publisher<String?> = if (panel is AltTextProvider) {
-            panel.altText.merge(label) { alt, lab -> if (alt == null) null else ((lab?.let { "$it\n" } ?: "") + alt) }
+        private fun createAltText(panel: JPanel, label: Flow.Publisher<out String?>): Flow.Publisher<(Int) -> String?> = if (panel is AltTextProvider) {
+            panel.altText.merge(label) { altFunc, lab ->
+                { maxLength: Int ->
+                    val alt = altFunc(maxLength)
+                    if (alt == null) null else ((lab?.let { "$it\n" } ?: "") + alt)
+                }
+            }
         } else {
-            null.asOneTimePublisher()
+            { _: Int -> null }.asOneTimePublisher()
         }
     }
 }

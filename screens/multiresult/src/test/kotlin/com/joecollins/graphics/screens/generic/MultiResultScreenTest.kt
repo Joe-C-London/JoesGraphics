@@ -107,7 +107,7 @@ class MultiResultScreenTest {
         panel.setSize(1024, 512)
         compareRendering("MultiResultPanel", "Basic-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 PARTY LEADERS
                 
@@ -226,7 +226,7 @@ class MultiResultScreenTest {
         panel.setSize(1024, 512)
         compareRendering("MultiResultPanel", "Update-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 MAJOR PARTY LEADERS
                 
@@ -256,7 +256,7 @@ class MultiResultScreenTest {
         )
         compareRendering("MultiResultPanel", "Update-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 MAJOR PARTY LEADERS
                 
@@ -278,7 +278,7 @@ class MultiResultScreenTest {
         title.submit("PARTY LEADERS")
         compareRendering("MultiResultPanel", "Update-3", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 PARTY LEADERS
                 
@@ -314,7 +314,7 @@ class MultiResultScreenTest {
         )
         compareRendering("MultiResultPanel", "Update-4", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 PARTY LEADERS
                 
@@ -350,7 +350,7 @@ class MultiResultScreenTest {
         )
         compareRendering("MultiResultPanel", "Update-5", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 PARTY LEADERS
                 
@@ -387,7 +387,7 @@ class MultiResultScreenTest {
         )
         compareRendering("MultiResultPanel", "Update-6", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 PARTY LEADERS
                 
@@ -415,7 +415,7 @@ class MultiResultScreenTest {
         title.submit("PARTY LEADERS IN DOUBT")
         compareRendering("MultiResultPanel", "Update-7", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 PARTY LEADERS IN DOUBT
                 
@@ -446,7 +446,7 @@ class MultiResultScreenTest {
         // intentionally same as before, as this district is no longer displayed
         compareRendering("MultiResultPanel", "Update-7", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 PARTY LEADERS IN DOUBT
                 
@@ -476,7 +476,7 @@ class MultiResultScreenTest {
         )
         compareRendering("MultiResultPanel", "Update-8", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 PARTY LEADERS IN DOUBT
                 
@@ -506,7 +506,7 @@ class MultiResultScreenTest {
         )
         compareRendering("MultiResultPanel", "Update-9", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 PARTY LEADERS IN DOUBT
                 
@@ -620,7 +620,7 @@ class MultiResultScreenTest {
         panel.setSize(1024, 512)
         compareRendering("MultiResultPanel", "ProgressLabels-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 MAJOR PARTY LEADERS
                 
@@ -650,7 +650,7 @@ class MultiResultScreenTest {
         )
         compareRendering("MultiResultPanel", "ProgressLabels-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 MAJOR PARTY LEADERS
                 
@@ -672,7 +672,7 @@ class MultiResultScreenTest {
         title.submit("PARTY LEADERS")
         compareRendering("MultiResultPanel", "ProgressLabels-3", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 PARTY LEADERS
                 
@@ -708,7 +708,7 @@ class MultiResultScreenTest {
         )
         compareRendering("MultiResultPanel", "ProgressLabels-4", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 PARTY LEADERS
                 
@@ -744,7 +744,7 @@ class MultiResultScreenTest {
         )
         compareRendering("MultiResultPanel", "ProgressLabels-5", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 PARTY LEADERS
                 
@@ -781,7 +781,7 @@ class MultiResultScreenTest {
         )
         compareRendering("MultiResultPanel", "ProgressLabels-6", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 PARTY LEADERS
                 
@@ -809,7 +809,7 @@ class MultiResultScreenTest {
         title.submit("PARTY LEADERS IN DOUBT")
         compareRendering("MultiResultPanel", "ProgressLabels-7", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 PARTY LEADERS IN DOUBT
                 
@@ -840,7 +840,7 @@ class MultiResultScreenTest {
         // intentionally same as before, as this district is no longer displayed
         compareRendering("MultiResultPanel", "ProgressLabels-7", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 PARTY LEADERS IN DOUBT
                 
@@ -870,7 +870,7 @@ class MultiResultScreenTest {
         )
         compareRendering("MultiResultPanel", "ProgressLabels-8", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 PARTY LEADERS IN DOUBT
                 
@@ -900,7 +900,7 @@ class MultiResultScreenTest {
         )
         compareRendering("MultiResultPanel", "ProgressLabels-9", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 PARTY LEADERS IN DOUBT
                 
@@ -1012,7 +1012,7 @@ class MultiResultScreenTest {
         panel.setSize(1024, 512)
         compareRendering("MultiResultPanel", "Others-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 SAINT JOHN
                 
@@ -1178,7 +1178,7 @@ class MultiResultScreenTest {
         panel.setSize(1024, 512)
         compareRendering("MultiResultPanel", "OthersParty-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 SAINT JOHN
                 
@@ -1340,7 +1340,7 @@ class MultiResultScreenTest {
         panel.setSize(1024, 512)
         compareRendering("MultiResultPanel", "MultipleRows-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 ELECTION 2020: NEW BRUNSWICK DECIDES
                 
@@ -1419,7 +1419,7 @@ class MultiResultScreenTest {
         districtsPublisher.submit(districts)
         compareRendering("MultiResultPanel", "MultipleRows-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 ELECTION 2020: NEW BRUNSWICK DECIDES
                 
@@ -1468,7 +1468,7 @@ class MultiResultScreenTest {
         districtsPublisher.submit(districts)
         compareRendering("MultiResultPanel", "MultipleRows-3", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 ELECTION 2020: NEW BRUNSWICK DECIDES
                 
@@ -1603,7 +1603,7 @@ class MultiResultScreenTest {
         panel.setSize(1024, 512)
         compareRendering("MultiResultPanel", "MultipleRowsProgressLabels-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 ELECTION 2020: NEW BRUNSWICK DECIDES
                 
@@ -1682,7 +1682,7 @@ class MultiResultScreenTest {
         districtsPublisher.submit(districts)
         compareRendering("MultiResultPanel", "MultipleRowsProgressLabels-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 ELECTION 2020: NEW BRUNSWICK DECIDES
                 
@@ -1731,7 +1731,7 @@ class MultiResultScreenTest {
         districtsPublisher.submit(districts)
         compareRendering("MultiResultPanel", "MultipleRowsProgressLabels-3", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 ELECTION 2020: NEW BRUNSWICK DECIDES
                 
@@ -1793,7 +1793,7 @@ class MultiResultScreenTest {
         panel.setSize(1024, 512)
         compareRendering("MultiResultPanel", "Runoff-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 GEORGIA SENATE
                 
@@ -1814,7 +1814,7 @@ class MultiResultScreenTest {
         districts.forEach { it.declareRunoff() }
         compareRendering("MultiResultPanel", "Runoff-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 GEORGIA SENATE
                 
@@ -1929,7 +1929,7 @@ class MultiResultScreenTest {
         panel.setSize(1024, 512)
         compareRendering("MultiResultPanel", "MapAdditionalHighlights-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 CABINET MEMBERS IN CHARLOTTETOWN
                 
@@ -2057,7 +2057,7 @@ class MultiResultScreenTest {
         panel.setSize(1024, 512)
         compareRendering("MultiResultPanel", "PartiesOnly-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 ELECTION 2020: NEW BRUNSWICK DECIDES
                 
@@ -2137,7 +2137,7 @@ class MultiResultScreenTest {
         districtPublisher.submit(districts)
         compareRendering("MultiResultPanel", "PartiesOnly-2", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 ELECTION 2020: NEW BRUNSWICK DECIDES
                 
@@ -2193,7 +2193,7 @@ class MultiResultScreenTest {
         districtPublisher.submit(districts)
         compareRendering("MultiResultPanel", "PartiesOnly-3", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 ELECTION 2020: NEW BRUNSWICK DECIDES
                 
@@ -2304,7 +2304,7 @@ class MultiResultScreenTest {
         panel.setSize(1024, 512)
         compareRendering("MultiResultPanel", "SwingRange-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 PARTY LEADERS
                 
@@ -2371,7 +2371,7 @@ class MultiResultScreenTest {
         panel.setSize(1024, 512)
         compareRendering("MultiResultPanel", "NonPartisan-1", panel)
         assertPublishes(
-            panel.altText,
+            panel.altText.map { it(1000) },
             """
                 AUTOMATIC RECOUNTS
 
