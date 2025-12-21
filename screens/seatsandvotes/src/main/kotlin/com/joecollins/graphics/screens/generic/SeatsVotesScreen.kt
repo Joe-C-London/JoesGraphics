@@ -53,10 +53,10 @@ class SeatsVotesScreen private constructor(seats: SeatViewPanel, votes: SimpleVo
                     this.progressLabel = me.progressLabel
                     this.notes = me.notes
                 },
-                majorityLine = me.majorityLineProps?.let {
+                winningLine = me.majorityLineProps?.let {
                     {
                         show = it.show
-                        display = it.display
+                        majority(it.display)
                     }
                 },
                 title = null.asOneTimePublisher(),
@@ -85,10 +85,10 @@ class SeatsVotesScreen private constructor(seats: SeatViewPanel, votes: SimpleVo
                     this.progressLabel = me.progressLabel
                     this.notes = me.notes
                 },
-                majorityLine = me.majorityLineProps?.let {
+                winningLine = me.majorityLineProps?.let {
                     {
                         show = it.show
-                        display = it.display
+                        majority(it.display)
                     }
                 },
                 title = null.asOneTimePublisher(),
@@ -117,10 +117,10 @@ class SeatsVotesScreen private constructor(seats: SeatViewPanel, votes: SimpleVo
                     this.progressLabel = me.progressLabel
                     this.notes = me.notes
                 },
-                majorityLine = me.majorityLineProps?.let {
+                winningLine = me.majorityLineProps?.let {
                     {
                         show = it.show
-                        display = it.display
+                        majority(it.display)
                     }
                 },
                 title = null.asOneTimePublisher(),
@@ -149,10 +149,10 @@ class SeatsVotesScreen private constructor(seats: SeatViewPanel, votes: SimpleVo
                     this.progressLabel = me.progressLabel
                     this.notes = me.notes
                 },
-                majorityLine = me.majorityLineProps?.let {
+                winningLine = me.majorityLineProps?.let {
                     {
                         show = it.show
-                        display = it.display
+                        majority(it.display)
                     }
                 },
                 title = null.asOneTimePublisher(),
@@ -181,10 +181,10 @@ class SeatsVotesScreen private constructor(seats: SeatViewPanel, votes: SimpleVo
                     this.progressLabel = me.progressLabel
                     this.notes = me.notes
                 },
-                majorityLine = me.majorityLineProps?.let {
+                winningLine = me.majorityLineProps?.let {
                     {
                         show = it.show
-                        display = it.display
+                        majority(it.display)
                     }
                 },
                 title = null.asOneTimePublisher(),

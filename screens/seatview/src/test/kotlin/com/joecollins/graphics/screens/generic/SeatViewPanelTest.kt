@@ -52,9 +52,9 @@ class SeatViewPanelTest {
                 header = changeHeader
                 subhead = changeSubhead
             },
-            majorityLine = {
+            winningLine = {
                 show = showMajority
-                display = { "$it SEATS FOR MAJORITY" }
+                majority { "$it SEATS FOR MAJORITY" }
             },
             title = title,
         )
@@ -197,9 +197,9 @@ class SeatViewPanelTest {
                 header = changeHeader
                 subhead = changeSubhead
             },
-            majorityLine = {
+            winningLine = {
                 show = showMajority
-                display = { "$it SEATS FOR MAJORITY" }
+                majority { "$it SEATS FOR MAJORITY" }
             },
             title = title,
         )
@@ -354,9 +354,9 @@ class SeatViewPanelTest {
                 this.partyOrder = partyOrder
                 header = swingHeader
             },
-            majorityLine = {
+            winningLine = {
                 show = showMajority
-                display = { "$it SEATS FOR MAJORITY" }
+                majority { "$it SEATS FOR MAJORITY" }
             },
             title = title,
         )
@@ -450,9 +450,9 @@ class SeatViewPanelTest {
                 this.partyOrder = partyOrder
                 header = swingHeader
             },
-            majorityLine = {
+            winningLine = {
                 show = showMajority
-                display = { "$it SEATS FOR MAJORITY" }
+                majority { "$it SEATS FOR MAJORITY" }
             },
             map = createPartyMap {
                 shapes = shapesByDistrict.asOneTimePublisher()
@@ -623,9 +623,9 @@ class SeatViewPanelTest {
                 seats = previousSeats
                 header = changeHeader
             },
-            majorityLine = {
+            winningLine = {
                 show = showMajority
-                display = { "$it SEATS FOR MAJORITY" }
+                majority { "$it SEATS FOR MAJORITY" }
             },
             title = title,
         )
@@ -831,9 +831,9 @@ class SeatViewPanelTest {
                 seats = previousSeats
                 header = changeHeader
             },
-            majorityLine = {
+            winningLine = {
                 show = showMajority
-                display = { "$it SEATS FOR MAJORITY" }
+                majority { "$it SEATS FOR MAJORITY" }
             },
             title = title,
         )
@@ -1039,9 +1039,9 @@ class SeatViewPanelTest {
                 seats = seatDiff
                 header = changeHeader
             },
-            majorityLine = {
+            winningLine = {
                 show = showMajority
-                display = { "$it SEATS FOR MAJORITY" }
+                majority { "$it SEATS FOR MAJORITY" }
             },
             title = title,
         )
@@ -1254,9 +1254,9 @@ class SeatViewPanelTest {
                 seats = previousSeats
                 header = changeHeader
             },
-            majorityLine = {
+            winningLine = {
                 show = showMajority
-                display = { "$it SEATS FOR MAJORITY" }
+                majority { "$it SEATS FOR MAJORITY" }
             },
             title = title,
         )
@@ -1404,9 +1404,9 @@ class SeatViewPanelTest {
                 seats = seatDiff
                 header = changeHeader
             },
-            majorityLine = {
+            winningLine = {
                 show = showMajority
-                display = { "$it SEATS FOR MAJORITY" }
+                majority { "$it SEATS FOR MAJORITY" }
             },
             title = title,
         )
@@ -1556,9 +1556,9 @@ class SeatViewPanelTest {
                 seats = previousSeats
                 header = changeHeader
             },
-            majorityLine = {
+            winningLine = {
                 show = showMajority
-                display = { "$it ELECTORAL VOTES TO WIN" }
+                majority { "$it ELECTORAL VOTES TO WIN" }
             },
             title = title,
         )
@@ -1617,9 +1617,9 @@ class SeatViewPanelTest {
                 seats = previousSeats
                 header = changeHeader
             },
-            majorityLine = {
+            winningLine = {
                 show = showMajority
-                display = { "$it ELECTORAL VOTES TO WIN" }
+                majority { "$it ELECTORAL VOTES TO WIN" }
             },
             title = title,
         )
@@ -1668,9 +1668,9 @@ class SeatViewPanelTest {
                 seats = previousSeats
                 header = changeHeader
             },
-            majorityLine = {
+            winningLine = {
                 show = showMajority
-                display = { "$it ELECTORAL VOTES TO WIN" }
+                majority { "$it ELECTORAL VOTES TO WIN" }
             },
             title = title,
         )
@@ -1712,9 +1712,9 @@ class SeatViewPanelTest {
                 seats = previousSeats
                 header = changeHeader
             },
-            majorityLine = {
+            winningLine = {
                 show = showMajority
-                display = { "$it SEATS FOR MAJORITY" }
+                majority { "$it SEATS FOR MAJORITY" }
             },
             title = title,
         )
@@ -1761,9 +1761,9 @@ class SeatViewPanelTest {
                 seats = previousSeats
                 header = changeHeader
             },
-            majorityLine = {
+            winningLine = {
                 show = showMajority
-                display = { "$it SEATS FOR MAJORITY" }
+                majority { "$it SEATS FOR MAJORITY" }
             },
             title = title,
         )
@@ -2073,9 +2073,9 @@ class SeatViewPanelTest {
                 header = changeHeader
                 showRaw = showPrevRaw
             },
-            majorityLine = {
+            winningLine = {
                 show = showMajority
-                display = { "$it FOR MAJORITY" }
+                majority { "$it FOR MAJORITY" }
             },
             title = "JAPAN".asOneTimePublisher(),
         )
@@ -2322,9 +2322,9 @@ class SeatViewPanelTest {
                 header = changeHeader
                 showRaw = showPrevRaw
             },
-            majorityLine = {
+            winningLine = {
                 show = showMajority
-                display = { "$it FOR MAJORITY" }
+                majority { "$it FOR MAJORITY" }
             },
             title = "JAPAN".asOneTimePublisher(),
         )
@@ -2441,9 +2441,9 @@ class SeatViewPanelTest {
                 header = changeHeader
                 showRaw = showPrevRaw
             },
-            majorityLine = {
+            winningLine = {
                 show = showMajority
-                display = { "$it FOR MAJORITY" }
+                majority { "$it FOR MAJORITY" }
             },
             title = "JAPAN".asOneTimePublisher(),
         )
@@ -2527,9 +2527,9 @@ class SeatViewPanelTest {
                 seats = previousSeats
                 header = changeHeader
             },
-            majorityLine = {
+            winningLine = {
                 show = showMajority
-                display = { "$it SEATS FOR MAJORITY" }
+                majority { "$it SEATS FOR MAJORITY" }
             },
             title = title,
         )
@@ -2584,8 +2584,8 @@ class SeatViewPanelTest {
                 seats = mapOf(lib to (0 to 11), yp to (0 to 6), ndp to (0 to 2)).asOneTimePublisher()
                 header = "CHANGE SINCE 2016".asOneTimePublisher()
             },
-            majorityLine = {
-                display = { "$it FOR MAJORITY" }
+            winningLine = {
+                majority { "$it FOR MAJORITY" }
             },
             title = "YUKON".asOneTimePublisher(),
         )
@@ -2670,8 +2670,8 @@ class SeatViewPanelTest {
                     header = "SWING SINCE 2000".asOneTimePublisher()
                 },
                 partyChanges = partyChanges,
-                majorityLine = {
-                    display = { "$it FOR MAJORITY" }
+                winningLine = {
+                    majority { "$it FOR MAJORITY" }
                 },
                 title = "CANADA".asOneTimePublisher(),
             )
@@ -2786,8 +2786,8 @@ class SeatViewPanelTest {
                     this.header = "SWING SINCE 2000".asOneTimePublisher()
                 },
                 partyChanges = partyChanges,
-                majorityLine = {
-                    display = { "$it FOR MAJORITY" }
+                winningLine = {
+                    majority { "$it FOR MAJORITY" }
                 },
                 title = "CANADA".asOneTimePublisher(),
             )
@@ -2901,8 +2901,8 @@ class SeatViewPanelTest {
                 this.header = "SWING SINCE 2000".asOneTimePublisher()
             },
             partyChanges = partyChanges,
-            majorityLine = {
-                display = { "$it FOR MAJORITY" }
+            winningLine = {
+                majority { "$it FOR MAJORITY" }
             },
             title = "CANADA".asOneTimePublisher(),
         )
@@ -2970,8 +2970,8 @@ class SeatViewPanelTest {
                 seats = mapOf(lib to 17, pc to 8, grn to 1).asOneTimePublisher()
                 header = "CHANGE SINCE 2015".asOneTimePublisher()
             },
-            majorityLine = {
-                display = { "$it FOR MAJORITY" }
+            winningLine = {
+                majority { "$it FOR MAJORITY" }
             },
             map = createResultMap<Int> {
                 shapes = peiShapesByDistrict().asOneTimePublisher()
@@ -3085,8 +3085,8 @@ class SeatViewPanelTest {
                 seats = prev.asOneTimePublisher()
                 header = "CHANGE SINCE 2017".asOneTimePublisher()
             },
-            majorityLine = {
-                display = { "$it FOR MAJORITY" }
+            winningLine = {
+                majority { "$it FOR MAJORITY" }
             },
             title = "FRANCE".asOneTimePublisher(),
         )
@@ -3155,9 +3155,9 @@ class SeatViewPanelTest {
                 header = swingHeader
                 range = 0.05.asOneTimePublisher()
             },
-            majorityLine = {
+            winningLine = {
                 show = showMajority
-                display = { "$it SEATS FOR MAJORITY" }
+                majority { "$it SEATS FOR MAJORITY" }
             },
             title = title,
         )
@@ -3232,8 +3232,8 @@ class SeatViewPanelTest {
                 seats = prev.asOneTimePublisher()
                 header = "CHANGE SINCE 2012".asOneTimePublisher()
             },
-            majorityLine = {
-                display = { "$it TO WIN" }
+            winningLine = {
+                majority { "$it TO WIN" }
             },
             title = "PRESIDENT".asOneTimePublisher(),
         )
@@ -3313,6 +3313,107 @@ class SeatViewPanelTest {
                 LIBERAL: 1 (-1)
                 
                 SWING SINCE 2019: 17.3% SWING GRN TO PC
+            """.trimIndent(),
+        )
+    }
+
+    @Test
+    fun testTwoThirdsMajority() {
+        val urp = Party("United Russia", "URP", Color.BLUE.darker())
+        val cprf = Party("Communist", "CPRF", Color.RED)
+        val srzp = Party("A Just Russia - For Truth", "SRZP", Color.YELLOW)
+        val ldpr = Party("Liberal Democratic", "LDPR", Color.BLUE)
+        val npp = Party("New People", "NPP", Color.CYAN)
+        val oth = Party.OTHERS
+        val partyOrder = listOf(cprf, srzp, oth, npp, urp, ldpr)
+        val panel = partySeats(
+            current = {
+                seats = mapOf(urp to 324, cprf to 57, ldpr to 21, srzp to 27, npp to 13, oth to 8).asOneTimePublisher()
+                header = "2021 RESULT".asOneTimePublisher()
+                subhead = "".asOneTimePublisher()
+                totalSeats = 450.asOneTimePublisher()
+            },
+            prev = {
+                seats = mapOf(urp to 343, cprf to 42, ldpr to 39, srzp to 23, oth to 3).asOneTimePublisher()
+                header = "CHANGE SINCE 2016".asOneTimePublisher()
+            },
+            swing = {
+                currVotes = mapOf(urp to 28064200, cprf to 10660669, ldpr to 4252252, srzp to 4201744, npp to 2997744, oth to 4981500).asOneTimePublisher()
+                prevVotes = mapOf(urp to 28527858, cprf to 7019752, ldpr to 6917603, srzp to 3275053, npp to 0, oth to 5909557).asOneTimePublisher()
+                this.partyOrder = partyOrder
+                header = "SWING SINCE 2016".asOneTimePublisher()
+            },
+            winningLine = {
+                majority { "MAJORITY: $it" }
+                twoThirds { "SUPERMAJORITY: $it" }
+            },
+            title = "RUSSIA".asOneTimePublisher(),
+        )
+        panel.setSize(1024, 512)
+        compareRendering("SeatViewPanel", "TwoThirdsMajority-1", panel)
+        assertPublishes(
+            panel.altText.map { it(1000) },
+            """
+                RUSSIA
+
+                2021 RESULT (CHANGE SINCE 2016)
+                UNITED RUSSIA: 324 (-19)
+                COMMUNIST: 57 (+15)
+                A JUST RUSSIA - FOR TRUTH: 27 (+4)
+                LIBERAL DEMOCRATIC: 21 (-18)
+                NEW PEOPLE: 13 (+13)
+                OTHERS: 8 (+5)
+                MAJORITY: 226
+                SUPERMAJORITY: 300
+                
+                SWING SINCE 2016: 5.0% SWING URP TO CPRF
+            """.trimIndent(),
+        )
+    }
+
+    @Test
+    fun testThreeFifthsMajority() {
+        val dem = Party("Democratic", "DEM", Color.BLUE)
+        val gop = Party("Republican", "GOP", Color.RED)
+        val oth = Party.OTHERS
+        val partyOrder = listOf(dem, oth, gop)
+        val panel = partySeats(
+            current = {
+                seats = mapOf(dem to 59, gop to 43).asOneTimePublisher()
+                header = "2008 RESULT".asOneTimePublisher()
+                subhead = "".asOneTimePublisher()
+                totalSeats = 100.asOneTimePublisher()
+            },
+            prev = {
+                seats = mapOf(dem to 51, gop to 49).asOneTimePublisher()
+                header = "CHANGE SINCE 2006".asOneTimePublisher()
+            },
+            swing = {
+                currVotes = mapOf(dem to 33650061, gop to 28863067, oth to 2349159).asOneTimePublisher()
+                prevVotes = mapOf(dem to 32344708, gop to 25437934, oth to 3056502).asOneTimePublisher()
+                this.partyOrder = partyOrder
+                header = "SWING SINCE 2006".asOneTimePublisher()
+            },
+            winningLine = {
+                majority { "MAJORITY: $it" }
+                threeFifths { "ANTI-FILIBUSTER: $it" }
+            },
+            title = "US SENATE".asOneTimePublisher(),
+        )
+        panel.setSize(1024, 512)
+        compareRendering("SeatViewPanel", "ThreeFifthsMajority-1", panel)
+        assertPublishes(
+            panel.altText.map { it(1000) },
+            """
+                US SENATE
+
+                2008 RESULT (CHANGE SINCE 2006)
+                DEMOCRATIC: 59 (+8)
+                REPUBLICAN: 43 (-6)
+                MAJORITY: 51
+                ANTI-FILIBUSTER: 60
+                
+                SWING SINCE 2006: 2.0% SWING DEM TO GOP
             """.trimIndent(),
         )
     }

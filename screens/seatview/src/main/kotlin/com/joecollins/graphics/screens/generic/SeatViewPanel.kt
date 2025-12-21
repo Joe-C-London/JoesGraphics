@@ -12,6 +12,7 @@ import com.joecollins.models.general.PartyOrCoalition
 import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.compose
 import com.joecollins.pubsub.map
+import com.joecollins.pubsub.mapElements
 import com.joecollins.pubsub.merge
 import java.awt.Color
 import java.awt.Shape
@@ -19,6 +20,7 @@ import java.text.DecimalFormat
 import java.util.concurrent.Flow
 import javax.swing.JPanel
 import kotlin.math.abs
+import kotlin.math.roundToInt
 import kotlin.math.sign
 
 class SeatViewPanel private constructor(
@@ -50,7 +52,7 @@ class SeatViewPanel private constructor(
             prev: (PrevSeats<PartyOrCoalition, Int>.() -> Unit)? = null,
             swing: (Swing<PartyOrCoalition>.() -> Unit)? = null,
             partyChanges: Flow.Publisher<out Map<out PartyOrCoalition, PartyOrCoalition>>? = null,
-            majorityLine: (MajorityLine.() -> Unit)? = null,
+            winningLine: (WinningLine.() -> Unit)? = null,
             partyClassification: (PartyClassification<PartyOrCoalition>.() -> Unit)? = null,
             map: AbstractMap<*>? = null,
             title: Flow.Publisher<out String?>,
@@ -59,7 +61,7 @@ class SeatViewPanel private constructor(
             diff = diff?.let { SeatDiff<PartyOrCoalition, Int>().apply(it) },
             prev = prev?.let { PrevSeats<PartyOrCoalition, Int>(partyChanges).apply(it) },
             swing = swing?.let { Swing<PartyOrCoalition>(partyChanges).apply(it) },
-            majority = majorityLine?.let { MajorityLine().apply(it) },
+            winningLine = winningLine?.let { WinningLine().apply(it) },
             partyClassification = partyClassification?.let { PartyClassification<PartyOrCoalition>().apply(it) },
             map = map,
             secondMap = null,
@@ -85,7 +87,7 @@ class SeatViewPanel private constructor(
             diff: (SeatDiff<PartyOrCoalition, Int>.() -> Unit)? = null,
             prev: (PrevSeats<PartyOrCoalition, Int>.() -> Unit)? = null,
             partyChanges: Flow.Publisher<out Map<out PartyOrCoalition, PartyOrCoalition>>? = null,
-            majorityLine: (MajorityLine.() -> Unit)? = null,
+            winningLine: (WinningLine.() -> Unit)? = null,
             partyClassification: (PartyClassification<PartyOrCoalition>.() -> Unit)? = null,
             map: AbstractMap<*>,
             secondMap: AbstractMap<*>,
@@ -95,7 +97,7 @@ class SeatViewPanel private constructor(
             diff = diff?.let { SeatDiff<PartyOrCoalition, Int>().apply(it) },
             prev = prev?.let { PrevSeats<PartyOrCoalition, Int>(partyChanges).apply(it) },
             swing = null,
-            majority = majorityLine?.let { MajorityLine().apply(it) },
+            winningLine = winningLine?.let { WinningLine().apply(it) },
             partyClassification = partyClassification?.let { PartyClassification<PartyOrCoalition>().apply(it) },
             map = map,
             secondMap = secondMap,
@@ -122,7 +124,7 @@ class SeatViewPanel private constructor(
             prev: (PrevSeats<Party, Int>.() -> Unit)? = null,
             swing: (Swing<Party>.() -> Unit)? = null,
             partyChanges: Flow.Publisher<out Map<out Party, Party>>? = null,
-            majorityLine: (MajorityLine.() -> Unit)? = null,
+            winningLine: (WinningLine.() -> Unit)? = null,
             partyClassification: (PartyClassification<Party>.() -> Unit)? = null,
             map: AbstractMap<*>? = null,
             title: Flow.Publisher<out String?>,
@@ -131,7 +133,7 @@ class SeatViewPanel private constructor(
             diff = diff?.let { SeatDiff<Party, Int>().apply(it) },
             prev = prev?.let { PrevSeats<Party, Int>(partyChanges).apply(it) },
             swing = swing?.let { Swing<Party>(partyChanges).apply(it) },
-            majority = majorityLine?.let { MajorityLine().apply(it) },
+            winningLine = winningLine?.let { WinningLine().apply(it) },
             partyClassification = partyClassification?.let { PartyClassification<Party>().apply(it) },
             map = map,
             secondMap = null,
@@ -158,7 +160,7 @@ class SeatViewPanel private constructor(
             prev: (PrevSeats<PartyOrCoalition, Pair<Int, Int>>.() -> Unit)? = null,
             swing: (Swing<PartyOrCoalition>.() -> Unit)? = null,
             partyChanges: Flow.Publisher<out Map<out PartyOrCoalition, PartyOrCoalition>>? = null,
-            majorityLine: (MajorityLine.() -> Unit)? = null,
+            winningLine: (WinningLine.() -> Unit)? = null,
             partyClassification: (PartyClassification<PartyOrCoalition>.() -> Unit)? = null,
             map: AbstractMap<*>? = null,
             title: Flow.Publisher<out String?>,
@@ -167,7 +169,7 @@ class SeatViewPanel private constructor(
             diff = diff?.let { SeatDiff<PartyOrCoalition, Pair<Int, Int>>().apply(it) },
             prev = prev?.let { PrevSeats<PartyOrCoalition, Pair<Int, Int>>(partyChanges).apply(it) },
             swing = swing?.let { Swing<PartyOrCoalition>(partyChanges).apply(it) },
-            majority = majorityLine?.let { MajorityLine().apply(it) },
+            winningLine = winningLine?.let { WinningLine().apply(it) },
             partyClassification = partyClassification?.let { PartyClassification<PartyOrCoalition>().apply(it) },
             map = map,
             secondMap = null,
@@ -194,7 +196,7 @@ class SeatViewPanel private constructor(
             prev: (PrevSeats<PartyOrCoalition, Pair<Int, Int>>.() -> Unit)? = null,
             swing: (Swing<PartyOrCoalition>.() -> Unit)? = null,
             partyChanges: Flow.Publisher<out Map<out PartyOrCoalition, PartyOrCoalition>>? = null,
-            majorityLine: (MajorityLine.() -> Unit)? = null,
+            winningLine: (WinningLine.() -> Unit)? = null,
             partyClassification: (PartyClassification<PartyOrCoalition>.() -> Unit)? = null,
             map: AbstractMap<*>? = null,
             title: Flow.Publisher<out String?>,
@@ -203,7 +205,7 @@ class SeatViewPanel private constructor(
             diff = diff?.let { SeatDiff<PartyOrCoalition, Pair<Int, Int>>().apply(it) },
             prev = prev?.let { PrevSeats<PartyOrCoalition, Pair<Int, Int>>(partyChanges).apply(it) },
             swing = swing?.let { Swing<PartyOrCoalition>(partyChanges).apply(it) },
-            majority = majorityLine?.let { MajorityLine().apply(it) },
+            winningLine = winningLine?.let { WinningLine().apply(it) },
             partyClassification = partyClassification?.let { PartyClassification<PartyOrCoalition>().apply(it) },
             map = map,
             secondMap = null,
@@ -230,7 +232,7 @@ class SeatViewPanel private constructor(
             prev: (PrevSeats<Party, Pair<Int, Int>>.() -> Unit)? = null,
             swing: (Swing<Party>.() -> Unit)? = null,
             partyChanges: Flow.Publisher<out Map<out Party, Party>>? = null,
-            majorityLine: (MajorityLine.() -> Unit)? = null,
+            winningLine: (WinningLine.() -> Unit)? = null,
             partyClassification: (PartyClassification<Party>.() -> Unit)? = null,
             map: AbstractMap<*>? = null,
             title: Flow.Publisher<out String?>,
@@ -239,7 +241,7 @@ class SeatViewPanel private constructor(
             diff = diff?.let { SeatDiff<Party, Pair<Int, Int>>().apply(it) },
             prev = prev?.let { PrevSeats<Party, Pair<Int, Int>>(partyChanges).apply(it) },
             swing = swing?.let { Swing<Party>(partyChanges).apply(it) },
-            majority = majorityLine?.let { MajorityLine().apply(it) },
+            winningLine = winningLine?.let { WinningLine().apply(it) },
             partyClassification = partyClassification?.let { PartyClassification<Party>().apply(it) },
             map = map,
             secondMap = null,
@@ -266,7 +268,7 @@ class SeatViewPanel private constructor(
             prev: (PrevSeats<PartyOrCoalition, Int>.() -> Unit)? = null,
             swing: (Swing<PartyOrCoalition>.() -> Unit)? = null,
             partyChanges: Flow.Publisher<out Map<out PartyOrCoalition, PartyOrCoalition>>? = null,
-            majorityLine: (MajorityLine.() -> Unit)? = null,
+            winningLine: (WinningLine.() -> Unit)? = null,
             map: AbstractMap<*>? = null,
             title: Flow.Publisher<out String?>,
         ): SeatViewPanel = SeatScreenBuilder(
@@ -274,7 +276,7 @@ class SeatViewPanel private constructor(
             diff = diff?.let { SeatDiff<PartyOrCoalition, IntRange>().apply(it) },
             prev = prev?.let { PrevSeats<PartyOrCoalition, Int>(partyChanges).apply(it) },
             swing = swing?.let { Swing<PartyOrCoalition>(partyChanges).apply(it) },
-            majority = majorityLine?.let { MajorityLine().apply(it) },
+            winningLine = winningLine?.let { WinningLine().apply(it) },
             partyClassification = null,
             map = map,
             secondMap = null,
@@ -300,7 +302,7 @@ class SeatViewPanel private constructor(
             diff: (SeatDiff<PartyOrCoalition, IntRange>.() -> Unit)? = null,
             prev: (PrevSeats<PartyOrCoalition, Int>.() -> Unit)? = null,
             partyChanges: Flow.Publisher<out Map<out PartyOrCoalition, PartyOrCoalition>>? = null,
-            majorityLine: (MajorityLine.() -> Unit)? = null,
+            winningLine: (WinningLine.() -> Unit)? = null,
             map: AbstractMap<*>,
             secondMap: AbstractMap<*>,
             title: Flow.Publisher<out String?>,
@@ -309,7 +311,7 @@ class SeatViewPanel private constructor(
             diff = diff?.let { SeatDiff<PartyOrCoalition, IntRange>().apply(it) },
             prev = prev?.let { PrevSeats<PartyOrCoalition, Int>(partyChanges).apply(it) },
             swing = null,
-            majority = majorityLine?.let { MajorityLine().apply(it) },
+            winningLine = winningLine?.let { WinningLine().apply(it) },
             partyClassification = null,
             map = map,
             secondMap = secondMap,
@@ -336,7 +338,7 @@ class SeatViewPanel private constructor(
             prev: (PrevSeats<Party, Int>.() -> Unit)? = null,
             swing: (Swing<Party>.() -> Unit)? = null,
             partyChanges: Flow.Publisher<out Map<out Party, Party>>? = null,
-            majorityLine: (MajorityLine.() -> Unit)? = null,
+            winningLine: (WinningLine.() -> Unit)? = null,
             map: AbstractMap<*>? = null,
             title: Flow.Publisher<out String?>,
         ): SeatViewPanel = SeatScreenBuilder(
@@ -344,7 +346,7 @@ class SeatViewPanel private constructor(
             diff = diff?.let { SeatDiff<Party, IntRange>().apply(it) },
             prev = prev?.let { PrevSeats<Party, Int>(partyChanges).apply(it) },
             swing = swing?.let { Swing<Party>(partyChanges).apply(it) },
-            majority = majorityLine?.let { MajorityLine().apply(it) },
+            winningLine = winningLine?.let { WinningLine().apply(it) },
             partyClassification = null,
             map = map,
             secondMap = null,
@@ -646,35 +648,43 @@ class SeatViewPanel private constructor(
         internal val rangeOrDefault by lazy { range ?: 0.1.asOneTimePublisher() }
     }
 
-    class MajorityLine internal constructor() {
+    class WinningLine internal constructor() {
         var show: Flow.Publisher<out Boolean>? = null
-        lateinit var display: (Int) -> String
+        internal val linesFromTotal: MutableList<((Int) -> Line)> = ArrayList()
 
-        internal fun lines(total: Flow.Publisher<Int>): BarFrameBuilder.Lines<Int> {
-            val lines = if (show == null) {
-                total.map { t -> listOf(t / 2 + 1) }
-            } else {
-                show!!.merge(total) { s, t ->
-                    if (s) {
-                        listOf(t / 2 + 1)
-                    } else {
-                        emptyList()
-                    }
-                }
-            }
-            return BarFrameBuilder.Lines.of(lines, display)
+        fun majority(display: (Int) -> String) = proportion({ total -> total / 2 + 1 }, display)
+
+        fun twoThirds(display: (Int) -> String) = proportion({ total -> (total - 1) * 2 / 3 + 1 }, display)
+
+        fun threeFifths(display: (Int) -> String) = proportion({ total -> (total - 1) * 3 / 5 + 1 }, display)
+
+        fun proportion(fromTotal: (Int) -> Int, display: (Int) -> String) {
+            this.linesFromTotal.add { total -> fromTotal(total).let { Line(it, display(it)) } }
         }
 
-        internal fun altText(total: Flow.Publisher<Int>): Flow.Publisher<String?> = if (show == null) {
-            total.map { display(it / 2 + 1) }
-        } else {
-            show!!.compose { maj ->
-                if (maj) {
-                    total.map { display(it / 2 + 1) }
+        internal class Line(val value: Int, val display: String)
+
+        internal fun linesToDisplay(total: Flow.Publisher<Int>): Flow.Publisher<List<Line>> = total.map { t -> linesFromTotal.map { it(t) } }
+            .run {
+                if (show == null) {
+                    this
                 } else {
-                    null.asOneTimePublisher()
+                    merge(show!!) { l, s -> if (s) l else emptyList() }
                 }
             }
+
+        internal fun lines(total: Flow.Publisher<Int>): BarFrameBuilder.Lines<Line> = BarFrameBuilder.Lines.of(linesToDisplay(total), { display }, { value })
+
+        internal fun altText(total: Flow.Publisher<Int>): Flow.Publisher<out String?> {
+            val lines = total.map { t -> linesFromTotal.map { it(t).display } }
+                .run {
+                    if (show == null) {
+                        this
+                    } else {
+                        merge(show!!) { l, s -> if (s) l else null }
+                    }
+                }
+            return lines.map { if (it == null || it.isEmpty()) null else it.joinToString("\n") }
         }
     }
 
@@ -722,7 +732,7 @@ class SeatViewPanel private constructor(
         private val diff: SeatDiff<KPT, CT>?,
         private val prev: PrevSeats<KPT, PT>?,
         private val swing: Swing<KPT>?,
-        private val majority: MajorityLine?,
+        private val winningLine: WinningLine?,
         private val partyClassification: PartyClassification<KPT>?,
         private val map: AbstractMap<*>?,
         private val secondMap: AbstractMap<*>?,
@@ -817,7 +827,11 @@ class SeatViewPanel private constructor(
             val bars = currEntries.merge(forceSingleLine) { c, sl ->
                 c.map { seatTemplate.createBar(keyTemplate.toMainBarHeader(it.key, sl), keyTemplate.toParty(it.key).color, it.value, if (it.result == Result.WINNER) keyTemplate.winnerShape(sl) else null) }
             }
-            val max = current.totalSeats?.let { t -> t.map { it * 2 / 3 } }
+            val max = current.totalSeats?.let { totalSeats ->
+                winningLine?.let { line ->
+                    line.linesToDisplay(totalSeats).merge(totalSeats) { l, t -> ((l.maxOfOrNull { it.value } ?: 0) * 1.2).roundToInt().coerceAtLeast(t * 2 / 3) }
+                } ?: totalSeats.map { it * 2 / 3 }
+            }
             return createBarFrame(
                 BarFrameArgs(
                     bars = bars,
@@ -826,7 +840,7 @@ class SeatViewPanel private constructor(
                     subhead = current.subhead,
                     notes = current.notes,
                     limits = max?.map { BarFrameBuilder.Limit(max = it) },
-                    lines = majority?.lines(current.totalSeats!!),
+                    lines = winningLine?.lines(current.totalSeats!!),
                 ),
             )
         }
@@ -842,7 +856,7 @@ class SeatViewPanel private constructor(
                         bars = bars,
                         header = classificationHeader,
                         limits = max?.map { BarFrameBuilder.Limit(max = it) },
-                        lines = majority?.lines(current.totalSeats!!),
+                        lines = winningLine?.lines(current.totalSeats!!),
                     ),
                 )
             }
@@ -897,10 +911,10 @@ class SeatViewPanel private constructor(
                     }
                 }
             }
-            val prevMajority = majority?.let { maj ->
-                MajorityLine().apply {
+            val prevWinningLine = winningLine?.let { maj ->
+                WinningLine().apply {
                     show = if (maj.show == null) showPrevRaw else maj.show!!.merge(showPrevRaw) { sm, sr -> sm && sr }
-                    display = maj.display
+                    linesFromTotal.addAll(maj.linesFromTotal)
                 }
             }
             return change?.let { change ->
@@ -912,7 +926,7 @@ class SeatViewPanel private constructor(
                         subhead = change.subhead,
                         notes = change.notes,
                         limits = limit,
-                        lines = prevMajority?.lines(prevTotal),
+                        lines = prevWinningLine?.lines(prevTotal),
                     ),
                 )
             }
@@ -999,7 +1013,7 @@ class SeatViewPanel private constructor(
                 }
             }
 
-            val majorityText: Flow.Publisher<String?> = majority?.altText(current.totalSeats!!)
+            val winningLineText: Flow.Publisher<out String?> = winningLine?.altText(current.totalSeats!!)
                 ?: null.asOneTimePublisher()
             val swingText: Flow.Publisher<out String?> =
                 createSwingFrame()?.altText?.merge(this.swing!!.header) { text, head ->
@@ -1020,15 +1034,15 @@ class SeatViewPanel private constructor(
                     val prevLines = prevEntries!!.map { entries ->
                         entries.joinToString("") { "\n${it.key.abbreviation}: ${seatTemplate.prevLabelText(it.value)}" }
                     }
-                    if (majority == null) return@compose prevLines
-                    val majorityLines = majority.altText(prevTotal)
-                    prevLines.merge(majorityLines) { p, m -> p + (if (m == null) "" else "\n$m") }
+                    if (winningLine == null) return@compose prevLines
+                    val winningLines = winningLine.altText(prevTotal)
+                    prevLines.merge(winningLines) { p, m -> p + (if (m == null) "" else "\n$m") }
                 }.merge(prevRawHeader) { text, head -> if (text == null) null else (head + text) }
             }
             return mainText.merge(changeText) { main, change -> main + (if (change == null) "" else " ($change)") }
                 .merge(textHeader) { second, head -> if (head == null) second else "$head\n\n$second" }
                 .merge(barsText) { first, next -> first + next }
-                .merge(majorityText) { text, maj -> text + (maj?.let { "\n$it" } ?: "") }
+                .merge(winningLineText) { text, maj -> text + (maj?.let { "\n$it" } ?: "") }
                 .merge(classificationText) { text, cl -> text + (cl?.let { "\n\n$it" } ?: "") }
                 .merge(prevRawText) { text, cl -> text + (cl?.let { "\n\n$it" } ?: "") }
                 .merge(swingText) { text, swing -> text + (swing?.let { "\n\n$it" } ?: "") }
